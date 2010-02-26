@@ -1,0 +1,1 @@
+java -server -mx256M -Dtinker.dir=$TINKER -Djava.library.path=$FFEHOME -jar $FFEHOME/ffe.jar

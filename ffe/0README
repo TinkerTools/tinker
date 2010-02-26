@@ -1,0 +1,16 @@
+
+                 ---------------------------------------------
+                 Force Field Explorer -- a Java GUI for TINKER
+                 ---------------------------------------------
+
+     This subdirectory contains Force Field Explorer, which is a Java GUI
+     for the TINKER package. The ffe.jar file is the main Java jar file
+     with source. The supplied shared libraries, libffe.so, ffe.dll and
+     libffe.jnilib are for Linux, Windows and Mac OS X systems. These
+     libraries are built via the shared.make and dll.bat scripts, which
+     contain the  necessary commands for the GNU gcc and other compilers.
+     The ffe and ffe.bat scripts contains the typical commands to start
+     the GUI. In order to run Force Field Explorer, Java 1.5 and Java3D
+     must first be installed. Further information about FFE is available
+     at http://dasher.wustl.edu/ffe/.
+

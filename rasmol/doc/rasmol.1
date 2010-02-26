@@ -1,0 +1,2003 @@
+.PU
+.TH RASMOL 1 "October 1994"
+.SH NAME
+rasmol \- Molecular Graphics Visualisation Tool v2.5
+
+.SH SYNOPSIS
+.B rasmol
+.RB "[\|" \-nodiplay "\|]"
+.RB "[\|\&[\|" "\-"\c
+.I "format"\c
+.RB "\|]"
+.I filename\c
+\&\|]
+.RB "[\|" "\-script "\c
+.I scriptfile\c
+\&\|]
+
+.SH FORMATS
+.PD 0
+.TP 12
+.B \-pdb
+Brookhaven Protein Databank
+.TP
+.B \-mdl
+MDL's MOL File Format
+.TP
+.B \-mol2
+Tripos' Sybyl MOL2 Format
+.TP
+.B \-xyz
+MSC's XYZ (XMol) Format
+.TP
+.B \-alchemy
+Alchemy File Format
+.TP
+.B \-charmm
+CHARMm File Format
+.PD
+.SH DESCRIPTION
+RasMol2 is a molecular graphics program intended for the visualisation of
+proteins, nucleic acids and small molecules. The program is aimed at
+display, teaching and generation of publication quality images. RasMol
+runs on Microsoft Windows, Apple Macintosh, UNIX and VMS systems. The
+UNIX and VMS systems require an 8, 24 or 32 bit colour X Windows display
+(X11R4 or later). The program reads in a molecule co-ordinate file and
+interactively displays the molecule on the screen in a variety of colour
+schemes and molecule representations. Currently available representations
+include depth-cued wireframes, 'Dreiding' sticks, spacefilling (CPK) spheres,
+ball and stick, solid and strand biomolecular ribbons, atom labels and dot
+surfaces.
+
+.SH COMMANDS
+RasMol allows the execution of interactive commands typed at the
+.B RasMol>
+prompt in the terminal window. Each command must be given on
+a separate line. Keywords are case insensitive and may be entered in
+either upper or lower case letters. All whitespace characters are
+ignored except to separate keywords and their arguments.
+
+The commands/keywords currently recognised by RasMol are given below.
+
+.TP
+.B Backbone
+The RasMol
+.B backbone
+command permits the representation of a polypeptide
+backbone as a series of bonds connecting the adjacent alpha carbons of
+each amino acid in a chain. The display of these backbone `bonds' is
+turned on and off by the command paramater the same as the
+.B wireframe
+command. The command
+.B backbone off
+turns off the selected `bonds', and
+.B backbone on
+or with a number turns them on. The number can be used
+to specify the cylinder radius of the representation in either angstrom
+or rasmol units. A parameter value of 500 (2.0 angstroms) or above
+results in a "Parameter value too large" error. Backbone objects may be
+coloured using the RasMol
+.B colour backbone
+command.
+
+.TP
+.B Background
+The RasMol
+.B background
+command is used to set the colour of the "canvas" background. The
+colour may be given as either a colour name or a comma separated
+triple of Red, Green and Blue (RGB) components enclosed in square
+brackets. Typing the command
+.B help colours
+will give a list of the predefined colour names recognised by RasMol.
+When running under X Windows, RasMol also recognises colours in the
+X server's colour name database.
+
+The
+.B background
+command is synonymous with the RasMol
+.B set background
+command.
+
+.TP
+.B Centre
+The RasMol
+.B centre
+command defines the point about which the
+.B rotate
+command and the scroll bars rotate the current molecule. Without a
+parameter the centre command resets the centre of rotation to be the
+centre of gravity of the molecule. If an atom expression is specified,
+RasMol rotates the molecule about the centre of gravity of the set of
+atoms specified by the expression. Hence, if a single atom is specified
+by the expression, that atom will remain `stationary' during rotations.
+
+Type
+.B help expression
+for more information on RasMol atom expressions.
+
+.TP
+.B Clipboard
+The RasMol
+.B clipboard
+command places a copy of the currently displayed image on the local
+graphics `clipboard'. Note: this command is not yet supported on
+UNIX or VMS machines. It is intended to make transfering images
+between applications easier under Microsoft Windows or on an Apple
+Macintosh.
+
+When using RasMol on a UNIX or VMS system this functionality may be
+achieved by generating a raster image in a format that can be read
+by the receiving program using the RasMol
+.B write
+command.
+
+.TP
+.B Colour
+Colour the atoms (or other objects) of the selected region. The colour may
+be given as either a colour name or a comma separated triple of Red, Green
+and Blue (RGB) components enclosed in square brackets. Typing the command
+.B help colours
+will give a list of all the predefined colour names recognised
+by RasMol.
+
+Allowed objects are
+.B atoms,
+.B bonds,
+.B backbone,
+.B ribbons
+.B labels
+.B dots,
+.B hbonds,
+and
+.B ssbonds.
+If no object is specified, the default keyword
+.B atom
+is assumed.
+Some colour schemes are defined for certain object types. The colour scheme
+.B none
+can be applied all objects accept atoms and dots, stating that the selected
+objects have no colour of their own, but use the colour of their associated
+atoms (i.e. the atoms they connect).
+.B Atom
+objects can also be coloured by
+.B cpk,
+.B amino,
+.B chain,
+.B group,
+.B shapely,
+.B structure,
+.B temperature
+.B charge
+and
+.B user. Hydrogen bonds can also be coloured by
+.B type
+and dot surfaces can also be coloured by
+.B electrostatic potential.
+For more information type
+.B help colour <colour>.
+
+.TP
+.B Connect
+The RasMol
+.B connect
+command is used to force RasMol to (re)calculate the connectivity
+of the current molecule. If the original input file contained
+connectivity information, this is discarded. The command
+.B connect false
+uses an extremely fast heuristic algorithmm that is suitable for
+determing bonding in large bio-molecules such as proteins and
+nucleic acids.  The command
+.B connect true
+uses a slower more accurate algorithm based upon covalent radii
+that is more suitable for small molecules containing inorganic
+elements or strained rings. If no parameters are given, RasMol
+determines which algorithm to use based on the number of atoms
+in the file. Greater than 255 atoms causes RasMol to use the
+faster implementation. This is the method used to determine
+bonding, if necessary, when a molecule is first read in using
+the
+.B load
+command.
+
+.TP
+.B Define
+The RasMol
+.B define
+command allows the user to associate an arbitrary set of atoms with a
+unique identifier. This allows the definition of user-defined sets. These
+sets are declared statically, i.e. once defined the contents of the set
+do not change, even if the expression defining them depends on the
+current transformation and representation of the molecule.
+
+.TP
+.B Dots
+The RasMol
+.B dots
+command is used to generate a Van der Waal's dot surface around the
+currently selected atoms. Dot surfaces display regularly spaced points
+on a sphere of Van der Waals' radius about each selected atom. Dots that
+would are `buried' within the Van der Waal's radius of any other atom
+(selected or not) are not displayed.
+The command
+.B dots on
+deletes any existing dot surface and generates a dots surface around
+the currently selected atom set with a default dot density of 100. The
+command
+.B dots off
+deletes any existing dot surface. The dot density may be
+specified by providing a numeric parameter between 1 and 1000. This
+value approximately corresponds to the number of dots on the surface
+of a medium sized atom.
+
+By default, the colour of each point on a dot surface is the colour
+of it's closest atom at the time the surface is generated. The colour
+of the whole dot surface may be changed using the
+.B colour dots
+command.
+
+.TP
+.B Echo
+The RasMol
+.B echo
+command is used to display a message in the RasMol command/terminal
+window. The string parameter may optionally be delimited in double
+quote characters. If no parameter is specified, the
+.B echo
+command displays a blank line. This command is particularly useful
+for displaying text from within a RasMol
+.B script
+file.
+
+.TP
+.B HBonds
+The RasMol
+.B hbond
+command is used to represent the hydrogen bonding of the protein
+molecule's backbone. This information is useful in assessing the
+protein's secondary structure. Hydrogen bonds are represented as
+either dotted lines or cylinders between the donor and acceptor
+residues. The first time the
+.B hbond
+command is used, the program searches the structure of the
+molecule to find hydrogen bonded residues and reports the number of bonds
+to the user. The command
+.B hbonds on
+displays the selected `bonds' as dotted lines, and the
+.B hbonds off
+turns off their display. The colour of hbond objects may be changed
+by the
+.B colour hbond
+command. Initially, each hydrogen bond has the colours of its connected
+atoms.
+
+By default the dotted lines are drawn between the accepting oxygen and
+the donating nitrogen. By using the
+.B set hbonds
+command the alpha carbon positions of the appropriate residues may be
+used instead. This is especially useful when examining proteins in
+backbone representation.
+
+.TP
+.B Help
+The RasMol
+.B help
+command provides on-line help on the given topic.
+
+.TP
+.B Label
+The RasMol
+.B label
+command allows an arbitrary formatted text string to be
+associated with each currently selected atom.  This string may contain
+embedded `expansion specifiers' which display properties of the atom
+being labelled. An expansion specifier consists of a `%' character
+followed by a single alphabetic character specifying the property to be
+displayed.
+An actual '%' character may be displayed by using the expansion
+specifier `%%'.
+
+Atom labelling for the currently selected atoms may be turned off with
+the command
+.B label off.
+By default, if no string is given as a parameter RasMol uses labels
+appropriate for the current molecule.
+
+The colour of each label may be changed using the
+.B colour label
+command. By default, each label is drawn in the same colour as the atom
+to which it is attached. The size of the displayed text may be changed
+using the
+.B set fontsize
+command.
+
+.TP
+.B Load
+Load a molecule co-ordinate file into RasMol2. Valid molecule file
+formats are
+.B pdb
+(Brookhaven Protein Databank),
+.B mdl
+(Molecular Design Limited's MOL file format),
+.B alchemy
+(Tripos' Alchemy file format),
+.B mol2
+(Tripos' Sybyl Mol2 file format),
+.B charmm
+(CHARMm file format) or
+.B xyz
+(MSC's XMol XYZ file format). If no file format is specified,
+.B pdb
+is assumed by default. Only a single molecule may be loaded at a time.
+To delete a molecule prior to loading another use the RasMol
+.B zap
+command.
+
+The
+.B load
+command selects all the atoms in the molecule, centres it on the
+screen and renders it as a CPK coloured wireframe model. If the molecule
+contains no bonds (i.e. contains only alpha carbons), it is drawn as
+an alpha carbon backbone. If the file specifies less bonds than atoms,
+RasMol determines connectivity using the
+.B connect
+command.
+
+.TP
+.B Print
+The RasMol
+.B print
+command sends the currently displayed image to the local default printer
+using the operating system's native printer driver. Note: this command
+is not yet supported under UNIX or VMS. It is intended to take advantage
+of Microsoft Windows and Apple Macintosh printer drivers. For example,
+allowing images to be printed directly on a dot matrix printer.
+
+When using RasMol on a UNIX or VMS system this functionality may be
+achieved by either generating a PostScript file using the RasMol
+.B write ps
+or
+.B write vectps
+commands and printing that or generating a raster image file and using a
+utility to dump that to the local printer.
+
+.TP
+.B Quit
+Exit from the RasMol program. The RasMol commands
+.B exit
+and
+.B quit
+are synonymous.
+
+.TP
+.B Renumber
+The RasMol
+.B renumber
+command sequentially numbers the residues in a macromolecular chain.
+The optional parameter specifies the value of the first residue in the
+sequence. By default, this value is one. For proteins,
+each amino acid is numbered consecutively from the N terminus to the C
+terminus. For nucleic acids, each base is numbered from the 5' terminus
+to 3' terminus. All chains in the current database are renumbered and gaps
+in the original sequence are ignored. The starting value for numbering may
+be negative.
+
+.TP
+.B Reset
+The RasMol
+.B reset
+command restores the original viewing transformation
+and centre of rotation. The scale is set to it default value,
+.B zoom 100,
+the centre of rotation is set to the geometric centre of the currently
+loaded molecule,
+.B centre all,
+this centre is translated to the middle of the screen and
+the viewpoint set to the default orientation.
+
+This command should not be mistaken for the RasMol
+.B zap
+command which deletes the currently stored molecule, returning the
+program to its initial state.
+
+.TP
+.B Restrict
+The RasMol
+.B restrict
+command both defines the currently selected region of the
+molecule and disables the representation of (most of) those parts of the
+molecule no longer selected.  All subsequent RasMol commands that modify
+a molecule's colour or representation effect only the currently selected
+region. The parameter of a
+.B restrict
+command is a RasMol atom expression that is evaluated for every atom
+of the current molecule. This command is very similar to the RasMol
+.B select
+command, except restrict disables the
+.B wireframe,
+.B spacefill
+and
+.B backbone
+representations in the non-selected region.
+
+Type "help expression" for more information on RasMol atom expressions.
+
+.TP
+.B Ribbons
+The RasMol
+.B ribbons
+command displays the currently loaded protein or nucleic acid as a
+smooth solid "ribbon" surface passing along the backbone of the protein.
+The ribbon is drawn between each amino acid whose alpha carbon is
+currently selected. The colour of the ribbon is changed by the RasMol
+.B colour ribbon
+command. If the current ribbon colour is
+.B none
+(the default), the colour is taken from the alpha carbon at each
+position along its length.
+
+The width of the ribbon at each position is determined by the optional
+parameter in the usual RasMol units. By default the width of the ribbon
+is taken from the secondary structure of the protein or a constant value
+of 720 (2.88 Angstroms) for nucleic acids.
+The default width of protein alpha helices and beta sheets is 380 (1.52
+Angstroms) and 100 (0.4 Angstroms) for turns and random coil. The
+secondary structure assignment is either from the PDB file or calculated
+using the DSSP algorithm as used by the
+.B structure
+command. This command is similar to the RasMol command
+.B strands
+which renders the biomolecular ribbon as parallel depth-cued curves.
+
+.TP
+.B Rotate
+Rotate the molecule about the specified axis.
+Permited values for the axis parameter are
+"x", "y" and "z".
+The integer parameter states the angle in degrees for the structure to
+be rotated. For the X and Y axes, positive values move the closest point
+up and right, and negative values move it down and left respectively. For
+the Z axis, a positive rotation acts clockwise and a negative angle
+anti-clockwise.
+
+.TP
+.B Save
+Save the currently selected set of atoms in either a Brookhaven Protein
+Database (PDB) or Alchemy(tm) format file.
+The distinction between this command and the RasMol
+.B write
+command has been dropped. The only difference is that without a format
+specifier the
+.B save
+command generates a
+.B PDB
+file and the
+.B write
+command generates a
+.B GIF
+image.
+
+.TP
+.B Script
+The RasMol
+.B script
+command reads a set of RasMol commands sequentially from a
+text file and executes them. This allows sequences of commonly used
+commands to be stored and performed by single command. A RasMol script
+file may contain a further script command up to a maximum "depth" of 10,
+allowing compilicated sequences of actions to be executed. RasMol
+ignores all characters after the first '#' character on each line
+allowing the scripts to be annotated. Script files are often also
+annotated using the RasMol
+.B echo
+command.
+
+The most common way to generate a RasMol script file is to use the
+.B write script
+or
+.B write rasmol
+commands to output the sequence of commands that are needed to
+regenerate the current view, representation and colouring of the
+currently displayed molecule.
+
+The RasMol command
+.B source
+is synonymous with the
+.B script
+command.
+
+.TP
+.B Select
+Define the currently selected region of the molecule. All subsequent RasMol
+commands that manipulate a molecule or modify its colour or representation,
+only effects the currently selected region. The parameter of a
+.B select
+command is a RasMol expression that is evaluated for every atom of the
+current molecule. The currently selected (active) region of the molecule
+are those atoms that cause the expression to evaluate true. To select
+the whole molecule use the RasMol command
+.B select all.
+The behaviour of the
+.B select
+command without any parameters is determined by the RasMol
+.B hetero
+and
+.B hydrogen
+parameters.
+
+Type "help expression" for more information on RasMol atom expressions.
+
+.TP
+.B Set
+The RasMol
+.B set
+command allows the user to alter various internal program parameters
+such as those controlling rendering options. Each parameter has its
+own set or permissible parameter options. Typically, ommiting the
+paramter option resets that parameter to its default value. A list of
+valid parameter names is given below.
+
+.TP
+.B Show
+The RasMol
+.B show
+command display details of the status of the currently
+loaded molecule. The command
+.B show information
+lists the molecule's name,
+classification, PDB code and the number of atoms, chains, groups it contains.
+If hydrogen bonding, disulphide bridges or secondary structure have been
+determined, the number of hbonds, ssbonds, helices, ladders and turns
+are also displayed respectively. The command
+.B show sequence
+lists the residues that compose each chain of the molecule.
+
+.TP
+.B Slab
+The RasMol
+.B slab
+command enables, disables or positions the z-clipping plane of the
+molecule. The program only draws those portions of the
+molecule that are further from the viewer than the slabbing plane.
+Values range  from zero at the very back of the molecule to
+100 which is completely in front of the molecule. Intermediate values
+determine the percentage of the molecule to be drawn.
+
+.TP
+.B Spacefill
+The RasMol
+.B spacefill
+command is used to represent all of the currently selected atoms as solid
+spheres. This command is used to produce both union-of-spheres and
+ball-and-stick models of a molecule. The command,
+.B spacefilll true,
+the default, represents each atom as a sphere of Van der Waals radius.
+The command
+.B spacefill off
+turns off the representation of the selected atom as spheres. A sphere
+radius may be specified as an integer in RasMol units (1/250th Angstrom)
+or a value containing a decimal point. A value of 500 (2.0
+Angstroms) or greater results in a "Parameter value too large" error.
+
+The
+.B temperature
+option sets the radius of each sphere to the value stored in its temperature
+field. Zero or negative values causes have no effect and values greater than
+2.0 are truncated to 2. The
+.B user
+option allows the radius of each spheres to be specified by additional lines
+in the molecule's PDB file using Raster 3D's COLOR record extension.
+
+The RasMol command
+.B cpk
+is synonymous with the
+.B spacefill
+command.
+
+.TP
+.B SSBonds
+The RasMol
+.B ssbonds
+command is used to represent the disulphide bridges of the protein
+molecule as either dotted lines or cylinders between the connected
+cysteines. The first time that the
+.B ssbonds
+command is used, the program searches the structure of the protein to
+find half-cysteine pairs (cysteines whose sulphurs are within 3 angstroms
+of each other) and reports the number of bridges to the user. The command
+.B ssbonds on
+displays the selected `bonds' as dotted lines, and the command
+.B ssbonds off
+disables the display of ssbonds in the currently selected area. Selection
+of disulphide bridges is identical to normal bonds, and may be adjusted
+using the RasMol
+.B set bondmode
+command. The colour of disulphide bonds may be changed using the
+.B colour ssbonds
+command. By default, each disulphide bond has the colours of its connected
+atoms.
+
+By default disulphide bonds are drawn between the sulphur atoms within
+the cysteine groups. By using the
+.B set ssbonds
+command the position of the cysteine's alpha carbons may be used instead.
+
+.TP
+.B Strands
+The RasMol
+.B strands
+command displays the currently loaded protein or nucleic acid as a
+smooth "ribbon" of depth-cued curves passing along the backbone of the
+protein. The ribbon is composed of a number of strands that run parallel
+to one another along the peptide plane of each residue. The ribbon is
+drawn between each amino acid whose alpha carbon is currently selected.
+The colour of the ribbon is changed by the RasMol
+.B colour ribbon
+command. If the current ribbon colour is
+.B none
+(the default), the colour is taken from the alpha carbon at each
+position along its length. The colour of the central and outermost
+strands may be coloured independently using the
+.B colour ribbon1
+and
+.B colour ribbon2
+commands respectively. The number of strands in the ribbon may be
+altered using the RasMol
+.B set strands
+command.
+
+The width of the ribbon at each position is determined by the optional
+parameter in the usual RasMol units. By default the width of the ribbon
+is taken from the secondary structure of the protein or a constant value
+of 720 for nucleic acids (which produces a ribbon 2.88 Angstroms wide).
+The default width of protein alpha helices and beta sheets is 380 (1.52
+Angstroms) and 100 (0.4 Angstroms) for turns and random coil. The
+secondary structure assignment is either from the PDB file or calculated
+using the DSSP algorithm as used by the
+.B structure
+command. This command is similar to the RasMol command
+.B ribbons
+which renders the biomolecular ribbon as a smooth shaded surface.
+
+.TP
+.B Structure
+The RasMol
+.B structure
+command calculates secondary structure assignments
+for the currently loaded protein. If the original PDB file contained
+structural assignment records (HELIX and SHEET) these are discarded.
+Initially, the hydrogen bonds of the current molecule are found, if this
+hasn't been done already. The secondary structure is the determined using
+Kabsch and Sander's DSSP algorithm. Once finished the program reports the
+number of helices, strands and turns found.
+
+.TP
+.B Translate
+The RasMol
+.B translate
+command moves the position of the centre of the molecule on the
+screen. The axis parameter specifies along which axis the molecule
+is to be moved and the integer parameter specifies the absolute
+position of the molecule centre from the middle of the screen.
+Permited values for the axis parameter are
+"x", "y" and "z".
+Displacement values must be between -100 and 100 which correspond to
+moving the current molecule just off the screen. A positive
+"x"
+displacement moves the molecule to the right, and a positive
+"y"
+displacement moves the molecule down the screen. The pair of commands
+.B translate x 0
+and
+.B translate y 0
+centres the molecule on the screen.
+
+.TP
+.B Wireframe
+The RasMol
+.B wireframe
+command represents each bond within the selected region of the molecule
+as either a cylinder, a line or depth-cued vector. The display of bonds
+as depth-cued vectors (drawn darker the further away from the viewer)
+is turned on by the command
+.B wireframe
+or
+.B wireframe on.
+The selected bonds are displayed as cylinders by specifying a radius
+either as an integer in RasMol units or containing a decimal point as
+a value in Angstroms.  A parameter value of 500 (2.0 angstroms) or
+above results in an "Parameter value too large" error. Bonds may be
+coloured using the
+.B colour bonds
+command.
+
+.TP
+.B Write
+Write the current image to a file in a standard raster format. Currently
+supported image file formats include
+.B gif
+(Compuserve GIF),
+.B ppm
+(Portable Pixmap),
+.B ras
+(Sun rasterfile),
+.B ps
+and
+.B epsf
+(Encapsulated PostScript),
+.B monops
+(Monochrome Encapsulated PostScript),
+.B bmp
+(Microsoft bitmap) and
+.B pict
+(Apple PICT). The
+.B write
+command may also be used to generate command scripts for other graphics
+programs. The format
+.B script
+writes out a file containing the RasMol
+.B script
+commands to reproduce the current image. The format
+.B molscript
+writes out the commands required to render the current view of the
+molecule as ribbons in Per Kraulis' Molscript program and the format
+.B kinemage
+the commands for David Richardson's program Mage.
+
+The distinction between this command and the RasMol
+.B save
+command has been dropped. The only difference is that without a format
+specifier the
+.B save
+command generates a
+.B PDB
+file and the
+.B write
+command generates a
+.B GIF
+image.
+
+.TP
+.B Zap
+Deletes the contents of the current database and resets parameter
+variables to their initial default state.
+
+.TP
+.B Zoom
+Change the magnification of the currently displayed image. Boolean
+parameters either magnify or reset the scale of current molecule. An
+integer parameter between 10 and 200 specifies the desired magnification
+as a percentage of the default scale.
+
+.SH SET PARAMETERS
+RasMol has a number of internal parameters that may be modified using the
+.B set
+command. These parameters control a number of program options such as
+rendering options and mouse button mappings.
+
+.TP
+.B Set Ambient
+The RasMol
+.B ambient
+parameter is used to control the amount of ambient (or surrounding)
+light in the scene. The
+.B ambient
+value must be between 0 and 100 that controls the percentage intensity
+of the darkest shade of an object. For a solid object, this is the
+intensity of surfaces facing away from the light source or in shadow.
+For depth-cued objects this is the intensity of objects furthest from
+the viewer.
+
+This parameter is commonly used to correct for monitors with different
+"gamma values" (brightness), to change how light or dark a hardcopy
+image appears when printed or to alter the feeling of depth for
+wireframe or ribbon representations.
+
+.TP
+.B Set Axes
+The RasMol
+.B axes
+parameter controls the display of orthogonal co-ordinate axes on
+the current display. The co-ordinate axes are those used in the
+molecule data file, and the origin is the centre of the molecule's
+bounding box. The
+.B set axes
+command is similar the the commands
+.B set boundbox
+and
+.B set unitcell
+that display the bounding box and the crystallographic unit cell
+respectively.
+
+.TP
+.B Set Background
+The RasMol
+.B background
+parameter is used to set the colour of the "canvas" background. The
+colour may be given as either a colour name or a comma separated
+triple of Red, Green, Blue (RGB) components enclosed in square
+brackets. Typing the command
+.B help colours
+will give a list of the predefined colour names recognised by RasMol.
+When running under X Windows, RasMol also recognises colours in the
+X server's colour name database.
+
+The command
+.B set background
+is synonymous with the RasMol command
+.B background.
+
+.TP
+.B Set BondMode
+The RasMol
+.B set bondmode
+command controls the mechanism used to select individual bonds. When
+using the
+.B select
+and
+.B restrict
+commands, a given bond will be selected if i) the bondmode is
+.B or
+and either of the connected atoms is selected, or ii) the bondmode is
+.B and
+and both atoms connected by the bond are selected. Hence an individual
+bond may be uniquely identified by using the command
+.B set bondmode and
+and then uniquely selecting the atoms at both ends.
+
+.TP
+.B Set BoundBox
+The RasMol
+.B boundbox
+parameter controls the display of the current molecules bounding box
+on the display. The bounding box is orthogonal to the data file's
+original co-ordinate axes. The
+.B set boundbox
+command is similar the the commands
+.B set axes
+and
+.B set unitcell
+that display orthogonal co-ordinate axes and the bounding box
+respectively.
+
+.TP
+.B Set Display
+This command controls the display mode within RasMol. By default,
+.B set display normal,
+RasMol displays the molecule in the representation specified by the
+user. The command
+.B set display selected
+changes the display mode such that the molecule is temporarily drawn
+so as to indicate currently selected portion of the molecule. The
+user specified colour scheme and representation remains unchanged.
+In this representation all selected atoms are shown in yellow and
+all non selected atoms are shown in blue. The colour of the background
+is also changed to a dark grey to indicate the change of display mode.
+This command is typically only used by external Graphical User
+Interfaces (GUIs).
+
+.TP
+.B Set HBonds
+The RasMol
+.B hbonds
+parameter determines whether hydrogen bonds are drawn between
+the donor and acceptor atoms of the hydrogen bond,
+.B set hbonds sidechain
+or between the alpha carbon atoms of the protein backbone and between
+the phosphorous atoms of the nucleic acid backbone,
+.B set hbonds backbone.
+The actual display of hydrogen bonds is controlled by the
+.B hbonds
+command. Drawing hydrogen bonds between protein alpha carbons or
+nucleic acid phosphorous atoms is useful when the rest of the molecule
+is shown in only a schematic representation such as
+.B backbone,
+.B ribbons
+or
+.B strands.
+his parameter is similar to the RasMol
+.B ssbonds
+parameter.
+
+.TP
+.B Set FontSize
+The RasMol
+.B set fontsize
+command is used to control the size of the characters that
+form atom labels. This value corresponds to the height of
+the displayed character in pixels. The maximum value of
+.B fontsize
+is 32 pixels, and the default value is 8 pixels high. To
+display atom labels on the screen use the RasMol
+.B label
+command and to change the colour of displayed labels, use
+the
+.B colour labels
+command.
+
+.TP
+.B Set Hetero
+The RasMol
+.B hetero
+parameter is used to modify the `default' behaviour of the RasMol
+.B select
+command, i.e. the behaviour of
+.B select
+without any parameters. When this value is
+.B false,
+the default
+.B select
+region does not include an heterogenous atoms (refer to the
+predefined set
+.B hetero
+). When this value is
+.B true,
+the default
+.B select
+region may contain hetero atoms. This parameter is similar to
+the RasMol
+.B hydrogen
+parameter which determines whether hydrogen atoms should be
+included in the default set. If both
+.B hetero
+and
+.B hydrogen
+are
+.B true,
+.B select
+without any parameters is equivalent to
+.B select all.
+
+.TP
+.B Set HourGlass
+The RasMol
+.B hourglass
+parameter allows the user to enable and disable the use of the `hour
+glass' cursor used by RasMol to indicate that the program is currently
+busy drawing the next frame. The command
+.B set hourglass on
+enable the indicator, whilst
+.B set hourglass off
+prevents RasMol from changing the cursor. This is useful when spinning
+the molecule, running a sequence of commands from a script file or
+using interprocess communication to execute complex sequences of
+commands. In these cases a `flashing' cursor may be distracting.
+
+.TP
+.B Set Hydrogen
+The RasMol
+.B hydrogen
+parameter is used to modify the `default' behaviour of the RasMol
+.B select
+command, i.e. the behaviour of
+.B select
+without any parameters. When this value is
+.B false,
+the default
+.B select
+region does not include any hydrogen or deuterium atoms (refer
+to the predefined set
+.B hydrogen
+). When this value is
+.B true,
+the default
+.B select
+region may contain hydrogen atoms. This parameter is similar to
+the RasMol
+.B hetero
+parameter which determines whether heterogenous atoms should be
+included in the default set. If both
+.B hydrogen
+and
+.B hetero
+are
+.B true,
+.B select
+without any parameters is equivalent to
+.B select all.
+
+.TP
+.B Set Kinemage
+The RasMol
+.B set kinemage
+command controls the amount of detail stored in a Kinemage output
+file generated by the RasMol
+.B write kinemage
+command. The output kinemage files are intended to be displayed by
+David Richardson's Mage program.
+.B set kinemage false,
+the default, only stores the currently displayed representation in
+the generated output file. The command
+.B set kinemage true,
+generates a more complex Kinemage that contains both the wireframe
+and backbone representations as well as the co-ordinate axes,
+bounding box and crystal unit cell.
+
+.TP
+.B Set Menus
+The RasMol
+.B set menus
+command enables the canvas window's menu buttons or menu bar. This
+command is typically only used by graphical user interfaces or to
+create as large as image as possible when using Microsoft Windows.
+
+.TP
+.B Set Mouse
+The RasMol
+.B set mouse
+command sets the rotation, translation, scaling and zooming mouse
+bindings. The default value is
+.B rasmol
+which is suitable for two button mice (for three button mice the
+second and third buttons are synonymous); X-Y rotation is controlled
+by the first button, and X-Y translation by the second. Additional
+functions are controlled by holding a modifier key on the keyboard.
+[Shift] and the first button performs scaling, [shift] and the second
+button performs Z-rotation, and [control] and the first mouse button
+controls the clipping plane. The
+.B insight
+and
+.B quanta
+provide the same mouse bindings as other packages for experienced
+users.
+
+.TP
+.B Set Radius
+The RasMol
+.B set radius
+command is used to alter the behaviour of the RasMol
+.B dots
+command depending upon the value of the
+.B solvent
+parameter.
+When
+.B solvent
+is
+.B true,
+the
+.B radius
+parameter controls whether a true Van der Waal's surface
+is generated by the
+.B dots
+command. If the value of
+.B radius
+is anything other than zero, that value is used as the
+radius of each atom instead of it true VdW value. When
+the value of
+.B solvent
+is
+.B true,
+this parameter determines the `probe sphere' (solvent) radius.
+The parameter may be given as an integer in rasmol units or
+containing a decimal point in Angstroms. The default value of
+this parameter is determined by the value of
+.B solvent
+and changing
+.B solvent
+resets
+.B radius
+to its new default value.
+
+.TP
+.B Set Shadow
+The RasMol
+.B set shadow
+command enables and disables raytracing of the currently rendered image.
+Currently only the spacefilling representation is shadowed or can cast
+shadows. Enabling shadowing will automatically disable the Z-clipping
+(slabbing) plane using the command
+.B slab off.
+Raytracing typically takes about 10s for a moderately sized protein.
+It is recommended that shadowing is normally disabled whilst the
+molecule is being transformed or manipulated, and only enabled once
+an appropiate viewpoint is selected, to provide a greater impression
+of depth.
+
+.TP
+.B Set SlabMode
+The RasMol
+.B slabmode
+parameter controls the rendering method of objects cut by the
+slabbing (z-clipping) plane. Valid slabmode parameters are
+"reject", "half", "hollow", "solid" and "section".
+
+.TP
+.B Set Solvent
+The RasMol
+.B set solvent
+command is used to control the behaviour of the RasMol
+.B dots
+command. Depending upon the value of the
+.B solvent
+parameter, the
+.B dots
+command either generates a Van der Waal's or a solvent
+acessible surface around the currently selected set of
+atoms. Changing this parameter automatically resets the
+value of the RasMol
+.B radius
+parameter.
+The command
+.B set solvent false,
+the default value, indicates that a Van der Waal's surface
+should be generated and resets the value of
+.B radius
+to zero. The command
+.B set solvent true
+indicates that a `Connolly' or `Richards' solvent
+accessible surface should be drawn and sets the
+.B radius
+parameter, the solvent radius, to 1.2 Angstroms (or 300
+RasMol units).
+
+.TP
+.B Set Specular
+The RasMol
+.B set specular
+command enables and disables the display of specular highlights on
+solid objects drawn by RasMol. Specular highlights appear as white
+reflections of the light source on the surface of the object. The
+current RasMol implementation uses an approximation function to
+generate this highlight.
+
+The specular highlights on the surfaces of solid objects may be
+altered by using the specular reflection coefficient, which is
+altered using the RasMol
+.B set specpower
+command.
+
+.TP
+.B Set SpecPower
+The
+.B specpower
+parameter determines the shininess of solid objects rendered by
+RasMol. This value between 0 and 100 adjusts the reflection
+coeffient used in specular highlight calculations. The specular
+highlights are enabled and disabled by the RasMol
+.B set specular
+command. Values around 20 or 30 produce plastic looking surfaces.
+High values represent more shiny surfaces such as metals, while
+lower values produce more diffuse/dull surfaces.
+
+.TP
+.B Set SSBonds
+The RasMol
+.B ssbonds
+parameter determines whether disulphide bridges are drawn between
+the sulphur atoms in the sidechain (the default) or between the alpha
+carbon atoms in the backbone of the cysteines residues. The actual
+display of disulphide bridges is controlled by the
+.B ssbonds
+command. Drawing disulphide bridges between alpha carbons is useful
+when the rest of the protein is shown in only a schematic
+representation such as
+.B backbone,
+.B ribbons
+or
+.B strands.
+his parameter is similar to the RasMol
+.B hbonds
+parameter.
+
+.TP
+.B Set Strands
+The RasMol
+.B strands
+parameter controls the number of parallel strands that are displayed
+in the ribbon representations of proteins. The permissible values for
+this parameter are 1, 2, 3, 4, 5 and 9. The default value is 5. The
+number of strands is constant for all ribbons being displayed.
+However, the ribbon width (the separation between strands) may be
+controlled on a residue by residue basis using the RasMol
+.B ribbons
+command.
+
+.TP
+.B Set UnitCell
+The RasMol
+.B unitcell
+parameter controls the display of the crystallographic unit cell on
+the current display. The crystal cell is only enabled if the appropriate
+crystal symmetry information is contained in the PDB data file. The
+RasMol command
+.B show symmetry
+display details of the crystal's space group and unit cell axes. The
+.B set unitcell
+command is similar the the commands
+.B set axes
+and
+.B set boundbox
+that display orthogonal co-ordinate axes and the bounding box
+respectively.
+
+.TP
+.B Set VectPS
+The RasMol
+.B vectps
+parameter is use to control the way in which the RasMol
+.B write
+command generates vector PostScript output files. The command
+.B set vectps on
+enables to use of black outlines around spheres and cylinder bonds
+producing `cartoon-like' high resolution output. However, the current
+implementation of RasMol incorrectly cartoons spheres that are intersected
+by more than one other sphere. Hence `ball and stick' models are rendered
+correctly by not large spacefilling spheres models. Cartoon outlines
+can be disabled, the default, by the command
+.B set vectps off
+
+.SH ATOM EXPRESSIONS
+RasMol atom expressions uniquely identify an arbitrary group of atoms
+within a molecule. Atom expressions are composed of either primitive
+expressions,
+predefined sets,
+comparison operators,
+.B within
+expressions,
+or logical (boolean) combinations of the above expression types.
+
+The logical operators allow complex queries to be constructed out of
+simpler ones using the standard boolean connectives
+.B and, or
+and
+.B not.
+These may be abbreviated by the symbols
+"&", "|" and "!"
+respectively. Parentheses (brackets) may be used to alter the
+precedence of the operators. For convenience, a comma may also
+be used for boolean disjunction.
+
+The atom expression is evaluated for each atom, hence
+.B protein and backbone
+selects protein bacbone atoms, not the protein and [nucleic] acid
+backbone atoms!
+
+.TP
+.B Primitive Expressions
+RasMol primitive expressions are the fundamental building blocks
+of atom expressions. There are two types of primitive expression.
+The first type is used to identify a given residue number or range
+of residue numbers. A single residue is identified by its number
+(position in the sequence), and a range is specified by lower and
+upper bounds separated by a hyphen character. For example
+.B select 5,6,7,8
+is also
+.B select 5-8.
+Note that this selects the given residue numbers in all macromolecule
+chains.
+
+The second type of primitive expression specifies a sequence of fields
+that must match for a given atom. The first part specifies a residue
+(or group of residues) and an optional second part specifies the atoms
+within those residues. The first part consists of a residue name,
+optionally followed by a residue number and/or chain identifier.
+The second part consists of a period character followed by an atom
+name.
+An asterisk may be used as a wild card for a whole field and a
+question mark as a single character wildcard.
+
+.TP
+.B Comparison Operators
+Parts of a molecule may also be distinguished using equality,
+inequality and ordering operators on their properties. The format
+of such comparison expression is a property name, followed by a
+comparison operator and then an integer value.
+
+The atom properties that may be used in RasMol are
+.B atomno
+for the atom serial number,
+.B elemno
+for the atom's atomic number (element),
+.B resno
+for the residue number,
+.B radius
+for the spacefill radius in RasMol units (or zero if not represented
+as a sphere) and
+.B temperature
+for the PDB anisotropic temperature value.
+
+The equality operator is denoted either
+"=" or "==".
+The inequality operator as either
+"<>", "!=" or "/=".
+The ordering operators are
+"<"
+for less than,
+"<="
+for less than or equal to,
+">"
+for greater than, and
+">"
+for greater than or equal to.
+
+.TP
+.B Within Expressions
+A RasMol
+.B within
+expression allows atoms to be selected on their proximity to
+another set of atoms. A
+.B within
+expression takes two parameters separated by a comma and surrounded
+by parenthesis. The first argument is an integer value called the
+"cut-off" distance of the within expression and the second argument
+is any  valid atom expression. The cut-off distance is expressed in
+either integer RasMol units or Angstroms containing a decimal point.
+An atom is selected if it is within the cut-off distance of any of
+the atoms defined by the second argument. This allows complex
+expressions to be constructed containing nested
+.B within
+expressions.
+
+For example, the command
+.B select within(3.2,backbone)
+selects any atom within a 3.2 Angstrom radius of any atom in a
+protein or nucleic acid backbone.
+.B Within
+expressions are particularly useful for selecting the atoms
+around an active site.
+
+.TP
+.B Predefined Sets
+RasMol atom expressions may contain predefined sets. These sets
+are single keywords that represent portions of a molecule of interest.
+Predefined sets are often abbreviations primitive atom expressions,
+and in some cases of selecting areas of a molecule that could not
+otherwise be distinguished. A list of the currently predefined sets
+is given below.
+In addition to the sets listed here, RasMol also treats element names
+(and their plurals) as predefined sets containing all atoms of that
+element type, i.e. the command
+.B select oxygen
+is equivalent to the command
+.B select elemno=8.
+
+.SH Predefined Sets
+.TP
+.B AT Set
+This set contains the atoms in the complementary nucleotides
+adenosine and thymidine (A and T respectively). All nucleotides
+are classified as either the set
+.B at
+or the set
+.B cg
+This set is equivalent to the RasMol atom expressions
+.B a,t
+and
+.B nucleic and not cg
+
+.TP
+.B Acidic Set
+The set of acidic amino acids.
+These are the residue types Asp and Glu.
+All amino acids are classified as either
+.B acidic,
+.B basic
+.B or
+.B neutral.
+This set is equivalent to the RasMol atom expressions
+.B asp, glu
+and
+.B amino and not (basic or neutral)
+
+.TP
+.B Acyclic Set
+The set of atoms in amino acids not containing a cycle or
+ring. All amino acids are classified as either
+.B cyclic
+or
+.B acyclic.
+This set is equivalent to the RasMol atom expression
+.B amino and not cyclic
+
+.TP
+.B Aliphatic Set
+This set contains the aliphatic amino acids.
+These are the amino acids Ala, Gly, Ile, Leu and Val.
+This set is equiavlent to the RasMol atom expression
+.B ala, gly, ile, leu, val
+
+.TP
+.B Alpha Set
+The set of alpha carbons in the protein molecule. This set is
+approximately equivalent to the RasMol atom expression
+.B *.CA
+This command should not be confused with the predefined set
+.B helix
+which contains the atoms in the amino acids of the protein's
+alpha helices.
+
+.TP
+.B Amino Set
+This set contains all the atoms contained in amino acid residues.
+This is useful for distinguishing the protein from the nucleic
+acid and heterogenous atoms in the current molecule database.
+
+.TP
+.B Aromatic Set
+The set of atoms in amino acids containing aromatic rings.
+These are the amino acids His, Phe, Trp and Tyr.
+Because they contain aromatic rings all members of this
+set are member of the predefined set
+.B cyclic.
+This set is equivalent to the RasMol atom expressions
+.B his, phe, trp, tyr
+and
+.B cyclic and not pro
+
+.TP
+.B Backbone Set
+This set contains the four atoms of each amino acid that form the
+polypeptide N-C-C-O backbone of proteins, and the atoms the sugar
+phosphate backbone of nucleic acids.
+Use the RasMol predefined sets
+.B protein
+and
+.B nucleic
+to distinguish between the two forms of backbone.
+Atoms in nucleic acids and proteins are either
+.B backbone
+or
+.B sidechain.
+This set is equivalent to the RasMol expression
+.B (protein or nucleic) and not sidechain
+
+The predefined set
+.B mainchain
+is synonymous with the set
+.B backbone.
+
+.TP
+.B Basic Set
+The set of basic amino acids.
+These are the residue types Arg, His and Lys.
+All amino acids are classified as either
+.B acidic,
+.B basic
+or
+.B neutral.
+This set is equivalent to the RasMol atom expressions
+.B arg, his, lys
+and
+.B amino and not (acidic or neutral)
+
+.TP
+.B Bonded Set
+This set contain all the atoms in the current molecule database that
+are bonded to atleast one other atom.
+
+.TP
+.B Buried Set
+This set contains the atoms in those amino acids that tend
+(prefer) to buried inside protein, away from contact with
+solvent molecules. This set refers to the amino acids
+preference and not the actual solvent acessibility for
+the current protein.
+All amino acids are classified as either
+.B surface
+or
+.B buried.
+This set is equivalent to the RasMol atom expression
+.B amino and not surface
+
+.TP
+.B CG Set
+This set contains the atoms in the complementary nucleotides
+cytidine and guanoine (C and G respectively). All nucleotides
+are classified as either the set
+.B at
+or the set
+.B cg
+This set is equivalent to the RasMol atom expressions
+.B c,g
+and
+.B nucleic and not at
+
+.TP
+.B Charged Set
+This set contains the charged amino acids. These are the amino
+acids that are either
+.B acidic
+or
+.B basic.
+Amino acids are classified as being either
+.B charged
+or
+.B neutral.
+This set is equivalent to the RasMol atom expressions
+.B acidic or basic
+and
+.B amino and not neutral
+
+.TP
+.B Cyclic Set
+The set of atoms in amino acids containing a cycle or rings.
+All amino acids are classified as either
+.B cyclic
+or
+.B acyclic.
+This set consists of the amino acids His, Phe, Pro, Trp and Tyr.
+The members of the predefined set
+.B aromatic
+are members of this set.
+The only cyclic but non-aromatic amino acid is proline.
+This set is equivalent to the RasMol atom expressions
+.B his, phe, pro, trp, tyr
+and
+.B aromatic or pro
+and
+.B amino and not acyclic
+
+.TP
+.B Cystine Set
+This set contains the atoms of cysteine residues that form part
+of a disulphide bridge, i.e. half cystines. RasMol automatically
+determines disulphide bridges, if neither the predefined set
+.B cystine
+nor the RasMol
+.B ssbonds
+command have been used since the molecule was loaded. The set of
+free cysteines may be determined using the RasMol atom expression
+.B cys and not cystine
+
+.TP
+.B Helix Set
+This set contains all atoms that form part of a protein alpha
+helix as determined by either the PDB file author or Kabsch and
+Sander's DSSP algorithm. By default, RasMol uses the secondary
+structure determination given in the PDB file if it exists.
+Otherwise, it uses the DSSP algorithm as used by the RasMol
+.B structure
+command.
+
+This predefined set should not be confused with the predefined set
+.B alpha
+which contains the alpha carbon atoms of a protein.
+
+.TP
+.B Hetero Set
+This set contains all the heterogenous atoms in the molecule. These
+are the atoms described by HETATM entries in the PDB file. These
+typically contain water, cofactors and other solvents and ligands. All
+.B hetero
+atoms are classified as either
+.B ligand
+or
+.B solvent
+atoms. These heterogenous
+.B solvent
+atoms are further classified as either
+.B water
+or
+.B ions.
+
+.TP
+.B Hydrogen Set
+This predefined set contains all the hydrogen and deuterium atoms
+of the current molecule. This predefined set is equivalent to the
+RasMol atom expression
+.B elemno=1
+
+.TP
+.B Hydrophobic Set
+This set contains all the hydrophobic amino acids.
+These are the amino acids Ala, Leu, Val, Ile, Pro, Phe, Met and Trp.
+All amino acids are classified as either
+.B hydrophobic
+or
+.B polar.
+This set is equivalent to the RasMol atom expressions
+.B ala, leu, val, ile, pro, phe, met, trp
+and
+.B amino and not polar
+
+.TP
+.B Ions Set
+This set contains all the heterogenous phosphate and sulphate ions in
+the current molecule data file. A large number of these ions are
+sometimes associated with protein and nucleic acid structures determined
+by X-ray crystallography. These atoms tend to clutter an image. All
+.B hetero
+atoms are classified as either
+.B ligand
+or
+.B solvent
+atoms. All
+.B solvent
+atoms are classified as either
+.B water
+or
+.B ions.
+
+.TP
+.B Large Set
+All amino acids are classified as either
+.B small,
+.B medium
+or
+.B large.
+This set is equivalent to the RasMol atom expression
+.B amino and not (small or medium)
+
+.TP
+.B Ligand Set
+This set contains all the heterogenous cofactor and ligand moieties that
+are contained in the current molecule data file. At this set is defined
+to be all
+.B hetero
+atoms that are not
+.B solvent
+atoms. Hence this set is equivalent to the RasMol atom expression
+.B hetero and not solvent
+
+.TP
+.B Medium Set
+All amino acids are classified as either
+.B small,
+.B medium
+or
+.B large.
+This set is equivalent to the RasMol atom expression
+.B amino and not (large or small)
+
+.TP
+.B Neutral Set
+The set of neutral amino acids.
+All amino acids are classified as either
+.B acidic,
+.B basic
+or
+.B neutral.
+This set is equivalent to the RasMol atom expression
+.B amino and not (acidic or basic)
+
+.TP
+.B Nucleic Set
+The set of all atoms in nucleic acids, which consists of the four
+nucleotide bases adenosine, cytidine, guanosine and thymidine (A,
+C, G and T respectively). All neucleotides are classified as either
+.B purine
+or
+.B pyrimidine.
+This set is equivalent to the RasMol atom expressions
+.B a,c,g,t
+and
+.B purine or pyrimidine
+
+.TP
+.B Polar Set
+This set contains the polar amino acids.
+All amino acids are classified as either
+.B hydrophobic
+or
+.B polar.
+This set is equivalent to the RasMol atom expression
+.B amino and not hydrophobic
+
+.TP
+.B Protein Set
+The set of all atoms in proteins. This consists of the RasMol
+predefined set
+.B amino
+and common post-translation modifications.
+
+.TP
+.B Purine Set
+The set of purine nucleotides.
+These are the bases adenosine and guanosine (A and G respectively).
+All nucleotides are either
+.B purines
+or
+.B pyrimidines.
+This set is equivalent to the RasMol atom expressions
+.B a,g
+and
+.B nucleic and not purine
+
+.TP
+.B Pyrimidine Set
+The set of pyrimidine nucleotides.
+These are the bases cytidine and thymidine (C and T respectively).
+All nucleotides are either
+.B purines
+or
+.B pyrimidines.
+This set is equivalent to the RasMol atom expressions
+.B c,t
+and
+.B nucleic and not pyrimidine
+
+.TP
+.B Selected Set
+This set contains the set of atoms in the currently selected
+region. The currently selected region is defined by the preceding
+.B select
+or
+.B restrict
+command and not the atom expression containing the
+.B selected
+keyword.
+
+.TP
+.B Sheet Set
+This set contains all atoms that form part of a protein beta
+sheet as determined by either the PDB file author or Kabsch and
+Sander's DSSP algorithm. By default, RasMol uses the secondary
+structure determination given in the PDB file if it exists.
+Otherwise, it uses the DSSP algorithm as used by the RasMol
+.B structure
+command.
+
+.TP
+.B Sidechain Set
+This set contains the functional sidechains of any amino acids
+and the base of each nucleotide. These are the atoms not part of
+the polypeptide N-C-C-O backbone of proteins or the sugar
+phosphate backbone of nucleic acids.
+Use the RasMol predefined sets
+.B protein
+and
+.B nucleic
+to distinguish between the two forms of sidechain.
+Atoms in nucleic acids and proteins are either
+.B backbone
+or
+.B sidechain.
+This set is equivalent to the RasMol expression
+.B (protein or nucleic) and not backbone
+
+.TP
+.B Small Set
+All amino acids are classified as either
+.B small,
+.B medium
+or
+.B large.
+This set is equivalent to the RasMol atom expression
+.B amino and not (medium or large)
+
+.TP
+.B Solvent Set
+This set contains the solvent atoms in the molecule co-ordinate file.
+These are the heterogenous water molecules, phosphate and sulphate
+ions. All
+.B hetero
+atoms are classified as either
+.B ligand
+or
+.B solvent
+atoms. All
+.B solvent
+atoms are classified as either
+.B water
+or
+.B ions.
+This set is equivalent to the RasMol atom expressions
+.B hetero and not ligand
+and
+.B water or ions
+
+.TP
+.B Surface Set
+This set contains the atoms in those amino acids that tend
+(prefer) to be on the surface of proteins, in contact with
+solvent molecules. This set refers to the amino acids
+preference and not the actual solvent accessibility for
+the current protein.
+All amino acids are classified as either
+.B surface
+or
+.B buried.
+This set is equivalent to the RasMol atom expression
+.B amino and not buried
+
+.TP
+.B Turn Set
+This set contains all atoms that form part of a protein turns
+as determined by either the PDB file author or Kabsch and
+Sander's DSSP algorithm. By default, RasMol uses the secondary
+structure determination given in the PDB file if it exists.
+Otherwise, it uses the DSSP algorithm as used by the RasMol
+.B structure
+command.
+
+.TP
+.B Water Set
+This set contains all the heterogenous water molecules in the current
+database. A large number of water molecules are sometimes associated
+with protein and nucleic acid structures determined by X-ray
+crystallography. These atoms tend to clutter an image.
+All
+.B hetero
+atoms are classified as either
+.B ligand
+or
+.B solvent
+atoms. The
+.B solvent
+atoms are further classified as either
+.B water
+or
+.B ions.
+
+.SH COLOUR SCHEMES
+The RasMol
+.B colour
+command allows different objects (such as atoms, bonds and ribbon segments)
+to be given a specified colour. Typically this colour is either a RasMol
+predefined colour name or an RGB triple. Additionally RasMol also supports
+.B cpk,
+.B amino,
+.B chain,
+.B group,
+.B shapely,
+.B structure,
+.B temperature,
+.B charge
+and
+.B user
+colour schemes for atoms, a
+.B hbond type
+colour scheme for hydrogen bonds and
+.B electrostatic potential
+colour scheme for dot surfaces.
+The currently predefined colour
+names are
+blue, black, cyan, green, greenblue, magenta, orange, purple,
+red, redorange, violet, white and yellow.
+
+.TP
+.B Amino Colours
+The RasMol
+.B amino
+colour scheme colours amino acids according to traditional amino acid
+properties. The purpose of colouring is to identify amino acids in an
+unusual or surprising environment. The outer parts of a protein that are
+polar are visible (bright) colours and non-polar residues darker. Most
+colours are hallowed by tradition. This colour scheme is similar to the
+.B shapely
+scheme.
+
+.TP
+.B Chain Colours
+The RasMol
+.B chain
+colour scheme assigns each macromolecular chain a unique colour. This
+colour scheme is particularly useful for distinguishing the parts of
+multimeric structure or the individual `strands' of a DNA chain.
+
+.TP
+.B CPK Colours
+The RasMol
+.B cpk
+colour scheme is based upon the colours of the popular plastic
+spacefilling models which were developed by Corey, Pauling and later
+improved by Kultun. This colour scheme colour `atom' objects by the
+atom (element) type. This is the scheme conventionally used by chemists.
+
+.TP
+.B Group Colours
+The RasMol
+.B group
+colour scheme colour codes residues by their position in a macromolecular
+chain. Each chain is drawn as a smooth spectrum from blue through green,
+yellow and orange to red. Hence the N terminus of proteins and 5' terminus
+of nucleic acids are coloured red and the C terminus of proteins and 3'
+terminus of nucleic acids are drawn in blue. If a chain has a large number
+of heterogenous molecules associated with it, the macromolecule may not be
+drawn in the full `range' of the spectrum.
+
+.TP
+.B Shapely Colours
+The RasMol
+.B shapely
+colour scheme colour codes residues by amino acid property. This scheme
+is based upon Bob Fletterick's "Shapely Models". Each amino acid and
+nucleic acid residue is given a unique colour. The
+.B shapely
+colour scheme is used by David Bacon's Raster3D program. This colour
+scheme is similar to the
+.B amino
+colour scheme.
+
+.TP
+.B Structure Colours
+The RasMol
+.B structure
+colour scheme colours the molecule by protein secondary structure.
+Alpha helices are coloured magenta, [240,0,128], beta sheets are
+coloured yellow, [255,255,0], turns are coloured pale blue, [96,128,255]
+and all other residues are coloured white. The secondary structure
+is either read from the PDB file (HELIX and SHEET records), if available,
+or determined using Kabsch and Sander's DSSP algorithm. The RasMol
+.B structure
+command may be used to force DSSP's structure assignment to be used.
+
+.TP
+.B Temperature Colours
+The RasMol
+.B temperature
+colour scheme colour codes each atom according to the anisotropic
+temperature (beta) value stored in the PDB file. Typically this gives
+a measure of the mobility/uncertainty of a given atom's position. High
+values are coloured in warmer (red) colours and lower values in colder
+(blue) colours. This feature is often used to associate a "scale" value
+[such as amino acid variability in viral mutants] with each atom in a
+PDB file, and colour the molecule appropriately.
+
+The difference between the
+.B temperature
+and
+.B charge
+colour schemes is that increasing temperature values proceed from blue
+to red, whereas increasing charge valuse go from red to blue.
+
+.TP
+.B Charge Colours
+The RasMol
+.B charge
+colour scheme colour codes each atom according to the charge value
+stored in the input file (or beta factor field of PDB files). High
+values are coloured in blue (positive) and lower values coloured in
+red (negative). Rather than use a fixed scale this scheme determines
+the maximum and minimum values of the charge/temperature field and
+interpolates from red to blue appropriately. Hence, green cannot be
+assumed to be `no net charge' charge.
+
+The difference between the
+.B charge
+and
+.B temperature
+colour schemes is that increasing temperature values proceed from blue
+to red, whereas increasing charge valuse go from red to blue.
+
+If the charge/temperature field stores reasonable values it is possible
+to use the RasMol
+.B colour dots potential
+command to colour code a dot surface (generated by the
+.B dots
+command) by electrostatic potential.
+
+.TP
+.B User Colours
+The RasMol
+.B user
+colour scheme allows RasMol to use the colour scheme stored in the
+PDB file. The colours for each atom are stored in COLO records placed
+in the PDB data file. This convention was introduced by David Bacon's
+Raster3D program.
+
+.TP
+.B HBond Type Colours
+The RasMol
+.B type
+colour scheme applies only to hydrogen bonds, hence is used in the command
+.B colour hbonds type
+This scheme colour codes each hydrogen bond according to the
+distance along a protein chain between hydrogen bond donor and acceptor.
+This schematic representation was introduced by Belhadj-Mostefa and
+Milner-White. This representation gives a good insight into protein
+secondary structure (hbonds forming alpha helices appear red, those
+forming sheets appear yellow and those forming turns appear magenta).
+
+.TP
+.B Potential Colours
+The RasMol
+.B potential
+colour scheme applies only to dot surfaces, hence is used in the command
+.B colour dots potential
+This scheme colours each currently displayed dot by the electrostatic
+potential at that point in space. This potential is calculated using
+Coulomb's law taking the temperature/charge field of the input file to
+be the charge assocated with that atom. This is the same interpretation
+used by the
+.B colour charge
+command. Like the
+.B charge
+colour scheme low values are blue/white and high values are red.
+
+.SH SEE ALSO
+The RasMol User Manual!
+
+.SH AUTHOR
+Copyright (C) 1992-94 by Roger Sayle. All rights reserved.
+ (rasmol@ggr.co.uk)

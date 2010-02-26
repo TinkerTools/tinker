@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install4j version="3.0">
+  <directoryPresets config="/user/ftp/pub/tinker" />
+  <application name="TINKER and FFE" distributionSourceDir="" mediaDir="/user/ponder/tinker-kits" mediaFilePattern="tinker-linux" compression="6" shortName="TINKER" publisher="Jay Ponder and Michael Schnieders, Washington University, St. Louis, MO" publisherWeb="http://dasher.wustl.edu/tinker" version="4.2" allPathsRelative="false" backupOnSave="false" autoSave="true" javaMinVersion="1.4" javaMaxVersion="1.5">
+    <searchSequence>
+      <registry />
+      <envVar name="JAVA_HOME" />
+      <envVar name="JDK_HOME" />
+    </searchSequence>
+    <variables />
+  </application>
+  <files>
+    <mountPoints>
+      <mountPoint name="" id="24" location="bin" mode="755" />
+      <mountPoint name="" id="21" location="" mode="755" />
+    </mountPoints>
+    <entries>
+      <dirEntry mountPoint="24" file="/user/ftp/pub/tinker-bin/linux-ffe" overwrite="1" shared="false" mode="755" dontUninstall="false" excludeSuffixes="" dirMode="755">
+        <exclude />
+      </dirEntry>
+      <dirEntry mountPoint="21" file="/user/ftp/pub/tinker" overwrite="4" shared="false" mode="644" dontUninstall="false" excludeSuffixes="" dirMode="755">
+        <exclude />
+      </dirEntry>
+    </entries>
+    <components />
+  </files>
+  <launchers>
+    <launcher name="Force Field Explorer" id="3" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="/user/schnied/ffe/src/ffe/icons/icon16.PNG" pngIcon32File="/user/schnied/ffe/src/ffe/icons/icon32.PNG" macServiceDependencies="" allowUserChangeServiceStartType="true">
+      <executable name="ffe" type="1" iconSet="true" iconFile="" executableDir="" redirectStderr="false" stderrFile="error.log" redirectStdout="false" stdoutFile="output.log" failOnStderrOutput="false" executableMode="1" changeWorkingDirectory="false" workingDirectory="test" singleInstance="false" serviceStartType="2" serviceDependencies="" jreLocation="" jreUncompressedSize="0">
+        <versionInfo include="true" fileVersion="" companyName="" fileDescription="Force Field Explorer is a Molecular Engineering Program and GUI to TINKER." legalCopyright="See the TINKER license agreement for copyright notices." productVersion="" internalName="Force Field Explorer" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="0" height="0" bitmapFile="">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="version %VERSION%" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="ffe.Main" vmParameters="-Xmx512m -Dtinker.dir=%INSTALL4J_EXEDIR%" arguments="" allowVMPassthroughParameters="false" minVersion="" maxVersion="" preferredVM="client">
+        <searchSequence>
+          <registry />
+          <envVar name="JAVA_HOME" />
+          <envVar name="JDK_HOME" />
+        </searchSequence>
+        <classPath>
+          <archive location="jar/ffe.jar" failOnError="true" />
+        </classPath>
+        <nativeLibraryDirectories>
+          <directory name="jar/linux" />
+        </nativeLibraryDirectories>
+      </java>
+      <includedFiles />
+    </launcher>
+  </launchers>
+  <installerGui allowUnattendedInstall="false" useCustomHeaderImage="false" customHeaderImage="" customSize="false" customWidth="500" customHeight="390">
+    <customCode preAction="false" preActionClass="" postAction="false" postActionClass="" preUninstallAction="false" preUninstallActionClass="" postUninstallAction="false" postUninstallActionClass="" initHandler="false" initHandlerClass="" directoryValidator="false" directoryValidatorClass="" installationHandler="false" installationHandlerClass="" />
+    <standardScreens>
+      <screen id="welcome" enabled="true" useCustomBanner="false" bannerImageFile="" background="255,255,255" />
+      <screen id="license" enabled="false" file="" />
+      <screen id="location" enabled="true" showSpace="true" suggestAppDir="true" />
+      <screen id="components" enabled="true" allSelected="true" firstMandatory="true">
+        <selectedComponents />
+        <mandatoryComponents />
+      </screen>
+      <screen id="programGroup" enabled="true" />
+      <screen id="fileAssociations" enabled="true">
+        <associations>
+          <association extension="xyz" description="TINKER Cart. Coord." winIconFile="" launcherId="3" selected="true" />
+          <association extension="int" description="TINKR Int. Coord." winIconFile="" launcherId="3" selected="true" />
+          <association extension="arc" description="TINKER Archive" winIconFile="" launcherId="3" selected="true" />
+          <association extension="pdb" description="Protein Data Bank" winIconFile="" launcherId="3" selected="false" />
+        </associations>
+      </screen>
+      <screen id="services" enabled="true" allSelected="true">
+        <selectedServiceLaunchers />
+      </screen>
+      <screen id="additionalTasks" enabled="true" customTasksPlacement="1">
+        <customTasks />
+      </screen>
+      <screen id="preInfo" enabled="false" file="" />
+      <screen id="install" enabled="true" />
+      <screen id="postInfo" enabled="false" file="" />
+      <screen id="finished" enabled="true" useCustomBanner="false" bannerImageFile="" background="255,255,255" />
+    </standardScreens>
+    <customScreens />
+  </installerGui>
+  <mediaSets>
+    <unixInstaller name="Unix JDK 1.4.2" id="30" mediaFileName="" installDir="tinker" allLaunchers="true" bundleType="1" includedJRE="linux-x86-1.4.2_04" jreURL="http://dasher.wustl.edu/ffe/linux-x86-1.4.2_03.tar.gz" jreFtpURL="" languageID="en" customScriptMode="1" customScriptFile="" customInstallBaseDir="" allowUserStartAfterFinish="false" launchExecutableId="" createUninstallIcon="true" overrideLicenseFile="false" licenseFile="" overridePreInformationFile="false" preInformationFile="" overridePostInformationFile="false" postInformationFile="" jreShared="false" adminRequired="false">
+      <selectedLaunchers />
+      <messageSet language="English" />
+      <exclude />
+      <variables />
+      <customScriptLines />
+      <excludedScreenIds />
+    </unixInstaller>
+  </mediaSets>
+  <buildIds buildAll="false">
+    <mediaSet refId="30" />
+  </buildIds>
+</install4j>
+

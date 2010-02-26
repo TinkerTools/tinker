@@ -1,0 +1,18 @@
+#!/bin/csh
+
+set RASMOLDIR=\"./\"
+
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT rasmol.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT molecule.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT abstree.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT command.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT transfor.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT render.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT repres.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT x11win.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT pixutils.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT outfile.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT script.c
+gcc -c -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT infile.c
+
+gcc -O -s -static -o rasmol rasmol.o molecule.o abstree.o command.o transfor.o render.o repres.o x11win.o pixutils.o outfile.o script.o infile.o /usr/lib/libm.a /usr/X11R6/lib/libXi.a /usr/X11R6/lib/libXext.a /usr/X11R6/lib/libX11.a

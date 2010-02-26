@@ -1,0 +1,31 @@
+
+                  -------------------------------------------
+                  C Version of TINKER Translated from Fortran
+                  -------------------------------------------
+
+          The /source subdirectory holds C code for the current TINKER
+          package. These source files were generated from the Fortran
+          version using the translation program f2c. Please note that
+          f2c does not allow DATA statements to precede other types
+          of declarations. This means that any common blocks containing
+          DATA statements must be included in source files at the very
+          bottom of the declarations section.
+
+          Some routines have native C versions that should be used to
+          replace the corresponding Fortran without f2c translation.
+          This native C code is contained in the /native subdirectory.
+          Note that a "clock.c" version of the Fortran "clock.f" is
+          not needed.
+
+          To create working executables, the resulting C code must be
+          compiled, then linked with the f2c object library for your
+          machine type as indicated in the file link.make. C versions
+          of the TINKER programs run significantly slower than native
+          Fortran versions on most machines.
+
+          While this C version of TINKER will run, we only recommend
+          its use if you absolutely cannot obtain access to a Fortran
+          compiler for your target system. The translated C code is not
+          easily human readable, is hard to modify, is more difficult
+          to build, and the resulting executables tend to be slow.
+

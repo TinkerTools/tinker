@@ -1,0 +1,73 @@
+/* raswin.idm
+ * RasWin Molecular Graphics
+ * Roger Sayle, September 1995
+ * Version 2.6
+ */
+
+#define IDM_OPEN       1000
+#define IDM_INFO       1001
+#define IDM_CLOSE      1002
+#define IDM_PRINT      1003
+#define IDM_SETUP      1004
+#define IDM_EXIT       1005
+
+#define IDM_SELECT     1010
+#define IDM_CUT        1011
+#define IDM_COPY       1012
+#define IDM_PASTE      1013
+#define IDM_DELETE     1014
+
+#define IDM_WIREFRAME  1020
+#define IDM_BACKBONE   1021
+#define IDM_STICKS     1022
+#define IDM_SPHERES    1023
+#define IDM_BALLSTICK  1024
+#define IDM_RIBBONS    1025
+#define IDM_STRANDS    1026
+#define IDM_CARTOONS   1027
+#define IDM_DOTS       1028
+
+#define IDM_MONO       1030
+#define IDM_CPK        1031
+#define IDM_SHAPELY    1032
+#define IDM_GROUP      1033
+#define IDM_CHAIN      1034
+#define IDM_TEMPER     1035
+#define IDM_STRUCT     1036
+#define IDM_USER       1037
+
+#define IDM_SLAB       1040
+#define IDM_HYDROGEN   1041
+#define IDM_HETERO     1042
+#define IDM_SPECULAR   1043
+#define IDM_SHADOW     1044
+#define IDM_STEREO     1045
+#define IDM_LABELS     1046
+
+#define IDM_BMP        1050
+#define IDM_PCX        1051
+#define IDM_GIF        1052
+#define IDM_EPSF       1053
+#define IDM_PPM        1054
+#define IDM_RAST       1055
+#define IDM_PICT       1056
+#define IDM_IRIS       1057
+
+#define IDM_ABOUT      1060
+#define IDM_HELP       1061
+
+#define IDD_HARDWARE   200
+#define IDD_FILETEXT   201
+#define IDD_FILELIST   202
+#define IDD_DIRTEXT    203
+#define IDD_DIRLIST    204
+
+
+#define IDD_INFOTEXT   210
+#define IDD_INFOTEXT1  210
+#define IDD_INFOTEXT2  211
+#define IDD_INFOTEXT3  212
+#define IDD_INFOTEXT4  213
+#define IDD_INFOTEXT5  214
+#define IDD_INFOTEXT6  215
+#define IDD_INFOTEXT7  216

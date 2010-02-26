@@ -1,0 +1,23 @@
+
+                  ------------------------------------------
+                  TINKER Notes for C Version on MacOSX/Intel
+                  ------------------------------------------
+
+         This subdirectory contains a set of script files that can
+         be used to build the C version of the TINKER program package
+         on a Linux system using the egcs C compiler. The C source
+         code was generated from the master Fortran version using the
+         f2c program for translation.
+
+         The convert.make script runs f2c in order to produce C source
+         code from the master Fortran version. Then the C code can be
+         compiled, placed into an object library and linked to TINKER
+         executables by running in order the corresponding scripts.
+         Note that f2c.h must be present during compilation. Also, the
+         f2c generated library, libf2c.a, is needed during the linking
+         phase.
+
+         Please note that native C versions of some TINKER routines
+         are found in the /native subdirectory. These should be copied
+         into the source directory before compiling the TINKER C code.
+

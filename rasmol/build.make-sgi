@@ -1,0 +1,19 @@
+#!/bin/csh
+
+set RASMOLDIR=\"./\"
+
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT rasmol.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT molecule.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT abstree.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT command.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT transfor.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT render.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT repres.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT x11win.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT x11win.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT pixutils.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT outfile.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT script.c
+cc -c -o32 -O -I/usr/include -DRASMOLDIR=$RASMOLDIR -DTHIRTYTWOBIT infile.c
+
+cc -O -s -o32 -o rasmol -L/usr/lib rasmol.o molecule.o abstree.o command.o transfor.o render.o repres.o x11win.o pixutils.o outfile.o script.o infile.o -lm -lXext -lX11  

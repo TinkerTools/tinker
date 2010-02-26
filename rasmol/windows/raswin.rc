@@ -1,0 +1,116 @@
+#include "windows.h"
+#include "raswin.idm"
+
+RasWinCursor CURSOR RasWin.cur
+RasWinIcon   ICON   RasWin.ico
+
+RasWinMenu MENU
+BEGIN
+    POPUP "&File" 
+    BEGIN
+        MENUITEM "&Open ...",       IDM_OPEN
+        MENUITEM "&Information",    IDM_INFO
+        MENUITEM "&Close",          IDM_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "&Print",          IDM_PRINT
+        MENUITEM "P&rint Setup...", IDM_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",           IDM_EXIT
+    END
+
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Select &All",    IDM_SELECT
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t",           IDM_CUT,    GRAYED
+        MENUITEM "&Copy",          IDM_COPY
+        MENUITEM "&Paste",         IDM_PASTE,  GRAYED
+        MENUITEM "De&lete",        IDM_DELETE, GRAYED
+    END
+
+    POPUP "&Display"
+    BEGIN
+        MENUITEM "&Wireframe",     IDM_WIREFRAME
+        MENUITEM "&Backbone",      IDM_BACKBONE
+        MENUITEM "S&ticks",        IDM_STICKS
+        MENUITEM "&Spacefill",     IDM_SPHERES
+        MENUITEM "&Ball && Stick", IDM_BALLSTICK 
+        MENUITEM "&Ribbons",       IDM_RIBBONS
+        MENUITEM "Strands",        IDM_STRANDS
+        MENUITEM "&Cartoons",      IDM_CARTOONS
+    END
+
+    POPUP "&Colours"
+    BEGIN
+        MENUITEM "&Monochrome",    IDM_MONO
+        MENUITEM "&CPK",           IDM_CPK
+        MENUITEM "&Shapely",       IDM_SHAPELY
+        MENUITEM "&Group",         IDM_GROUP
+        MENUITEM "C&hain",         IDM_CHAIN
+        MENUITEM "&Temperature",   IDM_TEMPER
+        MENUITEM "&Structure",     IDM_STRUCT
+        MENUITEM "&User",          IDM_USER
+    END
+
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "&Slab Mode",     IDM_SLAB,      CHECKED
+        MENUITEM "H&ydrogens",     IDM_HYDROGEN,  CHECKED
+        MENUITEM "&Hetero Atoms",  IDM_HETERO,    CHECKED
+        MENUITEM "S&pecular",      IDM_SPECULAR,  CHECKED
+        MENUITEM "&Shadows",       IDM_SHADOW,    CHECKED
+        MENUITEM "S&tereo",        IDM_STEREO,    CHECKED
+        MENUITEM "&Labels",        IDM_LABELS,    CHECKED
+    END
+
+    POPUP "&Export"
+    BEGIN
+        MENUITEM "&BMP",           IDM_BMP
+        MENUITEM "&GIF",           IDM_GIF
+        MENUITEM "&EPSF",          IDM_EPSF
+        MENUITEM "&PPM",           IDM_PPM
+        MENUITEM "&RAST",          IDM_RAST
+    END
+
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About RasMol",  IDM_ABOUT
+        MENUITEM "&User Manual",   IDM_HELP
+    END
+END
+
+
+
+AboutBox DIALOG 25, 20, 150, 88
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "About RasMol"
+FONT 8,"Helv"    
+BEGIN
+    ICON "RasWinIcon" -1, 2, 2, 0, 0, SS_ICON
+    CTEXT "RasWin Molecular Graphics"       -1, 25,  5, 125, 8
+    CTEXT "Windows Version 2.6"             -1, 25, 14, 125, 8
+    CTEXT "Copyright (c) 1993-1995 R.Sayle" -1, 0,  32, 150, 8
+    CTEXT "" IDD_HARDWARE,                      0,  50, 150, 8
+    DEFPUSHBUTTON "OK" IDOK, 56, 70, 32, 14, WS_GROUP
+END
+
+
+InfoBox DIALOG 25, 20, 200, 114
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Molecule Information"
+FONT 8,"Helv"    
+BEGIN
+    ICON "RasWinIcon" -1, 2, 2, 0, 0, SS_ICON
+    CTEXT "RasWin Molecular Graphics"   -1, 25,  5, 175, 8
+    CTEXT "Windows Version 2.6"         -1, 25, 14, 175, 8
+    DEFPUSHBUTTON "OK" IDOK, 81, 96, 32, 14, WS_GROUP
+
+    LTEXT "" IDD_INFOTEXT1, 0,  32, 200, 8, SS_LEFTNOWORDWRAP
+    LTEXT "" IDD_INFOTEXT2, 0,  41, 200, 8, SS_LEFTNOWORDWRAP
+    LTEXT "" IDD_INFOTEXT3, 0,  50, 200, 8, SS_LEFTNOWORDWRAP
+    LTEXT "" IDD_INFOTEXT4, 0,  59, 200, 8, SS_LEFTNOWORDWRAP
+    LTEXT "" IDD_INFOTEXT5, 0,  68, 200, 8, SS_LEFTNOWORDWRAP
+    LTEXT "" IDD_INFOTEXT6, 0,  77, 200, 8, SS_LEFTNOWORDWRAP
+    LTEXT "" IDD_INFOTEXT7, 0,  86, 200, 8, SS_LEFTNOWORDWRAP
+END
+

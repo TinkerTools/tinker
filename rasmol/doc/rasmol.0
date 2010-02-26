@@ -1,0 +1,1914 @@
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+NNNNAAAAMMMMEEEE
+     rasmol - Molecular Graphics Visualisation Tool v2.5
+
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+     rrrraaaassssmmmmoooollll [---- nnnnooooddddiiiippppllllaaaayyyy]  [[ ----   _f_o_r_m_a_t  ]  _f_i_l_e_n_a_m_e]  [ ---- ssssccccrrrriiiipppptttt
+     _s_c_r_i_p_t_f_i_l_e]
+
+
+FFFFOOOORRRRMMMMAAAATTTTSSSS
+     ----ppppddddbbbb         Brookhaven Protein Databank
+     ----mmmmddddllll         MDL's MOL File Format
+     ----mmmmoooollll2222        Tripos' Sybyl MOL2 Format
+     ----xxxxyyyyzzzz         MSC's XYZ (XMol) Format
+     ----aaaallllcccchhhheeeemmmmyyyy     Alchemy File Format
+     ----cccchhhhaaaarrrrmmmmmmmm      CHARMm File Format
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+     RasMol2 is a molecular graphics  program  intended  for  the
+     visualisation   of   proteins,   nucleic   acids  and  small
+     molecules. The program is aimed  at  display,  teaching  and
+     generation  of  publication  quality  images. RasMol runs on
+     Microsoft Windows, Apple Macintosh, UNIX  and  VMS  systems.
+     The UNIX and VMS systems require an 8, 24 or 32 bit colour X
+     Windows display (X11R4 or later). The  program  reads  in  a
+     molecule  co-ordinate  file  and  interactively displays the
+     molecule on the screen in a variety of  colour  schemes  and
+     molecule  representations.  Currently  available representa-
+     tions include depth-cued wireframes, 'Dreiding' sticks, spa-
+     cefilling  (CPK)  spheres,  ball and stick, solid and strand
+     biomolecular ribbons, atom labels and dot surfaces.
+
+
+CCCCOOOOMMMMMMMMAAAANNNNDDDDSSSS
+     RasMol allows the execution of interactive commands typed at
+     the RRRRaaaassssMMMMoooollll>>>> prompt in the terminal window. Each command must
+     be given on a separate line. Keywords are  case  insensitive
+     and  may  be  entered in either upper or lower case letters.
+     All whitespace characters are  ignored  except  to  separate
+     keywords and their arguments.
+
+     The commands/keywords currently  recognised  by  RasMol  are
+     given below.
+
+
+     BBBBaaaacccckkkkbbbboooonnnneeee
+          The RasMol bbbbaaaacccckkkkbbbboooonnnneeee command permits the  representation
+          of a polypeptide backbone as a series of bonds connect-
+          ing the adjacent alpha carbons of each amino acid in  a
+          chain.  The display of these backbone `bonds' is turned
+          on and off by the command paramater  the  same  as  the
+          wwwwiiiirrrreeeeffffrrrraaaammmmeeee  command.  The command bbbbaaaacccckkkkbbbboooonnnneeee ooooffffffff turns off
+
+
+
+Sun Microsystems    Last change: October 1994                   1
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          the selected `bonds', and bbbbaaaacccckkkkbbbboooonnnneeee oooonnnn or with a  number
+          turns  them  on.  The number can be used to specify the
+          cylinder  radius  of  the  representation   in   either
+          angstrom or rasmol units. A parameter value of 500 (2.0
+          angstroms) or above results in a "Parameter  value  too
+          large"  error.  Backbone  objects may be coloured using
+          the RasMol ccccoooolllloooouuuurrrr bbbbaaaacccckkkkbbbboooonnnneeee command.
+
+
+     BBBBaaaacccckkkkggggrrrroooouuuunnnndddd
+          The RasMol bbbbaaaacccckkkkggggrrrroooouuuunnnndddd command is used to set the colour
+          of  the "canvas" background. The colour may be given as
+          either a colour name or a  comma  separated  triple  of
+          Red, Green and Blue (RGB) components enclosed in square
+          brackets. Typing the command hhhheeeellllpppp ccccoooolllloooouuuurrrrssss will  give  a
+          list  of  the  predefined  colour  names  recognised by
+          RasMol.  When running  under  X  Windows,  RasMol  also
+          recognises  colours in the X server's colour name data-
+          base.
+
+          The bbbbaaaacccckkkkggggrrrroooouuuunnnndddd command is synonymous  with  the  RasMol
+          sssseeeetttt bbbbaaaacccckkkkggggrrrroooouuuunnnndddd command.
+
+
+     CCCCeeeennnnttttrrrreeee
+          The RasMol cccceeeennnnttttrrrreeee command defines the point about which
+          the  rrrroooottttaaaatttteeee  command  and  the  scroll  bars rotate the
+          current molecule. Without a parameter the  centre  com-
+          mand  resets the centre of rotation to be the centre of
+          gravity of the  molecule.  If  an  atom  expression  is
+          specified, RasMol rotates the molecule about the centre
+          of gravity of the set of atoms specified by the expres-
+          sion.  Hence,  if  a  single  atom  is specified by the
+          expression, that atom will remain  `stationary'  during
+          rotations.
+
+          Type hhhheeeellllpppp eeeexxxxpppprrrreeeessssssssiiiioooonnnn for  more  information  on  RasMol
+          atom expressions.
+
+
+     CCCClllliiiippppbbbbooooaaaarrrrdddd
+          The RasMol cccclllliiiippppbbbbooooaaaarrrrdddd  command  places  a  copy  of  the
+          currently  displayed image on the local graphics `clip-
+          board'. Note: this command is not yet supported on UNIX
+          or  VMS  machines.  It  is intended to make transfering
+          images between applications easier under Microsoft Win-
+          dows or on an Apple Macintosh.
+
+          When using RasMol on a UNIX or VMS  system  this  func-
+          tionality  may be achieved by generating a raster image
+          in a format that can be read by the  receiving  program
+          using the RasMol wwwwrrrriiiitttteeee command.
+
+
+
+Sun Microsystems    Last change: October 1994                   2
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+     CCCCoooolllloooouuuurrrr
+          Colour the atoms (or other  objects)  of  the  selected
+          region. The colour may be given as either a colour name
+          or a comma separated triple  of  Red,  Green  and  Blue
+          (RGB)  components  enclosed  in square brackets. Typing
+          the command hhhheeeellllpppp ccccoooolllloooouuuurrrrssss will give a list  of  all  the
+          predefined colour names recognised by RasMol.
+
+          Allowed objects are  aaaattttoooommmmssss,,,,  bbbboooonnnnddddssss,,,,  bbbbaaaacccckkkkbbbboooonnnneeee,,,,  rrrriiiibbbbbbbboooonnnnssss
+          llllaaaabbbbeeeellllssss  ddddoooottttssss,,,,  hhhhbbbboooonnnnddddssss,,,,  and  ssssssssbbbboooonnnnddddssss....  If  no object is
+          specified, the default keyword aaaattttoooommmm is  assumed.   Some
+          colour  schemes  are  defined for certain object types.
+          The colour scheme  nnnnoooonnnneeee  can  be  applied  all  objects
+          accept  atoms  and  dots,  stating  that  the  selected
+          objects have no colour of their own, but use the colour
+          of  their  associated  atoms  (i.e. the atoms they con-
+          nect).  AAAAttttoooommmm objects  can  also  be  coloured  by  ccccppppkkkk,,,,
+          aaaammmmiiiinnnnoooo,,,,  cccchhhhaaaaiiiinnnn,,,,  ggggrrrroooouuuupppp,,,,  sssshhhhaaaappppeeeellllyyyy,,,, ssssttttrrrruuuuccccttttuuuurrrreeee,,,, tttteeeemmmmppppeeeerrrraaaattttuuuurrrreeee
+          cccchhhhaaaarrrrggggeeee and uuuusssseeeerrrr.... HHHHyyyyddddrrrrooooggggeeeennnn bbbboooonnnnddddssss ccccaaaannnn aaaallllssssoooo  bbbbeeee  ttttyyyyppppeeee  and
+          dot  surfaces  can  also  be  coloured by eeeelllleeeeccccttttrrrroooossssttttaaaattttiiiicccc
+          ppppooootttteeeennnnttttiiiiaaaallll....  For  more  information  type  hhhheeeellllpppp   ccccoooolllloooouuuurrrr
+          <<<<ccccoooolllloooouuuurrrr>>>>....
+
+
+     CCCCoooonnnnnnnneeeecccctttt
+          The RasMol ccccoooonnnnnnnneeeecccctttt command is used to force  RasMol  to
+          (re)calculate the connectivity of the current molecule.
+          If  the  original  input  file  contained  connectivity
+          information,  this  is  discarded.  The command ccccoooonnnnnnnneeeecccctttt
+          ffffaaaallllsssseeee uses an extremely fast heuristic algorithmm  that
+          is   suitable  for  determing  bonding  in  large  bio-
+          molecules such as proteins and nucleic acids.  The com-
+          mand ccccoooonnnnnnnneeeecccctttt ttttrrrruuuueeee uses a slower more accurate algorithm
+          based upon covalent radii that  is  more  suitable  for
+          small   molecules   containing  inorganic  elements  or
+          strained rings. If  no  parameters  are  given,  RasMol
+          determines  which  algorithm to use based on the number
+          of atoms in the file. Greater  than  255  atoms  causes
+          RasMol  to  use  the faster implementation. This is the
+          method used to determine bonding, if necessary, when  a
+          molecule is first read in using the llllooooaaaadddd command.
+
+
+     DDDDeeeeffffiiiinnnneeee
+          The RasMol ddddeeeeffffiiiinnnneeee command allows the user to  associate
+          an  arbitrary  set  of  atoms with a unique identifier.
+          This allows the definition of user-defined sets.  These
+          sets  are  declared  statically,  i.e. once defined the
+          contents of the set do not change, even if the  expres-
+          sion  defining  them depends on the current transforma-
+          tion and representation of the molecule.
+
+
+
+
+Sun Microsystems    Last change: October 1994                   3
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+     DDDDoooottttssss The RasMol ddddoooottttssss command is used to generate a  Van  der
+          Waal's dot surface around the currently selected atoms.
+          Dot surfaces  display  regularly  spaced  points  on  a
+          sphere  of  Van  der  Waals' radius about each selected
+          atom. Dots that would are `buried' within the  Van  der
+          Waal's  radius  of any other atom (selected or not) are
+          not displayed.  The command ddddoooottttssss oooonnnn deletes any  exist-
+          ing dot surface and generates a dots surface around the
+          currently selected atom set with a default dot  density
+          of  100.  The command ddddoooottttssss ooooffffffff deletes any existing dot
+          surface. The dot density may be specified by  providing
+          a  numeric  parameter  between  1  and 1000. This value
+          approximately corresponds to the number of dots on  the
+          surface of a medium sized atom.
+
+          By default, the colour of each point on a  dot  surface
+          is the colour of it's closest atom at the time the sur-
+          face is generated. The colour of the whole dot  surface
+          may be changed using the ccccoooolllloooouuuurrrr ddddoooottttssss command.
+
+
+     EEEEcccchhhhoooo The RasMol eeeecccchhhhoooo command is used to display a message in
+          the  RasMol command/terminal window. The string parame-
+          ter may optionally be delimited in double quote charac-
+          ters.  If  no  parameter is specified, the eeeecccchhhhoooo command
+          displays a blank line.  This  command  is  particularly
+          useful  for displaying text from within a RasMol ssssccccrrrriiiipppptttt
+          file.
+
+
+     HHHHBBBBoooonnnnddddssss
+          The RasMol hhhhbbbboooonnnndddd  command  is  used  to  represent  the
+          hydrogen  bonding  of  the protein molecule's backbone.
+          This information is useful in assessing  the  protein's
+          secondary  structure. Hydrogen bonds are represented as
+          either dotted lines or cylinders between the donor  and
+          acceptor  residues. The first time the hhhhbbbboooonnnndddd command is
+          used,  the  program  searches  the  structure  of   the
+          molecule  to  find hydrogen bonded residues and reports
+          the number of bonds to the user. The command hhhhbbbboooonnnnddddssss  oooonnnn
+          displays  the selected `bonds' as dotted lines, and the
+          hhhhbbbboooonnnnddddssss ooooffffffff turns off their display. The colour of hbond
+          objects  may  be  changed  by the ccccoooolllloooouuuurrrr hhhhbbbboooonnnndddd command.
+          Initially, each hydrogen bond has the  colours  of  its
+          connected atoms.
+
+          By default the  dotted  lines  are  drawn  between  the
+          accepting  oxygen  and  the donating nitrogen. By using
+          the sssseeeetttt hhhhbbbboooonnnnddddssss command the alpha  carbon  positions  of
+          the  appropriate  residues may be used instead. This is
+          especially useful when examining proteins  in  backbone
+          representation.
+
+
+
+Sun Microsystems    Last change: October 1994                   4
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+     HHHHeeeellllpppp The RasMol hhhheeeellllpppp command provides on-line  help  on  the
+          given topic.
+
+
+     LLLLaaaabbbbeeeellll
+          The RasMol llllaaaabbbbeeeellll command allows an arbitrary  formatted
+          text  string  to  be  associated  with  each  currently
+          selected  atom.   This  string  may  contain   embedded
+          `expansion  specifiers' which display properties of the
+          atom being labelled. An expansion specifier consists of
+          a `%' character followed by a single alphabetic charac-
+          ter specifying the property to be displayed.  An actual
+          '%'  character  may be displayed by using the expansion
+          specifier `%%'.
+
+          Atom labelling for the currently selected atoms may  be
+          turned  off  with the command llllaaaabbbbeeeellll ooooffffffff.... By default, if
+          no string is given as a parameter  RasMol  uses  labels
+          appropriate for the current molecule.
+
+          The colour of each  label  may  be  changed  using  the
+          ccccoooolllloooouuuurrrr  llllaaaabbbbeeeellll  command. By default, each label is drawn
+          in the same colour as the atom to which it is attached.
+          The size of the displayed text may be changed using the
+          sssseeeetttt ffffoooonnnnttttssssiiiizzzzeeee command.
+
+
+     LLLLooooaaaadddd Load a molecule co-ordinate file  into  RasMol2.  Valid
+          molecule file formats are ppppddddbbbb (Brookhaven Protein Data-
+          bank), mmmmddddllll (Molecular Design Limited's  MOL  file  for-
+          mat), aaaallllcccchhhheeeemmmmyyyy (Tripos' Alchemy file format), mmmmoooollll2222 (Tri-
+          pos' Sybyl Mol2 file format), cccchhhhaaaarrrrmmmmmmmm (CHARMm file  for-
+          mat)  or  xxxxyyyyzzzz  (MSC's XMol XYZ file format). If no file
+          format is specified, ppppddddbbbb is assumed by default. Only  a
+          single  molecule  may be loaded at a time.  To delete a
+          molecule prior to loading another use  the  RasMol  zzzzaaaapppp
+          command.
+
+          The llllooooaaaadddd command selects all the atoms in the molecule,
+          centres  it  on  the  screen  and  renders  it as a CPK
+          coloured wireframe model. If the molecule  contains  no
+          bonds  (i.e.  contains only alpha carbons), it is drawn
+          as an alpha carbon backbone. If the file specifies less
+          bonds  than atoms, RasMol determines connectivity using
+          the ccccoooonnnnnnnneeeecccctttt command.
+
+
+     PPPPrrrriiiinnnntttt
+          The RasMol pppprrrriiiinnnntttt command sends the currently  displayed
+          image  to the local default printer using the operating
+          system's native printer driver. Note: this  command  is
+          not  yet supported under UNIX or VMS. It is intended to
+
+
+
+Sun Microsystems    Last change: October 1994                   5
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          take advantage of Microsoft Windows and Apple Macintosh
+          printer  drivers.  For  example,  allowing images to be
+          printed directly on a dot matrix printer.
+
+          When using RasMol on a UNIX or VMS  system  this  func-
+          tionality  may  be  achieved  by  either  generating  a
+          PostScript file using the  RasMol  wwwwrrrriiiitttteeee  ppppssss  or  wwwwrrrriiiitttteeee
+          vvvveeeeccccttttppppssss  commands and printing that or generating a ras-
+          ter image file and using a utility to dump that to  the
+          local printer.
+
+
+     QQQQuuuuiiiitttt Exit from the RasMol program. The RasMol commands  eeeexxxxiiiitttt
+          and qqqquuuuiiiitttt are synonymous.
+
+
+     RRRReeeennnnuuuummmmbbbbeeeerrrr
+          The RasMol rrrreeeennnnuuuummmmbbbbeeeerrrr command  sequentially  numbers  the
+          residues  in  a  macromolecular  chain.   The  optional
+          parameter specifies the value of the first  residue  in
+          the  sequence.  By default, this value is one. For pro-
+          teins, each amino acid is numbered  consecutively  from
+          the  N  terminus  to the C terminus. For nucleic acids,
+          each base is numbered from the 5' terminus to  3'  ter-
+          minus.  All  chains  in the current database are renum-
+          bered and gaps in the original  sequence  are  ignored.
+          The starting value for numbering may be negative.
+
+
+     RRRReeeesssseeeetttt
+          The RasMol rrrreeeesssseeeetttt command restores the original  viewing
+          transformation and centre of rotation. The scale is set
+          to it default value, zzzzoooooooommmm 111100000000,,,, the centre  of  rotation
+          is  set to the geometric centre of the currently loaded
+          molecule, cccceeeennnnttttrrrreeee aaaallllllll,,,, this centre is translated to  the
+          middle  of  the  screen  and  the  viewpoint set to the
+          default orientation.
+
+          This command should not be mistaken for the RasMol  zzzzaaaapppp
+          command  which  deletes  the currently stored molecule,
+          returning the program to its initial state.
+
+
+     RRRReeeessssttttrrrriiiicccctttt
+          The RasMol rrrreeeessssttttrrrriiiicccctttt command both defines the  currently
+          selected  region  of  the  molecule  and  disables  the
+          representation of (most of) those parts of the molecule
+          no  longer  selected.   All  subsequent RasMol commands
+          that  modify  a  molecule's  colour  or  representation
+          effect  only the currently selected region. The parame-
+          ter of a rrrreeeessssttttrrrriiiicccctttt command is a RasMol  atom  expression
+          that  is  evaluated  for  every  atom  of  the  current
+
+
+
+Sun Microsystems    Last change: October 1994                   6
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          molecule. This command is very similar  to  the  RasMol
+          sssseeeelllleeeecccctttt command, except restrict disables the wwwwiiiirrrreeeeffffrrrraaaammmmeeee,,,,
+          ssssppppaaaacccceeeeffffiiiillllllll and  bbbbaaaacccckkkkbbbboooonnnneeee  representations  in  the  non-
+          selected region.
+
+          Type "help expression" for more information  on  RasMol
+          atom expressions.
+
+
+     RRRRiiiibbbbbbbboooonnnnssss
+          The  RasMol  rrrriiiibbbbbbbboooonnnnssss  command  displays  the  currently
+          loaded  protein or nucleic acid as a smooth solid "rib-
+          bon" surface passing along the backbone of the protein.
+          The ribbon is drawn between each amino acid whose alpha
+          carbon is currently selected. The colour of the  ribbon
+          is  changed by the RasMol ccccoooolllloooouuuurrrr rrrriiiibbbbbbbboooonnnn command. If the
+          current ribbon colour is nnnnoooonnnneeee (the default), the colour
+          is  taken  from the alpha carbon at each position along
+          its length.
+
+          The width of the ribbon at each position is  determined
+          by the optional parameter in the usual RasMol units. By
+          default the width of  the  ribbon  is  taken  from  the
+          secondary  structure of the protein or a constant value
+          of 720 (2.88 Angstroms) for nucleic acids.  The default
+          width  of  protein alpha helices and beta sheets is 380
+          (1.52 Angstroms) and 100 (0.4 Angstroms) for turns  and
+          random  coil.  The  secondary  structure  assignment is
+          either from the PDB file or calculated using  the  DSSP
+          algorithm  as  used by the ssssttttrrrruuuuccccttttuuuurrrreeee command. This com-
+          mand is similar to the  RasMol  command  ssssttttrrrraaaannnnddddssss  which
+          renders  the biomolecular ribbon as parallel depth-cued
+          curves.
+
+
+     RRRRoooottttaaaatttteeee
+          Rotate the molecule about the specified axis.  Permited
+          values  for  the  axis  parameter are "x", "y" and "z".
+          The integer parameter states the angle in  degrees  for
+          the  structure  to  be  rotated.  For the X and Y axes,
+          positive values move the closest point  up  and  right,
+          and negative values move it down and left respectively.
+          For the Z axis, a positive rotation acts clockwise  and
+          a negative angle anti-clockwise.
+
+
+     SSSSaaaavvvveeee Save the currently selected set of atoms  in  either  a
+          Brookhaven Protein Database (PDB) or Alchemy(tm) format
+          file.  The distinction between  this  command  and  the
+          RasMol wwwwrrrriiiitttteeee command has been dropped. The only differ-
+          ence is that without a format specifier the  ssssaaaavvvveeee  com-
+          mand  generates  a  PPPPDDDDBBBB  file  and  the  wwwwrrrriiiitttteeee  command
+
+
+
+Sun Microsystems    Last change: October 1994                   7
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          generates a GGGGIIIIFFFF image.
+
+
+     SSSSccccrrrriiiipppptttt
+          The RasMol ssssccccrrrriiiipppptttt command reads a set  of  RasMol  com-
+          mands  sequentially from a text file and executes them.
+          This allows sequences of commonly used commands  to  be
+          stored and performed by single command. A RasMol script
+          file may contain a further script command up to a  max-
+          imum  "depth" of 10, allowing compilicated sequences of
+          actions to be executed. RasMol ignores  all  characters
+          after the first '#' character on each line allowing the
+          scripts to be annotated. Script files  are  often  also
+          annotated using the RasMol eeeecccchhhhoooo command.
+
+          The most common way to generate a RasMol script file is
+          to  use  the  wwwwrrrriiiitttteeee  ssssccccrrrriiiipppptttt or wwwwrrrriiiitttteeee rrrraaaassssmmmmoooollll commands to
+          output the sequence of  commands  that  are  needed  to
+          regenerate the current view, representation and colour-
+          ing of the currently displayed molecule.
+
+          The RasMol command ssssoooouuuurrrrcccceeee is synonymous with the ssssccccrrrriiiipppptttt
+          command.
+
+
+     SSSSeeeelllleeeecccctttt
+          Define the currently selected region of  the  molecule.
+          All   subsequent  RasMol  commands  that  manipulate  a
+          molecule or modify its colour or  representation,  only
+          effects the currently selected region. The parameter of
+          a  sssseeeelllleeeecccctttt  command  is  a  RasMol  expression  that  is
+          evaluated  for  every atom of the current molecule. The
+          currently selected (active) region of the molecule  are
+          those atoms that cause the expression to evaluate true.
+          To select the whole molecule  use  the  RasMol  command
+          sssseeeelllleeeecccctttt aaaallllllll.... The behaviour of the sssseeeelllleeeecccctttt command without
+          any parameters is determined by the RasMol  hhhheeeetttteeeerrrroooo  and
+          hhhhyyyyddddrrrrooooggggeeeennnn parameters.
+
+          Type "help expression" for more information  on  RasMol
+          atom expressions.
+
+
+     SSSSeeeetttt  The RasMol sssseeeetttt command allows the user to alter various
+          internal  program  parameters such as those controlling
+          rendering options. Each parameter has its  own  set  or
+          permissible  parameter options. Typically, ommiting the
+          paramter option resets that parameter  to  its  default
+          value. A list of valid parameter names is given below.
+
+
+     SSSShhhhoooowwww The RasMol sssshhhhoooowwww command display details of  the  status
+
+
+
+Sun Microsystems    Last change: October 1994                   8
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          of  the  currently  loaded  molecule.  The command sssshhhhoooowwww
+          iiiinnnnffffoooorrrrmmmmaaaattttiiiioooonnnn lists the molecule's name,  classification,
+          PDB  code  and  the  number of atoms, chains, groups it
+          contains.  If hydrogen bonding, disulphide  bridges  or
+          secondary structure have been determined, the number of
+          hbonds, ssbonds, helices, ladders and  turns  are  also
+          displayed respectively. The command sssshhhhoooowwww sssseeeeqqqquuuueeeennnncccceeee lists
+          the residues that compose each chain of the molecule.
+
+
+     SSSSllllaaaabbbb The RasMol ssssllllaaaabbbb command enables, disables or  positions
+          the  z-clipping plane of the molecule. The program only
+          draws those portions of the molecule that  are  further
+          from  the viewer than the slabbing plane.  Values range
+          from zero at the very back of the molecule to 100 which
+          is  completely  in  front of the molecule. Intermediate
+          values determine the percentage of the molecule  to  be
+          drawn.
+
+
+     SSSSppppaaaacccceeeeffffiiiillllllll
+          The RasMol ssssppppaaaacccceeeeffffiiiillllllll command is used to  represent  all
+          of  the currently selected atoms as solid spheres. This
+          command is used to produce  both  union-of-spheres  and
+          ball-and-stick  models of a molecule. The command, ssssppppaaaa----
+          cccceeeeffffiiiillllllllllll ttttrrrruuuueeee,,,, the default, represents each  atom  as  a
+          sphere  of Van der Waals radius.  The command ssssppppaaaacccceeeeffffiiiillllllll
+          ooooffffffff turns off the representation of the  selected  atom
+          as  spheres.  A  sphere  radius  may be specified as an
+          integer in RasMol units (1/250th Angstrom) or  a  value
+          containing  a  decimal  point.  A  value  of  500  (2.0
+          Angstroms) or greater results in a "Parameter value too
+          large" error.
+
+          The tttteeeemmmmppppeeeerrrraaaattttuuuurrrreeee option sets the radius of  each  sphere
+          to  the  value stored in its temperature field. Zero or
+          negative  values  causes  have  no  effect  and  values
+          greater  than  2.0  are truncated to 2. The uuuusssseeeerrrr option
+          allows the radius of each spheres to  be  specified  by
+          additional  lines in the molecule's PDB file using Ras-
+          ter 3D's COLOR record extension.
+
+          The RasMol command ccccppppkkkk is synonymous with the ssssppppaaaacccceeeeffffiiiillllllll
+          command.
+
+
+     SSSSSSSSBBBBoooonnnnddddssss
+          The RasMol ssssssssbbbboooonnnnddddssss command is  used  to  represent  the
+          disulphide  bridges  of  the protein molecule as either
+          dotted lines or cylinders between  the  connected  cys-
+          teines.  The  first  time  that  the ssssssssbbbboooonnnnddddssss command is
+          used, the program searches the structure of the protein
+
+
+
+Sun Microsystems    Last change: October 1994                   9
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          to  find  half-cysteine pairs (cysteines whose sulphurs
+          are within 3 angstroms of each other) and  reports  the
+          number  of  bridges to the user. The command ssssssssbbbboooonnnnddddssss oooonnnn
+          displays the selected `bonds' as dotted lines, and  the
+          command  ssssssssbbbboooonnnnddddssss ooooffffffff disables the display of ssbonds in
+          the currently selected area.  Selection  of  disulphide
+          bridges  is  identical  to  normal  bonds,  and  may be
+          adjusted using the RasMol  sssseeeetttt  bbbboooonnnnddddmmmmooooddddeeee  command.  The
+          colour  of  disulphide  bonds  may be changed using the
+          ccccoooolllloooouuuurrrr ssssssssbbbboooonnnnddddssss command.  By  default,  each  disulphide
+          bond has the colours of its connected atoms.
+
+          By default disulphide bonds are drawn between the  sul-
+          phur atoms within the cysteine groups. By using the sssseeeetttt
+          ssssssssbbbboooonnnnddddssss command the position of  the  cysteine's  alpha
+          carbons may be used instead.
+
+
+     SSSSttttrrrraaaannnnddddssss
+          The  RasMol  ssssttttrrrraaaannnnddddssss  command  displays  the  currently
+          loaded  protein or nucleic acid as a smooth "ribbon" of
+          depth-cued curves passing along  the  backbone  of  the
+          protein.  The ribbon is composed of a number of strands
+          that run parallel to  one  another  along  the  peptide
+          plane of each residue. The ribbon is drawn between each
+          amino acid whose alpha carbon  is  currently  selected.
+          The  colour  of  the  ribbon  is  changed by the RasMol
+          ccccoooolllloooouuuurrrr rrrriiiibbbbbbbboooonnnn command. If the current ribbon colour  is
+          nnnnoooonnnneeee  (the default), the colour is taken from the alpha
+          carbon at each position along its length. The colour of
+          the  central  and  outermost  strands  may  be coloured
+          independently using the ccccoooolllloooouuuurrrr rrrriiiibbbbbbbboooonnnn1111 and ccccoooolllloooouuuurrrr  rrrriiiibbbb----
+          bbbboooonnnn2222  commands  respectively.  The number of strands in
+          the ribbon may be altered using the RasMol sssseeeetttt  ssssttttrrrraaaannnnddddssss
+          command.
+
+          The width of the ribbon at each position is  determined
+          by the optional parameter in the usual RasMol units. By
+          default the width of  the  ribbon  is  taken  from  the
+          secondary  structure of the protein or a constant value
+          of 720 for nucleic acids (which produces a ribbon  2.88
+          Angstroms  wide).   The  default width of protein alpha
+          helices and beta sheets is 380 (1.52 Angstroms) and 100
+          (0.4  Angstroms)  for turns and random coil. The secon-
+          dary structure assignment is either from the  PDB  file
+          or  calculated  using the DSSP algorithm as used by the
+          ssssttttrrrruuuuccccttttuuuurrrreeee command.  This  command  is  similar  to  the
+          RasMol  command  rrrriiiibbbbbbbboooonnnnssss which renders the biomolecular
+          ribbon as a smooth shaded surface.
+
+
+     SSSSttttrrrruuuuccccttttuuuurrrreeee
+
+
+
+Sun Microsystems    Last change: October 1994                  10
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          The  RasMol  ssssttttrrrruuuuccccttttuuuurrrreeee  command  calculates   secondary
+          structure assignments for the currently loaded protein.
+          If the original PDB file contained  structural  assign-
+          ment  records  (HELIX  and  SHEET) these are discarded.
+          Initially, the hydrogen bonds of the  current  molecule
+          are found, if this hasn't been done already. The secon-
+          dary structure  is  the  determined  using  Kabsch  and
+          Sander's  DSSP  algorithm.  Once  finished  the program
+          reports the number of helices, strands and turns found.
+
+
+     TTTTrrrraaaannnnssssllllaaaatttteeee
+          The RasMol ttttrrrraaaannnnssssllllaaaatttteeee command moves the position of  the
+          centre  of the molecule on the screen. The axis parame-
+          ter specifies along which axis the molecule  is  to  be
+          moved  and the integer parameter specifies the absolute
+          position of the molecule centre from the middle of  the
+          screen.   Permited  values  for  the axis parameter are
+          "x", "y" and "z".  Displacement values must be  between
+          -100  and  100  which  correspond to moving the current
+          molecule just off the screen. A positive "x"  displace-
+          ment  moves  the  molecule to the right, and a positive
+          "y" displacement moves the molecule  down  the  screen.
+          The  pair  of  commands ttttrrrraaaannnnssssllllaaaatttteeee xxxx 0000 and ttttrrrraaaannnnssssllllaaaatttteeee yyyy 0000
+          centres the molecule on the screen.
+
+
+     WWWWiiiirrrreeeeffffrrrraaaammmmeeee
+          The  RasMol  wwwwiiiirrrreeeeffffrrrraaaammmmeeee  command  represents  each  bond
+          within  the selected region of the molecule as either a
+          cylinder, a line or depth-cued vector. The  display  of
+          bonds  as  depth-cued vectors (drawn darker the further
+          away from the viewer)  is  turned  on  by  the  command
+          wwwwiiiirrrreeeeffffrrrraaaammmmeeee  or  wwwwiiiirrrreeeeffffrrrraaaammmmeeee  oooonnnn....  The  selected  bonds are
+          displayed as cylinders by specifying a radius either as
+          an  integer  in  RasMol  units  or containing a decimal
+          point as a value in Angstroms.  A  parameter  value  of
+          500  (2.0  angstroms) or above results in an "Parameter
+          value too large" error. Bonds may be coloured using the
+          ccccoooolllloooouuuurrrr bbbboooonnnnddddssss command.
+
+
+     WWWWrrrriiiitttteeee
+          Write the current image to a file in a standard  raster
+          format.  Currently supported image file formats include
+          ggggiiiiffff (Compuserve GIF), ppppppppmmmm (Portable Pixmap),  rrrraaaassss  (Sun
+          rasterfile),  ppppssss  and  eeeeppppssssffff  (Encapsulated PostScript),
+          mmmmoooonnnnooooppppssss  (Monochrome   Encapsulated   PostScript),   bbbbmmmmpppp
+          (Microsoft  bitmap)  and  ppppiiiicccctttt  (Apple PICT). The wwwwrrrriiiitttteeee
+          command may also be used to  generate  command  scripts
+          for  other  graphics programs. The format ssssccccrrrriiiipppptttt writes
+          out a file containing the  RasMol  ssssccccrrrriiiipppptttt  commands  to
+
+
+
+Sun Microsystems    Last change: October 1994                  11
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          reproduce  the  current  image.  The  format  mmmmoooollllssssccccrrrriiiipppptttt
+          writes out the commands required to render the  current
+          view  of  the  molecule as ribbons in Per Kraulis' Mol-
+          script program and the format kkkkiiiinnnneeeemmmmaaaaggggeeee the commands for
+          David Richardson's program Mage.
+
+          The distinction between this  command  and  the  RasMol
+          ssssaaaavvvveeee  command  has been dropped. The only difference is
+          that without a format specifier the ssssaaaavvvveeee  command  gen-
+          erates a PPPPDDDDBBBB file and the wwwwrrrriiiitttteeee command generates a GGGGIIIIFFFF
+          image.
+
+
+     ZZZZaaaapppp  Deletes the contents of the current database and resets
+          parameter variables to their initial default state.
+
+
+     ZZZZoooooooommmm Change the magnification  of  the  currently  displayed
+          image.  Boolean  parameters either magnify or reset the
+          scale of current molecule. An integer parameter between
+          10  and  200  specifies  the desired magnification as a
+          percentage of the default scale.
+
+
+SSSSEEEETTTT PPPPAAAARRRRAAAAMMMMEEEETTTTEEEERRRRSSSS
+     RasMol has a number of internal parameters that may be modi-
+     fied  using  the  sssseeeetttt  command.  These  parameters control a
+     number of program options  such  as  rendering  options  and
+     mouse button mappings.
+
+
+     SSSSeeeetttt AAAAmmmmbbbbiiiieeeennnntttt
+          The RasMol aaaammmmbbbbiiiieeeennnntttt parameter is  used  to  control  the
+          amount  of ambient (or surrounding) light in the scene.
+          The aaaammmmbbbbiiiieeeennnntttt value must be between 0 and 100  that  con-
+          trols  the percentage intensity of the darkest shade of
+          an object. For a solid object, this is the intensity of
+          surfaces  facing  away from the light source or in sha-
+          dow.  For depth-cued objects this is the  intensity  of
+          objects furthest from the viewer.
+
+          This parameter is commonly used to correct for monitors
+          with  different  "gamma values" (brightness), to change
+          how light or dark a hardcopy image appears when printed
+          or  to alter the feeling of depth for wireframe or rib-
+          bon representations.
+
+
+     SSSSeeeetttt AAAAxxxxeeeessss
+          The RasMol  aaaaxxxxeeeessss  parameter  controls  the  display  of
+          orthogonal co-ordinate axes on the current display. The
+          co-ordinate axes are those used in  the  molecule  data
+
+
+
+Sun Microsystems    Last change: October 1994                  12
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          file,  and  the  origin is the centre of the molecule's
+          bounding box. The sssseeeetttt aaaaxxxxeeeessss command is similar  the  the
+          commands sssseeeetttt bbbboooouuuunnnnddddbbbbooooxxxx and sssseeeetttt uuuunnnniiiittttcccceeeellllllll that display the
+          bounding box and the crystallographic unit cell respec-
+          tively.
+
+
+     SSSSeeeetttt BBBBaaaacccckkkkggggrrrroooouuuunnnndddd
+          The RasMol bbbbaaaacccckkkkggggrrrroooouuuunnnndddd parameter  is  used  to  set  the
+          colour  of  the  "canvas" background. The colour may be
+          given as either a colour name or a comma separated tri-
+          ple  of  Red,  Green, Blue (RGB) components enclosed in
+          square brackets. Typing the command hhhheeeellllpppp  ccccoooolllloooouuuurrrrssss  will
+          give  a  list of the predefined colour names recognised
+          by RasMol.  When running under X Windows,  RasMol  also
+          recognises  colours in the X server's colour name data-
+          base.
+
+          The command  sssseeeetttt  bbbbaaaacccckkkkggggrrrroooouuuunnnndddd  is  synonymous  with  the
+          RasMol command bbbbaaaacccckkkkggggrrrroooouuuunnnndddd....
+
+
+     SSSSeeeetttt BBBBoooonnnnddddMMMMooooddddeeee
+          The RasMol sssseeeetttt bbbboooonnnnddddmmmmooooddddeeee command controls the  mechanism
+          used  to select individual bonds. When using the sssseeeelllleeeecccctttt
+          and rrrreeeessssttttrrrriiiicccctttt commands, a given bond will be selected if
+          i) the bondmode is oooorrrr and either of the connected atoms
+          is selected, or ii) the bondmode is aaaannnndddd and both  atoms
+          connected by the bond are selected. Hence an individual
+          bond may be uniquely identified by  using  the  command
+          sssseeeetttt  bbbboooonnnnddddmmmmooooddddeeee aaaannnndddd and then uniquely selecting the atoms
+          at both ends.
+
+
+     SSSSeeeetttt BBBBoooouuuunnnnddddBBBBooooxxxx
+          The RasMol bbbboooouuuunnnnddddbbbbooooxxxx parameter controls the  display  of
+          the  current molecules bounding box on the display. The
+          bounding box is orthogonal to the data file's  original
+          co-ordinate  axes.  The sssseeeetttt bbbboooouuuunnnnddddbbbbooooxxxx command is similar
+          the the commands sssseeeetttt aaaaxxxxeeeessss and sssseeeetttt uuuunnnniiiittttcccceeeellllllll that display
+          orthogonal   co-ordinate  axes  and  the  bounding  box
+          respectively.
+
+
+     SSSSeeeetttt DDDDiiiissssppppllllaaaayyyy
+          This command controls the display mode  within  RasMol.
+          By  default,  sssseeeetttt  ddddiiiissssppppllllaaaayyyy  nnnnoooorrrrmmmmaaaallll,,,, RasMol displays the
+          molecule in the representation specified by  the  user.
+          The  command  sssseeeetttt  ddddiiiissssppppllllaaaayyyy sssseeeelllleeeecccctttteeeedddd changes the display
+          mode such that the molecule is temporarily drawn so  as
+          to indicate currently selected portion of the molecule.
+          The user specified  colour  scheme  and  representation
+
+
+
+Sun Microsystems    Last change: October 1994                  13
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          remains unchanged.  In this representation all selected
+          atoms are shown in yellow and all  non  selected  atoms
+          are shown in blue. The colour of the background is also
+          changed to a  dark  grey  to  indicate  the  change  of
+          display  mode.   This command is typically only used by
+          external Graphical User Interfaces (GUIs).
+
+
+     SSSSeeeetttt HHHHBBBBoooonnnnddddssss
+          The RasMol hhhhbbbboooonnnnddddssss parameter determines whether hydrogen
+          bonds are drawn between the donor and acceptor atoms of
+          the hydrogen bond, sssseeeetttt hhhhbbbboooonnnnddddssss ssssiiiiddddeeeecccchhhhaaaaiiiinnnn or between  the
+          alpha  carbon atoms of the protein backbone and between
+          the phosphorous atoms of the nucleic acid backbone, sssseeeetttt
+          hhhhbbbboooonnnnddddssss  bbbbaaaacccckkkkbbbboooonnnneeee....  The actual display of hydrogen bonds
+          is controlled by the hhhhbbbboooonnnnddddssss command.  Drawing  hydrogen
+          bonds  between  protein  alpha  carbons or nucleic acid
+          phosphorous atoms  is  useful  when  the  rest  of  the
+          molecule  is  shown  in only a schematic representation
+          such as bbbbaaaacccckkkkbbbboooonnnneeee,,,, rrrriiiibbbbbbbboooonnnnssss or ssssttttrrrraaaannnnddddssss.... his parameter  is
+          similar to the RasMol ssssssssbbbboooonnnnddddssss parameter.
+
+
+     SSSSeeeetttt FFFFoooonnnnttttSSSSiiiizzzzeeee
+          The RasMol sssseeeetttt ffffoooonnnnttttssssiiiizzzzeeee command is used to control  the
+          size  of  the  characters  that  form atom labels. This
+          value corresponds to the height of the displayed  char-
+          acter  in  pixels.  The maximum value of ffffoooonnnnttttssssiiiizzzzeeee is 32
+          pixels, and the default value  is  8  pixels  high.  To
+          display  atom labels on the screen use the RasMol llllaaaabbbbeeeellll
+          command and to change the colour of  displayed  labels,
+          use the ccccoooolllloooouuuurrrr llllaaaabbbbeeeellllssss command.
+
+
+     SSSSeeeetttt HHHHeeeetttteeeerrrroooo
+          The RasMol hhhheeeetttteeeerrrroooo  parameter  is  used  to  modify  the
+          `default'  behaviour of the RasMol sssseeeelllleeeecccctttt command, i.e.
+          the behaviour of sssseeeelllleeeecccctttt without  any  parameters.  When
+          this value is ffffaaaallllsssseeee,,,, the default sssseeeelllleeeecccctttt region does not
+          include an heterogenous atoms (refer to the  predefined
+          set  hhhheeeetttteeeerrrroooo  ).  When  this  value is ttttrrrruuuueeee,,,, the default
+          sssseeeelllleeeecccctttt region may contain hetero atoms. This  parameter
+          is  similar  to  the  RasMol  hhhhyyyyddddrrrrooooggggeeeennnn  parameter which
+          determines whether hydrogen atoms should be included in
+          the  default set. If both hhhheeeetttteeeerrrroooo and hhhhyyyyddddrrrrooooggggeeeennnn are ttttrrrruuuueeee,,,,
+          sssseeeelllleeeecccctttt without any parameters is equivalent  to  sssseeeelllleeeecccctttt
+          aaaallllllll....
+
+
+     SSSSeeeetttt HHHHoooouuuurrrrGGGGllllaaaassssssss
+          The RasMol  hhhhoooouuuurrrrggggllllaaaassssssss  parameter  allows  the  user  to
+          enable  and  disable the use of the `hour glass' cursor
+
+
+
+Sun Microsystems    Last change: October 1994                  14
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          used  by  RasMol  to  indicate  that  the  program   is
+          currently  busy drawing the next frame. The command sssseeeetttt
+          hhhhoooouuuurrrrggggllllaaaassssssss oooonnnn enable the indicator, whilst sssseeeetttt hhhhoooouuuurrrrggggllllaaaassssssss
+          ooooffffffff  prevents  RasMol from changing the cursor. This is
+          useful when spinning the molecule, running  a  sequence
+          of  commands  from  a script file or using interprocess
+          communication to execute complex sequences of commands.
+          In these cases a `flashing' cursor may be distracting.
+
+
+     SSSSeeeetttt HHHHyyyyddddrrrrooooggggeeeennnn
+          The RasMol hhhhyyyyddddrrrrooooggggeeeennnn parameter is  used  to  modify  the
+          `default'  behaviour of the RasMol sssseeeelllleeeecccctttt command, i.e.
+          the behaviour of sssseeeelllleeeecccctttt without  any  parameters.  When
+          this value is ffffaaaallllsssseeee,,,, the default sssseeeelllleeeecccctttt region does not
+          include any hydrogen or deuterium atoms (refer  to  the
+          predefined set hhhhyyyyddddrrrrooooggggeeeennnn ). When this value is ttttrrrruuuueeee,,,, the
+          default sssseeeelllleeeecccctttt region may contain hydrogen atoms.  This
+          parameter  is  similar  to  the RasMol hhhheeeetttteeeerrrroooo parameter
+          which determines whether heterogenous atoms  should  be
+          included  in  the  default  set.  If  both hhhhyyyyddddrrrrooooggggeeeennnn and
+          hhhheeeetttteeeerrrroooo are  ttttrrrruuuueeee,,,,  sssseeeelllleeeecccctttt  without  any  parameters  is
+          equivalent to sssseeeelllleeeecccctttt aaaallllllll....
+
+
+     SSSSeeeetttt KKKKiiiinnnneeeemmmmaaaaggggeeee
+          The RasMol sssseeeetttt kkkkiiiinnnneeeemmmmaaaaggggeeee command controls the amount  of
+          detail  stored  in  a Kinemage output file generated by
+          the RasMol wwwwrrrriiiitttteeee kkkkiiiinnnneeeemmmmaaaaggggeeee command. The output  kinemage
+          files   are   intended   to   be   displayed  by  David
+          Richardson's Mage program.   sssseeeetttt  kkkkiiiinnnneeeemmmmaaaaggggeeee  ffffaaaallllsssseeee,,,,  the
+          default,  only stores the currently displayed represen-
+          tation in the generated output file.  The  command  sssseeeetttt
+          kkkkiiiinnnneeeemmmmaaaaggggeeee  ttttrrrruuuueeee,,,,  generates a more complex Kinemage that
+          contains both the wireframe  and  backbone  representa-
+          tions as well as the co-ordinate axes, bounding box and
+          crystal unit cell.
+
+
+     SSSSeeeetttt MMMMeeeennnnuuuussss
+          The  RasMol  sssseeeetttt  mmmmeeeennnnuuuussss  command  enables  the   canvas
+          window's menu buttons or menu bar. This command is typ-
+          ically only used by graphical  user  interfaces  or  to
+          create  as large as image as possible when using Micro-
+          soft Windows.
+
+
+     SSSSeeeetttt MMMMoooouuuusssseeee
+          The RasMol sssseeeetttt mmmmoooouuuusssseeee command sets the rotation,  trans-
+          lation, scaling and zooming mouse bindings. The default
+          value is rrrraaaassssmmmmoooollll which is suitable for two  button  mice
+          (for three button mice the second and third buttons are
+
+
+
+Sun Microsystems    Last change: October 1994                  15
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          synonymous); X-Y rotation is controlled  by  the  first
+          button,  and  X-Y translation by the second. Additional
+          functions are controlled by holding a modifier  key  on
+          the  keyboard.   [Shift]  and the first button performs
+          scaling, [shift] and  the  second  button  performs  Z-
+          rotation, and [control] and the first mouse button con-
+          trols the clipping plane. The iiiinnnnssssiiiigggghhhhtttt and  qqqquuuuaaaannnnttttaaaa  pro-
+          vide  the  same  mouse  bindings  as other packages for
+          experienced users.
+
+
+     SSSSeeeetttt RRRRaaaaddddiiiiuuuussss
+          The RasMol sssseeeetttt rrrraaaaddddiiiiuuuussss command  is  used  to  alter  the
+          behaviour of the RasMol ddddoooottttssss command depending upon the
+          value of the ssssoooollllvvvveeeennnntttt parameter.  When ssssoooollllvvvveeeennnntttt is  ttttrrrruuuueeee,,,,
+          the  rrrraaaaddddiiiiuuuussss  parameter  controls whether a true Van der
+          Waal's surface is generated by the ddddoooottttssss command. If the
+          value of rrrraaaaddddiiiiuuuussss is anything other than zero, that value
+          is used as the radius of each atom instead of  it  true
+          VdW  value.  When  the  value  of ssssoooollllvvvveeeennnntttt is ttttrrrruuuueeee,,,, this
+          parameter  determines  the  `probe  sphere'   (solvent)
+          radius.   The  parameter  may be given as an integer in
+          rasmol  units  or  containing  a   decimal   point   in
+          Angstroms.  The  default  value  of  this  parameter is
+          determined by the value of ssssoooollllvvvveeeennnntttt and changing ssssoooollllvvvveeeennnntttt
+          resets rrrraaaaddddiiiiuuuussss to its new default value.
+
+
+     SSSSeeeetttt SSSShhhhaaaaddddoooowwww
+          The RasMol sssseeeetttt sssshhhhaaaaddddoooowwww command enables and disables ray-
+          tracing  of  the  currently  rendered image.  Currently
+          only the spacefilling representation is shadowed or can
+          cast  shadows.  Enabling  shadowing  will automatically
+          disable the Z-clipping (slabbing) plane using the  com-
+          mand ssssllllaaaabbbb ooooffffffff.... Raytracing typically takes about 10s for
+          a moderately sized protein.   It  is  recommended  that
+          shadowing  is  normally disabled whilst the molecule is
+          being transformed or manipulated, and only enabled once
+          an  appropiate  viewpoint  is  selected,  to  provide a
+          greater impression of depth.
+
+
+     SSSSeeeetttt SSSSllllaaaabbbbMMMMooooddddeeee
+          The RasMol ssssllllaaaabbbbmmmmooooddddeeee parameter  controls  the  rendering
+          method  of  objects  cut  by  the slabbing (z-clipping)
+          plane. Valid slabmode parameters are "reject",  "half",
+          "hollow", "solid" and "section".
+
+
+     SSSSeeeetttt SSSSoooollllvvvveeeennnntttt
+          The RasMol sssseeeetttt ssssoooollllvvvveeeennnntttt command is used to  control  the
+          behaviour  of  the  RasMol ddddoooottttssss command. Depending upon
+
+
+
+Sun Microsystems    Last change: October 1994                  16
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          the value of the ssssoooollllvvvveeeennnntttt parameter,  the  ddddoooottttssss  command
+          either  generates a Van der Waal's or a solvent acessi-
+          ble surface around the currently selected set of atoms.
+          Changing  this parameter automatically resets the value
+          of the RasMol rrrraaaaddddiiiiuuuussss parameter.  The command  sssseeeetttt  ssssoooollll----
+          vvvveeeennnntttt ffffaaaallllsssseeee,,,, the default value, indicates that a Van der
+          Waal's surface should be generated and resets the value
+          of  rrrraaaaddddiiiiuuuussss  to zero. The command sssseeeetttt ssssoooollllvvvveeeennnntttt ttttrrrruuuueeee indi-
+          cates that a `Connolly' or `Richards' solvent  accessi-
+          ble surface should be drawn and sets the rrrraaaaddddiiiiuuuussss parame-
+          ter, the solvent  radius,  to  1.2  Angstroms  (or  300
+          RasMol units).
+
+
+     SSSSeeeetttt SSSSppppeeeeccccuuuullllaaaarrrr
+          The RasMol sssseeeetttt ssssppppeeeeccccuuuullllaaaarrrr command  enables  and  disables
+          the  display  of  specular  highlights on solid objects
+          drawn by RasMol. Specular highlights  appear  as  white
+          reflections  of  the light source on the surface of the
+          object.  The  current  RasMol  implementation  uses  an
+          approximation function to generate this highlight.
+
+          The  specular  highlights  on  the  surfaces  of  solid
+          objects may be altered by using the specular reflection
+          coefficient, which is  altered  using  the  RasMol  sssseeeetttt
+          ssssppppeeeeccccppppoooowwwweeeerrrr command.
+
+
+     SSSSeeeetttt SSSSppppeeeeccccPPPPoooowwwweeeerrrr
+          The ssssppppeeeeccccppppoooowwwweeeerrrr parameter  determines  the  shininess  of
+          solid  objects rendered by RasMol. This value between 0
+          and 100 adjusts the reflection coeffient used in specu-
+          lar highlight calculations. The specular highlights are
+          enabled and disabled by the RasMol  sssseeeetttt  ssssppppeeeeccccuuuullllaaaarrrr  com-
+          mand.  Values  around  20 or 30 produce plastic looking
+          surfaces.  High values represent  more  shiny  surfaces
+          such   as  metals,  while  lower  values  produce  more
+          diffuse/dull surfaces.
+
+
+     SSSSeeeetttt SSSSSSSSBBBBoooonnnnddddssss
+          The RasMol ssssssssbbbboooonnnnddddssss parameter determines whether  disul-
+          phide  bridges  are  drawn between the sulphur atoms in
+          the sidechain (the default) or between the alpha carbon
+          atoms  in  the  backbone of the cysteines residues. The
+          actual display of disulphide bridges is  controlled  by
+          the ssssssssbbbboooonnnnddddssss command. Drawing disulphide bridges between
+          alpha carbons is useful when the rest of the protein is
+          shown  in only a schematic representation such as bbbbaaaacccckkkk----
+          bbbboooonnnneeee,,,, rrrriiiibbbbbbbboooonnnnssss or ssssttttrrrraaaannnnddddssss.... his parameter is  similar  to
+          the RasMol hhhhbbbboooonnnnddddssss parameter.
+
+
+
+
+Sun Microsystems    Last change: October 1994                  17
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+     SSSSeeeetttt SSSSttttrrrraaaannnnddddssss
+          The RasMol ssssttttrrrraaaannnnddddssss parameter  controls  the  number  of
+          parallel  strands  that  are  displayed  in  the ribbon
+          representations of proteins. The permissible values for
+          this  parameter  are  1,  2, 3, 4, 5 and 9. The default
+          value is 5. The number of strands is constant  for  all
+          ribbons  being  displayed.   However,  the ribbon width
+          (the separation between strands) may be controlled on a
+          residue  by residue basis using the RasMol rrrriiiibbbbbbbboooonnnnssss com-
+          mand.
+
+
+     SSSSeeeetttt UUUUnnnniiiittttCCCCeeeellllllll
+          The RasMol uuuunnnniiiittttcccceeeellllllll parameter controls the  display  of
+          the  crystallographic unit cell on the current display.
+          The crystal cell is only  enabled  if  the  appropriate
+          crystal  symmetry  information  is contained in the PDB
+          data file. The RasMol  command  sssshhhhoooowwww  ssssyyyymmmmmmmmeeeettttrrrryyyy  display
+          details  of  the  crystal's  space  group and unit cell
+          axes. The sssseeeetttt uuuunnnniiiittttcccceeeellllllll command is similar the the  com-
+          mands sssseeeetttt aaaaxxxxeeeessss and sssseeeetttt bbbboooouuuunnnnddddbbbbooooxxxx that display orthogonal
+          co-ordinate axes and the bounding box respectively.
+
+
+     SSSSeeeetttt VVVVeeeeccccttttPPPPSSSS
+          The RasMol vvvveeeeccccttttppppssss parameter is use to control  the  way
+          in  which  the  RasMol  wwwwrrrriiiitttteeee  command generates vector
+          PostScript output files.  The  command  sssseeeetttt  vvvveeeeccccttttppppssss  oooonnnn
+          enables  to  use  of  black outlines around spheres and
+          cylinder bonds producing `cartoon-like' high resolution
+          output.  However,  the current implementation of RasMol
+          incorrectly cartoons spheres that  are  intersected  by
+          more  than  one  other  sphere.  Hence `ball and stick'
+          models are rendered correctly by not large spacefilling
+          spheres  models.  Cartoon outlines can be disabled, the
+          default, by the command sssseeeetttt vvvveeeeccccttttppppssss ooooffffffff
+
+
+AAAATTTTOOOOMMMM EEEEXXXXPPPPRRRREEEESSSSSSSSIIIIOOOONNNNSSSS
+     RasMol atom expressions uniquely identify an arbitrary group
+     of atoms within a molecule. Atom expressions are composed of
+     either primitive expressions,  predefined  sets,  comparison
+     operators, wwwwiiiitttthhhhiiiinnnn expressions, or logical (boolean) combina-
+     tions of the above expression types.
+
+     The logical operators  allow  complex  queries  to  be  con-
+     structed out of simpler ones using the standard boolean con-
+     nectives aaaannnndddd,,,, oooorrrr and nnnnooootttt.... These may be  abbreviated  by  the
+     symbols  "&", "|" and "!"  respectively. Parentheses (brack-
+     ets) may be used to alter the precedence of  the  operators.
+     For  convenience,  a comma may also be used for boolean dis-
+     junction.
+
+
+
+Sun Microsystems    Last change: October 1994                  18
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+     The atom expression is evaluated for each atom,  hence  pppprrrroooo----
+     tttteeeeiiiinnnn  aaaannnndddd  bbbbaaaacccckkkkbbbboooonnnneeee  selects  protein bacbone atoms, not the
+     protein and [nucleic] acid backbone atoms!
+
+
+     PPPPrrrriiiimmmmiiiittttiiiivvvveeee EEEExxxxpppprrrreeeessssssssiiiioooonnnnssss
+          RasMol primitive expressions are the fundamental build-
+          ing  blocks of atom expressions. There are two types of
+          primitive expression.  The first type is used to  iden-
+          tify  a  given  residue  number  or  range  of  residue
+          numbers. A single residue is identified by  its  number
+          (position in the sequence), and a range is specified by
+          lower and upper bounds separated by a hyphen character.
+          For  example  sssseeeelllleeeecccctttt  5555,,,,6666,,,,7777,,,,8888  is also sssseeeelllleeeecccctttt 5555----8888.... Note
+          that this selects the  given  residue  numbers  in  all
+          macromolecule chains.
+
+          The second type of  primitive  expression  specifies  a
+          sequence  of  fields  that must match for a given atom.
+          The first part specifies a residue (or group  of  resi-
+          dues)  and  an optional second part specifies the atoms
+          within those residues. The first  part  consists  of  a
+          residue  name,  optionally followed by a residue number
+          and/or chain identifier.  The second part consists of a
+          period character followed by an atom name.  An asterisk
+          may be used as a wild card for  a  whole  field  and  a
+          question mark as a single character wildcard.
+
+
+     CCCCoooommmmppppaaaarrrriiiissssoooonnnn OOOOppppeeeerrrraaaattttoooorrrrssss
+          Parts of a molecule may  also  be  distinguished  using
+          equality,  inequality  and  ordering operators on their
+          properties. The format of such comparison expression is
+          a  property name, followed by a comparison operator and
+          then an integer value.
+
+          The atom properties that may  be  used  in  RasMol  are
+          aaaattttoooommmmnnnnoooo  for  the  atom  serial  number,  eeeelllleeeemmmmnnnnoooo for the
+          atom's atomic number (element), rrrreeeessssnnnnoooo for  the  residue
+          number, rrrraaaaddddiiiiuuuussss for the spacefill radius in RasMol units
+          (or zero if not represented as a sphere)  and  tttteeeemmmmppppeeeerrrraaaa----
+          ttttuuuurrrreeee for the PDB anisotropic temperature value.
+
+          The equality operator is denoted either  "="  or  "==".
+          The  inequality  operator as either "<>", "!=" or "/=".
+          The ordering operators are "<" for less than, "<="  for
+          less  than  or  equal to, ">" for greater than, and ">"
+          for greater than or equal to.
+
+
+     WWWWiiiitttthhhhiiiinnnn EEEExxxxpppprrrreeeessssssssiiiioooonnnnssss
+          A RasMol wwwwiiiitttthhhhiiiinnnn expression allows atoms to be  selected
+
+
+
+Sun Microsystems    Last change: October 1994                  19
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          on  their  proximity  to another set of atoms. A wwwwiiiitttthhhhiiiinnnn
+          expression takes two parameters separated  by  a  comma
+          and surrounded by parenthesis. The first argument is an
+          integer value called  the  "cut-off"  distance  of  the
+          within expression and the second argument is any  valid
+          atom expression. The cut-off distance is  expressed  in
+          either  integer  RasMol units or Angstroms containing a
+          decimal point.  An atom is selected if it is within the
+          cut-off  distance  of  any  of the atoms defined by the
+          second argument. This allows complex expressions to  be
+          constructed containing nested wwwwiiiitttthhhhiiiinnnn expressions.
+
+          For example, the  command  sssseeeelllleeeecccctttt  wwwwiiiitttthhhhiiiinnnn((((3333....2222,,,,bbbbaaaacccckkkkbbbboooonnnneeee))))
+          selects  any  atom  within a 3.2 Angstrom radius of any
+          atom in a protein or  nucleic  acid  backbone.   WWWWiiiitttthhhhiiiinnnn
+          expressions  are  particularly useful for selecting the
+          atoms around an active site.
+
+
+     PPPPrrrreeeeddddeeeeffffiiiinnnneeeedddd SSSSeeeettttssss
+          RasMol atom expressions may  contain  predefined  sets.
+          These  sets are single keywords that represent portions
+          of a molecule of interest.  Predefined sets  are  often
+          abbreviations  primitive  atom expressions, and in some
+          cases of selecting areas of a molecule that  could  not
+          otherwise  be  distinguished.  A  list of the currently
+          predefined sets is given below.   In  addition  to  the
+          sets listed here, RasMol also treats element names (and
+          their plurals) as predefined sets containing all  atoms
+          of that element type, i.e. the command sssseeeelllleeeecccctttt ooooxxxxyyyyggggeeeennnn is
+          equivalent to the command sssseeeelllleeeecccctttt eeeelllleeeemmmmnnnnoooo====8888....
+
+
+PPPPrrrreeeeddddeeeeffffiiiinnnneeeedddd SSSSeeeettttssss
+     AAAATTTT SSSSeeeetttt
+          This  set  contains  the  atoms  in  the  complementary
+          nucleotides  adenosine  and  thymidine (A and T respec-
+          tively). All nucleotides are classified as  either  the
+          set  aaaatttt  or  the  set  ccccgggg This set is equivalent to the
+          RasMol atom expressions aaaa,,,,tttt and nnnnuuuucccclllleeeeiiiicccc aaaannnndddd nnnnooootttt ccccgggg
+
+
+     AAAAcccciiiiddddiiiicccc SSSSeeeetttt
+          The set of acidic amino acids.  These are  the  residue
+          types  Asp  and Glu.  All amino acids are classified as
+          either aaaacccciiiiddddiiiicccc,,,, bbbbaaaassssiiiicccc oooorrrr nnnneeeeuuuuttttrrrraaaallll.... This set is equivalent
+          to  the  RasMol atom expressions aaaasssspppp,,,, gggglllluuuu and aaaammmmiiiinnnnoooo aaaannnndddd
+          nnnnooootttt ((((bbbbaaaassssiiiicccc oooorrrr nnnneeeeuuuuttttrrrraaaallll))))
+
+
+     AAAAccccyyyycccclllliiiicccc SSSSeeeetttt
+          The set of atoms in amino acids not containing a  cycle
+
+
+
+Sun Microsystems    Last change: October 1994                  20
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          or  ring.  All  amino  acids  are  classified as either
+          ccccyyyycccclllliiiicccc or aaaaccccyyyycccclllliiiicccc.... This set is equivalent to the RasMol
+          atom expression aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt ccccyyyycccclllliiiicccc
+
+
+     AAAAlllliiiipppphhhhaaaattttiiiicccc SSSSeeeetttt
+          This set contains the aliphatic amino acids.  These are
+          the  amino  acids Ala, Gly, Ile, Leu and Val.  This set
+          is equiavlent to the RasMol atom expression  aaaallllaaaa,,,,  ggggllllyyyy,,,,
+          iiiilllleeee,,,, lllleeeeuuuu,,,, vvvvaaaallll
+
+
+     AAAAllllpppphhhhaaaa SSSSeeeetttt
+          The set of alpha carbons in the protein molecule.  This
+          set  is  approximately  equivalent  to  the RasMol atom
+          expression ****....CCCCAAAA This command  should  not  be  confused
+          with  the predefined set hhhheeeelllliiiixxxx which contains the atoms
+          in the amino acids of the protein's alpha helices.
+
+
+     AAAAmmmmiiiinnnnoooo SSSSeeeetttt
+          This set contains all the atoms contained in amino acid
+          residues.   This  is useful for distinguishing the pro-
+          tein from the nucleic acid and  heterogenous  atoms  in
+          the current molecule database.
+
+
+     AAAArrrroooommmmaaaattttiiiicccc SSSSeeeetttt
+          The set of atoms in  amino  acids  containing  aromatic
+          rings.   These  are  the  amino acids His, Phe, Trp and
+          Tyr.  Because they contain aromatic rings  all  members
+          of  this  set  are member of the predefined set ccccyyyycccclllliiiicccc....
+          This set is equivalent to the RasMol  atom  expressions
+          hhhhiiiissss,,,, pppphhhheeee,,,, ttttrrrrpppp,,,, ttttyyyyrrrr and ccccyyyycccclllliiiicccc aaaannnndddd nnnnooootttt pppprrrroooo
+
+
+     BBBBaaaacccckkkkbbbboooonnnneeee SSSSeeeetttt
+          This set contains the four atoms  of  each  amino  acid
+          that form the polypeptide N-C-C-O backbone of proteins,
+          and the atoms the sugar phosphate backbone  of  nucleic
+          acids.   Use  the  RasMol  predefined  sets pppprrrrooootttteeeeiiiinnnn and
+          nnnnuuuucccclllleeeeiiiicccc to distinguish between the two forms  of  back-
+          bone.   Atoms  in nucleic acids and proteins are either
+          bbbbaaaacccckkkkbbbboooonnnneeee or ssssiiiiddddeeeecccchhhhaaaaiiiinnnn.... This set is  equivalent  to  the
+          RasMol   expression   ((((pppprrrrooootttteeeeiiiinnnn   oooorrrr  nnnnuuuucccclllleeeeiiiicccc))))  aaaannnndddd  nnnnooootttt
+          ssssiiiiddddeeeecccchhhhaaaaiiiinnnn
+
+          The predefined set mmmmaaaaiiiinnnncccchhhhaaaaiiiinnnn is synonymous with the set
+          bbbbaaaacccckkkkbbbboooonnnneeee....
+
+
+     BBBBaaaassssiiiicccc SSSSeeeetttt
+
+
+
+Sun Microsystems    Last change: October 1994                  21
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          The set of basic amino acids.  These  are  the  residue
+          types Arg, His and Lys.  All amino acids are classified
+          as  either  aaaacccciiiiddddiiiicccc,,,,  bbbbaaaassssiiiicccc  or  nnnneeeeuuuuttttrrrraaaallll....  This  set  is
+          equivalent to the RasMol atom expressions aaaarrrrgggg,,,, hhhhiiiissss,,,, llllyyyyssss
+          and aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt ((((aaaacccciiiiddddiiiicccc oooorrrr nnnneeeeuuuuttttrrrraaaallll))))
+
+
+     BBBBoooonnnnddddeeeedddd SSSSeeeetttt
+          This set contain all the atoms in the current  molecule
+          database that are bonded to atleast one other atom.
+
+
+     BBBBuuuurrrriiiieeeedddd SSSSeeeetttt
+          This set contains the atoms in those amino  acids  that
+          tend  (prefer) to buried inside protein, away from con-
+          tact with solvent molecules. This  set  refers  to  the
+          amino acids preference and not the actual solvent aces-
+          sibility for the current protein.  All amino acids  are
+          classified  as  either  ssssuuuurrrrffffaaaacccceeee  or bbbbuuuurrrriiiieeeedddd.... This set is
+          equivalent to the RasMol atom expression aaaammmmiiiinnnnoooo aaaannnndddd  nnnnooootttt
+          ssssuuuurrrrffffaaaacccceeee
+
+
+     CCCCGGGG SSSSeeeetttt
+          This  set  contains  the  atoms  in  the  complementary
+          nucleotides  cytidine  and  guanoine  (C  and G respec-
+          tively). All nucleotides are classified as  either  the
+          set  aaaatttt  or  the  set  ccccgggg This set is equivalent to the
+          RasMol atom expressions cccc,,,,gggg and nnnnuuuucccclllleeeeiiiicccc aaaannnndddd nnnnooootttt aaaatttt
+
+
+     CCCChhhhaaaarrrrggggeeeedddd SSSSeeeetttt
+          This set contains the charged amino  acids.  These  are
+          the  amino acids that are either aaaacccciiiiddddiiiicccc or bbbbaaaassssiiiicccc.... Amino
+          acids are classified as being either  cccchhhhaaaarrrrggggeeeedddd  or  nnnneeeeuuuu----
+          ttttrrrraaaallll.... This set is equivalent to the RasMol atom expres-
+          sions aaaacccciiiiddddiiiicccc oooorrrr bbbbaaaassssiiiicccc and aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt nnnneeeeuuuuttttrrrraaaallll
+
+
+     CCCCyyyycccclllliiiicccc SSSSeeeetttt
+          The set of atoms in amino acids containing a  cycle  or
+          rings.  All amino acids are classified as either ccccyyyycccclllliiiicccc
+          or aaaaccccyyyycccclllliiiicccc.... This set consists of the amino  acids  His,
+          Phe,  Pro,  Trp and Tyr.  The members of the predefined
+          set aaaarrrroooommmmaaaattttiiiicccc are members of this set.  The only  cyclic
+          but  non-aromatic  amino  acid is proline.  This set is
+          equivalent to the RasMol  atom  expressions  hhhhiiiissss,,,,  pppphhhheeee,,,,
+          pppprrrroooo,,,,  ttttrrrrpppp,,,,  ttttyyyyrrrr  and  aaaarrrroooommmmaaaattttiiiicccc oooorrrr pppprrrroooo and aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt
+          aaaaccccyyyycccclllliiiicccc
+
+
+     CCCCyyyyssssttttiiiinnnneeee SSSSeeeetttt
+
+
+
+Sun Microsystems    Last change: October 1994                  22
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          This set contains the atoms of cysteine  residues  that
+          form  part  of a disulphide bridge, i.e. half cystines.
+          RasMol automatically determines disulphide bridges,  if
+          neither  the  predefined  set  ccccyyyyssssttttiiiinnnneeee  nor  the RasMol
+          ssssssssbbbboooonnnnddddssss command have been used since the  molecule  was
+          loaded.  The  set  of  free cysteines may be determined
+          using the RasMol atom expression ccccyyyyssss aaaannnndddd nnnnooootttt ccccyyyyssssttttiiiinnnneeee
+
+
+     HHHHeeeelllliiiixxxx SSSSeeeetttt
+          This set contains all atoms that form part of a protein
+          alpha helix as determined by either the PDB file author
+          or Kabsch and  Sander's  DSSP  algorithm.  By  default,
+          RasMol uses the secondary structure determination given
+          in the PDB file if it exists.  Otherwise, it  uses  the
+          DSSP algorithm as used by the RasMol ssssttttrrrruuuuccccttttuuuurrrreeee command.
+
+          This predefined set should not  be  confused  with  the
+          predefined  set  aaaallllpppphhhhaaaa  which contains the alpha carbon
+          atoms of a protein.
+
+
+     HHHHeeeetttteeeerrrroooo SSSSeeeetttt
+          This set contains all the  heterogenous  atoms  in  the
+          molecule.  These  are  the  atoms  described  by HETATM
+          entries in the PDB file. These typically contain water,
+          cofactors  and  other  solvents and ligands. All hhhheeeetttteeeerrrroooo
+          atoms are classified as either lllliiiiggggaaaannnndddd or ssssoooollllvvvveeeennnntttt atoms.
+          These heterogenous ssssoooollllvvvveeeennnntttt atoms are further classified
+          as either wwwwaaaatttteeeerrrr or iiiioooonnnnssss....
+
+
+     HHHHyyyyddddrrrrooooggggeeeennnn SSSSeeeetttt
+          This predefined set contains all the hydrogen and  deu-
+          terium  atoms  of the current molecule. This predefined
+          set  is  equivalent  to  the  RasMol  atom   expression
+          eeeelllleeeemmmmnnnnoooo====1111
+
+
+     HHHHyyyyddddrrrroooopppphhhhoooobbbbiiiicccc SSSSeeeetttt
+          This set contains  all  the  hydrophobic  amino  acids.
+          These are the amino acids Ala, Leu, Val, Ile, Pro, Phe,
+          Met and Trp.  All amino acids are classified as  either
+          hhhhyyyyddddrrrroooopppphhhhoooobbbbiiiicccc  or  ppppoooollllaaaarrrr....  This  set is equivalent to the
+          RasMol atom expressions aaaallllaaaa,,,, lllleeeeuuuu,,,, vvvvaaaallll,,,, iiiilllleeee,,,,  pppprrrroooo,,,,  pppphhhheeee,,,,
+          and aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt ppppoooollllaaaarrrr
+
+
+     IIIIoooonnnnssss SSSSeeeetttt
+          This set contains all the  heterogenous  phosphate  and
+          sulphate  ions  in  the  current  molecule data file. A
+          large number of these  ions  are  sometimes  associated
+
+
+
+Sun Microsystems    Last change: October 1994                  23
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          with  protein and nucleic acid structures determined by
+          X-ray crystallography. These atoms tend to  clutter  an
+          image. All hhhheeeetttteeeerrrroooo atoms are classified as either lllliiiiggggaaaannnndddd
+          or ssssoooollllvvvveeeennnntttt atoms. All ssssoooollllvvvveeeennnntttt atoms are  classified  as
+          either wwwwaaaatttteeeerrrr or iiiioooonnnnssss....
+
+
+     LLLLaaaarrrrggggeeee SSSSeeeetttt
+          All amino acids are classified as either ssssmmmmaaaallllllll,,,,  mmmmeeeeddddiiiiuuuummmm
+          or  llllaaaarrrrggggeeee....  This  set  is equivalent to the RasMol atom
+          expression aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt ((((ssssmmmmaaaallllllll oooorrrr mmmmeeeeddddiiiiuuuummmm))))
+
+
+     LLLLiiiiggggaaaannnndddd SSSSeeeetttt
+          This set contains all  the  heterogenous  cofactor  and
+          ligand  moieties  that  are  contained  in  the current
+          molecule data file. At this set is defined  to  be  all
+          hhhheeeetttteeeerrrroooo atoms that are not ssssoooollllvvvveeeennnntttt atoms. Hence this set
+          is equivalent to the RasMol atom expression hhhheeeetttteeeerrrroooo  aaaannnndddd
+          nnnnooootttt ssssoooollllvvvveeeennnntttt
+
+
+     MMMMeeeeddddiiiiuuuummmm SSSSeeeetttt
+          All amino acids are classified as either ssssmmmmaaaallllllll,,,,  mmmmeeeeddddiiiiuuuummmm
+          or  llllaaaarrrrggggeeee....  This  set  is equivalent to the RasMol atom
+          expression aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt ((((llllaaaarrrrggggeeee oooorrrr ssssmmmmaaaallllllll))))
+
+
+     NNNNeeeeuuuuttttrrrraaaallll SSSSeeeetttt
+          The set of neutral amino acids.  All  amino  acids  are
+          classified as either aaaacccciiiiddddiiiicccc,,,, bbbbaaaassssiiiicccc or nnnneeeeuuuuttttrrrraaaallll.... This set
+          is equivalent to the RasMol atom expression  aaaammmmiiiinnnnoooo  aaaannnndddd
+          nnnnooootttt ((((aaaacccciiiiddddiiiicccc oooorrrr bbbbaaaassssiiiicccc))))
+
+
+     NNNNuuuucccclllleeeeiiiicccc SSSSeeeetttt
+          The set of all atoms in nucleic acids,  which  consists
+          of  the  four  nucleotide  bases  adenosine,  cytidine,
+          guanosine and thymidine (A, C, G and  T  respectively).
+          All  neucleotides  are  classified  as either ppppuuuurrrriiiinnnneeee or
+          ppppyyyyrrrriiiimmmmiiiiddddiiiinnnneeee.... This set is equivalent to the  RasMol  atom
+          expressions aaaa,,,,cccc,,,,gggg,,,,tttt and ppppuuuurrrriiiinnnneeee oooorrrr ppppyyyyrrrriiiimmmmiiiiddddiiiinnnneeee
+
+
+     PPPPoooollllaaaarrrr SSSSeeeetttt
+          This set contains the polar  amino  acids.   All  amino
+          acids  are  classified  as either hhhhyyyyddddrrrroooopppphhhhoooobbbbiiiicccc or ppppoooollllaaaarrrr....
+          This set is equivalent to the  RasMol  atom  expression
+          aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt hhhhyyyyddddrrrroooopppphhhhoooobbbbiiiicccc
+
+
+     PPPPrrrrooootttteeeeiiiinnnn SSSSeeeetttt
+
+
+
+Sun Microsystems    Last change: October 1994                  24
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          The set of all atoms in proteins. This consists of  the
+          RasMol predefined set aaaammmmiiiinnnnoooo and common post-translation
+          modifications.
+
+
+     PPPPuuuurrrriiiinnnneeee SSSSeeeetttt
+          The set of purine nucleotides.   These  are  the  bases
+          adenosine  and  guanosine  (A and G respectively).  All
+          nucleotides are either ppppuuuurrrriiiinnnneeeessss or ppppyyyyrrrriiiimmmmiiiiddddiiiinnnneeeessss.... This set
+          is  equivalent  to  the RasMol atom expressions aaaa,,,,gggg and
+          nnnnuuuucccclllleeeeiiiicccc aaaannnndddd nnnnooootttt ppppuuuurrrriiiinnnneeee
+
+
+     PPPPyyyyrrrriiiimmmmiiiiddddiiiinnnneeee SSSSeeeetttt
+          The set of pyrimidine nucleotides.  These are the bases
+          cytidine  and  thymidine  (C  and T respectively).  All
+          nucleotides are either ppppuuuurrrriiiinnnneeeessss or ppppyyyyrrrriiiimmmmiiiiddddiiiinnnneeeessss.... This set
+          is  equivalent  to  the RasMol atom expressions cccc,,,,tttt and
+          nnnnuuuucccclllleeeeiiiicccc aaaannnndddd nnnnooootttt ppppyyyyrrrriiiimmmmiiiiddddiiiinnnneeee
+
+
+     SSSSeeeelllleeeecccctttteeeedddd SSSSeeeetttt
+          This set contains the set of  atoms  in  the  currently
+          selected  region.  The  currently  selected  region  is
+          defined by the preceding sssseeeelllleeeecccctttt or rrrreeeessssttttrrrriiiicccctttt command and
+          not  the  atom  expression containing the sssseeeelllleeeecccctttteeeedddd key-
+          word.
+
+
+     SSSShhhheeeeeeeetttt SSSSeeeetttt
+          This set contains all atoms that form part of a protein
+          beta  sheet as determined by either the PDB file author
+          or Kabsch and  Sander's  DSSP  algorithm.  By  default,
+          RasMol uses the secondary structure determination given
+          in the PDB file if it exists.  Otherwise, it  uses  the
+          DSSP algorithm as used by the RasMol ssssttttrrrruuuuccccttttuuuurrrreeee command.
+
+
+     SSSSiiiiddddeeeecccchhhhaaaaiiiinnnn SSSSeeeetttt
+          This set contains  the  functional  sidechains  of  any
+          amino  acids and the base of each nucleotide. These are
+          the atoms not part of the polypeptide N-C-C-O  backbone
+          of  proteins or the sugar phosphate backbone of nucleic
+          acids.  Use the  RasMol  predefined  sets  pppprrrrooootttteeeeiiiinnnn  and
+          nnnnuuuucccclllleeeeiiiicccc   to  distinguish  between  the  two  forms  of
+          sidechain.  Atoms in nucleic  acids  and  proteins  are
+          either bbbbaaaacccckkkkbbbboooonnnneeee or ssssiiiiddddeeeecccchhhhaaaaiiiinnnn.... This set is equivalent to
+          the RasMol expression  ((((pppprrrrooootttteeeeiiiinnnn  oooorrrr  nnnnuuuucccclllleeeeiiiicccc))))  aaaannnndddd  nnnnooootttt
+          bbbbaaaacccckkkkbbbboooonnnneeee
+
+
+     SSSSmmmmaaaallllllll SSSSeeeetttt
+
+
+
+Sun Microsystems    Last change: October 1994                  25
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          All amino acids are classified as either ssssmmmmaaaallllllll,,,,  mmmmeeeeddddiiiiuuuummmm
+          or  llllaaaarrrrggggeeee....  This  set  is equivalent to the RasMol atom
+          expression aaaammmmiiiinnnnoooo aaaannnndddd nnnnooootttt ((((mmmmeeeeddddiiiiuuuummmm oooorrrr llllaaaarrrrggggeeee))))
+
+
+     SSSSoooollllvvvveeeennnntttt SSSSeeeetttt
+          This set contains the solvent  atoms  in  the  molecule
+          co-ordinate  file.   These  are  the heterogenous water
+          molecules, phosphate  and  sulphate  ions.  All  hhhheeeetttteeeerrrroooo
+          atoms are classified as either lllliiiiggggaaaannnndddd or ssssoooollllvvvveeeennnntttt atoms.
+          All ssssoooollllvvvveeeennnntttt atoms are classified  as  either  wwwwaaaatttteeeerrrr  or
+          iiiioooonnnnssss.... This set is equivalent to the RasMol atom expres-
+          sions hhhheeeetttteeeerrrroooo aaaannnndddd nnnnooootttt lllliiiiggggaaaannnndddd and wwwwaaaatttteeeerrrr oooorrrr iiiioooonnnnssss
+
+
+     SSSSuuuurrrrffffaaaacccceeee SSSSeeeetttt
+          This set contains the atoms in those amino  acids  that
+          tend (prefer) to be on the surface of proteins, in con-
+          tact with solvent molecules. This  set  refers  to  the
+          amino  acids  preference  and  not  the  actual solvent
+          accessibility for the current protein.  All amino acids
+          are classified as either ssssuuuurrrrffffaaaacccceeee or bbbbuuuurrrriiiieeeedddd.... This set is
+          equivalent to the RasMol atom expression aaaammmmiiiinnnnoooo aaaannnndddd  nnnnooootttt
+          bbbbuuuurrrriiiieeeedddd
+
+
+     TTTTuuuurrrrnnnn SSSSeeeetttt
+          This set contains all atoms that form part of a protein
+          turns  as  determined  by either the PDB file author or
+          Kabsch and Sander's DSSP algorithm. By default,  RasMol
+          uses the secondary structure determination given in the
+          PDB file if it exists.  Otherwise,  it  uses  the  DSSP
+          algorithm as used by the RasMol ssssttttrrrruuuuccccttttuuuurrrreeee command.
+
+
+     WWWWaaaatttteeeerrrr SSSSeeeetttt
+          This set contains all the heterogenous water  molecules
+          in  the  current  database.  A  large  number  of water
+          molecules are sometimes  associated  with  protein  and
+          nucleic acid structures determined by X-ray crystallog-
+          raphy. These atoms  tend  to  clutter  an  image.   All
+          hhhheeeetttteeeerrrroooo atoms are classified as either lllliiiiggggaaaannnndddd or ssssoooollllvvvveeeennnntttt
+          atoms. The ssssoooollllvvvveeeennnntttt  atoms  are  further  classified  as
+          either wwwwaaaatttteeeerrrr or iiiioooonnnnssss....
+
+
+CCCCOOOOLLLLOOOOUUUURRRR SSSSCCCCHHHHEEEEMMMMEEEESSSS
+     The RasMol ccccoooolllloooouuuurrrr command allows different objects (such  as
+     atoms,  bonds  and  ribbon segments) to be given a specified
+     colour. Typically this colour is either a RasMol  predefined
+     colour  name or an RGB triple. Additionally RasMol also sup-
+     ports  ccccppppkkkk,,,,  aaaammmmiiiinnnnoooo,,,,  cccchhhhaaaaiiiinnnn,,,,   ggggrrrroooouuuupppp,,,,   sssshhhhaaaappppeeeellllyyyy,,,,   ssssttttrrrruuuuccccttttuuuurrrreeee,,,,
+
+
+
+Sun Microsystems    Last change: October 1994                  26
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+     tttteeeemmmmppppeeeerrrraaaattttuuuurrrreeee,,,,  cccchhhhaaaarrrrggggeeee  and  uuuusssseeeerrrr  colour schemes for atoms, a
+     hhhhbbbboooonnnndddd ttttyyyyppppeeee colour scheme for hydrogen  bonds  and  eeeelllleeeeccccttttrrrroooossss----
+     ttttaaaattttiiiicccc   ppppooootttteeeennnnttttiiiiaaaallll  colour  scheme  for  dot  surfaces.   The
+     currently predefined colour names  are  blue,  black,  cyan,
+     green,  greenblue,  magenta, orange, purple, red, redorange,
+     violet, white and yellow.
+
+
+     AAAAmmmmiiiinnnnoooo CCCCoooolllloooouuuurrrrssss
+          The RasMol aaaammmmiiiinnnnoooo  colour  scheme  colours  amino  acids
+          according  to  traditional  amino  acid properties. The
+          purpose of colouring is to identify amino acids  in  an
+          unusual or surprising environment. The outer parts of a
+          protein that are polar are visible (bright) colours and
+          non-polar residues darker. Most colours are hallowed by
+          tradition. This colour scheme is similar to the sssshhhhaaaappppeeeellllyyyy
+          scheme.
+
+
+     CCCChhhhaaaaiiiinnnn CCCCoooolllloooouuuurrrrssss
+          The RasMol cccchhhhaaaaiiiinnnn colour scheme assigns each macromolec-
+          ular  chain a unique colour. This colour scheme is par-
+          ticularly useful for distinguishing the parts  of  mul-
+          timeric  structure or the individual `strands' of a DNA
+          chain.
+
+
+     CCCCPPPPKKKK CCCCoooolllloooouuuurrrrssss
+          The RasMol ccccppppkkkk colour scheme is based upon the  colours
+          of  the  popular plastic spacefilling models which were
+          developed by Corey, Pauling and later improved by  Kul-
+          tun.  This  colour  scheme colour `atom' objects by the
+          atom (element) type. This is the scheme  conventionally
+          used by chemists.
+
+
+     GGGGrrrroooouuuupppp CCCCoooolllloooouuuurrrrssss
+          The RasMol ggggrrrroooouuuupppp colour scheme colour codes residues by
+          their position in a macromolecular chain. Each chain is
+          drawn as a smooth spectrum  from  blue  through  green,
+          yellow  and orange to red. Hence the N terminus of pro-
+          teins and 5' terminus of nucleic acids are coloured red
+          and  the  C  terminus  of  proteins  and 3' terminus of
+          nucleic acids are drawn in blue. If a chain has a large
+          number  of  heterogenous  molecules associated with it,
+          the macromolecule may not be drawn in the full  `range'
+          of the spectrum.
+
+
+     SSSShhhhaaaappppeeeellllyyyy CCCCoooolllloooouuuurrrrssss
+          The RasMol sssshhhhaaaappppeeeellllyyyy colour scheme colour codes  residues
+          by  amino  acid property. This scheme is based upon Bob
+
+
+
+Sun Microsystems    Last change: October 1994                  27
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          Fletterick's "Shapely  Models".  Each  amino  acid  and
+          nucleic  acid  residue  is  given  a unique colour. The
+          sssshhhhaaaappppeeeellllyyyy colour scheme is used by David Bacon's Raster3D
+          program.  This  colour  scheme  is similar to the aaaammmmiiiinnnnoooo
+          colour scheme.
+
+
+     SSSSttttrrrruuuuccccttttuuuurrrreeee CCCCoooolllloooouuuurrrrssss
+          The RasMol ssssttttrrrruuuuccccttttuuuurrrreeee colour scheme colours the molecule
+          by  protein  secondary  structure.   Alpha  helices are
+          coloured magenta, [240,0,128], beta sheets are coloured
+          yellow,  [255,255,0],  turns  are  coloured  pale blue,
+          [96,128,255] and all other residues are coloured white.
+          The  secondary  structure  is  either read from the PDB
+          file (HELIX and SHEET records), if available, or deter-
+          mined  using  Kabsch  and  Sander's DSSP algorithm. The
+          RasMol ssssttttrrrruuuuccccttttuuuurrrreeee command may be used  to  force  DSSP's
+          structure assignment to be used.
+
+
+     TTTTeeeemmmmppppeeeerrrraaaattttuuuurrrreeee CCCCoooolllloooouuuurrrrssss
+          The RasMol tttteeeemmmmppppeeeerrrraaaattttuuuurrrreeee colour scheme colour codes  each
+          atom  according  to  the anisotropic temperature (beta)
+          value stored in the PDB file. Typically  this  gives  a
+          measure  of  the mobility/uncertainty of a given atom's
+          position. High values  are  coloured  in  warmer  (red)
+          colours and lower values in colder (blue) colours. This
+          feature is often used  to  associate  a  "scale"  value
+          [such  as amino acid variability in viral mutants] with
+          each atom in  a  PDB  file,  and  colour  the  molecule
+          appropriately.
+
+          The  difference  between  the  tttteeeemmmmppppeeeerrrraaaattttuuuurrrreeee  and  cccchhhhaaaarrrrggggeeee
+          colour  schemes  is  that increasing temperature values
+          proceed from blue to  red,  whereas  increasing  charge
+          valuse go from red to blue.
+
+
+     CCCChhhhaaaarrrrggggeeee CCCCoooolllloooouuuurrrrssss
+          The RasMol cccchhhhaaaarrrrggggeeee colour scheme colour codes each  atom
+          according  to the charge value stored in the input file
+          (or beta factor field of PDB files).  High  values  are
+          coloured  in  blue (positive) and lower values coloured
+          in red (negative). Rather than use a fixed  scale  this
+          scheme determines the maximum and minimum values of the
+          charge/temperature field and interpolates from  red  to
+          blue  appropriately.  Hence, green cannot be assumed to
+          be `no net charge' charge.
+
+          The  difference  between  the  cccchhhhaaaarrrrggggeeee  and  tttteeeemmmmppppeeeerrrraaaattttuuuurrrreeee
+          colour  schemes  is  that increasing temperature values
+          proceed from blue to  red,  whereas  increasing  charge
+
+
+
+Sun Microsystems    Last change: October 1994                  28
+
+
+
+
+
+
+RASMOL(1)                 User Commands                 RASMOL(1)
+
+
+
+          valuse go from red to blue.
+
+          If  the  charge/temperature  field  stores   reasonable
+          values  it  is  possible  to use the RasMol ccccoooolllloooouuuurrrr ddddoooottttssss
+          ppppooootttteeeennnnttttiiiiaaaallll command to colour code a  dot  surface  (gen-
+          erated by the ddddoooottttssss command) by electrostatic potential.
+
+
+     UUUUsssseeeerrrr CCCCoooolllloooouuuurrrrssss
+          The RasMol uuuusssseeeerrrr colour scheme allows RasMol to use  the
+          colour  scheme  stored in the PDB file. The colours for
+          each atom are stored in COLO records placed in the  PDB
+          data  file.  This  convention  was  introduced by David
+          Bacon's Raster3D program.
+
+
+     HHHHBBBBoooonnnndddd TTTTyyyyppppeeee CCCCoooolllloooouuuurrrrssss
+          The RasMol ttttyyyyppppeeee colour scheme applies only to  hydrogen
+          bonds,  hence is used in the command ccccoooolllloooouuuurrrr hhhhbbbboooonnnnddddssss ttttyyyyppppeeee
+          This scheme colour codes each hydrogen  bond  according
+          to  the distance along a protein chain between hydrogen
+          bond donor and acceptor.  This schematic representation
+          was  introduced  by  Belhadj-Mostefa  and Milner-White.
+          This representation gives a good insight  into  protein
+          secondary   structure  (hbonds  forming  alpha  helices
+          appear red, those  forming  sheets  appear  yellow  and
+          those forming turns appear magenta).
+
+
+     PPPPooootttteeeennnnttttiiiiaaaallll CCCCoooolllloooouuuurrrrssss
+          The RasMol ppppooootttteeeennnnttttiiiiaaaallll colour scheme applies only to  dot
+          surfaces,  hence  is  used  in  the command ccccoooolllloooouuuurrrr ddddoooottttssss
+          ppppooootttteeeennnnttttiiiiaaaallll This scheme colours each currently  displayed
+          dot  by  the  electrostatic  potential at that point in
+          space. This potential is calculated using Coulomb's law
+          taking  the  temperature/charge field of the input file
+          to be the charge assocated with that atom. This is  the
+          same  interpretation used by the ccccoooolllloooouuuurrrr cccchhhhaaaarrrrggggeeee command.
+          Like the cccchhhhaaaarrrrggggeeee colour scheme low values are blue/white
+          and high values are red.
+
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+     The RasMol User Manual!
+
+
+AAAAUUUUTTTTHHHHOOOORRRR
+     Copyright (C) 1992-94 by Roger Sayle. All rights reserved.
+      (rasmol@ggr.co.uk)
+
+
+
+
+
+
+Sun Microsystems    Last change: October 1994                  29
+
+
+
