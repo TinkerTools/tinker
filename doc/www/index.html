@@ -1,0 +1,449 @@
+<HTML>
+<HEAD>
+<TITLE>TINKER Molecular Modeling Package</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<CENTER>
+<BR>
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+<P><B><FONT SIZE=7>TINKER Home Page</FONT></B></P>
+<P><IMG SRC="mechanic.gif" width="594" height="426"></I>
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+<H2><B>TINKER - <I>Software Tools for Molecular Design</I></B></H2>
+<P>Current Major Version: TINKER 4.2</P>
+<P>Major Release Date: June 2004</P>
+<P>Last Minor Revision: September 8, 2004</P>
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+
+<TABLE>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=7%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=LEFT WIDTH=84%>
+
+<CENTER>
+<H2>Introduction</H2>
+</CENTER>
+
+<UL>
+<P>The TINKER molecular modeling software is a complete and general
+package for molecular mechanics and dynamics, with some special features
+for biopolymers. TINKER has the ability to use any of several common
+parameter sets, such as Amber (ff94, ff96, ff98 and ff99), CHARMM
+(19 and 27), Allinger MM (MM2-1991 and MM3-2000), OPLS (OPLS-UA,
+OPLS-AA and OPLS-AA/L), Liam Dang's polarizable potentials, and our
+own AMOEBA polarizable atomic multipole force field. Parameter sets
+for other standard force fields such as GROMOS, UFF, ENCAD and MM4 are
+under consideration for future releases.</P>
+</UL>
+<UL>
+<P>The TINKER package includes a variety of novel algorithms such as
+a new distance geometry metrization method that has greater speed and
+better sampling than standard methods, Elber's reaction path methods,
+several of our Potential Smoothing and Search (PSS) methods for global
+optimization, an efficient potential surface scanning procedure, a
+flexible implementation of atomic multipole-based electrostatics with
+explicit dipole polarizability, a selection of continuum solvation
+treatments including several variants of the generalized Born (GB/SA)
+model, an efficient truncated Newton (TNCG) local optimizer, surface
+areas and volumes with derivatives, a simple free energy perturbation
+facility, normal mode analysis, minimization in Cartesian, torsional
+or rigid body space, velocity Verlet stochastic dynamics, an improved
+spherical energy cutoff method, Particle Mesh Ewald summation for
+partial charges and regular Ewald for polarizable multipoles, a novel
+reaction field treatment of long range electrostatics, and more....</P>
+</UL>
+
+<CENTER>
+<H2>Current Release</H2>
+</CENTER>
+
+<UL>
+<P>The release of TINKER version 4.2 coincides with a greatly improved
+version of the Force Field Explorer (FFE) visualization program and GUI.
+This major new release of FFE contains significant improvements in many
+areas such as stability, feature set and integration with TINKER. Further
+information is available from the FFE web site linked below.</P>
+</UL>
+<UL>
+<P>Other changes from the last TINKER version include the initial public
+release of a complete AMOEBA protein force field parameter set, and
+numerous minor additions and bug fixes, many of them suggested by users
+of the package. Please note that as with prior new releases, version 4.2
+is neither backward nor forward compatible with earlier versions of TINKER.
+For example, earlier versions of parameter files should not be used with
+version 4.2 executables and vice versa.</P>
+</UL>
+
+<CENTER>
+<H2>Future Development</H2>
+</CENTER>
+
+<UL>
+<P>We have essentially completed work much of the AMOEBA polarizable
+multipole force field. The AMOEBA water model and protein force field
+are part of the present distribution. Additional ion and small molecule
+parameters will be made available on this site in due course. Preliminary
+work has begun on development of compatible nucleic acid parameters. We
+are already planning for improvements and new features in the next
+releases of TINKER and Force Field Explorer. Suggestions and comments
+regarding other possible additions are always welcome. Of course, offers
+to provide or help write code are even better....</P>
+</UL>
+
+<CENTER>
+<H2>Availability</H2>
+</CENTER>
+
+<UL>
+<P>This distribution version of TINKER, with full source code, is made
+available free of charge to anyone who wants it. Major new releases of
+the package with additional features are generally placed on this site
+during February, June and October. Minor changes and bug fixes are
+added to the distribution version as we finish testing them. The basic
+package has been used by the Ponder lab and others at Washington
+University for several years and should be fairly robust. All we ask
+is that you notify us of any bugs, features you would like to see
+implemented, or major code extensions that you add yourself. If you
+make significant use of the package, please complete and return by
+regular post the license form available with the full distribution and
+via a link below. These forms are used to aid in convincing colleagues
+that TINKER and FFE are used outside of Washington University. They help
+us justify further development of the programs. We try to respond to
+email as time allows. Comments and questions are always welcome and
+should be directed to Jay Ponder at ponder@dasher.wustl.edu.</P>
+</UL>
+
+<CENTER>
+<H2>Installation</H2>
+</CENTER>
+
+<UL>
+<P>The easiest way to install TINKER and Force Field Explorer on your
+computer is to download the self-extracting installation kit for your
+machine type. Kits for Linux, Windows and Mac OS X are available from
+the links provided below on this web page. These installation packages
+are quite large (25-55Mb), so make sure you have a stable and fast
+connection before attempting to download. Note that the Mac OS X kit
+requires a 10.3 (Panther) system, and Mac users must obtain from Apple
+and install the Java3D package prior to running TINKER with FFE.</P>
+</UL>
+<UL>
+<P>The TINKER executables supplied with the installation kits are
+intended for use via the Force Field Explorer GUI. These executables
+have been linked against Java libraries needed for communication
+between TINKER and FFE. It is possible to run the kit executables
+stand-alone from the command line, but various Java related environment
+variables that are normally setup automatically by FFE must be provided
+manually. For those who do not wish to use the GUI and need only the
+standard options, we provide sets of prebuilt command line executables
+for Linux, Windows and Macintosh. See the README files in the command
+line executable directories.</P>
+</UL>
+<UL>
+<P>If you choose not to use the installation kits, you will still need
+to have a copy of the full distribution containing parameter sets,
+examples, benchmarks, test files, documentation, source code and
+instructions for building the package on a variety of machine types.
+The full distribution is available for download via the links below in
+two different compressed formats (GNU gzip and Windows ZIP). Please see
+the README files in the individual directories.</P>
+</UL>
+
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=9%>
+<P></P>
+</TD>
+</TABLE>
+
+<CENTER>
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+<H2>TINKER Downloads</H2>
+
+<TABLE WIDTH=640 CELLPADDING=5>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Installation Kit for Linux (53.4Mb)</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker-linux.sh.gz">DOWNLOAD</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Installation Kit for Windows (49.9Mb)</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker-windows.exe">DOWNLOAD</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Installation Kit for Mac OS X (26.4Mb)</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker-macosx.sit">DOWNLOAD</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>
+<P>Summary Sheet</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P>
+<P><A HREF="summary.html">VIEW</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker/doc/summary.pdf">PDF</A></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>License Agreement</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="license.html">VIEW</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker/doc/license.pdf">PDF</A></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>User's Guide</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="guide.html">VIEW</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker/doc/guide.pdf">PDF</A></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=84%>
+<P>Logo Illustration</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="original.gif">VIEW</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker/doc/cover.pdf">PDF</A></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>
+<P>Source Code Directory</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker/source">DIRECTORY</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Force Field Parameter Sets</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker/params">DIRECTORY</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Distribution Directory</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker">DIRECTORY</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>
+<P>Full Distribution (GNU gzip, 8.2Mb)</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker.tar.gz">DOWNLOAD</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Full Distribution (Windows ZIP, 8.6Mb)</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker.zip">DOWNLOAD</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>
+<P>Command Line Executables for Linux</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker-bin/linux">DIRECTORY</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Command Line Executables for Windows</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker-bin/windows">DIRECTORY</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>Command Line Executables for Mac OS X</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P><A HREF="ftp://dasher.wustl.edu/pub/tinker-bin/macosx">DIRECTORY</A></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN=1 WIDTH=76%>
+<P>
+<P>Force Field Explorer GUI</P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P>
+<P><A HREF="http://dasher.wustl.edu/ffe">WEB SITE</A><P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=8%>
+<P></P>
+</TD></TR>
+</TABLE>
+
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+
+<TABLE>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=7%>
+<P></P>
+</TD>
+<TD COLSPAN=1 ALIGN=LEFT WIDTH=84%>
+<UL>
+<P>TINKER's <I>"Molecular Mechanics"</I> Logo Illustration by Jay Nelson.
+Courtesy of Prof. Robert Paine, Chemistry Dept., Univ. of New Mexico.
+</P>
+<P>Initial development of TINKER was supported by Award 9808317 from the
+National Science Foundation and by Grant R01 GM58712 from the United
+States National Institutes of Health. Continued development of the AMOEBA
+polarizable force field for proteins is funded by NSF Award 0344670.
+</P>
+<P>Any opinions, findings, and conclusions or recommendations expressed
+in the TINKER Molecular Modeling package are those of the authors and do
+not reflect the views of either the National Science Foundation or the
+National Institutes of Health.
+</P>
+</UL>
+<CENTER>
+<IMG SRC="nsf.gif" WIDTH="83" HEIGHT="83">
+<IMG SRC="blank.gif" WIDTH="100" HEIGHT="80">
+<IMG SRC="nih.gif" WIDTH="80" HEIGHT="80">
+</CENTER>
+</TD>
+<TD COLSPAN=1 ALIGN=CENTER WIDTH=9%>
+</TD>
+</TABLE>
+
+<BR>
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+
+<ADDRESS>
+<BR>Last Update: September 8, 2004
+<BR>Maintainer: ponder@dasher.wustl.edu
+<A HREF="mailto:ponder@dasher.wustl.edu">(sendmail)</A>
+</ADDRESS>
+
+<BR>
+<HR ALIGN=CENTER SIZE=8 WIDTH=80% NOSHADE>
+<BR>
+
+</CENTER>
+</BODY>
+</HTML>
