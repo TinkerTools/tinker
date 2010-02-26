@@ -1,0 +1,16 @@
+
+                    ----------------------------------------
+                    Makefile for Building the TINKER Package
+                    ----------------------------------------
+
+          This subdirectory contains a Unix-style Makefile that can
+          be used to build the TINKER modeling package. The provided
+          file will need slight modification for use with machine and
+          compiler combinations not described in the file header. The
+          Makefile is a translation of the compile-library-link scripts
+          found in the machine specific subdirectories. A list of the
+          dependencies of source files on included files is generated
+          via the TINKER "document" program by running the depend.make
+          script from within the Fortran source directory. (Of course,
+          this can also be done with Perl, etc.)
+

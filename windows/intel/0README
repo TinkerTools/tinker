@@ -1,0 +1,9 @@
+
+              ---------------------------------------------------
+              TINKER Notes for Intel Fortran Compiler for Windows
+              ---------------------------------------------------
+
+          This subdirectory contains a set of batch files that can
+          be used to build the TINKER program package under Microsoft
+          Windows using the Intel Fortran Compiler for Windows.
+

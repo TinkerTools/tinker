@@ -1,0 +1,3266 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              AMOEBA-2009
+
+bond-cubic              -2.55
+bond-quartic            3.793125
+angle-cubic             -0.014
+angle-quartic           0.000056
+angle-pentic            -0.0000007
+angle-sextic            0.000000022
+opbendtype              ALLINGER
+opbend-cubic            -0.014
+opbend-quartic          0.000056
+opbend-pentic           -0.0000007
+opbend-sextic           0.000000022
+torsionunit             0.5
+vdwtype                 BUFFERED-14-7
+radiusrule              CUBIC-MEAN
+radiustype              R-MIN
+radiussize              DIAMETER
+epsilonrule             HHG
+dielectric              1.0
+polarization            MUTUAL
+vdw-13-scale            0.0
+vdw-14-scale            1.0
+vdw-15-scale            1.0
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.0
+polar-14-scale          1.0
+polar-15-scale          1.0
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Intermolecular
+Potentials for Small Organic Molecules", in preparation.
+
+J. W. Ponder and D. A. Case, "Force Fields for Protein Simulation",
+Adv. Prot. Chem., 66, 27-85 (2003)
+
+P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Water Model for
+Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947 (2003)
+
+P. Ren and J. W. Ponder, "A Consistent Treatment of Inter- and
+Intramolecular Polarization in Molecular Mechanics Calculations",
+J. Comput. Chem., 23, 1497-1506 (2002)
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom          1    1    He    "Helium Atom He"               2     4.003    0
+atom          2    2    Ne    "Neon Atom Ne"                10    20.179    0
+atom          3    3    Ar    "Argon Atom Ar"               18    39.948    0
+atom          4    4    Kr    "Krypton Atom Kr"             36    83.800    0
+atom          5    5    Xe    "Xenon Atom Xe"               54   131.290    0
+atom          6    6    Li+   "Lithium Ion Li+"              3     6.941    0
+atom          7    7    Na+   "Sodium Ion Na+"              11    22.990    0
+atom          8    8    K+    "Potassium Ion K+"            19    39.098    0
+atom          9    9    Rb+   "Rubidium Ion Rb+"            37    85.468    0
+atom         10   10    Cs+   "Cesium Ion Cs+"              55   132.905    0
+atom         11   11    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
+atom         12   12    Ca+   "Calcium Ion Ca+2"            20    40.078    0
+atom         13   13    F-    "Fluoride Ion F-"              9    18.998    0
+atom         14   14    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom         15   15    Br-   "Bromide Ion Br-"             35    79.904    0
+atom         16   16    I-    "Iodide Ion I-"               53   126.904    0
+atom         17   17    C     "Cyanide Ion C"                6    12.001    1
+atom         18   18    N     "Cyanide Ion N"                7    14.007    1
+atom         19   19    B     "Tetrafluoroborate B"          5    10.810    4
+atom         20   20    F     "Tetrafluoroborate F"          9    18.998    1
+atom         21   21    P     "Hexafluorophosphate P"       15    30.974    6
+atom         22   22    F     "Hexafluorophosphate F"        9    18.998    1
+atom         23   23    N     "Dinitrogen N2"                7    14.007    1
+atom         24   24    C     "Methane CH4"                  6    12.011    4
+atom         25   25    H     "Methane H4C"                  1     1.008    1
+atom         26   26    C     "Ethane CH3"                   6    12.011    4
+atom         27   27    H     "Ethane H3C"                   1     1.008    1
+atom         28   26    C     "Alkane CH3-"                  6    12.011    4
+atom         29   27    H     "Alkane H3C-"                  1     1.008    1
+atom         30   28    C     "Alkane -CH2-"                 6    12.011    4
+atom         31   29    H     "Alkane -H2C-"                 1     1.008    1
+atom         32   30    C     "Alkane >CH-"                  6    12.011    4
+atom         33   31    H     "Alkane -HC<"                  1     1.008    1
+atom         34   32    C     "Alkane >C<"                   6    12.011    4
+atom         35   33    O     "Water O"                      8    15.999    2
+atom         36   34    H     "Water H"                     1     1.008    1
+atom         37   35    O     "Methanol O"                   8    15.999    2
+atom         38   36    H     "Methanol HO"                  1     1.008    1
+atom         39   37    C     "Methanol CH3"                 6    12.011    4
+atom         40   38    H     "Methanol H3C"                 1     1.008    1
+atom         41   35    O     "Ethanol O"                    8    15.999    2
+atom         42   36    H     "Ethanol HO"                   1     1.008    1
+atom         43   39    C     "Ethanol CH2"                  6    12.011    4
+atom         44   38    H     "Ethanol H2C"                  1     1.008    1
+atom         45   39    C     "Ethanol CH3"                  6    12.011    4
+atom         46   40    H     "Ethanol H3C"                  1     1.008    1
+atom         47   39    C     "Propanol Me-CH2"              6    12.011    4
+atom         48   41    H     "Propanol Me-CH2"              1     1.008    1
+atom         49   39    C     "Propanol CH3"                 6    12.011    4
+atom         50   40    H     "Propanol H3C"                 1     1.008    1
+atom         51   35    O     "isoPropanol O"                8    15.999    2
+atom         52   36    H     "isoPropanol HO"               1     1.008    1
+atom         53   42    C     "isoPropanol >CH-"             6    12.011    4
+atom         54   38    H     "isoPropanol >CH-"             1     1.008    1
+atom         55   39    C     "isoPropanol CH3"              6    12.011    4
+atom         56   40    H     "isoPropanol H3C"              1     1.008    1
+atom         57   35    O     "Methyl Ether O"               8    15.999    2
+atom         58   39    C     "Methyl Ether CH3"             6    12.011    4
+atom         59   43    H     "Methyl Ether H3C"             1     1.008    1
+atom         60   44    N     "Ammonia N"                    7    14.007    3
+atom         61   45    H     "Ammonia H3N"                  1     1.008    1
+atom         62   46    N     "Ammonium Ion N+"              7    14.007    4
+atom         63   47    H     "Ammonium Ion H4N+"            1     1.008    1
+atom         64   48    N     "Methyl Amine N"               7    14.007    3
+atom         65   49    H     "Methyl Amine H2N"             1     1.008    1
+atom         66   39    C     "Methyl Amine CH3"             6    12.011    4
+atom         67   50    H     "Methyl Amine H3C"             1     1.008    1
+atom         68   48    N     "Ethyl Amine N"                7    14.007    3
+atom         69   49    H     "Ethyl Amine H2N"              1     1.008    1
+atom         70   39    C     "Ethyl Amine CH2"              6    12.011    4
+atom         71   50    H     "Ethyl Amine H2C"              1     1.008    1
+atom         72   39    C     "Ethyl Amine CH3"              6    12.011    4
+atom         73   40    H     "Ethyl Amine H3C"              1     1.008    1
+atom         74   39    C     "Propyl Amine CH3"             6    12.011    4
+atom         75   40    H     "Propyl Amine H3C"             1     1.008    1
+atom         76   39    C     "Propyl Amine Me-CH2"          6    12.011    4
+atom         77   41    H     "Propyl Amine Me-CH2"          1     1.008    1
+atom         78   48    N     "Dimethyl Amine N"             7    14.007    3
+atom         79   49    H     "Dimethyl Amine HN"            1     1.008    1
+atom         80   39    C     "Dimethyl Amine CH3"           6    12.011    4
+atom         81   50    H     "Dimethyl Amine H3C"           1     1.008    1
+atom         82   48    N     "Trimethyl Amine N"            7    14.007    3
+atom         83   39    C     "Trimethyl Amine CH3"          6    12.011    4
+atom         84   50    H     "Trimethyl Amine H3C"          1     1.008    1
+atom         85   48    N     "Pyrrolidine N"                7    14.007    3
+atom         86   49    H     "Pyrrolidine HN"               1     1.008    1
+atom         87   39    C     "Pyrrolidine C-CH2-C"          6    12.011    4
+atom         88   51    H     "Pyrrolidine C-CH2-C"          1     1.008    1
+atom         89   39    C     "Pyrrolidine CH2-N"            6    12.011    4
+atom         90   51    H     "Pyrrolidine H2C-N"            1     1.008    1
+atom         91   48    N     "NMePyrrolidine N"             7    14.007    3
+atom         92   39    C     "NMePyrrolidine CH2-N"         6    12.011    4
+atom         93   51    H     "NMePyrrolidine H2C-N"         1     1.008    1
+atom         94   39    C     "NMePyrrolidine CH2<"          6    12.011    4
+atom         95   51    H     "NMePyrrolidine H2C<"          1     1.008    1
+atom         96   39    C     "NMePyrrolidine CH3-N"         6    12.011    4
+atom         97   41    H     "NMePyrrolidine H3C-N"         1     1.008    1
+atom         98   52    C     "Formamide C=O"                6    12.011    3
+atom         99   53    H     "Formamide HCO"                1     1.008    1
+atom        100   54    O     "Formamide O"                  8    15.999    1
+atom        101   55    N     "Formamide N"                  7    14.007    3
+atom        102   56    H     "Formamide H2N"                1     1.008    1
+atom        103   52    C     "Acetamide C=O"                6    12.011    3
+atom        104   54    O     "Acetamide O"                  8    15.999    1
+atom        105   55    N     "Acetamide N"                  7    14.007    3
+atom        106   56    H     "Acetamide H2N"                1     1.008    1
+atom        107   39    C     "Acetamide CH3"                6    12.011    4
+atom        108   57    H     "Acetamide H3C"                1     1.008    1
+atom        109   39    C     "Propamide Me-CH2"             6    12.011    4
+atom        110   41    H     "Propamide Me-CH2"             1     1.008    1
+atom        111   39    C     "Propamide CH3"                6    12.011    4
+atom        112   40    H     "Propamide H3C"                1     1.008    1
+atom        113   52    C     "NMeFormamide C=O"             6    12.011    3
+atom        114   53    H     "NMeFormamide HCO"             1     1.008    1
+atom        115   54    O     "NMeFormamide O"               8    15.999    1
+atom        116   55    N     "NMeFormamide N"               7    14.007    3
+atom        117   56    H     "NMeFormamide HN"              1     1.008    1
+atom        118   39    C     "NMeFormamide CH3"             6    12.011    4
+atom        119   58    H     "NMeFormamide H3C"             1     1.008    1
+atom        120   39    C     "NEtFormamide CH2-N"           6    12.011    4
+atom        121   39    C     "NEtFormamide CH3-"            6    12.011    4
+atom        122   40    H     "NEtFormamide H3C"             1     1.008    1
+atom        123   52    C     "NMeAcetamide C=O"             6    12.011    3
+atom        124   54    O     "NMeAcetamide O"               8    15.999    1
+atom        125   55    N     "NMeAcetamide N"               7    14.007    3
+atom        126   56    H     "NMeAcetamide HN"              1     1.008    1
+atom        127   39    C     "NMeAcetamide CH3-N"           6    12.011    4
+atom        128   58    H     "NMeAcetamide H3C-N"           1     1.008    1
+atom        129   39    C     "NMeAcetamide CH3-C"           6    12.011    4
+atom        130   57    H     "NMeAcetamide H3C-C"           1     1.008    1
+atom        131   52    C     "DiMeFormamide C=O"            6    12.011    3
+atom        132   53    H     "DiMeFormamide HCO"            1     1.008    1
+atom        133   54    O     "DiMeFormamide O"              8    15.999    1
+atom        134   55    N     "DiMeFormamide N"              7    14.007    3
+atom        135   39    C     "DiMeFormamide CH3"            6    12.011    4
+atom        136   58    H     "DiMeFormamide H3C"            1     1.008    1
+atom        137   52    C     "DiMeAcetamide C=O"            6    12.011    3
+atom        138   54    O     "DiMeAcetamide O"              8    15.999    1
+atom        139   55    N     "DiMeAcetamide N"              7    14.007    3
+atom        140   39    C     "DiMeAcetamide CH3-N"          6    12.011    4
+atom        141   58    H     "DiMeAcetamide H3C-N"          1     1.008    1
+atom        142   39    C     "DiMeAcetamide CH3-C"          6    12.011    4
+atom        143   57    H     "DiMeAcetamide H3C-C"          1     1.008    1
+atom        144   59    O     "Formic Acid OH"               8    15.999    2
+atom        145   60    H     "Formic Acid HO"               1     1.008    1
+atom        146   61    C     "Formic Acid C=O"              6    12.011    3
+atom        147   54    O     "Formic Acid O=C"              8    15.999    1
+atom        148   62    H     "Formic Acid HC=O"             1     1.008    1
+atom        149   59    O     "Acetic Acid OH"               8    15.999    2
+atom        150   60    H     "Acetic Acid HO"               1     1.008    1
+atom        151   61    C     "Acetic Acid C=O"              6    12.011    3
+atom        152   54    O     "Acetic Acid O=C"              8    15.999    1
+atom        153   39    C     "Acetic Acid CH3"              6    12.011    4
+atom        154   63    H     "Acetic Acid H3C"              1     1.008    1
+atom        155   61    C     "Formaldehyde C=O"             6    12.011    3
+atom        156   54    O     "Formaldehyde O=C"             8    15.999    1
+atom        157   62    H     "Formaldehyde HC=O"            1     1.008    1
+atom        158   61    C     "Acetaldehyde C=O"             6    12.011    3
+atom        159   54    O     "Acetaldehyde O=C"             8    15.999    1
+atom        160   39    C     "Acetaldehyde CH3"             6    12.011    4
+atom        161   63    H     "Acetaldehyde H3C"             1     1.008    1
+atom        162   62    H     "Acetaldehyde HC=O"            1     1.008    1
+atom        163   64    S     "Hydrogen Sulfide S"          16    32.066    2
+atom        164   65    H     "Hydrogen Sulfide H2S"         1     1.008    1
+atom        165   66    S     "Methyl Sulfide S"            16    32.066    2
+atom        166   67    H     "Methyl Sulfide HS"            1     1.008    1
+atom        167   61    C     "Methyl Sulfide CH3"           6    12.011    4
+atom        168   68    H     "Methyl Sulfide H3C"           1     1.008    1
+atom        169   66    S     "Dimethyl Sulfide S"          16    32.066    2
+atom        170   61    C     "Dimethyl Sulfide CH3"         6    12.011    4
+atom        171   68    H     "Dimethyl Sulfide H3C"         1     1.008    1
+atom        172   66    S     "Dimethyl Disulfide S"        16    32.066    2
+atom        173   61    C     "Dimethyl Disulfide CH3"       6    12.011    4
+atom        174   68    H     "Dimethyl Disulfide H3C"       1     1.008    1
+atom        175   66    S     "Ethyl Sulfide S"             16    32.066    2
+atom        176   67    H     "Ethyl Sulfide HS"             1     1.008    1
+atom        177   61    C     "Ethyl Sulfide CH2"            6    12.011    4
+atom        178   68    H     "Ethyl Sulfide H2C"            1     1.008    1
+atom        179   69    C     "Ethyl Sulfide CH3"            6    12.011    4
+atom        180   70    H     "Ethyl Sulfide H3C"            1     1.008    1
+atom        181   66    S     "MeEt Sulfide S"              16    32.066    2
+atom        182   61    C     "MeEt Sulfide CH3-S"           6    12.011    4
+atom        183   68    H     "MeEt Sulfide H3C-S"           1     1.008    1
+atom        184   61    C     "MeEt Sulfide CH2-S"           6    12.011    4
+atom        185   68    H     "MeEt Sulfide CH2-S"           1     1.008    1
+atom        186   69    C     "MeEt Sulfide CH3-C"           6    12.011    4
+atom        187   70    H     "MeEt Sulfide H3C-C"           1     1.008    1
+atom        188   71    S     "Dimethyl Sulfoxide S=O"      16    32.066    3
+atom        189   72    O     "Dimethyl Sulfoxide S=O"       8    15.999    1
+atom        190   73    C     "Dimethyl Sulfoxide CH3"       6    12.011    4
+atom        191   74    H     "Dimethyl Sulfoxide H3C"       1     1.008    1
+atom        192   75    S     "Methyl Sulfonate SO3-"       16    32.066    4
+atom        193   76    O     "Methyl Sulfonate SO3-"        8    15.999    1
+atom        194   39    C     "Methyl Sulfonate CH3"         6    12.011    4
+atom        195   77    H     "Methyl Sulfonate H3C"         1     1.008    1
+atom        196   75    S     "Ethyl Sulfonate SO3-"        16    32.066    4
+atom        197   76    O     "Ethyl Sulfonate SO3-"         8    15.999    1
+atom        198   39    C     "Ethyl Sulfonate CH2"          6    12.011    4
+atom        199   77    H     "Ethyl Sulfonate H2C"          1     1.008    1
+atom        200   39    C     "Ethyl Sulfonate CH3"          6    12.011    4
+atom        201   40    H     "Ethyl Sulfonate H3C"          1     1.008    1
+atom        202   39    C     "Propyl Sulfonate Me-CH2"      6    12.011    4
+atom        203   41    H     "Propyl Sulfonate Me-CH2"      1     1.008    1
+atom        204   39    C     "Propyl Sulfonate CH3"         6    12.011    4
+atom        205   40    H     "Propyl Sulfonate H3C"         1     1.008    1
+atom        206   78    C     "Acetonitrile CN"              6    12.011    2
+atom        207   79    N     "Acetonitrile CN"              7    14.007    1
+atom        208   80    C     "Acetonitrile CH3"             6    12.011    4
+atom        209   81    H     "Acetonitrile H3C"             1     1.008    1
+atom        210   82    C     "Tricyanomethide CN"           6    12.011    2
+atom        211   83    N     "Tricyanomethide CN"           7    14.007    1
+atom        212   84    C     "Tricyanomethide >C-"          6    12.011    3
+atom        213   85    C     "Benzene C"                    6    12.011    3
+atom        214   86    H     "Benzene HC"                   1     1.008    1
+atom        215   87    C     "Ethylbenzene C1-CH2"          6    12.011    3
+atom        216   87    C     "Ethylbenzene C2"              6    12.011    3
+atom        217   87    C     "Ethylbenzene C3"              6    12.011    3
+atom        218   87    C     "Ethylbenzene C4"              6    12.011    3
+atom        219   88    H     "Ethylbenzene H2"              1     1.008    1
+atom        220   88    H     "Ethylbenzene H3"              1     1.008    1
+atom        221   88    H     "Ethylbenzene H4"              1     1.008    1
+atom        222   39    C     "Ethylbenzene CH2"             6    12.011    4
+atom        223   40    H     "Ethylbenzene H2C"             1     1.008    1
+atom        224   39    C     "Ethylbenzene CH3"             6    12.011    4
+atom        225   40    H     "Ethylbenzene H3C"             1     1.008    1
+atom        226   35    O     "Phenol HO"                    8    15.999    2
+atom        227   36    H     "Phenol HO"                    1     1.008    1
+atom        228   87    C     "Phenol C1-OH"                 6    12.011    3
+atom        229   87    C     "Phenol C2"                    6    12.011    3
+atom        230   87    C     "Phenol C3"                    6    12.011    3
+atom        231   87    C     "Phenol C4"                    6    12.011    3
+atom        232   88    H     "Phenol H2"                    1     1.008    1
+atom        233   88    H     "Phenol H3"                    1     1.008    1
+atom        234   88    H     "Phenol H4"                    1     1.008    1
+atom        235   39    C     "Toluene CH3"                  6    12.011    4
+atom        236   40    H     "Toluene H3C"                  1     1.008    1
+atom        237   87    C     "Toluene C1-CH3"               6    12.011    3
+atom        238   87    C     "Toluene C2"                   6    12.011    3
+atom        239   87    C     "Toluene C3"                   6    12.011    3
+atom        240   87    C     "Toluene C4"                   6    12.011    3
+atom        241   88    H     "Toluene H2"                   1     1.008    1
+atom        242   88    H     "Toluene H3"                   1     1.008    1
+atom        243   88    H     "Toluene H4"                   1     1.008    1
+atom        244   35    O     "p-Cresol OH"                  8    15.999    2
+atom        245   36    H     "p-Cresol HO"                  1     1.008    1
+atom        246   39    C     "p-Cresol CH3"                 6    12.011    4
+atom        247   50    H     "p-Cresol H3C"                 1     1.008    1
+atom        248   87    C     "p-Cresol C1-CH3"              6    12.011    3
+atom        249   87    C     "p-Cresol C2"                  6    12.011    3
+atom        250   87    C     "p-Cresol C3"                  6    12.011    3
+atom        251   87    C     "p-Cresol C4-OH"               6    12.011    3
+atom        252   88    H     "p-Cresol H2"                  1     1.008    1
+atom        253   88    H     "p-Cresol H3"                  1     1.008    1
+atom        254   89    N     "Imidazole NH"                 7    14.007    3
+atom        255   45    H     "Imidazole HN"                 1     1.008    1
+atom        256   90    C     "Imidazole N-C-N"              6    12.011    3
+atom        257   91    H     "Imidazole HC"                 1     1.008    1
+atom        258   89    N     "Imidazole N=C-"               7    14.007    2
+atom        259   90    C     "Imidazole C-N=C"              6    12.011    3
+atom        260   91    H     "Imidazole HC"                 1     1.008    1
+atom        261   90    C     "Imidazole C-NH-"              6    12.011    3
+atom        262   91    H     "Imidazole HC"                 1     1.008    1
+atom        263   39    C     "Ethylimidazole CH2"           6    12.011    4
+atom        264   40    H     "Ethylimidazole H2C"           1     1.008    1
+atom        265   39    C     "Ethylimidazole CH3"           6    12.011    4
+atom        266   40    H     "Ethylimidazole H3C"           1     1.008    1
+atom        267   89    N     "Ethylimidazole ND"            7    14.007    3
+atom        268   45    H     "Ethylimidazole HND"           1     1.008    1
+atom        269   90    C     "Ethylimidazole CE"            6    12.011    3
+atom        270   91    H     "Ethylimidazole HCE"           1     1.008    1
+atom        271   89    N     "Ethylimidazole NE"            7    14.007    3
+atom        272   45    H     "Ethylimidazole HNE"           1     1.008    1
+atom        273   90    C     "Ethylimidazole CD"            6    12.011    3
+atom        274   91    H     "Ethylimidazole HCD"           1     1.008    1
+atom        275   90    C     "Ethylimidazole CG"            6    12.011    3
+atom        276   89    N     "Indole N"                     7    14.007    3
+atom        277   45    H     "Indole HN"                    6     1.008    1
+atom        278   92    C     "Indole C1"                    6    12.011    3
+atom        279   92    C     "Indole C2"                    6    12.011    3
+atom        280   92    C     "Indole C3"                    6    12.011    3
+atom        281   92    C     "Indole C4"                    6    12.011    3
+atom        282   92    C     "Indole C5"                    6    12.011    3
+atom        283   92    C     "Indole C6"                    6    12.011    3
+atom        284   92    C     "Indole C7"                    6    12.011    3
+atom        285   92    C     "Indole C8"                    6    12.011    3
+atom        286   86    H     "Indole HC2"                   1     1.008    1
+atom        287   86    H     "Indole HC4"                   1     1.008    1
+atom        288   86    H     "Indole HC5"                   1     1.008    1
+atom        289   86    H     "Indole HC6"                   1     1.008    1
+atom        290   86    H     "Indole HC7"                   1     1.008    1
+atom        291   86    H     "Indole HC8"                   1     1.008    1
+atom        292   89    N     "3-Ethylindole N"              7    14.007    3
+atom        293   45    H     "3-Ethylindole HN"             1     1.008    1
+atom        294   92    C     "3-Ethylindole C2"             6    12.011    3
+atom        295   92    C     "3-Ethylindole C3"             6    12.011    3
+atom        296   92    C     "3-Ethylindole C4"             6    12.011    3
+atom        297   92    C     "3-Ethylindole C5"             6    12.011    3
+atom        298   92    C     "3-Ethylindole C6"             6    12.011    3
+atom        299   92    C     "3-Ethylindole C7"             6    12.011    3
+atom        300   92    C     "3-Ethylindole C8"             6    12.011    3
+atom        301   92    C     "3-Ethylindole C9"             6    12.011    3
+atom        302   86    H     "3-Ethylindole HC2"            1     1.008    1
+atom        303   86    H     "3-Ethylindole HC4"            1     1.008    1
+atom        304   86    H     "3-Ethylindole HC5"            1     1.008    1
+atom        305   86    H     "3-Ethylindole HC6"            1     1.008    1
+atom        306   86    H     "3-Ethylindole HC7"            1     1.008    1
+atom        307   93    C     "3-Ethylindole CH2"            6    12.011    4
+atom        308   40    H     "3-Ethylindole H2C"            1     1.008    1
+atom        309   93    C     "3-Ethylindole CH3"            6    12.011    4
+atom        310   40    H     "3-Ethylindole H3C"            1     1.008    1
+atom        311   89    N     "3-Formylindole N"             7    14.007    3
+atom        312   45    H     "3-Formylindole HN"            1     1.008    1
+atom        313   92    C     "3-Formylindole C2"            6    12.011    3
+atom        314   92    C     "3-Formylindole C3"            6    12.011    3
+atom        315   92    C     "3-Formylindole C4"            6    12.011    3
+atom        316   92    C     "3-Formylindole C5"            6    12.011    3
+atom        317   92    C     "3-Formylindole C6"            6    12.011    3
+atom        318   92    C     "3-Formylindole C7"            6    12.011    3
+atom        319   92    C     "3-Formylindole C8"            6    12.011    3
+atom        320   92    C     "3-Formylindole C9"            6    12.011    3
+atom        321   86    H     "3-Formylindole HC2"           1     1.008    1
+atom        322   86    H     "3-Formylindole HC4"           1     1.008    1
+atom        323   86    H     "3-Formylindole HC5"           1     1.008    1
+atom        324   86    H     "3-Formylindole HC6"           1     1.008    1
+atom        325   86    H     "3-Formylindole HC7"           1     1.008    1
+atom        326   52    C     "3-Formylindole C=O"           6    12.011    3
+atom        327   94    O     "3-Formylindole O=C"           8    15.999    1
+atom        328   62    H     "3-Formylindole HC=O"          1     1.008    1
+atom        329   95    N     "Benzamidine N"                7    14.007    3
+atom        330   96    H     "Benzamidine HN"               1     1.008    1
+atom        331   97    C     "Benzamidine N-C-N"            6    12.011    3
+atom        332   87    C     "Benzamidine C1-CN2"           6    12.011    3
+atom        333   87    C     "Benzamidine C2"               6    12.011    3
+atom        334   87    C     "Benzamidine C3"               6    12.011    3
+atom        335   87    C     "Benzamidine C4"               6    12.011    3
+atom        336   88    H     "Benzamidine H2"               1     1.008    1
+atom        337   88    H     "Benzamidine H3"               1     1.008    1
+atom        338   88    H     "Benzamidine H4"               1     1.008    1
+atom        339   98    N     "Pyridinium N"                 7    14.007    3
+atom        340   85    C     "Pyridinium C2"                6    12.011    3
+atom        341   85    C     "Pyridinium C3"                6    12.011    3
+atom        342   85    C     "Pyridinium C4"                6    12.011    3
+atom        343   99    H     "Pyridinium HN"                1     1.008    1
+atom        344   86    H     "Pyridinium H2"                1     1.008    1
+atom        345   86    H     "Pyridinium H3"                1     1.008    1
+atom        346   86    H     "Pyridinium H4"                1     1.008    1
+
+
+      ################################
+      ##                            ##
+      ##  Van der Waals Parameters  ##
+      ##                            ##
+      ################################
+
+
+vdw           1               2.9900     0.0080
+vdw           2               3.1500     0.0730
+vdw           3               3.8200     0.2600
+vdw           4               4.0900     0.3590
+vdw           5               4.3700     0.4980
+vdw           6               2.3800     0.0800
+vdw           7               3.0200     0.2600
+vdw           8               3.7100     0.3500
+vdw           9               4.1400     0.4400
+vdw          10               4.3700     0.5300
+vdw          11               2.5500     0.8500
+vdw          12               3.1500     1.6000
+vdw          13               3.4000     0.2500
+vdw          14               4.1300     0.3400
+vdw          15               4.3800     0.4300
+vdw          16               4.6600     0.5200
+vdw          17               4.0500     0.2050
+vdw          18               3.7100     0.0800
+vdw          19               3.9000     0.1000
+vdw          20               3.2200     0.1200
+vdw          21               4.5300     0.3500
+vdw          22               3.2200     0.1200
+vdw          23               3.7100     0.0800      0.990
+vdw          24               3.7800     0.1010
+vdw          25               2.9000     0.0220      0.900
+vdw          26               3.8200     0.1010
+vdw          27               2.9600     0.0240      0.920
+vdw          28               3.8200     0.1010
+vdw          29               2.9800     0.0240      0.940
+vdw          30               3.6500     0.1010
+vdw          31               2.9400     0.0260      0.910
+vdw          32               3.6000     0.1040
+vdw          33               3.4050     0.1100
+vdw          34               2.6550     0.0135      0.910
+vdw          35               3.4050     0.1100
+vdw          36               2.6550     0.0135      0.910
+vdw          37               3.7600     0.1010
+vdw          38               2.8700     0.0240      0.910
+vdw          39               3.8200     0.1010
+vdw          40               2.9600     0.0240      0.920
+vdw          41               2.9800     0.0240      0.920
+vdw          42               3.6500     0.1010
+vdw          43               2.8900     0.0240      0.910
+vdw          44               3.7100     0.1050
+vdw          45               2.7000     0.0200      0.910
+vdw          46               3.7100     0.1050
+vdw          47               2.4800     0.0115      0.900
+vdw          48               3.7100     0.1050
+vdw          49               2.7000     0.0200      0.910
+vdw          50               2.8800     0.0240      0.910
+vdw          51               2.9600     0.0220      0.920
+vdw          52               3.8200     0.1060
+vdw          53               2.8000     0.0260      0.910
+vdw          54               3.3000     0.1120
+vdw          55               3.7100     0.1100
+vdw          56               2.5900     0.0220      0.900
+vdw          57               2.9500     0.0260      0.910
+vdw          58               2.9300     0.0260      0.910
+vdw          59               3.4050     0.1100
+vdw          60               2.6550     0.0150      0.910
+vdw          61               3.7800     0.1060
+vdw          62               2.9200     0.0300      0.920
+vdw          63               2.9800     0.0240      0.940
+vdw          64               4.0050     0.3550
+vdw          65               2.7700     0.0240      0.960
+vdw          66               4.0050     0.3550
+vdw          67               2.7700     0.0240      0.960
+vdw          68               2.8700     0.0330      0.900
+vdw          69               3.8200     0.1040
+vdw          70               2.9800     0.0240      0.920
+vdw          71               3.9100     0.3850
+vdw          72               3.5200     0.1120
+vdw          73               3.8200     0.1010
+vdw          74               2.9100     0.0245      0.910
+vdw          75               3.9100     0.3850
+vdw          76               3.5100     0.1120
+vdw          77               2.9100     0.0330      0.900
+vdw          78               3.8200     0.1010
+vdw          79               3.5800     0.1100
+vdw          80               3.8200     0.1010
+vdw          81               2.9100     0.0330      0.900
+vdw          82               3.8200     0.1060
+vdw          83               3.6900     0.1100
+vdw          84               3.8200     0.1060
+vdw          85               3.8000     0.0890
+vdw          86               2.9800     0.0260      0.920
+vdw          87               3.8000     0.0910
+vdw          88               2.9800     0.0260      0.920
+vdw          89               3.7100     0.1050
+vdw          90               3.7800     0.1010
+vdw          91               3.0000     0.0240      0.940
+vdw          92               3.8000     0.1010
+vdw          93               3.8200     0.1040
+vdw          94               3.3000     0.1140
+vdw          95               3.7100     0.1100
+vdw          96               2.5900     0.0220      0.900
+vdw          97               3.6500     0.1010
+vdw          98               3.7100     0.1050
+vdw          99               2.7000     0.0200      0.910
+
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond         17   18         1072.00     1.1908
+bond         19   20          320.00     1.3900
+bond         21   22          350.00     1.6260
+bond         23   23         1613.00     1.0980
+bond         24   25          395.50     1.0835
+bond         26   26          323.00     1.5247
+bond         26   27          341.00     1.1020
+bond         26   28          323.00     1.5247
+bond         26   30          323.00     1.5247
+bond         28   28          323.00     1.5247
+bond         28   29          341.00     1.1120
+bond         30   31          341.00     1.1120
+bond         32   87          453.20     1.4950
+bond         33   34          529.60     0.9572
+bond         35   36          615.90     0.9670
+bond         35   37          500.10     1.4130
+bond         35   39          465.10     1.4130
+bond         35   42          410.10     1.4130
+bond         35   87          676.60     1.3550
+bond         37   38          385.00     1.1120
+bond         38   39          385.00     1.1120
+bond         38   42          341.00     1.1120
+bond         39   39          453.00     1.5247
+bond         39   40          385.00     1.1120
+bond         39   41          385.00     1.1120
+bond         39   42          323.00     1.5247
+bond         39   43          378.00     1.1120
+bond         39   48          381.30     1.4655
+bond         39   50          385.00     1.0860
+bond         39   51          341.00     1.1120
+bond         39   52          345.30     1.5090
+bond         39   55          374.80     1.4460
+bond         39   57          341.00     1.1120
+bond         39   58          341.00     1.1120
+bond         39   61          345.30     1.5090
+bond         39   63          341.00     1.1120
+bond         39   75          220.00     1.8015
+bond         39   77          341.00     1.1120
+bond         39   87          453.20     1.4990
+bond         39   90          453.20     1.4930
+bond         40   93          341.00     1.1120
+bond         44   45          516.50     1.0120
+bond         45   89          461.90     1.0150
+bond         45   89          467.60     1.0300
+bond          0   48          461.90     0.3000
+bond          0   89          461.90     0.3000
+bond         46   47          461.90     1.0150
+bond         48   49          515.90     1.0100
+bond         52   53          356.40     1.1004
+bond         52   54          601.80     1.2183
+bond         52   55          482.00     1.3639
+bond         52   62          314.40     1.0907
+bond         52   92          345.30     1.5090
+bond         52   94          705.00     1.2053
+bond         54   61          705.00     1.2255
+bond         55   56          542.00     1.0034
+bond         59   60          514.40     0.9737
+bond         59   61          431.60     1.3498
+bond         61   62          314.40     1.0907
+bond         61   66          235.80     1.8250
+bond         61   68          395.50     1.0850
+bond         61   69          323.00     1.5247
+bond         64   65          278.40     1.3420
+bond         66   67          315.40     1.3320
+bond         69   70          341.00     1.1120
+bond         71   72          494.20     1.5100
+bond         71   73          197.20     1.8062
+bond         73   74          388.20     1.0893
+bond         75   76          570.00     1.4780
+bond         78   79         1195.00     1.1700
+bond         78   80          380.00     1.4570
+bond         80   81          390.00     1.0873
+bond         82   83         1110.00     1.1530
+bond         82   84          420.00     1.4065
+bond         85   85          471.90     1.3820
+bond         85   86          370.50     1.0790
+bond         85   98          653.90     1.3550
+bond         86   92          370.50     1.1010
+bond         87   87          210.90     1.3650
+bond         87   88          409.50     1.0800
+bond         87   97          323.00     1.5250
+bond         89   90          653.90     1.3450
+bond         89   92          653.90     1.3550
+bond         90   90          539.60     1.3520
+bond         90   91          370.50     1.0810
+bond         92   92          471.90     1.3887
+bond         92   93          345.30     1.5090
+bond         93   93          323.00     1.5247
+bond         95   96          487.00     1.0280
+bond         95   97          491.40     1.3250
+bond         98   99          467.60     1.0300
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle        20   19   20      65.00     109.47
+anglef       22   21   22      40.00     180.00        4.0
+angle        25   24   25      39.57     109.47
+angle        26   26   27      42.44     109.80     109.31     110.70
+angle        27   26   27      39.57     107.60     107.80     109.47
+angle        27   26   28      42.44     109.80     109.31     110.70
+angle        27   26   30      42.00     110.70
+angle        26   28   28      48.20     109.50     110.20     111.00
+angle        26   28   29      42.44     109.80     109.31     110.70
+angle        28   28   29      42.44     109.80     109.31     110.70
+angle        29   28   29      39.57     107.60     107.80     109.47
+angle        26   30   26      48.20     109.50     110.20     111.00
+angle        26   30   31      42.00     112.80
+angle        34   33   34      34.05     108.50
+angle        36   35   37      64.96     106.80
+angle        36   35   39      64.96     106.80
+angle        36   35   42      53.96     106.80
+angle        36   35   87      25.90     109.00
+angle        39   35   39      88.50     106.00
+angle        35   37   38      60.99     110.00     108.90     108.70
+angle        38   37   38      45.57     107.60     107.80     109.47
+angle        35   39   38      60.99     110.00     108.90     108.70
+angle        35   39   39      65.71     107.50     107.00     107.90
+angle        35   39   43      70.00     110.00     108.90     108.70
+angle        38   39   38      40.57     107.60     107.80     109.47
+angle        38   39   39      45.44     109.80     109.31     110.70
+angle        39   39   39      48.20     109.50     110.20     111.00
+angle        39   39   40      45.44     109.80     109.31     110.70
+angle        39   39   41      45.44     109.80     109.31     110.70
+angle        39   39   48      56.11     109.47     108.00     111.00
+angle        39   39   50      42.44     109.80     109.31     110.70
+angle        39   39   51      42.44     109.80     109.31     110.70
+angle        39   39   55      53.96     109.48     111.30     111.80
+angle        39   39   58      42.44     109.80     109.31     110.70
+angle        39   39   75      53.00     108.00
+angle        39   39   77      42.44     109.80     109.30     110.70
+angle        39   39   87      38.85     110.60
+angle        39   39   90      38.85     112.70
+angle        40   39   40      40.57     107.60     107.80     109.47
+angle        40   39   42      42.44     109.80     109.31     110.70
+angle        40   39   87      39.57     109.50     109.31     110.40
+angle        40   39   90      39.57     109.50
+angle        41   39   41      45.57     107.60     107.80     109.47
+angle        41   39   48      58.99     109.30
+angle        43   39   43      43.57     107.60     107.80     109.47
+angle        48   39   50      70.99     109.30
+angle        48   39   51      58.99     109.30
+angle        50   39   50      40.57     107.60     107.80     109.47
+angle        50   39   87      39.57     109.50     109.31     110.40
+angle        51   39   51      39.57     107.60     107.80     109.47
+angle        52   39   57      38.85     109.49
+angle        55   39   58      54.67     111.00
+angle        57   39   57      39.57     107.60     107.80     109.47
+angle        58   39   58      39.57     107.60     107.80     109.47
+angle        61   39   63      38.85     109.49
+angle        63   39   63      39.57     107.60     107.80     109.47
+angle        75   39   77      35.00     108.15
+angle        77   39   77      39.00     110.75
+angle        35   42   38      58.99     110.00     108.90     108.70
+angle        35   42   39      59.71     107.50     107.00     107.90
+angle        38   42   39      42.44     109.80     109.31     110.70
+angle        39   42   39      48.20     109.50     110.20     111.00
+angle        45   44   45      43.52     106.40     106.80       0.00
+angle        47   46   47      43.52     109.47
+angle        39   48   39      51.80     107.20     108.20       0.00
+angle        39   48   49      43.16     108.10     110.90       0.00
+angle        49   48   49      34.50     106.40     107.10       0.00
+angle        39   52   54      80.00     122.40
+angle        39   52   55      70.00     113.40
+angle        53   52   54      68.34     119.20
+angle        53   52   55      31.65     109.30
+angle        54   52   55      76.98     124.20
+angle        62   52   92      33.38     116.10     117.30       0.00
+angle        62   52   94      61.15     119.20     119.20       0.00
+angle        92   52   94      61.15     123.50     123.50       0.00
+angle        39   55   39      54.67     122.50
+angle        39   55   52      50.00     122.00
+angle        39   55   56      32.01     117.00
+angle        52   55   56      50.00     121.00
+angle        56   55   56      22.30     122.00
+angle        60   59   61      49.64     108.70
+angle        39   61   54      61.15     123.50     123.50       0.00
+angle        39   61   59     111.51     110.30
+angle        39   61   62      33.38     116.10     117.30       0.00
+angle        54   61   59     122.30     121.50     122.50       0.00
+angle        54   61   62      61.15     119.20     119.20       0.00
+angle        54   61   62      61.15     119.20     119.20       0.00
+angle        54   61   62      61.15     119.20     119.20       0.00
+angle        54   61   62      61.15     119.20     119.20       0.00
+angle        59   61   62      39.57     107.00
+angle        59   61   62      39.57     107.00
+angle        59   61   62      39.57     107.00
+angle        59   61   62      39.57     107.00
+angle        62   61   62      46.76     115.50
+angle        66   61   68      60.24     110.80     110.80     108.00
+angle        66   61   69      53.24     108.00     109.50     110.10
+angle        68   61   68      39.57     107.60     107.80     109.47
+angle        68   61   69      42.44     109.80     109.31     110.70
+angle        65   64   65      52.52      92.90
+angle        61   66   61      60.43      95.90
+angle        61   66   67      46.76      96.00
+angle        61   69   70      42.44     109.80     109.31     110.70
+angle        70   69   70      39.57     107.60     107.80     109.47
+angle        72   71   73      57.25     106.88
+angle        73   71   73      87.39      92.98
+angle        71   73   74      44.07     107.06
+angle        74   73   74      38.95     110.07
+angle        39   75   76      60.00     104.60
+angle        76   75   76      70.00     113.50
+angle        79   78   80      65.00     180.00
+angle        78   80   81      45.00     109.92
+angle        81   80   81      40.00     109.02
+angle        83   82   84      42.00     180.00
+angle        82   84   82      65.00     120.00
+angle        85   85   85      63.31     120.00
+angle        85   85   86      35.25     120.00     120.50       0.00
+angle        85   85   98      69.78     121.00
+angle        86   85   98      38.13     119.00
+angle        35   87   87      43.16     120.00
+angle        39   87   87      33.81     122.30
+angle        87   87   87      64.67     121.70
+angle        87   87   88      35.25     120.00     120.50       0.00
+angle        87   87   97      54.67     121.70
+angle        45   89   90      35.25     125.50
+angle        45   89   92      35.25     125.50
+angle        90   89   90      86.33     105.10     107.10       0.00
+angle        90   89   90      86.33     105.10     107.10       0.00
+angle        92   89   92      86.33     109.00
+angle        39   90   89      35.97     122.00
+angle        39   90   90      35.97     131.00
+angle        89   90   89      28.78     112.10
+angle        89   90   90      47.48     107.00
+angle        89   90   91      38.13     122.50
+angle        90   90   91      35.25     128.00
+angle        52   92   92      54.67     121.70
+angle        86   92   89      38.13     122.50
+angle        86   92   92      35.25     128.00
+angle        89   92   92      47.48     109.00
+angle        92   92   92      63.31     120.00
+angle        92   92   93      61.87     127.00
+angle        40   93   40      39.57     107.60     107.80     109.47
+angle        40   93   92      61.15     109.80     109.31     110.70
+angle        40   93   93      42.44     109.80     109.31     110.70
+angle        92   93   93      48.20     109.50     110.20     111.00
+angle        96   95   96      29.50     123.00
+angle        96   95   97      41.70     120.50
+angle        87   97   95      28.80     120.00
+angle        95   97   95      28.80     120.00
+angle        85   98   85      86.33     112.60
+angle        85   98   99      35.25     123.70
+
+
+      ################################
+      ##                            ##
+      ##   Stretch-Bend Parameters  ##
+      ##                            ##
+      ################################
+
+
+strbnd       26   26   27      11.50      11.50
+strbnd       27   26   28      11.50      11.50
+strbnd       27   26   30      11.50      11.50
+strbnd       26   28   28      18.70      18.70
+strbnd       26   28   29      11.50      11.50
+strbnd       28   28   29      11.50      11.50
+strbnd       36   35   39      -4.50      38.00
+strbnd       36   35   87      12.95      12.95
+strbnd       37   35   36      38.00      -4.50
+strbnd       39   35   39      38.00      38.00
+strbnd       38   37   35      -4.50      38.00
+strbnd       35   39   39      38.00      38.00
+strbnd       35   39   40      11.50      11.50
+strbnd       35   39   43      38.00      -4.50
+strbnd       38   39   35      -4.50      38.00
+strbnd       38   39   39      -4.50      38.00
+strbnd       39   39   39      18.70      18.70
+strbnd       39   39   40      38.00      -4.50
+strbnd       39   39   41      38.00      -4.50
+strbnd       39   39   48      18.70      18.70
+strbnd       39   39   50      11.50      11.50
+strbnd       39   39   51      11.50      11.50
+strbnd       39   39   52      18.70      18.70
+strbnd       39   39   55      18.70      18.70
+strbnd       39   39   57      11.50      11.50
+strbnd       39   39   58      11.50      11.50
+strbnd       39   39   75      18.70      18.70
+strbnd       39   39   77      11.50      11.50
+strbnd       39   39   87      18.70      18.70
+strbnd       39   39   90      18.70      18.70
+strbnd       40   39   42      11.50      11.50
+strbnd       40   39   48      11.50      11.50
+strbnd       40   39   87      11.50      11.50
+strbnd       40   39   90      11.50      11.50
+strbnd       41   39   48      11.50      11.50
+strbnd       41   39   52      11.50      11.50
+strbnd       48   39   51      11.50      11.50
+strbnd       50   39   48      11.50      11.50
+strbnd       50   39   87      11.50      11.50
+strbnd       52   39   57      11.50      11.50
+strbnd       55   39   58      11.50      11.50
+strbnd       61   39   63      11.50      11.50
+strbnd       77   39   75      11.50      11.50
+strbnd       35   42   39      38.00      38.00
+strbnd       38   42   35      -4.50      38.00
+strbnd       38   42   39      -4.50      38.00
+strbnd       39   42   39      38.00      38.00
+strbnd       39   48   39       7.20       7.20
+strbnd       39   48    0       4.30       4.30
+strbnd       39   48   49       4.30       4.30
+strbnd       39   52   54      18.70      18.70
+strbnd       39   52   55      18.70      18.70
+strbnd       53   52   54      11.50      11.50
+strbnd       53   52   55      11.50      11.50
+strbnd       54   52   55      18.70      18.70
+strbnd       62   52   92      11.50      11.50
+strbnd       62   52   94      11.50      11.50
+strbnd       92   52   94      18.70      18.70
+strbnd       39   55   39       7.20       7.20
+strbnd       39   55   52       7.20       7.20
+strbnd       39   55   56       4.30       4.30
+strbnd       52   55   56       4.30       4.30
+strbnd       60   59   61      12.95      12.95
+strbnd       39   61   54      18.70      18.70
+strbnd       39   61   59      18.70      18.70
+strbnd       39   61   62      11.50      11.50
+strbnd       54   61   59      18.70      18.70
+strbnd       54   61   62      11.50      11.50
+strbnd       59   61   62      11.50      11.50
+strbnd       66   61   69      18.70      18.70
+strbnd       68   61   66      11.50      11.50
+strbnd       68   61   69      11.50      11.50
+strbnd       61   66   61      -5.75      -5.75
+strbnd       61   66   66      -5.75      -5.75
+strbnd       61   66   67       1.45       1.45
+strbnd       61   69   70      11.50      11.50
+strbnd       72   71   73      -5.75      -5.75
+strbnd       73   71   73      -5.75      -5.75
+strbnd       71   73   74      11.50      11.50
+strbnd       79   78   80      18.70      18.70
+strbnd       78   80   81      11.50      11.50
+strbnd       84   82   83      18.70      18.70
+strbnd       82   84   82      18.70      18.70
+strbnd       85   85   85      18.70      18.70
+strbnd       85   85   86      11.50      11.50
+strbnd       85   85   98      18.70      18.70
+strbnd       86   85   98      11.50      11.50
+strbnd       35   87   87      18.70      18.70
+strbnd       39   87   87      18.70      18.70
+strbnd       87   87   87      18.70      18.70
+strbnd       87   87   88      38.00      11.60
+strbnd       87   87   97      18.70      18.70
+strbnd       45   89   90       4.30       4.30
+strbnd       45   89   92       4.30       4.30
+strbnd       45   89   93       4.30       4.30
+strbnd        0   89   93       4.30       4.30
+strbnd       90   89   90      14.40      14.40
+strbnd       92   89   92      14.40      14.40
+strbnd       39   90   89      18.70      18.70
+strbnd       39   90   90      18.70      18.70
+strbnd       89   90   89      18.70      18.70
+strbnd       89   90   90      18.70      18.70
+strbnd       89   90   91      11.50      11.50
+strbnd       90   90   91      11.50      11.50
+strbnd       52   92   92      18.70      18.70
+strbnd       86   92   89      11.50      11.50
+strbnd       86   92   92      11.50      11.50
+strbnd       89   92   92      18.70      18.70
+strbnd       92   92   92      18.70      18.70
+strbnd       92   92   93      18.70      18.70
+
+
+      ################################
+      ##                            ##
+      ##   Urey-Bradley Parameters  ##
+      ##                            ##
+      ################################
+
+
+ureybrad     34   33   34      38.25     1.5537
+
+
+      ####################################
+      ##                                ##
+      ##  Out-of-Plane Bend Parameters  ##
+      ##                                ##
+      ####################################
+
+
+opbend       39   52    0    0            42.40
+opbend       53   52    0    0           140.30
+opbend       54   52    0    0            46.80
+opbend       55   52    0    0           107.90
+opbend       62   52    0    0           140.30
+opbend       92   52    0    0            42.40
+opbend       94   52    0    0            46.80
+opbend       39   55    0    0            12.90
+opbend       52   55    0    0            12.90
+opbend       56   55    0    0             5.80
+opbend       39   61    0    0            42.40
+opbend       54   61    0    0            46.80
+opbend       59   61    0    0           107.90
+opbend       62   61    0    0           140.30
+opbend       82   84    0    0            14.40
+opbend       85   85    0    0            14.40
+opbend       86   85    0    0            15.10
+opbend       98   85    0    0            18.00
+opbend       32   87    0    0            14.40
+opbend       35   87    0    0            14.40
+opbend       39   87    0    0            14.40
+opbend       87   87    0    0            14.40
+opbend       88   87    0    0            15.10
+opbend       97   87    0    0             7.20
+opbend       52   92    0    0            14.40
+opbend       86   92    0    0             7.90
+opbend       89   92    0    0            14.40
+opbend       92   92    0    0            14.40
+opbend       93   92    0    0            14.40
+opbend       96   95    0    0            12.90
+opbend       97   95    0    0             3.60
+opbend       87   97    0    0             1.40
+opbend       95   97    0    0             1.40
+opbend       85   98    0    0            10.80
+opbend       99   98    0    0            10.80
+
+
+      ############################
+      ##                        ##
+      ##  Torsional Parameters  ##
+      ##                        ##
+      ############################
+
+
+torsion      38    0   48   49      0.000 0.0 1  -0.014 180.0 2   0.295 0.0 3
+torsion      27   26   26   27      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      27   26   28   28      0.000 0.0 1   0.000 180.0 2   0.341 0.0 3
+torsion      27   26   28   29      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      26   28   28   26      0.854 0.0 1  -0.374 180.0 2   0.108 0.0 3
+torsion      26   28   28   29      0.000 0.0 1   0.000 180.0 2   0.341 0.0 3
+torsion      29   28   28   29      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      36   35   37   38      0.000 0.0 1   0.000 180.0 2   0.274 0.0 3
+torsion      36   35   39   38      0.000 0.0 1   0.000 180.0 2   0.274 0.0 3
+torsion      36   35   39   39     -1.447 0.0 1   0.531 180.0 2   0.317 0.0 3
+torsion      39   35   39   43      0.000 0.0 1   0.000 180.0 2   0.597 0.0 3
+torsion      36   35   42   38      0.000 0.0 1   0.000 180.0 2   0.266 0.0 3
+torsion      36   35   42   39     -1.372 0.0 1   0.232 180.0 2   0.400 0.0 3
+torsion      36   35   87   87      0.000 0.0 1   2.081 180.0 2   0.000 0.0 3
+torsion      35   39   39   39     -1.150 0.0 1   0.000 180.0 2   1.280 0.0 3
+torsion      35   39   39   40      0.000 0.0 1   0.000 180.0 2   0.300 0.0 3
+torsion      35   39   39   41      0.000 0.0 1   0.000 180.0 2   0.300 0.0 3
+torsion      38   39   39   39      0.000 0.0 1   0.000 180.0 2   0.280 0.0 3
+torsion      38   39   39   40      0.000 0.0 1   0.000 180.0 2   0.424 0.0 3
+torsion      38   39   39   41      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      39   39   39   39      0.185 0.0 1   0.170 180.0 2   0.520 0.0 3
+torsion      39   39   39   40      0.000 0.0 1   0.000 180.0 2   0.280 0.0 3
+torsion      39   39   39   48     -0.302 0.0 1   0.696 180.0 2   0.499 0.0 3
+torsion      39   39   39   50      0.000 0.0 1   0.000 180.0 2   0.280 0.0 3
+torsion      39   39   39   51      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      39   39   39   75      0.000 0.0 1   0.000 180.0 2   0.280 0.0 3
+torsion      39   39   39   77      0.000 0.0 1   0.000 180.0 2   0.280 0.0 3
+torsion      40   39   39   40      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   39   39   41      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      40   39   39   48      0.000 0.0 1   0.000 180.0 2   0.374 0.0 3
+torsion      40   39   39   50      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   39   39   55      0.000 0.0 1   0.000 180.0 2   0.500 0.0 3
+torsion      40   39   39   58      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   39   39   75      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      40   39   39   77      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   39   39   87      0.000 0.0 1   0.000 180.0 2   0.500 0.0 3
+torsion      40   39   39   90      0.000 0.0 1   0.000 180.0 2   0.500 0.0 3
+torsion      41   39   39   48      0.000 0.0 1   0.000 180.0 2   0.374 0.0 3
+torsion      41   39   39   50      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      41   39   39   75      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      41   39   39   77      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      48   39   39   51      0.000 0.0 1   0.000 180.0 2   0.374 0.0 3
+torsion      51   39   39   51      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   39   42   35      0.000 0.0 1   0.000 180.0 2   0.300 0.0 3
+torsion      40   39   42   38      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      40   39   42   39      0.000 0.0 1   0.000 180.0 2   0.280 0.0 3
+torsion      39   39   48   39      0.958 0.0 1  -0.155 180.0 2   0.766 0.0 3
+torsion      39   39   48   49     -0.107 0.0 1   0.512 180.0 2   0.365 0.0 3
+torsion      41   39   48   39      0.072 0.0 1  -0.012 180.0 2   0.563 0.0 3
+torsion      50   39   48   39      0.072 0.0 1  -0.012 180.0 2   0.563 0.0 3
+torsion      50   39   48   49      0.000 0.0 1   0.661 180.0 2   0.288 0.0 3
+torsion      51   39   48   39      0.121 0.0 1  -0.648 180.0 2   0.199 0.0 3
+torsion      51   39   48   49      0.121 0.0 1  -0.648 180.0 2   0.199 0.0 3
+torsion      57   39   52   54      0.000 0.0 1   0.000 180.0 2   0.235 0.0 3
+torsion      57   39   52   55      0.000 0.0 1   0.000 180.0 2  -0.010 0.0 3
+torsion      39   39   55   52      0.660 0.0 1  -0.456 180.0 2   0.254 0.0 3
+torsion      39   39   55   56     -0.660 0.0 1  -0.420 180.0 2  -0.254 0.0 3
+torsion      58   39   55   39      0.000 0.0 1   0.000 180.0 2   0.460 0.0 3
+torsion      58   39   55   52      0.000 0.0 1   0.000 180.0 2  -0.126 0.0 3
+torsion      58   39   55   56      0.000 0.0 1   0.000 180.0 2   0.000 0.0 3
+torsion      63   39   61   54     -0.154 0.0 1   0.044 180.0 2  -0.086 0.0 3
+torsion      63   39   61   59      0.250 0.0 1   0.850 180.0 2   0.000 0.0 3
+torsion      63   39   61   62      0.115 0.0 1   0.027 180.0 2   0.285 0.0 3
+torsion      39   39   75   76      0.000 0.0 1   0.000 180.0 2   0.000 0.0 3
+torsion      77   39   75   76      0.000 0.0 1   0.000 180.0 2   0.000 0.0 3
+torsion      39   39   87   87     -0.800 0.0 1  -0.100 180.0 2  -0.550 0.0 3
+torsion      40   39   87   87      0.000 0.0 1   0.000 180.0 2  -0.090 0.0 3
+torsion      50   39   87   87      0.000 0.0 1   0.000 180.0 2  -0.090 0.0 3
+torsion      39   39   90   89     -0.800 0.0 1  -0.100 180.0 2  -0.550 0.0 3
+torsion      39   39   90   90     -0.800 0.0 1  -0.100 180.0 2  -0.550 0.0 3
+torsion      40   39   90   89      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   39   90   90      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      39   52   55   39     -1.000 0.0 1   2.000 180.0 2   2.050 0.0 3
+torsion      39   52   55   56      0.000 0.0 1   1.200 180.0 2   0.800 0.0 3
+torsion      53   52   55   39      0.000 0.0 1   2.250 180.0 2   0.000 0.0 3
+torsion      53   52   55   56      0.000 0.0 1   0.500 180.0 2   0.350 0.0 3
+torsion      54   52   55   39      1.000 0.0 1   2.250 180.0 2  -2.250 0.0 3
+torsion      54   52   55   56      0.000 0.0 1  -0.664 180.0 2  -0.357 0.0 3
+torsion      62   52   92   92     -0.300 0.0 1   8.000 180.0 2   0.000 0.0 3
+torsion      94   52   92   92      0.000 0.0 1   8.000 180.0 2   0.000 0.0 3
+torsion      60   59   61   39      0.000 0.0 1   5.390 180.0 2   1.230 0.0 3
+torsion      60   59   61   54     -1.200 0.0 1   5.390 180.0 2   0.400 0.0 3
+torsion      60   59   61   62     -0.300 0.0 1   5.390 180.0 2   0.000 0.0 3
+torsion      68   61   66   61      0.000 0.0 1   0.000 180.0 2   0.660 0.0 3
+torsion      68   61   66   67      0.000 0.0 1   0.000 180.0 2   0.383 0.0 3
+torsion      69   61   66   61     -0.440 0.0 1  -0.260 180.0 2   0.600 0.0 3
+torsion      69   61   66   67     -1.096 0.0 1   0.079 180.0 2   0.384 0.0 3
+torsion      66   61   69   70      0.000 0.0 1   0.000 180.0 2   0.475 0.0 3
+torsion      68   61   69   70      0.000 0.0 1   0.000 180.0 2   0.238 0.0 3
+torsion      72   71   73   74      0.000 0.0 1   0.000 180.0 2   0.500 0.0 3
+torsion      73   71   73   74      0.000 0.0 1   0.000 180.0 2   0.500 0.0 3
+torsion      79   78   80   81      0.000 0.0 1   0.000 180.0 2   0.000 0.0 3
+torsion      83   82   84   82      0.000 0.0 1   0.000 180.0 2   0.000 0.0 3
+torsion      85   85   85   85     -0.670 0.0 1   4.004 180.0 2   0.000 0.0 3
+torsion      85   85   85   86      0.550 0.0 1   4.534 180.0 2  -0.550 0.0 3
+torsion      85   85   85   98      0.000 0.0 1   5.470 180.0 2   0.000 0.0 3
+torsion      86   85   85   86      0.000 0.0 1   4.072 180.0 2   0.000 0.0 3
+torsion      86   85   85   98     -3.150 0.0 1   3.000 180.0 2   0.000 0.0 3
+torsion      85   85   98   85      0.000 0.0 1  14.000 180.0 2   0.000 0.0 3
+torsion      85   85   98   99     -3.150 0.0 1   8.000 180.0 2   0.000 0.0 3
+torsion      86   85   98   85     -6.650 0.0 1  20.000 180.0 2   0.000 0.0 3
+torsion      86   85   98   99     -0.530 0.0 1   3.000 180.0 2   0.000 0.0 3
+torsion      35   87   87   87      0.000 0.0 1   4.470 180.0 2   0.000 0.0 3
+torsion      35   87   87   88      0.000 0.0 1   4.470 180.0 2   0.000 0.0 3
+torsion      39   87   87   87     -0.610 0.0 1   4.212 180.0 2   0.000 0.0 3
+torsion      39   87   87   88      0.000 0.0 1   6.104 180.0 2   0.000 0.0 3
+torsion      87   87   87   87     -0.670 0.0 1   4.004 180.0 2   0.000 0.0 3
+torsion      87   87   87   88      0.550 0.0 1   4.534 180.0 2  -0.550 0.0 3
+torsion      87   87   87   88      0.550 0.0 1   4.534 180.0 2  -0.550 0.0 3
+torsion      87   87   87   97     -0.610 0.0 1   4.212 180.0 2   0.000 0.0 3
+torsion      88   87   87   88      0.000 0.0 1   4.072 180.0 2   0.000 0.0 3
+torsion      88   87   87   97      0.000 0.0 1   6.104 180.0 2   0.000 0.0 3
+torsion      87   87   97   95      0.000 0.0 1   2.304 180.0 2   0.000 0.0 3
+torsion      45   89   90   39      0.000 0.0 1   4.104 180.0 2   0.000 0.0 3
+torsion      45   89   90   89     -2.744 0.0 1  15.000 180.0 2   0.000 0.0 3
+torsion      45   89   90   90     -3.150 0.0 1   8.000 180.0 2   0.000 0.0 3
+torsion      45   89   90   91     -0.530 0.0 1   3.000 180.0 2   0.000 0.0 3
+torsion      90   89   90   39      0.000 0.0 1   4.212 180.0 2   0.000 0.0 3
+torsion      90   89   90   89      0.000 0.0 1  15.000 180.0 2   0.000 0.0 3
+torsion      90   89   90   90      0.000 0.0 1  14.000 180.0 2   0.000 0.0 3
+torsion      90   89   90   91      0.000 0.0 1   7.000 180.0 2   0.000 0.0 3
+torsion      45   89   92   86     -0.530 0.0 1   3.000 180.0 2   0.000 0.0 3
+torsion      45   89   92   92     -3.150 0.0 1   8.000 180.0 2   0.000 0.0 3
+torsion      92   89   92   86     -6.650 0.0 1  20.000 180.0 2   0.000 0.0 3
+torsion      92   89   92   92      0.000 0.0 1  14.000 180.0 2   0.000 0.0 3
+torsion      39   90   90   89      0.000 0.0 1   4.212 180.0 2   0.000 0.0 3
+torsion      39   90   90   91      0.000 0.0 1   4.102 180.0 2   0.000 0.0 3
+torsion      89   90   90   89      0.900 0.0 1  15.000 180.0 2   0.000 0.0 3
+torsion      89   90   90   91     -3.150 0.0 1   3.000 180.0 2   0.000 0.0 3
+torsion      91   90   90   91      0.000 0.0 1  11.500 180.0 2   0.000 0.0 3
+torsion      52   92   92   86      0.000 0.0 1   6.104 180.0 2   0.000 0.0 3
+torsion      52   92   92   89      0.000 0.0 1   5.470 180.0 2   0.000 0.0 3
+torsion      52   92   92   92     -0.610 0.0 1   4.212 180.0 2   0.000 0.0 3
+torsion      86   92   92   86      0.000 0.0 1   7.072 180.0 2   0.000 0.0 3
+torsion      86   92   92   89     -3.150 0.0 1   3.000 180.0 2   0.000 0.0 3
+torsion      86   92   92   92      0.250 0.0 1   5.534 180.0 2  -0.550 0.0 3
+torsion      86   92   92   93      0.000 0.0 1   6.104 180.0 2   0.000 0.0 3
+torsion      89   92   92   92      0.000 0.0 1   5.470 180.0 2   0.000 0.0 3
+torsion      89   92   92   93      0.000 0.0 1   5.470 180.0 2   0.000 0.0 3
+torsion      92   92   92   92     -0.670 0.0 1   4.304 180.0 2   0.000 0.0 3
+torsion      92   92   92   93     -0.610 0.0 1   4.212 180.0 2   0.000 0.0 3
+torsion      92   92   93   40      0.000 0.0 1   0.000 180.0 2   0.341 0.0 3
+torsion      92   92   93   93      0.260 0.0 1  -0.255 180.0 2   0.260 0.0 3
+torsion      40   93   93   40      0.000 0.0 1   0.000 180.0 2   0.299 0.0 3
+torsion      40   93   93   92      0.000 0.0 1   0.000 180.0 2   0.341 0.0 3
+torsion      96   95   97   87      0.000 0.0 1   4.000 180.0 2   0.000 0.0 3
+torsion      96   95   97   95      0.000 0.0 1   4.000 180.0 2   0.000 0.0 3
+
+
+      #############################
+      ##                         ##
+      ##  Pi-Torsion Parameters  ##
+      ##                         ##
+      #############################
+
+
+pitors       52   55            6.85
+pitors       85   85            6.85
+pitors       87   87            6.85
+
+
+      ###################################
+      ##                               ##
+      ##  Atomic Multipole Parameters  ##
+      ##                               ##
+      ###################################
+
+
+multipole     1    0    0               0.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     2    0    0               0.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     3    0    0               0.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     4    0    0               0.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     5    0    0               0.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     6    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     7    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     8    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole     9    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    10    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    11    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    12    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    13    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    14    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    15    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    16    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    17   18    0              -0.50933
+                                        0.00000    0.00000    0.83219
+                                        0.03373
+                                        0.00000    0.03373
+                                        0.00000    0.00000   -0.06746
+multipole    18   17    0              -0.49067
+                                        0.00000    0.00000    0.62349
+                                       -0.46202
+                                        0.00000   -0.46202
+                                        0.00000    0.00000    0.92404
+multipole    19    0    0               0.50724
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    20   19    0              -0.37681
+                                        0.00000    0.00000    0.35197
+                                       -0.33840
+                                        0.00000   -0.33840
+                                        0.00000    0.00000    0.67680
+multipole    21    0    0               2.24240
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    22   21    0              -0.54040
+                                        0.00000    0.00000   -0.00975
+                                       -0.21692
+                                        0.00000   -0.21692
+                                        0.00000    0.00000    0.43384
+multipole    23   23    0               0.00000
+                                        0.00000    0.00000    0.12578
+                                        0.16329
+                                        0.00000    0.16329
+                                        0.00000    0.00000   -0.32658
+multipole    24   25   25              -0.22648
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    25   24   25               0.05662
+                                        0.00000    0.00000   -0.12142
+                                       -0.00797
+                                        0.00000   -0.00797
+                                        0.00000    0.00000    0.01594
+multipole    26   26   27              -0.17655
+                                        0.00000    0.00000    0.04700
+                                       -0.22275
+                                        0.00000   -0.22275
+                                        0.00000    0.00000    0.44550
+multipole    27   26   26               0.05885
+                                        0.03092    0.00000   -0.07878
+                                       -0.00954
+                                        0.00000   -0.03313
+                                        0.00313    0.00000    0.04267
+multipole    28   30   29              -0.16638
+                                        0.00000    0.00000    0.25069
+                                       -0.24574
+                                        0.00000   -0.24574
+                                        0.00000    0.00000    0.49148
+multipole    28   32   29              -0.16638
+                                        0.00000    0.00000    0.25069
+                                       -0.24574
+                                        0.00000   -0.24574
+                                        0.00000    0.00000    0.49148
+multipole    29   28   30               0.05546
+                                        0.01102    0.00000   -0.10399
+                                        0.00247
+                                        0.00000   -0.01906
+                                        0.00852    0.00000    0.01659
+multipole    29   28   32               0.05546
+                                        0.01102    0.00000   -0.10399
+                                        0.00247
+                                        0.00000   -0.01906
+                                        0.00852    0.00000    0.01659
+multipole    30   30   28              -0.12028
+                                        0.33700    0.00000    0.22666
+                                        0.34191
+                                        0.00000   -0.72407
+                                       -0.04985    0.00000    0.38216
+multipole    31   30   30               0.06014
+                                        0.00606    0.00000   -0.08554
+                                       -0.00370
+                                        0.00000   -0.01833
+                                        0.00546    0.00000    0.02203
+multipole    32   33   28              -0.05646
+                                        0.00000    0.00000   -0.19753
+                                       -0.37464
+                                        0.00000    0.21807
+                                        0.19091    0.00000    0.15657
+multipole    32   33   30              -0.05646
+                                        0.00000    0.00000   -0.19753
+                                       -0.37464
+                                        0.00000    0.21807
+                                        0.19091    0.00000    0.15657
+multipole    32   33   32              -0.05646
+                                        0.00000    0.00000   -0.19753
+                                       -0.37464
+                                        0.00000    0.21807
+                                        0.19091    0.00000    0.15657
+multipole    33   32   28               0.05646
+                                       -0.00037    0.00000   -0.03746
+                                       -0.01137
+                                        0.00000   -0.01137
+                                        0.00000    0.00000    0.02274
+multipole    33   32   30               0.05646
+                                       -0.00037    0.00000   -0.03746
+                                       -0.01137
+                                        0.00000   -0.01137
+                                        0.00000    0.00000    0.02274
+multipole    33   32   32               0.05646
+                                       -0.00037    0.00000   -0.03746
+                                       -0.01137
+                                        0.00000   -0.01137
+                                        0.00000    0.00000    0.02274
+multipole    34    0    0               0.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    35   36  -36              -0.51966
+                                        0.00000    0.00000    0.14279
+                                        0.37928
+                                        0.00000   -0.41809
+                                        0.00000    0.00000    0.03881
+multipole    36   35   36               0.25983
+                                       -0.03859    0.00000   -0.05818
+                                       -0.03673
+                                        0.00000   -0.10739
+                                       -0.00203    0.00000    0.14412
+multipole    37   38   39              -0.53771
+                                        0.23239    0.00000    0.14256
+                                        0.21444
+                                        0.00000   -0.55826
+                                       -0.21095    0.00000    0.34382
+multipole    38   37   39               0.24154
+                                       -0.04246    0.00000    0.00000
+                                       -0.06223
+                                        0.00000   -0.12152
+                                       -0.02736    0.00000    0.18375
+multipole    39   37   38               0.17575
+                                        0.00000    0.00000    0.57127
+                                       -0.44733
+                                        0.00000   -0.44733
+                                        0.00000    0.00000    0.89466
+multipole    40   39   37               0.04014
+                                        0.00000    0.00000   -0.10668
+                                       -0.00544
+                                        0.00000   -0.02734
+                                       -0.01699    0.00000    0.03278
+multipole    41   42   43              -0.50793
+                                        0.30397    0.00000    0.07443
+                                        0.21785
+                                        0.00000   -0.54387
+                                       -0.22371    0.00000    0.32602
+multipole    42   41   43               0.24956
+                                       -0.04674    0.00000    0.00000
+                                       -0.04536
+                                        0.00000   -0.09867
+                                       -0.01950    0.00000    0.14403
+multipole    43   41   45               0.14897
+                                        0.07697    0.00000    0.46667
+                                       -0.22387
+                                        0.00000   -0.51710
+                                       -0.34700    0.00000    0.74097
+multipole    43   41   47               0.17897
+                                        0.07697    0.00000    0.46667
+                                       -0.22387
+                                        0.00000   -0.51710
+                                       -0.34700    0.00000    0.74097
+multipole    44   43   41               0.03392
+                                       -0.01463    0.00000   -0.07700
+                                       -0.00706
+                                        0.00000   -0.01579
+                                       -0.02154    0.00000    0.02285
+multipole    45   43   46              -0.17398
+                                        0.00000    0.00000    0.32694
+                                       -0.23348
+                                        0.00000   -0.31115
+                                       -0.04183    0.00000    0.54463
+multipole    46   45   43               0.07185
+                                        0.00000    0.00000   -0.07829
+                                       -0.02252
+                                        0.00000   -0.03344
+                                        0.01606    0.00000    0.05596
+multipole    47   49   43              -0.13175
+                                        0.27622    0.00000    0.18608
+                                        0.22471
+                                        0.00000   -0.57970
+                                       -0.16099    0.00000    0.35499
+multipole    48   47   49               0.06360
+                                        0.00000    0.00000   -0.07581
+                                       -0.01386
+                                        0.00000   -0.02607
+                                        0.00078    0.00000    0.03993
+multipole    49   47   50              -0.16203
+                                        0.00000    0.00000    0.32333
+                                       -0.30615
+                                        0.00000   -0.27981
+                                        0.01123    0.00000    0.58596
+multipole    50   49   47               0.05938
+                                        0.00000    0.00000   -0.09019
+                                       -0.01198
+                                        0.00000   -0.03174
+                                        0.00468    0.00000    0.04372
+multipole    51   53   52              -0.53467
+                                       -0.11997    0.00000    0.30509
+                                       -0.12904
+                                        0.00000   -0.41083
+                                       -0.24252    0.00000    0.53987
+multipole    52   51   53               0.34832
+                                       -0.02310    0.00000   -0.09243
+                                        0.02057
+                                        0.00000   -0.02589
+                                        0.01814    0.00000    0.00532
+multipole    53   51   54               0.18465
+                                       -0.00129    0.00000    0.27865
+                                       -0.41290
+                                        0.00000   -0.18381
+                                        0.28296    0.00000    0.59671
+multipole    54   53   51              -0.00834
+                                        0.00129    0.00000   -0.09710
+                                       -0.00470
+                                        0.00000   -0.00889
+                                        0.01035    0.00000    0.01359
+multipole    55   53   55              -0.12383
+                                       -0.03880    0.00000    0.27670
+                                       -0.21286
+                                        0.00000   -0.18142
+                                       -0.04969    0.00000    0.39428
+multipole    56   55   53               0.04295
+                                       -0.00542    0.00000   -0.10152
+                                       -0.01487
+                                        0.00000   -0.01382
+                                       -0.00216    0.00000    0.02869
+multipole    57   58   58              -0.32494
+                                        0.53657    0.00000    0.37202
+                                        0.44076
+                                        0.00000   -0.87825
+                                        0.00127    0.00000    0.43749
+multipole    58   57   58               0.11615
+                                       -0.19923    0.00000    0.19298
+                                       -0.23681
+                                        0.00000   -0.41373
+                                       -0.10899    0.00000    0.65054
+multipole    59   58   57               0.01544
+                                        0.04231    0.00000   -0.02407
+                                       -0.01587
+                                        0.00000   -0.05904
+                                        0.03668    0.00000    0.07491
+multipole    60   61  -61  -61         -0.57960
+                                        0.15842    0.00000    0.06469
+                                       -0.43288
+                                        0.00000    0.27280
+                                       -0.28801    0.00000    0.16008
+multipole    61   60  -61  -61          0.19320
+                                       -0.03286    0.00000   -0.08851
+                                       -0.04741
+                                        0.00000    0.04478
+                                        0.01653    0.00000    0.00263
+multipole    62   63   63              -0.22892
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    63   62   63               0.30723
+                                        0.00000    0.00000    0.04225
+                                       -0.07085
+                                        0.00000   -0.07085
+                                        0.00000    0.00000    0.14170
+multipole    64   66  -65  -65         -0.73235
+                                       -0.06766    0.00000    0.50053
+                                       -0.78586
+                                        0.00000    0.11843
+                                       -0.42729    0.00000    0.66743
+multipole    65   64   66               0.30411
+                                       -0.01655    0.00000   -0.04238
+                                        0.05116
+                                        0.00000    0.01731
+                                       -0.03326    0.00000   -0.06847
+multipole    66   64   67               0.13715
+                                        0.00000    0.00000    0.30940
+                                       -0.22698
+                                        0.00000   -0.17804
+                                        0.14974    0.00000    0.40502
+multipole    67   66   64              -0.00434
+                                        0.00527    0.00000   -0.12660
+                                        0.09141
+                                        0.00000    0.00598
+                                       -0.00549    0.00000   -0.09739
+multipole    68   70  -69  -69         -0.78457
+                                       -0.13919    0.00000    0.43672
+                                       -0.60031
+                                        0.00000   -0.00688
+                                       -0.14251    0.00000    0.60719
+multipole    69   68   70               0.33429
+                                        0.01550    0.00000   -0.07147
+                                        0.09104
+                                        0.00000    0.00656
+                                        0.06677    0.00000   -0.09760
+multipole    70   68   72               0.07533
+                                        0.02126    0.00000    0.27273
+                                       -0.11070
+                                        0.00000   -0.44964
+                                       -0.22608    0.00000    0.56034
+multipole    70   68   76               0.03849
+                                        0.02126    0.00000    0.27273
+                                       -0.11070
+                                        0.00000   -0.44964
+                                       -0.22608    0.00000    0.56034
+multipole    71   70   68               0.03287
+                                       -0.00328    0.00000   -0.11206
+                                        0.05082
+                                        0.00000    0.01536
+                                       -0.10743    0.00000   -0.06618
+multipole    72   70   73              -0.13077
+                                        0.00000    0.00000    0.17419
+                                       -0.25148
+                                        0.00000   -0.02794
+                                       -0.03628    0.00000    0.27942
+multipole    73   72   70               0.03523
+                                        0.01099    0.00000   -0.09907
+                                        0.07159
+                                        0.00000    0.01975
+                                       -0.06636    0.00000   -0.09134
+multipole    74   76   75              -0.16203
+                                        0.00000    0.00000    0.32333
+                                       -0.30615
+                                        0.00000   -0.27981
+                                        0.01123    0.00000    0.58596
+multipole    75   74   76               0.05938
+                                        0.00000    0.00000   -0.09019
+                                       -0.01198
+                                        0.00000   -0.03174
+                                        0.00468    0.00000    0.04372
+multipole    76   74   70              -0.13155
+                                        0.27622    0.00000    0.18608
+                                        0.22471
+                                        0.00000   -0.57970
+                                       -0.16099    0.00000    0.35499
+multipole    77   76   74               0.06360
+                                        0.00000    0.00000   -0.07581
+                                       -0.01386
+                                        0.00000   -0.02607
+                                        0.00078    0.00000    0.03993
+multipole    78   79  -80  -80         -0.50428
+                                        0.44556    0.00000   -0.40528
+                                       -0.46816
+                                        0.00000    0.41972
+                                       -0.53357    0.00000    0.04844
+multipole    79   78   80               0.31436
+                                        0.00000    0.00000   -0.01317
+                                       -0.01675
+                                        0.00000   -0.11749
+                                        0.00000    0.00000    0.13424
+multipole    80   78   80               0.03586
+                                       -0.08099    0.00000    0.35884
+                                       -0.28498
+                                        0.00000   -0.43341
+                                        0.18616    0.00000    0.71839
+multipole    81   80   78               0.01970
+                                       -0.00547    0.00000   -0.11748
+                                        0.03191
+                                        0.00000    0.06495
+                                       -0.07663    0.00000   -0.09686
+multipole    82   83  -83  -83         -0.19506
+                                        0.64617    0.00000    0.22216
+                                       -0.71281
+                                        0.00000    0.37641
+                                       -0.42297    0.00000    0.33640
+multipole    83   82  -83  -83          0.00472
+                                       -0.12628    0.00000    0.36014
+                                       -0.65998
+                                        0.00000   -0.16196
+                                        0.18288    0.00000    0.82194
+multipole    84   83   82               0.02010
+                                        0.00237    0.00000   -0.10127
+                                        0.04286
+                                        0.00000    0.02869
+                                       -0.01037    0.00000   -0.07155
+multipole    85   86  -89  -89         -0.35208
+                                        0.53462    0.00000   -0.10752
+                                       -0.37199
+                                        0.00000    0.11075
+                                       -0.27388    0.00000    0.26124
+multipole    86   85   89               0.10040
+                                       -0.01272    0.00000   -0.10118
+                                       -0.00613
+                                        0.00000   -0.01791
+                                       -0.00220    0.00000    0.02404
+multipole    87   89   87              -0.19964
+                                        0.22355    0.00000    0.20213
+                                        0.29715
+                                        0.00000   -0.50142
+                                       -0.18234    0.00000    0.20427
+multipole    88   87   89               0.07729
+                                        0.00000    0.00000   -0.06322
+                                       -0.00431
+                                        0.00000   -0.00800
+                                        0.01053    0.00000    0.01231
+multipole    89   85   87               0.04684
+                                        0.24638    0.00000    0.26382
+                                        0.13003
+                                        0.00000   -0.69427
+                                       -0.14259    0.00000    0.56424
+multipole    90   89   85               0.06203
+                                       -0.02660    0.00000   -0.11082
+                                       -0.02038
+                                        0.00000    0.00233
+                                       -0.01687    0.00000    0.01805
+multipole    91   96  -92  -92         -0.16386
+                                        0.86090    0.00000    0.17248
+                                       -0.08613
+                                        0.00000    0.06267
+                                       -0.63594    0.00000    0.02346
+multipole    92   91   94               0.05185
+                                        0.13228    0.00000    0.30434
+                                        0.06680
+                                        0.00000   -0.61847
+                                       -0.12599    0.00000    0.55167
+multipole    93   92   93               0.00527
+                                        0.00406    0.00000   -0.10764
+                                       -0.01340
+                                        0.00000   -0.01393
+                                        0.00177    0.00000    0.02733
+multipole    94   92   94              -0.09279
+                                        0.22151    0.00000    0.21417
+                                        0.13087
+                                        0.00000   -0.35686
+                                       -0.20050    0.00000    0.22599
+multipole    95   94   95               0.04373
+                                        0.01196    0.00000   -0.08273
+                                       -0.01875
+                                        0.00000   -0.01896
+                                        0.00134    0.00000    0.03771
+multipole    96   91   97              -0.02496
+                                        0.04979    0.00000    0.29801
+                                       -0.38717
+                                        0.00000   -0.44363
+                                        0.10820    0.00000    0.83080
+multipole    97   96   91               0.02490
+                                       -0.00991    0.00000   -0.11456
+                                       -0.01289
+                                        0.00000   -0.01285
+                                       -0.00610    0.00000    0.02574
+multipole    98  100  101               0.68400
+                                        0.35855    0.00000    0.35024
+                                       -0.16615
+                                        0.00000    0.05785
+                                       -0.18250    0.00000    0.10830
+multipole    99   98  100              -0.00966
+                                        0.04692    0.00000   -0.16916
+                                        0.04863
+                                        0.00000    0.00186
+                                        0.02467    0.00000   -0.05049
+multipole   100   98  101              -0.66032
+                                       -0.11037    0.00000   -0.02173
+                                       -0.47187
+                                        0.00000    0.06623
+                                       -0.17201    0.00000    0.40564
+multipole   101   98  100              -0.28852
+                                       -0.05862    0.00000   -0.09300
+                                        0.58777
+                                        0.00000   -1.01585
+                                       -0.12557    0.00000    0.42808
+multipole   102  101   98               0.13725
+                                        0.00573    0.00000   -0.15670
+                                       -0.00132
+                                        0.00000   -0.06288
+                                        0.01422    0.00000    0.06420
+multipole   103  104  105               0.69704
+                                        0.32439    0.00000    0.34585
+                                        0.04129
+                                        0.00000   -0.08955
+                                       -0.08531    0.00000    0.04826
+multipole   104  103  105              -0.66360
+                                       -0.08498    0.00000    0.01193
+                                       -0.55576
+                                        0.00000    0.07729
+                                       -0.11662    0.00000    0.47847
+multipole   105  103  104              -0.34707
+                                        0.00433    0.00000   -0.17817
+                                        0.76240
+                                        0.00000   -0.95193
+                                       -0.04518    0.00000    0.18953
+multipole   106  105  103               0.13083
+                                       -0.00017    0.00000   -0.15549
+                                        0.00490
+                                        0.00000   -0.06975
+                                       -0.00360    0.00000    0.06485
+multipole   107  103  104              -0.19238
+                                       -0.05630    0.00000    0.24000
+                                       -0.15101
+                                        0.00000   -0.08245
+                                        0.04874    0.00000    0.23346
+multipole   108  107  103               0.08145
+                                        0.00000    0.00000   -0.09216
+                                       -0.01356
+                                        0.00000   -0.02534
+                                        0.00133    0.00000    0.03890
+multipole   109  103  104              -0.12704
+                                        0.08569    0.00000   -0.08840
+                                        0.31357
+                                        0.00000    0.26378
+                                        0.01921    0.00000   -0.57735
+multipole   110  109  103               0.08145
+                                        0.00000    0.00000   -0.09216
+                                       -0.01356
+                                        0.00000   -0.02534
+                                        0.00133    0.00000    0.03890
+multipole   111  109  112              -0.16203
+                                        0.00000    0.00000    0.32333
+                                       -0.30615
+                                        0.00000   -0.27981
+                                        0.01123    0.00000    0.58596
+multipole   112  111  109               0.05938
+                                        0.00000    0.00000   -0.09019
+                                       -0.01198
+                                        0.00000   -0.03174
+                                        0.00468    0.00000    0.04372
+multipole   113  115  116               0.65857
+                                        0.41598    0.00000    0.37265
+                                       -0.18173
+                                        0.00000    0.06910
+                                       -0.16554    0.00000    0.11263
+multipole   114  113  115              -0.01588
+                                        0.04813    0.00000   -0.16671
+                                        0.05978
+                                        0.00000    0.00638
+                                        0.02414    0.00000   -0.06616
+multipole   115  113  116              -0.67916
+                                       -0.09581    0.00000    0.00698
+                                       -0.39376
+                                        0.00000   -0.01911
+                                       -0.14889    0.00000    0.41287
+multipole   116  113  115              -0.19685
+                                        0.03810    0.00000   -0.16343
+                                        0.75512
+                                        0.00000   -1.07948
+                                       -0.17807    0.00000    0.32436
+multipole   117  116  113               0.06926
+                                       -0.07490    0.00000   -0.17460
+                                        0.02296
+                                        0.00000   -0.06128
+                                        0.00972    0.00000    0.03832
+multipole   118  116  113              -0.00817
+                                       -0.03257    0.00000    0.26271
+                                       -0.36503
+                                        0.00000   -0.20015
+                                        0.00659    0.00000    0.56518
+multipole   119  118  116               0.05741
+                                        0.00000    0.00000   -0.08912
+                                       -0.02815
+                                        0.00000   -0.02091
+                                       -0.00421    0.00000    0.04906
+multipole   120  116  113               0.12999
+                                        0.04290    0.00000    0.06605
+                                        0.00941
+                                        0.00000    0.03131
+                                       -0.04157    0.00000   -0.04072
+multipole   121  120  116               0.03407
+                                       -0.00588    0.00831    0.04151
+                                        0.04980
+                                        0.05442    0.03448
+                                       -0.02032    0.04044   -0.08428
+multipole   123  124  125               0.64220
+                                        0.22706    0.00000    0.31459
+                                       -0.50118
+                                        0.00000    0.23539
+                                        0.02285    0.00000    0.26579
+multipole   124  123  125              -0.66524
+                                       -0.05964    0.00000   -0.00965
+                                       -0.38021
+                                        0.00000   -0.05967
+                                       -0.12838    0.00000    0.43988
+multipole   125  123  124              -0.18752
+                                        0.20427    0.00000   -0.34027
+                                        1.06373
+                                        0.00000   -0.82316
+                                        0.04814    0.00000   -0.24057
+multipole   126  125  123               0.07726
+                                       -0.01582    0.00000   -0.17196
+                                        0.02821
+                                        0.00000   -0.05415
+                                        0.00463    0.00000    0.02594
+multipole   127  125  123              -0.03623
+                                        0.00000    0.00000    0.23240
+                                       -0.39078
+                                        0.00000   -0.13890
+                                       -0.04627    0.00000    0.52968
+multipole   128  127  125               0.06087
+                                       -0.00898    0.00000   -0.08765
+                                       -0.00712
+                                        0.00000   -0.03030
+                                       -0.02713    0.00000    0.03742
+multipole   129  123  124              -0.24387
+                                        0.00000    0.00000    0.07193
+                                        0.28325
+                                        0.00000    0.19307
+                                        0.29847    0.00000   -0.47632
+multipole   130  129  123               0.07693
+                                        0.00000    0.00000   -0.08930
+                                       -0.00778
+                                        0.00000   -0.03132
+                                        0.00708    0.00000    0.03910
+multipole   131  133  134               0.61546
+                                        0.34152    0.00000    0.30025
+                                       -0.28519
+                                        0.00000    0.03194
+                                       -0.18758    0.00000    0.25325
+multipole   132  131  133              -0.03132
+                                        0.05682    0.00000   -0.15943
+                                        0.04940
+                                        0.00000    0.01244
+                                        0.02463    0.00000   -0.06184
+multipole   133  131  134              -0.67725
+                                       -0.03839    0.00000    0.05139
+                                       -0.35361
+                                        0.00000   -0.08422
+                                       -0.04480    0.00000    0.43783
+multipole   134  131  133              -0.19791
+                                        0.08128    0.00000   -0.16063
+                                        0.77250
+                                        0.00000   -0.95072
+                                       -0.07925    0.00000    0.17822
+multipole   135  134  131               0.00688
+                                       -0.02610    0.00000    0.31443
+                                       -0.28042
+                                        0.00000   -0.19094
+                                       -0.04366    0.00000    0.47136
+multipole   136  135  134               0.04621
+                                       -0.02617    0.00000   -0.09444
+                                       -0.03433
+                                        0.00000   -0.01491
+                                       -0.01887    0.00000    0.04924
+multipole   137  138  139               0.80568
+                                        0.31418    0.00000    0.30936
+                                        0.16264
+                                        0.00000   -0.34513
+                                       -0.12966    0.00000    0.18249
+multipole   138  137  139              -0.76654
+                                       -0.03160    0.00000   -0.15691
+                                       -0.57523
+                                        0.00000    0.31642
+                                       -0.04180    0.00000    0.25881
+multipole   139  137  138              -0.27849
+                                        0.08827    0.07010   -0.39278
+                                        0.75371
+                                        0.00000   -0.88152
+                                        0.04478    0.00000    0.12781
+multipole   140  139  137              -0.01070
+                                       -0.07637    0.00000    0.33533
+                                       -0.45884
+                                        0.00000   -0.31611
+                                       -0.02300    0.00000    0.77495
+multipole   141  140  139               0.04803
+                                        0.00000    0.00000   -0.11050
+                                        0.00177
+                                        0.00000   -0.01118
+                                       -0.00738    0.00000    0.00941
+multipole   142  137  138              -0.27148
+                                       -0.02865    0.00000    0.25409
+                                       -0.19166
+                                        0.00000   -0.03693
+                                        0.08931    0.00000    0.22859
+multipole   143  142  137               0.08135
+                                        0.00000    0.00000   -0.08222
+                                       -0.00361
+                                        0.00000   -0.01208
+                                        0.00930    0.00000    0.01569
+multipole   144  146  145              -0.46919
+                                        0.17702    0.00000    0.02746
+                                        0.30493
+                                        0.00001   -0.49979
+                                       -0.33195    0.00000    0.19486
+multipole   145  144  146               0.25776
+                                       -0.04996    0.00000   -0.05293
+                                       -0.10496
+                                        0.00000   -0.10483
+                                       -0.02100    0.00000    0.20979
+multipole   146  147  144               0.75480
+                                        0.47467    0.00000    0.23486
+                                       -0.10721
+                                        0.00000   -0.02052
+                                       -0.49018    0.00000    0.12773
+multipole   147  146  144              -0.60103
+                                       -0.07976    0.00000   -0.03242
+                                       -0.43271
+                                        0.00000    0.10680
+                                       -0.13721    0.00000    0.32591
+multipole   148  146  147               0.05766
+                                        0.01745    0.00000   -0.16520
+                                        0.04785
+                                        0.00000   -0.00670
+                                        0.00836    0.00000   -0.04115
+multipole   149  151  150              -0.51449
+                                        0.17023    0.00000   -0.01931
+                                        0.41976
+                                        0.00000   -0.46569
+                                       -0.31987    0.00000    0.04593
+multipole   150  149  151               0.24812
+                                       -0.06534    0.00000   -0.06940
+                                       -0.09928
+                                        0.00000   -0.08341
+                                       -0.04437    0.00000    0.18269
+multipole   151  152  149               0.79309
+                                        0.44903    0.00000    0.22771
+                                        0.16786
+                                        0.00000   -0.19671
+                                       -0.31142    0.00000    0.02885
+multipole   152  151  149              -0.61662
+                                       -0.08296    0.00000   -0.00320
+                                       -0.50843
+                                        0.00000    0.12249
+                                       -0.13621    0.00000    0.38594
+multipole   153  151  152              -0.18319
+                                       -0.02790    0.00000    0.35976
+                                       -0.10461
+                                        0.00000   -0.11692
+                                        0.04626    0.00000    0.22153
+multipole   154  153  151               0.09103
+                                       -0.01445    0.00000   -0.09273
+                                       -0.01359
+                                        0.00702   -0.02416
+                                        0.00000    0.00000    0.03775
+multipole   155  156  157               0.50491
+                                        0.00000    0.00000    0.40735
+                                       -0.55471
+                                        0.00000    0.20992
+                                        0.00000    0.00000    0.34479
+multipole   156  155  157              -0.51381
+                                        0.00000    0.00000    0.03694
+                                       -0.46753
+                                        0.00000    0.14362
+                                        0.00000    0.00000    0.32391
+multipole   157  155  156               0.00445
+                                        0.00826    0.00000   -0.13618
+                                        0.04855
+                                        0.00000   -0.02218
+                                       -0.01283    0.00000   -0.02637
+multipole   158  159  160               0.54719
+                                        0.03558    0.00000    0.38474
+                                       -0.51526
+                                        0.00000    0.15339
+                                       -0.05746    0.00000    0.36187
+multipole   159  158  160              -0.54061
+                                       -0.05927    0.00000    0.03696
+                                       -0.54551
+                                        0.00000    0.14242
+                                       -0.10982    0.00000    0.40309
+multipole   160  158  159              -0.22361
+                                       -0.01192    0.00000    0.24635
+                                       -0.04230
+                                        0.00000   -0.13918
+                                        0.05210    0.00000    0.18148
+multipole   161  160  158               0.07963
+                                        0.00000    0.00000   -0.08270
+                                       -0.01659
+                                        0.00000   -0.02290
+                                       -0.00527    0.00000    0.03949
+multipole   162  158  159              -0.02186
+                                        0.02389    0.00000   -0.16073
+                                        0.04310
+                                        0.00000   -0.01011
+                                        0.01929    0.00000   -0.03299
+multipole   163  164 -164               0.23084
+                                        0.00000    0.00000    0.49866
+                                        1.54610
+                                        0.00000   -2.21649
+                                        0.00000    0.00000    0.67039
+multipole   164  163  164              -0.11542
+                                       -0.01880    0.00000   -0.26701
+                                       -0.00334
+                                        0.00000   -0.06496
+                                       -0.01793    0.00000    0.06830
+multipole   165  166  167               0.10186
+                                        0.41482    0.00000    0.31682
+                                        1.29701
+                                        0.00000   -2.44834
+                                       -0.60310    0.00000    1.15133
+multipole   166  165  167              -0.11359
+                                       -0.01493    0.00000   -0.23983
+                                        0.01575
+                                        0.00000   -0.08528
+                                       -0.02660    0.00000    0.06953
+multipole   167  165  168              -0.20403
+                                        0.00000    0.00000    0.08076
+                                       -0.06672
+                                        0.00000   -0.20158
+                                        0.00470    0.00000    0.26830
+multipole   168  167  165               0.07192
+                                        0.01185    0.00000   -0.10796
+                                       -0.00170
+                                        0.00000   -0.02645
+                                       -0.00552    0.00000    0.02815
+multipole   169  170 -170              -0.18536
+                                        0.00000    0.00000    0.69845
+                                        1.74494
+                                        0.00000   -2.90227
+                                        0.00000    0.00000    1.15733
+multipole   170  169  170               0.09754
+                                       -0.06505    0.00000    0.62751
+                                       -0.38369
+                                        0.00000   -0.35868
+                                        0.07336    0.00000    0.74237
+multipole   171  170  169              -0.00162
+                                       -0.08135    0.00000   -0.10752
+                                       -0.02832
+                                        0.00000    0.01779
+                                       -0.08079    0.00000    0.01053
+multipole   172  172  173              -0.15378
+                                        0.47182    0.00000    0.35804
+                                        1.33557
+                                        0.00000   -2.74527
+                                       -0.28170    0.00000    1.40970
+multipole   173  172  172               0.13830
+                                       -0.02096    0.00000    0.87668
+                                       -0.42121
+                                        0.00000   -0.34241
+                                        0.03686    0.00000    0.76362
+multipole   174  173  172               0.00516
+                                       -0.13471    0.00000   -0.16285
+                                        0.03143
+                                        0.00000    0.04698
+                                       -0.14145    0.00000   -0.07841
+multipole   175  177  176              -0.35646
+                                        0.01158    0.00000    0.38562
+                                        0.89799
+                                        0.00000   -2.59055
+                                       -0.61964    0.00000    1.69256
+multipole   176  175  177               0.20683
+                                        0.03656    0.00000    0.23967
+                                       -0.17006
+                                        0.00000   -0.22209
+                                        0.08133    0.00000    0.39215
+multipole   177  175  179               0.04522
+                                       -0.01580    0.00000    0.23138
+                                       -0.86708
+                                        0.00000   -0.05614
+                                        0.02517    0.00000    0.92322
+multipole   178  177  175              -0.00157
+                                        0.02645    0.00000   -0.01401
+                                       -0.10756
+                                        0.00000    0.01205
+                                        0.03041    0.00000    0.09551
+multipole   179  177  175               0.06207
+                                        0.00000    0.00000    0.28242
+                                       -0.17130
+                                        0.00005   -0.17329
+                                       -0.03605    0.00005    0.34459
+multipole   180  179  177               0.01516
+                                       -0.01903    0.00000   -0.04771
+                                       -0.06086
+                                        0.00000   -0.04888
+                                        0.00395    0.00000    0.10974
+multipole   181  184  182              -0.51231
+                                        0.34596    0.00000    0.23797
+                                        1.44128
+                                        0.00000   -2.68119
+                                       -0.42800    0.00000    1.23991
+multipole   182  181  184               0.19455
+                                       -0.00724    0.00000    0.87776
+                                       -0.49136
+                                        0.00000   -0.45808
+                                        0.13728    0.00000    0.94944
+multipole   183  182  181              -0.00140
+                                       -0.08817    0.00000   -0.11639
+                                       -0.01709
+                                        0.00000    0.02898
+                                       -0.09187    0.00000   -0.01189
+multipole   184  181  186               0.21136
+                                        0.05894    0.00000    1.08244
+                                       -0.83410
+                                        0.00000   -0.39960
+                                       -0.28758    0.00000    1.23370
+multipole   185  184  181              -0.01700
+                                       -0.16197    0.00000   -0.05262
+                                       -0.07296
+                                        0.00000    0.03911
+                                       -0.14370    0.00000    0.03385
+multipole   186  184  181               0.08583
+                                       -0.00087    0.00000    0.36631
+                                       -0.15926
+                                        0.00000   -0.24306
+                                       -0.00657    0.00000    0.40232
+multipole   187  186  184               0.01959
+                                       -0.01842    0.00000   -0.02389
+                                       -0.05455
+                                        0.00000   -0.05942
+                                        0.02613    0.00000    0.11397
+multipole   188  189 -190 -190          0.28761
+                                        0.34263    0.00000    0.97464
+                                       -0.69101
+                                        0.00000    0.85372
+                                       -0.23783    0.00000   -0.16271
+multipole   189  188 -190 -190         -0.63423
+                                       -0.03435    0.00000    0.26755
+                                       -0.60034
+                                        0.00000   -0.57370
+                                        0.09678    0.00000    1.17404
+multipole   190  188  189              -0.05355
+                                       -0.08789    0.00000    0.54241
+                                       -0.28219
+                                        0.00000   -0.59075
+                                       -0.20358    0.00000    0.87294
+multipole   191  190  188               0.07562
+                                       -0.01297    0.00000   -0.15656
+                                        0.08665
+                                        0.00000    0.07386
+                                        0.01776    0.00000   -0.16051
+multipole   192  194  193               0.68421
+                                        0.00000    0.00000    0.04448
+                                        0.24144
+                                        0.00000    0.24144
+                                        0.00000    0.00000   -0.48288
+multipole   193  192  194              -0.59947
+                                        0.02332    0.00000    0.46306
+                                       -0.52310
+                                        0.00000   -0.57116
+                                       -0.00192    0.00000    1.09426
+multipole   194  192  195              -0.12328
+                                        0.00000    0.00000    0.20364
+                                        0.03024
+                                        0.00000    0.03024
+                                        0.00000    0.00000   -0.06048
+multipole   195  194  192               0.07916
+                                        0.04006    0.00000    0.13850
+                                       -0.05327
+                                        0.00000   -0.09352
+                                        0.00000    0.00000    0.14679
+multipole   196  198  197               0.68359
+                                        0.00000    0.00000    0.04182
+                                        0.19805
+                                        0.00000    0.19805
+                                        0.00000    0.00000   -0.39610
+multipole   197  196  198              -0.60332
+                                        0.01993    0.00000    0.47399
+                                       -0.51735
+                                        0.00000   -0.59284
+                                       -0.00125    0.00000    1.11019
+multipole   198  196  200              -0.13070
+                                        0.14439    0.00000    0.17369
+                                        0.06183
+                                        0.00000    0.00175
+                                       -0.05422    0.00000   -0.06358
+multipole   198  196  202              -0.13070
+                                        0.14439    0.00000    0.17369
+                                        0.06183
+                                        0.00000    0.00175
+                                       -0.05422    0.00000   -0.06358
+multipole   199  198  196               0.09377
+                                        0.02557    0.00000    0.17130
+                                       -0.02736
+                                        0.00000   -0.07299
+                                       -0.03928    0.00000    0.10035
+multipole   200  198  201              -0.13840
+                                        0.00164    0.00000    0.15569
+                                       -0.07355
+                                        0.00000    0.00209
+                                        0.08902    0.00000    0.07146
+multipole   201  200  198               0.06931
+                                        0.03490    0.00000    0.14233
+                                       -0.05085
+                                        0.00000   -0.10572
+                                       -0.03686    0.00000    0.15657
+multipole   202  204  198              -0.14395
+                                        0.16557    0.00000    0.06166
+                                       -0.06305
+                                        0.00000   -0.14995
+                                       -0.12323    0.00000    0.21300
+multipole   203  202  204               0.10674
+                                       -0.00429    0.00000    0.17162
+                                       -0.00087
+                                        0.00000   -0.10613
+                                        0.05594    0.00000    0.10700
+multipole   204  202  205              -0.14964
+                                        0.00176    0.00000    0.05906
+                                       -0.06180
+                                        0.00000   -0.04998
+                                        0.05205    0.00000    0.11178
+multipole   205  204  202               0.04988
+                                        0.04036    0.00000    0.15279
+                                       -0.04562
+                                        0.00000   -0.11014
+                                       -0.01658    0.00000    0.15576
+multipole   206  207    0               0.50893
+                                        0.00000    0.00000    0.00838
+                                        0.04512
+                                        0.00000    0.04512
+                                        0.00000    0.00000   -0.09024
+multipole   207  206    0              -0.64934
+                                        0.00000    0.00000   -0.41663
+                                        0.40285
+                                        0.00000    0.40285
+                                        0.00000    0.00000   -0.80570
+multipole   208  206    0              -0.16118
+                                        0.00000    0.00000    0.17034
+                                       -0.03526
+                                        0.00000   -0.03526
+                                        0.00000    0.00000    0.07052
+multipole   209  208  206               0.10053
+                                        0.00543    0.00000   -0.12249
+                                        0.11906
+                                        0.00000    0.00913
+                                        0.02813    0.00000   -0.12819
+multipole   210  212  210               0.04926
+                                        0.00000    0.00000    0.09671
+                                       -0.44194
+                                        0.00000   -0.79642
+                                        0.00000    0.00000    1.23836
+multipole   211  210    0              -0.33505
+                                        0.00000    0.00000    0.64421
+                                       -0.23824
+                                        0.00000   -0.23824
+                                        0.00000    0.00000    0.47648
+multipole   212  210  210              -0.14263
+                                        0.00000    0.00000    0.00000
+                                        0.79947
+                                        0.00000   -1.59894
+                                        0.00000    0.00000    0.79947
+multipole   213  213 -213              -0.08620
+                                        0.00000    0.00000    0.13272
+                                        0.52524
+                                        0.00000   -1.18532
+                                        0.00000    0.00000    0.66008
+multipole   214  213  213               0.08620
+                                        0.00000    0.00000    0.13804
+                                       -0.01682
+                                        0.00000   -0.15371
+                                        0.00000    0.00000    0.17053
+multipole   215  222  216               0.03072
+                                        0.00125    0.00000    0.12469
+                                       -0.06402
+                                        0.00000   -0.27768
+                                       -0.00103    0.00000    0.34170
+multipole   216  215  217              -0.12168
+                                        0.22018    0.00000    0.11136
+                                        0.29801
+                                        0.00000   -0.22028
+                                        0.13973    0.00000   -0.07773
+multipole   217  216  218              -0.13553
+                                        0.08555    0.00000    0.06669
+                                       -0.05093
+                                        0.00000   -0.05737
+                                       -0.14891    0.00000    0.10830
+multipole   218  217  217              -0.13956
+                                        0.09435    0.00000    0.05497
+                                       -0.05052
+                                        0.00000   -0.07647
+                                       -0.15630    0.00000    0.12699
+multipole   219  216  215               0.11676
+                                       -0.00544    0.00000   -0.09789
+                                       -0.00311
+                                        0.00000   -0.00530
+                                        0.00156    0.00000    0.00841
+multipole   220  217  216               0.12064
+                                        0.00158    0.00000   -0.09651
+                                        0.00420
+                                        0.00000   -0.00600
+                                        0.00018    0.00000    0.00180
+multipole   221  218  217               0.12262
+                                        0.00000    0.00000   -0.09664
+                                        0.00381
+                                        0.00000   -0.00617
+                                        0.00001    0.00000    0.00236
+multipole   222  215  224              -0.33768
+                                        0.28850    0.00000    0.23637
+                                        0.34911
+                                        0.00000   -0.68326
+                                       -0.15432    0.00000    0.33415
+multipole   223  222  215               0.17341
+                                        0.00352    0.00000   -0.00147
+                                       -0.01537
+                                        0.00000   -0.02747
+                                        0.00752    0.00000    0.04284
+multipole   224  222  225              -0.48745
+                                        0.00104    0.00000    0.34794
+                                       -0.36178
+                                        0.00000   -0.28743
+                                        0.06023    0.00000    0.64921
+multipole   225  224  222               0.16805
+                                        0.01766    0.00000   -0.02781
+                                       -0.01320
+                                        0.00000   -0.02932
+                                        0.01136    0.00000    0.04252
+multipole   226  228  227              -0.60669
+                                        0.25004    0.00000    0.31054
+                                        0.14285
+                                        0.00000   -0.56484
+                                        0.08761    0.00000    0.42199
+multipole   227  226  228               0.37742
+                                       -0.15154    0.00000    0.12482
+                                       -0.16870
+                                        0.00000   -0.06439
+                                       -0.05778    0.00000    0.23309
+multipole   228  226  227               0.35048
+                                       -0.18052    0.00000    0.28488
+                                       -0.04061
+                                        0.00000   -0.91018
+                                       -0.10133    0.00000    0.95079
+multipole   229  228  230              -0.16487
+                                       -0.12931    0.00000   -0.04059
+                                        0.25079
+                                        0.00000   -0.74230
+                                       -0.03793    0.00000    0.49151
+multipole   230  229 -231               0.05310
+                                        0.00000    0.00000    0.08000
+                                        0.19556
+                                        0.00000   -0.68026
+                                       -0.32207    0.00000    0.48470
+multipole   231  230 -230              -0.08153
+                                        0.00000    0.00000    0.00302
+                                       -0.01236
+                                        0.00000   -0.60883
+                                       -0.03456    0.00000    0.62119
+multipole   232  229  228               0.03926
+                                        0.01720    0.00000   -0.00573
+                                       -0.01641
+                                        0.00000   -0.08767
+                                        0.00931    0.00000    0.10408
+multipole   233  230  229               0.03581
+                                        0.04577    0.00000    0.00787
+                                       -0.05397
+                                        0.00000   -0.07608
+                                        0.03840    0.00000    0.13005
+multipole   234  231  230               0.03372
+                                        0.00334    0.00000    0.01200
+                                       -0.04259
+                                        0.00000   -0.08852
+                                       -0.00007    0.00000    0.13111
+multipole   235  237  236              -0.49677
+                                        0.00000    0.00000    0.31898
+                                       -0.26883
+                                        0.00000   -0.22920
+                                        0.00015    0.00000    0.49803
+multipole   236  235  237               0.17403
+                                        0.00723    0.00000   -0.03413
+                                       -0.00941
+                                        0.00000   -0.02941
+                                        0.00729    0.00000    0.03882
+multipole   237  235  238               0.02465
+                                        0.00000    0.00000    0.04007
+                                       -0.05857
+                                        0.00000   -0.20568
+                                       -0.00385    0.00000    0.26425
+multipole   238  237  239              -0.12235
+                                        0.19912    0.00000    0.11496
+                                        0.25886
+                                        0.00000   -0.17954
+                                        0.11596    0.00000   -0.07932
+multipole   239  238  240              -0.13385
+                                        0.08336    0.00000    0.05837
+                                       -0.04215
+                                        0.00000   -0.05338
+                                       -0.14887    0.00000    0.09553
+multipole   240  239  239              -0.13995
+                                        0.09447    0.00000    0.05454
+                                       -0.04711
+                                        0.00000   -0.07943
+                                       -0.15404    0.00000    0.12654
+multipole   241  238  237               0.11944
+                                       -0.00156    0.00000   -0.09561
+                                       -0.00213
+                                        0.00000   -0.00628
+                                        0.00207    0.00000    0.00841
+multipole   242  239  238               0.12046
+                                        0.00167    0.00000   -0.09679
+                                        0.00417
+                                        0.00000   -0.00611
+                                        0.00000    0.00000    0.00194
+multipole   243  240  239               0.12258
+                                        0.00000    0.00000   -0.09717
+                                        0.00373
+                                        0.00000   -0.00624
+                                        0.00000    0.00000    0.00251
+multipole   244  251  245              -0.61500
+                                        0.20835    0.00000    0.36077
+                                        0.06711
+                                        0.00000   -0.54881
+                                        0.08087    0.00000    0.48170
+multipole   245  244  251               0.37682
+                                       -0.18948    0.00000    0.10490
+                                       -0.18861
+                                        0.00000   -0.03668
+                                       -0.09567    0.00000    0.22529
+multipole   246  248  247              -0.08979
+                                       -0.02031    0.00000    0.18981
+                                       -0.15326
+                                        0.00000   -0.14641
+                                       -0.03012    0.00000    0.29967
+multipole   247  246  248               0.04735
+                                        0.01648    0.00000   -0.02086
+                                       -0.00436
+                                        0.00000   -0.06126
+                                        0.01451    0.00000    0.06562
+multipole   248  249 -249              -0.07125
+                                        0.00000    0.00000   -0.09346
+                                       -0.28590
+                                        0.00000   -0.31283
+                                       -0.15734    0.00000    0.59873
+multipole   249  248 -250               0.05669
+                                        0.00000    0.00000    0.07425
+                                        0.19135
+                                        0.00000   -0.71537
+                                        0.81888    0.00000    0.52402
+multipole   250  251  249              -0.16275
+                                       -0.13693    0.00000   -0.08748
+                                        0.24073
+                                        0.00000   -0.87144
+                                       -0.09255    0.00000    0.63071
+multipole   251  244  245               0.35041
+                                       -0.17499    0.00000    0.28203
+                                       -0.06360
+                                        0.00000   -0.99813
+                                        0.12021    0.00000    1.06173
+multipole   252  249  248               0.02291
+                                       -0.11444    0.00000    0.00444
+                                       -0.04484
+                                        0.00000   -0.07496
+                                       -0.08873    0.00000    0.11980
+multipole   253  250  249               0.03653
+                                       -0.03274    0.00000    0.00320
+                                       -0.02466
+                                        0.00000   -0.09300
+                                       -0.02348    0.00000    0.11766
+multipole   254  256  261               0.20401
+                                        0.55110    0.00000    0.16949
+                                        1.40903
+                                        0.00000   -1.21521
+                                        0.78253    0.00000   -0.19382
+multipole   255  254  256               0.04290
+                                        0.00000    0.00000   -0.28505
+                                        0.08538
+                                        0.00000    0.01295
+                                        0.00497    0.00000   -0.09833
+multipole   256  254  258               0.35555
+                                        0.52610    0.00000    0.13591
+                                        0.06732
+                                        0.00000   -0.52680
+                                       -0.33777    0.00000    0.45948
+multipole   257  256  258               0.08711
+                                        0.01834    0.00000   -0.17930
+                                        0.04096
+                                        0.00000    0.00418
+                                        0.00934    0.00000   -0.04514
+multipole   258  256  259              -0.33192
+                                        0.68769    0.00000    0.17557
+                                        0.46425
+                                        0.00000   -0.27707
+                                       -0.13096    0.00000   -0.18718
+multipole   259  258  261              -0.14311
+                                       -0.17200   -0.00011   -0.15840
+                                        0.35808
+                                        0.00000   -0.08018
+                                       -0.59259    0.00000   -0.27790
+multipole   260  259  261               0.00836
+                                       -0.01874    0.00000   -0.24808
+                                        0.07031
+                                        0.00000    0.03601
+                                       -0.01152    0.00000   -0.10632
+multipole   261  254  259              -0.33219
+                                       -0.25202    0.00000    0.13585
+                                       -0.39588
+                                        0.00000   -0.33590
+                                       -0.48999    0.00000    0.73178
+multipole   262  261  259               0.10929
+                                        0.01897    0.00000   -0.16645
+                                        0.02818
+                                        0.00000    0.00282
+                                        0.01569    0.00000   -0.03100
+multipole   263  275  265              -0.08880
+                                        0.15672    0.00000    0.31130
+                                        0.22550
+                                        0.00000   -0.54417
+                                       -0.04357    0.00000    0.31867
+multipole   264  263  265               0.10822
+                                        0.02459    0.00000   -0.07191
+                                        0.00262
+                                        0.00000   -0.01821
+                                        0.00804    0.00000    0.01559
+multipole   265  263  275              -0.19864
+                                        0.06214    0.00000    0.22704
+                                       -0.31471
+                                        0.00000   -0.11680
+                                       -0.05010    0.00000    0.43151
+multipole   266  265  263               0.08043
+                                        0.02130    0.00000   -0.09095
+                                       -0.00575
+                                        0.00000   -0.01678
+                                        0.00762    0.00000    0.02253
+multipole   267  269  275              -0.12987
+                                        0.03834    0.00000   -0.06383
+                                        0.44552
+                                        0.00000   -0.65766
+                                        0.40880    0.00000    0.21214
+multipole   268  267  275               0.14705
+                                        0.00425    0.00000   -0.23584
+                                        0.02977
+                                        0.00000    0.02206
+                                        0.00518    0.00000   -0.05183
+multipole   269  271  267               0.41790
+                                        0.31085    0.00000    0.22290
+                                        0.05430
+                                        0.00000   -0.25793
+                                       -0.23315    0.00000    0.20363
+multipole   270  269  267               0.09985
+                                        0.00180    0.00000   -0.21845
+                                        0.03729
+                                        0.00000    0.02534
+                                        0.00058    0.00000   -0.06263
+multipole   271  269  273              -0.11640
+                                        0.03616    0.00000   -0.09843
+                                        0.51526
+                                        0.00000   -0.58535
+                                        0.26527    0.00000    0.07009
+multipole   272  271  273               0.14883
+                                        0.00731    0.00000   -0.23413
+                                        0.03803
+                                        0.00000    0.02230
+                                        0.00516    0.00000   -0.06033
+multipole   273  271  275               0.05480
+                                       -0.12804    0.00000    0.24168
+                                       -0.44188
+                                        0.00000   -0.20380
+                                        0.01046    0.00000    0.64568
+multipole   274  273  275               0.08285
+                                        0.00846    0.00000   -0.21673
+                                        0.03054
+                                        0.00012    0.02442
+                                        0.00333   -0.00018   -0.05496
+multipole   275  273  267               0.12470
+                                        0.11648    0.00000   -0.22490
+                                        0.55064
+                                        0.00000   -0.31799
+                                       -0.10188    0.00000   -0.23265
+multipole   276  278  281              -0.10971
+                                        0.04983    0.00000    0.22870
+                                        0.42557
+                                        0.00000   -0.91481
+                                        0.81241    0.00000    0.48924
+multipole   277  276  281               0.08652
+                                       -0.00346    0.00000   -0.22097
+                                        0.02323
+                                        0.00000    0.01497
+                                        0.00096    0.00000   -0.03820
+multipole   278  276  279               0.12507
+                                        0.05779    0.00000    0.35513
+                                       -0.13962
+                                        0.00000   -0.46271
+                                        0.15746    0.00000    0.60233
+multipole   279  278  280              -0.14474
+                                       -0.06204    0.00000   -0.03779
+                                        0.15000
+                                        0.00000   -0.23905
+                                        0.18939    0.00000    0.08905
+multipole   280  279  281              -0.02981
+                                       -0.12262    0.00000    0.04028
+                                        0.18403
+                                        0.00000   -0.14808
+                                        0.17023    0.00000   -0.03595
+multipole   281  276  280               0.22912
+                                       -0.01112    0.00000   -0.00350
+                                       -0.50740
+                                        0.00007   -0.70671
+                                       -0.09817    0.00004    1.21411
+multipole   282  280  283              -0.10590
+                                       -0.07239    0.00000   -0.15945
+                                        0.16811
+                                        0.00008    0.08601
+                                       -0.02311    0.00000   -0.25412
+multipole   283  282  284               0.06829
+                                        0.28429    0.00000    0.11920
+                                        0.55043
+                                        0.00000   -0.51069
+                                        0.42363    0.00000   -0.03974
+multipole   284  283  285              -0.04665
+                                       -0.02624    0.00000    0.01259
+                                        0.05707
+                                        0.00000   -0.18029
+                                       -0.11281    0.00000    0.12322
+multipole   285  281  284              -0.10330
+                                       -0.08090    0.00000   -0.07863
+                                        0.05342
+                                        0.00000   -0.02406
+                                       -0.05229    0.00000   -0.02936
+multipole   286  278  279               0.02522
+                                        0.00961    0.00000   -0.19443
+                                        0.02801
+                                        0.00000    0.01404
+                                        0.00733    0.00000   -0.04205
+multipole   287  279  280               0.00472
+                                        0.00794    0.00000   -0.20459
+                                        0.02913
+                                        0.00000    0.02224
+                                        0.01030    0.00000   -0.05137
+multipole   288  282  283              -0.00669
+                                        0.00390    0.00000   -0.19154
+                                        0.02589
+                                        0.00000    0.01733
+                                        0.00004    0.00000   -0.04322
+multipole   289  283  284               0.00213
+                                       -0.00328    0.00000   -0.18010
+                                        0.02710
+                                        0.00000    0.00837
+                                       -0.00305    0.00000   -0.03547
+multipole   290  284  285               0.00299
+                                        0.00077    0.00001   -0.18002
+                                        0.02705
+                                        0.00000    0.00804
+                                        0.00100    0.00000   -0.03509
+multipole   291  285  284               0.00274
+                                        0.01150    0.00000   -0.18274
+                                        0.02088
+                                        0.00000    0.01393
+                                        0.00556    0.00000   -0.03481
+multipole   292  294  300              -0.05207
+                                        0.12708    0.00000    0.30461
+                                        0.51487
+                                        0.00000   -1.03191
+                                        0.99253    0.00000    0.51704
+multipole   293  292  294               0.08064
+                                        0.00294    0.00000   -0.22349
+                                        0.02393
+                                        0.00000    0.01197
+                                       -0.00105    0.00000   -0.03590
+multipole   294  292  295               0.13685
+                                        0.07298    0.00000    0.42844
+                                       -0.00583
+                                        0.00000   -0.53665
+                                        0.44410    0.00000    0.54248
+multipole   295  294  301              -0.15430
+                                       -0.31678    0.00000   -0.17576
+                                        0.03495
+                                        0.00000   -0.16816
+                                        0.46592    0.00000    0.13321
+multipole   296  297  301              -0.17594
+                                       -0.32728    0.00000    0.10264
+                                       -0.33730
+                                        0.00000    0.25185
+                                        0.41510    0.00000    0.08545
+multipole   297  296  298              -0.00504
+                                        0.08002    0.00000    0.01285
+                                        0.19466
+                                        0.00000   -0.27554
+                                        0.05597    0.00000    0.08088
+multipole   298  297  299               0.04799
+                                        0.15354    0.00000    0.12274
+                                        0.39808
+                                        0.00000   -0.40924
+                                        0.27737    0.00000    0.01116
+multipole   299  298  300              -0.09861
+                                       -0.12330    0.00000   -0.02034
+                                       -0.05105
+                                        0.00000   -0.02710
+                                        0.04040    0.00000    0.07815
+multipole   300  292  299               0.27603
+                                       -0.03708    0.00000    0.10586
+                                       -0.40205
+                                        0.00000   -0.75526
+                                       -0.21214    0.00000    1.15731
+multipole   301  295  296              -0.00524
+                                        0.24654    0.00000   -0.13229
+                                        0.14792
+                                        0.00000   -0.04375
+                                       -0.13945    0.00000   -0.10417
+multipole   302  294  292               0.01133
+                                       -0.01101    0.00000   -0.20742
+                                        0.02681
+                                        0.00000    0.01883
+                                       -0.01044    0.00000   -0.04564
+multipole   303  296  297              -0.01588
+                                        0.00406    0.00000   -0.20022
+                                        0.03446
+                                        0.00000   -0.00468
+                                        0.00261    0.00000   -0.02978
+multipole   304  297  296              -0.00347
+                                        0.00344    0.00000   -0.18481
+                                        0.02834
+                                        0.00000    0.00877
+                                        0.00321    0.00000   -0.03711
+multipole   305  298  297              -0.00474
+                                       -0.00036    0.00000   -0.18495
+                                        0.02870
+                                        0.00000    0.00866
+                                       -0.00087    0.00000   -0.03736
+multipole   306  299  298              -0.00318
+                                        0.00974    0.00000   -0.18655
+                                        0.02342
+                                        0.00000    0.01336
+                                        0.00229    0.00000   -0.03678
+multipole   307  309  295              -0.17670
+                                       -0.03221    0.00000    0.13464
+                                       -0.23859
+                                        0.00000   -0.22495
+                                        0.14777    0.00000    0.46354
+multipole   308  307  295               0.06763
+                                        0.01091    0.00000   -0.05795
+                                       -0.00546
+                                        0.00000   -0.01685
+                                        0.00682    0.00000    0.02231
+multipole   309  307  310              -0.17176
+                                        0.01465    0.00000    0.14482
+                                       -0.22206
+                                        0.00000   -0.17168
+                                        0.06871    0.00000    0.39374
+multipole   310  309  307               0.05961
+                                        0.01793    0.00000   -0.09695
+                                        0.00132
+                                        0.00000   -0.02366
+                                        0.00756    0.00000    0.02234
+multipole   311  313  319              -0.34013
+                                        0.48521    0.00000    0.42107
+                                        0.38065
+                                        0.00000   -0.90200
+                                        0.57132    0.00000    0.52135
+multipole   312  311  313               0.36903
+                                        0.00295    0.00000   -0.04986
+                                       -0.00811
+                                        0.00000   -0.00143
+                                        0.00173    0.00000    0.00954
+multipole   313  311  314               0.05501
+                                        0.05932    0.00000    0.35325
+                                       -0.29521
+                                        0.00000   -0.38209
+                                       -0.06382    0.00000    0.67730
+multipole   314  313  320              -0.17824
+                                        0.13669    0.00000   -0.00640
+                                       -0.26881
+                                        0.00000   -0.11674
+                                        0.25457    0.00000    0.38555
+multipole   315  316  320              -0.15513
+                                       -0.10798    0.00000    0.03778
+                                       -0.31271
+                                        0.00000    0.18975
+                                        0.01944    0.00000    0.12296
+multipole   316  315  317              -0.04396
+                                        0.11398    0.00000    0.07385
+                                        0.07401
+                                        0.00000   -0.22656
+                                       -0.06641    0.00000    0.15255
+multipole   317  316  318              -0.07791
+                                        0.02176    0.00000    0.02355
+                                       -0.03649
+                                        0.00000   -0.07312
+                                       -0.22343    0.00000    0.10961
+multipole   318  317  319              -0.13725
+                                       -0.03060    0.00000   -0.00278
+                                       -0.04499
+                                        0.00000   -0.01141
+                                       -0.17084    0.00000    0.05640
+multipole   319  311  318               0.29737
+                                       -0.00949    0.00000   -0.31549
+                                       -0.94644
+                                        0.00000   -1.04582
+                                        0.44720    0.00000    1.99226
+multipole   320  314  315              -0.05438
+                                        0.13187    0.00000   -0.03232
+                                        0.30602
+                                        0.00000   -0.00200
+                                        0.05118    0.00000   -0.30402
+multipole   321  313  311               0.08202
+                                        0.00030    0.00000   -0.17548
+                                        0.03614
+                                        0.00000    0.03931
+                                        0.00226    0.00000   -0.07545
+multipole   322  315  320               0.07271
+                                        0.00365    0.00000   -0.17332
+                                        0.04281
+                                        0.00000    0.03393
+                                        0.00107    0.00000   -0.07674
+multipole   323  316  317               0.04407
+                                       -0.00064    0.00000   -0.16646
+                                        0.04222
+                                        0.00000    0.03302
+                                       -0.00015    0.00000   -0.07524
+multipole   324  317  318               0.04260
+                                       -0.00047    0.00000   -0.16643
+                                        0.04227
+                                        0.00000    0.03310
+                                       -0.00014    0.00000   -0.07537
+multipole   325  318  319               0.04544
+                                       -0.00629    0.00000   -0.16669
+                                        0.03235
+                                        0.00000    0.03842
+                                       -0.00279    0.00000   -0.07077
+multipole   326  327  314               0.68296
+                                        0.09638    0.00038    0.34533
+                                       -0.33906
+                                       -0.00116   -0.23145
+                                        0.17792    0.00032    0.57051
+multipole   327  326  314              -0.64204
+                                       -0.13596    0.00000   -0.03726
+                                       -0.71286
+                                        0.00000    0.41482
+                                       -0.24172    0.00000    0.29804
+multipole   328  326  327              -0.06217
+                                        0.00976    0.00000   -0.15720
+                                        0.04404
+                                        0.00000    0.03288
+                                        0.00320    0.00000   -0.07692
+multipole   329  331  330              -0.20566
+                                        0.00836    0.00000    0.11713
+                                        0.44050
+                                        0.00000   -1.36729
+                                       -0.03427    0.00000    0.92679
+multipole   330  329  331               0.25307
+                                        0.02830    0.00000    0.06289
+                                       -0.01360
+                                        0.00000   -0.12859
+                                        0.00625    0.00000    0.14219
+multipole   331  329 -329               0.15996
+                                        0.00000    0.00000    0.02424
+                                        0.39018
+                                        0.00000   -0.79214
+                                        0.00000    0.00000    0.40196
+multipole   332  331  333              -0.08387
+                                        0.00000    0.00000   -0.01676
+                                        0.47376
+                                        0.00000   -1.29130
+                                        0.00000    0.00000    0.81754
+multipole   333  334 -332              -0.09524
+                                        0.03212    0.00000    0.20067
+                                        0.67177
+                                        0.00000   -1.18961
+                                        0.03229    0.00000    0.51784
+multipole   334  333 -335              -0.07039
+                                        0.00000    0.00000    0.16226
+                                        0.51509
+                                        0.00000   -1.05821
+                                        0.00000    0.00000    0.54312
+multipole   335  334 -334              -0.06499
+                                        0.00000    0.00000    0.15549
+                                        0.50678
+                                        0.00000   -1.03720
+                                        0.00000    0.00000    0.53042
+multipole   336  333  334               0.14638
+                                       -0.01944    0.00000    0.13578
+                                        0.02066
+                                        0.00000   -0.13729
+                                        0.01944    0.00000    0.11663
+multipole   337  334  333               0.14253
+                                        0.00000    0.00000    0.13208
+                                       -0.01770
+                                        0.00000   -0.12726
+                                        0.00000    0.00000    0.14496
+multipole   338  335  334               0.14138
+                                        0.00000    0.00000    0.13189
+                                       -0.01988
+                                        0.00000   -0.12630
+                                        0.00000    0.00000    0.14618
+multipole   339  340 -340              -0.05502
+                                        0.00000    0.00000    0.06242
+                                        0.47168
+                                        0.00000   -1.01871
+                                        0.00000    0.00000    0.54703
+multipole   340  339  341               0.05590
+                                        0.08253    0.00000    0.13200
+                                        0.46183
+                                        0.00000   -0.87034
+                                        0.01814    0.00000    0.40851
+multipole   341  340  342              -0.01443
+                                        0.07830    0.00000    0.05860
+                                        0.48262
+                                        0.00000   -0.93236
+                                        0.02953    0.00000    0.44974
+multipole   342  341 -341               0.00018
+                                        0.00000    0.00000    0.08868
+                                        0.41966
+                                        0.00000   -0.89464
+                                        0.00000    0.00000    0.47498
+multipole   343  339  340               0.25368
+                                        0.00000    0.00000    0.04333
+                                       -0.02775
+                                        0.00000   -0.11523
+                                        0.00000    0.00000    0.14298
+multipole   344  340  339               0.14841
+                                       -0.00208    0.00000    0.08930
+                                       -0.03100
+                                        0.00000   -0.13300
+                                        0.00598    0.00000    0.16400
+multipole   345  341  340               0.14173
+                                       -0.00147    0.00000    0.09438
+                                       -0.03561
+                                        0.00000   -0.13066
+                                        0.00307    0.00000    0.16627
+multipole   346  342  341               0.13794
+                                        0.00000    0.00000    0.09607
+                                       -0.03544
+                                        0.00000   -0.12801
+                                        0.00000    0.00000    0.16345
+
+
+      ########################################
+      ##                                    ##
+      ##  Dipole Polarizability Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+polarize      1               0.205      0.390
+polarize      2               0.395      0.390
+polarize      3               1.640      0.390
+polarize      4               2.480      0.390
+polarize      5               4.040      0.390
+polarize      6               0.028      0.390
+polarize      7               0.120      0.390
+polarize      8               0.780      0.390
+polarize      9               1.350      0.390
+polarize     10               2.260      0.390
+polarize     11               0.080      0.095
+polarize     12               0.550      0.110
+polarize     13               1.350      0.390
+polarize     14               4.000      0.390
+polarize     15               5.650      0.390
+polarize     16               7.250      0.390
+polarize     17               1.344      0.390      18
+polarize     18               1.073      0.390      17
+polarize     19               1.600      0.390      20
+polarize     20               0.600      0.390      19
+polarize     21               1.828      0.390      22
+polarize     22               0.600      0.390      21
+polarize     23               1.073      0.390      23
+polarize     24               1.334      0.390      25
+polarize     25               0.496      0.390      24
+polarize     26               1.334      0.390      27
+polarize     27               0.496      0.390      26
+polarize     28               1.334      0.390      29
+polarize     29               0.496      0.390      28
+polarize     30               1.334      0.390      31
+polarize     31               0.496      0.390      30
+polarize     32               1.334      0.390      33
+polarize     33               0.496      0.390      32
+polarize     34               1.334      0.390
+polarize     35               0.837      0.390      36
+polarize     36               0.496      0.390      35
+polarize     37               0.837      0.390      38   39
+polarize     38               0.496      0.390      37
+polarize     39               1.334      0.390      37   40
+polarize     40               0.496      0.390      39
+polarize     41               0.834      0.390      42   43   47
+polarize     42               0.496      0.390      41
+polarize     43               1.334      0.390      41   44
+polarize     44               0.496      0.390      43
+polarize     45               1.334      0.390      46
+polarize     46               0.496      0.390      45
+polarize     47               1.334      0.390      41   48
+polarize     48               0.496      0.390      47
+polarize     49               1.334      0.390      50
+polarize     50               0.496      0.390      49
+polarize     51               0.834      0.390      52   53
+polarize     52               0.496      0.390      51
+polarize     53               1.334      0.390      51   54
+polarize     54               0.496      0.390      53
+polarize     55               1.334      0.390      56
+polarize     56               0.496      0.390      55
+polarize     57               0.837      0.390      58
+polarize     58               1.334      0.390      57   59
+polarize     59               0.496      0.390      58
+polarize     60               1.073      0.390      61
+polarize     61               0.496      0.390      60
+polarize     62               1.073      0.390      63
+polarize     63               0.496      0.390      62
+polarize     64               1.073      0.390      65   66
+polarize     65               0.496      0.390      64
+polarize     66               1.334      0.390      64   67
+polarize     67               0.496      0.390      66
+polarize     68               1.073      0.390      69   70
+polarize     69               0.496      0.390      68
+polarize     70               1.334      0.390      68   71
+polarize     71               0.496      0.390      70
+polarize     72               1.334      0.390      73
+polarize     73               0.496      0.390      72
+polarize     74               1.334      0.390      75
+polarize     75               0.496      0.390      74
+polarize     76               1.334      0.390      77
+polarize     77               0.496      0.390      76
+polarize     78               1.073      0.390      79   80
+polarize     79               0.496      0.390      78
+polarize     80               1.334      0.390      78   81
+polarize     81               0.496      0.390      80
+polarize     82               1.073      0.390      83
+polarize     83               1.334      0.390      82   84
+polarize     84               0.496      0.390      83
+polarize     85               1.073      0.390      86
+polarize     86               0.496      0.390      85
+polarize     87               1.334      0.390      88
+polarize     88               0.496      0.390      87
+polarize     89               1.334      0.390      90
+polarize     90               0.496      0.390      89
+polarize     91               1.073      0.390      92   96
+polarize     92               1.334      0.390      91   93
+polarize     93               0.496      0.390      92
+polarize     94               1.334      0.390      95
+polarize     95               0.496      0.390      94
+polarize     96               1.334      0.390      91   97
+polarize     97               0.496      0.390      96
+polarize     98               1.334      0.390      99  100  101
+polarize     99               0.496      0.390      98
+polarize    100               0.837      0.390      98
+polarize    101               1.073      0.390      98  102
+polarize    102               0.496      0.390     101
+polarize    103               1.334      0.390     104  105
+polarize    104               0.837      0.390     103
+polarize    105               1.073      0.390     103  106
+polarize    106               0.496      0.390     105
+polarize    107               1.334      0.390     108
+polarize    108               0.496      0.390     107
+polarize    109               1.334      0.390     110
+polarize    110               0.496      0.390     109
+polarize    111               1.334      0.390     112
+polarize    112               0.496      0.390     111
+polarize    113               1.334      0.390     114  115  116
+polarize    114               0.496      0.390     113
+polarize    115               0.837      0.390     113
+polarize    116               1.073      0.390     113  117
+polarize    117               0.496      0.390     116
+polarize    118               1.334      0.390     119
+polarize    119               0.496      0.390     118  120
+polarize    120               1.334      0.390     119
+polarize    121               1.334      0.390     122
+polarize    122               0.496      0.390     121
+polarize    123               1.334      0.390     124  125
+polarize    124               0.837      0.390     123
+polarize    125               1.073      0.390     123  126
+polarize    126               0.496      0.390     125
+polarize    127               1.334      0.390     128
+polarize    128               0.496      0.390     127
+polarize    129               1.334      0.390     130
+polarize    130               0.496      0.390     129
+polarize    131               1.334      0.390     132  133  134
+polarize    132               0.496      0.390     131
+polarize    133               0.837      0.390     131
+polarize    134               1.073      0.390     131
+polarize    135               1.334      0.390     136
+polarize    136               0.496      0.390     135
+polarize    137               1.334      0.390     138  139
+polarize    138               0.837      0.390     137
+polarize    139               1.073      0.390     137
+polarize    140               1.334      0.390     141
+polarize    141               0.496      0.390     140
+polarize    142               1.334      0.390     143
+polarize    143               0.496      0.390     142
+polarize    144               0.837      0.390     145  146
+polarize    145               0.496      0.390     144
+polarize    146               1.334      0.390     144  147  148
+polarize    147               0.837      0.390     146
+polarize    148               0.496      0.390     146
+polarize    149               0.837      0.390     150  151
+polarize    150               0.496      0.390     149
+polarize    151               1.334      0.390     149  152
+polarize    152               0.496      0.390     151
+polarize    153               1.334      0.390     154
+polarize    154               0.496      0.390     153
+polarize    155               1.334      0.390     156  157
+polarize    156               0.837      0.390     155
+polarize    157               0.496      0.390     155
+polarize    158               1.334      0.390     159  162
+polarize    159               0.837      0.390     158
+polarize    160               1.334      0.390     161
+polarize    161               0.496      0.390     160
+polarize    162               0.496      0.390     158
+polarize    163               2.800      0.390     164
+polarize    164               0.496      0.390     163
+polarize    165               2.800      0.390     166  167
+polarize    166               0.496      0.390     165
+polarize    167               1.334      0.390     165  168
+polarize    168               0.496      0.390     167
+polarize    169               2.800      0.390     170
+polarize    170               1.334      0.390     169  171
+polarize    171               0.496      0.390     170
+polarize    172               2.800      0.390     172  173
+polarize    173               1.334      0.390     172  174
+polarize    174               0.496      0.390     173
+polarize    175               2.800      0.390     176  177
+polarize    176               0.496      0.390     175
+polarize    177               1.334      0.390     175  178
+polarize    178               0.496      0.390     177
+polarize    179               1.334      0.390     180
+polarize    180               0.496      0.390     179
+polarize    181               2.800      0.390     182  184
+polarize    182               1.334      0.390     181  183
+polarize    183               0.496      0.390     182
+polarize    184               1.334      0.390     181  185
+polarize    185               0.496      0.390     184
+polarize    186               1.334      0.390     187
+polarize    187               0.496      0.390     186
+polarize    188               3.300      0.390     189  190
+polarize    189               0.837      0.390     188
+polarize    190               1.334      0.390     188  191
+polarize    191               0.496      0.390     190
+polarize    192               3.300      0.390     195
+polarize    193               0.837      0.390     194
+polarize    194               1.334      0.390     193
+polarize    195               0.496      0.390     192
+polarize    196               3.300      0.390     197
+polarize    197               0.837      0.390     196
+polarize    198               1.334      0.390     199
+polarize    199               0.496      0.390     198
+polarize    200               1.334      0.390     201
+polarize    201               0.496      0.390     200
+polarize    202               1.334      0.390     203
+polarize    203               0.496      0.390     202
+polarize    204               1.334      0.390     205
+polarize    205               0.496      0.390     204
+polarize    206               1.334      0.390     207  208
+polarize    207               1.073      0.390     206
+polarize    208               1.334      0.390     206  209
+polarize    209               0.496      0.390     208
+polarize    210               1.334      0.390     211  212
+polarize    211               1.073      0.390     210
+polarize    212               1.334      0.390     210
+polarize    213               1.750      0.390     213  214
+polarize    214               0.696      0.390     213
+polarize    215               1.750      0.390     216
+polarize    216               1.750      0.390     215  217  219
+polarize    217               1.750      0.390     216  218  220
+polarize    218               1.750      0.390     217  221
+polarize    219               0.696      0.390     216
+polarize    220               0.696      0.390     217
+polarize    221               0.696      0.390     218
+polarize    222               1.334      0.390     223
+polarize    223               0.496      0.390     222
+polarize    224               1.334      0.390     225
+polarize    225               0.496      0.390     224
+polarize    226               0.837      0.390     227  228
+polarize    227               0.496      0.390     226
+polarize    228               1.750      0.390     226  229
+polarize    229               1.750      0.390     228  230  232
+polarize    230               1.750      0.390     229  231  233
+polarize    231               1.750      0.390     230  234
+polarize    232               0.696      0.390     229
+polarize    233               0.696      0.390     230
+polarize    234               0.696      0.390     231
+polarize    235               1.334      0.390     236
+polarize    236               0.496      0.390     235
+polarize    237               1.750      0.390     238
+polarize    238               1.750      0.390     237  239  241
+polarize    239               1.750      0.390     238  240  242
+polarize    240               1.750      0.390     239  243
+polarize    241               0.696      0.390     238
+polarize    242               0.696      0.390     239
+polarize    243               0.696      0.390     240
+polarize    244               0.873      0.390     245  251
+polarize    245               0.496      0.390     244
+polarize    246               1.334      0.390     247  248
+polarize    247               0.496      0.390     246
+polarize    248               1.750      0.390     246  249
+polarize    249               1.750      0.390     248  250  252
+polarize    250               1.750      0.390     249  251  253
+polarize    251               1.750      0.390     244  250
+polarize    252               0.696      0.390     249
+polarize    253               0.696      0.390     250
+polarize    254               1.073      0.390     255  256  261
+polarize    255               0.496      0.390     254
+polarize    256               1.334      0.390     254  257  258
+polarize    257               0.496      0.390     256
+polarize    258               1.073      0.390     256  259
+polarize    259               1.334      0.390     258  260  261
+polarize    260               0.496      0.390     259
+polarize    261               1.334      0.390     254  259  262
+polarize    262               0.496      0.390     261
+polarize    263               1.377      0.390     264
+polarize    264               0.496      0.390     263
+polarize    265               1.337      0.390     266
+polarize    266               0.496      0.390     265
+polarize    267               1.073      0.390     268  269  275
+polarize    268               0.496      0.390     267
+polarize    269               1.334      0.390     267  270  271
+polarize    270               0.496      0.390     269
+polarize    271               1.073      0.390     269  272  273
+polarize    272               0.496      0.390     271
+polarize    273               1.334      0.390     271  274  275
+polarize    274               0.496      0.390     273
+polarize    275               1.334      0.390     267  273
+polarize    276               1.073      0.390     277  278  281
+polarize    277               0.496      0.390     276
+polarize    278               1.334      0.390     276  279  286
+polarize    279               1.334      0.390     278  280  287
+polarize    280               1.334      0.390     279  281  282
+polarize    281               1.334      0.390     276  280  285
+polarize    282               1.334      0.390     280  283  288
+polarize    283               1.334      0.390     282  284  289
+polarize    284               1.334      0.390     283  285  290
+polarize    285               1.334      0.390     281  284  291
+polarize    286               0.496      0.390     278
+polarize    287               0.496      0.390     279
+polarize    288               0.496      0.390     282
+polarize    289               0.496      0.390     283
+polarize    290               0.496      0.390     284
+polarize    291               0.496      0.390     285
+polarize    292               1.073      0.390     293  294  300
+polarize    293               0.496      0.390     292
+polarize    294               1.334      0.390     292  295  302
+polarize    295               1.334      0.390     294  301
+polarize    296               1.334      0.390     297  301  303
+polarize    297               1.334      0.390     296  298  304
+polarize    298               1.334      0.390     297  299  305
+polarize    299               1.334      0.390     298  300  306
+polarize    300               1.334      0.390     292  299  301
+polarize    301               1.334      0.390     295  296  300
+polarize    302               0.496      0.390     294
+polarize    303               0.496      0.390     296
+polarize    304               0.496      0.390     297
+polarize    305               0.496      0.390     298
+polarize    306               0.496      0.390     299
+polarize    307               1.334      0.390     308
+polarize    308               0.496      0.390     307
+polarize    309               1.334      0.390     310
+polarize    310               0.496      0.390     309
+polarize    311               1.073      0.390     312  313  319
+polarize    312               0.496      0.390     311
+polarize    313               1.334      0.390     311  314  321
+polarize    314               1.334      0.390     313  320  326
+polarize    315               1.334      0.390     316  320  322
+polarize    316               1.334      0.390     315  317  323
+polarize    317               1.334      0.390     316  318  324
+polarize    318               1.334      0.390     317  319  325
+polarize    319               1.334      0.390     311  318  320
+polarize    320               1.334      0.390     314  315  319
+polarize    321               0.496      0.390     313
+polarize    322               0.496      0.390     315
+polarize    323               0.496      0.390     316
+polarize    324               0.496      0.390     317
+polarize    325               0.496      0.390     318
+polarize    326               1.334      0.390     314  327  328
+polarize    327               0.837      0.390     326
+polarize    328               0.496      0.390     326
+polarize    329               1.073      0.390     330  331
+polarize    330               0.496      0.390     329
+polarize    331               0.496      0.390     329  332
+polarize    332               1.750      0.390     331  333
+polarize    333               1.750      0.390     332  334  336
+polarize    334               1.750      0.390     333  335  337
+polarize    335               1.750      0.390     334  338
+polarize    336               0.696      0.390     333
+polarize    337               0.696      0.390     334
+polarize    338               0.696      0.390     335
+polarize    339               1.073      0.390     340  343
+polarize    340               1.750      0.390     339  341  344
+polarize    341               1.750      0.390     340  342  345
+polarize    342               1.750      0.390     341  346
+polarize    343               0.496      0.390     339
+polarize    344               0.696      0.390     340
+polarize    345               0.696      0.390     341
+polarize    346               0.696      0.390     342

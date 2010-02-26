@@ -1,0 +1,5 @@
+crystal formamide.cell 1
+crystal formamide 4 n y
+newton formamide a a 0.0001
+xtalfit < formamide.dat
+rm formamide.xyz*

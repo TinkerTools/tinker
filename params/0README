@@ -1,0 +1,139 @@
+
+               -----------------------------------------------
+               PARAMS Directory for the TINKER Program Package
+               -----------------------------------------------
+
+      This directory contains the force field parameter sets distributed
+      with the TINKER package, implementing a selection of widely-used
+      literature force fields as well as the AMOEBA force field now
+      under development in the Ponder lab. We try to exactly reproduce
+      the intent of the original authors of our distributed, third-party
+      force fields. In all cases the parameter sets have been validated
+      against literature reports, results as provided by the original
+      developers, or calculations made with the authentic programs. With
+      the few exceptions noted below, TINKER calculations can be treated
+      as authentic results from the genuine force fields. Please inform
+      the TINKER developers of any discrepancies. A brief description of
+      each parameter set is provided below:
+
+      amber94    Amber ff94 parameters for proteins and nucleic acids.
+                 Note that N- and C-terminal amino acid charges differ
+                 slightly from the authentic charge values. For these
+                 terminal residues some charge is redistributed to or
+                 from the alpha carbon atom; the total magnitude of the
+                 redistribution is less than 0.01 e- in most cases. The
+                 file reproduces the authentic ff94 energies.
+
+      amber96    Amber ff96 parameters for proteins and nucleic acids.
+                 The only changes from Amber ff94 are in the phi/psi
+                 torsional parameters.
+
+      amber98    Amber ff98 parameters for proteins and nucleic acids.
+                 The only changes from Amber ff94 are in the glycosidic
+                 torsional parameters.
+
+      amber99    Amber ff99 parameters for proteins and nucleic acids.
+                 Uses the Cornell, et al (parm94) electrostatic model
+                 but changes several geometric values from the above
+                 Amber force fields.
+
+      amber99sb  Amber ff99sb parameters for proteins and nucleic acids.
+                 The only changes from Amber ff99 are to torsional
+                 parameters for phi/psi and phi'/psi' (angles to the
+                 beta carbon atom).
+
+      amoeba     AMOEBA force field for various small organic molecules
+                 based on polarizable atomic multipole electrostatics.
+
+      amoebabio  Biopolymer parameters (protein and nucleic acid) for
+                 the AMOEBA polarizable atomic multipole force field.
+
+      amoebapro  Protein parameters for the AMOEBA polarizable atomic
+                 multipole force field.
+
+      charmm19   CHARMM19 parameters for proteins and water. The nucleic
+                 acid values are not yet implemented. There are some
+                 differences between authentic CHARMM19 and the TINKER
+                 version due to replacement of CHARMM impropers by
+                 torsions for cases that involve atoms not bonded to
+                 the trigonal atom and TINKER's use of all possible
+                 torsions across a bond instead of a single torsion
+                 per bond. 
+
+      charmm22   CHARMM22 parameters for proteins, plus heme and lipids.
+                 Most of the nucleic acid and small model compound values
+                 are not yet implemented. The file almost exactly
+                 reproduces authentic CHARMM energies; there are small
+                 differences are related to TINKER symmetrization of some
+                 improper torsions.
+
+      charmm22   CHARMM22 parameters for proteins, plus heme and lipids.
+        -cmap    Contains the CMAP torsion-torsion phi-psi correction.
+                 Most of the nucleic acid and small model compound values
+                 are not yet implemented. The file almost exactly
+                 reproduces authentic CHARMM energies; there are small
+                 differences are related to TINKER symmetrization of some
+                 improper torsions, as well as in the CMAP correction.
+
+      dang       Polarizable force field parameters from Liem Dang at
+                 Pacific Northwest National Laboratory.
+
+      dudek      Scaled HF/6-31G* atomic multipole parameters from a
+                 preliminary force field by Dudek and Ponder. The file
+                 contains all the multipole values from the 1995 JCC
+                 paper. These values are now obsolete, and are largely
+                 superceeded by the polarizable AMOEBA force field.
+
+      encad      ENCAD parameters for proteins and nucleic acids
+                 (in preparation).
+
+      hoch       Simple NMR-NOE force field of Hoch and Stern.
+
+      mm2        Full MM2(1991) parameters including pi-systems. The
+                 anomeric and electronegativity correction terms are
+                 not implemented.
+
+      mm3        Full MM3(2000) parameters including pi-systems. The
+                 directional hydrogen bonding and electronegativity
+                 bond length correction terms are implemented, but
+                 the anomeric and Bohlmann correction terms are not
+                 implemented.
+
+      mm3pro     Protein-only version of the MM3 parameters. The
+                 dielectric constant and some bond stretch and torsion
+                 parameters are set to values recommended for high
+                 dielectric and/or bulk environments.
+
+      mmff       Full MMFF94 parameters for the Merck Molecular Force
+                 Field. Validated against the data suite deposited with
+                 the Computational Chemistry List (CCL)
+
+      oplsaa     OPLS-AA from July 2008 with all-atom parameters for
+                 proteins, nucleic acids and many general classes of
+                 organic molecules.
+
+      oplsaal    An modified version of 1997 OPLS-AA with optimized
+                 torsional parameters for the protein backbone and side
+                 chains as published in 2001.
+
+      oplsua     OPLS-UA containing united-atom parameters for proteins
+                 and many classes of organic molecules. Explicit hydrogens
+                 on polar atoms and aromatic carbons.
+
+      smoothaa   Parameters for use with the TINKER potential energy
+                 smoothing methods. Based on the OPLS-AA parameters, but
+                 with modifications to vdw and improper torsion terms.
+
+      smoothua   Similar to SMOOTHAA, but based on OPLS-UA parameters.
+
+      tiny       A generic parameter file intended to enable simple
+                 geometry optimization of crude structures to avoid
+                 steric clashes. The bond, angle and torsion parameters
+                 are set to idealized values. The vdw values are loosely
+                 based on OPLS. Electrostatics is neglected completely.
+
+      water      The current AMOEBA water parameters for a polarizable
+                 multipole electrostatics model. This model is equal to
+                 or better than the best available water models for many
+                 bulk and cluster properties.
+

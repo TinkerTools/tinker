@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+$file=$ARGV[0]; #tinker vibbig.x output
+$from=$ARV[1]; $to=$ARGV[2];
+if($#ARGV<2){die "command line syntax: vibbig.x_output first_mode last_mode\n";}
+
+
+$h=6.6260693*10**-34;	#planck
+$k=1.3806503*10**-23;	#boltzmann
+$T=298;			#temp
+$c=299792458;			#light
+$g=0;
+
+$lastline=$to+1;
+@f=`grep ' Mode ' $file -A $lastline`;
+
+print "@f\n";
+
+for($i=2;$i<=$lastline;$i++){
+
+	$v= ((split ' ', $f[$i])[1]);	#corrected for cm^-1-->s^-1 units
+	$v=$v*100*$c;	
+	$g1=$h*$v*(0.5+1/(exp($h*$v/($k*$T))-1));
+	$g2=$h*$v/(exp($h*$v/($k*$T))-1)-$k*$T*log(1-exp(-$h*$v/($k*$T)));
+	$g+=($g1-$g2);
+}
+
+
+$g=6.0221415*10**20*($g);		#corrected for J-->kJ/mol
+print "dGvib $g      kJ/mol\n";
+

@@ -1,0 +1,54 @@
+Date: Wed, 02 Apr 2003 17:06:07 -0600
+From: Jay Ponder <ponder@dasher.wustl.edu>
+Organization: Biochemistry, Washington University Medical School
+To: chemistry@ccl.net
+Subject: CCL:TINKER 4.0 and Force Field Explorer are Available
+Sender: "Computational Chemistry List" <chemistry-request@ccl.net>
+
+Dear Computational Chemistry List,
+
+A major, new release of the TINKER Molecular Modeling Package,
+version 4.0 dated February 2003, is available from the Ponder
+Lab web site at http://dasher.wustl.edu/ or via anonymous ftp
+download from dasher.wustl.edu in the /pub/tinker area.
+
+TINKER is a modular, general package for molecular mechanics and
+dynamics with some special facilities and parameter sets for
+biopolymers. It currently supports several force fields, including
+AMBER94, AMBER96, CHARMM19, CHARMM27, MM2, MM3, OPLS-UA, OPLS-AA
+and our own AMOEBA polarizable atomic multipole force field. The
+software contains many advanced algorithms for energy minimization,
+molecular dynamics, distance geometry and global search, including
+some methods that are not readily available elsewhere.
+
+In addition, TINKER version 4.0 comes with a new Java GUI which
+is named Force Field Explorer. This initial public release of the
+GUI requires Java 1.4 or later and the Java3D extensions. It has
+been tested on Linux and Windows, and should run correctly on any
+platform that supports recent Java versions and Java3D. Mac OS X
+does not currently support Java3D, and hence will not run the GUI.
+Force Field Explorer is tightly integrated with the TINKER code
+via a socket mechanism, and can be used to setup, launch, control
+and visualize TINKER calculations and results.
+
+TINKER and Force Field Explorer are distributed with full source
+code, a User's Guide, and several examples and test molecule files.
+Directions are supplied for building the package on most commonly
+used CPU/OS combinations. Prebuilt executables limited to a maximum
+of 10000 atoms are also provided for Linux, Windows and Mac OS X.
+
+Please see the web site above for further information. We ask those
+who make significant use of TINKER to complete, sign, and return by
+regular mail the license form available on our web site. We keep all
+the returned forms and use them to help justify further development
+of the package. Comments, questions and suggestions for future
+improvements should be sent to tinker@dasher.wustl.edu.
+
+                        Best wishes, Jay Ponder
+
+-- 
+Jay W. Ponder                          Phone:  (314) 362-4195
+Biochemistry, Box 8231                 Fax:    (314) 362-7183
+Washington University Medical School
+660 South Euclid Avenue                Email:  ponder@dasher.wustl.edu
+St. Louis, Missouri 63110  USA         WWW:    http://dasher.wustl.edu/

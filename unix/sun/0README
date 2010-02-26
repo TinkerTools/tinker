@@ -1,0 +1,9 @@
+
+                  -------------------------------------------
+                  TINKER Notes for Sun Machines under Solaris
+                  -------------------------------------------
+
+         This subdirectory contains a set of script files that can be
+         used to build the TINKER program package on a Sun workstation
+         using the native Sun compilers under Solaris.
+

@@ -1,0 +1,33 @@
+
+ ##############################################################################
+ ##############################################################################
+ ##                                                                          ##
+ ##             TINKER  ---  Software Tools for Molecular Design             ##
+ ##                                                                          ##
+ ##                        Version 5.0   October 2009                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##                            All Rights Reserved                           ##
+ ##                                                                          ##
+ ##############################################################################
+ ##############################################################################
+
+
+ Electrostatic Potential Grid Points :            4357
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+    Atom         Points        Potential        Target        RMS Diff
+
+       1          1942          -8.8521        -8.9326         0.5959
+       2          1211           6.9490         7.2227         0.4763
+       3          1204           6.9194         7.1950         0.4805
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Magnitude for Potential :              8.0334
+ Average Magnitude for Target :                 8.1777
+ Average Signed Potential Difference :         -0.1164
+ Average Unsigned Potential Difference :        0.3799
+ Root Mean Square Potential Difference :        0.5340

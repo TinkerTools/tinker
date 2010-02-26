@@ -1,0 +1,179 @@
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine beeman  --  Beeman rigid 4-site water MD step  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "beeman" performs a single molecular dynamics time step
+c     by means of a Beeman multistep recursion formula; the
+c     actual coefficients are Brooks' "Better Beeman" values
+c
+c     literature reference :
+c
+c     B. R. Brooks, "Algorithms for Molecular Dynamics at Constant
+c     Temperature and Pressure", DCRT Report, NIH, April 1988
+c
+c     THIS IS A SPECIAL VERSION FOR RIGID 4-SITE WATER MODELS SUCH AS
+c     TIP4P; THE 4TH SITE IS EXPRESSED AS A LINEAR COMBINATION OF THE
+c     OTHER THREE TO AVOID A DEGENERACY IN THE RATTLE CONSTRAINTS
+c
+c     LITERATURE REFERENCE :
+c
+c     G. Ciccotti, M. Ferrario and J. P. Ryckaert, "Molecular Dynamics
+c     of Rigid Systems in Cartesian Coordinates. A General Formulation",
+c     Molecular Physics, 47, 1253-1264 (1982)
+c
+c
+      subroutine beeman (istep,dt)
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'mdstuf.i'
+      include 'moldyn.i'
+      include 'shake.i'
+      include 'units.i'
+      include 'usage.i'
+      integer i,j,istep
+      real*8 dt,etot
+      real*8 dt_8,dt2_8
+      real*8 eksum,epot
+      real*8 temp,pres
+      real*8 xterm,yterm,zterm
+      real*8 oterm,hterm
+      real*8 ekin(3,3)
+      real*8 stress(3,3)
+      real*8 xold(maxatm)
+      real*8 yold(maxatm)
+      real*8 zold(maxatm)
+      real*8 derivs(3,maxatm)
+c
+c
+c     SET LINEAR COMBINATION FACTORS FOR TIP4P OR DANG-CHANG WATER
+c
+      if (story(1)(1:5) .eq. 'TIP4P') then
+         oterm = 0.7439758702622000d0
+         hterm = 0.1280120648689000d0
+      else if (story(1)(1:10) .eq. 'DANG-CHANG') then
+         oterm = 0.6330320807091532d0
+         hterm = 0.1834839596454234d0
+      else
+         call fatal
+      end if
+c
+c     set some time values for the dynamics integration
+c
+      dt_8 = dt / 8.0d0
+      dt2_8 = dt * dt_8
+c
+c     store the current atom positions, then find new atom
+c     positions and half-step velocities via Beeman recursion
+c
+      do i = 1, n
+         if (use(i)) then
+            xold(i) = x(i)
+            yold(i) = y(i)
+            zold(i) = z(i)
+            xterm = 5.0d0*a(1,i) - aold(1,i)
+            yterm = 5.0d0*a(2,i) - aold(2,i)
+            zterm = 5.0d0*a(3,i) - aold(3,i)
+            x(i) = x(i) + v(1,i)*dt + xterm*dt2_8
+            y(i) = y(i) + v(2,i)*dt + yterm*dt2_8
+            z(i) = z(i) + v(3,i)*dt + zterm*dt2_8
+            v(1,i) = v(1,i) + xterm*dt_8
+            v(2,i) = v(2,i) + yterm*dt_8
+            v(3,i) = v(3,i) + zterm*dt_8
+         end if
+      end do
+c
+c     get constraint-corrected positions and half-step velocities
+c
+      if (use_rattle)  call rattle (dt,xold,yold,zold)
+c
+c     MOVE M CENTER TO LINEAR COMBINATION OF H-O-H COORDINATES
+c
+      do i = 1, n
+         if (atomic(i) .eq. 0) then
+            x(i) = oterm*x(i-3) + hterm*x(i-2) + hterm*x(i-1)
+            y(i) = oterm*y(i-3) + hterm*y(i-2) + hterm*y(i-1)
+            z(i) = oterm*z(i-3) + hterm*z(i-2) + hterm*z(i-1)
+         end if
+      end do
+c
+c     get the potential energy and atomic forces
+c
+      call gradient (epot,derivs)
+c
+c     TRANSFER THE FORCES ON THE M CENTER TO THE H-O-H SITES
+c
+      do i = 1, n
+         if (atomic(i) .eq. 0) then
+            do j = 1, 3
+               derivs(j,i-3) = derivs(j,i-3) + oterm*derivs(j,i)
+               derivs(j,i-2) = derivs(j,i-2) + hterm*derivs(j,i)
+               derivs(j,i-1) = derivs(j,i-1) + hterm*derivs(j,i)
+            end do
+         end if
+      end do
+c
+c     use Newton's second law to get the next accelerations;
+c     find the full-step velocities using the Beeman recursion
+c
+      do i = 1, n
+         if (use(i)) then
+            do j = 1, 3
+               aold(j,i) = a(j,i)
+               a(j,i) = -convert * derivs(j,i) / mass(i)
+               v(j,i) = v(j,i) + (3.0d0*a(j,i)+aold(j,i))*dt_8
+            end do
+         end if
+      end do
+c
+c     find the constraint-corrected full-step velocities
+c
+      if (use_rattle)  call rattle2 (dt)
+c
+c     ZERO THE VELOCITIES AND ACCELERATIONS ON THE M CENTERS
+c
+      do i = 1, n
+         if (atomic(i) .eq. 0) then
+            do j = 1, 3
+               v(j,i) = 0.0d0
+               a(j,i) = 0.0d0
+            end do
+         end if
+      end do
+c
+c     USE ALTERED NUMBER OF DEGREES OF FREEDOM FOR 4-SITE WATER
+c
+      nfree = 6*(n/4) - 6
+      if (use_bounds)  nfree = nfree + 3
+c
+c     accumulate the kinetic energy and its outer product
+c
+      call kinetic (eksum,ekin)
+c
+c     make full-step temperature and pressure corrections
+c
+      call temper2 (dt,eksum,temp)
+      call pressure (dt,epot,ekin,temp,pres,stress)
+c
+c     system energy is sum of kinetic and potential energies
+c
+      etot = eksum + epot
+c
+c     compute statistics and save trajectory for this step
+c
+      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
+      call mdsave (istep,dt,epot)
+      return
+      end

@@ -1,0 +1,104 @@
+#!/usr/bin/perl 
+
+#This program is for analyzing the cumulative Helmholtz free energy change of 
+#a forward and backward whole-step perturbation of a MD simulation using Bennet Acceptance Ratio.
+#This program will look for two key files and two parameter files associated
+#with each simulation. Requires two frame sets of MD simulations in two different folders.
+#Two parameter file and two key files in each folder.
+
+#command-line arguments
+if(@ARGV){
+	$struct=$ARGV[0];
+	$firstframe=$ARGV[1];
+	$lastframe=$ARGV[2];
+	@keys=($ARGV[3],$ARGV[4]);
+	$C=$ARGV[5];
+	@folders=($ARGV[6],$ARGV[7]);
+	 }
+
+#or get arguments from prompts
+else{
+	print "Input name of *.xyz structure (NO EXTENSION!):   ";
+	chomp($struct=<STDIN>);
+	print "first MD frame number (NO LEADING ZEROS!):   ";
+	chomp($firstframe=<STDIN>);
+	print "last MD frame number (NO LEADING ZEROS!):  ";
+	chomp($lastframe=<STDIN>);
+	print "Input two .key filenames (WITH extensions) separated by spaces in increasing order of lambdas:   ";
+	@keys= split ' ', <STDIN>;
+	print "Input starting energy:  ";
+	chomp($C=<STDIN>); 
+	print "Input two folder names separated by spaces in increasing order of lambdas:   ";
+	@folders= split ' ', <STDIN>; 
+	}
+
+#constants in kcal/mol
+$R=.001987;
+$T=298.15;
+
+#compute avg exp terms, uses analysis subroutine
+$RT=$R*$T;
+$framenumber=$firstframe;
+while($framenumber<=$lastframe){
+
+	if($framenumber<10){
+		$frame="$struct"."."."00"."$framenumber";}
+	elsif($framenumber<100){
+		$frame="$struct"."."."0"."$framenumber";}
+	else {$frame="$struct"."."."$framenumber";}
+	
+	$u10[$framenumber]= &nrg($folders[1],$frame,$keys[0]);
+	$u11[$framenumber]= &nrg($folders[1],$frame,$keys[1]);
+	$u00[$framenumber]= &nrg($folders[0],$frame,$keys[0]);
+	$u01[$framenumber]= &nrg($folders[0],$frame,$keys[1]);
+	
+
+
+	$framenumber+=1;
+	}
+	
+$framenumber=$firstframe;
+$old=$C;
+print "$old\n";
+$new=&loop($old);
+print "$new\n";
+$diff=abs($new-$old);
+while($diff >= 0.01) {
+	$old=$new;
+	$new=&loop($old);
+	$diff=abs($new-$old);
+	$bailout+=1;
+	if($bailout==100){
+		print "The simulation completed 100 iterations without converging.\n";
+		system "time";
+			 }
+print "$new\n";
+	}
+
+sub loop {
+	$framenumber=$firstframe;
+	$num=0; 
+	$denom=0;
+	while($framenumber<=$lastframe){
+
+	
+	
+		$num+=1/(1+exp(($u10[$framenumber]-$u11[$framenumber]+$_[0])/$RT));
+	
+		$denom+=1/(1+exp(($u01[$framenumber]-$u00[$framenumber]-$_[0])/$RT)); 
+	
+		$framenumber+=1;
+		}
+
+	$dA=$RT*log($num/$denom)+$_[0];
+	return $dA;	
+	}
+	
+	
+#free energy data extraction subroutine invokes tinker/analyze.x
+sub nrg{
+	chdir "$_[0]";
+	my @analyze_string = split ' ', `analyze.x $_[1] E -k $_[2] | grep 'Total'`;
+	chdir "\.\.";
+	return $analyze_string[4];
+	}

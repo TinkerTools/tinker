@@ -1,0 +1,264 @@
+#!/usr/bin/perl
+
+# MDAVG is a Perl script to compute MD averages
+# from a TINKER dynamics trajectory log file
+#
+# Written by Pengyu Ren, Ponder Lab, July 2000
+
+if ($#ARGV > 2 or  $#ARGV < 1){die "$0: logfile start(in frame) end\n";}
+if ($#ARGV == 1) {$ARGV[2]=1000000;} 
+#In perl, $ARG[0] is the first argument, $0 is the name of prog
+$start=88+$ARGV[1]*14;
+@tot=();
+@totrms=();
+@pot=();
+@potrms=();
+@kin=();
+@kinrms=();
+@inter=();
+@interms=();
+@ele=();
+@elerms=();
+@vdw=();
+@vdwrms=();
+@pol=();
+@polrms=();
+@temp=();
+@temprms=();
+@toff=();
+@toffrms=();
+@press=();
+@pressrms=();
+@den=();
+@denrms=();
+$i=0;
+$count=0;
+
+open(LOG,"$ARGV[0]")||die "can't open log file\n";
+
+while(<LOG>){
+
+    if (substr($_,1,12) eq "Total Energy") {
+        $i++;
+        $etot=substr($_,23,13);
+        $etotrms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            $count++;
+            push(@tot, $etot);
+            push(@totrms, $etot);
+            push(@totrms, $etotrms);
+        }
+    }
+    if (substr($_,1,9) eq "Potential") {
+        $epot=substr($_,23,13);
+        $epotrms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@pot, $epot);
+            push(@potrms, $epot);
+            push(@potrms, $epotrms);
+        }
+    }
+    if (substr($_,1,7) eq "Kinetic") {
+        $ekin=substr($_,23,13);
+        $ekinrms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@kin, $ekin);
+            push(@kinrms, $ekin);
+            push(@kinrms, $ekinrms);
+        }
+    }
+    if (substr($_,1,14) eq "Intermolecular") {   
+        $ei=substr($_,23,13);
+        $eirms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@inter, $ei);
+            push(@interms, $ei);
+            push(@interms, $eirms);
+        }
+    }
+    if (substr($_,1,13) eq "Electrostatic") {
+        $ee=substr($_,23,13);
+        $eerms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@ele, $ee);
+            push(@elerms, $ee);
+            push(@elerms, $eerms);
+        }
+    }
+    if (substr($_,1,13) eq "van der Waals") {
+        $ev=substr($_,23,13);
+        $evrms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@vdw, $ev);
+            push(@vdwrms, $ev);
+            push(@vdwrms, $evrms);
+        }
+    }
+    if (substr($_,1,12) eq "Polarization") {
+        $ep=substr($_,23,13);
+        $eprms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@pol, $ep);
+            push(@polrms, $ep);
+            push(@polrms, $eprms);
+        }
+    } 
+    if (substr($_,1,11) eq "Temperature") {
+        $tm=substr($_,23,13);
+        $tmrms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@temp, $tm);
+            push(@temprms, $tm);
+            push(@temprms, $tmrms);
+        }
+    }
+    if (substr($_,1,17) eq "Thermostat Offset") {
+        $to=substr($_,23,13);
+        $torms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@toff, $to);
+            push(@toffrms, $to);
+            push(@toffrms, $torms);
+        }
+    }
+    if (substr($_,1,8) eq "Pressure") {
+        $pre=substr($_,23,13);
+        $prerms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@press, $pre);
+            push(@pressrms, $pre);
+            push(@pressrms, $prerms);
+        }
+      }
+    if (substr($_,1,7) eq "Density") {
+        $d=substr($_,23,13);
+        $drms=substr($_,53,7);
+        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
+            push(@den, $d);
+            push(@denrms, $d);
+            push(@denrms, $drms);
+        }
+      }
+}
+
+if ($#tot != -1) {
+    $avgtot=&AVG(@tot);
+    $stdtot=&STD2(@totrms);
+}
+if ($#pot != -1) {
+    $avgpot=&AVG(@pot);
+    $stdpot=&STD2(@potrms);
+}
+if ($#kin != -1) {
+    $avgkin=&AVG(@kin);
+    $stdkin=&STD2(@kinrms);
+}
+if ($#inter != -1) {
+    $avgi=&AVG(@inter);
+    $stdi=&STD2(@interms);
+}
+if ($#ele != -1) {
+    $avge=&AVG(@ele);
+    $stde=&STD2(@elerms);
+}
+if ($#vdw != -1) {
+    $avgv=&AVG(@vdw);
+    $stdv=&STD2(@vdwrms);
+}
+if ($#pol != -1) {
+    $avgp=&AVG(@pol);
+    $stdp=&STD2(@polrms);
+}
+if ($#temp != -1) {
+    $avgt=&AVG(@temp);
+    $stdt=&STD2(@temprms);
+}
+if ($#toff != -1) {
+    $avgto=&AVG(@toff);
+    $stdto=&STD2(@toffrms);
+}
+if ($#press != -1) {
+    $avgpr=&AVG(@press);
+    $stdpr=&STD2(@pressrms);
+}
+if ($#den != -1)  {
+   $avgd=&AVG(@den);
+    $stdd=&STD2(@denrms);
+}
+
+sub AVG{
+    $sum=0.0;
+    $cnt=0;
+    foreach $ii (@_) { 
+        $sum=$ii+$sum;
+        $cnt=$cnt+1;
+    }
+    $avg=$sum/$cnt;
+}
+
+sub STD{
+    $sum2=0.0;
+    $sum1=0.0;
+    $cnt=0;
+    foreach $ii (@_) { 
+        $sum1=$ii+$sum1;
+        $cnt=$cnt+1;
+    }
+    $avg=$sum/$cnt;
+   
+    foreach $ii (@_) {
+        $sum2=($avg-$ii)*($avg-$ii)+$sum2;
+    }             
+    $std=sqrt($sum2/($cnt-1));
+}
+
+sub STD2{
+    $sum2=0.0;
+    $sum1=0.0;
+    $cnt=0;
+    for($i=0;$i<$#_;$i=$i+2){
+        $cnt=$cnt+100;
+        $sum1=$_[$i]*100.0+$sum1;
+        $sum2=$sum2+($_[$i+1]**2+$_[$i]**2)*100.0;
+        $std2=$sum2/$cnt-($sum1/$cnt)**2;
+    }
+    if ($std2 > -0.0001 && $std2 < 0) { $std2=0.0; }
+    $std2=sqrt($std2);
+}
+
+if ($count > -1) {
+   printf " Total MD Frames     %15d\n", "$count";
+}
+if ($#tot > -1) {
+   printf " Total Energy        %15.4f  (+/-%9.4f)\n", "$avgtot","$stdtot";
+}
+if ($#pot > -1) {
+   printf " Potential Energy    %15.4f  (+/-%9.4f)\n", "$avgpot","$stdpot";
+}
+if ($#kin > -1) {
+   printf " Kinetic Energy      %15.4f  (+/-%9.4f)\n", "$avgkin","$stdkin";
+}
+if ($#inter > -1) {
+   printf " Intermolecular      %15.4f  (+/-%9.4f)\n", "$avgi","$stdi";
+}
+if ($#ele > -1) {
+   printf " Electrostatic       %15.4f  (+/-%9.4f)\n", "$avge","$stde";
+}
+if ($#vdw > -1) {
+   printf " van der Waals       %15.4f  (+/-%9.4f)\n", "$avgv","$stdv";
+}
+if ($#pol > -1) {
+   printf " Polarization        %15.4f  (+/-%9.4f)\n", "$avgp","$stdp";
+}
+if ($#temp > -1) {
+   printf " Temperature         %15.2f  (+/-%9.2f)\n", "$avgt","$stdt";
+}
+if ($#toff > -1) {
+   printf " Thermostat Offset   %15.2f  (+/-%9.2f)\n", "$avgto","$stdto";
+}
+if ($#press > -1) {
+   printf " Pressure            %15.2f  (+/-%9.2f)\n", "$avgpr","$stdpr";
+}
+if ($#den > -1) {
+   printf " Density             %15.4f  (+/-%9.4f)\n", "$avgd","$stdd";
+}

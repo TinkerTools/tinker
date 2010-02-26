@@ -1,0 +1,9 @@
+
+                  --------------------------------------------
+                  TINKER Notes for GNU gfortran on Linux/Intel
+                  --------------------------------------------
+
+         This subdirectory contains a set of script files that can be
+         used to build the TINKER program package on a Linux system
+         using the GNU gfortran Fortran compiler.
+

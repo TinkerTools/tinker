@@ -1,0 +1,242 @@
+c
+c
+c     #################################################################
+c     ##  COPYRIGHT (C)  1995  by  Yong Kong and Jay William Ponder  ##
+c     ##                     All Rights Reserved                     ##
+c     #################################################################
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  program radial  --  compute radial distribution function  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "radial" finds the radial distribution function for a specified
+c     pair of atom types via analysis of a set of stored coordinate
+c     frames from a liquid simulation
+c
+c     this version reads input from cycle files instead of an archive
+c
+c
+      program radial
+      implicit none
+      include 'sizes.i'
+      include 'argue.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'boxes.i'
+      include 'cutoff.i'
+      include 'files.i'
+      include 'iounit.i'
+      include 'math.i'
+      include 'molcul.i'
+      include 'potent.i'
+      integer maxbin
+      parameter (maxbin=10000)
+      integer i,j,k,nframe
+      integer ixyz,irdf
+      integer freeunit
+      integer trimtext
+      integer molj,molk
+      integer numj,numk
+      integer lengj,lengk
+      integer lext,next
+      integer start,stop,step
+      integer nbin,bin
+      integer hist(maxbin)
+      real*8 xj,yj,zj
+      real*8 dx,dy,dz
+      real*8 rjk,rmax,width
+      real*8 rlower,rupper
+      real*8 factor,pairs
+      real*8 volume,expect
+      real*8 gr(maxbin)
+      real*8 gs(maxbin)
+      logical exist
+      character*3 namej
+      character*3 namek
+      character*7 ext
+      character*60 coordfile
+      character*60 rdffile
+      character*80 record
+c
+c
+c     get the structure, unitcell parameters and molecules
+c
+      call initial
+      call getxyz
+      call unitcell
+      call molecule
+c
+c     set cutoffs small to enforce use of minimum images
+c
+      use_vdw = .true.
+      use_charge = .false.
+      use_dipole = .false.
+      use_mpole = .false.
+      use_ewald = .false.
+      vdwcut = 0.01d0
+      call lattice
+c
+c     get the numbers of the cycle files to be processed
+c
+      start = 0
+      stop = 0
+      step = 0
+      write (iout,10)
+   10 format (/,' Numbers of First & Last File and Step',
+     &              ' Increment :  ',$)
+      read (input,20)  record
+   20 format (a80)
+      read (record,*,err=30,end=30)  start,stop,step
+   30 continue
+      if (stop .eq. 0)  stop = start
+      if (step .eq. 0)  step = 1
+c
+c     get the names of the atoms to be used in rdf computation
+c
+      write (iout,40)
+   40 format (/,' Enter Names of First & Second Atoms :  ',$)
+      read (input,50)  record
+   50 format (a80)
+      next = 1
+      call getword (record,namej,next)
+      call getword (record,namek,next)
+c
+c     get the desired width of the radial distance bins
+c
+      width = 0.0d0
+      write (iout,60)
+   60 format (/,' Enter Width of Distance Bins [0.01 Ang] :  ',$)
+      read (input,70)  width
+   70 format (f10.0)
+      if (width .eq. 0.0d0)  width = 0.01d0
+c
+c     find largest bin based on minimum image convention
+c
+      if (octahedron) then
+         rmax = (sqrt(3.0d0)/4.0d0) * xbox
+      else
+         rmax = min(xbox2*beta_sin*gamma_sin,ybox2*gamma_sin,
+     &                         zbox2*beta_sin)
+      end if
+      nbin = int(rmax/width)
+c
+c     zero out the distance bins and distribution functions
+c
+      do i = 1, nbin
+         hist(i) = 0
+         gr(i) = 0.0d0
+         gs(i) = 0.0d0
+      end do
+c
+c     cycle over coordinate files to generate distance bins
+c
+      i = start
+      nframe = 0
+      dowhile (i.ge.start .and. i.le.stop)
+         ixyz = freeunit ()
+         lext = 3
+         call numeral (i,ext,lext)
+         coordfile = filename(1:leng)//'.'//ext(1:lext)
+         call version (coordfile,'old')
+         inquire (file=coordfile,exist=exist)
+         if (exist) then
+            nframe = nframe + 1
+            open (unit=ixyz,file=coordfile,status='old')
+            rewind (unit=ixyz)
+            call readxyz (ixyz)
+            close (unit=ixyz)
+            do j = 1, n
+               if (name(j) .eq. namej) then
+                  xj = x(j)
+                  yj = y(j)
+                  zj = z(j)
+                  molj = molcule(j)
+                  do k = 1, n
+                     if (name(k) .eq. namek) then
+                        molk = molcule(k)
+                        if (molj .ne. molk) then
+                           dx = x(k) - xj
+                           dy = y(k) - yj
+                           dz = z(k) - zj
+                           call image (dx,dy,dz,0)
+                           rjk = sqrt(dx*dx + dy*dy + dz*dz)
+                           bin = int(rjk/width) + 1
+                           hist(bin) = hist(bin) + 1
+                        end if
+                     end if
+                  end do
+               end if
+            end do
+         end if
+         i = i + step
+      end do
+      write (iout,80)  nframe
+   80 format (/,' Number of Coordinate Frames Used :',i8)
+c
+c     count the number of occurences of each atom type
+c
+      numj = 0
+      numk = 0
+      do i = 1, n
+         if (name(i) .eq. namej)  numj = numj + 1
+         if (name(i) .eq. namek)  numk = numk + 1
+      end do
+c
+c     normalize the distance bins to give radial distribution
+c
+      if (numj.ne.0 .and. numk.ne.0) then
+         pairs = dble(numj) * dble(numk) * dble(nframe)
+         volume = xbox * ybox * zbox
+         factor = (4.0d0/3.0d0) * pi * pairs / volume
+         do i = 1, nbin
+            rupper = dble(i) * width
+            rlower = rupper - width
+            expect = factor * (rupper**3 - rlower**3)
+            gr(i) = dble(hist(i)) / expect
+         end do
+      end if
+c
+c     find the 5th degree polynomial smoothed distribution function
+c
+      if (nbin .ge. 5) then
+         gs(1) = (69.0d0*gr(1) + 4.0d0*gr(2) - 6.0d0*gr(3)
+     &             + 4.0d0*gr(4) - gr(5)) / 70.0d0
+         gs(2) = (2.0d0*gr(1) + 27.0d0*gr(2) + 12.0d0*gr(3)
+     &             - 8.0d0*gr(4) + 2.0d0*gr(5)) / 35.0d0
+         do i = 3, nbin-2
+            gs(i) = (-3.0d0*gr(i-2) + 12.0d0*gr(i-1) + 17.0d0*gr(i)
+     &                + 12.0d0*gr(i+1) - 3.0d0*gr(i+2)) / 35.0d0
+         end do
+         gs(nbin-1) = (2.0d0*gr(nbin-4) - 8.0d0*gr(nbin-3)
+     &                  + 12.0d0*gr(nbin-2) + 27.0d0*gr(nbin-1)
+     &                       + 2.0d0*gr(nbin)) / 35.0d0
+         gs(nbin) = (-gr(nbin-4) + 4.0d0*gr(nbin-3) - 6.0d0*gr(nbin-2)
+     &                + 4.0d0*gr(nbin-1) + 69.0d0*gr(nbin)) / 70.0d0
+         do i = 1, nbin
+            gs(i) = max(0.0d0,gs(i))
+         end do
+      end if
+c
+c     write the radial distribution function to a file
+c
+      irdf = freeunit ()
+      lengj = trimtext (namej)
+      lengk = trimtext (namek)
+      rdffile = namej(1:lengj)//'_'//namek(1:lengk)//'.rdf'
+      call version (rdffile,'new')
+      open (unit=irdf,file=rdffile,status='new')
+      do i = 1, nbin
+         write (irdf,90)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
+   90    format (i8,i15,3x,f12.4,3x,2f12.4)
+      end do
+      close (unit=irdf)
+      write (iout,100)  rdffile(1:trimtext(rdffile))
+  100 format (/,' Radial Distribution Function Output to:  ',a)
+c
+c     perform any final tasks before program exit
+c
+      call final
+      end

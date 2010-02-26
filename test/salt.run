@@ -1,0 +1,4 @@
+crystal salt.cell 1
+crystal salt 4 n y
+xtalmin salt 0.01
+rm salt.xyz*

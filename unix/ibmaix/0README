@@ -1,0 +1,13 @@
+
+                 -------------------------------------------
+                 TINKER Notes for IBM Systems under AIX Unix
+                 -------------------------------------------
+
+          This subdirectory contains a set of script files that can
+          be used to build the TINKER program package on IBM AIX Unix
+          machines using the xlf Fortran compiler.
+
+          Note that IBM AIX Unix compatible code must be uncommented
+          in any system-dependent routines (clock.f, openend.f, etc.)
+          before compiling.
+

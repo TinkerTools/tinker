@@ -1,0 +1,204 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              TINY
+
+vdwtype                 LENNARD-JONES
+radiusrule              GEOMETRIC
+radiustype              SIGMA
+radiussize              RADIUS
+epsilonrule             GEOMETRIC
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+This is a generic parameter file intended to enable simple
+geometry optimization of crude structures to avoid steric
+clashes. The bond, angle and torsion parameters are set to
+idealized values. The vdw values are loosely based on OPLS.
+Electrostatics is neglected completely.
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom         11    H     "H Nonpolar"                   1     1.000    1
+atom         12    H     "H Polar"                      1     1.000    1
+atom         20    He    "He Atom"                      2     4.000    0
+atom         53    B     "B Trivalent"                  5    10.800    3
+atom         54    B     "B Tetravalent"                5    10.800    4
+atom         62    C     "C Divalent"                   6    12.000    2
+atom         63    C     "C Trivalent"                  6    12.000    3
+atom         64    C     "C Tetravalent"                6    12.000    4
+atom         71    N     "N Monovalent"                 7    14.000    1
+atom         72    N     "N Divalent"                   7    14.000    2
+atom         73    N     "N Trivalent"                  7    14.000    3
+atom         74    N+    "N+ Tetravalent"               7    14.000    4
+atom         81    O     "O Monovalent"                 8    16.000    1
+atom         82    O     "O Divalent"                   8    16.000    2
+atom         83    O+    "O+ Trivalent"                 8    16.000    3
+atom         90    F-    "F- Ion"                       9    18.000    0
+atom         91    F     "F Monovalent"                 9    18.000    1
+atom        100    Ne    "Ne Atom"                     10    20.200    0
+atom        110    Na+   "Na+ Ion"                     11    23.000    0
+atom        120    Mg+   "Mg+2 Ion"                    12    24.300    0
+atom        130    Al+   "Al+3 Ion"                    13    27.000    0
+atom        144    Si    "Si Tetravalent"              14    28.100    4
+atom        153    P     "P Trivalent"                 15    31.000    3
+atom        154    P     "P Tetravalent"               15    31.000    4
+atom        154    P     "P Pentavalent"               15    31.000    5
+atom        161    S     "S Monovalent"                16    32.000    1
+atom        162    S     "S Divalent"                  16    32.000    2
+atom        163    S     "S Trivalent"                 16    32.000    3
+atom        164    S     "S Tetravalent"               16    32.000    4
+atom        166    S     "S Hexavalent"                16    32.000    6
+atom        170    Cl-   "Cl- Ion"                     17    35.500    0
+atom        171    Cl    "Cl Monovalent"               17    35.500    1
+atom        180    Ar    "Ar Atom"                     18    39.900    0
+atom        190    K+    "K Ion"                       19    39.100    0
+atom        200    Ca+   "Ca+2 Ion"                    20    40.100    0
+atom        350    Br-   "Br- Ion"                     35    79.000    0
+atom        351    Br    "Br Monovalent"               35    79.000    1
+atom        360    Kr    "Kr Atom"                     36    83.800    0
+atom        370    Rb+   "Rb+ Ion"                     37    85.500    0
+atom        380    Sr+   "Sr+2 Ion"                    38    87.600    0
+atom        530    I-    "I- Ion"                      53   126.900    0
+atom        531    I     "I Monovalent"                53   126.900    1
+atom        540    Xe    "Xe Atom"                     54   131.300    0
+atom        550    Cs+   "Cs+ Ion"                     55   132.900    0
+atom        560    Ba+   "Ba+2 Ion"                    56   137.300    0
+
+
+      ################################
+      ##                            ##
+      ##  Van der Waals Parameters  ##
+      ##                            ##
+      ################################
+
+
+vdw          11               1.2000     0.0300
+vdw          12               0.3000     0.0100
+vdw          20               1.3000     0.0200
+vdw          53               1.9000     0.0400
+vdw          54               1.9000     0.0400
+vdw          62               1.7500     0.0700
+vdw          63               1.7500     0.0700
+vdw          64               1.7500     0.0700
+vdw          71               1.6000     0.1700
+vdw          72               1.6000     0.1700
+vdw          73               1.6000     0.1700
+vdw          74               1.6000     0.1700
+vdw          81               1.5000     0.2100
+vdw          82               1.5000     0.2100
+vdw          83               1.5000     0.2100
+vdw          91               1.4500     0.0600
+vdw         100               1.4000     0.0700
+vdw         144               2.0000     0.1500
+vdw         153               1.9000     0.2000
+vdw         154               1.9000     0.2000
+vdw         155               1.9000     0.2000
+vdw         161               1.8000     0.2500
+vdw         162               1.8000     0.2500
+vdw         163               1.8000     0.2500
+vdw         164               1.8000     0.2500
+vdw         166               1.8000     0.2500
+vdw         171               1.7000     0.3000
+vdw         180               1.7000     0.2300
+vdw         351               2.3000     0.0900
+vdw         360               1.8000     0.3100
+vdw         531               2.7000     0.0700
+vdw         540               1.9500     0.4300
+
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond         11   53          350.00     1.1000
+bond         11   54          350.00     1.1000
+bond         11   62          350.00     1.1000
+bond         11   63          350.00     1.1000
+bond         11   64          350.00     1.1000
+bond         11  144          200.00     1.5000
+bond         12   72          500.00     1.0000
+bond         12   73          500.00     1.0000
+bond         12   74          500.00     1.0000
+bond         12   82          500.00     1.0000
+bond         12   83          500.00     1.0000
+bond         12  162          300.00     1.3500
+bond         62   62         1200.00     1.2100
+bond         62   63          750.00     1.3100
+bond         62   64          400.00     1.4700
+bond         62   71         1350.00     1.1600
+bond         63   63          550.00     1.3700
+bond         63   64          400.00     1.5000
+bond         63   91          350.00     1.3500
+bond         63  171          200.00     1.7300
+bond         63  351          150.00     1.8900
+bond         63  531          150.00     2.0700
+bond         64   64          300.00     1.5300
+bond         64   72          350.00     1.4600
+bond         64   73          350.00     1.4600
+bond         64   74          350.00     1.4600
+bond         64   82          350.00     1.4100
+bond         64   83          350.00     1.4100
+bond         64   91          400.00     1.3900
+bond         64  144          200.00     1.8700
+bond         64  162          200.00     1.8100
+bond         64  171          200.00     1.7900
+bond         64  351          150.00     1.9500
+bond         64  531          150.00     2.1600
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle        11   62   62      35.00     180.00
+angle        11   63   62      35.00     120.00
+angle        11   63   63      35.00     120.00
+angle        11   63   64      35.00     120.00
+angle        11   64   62      35.00     109.50
+angle        11   64   63      35.00     109.50
+angle        11   64   64      35.00     109.50
+angle        62   64   62      60.00     109.50
+angle        62   64   63      60.00     109.50
+angle        63   64   63      60.00     109.50
+angle        62   64   64      60.00     109.50
+angle        63   64   64      60.00     109.50
+angle        64   64   64      60.00     109.50
+
+
+      ############################
+      ##                        ##
+      ##  Torsional Parameters  ##
+      ##                        ##
+      ############################
+
+
+torsion       0   62   62    0
+torsion       0   62   63    0
+torsion       0   62   64    0
+torsion       0   63   63    0           10.000  180.0  2
+torsion       0   63   64    0
+torsion       0   64   64    0            3.000    0.0  3

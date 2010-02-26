@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+# OCTAHEDRON is a Perl script to trim a cubic water box
+# to a truncated octahedron of the same long dimension;
+# does not renumber the atoms, so follow by xyzedit
+#
+# Written by Alan Grossfield, Ponder Lab, July 2004
+
+$file = shift;
+open(FILE, "$file") || die "couldn't read $file: $!\n";
+
+$boxsize = shift;
+
+$line = <FILE>;
+print $line;
+
+while (<FILE>)
+    {
+    $oxline = $_;
+    $h1line = <FILE>;
+    $h2line = <FILE>;
+
+
+    @fields = split(' ', $oxline);
+    $x = $fields[2];
+    $y = $fields[3];
+    $z = $fields[4];
+    $test = (abs($x) + abs($y) + abs($z))/0.75;
+    if ($test < $boxsize)
+        {
+        print $oxline;
+        print $h1line;
+        print $h2line;
+        }
+    }

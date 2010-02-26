@@ -1,0 +1,90 @@
+
+                 ----------------------------------------------
+                 Benchmark Results from TINKER 4.3  (June 2005)
+                 ----------------------------------------------
+
+
+                   Benchmark #1: Calmodulin Energy Evaluation
+
+              Isolated Calmodulin Molecule, 2264 Atoms, Amber ff94
+              Force Field, No Nonbonded Cutoffs, 10 Evaluations
+
+ MACHINE TYPE                                 MHz    ENERGY  GRADIENT  HESSIAN
+ ------------                                 ---    ------  --------  -------
+
+ HP Compaq nc8230 (FC 3.0, Intel 8.1)        2000      3.39     7.13    23.68
+ HP Compaq nc8230 (FC 3.0, g95)              2000      4.38     8.74    31.55
+ Compaq Evo N610c P4 (RH 9.0, Intel 8.1)     2000      4.40     8.92    33.81
+ Compaq Evo N610c P4 (RH 9.0, PGI 5.0-2)     2000      4.52    11.10    43.81
+ Compaq Evo N610c P4 (WinXP, Intel)          2000      4.31     8.70    33.12
+
+
+                Benchmark #2: Crambin Crystal Energy Evaluation
+
+           1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field with
+           PME for Electrostatics, 9.0 Ang vdw Cutoff, 10 Evaluations
+
+ MACHINE TYPE                                 MHz    ENERGY  GRADIENT  HESSIAN
+ ------------                                 ---    ------  --------  -------
+
+ HP Compaq nc8230 (FC 3.0, Intel 8.1)        2000      0.79     1.68     4.87
+ HP Compaq nc8230 (FC 3.0, g95)              2000      1.36     2.41     6.27
+ Compaq Evo N610c P4 (RH 9.0, Intel 8.1)     2000      1.28     2.68     6.87
+ Compaq Evo N610c P4 (RH 9.0, PGI 5.0-2)     2000      1.94     3.56     9.48
+ Compaq Evo N610c P4 (WinXP, Intel)          2000      1.20     2.63     6.79
+
+
+                 Benchmark #3: Peptide Normal Mode Calculation
+
+            Normal Modes of the Hessian and Vibration Freqencies of
+            a 20-Amino Acid, 328-Atom Peptide, OPLS-AA Force Field
+            without Cutoffs
+
+ MACHINE TYPE                                 MHz         NORMAL MODES
+ ------------                                 ---         ------------
+
+ HP Compaq nc8230 (FC 3.0, Intel 8.1)        2000               10
+ HP Compaq nc8230 (FC 3.0, g95)              2000               14
+ Compaq Evo N610c P4 (RH 9.0, Intel 8.1)     2000               18
+ Compaq Evo N610c P4 (RH 9.0, PGI 5.0-2)     2000               19
+ Compaq Evo N610c P4 (WinXP, Intel)          2000               20
+
+
+                Benchmark #4: TIP3P Water Box Molecular Dynamics
+
+            1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic
+            Box, 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid
+            TIP3P, 1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                                 MHz           DYNAMICS
+ ------------                                 ---           --------
+
+ HP Compaq nc8230 (FC 3.0, Intel 8.1)        2000               38
+ HP Compaq nc8230 (FC 3.0, g95)              2000               46
+ Compaq Evo N610c P4 (RH 9.0, Intel 8.1)     2000               55
+ Compaq Evo N610c P4 (RH 9.0, PGI 5.0-2)     2000               58
+ Compaq Evo N610c P4 (WinXP, Intel)          2000               58
+
+
+               Benchmark #5: AMOEBA Water Box Molecular Dynamics
+
+            100 MD Steps for 216 AMOEBA Flexible Polarizable Atomic
+            Multipole Waters in a 18.643 Ang Periodic Box, Standard
+            Ewald Sum for Electrostatics, 12.0 Ang Cutoffs for vdW,
+            1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                                 MHz           DYNAMICS
+ ------------                                 ---           --------
+
+ HP Compaq nc8230 (FC 3.0, Intel 8.1)        2000              103 
+ HP Compaq nc8230 (FC 3.0, g95)              2000              148
+ Compaq Evo N610c P4 (RH 9.0, Intel 8.1)     2000              169
+ Compaq Evo N610c P4 (RH 9.0, PGI 5.0-2)     2000              221
+ Compaq Evo N610c P4 (WinXP, Intel)          2000              169
+
+
+ ----------------------
+ Times are reported in seconds and were measured with TINKER Version 4.3,
+ dimensioned to MAXATM=10000 and MAXHESS=1000000. Each benchmark ran twice
+ in rapid succession on a quiet machine, and times shown were taken from
+ the second run.

@@ -1,0 +1,13 @@
+
+                   ------------------------------------------
+                   TINKER Notes for Legacy Unix Workstations
+                   ------------------------------------------
+
+          This subdirectory contains TINKER build script files for a
+          variety of proprietary Unix workstations. Note that these
+          scripts and the corresponding flags were all tested and
+          worked correctly at one time. However, none of these have
+          been used in recent years, and the scripts are only provided
+          as a starting point for anyone needing to use TINKER on one
+          of these workstation types.
+

@@ -1,0 +1,911 @@
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  program distgeom  --  produce distance geometry structures  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "distgeom" uses a metric matrix distance geometry procedure to
+c     generate structures with interpoint distances that lie within
+c     specified bounds, with chiral centers that maintain chirality,
+c     and with torsional angles restrained to desired values; the
+c     user also has the ability to interactively inspect and alter
+c     the triangle smoothed bounds matrix prior to embedding
+c
+c
+      program distgeom
+      implicit none
+      include 'sizes.i'
+      include 'align.i'
+      include 'angle.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'bond.i'
+      include 'couple.i'
+      include 'disgeo.i'
+      include 'files.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'math.i'
+      include 'refer.i'
+      include 'restrn.i'
+      include 'tors.i'
+      include 'usage.i'
+      include 'zcoord.i'
+      integer i,j,k,ia,ib,ic,id,ja,kb
+      integer igeo,ngeo,nhydro
+      integer ncopy,nshell,ntotal
+      integer swap,lext,freeunit
+      integer r1,r2,r3,r4,b1,b2
+      integer imap,jmap,nmap,map(maxatm)
+      integer total, fraction, loop
+      real*8 angle,hbond1,hbond2
+      real*8 bndfac,angfac,usefac
+      real*8 radi,rmsvalue,secs
+      real*8 rab,rbc,rac
+      real*8 qab,qbc,qcd,qac,qbd
+      real*8 xi,yi,zi,rij
+      real*8 bndmin,bndmax,tormin,tormax
+      real*8 vdwmax,cosmin,cosmax
+      real*8 cosabc,sinabc,cosbcd,sinbcd
+      real*8 width2,dist2,width
+      logical header,done,query,info
+      logical shell(maxatm)
+      character*1 answer,letter
+      character*7 ext
+      character*60 title,geofile
+      character*80 record
+c
+c
+c     get the input structure file for the embedding
+c
+      call initial
+      call getxyz
+c
+c     quit if there are too many atoms for distance geometry
+c
+      if (n .gt. maxgeo) then
+         write (iout,10)
+   10    format (/,' DISTGEOM  --  Too many Distance Geometry Atoms;',
+     &              ' Increase MAXGEO')
+         call fatal
+      end if
+c
+c     set the lists of attached atoms and active atoms
+c
+      call attach
+      call active
+c
+c     store the input structure for later comparison
+c
+      call makeref
+      call makeint (0)
+c
+c     set the width of the shell surrounding the active atoms
+c
+      write (iout,20)
+   20 format (/,' Enter the Desired Shell Width in Angstroms :  ',$)
+      read (input,30)  width
+   30 format (f20.0)
+c
+c     assign atoms within set distance of active ones to the shell
+c
+      nshell = 0
+      do i = 1, n
+         shell(i) = .false.
+      end do
+      width2 = width**2
+      if (nuse .ne. n) then
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, n
+                  if (.not.use(j) .and. .not.shell(j)) then
+                     dist2 = (x(j)-x(i))**2 +(y(j)-y(i))**2
+     &                              + (z(j)-z(i))**2
+                     if (dist2 .le. width2) then
+                        shell(j) = .true.
+                        nshell = nshell + 1
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     decide whether metal ions are to be treated as shell atoms
+c
+      write (iout,40)
+   40 format (/,' Include Metal Ions in Shell [Y] :  ',$)
+      read (input,50)  answer
+   50 format (a1)
+      call upcase (answer)
+      if (answer .ne. 'N') then
+         do i = 1, n
+            if (use(i) .and. n12(i).eq.0) then
+               shell(i) = .true.
+               nshell = nshell + 1
+               use(i) = .false.
+               nuse = nuse - 1
+            end if
+         end do
+      end if
+c
+c     find out if backbone atoms are to be treated as shell atoms
+c
+      answer = 'Y'
+      write (iout,60)
+   60 format (/,' Include Backbone Atoms in Shell [Y] :  ',$)
+      read (input,70)  answer
+   70 format (a1)
+      call upcase (answer)
+      if (answer .ne. 'N') then
+         do i = 1, n
+            if (use(i) .and. (type(i) .eq. 20 .or. type(i) .eq. 22
+     &            .or. type(i) .eq. 63 .or. type(i) .eq. 74)) then
+               shell(i) = .true.
+               nshell = nshell + 1
+               use(i) = .false.
+               nuse = nuse - 1
+            end if
+         end do
+      end if
+c
+c     delete any dummy atoms from the set of active atoms
+c
+      do i = n, 1, -1
+         letter = name(i)(1:1)
+         if (letter .eq. 'D') then
+            map(i) = 0
+            if (use(i)) then
+               use(i) = .false.
+               nuse = nuse - 1
+            end if
+         end if
+      end do
+c
+c     assign approximate radii to each of the atoms
+c
+      do i = 1, n
+         letter = name(i)(1:1)
+         if (name(i) .eq. 'CH ') then
+            vdwrad(i) = 1.5d0
+         else if (name(i) .eq. 'CH2') then
+            vdwrad(i) = 1.6d0
+         else if (name(i) .eq. 'CH3') then
+            vdwrad(i) = 1.7d0
+         else if (letter .eq. 'H') then
+            vdwrad(i) = 0.95d0
+         else if (letter .eq. 'C') then
+            nhydro = 0
+            loop = n12(i)
+            do j = 1,loop
+               if (name(i12(j,i))(1:1) .eq. 'H') then
+                  nhydro = nhydro + 1
+               end if
+            end do
+            if (nhydro .eq. 1) then
+               vdwrad(i) = 1.5d0
+            else if (nhydro .eq. 2) then
+               vdwrad(i) = 1.6d0
+            else if (nhydro .eq. 3) then
+               vdwrad(i) = 1.7d0
+            else
+               vdwrad(i) = 1.45d0
+            end if
+         else if (letter .eq. 'N') then
+            vdwrad(i) = 1.35d0
+         else if (letter .eq. 'O') then
+            vdwrad(i) = 1.35d0
+         else if (letter .eq. 'P') then
+            vdwrad(i) = 1.8d0
+         else if (letter .eq. 'S') then
+            vdwrad(i) = 1.8d0
+         else if (letter .eq. 'M') then
+            vdwrad(i) = 0.66d0
+         else if (letter .eq. 'D') then
+            vdwrad(i) = 0.0d0
+         else
+            vdwrad(i) = 0.5d0
+         end if
+      end do
+c
+c     check for use of hydrogens during the embedding procedure
+c
+      write (iout,80)
+   80 format (/,' Remove Hydrogens for Distance Geometry [Y] :  ',$)
+      read (input,90)  answer
+   90 format (a1)
+      call upcase (answer)
+c
+c     remove atoms which are not active or to be used for shell
+c
+      nmap = 0
+      do i = 1, nref
+         if (shell(i)) then
+            if (answer .ne. 'N') then
+               letter = name(i)(1:1)
+               if (letter .eq. 'H') then
+                  map(i) = 0
+                  shell(i) = .false.
+                  nshell = nshell - 1
+               else
+                  nmap = nmap + 1
+                  map(i) = nmap
+               end if
+            else
+               nmap = nmap + 1
+               map(i) = nmap
+            end if
+         else if (use(i)) then
+            if (answer .ne. 'N') then
+               letter = name(i)(1:1)
+               if (letter .eq. 'H') then
+                  map(i) = -1
+                  use(i) = .false.
+                  nuse = nuse - 1
+               else
+                  nmap = nmap + 1
+                  map(i) = nmap
+               end if
+            else
+               nmap = nmap + 1
+               map(i) = nmap
+            end if
+         else
+            map(i) = 0
+         end if
+      end do
+      do i = nref, 1, -1
+         if (map(i) .eq. 0 .or. map(i) .eq. -1)  call delete(i)
+      end do
+c
+c     quit if there are too many atoms for distance geometry
+c
+      if (n .gt. maxgeo) then
+         write (iout,100)
+  100    format (/,' DISTGEOM  --  Too many Distance Geometry Atoms;',
+     &              ' Increase MAXGEO')
+         call fatal
+      end if
+      do i = 1,nref
+         if (use(i) .or. shell(i)) then
+            vdwrad(map(i)) = vdwrad(i)
+         end if
+      end do
+c
+c     set the lists of attached atoms and local interactions
+c
+      call attach
+      call bonds
+      call angles
+      call torsions
+c
+c     set atoms to be superposed when using partial structures
+c
+      if (nref .ne. nuse) then
+         nfit = 0
+         do i = 1, nref
+            if (shell(i)) then
+               nfit = nfit + 1
+               ifit(1,nfit) = i
+               ifit(2,nfit) = map(i)
+            end if
+         end do
+      end if
+c
+c     set number of distance geometry structures to generate
+c
+      ngeo = -1
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=110,end=110)  ngeo
+  110 continue
+      if (ngeo .le. 0) then
+         write (iout,120)
+  120    format (/,' Number of Distance Geometry Structures',
+     &              ' Desired [1] :  ',$)
+         read (input,130)  ngeo
+  130    format (i10)
+         if (ngeo .eq. 0)  ngeo = 1
+      end if
+c
+c     enforce the original chirality of tetravalent atoms
+c
+      nchir = 0
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,140)
+  140    format (/,' Impose Chirality Constraints on Tetrahedral',
+     &              ' Atoms [Y] :  ',$)
+         read (input,150)  answer
+  150    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .ne. 'N') then
+         call nextarg (answer,exist)
+         if (.not. exist) then
+            write (iout,160)
+  160       format (/,' Use "Floating" Chirality for -XH2- and -XH3',
+     &                 ' Groups [N] :  ',$)
+            read (input,170)  answer
+  170       format (a1)
+         end if
+         call upcase (answer)
+         do i = 1, n
+            if (n12(i) .eq. 4) then
+               nhydro = 0
+               if (answer .eq. 'Y') then
+                  do j = 1, 4
+                     letter = name(i12(j,i))(1:1)
+                     if (letter .eq. 'H')  nhydro = nhydro + 1
+                  end do
+               end if
+               if (nhydro .lt. 2) then
+                  nchir = nchir + 1
+                  do j = 1, 4
+                     ichir(j,nchir) = i12(j,i)
+                  end do
+               end if
+            end if
+         end do
+      end if
+c
+c     enforce the planarity or chirality of trigonal centers
+c
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,180)
+  180    format (/,' Impose Planarity and/or Chirality of Trigonal',
+     &              ' Atoms [Y] :  ',$)
+         read (input,190)  answer
+  190    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .ne. 'N') then
+         do i = 1, n
+            if (n12(i) .eq. 3) then
+               nchir = nchir + 1
+               do j = 1, 3
+                  ichir(j,nchir) = i12(j,i)
+               end do
+               ichir(4,nchir) = i
+            end if
+         end do
+      end if
+c
+c     enforce torsional planarity on adjacent trigonal sites
+c
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,200)
+  200    format (/,' Impose Torsional Planarity on Adjacent Trigonal',
+     &              ' Atoms [Y] :  ',$)
+         read (input,210)  answer
+  210    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .ne. 'N') then
+         do i = 1, nbond
+            ia = ibnd(1,i)
+            ib = ibnd(2,i)
+            if (n12(ia).eq.3 .and. n12(ib).eq.3) then
+               do j = 1, n12(ia)
+                  ja = i12(j,ia)
+                  do k = 1, n12(ib)
+                     kb = i12(k,ib)
+                     if (ja.ne.ib .and. kb.ne.ia) then
+                        nchir = nchir + 1
+                        ichir(1,nchir) = ja
+                        ichir(2,nchir) = kb
+                        ichir(3,nchir) = ia
+                        ichir(4,nchir) = ib
+                     end if
+                  end do
+               end do
+            end if
+         end do
+      end if
+c
+c     optionally inspect and alter the smoothed bounds matrix
+c
+      query = .false.
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,220)
+  220    format (/,' Do You Wish to Examine or Alter the Bounds',
+     &              ' Matrix [N] :  ',$)
+         read (input,230)  answer
+  230    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'Y')  query = .true.
+c
+c     set the type of refinement to be used after embedding
+c
+      use_invert = .true.
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,240)
+  240    format (/,' Select the Enantiomer closest to the Input',
+     &              ' Structure [Y] :  ',$)
+         read (input,250)  answer
+  250    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'N')  use_invert = .false.
+c
+c     set the type of refinement to be used after embedding
+c
+      use_anneal = .true.
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,260)
+  260    format (/,' Refinement via Minimization or Annealing',
+     &              ' [M or A, <CR>=A] :  ',$)
+         read (input,270)  answer
+  270    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'M')  use_anneal = .false.
+c
+c     initialize chirality and planarity constraint values
+c
+      call chirin
+c
+c     get any distance bound and torsional angle restraints
+c
+      call restrain
+      do i = 1, ndfix
+         dfix(3,i) = min(1.0d0,dfix(3,i))
+      end do
+c
+c     print lists of the interatomic distance restraints
+c
+      if (verbose) then
+         header = .true.
+         do i = 1, ndfix
+            ia = idfix(1,i)
+            ib = idfix(2,i)
+            bndmin = dfix(1,i)
+            bndmax = dfix(2,i)
+            ncopy = nint(1.0d0/dfix(3,i))
+            if (header) then
+               header = .false.
+               write (iout,280)
+  280          format (/,' Interatomic Distance Bound',
+     &                    ' Restraints :',
+     &                 //,12x,'Atom Numbers',6x,'LowerBound',
+     &                    4x,'UpperBound',4x,'Degeneracy'/)
+            end if
+            if (ncopy .eq. 1) then
+               write (iout,290)  i,ia,ib,bndmin,bndmax
+  290          format (i6,5x,2i6,5x,f10.4,4x,f10.4)
+            else
+               write (iout,300)  i,ia,ib,bndmin,bndmax,ncopy
+  300          format (i6,5x,2i6,5x,f10.4,4x,f10.4,i12)
+            end if
+         end do
+c
+c     print lists of the torsional angle restraints
+c
+         header = .true.
+         do i = 1, ntfix
+            ia = itfix(1,i)
+            ib = itfix(2,i)
+            ic = itfix(3,i)
+            id = itfix(4,i)
+            tormin = tfix(1,i)
+            tormax = tfix(2,i)
+            if (header) then
+               header = .false.
+               write (iout,310)
+  310          format (/,' Intramolecular Torsional Angle',
+     &                    ' Restraints :',
+     &                 //,23x,'Atoms',20x,'Torsion Range',/)
+            end if
+            write (iout,320)  i,ia,ib,ic,id,tormin,tormax
+  320       format (i6,5x,4i6,5x,2f12.4)
+         end do
+      end if
+c
+c     map user supplied restraints to distance geometry atoms
+c
+      do i = 1, ndfix
+         idfix(1,i) = map(idfix(1,i))
+         idfix(2,i) = map(idfix(2,i))
+      end do
+      do i = 1, ntfix
+         itfix(1,i) = map(itfix(1,i))
+         itfix(2,i) = map(itfix(2,i))
+         itfix(3,i) = map(itfix(3,i))
+         itfix(4,i) = map(itfix(4,i))
+      end do
+      loop = ndfix
+      do i = loop,1,-1
+         if (idfix(1,i) .le. 0 .or. idfix(2,i) .le. 0) then
+            ndfix = ndfix - 1
+            do k = i+1,loop
+               idfix(1,i) = idfix(1,i+1)
+               idfix(2,i) = idfix(2,i+1)
+            end do
+         end if
+      end do
+      loop = ntfix
+      do i = loop,1,-1
+         if (itfix(1,i) .le. 0 .or. itfix(2,i) .le. 0 .or.
+     &          itfix(3,i) .le. 0 .or. itfix(4,i) .le. 0) then
+            ntfix = ntfix - 1
+            do k = i+1,loop
+               itfix(1,i) = itfix(1,i+1)
+               itfix(2,i) = itfix(2,i+1)
+               itfix(3,i) = itfix(3,i+1)
+               itfix(4,i) = itfix(4,i+1)
+            end do
+         end if
+      end do
+c
+c     initialize the upper and lower bounds matrix
+c
+      do i = 1, n
+         bnd(i,i) = 0.0d0
+      end do
+      vdwmax = 1000000.0d0
+      do i = 1, n
+         do j = 1, i-1
+            bnd(j,i) = vdwmax
+         end do
+      end do
+      do i = 1, n-1
+         radi = vdwrad(i)
+         do j = i+1, n
+            bnd(j,i) = radi + vdwrad(j)
+         end do
+      end do
+c
+c     set the upper and lower bounds for 1-2 distances
+c
+      bndfac = 0.01d0
+      do i = 1, nbond
+         ia = ibnd(1,i)
+         ib = ibnd(2,i)
+         rab = sqrt((x(ia)-x(ib))**2 + (y(ia)-y(ib))**2
+     &                     + (z(ia)-z(ib))**2)
+         bndmin = (1.0d0 - bndfac) * rab
+         bndmax = (1.0d0 + bndfac) * rab
+         if (ia .gt. ib) then
+            bnd(ia,ib) = bndmin
+            bnd(ib,ia) = bndmax
+         else
+            bnd(ia,ib) = bndmax
+            bnd(ib,ia) = bndmin
+         end if
+      end do
+c
+c     set the upper and lower bounds for 1-3 distances
+c
+      angfac = 0.01d0
+      do i = 1, nangle
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         rab = sqrt((x(ia)-x(ib))**2 + (y(ia)-y(ib))**2
+     &                    + (z(ia)-z(ib))**2)
+         rbc = sqrt((x(ib)-x(ic))**2 + (y(ib)-y(ic))**2
+     &                    + (z(ib)-z(ic))**2)
+         rac = sqrt((x(ia)-x(ic))**2 + (y(ia)-y(ic))**2
+     &                    + (z(ia)-z(ic))**2)
+         angle = acos((rab**2+rbc**2-rac**2) / (2.0*rab*rbc))
+         cosmin = cos(angle*(1.0d0-angfac))
+         cosmax = cos(min(pi,angle*(1.0d0+angfac)))
+         qab = min(bnd(ia,ib),bnd(ib,ia))
+         qbc = min(bnd(ic,ib),bnd(ib,ic))
+         bndmin = qab**2 + qbc**2 - 2.0d0*qab*qbc*cosmin
+         bndmin = sqrt(max(0.0d0,bndmin))
+         qab = max(bnd(ia,ib),bnd(ib,ia))
+         qbc = max(bnd(ic,ib),bnd(ib,ic))
+         bndmax = qab**2 + qbc**2 - 2.0d0*qab*qbc*cosmax
+         bndmax = sqrt(max(0.0d0,bndmax))
+         if (ia .gt. ic) then
+            bnd(ia,ic) = bndmin
+            bnd(ic,ia) = bndmax
+         else
+            bnd(ia,ic) = bndmax
+            bnd(ic,ia) = bndmin
+         end if
+      end do
+c
+c     set the upper and lower bounds for 1-4 distances
+c
+      do i = 1, ntors
+         ia = itors(1,i)
+         ib = itors(2,i)
+         ic = itors(3,i)
+         id = itors(4,i)
+         cosmin = 1.0d0
+         cosmax = -1.0d0
+         do j = 1, ntfix
+            r1 = itfix(1,j)
+            r2 = itfix(2,j)
+            r3 = itfix(3,j)
+            r4 = itfix(4,j)
+            if ((ia.eq.r1 .and. ib.eq.r2 .and.
+     &           ic.eq.r3 .and. id.eq.r4) .or.
+     &          (ia.eq.r4 .and. ib.eq.r3 .and.
+     &           ic.eq.r2 .and. id.eq.r1)) then
+               cosmin = cos(tfix(1,j)/radian)
+               cosmax = cosmin
+               bnd(max(ia,id),min(ia,id)) = 0.0d0
+            end if
+         end do
+         qab = min(bnd(ia,ib),bnd(ib,ia))
+         qbc = min(bnd(ib,ic),bnd(ic,ib))
+         qcd = min(bnd(ic,id),bnd(id,ic))
+         qac = min(bnd(ia,ic),bnd(ic,ia))
+         qbd = min(bnd(ib,id),bnd(id,ib))
+         cosabc = (qab**2+qbc**2-qac**2)/(2*qab*qbc)
+         sinabc = sqrt(max(0.0d0,1.0d0-cosabc**2))
+         cosbcd = (qbc**2+qcd**2-qbd**2)/(2*qbc*qcd)
+         sinbcd = sqrt(max(0.0d0,1.0d0-cosbcd**2))
+         bndmin = qab**2 + qbc**2 + qcd**2
+     &               + 2.0d0*qab*qcd*cosabc*cosbcd
+     &               - 2.0d0*qab*qcd*sinabc*sinbcd*cosmin
+     &               - 2.0d0*qbc*(qab*cosabc+qcd*cosbcd)
+         bndmin = sqrt(max(0.0d0,bndmin))
+         qab = max(bnd(ia,ib),bnd(ib,ia))
+         qbc = max(bnd(ib,ic),bnd(ic,ib))
+         qcd = max(bnd(ic,id),bnd(id,ic))
+         qac = max(bnd(ia,ic),bnd(ic,ia))
+         qbd = max(bnd(ib,id),bnd(id,ib))
+         cosabc = (qab**2+qbc**2-qac**2)/(2*qab*qbc)
+         sinabc = sqrt(max(0.0d0,1.0d0-cosabc**2))
+         cosbcd = (qbc**2+qcd**2-qbd**2)/(2*qbc*qcd)
+         sinbcd = sqrt(max(0.0d0,1.0d0-cosbcd**2))
+         bndmax = qab**2 + qbc**2 + qcd**2
+     &               + 2.0d0*qab*qcd*cosabc*cosbcd
+     &               - 2.0d0*qab*qcd*sinabc*sinbcd*cosmax
+     &               - 2.0d0*qbc*(qab*cosabc+qcd*cosbcd)
+         bndmax = sqrt(max(0.0d0,bndmax))
+         if (ia .gt. id) then
+            bnd(ia,id) = bndmin
+            bnd(id,ia) = bndmax
+         else
+            bnd(ia,id) = bndmax
+            bnd(id,ia) = bndmin
+         end if
+      end do
+c
+c     convert distance restraints into bounds matrix elements
+c
+      do i = 1, ndfix
+         ia = idfix(1,i)
+         ib = idfix(2,i)
+         bndmin = dfix(1,i)
+         bndmax = dfix(2,i)
+         if (ia .gt. ib) then
+            bnd(ia,ib) = bndmin
+            bnd(ib,ia) = bndmax
+         else
+            bnd(ia,ib) = bndmax
+            bnd(ib,ia) = bndmin
+         end if
+      end do
+c
+c     modify lower bounds to allow hydrogen bond formation
+c
+      hbond1 = 1.7d0
+      hbond2 = 2.55d0
+      do i = 1, n
+         letter = name(i)(1:1)
+         if (letter.eq.'N' .or. letter.eq.'O') then
+            do j = 1, n
+               letter = name(j)(1:1)
+               if (letter .eq. 'H') then
+                  k = i12(1,j)
+                  letter = name(k)(1:1)
+                  if (letter.eq.'N' .or. letter.eq.'O') then
+                     if (j .gt. i) then
+                        bnd(j,i) = min(hbond1,bnd(j,i))
+                     else
+                        bnd(i,j) = min(hbond1,bnd(i,j))
+                     end if
+                     if (k .gt. i) then
+                        bnd(k,i) = min(hbond2,bnd(k,i))
+                     else
+                        bnd(i,k) = min(hbond2,bnd(i,k))
+                     end if
+                  end if
+               end if
+            end do
+         end if
+      end do
+      ntotal = ndfix + max(10000,nshell*3)
+      if (ntotal .gt. maxfix) then
+         write (iout,330)
+  330    format (/,' DISTGEOM  --  Too many Shell Atom Restraints;',
+     &              ' Increase MAXFIX')
+         call fatal
+      end if
+c
+c     add distance restraints between each pair of inactive atoms
+c
+      if (nuse .ne. nref) then
+         total = nshell*(nshell-1)/2
+         fraction = max(3*nshell,10000)
+         fraction = max(total/fraction,1)
+         k = 0
+         usefac = 0.01d0
+         do i = 1, nref-1
+            if (shell(i)) then
+               imap = map(i)
+               xi = xref(i)
+               yi = yref(i)
+               zi = zref(i)
+               do j = i+1, nref
+                  if (shell(j)) then
+                     k = k + 1
+                     if (mod(k,fraction) .eq. 0) then
+                        jmap = map(j)
+                        rij = sqrt((xi-xref(j))**2 + (yi-yref(j))**2
+     &                                  + (zi-zref(j))**2)
+                        bndmin = (1.0d0 - usefac) * rij
+                        bndmax = (1.0d0 + usefac) * rij
+                        bnd(jmap,imap) = bndmin
+                        bnd(imap,jmap) = bndmax
+                        ndfix = ndfix + 1
+                        idfix(1,ndfix) = imap
+                        idfix(2,ndfix) = jmap
+                        dfix(1,ndfix) = bndmin
+                        dfix(2,ndfix) = bndmax
+                        dfix(3,ndfix) = 1.0d0
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     use the triangle inequalities to smooth the bounds
+c
+      if (debug .or. (verbose .and. n.le.130)) then
+         title = 'Input Distance Bounds :'
+         call grafic (n,maxgeo,bnd,title)
+      end if
+      write (iout,340)
+  340 format (/,' Bounds Smoothing via Triangle and Inverse',
+     &           ' Triangle Inequality :')
+      if (verbose)  call setime
+      call geodesic
+c     call triangle
+      if (verbose) then
+         call getime (secs)
+         write (iout,350)  secs
+  350    format (/,' Time Required for Bounds Smoothing :',4x,
+     &              f10.2,' seconds')
+      end if
+c
+c     allow interactive alteration of the bounds matrix
+c
+      done = .false.
+      dowhile (query .and. .not.done)
+         done = .true.
+         write (iout,360)
+  360    format (/,' Enter an Atom Pair to Display Bounds',
+     &              ' [<CR> When Done] :  ',$)
+         read (input,370)  record
+  370    format (a80)
+         read (record,*,err=420,end=420)  b1,b2
+         done = .false.
+         if (b1.lt.1 .or. b2.gt.n .or. b1.eq.b2)  goto 420
+         if (b1 .gt. b2) then
+            swap = b1
+            b1 = b2
+            b2 = swap
+         end if
+         write (iout,380)  bnd(b2,b1),bnd(b1,b2)
+  380    format (/,' Lower Bound :',f8.3,8x,'Upper Bound :',f8.3)
+  390    continue
+         write (iout,400)
+  400    format (/,' Enter New Bounds or <CR> to Leave Unchanged :  ',$)
+         read (input,410)  record
+  410    format (a80)
+         read (record,*,err=420,end=420)  bndmin,bndmax
+         if (bndmin .gt. bndmax)  goto 390
+         bnd(b2,b1) = bndmin
+         bnd(b1,b2) = bndmax
+         call trifix (b1,b2)
+  420    continue
+      end do
+c
+c     display the smoothed upper and lower bounds matrix
+c
+      if (debug .or. (verbose .and. n.le.130)) then
+         title = 'Triangle Smoothed Bounds :'
+         call grafic (n,maxgeo,bnd,title)
+      end if
+c
+c     find the largest value of an upper bound between atoms
+c
+      pathmax = 0.0d0
+      do i = 1, n
+         do j = 1, i-1
+            if (pathmax .lt. bnd(j,i))  pathmax = bnd(j,i)
+         end do
+      end do
+      write (iout,430)  pathmax
+  430 format (/,' Largest Upper Bound Distance :',15x,f13.4)
+      do i = 1, n
+         do j = 1, i-1
+            if (bnd(j,i) .ne. 1000000.0d0) goto 450
+         end do
+         do j = i+1, n
+            if (bnd(i,j) .ne. 1000000.0d0) goto 450
+         end do
+         write (iout,440) i
+  440    format (/,' Atom',i6,' is Unconstrained')
+  450    continue
+      end do
+c
+c     generate the desired number of distance geometry structures
+c
+      do j = 1, ngeo
+         n = nuse + nshell
+         write (iout,460)  j
+  460    format (/,' Generation via Distance Geometry of Structure',i5)
+         call embed
+c
+c     superpose the distance geometry structure on input structure
+c
+         info = verbose
+         verbose = .false.
+         call impose (nref,xref,yref,zref,n,x,y,z,rmsvalue)
+         verbose = info
+c
+c     put all coordinates back into x,y,z arrays and rebuild hydrogens
+c
+         do i = nref, 1, -1
+            name(i) = refnam(i)
+            type(i) = reftyp(i)
+            n12(i) = n12ref(i)
+            do k = 1, n12(i)
+               i12(k,i) = i12ref(k,i)
+            end do
+            if (use(i)) then
+               x(i) = x(map(i))
+               y(i) = y(map(i))
+               z(i) = z(map(i))
+            else if (shell(i)) then
+               x(i) = xref(i)
+               y(i) = yref(i)
+               z(i) = zref(i)
+            else if (map(i) .eq. 0) then
+               x(i) = xref(i)
+               y(i) = yref(i)
+               z(i) = zref(i)
+            end if
+         end do
+         do i = 1, nref
+            if (map(i) .eq. -1) then
+               call xyzatm (i,iz(1,i),blen(i),iz(2,i),alph(i),iz(3,i),
+     &                       bet(i),iz(4,i))
+            end if
+         end do
+         n = nref
+c
+c     write out the final optimized distance geometry structure
+c
+         lext = 3
+         call numeral (j,ext,lext)
+         geofile = filename(1:leng)//'.'//ext(1:lext)
+         call version (geofile,'new')
+         igeo = freeunit ()
+         open (unit=igeo,file=geofile,status='new')
+         call prtxyz (igeo)
+         close (unit=igeo)
+      end do
+      end

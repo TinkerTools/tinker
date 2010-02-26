@@ -1,0 +1,10 @@
+
+                 ---------------------------------------------
+                 TEST Directory for the TINKER Program Package
+                 ---------------------------------------------
+
+       This directory contains several sample molecules and test files
+       for use with the TINKER program package. The systems use various
+       force fields. Some equilibrated molecular dynamics restart files
+       for water, butane, etc. are present as *.dyn files.
+
