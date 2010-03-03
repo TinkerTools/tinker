@@ -135,7 +135,7 @@ c
       npole = 0
       npolar = 0
       do i = 1, n
-         if (polsiz(i) .ne. 0) then
+         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
             npole = npole + 1
             ipole(npole) = i
             pollist(i) = npole

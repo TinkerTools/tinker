@@ -621,7 +621,7 @@ L60:
     polar_1.npolar = 0;
     i__1 = atoms_1.n;
     for (i__ = 1; i__ <= i__1; ++i__) {
-	if (mpole_1.polsiz[i__ - 1] != 0) {
+	if (mpole_1.polsiz[i__ - 1] != 0 || polar_1.polarity[i__ - 1] != 0.) {
 	    ++mpole_1.npole;
 	    mpole_1.ipole[mpole_1.npole - 1] = i__;
 	    mpole_1.pollist[i__ - 1] = mpole_1.npole;
