@@ -327,6 +327,8 @@ c
          ib = irat(2,i)
          if (use_bounds .and. (molcule(ia).ne.molcule(ib))) then
             ratimage(i) = .true.
+         else if (use_polymer) then
+            ratimage(i) = .true.
          else
             ratimage(i) = .false.
          end if
