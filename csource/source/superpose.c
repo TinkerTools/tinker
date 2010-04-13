@@ -169,7 +169,7 @@ static integer c__2 = 2;
     static integer i__, i1, i2, n1, n2;
     static doublereal x1[25000], x2[25000], y1[25000], y2[25000], z1[25000], 
 	    z2[25000];
-    static logical same;
+    static logical same, self;
     static doublereal dist;
     static logical skip;
     static integer next, stop;
@@ -229,12 +229,12 @@ static integer c__2 = 2;
     static cilist io___47 = { 0, 0, 0, fmt_200, 0 };
     static cilist io___48 = { 0, 0, 0, fmt_210, 0 };
     static cilist io___49 = { 0, 0, 0, fmt_220, 0 };
-    static cilist io___61 = { 0, 0, 0, fmt_230, 0 };
-    static cilist io___62 = { 0, 0, 0, fmt_240, 0 };
-    static cilist io___64 = { 0, 0, 0, fmt_250, 0 };
-    static cilist io___69 = { 0, 0, 0, fmt_260, 0 };
-    static cilist io___70 = { 0, 0, 0, fmt_270, 0 };
-    static cilist io___71 = { 0, 0, 0, fmt_280, 0 };
+    static cilist io___62 = { 0, 0, 0, fmt_230, 0 };
+    static cilist io___63 = { 0, 0, 0, fmt_240, 0 };
+    static cilist io___65 = { 0, 0, 0, fmt_250, 0 };
+    static cilist io___70 = { 0, 0, 0, fmt_260, 0 };
+    static cilist io___71 = { 0, 0, 0, fmt_270, 0 };
+    static cilist io___72 = { 0, 0, 0, fmt_280, 0 };
 
 
 
@@ -805,10 +805,16 @@ L180:
     suffix_(file2, "xyz", (ftnlen)120, (ftnlen)3);
     version_(file2, "old", (ftnlen)120, (ftnlen)3);
     if (s_cmp(file1, file2, (ftnlen)120, (ftnlen)120) == 0) {
-	same = TRUE_;
 	ifile2 = ifile1;
+	self = TRUE_;
+	same = TRUE_;
+	i__1 = align_1.nfit;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    if (ifit_ref(1, i__) != ifit_ref(2, i__)) {
+		same = FALSE_;
+	    }
+	}
     } else {
-	same = FALSE_;
 	ifile2 = freeunit_();
 	o__1.oerr = 0;
 	o__1.ounit = ifile2;
@@ -823,6 +829,8 @@ L180:
 	al__1.aerr = 0;
 	al__1.aunit = ifile2;
 	f_rew(&al__1);
+	self = FALSE_;
+	same = FALSE_;
     }
 
 /*     read initial structure set from the first coordinate file */
@@ -866,18 +874,18 @@ L180:
 /*     perform the superposition of a structure pair */
 
     while(! inform_1.abort) {
-	io___61.ciunit = iounit_1.iout;
-	s_wsfe(&io___61);
+	io___62.ciunit = iounit_1.iout;
+	s_wsfe(&io___62);
 	do_fio(&c__1, (char *)&frame1, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&frame2, (ftnlen)sizeof(integer));
 	e_wsfe();
-	io___62.ciunit = iounit_1.iout;
-	s_wsfe(&io___62);
+	io___63.ciunit = iounit_1.iout;
+	s_wsfe(&io___63);
 	e_wsfe();
 	inform_1.verbose = TRUE_;
 	impose_(&n1, x1, y1, z1, &n2, x2, y2, z2, &rmsvalue);
-	io___64.ciunit = iounit_1.iout;
-	s_wsfe(&io___64);
+	io___65.ciunit = iounit_1.iout;
+	s_wsfe(&io___65);
 	do_fio(&c__1, (char *)&rmsvalue, (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&frame1, (ftnlen)sizeof(integer));
 	do_fio(&c__1, (char *)&frame2, (ftnlen)sizeof(integer));
@@ -900,12 +908,12 @@ L180:
 	    if (dist >= cutoff) {
 		if (header) {
 		    header = FALSE_;
-		    io___69.ciunit = iounit_1.iout;
-		    s_wsfe(&io___69);
+		    io___70.ciunit = iounit_1.iout;
+		    s_wsfe(&io___70);
 		    e_wsfe();
 		}
-		io___70.ciunit = iounit_1.iout;
-		s_wsfe(&io___70);
+		io___71.ciunit = iounit_1.iout;
+		s_wsfe(&io___71);
 		do_fio(&c__1, (char *)&i1, (ftnlen)sizeof(integer));
 		do_fio(&c__1, name1_ref(0, i1), (ftnlen)3);
 		do_fio(&c__1, (char *)&i2, (ftnlen)sizeof(integer));
@@ -917,8 +925,8 @@ L180:
 	    }
 	}
 	if (! header) {
-	    io___71.ciunit = iounit_1.iout;
-	    s_wsfe(&io___71);
+	    io___72.ciunit = iounit_1.iout;
+	    s_wsfe(&io___72);
 	    do_fio(&c__1, (char *)&rmsvalue, (ftnlen)sizeof(doublereal));
 	    e_wsfe();
 	}
@@ -968,7 +976,7 @@ L180:
 	}
 	if (inform_1.abort) {
 	    inform_1.abort = FALSE_;
-	    if (same) {
+	    if (self) {
 		al__1.aerr = 0;
 		al__1.aunit = ifile1;
 		f_rew(&al__1);
@@ -1012,7 +1020,7 @@ L180:
     cl__1.cunit = ifile1;
     cl__1.csta = 0;
     f_clos(&cl__1);
-    if (! same) {
+    if (! self) {
 	cl__1.cerr = 0;
 	cl__1.cunit = ifile2;
 	cl__1.csta = 0;

@@ -340,7 +340,8 @@ struct {
 	    , epsilon4[1000000]	/* was [1000][1000] */, radhbnd[1000000]	
 	    /* was [1000][1000] */, epshbnd[1000000]	/* was [1000][1000] */
 	    , kred[25000];
-    integer ired[25000], nvdw, ivdw[25000], jvdw[25000];
+    integer ired[25000], nvdw, ivdw[25000], jvdw[25000], nvt, ivt[25000], jvt[
+	    25000];
 } vdw_;
 
 #define vdw_1 vdw_
@@ -2659,6 +2660,9 @@ L80:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 
@@ -3887,25 +3891,25 @@ L80:
 /* Subroutine */ int enrgyze_(void)
 {
     /* Format strings */
-    static char fmt_10[] = "(/,\002 Total Potential Energy :\002,8x,f20.8"
+    static char fmt_10[] = "(/,\002 Total Potential Energy :\002,4x,f20.8"
 	    ",\002 Kcal/mole\002)";
-    static char fmt_20[] = "(/,\002 Total Potential Energy :\002,8x,d20.8"
+    static char fmt_20[] = "(/,\002 Total Potential Energy :\002,4x,d20.8"
 	    ",\002 Kcal/mole\002)";
-    static char fmt_30[] = "(/,\002 Total Potential Energy :\002,8x,f18.6"
+    static char fmt_30[] = "(/,\002 Total Potential Energy :\002,6x,f18.6"
 	    ",\002 Kcal/mole\002)";
-    static char fmt_40[] = "(/,\002 Total Potential Energy :\002,8x,d18.6"
+    static char fmt_40[] = "(/,\002 Total Potential Energy :\002,6x,d18.6"
 	    ",\002 Kcal/mole\002)";
     static char fmt_50[] = "(/,\002 Total Potential Energy :\002,8x,f16.4"
 	    ",\002 Kcal/mole\002)";
     static char fmt_60[] = "(/,\002 Total Potential Energy :\002,8x,d16.4"
 	    ",\002 Kcal/mole\002)";
-    static char fmt_70[] = "(/,\002 Intermolecular Energy :\002,9x,f20.8,"
+    static char fmt_70[] = "(/,\002 Intermolecular Energy :\002,5x,f20.8,"
 	    "\002 Kcal/mole\002)";
-    static char fmt_80[] = "(/,\002 Intermolecular Energy :\002,9x,d20.8,"
+    static char fmt_80[] = "(/,\002 Intermolecular Energy :\002,5x,d20.8,"
 	    "\002 Kcal/mole\002)";
-    static char fmt_90[] = "(/,\002 Intermolecular Energy :\002,9x,f18.6,"
+    static char fmt_90[] = "(/,\002 Intermolecular Energy :\002,7x,f18.6,"
 	    "\002 Kcal/mole\002)";
-    static char fmt_100[] = "(/,\002 Intermolecular Energy :\002,9x,d18.6"
+    static char fmt_100[] = "(/,\002 Intermolecular Energy :\002,7x,d18.6"
 	    ",\002 Kcal/mole\002)";
     static char fmt_110[] = "(/,\002 Intermolecular Energy :\002,9x,f16.4"
 	    ",\002 Kcal/mole\002)";
@@ -5242,9 +5246,6 @@ L80:
     /* Builtin functions */
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
-    /* Local variables */
-    static integer label;
-
     /* Fortran I/O blocks */
     static cilist io___216 = { 0, 0, 0, fmt_10, 0 };
     static cilist io___217 = { 0, 0, 0, fmt_20, 0 };
@@ -5263,20 +5264,20 @@ L80:
     static cilist io___230 = { 0, 0, 0, fmt_150, 0 };
     static cilist io___231 = { 0, 0, 0, fmt_160, 0 };
     static cilist io___232 = { 0, 0, 0, fmt_170, 0 };
-    static cilist io___234 = { 0, 0, 0, fmt_180, 0 };
-    static cilist io___235 = { 0, 0, 0, fmt_190, 0 };
-    static cilist io___236 = { 0, 0, 0, fmt_200, 0 };
-    static cilist io___237 = { 0, 0, 0, fmt_210, 0 };
-    static cilist io___238 = { 0, 0, 0, fmt_220, 0 };
-    static cilist io___239 = { 0, 0, 0, fmt_230, 0 };
-    static cilist io___240 = { 0, 0, 0, fmt_240, 0 };
-    static cilist io___241 = { 0, 0, 0, fmt_250, 0 };
-    static cilist io___242 = { 0, 0, 0, fmt_260, 0 };
-    static cilist io___243 = { 0, 0, 0, fmt_270, 0 };
-    static cilist io___244 = { 0, 0, 0, fmt_280, 0 };
-    static cilist io___245 = { 0, 0, 0, fmt_290, 0 };
-    static cilist io___246 = { 0, 0, 0, fmt_300, 0 };
-    static cilist io___247 = { 0, 0, 0, fmt_310, 0 };
+    static cilist io___233 = { 0, 0, 0, fmt_180, 0 };
+    static cilist io___234 = { 0, 0, 0, fmt_190, 0 };
+    static cilist io___235 = { 0, 0, 0, fmt_200, 0 };
+    static cilist io___236 = { 0, 0, 0, fmt_210, 0 };
+    static cilist io___237 = { 0, 0, 0, fmt_220, 0 };
+    static cilist io___238 = { 0, 0, 0, fmt_230, 0 };
+    static cilist io___239 = { 0, 0, 0, fmt_240, 0 };
+    static cilist io___240 = { 0, 0, 0, fmt_250, 0 };
+    static cilist io___241 = { 0, 0, 0, fmt_260, 0 };
+    static cilist io___242 = { 0, 0, 0, fmt_270, 0 };
+    static cilist io___243 = { 0, 0, 0, fmt_280, 0 };
+    static cilist io___244 = { 0, 0, 0, fmt_290, 0 };
+    static cilist io___245 = { 0, 0, 0, fmt_300, 0 };
+    static cilist io___246 = { 0, 0, 0, fmt_310, 0 };
 
 
 
@@ -5569,14 +5570,12 @@ L80:
 	if (abs(energi_1.ec) < 1e10) {
 	    io___232.ciunit = iounit_1.iout;
 	    s_wsfe(&io___232);
-	    do_fio(&c__1, (char *)&label, (ftnlen)sizeof(integer));
 	    do_fio(&c__1, (char *)&energi_1.ec, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.nec, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___234.ciunit = iounit_1.iout;
-	    s_wsfe(&io___234);
-	    do_fio(&c__1, (char *)&label, (ftnlen)sizeof(integer));
+	    io___233.ciunit = iounit_1.iout;
+	    s_wsfe(&io___233);
 	    do_fio(&c__1, (char *)&energi_1.ec, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.nec, (ftnlen)sizeof(integer));
 	    e_wsfe();
@@ -5584,14 +5583,14 @@ L80:
     }
     if (potent_1.use_chgdpl__ && action_1.necd != 0) {
 	if (abs(energi_1.ecd) < 1e10) {
-	    io___235.ciunit = iounit_1.iout;
-	    s_wsfe(&io___235);
+	    io___234.ciunit = iounit_1.iout;
+	    s_wsfe(&io___234);
 	    do_fio(&c__1, (char *)&energi_1.ecd, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.necd, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___236.ciunit = iounit_1.iout;
-	    s_wsfe(&io___236);
+	    io___235.ciunit = iounit_1.iout;
+	    s_wsfe(&io___235);
 	    do_fio(&c__1, (char *)&energi_1.ecd, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.necd, (ftnlen)sizeof(integer));
 	    e_wsfe();
@@ -5599,14 +5598,14 @@ L80:
     }
     if (potent_1.use_dipole__ && action_1.ned != 0) {
 	if (abs(energi_1.ed) < 1e10) {
-	    io___237.ciunit = iounit_1.iout;
-	    s_wsfe(&io___237);
+	    io___236.ciunit = iounit_1.iout;
+	    s_wsfe(&io___236);
 	    do_fio(&c__1, (char *)&energi_1.ed, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.ned, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___238.ciunit = iounit_1.iout;
-	    s_wsfe(&io___238);
+	    io___237.ciunit = iounit_1.iout;
+	    s_wsfe(&io___237);
 	    do_fio(&c__1, (char *)&energi_1.ed, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.ned, (ftnlen)sizeof(integer));
 	    e_wsfe();
@@ -5614,14 +5613,14 @@ L80:
     }
     if (potent_1.use_mpole__ && action_1.nem != 0) {
 	if (abs(energi_1.em) < 1e10) {
-	    io___239.ciunit = iounit_1.iout;
-	    s_wsfe(&io___239);
+	    io___238.ciunit = iounit_1.iout;
+	    s_wsfe(&io___238);
 	    do_fio(&c__1, (char *)&energi_1.em, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.nem, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___240.ciunit = iounit_1.iout;
-	    s_wsfe(&io___240);
+	    io___239.ciunit = iounit_1.iout;
+	    s_wsfe(&io___239);
 	    do_fio(&c__1, (char *)&energi_1.em, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.nem, (ftnlen)sizeof(integer));
 	    e_wsfe();
@@ -5629,50 +5628,50 @@ L80:
     }
     if (potent_1.use_polar__ && action_1.nep != 0) {
 	if (abs(energi_1.ep) < 1e10) {
-	    io___241.ciunit = iounit_1.iout;
-	    s_wsfe(&io___241);
+	    io___240.ciunit = iounit_1.iout;
+	    s_wsfe(&io___240);
 	    do_fio(&c__1, (char *)&energi_1.ep, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.nep, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	} else {
-	    io___242.ciunit = iounit_1.iout;
-	    s_wsfe(&io___242);
+	    io___241.ciunit = iounit_1.iout;
+	    s_wsfe(&io___241);
 	    do_fio(&c__1, (char *)&energi_1.ep, (ftnlen)sizeof(doublereal));
 	    do_fio(&c__1, (char *)&action_1.nep, (ftnlen)sizeof(integer));
 	    e_wsfe();
 	}
     }
     if (potent_1.use_rxnfld__ && action_1.ner != 0) {
-	io___243.ciunit = iounit_1.iout;
-	s_wsfe(&io___243);
+	io___242.ciunit = iounit_1.iout;
+	s_wsfe(&io___242);
 	do_fio(&c__1, (char *)&energi_1.er, (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&action_1.ner, (ftnlen)sizeof(integer));
 	e_wsfe();
     }
     if (potent_1.use_solv__ && action_1.nes != 0) {
-	io___244.ciunit = iounit_1.iout;
-	s_wsfe(&io___244);
+	io___243.ciunit = iounit_1.iout;
+	s_wsfe(&io___243);
 	do_fio(&c__1, (char *)&energi_1.es, (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&action_1.nes, (ftnlen)sizeof(integer));
 	e_wsfe();
     }
     if (potent_1.use_metal__ && action_1.nelf != 0) {
-	io___245.ciunit = iounit_1.iout;
-	s_wsfe(&io___245);
+	io___244.ciunit = iounit_1.iout;
+	s_wsfe(&io___244);
 	do_fio(&c__1, (char *)&energi_1.elf, (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&action_1.nelf, (ftnlen)sizeof(integer));
 	e_wsfe();
     }
     if (potent_1.use_geom__ && action_1.neg != 0) {
-	io___246.ciunit = iounit_1.iout;
-	s_wsfe(&io___246);
+	io___245.ciunit = iounit_1.iout;
+	s_wsfe(&io___245);
 	do_fio(&c__1, (char *)&energi_1.eg, (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&action_1.neg, (ftnlen)sizeof(integer));
 	e_wsfe();
     }
     if (potent_1.use_extra__ && action_1.nex != 0) {
-	io___247.ciunit = iounit_1.iout;
-	s_wsfe(&io___247);
+	io___246.ciunit = iounit_1.iout;
+	s_wsfe(&io___246);
 	do_fio(&c__1, (char *)&energi_1.ex, (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&action_1.nex, (ftnlen)sizeof(integer));
 	e_wsfe();
@@ -5730,15 +5729,15 @@ L80:
 	    moments_(void);
 
     /* Fortran I/O blocks */
-    static cilist io___248 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___249 = { 0, 0, 0, fmt_20, 0 };
-    static cilist io___250 = { 0, 0, 0, fmt_30, 0 };
-    static cilist io___251 = { 0, 0, 0, fmt_40, 0 };
-    static cilist io___252 = { 0, 0, 0, fmt_50, 0 };
-    static cilist io___253 = { 0, 0, 0, fmt_60, 0 };
-    static cilist io___254 = { 0, 0, 0, fmt_70, 0 };
-    static cilist io___256 = { 0, 0, 0, fmt_80, 0 };
-    static cilist io___259 = { 0, 0, 0, fmt_90, 0 };
+    static cilist io___247 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___248 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___249 = { 0, 0, 0, fmt_30, 0 };
+    static cilist io___250 = { 0, 0, 0, fmt_40, 0 };
+    static cilist io___251 = { 0, 0, 0, fmt_50, 0 };
+    static cilist io___252 = { 0, 0, 0, fmt_60, 0 };
+    static cilist io___253 = { 0, 0, 0, fmt_70, 0 };
+    static cilist io___255 = { 0, 0, 0, fmt_80, 0 };
+    static cilist io___258 = { 0, 0, 0, fmt_90, 0 };
 
 
 
@@ -5896,19 +5895,19 @@ L80:
 /*     get the total charge, dipole and quadrupole moments */
 
     moments_();
-    io___248.ciunit = iounit_1.iout;
-    s_wsfe(&io___248);
+    io___247.ciunit = iounit_1.iout;
+    s_wsfe(&io___247);
     do_fio(&c__1, (char *)&moment_1.netchg, (ftnlen)sizeof(doublereal));
     e_wsfe();
-    io___249.ciunit = iounit_1.iout;
-    s_wsfe(&io___249);
+    io___248.ciunit = iounit_1.iout;
+    s_wsfe(&io___248);
     do_fio(&c__1, (char *)&moment_1.netdpl, (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.xdpl, (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.ydpl, (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.zdpl, (ftnlen)sizeof(doublereal));
     e_wsfe();
-    io___250.ciunit = iounit_1.iout;
-    s_wsfe(&io___250);
+    io___249.ciunit = iounit_1.iout;
+    s_wsfe(&io___249);
     do_fio(&c__1, (char *)&moment_1.xxqdp, (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.xyqdp, (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.xzqdp, (ftnlen)sizeof(doublereal));
@@ -5919,24 +5918,24 @@ L80:
     do_fio(&c__1, (char *)&moment_1.zyqdp, (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.zzqdp, (ftnlen)sizeof(doublereal));
     e_wsfe();
-    io___251.ciunit = iounit_1.iout;
-    s_wsfe(&io___251);
+    io___250.ciunit = iounit_1.iout;
+    s_wsfe(&io___250);
     do_fio(&c__1, (char *)&moment_1.netqdp[0], (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.netqdp[1], (ftnlen)sizeof(doublereal));
     do_fio(&c__1, (char *)&moment_1.netqdp[2], (ftnlen)sizeof(doublereal));
     e_wsfe();
     if (chgpot_1.dielec != 1.) {
-	io___252.ciunit = iounit_1.iout;
-	s_wsfe(&io___252);
+	io___251.ciunit = iounit_1.iout;
+	s_wsfe(&io___251);
 	do_fio(&c__1, (char *)&chgpot_1.dielec, (ftnlen)sizeof(doublereal));
 	e_wsfe();
-	io___253.ciunit = iounit_1.iout;
-	s_wsfe(&io___253);
+	io___252.ciunit = iounit_1.iout;
+	s_wsfe(&io___252);
 	d__1 = moment_1.netchg / sqrt(chgpot_1.dielec);
 	do_fio(&c__1, (char *)&d__1, (ftnlen)sizeof(doublereal));
 	e_wsfe();
-	io___254.ciunit = iounit_1.iout;
-	s_wsfe(&io___254);
+	io___253.ciunit = iounit_1.iout;
+	s_wsfe(&io___253);
 	d__1 = moment_1.netdpl / sqrt(chgpot_1.dielec);
 	do_fio(&c__1, (char *)&d__1, (ftnlen)sizeof(doublereal));
 	e_wsfe();
@@ -5945,8 +5944,8 @@ L80:
 /*     get the radius of gyration and moments of inertia */
 
     gyrate_(&rg);
-    io___256.ciunit = iounit_1.iout;
-    s_wsfe(&io___256);
+    io___255.ciunit = iounit_1.iout;
+    s_wsfe(&io___255);
     do_fio(&c__1, (char *)&rg, (ftnlen)sizeof(doublereal));
     e_wsfe();
     inertia_(&c__1);
@@ -5954,8 +5953,8 @@ L80:
 /*     get the internal virial tensor via gradient calculation */
 
     gradient_(&energy, derivs);
-    io___259.ciunit = iounit_1.iout;
-    s_wsfe(&io___259);
+    io___258.ciunit = iounit_1.iout;
+    s_wsfe(&io___258);
     for (i__ = 1; i__ <= 3; ++i__) {
 	do_fio(&c__1, (char *)&vir_ref(1, i__), (ftnlen)sizeof(doublereal));
 	do_fio(&c__1, (char *)&vir_ref(2, i__), (ftnlen)sizeof(doublereal));
@@ -6024,13 +6023,13 @@ L80:
     static integer i__;
 
     /* Fortran I/O blocks */
-    static cilist io___261 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___262 = { 0, 0, 0, fmt_20, 0 };
-    static cilist io___264 = { 0, 0, 0, fmt_30, 0 };
-    static cilist io___265 = { 0, 0, 0, fmt_40, 0 };
-    static cilist io___266 = { 0, 0, 0, fmt_50, 0 };
-    static cilist io___267 = { 0, 0, 0, fmt_60, 0 };
-    static cilist io___268 = { 0, 0, 0, fmt_70, 0 };
+    static cilist io___260 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___261 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___263 = { 0, 0, 0, fmt_30, 0 };
+    static cilist io___264 = { 0, 0, 0, fmt_40, 0 };
+    static cilist io___265 = { 0, 0, 0, fmt_50, 0 };
+    static cilist io___266 = { 0, 0, 0, fmt_60, 0 };
+    static cilist io___267 = { 0, 0, 0, fmt_70, 0 };
 
 
 
@@ -6201,18 +6200,18 @@ L80:
     --active;
 
     /* Function Body */
-    io___261.ciunit = iounit_1.iout;
-    s_wsfe(&io___261);
+    io___260.ciunit = iounit_1.iout;
+    s_wsfe(&io___260);
     e_wsfe();
     if (inform_1.digits >= 8) {
-	io___262.ciunit = iounit_1.iout;
-	s_wsfe(&io___262);
+	io___261.ciunit = iounit_1.iout;
+	s_wsfe(&io___261);
 	e_wsfe();
 	i__1 = atoms_1.n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    if (active[i__]) {
-		io___264.ciunit = iounit_1.iout;
-		s_wsfe(&io___264);
+		io___263.ciunit = iounit_1.iout;
+		s_wsfe(&io___263);
 		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&analyz_1.aeb[i__ - 1], (ftnlen)sizeof(
 			doublereal));
@@ -6266,14 +6265,14 @@ L80:
 	    }
 	}
     } else if (inform_1.digits >= 6) {
-	io___265.ciunit = iounit_1.iout;
-	s_wsfe(&io___265);
+	io___264.ciunit = iounit_1.iout;
+	s_wsfe(&io___264);
 	e_wsfe();
 	i__1 = atoms_1.n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    if (active[i__]) {
-		io___266.ciunit = iounit_1.iout;
-		s_wsfe(&io___266);
+		io___265.ciunit = iounit_1.iout;
+		s_wsfe(&io___265);
 		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&analyz_1.aeb[i__ - 1], (ftnlen)sizeof(
 			doublereal));
@@ -6327,14 +6326,14 @@ L80:
 	    }
 	}
     } else {
-	io___267.ciunit = iounit_1.iout;
-	s_wsfe(&io___267);
+	io___266.ciunit = iounit_1.iout;
+	s_wsfe(&io___266);
 	e_wsfe();
 	i__1 = atoms_1.n;
 	for (i__ = 1; i__ <= i__1; ++i__) {
 	    if (active[i__]) {
-		io___268.ciunit = iounit_1.iout;
-		s_wsfe(&io___268);
+		io___267.ciunit = iounit_1.iout;
+		s_wsfe(&io___267);
 		do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 		do_fio(&c__1, (char *)&analyz_1.aeb[i__ - 1], (ftnlen)sizeof(
 			doublereal));

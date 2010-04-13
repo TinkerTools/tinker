@@ -46,7 +46,8 @@ c
       real*8 y1(maxatm),y2(maxatm)
       real*8 z1(maxatm),z2(maxatm)
       logical header,exist
-      logical query,skip,same
+      logical query,skip
+      logical self,same
       character*1 answer
       character*3 name1(maxatm)
       character*3 name2(maxatm)
@@ -308,13 +309,18 @@ c
       call suffix (file2,'xyz')
       call version (file2,'old')
       if (file1 .eq. file2) then
-         same = .true.
          ifile2 = ifile1
+         self = .true.
+         same = .true.
+         do i = 1, nfit
+            if (ifit(1,i) .ne. ifit(2,i))   same = .false.
+         end do
       else
-         same = .false.
          ifile2 = freeunit ()
          open (unit=ifile2,file=file2,status ='old')
          rewind (unit=ifile2)
+         self = .false.
+         same = .false.
       end if
 c
 c     read initial structure set from the first coordinate file
@@ -417,7 +423,7 @@ c
          end do
          if (abort) then
             abort = .false.
-            if (same) then
+            if (self) then
                rewind (unit=ifile1)
                do i = 1, frame1
                   call readxyz (ifile1)
@@ -451,6 +457,6 @@ c
 c     perform any final tasks before program exit
 c
       close (unit=ifile1)
-      if (.not. same)  close (unit=ifile2)
+      if (.not. self)  close (unit=ifile2)
       call final
       end

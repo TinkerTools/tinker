@@ -1640,7 +1640,7 @@ static doublereal c_b23 = 3.;
 
 /*     increment the polarization solvation derivatives */
 
-			if (potent_1.use_polar__) {
+			if (potent_1.use_mpole__ || potent_1.use_polar__) {
 			    de = solute_1.drbp[i__ - 1] * rb2 * (dlik * t1 + 
 				    duik * t2 + t3) / r__;
 			    dedx = de * xr;
@@ -1776,7 +1776,7 @@ static doublereal c_b23 = 3.;
 
 /*     increment the polarization solvation derivatives */
 
-			if (potent_1.use_polar__) {
+			if (potent_1.use_mpole__ || potent_1.use_polar__) {
 			    de = dbr * solute_1.drbp[i__ - 1];
 			    dedx = de * xr;
 			    dedy = de * yr;

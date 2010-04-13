@@ -835,6 +835,8 @@ L10:
 	if (bound_1.use_bounds__ && molcul_1.molcule[ia - 1] != 
 		molcul_1.molcule[ib - 1]) {
 	    shake_1.ratimage[i__ - 1] = TRUE_;
+	} else if (bound_1.use_polymer__) {
+	    shake_1.ratimage[i__ - 1] = TRUE_;
 	} else {
 	    shake_1.ratimage[i__ - 1] = FALSE_;
 	}

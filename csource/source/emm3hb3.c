@@ -163,7 +163,8 @@ struct {
 	    , epsilon4[1000000]	/* was [1000][1000] */, radhbnd[1000000]	
 	    /* was [1000][1000] */, epshbnd[1000000]	/* was [1000][1000] */
 	    , kred[25000];
-    integer ired[25000], nvdw, ivdw[25000], jvdw[25000];
+    integer ired[25000], nvdw, ivdw[25000], jvdw[25000], nvt, ivt[25000], jvt[
+	    25000];
 } vdw_;
 
 #define vdw_1 vdw_
@@ -334,7 +335,7 @@ static integer c__1 = 1;
     static doublereal p12, xi, yi, rv, zi, xr, yr, zr;
     static integer iv14[25000];
     static doublereal eps, rdn, rik, dot, xia, yia, zia, xib, yib, zib, xic, 
-	    yic, zic, xab, yab, zab, xcb, ycb, zcb, rab, rab2, rcb2, rik2, 
+	    yic, zic, xab, yab, zab, xcb, ycb, zcb, rab2, rab, rcb2, rik2, 
 	    rik3, rik4, rik5;
     static logical huge__;
     static doublereal fgrp, xred[25000], yred[25000], zred[25000];
@@ -918,6 +919,9 @@ static integer c__1 = 1;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 
@@ -2144,6 +2148,9 @@ static integer c__1 = 1;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 
@@ -2607,7 +2614,7 @@ L50:
     static doublereal p12, xi, yi, rv, zi, xr, yr, zr;
     static integer iv14[25000];
     static doublereal eps, rdn, rik, dot, xia, yia, zia, xib, yib, zib, xic, 
-	    yic, zic, xab, yab, zab, xcb, ycb, zcb, rab, rab2, rcb2, rik2, 
+	    yic, zic, xab, yab, zab, xcb, ycb, zcb, rab2, rab, rcb2, rik2, 
 	    rik3, rik4, rik5;
     static logical huge__;
     static doublereal fgrp, xred[25000], yred[25000], zred[25000];
@@ -3192,6 +3199,9 @@ L50:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 

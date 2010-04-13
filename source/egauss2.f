@@ -596,7 +596,7 @@ c     ###############################################################
 c
 c
 c     "egauss2b" calculates the Gaussian expansion van der Waals
-c     second derivatives for stophat potential energy smoothing
+c     second derivatives for use with potential energy smoothing
 c
 c
       subroutine egauss2b (iatom,xred,yred,zred)

@@ -947,7 +947,7 @@ c
 c
 c     "egauss3d" calculates the Gaussian expansion van der Waals
 c     interaction energy and partitions the energy among the atoms
-c     for potential energy smoothing
+c     for use with potential energy smoothing
 c
 c
       subroutine egauss3d

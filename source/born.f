@@ -665,7 +665,7 @@ c
 c
 c     increment the polarization solvation derivatives
 c
-                     if (use_polar) then
+                     if (use_mpole .or. use_polar) then
                         de = drbp(i) * rb2 * (dlik*t1+duik*t2+t3) / r
                         dedx = de * xr
                         dedy = de * yr
@@ -780,7 +780,7 @@ c
 c
 c     increment the polarization solvation derivatives
 c
-                     if (use_polar) then
+                     if (use_mpole .or. use_polar) then
                         de = dbr * drbp(i)
                         dedx = de * xr
                         dedy = de * yr

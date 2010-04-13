@@ -37,7 +37,7 @@ c     only necessary if periodic boundaries are in use
 c
       if (.not. use_bounds)  return
 c
-c     calculate the pressor tensor for anisotropic systems
+c     calculate the stress tensor for anisotropic systems
 c
       factor = prescon / volbox
       do i = 1, 3

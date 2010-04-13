@@ -95,7 +95,8 @@ struct {
 	    , epsilon4[1000000]	/* was [1000][1000] */, radhbnd[1000000]	
 	    /* was [1000][1000] */, epshbnd[1000000]	/* was [1000][1000] */
 	    , kred[25000];
-    integer ired[25000], nvdw, ivdw[25000], jvdw[25000];
+    integer ired[25000], nvdw, ivdw[25000], jvdw[25000], nvt, ivt[25000], jvt[
+	    25000];
 } vdw_;
 
 #define vdw_1 vdw_
@@ -195,7 +196,9 @@ static integer c__2 = 2;
     /* Local variables */
     static integer i__, k, ia, ib;
     static doublereal ep, rd;
-    static char pa[4], pb[4], pt[8];
+    static char pa[4], pb[4];
+    static integer it;
+    static char pt[8];
     static doublereal rdn, srad[5000];
     static integer size;
     static doublereal seps[5000];
@@ -590,6 +593,9 @@ static integer c__2 = 2;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 
@@ -978,6 +984,26 @@ L200:
 	inform_1.abort = TRUE_;
     }
 
+/*     count the number of vdw types and their frequencies */
+
+    vdw_1.nvt = 0;
+    i__1 = atoms_1.n;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	it = vdw_1.jvdw[i__ - 1];
+	i__2 = vdw_1.nvt;
+	for (k = 1; k <= i__2; ++k) {
+	    if (vdw_1.ivt[k - 1] == it) {
+		++vdw_1.jvt[k - 1];
+		goto L220;
+	    }
+	}
+	++vdw_1.nvt;
+	vdw_1.ivt[vdw_1.nvt - 1] = it;
+	vdw_1.jvt[vdw_1.nvt - 1] = 1;
+L220:
+	;
+    }
+
 /*     get the vdw radii and well depths for each atom type */
 
     for (i__ = 1; i__ <= 5000; ++i__) {
@@ -1143,7 +1169,7 @@ L200:
 
     for (i__ = 1; i__ <= 500; ++i__) {
 	if (s_cmp(kvpr_ref(0, i__), blank, (ftnlen)8, (ftnlen)8) == 0) {
-	    goto L220;
+	    goto L230;
 	}
 	ia = number_(kvpr_ref(0, i__), (ftnlen)4);
 	ib = number_(kvpr_ref(4, i__), (ftnlen)4);
@@ -1165,7 +1191,7 @@ L200:
 	epsilon4_ref(ia, ib) = (d__1 = kvdwpr_1.epspr[i__ - 1], abs(d__1));
 	epsilon4_ref(ib, ia) = (d__1 = kvdwpr_1.epspr[i__ - 1], abs(d__1));
     }
-L220:
+L230:
 
 /*     radii and well depths for hydrogen bonding pairs */
 
@@ -1178,7 +1204,7 @@ L220:
 	}
 	for (i__ = 1; i__ <= 500; ++i__) {
 	    if (s_cmp(khb_ref(0, i__), blank, (ftnlen)8, (ftnlen)8) == 0) {
-		goto L230;
+		goto L240;
 	    }
 	    ia = number_(khb_ref(0, i__), (ftnlen)4);
 	    ib = number_(khb_ref(4, i__), (ftnlen)4);
@@ -1196,7 +1222,7 @@ L220:
 	    epshbnd_ref(ia, ib) = (d__1 = khbond_1.epshb[i__ - 1], abs(d__1));
 	    epshbnd_ref(ib, ia) = (d__1 = khbond_1.epshb[i__ - 1], abs(d__1));
 	}
-L230:
+L240:
 	;
     }
 

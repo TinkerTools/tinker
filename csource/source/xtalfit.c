@@ -122,7 +122,8 @@ struct {
 	    , epsilon4[1000000]	/* was [1000][1000] */, radhbnd[1000000]	
 	    /* was [1000][1000] */, epshbnd[1000000]	/* was [1000][1000] */
 	    , kred[25000];
-    integer ired[25000], nvdw, ivdw[25000], jvdw[25000];
+    integer ired[25000], nvdw, ivdw[25000], jvdw[25000], nvt, ivt[25000], jvt[
+	    25000];
 } vdw_;
 
 #define vdw_1 vdw_
@@ -1339,6 +1340,9 @@ L150:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 
@@ -2015,6 +2019,9 @@ L10:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
+/*     nvt        number of distinct van der Waals types in the system */
+/*     ivt        number of each distinct vdw type/class in the system */
+/*     jvt        frequency of each vdw type or class in the system */
 
 
 

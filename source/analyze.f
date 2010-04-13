@@ -1207,21 +1207,21 @@ c
       if (digits .ge. 8) then
          if (abs(energy) .lt. 1.0d10) then
             write (iout,10)  energy
-   10       format (/,' Total Potential Energy :',8x,f20.8,
+   10       format (/,' Total Potential Energy :',4x,f20.8,
      &                    ' Kcal/mole')
          else
             write (iout,20)  energy
-   20       format (/,' Total Potential Energy :',8x,d20.8,
+   20       format (/,' Total Potential Energy :',4x,d20.8,
      &                    ' Kcal/mole')
          end if
       else if (digits .ge. 6) then
          if (abs(energy) .lt. 1.0d10) then
             write (iout,30)  energy
-   30       format (/,' Total Potential Energy :',8x,f18.6,
+   30       format (/,' Total Potential Energy :',6x,f18.6,
      &                    ' Kcal/mole')
          else
             write (iout,40)  energy
-   40       format (/,' Total Potential Energy :',8x,d18.6,
+   40       format (/,' Total Potential Energy :',6x,d18.6,
      &                    ' Kcal/mole')
          end if
       else
@@ -1242,21 +1242,21 @@ c
          if (digits .ge. 8) then
             if (abs(einter) .lt. 1.0d10) then
                write (iout,70)  einter
-   70          format (/,' Intermolecular Energy :',9x,f20.8,
+   70          format (/,' Intermolecular Energy :',5x,f20.8,
      &                       ' Kcal/mole')
             else
                write (iout,80)  einter
-   80          format (/,' Intermolecular Energy :',9x,d20.8,
+   80          format (/,' Intermolecular Energy :',5x,d20.8,
      &                       ' Kcal/mole')
             end if
          else if (digits .ge. 6) then
             if (abs(einter) .lt. 1.0d10) then
                write (iout,90)  einter
-   90          format (/,' Intermolecular Energy :',9x,f18.6,
+   90          format (/,' Intermolecular Energy :',7x,f18.6,
      &                       ' Kcal/mole')
             else
                write (iout,100)  einter
-  100          format (/,' Intermolecular Energy :',9x,d18.6,
+  100          format (/,' Intermolecular Energy :',7x,d18.6,
      &                       ' Kcal/mole')
             end if
          else
@@ -1670,10 +1670,10 @@ c
       end if
       if (use_charge .and. nec.ne.0) then
          if (abs(ec) .lt. 1.0d10) then
-            write (iout,170)  label,ec,nec
+            write (iout,170)  ec,nec
   170       format (' Charge-Charge',15x,f20.8,i15)
          else
-            write (iout,180)  label,ec,nec
+            write (iout,180)  ec,nec
   180       format (' Charge-Charge',15x,d20.8,i15)
          end if
       end if

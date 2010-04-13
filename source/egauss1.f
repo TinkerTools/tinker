@@ -1088,7 +1088,7 @@ c
 c
 c     "egauss1d" calculates the Gaussian expansion van der Waals
 c     interaction energy and its first derivatives for use with
-c     stophat potential energy smoothing
+c     potential energy smoothing
 c
 c
       subroutine egauss1d

@@ -374,7 +374,7 @@ struct {
 	return 0;
     }
 
-/*     calculate the pressor tensor for anisotropic systems */
+/*     calculate the stress tensor for anisotropic systems */
 
     factor = 68568.4112 / boxes_1.volbox;
     for (i__ = 1; i__ <= 3; ++i__) {
