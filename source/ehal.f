@@ -17,7 +17,10 @@ c
 c
       subroutine ehal
       implicit none
+      real*8 elrc
       include 'cutoff.i'
+      include 'energi.i'
+      include 'vdwpot.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -28,6 +31,13 @@ c
          call ehal0c
       else
          call ehal0a
+      end if
+c
+c     apply long range van der Waals correction if desired
+c
+      if (use_vcorr) then
+         call evcorr (elrc)
+         ev = ev + elrc
       end if
       return
       end

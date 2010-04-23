@@ -482,8 +482,8 @@ struct {
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -756,8 +756,8 @@ struct {
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -1059,8 +1059,8 @@ struct {
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 

@@ -156,6 +156,7 @@ g77 -c -O3 -ffast-math eurey.f
 g77 -c -O3 -ffast-math eurey1.f
 g77 -c -O3 -ffast-math eurey2.f
 g77 -c -O3 -ffast-math eurey3.f
+g77 -c -O3 -ffast-math evcorr.f
 g77 -c -O3 -ffast-math extra.f
 g77 -c -O3 -ffast-math extra1.f
 g77 -c -O3 -ffast-math extra2.f

@@ -35,7 +35,8 @@ c
       include 'potent.i'
       include 'vdw.i'
       include 'vdwpot.i'
-      integer i,k,ia,ib,next
+      integer i,k,it
+      integer ia,ib,next
       integer size,number
       real*8 rd,ep,rdn,gik
       real*8 srad(maxtyp)
@@ -270,6 +271,23 @@ c
          abort = .true.
       end if
 c
+c     count the number of vdw types and their frequencies
+c
+      nvt = 0
+      do i = 1, n
+         it = jvdw(i)
+         do k = 1, nvt
+            if (ivt(k) .eq. it) then
+               jvt(k) = jvt(k) + 1
+               goto 220
+            end if
+         end do
+         nvt = nvt + 1
+         ivt(nvt) = it
+         jvt(nvt) = 1
+  220    continue
+      end do
+c
 c     get the vdw radii and well depths for each atom type
 c
       do i = 1, maxtyp
@@ -444,7 +462,7 @@ c
 c     radii and well depths for special atom class pairs
 c
       do i = 1, maxnvp
-         if (kvpr(i) .eq. blank)  goto 220
+         if (kvpr(i) .eq. blank)  goto 230
          ia = number(kvpr(i)(1:4))
          ib = number(kvpr(i)(5:8))
          if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
@@ -459,7 +477,7 @@ c
          epsilon4(ia,ib) = abs(epspr(i))
          epsilon4(ib,ia) = abs(epspr(i))
       end do
-  220 continue
+  230 continue
 c
 c     radii and well depths for hydrogen bonding pairs
 c
@@ -471,7 +489,7 @@ c
             end do
          end do
          do i = 1, maxnhb
-            if (khb(i) .eq. blank)  goto 230
+            if (khb(i) .eq. blank)  goto 240
             ia = number(khb(i)(1:4))
             ib = number(khb(i)(5:8))
             if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
@@ -482,7 +500,7 @@ c
             epshbnd(ia,ib) = abs(epshb(i))
             epshbnd(ib,ia) = abs(epshb(i))
          end do
-  230    continue
+  240    continue
       end if
 c
 c     set coefficients for Gaussian fit to eps=1 and radmin=1

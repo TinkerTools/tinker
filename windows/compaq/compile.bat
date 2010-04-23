@@ -157,6 +157,7 @@ DF /compile_only /optimize /fast eurey.f
 DF /compile_only /optimize /fast eurey1.f
 DF /compile_only /optimize /fast eurey2.f
 DF /compile_only /optimize /fast eurey3.f
+DF /compile_only /optimize /fast evcorr.f
 DF /compile_only /optimize /fast extra.f
 DF /compile_only /optimize /fast extra1.f
 DF /compile_only /optimize /fast extra2.f

@@ -156,6 +156,7 @@ xlf -c -O eurey.f
 xlf -c -O eurey1.f
 xlf -c -O eurey2.f
 xlf -c -O eurey3.f
+xlf -c -O evcorr.f
 xlf -c -O extra.f
 xlf -c -O extra1.f
 xlf -c -O extra2.f

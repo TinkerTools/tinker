@@ -156,6 +156,7 @@ pgf77 -c -g -Ktrap=fp eurey.f
 pgf77 -c -g -Ktrap=fp eurey1.f
 pgf77 -c -g -Ktrap=fp eurey2.f
 pgf77 -c -g -Ktrap=fp eurey3.f
+pgf77 -c -g -Ktrap=fp evcorr.f
 pgf77 -c -g -Ktrap=fp extra.f
 pgf77 -c -g -Ktrap=fp extra1.f
 pgf77 -c -g -Ktrap=fp extra2.f

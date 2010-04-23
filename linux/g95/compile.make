@@ -156,6 +156,7 @@ g95 -c -O eurey.f
 g95 -c -O eurey1.f
 g95 -c -O eurey2.f
 g95 -c -O eurey3.f
+g95 -c -O evcorr.f
 g95 -c -O extra.f
 g95 -c -O extra1.f
 g95 -c -O extra2.f

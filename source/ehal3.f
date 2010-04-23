@@ -18,7 +18,16 @@ c
 c
       subroutine ehal3
       implicit none
+      integer i
+      real*8 elrc,aelrc
+      include 'sizes.i'
+      include 'analyz.i'
+      include 'atoms.i'
       include 'cutoff.i'
+      include 'energi.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'vdwpot.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -29,6 +38,21 @@ c
          call ehal3c
       else
          call ehal3a
+      end if
+c
+c     apply long range van der Waals correction if desired
+c
+      if (use_vcorr) then
+         call evcorr (elrc)
+         ev = ev + elrc
+         aelrc = elrc / dble(n)
+         do i = 1, n
+            aev(i) = aev(i) + aelrc
+         end do
+         if (verbose .and. elrc.ne.0.0d0) then
+            write (iout,10)  elrc
+   10       format (/,' Long Range vdw Correction :',9x,f12.4)
+         end if
       end if
       return
       end

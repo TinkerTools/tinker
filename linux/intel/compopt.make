@@ -156,6 +156,7 @@ ifort -c -fast -w eurey.f
 ifort -c -fast -w eurey1.f
 ifort -c -fast -w eurey2.f
 ifort -c -fast -w eurey3.f
+ifort -c -fast -w evcorr.f
 ifort -c -fast -w extra.f
 ifort -c -fast -w extra1.f
 ifort -c -fast -w extra2.f

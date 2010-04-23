@@ -156,6 +156,7 @@ f77 -c -fast -arch generic -tune generic eurey.f
 f77 -c -fast -arch generic -tune generic eurey1.f
 f77 -c -fast -arch generic -tune generic eurey2.f
 f77 -c -fast -arch generic -tune generic eurey3.f
+f77 -c -fast -arch generic -tune generic evcorr.f
 f77 -c -fast -arch generic -tune generic extra.f
 f77 -c -fast -arch generic -tune generic extra1.f
 f77 -c -fast -arch generic -tune generic extra2.f

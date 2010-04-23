@@ -15,6 +15,23 @@
 /* Common Block Declarations */
 
 struct {
+    doublereal aesum[25000], aeb[25000], aea[25000], aeba[25000], aeub[25000],
+	     aeaa[25000], aeopb[25000], aeopd[25000], aeid[25000], aeit[25000]
+	    , aet[25000], aept[25000], aebt[25000], aett[25000], aev[25000], 
+	    aec[25000], aecd[25000], aed[25000], aem[25000], aep[25000], aer[
+	    25000], aes[25000], aelf[25000], aeg[25000], aex[25000];
+} analyz_;
+
+#define analyz_1 analyz_
+
+struct {
+    doublereal x[25000], y[25000], z__[25000];
+    integer n, type__[25000];
+} atoms_;
+
+#define atoms_1 atoms_
+
+struct {
     doublereal vdwcut, chgcut, dplcut, mpolecut, vdwtaper, chgtaper, dpltaper,
 	     mpoletaper, ewaldcut;
     logical use_ewald__, use_lights__, use_list__, use_vlist__, use_clist__, 
@@ -24,22 +41,43 @@ struct {
 #define cutoff_1 cutoff_
 
 struct {
+    doublereal esum, eb, ea, eba, eub, eaa, eopb, eopd, eid, eit, et, ept, 
+	    ebt, ett, ev, ec, ecd, ed, em, ep, er, es, elf, eg, ex;
+} energi_;
+
+#define energi_1 energi_
+
+struct {
+    integer digits, iprint, iwrite, isend;
+    logical verbose, debug, holdup, abort;
+} inform_;
+
+#define inform_1 inform_
+
+struct {
+    integer iout, input;
+} iounit_;
+
+#define iounit_1 iounit_
+
+struct {
+    doublereal abuck, bbuck, cbuck, ghal, dhal, v2scale, v3scale, v4scale, 
+	    v5scale, igauss[20]	/* was [2][10] */;
+    integer ngauss;
+    logical use_vcorr__;
+    char vdwindex[5], vdwtyp[13], radtyp[5], radsiz[8], radrule[10], epsrule[
+	    10], gausstyp[8];
+} vdwpot_;
+
+#define vdwpot_1 vdwpot_
+
+struct {
     integer neb, nea, neba, neub, neaa, neopb, neopd, neid, neit, net, nept, 
 	    nebt, nett, nev, nec, necd, ned, nem, nep, new__, ner, nes, nelf, 
 	    neg, nex;
 } action_;
 
 #define action_1 action_
-
-struct {
-    doublereal aesum[25000], aeb[25000], aea[25000], aeba[25000], aeub[25000],
-	     aeaa[25000], aeopb[25000], aeopd[25000], aeid[25000], aeit[25000]
-	    , aet[25000], aept[25000], aebt[25000], aett[25000], aev[25000], 
-	    aec[25000], aecd[25000], aed[25000], aem[25000], aep[25000], aer[
-	    25000], aes[25000], aelf[25000], aeg[25000], aex[25000];
-} analyz_;
-
-#define analyz_1 analyz_
 
 struct {
     integer bndlist[200000]	/* was [8][25000] */, anglist[700000]	/* 
@@ -55,13 +93,6 @@ struct {
 } atmtyp_;
 
 #define atmtyp_1 atmtyp_
-
-struct {
-    doublereal x[25000], y[25000], z__[25000];
-    integer n, type__[25000];
-} atoms_;
-
-#define atoms_1 atoms_
 
 struct {
     doublereal bk[50000], bl[50000];
@@ -101,13 +132,6 @@ struct {
 #define couple_1 couple_
 
 struct {
-    doublereal esum, eb, ea, eba, eub, eaa, eopb, eopd, eid, eit, et, ept, 
-	    ebt, ett, ev, ec, ecd, ed, em, ep, er, es, elf, eg, ex;
-} energi_;
-
-#define energi_1 energi_
-
-struct {
     doublereal grpmass[1000], wgrp[1002001]	/* was [1001][1001] */;
     integer ngrp, kgrp[25000], igrp[2002]	/* was [2][1001] */, grplist[
 	    25000];
@@ -117,23 +141,10 @@ struct {
 #define group_1 group_
 
 struct {
-    integer digits, iprint, iwrite, isend;
-    logical verbose, debug, holdup, abort;
-} inform_;
-
-#define inform_1 inform_
-
-struct {
     doublereal einter;
 } inter_;
 
 #define inter_1 inter_
-
-struct {
-    integer iout, input;
-} iounit_;
-
-#define iounit_1 iounit_
 
 struct {
     doublereal molmass[25000], totmass;
@@ -170,16 +181,6 @@ struct {
 #define vdw_1 vdw_
 
 struct {
-    doublereal abuck, bbuck, cbuck, ghal, dhal, v2scale, v3scale, v4scale, 
-	    v5scale, igauss[20]	/* was [2][10] */;
-    integer ngauss;
-    char vdwindex[5], vdwtyp[13], radtyp[5], radsiz[8], radrule[10], epsrule[
-	    10], gausstyp[8];
-} vdwpot_;
-
-#define vdwpot_1 vdwpot_
-
-struct {
     doublereal xbox, ybox, zbox, alpha, beta, gamma, xbox2, ybox2, zbox2, 
 	    box34, lvec[9]	/* was [3][3] */, recip[9]	/* was [3][3] 
 	    */, volbox, beta_sin__, beta_cos__, gamma_sin__, gamma_cos__, 
@@ -209,8 +210,8 @@ struct {
 
 /* Table of constant values */
 
-static integer c__0 = 0;
 static integer c__1 = 1;
+static integer c__0 = 0;
 
 
 
@@ -243,12 +244,143 @@ static integer c__1 = 1;
 
 /* Subroutine */ int emm3hb3_(void)
 {
-    extern /* Subroutine */ int emm3hb3a_(void), emm3hb3b_(void), emm3hb3c_(
-	    void);
+    /* Format strings */
+    static char fmt_10[] = "(/,\002 Long Range vdw Correction :\002,9x,f12.4)"
+	    ;
+
+    /* System generated locals */
+    integer i__1;
+
+    /* Builtin functions */
+    integer s_wsfe(cilist *), do_fio(integer *, char *, ftnlen), e_wsfe(void);
+
+    /* Local variables */
+    static integer i__;
+    static doublereal elrc, aelrc;
+    extern /* Subroutine */ int evcorr_(doublereal *), emm3hb3a_(void), 
+	    emm3hb3b_(void), emm3hb3c_(void);
+
+    /* Fortran I/O blocks */
+    static cilist io___4 = { 0, 0, 0, fmt_10, 0 };
 
 
 
-/*     choose the method for summing over pairwise interactions */
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################# */
+/*     ##                                                         ## */
+/*     ##  sizes.i  --  parameter values to set array dimensions  ## */
+/*     ##                                                         ## */
+/*     ############################################################# */
+
+
+/*     "sizes.i" sets values for critical array dimensions used */
+/*     throughout the software; these parameters will fix the size */
+/*     of the largest systems that can be handled; values too large */
+/*     for the computer's memory and/or swap space to accomodate */
+/*     will result in poor performance or outright failure */
+
+/*     parameter:      maximum allowed number of: */
+
+/*     maxatm          atoms in the molecular system */
+/*     maxval          atoms directly bonded to an atom */
+/*     maxgrp          user-defined groups of atoms */
+/*     maxref          stored reference molecular systems */
+/*     maxtyp          force field atom type definitions */
+/*     maxclass        force field atom class definitions */
+/*     maxprm          lines in the parameter file */
+/*     maxkey          lines in the keyword file */
+/*     maxrot          bonds for torsional rotation */
+/*     maxvar          optimization variables (vector storage) */
+/*     maxopt          optimization variables (matrix storage) */
+/*     maxhess         off-diagonal Hessian elements */
+/*     maxlight        sites for method of lights neighbors */
+/*     maxvlst         atom neighbors in van der Waals pair list */
+/*     maxelst         atom neighbors in electrostatics pair list */
+/*     maxfft          grid points in each FFT dimension */
+/*     maxfix          geometric constraints and restraints */
+/*     maxvib          vibrational frequencies */
+/*     maxgeo          distance geometry points */
+/*     maxcell         unit cells in replicated crystal */
+/*     maxring         3-, 4-, or 5-membered rings */
+/*     maxbio          biopolymer atom definitions */
+/*     maxres          residues in the macromolecule */
+/*     maxamino        amino acid residue types */
+/*     maxnuc          nucleic acid residue types */
+/*     maxbnd          covalent bonds in molecular system */
+/*     maxang          bond angles in molecular system */
+/*     maxtors         torsional angles in molecular system */
+/*     maxbitor        bitorsions in molecular system */
+/*     maxpi           atoms in conjugated pisystem */
+/*     maxpib          covalent bonds involving pisystem */
+/*     maxpit          torsional angles involving pisystem */
+
+
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################## */
+/*     ##                                                          ## */
+/*     ##  analyz.i  --  energy components partitioned over atoms  ## */
+/*     ##                                                          ## */
+/*     ############################################################## */
+
+
+/*     aesum   total potential energy partitioned over atoms */
+/*     aeb     bond stretch energy partitioned over atoms */
+/*     aea     angle bend energy partitioned over atoms */
+/*     aeba    stretch-bend energy partitioned over atoms */
+/*     aeub    Urey-Bradley energy partitioned over atoms */
+/*     aeaa    angle-angle energy partitioned over atoms */
+/*     aeopb   out-of-plane bend energy partitioned over atoms */
+/*     aeopd   out-of-plane distance energy partitioned over atoms */
+/*     aeid    improper dihedral energy partitioned over atoms */
+/*     aeit    improper torsion energy partitioned over atoms */
+/*     aet     torsional energy partitioned over atoms */
+/*     aept    pi-orbital torsion energy partitioned over atoms */
+/*     aebt    stretch-torsion energy partitioned over atoms */
+/*     aett    torsion-torsion energy partitioned over atoms */
+/*     aev     van der Waals energy partitioned over atoms */
+/*     aec     charge-charge energy partitioned over atoms */
+/*     aecd    charge-dipole energy partitioned over atoms */
+/*     aed     dipole-dipole energy partitioned over atoms */
+/*     aem     multipole energy partitioned over atoms */
+/*     aep     polarization energy partitioned over atoms */
+/*     aer     reaction field energy partitioned over atoms */
+/*     aes     solvation energy partitioned over atoms */
+/*     aelf    metal ligand field energy partitioned over atoms */
+/*     aeg     geometric restraint energy partitioned over atoms */
+/*     aex     extra energy term partitioned over atoms */
+
+
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################### */
+/*     ##                                                           ## */
+/*     ##  atoms.i  --  number, position and type of current atoms  ## */
+/*     ##                                                           ## */
+/*     ############################################################### */
+
+
+/*     x       current x-coordinate for each atom in the system */
+/*     y       current y-coordinate for each atom in the system */
+/*     z       current z-coordinate for each atom in the system */
+/*     n       total number of atoms in the current system */
+/*     type    atom type number for each atom in the system */
+
 
 
 
@@ -281,12 +413,152 @@ static integer c__1 = 1;
 /*     use_mlist   logical flag governing use of multipole neighbor lists */
 
 
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################ */
+/*     ##                                                        ## */
+/*     ##  energi.i  --  individual potential energy components  ## */
+/*     ##                                                        ## */
+/*     ############################################################ */
+
+
+/*     esum   total potential energy of the system */
+/*     eb     bond stretch potential energy of the system */
+/*     ea     angle bend potential energy of the system */
+/*     eba    stretch-bend potential energy of the system */
+/*     eub    Urey-Bradley potential energy of the system */
+/*     eaa    angle-angle potential energy of the system */
+/*     eopb   out-of-plane bend potential energy of the system */
+/*     eopd   out-of-plane distance potential energy of the system */
+/*     eid    improper dihedral potential energy of the system */
+/*     eit    improper torsion potential energy of the system */
+/*     et     torsional potential energy of the system */
+/*     ept    pi-orbital torsion potential energy of the system */
+/*     ebt    stretch-torsion potential energy of the system */
+/*     ett    torsion-torsion potential energy of the system */
+/*     ev     van der Waals potential energy of the system */
+/*     ec     charge-charge potential energy of the system */
+/*     ecd    charge-dipole potential energy of the system */
+/*     ed     dipole-dipole potential energy of the system */
+/*     em     atomic multipole potential energy of the system */
+/*     ep     polarization potential energy of the system */
+/*     er     reaction field potential energy of the system */
+/*     es     solvation potential energy of the system */
+/*     elf    metal ligand field potential energy of the system */
+/*     eg     geometric restraint potential energy of the system */
+/*     ex     extra term potential energy of the system */
+
+
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################# */
+/*     ##                                                         ## */
+/*     ##  inform.i  --  control values for I/O and program flow  ## */
+/*     ##                                                         ## */
+/*     ############################################################# */
+
+
+/*     digits    decimal places output for energy and coordinates */
+/*     iprint    steps between status printing (0=no printing) */
+/*     iwrite    steps between coordinate dumps (0=no dumps) */
+/*     isend     steps between socket communication (0=no sockets) */
+/*     verbose   logical flag to turn on extra information */
+/*     debug     logical flag to turn on full debug printing */
+/*     holdup    logical flag to wait for carriage return on exit */
+/*     abort     logical flag to stop execution at next chance */
+
+
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################# */
+/*     ##                                                         ## */
+/*     ##  iounit.i  --  Fortran input/output (I/O) unit numbers  ## */
+/*     ##                                                         ## */
+/*     ############################################################# */
+
+
+/*     iout    Fortran I/O unit for main output (default=6) */
+/*     input   Fortran I/O unit for main input (default=5) */
+
+
+
+
+/*     choose the method for summing over pairwise interactions */
+
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ################################################################ */
+/*     ##                                                            ## */
+/*     ##  vdwpot.i  --  specifics of van der Waals functional form  ## */
+/*     ##                                                            ## */
+/*     ################################################################ */
+
+
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
+
+
     if (cutoff_1.use_lights__) {
 	emm3hb3b_();
     } else if (cutoff_1.use_vlist__) {
 	emm3hb3c_();
     } else {
 	emm3hb3a_();
+    }
+
+/*     apply long range van der Waals correction if desired */
+
+    if (vdwpot_1.use_vcorr__) {
+	evcorr_(&elrc);
+	energi_1.ev += elrc;
+	aelrc = elrc / (doublereal) atoms_1.n;
+	i__1 = atoms_1.n;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    analyz_1.aev[i__ - 1] += aelrc;
+	}
+	if (inform_1.verbose && elrc != 0.) {
+	    io___4.ciunit = iounit_1.iout;
+	    s_wsfe(&io___4);
+	    do_fio(&c__1, (char *)&elrc, (ftnlen)sizeof(doublereal));
+	    e_wsfe();
+	}
     }
     return 0;
 } /* emm3hb3_ */
@@ -356,10 +628,10 @@ static integer c__1 = 1;
     static doublereal expterm;
 
     /* Fortran I/O blocks */
-    static cilist io___70 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___71 = { 0, 0, 0, fmt_20, 0 };
-    static cilist io___72 = { 0, 0, 0, fmt_30, 0 };
-    static cilist io___73 = { 0, 0, 0, fmt_40, 0 };
+    static cilist io___74 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___75 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___76 = { 0, 0, 0, fmt_30, 0 };
+    static cilist io___77 = { 0, 0, 0, fmt_40, 0 };
 
 
 
@@ -919,8 +1191,8 @@ static integer c__1 = 1;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -938,24 +1210,25 @@ static integer c__1 = 1;
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 
@@ -1171,12 +1444,12 @@ static integer c__1 = 1;
 			    huge__) {
 			if (header) {
 			    header = FALSE_;
-			    io___70.ciunit = iounit_1.iout;
-			    s_wsfe(&io___70);
+			    io___74.ciunit = iounit_1.iout;
+			    s_wsfe(&io___74);
 			    e_wsfe();
 			}
-			io___71.ciunit = iounit_1.iout;
-			s_wsfe(&io___71);
+			io___75.ciunit = iounit_1.iout;
+			s_wsfe(&io___75);
 			do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 			do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -1390,12 +1663,12 @@ static integer c__1 = 1;
 				huge__) {
 			    if (header) {
 				header = FALSE_;
-				io___72.ciunit = iounit_1.iout;
-				s_wsfe(&io___72);
+				io___76.ciunit = iounit_1.iout;
+				s_wsfe(&io___76);
 				e_wsfe();
 			    }
-			    io___73.ciunit = iounit_1.iout;
-			    s_wsfe(&io___73);
+			    io___77.ciunit = iounit_1.iout;
+			    s_wsfe(&io___77);
 			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
@@ -1517,9 +1790,9 @@ static integer c__1 = 1;
     static doublereal expterm;
 
     /* Fortran I/O blocks */
-    static cilist io___152 = { 0, 0, 0, fmt_20, 0 };
-    static cilist io___153 = { 0, 0, 0, fmt_30, 0 };
-    static cilist io___154 = { 0, 0, 0, fmt_40, 0 };
+    static cilist io___156 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___157 = { 0, 0, 0, fmt_30, 0 };
+    static cilist io___158 = { 0, 0, 0, fmt_40, 0 };
 
 
 
@@ -2148,8 +2421,8 @@ static integer c__1 = 1;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -2167,24 +2440,25 @@ static integer c__1 = 1;
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 
@@ -2487,13 +2761,13 @@ L10:
 			    huge__) {
 			if (header) {
 			    header = FALSE_;
-			    io___152.ciunit = iounit_1.iout;
-			    s_wsfe(&io___152);
+			    io___156.ciunit = iounit_1.iout;
+			    s_wsfe(&io___156);
 			    e_wsfe();
 			}
 			if (prime) {
-			    io___153.ciunit = iounit_1.iout;
-			    s_wsfe(&io___153);
+			    io___157.ciunit = iounit_1.iout;
+			    s_wsfe(&io___157);
 			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
@@ -2509,8 +2783,8 @@ L10:
 				    doublereal));
 			    e_wsfe();
 			} else {
-			    io___154.ciunit = iounit_1.iout;
-			    s_wsfe(&io___154);
+			    io___158.ciunit = iounit_1.iout;
+			    s_wsfe(&io___158);
 			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
@@ -2633,8 +2907,8 @@ L50:
     static doublereal expterm;
 
     /* Fortran I/O blocks */
-    static cilist io___224 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___225 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___228 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___229 = { 0, 0, 0, fmt_20, 0 };
 
 
 
@@ -3199,8 +3473,8 @@ L50:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -3218,24 +3492,25 @@ L50:
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 
@@ -3448,12 +3723,12 @@ L50:
 			    huge__) {
 			if (header) {
 			    header = FALSE_;
-			    io___224.ciunit = iounit_1.iout;
-			    s_wsfe(&io___224);
+			    io___228.ciunit = iounit_1.iout;
+			    s_wsfe(&io___228);
 			    e_wsfe();
 			}
-			io___225.ciunit = iounit_1.iout;
-			s_wsfe(&io___225);
+			io___229.ciunit = iounit_1.iout;
+			s_wsfe(&io___229);
 			do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 			do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));

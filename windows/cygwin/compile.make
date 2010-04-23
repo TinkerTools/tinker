@@ -156,6 +156,7 @@ g77 -c -O3 -ffast-math -mno-cygwin eurey.f
 g77 -c -O3 -ffast-math -mno-cygwin eurey1.f
 g77 -c -O3 -ffast-math -mno-cygwin eurey2.f
 g77 -c -O3 -ffast-math -mno-cygwin eurey3.f
+g77 -c -O3 -ffast-math -mno-cygwin evcorr.f
 g77 -c -O3 -ffast-math -mno-cygwin extra.f
 g77 -c -O3 -ffast-math -mno-cygwin extra1.f
 g77 -c -O3 -ffast-math -mno-cygwin extra2.f

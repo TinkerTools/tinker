@@ -18,8 +18,12 @@ c
 c
       subroutine elj1
       implicit none
+      real*8 elrc,vlrc
       include 'sizes.i'
       include 'cutoff.i'
+      include 'energi.i'
+      include 'vdwpot.i'
+      include 'virial.i'
       include 'warp.i'
 c
 c
@@ -35,6 +39,16 @@ c
          call elj1b
       else
          call elj1a
+      end if
+c
+c     apply long range van der Waals correction if desired
+c
+      if (use_vcorr) then
+         call evcorr1 (elrc,vlrc)
+         ev = ev + elrc
+         vir(1,1) = vir(1,1) + vlrc
+         vir(2,2) = vir(2,2) + vlrc
+         vir(3,3) = vir(3,3) + vlrc
       end if
       return
       end
@@ -184,8 +198,8 @@ c
                   rik = sqrt(rik2)
                   p6 = rv**6 / rik2**3
                   p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
-                  de = eps * (p12 - p6) * (-12.0d0/rik)
+                  e = eps * (p12-2.0d0*p6)
+                  de = eps * (p12-p6) * (-12.0d0/rik)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -359,8 +373,8 @@ c
                      rik = sqrt(rik2)
                      p6 = rv**6 / rik2**3
                      p12 = p6 * p6
-                     e = eps * (p12 - 2.0d0*p6)
-                     de = eps * (p12 - p6) * (-12.0d0/rik)
+                     e = eps * (p12-2.0d0*p6)
+                     de = eps * (p12-p6) * (-12.0d0/rik)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -673,8 +687,8 @@ c
                   rik = sqrt(rik2)
                   p6 = rv**6 / rik2**3
                   p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
-                  de = eps * (p12 - p6) * (-12.0d0/rik)
+                  e = eps * (p12-2.0d0*p6)
+                  de = eps * (p12-p6) * (-12.0d0/rik)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -931,8 +945,8 @@ c
                   rik = sqrt(rik2)
                   p6 = rv**6 / rik2**3
                   p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
-                  de = eps * (p12 - p6) * (-12.0d0/rik)
+                  e = eps * (p12-2.0d0*p6)
+                  de = eps * (p12-p6) * (-12.0d0/rik)
 c
 c     use energy switching if near the cutoff distance
 c

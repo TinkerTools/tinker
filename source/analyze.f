@@ -139,8 +139,6 @@ c     setup to write out the large individual energy terms
 c
       if (dolarge) then
          verbose = .true.
-      else
-         verbose = .false.
       end if
 c
 c     setup to write out all of the individual energy terms
@@ -148,6 +146,7 @@ c
       if (dodetail) then
          doenergy = .true.
          debug = .true.
+         verbose = .true.
       else
          debug = .false.
       end if

@@ -157,6 +157,7 @@ ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey.f
 ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey1.f
 ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey2.f
 ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey3.f
+ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 evcorr.f
 ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra.f
 ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra1.f
 ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra2.f

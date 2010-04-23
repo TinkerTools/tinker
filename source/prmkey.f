@@ -296,6 +296,8 @@ c
       else if (keyword(1:13) .eq. 'VDW-15-SCALE ') then
          read (string,*,err=10,end=10)  v5scale
          if (v5scale .gt. 1.0d0)  v5scale = 1.0d0 / v5scale
+      else if (keyword(1:15) .eq. 'VDW-CORRECTION ') then
+         use_vcorr = .true.
 c
 c     set control parameters for charge-charge potentials
 c
@@ -305,10 +307,6 @@ c
          read (string,*,err=10,end=10)  dielec
       else if (keyword(1:11) .eq. 'CHG-BUFFER ') then
          read (string,*,err=10,end=10)  ebuffer
-      else if (keyword(1:15) .eq. 'NEUTRAL-GROUPS ') then
-         neutcut = .true.
-      else if (keyword(1:16) .eq. 'NEIGHBOR-GROUPS ') then
-         neutnbr = .true.
       else if (keyword(1:13) .eq. 'CHG-12-SCALE ') then
          read (string,*,err=10,end=10)  c2scale
          if (c2scale .gt. 1.0d0)  c2scale = 1.0d0 / c2scale
@@ -321,6 +319,10 @@ c
       else if (keyword(1:13) .eq. 'CHG-15-SCALE ') then
          read (string,*,err=10,end=10)  c5scale
          if (c5scale .gt. 1.0d0)  c5scale = 1.0d0 / c5scale
+      else if (keyword(1:16) .eq. 'NEIGHBOR-GROUPS ') then
+         neutnbr = .true.
+      else if (keyword(1:15) .eq. 'NEUTRAL-GROUPS ') then
+         neutcut = .true.
 c
 c     set control parameters for atomic multipole potentials
 c

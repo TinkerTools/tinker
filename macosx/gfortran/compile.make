@@ -156,6 +156,7 @@ gfortran -c -O3 eurey.f
 gfortran -c -O3 eurey1.f
 gfortran -c -O3 eurey2.f
 gfortran -c -O3 eurey3.f
+gfortran -c -O3 evcorr.f
 gfortran -c -O3 extra.f
 gfortran -c -O3 extra1.f
 gfortran -c -O3 extra2.f

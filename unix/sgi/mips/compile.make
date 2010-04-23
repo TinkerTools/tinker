@@ -156,6 +156,7 @@ f77 -c -O -mips4 eurey.f
 f77 -c -O -mips4 eurey1.f
 f77 -c -O -mips4 eurey2.f
 f77 -c -O -mips4 eurey3.f
+f77 -c -O -mips4 evcorr.f
 f77 -c -O -mips4 extra.f
 f77 -c -O -mips4 extra1.f
 f77 -c -O -mips4 extra2.f

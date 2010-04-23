@@ -135,11 +135,13 @@ c
 c     print the components for generalized Kirkwood solvation
 c
       if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
-         write (iout,30)  ecav,edisp,es-ecav-edisp
-   30    format (/,' Continuum Solvation Energy Components :'
-     &           //,' Cavitation',26x,f12.4,
-     &           /,' Dispersion',26x,f12.4,
-     &           /,' Electrostatic',23x,f12.4)
+         if (verbose) then
+            write (iout,30)  ecav,edisp,es-ecav-edisp
+   30       format (/,' Continuum Solvation Energy Components :'
+     &              //,' Cavitation',26x,f12.4,
+     &              /,' Dispersion',26x,f12.4,
+     &              /,' Electrostatic',23x,f12.4)
+         end if
       end if
       return
       end

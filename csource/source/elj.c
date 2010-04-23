@@ -24,6 +24,24 @@ struct {
 #define cutoff_1 cutoff_
 
 struct {
+    doublereal esum, eb, ea, eba, eub, eaa, eopb, eopd, eid, eit, et, ept, 
+	    ebt, ett, ev, ec, ecd, ed, em, ep, er, es, elf, eg, ex;
+} energi_;
+
+#define energi_1 energi_
+
+struct {
+    doublereal abuck, bbuck, cbuck, ghal, dhal, v2scale, v3scale, v4scale, 
+	    v5scale, igauss[20]	/* was [2][10] */;
+    integer ngauss;
+    logical use_vcorr__;
+    char vdwindex[5], vdwtyp[13], radtyp[5], radsiz[8], radrule[10], epsrule[
+	    10], gausstyp[8];
+} vdwpot_;
+
+#define vdwpot_1 vdwpot_
+
+struct {
     doublereal m2[25000], deform, difft, diffv, diffc;
     logical use_smooth__, use_dem__, use_gda__, use_tophat__, use_stophat__;
 } warp_;
@@ -69,13 +87,6 @@ struct {
 #define couple_1 couple_
 
 struct {
-    doublereal esum, eb, ea, eba, eub, eaa, eopb, eopd, eid, eit, et, ept, 
-	    ebt, ett, ev, ec, ecd, ed, em, ep, er, es, elf, eg, ex;
-} energi_;
-
-#define energi_1 energi_
-
-struct {
     doublereal grpmass[1000], wgrp[1002001]	/* was [1001][1001] */;
     integer ngrp, kgrp[25000], igrp[2002]	/* was [2][1001] */, grplist[
 	    25000];
@@ -109,16 +120,6 @@ struct {
 } vdw_;
 
 #define vdw_1 vdw_
-
-struct {
-    doublereal abuck, bbuck, cbuck, ghal, dhal, v2scale, v3scale, v4scale, 
-	    v5scale, igauss[20]	/* was [2][10] */;
-    integer ngauss;
-    char vdwindex[5], vdwtyp[13], radtyp[5], radsiz[8], radrule[10], epsrule[
-	    10], gausstyp[8];
-} vdwpot_;
-
-#define vdwpot_1 vdwpot_
 
 struct {
     doublereal xbox, ybox, zbox, alpha, beta, gamma, xbox2, ybox2, zbox2, 
@@ -171,8 +172,9 @@ static integer c__0 = 0;
 
 /* Subroutine */ int elj_(void)
 {
+    static doublereal elrc;
     extern /* Subroutine */ int elj0a_(void), elj0b_(void), elj0c_(void), 
-	    elj0d_(void), elj0e_(void);
+	    elj0d_(void), elj0e_(void), evcorr_(doublereal *);
 
 
 
@@ -263,6 +265,82 @@ static integer c__0 = 0;
 
 
 
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ############################################################ */
+/*     ##                                                        ## */
+/*     ##  energi.i  --  individual potential energy components  ## */
+/*     ##                                                        ## */
+/*     ############################################################ */
+
+
+/*     esum   total potential energy of the system */
+/*     eb     bond stretch potential energy of the system */
+/*     ea     angle bend potential energy of the system */
+/*     eba    stretch-bend potential energy of the system */
+/*     eub    Urey-Bradley potential energy of the system */
+/*     eaa    angle-angle potential energy of the system */
+/*     eopb   out-of-plane bend potential energy of the system */
+/*     eopd   out-of-plane distance potential energy of the system */
+/*     eid    improper dihedral potential energy of the system */
+/*     eit    improper torsion potential energy of the system */
+/*     et     torsional potential energy of the system */
+/*     ept    pi-orbital torsion potential energy of the system */
+/*     ebt    stretch-torsion potential energy of the system */
+/*     ett    torsion-torsion potential energy of the system */
+/*     ev     van der Waals potential energy of the system */
+/*     ec     charge-charge potential energy of the system */
+/*     ecd    charge-dipole potential energy of the system */
+/*     ed     dipole-dipole potential energy of the system */
+/*     em     atomic multipole potential energy of the system */
+/*     ep     polarization potential energy of the system */
+/*     er     reaction field potential energy of the system */
+/*     es     solvation potential energy of the system */
+/*     elf    metal ligand field potential energy of the system */
+/*     eg     geometric restraint potential energy of the system */
+/*     ex     extra term potential energy of the system */
+
+
+
+
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ################################################################ */
+/*     ##                                                            ## */
+/*     ##  vdwpot.i  --  specifics of van der Waals functional form  ## */
+/*     ##                                                            ## */
+/*     ################################################################ */
+
+
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
+
+
+
+
 /*     choose the method for summing over pairwise interactions */
 
 
@@ -301,6 +379,13 @@ static integer c__0 = 0;
 	elj0b_();
     } else {
 	elj0a_();
+    }
+
+/*     apply long range van der Waals correction if desired */
+
+    if (vdwpot_1.use_vcorr__) {
+	evcorr_(&elrc);
+	energi_1.ev += elrc;
     }
     return 0;
 } /* elj_ */
@@ -675,8 +760,8 @@ static integer c__0 = 0;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -694,24 +779,25 @@ static integer c__0 = 0;
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 
@@ -1461,8 +1547,8 @@ static integer c__0 = 0;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -1480,24 +1566,25 @@ static integer c__0 = 0;
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 
@@ -2116,8 +2203,8 @@ L20:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -2135,24 +2222,25 @@ L20:
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 
@@ -2382,24 +2470,25 @@ L20:
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
     vdwpot_1.ngauss = 2;
@@ -2703,8 +2792,8 @@ L20:
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -2722,24 +2811,25 @@ L20:
 /*     ################################################################ */
 
 
-/*     abuck      value of "A" constant in Buckingham vdw potential */
-/*     bbuck      value of "B" constant in Buckingham vdw potential */
-/*     cbuck      value of "C" constant in Buckingham vdw potential */
-/*     ghal       value of "gamma" in buffered 14-7 vdw potential */
-/*     dhal       value of "delta" in buffered 14-7 vdw potential */
-/*     v2scale    factor by which 1-2 vdw interactions are scaled */
-/*     v3scale    factor by which 1-3 vdw interactions are scaled */
-/*     v4scale    factor by which 1-4 vdw interactions are scaled */
-/*     v5scale    factor by which 1-5 vdw interactions are scaled */
-/*     igauss     coefficients of Gaussian fit to vdw potential */
-/*     ngauss     number of Gaussians used in fit to vdw potential */
-/*     vdwindex   indexing mode (atom type or class) for vdw parameters */
-/*     vdwtyp     type of van der Waals potential energy function */
-/*     radtyp     type of parameter (sigma or R-min) for atomic size */
-/*     radsiz     atomic size provided as radius or diameter */
-/*     radrule    combining rule for atomic size parameters */
-/*     epsrule    combining rule for vdw well depth parameters */
-/*     gausstyp   type of Gaussian fit to van der Waals potential */
+/*     abuck       value of "A" constant in Buckingham vdw potential */
+/*     bbuck       value of "B" constant in Buckingham vdw potential */
+/*     cbuck       value of "C" constant in Buckingham vdw potential */
+/*     ghal        value of "gamma" in buffered 14-7 vdw potential */
+/*     dhal        value of "delta" in buffered 14-7 vdw potential */
+/*     v2scale     factor by which 1-2 vdw interactions are scaled */
+/*     v3scale     factor by which 1-3 vdw interactions are scaled */
+/*     v4scale     factor by which 1-4 vdw interactions are scaled */
+/*     v5scale     factor by which 1-5 vdw interactions are scaled */
+/*     igauss      coefficients of Gaussian fit to vdw potential */
+/*     ngauss      number of Gaussians used in fit to vdw potential */
+/*     use_vcorr   flag to use long range vdw der Waals correction */
+/*     vdwindex    indexing mode (atom type or class) for vdw parameters */
+/*     vdwtyp      type of van der Waals potential energy function */
+/*     radtyp      type of parameter (sigma or R-min) for atomic size */
+/*     radsiz      atomic size provided as radius or diameter */
+/*     radrule     combining rule for atomic size parameters */
+/*     epsrule     combining rule for vdw well depth parameters */
+/*     gausstyp    type of Gaussian fit to van der Waals potential */
 
 
 

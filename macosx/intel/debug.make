@@ -156,6 +156,7 @@ ifort -c -g -warn unused -check uninit -check bounds eurey.f
 ifort -c -g -warn unused -check uninit -check bounds eurey1.f
 ifort -c -g -warn unused -check uninit -check bounds eurey2.f
 ifort -c -g -warn unused -check uninit -check bounds eurey3.f
+ifort -c -g -warn unused -check uninit -check bounds evcorr.f
 ifort -c -g -warn unused -check uninit -check bounds extra.f
 ifort -c -g -warn unused -check uninit -check bounds extra1.f
 ifort -c -g -warn unused -check uninit -check bounds extra2.f

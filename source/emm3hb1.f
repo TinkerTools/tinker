@@ -29,7 +29,11 @@ c
 c
       subroutine emm3hb1
       implicit none
+      real*8 elrc,vlrc
       include 'cutoff.i'
+      include 'energi.i'
+      include 'vdwpot.i'
+      include 'virial.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -40,6 +44,16 @@ c
          call emm3hb1c
       else
          call emm3hb1a
+      end if
+c
+c     apply long range van der Waals correction if desired
+c
+      if (use_vcorr) then
+         call evcorr1 (elrc,vlrc)
+         ev = ev + elrc
+         vir(1,1) = vir(1,1) + vlrc
+         vir(2,2) = vir(2,2) + vlrc
+         vir(3,3) = vir(3,3) + vlrc
       end if
       return
       end

@@ -157,6 +157,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace eurey.f
 LF95 -c -o1 -tpp -nstchk -ntrace eurey1.f
 LF95 -c -o1 -tpp -nstchk -ntrace eurey2.f
 LF95 -c -o1 -tpp -nstchk -ntrace eurey3.f
+LF95 -c -o1 -tpp -nstchk -ntrace evcorr.f
 LF95 -c -o1 -tpp -nstchk -ntrace extra.f
 LF95 -c -o1 -tpp -nstchk -ntrace extra1.f
 LF95 -c -o1 -tpp -nstchk -ntrace extra2.f

@@ -23,8 +23,8 @@ c     ired       attached atom from which reduction factor is applied
 c     nvdw       total number van der Waals active sites in the system
 c     ivdw       number of the atom for each van der Waals active site
 c     jvdw       type or class index into vdw parameters for each atom
-c     nvt        number of distinct van der Waals types in the system
-c     ivt        number of each distinct vdw type/class in the system
+c     nvt        number of distinct vdw types/classes in the system
+c     ivt        type/class index for each distinct vdw type or class
 c     jvt        frequency of each vdw type or class in the system
 c
 c

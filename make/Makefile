@@ -317,6 +317,7 @@ OBJS = active.o \
        eurey1.o \
        eurey2.o \
        eurey3.o \
+       evcorr.o \
        extra.o \
        extra1.o \
        extra2.o \
@@ -917,6 +918,7 @@ libtinker.a: ${OBJS}
         eurey1.o \
         eurey2.o \
         eurey3.o \
+        evcorr.o \
         extra.o \
         extra1.o \
         extra2.o \
@@ -1154,7 +1156,7 @@ edipole2.o: atoms.i bound.i cell.i chgpot.i dipole.i group.i hessn.i shunt.i siz
 edipole3.o: action.i analyz.i atmtyp.i atoms.i bound.i cell.i chgpot.i dipole.i energi.i group.i inform.i inter.i iounit.i molcul.i shunt.i sizes.i units.i usage.i
 egauss.o: atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i energi.i group.i light.i math.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i warp.i
 egauss1.o: atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i deriv.i energi.i group.i inter.i iounit.i light.i math.i molcul.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i virial.i warp.i
-egauss2.o: atmtyp.i atoms.i couple.i group.i hessn.i shunt.i sizes.i vdw.i vdwpot.i warp.i
+egauss2.o: atmtyp.i atoms.i bound.i cell.i couple.i group.i hessn.i shunt.i sizes.i vdw.i vdwpot.i warp.i
 egauss3.o: action.i analyz.i atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i energi.i group.i inform.i inter.i iounit.i light.i math.i molcul.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i warp.i
 egeom.o: atmtyp.i atoms.i bound.i energi.i group.i kgeoms.i math.i molcul.i sizes.i usage.i
 egeom1.o: atmtyp.i atoms.i bound.i deriv.i energi.i group.i inter.i kgeoms.i math.i molcul.i sizes.i usage.i virial.i
@@ -1231,6 +1233,7 @@ eurey.o: atoms.i bound.i energi.i group.i sizes.i urey.i urypot.i usage.i
 eurey1.o: atoms.i bound.i deriv.i energi.i group.i sizes.i urey.i urypot.i usage.i virial.i
 eurey2.o: atoms.i bound.i couple.i group.i hessn.i sizes.i urey.i urypot.i
 eurey3.o: action.i analyz.i atmtyp.i atoms.i bound.i energi.i group.i inform.i iounit.i sizes.i urey.i urypot.i usage.i
+evcorr.o: bound.i boxes.i cutoff.i math.i shunt.i sizes.i vdw.i vdwpot.i
 extra.o: energi.i
 extra1.o: atoms.i deriv.i energi.i sizes.i
 extra2.o: atoms.i hessn.i sizes.i

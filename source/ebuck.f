@@ -17,9 +17,12 @@ c
 c
       subroutine ebuck
       implicit none
+      real*8 elrc
       include 'sizes.i'
       include 'cutoff.i'
+      include 'energi.i'
       include 'iounit.i'
+      include 'vdwpot.i'
       include 'warp.i'
 c
 c
@@ -38,6 +41,13 @@ c
          call ebuck0b
       else
          call ebuck0a
+      end if
+c
+c     apply long range van der Waals correction if desired
+c
+      if (use_vcorr) then
+         call evcorr (elrc)
+         ev = ev + elrc
       end if
       return
       end

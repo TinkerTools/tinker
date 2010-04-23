@@ -156,6 +156,7 @@ pgf77 -c -fast eurey.f
 pgf77 -c -fast eurey1.f
 pgf77 -c -fast eurey2.f
 pgf77 -c -fast eurey3.f
+pgf77 -c -fast evcorr.f
 pgf77 -c -fast extra.f
 pgf77 -c -fast extra1.f
 pgf77 -c -fast extra2.f

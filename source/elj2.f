@@ -193,13 +193,13 @@ c
                   rik = sqrt(rik2)
                   p6 = rv**6 / rik2**3
                   p12 = p6 * p6
-                  de = eps * (p12 - p6) * (-12.0d0/rik)
-                  d2e = eps * (13.0d0*p12 - 7.0d0*p6) * (12.0d0/rik2)
+                  de = eps * (p12-p6) * (-12.0d0/rik)
+                  d2e = eps * (13.0d0*p12-7.0d0*p6) * (12.0d0/rik2)
 c
 c     use energy switching if near the cutoff distance
 c
                   if (rik2 .gt. cut2) then
-                     e = eps * (p12 - 2.0d0*p6)
+                     e = eps * (p12-2.0d0*p6)
                      rik3 = rik2 * rik
                      rik4 = rik2 * rik2
                      rik5 = rik2 * rik3
@@ -423,13 +423,13 @@ c
                      rik = sqrt(rik2)
                      p6 = rv**6 / rik2**3
                      p12 = p6 * p6
-                     de = eps * (p12 - p6) * (-12.0d0/rik)
-                     d2e = eps * (13.0d0*p12 - 7.0d0*p6) * (12.0d0/rik2)
+                     de = eps * (p12-p6) * (-12.0d0/rik)
+                     d2e = eps * (13.0d0*p12-7.0d0*p6) * (12.0d0/rik2)
 c
 c     use energy switching if near the cutoff distance
 c
                      if (rik2 .gt. cut2) then
-                        e = eps * (p12 - 2.0d0*p6)
+                        e = eps * (p12-2.0d0*p6)
                         rik3 = rik2 * rik
                         rik4 = rik2 * rik2
                         rik5 = rik2 * rik3

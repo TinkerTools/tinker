@@ -156,6 +156,7 @@ fort77 -c -O2 +E1 eurey.f
 fort77 -c -O2 +E1 eurey1.f
 fort77 -c -O2 +E1 eurey2.f
 fort77 -c -O2 +E1 eurey3.f
+fort77 -c -O2 +E1 evcorr.f
 fort77 -c -O2 +E1 extra.f
 fort77 -c -O2 +E1 extra1.f
 fort77 -c -O2 +E1 extra2.f

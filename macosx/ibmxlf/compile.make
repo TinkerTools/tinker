@@ -156,6 +156,7 @@ xlf -c -O2 -qmaxmem=-1 eurey.f
 xlf -c -O2 -qmaxmem=-1 eurey1.f
 xlf -c -O2 -qmaxmem=-1 eurey2.f
 xlf -c -O2 -qmaxmem=-1 eurey3.f
+xlf -c -O2 -qmaxmem=-1 evcorr.f
 xlf -c -O2 -qmaxmem=-1 extra.f
 xlf -c -O2 -qmaxmem=-1 extra1.f
 xlf -c -O2 -qmaxmem=-1 extra2.f

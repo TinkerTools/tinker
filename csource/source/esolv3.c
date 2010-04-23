@@ -843,13 +843,15 @@ static integer c__0 = 0;
 
     if (s_cmp(solute_1.solvtyp, "GK", (ftnlen)8, (ftnlen)2) == 0 || s_cmp(
 	    solute_1.solvtyp, "PB", (ftnlen)8, (ftnlen)2) == 0) {
-	io___17.ciunit = iounit_1.iout;
-	s_wsfe(&io___17);
-	do_fio(&c__1, (char *)&ecav, (ftnlen)sizeof(doublereal));
-	do_fio(&c__1, (char *)&edisp, (ftnlen)sizeof(doublereal));
-	d__1 = energi_1.es - ecav - edisp;
-	do_fio(&c__1, (char *)&d__1, (ftnlen)sizeof(doublereal));
-	e_wsfe();
+	if (inform_1.verbose) {
+	    io___17.ciunit = iounit_1.iout;
+	    s_wsfe(&io___17);
+	    do_fio(&c__1, (char *)&ecav, (ftnlen)sizeof(doublereal));
+	    do_fio(&c__1, (char *)&edisp, (ftnlen)sizeof(doublereal));
+	    d__1 = energi_1.es - ecav - edisp;
+	    do_fio(&c__1, (char *)&d__1, (ftnlen)sizeof(doublereal));
+	    e_wsfe();
+	}
     }
     return 0;
 } /* esolv3_ */
@@ -4981,8 +4983,8 @@ static integer c__0 = 0;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 
@@ -5546,8 +5548,8 @@ static integer c__0 = 0;
 /*     nvdw       total number van der Waals active sites in the system */
 /*     ivdw       number of the atom for each van der Waals active site */
 /*     jvdw       type or class index into vdw parameters for each atom */
-/*     nvt        number of distinct van der Waals types in the system */
-/*     ivt        number of each distinct vdw type/class in the system */
+/*     nvt        number of distinct vdw types/classes in the system */
+/*     ivt        type/class index for each distinct vdw type or class */
 /*     jvt        frequency of each vdw type or class in the system */
 
 

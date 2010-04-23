@@ -16,11 +16,15 @@ c
 c     "monte" performs a Monte Carlo-Minimization conformational
 c     search using Cartesian single atom or torsional move sets
 c
-c     literature reference:
+c     literature references:
 c
 c     Z. Li and H. A. Scheraga, "Monte Carlo-Minimization Approach
 c     to the Multiple-Minima Problem in Protein Folding", Proc. Natl.
 c     Acad. Sci. USA, 84, 6611-6615 (1987)
+c
+c     D. J. Wales, "Energy Landscapes with Applications to Clusters,
+c     Biomolecules and Glasses", Cambridge University Press, 2003,
+c     Section 6.7.4
 c
 c
       program monte
@@ -156,12 +160,12 @@ c
       if (temper .lt. 0.0d0) then
          write (iout,120)
   120    format (/,' Enter the Desired Temperature in Degrees',
-     &              ' K [298] : ', $)
+     &              ' K [500] : ', $)
          read (input,130)  string
   130    format (a120)
          read (string,*,err=140,end=140)  temper
   140    continue
-         if (temper .lt. 0.0d0)  temper = 298.0d0
+         if (temper .lt. 0.0d0)  temper = 500.0d0
       end if
       beta = 1.0d0 / (gasconst*temper)
 c
@@ -197,6 +201,7 @@ c
          zi(i) = z(i)
       end do
       call mcmstep (minimum,grdmin)
+      pminimum = minimum
       write (iout,210)  0,minimum
   210 format (i8,3x,f12.4)
 c
@@ -273,7 +278,6 @@ c
             yi(i) = y(i)
             zi(i) = z(i)
          end do
-         pminimum = minimum
          call mcmstep (minimum,grdmin)
 c
 c     test for an unreasonably low energy at the minimum
@@ -385,13 +389,13 @@ c     write out the final global minimum energy value
 c
       if (digits .ge. 8) then
          write (iout,240)  global
-  240    format (/,' Final Global Minimum :',2x,f20.8)
+  240    format (/,' Global Minimum Energy Value :',1x,f20.8)
       else if (digits .ge. 6) then
          write (iout,250)  global
-  250    format (/,' Final Global Minimum :',2x,f18.6)
+  250    format (/,' Global Minimum Energy Value :',3x,f18.6)
       else
          write (iout,260)  global
-  260    format (/,' Final Global Minimum :',2x,f16.4)
+  260    format (/,' Global Minimum Energy Value :',5x,f16.4)
       end if
 c
 c     perform any final tasks before program exit

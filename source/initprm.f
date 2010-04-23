@@ -261,6 +261,7 @@ c
       v3scale = 0.0d0
       v4scale = 1.0d0
       v5scale = 1.0d0
+      use_vcorr = .false.
 c
 c     set default control parameters for charge-charge terms
 c

@@ -201,6 +201,20 @@ c
                      end if
                   end do
 c
+c     use energy switching if near the cutoff distance
+c
+                  if (rik2 .gt. cut2) then
+                     rik3 = rik2 * rik
+                     rik4 = rik2 * rik2
+                     rik5 = rik2 * rik3
+                     taper = c5*rik5 + c4*rik4 + c3*rik3
+     &                          + c2*rik2 + c1*rik + c0
+                     dtaper = 5.0d0*c5*rik4 + 4.0d0*c4*rik3
+     &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
+                     de = e*dtaper + de*taper
+                     e = e * taper
+                  end if
+c
 c     scale the interaction based on its group membership
 c
                   if (use_group) then

@@ -156,6 +156,7 @@ g77 -c -O eurey.f
 g77 -c -O eurey1.f
 g77 -c -O eurey2.f
 g77 -c -O eurey3.f
+g77 -c -O evcorr.f
 g77 -c -O extra.f
 g77 -c -O extra1.f
 g77 -c -O extra2.f

@@ -95,11 +95,15 @@ static integer c__2 = 2;
 /*     "monte" performs a Monte Carlo-Minimization conformational */
 /*     search using Cartesian single atom or torsional move sets */
 
-/*     literature reference: */
+/*     literature references: */
 
 /*     Z. Li and H. A. Scheraga, "Monte Carlo-Minimization Approach */
 /*     to the Multiple-Minima Problem in Protein Folding", Proc. Natl. */
 /*     Acad. Sci. USA, 84, 6611-6615 (1987) */
+
+/*     D. J. Wales, "Energy Landscapes with Applications to Clusters, */
+/*     Biomolecules and Glasses", Cambridge University Press, 2003, */
+/*     Section 6.7.4 */
 
 
 /* Main program */ int MAIN__(void)
@@ -117,7 +121,7 @@ static integer c__2 = 2;
 	    " \002,$)";
     static char fmt_90[] = "(a120)";
     static char fmt_120[] = "(/,\002 Enter the Desired Temperature in Degr"
-	    "ees\002,\002 K [298] : \002,$)";
+	    "ees\002,\002 K [500] : \002,$)";
     static char fmt_130[] = "(a120)";
     static char fmt_160[] = "(/,\002 Enter RMS Gradient Criterion [0.01] :"
 	    " \002,$)";
@@ -130,9 +134,12 @@ static integer c__2 = 2;
     static char fmt_220[] = "(i8,3x,f12.4,3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)";
     static char fmt_230[] = "(i8,9x,\002------\002,3x,f12.4,3x,f10.2,3x,f8.3"
 	    ",6x,a6)";
-    static char fmt_240[] = "(/,\002 Final Global Minimum :\002,2x,f20.8)";
-    static char fmt_250[] = "(/,\002 Final Global Minimum :\002,2x,f18.6)";
-    static char fmt_260[] = "(/,\002 Final Global Minimum :\002,2x,f16.4)";
+    static char fmt_240[] = "(/,\002 Global Minimum Energy Value :\002,1x,f2"
+	    "0.8)";
+    static char fmt_250[] = "(/,\002 Global Minimum Energy Value :\002,3x,f1"
+	    "8.6)";
+    static char fmt_260[] = "(/,\002 Global Minimum Energy Value :\002,5x,f1"
+	    "6.4)";
 
     /* System generated locals */
     address a__1[2];
@@ -207,7 +214,7 @@ static integer c__2 = 2;
     static icilist io___35 = { 1, string, 1, 0, 120, 1 };
     static cilist io___36 = { 0, 0, 0, fmt_190, 0 };
     static cilist io___37 = { 0, 0, 0, fmt_200, 0 };
-    static cilist io___42 = { 0, 0, 0, fmt_210, 0 };
+    static cilist io___43 = { 0, 0, 0, fmt_210, 0 };
     static cilist io___63 = { 0, 0, 0, fmt_220, 0 };
     static cilist io___64 = { 0, 0, 0, fmt_230, 0 };
     static cilist io___65 = { 0, 0, 0, fmt_240, 0 };
@@ -655,7 +662,7 @@ L110:
 	}
 L140:
 	if (temper < 0.) {
-	    temper = 298.;
+	    temper = 500.;
 	}
     }
     beta = 1. / (temper * .0019872066);
@@ -725,8 +732,9 @@ L180:
 	zi[i__ - 1] = atoms_1.z__[i__ - 1];
     }
     mcmstep_(&minimum, &grdmin);
-    io___42.ciunit = iounit_1.iout;
-    s_wsfe(&io___42);
+    pminimum = minimum;
+    io___43.ciunit = iounit_1.iout;
+    s_wsfe(&io___43);
     do_fio(&c__1, (char *)&c__0, (ftnlen)sizeof(integer));
     do_fio(&c__1, (char *)&minimum, (ftnlen)sizeof(doublereal));
     e_wsfe();
@@ -830,7 +838,6 @@ L180:
 	    yi[i__ - 1] = atoms_1.y[i__ - 1];
 	    zi[i__ - 1] = atoms_1.z__[i__ - 1];
 	}
-	pminimum = minimum;
 	mcmstep_(&minimum, &grdmin);
 
 /*     test for an unreasonably low energy at the minimum */
