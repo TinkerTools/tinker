@@ -161,7 +161,7 @@ c
       real*8 p,p6,p12
       real*8 rho,tau,tau7
       real*8 dtau,gtau
-      real*8 rvterm, expterm
+      real*8 rvterm,expterm
 c
 c
 c     zero out the long range van der Waals corrections

@@ -140,6 +140,11 @@ c
      &              ' may give Poor Accuracy')
       end if
 c
+c     perform dynamic allocation of the qgrid array
+c
+      nullify (qgrid)
+      allocate (qgrid(2,nfft1,nfft2,nfft3))
+c
 c     initialize the PME arrays that can be precomputed
 c
       call moduli

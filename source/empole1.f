@@ -5685,7 +5685,7 @@ c
       real*8 fphip(10,maxatm)
       real*8 fphidp(20,maxatm)
       real*8 cphi(10,maxatm)
-      real*8 qgrip(2,maxfft,maxfft,maxfft)
+      real*8, pointer :: qgrip(:,:,:,:)
 c
 c     derivative indices into the fphi and fdip_phi arrays
 c
@@ -5729,6 +5729,11 @@ c
 c     compute the arrays of B-spline coefficients
 c
       if (.not. use_polar)  call bspline_fill
+c
+c     perform dynamic allocation of the qgrip array
+c
+      nullify (qgrip)
+      allocate (qgrip(2,nfft1,nfft2,nfft3))
 c
 c     assign permanent and induced multipoles to PME grid
 c     and perform the 3-D FFT forward transformation
@@ -5828,6 +5833,10 @@ c
          end if
          qfac(k1,k2,k3) = expterm
       end do
+c
+c     perform deallocation of the qgrip array
+c
+      deallocate (qgrip)
 c
 c     transform permanent multipoles without induced dipoles
 c
