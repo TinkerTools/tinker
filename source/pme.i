@@ -20,7 +20,6 @@ c     bsmod1     B-spline moduli along the a-axis direction
 c     bsmod2     B-spline moduli along the b-axis direction
 c     bsmod3     B-spline moduli along the c-axis direction
 c     table      intermediate array used by the FFT calculation
-c     qfac       prefactors for particle mesh Ewald charge grid
 c     thetai1    B-spline coefficients along the a-axis
 c     thetai2    B-spline coefficients along the b-axis
 c     thetai3    B-spline coefficients along the c-axis
@@ -31,6 +30,7 @@ c     bsorder    order of the PME B-spline approximation
 c     iprime     prime factorization of each FFT dimension
 c     igrid      initial Ewald charge grid values for B-spline
 c     qgrid      values on the particle mesh Ewald charge grid
+c     qfac       prefactors for particle mesh Ewald charge grid
 c
 c
       integer maxorder
@@ -42,15 +42,15 @@ c
       integer nfft1,nfft2,nfft3
       integer bsorder,iprime,igrid
       real*8 bsmod1,bsmod2,bsmod3
-      real*8 table,qfac
-      real*8 thetai1,thetai2,thetai3
+      real*8 table,thetai1
+      real*8 thetai2,thetai3
       real*8, pointer :: qgrid(:,:,:,:)
+      real*8, pointer :: qfac(:,:,:)
       common /pme/ bsmod1(maxfft),bsmod2(maxfft),
      &             bsmod3(maxfft),table(maxtable,3),
-     &             qfac(maxfft,maxfft,maxfft),
      &             thetai1(4,maxorder,maxatm),
      &             thetai2(4,maxorder,maxatm),
      &             thetai3(4,maxorder,maxatm),
      &             nfft1,nfft2,nfft3,bsorder,
      &             iprime(maxprime,3),igrid(3,maxatm),
-     &             qgrid
+     &             qgrid,qfac
