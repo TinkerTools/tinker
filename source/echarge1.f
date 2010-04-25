@@ -1042,7 +1042,8 @@ c
       integer i,j,k
       integer ii,kk
       integer in,kn
-      real*8 e,de,eintra
+      real*8 e,de,efix
+      real*8 eintra
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
@@ -1166,17 +1167,6 @@ c
                yr = yi - y(k)
                zr = zi - z(k)
 c
-c     increment the total intramolecular energy
-c
-               if (molcule(i) .eq. molcule(k)) then
-                  r2 = xr*xr + yr*yr + zr*zr
-                  r = sqrt(r2)
-                  rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
-                  e = fik / rb
-                  eintra = eintra + e
-               end if
-c
 c     find energy for interactions within real space cutoff
 c
                call image (xr,yr,zr)
@@ -1229,6 +1219,13 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
+c
+c     increment the total intramolecular energy
+c
+                  if (molcule(i) .eq. molcule(k)) then
+                     efix = (fik/rb) * scale
+                     eintra = eintra + efix
+                  end if
                end if
             end if
          end do
@@ -1248,10 +1245,6 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     for periodic boundary conditions with large cutoffs
 c     neighbors must be found by the replicates method
@@ -1426,7 +1419,8 @@ c
       integer ii,kk,in,kn
       integer kgy,kgz,kmap
       integer start,stop
-      real*8 e,de,eintra
+      real*8 e,de,efix
+      real*8 eintra
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
@@ -1596,17 +1590,6 @@ c
                yr = yi - ysort(kgy)
                zr = zi - zsort(kgz)
 c
-c     increment the total intramolecular energy
-c
-               if (prime .and. molcule(i).eq.molcule(k)) then
-                  r2 = xr*xr + yr*yr + zr*zr
-                  r = sqrt(r2)
-                  rb = r + ebuffer
-                  fik = fi * pchg(kmap) * cscale(kn)
-                  e = fik / rb
-                  eintra = eintra + e
-               end if
-c
 c     find energy for interactions within real space cutoff
 c
                if (use_bounds) then
@@ -1675,6 +1658,13 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
+c
+c     increment the total intramolecular energy
+c
+                  if (prime .and. molcule(i).eq.molcule(k)) then
+                     efix = (fik/rb) * scale
+                     eintra = eintra + efix
+                  end if
                end if
             end if
    20       continue
@@ -1744,7 +1734,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
-      real*8 e,de,eintra
+      real*8 e,de,efix
+      real*8 eintra
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
@@ -1869,17 +1860,6 @@ c
                yr = yi - y(k)
                zr = zi - z(k)
 c
-c     increment the total intramolecular energy
-c
-               if (molcule(i) .eq. molcule(k)) then
-                  r2 = xr*xr + yr*yr + zr*zr
-                  r = sqrt(r2)
-                  rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
-                  e = fik / rb
-                  eintra = eintra + e
-               end if
-c
 c     find energy for interactions within real space cutoff
 c
                call image (xr,yr,zr)
@@ -1932,6 +1912,13 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
+c
+c     increment the total intramolecular energy
+c
+                  if (molcule(i) .eq. molcule(k)) then
+                     efix = (fik/rb) * scale
+                     eintra = eintra + efix
+                  end if
                end if
             end if
          end do

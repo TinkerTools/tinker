@@ -1282,7 +1282,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -1416,16 +1416,17 @@ c
 c
 c     increment the total intramolecular energy
 c
+               efix = f * efix * mscale(kk)
+               eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
+     &                    + gli(3)*rr7*scale7
+               eifix = 0.5d0 * f * eifix
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintra = eintra + f*efix*mscale(kk)
-                  eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                       + gli(3)*rr7*scale7
-                  eintra = eintra + 0.5d0*f*eifix
+                  eintra = eintra + efix + eifix
                end if
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (max(abs(e),abs(ei)) .gt. 100.0d0)
+               huge = (max(abs(efix),abs(eifix)) .gt. 100.0d0)
                if (debug .or. (verbose.and.huge)) then
                   if (muse .or. puse) then
                      if (header) then
@@ -1437,7 +1438,8 @@ c
      &                             9x,'Distance',6x,'Energies',
      &                             ' (MPole, Polar)',/)
                      end if
-                     write (iout,20)  ii,name(ii),kk,name(kk),r,e,ei
+                     write (iout,20)  ii,name(ii),kk,name(kk),r,
+     &                                efix,eifix
    20                format (' M-Pole',5x,i5,'-',a3,1x,i5,
      &                          '-',a3,5x,f8.4,4x,2f12.4)
                   end if
@@ -1516,7 +1518,7 @@ c
                zr = z(kk) - z(ii)
                call imager (xr,yr,zr,j)
                r2 = xr*xr + yr* yr + zr*zr
-               if (r2 .le. cut2) then
+               if (r2 .le. off2) then
                   r = sqrt(r2)
                   ck = rpole(1,k)
                   dkx = rpole(2,k)
@@ -1638,7 +1640,6 @@ c
                   if (use_polymer .and. r2.le.polycut2)
      &               e = e - efix*(1.0d0-mscale(kk))
                   ei = ei - eifix
-
 c
 c     increment the overall multipole and polarization energies
 c
@@ -1659,7 +1660,11 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (max(abs(e),abs(ei)) .gt. 100.0d0)
+                  efix = f * efix * mscale(kk)
+                  eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
+     &                       + gli(3)*rr7*scale7
+                  eifix = 0.5d0 * f * eifix
+                  huge = (max(abs(efix),abs(eifix)) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1670,7 +1675,8 @@ c
      &                             9x,'Distance',6x,'Energies',
      &                             ' (MPole, Polar)',/)
                      end if
-                     write (iout,40)  ii,name(ii),kk,name(kk),r,e,ei
+                     write (iout,40)  ii,name(ii),kk,name(kk),r,
+     &                                efix,eifix
    40                format (' M-Pole',5x,i5,'-',a3,1x,i5,'-',a3,
      &                          1x,'(X)',1x,f8.4,4x,2f12.4)
                   end if
@@ -1992,7 +1998,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -2126,16 +2132,17 @@ c
 c
 c     increment the total intramolecular energy
 c
+               efix = f * efix * mscale(kk)
+               eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
+     &                    + gli(3)*rr7*scale7
+               eifix = 0.5d0 * f * eifix
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintra = eintra + f*efix*mscale(kk)
-                  eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                       + gli(3)*rr7*scale7
-                  eintra = eintra + 0.5d0*f*eifix
+                  eintra = eintra + efix + eifix
                end if
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (max(abs(e),abs(ei)) .gt. 100.0d0)
+               huge = (max(abs(efix),abs(eifix)) .gt. 100.0d0)
                if (debug .or. (verbose.and.huge)) then
                   if (muse .or. puse) then
                      if (header) then
@@ -2147,7 +2154,8 @@ c
      &                             9x,'Distance',6x,'Energies',
      &                             ' (MPole, Polar)',/)
                      end if
-                     write (iout,20)  ii,name(ii),kk,name(kk),r,e,ei
+                     write (iout,20)  ii,name(ii),kk,name(kk),r,
+     &                                efix,eifix
    20                format (' M-Pole',5x,i5,'-',a3,1x,i5,
      &                          '-',a3,5x,f8.4,4x,2f12.4)
                   end if

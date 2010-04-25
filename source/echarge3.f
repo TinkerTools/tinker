@@ -924,7 +924,8 @@ c
       integer i,j,k
       integer ii,kk
       integer in,kn
-      real*8 e,eintra
+      real*8 e,efix
+      real*8 eintra
       real*8 f,fi,fik
       real*8 fs,fgrp
       real*8 r,r2,rb,rew
@@ -1034,17 +1035,6 @@ c
                yr = yi - y(k)
                zr = zi - z(k)
 c
-c     increment the total intramolecular energy
-c
-               if (molcule(i) .eq. molcule(k)) then
-                  r2 = xr*xr + yr*yr + zr*zr
-                  r = sqrt(r2)
-                  rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
-                  e = fik / rb
-                  eintra = eintra + e
-               end if
-c
 c     find energy for interactions within real space cutoff
 c
                call image (xr,yr,zr)
@@ -1067,9 +1057,16 @@ c
                   aec(i) = aec(i) + 0.5d0*e
                   aec(k) = aec(k) + 0.5d0*e
 c
+c     increment the total intramolecular energy
+c
+                  efix = (fik/rb) * scale
+                  if (molcule(i) .eq. molcule(k)) then
+                     eintra = eintra + efix
+                  end if
+c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(efix) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1081,7 +1078,7 @@ c
      &                             5x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
-     &                                pchg(ii),pchg(kk),r,e
+     &                                pchg(ii),pchg(kk),r,efix
    20                format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                          8x,2f7.2,f10.4,f12.4)
                   end if
@@ -1184,7 +1181,8 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(e) .gt. 100.0d0)
+                     efix = (fik/rb) * scale
+                     huge = (abs(efix) .gt. 100.0d0)
                      if ((debug.and.e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -1197,7 +1195,7 @@ c
      &                                5x,'Energy',/)
                         end if
                         write (iout,40)  i,name(i),k,name(k),
-     &                                   pchg(ii),pchg(kk),r,e
+     &                                   pchg(ii),pchg(kk),r,efix
    40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)
                      end if
@@ -1265,7 +1263,8 @@ c
       integer ii,kk,in,kn
       integer kgy,kgz,kmap
       integer start,stop
-      real*8 e,eintra
+      real*8 e,efix
+      real*8 eintra
       real*8 f,fi,fik
       real*8 fs,fgrp
       real*8 r,r2,rb,rew
@@ -1421,17 +1420,6 @@ c
                yr = yi - ysort(kgy)
                zr = zi - zsort(kgz)
 c
-c     increment the total intramolecular energy
-c
-               if (prime .and. molcule(i).eq.molcule(k)) then
-                  r2 = xr*xr + yr*yr + zr*zr
-                  r = sqrt(r2)
-                  rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
-                  e = fik / rb
-                  eintra = eintra + e
-               end if
-c
 c     find energy for interactions within real space cutoff
 c
                if (use_bounds) then
@@ -1470,9 +1458,16 @@ c
                   aec(i) = aec(i) + 0.5d0*e
                   aec(k) = aec(k) + 0.5d0*e
 c
+c     increment the total intramolecular energy
+c
+                  efix = (fik/rb) * scale
+                  if (prime .and. molcule(i).eq.molcule(k)) then
+                     eintra = eintra + efix
+                  end if
+c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(efix) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1485,12 +1480,12 @@ c
                      end if
                      if (prime) then
                         write (iout,30)  i,name(i),k,name(k),pchg(ii),
-     &                                   pchg(kmap),r,e
+     &                                   pchg(kmap),r,efix
    30                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                             8x,2f7.2,f10.4,f12.4)
                      else
                         write (iout,40)  i,name(i),k,name(k),pchg(ii),
-     &                                   pchg(kmap),r,e
+     &                                   pchg(kmap),r,efix
    40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)
                      end if
@@ -1567,7 +1562,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
-      real*8 e,eintra
+      real*8 e,efix
+      real*8 eintra
       real*8 f,fi,fik
       real*8 fs,fgrp
       real*8 r,r2,rb,rew
@@ -1678,17 +1674,6 @@ c
                yr = yi - y(k)
                zr = zi - z(k)
 c
-c     increment the total intramolecular energy
-c
-               if (molcule(i) .eq. molcule(k)) then
-                  r2 = xr*xr + yr*yr + zr*zr
-                  r = sqrt(r2)
-                  rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
-                  e = fik / rb
-                  eintra = eintra + e
-               end if
-c
 c     find energy for interactions within real space cutoff
 c
                call image (xr,yr,zr)
@@ -1711,9 +1696,16 @@ c
                   aec(i) = aec(i) + 0.5d0*e
                   aec(k) = aec(k) + 0.5d0*e
 c
+c     increment the total intramolecular energy
+c
+                  efix = (fik/rb) * scale
+                  if (molcule(i) .eq. molcule(k)) then
+                     eintra = eintra + efix
+                  end if
+c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(efix) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1725,7 +1717,7 @@ c
      &                             5x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
-     &                                pchg(ii),pchg(kk),r,e
+     &                                pchg(ii),pchg(kk),r,efix
    20                format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                          8x,2f7.2,f10.4,f12.4)
                   end if

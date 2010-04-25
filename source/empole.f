@@ -1096,7 +1096,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -1293,7 +1293,7 @@ c
                zr = z(kk) - z(ii)
                call imager (xr,yr,zr,j)
                r2 = xr*xr + yr* yr + zr*zr
-               if (r2 .le. cut2) then
+               if (r2 .le. off2) then
                   r = sqrt(r2)
                   ck = rpole(1,k)
                   dkx = rpole(2,k)
@@ -1708,7 +1708,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
