@@ -81,7 +81,7 @@ f2c -A -s egauss2.f
 f2c -A -s egauss3.f
 f2c -A -s egeom.f
 f2c -A -s egeom1.f
-f2c -A -s-Nn1000  egeom2.f
+f2c -A -s -Nn1000 egeom2.f
 f2c -A -s egeom3.f
 f2c -A -s ehal.f
 f2c -A -s ehal1.f
@@ -109,7 +109,7 @@ f2c -A -s emm3hb1.f
 f2c -A -s emm3hb2.f
 f2c -A -s emm3hb3.f
 f2c -A -s empole.f
-f2c -A -s-Nn 1000  empole1.f
+f2c -A -s -Nn1000 empole1.f
 f2c -A -s empole2.f
 f2c -A -s empole3.f
 f2c -A -s energy.f
@@ -148,7 +148,7 @@ f2c -A -s etors2.f
 f2c -A -s etors3.f
 f2c -A -s etortor.f
 f2c -A -s etortor1.f
-f2c -A -s-Nn1000  etortor2.f
+f2c -A -s -Nn1000 etortor2.f
 f2c -A -s etortor3.f
 f2c -A -s eurey.f
 f2c -A -s eurey1.f
@@ -254,7 +254,7 @@ f2c -A -s newtrot.f
 f2c -A -s nextarg.f
 f2c -A -s nexttext.f
 f2c -A -s nspline.f
-f2c -A -s-NL400  nucleic.f
+f2c -A -s -NL400 nucleic.f
 f2c -A -s number.f
 f2c -A -s numeral.f
 f2c -A -s numgrad.f
@@ -269,7 +269,7 @@ f2c -A -s orient.f
 f2c -A -s orthog.f
 f2c -A -s overlap.f
 f2c -A -s path.f
-f2c -A -s-NL400  pdbxyz.f
+f2c -A -s -NL400 pdbxyz.f
 f2c -A -s piscf.f
 f2c -A -s pmepol.f
 f2c -A -s pmpb.f
@@ -282,7 +282,7 @@ f2c -A -s pressure.f
 f2c -A -s prmedit.f
 f2c -A -s prmkey.f
 f2c -A -s promo.f
-f2c -A -s-NL400  protein.f
+f2c -A -s -NL400 protein.f
 f2c -A -s prtdyn.f
 f2c -A -s prterr.f
 f2c -A -s prtint.f

@@ -156,18 +156,7 @@ c
       logical done
 c
 c
-c     zero out the atomic and molecular induced dipole components
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-         end do
-      end do
-      do j = 1, 3
-         umol(j) = 0.0d0
-      end do
-c
-c     compute induced dipoles as polarizability times external field
+c     set induced dipoles to polarizability times external field
 c
       do i = 1, npole
          do j = 1, 3
@@ -175,7 +164,18 @@ c
          end do
       end do
 c
-c     set tolerances for computation of mutual induced dipoles
+c     compute direct induced dipole moments from direct field
+c
+      if (poltyp .eq. 'DIRECT') then
+         call ufield (field)
+         do i = 1, npole
+            do j = 1, 3
+               uind(j,i) = uind(j,i) + polarity(i)*field(j,i)
+            end do
+         end do
+      end if
+c
+c     compute mutual induced dipole moments by an iterative method
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
@@ -188,18 +188,10 @@ c
             end do
          end do
 c
-c     compute mutual induced dipole moments by an iterative method
-c
-         dowhile (.not. done)
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = 0.0d0
-               end do
-            end do
-            call ufield (field)
-c
 c     check to see if the mutual induced dipoles have converged
 c
+         dowhile (.not. done)
+            call ufield (field)
             iter = iter + 1
             epsold = eps
             eps = 0.0d0
@@ -227,22 +219,25 @@ c
             if (iter .ge. maxiter)  done = .true.
          end do
 c
-c     sum up the total molecular induced dipole components
-c
-         do i = 1, npole
-            umol(1) = umol(1) + uind(1,i)
-            umol(2) = umol(2) + uind(2,i)
-            umol(3) = umol(3) + uind(3,i)
-         end do
-c
 c     print a warning if induced dipoles failed to converge
 c
          if (eps .gt. poleps) then
             write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
+   30       format (/,' MOLUIND  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
          end if
       end if
+c
+c     sum up the total molecular induced dipole components
+c
+      do j = 1, 3
+         umol(j) = 0.0d0
+      end do
+      do i = 1, npole
+         umol(1) = umol(1) + uind(1,i)
+         umol(2) = umol(2) + uind(2,i)
+         umol(3) = umol(3) + uind(3,i)
+      end do
       return
       end
 c
@@ -281,6 +276,14 @@ c
       real*8 pscale(maxatm)
       real*8 field(3,maxatm)
 c
+c
+c     zero out the value of the electric field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = 0.0d0
+         end do
+      end do
 c
 c     loop over pairs of sites incrementing the electric field
 c

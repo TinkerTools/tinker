@@ -573,8 +573,8 @@ static integer c__3 = 3;
 	    " Moments :\002,//,4x,\002Iter\002,8x,\002RMS Change (Debyes)\002"
 	    ",/)";
     static char fmt_20[] = "(i8,7x,f16.10)";
-    static char fmt_30[] = "(/,\002 INDUCE  --  Warning, Induced Dipole"
-	    "s\002,\002 are not Converged\002)";
+    static char fmt_30[] = "(/,\002 MOLUIND  --  Warning, Induced Dipoles"
+	    "\002,\002 are not Converged\002)";
 
     /* System generated locals */
     integer i__1;
@@ -870,7 +870,7 @@ static integer c__3 = 3;
 
 
 
-/*     zero out the atomic and molecular induced dipole components */
+/*     set induced dipoles to polarizability times external field */
 
     /* Parameter adjustments */
     --umol;
@@ -880,23 +880,24 @@ static integer c__3 = 3;
     i__1 = mpole_1.npole;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	for (j = 1; j <= 3; ++j) {
-	    uind_ref(j, i__) = 0.;
-	}
-    }
-    for (j = 1; j <= 3; ++j) {
-	umol[j] = 0.;
-    }
-
-/*     compute induced dipoles as polarizability times external field */
-
-    i__1 = mpole_1.npole;
-    for (i__ = 1; i__ <= i__1; ++i__) {
-	for (j = 1; j <= 3; ++j) {
 	    uind_ref(j, i__) = polar_1.polarity[i__ - 1] * exfield[j];
 	}
     }
 
-/*     set tolerances for computation of mutual induced dipoles */
+/*     compute direct induced dipole moments from direct field */
+
+    if (s_cmp(polpot_1.poltyp, "DIRECT", (ftnlen)6, (ftnlen)6) == 0) {
+	ufield_(field);
+	i__1 = mpole_1.npole;
+	for (i__ = 1; i__ <= i__1; ++i__) {
+	    for (j = 1; j <= 3; ++j) {
+		uind_ref(j, i__) = uind_ref(j, i__) + polar_1.polarity[i__ - 
+			1] * field_ref(j, i__);
+	    }
+	}
+    }
+
+/*     compute mutual induced dipole moments by an iterative method */
 
     if (s_cmp(polpot_1.poltyp, "MUTUAL", (ftnlen)6, (ftnlen)6) == 0) {
 	done = FALSE_;
@@ -910,19 +911,10 @@ static integer c__3 = 3;
 	    }
 	}
 
-/*     compute mutual induced dipole moments by an iterative method */
-
-	while(! done) {
-	    i__1 = mpole_1.npole;
-	    for (i__ = 1; i__ <= i__1; ++i__) {
-		for (j = 1; j <= 3; ++j) {
-		    field_ref(j, i__) = 0.;
-		}
-	    }
-	    ufield_(field);
-
 /*     check to see if the mutual induced dipoles have converged */
 
+	while(! done) {
+	    ufield_(field);
 	    ++iter;
 	    epsold = eps;
 	    eps = 0.;
@@ -963,15 +955,6 @@ static integer c__3 = 3;
 	    }
 	}
 
-/*     sum up the total molecular induced dipole components */
-
-	i__1 = mpole_1.npole;
-	for (i__ = 1; i__ <= i__1; ++i__) {
-	    umol[1] += uind_ref(1, i__);
-	    umol[2] += uind_ref(2, i__);
-	    umol[3] += uind_ref(3, i__);
-	}
-
 /*     print a warning if induced dipoles failed to converge */
 
 	if (eps > polpot_1.poleps) {
@@ -979,6 +962,18 @@ static integer c__3 = 3;
 	    s_wsfe(&io___33);
 	    e_wsfe();
 	}
+    }
+
+/*     sum up the total molecular induced dipole components */
+
+    for (j = 1; j <= 3; ++j) {
+	umol[j] = 0.;
+    }
+    i__1 = mpole_1.npole;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	umol[1] += uind_ref(1, i__);
+	umol[2] += uind_ref(2, i__);
+	umol[3] += uind_ref(3, i__);
     }
     return 0;
 } /* moluind_ */
@@ -1218,12 +1213,21 @@ static integer c__3 = 3;
 
 
 
-/*     loop over pairs of sites incrementing the electric field */
+/*     zero out the value of the electric field at each site */
 
     /* Parameter adjustments */
     field -= 4;
 
     /* Function Body */
+    i__1 = mpole_1.npole;
+    for (i__ = 1; i__ <= i__1; ++i__) {
+	for (j = 1; j <= 3; ++j) {
+	    field_ref(j, i__) = 0.;
+	}
+    }
+
+/*     loop over pairs of sites incrementing the electric field */
+
     i__1 = mpole_1.npole - 1;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	ii = mpole_1.ipole[i__ - 1];

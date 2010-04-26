@@ -3248,7 +3248,7 @@ static integer c__0 = 0;
 	    zr = atoms_1.z__[kk - 1] - atoms_1.z__[ii - 1];
 	    image_(&xr, &yr, &zr);
 	    r2 = xr * xr + yr * yr + zr * zr;
-	    if (r2 <= shunt_1.cut2) {
+	    if (r2 <= shunt_1.off2) {
 		r__ = sqrt(r2);
 		ck = rpole_ref(1, k);
 		dkx = rpole_ref(2, k);
@@ -3468,7 +3468,7 @@ static integer c__0 = 0;
 		zr = atoms_1.z__[kk - 1] - atoms_1.z__[ii - 1];
 		imager_(&xr, &yr, &zr, &j);
 		r2 = xr * xr + yr * yr + zr * zr;
-		if (r2 <= shunt_1.cut2) {
+		if (r2 <= shunt_1.off2) {
 		    r__ = sqrt(r2);
 		    ck = rpole_ref(1, k);
 		    dkx = rpole_ref(2, k);
@@ -4663,7 +4663,7 @@ static integer c__0 = 0;
 	    zr = atoms_1.z__[kk - 1] - atoms_1.z__[ii - 1];
 	    image_(&xr, &yr, &zr);
 	    r2 = xr * xr + yr * yr + zr * zr;
-	    if (r2 <= shunt_1.cut2) {
+	    if (r2 <= shunt_1.off2) {
 		r__ = sqrt(r2);
 		ck = rpole_ref(1, k);
 		dkx = rpole_ref(2, k);

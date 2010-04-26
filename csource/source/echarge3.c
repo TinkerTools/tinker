@@ -3076,9 +3076,8 @@ L50:
     static doublereal fi, fs, rb, xi, yi, zi, xd, yd, zd, xr, yr, zr, fik, 
 	    rew;
     extern doublereal erfc_(doublereal *);
-    static logical huge__;
-    static doublereal fgrp;
-    static logical usei;
+    static doublereal efix, fgrp;
+    static logical usei, huge__;
     extern /* Subroutine */ int image_(doublereal *, doublereal *, doublereal 
 	    *);
     static doublereal scale;
@@ -3094,10 +3093,10 @@ L50:
     static doublereal erfterm;
 
     /* Fortran I/O blocks */
-    static cilist io___188 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___189 = { 0, 0, 0, fmt_20, 0 };
-    static cilist io___190 = { 0, 0, 0, fmt_30, 0 };
-    static cilist io___191 = { 0, 0, 0, fmt_40, 0 };
+    static cilist io___189 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___190 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___191 = { 0, 0, 0, fmt_30, 0 };
+    static cilist io___192 = { 0, 0, 0, fmt_40, 0 };
 
 
 
@@ -3806,17 +3805,6 @@ L50:
 		yr = yi - atoms_1.y[k - 1];
 		zr = zi - atoms_1.z__[k - 1];
 
-/*     increment the total intramolecular energy */
-
-		if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) {
-		    r2 = xr * xr + yr * yr + zr * zr;
-		    r__ = sqrt(r2);
-		    rb = r__ + chgpot_1.ebuffer;
-		    fik = fi * charge_1.pchg[kk - 1] * cscale[kn - 1];
-		    e = fik / rb;
-		    eintra += e;
-		}
-
 /*     find energy for interactions within real space cutoff */
 
 		image_(&xr, &yr, &zr);
@@ -3841,18 +3829,26 @@ L50:
 		    analyz_1.aec[i__ - 1] += e * .5;
 		    analyz_1.aec[k - 1] += e * .5;
 
+/*     increment the total intramolecular energy */
+
+		    efix = fik / rb * scale;
+		    if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) 
+			    {
+			eintra += efix;
+		    }
+
 /*     print a message if the energy of this interaction is large */
 
-		    huge__ = abs(e) > 100.;
+		    huge__ = abs(efix) > 100.;
 		    if (inform_1.debug || inform_1.verbose && huge__) {
 			if (header) {
 			    header = FALSE_;
-			    io___188.ciunit = iounit_1.iout;
-			    s_wsfe(&io___188);
+			    io___189.ciunit = iounit_1.iout;
+			    s_wsfe(&io___189);
 			    e_wsfe();
 			}
-			io___189.ciunit = iounit_1.iout;
-			s_wsfe(&io___189);
+			io___190.ciunit = iounit_1.iout;
+			s_wsfe(&io___190);
 			do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 			do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -3863,7 +3859,8 @@ L50:
 				sizeof(doublereal));
 			do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(doublereal)
 				);
-			do_fio(&c__1, (char *)&e, (ftnlen)sizeof(doublereal));
+			do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
+				doublereal));
 			e_wsfe();
 		    }
 		}
@@ -3989,17 +3986,18 @@ L50:
 
 /*     print a message if the energy of this interaction is large */
 
-			huge__ = abs(e) > 100.;
+			efix = fik / rb * scale;
+			huge__ = abs(efix) > 100.;
 			if (inform_1.debug && e != 0. || inform_1.verbose && 
 				huge__) {
 			    if (header) {
 				header = FALSE_;
-				io___190.ciunit = iounit_1.iout;
-				s_wsfe(&io___190);
+				io___191.ciunit = iounit_1.iout;
+				s_wsfe(&io___191);
 				e_wsfe();
 			    }
-			    io___191.ciunit = iounit_1.iout;
-			    s_wsfe(&io___191);
+			    io___192.ciunit = iounit_1.iout;
+			    s_wsfe(&io___192);
 			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
@@ -4012,7 +4010,7 @@ L50:
 				    ftnlen)sizeof(doublereal));
 			    do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(
 				    doublereal));
-			    do_fio(&c__1, (char *)&e, (ftnlen)sizeof(
+			    do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
 				    doublereal));
 			    e_wsfe();
 			}
@@ -4082,7 +4080,7 @@ L50:
 
     /* Builtin functions */
     integer s_cmp(char *, char *, ftnlen, ftnlen);
-    double sqrt(doublereal), d_sign(doublereal *, doublereal *);
+    double d_sign(doublereal *, doublereal *), sqrt(doublereal);
     integer s_wsfe(cilist *), e_wsfe(void), do_fio(integer *, char *, ftnlen);
 
     /* Local variables */
@@ -4095,7 +4093,7 @@ L50:
     static doublereal fik, rew;
     extern doublereal erfc_(doublereal *);
     static integer kmap, stop;
-    static doublereal fgrp;
+    static doublereal efix, fgrp;
     static logical usei, huge__;
     static doublereal scale;
     static logical prime;
@@ -4112,9 +4110,9 @@ L50:
     static doublereal erfterm;
 
     /* Fortran I/O blocks */
-    static cilist io___237 = { 0, 0, 0, fmt_20, 0 };
-    static cilist io___238 = { 0, 0, 0, fmt_30, 0 };
-    static cilist io___239 = { 0, 0, 0, fmt_40, 0 };
+    static cilist io___239 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___240 = { 0, 0, 0, fmt_30, 0 };
+    static cilist io___241 = { 0, 0, 0, fmt_40, 0 };
 
 
 
@@ -4903,18 +4901,6 @@ L10:
 		yr = yi - ysort[kgy - 1];
 		zr = zi - zsort[kgz - 1];
 
-/*     increment the total intramolecular energy */
-
-		if (prime && molcul_1.molcule[i__ - 1] == molcul_1.molcule[k 
-			- 1]) {
-		    r2 = xr * xr + yr * yr + zr * zr;
-		    r__ = sqrt(r2);
-		    rb = r__ + chgpot_1.ebuffer;
-		    fik = fi * charge_1.pchg[kk - 1] * cscale[kn - 1];
-		    e = fik / rb;
-		    eintra += e;
-		}
-
 /*     find energy for interactions within real space cutoff */
 
 		if (bound_1.use_bounds__) {
@@ -4969,19 +4955,27 @@ L10:
 		    analyz_1.aec[i__ - 1] += e * .5;
 		    analyz_1.aec[k - 1] += e * .5;
 
+/*     increment the total intramolecular energy */
+
+		    efix = fik / rb * scale;
+		    if (prime && molcul_1.molcule[i__ - 1] == 
+			    molcul_1.molcule[k - 1]) {
+			eintra += efix;
+		    }
+
 /*     print a message if the energy of this interaction is large */
 
-		    huge__ = abs(e) > 100.;
+		    huge__ = abs(efix) > 100.;
 		    if (inform_1.debug || inform_1.verbose && huge__) {
 			if (header) {
 			    header = FALSE_;
-			    io___237.ciunit = iounit_1.iout;
-			    s_wsfe(&io___237);
+			    io___239.ciunit = iounit_1.iout;
+			    s_wsfe(&io___239);
 			    e_wsfe();
 			}
 			if (prime) {
-			    io___238.ciunit = iounit_1.iout;
-			    s_wsfe(&io___238);
+			    io___240.ciunit = iounit_1.iout;
+			    s_wsfe(&io___240);
 			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
@@ -4994,12 +4988,12 @@ L10:
 				    ftnlen)sizeof(doublereal));
 			    do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(
 				    doublereal));
-			    do_fio(&c__1, (char *)&e, (ftnlen)sizeof(
+			    do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
 				    doublereal));
 			    e_wsfe();
 			} else {
-			    io___239.ciunit = iounit_1.iout;
-			    s_wsfe(&io___239);
+			    io___241.ciunit = iounit_1.iout;
+			    s_wsfe(&io___241);
 			    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(
 				    integer));
 			    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
@@ -5012,7 +5006,7 @@ L10:
 				    ftnlen)sizeof(doublereal));
 			    do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(
 				    doublereal));
-			    do_fio(&c__1, (char *)&e, (ftnlen)sizeof(
+			    do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
 				    doublereal));
 			    e_wsfe();
 			}
@@ -5104,9 +5098,8 @@ L50:
     static integer kkk;
     static doublereal fik, rew;
     extern doublereal erfc_(doublereal *);
-    static logical huge__;
-    static doublereal fgrp;
-    static logical usei;
+    static doublereal efix, fgrp;
+    static logical usei, huge__;
     extern /* Subroutine */ int image_(doublereal *, doublereal *, doublereal 
 	    *);
     static doublereal scale;
@@ -5119,8 +5112,8 @@ L50:
     static doublereal erfterm;
 
     /* Fortran I/O blocks */
-    static cilist io___276 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___277 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___279 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___280 = { 0, 0, 0, fmt_20, 0 };
 
 
 
@@ -5835,17 +5828,6 @@ L50:
 		yr = yi - atoms_1.y[k - 1];
 		zr = zi - atoms_1.z__[k - 1];
 
-/*     increment the total intramolecular energy */
-
-		if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) {
-		    r2 = xr * xr + yr * yr + zr * zr;
-		    r__ = sqrt(r2);
-		    rb = r__ + chgpot_1.ebuffer;
-		    fik = fi * charge_1.pchg[kk - 1] * cscale[kn - 1];
-		    e = fik / rb;
-		    eintra += e;
-		}
-
 /*     find energy for interactions within real space cutoff */
 
 		image_(&xr, &yr, &zr);
@@ -5870,18 +5852,26 @@ L50:
 		    analyz_1.aec[i__ - 1] += e * .5;
 		    analyz_1.aec[k - 1] += e * .5;
 
+/*     increment the total intramolecular energy */
+
+		    efix = fik / rb * scale;
+		    if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) 
+			    {
+			eintra += efix;
+		    }
+
 /*     print a message if the energy of this interaction is large */
 
-		    huge__ = abs(e) > 100.;
+		    huge__ = abs(efix) > 100.;
 		    if (inform_1.debug || inform_1.verbose && huge__) {
 			if (header) {
 			    header = FALSE_;
-			    io___276.ciunit = iounit_1.iout;
-			    s_wsfe(&io___276);
+			    io___279.ciunit = iounit_1.iout;
+			    s_wsfe(&io___279);
 			    e_wsfe();
 			}
-			io___277.ciunit = iounit_1.iout;
-			s_wsfe(&io___277);
+			io___280.ciunit = iounit_1.iout;
+			s_wsfe(&io___280);
 			do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 			do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
 			do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));
@@ -5892,7 +5882,8 @@ L50:
 				sizeof(doublereal));
 			do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(doublereal)
 				);
-			do_fio(&c__1, (char *)&e, (ftnlen)sizeof(doublereal));
+			do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
+				doublereal));
 			e_wsfe();
 		    }
 		}
@@ -5982,8 +5973,8 @@ L50:
     static logical proceed;
 
     /* Fortran I/O blocks */
-    static cilist io___309 = { 0, 0, 0, fmt_10, 0 };
-    static cilist io___310 = { 0, 0, 0, fmt_20, 0 };
+    static cilist io___312 = { 0, 0, 0, fmt_10, 0 };
+    static cilist io___313 = { 0, 0, 0, fmt_20, 0 };
 
 
 
@@ -6590,12 +6581,12 @@ L50:
 		if (inform_1.debug || inform_1.verbose && huge__) {
 		    if (header) {
 			header = FALSE_;
-			io___309.ciunit = iounit_1.iout;
-			s_wsfe(&io___309);
+			io___312.ciunit = iounit_1.iout;
+			s_wsfe(&io___312);
 			e_wsfe();
 		    }
-		    io___310.ciunit = iounit_1.iout;
-		    s_wsfe(&io___310);
+		    io___313.ciunit = iounit_1.iout;
+		    s_wsfe(&io___313);
 		    do_fio(&c__1, (char *)&i__, (ftnlen)sizeof(integer));
 		    do_fio(&c__1, name___ref(0, i__), (ftnlen)3);
 		    do_fio(&c__1, (char *)&k, (ftnlen)sizeof(integer));

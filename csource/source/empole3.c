@@ -4452,7 +4452,7 @@ static integer c__1 = 1;
 	    zr = atoms_1.z__[kk - 1] - atoms_1.z__[ii - 1];
 	    image_(&xr, &yr, &zr);
 	    r2 = xr * xr + yr * yr + zr * zr;
-	    if (r2 <= shunt_1.cut2) {
+	    if (r2 <= shunt_1.off2) {
 		r__ = sqrt(r2);
 		ck = rpole_ref(1, k);
 		dkx = rpole_ref(2, k);
@@ -4600,17 +4600,18 @@ static integer c__1 = 1;
 
 /*     increment the total intramolecular energy */
 
+		efix = f * efix * mscale[kk - 1];
+		eifix = gli[0] * rr3 * scale3 + gli[1] * rr5 * scale5 + gli[2]
+			 * rr7 * scale7;
+		eifix = f * .5 * eifix;
 		if (molcul_1.molcule[ii - 1] == molcul_1.molcule[kk - 1]) {
-		    *eintra += f * efix * mscale[kk - 1];
-		    eifix = gli[0] * rr3 * scale3 + gli[1] * rr5 * scale5 + 
-			    gli[2] * rr7 * scale7;
-		    *eintra += f * .5 * eifix;
+		    *eintra = *eintra + efix + eifix;
 		}
 
 /*     print a message if the energy of this interaction is large */
 
 /* Computing MAX */
-		d__1 = abs(e), d__2 = abs(ei);
+		d__1 = abs(efix), d__2 = abs(eifix);
 		huge__ = max(d__1,d__2) > 100.;
 		if (inform_1.debug || inform_1.verbose && huge__) {
 		    if (muse || puse) {
@@ -4628,9 +4629,10 @@ static integer c__1 = 1;
 			do_fio(&c__1, name___ref(0, kk), (ftnlen)3);
 			do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(doublereal)
 				);
-			do_fio(&c__1, (char *)&e, (ftnlen)sizeof(doublereal));
-			do_fio(&c__1, (char *)&ei, (ftnlen)sizeof(doublereal))
-				;
+			do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
+				doublereal));
+			do_fio(&c__1, (char *)&eifix, (ftnlen)sizeof(
+				doublereal));
 			e_wsfe();
 		    }
 		}
@@ -4721,7 +4723,7 @@ static integer c__1 = 1;
 		zr = atoms_1.z__[kk - 1] - atoms_1.z__[ii - 1];
 		imager_(&xr, &yr, &zr, &j);
 		r2 = xr * xr + yr * yr + zr * zr;
-		if (r2 <= shunt_1.cut2) {
+		if (r2 <= shunt_1.off2) {
 		    r__ = sqrt(r2);
 		    ck = rpole_ref(1, k);
 		    dkx = rpole_ref(2, k);
@@ -4875,8 +4877,12 @@ static integer c__1 = 1;
 
 /*     print a message if the energy of this interaction is large */
 
+		    efix = f * efix * mscale[kk - 1];
+		    eifix = gli[0] * rr3 * scale3 + gli[1] * rr5 * scale5 + 
+			    gli[2] * rr7 * scale7;
+		    eifix = f * .5 * eifix;
 /* Computing MAX */
-		    d__1 = abs(e), d__2 = abs(ei);
+		    d__1 = abs(efix), d__2 = abs(eifix);
 		    huge__ = max(d__1,d__2) > 100.;
 		    if (inform_1.debug || inform_1.verbose && huge__) {
 			if (header) {
@@ -4893,9 +4899,10 @@ static integer c__1 = 1;
 			do_fio(&c__1, name___ref(0, kk), (ftnlen)3);
 			do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(doublereal)
 				);
-			do_fio(&c__1, (char *)&e, (ftnlen)sizeof(doublereal));
-			do_fio(&c__1, (char *)&ei, (ftnlen)sizeof(doublereal))
-				;
+			do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
+				doublereal));
+			do_fio(&c__1, (char *)&eifix, (ftnlen)sizeof(
+				doublereal));
 			e_wsfe();
 		    }
 		}
@@ -6303,7 +6310,7 @@ static integer c__1 = 1;
 	    zr = atoms_1.z__[kk - 1] - atoms_1.z__[ii - 1];
 	    image_(&xr, &yr, &zr);
 	    r2 = xr * xr + yr * yr + zr * zr;
-	    if (r2 <= shunt_1.cut2) {
+	    if (r2 <= shunt_1.off2) {
 		r__ = sqrt(r2);
 		ck = rpole_ref(1, k);
 		dkx = rpole_ref(2, k);
@@ -6451,17 +6458,18 @@ static integer c__1 = 1;
 
 /*     increment the total intramolecular energy */
 
+		efix = f * efix * mscale[kk - 1];
+		eifix = gli[0] * rr3 * scale3 + gli[1] * rr5 * scale5 + gli[2]
+			 * rr7 * scale7;
+		eifix = f * .5 * eifix;
 		if (molcul_1.molcule[ii - 1] == molcul_1.molcule[kk - 1]) {
-		    *eintra += f * efix * mscale[kk - 1];
-		    eifix = gli[0] * rr3 * scale3 + gli[1] * rr5 * scale5 + 
-			    gli[2] * rr7 * scale7;
-		    *eintra += f * .5 * eifix;
+		    *eintra = *eintra + efix + eifix;
 		}
 
 /*     print a message if the energy of this interaction is large */
 
 /* Computing MAX */
-		d__1 = abs(e), d__2 = abs(ei);
+		d__1 = abs(efix), d__2 = abs(eifix);
 		huge__ = max(d__1,d__2) > 100.;
 		if (inform_1.debug || inform_1.verbose && huge__) {
 		    if (muse || puse) {
@@ -6479,9 +6487,10 @@ static integer c__1 = 1;
 			do_fio(&c__1, name___ref(0, kk), (ftnlen)3);
 			do_fio(&c__1, (char *)&r__, (ftnlen)sizeof(doublereal)
 				);
-			do_fio(&c__1, (char *)&e, (ftnlen)sizeof(doublereal));
-			do_fio(&c__1, (char *)&ei, (ftnlen)sizeof(doublereal))
-				;
+			do_fio(&c__1, (char *)&efix, (ftnlen)sizeof(
+				doublereal));
+			do_fio(&c__1, (char *)&eifix, (ftnlen)sizeof(
+				doublereal));
 			e_wsfe();
 		    }
 		}

@@ -2814,7 +2814,7 @@ L20:
     static doublereal fi, fs, rb, xi, yi, zi, xd, yd, zd, xr, yr, zr, rb2, 
 	    fik, rew, vxx, vyx, vyy, vzx, vzz, vzy;
     extern doublereal erfc_(doublereal *);
-    static doublereal dedx, dedy, dedz, fgrp, term;
+    static doublereal dedx, dedy, dedz, efix, fgrp, term;
     static logical usei;
     extern /* Subroutine */ int image_(doublereal *, doublereal *, doublereal 
 	    *);
@@ -3459,17 +3459,6 @@ L20:
 		yr = yi - atoms_1.y[k - 1];
 		zr = zi - atoms_1.z__[k - 1];
 
-/*     increment the total intramolecular energy */
-
-		if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) {
-		    r2 = xr * xr + yr * yr + zr * zr;
-		    r__ = sqrt(r2);
-		    rb = r__ + chgpot_1.ebuffer;
-		    fik = fi * charge_1.pchg[kk - 1] * cscale[kn - 1];
-		    e = fik / rb;
-		    eintra += e;
-		}
-
 /*     find energy for interactions within real space cutoff */
 
 		image_(&xr, &yr, &zr);
@@ -3527,6 +3516,14 @@ L20:
 		    vir_ref(1, 3) = vir_ref(1, 3) + vzx;
 		    vir_ref(2, 3) = vir_ref(2, 3) + vzy;
 		    vir_ref(3, 3) = vir_ref(3, 3) + vzz;
+
+/*     increment the total intramolecular energy */
+
+		    if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) 
+			    {
+			efix = fik / rb * scale;
+			eintra += efix;
+		    }
 		}
 	    }
 	}
@@ -3550,10 +3547,6 @@ L20:
 	    cscale[i15_ref(j, in) - 1] = 1.;
 	}
     }
-
-/*     intermolecular energy is total minus intramolecular part */
-
-    inter_1.einter = inter_1.einter + energi_1.ec - eintra;
 
 /*     for periodic boundary conditions with large cutoffs */
 /*     neighbors must be found by the replicates method */
@@ -3745,7 +3738,7 @@ L20:
 
     /* Builtin functions */
     integer s_cmp(char *, char *, ftnlen, ftnlen);
-    double sqrt(doublereal), d_sign(doublereal *, doublereal *), exp(
+    double d_sign(doublereal *, doublereal *), sqrt(doublereal), exp(
 	    doublereal);
 
     /* Local variables */
@@ -3760,7 +3753,7 @@ L20:
     extern doublereal erfc_(doublereal *);
     static doublereal dedx;
     static integer kmap;
-    static doublereal dedy, dedz;
+    static doublereal dedy, efix, dedz;
     static integer stop;
     static doublereal fgrp, term;
     static logical usei;
@@ -4488,18 +4481,6 @@ L10:
 		yr = yi - ysort[kgy - 1];
 		zr = zi - zsort[kgz - 1];
 
-/*     increment the total intramolecular energy */
-
-		if (prime && molcul_1.molcule[i__ - 1] == molcul_1.molcule[k 
-			- 1]) {
-		    r2 = xr * xr + yr * yr + zr * zr;
-		    r__ = sqrt(r2);
-		    rb = r__ + chgpot_1.ebuffer;
-		    fik = fi * charge_1.pchg[kmap - 1] * cscale[kn - 1];
-		    e = fik / rb;
-		    eintra += e;
-		}
-
 /*     find energy for interactions within real space cutoff */
 
 		if (bound_1.use_bounds__) {
@@ -4585,6 +4566,14 @@ L10:
 		    vir_ref(1, 3) = vir_ref(1, 3) + vzx;
 		    vir_ref(2, 3) = vir_ref(2, 3) + vzy;
 		    vir_ref(3, 3) = vir_ref(3, 3) + vzz;
+
+/*     increment the total intramolecular energy */
+
+		    if (prime && molcul_1.molcule[i__ - 1] == 
+			    molcul_1.molcule[k - 1]) {
+			efix = fik / rb * scale;
+			eintra += efix;
+		    }
 		}
 	    }
 L20:
@@ -4665,7 +4654,7 @@ L20:
     static integer kkk;
     static doublereal rew, vxx, vyx, vyy, vzx, vzz, vzy;
     extern doublereal erfc_(doublereal *);
-    static doublereal dedx, dedy, dedz, fgrp, term;
+    static doublereal dedx, dedy, dedz, efix, fgrp, term;
     static logical usei;
     extern /* Subroutine */ int image_(doublereal *, doublereal *, doublereal 
 	    *);
@@ -5313,17 +5302,6 @@ L20:
 		yr = yi - atoms_1.y[k - 1];
 		zr = zi - atoms_1.z__[k - 1];
 
-/*     increment the total intramolecular energy */
-
-		if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) {
-		    r2 = xr * xr + yr * yr + zr * zr;
-		    r__ = sqrt(r2);
-		    rb = r__ + chgpot_1.ebuffer;
-		    fik = fi * charge_1.pchg[kk - 1] * cscale[kn - 1];
-		    e = fik / rb;
-		    eintra += e;
-		}
-
 /*     find energy for interactions within real space cutoff */
 
 		image_(&xr, &yr, &zr);
@@ -5381,6 +5359,14 @@ L20:
 		    vir_ref(1, 3) = vir_ref(1, 3) + vzx;
 		    vir_ref(2, 3) = vir_ref(2, 3) + vzy;
 		    vir_ref(3, 3) = vir_ref(3, 3) + vzz;
+
+/*     increment the total intramolecular energy */
+
+		    if (molcul_1.molcule[i__ - 1] == molcul_1.molcule[k - 1]) 
+			    {
+			efix = fik / rb * scale;
+			eintra += efix;
+		    }
 		}
 	    }
 	}
