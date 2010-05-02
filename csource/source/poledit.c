@@ -6342,7 +6342,7 @@ L60:
     /* Format strings */
     static char fmt_10[] = "(a)";
     static char fmt_20[] = "()";
-    static char fmt_30[] = "(\002atom\002,6x,2i5,4x,a3,4x,\002\"\002,a20"
+    static char fmt_30[] = "(\002atom\002,6x,2i5,4x,a3,3x,\002\"\002,a20"
 	    ",\002\"\002,i10,f10.3,i5)";
     static char fmt_40[] = "()";
     static char fmt_50[] = "(\002multipole\002,1x,3i5,11x,f11.5)";

@@ -1155,12 +1155,10 @@ L110:
 	if (minat == 0) {
 	    done = TRUE_;
 	}
-	if (! done) {
-	    if (potent_1.use_tors__) {
-		if (usage_1.use[ia - 1] || usage_1.use[ib - 1] || usage_1.use[
-			ic - 1] || usage_1.use[id - 1]) {
-		    inform_1.abort = TRUE_;
-		}
+	if (potent_1.use_tors__ && ! done) {
+	    if (usage_1.use[ia - 1] || usage_1.use[ib - 1] || usage_1.use[ic 
+		    - 1] || usage_1.use[id - 1]) {
+		inform_1.abort = TRUE_;
 	    }
 	    if (header) {
 		header = FALSE_;

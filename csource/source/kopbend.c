@@ -98,6 +98,13 @@ struct {
 
 #define potent_1 potent_
 
+struct {
+    integer nuse, iuse[25000];
+    logical use[25000];
+} usage_;
+
+#define usage_1 usage_
+
 /* Table of constant values */
 
 static integer c__3 = 3;
@@ -132,10 +139,10 @@ static integer c__4 = 4;
     static char fmt_30[] = "(4x,4i4,10x,f12.3)";
     static char fmt_40[] = "(/,\002 KOPBEND --  Too many Out-of-Plane\002"
 	    ",\002 Angle Bending Parameters\002)";
-    static char fmt_70[] = "(/,\002 Undefined Out-of-Plane Bend Parameters "
-	    ":\002,//,\002 Type\002,24x,\002Atom Names\002,24x,\002Atom Class"
-	    "es\002,/)";
-    static char fmt_80[] = "(\002 Angle-OP\002,3x,4(i6,\002-\002,a3),5x,4i5)";
+    static char fmt_80[] = "(/,\002 Undefined Out-of-Plane Bend\002,\002 Par"
+	    "ameters :\002,//,\002 Type\002,24x,\002Atom Names\002,24x,\002At"
+	    "om Classes\002,/)";
+    static char fmt_90[] = "(\002 Angle-OP\002,3x,4(i6,\002-\002,a3),5x,4i5)";
 
     /* System generated locals */
     address a__1[4], a__2[3];
@@ -155,8 +162,10 @@ static integer c__4 = 4;
     static char pt[16], pt0[16], pt1[16];
     static integer ita, itb, itc, itd;
     static doublereal fopb;
+    static logical done;
+    static integer nopb;
     static logical jopb[1000];
-    static integer nopb, size, next;
+    static integer size, next;
     static char zero4[4], zero8[8], blank[16];
     static logical header;
     static char record[120];
@@ -174,8 +183,8 @@ static integer c__4 = 4;
     static cilist io___22 = { 0, 0, 0, fmt_20, 0 };
     static cilist io___23 = { 0, 0, 0, fmt_30, 0 };
     static cilist io___25 = { 0, 0, 0, fmt_40, 0 };
-    static cilist io___35 = { 0, 0, 0, fmt_70, 0 };
     static cilist io___36 = { 0, 0, 0, fmt_80, 0 };
+    static cilist io___37 = { 0, 0, 0, fmt_90, 0 };
 
 
 
@@ -512,6 +521,25 @@ static integer c__4 = 4;
 
 
 
+/*     ################################################### */
+/*     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ## */
+/*     ##              All Rights Reserved              ## */
+/*     ################################################### */
+
+/*     ########################################################### */
+/*     ##                                                       ## */
+/*     ##  usage.i  --  atoms active during energy computation  ## */
+/*     ##                                                       ## */
+/*     ########################################################### */
+
+
+/*     nuse   total number of active atoms in energy calculation */
+/*     iuse   numbers of the atoms active in energy calculation */
+/*     use    true if an atom is active, false if inactive */
+
+
+
+
 /*     process keywords containing out-of-plane bend parameters */
 
     s_copy(blank, "                ", (ftnlen)16, (ftnlen)16);
@@ -684,6 +712,7 @@ L60:
 		i__4[1] = 4, a__2[1] = pb;
 		i__4[2] = 8, a__2[2] = zero8;
 		s_cat(pt0, a__2, i__4, &c__3, (ftnlen)16);
+		done = FALSE_;
 		i__2 = nopb;
 		for (j = 1; j <= i__2; ++j) {
 		    if (s_cmp(kopb_ref(0, j), pt, (ftnlen)16, (ftnlen)16) == 
@@ -692,7 +721,8 @@ L60:
 			opbend_1.iopb[opbend_1.nopbend - 1] = i__;
 			opbend_1.opbk[opbend_1.nopbend - 1] = kopbnd_1.opbn[j 
 				- 1];
-			goto L90;
+			done = TRUE_;
+			goto L70;
 		    }
 		}
 		i__2 = nopb;
@@ -703,7 +733,8 @@ L60:
 			opbend_1.iopb[opbend_1.nopbend - 1] = i__;
 			opbend_1.opbk[opbend_1.nopbend - 1] = kopbnd_1.opbn[j 
 				- 1];
-			goto L90;
+			done = TRUE_;
+			goto L70;
 		    }
 		}
 		i__2 = nopb;
@@ -714,33 +745,38 @@ L60:
 			opbend_1.iopb[opbend_1.nopbend - 1] = i__;
 			opbend_1.opbk[opbend_1.nopbend - 1] = kopbnd_1.opbn[j 
 				- 1];
-			goto L90;
+			done = TRUE_;
+			goto L70;
 		    }
 		}
-		inform_1.abort = TRUE_;
-		if (header) {
-		    header = FALSE_;
-		    io___35.ciunit = iounit_1.iout;
-		    s_wsfe(&io___35);
+L70:
+		if (potent_1.use_opbend__ && ! done) {
+		    if (usage_1.use[ia - 1] || usage_1.use[ib - 1] || 
+			    usage_1.use[ic - 1] || usage_1.use[id - 1]) {
+			inform_1.abort = TRUE_;
+		    }
+		    if (header) {
+			header = FALSE_;
+			io___36.ciunit = iounit_1.iout;
+			s_wsfe(&io___36);
+			e_wsfe();
+		    }
+		    io___37.ciunit = iounit_1.iout;
+		    s_wsfe(&io___37);
+		    do_fio(&c__1, (char *)&id, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, name___ref(0, id), (ftnlen)3);
+		    do_fio(&c__1, (char *)&ib, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, name___ref(0, ib), (ftnlen)3);
+		    do_fio(&c__1, (char *)&ia, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, name___ref(0, ia), (ftnlen)3);
+		    do_fio(&c__1, (char *)&ic, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, name___ref(0, ic), (ftnlen)3);
+		    do_fio(&c__1, (char *)&itd, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&itb, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&ita, (ftnlen)sizeof(integer));
+		    do_fio(&c__1, (char *)&itc, (ftnlen)sizeof(integer));
 		    e_wsfe();
 		}
-		io___36.ciunit = iounit_1.iout;
-		s_wsfe(&io___36);
-		do_fio(&c__1, (char *)&id, (ftnlen)sizeof(integer));
-		do_fio(&c__1, name___ref(0, id), (ftnlen)3);
-		do_fio(&c__1, (char *)&ib, (ftnlen)sizeof(integer));
-		do_fio(&c__1, name___ref(0, ib), (ftnlen)3);
-		do_fio(&c__1, (char *)&ia, (ftnlen)sizeof(integer));
-		do_fio(&c__1, name___ref(0, ia), (ftnlen)3);
-		do_fio(&c__1, (char *)&ic, (ftnlen)sizeof(integer));
-		do_fio(&c__1, name___ref(0, ic), (ftnlen)3);
-		do_fio(&c__1, (char *)&itd, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&itb, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&ita, (ftnlen)sizeof(integer));
-		do_fio(&c__1, (char *)&itc, (ftnlen)sizeof(integer));
-		e_wsfe();
-L90:
-		;
 	    } else {
 		iang_ref(4, i__) = ib;
 	    }

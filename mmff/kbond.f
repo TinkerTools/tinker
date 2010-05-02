@@ -272,10 +272,8 @@ c
   130    continue
          minat = min(atomic(ia),atomic(ib))
          if (minat .eq. 0)  done = .true.
-         if (.not. done) then
-            if (use_bond) then
-               if (use(ia) .or. use(ib))  abort = .true.
-            end if
+         if (use_bond .and. .not.done) then
+            if (use(ia) .or. use(ib))  abort = .true.
             if (header) then
                header = .false.
                write (iout,140)

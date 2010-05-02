@@ -2202,7 +2202,7 @@ c
          do i = 1, n
             write (ikey,30)  i,i,name(i),story(i),atomic(i),
      &                       mass(i),valence(i)
-   30       format ('atom',6x,2i5,4x,a3,4x,'"',a20,'"',i10,f10.3,i5)
+   30       format ('atom',6x,2i5,4x,a3,3x,'"',a20,'"',i10,f10.3,i5)
          end do
          if (n .ne. 0) then
             write (ikey,40)

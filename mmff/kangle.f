@@ -843,10 +843,8 @@ c
   220    continue
          minat = min(atomic(ia),atomic(ib),atomic(ic))
          if (minat .eq. 0)  done = .true.
-         if (.not. done) then
-            if (use_angle) then
-               if (use(ia) .or. use(ib) .or. use(ic))  abort = .true.
-            end if
+         if (use_angle .and. .not.done) then
+            if (use(ia) .or. use(ib) .or. use(ic))  abort = .true.
             if (header) then
                header = .false.
                write (iout,230)

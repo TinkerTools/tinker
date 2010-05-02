@@ -467,11 +467,9 @@ c
   110    continue
          minat = min(atomic(ia),atomic(ib),atomic(ic),atomic(id))
          if (minat .eq. 0)  done = .true.
-         if (.not. done) then
-            if (use_tors) then
-               if (use(ia) .or. use(ib) .or. use(ic) .or. use(id))
-     &            abort = .true.
-            end if
+         if (use_tors .and. .not.done) then
+            if (use(ia) .or. use(ib) .or. use(ic) .or. use(id))
+     &         abort = .true.
             if (header) then
                header = .false.
                write (iout,120)

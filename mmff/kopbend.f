@@ -33,6 +33,7 @@ c
       include 'merck.i'
       include 'opbend.i'
       include 'potent.i'
+      include 'usage.i'
       integer i,j,nopb,it
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -42,7 +43,7 @@ c
       integer next,size
       integer collclass
       real*8 fopb
-      logical header
+      logical header,done
       logical jopb(maxclass)
       character*4 pa,pb,pc,pd
       character*4 zero4
@@ -163,7 +164,8 @@ c
                      nopbend = nopbend + 1
                      iopb(nopbend) = i
                      opbk(nopbend) = opbn(j)
-                     goto 90
+                     done = .true.
+                     goto 70
                   end if
                end do
                do j = 1, nopb
@@ -171,7 +173,8 @@ c
                      nopbend = nopbend + 1
                      iopb(nopbend) = i
                      opbk(nopbend) = opbn(j)
-                     goto 90
+                     done = .true.
+                     goto 70
                   end if
                end do
                do j = 1, nopb
@@ -179,21 +182,26 @@ c
                      nopbend = nopbend + 1
                      iopb(nopbend) = i
                      opbk(nopbend) = opbn(j)
-                     goto 90
+                     done = .true.
+                     goto 70
                   end if
                end do
-               abort = .true.
-               if (header) then
-                  header = .false.
-                  write (iout,70)
-   70             format (/,' Undefined Out-of-Plane Bend Parameters :',
-     &                    //,' Type',24x,'Atom Names',24x,
-     &                       'Atom Classes',/)
+   70          continue
+               if (use_opbend .and. .not.done) then
+                  if (use(ia) .or. use(ib) .or. use(ic) .or. use(id))
+     &               abort = .true.
+                  if (header) then
+                     header = .false.
+                     write (iout,80)
+   80                format (/,' Undefined Out-of-Plane Bend',
+     &                          ' Parameters :',
+     &                       //,' Type',24x,'Atom Names',24x,
+     &                          'Atom Classes',/)
+                  end if
+                  write (iout,90)  id,name(id),ib,name(ib),ia,name(ia),
+     &                             ic,name(ic),itd,itb,ita,itc
+   90             format (' Angle-OP',3x,4(i6,'-',a3),5x,4i5)
                end if
-               write (iout,80)  id,name(id),ib,name(ib),ia,name(ia),
-     &                          ic,name(ic),itd,itb,ita,itc
-   80          format (' Angle-OP',3x,4(i6,'-',a3),5x,4i5)
-   90          continue
             else
                iang(4,i) = ib
             end if
