@@ -41,6 +41,7 @@ c
       parameter (maxtable=4*maxfft)
       integer nfft1,nfft2,nfft3
       integer bsorder,iprime,igrid
+      integer*8 fftw_planf,fftw_planb
       real*8 bsmod1,bsmod2,bsmod3
       real*8 table,thetai1
       real*8 thetai2,thetai3
@@ -53,4 +54,4 @@ c
      &             thetai3(4,maxorder,maxatm),
      &             nfft1,nfft2,nfft3,bsorder,
      &             iprime(maxprime,3),igrid(3,maxatm),
-     &             qgrid,qfac
+     &             qgrid,qfac,fftw_planf,fftw_planb

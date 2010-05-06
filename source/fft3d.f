@@ -20,15 +20,38 @@ c
       implicit none
       include 'sizes.i'
       include 'pme.i'
-c
+	   
+	   integer error
+	   integer FFTW_FORWARD
+	   parameter (FFTW_FORWARD=-1)
+	   integer FFTW_BACKWARD
+	   parameter (FFTW_BACKWARD=+1)
+	   integer FFTW_ESTIMATE
+	   parameter (FFTW_ESTIMATE=64)
+
+	  integer nprocs
+!$	  integer omp_get_num_procs
 c
 c     perform initialization along X, Y and Z directions
 c
-      call cffti (nfft1,table(1,1),iprime(1,1))
-      call cffti (nfft2,table(1,2),iprime(1,2))
-      call cffti (nfft3,table(1,3),iprime(1,3))
-      return
-      end
+	  nprocs = 1
+	  error = 12
+!$    if(1.eq.1) then
+!$      nprocs = omp_get_num_procs()
+!$		 call dfftw_init_threads(error)
+!$		 call dfftw_plan_with_nthreads(nprocs)
+!$		 call dfftw_plan_dft_3d(fftw_planf,nfft1,nfft2,nfft3,
+!$   &        qgrid,qgrid,FFTW_FORWARD,FFTW_ESTIMATE)
+!$		 call dfftw_plan_dft_3d(fftw_planb,nfft1,nfft2,nfft3,
+!$   &        qgrid,qgrid,FFTW_BACKWARD,FFTW_ESTIMATE)
+!$	   else
+		 call cffti (nfft1,table(1,1),iprime(1,1))
+		 call cffti (nfft2,table(1,2),iprime(1,2))
+		 call cffti (nfft3,table(1,3),iprime(1,3))
+!$	   endif
+      
+	  return
+	  end
 c
 c
 c     ##########################################################
@@ -42,7 +65,21 @@ c     "fftfront" does a 3-D FFT forward transform via three
 c     separate 1-D transformations
 c
 c
-      subroutine fftfront
+	  subroutine fftfront
+      implicit none
+      include 'sizes.i'
+      include 'pme.i'
+
+!$	  if(1.eq.1) then
+!$	  call dfftw_execute_dft(fftw_planf,qgrid,qgrid)
+!$	  else
+	  call fftfront_orig
+!$	  endif
+
+	  return
+	  end
+	  
+      subroutine fftfront_orig
       implicit none
       include 'sizes.i'
       include 'pme.i'
@@ -106,7 +143,21 @@ c     "fftback" does a 3-D FFT backward transform via three
 c     separate 1-D transformations
 c
 c
-      subroutine fftback
+	  subroutine fftback
+      implicit none
+      include 'sizes.i'
+      include 'pme.i'
+	  
+!$	  if(1.eq.1) then
+!$	  call dfftw_execute_dft(fftw_planb,qgrid,qgrid)
+!$	  else
+	  call fftback_orig
+!$	  endif
+
+	  return
+	  end
+	  
+      subroutine fftback_orig
       implicit none
       include 'sizes.i'
       include 'pme.i'
