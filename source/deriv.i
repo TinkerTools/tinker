@@ -45,7 +45,6 @@ c
       real*8 debt,dett,dev,dec
       real*8 decd,ded,dem,dep,der
       real*8 des,delf,deg,dex
-      real*8 demi,demk,depi,depk
       common /deriv/ desum(3,maxatm),deb(3,maxatm),dea(3,maxatm),
      &               deba(3,maxatm),deub(3,maxatm),deaa(3,maxatm),
      &               deopb(3,maxatm),deopd(3,maxatm),deid(3,maxatm),
@@ -54,5 +53,4 @@ c
      &               dec(3,maxatm),decd(3,maxatm),ded(3,maxatm),
      &               dem(3,maxatm),dep(3,maxatm),der(3,maxatm),
      &               des(3,maxatm),delf(3,maxatm),deg(3,maxatm),
-     &               dex(3,maxatm),demi(3,maxatm),demk(3,maxatm),
-     &               depi(3,maxatm),depk(3,maxatm)
+     &               dex(3,maxatm)

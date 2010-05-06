@@ -45,7 +45,5 @@ c
       real*8 ebt,ett,ev,ec
       real*8 ecd,ed,em,ep,er
       real*8 es,elf,eg,ex
-      real*8 emtt,eptt
       common /energi/ esum,eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,et,ept,
-     &                ebt,ett,ev,ec,ecd,ed,em,ep,er,es,elf,eg,ex,
-     &                emtt,eptt
+     &                ebt,ett,ev,ec,ecd,ed,em,ep,er,es,elf,eg,ex

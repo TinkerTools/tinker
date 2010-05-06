@@ -4729,6 +4729,11 @@ c
       real*8 uscale(maxatm)
       logical dorl,dorli
       external erfc
+	  
+	  real*8 emtt,eptt
+	  real*8 virt(3,3)
+	  real*8 demi(3,maxatm),demk(3,maxatm)
+	  real*8 depi(3,maxatm),depk(3,maxatm)
 c
 c
 c     zero out the intramolecular portion of the Ewald energy
@@ -4750,8 +4755,48 @@ c
       f = electric / dielec
       call switch ('EWALD')
 c
+c     Initialize OpenMP variables
+c
+	  emtt = 0.0d0
+	  eptt = 0.0d0
+	  
+	  do i=1,3
+		do j=1,3
+			viri(j,i) = 0.0d0
+		end do
+	  end do
+	  
+	  do i=1,maxatm
+		do j=1,3
+			demi(j,i) = 0.0d0
+			demk(j,i) = 0.0d0
+			depi(j,i) = 0.0d0
+			depk(j,i) = 0.0d0
+		end do
+	  end do	  
+c
 c     set the permanent multipole and induced dipole values
 c
+!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,eintra,damp,expdamp,
+!$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
+!$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,usc3,usc5,alsq2,alsq2n,
+!$OMP& exp2a,ralpha,gfd,gfdr,xr,yr,zr,xix,yix,zix,
+!$OMP& xiz,yiz,ziz,xkx,ykx,zkx,xkz,ykz,zkz,r,r2,rr1,rr3,
+!$OMP& xiy,yiy,ziy,xky,yky,zky,
+!$OMP& rr5,rr7,rr9,rr11,erl,erli,vxx,vyy,vzz,vyx,vzx,vzy,
+!$OMP& frcxi,frcyi,frczi,frcxk,frcyk,frczk,ci,di,qi,ck,dk,qk,
+!$OMP& fridmp,findmp,ftm2,ftm2i,ftm2r,ftm2ri,ttm2,ttm3,
+!$OMP& ttm2i,ttm3i,ttm2r,ttm3r,ttm2ri,ttm3ri,fdir,dixdk,
+!$OMP& dkxui,dixuk,dixukp,dkxuip,uixqkr,ukxqir,uixqkrp,ukxqirp,
+!$OMP& qiuk,qkui,qiukp,qkuip,rxqiuk,rxqkui,rxqiukp,rxqkuip,
+!$OMP& qidk,qkdi,qir,qkr,qiqkr,qkqir,qixqk,rxqir,dixr,dkxr,
+!$OMP& dixqkr,dkxqir,rxqkr,qkrxqir,rxqikr,rxqkir,rxqidk,rxqkdi,
+!$OMP& ddsc3,ddsc5,ddsc7,bn,sc,gl,sci,scip,gli,glip,gf,gfi,
+!$OMP& gfr,gfri,gti,gtri,dorl,dorli)
+!$OMP& firstprivate(mscale,pscale,dscale,uscale)
+!$OMP DO reduction(+:emtt,eptt,viri,demi,depi,demk,depk)
+!$OMP& schedule(dynamic,600)
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -5104,8 +5149,8 @@ c
                ei = ei - erli
                e = f * e
                ei = f * ei
-               em = em + e
-               ep = ep + ei
+               emtt = emtt + e
+               eptt = eptt + ei
 c
 c     increment the total intramolecular energy; assumes
 c     intramolecular distances are less than half of cell
@@ -5493,23 +5538,24 @@ c
 c
 c     increment gradient due to force and torque on first site
 c
-               dem(1,ii) = dem(1,ii) + ftm2(1)
-               dem(2,ii) = dem(2,ii) + ftm2(2)
-               dem(3,ii) = dem(3,ii) + ftm2(3)
-               dep(1,ii) = dep(1,ii) + ftm2i(1)
-               dep(2,ii) = dep(2,ii) + ftm2i(2)
-               dep(3,ii) = dep(3,ii) + ftm2i(3)
-               call torque (i,ttm2,ttm2i,frcxi,frcyi,frczi)
+               demi(1,ii) = demi(1,ii) + ftm2(1)
+               demi(2,ii) = demi(2,ii) + ftm2(2)
+               demi(3,ii) = demi(3,ii) + ftm2(3)
+               depi(1,ii) = depi(1,ii) + ftm2i(1)
+               depi(2,ii) = depi(2,ii) + ftm2i(2)
+               depi(3,ii) = depi(3,ii) + ftm2i(3)
+               call torque4(i,ttm2,ttm2i,frcxi,frcyi,frczi,demi,depi)
 c
 c     increment gradient due to force and torque on second site
 c
-               dem(1,kk) = dem(1,kk) - ftm2(1)
-               dem(2,kk) = dem(2,kk) - ftm2(2)
-               dem(3,kk) = dem(3,kk) - ftm2(3)
-               dep(1,kk) = dep(1,kk) - ftm2i(1)
-               dep(2,kk) = dep(2,kk) - ftm2i(2)
-               dep(3,kk) = dep(3,kk) - ftm2i(3)
-               call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk)
+               demk(1,kk) = demk(1,kk) - ftm2(1)
+               demk(2,kk) = demk(2,kk) - ftm2(2)
+               demk(3,kk) = demk(3,kk) - ftm2(3)
+               depk(1,kk) = depk(1,kk) - ftm2i(1)
+               depk(2,kk) = depk(2,kk) - ftm2i(2)
+               depk(3,kk) = depk(3,kk) - ftm2i(3)
+			     call torque4(k,ttm3,ttm3i,frcxk,frcyk,frczk,demk,depk)
+               !call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk)
 c
 c     increment the internal virial tensor components
 c
@@ -5561,15 +5607,15 @@ c
                vzz = -zr*(ftm2(3)+ftm2i(3)) + zix*frcxi(3)
      &                  + ziy*frcyi(3) + ziz*frczi(3) + zkx*frcxk(3)
      &                  + zky*frcyk(3) + zkz*frczk(3)
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
+               viri(1,1) = viri(1,1) + vxx
+               viri(2,1) = viri(2,1) + vyx
+               viri(3,1) = viri(3,1) + vzx
+               viri(1,2) = viri(1,2) + vyx
+               viri(2,2) = viri(2,2) + vyy
+               viri(3,2) = viri(3,2) + vzy
+               viri(1,3) = viri(1,3) + vzx
+               viri(2,3) = viri(2,3) + vzy
+               viri(3,3) = viri(3,3) + vzz
             end if
          end do
 c
@@ -5608,6 +5654,25 @@ c
             uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
+!$OMP END PARALLEL
+	  
+	  do i=1,3
+		do j=1,3
+			vir(j,i) = viri(j,i) + vir(j,i)
+		end do
+	  end do
+	  
+	  do i=1,maxatm
+		do j=1,3
+			dem(j,i) = dem(j,i) + demi(j,i) + demk(j,i)
+			dep(j,i) = dep(j,i) + depi(j,i) + depk(j,i)
+		end do
+	  end do
+
+	  em = emtt + em
+	  ep = eptt + ep
+	  
       return
       end
 c
