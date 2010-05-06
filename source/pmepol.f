@@ -354,8 +354,9 @@ c
       real*8 fphi(20,maxatm)
 c
 c
-c     extract the permanent multipole field at each site
-c
+!$OMP PARALLEL default(private) shared(npole,igrid,bsorder,
+!$OMP& nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,fphi)
+!$OMP DO
       do m = 1, npole
          igrd0 = igrid(1,m)
          jgrd0 = igrid(2,m)
@@ -426,9 +427,9 @@ c
                tu20 = tu20 + t2*u0
                tu11 = tu11 + t1*u1
                tu02 = tu02 + t0*u2
-               tu30 = tu30 + t3*u0
-               tu21 = tu21 + t2*u1
-               tu12 = tu12 + t1*u2
+               tu30 = tu30 + t3*u0 
+               tu21 = tu21 + t2*u1 
+               tu12 = tu12 + t1*u2 
                tu03 = tu03 + t0*u3
             end do
             tuv000 = tuv000 + tu00*v0
@@ -473,6 +474,8 @@ c
          fphi(19,m) = tuv012
          fphi(20,m) = tuv111
       end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -524,8 +527,9 @@ c
       real*8 fdip_sum_phi(20,maxatm)
 c
 c
-c     extract the induced dipole field at each site
-c
+!$OMP PARALLEL DO default(private) shared(npole,igrid,
+!$OMP& bsorder,nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,
+!$OMP& fdip_phi1,fdip_phi2,fdip_sum_phi)
       do m = 1, npole
          igrd0 = igrid(1,m)
          jgrd0 = igrid(2,m)
@@ -648,9 +652,9 @@ c
                tu20 = tu20 + t2*u0
                tu11 = tu11 + t1*u1
                tu02 = tu02 + t0*u2
-               tu30 = tu30 + t3*u0
-               tu21 = tu21 + t2*u1
-               tu12 = tu12 + t1*u2
+               tu30 = tu30 + t3*u0 
+               tu21 = tu21 + t2*u1 
+               tu12 = tu12 + t1*u2 
                tu03 = tu03 + t0*u3
             end do
             tuv100_1 = tuv100_1 + tu10_1*v0
@@ -731,6 +735,7 @@ c
          fdip_sum_phi(19,m) = tuv012
          fdip_sum_phi(20,m) = tuv111
       end do
+!$OMP END PARALLEL DO
       return
       end
 c

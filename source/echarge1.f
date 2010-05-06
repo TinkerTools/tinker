@@ -1751,6 +1751,12 @@ c
       real*8 cscale(maxatm)
       logical proceed,usei
       external erfc
+	  
+  	  real*8 ect,eintrat,eintert
+	  real*8 dect1(3,maxatm),dect2(3,maxatm),virt(3,3)
+	  real*8 erfcore2, recr
+	  real*8 temp1,temp2,temp3
+
 c
 c
 c     zero out the Ewald summation energy and derivatives
@@ -1817,8 +1823,37 @@ c     compute reciprocal space Ewald energy and first derivatives
 c
       call ecrecip1
 c
-c     compute the real space Ewald energy and first derivatives
+c	  setup for the parallel real space calculation
 c
+	  ect = ec
+	  eintrat = eintra
+	  eintert = einter
+	  
+	  do i=1,3
+		virt(1,i) = vir(1,i)
+		virt(2,i) = vir(2,i)
+		virt(3,i) = vir(3,i)
+	  end do
+	  
+	  do i=1,maxatm
+		dect1(1,i) = dec(1,i)
+		dect1(2,i) = dec(2,i)
+		dect1(3,i) = dec(3,i)
+		dect2(1,i) = 0.0d0
+		dect2(2,i) = 0.0d0
+		dect2(3,i) = 0.0d0
+	  end do
+	  
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,f,
+!$OMP& pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
+!$OMP& c2scale,c3scale,c4scale,c5scale,use_group,fgrp,
+!$OMP& off2,aewald,molcule,ebuffer) firstprivate(cscale)
+!$OMP& shared(eintrat,eintert,ect,dect1,dect2,virt)
+!$OMP DO reduction(+:eintrat,eintert,ect,dect1,dect2,virt)
+!$OMP& schedule(dynamic,600)
+c
+c     compute the real space Ewald energy and first derivatives
+c	  
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
@@ -1845,6 +1880,9 @@ c
 c
 c     decide whether to compute the current interaction
 c
+		  temp1 = 0.0d0
+		  temp2 = 0.0d0
+		  temp3 = 0.0d0
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = iion(kk)
@@ -1887,13 +1925,13 @@ c
 c
 c     increment the overall energy and derivative expressions
 c
-                  ec = ec + e
-                  dec(1,i) = dec(1,i) + dedx
-                  dec(2,i) = dec(2,i) + dedy
-                  dec(3,i) = dec(3,i) + dedz
-                  dec(1,k) = dec(1,k) - dedx
-                  dec(2,k) = dec(2,k) - dedy
-                  dec(3,k) = dec(3,k) - dedz
+                 ect = ect + e
+                 temp1 = temp1 + dedx
+                 temp2 = temp2 + dedy
+                 temp3 = temp3 + dedz
+					dect2(1,k) = -dedx + dect2(1,k) 
+                 dect2(2,k) = -dedy + dect2(2,k)
+                 dect2(3,k) = -dedz + dect2(3,k)
 c
 c     increment the internal virial tensor components
 c
@@ -1903,15 +1941,15 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  virt(1,1) = virt(1,1) + vxx
+                  virt(2,1) = virt(2,1) + vyx
+                  virt(3,1) = virt(3,1) + vzx
+                  virt(1,2) = virt(1,2) + vyx
+                  virt(2,2) = virt(2,2) + vyy
+                  virt(3,2) = virt(3,2) + vzy
+                  virt(1,3) = virt(1,3) + vzx
+                  virt(2,3) = virt(2,3) + vzy
+                  virt(3,3) = virt(3,3) + vzz
 c
 c     increment the total intramolecular energy
 c
@@ -1922,6 +1960,11 @@ c
                end if
             end if
          end do
+
+ 		 dect1(1,i) = dect1(1,i) + temp1
+		 dect1(2,i) = dect1(2,i) + temp2
+		 dect1(3,i) = dect1(3,i) + temp3
+
 c
 c     reset interaction scaling coefficients for connected atoms
 c
@@ -1938,6 +1981,24 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+!$OMP END DO
+!$OMP END PARALLEL
+	  
+	  do i=1,3
+		vir(1,i) = virt(1,i)
+		vir(2,i) = virt(2,i)
+		vir(3,i) = virt(3,i)
+	  end do
+	  
+	  do i=1,maxatm
+		dec(1,i) = dect1(1,i) + dect2(1,i)
+		dec(2,i) = dect1(2,i) + dect2(2,i)
+		dec(3,i) = dect1(3,i) + dect2(3,i)
+	  end do
+	  
+	  einter = eintert
+	  eintra = eintrat
+	  ec = ect
 c
 c     intermolecular energy is total minus intramolecular part
 c

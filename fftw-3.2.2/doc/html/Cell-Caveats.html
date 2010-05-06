@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>Cell Caveats - FFTW 3.2.2</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="FFTW 3.2.2">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="FFTW-on-the-Cell-Processor.html#FFTW-on-the-Cell-Processor" title="FFTW on the Cell Processor">
+<link rel="prev" href="Cell-Installation.html#Cell-Installation" title="Cell Installation">
+<link rel="next" href="FFTW-Accuracy-on-Cell.html#FFTW-Accuracy-on-Cell" title="FFTW Accuracy on Cell">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for FFTW
+(version 3.2.2, 12 July 2009).
+
+Copyright (C) 2003 Matteo Frigo.
+
+Copyright (C) 2003 Massachusetts Institute of Technology.
+
+     Permission is granted to make and distribute verbatim copies of
+     this manual provided the copyright notice and this permission
+     notice are preserved on all copies.
+
+     Permission is granted to copy and distribute modified versions of
+     this manual under the conditions for verbatim copying, provided
+     that the entire resulting derived work is distributed under the
+     terms of a permission notice identical to this one.
+
+     Permission is granted to copy and distribute translations of this
+     manual into another language, under the above conditions for
+     modified versions, except that this permission notice may be
+     stated in a translation approved by the Free Software Foundation.
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<div class="node">
+<a name="Cell-Caveats"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="FFTW-Accuracy-on-Cell.html#FFTW-Accuracy-on-Cell">FFTW Accuracy on Cell</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Cell-Installation.html#Cell-Installation">Cell Installation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="FFTW-on-the-Cell-Processor.html#FFTW-on-the-Cell-Processor">FFTW on the Cell Processor</a>
+<hr>
+</div>
+
+<h3 class="section">6.2 Cell Caveats</h3>
+
+     <ul>
+<li>The FFTW benchmark program allocates memory using malloc() or
+equivalent library calls, reflecting the common usage of the FFTW
+library.  However, you can sometimes improve performance significantly
+by allocating memory in system-specific large TLB pages.  E.g., we
+have seen 39 GFLOPS/s for a 256&nbsp;&times;&nbsp;256&nbsp;&times;&nbsp;256 problem using
+large pages, whereas the speed is about 25 GFLOPS/s with normal pages. 
+YMMV.
+
+     <li>FFTW hoards all available SPEs for itself.  You can optionally
+choose a different number of SPEs by calling the undocumented
+function <code>fftw_cell_set_nspe(n)</code>, where <code>n</code> is the number of desired
+SPEs.  Expect this interface to go away once we figure out how to
+make FFTW play nicely with other Cell software.
+
+     <p>In particular, if you try to link both the single and double precision
+of FFTW in the same program (which you can do), they will both try
+to grab all SPEs and the second one will hang.
+
+     <li>The SPEs demand that data be stored in contiguous arrays aligned at
+16-byte boundaries.  If you instruct FFTW to operate on
+noncontiguous or nonaligned data, the SPEs will not be used,
+resulting in slow execution.  See <a href="Data-Alignment.html#Data-Alignment">Data Alignment</a>.
+
+     <li>The <code>FFTW_ESTIMATE</code> mode may produce seriously suboptimal plans, and
+it becomes particularly confused if you enable both the SPEs and
+Altivec.  If you care about performance, please use <code>FFTW_MEASURE</code>
+or <code>FFTW_PATIENT</code> until we figure out a more reliable performance model.
+
+</ul>
+
+<!--  -->
+   </body></html>
+

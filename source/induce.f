@@ -2204,6 +2204,9 @@ c
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
       external erfc
+	  
+	  real*8 fieldt(3,maxatm)
+	  real*8 fieldtp(3,maxatm)
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -2217,9 +2220,25 @@ c
          pscale(i) = 1.0d0
          dscale(i) = 1.0d0
       end do
+	  
+	  do i=1,npole
+	  	do j=1,3
+			fieldt(j,i) = 0.0d0
+			fieldtp(j,i) = 0.0d0
+	  	end do
+	  end do
 c
 c     compute the real space portion of the Ewald summation
 c
+!$OMP PARALLEL default(shared) private(i,j,k,ii,pdi,pti,ci,dix,diy,diz,
+!$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,kkk,kk,xr,yr,zr,
+!$OMP& r2,r,ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ralpha,bn,
+!$OMP& alsq2,alsq2n,exp2a,bfac,scale3,scale5,scale7,damp,pgamma,
+!$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,drr3,drr5,drr7,prr3,prr5,prr7,
+!$OMP& dir,qix,qiy,qiz,qir,dkr,qkx,qky,qkz,qkr,fim,fkm,fid,fkd,fip,
+!$OMP& fkp,expdamp) firstprivate(dscale,pscale)
+!$OMP DO reduction(+:fieldt,fieldtp)
+!$OMP& schedule(dynamic,600)
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -2377,10 +2396,10 @@ c
 c     increment the field at each site due to this interaction
 c
                do j = 1, 3
-                  field(j,i) = field(j,i) + fim(j) - fid(j)
-                  field(j,k) = field(j,k) + fkm(j) - fkd(j)
-                  fieldp(j,i) = fieldp(j,i) + fim(j) - fip(j)
-                  fieldp(j,k) = fieldp(j,k) + fkm(j) - fkp(j)
+                  fieldt(j,i) = fieldt(j,i) + fim(j) - fid(j)
+                  fieldt(j,k) = fieldt(j,k) + fkm(j) - fkd(j)
+                  fieldtp(j,i) = fieldtp(j,i) + fim(j) - fip(j)
+                  fieldtp(j,k) = fieldtp(j,k) + fkm(j) - fkp(j)
                end do
             end if
          end do
@@ -2412,6 +2431,16 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
+!$OMP END PARALLEL
+	  
+	  do i=1,npole
+	  	do j=1,3
+			field(j,i) = fieldt(j,i) + field(j,i)
+			fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
+	  	end do
+	  end do
+	  
       return
       end
 c
@@ -2908,6 +2937,9 @@ c
       real*8 fieldp(3,maxatm)
       real*8 dscale(maxatm)
       external erfc
+	  
+	  real*8 fieldt(3,maxatm)
+	  real*8 fieldtp(3,maxatm)
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -2920,9 +2952,25 @@ c
       do i = 1, n
          dscale(i) = 1.0d0
       end do
+
+	  do i=1,npole
+	  	do j=1,3
+			fieldt(j,i) = 0.0d0
+			fieldtp(j,i) = 0.0d0
+	  	end do
+	  end do
+	  
 c
 c     compute the real space portion of the Ewald summation
 c
+!$OMP PARALLEL default(shared) private(xr,yr,zr,r,r2,rr3,rr5,
+!$OMP& bfac,exp2a,duir,dukr,puir,pukr,pdi,pti,expdamp,
+!$OMP& duix,duiy,duiz,puix,puiy,puiz,dukx,duky,dukz,pukx,puky,pukz,
+!$OMP& ralpha,damp,alsq2,alsq2n,scale3,scale5,bn,fimd,fkmd,
+!$OMP& fimp,fkmp,fid,fkd,fip,fkp,i,j,k,ii,kk,kkk)
+!$OMP& firstprivate(dscale)
+!$OMP DO reduction(+:fieldt,fieldtp)
+!$OMP& schedule(dynamic,600)
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -3025,10 +3073,10 @@ c
 c     increment the field at each site due to this interaction
 c
                do j = 1, 3
-                  field(j,i) = field(j,i) + fimd(j) - fid(j)
-                  field(j,k) = field(j,k) + fkmd(j) - fkd(j)
-                  fieldp(j,i) = fieldp(j,i) + fimp(j) - fip(j)
-                  fieldp(j,k) = fieldp(j,k) + fkmp(j) - fkp(j)
+                  fieldt(j,i) = fieldt(j,i) + fimd(j) - fid(j)
+                  fieldt(j,k) = fieldt(j,k) + fkmd(j) - fkd(j)
+                  fieldtp(j,i) = fieldtp(j,i) + fimp(j) - fip(j)
+                  fieldtp(j,k) = fieldtp(j,k) + fkmp(j) - fkp(j)
                end do
             end if
          end do
@@ -3048,6 +3096,18 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
+
+!$OMP DO
+	  do i=1,npole
+	  	do j=1,3
+			field(j,i) = fieldt(j,i) + field(j,i)
+			fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
+	  	end do
+	  end do
+!$OMP END DO
+!$OMP END PARALLEL
+
       return
       end
 c

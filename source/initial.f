@@ -48,6 +48,11 @@ c
       real*8 precise
 c
 c
+c	  set the stacksize for OpenMP based calculations
+c
+!$	  call kmp_set_stacksize(2**24)
+c
+c
 c     number of atoms used in superposition
 c
       nfit = 0

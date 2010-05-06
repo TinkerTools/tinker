@@ -876,6 +876,9 @@ c
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
       logical proceed,usei
+	  
+	  real*8 evt,eintert
+	  real*8 devt(3,maxatm),virt(3,3)
 c
 c
 c     zero out the van der Waals energy and first derivatives
@@ -909,8 +912,34 @@ c
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
+c	  setup for the parallel real space calculation
+c
+	  evt = ev
+	  eintert = einter
+	  
+	  do i=1,3
+		virt(1,i) = vir(1,i)
+		virt(2,i) = vir(2,i)
+		virt(3,i) = vir(3,i)
+	  end do	
+	  
+	  do i=1,maxatm
+		devt(1,i) = dev(1,i)
+		devt(2,i) = dev(2,i)
+		devt(3,i) = dev(3,i)
+	  end do
+c
 c     find van der Waals energy and derivatives via neighbor list
 c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,jvdw,
+!$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
+!$OMP& fgrp,off2,radmin,epsilon,radmin4,epsilon4,ghal,
+!$OMP& dhal,cut2,c0,c1,c2,c3,c4,c5,molcule)
+!$OMP& firstprivate(vscale)
+!$OMP& shared(evt,devt,virt,eintert)
+!$OMP DO reduction(+:evt,devt,virt,eintert)
+!$OMP& schedule(dynamic,600)
       do ii = 1, nvdw
          i = ivdw(ii)
          iv = ired(i)
@@ -1009,32 +1038,32 @@ c
 c
 c     increment the total van der Waals energy and derivatives
 c
-                  ev = ev + e
+                  evt = evt + e
                   if (i .eq. iv) then
-                     dev(1,i) = dev(1,i) + dedx
-                     dev(2,i) = dev(2,i) + dedy
-                     dev(3,i) = dev(3,i) + dedz
+                     devt(1,i) = devt(1,i) + dedx
+                     devt(2,i) = devt(2,i) + dedy
+                     devt(3,i) = devt(3,i) + dedz
                   else
-                     dev(1,i) = dev(1,i) + dedx*redi
-                     dev(2,i) = dev(2,i) + dedy*redi
-                     dev(3,i) = dev(3,i) + dedz*redi
-                     dev(1,iv) = dev(1,iv) + dedx*rediv
-                     dev(2,iv) = dev(2,iv) + dedy*rediv
-                     dev(3,iv) = dev(3,iv) + dedz*rediv
+                     devt(1,i) = devt(1,i) + dedx*redi
+                     devt(2,i) = devt(2,i) + dedy*redi
+                     devt(3,i) = devt(3,i) + dedz*redi
+                     devt(1,iv) = devt(1,iv) + dedx*rediv
+                     devt(2,iv) = devt(2,iv) + dedy*rediv
+                     devt(3,iv) = devt(3,iv) + dedz*rediv
                   end if
                   if (k .eq. kv) then
-                     dev(1,k) = dev(1,k) - dedx
-                     dev(2,k) = dev(2,k) - dedy
-                     dev(3,k) = dev(3,k) - dedz
+                     devt(1,k) = -dedx + devt(1,k)
+                     devt(2,k) = -dedy + devt(2,k)
+                     devt(3,k) = -dedz + devt(3,k)
                   else
                      redk = kred(k)
                      redkv = 1.0d0 - redk
-                     dev(1,k) = dev(1,k) - dedx*redk
-                     dev(2,k) = dev(2,k) - dedy*redk
-                     dev(3,k) = dev(3,k) - dedz*redk
-                     dev(1,kv) = dev(1,kv) - dedx*redkv
-                     dev(2,kv) = dev(2,kv) - dedy*redkv
-                     dev(3,kv) = dev(3,kv) - dedz*redkv
+                     devt(1,k) = -(dedx*redk) + devt(1,k)
+                     devt(2,k) = -(dedy*redk) + devt(2,k) 
+                     devt(3,k) = -(dedz*redk) + devt(3,k) 
+                     devt(1,kv) = -(dedx*redkv) + devt(1,kv) 
+                     devt(2,kv) = -(dedy*redkv) + devt(2,kv) 
+                     devt(3,kv) = -(dedz*redkv) + devt(3,kv)
                   end if
 c
 c     increment the internal virial tensor components
@@ -1045,20 +1074,20 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  virt(1,1) = virt(1,1) + vxx
+                  virt(2,1) = virt(2,1) + vyx
+                  virt(3,1) = virt(3,1) + vzx
+                  virt(1,2) = virt(1,2) + vyx
+                  virt(2,2) = virt(2,2) + vyy
+                  virt(3,2) = virt(3,2) + vzy
+                  virt(1,3) = virt(1,3) + vzx
+                  virt(2,3) = virt(2,3) + vzy
+                  virt(3,3) = virt(3,3) + vzz
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
+                     eintert = eintert + e
                   end if
                end if
             end if
@@ -1079,5 +1108,22 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
-      return
-      end
+!$OMP END DO
+!$OMP END PARALLEL
+
+	  ev = evt
+	  einter = eintert
+	  
+	  do i=1,3
+		vir(1,i) = virt(1,i)
+		vir(2,i) = virt(2,i)
+		vir(3,i) = virt(3,i)
+	  end do
+	  
+	  do i=1,maxatm
+		dev(1,i) = devt(1,i)
+		dev(2,i) = devt(2,i)
+		dev(3,i) = devt(3,i)
+	  end do
+	  return
+	  end

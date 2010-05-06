@@ -55,8 +55,9 @@ c
       include 'iounit.i'
       include 'neigh.i'
       include 'vdw.i'
-      integer i,k
+      integer i,k,l
       integer ii,iv
+	   integer residx(maxvlst), rescnt
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius
@@ -109,7 +110,8 @@ c
 c
 c     update sites whose displacement exceeds half the buffer
 c
-      do i = 1, nvdw
+	  rescnt = 0
+	  do i = 1, nvdw
          reset(i) = .false.
          xi = xred(i)
          yi = yred(i)
@@ -122,24 +124,38 @@ c
          if (dovlst .or. r2.ge.lbuf2) then
             call vbuild (i,xred,yred,zred,xold,yold,zold)
             reset(i) = .true.
-            do k = 1, i-1
-               if (.not. reset(k)) then
-                  xr = xi - xred(k)
-                  yr = yi - yred(k)
-                  zr = zi - zred(k)
-                  call imagen (xr,yr,zr)
-                  r2 = xr*xr + yr*yr + zr*zr
-c
-c     perform an update by rebuilding lower numbered neighbors
-c
-                  if (r2 .le. vbuf2) then
-                     call vbuild (k,xred,yred,zred,xold,yold,zold)
-                     reset(k) = .true.
-                  end if
-               end if
-            end do
+			rescnt = rescnt + 1
+			residx(rescnt) = i
          end if
       end do
+	  
+	  if(rescnt.gt.0) then
+!$OMP PARALLEL default(shared) private(i,k,l)
+!$OMP DO
+	  do i=1,nvdw
+		do k=1,nvlst(i)
+			do l=1,rescnt
+				if(vlst(k,i).eq.residx(l)) then
+					if(.not.reset(i)) then
+						xr = xi - xred(k)
+						yr = yi - yred(k)
+						zr = zi - zred(k)
+						call imagen (xr,yr,zr)
+						r2 = xr*xr + yr*yr + zr*zr
+						if (r2 .le. vbuf2) then
+							call vbuild (k,xred,yred,zred,
+     &									xold,yold,zold)
+							reset(k) = .true.
+						end if
+					end if
+				end if
+			end do
+		end do
+	  end do
+!$OMP END DO
+!$OMP END PARALLEL
+	  end if
+	  
       return
       end
 c
@@ -640,8 +656,9 @@ c
       include 'iounit.i'
       include 'mpole.i'
       include 'neigh.i'
-      integer i,k
+      integer i,k,l
       integer ii,kk
+	  integer residx(maxelst), rescnt
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -679,6 +696,7 @@ c
 c
 c     update sites whose displacement exceeds half the buffer
 c
+	  rescnt = 0
       do i = 1, npole
          reset(i) = .false.
          ii = ipole(i)
@@ -693,25 +711,38 @@ c
          if (domlst .or. r2.ge.lbuf2) then
             call mbuild (i,xold,yold,zold)
             reset(i) = .true.
-            do k = 1, i-1
-               if (.not. reset(k)) then
-                  kk = ipole(k)
-                  xr = xi - x(kk)
-                  yr = yi - y(kk)
-                  zr = zi - z(kk)
-                  call imagen (xr,yr,zr)
-                  r2 = xr*xr + yr*yr + zr*zr
-c
-c     rebuild the list of any possible lower numbered neighbor
-c
-                  if (r2 .le. mbuf2) then
-                     call mbuild (k,xold,yold,zold)
-                     reset(k) = .true.
-                  end if
-               end if
-            end do
+			rescnt = rescnt + 1
+			residx(rescnt) = i
          end if
       end do
+	  	  
+	  if(rescnt.gt.0) then
+!$OMP PARALLEL default(shared) private(i,k,l)
+!$OMP DO
+	  do i=1,npole
+		do k=1,nelst(i)
+			do l=1,rescnt
+				if(elst(k,i).eq.residx(l)) then
+				  if (.not. reset(i)) then
+					  ii = ipole(i)
+					  xr = xi - x(ii)
+					  yr = yi - y(ii)
+					  zr = zi - z(ii)
+					  call imagen (xr,yr,zr)
+					  r2 = xr*xr + yr*yr + zr*zr
+					  if (r2 .le. mbuf2) then
+						 call mbuild (i,xold,yold,zold)
+						 reset(i) = .true.
+					  end if
+                  end if
+				end if
+			end do
+		end do
+	  end do
+!$OMP END DO
+!$OMP END PARALLEL
+	  end if
+	 
       return
       end
 c

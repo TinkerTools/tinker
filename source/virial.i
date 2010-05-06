@@ -15,5 +15,5 @@ c
 c     vir    total internal virial Cartesian tensor components
 c
 c
-      real*8 vir
-      common /virial/ vir(3,3)
+      real*8 vir, viri
+      common /virial/ vir(3,3),viri(3,3)
