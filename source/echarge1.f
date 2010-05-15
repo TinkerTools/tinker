@@ -1748,15 +1748,14 @@ c
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 ect,eintrat,eintert
+      real*8 temp1,temp2,temp3
+      real*8 virt(3,3)
       real*8 cscale(maxatm)
+      real*8 dect1(3,maxatm)
+      real*8 dect2(3,maxatm)
       logical proceed,usei
       external erfc
-	  
-  	  real*8 ect,eintrat,eintert
-	  real*8 dect1(3,maxatm),dect2(3,maxatm),virt(3,3)
-	  real*8 erfcore2, recr
-	  real*8 temp1,temp2,temp3
-
 c
 c
 c     zero out the Ewald summation energy and derivatives
@@ -1823,27 +1822,27 @@ c     compute reciprocal space Ewald energy and first derivatives
 c
       call ecrecip1
 c
-c	  setup for the parallel real space calculation
+c     initialize local variables for OpenMP calculation
 c
-	  ect = ec
-	  eintrat = eintra
-	  eintert = einter
-	  
-	  do i=1,3
-		virt(1,i) = vir(1,i)
-		virt(2,i) = vir(2,i)
-		virt(3,i) = vir(3,i)
-	  end do
-	  
-	  do i=1,maxatm
-		dect1(1,i) = dec(1,i)
-		dect1(2,i) = dec(2,i)
-		dect1(3,i) = dec(3,i)
-		dect2(1,i) = 0.0d0
-		dect2(2,i) = 0.0d0
-		dect2(3,i) = 0.0d0
-	  end do
-	  
+      ect = ec
+      eintrat = eintra
+      eintert = einter
+      do i = 1, maxatm
+         dect1(1,i) = dec(1,i)
+         dect1(2,i) = dec(2,i)
+         dect1(3,i) = dec(3,i)
+         dect2(1,i) = 0.0d0
+         dect2(2,i) = 0.0d0
+         dect2(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         virt(1,i) = vir(1,i)
+         virt(2,i) = vir(2,i)
+         virt(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,f,
 !$OMP& pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
 !$OMP& c2scale,c3scale,c4scale,c5scale,use_group,fgrp,
@@ -1880,9 +1879,9 @@ c
 c
 c     decide whether to compute the current interaction
 c
-		  temp1 = 0.0d0
-		  temp2 = 0.0d0
-		  temp3 = 0.0d0
+         temp1 = 0.0d0
+         temp2 = 0.0d0
+         temp3 = 0.0d0
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = iion(kk)
@@ -1929,7 +1928,7 @@ c
                  temp1 = temp1 + dedx
                  temp2 = temp2 + dedy
                  temp3 = temp3 + dedz
-					dect2(1,k) = -dedx + dect2(1,k) 
+                 dect2(1,k) = -dedx + dect2(1,k) 
                  dect2(2,k) = -dedy + dect2(2,k)
                  dect2(3,k) = -dedz + dect2(3,k)
 c
@@ -1960,11 +1959,9 @@ c
                end if
             end if
          end do
-
- 		 dect1(1,i) = dect1(1,i) + temp1
-		 dect1(2,i) = dect1(2,i) + temp2
-		 dect1(3,i) = dect1(3,i) + temp3
-
+         dect1(1,i) = dect1(1,i) + temp1
+         dect1(2,i) = dect1(2,i) + temp2
+         dect1(3,i) = dect1(3,i) + temp3
 c
 c     reset interaction scaling coefficients for connected atoms
 c
@@ -1981,24 +1978,27 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
-	  
-	  do i=1,3
-		vir(1,i) = virt(1,i)
-		vir(2,i) = virt(2,i)
-		vir(3,i) = virt(3,i)
-	  end do
-	  
-	  do i=1,maxatm
-		dec(1,i) = dect1(1,i) + dect2(1,i)
-		dec(2,i) = dect1(2,i) + dect2(2,i)
-		dec(3,i) = dect1(3,i) + dect2(3,i)
-	  end do
-	  
-	  einter = eintert
-	  eintra = eintrat
-	  ec = ect
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ec = ect
+      eintra = eintrat
+      einter = eintert
+      do i = 1, maxatm
+         dec(1,i) = dect1(1,i) + dect2(1,i)
+         dec(2,i) = dect1(2,i) + dect2(2,i)
+         dec(3,i) = dect1(3,i) + dect2(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = virt(1,i)
+         vir(2,i) = virt(2,i)
+         vir(3,i) = virt(3,i)
+      end do	  
 c
 c     intermolecular energy is total minus intramolecular part
 c

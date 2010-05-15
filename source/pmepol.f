@@ -354,9 +354,13 @@ c
       real*8 fphi(20,maxatm)
 c
 c
-!$OMP PARALLEL default(private) shared(npole,igrid,bsorder,
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL DO default(private) shared(npole,igrid,bsorder,
 !$OMP& nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,fphi)
-!$OMP DO
+c
+c     extract the permanent multipole field at each site
+c
       do m = 1, npole
          igrd0 = igrid(1,m)
          jgrd0 = igrid(2,m)
@@ -474,8 +478,10 @@ c
          fphi(19,m) = tuv012
          fphi(20,m) = tuv111
       end do
-!$OMP END DO
-!$OMP END PARALLEL
+c
+c     end OpenMP directive for the major loop structure
+c
+!$OMP END PARALLEL DO
       return
       end
 c
@@ -527,9 +533,14 @@ c
       real*8 fdip_sum_phi(20,maxatm)
 c
 c
+c     set OpenMP directives for the major loop structure
+c
 !$OMP PARALLEL DO default(private) shared(npole,igrid,
 !$OMP& bsorder,nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,
 !$OMP& fdip_phi1,fdip_phi2,fdip_sum_phi)
+c
+c     extract the induced dipole field at each site
+c
       do m = 1, npole
          igrd0 = igrid(1,m)
          jgrd0 = igrid(2,m)
@@ -735,6 +746,9 @@ c
          fdip_sum_phi(19,m) = tuv012
          fdip_sum_phi(20,m) = tuv111
       end do
+c
+c     end OpenMP directive for the major loop structure
+c
 !$OMP END PARALLEL DO
       return
       end

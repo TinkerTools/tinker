@@ -83,8 +83,9 @@ c
 c     search keywords for Ewald summation commands
 c
       do i = 1, nkey
-         next = 1
          record = keyline(i)
+         next = 1
+         call upcase (record)
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:120)

@@ -4684,6 +4684,7 @@ c
       real*8 erl,erli
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 emtt,eptt
       real*8 frcxi(3),frcxk(3)
       real*8 frcyi(3),frcyk(3)
       real*8 frczi(3),frczk(3)
@@ -4727,13 +4728,13 @@ c
       real*8 pscale(maxatm)
       real*8 dscale(maxatm)
       real*8 uscale(maxatm)
+      real*8 viri(3,3)
+      real*8 demi(3,maxatm)
+      real*8 demk(3,maxatm)
+      real*8 depi(3,maxatm)
+      real*8 depk(3,maxatm)
       logical dorl,dorli
       external erfc
-	  
-	  real*8 emtt,eptt
-	  real*8 virt(3,3)
-	  real*8 demi(3,maxatm),demk(3,maxatm)
-	  real*8 depi(3,maxatm),depk(3,maxatm)
 c
 c
 c     zero out the intramolecular portion of the Ewald energy
@@ -4755,27 +4756,25 @@ c
       f = electric / dielec
       call switch ('EWALD')
 c
-c     Initialize OpenMP variables
+c     initialize local variables for OpenMP calculation
 c
-	  emtt = 0.0d0
-	  eptt = 0.0d0
-	  
-	  do i=1,3
-		do j=1,3
-			viri(j,i) = 0.0d0
-		end do
-	  end do
-	  
-	  do i=1,maxatm
-		do j=1,3
-			demi(j,i) = 0.0d0
-			demk(j,i) = 0.0d0
-			depi(j,i) = 0.0d0
-			depk(j,i) = 0.0d0
-		end do
-	  end do	  
+      emtt = 0.0d0
+      eptt = 0.0d0
+      do i = 1, maxatm
+         do j = 1, 3
+            demi(j,i) = 0.0d0
+            demk(j,i) = 0.0d0
+            depi(j,i) = 0.0d0
+            depk(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            viri(j,i) = 0.0d0
+         end do
+      end do
 c
-c     set the permanent multipole and induced dipole values
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) firstprivate(f) 
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,eintra,damp,expdamp,
@@ -4797,6 +4796,9 @@ c
 !$OMP& firstprivate(mscale,pscale,dscale,uscale)
 !$OMP DO reduction(+:emtt,eptt,viri,demi,depi,demk,depk)
 !$OMP& schedule(dynamic,600)
+c
+c     set the permanent multipole and induced dipole values
+c
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -5544,7 +5546,7 @@ c
                depi(1,ii) = depi(1,ii) + ftm2i(1)
                depi(2,ii) = depi(2,ii) + ftm2i(2)
                depi(3,ii) = depi(3,ii) + ftm2i(3)
-               call torque4(i,ttm2,ttm2i,frcxi,frcyi,frczi,demi,depi)
+               call torque3 (i,ttm2,ttm2i,frcxi,frcyi,frczi,demi,depi)
 c
 c     increment gradient due to force and torque on second site
 c
@@ -5554,8 +5556,7 @@ c
                depk(1,kk) = depk(1,kk) - ftm2i(1)
                depk(2,kk) = depk(2,kk) - ftm2i(2)
                depk(3,kk) = depk(3,kk) - ftm2i(3)
-			     call torque4(k,ttm3,ttm3i,frcxk,frcyk,frczk,demk,depk)
-               !call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk)
+               call torque3 (k,ttm3,ttm3i,frcxk,frcyk,frczk,demk,depk)
 c
 c     increment the internal virial tensor components
 c
@@ -5654,25 +5655,27 @@ c
             uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
-	  
-	  do i=1,3
-		do j=1,3
-			vir(j,i) = viri(j,i) + vir(j,i)
-		end do
-	  end do
-	  
-	  do i=1,maxatm
-		do j=1,3
-			dem(j,i) = dem(j,i) + demi(j,i) + demk(j,i)
-			dep(j,i) = dep(j,i) + depi(j,i) + depk(j,i)
-		end do
-	  end do
-
-	  em = emtt + em
-	  ep = eptt + ep
-	  
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      em = em + emtt
+      ep = ep + eptt
+      do i = 1, maxatm
+         do j = 1, 3
+            dem(j,i) = dem(j,i) + demi(j,i) + demk(j,i)
+            dep(j,i) = dep(j,i) + depi(j,i) + depk(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + viri(j,i)
+         end do
+      end do
       return
       end
 c

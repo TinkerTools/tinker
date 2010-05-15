@@ -2199,14 +2199,13 @@ c
       real*8 fim(3),fkm(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
+      real*8 field(3,maxatm)
+      real*8 fieldp(3,maxatm)
+      real*8 fieldt(3,maxatm)
+      real*8 fieldtp(3,maxatm)
       external erfc
-	  
-	  real*8 fieldt(3,maxatm)
-	  real*8 fieldtp(3,maxatm)
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -2220,15 +2219,17 @@ c
          pscale(i) = 1.0d0
          dscale(i) = 1.0d0
       end do
-	  
-	  do i=1,npole
-	  	do j=1,3
-			fieldt(j,i) = 0.0d0
-			fieldtp(j,i) = 0.0d0
-	  	end do
-	  end do
 c
-c     compute the real space portion of the Ewald summation
+c     initialize local variables for OpenMP calculation
+c
+      do i = 1, npole
+         do j = 1, 3
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+         end do
+      end do
+c
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,pdi,pti,ci,dix,diy,diz,
 !$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,kkk,kk,xr,yr,zr,
@@ -2239,6 +2240,9 @@ c
 !$OMP& fkp,expdamp) firstprivate(dscale,pscale)
 !$OMP DO reduction(+:fieldt,fieldtp)
 !$OMP& schedule(dynamic,600)
+c
+c     compute the real space portion of the Ewald summation
+c
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -2431,16 +2435,19 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP DO
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = fieldt(j,i) + field(j,i)
+            fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
+         end do
+      end do
 !$OMP END DO
 !$OMP END PARALLEL
-	  
-	  do i=1,npole
-	  	do j=1,3
-			field(j,i) = fieldt(j,i) + field(j,i)
-			fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
-	  	end do
-	  end do
-	  
       return
       end
 c
@@ -2933,13 +2940,12 @@ c
       real*8 fimp(3),fkmp(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
+      real*8 dscale(maxatm)
       real*8 field(3,maxatm)
       real*8 fieldp(3,maxatm)
-      real*8 dscale(maxatm)
+      real*8 fieldt(3,maxatm)
+      real*8 fieldtp(3,maxatm)
       external erfc
-	  
-	  real*8 fieldt(3,maxatm)
-	  real*8 fieldtp(3,maxatm)
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -2952,16 +2958,17 @@ c
       do i = 1, n
          dscale(i) = 1.0d0
       end do
-
-	  do i=1,npole
-	  	do j=1,3
-			fieldt(j,i) = 0.0d0
-			fieldtp(j,i) = 0.0d0
-	  	end do
-	  end do
-	  
 c
-c     compute the real space portion of the Ewald summation
+c     initialize local variables for OpenMP calculation
+c
+      do i = 1, npole
+         do j = 1, 3
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+         end do
+      end do
+c
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(xr,yr,zr,r,r2,rr3,rr5,
 !$OMP& bfac,exp2a,duir,dukr,puir,pukr,pdi,pti,expdamp,
@@ -2971,6 +2978,9 @@ c
 !$OMP& firstprivate(dscale)
 !$OMP DO reduction(+:fieldt,fieldtp)
 !$OMP& schedule(dynamic,600)
+c
+c     compute the real space portion of the Ewald summation
+c
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -3096,18 +3106,19 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
-
 !$OMP DO
-	  do i=1,npole
-	  	do j=1,3
-			field(j,i) = fieldt(j,i) + field(j,i)
-			fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
-	  	end do
-	  end do
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = fieldt(j,i) + field(j,i)
+            fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
+         end do
+      end do
 !$OMP END DO
 !$OMP END PARALLEL
-
       return
       end
 c

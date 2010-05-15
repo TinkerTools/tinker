@@ -871,14 +871,14 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 evt,eintert
+      real*8 virt(3,3)
       real*8 xred(maxatm)
       real*8 yred(maxatm)
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
+      real*8 devt(3,maxatm)
       logical proceed,usei
-	  
-	  real*8 evt,eintert
-	  real*8 devt(3,maxatm),virt(3,3)
 c
 c
 c     zero out the van der Waals energy and first derivatives
@@ -912,24 +912,22 @@ c
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
-c	  setup for the parallel real space calculation
+c     copy global to local copies for OpenMP calculation
 c
-	  evt = ev
-	  eintert = einter
-	  
-	  do i=1,3
-		virt(1,i) = vir(1,i)
-		virt(2,i) = vir(2,i)
-		virt(3,i) = vir(3,i)
-	  end do	
-	  
-	  do i=1,maxatm
-		devt(1,i) = dev(1,i)
-		devt(2,i) = dev(2,i)
-		devt(3,i) = dev(3,i)
-	  end do
+      evt = ev
+      eintert = einter
+      do i = 1, maxatm
+         devt(1,i) = dev(1,i)
+         devt(2,i) = dev(2,i)
+         devt(3,i) = dev(3,i)
+      end do
+      do i = 1, 3
+         virt(1,i) = vir(1,i)
+         virt(2,i) = vir(2,i)
+         virt(3,i) = vir(3,i)
+      end do 
 c
-c     find van der Waals energy and derivatives via neighbor list
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,jvdw,
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
@@ -940,6 +938,9 @@ c
 !$OMP& shared(evt,devt,virt,eintert)
 !$OMP DO reduction(+:evt,devt,virt,eintert)
 !$OMP& schedule(dynamic,600)
+c
+c     find van der Waals energy and derivatives via neighbor list
+c
       do ii = 1, nvdw
          i = ivdw(ii)
          iv = ired(i)
@@ -1108,22 +1109,25 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
-
-	  ev = evt
-	  einter = eintert
-	  
-	  do i=1,3
-		vir(1,i) = virt(1,i)
-		vir(2,i) = virt(2,i)
-		vir(3,i) = virt(3,i)
-	  end do
-	  
-	  do i=1,maxatm
-		dev(1,i) = devt(1,i)
-		dev(2,i) = devt(2,i)
-		dev(3,i) = devt(3,i)
-	  end do
-	  return
-	  end
+c
+c     copy local to global copies for OpenMP calculation
+c
+      ev = evt
+      einter = eintert
+      do i = 1, maxatm
+         dev(1,i) = devt(1,i)
+         dev(2,i) = devt(2,i)
+         dev(3,i) = devt(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = virt(1,i)
+         vir(2,i) = virt(2,i)
+         vir(3,i) = virt(3,i)
+      end do
+      return
+      end

@@ -95,7 +95,8 @@ c     print the value used for the random number seed
 c
          if (verbose) then
             write (iout,20)  seed
-   20       format (/,' RANDOM  --  Initialized with SEED of',i12)
+   20       format (/,' Random Number Generator Initialized',
+     &                 ' with SEED :',3x,i12)
          end if
 c
 c     warm up and then load the shuffling table

@@ -1,0 +1,18 @@
+
+                 --------------------------------------------
+                 FFTW -- Fast, Parallel FFT for OpenMP TINKER
+                 --------------------------------------------
+
+      This directory contains FFTW-3.2.2 which is required by the OpenMP
+      version of TINKER. In particular, TINKER needs the two fftw object
+      libraries, libfftw3.a and libfftw3_threads.a. To build fftw, first
+      set the Intel compilers via "setenv CC icc" and "setenv F77 ifort".
+      Next invoke the configure command as:
+
+         configure --prefix=/Users/ponder/tinker/fftw --enable-threads
+
+      This will generate a Makefile configured to place the build under
+      /Users/ponder/tinker/fftw (change this directory for your setup).
+      Finally, issue the "make" and "make install" commands to build and
+      install fftw. The needed libraries will be in /lib.
+    

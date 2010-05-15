@@ -23,6 +23,7 @@ c
       include 'boxes.i'
       include 'cutoff.i'
       include 'ewald.i'
+      include 'fft.i'
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
@@ -49,6 +50,7 @@ c
 c
 c     default boundary treatment, B-spline order and grid density
 c
+      ffttyp = 'FFTPACK'
       boundary = 'TINFOIL'
       bsorder = 5
       dens = 1.2d0
@@ -83,12 +85,14 @@ c
 c     search keywords for Ewald summation commands
 c
       do i = 1, nkey
-         next = 1
          record = keyline(i)
+         next = 1
+         call upcase (record)
          call gettext (record,keyword,next)
-         call upcase (keyword)
          string = record(next:120)
-         if (keyword(1:12) .eq. 'EWALD-ALPHA ') then
+         if (keyword(1:12) .eq. 'FFT-PACKAGE ') then
+            call getword (record,ffttyp,next)
+         else if (keyword(1:12) .eq. 'EWALD-ALPHA ') then
             read (string,*,err=20)  aewald
          else if (keyword(1:15) .eq. 'EWALD-BOUNDARY ') then
             boundary = 'VACUUM'
