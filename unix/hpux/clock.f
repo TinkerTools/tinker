@@ -24,8 +24,13 @@ c
       real*8 seconds
 c
 c
-c     use the standard "etime" intrinsic function, this code
-c     works for all compilers except those noted below
+c     code for Fortran standard "cpu_time" intrinsic function
+c
+c     real time
+c     call cpu_time (time)
+c     seconds = dble(time)
+c
+c     code for the Unix standard "etime" intrinsic function
 c
 c     real etime,times(2)
 c     seconds = dble(etime(times))
@@ -34,12 +39,6 @@ c     code for IBM xlf compiler on AIX appends an underscore
 c
 c     real etime_,times(2)
 c     seconds = dble(etime_(times))
-c
-c     code for Compaq Visual Fortran compiler on Windows
-c
-c     real time
-c     call cpu_time (time)
-c     seconds = dble(time)
 c
 c     code for Hewlett-Packard HP-UX only gives wall clock time;
 c     for the HP systems the +E1 compiler option is required

@@ -26,14 +26,14 @@ c
 c
 c     code for Fortran standard "cpu_time" intrinsic function
 c
-      real time
-      call cpu_time (time)
-      seconds = dble(time)
+c     real time
+c     call cpu_time (time)
+c     seconds = dble(time)
 c
 c     code for the Unix standard "etime" intrinsic function
 c
-c     real etime,times(2)
-c     seconds = dble(etime(times))
+      real etime,times(2)
+      seconds = dble(etime(times))
 c
 c     code for IBM xlf compiler on AIX appends an underscore
 c

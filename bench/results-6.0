@@ -11,7 +11,7 @@
  MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
  ------------                                 ---    ------  --------  -------
 
- MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93      1.56      2.97     9.20
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      1.90      3.06     8.98
 
  Benchmark #2: Crambin Crystal Energy Evaluation
 
@@ -21,7 +21,7 @@
  MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
  ------------                                 ---    ------  --------  -------
 
- MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93      3.16      4.44    16.85
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      3.11      4.34    16.30
 
  Benchmark #3: Peptide Normal Mode Calculation
 
@@ -31,7 +31,7 @@
  MACHINE TYPE                                 GHz          VIBRATIONS
  ------------                                 ---          ----------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                4.71
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                3.33
 
  Benchmark #4: TIP3P Water Box Molecular Dynamics
 
@@ -53,7 +53,7 @@
  MACHINE TYPE                                 GHz            DYNAMICS
  ------------                                 ---            --------
 
- MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93               143.7
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93               143.7
 
  Benchmark #6: CHARMM DFHR-Water Molecular Dynamics
 
@@ -69,6 +69,11 @@
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93     Serial-IOP   (0.93) 110
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1      (1.00) 119
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2      (1.53)  78
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1      (1.00) 125
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2      (1.67)  75
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4      (2.55)  49
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6      (3.05)  41
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8      (3.38)  37
 
  Benchmark #7: AMOEBA DFHR-Water Molecular Dynamics
 
