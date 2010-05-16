@@ -929,11 +929,11 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,jvdw,
-!$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
-!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
-!$OMP& fgrp,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,cut2,c0,c1,c2,c3,c4,c5,molcule)
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
+!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
+!$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
+!$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5,molcule)
 !$OMP& firstprivate(vscale)
 !$OMP& shared(evt,devt,virt,eintert)
 !$OMP DO reduction(+:evt,devt,virt,eintert)
@@ -1053,18 +1053,18 @@ c
                      devt(3,iv) = devt(3,iv) + dedz*rediv
                   end if
                   if (k .eq. kv) then
-                     devt(1,k) = -dedx + devt(1,k)
-                     devt(2,k) = -dedy + devt(2,k)
-                     devt(3,k) = -dedz + devt(3,k)
+                     devt(1,k) = devt(1,k) - dedx
+                     devt(2,k) = devt(2,k) - dedy
+                     devt(3,k) = devt(3,k) - dedz
                   else
                      redk = kred(k)
                      redkv = 1.0d0 - redk
-                     devt(1,k) = -(dedx*redk) + devt(1,k)
-                     devt(2,k) = -(dedy*redk) + devt(2,k) 
-                     devt(3,k) = -(dedz*redk) + devt(3,k) 
-                     devt(1,kv) = -(dedx*redkv) + devt(1,kv) 
-                     devt(2,kv) = -(dedy*redkv) + devt(2,kv) 
-                     devt(3,kv) = -(dedz*redkv) + devt(3,kv)
+                     devt(1,k) = devt(1,k) - dedx*redk
+                     devt(2,k) = devt(2,k) - dedy*redk
+                     devt(3,k) = devt(3,k) - dedz*redk
+                     devt(1,kv) = devt(1,kv) - dedx*redkv
+                     devt(2,kv) = devt(2,kv) - dedy*redkv
+                     devt(3,kv) = devt(3,kv) - dedz*redkv
                   end if
 c
 c     increment the internal virial tensor components

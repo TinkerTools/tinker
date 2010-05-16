@@ -55,8 +55,8 @@ c
       include 'iounit.i'
       include 'neigh.i'
       include 'vdw.i'
-      integer i,j,k,m
-      integer ii,iv
+      integer i,j,k
+      integer ii,iv,kk
       integer nmove
       integer move(maxvlst)
       real*8 xi,yi,zi
@@ -136,27 +136,28 @@ c
 !$OMP PARALLEL default(shared) private(i,j,k)
 !$OMP DO
          do i = 1, nvdw
-            xi = xred(i)
-            yi = yred(i)
-            zi = zred(i)
-            do j = 1, nvlst(i)
-               do k = 1, nmove
-                  if (vlst(j,i) .eq. move(k)) then
-                     if (.not. reset(i)) then
-                        m = move(k)
-                        xr = xi - xred(m)
-                        yr = yi - yred(m)
-                        zr = zi - zred(m)
-                        call imagen (xr,yr,zr)
-                        r2 = xr*xr + yr*yr + zr*zr
-                        if (r2 .le. vbuf2) then
-                           call vbuild (i,xred,yred,zred,xold,yold,zold)
-                           reset(i) = .true.
-                        end if
+            if (.not. reset(i)) then
+               xi = xred(i)
+               yi = yred(i)
+               zi = zred(i)
+               do j = 1, nvlst(i)
+                  do k = 1, nmove
+                     if (vlst(j,i) .eq. move(k)) then
+                           kk = move(k)
+                           xr = xi - xred(kk)
+                           yr = yi - yred(kk)
+                           zr = zi - zred(kk)
+                           call imagen (xr,yr,zr)
+                           r2 = xr*xr + yr*yr + zr*zr
+                           if (r2 .le. vbuf2) then
+                              call vbuild (i,xred,yred,zred,
+     &                                     xold,yold,zold)
+                              reset(i) = .true.
+                           end if
                      end if
-                  end if
+                  end do
                end do
-            end do
+            end if
          end do
 !$OMP END DO
 !$OMP END PARALLEL
@@ -376,8 +377,10 @@ c
       include 'charge.i'
       include 'iounit.i'
       include 'neigh.i'
-      integer i,k
-      integer ic,kc
+      integer i,j,k
+      integer ii,kk
+      integer nmove
+      integer move(maxelst)
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -415,12 +418,13 @@ c
 c
 c     update sites whose displacement exceeds half the buffer
 c
+      nmove = 0
       do i = 1, nion
          reset(i) = .false.
-         ic = kion(i)
-         xi = x(ic)
-         yi = y(ic)
-         zi = z(ic)
+         ii = kion(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          xr = xi - xold(i)
          yr = yi - yold(i)
          zr = zi - zold(i)
@@ -429,25 +433,43 @@ c
          if (doclst .or. r2.ge.lbuf2) then
             call cbuild (i,xold,yold,zold)
             reset(i) = .true.
-            do k = 1, i-1
-               if (.not. reset(k)) then
-                  kc = kion(k)
-                  xr = xi - x(kc)
-                  yr = yi - y(kc)
-                  zr = zi - z(kc)
-                  call imagen (xr,yr,zr)
-                  r2 = xr*xr + yr*yr + zr*zr
-c
-c     rebuild the list of any possible lower numbered neighbor
-c
-                  if (r2 .le. cbuf2) then
-                     call cbuild (k,xold,yold,zold)
-                     reset(k) = .true.
-                  end if
-               end if
-            end do
+            nmove = nmove + 1
+            move(nmove) = i
          end if
       end do
+c
+c     update sites whose higher numbered neighbors have moved
+c
+      if (nmove .ne. 0) then
+!$OMP PARALLEL default(shared) private(i,j,k)
+!$OMP DO
+         do i = 1, nion
+            if (.not. reset(i)) then
+               ii = kion(i)
+               xi = x(ii)
+               yi = y(ii)
+               zi = z(ii)
+               do j = 1, nelst(i)
+                  do k = 1, nmove
+                     if (elst(j,i) .eq. move(k)) then
+                           kk = kion(move(k))
+                           xr = xi - x(kk)
+                           yr = yi - y(kk)
+                           zr = zi - z(kk)
+                           call imagen (xr,yr,zr)
+                           r2 = xr*xr + yr*yr + zr*zr
+                           if (r2 .le. cbuf2) then
+                              call cbuild (i,xold,yold,zold)
+                              reset(i) = .true.
+                           end if
+                     end if
+                  end do
+               end do
+            end if
+         end do
+!$OMP END DO
+!$OMP END PARALLEL
+      end if
       return
       end
 c
@@ -471,7 +493,7 @@ c
       include 'charge.i'
       include 'iounit.i'
       include 'neigh.i'
-      integer i,k,ic,kc
+      integer i,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
       real*8 xold(maxatm)
@@ -482,18 +504,18 @@ c
 c     zero out the list and get coordinates for the site
 c
       nelst(i) = 0
-      ic = kion(i)
-      xi = x(ic)
-      yi = y(ic)
-      zi = z(ic)
+      ii = kion(i)
+      xi = x(ii)
+      yi = y(ii)
+      zi = z(ii)
 c
 c     generate all neighbors for the site being rebuilt
 c
       do k = i+1, nion
-         kc = kion(k)
-         xr = xi - x(kc)
-         yr = yi - y(kc)
-         zr = zi - z(kc)
+         kk = kion(k)
+         xr = xi - x(kk)
+         yr = yi - y(kk)
+         zr = zi - z(kk)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .le. cbuf2) then
@@ -540,7 +562,7 @@ c
       include 'iounit.i'
       include 'light.i'
       include 'neigh.i'
-      integer i,j,k,ic
+      integer i,j,k,ii
       integer kgy,kgz
       integer start,stop
       real*8 xi,yi,zi
@@ -559,13 +581,13 @@ c     transfer interaction site coordinates to sorting arrays
 c
       do i = 1, nion
          nelst(i) = 0
-         ic = kion(i)
-         xold(i) = x(ic)
-         yold(i) = y(ic)
-         zold(i) = z(ic)
-         xsort(i) = x(ic)
-         ysort(i) = y(ic)
-         zsort(i) = z(ic)
+         ii = kion(i)
+         xold(i) = x(ii)
+         yold(i) = y(ii)
+         zold(i) = z(ii)
+         xsort(i) = x(ii)
+         ysort(i) = y(ii)
+         zsort(i) = z(ii)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -728,28 +750,28 @@ c
 !$OMP PARALLEL default(shared) private(i,j,k)
 !$OMP DO
          do i = 1, npole
-            ii = ipole(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
-            do j = 1, nelst(i)
-               do k = 1, nmove
-                  if (elst(j,i) .eq. move(k)) then
-                     if (.not. reset(i)) then
-                        kk = ipole(move(k))
-                        xr = xi - x(kk)
-                        yr = yi - y(kk)
-                        zr = zi - z(kk)
-                        call imagen (xr,yr,zr)
-                        r2 = xr*xr + yr*yr + zr*zr
-                        if (r2 .le. mbuf2) then
-                           call mbuild (i,xold,yold,zold)
-                           reset(i) = .true.
-                        end if
+            if (.not. reset(i)) then
+               ii = ipole(i)
+               xi = x(ii)
+               yi = y(ii)
+               zi = z(ii)
+               do j = 1, nelst(i)
+                  do k = 1, nmove
+                     if (elst(j,i) .eq. move(k)) then
+                           kk = ipole(move(k))
+                           xr = xi - x(kk)
+                           yr = yi - y(kk)
+                           zr = zi - z(kk)
+                           call imagen (xr,yr,zr)
+                           r2 = xr*xr + yr*yr + zr*zr
+                           if (r2 .le. mbuf2) then
+                              call mbuild (i,xold,yold,zold)
+                              reset(i) = .true.
+                           end if
                      end if
-                  end if
+                  end do
                end do
-            end do
+            end if
          end do
 !$OMP END DO
 !$OMP END PARALLEL
