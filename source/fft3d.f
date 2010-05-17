@@ -34,7 +34,7 @@ c
          error = 12
          ifront = -1
          iback = 1
-         iguess = 64
+         iguess = 0
          nprocs = omp_get_num_procs ()
          call dfftw_init_threads (error)
          call dfftw_plan_with_nthreads (nprocs)
