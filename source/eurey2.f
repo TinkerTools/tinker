@@ -41,7 +41,7 @@ c     compute the Hessian elements of the Urey-Bradley energy
 c
       do iurey = 1, nurey
          ia = iury(1,iurey)
-         ic = iury(2,iurey)
+         ic = iury(3,iurey)
          ideal = ul(iurey)
          force = uk(iurey)
 c

@@ -4,16 +4,21 @@
                  --------------------------------------------
 
       This directory contains FFTW-3.2.2 which is required by the OpenMP
-      version of TINKER. In particular, TINKER needs the two fftw object
-      libraries, libfftw3.a and libfftw3_threads.a. To build fftw, first
-      set the Intel compilers via "setenv CC icc" and "setenv F77 ifort".
-      Then recreate a clean distribution directory via "make distclean".
-      Next invoke the configure command as:
+      version of TINKER. In particular, TINKER needs the two fftw static
+      object libraries, libfftw3.a and libfftw3_threads.a. To build fftw
+      using the Intel compilers, issue the following set of commands as
+      shown below. Note that the 'setenv" syntax is for csh/tcsh shells,
+      and should be modified for other shells. Also. the --prefix in the
+      "configure" command should be changed to the correct path on your
+      local machine (ie, the current /fftw area under the TINKER tree).
 
-         configure --prefix=/Users/ponder/tinker/fftw --enable-threads
+      setenv CC icc
+      setenv F77 ifort
+      make distclean
+      configure --prefix=/Users/ponder/tinker/fftw --enable-threads
+      make
+      make install
 
-      This will generate a Makefile configured to place the build under
-      /Users/ponder/tinker/fftw (change this directory for your setup).
-      Finally, issue the "make" and "make install" commands to build and
-      install fftw. The needed libraries will be in /lib.
-    
+      After completion of the above, the libraries files used by TINKER
+      will be in the /lib subdirectory.
+
