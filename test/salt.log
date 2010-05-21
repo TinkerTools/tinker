@@ -4,9 +4,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 5.0   October 2009                        ##
+ ##                          Version 6.0  June 2010                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2010               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -25,9 +25,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 5.0   October 2009                        ##
+ ##                          Version 6.0  June 2010                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2010               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -48,9 +48,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 5.0   October 2009                        ##
+ ##                          Version 6.0  June 2010                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2010               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -66,7 +66,7 @@
 
  Additional van der Waals Parameters :
 
-     Atom Class         Radius     Epsilon     Reduction
+     Atom Class          Size      Epsilon     Reduction
 
          1              3.3304      0.0028       0.000
          2              4.4172      0.1180       0.000
@@ -98,8 +98,8 @@
  OCVM  --  Normal Termination due to SmallGrad
 
  Final Potential Function Value :       -754.4297
- Final RMS Coordinate Gradient :       0.2561D-12
- Final Coordinate Gradient Norm :      0.7243D-12
+ Final RMS Coordinate Gradient :       0.4736D-12
+ Final Coordinate Gradient Norm :      0.1340D-11
  Final RMS Lattice Gradient :          0.5267D-02
  Final Lattice Gradient Norm :         0.1290D-01
 

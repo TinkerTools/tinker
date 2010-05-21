@@ -21,32 +21,35 @@ c
       include 'sizes.i'
       include 'fft.i'
       include 'pme.i'
-      integer nprocs,error
-      integer ifront,iback
-      integer iguess
-      integer omp_get_num_procs
+!$    integer ifront,iback
+!$    integer error,iguess
+!$    integer nprocs
+!$    integer omp_get_num_procs
 c
 c
-c     initialization and setup for Fast Fourier transform
+c     initialization of Fast Fourier transform using FFTW
 c
-      if (ffttyp .eq. 'FFTW') then
-         nprocs = 1
-         error = 12
-         ifront = -1
-         iback = 1
-         iguess = 0
-         nprocs = omp_get_num_procs ()
-         call dfftw_init_threads (error)
-         call dfftw_plan_with_nthreads (nprocs)
-         call dfftw_plan_dft_3d (planf,nfft1,nfft2,nfft3,qgrid,
-     &                              qgrid,ifront,iguess)
-         call dfftw_plan_dft_3d (planb,nfft1,nfft2,nfft3,qgrid,
-     &                              qgrid,iback,iguess)
-      else
+!$    if (ffttyp .eq. 'FFTW') then
+!$       ifront = -1
+!$       iback = 1
+!$       error = 0
+!$       iguess = 0
+!$       nprocs = 1
+!$       nprocs = omp_get_num_procs ()
+!$       call dfftw_init_threads (error)
+!$       call dfftw_plan_with_nthreads (nprocs)
+!$       call dfftw_plan_dft_3d (planf,nfft1,nfft2,nfft3,qgrid,
+!$   &                              qgrid,ifront,iguess)
+!$       call dfftw_plan_dft_3d (planb,nfft1,nfft2,nfft3,qgrid,
+!$   &                              qgrid,iback,iguess)
+!$    else
+c
+c     initialization of Fast Fourier transform using FFTPACK
+c
          call cffti (nfft1,table(1,1),iprime(1,1))
          call cffti (nfft2,table(1,2),iprime(1,2))
          call cffti (nfft3,table(1,3),iprime(1,3))
-      end if
+!$    end if
       return
       end
 c
@@ -73,9 +76,9 @@ c
 c
 c     perform a single 3-D forward transform using FFTW
 c
-      if (ffttyp .eq. 'FFTW') then
-         call dfftw_execute_dft (planf,qgrid,qgrid)
-      else
+!$    if (ffttyp .eq. 'FFTW') then
+!$       call dfftw_execute_dft (planf,qgrid,qgrid)
+!$    else
 c
 c     perform three 1-D forward transforms using FFTPACK
 c
@@ -118,7 +121,7 @@ c
                end do
             end do
          end do
-      end if
+!$    end if
       return
       end
 c
@@ -145,9 +148,9 @@ c
 c
 c     perform a single 3-D backward transform using FFTW
 c
-      if (ffttyp .eq. 'FFTW') then
-         call dfftw_execute_dft (planb,qgrid,qgrid)
-      else
+!$    if (ffttyp .eq. 'FFTW') then
+!$       call dfftw_execute_dft (planb,qgrid,qgrid)
+!$    else
 c
 c     perform three 1-D backward transforms using FFTPACK
 c
@@ -190,6 +193,6 @@ c
                end do
             end do
          end do
-      end if
+!$    end if
       return
       end

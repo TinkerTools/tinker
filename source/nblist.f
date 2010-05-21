@@ -133,7 +133,7 @@ c
 c     update sites whose higher numbered neighbors have moved
 c
       if (nmove .ne. 0) then
-!$OMP PARALLEL default(shared) private(i,j,k)
+!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,kk,xr,yr,zr,r2)
 !$OMP DO
          do i = 1, nvdw
             if (.not. reset(i)) then
@@ -441,7 +441,7 @@ c
 c     update sites whose higher numbered neighbors have moved
 c
       if (nmove .ne. 0) then
-!$OMP PARALLEL default(shared) private(i,j,k)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,kk,xr,yr,zr,r2)
 !$OMP DO
          do i = 1, nion
             if (.not. reset(i)) then
@@ -747,7 +747,7 @@ c
 c     update sites whose higher numbered neighbors have moved
 c
       if (nmove .ne. 0) then
-!$OMP PARALLEL default(shared) private(i,j,k)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,kk,xr,yr,zr,r2)
 !$OMP DO
          do i = 1, npole
             if (.not. reset(i)) then

@@ -61,12 +61,12 @@
                           optimal carbonyl oxygen energy parameters
                           from a fit to lattice energy and structure
 
-         (10) GPCR        finds two lowest-frequency normal modes
+         (10) GPCR        finds the lowest-frequency normal mode
                           of bacteriorhodopsin using vibrational
                           analysis via a sliding block iterative
                           matrix diagonalization (Alter gpcr.run
-                          script to save gpcr.001 and gpcr.002 if
-                          you want to view the modes. This example
+                          script to save the file gpcr.001 if you
+                          want to view the modes. Note this example
                           requires about an hour to complete.)
 
          (11) HELIX       rigid-body optimization of the packing of

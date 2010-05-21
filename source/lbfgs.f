@@ -126,9 +126,9 @@ c
 c
 c     set default parameters for the line search
 c
-      if (stpmin .eq. 0.0d0)  stpmin = 1.0d-16
       if (stpmax .eq. 0.0d0)  stpmax = 5.0d0
-      if (cappa .eq. 0.0d0)  cappa = 0.9d0
+      stpmin = 1.0d-16
+      cappa = 0.9d0
       slpmax = 10000.0d0
       angmax = 180.0d0
       intmax = 5

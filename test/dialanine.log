@@ -4,9 +4,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 5.0   October 2009                        ##
+ ##                          Version 6.0  June 2010                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2010               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -35,16 +35,16 @@
     Search Direction   4           Step     22              -13.5937
     Search Direction   5           Step     13              -15.5791
     Search Direction   6           Step     12              -15.5791
-    Search Direction   7           Step     24              -15.5791
+    Search Direction   7           Step     24              -14.4413
+
+    Potential Surface Map       Minimum      4              -14.4413
+
     Search Direction   8           Step     29              -16.4953
 
-    Potential Surface Map       Minimum      4              -16.4953
+    Potential Surface Map       Minimum      5              -16.4953
 
     Search Direction   9           Step     13              -16.4953
     Search Direction  10           Step     23              -14.4413
-
-    Potential Surface Map       Minimum      5              -14.4413
-
 
  Normal Mode Local Search       Minimum      2
 
@@ -69,10 +69,7 @@
 
     Search Direction   1           Step     22              -16.4953
     Search Direction   2           Step     13              -13.5937
-    Search Direction   3           Step     18               -8.0788
-
-    Potential Surface Map       Minimum      8               -8.0788
-
+    Search Direction   3           Step     18               -8.1029
     Search Direction   4           Step     18               -8.1029
     Search Direction   5           Step     31              -16.4953
     Search Direction   6           Step     16              -13.5937
@@ -80,40 +77,21 @@
     Search Direction   8           Step     12              -13.5937
     Search Direction   9           Step     24               -2.6720
 
-    Potential Surface Map       Minimum      9               -2.6720
+    Potential Surface Map       Minimum      8               -2.6720
 
     Search Direction  10           Step     33              -13.5937
 
  Normal Mode Local Search       Minimum      4
 
-    Search Direction   1           Step     39              -12.2121
-    Search Direction   2           Step     11              -16.4953
-    Search Direction   3           Step     21              -13.2016
-
-    Potential Surface Map       Minimum     10              -13.2016
-
-    Search Direction   4           Step     36               -8.1029
-    Search Direction   5           Step     19              -16.4953
-    Search Direction   6           Step     43               -4.5079
-
-    Potential Surface Map       Minimum     11               -4.5079
-
-    Search Direction   7           Step     11              -16.4953
-    Search Direction   8           Step     12              -16.4953
-    Search Direction   9                                      ------
-    Search Direction  10           Step     59              -16.4953
-
- Normal Mode Local Search       Minimum      5
-
-    Search Direction   1           Step      9              -14.4413
+    Search Direction   1           Step      9              -16.4953
     Search Direction   2           Step     32              -12.2121
     Search Direction   3           Step     29               -4.7067
 
-    Potential Surface Map       Minimum     12               -4.7067
+    Potential Surface Map       Minimum      9               -4.7067
 
     Search Direction   4           Step     28               -4.6390
 
-    Potential Surface Map       Minimum     13               -4.6390
+    Potential Surface Map       Minimum     10               -4.6390
 
     Search Direction   5           Step     35              -12.2121
     Search Direction   6           Step     41              -12.2121
@@ -121,6 +99,25 @@
     Search Direction   8           Step     15              -14.4413
     Search Direction   9           Step     34              -14.4413
     Search Direction  10           Step     38              -15.5791
+
+ Normal Mode Local Search       Minimum      5
+
+    Search Direction   1           Step     39              -12.2121
+    Search Direction   2           Step     11              -16.4953
+    Search Direction   3           Step     21              -13.2016
+
+    Potential Surface Map       Minimum     11              -13.2016
+
+    Search Direction   4           Step     36               -4.6390
+    Search Direction   5           Step     19              -16.4953
+    Search Direction   6           Step     43               -4.5079
+
+    Potential Surface Map       Minimum     12               -4.5079
+
+    Search Direction   7           Step     11              -16.4953
+    Search Direction   8           Step     12              -16.4953
+    Search Direction   9                                      ------
+    Search Direction  10           Step     59              -16.4953
 
  Normal Mode Local Search       Minimum      6
 
@@ -133,18 +130,18 @@
     Search Direction   7           Step     13               -8.1029
     Search Direction   8           Step     12               -8.1029
     Search Direction   9           Step     35               -8.0788
+
+    Potential Surface Map       Minimum     13               -8.0788
+
     Search Direction  10           Step     24               -8.1029
 
  Normal Mode Local Search       Minimum      7
 
     Search Direction   1           Step     19              -16.4953
-    Search Direction   2           Step     17               -6.4828
-
-    Potential Surface Map       Minimum     14               -6.4828
-
+    Search Direction   2           Step     17              -12.2121
     Search Direction   3           Step     22               -8.0514
 
-    Potential Surface Map       Minimum     15               -8.0514
+    Potential Surface Map       Minimum     14               -8.0514
 
     Search Direction   4           Step     23               -8.0514
     Search Direction   5           Step     19              -12.2121
@@ -156,75 +153,30 @@
 
  Normal Mode Local Search       Minimum      8
 
-    Search Direction   1           Step     15               -8.0788
-    Search Direction   2           Step     19              -12.2121
-    Search Direction   3           Step     17               -8.1029
-    Search Direction   4           Step     16              -13.5937
-    Search Direction   5           Step     12               -8.0788
-    Search Direction   6           Step     12               -8.0788
-    Search Direction   7           Step     31               -8.1029
-    Search Direction   8           Step     15               -8.0788
-    Search Direction   9           Step     17               -1.1986
-
-    Potential Surface Map       Minimum     16               -1.1986
-
-    Search Direction  10           Step     33               -8.1029
-
- Normal Mode Local Search       Minimum      9
-
     Search Direction   1           Step     15               -2.0819
 
-    Potential Surface Map       Minimum     17               -2.0819
+    Potential Surface Map       Minimum     15               -2.0819
 
     Search Direction   2           Step     14               -7.3457
 
-    Potential Surface Map       Minimum     18               -7.3457
+    Potential Surface Map       Minimum     16               -7.3457
 
     Search Direction   3           Step     15               -4.7067
-    Search Direction   4           Step     37              -12.2121
+    Search Direction   4           Step     37               -9.8426
     Search Direction   5           Step     28              -14.4413
     Search Direction   6           Step     29              -14.4413
     Search Direction   7           Step     38               -8.0788
     Search Direction   8           Step     36               -8.0788
     Search Direction   9           Step     19               -2.6720
-    Search Direction  10           Step     31              -13.2016
+    Search Direction  10           Step     31               -2.0819
 
- Normal Mode Local Search       Minimum     10
+ Normal Mode Local Search       Minimum      9
 
-    Search Direction   1           Step     18               -8.0788
-    Search Direction   2           Step     19               -8.1029
-    Search Direction   3           Step     18              -16.4953
-    Search Direction   4           Step     18              -16.4953
-    Search Direction   5           Step     11              -13.2016
-    Search Direction   6           Step     11              -13.2016
-    Search Direction   7           Step     52               -2.6720
-    Search Direction   8           Step     20              -13.2016
-    Search Direction   9           Step     12              -13.5937
-    Search Direction  10           Step     23              -13.2016
-
- Normal Mode Local Search       Minimum     11
-
-    Search Direction   1           Step     10               -4.5079
-    Search Direction   2           Step     11              -12.2121
-    Search Direction   3           Step     23               -2.5229
-
-    Potential Surface Map       Minimum     19               -2.5229
-
-    Search Direction   4           Step     17               -2.5229
-    Search Direction   5           Step     37              -16.4953
-    Search Direction   6           Step     21              -16.4953
-    Search Direction   7           Step     46               -6.4828
-    Search Direction   8           Step     17               -4.5079
-    Search Direction   9           Step     34               -6.4828
-    Search Direction  10           Step     26               -6.4828
-
- Normal Mode Local Search       Minimum     12
-
-    Search Direction   1           Step     16               -2.0819
+    Search Direction   1           Step     16               -4.6390
     Search Direction   2           Step     13               -2.6720
     Search Direction   3           Step     20                1.2792
 
-    Potential Surface Map       Minimum     20                1.2792
+    Potential Surface Map       Minimum     17                1.2792
 
     Search Direction   4           Step     19                1.2792
     Search Direction   5           Step     22              -14.4413
@@ -234,11 +186,11 @@
     Search Direction   9           Step     23               -4.7067
     Search Direction  10           Step     18               -7.3457
 
- Normal Mode Local Search       Minimum     13
+ Normal Mode Local Search       Minimum     10
 
     Search Direction   1           Step     11               -8.0654
 
-    Potential Surface Map       Minimum     21               -8.0654
+    Potential Surface Map       Minimum     18               -8.0654
 
     Search Direction   2           Step     37               -8.1029
     Search Direction   3           Step     17               -4.7067
@@ -250,20 +202,52 @@
     Search Direction   9           Step     17               -4.7067
     Search Direction  10           Step     19               -7.3457
 
+ Normal Mode Local Search       Minimum     11
+
+    Search Direction   1           Step     18               -8.0788
+    Search Direction   2           Step     19               -8.0788
+    Search Direction   3           Step     18              -16.4953
+    Search Direction   4           Step     18              -16.4953
+    Search Direction   5           Step     11              -13.2016
+    Search Direction   6           Step     11              -13.2016
+    Search Direction   7           Step     52               -2.6720
+    Search Direction   8           Step     20              -13.2016
+    Search Direction   9           Step     12              -13.5937
+    Search Direction  10           Step     23              -13.2016
+
+ Normal Mode Local Search       Minimum     12
+
+    Search Direction   1           Step     10               -4.5079
+    Search Direction   2           Step     11               -4.5079
+    Search Direction   3           Step     23               -2.5229
+
+    Potential Surface Map       Minimum     19               -2.5229
+
+    Search Direction   4           Step     17               -2.5229
+    Search Direction   5           Step     37              -16.4953
+    Search Direction   6           Step     21              -16.4953
+    Search Direction   7           Step     46               -6.4828
+
+    Potential Surface Map       Minimum     20               -6.4828
+
+    Search Direction   8           Step     17               -4.5079
+    Search Direction   9           Step     34               -6.4828
+    Search Direction  10           Step     26               -6.4828
+
+ Normal Mode Local Search       Minimum     13
+
+    Search Direction   1           Step     15               -8.0788
+    Search Direction   2           Step     19              -12.2121
+    Search Direction   3           Step     17              -13.5937
+    Search Direction   4           Step     16              -13.5937
+    Search Direction   5           Step     12               -8.0788
+    Search Direction   6           Step     12               -8.0788
+    Search Direction   7           Step     31               -8.1029
+    Search Direction   8           Step     15               -8.1029
+    Search Direction   9           Step     17               -8.0788
+    Search Direction  10           Step     33               -8.1029
+
  Normal Mode Local Search       Minimum     14
-
-    Search Direction   1           Step     14              -12.2121
-    Search Direction   2           Step     12              -12.2121
-    Search Direction   3           Step     29                1.2792
-    Search Direction   4           Step     17                1.2792
-    Search Direction   5           Step     24              -16.4953
-    Search Direction   6           Step     24              -15.5791
-    Search Direction   7           Step     44               -6.4828
-    Search Direction   8           Step     22               -6.4828
-    Search Direction   9           Step     16               -4.5079
-    Search Direction  10           Step     18               -6.4828
-
- Normal Mode Local Search       Minimum     15
 
     Search Direction   1           Step     12               -8.0514
     Search Direction   2           Step     16               -8.1029
@@ -274,30 +258,17 @@
     Search Direction   7           Step     29                1.2792
     Search Direction   8           Step     45                2.4966
 
-    Potential Surface Map       Minimum     22                2.4966
+    Potential Surface Map       Minimum     21                2.4966
 
     Search Direction   9           Step     20               -8.0514
     Search Direction  10           Step     14               -8.0514
 
- Normal Mode Local Search       Minimum     16
-
-    Search Direction   1           Step      7               -2.5229
-    Search Direction   2           Step     14               -8.1029
-    Search Direction   3           Step     22               -4.5079
-    Search Direction   4           Step     12               -1.1986
-    Search Direction   5           Step     23              -13.5937
-    Search Direction   6           Step     23              -13.5937
-    Search Direction   7           Step     14               -1.1986
-    Search Direction   8                                      ------
-    Search Direction   9           Step     39               -1.1986
-    Search Direction  10           Step     16               -1.1986
-
- Normal Mode Local Search       Minimum     17
+ Normal Mode Local Search       Minimum     15
 
     Search Direction   1           Step     19              -14.4413
     Search Direction   2           Step     18               -4.6390
     Search Direction   3           Step     17               -2.5229
-    Search Direction   4           Step     17               -8.0788
+    Search Direction   4           Step     17               -2.5229
     Search Direction   5           Step     24               -4.6390
     Search Direction   6                                      ------
     Search Direction   7           Step     12               -2.0819
@@ -305,10 +276,10 @@
     Search Direction   9           Step     19              -13.2016
     Search Direction  10           Step     20              -13.2016
 
- Normal Mode Local Search       Minimum     18
+ Normal Mode Local Search       Minimum     16
 
-    Search Direction   1           Step     29              -16.4953
-    Search Direction   2           Step      9               -7.3457
+    Search Direction   1           Step     29              -13.5937
+    Search Direction   2           Step      9              -13.5937
     Search Direction   3           Step     17               -8.0514
     Search Direction   4           Step     17               -8.0514
     Search Direction   5           Step     21              -15.5791
@@ -317,6 +288,35 @@
     Search Direction   8           Step     36               -8.0654
     Search Direction   9           Step     20               -4.6390
     Search Direction  10           Step      9               -8.0654
+
+ Normal Mode Local Search       Minimum     17
+
+    Search Direction   1           Step     10               -1.1986
+
+    Potential Surface Map       Minimum     22               -1.1986
+
+    Search Direction   2           Step     11                2.4966
+    Search Direction   3           Step     12               -8.0514
+    Search Direction   4           Step     17               -8.0514
+    Search Direction   5           Step     33               -4.5079
+    Search Direction   6           Step     15                1.2792
+    Search Direction   7           Step     17                1.2792
+    Search Direction   8           Step     28               -8.0514
+    Search Direction   9           Step     17                1.2792
+    Search Direction  10           Step     40               -4.5079
+
+ Normal Mode Local Search       Minimum     18
+
+    Search Direction   1           Step     12              -13.5937
+    Search Direction   2           Step     18              -13.2016
+    Search Direction   3           Step     17               -8.0514
+    Search Direction   4           Step     17               -8.0514
+    Search Direction   5           Step     19              -16.4953
+    Search Direction   6           Step     21              -15.5791
+    Search Direction   7           Step     12               -8.0654
+    Search Direction   8           Step     12               -8.0654
+    Search Direction   9           Step     26               -7.3457
+    Search Direction  10           Step     21               -4.6390
 
  Normal Mode Local Search       Minimum     19
 
@@ -333,39 +333,39 @@
 
  Normal Mode Local Search       Minimum     20
 
-    Search Direction   1           Step     10               -1.1986
-    Search Direction   2           Step     11                1.2792
-    Search Direction   3           Step     12               -8.0514
-    Search Direction   4           Step     17               -8.0514
-    Search Direction   5           Step     33               -4.5079
-    Search Direction   6           Step     15                1.2792
-    Search Direction   7           Step     17                1.2792
-    Search Direction   8           Step     28               -8.0514
-    Search Direction   9           Step     17                1.2792
-    Search Direction  10           Step     40               -4.5079
+    Search Direction   1           Step     14              -12.2121
+    Search Direction   2           Step     12              -12.2121
+    Search Direction   3           Step     29                1.2792
+    Search Direction   4           Step     17                1.2792
+    Search Direction   5           Step     24              -16.4953
+    Search Direction   6           Step     24              -15.5791
+    Search Direction   7           Step     44               -6.4828
+    Search Direction   8           Step     22               -6.4828
+    Search Direction   9           Step     16               -4.5079
+    Search Direction  10           Step     18               -6.4828
 
  Normal Mode Local Search       Minimum     21
-
-    Search Direction   1           Step     12              -13.5937
-    Search Direction   2           Step     18              -13.2016
-    Search Direction   3           Step     17               -8.0514
-    Search Direction   4           Step     17               -8.0514
-    Search Direction   5           Step     19              -16.4953
-    Search Direction   6           Step     21              -15.5791
-    Search Direction   7           Step     12               -8.0654
-    Search Direction   8           Step     12               -8.0654
-    Search Direction   9           Step     26               -7.3457
-    Search Direction  10           Step     21               -4.6390
-
- Normal Mode Local Search       Minimum     22
 
     Search Direction   1           Step     10                2.4966
     Search Direction   2           Step     33               -7.3457
     Search Direction   3           Step     12                1.2792
-    Search Direction   4           Step     32              -12.2121
-    Search Direction   5           Step     19                2.4966
+    Search Direction   4           Step     32               -9.8426
+    Search Direction   5           Step     19               -8.0514
     Search Direction   6           Step     19                2.4966
     Search Direction   7           Step     24                1.2792
     Search Direction   8           Step     16               -8.0514
     Search Direction   9           Step     29               -8.0654
     Search Direction  10           Step     24                1.2792
+
+ Normal Mode Local Search       Minimum     22
+
+    Search Direction   1           Step      7               -1.1986
+    Search Direction   2           Step     14               -8.1029
+    Search Direction   3           Step     22               -4.5079
+    Search Direction   4           Step     12               -1.1986
+    Search Direction   5           Step     23              -13.5937
+    Search Direction   6           Step     23              -13.5937
+    Search Direction   7           Step     14               -1.1986
+    Search Direction   8                                      ------
+    Search Direction   9           Step     39               -1.1986
+    Search Direction  10           Step     16               -1.1986

@@ -4795,7 +4795,7 @@ c
 !$OMP& gfr,gfri,gti,gtri,dorl,dorli)
 !$OMP& firstprivate(mscale,pscale,dscale,uscale)
 !$OMP DO reduction(+:emtt,eptt,viri,demi,depi,demk,depk)
-!$OMP& schedule(dynamic,600)
+!$OMP& schedule(dynamic)
 c
 c     set the permanent multipole and induced dipole values
 c

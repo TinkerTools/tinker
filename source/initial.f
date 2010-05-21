@@ -20,7 +20,6 @@ c
       implicit none
       include 'sizes.i'
       include 'align.i'
-      include 'argue.i'
       include 'atoms.i'
       include 'bath.i'
       include 'bound.i'
@@ -35,6 +34,7 @@ c
       include 'molcul.i'
       include 'mutant.i'
       include 'neigh.i'
+      include 'openmp.i'
       include 'output.i'
       include 'params.i'
       include 'pdb.i'
@@ -45,29 +45,94 @@ c
       include 'socket.i'
       include 'warp.i'
       include 'zclose.i'
+!$    integer omp_get_num_procs
       real*8 precise
 c
 c
-c     stacksize for OpenMP based calculations
+c     default unit numbers for input and output
 c
+      input = 5
+      iout = 6
+c
+c     display program banner and copyright notice
+c
+      call promo
+c
+c     command line arguments to the program
+c
+      call command
+c
+c     cores, thread count and stacksize for OpenMP
+c
+      nproc = 1
+      nthread = 1
+!$    nproc = omp_get_num_procs ()
+!$    nthread = nproc
+!$    call omp_set_num_threads (nthread)
+!$    call omp_set_nested (.true.)
 !$    call kmp_set_stacksize (2**24)
 c
-c     number of atoms used in superposition
+c     values of machine precision constants
 c
-      nfit = 0
+      tiny = precise (1)
+      small = precise (2)
+      huge = precise (3)
 c
-c     number of command line arguments
+c     number of lines in the keyfile
 c
-      narg = 0
+      nkey = 0
+c
+c     number of lines in the parameter file
+c
+      nprm = 0
 c
 c     number of atoms in the system
 c
       n = 0
 c
-c     flags for temperature and pressure baths
+c     number of molecules in the system
 c
-      isothermal = .false.
-      isobaric = .false.
+      nmol = 0
+c
+c     number of unit cell replicates
+c
+      ncell = 0
+c
+c     number of atoms used in superposition
+c
+      nfit = 0
+c
+c     number of mutated atoms in the system
+c
+      nmut = 0
+c
+c     number of bonds added or deleted from Z-matrix
+c
+      nadd = 0
+      ndel = 0
+c
+c     number of atoms in Protein Data Bank format
+c
+      npdb = 0
+c
+c     number of residues and chains in biopolymer sequence
+c
+      nseq = 0
+      nchain = 0
+c
+c     highest numbered previous cycle file
+c
+      nprior = 0
+c
+c     flags for information levels within the program
+c
+      verbose = .false.
+      debug = .false.
+      abort = .false.
+c
+c     flag for use of atom groups
+c
+      use_group = .false.
 c
 c     flags for periodic boundaries
 c
@@ -75,75 +140,16 @@ c
       use_replica = .false.
       use_polymer = .false.
 c
-c     number of unit cell replicates
+c     flags for temperature and pressure baths
 c
-      ncell = 0
-c
-c     flag for use of atom groups
-c
-      use_group = .false.
-c
-c     highest numbered previous cycle file
-c
-      nprior = 0
-c
-c     information levels within the program
-c
-      verbose = .false.
-      debug = .false.
-      abort = .false.
-c
-c     default input/output unit numbers
-c
-      input = 5
-      iout = 6
-c
-c     number of lines in the keyfile
-c
-      nkey = 0
-c
-c     default parameters used by line search
-c
-      stpmin = 0.0d0
-      stpmax = 0.0d0
-      cappa = 0.0d0
-      slpmax = 0.0d0
-      angmax = 0.0d0
-      intmax = 0
-c
-c     default parameters used by optimizations
-c
-      fctmin = 0.0d0
-      maxiter = 0
-      nextiter = 0
-      iprint = -1
-      iwrite = -1
-c
-c     number of molecules in the system
-c
-      nmol = 0
-c
-c     number of mutated atoms in the system
-c
-      nmut = 0
+      isothermal = .false.
+      isobaric = .false.
 c
 c     flags for rebuilding of neighbor lists
 c
       dovlst = .true.
       doclst = .true.
       domlst = .true.
-c
-c     type of coordinates file
-c
-      coordtype = 'NONE'
-c
-c     number of lines in the parameter file
-c
-      nprm = 0
-c
-c     number of atoms in Protein Data Bank format
-c
-      npdb = 0
 c
 c     flag for use of rigid bodies
 c
@@ -152,11 +158,6 @@ c
 c     flag to show setting of optimization scale factors
 c
       set_scale = .false.
-c
-c     number of residues and chains in biopolymer sequence
-c
-      nseq = 0
-      nchain = 0
 c
 c     flags for external Java socket communication
 c
@@ -171,27 +172,21 @@ c
       use_tophat = .false.
       use_stophat = .false.
 c
-c     number of bonds added or deleted from Z-matrix
+c     type of coordinates file
 c
-      nadd = 0
-      ndel = 0
-c
-c     display program info and copyright notice
-c
-      call promo
+      coordtype = 'NONE'
 c
 c     names of biopolymer residue types
 c
       call initres
 c
-c     determine a set of machine precision values
+c     default parameters used by optimizations
 c
-      tiny = precise (1)
-      small = precise (2)
-      huge = precise (3)
-c
-c     get any command line arguments to the program
-c
-      call command
+      fctmin = 0.0d0
+      maxiter = 0
+      nextiter = 0
+      iprint = -1
+      iwrite = -1
+      stpmax = 0.0d0
       return
       end

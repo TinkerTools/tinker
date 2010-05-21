@@ -59,7 +59,7 @@ c
       call getxyz
       call mechanic
 c
-c     get the number calculation cycles to be performed
+c     get the number of calculation cycles to be performed
 c
       ncalls = 0
       query = .true.

@@ -36,17 +36,28 @@ c
       real*8 f(maxrsd),g(maxlsq)
       real*8 jacobian(maxrsd,maxlsq)
       logical exist,query
-      character*20 label(6)
+      character*16 blank
+      character*16 label(6)
       character*120 record
       character*120 string
       external xtalerr,xtalwrt
 c
 c
-c     initialize some variables and print the header information
+c     initialize some variables to be used during fitting
 c
       call initial
       nvary = 0
       nresid = 0
+      blank = '                '
+      do i = 1, maxlsq
+         vartyp(i) = blank
+      end do
+      do i = 1, maxrsd
+         rsdtyp(i) = blank
+      end do
+c
+c     print informational header about available parameters
+c
       write (iout,10)
    10 format (/,' The Following Parameters can be Fit for',
      &           ' each Atom Type :',
@@ -171,12 +182,12 @@ c
          do i = 1, 6
             iresid(nresid+i) = ixtal
          end do
-         rsdtyp(nresid+1) = 'Force a-Axis'
-         rsdtyp(nresid+2) = 'Force b-Axis'
-         rsdtyp(nresid+3) = 'Force c-Axis'
-         rsdtyp(nresid+4) = 'Force Alpha'
-         rsdtyp(nresid+5) = 'Force Beta'
-         rsdtyp(nresid+6) = 'Force Gamma'
+         rsdtyp(nresid+1) = 'Force a-Axis    '
+         rsdtyp(nresid+2) = 'Force b-Axis    '
+         rsdtyp(nresid+3) = 'Force c-Axis    '
+         rsdtyp(nresid+4) = 'Force Alpha     '
+         rsdtyp(nresid+5) = 'Force Beta      '
+         rsdtyp(nresid+6) = 'Force Gamma     '
          nresid = nresid + 6
 c
 c     print molecules per unit cell, lattice energy and dipole
@@ -187,14 +198,14 @@ c
          if (e0_lattice .ne. 0.0d0) then
             nresid = nresid + 1
             iresid(nresid) = ixtal
-            rsdtyp(nresid) = 'Lattice Energy'
+            rsdtyp(nresid) = 'Lattice Energy  '
             write (iout,190)  e0_lattice
   190       format (' Value of Crystal Lattice Energy :  ',f13.2)
          end if
          if (moment_0 .ne. 0.0d0) then
             nresid = nresid + 1
             iresid(nresid) = ixtal
-            rsdtyp(nresid) = 'Dipole Moment'
+            rsdtyp(nresid) = 'Dipole Moment   '
             write (iout,200)  moment_0
   200       format (' Value of Molecular Dipole Moment : ',f13.2)
          end if
@@ -214,12 +225,12 @@ c
 c
 c     types of variables for use in optimization
 c
-      label(1) = 'Atomic Radius'
-      label(2) = 'Well Depth'
-      label(3) = 'H Reduction'
-      label(4) = 'Partial Charge'
+      label(1) = 'Atomic Radius   '
+      label(2) = 'Well Depth      '
+      label(3) = 'H Reduction     '
+      label(4) = 'Partial Charge  '
       label(5) = 'Dipole Magnitude'
-      label(6) = 'Dipole Position'
+      label(6) = 'Dipole Position '
       do i = 1, nvary
          vartyp(i) = label(ivary(i))
       end do
@@ -231,13 +242,13 @@ c
       do i = 1, nvary
          if (ivary(i) .le. 3) then
             write (iout,220)  i,vartyp(i),vary(1,i),xx(i)
-  220       format (3x,'(',i2,')',2x,a20,'Atom Class',i5,4x,f12.4)
+  220       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,f12.4)
          else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,230)  i,vartyp(i),vary(1,i),xx(i)
-  230       format (3x,'(',i2,')',2x,a20,'Atom Type ',i5,4x,f12.4)
+  230       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,f12.4)
          else if (ivary(i) .eq. 6) then
             write (iout,240)  i,vartyp(i),vary(1,i),vary(2,i),xx(i)
-  240       format (3x,'(',i2,')',2x,a20,'Bond Type ',2i5,f12.4)
+  240       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,f12.4)
          end if
       end do
 c
@@ -281,13 +292,13 @@ c
       do i = 1, nvary
          if (ivary(i) .le. 3) then
             write (iout,260)  i,vartyp(i),vary(1,i),xx(i),g(i)
-  260       format (3x,'(',i2,')',2x,a20,'Atom Class',i5,4x,2f12.4)
+  260       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,2f12.4)
          else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,270)  i,vartyp(i),vary(1,i),xx(i),g(i)
-  270       format (3x,'(',i2,')',2x,a20,'Atom Type ',i5,4x,2f12.4)
+  270       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,2f12.4)
          else if (ivary(i) .eq. 6) then
             write (iout,280)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),g(i)
-  280       format (3x,'(',i2,')',2x,a20,'Bond Type ',2i5,2f12.4)
+  280       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,2f12.4)
          end if
       end do
 c
@@ -954,13 +965,13 @@ c
       do i = 1, nvary
          if (ivary(i) .le. 3) then
             write (iout,20)  i,vartyp(i),vary(1,i),xx(i),gs(i)
-   20       format (3x,'(',i2,')',2x,a20,'Atom Class',i5,4x,2f12.4)
+   20       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,2f12.4)
          else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,30)  i,vartyp(i),vary(1,i),xx(i),gs(i)
-   30       format (3x,'(',i2,')',2x,a20,'Atom Type ',i5,4x,2f12.4)
+   30       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,2f12.4)
          else if (ivary(i) .eq. 6) then
             write (iout,40)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),gs(i)
-   40       format (3x,'(',i2,')',2x,a20,'Bond Type ',2i5,2f12.4)
+   40       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,2f12.4)
          end if
       end do
 c
@@ -971,7 +982,7 @@ c
      &           i4,' :',/)
       do i = 1, nresid
          write (iout,60)  i,rsdtyp(i),iresid(i),f(i)
-   60    format (3x,'(',i2,')',2x,a20,2x,'Crystal',i4,4x,f12.4)
+   60    format (3x,'(',i2,')',2x,a16,4x,2x,'Crystal',i4,4x,f12.4)
       end do
       write (iout,70)
    70 format ()

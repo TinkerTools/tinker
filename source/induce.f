@@ -2231,15 +2231,14 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,pdi,pti,ci,dix,diy,diz,
-!$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,kkk,kk,xr,yr,zr,
+!$OMP PARALLEL default(shared) private(i,j,k,ii,pdi,pti,
+!$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,kkk,kk,xr,yr,zr,
 !$OMP& r2,r,ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ralpha,bn,
 !$OMP& alsq2,alsq2n,exp2a,bfac,scale3,scale5,scale7,damp,pgamma,
 !$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,drr3,drr5,drr7,prr3,prr5,prr7,
 !$OMP& dir,qix,qiy,qiz,qir,dkr,qkx,qky,qkz,qkr,fim,fkm,fid,fkd,fip,
 !$OMP& fkp,expdamp) firstprivate(dscale,pscale)
-!$OMP DO reduction(+:fieldt,fieldtp)
-!$OMP& schedule(dynamic,600)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(dynamic)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -2976,8 +2975,7 @@ c
 !$OMP& ralpha,damp,alsq2,alsq2n,scale3,scale5,bn,fimd,fkmd,
 !$OMP& fimp,fkmp,fid,fkd,fip,fkp,i,j,k,ii,kk,kkk)
 !$OMP& firstprivate(dscale)
-!$OMP DO reduction(+:fieldt,fieldtp)
-!$OMP& schedule(dynamic,600)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(dynamic)
 c
 c     compute the real space portion of the Ewald summation
 c

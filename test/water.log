@@ -4,30 +4,30 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 5.0   October 2009                        ##
+ ##                          Version 6.0  June 2010                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2010               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
  ##############################################################################
 
 
- Electrostatic Potential Grid Points :            4357
+ Electrostatic Potential Grid Points :            4364
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
 
-    Atom         Points        Potential        Target        RMS Diff
+    Atom         Points       Potential 1    Potential 2      RMS Diff
 
-       1          1942          -8.8521        -8.9326         0.5959
-       2          1211           6.9490         7.2227         0.4763
-       3          1204           6.9194         7.1950         0.4805
+       1          1929          -7.1409        -7.1409         0.0000
+       2          1219           5.5478         5.5478         0.0000
+       3          1216           5.5351         5.5351         0.0000
 
  Electrostatic Potential over all Grid Points :
 
- Average Magnitude for Potential :              8.0334
- Average Magnitude for Target :                 8.1777
- Average Signed Potential Difference :         -0.1164
- Average Unsigned Potential Difference :        0.3799
- Root Mean Square Potential Difference :        0.5340
+ Average Magnitude for Potential 1 :            6.4772
+ Average Magnitude for Potential 2 :            6.4772
+ Average Signed Potential Difference :          0.0000
+ Average Unsigned Potential Difference :        0.0000
+ Root Mean Square Potential Difference :        0.0000

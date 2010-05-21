@@ -79,6 +79,15 @@ c
       diverge = 0.005d0
       reduce = 0.0d0
 c
+c     set default parameters for the line search
+c
+      stpmin = 1.0d-16
+      stpmax = 2.0d0
+      cappa = 0.1d0
+      slpmax = 10000.0d0
+      angmax = 180.0d0
+      intmax = 5
+c
 c     get coordinates for the first endpoint structure
 c
       call getxyz

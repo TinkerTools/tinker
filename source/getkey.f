@@ -23,6 +23,7 @@ c
       include 'files.i'
       include 'iounit.i'
       include 'keys.i'
+      include 'openmp.i'
       integer i,ikey
       integer next,length
       integer freeunit
@@ -122,6 +123,21 @@ c
    70          format (a)
             end if
          end if
+      end do
+c
+c     set number of threads for OpenMP parallelization
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call upcase (record)
+         call gettext (record,keyword,next)
+         string = record(next:120)
+         if (keyword(1:15) .eq. 'OPENMP-THREADS ') then
+            read (string,*,err=80,end=80)  nthread
+!$          call omp_set_num_threads (nthread)
+         end if
+   80    continue
       end do
       return
       end

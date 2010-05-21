@@ -1843,13 +1843,13 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,f,
-!$OMP& pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
+!$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
 !$OMP& c2scale,c3scale,c4scale,c5scale,use_group,fgrp,
 !$OMP& off2,aewald,molcule,ebuffer) firstprivate(cscale)
 !$OMP& shared(eintrat,eintert,ect,dect1,dect2,virt)
 !$OMP DO reduction(+:eintrat,eintert,ect,dect1,dect2,virt)
-!$OMP& schedule(dynamic,600)
+!$OMP& schedule(dynamic)
 c
 c     compute the real space Ewald energy and first derivatives
 c	  

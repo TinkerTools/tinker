@@ -26,7 +26,7 @@ c
       integer nxtal,nvary,ivary
       integer vary,iresid
       real*8 e0_lattice,moment_0
-      character*20 rsdtyp,vartyp
-      common /xtal1/ e0_lattice,moment_0,nxtal,nvary,ivary(maxlsq),
+      character*16 rsdtyp,vartyp
+      common /xtals/ e0_lattice,moment_0,nxtal,nvary,ivary(maxlsq),
      &               vary(2,maxlsq),iresid(maxrsd),rsdtyp(maxrsd),
      &               vartyp(maxlsq)

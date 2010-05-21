@@ -27,6 +27,7 @@ c
 c
 c     initialize command line arguments as blank strings
 c
+      narg = 0
       blank = '                    '
       do i = 0, maxarg
          arg(i) = blank//blank//blank

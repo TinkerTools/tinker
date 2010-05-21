@@ -3,7 +3,7 @@
                  Benchmark Results from TINKER 6.0  (June 2010)
                  ----------------------------------------------
 
- Benchmark #1: Calmodulin Energy Evaluation
+ Benchmark #1: Calmodulin Energy Evaluation (Serial)
 
  Isolated Calmodulin Molecule, 2264 Atoms, Amber ff94 Force Field,
  No Nonbonded Cutoffs, 10 Evaluations
@@ -12,8 +12,9 @@
  ------------                                 ---    ------  --------  -------
 
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      1.90      3.06     8.98
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      2.02      3.20     9.40
 
- Benchmark #2: Crambin Crystal Energy Evaluation
+ Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
 
  Crambin unit cell, 1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
  with PME for Electrostatics, 9.0 Ang vdw Cutoff, 100 Evaluations
@@ -22,8 +23,9 @@
  ------------                                 ---    ------  --------  -------
 
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      3.11      4.34    16.30
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      3.25      4.51    17.09
 
- Benchmark #3: Peptide Normal Mode Calculation
+ Benchmark #3: Peptide Normal Mode Calculation (Serial)
 
  Normal Modes of the Hessian and Vibration Freqencies of a 20-Amino Acid,
  328-Atom Peptide, OPLS-AA Force Field without Cutoffs
@@ -32,8 +34,9 @@
  ------------                                 ---          ----------
 
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                3.33
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                3.55
 
- Benchmark #4: TIP3P Water Box Molecular Dynamics
+ Benchmark #4: TIP3P Water Box Molecular Dynamics (Serial)
 
  MD run of 1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic Box,
  9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
@@ -42,59 +45,60 @@
  MACHINE TYPE                                 GHz            DYNAMICS
  ------------                                 ---            --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                16.8
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                14.4
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                15.3
 
- Benchmark #5: AMOEBA Water Box Molecular Dynamics
+ Benchmark #5: AMOEBA Water Box Molecular Dynamics (Serial)
 
  MD run of 1000 MD Steps for 216 AMOEBA Waters in a 18.643 Ang Box,
- Neighbor Lists, PME with a 7.0 Ang Real-Space Cutoff, 9.0 Ang Cutoff
- for vdW, and 1.0 fs Time Step with Modified Beeman Integration
+ Neighbor Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, and 1.0 fs Time Step with Modified Beeman Integration
 
  MACHINE TYPE                                 GHz            DYNAMICS
  ------------                                 ---            --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93               143.7
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                 144
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                 130
 
- Benchmark #6: CHARMM DFHR-Water Molecular Dynamics
+ Benchmark #6: CHARMM DFHR-Water Molecular Dynamics (Parallel, OpenMP)
 
  MD run of 100 MD Steps for CHARMM DHFR-Water (23558 Atoms, 62.23 Ang Box),
- Neighbor Lists, PME with a 7.0 Ang Real-Space Cutoff, 9.0 Ang Cutoff for
- vdW, 1.0 fs Time Step with  Modified Beeman Integration, Serial and OpenMP
- timings reported as actual "wall clock" time for benchmark
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with  Modified Beeman Integration,
+ Serial and OpenMP timings reported as "wall clock" time for benchmark
 
  MACHINE TYPE                                 GHz    Cores/Threads   DYNAMICS
  ------------                                 ---    -------------   --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93     Serial-Gen   (0.83) 106
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93     Serial-IOP   (0.93) 110
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93       Serial     (0.89) 133
  MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1      (1.00) 119
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2      (1.53)  78
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1      (1.00) 125
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2      (1.67)  75
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4      (2.55)  49
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6      (3.05)  41
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8      (3.38)  37
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2      (1.61)  74
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80       Serial     (0.92) 137
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1      (1.00) 126
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2      (1.66)  76
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4      (2.52)  50
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6      (3.15)  40
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8      (3.41)  37
 
- Benchmark #7: AMOEBA DFHR-Water Molecular Dynamics
+ Benchmark #7: AMOEBA DFHR-Water Molecular Dynamics (Parallel, OpenMP)
 
  MD run of 100 MD Steps for AMOEBA DHFR-Water (23558 Atoms, 62.23 Ang Box),
- Neighbor Lists, PME with a 7.0 Ang Real-Space Cutoff, 12.0 Ang Cutoff for
- vdW, 1.0 fs Time Step with  Modified Beeman Integration, Serial and OpenMP
- timings reported as actual "wall clock" time for benchmark
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 12.0 Ang vdW Cutoff, 1.0 fs Time Step with  Modified Beeman Integration,
+ Serial and OpenMP timings reported as "wall clock" time for benchmark
 
  MACHINE TYPE                                 GHz    Cores/Threads   DYNAMICS
  ------------                                 ---    -------------   --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93     Serial-Gen   (0.83) 748
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93     Serial-IOP   (0.93) 671
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1      (1.00) 622
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2      (1.75) 355
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80     Serial-Gen   (0.82) 797
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1      (1.00) 656
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2      (1.65) 398
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4      (2.74) 239
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6      (3.45) 190
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8      (3.98) 165
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93       Serial     (0.81) 788
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1      (1.00) 636
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2      (1.71) 371
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80       Serial     (0.83) 807
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1      (1.00) 668
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2      (1.69) 395
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4      (2.77) 241
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6      (3.48) 192
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8      (3.98) 168
 
  ----------------------
  Times are reported in seconds and were measured with TINKER Version 6.0,

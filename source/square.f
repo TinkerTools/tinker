@@ -129,11 +129,9 @@ c
 c
 c     setup the default tolerances and parameter values
 c
-      eps = precise (2)
       ndigit = 10
-      if (eps .lt. 10.0d0**(-ndigit)) then
-         eps = 10.0d0**(-ndigit)
-      end if
+      eps = precise (2)
+      eps = max(eps,10.0d0**(-ndigit))
       if (maxiter .eq. 0)  maxiter = 100
       if (iprint .lt. 0)  iprint = 1
       if (iwrite .lt. 0)  iwrite = 1

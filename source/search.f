@@ -78,7 +78,7 @@ c
 c     use default parameters for the line search if needed
 c
       blank = '         '
-      if (stpmin .eq. 0.0d0)  stpmin = 1.0d-20
+      if (stpmin .eq. 0.0d0)  stpmin = 1.0d-16
       if (stpmax .eq. 0.0d0)  stpmax = 2.0d0
       if (cappa .eq. 0.0d0)  cappa = 0.1d0
       if (slpmax .eq. 0.0d0)  slpmax = 10000.0d0

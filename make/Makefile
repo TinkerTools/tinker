@@ -43,20 +43,6 @@ LINKDIR = /usr/local/bin
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible
 ##  Oper Sys: Fedora Core
-##  Compiler: GNU g77
-##
-
-#F77 = /usr/bin/g77
-#LIBS =
-#F77FLAGS = -c
-#OPTFLAGS = -O3 -ffast-math
-#LIBFLAGS = -crusv
-#LINKFLAGS =
-
-##
-##  Machine:  Generic Linux
-##  CPU Type: Intel x86 Compatible
-##  Oper Sys: Fedora Core
 ##  Compiler: GNU gfortran
 ##
 
@@ -69,7 +55,7 @@ LINKDIR = /usr/local/bin
 
 ##
 ##  Machine:  Generic Linux
-##  CPU Type: Intel x86 Compatible
+##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
 ##  Compiler: Intel Fortran for Linux 11
 ##
@@ -82,27 +68,13 @@ LINKDIR = /usr/local/bin
 #LINKFLAGS =
 
 ##
-##  Machine:  Generic Linux
-##  CPU Type: Intel x86 Compatible
-##  Oper Sys: Fedora Core
-##  Compiler: Portland Group (PGI) Fortran
-##
-
-#F77 = /opt/pgi/linux86/bin/pgf77
-#LIBS =
-#F77FLAGS = -c
-#OPTFLAGS = -fast
-#LIBFLAGS = -crusv
-#LINKFLAGS =
-
-##
-##  Machine:  Macintosh (Intel)
-##  CPU Type: Intel x86_64 Compatible
+##  Machine:  Macintosh
+##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.5 (Leopard)
 ##  Compiler: Intel Fortran for Mac 11
 ##
 
-F77 = /opt/intel/Compiler/11.1/058/bin/intel64/ifort
+F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
 LIBS =
 F77FLAGS = -c
 OPTFLAGS = -fast -xSSE3 -no-ipo -w -vec-report0
@@ -110,10 +82,28 @@ LIBFLAGS = -crusv
 LINKFLAGS =
 
 ##
-##  Machine:  Macintosh (PPC)
+##  Machine:  Macintosh
+##  CPU Type: Intel Xeon
+##  Oper Sys: OS X 10.6 (Snow Leopard)
+##  Compiler: Intel Fortran for Mac 11
+##  Parallel: OpenMP
+##
+
+#F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
+#CC = /opt/intel/Compiler/11.1/088/bin/intel64/icc
+#LIBS = #-L/user/ponder/tinker/fftw/lib -lfftw3_threads -lfftw3 -lm
+#INC = -I/usr/include
+#F77FLAGS = -c -align all -assume cc_omp
+#CFLAGS = -c $(INC)
+#OPTFLAGS = -O2 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#LIBFLAGS = -crusv
+#LINKFLAGS = $(OPTFLAGS) $(LIBS) -mmacosx-version-min=10.4
+
+##
+##  Machine:  Macintosh
 ##  CPU Type: PowerPC G4/G5
 ##  Oper Sys: OS X 10.4 (Tiger)
-##  Compiler: IBM XLF
+##  Compiler: IBM XLF 8.1
 ##
 
 #F77 = /opt/ibmcmp/xlf/8.1/bin/xlf
