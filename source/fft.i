@@ -15,10 +15,10 @@ c
 c     maxtable   maximum size of the FFT table intermediate array
 c     maxprime   maximum number of prime factors of FFT dimension
 c
-c     table      intermediate array used by the FFT routine (fftpack)
-c     iprime     prime factorization of each FFT dimension (fftpack)
 c     planf      pointer to forward transform data structure (fftw)
 c     planb      pointer to backward transform data structure (fftw)
+c     table      intermediate array used by the FFT routine (fftpack)
+c     iprime     prime factorization of each FFT dimension (fftpack)
 c     ffttyp     type of FFT package; currently FFTPACK or FFTW
 c
 c
@@ -31,5 +31,5 @@ c
       integer*8 planb
       real*8 table
       character*7 ffttyp
-      common /fft/ table(maxtable,3),iprime(maxprime,3),planf,planb,
+      common /fft/ planf,planb,table(maxtable,3),iprime(maxprime,3),
      &             ffttyp

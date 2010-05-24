@@ -22,3 +22,8 @@
       After completion of the above, the libraries files used by TINKER
       will be in the /lib subdirectory.
 
+      Note that the configure script may need modification to include
+      processor-specific compiler flags. In particular, the originally
+      provided version should have the -xHost option replaced by either
+      -axssse3 on OS X, or by -axsse3 on generic Linux systems.
+

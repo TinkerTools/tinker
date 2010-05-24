@@ -13355,7 +13355,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
               esac ;;
           esac
           # newer icc versions should support -xHost
-	  icc_flags="-xHost $icc_flags"
+	  # icc_flags="-xHost $icc_flags"
+          # use -axssse3 on Mac OS X, and -axsse3 for generic Linux (JWP)
+          icc_flags="-axssse3 $icc_flags"
+          #icc_flags="-axsse3 $icc_flags"
           if test "x$icc_flags" != x; then
             for flag in $icc_flags; do
                { $as_echo "$as_me:$LINENO: checking whether C compiler accepts $flag" >&5

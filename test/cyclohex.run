@@ -1,5 +1,5 @@
-saddle cyclohex.chair cyclohex.boat 0.1 y
+../bin/saddle cyclohex.chair cyclohex.boat 0.1 y
 cp tstate.xyz cyclohex.xyz
-newton cyclohex a a 0.0001
-vibrate cyclohex 0
+../bin/newton cyclohex a a 0.0001
+../bin/vibrate cyclohex 0
 rm cyclohex.xyz* tstate.xyz

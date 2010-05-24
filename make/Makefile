@@ -60,12 +60,30 @@ LINKDIR = /usr/local/bin
 ##  Compiler: Intel Fortran for Linux 11
 ##
 
-#F77 = /opt/intel/Compiler/11.0/081/bin/ia32/ifort
+#F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
 #LIBS =
 #F77FLAGS = -c
-#OPTFLAGS = -O3 -axSSE3 -no-prec-div -no-ipo -w -vec-report0
+#OPTFLAGS = -O3 -axsse3 -no-prec-div -no-ipo -vec-report0
 #LIBFLAGS = -crusv
 #LINKFLAGS =
+
+##
+##  Machine:  Generic Linux
+##  CPU Type: Intel x86 Compatible (also AMD)
+##  Oper Sys: Fedora Core
+##  Compiler: Intel Fortran for Linux 11
+##  Parallel: OpenMP
+##
+
+#F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
+#CC = /opt/intel/Compiler/11.1/072/bin/ia32/icc
+#LIBS = #-L/user/ponder/tinker/fftw/lib -lfftw3_threads -lfftw3 -lm
+#INC = -I/usr/include
+#F77FLAGS = -c -align all -assume cc_omp
+#CFLAGS = -c $(INC)
+#OPTFLAGS = -O3 -axsse3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#LIBFLAGS = -crusv
+#LINKFLAGS = $(OPTFLAGS) $(LIBS)
 
 ##
 ##  Machine:  Macintosh
@@ -77,7 +95,7 @@ LINKDIR = /usr/local/bin
 F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
 LIBS =
 F77FLAGS = -c
-OPTFLAGS = -fast -xSSE3 -no-ipo -w -vec-report0
+OPTFLAGS = -fast -axssse3 -no-ipo -w -vec-report0
 LIBFLAGS = -crusv
 LINKFLAGS =
 
@@ -95,7 +113,7 @@ LINKFLAGS =
 #INC = -I/usr/include
 #F77FLAGS = -c -align all -assume cc_omp
 #CFLAGS = -c $(INC)
-#OPTFLAGS = -O2 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#OPTFLAGS = -O3 -axssse3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
 #LIBFLAGS = -crusv
 #LINKFLAGS = $(OPTFLAGS) $(LIBS) -mmacosx-version-min=10.4
 

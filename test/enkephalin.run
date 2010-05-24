@@ -1,4 +1,4 @@
-protein < enkephalin.dat
-minimize enkephalin 0.0001
-vibrate enkephalin 7
+../bin/protein < enkephalin.dat
+../bin/minimize enkephalin 0.0001
+../bin/vibrate enkephalin 7
 rm enkephalin.xyz* enkephalin.int enkephalin.seq enkephalin.0*

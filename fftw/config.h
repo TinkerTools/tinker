@@ -39,7 +39,7 @@
 /* #undef FC_DUMMY_MAIN_EQ_F77 */
 
 /* C compiler name and flags */
-#define FFTW_CC "icc -std=c99 -O3 -ansi-alias -malign-double -xHost -D_THREAD_SAFE "
+#define FFTW_CC "icc -std=c99 -O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE "
 
 /* Define to enable extra FFTW debugging code. */
 /* #undef FFTW_DEBUG */

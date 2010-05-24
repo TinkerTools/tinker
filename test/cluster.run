@@ -1,2 +1,2 @@
-gda < cluster.dat
+../bin/gda < cluster.dat
 rm cluster.0*

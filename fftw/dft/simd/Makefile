@@ -96,7 +96,7 @@ AUTOMAKE = ${SHELL} /Users/ponder/tinker/fftw/missing --run automake-1.10
 AWK = awk
 CC = icc -std=c99
 CCDEPMODE = depmode=gcc3
-CFLAGS = -O3 -ansi-alias -malign-double -xHost -D_THREAD_SAFE 
+CFLAGS = -O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE 
 CODELET_OPTIM = 
 CPP = icc -std=c99 -E
 CPPFLAGS = 

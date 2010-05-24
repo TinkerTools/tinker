@@ -62,7 +62,7 @@ c     command line arguments to the program
 c
       call command
 c
-c     cores, thread count and stacksize for OpenMP
+c     cores, thread count and options for OpenMP
 c
       nproc = 1
       nthread = 1
@@ -71,6 +71,7 @@ c
 !$    call omp_set_num_threads (nthread)
 !$    call omp_set_nested (.true.)
 !$    call kmp_set_stacksize (2**24)
+!$    call kmp_set_blocktime (0)
 c
 c     values of machine precision constants
 c
