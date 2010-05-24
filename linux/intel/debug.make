@@ -1,11 +1,11 @@
 #
 #
-#  ############################################################
-#  ##                                                        ##
-#  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##       (Intel Fortran Compiler for Linux Version)       ##
-#  ##                                                        ##
-#  ############################################################
+#  ################################################################
+#  ##                                                            ##
+#  ##  debug.make  --  debug compile each of the TINKER modules  ##
+#  ##         (Intel Fortran Compiler for Linux Version)         ##
+#  ##                                                            ##
+#  ################################################################
 #
 #
 ifort -c -g -warn unused -check uninit -check bounds active.f

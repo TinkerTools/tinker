@@ -2,7 +2,7 @@
 #
 #  ###################################################################
 #  ##                                                               ##
-#  ##  linkopt.make  --  optimized link of TINKER package programs  ##
+#  ##  linkopt.make  --  optimized link of all the TINKER programs  ##
 #  ##           (Intel Fortran Compiler for Linux Version)          ##
 #  ##                                                               ##
 #  ###################################################################

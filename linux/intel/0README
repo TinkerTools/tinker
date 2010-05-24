@@ -5,30 +5,13 @@
 
          This subdirectory contains a set of script files that can be
          used to build the TINKER program package on an Intel-based
-         Linux system using the Intel Fortran Compiler for Linux.
+         Linux system using the Intel Fortran Compiler for Linux. The
+         use of the "generic.make" compile script restricts the Intel
+         compiler to SSE3-compatible instructions, and the resulting
+         executables should run on most AMD-based machines.
 
          Please note that by default some Linux distributions limit
          stacksize and datasize for processes as can be checked via
          the csh limit command or similar. Large TINKER executables
          will need these values increased to avoid failure at startup.
-
-         Several pairs of compile and link scripts are provided:
-
-           compile.make   | for Intel Core 2 CPUs (SSSE3)
-           link.make      |
-
-           debug.make     | for use with symbolic debuggers
-           linkd.make     |
-
-           compopt.make   | use inter-procedure optimization (IPO)
-           linkopt.make   |
-
-           compamd.make   | for AMD Opteron CPUs (SSE2)
-           linkamd.make   |
-
-           compgui.make   | executables compatible with FFE
-           linkgui.make   |
-
-           compapbs.make  | executables compatible with APBS
-           linkapbs.make  |
 

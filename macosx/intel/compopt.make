@@ -1,366 +1,366 @@
 #
 #
-#  #############################################################
-#  ##                                                         ##
-#  ##  compopt.make  --  optimized compile of TINKER modules  ##
-#  ##       (Intel Fortran Compiler for Mac OSX Version)      ##
-#  ##                                                         ##
-#  #############################################################
+#  #################################################################
+#  ##                                                             ##
+#  ##  compopt.make  --  optimized compile of the TINKER modules  ##
+#  ##         (Intel Fortran Compiler for Mac OSX Version)        ##
+#  ##                                                             ##
+#  #################################################################
 #
 #
-ifort -c -fast -w active.f
-ifort -c -fast -w alchemy.f
-ifort -c -fast -w analysis.f
-ifort -c -fast -w analyze.f
-ifort -c -fast -w angles.f
-ifort -c -fast -w anneal.f
-ifort -c -fast -w archive.f
-ifort -c -fast -w attach.f
-ifort -c -fast -w basefile.f
-ifort -c -fast -w beeman.f
-ifort -c -fast -w bicubic.f
-ifort -c -fast -w bitors.f
-ifort -c -fast -w bonds.f
-ifort -c -fast -w born.f
-ifort -c -fast -w bounds.f
-ifort -c -fast -w bspline.f
-ifort -c -fast -w calendar.f
-ifort -c -fast -w center.f
-ifort -c -fast -w chkpole.f
-ifort -c -fast -w chkring.f
-ifort -c -fast -w chkxyz.f
-ifort -c -fast -w cholesky.f
-ifort -c -fast -w clock.f
-ifort -c -fast -w cluster.f
-ifort -c -fast -w column.f
-ifort -c -fast -w command.f
-ifort -c -fast -w connect.f
-ifort -c -fast -w connolly.f
-ifort -c -fast -w control.f
-ifort -c -fast -w correlate.f
-ifort -c -fast -w crystal.f
-ifort -c -fast -w cspline.f
-ifort -c -fast -w cutoffs.f
-ifort -c -fast -w deflate.f
-ifort -c -fast -w delete.f
-ifort -c -fast -w diagq.f
-ifort -c -fast -w diffeq.f
-ifort -c -fast -w diffuse.f
-ifort -c -fast -w distgeom.f
-ifort -c -fast -w document.f
-ifort -c -fast -w dynamic.f
-ifort -c -fast -w eangang.f
-ifort -c -fast -w eangang1.f
-ifort -c -fast -w eangang2.f
-ifort -c -fast -w eangang3.f
-ifort -c -fast -w eangle.f
-ifort -c -fast -w eangle1.f
-ifort -c -fast -w eangle2.f
-ifort -c -fast -w eangle3.f
-ifort -c -fast -w ebond.f
-ifort -c -fast -w ebond1.f
-ifort -c -fast -w ebond2.f
-ifort -c -fast -w ebond3.f
-ifort -c -fast -w ebuck.f
-ifort -c -fast -w ebuck1.f
-ifort -c -fast -w ebuck2.f
-ifort -c -fast -w ebuck3.f
-ifort -c -fast -w echarge.f
-ifort -c -fast -w echarge1.f
-ifort -c -fast -w echarge2.f
-ifort -c -fast -w echarge3.f
-ifort -c -fast -w echgdpl.f
-ifort -c -fast -w echgdpl1.f
-ifort -c -fast -w echgdpl2.f
-ifort -c -fast -w echgdpl3.f
-ifort -c -fast -w edipole.f
-ifort -c -fast -w edipole1.f
-ifort -c -fast -w edipole2.f
-ifort -c -fast -w edipole3.f
-ifort -c -fast -w egauss.f
-ifort -c -fast -w egauss1.f
-ifort -c -fast -w egauss2.f
-ifort -c -fast -w egauss3.f
-ifort -c -fast -w egeom.f
-ifort -c -fast -w egeom1.f
-ifort -c -fast -w egeom2.f
-ifort -c -fast -w egeom3.f
-ifort -c -fast -w ehal.f
-ifort -c -fast -w ehal1.f
-ifort -c -fast -w ehal2.f
-ifort -c -fast -w ehal3.f
-ifort -c -fast -w eimprop.f
-ifort -c -fast -w eimprop1.f
-ifort -c -fast -w eimprop2.f
-ifort -c -fast -w eimprop3.f
-ifort -c -fast -w eimptor.f
-ifort -c -fast -w eimptor1.f
-ifort -c -fast -w eimptor2.f
-ifort -c -fast -w eimptor3.f
-ifort -c -fast -w elj.f
-ifort -c -fast -w elj1.f
-ifort -c -fast -w elj2.f
-ifort -c -fast -w elj3.f
-ifort -c -fast -w embed.f
-ifort -c -fast -w emetal.f
-ifort -c -fast -w emetal1.f
-ifort -c -fast -w emetal2.f
-ifort -c -fast -w emetal3.f
-ifort -c -fast -w emm3hb.f
-ifort -c -fast -w emm3hb1.f
-ifort -c -fast -w emm3hb2.f
-ifort -c -fast -w emm3hb3.f
-ifort -c -fast -w empole.f
-ifort -c -fast -w empole1.f
-ifort -c -fast -w empole2.f
-ifort -c -fast -w empole3.f
-ifort -c -fast -w energy.f
-ifort -c -fast -w eopbend.f
-ifort -c -fast -w eopbend1.f
-ifort -c -fast -w eopbend2.f
-ifort -c -fast -w eopbend3.f
-ifort -c -fast -w eopdist.f
-ifort -c -fast -w eopdist1.f
-ifort -c -fast -w eopdist2.f
-ifort -c -fast -w eopdist3.f
-ifort -c -fast -w epitors.f
-ifort -c -fast -w epitors1.f
-ifort -c -fast -w epitors2.f
-ifort -c -fast -w epitors3.f
-ifort -c -fast -w erf.f
-ifort -c -fast -w erxnfld.f
-ifort -c -fast -w erxnfld1.f
-ifort -c -fast -w erxnfld2.f
-ifort -c -fast -w erxnfld3.f
-ifort -c -fast -w esolv.f
-ifort -c -fast -w esolv1.f
-ifort -c -fast -w esolv2.f
-ifort -c -fast -w esolv3.f
-ifort -c -fast -w estrbnd.f
-ifort -c -fast -w estrbnd1.f
-ifort -c -fast -w estrbnd2.f
-ifort -c -fast -w estrbnd3.f
-ifort -c -fast -w estrtor.f
-ifort -c -fast -w estrtor1.f
-ifort -c -fast -w estrtor2.f
-ifort -c -fast -w estrtor3.f
-ifort -c -fast -w etors.f
-ifort -c -fast -w etors1.f
-ifort -c -fast -w etors2.f
-ifort -c -fast -w etors3.f
-ifort -c -fast -w etortor.f
-ifort -c -fast -w etortor1.f
-ifort -c -fast -w etortor2.f
-ifort -c -fast -w etortor3.f
-ifort -c -fast -w eurey.f
-ifort -c -fast -w eurey1.f
-ifort -c -fast -w eurey2.f
-ifort -c -fast -w eurey3.f
-ifort -c -fast -w evcorr.f
-ifort -c -fast -w extra.f
-ifort -c -fast -w extra1.f
-ifort -c -fast -w extra2.f
-ifort -c -fast -w extra3.f
-ifort -c -fast -w fatal.f
-ifort -c -fast -w fft3d.f
-ifort -c -fast -w fftpack.f
-ifort -c -fast -w field.f
-ifort -c -fast -w final.f
-ifort -c -fast -w flatten.f
-ifort -c -fast -w freeunit.f
-ifort -c -fast -w gda.f
-ifort -c -fast -w geometry.f
-ifort -c -fast -w getime.f
-ifort -c -fast -w getint.f
-ifort -c -fast -w getkey.f
-ifort -c -fast -w getmol2.f
-ifort -c -fast -w getnumb.f
-ifort -c -fast -w getpdb.f
-ifort -c -fast -w getprm.f
-ifort -c -fast -w getref.f
-ifort -c -fast -w getstring.f
-ifort -c -fast -w gettext.f
-ifort -c -fast -w getword.f
-ifort -c -fast -w getxyz.f
-ifort -c -fast -w gradient.f
-ifort -c -fast -w gradrgd.f
-ifort -c -fast -w gradrot.f
-ifort -c -fast -w groups.f
-ifort -c -fast -w grpline.f
-ifort -c -fast -w gyrate.f
-ifort -c -fast -w hessian.f
-ifort -c -fast -w hessrgd.f
-ifort -c -fast -w hessrot.f
-ifort -c -fast -w hybrid.f
-ifort -c -fast -w image.f
-ifort -c -fast -w impose.f
-ifort -c -fast -w induce.f
-ifort -c -fast -w inertia.f
-ifort -c -fast -w initial.f
-ifort -c -fast -w initprm.f
-ifort -c -fast -w initres.f
-ifort -c -fast -w initrot.f
-ifort -c -fast -w insert.f
-ifort -c -fast -w intedit.f
-ifort -c -fast -w intxyz.f
-ifort -c -fast -w invbeta.f
-ifort -c -fast -w invert.f
-ifort -c -fast -w jacobi.f
-ifort -c -fast -w kangang.f
-ifort -c -fast -w kangle.f
-ifort -c -fast -w katom.f
-ifort -c -fast -w kbond.f
-ifort -c -fast -w kcharge.f
-ifort -c -fast -w kdipole.f
-ifort -c -fast -w kewald.f
-ifort -c -fast -w kgeom.f
-ifort -c -fast -w kimprop.f
-ifort -c -fast -w kimptor.f
-ifort -c -fast -w kinetic.f
-ifort -c -fast -w kmetal.f
-ifort -c -fast -w kmpole.f
-ifort -c -fast -w kopbend.f
-ifort -c -fast -w kopdist.f
-ifort -c -fast -w korbit.f
-ifort -c -fast -w kpitors.f
-ifort -c -fast -w kpolar.f
-ifort -c -fast -w ksolv.f
-ifort -c -fast -w kstrbnd.f
-ifort -c -fast -w kstrtor.f
-ifort -c -fast -w ktors.f
-ifort -c -fast -w ktortor.f
-ifort -c -fast -w kurey.f
-ifort -c -fast -w kvdw.f
-ifort -c -fast -w lattice.f
-ifort -c -fast -w lbfgs.f
-ifort -c -fast -w lights.f
-ifort -c -fast -w makeint.f
-ifort -c -fast -w makepdb.f
-ifort -c -fast -w makeref.f
-ifort -c -fast -w makexyz.f
-ifort -c -fast -w maxwell.f
-ifort -c -fast -w mdinit.f
-ifort -c -fast -w mdrest.f
-ifort -c -fast -w mdsave.f
-ifort -c -fast -w mdstat.f
-ifort -c -fast -w mechanic.f
-ifort -c -fast -w merge.f
-ifort -c -fast -w minimize.f
-ifort -c -fast -w minirot.f
-ifort -c -fast -w minrigid.f
-ifort -c -fast -w molecule.f
-ifort -c -fast -w moments.f
-ifort -c -fast -w monte.f
-ifort -c -fast -w mutate.f
-ifort -c -fast -w nblist.f
-ifort -c -fast -w newton.f
-ifort -c -fast -w newtrot.f
-ifort -c -fast -w nextarg.f
-ifort -c -fast -w nexttext.f
-ifort -c -fast -w nspline.f
-ifort -c -fast -w nucleic.f
-ifort -c -fast -w number.f
-ifort -c -fast -w numeral.f
-ifort -c -fast -w numgrad.f
-ifort -c -fast -w ocvm.f
-ifort -c -fast -w openend.f
-ifort -c -fast -w optimize.f
-ifort -c -fast -w optirot.f
-ifort -c -fast -w optrigid.f
-ifort -c -fast -w optsave.f
-ifort -c -fast -w orbital.f
-ifort -c -fast -w orient.f
-ifort -c -fast -w orthog.f
-ifort -c -fast -w overlap.f
-ifort -c -fast -w path.f
-ifort -c -fast -w pdbxyz.f
-ifort -c -fast -w piscf.f
-ifort -c -fast -w pmepol.f
-ifort -c -fast -w pmpb.f
-ifort -c -fast -w polarize.f
-ifort -c -fast -w poledit.f
-ifort -c -fast -w polymer.f
-ifort -c -fast -w potential.f
-ifort -c -fast -w precise.f
-ifort -c -fast -w pressure.f
-ifort -c -fast -w prmedit.f
-ifort -c -fast -w prmkey.f
-ifort -c -fast -w promo.f
-ifort -c -fast -w protein.f
-ifort -c -fast -w prtdyn.f
-ifort -c -fast -w prterr.f
-ifort -c -fast -w prtint.f
-ifort -c -fast -w prtmol2.f
-ifort -c -fast -w prtpdb.f
-ifort -c -fast -w prtprm.f
-ifort -c -fast -w prtseq.f
-ifort -c -fast -w prtxyz.f
-ifort -c -fast -w pss.f
-ifort -c -fast -w pssrigid.f
-ifort -c -fast -w pssrot.f
-ifort -c -fast -w quatfit.f
-ifort -c -fast -w radial.f
-ifort -c -fast -w random.f
-ifort -c -fast -w rattle.f
-ifort -c -fast -w readdyn.f
-ifort -c -fast -w readgau.f
-ifort -c -fast -w readint.f
-ifort -c -fast -w readmol2.f
-ifort -c -fast -w readpdb.f
-ifort -c -fast -w readprm.f
-ifort -c -fast -w readseq.f
-ifort -c -fast -w readxyz.f
-ifort -c -fast -w replica.f
-ifort -c -fast -w rgdstep.f
-ifort -c -fast -w rings.f
-ifort -c -fast -w rmsfit.f
-ifort -c -fast -w rotlist.f
-ifort -c -fast -w rotpole.f
-ifort -c -fast -w saddle.f
-ifort -c -fast -w scan.f
-ifort -c -fast -w sdstep.f
-ifort -c -fast -w search.f
-ifort -c -fast -w server.f
-ifort -c -fast -w setime.f
-ifort -c -fast -w shakeup.f
-ifort -c -fast -w sigmoid.f
-ifort -c -fast -w sktstuff.f
-ifort -c -fast -w sniffer.f
-ifort -c -fast -w sort.f
-ifort -c -fast -w spacefill.f
-ifort -c -fast -w spectrum.f
-ifort -c -fast -w square.f
-ifort -c -fast -w suffix.f
-ifort -c -fast -w superpose.f
-ifort -c -fast -w surface.f
-ifort -c -fast -w surfatom.f
-ifort -c -fast -w switch.f
-ifort -c -fast -w sybylxyz.f
-ifort -c -fast -w temper.f
-ifort -c -fast -w testgrad.f
-ifort -c -fast -w testhess.f
-ifort -c -fast -w testpair.f
-ifort -c -fast -w testrot.f
-ifort -c -fast -w timer.f
-ifort -c -fast -w timerot.f
-ifort -c -fast -w tncg.f
-ifort -c -fast -w torphase.f
-ifort -c -fast -w torque.f
-ifort -c -fast -w torsions.f
-ifort -c -fast -w trimtext.f
-ifort -c -fast -w unitcell.f
-ifort -c -fast -w valence.f
-ifort -c -fast -w verlet.f
-ifort -c -fast -w version.f
-ifort -c -fast -w vibbig.f
-ifort -c -fast -w vibrate.f
-ifort -c -fast -w vibrot.f
-ifort -c -fast -w volume.f
-ifort -c -fast -w xtalfit.f
-ifort -c -fast -w xtalmin.f
-ifort -c -fast -w xyzatm.f
-ifort -c -fast -w xyzedit.f
-ifort -c -fast -w xyzint.f
-ifort -c -fast -w xyzpdb.f
-ifort -c -fast -w xyzsybyl.f
-ifort -c -fast -w zatom.f
+ifort -c -fast active.f
+ifort -c -fast alchemy.f
+ifort -c -fast analysis.f
+ifort -c -fast analyze.f
+ifort -c -fast angles.f
+ifort -c -fast anneal.f
+ifort -c -fast archive.f
+ifort -c -fast attach.f
+ifort -c -fast basefile.f
+ifort -c -fast beeman.f
+ifort -c -fast bicubic.f
+ifort -c -fast bitors.f
+ifort -c -fast bonds.f
+ifort -c -fast born.f
+ifort -c -fast bounds.f
+ifort -c -fast bspline.f
+ifort -c -fast calendar.f
+ifort -c -fast center.f
+ifort -c -fast chkpole.f
+ifort -c -fast chkring.f
+ifort -c -fast chkxyz.f
+ifort -c -fast cholesky.f
+ifort -c -fast clock.f
+ifort -c -fast cluster.f
+ifort -c -fast column.f
+ifort -c -fast command.f
+ifort -c -fast connect.f
+ifort -c -fast connolly.f
+ifort -c -fast control.f
+ifort -c -fast correlate.f
+ifort -c -fast crystal.f
+ifort -c -fast cspline.f
+ifort -c -fast cutoffs.f
+ifort -c -fast deflate.f
+ifort -c -fast delete.f
+ifort -c -fast diagq.f
+ifort -c -fast diffeq.f
+ifort -c -fast diffuse.f
+ifort -c -fast distgeom.f
+ifort -c -fast document.f
+ifort -c -fast dynamic.f
+ifort -c -fast eangang.f
+ifort -c -fast eangang1.f
+ifort -c -fast eangang2.f
+ifort -c -fast eangang3.f
+ifort -c -fast eangle.f
+ifort -c -fast eangle1.f
+ifort -c -fast eangle2.f
+ifort -c -fast eangle3.f
+ifort -c -fast ebond.f
+ifort -c -fast ebond1.f
+ifort -c -fast ebond2.f
+ifort -c -fast ebond3.f
+ifort -c -fast ebuck.f
+ifort -c -fast ebuck1.f
+ifort -c -fast ebuck2.f
+ifort -c -fast ebuck3.f
+ifort -c -fast echarge.f
+ifort -c -fast echarge1.f
+ifort -c -fast echarge2.f
+ifort -c -fast echarge3.f
+ifort -c -fast echgdpl.f
+ifort -c -fast echgdpl1.f
+ifort -c -fast echgdpl2.f
+ifort -c -fast echgdpl3.f
+ifort -c -fast edipole.f
+ifort -c -fast edipole1.f
+ifort -c -fast edipole2.f
+ifort -c -fast edipole3.f
+ifort -c -fast egauss.f
+ifort -c -fast egauss1.f
+ifort -c -fast egauss2.f
+ifort -c -fast egauss3.f
+ifort -c -fast egeom.f
+ifort -c -fast egeom1.f
+ifort -c -fast egeom2.f
+ifort -c -fast egeom3.f
+ifort -c -fast ehal.f
+ifort -c -fast ehal1.f
+ifort -c -fast ehal2.f
+ifort -c -fast ehal3.f
+ifort -c -fast eimprop.f
+ifort -c -fast eimprop1.f
+ifort -c -fast eimprop2.f
+ifort -c -fast eimprop3.f
+ifort -c -fast eimptor.f
+ifort -c -fast eimptor1.f
+ifort -c -fast eimptor2.f
+ifort -c -fast eimptor3.f
+ifort -c -fast elj.f
+ifort -c -fast elj1.f
+ifort -c -fast elj2.f
+ifort -c -fast elj3.f
+ifort -c -fast embed.f
+ifort -c -fast emetal.f
+ifort -c -fast emetal1.f
+ifort -c -fast emetal2.f
+ifort -c -fast emetal3.f
+ifort -c -fast emm3hb.f
+ifort -c -fast emm3hb1.f
+ifort -c -fast emm3hb2.f
+ifort -c -fast emm3hb3.f
+ifort -c -fast empole.f
+ifort -c -fast empole1.f
+ifort -c -fast empole2.f
+ifort -c -fast empole3.f
+ifort -c -fast energy.f
+ifort -c -fast eopbend.f
+ifort -c -fast eopbend1.f
+ifort -c -fast eopbend2.f
+ifort -c -fast eopbend3.f
+ifort -c -fast eopdist.f
+ifort -c -fast eopdist1.f
+ifort -c -fast eopdist2.f
+ifort -c -fast eopdist3.f
+ifort -c -fast epitors.f
+ifort -c -fast epitors1.f
+ifort -c -fast epitors2.f
+ifort -c -fast epitors3.f
+ifort -c -fast erf.f
+ifort -c -fast erxnfld.f
+ifort -c -fast erxnfld1.f
+ifort -c -fast erxnfld2.f
+ifort -c -fast erxnfld3.f
+ifort -c -fast esolv.f
+ifort -c -fast esolv1.f
+ifort -c -fast esolv2.f
+ifort -c -fast esolv3.f
+ifort -c -fast estrbnd.f
+ifort -c -fast estrbnd1.f
+ifort -c -fast estrbnd2.f
+ifort -c -fast estrbnd3.f
+ifort -c -fast estrtor.f
+ifort -c -fast estrtor1.f
+ifort -c -fast estrtor2.f
+ifort -c -fast estrtor3.f
+ifort -c -fast etors.f
+ifort -c -fast etors1.f
+ifort -c -fast etors2.f
+ifort -c -fast etors3.f
+ifort -c -fast etortor.f
+ifort -c -fast etortor1.f
+ifort -c -fast etortor2.f
+ifort -c -fast etortor3.f
+ifort -c -fast eurey.f
+ifort -c -fast eurey1.f
+ifort -c -fast eurey2.f
+ifort -c -fast eurey3.f
+ifort -c -fast evcorr.f
+ifort -c -fast extra.f
+ifort -c -fast extra1.f
+ifort -c -fast extra2.f
+ifort -c -fast extra3.f
+ifort -c -fast fatal.f
+ifort -c -fast fft3d.f
+ifort -c -fast fftpack.f
+ifort -c -fast field.f
+ifort -c -fast final.f
+ifort -c -fast flatten.f
+ifort -c -fast freeunit.f
+ifort -c -fast gda.f
+ifort -c -fast geometry.f
+ifort -c -fast getime.f
+ifort -c -fast getint.f
+ifort -c -fast getkey.f
+ifort -c -fast getmol2.f
+ifort -c -fast getnumb.f
+ifort -c -fast getpdb.f
+ifort -c -fast getprm.f
+ifort -c -fast getref.f
+ifort -c -fast getstring.f
+ifort -c -fast gettext.f
+ifort -c -fast getword.f
+ifort -c -fast getxyz.f
+ifort -c -fast gradient.f
+ifort -c -fast gradrgd.f
+ifort -c -fast gradrot.f
+ifort -c -fast groups.f
+ifort -c -fast grpline.f
+ifort -c -fast gyrate.f
+ifort -c -fast hessian.f
+ifort -c -fast hessrgd.f
+ifort -c -fast hessrot.f
+ifort -c -fast hybrid.f
+ifort -c -fast image.f
+ifort -c -fast impose.f
+ifort -c -fast induce.f
+ifort -c -fast inertia.f
+ifort -c -fast initial.f
+ifort -c -fast initprm.f
+ifort -c -fast initres.f
+ifort -c -fast initrot.f
+ifort -c -fast insert.f
+ifort -c -fast intedit.f
+ifort -c -fast intxyz.f
+ifort -c -fast invbeta.f
+ifort -c -fast invert.f
+ifort -c -fast jacobi.f
+ifort -c -fast kangang.f
+ifort -c -fast kangle.f
+ifort -c -fast katom.f
+ifort -c -fast kbond.f
+ifort -c -fast kcharge.f
+ifort -c -fast kdipole.f
+ifort -c -fast kewald.f
+ifort -c -fast kgeom.f
+ifort -c -fast kimprop.f
+ifort -c -fast kimptor.f
+ifort -c -fast kinetic.f
+ifort -c -fast kmetal.f
+ifort -c -fast kmpole.f
+ifort -c -fast kopbend.f
+ifort -c -fast kopdist.f
+ifort -c -fast korbit.f
+ifort -c -fast kpitors.f
+ifort -c -fast kpolar.f
+ifort -c -fast ksolv.f
+ifort -c -fast kstrbnd.f
+ifort -c -fast kstrtor.f
+ifort -c -fast ktors.f
+ifort -c -fast ktortor.f
+ifort -c -fast kurey.f
+ifort -c -fast kvdw.f
+ifort -c -fast lattice.f
+ifort -c -fast lbfgs.f
+ifort -c -fast lights.f
+ifort -c -fast makeint.f
+ifort -c -fast makepdb.f
+ifort -c -fast makeref.f
+ifort -c -fast makexyz.f
+ifort -c -fast maxwell.f
+ifort -c -fast mdinit.f
+ifort -c -fast mdrest.f
+ifort -c -fast mdsave.f
+ifort -c -fast mdstat.f
+ifort -c -fast mechanic.f
+ifort -c -fast merge.f
+ifort -c -fast minimize.f
+ifort -c -fast minirot.f
+ifort -c -fast minrigid.f
+ifort -c -fast molecule.f
+ifort -c -fast moments.f
+ifort -c -fast monte.f
+ifort -c -fast mutate.f
+ifort -c -fast nblist.f
+ifort -c -fast newton.f
+ifort -c -fast newtrot.f
+ifort -c -fast nextarg.f
+ifort -c -fast nexttext.f
+ifort -c -fast nspline.f
+ifort -c -fast nucleic.f
+ifort -c -fast number.f
+ifort -c -fast numeral.f
+ifort -c -fast numgrad.f
+ifort -c -fast ocvm.f
+ifort -c -fast openend.f
+ifort -c -fast optimize.f
+ifort -c -fast optirot.f
+ifort -c -fast optrigid.f
+ifort -c -fast optsave.f
+ifort -c -fast orbital.f
+ifort -c -fast orient.f
+ifort -c -fast orthog.f
+ifort -c -fast overlap.f
+ifort -c -fast path.f
+ifort -c -fast pdbxyz.f
+ifort -c -fast piscf.f
+ifort -c -fast pmepol.f
+ifort -c -fast pmpb.f
+ifort -c -fast polarize.f
+ifort -c -fast poledit.f
+ifort -c -fast polymer.f
+ifort -c -fast potential.f
+ifort -c -fast precise.f
+ifort -c -fast pressure.f
+ifort -c -fast prmedit.f
+ifort -c -fast prmkey.f
+ifort -c -fast promo.f
+ifort -c -fast protein.f
+ifort -c -fast prtdyn.f
+ifort -c -fast prterr.f
+ifort -c -fast prtint.f
+ifort -c -fast prtmol2.f
+ifort -c -fast prtpdb.f
+ifort -c -fast prtprm.f
+ifort -c -fast prtseq.f
+ifort -c -fast prtxyz.f
+ifort -c -fast pss.f
+ifort -c -fast pssrigid.f
+ifort -c -fast pssrot.f
+ifort -c -fast quatfit.f
+ifort -c -fast radial.f
+ifort -c -fast random.f
+ifort -c -fast rattle.f
+ifort -c -fast readdyn.f
+ifort -c -fast readgau.f
+ifort -c -fast readint.f
+ifort -c -fast readmol2.f
+ifort -c -fast readpdb.f
+ifort -c -fast readprm.f
+ifort -c -fast readseq.f
+ifort -c -fast readxyz.f
+ifort -c -fast replica.f
+ifort -c -fast rgdstep.f
+ifort -c -fast rings.f
+ifort -c -fast rmsfit.f
+ifort -c -fast rotlist.f
+ifort -c -fast rotpole.f
+ifort -c -fast saddle.f
+ifort -c -fast scan.f
+ifort -c -fast sdstep.f
+ifort -c -fast search.f
+ifort -c -fast server.f
+ifort -c -fast setime.f
+ifort -c -fast shakeup.f
+ifort -c -fast sigmoid.f
+ifort -c -fast sktstuff.f
+ifort -c -fast sniffer.f
+ifort -c -fast sort.f
+ifort -c -fast spacefill.f
+ifort -c -fast spectrum.f
+ifort -c -fast square.f
+ifort -c -fast suffix.f
+ifort -c -fast superpose.f
+ifort -c -fast surface.f
+ifort -c -fast surfatom.f
+ifort -c -fast switch.f
+ifort -c -fast sybylxyz.f
+ifort -c -fast temper.f
+ifort -c -fast testgrad.f
+ifort -c -fast testhess.f
+ifort -c -fast testpair.f
+ifort -c -fast testrot.f
+ifort -c -fast timer.f
+ifort -c -fast timerot.f
+ifort -c -fast tncg.f
+ifort -c -fast torphase.f
+ifort -c -fast torque.f
+ifort -c -fast torsions.f
+ifort -c -fast trimtext.f
+ifort -c -fast unitcell.f
+ifort -c -fast valence.f
+ifort -c -fast verlet.f
+ifort -c -fast version.f
+ifort -c -fast vibbig.f
+ifort -c -fast vibrate.f
+ifort -c -fast vibrot.f
+ifort -c -fast volume.f
+ifort -c -fast xtalfit.f
+ifort -c -fast xtalmin.f
+ifort -c -fast xyzatm.f
+ifort -c -fast xyzedit.f
+ifort -c -fast xyzint.f
+ifort -c -fast xyzpdb.f
+ifort -c -fast xyzsybyl.f
+ifort -c -fast zatom.f

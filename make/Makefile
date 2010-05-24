@@ -63,9 +63,9 @@ LINKDIR = /usr/local/bin
 #F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
 #LIBS =
 #F77FLAGS = -c
-#OPTFLAGS = -O3 -axsse3 -no-prec-div -no-ipo -vec-report0
+#OPTFLAGS = -O3 -axSSE3 -no-prec-div -no-ipo -vec-report0
 #LIBFLAGS = -crusv
-#LINKFLAGS =
+#LINKFLAGS = -static-intel
 
 ##
 ##  Machine:  Generic Linux
@@ -81,9 +81,9 @@ LINKDIR = /usr/local/bin
 #INC = -I/usr/include
 #F77FLAGS = -c -align all -assume cc_omp
 #CFLAGS = -c $(INC)
-#OPTFLAGS = -O3 -axsse3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#OPTFLAGS = -O3 -axSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
 #LIBFLAGS = -crusv
-#LINKFLAGS = $(OPTFLAGS) $(LIBS)
+#LINKFLAGS = $(OPTFLAGS) $(LIBS) -static-intel
 
 ##
 ##  Machine:  Macintosh
@@ -95,9 +95,9 @@ LINKDIR = /usr/local/bin
 F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
 LIBS =
 F77FLAGS = -c
-OPTFLAGS = -fast -axssse3 -no-ipo -w -vec-report0
+OPTFLAGS = -fast -axSSSE3 -no-ipo -vec-report0
 LIBFLAGS = -crusv
-LINKFLAGS =
+LINKFLAGS = -static-intel -mmacosx-version-min=10.4
 
 ##
 ##  Machine:  Macintosh
@@ -113,7 +113,7 @@ LINKFLAGS =
 #INC = -I/usr/include
 #F77FLAGS = -c -align all -assume cc_omp
 #CFLAGS = -c $(INC)
-#OPTFLAGS = -O3 -axssse3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#OPTFLAGS = -O3 -axSSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
 #LIBFLAGS = -crusv
 #LINKFLAGS = $(OPTFLAGS) $(LIBS) -mmacosx-version-min=10.4
 

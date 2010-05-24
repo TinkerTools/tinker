@@ -1,366 +1,366 @@
 #
 #
-#  ############################################################
-#  ##                                                        ##
-#  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##       (Intel Fortran Compiler for Linux Version)       ##
-#  ##                                                        ##
-#  ############################################################
+#  ###################################################################
+#  ##                                                               ##
+#  ##  compile.make  --  compile all the TINKER modules for OpenMP  ##
+#  ##          (Intel Fortran Compiler for Linux Version)           ##
+#  ##                                                               ##
+#  ###################################################################
 #
 #
-ifort -c -fast -axsse3 -no-ipo -vec-report0 active.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 alchemy.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 analysis.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 analyze.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 angles.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 anneal.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 archive.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 attach.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 basefile.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 beeman.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 bicubic.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 bitors.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 bonds.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 born.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 bounds.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 bspline.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 calendar.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 center.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 chkpole.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 chkring.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 chkxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 cholesky.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 clock.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 cluster.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 column.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 command.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 connect.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 connolly.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 control.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 correlate.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 crystal.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 cspline.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 cutoffs.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 deflate.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 delete.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 diagq.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 diffeq.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 diffuse.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 distgeom.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 document.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 dynamic.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangang.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangang1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangang2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangang3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangle.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangle1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangle2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eangle3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebond.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebond1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebond2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebond3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebuck.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebuck1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebuck2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ebuck3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echarge.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echarge1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echarge2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echarge3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echgdpl.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echgdpl1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echgdpl2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 echgdpl3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 edipole.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 edipole1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 edipole2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 edipole3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egauss.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egauss1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egauss2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egauss3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egeom.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egeom1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egeom2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 egeom3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ehal.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ehal1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ehal2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ehal3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimprop.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimprop1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimprop2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimprop3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimptor.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimptor1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimptor2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eimptor3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 elj.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 elj1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 elj2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 elj3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 embed.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emetal.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emetal1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emetal2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emetal3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emm3hb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emm3hb1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emm3hb2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 emm3hb3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 empole.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 empole1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 empole2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 empole3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 energy.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopbend.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopbend1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopbend2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopbend3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopdist.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopdist1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopdist2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eopdist3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 epitors.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 epitors1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 epitors2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 epitors3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 erf.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 erxnfld.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 erxnfld1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 erxnfld2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 erxnfld3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 esolv.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 esolv1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 esolv2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 esolv3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrbnd.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrbnd1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrbnd2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrbnd3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrtor.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrtor1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrtor2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 estrtor3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etors.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etors1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etors2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etors3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etortor.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etortor1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etortor2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 etortor3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eurey.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eurey1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eurey2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 eurey3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 evcorr.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 extra.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 extra1.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 extra2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 extra3.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 fatal.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 fft3d.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 fftpack.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 field.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 final.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 flatten.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 freeunit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 gda.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 geometry.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getime.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getint.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getkey.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getmol2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getnumb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getpdb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getprm.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getref.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getstring.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 gettext.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getword.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 getxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 gradient.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 gradrgd.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 gradrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 groups.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 grpline.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 gyrate.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 hessian.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 hessrgd.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 hessrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 hybrid.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 image.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 impose.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 induce.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 inertia.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 initial.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 initprm.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 initres.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 initrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 insert.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 intedit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 intxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 invbeta.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 invert.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 jacobi.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kangang.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kangle.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 katom.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kbond.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kcharge.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kdipole.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kewald.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kgeom.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kimprop.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kimptor.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kinetic.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kmetal.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kmpole.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kopbend.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kopdist.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 korbit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kpitors.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kpolar.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ksolv.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kstrbnd.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kstrtor.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ktors.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ktortor.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kurey.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 kvdw.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 lattice.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 lbfgs.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 lights.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 makeint.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 makepdb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 makeref.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 makexyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 maxwell.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 mdinit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 mdrest.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 mdsave.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 mdstat.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 mechanic.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 merge.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 minimize.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 minirot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 minrigid.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 molecule.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 moments.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 monte.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 mutate.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 nblist.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 newton.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 newtrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 nextarg.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 nexttext.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 nspline.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 nucleic.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 number.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 numeral.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 numgrad.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 ocvm.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 openend.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 optimize.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 optirot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 optrigid.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 optsave.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 orbital.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 orient.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 orthog.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 overlap.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 path.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pdbxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 piscf.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pmepol.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pmpb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 polarize.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 poledit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 polymer.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 potential.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 precise.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pressure.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prmedit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prmkey.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 promo.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 protein.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtdyn.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prterr.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtint.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtmol2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtpdb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtprm.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtseq.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 prtxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pss.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pssrigid.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pssrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 quatfit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 radial.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 random.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 rattle.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readdyn.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readgau.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readint.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readmol2.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readpdb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readprm.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readseq.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 readxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 replica.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 rgdstep.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 rings.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 rmsfit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 rotlist.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 rotpole.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 saddle.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 scan.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 sdstep.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 search.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 server.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 setime.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 shakeup.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 sigmoid.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 sktstuff.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 sniffer.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 sort.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 spacefill.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 spectrum.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 square.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 suffix.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 superpose.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 surface.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 surfatom.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 switch.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 sybylxyz.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 temper.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 testgrad.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 testhess.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 testpair.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 testrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 timer.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 timerot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 tncg.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 torphase.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 torque.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 torsions.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 trimtext.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 unitcell.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 valence.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 verlet.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 version.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 vibbig.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 vibrate.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 vibrot.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 volume.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xtalfit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xtalmin.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xyzatm.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xyzedit.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xyzint.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xyzpdb.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 xyzsybyl.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 zatom.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar active.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar alchemy.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar analysis.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar analyze.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar angles.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar anneal.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar archive.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar attach.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar basefile.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar beeman.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar bicubic.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar bitors.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar bonds.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar born.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar bounds.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar bspline.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar calendar.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar center.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar chkpole.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar chkring.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar chkxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar cholesky.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar clock.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar cluster.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar column.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar command.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar connect.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar connolly.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar control.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar correlate.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar crystal.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar cspline.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar cutoffs.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar deflate.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar delete.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar diagq.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar diffeq.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar diffuse.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar distgeom.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar document.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar dynamic.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangang.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangang1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangang2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangang3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangle.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangle1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangle2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eangle3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebond.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebond1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebond2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebond3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebuck.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebuck1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebuck2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ebuck3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echarge.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echarge1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echarge2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echarge3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echgdpl.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echgdpl1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echgdpl2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar echgdpl3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar edipole.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar edipole1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar edipole2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar edipole3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egauss.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egauss1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egauss2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egauss3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egeom.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egeom1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egeom2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar egeom3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ehal.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ehal1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ehal2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ehal3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimprop.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimprop1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimprop2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimprop3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimptor.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimptor1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimptor2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eimptor3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar elj.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar elj1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar elj2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar elj3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar embed.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emetal.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emetal1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emetal2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emetal3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emm3hb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emm3hb1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emm3hb2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar emm3hb3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar empole.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar empole1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar empole2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar empole3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar energy.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopbend.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopbend1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopbend2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopbend3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopdist.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopdist1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopdist2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eopdist3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar epitors.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar epitors1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar epitors2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar epitors3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar erf.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar erxnfld.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar erxnfld1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar erxnfld2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar erxnfld3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar esolv.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar esolv1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar esolv2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar esolv3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrbnd.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrbnd1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrbnd2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrbnd3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrtor.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrtor1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrtor2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar estrtor3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etors.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etors1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etors2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etors3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etortor.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etortor1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etortor2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar etortor3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eurey.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eurey1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eurey2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar eurey3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar evcorr.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar extra.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar extra1.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar extra2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar extra3.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar fatal.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar fft3d.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar fftpack.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar field.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar final.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar flatten.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar freeunit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar gda.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar geometry.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getime.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getint.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getkey.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getmol2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getnumb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getpdb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getprm.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getref.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getstring.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar gettext.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getword.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar getxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar gradient.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar gradrgd.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar gradrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar groups.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar grpline.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar gyrate.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar hessian.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar hessrgd.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar hessrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar hybrid.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar image.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar impose.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar induce.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar inertia.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar initial.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar initprm.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar initres.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar initrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar insert.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar intedit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar intxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar invbeta.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar invert.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar jacobi.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kangang.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kangle.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar katom.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kbond.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kcharge.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kdipole.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kewald.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kgeom.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kimprop.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kimptor.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kinetic.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kmetal.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kmpole.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kopbend.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kopdist.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar korbit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kpitors.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kpolar.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ksolv.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kstrbnd.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kstrtor.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ktors.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ktortor.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kurey.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar kvdw.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar lattice.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar lbfgs.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar lights.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar makeint.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar makepdb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar makeref.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar makexyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar maxwell.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar mdinit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar mdrest.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar mdsave.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar mdstat.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar mechanic.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar merge.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar minimize.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar minirot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar minrigid.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar molecule.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar moments.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar monte.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar mutate.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar nblist.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar newton.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar newtrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar nextarg.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar nexttext.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar nspline.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar nucleic.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar number.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar numeral.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar numgrad.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar ocvm.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar openend.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar optimize.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar optirot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar optrigid.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar optsave.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar orbital.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar orient.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar orthog.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar overlap.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar path.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pdbxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar piscf.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pmepol.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pmpb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar polarize.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar poledit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar polymer.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar potential.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar precise.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pressure.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prmedit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prmkey.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar promo.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar protein.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtdyn.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prterr.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtint.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtmol2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtpdb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtprm.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtseq.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar prtxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pss.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pssrigid.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar pssrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar quatfit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar radial.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar random.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar rattle.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readdyn.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readgau.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readint.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readmol2.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readpdb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readprm.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readseq.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar readxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar replica.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar rgdstep.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar rings.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar rmsfit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar rotlist.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar rotpole.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar saddle.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar scan.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar sdstep.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar search.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar server.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar setime.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar shakeup.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar sigmoid.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar sktstuff.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar sniffer.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar sort.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar spacefill.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar spectrum.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar square.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar suffix.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar superpose.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar surface.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar surfatom.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar switch.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar sybylxyz.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar temper.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar testgrad.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar testhess.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar testpair.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar testrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar timer.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar timerot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar tncg.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar torphase.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar torque.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar torsions.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar trimtext.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar unitcell.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar valence.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar verlet.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar version.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar vibbig.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar vibrate.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar vibrot.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar volume.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xtalfit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xtalmin.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xyzatm.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xyzedit.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xyzint.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xyzpdb.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar xyzsybyl.f
+ifort -c -O3 -xHost -align all -assume cc_omp -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar zatom.f
