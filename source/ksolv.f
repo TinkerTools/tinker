@@ -12,9 +12,9 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "ksolv" assigns continuum solvation energy parameters for
+c     "ksolv" assigns implicit solvation energy parameters for
 c     the surface area, generalized Born, generalized Kirkwood
-c     and Poisson-Boltzmann solvation models
+c     and Poisson-Boltzmann, cavity-dispersion and HPMF models
 c
 c
       subroutine ksolv
@@ -35,7 +35,7 @@ c
       character*120 string
 c
 c
-c     defaults for continuum solvation term and parameters
+c     defaults for implicit solvation term and parameters
 c
       use_solv = .false.
       use_born = .false.
@@ -43,7 +43,7 @@ c
       borntyp = '        '
       doffset = 0.09d0
 c
-c     search keywords for continuum solvation commands
+c     search keywords for implicit solvation commands
 c
       header = .true.
       do i = 1, nkey
@@ -80,9 +80,17 @@ c
             else if (value(1:3) .eq. 'ACE') then
                use_born = .true.
                solvtyp = 'ACE'
+            else if (value(1:7) .eq. 'GB-HPMF') then
+               use_born = .true.
+               solvtyp = 'GB-HPMF'
+            else if (value(1:7) .eq. 'GK-HPMF') then
+               use_born = .true.
+               solvtyp = 'GK-HPMF'
             else if (value(1:2) .eq. 'GK') then
                use_born = .true.
                solvtyp = 'GK'
+            else if (value(1:7) .eq. 'PB-HPMF') then
+               solvtyp = 'PB-HPMF'
             else if (value(1:2) .eq. 'PB') then
                solvtyp = 'PB'
             end if
@@ -116,7 +124,7 @@ c
                if (header) then
                   header = .false.
                   write (iout,20)
-   20             format (/,' Additional Continuum Solvation',
+   20             format (/,' Additional Implicit Solvation',
      &                       ' Parameters:',
      &                    //,5x,'Atom Type',10x,'Radius',/)
                end if
@@ -139,6 +147,7 @@ c
       if (use_born .and. borntyp.eq.'       ') then
          borntyp = solvtyp
          if (solvtyp .eq. 'GK')  borntyp = 'GRYCUK'
+         if (solvtyp .eq. 'GB-HPMF')  borntyp = 'STILL'
       end if
 c
 c     invoke the setup needed for specific Born radius models
@@ -149,9 +158,18 @@ c     invoke the setup needed for specific solvation models
 c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
          call ksa
+      else if (solvtyp .eq. 'GB-HPMF') then
+         call kgb
+         call khpmf
+      else if (solvtyp .eq. 'GK-HPMF') then
+         call kgk
+         call khpmf
       else if (solvtyp .eq. 'GK') then
          call kgk
          call knp
+      else if (solvtyp .eq. 'PB-HPMF') then
+         call kpb
+         call khpmf
       else if (solvtyp .eq. 'PB') then
          call kpb
          call knp
@@ -169,8 +187,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "ksa" initializes parameters needed for surface area only
-c     solvation models including ASP and SASA
+c     "ksa" initializes parameters needed for surface area-based
+c     implicit solvation models including ASP and SASA
 c
 c     literature references:
 c
@@ -307,7 +325,7 @@ c     ##############################################################
 c
 c
 c     "kgb" initializes parameters needed for the generalized
-c     Born solvation models
+c     Born implicit solvation models
 c
 c     literature references:
 c
@@ -349,7 +367,7 @@ c
 c
 c     set offset and scaling values for analytical Still method
 c
-      if (solvtyp .eq. 'STILL') then
+      if (borntyp .eq. 'STILL') then
          p1 = 0.073d0
          p2 = 0.921d0
          p3 = 6.211d0
@@ -361,7 +379,7 @@ c
 c
 c     set overlap scale factors for HCT and OBC methods
 c
-      if (solvtyp.eq.'HCT' .or. solvtyp.eq.'OBC') then
+      if (borntyp.eq.'HCT' .or. borntyp.eq.'OBC') then
          do i = 1, n
             shct(i) = 0.80d0
             atmnum = atomic(i)
@@ -378,7 +396,7 @@ c
 c
 c     set rescaling coefficients for the OBC method
 c
-      if (solvtyp .eq. 'OBC') then
+      if (borntyp .eq. 'OBC') then
          do i = 1, n
             aobc(i) = 1.00d0
             bobc(i) = 0.80d0
@@ -388,29 +406,29 @@ c
 c
 c     set the Gaussian width factor for the ACE method
 c
-      if (solvtyp .eq. 'ACE') then
+      if (borntyp .eq. 'ACE') then
          width = 1.2d0
       end if
 c
 c     assign surface area factors for nonpolar solvation
 c
-      if (solvtyp .eq. 'ONION') then
+      if (borntyp .eq. 'ONION') then
          do i = 1, n
             asolv(i) = 0.0072d0
          end do
-      else if (solvtyp .eq. 'STILL') then
+      else if (borntyp .eq. 'STILL') then
          do i = 1, n
             asolv(i) = 0.0049d0
          end do
-      else if (solvtyp .eq. 'HCT') then
+      else if (borntyp .eq. 'HCT') then
          do i = 1, n
             asolv(i) = 0.0054d0
          end do
-      else if (solvtyp .eq. 'OBC') then
+      else if (borntyp .eq. 'OBC') then
          do i = 1, n
             asolv(i) = 0.0054d0
          end do
-      else if (solvtyp .eq. 'ACE') then
+      else if (borntyp .eq. 'ACE') then
          do i = 1, n
             asolv(i) = 0.0030d0
          end do
@@ -419,7 +437,7 @@ c
 c     assign standard radii for GB/SA methods other than ACE;
 c     taken from Macromodel and OPLS-AA, except for hydrogens
 c
-      if (solvtyp .ne. 'ACE') then
+      if (borntyp .ne. 'ACE') then
          do i = 1, n
             atmnum = atomic(i)
             if (atmnum .eq. 1) then
@@ -484,7 +502,7 @@ c
 c
 c     compute the atomic volumes for the analytical Still method
 c
-      if (solvtyp .eq. 'STILL') then
+      if (borntyp .eq. 'STILL') then
          do i = 1, n
             vsolv(i) = (4.0d0*pi/3.0d0) * rsolv(i)**3
             ri = rsolv(i)
@@ -548,7 +566,7 @@ c
 c     assign the atomic radii and volumes for the ACE method;
 c     volumes taken from average Voronoi values with hydrogens
 c
-      if (solvtyp .eq. 'ACE') then
+      if (borntyp .eq. 'ACE') then
          do i = 1, n
             atmnum = atomic(i)
             atmmas = nint(mass(i))
@@ -756,7 +774,7 @@ c     ###############################################################
 c
 c
 c     "kgk" initializes parameters needed for the generalized
-c     Kirkwood solvation model
+c     Kirkwood implicit solvation model
 c
 c
       subroutine kgk
@@ -1078,7 +1096,7 @@ c     ###############################################################
 c
 c
 c     "kpb" assigns parameters needed for the Poisson-Boltzmann
-c     solvation model implemented via APBS
+c     implicit solvation model implemented via APBS
 c
 c
       subroutine kpb
@@ -1606,15 +1624,15 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine knp  --  assign nonpolar solvation parameters  ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine knp  --  assign cavity-dispersion parameters  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "knp" initializes parameters needed for the cavitation-plus-
-c     dispersion nonpolar portion of solvation models
+c     "knp" initializes parameters needed for the cavity-plus-
+c     dispersion nonpolar implicit solvation model
 c
 c
       subroutine knp
@@ -1727,6 +1745,102 @@ c
             end if
          end if
          cdisp(i) = slevy * awater * cdisp(i)
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine khpmf  --  assign hydrophobic PMF parameters  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "khpmf" initializes parameters needed for the hydrophobic
+c     potential of mean force nonpolar implicit solvation model
+c
+c     literature reference:
+c
+c     M. S. Lin, N. L. Fawzi and T. Head-Gordon, "Hydrophobic
+c     Potential of Mean Force as a Solvation Function for Protein
+c     Structure Prediction", Structure, 15, 727-740 (2007)
+c
+c
+      subroutine khpmf
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'couple.i'
+      include 'hpmf.i'
+      include 'iounit.i'
+      integer i,j,k
+      integer nh,atmnum
+      logical keep
+c
+c
+c     get carbons for PMF and set surface area screening values
+c
+      npmf = 0
+      do i = 1, n
+         if (atomic(i) .eq. 6) then
+            keep = .true.
+            nh = 0
+            if (n12(i) .le. 2)  keep = .false.
+            do j = 1, n12(i)
+               k = i12(j,i)
+               if (atomic(k) .eq. 1)  nh = nh + 1
+               if (n12(i).eq.3 .and. atomic(k).eq.8)  keep = .false.
+            end do
+            if (keep) then
+               npmf = npmf + 1
+               ipmf(npmf) = i
+               acsa(i) = 1.0d0
+               if (n12(i).eq.3 .and. nh.eq.0)  acsa(i) = 1.554d0
+               if (n12(i).eq.3 .and. nh.eq.1)  acsa(i) = 1.073d0
+               if (n12(i).eq.4 .and. nh.eq.1)  acsa(i) = 1.276d0
+               if (n12(i).eq.4 .and. nh.eq.2)  acsa(i) = 1.045d0
+               if (n12(i).eq.4 .and. nh.eq.3)  acsa(i) = 0.880d0
+               acsa(i) = acsa(i) * safact/acsurf
+            end if
+         end if
+      end do
+c
+c     check for too many total hydrophobic PMF carbon atoms
+c
+      if (npmf .gt. maxpmf) then
+         write (iout,10)
+   10    format (/,' KHPMF  --  Too many Hydrophobic PMF Atoms;',
+     &              ' Increase MAXPMF')
+         call fatal
+      end if
+c
+c     assign HPMF atomic radii from traditional Bondi values
+c
+      do i = 1, n
+         rpmf(i) = 2.0d0
+         atmnum = atomic(i)
+         if (atmnum .eq. 0)  rpmf(i) = 0.00d0
+         if (atmnum .eq. 1)  rpmf(i) = 1.20d0
+         if (atmnum .eq. 2)  rpmf(i) = 1.40d0
+         if (atmnum .eq. 5)  rpmf(i) = 1.80d0
+         if (atmnum .eq. 6)  rpmf(i) = 1.70d0
+         if (atmnum .eq. 7)  rpmf(i) = 1.55d0
+c        if (atmnum .eq. 8)  rpmf(i) = 1.52d0
+         if (atmnum .eq. 8)  rpmf(i) = 1.50d0
+         if (atmnum .eq. 9)  rpmf(i) = 1.47d0
+         if (atmnum .eq. 10)  rpmf(i) = 1.54d0
+         if (atmnum .eq. 14)  rpmf(i) = 2.10d0
+         if (atmnum .eq. 15)  rpmf(i) = 1.80d0
+         if (atmnum .eq. 16)  rpmf(i) = 1.80d0
+         if (atmnum .eq. 17)  rpmf(i) = 1.75d0
+         if (atmnum .eq. 18)  rpmf(i) = 1.88d0
+         if (atmnum .eq. 34)  rpmf(i) = 1.90d0
+         if (atmnum .eq. 35)  rpmf(i) = 1.85d0
+         if (atmnum .eq. 36)  rpmf(i) = 2.02d0
+         if (atmnum .eq. 53)  rpmf(i) = 1.98d0
+         if (atmnum .eq. 54)  rpmf(i) = 2.16d0
       end do
       return
       end

@@ -300,7 +300,7 @@ c
       u3scale = 1.0d0
       u4scale = 1.0d0
 c
-c     set default control parameters for continuum solvation
+c     set default control parameters for implicit solvation
 c
       solvtyp = blank8
       borntyp = blank8

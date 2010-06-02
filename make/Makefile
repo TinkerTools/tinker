@@ -81,7 +81,7 @@ LINKDIR = /usr/local/bin
 #INC = -I/usr/include
 #F77FLAGS = -c -align all -assume cc_omp
 #CFLAGS = -c $(INC)
-#OPTFLAGS = -O3 -axSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#OPTFLAGS = -O3 -axSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar
 #LIBFLAGS = -crusv
 #LINKFLAGS = $(OPTFLAGS) $(LIBS) -static-intel
 
@@ -113,7 +113,7 @@ LINKFLAGS = -static-intel -mmacosx-version-min=10.4
 #INC = -I/usr/include
 #F77FLAGS = -c -align all -assume cc_omp
 #CFLAGS = -c $(INC)
-#OPTFLAGS = -O3 -axSSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto_scalar
+#OPTFLAGS = -O3 -axSSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar
 #LIBFLAGS = -crusv
 #LINKFLAGS = $(OPTFLAGS) $(LIBS) -mmacosx-version-min=10.4
 

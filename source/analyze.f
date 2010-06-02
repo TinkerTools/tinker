@@ -1410,7 +1410,7 @@ c
       end if
       if (use_solv .and. nes.ne.0) then
          write (iout,280)  es,nes
-  280    format (' Continuum Solvation',13x,f16.4,i15)
+  280    format (' Implicit Solvation',14x,f16.4,i15)
       end if
       if (use_metal .and. nelf.ne.0) then
          write (iout,290)  elf,nelf
@@ -1564,7 +1564,7 @@ c
       end if
       if (use_solv .and. nes.ne.0) then
          write (iout,280)  es,nes
-  280    format (' Continuum Solvation',11x,f18.6,i15)
+  280    format (' Implicit Solvation',12x,f18.6,i15)
       end if
       if (use_metal .and. nelf.ne.0) then
          write (iout,290)  elf,nelf
@@ -1718,7 +1718,7 @@ c
       end if
       if (use_solv .and. nes.ne.0) then
          write (iout,280)  es,nes
-  280    format (' Continuum Solvation',9x,f20.8,i15)
+  280    format (' Implicit Solvation',10x,f20.8,i15)
       end if
       if (use_metal .and. nelf.ne.0) then
          write (iout,290)  elf,nelf

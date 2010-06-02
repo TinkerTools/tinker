@@ -5,15 +5,15 @@ c     ##  COPYRIGHT (C)  1996  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine born  --  Born radii for continuum solvation  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine born  --  Born radii for implicit solvation  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "born" computes the Born radius of each atom for use with
-c     the various continuum solvation models
+c     the various implicit solvation models
 c
 c     literature references:
 c
@@ -492,7 +492,7 @@ c
                   end if
                   de = drb(i) * p4 * gpi * vk * (4.0d0*ccf-dccf) / r6
 c
-c     increment the overall continuum solvation derivatives
+c     increment the overall implicit solvation derivatives
 c
                   dedx = de * xr
                   dedy = de * yr
@@ -562,7 +562,7 @@ c
      &                       + 0.25d0*log(uik/lik)/r2
                      de = drb(i) * rb2 * (dlik*t1+duik*t2+t3) / r
 c
-c     increment the overall continuum solvation derivatives
+c     increment the overall implicit solvation derivatives
 c
                      dedx = de * xr
                      dedy = de * yr
@@ -848,7 +848,7 @@ c
                   de2 = 3.0d0*r2/rusum - 4.0d0*r6/rusum**2
                   de = drb(i) * rbi2 * (de1+vk*ratio**3*de2/pi) / r
 c
-c     increment the overall continuum solvation derivatives
+c     increment the overall implicit solvation derivatives
 c
                   dedx = de * xr
                   dedy = de * yr

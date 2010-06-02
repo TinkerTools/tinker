@@ -12,7 +12,7 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "esolv2" calculates second derivatives of the continuum
+c     "esolv2" calculates second derivatives of the implicit
 c     solvation energy for surface area, generalized Born,
 c     generalized Kirkwood and Poisson-Boltzmann solvation models
 c
@@ -42,7 +42,8 @@ c     call surface1 (es,aes,des,rsolv,asolv,probe)
 c
 c     get the generalized Born term for GB/SA solvation
 c
-      if (use_born .and. solvtyp.ne.'GK' .and. solvtyp.ne.'PB') then
+      if (use_born .and. solvtyp.ne.'GK'
+     &       .and. solvtyp.ne.'GK-HPMF') then
          if (use_smooth) then
             call egb2b (i)
          else

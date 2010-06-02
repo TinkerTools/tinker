@@ -6,16 +6,16 @@ c     ##  COPYRIGHT (C) 2006 by Michael Schnieders & Jay W. Ponder  ##
 c     ##                     All Rights Reserved                    ##
 c     ################################################################
 c
-c     ########################################################
-c     ##                                                    ##
-c     ##  subroutine esolv  --  continuum solvation energy  ##
-c     ##                                                    ##
-c     ########################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine esolv  --  implicit solvation potential energy  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "esolv" calculates the continuum solvation energy for
-c     surface area, generalized Born, generalized Kirkwood
-c     and Poisson-Boltzmann solvation models
+c     "esolv" calculates the implicit solvation energy for surface area,
+c     generalized Born, generalized Kirkwood and Poisson-Boltzmann
+c     solvation models
 c
 c
       subroutine esolv
@@ -30,13 +30,19 @@ c
       integer i
       real*8 e,ai,ri,rb
       real*8 term,probe
+      real*8 esurf,ehp,eace
       real*8 ecav,edisp
       real*8 aes(maxatm)
 c
 c
-c     zero out the continuum solvation energy
+c     zero out the implicit solvation energy components
 c
       es = 0.0d0
+      esurf = 0.0d0
+      ecav = 0.0d0
+      edisp = 0.0d0
+      ehp = 0.0d0
+      eace = 0.0d0
 c
 c     set a value for the solvent molecule probe radius
 c
@@ -50,13 +56,21 @@ c
 c     nonpolar energy for Onion GB method via exact area
 c
       else if (solvtyp .eq. 'ONION') then
-         call surface (es,aes,rsolv,asolv,probe)
+         call surface (esurf,aes,rsolv,asolv,probe)
+         es = esurf
 c
 c     nonpolar energy as cavity formation plus dispersion
 c
       else if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
          call enp (ecav,edisp)
          es = ecav + edisp
+c
+c     nonpolar energy as hydrophobic potential of mean force
+c
+      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
+     &            .or. solvtyp.eq.'PB-HPMF') then
+         call ehpmf (ehp)
+         es = ehp
 c
 c     nonpolar energy for GB via ACE surface area approximation
 c
@@ -68,16 +82,17 @@ c
             rb = rborn(i)
             if (rb .ne. 0.0d0) then
                e = ai * term * (ri+probe)**2 * (ri/rb)**6
-               es = es + e
+               eace = eace + e
             end if
          end do
+         es = eace
       end if
 c
 c     get polarization energy term for the solvation methods
 c
-      if (solvtyp .eq. 'GK') then
+      if (solvtyp.eq.'GK' .or. solvtyp.eq.'GK-HPMF') then
          call egk
-      else if (solvtyp .eq. 'PB') then
+      else if (solvtyp.eq.'PB' .or. solvtyp.eq.'PB-HPMF') then
          call epb
       else if (use_born) then
          if (use_smooth) then
@@ -332,7 +347,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "egk0a" calculates the electrostatic portion of the continuum
+c     "egk0a" calculates the electrostatic portion of the implicit
 c     solvation energy via the generalized Kirkwood model
 c
 c
@@ -989,7 +1004,7 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "epb" calculates the continuum solvation energy via the
+c     "epb" calculates the implicit solvation energy via the
 c     Poisson-Boltzmann plus nonpolar implicit solvation
 c
 c
@@ -1093,7 +1108,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "enp" calculates the nonpolar continuum solvation energy
+c     "enp" calculates the nonpolar implicit solvation energy
 c     as a sum of cavity and dispersion terms
 c
 c
@@ -1117,7 +1132,7 @@ c
       real*8 aesurf(maxatm)
 c
 c
-c     zero out the nonpolar continuum solvation energy terms
+c     zero out the nonpolar implicit solvation energy terms
 c
       ecav = 0.0d0
       edisp = 0.0d0
@@ -1188,11 +1203,11 @@ c     call ewcax (edisp)
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine ewca  --  WCA dispersion energy for solvation  ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ewca  --  Weeks-Chandler-Andersen dispersion  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "ewca" find the Weeks-Chandler-Andersen dispersion energy
@@ -1550,6 +1565,144 @@ c
          do j = 1, n15(i)
             k = i15(j,i)
             roff(k) = rdisp(k) + offset
+         end do
+      end do
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ehpmf  --  hydrophobic PMF nonpolar solvation  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "ehpmf" calculates the hydrophobic potential of mean force
+c     energy using a pairwise double loop
+c
+c     literature reference:
+c
+c     M. S. Lin, N. L. Fawzi and T. Head-Gordon, "Hydrophobic
+c     Potential of Mean Force as a Solvation Function for Protein
+c     Structure Prediction", Structure, 15, 727-740 (2007)
+c
+c
+      subroutine ehpmf (ehp)
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'couple.i'
+      include 'hpmf.i'
+      include 'math.i'
+      integer i,j,k,m
+      integer ii,jj,kk
+      integer sschk
+      integer omit(maxatm)
+      real*8 xr,yr,zr,r,r2
+      real*8 e,ehp
+      real*8 rsurf,pisurf
+      real*8 hpmfcut2
+      real*8 saterm,sasa
+      real*8 rbig,rsmall
+      real*8 part,cutv
+      real*8 e1,e2,e3,sum
+      real*8 arg1,arg2,arg3
+      real*8 arg12,arg22,arg32
+      real*8 cutmtx(maxatm)
+c
+c
+c     zero out the hydrophobic potential of mean force energy
+c
+      ehp = 0.0d0
+c
+c     set some values needed during the HPMF calculation
+c
+      rsurf = rcarbon + 2.0d0*rwater
+      pisurf = pi * (rcarbon+rwater)
+      hpmfcut2 = hpmfcut * hpmfcut
+c
+c     get the solvent accessible surface area for each atom
+c
+      do ii = 1, npmf
+         i = ipmf(ii)
+         saterm = acsa(i)
+         sasa = 1.0d0
+         do k = 1, n
+            if (i .ne. k) then
+               xr = x(i) - x(k)
+               yr = y(i) - y(k)
+               zr = z(i) - z(k)
+               r2 = xr*xr + yr*yr + zr*zr
+               rbig = rpmf(k) + rsurf
+               if (r2 .le. rbig*rbig) then
+                  r = sqrt(r2)         
+                  rsmall = rpmf(k) - rcarbon
+                  part = pisurf * (rbig-r) * (1.0d0+rsmall/r)
+                  sasa = sasa * (1.0d0-saterm*part)
+               end if
+            end if
+         end do
+         sasa = acsurf * sasa
+         cutv = tanh(tslope*(sasa-toffset))
+         cutmtx(i) = 0.5d0 * (1.0d0+cutv)
+      end do
+c
+c     find the hydrophobic PMF energy via a double loop search
+c
+      do i = 1, n
+         omit(i) = 0
+      end do
+      do ii = 1, npmf-1
+         i = ipmf(ii)
+         sschk = 0
+         do j = 1, n12(i)
+            k = i12(j,i)
+            omit(k) = i
+            if (atomic(k) .eq. 16)  sschk = k
+         end do
+         do j = 1, n13(i)
+            k = i13(j,i)
+            omit(k) = i
+         end do
+         do j = 1, n14(i)
+            k = i14(j,i)
+            omit(k) = i
+            if (sschk .ne. 0) then
+               do jj = 1, n12(k)
+                  m = i12(jj,k)
+                  if (atomic(m) .eq. 16) then
+                     do kk = 1, n12(m)
+                        if (i12(kk,m) .eq. sschk)  omit(k) = 0
+                     end do
+                  end if
+               end do
+            end if
+         end do
+         do kk = ii+1, npmf
+            k = ipmf(kk)
+            if (omit(k) .ne. i) then
+               xr = x(i) - x(k)
+               yr = y(i) - y(k)
+               zr = z(i) - z(k)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. hpmfcut2) then
+                  r = sqrt(r2)
+                  arg1 = (r-c1) * w1
+                  arg12 = arg1 * arg1
+                  arg2 = (r-c2) * w2
+                  arg22 = arg2 * arg2
+                  arg3 = (r-c3) * w3
+                  arg32 = arg3 * arg3
+                  e1 = h1 * exp(-arg12)
+                  e2 = h2 * exp(-arg22)
+                  e3 = h3 * exp(-arg32)
+                  sum = e1 + e2 + e3
+                  e = sum * cutmtx(i) * cutmtx(k)
+                  ehp = ehp + e
+               end if
+            end if
          end do
       end do
       return

@@ -12,7 +12,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "esolv1" calculates the continuum solvation energy and
+c     "esolv1" calculates the implicit solvation energy and
 c     first derivatives with respect to Cartesian coordinates
 c     for surface area, generalized Born, generalized Kirkwood
 c     and Poisson-Boltzmann solvation models
@@ -31,13 +31,19 @@ c
       integer i
       real*8 e,ai,ri,rb
       real*8 term,probe
+      real*8 esurf,ehp,eace
       real*8 ecav,edisp
       real*8 aes(maxatm)
 c
 c
-c     zero out the continuum solvation energy and derivatives
+c     zero out the implicit solvation energy and derivatives
 c
       es = 0.0d0
+      esurf = 0.0d0
+      ecav = 0.0d0
+      edisp = 0.0d0
+      ehp = 0.0d0
+      eace = 0.0d0
       do i = 1, n
          drb(i) = 0.0d0
          drbp(i) = 0.0d0
@@ -58,13 +64,21 @@ c
 c     nonpolar energy and derivs for Onion method via exact area
 c
       else if (solvtyp .eq. 'ONION') then
-         call surface1 (es,aes,des,rsolv,asolv,probe)
+         call surface1 (esurf,aes,des,rsolv,asolv,probe)
+         es = esurf
 c
 c     nonpolar energy and derivs as cavity plus dispersion
 c
       else if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
          call enp1 (ecav,edisp)
          es = ecav + edisp
+c
+c     nonpolar energy and derivs as hydrophobic PMF term
+c
+      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
+     &            .or. solvtyp.eq.'PB-HPMF') then
+         call ehpmf1 (ehp)
+         es = ehp
 c
 c     nonpolar energy and derivs via ACE area approximation
 c
@@ -76,17 +90,18 @@ c
             rb = rborn(i)
             if (rb .ne. 0.0d0) then
                e = ai * term * (ri+probe)**2 * (ri/rb)**6
-               es = es + e
+               eace = eace + e
                drb(i) = drb(i) - 6.0d0*e/rb
             end if
          end do
+         es = eace
       end if
 c
 c     get polarization energy and derivatives for solvation methods
 c
-      if (solvtyp .eq. 'GK') then
+      if (solvtyp.eq.'GK' .or. solvtyp.eq.'GK-HPMF') then
          call egk1
-      else if (solvtyp .eq. 'PB') then
+      else if (solvtyp.eq.'PB' .or. solvtyp.eq.'PB-HPMF') then
          call epb1
       else if (use_born) then
          if (use_smooth) then
@@ -467,7 +482,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "egk1" calculates the continuum solvation energy and derivatives
+c     "egk1" calculates the implicit solvation energy and derivatives
 c     via the generalized Kirkwood plus nonpolar implicit solvation
 c
 c
@@ -495,7 +510,7 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "egk1a" calculates the electrostatic portion of the continuum
+c     "egk1a" calculates the electrostatic portion of the implicit
 c     solvation energy and derivatives via the generalized Kirkwood
 c     model
 c
@@ -2951,7 +2966,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "epb1" calculates the continuum solvation energy and derivatives
+c     "epb1" calculates the implicit solvation energy and derivatives
 c     via the Poisson-Boltzmann plus nonpolar implicit solvation
 c
 c
@@ -3004,7 +3019,7 @@ c
       real*8 polgrd(3,maxatm)
 c
 c
-c     induced dipole continuum energy via their
+c     induced dipole implicit energy via their
 c     interaction with the permanent multipoles
 c
       if (use_polar) then
@@ -3017,7 +3032,7 @@ c
          sum = -0.5d0 * electric * sum
          pbe = pbe + sum
 c
-c     initialize induced dipole continuum energy gradients
+c     initialize induced dipole implicit energy gradients
 c
          do i = 1, n
             do j = 1, 3
@@ -3055,7 +3070,7 @@ c
             call apbsnlinduce (inppole,pbeuinp)
          end if
 c
-c     compute direct induced dipole continuum solvation energy
+c     compute direct induced dipole implicit solvation energy
 c     gradients using potentials saved during the SCRF convergence
 c
          call pbdirectpolforce (indpole,inppole,directf,directt)
@@ -3081,7 +3096,7 @@ c
             end do
          end if
 c
-c     add induced dipole continuum solvation energy gradients
+c     add induced dipole implicit solvation energy gradients
 c     to overall polarization energy gradients
 c
          do i = 1, n
@@ -3128,7 +3143,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "enp1" calculates the nonpolar continuum solvation energy
+c     "enp1" calculates the nonpolar implicit solvation energy
 c     and derivatives as a sum of cavity and dispersion terms
 c
 c
@@ -3273,18 +3288,18 @@ c
          end do
       end if
 c
-c     find the continuum dispersion solvation energy
+c     find the implicit dispersion solvation energy
 c
       call ewca1 (edisp)
       return
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine ewca1  --  find WCA dispersion energy & derivs  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ewca1  --  WCA dispersion energy and derivs  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "ewca1" finds the Weeks-Chandler-Anderson dispersion energy
@@ -3556,6 +3571,231 @@ c     increment the overall dispersion energy component
 c
          e = cdisp(i) - slevy*awater*sum
          edisp = edisp + e
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ehpmf1  --  HPMF nonpolar solvation and derivs  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ehpmf1" calculates the hydrophobic potential of mean force
+c     energy and first derivatives using a pairwise double loop
+c
+c     literature reference:
+c
+c     M. S. Lin, N. L. Fawzi and T. Head-Gordon, "Hydrophobic
+c     Potential of Mean Force as a Solvation Function for Protein
+c     Structure Prediction", Structure, 15, 727-740 (2007)
+c
+c
+      subroutine ehpmf1 (ehp)
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'couple.i'
+      include 'deriv.i'
+      include 'hpmf.i'
+      include 'iounit.i'
+      include 'math.i'
+      integer i,j,k,m
+      integer ii,jj,kk
+      integer sschk
+      integer omit(maxatm)
+      real*8 xi,yi,zi
+      real*8 xk,yk,zk
+      real*8 xr,yr,zr
+      real*8 e,ehp,r,r2
+      real*8 rsurf,pisurf
+      real*8 hpmfcut2
+      real*8 saterm,sasa
+      real*8 rbig,rsmall
+      real*8 part,cutv
+      real*8 t1a,t1b
+      real*8 e1,e2,e3,sum
+      real*8 arg1,arg2,arg3
+      real*8 arg12,arg22,arg32
+      real*8 de1,de2,de3,dsum
+      real*8 sumi,sumj,term
+      real*8 dedx,dedy,dedz
+      real*8 cutmtx(maxatm)
+      real*8 dcutmtx(maxatm)
+c
+c
+c     zero out the hydrophobic potential of mean force energy
+c
+      ehp = 0.0d0
+c
+c     set some values needed during the HPMF calculation
+c
+      rsurf = rcarbon + 2.0d0*rwater
+      pisurf = pi * (rcarbon+rwater)
+      hpmfcut2 = hpmfcut * hpmfcut
+c
+c     get the surface area and derivative terms for each atom
+c
+      do ii = 1, npmf
+         i = ipmf(ii)
+         saterm = acsa(i)
+         sasa = 1.0d0
+         do k = 1, n
+            if (i .ne. k) then
+               xr = x(i) - x(k)
+               yr = y(i) - y(k)
+               zr = z(i) - z(k)
+               r2 = xr*xr + yr*yr + zr*zr
+               rbig = rpmf(k) + rsurf
+               if (r2 .le. rbig*rbig) then
+                  r = sqrt(r2)         
+                  rsmall = rpmf(k) - rcarbon
+                  part = pisurf * (rbig-r) * (1.0d0+rsmall/r)
+                  sasa = sasa * (1.0d0-saterm*part)
+               end if
+            end if
+         end do
+         sasa = acsurf * sasa
+         cutv = tanh(tslope*(sasa-toffset))
+         cutmtx(i) = 0.5d0 * (1.0d0+cutv)
+         dcutmtx(i) = 0.5d0 * tslope * (1.0d0-cutv*cutv)
+         do k = 1, n
+            dacsa(k,ii) = 0.0d0
+            if (i .ne. k) then
+               xr = x(i) - x(k)
+               yr = y(i) - y(k)
+               zr = z(i) - z(k)
+               r2 = xr*xr + yr*yr + zr*zr
+               rbig = rpmf(k) + rsurf
+               if (r2 .le. rbig*rbig) then
+                  r = sqrt(r2)         
+                  rsmall = rpmf(k) - rcarbon
+                  part = pisurf * (rbig-r) * (1.0d0+rsmall/r)
+                  t1b = -pisurf * (1.0d0+rbig*rsmall/r2)
+                  t1a = -sasa / (1.0d0/saterm-part)
+                  dacsa(k,ii) = t1a * t1b / r
+               end if
+            end if
+         end do
+      end do
+c
+c     find the hydrophobic PMF energy and derivs via a double loop
+c
+      do i = 1, n
+         omit(i) = 0
+      end do
+      do ii = 1, npmf-1
+         i = ipmf(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         sschk = 0
+         do j = 1, n12(i)
+            k = i12(j,i)
+            omit(k) = i
+            if (atomic(k) .eq. 16)  sschk = k
+         end do
+         do j = 1, n13(i)
+            k = i13(j,i)
+            omit(k) = i
+         end do
+         do j = 1, n14(i)
+            k = i14(j,i)
+            omit(k) = i
+            if (sschk .ne. 0) then
+               do jj = 1, n12(k)
+                  m = i12(jj,k)
+                  if (atomic(m) .eq. 16) then
+                     do kk = 1, n12(m)
+                        if (i12(kk,m) .eq. sschk)  omit(k) = 0
+                     end do
+                  end if
+               end do
+            end if
+         end do
+         do kk = ii+1, npmf
+            k = ipmf(kk)
+            xk = x(k)
+            yk = y(k)
+            zk = z(k)
+            if (omit(k) .ne. i) then
+               xr = xi - xk
+               yr = yi - yk
+               zr = zi - zk
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. hpmfcut2) then
+                  r = sqrt(r2)
+                  arg1 = (r-c1) * w1
+                  arg12 = arg1 * arg1
+                  arg2 = (r-c2) * w2
+                  arg22 = arg2 * arg2
+                  arg3 = (r-c3) * w3
+                  arg32 = arg3 * arg3
+                  e1 = h1 * exp(-arg12)
+                  e2 = h2 * exp(-arg22)
+                  e3 = h3 * exp(-arg32)
+                  sum = e1 + e2 + e3
+                  e = sum * cutmtx(i) * cutmtx(k)
+                  ehp = ehp + e
+c
+c     first part of hydrophobic PMF derivative calculation
+c
+                  de1 = -2.0d0 * e1 * arg1 * w1
+                  de2 = -2.0d0 * e2 * arg2 * w2
+                  de3 = -2.0d0 * e3 * arg3 * w3
+                  dsum = (de1+de2+de3) * cutmtx(i) * cutmtx(k) / r
+                  dedx = dsum * xr
+                  dedy = dsum * yr
+                  dedz = dsum * zr
+                  des(1,i) = des(1,i) + dedx
+                  des(2,i) = des(2,i) + dedy
+                  des(3,i) = des(3,i) + dedz
+                  des(1,k) = des(1,k) - dedx
+                  des(2,k) = des(2,k) - dedy
+                  des(3,k) = des(3,k) - dedz
+c
+c     second part of hydrophobic PMF derivative calculation
+c
+                  sumi = sum * cutmtx(k) * dcutmtx(i)
+                  sumj = sum * cutmtx(i) * dcutmtx(k)
+                  if (sumi .ne. 0.0d0) then
+                     do j = 1, n
+                        if (dacsa(j,ii) .ne. 0.0d0) then
+                           term = sumi * dacsa(j,ii)
+                           dedx = term * (xi-x(j))
+                           dedy = term * (yi-y(j))
+                           dedz = term * (zi-z(j))
+                           des(1,i) = des(1,i) + dedx
+                           des(2,i) = des(2,i) + dedy
+                           des(3,i) = des(3,i) + dedz
+                           des(1,j) = des(1,j) - dedx
+                           des(2,j) = des(2,j) - dedy
+                           des(3,j) = des(3,j) - dedz
+                        end if
+                     end do
+                  end if
+                  if (sumj .ne. 0.0d0) then
+                     do j = 1, n
+                        if (dacsa(j,kk) .ne. 0.0d0) then
+                           term = sumj * dacsa(j,kk)
+                           dedx = term * (xk-x(j))
+                           dedy = term * (yk-y(j))
+                           dedz = term * (zk-z(j))
+                           des(1,k) = des(1,k) + dedx
+                           des(2,k) = des(2,k) + dedy
+                           des(3,k) = des(3,k) + dedz
+                           des(1,j) = des(1,j) - dedx
+                           des(2,j) = des(2,j) - dedy
+                           des(3,j) = des(3,j) - dedz
+                        end if
+                     end do
+                  end if
+               end if
+            end if
+         end do
       end do
       return
       end
