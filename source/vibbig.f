@@ -44,10 +44,7 @@ c
       include 'iounit.i'
       include 'keys.i'
       include 'units.i'
-      integer maxroot
-      integer maxbasis
-      parameter (maxroot=50)
-      parameter (maxbasis=3*maxroot)
+      include 'vibs.i'
       integer i,j,k,ii,next
       integer i1,i2,k0,k1,k2
       integer ivib,ivb1,ivb2
@@ -82,8 +79,6 @@ c
       real*8 tmp2(maxbasis)
       real*8 h(maxbasis,maxbasis)
       real*8 c(maxbasis,maxbasis)
-      real*8 phi(maxvar,maxbasis)
-      real*8 phik(maxvar,maxbasis)
       character*1 answer
       character*20 keyword
       character*120 record
@@ -357,8 +352,8 @@ c
 c
 c     project out locked roots from components of phi
 c
-      call project (nvar,nconv,ivb1,nroot,0,phi)
-      call project (nvar,nconv,ivb1,nroot,0,phik)
+      call project (nvar,nconv,ivb1,nroot,0)
+      call projectk (nvar,nconv,ivb1,nroot,0)
 c
 c     reload and make vector orthonormal to existing basis
 c
@@ -376,7 +371,7 @@ c
                p(k) = p(k) / sum
             end do
          else
-            call gsort (nvar,i-1,phi,p)
+            call gsort (nvar,i-1,p)
          end if
          do k = 1, nvar
             phi(k,i) = p(k)
@@ -453,8 +448,8 @@ c
 c
 c     project out locked roots from components of phi
 c
-      call project (nvar,nconv,ivb1,nroot,nroot,phi)
-      call project (nvar,nconv,ivb1,nroot,nroot,phik)
+      call project (nvar,nconv,ivb1,nroot,nroot)
+      call projectk (nvar,nconv,ivb1,nroot,nroot)
 c
 c     reload and make vector orthonormal to existing basis
 c
@@ -462,7 +457,7 @@ c
          do k = 1, nvar
             p(k) = phi(k,i+nroot)
          end do
-         call gsort (nvar,nroot+i-1,phi,p)
+         call gsort (nvar,nroot+i-1,p)
          do k = 1, nvar
             phi(k,i+nroot) = p(k)
          end do
@@ -599,8 +594,8 @@ c
 c
 c     project out locked roots from components of phi
 c
-      call project (nvar,nconv,ivb1,nroot,npair,phi)
-      call project (nvar,nconv,ivb1,nroot,npair,phik)
+      call project (nvar,nconv,ivb1,nroot,npair)
+      call projectk (nvar,nconv,ivb1,nroot,npair)
 c
 c     reload and orthogonalize to 1st + 2nd
 c
@@ -608,7 +603,7 @@ c
          do k = 1, nvar
             p(k) = phi(k,i+npair)
          end do
-         call gsort (nvar,npair+i-1,phi,p)
+         call gsort (nvar,npair+i-1,p)
          do k = 1, nvar
             phi(k,i+npair) = p(k)
          end do
@@ -959,8 +954,8 @@ c
 c
 c     project out locked roots from components of phi
 c
-      call project (nvar,nconv,ivb1,npair,0,phi)
-      call project (nvar,nconv,ivb1,npair,0,phik)
+      call project (nvar,nconv,ivb1,npair,0)
+      call projectk (nvar,nconv,ivb1,npair,0)
 c
 c     setup next iteration; solution residue, Davidson weight
 c
@@ -986,7 +981,7 @@ c
 c
 c     project out locked roots from components of phi
 c
-      call project (nvar,nconv,ivb1,nroot,npair,phi)
+      call project (nvar,nconv,ivb1,nroot,npair)
 c
 c     reload and orthogonalize to 1st + 2nd
 c
@@ -994,7 +989,7 @@ c
          do k = 1, nvar
             p(k) = phi(k,i+npair)
          end do
-         call gsort (nvar,npair+i-1,phi,p)
+         call gsort (nvar,npair+i-1,p)
          do k = 1, nvar
             phi(k,i+npair) = p(k)
          end do
@@ -1015,7 +1010,7 @@ c
 c
 c     project out locked roots from components of phik
 c
-      call project (nvar,nconv,ivb1,nroot,npair,phik)
+      call projectk (nvar,nconv,ivb1,nroot,npair)
       goto 160
   280 continue
       end
@@ -1358,20 +1353,16 @@ c     "gsort" uses the Gram-Schmidt algorithm to build orthogonal
 c     vectors for sliding block interative matrix diagonalization
 c
 c
-      subroutine gsort (nvar,nb,phi,p0)
+      subroutine gsort (nvar,nb,p0)
       implicit none
       include 'sizes.i'
-      integer maxroot
-      integer maxbasis
-      parameter (maxroot=50)
-      parameter (maxbasis=3*maxroot)
+      include 'vibs.i'
       integer i,j
       integer nvar,nb
       real*8 sum
       real*8 s(maxbasis)
       real*8 p0(maxvar)
       real*8 proj(maxvar)
-      real*8 phi(maxvar,maxbasis)
 c
 c
 c     make overlap between two basis sets
@@ -1478,27 +1469,22 @@ c     them out of the components of the set of trial eigenvectors
 c     using the relation Y = X - U * U^T * X
 c
 c
-      subroutine project (nvar,nconv,ivb1,ns,m,phi)
+      subroutine project (nvar,nconv,ivb1,ns,m)
       implicit none
       include 'sizes.i'
-      integer maxroot
-      integer maxbasis
-      parameter (maxroot=50)
-      parameter (maxbasis=3*maxroot)
+      include 'vibs.i'
       integer i,j,k
       integer nvar,nconv
       integer ivb1,ns,m
-      real*8 tmp(maxbasis)
+      real*8 temp(maxbasis)
       real*8 u(maxvar)
-      real*8 phi(maxvar,maxbasis)
-      real*8 phik(maxvar,maxbasis)
 c
 c
 c     zero the temporary storage array
 c
       do k = 1, nvar
          do i = 1, ns
-            phik(k,i+m) = 0.0d0
+            pwork(k,i+m) = 0.0d0
          end do
       end do
 c
@@ -1507,14 +1493,14 @@ c
       do i = 1, nconv
          read (ivb1)  (u(k),k=1,nvar)
          do j = 1, ns
-            tmp(j) = 0.0d0
+            temp(j) = 0.0d0
             do k = 1, nvar
-               tmp(j) = tmp(j) + u(k)*phi(k,j+m)
+               temp(j) = temp(j) + u(k)*phi(k,j+m)
             end do
          end do
          do j = 1, ns
             do k = 1, nvar
-               phik(k,j+m) = phik(k,j+m) + u(k)*tmp(j)
+               pwork(k,j+m) = pwork(k,j+m) + u(k)*temp(j)
             end do
          end do
       end do
@@ -1523,7 +1509,67 @@ c     project locked vectors out of the current set
 c
       do k = 1, nvar
          do i = 1, ns
-            phi(k,i+m) = phi(k,i+m) - phik(k,i+m)
+            phi(k,i+m) = phi(k,i+m) - pwork(k,i+m)
+         end do
+      end do
+      if (nconv .gt. 0)  rewind (unit=ivb1)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine projectk  --  remove known vectors from current  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "projectk" reads locked vectors from a binary file and projects
+c     them out of the components of the set of trial eigenvectors
+c     using the relation Y = X - U * U^T * X
+c
+c
+      subroutine projectk (nvar,nconv,ivb1,ns,m)
+      implicit none
+      include 'sizes.i'
+      include 'vibs.i'
+      integer i,j,k
+      integer nvar,nconv
+      integer ivb1,ns,m
+      real*8 temp(maxbasis)
+      real*8 u(maxvar)
+c
+c
+c     zero the temporary storage array
+c
+      do k = 1, nvar
+         do i = 1, ns
+            pwork(k,i+m) = 0.0d0
+         end do
+      end do
+c
+c     read and scan over the locked eigenvectors
+c
+      do i = 1, nconv
+         read (ivb1)  (u(k),k=1,nvar)
+         do j = 1, ns
+            temp(j) = 0.0d0
+            do k = 1, nvar
+               temp(j) = temp(j) + u(k)*phik(k,j+m)
+            end do
+         end do
+         do j = 1, ns
+            do k = 1, nvar
+               pwork(k,j+m) = pwork(k,j+m) + u(k)*temp(j)
+            end do
+         end do
+      end do
+c
+c     project locked vectors out of the current set
+c
+      do k = 1, nvar
+         do i = 1, ns
+            phik(k,i+m) = phik(k,i+m) - pwork(k,i+m)
          end do
       end do
       if (nconv .gt. 0)  rewind (unit=ivb1)
