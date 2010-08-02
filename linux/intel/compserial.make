@@ -275,7 +275,7 @@ ifort -c -fast -axsse3 -no-ipo -vec-report0 overlap.f
 ifort -c -fast -axsse3 -no-ipo -vec-report0 path.f
 ifort -c -fast -axsse3 -no-ipo -vec-report0 pdbxyz.f
 ifort -c -fast -axsse3 -no-ipo -vec-report0 piscf.f
-ifort -c -fast -axsse3 -no-ipo -vec-report0 pmepol.f
+ifort -c -fast -axsse3 -no-ipo -vec-report0 pmestuff.f
 ifort -c -fast -axsse3 -no-ipo -vec-report0 pmpb.f
 ifort -c -fast -axsse3 -no-ipo -vec-report0 polarize.f
 ifort -c -fast -axsse3 -no-ipo -vec-report0 poledit.f

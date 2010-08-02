@@ -13,6 +13,7 @@ c     ###########################################################
 c
 c
 c     maxorder   maximum order of the B-spline approximation
+c     maxchunk   maximum number of charge grid spatial regions
 c
 c     bsmod1     B-spline moduli along the a-axis direction
 c     bsmod2     B-spline moduli along the b-axis direction
@@ -29,8 +30,9 @@ c     qgrid      values on the particle mesh Ewald charge grid
 c     qfac       prefactors for particle mesh Ewald charge grid
 c
 c
-      integer maxorder
+      integer maxorder,maxchunk
       parameter (maxorder=10)
+      parameter (maxchunk=8)
       integer nfft1,nfft2,nfft3
       integer bsorder,igrid
       real*8 bsmod1,bsmod2,bsmod3
@@ -41,5 +43,5 @@ c
      &             thetai1(4,maxorder,maxatm),
      &             thetai2(4,maxorder,maxatm),
      &             thetai3(4,maxorder,maxatm),
-     &             nfft1,nfft2,nfft3,bsorder,
-     &             igrid(3,maxatm),qgrid,qfac
+     &             nfft1,nfft2,nfft3,bsorder,igrid(3,maxatm),
+     &             qgrid,qfac

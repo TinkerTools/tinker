@@ -241,7 +241,7 @@ tinker
 +orthog.obj &
 +overlap.obj &
 +piscf.obj &
-+pmepol.obj &
++pmestuff.obj &
 +pmpb.obj &
 +polymer.obj &
 +precise.obj &

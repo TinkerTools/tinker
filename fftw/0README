@@ -27,5 +27,7 @@
       provided version uses the -xHost option to build FFTW optimized
       for the current CPU. In the macosx and linux versions, this flag
       is replaced by -axssse3 or -axsse3, respectively, to perform a
-      generic build for those systems.
+      generic build for those systems. If, on the other hand, you want
+      executables optimized for the machine type you are building on,
+      then just use the original file, "configure-orig"
 

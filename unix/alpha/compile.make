@@ -275,7 +275,7 @@ f77 -c -fast -arch generic -tune generic overlap.f
 f77 -c -fast -arch generic -tune generic path.f
 f77 -c -fast -arch generic -tune generic pdbxyz.f
 f77 -c -fast -arch generic -tune generic piscf.f
-f77 -c -fast -arch generic -tune generic pmepol.f
+f77 -c -fast -arch generic -tune generic pmestuff.f
 f77 -c -fast -arch generic -tune generic pmpb.f
 f77 -c -fast -arch generic -tune generic polarize.f
 f77 -c -fast -arch generic -tune generic poledit.f

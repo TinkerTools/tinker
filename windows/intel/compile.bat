@@ -276,7 +276,7 @@ ifort /c /fast /Qno-ipo /w /Qvec-report0 overlap.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 path.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 pdbxyz.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 piscf.f
-ifort /c /fast /Qno-ipo /w /Qvec-report0 pmepol.f
+ifort /c /fast /Qno-ipo /w /Qvec-report0 pmestuff.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 pmpb.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 polarize.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 poledit.f

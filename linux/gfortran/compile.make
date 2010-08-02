@@ -275,7 +275,7 @@ gfortran -c -O overlap.f
 gfortran -c -O path.f
 gfortran -c -O pdbxyz.f
 gfortran -c -O piscf.f
-gfortran -c -O pmepol.f
+gfortran -c -O pmestuff.f
 gfortran -c -O pmpb.f
 gfortran -c -O polarize.f
 gfortran -c -O poledit.f

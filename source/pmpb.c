@@ -344,6 +344,7 @@ void apbsempole_(int *natom, double x[maxatm][3],
         if (indU[i] != VNULL) Vgrid_dtor(&indU[i]);
         if (nlIndU[i] != VNULL) Vgrid_dtor(&nlIndU[i]);
     }
+
     /* Kill the old atom list */
     if (alist[0] != VNULL) {
        Valist_dtor(&alist[0]);
@@ -397,7 +398,6 @@ void apbsempole_(int *natom, double x[maxatm][3],
 
     /* Only call the setupCalc routine once, so that we can
        reuse this nosh object */
-
     if (nosh->ncalc < 2) {
        if (NOsh_setupElecCalc(nosh, alist) != 1) {
           printf("Error setting up calculations\n");
@@ -561,11 +561,11 @@ void apbsempole_(int *natom, double x[maxatm][3],
 
     // Convert results into kcal/mol units
     kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 * 1.0/4.184;
-    // Electric converts from electron**2/Angstrom to Kcal/mol
-    electric = 332.05382;
+    // Electric converts from electron**2/Angstrom to kcal/mol
+    electric = 332.063709;
     *total = 0.0;
     for (i=0; i<alist[0]->number; i++){
-       /* starting with the field in KT/e/Ang^2 multiply by Kcal/mol/KT
+       /* starting with the field in KT/e/Ang^2 multiply by kcal/mol/KT
           the field is then divided by "electric" to convert to e/Ang^2 */
        energy[i] *= 0.5 * kT;
        *total += energy[i];
@@ -819,7 +819,7 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
           data = Vmem_malloc(VNULL, nx*ny*nz, sizeof(double));
           Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
           nlIndU[i] = Vgrid_ctor(nx,ny,nz,hx,hy,hzed,xmin,ymin,zmin,data);
-          nlIndU[i]->readdata = 1; // set readata flag to have the dtor free data
+          nlIndU[i]->readdata = 1; // set readata flag to have dtor free data
        } else {
           data = nlIndU[i]->data;
           Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
@@ -854,7 +854,7 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
 }
 
 /***********************************************************************
-  pbdirectpolarizationforce is called from TINKER to:
+  pbdirectpolforce is called from TINKER to:
 
   (1) compute direct polarization forces and torques using
       saved potentials
@@ -988,7 +988,7 @@ void pbdirectpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
 }
 
 /***********************************************************************
-  pbmutualpolarizationforce is called from TINKER to:
+  pbmutualpolforce is called from TINKER to:
 
   (1) compute mutual polarization forces using saved potentials
 ***********************************************************************/
@@ -1086,6 +1086,12 @@ void pbmutualpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
 
     killMG(nosh, pbe, pmgp, pmg);
 }
+
+/***********************************************************************
+  apbsfinal is called from TINKER to:
+
+  (1) clean up at the end of an APBS calculation
+***********************************************************************/
 
 void apbsfinal_() {
     unsigned long int bytesTotal, highWater;

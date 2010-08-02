@@ -275,7 +275,7 @@ ifort -c -g -warn unused -check uninit -check bounds overlap.f
 ifort -c -g -warn unused -check uninit -check bounds path.f
 ifort -c -g -warn unused -check uninit -check bounds pdbxyz.f
 ifort -c -g -warn unused -check uninit -check bounds piscf.f
-ifort -c -g -warn unused -check uninit -check bounds pmepol.f
+ifort -c -g -warn unused -check uninit -check bounds pmestuff.f
 ifort -c -g -warn unused -check uninit -check bounds pmpb.f
 ifort -c -g -warn unused -check uninit -check bounds polarize.f
 ifort -c -g -warn unused -check uninit -check bounds poledit.f

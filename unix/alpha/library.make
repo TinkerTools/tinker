@@ -251,7 +251,7 @@ orient.o \
 orthog.o \
 overlap.o \
 piscf.o \
-pmepol.o \
+pmestuff.o \
 pmpb.o \
 polymer.o \
 precise.o \

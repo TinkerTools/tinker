@@ -276,7 +276,7 @@ f77 -c -O overlap.f
 f77 -c -O path.f
 f77 -c -O pdbxyz.f
 f77 -c -O piscf.f
-f77 -c -O pmepol.f
+f77 -c -O pmestuff.f
 f77 -c -O pmpb.f
 f77 -c -O polarize.f
 f77 -c -O poledit.f

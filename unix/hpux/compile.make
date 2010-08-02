@@ -275,7 +275,7 @@ fort77 -c -O2 +E1 overlap.f
 fort77 -c -O2 +E1 path.f
 fort77 -c -O2 +E1 pdbxyz.f
 fort77 -c -O2 +E1 piscf.f
-fort77 -c -O2 +E1 pmepol.f
+fort77 -c -O2 +E1 pmestuff.f
 fort77 -c -O2 +E1 pmpb.f
 fort77 -c -O2 +E1 polarize.f
 fort77 -c -O2 +E1 poledit.f

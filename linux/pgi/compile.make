@@ -275,7 +275,7 @@ pgf77 -c -fast overlap.f
 pgf77 -c -fast path.f
 pgf77 -c -fast pdbxyz.f
 pgf77 -c -fast piscf.f
-pgf77 -c -fast pmepol.f
+pgf77 -c -fast pmestuff.f
 pgf77 -c -fast pmpb.f
 pgf77 -c -fast polarize.f
 pgf77 -c -fast poledit.f

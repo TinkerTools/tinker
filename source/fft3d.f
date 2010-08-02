@@ -46,9 +46,9 @@ c
 c
 c     initialization of Fast Fourier transform using FFTPACK
 c
-         call cffti (nfft1,table(1,1),iprime(1,1))
-         call cffti (nfft2,table(1,2),iprime(1,2))
-         call cffti (nfft3,table(1,3),iprime(1,3))
+         call cffti (nfft1,ffttable(1,1),iprime(1,1))
+         call cffti (nfft2,ffttable(1,2),iprime(1,2))
+         call cffti (nfft3,ffttable(1,3),iprime(1,3))
 !$    end if
       return
       end
@@ -88,7 +88,7 @@ c
                   work(1,i) = qgrid(1,i,j,k)
                   work(2,i) = qgrid(2,i,j,k)
                end do
-               call cfftf (nfft1,work,table(1,1),iprime(1,1))
+               call cfftf (nfft1,work,ffttable(1,1),iprime(1,1))
                do i = 1, nfft1
                   qgrid(1,i,j,k) = work(1,i)
                   qgrid(2,i,j,k) = work(2,i)
@@ -101,7 +101,7 @@ c
                   work(1,j) = qgrid(1,i,j,k)
                   work(2,j) = qgrid(2,i,j,k)
                end do
-               call cfftf (nfft2,work,table(1,2),iprime(1,2))
+               call cfftf (nfft2,work,ffttable(1,2),iprime(1,2))
                do j = 1, nfft2
                   qgrid(1,i,j,k) = work(1,j)
                   qgrid(2,i,j,k) = work(2,j)
@@ -114,7 +114,7 @@ c
                   work(1,k) = qgrid(1,i,j,k)
                   work(2,k) = qgrid(2,i,j,k)
                end do
-               call cfftf (nfft3,work,table(1,3),iprime(1,3))
+               call cfftf (nfft3,work,ffttable(1,3),iprime(1,3))
                do k = 1, nfft3
                   qgrid(1,i,j,k) = work(1,k)
                   qgrid(2,i,j,k) = work(2,k)
@@ -160,7 +160,7 @@ c
                   work(1,i) = qgrid(1,i,j,k)
                   work(2,i) = qgrid(2,i,j,k)
                end do
-               call cfftb (nfft1,work,table(1,1),iprime(1,1))
+               call cfftb (nfft1,work,ffttable(1,1),iprime(1,1))
                do i = 1, nfft1
                   qgrid(1,i,j,k) = work(1,i)
                   qgrid(2,i,j,k) = work(2,i)
@@ -173,7 +173,7 @@ c
                   work(1,j) = qgrid(1,i,j,k)
                   work(2,j) = qgrid(2,i,j,k)
                end do
-               call cfftb (nfft2,work,table(1,2),iprime(1,2))
+               call cfftb (nfft2,work,ffttable(1,2),iprime(1,2))
                do j = 1, nfft2
                   qgrid(1,i,j,k) = work(1,j)
                   qgrid(2,i,j,k) = work(2,j)
@@ -186,7 +186,7 @@ c
                   work(1,k) = qgrid(1,i,j,k)
                   work(2,k) = qgrid(2,i,j,k)
                end do
-               call cfftb (nfft3,work,table(1,3),iprime(1,3))
+               call cfftb (nfft3,work,ffttable(1,3),iprime(1,3))
                do k = 1, nfft3
                   qgrid(1,i,j,k) = work(1,k)
                   qgrid(2,i,j,k) = work(2,k)

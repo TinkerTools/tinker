@@ -444,7 +444,7 @@ OBJS = active.o \
        path.o \
        pdbxyz.o \
        piscf.o \
-       pmepol.o \
+       pmestuff.o \
        pmpb.o \
        polarize.o \
        poledit.o \
@@ -1030,7 +1030,7 @@ libtinker.a: ${OBJS}
         orthog.o \
         overlap.o \
         piscf.o \
-        pmepol.o \
+        pmestuff.o \
         pmpb.o \
         polymer.o \
         precise.o \
@@ -1297,7 +1297,7 @@ katom.o: atmtyp.i atoms.i couple.i inform.i iounit.i katoms.i keys.i sizes.i
 kbond.o: angle.i atmlst.i atmtyp.i atoms.i bond.i couple.i inform.i iounit.i kbonds.i keys.i potent.i sizes.i tors.i usage.i
 kcharge.o: atmtyp.i atoms.i charge.i chgpot.i couple.i inform.i iounit.i kchrge.i keys.i potent.i sizes.i
 kdipole.o: atmlst.i atoms.i bond.i couple.i dipole.i inform.i iounit.i kdipol.i keys.i potent.i sizes.i
-kewald.o: atoms.i bound.i boxes.i cutoff.i ewald.i fft.i inform.i iounit.i keys.i math.i pme.i sizes.i
+kewald.o: atoms.i bound.i boxes.i chunks.i cutoff.i ewald.i fft.i inform.i iounit.i keys.i math.i pme.i sizes.i
 kgeom.o: atmtyp.i atoms.i bound.i couple.i group.i iounit.i keys.i kgeoms.i molcul.i potent.i sizes.i
 kimprop.o: atmtyp.i atoms.i couple.i improp.i inform.i iounit.i keys.i kiprop.i potent.i sizes.i
 kimptor.o: atmtyp.i atoms.i couple.i imptor.i inform.i iounit.i keys.i kitors.i math.i potent.i sizes.i
@@ -1360,7 +1360,7 @@ overlap.o: units.i
 path.o: align.i atmtyp.i atoms.i files.i inform.i iounit.i linmin.i minima.i output.i paths.i sizes.i
 pdbxyz.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i iounit.i katoms.i pdb.i resdue.i sequen.i sizes.i
 piscf.o: atmtyp.i atoms.i bond.i border.i couple.i inform.i iounit.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
-pmepol.o: atoms.i boxes.i mpole.i pme.i sizes.i
+pmestuff.o: atoms.i boxes.i chunks.i mpole.i pme.i sizes.i
 pmpb.o:
 polarize.o: atoms.i inform.i iounit.i molcul.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
 poledit.o: atmtyp.i atoms.i couple.i dma.i files.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i

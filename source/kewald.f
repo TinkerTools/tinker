@@ -19,8 +19,10 @@ c
       subroutine kewald
       implicit none
       include 'sizes.i'
+      include 'atoms.i'
       include 'bound.i'
       include 'boxes.i'
+      include 'chunks.i'
       include 'cutoff.i'
       include 'ewald.i'
       include 'fft.i'
@@ -38,7 +40,7 @@ c
       character*120 record
       character*120 string
 c
-c     Ewald grid needs even numbers with factors of 2, 3 and 5
+c     PME grid size must be even with factors of only 2, 3 and 5
 c
       data multi  /   2,   4,   6,   8,  10,  12,  16,  18,  20,
      &               24,  30,  32,  36,  40,  48,  50,  54,  60,
@@ -124,6 +126,19 @@ c
          end if
       end do
 c
+c     set the number of chunks and grid points per chunk
+c
+      nchk1 = 2
+      nchk2 = 2
+      nchk3 = 2
+      nchunk = nchk1 * nchk2 * nchk3
+      ngrd1 = nfft1 / nchk1
+      ngrd2 = nfft2 / nchk2
+      ngrd3 = nfft3 / nchk3
+      nlpts = (bsorder-1) / 2
+      nrpts = bsorder - nlpts - 1
+      grdoff = (bsorder+1)/2 + 1
+c
 c     check the B-spline order and charge grid dimension
 c
       if (bsorder .gt. maxorder) then
@@ -144,12 +159,14 @@ c
      &              ' may give Poor Accuracy')
       end if
 c
-c     perform dynamic allocation of the qgrid and qfac arrays
+c     perform dynamic allocation of the various PME arrays
 c
       nullify (qgrid)
       allocate (qgrid(2,nfft1,nfft2,nfft3))
       nullify (qfac)
       allocate (qfac(nfft1,nfft2,nfft3))
+      nullify (pmetable)
+      allocate (pmetable(nchunk,n))
 c
 c     initialize the PME arrays that can be precomputed
 c

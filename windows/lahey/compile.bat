@@ -276,7 +276,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace overlap.f
 LF95 -c -o1 -tpp -nstchk -ntrace path.f
 LF95 -c -o1 -tpp -nstchk -ntrace pdbxyz.f
 LF95 -c -o1 -tpp -nstchk -ntrace piscf.f
-LF95 -c -o1 -tpp -nstchk -ntrace pmepol.f
+LF95 -c -o1 -tpp -nstchk -ntrace pmestuff.f
 LF95 -c -o1 -tpp -nstchk -ntrace pmpb.f
 LF95 -c -o1 -tpp -nstchk -ntrace polarize.f
 LF95 -c -o1 -tpp -nstchk -ntrace poledit.f

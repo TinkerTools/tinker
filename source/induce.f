@@ -1574,9 +1574,10 @@ c
          cmp(10,i) = 2.0d0 * rpole(10,i)
       end do
 c
-c     compute the arrays of B-spline coefficients
+c     compute B-spline coefficients and spatial decomposition
 c
       call bspline_fill
+      call table_fill
 c
 c     convert Cartesian multipoles to fractional coordinates
 c

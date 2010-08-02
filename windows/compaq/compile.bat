@@ -276,7 +276,7 @@ DF /compile_only /optimize /fast overlap.f
 DF /compile_only /optimize /fast path.f
 DF /compile_only /optimize /fast pdbxyz.f
 DF /compile_only /optimize /fast piscf.f
-DF /compile_only /optimize /fast pmepol.f
+DF /compile_only /optimize /fast pmestuff.f
 DF /compile_only /optimize /fast pmpb.f
 DF /compile_only /optimize /fast polarize.f
 DF /compile_only /optimize /fast poledit.f

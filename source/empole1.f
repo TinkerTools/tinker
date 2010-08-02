@@ -5796,7 +5796,10 @@ c
 c
 c     compute the arrays of B-spline coefficients
 c
-      if (.not. use_polar)  call bspline_fill
+      if (.not. use_polar) then
+         call bspline_fill
+         call table_fill
+      end if
 c
 c     perform dynamic allocation of the qgrip array
 c
@@ -5880,8 +5883,7 @@ c
          term = -pterm * hsq
          expterm = 0.0d0
          if (term .gt. -50.0d0) then
-            denom = volterm * hsq * bsmod1(k1) * bsmod2(k2)
-     &                 * bsmod3(k3)
+            denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
             expterm = exp(term) / denom
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))

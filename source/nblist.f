@@ -987,7 +987,8 @@ c
       real*8 xr,yr,zr
 c
 c
-c     for orthogonal lattice, find the desired image directly
+c     for orthogonal lattice, find the desired image directly;
+c     too save time, this only returns the correct magnitudes
 c
       if (orthogonal) then
          xr = abs(xr)

@@ -275,7 +275,7 @@ g77 -c -O3 -ffast-math overlap.f
 g77 -c -O3 -ffast-math path.f
 g77 -c -O3 -ffast-math pdbxyz.f
 g77 -c -O3 -ffast-math piscf.f
-g77 -c -O3 -ffast-math pmepol.f
+g77 -c -O3 -ffast-math pmestuff.f
 g77 -c -O3 -ffast-math pmpb.f
 g77 -c -O3 -ffast-math polarize.f
 g77 -c -O3 -ffast-math poledit.f
