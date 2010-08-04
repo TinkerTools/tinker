@@ -29,6 +29,7 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
+      include 'openmp.i'
       include 'pme.i'
       integer maxpower
       parameter (maxpower=54)
@@ -128,13 +129,16 @@ c
 c
 c     set the number of chunks and grid points per chunk
 c
-      nchk1 = 2
-      nchk2 = 2
-      nchk3 = 2
-      nchunk = nchk1 * nchk2 * nchk3
+      nchk1 = 1
+      nchk2 = 1
+      nchk3 = 1
+      if (nthread .ge. 2)  nchk1 = 2
+      if (nthread .ge. 4)  nchk2 = 2
+      if (nthread .ge. 8)  nchk3 = 2
       ngrd1 = nfft1 / nchk1
       ngrd2 = nfft2 / nchk2
       ngrd3 = nfft3 / nchk3
+      nchunk = nchk1 * nchk2 * nchk3
       nlpts = (bsorder-1) / 2
       nrpts = bsorder - nlpts - 1
       grdoff = (bsorder+1)/2 + 1
@@ -161,6 +165,12 @@ c
 c
 c     perform dynamic allocation of the various PME arrays
 c
+      nullify (thetai1)
+      allocate (thetai1(4,bsorder,n))
+      nullify (thetai2)
+      allocate (thetai2(4,bsorder,n))
+      nullify (thetai3)
+      allocate (thetai3(4,bsorder,n))
       nullify (qgrid)
       allocate (qgrid(2,nfft1,nfft2,nfft3))
       nullify (qfac)
