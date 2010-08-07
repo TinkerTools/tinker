@@ -77,8 +77,8 @@ c
       real*8 h0(maxvar)
       real*8 rho(maxsav)
       real*8 alpha(maxsav)
-      real*8 s(maxvar,maxsav)
-      real*8 y(maxvar,maxsav)
+      real*8, pointer :: s(:,:)
+      real*8, pointer :: y(:,:)
       logical done
       character*9 blank,status
       character*20 keyword
@@ -238,6 +238,13 @@ c
          done = .true.
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (s)
+      allocate (s(nvar,msav))
+      nullify (y)
+      allocate (y(nvar,msav))
+c
 c     start of a new limited memory BFGS iteration
 c
       dowhile (.not. done)
@@ -380,6 +387,11 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (s)
+      deallocate (y)
 c
 c     set final value of the objective function
 c

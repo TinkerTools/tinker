@@ -27,10 +27,11 @@ c
       integer size,start,stop
       logical opened
       character*1 letter
+      character*23 fstr
       character*120 seqfile
 c
 c
-c     open output unit if not already done
+c     open the output unit if not already done
 c
       inquire (unit=iseq,opened=opened)
       if (.not. opened) then
@@ -51,14 +52,14 @@ c
             smin = smax + 1
             smax = smax + 15
             smax = min(smax,size)
-            if (i.ne.1 .and. smin.eq.1) then
-               write (iseq,10)
-   10          format ()
-            end if
-            write (iseq,20)  letter,smin,(seq(k+start-1),k=smin,smax)
-   20       format (3x,a1,i6,1x,15(1x,a3))
+            if (i.ne.1 .and. smin.eq.1)  write (iseq,'()')
+            fstr = '(3x,a1,i6,1x,15(1x,a3))'
+            write (iseq,fstr)  letter,smin,(seq(k+start-1),k=smin,smax)
          end do
       end do
+c
+c     close the output unit if opened by this routine
+c
       if (.not. opened)  close (unit=iseq)
       return
       end

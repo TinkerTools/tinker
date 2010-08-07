@@ -26,14 +26,18 @@ c
       integer i,k,ipdb
       integer start,stop,resnumb
       integer resid(maxres)
+      real*8 crdmin,crdmax
       logical opened
       character*1 chnname
       character*1 chain(maxres)
+      character*2 atmc,resc
       character*3 resname
+      character*6 crdc
+      character*38 fstr
       character*120 pdbfile
 c
 c
-c     open output unit if not already done
+c     open the output unit if not already done
 c
       inquire (unit=ipdb,opened=opened)
       if (.not. opened) then
@@ -45,11 +49,11 @@ c
 c     write out the header lines and the title
 c
       if (ltitle .eq. 0) then
-         write (ipdb,10)
-   10    format ('HEADER',/,'COMPND',/,'SOURCE')
+         fstr = '(''HEADER'',/,''COMPND'',/,''SOURCE'')'
+         write (ipdb,fstr(1:32))
       else
-         write (ipdb,20)  title(1:ltitle)
-   20    format ('HEADER',4x,a,/,'COMPND',/,'SOURCE')
+         fstr = '(''HEADER'',4x,a,/,''COMPND'',/,''SOURCE'')'
+         write (ipdb,fstr(1:37))  title(1:ltitle)
       end if
 c
 c     find the chain name and chain position for each residue
@@ -72,8 +76,35 @@ c
          if (resnam(i) .eq. 'HIP')  resnam(i) = 'HIS'
       end do
 c
-c     next, write the coordinates for each PDB atom
+c     check for large systems needing extended formatting
 c
+      atmc = 'i5'
+      if (npdb .ge. 10000)  atmc = 'i6'
+      if (npdb .ge. 100000)  atmc = 'i7'
+      resc = 'i4'
+      crdmin = 0.0d0
+      crdmax = 0.0d0
+      do i = 1, npdb
+         if (pdbtyp(i) .eq. 'ATOM  ') then
+            resnumb = resid(resnum(i))
+         else
+            resnumb = resnum(i)
+         end if
+         if (resnumb .ge. 10000)  resc = 'i5'
+         if (resnumb .ge. 100000)  resc = 'i6'
+         crdmin = min(crdmin,xpdb(i),ypdb(i),zpdb(i))
+         crdmax = max(crdmax,xpdb(i),ypdb(i),zpdb(i))
+      end do
+      crdc = '3f8.3 '
+      if (crdmin .le. -100.0d0)  crdc = '3f9.3 '
+      if (crdmax .ge. 1000.0d0)  crdc = '3f9.3 '
+      if (crdmin .le. -1000.0d0)  crdc = '3f10.3'
+      if (crdmax .ge. 10000.0d0)  crdc = '3f10.3'
+c
+c     write info and coordinates for each PDB atom
+c
+      fstr = '(a6,'//atmc//',1x,a4,1x,a3,1x,a1,'//resc//
+     &          ',4x,'//crdc//')'
       do i = 1, npdb
          resname = resnam(i)
          if (resname(2:3) .eq. '  ')  resname = '  '//resname(1:1)
@@ -85,21 +116,23 @@ c
             resnumb = resnum(i)
             chnname = ' '
          end if
-         write (ipdb,30)  pdbtyp(i),i,atmnam(i),resname,chnname,
-     &                    resnumb,xpdb(i),ypdb(i),zpdb(i)
-   30    format (a6,i5,1x,a4,1x,a3,1x,a1,i4,4x,3f8.3)
+         write (ipdb,fstr)  pdbtyp(i),i,atmnam(i),resname,chnname,
+     &                      resnumb,xpdb(i),ypdb(i),zpdb(i)
       end do
 c
-c     finally, write any connectivity records for PDB atoms
+c     write any connectivity records for PDB atoms
 c
+      fstr = '(''CONECT'',9'//atmc//')'
       do i = 1, npdb
          if (npdb12(i) .ne. 0) then
-            write (ipdb,40)  i,(ipdb12(k,i),k=1,npdb12(i))
-   40       format ('CONECT',5i5)
+            write (ipdb,fstr(1:14))  i,(ipdb12(k,i),k=1,npdb12(i))
          end if
       end do
-      write (ipdb,50)
-   50 format ('END')
-c     close (unit=ipdb)
+      fstr = '(''END'')'
+      write (ipdb,fstr(1:7))
+c
+c     close the output unit if opened by this routine
+c
+c     if (.not. opened)  close (unit=ipdb)
       return
       end

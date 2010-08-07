@@ -29,7 +29,7 @@ c
       include 'zcoord.i'
       integer i,imin,next
       integer freeunit
-      real*8 minirot1,minimum
+      real*8 minimum,minirot1
       real*8 grdmin,grms,gnorm
       real*8 xx(maxvar)
       real*8 derivs(maxrot)

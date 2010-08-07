@@ -5801,7 +5801,7 @@ c
          call table_fill
       end if
 c
-c     perform dynamic allocation of the qgrip array
+c     perform dynamic allocation of some local arrays
 c
       nullify (qgrip)
       allocate (qgrip(2,nfft1,nfft2,nfft3))
@@ -5904,7 +5904,7 @@ c
          qfac(k1,k2,k3) = expterm
       end do
 c
-c     perform deallocation of the qgrip array
+c     perform deallocation of some local arrays
 c
       deallocate (qgrip)
 c

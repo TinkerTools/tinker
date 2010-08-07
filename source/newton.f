@@ -28,7 +28,7 @@ c
       integer i,j,imin,nvar
       integer next,freeunit
       real*8 gnorm,grms,grdmin
-      real*8 newton1,minimum
+      real*8 minimum,newton1
       real*8 xx(maxvar)
       real*8 derivs(3,maxatm)
       logical exist

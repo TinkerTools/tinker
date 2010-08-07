@@ -28,7 +28,7 @@ c
       include 'usage.i'
       integer i,j,imin,nvar
       integer next,freeunit
-      real*8 minimiz1,minimum
+      real*8 minimum,minimiz1
       real*8 grdmin,gnorm,grms
       real*8 energy,eps
       real*8 xx(maxvar)

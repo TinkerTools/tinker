@@ -132,9 +132,9 @@ c
       nchk1 = 1
       nchk2 = 1
       nchk3 = 1
-      if (nthread .ge. 2)  nchk1 = 2
-      if (nthread .ge. 4)  nchk2 = 2
-      if (nthread .ge. 8)  nchk3 = 2
+      if (nthread .gt. 1)  nchk1 = 2
+      if (nthread .gt. 2)  nchk2 = 2
+      if (nthread .gt. 4)  nchk3 = 2
       ngrd1 = nfft1 / nchk1
       ngrd2 = nfft2 / nchk2
       ngrd3 = nfft3 / nchk3
@@ -176,7 +176,7 @@ c
       nullify (qfac)
       allocate (qfac(nfft1,nfft2,nfft3))
       nullify (pmetable)
-      allocate (pmetable(nchunk,n))
+      allocate (pmetable(n,nchunk))
 c
 c     initialize the PME arrays that can be precomputed
 c

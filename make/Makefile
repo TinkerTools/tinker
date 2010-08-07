@@ -111,11 +111,11 @@ LINKFLAGS = -static-intel -mmacosx-version-min=10.4
 #CC = /opt/intel/Compiler/11.1/088/bin/intel64/icc
 #LIBS = #-L/user/ponder/tinker/fftw/lib -lfftw3_threads -lfftw3 -lm
 #INC = -I/usr/include
-#F77FLAGS = -c -align all -assume cc_omp
+#F77FLAGS = -c -axSSSE3 -assume cc_omp
 #CFLAGS = -c $(INC)
-#OPTFLAGS = -O3 -axSSSE3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar
+#OPTFLAGS = -fast -no-ipo -openmp
 #LIBFLAGS = -crusv
-#LINKFLAGS = $(OPTFLAGS) $(LIBS) -mmacosx-version-min=10.4
+#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.4 $(LIBS)
 
 ##
 ##  Machine:  Macintosh

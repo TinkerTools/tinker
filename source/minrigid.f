@@ -28,7 +28,7 @@ c
       include 'rigid.i'
       integer i,j,imin,nvar
       integer next,freeunit
-      real*8 minrigid1,minimum
+      real*8 minimum,minrigid1
       real*8 grdmin,grms,gnorm
       real*8 xx(maxvar)
       real*8 derivs(6,maxgrp)

@@ -29,7 +29,7 @@ c
       integer i,imin,next
       integer freeunit
       real*8 grdmin,gnorm,grms
-      real*8 newtrot1,minimum
+      real*8 minimum,newtrot1
       real*8 xx(maxvar)
       real*8 derivs(maxrot)
       logical exist

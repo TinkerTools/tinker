@@ -192,9 +192,9 @@ c
 c
 c     zero out the PME table marking chunks per site
 c
-      do i = 1, n
-         do k = 1, nchunk
-            pmetable(k,i) = 0
+      do k = 1, nchunk
+         do i = 1, n
+            pmetable(i,k) = 0
          end do
       end do
 c
@@ -244,7 +244,7 @@ c
 c     set and store central chunk where the site is located
 c
          k = (cid(3)-1)*nchk1*nchk2 + (cid(2)-1)*nchk1 + cid(1)
-         pmetable(k,i) = 1
+         pmetable(i,k) = 1
 c
 c     flags for atom bounds to left or right of central chunk
 c
@@ -335,7 +335,7 @@ c
       if (temp(3) .lt. 1)  temp(3) = nchk3
       if (temp(3) .gt. nchk3)  temp(3) = 1
       k = (temp(3)-1)*nchk1*nchk2 + (temp(2)-1)*nchk1 + temp(1)
-      pmetable(k,i) = 1
+      pmetable(i,k) = 1
       return
       end
 c
@@ -405,7 +405,7 @@ c
          cbound(5) = cid(3)*ngrd3 + 1
          cbound(6) = cbound(5) + ngrd3 - 1
          do ii = 1, n
-            if (pmetable(jj,ii) .eq. 1) then
+            if (pmetable(ii,jj) .eq. 1) then
                nearpt(1) = igrid(1,ii) + grdoff
                nearpt(2) = igrid(2,ii) + grdoff
                nearpt(3) = igrid(3,ii) + grdoff
@@ -415,23 +415,23 @@ c
                abound(4) = nearpt(2) + nrpts
                abound(5) = nearpt(3) - nlpts
                abound(6) = nearpt(3) + nrpts
-               call adjust_bounds (offsetx,nfft1,nchk1,abound(1),
-     &                             abound(2),cbound(1),cbound(2))
-               call adjust_bounds (offsety,nfft2,nchk2,abound(3),
-     &                             abound(4),cbound(3),cbound(4))
-               call adjust_bounds (offsetz,nfft3,nchk3,abound(5),
-     &                             abound(6),cbound(5),cbound(6))
+               call adjust (offsetx,nfft1,nchk1,abound(1),
+     &                        abound(2),cbound(1),cbound(2))
+               call adjust (offsety,nfft2,nchk2,abound(3),
+     &                        abound(4),cbound(3),cbound(4))
+               call adjust (offsetz,nfft3,nchk3,abound(5),
+     &                        abound(6),cbound(5),cbound(6))
                do kkk = abound(5), abound(6)
                   k = kkk
                   m = k + offsetz
-                  if (k .lt. 1)   k = k + nfft3
+                  if (k .lt. 1)  k = k + nfft3
                   v0 = thetai3(1,m,ii)
                   v1 = thetai3(2,m,ii)
                   v2 = thetai3(3,m,ii)
                   do jjj = abound(3), abound(4)
                      j = jjj
                      m = j + offsety
-                     if (j .lt. 1)   j = j + nfft2
+                     if (j .lt. 1)  j = j + nfft2
                      u0 = thetai2(1,m,ii)
                      u1 = thetai2(2,m,ii)
                      u2 = thetai2(3,m,ii)
@@ -444,7 +444,7 @@ c
                      do iii = abound(1), abound(2)
                         i = iii
                         m = i + offsetx
-                        if (i .lt. 1)   i = i + nfft1
+                        if (i .lt. 1)  i = i + nfft1
                         t0 = thetai1(1,m,ii)
                         t1 = thetai1(2,m,ii)
                         t2 = thetai1(3,m,ii)
@@ -531,7 +531,7 @@ c
          cbound(5) = cid(3)*ngrd3 + 1
          cbound(6) = cbound(5) + ngrd3 - 1
          do ii = 1, n
-            if (pmetable(jj,ii) .eq. 1) then
+            if (pmetable(ii,jj) .eq. 1) then
                nearpt(1) = igrid(1,ii) + grdoff
                nearpt(2) = igrid(2,ii) + grdoff
                nearpt(3) = igrid(3,ii) + grdoff
@@ -541,22 +541,22 @@ c
                abound(4) = nearpt(2) + nrpts
                abound(5) = nearpt(3) - nlpts
                abound(6) = nearpt(3) + nrpts
-               call adjust_bounds (offsetx,nfft1,nchk1,abound(1),
-     &                             abound(2),cbound(1),cbound(2))
-               call adjust_bounds (offsety,nfft2,nchk2,abound(3),
-     &                             abound(4),cbound(3),cbound(4))
-               call adjust_bounds (offsetz,nfft3,nchk3,abound(5),
-     &                             abound(6),cbound(5),cbound(6))
+               call adjust (offsetx,nfft1,nchk1,abound(1),
+     &                        abound(2),cbound(1),cbound(2))
+               call adjust (offsety,nfft2,nchk2,abound(3),
+     &                        abound(4),cbound(3),cbound(4))
+               call adjust (offsetz,nfft3,nchk3,abound(5),
+     &                        abound(6),cbound(5),cbound(6))
                do kkk = abound(5), abound(6)
                   k = kkk
                   m = k + offsetz
-                  if (k .lt. 1)   k = k + nfft3
+                  if (k .lt. 1)  k = k + nfft3
                   v0 = thetai3(1,m,ii)
                   v1 = thetai3(2,m,ii)
                   do jjj = abound(3), abound(4)
                      j = jjj
                      m = j + offsety
-                     if (j .lt. 1)   j = j + nfft2
+                     if (j .lt. 1)  j = j + nfft2
                      u0 = thetai2(1,m,ii)
                      u1 = thetai2(2,m,ii)
                      term01 = fuind(2,ii)*u1*v0 + fuind(3,ii)*u0*v1
@@ -566,7 +566,7 @@ c
                      do iii = abound(1), abound(2)
                         i = iii
                         m = i + offsetx
-                        if (i .lt. 1)   i = i + nfft1
+                        if (i .lt. 1)  i = i + nfft1
                         t0 = thetai1(1,m,ii)
                         t1 = thetai1(2,m,ii)
                         qgrid(1,i,j,k) = qgrid(1,i,j,k) + term01*t0
@@ -588,18 +588,18 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine adjust_bounds  --  alter PME grid site bounds  ##
-c     ##                                                            ##
-c     ################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine adjust  --  alter site bounds for the PME grid  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "adjust_bounds" modifies site bounds on the PME grid and
-c     returns an offset into the B-spline coefficient arrays
+c     "adjust" modifies site bounds on the PME grid and returns
+c     an offset into the B-spline coefficient arrays
 c
 c
-      subroutine adjust_bounds (offset,nfft,nchk,amin,amax,cmin,cmax)
+      subroutine adjust (offset,nfft,nchk,amin,amax,cmin,cmax)
       implicit none
       integer offset
       integer nfft,nchk
