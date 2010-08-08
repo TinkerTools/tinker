@@ -65,13 +65,13 @@ fast_install=needless
 
 # The host system.
 host_alias=
-host=i386-apple-darwin10.3.0
-host_os=darwin10.3.0
+host=i386-apple-darwin10.4.0
+host_os=darwin10.4.0
 
 # The build system.
 build_alias=
-build=i386-apple-darwin10.3.0
-build_os=darwin10.3.0
+build=i386-apple-darwin10.4.0
+build_os=darwin10.4.0
 
 # A sed program that does not truncate output.
 SED="/usr/bin/sed"

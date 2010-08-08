@@ -95,20 +95,20 @@ c
          if (modstep .eq. 1) then
             if (use_bounds .and. integrate.ne.'STOCHASTIC') then
                write (iout,10)
-   10          format (/,'    MD Step      E Total   E Potential',
-     &                    '   E Kinetic       Temp       Pres',/)
+   10          format (/,4x,'MD Step',6x,'E Total',3x,'E Potential',
+     &                    5x,'E Kinetic',7x,'Temp',7x,'Pres',/)
             else
                write (iout,20)
-   20          format (/,'    MD Step      E Total   E Potential',
-     &                    '   E Kinetic       Temp',/)
+   20          format (/,4x,'MD Step',6x,'E Total',3x,'E Potential',
+     &                    5x,'E Kinetic',7x,'Temp',/)
             end if
          end if
          if (use_bounds .and. integrate.ne.'STOCHASTIC') then
             write (iout,30)  istep,etot,epot,ekin,temp,pres
-   30       format (i10,2f14.4,f12.4,2f11.2)
+   30       format (i10,3f14.4,2f11.2)
          else
             write (iout,40)  istep,etot,epot,ekin,temp
-   40       format (i10,2f14.4,f12.4,f11.2)
+   40       format (i10,3f14.4,f11.2)
          end if
       end if
 c
