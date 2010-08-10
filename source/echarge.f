@@ -1569,36 +1569,27 @@ c
       subroutine ecrecip
       implicit none
       include 'sizes.i'
-      include 'atoms.i'
       include 'bound.i'
       include 'boxes.i'
-      include 'charge.i'
       include 'chgpot.i'
       include 'energi.i'
       include 'ewald.i'
       include 'math.i'
       include 'pme.i'
-      integer i,j,k,m,ii
-      integer i0,j0,k0
-      integer it1,it2,it3
+      integer i,j,k
       integer k1,k2,k3
       integer m1,m2,m3
       integer nf1,nf2,nf3
-      integer ifr,nff,npoint
-      real*8 xi,yi,zi
-      real*8 fr,w,denom
-      real*8 e,term,expterm
+      integer nff,npoint
+      real*8 e,f,denom
+      real*8 term,expterm
       real*8 pterm,volterm
-      real*8 f,hsq,struc2
-      real*8 t1,t2,t3
+      real*8 hsq,struc2
       real*8 h1,h2,h3
       real*8 r1,r2,r3
-      real*8 theta1(maxorder,maxatm)
-      real*8 theta2(maxorder,maxatm)
-      real*8 theta3(maxorder,maxatm)
 c
 c
-c     zero out the particle mesh Ewald charge grid
+c     zero out the particle mesh Ewald grid values
 c
       do k = 1, nfft3
          do j = 1, nfft2
@@ -1609,58 +1600,11 @@ c
          end do
       end do
 c
-c     get the B-spline coefficients for each charge site
+c     get B-spline coefficients and put charges onto grid
 c
-      do ii = 1, nion
-         i = iion(ii)
-         xi = x(i)
-         yi = y(i)
-         zi = z(i)
-         w = xi*recip(1,1) + yi*recip(2,1) + zi*recip(3,1)
-         fr = dble(nfft1) * (w-anint(w)+0.5d0)
-         ifr = int(fr)
-         w = fr - dble(ifr)
-         igrid(1,i) = ifr - bsorder
-         call bspline (w,bsorder,theta1(1,i))
-         w = xi*recip(1,2) + yi*recip(2,2) + zi*recip(3,2)
-         fr = dble(nfft2) * (w-anint(w)+0.5d0)
-         ifr = int(fr)
-         w = fr - dble(ifr)
-         igrid(2,i) = ifr - bsorder
-         call bspline (w,bsorder,theta2(1,i))
-         w = xi*recip(1,3) + yi*recip(2,3) + zi*recip(3,3)
-         fr = dble(nfft3) * (w-anint(w)+0.5d0)
-         ifr = int(fr)
-         w = fr - dble(ifr)
-         igrid(3,i) = ifr - bsorder
-         call bspline (w,bsorder,theta3(1,i))
-      end do
-c
-c     put the atomic partial charges onto the grid
-c
-      do ii = 1, nion
-         m = iion(ii)
-         k0 = igrid(3,m)
-         do it3 = 1, bsorder
-            k0 = k0 + 1
-            k = k0 + 1 + (nfft3-sign(nfft3,k0))/2
-            t3 = theta3(it3,m) * pchg(ii)
-            j0 = igrid(2,m)
-            do it2 = 1, bsorder
-               j0 = j0 + 1
-               j = j0 + 1 + (nfft2-sign(nfft2,j0))/2
-               t2 = theta2(it2,m)
-               term = t2 * t3
-               i0 = igrid(1,m)
-               do it1 = 1, bsorder
-                  i0 = i0 + 1
-                  i = i0 + 1 + (nfft1-sign(nfft1,i0))/2
-                  t1 = theta1(it1,m)
-                  qgrid(1,i,j,k) = qgrid(1,i,j,k) + term*t1
-               end do
-            end do
-         end do
-      end do
+      call bspline_fill
+      call table_fill
+      call grid_pchg
 c
 c     perform the 3-D FFT forward transformation
 c

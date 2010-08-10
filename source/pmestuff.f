@@ -22,7 +22,7 @@ c     ##################################################################
 c
 c
 c     "bspline_fill" finds B-spline coefficients and derivatives
-c     for electrostatic sites along the fractional coordinate axes
+c     for PME atomic sites along the fractional coordinate axes
 c
 c
       subroutine bspline_fill
@@ -30,131 +30,142 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'boxes.i'
-      include 'mpole.i'
       include 'pme.i'
       integer i,ii,ifr
       real*8 w,fr
+      real*8 xi,yi,zi
 c
 c
-c     get the B-spline coefficients for each multipole site
+c     get the B-spline coefficients for each atomic site
 c
-      do i = 1, npole
-         ii = ipole(i)
-         w = x(ii)*recip(1,1) + y(ii)*recip(2,1) + z(ii)*recip(3,1)
+      do i = 1, n
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         w = xi*recip(1,1) + yi*recip(2,1) + zi*recip(3,1)
          fr = dble(nfft1) * (w-anint(w)+0.5d0)
          ifr = int(fr)
          w = fr - dble(ifr)
          igrid(1,i) = ifr - bsorder
-         call bspline_gen (w,thetai1(1,1,i))
-         w = x(ii)*recip(1,2) + y(ii)*recip(2,2) + z(ii)*recip(3,2)
+         call bsplgen (w,thetai1(1,1,i))
+         w = xi*recip(1,2) + yi*recip(2,2) + zi*recip(3,2)
          fr = dble(nfft2) * (w-anint(w)+0.5d0)
          ifr = int(fr)
          w = fr - dble(ifr)
          igrid(2,i) = ifr - bsorder
-         call bspline_gen (w,thetai2(1,1,i))
-         w = x(ii)*recip(1,3) + y(ii)*recip(2,3) + z(ii)*recip(3,3)
+         call bsplgen (w,thetai2(1,1,i))
+         w = xi*recip(1,3) + yi*recip(2,3) + zi*recip(3,3)
          fr = dble(nfft3) * (w-anint(w)+0.5d0)
          ifr = int(fr)
          w = fr - dble(ifr)
          igrid(3,i) = ifr - bsorder
-         call bspline_gen (w,thetai3(1,1,i))
+         call bsplgen (w,thetai3(1,1,i))
       end do
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine bspline_gen  --  single-site B-spline coeffs  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine bsplgen  --  B-spline coefficients for an atom  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "bspline_gen" gets B-spline coefficients and derivatives for
-c     a single electrostatic site along a particular direction
+c     "bsplgen" gets B-spline coefficients and derivatives for
+c     a single PME atomic site along a particular direction
 c
 c
-      subroutine bspline_gen (w,thetai)
+      subroutine bsplgen (w,thetai)
       implicit none
       include 'sizes.i'
       include 'pme.i'
+      include 'potent.i'
       integer i,j,k
+      integer level
       real*8 w,denom
       real*8 thetai(4,maxorder)
-      real*8 array(maxorder,maxorder)
+      real*8 temp(maxorder,maxorder)
 c
+c
+c     set B-spline depth for partial charges or multipoles
+c
+      level = 2
+      if (use_mpole .or. use_polar)  level = 4
 c
 c     initialization to get to 2nd order recursion
 c
-      array(2,2) = w
-      array(2,1) = 1.0d0 - w
+      temp(2,2) = w
+      temp(2,1) = 1.0d0 - w
 c
 c     perform one pass to get to 3rd order recursion
 c
-      array(3,3) = 0.5d0 * w * array(2,2)
-      array(3,2) = 0.5d0 * ((1.0d0+w)*array(2,1)+(2.0d0-w)*array(2,2))
-      array(3,1) = 0.5d0 * (1.0d0-w) * array(2,1)
+      temp(3,3) = 0.5d0 * w * temp(2,2)
+      temp(3,2) = 0.5d0 * ((1.0d0+w)*temp(2,1)+(2.0d0-w)*temp(2,2))
+      temp(3,1) = 0.5d0 * (1.0d0-w) * temp(2,1)
 c
 c     compute standard B-spline recursion to desired order
 c
       do i = 4, bsorder
          k = i - 1
          denom = 1.0d0 / dble(k)
-         array(i,i) = denom * w * array(k,k)
+         temp(i,i) = denom * w * temp(k,k)
          do j = 1, i-2
-            array(i,i-j) = denom * ((w+dble(j))*array(k,i-j-1)
-     &                             +(dble(i-j)-w)*array(k,i-j))
+            temp(i,i-j) = denom * ((w+dble(j))*temp(k,i-j-1)
+     &                             +(dble(i-j)-w)*temp(k,i-j))
          end do
-         array(i,1) = denom * (1.0d0-w) * array(k,1)
+         temp(i,1) = denom * (1.0d0-w) * temp(k,1)
       end do
 c
 c     get coefficients for the B-spline first derivative
 c
       k = bsorder - 1
-      array(k,bsorder) = array(k,bsorder-1)
+      temp(k,bsorder) = temp(k,bsorder-1)
       do i = bsorder-1, 2, -1
-         array(k,i) = array(k,i-1) - array(k,i)
+         temp(k,i) = temp(k,i-1) - temp(k,i)
       end do
-      array(k,1) = -array(k,1)
+      temp(k,1) = -temp(k,1)
 c
 c     get coefficients for the B-spline second derivative
 c
-      k = bsorder - 2
-      array(k,bsorder-1) = array(k,bsorder-2)
-      do i = bsorder-2, 2, -1
-         array(k,i) = array(k,i-1) - array(k,i)
-      end do
-      array(k,1) = -array(k,1)
-      array(k,bsorder) = array(k,bsorder-1)
-      do i = bsorder-1, 2, -1
-         array(k,i) = array(k,i-1) - array(k,i)
-      end do
-      array(k,1) = -array(k,1)
+      if (level .eq. 4) then
+         k = bsorder - 2
+         temp(k,bsorder-1) = temp(k,bsorder-2)
+         do i = bsorder-2, 2, -1
+            temp(k,i) = temp(k,i-1) - temp(k,i)
+         end do
+         temp(k,1) = -temp(k,1)
+         temp(k,bsorder) = temp(k,bsorder-1)
+         do i = bsorder-1, 2, -1
+            temp(k,i) = temp(k,i-1) - temp(k,i)
+         end do
+         temp(k,1) = -temp(k,1)
 c
 c     get coefficients for the B-spline third derivative
 c
-      k = bsorder - 3
-      array(k,bsorder-2) = array(k,bsorder-3)
-      do i = bsorder-3, 2, -1
-         array(k,i) = array(k,i-1) - array(k,i)
-      end do
-      array(k,1) = -array(k,1)
-      array(k,bsorder-1) = array(k,bsorder-2)
-      do i = bsorder-2, 2, -1
-         array(k,i) = array(k,i-1) - array(k,i)
-      end do
-      array(k,1) = -array(k,1)
-      array(k,bsorder) = array(k,bsorder-1)
-      do i = bsorder-1, 2, -1
-         array(k,i) = array(k,i-1) - array(k,i)
-      end do
-      array(k,1) = -array(k,1)
+         k = bsorder - 3
+         temp(k,bsorder-2) = temp(k,bsorder-3)
+         do i = bsorder-3, 2, -1
+            temp(k,i) = temp(k,i-1) - temp(k,i)
+         end do
+         temp(k,1) = -temp(k,1)
+         temp(k,bsorder-1) = temp(k,bsorder-2)
+         do i = bsorder-2, 2, -1
+            temp(k,i) = temp(k,i-1) - temp(k,i)
+         end do
+         temp(k,1) = -temp(k,1)
+         temp(k,bsorder) = temp(k,bsorder-1)
+         do i = bsorder-1, 2, -1
+            temp(k,i) = temp(k,i-1) - temp(k,i)
+         end do
+         temp(k,1) = -temp(k,1)
+      end if
 c
 c     copy coefficients from temporary to permanent storage
 c
       do i = 1, bsorder
-         do j = 1, 4
-            thetai(j,i) = array(bsorder-j+1,i)
+         do j = 1, level
+            thetai(j,i) = temp(bsorder-j+1,i)
          end do
       end do
       return
@@ -340,6 +351,117 @@ c
       end
 c
 c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine grid_pchg  --  put partial charges on PME grid  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "grid_pchg" places the fractional atomic partial charges onto
+c     the particle mesh Ewald grid
+c
+c
+      subroutine grid_pchg
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'charge.i'
+      include 'chunks.i'
+      include 'pme.i'
+      integer i,j,k,m
+      integer ii,jj,kk
+      integer ichk,isite,iatm
+      integer offsetx,offsety
+      integer offsetz
+      integer cid(3)
+      integer nearpt(3)
+      integer abound(6)
+      integer cbound(6)
+      real*8 v0,u0,t0
+      real*8 term
+c
+c
+c     zero out the particle mesh Ewald charge grid
+c
+      do k = 1, nfft3
+         do j = 1, nfft2
+            do i = 1, nfft1
+               qgrid(1,i,j,k) = 0.0d0
+               qgrid(2,i,j,k) = 0.0d0
+            end do
+         end do
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,u0,term,t0)
+!$OMP DO
+c
+c     put the permanent multipole moments onto the grid
+c
+      do ichk = 1, nchunk
+         cid(1) = mod(ichk-1,nchk1)
+         cid(2) = mod(((ichk-1-cid(1))/nchk1),nchk2)
+         cid(3) = mod((ichk-1)/(nchk1*nchk2),nchk3)
+         cbound(1) = cid(1)*ngrd1 + 1
+         cbound(2) = cbound(1) + ngrd1 - 1
+         cbound(3) = cid(2)*ngrd2 + 1
+         cbound(4) = cbound(3) + ngrd2 - 1
+         cbound(5) = cid(3)*ngrd3 + 1
+         cbound(6) = cbound(5) + ngrd3 - 1
+         do isite = 1, nion
+            iatm = iion(isite)
+            if (pmetable(iatm,ichk) .eq. 1) then
+               nearpt(1) = igrid(1,iatm) + grdoff
+               nearpt(2) = igrid(2,iatm) + grdoff
+               nearpt(3) = igrid(3,iatm) + grdoff
+               abound(1) = nearpt(1) - nlpts
+               abound(2) = nearpt(1) + nrpts
+               abound(3) = nearpt(2) - nlpts
+               abound(4) = nearpt(2) + nrpts
+               abound(5) = nearpt(3) - nlpts
+               abound(6) = nearpt(3) + nrpts
+               call adjust (offsetx,nfft1,nchk1,abound(1),
+     &                        abound(2),cbound(1),cbound(2))
+               call adjust (offsety,nfft2,nchk2,abound(3),
+     &                        abound(4),cbound(3),cbound(4))
+               call adjust (offsetz,nfft3,nchk3,abound(5),
+     &                        abound(6),cbound(5),cbound(6))
+               do kk = abound(5), abound(6)
+                  k = kk
+                  m = k + offsetz
+                  if (k .lt. 1)  k = k + nfft3
+                  v0 = thetai3(1,m,iatm) * pchg(isite)
+                  do jj = abound(3), abound(4)
+                     j = jj
+                     m = j + offsety
+                     if (j .lt. 1)  j = j + nfft2
+                     u0 = thetai2(1,m,iatm)
+                     term = v0 * u0
+                     do ii = abound(1), abound(2)
+                        i = ii
+                        m = i + offsetx
+                        if (i .lt. 1)  i = i + nfft1
+                        t0 = thetai1(1,m,iatm)
+                        qgrid(1,i,j,k) = qgrid(1,i,j,k) + term*t0
+                     end do
+                  end do
+               end do
+            end if
+         end do
+      end do
+c
+c     end OpenMP directive for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine grid_mpole  --  put multipoles on PME grid  ##
@@ -359,8 +481,8 @@ c
       include 'mpole.i'
       include 'pme.i'
       integer i,j,k,m
-      integer ii,jj
-      integer iii,jjj,kkk
+      integer ii,jj,kk
+      integer ichk,isite,iatm
       integer offsetx,offsety
       integer offsetz
       integer cid(3)
@@ -387,28 +509,29 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,iii,jjj,kkk,
-!$OMP& cid,nearpt,cbound,abound,offsetx,offsety,offsetz,
-!$OMP& v0,v1,v2,u0,u1,u2,term0,term1,term2,t0,t1,t2)
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,v1,v2,u0,u1,u2,term0,term1,term2,t0,t1,t2)
 !$OMP DO
 c
 c     put the permanent multipole moments onto the grid
 c
-      do jj = 1, nchunk
-         cid(1) = mod(jj-1,nchk1)
-         cid(2) = mod(((jj-1-cid(1))/nchk1),nchk2)
-         cid(3) = mod((jj-1)/(nchk1*nchk2),nchk3)
+      do ichk = 1, nchunk
+         cid(1) = mod(ichk-1,nchk1)
+         cid(2) = mod(((ichk-1-cid(1))/nchk1),nchk2)
+         cid(3) = mod((ichk-1)/(nchk1*nchk2),nchk3)
          cbound(1) = cid(1)*ngrd1 + 1
          cbound(2) = cbound(1) + ngrd1 - 1
          cbound(3) = cid(2)*ngrd2 + 1
          cbound(4) = cbound(3) + ngrd2 - 1
          cbound(5) = cid(3)*ngrd3 + 1
          cbound(6) = cbound(5) + ngrd3 - 1
-         do ii = 1, n
-            if (pmetable(ii,jj) .eq. 1) then
-               nearpt(1) = igrid(1,ii) + grdoff
-               nearpt(2) = igrid(2,ii) + grdoff
-               nearpt(3) = igrid(3,ii) + grdoff
+         do isite = 1, npole
+            iatm = ipole(isite)
+            if (pmetable(iatm,ichk) .eq. 1) then
+               nearpt(1) = igrid(1,iatm) + grdoff
+               nearpt(2) = igrid(2,iatm) + grdoff
+               nearpt(3) = igrid(3,iatm) + grdoff
                abound(1) = nearpt(1) - nlpts
                abound(2) = nearpt(1) + nrpts
                abound(3) = nearpt(2) - nlpts
@@ -421,33 +544,33 @@ c
      &                        abound(4),cbound(3),cbound(4))
                call adjust (offsetz,nfft3,nchk3,abound(5),
      &                        abound(6),cbound(5),cbound(6))
-               do kkk = abound(5), abound(6)
-                  k = kkk
+               do kk = abound(5), abound(6)
+                  k = kk
                   m = k + offsetz
                   if (k .lt. 1)  k = k + nfft3
-                  v0 = thetai3(1,m,ii)
-                  v1 = thetai3(2,m,ii)
-                  v2 = thetai3(3,m,ii)
-                  do jjj = abound(3), abound(4)
-                     j = jjj
+                  v0 = thetai3(1,m,iatm)
+                  v1 = thetai3(2,m,iatm)
+                  v2 = thetai3(3,m,iatm)
+                  do jj = abound(3), abound(4)
+                     j = jj
                      m = j + offsety
                      if (j .lt. 1)  j = j + nfft2
-                     u0 = thetai2(1,m,ii)
-                     u1 = thetai2(2,m,ii)
-                     u2 = thetai2(3,m,ii)
-                     term0 = fmp(1,ii)*u0*v0 + fmp(3,ii)*u1*v0
-     &                          + fmp(4,ii)*u0*v1 + fmp(6,ii)*u2*v0
-     &                          + fmp(7,ii)*u0*v2 + fmp(10,ii)*u1*v1
-                     term1 = fmp(2,ii)*u0*v0 + fmp(8,ii)*u1*v0
-     &                          + fmp(9,ii)*u0*v1
-                     term2 = fmp(5,ii) * u0 * v0
-                     do iii = abound(1), abound(2)
-                        i = iii
+                     u0 = thetai2(1,m,iatm)
+                     u1 = thetai2(2,m,iatm)
+                     u2 = thetai2(3,m,iatm)
+                     term0 = fmp(1,isite)*u0*v0 + fmp(3,isite)*u1*v0
+     &                     + fmp(4,isite)*u0*v1 + fmp(6,isite)*u2*v0
+     &                     + fmp(7,isite)*u0*v2 + fmp(10,isite)*u1*v1
+                     term1 = fmp(2,isite)*u0*v0 + fmp(8,isite)*u1*v0
+     &                          + fmp(9,isite)*u0*v1
+                     term2 = fmp(5,isite) * u0 * v0
+                     do ii = abound(1), abound(2)
+                        i = ii
                         m = i + offsetx
                         if (i .lt. 1)  i = i + nfft1
-                        t0 = thetai1(1,m,ii)
-                        t1 = thetai1(2,m,ii)
-                        t2 = thetai1(3,m,ii)
+                        t0 = thetai1(1,m,iatm)
+                        t1 = thetai1(2,m,iatm)
+                        t2 = thetai1(3,m,iatm)
                         qgrid(1,i,j,k) = qgrid(1,i,j,k) + term0*t0
      &                                      + term1*t1 + term2*t2
                      end do
@@ -484,8 +607,8 @@ c
       include 'mpole.i'
       include 'pme.i'
       integer i,j,k,m
-      integer ii,jj
-      integer iii,jjj,kkk
+      integer ii,jj,kk
+      integer ichk,isite,iatm
       integer offsetx,offsety
       integer offsetz
       integer cid(3)
@@ -513,28 +636,29 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,iii,jjj,kkk,
-!$OMP& cid,nearpt,cbound,abound,offsetx,offsety,offsetz,
-!$OMP& v0,v1,u0,u1,term01,term11,term02,term12,t0,t1)
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,v1,u0,u1,term01,term11,term02,term12,t0,t1)
 !$OMP DO
 c
 c     put the induced dipole moments onto the grid
 c
-      do jj = 1, nchunk
-         cid(1) = mod(jj-1,nchk1)
-         cid(2) = mod(((jj-1-cid(1))/nchk1),nchk2)
-         cid(3) = mod((jj-1)/(nchk1*nchk2),nchk3)
+      do ichk = 1, nchunk
+         cid(1) = mod(ichk-1,nchk1)
+         cid(2) = mod(((ichk-1-cid(1))/nchk1),nchk2)
+         cid(3) = mod((ichk-1)/(nchk1*nchk2),nchk3)
          cbound(1) = cid(1)*ngrd1 + 1
          cbound(2) = cbound(1) + ngrd1 - 1
          cbound(3) = cid(2)*ngrd2 + 1
          cbound(4) = cbound(3) + ngrd2 - 1
          cbound(5) = cid(3)*ngrd3 + 1
          cbound(6) = cbound(5) + ngrd3 - 1
-         do ii = 1, n
-            if (pmetable(ii,jj) .eq. 1) then
-               nearpt(1) = igrid(1,ii) + grdoff
-               nearpt(2) = igrid(2,ii) + grdoff
-               nearpt(3) = igrid(3,ii) + grdoff
+         do isite = 1, npole
+            iatm = ipole(isite)
+            if (pmetable(iatm,ichk) .eq. 1) then
+               nearpt(1) = igrid(1,iatm) + grdoff
+               nearpt(2) = igrid(2,iatm) + grdoff
+               nearpt(3) = igrid(3,iatm) + grdoff
                abound(1) = nearpt(1) - nlpts
                abound(2) = nearpt(1) + nrpts
                abound(3) = nearpt(2) - nlpts
@@ -547,28 +671,30 @@ c
      &                        abound(4),cbound(3),cbound(4))
                call adjust (offsetz,nfft3,nchk3,abound(5),
      &                        abound(6),cbound(5),cbound(6))
-               do kkk = abound(5), abound(6)
-                  k = kkk
+               do kk = abound(5), abound(6)
+                  k = kk
                   m = k + offsetz
                   if (k .lt. 1)  k = k + nfft3
-                  v0 = thetai3(1,m,ii)
-                  v1 = thetai3(2,m,ii)
-                  do jjj = abound(3), abound(4)
-                     j = jjj
+                  v0 = thetai3(1,m,iatm)
+                  v1 = thetai3(2,m,iatm)
+                  do jj = abound(3), abound(4)
+                     j = jj
                      m = j + offsety
                      if (j .lt. 1)  j = j + nfft2
-                     u0 = thetai2(1,m,ii)
-                     u1 = thetai2(2,m,ii)
-                     term01 = fuind(2,ii)*u1*v0 + fuind(3,ii)*u0*v1
-                     term11 = fuind(1,ii)*u0*v0
-                     term02 = fuinp(2,ii)*u1*v0 + fuinp(3,ii)*u0*v1
-                     term12 = fuinp(1,ii)*u0*v0
-                     do iii = abound(1), abound(2)
-                        i = iii
+                     u0 = thetai2(1,m,iatm)
+                     u1 = thetai2(2,m,iatm)
+                     term01 = fuind(2,isite)*u1*v0
+     &                           + fuind(3,isite)*u0*v1
+                     term11 = fuind(1,isite)*u0*v0
+                     term02 = fuinp(2,isite)*u1*v0
+     &                           + fuinp(3,isite)*u0*v1
+                     term12 = fuinp(1,isite)*u0*v0
+                     do ii = abound(1), abound(2)
+                        i = ii
                         m = i + offsetx
                         if (i .lt. 1)  i = i + nfft1
-                        t0 = thetai1(1,m,ii)
-                        t1 = thetai1(2,m,ii)
+                        t0 = thetai1(1,m,iatm)
+                        t1 = thetai1(2,m,iatm)
                         qgrid(1,i,j,k) = qgrid(1,i,j,k) + term01*t0
      &                                      + term11*t1
                         qgrid(2,i,j,k) = qgrid(2,i,j,k) + term02*t0
@@ -651,7 +777,8 @@ c
       include 'sizes.i'
       include 'mpole.i'
       include 'pme.i'
-      integer i,j,k,m
+      integer i,j,k
+      integer isite,iatm
       integer i0,j0,k0
       integer it1,it2,it3
       integer igrd0,jgrd0,kgrd0
@@ -670,16 +797,17 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,igrid,bsorder,
+!$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
 !$OMP& nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,fphi)
 !$OMP DO
 c
 c     extract the permanent multipole field at each site
 c
-      do m = 1, npole
-         igrd0 = igrid(1,m)
-         jgrd0 = igrid(2,m)
-         kgrd0 = igrid(3,m)
+      do isite = 1, npole
+         iatm = ipole(isite)
+         igrd0 = igrid(1,iatm)
+         jgrd0 = igrid(2,iatm)
+         kgrd0 = igrid(3,iatm)
          tuv000 = 0.0d0
          tuv001 = 0.0d0
          tuv010 = 0.0d0
@@ -704,10 +832,10 @@ c
          do it3 = 1, bsorder
             k0 = k0 + 1
             k = k0 + 1 + (nfft3-isign(nfft3,k0))/2
-            v0 = thetai3(1,it3,m)
-            v1 = thetai3(2,it3,m)
-            v2 = thetai3(3,it3,m)
-            v3 = thetai3(4,it3,m)
+            v0 = thetai3(1,it3,iatm)
+            v1 = thetai3(2,it3,iatm)
+            v2 = thetai3(3,it3,iatm)
+            v3 = thetai3(4,it3,iatm)
             tu00 = 0.0d0
             tu10 = 0.0d0
             tu01 = 0.0d0
@@ -722,10 +850,10 @@ c
             do it2 = 1, bsorder
                j0 = j0 + 1
                j = j0 + 1 + (nfft2-isign(nfft2,j0))/2
-               u0 = thetai2(1,it2,m)
-               u1 = thetai2(2,it2,m)
-               u2 = thetai2(3,it2,m)
-               u3 = thetai2(4,it2,m)
+               u0 = thetai2(1,it2,iatm)
+               u1 = thetai2(2,it2,iatm)
+               u2 = thetai2(3,it2,iatm)
+               u3 = thetai2(4,it2,iatm)
                t0 = 0.0d0
                t1 = 0.0d0
                t2 = 0.0d0
@@ -735,10 +863,10 @@ c
                   i0 = i0 + 1
                   i = i0 + 1 + (nfft1-isign(nfft1,i0))/2
                   tq = qgrid(1,i,j,k)
-                  t0 = t0 + tq*thetai1(1,it1,m)
-                  t1 = t1 + tq*thetai1(2,it1,m)
-                  t2 = t2 + tq*thetai1(3,it1,m)
-                  t3 = t3 + tq*thetai1(4,it1,m)
+                  t0 = t0 + tq*thetai1(1,it1,iatm)
+                  t1 = t1 + tq*thetai1(2,it1,iatm)
+                  t2 = t2 + tq*thetai1(3,it1,iatm)
+                  t3 = t3 + tq*thetai1(4,it1,iatm)
                end do
                tu00 = tu00 + t0*u0
                tu10 = tu10 + t1*u0
@@ -772,26 +900,26 @@ c
             tuv012 = tuv012 + tu01*v2
             tuv111 = tuv111 + tu11*v1
          end do
-         fphi(1,m) = tuv000
-         fphi(2,m) = tuv100
-         fphi(3,m) = tuv010
-         fphi(4,m) = tuv001
-         fphi(5,m) = tuv200
-         fphi(6,m) = tuv020
-         fphi(7,m) = tuv002
-         fphi(8,m) = tuv110
-         fphi(9,m) = tuv101
-         fphi(10,m) = tuv011
-         fphi(11,m) = tuv300
-         fphi(12,m) = tuv030
-         fphi(13,m) = tuv003
-         fphi(14,m) = tuv210
-         fphi(15,m) = tuv201
-         fphi(16,m) = tuv120
-         fphi(17,m) = tuv021
-         fphi(18,m) = tuv102
-         fphi(19,m) = tuv012
-         fphi(20,m) = tuv111
+         fphi(1,isite) = tuv000
+         fphi(2,isite) = tuv100
+         fphi(3,isite) = tuv010
+         fphi(4,isite) = tuv001
+         fphi(5,isite) = tuv200
+         fphi(6,isite) = tuv020
+         fphi(7,isite) = tuv002
+         fphi(8,isite) = tuv110
+         fphi(9,isite) = tuv101
+         fphi(10,isite) = tuv011
+         fphi(11,isite) = tuv300
+         fphi(12,isite) = tuv030
+         fphi(13,isite) = tuv003
+         fphi(14,isite) = tuv210
+         fphi(15,isite) = tuv201
+         fphi(16,isite) = tuv120
+         fphi(17,isite) = tuv021
+         fphi(18,isite) = tuv102
+         fphi(19,isite) = tuv012
+         fphi(20,isite) = tuv111
       end do
 c
 c     end OpenMP directive for the major loop structure
@@ -818,7 +946,8 @@ c
       include 'sizes.i'
       include 'mpole.i'
       include 'pme.i'
-      integer i,j,k,m
+      integer i,j,k
+      integer isite,iatm
       integer i0,j0,k0
       integer it1,it2,it3
       integer igrd0,jgrd0,kgrd0
@@ -851,17 +980,18 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,igrid,
-!$OMP& bsorder,nfft3,thetai3,nfft2,thetai2,nfft1,
+!$OMP PARALLEL default(private) shared(npole,ipole,
+!$OMP& igrid,bsorder,nfft3,thetai3,nfft2,thetai2,nfft1,
 !$OMP& thetai1,qgrid,fdip_phi1,fdip_phi2,fdip_sum_phi)
 !$OMP DO
 c
 c     extract the induced dipole field at each site
 c
-      do m = 1, npole
-         igrd0 = igrid(1,m)
-         jgrd0 = igrid(2,m)
-         kgrd0 = igrid(3,m)
+      do isite = 1, npole
+         iatm = ipole(isite)
+         igrd0 = igrid(1,iatm)
+         jgrd0 = igrid(2,iatm)
+         kgrd0 = igrid(3,iatm)
          tuv100_1 = 0.0d0
          tuv010_1 = 0.0d0
          tuv001_1 = 0.0d0
@@ -904,10 +1034,10 @@ c
          do it3 = 1, bsorder
             k0 = k0 + 1
             k = k0 + 1 + (nfft3-isign(nfft3,k0))/2
-            v0 = thetai3(1,it3,m)
-            v1 = thetai3(2,it3,m)
-            v2 = thetai3(3,it3,m)
-            v3 = thetai3(4,it3,m)
+            v0 = thetai3(1,it3,iatm)
+            v1 = thetai3(2,it3,iatm)
+            v2 = thetai3(3,it3,iatm)
+            v3 = thetai3(4,it3,iatm)
             tu00_1 = 0.0d0
             tu01_1 = 0.0d0
             tu10_1 = 0.0d0
@@ -934,10 +1064,10 @@ c
             do it2 = 1, bsorder
                j0 = j0 + 1
                j = j0 + 1 + (nfft2-isign(nfft2,j0))/2
-               u0 = thetai2(1,it2,m)
-               u1 = thetai2(2,it2,m)
-               u2 = thetai2(3,it2,m)
-               u3 = thetai2(4,it2,m)
+               u0 = thetai2(1,it2,iatm)
+               u1 = thetai2(2,it2,iatm)
+               u2 = thetai2(3,it2,iatm)
+               u3 = thetai2(4,it2,iatm)
                t0_1 = 0.0d0
                t1_1 = 0.0d0
                t2_1 = 0.0d0
@@ -951,13 +1081,13 @@ c
                   i = i0 + 1 + (nfft1-isign(nfft1,i0))/2
                   tq_1 = qgrid(1,i,j,k)
                   tq_2 = qgrid(2,i,j,k)
-                  t0_1 = t0_1 + tq_1*thetai1(1,it1,m)
-                  t1_1 = t1_1 + tq_1*thetai1(2,it1,m)
-                  t2_1 = t2_1 + tq_1*thetai1(3,it1,m)
-                  t0_2 = t0_2 + tq_2*thetai1(1,it1,m)
-                  t1_2 = t1_2 + tq_2*thetai1(2,it1,m)
-                  t2_2 = t2_2 + tq_2*thetai1(3,it1,m)
-                  t3 = t3 + (tq_1+tq_2)*thetai1(4,it1,m)
+                  t0_1 = t0_1 + tq_1*thetai1(1,it1,iatm)
+                  t1_1 = t1_1 + tq_1*thetai1(2,it1,iatm)
+                  t2_1 = t2_1 + tq_1*thetai1(3,it1,iatm)
+                  t0_2 = t0_2 + tq_2*thetai1(1,it1,iatm)
+                  t1_2 = t1_2 + tq_2*thetai1(2,it1,iatm)
+                  t2_2 = t2_2 + tq_2*thetai1(3,it1,iatm)
+                  t3 = t3 + (tq_1+tq_2)*thetai1(4,it1,iatm)
                end do
                tu00_1 = tu00_1 + t0_1*u0
                tu10_1 = tu10_1 + t1_1*u0
@@ -1024,44 +1154,44 @@ c
             tuv012 = tuv012 + tu01*v2
             tuv111 = tuv111 + tu11*v1
          end do
-         fdip_phi1(2,m) = tuv100_1
-         fdip_phi1(3,m) = tuv010_1
-         fdip_phi1(4,m) = tuv001_1
-         fdip_phi1(5,m) = tuv200_1
-         fdip_phi1(6,m) = tuv020_1
-         fdip_phi1(7,m) = tuv002_1
-         fdip_phi1(8,m) = tuv110_1
-         fdip_phi1(9,m) = tuv101_1
-         fdip_phi1(10,m) = tuv011_1
-         fdip_phi2(2,m) = tuv100_2
-         fdip_phi2(3,m) = tuv010_2
-         fdip_phi2(4,m) = tuv001_2
-         fdip_phi2(5,m) = tuv200_2
-         fdip_phi2(6,m) = tuv020_2
-         fdip_phi2(7,m) = tuv002_2
-         fdip_phi2(8,m) = tuv110_2
-         fdip_phi2(9,m) = tuv101_2
-         fdip_phi2(10,m) = tuv011_2
-         fdip_sum_phi(1,m) = tuv000
-         fdip_sum_phi(2,m) = tuv100
-         fdip_sum_phi(3,m) = tuv010
-         fdip_sum_phi(4,m) = tuv001
-         fdip_sum_phi(5,m) = tuv200
-         fdip_sum_phi(6,m) = tuv020
-         fdip_sum_phi(7,m) = tuv002
-         fdip_sum_phi(8,m) = tuv110
-         fdip_sum_phi(9,m) = tuv101
-         fdip_sum_phi(10,m) = tuv011
-         fdip_sum_phi(11,m) = tuv300
-         fdip_sum_phi(12,m) = tuv030
-         fdip_sum_phi(13,m) = tuv003
-         fdip_sum_phi(14,m) = tuv210
-         fdip_sum_phi(15,m) = tuv201
-         fdip_sum_phi(16,m) = tuv120
-         fdip_sum_phi(17,m) = tuv021
-         fdip_sum_phi(18,m) = tuv102
-         fdip_sum_phi(19,m) = tuv012
-         fdip_sum_phi(20,m) = tuv111
+         fdip_phi1(2,isite) = tuv100_1
+         fdip_phi1(3,isite) = tuv010_1
+         fdip_phi1(4,isite) = tuv001_1
+         fdip_phi1(5,isite) = tuv200_1
+         fdip_phi1(6,isite) = tuv020_1
+         fdip_phi1(7,isite) = tuv002_1
+         fdip_phi1(8,isite) = tuv110_1
+         fdip_phi1(9,isite) = tuv101_1
+         fdip_phi1(10,isite) = tuv011_1
+         fdip_phi2(2,isite) = tuv100_2
+         fdip_phi2(3,isite) = tuv010_2
+         fdip_phi2(4,isite) = tuv001_2
+         fdip_phi2(5,isite) = tuv200_2
+         fdip_phi2(6,isite) = tuv020_2
+         fdip_phi2(7,isite) = tuv002_2
+         fdip_phi2(8,isite) = tuv110_2
+         fdip_phi2(9,isite) = tuv101_2
+         fdip_phi2(10,isite) = tuv011_2
+         fdip_sum_phi(1,isite) = tuv000
+         fdip_sum_phi(2,isite) = tuv100
+         fdip_sum_phi(3,isite) = tuv010
+         fdip_sum_phi(4,isite) = tuv001
+         fdip_sum_phi(5,isite) = tuv200
+         fdip_sum_phi(6,isite) = tuv020
+         fdip_sum_phi(7,isite) = tuv002
+         fdip_sum_phi(8,isite) = tuv110
+         fdip_sum_phi(9,isite) = tuv101
+         fdip_sum_phi(10,isite) = tuv011
+         fdip_sum_phi(11,isite) = tuv300
+         fdip_sum_phi(12,isite) = tuv030
+         fdip_sum_phi(13,isite) = tuv003
+         fdip_sum_phi(14,isite) = tuv210
+         fdip_sum_phi(15,isite) = tuv201
+         fdip_sum_phi(16,isite) = tuv120
+         fdip_sum_phi(17,isite) = tuv021
+         fdip_sum_phi(18,isite) = tuv102
+         fdip_sum_phi(19,isite) = tuv012
+         fdip_sum_phi(20,isite) = tuv111
       end do
 c
 c     end OpenMP directive for the major loop structure

@@ -34,21 +34,35 @@ c
       real*8 eopd0,eid0,eit0,et0,ept0,ebt0
       real*8 ett0,ev0,ec0,ecd0,ed0,em0,ep0
       real*8 er0,es0,elf0,eg0,ex0
-      real*8 ndeb(3,maxatm),ndea(3,maxatm)
-      real*8 ndeba(3,maxatm),ndeub(3,maxatm)
-      real*8 ndeaa(3,maxatm),ndeopb(3,maxatm)
-      real*8 ndeopd(3,maxatm),ndeid(3,maxatm)
-      real*8 ndeit(3,maxatm),ndet(3,maxatm)
-      real*8 ndept(3,maxatm),ndebt(3,maxatm)
-      real*8 ndett(3,maxatm),ndev(3,maxatm)
-      real*8 ndec(3,maxatm),ndecd(3,maxatm)
-      real*8 nded(3,maxatm),ndem(3,maxatm)
-      real*8 ndep(3,maxatm),nder(3,maxatm)
-      real*8 ndes(3,maxatm),ndelf(3,maxatm)
-      real*8 ndeg(3,maxatm),ndex(3,maxatm)
-      real*8 detot(3,maxatm),ndetot(3,maxatm)
-      real*8 denorm(maxatm),ndenorm(maxatm)
       real*8 totnorm,ntotnorm,rms,nrms
+      real*8, pointer :: denorm(:)
+      real*8, pointer :: ndenorm(:)
+      real*8, pointer :: detot(:,:)
+      real*8, pointer :: ndetot(:,:)
+      real*8, pointer :: ndeb(:,:)
+      real*8, pointer :: ndea(:,:)
+      real*8, pointer :: ndeba(:,:)
+      real*8, pointer :: ndeub(:,:)
+      real*8, pointer :: ndeaa(:,:)
+      real*8, pointer :: ndeopb(:,:)
+      real*8, pointer :: ndeopd(:,:)
+      real*8, pointer :: ndeid(:,:)
+      real*8, pointer :: ndeit(:,:)
+      real*8, pointer :: ndet(:,:)
+      real*8, pointer :: ndept(:,:)
+      real*8, pointer :: ndebt(:,:)
+      real*8, pointer :: ndett(:,:)
+      real*8, pointer :: ndev(:,:)
+      real*8, pointer :: ndec(:,:)
+      real*8, pointer :: ndecd(:,:)
+      real*8, pointer :: nded(:,:)
+      real*8, pointer :: ndem(:,:)
+      real*8, pointer :: ndep(:,:)
+      real*8, pointer :: nder(:,:)
+      real*8, pointer :: ndes(:,:)
+      real*8, pointer :: ndelf(:,:)
+      real*8, pointer :: ndeg(:,:)
+      real*8, pointer :: ndex(:,:)
       logical exist,query
       logical doanalyt,donumer,dofull
       character*1 answer
@@ -134,6 +148,11 @@ c
          call upcase (answer)
          if (answer .eq. 'Y')  dofull = .true.
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (detot)
+      allocate (detot(3,n))
 c
 c     compute the analytical gradient components
 c
@@ -246,6 +265,59 @@ c
          end if
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (ndetot)
+      allocate (ndetot(3,n))
+      nullify (ndeb)
+      allocate (ndeb(3,n))
+      nullify (ndea)
+      allocate (ndea(3,n))
+      nullify (ndeba)
+      allocate (ndeba(3,n))
+      nullify (ndeub)
+      allocate (ndeub(3,n))
+      nullify (ndeaa)
+      allocate (ndeaa(3,n))
+      nullify (ndeopb)
+      allocate (ndeopb(3,n))
+      nullify (ndeopd)
+      allocate (ndeopd(3,n))
+      nullify (ndeid)
+      allocate (ndeid(3,n))
+      nullify (ndeit)
+      allocate (ndeit(3,n))
+      nullify (ndet)
+      allocate (ndet(3,n))
+      nullify (ndept)
+      allocate (ndept(3,n))
+      nullify (ndebt)
+      allocate (ndebt(3,n))
+      nullify (ndett)
+      allocate (ndett(3,n))
+      nullify (ndev)
+      allocate (ndev(3,n))
+      nullify (ndec)
+      allocate (ndec(3,n))
+      nullify (ndecd)
+      allocate (ndecd(3,n))
+      nullify (nded)
+      allocate (nded(3,n))
+      nullify (ndem)
+      allocate (ndem(3,n))
+      nullify (ndep)
+      allocate (ndep(3,n))
+      nullify (nder)
+      allocate (nder(3,n))
+      nullify (ndes)
+      allocate (ndes(3,n))
+      nullify (ndelf)
+      allocate (ndelf(3,n))
+      nullify (ndeg)
+      allocate (ndeg(3,n))
+      nullify (ndex)
+      allocate (ndex(3,n))
+c
 c     get the Cartesian component two-sided numerical gradients
 c
       do i = 1, n
@@ -301,6 +373,7 @@ c
                else if (j .eq. 3) then
                   z(i) = old
                end if
+               ndetot(j,i) = (f - f0) / eps
                ndeb(j,i) = (eb - eb0) / eps
                ndea(j,i) = (ea - ea0) / eps
                ndeba(j,i) = (eba - eba0) / eps
@@ -325,7 +398,6 @@ c
                ndelf(j,i) = (elf - elf0) / eps
                ndeg(j,i) = (eg - eg0) / eps
                ndex(j,i) = (ex - ex0) / eps
-               ndetot(j,i) = (f - f0) / eps
             end do
          end if
 c
@@ -420,6 +492,40 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (ndeb)
+      deallocate (ndea)
+      deallocate (ndeba)
+      deallocate (ndeub)
+      deallocate (ndeaa)
+      deallocate (ndeopb)
+      deallocate (ndeopd)
+      deallocate (ndeid)
+      deallocate (ndeit)
+      deallocate (ndet)
+      deallocate (ndept)
+      deallocate (ndebt)
+      deallocate (ndett)
+      deallocate (ndev)
+      deallocate (ndec)
+      deallocate (ndecd)
+      deallocate (nded)
+      deallocate (ndem)
+      deallocate (ndep)
+      deallocate (nder)
+      deallocate (ndes)
+      deallocate (ndelf)
+      deallocate (ndeg)
+      deallocate (ndex)
+c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (denorm)
+      allocate (denorm(n))
+      nullify (ndenorm)
+      allocate (ndenorm(n))
+c
 c     print the total gradient components for each atom
 c
       write (iout,300)
@@ -473,6 +579,13 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (detot)
+      deallocate (ndetot)
+      deallocate (denorm)
+      deallocate (ndenorm)
 c
 c     print the total norm for the analytical gradient
 c
