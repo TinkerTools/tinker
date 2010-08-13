@@ -23,7 +23,6 @@ gfortran -c -O3 bitors.f
 gfortran -c -O3 bonds.f
 gfortran -c -O3 born.f
 gfortran -c -O3 bounds.f
-gfortran -c -O3 bspline.f
 gfortran -c -O3 calendar.f
 gfortran -c -O3 center.f
 gfortran -c -O3 chkpole.f
@@ -346,6 +345,7 @@ gfortran -c -O3 timerot.f
 gfortran -c -O3 tncg.f
 gfortran -c -O3 torphase.f
 gfortran -c -O3 torque.f
+gfortran -c -O3 torsfit.f
 gfortran -c -O3 torsions.f
 gfortran -c -O3 trimtext.f
 gfortran -c -O3 unitcell.f

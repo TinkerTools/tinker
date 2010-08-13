@@ -23,7 +23,6 @@ g77 -c -O3 -ffast-math bitors.f
 g77 -c -O3 -ffast-math bonds.f
 g77 -c -O3 -ffast-math born.f
 g77 -c -O3 -ffast-math bounds.f
-g77 -c -O3 -ffast-math bspline.f
 g77 -c -O3 -ffast-math calendar.f
 g77 -c -O3 -ffast-math center.f
 g77 -c -O3 -ffast-math chkpole.f
@@ -346,6 +345,7 @@ g77 -c -O3 -ffast-math timerot.f
 g77 -c -O3 -ffast-math tncg.f
 g77 -c -O3 -ffast-math torphase.f
 g77 -c -O3 -ffast-math torque.f
+g77 -c -O3 -ffast-math torsfit.f
 g77 -c -O3 -ffast-math torsions.f
 g77 -c -O3 -ffast-math trimtext.f
 g77 -c -O3 -ffast-math unitcell.f

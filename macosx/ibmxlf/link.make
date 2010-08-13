@@ -55,6 +55,7 @@ xlf -O2 -o testpair.x testpair.o libtinker.a
 xlf -O2 -o testrot.x testrot.o libtinker.a
 xlf -O2 -o timer.x timer.o libtinker.a
 xlf -O2 -o timerot.x timerot.o libtinker.a
+xlf -O2 -o torsfit.x torsfit.o libtinker.a
 xlf -O2 -o valence.x valence.o libtinker.a
 xlf -O2 -o vibbig.x vibbig.o libtinker.a
 xlf -O2 -o vibrate.x vibrate.o libtinker.a

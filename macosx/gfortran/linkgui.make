@@ -54,6 +54,7 @@ gfortran -o testpair.x testpair.o libtinker.a -framework JavaVM -framework CoreF
 gfortran -o testrot.x testrot.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o timer.x timer.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o timerot.x timerot.o libtinker.a -framework JavaVM -framework CoreFoundation
+gfortran -o torsfit.x torsfit.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o valence.x valence.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o vibbig.x vibbig.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o vibrate.x vibrate.o libtinker.a -framework JavaVM -framework CoreFoundation

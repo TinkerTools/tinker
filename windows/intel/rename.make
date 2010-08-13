@@ -55,6 +55,7 @@ mv TESTPAIR.ZIP  testpair.zip
 mv TESTROT.ZIP   testrot.zip
 mv TIMER.ZIP     timer.zip
 mv TIMEROT.ZIP   timerot.zip
+mv TORSFIT.ZIP   torsfit.zip
 mv VALENCE.ZIP   valence.zip
 mv VIBBIG.ZIP    vibbig.zip
 mv VIBRATE.ZIP   vibrate.zip

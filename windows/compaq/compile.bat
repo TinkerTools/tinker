@@ -24,7 +24,6 @@ DF /compile_only /optimize /fast bitors.f
 DF /compile_only /optimize /fast bonds.f
 DF /compile_only /optimize /fast born.f
 DF /compile_only /optimize /fast bounds.f
-DF /compile_only /optimize /fast bspline.f
 DF /compile_only /optimize /fast calendar.f
 DF /compile_only /optimize /fast center.f
 DF /compile_only /optimize /fast chkpole.f
@@ -347,6 +346,7 @@ DF /compile_only /optimize /fast timerot.f
 DF /compile_only /optimize /fast tncg.f
 DF /compile_only /optimize /fast torphase.f
 DF /compile_only /optimize /fast torque.f
+DF /compile_only /optimize /fast torsfit.f
 DF /compile_only /optimize /fast torsions.f
 DF /compile_only /optimize /fast trimtext.f
 DF /compile_only /optimize /fast unitcell.f

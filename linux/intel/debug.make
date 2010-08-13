@@ -23,7 +23,6 @@ ifort -c -g -warn unused -check uninit -check bounds bitors.f
 ifort -c -g -warn unused -check uninit -check bounds bonds.f
 ifort -c -g -warn unused -check uninit -check bounds born.f
 ifort -c -g -warn unused -check uninit -check bounds bounds.f
-ifort -c -g -warn unused -check uninit -check bounds bspline.f
 ifort -c -g -warn unused -check uninit -check bounds calendar.f
 ifort -c -g -warn unused -check uninit -check bounds center.f
 ifort -c -g -warn unused -check uninit -check bounds chkpole.f
@@ -346,6 +345,7 @@ ifort -c -g -warn unused -check uninit -check bounds timerot.f
 ifort -c -g -warn unused -check uninit -check bounds tncg.f
 ifort -c -g -warn unused -check uninit -check bounds torphase.f
 ifort -c -g -warn unused -check uninit -check bounds torque.f
+ifort -c -g -warn unused -check uninit -check bounds torsfit.f
 ifort -c -g -warn unused -check uninit -check bounds torsions.f
 ifort -c -g -warn unused -check uninit -check bounds trimtext.f
 ifort -c -g -warn unused -check uninit -check bounds unitcell.f

@@ -56,6 +56,7 @@ ifort /4Yportlib testpair.obj tinker.lib
 ifort /4Yportlib testrot.obj tinker.lib
 ifort /4Yportlib timer.obj tinker.lib
 ifort /4Yportlib timerot.obj tinker.lib
+ifort /4Yportlib torsfit.obj tinker.lib
 ifort /4Yportlib valence.obj tinker.lib
 ifort /4Yportlib vibbig.obj tinker.lib
 ifort /4Yportlib vibrate.obj tinker.lib

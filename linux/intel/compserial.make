@@ -23,7 +23,6 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bitors.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bonds.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 born.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bounds.f
-ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bspline.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 calendar.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 center.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 chkpole.f
@@ -346,6 +345,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 timerot.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 tncg.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 torphase.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 torque.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 torsfit.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 torsions.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 trimtext.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 unitcell.f

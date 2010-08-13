@@ -55,6 +55,7 @@ xlf -o testpair.x testpair.o -L. -ltinker
 xlf -o testrot.x testrot.o -L. -ltinker
 xlf -o timer.x timer.o -L. -ltinker
 xlf -o timerot.x timerot.o -L. -ltinker
+xlf -o torsfit.x torsfit.o -L. -ltinker
 xlf -o valence.x valence.o -L. -ltinker
 xlf -o vibbig.x vibbig.o -L. -ltinker
 xlf -o vibrate.x vibrate.o -L. -ltinker

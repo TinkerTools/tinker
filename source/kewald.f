@@ -203,9 +203,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ewaldcof" finds a value of the Ewald coefficient such that
-c     all terms beyond the specified cutoff distance will have an
-c     value less than a specified tolerance
+c     "ewaldcof" finds an Ewald coefficient such that all terms
+c     beyond the specified cutoff distance will have a value less
+c     than a specified tolerance
 c
 c
       subroutine ewaldcof (alpha,cutoff)
@@ -328,6 +328,44 @@ c
       call dftmod (bsmod1,bsarray,nfft1,bsorder)
       call dftmod (bsmod2,bsarray,nfft2,bsorder)
       call dftmod (bsmod3,bsarray,nfft3,bsorder)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine bspline  --  determine B-spline coefficients  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "bspline" calculates the coefficients for an n-th order
+c     B-spline approximation
+c
+c
+      subroutine bspline (x,n,c)
+      implicit none
+      integer i,k,n
+      real*8 x,denom
+      real*8 c(*)
+c
+c
+c     initialize the B-spline as the linear case
+c
+      c(1) = 1.0d0 - x
+      c(2) = x
+c
+c     compute standard B-spline recursion to n-th order
+c
+      do k = 3, n
+         denom = 1.0d0 / dble(k-1)
+         c(k) = x * c(k-1) * denom
+         do i = 1, k-2
+            c(k-i) = ((x+dble(i))*c(k-i-1)
+     &                  + (dble(k-i)-x)*c(k-i)) * denom
+         end do
+         c(1) = (1.0d0-x) * c(1) * denom
+      end do
       return
       end
 c

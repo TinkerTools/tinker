@@ -23,7 +23,6 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bitors.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bonds.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp born.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bounds.f
-ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bspline.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp calendar.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp center.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp chkpole.f
@@ -346,6 +345,7 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp timerot.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp tncg.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp torphase.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp torque.f
+ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp torsfit.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp torsions.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp trimtext.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp unitcell.f

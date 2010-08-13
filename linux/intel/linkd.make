@@ -55,6 +55,7 @@ ifort -g -o testpair.x testpair.o libtinker.a
 ifort -g -o testrot.x testrot.o libtinker.a
 ifort -g -o timer.x timer.o libtinker.a
 ifort -g -o timerot.x timerot.o libtinker.a
+ifort -g -o torsfit.x torsfit.o libtinker.a
 ifort -g -o valence.x valence.o libtinker.a
 ifort -g -o vibbig.x vibbig.o libtinker.a
 ifort -g -o vibrate.x vibrate.o libtinker.a

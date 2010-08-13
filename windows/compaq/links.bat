@@ -57,6 +57,7 @@ DF /optimize /fast testpair.obj tinker.lib
 DF /optimize /fast testrot.obj tinker.lib
 DF /optimize /fast timer.obj tinker.lib
 DF /optimize /fast timerot.obj tinker.lib
+DF /optimize /fast torsfit.obj tinker.lib
 DF /optimize /fast valence.obj tinker.lib
 DF /optimize /fast vibbig.obj tinker.lib
 DF /optimize /fast vibrate.obj tinker.lib

@@ -54,6 +54,7 @@ mv testpair.x  ../bin/testpair
 mv testrot.x   ../bin/testrot
 mv timer.x     ../bin/timer
 mv timerot.x   ../bin/timerot
+mv torsfit.x   ../bin/torsfit
 mv valence.x   ../bin/valence
 mv vibbig.x    ../bin/vibbig
 mv vibrate.x   ../bin/vibrate

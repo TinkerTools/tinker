@@ -24,7 +24,6 @@ LF95 -c -o1 -tpp -nstchk -ntrace bitors.f
 LF95 -c -o1 -tpp -nstchk -ntrace bonds.f
 LF95 -c -o1 -tpp -nstchk -ntrace born.f
 LF95 -c -o1 -tpp -nstchk -ntrace bounds.f
-LF95 -c -o1 -tpp -nstchk -ntrace bspline.f
 LF95 -c -o1 -tpp -nstchk -ntrace calendar.f
 LF95 -c -o1 -tpp -nstchk -ntrace center.f
 LF95 -c -o1 -tpp -nstchk -ntrace chkpole.f
@@ -347,6 +346,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace timerot.f
 LF95 -c -o1 -tpp -nstchk -ntrace tncg.f
 LF95 -c -o1 -tpp -nstchk -ntrace torphase.f
 LF95 -c -o1 -tpp -nstchk -ntrace torque.f
+LF95 -c -o1 -tpp -nstchk -ntrace torsfit.f
 LF95 -c -o1 -tpp -nstchk -ntrace torsions.f
 LF95 -c -o1 -tpp -nstchk -ntrace trimtext.f
 LF95 -c -o1 -tpp -nstchk -ntrace unitcell.f

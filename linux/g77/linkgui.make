@@ -60,6 +60,7 @@ g77 -pthread -s -o testpair.x testpair.o libtinker.a libjvm.so
 g77 -pthread -s -o testrot.x testrot.o libtinker.a libjvm.so 
 g77 -pthread -s -o timer.x timer.o libtinker.a libjvm.so 
 g77 -pthread -s -o timerot.x timerot.o libtinker.a libjvm.so 
+g77 -pthread -s -o torsfit.x torsfit.o libtinker.a libjvm.so 
 g77 -pthread -s -o valence.x valence.o libtinker.a libjvm.so 
 g77 -pthread -s -o vibbig.x vibbig.o libtinker.a libjvm.so 
 g77 -pthread -s -o vibrate.x vibrate.o libtinker.a libjvm.so 

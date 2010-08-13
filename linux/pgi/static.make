@@ -55,6 +55,7 @@ pgf77 -Bstatic -s -o testpair.x testpair.o libtinker.a
 pgf77 -Bstatic -s -o testrot.x testrot.o libtinker.a
 pgf77 -Bstatic -s -o timer.x timer.o libtinker.a
 pgf77 -Bstatic -s -o timerot.x timerot.o libtinker.a
+pgf77 -Bstatic -s -o torsfit.x torsfit.o libtinker.a
 pgf77 -Bstatic -s -o valence.x valence.o libtinker.a
 pgf77 -Bstatic -s -o vibbig.x vibbig.o libtinker.a
 pgf77 -Bstatic -s -o vibrate.x vibrate.o libtinker.a

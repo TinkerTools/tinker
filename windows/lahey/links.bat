@@ -57,6 +57,7 @@ LF95 -o1 -tpp -nstchk -ntrace -nomap testpair.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap testrot.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap timer.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap timerot.obj -lib tinker
+LF95 -o1 -tpp -nstchk -ntrace -nomap torsfit.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap valence.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap vibbig.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap vibrate.obj -lib tinker

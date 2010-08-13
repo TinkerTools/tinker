@@ -55,6 +55,7 @@ g77 -o testpair.x testpair.o libtinker.a
 g77 -o testrot.x testrot.o libtinker.a
 g77 -o timer.x timer.o libtinker.a
 g77 -o timerot.x timerot.o libtinker.a
+g77 -o torsfit.x torsfit.o libtinker.a
 g77 -o valence.x valence.o libtinker.a
 g77 -o vibbig.x vibbig.o libtinker.a
 g77 -o vibrate.x vibrate.o libtinker.a

@@ -24,7 +24,6 @@ f77 -c -O -N11 bitors.f
 f77 -c -O -N11 bonds.f
 f77 -c -O -N11 born.f
 f77 -c -O -N11 bounds.f
-f77 -c -O -N11 bspline.f
 f77 -c -O -N11 calendar.f
 f77 -c -O -N11 center.f
 f77 -c -O -N11 chkpole.f
@@ -347,6 +346,7 @@ f77 -c -O -N11 timerot.f
 f77 -c -O -N11 tncg.f
 f77 -c -O -N11 torphase.f
 f77 -c -O -N11 torque.f
+f77 -c -O -N11 torsfit.f
 f77 -c -O -N11 torsions.f
 f77 -c -O -N11 trimtext.f
 f77 -c -O -N11 unitcell.f

@@ -7,13 +7,13 @@ c     ##############################################################
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine readgau  --  read data from G03 output file  ##
+c     ##  subroutine readgau  --  read data from G09 output file  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
 c     "readgau" reads an ab initio optimized structure, forces,
-c     Hessian and frequencies from a Gaussian 03 output file
+c     Hessian and frequencies from a Gaussian 09 output file
 c
 c
       subroutine readgau
@@ -30,9 +30,13 @@ c
       integer length,next
       integer freeunit
       integer trimtext
+      logical hasinputxyz
+      logical hasMP2
+      logical waiter
       logical exist
       real*8 frcunit,hessunit
       character*4 arcstart
+      character*6 gname
       character*120 keyword
       character*120 gaufile
       character*120 record
@@ -43,11 +47,13 @@ c
 c     initialize some values prior to opening the log file
 c
       exist = .false.
+      hasinputxyz = .false.
       ngatom = 0
       nfreq = 0
       arcstart = '1'//char(backslash)//'1'//char(backslash)
+      waiter = .false.
 c
-c     specify and open the Gaussian 03 output log file
+c     specify and open the Gaussian 09 output log file
 c
       call nextarg (gaufile,exist)
       if (exist) then
@@ -81,37 +87,31 @@ c
             inquire (file=gaufile,exist=exist)
          end if
       end do
+c
+c     read structure, forces and frequencies from Gaussian output
+c
       open (unit=igau,file=gaufile,status='old')
       rewind (unit=igau)
-c
-c     read each line of Gaussian output and find nonblank string
-c
-      dowhile (.true.)
-         read (igau,30,err=120,end=120)  keyword
+      dowhile (.true. .and. (.not. eof(igau)))
+         read (igau,30,err=130,end=130)  record
    30    format (a120)
-         j = 0
-         do i = 120, 1, -1
-            if (keyword(i:i) .ne. ' ')  j = i
-         end do
-         j = j - 1
-         do i = 1, 120-j
-            keyword(i:i) = keyword(i+j:i+j)
-         end do
-         do i = 121-j, 120
-            keyword(i:i) = ' '
-         end do
+         next = 1
+         keyword = record
+         call trimhead (keyword)
          length = trimtext (keyword)
          call upcase (keyword)
-c
-c     get structure, forces and frequencies from Gaussian output
-c
-         if (keyword(1:20). eq. 'STANDARD ORIENTATION') then
+         if (waiter .and. keyword (1:12) .ne. 'JOB CPU TIME') then 
+            goto 130
+         else 
+            waiter = .false.
+         end if
+         if (keyword(1:20) .eq. 'STANDARD ORIENTATION') then
             do i = 1, 4
-               read (igau,30,err=120,end=120)  record
+               read (igau,30,err=130,end=130)  record
             end do
             i = 1
             dowhile (.true.)
-               read (igau,40,err=120,end=120)  record
+               read (igau,40,err=130,end=130)  record
    40          format (a120)
                read (record,*,err=50,end=50)  itmp,jtmp,ktmp,
      &                                        gx(i),gy(i),gz(i)
@@ -122,36 +122,77 @@ c
             ngatom = i - 1
          else if (keyword(37:58) .eq. 'FORCES (HARTREES/BOHR)') then
             frcunit = hartree / bohr
-            read (igau,60,err=120,end=120)  record
-   60       format (a120)
-            read (igau,70,err=120,end=120)  record
-   70       format (a120)
+            read (igau,80,err=130,end=130)  record
+   80       format (a120)
+            read (igau,90,err=130,end=130)  record
+   90       format (a120)
             do i = 1, ngatom
-               read (igau,80,err=120,end=120)  record
-   80          format (a120)
-               read (record,*,err=90,end=90)  itmp,jtmp,gforce(1,i),
+               read (igau,100,err=130,end=130)  record
+  100          format (a120)
+               read (record,*,err=110,end=110)  itmp,jtmp,gforce(1,i),
      &                                          gforce(2,i),gforce(3,i)
                do j = 1, 3
                   gforce(j,i) = gforce(j,i) * frcunit
                end do
-   90          continue
+  110          continue
             end do
          else if (keyword(1:14) .eq. 'FREQUENCIES --') then
             string = keyword(15:120)
-            read (string,*,err=100,end=100)  gfreq(nfreq+1),
+            read (string,*,err=120,end=120)  gfreq(nfreq+1),
      &                                       gfreq(nfreq+2),
      &                                       gfreq(nfreq+3)
-  100       continue
+  120       continue
             nfreq = nfreq + 3
 c
-c     get the Hessian from archive section at bottom of output
+c     read the Hessian from archive section at bottom of output
 c
          else if (keyword(1:4) .eq. arcstart) then
-            hessunit = hartree / bohr**2
-            next = 1
-            dowhile (.true.)
-               call readarcword (igau,record,word,length,next)
-               if (word(1:5) .eq. 'NImag') then
+            itmp = 0
+            dowhile (.true. .and. (.not. eof(igau)))
+               if(next > 73) then 
+                   read (igau,20)  record
+                   next = 1
+               end if
+               call readarcword(igau,record,word,length,next)
+               if(word(1:1) .eq. '\') itmp = itmp+1
+               if(itmp .eq. 16 .and. hasinputxyz) then
+                  do i = 1, ngatom
+                     do j = 1,5
+                        if(next > 73) then
+                           read (igau,20)  record
+                           next = 1
+                        end if
+                        call readarcword(igau,record,word,length,next)
+                        if(j .eq. 1) read(word(1:length),*) gname
+                        if(j .eq. 2) read(word(1:length),*) gx(i)
+                        if(j .eq. 3) read(word(1:length),*) gy(i)
+                        if(j .eq. 4) read(word(1:length),*) gz(i)
+                     end do
+                  end do
+               end if
+               if(itmp .gt. 16 .and. word(1:2) .eq. 'HF') then
+                  do i = 1, 2
+                     if(next > 73) then
+                        read (igau,20)  record
+                        next = 1
+                     end if
+                     call readarcword (igau,record,word,length,next)
+                  end do
+                  read(word(1:length),*)  egau
+                  egau = egau*627.509
+               else if(itmp .gt. 16 .and. word(1:3) .eq. 'MP2') then
+                  hasmp2 = .true.
+                  do i = 1, 2
+                     if(next > 73) then
+                        read (igau,20)  record
+                        next = 1
+                     end if
+                     call readarcword (igau,record,word,length,next)
+                  end do
+                  read(word(1:length),*)  egau
+                  egau = egau*627.509
+               else if (word(1:5) .eq. 'NImag') then
+                  hessunit = hartree / bohr**2
                   do i = 1, 4
                      call readarcword (igau,record,word,length,next)
                   end do
@@ -161,15 +202,17 @@ c
                      read (word(1:length),*)  gh(i)
                      gh(i) = gh(i) * hessunit
                   end do
-                  goto 110
+                  goto 130
                end if
                code = ichar(word(1:1))
-               if (code .eq. atsign)  goto 110
+               if (code .eq. atsign)  then
+                  waiter = .true.
+                  goto 130
+               end if
             end do
-  110       continue
          end if
       end do
-  120 continue
+  130 continue
       close (unit=igau)
 c
 c     zero out the frequencies if none were in Gaussian output
@@ -220,7 +263,8 @@ c     attempt to read a text word entry from the input string
 c
       letter = string (next:next)
       code = ichar(letter)
-      if (code.eq.backslash .or. code.eq.equal) then
+      if (code.eq.backslash .or. code.eq.equal 
+     &    .or. code.eq.space) then
          word(1:1) = letter
          next = next + 1
          length = 1
@@ -228,7 +272,8 @@ c
       end if
    10 continue
       do i = next, 75
-         if (code.eq.backslash .or. code.eq.equal)  return
+         if (code.eq.backslash .or. code.eq.equal 
+     &       .or. code.eq.space)  return
          if (next .gt. 70) then
             read (igau,20,err=30,end=30)  string
    20       format (a120)
@@ -239,7 +284,8 @@ c
             next = next + 1
             return
          end if
-         if (code.eq.backslash .or. code.eq.equal)  return
+         if (code.eq.backslash .or. code.eq.equal 
+     &       .or. code.eq.space)  return
          word(length:length) = letter
          next = next + 1
          letter = string(next:next)
@@ -251,5 +297,43 @@ c
          length = 1
       end if
    30 continue
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine trimhead  --  remove spaces before first text  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "trimhead" removes the spaces before the first non-blank
+c     character in a text string
+c
+c
+      subroutine trimhead (string)
+      implicit none
+      integer i,j,k
+      character*120 string,temp
+c
+c
+c     loop over characters, removing blank beginning spaces
+c
+      do i = 1, 120
+         temp(i:i) = ' '
+      end do
+      j = 0
+      k = 0
+      do i = 1, 120
+         if (string(i:i) .ne. ' ')  j = 1
+         if (j .eq. 1) then
+            k = k + 1
+            temp(k:k) = string(i:i)
+         end if
+      end do
+      do i = 1, 120
+         string(i:i) = temp(i:i)
+      end do
       return
       end

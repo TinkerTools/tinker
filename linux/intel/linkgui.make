@@ -60,6 +60,7 @@ ifort -O3 -no-prec-div -static -o testpair.x testpair.o libtinker.a libjvm.so ; 
 ifort -O3 -no-prec-div -static -o testrot.x testrot.o libtinker.a libjvm.so ; strip testrot.x
 ifort -O3 -no-prec-div -static -o timer.x timer.o libtinker.a libjvm.so ; strip timer.x
 ifort -O3 -no-prec-div -static -o timerot.x timerot.o libtinker.a libjvm.so ; strip timerot.x
+ifort -O3 -no-prec-div -static -o torsfit.x torsfit.o libtinker.a libjvm.so ; strip torsfit.x
 ifort -O3 -no-prec-div -static -o valence.x valence.o libtinker.a libjvm.so ; strip valence.x
 ifort -O3 -no-prec-div -static -o vibbig.x vibbig.o libtinker.a libjvm.so ; strip vibbig.x
 ifort -O3 -no-prec-div -static -o vibrate.x vibrate.o libtinker.a libjvm.so ; strip vibrate.x

@@ -23,7 +23,6 @@ xlf -c -O bitors.f
 xlf -c -O bonds.f
 xlf -c -O born.f
 xlf -c -O bounds.f
-xlf -c -O bspline.f
 xlf -c -O calendar.f
 xlf -c -O center.f
 xlf -c -O chkpole.f
@@ -346,6 +345,7 @@ xlf -c -O timerot.f
 xlf -c -O tncg.f
 xlf -c -O torphase.f
 xlf -c -O torque.f
+xlf -c -O torsfit.f
 xlf -c -O torsions.f
 xlf -c -O trimtext.f
 xlf -c -O unitcell.f

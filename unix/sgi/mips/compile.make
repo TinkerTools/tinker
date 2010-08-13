@@ -23,7 +23,6 @@ f77 -c -O -mips4 bitors.f
 f77 -c -O -mips4 bonds.f
 f77 -c -O -mips4 born.f
 f77 -c -O -mips4 bounds.f
-f77 -c -O -mips4 bspline.f
 f77 -c -O -mips4 calendar.f
 f77 -c -O -mips4 center.f
 f77 -c -O -mips4 chkpole.f
@@ -346,6 +345,7 @@ f77 -c -O -mips4 timerot.f
 f77 -c -O -mips4 tncg.f
 f77 -c -O -mips4 torphase.f
 f77 -c -O -mips4 torque.f
+f77 -c -O -mips4 torsfit.f
 f77 -c -O -mips4 torsions.f
 f77 -c -O -mips4 trimtext.f
 f77 -c -O -mips4 unitcell.f

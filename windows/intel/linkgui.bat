@@ -61,6 +61,7 @@ ifort /4Yportlib testpair.obj tinker.lib %javalib%
 ifort /4Yportlib testrot.obj tinker.lib %javalib%
 ifort /4Yportlib timer.obj tinker.lib %javalib%
 ifort /4Yportlib timerot.obj tinker.lib %javalib%
+ifort /4Yportlib torsfit.obj tinker.lib %javalib%
 ifort /4Yportlib valence.obj tinker.lib %javalib%
 ifort /4Yportlib vibbig.obj tinker.lib %javalib%
 ifort /4Yportlib vibrate.obj tinker.lib %javalib%

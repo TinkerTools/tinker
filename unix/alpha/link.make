@@ -55,6 +55,7 @@ f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testpair.x testpair.o libt
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testrot.x testrot.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o timer.x timer.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o timerot.x timerot.o libtinker.a
+f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o torsfit.x torsfit.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o valence.x valence.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o vibbig.x vibbig.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o vibrate.x vibrate.o libtinker.a

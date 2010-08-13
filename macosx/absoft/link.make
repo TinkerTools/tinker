@@ -55,6 +55,7 @@ f77 -o testpair.x testpair.o libtinker.a
 f77 -o testrot.x testrot.o libtinker.a
 f77 -o timer.x timer.o libtinker.a
 f77 -o timerot.x timerot.o libtinker.a
+f77 -o torsfit.x torsfit.o libtinker.a
 f77 -o valence.x valence.o libtinker.a
 f77 -o vibbig.x vibbig.o libtinker.a
 f77 -o vibrate.x vibrate.o libtinker.a

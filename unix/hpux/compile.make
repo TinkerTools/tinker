@@ -23,7 +23,6 @@ fort77 -c -O2 +E1 bitors.f
 fort77 -c -O2 +E1 bonds.f
 fort77 -c -O2 +E1 born.f
 fort77 -c -O2 +E1 bounds.f
-fort77 -c -O2 +E1 bspline.f
 fort77 -c -O2 +E1 calendar.f
 fort77 -c -O2 +E1 center.f
 fort77 -c -O2 +E1 chkpole.f
@@ -346,6 +345,7 @@ fort77 -c -O2 +E1 timerot.f
 fort77 -c -O2 +E1 tncg.f
 fort77 -c -O2 +E1 torphase.f
 fort77 -c -O2 +E1 torque.f
+fort77 -c -O2 +E1 torsfit.f
 fort77 -c -O2 +E1 torsions.f
 fort77 -c -O2 +E1 trimtext.f
 fort77 -c -O2 +E1 unitcell.f

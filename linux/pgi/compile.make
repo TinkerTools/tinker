@@ -23,7 +23,6 @@ pgf77 -c -fast bitors.f
 pgf77 -c -fast bonds.f
 pgf77 -c -fast born.f
 pgf77 -c -fast bounds.f
-pgf77 -c -fast bspline.f
 pgf77 -c -fast calendar.f
 pgf77 -c -fast center.f
 pgf77 -c -fast chkpole.f
@@ -346,6 +345,7 @@ pgf77 -c -fast timerot.f
 pgf77 -c -fast tncg.f
 pgf77 -c -fast torphase.f
 pgf77 -c -fast torque.f
+pgf77 -c -fast torsfit.f
 pgf77 -c -fast torsions.f
 pgf77 -c -fast trimtext.f
 pgf77 -c -fast unitcell.f

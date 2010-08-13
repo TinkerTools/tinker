@@ -21,7 +21,6 @@ bitors.o \
 bonds.o \
 born.o \
 bounds.o \
-bspline.o \
 calendar.o \
 center.o \
 chkpole.o \

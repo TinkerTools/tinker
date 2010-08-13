@@ -189,7 +189,6 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'chunks.i'
-      include 'mpole.i'
       include 'pme.i'
       integer i,k
       integer cid(3)

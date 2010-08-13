@@ -55,6 +55,7 @@ gfortran -o testpair.x testpair.o libtinker.a
 gfortran -o testrot.x testrot.o libtinker.a
 gfortran -o timer.x timer.o libtinker.a
 gfortran -o timerot.x timerot.o libtinker.a
+gfortran -o torsfit.x torsfit.o libtinker.a
 gfortran -o valence.x valence.o libtinker.a
 gfortran -o vibbig.x vibbig.o libtinker.a
 gfortran -o vibrate.x vibrate.o libtinker.a

@@ -55,6 +55,7 @@ g95 -o testpair.x testpair.o libtinker.a
 g95 -o testrot.x testrot.o libtinker.a
 g95 -o timer.x timer.o libtinker.a
 g95 -o timerot.x timerot.o libtinker.a
+g95 -o torsfit.x torsfit.o libtinker.a
 g95 -o valence.x valence.o libtinker.a
 g95 -o vibbig.x vibbig.o libtinker.a
 g95 -o vibrate.x vibrate.o libtinker.a

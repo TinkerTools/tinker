@@ -61,6 +61,7 @@ ifort -fast -no-ipo -static-intel -o testpair.x testpair.o libtinker.a $APBSLIBS
 ifort -fast -no-ipo -static-intel -o testrot.x testrot.o libtinker.a $APBSLIBS ; strip testrot.x
 ifort -fast -no-ipo -static-intel -o timer.x timer.o libtinker.a $APBSLIBS ; strip timer.x
 ifort -fast -no-ipo -static-intel -o timerot.x timerot.o libtinker.a $APBSLIBS ; strip timerot.x
+ifort -fast -no-ipo -static-intel -o torsfit.x torsfit.o libtinker.a $APBSLIBS ; strip torsfit.x
 ifort -fast -no-ipo -static-intel -o valence.x valence.o libtinker.a $APBSLIBS ; strip valence.x
 ifort -fast -no-ipo -static-intel -o vibbig.x vibbig.o libtinker.a $APBSLIBS ; strip vibbig.x
 ifort -fast -no-ipo -static-intel -o vibrate.x vibrate.o libtinker.a $APBSLIBS ; strip vibrate.x

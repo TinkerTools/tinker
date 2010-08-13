@@ -55,6 +55,7 @@ ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o testpa
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o testrot.x testrot.o libtinker.a ; strip testrot.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o timer.x timer.o libtinker.a ; strip timer.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o timerot.x timerot.o libtinker.a ; strip timerot.x
+ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o torsfit.x torsfit.o libtinker.a ; strip torsfit.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o valence.x valence.o libtinker.a ; strip valence.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o vibbig.x vibbig.o libtinker.a ; strip vibbig.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.4 -o vibrate.x vibrate.o libtinker.a ; strip vibrate.x

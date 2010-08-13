@@ -23,7 +23,6 @@ g77 -c -O3 -ffast-math -mno-cygwin bitors.f
 g77 -c -O3 -ffast-math -mno-cygwin bonds.f
 g77 -c -O3 -ffast-math -mno-cygwin born.f
 g77 -c -O3 -ffast-math -mno-cygwin bounds.f
-g77 -c -O3 -ffast-math -mno-cygwin bspline.f
 g77 -c -O3 -ffast-math -mno-cygwin calendar.f
 g77 -c -O3 -ffast-math -mno-cygwin center.f
 g77 -c -O3 -ffast-math -mno-cygwin chkpole.f
@@ -346,6 +345,7 @@ g77 -c -O3 -ffast-math -mno-cygwin timerot.f
 g77 -c -O3 -ffast-math -mno-cygwin tncg.f
 g77 -c -O3 -ffast-math -mno-cygwin torphase.f
 g77 -c -O3 -ffast-math -mno-cygwin torque.f
+g77 -c -O3 -ffast-math -mno-cygwin torsfit.f
 g77 -c -O3 -ffast-math -mno-cygwin torsions.f
 g77 -c -O3 -ffast-math -mno-cygwin trimtext.f
 g77 -c -O3 -ffast-math -mno-cygwin unitcell.f

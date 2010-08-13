@@ -23,7 +23,6 @@ f77 -c -fast -arch generic -tune generic bitors.f
 f77 -c -fast -arch generic -tune generic bonds.f
 f77 -c -fast -arch generic -tune generic born.f
 f77 -c -fast -arch generic -tune generic bounds.f
-f77 -c -fast -arch generic -tune generic bspline.f
 f77 -c -fast -arch generic -tune generic calendar.f
 f77 -c -fast -arch generic -tune generic center.f
 f77 -c -fast -arch generic -tune generic chkpole.f
@@ -346,6 +345,7 @@ f77 -c -fast -arch generic -tune generic timerot.f
 f77 -c -fast -arch generic -tune generic tncg.f
 f77 -c -fast -arch generic -tune generic torphase.f
 f77 -c -fast -arch generic -tune generic torque.f
+f77 -c -fast -arch generic -tune generic torsfit.f
 f77 -c -fast -arch generic -tune generic torsions.f
 f77 -c -fast -arch generic -tune generic trimtext.f
 f77 -c -fast -arch generic -tune generic unitcell.f

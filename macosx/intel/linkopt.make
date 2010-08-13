@@ -55,6 +55,7 @@ ifort -fast -static-intel -vec-report0 -o testpair.x testpair.f *.o ; strip test
 ifort -fast -static-intel -vec-report0 -o testrot.x testrot.f *.o ; strip testrot.x
 ifort -fast -static-intel -vec-report0 -o timer.x timer.f *.o ; strip timer.x
 ifort -fast -static-intel -vec-report0 -o timerot.x timerot.f *.o ; strip timerot.x
+ifort -fast -static-intel -vec-report0 -o torsfit.x torsfit.f *.o ; strip torsfit.x
 ifort -fast -static-intel -vec-report0 -o valence.x valence.f *.o ; strip valence.x
 ifort -fast -static-intel -vec-report0 -o vibbig.x vibbig.f *.o ; strip vibbig.x
 ifort -fast -static-intel -vec-report0 -o vibrate.x vibrate.f *.o ; strip vibrate.x

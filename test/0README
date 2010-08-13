@@ -1,7 +1,7 @@
 
-                ------------------------------------------------
-                EXAMPLE Directory for the TINKER Program Package
-                ------------------------------------------------
+                 ---------------------------------------------
+                 TEST Directory for the TINKER Program Package
+                 ---------------------------------------------
 
          This directory contains several examples illustrating use of
          several of the programs in the TINKER package.
@@ -55,13 +55,18 @@
                           determination of the lowest frequency
                           normal mode
 
-         (09) FORMAMIDE   generation of unit cell from fractional
+         (09) ETHANOL     fitting of torsional parameter values for
+                          the C-C-O-H bond based on relative quantum
+                          mechanical (G09) energies for rotating the
+                          C-O bond
+
+         (10) FORMAMIDE   generation of unit cell from fractional
                           coordinates, followed by full crystal
                           energy minimization and determination of
                           optimal carbonyl oxygen energy parameters
                           from a fit to lattice energy and structure
 
-         (10) GPCR        finds the lowest-frequency normal mode
+         (11) GPCR        finds the lowest-frequency normal mode
                           of bacteriorhodopsin using vibrational
                           analysis via a sliding block iterative
                           matrix diagonalization (Alter gpcr.run
@@ -69,21 +74,21 @@
                           want to view the modes. Note this example
                           requires about an hour to complete.)
 
-         (11) HELIX       rigid-body optimization of the packing of
+         (12) HELIX       rigid-body optimization of the packing of
                           two idealized polyalanine helices using
                           only van der Waals interactions
 
-         (12) SALT        convert sodium chloride asymmetric unit to
+         (13) SALT        convert sodium chloride asymmetric unit to
                           the unit cell, then a crystal minimization
                           starting from the diffraction structure
                           using Ewald summation for electrostatics
 
-         (13) TETRAALA    generate capped alanine tetrapeptide in an
+         (14) TETRAALA    generate capped alanine tetrapeptide in an
                           extended conformation, then use Monte Carlo
                           Minimization with random torsional moves to
                           find the global minimum energy structure
 
-         (14) WATER       compare the electrostatic potential around
+         (15) WATER       compare the electrostatic potential around
                           an AMOEBA water molecule to the QM-derived
                           potential (MP2/aug-cc-pVTZ) on a grid of
                           points outside the molecular surface.

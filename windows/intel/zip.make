@@ -55,6 +55,7 @@ zip testpair.zip testpair.exe
 zip testrot.zip testrot.exe
 zip timer.zip timer.exe
 zip timerot.zip timerot.exe
+zip torsfit.zip torsfit.exe
 zip valence.zip valence.exe
 zip vibbig.zip vibbig.exe
 zip vibrate.zip vibrate.exe

@@ -24,7 +24,6 @@ ifort /c /fast /Qno-ipo /w /Qvec-report0 bitors.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 bonds.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 born.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 bounds.f
-ifort /c /fast /Qno-ipo /w /Qvec-report0 bspline.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 calendar.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 center.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 chkpole.f
@@ -347,6 +346,7 @@ ifort /c /fast /Qno-ipo /w /Qvec-report0 timerot.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 tncg.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 torphase.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 torque.f
+ifort /c /fast /Qno-ipo /w /Qvec-report0 torsfit.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 torsions.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 trimtext.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 unitcell.f

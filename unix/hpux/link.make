@@ -54,6 +54,7 @@ fort77 -O2 +E1 +U77 -o testpair.x testpair.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o testrot.x testrot.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o timer.x timer.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o timerot.x timerot.o -L. -ltinker
+fort77 -O2 +E1 +U77 -o torsfit.x torsfit.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o valence.x valence.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o vibbig.x vibbig.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o vibrate.x vibrate.o -L. -ltinker

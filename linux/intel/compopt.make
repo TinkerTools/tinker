@@ -23,7 +23,6 @@ ifort -c -fast bitors.f
 ifort -c -fast bonds.f
 ifort -c -fast born.f
 ifort -c -fast bounds.f
-ifort -c -fast bspline.f
 ifort -c -fast calendar.f
 ifort -c -fast center.f
 ifort -c -fast chkpole.f
@@ -346,6 +345,7 @@ ifort -c -fast timerot.f
 ifort -c -fast tncg.f
 ifort -c -fast torphase.f
 ifort -c -fast torque.f
+ifort -c -fast torsfit.f
 ifort -c -fast torsions.f
 ifort -c -fast trimtext.f
 ifort -c -fast unitcell.f

@@ -23,7 +23,6 @@ g77 -c -O bitors.f
 g77 -c -O bonds.f
 g77 -c -O born.f
 g77 -c -O bounds.f
-g77 -c -O bspline.f
 g77 -c -O calendar.f
 g77 -c -O center.f
 g77 -c -O chkpole.f
@@ -346,6 +345,7 @@ g77 -c -O timerot.f
 g77 -c -O tncg.f
 g77 -c -O torphase.f
 g77 -c -O torque.f
+g77 -c -O torsfit.f
 g77 -c -O torsions.f
 g77 -c -O trimtext.f
 g77 -c -O unitcell.f

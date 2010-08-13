@@ -192,7 +192,6 @@ OBJS = active.o \
        bonds.o \
        born.o \
        bounds.o \
-       bspline.o \
        calendar.o \
        center.o \
        chkpole.o \
@@ -515,6 +514,7 @@ OBJS = active.o \
        tncg.o \
        torphase.o \
        torque.o \
+       torsfit.o \
        torsions.o \
        trimtext.o \
        unitcell.o \
@@ -581,6 +581,7 @@ EXEFILES = alchemy.x \
            testrot.x \
            timer.x \
            timerot.x \
+           torsfit.x \
            valence.x \
            vibbig.x \
            vibrate.x \
@@ -657,6 +658,7 @@ rename:
 	mv  testrot.x    $(BINDIR)/testrot
 	mv  timer.x      $(BINDIR)/timer
 	mv  timerot.x    $(BINDIR)/timerot
+	mv  torsfit.x    $(BINDIR)/torsfit
 	mv  valence.x    $(BINDIR)/valence
 	mv  vibbig.x     $(BINDIR)/vibbig
 	mv  vibrate.x    $(BINDIR)/vibrate
@@ -716,6 +718,7 @@ remove_links:
 	rm -f $(LINKDIR)/testrot
 	rm -f $(LINKDIR)/timer
 	rm -f $(LINKDIR)/timerot
+	rm -f $(LINKDIR)/torsfit
 	rm -f $(LINKDIR)/valence
 	rm -f $(LINKDIR)/vibbig
 	rm -f $(LINKDIR)/vibrate
@@ -775,6 +778,7 @@ create_links:
 	ln -s $(BINDIR)/testrot    $(LINKDIR)/testrot
 	ln -s $(BINDIR)/timer      $(LINKDIR)/timer
 	ln -s $(BINDIR)/timerot    $(LINKDIR)/timerot
+	ln -s $(BINDIR)/torsfit    $(LINKDIR)/torsfit
 	ln -s $(BINDIR)/valence    $(LINKDIR)/valence
 	ln -s $(BINDIR)/vibbig     $(LINKDIR)/vibbig
 	ln -s $(BINDIR)/vibrate    $(LINKDIR)/vibrate
@@ -799,7 +803,6 @@ libtinker.a: ${OBJS}
         bonds.o \
         born.o \
         bounds.o \
-        bspline.o \
         calendar.o \
         center.o \
         chkpole.o \
@@ -1108,7 +1111,6 @@ bitors.o: angle.i bitor.i couple.i iounit.i sizes.i
 bonds.o: atmlst.i atoms.i bond.i couple.i iounit.i sizes.i
 born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pb.i potent.i sizes.i solute.i virial.i
 bounds.o: atmtyp.i atoms.i boxes.i molcul.i sizes.i
-bspline.o:
 calendar.o:
 center.o: align.i sizes.i
 chkpole.o: atoms.i mpole.i sizes.i
@@ -1360,7 +1362,7 @@ overlap.o: units.i
 path.o: align.i atmtyp.i atoms.i files.i inform.i iounit.i linmin.i minima.i output.i paths.i sizes.i
 pdbxyz.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i iounit.i katoms.i pdb.i resdue.i sequen.i sizes.i
 piscf.o: atmtyp.i atoms.i bond.i border.i couple.i inform.i iounit.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
-pmestuff.o: atoms.i boxes.i chunks.i mpole.i pme.i sizes.i
+pmestuff.o: atoms.i boxes.i charge.i chunks.i mpole.i pme.i potent.i sizes.i
 pmpb.o:
 polarize.o: atoms.i inform.i iounit.i molcul.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
 poledit.o: atmtyp.i atoms.i couple.i dma.i files.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
@@ -1431,6 +1433,7 @@ timerot.o: cutoff.i iounit.i sizes.i
 tncg.o: hescut.i inform.i iounit.i keys.i linmin.i math.i minima.i output.i piorbs.i potent.i sizes.i
 torphase.o:
 torque.o: atoms.i deriv.i mpole.i sizes.i
+torsfit.o: atmtyp.i atoms.i files.i inform.i iounit.i keys.i kgeoms.i ktorsn.i math.i output.i potent.i qmstuf.i scales.i sizes.i tors.i usage.i
 torsions.o: bond.i couple.i iounit.i sizes.i tors.i
 trimtext.o:
 unitcell.o: bound.i boxes.i iounit.i keys.i sizes.i

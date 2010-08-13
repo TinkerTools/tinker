@@ -55,6 +55,7 @@ ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o testrot.x testrot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testrot.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o timer.x timer.o libtinker.a libfftw3_threads.a libfftw3.a ; strip timer.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o timerot.x timerot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip timerot.x
+ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o torsfit.x torsfit.o libtinker.a libfftw3_threads.a libfftw3.a ; strip torsfit.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o valence.x valence.o libtinker.a libfftw3_threads.a libfftw3.a ; strip valence.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o vibbig.x vibbig.o libtinker.a libfftw3_threads.a libfftw3.a ; strip vibbig.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -auto-scalar -static-intel -o vibrate.x vibrate.o libtinker.a libfftw3_threads.a libfftw3.a ; strip vibrate.x

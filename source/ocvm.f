@@ -82,7 +82,7 @@ c
       real*8 m(maxopt),n(maxopt)
       real*8 p(maxopt),q(maxopt)
       real*8 u(maxopt),hq(maxopt)
-      real*8 h(maxopt,maxopt)
+      real*8, pointer :: h(:,:)
       logical restart,done
       character*9 status
       character*20 keyword
@@ -176,6 +176,11 @@ c
    40    format (/,' VM Iter    F Value       G RMS     F Move',
      &              '    X Move      Angle   FG Call',/)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (h)
+      allocate (h(nvar,mvar))
 c
 c     set the "h" matrix to a diagonal upon restarting
 c
@@ -541,5 +546,9 @@ c
          end if
   170    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (h)
       return
       end

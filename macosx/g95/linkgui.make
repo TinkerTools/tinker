@@ -54,6 +54,7 @@ g95 -o testpair.x testpair.o libtinker.a -framework JavaVM -framework CoreFounda
 g95 -o testrot.x testrot.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o timer.x timer.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o timerot.x timerot.o libtinker.a -framework JavaVM -framework CoreFoundation
+g95 -o torsfit.x torsfit.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o valence.x valence.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o vibbig.x vibbig.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o vibrate.x vibrate.o libtinker.a -framework JavaVM -framework CoreFoundation
