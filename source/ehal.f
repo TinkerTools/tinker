@@ -603,7 +603,7 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer iv14(maxatm)
-      real*8 e,eps,rdn
+      real*8 e,eps,rdn,evt
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -642,6 +642,21 @@ c
          yred(i) = rdn*(y(i)-y(iv)) + y(iv)
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      evt = ev
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
+!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
+!$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
+!$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5)
+!$OMP& firstprivate(vscale)
+!$OMP& shared(evt)
+!$OMP DO reduction(+:evt) schedule(dynamic)
 c
 c     find the van der Waals energy via neighbor list search
 c
@@ -724,7 +739,7 @@ c
 c
 c     increment the overall van der Waals energy components
 c
-                  ev = ev + e
+                  evt = evt + e
                end if
             end if
          end do
@@ -744,5 +759,14 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ev = evt
       return
       end

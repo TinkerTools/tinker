@@ -754,6 +754,7 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
+      integer nevt
       integer iv14(maxatm)
       real*8 e,eps,rdn
       real*8 fgrp,rv,rv7
@@ -762,10 +763,12 @@ c
       real*8 rho,tau,taper
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
+      real*8 evt,eintert
       real*8 xred(maxatm)
       real*8 yred(maxatm)
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
+      real*8 aevt(maxatm)
       logical proceed,usei
       logical header,huge
 c
@@ -800,6 +803,26 @@ c
          yred(i) = rdn*(y(i)-y(iv)) + y(iv)
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      evt = ev
+      eintert = einter
+      nevt= nev
+      do i = 1, maxatm
+         aevt(i) = aev(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
+!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
+!$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
+!$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5,molcule,nev)
+!$OMP& firstprivate(vscale)
+!$OMP& shared(evt,nevt,aevt,eintert)
+!$OMP DO reduction(+:evt,nevt,aevt,eintert) schedule(dynamic)
 c
 c     find the van der Waals energy via neighbor list search
 c
@@ -883,16 +906,16 @@ c
 c     increment the overall van der Waals energy components
 c
                   if (e .ne. 0.0d0) then
-                     nev = nev + 1
-                     ev = ev + e
-                     aev(i) = aev(i) + 0.5d0*e
-                     aev(k) = aev(k) + 0.5d0*e
+                     nevt = nevt + 1
+                     evt = evt + e
+                     aevt(i) = aevt(i) + 0.5d0*e
+                     aevt(k) = aevt(k) + 0.5d0*e
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
+                     eintert = eintert + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -932,6 +955,20 @@ c
          do j = 1, n15(i)
             vscale(i15(j,i)) = 1.0d0
          end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ev = evt
+      einter = eintert
+      nev = nevt
+      do i = 1, maxatm
+         aev(i) = aevt(i)
       end do
       return
       end

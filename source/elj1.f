@@ -887,7 +887,7 @@ c
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
-c     copy global to local copies for OpenMP calculation
+c     transfer global to local copies for OpenMP calculation
 c
       evt = ev
       eintert = einter
@@ -1083,7 +1083,7 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     copy local to global copies for OpenMP calculation
+c     transfer local to global copies for OpenMP calculation
 c
       ev = evt
       einter = eintert
