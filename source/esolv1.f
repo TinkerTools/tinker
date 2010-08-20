@@ -523,7 +523,7 @@ c
       include 'chgpot.i'
       include 'deriv.i'
       include 'energi.i'
-      include 'gk.i'
+      include 'gkstuf.i'
       include 'group.i'
       include 'inter.i'
       include 'molcul.i'
@@ -3004,7 +3004,7 @@ c
       include 'deriv.i'
       include 'energi.i'
       include 'mpole.i'
-      include 'pb.i'
+      include 'pbstuf.i'
       include 'polar.i'
       include 'polpot.i'
       include 'potent.i'
@@ -3625,6 +3625,7 @@ c
       real*8 dedx,dedy,dedz
       real*8 cutmtx(maxatm)
       real*8 dcutmtx(maxatm)
+      real*8, pointer :: dacsa(:,:)
 c
 c
 c     zero out the hydrophobic potential of mean force energy
@@ -3636,6 +3637,11 @@ c
       rsurf = rcarbon + 2.0d0*rwater
       pisurf = pi * (rcarbon+rwater)
       hpmfcut2 = hpmfcut * hpmfcut
+c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (dacsa)
+      allocate (dacsa(n,npmf))
 c
 c     get the surface area and derivative terms for each atom
 c
@@ -3797,5 +3803,9 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dacsa)
       return
       end

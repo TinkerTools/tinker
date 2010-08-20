@@ -20,7 +20,7 @@ c
       subroutine ksolv
       implicit none
       include 'sizes.i'
-      include 'gk.i'
+      include 'gkstuf.i'
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
@@ -783,7 +783,7 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'couple.i'
-      include 'gk.i'
+      include 'gkstuf.i'
       include 'keys.i'
       include 'kvdws.i'
       include 'solute.i'
@@ -1106,14 +1106,14 @@ c
       include 'atmtyp.i'
       include 'bath.i'
       include 'couple.i'
-      include 'gk.i'
+      include 'gkstuf.i'
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
       include 'kvdws.i'
       include 'math.i'
       include 'npolar.i'
-      include 'pb.i'
+      include 'pbstuf.i'
       include 'potent.i'
       include 'solute.i'
       integer i,j,k,l,m
@@ -1611,15 +1611,18 @@ c
 c
 c     make call needed to initialize the APBS calculation
 c
+      call apbsinitial (dime,grid,gcent,cgrid,cgcent,fgrid,fgcent,
+     &                  pdie,sdie,srad,swin,sdens,kelvin,ionn,ionc,
+     &                  ionq,ionr,pbtyp,pbtyplen,pbsoln,pbsolnlen,
+     &                  bcfl,bcfllen,chgm,chgmlen,srfm,srfmlen)
+c
+c     print out the APBS grid dimensions and spacing
+c
       if (verbose) then
          write (iout,160)  (dime(i),i=1,3),grid(1)
   160    format (/,' APBS Grid Dimensions and Spacing :',
      &           //,10x,3i8,10x,f10.4)
       end if
-      call apbsinitial (dime,grid,gcent,cgrid,cgcent,fgrid,fgcent,
-     &                  pdie,sdie,srad,swin,sdens,kelvin,ionn,ionc,
-     &                  ionq,ionr,pbtyp,pbtyplen,pbsoln,pbsolnlen,
-     &                  bcfl,bcfllen,chgm,chgmlen,srfm,srfmlen)
       return
       end
 c
@@ -1774,7 +1777,6 @@ c
       include 'atoms.i'
       include 'couple.i'
       include 'hpmf.i'
-      include 'iounit.i'
       integer i,j,k
       integer nh,atmnum
       logical keep
@@ -1806,15 +1808,6 @@ c
             end if
          end if
       end do
-c
-c     check for too many total hydrophobic PMF carbon atoms
-c
-      if (npmf .gt. maxpmf) then
-         write (iout,10)
-   10    format (/,' KHPMF  --  Too many Hydrophobic PMF Atoms;',
-     &              ' Increase MAXPMF')
-         call fatal
-      end if
 c
 c     assign HPMF atomic radii from traditional Bondi values
 c

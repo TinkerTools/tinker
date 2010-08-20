@@ -180,7 +180,7 @@ c     ###############################################################
 c
 c
 c     "table_fill" constructs an array which stores the spatial
-c     regions of the PME charge grid containing contributions
+c     regions of the particle mesh Ewald grid with contributions
 c     from each electrostatic site
 c
 c
@@ -215,18 +215,18 @@ c
          nearpt(2) = igrid(2,i) + grdoff
          nearpt(3) = igrid(3,i) + grdoff
          if (nearpt(1) .lt. 1) then
-            nearpt(1) = nfft1 + mod(nearpt(1),nfft1)
-         else if (nearpt(1) .ge. nfft1) then
+            nearpt(1) = mod(nearpt(1),nfft1) + nfft1
+         else if (nearpt(1) .gt. nfft1) then
             nearpt(1) = mod(nearpt(1),nfft1)
          end if
          if (nearpt(2) .lt. 1) then
-            nearpt(2) = nfft2 + mod(nearpt(2),nfft2)
-         else if (nearpt(2) .ge. nfft2) then
+            nearpt(2) = mod(nearpt(2),nfft2) + nfft2
+         else if (nearpt(2) .gt. nfft2) then
             nearpt(2) = mod(nearpt(2),nfft2)
          end if
          if (nearpt(3) .lt. 1) then
-            nearpt(3) = nfft3 + mod(nearpt(3),nfft3)
-         else if (nearpt(3) .ge. nfft3) then
+            nearpt(3) = mod(nearpt(3),nfft3) + nfft3
+         else if (nearpt(3) .gt. nfft3) then
             nearpt(3) = mod(nearpt(3),nfft3)
          end if
          abound(1) = nearpt(1) - nlpts
@@ -238,12 +238,6 @@ c
          cid(1) = (nearpt(1)-1)/ngrd1 + 1
          cid(2) = (nearpt(2)-1)/ngrd2 + 1
          cid(3) = (nearpt(3)-1)/ngrd3 + 1
-         if (cid(1).lt.1 .or. cid(1).gt.nchk1)
-     &      cid(1) = abs(mod(cid(1),nchk1)) + 1
-         if (cid(2).lt.1 .or. cid(2).gt.nchk2)
-     &      cid(2) = abs(mod(cid(2),nchk2)) + 1
-         if (cid(3).lt.1 .or. cid(3).gt.nchk3)
-     &      cid(3) = abs(mod(cid(3),nchk3)) + 1
          cbound(1) = (cid(1)-1)*ngrd1 + 1
          cbound(2) = cbound(1) + ngrd1 - 1
          cbound(3) = (cid(2)-1)*ngrd2 + 1

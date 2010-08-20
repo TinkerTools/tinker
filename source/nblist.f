@@ -841,7 +841,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "mfull" performs a complete rebuild of the partial charge
+c     "mfull" performs a complete rebuild of the atomic multipole
 c     pair neighbor list for all sites using the method of lights
 c
 c

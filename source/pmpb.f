@@ -26,6 +26,7 @@ c
      &                        pbtyplen,pbsoln,pbsolnlen,bcfl,
      &                        bcfllen,chgm,chgmlen,srfm,srfmlen)
       implicit none
+      include 'iounit.i'
       integer dime(*)
       integer ionn
       integer ionq(*)
@@ -53,6 +54,14 @@ c
       character*(*) bcfl
       character*(*) chgm
       character*(*) srfm
+c
+c
+c     exit with an error message if APBS calculation is attempted
+c
+      write (iout,10)
+   10 format (/,' APBSINITIAL  --  APBS Not Supported by This',
+     &           ' TINKER Version')
+      call fatal
       return
       end
 c

@@ -59,7 +59,7 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'math.i'
-      include 'pb.i'
+      include 'pbstuf.i'
       include 'solute.i'
       integer i,j,k,it,kt
       integer skip(maxatm)

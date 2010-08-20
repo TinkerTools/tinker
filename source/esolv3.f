@@ -476,7 +476,7 @@ c
       include 'atmtyp.i'
       include 'chgpot.i'
       include 'energi.i'
-      include 'gk.i'
+      include 'gkstuf.i'
       include 'group.i'
       include 'inform.i'
       include 'inter.i'
@@ -1179,7 +1179,7 @@ c
       include 'chgpot.i'
       include 'energi.i'
       include 'mpole.i'
-      include 'pb.i'
+      include 'pbstuf.i'
       include 'polar.i'
       include 'potent.i'
       integer i,ii

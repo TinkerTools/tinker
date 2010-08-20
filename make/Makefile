@@ -30,7 +30,7 @@
 ##  LINKDIR      Linked Copies of TINKER Executables
 ##
 
-TINKERDIR = /user/ponder/tinker
+TINKERDIR = /Users/ponder/tinker
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
 
@@ -62,8 +62,8 @@ LINKDIR = /usr/local/bin
 
 #F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
 #LIBS =
-#F77FLAGS = -c
-#OPTFLAGS = -O3 -axSSE3 -no-ipo -no-prec-div -vec-report0
+#F77FLAGS = -c -axSSE3 -vec-report0
+#OPTFLAGS = -O3 -no-ipo -no-prec-div
 #LIBFLAGS = -crusv
 #LINKFLAGS = -static-intel
 
@@ -76,28 +76,25 @@ LINKDIR = /usr/local/bin
 ##
 
 #F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
-#CC = /opt/intel/Compiler/11.1/072/bin/ia32/icc
-#LIBS = #-L/user/ponder/tinker/fftw/lib -lfftw3_threads -lfftw3 -lm
-#INC = -I/usr/include
+#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
 #F77FLAGS = -c -axSSE3 -assume cc_omp
-#CFLAGS = -c $(INC)
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
 #LIBFLAGS = -crusv
-#LINKFLAGS = $(OPTFLAGS) -static-intel $(LIBS)
+#LINKFLAGS = $(OPTFLAGS) -static-intel
 
 ##
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.5 (Leopard)
+##  Oper Sys: OS X 10.6 (Snow Leopard)
 ##  Compiler: Intel Fortran for Mac 11
 ##
 
-F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
-LIBS =
-F77FLAGS = -c
-OPTFLAGS = -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0
-LIBFLAGS = -crusv
-LINKFLAGS = -static-intel -mmacosx-version-min=10.4
+#F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
+#LIBS =
+#F77FLAGS = -c -axSSSE3 -vec-report0
+#OPTFLAGS = -O3 -no-ipo -no-prec-div
+#LIBFLAGS = -crusv
+#LINKFLAGS = -static-intel -mmacosx-version-min=10.4
 
 ##
 ##  Machine:  Macintosh
@@ -107,15 +104,12 @@ LINKFLAGS = -static-intel -mmacosx-version-min=10.4
 ##  Parallel: OpenMP
 ##
 
-#F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
-#CC = /opt/intel/Compiler/11.1/088/bin/intel64/icc
-#LIBS = #-L/user/ponder/tinker/fftw/lib -lfftw3_threads -lfftw3 -lm
-#INC = -I/usr/include
-#F77FLAGS = -c -axSSSE3 -assume cc_omp
-#CFLAGS = -c $(INC)
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
-#LIBFLAGS = -crusv
-#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.4 $(LIBS)
+F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
+LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+F77FLAGS = -c -axSSSE3 -assume cc_omp
+OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
+LIBFLAGS = -crusv
+LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.4
 
 ##
 ##  Machine:  Macintosh
@@ -126,7 +120,6 @@ LINKFLAGS = -static-intel -mmacosx-version-min=10.4
 
 #F77 = /opt/ibmcmp/xlf/8.1/bin/xlf
 #F77FLAGS = -c -qextname
-#CFLAGS = -c
 #OPTFLAGS = -O2 -qmaxmem=-1
 #LIBFLAGS = -r
 #LINKFLAGS =
@@ -596,11 +589,14 @@ EXEFILES = alchemy.x \
 .f.o:
 	${F77} ${F77FLAGS} ${OPTFLAGS} $*.f 
 
-.c.o:
-	${CC} ${CFLAGS} ${INCLUDEDIR} ${OPTFLAGS} $*.c 
+pmpb.o:
+	${F77} ${F77FLAGS} ${OPTFLAGS} pmpb.f
+
+server.o:
+	${F77} ${F77FLAGS} ${OPTFLAGS} server.f
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ $^ ${LIBS}
+	${F77} ${LINKFLAGS} -o $@ $^ ${LIBS}; strip $@
 
 all:	${EXEFILES}
 
@@ -608,7 +604,7 @@ clean:
 	rm -f *.o *.a *.x
 
 listing:
-	cat *.i *.f > tinker.txt
+	cat *.i *.f *.c > tinker.txt
 
 rename:
 	mv  alchemy.x    $(BINDIR)/alchemy
@@ -1109,7 +1105,7 @@ beeman.o: atmtyp.i atoms.i moldyn.i shake.i sizes.i units.i usage.i
 bicubic.o:
 bitors.o: angle.i bitor.i couple.i iounit.i sizes.i
 bonds.o: atmlst.i atoms.i bond.i couple.i iounit.i sizes.i
-born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pb.i potent.i sizes.i solute.i virial.i
+born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pbstuf.i potent.i sizes.i solute.i virial.i
 bounds.o: atmtyp.i atoms.i boxes.i molcul.i sizes.i
 calendar.o:
 center.o: align.i sizes.i
@@ -1219,10 +1215,10 @@ erxnfld.o: atoms.i chgpot.i energi.i mpole.i rxnfld.i rxnpot.i shunt.i sizes.i u
 erxnfld1.o: atoms.i deriv.i energi.i sizes.i
 erxnfld2.o:
 erxnfld3.o: action.i analyz.i atmtyp.i atoms.i chgpot.i energi.i inform.i iounit.i mpole.i shunt.i sizes.i usage.i
-esolv.o: atmtyp.i atoms.i bound.i charge.i chgpot.i couple.i deriv.i energi.i gk.i group.i hpmf.i kvdws.i math.i mpole.i npolar.i pb.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i usage.i vdw.i warp.i
-esolv1.o: atmtyp.i atoms.i bound.i boxes.i charge.i chgpot.i couple.i cutoff.i deriv.i energi.i gk.i group.i hpmf.i inter.i iounit.i kvdws.i math.i molcul.i mplpot.i mpole.i npolar.i pb.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i usage.i vdw.i virial.i warp.i
+esolv.o: atmtyp.i atoms.i bound.i charge.i chgpot.i couple.i deriv.i energi.i gkstuf.i group.i hpmf.i kvdws.i math.i mpole.i npolar.i pbstuf.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i usage.i vdw.i warp.i
+esolv1.o: atmtyp.i atoms.i bound.i boxes.i charge.i chgpot.i couple.i cutoff.i deriv.i energi.i gkstuf.i group.i hpmf.i inter.i iounit.i kvdws.i math.i molcul.i mplpot.i mpole.i npolar.i pbstuf.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i usage.i vdw.i virial.i warp.i
 esolv2.o: atoms.i charge.i chgpot.i hessn.i math.i potent.i shunt.i sizes.i solute.i warp.i
-esolv3.o: action.i analyz.i atmtyp.i atoms.i bound.i charge.i chgpot.i couple.i deriv.i energi.i gk.i group.i hpmf.i inform.i inter.i iounit.i kvdws.i math.i molcul.i mpole.i npolar.i pb.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i usage.i vdw.i warp.i
+esolv3.o: action.i analyz.i atmtyp.i atoms.i bound.i charge.i chgpot.i couple.i deriv.i energi.i gkstuf.i group.i hpmf.i inform.i inter.i iounit.i kvdws.i math.i molcul.i mpole.i npolar.i pbstuf.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i usage.i vdw.i warp.i
 estrbnd.o: angle.i angpot.i atoms.i bond.i bound.i energi.i group.i math.i sizes.i strbnd.i usage.i
 estrbnd1.o: angle.i angpot.i atoms.i bond.i bound.i deriv.i energi.i group.i math.i sizes.i strbnd.i usage.i virial.i
 estrbnd2.o: angle.i angpot.i atoms.i bond.i bound.i group.i hessn.i math.i sizes.i strbnd.i
@@ -1281,7 +1277,7 @@ hessrot.o: math.i omega.i sizes.i zcoord.i
 hybrid.o: angle.i atmlst.i atmtyp.i atoms.i bond.i charge.i couple.i dipole.i imptor.i inform.i iounit.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i kitors.i kpolr.i kstbnd.i ksttor.i ktorsn.i kvdws.i math.i mpole.i mutant.i polar.i sizes.i strbnd.i strtor.i tors.i vdw.i vdwpot.i
 image.o: boxes.i cell.i sizes.i
 impose.o: align.i inform.i iounit.i sizes.i
-induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gk.i group.i inform.i iounit.i math.i mpole.i neigh.i pb.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i
+induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i
 inertia.o: atmtyp.i atoms.i iounit.i math.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
 initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
@@ -1311,7 +1307,7 @@ kopdist.o: angle.i angpot.i atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i
 korbit.o: atmtyp.i atoms.i bond.i inform.i iounit.i keys.i korbs.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
 kpitors.o: atmtyp.i atoms.i bond.i couple.i inform.i iounit.i keys.i kpitor.i pitors.i potent.i sizes.i
 kpolar.o: atoms.i couple.i inform.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i
-ksolv.o: angle.i atmlst.i atmtyp.i atoms.i bath.i bond.i chgpot.i couple.i gk.i hpmf.i inform.i iounit.i keys.i kvdws.i math.i npolar.i pb.i potent.i sizes.i solute.i
+ksolv.o: angle.i atmlst.i atmtyp.i atoms.i bath.i bond.i chgpot.i couple.i gkstuf.i hpmf.i inform.i iounit.i keys.i kvdws.i math.i npolar.i pbstuf.i potent.i sizes.i solute.i
 kstrbnd.o: angle.i angpot.i atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i keys.i kstbnd.i potent.i sizes.i strbnd.i
 kstrtor.o: atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i keys.i ksttor.i potent.i sizes.i strtor.i tors.i
 ktors.o: atmtyp.i atoms.i couple.i inform.i iounit.i keys.i ktorsn.i math.i potent.i sizes.i tors.i usage.i

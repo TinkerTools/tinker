@@ -877,6 +877,7 @@ c
       integer iclass(0:maxclass)
       real*8 pol,thl
       logical dotype,doclass
+      logical prtclass
       character*20 keyword
       character*30 blank
       character*120 record
@@ -917,8 +918,9 @@ c
          if (offset .gt. 0)  kc = offset - 1
       end if
 c
-c     count and order the atom types and atom classes
+c     count, order and test equivalence of atom types and classes
 c
+      prtclass = .false.
       do i = 1, nprm
          record = prmline(i)
          next = 1
@@ -930,6 +932,7 @@ c
             call getnumb (record,it,next)
             call getnumb (record,ic,next)
             if (ic .eq. 0)  ic = it
+            if (it .ne. ic)  prtclass = .true.
             if (itype(it) .eq. 0) then
                kt = kt + 1
                if (dotype) then
@@ -965,8 +968,13 @@ c
             if (ib .eq. 0)  ib = ia
             ia = itype(ia)
             ib = iclass(ib)
-            write (iprm,50)  ia,ib,record(next:length)
-   50       format ('atom',6x,2i5,a)
+            if (prtclass) then
+               write (iprm,50)  ia,ib,record(next:length)
+   50          format ('atom',6x,2i5,a)
+            else
+               write (iprm,60)  ia,record(next:length)
+   60          format ('atom',6x,i5,a)
+            end if
          else if (keyword(1:4) .eq. 'VDW ') then
             ia = 0
             call getnumb (record,ia,next)
@@ -975,8 +983,8 @@ c
             else
                ia = iclass(ia)
             end if
-            write (iprm,60)  ia,record(next:length)
-   60       format ('vdw',7x,i5,a)
+            write (iprm,70)  ia,record(next:length)
+   70       format ('vdw',7x,i5,a)
          else if (keyword(1:6) .eq. 'VDW14 ') then
             ia = 0
             call getnumb (record,ia,next)
@@ -985,8 +993,8 @@ c
             else
                ia = iclass(ia)
             end if
-            write (iprm,70)  ia,record(next:length)
-   70       format ('vdw14',5x,i5,a)
+            write (iprm,80)  ia,record(next:length)
+   80       format ('vdw14',5x,i5,a)
          else if (keyword(1:6) .eq. 'VDWPR ') then
             ia = 0
             ib = 0
@@ -1000,8 +1008,8 @@ c
                ib = iclass(ib)
             end if
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,80)  ia,ib,record(next:length)
-   80       format ('vdwpr',5x,2i5,a)
+            write (iprm,90)  ia,ib,record(next:length)
+   90       format ('vdwpr',5x,2i5,a)
          else if (keyword(1:6) .eq. 'HBOND ') then
             ia = 0
             ib = 0
@@ -1015,8 +1023,8 @@ c
                ib = iclass(ib)
             end if
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,90)  ia,ib,record(next:length)
-   90       format ('hbond',5x,2i5,a)
+            write (iprm,100)  ia,ib,record(next:length)
+  100       format ('hbond',5x,2i5,a)
          else if (keyword(1:5) .eq. 'BOND ') then
             ia = 0
             ib = 0
@@ -1025,8 +1033,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,100)  ia,ib,record(next:length)
-  100       format ('bond',6x,2i5,a)
+            write (iprm,110)  ia,ib,record(next:length)
+  110       format ('bond',6x,2i5,a)
          else if (keyword(1:6) .eq. 'BOND5 ') then
             ia = 0
             ib = 0
@@ -1035,8 +1043,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,110)  ia,ib,record(next:length)
-  110       format ('bond5',5x,2i5,a)
+            write (iprm,120)  ia,ib,record(next:length)
+  120       format ('bond5',5x,2i5,a)
          else if (keyword(1:6) .eq. 'BOND4 ') then
             ia = 0
             ib = 0
@@ -1045,8 +1053,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,120)  ia,ib,record(next:length)
-  120       format ('bond4',5x,2i5,a)
+            write (iprm,130)  ia,ib,record(next:length)
+  130       format ('bond4',5x,2i5,a)
          else if (keyword(1:6) .eq. 'BOND3 ') then
             ia = 0
             ib = 0
@@ -1055,8 +1063,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,130)  ia,ib,record(next:length)
-  130       format ('bond3',5x,2i5,a)
+            write (iprm,140)  ia,ib,record(next:length)
+  140       format ('bond3',5x,2i5,a)
          else if (keyword(1:9) .eq. 'ELECTNEG ') then
             ia = 0
             ib = 0
@@ -1067,8 +1075,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             ic = iclass(ic)
-            write (iprm,140)  ia,ib,ic,record(next:length)
-  140       format ('electneg',2x,3i5,a)
+            write (iprm,150)  ia,ib,ic,record(next:length)
+  150       format ('electneg',2x,3i5,a)
          else if (keyword(1:6) .eq. 'ANGLE ') then
             ia = 0
             ib = 0
@@ -1080,8 +1088,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,150)  ia,ib,ic,record(next:length)
-  150       format ('angle',5x,3i5,a)
+            write (iprm,160)  ia,ib,ic,record(next:length)
+  160       format ('angle',5x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLE5 ') then
             ia = 0
             ib = 0
@@ -1093,8 +1101,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,160)  ia,ib,ic,record(next:length)
-  160       format ('angle5',4x,3i5,a)
+            write (iprm,170)  ia,ib,ic,record(next:length)
+  170       format ('angle5',4x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLE4 ') then
             ia = 0
             ib = 0
@@ -1106,8 +1114,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,170)  ia,ib,ic,record(next:length)
-  170       format ('angle4',4x,3i5,a)
+            write (iprm,180)  ia,ib,ic,record(next:length)
+  180       format ('angle4',4x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLE3 ') then
             ia = 0
             ib = 0
@@ -1119,8 +1127,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,180)  ia,ib,ic,record(next:length)
-  180       format ('angle3',4x,3i5,a)
+            write (iprm,190)  ia,ib,ic,record(next:length)
+  190       format ('angle3',4x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLEF ') then
             ia = 0
             ib = 0
@@ -1132,8 +1140,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,190)  ia,ib,ic,record(next:length)
-  190       format ('anglef',4x,3i5,a)
+            write (iprm,200)  ia,ib,ic,record(next:length)
+  200       format ('anglef',4x,3i5,a)
          else if (keyword(1:7) .eq. 'STRBND ') then
             ia = 0
             ib = 0
@@ -1144,8 +1152,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             ic = iclass(ic)
-            write (iprm,200)  ia,ib,ic,record(next:length)
-  200       format ('strbnd',4x,3i5,a)
+            write (iprm,210)  ia,ib,ic,record(next:length)
+  210       format ('strbnd',4x,3i5,a)
          else if (keyword(1:9) .eq. 'UREYBRAD ') then
             ia = 0
             ib = 0
@@ -1157,14 +1165,14 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,210)  ia,ib,ic,record(next:length)
-  210       format ('ureybrad',2x,3i5,a)
+            write (iprm,220)  ia,ib,ic,record(next:length)
+  220       format ('ureybrad',2x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGANG ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,220)  ia,record(next:length)
-  220       format ('angang',4x,i5,a)
+            write (iprm,230)  ia,record(next:length)
+  230       format ('angang',4x,i5,a)
          else if (keyword(1:7) .eq. 'OPBEND ') then
             ia = 0
             ib = 0
@@ -1179,8 +1187,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (2,ic,id,0,0,0)
-            write (iprm,230)  ia,ib,ic,id,record(next:length)
-  230       format ('opbend',4x,4i5,a)
+            write (iprm,240)  ia,ib,ic,id,record(next:length)
+  240       format ('opbend',4x,4i5,a)
          else if (keyword(1:7) .eq. 'OPDIST ') then
             ia = 0
             ib = 0
@@ -1197,8 +1205,8 @@ c
             call prmsort (2,ib,ic,0,0,0)
             call prmsort (2,ib,id,0,0,0)
             call prmsort (2,ic,id,0,0,0)
-            write (iprm,240)  ia,ib,ic,id,record(next:length)
-  240       format ('opdist',4x,4i5,a)
+            write (iprm,250)  ia,ib,ic,id,record(next:length)
+  250       format ('opdist',4x,4i5,a)
          else if (keyword(1:9) .eq. 'IMPROPER ') then
             ia = 0
             ib = 0
@@ -1212,8 +1220,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            write (iprm,250)  ia,ib,ic,id,record(next:length)
-  250       format ('improper',2x,4i5,a)
+            write (iprm,260)  ia,ib,ic,id,record(next:length)
+  260       format ('improper',2x,4i5,a)
          else if (keyword(1:8) .eq. 'IMPTORS ') then
             ia = 0
             ib = 0
@@ -1227,8 +1235,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            write (iprm,260)  ia,ib,ic,id,record(next:length)
-  260       format ('imptors',3x,4i5,a)
+            write (iprm,270)  ia,ib,ic,id,record(next:length)
+  270       format ('imptors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'TORSION ') then
             ia = 0
             ib = 0
@@ -1243,8 +1251,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,270)  ia,ib,ic,id,record(next:length)
-  270       format ('torsion',3x,4i5,a)
+            write (iprm,280)  ia,ib,ic,id,record(next:length)
+  280       format ('torsion',3x,4i5,a)
          else if (keyword(1:9) .eq. 'TORSION5 ') then
             ia = 0
             ib = 0
@@ -1259,8 +1267,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,280)  ia,ib,ic,id,record(next:length)
-  280       format ('torsion5',2x,4i5,a)
+            write (iprm,290)  ia,ib,ic,id,record(next:length)
+  290       format ('torsion5',2x,4i5,a)
          else if (keyword(1:9) .eq. 'TORSION4 ') then
             ia = 0
             ib = 0
@@ -1275,8 +1283,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,290)  ia,ib,ic,id,record(next:length)
-  290       format ('torsion4',2x,4i5,a)
+            write (iprm,300)  ia,ib,ic,id,record(next:length)
+  300       format ('torsion4',2x,4i5,a)
          else if (keyword(1:7) .eq. 'PITORS ') then
             ia = 0
             ib = 0
@@ -1285,8 +1293,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,300)  ia,ib,record(next:length)
-  300       format ('pitors',4x,2i5,a)
+            write (iprm,310)  ia,ib,record(next:length)
+  310       format ('pitors',4x,2i5,a)
          else if (keyword(1:8) .eq. 'STRTORS ') then
             ia = 0
             ib = 0
@@ -1301,8 +1309,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,310)  ia,ib,ic,id,record(next:length)
-  310       format ('strtors',3x,4i5,a)
+            write (iprm,320)  ia,ib,ic,id,record(next:length)
+  320       format ('strtors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'TORTORS ') then
             ia = 0
             ib = 0
@@ -1319,14 +1327,14 @@ c
             ic = iclass(ic)
             id = iclass(id)
             ie = iclass(ie)
-            write (iprm,320)  ia,ib,ic,id,ie,record(next:length)
-  320       format ('tortors',3x,5i5,a)
+            write (iprm,330)  ia,ib,ic,id,ie,record(next:length)
+  330       format ('tortors',3x,5i5,a)
          else if (keyword(1:7) .eq. 'CHARGE ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = itype(ia)
-            write (iprm,330)  ia,record(next:length)
-  330       format ('charge',4x,i5,a)
+            write (iprm,340)  ia,record(next:length)
+  340       format ('charge',4x,i5,a)
          else if (keyword(1:7) .eq. 'DIPOLE ') then
             ia = 0
             ib = 0
@@ -1334,8 +1342,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,340)  ia,ib,record(next:length)
-  340       format ('dipole',4x,2i5,a)
+            write (iprm,350)  ia,ib,record(next:length)
+  350       format ('dipole',4x,2i5,a)
          else if (keyword(1:8) .eq. 'DIPOLE5 ') then
             ia = 0
             ib = 0
@@ -1343,8 +1351,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,350)  ia,ib,record(next:length)
-  350       format ('dipole5',3x,2i5,a)
+            write (iprm,360)  ia,ib,record(next:length)
+  360       format ('dipole5',3x,2i5,a)
          else if (keyword(1:8) .eq. 'DIPOLE4 ') then
             ia = 0
             ib = 0
@@ -1352,8 +1360,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,360)  ia,ib,record(next:length)
-  360       format ('dipole4',3x,2i5,a)
+            write (iprm,370)  ia,ib,record(next:length)
+  370       format ('dipole4',3x,2i5,a)
          else if (keyword(1:8) .eq. 'DIPOLE3 ') then
             ia = 0
             ib = 0
@@ -1361,8 +1369,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,370)  ia,ib,record(next:length)
-  370       format ('dipole3',3x,2i5,a)
+            write (iprm,380)  ia,ib,record(next:length)
+  380       format ('dipole3',3x,2i5,a)
          else if (keyword(1:10) .eq. 'MULTIPOLE ') then
             ia = 0
             ib = 0
@@ -1377,11 +1385,11 @@ c
             ic = isign(1,ic) * itype(abs(ic))
             id = isign(1,id) * itype(abs(id))
             if (id .eq. 0) then
-               write (iprm,380)  ia,ib,ic,record(next:length)
-  380          format ('multipole',1x,3i5,a)
+               write (iprm,390)  ia,ib,ic,record(next:length)
+  390          format ('multipole',1x,3i5,a)
             else
-               write (iprm,390)  ia,ib,ic,id,record(next:length)
-  390          format ('multipole',1x,4i5,a)
+               write (iprm,400)  ia,ib,ic,id,record(next:length)
+  400          format ('multipole',1x,4i5,a)
             end if
          else if (keyword(1:9) .eq. 'POLARIZE ') then
             ia = 0
@@ -1392,9 +1400,9 @@ c
                ig(j) = 0
             end do
             string = record(next:120)
-            read (string,*,err=400,end=400)  ia,pol,thl,
+            read (string,*,err=410,end=410)  ia,pol,thl,
      &                                       (ig(j),j=1,maxval)
-  400       continue
+  410       continue
             ia = itype(ia)
             do j = 1, maxval
                if (ig(j) .ne. 0) then
@@ -1403,14 +1411,14 @@ c
                end if
             end do
             call sort (kg,ig)
-            write (iprm,410)  ia,pol,thl,(ig(j),j=1,kg)
-  410       format ('polarize',2x,i5,f20.3,f11.3,3x,8i5)
+            write (iprm,420)  ia,pol,thl,(ig(j),j=1,kg)
+  420       format ('polarize',2x,i5,f20.3,f11.3,3x,8i5)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,420)  ia,record(next:length)
-  420       format ('piatom',4x,i5,a)
+            write (iprm,430)  ia,record(next:length)
+  430       format ('piatom',4x,i5,a)
          else if (keyword(1:7) .eq. 'PIBOND ') then
             ia = 0
             ib = 0
@@ -1419,8 +1427,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,430)  ia,ib,record(next:length)
-  430       format ('pibond',4x,2i5,a)
+            write (iprm,440)  ia,ib,record(next:length)
+  440       format ('pibond',4x,2i5,a)
          else if (keyword(1:8) .eq. 'PIBOND5 ') then
             ia = 0
             ib = 0
@@ -1429,8 +1437,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,440)  ia,ib,record(next:length)
-  440       format ('pibond5',3x,2i5,a)
+            write (iprm,450)  ia,ib,record(next:length)
+  450       format ('pibond5',3x,2i5,a)
          else if (keyword(1:8) .eq. 'PIBOND4 ') then
             ia = 0
             ib = 0
@@ -1439,37 +1447,37 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,450)  ia,ib,record(next:length)
-  450       format ('pibond4',3x,2i5,a)
+            write (iprm,460)  ia,ib,record(next:length)
+  460       format ('pibond4',3x,2i5,a)
          else if (keyword(1:6) .eq. 'METAL ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,460)  ia,record(next:length)
-  460       format ('metal',5x,i5,a)
+            write (iprm,470)  ia,record(next:length)
+  470       format ('metal',5x,i5,a)
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
             string = record(next:120)
-            read (string,*,err=470,end=470)  ia
+            read (string,*,err=480,end=480)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:120)
-            read (string,*,err=470,end=470)  ib
-  470       continue
+            read (string,*,err=480,end=480)  ib
+  480       continue
             if (ib .ne. 0) then
                ib = itype(ib)
                if (ib.eq.0 .and. kt.lt.999)  ib = 999
             end if
             length = min(30,max(1,51-next))
-            write (iprm,480)  record(8:next)//blank(1:length),ib
-  480       format ('biotype',a,i5)
+            write (iprm,490)  record(8:next)//blank(1:length),ib
+  490       format ('biotype',a,i5)
          else if (length .eq. 0) then
-            write (iprm,490)
-  490       format ()
+            write (iprm,500)
+  500       format ()
          else
-            write (iprm,500)  record(1:length)
-  500       format (a)
+            write (iprm,510)  record(1:length)
+  510       format (a)
          end if
       end do
       return

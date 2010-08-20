@@ -70,6 +70,9 @@ c
 !$    nthread = nproc
 !$    call omp_set_num_threads (nthread)
 !$    call omp_set_nested (.true.)
+c
+c     Intel compiler extensions to OpenMP standard
+c
 !$    call kmp_set_stacksize (2**24)
 !$    call kmp_set_blocktime (0)
 c

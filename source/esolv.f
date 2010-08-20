@@ -357,7 +357,7 @@ c
       include 'atoms.i'
       include 'chgpot.i'
       include 'energi.i'
-      include 'gk.i'
+      include 'gkstuf.i'
       include 'group.i'
       include 'mpole.i'
       include 'polar.i'
@@ -1014,7 +1014,7 @@ c
       include 'chgpot.i'
       include 'energi.i'
       include 'mpole.i'
-      include 'pb.i'
+      include 'pbstuf.i'
       include 'polar.i'
       include 'potent.i'
       integer i,ii
@@ -1063,7 +1063,7 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'mpole.i'
-      include 'pb.i'
+      include 'pbstuf.i'
       include 'solute.i'
       integer i,j,ii
       real*8 pos(3,maxatm)

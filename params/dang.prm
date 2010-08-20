@@ -30,6 +30,10 @@ L. X. Dang, "Development of Nonadditive Intermolecular Potentials Using
 Molecular Dynamics: Solvation of Li+ and F- Ions in Polarizable Water",
 J. Chem. Phys., 96, 6970-6977 (1992)
 
+D. E. Smith and L. X. Dang, "Interionic Potentials of Mean Force for SrCl2
+in Polarizable Water: A Computer Simulation Study", Chem. Phys. Lett.,
+230, 209-214 (1994)
+
 L. X. Dang and T.-M. Chang, "Molecular Dynamics Study of Water Clusters,
 Liquid, and Liquid-Vapor Interface of Water with Many-Body Potentials".
 J. Chem. Phys., 106, 8149-8159 (1997)
@@ -87,9 +91,17 @@ J. L. Thomas, M. Roeselova, L. X. Dang and D. J. Tobias, "Molecular
 Dynamics Simulations of the Solution-Air Interface of Aqueous Sodium
 Nitrate", J. Phys. Chem. A, 111, 3091-3098 (2007)
 
+C. D. Wick and L. X. Dang, "Molecular Dynamics Study of Ion Transfer and
+Distribution at the Interface of Water and 1,2-Dichloroethane", J. Chem.
+Phys. C, 112, 647-649 (2008)
+
 C. D. Wick and L. X. Dang, "Investigating Hydroxide Anion Interfacial
 Activity by Classical and Multistate Empirical Valence Bond Molecular
 Dynamics Simulations", J. Phys. Chem. A, 113, 6356-6364 (2009)
+
+X. Sun, T.-M. Chang, Y. Cao, S. Niwayama, W. L. Hase and L. X. Dang,
+"Solvation of Dimethyl Succinate in a Sodium Hydroxide Aqueous Solution.
+A Computational Study", J. Phys. Chem. B, 113, 6473-6477 (2009)
 
 M. Baer, C. J. Mundy, T.-M. Chang, F.-M. Tao and L. X. Dang, "Interpreting
 Vibrational Sum-Frequency Spectra of Sulfur Dioxide at the Air/Water
@@ -110,8 +122,8 @@ species should be rigid bodies to reproduce the published Dang models
 atom          1    OW    "Dang-Chang Water O"           8    15.995    3
 atom          2    HW    "Dang-Chang Water H"           1     1.008    1
 atom          3    M     "Dang-Chang Water M"           0     0.001    1
-atom          4    O     "Dang 3-Site Water O"          8    15.995    2
-atom          5    H     "Dang 3-Site Water H"          1     1.008    1
+atom          4    O     "Dang RPOL Water O"            8    15.995    2
+atom          5    H     "Dang RPOL Water H"            1     1.008    1
 atom          6    O     "Hydronium Ion O"              8    15.995    3
 atom          7    H     "Hydronium Ion H"              1     1.008    1
 atom          8    O     "Hydroxyl Radical O"           8    15.995    1
@@ -130,26 +142,31 @@ atom         20    Cl    "Dichloromethane Cl"          17    35.453    1
 atom         21    C     "Chloroform C"                 6    12.000    4
 atom         22    H     "Chloroform H"                 1     1.008    1
 atom         23    Cl    "Chloroform Cl"               17    35.453    1
-atom         24    C     "Carbon Tetrachloride"         6    12.000    4
-atom         25    Cl    "Carbon Tetrachloride"        17    35.453    1
-atom         26    N     "Ammonia N"                    7    14.003    4
-atom         27    H     "Ammonia H"                    1     1.008    1
-atom         28    M     "Ammonia M"                    0     0.001    1
-atom         29    N     "Ammonium Ion N"               7    14.003    4
-atom         30    H     "Ammonium Ion H"               1     1.008    1
-atom         31    N     "Nitrate Ion N"                7    14.003    3
-atom         32    O     "Nitrate Ion O"                8    15.995    1
-atom         33    S     "Sulfur Dioxide S"            16    32.066    2
-atom         34    O     "Sulfur Dioxide O"             8    15.995    1
-atom         35    Li+   "Lithium Ion"                  3     6.941    0
-atom         36    Na+   "Sodium Ion"                  11    22.990    0
-atom         37    K+    "Potassium Ion"               19    39.098    0
-atom         38    Cs+   "Cesium Ion"                  55   132.905    0
-atom         39    Ca+   "Calcium Ion"                 20    40.078    0
-atom         40    F-    "Fluoride Ion"                 9    18.998    0
-atom         41    Cl-   "Chloride Ion"                17    35.453    0
-atom         42    Br-   "Bromide Ion"                 35    79.904    0
-atom         43    I-    "Iodide Ion"                  53   126.904    0
+atom         24    C     "Carbon Tetrachloride C"       6    12.000    4
+atom         25    Cl    "Carbon Tetrachloride Cl"     17    35.453    1
+atom         26    C     "1,2-Dichloroethane C"         6    12.000    4
+atom         27    H     "1,2-Dichloroethane H"         1     1.008    1
+atom         28    Cl    "1,2-Dichloroethane Cl"       17    35.453    1
+atom         29    N     "Ammonia N"                    7    14.003    4
+atom         30    H     "Ammonia H"                    1     1.008    1
+atom         31    M     "Ammonia M"                    0     0.001    1
+atom         32    N     "Ammonium Ion N"               7    14.003    4
+atom         33    H     "Ammonium Ion H"               1     1.008    1
+atom         34    N     "Nitrate Ion N"                7    14.003    3
+atom         35    O     "Nitrate Ion O"                8    15.995    1
+atom         36    S     "Sulfur Dioxide S"            16    32.066    2
+atom         37    O     "Sulfur Dioxide O"             8    15.995    1
+atom         38    Li+   "Lithium Ion"                  3     6.941    0
+atom         39    Na+   "Sodium Ion"                  11    22.990    0
+atom         40    K+    "Potassium Ion"               19    39.098    0
+atom         41    Rb+   "Rubidium Ion"                37    85.468    0
+atom         42    Cs+   "Cesium Ion"                  55   132.905    0
+atom         43    Ca+   "Calcium Ion"                 20    40.078    0
+atom         44    Sr+   "Strontium Ion"               38    87.620    0
+atom         45    F-    "Fluoride Ion"                 9    18.998    0
+atom         46    Cl-   "Chloride Ion"                17    35.453    0
+atom         47    Br-   "Bromide Ion"                 35    79.904    0
+atom         48    I-    "Iodide Ion"                  53   126.904    0
 
 
       ################################
@@ -159,17 +176,17 @@ atom         43    I-    "Iodide Ion"                  53   126.904    0
       ################################
 
 
-vdw           1               3.2340     0.1825  !! original model
-#vdw          1               3.2215     0.1825  !! for water-SO2
+vdw           1               3.2340     0.1825
+#vdw          1               3.2215     0.1825  !! alt value for water-SO2
 vdw           2               0.0000     0.0000
 vdw           3               0.0000     0.0000
-vdw           4               3.2050     0.1600
+vdw           4               3.1960     0.1600
 vdw           5               0.0000     0.0000
 vdw           6               3.2340     0.1475
 vdw           7               0.0000     0.0000
 vdw           8               3.0237     0.1560
 vdw           9               0.0000     0.0000
-vdw          10               3.5200     0.1825
+vdw          10               3.5190     0.1825
 vdw          11               0.0000     0.0000
 vdw          12               3.2340     0.1825
 vdw          13               0.0000     0.0000
@@ -185,27 +202,33 @@ vdw          22               2.8100     0.0200
 vdw          23               3.4500     0.2750
 vdw          24               3.4100     0.1000
 vdw          25               3.4500     0.2600
-vdw          26               3.2870     0.3450
-vdw          27               0.0000     0.0000
-vdw          28               0.0000     0.0000
-vdw          29               3.4500     0.1860
+vdw          26               3.4100     0.1300
+vdw          27               2.4000     0.0400
+vdw          28               3.4500     0.1300
+vdw          29               3.2870     0.3450
 vdw          30               0.0000     0.0000
-vdw          31               3.3498     0.1700
-vdw          32               3.2072     0.1600
-vdw          33               2.8510     0.1400
-vdw          34               3.4211     0.2500
-vdw          35               1.5060     0.1650
-vdw          36               2.2718     0.1000
-#vdw         28               2.3787     0.1000  !! for methanol-Na+
-vdw          37               3.1540     0.1000
-#vdw         29               3.0470     0.1000  !! alt value for water-K+
-#vdw         29               3.7863     0.1000  !! for benzene-K+
-vdw          38               3.8310     0.1000
-vdw          39               2.9132     0.1000
-vdw          40               3.3590     0.1000
-vdw          41               4.3387     0.1000
-vdw          42               4.5436     0.1000
-vdw          43               5.1245     0.1000
+vdw          31               0.0000     0.0000
+vdw          32               3.4500     0.1860
+vdw          33               0.0000     0.0000
+vdw          34               3.3498     0.1700
+vdw          35               3.2072     0.1600
+vdw          36               2.8510     0.1400
+vdw          37               3.4211     0.2500
+vdw          38               1.5060     0.1650
+vdw          39               2.2718     0.1000
+#vdw         39               2.3500     0.1300  !! alt value for water-Na+
+#vdw         39               2.3787     0.1000  !! alt value for methanol-Na+
+vdw          40               3.1540     0.1000
+#vdw         40               3.0470     0.1000  !! alt value for water-K+
+#vdw         40               3.7863     0.1000  !! alt value for benzene-K+
+vdw          41               3.5280     0.1000
+vdw          42               3.8310     0.1000
+vdw          43               2.9132     0.1000
+vdw          44               3.3410     0.1000
+vdw          45               3.3590     0.1000
+vdw          46               4.3387     0.1000
+vdw          47               4.5436     0.1000
+vdw          48               5.1245     0.1000
 
 
       #####################################
@@ -243,11 +266,11 @@ bond         18   20         1000.00     1.7720
 bond         21   22         1000.00     1.0700
 bond         21   23         1000.00     1.7600
 bond         24   25         1000.00     1.7700
-bond         26   27         1000.00     1.0124
-bond         26   28         1000.00     0.1650
-bond         29   30         1000.00     1.0100
-bond         31   32         1000.00     1.2690
-bond         33   34         1000.00     1.4320  !! expt value
+bond         29   30         1000.00     1.0124
+bond         29   31         1000.00     0.1650
+bond         32   33         1000.00     1.0100
+bond         34   35         1000.00     1.2690
+bond         36   37         1000.00     1.4320  !! expt value
 
 
       ################################
@@ -271,11 +294,11 @@ angle        20   18   20     100.00     111.20
 angle        22   21   23     100.00     107.64
 angle        23   21   23     100.00     111.24
 angle        25   24   25     100.00     109.47
-angle        27   26   27     100.00     106.70
-angle        27   26   28     100.00      67.8822
-angle        30   29   30     100.00     109.47
-angle        32   31   32     100.00     120.00
-angle        34   33   34     100.00     180.00
+angle        30   29   30     100.00     106.70
+angle        30   29   31     100.00      67.8822
+angle        33   32   33     100.00     109.47
+angle        35   34   35     100.00     120.00
+angle        37   36   37     100.00     180.00
 
 
       ###############################
@@ -285,7 +308,7 @@ angle        34   33   34     100.00     180.00
       ###############################
 
 
-ureybrad     32   31   32     100.00     2.1970
+ureybrad     35   34   35     100.00     2.1970
 
 
       #####################################
@@ -309,6 +332,7 @@ torsion      13   12   14   15            0.167    0.0  3
 torsion      16   16   16   16            3.625  180.0  2
 torsion      16   16   16   17            3.625  180.0  2
 torsion      17   16   16   17            3.625  180.0  2
+torsion      28   26   26   28      -1.650 0.0 1  1.000 180.0 2  0.800 0.0 3
 
 
       ###################################
@@ -433,62 +457,62 @@ multipole    25    0    0               0.04040
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    26    0    0               0.00000
+multipole    26    0    0               0.11500
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    27    0    0               0.47160
+multipole    27    0    0               0.05500
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    28    0    0              -1.41450
+multipole    28    0    0              -0.22500
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    29    0    0              -0.81720
+multipole    29    0    0               0.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    30    0    0               0.45430
+multipole    30    0    0               0.47160
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    31    0    0               0.95000
+multipole    31    0    0              -1.41450
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    32    0    0              -0.65000
+multipole    32    0    0              -0.81720
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    33    0    0               0.47000
+multipole    33    0    0               0.45430
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    34    0    0              -0.23500
+multipole    34    0    0               0.95000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    35    0    0               1.00000
+multipole    35    0    0              -0.65000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    36    0    0               1.00000
+multipole    36    0    0               0.47000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    37    0    0               1.00000
+multipole    37    0    0              -0.23500
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
@@ -498,27 +522,52 @@ multipole    38    0    0               1.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    39    0    0               2.00000
+multipole    39    0    0               1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    40    0    0              -1.00000
+multipole    40    0    0               1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    41    0    0              -1.00000
+multipole    41    0    0               1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    42    0    0              -1.00000
+multipole    42    0    0               1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole    43    0    0              -1.00000
+multipole    43    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    44    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    45    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    46    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    47    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole    48    0    0              -1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
@@ -541,7 +590,7 @@ polarize      6               0.980      0.000       7
 polarize      7               0.000      0.000       6
 polarize      8               1.070      0.000       9
 polarize      9               0.000      0.000       8
-polarize     10               3.340      0.000      11
+polarize     10               2.300      0.000      11
 polarize     11               0.000      0.000      10
 polarize     12               2.020      0.000      13   14
 polarize     13               0.000      0.000      12
@@ -557,21 +606,26 @@ polarize     22               0.135      0.000      21
 polarize     23               1.910      0.000      21
 polarize     24               0.878      0.000      25
 polarize     25               1.910      0.000      24
-polarize     26               0.000      0.000      27   28
-polarize     27               0.000      0.000      26
-polarize     28               2.226      0.000      26
-polarize     29               0.530      0.000      30
-polarize     30               0.161      0.000      29
-polarize     31               0.000      0.000      32
-polarize     32               1.490      0.000      31
-polarize     33               3.800      0.000      34
-polarize     34               0.000      0.000      33
-polarize     35               0.029      0.000
-polarize     36               0.240      0.000
-polarize     37               0.830      0.000
-polarize     38               2.440      0.000
-polarize     39               0.470      0.000
-polarize     40               1.050      0.000
-polarize     41               3.690      0.000
-polarize     42               4.770      0.000
-polarize     43               6.920      0.000
+polarize     26               0.878      0.000      27   28
+polarize     27               0.135      0.000      26
+polarize     28               1.910      0.000      26
+polarize     29               0.000      0.000      30   31
+polarize     30               0.000      0.000      29
+polarize     31               2.226      0.000      29
+polarize     32               0.530      0.000      33
+polarize     33               0.161      0.000      32
+polarize     34               0.000      0.000      35
+polarize     35               1.490      0.000      34
+polarize     36               3.800      0.000      37
+polarize     37               0.000      0.000      36
+polarize     38               0.029      0.000
+polarize     39               0.240      0.000
+polarize     40               0.830      0.000
+polarize     41               1.400      0.000
+polarize     42               2.440      0.000
+polarize     43               0.470      0.000
+polarize     44               0.860      0.000
+polarize     45               1.050      0.000
+polarize     46               3.690      0.000
+polarize     47               4.770      0.000
+polarize     48               6.920      0.000

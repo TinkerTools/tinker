@@ -260,7 +260,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "momfull"  computes the electric moments for the full system
+c     "momfull" computes the electric moments for the full system
 c     as a sum over the partial charges, bond dipoles and atomic
 c     multipole moments
 c

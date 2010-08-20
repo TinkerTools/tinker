@@ -87,12 +87,16 @@ jboolean InitializeJVM() {
    }
 }
 
+void chksocket_(int *flag) {
+   *flag = 1;
+   return;
+}
+
 void createjvm_(int *flag) {
    if (!InitializeJVM()) {
       *flag = 0;
       return;
    }
-
    *flag = 1;
    return;
 }
@@ -122,15 +126,14 @@ void createserver_(jint *flag) {
       *flag = 0;
       return;
    }
-   methodID = (*env)->GetMethodID(env, serverclass, "<init>", 
+   methodID = (*env)->GetMethodID(env, serverclass, "<init>",
       "(Lffe/tinker/TinkerSystem;)V");
    temp =  (*env)->NewObject(env, serverclass, methodID, systemobject);
    methodID = (*env)->GetMethodID(env, serverclass, "start", "()V");
    (*env)->CallVoidMethod(env, temp, methodID, "()V");
-   serverobject =  (*env)->NewGlobalRef(env, temp); 
+   serverobject =  (*env)->NewGlobalRef(env, temp);
    (*env)->DeleteLocalRef(env, temp);
    *flag = 1;
-
    return;
 }
 
@@ -144,7 +147,7 @@ void destroyserver_() {
 
    // Wait while it closes any clients
    methodID = (*env)->GetMethodID(env, serverclass, "isAlive", "()Z");
-   while ((*env)->CallBooleanMethod(env, serverobject, methodID, "()Z")) { 
+   while ((*env)->CallBooleanMethod(env, serverobject, methodID, "()Z")) {
    }
 
    (*env)->DeleteGlobalRef(env, serverobject);
@@ -205,7 +208,7 @@ void createsystem_(jint *atoms, jint *keywords, jint* flag) {
    }
    methodID = (*env)->GetMethodID(env, systemclass, "<init>", "(II)V");
    temp = (*env)->NewObject(env, systemclass, methodID, *atoms, *keywords);
-   systemobject = (*env)->NewGlobalRef(env, temp); 
+   systemobject = (*env)->NewGlobalRef(env, temp);
    (*env)->DeleteLocalRef(env, temp);
    *flag = 1;
    return;
@@ -229,11 +232,11 @@ void createupdate_(jint *n, jint *type, jint* amoeba, jint* flag) {
    else jbool = JNI_TRUE;
 
    temp = (*env)->NewObject(env, updateclass, methodID, *n, *type, jbool);
-   updateobject  = (*env)->NewGlobalRef(env, temp); 
+   updateobject  = (*env)->NewGlobalRef(env, temp);
    (*env)->DeleteLocalRef(env, temp);
    methodID = (*env)->GetMethodID(env,serverclass,"loadUpdate",
                                    "(Lffe/tinker/TinkerUpdate;)V");
-   (*env)->CallObjectMethod(env, serverobject, methodID, updateobject); 
+   (*env)->CallObjectMethod(env, serverobject, methodID, updateobject);
    *flag = 1;
    return;
 }
@@ -241,7 +244,7 @@ void createupdate_(jint *n, jint *type, jint* amoeba, jint* flag) {
 void setcoordinates_(jint *n, jdouble *x, jdouble *y, jdouble *z) {
    jfieldID fieldID;
    jobjectArray coords;
-   jdoubleArray jx; 
+   jdoubleArray jx;
    jobject object;
    jclass class;
 
@@ -422,7 +425,7 @@ void setfile_(char *name, jint len) {
    jfieldID fieldID;
    jstring string;
 
-   string = char2jstring(name, len);	
+   string = char2jstring(name, len);
    fieldID = (*env)->GetFieldID(env, systemclass, "file",
                                 "Ljava/lang/String;");
    (*env)->SetObjectField(env, systemobject, fieldID, string);
