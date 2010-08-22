@@ -153,6 +153,13 @@ c
    10    continue
       end do
 c
+c     apply any Ewald cutoff to charge and multipole terms
+c
+      if (use_ewald) then
+         chgcut = ewaldcut
+         mpolecut = ewaldcut
+      end if
+c
 c     convert any distance percentages to absolute distances
 c
       if (vdwtaper .lt. 1.0d0)  vdwtaper = vdwtaper * vdwcut
@@ -175,9 +182,5 @@ c
       vbuf2 = (vdwcut+lbuffer)**2
       cbuf2 = (chgcut+lbuffer)**2
       mbuf2 = (mpolecut+lbuffer)**2
-      if (use_ewald) then
-         cbuf2 = (ewaldcut+lbuffer)**2
-         mbuf2 = (ewaldcut+lbuffer)**2
-      end if
       return
       end

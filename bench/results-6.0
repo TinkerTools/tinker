@@ -1,7 +1,7 @@
 
-                 ----------------------------------------------
-                 Benchmark Results from TINKER 6.0  (June 2010)
-                 ----------------------------------------------
+               -------------------------------------------------
+               Benchmark Results from TINKER 6.0  (October 2010)
+               -------------------------------------------------
 
  Benchmark #1: Calmodulin Energy Evaluation (Serial)
 
@@ -11,9 +11,9 @@
  MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
  ------------                                 ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      1.90      3.06     8.98
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      2.02      3.20     9.40
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66      2.80      4.90    12.81
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      1.86      3.05     8.92
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      1.95      3.20     9.30
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66      2.73      4.71    12.78
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66      3.02      4.85    15.23
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40      2.45      4.85    15.46
 
@@ -25,9 +25,9 @@
  MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
  ------------                                 ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      3.11      4.34    16.30
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      3.25      4.51    17.09
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66      3.92      5.51    20.32
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      3.25      4.49    16.10
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      3.43      4.74    16.96
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66      4.04      5.61    20.16
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66      3.82      5.28    25.26
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40      5.58      7.47    32.74
 
@@ -39,9 +39,9 @@
  MACHINE TYPE                                 GHz          VIBRATIONS
  ------------                                 ---          ----------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                3.33
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                3.55
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                4.02
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                3.32
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                3.46
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                4.00
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                4.60
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                7.94
 
@@ -54,9 +54,9 @@
  MACHINE TYPE                                 GHz            DYNAMICS
  ------------                                 ---            --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                14.4
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                15.3
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                20.9
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                14.5
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                15.1
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                20.8
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                21.9
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                23.2
 
@@ -69,9 +69,9 @@
  MACHINE TYPE                                 GHz            DYNAMICS
  ------------                                 ---            --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                 144
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                 130
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                 167
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                 158
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                 161
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                 210
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                 191
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                 250
 
@@ -85,16 +85,16 @@
  MACHINE TYPE                                 GHz    Cores/Threads    DYNAMICS
  ------------                                 ---    -------------    --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1       119 (1.00)
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2        74 (1.61)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1       126 (1.00)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2        76 (1.66)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        50 (2.52)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6        40 (3.15)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8        37 (3.41)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/1       147 (1.00)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/2        98 (1.50)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/4        66 (2.23)
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1        76 (1.00)
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2        48 (1.58)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1        80 (1.00)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2        51 (1.57)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        36 (2.22)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6        32 (2.50)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8        29 (2.76)
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/1       102 (1.00)
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/2        64 (1.59)
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/4        46 (2.22)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/1       165 (1.00)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/2       112 (1.47)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/4        78 (2.12)
@@ -112,16 +112,16 @@
  MACHINE TYPE                                 GHz    Cores/Threads    DYNAMICS
  ------------                                 ---    -------------    --------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1       636 (1.00)
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2       371 (1.71)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1       706 (1.00)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2       420 (1.68)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4       253 (2.79)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6       203 (3.48)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8       168 (4.18)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/1       892 (1.00)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/2       524 (1.70)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/4       314 (2.84)
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1       624 (1.00)
+ MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2       341 (1.83)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1       654 (1.00)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2       373 (1.75)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4       228 (2.87)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6       183 (3.57)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8       153 (4.27)
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/1       849 (1.00)
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/2       486 (1.75)
+ Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/4       295 (2.88)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/1       959 (1.00)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/2       596 (1.61)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/4       377 (2.54)

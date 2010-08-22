@@ -654,8 +654,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
 !$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(vscale)
-!$OMP& shared(evt)
+!$OMP& firstprivate(vscale,iv14) shared(evt)
 !$OMP DO reduction(+:evt) schedule(dynamic)
 c
 c     find the van der Waals energy via neighbor list search

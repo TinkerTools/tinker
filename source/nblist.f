@@ -15,10 +15,6 @@ c
 c     "nblist" constructs and maintains nonbonded pair neighbor lists
 c     for vdw and electrostatic interactions
 c
-c     the routines "vlist", "clist" and "mlist" each implement two
-c     methods for complete list rebuilds and two methods for list
-c     updates; only one of each pair should be uncommented
-c
 c
       subroutine nblist
       implicit none
@@ -52,6 +48,7 @@ c
       include 'atoms.i'
       include 'bound.i'
       include 'boxes.i'
+      include 'cutoff.i'
       include 'iounit.i'
       include 'neigh.i'
       include 'vdw.i'
@@ -61,6 +58,7 @@ c
       real*8 xr,yr,zr
       real*8 radius
       real*8 rdn,r2
+      real*8 vbig2
       real*8 xred(maxatm)
       real*8 yred(maxatm)
       real*8 zred(maxatm)
@@ -92,6 +90,7 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
+      vbig2 = (vdwcut+2.0d0*lbuffer)**2
 c
 c     perform a complete list build instead of an update
 c
@@ -107,12 +106,9 @@ c
          return
       end if
 c
-c     update sites whose displacement exceeds half the buffer
+c     test each site for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO
       do i = 1, nvdw
-         reset(i) = .false.
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -122,39 +118,57 @@ c
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
-            call vbuild (i,xred,yred,zred,xold,yold,zold)
-            reset(i) = .true.
-         end if
-      end do
-!$OMP END DO
 c
-c     update sites whose higher numbered neighbors have moved
+c     rebuild the higher numbered neighbors of this site
 c
-!$OMP DO
-      do i = 1, nvdw
-         if (.not. reset(i)) then
-            xi = xred(i)
-            yi = yred(i)
-            zi = zred(i)
-            do j = 1, nvlst(i)
-               k = vlst(j,i)
-               if (reset(k)) then
-                  xr = xi - xred(k)
-                  yr = yi - yred(k)
-                  zr = zi - zred(k)
-                  call imagen (xr,yr,zr)
-                  r2 = xr*xr + yr*yr + zr*zr
-                  if (r2 .le. vbuf2) then
-                     call vbuild (i,xred,yred,zred,xold,yold,zold)
-                     goto 20
-                  end if
+            j = 0
+            do k = i+1, nvdw
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. vbuf2) then
+                  j = j + 1
+                  vlst(j,i) = k
+               end if
+            end do
+            nvlst(i) = j
+c
+c     store new coordinates to reflect update of this site
+c
+            xold(i) = xi
+            yold(i) = yi
+            zold(i) = zi
+c
+c     adjust lists of lower numbered neighbors of this site
+c
+            do k = 1, i-1
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. vbuf2) then
+                  do j = 1, nvlst(k)
+                     if (vlst(j,k) .eq. i)  goto 20
+                  end do
+                  nvlst(k) = nvlst(k) + 1
+                  vlst(nvlst(k),k) = i
+   20             continue
+               else if (r2 .le. vbig2) then
+                  do j = 1, nvlst(k)
+                     if (vlst(j,k) .eq. i) then
+                        vlst(j,k) = vlst(nvlst(k),k)
+                        nvlst(k) = nvlst(k) - 1
+                        goto 30
+                     end if
+                  end do
+   30             continue
                end if
             end do
          end if
-   20    continue
       end do
-!$OMP END DO
-!$OMP END PARALLEL
       return
       end
 c
@@ -369,6 +383,7 @@ c
       include 'bound.i'
       include 'boxes.i'
       include 'charge.i'
+      include 'cutoff.i'
       include 'iounit.i'
       include 'neigh.i'
       integer i,j,k
@@ -376,6 +391,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
+      real*8 cbig2
       real*8 xold(maxatm)
       real*8 yold(maxatm)
       real*8 zold(maxatm)
@@ -393,6 +409,7 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
+      cbig2 = (chgcut+2.0d0*lbuffer)**2
 c
 c     perform a complete list build instead of an update
 c
@@ -408,12 +425,9 @@ c
          return
       end if
 c
-c     update sites whose displacement exceeds half the buffer
+c     test each site for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO
       do i = 1, nion
-         reset(i) = .false.
          ii = kion(i)
          xi = x(ii)
          yi = y(ii)
@@ -424,41 +438,59 @@ c
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
-            call cbuild (i,xold,yold,zold)
-            reset(i) = .true.
-         end if
-      end do
-!$OMP END DO
 c
-c     update sites whose higher numbered neighbors have moved
+c     rebuild the higher numbered neighbors of this site
 c
-!$OMP DO
-      do i = 1, nion
-         if (.not. reset(i)) then
-            ii = kion(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
-            do j = 1, nelst(i)
-               k = elst(j,i)
-               if (reset(k)) then
-                  kk = kion(k)
-                  xr = xi - x(kk)
-                  yr = yi - y(kk)
-                  zr = zi - z(kk)
-                  call imagen (xr,yr,zr)
-                  r2 = xr*xr + yr*yr + zr*zr
-                  if (r2 .le. cbuf2) then
-                     call cbuild (i,xold,yold,zold)
-                     goto 20
-                  end if
+            j = 0
+            do k = i+1, nion
+               kk = kion(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. cbuf2) then
+                  j = j + 1
+                  elst(j,i) = k
+               end if
+            end do
+            nelst(i) = j
+c
+c     store new coordinates to reflect update of this site
+c
+            xold(i) = xi
+            yold(i) = yi
+            zold(i) = zi
+c
+c     adjust lists of lower numbered neighbors of this site
+c
+            do k = 1, i-1
+               kk = kion(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. cbuf2) then
+                  do j = 1, nelst(k)
+                     if (elst(j,k) .eq. i)  goto 20
+                  end do
+                  nelst(k) = nelst(k) + 1
+                  elst(nelst(k),k) = i
+   20             continue
+               else if (r2 .le. cbig2) then
+                  do j = 1, nelst(k)
+                     if (elst(j,k) .eq. i) then
+                        elst(j,k) = elst(nelst(k),k)
+                        nelst(k) = nelst(k) - 1
+                        goto 30
+                     end if
+                  end do
+   30             continue
                end if
             end do
          end if
-   20    continue
       end do
-!$OMP END DO
-!$OMP END PARALLEL
       return
       end
 c
@@ -670,6 +702,7 @@ c
       include 'atoms.i'
       include 'bound.i'
       include 'boxes.i'
+      include 'cutoff.i'
       include 'iounit.i'
       include 'mpole.i'
       include 'neigh.i'
@@ -678,6 +711,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
+      real*8 mbig2
       real*8 xold(maxatm)
       real*8 yold(maxatm)
       real*8 zold(maxatm)
@@ -695,6 +729,7 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
+      mbig2 = (mpolecut+2.0d0*lbuffer)**2
 c
 c     perform a complete list build instead of an update
 c
@@ -710,12 +745,9 @@ c
          return
       end if
 c
-c     update sites whose displacement exceeds half the buffer
+c     test each site for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO
       do i = 1, npole
-         reset(i) = .false.
          ii = ipole(i)
          xi = x(ii)
          yi = y(ii)
@@ -726,41 +758,59 @@ c
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
-            call mbuild (i,xold,yold,zold)
-            reset(i) = .true.
-         end if
-      end do
-!$OMP END DO
 c
-c     update sites whose higher numbered neighbors have moved
+c     rebuild the higher numbered neighbors of this site
 c
-!$OMP DO
-      do i = 1, npole
-         if (.not. reset(i)) then
-            ii = ipole(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
-            do j = 1, nelst(i)
-               k = elst(j,i)
-               if (reset(k)) then
-                  kk = ipole(k)
-                  xr = xi - x(kk)
-                  yr = yi - y(kk)
-                  zr = zi - z(kk)
-                  call imagen (xr,yr,zr)
-                  r2 = xr*xr + yr*yr + zr*zr
-                  if (r2 .le. cbuf2) then
-                     call mbuild (i,xold,yold,zold)
-                     goto 20
-                  end if
+            j = 0
+            do k = i+1, npole
+               kk = ipole(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. mbuf2) then
+                  j = j + 1
+                  elst(j,i) = k
+               end if
+            end do
+            nelst(i) = j
+c
+c     store new coordinates to reflect update of this site
+c
+            xold(i) = xi
+            yold(i) = yi
+            zold(i) = zi
+c
+c     adjust lists of lower numbered neighbors of this site
+c
+            do k = 1, i-1
+               kk = ipole(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. mbuf2) then
+                  do j = 1, nelst(k)
+                     if (elst(j,k) .eq. i)  goto 20
+                  end do
+                  nelst(k) = nelst(k) + 1
+                  elst(nelst(k),k) = i
+   20             continue
+               else if (r2 .le. mbig2) then
+                  do j = 1, nelst(k)
+                     if (elst(j,k) .eq. i) then
+                        elst(j,k) = elst(nelst(k),k)
+                        nelst(k) = nelst(k) - 1
+                        goto 30
+                     end if
+                  end do
+   30             continue
                end if
             end do
          end if
-   20    continue
       end do
-!$OMP END DO
-!$OMP END PARALLEL
       return
       end
 c
