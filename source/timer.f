@@ -20,18 +20,21 @@ c
       program timer
       implicit none
       include 'sizes.i'
+      include 'atoms.i'
       include 'cutoff.i'
       include 'hescut.i'
       include 'inform.i'
       include 'iounit.i'
-      integer i,ncalls,next
-      integer hinit(3,maxatm)
-      integer hstop(3,maxatm)
-      integer hindex(maxhess)
-      real*8 value,energy,elapsed
-      real*8 derivs(3,maxatm)
-      real*8 h(maxhess)
-      real*8 hdiag(3,maxatm)
+      integer i,ncalls
+      integer next,hmax
+      integer, pointer :: hindex(:)
+      integer, pointer :: hinit(:,:)
+      integer, pointer :: hstop(:,:)
+      real*8 value,energy
+      real*8 elapsed
+      real*8, pointer :: h(:)
+      real*8, pointer :: hdiag(:,:)
+      real*8, pointer :: derivs(:,:)
       logical exist,query
       logical dohessian
       character*1 answer
@@ -76,6 +79,24 @@ c
       end if
       call upcase (answer)
       if (answer .eq. 'N')  dohessian = .false.
+c
+c     perform dynamic allocation of some local arrays
+c
+      nullify (derivs)
+      allocate (derivs(3,n))
+      if (dohessian) then
+         nullify (hinit)
+         allocate (hinit(3,n))
+         nullify (hstop)
+         allocate (hstop(3,n))
+         nullify (hdiag)
+         allocate (hdiag(3,n))
+         hmax = min(maxhess,(3*n*(3*n-1))/2)
+         nullify (hindex)
+         allocate (hindex(hmax))
+         nullify (h)
+         allocate (h(hmax))
+      end if
 c
 c     get the timing for setup of the calculation
 c
@@ -159,6 +180,17 @@ c
          write (iout,120)  elapsed,ncalls
   120    format (/,' Hessian Matrix :    ',f15.3,' Seconds for',
      &              i6,' Evaluations')
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
+      if (dohessian) then
+         deallocate (hinit)
+         deallocate (hstop)
+         deallocate (hdiag)
+         deallocate (hindex)
+         deallocate (h)
       end if
 c
 c     perform any final tasks before program exit

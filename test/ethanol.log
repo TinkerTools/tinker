@@ -14,17 +14,16 @@
 
 
  Enter Cartesian Coordinate File Name :  
- Two Center Bond Atoms of the Torsion : 
- Two Center Bond Atoms for the 2nd Torsion [Optional, <CR>=Exit] : 
- Torsions Crossing the Center Bond :
+ Enter Central Atoms of the 1st Torsion : 
+ Enter Central Atoms of the 2nd Torsion [Optional, <CR>=None] : 
+ Torsions Crossing the Central Bond :
 
- Torsion No.     1 :     1 ---    5 ---    8 ---    9
- Torsion No.     2 :     6 ---    5 ---    8 ---    9
- Torsion No.     3 :     7 ---    5 ---    8 ---    9
+ Torsion     1 :      1-C       5-C       8-O       9-H  
+ Torsion     2 :      6-H       5-C       8-O       9-H  
+ Torsion     3 :      7-H       5-C       8-O       9-H  
 
- Choose the Torsions for Fitting from Above List 
-
- Enter Total Conformation Number: 
+ Choose Torsions for Fitting from Above List :  
+ Enter Total Number of Conformations :  
  Enter the Name of the Gaussian Output File :  
  Finished Reading Conformation   1
 

@@ -62,7 +62,7 @@ LINKDIR = /usr/local/bin
 
 #F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
 #LIBS =
-#F77FLAGS = -c -axSSE3 -vec-report0
+#F77FLAGS = -c -xHost -vec-report0
 #OPTFLAGS = -O3 -no-ipo -no-prec-div
 #LIBFLAGS = -crusv
 #LINKFLAGS = -static-intel
@@ -77,7 +77,7 @@ LINKDIR = /usr/local/bin
 
 #F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
 #LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
-#F77FLAGS = -c -axSSE3 -assume cc_omp
+#F77FLAGS = -c -xHost -assume cc_omp
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
 #LIBFLAGS = -crusv
 #LINKFLAGS = $(OPTFLAGS) -static-intel

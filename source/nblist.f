@@ -48,24 +48,21 @@ c
       include 'atoms.i'
       include 'bound.i'
       include 'boxes.i'
-      include 'cutoff.i'
       include 'iounit.i'
       include 'neigh.i'
       include 'vdw.i'
       integer i,j,k
-      integer ii,iv,kk
+      integer ii,iv
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius
       real*8 rdn,r2
-      real*8 vbig2
       real*8 xred(maxatm)
       real*8 yred(maxatm)
       real*8 zred(maxatm)
       real*8 xold(maxatm)
       real*8 yold(maxatm)
       real*8 zold(maxatm)
-      logical reset(maxatm)
       save xold,yold,zold
 c
 c
@@ -90,7 +87,6 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
-      vbig2 = (vdwcut+2.0d0*lbuffer)**2
 c
 c     perform a complete list build instead of an update
 c
@@ -123,9 +119,9 @@ c     rebuild the higher numbered neighbors of this site
 c
             j = 0
             do k = i+1, nvdw
-               xr = xi - xred(k)
-               yr = yi - yred(k)
-               zr = zi - zred(k)
+               xr = xi - xold(k)
+               yr = yi - yold(k)
+               zr = zi - zold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
@@ -144,9 +140,9 @@ c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
-               xr = xi - xred(k)
-               yr = yi - yred(k)
-               zr = zi - zred(k)
+               xr = xi - xold(k)
+               yr = yi - yold(k)
+               zr = zi - zold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
@@ -156,7 +152,7 @@ c
                   nvlst(k) = nvlst(k) + 1
                   vlst(nvlst(k),k) = i
    20             continue
-               else if (r2 .le. vbig2) then
+               else if (r2 .le. vbufx) then
                   do j = 1, nvlst(k)
                      if (vlst(j,k) .eq. i) then
                         vlst(j,k) = vlst(nvlst(k),k)
@@ -383,19 +379,15 @@ c
       include 'bound.i'
       include 'boxes.i'
       include 'charge.i'
-      include 'cutoff.i'
       include 'iounit.i'
       include 'neigh.i'
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      real*8 cbig2
       real*8 xold(maxatm)
       real*8 yold(maxatm)
       real*8 zold(maxatm)
-      logical reset(maxatm)
       save xold,yold,zold
 c
 c
@@ -409,7 +401,6 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
-      cbig2 = (chgcut+2.0d0*lbuffer)**2
 c
 c     perform a complete list build instead of an update
 c
@@ -443,10 +434,9 @@ c     rebuild the higher numbered neighbors of this site
 c
             j = 0
             do k = i+1, nion
-               kk = kion(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xold(k)
+               yr = yi - yold(k)
+               zr = zi - zold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -465,10 +455,9 @@ c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
-               kk = kion(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xold(k)
+               yr = yi - yold(k)
+               zr = zi - zold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -478,7 +467,7 @@ c
                   nelst(k) = nelst(k) + 1
                   elst(nelst(k),k) = i
    20             continue
-               else if (r2 .le. cbig2) then
+               else if (r2 .le. cbufx) then
                   do j = 1, nelst(k)
                      if (elst(j,k) .eq. i) then
                         elst(j,k) = elst(nelst(k),k)
@@ -702,20 +691,16 @@ c
       include 'atoms.i'
       include 'bound.i'
       include 'boxes.i'
-      include 'cutoff.i'
       include 'iounit.i'
       include 'mpole.i'
       include 'neigh.i'
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      real*8 mbig2
       real*8 xold(maxatm)
       real*8 yold(maxatm)
       real*8 zold(maxatm)
-      logical reset(maxatm)
       save xold,yold,zold
 c
 c
@@ -729,7 +714,6 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
-      mbig2 = (mpolecut+2.0d0*lbuffer)**2
 c
 c     perform a complete list build instead of an update
 c
@@ -763,10 +747,9 @@ c     rebuild the higher numbered neighbors of this site
 c
             j = 0
             do k = i+1, npole
-               kk = ipole(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xold(k)
+               yr = yi - yold(k)
+               zr = zi - zold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -785,10 +768,9 @@ c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
-               kk = ipole(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xold(k)
+               yr = yi - yold(k)
+               zr = zi - zold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -798,7 +780,7 @@ c
                   nelst(k) = nelst(k) + 1
                   elst(nelst(k),k) = i
    20             continue
-               else if (r2 .le. mbig2) then
+               else if (r2 .le. mbufx) then
                   do j = 1, nelst(k)
                      if (elst(j,k) .eq. i) then
                         elst(j,k) = elst(nelst(k),k)

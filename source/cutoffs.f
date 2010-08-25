@@ -182,5 +182,8 @@ c
       vbuf2 = (vdwcut+lbuffer)**2
       cbuf2 = (chgcut+lbuffer)**2
       mbuf2 = (mpolecut+lbuffer)**2
+      vbufx = (vdwcut+2.0d0*lbuffer)**2
+      cbufx = (chgcut+2.0d0*lbuffer)**2
+      mbufx = (mpolecut+2.0d0*lbuffer)**2
       return
       end

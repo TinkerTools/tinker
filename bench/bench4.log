@@ -4,9 +4,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 5.0   October 2009                        ##
+ ##                        Version 6.0   October 2010                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2009               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2010               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -40,7 +40,7 @@
 
  Additional van der Waals Parameters :
 
-     Atom Class         Radius     Epsilon     Reduction
+     Atom Class          Size      Epsilon     Reduction
 
          1              3.1507      0.1521       0.000
          2              0.0000      0.0000       0.000
@@ -139,15 +139,15 @@
  Kinetic Energy             376.4242 Kcal/mole   (+/-   7.4408)
  Intermolecular           -2076.8634 Kcal/mole   (+/-   7.3492)
  Temperature                  293.00 Kelvin      (+/-     5.79)
- Pressure                     194.17 Atmosphere  (+/-   479.43)
+ Pressure                     194.17 Atmosphere  (+/-   479.44)
  Density                      0.9972 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      900 Dynamics Steps
 
  Simulation Time              0.9000 Picosecond
- Total Energy             -1697.6929 Kcal/mole   (+/-   0.8252)
+ Total Energy             -1697.6928 Kcal/mole   (+/-   0.8252)
  Potential Energy         -2075.7127 Kcal/mole   (+/-   5.8531)
- Kinetic Energy             378.0198 Kcal/mole   (+/-   5.8823)
+ Kinetic Energy             378.0199 Kcal/mole   (+/-   5.8824)
  Intermolecular           -2075.7127 Kcal/mole   (+/-   5.8531)
  Temperature                  294.24 Kelvin      (+/-     4.58)
  Pressure                     519.14 Atmosphere  (+/-   197.83)
@@ -156,10 +156,10 @@
  Average Values for the last   100 out of     1000 Dynamics Steps
 
  Simulation Time              1.0000 Picosecond
- Total Energy             -1695.3260 Kcal/mole   (+/-   0.9097)
- Potential Energy         -2072.8753 Kcal/mole   (+/-   6.0539)
- Kinetic Energy             377.5493 Kcal/mole   (+/-   5.9327)
- Intermolecular           -2072.8753 Kcal/mole   (+/-   6.0539)
- Temperature                  293.87 Kelvin      (+/-     4.62)
- Pressure                     877.49 Atmosphere  (+/-   702.89)
+ Total Energy             -1695.3265 Kcal/mole   (+/-   0.9094)
+ Potential Energy         -2072.8779 Kcal/mole   (+/-   6.0523)
+ Kinetic Energy             377.5514 Kcal/mole   (+/-   5.9311)
+ Intermolecular           -2072.8779 Kcal/mole   (+/-   6.0523)
+ Temperature                  293.88 Kelvin      (+/-     4.62)
+ Pressure                     877.49 Atmosphere  (+/-   702.83)
  Density                      0.9972 Grams/cc    (+/-   0.0000)

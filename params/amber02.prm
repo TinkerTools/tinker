@@ -15,6 +15,7 @@ radiussize              RADIUS
 epsilonrule             GEOMETRIC
 vdw-14-scale            2.0
 chg-14-scale            1.2
+electric                332.0522173
 dielectric              1.0
 polarization            MUTUAL
 polar-eps               0.000001

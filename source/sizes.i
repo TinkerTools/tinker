@@ -80,7 +80,7 @@ c
       parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
-      parameter (maxfft=100)
+      parameter (maxfft=200)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)
       parameter (maxgeo=1000)
