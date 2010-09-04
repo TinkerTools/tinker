@@ -27,14 +27,19 @@ c
       integer i,j,next
       integer nmobile,nfixed
       integer center,nsphere
-      integer mobile(maxatm)
-      integer fixed(maxatm)
+      integer, allocatable :: mobile(:)
+      integer, allocatable :: fixed(:)
       real*8 xcenter,ycenter,zcenter
       real*8 radius,radius2,dist2
       character*20 keyword
       character*120 record
       character*120 string
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mobile(n))
+      allocate (fixed(n))
 c
 c     set defaults for the numbers and lists of active atoms
 c
@@ -64,7 +69,7 @@ c
          if (keyword(1:7) .eq. 'ACTIVE ') then
             read (string,*,err=10,end=10)  (mobile(i),i=nmobile+1,n)
    10       continue
-            dowhile (mobile(nmobile+1) .ne. 0)
+            do while (mobile(nmobile+1) .ne. 0)
                nmobile = nmobile + 1
                mobile(nmobile) = max(-n,min(n,mobile(nmobile)))
             end do
@@ -74,7 +79,7 @@ c
          else if (keyword(1:9) .eq. 'INACTIVE ') then
             read (string,*,err=20,end=20)  (fixed(i),i=nfixed+1,n)
    20       continue
-            dowhile (fixed(nfixed+1) .ne. 0)
+            do while (fixed(nfixed+1) .ne. 0)
                nfixed = nfixed + 1
                fixed(nfixed) = max(-n,min(n,fixed(nfixed)))
             end do
@@ -133,7 +138,7 @@ c
 c     set active atoms to those marked as not inactive
 c
       i = 1
-      dowhile (fixed(i) .ne. 0)
+      do while (fixed(i) .ne. 0)
          if (fixed(i) .gt. 0) then
             j = fixed(i)
             if (use(j)) then
@@ -155,7 +160,7 @@ c
 c     set active atoms to only those marked as active
 c
       i = 1
-      dowhile (mobile(i) .ne. 0)
+      do while (mobile(i) .ne. 0)
          if (i .eq. 1) then
             nuse = 0
             do j = 1, n
@@ -199,5 +204,10 @@ c
          write (iout,80)  (iuse(i),i=1,nuse)
    80    format (3x,10i7)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mobile)
+      deallocate (fixed)
       return
       end

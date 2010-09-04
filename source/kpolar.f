@@ -261,7 +261,7 @@ c
                list(jj) = i
             end if
          end do
-         dowhile (.not. done)
+         do while (.not. done)
             done = .true.
             do j = start, stop
                jj = ip11(j,i)

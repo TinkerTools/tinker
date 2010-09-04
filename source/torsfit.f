@@ -61,7 +61,7 @@ c
       end if
    10 continue
       if (query) then
-         dowhile (torbnd(1).eq.0 .or. torbnd(2).eq.0)
+         do while (torbnd(1).eq.0 .or. torbnd(2).eq.0)
             write (iout,20)
    20       format (/,' Enter Central Atoms of the 1st Torsion : ',$)
             read (input,*,err=30,end=30)  torbnd(1),torbnd(2)
@@ -673,7 +673,7 @@ c     fitting the torsion parameters
 c
       maxstep = 1
       avedl = 0.5d0
-      dowhile (avedl .gt. 0.1 .and. istep .lt. maxstep)
+      do while (avedl .gt. 0.1 .and. istep .lt. maxstep)
          do i = 1, nconf
             ivxx = 0
             torf(i) = 0.0d0

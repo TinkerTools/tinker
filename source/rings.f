@@ -279,8 +279,7 @@ c
       if (debug) then
          if (nring3 .gt. 0) then
             write (iout,90)
-   90       format (/,' Three-Membered Rings Contained',
-     &                 ' in the Structure :',
+   90       format (/,' Three-Membered Rings in the Structure :',
      &              //,11x,'Ring',14x,'Atoms in Ring',/)
             do i = 1, nring3
                write (iout,100)  i,(iring3(j,i),j=1,3)
@@ -289,8 +288,7 @@ c
          end if
          if (nring4 .gt. 0) then
             write (iout,110)
-  110       format (/,' Four-Membered Rings Contained',
-     &                 ' in the Structure :',
+  110       format (/,' Four-Membered Rings in the Structure :',
      &              //,11x,'Ring',17x,'Atoms in Ring',/)
             do i = 1, nring4
                write (iout,120)  i,(iring4(j,i),j=1,4)
@@ -299,8 +297,7 @@ c
          end if
          if (nring5 .gt. 0) then
             write (iout,130)
-  130       format (/,' Five-Membered Rings Contained',
-     &                 ' in the Structure :',
+  130       format (/,' Five-Membered Rings in the Structure :',
      &              //,11x,'Ring',20x,'Atoms in Ring',/)
             do i = 1, nring5
                write (iout,140)  i,(iring5(j,i),j=1,5)
@@ -309,8 +306,7 @@ c
          end if
          if (nring6 .gt. 0) then
             write (iout,150)
-  150       format (/,' Six-Membered Rings Contained',
-     &                 ' in the Structure :',
+  150       format (/,' Six-Membered Rings in the Structure :',
      &              //,11x,'Ring',23x,'Atoms in Ring',/)
             do i = 1, nring6
                write (iout,160)  i,(iring6(j,i),j=1,6)

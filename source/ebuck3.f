@@ -488,6 +488,7 @@ c
       integer kk,kv,kt
       integer kgy,kgz
       integer start,stop
+      integer ikmin,ikmax
       integer iv14(maxatm)
       real*8 e,rv,eps
       real*8 rdn,fgrp
@@ -713,14 +714,16 @@ c
      &                             18x,'Minimum',4x,'Actual',
      &                             6x,'Energy',/)
                      end if
+                     ikmin = min(i,k)
+                     ikmax = max(i,k)
                      if (prime) then
-                        write (iout,30)  i,name(i),k,name(k),
-     &                                   rv,sqrt(rik2),e
+                        write (iout,30)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),rv,sqrt(rik2),e
    30                   format (' VDW-Buck',3x,i5,'-',a3,1x,i5,'-',
      &                             a3,12x,2f10.4,f12.4)
                      else
-                        write (iout,40)  i,name(i),k,name(k),
-     &                                   rv,sqrt(rik2),e
+                        write (iout,40)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),rv,sqrt(rik2),e
    40                   format (' VDW-Buck',3x,i5,'-',a3,1x,i5,'-',
      &                             a3,3x,'(XTAL)',3x,2f10.4,f12.4)
                      end if

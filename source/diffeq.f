@@ -66,7 +66,7 @@ c
 c
 c     perform a series of individual integration steps
 c
-      dowhile (.not. terminate)
+      do while (.not. terminate)
          call gvalue (x,y,dydx)
          do i = 1, nvar
             yscal(i) = abs(y(i)) + abs(h*dydx(i)) + tiny

@@ -432,6 +432,7 @@ c
       integer in,ic,kn,kc
       integer kgy,kgz,kmap
       integer start,stop
+      integer ikmin,ikmax
       real*8 e,fgrp
       real*8 r,r2,rb
       real*8 f,fi,fik
@@ -636,13 +637,17 @@ c
      &                             16x,'Charges',5x,'Distance',
      &                             5x,'Energy',/)
                      end if
+                     ikmin = min(i,k)
+                     ikmax = max(i,k)
                      if (prime) then
-                        write (iout,30)  i,name(i),k,name(k),pchg(ii),
+                        write (iout,30)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),pchg(ii),
      &                                   pchg(kmap),r,e
    30                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                             8x,2f7.2,f10.4,f12.4)
                      else
-                        write (iout,40)  i,name(i),k,name(k),pchg(ii),
+                        write (iout,40)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),pchg(ii),
      &                                   pchg(kmap),r,e
    40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
      &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)

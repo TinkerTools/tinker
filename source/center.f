@@ -23,9 +23,9 @@ c
       integer i,k,n1,n2
       real*8 weigh,norm
       real*8 xmid,ymid,zmid
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8 x1(*),x2(*)
+      real*8 y1(*),y2(*)
+      real*8 z1(*),z2(*)
 c
 c
 c     find the weighted centroid of the second

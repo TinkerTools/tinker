@@ -3625,7 +3625,7 @@ c
       real*8 dedx,dedy,dedz
       real*8 cutmtx(maxatm)
       real*8 dcutmtx(maxatm)
-      real*8, pointer :: dacsa(:,:)
+      real*8, allocatable :: dacsa(:,:)
 c
 c
 c     zero out the hydrophobic potential of mean force energy
@@ -3640,7 +3640,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nullify (dacsa)
       allocate (dacsa(n,npmf))
 c
 c     get the surface area and derivative terms for each atom

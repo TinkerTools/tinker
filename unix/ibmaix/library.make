@@ -159,7 +159,6 @@ final.o \
 flatten.o \
 freeunit.o \
 geometry.o \
-getime.o \
 getint.o \
 getkey.o \
 getmol2.o \
@@ -285,7 +284,6 @@ rotpole.o \
 sdstep.o \
 search.o \
 server.o \
-setime.o \
 shakeup.o \
 sigmoid.o \
 sktstuff.o \

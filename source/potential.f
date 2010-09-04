@@ -115,7 +115,7 @@ c
      &           /,4x,'(4) Compare the Model Potentials of Two Systems',
      &           /,4x,'(5) Compare a Model Potential to a Target Grid',
      &           /,4x,'(6) Fit Electrostatic Parameters to Target Grid')
-         dowhile (mode.lt.1 .or. mode.gt.6)
+         do while (mode.lt.1 .or. mode.gt.6)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)
@@ -150,7 +150,7 @@ c
             call version (potfile,'old')
             inquire (file=potfile,exist=exist)
          end if
-         dowhile (.not. exist)
+         do while (.not. exist)
             write (iout,60)
    60       format (/,' Enter the Gaussian CUBE File Name :  ',$)
             read (input,70)  potfile
@@ -227,7 +227,7 @@ c
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)
-      dowhile (.not. abort)
+      do while (.not. abort)
          nconf = nconf + 1
          call makeref (nconf)
          call readxyz (ixyz)
@@ -273,14 +273,14 @@ c
          if (keyword(1:16) .eq. 'POTENTIAL-ATOMS ') then
             read (string,*,err=180,end=180)  (glist(k),k=nglist+1,n)
   180       continue
-            dowhile (glist(nglist+1) .ne. 0)
+            do while (glist(nglist+1) .ne. 0)
                nglist = nglist + 1
                glist(nglist) = max(-n,min(n,glist(nglist)))
             end do
          else if (keyword(1:14) .eq. 'POTENTIAL-FIT ') then
             read (string,*,err=190,end=190)  (flist(k),k=nflist+1,n)
   190       continue
-            dowhile (flist(nflist+1) .ne. 0)
+            do while (flist(nflist+1) .ne. 0)
                nflist = nflist + 1
                flist(nflist) = max(-n,min(n,flist(nflist)))
             end do
@@ -315,7 +315,7 @@ c
 c     set active grid atoms to only those marked for use
 c
       i = 1
-      dowhile (glist(i) .ne. 0)
+      do while (glist(i) .ne. 0)
          if (i .eq. 1) then
             ngatm = 0
             do k = 1, n
@@ -343,7 +343,7 @@ c
 c     set active fitting atoms to only those marked for use
 c
       i = 1
-      dowhile (flist(i) .ne. 0)
+      do while (flist(i) .ne. 0)
          if (i .eq. 1) then
             nfatm = 0
             do k = 1, n
@@ -387,7 +387,7 @@ c
             call version (xyzfile,'old')
             inquire (file=xyzfile,exist=exist)
          end if
-         dowhile (.not. exist)
+         do while (.not. exist)
             write (iout,220)
   220       format (/,' Enter Name of Second Coordinate File :  ',$)
             read (input,230)  xyzfile
@@ -409,7 +409,7 @@ c
             call version (potfile,'old')
             inquire (file=potfile,exist=exist)
          end if
-         dowhile (.not. exist)
+         do while (.not. exist)
             write (iout,240)
   240       format (/,' Enter Target Grid/Potential File Name :  ',$)
             read (input,250)  potfile

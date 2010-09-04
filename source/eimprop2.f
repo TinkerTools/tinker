@@ -156,10 +156,10 @@ c
                if (abs(angle+ideal) .lt. abs(angle-ideal))
      &            ideal = -ideal
                dt = angle - ideal
-               dowhile (dt .gt. 180.0d0)
+               do while (dt .gt. 180.0d0)
                   dt = dt - 360.0d0
                end do
-               dowhile (dt .lt. -180.0d0)
+               do while (dt .lt. -180.0d0)
                   dt = dt + 360.0d0
                end do
                dt = dt / radian

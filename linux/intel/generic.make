@@ -169,7 +169,6 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp flatten.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp freeunit.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp gda.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp geometry.f
-ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp getime.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp getint.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp getkey.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp getmol2.f
@@ -320,7 +319,6 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp scan.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp sdstep.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp search.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp server.f
-ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp setime.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp shakeup.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp sigmoid.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp sktstuff.f

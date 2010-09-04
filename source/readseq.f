@@ -63,7 +63,7 @@ c
 c
 c     read in the biopolymer sequence file
 c
-      dowhile (.true.)
+      do while (.true.)
          read (iseq,20,err=30,end=30)  record
    20    format (a120)
          length = trimtext (record)
@@ -80,7 +80,7 @@ c
             chnnam(nchain) = letter
          end if
          done = .false.
-         dowhile (.not. done)
+         do while (.not. done)
             call getword (record,word,next)
             if (word .eq. '   ') then
                done = .true.

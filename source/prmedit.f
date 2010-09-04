@@ -52,7 +52,7 @@ c
      &           /,4x,'(4) Renumber the Atom Classes, and Reorder',
      &           /,4x,'(5) Renumber Types and Classes, and Reorder'
      &           /,4x,'(6) Sort and Format Multipole Parameters')
-         dowhile (mode.lt.1 .or. mode.gt.6)
+         do while (mode.lt.1 .or. mode.gt.6)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)
@@ -143,7 +143,7 @@ c
       integer kg,kt
       integer nx,ny,nxy
       integer ft(6)
-      integer ig(maxval)
+      integer ig(20)
       real*8 wght
       real*8 rd,ep,rdn
       real*8 dl,fc,bd
@@ -172,7 +172,7 @@ c     reformat and print the various parameters
 c
       i = 0
       blank = '                              '
-      dowhile (i .lt. nprm)
+      do while (i .lt. nprm)
          i = i + 1
          record = prmline(i)
          length = trimtext (record)
@@ -766,11 +766,11 @@ c
             ia = 0
             pol = 0.0d0
             thl = 0.0d0
-            do j = 1, maxval
+            do j = 1, 20
                ig(j) = 0
             end do
             read (string,*,err=1120,end=1120)  ia,pol,thl,
-     &                                       (ig(j),j=1,maxval)
+     &                                         (ig(j),j=1,20)
  1120       continue
             kg = 0
             do j = 1, maxval
@@ -780,7 +780,7 @@ c
             end do
             call sort (kg,ig)
             write (iprm,1130)  ia,pol,thl,(ig(j),j=1,kg)
- 1130       format ('polarize',2x,i5,5x,2f11.3,3x,8i5)
+ 1130       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             el = 0.0d0
@@ -836,7 +836,7 @@ c
             length = trimtext(note)
             string = '"'//note(1:length)//'"'//blank
             write (iprm,1240)  ia,sym,string(1:30),ib
- 1240       format ('biotype',3x,i5,4x,a3,5x,a30,i5)
+ 1240       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
          else if (length .eq. 0) then
             write (iprm,1250)
  1250       format ()
@@ -872,7 +872,7 @@ c
       integer offset,next
       integer length
       integer trimtext
-      integer kg,ig(maxval)
+      integer kg,ig(20)
       integer itype(0:maxtyp)
       integer iclass(0:maxclass)
       real*8 pol,thl
@@ -1396,12 +1396,12 @@ c
             pol = 0.0d0
             thl = 0.0d0
             kg = 0
-            do j = 1, maxval
+            do j = 1, 20
                ig(j) = 0
             end do
             string = record(next:120)
             read (string,*,err=410,end=410)  ia,pol,thl,
-     &                                       (ig(j),j=1,maxval)
+     &                                       (ig(j),j=1,20)
   410       continue
             ia = itype(ia)
             do j = 1, maxval
@@ -1412,7 +1412,7 @@ c
             end do
             call sort (kg,ig)
             write (iprm,420)  ia,pol,thl,(ig(j),j=1,kg)
-  420       format ('polarize',2x,i5,f20.3,f11.3,3x,8i5)
+  420       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             call getnumb (record,ia,next)
@@ -1469,7 +1469,7 @@ c
                ib = itype(ib)
                if (ib.eq.0 .and. kt.lt.999)  ib = 999
             end if
-            length = min(30,max(1,51-next))
+            length = min(30,max(1,59-next))
             write (iprm,490)  record(8:next)//blank(1:length),ib
   490       format ('biotype',a,i5)
          else if (length .eq. 0) then

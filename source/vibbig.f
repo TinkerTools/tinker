@@ -169,6 +169,12 @@ c
       npair = 2 * nroot
       nbasis = 3 * nroot
 c
+c     perform dynamic allocation of various vibbig arrays
+c
+      allocate (phi(nvar,nbasis))
+      allocate (phik(nvar,nbasis))
+      allocate (pwork(nvar,nbasis))
+c
 c     open or create eigenvector file for use during restarts
 c
       ivb1 = freeunit ()
@@ -247,7 +253,7 @@ c
       if (exist) then
          open (unit=iblock,file=blockfile,status='old')
          i = 0
-         dowhile (.true.)
+         do while (.true.)
             i = i + 1
             read (iblock,*,err=80,end=80)  iblk(i)
          end do
@@ -283,7 +289,7 @@ c
 c     determine number of prior modes available at restart
 c
       nlock = 0
-      dowhile (.true.)
+      do while (.true.)
          read (ivb1,err=130,end=130)  (p(k),k=1,nvar)
          nlock = nlock + 1
       end do
@@ -1013,6 +1019,16 @@ c
       call projectk (nvar,nconv,ivb1,nroot,npair)
       goto 160
   280 continue
+c
+c     perform deallocation of various vibbig arrays
+c
+      deallocate (phi)
+      deallocate (phik)
+      deallocate (pwork)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end
 c
 c
@@ -1035,12 +1051,13 @@ c
       integer nvar,nbasis
       integer np,ifactor
       integer nblk,nguess
-      integer iblk(maxatm)
-      real*8 w,random,sum
-      real*8 p(maxvar)
-      real*8 tmp(maxvar)
-      real*8 uu(maxhess)
+      integer iblk(*)
+      real*8 w,sum
+      real*8 random
+      real*8 p(*)
+      real*8 uu(*)
       real*8 u(maxvar,6)
+      real*8 tmp(maxvar)
 c
 c
 c     set the number of random guesses
@@ -1129,7 +1146,7 @@ c
       real*8 cm(3),p(3)
       real*8 t1(3),t2(3)
       real*8 e(3,3),c(3,3)
-      real*8 xe(maxvar)
+      real*8 xe(*)
       real*8 u(maxvar,6)
       real*8 ur(maxvar,3)
 c
@@ -1268,13 +1285,13 @@ c
       integer i,j,k,l
       integer nvar,nblk
       integer k0,k1,k2,l2
-      integer iblk(maxatm)
+      integer iblk(*)
       real*8 h,hmin
-      real*8 uku(maxvar)
-      real*8 pk(maxvar)
+      real*8 uku(*)
+      real*8 pk(*)
+      real*8 uu(*)
       real*8 d(maxvar)
       real*8 work(maxvar)
-      real*8 uu(maxhess)
 c
 c
 c     find smallest element of |h-uku|
@@ -1360,8 +1377,8 @@ c
       integer i,j
       integer nvar,nb
       real*8 sum
+      real*8 p0(*)
       real*8 s(maxbasis)
-      real*8 p0(maxvar)
       real*8 proj(maxvar)
 c
 c
@@ -1424,8 +1441,8 @@ c
       implicit none
       include 'sizes.i'
       integer i,j,nvar,np
-      real*8 pk(maxvar)
-      real*8 p(maxvar)
+      real*8 pk(*)
+      real*8 p(*)
       real*8 u(maxvar,6)
       real*8 pku(6)
 c
@@ -1597,10 +1614,10 @@ c
       integer i,j,k,nvar
       real*8 e,term
       real*8 sum,eps
-      real*8 xm(maxvar)
-      real*8 qe(maxvar)
-      real*8 uvec(maxvar)
-      real*8 kuvec(maxvar)
+      real*8 xm(*)
+      real*8 qe(*)
+      real*8 uvec(*)
+      real*8 kuvec(*)
       real*8 delta(maxvar)
       real*8 grd1(3,maxatm)
       real*8 grd2(3,maxatm)
@@ -1725,8 +1742,8 @@ c
       include 'sizes.i'
       integer i,j,k,m
       integer n,k0,k1
-      real*8 wres(maxvar)
-      real*8 vector(maxhess)
+      real*8 wres(*)
+      real*8 vector(*)
       real*8 hval(maxvib)
       real*8 a(maxvib)
       real*8 b(maxvib)
@@ -1792,7 +1809,7 @@ c
       integer lext,nview
       integer freeunit
       real*8 ratio
-      real*8 p(maxvar)
+      real*8 p(*)
       real*8 xref(maxatm)
       real*8 yref(maxatm)
       real*8 zref(maxatm)
@@ -1877,11 +1894,11 @@ c
       integer i1,i2
       real*8 ami,amik
       real*8 cutoff,rdn
+      real*8 amass(*)
+      real*8 vector(*)
       real*8 xred(maxatm)
       real*8 yred(maxatm)
       real*8 zred(maxatm)
-      real*8 amass(maxatm)
-      real*8 vector(maxhess)
 c
 c
 c     maintain any periodic boundary conditions

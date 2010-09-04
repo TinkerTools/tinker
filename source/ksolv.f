@@ -1314,13 +1314,13 @@ c
       dime(1) = 33
       dime(2) = 33
       dime(3) = 33
-      dowhile (grid(1)*dime(1) .lt. xlen)
+      do while (grid(1)*dime(1) .lt. xlen)
          dime(1) = dime(1) + 32
       end do
-      dowhile (grid(2)*dime(2) .lt. ylen)
+      do while (grid(2)*dime(2) .lt. ylen)
          dime(2) = dime(2) + 32
       end do
-      dowhile (grid(3)*dime(3) .lt. zlen)
+      do while (grid(3)*dime(3) .lt. zlen)
          dime(3) = dime(3) + 32
       end do
 c

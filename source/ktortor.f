@@ -176,11 +176,11 @@ c
                tmp2(k-1) = tbf(m+k,i)
             end do
             if (cyclic) then
-               call cspline (nx,maxtgrd,tmp1,tmp2,bs,cs,ds,
-     &                       tmp3,tmp4,tmp5,tmp6,tmp7)
+               call cspline (nx,tmp1,tmp2,bs,cs,ds,tmp3,
+     &                         tmp4,tmp5,tmp6,tmp7)
             else
-               call nspline (nx,maxtgrd,tmp1,tmp2,bs,cs,
-     &                       tmp3,tmp4,tmp5,tmp6,tmp7)
+               call nspline (nx,tmp1,tmp2,bs,cs,tmp3,
+     &                         tmp4,tmp5,tmp6,tmp7)
             end if
             do k = 1, tnx(i)
                tbx(m+k,i) = bs(k-1)
@@ -199,11 +199,11 @@ c
                tmp2(k-1) = tbf(m+(k-1)*tnx(i),i)
             end do
             if (cyclic) then
-               call cspline (ny,maxtgrd,tmp1,tmp2,bs,cs,ds,
-     &                       tmp3,tmp4,tmp5,tmp6,tmp7)
+               call cspline (ny,tmp1,tmp2,bs,cs,ds,tmp3,
+     &                         tmp4,tmp5,tmp6,tmp7)
             else
-               call nspline (ny,maxtgrd,tmp1,tmp2,bs,cs,
-     &                       tmp3,tmp4,tmp5,tmp6,tmp7)
+               call nspline (ny,tmp1,tmp2,bs,cs,tmp3,
+     &                         tmp4,tmp5,tmp6,tmp7)
             end if
             do k = 1, tny(i)
                tby(m+(k-1)*tnx(i),i) = bs(k-1)
@@ -219,11 +219,11 @@ c
                tmp2(k-1) = tbx(m+(k-1)*tnx(i),i)
             end do
             if (cyclic) then
-               call cspline (ny,maxtgrd,tmp1,tmp2,bs,cs,ds,
-     &                       tmp3,tmp4,tmp5,tmp6,tmp7)
+               call cspline (ny,tmp1,tmp2,bs,cs,ds,tmp3,
+     &                          tmp4,tmp5,tmp6,tmp7)
             else
-               call nspline (ny,maxtgrd,tmp1,tmp2,bs,cs,
-     &                       tmp3,tmp4,tmp5,tmp6,tmp7)
+               call nspline (ny,tmp1,tmp2,bs,cs,tmp3,
+     &                         tmp4,tmp5,tmp6,tmp7)
             end if
             do k = 1, tny(i)
                tbxy(m+(k-1)*tnx(i),i) = bs(k-1)

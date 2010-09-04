@@ -110,19 +110,20 @@ c
       integer i,nvar,fg_call
       integer iter_tn,iter_cg
       integer next,newhess
-      integer nerr,maxerr
-      integer h_init(maxvar)
-      integer h_stop(maxvar)
-      integer h_index(maxhess)
+      integer nerr,maxerr,hmax
+      integer, allocatable :: h_init(:)
+      integer, allocatable :: h_stop(:)
+      integer, allocatable :: h_index(:)
       real*8 f,fgvalue,grdmin
       real*8 minimum,angle,rms
       real*8 x_move,f_move,f_old
       real*8 g_norm,g_rms
-      real*8 x(maxvar)
-      real*8 x_old(maxvar)
-      real*8 g(maxvar),p(maxvar)
-      real*8 h(maxhess)
-      real*8 h_diag(maxvar)
+      real*8 x(*)
+      real*8, allocatable :: x_old(:)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: h_diag(:)
+      real*8, allocatable :: h(:)
       logical done,negtest
       logical automode,automatic
       character*4 h_mode
@@ -249,6 +250,18 @@ c
      &              '  X Move   CG Iter   Solve   FG Call',/)
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (h_init(nvar))
+      allocate (h_stop(nvar))
+      allocate (x_old(nvar))
+      allocate (g(nvar))
+      allocate (p(nvar))
+      allocate (h_diag(nvar))
+      hmax = min(maxhess,(nvar*(nvar-1))/2)
+      allocate (h_index(hmax))
+      allocate (h(hmax))
+c
 c     evaluate the function and get the initial gradient
 c
       iter_cg = 0
@@ -308,7 +321,7 @@ c
 c
 c     beginning of the outer truncated Newton iteration
 c
-      dowhile (.not. done)
+      do while (.not. done)
          iter_tn = iter_tn + 1
 c
 c     if pisystem is present, update the molecular orbitals
@@ -471,6 +484,17 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (h_init)
+      deallocate (h_stop)
+      deallocate (x_old)
+      deallocate (g)
+      deallocate (p)
+      deallocate (h_diag)
+      deallocate (h_index)
+      deallocate (h)
       return
       end
 c
@@ -502,9 +526,9 @@ c
       integer i,j,k,nvar,cycle
       integer iter,iter_cg
       integer fg_call,maxiter
-      integer h_init(maxvar)
-      integer h_stop(maxvar)
-      integer h_index(maxhess)
+      integer h_init(*)
+      integer h_stop(*)
+      integer h_index(*)
       real*8 alpha,beta,delta
       real*8 sigma,f_sigma
       real*8 fgvalue,eps
@@ -512,19 +536,33 @@ c
       real*8 hj,gg,dq,rr,dd
       real*8 rs,rs_new,r_norm
       real*8 converge
-      real*8 x(maxvar),g(maxvar)
-      real*8 p(maxvar),q(maxvar)
-      real*8 m(maxvar),r(maxvar)
-      real*8 s(maxvar),d(maxvar)
-      real*8 x_sigma(maxvar)
-      real*8 g_sigma(maxvar)
-      real*8 h_diag(maxvar)
-      real*8 h(maxhess)
+      real*8 x(*)
+      real*8 g(*)
+      real*8 p(*)
+      real*8 h_diag(*)
+      real*8 h(*)
+      real*8, allocatable :: m(:)
+      real*8, allocatable :: r(:)
+      real*8, allocatable :: s(:)
+      real*8, allocatable :: d(:)
+      real*8, allocatable :: q(:)
+      real*8, allocatable :: x_sigma(:)
+      real*8, allocatable :: g_sigma(:)
       logical negtest
       character*6 mode,method
       character*9 status
       external fgvalue
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (m(nvar))
+      allocate (r(nvar))
+      allocate (s(nvar))
+      allocate (d(nvar))
+      allocate (q(nvar))
+      allocate (x_sigma(nvar))
+      allocate (g_sigma(nvar))
 c
 c     transformation using exact Hessian diagonal
 c
@@ -575,7 +613,7 @@ c
 c
 c     evaluate or estimate the matrix-vector product
 c
-      dowhile (.true.)
+      do while (.true.)
          if (mode.eq.'TNCG' .or. mode.eq.'NEWTON') then
             do i = 1, nvar
                q(i) = 0.0d0
@@ -677,6 +715,16 @@ c
          end do
       end if
       iter_cg = iter_cg + iter
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (m)
+      deallocate (r)
+      deallocate (s)
+      deallocate (d)
+      deallocate (q)
+      deallocate (x_sigma)
+      deallocate (g_sigma)
       return
       end
 c
@@ -717,29 +765,45 @@ c
       integer i,j,k,ii,kk
       integer iii,kkk,iter
       integer nvar,nblock
-      integer ix,iy,iz,icount
-      integer h_init(maxvar)
-      integer h_stop(maxvar)
-      integer c_init(maxvar)
-      integer c_stop(maxvar)
-      integer h_index(maxhess)
-      integer c_index(maxhess)
-      integer c_value(maxhess)
+      integer ix,iy,iz
+      integer hmax,icount
+      integer h_init(*)
+      integer h_stop(*)
+      integer h_index(*)
+      integer, allocatable :: c_init(:)
+      integer, allocatable :: c_stop(:)
+      integer, allocatable :: c_index(:)
+      integer, allocatable :: c_value(:)
       real*8 f_i,f_k
       real*8 omega,factor
       real*8 maxalpha,alpha
-      real*8 diag(maxvar)
-      real*8 f(maxhess)
-      real*8 f_diag(maxvar)
-      real*8 h(maxhess)
-      real*8 h_diag(maxvar)
-      real*8 r(maxvar)
-      real*8 s(maxvar)
       real*8 a(6),b(3)
+      real*8 h_diag(*)
+      real*8 h(*)
+      real*8 s(*)
+      real*8 r(*)
+      real*8, allocatable :: diag(:)
+      real*8, allocatable :: f_diag(:)
+      real*8, allocatable :: f(:)
       logical stable
       character*6 method
       save f,f_diag,stable
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (method .eq. 'SSOR')  allocate (diag(nvar))
+      if (method .eq. 'ICCG') then
+         hmax = min(maxhess,(nvar*(nvar-1))/2)
+         if (iter .eq. 0) then
+            allocate (c_init(nvar))
+            allocate (c_stop(nvar))
+            allocate (c_index(hmax))
+            allocate (c_value(hmax))
+         end if
+         if (.not. allocated(f_diag))  allocate (f_diag(nvar))
+         if (.not. allocated(f))  allocate (f(hmax))
+      end if
 c
 c     use no preconditioning, using M = identity matrix
 c
@@ -861,7 +925,7 @@ c
                   f(j) = h(j)
                   ii = c_init(i)
                   kk = c_init(k)
-                  dowhile (ii.le.c_stop(i) .and. kk.le.c_stop(k))
+                  do while (ii.le.c_stop(i) .and. kk.le.c_stop(k))
                      iii = c_index(ii)
                      kkk = c_index(kk)
                      if (iii .lt. kkk) then
@@ -913,6 +977,18 @@ c
             do i = 1, nvar
                s(i) = r(i) / abs(h_diag(i))
             end do
+         end if
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      if (method .eq. 'SSOR')  deallocate (diag)
+      if (method .eq. 'ICCG') then
+         if (iter .eq. 0) then
+            deallocate (c_init)
+            deallocate (c_stop)
+            deallocate (c_index)
+            deallocate (c_value)
          end if
       end if
       return

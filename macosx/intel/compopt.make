@@ -169,7 +169,6 @@ ifort -c -fast flatten.f
 ifort -c -fast freeunit.f
 ifort -c -fast gda.f
 ifort -c -fast geometry.f
-ifort -c -fast getime.f
 ifort -c -fast getint.f
 ifort -c -fast getkey.f
 ifort -c -fast getmol2.f
@@ -320,7 +319,6 @@ ifort -c -fast scan.f
 ifort -c -fast sdstep.f
 ifort -c -fast search.f
 ifort -c -fast server.f
-ifort -c -fast setime.f
 ifort -c -fast shakeup.f
 ifort -c -fast sigmoid.f
 ifort -c -fast sktstuff.f

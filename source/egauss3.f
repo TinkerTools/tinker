@@ -453,6 +453,7 @@ c
       integer kk,kv,kt
       integer kgy,kgz
       integer start,stop
+      integer ikmin,ikmax
       integer iv14(maxatm)
       real*8 e,eps,rdn
       real*8 rad,rad2,fgrp
@@ -673,14 +674,16 @@ c
      &                             6x,'Energy',/)
                      end if
                      rad = sqrt(rad2)
+                     ikmin = min(i,k)
+                     ikmax = max(i,k)
                      if (prime) then
-                        write (iout,30)  i,name(i),k,name(k),
-     &                                   rad,sqrt(rik2),e
+                        write (iout,30)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),rad,sqrt(rik2),e
    30                   format (' VDW-Gauss',2x,i5,'-',a3,1x,i5,'-',
      &                             a3,12x,2f10.4,f12.4)
                      else
-                        write (iout,40)  i,name(i),k,name(k),
-     &                                   rad,sqrt(rik2),e
+                        write (iout,40)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),rad,sqrt(rik2),e
    40                   format (' VDW-Gauss',2x,i5,'-',a3,1x,i5,'-',
      &                             a3,3x,'(XTAL)',3x,2f10.4,f12.4)
                      end if

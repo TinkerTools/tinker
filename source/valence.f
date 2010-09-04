@@ -80,7 +80,7 @@ c
      &           /,4x,'(2) Compare QM and MM Vibrational Frequencies',
      &           /,4x,'(3) Force Fit of Parameters to QM Results',
      &           /,4x,'(4) Structure Fit of Parameters to QM Results')
-         dowhile (mode.lt.1 .or. mode.gt.4)
+         do while (mode.lt.1 .or. mode.gt.4)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)

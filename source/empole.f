@@ -1903,15 +1903,22 @@ c
       real*8 hsq,expterm
       real*8 term,pterm
       real*8 a(3,3)
-      real*8 fuind(3,maxatm)
-      real*8 cmp(10,maxatm)
-      real*8 fmp(10,maxatm)
-      real*8 fphi(20,maxatm)
+      real*8, allocatable :: fuind(:,:)
+      real*8, allocatable :: cmp(:,:)
+      real*8, allocatable :: fmp(:,:)
+      real*8, allocatable :: fphi(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fuind(3,npole))
+      allocate (cmp(10,npole))
+      allocate (fmp(10,npole))
+      allocate (fphi(20,npole))
 c
 c     copy the multipole moments into local storage areas
 c
@@ -2047,5 +2054,12 @@ c
          e = 0.5d0 * electric * e
          ep = ep + e
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (fuind)
+      deallocate (cmp)
+      deallocate (fmp)
+      deallocate (fphi)
       return
       end

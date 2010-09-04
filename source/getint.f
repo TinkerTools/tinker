@@ -40,7 +40,7 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter Internal Coordinate File Name :  ',$)
          read (input,20)  intfile

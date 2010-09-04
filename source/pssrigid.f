@@ -327,7 +327,7 @@ c
 c
 c     find local minimum along each of the steepest directions
 c
-      dowhile (.not. done)
+      do while (.not. done)
          ndoi = ndoi + 1
          write (iout,10)  ndoi,minref
    10    format (/,' Normal Mode Search :',8x,'Iteration',i4,
@@ -507,7 +507,7 @@ c     size = 0.1d0
 c
 c     scan the search direction for a minimization candidate
 c
-      dowhile (.not. done)
+      do while (.not. done)
          if (kstep .ne. 0) then
             nvar = 0
             do i = 1, ngrp

@@ -67,7 +67,7 @@ c
       quit = .false.
       abort = .true.
       size = 0
-      dowhile (size .eq. 0)
+      do while (size .eq. 0)
          read (ixyz,20,err=60,end=60)  record
    20    format (a120)
          size = trimtext (record)
@@ -121,7 +121,7 @@ c
       do i = 1, n
          next = 1
          size = 0
-         dowhile (size .eq. 0)
+         do while (size .eq. 0)
             read (ixyz,40,err=60,end=60)  record
    40       format (a120)
             size = trimtext (record)

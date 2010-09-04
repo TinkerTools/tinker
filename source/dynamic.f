@@ -75,7 +75,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=40,end=40)  dt
    40 continue
-      dowhile (dt .lt. 0.0d0)
+      do while (dt .lt. 0.0d0)
          write (iout,50)
    50    format (/,' Enter the Time Step Length in Femtoseconds',
      &              ' [1.0] :  ',$)
@@ -97,7 +97,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=80,end=80)  dtdump
    80 continue
-      dowhile (dtdump .lt. 0.0d0)
+      do while (dtdump .lt. 0.0d0)
          write (iout,90)
    90    format (/,' Enter Time between Dumps in Picoseconds',
      &              ' [0.1] :  ',$)
@@ -115,7 +115,7 @@ c
          call nextarg (string,exist)
          if (exist)  read (string,*,err=120,end=120)  mode
   120    continue
-         dowhile (mode.lt.1 .or. mode.gt.4)
+         do while (mode.lt.1 .or. mode.gt.4)
             write (iout,130)
   130       format (/,' Available Statistical Mechanical Ensembles :',
      &              //,4x,'(1) Microcanonical (NVE)',
@@ -135,7 +135,7 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=160,end=160)  kelvin
   160       continue
-            dowhile (kelvin .lt. 0.0d0)
+            do while (kelvin .lt. 0.0d0)
                write (iout,170)
   170          format (/,' Enter the Desired Temperature in Degrees',
      &                    ' K [298] :  ',$)
@@ -152,7 +152,7 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=200,end=200)  atmsph
   200       continue
-            dowhile (atmsph .lt. 0.0d0)
+            do while (atmsph .lt. 0.0d0)
                write (iout,210)
   210          format (/,' Enter the Desired Pressure in Atm',
      &                    ' [1.0] :  ',$)
@@ -171,7 +171,7 @@ c
          call nextarg (string,exist)
          if (exist)  read (string,*,err=240,end=240)  mode
   240    continue
-         dowhile (mode.lt.1 .or. mode.gt.2)
+         do while (mode.lt.1 .or. mode.gt.2)
             write (iout,250)
   250       format (/,' Available Simulation Control Modes :',
      &              //,4x,'(1) Constant Total Energy Value (E)',
@@ -189,7 +189,7 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=280,end=280)  kelvin
   280       continue
-            dowhile (kelvin .lt. 0.0d0)
+            do while (kelvin .lt. 0.0d0)
                write (iout,290)
   290          format (/,' Enter the Desired Temperature in Degrees',
      &                    ' K [298] :  ',$)

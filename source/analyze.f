@@ -36,7 +36,7 @@ c
       logical dolarge,dodetail
       logical doprops
       logical exist
-      logical active(maxatm)
+      logical, allocatable :: active(:)
       character*1 letter
       character*120 record
       character*120 string
@@ -91,6 +91,10 @@ c
          if (letter .eq. 'M')  doprops = .true.
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (active(n))
+c
 c     get the list of atoms for which output is desired
 c
       if (doatom .or. doparam) then
@@ -117,7 +121,7 @@ c
             active(i) = .true.
          end do
          i = 1
-         dowhile (list(i) .ne. 0)
+         do while (list(i) .ne. 0)
             if (i .eq. 1) then
                do j = 1, n
                   active(j) = .false.
@@ -172,7 +176,7 @@ c
 c
 c     perform analysis for each successive coordinate structure
 c
-      dowhile (.not. abort)
+      do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
             write (iout,90)  frame
@@ -186,13 +190,7 @@ c
 c     energy partitioning by potential energy components
 c
          if (doenergy) then
-            if (digits .ge. 8) then
-               call analyz8
-            else if (digits .ge. 6) then
-               call analyz6
-            else
-               call analyz4
-            end if
+            call partyze
          end if
 c
 c     get various electrostatic and inertial properties
@@ -211,6 +209,10 @@ c     attempt to read next structure from the coordinate file
 c
          call readxyz (ixyz)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (active)
 c
 c     perform any final tasks before program exit
 c
@@ -434,7 +436,7 @@ c
       real*8 phase(6)
       real*8 mpl(13)
       logical header
-      logical active(maxatm)
+      logical active(*)
 c
 c
 c     number of each type of interaction and site
@@ -1195,6 +1197,7 @@ c
       include 'iounit.i'
       include 'molcul.i'
       real*8 energy
+      character*120 fstr
 c
 c
 c     perform the energy analysis by atom and component
@@ -1203,534 +1206,175 @@ c
 c
 c     print out the total potential energy of the system
 c
-      if (digits .ge. 8) then
-         if (abs(energy) .lt. 1.0d10) then
-            write (iout,10)  energy
-   10       format (/,' Total Potential Energy :',4x,f20.8,
-     &                    ' Kcal/mole')
-         else
-            write (iout,20)  energy
-   20       format (/,' Total Potential Energy :',4x,d20.8,
-     &                    ' Kcal/mole')
-         end if
-      else if (digits .ge. 6) then
-         if (abs(energy) .lt. 1.0d10) then
-            write (iout,30)  energy
-   30       format (/,' Total Potential Energy :',6x,f18.6,
-     &                    ' Kcal/mole')
-         else
-            write (iout,40)  energy
-   40       format (/,' Total Potential Energy :',6x,d18.6,
-     &                    ' Kcal/mole')
-         end if
-      else
-         if (abs(energy) .lt. 1.0d10) then
-            write (iout,50)  energy
-   50       format (/,' Total Potential Energy :',8x,f16.4,
-     &                    ' Kcal/mole')
-         else
-            write (iout,60)  energy
-   60       format (/,' Total Potential Energy :',8x,d16.4,
-     &                    ' Kcal/mole')
-         end if
-      end if
+      fstr = '(/,'' Total Potential Energy :'',8x,f16.4,'' Kcal/mole'')'
+      if (digits .ge. 6)  fstr(32:39) = '6x,f18.6'
+      if (digits .ge. 8)  fstr(32:39) = '4x,f20.8'
+      if (abs(energy) .ge. 1.0d10)  fstr(35:35) = 'd'
+      write (iout,fstr)  energy
 c
 c     intermolecular energy for systems with multiple molecules
 c
-      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald) then
-         if (digits .ge. 8) then
-            if (abs(einter) .lt. 1.0d10) then
-               write (iout,70)  einter
-   70          format (/,' Intermolecular Energy :',5x,f20.8,
-     &                       ' Kcal/mole')
-            else
-               write (iout,80)  einter
-   80          format (/,' Intermolecular Energy :',5x,d20.8,
-     &                       ' Kcal/mole')
-            end if
-         else if (digits .ge. 6) then
-            if (abs(einter) .lt. 1.0d10) then
-               write (iout,90)  einter
-   90          format (/,' Intermolecular Energy :',7x,f18.6,
-     &                       ' Kcal/mole')
-            else
-               write (iout,100)  einter
-  100          format (/,' Intermolecular Energy :',7x,d18.6,
-     &                       ' Kcal/mole')
-            end if
-         else
-            if (abs(einter) .lt. 1.0d10) then
-               write (iout,110)  einter
-  110          format (/,' Intermolecular Energy :',9x,f16.4,
-     &                       ' Kcal/mole')
-            else
-               write (iout,120)  einter
-  120          format (/,' Intermolecular Energy :',9x,d16.4,
-     &                       ' Kcal/mole')
-            end if
-         end if
-      end if
+      fstr = '(/,'' Intermolecular Energy :'',9x,f16.4,'' Kcal/mole'')'
+      if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
+      if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
+      if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
+      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald)
+     &   write (iout,fstr)  einter
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine analyz4  --  low precision energy components  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine partyze  --  energy component decomposition  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "analyz4" prints the energy to 4 decimal places and number
-c     of interactions for each component of the potential energy
+c     "partyze" prints the energy component and number of
+c     interactions for each of the potential energy terms
 c
 c
-      subroutine analyz4
+      subroutine partyze
       include 'action.i'
       include 'cutoff.i'
       include 'energi.i'
+      include 'inform.i'
       include 'iounit.i'
       include 'potent.i'
+      character*12 form1
+      character*12 form2
+      character*120 fstr
 c
 c
 c     write out each energy component to the desired precision
 c
-      write (iout,10)
-   10 format (/,' Energy Component Breakdown :',11x,'Kcal/mole',
-     &          6x,'Interactions'/)
+      form1 = '5x,f16.4,i15'
+      if (digits .ge. 6)  form1 = '3x,f18.6,i15'
+      if (digits .ge. 8)  form1 = '1x,f20.8,i15'
+      form2 = form1(1:3)//'d'//form1(5:12)
+      fstr = '(/,'' Energy Component Breakdown :'',
+     &          11x,''Kcal/mole'',6x,''Interactions''/)'
+      write (iout,fstr)
       if (use_bond .and. neb.ne.0) then
-         write (iout,20)  eb,neb
-   20    format (' Bond Stretching',17x,f16.4,i15)
+         fstr = '('' Bond Stretching'',12x,'//form1//')'
+         write (iout,fstr)  eb,neb
       end if
       if (use_angle .and. nea.ne.0) then
-         write (iout,30)  ea,nea
-   30    format (' Angle Bending',19x,f16.4,i15)
+         fstr = '('' Angle Bending'',14x,'//form1//')'
+         write (iout,fstr)  ea,nea
       end if
       if (use_strbnd .and. neba.ne.0) then
-         write (iout,40)  eba,neba
-   40    format (' Stretch-Bend',20x,f16.4,i15)
+         fstr = '('' Stretch Bend'',15x,'//form1//')'
+         write (iout,fstr)  eba,neba
       end if
       if (use_urey .and. neub.ne.0) then
-         write (iout,50)  eub,neub
-   50    format (' Urey-Bradley',20x,f16.4,i15)
+         fstr = '('' Urey-Bradley'',15x,'//form1//')'
+         write (iout,fstr)  eub,neub
       end if
       if (use_angang .and. neaa.ne.0) then
-         write (iout,60)  eaa,neaa
-   60    format (' Angle-Angle',21x,f16.4,i15)
+         fstr = '('' Angle-Angle'',16x,'//form1//')'
+         write (iout,fstr)  eaa,neaa
       end if
       if (use_opbend .and. neopb.ne.0) then
-         write (iout,70)  eopb,neopb
-   70    format (' Out-of-Plane Bend',15x,f16.4,i15)
+         fstr = '('' Out-of-Plane Bend'',10x,'//form1//')'
+         write (iout,fstr)  eopb,neopb
       end if
       if (use_opdist .and. neopd.ne.0) then
-         write (iout,80)  eopd,neopd
-   80    format (' Out-of-Plane Distance',11x,f16.4,i15)
+         fstr = '('' Out-of-Plane Distance'',6x,'//form1//')'
+         write (iout,fstr)  eopd,neopd
       end if
       if (use_improp .and. neid.ne.0) then
-         write (iout,90)  eid,neid
-   90    format (' Improper Dihedral',15x,f16.4,i15)
+         fstr = '('' Improper Dihedral'',10x,'//form1//')'
+         write (iout,fstr)  eid,neid
       end if
       if (use_imptor .and. neit.ne.0) then
-         write (iout,100)  eit,neit
-  100    format (' Improper Torsion',16x,f16.4,i15)
+         fstr = '('' Improper Torsion'',11x,'//form1//')'
+         write (iout,fstr)  eit,neit
       end if
       if (use_tors .and. net.ne.0) then
-         write (iout,110)  et,net
-  110    format (' Torsional Angle',17x,f16.4,i15)
+         fstr = '('' Torsional Angle'',12x,'//form1//')'
+         write (iout,fstr)  et,net
       end if
       if (use_pitors .and. nept.ne.0) then
-         write (iout,120)  ept,nept
-  120    format (' Pi-Orbital Torsion',14x,f16.4,i15)
+         fstr = '('' Pi-Orbital Torsion'',9x,'//form1//')'
+         write (iout,fstr)  ept,nept
       end if
       if (use_strtor .and. nebt.ne.0) then
-         write (iout,130)  ebt,nebt
-  130    format (' Stretch-Torsion',17x,f16.4,i15)
+         fstr = '('' Stretch-Torsion'',12x,'//form1//')'
+         write (iout,fstr)  ebt,nebt
       end if
       if (use_tortor .and. nett.ne.0) then
-         write (iout,140)  ett,nett
-  140    format (' Torsion-Torsion',17x,f16.4,i15)
+         fstr = '('' Torsion-Torsion'',12x,'//form1//')'
+         write (iout,fstr)  ett,nett
       end if
       if (use_vdw .and. nev.ne.0) then
          if (abs(ev) .lt. 1.0d10) then
-            write (iout,150)  ev,nev
-  150       format (' Van der Waals',19x,f16.4,i15)
+            fstr = '('' Van der Waals'',14x,'//form1//')'
          else
-            write (iout,160)  ev,nev
-  160       format (' Van der Waals',19x,d16.4,i15)
+            fstr = '('' Van der Waals'',14x,'//form2//')'
          end if
+         write (iout,fstr)  ev,nev
       end if
       if (use_charge .and. nec.ne.0) then
          if (abs(ec) .lt. 1.0d10) then
-            write (iout,170)  ec,nec
-  170       format (' Charge-Charge',19x,f16.4,i15)
+            fstr = '('' Charge-Charge'',14x,'//form1//')'
          else
-            write (iout,180)  ec,nec
-  180       format (' Charge-Charge',19x,d16.4,i15)
+            fstr = '('' Charge-Charge'',14x,'//form2//')'
          end if
+         write (iout,fstr)  ec,nec
       end if
       if (use_chgdpl .and. necd.ne.0) then
          if (abs(ecd) .lt. 1.0d10) then
-            write (iout,190)  ecd,necd
-  190       format (' Charge-Dipole',19x,f16.4,i15)
+            fstr = '('' Charge-Dipole'',14x,'//form1//')'
          else
-            write (iout,200)  ecd,necd
-  200       format (' Charge-Dipole',19x,d16.4,i15)
+            fstr = '('' Charge-Dipole'',14x,'//form2//')'
          end if
+         write (iout,fstr)  ecd,necd
       end if
       if (use_dipole .and. ned.ne.0) then
          if (abs(ed) .lt. 1.0d10) then
-            write (iout,210)  ed,ned
-  210       format (' Dipole-Dipole',19x,f16.4,i15)
+            fstr = '('' Dipole-Dipole'',14x,'//form1//')'
          else
-            write (iout,220)  ed,ned
-  220       format (' Dipole-Dipole',19x,d16.4,i15)
+            fstr = '('' Dipole-Dipole'',14x,'//form2//')'
          end if
+         write (iout,fstr)  ed,ned
       end if
       if (use_mpole .and. nem.ne.0) then
          if (abs(em) .lt. 1.0d10) then
-            write (iout,230)  em,nem
-  230       format (' Atomic Multipoles',15x,f16.4,i15)
+            fstr = '('' Atomic Multipoles'',10x,'//form1//')'
          else
-            write (iout,240)  em,nem
-  240       format (' Atomic Multipoles',15x,d16.4,i15)
+            fstr = '('' Atomic Multipoles'',10x,'//form2//')'
          end if
+         write (iout,fstr)  em,nem
       end if
       if (use_polar .and. nep.ne.0) then
          if (abs(ep) .lt. 1.0d10) then
-            write (iout,250)  ep,nep
-  250       format (' Polarization',20x,f16.4,i15)
+            fstr = '('' Polarization'',15x,'//form1//')'
          else
-            write (iout,260)  ep,nep
-  260       format (' Polarization',20x,d16.4,i15)
+            fstr = '('' Polarization'',15x,'//form2//')'
          end if
+         write (iout,fstr)  ep,nep
       end if
       if (use_rxnfld .and. ner.ne.0) then
-         write (iout,270)  er,ner
-  270    format (' Reaction Field',18x,f16.4,i15)
+         fstr = '('' Reaction Field'',13x,'//form1//')'
+         write (iout,fstr)  er,ner
       end if
       if (use_solv .and. nes.ne.0) then
-         write (iout,280)  es,nes
-  280    format (' Implicit Solvation',14x,f16.4,i15)
+         fstr = '('' Implicit Solvation'',9x,'//form1//')'
+         write (iout,fstr)  es,nes
       end if
       if (use_metal .and. nelf.ne.0) then
-         write (iout,290)  elf,nelf
-  290    format (' Metal Ligand Field',14x,f16.4,i15)
+         fstr = '('' Metal Ligand Field'',9x,'//form1//')'
+         write (iout,fstr)  elf,nelf
       end if
       if (use_geom .and. neg.ne.0) then
-         write (iout,300)  eg,neg
-  300    format (' Geometric Restraints',12x,f16.4,i15)
+         fstr = '('' Geometric Restraints'',7x,'//form1//')'
+         write (iout,fstr)  eg,neg
       end if
       if (use_extra .and. nex.ne.0) then
-         write (iout,310)  ex,nex
-  310    format (' Extra Energy Terms',14x,f16.4,i15)
-      end if
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine analyz6  --  medium precision energy components  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "analyz6" prints the energy to 6 decimal places and number
-c     of interactions for each component of the potential energy
-c
-c
-      subroutine analyz6
-      include 'action.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'iounit.i'
-      include 'potent.i'
-c
-c
-c     write out each energy component to the desired precision
-c
-      write (iout,10)
-   10 format (/,' Energy Component Breakdown :',11x,'Kcal/mole',
-     &          6x,'Interactions'/)
-      if (use_bond .and. neb.ne.0) then
-         write (iout,20)  eb,neb
-   20    format (' Bond Stretching',15x,f18.6,i15)
-      end if
-      if (use_angle .and. nea.ne.0) then
-         write (iout,30)  ea,nea
-   30    format (' Angle Bending',17x,f18.6,i15)
-      end if
-      if (use_strbnd .and. neba.ne.0) then
-         write (iout,40)  eba,neba
-   40    format (' Stretch-Bend',18x,f18.6,i15)
-      end if
-      if (use_urey .and. neub.ne.0) then
-         write (iout,50)  eub,neub
-   50    format (' Urey-Bradley',18x,f18.6,i15)
-      end if
-      if (use_angang .and. neaa.ne.0) then
-         write (iout,60)  eaa,neaa
-   60    format (' Angle-Angle',19x,f18.6,i15)
-      end if
-      if (use_opbend .and. neopb.ne.0) then
-         write (iout,70)  eopb,neopb
-   70    format (' Out-of-Plane Bend',13x,f18.6,i15)
-      end if
-      if (use_opdist .and. neopd.ne.0) then
-         write (iout,80)  eopd,neopd
-   80    format (' Out-of-Plane Distance',9x,f18.6,i15)
-      end if
-      if (use_improp .and. neid.ne.0) then
-         write (iout,90)  eid,neid
-   90    format (' Improper Dihedral',13x,f18.6,i15)
-      end if
-      if (use_imptor .and. neit.ne.0) then
-         write (iout,100)  eit,neit
-  100    format (' Improper Torsion',14x,f18.6,i15)
-      end if
-      if (use_tors .and. net.ne.0) then
-         write (iout,110)  et,net
-  110    format (' Torsional Angle',15x,f18.6,i15)
-      end if
-      if (use_pitors .and. nept.ne.0) then
-         write (iout,120)  ept,nept
-  120    format (' Pi-Orbital Torsion',12x,f18.6,i15)
-      end if
-      if (use_strtor .and. nebt.ne.0) then
-         write (iout,130)  ebt,nebt
-  130    format (' Stretch-Torsion',15x,f18.6,i15)
-      end if
-      if (use_tortor .and. nett.ne.0) then
-         write (iout,140)  ett,nett
-  140    format (' Torsion-Torsion',15x,f18.6,i15)
-      end if
-      if (use_vdw .and. nev.ne.0) then
-         if (abs(ev) .lt. 1.0d10) then
-            write (iout,150)  ev,nev
-  150       format (' Van der Waals',17x,f18.6,i15)
-         else
-            write (iout,160)  ev,nev
-  160       format (' Van der Waals',17x,d18.6,i15)
-         end if
-      end if
-      if (use_charge .and. nec.ne.0) then
-         if (abs(ec) .lt. 1.0d10) then
-            write (iout,170)  ec,nec
-  170       format (' Charge-Charge',17x,f18.6,i15)
-         else
-            write (iout,180)  ec,nec
-  180       format (' Charge-Charge',17x,d18.6,i15)
-         end if
-      end if
-      if (use_chgdpl .and. necd.ne.0) then
-         if (abs(ecd) .lt. 1.0d10) then
-            write (iout,190)  ecd,necd
-  190       format (' Charge-Dipole',17x,f18.6,i15)
-         else
-            write (iout,200)  ecd,necd
-  200       format (' Charge-Dipole',17x,d18.6,i15)
-         end if
-      end if
-      if (use_dipole .and. ned.ne.0) then
-         if (abs(ed) .lt. 1.0d10) then
-            write (iout,210)  ed,ned
-  210       format (' Dipole-Dipole',17x,f18.6,i15)
-         else
-            write (iout,220)  ed,ned
-  220       format (' Dipole-Dipole',17x,d18.6,i15)
-         end if
-      end if
-      if (use_mpole .and. nem.ne.0) then
-         if (abs(em) .lt. 1.0d10) then
-            write (iout,230)  em,nem
-  230       format (' Atomic Multipoles',13x,f18.6,i15)
-         else
-            write (iout,240)  em,nem
-  240       format (' Atomic Multipoles',13x,d18.6,i15)
-         end if
-      end if
-      if (use_polar .and. nep.ne.0) then
-         if (abs(ep) .lt. 1.0d10) then
-            write (iout,250)  ep,nep
-  250       format (' Polarization',18x,f18.6,i15)
-         else
-            write (iout,260)  ep,nep
-  260       format (' Polarization',18x,d18.6,i15)
-         end if
-      end if
-      if (use_rxnfld .and. ner.ne.0) then
-         write (iout,270)  er,ner
-  270    format (' Reaction Field',16x,f18.6,i15)
-      end if
-      if (use_solv .and. nes.ne.0) then
-         write (iout,280)  es,nes
-  280    format (' Implicit Solvation',12x,f18.6,i15)
-      end if
-      if (use_metal .and. nelf.ne.0) then
-         write (iout,290)  elf,nelf
-  290    format (' Metal Ligand Field',12x,f18.6,i15)
-      end if
-      if (use_geom .and. neg.ne.0) then
-         write (iout,300)  eg,neg
-  300    format (' Geometric Restraints',10x,f18.6,i15)
-      end if
-      if (use_extra .and. nex.ne.0) then
-         write (iout,310)  ex,nex
-  310    format (' Extra Energy Terms',12x,f18.6,i15)
-      end if
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine analyz8  --  high precision energy components  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "analyz8" prints the energy to 8 decimal places and number
-c     of interactions for each component of the potential energy
-c
-c
-      subroutine analyz8
-      include 'action.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'iounit.i'
-      include 'potent.i'
-c
-c
-c     write out each energy component to the desired precision
-c
-      write (iout,10)
-   10 format (/,' Energy Component Breakdown :',11x,'Kcal/mole',
-     &          6x,'Interactions'/)
-      if (use_bond .and. neb.ne.0) then
-         write (iout,20)  eb,neb
-   20    format (' Bond Stretching',13x,f20.8,i15)
-      end if
-      if (use_angle .and. nea.ne.0) then
-         write (iout,30)  ea,nea
-   30    format (' Angle Bending',15x,f20.8,i15)
-      end if
-      if (use_strbnd .and. neba.ne.0) then
-         write (iout,40)  eba,neba
-   40    format (' Stretch-Bend',16x,f20.8,i15)
-      end if
-      if (use_urey .and. neub.ne.0) then
-         write (iout,50)  eub,neub
-   50    format (' Urey-Bradley',16x,f20.8,i15)
-      end if
-      if (use_angang .and. neaa.ne.0) then
-         write (iout,60)  eaa,neaa
-   60    format (' Angle-Angle',17x,f20.8,i15)
-      end if
-      if (use_opbend .and. neopb.ne.0) then
-         write (iout,70)  eopb,neopb
-   70    format (' Out-of-Plane Bend',11x,f20.8,i15)
-      end if
-      if (use_opdist .and. neopd.ne.0) then
-         write (iout,80)  eopd,neopd
-   80    format (' Out-of-Plane Distance',7x,f20.8,i15)
-      end if
-      if (use_improp .and. neid.ne.0) then
-         write (iout,90)  eid,neid
-   90    format (' Improper Dihedral',11x,f20.8,i15)
-      end if
-      if (use_imptor .and. neit.ne.0) then
-         write (iout,100)  eit,neit
-  100    format (' Improper Torsion',12x,f20.8,i15)
-      end if
-      if (use_tors .and. net.ne.0) then
-         write (iout,110)  et,net
-  110    format (' Torsional Angle',13x,f20.8,i15)
-      end if
-      if (use_pitors .and. nept.ne.0) then
-         write (iout,120)  ept,nept
-  120    format (' Pi-Orbital Torsion',10x,f20.8,i15)
-      end if
-      if (use_strtor .and. nebt.ne.0) then
-         write (iout,130)  ebt,nebt
-  130    format (' Stretch-Torsion',13x,f20.8,i15)
-      end if
-      if (use_tortor .and. nett.ne.0) then
-         write (iout,140)  ett,nett
-  140    format (' Torsion-Torsion',13x,f20.8,i15)
-      end if
-      if (use_vdw .and. nev.ne.0) then
-         if (abs(ev) .lt. 1.0d10) then
-            write (iout,150)  ev,nev
-  150       format (' Van der Waals',15x,f20.8,i15)
-         else
-            write (iout,160)  ev,nev
-  160       format (' Van der Waals',15x,d20.8,i15)
-         end if
-      end if
-      if (use_charge .and. nec.ne.0) then
-         if (abs(ec) .lt. 1.0d10) then
-            write (iout,170)  ec,nec
-  170       format (' Charge-Charge',15x,f20.8,i15)
-         else
-            write (iout,180)  ec,nec
-  180       format (' Charge-Charge',15x,d20.8,i15)
-         end if
-      end if
-      if (use_chgdpl .and. necd.ne.0) then
-         if (abs(ecd) .lt. 1.0d10) then
-            write (iout,190)  ecd,necd
-  190       format (' Charge-Dipole',15x,f20.8,i15)
-         else
-            write (iout,200)  ecd,necd
-  200       format (' Charge-Dipole',15x,d20.8,i15)
-         end if
-      end if
-      if (use_dipole .and. ned.ne.0) then
-         if (abs(ed) .lt. 1.0d10) then
-            write (iout,210)  ed,ned
-  210       format (' Dipole-Dipole',15x,f20.8,i15)
-         else
-            write (iout,220)  ed,ned
-  220       format (' Dipole-Dipole',15x,d20.8,i15)
-         end if
-      end if
-      if (use_mpole .and. nem.ne.0) then
-         if (abs(em) .lt. 1.0d10) then
-            write (iout,230)  em,nem
-  230       format (' Atomic Multipoles',11x,f20.8,i15)
-         else
-            write (iout,240)  em,nem
-  240       format (' Atomic Multipoles',11x,d20.8,i15)
-         end if
-      end if
-      if (use_polar .and. nep.ne.0) then
-         if (abs(ep) .lt. 1.0d10) then
-            write (iout,250)  ep,nep
-  250       format (' Polarization',16x,f20.8,i15)
-         else
-            write (iout,260)  ep,nep
-  260       format (' Polarization',16x,d20.8,i15)
-         end if
-      end if
-      if (use_rxnfld .and. ner.ne.0) then
-         write (iout,270)  er,ner
-  270    format (' Reaction Field',14x,f20.8,i15)
-      end if
-      if (use_solv .and. nes.ne.0) then
-         write (iout,280)  es,nes
-  280    format (' Implicit Solvation',10x,f20.8,i15)
-      end if
-      if (use_metal .and. nelf.ne.0) then
-         write (iout,290)  elf,nelf
-  290    format (' Metal Ligand Field',10x,f20.8,i15)
-      end if
-      if (use_geom .and. neg.ne.0) then
-         write (iout,300)  eg,neg
-  300    format (' Geometric Restraints',8x,f20.8,i15)
-      end if
-      if (use_extra .and. nex.ne.0) then
-         write (iout,310)  ex,nex
-  310    format (' Extra Energy Terms',10x,f20.8,i15)
+         fstr = '('' Extra Energy Terms'',9x,'//form1//')'
+         write (iout,fstr)  ex,nex
       end if
       return
       end
@@ -1749,12 +1393,13 @@ c
 c
       subroutine propyze
       include 'sizes.i'
+      include 'atoms.i'
       include 'chgpot.i'
       include 'iounit.i'
       include 'moment.i'
       include 'virial.i'
       real*8 rg,energy
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     get the total charge, dipole and quadrupole moments
@@ -1790,7 +1435,9 @@ c
 c
 c     get the internal virial tensor via gradient calculation
 c
+      allocate (derivs(3,n))
       call gradient (energy,derivs)
+      deallocate (derivs)
       write (iout,90)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
    90 format (/,' Internal Virial Tensor :',12x,3f12.3,
      &        /,37x,3f12.3,/,37x,3f12.3)
@@ -1816,57 +1463,34 @@ c
       include 'inform.i'
       include 'iounit.i'
       integer i
-      logical active(maxatm)
+      logical active(*)
+      character*120 fstr
 c
 c
 c     energy partitioning over the individual atoms
 c
-      write (iout,10)
-   10 format (/,' Potential Energy Breakdown over Atoms :')
+      fstr = '(/,'' Potential Energy Breakdown over Atoms :'')'
+      write (iout,fstr)
       if (digits .ge. 8) then
-         write (iout,20)
-   20    format (/,'  Atom',9x,'EB',14x,'EA',14x,'EBA',13x,'EUB',
+         write (iout,10)
+   10    format (/,'  Atom',9x,'EB',14x,'EA',14x,'EBA',13x,'EUB',
      &           /,15x,'EAA',13x,'EOPB',12x,'EOPD',12x,'EID',
      &           /,15x,'EIT',13x,'ET',14x,'EPT',13x,'EBT',
      &           /,15x,'ETT',13x,'EV',14x,'EC',14x,'ECD',
      &           /,15x,'ED',14x,'EM',14x,'EP',14x,'ER',
      &           /,15x,'ES',14x,'ELF',13x,'EG',14x,'EX')
-         do i = 1, n
-            if (active(i)) then
-               write (iout,30)  i,aeb(i),aea(i),aeba(i),aeub(i),
-     &                          aeaa(i),aeopb(i),aeopd(i),aeid(i),
-     &                          aeit(i),aet(i),aept(i),aebt(i),aett(i),
-     &                          aev(i),aec(i),aecd(i),aed(i),aem(i),
-     &                          aep(i),aer(i),aes(i),aelf(i),aeg(i),
-     &                          aex(i)
-   30          format (/,i6,4f16.8,/,6x,4f16.8,/,6x,4f16.8,
-     &                 /,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8)
-            end if
-         end do
       else if (digits .ge. 6) then
-         write (iout,40)
-   40    format (/,'  Atom',8x,'EB',12x,'EA',12x,'EBA',11x,'EUB',
+         write (iout,20)
+   20    format (/,'  Atom',8x,'EB',12x,'EA',12x,'EBA',11x,'EUB',
      &              11x,'EAA',
      &           /,14x,'EOPB',10x,'EOPD',10x,'EID',11x,'EIT',
      &              11x,'ET',
      &           /,14x,'EPT',11x,'EBT',11x,'ETT',11x,'EV',12x,'EC',
      &           /,14x,'ECD',11x,'ED',12x,'EM',12x,'EP',12x,'ER',
      &           /,14x,'ES',12x,'ELF',11x,'EG',12x,'EX')
-         do i = 1, n
-            if (active(i)) then
-               write (iout,50)  i,aeb(i),aea(i),aeba(i),aeub(i),
-     &                          aeaa(i),aeopb(i),aeopd(i),aeid(i),
-     &                          aeit(i),aet(i),aept(i),aebt(i),aett(i),
-     &                          aev(i),aec(i),aecd(i),aed(i),aem(i),
-     &                          aep(i),aer(i),aes(i),aelf(i),aeg(i),
-     &                          aex(i)
-   50          format (/,i6,5f14.6,/,6x,5f14.6,/,6x,5f14.6,
-     &                 /,6x,5f14.6,/,6x,4f14.6)
-            end if
-         end do
       else
-         write (iout,60)
-   60    format (/,'  Atom',8x,'EB',10x,'EA',10x,'EBA',9x,'EUB',
+         write (iout,30)
+   30    format (/,'  Atom',8x,'EB',10x,'EA',10x,'EBA',9x,'EUB',
      &              9x,'EAA',9x,'EOPB',
      &           /,14x,'EOPD',8x,'EID',9x,'EIT',9x,'ET',10x,'EPT',
      &              9x,'EBT',
@@ -1874,18 +1498,24 @@ c
      &              10x,'EM',
      &           /,14x,'EP',10x,'ER',10x,'ES',10x,'ELF',9x,'EG',
      &              10x,'EX')
-         do i = 1, n
-            if (active(i)) then
-               write (iout,70)  i,aeb(i),aea(i),aeba(i),aeub(i),
-     &                          aeaa(i),aeopb(i),aeopd(i),aeid(i),
-     &                          aeit(i),aet(i),aept(i),aebt(i),aett(i),
-     &                          aev(i),aec(i),aecd(i),aed(i),aem(i),
-     &                          aep(i),aer(i),aes(i),aelf(i),aeg(i),
-     &                          aex(i)
-   70          format (/,i6,6f12.4,/,6x,6f12.4,/,6x,6f12.4,
-     &                 /,6x,6f12.4)
-            end if
-         end do
       end if
+      if (digits .ge. 8) then
+         fstr = '(/,i6,4f16.8,/,6x,4f16.8,/,6x,4f16.8,'//
+     &             '/,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8)'
+      else if (digits .ge. 6) then
+         fstr = '(/,i6,5f14.6,/,6x,5f14.6,/,6x,5f14.6,'//
+     &             '/,6x,5f14.6,/,6x,4f14.6)'
+      else
+         fstr = '(/,i6,6f12.4,/,6x,6f12.4,/,6x,6f12.4,/,6x,6f12.4)'
+      end if
+      do i = 1, n
+         if (active(i)) then
+            write (iout,fstr)  i,aeb(i),aea(i),aeba(i),aeub(i),aeaa(i),
+     &                         aeopb(i),aeopd(i),aeid(i),aeit(i),aet(i),
+     &                         aept(i),aebt(i),aett(i),aev(i),aec(i),
+     &                         aecd(i),aed(i),aem(i),aep(i),aer(i),
+     &                         aes(i),aelf(i),aeg(i),aex(i)
+         end if
+      end do
       return
       end

@@ -169,7 +169,6 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 flatten.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 freeunit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 gda.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 geometry.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getime.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getint.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getkey.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getmol2.f
@@ -320,7 +319,6 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 scan.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sdstep.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 search.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 server.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 setime.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 shakeup.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sigmoid.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sktstuff.f

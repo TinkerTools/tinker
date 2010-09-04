@@ -19,13 +19,17 @@
           fault or mystereous loader error, check the limits for your
           processes by issuing the "limit" command at a C shell prompt
           (or similar under other shells). On many workstations these
-          limits are set to quite small values for ordinary users. To
-          eliminate the problem issue the following three commands:
+          limits are set to quite small values for ordinary users via
+          the following three commands:
 
                          limit filesize unlimited
                          limit datasize unlimited
                          limit stacksize unlimited
 
-          These same commands can also be put in your .cshrc file or
-          equivalent startup file to be run at login time.
+          These commands can be put in your .cshrc file or equivalent
+          shell startup file to be run at login time.
+
+          Also, early versions of the SGI compiler required use of
+          the access='append' option in the openend.f routine. This
+          should not be necessary under later Fortran 90/95 versions.
 

@@ -1,9 +1,9 @@
 c
 c
-c     ###############################################################
-c     ##  COPYRIGHT (C)  1995  by  Yong Kong & Jay William Ponder  ##
-c     ##                    All Rights Reserved                    ##
-c     ###############################################################
+c     ############################################################
+c     ##  COPYRIGHT (C) 1995 by Yong Kong & Jay William Ponder  ##
+c     ##                  All Rights Reserved                   ##
+c     ############################################################
 c
 c     ################################################################
 c     ##                                                            ##
@@ -35,8 +35,7 @@ c
       include 'boxes.i'
       include 'iounit.i'
       include 'molcul.i'
-      integer maxmol,maxframe
-      parameter (maxmol=800)
+      integer maxframe
       parameter (maxframe=2000)
       integer i,j,k,m
       integer nframe,iframe
@@ -54,9 +53,9 @@ c
       real*8 xmsd(maxframe)
       real*8 ymsd(maxframe)
       real*8 zmsd(maxframe)
-      real*8 xcm(maxmol,maxframe)
-      real*8 ycm(maxmol,maxframe)
-      real*8 zcm(maxmol,maxframe)
+      real*8, allocatable :: xcm(:,:)
+      real*8, allocatable :: ycm(:,:)
+      real*8, allocatable :: zcm(:,:)
       logical exist,query
       character*120 arcfile
       character*120 record
@@ -79,7 +78,7 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter Coordinate Archive File Name :  ',$)
          read (input,20)  arcfile
@@ -146,7 +145,7 @@ c
 c
 c     get cell axis lengths from command line or interactively
 c
-      dowhile (xbox .eq. 0.0d0)
+      do while (xbox .eq. 0.0d0)
          write (iout,100)
   100    format (/,' Enter Unit Cell Axis Lengths :  ',$)
          read (input,110)  record
@@ -156,6 +155,15 @@ c
          if (ybox .eq. 0.0d0)  ybox = xbox
          if (zbox .eq. 0.0d0)  zbox = xbox
       end do
+c
+c     check for possible non-orthogonal system unit cell
+c
+      if (.not. orthogonal) then
+         write (iout,130)
+  130    format (/,' DIFFUSE  --  Non-Orthogonal Unit Cell is',
+     &              ' Not Supported')
+         call fatal
+      end if
 c
 c     set the half width values for the periodic box
 c
@@ -169,14 +177,11 @@ c
       call katom
       call molecule
 c
-c     check for too many iudividual molecules in the system
+c     perform dynamic allocation of some local arrays
 c
-      if (nmol .gt. maxmol) then
-         write (iout,130)  maxmol
-  130    format (/,' DIFFUSE  --  The Maximum of',i6,' Molecules',
-     &              ' has been Exceeded')
-         call fatal
-      end if
+      allocate (xcm(nmol,maxframe))
+      allocate (ycm(nmol,maxframe))
+      allocate (zcm(nmol,maxframe))
 c
 c     get the archived coordinates for each frame in turn
 c
@@ -185,7 +190,7 @@ c
       nframe = 0
       iframe = start
       skip = start
-      dowhile (iframe.ge.start .and. iframe.le.stop)
+      do while (iframe.ge.start .and. iframe.le.stop)
          skip = (skip-1) * (n+1)
          do j = 1, skip
             read (iarc,150,err=160,end=160)
@@ -237,22 +242,22 @@ c
             dx = xmid - xold
             dy = ymid - yold
             dz = zmid - zold
-            dowhile (dx .gt. xbox2)
+            do while (dx .gt. xbox2)
                dx = dx - xbox
             end do
-            dowhile (dx .lt. -xbox2)
+            do while (dx .lt. -xbox2)
                dx = dx + xbox
             end do
-            dowhile (dy .gt. ybox2)
+            do while (dy .gt. ybox2)
                dy = dy - ybox
             end do
-            dowhile (dy .lt. -ybox2)
+            do while (dy .lt. -ybox2)
                dy = dy + ybox
             end do
-            dowhile (dz .gt. zbox2)
+            do while (dz .gt. zbox2)
                dz = dz - zbox
             end do
-            dowhile (dz .lt. -zbox2)
+            do while (dz .lt. -zbox2)
                dz = dz + zbox
             end do
             xcm(i,nframe) = xold + dx
@@ -287,6 +292,12 @@ c
             end do
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xcm)
+      deallocate (ycm)
+      deallocate (zcm)
 c
 c     get mean squared displacements and convert units;
 c     conversion is from sq. Ang/ps to 10-5 sq. cm/sec

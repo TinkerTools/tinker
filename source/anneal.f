@@ -63,7 +63,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=10,end=10)  cold
    10 continue
-      dowhile (hot.lt.0.0d0 .or. cold.lt.0.0d0)
+      do while (hot.lt.0.0d0 .or. cold.lt.0.0d0)
          hot = -1.0d0
          cold = -1.0d0
          write (iout,20)
@@ -83,7 +83,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=50,end=50)  nequil
    50 continue
-      dowhile (nequil .lt. 0)
+      do while (nequil .lt. 0)
          write (iout,60)
    60    format (/,' Enter the Number of Equilibration Steps [0] :  ',$)
          read (input,70,err=80)  nequil
@@ -98,7 +98,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=90,end=90)  nstep
    90 continue
-      dowhile (nstep .lt. 0)
+      do while (nstep .lt. 0)
          write (iout,100)
   100    format (/,' Enter the Number of Cooling Protocol Steps',
      &              ' [2000] :  ',$)
@@ -131,7 +131,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=150,end=150)  dt
   150 continue
-      dowhile (dt .lt. 0.0d0)
+      do while (dt .lt. 0.0d0)
          write (iout,160)
   160    format (/,' Enter the Time Step Length in Femtoseconds',
      &              ' [1.0] :  ',$)
@@ -148,7 +148,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=190,end=190)  dtdump
   190 continue
-      dowhile (dtdump .lt. 0.0d0)
+      do while (dtdump .lt. 0.0d0)
          write (iout,200)
   200    format (/,' Enter Time between Dumps in Picoseconds',
      &              ' [0.1] :  ',$)
@@ -165,7 +165,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=230,end=230)  logmass
   230 continue
-      dowhile (logmass .lt. 0.0d0)
+      do while (logmass .lt. 0.0d0)
          write (iout,240)
   240    format (/,' Increase Atomic Weights by a Factor of',
      &              ' 10^x [x=0.0] :  ',$)
@@ -188,7 +188,7 @@ c
          call nextarg (string,exist)
          if (exist)  read (string,*,err=270,end=270)  sharp
   270    continue
-         dowhile (sharp .lt. 0.0d0)
+         do while (sharp .lt. 0.0d0)
             write (iout,280)
   280       format (/,' Enter Final Desired Deformation Parameter',
      &                 ' [0.0] :  ',$)

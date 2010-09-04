@@ -1,9 +1,9 @@
 c
 c
-c     #################################################################
-c     ##  COPYRIGHT (C)  1995  by  Yong Kong and Jay William Ponder  ##
-c     ##                     All Rights Reserved                     ##
-c     #################################################################
+c     ##############################################################
+c     ##  COPYRIGHT (C) 1995 by Yong Kong and Jay William Ponder  ##
+c     ##                   All Rights Reserved                    ##
+c     ##############################################################
 c
 c     ################################################################
 c     ##                                                            ##
@@ -31,8 +31,6 @@ c
       include 'math.i'
       include 'molcul.i'
       include 'potent.i'
-      integer maxbin
-      parameter (maxbin=10000)
       integer i,j,k,iarc
       integer nframe,iframe
       integer freeunit,next
@@ -42,15 +40,15 @@ c
       integer start,stop
       integer step,skip
       integer nbin,bin
-      integer hist(maxbin)
+      integer, allocatable :: hist(:)
       real*8 xj,yj,zj
       real*8 dx,dy,dz
       real*8 rjk,rmax,width
       real*8 rlower,rupper
       real*8 factor,pairs
       real*8 volume,expect
-      real*8 gr(maxbin)
-      real*8 gs(maxbin)
+      real*8, allocatable :: gr(:)
+      real*8, allocatable :: gs(:)
       logical exist,query
       logical intramol
       character*1 answer
@@ -77,7 +75,7 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter Coordinate Archive File Name :  ',$)
          read (input,20)  arcfile
@@ -234,12 +232,12 @@ c
 c     set the number of distance bins to be accumulated
 c
       nbin = int(rmax/width)
-      if (nbin .gt. maxbin) then
-         write (iout,190)
-  190    format (/,' RADIAL  --  Too many Distance Bins; Increase',
-     &              ' MAXBIN')
-         call fatal
-      end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hist(nbin))
+      allocate (gr(nbin))
+      allocate (gs(nbin))
 c
 c     zero out the distance bins and distribution functions
 c
@@ -251,26 +249,26 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,200)
-  200 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,190)
+  190 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
-      dowhile (iframe.ge.start .and. iframe.le.stop)
+      do while (iframe.ge.start .and. iframe.le.stop)
          skip = (skip-1) * (n+1)
          do j = 1, skip
-            read (iarc,210,err=220,end=220)
-  210       format ()
+            read (iarc,200,err=210,end=210)
+  200       format ()
          end do
-  220    continue
+  210    continue
          iframe = iframe + step
          skip = step
          call readxyz (iarc)
          if (.not. abort) then
             nframe = nframe + 1
             if (mod(nframe,100) .eq. 0) then
-               write (iout,230)  nframe
-  230          format (4x,'Processing Coordinate Frame',i13)
+               write (iout,220)  nframe
+  220          format (4x,'Processing Coordinate Frame',i13)
             end if
             do j = 1, n
                if (name(j).eq.namej .or. type(j).eq.typej) then
@@ -304,8 +302,8 @@ c
          call readxyz (iarc)
       end if
       close (unit=iarc)
-      write (iout,240)  nframe
-  240 format (/,' Total Number of Coordinate Frames :',i8)
+      write (iout,230)  nframe
+  230 format (/,' Total Number of Coordinate Frames :',i8)
 c
 c     count the number of occurences of each atom type
 c
@@ -357,17 +355,23 @@ c
 c
 c     output the final radial distribution function results
 c
-      write (iout,250)  labelj,labelk
-  250 format (/,' Pairwise Radial Distribution Function :'
+      write (iout,240)  labelj,labelk
+  240 format (/,' Pairwise Radial Distribution Function :'
      &        //,7x,'First Name or Type :  ',a6,
      &           5x,'Second Name or Type :  ',a6)
-      write (iout,260)
-  260 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
+      write (iout,250)
+  250 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
      &           4x,'Smooth g(r)',/)
       do i = 1, nbin
-         write (iout,270)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
-  270    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
+         write (iout,260)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
+  260    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hist)
+      deallocate (gr)
+      deallocate (gs)
 c
 c     perform any final tasks before program exit
 c

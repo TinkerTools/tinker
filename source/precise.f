@@ -37,8 +37,8 @@ c     minimum of 0.24x10-307 is a patch for some SGI's,
 c     for Sparc cpu's under Linux, etc.
 c
       if (i .eq. 1) then
-c        dowhile (precise .ne. zero)
-         dowhile (precise .ge. 0.24d-307)
+c        do while (precise .ne. zero)
+         do while (precise .ge. 0.24d-307)
             value = precise
             precise = precise / delta
          end do
@@ -47,7 +47,7 @@ c
 c     find the smallest relative floating point spacing
 c
       else if (i .eq. 2) then
-         dowhile (one+precise .ne. one)
+         do while (one+precise .ne. one)
             value = precise
             precise = precise / delta
          end do
@@ -56,7 +56,7 @@ c
 c     find the largest relative floating point spacing
 c
       else if (i .eq. 3) then
-         dowhile (one+precise .ne. precise)
+         do while (one+precise .ne. precise)
            value = precise
            precise = precise * delta
          end do

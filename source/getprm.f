@@ -83,7 +83,7 @@ c
 c
 c     if necessary, ask for the parameter filename
 c
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter Potential Parameter File Name :  ',$)
          read (input,20)  prmfile
@@ -104,7 +104,7 @@ c
          iprm = freeunit ()
          open (unit=iprm,file=prmfile,status='old')
          rewind (unit=iprm)
-         dowhile (.true.)
+         do while (.true.)
             read (iprm,30,err=50,end=50)  record
    30       format (a120)
             nprm = nprm + 1

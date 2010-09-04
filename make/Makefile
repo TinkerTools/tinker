@@ -331,7 +331,6 @@ OBJS = active.o \
        freeunit.o \
        gda.o \
        geometry.o \
-       getime.o \
        getint.o \
        getkey.o \
        getmol2.o \
@@ -482,7 +481,6 @@ OBJS = active.o \
        sdstep.o \
        search.o \
        server.o \
-       setime.o \
        shakeup.o \
        sigmoid.o \
        sktstuff.o \
@@ -938,7 +936,6 @@ libtinker.a: ${OBJS}
         flatten.o \
         freeunit.o \
         geometry.o \
-        getime.o \
         getint.o \
         getkey.o \
         getmol2.o \
@@ -1064,7 +1061,6 @@ libtinker.a: ${OBJS}
         sdstep.o \
         search.o \
         server.o \
-        setime.o \
         shakeup.o \
         sigmoid.o \
         sktstuff.o \
@@ -1113,7 +1109,7 @@ chkpole.o: atoms.i mpole.i sizes.i
 chkring.o: couple.i sizes.i
 chkxyz.o: atoms.i iounit.i sizes.i
 cholesky.o:
-clock.o:
+clock.o: chrono.i
 cluster.o: atmtyp.i atoms.i bound.i cutoff.i group.i inform.i iounit.i keys.i molcul.i sizes.i
 column.o: sizes.i
 command.o: argue.i
@@ -1253,7 +1249,6 @@ flatten.o: atoms.i fields.i inform.i iounit.i keys.i sizes.i warp.i
 freeunit.o: iounit.i
 gda.o: atoms.i files.i iounit.i minima.i potent.i sizes.i vdwpot.i warp.i
 geometry.o: atoms.i math.i sizes.i
-getime.o: chrono.i
 getint.o: inform.i iounit.i output.i
 getkey.o: argue.i files.i iounit.i keys.i openmp.i sizes.i
 getmol2.o: files.i iounit.i
@@ -1359,7 +1354,7 @@ path.o: align.i atmtyp.i atoms.i files.i inform.i iounit.i linmin.i minima.i out
 pdbxyz.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i iounit.i katoms.i pdb.i resdue.i sequen.i sizes.i
 piscf.o: atmtyp.i atoms.i bond.i border.i couple.i inform.i iounit.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
 pmestuff.o: atoms.i boxes.i charge.i chunks.i mpole.i pme.i potent.i sizes.i
-pmpb.o:
+pmpb.o: iounit.i
 polarize.o: atoms.i inform.i iounit.i molcul.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
 poledit.o: atmtyp.i atoms.i couple.i dma.i files.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
 polymer.o: atoms.i bond.i bound.i boxes.i iounit.i keys.i sizes.i
@@ -1404,7 +1399,6 @@ scan.o: atoms.i files.i inform.i iounit.i math.i minima.i omega.i output.i sizes
 sdstep.o: atmtyp.i atoms.i bath.i couple.i kvdws.i math.i mdstuf.i moldyn.i shake.i sizes.i stodyn.i units.i usage.i virial.i
 search.o: linmin.i math.i sizes.i
 server.o:
-setime.o: chrono.i
 shakeup.o: angle.i atmlst.i atmtyp.i atoms.i bond.i bound.i couple.i keys.i math.i molcul.i ring.i shake.i sizes.i usage.i
 sigmoid.o:
 sktstuff.o: atmtyp.i atoms.i charge.i couple.i deriv.i fields.i files.i inform.i iounit.i keys.i moldyn.i mpole.i polar.i potent.i sizes.i socket.i
@@ -1422,9 +1416,9 @@ sybylxyz.o: files.i iounit.i titles.i
 temper.o: atmtyp.i atoms.i bath.i group.i mdstuf.i moldyn.i rgddyn.i sizes.i units.i usage.i
 testgrad.o: atoms.i deriv.i energi.i inform.i inter.i iounit.i sizes.i solute.i usage.i
 testhess.o: atoms.i files.i hescut.i inform.i iounit.i sizes.i usage.i
-testpair.o: atoms.i cutoff.i deriv.i energi.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i
+testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i
 testrot.o: domega.i energi.i inform.i iounit.i math.i omega.i sizes.i zcoord.i
-timer.o: cutoff.i hescut.i inform.i iounit.i sizes.i
+timer.o: atoms.i cutoff.i hescut.i inform.i iounit.i sizes.i
 timerot.o: cutoff.i iounit.i sizes.i
 tncg.o: hescut.i inform.i iounit.i keys.i linmin.i math.i minima.i output.i piorbs.i potent.i sizes.i
 torphase.o:

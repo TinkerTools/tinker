@@ -169,7 +169,6 @@ gfortran -c -O flatten.f
 gfortran -c -O freeunit.f
 gfortran -c -O gda.f
 gfortran -c -O geometry.f
-gfortran -c -O getime.f
 gfortran -c -O getint.f
 gfortran -c -O getkey.f
 gfortran -c -O getmol2.f
@@ -320,7 +319,6 @@ gfortran -c -O scan.f
 gfortran -c -O sdstep.f
 gfortran -c -O search.f
 gfortran -c -O server.f
-gfortran -c -O setime.f
 gfortran -c -O shakeup.f
 gfortran -c -O sigmoid.f
 gfortran -c -O sktstuff.f

@@ -51,7 +51,8 @@ c
       real*8 rdb2,rad2,rcd2
       real*8 rab2,rcb2
       real*8 cc,ee,bkk2
-      logical header,huge,proceed
+      logical proceed
+      logical header,huge
 c
 c
 c     zero out the out-of-plane bend energy and partitioning

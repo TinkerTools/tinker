@@ -83,7 +83,7 @@ c
          ikey = freeunit ()
          open (unit=ikey,file=keyfile,status='old')
          rewind (unit=ikey)
-         dowhile (.true.)
+         do while (.true.)
             read (ikey,20,err=40,end=40)  record
    20       format (a120)
             nkey = nkey + 1

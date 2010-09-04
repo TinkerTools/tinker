@@ -64,7 +64,7 @@ c     currently handles up to 10000 versions of a file
 c
       if (.not. noversion) then
          i = 1
-         dowhile (exist)
+         do while (exist)
             i = i + 1
             oldfile = newfile
             thousand = i / 1000
@@ -100,7 +100,7 @@ c
             else
                exist = .true.
             end if
-            dowhile (exist)
+            do while (exist)
                write (iout,10)
    10          format (/,' Enter File Name for Coordinate Output :  ',$)
                read (input,20)  filename

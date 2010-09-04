@@ -70,7 +70,7 @@ c
             inquire (file=gaufile,exist=exist)
          end if
       end if
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter the Name of the Gaussian Output File :  ',$)
          read (input,20)  gaufile
@@ -92,7 +92,7 @@ c     read structure, forces and frequencies from Gaussian output
 c
       open (unit=igau,file=gaufile,status='old')
       rewind (unit=igau)
-      dowhile (.true. .and. (.not. eof(igau)))
+      do while (.true. .and. (.not. eof(igau)))
          read (igau,30,err=130,end=130)  record
    30    format (a120)
          next = 1
@@ -110,7 +110,7 @@ c
                read (igau,30,err=130,end=130)  record
             end do
             i = 1
-            dowhile (.true.)
+            do while (.true.)
                read (igau,40,err=130,end=130)  record
    40          format (a120)
                read (record,*,err=50,end=50)  itmp,jtmp,ktmp,
@@ -148,7 +148,7 @@ c     read the Hessian from archive section at bottom of output
 c
          else if (keyword(1:4) .eq. arcstart) then
             itmp = 0
-            dowhile (.true. .and. (.not. eof(igau)))
+            do while (.true. .and. (.not. eof(igau)))
                if(next > 73) then 
                    read (igau,20)  record
                    next = 1

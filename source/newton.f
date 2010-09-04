@@ -29,8 +29,8 @@ c
       integer next,freeunit
       real*8 gnorm,grms,grdmin
       real*8 minimum,newton1
-      real*8 xx(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: derivs(:,:)
       logical exist
       character*1 answer
       character*6 mode,method
@@ -132,6 +132,11 @@ c
       close (unit=imin)
       outfile = minfile
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(3*n))
+      allocate (derivs(3,n))
+c
 c     translate the coordinates of each active atom
 c
       nvar = 0
@@ -178,6 +183,11 @@ c
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / sqrt(dble(nvar/3))
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      deallocate (derivs)
 c
 c     write out the final function and gradient values
 c
@@ -252,9 +262,9 @@ c
       include 'usage.i'
       integer i,nvar
       real*8 newton1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -270,6 +280,10 @@ c
             z(i) = xx(nvar)
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -289,6 +303,10 @@ c
             g(nvar) = derivs(3,i)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -311,14 +329,14 @@ c
       include 'atoms.i'
       include 'usage.i'
       integer i,j,k,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hindex(maxhess)
-      integer hvar(maxvar)
-      integer huse(maxvar)
-      real*8 xx(maxvar)
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
+      integer hinit(*)
+      integer hstop(*)
+      integer hindex(*)
+      integer, allocatable :: hvar(:)
+      integer, allocatable :: huse(:)
+      real*8 xx(*)
+      real*8 hdiag(*)
+      real*8 h(*)
       character*4 mode
 c
 c
@@ -340,6 +358,11 @@ c
 c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hvar(nvar))
+      allocate (huse(nvar))
 c
 c     transform the sparse Hessian to use only active atoms
 c
@@ -369,5 +392,10 @@ c
             end do
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hvar)
+      deallocate (huse)
       return
       end

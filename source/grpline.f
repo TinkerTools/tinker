@@ -31,12 +31,18 @@ c
       real*8 weigh
       real*8 rcm(3)
       real*8 inert(6)
-      real*8 xcm(maxatm)
-      real*8 ycm(maxatm)
-      real*8 zcm(maxatm)
+      real*8, allocatable :: xcm(:)
+      real*8, allocatable :: ycm(:)
+      real*8, allocatable :: zcm(:)
 c
 c
-c     compute the center of mass coordinates of each group
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xcm(n))
+      allocate (ycm(n))
+      allocate (zcm(n))
+c
+c     get atomic coordinates relative to group center of mass
 c
       do i = 1, ngrp
          start = igrp(1,i)
@@ -63,7 +69,7 @@ c
          end do
       end do
 c
-c     use the moments of inertia to check for linearity
+c     compute the moments of inertia and check for linearity
 c
       eps = 1.0d-8
       do i = 1, ngrp
@@ -99,5 +105,11 @@ c
             if (abs(det) .lt. eps)  linear(i) = .true.
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xcm)
+      deallocate (ycm)
+      deallocate (zcm)
       return
       end

@@ -24,6 +24,7 @@ c
       integer maxbasis
       parameter (maxroot=50)
       parameter (maxbasis=3*maxroot)
-      real*8 phi,phik,pwork
-      common /vibs/ phi(maxvar,maxbasis),phik(maxvar,maxbasis),
-     &              pwork(maxvar,maxbasis)
+      real*8, pointer :: phi(:,:)
+      real*8, pointer :: phik(:,:)
+      real*8, pointer :: pwork(:,:)
+      common /vibs/ phi,phik,pwork

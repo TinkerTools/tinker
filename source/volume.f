@@ -304,7 +304,7 @@ c
 c
 c     section atom spheres perpendicular to the z axis
 c
-            dowhile (zgrid .le. ztop)
+            do while (zgrid .le. ztop)
 c
 c     "rsecr" is radius of circle of intersection
 c     of "ir" sphere on the current sphere
@@ -403,7 +403,7 @@ c     sort the arc endpoint arrays, each with "narc" entries,
 c     in order of increasing values of the arguments in "arci"
 c
                   k = 1
-                  dowhile (k .lt. narc)
+                  do while (k .lt. narc)
                      aa = arci(k)
                      bb = arcf(k)
                      temp = 1000000.0d0
@@ -634,7 +634,7 @@ c
 c
 c     section atom spheres perpendicular to the z axis
 c
-         dowhile (zgrid .le. ztop)
+         do while (zgrid .le. ztop)
 c
 c     "rsecr" is radius of current atom sphere on the z-plane
 c
@@ -659,7 +659,7 @@ c
             k = 0
             narc = 0
             covered = .false.
-            dowhile (.not.covered .and. k.lt.nnear
+            do while (.not.covered .and. k.lt.nnear
      &                   .and. narc.lt.maxarc)
                k = k + 1
                in = inear(k)
@@ -753,7 +753,7 @@ c
 c     general case; sort arc endpoints
 c
                k = 1
-               dowhile (k .lt. narc)
+               do while (k .lt. narc)
                   aa = arci(k)
                   bb = arcf(k)
                   iaa = arciatom(k)

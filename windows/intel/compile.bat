@@ -170,7 +170,6 @@ ifort /c /fast /Qno-ipo /w /Qvec-report0 flatten.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 freeunit.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 gda.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 geometry.f
-ifort /c /fast /Qno-ipo /w /Qvec-report0 getime.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 getint.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 getkey.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 getmol2.f
@@ -321,7 +320,6 @@ ifort /c /fast /Qno-ipo /w /Qvec-report0 scan.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 sdstep.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 search.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 server.f
-ifort /c /fast /Qno-ipo /w /Qvec-report0 setime.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 shakeup.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 sigmoid.f
 ifort /c /fast /Qno-ipo /w /Qvec-report0 sktstuff.f

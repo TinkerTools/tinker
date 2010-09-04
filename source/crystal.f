@@ -80,7 +80,7 @@ c
      &           /,4x,'(3) Move Any Stray Molecules into Unit Cell',
      &           /,4x,'(4) Make a Unit Cell from Asymmetric Unit',
      &           /,4x,'(5) Make a Big Block from Single Unit Cell')
-         dowhile (mode.lt.1 .or. mode.gt.5)
+         do while (mode.lt.1 .or. mode.gt.5)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)
@@ -140,7 +140,7 @@ c
 c
 c     if not in keyfile, get the unit cell axis lengths
 c
-      dowhile (xbox .eq. 0.0d0)
+      do while (xbox .eq. 0.0d0)
          write (iout,110)
   110    format (/,' Enter Unit Cell Axis Lengths :  ',$)
          read (input,120)  record
@@ -154,7 +154,7 @@ c
 c
 c     if not in keyfile, get the unit cell angle values
 c
-      dowhile (alpha .eq. 0.0d0)
+      do while (alpha .eq. 0.0d0)
          write (iout,140)
   140    format (/,' Enter Unit Cell Axis Angles :   ',$)
          read (input,150)  record

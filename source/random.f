@@ -217,7 +217,7 @@ c
 c     get a pair of appropriate components in the plane
 c
       s = 2.0d0
-      dowhile (s .ge. 1.0d0)
+      do while (s .ge. 1.0d0)
          x = 2.0d0 * random () - 1.0d0
          y = 2.0d0 * random () - 1.0d0
          s = x**2 + y**2

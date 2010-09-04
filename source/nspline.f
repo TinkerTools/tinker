@@ -17,19 +17,19 @@ c     with natural boundary conditions where the first and last second
 c     derivatives are already known
 c
 c
-      subroutine nspline (n,np,x0,y0,s1,s2,h,g,dy,dla,dmu)
+      subroutine nspline (n,x0,y0,s1,s2,h,g,dy,dla,dmu)
       implicit none
-      integer i,n,np
+      integer i,n
       real*8 t,y21,y2n
-      real*8 x0(0:np)
-      real*8 y0(0:np)
-      real*8 s1(0:np)
-      real*8 s2(0:np)
-      real*8 h(0:np)
-      real*8 g(0:np)
-      real*8 dy(0:np)
-      real*8 dla(0:np)
-      real*8 dmu(0:np)
+      real*8 x0(0:*)
+      real*8 y0(0:*)
+      real*8 s1(0:*)
+      real*8 s2(0:*)
+      real*8 h(0:*)
+      real*8 g(0:*)
+      real*8 dy(0:*)
+      real*8 dla(0:*)
+      real*8 dmu(0:*)
 c
 c
 c     set first and last second deriviatives to zero

@@ -98,17 +98,28 @@ c
       real*8 rmin,eps
       parameter (rmin=0.000001d0)
       parameter (eps=0.00000001d0)
-      integer j,k,m,na,nb,la,lb,ja,jb,nn,max,maxx
-      integer novi,ia(200),ib(200),idsga(5),idsgb(5)
-      integer icosa(2),icosb(2),isina(4),isinb(4)
-      real*8 s(3),r,za,zb,fact(15),cjkm
-      real*8 a(20),b(20),c(200),cbase(20),theta(6)
-      real*8 cosa(2),cosb(2),sinab(4),dsiga(5),dsigb(5)
-      real*8 an,ana,anb,anr,rhalf,coef,p,pt
+      integer j,k,m,na,nb,la,lb,ja,jb
+      integer nn,max,maxx,novi
+      integer idsga(5),idsgb(5)
+      integer icosa(2),icosb(2)
+      integer isina(4),isinb(4)
+      integer ia(200),ib(200)
+      real*8 an,ana,anb,anr
+      real*8 rhalf,coef,p,pt
+      real*8 r,za,zb,cjkm
+      real*8 s(3),fact(15)
+      real*8 cbase(20),theta(6)
+      real*8 cosa(2),cosb(2)
+      real*8 sinab(4)
+      real*8 dsiga(5),dsigb(5)
+      real*8 a(20),b(20),c(200)
       logical done
-      save icosa,icosb,cosa,cosb
-      save idsga,idsgb,dsiga,dsigb
-      save isina,isinb,sinab,theta,fact
+      save icosa,icosb
+      save cosa,cosb
+      save idsga,idsgb
+      save dsiga,dsigb
+      save isina,isinb
+      save sinab,theta,fact
       external cjkm
       data icosa  / 0, 1 /
       data icosb  / 0, 1 /
@@ -180,7 +191,7 @@ c
          call polyp (c,ia,ib,maxx,dsigb,idsga,idsgb,5)
       end if
       novi = 1
-      dowhile (.not. done)
+      do while (.not. done)
          do j = 1, maxx
             ja = ia(j) + 1
             jb = ib(j) + 1
@@ -240,8 +251,9 @@ c
       subroutine polyp (c,ia,ib,max,d,iaa,ibb,n)
       implicit none
       integer i,j,k,m,max,n
-      integer ia(200),ib(200),iaa(n),ibb(n)
-      real*8 c(200),d(n)
+      integer ia(200),ib(200)
+      integer iaa(*),ibb(*)
+      real*8 c(200),d(*)
 c
 c
       do j = 1, max
@@ -271,8 +283,11 @@ c
 c
       function cjkm (j,k,m)
       implicit none
-      integer i,j,k,m,min,max,id,idd,ip1
-      real*8 cjkm,fact(15),b1,b2,sum
+      integer i,j,k,m
+      integer min,max
+      integer id,idd,ip1
+      real*8 cjkm,b1,b2,sum
+      real*8 fact(15)
       save fact
       data fact  / 1.0d0, 1.0d0, 2.0d0, 6.0d0, 24.0d0, 120.0d0,
      &             720.0d0, 5040.0d0, 40320.0d0, 362880.0d0,
@@ -317,7 +332,8 @@ c
       subroutine aset (alpha,n,a)
       implicit none
       integer i,n
-      real*8 alpha,a(20),alp
+      real*8 alpha,alp
+      real*8 a(20)
 c
 c
       alp = 1.0d0 / alpha
@@ -345,8 +361,9 @@ c
       real*8 eps
       parameter (eps=0.000001d0)
       integer i,j,n
-      real*8 beta,b(20),bmax
+      real*8 beta,bmax
       real*8 betam,d1,d2
+      real*8 b(20)
       external bmax
 c
 c
@@ -395,8 +412,10 @@ c
       real*8 eps
       parameter (eps=0.0000001d0)
       integer n
-      real*8 bmax,beta,b,top,bot
-      real*8 sum,fi,sign,term
+      real*8 bmax,beta
+      real*8 b,top,bot
+      real*8 sum,fi
+      real*8 sign,term
       logical done
 c
 c
@@ -413,7 +432,7 @@ c
          sign = -2.0d0
       end if
       term = sum
-      dowhile (.not. done)
+      do while (.not. done)
          bot = top + 2.0d0
          term = term * b * top / (fi*(fi-1.0d0)*bot)
          sum = sum + term

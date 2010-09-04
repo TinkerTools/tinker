@@ -116,7 +116,7 @@ c
 c
 c     use special translation mechanisms used for biopolymers
 c
-      dowhile (.not. abort)
+      do while (.not. abort)
          if (peptide .or. nucacid) then
             if (peptide)  call ribosome
             if (nucacid)  call ligase
@@ -2241,7 +2241,7 @@ c     find water molecules and ions in PDB HETATM records
 c
       n = n + 1
       i = 0
-      dowhile (i .lt. npdb)
+      do while (i .lt. npdb)
          i = i + 1
          if (pdbtyp(i) .eq. 'HETATM') then
             if (resnam(i) .eq. 'HOH') then

@@ -28,10 +28,10 @@ c
       include 'iounit.i'
       include 'keys.i'
       include 'molcul.i'
-      integer i,j,k,next
+      integer i,j,k
+      integer next,size
       integer gnum,ga,gb
-      integer list(maxatm)
-      integer size(0:maxgrp)
+      integer, allocatable :: list(:)
       real*8 wg
       logical header
       character*20 keyword
@@ -59,6 +59,10 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
 c     get any keywords containing atom group definitions
 c
       do j = 1, nkey
@@ -69,7 +73,7 @@ c
          if (keyword(1:6) .eq. 'GROUP ') then
             use_group = .true.
             gnum = 0
-            do i = 1, n
+            do i = 1, 20
                list(i) = 0
             end do
             call getnumb (record,gnum,next)
@@ -80,10 +84,10 @@ c
                call fatal
             end if
             string = record(next:120)
-            read (string,*,err=20,end=20)  (list(i),i=1,n)
+            read (string,*,err=20,end=20)  (list(i),i=1,20)
    20       continue
             i = 1
-            dowhile (list(i) .ne. 0)
+            do while (list(i) .ne. 0)
                if (list(i) .gt. 0) then
                   grplist(list(i)) = gnum
                   i = i + 1
@@ -163,11 +167,15 @@ c
 c
 c     sort the list of atoms in each group by atom number
 c
-         do i = 0, maxgrp
-            size(i) = igrp(2,i) - igrp(1,i) + 1
-            call sort (size(i),kgrp(igrp(1,i)))
+         do i = 0, ngrp
+            size = igrp(2,i) - igrp(1,i) + 1
+            call sort (size,kgrp(igrp(1,i)))
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     use only intragroup or intergroup interactions if selected
 c
@@ -191,7 +199,8 @@ c
 c     disable consideration of interactions with any empty groups
 c
       do i = 0, ngrp
-         if (size(i) .eq. 0) then
+         size = igrp(2,i) - igrp(1,i) + 1
+         if (size .eq. 0) then
             do j = 0, ngrp
                wgrp(j,i) = 0.0d0
                wgrp(i,j) = 0.0d0
@@ -220,9 +229,10 @@ c     output the final list of atoms in each group
 c
       if (debug .and. use_group) then
          do i = 1, ngrp
-            if (size(i) .ne. 0) then
+            size = igrp(2,i) - igrp(1,i) + 1
+            if (size .ne. 0) then
                write (iout,50)  i
-   50          format (/,' List of Atoms Contained in Group',i3,' :',/)
+   50          format (/,' List of Atoms in Group',i3,' :',/)
                write (iout,60)  (kgrp(j),j=igrp(1,i),igrp(2,i))
    60          format (3x,10i7)
             end if

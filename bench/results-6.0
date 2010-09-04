@@ -131,7 +131,7 @@
 
  ----------------------
  Times are reported in seconds and were measured with TINKER Version 6.0,
- dimensioned to MAXATM=25000 and MAXHESS=1000000. Each benchmark ran twice
+ dimensioned to MAXATM=75000 and MAXHESS=1000000. Each benchmark ran twice
  in rapid succession on a quiet machine, and times shown were taken from
  the second run. The first 5 benchmarks were run with serial executables,
  while the last two benchmarks are a test of OpenMP parallel performance.

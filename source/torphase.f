@@ -36,10 +36,10 @@ c
 c     shift the phase angles into the standard range
 c
       do i = 1, 6
-         dowhile (phase(i) .lt. -180.0d0)
+         do while (phase(i) .lt. -180.0d0)
             phase(i) = phase(i) + 360.0d0
          end do
-         dowhile (phase(i) .gt. 180.0d0)
+         do while (phase(i) .gt. 180.0d0)
             phase(i) = phase(i) - 360.0d0
          end do
       end do

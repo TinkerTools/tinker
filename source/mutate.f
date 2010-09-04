@@ -91,7 +91,7 @@ c
             read (string,*,err=10,end=10)  (list(i),i=1,maxlist)
    10       continue
             k = 1
-            dowhile (list(k) .ne. 0)
+            do while (list(k) .ne. 0)
                ia = list(k)
                if (list(k) .gt. 0) then
                   if (.not. mut(ia)) then

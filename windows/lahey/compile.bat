@@ -170,7 +170,6 @@ LF95 -c -o1 -tpp -nstchk -ntrace flatten.f
 LF95 -c -o1 -tpp -nstchk -ntrace freeunit.f
 LF95 -c -o1 -tpp -nstchk -ntrace gda.f
 LF95 -c -o1 -tpp -nstchk -ntrace geometry.f
-LF95 -c -o1 -tpp -nstchk -ntrace getime.f
 LF95 -c -o1 -tpp -nstchk -ntrace getint.f
 LF95 -c -o1 -tpp -nstchk -ntrace getkey.f
 LF95 -c -o1 -tpp -nstchk -ntrace getmol2.f
@@ -321,7 +320,6 @@ LF95 -c -o1 -tpp -nstchk -ntrace scan.f
 LF95 -c -o1 -tpp -nstchk -ntrace sdstep.f
 LF95 -c -o1 -tpp -nstchk -ntrace search.f
 LF95 -c -o1 -tpp -nstchk -ntrace server.f
-LF95 -c -o1 -tpp -nstchk -ntrace setime.f
 LF95 -c -o1 -tpp -nstchk -ntrace shakeup.f
 LF95 -c -o1 -tpp -nstchk -ntrace sigmoid.f
 LF95 -c -o1 -tpp -nstchk -ntrace sktstuff.f

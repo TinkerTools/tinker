@@ -209,7 +209,7 @@ c
      &              ' structure 2. Hit <RET> to end entry',
      &           /,' of the list of pairs.')
          nfit = 0
-         dowhile (.true.)
+         do while (.true.)
             do i = 1, 4
                range(i) = 0
             end do
@@ -358,7 +358,7 @@ c
 c
 c     perform the superposition of a structure pair
 c
-      dowhile (.not. abort)
+      do while (.not. abort)
          write (iout,230)  frame1,frame2
   230    format (/,' File 1 Frame :',i6,13x,'File 2 Frame :',i6)
          write (iout,240)

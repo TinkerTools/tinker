@@ -66,7 +66,7 @@ c
 c
 c     refine inverse distribution value via Newton iteration
 c
-      dowhile (.not. done)
+      do while (.not. done)
          slope = (x**aexp * (1.0d0-x)**bexp) / beta
          error = betai(a,b,x) - y
          x = x - error/slope
@@ -84,7 +84,7 @@ c
 c
 c     refine inverse distribution value via bisection search
 c
-      dowhile (.not. done)
+      do while (.not. done)
          x = 0.5d0 * (x0+x1)
          error = betai(a,b,x) - y
          if (error .gt. 0.0d0)  x1 = x

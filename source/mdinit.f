@@ -42,7 +42,7 @@ c
       integer lext,freeunit
       real*8 e,maxwell,speed
       real*8 vec(3)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: derivs(:,:)
       logical exist
       character*7 ext
       character*20 keyword
@@ -235,7 +235,6 @@ c
 c     set translational velocities for rigid body dynamics
 c
       else if (integrate .eq. 'RIGIDBODY') then
-         call gradient (e,derivs)
          do i = 1, ngrp
             speed = maxwell (grpmass(i),kelvin)
             call ranvec (vec)
@@ -250,6 +249,7 @@ c
 c     set velocities and accelerations for Cartesian dynamics
 c
       else
+         allocate (derivs(3,n))
          call gradient (e,derivs)
          do i = 1, n
             if (use(i)) then
@@ -268,6 +268,7 @@ c
                end do
             end if
          end do
+         deallocate (derivs)
          if (nuse .eq. n)  call mdrest
       end if
 c
@@ -275,7 +276,7 @@ c     check for any prior dynamics coordinate sets
 c
       i = 0
       exist = .true.
-      dowhile (exist)
+      do while (exist)
          i = i + 1
          lext = 3
          call numeral (i,ext,lext)

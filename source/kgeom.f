@@ -211,16 +211,16 @@ c
             if (t1 .eq. 0.0d0)  t1 = 1.0d0
             if (.not. exist)  t2 = geometry (ia,ib,ic,id)
             if (t3 .eq. 0.0d0)  t3 = t2
-            dowhile (t2 .gt. 180.0d0)
+            do while (t2 .gt. 180.0d0)
                t2 = t2 - 360.0d0
             end do
-            dowhile (t2 .lt. -180.0d0)
+            do while (t2 .lt. -180.0d0)
                t2 = t2 + 360.0d0
             end do
-            dowhile (t3 .gt. 180.0d0)
+            do while (t3 .gt. 180.0d0)
                t3 = t3 - 360.0d0
             end do
-            dowhile (t3 .lt. -180.0d0)
+            do while (t3 .lt. -180.0d0)
                t3 = t3 + 360.0d0
             end do
             ntfix = ntfix + 1

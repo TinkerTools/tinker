@@ -19,13 +19,13 @@ c
 c     variables and parameters:
 c
 c     n         logical dimension of the matrix to be diagonalized
-c     np        physical dimension of the matrix storage area
+c     np        physical dimension of the eigenvector storage area
 c     nv        number of eigenvalues and eigenvectors desired
 c     dd        upper triangle of the matrix to be diagonalized
 c     ev        returned with the eigenvalues in ascending order
 c     vec       returned with the eigenvectors of the matrix
-c     a,b,p,w   some temporary work vectors of physical dimension
-c     ta,tb,y   more temporary work vectors of physical dimension
+c     a,b,p,w   some temporary work vectors of logical dimension
+c     ta,tb,y   more temporary work vectors of logical dimension
 c
 c     literature reference:
 c
@@ -54,13 +54,12 @@ c
       real*8 s,sgn,sum1
       real*8 t,term,temp
       real*8 trial,xnorm
-      real*8 ev(np)
-      real*8 a(np),b(np)
-      real*8 p(np),w(np)
-      real*8 ta(np),tb(np)
-      real*8 y(np)
-      real*8 dd(np*(np+1)/2)
-      real*8 vec(np,np)
+      real*8 ev(*),dd(*)
+      real*8 a(*),b(*)
+      real*8 p(*),w(*)
+      real*8 ta(*),tb(*)
+      real*8 y(*)
+      real*8 vec(np,*)
       logical done
 c
 c
@@ -197,12 +196,12 @@ c
          end do
          ev(i) = rootx
          trial = 0.5d0 * (root+ev(i))
-         dowhile (abs(trial-root).ge.eps .and. abs(trial-ev(i)).ge.eps)
+         do while (abs(trial-root).ge.eps .and. abs(trial-ev(i)).ge.eps)
             nomtch = n
             j = 1
-            dowhile (j .le. n)
+            do while (j .le. n)
                f0 = a(j) - trial
-               dowhile (abs(f0) .ge. zeta)
+               do while (abs(f0) .ge. zeta)
                   if (f0 .ge. 0.0d0)  nomtch = nomtch - 1
                   j = j + 1
                   if (j .gt. n)  goto 10
@@ -264,7 +263,7 @@ c
          do j = 1, n
             m = m - 1
             done = .false.
-            dowhile (.not. done)
+            do while (.not. done)
                done = .true.
                if (n-m-1 .lt. 0) then
                   elim1 = y(m)

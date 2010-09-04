@@ -38,9 +38,9 @@ c
       real*8 work1(4),work2(4)
       real*8 rot(3,3)
       real*8 c(4,4),v(4,4)
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8 x1(*),x2(*)
+      real*8 y1(*),y2(*)
+      real*8 z1(*),z2(*)
 c
 c
 c     build the upper triangle of the quadratic form matrix

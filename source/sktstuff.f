@@ -144,7 +144,7 @@ c     load the current dynamics information
 c
       call setcoordinates (n,x,y,z)
       time = dble(istep) * dt
-      call settime (time)
+      call setmdtime (time)
       call setenergy (epot)
       do i = 1, n
          vx(i) = v(1,i)

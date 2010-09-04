@@ -33,7 +33,7 @@ c
       integer i,iopt,iend
       integer ncycle,nvar
       integer lext,freeunit
-      real*8 f,xx(maxvar)
+      real*8 f,xx(*)
       logical exist
       character*7 ext
       character*120 optfile

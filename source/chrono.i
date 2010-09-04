@@ -7,13 +7,14 @@ c     ###################################################
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  chrono.i  --  timing statistics for the current program  ##
+c     ##  chrono.i  --  clock time values for the current program  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     cputim   elapsed cpu time in seconds since start of program
+c     twall   current processor wall clock time in seconds
+c     tcpu    elapsed cpu time from start of program in seconds
 c
 c
-      real*8 cputim
-      common /chrono/ cputim
+      real*8 twall,tcpu
+      common /chrono/ twall,tcpu

@@ -1010,13 +1010,13 @@ c     special check for inconsistent probes
 c
             iptr = tfe(nt)
             ned = 0
-            dowhile (iptr .ne. 0)
+            do while (iptr .ne. 0)
                ned = ned + 1
                iptr = enext(iptr)
             end do
             if (mod(ned,2) .ne. 0) then
                iptr = tfe(nt)
-               dowhile (iptr .ne. 0)
+               do while (iptr .ne. 0)
                   iv1 = env(1,iptr)
                   iv2 = env(2,iptr)
                   ip1 = vp(iv1)
@@ -2611,7 +2611,7 @@ c
          write (iout,150)
   150    format (/,' Convex Surface Area for Individual Atoms :',/)
          k = 1
-         dowhile (k .le. na)
+         do while (k .le. na)
             write (iout,160)  (ia,atmarea(ia),ia=k,min(k+4,na))
   160       format (1x,5(i7,f8.3))
             k = k + 5

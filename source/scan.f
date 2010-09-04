@@ -112,7 +112,7 @@ c
 c     use normal mode local search to explore adjacent minima
 c
       niter = 0
-      dowhile (niter .lt. nmap)
+      do while (niter .lt. nmap)
          niter = niter + 1
          write (iout,110)  niter
   110    format (/,' Normal Mode Local Search',7x,'Minimum',i7,/)
@@ -464,7 +464,7 @@ c
 c
 c     scan the search direction for a minimization candidate
 c
-      dowhile (.not. done)
+      do while (.not. done)
          if (kstep .ne. 0) then
             do i = 1, nomega
                ztors(zline(i)) = ztors(zline(i)) + step(i)

@@ -36,13 +36,14 @@ c
       real*8 xmet,ymet,zmet
       real*8 alpha,beta
       real*8 kappa,r0cu
+      real*8 demet(3)
       real*8 rback(3,maxneigh)
       real*8 dedrback(3,maxneigh)
       real*8 facback(maxneigh)
       real*8 dfacback(3,maxneigh)
       real*8 dftback(3,maxneigh)
       real*8 detback(3,maxneigh)
-      real*8 de(3,maxneigh),demet(3)
+      real*8 de(3,maxneigh)
       real*8 delfdh(maxneigh)
       real*8 xneigh(maxneigh)
       real*8 yneigh(maxneigh)

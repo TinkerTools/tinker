@@ -37,9 +37,9 @@ c
       real*8 xdel,ydel,zdel
       real*8 mang(3),vang(3)
       real*8 vtot(3),tensor(3,3)
-      real*8 xcm(maxgrp)
-      real*8 ycm(maxgrp)
-      real*8 zcm(maxgrp)
+      real*8, allocatable :: xcm(:)
+      real*8, allocatable :: ycm(:)
+      real*8, allocatable :: zcm(:)
 c
 c
 c     zero out the total mass and overall linear velocity
@@ -77,6 +77,14 @@ c
          etrans = etrans + vtot(j)**2
       end do
       etrans = 0.5d0 * etrans * totmass / convert
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (.not.use_bounds .and. integrate.eq.'RIGIDBODY') then
+         allocate (xcm(ngrp))
+         allocate (ycm(ngrp))
+         allocate (zcm(ngrp))
+      end if
 c
 c     find the center of mass coordinates of the overall system
 c
@@ -279,6 +287,14 @@ c
      &              /,' Rotational Kinetic Energy :',13x,f12.4,
      &                 ' Kcal/mole')
          end if
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      if (.not.use_bounds .and. integrate.eq.'RIGIDBODY') then
+         deallocate (xcm)
+         deallocate (ycm)
+         deallocate (zcm)
       end if
       return
       end

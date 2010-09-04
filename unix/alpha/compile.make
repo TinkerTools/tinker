@@ -169,7 +169,6 @@ f77 -c -fast -arch generic -tune generic flatten.f
 f77 -c -fast -arch generic -tune generic freeunit.f
 f77 -c -fast -arch generic -tune generic gda.f
 f77 -c -fast -arch generic -tune generic geometry.f
-f77 -c -fast -arch generic -tune generic getime.f
 f77 -c -fast -arch generic -tune generic getint.f
 f77 -c -fast -arch generic -tune generic getkey.f
 f77 -c -fast -arch generic -tune generic getmol2.f
@@ -320,7 +319,6 @@ f77 -c -fast -arch generic -tune generic scan.f
 f77 -c -fast -arch generic -tune generic sdstep.f
 f77 -c -fast -arch generic -tune generic search.f
 f77 -c -fast -arch generic -tune generic server.f
-f77 -c -fast -arch generic -tune generic setime.f
 f77 -c -fast -arch generic -tune generic shakeup.f
 f77 -c -fast -arch generic -tune generic sigmoid.f
 f77 -c -fast -arch generic -tune generic sktstuff.f

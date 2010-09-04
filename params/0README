@@ -44,12 +44,15 @@
 
       amoeba     AMOEBA force field for various small organic molecules
                  based on polarizable atomic multipole electrostatics.
+                 Both 2004 (amoeba04) and 2009 (amoeba09) are provided.
 
       amoebabio  Biopolymer parameters (protein and nucleic acid) for
                  the AMOEBA polarizable atomic multipole force field.
+                 The 2009 version is provided.
 
       amoebapro  Protein parameters for the AMOEBA polarizable atomic
-                 multipole force field.
+                 multipole force field. The original 2004 version is
+                 provided.
 
       charmm19   CHARMM19 parameters for proteins and water. The nucleic
                  acid values are not yet implemented. There are some

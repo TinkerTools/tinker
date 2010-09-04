@@ -301,7 +301,7 @@ c
 c
 c     find local minimum along each of the steepest directions
 c
-      dowhile (.not. done)
+      do while (.not. done)
          ndoi = ndoi + 1
          write (iout,10)  ndoi,minref
    10    format (/,' Torsional Mode Search :',5x,'Iteration',i4,
@@ -446,7 +446,7 @@ c
 c
 c     scan the search direction for a minimization candidate
 c
-      dowhile (.not. done)
+      do while (.not. done)
          if (kstep .ne. 0) then
             do i = 1, nomega
                ztors(zline(i)) = ztors(zline(i)) + step(i)

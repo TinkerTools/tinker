@@ -42,7 +42,7 @@ c
 c     manually read to the end of file, slow but always correct
 c
 c     open (unit=iunit,file=name,status='old')
-c     dowhile (.true.)
+c     do while (.true.)
 c        read (iunit,10,err=20,end=20)
 c  10    format ()
 c     end do

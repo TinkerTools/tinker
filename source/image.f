@@ -29,13 +29,13 @@ c
 c     for orthogonal lattice, find the desired image directly
 c
       if (orthogonal) then
-         dowhile (abs(xr) .gt. xcell2)
+         do while (abs(xr) .gt. xcell2)
             xr = xr - sign(xcell,xr)
          end do
-         dowhile (abs(yr) .gt. ycell2)
+         do while (abs(yr) .gt. ycell2)
             yr = yr - sign(ycell,yr)
          end do
-         dowhile (abs(zr) .gt. zcell2)
+         do while (abs(zr) .gt. zcell2)
             zr = zr - sign(zcell,zr)
          end do
 c
@@ -46,13 +46,13 @@ c
       else if (monoclinic) then
          zf = zr / beta_sin
          xf = xr - zf*beta_cos
-         dowhile (abs(xf) .gt. xcell2)
+         do while (abs(xf) .gt. xcell2)
             xf = xf - sign(xcell,xf)
          end do
-         dowhile (abs(yr) .gt. ycell2)
+         do while (abs(yr) .gt. ycell2)
             yr = yr - sign(ycell,yr)
          end do
-         dowhile (abs(zf) .gt. zcell2)
+         do while (abs(zf) .gt. zcell2)
             zf = zf - sign(zcell,zf)
          end do
          xr = xf + zf*beta_cos
@@ -66,13 +66,13 @@ c
          zf = zr / gamma_term
          yf = (yr - zf*beta_term) / gamma_sin
          xf = xr - yf*gamma_cos - zf*beta_cos
-         dowhile (abs(xf) .gt. xcell2)
+         do while (abs(xf) .gt. xcell2)
             xf = xf - sign(xcell,xf)
          end do
-         dowhile (abs(yf) .gt. ycell2)
+         do while (abs(yf) .gt. ycell2)
             yf = yf - sign(ycell,yf)
          end do
-         dowhile (abs(zf) .gt. zcell2)
+         do while (abs(zf) .gt. zcell2)
             zf = zf - sign(zcell,zf)
          end do
          xr = xf + yf*gamma_cos + zf*beta_cos
@@ -83,13 +83,13 @@ c     for truncated octahedron, use orthogonal box equations,
 c     then perform extra tests to remove corner pieces
 c
       else if (octahedron) then
-         dowhile (abs(xr) .gt. xbox2)
+         do while (abs(xr) .gt. xbox2)
             xr = xr - sign(xbox,xr)
          end do
-         dowhile (abs(yr) .gt. ybox2)
+         do while (abs(yr) .gt. ybox2)
             yr = yr - sign(ybox,yr)
          end do
-         dowhile (abs(zr) .gt. zbox2)
+         do while (abs(zr) .gt. zbox2)
             zr = zr - sign(zbox,zr)
          end do
          if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
@@ -161,15 +161,15 @@ c     for orthogonal lattice, find the desired image directly
 c
       if (orthogonal) then
          xr = xr + xmove
-         dowhile (abs(xr) .gt. xsize2)
+         do while (abs(xr) .gt. xsize2)
             xr = xr - sign(xsize,xr)
          end do
          yr = yr + ymove
-         dowhile (abs(yr) .gt. ysize2)
+         do while (abs(yr) .gt. ysize2)
             yr = yr - sign(ysize,yr)
          end do
          zr = zr + zmove
-         dowhile (abs(zr) .gt. zsize2)
+         do while (abs(zr) .gt. zsize2)
             zr = zr - sign(zsize,zr)
          end do
 c
@@ -181,15 +181,15 @@ c
          zf = zr / beta_sin
          xf = xr - zf*beta_cos
          xf = xf + xmove
-         dowhile (abs(xf) .gt. xsize2)
+         do while (abs(xf) .gt. xsize2)
             xf = xf - sign(xsize,xf)
          end do
          yr = yr + ymove
-         dowhile (abs(yr) .gt. ysize2)
+         do while (abs(yr) .gt. ysize2)
             yr = yr - sign(ysize,yr)
          end do
          zf = zf + zmove
-         dowhile (abs(zf) .gt. zsize2)
+         do while (abs(zf) .gt. zsize2)
             zf = zf - sign(zsize,zf)
          end do
          xr = xf + zf*beta_cos
@@ -204,15 +204,15 @@ c
          yf = (yr - zf*beta_term) / gamma_sin
          xf = xr - yf*gamma_cos - zf*beta_cos
          xf = xf + xmove
-         dowhile (abs(xf) .gt. xsize2)
+         do while (abs(xf) .gt. xsize2)
             xf = xf - sign(xsize,xf)
          end do
          yf = yf + ymove
-         dowhile (abs(yf) .gt. ysize2)
+         do while (abs(yf) .gt. ysize2)
             yf = yf - sign(ysize,yf)
          end do
          zf = zf + zmove
-         dowhile (abs(zf) .gt. zsize2)
+         do while (abs(zf) .gt. zsize2)
             zf = zf - sign(zsize,zf)
          end do
          xr = xf + yf*gamma_cos + zf*beta_cos
@@ -223,13 +223,13 @@ c     for truncated octahedron, use orthogonal box equations,
 c     then perform extra tests to remove corner pieces
 c
       else if (octahedron) then
-         dowhile (abs(xr) .gt. xbox2)
+         do while (abs(xr) .gt. xbox2)
             xr = xr - sign(xbox,xr)
          end do
-         dowhile (abs(yr) .gt. ybox2)
+         do while (abs(yr) .gt. ybox2)
             yr = yr - sign(ybox,yr)
          end do
-         dowhile (abs(zr) .gt. zbox2)
+         do while (abs(zr) .gt. zbox2)
             zr = zr - sign(zbox,zr)
          end do
          if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then

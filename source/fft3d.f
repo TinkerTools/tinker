@@ -71,7 +71,7 @@ c
       include 'fft.i'
       include 'pme.i'
       integer i,j,k
-      real*8 work(2,maxfft)
+      real*8, allocatable :: work(:,:)
 c
 c
 c     perform a single 3-D forward transform using FFTW
@@ -82,6 +82,7 @@ c
 c
 c     perform three 1-D forward transforms using FFTPACK
 c
+         allocate (work(2,max(nfft1,nfft2,nfft3)))
          do k = 1, nfft3
             do j = 1, nfft2
                do i = 1, nfft1
@@ -121,6 +122,7 @@ c
                end do
             end do
          end do
+         deallocate (work)
 !$    end if
       return
       end
@@ -143,7 +145,7 @@ c
       include 'fft.i'
       include 'pme.i'
       integer i,j,k
-      real*8 work(2,maxfft)
+      real*8, allocatable :: work(:,:)
 c
 c
 c     perform a single 3-D backward transform using FFTW
@@ -154,6 +156,7 @@ c
 c
 c     perform three 1-D backward transforms using FFTPACK
 c
+         allocate (work(2,max(nfft1,nfft2,nfft3)))
          do k = 1, nfft3
             do j = 1, nfft2
                do i = 1, nfft1
@@ -193,6 +196,7 @@ c
                end do
             end do
          end do
+         deallocate (work)
 !$    end if
       return
       end

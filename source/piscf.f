@@ -236,7 +236,7 @@ c     now, do the scf-mo computation; note that it needs to
 c     be done twice, initially for the planar analog of the
 c     actual system; then for the nonplanar (actual) system
 c
-      dowhile (mode.eq.'PLANAR' .or. mode.eq.'NONPLN')
+      do while (mode.eq.'PLANAR' .or. mode.eq.'NONPLN')
          if (mode .eq. 'NONPLN') then
             call pitilt (povlap)
             do k = 1, nbpi
@@ -255,7 +255,7 @@ c     exchange repulsions
 c
          iter = 0
          delta = 2.0d0 * converge
-         dowhile (delta.gt.converge .and. iter.lt.maxiter)
+         do while (delta.gt.converge .and. iter.lt.maxiter)
             iter = iter + 1
             call jacobi (norbit,maxpi,fock,en,v,work1,work2)
             do i = 1, norbit

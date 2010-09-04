@@ -72,7 +72,7 @@ c
          listpi(i) = .false.
       end do
       i = 1
-      dowhile (piatoms(i) .ne. 0)
+      do while (piatoms(i) .ne. 0)
          if (piatoms(i) .gt. 0) then
             listpi(piatoms(i)) = .true.
             i = i + 1

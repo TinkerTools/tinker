@@ -48,7 +48,7 @@ c
       integer maxneg,nneg
       integer maxinner,ninner
       integer maxouter,nouter
-      real*8 fctval,grdmin,secs
+      real*8 fctval,grdmin,wall,cpu
       real*8 dt,temp_start,temp_stop
       real*8 rg,rmsorig,rmsflip,mass
       real*8 bounds,contact,local
@@ -89,10 +89,10 @@ c
       maxneg = 2
       nouter = 0
       valid = .false.
-      dowhile (.not. valid)
+      do while (.not. valid)
          ninner = 0
          done = .false.
-         dowhile (.not. done)
+         do while (.not. done)
             ninner = ninner + 1
             call dstmat (matrix)
             call metric (matrix,nneg)
@@ -152,7 +152,7 @@ c
       if (debug) then
          i = 0
          exist = .true.
-         dowhile (exist)
+         do while (exist)
             i = i + 1
             lext = 3
             call numeral (i,ext,lext)
@@ -187,7 +187,7 @@ c
 c
 c     minimize the error function via simulated annealing
 c
-      if (verbose)  call setime
+      if (verbose)  call settime
       if (use_anneal) then
          iprint = 0
          if (verbose)  iprint = 10
@@ -226,8 +226,8 @@ c
          call refine (errtyp,fctval,grdmin)
       end if
       if (verbose) then
-         call getime (secs)
-         write (iout,40)  secs
+         call gettime (wall,cpu)
+         write (iout,40)  wall
    40    format (/,' Time Required for Refinement :',10x,f12.2,
      &              ' seconds')
       end if
@@ -565,7 +565,7 @@ c
 c
 c     get the next candidate atom from head of queue
 c
-      dowhile (head .ne. 0)
+      do while (head .ne. 0)
          j = head
          queued(j) = .false.
          head = queue(head)
@@ -979,7 +979,8 @@ c
       real*8 invbeta,alpha,beta
       real*8 corr,mean,stdev
       real*8 denom,swap,delta
-      real*8 percent,eps,gap,secs
+      real*8 percent,eps,gap
+      real*8 wall,cpu
       real*8 value(maxpair)
       real*8 dmx(maxgeo,maxgeo)
       logical first,uniform
@@ -1068,7 +1069,7 @@ c
 c     write out the final choice for distance matrix generation
 c
       if (verbose) then
-         call setime
+         call settime
          if (method .eq. 'CLASSIC') then
             write (iout,30)
    30       format (/,' Distance Matrix via Uniform Random',
@@ -1343,8 +1344,8 @@ c
 c     get the time required for distance matrix generation
 c
       if (verbose) then
-         call getime (secs)
-         write (iout,170)  secs
+         call gettime (wall,cpu)
+         write (iout,170)  wall
   170    format (/,' Time Required for Distance Matrix :',5x,f12.2,
      &              ' seconds')
       end if
@@ -1466,16 +1467,17 @@ c
       integer maxeigen
       parameter (maxeigen=5)
       integer i,j,neigen
+      real*8 wall,cpu
       real*8 evl(maxeigen)
       real*8 evc(maxgeo,maxeigen)
       real*8 gmx(maxgeo,maxgeo)
-      real*8 secs,work(maxgeo)
+      real*8 work(maxgeo)
       logical valid
 c
 c
 c     initialize number of eigenvalues and convergence criteria
 c
-      if (verbose)  call setime
+      if (verbose)  call settime
       neigen = 3
 c
 c     compute largest eigenvalues via power method with deflation
@@ -1509,8 +1511,8 @@ c
 c     get the time required for partial matrix diagonalization
 c
       if (verbose) then
-         call getime (secs)
-         write (iout,50)  secs
+         call gettime (wall,cpu)
+         write (iout,50)  wall
    50    format (/,' Time Required for Eigenvalues :',9x,f12.2,
      &              ' seconds')
       end if
@@ -1686,19 +1688,25 @@ c
       include 'atoms.i'
       include 'inform.i'
       include 'iounit.i'
-      integer i,k,iter,niter,period
-      real*8 pairs,dn1,dn2,rg,secs
+      integer i,k,iter
+      integer niter,period
+      real*8 pairs,rg
+      real*8 dn1,dn2
+      real*8 wall,cpu
       real*8 target,dist,error
       real*8 rmserr,average
-      real*8 xi,yi,zi,b(maxatm)
+      real*8 xi,yi,zi
+      real*8 b(maxatm)
+      real*8 xx(maxatm)
+      real*8 yy(maxatm)
+      real*8 zz(maxatm)
       real*8 dmx(maxgeo,maxgeo)
-      real*8 xx(maxatm),yy(maxatm),zz(maxatm)
       character*120 title
 c
 c
 c     set number of iterations and some other needed values
 c
-      if (verbose)  call setime
+      if (verbose)  call settime
       niter = 20
       period = 5
       pairs = dble(n*(n-1)/2)
@@ -1839,8 +1847,8 @@ c
 c
 c     get the time required for the majorization procedure
 c
-         call getime (secs)
-         write (iout,50)  secs
+         call gettime (wall,cpu)
+         write (iout,50)  wall
    50    format (/,' Time Required for Majorization :',8x,f12.2,
      &              ' seconds')
       end if

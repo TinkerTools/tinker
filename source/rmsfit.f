@@ -23,9 +23,9 @@ c
       real*8 rmsfit,rmsterm
       real*8 xr,yr,zr,dist2
       real*8 weigh,norm
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8 x1(*),x2(*)
+      real*8 y1(*),y2(*)
+      real*8 z1(*),z2(*)
 c
 c
 c     compute the rms fit over superimposed atom pairs

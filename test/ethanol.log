@@ -63,7 +63,7 @@
  Relative Conformational Energy (QM)     8  1.26782 kcal/mole
  Relative Conformational Energy (QM)     9  0.60291 kcal/mole
  Relative Conformational Energy (QM)    10  0.28037 kcal/mole
- torsion   39  39  35  36  -1.447   0.531   0.317   0.000   0.000   0.000
+ torsion   40  40  36  37  -1.447   0.531   0.317   0.000   0.000   0.000
  Fixed Torsion            1           5           8           9
  Fitting Torsion No.    1 Flag    0
  Variable    1   1 Variable Flag    T
@@ -116,7 +116,7 @@
  Relative Conformational Energy (MM)     8      0.59404 kcal/mole
  Relative Conformational Energy (MM)     9      0.18930 kcal/mole
  Relative Conformational Energy (MM)    10      0.00000 kcal/mole
- Energy Diff RMS   0.738563819827242     
+ Energy Diff RMS   0.738563810625778     
  Conformation   1 Weight   0.6188
  Conformation   2 Weight   0.4703
  Conformation   3 Weight   0.4716
@@ -152,8 +152,8 @@
  Relative Conformational Energy (MM)     7      1.58941 kcal/mole
  Relative Conformational Energy (MM)     8      1.29399 kcal/mole
  Relative Conformational Energy (MM)     9      0.60172 kcal/mole
- Relative Conformational Energy (MM)    10      0.25199 kcal/mole
- Energy RMS With Fitting Parmeters =   2.546191527075149E-002
+ Relative Conformational Energy (MM)    10      0.25200 kcal/mole
+ Energy RMS With Fitting Parmeters =   2.546199926257160E-002
  
  Fitting Torsional Parameters:
- torsion   39  39  35  36  -1.888 0.0 1    0.268 180.0 2    0.744 0.0 3
+ torsion   40  40  36  37  -1.888 0.0 1    0.268 180.0 2    0.744 0.0 3

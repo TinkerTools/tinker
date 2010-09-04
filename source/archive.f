@@ -27,12 +27,12 @@ c
       include 'usage.i'
       integer i,k,iarc,ixyz
       integer start,stop
-      integer step,nlist
+      integer step,now
       integer lext,next
-      integer now,lengb
+      integer lengb
       integer leng1,leng2
       integer freeunit
-      integer list(maxatm)
+      integer list(20)
       logical exist,query
       character*1 answer
       character*7 ext,mode
@@ -121,7 +121,7 @@ c
 c     cycle over the user specified coordinate files
 c
          i = start
-         dowhile (i.ge.start .and. i.le.stop)
+         do while (i.ge.start .and. i.le.stop)
             ixyz = freeunit ()
             lext = 3
             call numeral (i,ext,lext)
@@ -163,7 +163,7 @@ c     extract individual files from a concatenated archive file
 c
       if (mode.eq.'EXTRACT' .or. mode.eq.'TRIM') then
          inquire (file=arcfile,exist=exist)
-         dowhile (.not. exist)
+         do while (.not. exist)
             write (iout,90)
    90       format (/,' Enter Name of the Coordinate Archive',
      &                 ' File :  ',$)
@@ -190,18 +190,17 @@ c
                use(i) = .true.
             end do
          else if (mode.eq.'TRIM' .and. nuse.eq.n) then
-            nlist = 0
-            do i = 1, maxatm
+            do i = 1, 20
                list(i) = 0
             end do
             write (iout,110)
   110       format (/,' Numbers of the Atoms to be Removed :  ',$)
             read (input,120)  record
   120       format (a120)
-            read (record,*,err=130,end=130)  (list(i),i=1,maxatm)
+            read (record,*,err=130,end=130)  (list(i),i=1,20)
   130       continue
             i = 1
-            dowhile (list(i) .ne. 0)
+            do while (list(i) .ne. 0)
                list(i) = max(-n,min(n,list(i)))
                if (list(i) .gt. 0) then
                   k = list(i)
@@ -266,7 +265,7 @@ c
 c
 c     loop over the individual coordinate files to be extracted
 c
-         dowhile (start .ne. 0)
+         do while (start .ne. 0)
             if (start .le. now) then
                now = 1
                rewind (unit=iarc)
@@ -276,7 +275,7 @@ c
             end do
             i = start
             if (mode .eq. 'EXTRACT') then
-               dowhile (i.ge.start .and. i.le.stop)
+               do while (i.ge.start .and. i.le.stop)
                   lext = 3
                   call numeral (i,ext,lext)
                   call readxyz (iarc)
@@ -298,7 +297,7 @@ c
                call suffix (xyzfile,'arc')
                call version (xyzfile,'new')
                open (unit=ixyz,file=xyzfile,status='new')
-               dowhile (i.ge.start .and. i.le.stop)
+               do while (i.ge.start .and. i.le.stop)
                   call readxyz (iarc)
                   if (abort)  goto 180
                   call prtarc (ixyz)

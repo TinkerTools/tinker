@@ -79,7 +79,7 @@ c
 c
 c     process individual atoms from the Protein Data Bank file
 c
-      dowhile (.true.)
+      do while (.true.)
          read (ipdb,20,err=90,end=90)  record
    20    format (a120)
          call upcase (record)
@@ -248,7 +248,7 @@ c
 c     scan for multiple chains, alternate locations and inserts
 c
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          read (ipdb,10,err=30,end=30)  record
    10    format (a120)
          call upcase (record)

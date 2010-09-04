@@ -169,7 +169,6 @@ xlf -c -O flatten.f
 xlf -c -O freeunit.f
 xlf -c -O gda.f
 xlf -c -O geometry.f
-xlf -c -O getime.f
 xlf -c -O getint.f
 xlf -c -O getkey.f
 xlf -c -O getmol2.f
@@ -320,7 +319,6 @@ xlf -c -O scan.f
 xlf -c -O sdstep.f
 xlf -c -O search.f
 xlf -c -O server.f
-xlf -c -O setime.f
 xlf -c -O shakeup.f
 xlf -c -O sigmoid.f
 xlf -c -O sktstuff.f

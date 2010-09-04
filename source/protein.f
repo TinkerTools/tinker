@@ -183,7 +183,7 @@ c     get the amino acid sequence data and dihedral angle values
 c
       i = 0
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          i = i + 1
          phi(i) = 0.0d0
          psi(i) = 0.0d0

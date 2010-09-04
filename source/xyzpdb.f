@@ -56,7 +56,7 @@ c
 c
 c     add each successive coordinate frame to the PDB file
 c
-      dowhile (.not. abort)
+      do while (.not. abort)
          call makepdb
          call prtpdb (ipdb)
          call readxyz (ixyz)

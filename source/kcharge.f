@@ -31,7 +31,7 @@ c
       include 'potent.i'
       integer i,j,k,m
       integer ia,next
-      integer nc12(maxatm)
+      integer, allocatable :: nc12(:)
       real*8 cg
       logical header
       character*20 keyword
@@ -126,6 +126,10 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (nc12(n))
+c
 c     optionally use neutral groups for neighbors and cutoffs
 c
       if (neutnbr .or. neutcut) then
@@ -149,6 +153,10 @@ c
             end if
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (nc12)
 c
 c     turn off charge-charge and charge-dipole terms if not used
 c

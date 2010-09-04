@@ -356,14 +356,14 @@ c
       end
 c
 c
-c     ##########################
-c     ##                      ##
-c     ##  subroutine settime  ##
-c     ##                      ##
-c     ##########################
+c     ############################
+c     ##                        ##
+c     ##  subroutine setmdtime  ##
+c     ##                        ##
+c     ############################
 c
 c
-      subroutine settime (time)
+      subroutine setmdtime (time)
       implicit none
       real*8 time
       return

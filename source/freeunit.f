@@ -29,7 +29,7 @@ c     try each logical unit until an unopened one is found
 c
       freeunit = 0
       used = .true.
-      dowhile (used)
+      do while (used)
          freeunit = freeunit + 1
          if (freeunit.ne.input .and. freeunit.ne.iout) then
             if (freeunit .gt. 99) then

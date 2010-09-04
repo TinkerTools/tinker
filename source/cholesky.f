@@ -13,9 +13,9 @@ c     ################################################################
 c
 c
 c     "cholesky" uses a modified Cholesky method to solve the linear
-c     system Ax = b, returning "x" in "b"; "A" is assumed to be a
-c     real symmetric positive definite matrix with its diagonal and
-c     upper triangle stored by rows
+c     system Ax = b, returning "x" in "b"; "A" is a real symmetric
+c     positive definite matrix with its upper triangle (including the
+c     diagonal) stored by rows
 c
 c     literature reference:
 c
@@ -29,8 +29,8 @@ c
       integer ii,ij,ik,ki,kk
       integer im,jk,jm
       real*8 r,s,t
-      real*8 a(nvar*(nvar+1)/2)
-      real*8 b(nvar)
+      real*8 a(*)
+      real*8 b(*)
 c
 c
 c     Cholesky factorization to reduce "A" to (L)(D)(L transpose)

@@ -99,7 +99,7 @@ c
    20 continue
       nmode = 18
       mode = -1
-      dowhile (mode.lt.0 .or. mode.gt.nmode)
+      do while (mode.lt.0 .or. mode.gt.nmode)
          mode = 0
          write (iout,30)
    30    format (/,' Number of the Desired Choice [<CR>=Exit] :  ',$)
@@ -132,7 +132,7 @@ c
   100    format (a120)
          read (record,*,err=110,end=110)  (list(i),i=1,maxatm)
   110    continue
-         dowhile (list(nlist+1) .ne. 0)
+         do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
          do i = 1, nlist
@@ -170,7 +170,7 @@ c
   130    format (a120)
          read (record,*,err=140,end=140)  (list(i),i=1,maxatm)
   140    continue
-         dowhile (list(nlist+1) .ne. 0)
+         do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
          natom = n
@@ -249,7 +249,7 @@ c
   180    format (a120)
          read (record,*,err=190,end=190)  (list(i),i=1,maxatm)
   190    continue
-         dowhile (list(nlist+1) .ne. 0)
+         do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
          call sort4 (nlist,list)
@@ -512,7 +512,7 @@ c
          xbox = 0.0d0
          ybox = 0.0d0
          zbox = 0.0d0
-         dowhile (xbox .eq. 0.0d0)
+         do while (xbox .eq. 0.0d0)
             write (iout,330)
   330       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
             read (input,340)  record

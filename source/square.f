@@ -330,7 +330,7 @@ c     compute the Levenberg-Marquardt step
 c
       icode = 6
       first = .true.
-      dowhile (icode .ge. 4)
+      do while (icode .ge. 4)
          call lmstep (nactive,ga,fjac,mdim,ipvt,xsa,qtf,stpmax,
      &                       delta,amu,first,sa,gauss)
 c
@@ -779,7 +779,7 @@ c
 c     iterate until a satisfactory "amu" is generated
 c
          done = .false.
-         dowhile (.not. done)
+         do while (.not. done)
             if (amu.lt.amulow .or. amu.gt.amuhi) then
                amu = max(sqrt(amulow*amuhi),0.001d0*amuhi)
             end if

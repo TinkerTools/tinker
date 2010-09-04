@@ -215,7 +215,7 @@ c
 c     perform a set of basic sniffer search steps
 c
       niter = 0
-      dowhile (.not. done)
+      do while (.not. done)
          write (iout,110)
   110    format (/,4x,'Iter',11x,'F Value',13x,'G RMS',
      &             8x,'X Move',9x,'Angle',/)

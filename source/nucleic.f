@@ -185,7 +185,7 @@ c     get the nucleotide sequence data and dihedral angle values
 c
       i = 0
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          i = i + 1
          do j = 1, 6
             bkbone(j,i) = 0.0d0
@@ -1068,7 +1068,7 @@ c
                root(nbase) = j
                kseq = kseq + 1
                resname = nuclz(seqtyp(kseq))
-               dowhile (resname.eq.'MP ' .or. resname.eq.'DP '
+               do while (resname.eq.'MP ' .or. resname.eq.'DP '
      &                         .or. resname.eq.'TP ')
                   kseq = kseq + 1
                   resname = nuclz(seqtyp(kseq))

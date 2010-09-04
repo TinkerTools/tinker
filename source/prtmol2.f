@@ -89,7 +89,7 @@ c
          end if
          atmnam = name(i)//number
          do j = 1, 6
-            dowhile (atmnam(j:j) .eq. ' ')
+            do while (atmnam(j:j) .eq. ' ')
                do k = j, 6
                   atmnam(k:k) = atmnam(k+1:k+1)
                end do

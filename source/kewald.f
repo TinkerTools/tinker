@@ -163,19 +163,13 @@ c
      &              ' may give Poor Accuracy')
       end if
 c
-c     perform dynamic allocation of the various PME arrays
+c     perform dynamic allocation of various PME arrays
 c
-      nullify (thetai1)
       allocate (thetai1(4,bsorder,n))
-      nullify (thetai2)
       allocate (thetai2(4,bsorder,n))
-      nullify (thetai3)
       allocate (thetai3(4,bsorder,n))
-      nullify (qgrid)
       allocate (qgrid(2,nfft1,nfft2,nfft3))
-      nullify (qfac)
       allocate (qfac(nfft1,nfft2,nfft3))
-      nullify (pmetable)
       allocate (pmetable(n,nchunk))
 c
 c     initialize the PME arrays that can be precomputed
@@ -227,7 +221,7 @@ c
       ratio = eps + 1.0d0
       x = 0.5d0
       i = 0
-      dowhile (ratio .ge. eps)
+      do while (ratio .ge. eps)
          i = i + 1
          x = 2.0d0 * x
          y = x * cutoff

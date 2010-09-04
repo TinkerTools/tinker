@@ -37,28 +37,28 @@ c
       integer nvib,ivib
       integer nview,next
       integer nlist,ilist
-      integer iv(maxvib)
-      integer list(maxvib)
-      integer hinit(3,maxatm)
-      integer hstop(3,maxatm)
-      integer hindex(maxhess)
+      integer, allocatable :: list(:)
+      integer, allocatable :: iv(:)
+      integer, allocatable :: hindex(:)
+      integer, allocatable :: hinit(:,:)
+      integer, allocatable :: hstop(:,:)
       real*8 factor,vnorm,ratio
-      real*8 xref(maxatm)
-      real*8 yref(maxatm)
-      real*8 zref(maxatm)
-      real*8 mass2(maxatm)
-      real*8 eigen(maxvib)
-      real*8 a(maxvib)
-      real*8 b(maxvib)
-      real*8 p(maxvib)
-      real*8 w(maxvib)
-      real*8 ta(maxvib)
-      real*8 tb(maxvib)
-      real*8 ty(maxvib)
-      real*8 matrix((maxvib+1)*maxvib/2)
-      real*8 h(maxhess)
-      real*8 hdiag(3,maxatm)
-      real*8 vects(maxvib,maxvib)
+      real*8, allocatable :: xref(:)
+      real*8, allocatable :: yref(:)
+      real*8, allocatable :: zref(:)
+      real*8, allocatable :: mass2(:)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: h(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: matrix(:)
+      real*8, allocatable :: hdiag(:,:)
+      real*8, allocatable :: vects(:,:)
       logical exist,query
       character*1 letter
       character*7 ext
@@ -73,15 +73,28 @@ c
       call getxyz
       call mechanic
 c
-c     initialize various things needed for vibrations
+c     check for too many frequencies or Hessian elements
 c
       nfreq = 3 * nuse
-      ndummy = 0
-      if (nfreq.gt.maxvib .or. nfreq*nfreq.gt.maxhess) then
+      if (nfreq.gt.maxvib .or. nfreq*(nfreq-1)/2.gt.maxhess) then
          write (iout,10)
    10    format (/,' VIBRATE  --  Too many Atoms in the Molecule')
          call fatal
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mass2(n))
+      allocate (hinit(3,n))
+      allocate (hstop(3,n))
+      allocate (hdiag(3,n))
+      allocate (hindex(nfreq*(nfreq-1)/2))
+      allocate (h(nfreq*(nfreq-1)/2))
+      allocate (matrix(nfreq*(nfreq+1)/2))
+c
+c     initialize various things needed for vibrations
+c
+      ndummy = 0
       do i = 1, n
          if (use(i) .and. atomic(i).eq.0) then
             ndummy = ndummy + 1
@@ -115,10 +128,22 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(nfreq))
+      allocate (b(nfreq))
+      allocate (p(nfreq))
+      allocate (w(nfreq))
+      allocate (ta(nfreq))
+      allocate (tb(nfreq))
+      allocate (ty(nfreq))
+      allocate (eigen(nfreq))
+      allocate (vects(nfreq,nfreq))
+c
 c     perform diagonalization to get Hessian eigenvalues
 c
-      call diagq (nfreq,maxvib,nfreq,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
+     &                    a,b,p,w,ta,tb,ty)
       write (iout,20)
    20 format (/,' Eigenvalues of the Hessian Matrix :',/)
       write (iout,30)  (i,eigen(i),i=1,nvib)
@@ -145,8 +170,8 @@ c
 c
 c     diagonalize to get vibrational frequencies and normal modes
 c
-      call diagq (nfreq,maxvib,nfreq,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
+     &                    a,b,p,w,ta,tb,ty)
       factor = sqrt(convert) / (2.0d0*pi*lightspd)
       do i = 1, nvib
          eigen(i) = factor * sign(1.0d0,eigen(i)) * sqrt(abs(eigen(i)))
@@ -155,6 +180,21 @@ c
    40 format (/,' Vibrational Frequencies (cm-1) :',/)
       write (iout,50)  (i,eigen(i),i=1,nvib)
    50 format (5(i5,f10.3))
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hinit)
+      deallocate (hstop)
+      deallocate (hdiag)
+      deallocate (h)
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (matrix)
 c
 c     form Cartesian coordinate displacements from normal modes
 c
@@ -170,6 +210,14 @@ c
             vects(j,i) = vects(j,i) / vnorm
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(nfreq))
+      allocate (iv(nfreq))
+      allocate (xref(n))
+      allocate (yref(n))
+      allocate (zref(n))
 c
 c     try to get output vibrational modes from command line
 c
@@ -290,6 +338,17 @@ c
             z(i) = zref(i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (iv)
+      deallocate (mass2)
+      deallocate (xref)
+      deallocate (yref)
+      deallocate (zref)
+      deallocate (eigen)
+      deallocate (vects)
 c
 c     perform any final tasks before program exit
 c

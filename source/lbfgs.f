@@ -67,18 +67,18 @@ c
       real*8 minimum,grdmin
       real*8 angle,rms,beta
       real*8 ys,yy,gamma
-      real*8 x(maxvar)
-      real*8 x_old(maxvar)
-      real*8 g(maxvar)
-      real*8 g_old(maxvar)
-      real*8 p(maxvar)
-      real*8 q(maxvar)
-      real*8 r(maxvar)
-      real*8 h0(maxvar)
+      real*8 x(*)
       real*8 rho(maxsav)
       real*8 alpha(maxsav)
-      real*8, pointer :: s(:,:)
-      real*8, pointer :: y(:,:)
+      real*8, allocatable :: x_old(:)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: g_old(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: q(:)
+      real*8, allocatable :: r(:)
+      real*8, allocatable :: h0(:)
+      real*8, allocatable :: s(:,:)
+      real*8, allocatable :: y(:,:)
       logical done
       character*9 blank,status
       character*20 keyword
@@ -174,6 +174,18 @@ c
      &              ' the Maximum of',i5)
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x_old(nvar))
+      allocate (g(nvar))
+      allocate (g_old(nvar))
+      allocate (p(nvar))
+      allocate (q(nvar))
+      allocate (r(nvar))
+      allocate (h0(nvar))
+      allocate (s(nvar,msav))
+      allocate (y(nvar,msav))
+c
 c     evaluate the function and get the initial gradient
 c
       niter = nextiter - 1
@@ -238,16 +250,9 @@ c
          done = .true.
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      nullify (s)
-      allocate (s(nvar,msav))
-      nullify (y)
-      allocate (y(nvar,msav))
-c
 c     start of a new limited memory BFGS iteration
 c
-      dowhile (.not. done)
+      do while (.not. done)
          niter = niter + 1
          muse = min(niter-1,msav)
          m = m + 1
@@ -390,6 +395,13 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (x_old)
+      deallocate (g)
+      deallocate (g_old)
+      deallocate (p)
+      deallocate (q)
+      deallocate (r)
+      deallocate (h0)
       deallocate (s)
       deallocate (y)
 c

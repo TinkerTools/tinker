@@ -169,7 +169,6 @@ g77 -c -O3 -ffast-math -mno-cygwin flatten.f
 g77 -c -O3 -ffast-math -mno-cygwin freeunit.f
 g77 -c -O3 -ffast-math -mno-cygwin gda.f
 g77 -c -O3 -ffast-math -mno-cygwin geometry.f
-g77 -c -O3 -ffast-math -mno-cygwin getime.f
 g77 -c -O3 -ffast-math -mno-cygwin getint.f
 g77 -c -O3 -ffast-math -mno-cygwin getkey.f
 g77 -c -O3 -ffast-math -mno-cygwin getmol2.f
@@ -320,7 +319,6 @@ g77 -c -O3 -ffast-math -mno-cygwin scan.f
 g77 -c -O3 -ffast-math -mno-cygwin sdstep.f
 g77 -c -O3 -ffast-math -mno-cygwin search.f
 g77 -c -O3 -ffast-math -mno-cygwin server.f
-g77 -c -O3 -ffast-math -mno-cygwin setime.f
 g77 -c -O3 -ffast-math -mno-cygwin shakeup.f
 g77 -c -O3 -ffast-math -mno-cygwin sigmoid.f
 g77 -c -O3 -ffast-math -mno-cygwin sktstuff.f

@@ -502,7 +502,7 @@ c
 c
 c     compute mutual induced dipole moments by an iterative method
 c
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, npole
                do j = 1, 3
                   field(j,i) = 0.0d0
@@ -970,7 +970,7 @@ c
 c
 c     compute mutual induced dipole moments by an iterative method
 c
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, npole
                do j = 1, 3
                   field(j,i) = 0.0d0
@@ -1231,7 +1231,7 @@ c
 c
 c     compute mutual induced dipole moments by an iterative method
 c
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, npole
                do j = 1, 3
                   field(j,i) = 0.0d0
@@ -1434,7 +1434,7 @@ c
 c
 c     compute mutual induced dipole moments by an iterative method
 c
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, npole
                do j = 1, 3
                   field(j,i) = 0.0d0
@@ -1548,16 +1548,23 @@ c
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
-      real*8 field(3,maxatm)
-      real*8 cmp(10,maxatm)
-      real*8 fmp(10,maxatm)
-      real*8 cphi(10,maxatm)
-      real*8 fphi(20,maxatm)
+      real*8 field(3,*)
+      real*8, allocatable :: cmp(:,:)
+      real*8, allocatable :: fmp(:,:)
+      real*8, allocatable :: cphi(:,:)
+      real*8, allocatable :: fphi(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cmp(10,npole))
+      allocate (fmp(10,npole))
+      allocate (cphi(10,npole))
+      allocate (fphi(20,npole))
 c
 c     copy multipole moments and coordinates to local storage
 c
@@ -1666,6 +1673,13 @@ c
          field(2,i) = field(2,i) - cphi(3,i)
          field(3,i) = field(3,i) - cphi(4,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cmp)
+      deallocate (fmp)
+      deallocate (cphi)
+      deallocate (fphi)
       return
       end
 c
@@ -2475,20 +2489,30 @@ c
       integer i,j,k
       real*8 term
       real*8 a(3,3)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 fuind(3,maxatm)
-      real*8 fuinp(3,maxatm)
-      real*8 fdip_phi1(10,maxatm)
-      real*8 fdip_phi2(10,maxatm)
-      real*8 fdip_sum_phi(20,maxatm)
-      real*8 dipfield1(3,maxatm)
-      real*8 dipfield2(3,maxatm)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8, allocatable :: fuind(:,:)
+      real*8, allocatable :: fuinp(:,:)
+      real*8, allocatable :: fdip_phi1(:,:)
+      real*8, allocatable :: fdip_phi2(:,:)
+      real*8, allocatable :: fdip_sum_phi(:,:)
+      real*8, allocatable :: dipfield1(:,:)
+      real*8, allocatable :: dipfield2(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fuind(3,npole))
+      allocate (fuinp(3,npole))
+      allocate (fdip_phi1(10,npole))
+      allocate (fdip_phi2(10,npole))
+      allocate (fdip_sum_phi(20,npole))
+      allocate (dipfield1(3,npole))
+      allocate (dipfield2(3,npole))
 c
 c     convert Cartesian dipoles to fractional coordinates
 c
@@ -2554,6 +2578,16 @@ c
             fieldp(k,i) = fieldp(k,i) - dipfield2(k,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (fuind)
+      deallocate (fuinp)
+      deallocate (fdip_phi1)
+      deallocate (fdip_phi2)
+      deallocate (fdip_sum_phi)
+      deallocate (dipfield1)
+      deallocate (dipfield2)
       return
       end
 c
@@ -3602,7 +3636,7 @@ c
 c
 c     compute mutual induced dipole moments by an iterative method
 c
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, npole
                do j = 1, 3
                   field(j,i) = 0.0d0
@@ -4163,7 +4197,7 @@ c
 c
 c     get mutual induced dipole moments by an iterative method
 c
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, n
                do j = 1, 3
                   indpole(j,i) = 0.0d0

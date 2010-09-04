@@ -24,7 +24,8 @@ c
       include 'cutoff.i'
       include 'iounit.i'
       integer i,ncalls,next
-      real*8 energy,value,elapsed
+      real*8 energy,value
+      real*8 wall,cpu
       real*8 derivs(maxrot)
       real*8 hrot(maxrot,maxrot)
       logical exist,query
@@ -41,11 +42,11 @@ c
 c
 c     get the timing for setup of the calculation
 c
-      call setime
+      call settime
       call mechanic
       call initrot
       if (use_list)  call nblist
-      call getime (elapsed)
+      call gettime (wall,cpu)
 c
 c     get the number of calculation cycles to perform
 c
@@ -82,77 +83,81 @@ c
 c
 c     print the time required for the computation setup
 c
-      write (iout,60)  elapsed
-   60 format (/,' Computation Set-up :',f15.3,' Seconds')
+      write (iout,60)  ncalls
+   60 format (/,' Total Wall Clock and CPU Time in Seconds for',
+     &           i6,' Evaluations :')
+      write (iout,70)  wall,cpu
+   70 format (/,' Computation Set-up :',f15.3,' Sec (Wall)',
+     &           f15.3,' Sec (CPU)')
 c
 c     run the potential energy only timing experiment
 c
-      call setime
+      call settime
       do i = 1, ncalls
          value = energy ()
       end do
-      call getime (elapsed)
-      write (iout,70)  elapsed,ncalls
-   70 format (/,' Potential Energy :  ',f15.3,' Seconds for',
-     &           i6,' Evaluations')
+      call gettime (wall,cpu)
+      write (iout,80)  wall,cpu
+   80 format (/,' Potential Energy :  ',f15.3,' Sec (Wall)',
+     &           f15.3,' Sec (CPU)')
 c
 c     run the energy and gradient timing experiment
 c
-      call setime
+      call settime
       do i = 1, ncalls
          call gradrot (value,derivs)
       end do
-      call getime (elapsed)
-      write (iout,80)  elapsed,ncalls
-   80 format (/,' Energy & Gradient : ',f15.3,' Seconds for',
-     &           i6,' Evaluations')
+      call gettime (wall,cpu)
+      write (iout,90)  wall,cpu
+   90 format (/,' Energy & Gradient : ',f15.3,' Sec (Wall)',
+     &           f15.3,' Sec (CPU)')
 c
 c     run the Hessian matrix only timing experiment
 c
       if (dohessian) then
-         call setime
+         call settime
          do i = 1, ncalls
             call hessrot ('FULL',hrot)
          end do
-         call getime (elapsed)
-         write (iout,90)  elapsed,ncalls
-   90    format (/,' Hessian Matrix :    ',f15.3,' Seconds for',
-     &              i6,' Evaluations')
+         call gettime (wall,cpu)
+         write (iout,100)  wall,cpu
+  100    format (/,' Hessian Matrix :    ',f15.3,' Sec (Wall)',
+     &              f15.3,' Sec (CPU)')
       end if
 c
 c     repeat the potential energy only timing experiment
 c
-      call setime
+      call settime
       do i = 1, ncalls
          value = energy ()
       end do
-      call getime (elapsed)
-      write (iout,100)  elapsed,ncalls
-  100 format (/,' Potential Energy :  ',f15.3,' Seconds for',
-     &           i6,' Evaluations')
+      call gettime (wall,cpu)
+      write (iout,110)  wall,cpu
+  110 format (/,' Potential Energy :  ',f15.3,' Sec (Wall)',
+     &           f15.3,' Sec (CPU)')
 c
 c     repeat the energy and gradient timing experiment
 c
-      call setime
+      call settime
       do i = 1, ncalls
          call gradrot (value,derivs)
       end do
-      call getime (elapsed)
-      write (iout,110)  elapsed,ncalls
-  110 format (/,' Energy & Gradient : ',f15.3,' Seconds for',
-     &           i6,' Evaluations')
+      call gettime (wall,cpu)
+      write (iout,120)  wall,cpu
+  120 format (/,' Energy & Gradient : ',f15.3,' Sec (Wall)',
+     &           f15.3,' Sec (CPU)')
 c
 c     repeat the Hessian matrix only timing experiment
 c
       if (dohessian) then
-         call setime
+         call settime
          do i = 1, ncalls
             call hessrot ('FULL',hrot)
          end do
-         call getime (elapsed)
-         write (iout,120)  elapsed,ncalls
-  120    format (/,' Hessian Matrix :    ',f15.3,' Seconds for',
-     &              i6,' Evaluations')
+         call gettime (wall,cpu)
+         write (iout,130)  wall,cpu
+  130    format (/,' Hessian Matrix :    ',f15.3,' Sec (Wall)',
+     &              f15.3,' Sec (CPU)')
       end if
 c
 c     perform any final tasks before program exit

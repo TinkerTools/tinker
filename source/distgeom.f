@@ -42,9 +42,11 @@ c
       integer next,freeunit
       integer igeo,ngeo,nhydro
       integer r1,r2,r3,r4,b1,b2
-      real*8 angle,hbond1,hbond2
-      real*8 bndfac,angfac,weigh
-      real*8 radi,rmsvalue,secs
+      real*8 angle,weigh
+      real*8 hbond1,hbond2
+      real*8 bndfac,angfac
+      real*8 radi,rmsvalue
+      real*8 wall,cpu
       real*8 rab,rbc,rac,t1,t2
       real*8 qab,qbc,qcd,qac,qbd
       real*8 bndmin,bndmax
@@ -563,12 +565,12 @@ c
       write (iout,250)
   250 format (/,' Bounds Smoothing via Triangle and Inverse',
      &           ' Triangle Inequality :')
-      if (verbose)  call setime
+      if (verbose)  call settime
       call geodesic
 c     call triangle
       if (verbose) then
-         call getime (secs)
-         write (iout,260)  secs
+         call gettime (wall,cpu)
+         write (iout,260)  wall
   260    format (/,' Time Required for Bounds Smoothing :',4x,
      &              f12.2,' seconds')
       end if
@@ -576,7 +578,7 @@ c
 c     allow interactive alteration of the bounds matrix
 c
       done = .false.
-      dowhile (query .and. .not.done)
+      do while (query .and. .not.done)
          done = .true.
          write (iout,270)
   270    format (/,' Enter an Atom Pair to Display Bounds',

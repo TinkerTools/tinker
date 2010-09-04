@@ -170,7 +170,6 @@ DF /compile_only /optimize /fast flatten.f
 DF /compile_only /optimize /fast freeunit.f
 DF /compile_only /optimize /fast gda.f
 DF /compile_only /optimize /fast geometry.f
-DF /compile_only /optimize /fast getime.f
 DF /compile_only /optimize /fast getint.f
 DF /compile_only /optimize /fast getkey.f
 DF /compile_only /optimize /fast getmol2.f
@@ -321,7 +320,6 @@ DF /compile_only /optimize /fast scan.f
 DF /compile_only /optimize /fast sdstep.f
 DF /compile_only /optimize /fast search.f
 DF /compile_only /optimize /fast server.f
-DF /compile_only /optimize /fast setime.f
 DF /compile_only /optimize /fast shakeup.f
 DF /compile_only /optimize /fast sigmoid.f
 DF /compile_only /optimize /fast sktstuff.f

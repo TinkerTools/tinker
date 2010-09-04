@@ -413,7 +413,7 @@ c
 c
 c     find local minimum along each of the steepest directions
 c
-      dowhile (.not. done)
+      do while (.not. done)
          niter = niter + 1
          write (iout,10)  niter,minref
    10    format (/,' Cartesian Mode Search :',5x,'Iteration',i4,
@@ -525,7 +525,7 @@ c
 c
 c     find local minimum along each of the steepest directions
 c
-      dowhile (.not. done)
+      do while (.not. done)
          niter = niter + 1
          write (iout,10)  niter,minref
    10    format (/,' Torsional Mode Search :',5x,'Iteration',i4,
@@ -730,7 +730,7 @@ c
 c
 c     scan the search direction for a minimization candidate
 c
-      dowhile (.not. done)
+      do while (.not. done)
          if (kstep .ne. 0) then
             do i = 1, n
                x(i) = x(i) + step(1,i)
@@ -828,7 +828,7 @@ c
 c
 c     scan the search direction for a minimization candidate
 c
-      dowhile (.not. done)
+      do while (.not. done)
          if (kstep .ne. 0) then
             do i = 1, nomega
                ztors(zline(i)) = ztors(zline(i)) + step(i)

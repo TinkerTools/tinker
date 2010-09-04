@@ -100,7 +100,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=20,end=20)  mode
    20 continue
-      dowhile (mode.lt.1 .or. mode.gt.6)
+      do while (mode.lt.1 .or. mode.gt.6)
          write (iout,30)
    30    format (/,' Enter the Number of the Desired Choice :  ',$)
          read (input,40,err=20)  mode
@@ -117,7 +117,7 @@ c
             call version (srcfile,'old')
             inquire (file=srcfile,exist=exist)
          end if
-         dowhile (.not. exist)
+         do while (.not. exist)
             write (iout,50)
    50       format (/,' Enter Name of Source Code Listing File :  ',$)
             read (input,60)  srcfile
@@ -133,7 +133,7 @@ c     get a list of routines and descriptions from source code
 c
       if (mode .eq. 1) then
          nunit = 0
-         dowhile (.true.)
+         do while (.true.)
             read (isrc,70,err=100,end=100)  record
    70       format (a120)
             if (record(1:9) .eq. 'c     ## ') then
@@ -152,7 +152,7 @@ c
    80             format (///)
                   k = 0
                   done = .false.
-                  dowhile (.not. done)
+                  do while (.not. done)
                      read (isrc,90,err=100,end=100)  record
    90                format (a120)
                      leng = trimtext (record)
@@ -227,7 +227,7 @@ c     get a list of the calls made by each source code routine
 c
       if (mode .eq. 2) then
          nunit = 0
-         dowhile (.true.)
+         do while (.true.)
             read (isrc,170,err=180,end=180)  record
   170       format (a120)
             call upcase (record)
@@ -303,7 +303,7 @@ c     get a list of common block contents from source code
 c
       if (mode .eq. 3) then
          nunit = 0
-         dowhile (.true.)
+         do while (.true.)
             read (isrc,230,err=260,end=260)  record
   230       format (a120)
             if (record(1:9) .eq. 'c     ## ') then
@@ -321,7 +321,7 @@ c
   240             format (///)
                   k = 0
                   done = .false.
-                  dowhile (.not. done)
+                  do while (.not. done)
                      read (isrc,250,err=260,end=260)  record
   250                format (a120)
                      leng = trimtext (record)
@@ -391,7 +391,7 @@ c     get the keyword values from the source code listing
 c
       if (mode .eq. 4) then
          nkey = 0
-         dowhile (.true.)
+         do while (.true.)
             read (isrc,330,err=340,end=340)  record
   330       format (a120)
             next = index (record,'if (keyword(')
@@ -435,7 +435,7 @@ c     get the included files from the source code listing
 c
       if (mode .eq. 5) then
          nkey = 0
-         dowhile (.true.)
+         do while (.true.)
             read (isrc,370,err=380,end=380)  record
   370       format (a120)
             next = 1

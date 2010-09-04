@@ -129,7 +129,7 @@ c     process each line of the parameter file, first
 c     extract the keyword at the start of each line
 c
       iprm = 0
-      dowhile (iprm .lt. nprm)
+      do while (iprm .lt. nprm)
          iprm = iprm + 1
          record = prmline(iprm)
          next = 1

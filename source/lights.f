@@ -116,13 +116,13 @@ c
             xsort(i) = xfrac(i)
             ysort(i) = yfrac(i)
             zsort(i) = zfrac(i)
-            dowhile (abs(xsort(i)) .gt. xcell2)
+            do while (abs(xsort(i)) .gt. xcell2)
                xsort(i) = xsort(i) - sign(xcell,xsort(i))
             end do
-            dowhile (abs(ysort(i)) .gt. ycell2)
+            do while (abs(ysort(i)) .gt. ycell2)
                ysort(i) = ysort(i) - sign(ycell,ysort(i))
             end do
-            dowhile (abs(zsort(i)) .gt. zcell2)
+            do while (abs(zsort(i)) .gt. zcell2)
                zsort(i) = zsort(i) - sign(zcell,zsort(i))
             end do
          end do
@@ -141,13 +141,13 @@ c
                xsort(k) = xfrac(i) + xmove
                ysort(k) = yfrac(i) + ymove
                zsort(k) = zfrac(i) + zmove
-               dowhile (abs(xsort(k)) .gt. xcell2)
+               do while (abs(xsort(k)) .gt. xcell2)
                   xsort(k) = xsort(k) - sign(xcell,xsort(k))
                end do
-               dowhile (abs(ysort(k)) .gt. ycell2)
+               do while (abs(ysort(k)) .gt. ycell2)
                   ysort(k) = ysort(k) - sign(ycell,ysort(k))
                end do
-               dowhile (abs(zsort(k)) .gt. zcell2)
+               do while (abs(zsort(k)) .gt. zcell2)
                   zsort(k) = zsort(k) - sign(zcell,zsort(k))
                end do
             end do
@@ -198,7 +198,7 @@ c
       do i = 1, nlight
          k = locx(i)
          if (k .le. nsite) then
-            dowhile (xsort(j)-xsort(i)+box .lt. xcut)
+            do while (xsort(j)-xsort(i)+box .lt. xcut)
                if (j .eq. nlight) then
                   if (use_bounds) then
                      j = 0
@@ -225,7 +225,7 @@ c
       do i = nlight, 1, -1
          k = locy(i)
          if (k .le. nsite) then
-            dowhile (ysort(i)-ysort(j)+box .le. ycut)
+            do while (ysort(i)-ysort(j)+box .le. ycut)
                if (j .eq. 1) then
                   if (use_bounds) then
                      j = nlight + 1
@@ -252,7 +252,7 @@ c
       do i = 1, nlight
          k = locy(i)
          if (k .le. nsite) then
-            dowhile (ysort(j)-ysort(i)+box .lt. ycut)
+            do while (ysort(j)-ysort(i)+box .lt. ycut)
                if (j .eq. nlight) then
                   if (use_bounds) then
                      j = 0
@@ -279,7 +279,7 @@ c
       do i = nlight, 1, -1
          k = locz(i)
          if (k .le. nsite) then
-            dowhile (zsort(i)-zsort(j)+box .le. zcut)
+            do while (zsort(i)-zsort(j)+box .le. zcut)
                if (j .eq. 1) then
                   if (use_bounds) then
                      j = nlight + 1
@@ -306,7 +306,7 @@ c
       do i = 1, nlight
          k = locz(i)
          if (k .le. nsite) then
-            dowhile (zsort(j)-zsort(i)+box .lt. zcut)
+            do while (zsort(j)-zsort(i)+box .lt. zcut)
                if (j .eq. nlight) then
                   if (use_bounds) then
                      j = 0

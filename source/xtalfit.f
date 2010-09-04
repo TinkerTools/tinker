@@ -71,7 +71,7 @@ c
 c     get the types of potential parameters to be optimized
 c
       query = .true.
-      dowhile (query)
+      do while (query)
          prmtyp = -1
          atom1 = 0
          atom2 = 0

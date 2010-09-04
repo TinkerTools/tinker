@@ -149,7 +149,6 @@ tinker
 +flatten.obj &
 +freeunit.obj &
 +geometry.obj &
-+getime.obj &
 +getint.obj &
 +getkey.obj &
 +getmol2.obj &
@@ -275,7 +274,6 @@ tinker
 +sdstep.obj &
 +search.obj &
 +server.obj &
-+setime.obj &
 +shakeup.obj &
 +sigmoid.obj &
 +sktstuff.obj &

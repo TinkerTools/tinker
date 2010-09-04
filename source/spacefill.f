@@ -150,7 +150,7 @@ c
 c
 c     get area and volume for successive coordinate structures
 c
-      dowhile (.not. abort)
+      do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
             write (iout,100)  frame

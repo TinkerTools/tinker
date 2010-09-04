@@ -35,7 +35,7 @@ c
       logical right,negative
       character*1 digit(0:9)
       character*(*) string
-      data digit / '0','1','2','3','4','5','6','7','8','9' /
+      data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
 c
 c     set justification and size bounds for numeral string

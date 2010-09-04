@@ -5742,18 +5742,18 @@ c
       real*8 cphim(4),cphid(4)
       real*8 cphip(4)
       real*8 a(3,3),ftc(10,10)
-      real*8 frc(3,maxatm)
-      real*8 trq(3,maxatm)
-      real*8 fuind(3,maxatm)
-      real*8 fuinp(3,maxatm)
-      real*8 cmp(10,maxatm)
-      real*8 fmp(10,maxatm)
-      real*8 fphi(20,maxatm)
-      real*8 fphid(10,maxatm)
-      real*8 fphip(10,maxatm)
-      real*8 fphidp(20,maxatm)
-      real*8 cphi(10,maxatm)
-      real*8, pointer :: qgrip(:,:,:,:)
+      real*8, allocatable :: frc(:,:)
+      real*8, allocatable :: trq(:,:)
+      real*8, allocatable :: fuind(:,:)
+      real*8, allocatable :: fuinp(:,:)
+      real*8, allocatable :: cmp(:,:)
+      real*8, allocatable :: fmp(:,:)
+      real*8, allocatable :: fphi(:,:)
+      real*8, allocatable :: fphid(:,:)
+      real*8, allocatable :: fphip(:,:)
+      real*8, allocatable :: fphidp(:,:)
+      real*8, allocatable :: cphi(:,:)
+      real*8, allocatable :: qgrip(:,:,:,:)
 c
 c     derivative indices into the fphi and fdip_phi arrays
 c
@@ -5765,6 +5765,20 @@ c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (frc(3,npole))
+      allocate (trq(3,npole))
+      allocate (fuind(3,npole))
+      allocate (fuinp(3,npole))
+      allocate (cmp(10,npole))
+      allocate (fmp(10,npole))
+      allocate (fphi(20,npole))
+      allocate (fphid(10,npole))
+      allocate (fphip(10,npole))
+      allocate (fphidp(20,npole))
+      allocate (cphi(10,npole))
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -5803,7 +5817,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nullify (qgrip)
       allocate (qgrip(2,nfft1,nfft2,nfft3))
 c
 c     assign permanent and induced multipoles to PME grid
@@ -6239,5 +6252,19 @@ c
       vir(1,3) = vir(1,3) + vzx
       vir(2,3) = vir(2,3) + vzy
       vir(3,3) = vir(3,3) + vzz
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (frc)
+      deallocate (trq)
+      deallocate (fuind)
+      deallocate (fuinp)
+      deallocate (cmp)
+      deallocate (fmp)
+      deallocate (fphi)
+      deallocate (fphid)
+      deallocate (fphip)
+      deallocate (fphidp)
+      deallocate (cphi)
       return
       end

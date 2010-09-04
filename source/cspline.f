@@ -21,23 +21,22 @@ c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
 c     Springer Verlag, 1996, Section 10.1.2  [see routine "isplpe"]
 c
 c
-      subroutine cspline (n,np,xn,fn,b,c,d,h,du,dm,rc,rs)
+      subroutine cspline (n,xn,fn,b,c,d,h,du,dm,rc,rs)
       implicit none
       include 'iounit.i'
-      integer i,n,np
-      integer iflag
+      integer i,n,iflag
       real*8 eps,average
       real*8 temp1,temp2
-      real*8 xn(0:np)
-      real*8 fn(0:np)
-      real*8 b(0:np)
-      real*8 c(0:np)
-      real*8 d(0:np)
-      real*8 h(0:np)
-      real*8 du(0:np)
-      real*8 dm(0:np)
-      real*8 rc(0:np)
-      real*8 rs(0:np)
+      real*8 xn(0:*)
+      real*8 fn(0:*)
+      real*8 b(0:*)
+      real*8 c(0:*)
+      real*8 d(0:*)
+      real*8 h(0:*)
+      real*8 du(0:*)
+      real*8 dm(0:*)
+      real*8 rc(0:*)
+      real*8 rs(0:*)
 c
 c
 c     check the periodicity of fn, and for subsequent call
@@ -78,7 +77,7 @@ c
 c
 c     solve the linear system with factorization
 c
-      call cytsy (n,np,dm,du,rc,rs,c,iflag)
+      call cytsy (n,dm,du,rc,rs,c,iflag)
       if (iflag .ne. 1)  return
 c
 c     compute remaining spline coefficients
@@ -109,26 +108,25 @@ c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
 c     Springer Verlag, 1996, Section 4.11.2
 c
 c
-      subroutine cytsy (n,np,dm,du,cr,rs,x,iflag)
+      subroutine cytsy (n,dm,du,cr,rs,x,iflag)
       implicit none
-      integer n,np
-      integer iflag
-      real*8 dm(0:np)
-      real*8 du(0:np)
-      real*8 cr(0:np)
-      real*8 rs(0:np)
-      real*8 x(0:np)
+      integer n,iflag
+      real*8 dm(0:*)
+      real*8 du(0:*)
+      real*8 cr(0:*)
+      real*8 rs(0:*)
+      real*8 x(0:*)
 c
 c
 c     factorization of the input matrix
 c
       iflag = -2
       if (n .lt. 3)  return
-      call cytsyp (n,np,dm,du,cr,iflag)
+      call cytsyp (n,dm,du,cr,iflag)
 c
 c     update and back substitute as necessary
 c
-      if (iflag .eq. 1)  call cytsys (n,np,dm,du,cr,rs,x)
+      if (iflag .eq. 1)  call cytsys (n,dm,du,cr,rs,x)
       return
       end
 c
@@ -149,15 +147,14 @@ c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
 c     Springer Verlag, 1996, Section 4.11.2
 c
 c
-      subroutine cytsyp (n,np,dm,du,cr,iflag)
+      subroutine cytsyp (n,dm,du,cr,iflag)
       implicit none
-      integer i,n,np
-      integer iflag
+      integer i,n,iflag
       real*8 eps,row,d
       real*8 temp1,temp2
-      real*8 dm(0:np)
-      real*8 du(0:np)
-      real*8 cr(0:np)
+      real*8 dm(0:*)
+      real*8 du(0:*)
+      real*8 cr(0:*)
 c
 c
 c     set error bound and test for condition n greater than 2
@@ -252,15 +249,15 @@ c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
 c     Springer Verlag, 1996, Section 4.11.2
 c
 c
-      subroutine cytsys (n,np,dm,du,cr,rs,x)
+      subroutine cytsys (n,dm,du,cr,rs,x)
       implicit none
-      integer i,n,np
+      integer i,n
       real*8 sum,temp
-      real*8 dm(0:np)
-      real*8 du(0:np)
-      real*8 cr(0:np)
-      real*8 rs(0:np)
-      real*8 x(0:np)
+      real*8 dm(0:*)
+      real*8 du(0:*)
+      real*8 cr(0:*)
+      real*8 rs(0:*)
+      real*8 x(0:*)
 c
 c
 c     updating phase
@@ -277,7 +274,7 @@ c
       temp = temp - sum
       rs(n) = temp / dm(n)
 c
-c     backsubstitution phase
+c     back substitution phase
 c
       x(n) = rs(n)
       x(n-1) = rs(n-1) - du(n-1)*x(n)

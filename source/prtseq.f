@@ -48,7 +48,7 @@ c
          stop = ichain(2,i)
          size = stop - start + 1
          smax = 0
-         dowhile (smax .lt. size)
+         do while (smax .lt. size)
             smin = smax + 1
             smax = smax + 15
             smax = min(smax,size)

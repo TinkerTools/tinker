@@ -26,7 +26,7 @@ c
       integer i,j,k
       integer mi,mj,mk
       integer iattach
-      integer list(maxatm)
+      integer, allocatable :: list(:)
 c
 c
 c     zero number of molecules and molecule membership list
@@ -74,6 +74,10 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
 c     pack atoms of each molecule into a contiguous indexed list
 c
       do i = 1, n
@@ -94,6 +98,10 @@ c
          end if
       end do
       imol(2,nmol) = n
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     sort the list of atoms in each molecule by atom number
 c

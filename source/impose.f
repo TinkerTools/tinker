@@ -28,9 +28,9 @@ c
       integer i,n1,n2
       real*8 xmid,ymid,zmid
       real*8 rmsvalue,rmsfit
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8 x1(*),x2(*)
+      real*8 y1(*),y2(*)
+      real*8 z1(*),z2(*)
 c
 c
 c     superimpose the full structures if not specified

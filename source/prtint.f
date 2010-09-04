@@ -85,10 +85,10 @@ c     convert torsional angles to lie in standard range
 c
       do i = 4, n
          if (iz(4,i) .eq. 0) then
-            dowhile (ztors(i) .lt. -180.0d0)
+            do while (ztors(i) .lt. -180.0d0)
                ztors(i) = ztors(i) + 360.0d0
             end do
-            dowhile (ztors(i) .gt. 180.0d0)
+            do while (ztors(i) .gt. 180.0d0)
                ztors(i) = ztors(i) - 360.0d0
             end do
          end if

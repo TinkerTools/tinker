@@ -28,9 +28,7 @@ c
       real*8 weigh
       real*8 xmid,ymid,zmid
       real*8 xfrac,yfrac,zfrac
-      real*8 xoff(maxatm)
-      real*8 yoff(maxatm)
-      real*8 zoff(maxatm)
+      real*8 xcom,ycom,zcom
 c
 c
 c     locate the center of mass of each molecule
@@ -53,15 +51,6 @@ c
          ymid = ymid / weigh
          zmid = zmid / weigh
 c
-c     save atomic coordinates relative to center of mass
-c
-         do j = init, stop
-            k = kmol(j)
-            xoff(k) = x(k) - xmid
-            yoff(k) = y(k) - ymid
-            zoff(k) = z(k) - zmid
-         end do
-c
 c     get fractional coordinates of center of mass
 c
          if (orthogonal .or. octahedron) then
@@ -80,22 +69,22 @@ c
 c
 c     translate center of mass into the periodic box
 c
-         dowhile (xfrac .gt. xbox2)
+         do while (xfrac .gt. xbox2)
             xfrac = xfrac - xbox
          end do
-         dowhile (xfrac .lt. -xbox2)
+         do while (xfrac .lt. -xbox2)
             xfrac = xfrac + xbox
          end do
-         dowhile (yfrac .gt. ybox2)
+         do while (yfrac .gt. ybox2)
             yfrac = yfrac - ybox
          end do
-         dowhile (yfrac .lt. -ybox2)
+         do while (yfrac .lt. -ybox2)
             yfrac = yfrac + ybox
          end do
-         dowhile (zfrac .gt. zbox2)
+         do while (zfrac .gt. zbox2)
             zfrac = zfrac - zbox
          end do
-         dowhile (zfrac .lt. -zbox2)
+         do while (zfrac .lt. -zbox2)
             zfrac = zfrac + zbox
          end do
 c
@@ -109,29 +98,29 @@ c
             end if
          end if
 c
-c     convert fractional center of mass back to Cartesian
+c     convert translated fraction center of mass to Cartesian
 c
          if (orthogonal .or. octahedron) then
-            xmid = xfrac
-            ymid = yfrac
-            zmid = zfrac
+            xcom = xfrac
+            ycom = yfrac
+            zcom = zfrac
          else if (monoclinic) then
-            xmid = xfrac + zfrac*beta_cos
-            ymid = yfrac
-            zmid = zfrac * beta_sin
+            xcom = xfrac + zfrac*beta_cos
+            ycom = yfrac
+            zcom = zfrac * beta_sin
          else if (triclinic) then
-            xmid = xfrac + yfrac*gamma_cos + zfrac*beta_cos
-            ymid = yfrac*gamma_sin + zfrac*beta_term
-            zmid = zfrac * gamma_term
+            xcom = xfrac + yfrac*gamma_cos + zfrac*beta_cos
+            ycom = yfrac*gamma_sin + zfrac*beta_term
+            zcom = zfrac * gamma_term
          end if
 c
 c     translate coordinates via offset from center of mass
 c
          do j = init, stop
             k = kmol(j)
-            x(k) = xoff(k) + xmid
-            y(k) = yoff(k) + ymid
-            z(k) = zoff(k) + zmid
+            x(k) = x(k) - xmid + xcom
+            y(k) = y(k) - ymid + ycom
+            z(k) = z(k) - zmid + zcom
          end do
       end do
       return

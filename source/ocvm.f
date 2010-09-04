@@ -73,16 +73,22 @@ c
       real*8 micron,mw,us,qk0
       real*8 a,b,b0,c
       real*8 alpha,gamma,delta
-      real*8 x(maxopt),g(maxopt)
-      real*8 x0(maxopt)
-      real*8 x0old(maxopt)
-      real*8 search(maxopt)
-      real*8 s(maxopt),w(maxopt)
-      real*8 k(maxopt),k0(maxopt)
-      real*8 m(maxopt),n(maxopt)
-      real*8 p(maxopt),q(maxopt)
-      real*8 u(maxopt),hq(maxopt)
-      real*8, pointer :: h(:,:)
+      real*8 x0(*)
+      real*8, allocatable :: x0old(:)
+      real*8, allocatable :: x(:)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: hq(:)
+      real*8, allocatable :: search(:)
+      real*8, allocatable :: s(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: k(:)
+      real*8, allocatable :: k0(:)
+      real*8, allocatable :: m(:)
+      real*8, allocatable :: n(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: q(:)
+      real*8, allocatable :: u(:)
+      real*8, allocatable :: h(:,:)
       logical restart,done
       character*9 status
       character*20 keyword
@@ -155,6 +161,24 @@ c
    20    continue
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x0old(nvar))
+      allocate (x(nvar))
+      allocate (g(nvar))
+      allocate (hq(nvar))
+      allocate (search(nvar))
+      allocate (s(mvar))
+      allocate (w(mvar))
+      allocate (k(mvar))
+      allocate (k0(mvar))
+      allocate (m(mvar))
+      allocate (n(mvar))
+      allocate (p(mvar))
+      allocate (q(mvar))
+      allocate (u(mvar))
+      allocate (h(nvar,mvar))
+c
 c     evaluate the function and get the initial gradient
 c
       niter = nextiter - 1
@@ -177,14 +201,9 @@ c
      &              '    X Move      Angle   FG Call',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      nullify (h)
-      allocate (h(nvar,mvar))
-c
 c     set the "h" matrix to a diagonal upon restarting
 c
-      dowhile (.not. done)
+      do while (.not. done)
          if (restart) then
             do j = 1, mvar
                do i = 1, nvar
@@ -549,6 +568,20 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (x0old)
+      deallocate (x)
+      deallocate (g)
+      deallocate (hq)
+      deallocate (search)
+      deallocate (s)
+      deallocate (w)
+      deallocate (k)
+      deallocate (k0)
+      deallocate (m)
+      deallocate (n)
+      deallocate (p)
+      deallocate (q)
+      deallocate (u)
       deallocate (h)
       return
       end

@@ -180,7 +180,7 @@ c
 c
 c     read in the next molecular dynamics coordinate frame
 c
-         dowhile (i.ge.start .and. i.le.stop)
+         do while (i.ge.start .and. i.le.stop)
             istep = istep + 1
             lext = 3
             call numeral (i,ext,lext)

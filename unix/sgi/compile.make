@@ -169,7 +169,6 @@ f77 -c -O -mips4 flatten.f
 f77 -c -O -mips4 freeunit.f
 f77 -c -O -mips4 gda.f
 f77 -c -O -mips4 geometry.f
-f77 -c -O -mips4 getime.f
 f77 -c -O -mips4 getint.f
 f77 -c -O -mips4 getkey.f
 f77 -c -O -mips4 getmol2.f
@@ -320,7 +319,6 @@ f77 -c -O -mips4 scan.f
 f77 -c -O -mips4 sdstep.f
 f77 -c -O -mips4 search.f
 f77 -c -O -mips4 server.f
-f77 -c -O -mips4 setime.f
 f77 -c -O -mips4 shakeup.f
 f77 -c -O -mips4 sigmoid.f
 f77 -c -O -mips4 sktstuff.f

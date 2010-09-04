@@ -190,7 +190,7 @@ c
 c
 c     check to see if the mutual induced dipoles have converged
 c
-         dowhile (.not. done)
+         do while (.not. done)
             call ufield (field)
             iter = iter + 1
             epsold = eps

@@ -31,7 +31,7 @@ c
       include 'virial.i'
       integer i,j
       real*8 energy,cutoff
-      real*8 derivs(3,maxatm)
+      real*8 derivs(3,*)
 c
 c
 c     zero out each of the potential energy components

@@ -165,7 +165,7 @@ c     use iterative scheme to converge the angular momenta
 c
             iter = 0
             delta = 1.0d0
-            dowhile (delta.gt.eps .and. iter.lt.maxiter)
+            do while (delta.gt.eps .and. iter.lt.maxiter)
                iter = iter + 1
                call rotrgd (dfi,arot)
 c

@@ -169,7 +169,6 @@ pgf77 -c -fast flatten.f
 pgf77 -c -fast freeunit.f
 pgf77 -c -fast gda.f
 pgf77 -c -fast geometry.f
-pgf77 -c -fast getime.f
 pgf77 -c -fast getint.f
 pgf77 -c -fast getkey.f
 pgf77 -c -fast getmol2.f
@@ -320,7 +319,6 @@ pgf77 -c -fast scan.f
 pgf77 -c -fast sdstep.f
 pgf77 -c -fast search.f
 pgf77 -c -fast server.f
-pgf77 -c -fast setime.f
 pgf77 -c -fast shakeup.f
 pgf77 -c -fast sigmoid.f
 pgf77 -c -fast sktstuff.f

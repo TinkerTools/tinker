@@ -27,7 +27,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -42,7 +42,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -91,7 +91,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -110,7 +110,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -162,7 +162,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -181,7 +181,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -224,7 +224,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -239,7 +239,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (abs(list(j)) .lt. abs(list(j+1)))  j = j + 1
             end if
@@ -281,7 +281,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -296,7 +296,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                jmod = mod(list(j),m)
                j1mod = mod(list(j+1),m)
@@ -349,7 +349,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -364,7 +364,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -414,7 +414,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -433,7 +433,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -477,7 +477,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -503,7 +503,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -545,7 +545,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -571,7 +571,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if
@@ -613,7 +613,7 @@ c     perform the heapsort of the input list
 c
       k = n/2 + 1
       index = n
-      dowhile (n .gt. 1)
+      do while (n .gt. 1)
          if (k .gt. 1) then
             k = k - 1
             lists = list(k)
@@ -639,7 +639,7 @@ c
          end if
          i = k
          j = k + k
-         dowhile (j .le. index)
+         do while (j .le. index)
             if (j .lt. index) then
                if (list(j) .lt. list(j+1))  j = j + 1
             end if

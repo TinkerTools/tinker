@@ -32,7 +32,7 @@ c
       real*8 xdist,ydist,zdist
       real*8 xterm,yterm,zterm
       real*8 g(3,maxatm)
-      real*8 derivs(maxrot)
+      real*8 derivs(*)
 c
 c
 c     zero out individual components of torsional derivatives

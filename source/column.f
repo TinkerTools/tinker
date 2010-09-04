@@ -22,13 +22,13 @@ c
       include 'sizes.i'
       integer i,j,k
       integer m,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer cinit(maxvar)
-      integer cstop(maxvar)
-      integer hindex(maxhess)
-      integer cindex(maxhess)
-      integer cvalue(maxhess)
+      integer hinit(*)
+      integer hstop(*)
+      integer cinit(*)
+      integer cstop(*)
+      integer hindex(*)
+      integer cindex(*)
+      integer cvalue(*)
 c
 c
 c     zero out the start and end marker for each column

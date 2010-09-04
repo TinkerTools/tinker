@@ -1662,7 +1662,7 @@ c
          ratio = rinit
          e = 0.0d0
          done = .false.
-         dowhile (.not. done)
+         do while (.not. done)
             inner = roff(i)
             outer = inner + t
             roff(i) = 0.5d0 * (inner+outer)

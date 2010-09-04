@@ -31,8 +31,8 @@ c
       real*8 minimum,minimiz1
       real*8 grdmin,gnorm,grms
       real*8 energy,eps
-      real*8 xx(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: derivs(:,:)
       logical exist,analytic
       character*20 keyword
       character*120 minfile
@@ -109,6 +109,11 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+      allocate (derivs(3,n))
+c
 c     scale the coordinates of each active atom
 c
       nvar = 0
@@ -159,6 +164,11 @@ c
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / sqrt(dble(nvar/3))
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      deallocate (derivs)
 c
 c     write out the final function and gradient values
 c
@@ -235,9 +245,9 @@ c
       integer i,nvar
       real*8 minimiz1,e
       real*8 energy,eps
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
       logical analytic
       external energy
 c
@@ -260,6 +270,10 @@ c
             z(i) = xx(nvar) / scale(nvar)
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -284,5 +298,9 @@ c
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

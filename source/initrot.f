@@ -80,7 +80,7 @@ c
 c     manual selection of the torsional angles to be rotated
 c
       if (mode .eq. 1) then
-         dowhile (nomega .lt. maxrot)
+         do while (nomega .lt. maxrot)
             nomega = nomega + 1
             j1 = 0
             j2 = 0

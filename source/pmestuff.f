@@ -89,7 +89,7 @@ c
       integer i,j,k
       integer level
       real*8 w,denom
-      real*8 thetai(4,bsorder)
+      real*8 thetai(4,*)
       real*8 temp(maxorder,maxorder)
 c
 c
@@ -491,7 +491,7 @@ c
       real*8 v1,u1,t1
       real*8 v2,u2,t2
       real*8 term0,term1,term2
-      real*8 fmp(10,maxatm)
+      real*8 fmp(10,*)
 c
 c
 c     zero out the particle mesh Ewald charge grid
@@ -617,8 +617,8 @@ c
       real*8 v1,u1,t1
       real*8 term01,term11
       real*8 term02,term12
-      real*8 fuind(3,maxatm)
-      real*8 fuinp(3,maxatm)
+      real*8 fuind(3,*)
+      real*8 fuinp(3,*)
 c
 c
 c     zero out the particle mesh Ewald charge grid
@@ -790,7 +790,7 @@ c
       real*8 tuv101,tuv011,tuv300,tuv030
       real*8 tuv003,tuv210,tuv201,tuv120
       real*8 tuv021,tuv102,tuv012,tuv111
-      real*8 fphi(20,maxatm)
+      real*8 fphi(20,*)
 c
 c
 c     set OpenMP directives for the major loop structure
@@ -971,9 +971,9 @@ c
       real*8 tuv101,tuv011,tuv300,tuv030
       real*8 tuv003,tuv210,tuv201,tuv120
       real*8 tuv021,tuv102,tuv012,tuv111
-      real*8 fdip_phi1(10,maxatm)
-      real*8 fdip_phi2(10,maxatm)
-      real*8 fdip_sum_phi(20,maxatm)
+      real*8 fdip_phi1(10,*)
+      real*8 fdip_phi2(10,*)
+      real*8 fdip_sum_phi(20,*)
 c
 c
 c     set OpenMP directives for the major loop structure
@@ -1217,8 +1217,8 @@ c
       include 'mpole.i'
       integer i,j,k
       real*8 ctf(10,10)
-      real*8 cmp(10,maxatm)
-      real*8 fmp(10,maxatm)
+      real*8 cmp(10,*)
+      real*8 fmp(10,*)
 c
 c
 c     find the matrix to convert Cartesian to fractional
@@ -1334,8 +1334,8 @@ c
       include 'mpole.i'
       integer i,j,k
       real*8 ftc(10,10)
-      real*8 cphi(10,maxatm)
-      real*8 fphi(20,maxatm)
+      real*8 cphi(10,*)
+      real*8 fphi(20,*)
 c
 c
 c     find the matrix to convert fractional to Cartesian

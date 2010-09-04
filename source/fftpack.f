@@ -50,21 +50,22 @@ c
       subroutine cffti1 (n,wa,ifac)
       implicit none
       include 'math.i'
-      integer i,j,ii,n,ifac(*)
-      integer ib,ido,idot,ip,ipm
+      integer i,j,ii,n,ip,ipm
+      integer ib,ido,idot
       integer i1,k1,l1,l2,ld
       integer nl,nf,nq,nr
       integer ntry,ntryh(4)
-      real*8 arg,argh,argld
-      real*8 fi,wa(*)
-      data ntryh / 3, 4, 2, 5 /
+      integer ifac(*)
+      real*8 arg,argh,argld,fi
+      real*8 wa(*)
+      data ntryh  / 3, 4, 2, 5 /
 c
 c
       nl = n
       nf = 0
       j = 1
       ntry = ntryh(j)
-      dowhile (nl .ne. 1)
+      do while (nl .ne. 1)
          nq = nl / ntry
          nr = nl - ntry*nq
          if (nr .eq. 0) then

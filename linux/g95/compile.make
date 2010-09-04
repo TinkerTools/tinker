@@ -169,7 +169,6 @@ g95 -c -O flatten.f
 g95 -c -O freeunit.f
 g95 -c -O gda.f
 g95 -c -O geometry.f
-g95 -c -O getime.f
 g95 -c -O getint.f
 g95 -c -O getkey.f
 g95 -c -O getmol2.f
@@ -320,7 +319,6 @@ g95 -c -O scan.f
 g95 -c -O sdstep.f
 g95 -c -O search.f
 g95 -c -O server.f
-g95 -c -O setime.f
 g95 -c -O shakeup.f
 g95 -c -O sigmoid.f
 g95 -c -O sktstuff.f

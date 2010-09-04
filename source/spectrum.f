@@ -54,7 +54,7 @@ c
 c
 c     ask for the velocity autocorrelation data filename
 c
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter Name of Velocity Autocorrelation',
      &              ' File :  ',$)
@@ -91,7 +91,7 @@ c
 c     read through file headers to the start of the data
 c
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          read (ivel,60)  record
    60    format (a120)
          if (record(4:13) .eq. 'Separation') then

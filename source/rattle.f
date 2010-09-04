@@ -75,7 +75,7 @@ c     apply rattle to distances and half-step velocity values
 c
       niter = 0
       done = .false.
-      dowhile (.not.done .and. niter.lt.maxiter)
+      do while (.not.done .and. niter.lt.maxiter)
          niter = niter + 1
          done = .true.
          do i = 1, nrat
@@ -245,7 +245,7 @@ c
 c
 c     apply the rattle algorithm to correct the velocities
 c
-      dowhile (.not.done .and. niter.lt.maxiter)
+      do while (.not.done .and. niter.lt.maxiter)
          niter = niter + 1
          done = .true.
          do i = 1, nrat

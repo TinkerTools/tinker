@@ -197,7 +197,7 @@ c     use bicubic interpolation to compute spline values
 c
                nlo = 1
                nhi = tnx(k)
-               dowhile (nhi-nlo .gt. 1)
+               do while (nhi-nlo .gt. 1)
                   nt = (nhi+nlo) / 2
                   if (ttx(nt,k) .gt. value1) then
                      nhi = nt
@@ -208,7 +208,7 @@ c
                xlo = nlo
                nlo = 1
                nhi = tny(k)
-               dowhile (nhi-nlo .gt. 1)
+               do while (nhi-nlo .gt. 1)
                   nt = (nhi + nlo)/2
                   if (tty(nt,k) .gt. value2) then
                      nhi = nt

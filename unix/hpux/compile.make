@@ -169,7 +169,6 @@ fort77 -c -O2 +E1 flatten.f
 fort77 -c -O2 +E1 freeunit.f
 fort77 -c -O2 +E1 gda.f
 fort77 -c -O2 +E1 geometry.f
-fort77 -c -O2 +E1 getime.f
 fort77 -c -O2 +E1 getint.f
 fort77 -c -O2 +E1 getkey.f
 fort77 -c -O2 +E1 getmol2.f
@@ -320,7 +319,6 @@ fort77 -c -O2 +E1 scan.f
 fort77 -c -O2 +E1 sdstep.f
 fort77 -c -O2 +E1 search.f
 fort77 -c -O2 +E1 server.f
-fort77 -c -O2 +E1 setime.f
 fort77 -c -O2 +E1 shakeup.f
 fort77 -c -O2 +E1 sigmoid.f
 fort77 -c -O2 +E1 sktstuff.f

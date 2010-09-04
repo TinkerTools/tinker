@@ -107,7 +107,7 @@ c
             rold = roff(i)
             total = 0.0d0
             done = .false.
-            dowhile (.not. done)
+            do while (.not. done)
                roff(i) = roff(i) + 0.5d0*t
                call surfatom (i,area,roff)
                fraction = area / (4.0d0*pi*roff(i)**2)
@@ -382,7 +382,7 @@ c
          write (iout,10)
    10    format (/,' Born Radii for Individual Atoms :',/)
          k = 1
-         dowhile (k .le. n)
+         do while (k .le. n)
             write (iout,20)  (i,rborn(i),i=k,min(k+4,n))
    20       format (1x,5(i7,f8.3))
             k = k + 5

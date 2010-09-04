@@ -169,7 +169,6 @@ ifort -c -g -warn unused -check uninit -check bounds flatten.f
 ifort -c -g -warn unused -check uninit -check bounds freeunit.f
 ifort -c -g -warn unused -check uninit -check bounds gda.f
 ifort -c -g -warn unused -check uninit -check bounds geometry.f
-ifort -c -g -warn unused -check uninit -check bounds getime.f
 ifort -c -g -warn unused -check uninit -check bounds getint.f
 ifort -c -g -warn unused -check uninit -check bounds getkey.f
 ifort -c -g -warn unused -check uninit -check bounds getmol2.f
@@ -320,7 +319,6 @@ ifort -c -g -warn unused -check uninit -check bounds scan.f
 ifort -c -g -warn unused -check uninit -check bounds sdstep.f
 ifort -c -g -warn unused -check uninit -check bounds search.f
 ifort -c -g -warn unused -check uninit -check bounds server.f
-ifort -c -g -warn unused -check uninit -check bounds setime.f
 ifort -c -g -warn unused -check uninit -check bounds shakeup.f
 ifort -c -g -warn unused -check uninit -check bounds sigmoid.f
 ifort -c -g -warn unused -check uninit -check bounds sktstuff.f

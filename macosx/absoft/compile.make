@@ -170,7 +170,6 @@ f77 -c -O -N11 flatten.f
 f77 -c -O -N11 freeunit.f
 f77 -c -O -N11 gda.f
 f77 -c -O -N11 geometry.f
-f77 -c -O -N11 getime.f
 f77 -c -O -N11 getint.f
 f77 -c -O -N11 getkey.f
 f77 -c -O -N11 getmol2.f
@@ -321,7 +320,6 @@ f77 -c -O -N11 scan.f
 f77 -c -O -N11 sdstep.f
 f77 -c -O -N11 search.f
 f77 -c -O -N11 server.f
-f77 -c -O -N11 setime.f
 f77 -c -O -N11 shakeup.f
 f77 -c -O -N11 sigmoid.f
 f77 -c -O -N11 sktstuff.f

@@ -2855,336 +2855,336 @@ multipole   337  333  332               0.13794
       ########################################
 
 
-polarize      1           0.205      0.390
-polarize      2           0.395      0.390
-polarize      3           1.640      0.390
-polarize      4           2.480      0.390
-polarize      5           4.040      0.390
-polarize      6           0.028      0.390
-polarize      7           0.120      0.390
-polarize      8           0.780      0.390
-polarize      9           1.350      0.390
-polarize     10           2.260      0.390
-polarize     11           0.080      0.095
-polarize     12           0.550      0.110
-polarize     13           1.350      0.390
-polarize     14           4.000      0.390
-polarize     15           5.650      0.390
-polarize     16           7.250      0.390
-polarize     17           1.600      0.390      18
-polarize     18           0.600      0.390      17
-polarize     19           1.828      0.390      20
-polarize     20           0.600      0.390      19
-polarize     21           1.073      0.390      21
-polarize     22           1.334      0.390      23
-polarize     23           0.496      0.390      22
-polarize     24           1.334      0.390      25
-polarize     25           0.496      0.390      24
-polarize     26           1.334      0.390      27
-polarize     27           0.496      0.390      26
-polarize     28           1.334      0.390      29
-polarize     29           0.496      0.390      28
-polarize     30           1.334      0.390      31
-polarize     31           0.496      0.390      30
-polarize     32           1.334      0.390
-polarize     33           0.837      0.390      34
-polarize     34           0.496      0.390      33
-polarize     35           1.334      0.390      36
-polarize     36           0.496      0.390      35
-polarize     37           0.837      0.390      38
-polarize     38           0.496      0.390      37
-polarize     39           1.334      0.390      40
-polarize     40           0.496      0.390      39
-polarize     41           1.334      0.390      42
-polarize     42           0.496      0.390      41
-polarize     43           0.834      0.390      44
-polarize     44           0.496      0.390      43
-polarize     45           1.334      0.390      46
-polarize     46           0.496      0.390      45
-polarize     47           1.334      0.390      48
-polarize     48           0.496      0.390      47
-polarize     49           1.334      0.390      50
-polarize     50           0.496      0.390      49
-polarize     51           1.334      0.390      52
-polarize     52           0.496      0.390      51
-polarize     53           0.834      0.390      54
-polarize     54           0.496      0.390      53
-polarize     55           0.837      0.390
-polarize     56           1.334      0.390      57
-polarize     57           0.496      0.390      56
-polarize     58           1.073      0.390      59
-polarize     59           0.496      0.390      58
-polarize     61           1.073      0.390      62
-polarize     62           0.496      0.390      61
-polarize     63           1.334      0.390      64
-polarize     64           0.496      0.390      63
-polarize     65           1.073      0.390      66
-polarize     66           0.496      0.390      65
-polarize     67           1.334      0.390      68
-polarize     68           0.496      0.390      67
-polarize     69           1.334      0.390      70
-polarize     70           0.496      0.390      69
-polarize     71           1.073      0.390      72
-polarize     72           0.496      0.390      71
-polarize     73           1.334      0.390      74
-polarize     74           0.496      0.390      73
-polarize     75           1.334      0.390      76
-polarize     76           0.496      0.390      75
-polarize     77           1.334      0.390      78
-polarize     78           0.496      0.390      77
-polarize     79           1.073      0.390      80
-polarize     80           0.496      0.390      79
-polarize     81           1.334      0.390      82
-polarize     82           0.496      0.390      81
-polarize     83           1.073      0.390
-polarize     84           1.334      0.390      85
-polarize     85           0.496      0.390      84
-polarize     86           1.334      0.390      87
-polarize     87           0.496      0.390      86
-polarize     88           1.073      0.390      89
-polarize     89           0.496      0.390      88
-polarize     90           1.650      0.390
-polarize     92           1.650      0.390
-polarize     94           0.809      0.390
-polarize     95           2.000      0.390
-polarize     97           1.334      0.390      98   99  100
-polarize     98           0.496      0.390      97
-polarize     99           0.837      0.390      97
-polarize    100           1.073      0.390      97  101
-polarize    101           0.496      0.390     100
-polarize    102           1.334      0.390     103  104
-polarize    103           0.837      0.390     102
-polarize    104           1.073      0.390     102  105
-polarize    105           0.496      0.390     104
-polarize    106           1.334      0.390     107
-polarize    107           0.496      0.390     106
-polarize    108           1.334      0.390     109
-polarize    109           0.496      0.390     108
-polarize    110           1.334      0.390     111
-polarize    111           0.496      0.390     110
-polarize    112           1.334      0.390     113  114  115
-polarize    113           0.496      0.390     112
-polarize    114           0.837      0.390     112
-polarize    115           1.073      0.390     112  116
-polarize    116           0.496      0.390     115
-polarize    117           1.334      0.390     118
-polarize    118           0.496      0.390     117  119
-polarize    119           1.334      0.390     118
-polarize    120           1.334      0.390     121
-polarize    121           0.496      0.390     120
-polarize    122           1.334      0.390     123  124
-polarize    123           0.837      0.390     122
-polarize    124           1.073      0.390     122  125
-polarize    125           0.496      0.390     124
-polarize    126           1.334      0.390     127
-polarize    127           0.496      0.390     126
-polarize    128           1.334      0.390     129
-polarize    129           0.496      0.390     128
-polarize    130           1.334      0.390     131  132  133
-polarize    131           0.496      0.390     130
-polarize    132           0.837      0.390     130
-polarize    133           1.073      0.390     130
-polarize    134           1.334      0.390     135
-polarize    135           0.496      0.390     134
-polarize    136           1.334      0.390     137  138
-polarize    137           0.837      0.390     136
-polarize    138           1.073      0.390     136
-polarize    139           1.334      0.390     140
-polarize    140           0.496      0.390     139
-polarize    141           1.334      0.390     142
-polarize    142           0.496      0.390     141
-polarize    143           0.837      0.390     144  145
-polarize    144           0.496      0.390     143
-polarize    145           1.334      0.390     143  146  147
-polarize    146           0.837      0.390     145
-polarize    147           0.496      0.390     145
-polarize    148           0.837      0.390     149  150
-polarize    149           0.496      0.390     148
-polarize    150           1.334      0.390     148  151
-polarize    151           0.496      0.390     150
-polarize    152           1.334      0.390     153
-polarize    153           0.496      0.390     152
-polarize    154           1.334      0.390     155  156
-polarize    155           0.837      0.390     154
-polarize    156           0.496      0.390     154
-polarize    157           1.334      0.390     158  161
-polarize    158           0.837      0.390     157
-polarize    159           1.334      0.390     160
-polarize    160           0.496      0.390     159
-polarize    161           0.496      0.390     157
-polarize    162           3.300      0.390     163
-polarize    163           0.496      0.390     162
-polarize    164           1.334      0.390     165
-polarize    165           0.496      0.390     164
-polarize    166           3.300      0.390     167
-polarize    167           0.496      0.390     166
-polarize    168           3.300      0.390
-polarize    169           1.334      0.390     170
-polarize    170           0.496      0.390     169
-polarize    171           3.300      0.390     171
-polarize    172           1.334      0.390     173
-polarize    173           0.496      0.390     172
-polarize    174           1.334      0.390     175
-polarize    175           0.496      0.390     174
-polarize    176           1.334      0.390     177
-polarize    177           0.496      0.390     176
-polarize    178           3.300      0.390     179
-polarize    179           0.496      0.390     178
-polarize    180           1.334      0.390     181
-polarize    181           0.496      0.390     180
-polarize    182           1.334      0.390     183
-polarize    183           0.496      0.390     182
-polarize    184           3.300      0.390
-polarize    185           1.334      0.390     186
-polarize    186           0.496      0.390     185
-polarize    187           1.334      0.390     190
-polarize    188           0.496      0.390     189
-polarize    189           3.300      0.390     188
-polarize    190           0.837      0.390     187
-polarize    191           1.334      0.390     192
-polarize    192           0.496      0.390     191
-polarize    193           1.334      0.390     194
-polarize    194           0.496      0.390     193
-polarize    195           3.300      0.390     196
-polarize    196           0.837      0.390     195
-polarize    197           1.334      0.390     198
-polarize    198           0.496      0.390     197
-polarize    199           1.334      0.390     200
-polarize    200           0.496      0.390     199
-polarize    201           1.334      0.390     202
-polarize    202           1.334      0.390     201  203
-polarize    203           1.073      0.390     202
-polarize    204           1.750      0.390     204  205
-polarize    205           0.696      0.390     204
-polarize    206           1.750      0.390     207
-polarize    207           1.750      0.390     206  208  210
-polarize    208           1.750      0.390     207  209  211
-polarize    209           1.750      0.390     208  212
-polarize    210           0.696      0.390     207
-polarize    211           0.696      0.390     208
-polarize    212           0.696      0.390     209
-polarize    213           1.334      0.390     214
-polarize    214           0.496      0.390     213
-polarize    215           1.334      0.390     216
-polarize    216           0.496      0.390     215
-polarize    217           1.750      0.390     218
-polarize    218           1.750      0.390     217  219  221
-polarize    219           1.750      0.390     218  220  222
-polarize    220           1.750      0.390     219  223
-polarize    221           0.696      0.390     218
-polarize    222           0.696      0.390     219
-polarize    223           0.696      0.390     220
-polarize    224           0.837      0.390     225
-polarize    225           0.496      0.390     224
-polarize    226           1.750      0.390     227
-polarize    227           1.750      0.390     226  228  230
-polarize    228           1.750      0.390     227  229  231
-polarize    229           1.750      0.390     228  232
-polarize    230           0.696      0.390     227
-polarize    231           0.696      0.390     228
-polarize    232           0.696      0.390     229
-polarize    233           1.334      0.390     234
-polarize    234           0.496      0.390     233
-polarize    235           1.750      0.390     236
-polarize    236           1.750      0.390     235  237  239
-polarize    237           1.750      0.390     236  238  240
-polarize    238           1.750      0.390     237
-polarize    239           0.696      0.390     236
-polarize    240           0.696      0.390     237
-polarize    241           1.334      0.390     242
-polarize    242           0.496      0.390     241
-polarize    243           0.873      0.390     244
-polarize    244           0.496      0.390     243
-polarize    245           1.073      0.390     246  247  252
-polarize    246           0.496      0.390     245
-polarize    247           1.334      0.390     245  248  249
-polarize    248           0.496      0.390     247
-polarize    249           1.073      0.390     247  250
-polarize    250           1.334      0.390     249  251  252
-polarize    251           0.496      0.390     250
-polarize    252           1.334      0.390     245  250  253
-polarize    253           0.496      0.390     252
-polarize    254           1.377      0.390     255
-polarize    255           0.496      0.390     254
-polarize    256           1.337      0.390     257
-polarize    257           0.496      0.390     256
-polarize    258           1.073      0.390     259  260  266
-polarize    259           0.496      0.390     258
-polarize    260           1.334      0.390     258  261  262
-polarize    261           0.496      0.390     260
-polarize    262           1.073      0.390     260  263  264
-polarize    263           0.496      0.390     262
-polarize    264           1.334      0.390     262  265  266
-polarize    265           0.496      0.390     264
-polarize    266           1.334      0.390     258  264
-polarize    267           1.073      0.390     268  269  272
-polarize    268           0.496      0.390     267
-polarize    269           1.334      0.390     267  270  277
-polarize    270           1.334      0.390     269  271  278
-polarize    271           1.334      0.390     270  272  273
-polarize    272           1.334      0.390     267  271  276
-polarize    273           1.334      0.390     271  274  279
-polarize    274           1.334      0.390     273  275  280
-polarize    275           1.334      0.390     274  276  281
-polarize    276           1.334      0.390     272  275  282
-polarize    277           0.496      0.390     269
-polarize    278           0.496      0.390     270
-polarize    279           0.496      0.390     273
-polarize    280           0.496      0.390     274
-polarize    281           0.496      0.390     275
-polarize    282           0.496      0.390     276
-polarize    283           1.073      0.390     284  285  291
-polarize    284           0.496      0.390     283
-polarize    285           1.334      0.390     283  286  293
-polarize    286           1.334      0.390     285  292
-polarize    287           1.334      0.390     288  292  294
-polarize    288           1.334      0.390     287  289  295
-polarize    289           1.334      0.390     288  290  296
-polarize    290           1.334      0.390     289  291  297
-polarize    291           1.334      0.390     283  290  292
-polarize    292           1.334      0.390     286  287  291
-polarize    293           0.496      0.390     285
-polarize    294           0.496      0.390     287
-polarize    295           0.496      0.390     288
-polarize    296           0.496      0.390     289
-polarize    297           0.496      0.390     290
-polarize    298           1.334      0.390     299
-polarize    299           0.496      0.390     298
-polarize    300           1.334      0.390     301
-polarize    301           0.496      0.390     300
-polarize    302           1.073      0.390     303  304  310
-polarize    303           0.496      0.390     302
-polarize    304           1.334      0.390     302  305  312
-polarize    305           1.334      0.390     304  311  317
-polarize    306           1.334      0.390     307  311  313
-polarize    307           1.334      0.390     306  308  314
-polarize    308           1.334      0.390     307  309  315
-polarize    309           1.334      0.390     308  310  316
-polarize    310           1.334      0.390     302  309  311
-polarize    311           1.334      0.390     305  306  310
-polarize    312           0.496      0.390     304
-polarize    313           0.496      0.390     306
-polarize    314           0.496      0.390     307
-polarize    315           0.496      0.390     308
-polarize    316           0.496      0.390     309
-polarize    317           1.334      0.390     305  318  319
-polarize    318           0.837      0.390     317
-polarize    319           0.496      0.390     317
-polarize    320           1.073      0.390     321  322
-polarize    321           0.496      0.390     320
-polarize    322           0.496      0.390     320  323
-polarize    323           1.750      0.390     322  324
-polarize    324           1.750      0.390     323  325  327
-polarize    325           1.750      0.390     324  326  328
-polarize    326           1.750      0.390     325  329
-polarize    327           0.696      0.390     324
-polarize    328           0.696      0.390     325
-polarize    329           0.696      0.390     326
-polarize    330           1.073      0.390     331  334
-polarize    331           1.750      0.390     330  332  335
-polarize    332           1.750      0.390     331  333  336
-polarize    333           1.750      0.390     332  337
-polarize    334           0.496      0.390     330
-polarize    335           0.696      0.390     331
-polarize    336           0.696      0.390     332
-polarize    337           0.696      0.390     333
+polarize      1          0.2050     0.3900
+polarize      2          0.3950     0.3900
+polarize      3          1.6400     0.3900
+polarize      4          2.4800     0.3900
+polarize      5          4.0400     0.3900
+polarize      6          0.0280     0.3900
+polarize      7          0.1200     0.3900
+polarize      8          0.7800     0.3900
+polarize      9          1.3500     0.3900
+polarize     10          2.2600     0.3900
+polarize     11          0.0800     0.0950
+polarize     12          0.5500     0.1100
+polarize     13          1.3500     0.3900
+polarize     14          4.0000     0.3900
+polarize     15          5.6500     0.3900
+polarize     16          7.2500     0.3900
+polarize     17          1.6000     0.3900     18
+polarize     18          0.6000     0.3900     17
+polarize     19          1.8280     0.3900     20
+polarize     20          0.6000     0.3900     19
+polarize     21          1.0730     0.3900     21
+polarize     22          1.3340     0.3900     23
+polarize     23          0.4960     0.3900     22
+polarize     24          1.3340     0.3900     25
+polarize     25          0.4960     0.3900     24
+polarize     26          1.3340     0.3900     27
+polarize     27          0.4960     0.3900     26
+polarize     28          1.3340     0.3900     29
+polarize     29          0.4960     0.3900     28
+polarize     30          1.3340     0.3900     31
+polarize     31          0.4960     0.3900     30
+polarize     32          1.3340     0.3900
+polarize     33          0.8370     0.3900     34
+polarize     34          0.4960     0.3900     33
+polarize     35          1.3340     0.3900     36
+polarize     36          0.4960     0.3900     35
+polarize     37          0.8370     0.3900     38
+polarize     38          0.4960     0.3900     37
+polarize     39          1.3340     0.3900     40
+polarize     40          0.4960     0.3900     39
+polarize     41          1.3340     0.3900     42
+polarize     42          0.4960     0.3900     41
+polarize     43          0.8340     0.3900     44
+polarize     44          0.4960     0.3900     43
+polarize     45          1.3340     0.3900     46
+polarize     46          0.4960     0.3900     45
+polarize     47          1.3340     0.3900     48
+polarize     48          0.4960     0.3900     47
+polarize     49          1.3340     0.3900     50
+polarize     50          0.4960     0.3900     49
+polarize     51          1.3340     0.3900     52
+polarize     52          0.4960     0.3900     51
+polarize     53          0.8340     0.3900     54
+polarize     54          0.4960     0.3900     53
+polarize     55          0.8370     0.3900
+polarize     56          1.3340     0.3900     57
+polarize     57          0.4960     0.3900     56
+polarize     58          1.0730     0.3900     59
+polarize     59          0.4960     0.3900     58
+polarize     61          1.0730     0.3900     62
+polarize     62          0.4960     0.3900     61
+polarize     63          1.3340     0.3900     64
+polarize     64          0.4960     0.3900     63
+polarize     65          1.0730     0.3900     66
+polarize     66          0.4960     0.3900     65
+polarize     67          1.3340     0.3900     68
+polarize     68          0.4960     0.3900     67
+polarize     69          1.3340     0.3900     70
+polarize     70          0.4960     0.3900     69
+polarize     71          1.0730     0.3900     72
+polarize     72          0.4960     0.3900     71
+polarize     73          1.3340     0.3900     74
+polarize     74          0.4960     0.3900     73
+polarize     75          1.3340     0.3900     76
+polarize     76          0.4960     0.3900     75
+polarize     77          1.3340     0.3900     78
+polarize     78          0.4960     0.3900     77
+polarize     79          1.0730     0.3900     80
+polarize     80          0.4960     0.3900     79
+polarize     81          1.3340     0.3900     82
+polarize     82          0.4960     0.3900     81
+polarize     83          1.0730     0.3900
+polarize     84          1.3340     0.3900     85
+polarize     85          0.4960     0.3900     84
+polarize     86          1.3340     0.3900     87
+polarize     87          0.4960     0.3900     86
+polarize     88          1.0730     0.3900     89
+polarize     89          0.4960     0.3900     88
+polarize     90          1.6500     0.3900
+polarize     92          1.6500     0.3900
+polarize     94          0.8090     0.3900
+polarize     95          2.0000     0.3900
+polarize     97          1.3340     0.3900     98   99  100
+polarize     98          0.4960     0.3900     97
+polarize     99          0.8370     0.3900     97
+polarize    100          1.0730     0.3900     97  101
+polarize    101          0.4960     0.3900    100
+polarize    102          1.3340     0.3900    103  104
+polarize    103          0.8370     0.3900    102
+polarize    104          1.0730     0.3900    102  105
+polarize    105          0.4960     0.3900    104
+polarize    106          1.3340     0.3900    107
+polarize    107          0.4960     0.3900    106
+polarize    108          1.3340     0.3900    109
+polarize    109          0.4960     0.3900    108
+polarize    110          1.3340     0.3900    111
+polarize    111          0.4960     0.3900    110
+polarize    112          1.3340     0.3900    113  114  115
+polarize    113          0.4960     0.3900    112
+polarize    114          0.8370     0.3900    112
+polarize    115          1.0730     0.3900    112  116
+polarize    116          0.4960     0.3900    115
+polarize    117          1.3340     0.3900    118
+polarize    118          0.4960     0.3900    117  119
+polarize    119          1.3340     0.3900    118
+polarize    120          1.3340     0.3900    121
+polarize    121          0.4960     0.3900    120
+polarize    122          1.3340     0.3900    123  124
+polarize    123          0.8370     0.3900    122
+polarize    124          1.0730     0.3900    122  125
+polarize    125          0.4960     0.3900    124
+polarize    126          1.3340     0.3900    127
+polarize    127          0.4960     0.3900    126
+polarize    128          1.3340     0.3900    129
+polarize    129          0.4960     0.3900    128
+polarize    130          1.3340     0.3900    131  132  133
+polarize    131          0.4960     0.3900    130
+polarize    132          0.8370     0.3900    130
+polarize    133          1.0730     0.3900    130
+polarize    134          1.3340     0.3900    135
+polarize    135          0.4960     0.3900    134
+polarize    136          1.3340     0.3900    137  138
+polarize    137          0.8370     0.3900    136
+polarize    138          1.0730     0.3900    136
+polarize    139          1.3340     0.3900    140
+polarize    140          0.4960     0.3900    139
+polarize    141          1.3340     0.3900    142
+polarize    142          0.4960     0.3900    141
+polarize    143          0.8370     0.3900    144  145
+polarize    144          0.4960     0.3900    143
+polarize    145          1.3340     0.3900    143  146  147
+polarize    146          0.8370     0.3900    145
+polarize    147          0.4960     0.3900    145
+polarize    148          0.8370     0.3900    149  150
+polarize    149          0.4960     0.3900    148
+polarize    150          1.3340     0.3900    148  151
+polarize    151          0.4960     0.3900    150
+polarize    152          1.3340     0.3900    153
+polarize    153          0.4960     0.3900    152
+polarize    154          1.3340     0.3900    155  156
+polarize    155          0.8370     0.3900    154
+polarize    156          0.4960     0.3900    154
+polarize    157          1.3340     0.3900    158  161
+polarize    158          0.8370     0.3900    157
+polarize    159          1.3340     0.3900    160
+polarize    160          0.4960     0.3900    159
+polarize    161          0.4960     0.3900    157
+polarize    162          3.3000     0.3900    163
+polarize    163          0.4960     0.3900    162
+polarize    164          1.3340     0.3900    165
+polarize    165          0.4960     0.3900    164
+polarize    166          3.3000     0.3900    167
+polarize    167          0.4960     0.3900    166
+polarize    168          3.3000     0.3900
+polarize    169          1.3340     0.3900    170
+polarize    170          0.4960     0.3900    169
+polarize    171          3.3000     0.3900    171
+polarize    172          1.3340     0.3900    173
+polarize    173          0.4960     0.3900    172
+polarize    174          1.3340     0.3900    175
+polarize    175          0.4960     0.3900    174
+polarize    176          1.3340     0.3900    177
+polarize    177          0.4960     0.3900    176
+polarize    178          3.3000     0.3900    179
+polarize    179          0.4960     0.3900    178
+polarize    180          1.3340     0.3900    181
+polarize    181          0.4960     0.3900    180
+polarize    182          1.3340     0.3900    183
+polarize    183          0.4960     0.3900    182
+polarize    184          3.3000     0.3900
+polarize    185          1.3340     0.3900    186
+polarize    186          0.4960     0.3900    185
+polarize    187          1.3340     0.3900    190
+polarize    188          0.4960     0.3900    189
+polarize    189          3.3000     0.3900    188
+polarize    190          0.8370     0.3900    187
+polarize    191          1.3340     0.3900    192
+polarize    192          0.4960     0.3900    191
+polarize    193          1.3340     0.3900    194
+polarize    194          0.4960     0.3900    193
+polarize    195          3.3000     0.3900    196
+polarize    196          0.8370     0.3900    195
+polarize    197          1.3340     0.3900    198
+polarize    198          0.4960     0.3900    197
+polarize    199          1.3340     0.3900    200
+polarize    200          0.4960     0.3900    199
+polarize    201          1.3340     0.3900    202
+polarize    202          1.3340     0.3900    201  203
+polarize    203          1.0730     0.3900    202
+polarize    204          1.7500     0.3900    204  205
+polarize    205          0.6960     0.3900    204
+polarize    206          1.7500     0.3900    207
+polarize    207          1.7500     0.3900    206  208  210
+polarize    208          1.7500     0.3900    207  209  211
+polarize    209          1.7500     0.3900    208  212
+polarize    210          0.6960     0.3900    207
+polarize    211          0.6960     0.3900    208
+polarize    212          0.6960     0.3900    209
+polarize    213          1.3340     0.3900    214
+polarize    214          0.4960     0.3900    213
+polarize    215          1.3340     0.3900    216
+polarize    216          0.4960     0.3900    215
+polarize    217          1.7500     0.3900    218
+polarize    218          1.7500     0.3900    217  219  221
+polarize    219          1.7500     0.3900    218  220  222
+polarize    220          1.7500     0.3900    219  223
+polarize    221          0.6960     0.3900    218
+polarize    222          0.6960     0.3900    219
+polarize    223          0.6960     0.3900    220
+polarize    224          0.8370     0.3900    225
+polarize    225          0.4960     0.3900    224
+polarize    226          1.7500     0.3900    227
+polarize    227          1.7500     0.3900    226  228  230
+polarize    228          1.7500     0.3900    227  229  231
+polarize    229          1.7500     0.3900    228  232
+polarize    230          0.6960     0.3900    227
+polarize    231          0.6960     0.3900    228
+polarize    232          0.6960     0.3900    229
+polarize    233          1.3340     0.3900    234
+polarize    234          0.4960     0.3900    233
+polarize    235          1.7500     0.3900    236
+polarize    236          1.7500     0.3900    235  237  239
+polarize    237          1.7500     0.3900    236  238  240
+polarize    238          1.7500     0.3900    237
+polarize    239          0.6960     0.3900    236
+polarize    240          0.6960     0.3900    237
+polarize    241          1.3340     0.3900    242
+polarize    242          0.4960     0.3900    241
+polarize    243          0.8730     0.3900    244
+polarize    244          0.4960     0.3900    243
+polarize    245          1.0730     0.3900    246  247  252
+polarize    246          0.4960     0.3900    245
+polarize    247          1.3340     0.3900    245  248  249
+polarize    248          0.4960     0.3900    247
+polarize    249          1.0730     0.3900    247  250
+polarize    250          1.3340     0.3900    249  251  252
+polarize    251          0.4960     0.3900    250
+polarize    252          1.3340     0.3900    245  250  253
+polarize    253          0.4960     0.3900    252
+polarize    254          1.3770     0.3900    255
+polarize    255          0.4960     0.3900    254
+polarize    256          1.3370     0.3900    257
+polarize    257          0.4960     0.3900    256
+polarize    258          1.0730     0.3900    259  260  266
+polarize    259          0.4960     0.3900    258
+polarize    260          1.3340     0.3900    258  261  262
+polarize    261          0.4960     0.3900    260
+polarize    262          1.0730     0.3900    260  263  264
+polarize    263          0.4960     0.3900    262
+polarize    264          1.3340     0.3900    262  265  266
+polarize    265          0.4960     0.3900    264
+polarize    266          1.3340     0.3900    258  264
+polarize    267          1.0730     0.3900    268  269  272
+polarize    268          0.4960     0.3900    267
+polarize    269          1.3340     0.3900    267  270  277
+polarize    270          1.3340     0.3900    269  271  278
+polarize    271          1.3340     0.3900    270  272  273
+polarize    272          1.3340     0.3900    267  271  276
+polarize    273          1.3340     0.3900    271  274  279
+polarize    274          1.3340     0.3900    273  275  280
+polarize    275          1.3340     0.3900    274  276  281
+polarize    276          1.3340     0.3900    272  275  282
+polarize    277          0.4960     0.3900    269
+polarize    278          0.4960     0.3900    270
+polarize    279          0.4960     0.3900    273
+polarize    280          0.4960     0.3900    274
+polarize    281          0.4960     0.3900    275
+polarize    282          0.4960     0.3900    276
+polarize    283          1.0730     0.3900    284  285  291
+polarize    284          0.4960     0.3900    283
+polarize    285          1.3340     0.3900    283  286  293
+polarize    286          1.3340     0.3900    285  292
+polarize    287          1.3340     0.3900    288  292  294
+polarize    288          1.3340     0.3900    287  289  295
+polarize    289          1.3340     0.3900    288  290  296
+polarize    290          1.3340     0.3900    289  291  297
+polarize    291          1.3340     0.3900    283  290  292
+polarize    292          1.3340     0.3900    286  287  291
+polarize    293          0.4960     0.3900    285
+polarize    294          0.4960     0.3900    287
+polarize    295          0.4960     0.3900    288
+polarize    296          0.4960     0.3900    289
+polarize    297          0.4960     0.3900    290
+polarize    298          1.3340     0.3900    299
+polarize    299          0.4960     0.3900    298
+polarize    300          1.3340     0.3900    301
+polarize    301          0.4960     0.3900    300
+polarize    302          1.0730     0.3900    303  304  310
+polarize    303          0.4960     0.3900    302
+polarize    304          1.3340     0.3900    302  305  312
+polarize    305          1.3340     0.3900    304  311  317
+polarize    306          1.3340     0.3900    307  311  313
+polarize    307          1.3340     0.3900    306  308  314
+polarize    308          1.3340     0.3900    307  309  315
+polarize    309          1.3340     0.3900    308  310  316
+polarize    310          1.3340     0.3900    302  309  311
+polarize    311          1.3340     0.3900    305  306  310
+polarize    312          0.4960     0.3900    304
+polarize    313          0.4960     0.3900    306
+polarize    314          0.4960     0.3900    307
+polarize    315          0.4960     0.3900    308
+polarize    316          0.4960     0.3900    309
+polarize    317          1.3340     0.3900    305  318  319
+polarize    318          0.8370     0.3900    317
+polarize    319          0.4960     0.3900    317
+polarize    320          1.0730     0.3900    321  322
+polarize    321          0.4960     0.3900    320
+polarize    322          0.4960     0.3900    320  323
+polarize    323          1.7500     0.3900    322  324
+polarize    324          1.7500     0.3900    323  325  327
+polarize    325          1.7500     0.3900    324  326  328
+polarize    326          1.7500     0.3900    325  329
+polarize    327          0.6960     0.3900    324
+polarize    328          0.6960     0.3900    325
+polarize    329          0.6960     0.3900    326
+polarize    330          1.0730     0.3900    331  334
+polarize    331          1.7500     0.3900    330  332  335
+polarize    332          1.7500     0.3900    331  333  336
+polarize    333          1.7500     0.3900    332  337
+polarize    334          0.4960     0.3900    330
+polarize    335          0.6960     0.3900    331
+polarize    336          0.6960     0.3900    332
+polarize    337          0.6960     0.3900    333

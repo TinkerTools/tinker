@@ -32,7 +32,7 @@ c
       real*8 ephi(3),etheta(3)
       real*8 epsi(3),tau(3)
       real*8 g(3,maxatm)
-      real*8 derivs(6,maxgrp)
+      real*8 derivs(6,*)
 c
 c
 c     zero out the total of rigid body derivative components

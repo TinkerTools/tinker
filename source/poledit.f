@@ -42,7 +42,7 @@ c
      &           //,4x,'(1) Multipole Parameters from GDMA Output',
      &           /,4x,'(2) Alter Local Coordinate Frame Definitions',
      &           /,4x,'(3) Removal of Intramolecular Polarization')
-         dowhile (mode.lt.1 .or. mode.gt.3)
+         do while (mode.lt.1 .or. mode.gt.3)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)
@@ -153,7 +153,7 @@ c
 c
 c     ask for the user specified GDMA output filename
 c
-      dowhile (.not. exist)
+      do while (.not. exist)
          write (iout,10)
    10    format (/,' Enter GDMA Output File Name :  ',$)
          read (input,20)  dmafile
@@ -173,7 +173,7 @@ c     get coordinates and multipoles from GDMA output file
 c
       i = 0
       rewind (unit=idma)
-      dowhile (.true.)
+      do while (.true.)
          read (idma,30,err=50,end=50)  record
    30    format (a120)
          if (i .ne. 0)  call match1 (i,record)
@@ -216,7 +216,7 @@ c     check for GDMA coordinate values in atomic units
 c
       use_bohr = .false.
       rewind (unit=idma)
-      dowhile (.true.)
+      do while (.true.)
          read (idma,60,err=70,end=70)  record
    60    format (a120)
          if (record(1:27) .eq. 'Positions and radii in bohr') then
@@ -240,13 +240,13 @@ c     find atomic numbers in verbose GDMA output if available
 c
       done = .false.
       rewind (unit=idma)
-      dowhile (.true.)
+      do while (.true.)
          read (idma,80,err=100,end=100)  record
    80    format (a120)
          if (record(1:16) .eq. 'Nuclear charges:') then
             k = min(n,20)
             read (record(17:120),*,err=100,end=100)  (atomic(i),i=1,k)
-            dowhile (k .ne. n)
+            do while (k .ne. n)
                j = k + 1
                k = min(n,k+20)
                read (idma,90,err=100,end=100)  record
@@ -825,7 +825,7 @@ c     allow the user to manually alter local coordinate frames
 c
       query = .true.
       alter = .false.
-      dowhile (query)
+      do while (query)
          i = 0
          ia = 0
          ib = 0
@@ -1129,7 +1129,7 @@ c     allow the user to manually alter local coordinate frames
 c
       query = .true.
       alter = .false.
-      dowhile (query)
+      do while (query)
          ii = 0
          ia = 0
          ib = 0
@@ -1354,7 +1354,7 @@ c     allow the user to manually alter polarizability values
 c
       query = .true.
       alter = .false.
-      dowhile (query)
+      do while (query)
          ii = 0
          pol = 0.0d0
          thl = 0.39d0
@@ -1412,7 +1412,7 @@ c
 c     get the bonds that separate the polarization groups
 c
       query = .true.
-      dowhile (query)
+      do while (query)
          ia = 0
          ib = 0
          write (iout,130)
@@ -1779,7 +1779,7 @@ c
 c
 c     compute mutual induced dipole moments by an iterative method
 c
-      dowhile (.not. done)
+      do while (.not. done)
          do i = 1, npole
             do j = 1, 3
                field(j,i) = 0.0d0

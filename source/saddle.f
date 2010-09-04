@@ -306,7 +306,7 @@ c
 c
 c     make an iterative search for quadratic line maximum
 c
-      dowhile (.not. done)
+      do while (.not. done)
          f_0 = f
          t = t + delta
          call pathpnt (nvar,t,xx,xmin1,xmin2)
@@ -331,7 +331,7 @@ c
             goto 130
          end if
          spanned = .false.
-         dowhile (.not. spanned)
+         do while (.not. spanned)
             p = 2.0d0 * p
             t = t + p*delta
             if (t .le. 0.0d0) then
@@ -456,7 +456,7 @@ c
 c
 c     line search to find minimum in conjugate direction
 c
-      dowhile (.not. terminate)
+      do while (.not. terminate)
          ninner = ninner + 1
          f_old = f
          g2_old = g2
