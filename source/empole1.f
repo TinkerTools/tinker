@@ -104,7 +104,8 @@ c
       include 'virial.i'
       integer i,j,k
       integer ii,kk,jcell
-      integer ix,iz,kx,kz
+      integer ix,iy,iz
+      integer kx,ky,kz
       integer iax,iay,iaz
       integer kax,kay,kaz
       real*8 e,ei,f,fgrp,gfd
@@ -210,6 +211,7 @@ c
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
+         iy = yaxis(i)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -225,7 +227,7 @@ c
          qi(7) = rpole(11,i)
          qi(8) = rpole(12,i)
          qi(9) = rpole(13,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix))
+         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -242,7 +244,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                 if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -269,7 +271,8 @@ c
             kk = ipole(k)
             kz = zaxis(k)
             kx = xaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx))
+            ky = yaxis(k)
+            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -770,12 +773,12 @@ c
 c
 c     increment the internal virial tensor components
 c
-               iaz = zaxis(i)
-               iax = xaxis(i)
-               iay = yaxis(i)
-               kaz = zaxis(k)
-               kax = xaxis(k)
-               kay = yaxis(k)
+               iaz = iz
+               iax = iz
+               iay = iy
+               kaz = kz
+               kax = kx
+               kay = ky
                if (iaz .eq. 0)  iaz = ii
                if (iax .eq. 0)  iax = ii
                if (iay .eq. 0)  iay = ii
@@ -878,6 +881,7 @@ c
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
+         iy = yaxis(i)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -893,7 +897,7 @@ c
          qi(7) = rpole(11,i)
          qi(8) = rpole(12,i)
          qi(9) = rpole(13,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix))
+         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -933,7 +937,8 @@ c
             kk = ipole(k)
             kz = zaxis(k)
             kx = xaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx))
+            ky = yaxis(k)
+            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
@@ -1489,12 +1494,12 @@ c
 c
 c     increment the internal virial tensor components
 c
-               iaz = zaxis(i)
-               iax = xaxis(i)
-               iay = yaxis(i)
-               kaz = zaxis(k)
-               kax = xaxis(k)
-               kay = yaxis(k)
+               iaz = iz
+               iax = ix
+               iay = iy
+               kaz = kz
+               kax = kx
+               kay = ky
                if (iaz .eq. 0)  iaz = ii
                if (iax .eq. 0)  iax = ii
                if (iay .eq. 0)  iay = ii
@@ -1628,7 +1633,8 @@ c
       include 'virial.i'
       integer i,j,k
       integer ii,kk,kkk
-      integer ix,iz,kx,kz
+      integer ix,iy,iz
+      integer kx,ky,kz
       integer iax,iay,iaz
       integer kax,kay,kaz
       real*8 e,ei,f,fgrp,gfd
@@ -1734,6 +1740,7 @@ c
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
+         iy = yaxis(i)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -1749,7 +1756,7 @@ c
          qi(7) = rpole(11,i)
          qi(8) = rpole(12,i)
          qi(9) = rpole(13,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix))
+         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -1766,7 +1773,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                 if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -1794,7 +1801,8 @@ c
             kk = ipole(k)
             kz = zaxis(k)
             kx = xaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx))
+            ky = yaxis(k)
+            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -2295,12 +2303,12 @@ c
 c
 c     increment the internal virial tensor components
 c
-               iaz = zaxis(i)
-               iax = xaxis(i)
-               iay = yaxis(i)
-               kaz = zaxis(k)
-               kax = xaxis(k)
-               kay = yaxis(k)
+               iaz = iz
+               iax = ix
+               iay = iy
+               kaz = kz
+               kax = kx
+               kay = ky
                if (iaz .eq. 0)  iaz = ii
                if (iax .eq. 0)  iax = ii
                if (iay .eq. 0)  iay = ii
@@ -2627,7 +2635,7 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine ereal1c  --  ewald real space derivs via loop  ##
+c     ##  subroutine ereal1c  --  Ewald real space derivs via loop  ##
 c     ##                                                            ##
 c     ################################################################
 c
@@ -2788,7 +2796,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                 if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -4724,15 +4732,23 @@ c
       real*8 gf(7),gfi(6)
       real*8 gfr(7),gfri(6)
       real*8 gti(6),gtri(6)
+      real*8 viri(3,3)
+c     real*8, allocatable :: mscale(:)
+c     real*8, allocatable :: pscale(:)
+c     real*8, allocatable :: dscale(:)
+c     real*8, allocatable :: uscale(:)
+      real*8, allocatable :: demi(:,:)
+      real*8, allocatable :: demk(:,:)
+      real*8, allocatable :: depi(:,:)
+      real*8, allocatable :: depk(:,:)
       real*8 mscale(maxatm)
       real*8 pscale(maxatm)
       real*8 dscale(maxatm)
       real*8 uscale(maxatm)
-      real*8 viri(3,3)
-      real*8 demi(3,maxatm)
-      real*8 demk(3,maxatm)
-      real*8 depi(3,maxatm)
-      real*8 depk(3,maxatm)
+c     real*8 demi(3,maxatm)
+c     real*8 demk(3,maxatm)
+c     real*8 depi(3,maxatm)
+c     real*8 depk(3,maxatm)
       logical dorl,dorli
       external erfc
 c
@@ -4741,6 +4757,17 @@ c     zero out the intramolecular portion of the Ewald energy
 c
       eintra = 0.0d0
       if (npole .eq. 0)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+c     allocate (mscale(n))
+c     allocate (pscale(n))
+c     allocate (dscale(n))
+c     allocate (uscale(n))
+      allocate (demi(3,n))
+      allocate (demk(3,n))
+      allocate (depi(3,n))
+      allocate (depk(3,n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -4760,7 +4787,7 @@ c     initialize local variables for OpenMP calculation
 c
       emtt = 0.0d0
       eptt = 0.0d0
-      do i = 1, maxatm
+      do i = 1, n
          do j = 1, 3
             demi(j,i) = 0.0d0
             demk(j,i) = 0.0d0
@@ -4832,7 +4859,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                 if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -5665,7 +5692,7 @@ c     add local copies to global variables for OpenMP calculation
 c
       em = em + emtt
       ep = ep + eptt
-      do i = 1, maxatm
+      do i = 1, n
          do j = 1, 3
             dem(j,i) = dem(j,i) + demi(j,i) + demk(j,i)
             dep(j,i) = dep(j,i) + depi(j,i) + depk(j,i)
@@ -5676,6 +5703,17 @@ c
             vir(j,i) = vir(j,i) + viri(j,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+c     deallocate (mscale)
+c     deallocate (pscale)
+c     deallocate (dscale)
+c     deallocate (uscale)
+      deallocate (demi)
+      deallocate (demk)
+      deallocate (depi)
+      deallocate (depk)
       return
       end
 c

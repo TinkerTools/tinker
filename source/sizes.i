@@ -65,7 +65,7 @@ c
       integer maxnuc,maxbnd,maxang
       integer maxtors,maxbitor,maxpi
       integer maxpib,maxpit
-      parameter (maxatm=75000)
+      parameter (maxatm=50000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
       parameter (maxref=10)

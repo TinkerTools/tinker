@@ -30,24 +30,18 @@ Kernel configured for up to 2 processors.
 Processor type: i486 (Intel 80486)
 Processors active: 0 1
 Primary memory available: 4.00 gigabytes
-Default processor set: 68 tasks, 274 threads, 2 processors
-Load average: 0.29, Mach factor: 1.69
+Default processor set: 60 tasks, 246 threads, 2 processors
+Load average: 0.52, Mach factor: 1.47
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
+PATH: /opt/pgi/osx86-64/10.8/bin
 PATH: /opt/intel/Compiler/11.1/088/bin/intel64
 PATH: /opt/intel/Compiler/11.1/088/bin
 PATH: /opt/intel/Compiler/11.1/088/bin/intel64
 PATH: /opt/intel/Compiler/11.1/088/bin
-PATH: /opt/intel/Compiler/11.1/088/bin/intel64
-PATH: /opt/intel/Compiler/11.1/088/bin
-PATH: /opt/intel/Compiler/11.1/088/bin/intel64
-PATH: /opt/intel/Compiler/11.1/088/bin
-PATH: /opt/intel/Compiler/11.1/088/bin/intel64
-PATH: /opt/intel/Compiler/11.1/088/bin
-PATH: /opt/intel/Compiler/11.1/088/bin/intel64
-PATH: /opt/intel/Compiler/11.1/088/bin
+PATH: /opt/pgi/osx86-64/10.8/bin
 PATH: /opt/intel/Compiler/11.1/088/bin/intel64
 PATH: /opt/intel/Compiler/11.1/088/bin
 PATH: /opt/intel/Compiler/11.1/088/bin/intel64
@@ -57,23 +51,8 @@ PATH: /bin
 PATH: /usr/sbin
 PATH: /sbin
 PATH: /usr/local/bin
+PATH: /usr/local/git/bin
 PATH: /usr/X11/bin
-PATH: /usr/X11R6/bin
-PATH: .
-PATH: /Applications/bin
-PATH: /Users/ponder/tinker/bin
-PATH: /Applications/gaussian/g09/bin
-PATH: /Applications/gaussian/g09/bsd
-PATH: /Applications/gaussian/g09
-PATH: /Applications/orca
-PATH: /usr/X11R6/bin
-PATH: .
-PATH: /Applications/bin
-PATH: /Users/ponder/tinker/bin
-PATH: /Applications/gaussian/g09/bin
-PATH: /Applications/gaussian/g09/bsd
-PATH: /Applications/gaussian/g09
-PATH: /Applications/orca
 PATH: /usr/X11R6/bin
 PATH: .
 PATH: /Applications/bin
@@ -120,23 +99,23 @@ configure:2711: result: i386-apple-darwin10.4.0
 configure:2733: checking host system type
 configure:2748: result: i386-apple-darwin10.4.0
 configure:3181: checking for gcc
-configure:3208: result: icc
+configure:3208: result: pgcc
 configure:3440: checking for C compiler version
-configure:3448: icc --version >&5
-icc (ICC) 11.1 20100401
-Copyright (C) 1985-2010 Intel Corporation.  All rights reserved.
-
-configure:3452: $? = 0
-configure:3459: icc -v >&5
-Version 11.1 
+configure:3448: pgcc --version >&5
+pgcc-Error-Unknown switch: --version
+configure:3452: $? = 1
+configure:3459: pgcc -v >&5
+pgcc-Warning-No files to process
 configure:3463: $? = 0
-configure:3470: icc -V >&5
-Intel(R) C Intel(R) 64 Compiler Professional for applications running on Intel(R) 64, Version 11.1    Build 20100401 Package ID: m_cproc_p_11.1.088
-Copyright (C) 1985-2010 Intel Corporation.  All rights reserved.
+configure:3470: pgcc -V >&5
 
+pgcc 10.8-0 64-bit target on Apple OS/X -tp penryn-64 
+Copyright 1989-2000, The Portland Group, Inc.  All Rights Reserved.
+Copyright 2000-2010, STMicroelectronics, Inc.  All Rights Reserved.
 configure:3474: $? = 0
 configure:3497: checking for C compiler default output file name
-configure:3519: icc    conftest.c  >&5
+configure:3519: pgcc    conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:3523: $? = 0
 configure:3561: result: a.out
 configure:3580: checking whether the C compiler works
@@ -146,387 +125,565 @@ configure:3613: result: yes
 configure:3620: checking whether we are cross compiling
 configure:3622: result: no
 configure:3625: checking for suffix of executables
-configure:3632: icc -o conftest    conftest.c  >&5
+configure:3632: pgcc -o conftest    conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:3636: $? = 0
 configure:3662: result: 
 configure:3668: checking for suffix of object files
-configure:3694: icc -c   conftest.c >&5
+configure:3694: pgcc -c   conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:3698: $? = 0
 configure:3723: result: o
 configure:3727: checking whether we are using the GNU C compiler
-configure:3756: icc -c   conftest.c >&5
-configure:3763: $? = 0
-configure:3780: result: yes
-configure:3789: checking whether icc accepts -g
-configure:3819: icc -c -g  conftest.c >&5
+configure:3756: pgcc -c   conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0040-Illegal use of symbol, choke (conftest.c: 16)
+PGC-W-0156-Type not specified, 'int' assumed (conftest.c: 16)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:3763: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| #ifndef __GNUC__
+|        choke me
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:3780: result: no
+configure:3789: checking whether pgcc accepts -g
+configure:3819: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:3826: $? = 0
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+|   ;
+|   return 0;
+| }
+configure:3858: pgcc -c   conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+configure:3865: $? = 0
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+|   ;
+|   return 0;
+| }
+configure:3898: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+configure:3905: $? = 0
 configure:3927: result: yes
-configure:3944: checking for icc option to accept ISO C89
-configure:4018: icc  -c -g -O2  conftest.c >&5
+configure:3944: checking for pgcc option to accept ISO C89
+configure:4018: pgcc  -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-W-0261-no macro replacement within a character constant (conftest.c: 45)
+PGC/x86-64 OSX 10.8-0: compilation completed with warnings
 configure:4025: $? = 0
 configure:4048: result: none needed
 configure:4077: checking for style of include used by make
 configure:4105: result: GNU
-configure:4130: checking dependency style of icc
-configure:4221: result: gcc3
+configure:4130: checking dependency style of pgcc
+configure:4221: result: none
 configure:4238: checking for C compiler vendor
-configure:4272: icc -c -g -O2  conftest.c >&5
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__ICC) || defined(__ECC) || defined(__INTEL_COMPILER))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__xlc__) || defined(__xlC__) || defined(__IBMC__) || defined(__IBMCPP__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__PATHCC__) || defined(__PATHSCALE__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__GNUC__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__SUNPRO_C) || defined(__SUNPRO_CC))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__HP_cc) || defined(__HP_aCC))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__DECC) || defined(__DECCXX) || defined(__DECC_VER) || defined(__DECCXX_VER))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__BORLANDC__) || defined(__TURBOC__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__COMO__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(_CRAYC))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__KCC))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__LCC__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__MWERKS__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__sgi) || defined(sgi))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(_MSC_VER))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
+PGC-S-0039-Use of undeclared variable thisisanerror (conftest.c: 17)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
+configure:4279: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+| #if !(defined(__WATCOMC__))
+|       thisisanerror;
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:4272: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:4279: $? = 0
-configure:4296: result: intel
-configure:4301: checking for icc option to accept ISO C99
-configure:4460: icc  -c -g -O2  conftest.c >&5
-conftest.c(61): error: expected a ")"
-  test_restrict (ccp restrict text)
-                              ^
-
-conftest.c(66): error: expected an expression
-    for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-         ^
-
-conftest.c(66): error: identifier "text" is undefined
-    for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-                               ^
-
-conftest.c(66): error: identifier "i" is undefined
-    for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-                                    ^
-
-conftest.c(115): error: expected a ";"
-    char *restrict newvar = "Another string";
-                   ^
-
-conftest.c(125): error: expected an expression
-    for (int i = 0; i < ia->datasize; ++i)
-         ^
-
-conftest.c(125): error: identifier "i" is undefined
-    for (int i = 0; i < ia->datasize; ++i)
-                    ^
-
-conftest.c(141): error: identifier "newvar" is undefined
-    return (!success || bignum == 0LL || ubignum == 0uLL || newvar[0] == 'x'
-                                                            ^
-
-compilation aborted for conftest.c (code 2)
-configure:4467: $? = 2
-configure: failed program was:
-| /* confdefs.h.  */
-| #define PACKAGE_NAME "fftw"
-| #define PACKAGE_TARNAME "fftw"
-| #define PACKAGE_VERSION "3.2.2"
-| #define PACKAGE_STRING "fftw 3.2.2"
-| #define PACKAGE_BUGREPORT "fftw@fftw.org"
-| #define PACKAGE "fftw"
-| #define VERSION "3.2.2"
-| #define FFTW_ENABLE_ALLOCA 1
-| /* end confdefs.h.  */
-| #include <stdarg.h>
-| #include <stdbool.h>
-| #include <stdlib.h>
-| #include <wchar.h>
-| #include <stdio.h>
-| 
-| // Check varargs macros.  These examples are taken from C99 6.10.3.5.
-| #define debug(...) fprintf (stderr, __VA_ARGS__)
-| #define showlist(...) puts (#__VA_ARGS__)
-| #define report(test,...) ((test) ? puts (#test) : printf (__VA_ARGS__))
-| static void
-| test_varargs_macros (void)
-| {
-|   int x = 1234;
-|   int y = 5678;
-|   debug ("Flag");
-|   debug ("X = %d\n", x);
-|   showlist (The first, second, and third items.);
-|   report (x>y, "x is %d but y is %d", x, y);
-| }
-| 
-| // Check long long types.
-| #define BIG64 18446744073709551615ull
-| #define BIG32 4294967295ul
-| #define BIG_OK (BIG64 / BIG32 == 4294967297ull && BIG64 % BIG32 == 0)
-| #if !BIG_OK
-|   your preprocessor is broken;
-| #endif
-| #if BIG_OK
-| #else
-|   your preprocessor is broken;
-| #endif
-| static long long int bignum = -9223372036854775807LL;
-| static unsigned long long int ubignum = BIG64;
-| 
-| struct incomplete_array
-| {
-|   int datasize;
-|   double data[];
-| };
-| 
-| struct named_init {
-|   int number;
-|   const wchar_t *name;
-|   double average;
-| };
-| 
-| typedef const char *ccp;
-| 
-| static inline int
-| test_restrict (ccp restrict text)
-| {
-|   // See if C++-style comments work.
-|   // Iterate through items via the restricted pointer.
-|   // Also check for declarations in for loops.
-|   for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-|     continue;
-|   return 0;
-| }
-| 
-| // Check varargs and va_copy.
-| static void
-| test_varargs (const char *format, ...)
-| {
-|   va_list args;
-|   va_start (args, format);
-|   va_list args_copy;
-|   va_copy (args_copy, args);
-| 
-|   const char *str;
-|   int number;
-|   float fnumber;
-| 
-|   while (*format)
-|     {
-|       switch (*format++)
-| 	{
-| 	case 's': // string
-| 	  str = va_arg (args_copy, const char *);
-| 	  break;
-| 	case 'd': // int
-| 	  number = va_arg (args_copy, int);
-| 	  break;
-| 	case 'f': // float
-| 	  fnumber = va_arg (args_copy, double);
-| 	  break;
-| 	default:
-| 	  break;
-| 	}
-|     }
-|   va_end (args_copy);
-|   va_end (args);
-| }
-| 
-| int
-| main ()
-| {
-| 
-|   // Check bool.
-|   _Bool success = false;
-| 
-|   // Check restrict.
-|   if (test_restrict ("String literal") == 0)
-|     success = true;
-|   char *restrict newvar = "Another string";
-| 
-|   // Check varargs.
-|   test_varargs ("s, d' f .", "string", 65, 34.234);
-|   test_varargs_macros ();
-| 
-|   // Check flexible array members.
-|   struct incomplete_array *ia =
-|     malloc (sizeof (struct incomplete_array) + (sizeof (double) * 10));
-|   ia->datasize = 10;
-|   for (int i = 0; i < ia->datasize; ++i)
-|     ia->data[i] = i * 1.234;
-| 
-|   // Check named initializers.
-|   struct named_init ni = {
-|     .number = 34,
-|     .name = L"Test wide string",
-|     .average = 543.34343,
-|   };
-| 
-|   ni.number = 58;
-| 
-|   int dynamic_array[ni.number];
-|   dynamic_array[ni.number - 1] = 543;
-| 
-|   // work around unused variable warnings
-|   return (!success || bignum == 0LL || ubignum == 0uLL || newvar[0] == 'x'
-| 	  || dynamic_array[ni.number - 1] != 543);
-| 
-|   ;
-|   return 0;
-| }
-configure:4460: icc -std=gnu99 -c -g -O2  conftest.c >&5
-conftest.c(66): error: expected an expression
-    for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-         ^
-
-conftest.c(66): error: identifier "i" is undefined
-    for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-                                    ^
-
-conftest.c(125): error: expected an expression
-    for (int i = 0; i < ia->datasize; ++i)
-         ^
-
-conftest.c(125): error: identifier "i" is undefined
-    for (int i = 0; i < ia->datasize; ++i)
-                    ^
-
-compilation aborted for conftest.c (code 2)
-configure:4467: $? = 2
-configure: failed program was:
-| /* confdefs.h.  */
-| #define PACKAGE_NAME "fftw"
-| #define PACKAGE_TARNAME "fftw"
-| #define PACKAGE_VERSION "3.2.2"
-| #define PACKAGE_STRING "fftw 3.2.2"
-| #define PACKAGE_BUGREPORT "fftw@fftw.org"
-| #define PACKAGE "fftw"
-| #define VERSION "3.2.2"
-| #define FFTW_ENABLE_ALLOCA 1
-| /* end confdefs.h.  */
-| #include <stdarg.h>
-| #include <stdbool.h>
-| #include <stdlib.h>
-| #include <wchar.h>
-| #include <stdio.h>
-| 
-| // Check varargs macros.  These examples are taken from C99 6.10.3.5.
-| #define debug(...) fprintf (stderr, __VA_ARGS__)
-| #define showlist(...) puts (#__VA_ARGS__)
-| #define report(test,...) ((test) ? puts (#test) : printf (__VA_ARGS__))
-| static void
-| test_varargs_macros (void)
-| {
-|   int x = 1234;
-|   int y = 5678;
-|   debug ("Flag");
-|   debug ("X = %d\n", x);
-|   showlist (The first, second, and third items.);
-|   report (x>y, "x is %d but y is %d", x, y);
-| }
-| 
-| // Check long long types.
-| #define BIG64 18446744073709551615ull
-| #define BIG32 4294967295ul
-| #define BIG_OK (BIG64 / BIG32 == 4294967297ull && BIG64 % BIG32 == 0)
-| #if !BIG_OK
-|   your preprocessor is broken;
-| #endif
-| #if BIG_OK
-| #else
-|   your preprocessor is broken;
-| #endif
-| static long long int bignum = -9223372036854775807LL;
-| static unsigned long long int ubignum = BIG64;
-| 
-| struct incomplete_array
-| {
-|   int datasize;
-|   double data[];
-| };
-| 
-| struct named_init {
-|   int number;
-|   const wchar_t *name;
-|   double average;
-| };
-| 
-| typedef const char *ccp;
-| 
-| static inline int
-| test_restrict (ccp restrict text)
-| {
-|   // See if C++-style comments work.
-|   // Iterate through items via the restricted pointer.
-|   // Also check for declarations in for loops.
-|   for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-|     continue;
-|   return 0;
-| }
-| 
-| // Check varargs and va_copy.
-| static void
-| test_varargs (const char *format, ...)
-| {
-|   va_list args;
-|   va_start (args, format);
-|   va_list args_copy;
-|   va_copy (args_copy, args);
-| 
-|   const char *str;
-|   int number;
-|   float fnumber;
-| 
-|   while (*format)
-|     {
-|       switch (*format++)
-| 	{
-| 	case 's': // string
-| 	  str = va_arg (args_copy, const char *);
-| 	  break;
-| 	case 'd': // int
-| 	  number = va_arg (args_copy, int);
-| 	  break;
-| 	case 'f': // float
-| 	  fnumber = va_arg (args_copy, double);
-| 	  break;
-| 	default:
-| 	  break;
-| 	}
-|     }
-|   va_end (args_copy);
-|   va_end (args);
-| }
-| 
-| int
-| main ()
-| {
-| 
-|   // Check bool.
-|   _Bool success = false;
-| 
-|   // Check restrict.
-|   if (test_restrict ("String literal") == 0)
-|     success = true;
-|   char *restrict newvar = "Another string";
-| 
-|   // Check varargs.
-|   test_varargs ("s, d' f .", "string", 65, 34.234);
-|   test_varargs_macros ();
-| 
-|   // Check flexible array members.
-|   struct incomplete_array *ia =
-|     malloc (sizeof (struct incomplete_array) + (sizeof (double) * 10));
-|   ia->datasize = 10;
-|   for (int i = 0; i < ia->datasize; ++i)
-|     ia->data[i] = i * 1.234;
-| 
-|   // Check named initializers.
-|   struct named_init ni = {
-|     .number = 34,
-|     .name = L"Test wide string",
-|     .average = 543.34343,
-|   };
-| 
-|   ni.number = 58;
-| 
-|   int dynamic_array[ni.number];
-|   dynamic_array[ni.number - 1] = 543;
-| 
-|   // work around unused variable warnings
-|   return (!success || bignum == 0LL || ubignum == 0uLL || newvar[0] == 'x'
-| 	  || dynamic_array[ni.number - 1] != 543);
-| 
-|   ;
-|   return 0;
-| }
-configure:4460: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:4296: result: portland
+configure:4301: checking for pgcc option to accept ISO C99
+configure:4460: pgcc  -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:4467: $? = 0
-configure:4497: result: -std=c99
-configure:4628: checking for icc -std=c99 option to accept ISO Standard C
-configure:4639: result: -std=c99
+configure:4490: result: none needed
+configure:4628: checking for pgcc option to accept ISO Standard C
+configure:4637: result: none needed
 configure:4658: checking for a BSD-compatible install
 configure:4726: result: /usr/bin/install -c
 configure:4737: checking whether ln -s works
@@ -541,17 +698,22 @@ configure:5256: checking for egrep
 configure:5320: result: /usr/bin/grep -E
 configure:5325: checking for fgrep
 configure:5389: result: /usr/bin/grep -F
-configure:5424: checking for ld used by icc -std=c99
+configure:5457: checking for non-GNU ld
 configure:5491: result: /usr/bin/ld
 configure:5500: checking if the linker (/usr/bin/ld) is GNU ld
 configure:5515: result: no
 configure:5527: checking for BSD- or MS-compatible name lister (nm)
 configure:5576: result: /usr/bin/nm
 configure:5694: checking the name lister (/usr/bin/nm) interface
-configure:5701: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:5701: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:5704: /usr/bin/nm "conftest.o"
 configure:5707: output
-0000000000000108 B _some_variable
+0000000000000028 d .__pgdbg_stub
+                 U ___pgdbg_stub
+                 U ___pgio_ini
+0000000000000020 D _some_variable
+0000000000000000 t pgio_ini2
 configure:5714: result: BSD nm
 configure:5718: checking the maximum length of command line arguments
 configure:5838: result: 196608
@@ -574,17 +736,21 @@ configure:6430: result: strip
 configure:6502: checking for ranlib
 configure:6518: found /usr/bin/ranlib
 configure:6529: result: ranlib
-configure:6619: checking command to parse /usr/bin/nm output from icc -std=c99 object
-configure:6737: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:6619: checking command to parse /usr/bin/nm output from pgcc object
+configure:6737: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.981 hours.
 configure:6740: $? = 0
 configure:6744: /usr/bin/nm conftest.o \| sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' \> conftest.nm
 configure:6747: $? = 0
 cannot find nm_test_var in conftest.nm
-configure:6737: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:6737: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:6740: $? = 0
 configure:6744: /usr/bin/nm conftest.o \| sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' \> conftest.nm
 configure:6747: $? = 0
-configure:6801: icc -std=c99 -o conftest -g -O2   conftest.c conftstm.o >&5
+configure:6801: pgcc -o conftest -g   conftest.c conftstm.o >&5
+conftest.c:
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:6804: $? = 0
 configure:6842: result: ok
 configure:7135: checking for dsymutil
@@ -602,20 +768,22 @@ configure:7438: result: otool
 configure:7503: checking for otool64
 configure:7533: result: no
 configure:7578: checking for -single_module linker flag
-icc -std=c99 -g -O2  -o libconftest.dylib -dynamiclib -Wl,-single_module conftest.c
-configure:7605: result: yes
+pgcc -g  -o libconftest.dylib -dynamiclib -Wl,-single_module conftest.c
+pgcc-Error-Unknown switch: -dynamiclib
+configure:7605: result: no
 configure:7607: checking for -exported_symbols_list linker flag
-configure:7637: icc -std=c99 -o conftest -g -O2   -Wl,-exported_symbols_list,conftest.sym conftest.c  >&5
+configure:7637: pgcc -o conftest -g   -Wl,-exported_symbols_list,conftest.sym conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:7644: $? = 0
 configure:7666: result: yes
 configure:7708: checking how to run the C preprocessor
-configure:7748: icc -std=c99 -E  conftest.c
+configure:7748: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:7755: $? = 0
-configure:7786: icc -std=c99 -E  conftest.c
-conftest.c(11): error #5: could not open source file "ac_nonexistent.h"
-  #include <ac_nonexistent.h>
-                             ^
-
+configure:7786: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.98 hours.
+PGC-F-0206-Can't find include file ac_nonexistent.h (conftest.c: 11)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:7793: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -629,14 +797,14 @@ configure: failed program was:
 | #define FFTW_ENABLE_ALLOCA 1
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
-configure:7826: result: icc -std=c99 -E
-configure:7855: icc -std=c99 -E  conftest.c
+configure:7826: result: pgcc -E
+configure:7855: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:7862: $? = 0
-configure:7893: icc -std=c99 -E  conftest.c
-conftest.c(11): error #5: could not open source file "ac_nonexistent.h"
-  #include <ac_nonexistent.h>
-                             ^
-
+configure:7893: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.98 hours.
+PGC-F-0206-Can't find include file ac_nonexistent.h (conftest.c: 11)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:7900: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -651,76 +819,88 @@ configure: failed program was:
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 configure:7940: checking for ANSI C header files
-configure:7970: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:7970: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:7977: $? = 0
-configure:8076: icc -std=c99 -o conftest -g -O2   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
+NOTE: your trial license will expire in 13 days, 0.98 hours.
+configure:8076: pgcc -o conftest -g   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8080: $? = 0
 configure:8086: ./conftest
 configure:8090: $? = 0
 configure:8108: result: yes
 configure:8132: checking for sys/types.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for sys/stat.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for stdlib.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for string.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for memory.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for strings.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for inttypes.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for stdint.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8132: checking for unistd.h
-configure:8153: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8153: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.98 hours.
 configure:8160: $? = 0
 configure:8177: result: yes
 configure:8195: checking for dlfcn.h
-configure:8216: icc -std=c99 -c -g -O2  conftest.c >&5
+configure:8216: pgcc -c -g  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:8223: $? = 0
 configure:8240: result: yes
 configure:8394: checking for objdir
 configure:8409: result: .libs
-configure:8705: checking if icc -std=c99 supports -fno-rtti -fno-exceptions
-configure:8723: icc -std=c99 -c -g -O2  -fno-rtti -fno-exceptions conftest.c >&5
-configure:8727: $? = 0
-configure:8740: result: yes
-configure:8760: checking for icc -std=c99 option to produce PIC
-configure:9032: result: -fno-common -DPIC
-configure:9044: checking if icc -std=c99 PIC flag -fno-common -DPIC works
-configure:9062: icc -std=c99 -c -g -O2  -fno-common -DPIC -DPIC conftest.c >&5
+configure:8760: checking for pgcc option to produce PIC
+configure:9032: result:  -DPIC
+configure:9044: checking if pgcc PIC flag  -DPIC works
+configure:9062: pgcc -c -g   -DPIC -DPIC conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:9066: $? = 0
 configure:9079: result: yes
-configure:9103: checking if icc -std=c99 static flag -static works
-icc: command line warning #10156: ignoring option '-s'; no argument required
-configure:9131: result: no
-configure:9146: checking if icc -std=c99 supports -c -o file.o
-configure:9167: icc -std=c99 -c -g -O2  -o out/conftest2.o conftest.c >&5
+configure:9103: checking if pgcc static flag  works
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+configure:9131: result: yes
+configure:9146: checking if pgcc supports -c -o file.o
+configure:9167: pgcc -c -g  -o out/conftest2.o conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:9171: $? = 0
 configure:9193: result: yes
-configure:9201: checking if icc -std=c99 supports -c -o file.o
+configure:9201: checking if pgcc supports -c -o file.o
 configure:9248: result: yes
-configure:9281: checking whether the icc -std=c99 linker (/usr/bin/ld) supports shared libraries
-configure:10359: result: yes
+configure:9281: checking whether the pgcc linker (/usr/bin/ld) supports shared libraries
+configure:10359: result: no
 configure:10598: checking dynamic linker characteristics
 configure:11293: result: darwin10.4.0 dyld
 configure:11395: checking how to hardcode library paths into programs
@@ -728,7 +908,7 @@ configure:11420: result: immediate
 configure:12253: checking whether stripping libraries is possible
 configure:12267: result: yes
 configure:12293: checking if libtool supports shared libraries
-configure:12295: result: yes
+configure:12295: result: no
 configure:12298: checking whether to build shared libraries
 configure:12319: result: no
 configure:12322: checking whether to build static libraries
@@ -739,34 +919,24 @@ configure:12401: checking for ocamlopt
 configure:12431: result: no
 configure:12438: checking for ocamldep
 configure:12468: result: no
-configure:13003: checking whether C compiler accepts -ansi-alias
-configure:13028: icc -std=c99 -c -ansi-alias  conftest.c >&5
-configure:13035: $? = 0
-configure:13051: result: yes
-configure:13063: checking whether C compiler accepts -malign-double
-configure:13092: icc -std=c99 -c -malign-double  conftest.c >&5
-configure:13099: $? = 0
-configure:13117: result: yes
-configure:13364: checking whether C compiler accepts -axssse3
-configure:13389: icc -std=c99 -c -axssse3  conftest.c >&5
-configure:13396: $? = 0
-configure:13412: result: yes
-configure:13422: checking for icc architecture flag
-configure:13424: result: -axssse3
-configure:14224: checking whether C compiler accepts -O3 -ansi-alias -malign-double -axssse3
-configure:14249: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:14224: checking whether C compiler accepts -O3
+configure:14249: pgcc -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:14256: $? = 0
 configure:14272: result: yes
+configure:14767: checking whether C compiler accepts -Masmkeyword
+configure:14796: pgcc -c -Masmkeyword  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+configure:14803: $? = 0
+configure:14821: result: yes
 configure:15288: checking for ANSI C header files
 configure:15456: result: yes
 configure:15496: checking libintl.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(57): catastrophic error: could not open source file "libintl.h"
-  #include <libintl.h>
-                      ^
-
-compilation aborted for conftest.c (code 4)
-configure:15520: $? = 4
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file libintl.h (conftest.c: 57)
+PGC/x86-64 OSX 10.8-0: compilation aborted
+configure:15520: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -827,11 +997,10 @@ configure: failed program was:
 | #include <libintl.h>
 configure:15534: result: no
 configure:15538: checking libintl.h presence
-configure:15553: icc -std=c99 -E  conftest.c
-conftest.c(24): error #5: could not open source file "libintl.h"
-  #include <libintl.h>
-                      ^
-
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file libintl.h (conftest.c: 24)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:15560: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -862,13 +1031,11 @@ configure:15574: result: no
 configure:15607: checking for libintl.h
 configure:15616: result: no
 configure:15496: checking malloc.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(57): catastrophic error: could not open source file "malloc.h"
-  #include <malloc.h>
-                     ^
-
-compilation aborted for conftest.c (code 4)
-configure:15520: $? = 4
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file malloc.h (conftest.c: 57)
+PGC/x86-64 OSX 10.8-0: compilation aborted
+configure:15520: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -929,11 +1096,10 @@ configure: failed program was:
 | #include <malloc.h>
 configure:15534: result: no
 configure:15538: checking malloc.h presence
-configure:15553: icc -std=c99 -E  conftest.c
-conftest.c(24): error #5: could not open source file "malloc.h"
-  #include <malloc.h>
-                     ^
-
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file malloc.h (conftest.c: 24)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:15560: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -964,11 +1130,13 @@ configure:15574: result: no
 configure:15607: checking for malloc.h
 configure:15616: result: no
 configure:15496: checking stddef.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15520: $? = 0
 configure:15534: result: yes
 configure:15538: checking stddef.h presence
-configure:15553: icc -std=c99 -E  conftest.c
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15560: $? = 0
 configure:15574: result: yes
 configure:15607: checking for stddef.h
@@ -980,11 +1148,13 @@ configure:15492: result: yes
 configure:15485: checking for strings.h
 configure:15492: result: yes
 configure:15496: checking sys/time.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15520: $? = 0
 configure:15534: result: yes
 configure:15538: checking sys/time.h presence
-configure:15553: icc -std=c99 -E  conftest.c
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15560: $? = 0
 configure:15574: result: yes
 configure:15607: checking for sys/time.h
@@ -992,23 +1162,23 @@ configure:15616: result: yes
 configure:15485: checking for unistd.h
 configure:15492: result: yes
 configure:15496: checking limits.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15520: $? = 0
 configure:15534: result: yes
 configure:15538: checking limits.h presence
-configure:15553: icc -std=c99 -E  conftest.c
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15560: $? = 0
 configure:15574: result: yes
 configure:15607: checking for limits.h
 configure:15616: result: yes
 configure:15496: checking c_asm.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(64): catastrophic error: could not open source file "c_asm.h"
-  #include <c_asm.h>
-                    ^
-
-compilation aborted for conftest.c (code 4)
-configure:15520: $? = 4
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file c_asm.h (conftest.c: 64)
+PGC/x86-64 OSX 10.8-0: compilation aborted
+configure:15520: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -1076,11 +1246,10 @@ configure: failed program was:
 | #include <c_asm.h>
 configure:15534: result: no
 configure:15538: checking c_asm.h presence
-configure:15553: icc -std=c99 -E  conftest.c
-conftest.c(31): error #5: could not open source file "c_asm.h"
-  #include <c_asm.h>
-                    ^
-
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file c_asm.h (conftest.c: 31)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:15560: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1118,13 +1287,11 @@ configure:15574: result: no
 configure:15607: checking for c_asm.h
 configure:15616: result: no
 configure:15496: checking intrinsics.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(64): catastrophic error: could not open source file "intrinsics.h"
-  #include <intrinsics.h>
-                         ^
-
-compilation aborted for conftest.c (code 4)
-configure:15520: $? = 4
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file intrinsics.h (conftest.c: 64)
+PGC/x86-64 OSX 10.8-0: compilation aborted
+configure:15520: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -1192,11 +1359,10 @@ configure: failed program was:
 | #include <intrinsics.h>
 configure:15534: result: no
 configure:15538: checking intrinsics.h presence
-configure:15553: icc -std=c99 -E  conftest.c
-conftest.c(31): error #5: could not open source file "intrinsics.h"
-  #include <intrinsics.h>
-                         ^
-
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
+PGC-F-0206-Can't find include file intrinsics.h (conftest.c: 31)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:15560: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1236,43 +1402,47 @@ configure:15616: result: no
 configure:15485: checking for stdint.h
 configure:15492: result: yes
 configure:15496: checking mach/mach_time.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15520: $? = 0
 configure:15534: result: yes
 configure:15538: checking mach/mach_time.h presence
-configure:15553: icc -std=c99 -E  conftest.c
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15560: $? = 0
 configure:15574: result: yes
 configure:15607: checking for mach/mach_time.h
 configure:15616: result: yes
 configure:15496: checking sys/sysctl.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15520: $? = 0
 configure:15534: result: yes
 configure:15538: checking sys/sysctl.h presence
-configure:15553: icc -std=c99 -E  conftest.c
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15560: $? = 0
 configure:15574: result: yes
 configure:15607: checking for sys/sysctl.h
 configure:15616: result: yes
 configure:15496: checking xmmintrin.h usability
-configure:15513: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15513: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.979 hours.
 configure:15520: $? = 0
 configure:15534: result: yes
 configure:15538: checking xmmintrin.h presence
-configure:15553: icc -std=c99 -E  conftest.c
+configure:15553: pgcc -E  conftest.c
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:15560: $? = 0
 configure:15574: result: yes
 configure:15607: checking for xmmintrin.h
 configure:15616: result: yes
 configure:15652: checking altivec.h usability
-configure:15669: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3    conftest.c >&5
-conftest.c(68): catastrophic error: could not open source file "altivec.h"
-  #include <altivec.h>
-                      ^
-
-compilation aborted for conftest.c (code 4)
-configure:15676: $? = 4
+configure:15669: pgcc -Masmkeyword -c -O3    conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
+PGC-F-0206-Can't find include file altivec.h (conftest.c: 68)
+PGC/x86-64 OSX 10.8-0: compilation aborted
+configure:15676: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -1344,11 +1514,10 @@ configure: failed program was:
 | #include <altivec.h>
 configure:15690: result: no
 configure:15694: checking altivec.h presence
-configure:15709: icc -std=c99 -E   conftest.c
-conftest.c(35): error #5: could not open source file "altivec.h"
-  #include <altivec.h>
-                      ^
-
+configure:15709: pgcc -E   conftest.c
+NOTE: your trial license will expire in 13 days, 0.978 hours.
+PGC-F-0206-Can't find include file altivec.h (conftest.c: 35)
+PGC/x86-64 OSX 10.8-0: compilation aborted
 configure:15716: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1390,34 +1559,23 @@ configure:15730: result: no
 configure:15763: checking for altivec.h
 configure:15772: result: no
 configure:15792: checking for an ANSI C-conforming const
-configure:15867: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(64): warning #592: variable "t" is used before its value is set
-      *t++ = 0;
-       ^
-
-conftest.c(80): warning #592: variable "b" is used before its value is set
-      struct s *b; b->j = 5;
-                   ^
-
-conftest.c(86): warning #592: variable "cs" is used before its value is set
-    return !cs[0] && !zero.x;
-            ^
-
+configure:15867: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:15874: $? = 0
 configure:15889: result: yes
 configure:15899: checking for inline
-configure:15925: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15925: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:15932: $? = 0
 configure:15950: result: inline
 configure:15969: checking for size_t
-configure:15997: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:15997: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:16004: $? = 0
-configure:16031: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(71): error: expected an expression
-  if (sizeof ((size_t)))
-                      ^
-
-compilation aborted for conftest.c (code 2)
+configure:16031: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
+PGC-S-0040-Illegal use of symbol, size_t (conftest.c: 71)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:16038: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1497,22 +1655,18 @@ configure: failed program was:
 | }
 configure:16061: result: yes
 configure:16073: checking whether time.h and sys/time.h may both be included
-configure:16103: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(42): warning #279: controlling expression is constant
-  if ((struct tm *) 0)
-      ^
-
+configure:16103: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:16110: $? = 0
 configure:16125: result: yes
 configure:16135: checking for long double
-configure:16163: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:16163: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:16170: $? = 0
-configure:16197: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(72): error: expected an expression
-  if (sizeof ((long double)))
-                           ^
-
-compilation aborted for conftest.c (code 2)
+configure:16197: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
+PGC-S-0036-Syntax error: Recovery attempted by inserting identifier .Z0000 before ')' (conftest.c: 72)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:16204: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1593,12 +1747,10 @@ configure: failed program was:
 | }
 configure:16227: result: yes
 configure:16245: checking for hrtime_t
-configure:16278: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(46): error: identifier "hrtime_t" is undefined
-  if (sizeof (hrtime_t))
-              ^
-
-compilation aborted for conftest.c (code 2)
+configure:16278: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
+PGC-S-0039-Use of undeclared variable hrtime_t (conftest.c: 46)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:16285: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1653,62 +1805,69 @@ configure: failed program was:
 | }
 configure:16347: result: no
 configure:16362: checking size of int
-configure:16667: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:16667: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:16671: $? = 0
 configure:16677: ./conftest
 configure:16681: $? = 0
 configure:16707: result: 4
 configure:16721: checking size of unsigned int
-configure:17026: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:17026: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:17030: $? = 0
 configure:17036: ./conftest
 configure:17040: $? = 0
 configure:17066: result: 4
 configure:17080: checking size of long
-configure:17385: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:17385: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:17389: $? = 0
 configure:17395: ./conftest
 configure:17399: $? = 0
 configure:17425: result: 8
 configure:17439: checking size of unsigned long
-configure:17744: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:17744: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:17748: $? = 0
 configure:17754: ./conftest
 configure:17758: $? = 0
 configure:17784: result: 8
 configure:17798: checking size of long long
-configure:18103: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:18103: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:18107: $? = 0
 configure:18113: ./conftest
 configure:18117: $? = 0
 configure:18143: result: 8
 configure:18157: checking size of unsigned long long
-configure:18462: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:18462: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:18466: $? = 0
 configure:18472: ./conftest
 configure:18476: $? = 0
 configure:18502: result: 8
 configure:18516: checking size of size_t
-configure:18821: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:18821: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:18825: $? = 0
 configure:18831: ./conftest
 configure:18835: $? = 0
 configure:18861: result: 8
 configure:18875: checking size of ptrdiff_t
-configure:19180: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:19180: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:19184: $? = 0
 configure:19190: ./conftest
 configure:19194: $? = 0
 configure:19220: result: 8
 configure:19231: checking for uintptr_t
-configure:19263: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:19263: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:19270: $? = 0
-configure:19301: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(85): error: expected an expression
-  if (sizeof ((uintptr_t)))
-                         ^
-
-compilation aborted for conftest.c (code 2)
+configure:19301: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
+PGC-S-0040-Illegal use of symbol, uintptr_t (conftest.c: 85)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:19308: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -1802,42 +1961,49 @@ configure: failed program was:
 | }
 configure:19331: result: yes
 configure:19707: checking size of float
-configure:20012: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:20012: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:20016: $? = 0
 configure:20022: ./conftest
 configure:20026: $? = 0
 configure:20052: result: 4
 configure:20066: checking size of double
-configure:20371: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:20371: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.978 hours.
 configure:20375: $? = 0
 configure:20381: ./conftest
 configure:20385: $? = 0
 configure:20411: result: 8
 configure:20424: checking for working alloca.h
-configure:20451: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:20451: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:20458: $? = 0
 configure:20478: result: yes
 configure:20488: checking for alloca
-configure:20535: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:20535: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:20542: $? = 0
 configure:20562: result: yes
 configure:20799: checking for working strtod
-configure:20850: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:20850: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:20854: $? = 0
 configure:20860: ./conftest
 configure:20864: $? = 0
 configure:20881: result: yes
 configure:21057: checking for vprintf
-configure:21113: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:21113: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21120: $? = 0
 configure:21142: result: yes
 configure:21151: checking for _doprnt
-configure:21207: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c  >&5
+configure:21207: pgcc -Masmkeyword -o conftest -O3   conftest.c  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
   "__doprnt", referenced from:
-      _main in iccTGJJr4.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21214: $? = 1
+configure:21214: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -1929,16 +2095,18 @@ configure: failed program was:
 | }
 configure:21234: result: no
 configure:21249: checking for sin in -lm
-configure:21284: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm   >&5
+configure:21284: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm   >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21291: $? = 0
 configure:21312: result: yes
 configure:21499: checking for BSDgettimeofday
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
   "_BSDgettimeofday", referenced from:
-      _main in iccLbXsse.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21562: $? = 1
+configure:21562: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -2031,16 +2199,18 @@ configure: failed program was:
 | }
 configure:21584: result: no
 configure:21499: checking for gettimeofday
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for gethrtime
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
   "_gethrtime", referenced from:
-      _main in icc7bJ9Od.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21562: $? = 1
+configure:21562: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -2134,12 +2304,13 @@ configure: failed program was:
 | }
 configure:21584: result: no
 configure:21499: checking for read_real_time
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
   "_read_real_time", referenced from:
-      _main in iccdSFZoo.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21562: $? = 1
+configure:21562: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -2233,12 +2404,13 @@ configure: failed program was:
 | }
 configure:21584: result: no
 configure:21499: checking for time_base_to_time
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
   "_time_base_to_time", referenced from:
-      _main in icc7RJYwj.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21562: $? = 1
+configure:21562: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -2332,28 +2504,33 @@ configure: failed program was:
 | }
 configure:21584: result: no
 configure:21499: checking for drand48
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for sqrt
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for memset
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for posix_memalign
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for memalign
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
   "_memalign", referenced from:
-      _main in iccvobawh.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21562: $? = 1
+configure:21562: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -2451,20 +2628,13 @@ configure: failed program was:
 | }
 configure:21584: result: no
 configure:21499: checking for _mm_malloc
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
-configure:21562: $? = 0
-configure:21584: result: yes
-configure:21499: checking for _mm_free
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
-configure:21562: $? = 0
-configure:21584: result: yes
-configure:21499: checking for clock_gettime
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 Undefined symbols:
-  "_clock_gettime", referenced from:
-      _main in iccvCYHRF.o
+  "__mm_malloc", referenced from:
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21562: $? = 1
+configure:21562: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -2521,8 +2691,214 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
+| /* end confdefs.h.  */
+| /* Define _mm_malloc to an innocuous variant, in case <limits.h> declares _mm_malloc.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define _mm_malloc innocuous__mm_malloc
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|     which can conflict with char _mm_malloc (); below.
+|     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+|     <limits.h> exists even on freestanding compilers.  */
+| 
+| #ifdef __STDC__
+| # include <limits.h>
+| #else
+| # include <assert.h>
+| #endif
+| 
+| #undef _mm_malloc
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char _mm_malloc ();
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub__mm_malloc || defined __stub____mm_malloc
+| choke me
+| #endif
+| 
+| int
+| main ()
+| {
+| return _mm_malloc ();
+|   ;
+|   return 0;
+| }
+configure:21584: result: no
+configure:21499: checking for _mm_free
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
+Undefined symbols:
+  "__mm_free", referenced from:
+      _main in conftest.o
+ld: symbol(s) not found
+configure:21562: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define STDC_HEADERS 1
+| #define HAVE_STDDEF_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_TIME_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_MACH_MACH_TIME_H 1
+| #define HAVE_SYS_SYSCTL_H 1
+| #define HAVE_XMMINTRIN_H 1
+| #define TIME_WITH_SYS_TIME 1
+| #define HAVE_LONG_DOUBLE 1
+| #define SIZEOF_INT 4
+| #define SIZEOF_UNSIGNED_INT 4
+| #define SIZEOF_LONG 8
+| #define SIZEOF_UNSIGNED_LONG 8
+| #define SIZEOF_LONG_LONG 8
+| #define SIZEOF_UNSIGNED_LONG_LONG 8
+| #define SIZEOF_SIZE_T 8
+| #define SIZEOF_PTRDIFF_T 8
+| #define HAVE_UINTPTR_T 1
+| #define SIZEOF_FLOAT 4
+| #define SIZEOF_DOUBLE 8
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_ALLOCA 1
+| #define HAVE_VPRINTF 1
+| #define HAVE_LIBM 1
+| #define HAVE_GETTIMEOFDAY 1
+| #define HAVE_DRAND48 1
+| #define HAVE_SQRT 1
+| #define HAVE_MEMSET 1
+| #define HAVE_POSIX_MEMALIGN 1
+| /* end confdefs.h.  */
+| /* Define _mm_free to an innocuous variant, in case <limits.h> declares _mm_free.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define _mm_free innocuous__mm_free
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|     which can conflict with char _mm_free (); below.
+|     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+|     <limits.h> exists even on freestanding compilers.  */
+| 
+| #ifdef __STDC__
+| # include <limits.h>
+| #else
+| # include <assert.h>
+| #endif
+| 
+| #undef _mm_free
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char _mm_free ();
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub__mm_free || defined __stub____mm_free
+| choke me
+| #endif
+| 
+| int
+| main ()
+| {
+| return _mm_free ();
+|   ;
+|   return 0;
+| }
+configure:21584: result: no
+configure:21499: checking for clock_gettime
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
+Undefined symbols:
+  "_clock_gettime", referenced from:
+      _main in conftest.o
+ld: symbol(s) not found
+configure:21562: $? = 2
+configure: failed program was:
+| /* confdefs.h.  */
+| #define PACKAGE_NAME "fftw"
+| #define PACKAGE_TARNAME "fftw"
+| #define PACKAGE_VERSION "3.2.2"
+| #define PACKAGE_STRING "fftw 3.2.2"
+| #define PACKAGE_BUGREPORT "fftw@fftw.org"
+| #define PACKAGE "fftw"
+| #define VERSION "3.2.2"
+| #define FFTW_ENABLE_ALLOCA 1
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define STDC_HEADERS 1
+| #define HAVE_STDDEF_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_TIME_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_MACH_MACH_TIME_H 1
+| #define HAVE_SYS_SYSCTL_H 1
+| #define HAVE_XMMINTRIN_H 1
+| #define TIME_WITH_SYS_TIME 1
+| #define HAVE_LONG_DOUBLE 1
+| #define SIZEOF_INT 4
+| #define SIZEOF_UNSIGNED_INT 4
+| #define SIZEOF_LONG 8
+| #define SIZEOF_UNSIGNED_LONG 8
+| #define SIZEOF_LONG_LONG 8
+| #define SIZEOF_UNSIGNED_LONG_LONG 8
+| #define SIZEOF_SIZE_T 8
+| #define SIZEOF_PTRDIFF_T 8
+| #define HAVE_UINTPTR_T 1
+| #define SIZEOF_FLOAT 4
+| #define SIZEOF_DOUBLE 8
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_ALLOCA 1
+| #define HAVE_VPRINTF 1
+| #define HAVE_LIBM 1
+| #define HAVE_GETTIMEOFDAY 1
+| #define HAVE_DRAND48 1
+| #define HAVE_SQRT 1
+| #define HAVE_MEMSET 1
+| #define HAVE_POSIX_MEMALIGN 1
 | /* end confdefs.h.  */
 | /* Define clock_gettime to an innocuous variant, in case <limits.h> declares clock_gettime.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -2564,40 +2940,45 @@ configure: failed program was:
 | }
 configure:21584: result: no
 configure:21499: checking for mach_absolute_time
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for sysctl
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for abort
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for sinl
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for cosl
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21499: checking for snprintf
-configure:21555: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:21555: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.977 hours.
 configure:21562: $? = 0
 configure:21584: result: yes
 configure:21596: checking whether drand48 is declared
-configure:21625: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:21625: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:21632: $? = 0
 configure:21647: result: yes
 configure:21663: checking whether memalign is declared
-configure:21692: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(103): error: identifier "memalign" is undefined
-    (void) memalign;
-           ^
-
-compilation aborted for conftest.c (code 2)
+configure:21692: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+PGC-S-0039-Use of undeclared variable memalign (conftest.c: 101)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:21699: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -2655,8 +3036,6 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
 | #define HAVE_MACH_ABSOLUTE_TIME 1
 | #define HAVE_SYSCTL 1
 | #define HAVE_ABORT 1
@@ -2710,16 +3089,15 @@ configure: failed program was:
 | }
 configure:21714: result: no
 configure:21730: checking whether posix_memalign is declared
-configure:21759: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
+configure:21759: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:21766: $? = 0
 configure:21781: result: yes
 configure:21797: checking whether sinl is declared
-configure:21826: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(105): error: identifier "sinl" is undefined
-    (void) sinl;
-           ^
-
-compilation aborted for conftest.c (code 2)
+configure:21826: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+PGC-S-0039-Use of undeclared variable sinl (conftest.c: 103)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:21833: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -2777,8 +3155,6 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
 | #define HAVE_MACH_ABSOLUTE_TIME 1
 | #define HAVE_SYSCTL 1
 | #define HAVE_ABORT 1
@@ -2834,12 +3210,10 @@ configure: failed program was:
 | }
 configure:21848: result: no
 configure:21864: checking whether cosl is declared
-configure:21893: icc -std=c99 -c -O3 -ansi-alias -malign-double -axssse3  conftest.c >&5
-conftest.c(106): error: identifier "cosl" is undefined
-    (void) cosl;
-           ^
-
-compilation aborted for conftest.c (code 2)
+configure:21893: pgcc -Masmkeyword -c -O3  conftest.c >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+PGC-S-0039-Use of undeclared variable cosl (conftest.c: 104)
+PGC/x86-64 OSX 10.8-0: compilation completed with severe errors
 configure:21900: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
@@ -2897,8 +3271,6 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
 | #define HAVE_MACH_ABSOLUTE_TIME 1
 | #define HAVE_SYSCTL 1
 | #define HAVE_ABORT 1
@@ -2955,16 +3327,13 @@ configure: failed program was:
 | }
 configure:21915: result: no
 configure:21934: checking for _rtc intrinsic
-configure:21960: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
-conftest.c(76): warning #266: function "_rtc" declared implicitly
-  _rtc()
-  ^
-
+configure:21960: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 Undefined symbols:
   "__rtc", referenced from:
-      _main in iccH7etnv.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:21967: $? = 1
+configure:21967: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -3021,8 +3390,6 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
 | #define HAVE_MACH_ABSOLUTE_TIME 1
 | #define HAVE_SYSCTL 1
 | #define HAVE_ABORT 1
@@ -3047,117 +3414,29 @@ configure: failed program was:
 | }
 configure:21990: result: no
 configure:22103: checking for isnan
-configure:22127: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm  >&5
+configure:22127: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:22134: $? = 0
 configure:22160: result: yes
-configure:22167: checking whether C compiler accepts -mpreferred-stack-boundary=4
-configure:22196: icc -std=c99 -c -mpreferred-stack-boundary=4  conftest.c >&5
-icc: command line error: option '-mpreferred-stack-boundary=' not supported
-configure:22203: $? = 1
-configure: failed program was:
-| /* confdefs.h.  */
-| #define PACKAGE_NAME "fftw"
-| #define PACKAGE_TARNAME "fftw"
-| #define PACKAGE_VERSION "3.2.2"
-| #define PACKAGE_STRING "fftw 3.2.2"
-| #define PACKAGE_BUGREPORT "fftw@fftw.org"
-| #define PACKAGE "fftw"
-| #define VERSION "3.2.2"
-| #define FFTW_ENABLE_ALLOCA 1
-| #define STDC_HEADERS 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_MEMORY_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_DLFCN_H 1
-| #define LT_OBJDIR ".libs/"
-| #define STDC_HEADERS 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_MACH_MACH_TIME_H 1
-| #define HAVE_SYS_SYSCTL_H 1
-| #define HAVE_XMMINTRIN_H 1
-| #define TIME_WITH_SYS_TIME 1
-| #define HAVE_LONG_DOUBLE 1
-| #define SIZEOF_INT 4
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_LONG 8
-| #define SIZEOF_UNSIGNED_LONG 8
-| #define SIZEOF_LONG_LONG 8
-| #define SIZEOF_UNSIGNED_LONG_LONG 8
-| #define SIZEOF_SIZE_T 8
-| #define SIZEOF_PTRDIFF_T 8
-| #define HAVE_UINTPTR_T 1
-| #define SIZEOF_FLOAT 4
-| #define SIZEOF_DOUBLE 8
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define HAVE_VPRINTF 1
-| #define HAVE_LIBM 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_DRAND48 1
-| #define HAVE_SQRT 1
-| #define HAVE_MEMSET 1
-| #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
-| #define HAVE_MACH_ABSOLUTE_TIME 1
-| #define HAVE_SYSCTL 1
-| #define HAVE_ABORT 1
-| #define HAVE_SINL 1
-| #define HAVE_COSL 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_DECL_DRAND48 1
-| #define HAVE_DECL_MEMALIGN 0
-| #define HAVE_DECL_POSIX_MEMALIGN 1
-| #define HAVE_DECL_SINL 0
-| #define HAVE_DECL_COSL 0
-| #define HAVE_ISNAN 1
-| /* end confdefs.h.  */
-| 
-| int
-| main ()
-| {
-| 
-|   ;
-|   return 0;
-| }
-configure:22221: result: no
 configure:22533: checking for Fortran 77 compiler version
-configure:22541: ifort --version >&5
-ifort (IFORT) 11.1 20100401
-Copyright (C) 1985-2010 Intel Corporation.  All rights reserved.
-
-configure:22545: $? = 0
-configure:22552: ifort -v >&5
-Version 11.1 
+configure:22541: pgf95 --version >&5
+pgf95-Error-Unknown switch: --version
+configure:22545: $? = 1
+configure:22552: pgf95 -v >&5
+pgf95-Warning-No files to process
 configure:22556: $? = 0
-configure:22563: ifort -V >&5
-Intel(R) Fortran Intel(R) 64 Compiler Professional for applications running on Intel(R) 64, Version 11.1    Build 20100401 Package ID: m_cprof_p_11.1.088
-Copyright (C) 1985-2010 Intel Corporation.  All rights reserved.
+configure:22563: pgf95 -V >&5
 
+pgf95 10.8-0 64-bit target on Apple OS/X -tp penryn-64 
+Copyright 1989-2000, The Portland Group, Inc.  All Rights Reserved.
+Copyright 2000-2010, STMicroelectronics, Inc.  All Rights Reserved.
 configure:22567: $? = 0
 configure:22575: checking whether we are using the GNU Fortran 77 compiler
-configure:22594: ifort -c  conftest.F >&5
-conftest.F(3): error #5082: Syntax error, found END-OF-STATEMENT when expecting one of: ( % : . = =>
-       choke me
----------------^
-conftest.F(3): error #6218: This statement is positioned incorrectly and/or has syntax errors.
-       choke me
----------------^
-compilation aborted for conftest.F (code 1)
-configure:22601: $? = 1
+configure:22594: pgf95 -c  conftest.F >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+PGF90-S-0034-Syntax error at or near end of line (conftest.F: 3)
+  0 inform,   0 warnings,   1 severes, 0 fatal for main
+configure:22601: $? = 2
 configure: failed program was:
 |       program main
 | #ifndef __GNUC__
@@ -3166,111 +3445,123 @@ configure: failed program was:
 | 
 |       end
 configure:22618: result: no
-configure:22624: checking whether ifort accepts -g
-configure:22641: ifort -c -g conftest.f >&5
+configure:22624: checking whether pgf95 accepts -g
+configure:22641: pgf95 -c -g conftest.f >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:22648: $? = 0
 configure:22664: result: yes
 configure:22800: checking for Fortran 77 compiler version
-configure:22808: ifort --version >&5
-ifort (IFORT) 11.1 20100401
-Copyright (C) 1985-2010 Intel Corporation.  All rights reserved.
-
-configure:22812: $? = 0
-configure:22819: ifort -v >&5
-Version 11.1 
+configure:22808: pgf95 --version >&5
+pgf95-Error-Unknown switch: --version
+configure:22812: $? = 1
+configure:22819: pgf95 -v >&5
+pgf95-Warning-No files to process
 configure:22823: $? = 0
-configure:22830: ifort -V >&5
-Intel(R) Fortran Intel(R) 64 Compiler Professional for applications running on Intel(R) 64, Version 11.1    Build 20100401 Package ID: m_cprof_p_11.1.088
-Copyright (C) 1985-2010 Intel Corporation.  All rights reserved.
+configure:22830: pgf95 -V >&5
 
+pgf95 10.8-0 64-bit target on Apple OS/X -tp penryn-64 
+Copyright 1989-2000, The Portland Group, Inc.  All Rights Reserved.
+Copyright 2000-2010, STMicroelectronics, Inc.  All Rights Reserved.
 configure:22834: $? = 0
 configure:22842: checking whether we are using the GNU Fortran 77 compiler
 configure:22885: result: no
-configure:22891: checking whether ifort accepts -g
+configure:22891: checking whether pgf95 accepts -g
 configure:22931: result: yes
 configure:23067: checking if libtool supports shared libraries
-configure:23069: result: yes
+configure:23069: result: no
 configure:23072: checking whether to build shared libraries
 configure:23092: result: no
 configure:23095: checking whether to build static libraries
 configure:23099: result: yes
-configure:23113: checking for ifort option to produce PIC
+configure:23113: checking for pgf95 option to produce PIC
 configure:23385: result: 
-configure:23450: checking if ifort static flag  works
+configure:23450: checking if pgf95 static flag  works
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:23478: result: yes
-configure:23490: checking if ifort supports -c -o file.o
-configure:23508: ifort -c -g -o out/conftest2.o conftest.f >&5
+configure:23490: checking if pgf95 supports -c -o file.o
+configure:23508: pgf95 -c -g -o out/conftest2.o conftest.f >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:23512: $? = 0
 configure:23537: result: yes
-configure:23542: checking if ifort supports -c -o file.o
+configure:23542: checking if pgf95 supports -c -o file.o
 configure:23589: result: yes
-configure:23619: checking whether the ifort linker (/usr/bin/ld) supports shared libraries
-configure:24677: result: yes
+configure:23619: checking whether the pgf95 linker (/usr/bin/ld) supports shared libraries
+configure:24677: result: no
 configure:24814: checking dynamic linker characteristics
 configure:25447: result: darwin10.4.0 dyld
 configure:25498: checking how to hardcode library paths into programs
 configure:25523: result: immediate
-configure:25564: checking how to get verbose linking output from ifort
-configure:25580: ifort -c -g conftest.f >&5
+configure:25564: checking how to get verbose linking output from pgf95
+configure:25580: pgf95 -c -g conftest.f >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:25587: $? = 0
-configure:25609: ifort -o conftest -g -v conftest.f -lm
-Version 11.1 
-/opt/intel/Compiler/11.1/088/bin/intel64/fortcom    -D__INTEL_COMPILER=1110 -D_MT -D__INTEL_COMPILER_BUILD_DATE=20100401 -D__PIC__ -D__pic__ -D__APPLE__ -D__MACH__ -D__x86_64 -D__x86_64__ -mGLOB_pack_sort_init_list -I. -I/opt/intel/Compiler/11.1/088/include/intel64 -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/include/intel64 -I/opt/intel/Compiler/11.1/088/include -I/usr/local/include -I/usr/include -I/usr/lib/gcc/i686-apple-darwin10/4.2.1/include "-fp_modbits honor_f32_conversion" "-fp_modbits honor_f64_conversion" -O0 -g2 -mP1OPT_version=11.1-intel64 -mGLOB_diag_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforton9PCS.diag -mGLOB_diag_use_message_catalog=FALSE -mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort -mGLOB_use_fort_dope_vector -mP2OPT_static_promotion -mP1OPT_print_version=FALSE -mP3OPT_use_mspp_call_convention -mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE "-mGLOB_options_string=-o conftest -g -v -lm" -mGLOB_position_independent_code -mGLOB_preemption_model=1 -mGLOB_cxx_limited_range=FALSE -mP3OPT_emit_line_numbers -mP2OPT_suppress_unreferenced_locals=FALSE -mGLOB_debug_target=GLOB_DEBUG_TARGET_ALL -mGLOB_debug_format=GLOB_DEBUG_FORMAT_DWARF20 -mP3OPT_dwarf_format=P3OPT_DWARF_FORMAT_OBJ_ONLY -mGLOB_as_output_backup_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortHJfNTsas_.s -mIPOPT_activate -mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2 -mGLOB_maintain_errno -mGLOB_noinline_intrinsics -mGLOB_use_base_pointer -mGLOB_extended_instructions=0x80 -mGLOB_advanced_optim=TRUE -mP2OPT_subs_out_of_bound=FALSE -mGLOB_ansi_alias -mIPOPT_ninl_limit=0 -mIPOPT_ninl_user_level=0 -mIPOPT_args_in_regs=0 -mIPOPT_args_in_regs=0 -mPGOPTI_value_profile_use=T -mP2OPT_gen_linux_const_pooling=FALSE -mGLOB_opt_level=0 -mIPOPT_obj_output_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforton9PCS.o -mGLOB_os_target=GLOB_OS_TARGET_MACH -mGLOB_obj_output_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforton9PCS.o -mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN -mP1OPT_source_file_name=conftest.f conftest.f
-ld    -lcrt1.10.5.o -dynamic -arch x86_64 -weak_reference_mismatches non-weak -no_compact_unwind -o conftest /opt/intel/Compiler/11.1/088/lib/for_main.o /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforton9PCS.o -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libimf.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lgcc -lgcc_s.10.5 -lgcc -lSystemStubs -lmx -lSystem /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9EpQ7Flibgcc
+configure:25609: pgf95 -o conftest -g -v conftest.f -lm
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortSKCUVKgnudirs
+/opt/pgi/osx86-64/10.8/bin/pgf901 conftest.f -debug -x 120 0x80000 -x 120 0x200 -opt 0 -nohpf -nostatic -quad -x 15 2 -x 49 0x400004 -x 51 0x20 -x 57 0x4c -x 58 0x10000 -x 124 0x1000 -x 119 0x1000 -x 59 4 -x 129 0x10 -x 51 0x20 -x 124 0x401 -x 19 0x400000 -x 57 0x7b0000 -x 58 0x78031040 -x 119 0x610400 -x 119 0x1000 -x 59 4 -x 129 0x10 -x 48 4608 -x 49 0x100 -x 120 0x200 -stdinc /opt/pgi/osx86-64/10.8/include:/usr/local/include:/usr/lib/gcc/i686-apple-darwin10/4.2.1/include:/usr/lib/gcc/i686-apple-darwin10/4.2.1/include:/usr/include -def unix -def __unix -def __unix__ -def __LITTLE_ENDIAN__ -def __inline__= -def osx86 -def __osx86 -def __osx86__ -def __APPLE__ -def __LP64__ -def __x86_64__ -def _M_IX86 -def __NO_MATH_INLINES -def __amd64__ -def __extension__= -def __SSE__ -def __MMX__ -def __SSE2__ -def __SSE3__ -def __SSSE3__ -nofreeform -vect 48 -x 49 0x1000 -modexport /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95neXtNkNP7ASM.cmod -modindex /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf951eXtFFaXEB4k.cmdx -output /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95LeXtVKY8QQoc.ilm
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+  0 inform,   0 warnings,   0 severes, 0 fatal for main
+PGF90/x86-64 OSX 10.8-0: compilation successful
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortraZWPWos
+/opt/pgi/osx86-64/10.8/bin/pgf902 /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95LeXtVKY8QQoc.ilm -fn conftest.f -debug -x 120 0x80000 -x 120 0x200 -opt 0 -x 59 4 -x 119 0x10000010 -x 129 0x80 -x 19 0x400000 -dollar '$' -x 119 0x40610400 -x 119 0x1000 -x 59 4 -x 129 0x10 -x 70 0x8000 -x 122 1 -x 120 0x80 -x 122 0x40 -x 123 0x1000 -x 127 21 -tp penryn-64 -y 80 0x40000000 -x 120 0x200 -y 119 0x40000000 -x 51 0x20 -x 124 0x401 -x 124 0x1000 -x 124 0x4000 -y 15 2 -x 57 0x3b0000 -x 58 0x48000000 -x 49 0x100 -x 120 0x200 -astype 1 -x 117 0x2000 -x 124 1 -cmdline '+pgf95 conftest.f -o conftest -g -v -lm' -asm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95DeXtxBKhrBum.s
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+  0 inform,   0 warnings,   0 severes, 0 fatal for main
+PGF90/x86-64 OSX 10.8-0: compilation successful
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortmG7M8ytos
+/usr/bin/as -arch x86_64 /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95DeXtxBKhrBum.s -o conftest.o
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortbtN70zgdb_v
+/opt/pgi/osx86-64/10.8/bin/pgappend -noerror conftest.o -name .IPDINFO /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95neXtNkNP7ASM.cmod -name .IPEINFO /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf951eXtFFaXEB4k.cmdx
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortHJfNTsas_.s
-
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortzJ5G8carg
-
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortcv5abMgnudirs
-
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforton9PCS.o
+/usr/bin/ld /usr/lib/crt1.o /opt/pgi/osx86-64/10.8/lib/pgimainxx.o /opt/pgi/osx86-64/10.8/lib/f90main.o -arch x86_64 -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 conftest.o -lm -macosx_version_min 10.5.0 -rpath /opt/pgi/osx86-64/10.8/lib -o conftest -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lc -lnspgc -lpgc -lm -lgcc -lc -lgcc -lSystem
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95LeXtVKY8QQoc.ilm
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95neXtNkNP7ASM.cmod
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf951eXtFFaXEB4k.cmdx
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95DeXtxBKhrBum.s
 configure:25678: result: -v
-configure:25680: checking for Fortran 77 libraries of ifort
-configure:25703: ifort -o conftest -g -v conftest.f -lm
-Version 11.1 
-/opt/intel/Compiler/11.1/088/bin/intel64/fortcom    -D__INTEL_COMPILER=1110 -D_MT -D__INTEL_COMPILER_BUILD_DATE=20100401 -D__PIC__ -D__pic__ -D__APPLE__ -D__MACH__ -D__x86_64 -D__x86_64__ -mGLOB_pack_sort_init_list -I. -I/opt/intel/Compiler/11.1/088/include/intel64 -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/Frameworks/mkl/include -I/opt/intel/Compiler/11.1/088/include/intel64 -I/opt/intel/Compiler/11.1/088/include -I/usr/local/include -I/usr/include -I/usr/lib/gcc/i686-apple-darwin10/4.2.1/include "-fp_modbits honor_f32_conversion" "-fp_modbits honor_f64_conversion" -O0 -g2 -mP1OPT_version=11.1-intel64 -mGLOB_diag_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortdGC7FT.diag -mGLOB_diag_use_message_catalog=FALSE -mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort -mGLOB_use_fort_dope_vector -mP2OPT_static_promotion -mP1OPT_print_version=FALSE -mP3OPT_use_mspp_call_convention -mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE "-mGLOB_options_string=-o conftest -g -v -lm" -mGLOB_position_independent_code -mGLOB_preemption_model=1 -mGLOB_cxx_limited_range=FALSE -mP3OPT_emit_line_numbers -mP2OPT_suppress_unreferenced_locals=FALSE -mGLOB_debug_target=GLOB_DEBUG_TARGET_ALL -mGLOB_debug_format=GLOB_DEBUG_FORMAT_DWARF20 -mP3OPT_dwarf_format=P3OPT_DWARF_FORMAT_OBJ_ONLY -mGLOB_as_output_backup_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforto62GV6as_.s -mIPOPT_activate -mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2 -mGLOB_maintain_errno -mGLOB_noinline_intrinsics -mGLOB_use_base_pointer -mGLOB_extended_instructions=0x80 -mGLOB_advanced_optim=TRUE -mP2OPT_subs_out_of_bound=FALSE -mGLOB_ansi_alias -mIPOPT_ninl_limit=0 -mIPOPT_ninl_user_level=0 -mIPOPT_args_in_regs=0 -mIPOPT_args_in_regs=0 -mPGOPTI_value_profile_use=T -mP2OPT_gen_linux_const_pooling=FALSE -mGLOB_opt_level=0 -mIPOPT_obj_output_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortdGC7FT.o -mGLOB_os_target=GLOB_OS_TARGET_MACH -mGLOB_obj_output_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortdGC7FT.o -mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN -mP1OPT_source_file_name=conftest.f conftest.f
-ld    -lcrt1.10.5.o -dynamic -arch x86_64 -weak_reference_mismatches non-weak -no_compact_unwind -o conftest /opt/intel/Compiler/11.1/088/lib/for_main.o /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortdGC7FT.o -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/opt/intel/Compiler/11.1/088/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libimf.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lgcc -lgcc_s.10.5 -lgcc -lSystemStubs -lmx -lSystem /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortWS8wtZlibgcc
+configure:25680: checking for Fortran 77 libraries of pgf95
+configure:25703: pgf95 -o conftest -g -v conftest.f -lm
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortNgYytegnudirs
+/opt/pgi/osx86-64/10.8/bin/pgf901 conftest.f -debug -x 120 0x80000 -x 120 0x200 -opt 0 -nohpf -nostatic -quad -x 15 2 -x 49 0x400004 -x 51 0x20 -x 57 0x4c -x 58 0x10000 -x 124 0x1000 -x 119 0x1000 -x 59 4 -x 129 0x10 -x 51 0x20 -x 124 0x401 -x 19 0x400000 -x 57 0x7b0000 -x 58 0x78031040 -x 119 0x610400 -x 119 0x1000 -x 59 4 -x 129 0x10 -x 48 4608 -x 49 0x100 -x 120 0x200 -stdinc /opt/pgi/osx86-64/10.8/include:/usr/local/include:/usr/lib/gcc/i686-apple-darwin10/4.2.1/include:/usr/lib/gcc/i686-apple-darwin10/4.2.1/include:/usr/include -def unix -def __unix -def __unix__ -def __LITTLE_ENDIAN__ -def __inline__= -def osx86 -def __osx86 -def __osx86__ -def __APPLE__ -def __LP64__ -def __x86_64__ -def _M_IX86 -def __NO_MATH_INLINES -def __amd64__ -def __extension__= -def __SSE__ -def __MMX__ -def __SSE2__ -def __SSE3__ -def __SSSE3__ -nofreeform -vect 48 -x 49 0x1000 -modexport /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95nzXtNkNP7ASM.cmod -modindex /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf951zXtFFaXEB4k.cmdx -output /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95LzXtVKY8QQoc.ilm
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+  0 inform,   0 warnings,   0 severes, 0 fatal for main
+PGF90/x86-64 OSX 10.8-0: compilation successful
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortCG0hydos
+/opt/pgi/osx86-64/10.8/bin/pgf902 /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95LzXtVKY8QQoc.ilm -fn conftest.f -debug -x 120 0x80000 -x 120 0x200 -opt 0 -x 59 4 -x 119 0x10000010 -x 129 0x80 -x 19 0x400000 -dollar '$' -x 119 0x40610400 -x 119 0x1000 -x 59 4 -x 129 0x10 -x 70 0x8000 -x 122 1 -x 120 0x80 -x 122 0x40 -x 123 0x1000 -x 127 21 -tp penryn-64 -y 80 0x40000000 -x 120 0x200 -y 119 0x40000000 -x 51 0x20 -x 124 0x401 -x 124 0x1000 -x 124 0x4000 -y 15 2 -x 57 0x3b0000 -x 58 0x48000000 -x 49 0x100 -x 120 0x200 -astype 1 -x 117 0x2000 -x 124 1 -cmdline '+pgf95 conftest.f -o conftest -g -v -lm' -asm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95DzXtxBKhrBum.s
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+  0 inform,   0 warnings,   0 severes, 0 fatal for main
+PGF90/x86-64 OSX 10.8-0: compilation successful
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortfTRj5Ltos
+/usr/bin/as -arch x86_64 /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95DzXtxBKhrBum.s -o conftest.o
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortsUPZ00gdb_v
+/opt/pgi/osx86-64/10.8/bin/pgappend -noerror conftest.o -name .IPDINFO /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95nzXtNkNP7ASM.cmod -name .IPEINFO /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf951zXtFFaXEB4k.cmdx
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforto62GV6as_.s
-
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforti7C1Uearg
-
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9h1XNbgnudirs
-
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortdGC7FT.o
-configure:25880: result:  -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl
+/usr/bin/ld /usr/lib/crt1.o /opt/pgi/osx86-64/10.8/lib/pgimainxx.o /opt/pgi/osx86-64/10.8/lib/f90main.o -arch x86_64 -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 conftest.o -lm -macosx_version_min 10.5.0 -rpath /opt/pgi/osx86-64/10.8/lib -o conftest -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lc -lnspgc -lpgc -lm -lgcc -lc -lgcc -lSystem
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95LzXtVKY8QQoc.ilm
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95nzXtNkNP7ASM.cmod
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf951zXtFFaXEB4k.cmdx
+Unlinking /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-/pgf95DzXtxBKhrBum.s
+configure:25880: result:  -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc
 configure:25896: checking for dummy main to link with Fortran 77 libraries
-configure:25940: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c -lm   -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl >&5
+configure:25940: pgcc -Masmkeyword -o conftest -O3   conftest.c -lm   -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:25947: $? = 0
 configure:26035: result: none
 configure:26080: checking for Fortran 77 name-mangling scheme
-configure:26099: ifort -c -g conftest.f >&5
+configure:26099: pgf95 -c -g conftest.f >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:26106: $? = 0
-configure:26161: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c cfortran_test.o -lm   -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl >&5
+configure:26161: pgcc -Masmkeyword -o conftest -O3   conftest.c cfortran_test.o -lm   -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc >&5
+conftest.c:
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 Undefined symbols:
   "_foobar", referenced from:
-      _main in icc8xAbB5.o
+      _main in conftest.o
 ld: symbol(s) not found
-configure:26168: $? = 1
+configure:26168: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -3327,8 +3618,6 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
 | #define HAVE_MACH_ABSOLUTE_TIME 1
 | #define HAVE_SYSCTL 1
 | #define HAVE_ABORT 1
@@ -3365,19 +3654,20 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:26161: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c cfortran_test.o -lm   -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl >&5
+configure:26161: pgcc -Masmkeyword -o conftest -O3   conftest.c cfortran_test.o -lm   -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc >&5
+conftest.c:
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:26168: $? = 0
-configure:26250: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3   conftest.c cfortran_test.o -lm   -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl >&5
+configure:26250: pgcc -Masmkeyword -o conftest -O3   conftest.c cfortran_test.o -lm   -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc >&5
+conftest.c:
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:26257: $? = 0
 configure:26320: result: lower case, underscore, no extra underscore
 configure:26867: checking for the pthreads library -lpthreads
-configure:26921: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3    conftest.c -lpthreads -lm  >&5
-conftest.c(87): warning #592: variable "th" is used before its value is set
-  pthread_t th; pthread_join(th, (void**) 0);
-                             ^
-
+configure:26921: pgcc -Masmkeyword -o conftest -O3    conftest.c -lpthreads -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 ld: library not found for -lpthreads
-configure:26928: $? = 1
+configure:26928: $? = 2
 configure: failed program was:
 | /* confdefs.h.  */
 | #define PACKAGE_NAME "fftw"
@@ -3434,8 +3724,6 @@ configure: failed program was:
 | #define HAVE_SQRT 1
 | #define HAVE_MEMSET 1
 | #define HAVE_POSIX_MEMALIGN 1
-| #define HAVE__MM_MALLOC 1
-| #define HAVE__MM_FREE 1
 | #define HAVE_MACH_ABSOLUTE_TIME 1
 | #define HAVE_SYSCTL 1
 | #define HAVE_ABORT 1
@@ -3476,21 +3764,24 @@ configure: failed program was:
 | }
 configure:26951: result: no
 configure:26812: checking whether pthreads work without any flags
-configure:26921: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3    conftest.c  -lm  >&5
-conftest.c(87): warning #592: variable "th" is used before its value is set
-  pthread_t th; pthread_join(th, (void**) 0);
-                             ^
-
+configure:26921: pgcc -Masmkeyword -o conftest -O3    conftest.c  -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:26928: $? = 0
 configure:26951: result: yes
 configure:26970: checking for joinable pthread attribute
-configure:27003: icc -std=c99 -o conftest -O3 -ansi-alias -malign-double -axssse3    conftest.c  -lm  >&5
+configure:27003: pgcc -Masmkeyword -o conftest -O3    conftest.c  -lm  >&5
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:27010: $? = 0
 configure:27030: result: PTHREAD_CREATE_JOINABLE
 configure:27040: checking if more special flags are required for pthreads
 configure:27047: result: -D_THREAD_SAFE
+configure:27062: checking for xlc_r
+configure:27092: result: no
+configure:27062: checking for cc_r
+configure:27092: result: no
 configure:27228: checking whether a cycle counter is available
-configure:27248: icc -std=c99 -E  -I./kernel conftest.c
+configure:27248: pgcc -E  -I./kernel conftest.c
+NOTE: your trial license will expire in 13 days, 0.976 hours.
 configure:27255: $? = 0
 configure:27270: result: yes
 configure:27466: creating ./config.status
@@ -3510,52 +3801,52 @@ generated by GNU Autoconf 2.63.  Invocation command line was
 
 on sleigh
 
-config.status:1170: creating Makefile
-config.status:1170: creating support/Makefile
-config.status:1170: creating genfft/Makefile
-config.status:1170: creating kernel/Makefile
-config.status:1170: creating simd/Makefile
-config.status:1170: creating simd/nonportable/Makefile
-config.status:1170: creating dft/Makefile
-config.status:1170: creating dft/scalar/Makefile
-config.status:1170: creating dft/scalar/codelets/Makefile
-config.status:1170: creating dft/simd/Makefile
-config.status:1170: creating dft/simd/codelets/Makefile
-config.status:1170: creating rdft/Makefile
-config.status:1170: creating rdft/scalar/Makefile
-config.status:1170: creating rdft/scalar/r2cf/Makefile
-config.status:1170: creating rdft/scalar/r2cb/Makefile
-config.status:1170: creating rdft/scalar/r2r/Makefile
-config.status:1170: creating rdft/simd/Makefile
-config.status:1170: creating rdft/simd/codelets/Makefile
-config.status:1170: creating reodft/Makefile
-config.status:1170: creating threads/Makefile
-config.status:1170: creating cell/Makefile
-config.status:1170: creating cell/spu/Makefile
-config.status:1170: creating api/Makefile
-config.status:1170: creating libbench2/Makefile
-config.status:1170: creating tests/Makefile
-config.status:1170: creating doc/Makefile
-config.status:1170: creating doc/FAQ/Makefile
-config.status:1170: creating tools/Makefile
-config.status:1170: creating tools/fftw_wisdom.1
-config.status:1170: creating tools/fftw-wisdom-to-conf
-config.status:1170: creating m4/Makefile
-config.status:1170: creating fftw.pc
-config.status:1170: creating config.h
-config.status:1444: executing depfiles commands
-config.status:1444: executing libtool commands
+config.status:1163: creating Makefile
+config.status:1163: creating support/Makefile
+config.status:1163: creating genfft/Makefile
+config.status:1163: creating kernel/Makefile
+config.status:1163: creating simd/Makefile
+config.status:1163: creating simd/nonportable/Makefile
+config.status:1163: creating dft/Makefile
+config.status:1163: creating dft/scalar/Makefile
+config.status:1163: creating dft/scalar/codelets/Makefile
+config.status:1163: creating dft/simd/Makefile
+config.status:1163: creating dft/simd/codelets/Makefile
+config.status:1163: creating rdft/Makefile
+config.status:1163: creating rdft/scalar/Makefile
+config.status:1163: creating rdft/scalar/r2cf/Makefile
+config.status:1163: creating rdft/scalar/r2cb/Makefile
+config.status:1163: creating rdft/scalar/r2r/Makefile
+config.status:1163: creating rdft/simd/Makefile
+config.status:1163: creating rdft/simd/codelets/Makefile
+config.status:1163: creating reodft/Makefile
+config.status:1163: creating threads/Makefile
+config.status:1163: creating cell/Makefile
+config.status:1163: creating cell/spu/Makefile
+config.status:1163: creating api/Makefile
+config.status:1163: creating libbench2/Makefile
+config.status:1163: creating tests/Makefile
+config.status:1163: creating doc/Makefile
+config.status:1163: creating doc/FAQ/Makefile
+config.status:1163: creating tools/Makefile
+config.status:1163: creating tools/fftw_wisdom.1
+config.status:1163: creating tools/fftw-wisdom-to-conf
+config.status:1163: creating m4/Makefile
+config.status:1163: creating fftw.pc
+config.status:1163: creating config.h
+config.status:1437: executing depfiles commands
+config.status:1437: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
 ## ---------------- ##
 
 ac_cv_build=i386-apple-darwin10.4.0
-ac_cv_c_compiler_gnu=yes
+ac_cv_c_compiler_gnu=no
 ac_cv_c_const=yes
 ac_cv_c_inline=inline
 ac_cv_env_CC_set=set
-ac_cv_env_CC_value=icc
+ac_cv_env_CC_value=pgcc
 ac_cv_env_CFLAGS_set=
 ac_cv_env_CFLAGS_value=
 ac_cv_env_CPPFLAGS_set=
@@ -3563,7 +3854,7 @@ ac_cv_env_CPPFLAGS_value=
 ac_cv_env_CPP_set=
 ac_cv_env_CPP_value=
 ac_cv_env_F77_set=set
-ac_cv_env_F77_value=ifort
+ac_cv_env_F77_value=pgf95
 ac_cv_env_FFLAGS_set=
 ac_cv_env_FFLAGS_value=
 ac_cv_env_LDFLAGS_set=
@@ -3580,13 +3871,13 @@ ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
 ac_cv_f77_compiler_gnu=no
 ac_cv_f77_dummy_main=none
-ac_cv_f77_libs=' -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl'
+ac_cv_f77_libs=' -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc'
 ac_cv_f77_mangling='lower case, underscore, no extra underscore'
 ac_cv_fortran_dummy_main=none
 ac_cv_func_BSDgettimeofday=no
 ac_cv_func__doprnt=no
-ac_cv_func__mm_free=yes
-ac_cv_func__mm_malloc=yes
+ac_cv_func__mm_free=no
+ac_cv_func__mm_malloc=no
 ac_cv_func_abort=yes
 ac_cv_func_alloca_works=yes
 ac_cv_func_clock_gettime=no
@@ -3643,9 +3934,9 @@ ac_cv_path_GREP=/usr/bin/grep
 ac_cv_path_SED=/usr/bin/sed
 ac_cv_path_install='/usr/bin/install -c'
 ac_cv_prog_AWK=awk
-ac_cv_prog_CPP='icc -std=c99 -E'
+ac_cv_prog_CPP='pgcc -E'
 ac_cv_prog_ac_ct_AR=ar
-ac_cv_prog_ac_ct_CC=icc
+ac_cv_prog_ac_ct_CC=pgcc
 ac_cv_prog_ac_ct_DSYMUTIL=dsymutil
 ac_cv_prog_ac_ct_LIPO=lipo
 ac_cv_prog_ac_ct_NMEDIT=nmedit
@@ -3654,9 +3945,9 @@ ac_cv_prog_ac_ct_OTOOL=otool
 ac_cv_prog_ac_ct_RANLIB=ranlib
 ac_cv_prog_ac_ct_STRIP=strip
 ac_cv_prog_cc_c89=
-ac_cv_prog_cc_c99=-std=c99
+ac_cv_prog_cc_c99=
 ac_cv_prog_cc_g=yes
-ac_cv_prog_cc_stdc=-std=c99
+ac_cv_prog_cc_stdc=
 ac_cv_prog_f77_g=yes
 ac_cv_prog_f77_v=-v
 ac_cv_prog_make_make_set=yes
@@ -3675,14 +3966,11 @@ ac_cv_type_long_double=yes
 ac_cv_type_size_t=yes
 ac_cv_type_uintptr_t=yes
 ac_cv_working_alloca_h=yes
-am_cv_CC_dependencies_compiler_type=gcc3
-ax_cv_c_compiler_vendor=intel
-ax_cv_c_flags__O3__ansi_alias__malign_double__axssse3=yes
-ax_cv_c_flags__ansi_alias=yes
-ax_cv_c_flags__axssse3=yes
-ax_cv_c_flags__malign_double=yes
-ax_cv_c_flags__mpreferred_stack_boundary_4=no
-lt_cv_apple_cc_single_mod=yes
+am_cv_CC_dependencies_compiler_type=none
+ax_cv_c_compiler_vendor=portland
+ax_cv_c_flags__Masmkeyword=yes
+ax_cv_c_flags__O3=yes
+lt_cv_apple_cc_single_mod=no
 lt_cv_deplibs_check_method=pass_all
 lt_cv_file_magic_cmd='$MAGIC_CMD'
 lt_cv_file_magic_test_file=
@@ -3695,8 +3983,7 @@ lt_cv_path_NM=/usr/bin/nm
 lt_cv_prog_compiler_c_o=yes
 lt_cv_prog_compiler_c_o_F77=yes
 lt_cv_prog_compiler_pic_works=yes
-lt_cv_prog_compiler_rtti_exceptions=yes
-lt_cv_prog_compiler_static_works=no
+lt_cv_prog_compiler_static_works=yes
 lt_cv_prog_compiler_static_works_F77=yes
 lt_cv_prog_gnu_ld=no
 lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p'\'''
@@ -3721,13 +4008,13 @@ AUTOCONF='${SHELL} /Users/ponder/tinker/fftw/missing --run autoconf'
 AUTOHEADER='${SHELL} /Users/ponder/tinker/fftw/missing --run autoheader'
 AUTOMAKE='${SHELL} /Users/ponder/tinker/fftw/missing --run automake-1.10'
 AWK='awk'
-CC='icc -std=c99'
-CCDEPMODE='depmode=gcc3'
-CFLAGS='-O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE '
+CC='pgcc -Masmkeyword'
+CCDEPMODE='depmode=none'
+CFLAGS='-O3 -D_THREAD_SAFE '
 CODELET_OPTIM=''
 COMBINED_THREADS_FALSE=''
 COMBINED_THREADS_TRUE='#'
-CPP='icc -std=c99 -E'
+CPP='pgcc -E'
 CPPFLAGS=''
 CYGPATH_W='echo'
 DEFS='-DHAVE_CONFIG_H'
@@ -3740,10 +4027,10 @@ ECHO_N=''
 ECHO_T=''
 EGREP='/usr/bin/grep -E'
 EXEEXT=''
-F77='ifort'
+F77='pgf95'
 FFLAGS='-g'
 FGREP='/usr/bin/grep -F'
-FLIBS=' -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl'
+FLIBS=' -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc'
 GREP='/usr/bin/grep'
 HAVE_CELL_FALSE=''
 HAVE_CELL_TRUE='#'
@@ -3799,7 +4086,7 @@ POW_LIB=''
 PRECISION='d'
 PREC_SUFFIX=''
 PRTDIAG=''
-PTHREAD_CC='icc -std=c99'
+PTHREAD_CC='pgcc -Masmkeyword'
 PTHREAD_CFLAGS='-D_THREAD_SAFE '
 PTHREAD_LIBS=''
 RANLIB='ranlib'
@@ -3818,12 +4105,12 @@ TARGET_OCAMLLIB='/Users/ponder/tinker/fftw/lib/fftw'
 TARGET_OCAMLRUN='/Users/ponder/tinker/fftw/bin/ocamlrun'
 THREADLIBS=' '
 VERSION='3.2.2'
-ac_ct_CC='icc'
+ac_ct_CC='pgcc'
 ac_ct_DUMPBIN=''
 ac_ct_F77=''
 acx_pthread_config=''
-am__fastdepCC_FALSE='#'
-am__fastdepCC_TRUE=''
+am__fastdepCC_FALSE=''
+am__fastdepCC_TRUE='#'
 am__include='include'
 am__isrc=''
 am__leading_dot='.'
@@ -3925,8 +4212,6 @@ target_alias=''
 #define HAVE_SQRT 1
 #define HAVE_MEMSET 1
 #define HAVE_POSIX_MEMALIGN 1
-#define HAVE__MM_MALLOC 1
-#define HAVE__MM_FREE 1
 #define HAVE_MACH_ABSOLUTE_TIME 1
 #define HAVE_SYSCTL 1
 #define HAVE_ABORT 1
@@ -3945,7 +4230,7 @@ target_alias=''
 #define HAVE_THREADS 1
 #define USING_POSIX_THREADS 1
 #define HAVE_THREADS 1
-#define FFTW_CC "icc -std=c99 -O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE "
+#define FFTW_CC "pgcc -Masmkeyword -O3 -D_THREAD_SAFE "
 #define CODELET_OPTIM ""
 
 configure: exit 0

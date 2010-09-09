@@ -1910,37 +1910,43 @@ c
             if (iz .ne. 0)  iz = type(iz)
             if (ix .ne. 0)  ix = type(ix)
             if (iy .ne. 0)  iy = type(iy)
-            if (polaxe(i) .eq. 'Z-then-X') then
+            if (polaxe(i) .eq. 'None') then
+               write (ikey,60)  it,pole(1,i)
+   60          format ('multipole',27x,f11.5)
+            else if (polaxe(i) .eq. 'Z-Only') then
+               write (ikey,70)  it,iz,pole(1,i)
+   70          format ('multipole',1x,2i5,16x,f11.5)
+            else if (polaxe(i) .eq. 'Z-then-X') then
                if (yaxis(i) .eq. 0) then
-                  write (ikey,60)  it,iz,ix,pole(1,i)
-   60             format ('multipole',1x,3i5,11x,f11.5)
+                  write (ikey,80)  it,iz,ix,pole(1,i)
+   80             format ('multipole',1x,3i5,11x,f11.5)
                else
-                  write (ikey,70)  it,iz,ix,iy,pole(1,i)
-   70             format ('multipole',1x,4i5,6x,f11.5)
+                  write (ikey,90)  it,iz,ix,iy,pole(1,i)
+   90             format ('multipole',1x,4i5,6x,f11.5)
                end if
             else if (polaxe(i) .eq. 'Bisector') then
                if (yaxis(i) .eq. 0) then
-                  write (ikey,80)  it,iz,-ix,pole(1,i)
-   80             format ('multipole',1x,3i5,11x,f11.5)
+                  write (ikey,100)  it,iz,-ix,pole(1,i)
+  100             format ('multipole',1x,3i5,11x,f11.5)
                else
-                  write (ikey,90)  it,iz,-ix,iy,pole(1,i)
-   90             format ('multipole',1x,4i5,6x,f11.5)
+                  write (ikey,110)  it,iz,-ix,iy,pole(1,i)
+  110             format ('multipole',1x,4i5,6x,f11.5)
                end if
             else if (polaxe(i) .eq. 'Z-Bisect') then
-               write (ikey,100)  it,iz,-ix,-iy,pole(1,i)
-  100          format ('multipole',1x,4i5,6x,f11.5)
+               write (ikey,120)  it,iz,-ix,-iy,pole(1,i)
+  120          format ('multipole',1x,4i5,6x,f11.5)
             else if (polaxe(i) .eq. '3-Fold') then
-               write (ikey,110)  it,-iz,-ix,-iy,pole(1,i)
-  110          format ('multipole',1x,4i5,6x,f11.5)
+               write (ikey,130)  it,-iz,-ix,-iy,pole(1,i)
+  130          format ('multipole',1x,4i5,6x,f11.5)
             end if
-            write (ikey,120)  pole(2,i),pole(3,i),pole(4,i)
-  120       format (36x,3f11.5)
-            write (ikey,130)  pole(5,i)
-  130       format (36x,f11.5)
-            write (ikey,140)  pole(8,i),pole(9,i)
-  140       format (36x,2f11.5)
-            write (ikey,150)  pole(11,i),pole(12,i),pole(13,i)
-  150       format (36x,3f11.5)
+            write (ikey,140)  pole(2,i),pole(3,i),pole(4,i)
+  140       format (36x,3f11.5)
+            write (ikey,150)  pole(5,i)
+  150       format (36x,f11.5)
+            write (ikey,160)  pole(8,i),pole(9,i)
+  160       format (36x,2f11.5)
+            write (ikey,170)  pole(11,i),pole(12,i),pole(13,i)
+  170       format (36x,3f11.5)
          end if
       end do
       close (unit=ikey)

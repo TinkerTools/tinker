@@ -27,11 +27,13 @@ c     class1    atom class of each atom in the final state system
 c     mut       true if an atom is to be mutated, false otherwise
 c
 c
-      integer nmut,imut(maxatm)
-      integer type0(maxatm),type1(maxatm)
-      integer class0(maxatm),class1(maxatm)
-      real*8 lambda,vlambda,clambda
-      real*8 dlambda,mlambda,plambda
-      logical mut(maxatm)
+      integer nmut,imut
+      integer type0,type1
+      integer class0,class1
+      real*8 lambda,vlambda
+      real*8 clambda,dlambda
+      real*8 mlambda,plambda
+      logical mut
       common /mutant/ lambda,vlambda,clambda,dlambda,mlambda,plambda,
-     &                nmut,imut,type0,type1,class0,class1,mut
+     &                nmut,imut(maxatm),type0(maxatm),type1(maxatm),
+     &                class0(maxatm),class1(maxatm),mut(maxatm)

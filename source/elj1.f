@@ -891,7 +891,7 @@ c     transfer global to local copies for OpenMP calculation
 c
       evt = ev
       eintert = einter
-      do i = 1, maxatm
+      do i = 1, n
          devt(1,i) = dev(1,i)
          devt(2,i) = dev(2,i)
          devt(3,i) = dev(3,i)
@@ -1086,7 +1086,7 @@ c     transfer local to global copies for OpenMP calculation
 c
       ev = evt
       einter = eintert
-      do i = 1, maxatm
+      do i = 1, n
          dev(1,i) = devt(1,i)
          dev(2,i) = devt(2,i)
          dev(3,i) = devt(3,i)

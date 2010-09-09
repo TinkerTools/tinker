@@ -53,6 +53,7 @@ c
       integer i,ii
       integer ix,iy,iz
       real*8 r,dot
+      real*8 random
       real*8 xi,yi,zi
       real*8 dx,dy,dz
       real*8 dx1,dy1,dz1
@@ -80,9 +81,31 @@ c
       a(2,3) = 0.0d0
       a(3,3) = 1.0d0
 c
-c     z-then-x method rotation matrix elements for z- and x-axes
+c     Z-only method rotation matrix elements for z-axis only
 c
-      if (polaxe(i) .eq. 'Z-then-X') then
+      if (polaxe(i) .eq. 'Z-Only') then
+         dx = x(iz) - xi
+         dy = y(iz) - yi
+         dz = z(iz) - zi
+         r = sqrt(dx*dx + dy*dy + dz*dz)
+         a(1,3) = dx / r
+         a(2,3) = dy / r
+         a(3,3) = dz / r
+         dx = random ()
+         dy = random ()
+         dz = random ()
+         dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
+         dx = dx - dot*a(1,3)
+         dy = dy - dot*a(2,3)
+         dz = dz - dot*a(3,3)
+         r = sqrt(dx*dx + dy*dy + dz*dz)
+         a(1,1) = dx / r
+         a(2,1) = dy / r
+         a(3,1) = dz / r
+c
+c     Z-then-X method rotation matrix elements for z- and x-axes
+c
+      else if (polaxe(i) .eq. 'Z-then-X') then
          dx = x(iz) - xi
          dy = y(iz) - yi
          dz = z(iz) - zi
@@ -135,7 +158,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     z-bisect method rotation matrix elements for z- and x-axes
+c     Z-bisect method rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Z-Bisect') then
          dx = x(iz) - xi

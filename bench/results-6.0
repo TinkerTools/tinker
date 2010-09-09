@@ -8,12 +8,15 @@
  Gas-Phase Calmodulin Molecule, 2264 Atoms, Amber ff94 Force Field,
  No Nonbonded Cutoffs, 10 Evaluations
 
- MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
- ------------                                 ---    ------  --------  -------
+ MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
+ ---------------------------                  ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      1.86      3.05     8.92
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93      1.86      3.06     8.91
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93      1.52      3.23    10.69
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93      1.53      3.19    11.79
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93      2.10      4.33    15.86
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      1.95      3.20     9.30
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66      2.73      4.71    12.78
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66      2.73      4.71    12.78
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66      2.56      4.86    14.69
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40      2.42      4.69    15.43
 
@@ -22,12 +25,15 @@
  Crambin Unit Cell, 1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
  with PME for Electrostatics, 9.0 Ang vdw Cutoff, 100 Evaluations
 
- MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
- ------------                                 ---    ------  --------  -------
+ MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
+ ---------------------------                  ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93      3.25      4.49    16.10
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93      3.26      4.48    16.00
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93      3.09      4.49    19.48
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93      2.87      4.41    21.46
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93      4.17      5.91    33.11
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      3.43      4.74    16.96
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66      4.04      5.61    20.16
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66      4.04      5.61    20.16
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66      3.91      5.35    23.56
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40      5.76      7.68    30.61
 
@@ -36,12 +42,15 @@
  Normal Modes of the Hessian and Vibration Freqencies of a 20-Amino Acid,
  328-Atom Peptide, OPLS-AA Force Field without Cutoffs
 
- MACHINE TYPE                                 GHz             Seconds
- ------------                                 ---             -------
+ MACHINE TYPE (OS, Compiler)                  GHz             Seconds
+ ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                3.32
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93                4.93
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93                4.99
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93                4.36
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                7.35
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                3.46
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                4.00
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                4.00
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                4.55
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                7.98
 
@@ -51,12 +60,15 @@
  9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
  Step with Modified Beeman Integration
 
- MACHINE TYPE                                 GHz             Seconds
- ------------                                 ---             -------
+ MACHINE TYPE (OS, Compiler)                  GHz             Seconds
+ ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                14.5
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93                14.4
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93                14.4
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93                13.6
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                23.3
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                15.1
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                20.8
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                20.8
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                21.4
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                21.7
 
@@ -66,35 +78,42 @@
  Neighbor Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff, and 1.0 fs Time Step with Modified Beeman Integration
 
- MACHINE TYPE                                 GHz             Seconds
- ------------                                 ---             -------
+ MACHINE TYPE (OS, Compiler)                  GHz             Seconds
+ ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93                 158
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93                 143
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93                 180
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93                 206
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                 247
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                 161
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66                 210
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                 210
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                 232
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                 293
 
- Benchmark #6: CHARMM DFHR-Water Molecular Dynamics (Parallel, OpenMP)
+ Benchmark #6: CHARMM DHFR-Water Molecular Dynamics (Parallel, OpenMP)
 
  MD run of 100 MD Steps for CHARMM DHFR-Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
  OpenMP timings reported as "wall clock" time for benchmark
 
- MACHINE TYPE                                 GHz    Cores/Threads     Seconds
- ------------                                 ---    -------------     -------
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1        76 (1.00)
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2        48 (1.58)
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/1        77 (1.00)
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2        48 (1.60)
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1        82 (1.00)
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/2        52 (1.58)
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93         2/1        77 (1.00)
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93       Serial      108 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1        80 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2        51 (1.57)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        36 (2.22)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6        32 (2.50)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8        29 (2.76)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/1       102 (1.00)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/2        64 (1.59)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/4        46 (2.22)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/1       102 (1.00)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/2        64 (1.59)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/4        46 (2.22)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/1       103 (1.00)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/2        65 (1.58)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/4        46 (2.24)
@@ -102,26 +121,30 @@
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/2        83 (1.59)
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/4        58 (2.28)
 
- Benchmark #7: AMOEBA DFHR-Water Molecular Dynamics (Parallel, OpenMP)
+ Benchmark #7: AMOEBA DHFR-Water Molecular Dynamics (Parallel, OpenMP)
 
  MD run of 100 MD Steps for AMOEBA DHFR-Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
  OpenMP timings reported as "wall clock" time for benchmark
 
- MACHINE TYPE                                 GHz    Cores/Threads     Seconds
- ------------                                 ---    -------------     -------
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/1       624 (1.00)
- MacBook Pro (OSX 10.6.3, Intel 11.1)        2.93         2/2       341 (1.83)
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/1       616 (1.00)
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2       341 (1.83)
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1       750 (1.00)
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/2       408 (1.84)
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93         2/1       790 (1.00)
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93       Serial     1091 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1       654 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2       373 (1.75)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4       228 (2.87)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6       183 (3.57)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8       153 (4.27)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/1       849 (1.00)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/2       486 (1.75)
- Mac Pro (OSX 10.6.3, Intel 11.1)            2.66         4/4       295 (2.88)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/1       849 (1.00)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/2       486 (1.75)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/4       295 (2.88)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/1       940 (1.00)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/2       557 (1.69)
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/4       333 (2.82)
@@ -131,8 +154,7 @@
 
  ----------------------
  Times are reported in seconds and were measured with TINKER Version 6.0,
- dimensioned to MAXATM=75000 and MAXHESS=1000000. Each benchmark ran twice
+ dimensioned to MAXATM=50000 and MAXHESS=1000000. Each benchmark ran twice
  in rapid succession on a quiet machine, and times shown were taken from
  the second run. The first 5 benchmarks were run with serial executables,
  while the last two benchmarks are a test of OpenMP parallel performance.
-

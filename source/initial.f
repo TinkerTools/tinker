@@ -73,8 +73,8 @@ c
 c
 c     Intel compiler extensions to OpenMP standard
 c
-!$    call kmp_set_stacksize (2**24)
-!$    call kmp_set_blocktime (0)
+c!$    call kmp_set_stacksize (2**24)
+c!$    call kmp_set_blocktime (0)
 c
 c     values of machine precision constants
 c

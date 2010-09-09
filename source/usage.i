@@ -19,4 +19,4 @@ c
 c
       integer nuse,iuse
       logical use
-      common /usage/ nuse,iuse(maxatm),use(maxatm)
+      common /usage/ nuse,iuse(maxatm),use(0:maxatm)

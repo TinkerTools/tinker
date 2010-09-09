@@ -12,10 +12,10 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     m2scale   factor by which 1-2 multipole interactions are scaled
-c     m3scale   factor by which 1-3 multipole interactions are scaled
-c     m4scale   factor by which 1-4 multipole interactions are scaled
-c     m5scale   factor by which 1-5 multipole interactions are scaled
+c     m2scale   scale factor for 1-2 multipole energy interactions
+c     m3scale   scale factor for 1-3 multipole energy interactions
+c     m4scale   scale factor for 1-4 multipole energy interactions
+c     m5scale   scale factor for 1-5 multipole energy interactions
 c
 c
       real*8 m2scale,m3scale

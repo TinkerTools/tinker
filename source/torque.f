@@ -19,7 +19,7 @@ c
 c     literature reference:
 c
 c     P. L. Popelier and A. J. Stone, "Formulae for the First and
-c     Second Derivatives of Aniostropic Potentials with Respect to
+c     Second Derivatives of Anisotropic Potentials with Respect to
 c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c
@@ -31,7 +31,7 @@ c
       include 'mpole.i'
       integer i,j
       integer ia,ib,ic,id
-      real*8 du,dv,dw
+      real*8 du,dv,dw,random
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -59,14 +59,6 @@ c
       character*8 axetyp
 c
 c
-c     get the local frame type and the frame-defining atoms
-c
-      ia = zaxis(i)
-      ib = ipole(i)
-      ic = xaxis(i)
-      id = yaxis(i)
-      axetyp = polaxe(i)
-c
 c     zero out force components on local frame-defining atoms
 c
       do j = 1, 3
@@ -75,22 +67,37 @@ c
          frcy(j) = 0.0d0
       end do
 c
+c     get the local frame type and the frame-defining atoms
+c
+      ia = zaxis(i)
+      ib = ipole(i)
+      ic = xaxis(i)
+      id = yaxis(i)
+      axetyp = polaxe(i)
+      if (axetyp .eq. 'None')  return
+c
 c     construct the three rotation axes for the local frame
 c
       u(1) = x(ia) - x(ib)
       u(2) = y(ia) - y(ib)
       u(3) = z(ia) - z(ib)
-      v(1) = x(ic) - x(ib)
-      v(2) = y(ic) - y(ib)
-      v(3) = z(ic) - z(ib)
-      if (axetyp.eq.'Z-then-X' .or. axetyp.eq.'Bisector') then
-         w(1) = u(2)*v(3) - u(3)*v(2)
-         w(2) = u(3)*v(1) - u(1)*v(3)
-         w(3) = u(1)*v(2) - u(2)*v(1)
-      else if (axetyp.eq.'Z-Bisect' .or. axetyp.eq.'3-Fold') then
+      if (axetyp .ne. 'Z-Only') then
+         v(1) = x(ic) - x(ib)
+         v(2) = y(ic) - y(ib)
+         v(3) = z(ic) - z(ib)
+      else
+         v(1) = random ()
+         v(2) = random ()
+         v(3) = random ()
+      end if
+      if (axetyp.eq.'Z-Bisect' .or. axetyp.eq.'3-Fold') then
          w(1) = x(id) - x(ib)
          w(2) = y(id) - y(ib)
          w(3) = z(id) - z(ib)
+      else
+         w(1) = u(2)*v(3) - u(3)*v(2)
+         w(2) = u(3)*v(1) - u(1)*v(3)
+         w(3) = u(1)*v(2) - u(2)*v(1)
       end if
       usiz = sqrt(u(1)*u(1) + u(2)*u(2) + u(3)*u(3))
       vsiz = sqrt(v(1)*v(1) + v(2)*v(2) + v(3)*v(3))
@@ -162,7 +169,7 @@ c
          end do
       end if
 c
-c     compute the sine of the angle between the rotation axes
+c     get sine and cosine of angles between the rotation axes
 c
       uvcos = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
       uvsin = sqrt(1.0d0 - uvcos*uvcos)
@@ -211,9 +218,19 @@ c
          dphids = -trq1(1)*s(1) - trq1(2)*s(2) - trq1(3)*s(3)
       end if
 c
+c     force distribution for the Z-only local coordinate method
+c
+      if (axetyp .eq. 'Z-Only') then
+         do j = 1, 3
+            du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
+            dem(j,ia) = dem(j,ia) + du
+            dem(j,ib) = dem(j,ib) - du
+c           frcz(j) = frcz(j) + du
+         end do
+c
 c     force distribution for the Z-then-X local coordinate method
 c
-      if (axetyp .eq. 'Z-then-X') then
+      else if (axetyp .eq. 'Z-then-X') then
          do j = 1, 3
             du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
             dv = -uv(j)*dphidu/(vsiz*uvsin)
@@ -296,9 +313,19 @@ c
          dphids = -trq2(1)*s(1) - trq2(2)*s(2) - trq2(3)*s(3)
       end if
 c
+c     force distribution for the Z-only local coordinate method
+c
+      if (axetyp .eq. 'Z-Only') then
+         do j = 1, 3
+            du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
+            dep(j,ia) = dep(j,ia) + du
+            dep(j,ib) = dep(j,ib) - du
+            frcz(j) = frcz(j) + du
+         end do
+c
 c     force distribution for the Z-then-X local coordinate method
 c
-      if (axetyp .eq. 'Z-then-X') then
+      else if (axetyp .eq. 'Z-then-X') then
          do j = 1, 3
             du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
             dv = -uv(j)*dphidu/(vsiz*uvsin)
@@ -387,7 +414,7 @@ c
 c     literature reference:
 c
 c     P. L. Popelier and A. J. Stone, "Formulae for the First and
-c     Second Derivatives of Aniostropic Potentials with Respect to
+c     Second Derivatives of Anisotropic Potentials with Respect to
 c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c
@@ -398,7 +425,7 @@ c
       include 'mpole.i'
       integer i,j
       integer ia,ib,ic,id
-      real*8 du,dv,dw
+      real*8 du,dv,dw,random
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -421,8 +448,8 @@ c
       real*8 uv(3),uw(3),vw(3)
       real*8 ur(3),us(3)
       real*8 vs(3),ws(3)
-      real*8 trq(3,maxatm)
-      real*8 derivs(3,maxatm)
+      real*8 trq(3,*)
+      real*8 derivs(3,*)
       character*8 axetyp
 c
 c
@@ -434,23 +461,30 @@ c
          ic = xaxis(i)
          id = yaxis(i)
          axetyp = polaxe(i)
+         if (axetyp .eq. 'None')  goto 10
 c
 c     construct the three rotation axes for the local frame
 c
          u(1) = x(ia) - x(ib)
          u(2) = y(ia) - y(ib)
          u(3) = z(ia) - z(ib)
-         v(1) = x(ic) - x(ib)
-         v(2) = y(ic) - y(ib)
-         v(3) = z(ic) - z(ib)
-         if (axetyp.eq.'Z-then-X' .or. axetyp.eq.'Bisector') then
-            w(1) = u(2)*v(3) - u(3)*v(2)
-            w(2) = u(3)*v(1) - u(1)*v(3)
-            w(3) = u(1)*v(2) - u(2)*v(1)
-         else if (axetyp.eq.'Z-Bisect' .or. axetyp.eq.'3-Fold') then
+         if (axetyp .ne. 'Z-Only') then
+            v(1) = x(ic) - x(ib)
+            v(2) = y(ic) - y(ib)
+            v(3) = z(ic) - z(ib)
+         else
+            v(1) = random ()
+            v(2) = random ()
+            v(3) = random ()
+         end if
+         if (axetyp.eq.'Z-Bisect' .or. axetyp.eq.'3-Fold') then
             w(1) = x(id) - x(ib)
             w(2) = y(id) - y(ib)
             w(3) = z(id) - z(ib)
+         else
+            w(1) = u(2)*v(3) - u(3)*v(2)
+            w(2) = u(3)*v(1) - u(1)*v(3)
+            w(3) = u(1)*v(2) - u(2)*v(1)
          end if
          usiz = sqrt(u(1)*u(1) + u(2)*u(2) + u(3)*u(3))
          vsiz = sqrt(v(1)*v(1) + v(2)*v(2) + v(3)*v(3))
@@ -522,7 +556,7 @@ c
             end do
          end if
 c
-c     compute the sine of the angle between the rotation axes
+c     get sine and cosine of angles between the rotation axes
 c
          uvcos = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
          uvsin = sqrt(1.0d0 - uvcos*uvcos)
@@ -543,22 +577,22 @@ c
 c
 c     compute the projection of v and w onto the ru-plane
 c
-      if (axetyp .eq. 'Z-Bisect') then
-         do j = 1, 3
-           t1(j) = v(j) - s(j)*vscos
-           t2(j) = w(j) - s(j)*wscos
-         end do
-         t1siz = sqrt(t1(1)*t1(1)+t1(2)*t1(2)+t1(3)*t1(3))
-         t2siz = sqrt(t2(1)*t2(1)+t2(2)*t2(2)+t2(3)*t2(3))
-         do j = 1, 3
-           t1(j) = t1(j) / t1siz
-           t2(j) = t2(j) / t2siz
-         end do
-         ut1cos = u(1)*t1(1) + u(2)*t1(2) + u(3)*t1(3)
-         ut1sin = sqrt(1.0d0 - ut1cos*ut1cos)
-         ut2cos = u(1)*t2(1) + u(2)*t2(2) + u(3)*t2(3)
-         ut2sin = sqrt(1.0d0 - ut2cos*ut2cos)
-      end if
+         if (axetyp .eq. 'Z-Bisect') then
+            do j = 1, 3
+              t1(j) = v(j) - s(j)*vscos
+              t2(j) = w(j) - s(j)*wscos
+            end do
+            t1siz = sqrt(t1(1)*t1(1)+t1(2)*t1(2)+t1(3)*t1(3))
+            t2siz = sqrt(t2(1)*t2(1)+t2(2)*t2(2)+t2(3)*t2(3))
+            do j = 1, 3
+              t1(j) = t1(j) / t1siz
+              t2(j) = t2(j) / t2siz
+            end do
+            ut1cos = u(1)*t1(1) + u(2)*t1(2) + u(3)*t1(3)
+            ut1sin = sqrt(1.0d0 - ut1cos*ut1cos)
+            ut2cos = u(1)*t2(1) + u(2)*t2(2) + u(3)*t2(3)
+            ut2sin = sqrt(1.0d0 - ut2cos*ut2cos)
+         end if
 c
 c     negative of dot product of torque with unit vectors gives
 c     result of infinitesimal rotation along these vectors
@@ -571,9 +605,18 @@ c
             dphids = -trq(1,i)*s(1) - trq(2,i)*s(2) - trq(3,i)*s(3)
          end if
 c
+c     force distribution for the Z-only local coordinate method
+c
+         if (axetyp .eq. 'Z-Only') then
+            do j = 1, 3
+               du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
+               derivs(j,ia) = derivs(j,ia) + du
+               derivs(j,ib) = derivs(j,ib) - du
+            end do
+c
 c     force distribution for the Z-then-X local coordinate method
 c
-         if (axetyp .eq. 'Z-then-X') then
+         else if (axetyp .eq. 'Z-then-X') then
             do j = 1, 3
                du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
                dv = -uv(j)*dphidu/(vsiz*uvsin)
@@ -634,6 +677,7 @@ c
                derivs(j,ib) = derivs(j,ib) - du - dv - dw
             end do
          end if
+   10    continue
       end do
       return
       end
@@ -653,7 +697,7 @@ c
 c     literature reference:
 c
 c     P. L. Popelier and A. J. Stone, "Formulae for the First and
-c     Second Derivatives of Aniostropic Potentials with Respect to
+c     Second Derivatives of Anisotropic Potentials with Respect to
 c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c
@@ -665,7 +709,7 @@ c
       include 'mpole.i'
       integer i,j,k
       integer ia,ib,ic,id
-      real*8 du,dv,dw
+      real*8 du,dv,dw,random
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -690,18 +734,10 @@ c
       real*8 uv(3),uw(3),vw(3)
       real*8 ur(3),us(3)
       real*8 vs(3),ws(3)
-      real*8 demi(3,maxatm)
-      real*8 depi(3,maxatm)
+      real*8 demi(3,*)
+      real*8 depi(3,*)
       character*8 axetyp
 c
-c
-c     get the local frame type and the frame-defining atoms
-c
-      ia = zaxis(i)
-      ib = ipole(i)
-      ic = xaxis(i)
-      id = yaxis(i)
-      axetyp = polaxe(i)
 c
 c     zero out force components on local frame-defining atoms
 c
@@ -711,22 +747,37 @@ c
          frcy(j) = 0.0d0
       end do
 c
+c     get the local frame type and the frame-defining atoms
+c
+      ia = zaxis(i)
+      ib = ipole(i)
+      ic = xaxis(i)
+      id = yaxis(i)
+      axetyp = polaxe(i)
+      if (axetyp .eq. 'None')  return
+c
 c     construct the three rotation axes for the local frame
 c
       u(1) = x(ia) - x(ib)
       u(2) = y(ia) - y(ib)
       u(3) = z(ia) - z(ib)
-      v(1) = x(ic) - x(ib)
-      v(2) = y(ic) - y(ib)
-      v(3) = z(ic) - z(ib)
-      if (axetyp.eq.'Z-then-X' .or. axetyp.eq.'Bisector') then
-         w(1) = u(2)*v(3) - u(3)*v(2)
-         w(2) = u(3)*v(1) - u(1)*v(3)
-         w(3) = u(1)*v(2) - u(2)*v(1)
-      else if (axetyp.eq.'Z-Bisect' .or. axetyp.eq.'3-Fold') then
+      if (axetyp .ne. 'Z-Only') then
+         v(1) = x(ic) - x(ib)
+         v(2) = y(ic) - y(ib)
+         v(3) = z(ic) - z(ib)
+      else
+         v(1) = random ()
+         v(2) = random ()
+         v(3) = random ()
+      end if
+      if (axetyp.eq.'Z-Bisect' .or. axetyp.eq.'3-Fold') then
          w(1) = x(id) - x(ib)
          w(2) = y(id) - y(ib)
          w(3) = z(id) - z(ib)
+      else
+         w(1) = u(2)*v(3) - u(3)*v(2)
+         w(2) = u(3)*v(1) - u(1)*v(3)
+         w(3) = u(1)*v(2) - u(2)*v(1)
       end if
       usiz = sqrt(u(1)*u(1) + u(2)*u(2) + u(3)*u(3))
       vsiz = sqrt(v(1)*v(1) + v(2)*v(2) + v(3)*v(3))
@@ -798,7 +849,7 @@ c
          end do
       end if
 c
-c     compute the sine of the angle between the rotation axes
+c     get sine and cosine of angles between the rotation axes
 c
       uvcos = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
       uvsin = sqrt(1.0d0 - uvcos*uvcos)
@@ -847,9 +898,19 @@ c
          dphids = -trq1(1)*s(1) - trq1(2)*s(2) - trq1(3)*s(3)
       end if
 c
+c     force distribution for the Z-only local coordinate method
+c
+      if (axetyp .eq. 'Z-Only') then
+         do j = 1, 3
+            du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
+            demi(j,ia) = demi(j,ia) + du
+            demi(j,ib) = demi(j,ib) - du
+            frcz(j) = frcz(j) + du
+         end do
+c
 c     force distribution for the Z-then-X local coordinate method
 c
-      if (axetyp .eq. 'Z-then-X') then
+      else if (axetyp .eq. 'Z-then-X') then
          do j = 1, 3
             du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
             dv = -uv(j)*dphidu/(vsiz*uvsin)
@@ -932,9 +993,19 @@ c
          dphids = -trq2(1)*s(1) - trq2(2)*s(2) - trq2(3)*s(3)
       end if
 c
+c     force distribution for the Z-only local coordinate method
+c
+      if (axetyp .eq. 'Z-Only') then
+         do j = 1, 3
+            du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
+            depi(j,ia) = depi(j,ia) + du
+            depi(j,ib) = depi(j,ib) - du
+            frcz(j) = frcz(j) + du
+         end do
+c
 c     force distribution for the Z-then-X local coordinate method
 c
-      if (axetyp .eq. 'Z-then-X') then
+      else if (axetyp .eq. 'Z-then-X') then
          do j = 1, 3
             du = uv(j)*dphidv/(usiz*uvsin) + uw(j)*dphidw/usiz
             dv = -uv(j)*dphidu/(vsiz*uvsin)

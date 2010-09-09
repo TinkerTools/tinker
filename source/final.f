@@ -20,10 +20,13 @@ c
       subroutine final
       implicit none
       include 'sizes.i'
+      include 'chunks.i'
       include 'inform.i'
       include 'iounit.i'
+      include 'pme.i'
       include 'socket.i'
       include 'solute.i'
+      include 'vibs.i'
 c
 c
 c     close any open socket used for external communication
@@ -37,6 +40,18 @@ c
       if (solvtyp .eq. 'PB') then
          call apbsfinal
       end if
+c
+c     perform deallocation of any associated pointers arrays
+c
+      if (associated(thetai1))  deallocate (thetai1)
+      if (associated(thetai2))  deallocate (thetai2)
+      if (associated(thetai3))  deallocate (thetai3)
+      if (associated(qgrid))  deallocate (qgrid)
+      if (associated(qfac))  deallocate (qfac)
+      if (associated(pmetable))  deallocate (pmetable)
+      if (associated(phi))  deallocate (phi)
+      if (associated(phik))  deallocate (phik)
+      if (associated(pwork))  deallocate (pwork)
 c
 c     print a final status message before exiting TINKER
 c

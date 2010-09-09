@@ -992,17 +992,18 @@ c
 c     dipole polarizability scaling parameters
 c
          write (itxt,1350)  d1scale,d2scale,d3scale,d4scale
- 1350    format (//,15x,'Direct Polarizability Scaling Factors',
+ 1350    format (//,15x,'Direct Induction Scaling Factors',
      &           ///,20x,'1-1 Groups',f15.3,/,20x,'1-2 Groups',f15.3,
      &           /,20x,'1-3 Groups',f15.3,/,20x,'1-4 Groups',f15.3)
          write (itxt,1360)  u1scale,u2scale,u3scale,u4scale
- 1360    format (//,15x,'Mutual Polarizability Scaling Factors',
+ 1360    format (//,15x,'Mutual Induction Scaling Factors',
      &           ///,20x,'1-1 Groups',f15.3,/,20x,'1-2 Groups',f15.3,
      &           /,20x,'1-3 Groups',f15.3,/,20x,'1-4 Groups',f15.3)
-         write (itxt,1370)  p2scale,p3scale,p4scale,p5scale
+         write (itxt,1370)  p2scale,p3scale,p4scale,p5scale,p41scale
  1370    format (//,15x,'Polarizability Energy Scaling Factors',
      &           ///,20x,'1-2 Atoms',f16.3,/,20x,'1-3 Atoms',f16.3,
-     &           /,20x,'1-4 Atoms',f16.3,/,20x,'1-5 Atoms',f16.3)
+     &           /,20x,'1-4 Atoms',f16.3,/,20x,'1-5 Atoms',f16.3,
+     &           /,20x,'1-4 Intra',f16.3)
       end if
 c
 c     conjugated pisystem atom parameters

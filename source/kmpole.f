@@ -35,7 +35,7 @@ c
       integer it,jt,kt,lt
       integer imp,nmp
       integer size,next
-      integer big,number
+      integer number
       integer kz,kx,ky
       integer ztyp,xtyp,ytyp
       integer mpt(maxnmp)
@@ -72,22 +72,28 @@ c
             k = 0
             string = record(next:120)
             read (string,*,err=10,end=10)  k,kz,kx,ky,mpl(1)
-            goto 20
+            goto 40
    10       continue
-            read (string,*,err=30,end=30)  k,kz,kx,mpl(1)
+            read (string,*,err=20,end=20)  k,kz,kx,mpl(1)
+            goto 40
    20       continue
+            read (string,*,err=30,end=30)  k,kz,mpl(1)
+            goto 40
+   30       continue
+            read (string,*,err=50,end=50)  k,mpl(1)
+   40       continue
             if (k .gt. 0) then
                record = keyline(i+1)
-               read (record,*,err=30,end=30)  mpl(2),mpl(3),mpl(4)
+               read (record,*,err=50,end=50)  mpl(2),mpl(3),mpl(4)
                record = keyline(i+2)
-               read (record,*,err=30,end=30)  mpl(5)
+               read (record,*,err=50,end=50)  mpl(5)
                record = keyline(i+3)
-               read (record,*,err=30,end=30)  mpl(8),mpl(9)
+               read (record,*,err=50,end=50)  mpl(8),mpl(9)
                record = keyline(i+4)
-               read (record,*,err=30,end=30)  mpl(11),mpl(12),mpl(13)
+               read (record,*,err=50,end=50)  mpl(11),mpl(12),mpl(13)
                imp = imp + 1
             end if
-   30       continue
+   50       continue
          end if
       end do
 c
@@ -95,8 +101,8 @@ c     check for too many combined parameter values
 c
       nmp = nmp + imp
       if (nmp .gt. maxnmp) then
-         write (iout,40)
-   40    format (/,' KMPOLE  --  Too many Atomic Multipole',
+         write (iout,60)
+   60    format (/,' KMPOLE  --  Too many Atomic Multipole',
      &              ' Parameters')
          abort = .true.
       end if
@@ -133,13 +139,23 @@ c
                mpl(j) = 0.0d0
             end do
             string = record(next:120)
-            read (string,*,err=50,end=50)  k,kz,kx,ky,mpl(1)
-            goto 60
-   50       continue
+            read (string,*,err=70,end=70)  k,kz,kx,ky,mpl(1)
+            goto 100
+   70       continue
             ky = 0
-            read (string,*,err=90,end=90)  k,kz,kx,mpl(1)
-   60       continue
+            read (string,*,err=80,end=80)  k,kz,kx,mpl(1)
+            goto 100
+   80       continue
+            kx = 0
+            read (string,*,err=90,end=90)  k,kz,mpl(1)
+            goto 100
+   90       continue
+            kz = 0
+            read (string,*,err=130,end=130)  k,mpl(1)
+  100       continue
             if (k .gt. 0) then
+               if (kz .eq. 0)  axt = 'None'
+               if (kz.ne.0 .and. kx.eq.0)  axt = 'Z-Only'
                if (kz.lt.0 .or. kx.lt.0)  axt = 'Bisector'
                if (kx.lt.0 .and. ky.lt.0)  axt = 'Z-Bisect'
                if (max(kz,kx,ky) .lt. 0)  axt = '3-Fold'
@@ -147,26 +163,26 @@ c
                kx = abs(kx)
                ky = abs(ky)
                record = keyline(i+1)
-               read (record,*,err=90,end=90)  mpl(2),mpl(3),mpl(4)
+               read (record,*,err=130,end=130)  mpl(2),mpl(3),mpl(4)
                record = keyline(i+2)
-               read (record,*,err=90,end=90)  mpl(5)
+               read (record,*,err=130,end=130)  mpl(5)
                record = keyline(i+3)
-               read (record,*,err=90,end=90)  mpl(8),mpl(9)
+               read (record,*,err=130,end=130)  mpl(8),mpl(9)
                record = keyline(i+4)
-               read (record,*,err=90,end=90)  mpl(11),mpl(12),mpl(13)
+               read (record,*,err=130,end=130)  mpl(11),mpl(12),mpl(13)
                mpl(6) = mpl(8)
                mpl(7) = mpl(11)
                mpl(10) = mpl(12)
                if (header) then
                   header = .false.
-                  write (iout,70)
-   70             format (/,' Additional Atomic Multipole Parameters :',
+                  write (iout,110)
+  110             format (/,' Additional Atomic Multipole Parameters :',
      &                    //,5x,'Atom Type',5x,'Coordinate Frame',
      &                       ' Definition',8x,'Multipole Moments')
                end if
-               write (iout,80)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
+               write (iout,120)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
      &                          mpl(8),mpl(9),(mpl(j),j=11,13)
-   80          format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
+  120          format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
      &                    /,48x,3f9.5,/,48x,f9.5,
      &                    /,48x,2f9.5,/,48x,3f9.5)
                size = 4
@@ -182,7 +198,7 @@ c
                   multip(j,imp) = mpl(j)
                end do
             end if
-   90       continue
+  130       continue
          end if
       end do
 c
@@ -237,7 +253,7 @@ c
                               do m = 1, 13
                                  pole(m,i) = multip(m,imp)
                               end do
-                              goto 100
+                              goto 140
                            end if
                            do l = 1, n12(i)
                               li = i12(l,i)
@@ -251,7 +267,7 @@ c
                                  do m = 1, 13
                                     pole(m,i) = multip(m,imp)
                                  end do
-                                 goto 100
+                                 goto 140
                               end if
                            end do
                         end if
@@ -287,7 +303,7 @@ c
                               do m = 1, 13
                                  pole(m,i) = multip(m,imp)
                               end do
-                              goto 100
+                              goto 140
                            end if
                            do l = 1, n13(i)
                               li = i13(l,i)
@@ -305,7 +321,7 @@ c
                                  do m = 1, 13
                                     pole(m,i) = multip(m,imp)
                                  end do
-                                 goto 100
+                                 goto 140
                               end if
                            end do
                         end if
@@ -328,12 +344,11 @@ c
                   if (jt .eq. ztyp) then
                      if (xtyp .eq. 0) then
                         zaxis(i) = ji
-                        xaxis(i) = n + 1
                         polaxe(i) = mpaxis(imp)
                         do m = 1, 13
                            pole(m,i) = multip(m,imp)
                         end do
-                        goto 100
+                        goto 140
                      end if
                   end if
                end do
@@ -348,17 +363,15 @@ c
                xtyp = mpx(imp)
                ytyp = mpy(imp)
                if (ztyp .eq. 0) then
-                  zaxis(i) = n + 1
-                  xaxis(i) = n + 2
                   polaxe(i) = mpaxis(imp)
                   do m = 1, 13
                      pole(m,i) = multip(m,imp)
                   end do
-                  goto 100
+                  goto 140
                end if
             end if
          end do
-  100    continue
+  140    continue
       end do
 c
 c     process keywords with multipole parameters for specific atoms
@@ -379,14 +392,24 @@ c
                mpl(j) = 0.0d0
             end do
             string = record(next:120)
-            read (string,*,err=110,end=110)  k,kz,kx,ky,mpl(1)
-            goto 120
-  110       continue
+            read (string,*,err=150,end=150)  k,kz,kx,ky,mpl(1)
+            goto 180
+  150       continue
             ky = 0
-            read (string,*,err=150,end=150)  k,kz,kx,mpl(1)
-  120       continue
+            read (string,*,err=160,end=160)  k,kz,kx,mpl(1)
+            goto 180
+  160       continue
+            kx = 0
+            read (string,*,err=170,end=170)  k,kz,mpl(1)
+            goto 180
+  170       continue
+            kz = 0
+            read (string,*,err=210,end=210)  k,mpl(1)
+  180       continue
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
+               if (kz .eq. 0)  axt = 'None'
+               if (kz.ne.0 .and. kx.eq.0)  axt = 'Z-Only'
                if (kz.lt.0 .or. kx.lt.0)  axt = 'Bisector'
                if (kx.lt.0 .and. ky.lt.0)  axt = 'Z-Bisect'
                if (max(kz,kx,ky) .lt. 0)  axt = '3-Fold'
@@ -394,31 +417,29 @@ c
                kx = abs(kx)
                ky = abs(ky)
                record = keyline(i+1)
-               read (record,*,err=150,end=150)  mpl(2),mpl(3),mpl(4)
+               read (record,*,err=210,end=210)  mpl(2),mpl(3),mpl(4)
                record = keyline(i+2)
-               read (record,*,err=150,end=150)  mpl(5)
+               read (record,*,err=210,end=210)  mpl(5)
                record = keyline(i+3)
-               read (record,*,err=150,end=150)  mpl(8),mpl(9)
+               read (record,*,err=210,end=210)  mpl(8),mpl(9)
                record = keyline(i+4)
-               read (record,*,err=150,end=150)  mpl(11),mpl(12),mpl(13)
+               read (record,*,err=210,end=210)  mpl(11),mpl(12),mpl(13)
                mpl(6) = mpl(8)
                mpl(7) = mpl(11)
                mpl(10) = mpl(12)
                if (header) then
                   header = .false.
-                  write (iout,130)
-  130             format (/,' Additional Atomic Multipoles',
+                  write (iout,190)
+  190             format (/,' Additional Atomic Multipoles',
      &                       ' for Specific Atoms :',
      &                    //,6x,'Atom',9x,'Coordinate Frame',
      &                       ' Definition',8x,'Multipole Moments')
                end if
-               write (iout,140)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
+               write (iout,200)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
      &                           mpl(8),mpl(9),(mpl(j),j=11,13)
-  140          format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
+  200          format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
      &                    /,48x,3f9.5,/,48x,f9.5,
      &                    /,48x,2f9.5,/,48x,3f9.5)
-               if (kz .eq. 0)  kz = n + 1
-               if (kx .eq. 0)  kx = n + 2
                zaxis(k) = kz
                xaxis(k) = kx
                yaxis(k) = ky
@@ -427,7 +448,7 @@ c
                   pole(j,k) = mpl(j)
                end do
             end if
-  150       continue
+  210       continue
          end if
       end do
 c
@@ -457,20 +478,6 @@ c
          end if
          polsiz(i) = size
       end do
-c
-c     if needed, get random coordinates for dummy axis defining atoms
-c
-      big = 0
-      do i = 1, n
-         big = max(big,zaxis(i),xaxis(i),yaxis(i))
-      end do
-      if (big .gt. n) then
-         do i = n+1, big
-            x(i) = random ()
-            y(i) = random ()
-            z(i) = random ()
-         end do
-      end if
 c
 c     if polarization not used, zero out induced dipoles
 c

@@ -1827,7 +1827,7 @@ c
       ect = ec
       eintrat = eintra
       eintert = einter
-      do i = 1, maxatm
+      do i = 1, n
          dect1(1,i) = dec(1,i)
          dect1(2,i) = dec(2,i)
          dect1(3,i) = dec(3,i)
@@ -1989,7 +1989,7 @@ c
       ec = ect
       eintra = eintrat
       einter = eintert
-      do i = 1, maxatm
+      do i = 1, n
          dec(1,i) = dect1(1,i) + dect2(1,i)
          dec(2,i) = dect1(2,i) + dect2(2,i)
          dec(3,i) = dect1(3,i) + dect2(3,i)

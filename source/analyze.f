@@ -1059,8 +1059,6 @@ c
                izaxe = zaxis(i)
                ixaxe = xaxis(i)
                iyaxe = yaxis(i)
-               if (izaxe .gt. n)  izaxe = 0
-               if (ixaxe .gt. n)  ixaxe = 0
                if (iyaxe .lt. 0)  iyaxe = -iyaxe
                mpl(1) = pole(1,i)
                do j = 2, 4
@@ -1069,23 +1067,29 @@ c
                do j = 5, 13
                   mpl(j) = 3.0d0 * pole(j,i) / bohr**2
                end do
-               if (ixaxe .eq. 0) then
-                  write (iout,660)  i,ia,izaxe,polaxe(i),
+               if (izaxe .eq. 0) then
+                  write (iout,660)  i,ia,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  660             format (i6,3x,i6,1x,i7,17x,a8,2x,f9.5,/,50x,3f9.5,
+  660             format (i6,3x,i6,25x,a8,2x,f9.5,/,50x,3f9.5,
+     &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
+               else if (ixaxe .eq. 0) then
+                  write (iout,670)  i,ia,izaxe,polaxe(i),
+     &                              (mpl(j),j=1,5),mpl(8),mpl(9),
+     &                              (mpl(j),j=11,13)
+  670             format (i6,3x,i6,1x,i7,17x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else  if (iyaxe .eq. 0) then
-                  write (iout,670)  i,ia,izaxe,ixaxe,polaxe(i),
+                  write (iout,680)  i,ia,izaxe,ixaxe,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  670             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
+  680             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else
-                  write (iout,680)  i,ia,izaxe,ixaxe,iyaxe,polaxe(i),
+                  write (iout,690)  i,ia,izaxe,ixaxe,iyaxe,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  680             format (i6,3x,i6,1x,3i7,3x,a8,2x,f9.5,/,50x,3f9.5,
+  690             format (i6,3x,i6,1x,3i7,3x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                end if
             end if
@@ -1101,14 +1105,14 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  write (iout,690)
-  690             format (/,' Dipole Polarizability Parameters :',
+                  write (iout,700)
+  700             format (/,' Dipole Polarizability Parameters :',
      &                    //,10x,'Atom Number',5x,'Alpha',5x,'Damp',
      &                       6x,'Polarization Group',/)
                end if
-               write (iout,700)  i,ia,polarity(i),thole(i),
+               write (iout,710)  i,ia,polarity(i),thole(i),
      &                           (ip11(j,ia),j=1,np11(ia))
-  700          format (i6,3x,i6,6x,f10.4,f9.3,3x,20i6)
+  710          format (i6,3x,i6,6x,f10.4,f9.3,3x,20i6)
             end if
          end do
       end if
@@ -1123,13 +1127,13 @@ c
                k = k + 1
                if (header) then
                   header = .false.
-                  write (iout,710)
-  710             format (/,' Empirical Solvation Parameters :',
+                  write (iout,720)
+  720             format (/,' Empirical Solvation Parameters :',
      &                    //,10x,'Atom Number',13x,'Radius',
      &                       3x,'ASP Value',/)
                end if
-               write (iout,720)  k,i,rsolv(i),asolv(i)
-  720          format (i6,3x,i6,15x,2f10.4)
+               write (iout,730)  k,i,rsolv(i),asolv(i)
+  730          format (i6,3x,i6,15x,2f10.4)
             end if
          end do
       end if
@@ -1143,13 +1147,13 @@ c
             j = class(ia)
             if (header) then
                header = .false.
-               write (iout,730)
-  730          format (/,' Conjugated Pi-Atom Parameters :',
+               write (iout,740)
+  740          format (/,' Conjugated Pi-Atom Parameters :',
      &                 //,10x,'Atom Number',14x,'Nelect',
      &                    6x,'Ionize',4x,'Repulsion',/)
             end if
-            write (iout,740)  i,ia,electron(j),ionize(j),repulse(j)
-  740       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
+            write (iout,750)  i,ia,electron(j),ionize(j),repulse(j)
+  750       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
          end do
       end if
 c
@@ -1162,13 +1166,13 @@ c
             ib = ibpi(3,i)
             if (header) then
                header = .false.
-               write (iout,750)
-  750          format (/,' Conjugated Pi-Bond Parameters :',
+               write (iout,760)
+  760          format (/,' Conjugated Pi-Bond Parameters :',
      &                 //,10x,'Atom Numbers',21x,'K Slope',
      &                    3x,'L Slope',/)
             end if
-            write (iout,760)  i,ia,ib,kslope(i),lslope(i)
-  760       format (i6,3x,2i6,19x,2f10.4)
+            write (iout,770)  i,ia,ib,kslope(i),lslope(i)
+  770       format (i6,3x,2i6,19x,2f10.4)
          end do
       end if
       return

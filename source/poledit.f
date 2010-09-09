@@ -648,8 +648,7 @@ c
       integer ia,ib,ic,id
       integer kab,kac,kad
       integer kbc,kbd,kcd
-      integer priority,big
-      real*8 random
+      integer priority
       logical query,alter
       character*120 record
 c
@@ -662,6 +661,7 @@ c
             zaxis(i) = 0
             xaxis(i) = 0
             yaxis(i) = 0
+            polaxe(i) = 'None'
 c
 c     automatically assign local frame for a monovalent atom
 c
@@ -670,6 +670,7 @@ c
             zaxis(i) = ia
             if (n12(ia) .eq. 1) then
                xaxis(i) = 0
+               polaxe(i) = 'Z-Only'
             else
                m = 0
                do k = 1, n12(ia)
@@ -841,6 +842,8 @@ c
             query = .false.
          else
             alter = .true.
+            if (ia .eq. 0)  polaxe(i)= 'None'
+            if (ia.ne.0 .and. ib.eq.0)  polaxe(i) = 'Z-Only'
             if (ia.gt.0 .and. ib.gt.0)  polaxe(i) = 'Z-then-X'
             if (ia.lt.0 .or. ib.lt.0)  polaxe(i) = 'Bisector'
             if (ib.lt.0 .and. ic.lt.0)  polaxe(i) = 'Z-Bisect'
@@ -863,27 +866,6 @@ c
             write (iout,90)  i,name(i),polaxe(i),zaxis(i),
      &                       xaxis(i),yaxis(i)
    90       format (i8,6x,a3,7x,a8,2x,3i8)
-         end do
-      end if
-c
-c     create random dummy atoms to define local frames as needed
-c
-      big = 0
-      do i = 1, npole
-         if (zaxis(i) .eq. 0) then
-            zaxis(i) = n + 1
-            xaxis(i) = n + 2
-            big = n + 2
-         else if (xaxis(i) .eq. 0) then
-            xaxis(i) = n + 1
-            big = max(big,n+1)
-         end if
-      end do
-      if (big .gt. n) then
-         do i = n+1, big
-            x(i) = random ()
-            y(i) = random ()
-            z(i) = random ()
          end do
       end if
       return
@@ -1037,8 +1019,6 @@ c
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
-            if (izaxe .gt. n)  izaxe = 0
-            if (ixaxe .gt. n)  ixaxe = 0
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
             write (iout,40)  ii,name(ii),atomic(ii)
    40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
@@ -1117,8 +1097,6 @@ c
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
-            if (izaxe .gt. n)  izaxe = 0
-            if (ixaxe .gt. n)  ixaxe = 0
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
             write (iout,40)  ii,name(ii),polaxe(i),izaxe,ixaxe,iyaxe
    40       format (i8,6x,a3,7x,a8,2x,3i8)
@@ -1146,6 +1124,8 @@ c
             query = .false.
          else if (i .ne. 0) then
             alter = .true.
+            if (ia .eq. 0)  polaxe(i) = 'None'
+            if (ia.ne.0 .and. ib.eq.0)  polaxe(i) = 'Z-Only'
             if (ia.gt.0 .and. ib.gt.0)  polaxe(i) = 'Z-then-X'
             if (ia.lt.0  .or. ib.lt.0)  polaxe(i) = 'Bisector'
             if (ib.lt.0 .and. ic.lt.0)  polaxe(i) = 'Z-Bisect'
@@ -1173,8 +1153,6 @@ c
                izaxe = zaxis(i)
                ixaxe = xaxis(i)
                iyaxe = yaxis(i)
-               if (izaxe .gt. n)  izaxe = 0
-               if (ixaxe .gt. n)  ixaxe = 0
                if (iyaxe .lt. 0)  iyaxe = -iyaxe
                write (iout,110)  ii,name(ii),polaxe(i),izaxe,ixaxe,iyaxe
   110          format (i8,6x,a3,7x,a8,2x,3i8)
@@ -1280,8 +1258,6 @@ c
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
-            if (izaxe .gt. n)  izaxe = 0
-            if (ixaxe .gt. n)  ixaxe = 0
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
             write (iout,160)  ii,name(ii),atomic(ii)
   160       format (/,' Atom:',i8,9x,'Name:',3x,a3,
@@ -1565,8 +1541,6 @@ c
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
-            if (izaxe .gt. n)  izaxe = 0
-            if (ixaxe .gt. n)  ixaxe = 0
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
             write (iout,40)  ii,name(ii),atomic(ii)
    40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
@@ -1611,10 +1585,8 @@ c
       include 'polpot.i'
       include 'potent.i'
       include 'units.i'
-      integer i,j,k
+      integer i,j,k,ii,kk
       integer iter,maxiter
-      integer ii,ix,iz
-      integer kk,kx,kz
       real*8 r,r2,xr,yr,zr
       real*8 rr3,rr5,rr7
       real*8 pdi,pti,pgamma
@@ -1654,8 +1626,6 @@ c     compute the direct induced dipole moment at each atom
 c
       do i = 1, npole-1
          ii = ipole(i)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -1685,8 +1655,6 @@ c
          end do
          do k = i+1, npole
             kk = ipole(k)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
             xr = x(kk) - x(ii)
             yr = y(kk) - y(ii)
             zr = z(kk) - z(ii)
@@ -1787,8 +1755,6 @@ c
          end do
          do i = 1, npole-1
             ii = ipole(i)
-            iz = zaxis(ii)
-            ix = xaxis(ii)
             pdi = pdamp(i)
             pti = thole(i)
             uix = uind(1,i)
@@ -1811,8 +1777,6 @@ c
             end do
             do k = i+1, npole
                kk = ipole(k)
-               kz = zaxis(kk)
-               kx = xaxis(kk)
                xr = x(kk) - x(ii)
                yr = y(kk) - y(ii)
                zr = z(kk) - z(ii)
@@ -2114,8 +2078,6 @@ c
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
-            if (izaxe .gt. n)  izaxe = 0
-            if (ixaxe .gt. n)  ixaxe = 0
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
             write (iout,100)  ii,name(ii),atomic(ii)
   100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
@@ -2218,57 +2180,61 @@ c
          izaxe = zaxis(i)
          ixaxe = xaxis(i)
          iyaxe = yaxis(i)
-         if (izaxe .gt. n)  izaxe = 0
-         if (ixaxe .gt. n)  ixaxe = 0
          if (iyaxe .lt. 0)  iyaxe = -iyaxe
-         if (polaxe(i) .eq. 'Z-then-X') then
+         if (polaxe(i) .eq. 'None') then
+            write (ikey,50)  it,pole(1,i)
+   50       format ('multipole',1x,i5,21x,f11.5)
+         else if (polaxe(i) .eq. 'Z-Only') then
+            write (ikey,60)  it,izaxe,pole(1,i)
+   60       format ('multipole',1x,2i5,16x,f11.5)
+         else if (polaxe(i) .eq. 'Z-then-X') then
             if (yaxis(i) .eq. 0) then
-               write (ikey,50)  it,izaxe,ixaxe,pole(1,i)
-   50          format ('multipole',1x,3i5,11x,f11.5)
+               write (ikey,70)  it,izaxe,ixaxe,pole(1,i)
+   70          format ('multipole',1x,3i5,11x,f11.5)
             else
-               write (ikey,60)  it,izaxe,ixaxe,iyaxe,pole(1,i)
-   60          format ('multipole',1x,4i5,6x,f11.5)
+               write (ikey,80)  it,izaxe,ixaxe,iyaxe,pole(1,i)
+   80          format ('multipole',1x,4i5,6x,f11.5)
             end if
          else if (polaxe(i) .eq. 'Bisector') then
             if (yaxis(i) .eq. 0) then
-               write (ikey,70)  it,-izaxe,-ixaxe,pole(1,i)
-   70          format ('multipole',1x,3i5,11x,f11.5)
+               write (ikey,90)  it,-izaxe,-ixaxe,pole(1,i)
+   90          format ('multipole',1x,3i5,11x,f11.5)
             else
-               write (ikey,80)  it,-izaxe,-ixaxe,iyaxe,pole(1,i)
-   80          format ('multipole',1x,4i5,6x,f11.5)
+               write (ikey,100)  it,-izaxe,-ixaxe,iyaxe,pole(1,i)
+  100          format ('multipole',1x,4i5,6x,f11.5)
             end if
          else if (polaxe(i) .eq. 'Z-Bisect') then
-            write (ikey,90)  it,izaxe,-ixaxe,-iyaxe,pole(1,i)
-   90       format ('multipole',1x,4i5,6x,f11.5)
+            write (ikey,110)  it,izaxe,-ixaxe,-iyaxe,pole(1,i)
+  110       format ('multipole',1x,4i5,6x,f11.5)
          else if (polaxe(i) .eq. '3-Fold') then
-            write (ikey,100)  it,-izaxe,-ixaxe,-iyaxe,pole(1,i)
-  100       format ('multipole',1x,4i5,6x,f11.5)
+            write (ikey,120)  it,-izaxe,-ixaxe,-iyaxe,pole(1,i)
+  120       format ('multipole',1x,4i5,6x,f11.5)
          end if
-         write (ikey,110)  pole(2,i),pole(3,i),pole(4,i)
-  110    format (36x,3f11.5)
-         write (ikey,120)  pole(5,i)
-  120    format (36x,f11.5)
-         write (ikey,130)  pole(8,i),pole(9,i)
-  130    format (36x,2f11.5)
-         write (ikey,140)  pole(11,i),pole(12,i),pole(13,i)
-  140    format (36x,3f11.5)
+         write (ikey,130)  pole(2,i),pole(3,i),pole(4,i)
+  130    format (36x,3f11.5)
+         write (ikey,140)  pole(5,i)
+  140    format (36x,f11.5)
+         write (ikey,150)  pole(8,i),pole(9,i)
+  150    format (36x,2f11.5)
+         write (ikey,160)  pole(11,i),pole(12,i),pole(13,i)
+  160    format (36x,3f11.5)
       end do
 c
 c     output the polarizability parameters to the keyfile
 c
       if (dofull) then
          if (n .ne. 0) then
-            write (ikey,150)
-  150       format ()
+            write (ikey,170)
+  170       format ()
          end if
          do i = 1, npole
             k = 0
             do j = 1, maxval
                if (pgrp(j,i) .ne. 0)  k = j
             end do
-            write (ikey,160)  ipole(i),polarity(i),thole(i),
+            write (ikey,180)  ipole(i),polarity(i),thole(i),
      &                        (pgrp(j,i),j=1,k)
-  160       format ('polarize',2x,i5,9x,2f11.3,3x,20i5)
+  180       format ('polarize',2x,i5,9x,2f11.3,3x,20i5)
          end do
       end if
       close (unit=ikey)

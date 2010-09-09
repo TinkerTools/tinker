@@ -359,6 +359,9 @@ c
       else if (keyword(1:15) .eq. 'POLAR-15-SCALE ') then
          read (string,*,err=10,end=10)  p5scale
          if (p5scale .gt. 1.0d0)  p5scale = 1.0d0 / p5scale
+      else if (keyword(1:15) .eq. 'POLAR-14-INTRA ') then
+         read (string,*,err=10,end=10)  p41scale
+         if (p41scale .gt. 1.0d0)  p41scale = 1.0d0 / p41scale
       else if (keyword(1:16) .eq. 'DIRECT-11-SCALE ') then
          read (string,*,err=10,end=10)  d1scale
          if (d1scale .gt. 1.0d0)  d1scale = 1.0d0 / d1scale

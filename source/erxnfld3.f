@@ -36,8 +36,9 @@ c
       include 'shunt.i'
       include 'usage.i'
       integer i,j,k
-      integer ii,iz,ix
-      integer kk,kz,kx
+      integer ii,kk
+      integer ix,iy,iz
+      integer kx,ky,kz
       real*8 eik,r2
       real*8 xr,yr,zr
       real*8 r,di,dk
@@ -78,7 +79,8 @@ c
          i = ipole(ii)
          iz = zaxis(ii)
          ix = xaxis(ii)
-         usei = (use(i) .or. use(iz) .or. use(ix))
+         iy = yaxis(ii)
+         usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
          do j = 1, polsiz(ii)
             rpi(j) = rpole(j,ii)
          end do
@@ -86,7 +88,8 @@ c
             k = ipole(kk)
             kz = zaxis(kk)
             kx = xaxis(kk)
-            usek = (use(k) .or. use(kz) .or. use(kx))
+            ky = yaxis(kk)
+            usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             if (usei .or. usek) then
                xr = x(k) - x(i)
                yr = y(k) - y(i)

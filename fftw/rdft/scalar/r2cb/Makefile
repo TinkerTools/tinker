@@ -122,11 +122,11 @@ AUTOCONF = ${SHELL} /Users/ponder/tinker/fftw/missing --run autoconf
 AUTOHEADER = ${SHELL} /Users/ponder/tinker/fftw/missing --run autoheader
 AUTOMAKE = ${SHELL} /Users/ponder/tinker/fftw/missing --run automake-1.10
 AWK = awk
-CC = icc -std=c99
-CCDEPMODE = depmode=gcc3
-CFLAGS = -O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE 
+CC = pgcc -Masmkeyword
+CCDEPMODE = depmode=none
+CFLAGS = -O3 -D_THREAD_SAFE 
 CODELET_OPTIM = 
-CPP = icc -std=c99 -E
+CPP = pgcc -E
 CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
@@ -139,10 +139,10 @@ ECHO_N =
 ECHO_T = 
 EGREP = /usr/bin/grep -E
 EXEEXT = 
-F77 = ifort
+F77 = pgf95
 FFLAGS = -g
 FGREP = /usr/bin/grep -F
-FLIBS =  -L/opt/intel/Compiler/11.1/088/lib /opt/intel/Compiler/11.1/088/lib/libimf.a -lm -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/Compiler/11.1/088/lib/ -L/opt/intel/Compiler/11.1/088/Frameworks/mkl/lib/em64t/ -L/opt/intel/Compiler/11.1/088/Frameworks/tbb/ia32/cc4.0.1_os10.5.4/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/Compiler/11.1/088/lib/libifport.a /opt/intel/Compiler/11.1/088/lib/libifcore.a /opt/intel/Compiler/11.1/088/lib/libsvml.a /opt/intel/Compiler/11.1/088/lib/libipgo.a -lSystemStubs -lmx /opt/intel/Compiler/11.1/088/lib/libirc.a -lpthread -ldl
+FLIBS =  -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc
 GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALLED_OCAMLC = /Users/ponder/tinker/fftw/bin/ocamlc
@@ -189,7 +189,7 @@ POW_LIB =
 PRECISION = d
 PREC_SUFFIX = 
 PRTDIAG = 
-PTHREAD_CC = icc -std=c99
+PTHREAD_CC = pgcc -Masmkeyword
 PTHREAD_CFLAGS = -D_THREAD_SAFE 
 PTHREAD_LIBS = 
 RANLIB = ranlib
@@ -208,7 +208,7 @@ abs_builddir = /Users/ponder/tinker/fftw/rdft/scalar/r2cb
 abs_srcdir = /Users/ponder/tinker/fftw/rdft/scalar/r2cb
 abs_top_builddir = /Users/ponder/tinker/fftw
 abs_top_srcdir = /Users/ponder/tinker/fftw
-ac_ct_CC = icc
+ac_ct_CC = pgcc
 ac_ct_DUMPBIN = 
 ac_ct_F77 = 
 acx_pthread_config = 
@@ -510,25 +510,25 @@ include ./$(DEPDIR)/r2cb_8.Plo
 include ./$(DEPDIR)/r2cb_9.Plo
 
 .c.o:
-	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-#	source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(COMPILE) -c $<
+#	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+#	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	source='$<' object='$@' libtool=no \
+	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+	$(COMPILE) -c $<
 
 .c.obj:
-	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-#	source='$<' object='$@' libtool=no \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+#	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+#	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+	source='$<' object='$@' libtool=no \
+	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-#	source='$<' object='$@' libtool=yes \
-#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-#	$(LTCOMPILE) -c -o $@ $<
+#	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+#	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+	source='$<' object='$@' libtool=yes \
+	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+	$(LTCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

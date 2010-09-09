@@ -12,15 +12,19 @@
       "configure" command should be changed to the correct path on your
       local machine (ie, the current /fftw area under the TINKER tree).
 
-      setenv CC icc
-      setenv F77 ifort
+      setenv CC gcc
+      setenv F77 gfortran
       make distclean
       configure --prefix=/Users/ponder/tinker/fftw --enable-threads
       make
       make install
 
-      After completion of the above, the libraries files used by TINKER
-      will be in the /lib subdirectory.
+      The above "setenv" commands are for use of the GNU compilers. To
+      use the Intel or PGI compilers, substitute "icc" or "pgcc" for
+      "gcc", and "ifort" or "pgf95" for "gfortran".
+
+      After completion of the above commands, the libraries files used
+      by TINKER  will be in the /lib subdirectory.
 
       Note modified versions of the configure script are used to enforce
       processor-specific compiler flags. In particular, the originally

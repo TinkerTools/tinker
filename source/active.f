@@ -44,6 +44,7 @@ c
 c     set defaults for the numbers and lists of active atoms
 c
       nuse = n
+      use(0) = .false.
       do i = 1, n
          use(i) = .true.
       end do

@@ -791,8 +791,8 @@ c
       include 'usage.i'
       integer i,j,k
       integer ii,kk
-      integer ix,iz
-      integer kx,kz
+      integer ix,iy,iz
+      integer kx,ky,kz
       real*8 ei,f,fikp
       real*8 fgrp,damp
       real*8 r,r2,xr,yr,zr
@@ -835,6 +835,7 @@ c
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
+         iy = yaxis(i)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -850,7 +851,7 @@ c
          uix = uinds(1,i) - uind(1,i)
          uiy = uinds(2,i) - uind(2,i)
          uiz = uinds(3,i) - uind(3,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix))
+         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -861,7 +862,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                 if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -874,7 +875,8 @@ c
             kk = ipole(k)
             kz = zaxis(k)
             kx = xaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx))
+            ky = yaxis(k)
+            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             if (.not. use_intra)  proceed = .true.

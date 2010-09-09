@@ -70,8 +70,8 @@ c     results in a faster but approximate Hessian calculation
 c
       nlist = 0
       do k = 1, npole
-         if (biglist .or. ipole(k).eq.i .or.
-     &          zaxis(k).eq.i .or. xaxis(k).eq.i) then
+         if (biglist .or. ipole(k).eq.i .or. zaxis(k).eq.i
+     &          .or. xaxis(k).eq.i .or. yaxis(k).eq.i) then
             nlist = nlist + 1
             list(nlist) = k
          end if
@@ -188,7 +188,8 @@ c
       include 'usage.i'
       integer i,j,k,nlist
       integer ii,iii,kk
-      integer ix,iz,kx,kz
+      integer ix,iy,iz
+      integer kx,ky,kz
       integer list(maxatm)
       real*8 f,fgrp,gfd
       real*8 damp,expdamp
@@ -288,6 +289,7 @@ c
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
+         iy = yaxis(i)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -303,7 +305,7 @@ c
          qi(7) = rpole(11,i)
          qi(8) = rpole(12,i)
          qi(9) = rpole(13,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix))
+         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -320,7 +322,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                 if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -347,7 +349,8 @@ c
             kk = ipole(k)
             kz = zaxis(k)
             kx = xaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx))
+            ky = yaxis(k)
+            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -866,7 +869,7 @@ c
          end do
       end do
 c
-c     rezero out the derivatives for terms that are not used
+c     zero out the derivatives for terms that are not used
 c
       if (.not. use_mpole) then
          do i = 1, n

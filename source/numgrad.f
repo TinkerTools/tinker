@@ -24,7 +24,7 @@ c
       integer i
       real*8 fvalue,eps
       real*8 f,f0,old
-      real*8 g(3,maxatm)
+      real*8 g(3,*)
       logical twosided
       external fvalue
 c

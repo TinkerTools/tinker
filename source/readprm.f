@@ -995,7 +995,15 @@ c
             goto 400
   390       continue
             id = 0
-            read (string,*,err=410,end=410)  ia,ib,ic,pl(1)
+            read (string,*,err=391,end=391)  ia,ib,ic,pl(1)
+            goto 400
+  391       continue
+            ic = 0
+            read (string,*,err=392,end=392)  ia,ib,pl(1)
+            goto 400
+  392       continue
+            ib = 0
+            read (string,*,err=410,end=410)  ia,pl(1)
   400       continue
             iprm = iprm + 1
             record = prmline(iprm)
@@ -1010,6 +1018,8 @@ c
             record = prmline(iprm)
             read (record,*,err=410,end=410)  pl(11),pl(12),pl(13)
   410       continue
+            if (ib .eq. 0)  axt = 'None'
+            if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Only'
             if (ib.lt.0 .or. ic.lt.0)  axt = 'Bisector'
             if (ic.lt.0 .and. id.lt.0)  axt = 'Z-Bisect'
             if (max(ib,ic,id) .lt. 0)  axt = '3-Fold'
