@@ -26,6 +26,7 @@ c
       include 'pme.i'
       include 'socket.i'
       include 'solute.i'
+      include 'usage.i'
       include 'vibs.i'
 c
 c
@@ -49,6 +50,8 @@ c
       if (associated(qgrid))  deallocate (qgrid)
       if (associated(qfac))  deallocate (qfac)
       if (associated(pmetable))  deallocate (pmetable)
+      if (associated(iuse))  deallocate (iuse)
+      if (associated(use))  deallocate (use)
       if (associated(phi))  deallocate (phi)
       if (associated(phik))  deallocate (phik)
       if (associated(pwork))  deallocate (pwork)

@@ -37,8 +37,8 @@ c
       integer oldtype,newtype
       integer nlist,nmolecule
       integer freeunit
-      integer list(maxatm)
-      integer keep(maxatm)
+      integer, allocatable :: list(:)
+      integer, allocatable :: keep(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xran,yran,zran
@@ -51,8 +51,8 @@ c
       real*8 sphi,stheta,spsi
       real*8 dist2,cut2
       real*8 random,norm,weigh
-      real*8 rad(maxatm)
       real*8 a(3,3)
+      real*8, allocatable :: rad(:)
       logical write
       character*120 xyzfile
       character*120 record
@@ -70,6 +70,12 @@ c
       call getxyz
       call field
       call katom
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+      allocate (keep(n))
+      allocate (rad(n))
 c
 c     present a list of possible coordinate modifications
 c
@@ -568,6 +574,12 @@ c
          goto 20
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (keep)
+      deallocate (rad)
+c
 c     write out the new coordinates file in its new format
 c
       if (write) then
@@ -627,7 +639,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr,rik2
       real*8 close,close2
-      logical remove(maxatm)
+      logical, allocatable :: remove(:)
       character*120 solvfile
       external merge
 c
@@ -661,6 +673,10 @@ c
       call unitcell
       call lattice
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (remove(nmol))
+c
 c     initialize the list of solvent molecules to be deleted
 c
       do i = 1, nmol
@@ -691,5 +707,9 @@ c
       do i = ntot, nref(1)+1, -1
          if (remove(molcule(i)))  call delete (i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (remove)
       return
       end

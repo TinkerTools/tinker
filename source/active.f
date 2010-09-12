@@ -36,6 +36,13 @@ c
       character*120 string
 c
 c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (associated(iuse))  deallocate (iuse)
+      if (associated(use))  deallocate (use)
+      allocate (iuse(n))
+      allocate (use(0:n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mobile(n))

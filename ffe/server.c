@@ -393,7 +393,7 @@ void setforcefield_(char *forcefield, jint len) {
    (*env)->SetObjectField(env, systemobject, fieldID, string);
 }
 
-void settime_(jdouble *time) {
+void setmdtime_(jdouble *time) {
    jfieldID fieldID;
 
    fieldID = (*env)->GetFieldID(env, updateclass, "time", "D");

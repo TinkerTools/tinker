@@ -74,7 +74,7 @@ c
       real*8 dsqj,gi,pix2
       real*8 therk,dk,gk
       real*8 risqk,rik
-      real*8 radius(maxatm)
+      real*8 radius(*)
       real*8 ri(maxarc),risq(maxarc)
       real*8 bsq(maxarc),bsq1(maxarc)
       real*8 dsq(maxarc),dsq1(maxarc)
@@ -559,7 +559,8 @@ c
       real*8 risqk,rik,risql
       real*8 faca,facb,facc
       real*8 gaca,gacb
-      real*8 radius(maxatm)
+      real*8 radius(*)
+      real*8 darea(3,*)
       real*8 ri(maxarc),risq(maxarc)
       real*8 bsq(maxarc),bsq1(maxarc)
       real*8 dsq(maxarc),dsq1(maxarc)
@@ -572,7 +573,6 @@ c
       real*8 zc(maxarc),zc1(maxarc)
       real*8 ux(maxarc),uy(maxarc)
       real*8 uz(maxarc)
-      real*8 darea(3,maxatm)
       logical moved,top
       logical omit(maxarc)
 c

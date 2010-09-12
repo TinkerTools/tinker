@@ -163,8 +163,14 @@ c
      &              ' may give Poor Accuracy')
       end if
 c
-c     perform dynamic allocation of various PME arrays
+c     perform dynamic allocation of some pointer arrays
 c
+      if (associated(thetai1))  deallocate (thetai1)
+      if (associated(thetai2))  deallocate (thetai2)
+      if (associated(thetai3))  deallocate (thetai3)
+      if (associated(qgrid))  deallocate (qgrid)
+      if (associated(qfac))  deallocate (qfac)
+      if (associated(pmetable))  deallocate (pmetable)
       allocate (thetai1(4,bsorder,n))
       allocate (thetai2(4,bsorder,n))
       allocate (thetai3(4,bsorder,n))

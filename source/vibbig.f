@@ -169,7 +169,7 @@ c
       npair = 2 * nroot
       nbasis = 3 * nroot
 c
-c     perform dynamic allocation of various vibbig arrays
+c     perform dynamic allocation of some pointer arrays
 c
       allocate (phi(nvar,nbasis))
       allocate (phik(nvar,nbasis))
@@ -1018,16 +1018,10 @@ c     project out locked roots from components of phik
 c
       call projectk (nvar,nconv,ivb1,nroot,npair)
       goto 160
-  280 continue
-c
-c     perform deallocation of various vibbig arrays
-c
-      deallocate (phi)
-      deallocate (phik)
-      deallocate (pwork)
 c
 c     perform any final tasks before program exit
 c
+  280 continue
       call final
       end
 c

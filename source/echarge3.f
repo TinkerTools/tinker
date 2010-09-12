@@ -1567,6 +1567,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
+      integer nect
       real*8 e,efix
       real*8 eintra
       real*8 f,fi,fik
@@ -1577,7 +1578,9 @@ c
       real*8 xd,yd,zd
       real*8 erfc,erfterm
       real*8 scale,scaleterm
+      real*8 ect,eintrat
       real*8 cscale(maxatm)
+      real*8 aect(maxatm)
       logical proceed,usei
       logical header,huge
       external erfc
@@ -1635,6 +1638,25 @@ c
 c     compute the reciprocal space part of the Ewald summation
 c
       call ecrecip
+c
+c     initialize local variables for OpenMP calculation
+c
+      ect = ec
+      eintrat = eintra
+      nect = nec
+      do i = 1, n
+         aect(i) = aec(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,
+!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
+!$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
+!$OMP& aewald,molcule,ebuffer,name,verbose,debug,header)
+!$OMP& firstprivate(cscale) shared(ect,eintrat,nect,aect)
+!$OMP DO reduction(+:ect,eintrat,nect,aect)
+!$OMP& schedule(dynamic)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1696,16 +1718,16 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-                  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
+                  nect = nect + 1
+                  ect = ect + e
+                  aect(i) = aect(i) + 0.5d0*e
+                  aect(k) = aect(k) + 0.5d0*e
 c
 c     increment the total intramolecular energy
 c
                   efix = (fik/rb) * scale
                   if (molcule(i) .eq. molcule(k)) then
-                     eintra = eintra + efix
+                     eintrat = eintrat + efix
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1744,6 +1766,20 @@ c
          do j = 1, n15(in)
             cscale(i15(j,in)) = 1.0d0
          end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ec = ect
+      eintra = eintrat
+      nec = nect
+      do i = 1, n
+         aec(i) = aect(i)
       end do
 c
 c     intermolecular energy is total minus intramolecular part

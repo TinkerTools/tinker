@@ -28,8 +28,9 @@ c
       integer i,k,nsamp
       integer ivel,nvel
       integer freeunit
-      real*8 factor,aver,norm
-      real*8 step,freq,time
+      real*8 factor,aver
+      real*8 norm,step
+      real*8 freq,time
       real*8 vel(0:maxvel)
       real*8 intense(maxfreq)
       logical exist,done

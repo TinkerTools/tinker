@@ -35,16 +35,16 @@ c
       include 'vdwpot.i'
       integer i,j,k
       integer ii,nhess
-      integer hinit(3,maxatm)
-      integer hstop(3,maxatm)
-      integer hindex(maxhess)
+      integer hindex(*)
+      integer hinit(3,*)
+      integer hstop(3,*)
       real*8 percent,filled
       real*8 cutoff,rdn,hmax
       real*8 xred(maxatm)
       real*8 yred(maxatm)
       real*8 zred(maxatm)
-      real*8 hdiag(3,maxatm)
-      real*8 h(maxhess)
+      real*8 h(*)
+      real*8 hdiag(3,*)
       logical keep(maxatm)
 c
 c

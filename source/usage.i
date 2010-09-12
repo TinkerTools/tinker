@@ -17,6 +17,7 @@ c     iuse   numbers of the atoms active in energy calculation
 c     use    true if an atom is active, false if inactive
 c
 c
-      integer nuse,iuse
-      logical use
-      common /usage/ nuse,iuse(maxatm),use(0:maxatm)
+      integer nuse
+      integer, pointer :: iuse(:)
+      logical, pointer :: use(:)
+      common /usage/ nuse,iuse,use

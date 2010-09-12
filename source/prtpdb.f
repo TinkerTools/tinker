@@ -24,7 +24,8 @@ c
       include 'sequen.i'
       include 'titles.i'
       integer i,k,ipdb
-      integer start,stop,resnumb
+      integer start,stop
+      integer resnumb
       integer resid(maxres)
       real*8 crdmin,crdmax
       logical opened

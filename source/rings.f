@@ -37,7 +37,7 @@ c
       integer id,ie,ig
       integer list1,list2
       integer list3,list4
-      integer list(maxatm)
+      integer, allocatable :: list(:)
       logical reduce
 c
 c
@@ -80,6 +80,10 @@ c
    20       continue
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
 c
 c     search for and store all of the 4-membered rings
 c
@@ -273,6 +277,10 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     print out lists of the small rings in the structure
 c
