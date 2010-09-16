@@ -270,9 +270,10 @@ c
       if (bionum .ne. 0) then
          if (i .ne. 0) then
             type(n) = biotyp(bionum)
-            if (type(n) .ne. 0) then
+            if (type(n) .gt. 0) then
                name(n) = symbol(type(n))
             else
+               type(n) = 0
                name(n) = '   '
             end if
             x(n) = xpdb(i)
@@ -324,9 +325,10 @@ c     connectivities and increment the atom counter
 c
       if (bionum .ne. 0) then
          type(n) = biotyp(bionum)
-         if (type(n) .ne. 0) then
+         if (type(n) .gt. 0) then
             name(n) = symbol(type(n))
          else
+            type(n) = 0
             name(n) = '   '
          end if
          if (i .eq. 0) then
@@ -439,16 +441,8 @@ c
       integer ni(maxres),cai(maxres)
       integer ci(maxres),oi(maxres)
       integer icyclic(maxres)
-      integer icys(maxres),idisulf(2,maxres)
-      integer ntyp(maxamino),catyp(maxamino)
-      integer ctyp(maxamino),hntyp(maxamino)
-      integer otyp(maxamino),hatyp(maxamino)
-      integer nntyp(maxamino),cantyp(maxamino)
-      integer cntyp(maxamino),hnntyp(maxamino)
-      integer ontyp(maxamino),hantyp(maxamino)
-      integer nctyp(maxamino),cactyp(maxamino)
-      integer cctyp(maxamino),hnctyp(maxamino)
-      integer octyp(maxamino),hactyp(maxamino)
+      integer icys(maxres)
+      integer idisulf(2,maxres)
       real*8 rik,xcys(maxres)
       real*8 ycys(maxres)
       real*8 zcys(maxres)
@@ -459,87 +453,6 @@ c
       logical header
       character*3 resname
       character*4 atmname
-c
-c     biopolymer atom types for amino acid backbone atoms
-c
-      data ntyp    /   1,   7,  15,  27,  41,  55,  65,  77,  87,
-     &                96, 107, 122, 138, 161, 178, 194, 210, 220,
-     &               232, 244, 258, 271, 287, 304, 318, 325,   0,
-     &                 0,   0,   0,   1 /
-      data catyp   /   2,   8,  16,  28,  42,  56,  66,  78,  88,
-     &                97, 108, 123, 139, 162, 179, 195, 211, 221,
-     &               233, 245, 259, 272, 288, 305, 319, 326,   0,
-     &                 0,   0,   0,   2 /
-      data ctyp    /   3,   9,  17,  29,  43,  57,  67,  79,  89,
-     &                98, 109, 124, 140, 163, 180, 196, 212, 222,
-     &               234, 246, 260, 273, 289, 306, 320, 327,   0,
-     &                 0,   0,   0,   3 /
-      data hntyp   /   4,  10,  18,  30,  44,  58,  68,  80,  90,
-     &                 0, 110, 125, 141, 164, 181, 197, 213, 223,
-     &               235, 247, 261, 274, 290, 307, 321, 328,   0,
-     &                 0,   0,   0,   4 /
-      data otyp    /   5,  11,  19,  31,  45,  59,  69,  81,  91,
-     &                99, 111, 126, 142, 165, 182, 198, 214, 224,
-     &               236, 248, 262, 275, 291, 308, 322, 329,   0,
-     &                 0,   0,   0,   5 /
-      data hatyp   /   6,  12,  20,  32,  46,  60,  70,  82,  92,
-     &               100, 112, 127, 143, 166, 183, 199, 215, 225,
-     &               237, 249, 263, 276, 292, 309,   0, 330,   0,
-     &                 0,   0,   0,   6 /
-c
-c     biopolymer atom types for N-terminal backbone atoms
-c
-      data nntyp   / 350, 356, 362, 368, 374, 380, 386, 392, 398,
-     &               404, 412, 418, 424, 430, 436, 442, 448, 454,
-     &               460, 466, 472, 478, 484, 490, 496, 325,   0,
-     &                 0,   0,   0, 350 /
-      data cantyp  / 351, 357, 363, 369, 375, 381, 387, 393, 399,
-     &               405, 413, 419, 425, 431, 437, 443, 449, 455,
-     &               461, 467, 473, 479, 485, 491, 497, 326,   0,
-     &               340,   0,   0, 351 /
-      data cntyp   / 352, 358, 364, 370, 376, 382, 388, 394, 400,
-     &               406, 414, 420, 426, 432, 438, 444, 450, 456,
-     &               462, 468, 474, 480, 486, 492, 498, 327, 337,
-     &               342,   0,   0, 352 /
-      data hnntyp  / 353, 359, 365, 371, 377, 383, 389, 395, 401,
-     &               407, 415, 421, 427, 433, 439, 445, 451, 457,
-     &               463, 469, 475, 481, 487, 493, 499, 328,   0,
-     &                 0,   0,   0, 353 /
-      data ontyp   / 354, 360, 366, 372, 378, 384, 390, 396, 402,
-     &               408, 416, 422, 428, 434, 440, 446, 452, 458,
-     &               464, 470, 476, 482, 488, 494, 500, 329, 339,
-     &               343,   0,   0, 354 /
-      data hantyp  / 355, 361, 367, 373, 379, 385, 391, 397, 403,
-     &               409, 417, 423, 429, 435, 441, 447, 453, 459,
-     &               465, 471, 477, 483, 489, 495,   0, 330, 338,
-     &               341,   0,   0, 355 /
-c
-c     biopolymer atom types for C-terminal backbone atoms
-c
-      data nctyp   / 501, 507, 513, 519, 525, 531, 537, 543, 549,
-     &               555, 560, 566, 572, 578, 584, 590, 596, 602,
-     &               608, 614, 620, 626, 632, 638, 644,   0,   0,
-     &                 0, 344, 346, 501 /
-      data cactyp  / 502, 508, 514, 520, 526, 532, 538, 544, 550,
-     &               556, 561, 567, 573, 579, 585, 591, 597, 603,
-     &               609, 615, 621, 627, 633, 639, 645,   0,   0,
-     &                 0,   0, 348, 502 /
-      data cctyp   / 503, 509, 515, 521, 527, 533, 539, 545, 551,
-     &               557, 562, 568, 574, 580, 586, 592, 598, 604,
-     &               610, 616, 622, 628, 634, 640, 646,   0,   0,
-     &                 0,   0,   0, 503 /
-      data hnctyp  / 504, 510, 516, 522, 528, 534, 540, 546, 552,
-     &                 0, 563, 569, 575, 581, 587, 593, 599, 605,
-     &               611, 617, 623, 629, 635, 641, 647,   0,   0,
-     &                 0, 345, 347, 504 /
-      data octyp   / 505, 511, 517, 523, 529, 535, 541, 547, 553,
-     &               558, 564, 570, 576, 582, 588, 594, 600, 606,
-     &               612, 618, 624, 630, 636, 642, 648,   0,   0,
-     &                 0,   0,   0, 505 /
-      data hactyp  / 506, 512, 518, 524, 530, 536, 542, 548, 554,
-     &               559, 565, 571, 577, 583, 589, 595, 601, 607,
-     &               613, 619, 625, 631, 637, 643,   0,   0,   0,
-     &                 0,   0, 349, 506 /
 c
 c
 c     set a pointer to the first and last atom of each residue
@@ -946,683 +859,806 @@ c     acid side chain; coordinates are read from the Protein Data
 c     Bank file or found from internal coordinates, then atom types
 c     are assigned and connectivity data generated
 c
+c     note biotypes of CD and HD atoms for N-terminal proline are
+c     set as absolute values, not relative to the CB atom
+c
 c
       subroutine addside (resname,ires,start,stop,cai,ni,ci,cystype)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'resdue.i'
       include 'sequen.i'
-      integer i,ires
+      integer i,k,ires
       integer start,stop
       integer cai,ni,ci
       integer cystype
       character*3 resname
 c
 c
+c     set the CB atom as reference site
+c
+      k = cbtyp(seqtyp(ires))
+c
 c     glycine residue  (GLY)
 c
       if (resname .eq. 'GLY') then
          call findatm (' HA3',start,stop,i)
-         if (ires .eq. 1) then
-            call newatm (i,355,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
-         else if (ires .eq. nseq) then
-            call newatm (i,506,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
-         else
-            call newatm (i,6,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
-         end if
+         k = hatyp(seqtyp(ires))
+         if (ires .eq. 1)  k = hantyp(seqtyp(ires))
+         if (ires .eq. nseq)  k = hactyp(seqtyp(ires))
+         call newatm (i,k,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
 c
 c     alanine residue  (ALA)
 c
       else if (resname .eq. 'ALA') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,13,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' HB1',start,stop,i)
-         call newatm (i,14,n-1,1.10d0,cai,110.2d0,ni,180.0d0,0)
+         call newatm (i,k+1,n-1,1.10d0,cai,110.2d0,ni,180.0d0,0)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,14,n-2,1.10d0,cai,110.2d0,ni,60.0d0,0)
+         call newatm (i,k+1,n-2,1.10d0,cai,110.2d0,ni,60.0d0,0)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,14,n-3,1.10d0,cai,110.2d0,ni,-60.0d0,0)
+         call newatm (i,k+1,n-3,1.10d0,cai,110.2d0,ni,-60.0d0,0)
 c
 c     valine residue  (VAL)
 c
       else if (resname .eq. 'VAL') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,21,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG1',start,stop,i)
-         call oldatm (i,23,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CG2',start,stop,i)
-         call oldatm (i,25,n-2,ires)
+         call oldatm (i,k+4,n-2,ires)
          call findatm (' HB ',start,stop,i)
-         call newatm (i,22,n-3,1.10d0,cai,107.0d0,n-2,108.2d0,1)
+         call newatm (i,k+1,n-3,1.10d0,cai,107.0d0,n-2,108.2d0,1)
          call findatm ('HG11',start,stop,i)
-         call newatm (i,24,n-3,1.10d0,n-4,111.6d0,cai,180.0d0,0)
+         call newatm (i,k+3,n-3,1.10d0,n-4,111.6d0,cai,180.0d0,0)
          call findatm ('HG12',start,stop,i)
-         call newatm (i,24,n-4,1.10d0,n-5,111.6d0,cai,60.0d0,0)
+         call newatm (i,k+3,n-4,1.10d0,n-5,111.6d0,cai,60.0d0,0)
          call findatm ('HG13',start,stop,i)
-         call newatm (i,24,n-5,1.10d0,n-6,111.6d0,cai,-60.0d0,0)
+         call newatm (i,k+3,n-5,1.10d0,n-6,111.6d0,cai,-60.0d0,0)
          call findatm ('HG21',start,stop,i)
-         call newatm (i,26,n-5,1.10d0,n-7,111.6d0,cai,180.0d0,0)
+         call newatm (i,k+5,n-5,1.10d0,n-7,111.6d0,cai,180.0d0,0)
          call findatm ('HG22',start,stop,i)
-         call newatm (i,26,n-6,1.10d0,n-8,111.6d0,cai,60.0d0,0)
+         call newatm (i,k+5,n-6,1.10d0,n-8,111.6d0,cai,60.0d0,0)
          call findatm ('HG23',start,stop,i)
-         call newatm (i,26,n-7,1.10d0,n-9,111.6d0,cai,-60.0d0,0)
+         call newatm (i,k+5,n-7,1.10d0,n-9,111.6d0,cai,-60.0d0,0)
 c
 c     leucine residue  (LEU)
 c
       else if (resname .eq. 'LEU') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,33,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,35,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD1',start,stop,i)
-         call oldatm (i,37,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,39,n-2,ires)
+         call oldatm (i,k+6,n-2,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,34,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,34,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
          call findatm (' HG ',start,stop,i)
-         call newatm (i,36,n-5,1.10d0,n-6,107.0d0,n-4,108.2d0,1)
+         call newatm (i,k+3,n-5,1.10d0,n-6,107.0d0,n-4,108.2d0,1)
          call findatm ('HD11',start,stop,i)
-         call newatm (i,38,n-5,1.10d0,n-6,111.6d0,n-7,180.0d0,0)
+         call newatm (i,k+5,n-5,1.10d0,n-6,111.6d0,n-7,180.0d0,0)
          call findatm ('HD12',start,stop,i)
-         call newatm (i,38,n-6,1.10d0,n-7,111.6d0,n-8,60.0d0,0)
+         call newatm (i,k+5,n-6,1.10d0,n-7,111.6d0,n-8,60.0d0,0)
          call findatm ('HD13',start,stop,i)
-         call newatm (i,38,n-7,1.10d0,n-8,111.6d0,n-9,-60.0d0,0)
+         call newatm (i,k+5,n-7,1.10d0,n-8,111.6d0,n-9,-60.0d0,0)
          call findatm ('HD21',start,stop,i)
-         call newatm (i,40,n-7,1.10d0,n-9,111.6d0,n-10,180.0d0,0)
+         call newatm (i,k+7,n-7,1.10d0,n-9,111.6d0,n-10,180.0d0,0)
          call findatm ('HD22',start,stop,i)
-         call newatm (i,40,n-8,1.10d0,n-10,111.6d0,n-11,60.0d0,0)
+         call newatm (i,k+7,n-8,1.10d0,n-10,111.6d0,n-11,60.0d0,0)
          call findatm ('HD23',start,stop,i)
-         call newatm (i,40,n-9,1.10d0,n-11,111.6d0,n-12,-60.0d0,0)
+         call newatm (i,k+7,n-9,1.10d0,n-11,111.6d0,n-12,-60.0d0,0)
 c
 c     isoleucine residue  (ILE)
 c
       else if (resname .eq. 'ILE') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,47,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG1',start,stop,i)
-         call oldatm (i,49,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CG2',start,stop,i)
-         call oldatm (i,51,n-2,ires)
+         call oldatm (i,k+4,n-2,ires)
          call findatm (' CD1',start,stop,i)
          if (i .eq. 0)  call findatm (' CD ',start,stop,i)
-         call oldatm (i,53,n-2,ires)
+         call oldatm (i,k+6,n-2,ires)
          call findatm (' HB ',start,stop,i)
-         call newatm (i,48,n-4,1.10d0,cai,107.0d0,n-3,108.2d0,-1)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.0d0,n-3,108.2d0,-1)
          call findatm ('HG12',start,stop,i)
-         call newatm (i,50,n-4,1.10d0,n-5,109.5d0,n-2,109.5d0,1)
+         call newatm (i,k+3,n-4,1.10d0,n-5,109.5d0,n-2,109.5d0,1)
          call findatm ('HG13',start,stop,i)
-         call newatm (i,50,n-5,1.10d0,n-6,109.5d0,n-3,109.5d0,-1)
+         call newatm (i,k+3,n-5,1.10d0,n-6,109.5d0,n-3,109.5d0,-1)
          call findatm ('HG21',start,stop,i)
-         call newatm (i,52,n-5,1.10d0,n-7,111.6d0,cai,180.0d0,0)
+         call newatm (i,k+5,n-5,1.10d0,n-7,111.6d0,cai,180.0d0,0)
          call findatm ('HG22',start,stop,i)
-         call newatm (i,52,n-6,1.10d0,n-8,111.6d0,cai,60.0d0,0)
+         call newatm (i,k+5,n-6,1.10d0,n-8,111.6d0,cai,60.0d0,0)
          call findatm ('HG23',start,stop,i)
-         call newatm (i,52,n-7,1.10d0,n-9,111.6d0,cai,-60.0d0,0)
+         call newatm (i,k+5,n-7,1.10d0,n-9,111.6d0,cai,-60.0d0,0)
          call findatm ('HD11',start,stop,i)
-         call newatm (i,54,n-7,1.10d0,n-9,111.6d0,n-10,180.0d0,0)
+         call newatm (i,k+7,n-7,1.10d0,n-9,111.6d0,n-10,180.0d0,0)
          call findatm ('HD12',start,stop,i)
-         call newatm (i,54,n-8,1.10d0,n-10,111.6d0,n-11,60.0d0,0)
+         call newatm (i,k+7,n-8,1.10d0,n-10,111.6d0,n-11,60.0d0,0)
          call findatm ('HD13',start,stop,i)
-         call newatm (i,54,n-9,1.10d0,n-11,111.6d0,n-12,-60.0d0,0)
+         call newatm (i,k+7,n-9,1.10d0,n-11,111.6d0,n-12,-60.0d0,0)
 c
 c     serine residue  (SER)
 c
       else if (resname .eq. 'SER') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,61,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' OG ',start,stop,i)
-         call oldatm (i,63,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,62,n-2,1.10d0,cai,109.2d0,n-1,109.5d0,1)
+         call newatm (i,k+1,n-2,1.10d0,cai,109.2d0,n-1,109.5d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,62,n-3,1.10d0,cai,109.2d0,n-2,109.5d0,-1)
+         call newatm (i,k+1,n-3,1.10d0,cai,109.2d0,n-2,109.5d0,-1)
          call findatm (' HG ',start,stop,i)
-         call newatm (i,64,n-3,0.94d0,n-4,106.9d0,cai,180.0d0,0)
+         call newatm (i,k+3,n-3,0.94d0,n-4,106.9d0,cai,180.0d0,0)
 c
 c     threonine residue  (THR)
 c
       else if (resname .eq. 'THR') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,71,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' OG1',start,stop,i)
-         call oldatm (i,73,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CG2',start,stop,i)
-         call oldatm (i,75,n-2,ires)
+         call oldatm (i,k+4,n-2,ires)
          call findatm (' HB ',start,stop,i)
-         call newatm (i,72,n-3,1.10d0,cai,107.0d0,n-2,108.2d0,-1)
+         call newatm (i,k+1,n-3,1.10d0,cai,107.0d0,n-2,108.2d0,-1)
          call findatm (' HG1',start,stop,i)
-         call newatm (i,74,n-3,0.94d0,n-4,106.9d0,cai,180.0d0,0)
+         call newatm (i,k+3,n-3,0.94d0,n-4,106.9d0,cai,180.0d0,0)
          call findatm ('HG21',start,stop,i)
-         call newatm (i,76,n-3,1.10d0,n-5,111.6d0,cai,180.0d0,0)
+         call newatm (i,k+5,n-3,1.10d0,n-5,111.6d0,cai,180.0d0,0)
          call findatm ('HG22',start,stop,i)
-         call newatm (i,76,n-4,1.10d0,n-6,111.6d0,cai,60.0d0,0)
+         call newatm (i,k+5,n-4,1.10d0,n-6,111.6d0,cai,60.0d0,0)
          call findatm ('HG23',start,stop,i)
-         call newatm (i,76,n-5,1.10d0,n-7,111.6d0,cai,-60.0d0,0)
+         call newatm (i,k+5,n-5,1.10d0,n-7,111.6d0,cai,-60.0d0,0)
 c
 c     cysteine residue  (CYS)
 c
       else if (resname .eq. 'CYS') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,83,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' SG ',start,stop,i)
-         call oldatm (i,85,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,84,n-2,1.10d0,cai,109.5d0,n-1,107.5d0,1)
+         call newatm (i,k+1,n-2,1.10d0,cai,109.5d0,n-1,107.5d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,84,n-3,1.10d0,cai,109.5d0,n-2,107.5d0,-1)
+         call newatm (i,k+1,n-3,1.10d0,cai,109.5d0,n-2,107.5d0,-1)
          call findatm (' HG ',start,stop,i)
-         call newatm (i,86,n-3,1.34d0,n-4,96.0d0,cai,180.0d0,0)
+         call newatm (i,k+3,n-3,1.34d0,n-4,96.0d0,cai,180.0d0,0)
 c
 c     cystine residue  (CYX)
 c
       else if (resname .eq. 'CYX') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,93,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' SG ',start,stop,i)
          cystype = n
-         call oldatm (i,95,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,94,n-2,1.10d0,cai,109.5d0,n-1,107.5d0,1)
+         call newatm (i,k+1,n-2,1.10d0,cai,109.5d0,n-1,107.5d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,94,n-3,1.10d0,cai,109.5d0,n-2,107.5d0,-1)
+         call newatm (i,k+1,n-3,1.10d0,cai,109.5d0,n-2,107.5d0,-1)
+c
+c     deprotonated cysteine residue  (CYD)
+c
+      else if (resname .eq. 'CYD') then
+         call findatm (' CB ',start,stop,i)
+         call oldatm (i,k,cai,ires)
+         call findatm (' SG ',start,stop,i)
+         call oldatm (i,k+2,n-1,ires)
+         call findatm (' HB2',start,stop,i)
+         call newatm (i,k+1,n-2,1.10d0,cai,109.5d0,n-1,107.5d0,1)
+         call findatm (' HB3',start,stop,i)
+         call newatm (i,k+1,n-3,1.10d0,cai,109.5d0,n-2,107.5d0,-1)
 c
 c     proline residue  (PRO)
 c
       else if (resname .eq. 'PRO') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,101,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,103,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
          if (ires .eq. 1) then
-            call oldatm (i,410,n-1,ires)
+            call oldatm (i,482,n-1,ires)
          else
-            call oldatm (i,105,n-1,ires)
+            call oldatm (i,k+4,n-1,ires)
          end if
          call addbond (n-1,ni)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,102,n-3,1.10d0,cai,111.2d0,n-2,111.2d0,1)
+         call newatm (i,k+1,n-3,1.10d0,cai,111.2d0,n-2,111.2d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,102,n-4,1.10d0,cai,111.2d0,n-3,111.2d0,-1)
+         call newatm (i,k+1,n-4,1.10d0,cai,111.2d0,n-3,111.2d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,104,n-4,1.10d0,n-5,111.2d0,n-3,111.2d0,1)
+         call newatm (i,k+3,n-4,1.10d0,n-5,111.2d0,n-3,111.2d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,104,n-5,1.10d0,n-6,111.2d0,n-4,111.2d0,-1)
+         call newatm (i,k+3,n-5,1.10d0,n-6,111.2d0,n-4,111.2d0,-1)
          if (ires .eq. 1) then
             call findatm (' HD2',start,stop,i)
-            call newatm (i,411,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
+            call newatm (i,483,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
             call findatm (' HD3',start,stop,i)
-            call newatm (i,411,n-6,1.10d0,n-7,111.2d0,ni,111.2d0,-1)
+            call newatm (i,483,n-6,1.10d0,n-7,111.2d0,ni,111.2d0,-1)
          else
             call findatm (' HD2',start,stop,i)
-            call newatm (i,106,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
+            call newatm (i,k+5,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
             call findatm (' HD3',start,stop,i)
-            call newatm (i,106,n-6,1.10d0,n-7,111.2d0,ni,111.2d0,-1)
+            call newatm (i,k+5,n-6,1.10d0,n-7,111.2d0,ni,111.2d0,-1)
          end if
 c
 c     phenylalanine residue  (PHE)
 c
       else if (resname .eq. 'PHE') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,113,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,115,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD1',start,stop,i)
-         call oldatm (i,116,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,116,n-2,ires)
+         call oldatm (i,k+3,n-2,ires)
          call findatm (' CE1',start,stop,i)
-         call oldatm (i,118,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' CE2',start,stop,i)
-         call oldatm (i,118,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' CZ ',start,stop,i)
-         call oldatm (i,120,n-1,ires)
+         call oldatm (i,k+7,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,114,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,1)
+         call newatm (i,k+1,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,114,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,-1)
+         call newatm (i,k+1,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,-1)
          call findatm (' HD1',start,stop,i)
-         call newatm (i,117,n-7,1.09d0,n-8,120.0d0,n-9,0.0d0,0)
+         call newatm (i,k+4,n-7,1.09d0,n-8,120.0d0,n-9,0.0d0,0)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,117,n-7,1.09d0,n-9,120.0d0,n-10,0.0d0,0)
+         call newatm (i,k+4,n-7,1.09d0,n-9,120.0d0,n-10,0.0d0,0)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,119,n-7,1.09d0,n-9,120.0d0,n-10,180.0d0,0)
+         call newatm (i,k+6,n-7,1.09d0,n-9,120.0d0,n-10,180.0d0,0)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,119,n-7,1.09d0,n-9,120.0d0,n-11,180.0d0,0)
+         call newatm (i,k+6,n-7,1.09d0,n-9,120.0d0,n-11,180.0d0,0)
          call findatm (' HZ ',start,stop,i)
-         call newatm (i,121,n-7,1.09d0,n-8,120.0d0,n-10,180.0d0,0)
+         call newatm (i,k+8,n-7,1.09d0,n-8,120.0d0,n-10,180.0d0,0)
 c
 c     tyrosine residue  (TYR)
 c
       else if (resname .eq. 'TYR') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,128,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,130,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD1',start,stop,i)
-         call oldatm (i,131,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,131,n-2,ires)
+         call oldatm (i,k+3,n-2,ires)
          call findatm (' CE1',start,stop,i)
-         call oldatm (i,133,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' CE2',start,stop,i)
-         call oldatm (i,133,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' CZ ',start,stop,i)
-         call oldatm (i,135,n-1,ires)
+         call oldatm (i,k+7,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' OH ',start,stop,i)
-         call oldatm (i,136,n-1,ires)
+         call oldatm (i,k+8,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,129,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,1)
+         call newatm (i,k+1,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,129,n-9,1.10d0,cai,107.9d0,n-8,110.0d0,-1)
+         call newatm (i,k+1,n-9,1.10d0,cai,107.9d0,n-8,110.0d0,-1)
          call findatm (' HD1',start,stop,i)
-         call newatm (i,132,n-8,1.09d0,n-9,120.0d0,n-10,0.0d0,0)
+         call newatm (i,k+4,n-8,1.09d0,n-9,120.0d0,n-10,0.0d0,0)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,132,n-8,1.09d0,n-10,120.0d0,n-11,0.0d0,0)
+         call newatm (i,k+4,n-8,1.09d0,n-10,120.0d0,n-11,0.0d0,0)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,134,n-8,1.09d0,n-10,120.0d0,n-11,180.0d0,0)
+         call newatm (i,k+6,n-8,1.09d0,n-10,120.0d0,n-11,180.0d0,0)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,134,n-8,1.09d0,n-10,120.0d0,n-12,180.0d0,0)
+         call newatm (i,k+6,n-8,1.09d0,n-10,120.0d0,n-12,180.0d0,0)
          call findatm (' HH ',start,stop,i)
-         call newatm (i,137,n-7,0.97d0,n-8,108.0d0,n-9,0.0d0,0)
+         call newatm (i,k+9,n-7,0.97d0,n-8,108.0d0,n-9,0.0d0,0)
+c
+c     deprotonated tyrosine residue  (TYD)
+c
+      else if (resname .eq. 'TYD') then
+         call findatm (' CB ',start,stop,i)
+         call oldatm (i,k,cai,ires)
+         call findatm (' CG ',start,stop,i)
+         call oldatm (i,k+2,n-1,ires)
+         call findatm (' CD1',start,stop,i)
+         call oldatm (i,k+3,n-1,ires)
+         call findatm (' CD2',start,stop,i)
+         call oldatm (i,k+3,n-2,ires)
+         call findatm (' CE1',start,stop,i)
+         call oldatm (i,k+5,n-2,ires)
+         call findatm (' CE2',start,stop,i)
+         call oldatm (i,k+5,n-2,ires)
+         call findatm (' CZ ',start,stop,i)
+         call oldatm (i,k+7,n-1,ires)
+         call addbond (n-1,n-3)
+         call findatm (' OH ',start,stop,i)
+         call oldatm (i,k+8,n-1,ires)
+         call findatm (' HB2',start,stop,i)
+         call newatm (i,k+1,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,1)
+         call findatm (' HB3',start,stop,i)
+         call newatm (i,k+1,n-9,1.10d0,cai,107.9d0,n-8,110.0d0,-1)
+         call findatm (' HD1',start,stop,i)
+         call newatm (i,k+4,n-8,1.09d0,n-9,120.0d0,n-10,0.0d0,0)
+         call findatm (' HD2',start,stop,i)
+         call newatm (i,k+4,n-8,1.09d0,n-10,120.0d0,n-11,0.0d0,0)
+         call findatm (' HE1',start,stop,i)
+         call newatm (i,k+6,n-8,1.09d0,n-10,120.0d0,n-11,180.0d0,0)
+         call findatm (' HE2',start,stop,i)
+         call newatm (i,k+6,n-8,1.09d0,n-10,120.0d0,n-12,180.0d0,0)
 c
 c     tryptophan residue  (TRP)
 c
       else if (resname .eq. 'TRP') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,144,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,146,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD1',start,stop,i)
-         call oldatm (i,147,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,149,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' NE1',start,stop,i)
-         call oldatm (i,150,n-2,ires)
+         call oldatm (i,k+6,n-2,ires)
          call findatm (' CE2',start,stop,i)
-         call oldatm (i,152,n-1,ires)
+         call oldatm (i,k+8,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' CE3',start,stop,i)
-         call oldatm (i,153,n-3,ires)
+         call oldatm (i,k+9,n-3,ires)
          call findatm (' CZ2',start,stop,i)
-         call oldatm (i,155,n-2,ires)
+         call oldatm (i,k+11,n-2,ires)
          call findatm (' CZ3',start,stop,i)
-         call oldatm (i,157,n-2,ires)
+         call oldatm (i,k+13,n-2,ires)
          call findatm (' CH2',start,stop,i)
-         call oldatm (i,159,n-1,ires)
+         call oldatm (i,k+15,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,145,n-10,1.10d0,cai,107.9d0,n-9,110.0d0,1)
+         call newatm (i,k+1,n-10,1.10d0,cai,107.9d0,n-9,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,145,n-11,1.10d0,cai,107.9d0,n-10,110.0d0,-1)
+         call newatm (i,k+1,n-11,1.10d0,cai,107.9d0,n-10,110.0d0,-1)
          call findatm (' HD1',start,stop,i)
-         call newatm (i,148,n-10,1.09d0,n-11,126.0d0,n-12,0.0d0,0)
+         call newatm (i,k+4,n-10,1.09d0,n-11,126.0d0,n-12,0.0d0,0)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,151,n-9,1.01d0,n-11,126.3d0,n-12,180.0d0,0)
+         call newatm (i,k+7,n-9,1.01d0,n-11,126.3d0,n-12,180.0d0,0)
          call findatm (' HE3',start,stop,i)
-         call newatm (i,154,n-8,1.09d0,n-6,120.0d0,n-5,180.0d0,0)
+         call newatm (i,k+10,n-8,1.09d0,n-6,120.0d0,n-5,180.0d0,0)
          call findatm (' HZ2',start,stop,i)
-         call newatm (i,156,n-8,1.09d0,n-6,120.0d0,n-7,180.0d0,0)
+         call newatm (i,k+12,n-8,1.09d0,n-6,120.0d0,n-7,180.0d0,0)
          call findatm (' HZ3',start,stop,i)
-         call newatm (i,158,n-8,1.09d0,n-7,120.0d0,n-9,180.0d0,0)
+         call newatm (i,k+14,n-8,1.09d0,n-7,120.0d0,n-9,180.0d0,0)
          call findatm (' HH2',start,stop,i)
-         call newatm (i,160,n-8,1.09d0,n-9,120.0d0,n-11,180.0d0,0)
+         call newatm (i,k+16,n-8,1.09d0,n-9,120.0d0,n-11,180.0d0,0)
 c
 c     histidine (HD and HE) residue  (HIS)
 c
       else if (resname .eq. 'HIS') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,167,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,169,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' ND1',start,stop,i)
-         call oldatm (i,170,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,172,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' CE1',start,stop,i)
-         call oldatm (i,174,n-2,ires)
+         call oldatm (i,k+7,n-2,ires)
          call findatm (' NE2',start,stop,i)
-         call oldatm (i,176,n-1,ires)
+         call oldatm (i,k+9,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,168,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,1)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,168,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,-1)
+         call newatm (i,k+1,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,-1)
          call findatm (' HD1',start,stop,i)
-         call newatm (i,171,n-6,1.02d0,n-4,126.0d0,n-3,180.0d0,0)
+         call newatm (i,k+4,n-6,1.02d0,n-4,126.0d0,n-3,180.0d0,0)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,173,n-6,1.09d0,n-4,126.0d0,n-5,180.0d0,0)
+         call newatm (i,k+6,n-6,1.09d0,n-4,126.0d0,n-5,180.0d0,0)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,175,n-6,1.09d0,n-5,126.0d0,n-7,180.0d0,0)
+         call newatm (i,k+8,n-6,1.09d0,n-5,126.0d0,n-7,180.0d0,0)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,177,n-6,1.02d0,n-7,126.0d0,n-9,180.0d0,0)
+         call newatm (i,k+10,n-6,1.02d0,n-7,126.0d0,n-9,180.0d0,0)
 c
 c     histidine (HD only) residue  (HID)
 c
       else if (resname .eq. 'HID') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,184,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,186,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' ND1',start,stop,i)
-         call oldatm (i,187,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,189,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' CE1',start,stop,i)
-         call oldatm (i,191,n-2,ires)
+         call oldatm (i,k+7,n-2,ires)
          call findatm (' NE2',start,stop,i)
-         call oldatm (i,193,n-1,ires)
+         call oldatm (i,k+9,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,185,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,1)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,185,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,-1)
+         call newatm (i,k+1,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,-1)
          call findatm (' HD1',start,stop,i)
-         call newatm (i,188,n-6,1.02d0,n-4,126.0d0,n-3,180.0d0,0)
+         call newatm (i,k+4,n-6,1.02d0,n-4,126.0d0,n-3,180.0d0,0)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,190,n-6,1.09d0,n-4,126.0d0,n-5,180.0d0,0)
+         call newatm (i,k+6,n-6,1.09d0,n-4,126.0d0,n-5,180.0d0,0)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,192,n-6,1.09d0,n-5,126.0d0,n-7,180.0d0,0)
+         call newatm (i,k+8,n-6,1.09d0,n-5,126.0d0,n-7,180.0d0,0)
 c
 c     histidine (HE only) residue  (HIE)
 c
       else if (resname .eq. 'HIE') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,200,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,202,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' ND1',start,stop,i)
-         call oldatm (i,203,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' CD2',start,stop,i)
-         call oldatm (i,204,n-2,ires)
+         call oldatm (i,k+4,n-2,ires)
          call findatm (' CE1',start,stop,i)
-         call oldatm (i,206,n-2,ires)
+         call oldatm (i,k+6,n-2,ires)
          call findatm (' NE2',start,stop,i)
-         call oldatm (i,208,n-1,ires)
+         call oldatm (i,k+8,n-1,ires)
          call addbond (n-1,n-3)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,201,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,1)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,201,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,-1)
+         call newatm (i,k+1,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,-1)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,205,n-5,1.09d0,n-3,126.0d0,n-4,180.0d0,0)
+         call newatm (i,k+5,n-5,1.09d0,n-3,126.0d0,n-4,180.0d0,0)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,207,n-5,1.09d0,n-4,126.0d0,n-6,180.0d0,0)
+         call newatm (i,k+7,n-5,1.09d0,n-4,126.0d0,n-6,180.0d0,0)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,209,n-5,1.02d0,n-6,126.0d0,n-8,180.0d0,0)
+         call newatm (i,k+9,n-5,1.02d0,n-6,126.0d0,n-8,180.0d0,0)
 c
 c     aspartic acid residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,216,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,218,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' OD1',start,stop,i)
-         call oldatm (i,219,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' OD2',start,stop,i)
-         call oldatm (i,219,n-2,ires)
+         call oldatm (i,k+3,n-2,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,217,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,217,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+c
+c     protonated aspartic acid residue  (ASH)
+c
+      else if (resname .eq. 'ASH') then
+         call findatm (' CB ',start,stop,i)
+         call oldatm (i,k,cai,ires)
+         call findatm (' CG ',start,stop,i)
+         call oldatm (i,k+2,n-1,ires)
+         call findatm (' OD1',start,stop,i)
+         call oldatm (i,k+3,n-1,ires)
+         call findatm (' OD2',start,stop,i)
+         call oldatm (i,k+4,n-2,ires)
+         call findatm (' HB2',start,stop,i)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
+         call findatm (' HB3',start,stop,i)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+         call findatm (' HD2',start,stop,i)
+         call newatm (i,k+5,n-3,0.98d0,n-5,108.7d0,n-4,0.0d0,0)
 c
 c     asparagine residue  (ASN)
 c
       else if (resname .eq. 'ASN') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,226,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,228,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' OD1',start,stop,i)
-         call oldatm (i,229,n-1,ires)
+         call oldatm (i,k+3,n-1,ires)
          call findatm (' ND2',start,stop,i)
-         call oldatm (i,230,n-2,ires)
+         call oldatm (i,k+4,n-2,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,227,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,227,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
          call findatm ('HD21',start,stop,i)
-         call newatm (i,231,n-3,1.01d0,n-5,120.9d0,n-6,0.0d0,0)
+         call newatm (i,k+5,n-3,1.01d0,n-5,120.9d0,n-6,0.0d0,0)
          call findatm ('HD22',start,stop,i)
-         call newatm (i,231,n-4,1.01d0,n-6,120.3d0,n-7,180.0d0,0)
+         call newatm (i,k+5,n-4,1.01d0,n-6,120.3d0,n-7,180.0d0,0)
 c
 c     glutamic acid residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,238,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,240,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         call oldatm (i,242,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' OE1',start,stop,i)
-         call oldatm (i,243,n-1,ires)
+         call oldatm (i,k+5,n-1,ires)
          call findatm (' OE2',start,stop,i)
-         call oldatm (i,243,n-2,ires)
+         call oldatm (i,k+5,n-2,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,239,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,239,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,241,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
+         call newatm (i,k+3,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,241,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
+         call newatm (i,k+3,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
+c
+c     protonated glutamic acid residue  (GLH)
+c
+      else if (resname .eq. 'GLH') then
+         call findatm (' CB ',start,stop,i)
+         call oldatm (i,k,cai,ires)
+         call findatm (' CG ',start,stop,i)
+         call oldatm (i,k+2,n-1,ires)
+         call findatm (' CD ',start,stop,i)
+         call oldatm (i,k+4,n-1,ires)
+         call findatm (' OE1',start,stop,i)
+         call oldatm (i,k+5,n-1,ires)
+         call findatm (' OE2',start,stop,i)
+         call oldatm (i,k+6,n-2,ires)
+         call findatm (' HB2',start,stop,i)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
+         call findatm (' HB3',start,stop,i)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
+         call findatm (' HG2',start,stop,i)
+         call newatm (i,k+3,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
+         call findatm (' HG3',start,stop,i)
+         call newatm (i,k+3,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
+         call findatm (' HE2',start,stop,i)
+         call newatm (i,k+7,n-5,0.98d0,n-7,108.7d0,n-6,0.0d0,0)
 c
 c     glutamine residue  (GLN)
 c
       else if (resname .eq. 'GLN') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,250,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,252,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         call oldatm (i,254,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' OE1',start,stop,i)
-         call oldatm (i,255,n-1,ires)
+         call oldatm (i,k+5,n-1,ires)
          call findatm (' NE2',start,stop,i)
-         call oldatm (i,256,n-2,ires)
+         call oldatm (i,k+6,n-2,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,251,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,251,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,253,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
+         call newatm (i,k+3,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,253,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
+         call newatm (i,k+3,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
          call findatm ('HE21',start,stop,i)
-         call newatm (i,257,n-5,1.01d0,n-7,120.9d0,n-8,0.0d0,0)
+         call newatm (i,k+7,n-5,1.01d0,n-7,120.9d0,n-8,0.0d0,0)
          call findatm ('HE22',start,stop,i)
-         call newatm (i,257,n-6,1.01d0,n-8,120.3d0,n-9,180.0d0,0)
+         call newatm (i,k+7,n-6,1.01d0,n-8,120.3d0,n-9,180.0d0,0)
 c
 c     methionine residue  (MET)
 c
       else if (resname .eq. 'MET') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,264,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,266,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' SD ',start,stop,i)
-         call oldatm (i,268,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' CE ',start,stop,i)
-         call oldatm (i,269,n-1,ires)
+         call oldatm (i,k+5,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,265,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,265,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,267,n-5,1.10d0,n-6,109.5d0,n-4,109.5d0,1)
+         call newatm (i,k+3,n-5,1.10d0,n-6,109.5d0,n-4,109.5d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,267,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,-1)
+         call newatm (i,k+3,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,-1)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,270,n-5,1.10d0,n-6,110.2d0,n-7,180.0d0,0)
+         call newatm (i,k+6,n-5,1.10d0,n-6,110.2d0,n-7,180.0d0,0)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,270,n-6,1.10d0,n-7,110.2d0,n-8,60.0d0,0)
+         call newatm (i,k+6,n-6,1.10d0,n-7,110.2d0,n-8,60.0d0,0)
          call findatm (' HE3',start,stop,i)
-         call newatm (i,270,n-7,1.10d0,n-8,110.2d0,n-9,-60.0d0,0)
+         call newatm (i,k+6,n-7,1.10d0,n-8,110.2d0,n-9,-60.0d0,0)
 c
 c     lysine residue  (LYS)
 c
       else if (resname .eq. 'LYS') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,277,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,279,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         call oldatm (i,281,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' CE ',start,stop,i)
-         call oldatm (i,283,n-1,ires)
+         call oldatm (i,k+6,n-1,ires)
          call findatm (' NZ ',start,stop,i)
-         call oldatm (i,285,n-1,ires)
+         call oldatm (i,k+8,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,278,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,278,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,280,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
+         call newatm (i,k+3,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,280,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
+         call newatm (i,k+3,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,282,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,1)
+         call newatm (i,k+5,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,1)
          call findatm (' HD3',start,stop,i)
-         call newatm (i,282,n-8,1.10d0,n-9,109.5d0,n-7,109.5d0,-1)
+         call newatm (i,k+5,n-8,1.10d0,n-9,109.5d0,n-7,109.5d0,-1)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,284,n-8,1.10d0,n-9,110.9d0,n-7,107.3d0,1)
+         call newatm (i,k+7,n-8,1.10d0,n-9,110.9d0,n-7,107.3d0,1)
          call findatm (' HE3',start,stop,i)
-         call newatm (i,284,n-9,1.10d0,n-10,110.9d0,n-8,107.3d0,-1)
+         call newatm (i,k+7,n-9,1.10d0,n-10,110.9d0,n-8,107.3d0,-1)
          call findatm (' HZ1',start,stop,i)
-         call newatm (i,286,n-9,1.04d0,n-10,110.5d0,n-11,180.0d0,0)
+         call newatm (i,k+9,n-9,1.04d0,n-10,110.5d0,n-11,180.0d0,0)
          call findatm (' HZ2',start,stop,i)
-         call newatm (i,286,n-10,1.04d0,n-11,110.5d0,n-12,60.0d0,0)
+         call newatm (i,k+9,n-10,1.04d0,n-11,110.5d0,n-12,60.0d0,0)
          call findatm (' HZ3',start,stop,i)
-         call newatm (i,286,n-11,1.04d0,n-12,110.5d0,n-13,-60.0d0,0)
+         call newatm (i,k+9,n-11,1.04d0,n-12,110.5d0,n-13,-60.0d0,0)
+c
+c     deprotonated lysine residue  (LYD)
+c
+      else if (resname .eq. 'LYD') then
+         call findatm (' CB ',start,stop,i)
+         call oldatm (i,k,cai,ires)
+         call findatm (' CG ',start,stop,i)
+         call oldatm (i,k+2,n-1,ires)
+         call findatm (' CD ',start,stop,i)
+         call oldatm (i,k+4,n-1,ires)
+         call findatm (' CE ',start,stop,i)
+         call oldatm (i,k+6,n-1,ires)
+         call findatm (' NZ ',start,stop,i)
+         call oldatm (i,k+8,n-1,ires)
+         call findatm (' HB2',start,stop,i)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,1)
+         call findatm (' HB3',start,stop,i)
+         call newatm (i,k+1,n-6,1.10d0,cai,107.9d0,n-5,110.0d0,-1)
+         call findatm (' HG2',start,stop,i)
+         call newatm (i,k+3,n-6,1.10d0,n-7,109.5d0,n-5,109.5d0,1)
+         call findatm (' HG3',start,stop,i)
+         call newatm (i,k+3,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,-1)
+         call findatm (' HD2',start,stop,i)
+         call newatm (i,k+5,n-7,1.10d0,n-8,109.5d0,n-6,109.5d0,1)
+         call findatm (' HD3',start,stop,i)
+         call newatm (i,k+5,n-8,1.10d0,n-9,109.5d0,n-7,109.5d0,-1)
+         call findatm (' HE2',start,stop,i)
+         call newatm (i,k+7,n-8,1.10d0,n-9,110.9d0,n-7,107.3d0,1)
+         call findatm (' HE3',start,stop,i)
+         call newatm (i,k+7,n-9,1.10d0,n-10,110.9d0,n-8,107.3d0,-1)
+         call findatm (' HZ1',start,stop,i)
+         call newatm (i,k+9,n-9,1.04d0,n-10,110.5d0,n-11,180.0d0,0)
+         call findatm (' HZ2',start,stop,i)
+         call newatm (i,k+9,n-10,1.04d0,n-11,110.5d0,n-12,60.0d0,0)
 c
 c     arginine residue  (ARG)
 c
       else if (resname .eq. 'ARG') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,293,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,295,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         call oldatm (i,297,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' NE ',start,stop,i)
-         call oldatm (i,299,n-1,ires)
+         call oldatm (i,k+6,n-1,ires)
          call findatm (' CZ ',start,stop,i)
-         call oldatm (i,301,n-1,ires)
+         call oldatm (i,k+8,n-1,ires)
          call findatm (' NH1',start,stop,i)
-         call oldatm (i,302,n-1,ires)
+         call oldatm (i,k+9,n-1,ires)
          call findatm (' NH2',start,stop,i)
-         call oldatm (i,302,n-2,ires)
+         call oldatm (i,k+9,n-2,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,294,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,1)
+         call newatm (i,k+1,n-7,1.10d0,cai,107.9d0,n-6,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,294,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,-1)
+         call newatm (i,k+1,n-8,1.10d0,cai,107.9d0,n-7,110.0d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,296,n-8,1.10d0,n-9,109.5d0,n-7,109.5d0,1)
+         call newatm (i,k+3,n-8,1.10d0,n-9,109.5d0,n-7,109.5d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,296,n-9,1.10d0,n-10,109.5d0,n-8,109.5d0,-1)
+         call newatm (i,k+3,n-9,1.10d0,n-10,109.5d0,n-8,109.5d0,-1)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,298,n-9,1.10d0,n-10,109.5d0,n-8,109.5d0,1)
+         call newatm (i,k+5,n-9,1.10d0,n-10,109.5d0,n-8,109.5d0,1)
          call findatm (' HD3',start,stop,i)
-         call newatm (i,298,n-10,1.10d0,n-11,109.5d0,n-9,109.5d0,-1)
+         call newatm (i,k+5,n-10,1.10d0,n-11,109.5d0,n-9,109.5d0,-1)
          call findatm (' HE ',start,stop,i)
-         call newatm (i,300,n-10,1.01d0,n-11,118.5d0,n-9,120.0d0,1)
+         call newatm (i,k+7,n-10,1.01d0,n-11,118.5d0,n-9,120.0d0,1)
          call findatm ('HH11',start,stop,i)
-         call newatm (i,303,n-9,1.01d0,n-10,122.5d0,n-11,0.0d0,0)
+         call newatm (i,k+10,n-9,1.01d0,n-10,122.5d0,n-11,0.0d0,0)
          call findatm ('HH12',start,stop,i)
-         call newatm (i,303,n-10,1.01d0,n-11,118.8d0,n-12,180.0d0,0)
+         call newatm (i,k+10,n-10,1.01d0,n-11,118.8d0,n-12,180.0d0,0)
          call findatm ('HH21',start,stop,i)
-         call newatm (i,303,n-10,1.01d0,n-12,122.5d0,n-13,0.0d0,0)
+         call newatm (i,k+10,n-10,1.01d0,n-12,122.5d0,n-13,0.0d0,0)
          call findatm ('HH22',start,stop,i)
-         call newatm (i,303,n-11,1.01d0,n-13,118.8d0,n-14,180.0d0,0)
+         call newatm (i,k+10,n-11,1.01d0,n-13,118.8d0,n-14,180.0d0,0)
 c
 c     ornithine residue  (ORN)
 c
       else if (resname .eq. 'ORN') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,310,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,312,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         call oldatm (i,314,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call findatm (' NE ',start,stop,i)
-         call oldatm (i,316,n-1,ires)
+         call oldatm (i,k+6,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,311,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
+         call newatm (i,k+1,n-4,1.10d0,cai,107.9d0,n-3,110.0d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,311,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
+         call newatm (i,k+1,n-5,1.10d0,cai,107.9d0,n-4,110.0d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,313,n-5,1.10d0,n-7,109.5d0,n-4,109.5d0,1)
+         call newatm (i,k+3,n-5,1.10d0,n-7,109.5d0,n-4,109.5d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,313,n-6,1.10d0,n-8,109.5d0,n-5,109.5d0,-1)
+         call newatm (i,k+3,n-6,1.10d0,n-8,109.5d0,n-5,109.5d0,-1)
          call findatm (' HD2',start,stop,i)
-         call newatm (i,315,n-6,1.10d0,n-8,109.5d0,n-5,109.5d0,1)
+         call newatm (i,k+5,n-6,1.10d0,n-8,109.5d0,n-5,109.5d0,1)
          call findatm (' HD3',start,stop,i)
-         call newatm (i,315,n-7,1.10d0,n-9,109.5d0,n-6,109.5d0,-1)
+         call newatm (i,k+5,n-7,1.10d0,n-9,109.5d0,n-6,109.5d0,-1)
          call findatm (' HE1',start,stop,i)
-         call newatm (i,317,n-7,1.04d0,n-8,110.5d0,n-9,180.0d0,0)
+         call newatm (i,k+7,n-7,1.04d0,n-8,110.5d0,n-9,180.0d0,0)
          call findatm (' HE2',start,stop,i)
-         call newatm (i,317,n-8,1.04d0,n-9,110.5d0,n-10,60.0d0,0)
+         call newatm (i,k+7,n-8,1.04d0,n-9,110.5d0,n-10,60.0d0,0)
          call findatm (' HE3',start,stop,i)
-         call newatm (i,317,n-9,1.04d0,n-10,110.5d0,n-11,-60.0d0,0)
+         call newatm (i,k+7,n-9,1.04d0,n-10,110.5d0,n-11,-60.0d0,0)
 c
 c     methylalanine residue  (AIB)
 c
       else if (resname .eq. 'AIB') then
          call findatm (' CB1',start,stop,i)
-         call oldatm (i,323,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CB2',start,stop,i)
-         call oldatm (i,323,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm ('HB11',start,stop,i)
-         call newatm (i,324,n-2,1.10d0,cai,110.2d0,ni,180.0d0,0)
+         call newatm (i,k+1,n-2,1.10d0,cai,110.2d0,ni,180.0d0,0)
          call findatm ('HB12',start,stop,i)
-         call newatm (i,324,n-3,1.10d0,cai,110.2d0,ni,60.0d0,0)
+         call newatm (i,k+1,n-3,1.10d0,cai,110.2d0,ni,60.0d0,0)
          call findatm ('HB13',start,stop,i)
-         call newatm (i,324,n-4,1.10d0,cai,110.2d0,ni,-60.0d0,0)
+         call newatm (i,k+1,n-4,1.10d0,cai,110.2d0,ni,-60.0d0,0)
          call findatm ('HB21',start,stop,i)
-         call newatm (i,324,n-4,1.10d0,cai,110.2d0,ni,180.0d0,0)
+         call newatm (i,k+1,n-4,1.10d0,cai,110.2d0,ni,180.0d0,0)
          call findatm ('HB22',start,stop,i)
-         call newatm (i,324,n-5,1.10d0,cai,110.2d0,ni,60.0d0,0)
+         call newatm (i,k+1,n-5,1.10d0,cai,110.2d0,ni,60.0d0,0)
          call findatm ('HB23',start,stop,i)
-         call newatm (i,324,n-6,1.10d0,cai,110.2d0,ni,-60.0d0,0)
+         call newatm (i,k+1,n-6,1.10d0,cai,110.2d0,ni,-60.0d0,0)
 c
 c     pyroglutamic acid residue  (PCA)
 c
       else if (resname .eq. 'PCA') then
          call findatm (' CB ',start,stop,i)
-         call oldatm (i,331,cai,ires)
+         call oldatm (i,k,cai,ires)
          call findatm (' CG ',start,stop,i)
-         call oldatm (i,333,n-1,ires)
+         call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         call oldatm (i,335,n-1,ires)
+         call oldatm (i,k+4,n-1,ires)
          call addbond (n-1,ni)
          call findatm (' OE ',start,stop,i)
-         call oldatm (i,336,n-1,ires)
+         call oldatm (i,k+5,n-1,ires)
          call findatm (' HB2',start,stop,i)
-         call newatm (i,332,n-4,1.10d0,cai,111.2d0,n-3,111.2d0,1)
+         call newatm (i,k+1,n-4,1.10d0,cai,111.2d0,n-3,111.2d0,1)
          call findatm (' HB3',start,stop,i)
-         call newatm (i,332,n-5,1.10d0,cai,111.2d0,n-4,111.2d0,-1)
+         call newatm (i,k+1,n-5,1.10d0,cai,111.2d0,n-4,111.2d0,-1)
          call findatm (' HG2',start,stop,i)
-         call newatm (i,334,n-5,1.10d0,n-6,111.2d0,n-4,111.2d0,1)
+         call newatm (i,k+3,n-5,1.10d0,n-6,111.2d0,n-4,111.2d0,1)
          call findatm (' HG3',start,stop,i)
-         call newatm (i,334,n-6,1.10d0,n-7,111.2d0,n-5,111.2d0,-1)
+         call newatm (i,k+3,n-6,1.10d0,n-7,111.2d0,n-5,111.2d0,-1)
 c
 c     unknown residue  (UNK)
 c
       else if (resname .eq. 'UNK') then
-         if (ires .eq. 1) then
-            call newatm (0,355,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
-         else if (ires .eq. nseq) then
-            call newatm (0,506,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
-         else
-            call newatm (0,6,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
-         end if
+         k = hatyp(seqtyp(ires))
+         if (ires .eq. 1)  k = hantyp(seqtyp(ires))
+         if (ires .eq. nseq)  k = hactyp(seqtyp(ires))
+         call newatm (i,k,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
       end if
       return
       end
@@ -1655,62 +1691,9 @@ c
       integer c4i,o4i,c1i
       integer c3i,c2i,o3i,o2i
       integer resatm(2,maxres)
-      integer o5typ(maxnuc),c5typ(maxnuc)
-      integer h51typ(maxnuc),h52typ(maxnuc)
-      integer c4typ(maxnuc),h4typ(maxnuc)
-      integer o4typ(maxnuc),c1typ(maxnuc)
-      integer h1typ(maxnuc),c3typ(maxnuc)
-      integer h3typ(maxnuc),c2typ(maxnuc)
-      integer o3typ(maxnuc),o2typ(maxnuc)
-      integer h21typ(maxnuc),h22typ(maxnuc)
-      integer ptyp(maxnuc),optyp(maxnuc)
-      integer h5ttyp(maxnuc),h3ttyp(maxnuc)
       logical newchain,endchain
       logical deoxy(maxres)
       character*3 resname
-c
-c     biopolymer atom types for nucleic acid backbone atoms
-c
-      data o5typ   / 1001, 1031, 1062, 1090, 1117, 1146, 1176, 1203,
-     &                  0,    0,    0,    0 /
-      data c5typ   / 1002, 1032, 1063, 1091, 1118, 1147, 1177, 1204,
-     &                  0,    0,    0,    0 /
-      data h51typ  / 1003, 1033, 1064, 1092, 1119, 1148, 1178, 1205,
-     &                  0,    0,    0,    0 /
-      data h52typ  / 1004, 1034, 1065, 1093, 1120, 1149, 1179, 1206,
-     &                  0,    0,    0,    0 /
-      data c4typ   / 1005, 1035, 1066, 1094, 1121, 1150, 1180, 1207,
-     &                  0,    0,    0,    0 /
-      data h4typ   / 1006, 1036, 1067, 1095, 1122, 1151, 1181, 1208,
-     &                  0,    0,    0,    0 /
-      data o4typ   / 1007, 1037, 1068, 1096, 1123, 1152, 1182, 1209,
-     &                  0,    0,    0,    0 /
-      data c1typ   / 1008, 1038, 1069, 1097, 1124, 1153, 1183, 1210,
-     &                  0,    0,    0,    0 /
-      data h1typ   / 1009, 1039, 1070, 1098, 1125, 1154, 1184, 1211,
-     &                  0,    0,    0,    0 /
-      data c3typ   / 1010, 1040, 1071, 1099, 1126, 1155, 1185, 1212,
-     &                  0,    0,    0,    0 /
-      data h3typ   / 1011, 1041, 1072, 1100, 1127, 1156, 1186, 1213,
-     &                  0,    0,    0,    0 /
-      data c2typ   / 1012, 1042, 1073, 1101, 1128, 1157, 1187, 1214,
-     &                  0,    0,    0,    0 /
-      data h21typ  / 1013, 1043, 1074, 1102, 1129, 1158, 1188, 1215,
-     &                  0,    0,    0,    0 /
-      data h22typ  / 1015, 1045, 1076, 1104, 1130, 1159, 1189, 1216,
-     &                  0,    0,    0,    0 /
-      data o3typ   / 1016, 1046, 1077, 1105, 1131, 1160, 1190, 1217,
-     &                  0,    0,    0,    0 /
-      data o2typ   / 1014, 1044, 1075, 1103,    0,    0,    0,    0,
-     &                  0,    0,    0,    0 /
-      data ptyp    / 1230, 1230, 1230, 1230, 1242, 1242, 1242, 1242,
-     &                  0,    0,    0,    0 /
-      data optyp   / 1231, 1231, 1231, 1231, 1243, 1243, 1243, 1243,
-     &                  0,    0,    0,    0 /
-      data h5ttyp  / 1233, 1233, 1233, 1233, 1245, 1245, 1245, 1245,
-     &                  0,    0,    0,    0 /
-      data h3ttyp  / 1238, 1238, 1238, 1238, 1250, 1250, 1250, 1250,
-     &                  0,    0,    0,    0 /
 c
 c
 c     set a pointer to the first and last atom of each residue

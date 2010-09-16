@@ -31,10 +31,9 @@ c
       include 'atoms.i'
       include 'boxes.i'
       include 'pme.i'
-      integer i,ii,ifr
+      integer i,ifr
       real*8 xi,yi,zi
       real*8 w,fr,eps
-      integer j,k
 c
 c
 c     offset used to shift sites off exact lattice bounds

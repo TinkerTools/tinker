@@ -129,14 +129,14 @@ c     remove a specified list of individual atoms
 c
       if (mode .eq. 2) then
          nlist = 0
-         do i = 1, maxatm
+         do i = 1, n
             list(i) = 0
          end do
          write (iout,90)
    90    format (/,' Numbers of the Atoms to be Removed :  ',$)
          read (input,100)  record
   100    format (a120)
-         read (record,*,err=110,end=110)  (list(i),i=1,maxatm)
+         read (record,*,err=110,end=110)  (list(i),i=1,n)
   110    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
@@ -167,14 +167,14 @@ c     remove all atoms with any of a specified list of atom types
 c
       if (mode .eq. 3) then
          nlist = 0
-         do i = 1, maxatm
+         do i = 1, n
             list(i) = 0
          end do
          write (iout,120)
   120    format (/,' Atom Types to be Removed :  ',$)
          read (input,130)  record
   130    format (a120)
-         read (record,*,err=140,end=140)  (list(i),i=1,maxatm)
+         read (record,*,err=140,end=140)  (list(i),i=1,n)
   140    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
@@ -246,14 +246,14 @@ c     insert a specified list of individual atoms
 c
       if (mode .eq. 5) then
          nlist = 0
-         do i = 1, maxatm
+         do i = 1, n
             list(i) = 0
          end do
          write (iout,170)
   170    format (/,' Numbers of the Atoms to be Inserted :  ',$)
          read (input,180)  record
   180    format (a120)
-         read (record,*,err=190,end=190)  (list(i),i=1,maxatm)
+         read (record,*,err=190,end=190)  (list(i),i=1,n)
   190    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1

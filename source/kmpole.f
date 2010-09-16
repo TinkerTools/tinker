@@ -42,7 +42,7 @@ c
       integer mpz(maxnmp)
       integer mpx(maxnmp)
       integer mpy(maxnmp)
-      real*8 random,mpl(13)
+      real*8 mpl(13)
       logical header,path
       character*4 pa,pb,pc,pd
       character*8 axt

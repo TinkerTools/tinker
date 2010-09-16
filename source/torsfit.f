@@ -23,11 +23,9 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
-      integer i,nvar,next
-      integer length
+      integer i,length
       integer torbnd(10)
       logical exist,query
-      character*20 keyword
       character*120 record
       character*120 string
       character*120 xyzfile
@@ -154,7 +152,6 @@ c
       integer tflg(maxfittor),cflg(9*maxfittor)
       logical vflg (6,maxfittor),done
       logical confvisited(maxconf)
-      character*8 pkt(maxfittor)
       character*4 pa,pb,pc,pd
       character*16 kft(maxfittor)
       character*16 kct(9*maxfittor)
@@ -163,7 +160,7 @@ c
       integer oldleng
       character*120 oldkeyline(maxkey)
       integer oldnkey
-      real*8 mata(6*maxfittor,6*maxfittor),vectb(6*maxfittor)
+      real*8 mata(6*maxfittor,6*maxfittor)
       real*8 avedl
       integer nvar
       integer refconf(maxconf)

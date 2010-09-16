@@ -76,11 +76,12 @@ c
          call inertia (2)
       end if
 c
-c     remove any dummy atoms from Cartesian coordinates
+c     remove dummy atoms and set undefined atoms to type zero
 c
       natom = n
       do i = natom, 1, -1
          if (type(i) .eq. 0)  call delete (i)
+         if (type(i) .lt. 0)  type(i) = 0
       end do
 c
 c     convert to internal and Cartesian coordinates
@@ -429,20 +430,14 @@ c
       include 'nucleo.i'
       include 'resdue.i'
       include 'sequen.i'
-      integer i,j,k,m
+      integer i,k,m
       integer poi,o2i,c1i
       integer c2i,c3i,c4i
       integer c5i,o3i,o4i,o5i
-      integer ptyp,optyp,ostyp
-      integer ottyp,httyp
-      integer o5typ(maxnuc)
+      integer phtyp,ophtyp
+      integer ostyp,ottyp
       logical single,cap3,cap5
       character*3 resname
-c
-c     biopolymer atom types for nucleotide backbone atoms
-c
-      data o5typ   / 1001, 1031, 1062, 1090, 1117, 1146, 1176, 1203,
-     &                  0,    0,    0,    0 /
 c
 c
 c     initialize the atom counter to the first atom
@@ -471,33 +466,32 @@ c     build the first residue or a phosphate capping group
 c
          i = ichain(1,m)
          k = seqtyp(i)
-         j = o5typ(k)
          resname = nuclz(k)
          if (resname .eq. 'MP ') then
             if (deoxy(i+1)) then
                ostyp = 1246
-               ptyp = 1247
-               optyp = 1248
+               phtyp = 1247
+               ophtyp = 1248
             else
                ostyp = 1234
-               ptyp = 1235
-               optyp = 1236
+               phtyp = 1235
+               ophtyp = 1236
             end if
             if (m .eq. 1) then
                o3i = n
-               call zatom (optyp,0.0d0,0.0d0,0.0d0,0,0,0,0)
+               call zatom (ophtyp,0.0d0,0.0d0,0.0d0,0,0,0,0)
                poi = n
-               call zatom (ptyp,1.52d0,0.0d0,0.0d0,o3i,0,0,0)
-               call zatom (optyp,1.52d0,113.0d0,0.0d0,poi,o3i,0,0)
+               call zatom (phtyp,1.52d0,0.0d0,0.0d0,o3i,0,0,0)
+               call zatom (ophtyp,1.52d0,113.0d0,0.0d0,poi,o3i,0,0)
             else
                o3i = n
-               call zatom (optyp,30.0d0,150.0d0,180.0d0,n-1,n-2,n-3,0)
+               call zatom (ophtyp,30.0d0,150.0d0,180.0d0,n-1,n-2,n-3,0)
                call zatom (-2,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
                poi = n
-               call zatom (ptyp,1.52d0,150.0d0,180.0d0,o3i,n-2,n-3,0)
-               call zatom (optyp,1.52d0,113.0d0,180.0d0,poi,o3i,n-3,0)
+               call zatom (phtyp,1.52d0,150.0d0,180.0d0,o3i,n-2,n-3,0)
+               call zatom (ophtyp,1.52d0,113.0d0,180.0d0,poi,o3i,n-3,0)
             end if
-            call zatom (optyp,1.52d0,113.0d0,113.0d0,poi,o3i,n-1,1)
+            call zatom (ophtyp,1.52d0,113.0d0,113.0d0,poi,o3i,n-1,1)
             o5i = n
             call zatom (ostyp,1.63d0,106.0d0,106.0d0,poi,o3i,n-2,-1)
          else if (resname .eq. 'DP ') then
@@ -514,87 +508,89 @@ c
                o5i = n
                call zatom (ottyp,0.0d0,0.0d0,0.0d0,0,0,0,0)
                c5i = n
-               call zatom (j+1,1.44d0,0.0d0,0.0d0,o5i,0,0,0)
+               call zatom (c5typ(k),1.44d0,0.0d0,0.0d0,o5i,0,0,0)
                c4i = n
-               call zatom (j+4,1.52d0,110.1d0,0.0d0,c5i,o5i,0,0)
+               call zatom (c4typ(k),1.52d0,110.1d0,0.0d0,c5i,o5i,0,0)
             else
                o5i = n
                call zatom (ottyp,0.96d0,150.0d0,180.0d0,n-1,n-2,n-3,0)
                call zatom (-2,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
                c5i = n
-               call zatom (j+1,1.44d0,119.0d0,180.0d0,o5i,n-2,n-3,0)
+               call zatom (c5typ(k),1.44d0,119.0d0,180.0d0,
+     &                        o5i,n-2,n-3,0)
                c4i = n
-               call zatom (j+4,1.52d0,110.1d0,180.0d0,c5i,o5i,n-3,0)
+               call zatom (c4typ(k),1.52d0,110.1d0,180.0d0,
+     &                        c5i,o5i,n-3,0)
             end if
             o4i = n
-            call zatom (j+6,1.46d0,108.9d0,bkbone(3,i)-120.0d0,
+            call zatom (o4typ(k),1.46d0,108.9d0,bkbone(3,i)-120.0d0,
      &                     c4i,c5i,o5i,0)
             c1i = n
             if (pucker(i) .eq. 3) then
-               call zatom (j+7,1.42d0,109.8d0,145.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,145.0d0,
+     &                        o4i,c4i,c5i,0)
             else if (pucker(i) .eq. 2) then
-               call zatom (j+7,1.42d0,109.8d0,107.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,107.0d0,
+     &                        o4i,c4i,c5i,0)
             else if (pucker(i) .eq. 1) then
-               call zatom (j+7,1.42d0,109.8d0,140.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,140.0d0,
+     &                        o4i,c4i,c5i,0)
             end if
             c3i = n
-            call zatom (j+9,1.53d0,115.9d0,bkbone(3,i),c4i,c5i,o5i,0)
+            call zatom (c3typ(k),1.53d0,115.9d0,bkbone(3,i),
+     &                     c4i,c5i,o5i,0)
             c2i = n
-            call zatom (j+11,1.53d0,102.4d0,bkbone(4,i)+120.0d0,
+            call zatom (c2typ(k),1.53d0,102.4d0,bkbone(4,i)+120.0d0,
      &                     c3i,c4i,c5i,0)
             call zatom (-1,0.0d0,0.0d0,0.0d0,c1i,c2i,0,0)
             o3i = n
             if (deoxy(i)) then
                if (single) then
-                  ottyp = 1249
-                  call zatom (ottyp,1.42d0,112.1d0,bkbone(4,i),
+                  call zatom (1249,1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                else
-                  call zatom (j+14,1.42d0,112.1d0,bkbone(4,i),
+                  call zatom (o3typ(k),1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                end if
             else
                if (single) then
-                  ottyp = 1237
-                  call zatom (ottyp,1.42d0,112.1d0,bkbone(4,i),
+                  call zatom (1237,1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                else
-                  call zatom (j+15,1.42d0,112.1 d0,bkbone(4,i),
+                  call zatom (o3typ(k),1.42d0,112.1 d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                end if
                o2i = n
-               call zatom (j+13,1.43d0,109.5d0,109.5d0,c2i,c3i,c1i,1)
+               call zatom (o2typ(k),1.43d0,109.5d0,109.5d0,
+     &                        c2i,c3i,c1i,1)
             end if
-            if (deoxy(i)) then
-               httyp = 1245
-            else
-               httyp = 1233
-            end if
-            call zatom (httyp,0.96d0,107.0d0,180.0d0,o5i,c5i,c4i,0)
-            call zatom (j+2,1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,1)
-            call zatom (j+3,1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,-1)
-            call zatom (j+5,1.09d0,109.5d0,109.5d0,c4i,c5i,c3i,-1)
+            call zatom (h5ttyp(k),0.96d0,107.0d0,180.0d0,
+     &                     o5i,c5i,c4i,0)
+            call zatom (h51typ(k),1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,1)
+            call zatom (h52typ(k),1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,-1)
+            call zatom (h4typ(k),1.09d0,109.5d0,109.5d0,c4i,c5i,c3i,-1)
             if (pucker(i) .eq. 3) then
-               call zatom (j+8,1.09d0,109.5d0,120.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,120.0d0,
+     &                        c1i,o4i,c2i,-1)
             else if (pucker(i) .eq. 2) then
-               call zatom (j+8,1.09d0,109.5d0,115.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,115.0d0,
+     &                        c1i,o4i,c2i,-1)
             else if (pucker(i) .eq. 1) then
-               call zatom (j+8,1.09d0,109.5d0,90.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,90.0d0,
+     &                        c1i,o4i,c2i,-1)
             end if
-            call zatom (j+10,1.09d0,109.5d0,109.5d0,c3i,c4i,c2i,-1)
-            call zatom (j+12,1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,-1)
+            call zatom (h3typ(k),1.09d0,109.5d0,109.5d0,c3i,c4i,c2i,-1)
+            call zatom (h21typ(k),1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,-1)
             if (deoxy(i)) then
-               call zatom (j+13,1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,1)
+               call zatom (h22typ(k),1.09d0,109.5d0,109.5d0,
+     &                        c2i,c3i,c1i,1)
             else
-               call zatom (j+14,0.96d0,107.0d0,180.0d0,o2i,c2i,c3i,0)
+               call zatom (h22typ(k),0.96d0,107.0d0,180.0d0,
+     &                        o2i,c2i,c3i,0)
             end if
             if (single) then
-               if (deoxy(i)) then
-                  httyp = 1250
-               else
-                  httyp = 1238
-               end if
-               call zatom (httyp,0.96d0,115.0d0,180.0d0,o3i,c3i,c4i,0)
+               call zatom (h3ttyp(k),0.96d0,115.0d0,180.0d0,
+     &                        o3i,c3i,c4i,0)
             end if
             call nucbase (resname,i,c1i,o4i,c2i)
          end if
@@ -603,47 +599,46 @@ c     build atoms for residues in the middle of the chain
 c
          do i = ichain(1,m)+1, ichain(2,m)-1
             k = seqtyp(i)
-            j = o5typ(k)
             resname = nuclz(k)
             if (cap5) then
                cap5 = .false.
             else
-               if (deoxy(i)) then
-                  ptyp = 1242
-                  optyp = 1243
-               else
-                  ptyp = 1230
-                  optyp = 1231
-               end if
                poi = n
-               call zatom (ptyp,1.60d0,119.0d0,bkbone(5,i-1),
+               call zatom (ptyp(k),1.60d0,119.0d0,bkbone(5,i-1),
      &                        o3i,c3i,c4i,0)
-               call zatom (optyp,1.48d0,109.0d0,bkbone(6,i-1)+120.0d0,
-     &                        poi,o3i,c3i,0)
-               call zatom (optyp,1.48d0,109.0d0,bkbone(6,i-1)-120.0d0,
-     &                        poi,o3i,c3i,0)
+               call zatom (optyp(k),1.48d0,109.0d0,
+     &                        bkbone(6,i-1)+120.0d0,poi,o3i,c3i,0)
+               call zatom (optyp(k),1.48d0,109.0d0,
+     &                        bkbone(6,i-1)-120.0d0,poi,o3i,c3i,0)
                o5i = n
-               call zatom (j,1.60d0,101.8d0,bkbone(6,i-1),poi,o3i,c3i,0)
+               call zatom (o5typ(k),1.60d0,101.8d0,bkbone(6,i-1),
+     &                        poi,o3i,c3i,0)
             end if
             c5i = n
-            call zatom (j+1,1.44d0,119.0d0,bkbone(1,i),o5i,poi,o3i,0)
+            call zatom (c5typ(k),1.44d0,119.0d0,bkbone(1,i),
+     &                     o5i,poi,o3i,0)
             c4i = n
-            call zatom (j+4,1.52d0,110.1d0,bkbone(2,i),c5i,o5i,poi,0)
+            call zatom (c4typ(k),1.52d0,110.1d0,bkbone(2,i),
+     &                     c5i,o5i,poi,0)
             o4i = n
-            call zatom (j+6,1.46d0,108.9d0,bkbone(3,i)-120.0d0,
+            call zatom (o4typ(k),1.46d0,108.9d0,bkbone(3,i)-120.0d0,
      &                     c4i,c5i,o5i,0)
             c1i = n
             if (pucker(i) .eq. 3) then
-               call zatom (j+7,1.42d0,109.8d0,145.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,145.0d0,
+     &                        o4i,c4i,c5i,0)
             else if (pucker(i) .eq. 2) then
-               call zatom (j+7,1.42d0,109.8d0,107.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,107.0d0,
+     &                        o4i,c4i,c5i,0)
             else if (pucker(i) .eq. 1) then
-               call zatom (j+7,1.42d0,109.8d0,140.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,140.0d0,
+     &                        o4i,c4i,c5i,0)
             end if
             c3i = n
-            call zatom (j+9,1.53d0,115.9d0,bkbone(3,i),c4i,c5i,o5i,0)
+            call zatom (c3typ(k),1.53d0,115.9d0,bkbone(3,i),
+     &                     c4i,c5i,o5i,0)
             c2i = n
-            call zatom (j+11,1.53d0,102.4d0,bkbone(4,i)+120.0d0,
+            call zatom (c2typ(k),1.53d0,102.4d0,bkbone(4,i)+120.0d0,
      &                     c3i,c4i,c5i,0)
             call zatom (-1,0.0d0,0.0d0,0.0d0,c1i,c2i,0,0)
             o3i = n
@@ -652,7 +647,7 @@ c
                   call zatom (1251,1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                else
-                  call zatom (j+14,1.42d0,112.1d0,bkbone(4,i),
+                  call zatom (o3typ(k),1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                end if
             else
@@ -660,28 +655,34 @@ c
                   call zatom (1239,1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                else
-                  call zatom (j+15,1.42d0,112.1d0,bkbone(4,i),
+                  call zatom (o3typ(k),1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                end if
                o2i = n
-               call zatom (j+13,1.43d0,109.5d0,109.5d0,c2i,c3i,c1i,1)
+               call zatom (o2typ(k),1.43d0,109.5d0,109.5d0,
+     &                        c2i,c3i,c1i,1)
             end if
-            call zatom (j+2,1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,1)
-            call zatom (j+3,1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,-1)
-            call zatom (j+5,1.09d0,109.5d0,109.5d0,c4i,c5i,c3i,-1)
+            call zatom (h51typ(k),1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,1)
+            call zatom (h52typ(k),1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,-1)
+            call zatom (h4typ(k),1.09d0,109.5d0,109.5d0,c4i,c5i,c3i,-1)
             if (pucker(i) .eq. 3) then
-               call zatom (j+8,1.09d0,109.5d0,120.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,120.0d0,
+     &                        c1i,o4i,c2i,-1)
             else if (pucker(i) .eq. 2) then
-               call zatom (j+8,1.09d0,109.5d0,115.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,115.0d0,
+     &                        c1i,o4i,c2i,-1)
             else if (pucker(i) .eq. 1) then
-               call zatom (j+8,1.09d0,109.5d0,90.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,90.0d0,
+     &                        c1i,o4i,c2i,-1)
             end if
-            call zatom (j+10,1.09d0,109.5d0,109.5d0,c3i,c4i,c2i,-1)
-            call zatom (j+12,1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,-1)
+            call zatom (h3typ(k),1.09d0,109.5d0,109.5d0,c3i,c4i,c2i,-1)
+            call zatom (h21typ(k),1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,-1)
             if (deoxy(i)) then
-               call zatom (j+13,1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,1)
+               call zatom (h22typ(k),1.09d0,109.5d0,109.5d0,
+     &                        c2i,c3i,c1i,1)
             else
-               call zatom (j+14,0.96d0,107.0d0,180.0d0,o2i,c2i,c3i,0)
+               call zatom (h22typ(k),0.96d0,107.0d0,180.0d0,
+     &                        o2i,c2i,c3i,0)
             end if
             call nucbase (resname,i,c1i,o4i,c2i)
          end do
@@ -690,23 +691,24 @@ c     build the last residue or a phosphate capping group
 c
          i = ichain(2,m)
          k = seqtyp(i)
-         j = o5typ(k)
          resname = nuclz(k)
          if (single) then
             continue
          else if (resname .eq. 'MP ') then
-            if (deoxy(i-1)) then
-               ptyp = 1252
-               optyp = 1253
-            else
-               ptyp = 1240
-               optyp = 1241
-            end if
             poi = n
-            call zatom (ptyp,1.63d0,119.0d0,bkbone(5,i-1),o3i,c3i,c4i,0)
-            call zatom (optyp,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
-            call zatom (optyp,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
-            call zatom (optyp,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            if (deoxy(i-1)) then
+               call zatom (1252,1.63d0,119.0d0,bkbone(5,i-1),
+     &                        o3i,c3i,c4i,0)
+               call zatom (1253,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
+               call zatom (1253,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
+               call zatom (1253,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            else
+               call zatom (1240,1.63d0,119.0d0,bkbone(5,i-1),
+     &                        o3i,c3i,c4i,0)
+               call zatom (1241,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
+               call zatom (1241,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
+               call zatom (1241,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            end if
          else if (resname .eq. 'DP ') then
             continue
          else if (resname .eq. 'TP ') then
@@ -715,76 +717,78 @@ c
             if (cap5) then
                cap5 = .false.
             else
-               if (deoxy(i)) then
-                  ptyp = 1242
-                  optyp = 1243
-               else
-                  ptyp = 1230
-                  optyp = 1231
-               end if
                poi = n
-               call zatom (ptyp,1.60d0,119.0d0,bkbone(5,i-1),
+               call zatom (ptyp(k),1.60d0,119.0d0,bkbone(5,i-1),
      &                        o3i,c3i,c4i,0)
-               call zatom (optyp,1.48d0,109.0d0,bkbone(6,i-1)+120.0d0,
-     &                        poi,o3i,c3i,0)
-               call zatom (optyp,1.48d0,109.0d0,bkbone(6,i-1)-120.0d0,
-     &                        poi,o3i,c3i,0)
+               call zatom (optyp(k),1.48d0,109.0d0,
+     &                        bkbone(6,i-1)+120.0d0,poi,o3i,c3i,0)
+               call zatom (optyp(k),1.48d0,109.0d0,
+     &                        bkbone(6,i-1)-120.0d0,poi,o3i,c3i,0)
                o5i = n
-               call zatom (j,1.60d0,101.8d0,bkbone(6,i-1),poi,o3i,c3i,0)
+               call zatom (o5typ(k),1.60d0,101.8d0,bkbone(6,i-1),
+     &                        poi,o3i,c3i,0)
             end if
             c5i = n
-            call zatom (j+1,1.44d0,119.0d0,bkbone(1,i),o5i,poi,o3i,0)
+            call zatom (c5typ(k),1.44d0,119.0d0,bkbone(1,i),
+     &                     o5i,poi,o3i,0)
             c4i = n
-            call zatom (j+4,1.52d0,110.1d0,bkbone(2,i),c5i,o5i,poi,0)
+            call zatom (c4typ(k),1.52d0,110.1d0,bkbone(2,i),
+     &                     c5i,o5i,poi,0)
             o4i = n
-            call zatom (j+6,1.46d0,108.9d0,bkbone(3,i)-120.0d0,
+            call zatom (o4typ(k),1.46d0,108.9d0,bkbone(3,i)-120.0d0,
      &                     c4i,c5i,o5i,0)
             c1i = n
             if (pucker(i) .eq. 3) then
-               call zatom (j+7,1.42d0,109.8d0,145.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,145.0d0,
+     &                        o4i,c4i,c5i,0)
             else if (pucker(i) .eq. 2) then
-               call zatom (j+7,1.42d0,109.8d0,107.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,107.0d0,
+     &                        o4i,c4i,c5i,0)
             else if (pucker(i) .eq. 1) then
-               call zatom (j+7,1.42d0,109.8d0,140.0d0,o4i,c4i,c5i,0)
+               call zatom (c1typ(k),1.42d0,109.8d0,140.0d0,
+     &                        o4i,c4i,c5i,0)
             end if
             c3i = n
-            call zatom (j+9,1.53d0,115.9d0,bkbone(3,i),c4i,c5i,o5i,0)
+            call zatom (c3typ(k),1.53d0,115.9d0,bkbone(3,i),
+     &                     c4i,c5i,o5i,0)
             c2i = n
-            call zatom (j+11,1.53d0,102.4d0,bkbone(4,i)+120.0d0,
+            call zatom (c2typ(k),1.53d0,102.4d0,bkbone(4,i)+120.0d0,
      &                     c3i,c4i,c5i,0)
             call zatom (-1,0.0d0,0.0d0,0.0d0,c1i,c2i,0,0)
             o3i = n
             if (deoxy(i)) then
-               ottyp = 1249
-               call zatom (ottyp,1.42d0,112.1d0,bkbone(4,i),
+               call zatom (1249,1.42d0,112.1d0,bkbone(4,i),
      &                        c3i,c4i,c5i,0)
             else
-               ottyp = 1237
-               call zatom (ottyp,1.42d0,112.1d0,bkbone(4,i),
+               call zatom (1237,1.42d0,112.1d0,bkbone(4,i),
      &                        c3i,c4i,c5i,0)
                o2i = n
-               call zatom (j+13,1.43d0,109.5d0,109.5d0,c2i,c3i,c1i,1)
+               call zatom (o2typ(k),1.43d0,109.5d0,109.5d0,
+     &                        c2i,c3i,c1i,1)
             end if
-            call zatom (j+2,1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,1)
-            call zatom (j+3,1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,-1)
-            call zatom (j+5,1.09d0,109.5d0,109.5d0,c4i,c5i,c3i,-1)
+            call zatom (h51typ(k),1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,1)
+            call zatom (h52typ(k),1.09d0,109.5d0,109.5d0,c5i,o5i,c4i,-1)
+            call zatom (h4typ(k),1.09d0,109.5d0,109.5d0,c4i,c5i,c3i,-1)
             if (pucker(i) .eq. 3) then
-               call zatom (j+8,1.09d0,109.5d0,120.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,120.0d0,
+     &                        c1i,o4i,c2i,-1)
             else if (pucker(i) .eq. 2) then
-               call zatom (j+8,1.09d0,109.5d0,115.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,115.0d0,
+     &                        c1i,o4i,c2i,-1)
             else if (pucker(i) .eq. 1) then
-               call zatom (j+8,1.09d0,109.5d0,90.0d0,c1i,o4i,c2i,-1)
+               call zatom (h1typ(k),1.09d0,109.5d0,90.0d0,
+     &                        c1i,o4i,c2i,-1)
             end if
-            call zatom (j+10,1.09d0,109.5d0,109.5d0,c3i,c4i,c2i,-1)
-            call zatom (j+12,1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,-1)
+            call zatom (h3typ(k),1.09d0,109.5d0,109.5d0,c3i,c4i,c2i,-1)
+            call zatom (h21typ(k),1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,-1)
             if (deoxy(i)) then
-               httyp = 1250
-               call zatom (j+13,1.09d0,109.5d0,109.5d0,c2i,c3i,c1i,1)
+               call zatom (h22typ(k),1.09d0,109.5d0,109.5d0,
+     &                        c2i,c3i,c1i,1)
             else
-               httyp = 1238
-               call zatom (j+14,0.96d0,107.0d0,180.0d0,o2i,c2i,c3i,0)
+               call zatom (h22typ(k),0.96d0,107.0d0,180.0d0,
+     &                        o2i,c2i,c3i,0)
             end if
-            call zatom (httyp,0.96d0,115.0d0,180.0d0,o3i,c3i,c4i,0)
+            call zatom (h3ttyp(k),0.96d0,115.0d0,180.0d0,o3i,c3i,c4i,0)
             call nucbase (resname,i,c1i,o4i,c2i)
          end if
       end do
@@ -1031,6 +1035,13 @@ c
       character*3 resname
       external watson1,optsave
 c
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (associated(iuse))  deallocate (iuse)
+      if (associated(use))  deallocate (use)
+      allocate (iuse(n))
+      allocate (use(0:n))
 c
 c     set all atoms to be active during energy evaluations
 c

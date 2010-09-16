@@ -14,7 +14,7 @@
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93      1.86      3.06     8.91
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93      1.52      3.23    10.69
  MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93      1.53      3.19    11.79
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93      2.10      4.33    15.86
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93      2.17      4.36    15.98
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      1.95      3.20     9.30
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66      2.73      4.71    12.78
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66      2.56      4.86    14.69
@@ -31,7 +31,7 @@
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93      3.26      4.48    16.00
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93      3.09      4.49    19.48
  MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93      2.87      4.41    21.46
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93      4.17      5.91    33.11
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93      4.14      5.90    31.90
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      3.43      4.74    16.96
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66      4.04      5.61    20.16
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66      3.91      5.35    23.56
@@ -48,7 +48,7 @@
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93                4.93
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93                4.99
  MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93                4.36
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                7.35
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                7.32
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                3.46
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                4.00
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                4.55
@@ -66,7 +66,7 @@
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93                14.4
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93                14.4
  MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93                13.6
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                23.3
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                23.6
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                15.1
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                20.8
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                21.4
@@ -84,7 +84,7 @@
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93                 143
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93                 180
  MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93                 206
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                 247
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93                 255
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                 161
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                 210
  Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66                 232
@@ -100,26 +100,26 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/1        77 (1.00)
- MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2        48 (1.60)
- MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1        82 (1.00)
- MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/2        52 (1.58)
- MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93         2/1        77 (1.00)
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93       Serial      108 (1.00)
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/1        76 (1.00)
+ MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2        47 (1.62)
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1        81 (1.00)
+ MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/2        50 (1.62)
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93       Serial       76 (1.00)
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93       Serial      100 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1        80 (1.00)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2        51 (1.57)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        36 (2.22)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6        32 (2.50)
- Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8        29 (2.76)
- Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/1       102 (1.00)
- Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/2        64 (1.59)
- Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/4        46 (2.22)
- Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/1       103 (1.00)
- Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/2        65 (1.58)
- Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/4        46 (2.24)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/1       132 (1.00)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/2        83 (1.59)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/4        58 (2.28)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2        50 (1.60)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        34 (2.35)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6        30 (2.67)
+ Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8        26 (3.08)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/1       101 (1.00)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/2        62 (1.63)
+ Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/4        45 (2.24)
+ Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/1       104 (1.00)
+ Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/2        64 (1.63)
+ Mac Pro (Fedora 9, Intel 11.1, 32-bit)      2.66         4/4        44 (2.36)
+ Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/1       138 (1.00)
+ Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/2        85 (1.62)
+ Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/4        58 (2.38)
 
  Benchmark #7: AMOEBA DHFR-Water Molecular Dynamics (Parallel, OpenMP)
 
@@ -135,8 +135,8 @@
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2       341 (1.83)
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1       750 (1.00)
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/2       408 (1.84)
- MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93         2/1       790 (1.00)
- MacBook Pro (OSX 10.6.4, g95 0.93)          2.93       Serial     1091 (1.00)
+ MacBook Pro (OSX 10.6.4, gfortran 4.6)      2.93       Serial      790 (1.00)
+ MacBook Pro (OSX 10.6.4, g95 0.93)          2.93       Serial     1164 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1       654 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2       373 (1.75)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4       228 (2.87)

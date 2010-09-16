@@ -38,10 +38,10 @@ c     fill various arrays with information for this atom
 c
       if (bionum .gt. 0) then
          type(n) = biotyp(bionum)
-         if (type(n) .ne. 0) then
+         if (type(n) .gt. 0) then
             name(n) = symbol(type(n))
          else
-            name(n) = '   '
+            name(n) = 'XXX'
          end if
          zbond(n) = bond
          zang(n) = angle

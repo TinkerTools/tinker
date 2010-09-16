@@ -231,7 +231,7 @@ c
 c
 c     "systyze" is an auxiliary routine for the analyze program
 c     that prints general information about the molecular system
-c     the the force field model
+c     and the force field model
 c
 c
       subroutine systyze

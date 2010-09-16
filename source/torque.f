@@ -707,7 +707,7 @@ c
       include 'atoms.i'
       include 'deriv.i'
       include 'mpole.i'
-      integer i,j,k
+      integer i,j
       integer ia,ib,ic,id
       real*8 du,dv,dw,random
       real*8 usiz,vsiz,wsiz

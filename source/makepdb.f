@@ -678,6 +678,11 @@ c
       else if (resname .eq. 'CYX') then
          call pdbatm (' SG ',resname,ires,cbi+1)
 c
+c     deprotonated cysteine residue  (CYD)
+c
+      else if (resname .eq. 'CYD') then
+         call pdbatm (' SG ',resname,ires,cbi+1)
+c
 c     proline residue  (PRO)
 c
       else if (resname .eq. 'PRO') then
@@ -697,6 +702,17 @@ c
 c     tyrosine residue  (TYR)
 c
       else if (resname .eq. 'TYR') then
+         call pdbatm (' CG ',resname,ires,cbi+1)
+         call pdbatm (' CD1',resname,ires,cbi+2)
+         call pdbatm (' CD2',resname,ires,cbi+3)
+         call pdbatm (' CE1',resname,ires,cbi+4)
+         call pdbatm (' CE2',resname,ires,cbi+5)
+         call pdbatm (' CZ ',resname,ires,cbi+6)
+         call pdbatm (' OH ',resname,ires,cbi+7)
+c
+c     deprotonated tyrosine residue  (TYD)
+c
+      else if (resname .eq. 'TYD') then
          call pdbatm (' CG ',resname,ires,cbi+1)
          call pdbatm (' CD1',resname,ires,cbi+2)
          call pdbatm (' CD2',resname,ires,cbi+3)
@@ -752,6 +768,13 @@ c
          call pdbatm (' OD1',resname,ires,cbi+2)
          call pdbatm (' OD2',resname,ires,cbi+3)
 c
+c     protonated aspartic acid residue  (ASH)
+c
+      else if (resname .eq. 'ASH') then
+         call pdbatm (' CG ',resname,ires,cbi+1)
+         call pdbatm (' OD1',resname,ires,cbi+2)
+         call pdbatm (' OD2',resname,ires,cbi+3)
+c
 c     asparagine residue  (ASN)
 c
       else if (resname .eq. 'ASN') then
@@ -762,6 +785,14 @@ c
 c     glutamic acid residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
+         call pdbatm (' CG ',resname,ires,cbi+1)
+         call pdbatm (' CD ',resname,ires,cbi+2)
+         call pdbatm (' OE1',resname,ires,cbi+3)
+         call pdbatm (' OE2',resname,ires,cbi+4)
+c
+c     protonated glutamic acid residue  (GLH)
+c
+      else if (resname .eq. 'GLH') then
          call pdbatm (' CG ',resname,ires,cbi+1)
          call pdbatm (' CD ',resname,ires,cbi+2)
          call pdbatm (' OE1',resname,ires,cbi+3)
@@ -785,6 +816,14 @@ c
 c     lysine residue  (LYS)
 c
       else if (resname .eq. 'LYS') then
+         call pdbatm (' CG ',resname,ires,cbi+1)
+         call pdbatm (' CD ',resname,ires,cbi+2)
+         call pdbatm (' CE ',resname,ires,cbi+3)
+         call pdbatm (' NZ ',resname,ires,cbi+4)
+c
+c     deprotonated lysine residue  (LYD)
+c
+      else if (resname .eq. 'LYD') then
          call pdbatm (' CG ',resname,ires,cbi+1)
          call pdbatm (' CD ',resname,ires,cbi+2)
          call pdbatm (' CE ',resname,ires,cbi+3)
@@ -1056,6 +1095,14 @@ c
             call pdbatm (' HB3',resname,ires,hca+4)
          end if
 c
+c     deprotonated cysteine residue  (CYD)
+c
+      else if (resname .eq. 'CYD') then
+         if (allatom) then
+            call pdbatm (' HB2',resname,ires,hca+3)
+            call pdbatm (' HB3',resname,ires,hca+4)
+         end if
+c
 c     proline residue  (PRO)
 c
       else if (resname .eq. 'PRO') then
@@ -1094,6 +1141,18 @@ c
             call pdbatm (' HH ',resname,ires,hca+15)
          else
             call pdbatm (' HH ',resname,ires,cbi+12)
+         end if
+c
+c     deprotonated tyrosine residue  (TYD)
+c
+      else if (resname .eq. 'TYD') then
+         if (allatom) then
+            call pdbatm (' HB2',resname,ires,hca+9)
+            call pdbatm (' HB3',resname,ires,hca+10)
+            call pdbatm (' HD1',resname,ires,hca+11)
+            call pdbatm (' HD2',resname,ires,hca+12)
+            call pdbatm (' HE1',resname,ires,hca+13)
+            call pdbatm (' HE2',resname,ires,hca+14)
          end if
 c
 c     tryptophan residue  (TRP)
@@ -1161,6 +1220,17 @@ c
             call pdbatm (' HB3',resname,ires,hca+6)
          end if
 c
+c     protonated aspartic acid residue  (ASH)
+c
+      else if (resname .eq. 'ASH') then
+         if (allatom) then
+            call pdbatm (' HB2',resname,ires,hca+5)
+            call pdbatm (' HB3',resname,ires,hca+6)
+            call pdbatm (' HD2',resname,ires,hca+7)
+         else
+            call pdbatm (' HD2',resname,ires,cbi+4)
+         end if
+c
 c     asparagine residue  (ASN)
 c
       else if (resname .eq. 'ASN') then
@@ -1182,6 +1252,19 @@ c
             call pdbatm (' HB3',resname,ires,hca+7)
             call pdbatm (' HG2',resname,ires,hca+8)
             call pdbatm (' HG3',resname,ires,hca+9)
+         end if
+c
+c     protonated glutamic acid residue  (GLH)
+c
+      else if (resname .eq. 'GLH') then
+         if (allatom) then
+            call pdbatm (' HB2',resname,ires,hca+6)
+            call pdbatm (' HB3',resname,ires,hca+7)
+            call pdbatm (' HG2',resname,ires,hca+8)
+            call pdbatm (' HG3',resname,ires,hca+9)
+            call pdbatm (' HE2',resname,ires,hca+10)
+         else
+            call pdbatm (' HE2',resname,ires,cbi+5)
          end if
 c
 c     glutamine residue  (GLN)
@@ -1231,6 +1314,25 @@ c
             call pdbatm (' HZ1',resname,ires,cbi+5)
             call pdbatm (' HZ2',resname,ires,cbi+6)
             call pdbatm (' HZ3',resname,ires,cbi+7)
+         end if
+c
+c     deprotonated lysine residue  (LYD)
+c
+      else if (resname .eq. 'LYD') then
+         if (allatom) then
+            call pdbatm (' HB2',resname,ires,hca+6)
+            call pdbatm (' HB3',resname,ires,hca+7)
+            call pdbatm (' HG2',resname,ires,hca+8)
+            call pdbatm (' HG3',resname,ires,hca+9)
+            call pdbatm (' HD2',resname,ires,hca+10)
+            call pdbatm (' HD3',resname,ires,hca+11)
+            call pdbatm (' HE2',resname,ires,hca+12)
+            call pdbatm (' HE3',resname,ires,hca+13)
+            call pdbatm (' HZ1',resname,ires,hca+14)
+            call pdbatm (' HZ2',resname,ires,hca+15)
+         else
+            call pdbatm (' HZ1',resname,ires,cbi+5)
+            call pdbatm (' HZ2',resname,ires,cbi+6)
          end if
 c
 c     arginine residue  (ARG)

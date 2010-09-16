@@ -2079,559 +2079,685 @@ biotype      92    HA      "Cystine (SS)"                      0
 biotype      93    CB      "Cystine (SS)"                     37
 biotype      94    HB      "Cystine (SS)"                      0
 biotype      95    SG      "Cystine (SS)"                     38
-biotype      96    N       "Proline"                           3
-biotype      97    CA      "Proline"                          14
-biotype      98    C       "Proline"                           1
-biotype      99    O       "Proline"                           2
-biotype     100    HA      "Proline"                           0
-biotype     101    CB      "Proline"                           9
-biotype     102    HB      "Proline"                           0
-biotype     103    CG      "Proline"                           9
-biotype     104    HG      "Proline"                           0
-biotype     105    CD      "Proline"                          15
-biotype     106    HD      "Proline"                           0
-biotype     107    N       "Phenylalanine"                     3
-biotype     108    CA      "Phenylalanine"                     6
-biotype     109    C       "Phenylalanine"                     1
-biotype     110    HN      "Phenylalanine"                     4
-biotype     111    O       "Phenylalanine"                     2
-biotype     112    HA      "Phenylalanine"                     0
-biotype     113    CB      "Phenylalanine"                    66
-biotype     114    HB      "Phenylalanine"                     0
-biotype     115    CG      "Phenylalanine"                    11
-biotype     116    CD      "Phenylalanine"                    11
-biotype     117    HD      "Phenylalanine"                    75
-biotype     118    CE      "Phenylalanine"                    11
-biotype     119    HE      "Phenylalanine"                    75
-biotype     120    CZ      "Phenylalanine"                    11
-biotype     121    HZ      "Phenylalanine"                    75
-biotype     122    N       "Tyrosine"                          3
-biotype     123    CA      "Tyrosine"                          6
-biotype     124    C       "Tyrosine"                          1
-biotype     125    HN      "Tyrosine"                          4
-biotype     126    O       "Tyrosine"                          2
-biotype     127    HA      "Tyrosine"                          0
-biotype     128    CB      "Tyrosine"                         66
-biotype     129    HB      "Tyrosine"                          0
-biotype     130    CG      "Tyrosine"                         11
-biotype     131    CD      "Tyrosine"                         11
-biotype     132    HD      "Tyrosine"                         75
-biotype     133    CE      "Tyrosine"                         11
-biotype     134    HE      "Tyrosine"                         75
-biotype     135    CZ      "Tyrosine"                         26
-biotype     136    OH      "Tyrosine"                         76
-biotype     137    HH      "Tyrosine"                         24
-biotype     138    N       "Tryptophan"                        3
-biotype     139    CA      "Tryptophan"                        6
-biotype     140    C       "Tryptophan"                        1
-biotype     141    HN      "Tryptophan"                        4
-biotype     142    O       "Tryptophan"                        2
-biotype     143    HA      "Tryptophan"                        0
-biotype     144    CB      "Tryptophan"                       66
-biotype     145    HB      "Tryptophan"                        0
-biotype     146    CG      "Tryptophan"                       50
-biotype     147    CD1     "Tryptophan"                       45
-biotype     148    HD1     "Tryptophan"                       75
-biotype     149    CD2     "Tryptophan"                       68
-biotype     150    NE1     "Tryptophan"                       40
-biotype     151    HE1     "Tryptophan"                       41
-biotype     152    CE2     "Tryptophan"                       67
-biotype     153    CE3     "Tryptophan"                       11
-biotype     154    HE3     "Tryptophan"                       75
-biotype     155    CZ2     "Tryptophan"                       11
-biotype     156    HZ2     "Tryptophan"                       75
-biotype     157    CZ3     "Tryptophan"                       11
-biotype     158    HZ3     "Tryptophan"                       75
-biotype     159    CH2     "Tryptophan"                       11
-biotype     160    HH2     "Tryptophan"                       75
-biotype     161    N       "Histidine (+)"                     3
-biotype     162    CA      "Histidine (+)"                     6
-biotype     163    C       "Histidine (+)"                     1
-biotype     164    HN      "Histidine (+)"                     4
-biotype     165    O       "Histidine (+)"                     2
-biotype     166    HA      "Histidine (+)"                     0
-biotype     167    CB      "Histidine (+)"                    66
-biotype     168    HB      "Histidine (+)"                     0
-biotype     169    CG      "Histidine (+)"                    69
-biotype     170    ND1     "Histidine (+)"                    46
-biotype     171    HD1     "Histidine (+)"                    47
-biotype     172    CD2     "Histidine (+)"                    49
-biotype     173    HD2     "Histidine (+)"                    75
-biotype     174    CE1     "Histidine (+)"                    48
-biotype     175    HE1     "Histidine (+)"                    75
-biotype     176    NE2     "Histidine (+)"                    46
-biotype     177    HE2     "Histidine (+)"                    47
-biotype     178    N       "Histidine (HD)"                    3
-biotype     179    CA      "Histidine (HD)"                    6
-biotype     180    C       "Histidine (HD)"                    1
-biotype     181    HN      "Histidine (HD)"                    4
-biotype     182    O       "Histidine (HD)"                    2
-biotype     183    HA      "Histidine (HD)"                    0
-biotype     184    CB      "Histidine (HD)"                   66
-biotype     185    HB      "Histidine (HD)"                    0
-biotype     186    CG      "Histidine (HD)"                   73
-biotype     187    ND1     "Histidine (HD)"                   40
-biotype     188    HD1     "Histidine (HD)"                   41
-biotype     189    CD2     "Histidine (HD)"                   74
-biotype     190    HD2     "Histidine (HD)"                   75
-biotype     191    CE1     "Histidine (HD)"                   43
-biotype     192    HE1     "Histidine (HD)"                   75
-biotype     193    NE2     "Histidine (HD)"                   42
-biotype     194    N       "Histidine (HE)"                    3
-biotype     195    CA      "Histidine (HE)"                    6
-biotype     196    C       "Histidine (HE)"                    1
-biotype     197    HN      "Histidine (HE)"                    4
-biotype     198    O       "Histidine (HE)"                    2
-biotype     199    HA      "Histidine (HE)"                    0
-biotype     200    CB      "Histidine (HE)"                   66
-biotype     201    HB      "Histidine (HE)"                    0
-biotype     202    CG      "Histidine (HE)"                   44
-biotype     203    ND1     "Histidine (HE)"                   42
-biotype     204    CD2     "Histidine (HE)"                   45
-biotype     205    HD2     "Histidine (HE)"                   75
-biotype     206    CE1     "Histidine (HE)"                   43
-biotype     207    HE1     "Histidine (HE)"                   75
-biotype     208    NE2     "Histidine (HE)"                   40
-biotype     209    HE2     "Histidine (HE)"                   41
-biotype     210    N       "Aspartic Acid"                     3
-biotype     211    CA      "Aspartic Acid"                     6
-biotype     212    C       "Aspartic Acid"                     1
-biotype     213    HN      "Aspartic Acid"                     4
-biotype     214    O       "Aspartic Acid"                     2
-biotype     215    HA      "Aspartic Acid"                     0
-biotype     216    CB      "Aspartic Acid"                    16
-biotype     217    HB      "Aspartic Acid"                     0
-biotype     218    CG      "Aspartic Acid"                    17
-biotype     219    OD      "Aspartic Acid"                    18
-biotype     220    N       "Asparagine"                        3
-biotype     221    CA      "Asparagine"                        6
-biotype     222    C       "Asparagine"                        1
-biotype     223    HN      "Asparagine"                        4
-biotype     224    O       "Asparagine"                        2
-biotype     225    HA      "Asparagine"                        0
-biotype     226    CB      "Asparagine"                        9
-biotype     227    HB      "Asparagine"                        0
-biotype     228    CG      "Asparagine"                        1
-biotype     229    OD1     "Asparagine"                        2
-biotype     230    ND2     "Asparagine"                       12
-biotype     231    HD2     "Asparagine"                       13
-biotype     232    N       "Glutamic Acid"                     3
-biotype     233    CA      "Glutamic Acid"                     6
-biotype     234    C       "Glutamic Acid"                     1
-biotype     235    HN      "Glutamic Acid"                     4
-biotype     236    O       "Glutamic Acid"                     2
-biotype     237    HA      "Glutamic Acid"                     0
-biotype     238    CB      "Glutamic Acid"                     9
-biotype     239    HB      "Glutamic Acid"                     0
-biotype     240    CG      "Glutamic Acid"                    16
-biotype     241    HG      "Glutamic Acid"                     0
-biotype     242    CD      "Glutamic Acid"                    17
-biotype     243    OE      "Glutamic Acid"                    18
-biotype     244    N       "Glutamine"                         3
-biotype     245    CA      "Glutamine"                         6
-biotype     246    C       "Glutamine"                         1
-biotype     247    HN      "Glutamine"                         4
-biotype     248    O       "Glutamine"                         2
-biotype     249    HA      "Glutamine"                         0
-biotype     250    CB      "Glutamine"                         9
-biotype     251    HB      "Glutamine"                         0
-biotype     252    CG      "Glutamine"                         9
-biotype     253    HG      "Glutamine"                         0
-biotype     254    CD      "Glutamine"                         1
-biotype     255    OE1     "Glutamine"                         2
-biotype     256    NE2     "Glutamine"                        12
-biotype     257    HE2     "Glutamine"                        13
-biotype     258    N       "Methionine"                        3
-biotype     259    CA      "Methionine"                        6
-biotype     260    C       "Methionine"                        1
-biotype     261    HN      "Methionine"                        4
-biotype     262    O       "Methionine"                        2
-biotype     263    HA      "Methionine"                        0
-biotype     264    CB      "Methionine"                        9
-biotype     265    HB      "Methionine"                        0
-biotype     266    CG      "Methionine"                       34
-biotype     267    HG      "Methionine"                        0
-biotype     268    SD      "Methionine"                       35
-biotype     269    CE      "Methionine"                       36
-biotype     270    HE      "Methionine"                        0
-biotype     271    N       "Lysine"                            3
-biotype     272    CA      "Lysine"                            6
-biotype     273    C       "Lysine"                            1
-biotype     274    HN      "Lysine"                            4
-biotype     275    O       "Lysine"                            2
-biotype     276    HA      "Lysine"                            0
-biotype     277    CB      "Lysine"                            9
-biotype     278    HB      "Lysine"                            0
-biotype     279    CG      "Lysine"                            9
-biotype     280    HG      "Lysine"                            0
-biotype     281    CD      "Lysine"                            9
-biotype     282    HD      "Lysine"                            0
-biotype     283    CE      "Lysine"                           19
-biotype     284    HE      "Lysine"                            0
-biotype     285    NZ      "Lysine"                           20
-biotype     286    HZ      "Lysine"                           21
-biotype     287    N       "Arginine"                          3
-biotype     288    CA      "Arginine"                          6
-biotype     289    C       "Arginine"                          1
-biotype     290    HN      "Arginine"                          4
-biotype     291    O       "Arginine"                          2
-biotype     292    HA      "Arginine"                          0
-biotype     293    CB      "Arginine"                          9
-biotype     294    HB      "Arginine"                          0
-biotype     295    CG      "Arginine"                         57
-biotype     296    HG      "Arginine"                          0
-biotype     297    CD      "Arginine"                         56
-biotype     298    HD      "Arginine"                          0
-biotype     299    NE      "Arginine"                         54
-biotype     300    HE      "Arginine"                         55
-biotype     301    CZ      "Arginine"                         53
-biotype     302    NH      "Arginine"                         51
-biotype     303    HH      "Arginine"                         52
-biotype     304    N       "Ornithine"                         3
-biotype     305    CA      "Ornithine"                         6
-biotype     306    C       "Ornithine"                         1
-biotype     307    HN      "Ornithine"                         4
-biotype     308    O       "Ornithine"                         2
-biotype     309    HA      "Ornithine"                         0
-biotype     310    CB      "Ornithine"                         9
-biotype     311    HB      "Ornithine"                         0
-biotype     312    CG      "Ornithine"                         9
-biotype     313    HG      "Ornithine"                         0
-biotype     314    CD      "Ornithine"                        19
-biotype     315    HD      "Ornithine"                         0
-biotype     316    NE      "Ornithine"                        20
-biotype     317    HE      "Ornithine"                        21
-biotype     318    N       "MethylAlanine (AIB)"               3
-biotype     319    CA      "MethylAlanine (AIB)"              64
-biotype     320    C       "MethylAlanine (AIB)"               1
-biotype     321    HN      "MethylAlanine (AIB)"               4
-biotype     322    O       "MethylAlanine (AIB)"               2
-biotype     323    CB      "MethylAlanine (AIB)"              65
-biotype     324    HB      "MethylAlanine (AIB)"               0
-biotype     325    N       "Pyroglutamic Acid"               999
-biotype     326    CA      "Pyroglutamic Acid"               999
-biotype     327    C       "Pyroglutamic Acid"               999
-biotype     328    HN      "Pyroglutamic Acid"               999
-biotype     329    O       "Pyroglutamic Acid"               999
-biotype     330    HA      "Pyroglutamic Acid"                 0
-biotype     331    CB      "Pyroglutamic Acid"               999
-biotype     332    HB      "Pyroglutamic Acid"                 0
-biotype     333    CG      "Pyroglutamic Acid"               999
-biotype     334    HG      "Pyroglutamic Acid"                 0
-biotype     335    CD      "Pyroglutamic Acid"               999
-biotype     336    OE      "Pyroglutamic Acid"               999
-biotype     337    C       "Formyl N-Terminus"                72
-biotype     338    H       "Formyl N-Terminus"                 0
-biotype     339    O       "Formyl N-Terminus"                 2
-biotype     340    CH3     "Acetyl N-Terminus"                 7
-biotype     341    H       "Acetyl N-Terminus"                 0
-biotype     342    C       "Acetyl N-Terminus"                 1
-biotype     343    O       "Acetyl N-Terminus"                 2
-biotype     344    N       "Amide C-Terminus"                 12
-biotype     345    HN      "Amide C-Terminus"                 13
-biotype     346    N       "N-MeAmide C-Terminus"              3
-biotype     347    HN      "N-MeAmide C-Terminus"              4
-biotype     348    CH3     "N-MeAmide C-Terminus"             39
-biotype     349    H       "N-MeAmide C-Terminus"              0
-biotype     350    N       "N-Terminal GLY"                   20
-biotype     351    CA      "N-Terminal GLY"                   27
-biotype     352    C       "N-Terminal GLY"                    1
-biotype     353    HN      "N-Terminal GLY"                   21
-biotype     354    O       "N-Terminal GLY"                    2
-biotype     355    HA      "N-Terminal GLY"                    0
-biotype     356    N       "N-Terminal ALA"                   20
-biotype     357    CA      "N-Terminal ALA"                   29
-biotype     358    C       "N-Terminal ALA"                    1
-biotype     359    HN      "N-Terminal ALA"                   21
-biotype     360    O       "N-Terminal ALA"                    2
-biotype     361    HA      "N-Terminal ALA"                    0
-biotype     362    N       "N-Terminal VAL"                   20
-biotype     363    CA      "N-Terminal VAL"                   29
-biotype     364    C       "N-Terminal VAL"                    1
-biotype     365    HN      "N-Terminal VAL"                   21
-biotype     366    O       "N-Terminal VAL"                    2
-biotype     367    HA      "N-Terminal VAL"                    0
-biotype     368    N       "N-Terminal LEU"                   20
-biotype     369    CA      "N-Terminal LEU"                   29
-biotype     370    C       "N-Terminal LEU"                    1
-biotype     371    HN      "N-Terminal LEU"                   21
-biotype     372    O       "N-Terminal LEU"                    2
-biotype     373    HA      "N-Terminal LEU"                    0
-biotype     374    N       "N-Terminal ILE"                   20
-biotype     375    CA      "N-Terminal ILE"                   29
-biotype     376    C       "N-Terminal ILE"                    1
-biotype     377    HN      "N-Terminal ILE"                   21
-biotype     378    O       "N-Terminal ILE"                    2
-biotype     379    HA      "N-Terminal ILE"                    0
-biotype     380    N       "N-Terminal SER"                   20
-biotype     381    CA      "N-Terminal SER"                   29
-biotype     382    C       "N-Terminal SER"                    1
-biotype     383    HN      "N-Terminal SER"                   21
-biotype     384    O       "N-Terminal SER"                    2
-biotype     385    HA      "N-Terminal SER"                    0
-biotype     386    N       "N-Terminal THR"                   20
-biotype     387    CA      "N-Terminal THR"                   29
-biotype     388    C       "N-Terminal THR"                    1
-biotype     389    HN      "N-Terminal THR"                   21
-biotype     390    O       "N-Terminal THR"                    2
-biotype     391    HA      "N-Terminal THR"                    0
-biotype     392    N       "N-Terminal CYS (SH)"              20
-biotype     393    CA      "N-Terminal CYS (SH)"              29
-biotype     394    C       "N-Terminal CYS (SH)"               1
-biotype     395    HN      "N-Terminal CYS (SH)"              21
-biotype     396    O       "N-Terminal CYS (SH)"               2
-biotype     397    HA      "N-Terminal CYS (SH)"               0
-biotype     398    N       "N-Terminal CYS (SS)"              20
-biotype     399    CA      "N-Terminal CYS (SS)"              29
-biotype     400    C       "N-Terminal CYS (SS)"               1
-biotype     401    HN      "N-Terminal CYS (SS)"              21
-biotype     402    O       "N-Terminal CYS (SS)"               2
-biotype     403    HA      "N-Terminal CYS (SS)"               0
-biotype     404    N       "N-Terminal PRO"                   20
-biotype     405    CA      "N-Terminal PRO"                   70
-biotype     406    C       "N-Terminal PRO"                    1
-biotype     407    HN      "N-Terminal PRO"                   21
-biotype     408    O       "N-Terminal PRO"                    2
-biotype     409    HA      "N-Terminal PRO"                    0
-biotype     410    CD      "N-Terminal PRO"                   15
-biotype     411    HD      "N-Terminal PRO"                    0
-biotype     412    N       "N-Terminal PHE"                   20
-biotype     413    CA      "N-Terminal PHE"                   29
-biotype     414    C       "N-Terminal PHE"                    1
-biotype     415    HN      "N-Terminal PHE"                   21
-biotype     416    O       "N-Terminal PHE"                    2
-biotype     417    HA      "N-Terminal PHE"                    0
-biotype     418    N       "N-Terminal TYR"                   20
-biotype     419    CA      "N-Terminal TYR"                   29
-biotype     420    C       "N-Terminal TYR"                    1
-biotype     421    HN      "N-Terminal TYR"                   21
-biotype     422    O       "N-Terminal TYR"                    2
-biotype     423    HA      "N-Terminal TYR"                    0
-biotype     424    N       "N-Terminal TRP"                   20
-biotype     425    CA      "N-Terminal TRP"                   29
-biotype     426    C       "N-Terminal TRP"                    1
-biotype     427    HN      "N-Terminal TRP"                   21
-biotype     428    O       "N-Terminal TRP"                    2
-biotype     429    HA      "N-Terminal TRP"                    0
-biotype     430    N       "N-Terminal HIS (+)"               20
-biotype     431    CA      "N-Terminal HIS (+)"               29
-biotype     432    C       "N-Terminal HIS (+)"                1
-biotype     433    HN      "N-Terminal HIS (+)"               21
-biotype     434    O       "N-Terminal HIS (+)"                2
-biotype     435    HA      "N-Terminal HIS (+)"                0
-biotype     436    N       "N-Terminal HIS (HD)"              20
-biotype     437    CA      "N-Terminal HIS (HD)"              29
-biotype     438    C       "N-Terminal HIS (HD)"               1
-biotype     439    HN      "N-Terminal HIS (HD)"              21
-biotype     440    O       "N-Terminal HIS (HD)"               2
-biotype     441    HA      "N-Terminal HIS (HD)"               0
-biotype     442    N       "N-Terminal HIS (HE)"              20
-biotype     443    CA      "N-Terminal HIS (HE)"              29
-biotype     444    C       "N-Terminal HIS (HE)"               1
-biotype     445    HN      "N-Terminal HIS (HE)"              21
-biotype     446    O       "N-Terminal HIS (HE)"               2
-biotype     447    HA      "N-Terminal HIS (HE)"               0
-biotype     448    N       "N-Terminal ASP"                   20
-biotype     449    CA      "N-Terminal ASP"                   29
-biotype     450    C       "N-Terminal ASP"                    1
-biotype     451    HN      "N-Terminal ASP"                   21
-biotype     452    O       "N-Terminal ASP"                    2
-biotype     453    HA      "N-Terminal ASP"                    0
-biotype     454    N       "N-Terminal ASN"                   20
-biotype     455    CA      "N-Terminal ASN"                   29
-biotype     456    C       "N-Terminal ASN"                    1
-biotype     457    HN      "N-Terminal ASN"                   21
-biotype     458    O       "N-Terminal ASN"                    2
-biotype     459    HA      "N-Terminal ASN"                    0
-biotype     460    N       "N-Terminal GLU"                   20
-biotype     461    CA      "N-Terminal GLU"                   29
-biotype     462    C       "N-Terminal GLU"                    1
-biotype     463    HN      "N-Terminal GLU"                   21
-biotype     464    O       "N-Terminal GLU"                    2
-biotype     465    HA      "N-Terminal GLU"                    0
-biotype     466    N       "N-Terminal GLN"                   20
-biotype     467    CA      "N-Terminal GLN"                   29
-biotype     468    C       "N-Terminal GLN"                    1
-biotype     469    HN      "N-Terminal GLN"                   21
-biotype     470    O       "N-Terminal GLN"                    2
-biotype     471    HA      "N-Terminal GLN"                    0
-biotype     472    N       "N-Terminal MET"                   20
-biotype     473    CA      "N-Terminal MET"                   29
-biotype     474    C       "N-Terminal MET"                    1
-biotype     475    HN      "N-Terminal MET"                   21
-biotype     476    O       "N-Terminal MET"                    2
-biotype     477    HA      "N-Terminal MET"                    0
-biotype     478    N       "N-Terminal LYS"                   20
-biotype     479    CA      "N-Terminal LYS"                   29
-biotype     480    C       "N-Terminal LYS"                    1
-biotype     481    HN      "N-Terminal LYS"                   21
-biotype     482    O       "N-Terminal LYS"                    2
-biotype     483    HA      "N-Terminal LYS"                    0
-biotype     484    N       "N-Terminal ARG"                   20
-biotype     485    CA      "N-Terminal ARG"                   29
-biotype     486    C       "N-Terminal ARG"                    1
-biotype     487    HN      "N-Terminal ARG"                   21
-biotype     488    O       "N-Terminal ARG"                    2
-biotype     489    HA      "N-Terminal ARG"                    0
-biotype     490    N       "N-Terminal ORN"                   20
-biotype     491    CA      "N-Terminal ORN"                   29
-biotype     492    C       "N-Terminal ORN"                    1
-biotype     493    HN      "N-Terminal ORN"                   21
-biotype     494    O       "N-Terminal ORN"                    2
-biotype     495    HA      "N-Terminal ORN"                    0
-biotype     496    N       "N-Terminal AIB"                   20
-biotype     497    CA      "N-Terminal AIB"                  999
-biotype     498    C       "N-Terminal AIB"                    1
-biotype     499    HN      "N-Terminal AIB"                   21
-biotype     500    O       "N-Terminal AIB"                    2
-biotype     501    N       "C-Terminal GLY"                    3
-biotype     502    CA      "C-Terminal GLY"                   28
-biotype     503    C       "C-Terminal GLY"                   17
-biotype     504    HN      "C-Terminal GLY"                    4
-biotype     505    OXT     "C-Terminal GLY"                   18
-biotype     506    HA      "C-Terminal GLY"                    0
-biotype     507    N       "C-Terminal ALA"                    3
-biotype     508    CA      "C-Terminal ALA"                   30
-biotype     509    C       "C-Terminal ALA"                   17
-biotype     510    HN      "C-Terminal ALA"                    4
-biotype     511    OXT     "C-Terminal ALA"                   18
-biotype     512    HA      "C-Terminal ALA"                    0
-biotype     513    N       "C-Terminal VAL"                    3
-biotype     514    CA      "C-Terminal VAL"                   30
-biotype     515    C       "C-Terminal VAL"                   17
-biotype     516    HN      "C-Terminal VAL"                    4
-biotype     517    OXT     "C-Terminal VAL"                   18
-biotype     518    HA      "C-Terminal VAL"                    0
-biotype     519    N       "C-Terminal LEU"                    3
-biotype     520    CA      "C-Terminal LEU"                   30
-biotype     521    C       "C-Terminal LEU"                   17
-biotype     522    HN      "C-Terminal LEU"                    4
-biotype     523    OXT     "C-Terminal LEU"                   18
-biotype     524    HA      "C-Terminal LEU"                    0
-biotype     525    N       "C-Terminal ILE"                    3
-biotype     526    CA      "C-Terminal ILE"                   30
-biotype     527    C       "C-Terminal ILE"                   17
-biotype     528    HN      "C-Terminal ILE"                    4
-biotype     529    OXT     "C-Terminal ILE"                   18
-biotype     530    HA      "C-Terminal ILE"                    0
-biotype     531    N       "C-Terminal SER"                    3
-biotype     532    CA      "C-Terminal SER"                   30
-biotype     533    C       "C-Terminal SER"                   17
-biotype     534    HN      "C-Terminal SER"                    4
-biotype     535    OXT     "C-Terminal SER"                   18
-biotype     536    HA      "C-Terminal SER"                    0
-biotype     537    N       "C-Terminal THR"                    3
-biotype     538    CA      "C-Terminal THR"                   30
-biotype     539    C       "C-Terminal THR"                   17
-biotype     540    HN      "C-Terminal THR"                    4
-biotype     541    OXT     "C-Terminal THR"                   18
-biotype     542    HA      "C-Terminal THR"                    0
-biotype     543    N       "C-Terminal CYS (SH)"               3
-biotype     544    CA      "C-Terminal CYS (SH)"              30
-biotype     545    C       "C-Terminal CYS (SH)"              17
-biotype     546    HN      "C-Terminal CYS (SH)"               4
-biotype     547    OXT     "C-Terminal CYS (SH)"              18
-biotype     548    HA      "C-Terminal CYS (SH)"               0
-biotype     549    N       "C-Terminal CYS (SS)"               3
-biotype     550    CA      "C-Terminal CYS (SS)"              30
-biotype     551    C       "C-Terminal CYS (SS)"              17
-biotype     552    HN      "C-Terminal CYS (SS)"               4
-biotype     553    OXT     "C-Terminal CYS (SS)"              18
-biotype     554    HA      "C-Terminal CYS (SS)"               0
-biotype     555    N       "C-Terminal PRO"                    3
-biotype     556    CA      "C-Terminal PRO"                   71
-biotype     557    C       "C-Terminal PRO"                   17
-biotype     558    OXT     "C-Terminal PRO"                   18
-biotype     559    HA      "C-Terminal PRO"                    0
-biotype     560    N       "C-Terminal PHE"                    3
-biotype     561    CA      "C-Terminal PHE"                   30
-biotype     562    C       "C-Terminal PHE"                   17
-biotype     563    HN      "C-Terminal PHE"                    4
-biotype     564    OXT     "C-Terminal PHE"                   18
-biotype     565    HA      "C-Terminal PHE"                    0
-biotype     566    N       "C-Terminal TYR"                    3
-biotype     567    CA      "C-Terminal TYR"                   30
-biotype     568    C       "C-Terminal TYR"                   17
-biotype     569    HN      "C-Terminal TYR"                    4
-biotype     570    OXT     "C-Terminal TYR"                   18
-biotype     571    HA      "C-Terminal TYR"                    0
-biotype     572    N       "C-Terminal TRP"                    3
-biotype     573    CA      "C-Terminal TRP"                   30
-biotype     574    C       "C-Terminal TRP"                   17
-biotype     575    HN      "C-Terminal TRP"                    4
-biotype     576    OXT     "C-Terminal TRP"                   18
-biotype     577    HA      "C-Terminal TRP"                    0
-biotype     578    N       "C-Terminal HIS (+)"                3
-biotype     579    CA      "C-Terminal HIS (+)"               30
-biotype     580    C       "C-Terminal HIS (+)"               17
-biotype     581    HN      "C-Terminal HIS (+)"                4
-biotype     582    OXT     "C-Terminal HIS (+)"               18
-biotype     583    HA      "C-Terminal HIS (+)"                0
-biotype     584    N       "C-Terminal HIS (HD)"               3
-biotype     585    CA      "C-Terminal HIS (HD)"              30
-biotype     586    C       "C-Terminal HIS (HD)"              17
-biotype     587    HN      "C-Terminal HIS (HD)"               4
-biotype     588    OXT     "C-Terminal HIS (HD)"              18
-biotype     589    HA      "C-Terminal HIS (HD)"               0
-biotype     590    N       "C-Terminal HIS (HE)"               3
-biotype     591    CA      "C-Terminal HIS (HE)"              30
-biotype     592    C       "C-Terminal HIS (HE)"              17
-biotype     593    HN      "C-Terminal HIS (HE)"               4
-biotype     594    OXT     "C-Terminal HIS (HE)"              18
-biotype     595    HA      "C-Terminal HIS (HE)"               0
-biotype     596    N       "C-Terminal ASP"                    3
-biotype     597    CA      "C-Terminal ASP"                   30
-biotype     598    C       "C-Terminal ASP"                   17
-biotype     599    HN      "C-Terminal ASP"                    4
-biotype     600    OXT     "C-Terminal ASP"                   18
-biotype     601    HA      "C-Terminal ASP"                    0
-biotype     602    N       "C-Terminal ASN"                    3
-biotype     603    CA      "C-Terminal ASN"                   30
-biotype     604    C       "C-Terminal ASN"                   17
-biotype     605    HN      "C-Terminal ASN"                    4
-biotype     606    OXT     "C-Terminal ASN"                   18
-biotype     607    HA      "C-Terminal ASN"                    0
-biotype     608    N       "C-Terminal GLU"                    3
-biotype     609    CA      "C-Terminal GLU"                   30
-biotype     610    C       "C-Terminal GLU"                   17
-biotype     611    HN      "C-Terminal GLU"                    4
-biotype     612    OXT     "C-Terminal GLU"                   18
-biotype     613    HA      "C-Terminal GLU"                    0
-biotype     614    N       "C-Terminal GLN"                    3
-biotype     615    CA      "C-Terminal GLN"                   30
-biotype     616    C       "C-Terminal GLN"                   17
-biotype     617    HN      "C-Terminal GLN"                    4
-biotype     618    OXT     "C-Terminal GLN"                   18
-biotype     619    HA      "C-Terminal GLN"                    0
-biotype     620    N       "C-Terminal MET"                    3
-biotype     621    CA      "C-Terminal MET"                   30
-biotype     622    C       "C-Terminal MET"                   17
-biotype     623    HN      "C-Terminal MET"                    4
-biotype     624    OXT     "C-Terminal MET"                   18
-biotype     625    HA      "C-Terminal MET"                    0
-biotype     626    N       "C-Terminal LYS"                    3
-biotype     627    CA      "C-Terminal LYS"                   30
-biotype     628    C       "C-Terminal LYS"                   17
-biotype     629    HN      "C-Terminal LYS"                    4
-biotype     630    OXT     "C-Terminal LYS"                   18
-biotype     631    HA      "C-Terminal LYS"                    0
-biotype     632    N       "C-Terminal ARG"                    3
-biotype     633    CA      "C-Terminal ARG"                   30
-biotype     634    C       "C-Terminal ARG"                   17
-biotype     635    HN      "C-Terminal ARG"                    4
-biotype     636    OXT     "C-Terminal ARG"                   18
-biotype     637    HA      "C-Terminal ARG"                    0
-biotype     638    N       "C-Terminal ORN"                    3
-biotype     639    CA      "C-Terminal ORN"                   30
-biotype     640    C       "C-Terminal ORN"                   17
-biotype     641    HN      "C-Terminal ORN"                    4
-biotype     642    OXT     "C-Terminal ORN"                   18
-biotype     643    HA      "C-Terminal ORN"                    0
-biotype     644    N       "C-Terminal AIB"                    3
-biotype     645    CA      "C-Terminal AIB"                  999
-biotype     646    C       "C-Terminal AIB"                   17
-biotype     647    HN      "C-Terminal AIB"                    4
-biotype     648    OXT     "C-Terminal AIB"                   18
+biotype      96    N       "Cysteine (S-)"                    -1
+biotype      97    CA      "Cysteine (S-)"                    -1
+biotype      98    C       "Cysteine (S-)"                    -1
+biotype      99    HN      "Cysteine (S-)"                    -1
+biotype     100    O       "Cysteine (S-)"                    -1
+biotype     101    HA      "Cysteine (S-)"                     0
+biotype     102    CB      "Cysteine (S-)"                    -1
+biotype     103    HB      "Cysteine (S-)"                     0
+biotype     104    SG      "Cysteine (S-)"                    -1
+biotype     105    N       "Proline"                           3
+biotype     106    CA      "Proline"                          14
+biotype     107    C       "Proline"                           1
+biotype     108    O       "Proline"                           2
+biotype     109    HA      "Proline"                           0
+biotype     110    CB      "Proline"                           9
+biotype     111    HB      "Proline"                           0
+biotype     112    CG      "Proline"                           9
+biotype     113    HG      "Proline"                           0
+biotype     114    CD      "Proline"                          15
+biotype     115    HD      "Proline"                           0
+biotype     116    N       "Phenylalanine"                     3
+biotype     117    CA      "Phenylalanine"                     6
+biotype     118    C       "Phenylalanine"                     1
+biotype     119    HN      "Phenylalanine"                     4
+biotype     120    O       "Phenylalanine"                     2
+biotype     121    HA      "Phenylalanine"                     0
+biotype     122    CB      "Phenylalanine"                    66
+biotype     123    HB      "Phenylalanine"                     0
+biotype     124    CG      "Phenylalanine"                    11
+biotype     125    CD      "Phenylalanine"                    11
+biotype     126    HD      "Phenylalanine"                    75
+biotype     127    CE      "Phenylalanine"                    11
+biotype     128    HE      "Phenylalanine"                    75
+biotype     129    CZ      "Phenylalanine"                    11
+biotype     130    HZ      "Phenylalanine"                    75
+biotype     131    N       "Tyrosine"                          3
+biotype     132    CA      "Tyrosine"                          6
+biotype     133    C       "Tyrosine"                          1
+biotype     134    HN      "Tyrosine"                          4
+biotype     135    O       "Tyrosine"                          2
+biotype     136    HA      "Tyrosine"                          0
+biotype     137    CB      "Tyrosine"                         66
+biotype     138    HB      "Tyrosine"                          0
+biotype     139    CG      "Tyrosine"                         11
+biotype     140    CD      "Tyrosine"                         11
+biotype     141    HD      "Tyrosine"                         75
+biotype     142    CE      "Tyrosine"                         11
+biotype     143    HE      "Tyrosine"                         75
+biotype     144    CZ      "Tyrosine"                         26
+biotype     145    OH      "Tyrosine"                         76
+biotype     146    HH      "Tyrosine"                         24
+biotype     147    N       "Tyrosine (O-)"                    -1
+biotype     148    CA      "Tyrosine (O-)"                    -1
+biotype     149    C       "Tyrosine (O-)"                    -1
+biotype     150    HN      "Tyrosine (O-)"                    -1
+biotype     151    O       "Tyrosine (O-)"                    -1
+biotype     152    HA      "Tyrosine (O-)"                     0
+biotype     153    CB      "Tyrosine (O-)"                    -1
+biotype     154    HB      "Tyrosine (O-)"                     0
+biotype     155    CG      "Tyrosine (O-)"                    -1
+biotype     156    CD      "Tyrosine (O-)"                    -1
+biotype     157    HD      "Tyrosine (O-)"                    -1
+biotype     158    CE      "Tyrosine (O-)"                    -1
+biotype     159    HE      "Tyrosine (O-)"                    -1
+biotype     160    CZ      "Tyrosine (O-)"                    -1
+biotype     161    OH      "Tyrosine (O-)"                    -1
+biotype     162    N       "Tryptophan"                        3
+biotype     163    CA      "Tryptophan"                        6
+biotype     164    C       "Tryptophan"                        1
+biotype     165    HN      "Tryptophan"                        4
+biotype     166    O       "Tryptophan"                        2
+biotype     167    HA      "Tryptophan"                        0
+biotype     168    CB      "Tryptophan"                       66
+biotype     169    HB      "Tryptophan"                        0
+biotype     170    CG      "Tryptophan"                       50
+biotype     171    CD1     "Tryptophan"                       45
+biotype     172    HD1     "Tryptophan"                       75
+biotype     173    CD2     "Tryptophan"                       68
+biotype     174    NE1     "Tryptophan"                       40
+biotype     175    HE1     "Tryptophan"                       41
+biotype     176    CE2     "Tryptophan"                       67
+biotype     177    CE3     "Tryptophan"                       11
+biotype     178    HE3     "Tryptophan"                       75
+biotype     179    CZ2     "Tryptophan"                       11
+biotype     180    HZ2     "Tryptophan"                       75
+biotype     181    CZ3     "Tryptophan"                       11
+biotype     182    HZ3     "Tryptophan"                       75
+biotype     183    CH2     "Tryptophan"                       11
+biotype     184    HH2     "Tryptophan"                       75
+biotype     185    N       "Histidine (+)"                     3
+biotype     186    CA      "Histidine (+)"                     6
+biotype     187    C       "Histidine (+)"                     1
+biotype     188    HN      "Histidine (+)"                     4
+biotype     189    O       "Histidine (+)"                     2
+biotype     190    HA      "Histidine (+)"                     0
+biotype     191    CB      "Histidine (+)"                    66
+biotype     192    HB      "Histidine (+)"                     0
+biotype     193    CG      "Histidine (+)"                    69
+biotype     194    ND1     "Histidine (+)"                    46
+biotype     195    HD1     "Histidine (+)"                    47
+biotype     196    CD2     "Histidine (+)"                    49
+biotype     197    HD2     "Histidine (+)"                    75
+biotype     198    CE1     "Histidine (+)"                    48
+biotype     199    HE1     "Histidine (+)"                    75
+biotype     200    NE2     "Histidine (+)"                    46
+biotype     201    HE2     "Histidine (+)"                    47
+biotype     202    N       "Histidine (HD)"                    3
+biotype     203    CA      "Histidine (HD)"                    6
+biotype     204    C       "Histidine (HD)"                    1
+biotype     205    HN      "Histidine (HD)"                    4
+biotype     206    O       "Histidine (HD)"                    2
+biotype     207    HA      "Histidine (HD)"                    0
+biotype     208    CB      "Histidine (HD)"                   66
+biotype     209    HB      "Histidine (HD)"                    0
+biotype     210    CG      "Histidine (HD)"                   73
+biotype     211    ND1     "Histidine (HD)"                   40
+biotype     212    HD1     "Histidine (HD)"                   41
+biotype     213    CD2     "Histidine (HD)"                   74
+biotype     214    HD2     "Histidine (HD)"                   75
+biotype     215    CE1     "Histidine (HD)"                   43
+biotype     216    HE1     "Histidine (HD)"                   75
+biotype     217    NE2     "Histidine (HD)"                   42
+biotype     218    N       "Histidine (HE)"                    3
+biotype     219    CA      "Histidine (HE)"                    6
+biotype     220    C       "Histidine (HE)"                    1
+biotype     221    HN      "Histidine (HE)"                    4
+biotype     222    O       "Histidine (HE)"                    2
+biotype     223    HA      "Histidine (HE)"                    0
+biotype     224    CB      "Histidine (HE)"                   66
+biotype     225    HB      "Histidine (HE)"                    0
+biotype     226    CG      "Histidine (HE)"                   44
+biotype     227    ND1     "Histidine (HE)"                   42
+biotype     228    CD2     "Histidine (HE)"                   45
+biotype     229    HD2     "Histidine (HE)"                   75
+biotype     230    CE1     "Histidine (HE)"                   43
+biotype     231    HE1     "Histidine (HE)"                   75
+biotype     232    NE2     "Histidine (HE)"                   40
+biotype     233    HE2     "Histidine (HE)"                   41
+biotype     234    N       "Aspartic Acid"                     3
+biotype     235    CA      "Aspartic Acid"                     6
+biotype     236    C       "Aspartic Acid"                     1
+biotype     237    HN      "Aspartic Acid"                     4
+biotype     238    O       "Aspartic Acid"                     2
+biotype     239    HA      "Aspartic Acid"                     0
+biotype     240    CB      "Aspartic Acid"                    16
+biotype     241    HB      "Aspartic Acid"                     0
+biotype     242    CG      "Aspartic Acid"                    17
+biotype     243    OD      "Aspartic Acid"                    18
+biotype     244    N       "Aspartic Acid (COOH)"             -1
+biotype     245    CA      "Aspartic Acid (COOH)"             -1
+biotype     246    C       "Aspartic Acid (COOH)"             -1
+biotype     247    HN      "Aspartic Acid (COOH)"             -1
+biotype     248    O       "Aspartic Acid (COOH)"             -1
+biotype     249    HA      "Aspartic Acid (COOH)"              0
+biotype     250    CB      "Aspartic Acid (COOH)"             -1
+biotype     251    HB      "Aspartic Acid (COOH)"              0
+biotype     252    CG      "Aspartic Acid (COOH)"             -1
+biotype     253    OD1     "Aspartic Acid (COOH)"             -1
+biotype     254    OD2     "Aspartic Acid (COOH)"             -1
+biotype     255    HD2     "Aspartic Acid (COOH)"             -1
+biotype     256    N       "Asparagine"                        3
+biotype     257    CA      "Asparagine"                        6
+biotype     258    C       "Asparagine"                        1
+biotype     259    HN      "Asparagine"                        4
+biotype     260    O       "Asparagine"                        2
+biotype     261    HA      "Asparagine"                        0
+biotype     262    CB      "Asparagine"                        9
+biotype     263    HB      "Asparagine"                        0
+biotype     264    CG      "Asparagine"                        1
+biotype     265    OD1     "Asparagine"                        2
+biotype     266    ND2     "Asparagine"                       12
+biotype     267    HD2     "Asparagine"                       13
+biotype     268    N       "Glutamic Acid"                     3
+biotype     269    CA      "Glutamic Acid"                     6
+biotype     270    C       "Glutamic Acid"                     1
+biotype     271    HN      "Glutamic Acid"                     4
+biotype     272    O       "Glutamic Acid"                     2
+biotype     273    HA      "Glutamic Acid"                     0
+biotype     274    CB      "Glutamic Acid"                     9
+biotype     275    HB      "Glutamic Acid"                     0
+biotype     276    CG      "Glutamic Acid"                    16
+biotype     277    HG      "Glutamic Acid"                     0
+biotype     278    CD      "Glutamic Acid"                    17
+biotype     279    OE      "Glutamic Acid"                    18
+biotype     280    N       "Glutamic Acid (COOH)"             -1
+biotype     281    CA      "Glutamic Acid (COOH)"             -1
+biotype     282    C       "Glutamic Acid (COOH)"             -1
+biotype     283    HN      "Glutamic Acid (COOH)"             -1
+biotype     284    O       "Glutamic Acid (COOH)"             -1
+biotype     285    HA      "Glutamic Acid (COOH)"              0
+biotype     286    CB      "Glutamic Acid (COOH)"             -1
+biotype     287    HB      "Glutamic Acid (COOH)"              0
+biotype     288    CG      "Glutamic Acid (COOH)"             -1
+biotype     289    HG      "Glutamic Acid (COOH)"              0
+biotype     290    CD      "Glutamic Acid (COOH)"             -1
+biotype     291    OE1     "Glutamic Acid (COOH)"             -1
+biotype     292    OE2     "Glutamic Acid (COOH)"             -1
+biotype     293    HE2     "Glutamic Acid (COOH)"             -1
+biotype     294    N       "Glutamine"                         3
+biotype     295    CA      "Glutamine"                         6
+biotype     296    C       "Glutamine"                         1
+biotype     297    HN      "Glutamine"                         4
+biotype     298    O       "Glutamine"                         2
+biotype     299    HA      "Glutamine"                         0
+biotype     300    CB      "Glutamine"                         9
+biotype     301    HB      "Glutamine"                         0
+biotype     302    CG      "Glutamine"                         9
+biotype     303    HG      "Glutamine"                         0
+biotype     304    CD      "Glutamine"                         1
+biotype     305    OE1     "Glutamine"                         2
+biotype     306    NE2     "Glutamine"                        12
+biotype     307    HE2     "Glutamine"                        13
+biotype     308    N       "Methionine"                        3
+biotype     309    CA      "Methionine"                        6
+biotype     310    C       "Methionine"                        1
+biotype     311    HN      "Methionine"                        4
+biotype     312    O       "Methionine"                        2
+biotype     313    HA      "Methionine"                        0
+biotype     314    CB      "Methionine"                        9
+biotype     315    HB      "Methionine"                        0
+biotype     316    CG      "Methionine"                       34
+biotype     317    HG      "Methionine"                        0
+biotype     318    SD      "Methionine"                       35
+biotype     319    CE      "Methionine"                       36
+biotype     320    HE      "Methionine"                        0
+biotype     321    N       "Lysine"                            3
+biotype     322    CA      "Lysine"                            6
+biotype     323    C       "Lysine"                            1
+biotype     324    HN      "Lysine"                            4
+biotype     325    O       "Lysine"                            2
+biotype     326    HA      "Lysine"                            0
+biotype     327    CB      "Lysine"                            9
+biotype     328    HB      "Lysine"                            0
+biotype     329    CG      "Lysine"                            9
+biotype     330    HG      "Lysine"                            0
+biotype     331    CD      "Lysine"                            9
+biotype     332    HD      "Lysine"                            0
+biotype     333    CE      "Lysine"                           19
+biotype     334    HE      "Lysine"                            0
+biotype     335    NZ      "Lysine"                           20
+biotype     336    HZ      "Lysine"                           21
+biotype     337    N       "Lysine (NH2)"                     -1
+biotype     338    CA      "Lysine (NH2)"                     -1
+biotype     339    C       "Lysine (NH2)"                     -1
+biotype     340    HN      "Lysine (NH2)"                     -1
+biotype     341    O       "Lysine (NH2)"                     -1
+biotype     342    HA      "Lysine (NH2)"                      0
+biotype     343    CB      "Lysine (NH2)"                     -1
+biotype     344    HB      "Lysine (NH2)"                      0
+biotype     345    CG      "Lysine (NH2)"                     -1
+biotype     346    HG      "Lysine (NH2)"                      0
+biotype     347    CD      "Lysine (NH2)"                     -1
+biotype     348    HD      "Lysine (NH2)"                      0
+biotype     349    CE      "Lysine (NH2)"                     -1
+biotype     350    HE      "Lysine (NH2)"                      0
+biotype     351    NZ      "Lysine (NH2)"                     -1
+biotype     352    HZ      "Lysine (NH2)"                     -1
+biotype     353    N       "Arginine"                          3
+biotype     354    CA      "Arginine"                          6
+biotype     355    C       "Arginine"                          1
+biotype     356    HN      "Arginine"                          4
+biotype     357    O       "Arginine"                          2
+biotype     358    HA      "Arginine"                          0
+biotype     359    CB      "Arginine"                          9
+biotype     360    HB      "Arginine"                          0
+biotype     361    CG      "Arginine"                         57
+biotype     362    HG      "Arginine"                          0
+biotype     363    CD      "Arginine"                         56
+biotype     364    HD      "Arginine"                          0
+biotype     365    NE      "Arginine"                         54
+biotype     366    HE      "Arginine"                         55
+biotype     367    CZ      "Arginine"                         53
+biotype     368    NH      "Arginine"                         51
+biotype     369    HH      "Arginine"                         52
+biotype     370    N       "Ornithine"                         3
+biotype     371    CA      "Ornithine"                         6
+biotype     372    C       "Ornithine"                         1
+biotype     373    HN      "Ornithine"                         4
+biotype     374    O       "Ornithine"                         2
+biotype     375    HA      "Ornithine"                         0
+biotype     376    CB      "Ornithine"                         9
+biotype     377    HB      "Ornithine"                         0
+biotype     378    CG      "Ornithine"                         9
+biotype     379    HG      "Ornithine"                         0
+biotype     380    CD      "Ornithine"                        19
+biotype     381    HD      "Ornithine"                         0
+biotype     382    NE      "Ornithine"                        20
+biotype     383    HE      "Ornithine"                        21
+biotype     384    N       "MethylAlanine (AIB)"               3
+biotype     385    CA      "MethylAlanine (AIB)"              64
+biotype     386    C       "MethylAlanine (AIB)"               1
+biotype     387    HN      "MethylAlanine (AIB)"               4
+biotype     388    O       "MethylAlanine (AIB)"               2
+biotype     389    CB      "MethylAlanine (AIB)"              65
+biotype     390    HB      "MethylAlanine (AIB)"               0
+biotype     391    N       "Pyroglutamic Acid"                -1
+biotype     392    CA      "Pyroglutamic Acid"                -1
+biotype     393    C       "Pyroglutamic Acid"                -1
+biotype     394    HN      "Pyroglutamic Acid"                -1
+biotype     395    O       "Pyroglutamic Acid"                -1
+biotype     396    HA      "Pyroglutamic Acid"                 0
+biotype     397    CB      "Pyroglutamic Acid"                -1
+biotype     398    HB      "Pyroglutamic Acid"                 0
+biotype     399    CG      "Pyroglutamic Acid"                -1
+biotype     400    HG      "Pyroglutamic Acid"                 0
+biotype     401    CD      "Pyroglutamic Acid"                -1
+biotype     402    OE      "Pyroglutamic Acid"                -1
+biotype     403    C       "Formyl N-Terminus"                72
+biotype     404    H       "Formyl N-Terminus"                 0
+biotype     405    O       "Formyl N-Terminus"                 2
+biotype     406    CH3     "Acetyl N-Terminus"                 7
+biotype     407    H       "Acetyl N-Terminus"                 0
+biotype     408    C       "Acetyl N-Terminus"                 1
+biotype     409    O       "Acetyl N-Terminus"                 2
+biotype     410    N       "Amide C-Terminus"                 12
+biotype     411    HN      "Amide C-Terminus"                 13
+biotype     412    N       "N-MeAmide C-Terminus"              3
+biotype     413    HN      "N-MeAmide C-Terminus"              4
+biotype     414    CH3     "N-MeAmide C-Terminus"             39
+biotype     415    H       "N-MeAmide C-Terminus"              0
+biotype     416    N       "N-Terminal GLY"                   20
+biotype     417    CA      "N-Terminal GLY"                   27
+biotype     418    C       "N-Terminal GLY"                    1
+biotype     419    HN      "N-Terminal GLY"                   21
+biotype     420    O       "N-Terminal GLY"                    2
+biotype     421    HA      "N-Terminal GLY"                    0
+biotype     422    N       "N-Terminal ALA"                   20
+biotype     423    CA      "N-Terminal ALA"                   29
+biotype     424    C       "N-Terminal ALA"                    1
+biotype     425    HN      "N-Terminal ALA"                   21
+biotype     426    O       "N-Terminal ALA"                    2
+biotype     427    HA      "N-Terminal ALA"                    0
+biotype     428    N       "N-Terminal VAL"                   20
+biotype     429    CA      "N-Terminal VAL"                   29
+biotype     430    C       "N-Terminal VAL"                    1
+biotype     431    HN      "N-Terminal VAL"                   21
+biotype     432    O       "N-Terminal VAL"                    2
+biotype     433    HA      "N-Terminal VAL"                    0
+biotype     434    N       "N-Terminal LEU"                   20
+biotype     435    CA      "N-Terminal LEU"                   29
+biotype     436    C       "N-Terminal LEU"                    1
+biotype     437    HN      "N-Terminal LEU"                   21
+biotype     438    O       "N-Terminal LEU"                    2
+biotype     439    HA      "N-Terminal LEU"                    0
+biotype     440    N       "N-Terminal ILE"                   20
+biotype     441    CA      "N-Terminal ILE"                   29
+biotype     442    C       "N-Terminal ILE"                    1
+biotype     443    HN      "N-Terminal ILE"                   21
+biotype     444    O       "N-Terminal ILE"                    2
+biotype     445    HA      "N-Terminal ILE"                    0
+biotype     446    N       "N-Terminal SER"                   20
+biotype     447    CA      "N-Terminal SER"                   29
+biotype     448    C       "N-Terminal SER"                    1
+biotype     449    HN      "N-Terminal SER"                   21
+biotype     450    O       "N-Terminal SER"                    2
+biotype     451    HA      "N-Terminal SER"                    0
+biotype     452    N       "N-Terminal THR"                   20
+biotype     453    CA      "N-Terminal THR"                   29
+biotype     454    C       "N-Terminal THR"                    1
+biotype     455    HN      "N-Terminal THR"                   21
+biotype     456    O       "N-Terminal THR"                    2
+biotype     457    HA      "N-Terminal THR"                    0
+biotype     458    N       "N-Terminal CYS (SH)"              20
+biotype     459    CA      "N-Terminal CYS (SH)"              29
+biotype     460    C       "N-Terminal CYS (SH)"               1
+biotype     461    HN      "N-Terminal CYS (SH)"              21
+biotype     462    O       "N-Terminal CYS (SH)"               2
+biotype     463    HA      "N-Terminal CYS (SH)"               0
+biotype     464    N       "N-Terminal CYX (SS)"              20
+biotype     465    CA      "N-Terminal CYX (SS)"              29
+biotype     466    C       "N-Terminal CYX (SS)"               1
+biotype     467    HN      "N-Terminal CYX (SS)"              21
+biotype     468    O       "N-Terminal CYX (SS)"               2
+biotype     469    HA      "N-Terminal CYX (SS)"               0
+biotype     470    N       "N-Terminal CYD (S-)"              -1
+biotype     471    CA      "N-Terminal CYD (S-)"              -1
+biotype     472    C       "N-Terminal CYD (S-)"              -1
+biotype     473    HN      "N-Terminal CYD (S-)"              -1
+biotype     474    O       "N-Terminal CYD (S-)"              -1
+biotype     475    HA      "N-Terminal CYD (S-)"               0
+biotype     476    N       "N-Terminal PRO"                   20
+biotype     477    CA      "N-Terminal PRO"                   70
+biotype     478    C       "N-Terminal PRO"                    1
+biotype     479    HN      "N-Terminal PRO"                   21
+biotype     480    O       "N-Terminal PRO"                    2
+biotype     481    HA      "N-Terminal PRO"                    0
+biotype     482    CD      "N-Terminal PRO"                   15
+biotype     483    HD      "N-Terminal PRO"                    0
+biotype     484    N       "N-Terminal PHE"                   20
+biotype     485    CA      "N-Terminal PHE"                   29
+biotype     486    C       "N-Terminal PHE"                    1
+biotype     487    HN      "N-Terminal PHE"                   21
+biotype     488    O       "N-Terminal PHE"                    2
+biotype     489    HA      "N-Terminal PHE"                    0
+biotype     490    N       "N-Terminal TYR"                   20
+biotype     491    CA      "N-Terminal TYR"                   29
+biotype     492    C       "N-Terminal TYR"                    1
+biotype     493    HN      "N-Terminal TYR"                   21
+biotype     494    O       "N-Terminal TYR"                    2
+biotype     495    HA      "N-Terminal TYR"                    0
+biotype     496    N       "N-Terminal TYD (O-)"              -1
+biotype     497    CA      "N-Terminal TYD (O-)"              -1
+biotype     498    C       "N-Terminal TYD (O-)"              -1
+biotype     499    HN      "N-Terminal TYD (O-)"              -1
+biotype     500    O       "N-Terminal TYD (O-)"              -1
+biotype     501    HA      "N-Terminal TYD (O-)"               0
+biotype     502    N       "N-Terminal TRP"                   20
+biotype     503    CA      "N-Terminal TRP"                   29
+biotype     504    C       "N-Terminal TRP"                    1
+biotype     505    HN      "N-Terminal TRP"                   21
+biotype     506    O       "N-Terminal TRP"                    2
+biotype     507    HA      "N-Terminal TRP"                    0
+biotype     508    N       "N-Terminal HIS (+)"               20
+biotype     509    CA      "N-Terminal HIS (+)"               29
+biotype     510    C       "N-Terminal HIS (+)"                1
+biotype     511    HN      "N-Terminal HIS (+)"               21
+biotype     512    O       "N-Terminal HIS (+)"                2
+biotype     513    HA      "N-Terminal HIS (+)"                0
+biotype     514    N       "N-Terminal HIS (HD)"              20
+biotype     515    CA      "N-Terminal HIS (HD)"              29
+biotype     516    C       "N-Terminal HIS (HD)"               1
+biotype     517    HN      "N-Terminal HIS (HD)"              21
+biotype     518    O       "N-Terminal HIS (HD)"               2
+biotype     519    HA      "N-Terminal HIS (HD)"               0
+biotype     520    N       "N-Terminal HIS (HE)"              20
+biotype     521    CA      "N-Terminal HIS (HE)"              29
+biotype     522    C       "N-Terminal HIS (HE)"               1
+biotype     523    HN      "N-Terminal HIS (HE)"              21
+biotype     524    O       "N-Terminal HIS (HE)"               2
+biotype     525    HA      "N-Terminal HIS (HE)"               0
+biotype     526    N       "N-Terminal ASP"                   20
+biotype     527    CA      "N-Terminal ASP"                   29
+biotype     528    C       "N-Terminal ASP"                    1
+biotype     529    HN      "N-Terminal ASP"                   21
+biotype     530    O       "N-Terminal ASP"                    2
+biotype     531    HA      "N-Terminal ASP"                    0
+biotype     532    N       "N-Terminal ASH (COOH)"            -1
+biotype     533    CA      "N-Terminal ASH (COOH)"            -1
+biotype     534    C       "N-Terminal ASH (COOH)"            -1
+biotype     535    HN      "N-Terminal ASH (COOH)"            -1
+biotype     536    O       "N-Terminal ASH (COOH)"            -1
+biotype     537    HA      "N-Terminal ASH (COOH)"             0
+biotype     538    N       "N-Terminal ASN"                   20
+biotype     539    CA      "N-Terminal ASN"                   29
+biotype     540    C       "N-Terminal ASN"                    1
+biotype     541    HN      "N-Terminal ASN"                   21
+biotype     542    O       "N-Terminal ASN"                    2
+biotype     543    HA      "N-Terminal ASN"                    0
+biotype     544    N       "N-Terminal GLU"                   20
+biotype     545    CA      "N-Terminal GLU"                   29
+biotype     546    C       "N-Terminal GLU"                    1
+biotype     547    HN      "N-Terminal GLU"                   21
+biotype     548    O       "N-Terminal GLU"                    2
+biotype     549    HA      "N-Terminal GLU"                    0
+biotype     550    N       "N-Terminal GLH (COOH)"            -1
+biotype     551    CA      "N-Terminal GLH (COOH)"            -1
+biotype     552    C       "N-Terminal GLH (COOH)"            -1
+biotype     553    HN      "N-Terminal GLH (COOH)"            -1
+biotype     554    O       "N-Terminal GLH (COOH)"            -1
+biotype     555    HA      "N-Terminal GLH (COOH)"             0
+biotype     556    N       "N-Terminal GLN"                   20
+biotype     557    CA      "N-Terminal GLN"                   29
+biotype     558    C       "N-Terminal GLN"                    1
+biotype     559    HN      "N-Terminal GLN"                   21
+biotype     560    O       "N-Terminal GLN"                    2
+biotype     561    HA      "N-Terminal GLN"                    0
+biotype     562    N       "N-Terminal MET"                   20
+biotype     563    CA      "N-Terminal MET"                   29
+biotype     564    C       "N-Terminal MET"                    1
+biotype     565    HN      "N-Terminal MET"                   21
+biotype     566    O       "N-Terminal MET"                    2
+biotype     567    HA      "N-Terminal MET"                    0
+biotype     568    N       "N-Terminal LYS"                   20
+biotype     569    CA      "N-Terminal LYS"                   29
+biotype     570    C       "N-Terminal LYS"                    1
+biotype     571    HN      "N-Terminal LYS"                   21
+biotype     572    O       "N-Terminal LYS"                    2
+biotype     573    HA      "N-Terminal LYS"                    0
+biotype     574    N       "N-Terminal LYD (NH2)"             -1
+biotype     575    CA      "N-Terminal LYD (NH2)"             -1
+biotype     576    C       "N-Terminal LYD (NH2)"             -1
+biotype     577    HN      "N-Terminal LYD (NH2)"             -1
+biotype     578    O       "N-Terminal LYD (NH2)"             -1
+biotype     579    HA      "N-Terminal LYD (NH2)"              0
+biotype     580    N       "N-Terminal ARG"                   20
+biotype     581    CA      "N-Terminal ARG"                   29
+biotype     582    C       "N-Terminal ARG"                    1
+biotype     583    HN      "N-Terminal ARG"                   21
+biotype     584    O       "N-Terminal ARG"                    2
+biotype     585    HA      "N-Terminal ARG"                    0
+biotype     586    N       "N-Terminal ORN"                   20
+biotype     587    CA      "N-Terminal ORN"                   29
+biotype     588    C       "N-Terminal ORN"                    1
+biotype     589    HN      "N-Terminal ORN"                   21
+biotype     590    O       "N-Terminal ORN"                    2
+biotype     591    HA      "N-Terminal ORN"                    0
+biotype     592    N       "N-Terminal AIB"                   20
+biotype     593    CA      "N-Terminal AIB"                   -1
+biotype     594    C       "N-Terminal AIB"                    1
+biotype     595    HN      "N-Terminal AIB"                   21
+biotype     596    O       "N-Terminal AIB"                    2
+biotype     597    N       "C-Terminal GLY"                    3
+biotype     598    CA      "C-Terminal GLY"                   28
+biotype     599    C       "C-Terminal GLY"                   17
+biotype     600    HN      "C-Terminal GLY"                    4
+biotype     601    OXT     "C-Terminal GLY"                   18
+biotype     602    HA      "C-Terminal GLY"                    0
+biotype     603    N       "C-Terminal ALA"                    3
+biotype     604    CA      "C-Terminal ALA"                   30
+biotype     605    C       "C-Terminal ALA"                   17
+biotype     606    HN      "C-Terminal ALA"                    4
+biotype     607    OXT     "C-Terminal ALA"                   18
+biotype     608    HA      "C-Terminal ALA"                    0
+biotype     609    N       "C-Terminal VAL"                    3
+biotype     610    CA      "C-Terminal VAL"                   30
+biotype     611    C       "C-Terminal VAL"                   17
+biotype     612    HN      "C-Terminal VAL"                    4
+biotype     613    OXT     "C-Terminal VAL"                   18
+biotype     614    HA      "C-Terminal VAL"                    0
+biotype     615    N       "C-Terminal LEU"                    3
+biotype     616    CA      "C-Terminal LEU"                   30
+biotype     617    C       "C-Terminal LEU"                   17
+biotype     618    HN      "C-Terminal LEU"                    4
+biotype     619    OXT     "C-Terminal LEU"                   18
+biotype     620    HA      "C-Terminal LEU"                    0
+biotype     621    N       "C-Terminal ILE"                    3
+biotype     622    CA      "C-Terminal ILE"                   30
+biotype     623    C       "C-Terminal ILE"                   17
+biotype     624    HN      "C-Terminal ILE"                    4
+biotype     625    OXT     "C-Terminal ILE"                   18
+biotype     626    HA      "C-Terminal ILE"                    0
+biotype     627    N       "C-Terminal SER"                    3
+biotype     628    CA      "C-Terminal SER"                   30
+biotype     629    C       "C-Terminal SER"                   17
+biotype     630    HN      "C-Terminal SER"                    4
+biotype     631    OXT     "C-Terminal SER"                   18
+biotype     632    HA      "C-Terminal SER"                    0
+biotype     633    N       "C-Terminal THR"                    3
+biotype     634    CA      "C-Terminal THR"                   30
+biotype     635    C       "C-Terminal THR"                   17
+biotype     636    HN      "C-Terminal THR"                    4
+biotype     637    OXT     "C-Terminal THR"                   18
+biotype     638    HA      "C-Terminal THR"                    0
+biotype     639    N       "C-Terminal CYS (SH)"               3
+biotype     640    CA      "C-Terminal CYS (SH)"              30
+biotype     641    C       "C-Terminal CYS (SH)"              17
+biotype     642    HN      "C-Terminal CYS (SH)"               4
+biotype     643    OXT     "C-Terminal CYS (SH)"              18
+biotype     644    HA      "C-Terminal CYS (SH)"               0
+biotype     645    N       "C-Terminal CYX (SS)"               3
+biotype     646    CA      "C-Terminal CYX (SS)"              30
+biotype     647    C       "C-Terminal CYX (SS)"              17
+biotype     648    HN      "C-Terminal CYX (SS)"               4
+biotype     649    OXT     "C-Terminal CYX (SS)"              18
+biotype     650    HA      "C-Terminal CYX (SS)"               0
+biotype     651    N       "C-Terminal CYD (S-)"              -1
+biotype     652    CA      "C-Terminal CYD (S-)"              -1
+biotype     653    C       "C-Terminal CYD (S-)"              -1
+biotype     654    HN      "C-Terminal CYD (S-)"              -1
+biotype     655    OXT     "C-Terminal CYD (S-)"              -1
+biotype     656    HA      "C-Terminal CYD (S-)"               0
+biotype     657    N       "C-Terminal PRO"                    3
+biotype     658    CA      "C-Terminal PRO"                   71
+biotype     659    C       "C-Terminal PRO"                   17
+biotype     660    OXT     "C-Terminal PRO"                   18
+biotype     661    HA      "C-Terminal PRO"                    0
+biotype     662    N       "C-Terminal PHE"                    3
+biotype     663    CA      "C-Terminal PHE"                   30
+biotype     664    C       "C-Terminal PHE"                   17
+biotype     665    HN      "C-Terminal PHE"                    4
+biotype     666    OXT     "C-Terminal PHE"                   18
+biotype     667    HA      "C-Terminal PHE"                    0
+biotype     668    N       "C-Terminal TYR"                    3
+biotype     669    CA      "C-Terminal TYR"                   30
+biotype     670    C       "C-Terminal TYR"                   17
+biotype     671    HN      "C-Terminal TYR"                    4
+biotype     672    OXT     "C-Terminal TYR"                   18
+biotype     673    HA      "C-Terminal TYR"                    0
+biotype     674    N       "C-Terminal TYD (O-)"              -1
+biotype     675    CA      "C-Terminal TYD (O-)"              -1
+biotype     676    C       "C-Terminal TYD (O-)"              -1
+biotype     677    HN      "C-Terminal TYD (O-)"              -1
+biotype     678    OXT     "C-Terminal TYD (O-)"              -1
+biotype     679    HA      "C-Terminal TYD (O-)"               0
+biotype     680    N       "C-Terminal TRP"                    3
+biotype     681    CA      "C-Terminal TRP"                   30
+biotype     682    C       "C-Terminal TRP"                   17
+biotype     683    HN      "C-Terminal TRP"                    4
+biotype     684    OXT     "C-Terminal TRP"                   18
+biotype     685    HA      "C-Terminal TRP"                    0
+biotype     686    N       "C-Terminal HIS (+)"                3
+biotype     687    CA      "C-Terminal HIS (+)"               30
+biotype     688    C       "C-Terminal HIS (+)"               17
+biotype     689    HN      "C-Terminal HIS (+)"                4
+biotype     690    OXT     "C-Terminal HIS (+)"               18
+biotype     691    HA      "C-Terminal HIS (+)"                0
+biotype     692    N       "C-Terminal HIS (HD)"               3
+biotype     693    CA      "C-Terminal HIS (HD)"              30
+biotype     694    C       "C-Terminal HIS (HD)"              17
+biotype     695    HN      "C-Terminal HIS (HD)"               4
+biotype     696    OXT     "C-Terminal HIS (HD)"              18
+biotype     697    HA      "C-Terminal HIS (HD)"               0
+biotype     698    N       "C-Terminal HIS (HE)"               3
+biotype     699    CA      "C-Terminal HIS (HE)"              30
+biotype     700    C       "C-Terminal HIS (HE)"              17
+biotype     701    HN      "C-Terminal HIS (HE)"               4
+biotype     702    OXT     "C-Terminal HIS (HE)"              18
+biotype     703    HA      "C-Terminal HIS (HE)"               0
+biotype     704    N       "C-Terminal ASP"                    3
+biotype     705    CA      "C-Terminal ASP"                   30
+biotype     706    C       "C-Terminal ASP"                   17
+biotype     707    HN      "C-Terminal ASP"                    4
+biotype     708    OXT     "C-Terminal ASP"                   18
+biotype     709    HA      "C-Terminal ASP"                    0
+biotype     710    N       "C-Terminal ASH (COOH)"            -1
+biotype     711    CA      "C-Terminal ASH (COOH)"            -1
+biotype     712    C       "C-Terminal ASH (COOH)"            -1
+biotype     713    HN      "C-Terminal ASH (COOH)"            -1
+biotype     714    OXT     "C-Terminal ASH (COOH)"            -1
+biotype     715    HA      "C-Terminal ASH (COOH)"             0
+biotype     716    N       "C-Terminal ASN"                    3
+biotype     717    CA      "C-Terminal ASN"                   30
+biotype     718    C       "C-Terminal ASN"                   17
+biotype     719    HN      "C-Terminal ASN"                    4
+biotype     720    OXT     "C-Terminal ASN"                   18
+biotype     721    HA      "C-Terminal ASN"                    0
+biotype     722    N       "C-Terminal GLU"                    3
+biotype     723    CA      "C-Terminal GLU"                   30
+biotype     724    C       "C-Terminal GLU"                   17
+biotype     725    HN      "C-Terminal GLU"                    4
+biotype     726    OXT     "C-Terminal GLU"                   18
+biotype     727    HA      "C-Terminal GLU"                    0
+biotype     728    N       "C-Terminal GLH (COOH)"            -1
+biotype     729    CA      "C-Terminal GLH (COOH)"            -1
+biotype     730    C       "C-Terminal GLH (COOH)"            -1
+biotype     731    HN      "C-Terminal GLH (COOH)"            -1
+biotype     732    OXT     "C-Terminal GLH (COOH)"            -1
+biotype     733    HA      "C-Terminal GLH (COOH)"             0
+biotype     734    N       "C-Terminal GLN"                    3
+biotype     735    CA      "C-Terminal GLN"                   30
+biotype     736    C       "C-Terminal GLN"                   17
+biotype     737    HN      "C-Terminal GLN"                    4
+biotype     738    OXT     "C-Terminal GLN"                   18
+biotype     739    HA      "C-Terminal GLN"                    0
+biotype     740    N       "C-Terminal MET"                    3
+biotype     741    CA      "C-Terminal MET"                   30
+biotype     742    C       "C-Terminal MET"                   17
+biotype     743    HN      "C-Terminal MET"                    4
+biotype     744    OXT     "C-Terminal MET"                   18
+biotype     745    HA      "C-Terminal MET"                    0
+biotype     746    N       "C-Terminal LYS"                    3
+biotype     747    CA      "C-Terminal LYS"                   30
+biotype     748    C       "C-Terminal LYS"                   17
+biotype     749    HN      "C-Terminal LYS"                    4
+biotype     750    OXT     "C-Terminal LYS"                   18
+biotype     751    HA      "C-Terminal LYS"                    0
+biotype     752    N       "C-Terminal LYD (NH2)"             -1
+biotype     753    CA      "C-Terminal LYD (NH2)"             -1
+biotype     754    C       "C-Terminal LYD (NH2)"             -1
+biotype     755    HN      "C-Terminal LYD (NH2)"             -1
+biotype     756    OXT     "C-Terminal LYD (NH2)"             -1
+biotype     757    HA      "C-Terminal LYD (NH2)"              0
+biotype     758    N       "C-Terminal ARG"                    3
+biotype     759    CA      "C-Terminal ARG"                   30
+biotype     760    C       "C-Terminal ARG"                   17
+biotype     761    HN      "C-Terminal ARG"                    4
+biotype     762    OXT     "C-Terminal ARG"                   18
+biotype     763    HA      "C-Terminal ARG"                    0
+biotype     764    N       "C-Terminal ORN"                    3
+biotype     765    CA      "C-Terminal ORN"                   30
+biotype     766    C       "C-Terminal ORN"                   17
+biotype     767    HN      "C-Terminal ORN"                    4
+biotype     768    OXT     "C-Terminal ORN"                   18
+biotype     769    HA      "C-Terminal ORN"                    0
+biotype     770    N       "C-Terminal AIB"                    3
+biotype     771    CA      "C-Terminal AIB"                   -1
+biotype     772    C       "C-Terminal AIB"                   17
+biotype     773    HN      "C-Terminal AIB"                    4
+biotype     774    OXT     "C-Terminal AIB"                   18
 biotype    2001    O       "Water"                            77
 biotype    2002    H       "Water"                            78
 biotype    2003    NA      "Sodium Ion"                      198

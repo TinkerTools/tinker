@@ -107,6 +107,8 @@ c
 c     initialize coordinates and connectivities for each atom
 c
       do i = 1, n
+         tag(i) = 0
+         name(i) = '   '
          x(i) = 0.0d0
          y(i) = 0.0d0
          z(i) = 0.0d0

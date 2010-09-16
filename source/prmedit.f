@@ -50,9 +50,10 @@ c
      &           /,4x,'(2) Reorder Individual Parameter Records',
      &           /,4x,'(3) Renumber the Atom Types, and Reorder',
      &           /,4x,'(4) Renumber the Atom Classes, and Reorder',
-     &           /,4x,'(5) Renumber Types and Classes, and Reorder'
-     &           /,4x,'(6) Sort and Format Multipole Parameters')
-         do while (mode.lt.1 .or. mode.gt.6)
+     &           /,4x,'(5) Renumber Types and Classes, and Reorder',
+     &           /,4x,'(6) Sort and Format Multipole Parameters',
+     &           /,4x,'(7) Renumber and Format Biotype Parameters')
+         do while (mode.lt.1 .or. mode.gt.7)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)
@@ -109,6 +110,19 @@ c
          call polesort (iprm)
          write (iout,80)  prmfile(1:trimtext(prmfile))
    80    format (/,' Sorted Multipole Values Written To:  ',a)
+         close (unit=iprm)
+      end if
+c
+c     renumber and format any biotype parameter values
+c
+      if (mode .eq. 7) then
+         iprm = freeunit ()
+         prmfile = 'biotype.prm'
+         call version (prmfile,'new')
+         open (unit=iprm,file=prmfile,status='new')
+         call biosort (iprm)
+         write (iout,90)  prmfile(1:trimtext(prmfile))
+   90    format (/,' Renumbered Biotype Values Written To:  ',a)
          close (unit=iprm)
       end if
       call final
@@ -1555,7 +1569,6 @@ c
       include 'params.i'
       integer i,j,n,iprm
       integer size,next
-      integer length
       integer trimtext
       integer ia,ib,ic,id
       integer key(maxprm)
@@ -1573,7 +1586,6 @@ c
       n = 0
       do i = 1, nprm
          record = prmline(i)
-         length = trimtext (record)
          next = 1
          call gettext (record,keyword,next)
          call upcase (keyword)
@@ -1647,6 +1659,59 @@ c
          write (iprm,80)  v1,v2,v3
    80    format (36x,3f11.5)
    90    continue
+      end do
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine biosort  --  renumber and format biotypes  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "biosort" renumbers and formats biotype parameters used to
+c     convert biomolecular structure into force field atom types
+c
+c
+      subroutine biosort (iprm)
+      implicit none
+      include 'sizes.i'
+      include 'params.i'
+      integer i,n,iprm
+      integer next
+      integer length
+      integer trimtext
+      integer ia,ib
+      character*3 sym
+      character*20 keyword
+      character*30 blank
+      character*120 record
+      character*120 string
+c
+c
+c     find, renumber and format the biotype parameters
+c
+      blank = '                              '
+      n = 0
+      do i = 1, nprm
+         record = prmline(i)
+         next = 1
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:8) .eq. 'BIOTYPE ') then
+            n = n + 1
+            call getnumb (record,ia,next)
+            call getword (record,sym,next)
+            call getstring (record,string,next)
+            call getnumb (record,ib,next)
+            if (ia .gt. n)  n = ia
+            length = trimtext (string)
+            string = '"'//string(1:length)//'"'//blank(1:30-length)
+            write (iprm,10)  n,sym,string(1:32),ib
+   10       format ('biotype',i8,4x,a3,5x,a32,i5)
+         end if
       end do
       return
       end

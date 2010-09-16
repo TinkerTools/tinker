@@ -108,6 +108,8 @@ c
 c     initialize coordinates and connectivities for each atom
 c
       do i = 1, n
+         tag(i) = 0
+         name(i) = '   '
          zbond(i) = 0.0d0
          zang(i) = 0.0d0
          ztors(i) = 0.0d0

@@ -76,11 +76,12 @@ c
          call inertia (2)
       end if
 c
-c     remove any dummy atoms from Cartesian coordinates
+c     remove dummy atoms and set undefined atoms to type zero
 c
       natom = n
       do i = natom, 1, -1
          if (type(i) .eq. 0)  call delete (i)
+         if (type(i) .lt. 0)  type(i) = 0
       end do
 c
 c     convert to internal and Cartesian coordinates
@@ -287,6 +288,7 @@ c
             end do
             if (seq(i) .eq. 'PHE')  chi(2,i) = 90.0d0
             if (seq(i) .eq. 'TYR')  chi(2,i) = 90.0d0
+            if (seq(i) .eq. 'TYD')  chi(2,i) = 90.0d0
             if (seq(i) .eq. 'TRP')  chi(2,i) = 90.0d0
             if (seq(i) .eq. 'HIS')  chi(2,i) = 90.0d0
             if (seq(i) .eq. 'HID')  chi(2,i) = 90.0d0
@@ -340,101 +342,13 @@ c
       include 'resdue.i'
       include 'sequen.i'
       integer i,k,m,next
-      integer ntyp(maxamino),catyp(maxamino)
-      integer ctyp(maxamino),hntyp(maxamino)
-      integer otyp(maxamino),hatyp(maxamino)
-      integer nntyp(maxamino),cantyp(maxamino)
-      integer cntyp(maxamino),hnntyp(maxamino)
-      integer ontyp(maxamino),hantyp(maxamino)
-      integer nctyp(maxamino),cactyp(maxamino)
-      integer cctyp(maxamino),hnctyp(maxamino)
-      integer octyp(maxamino),hactyp(maxamino)
-      integer ni(maxres),cai(maxres),ci(maxres)
+      integer ni(maxres)
+      integer cai(maxres)
+      integer ci(maxres)
       logical single,cyclic
       character*1 answer
       character*3 resname
       character*120 record
-c
-c     biopolymer atom types for amino acid backbone atoms
-c
-      data ntyp    /   1,   7,  15,  27,  41,  55,  65,  77,  87,
-     &                96, 107, 122, 138, 161, 178, 194, 210, 220,
-     &               232, 244, 258, 271, 287, 304, 318, 325,   0,
-     &                 0,   0,   0,   1 /
-      data catyp   /   2,   8,  16,  28,  42,  56,  66,  78,  88,
-     &                97, 108, 123, 139, 162, 179, 195, 211, 221,
-     &               233, 245, 259, 272, 288, 305, 319, 326,   0,
-     &                 0,   0,   0,   2 /
-      data ctyp    /   3,   9,  17,  29,  43,  57,  67,  79,  89,
-     &                98, 109, 124, 140, 163, 180, 196, 212, 222,
-     &               234, 246, 260, 273, 289, 306, 320, 327,   0,
-     &                 0,   0,   0,   3 /
-      data hntyp   /   4,  10,  18,  30,  44,  58,  68,  80,  90,
-     &                 0, 110, 125, 141, 164, 181, 197, 213, 223,
-     &               235, 247, 261, 274, 290, 307, 321, 328,   0,
-     &                 0,   0,   0,   4 /
-      data otyp    /   5,  11,  19,  31,  45,  59,  69,  81,  91,
-     &                99, 111, 126, 142, 165, 182, 198, 214, 224,
-     &               236, 248, 262, 275, 291, 308, 322, 329,   0,
-     &                 0,   0,   0,   5 /
-      data hatyp   /   6,  12,  20,  32,  46,  60,  70,  82,  92,
-     &               100, 112, 127, 143, 166, 183, 199, 215, 225,
-     &               237, 249, 263, 276, 292, 309,   0, 330,   0,
-     &                 0,   0,   0,   6 /
-c
-c     biopolymer atom types for N-terminal backbone atoms
-c
-      data nntyp   / 350, 356, 362, 368, 374, 380, 386, 392, 398,
-     &               404, 412, 418, 424, 430, 436, 442, 448, 454,
-     &               460, 466, 472, 478, 484, 490, 496, 325,   0,
-     &                 0,   0,   0, 350 /
-      data cantyp  / 351, 357, 363, 369, 375, 381, 387, 393, 399,
-     &               405, 413, 419, 425, 431, 437, 443, 449, 455,
-     &               461, 467, 473, 479, 485, 491, 497, 326,   0,
-     &               340,   0,   0, 351 /
-      data cntyp   / 352, 358, 364, 370, 376, 382, 388, 394, 400,
-     &               406, 414, 420, 426, 432, 438, 444, 450, 456,
-     &               462, 468, 474, 480, 486, 492, 498, 327, 337,
-     &               342,   0,   0, 352 /
-      data hnntyp  / 353, 359, 365, 371, 377, 383, 389, 395, 401,
-     &               407, 415, 421, 427, 433, 439, 445, 451, 457,
-     &               463, 469, 475, 481, 487, 493, 499, 328,   0,
-     &                 0,   0,   0, 353 /
-      data ontyp   / 354, 360, 366, 372, 378, 384, 390, 396, 402,
-     &               408, 416, 422, 428, 434, 440, 446, 452, 458,
-     &               464, 470, 476, 482, 488, 494, 500, 329, 339,
-     &               343,   0,   0, 354 /
-      data hantyp  / 355, 361, 367, 373, 379, 385, 391, 397, 403,
-     &               409, 417, 423, 429, 435, 441, 447, 453, 459,
-     &               465, 471, 477, 483, 489, 495,   0, 330, 338,
-     &               341,   0,   0, 355 /
-c
-c     biopolymer atom types for C-terminal backbone atoms
-c
-      data nctyp   / 501, 507, 513, 519, 525, 531, 537, 543, 549,
-     &               555, 560, 566, 572, 578, 584, 590, 596, 602,
-     &               608, 614, 620, 626, 632, 638, 644,   0,   0,
-     &                 0, 344, 346, 501 /
-      data cactyp  / 502, 508, 514, 520, 526, 532, 538, 544, 550,
-     &               556, 561, 567, 573, 579, 585, 591, 597, 603,
-     &               609, 615, 621, 627, 633, 639, 645,   0,   0,
-     &                 0,   0, 348, 502 /
-      data cctyp   / 503, 509, 515, 521, 527, 533, 539, 545, 551,
-     &               557, 562, 568, 574, 580, 586, 592, 598, 604,
-     &               610, 616, 622, 628, 634, 640, 646,   0,   0,
-     &                 0,   0,   0, 503 /
-      data hnctyp  / 504, 510, 516, 522, 528, 534, 540, 546, 552,
-     &                 0, 563, 569, 575, 581, 587, 593, 599, 605,
-     &               611, 617, 623, 629, 635, 641, 647,   0,   0,
-     &                 0, 345, 347, 504 /
-      data octyp   / 505, 511, 517, 523, 529, 535, 541, 547, 553,
-     &               558, 564, 570, 576, 582, 588, 594, 600, 606,
-     &               612, 618, 624, 630, 636, 642, 648,   0,   0,
-     &                 0,   0,   0, 505 /
-      data hactyp  / 506, 512, 518, 524, 530, 536, 542, 548, 554,
-     &               559, 565, 571, 577, 583, 589, 595, 601, 607,
-     &               613, 619, 625, 631, 637, 643,   0,   0,   0,
-     &                 0,   0, 349, 506 /
 c
 c
 c     determine whether the peptide chain is cyclic
@@ -811,425 +725,495 @@ c     cai       atom number of alpha carbon in residue i
 c     ni        atom number of amide nitrogen in residue i
 c     ci        atom number of carbonyl carbon in residue i
 c
+c     note biotypes of CD and HD atoms for N-terminal proline
+c     are set as absolute values, not relative to the CB atom
+c
 c
       subroutine proside (resname,i,cai,ni,ci)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'phipsi.i'
+      include 'resdue.i'
       include 'sequen.i'
-      integer i,cai,ni,ci
+      integer i,k
+      integer cai,ni,ci
       character*3 resname
 c
+c
+c     set the CB atom as reference site
+c
+      k = cbtyp(seqtyp(i))
 c
 c     glycine residue  (GLY)
 c
       if (resname .eq. 'GLY') then
-         if (i .eq. 1) then
-            call zatom (355,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
-         else if (i .eq. nseq) then
-            call zatom (506,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
-         else
-            call zatom (6,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
-         end if
+         k = hatyp(seqtyp(i))
+         if (i .eq. 1)  k = hantyp(seqtyp(i))
+         if (i .eq. nseq)  k = hactyp(seqtyp(i))
+         call zatom (k,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
 c
 c     alanine residue  (ALA)
 c
       else if (resname .eq. 'ALA') then
-         call zatom (13,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (14,1.11d0,109.4d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (14,1.11d0,109.4d0,109.4d0,n-2,cai,n-1,1)
-         call zatom (14,1.11d0,109.4d0,109.4d0,n-3,cai,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+1,1.11d0,109.4d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-2,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-3,cai,n-2,-1)
 c
 c     valine residue  (VAL)
 c
       else if (resname .eq. 'VAL') then
-         call zatom (21,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (23,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (25,1.54d0,109.5d0,109.5d0,n-2,cai,n-1,-1)
-         call zatom (22,1.11d0,109.4d0,109.4d0,n-3,cai,n-2,1)
-         call zatom (24,1.11d0,109.4d0,180.0d0,n-3,n-4,cai,0)
-         call zatom (24,1.11d0,109.4d0,109.4d0,n-4,n-5,n-1,1)
-         call zatom (24,1.11d0,109.4d0,109.4d0,n-5,n-6,n-2,-1)
-         call zatom (26,1.11d0,109.4d0,180.0d0,n-5,n-7,cai,0)
-         call zatom (26,1.11d0,109.4d0,109.4d0,n-6,n-8,n-1,1)
-         call zatom (26,1.11d0,109.4d0,109.4d0,n-7,n-9,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,109.5d0,n-2,cai,n-1,-1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-3,cai,n-2,1)
+         call zatom (k+3,1.11d0,109.4d0,180.0d0,n-3,n-4,cai,0)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-4,n-5,n-1,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-2,-1)
+         call zatom (k+5,1.11d0,109.4d0,180.0d0,n-5,n-7,cai,0)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-6,n-8,n-1,1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-7,n-9,n-2,-1)
 c
 c     leucine residue  (LEU)
 c
       else if (resname .eq. 'LEU') then
-         call zatom (33,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (35,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (37,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (39,1.54d0,109.5d0,109.4d0,n-2,n-3,n-1,-1)
-         call zatom (34,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
-         call zatom (34,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
-         call zatom (36,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,1)
-         call zatom (38,1.11d0,109.4d0,180.0d0,n-5,n-6,n-7,0)
-         call zatom (38,1.11d0,109.4d0,109.4d0,n-6,n-7,n-1,1)
-         call zatom (38,1.11d0,109.4d0,109.4d0,n-7,n-8,n-2,-1)
-         call zatom (40,1.11d0,109.4d0,180.0d0,n-7,n-9,n-10,0)
-         call zatom (40,1.11d0,109.4d0,109.4d0,n-8,n-10,n-1,1)
-         call zatom (40,1.11d0,109.4d0,109.4d0,n-9,n-11,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+6,1.54d0,109.5d0,109.4d0,n-2,n-3,n-1,-1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,1)
+         call zatom (k+5,1.11d0,109.4d0,180.0d0,n-5,n-6,n-7,0)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-6,n-7,n-1,1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-7,n-8,n-2,-1)
+         call zatom (k+7,1.11d0,109.4d0,180.0d0,n-7,n-9,n-10,0)
+         call zatom (k+7,1.11d0,109.4d0,109.4d0,n-8,n-10,n-1,1)
+         call zatom (k+7,1.11d0,109.4d0,109.4d0,n-9,n-11,n-2,-1)
 c
 c     isoleucine residue  (ILE)
 c
       else if (resname .eq. 'ILE') then
-         call zatom (47,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (49,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (51,1.54d0,109.5d0,109.5d0,n-2,cai,n-1,1)
-         call zatom (53,1.54d0,109.5d0,chi(2,i),n-2,n-3,cai,0)
-         call zatom (48,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,-1)
-         call zatom (50,1.11d0,109.4d0,109.4d0,n-4,n-5,n-2,1)
-         call zatom (50,1.11d0,109.4d0,109.4d0,n-5,n-6,n-3,-1)
-         call zatom (52,1.11d0,110.0d0,180.0d0,n-5,n-7,n-6,0)
-         call zatom (52,1.11d0,110.0d0,109.0d0,n-6,n-8,n-1,1)
-         call zatom (52,1.11d0,110.0d0,109.0d0,n-7,n-9,n-2,-1)
-         call zatom (54,1.11d0,110.0d0,180.0d0,n-7,n-9,n-10,0)
-         call zatom (54,1.11d0,110.0d0,109.0d0,n-8,n-10,n-1,1)
-         call zatom (54,1.11d0,110.0d0,109.0d0,n-9,n-11,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,109.5d0,n-2,cai,n-1,1)
+         call zatom (k+6,1.54d0,109.5d0,chi(2,i),n-2,n-3,cai,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-4,n-5,n-2,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-3,-1)
+         call zatom (k+5,1.11d0,110.0d0,180.0d0,n-5,n-7,n-6,0)
+         call zatom (k+5,1.11d0,110.0d0,109.0d0,n-6,n-8,n-1,1)
+         call zatom (k+5,1.11d0,110.0d0,109.0d0,n-7,n-9,n-2,-1)
+         call zatom (k+7,1.11d0,110.0d0,180.0d0,n-7,n-9,n-10,0)
+         call zatom (k+7,1.11d0,110.0d0,109.0d0,n-8,n-10,n-1,1)
+         call zatom (k+7,1.11d0,110.0d0,109.0d0,n-9,n-11,n-2,-1)
 c
 c     serine residue  (SER)
 c
       else if (resname .eq. 'SER') then
-         call zatom (61,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (63,1.41d0,107.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (62,1.11d0,109.4d0,106.7d0,n-2,cai,n-1,1)
-         call zatom (62,1.11d0,109.4d0,106.7d0,n-3,cai,n-2,-1)
-         call zatom (64,0.94d0,106.9d0,chi(2,i),n-3,n-4,cai,0)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.41d0,107.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,106.7d0,n-2,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,106.7d0,n-3,cai,n-2,-1)
+         call zatom (k+3,0.94d0,106.9d0,chi(2,i),n-3,n-4,cai,0)
 c
 c     threonine residue  (THR)
 c
       else if (resname .eq. 'THR') then
-         call zatom (71,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (73,1.41d0,107.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (75,1.54d0,109.5d0,107.7d0,n-2,cai,n-1,1)
-         call zatom (72,1.11d0,109.4d0,106.7d0,n-3,cai,n-2,-1)
-         call zatom (74,0.94d0,106.9d0,chi(2,i),n-3,n-4,cai,0)
-         call zatom (76,1.11d0,110.0d0,180.0d0,n-3,n-5,cai,0)
-         call zatom (76,1.11d0,110.0d0,109.0d0,n-4,n-6,n-1,1)
-         call zatom (76,1.11d0,110.0d0,109.0d0,n-5,n-7,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.41d0,107.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,107.7d0,n-2,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,106.7d0,n-3,cai,n-2,-1)
+         call zatom (k+3,0.94d0,106.9d0,chi(2,i),n-3,n-4,cai,0)
+         call zatom (k+5,1.11d0,110.0d0,180.0d0,n-3,n-5,cai,0)
+         call zatom (k+5,1.11d0,110.0d0,109.0d0,n-4,n-6,n-1,1)
+         call zatom (k+5,1.11d0,110.0d0,109.0d0,n-5,n-7,n-2,-1)
 c
 c     cysteine residue  (CYS)
 c
       else if (resname .eq. 'CYS') then
-         call zatom (83,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (85,1.82d0,109.0d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (84,1.11d0,109.4d0,112.0d0,n-2,cai,n-1,1)
-         call zatom (84,1.11d0,109.4d0,112.0d0,n-3,cai,n-2,-1)
-         call zatom (86,1.34d0,96.0d0,chi(2,i),n-3,n-4,cai,0)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.82d0,109.0d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,112.0d0,n-2,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,112.0d0,n-3,cai,n-2,-1)
+         call zatom (k+3,1.34d0,96.0d0,chi(2,i),n-3,n-4,cai,0)
 c
 c     cystine residue  (CYX)
 c
       else if (resname .eq. 'CYX') then
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.82d0,109.0d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,112.0d0,n-2,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,112.0d0,n-3,cai,n-2,-1)
          if (disulf(i) .gt. i) then
-            call zatom (93,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-            call zatom (95,1.82d0,109.0d0,chi(1,i),n-1,cai,ni,0)
-            call zatom (94,1.11d0,109.4d0,112.0d0,n-2,cai,n-1,1)
-            call zatom (94,1.11d0,109.4d0,112.0d0,n-3,cai,n-2,-1)
             disulf(i) = n - 3
          else if (disulf(i) .lt. i) then
-            call zatom (93,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-            call zatom (95,1.82d0,109.0d0,chi(1,i),n-1,cai,ni,0)
-            call zatom (94,1.11d0,109.4d0,112.0d0,n-2,cai,n-1,1)
-            call zatom (94,1.11d0,109.4d0,112.0d0,n-3,cai,n-2,-1)
             call zatom (-1,0.0d0,0.0d0,0.0d0,disulf(disulf(i)),n-3,0,0)
          end if
+c
+c     deprotonated cysteine residue  (CYD)
+c
+      else if (resname .eq. 'CYD') then
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.82d0,109.0d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,112.0d0,n-2,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,112.0d0,n-3,cai,n-2,-1)
 c
 c     proline residue  (PRO)
 c
       else if (resname .eq. 'PRO') then
-         call zatom (101,1.54d0,107.0d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (103,1.54d0,107.0d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k,1.54d0,107.0d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,107.0d0,chi(1,i),n-1,cai,ni,0)
          if (i .eq. 1) then
-            call zatom (410,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
+            call zatom (482,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
          else
-            call zatom (105,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
+            call zatom (k+4,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
          end if
          call zatom (-1,0.0d0,0.0d0,0.0d0,ni,n-1,0,0)
-         call zatom (102,1.11d0,109.4d0,109.4d0,n-3,cai,n-2,1)
-         call zatom (102,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,-1)
-         call zatom (104,1.11d0,109.4d0,109.4d0,n-4,n-5,n-3,1)
-         call zatom (104,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,-1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-3,cai,n-2,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-4,n-5,n-3,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,-1)
          if (i .eq. 1) then
-            call zatom (411,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
-            call zatom (411,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)
+            call zatom (483,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
+            call zatom (483,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)
          else
-            call zatom (106,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
-            call zatom (106,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)
+            call zatom (k+5,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
+            call zatom (k+5,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)
          end if
 c
 c     phenylalanine residue  (PHE)
 c
       else if (resname .eq. 'PHE') then
-         call zatom (113,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (115,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (116,1.39d0,120.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (116,1.39d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
-         call zatom (118,1.39d0,120.0d0,180.0d0,n-2,n-3,n-4,0)
-         call zatom (118,1.39d0,120.0d0,180.0d0,n-2,n-4,n-5,0)
-         call zatom (120,1.39d0,120.0d0,0.0d0,n-2,n-4,n-5,0)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.39d0,120.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+3,1.39d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
+         call zatom (k+5,1.39d0,120.0d0,180.0d0,n-2,n-3,n-4,0)
+         call zatom (k+5,1.39d0,120.0d0,180.0d0,n-2,n-4,n-5,0)
+         call zatom (k+7,1.39d0,120.0d0,0.0d0,n-2,n-4,n-5,0)
          call zatom (-1,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
-         call zatom (114,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,1)
-         call zatom (114,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,-1)
-         call zatom (117,1.10d0,120.0d0,120.0d0,n-7,n-8,n-5,1)
-         call zatom (117,1.10d0,120.0d0,120.0d0,n-7,n-9,n-5,1)
-         call zatom (119,1.10d0,120.0d0,120.0d0,n-7,n-9,n-5,1)
-         call zatom (119,1.10d0,120.0d0,120.0d0,n-7,n-9,n-6,1)
-         call zatom (121,1.10d0,120.0d0,120.0d0,n-7,n-9,n-8,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,-1)
+         call zatom (k+4,1.10d0,120.0d0,120.0d0,n-7,n-8,n-5,1)
+         call zatom (k+4,1.10d0,120.0d0,120.0d0,n-7,n-9,n-5,1)
+         call zatom (k+6,1.10d0,120.0d0,120.0d0,n-7,n-9,n-5,1)
+         call zatom (k+6,1.10d0,120.0d0,120.0d0,n-7,n-9,n-6,1)
+         call zatom (k+8,1.10d0,120.0d0,120.0d0,n-7,n-9,n-8,1)
 c
 c     tyrosine residue  (TYR)
 c
       else if (resname .eq. 'TYR') then
-         call zatom (128,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (130,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (131,1.39d0,120.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (131,1.39d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
-         call zatom (133,1.39d0,120.0d0,180.0d0,n-2,n-3,n-4,0)
-         call zatom (133,1.39d0,120.0d0,180.0d0,n-2,n-4,n-5,0)
-         call zatom (135,1.39d0,120.0d0,0.0d0,n-2,n-4,n-5,0)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.39d0,120.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+3,1.39d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
+         call zatom (k+5,1.39d0,120.0d0,180.0d0,n-2,n-3,n-4,0)
+         call zatom (k+5,1.39d0,120.0d0,180.0d0,n-2,n-4,n-5,0)
+         call zatom (k+7,1.39d0,120.0d0,0.0d0,n-2,n-4,n-5,0)
          call zatom (-1,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
-         call zatom (136,1.36d0,120.0d0,120.0d0,n-1,n-2,n-3,1)
-         call zatom (129,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,1)
-         call zatom (129,1.11d0,109.4d0,109.4d0,n-9,cai,n-8,-1)
-         call zatom (132,1.10d0,120.0d0,120.0d0,n-8,n-9,n-6,1)
-         call zatom (132,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
-         call zatom (134,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
-         call zatom (134,1.10d0,120.0d0,120.0d0,n-8,n-10,n-7,1)
-         call zatom (137,0.97d0,108.0d0,0.0d0,n-7,n-8,n-9,0)
+         call zatom (k+8,1.36d0,120.0d0,120.0d0,n-1,n-2,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-9,cai,n-8,-1)
+         call zatom (k+4,1.10d0,120.0d0,120.0d0,n-8,n-9,n-6,1)
+         call zatom (k+4,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
+         call zatom (k+6,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
+         call zatom (k+6,1.10d0,120.0d0,120.0d0,n-8,n-10,n-7,1)
+         call zatom (k+9,0.97d0,108.0d0,0.0d0,n-7,n-8,n-9,0)
+c
+c     deprotonated tyrosine residue  (TYD)
+c
+      else if (resname .eq. 'TYD') then
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.39d0,120.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+3,1.39d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
+         call zatom (k+5,1.39d0,120.0d0,180.0d0,n-2,n-3,n-4,0)
+         call zatom (k+5,1.39d0,120.0d0,180.0d0,n-2,n-4,n-5,0)
+         call zatom (k+7,1.39d0,120.0d0,0.0d0,n-2,n-4,n-5,0)
+         call zatom (-1,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
+         call zatom (k+8,1.36d0,120.0d0,120.0d0,n-1,n-2,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-9,cai,n-8,-1)
+         call zatom (k+4,1.10d0,120.0d0,120.0d0,n-8,n-9,n-6,1)
+         call zatom (k+4,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
+         call zatom (k+6,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
+         call zatom (k+6,1.10d0,120.0d0,120.0d0,n-8,n-10,n-7,1)
 c
 c     tryptophan residue  (TRP)
 c
       else if (resname .eq. 'TRP') then
-         call zatom (144,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (146,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (147,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (149,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
-         call zatom (150,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
-         call zatom (152,1.35d0,108.0d0,0.0d0,n-1,n-3,n-4,0)
+         call zatom (k,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
+         call zatom (k+6,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
+         call zatom (k+8,1.35d0,108.0d0,0.0d0,n-1,n-3,n-4,0)
          call zatom (-1,0.0d0,0.0d0,0.0d0,n-3,n-1,0,0)
-         call zatom (153,1.35d0,120.0d0,180.0d0,n-3,n-1,n-2,0)
-         call zatom (155,1.35d0,120.0d0,0.0d0,n-2,n-4,n-1,0)
-         call zatom (157,1.35d0,120.0d0,0.0d0,n-2,n-5,n-3,0)
-         call zatom (159,1.35d0,120.0d0,0.0d0,n-2,n-4,n-6,0)
+         call zatom (k+9,1.35d0,120.0d0,180.0d0,n-3,n-1,n-2,0)
+         call zatom (k+11,1.35d0,120.0d0,0.0d0,n-2,n-4,n-1,0)
+         call zatom (k+13,1.35d0,120.0d0,0.0d0,n-2,n-5,n-3,0)
+         call zatom (k+15,1.35d0,120.0d0,0.0d0,n-2,n-4,n-6,0)
          call zatom (-1,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
-         call zatom (145,1.11d0,109.4d0,109.4d0,n-10,cai,n-9,1)
-         call zatom (145,1.11d0,109.4d0,109.4d0,n-11,cai,n-10,-1)
-         call zatom (148,1.10d0,126.0d0,126.0d0,n-10,n-11,n-8,1)
-         call zatom (151,1.05d0,126.0d0,126.0d0,n-9,n-11,n-8,1)
-         call zatom (154,1.10d0,120.0d0,120.0d0,n-8,n-11,n-6,1)
-         call zatom (156,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
-         call zatom (158,1.10d0,120.0d0,120.0d0,n-8,n-10,n-7,1)
-         call zatom (160,1.10d0,120.0d0,120.0d0,n-8,n-10,n-9,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-10,cai,n-9,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-11,cai,n-10,-1)
+         call zatom (k+4,1.10d0,126.0d0,126.0d0,n-10,n-11,n-8,1)
+         call zatom (k+7,1.05d0,126.0d0,126.0d0,n-9,n-11,n-8,1)
+         call zatom (k+10,1.10d0,120.0d0,120.0d0,n-8,n-11,n-6,1)
+         call zatom (k+12,1.10d0,120.0d0,120.0d0,n-8,n-10,n-6,1)
+         call zatom (k+14,1.10d0,120.0d0,120.0d0,n-8,n-10,n-7,1)
+         call zatom (k+16,1.10d0,120.0d0,120.0d0,n-8,n-10,n-9,1)
 c
 c     histidine (HD and HE) residue  (HIS)
 c
       else if (resname .eq. 'HIS') then
-         call zatom (167,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (169,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (170,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (172,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
-         call zatom (174,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
-         call zatom (176,1.35d0,108.0d0,0.0d0,n-2,n-4,n-3,0)
+         call zatom (k,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
+         call zatom (k+7,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
+         call zatom (k+9,1.35d0,108.0d0,0.0d0,n-2,n-4,n-3,0)
          call zatom (-1,0.0d0,0.0d0,.00d0,n-2,n-1,0,0)
-         call zatom (168,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,1)
-         call zatom (168,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,-1)
-         call zatom (171,1.02d0,126.0d0,0.0d0,n-6,n-7,n-8,0)
-         call zatom (173,1.10d0,126.0d0,126.0d0,n-6,n-8,n-4,1)
-         call zatom (175,1.10d0,126.0d0,126.0d0,n-6,n-8,n-5,1)
-         call zatom (177,1.02d0,126.0d0,126.0d0,n-6,n-8,n-7,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,-1)
+         call zatom (k+4,1.02d0,126.0d0,0.0d0,n-6,n-7,n-8,0)
+         call zatom (k+6,1.10d0,126.0d0,126.0d0,n-6,n-8,n-4,1)
+         call zatom (k+8,1.10d0,126.0d0,126.0d0,n-6,n-8,n-5,1)
+         call zatom (k+10,1.02d0,126.0d0,126.0d0,n-6,n-8,n-7,1)
 c
 c     histidine (HD only) residue  (HID)
 c
       else if (resname .eq. 'HID') then
-         call zatom (184,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (186,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (187,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (189,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
-         call zatom (191,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
-         call zatom (193,1.35d0,108.0d0,0.0d0,n-2,n-4,n-3,0)
+         call zatom (k,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
+         call zatom (k+7,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
+         call zatom (k+9,1.35d0,108.0d0,0.0d0,n-2,n-4,n-3,0)
          call zatom (-1,0.0d0,0.0d0,.00d0,n-2,n-1,0,0)
-         call zatom (185,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,1)
-         call zatom (185,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,-1)
-         call zatom (188,1.02d0,126.0d0,0.0d0,n-6,n-7,n-8,0)
-         call zatom (190,1.10d0,126.0d0,126.0d0,n-6,n-8,n-4,1)
-         call zatom (192,1.10d0,126.0d0,126.0d0,n-6,n-8,n-5,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,-1)
+         call zatom (k+4,1.02d0,126.0d0,0.0d0,n-6,n-7,n-8,0)
+         call zatom (k+6,1.10d0,126.0d0,126.0d0,n-6,n-8,n-4,1)
+         call zatom (k+8,1.10d0,126.0d0,126.0d0,n-6,n-8,n-5,1)
 c
 c     histidine (HE only) residue  (HIE)
 c
       else if (resname .eq. 'HIE') then
-         call zatom (200,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (202,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (203,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (204,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
-         call zatom (206,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
-         call zatom (208,1.35d0,108.0d0,0.0d0,n-2,n-4,n-3,0)
+         call zatom (k,1.54d0,109.5d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.50d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.35d0,126.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+4,1.35d0,126.0d0,108.0d0,n-2,n-3,n-1,1)
+         call zatom (k+6,1.35d0,108.0d0,0.0d0,n-2,n-3,n-1,0)
+         call zatom (k+8,1.35d0,108.0d0,0.0d0,n-2,n-4,n-3,0)
          call zatom (-1,0.0d0,0.0d0,.00d0,n-2,n-1,0,0)
-         call zatom (201,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,1)
-         call zatom (201,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,-1)
-         call zatom (205,1.10d0,126.0d0,126.0d0,n-5,n-7,n-3,1)
-         call zatom (207,1.10d0,126.0d0,126.0d0,n-5,n-7,n-4,1)
-         call zatom (209,1.02d0,126.0d0,126.0d0,n-5,n-7,n-6,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,-1)
+         call zatom (k+5,1.10d0,126.0d0,126.0d0,n-5,n-7,n-3,1)
+         call zatom (k+7,1.10d0,126.0d0,126.0d0,n-5,n-7,n-4,1)
+         call zatom (k+9,1.02d0,126.0d0,126.0d0,n-5,n-7,n-6,1)
 c
 c     aspartic acid residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
-         call zatom (216,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (218,1.51d0,107.8d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (219,1.25d0,117.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (219,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
-         call zatom (217,1.11d0,109.4d0,107.9d0,n-4,cai,n-3,1)
-         call zatom (217,1.11d0,109.4d0,107.9d0,n-5,cai,n-4,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.51d0,107.8d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.25d0,117.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+3,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,107.9d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,107.9d0,n-5,cai,n-4,-1)
+c
+c     protonated aspartic acid residue  (ASH)
+c
+      else if (resname .eq. 'ASH') then
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.51d0,107.8d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.25d0,117.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+4,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,107.9d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,107.9d0,n-5,cai,n-4,-1)
+         call zatom (k+5,0.98d0,108.7d0,0.0d0,n-3,n-5,n-4,0)
 c
 c     asparagine residue  (ASN)
 c
       else if (resname .eq. 'ASN') then
-         call zatom (226,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (228,1.51d0,107.8d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (229,1.22d0,122.5d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (230,1.34d0,112.7d0,124.0d0,n-2,n-3,n-1,1)
-         call zatom (227,1.11d0,109.4d0,107.9d0,n-4,cai,n-3,1)
-         call zatom (227,1.11d0,109.4d0,107.9d0,n-5,cai,n-4,-1)
-         call zatom (231,1.02d0,119.0d0,0.0d0,n-3,n-5,n-6,0)
-         call zatom (231,1.02d0,119.0d0,120.0d0,n-4,n-6,n-1,1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.51d0,107.8d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+3,1.22d0,122.5d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+4,1.34d0,112.7d0,124.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,107.9d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,107.9d0,n-5,cai,n-4,-1)
+         call zatom (k+5,1.02d0,119.0d0,0.0d0,n-3,n-5,n-6,0)
+         call zatom (k+5,1.02d0,119.0d0,120.0d0,n-4,n-6,n-1,1)
 c
 c     glutamic acid residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
-         call zatom (238,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (240,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (242,1.51d0,107.8d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (243,1.25d0,117.0d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (243,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
-         call zatom (239,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
-         call zatom (239,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
-         call zatom (241,1.11d0,109.4d0,107.9d0,n-6,n-7,n-5,1)
-         call zatom (241,1.11d0,109.4d0,107.9d0,n-7,n-8,n-6,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.51d0,107.8d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.25d0,117.0d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+5,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
+         call zatom (k+3,1.11d0,109.4d0,107.9d0,n-6,n-7,n-5,1)
+         call zatom (k+3,1.11d0,109.4d0,107.9d0,n-7,n-8,n-6,-1)
+c
+c     protonated glutamic acid residue  (GLH)
+c
+      else if (resname .eq. 'GLH') then
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.51d0,107.8d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.25d0,117.0d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+6,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
+         call zatom (k+3,1.11d0,109.4d0,107.9d0,n-6,n-7,n-5,1)
+         call zatom (k+3,1.11d0,109.4d0,107.9d0,n-7,n-8,n-6,-1)
+         call zatom (k+7,0.98d0,108.7d0,0.0d0,n-5,n-7,n-6,0)
 c
 c     glutamine residue  (GLN)
 c
       else if (resname .eq. 'GLN') then
-         call zatom (250,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (252,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (254,1.51d0,107.8d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (255,1.22d0,122.5d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (256,1.34d0,112.7d0,124.0d0,n-2,n-3,n-1,1)
-         call zatom (251,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
-         call zatom (251,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
-         call zatom (253,1.11d0,109.4d0,107.9d0,n-6,n-7,n-5,1)
-         call zatom (253,1.11d0,109.4d0,107.9d0,n-7,n-8,n-6,-1)
-         call zatom (257,1.02d0,119.0d0,0.0d0,n-5,n-7,n-8,0)
-         call zatom (257,1.02d0,119.0d0,120.0d0,n-6,n-8,n-1,1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.51d0,107.8d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.22d0,122.5d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+6,1.34d0,112.7d0,124.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
+         call zatom (k+3,1.11d0,109.4d0,107.9d0,n-6,n-7,n-5,1)
+         call zatom (k+3,1.11d0,109.4d0,107.9d0,n-7,n-8,n-6,-1)
+         call zatom (k+7,1.02d0,119.0d0,0.0d0,n-5,n-7,n-8,0)
+         call zatom (k+7,1.02d0,119.0d0,120.0d0,n-6,n-8,n-1,1)
 c
 c     methionine residue  (MET)
 c
       else if (resname .eq. 'MET') then
-         call zatom (264,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (266,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (268,1.82d0,109.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (269,1.82d0,96.3d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (265,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
-         call zatom (265,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
-         call zatom (267,1.11d0,109.4d0,112.0d0,n-5,n-6,n-4,1)
-         call zatom (267,1.11d0,109.4d0,112.0d0,n-6,n-7,n-5,-1)
-         call zatom (270,1.11d0,112.0d0,180.0d0,n-5,n-6,n-7,0)
-         call zatom (270,1.11d0,112.0d0,109.4d0,n-6,n-7,n-1,1)
-         call zatom (270,1.11d0,112.0d0,109.4d0,n-7,n-8,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.82d0,109.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+5,1.82d0,96.3d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
+         call zatom (k+3,1.11d0,109.4d0,112.0d0,n-5,n-6,n-4,1)
+         call zatom (k+3,1.11d0,109.4d0,112.0d0,n-6,n-7,n-5,-1)
+         call zatom (k+6,1.11d0,112.0d0,180.0d0,n-5,n-6,n-7,0)
+         call zatom (k+6,1.11d0,112.0d0,109.4d0,n-6,n-7,n-1,1)
+         call zatom (k+6,1.11d0,112.0d0,109.4d0,n-7,n-8,n-2,-1)
 c
 c     lysine residue  (LYS)
 c
       else if (resname .eq. 'LYS') then
-         call zatom (277,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (279,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (281,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (283,1.54d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (285,1.50d0,109.5d0,chi(4,i),n-1,n-2,n-3,0)
-         call zatom (278,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
-         call zatom (278,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
-         call zatom (280,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,1)
-         call zatom (280,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,-1)
-         call zatom (282,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,1)
-         call zatom (282,1.11d0,109.4d0,109.4d0,n-8,n-9,n-7,-1)
-         call zatom (284,1.11d0,109.4d0,108.8d0,n-8,n-9,n-7,1)
-         call zatom (284,1.11d0,109.4d0,108.8d0,n-9,n-10,n-8,-1)
-         call zatom (286,1.02d0,109.5d0,180.0d0,n-9,n-10,n-11,0)
-         call zatom (286,1.02d0,109.5d0,109.5d0,n-10,n-11,n-1,1)
-         call zatom (286,1.02d0,109.5d0,109.5d0,n-11,n-12,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+6,1.54d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+8,1.50d0,109.5d0,chi(4,i),n-1,n-2,n-3,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,-1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-8,n-9,n-7,-1)
+         call zatom (k+7,1.11d0,109.4d0,108.8d0,n-8,n-9,n-7,1)
+         call zatom (k+7,1.11d0,109.4d0,108.8d0,n-9,n-10,n-8,-1)
+         call zatom (k+9,1.02d0,109.5d0,180.0d0,n-9,n-10,n-11,0)
+         call zatom (k+9,1.02d0,109.5d0,109.5d0,n-10,n-11,n-1,1)
+         call zatom (k+9,1.02d0,109.5d0,109.5d0,n-11,n-12,n-2,-1)
+c
+c     deprotonated lysine residue  (LYD)
+c
+      else if (resname .eq. 'LYD') then
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+6,1.54d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+8,1.50d0,109.5d0,chi(4,i),n-1,n-2,n-3,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,-1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-8,n-9,n-7,-1)
+         call zatom (k+7,1.11d0,109.4d0,108.8d0,n-8,n-9,n-7,1)
+         call zatom (k+7,1.11d0,109.4d0,108.8d0,n-9,n-10,n-8,-1)
+         call zatom (k+9,1.02d0,109.5d0,180.0d0,n-9,n-10,n-11,0)
+         call zatom (k+9,1.02d0,109.5d0,109.5d0,n-10,n-11,n-1,1)
 c
 c     arginine residue  (ARG)
 c
       else if (resname .eq. 'ARG') then
-         call zatom (293,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (295,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (297,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (299,1.45d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (301,1.35d0,120.0d0,chi(4,i),n-1,n-2,n-3,0)
-         call zatom (302,1.35d0,120.0d0,180.0d0,n-1,n-2,n-3,0)
-         call zatom (302,1.35d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
-         call zatom (294,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,1)
-         call zatom (294,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,-1)
-         call zatom (296,1.11d0,109.4d0,109.4d0,n-8,n-9,n-7,1)
-         call zatom (296,1.11d0,109.4d0,109.4d0,n-9,n-10,n-8,-1)
-         call zatom (298,1.11d0,109.4d0,109.4d0,n-9,n-10,n-8,1)
-         call zatom (298,1.11d0,109.4d0,109.4d0,n-10,n-11,n-9,-1)
-         call zatom (300,1.02d0,120.0d0,120.0d0,n-10,n-11,n-9,1)
-         call zatom (303,1.02d0,120.0d0,180.0d0,n-9,n-10,n-11,0)
-         call zatom (303,1.02d0,120.0d0,120.0d0,n-10,n-11,n-1,1)
-         call zatom (303,1.02d0,120.0d0,180.0d0,n-10,n-12,n-13,0)
-         call zatom (303,1.02d0,120.0d0,120.0d0,n-11,n-13,n-1,1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+6,1.45d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+8,1.35d0,120.0d0,chi(4,i),n-1,n-2,n-3,0)
+         call zatom (k+9,1.35d0,120.0d0,180.0d0,n-1,n-2,n-3,0)
+         call zatom (k+9,1.35d0,120.0d0,120.0d0,n-2,n-3,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-7,cai,n-6,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-8,cai,n-7,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-8,n-9,n-7,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-9,n-10,n-8,-1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-9,n-10,n-8,1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-10,n-11,n-9,-1)
+         call zatom (k+7,1.02d0,120.0d0,120.0d0,n-10,n-11,n-9,1)
+         call zatom (k+10,1.02d0,120.0d0,180.0d0,n-9,n-10,n-11,0)
+         call zatom (k+10,1.02d0,120.0d0,120.0d0,n-10,n-11,n-1,1)
+         call zatom (k+10,1.02d0,120.0d0,180.0d0,n-10,n-12,n-13,0)
+         call zatom (k+10,1.02d0,120.0d0,120.0d0,n-11,n-13,n-1,1)
 c
 c     ornithine residue  (ORN)
 c
       else if (resname .eq. 'ORN') then
-         call zatom (310,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (312,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (314,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (316,1.50d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (311,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
-         call zatom (311,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
-         call zatom (313,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,1)
-         call zatom (313,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,-1)
-         call zatom (315,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,1)
-         call zatom (315,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,-1)
-         call zatom (317,1.02d0,109.5d0,180.0d0,n-7,n-8,n-9,0)
-         call zatom (317,1.02d0,109.5d0,109.5d0,n-8,n-9,n-1,1)
-         call zatom (317,1.02d0,109.5d0,109.5d0,n-9,n-10,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,109.5d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k+6,1.50d0,109.5d0,chi(3,i),n-1,n-2,n-3,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,-1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,1)
+         call zatom (k+5,1.11d0,109.4d0,109.4d0,n-7,n-8,n-6,-1)
+         call zatom (k+7,1.02d0,109.5d0,180.0d0,n-7,n-8,n-9,0)
+         call zatom (k+7,1.02d0,109.5d0,109.5d0,n-8,n-9,n-1,1)
+         call zatom (k+7,1.02d0,109.5d0,109.5d0,n-9,n-10,n-2,-1)
 c
 c     methylalanine residue  (AIB)
 c
       else if (resname .eq. 'AIB') then
-         call zatom (323,1.54d0,109.5d0,107.8d0,cai,ni,ci,-chiral(i))
-         call zatom (323,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
-         call zatom (324,1.11d0,109.4d0,chi(1,i),n-2,cai,ni,0)
-         call zatom (324,1.11d0,109.4d0,109.4d0,n-3,cai,n-1,1)
-         call zatom (324,1.11d0,109.4d0,109.4d0,n-4,cai,n-2,-1)
-         call zatom (324,1.11d0,109.4d0,chi(1,i),n-4,cai,ni,0)
-         call zatom (324,1.11d0,109.4d0,109.4d0,n-5,cai,n-1,1)
-         call zatom (324,1.11d0,109.4d0,109.4d0,n-6,cai,n-2,-1)
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,-chiral(i))
+         call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
+         call zatom (k+1,1.11d0,109.4d0,chi(1,i),n-2,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-3,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-2,-1)
+         call zatom (k+1,1.11d0,109.4d0,chi(1,i),n-4,cai,ni,0)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-1,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-2,-1)
 c
 c     pyroglutamic acid residue  (PCA)
 c
       else if (resname .eq. 'PCA') then
-         call zatom (331,1.54d0,107.0d0,109.5d0,cai,ni,ci,chiral(i))
-         call zatom (333,1.54d0,107.0d0,chi(1,i),n-1,cai,ni,0)
-         call zatom (335,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
+         call zatom (k,1.54d0,107.0d0,109.5d0,cai,ni,ci,chiral(i))
+         call zatom (k+2,1.54d0,107.0d0,chi(1,i),n-1,cai,ni,0)
+         call zatom (k+4,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
          call zatom (-1,0.0d0,0.0d0,0.0d0,ni,n-1,0,0)
-         call zatom (336,1.22d0,126.0d0,126.0d0,n-1,ni,n-2,1)
-         call zatom (332,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
-         call zatom (332,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
-         call zatom (334,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,1)
-         call zatom (334,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,-1)
+         call zatom (k+5,1.22d0,126.0d0,126.0d0,n-1,ni,n-2,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-4,cai,n-3,1)
+         call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,-1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,1)
+         call zatom (k+3,1.11d0,109.4d0,109.4d0,n-6,n-7,n-5,-1)
 c
 c     unknown residue  (UNK)
 c
       else if (resname .eq. 'UNK') then
-         if (i .eq. 1) then
-            call zatom (355,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
-         else if (i .eq. nseq) then
-            call zatom (506,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
-         else
-            call zatom (6,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
-         end if
+         k = hatyp(seqtyp(i))
+         if (i .eq. 1)  k = hantyp(seqtyp(i))
+         if (i .eq. nseq)  k = hactyp(seqtyp(i))
+         call zatom (k,1.11d0,109.5d0,107.9d0,cai,ni,ci,chiral(i))
       end if
       return
       end
@@ -1267,6 +1251,13 @@ c
       real*8 xx(maxopt)
       external pauling1,optsave
 c
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (associated(iuse))  deallocate (iuse)
+      if (associated(use))  deallocate (use)
+      allocate (iuse(n))
+      allocate (use(0:n))
 c
 c     set all atoms to be active during energy evaluations
 c
