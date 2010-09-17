@@ -25,10 +25,12 @@ c
       include 'titles.i'
       integer i,k,ipdb
       integer start,stop
-      integer resnumb
+      integer resmax,resnumb
       integer resid(maxres)
       real*8 crdmin,crdmax
       logical opened
+      logical rename
+      logical reformat
       character*1 chnname
       character*1 chain(maxres)
       character*2 atmc,resc
@@ -37,6 +39,11 @@ c
       character*38 fstr
       character*120 pdbfile
 c
+c
+c     set flags for residue naming and large value formatting
+c
+      rename = .false.
+      reformat = .false.
 c
 c     open the output unit if not already done
 c
@@ -70,37 +77,49 @@ c
 c
 c     change some TINKER residue names to match PDB standards
 c
-      do i = 1, npdb
-         if (resnam(i) .eq. 'CYX')  resnam(i) = 'CYS'
-         if (resnam(i) .eq. 'HID')  resnam(i) = 'HIS'
-         if (resnam(i) .eq. 'HIE')  resnam(i) = 'HIS'
-         if (resnam(i) .eq. 'HIP')  resnam(i) = 'HIS'
-      end do
+      if (rename) then
+         do i = 1, npdb
+            if (resnam(i) .eq. 'CYX')  resnam(i) = 'CYS'
+            if (resnam(i) .eq. 'CYD')  resnam(i) = 'CYS'
+            if (resnam(i) .eq. 'TYD')  resnam(i) = 'TYR'
+            if (resnam(i) .eq. 'HID')  resnam(i) = 'HIS'
+            if (resnam(i) .eq. 'HIE')  resnam(i) = 'HIS'
+            if (resnam(i) .eq. 'HIP')  resnam(i) = 'HIS'
+            if (resnam(i) .eq. 'ASH')  resnam(i) = 'ASP'
+            if (resnam(i) .eq. 'GLH')  resnam(i) = 'GLU'
+            if (resnam(i) .eq. 'LYD')  resnam(i) = 'LYS'
+         end do
+      end if
 c
-c     check for large systems needing extended formatting
+c     set formatting to match the PDB fixed format standard
 c
       atmc = 'i5'
-      if (npdb .ge. 10000)  atmc = 'i6'
-      if (npdb .ge. 100000)  atmc = 'i7'
       resc = 'i4'
+      crdc = '3f8.3 '
+c
+c     check for large values requiring extended formatting
+c
+      resmax = 0
       crdmin = 0.0d0
       crdmax = 0.0d0
       do i = 1, npdb
          if (pdbtyp(i) .eq. 'ATOM  ') then
-            resnumb = resid(resnum(i))
+            resmax = max(resmax,resid(resnum(i)))
          else
-            resnumb = resnum(i)
+            resmax = max(resmax,resnum(i))
          end if
-         if (resnumb .ge. 10000)  resc = 'i5'
-         if (resnumb .ge. 100000)  resc = 'i6'
          crdmin = min(crdmin,xpdb(i),ypdb(i),zpdb(i))
          crdmax = max(crdmax,xpdb(i),ypdb(i),zpdb(i))
       end do
-      crdc = '3f8.3 '
-      if (crdmin .le. -100.0d0)  crdc = '3f9.3 '
-      if (crdmax .ge. 1000.0d0)  crdc = '3f9.3 '
-      if (crdmin .le. -1000.0d0)  crdc = '3f10.3'
-      if (crdmax .ge. 10000.0d0)  crdc = '3f10.3'
+      if (reformat) then
+         if (npdb .ge. 100000)  atmc = 'i6'
+         if (resmax .ge. 10000)  resc = 'i5'
+         if (resmax .ge. 100000)  resc = 'i6'
+         if (crdmin .le. -100.0d0)  crdc = '3f9.3 '
+         if (crdmax .ge. 1000.0d0)  crdc = '3f9.3 '
+         if (crdmin .le. -1000.0d0)  crdc = '3f10.3'
+         if (crdmax .ge. 10000.0d0)  crdc = '3f10.3'
+      end if
 c
 c     write info and coordinates for each PDB atom
 c

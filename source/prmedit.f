@@ -1479,10 +1479,7 @@ c
             string = record(next:120)
             read (string,*,err=480,end=480)  ib
   480       continue
-            if (ib .ne. 0) then
-               ib = itype(ib)
-               if (ib.eq.0 .and. kt.lt.999)  ib = 999
-            end if
+            if (ib .gt. 0)  ib = itype(ib)
             length = min(30,max(1,59-next))
             write (iprm,490)  record(8:next)//blank(1:length),ib
   490       format ('biotype',a,i5)
