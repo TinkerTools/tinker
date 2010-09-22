@@ -148,6 +148,7 @@ c
                call readxyz (ixyz)
                close (unit=ixyz)
                if (i .eq. start) then
+                  call active
                   nuse = n
                   do k = 1, nuse
                      use(k) = .true.

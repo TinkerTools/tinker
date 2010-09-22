@@ -115,6 +115,12 @@ c
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
 c
+c     store coordinates to reflect update of this site
+c
+            xold(i) = xi
+            yold(i) = yi
+            zold(i) = zi
+c
 c     rebuild the higher numbered neighbors of this site
 c
             j = 0
@@ -130,12 +136,6 @@ c
                end if
             end do
             nvlst(i) = j
-c
-c     store new coordinates to reflect update of this site
-c
-            xold(i) = xi
-            yold(i) = yi
-            zold(i) = zi
 c
 c     adjust lists of lower numbered neighbors of this site
 c
@@ -198,11 +198,14 @@ c
       real*8 zold(maxatm)
 c
 c
-c     zero out the list and get coordinates for the site
+c     store coordinates to reflect update of the site
 c
       xi = xred(i)
       yi = yred(i)
       zi = zred(i)
+      xold(i) = xi
+      yold(i) = yi
+      zold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -219,12 +222,6 @@ c
          end if
       end do
       nvlst(i) = j
-c
-c     store new coordinates to reflect update of the site
-c
-      xold(i) = xi
-      yold(i) = yi
-      zold(i) = zi
 c
 c     check to see if the neighbor list is too long
 c
@@ -430,6 +427,12 @@ c
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
 c
+c     store coordinates to reflect update of this site
+c
+            xold(i) = xi
+            yold(i) = yi
+            zold(i) = zi
+c
 c     rebuild the higher numbered neighbors of this site
 c
             j = 0
@@ -445,12 +448,6 @@ c
                end if
             end do
             nelst(i) = j
-c
-c     store new coordinates to reflect update of this site
-c
-            xold(i) = xi
-            yold(i) = yi
-            zold(i) = zi
 c
 c     adjust lists of lower numbered neighbors of this site
 c
@@ -511,12 +508,15 @@ c
       real*8 zold(maxatm)
 c
 c
-c     zero out the list and get coordinates for the site
+c     store new coordinates to reflect update of the site
 c
       ii = kion(i)
       xi = x(ii)
       yi = y(ii)
       zi = z(ii)
+      xold(i) = xi
+      yold(i) = yi
+      zold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -534,12 +534,6 @@ c
          end if
       end do
       nelst(i) = j
-c
-c     store new coordinates to reflect update of the site
-c
-      xold(i) = xi
-      yold(i) = yi
-      zold(i) = zi
 c
 c     check to see if the neighbor list is too long
 c
@@ -743,6 +737,12 @@ c
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
 c
+c     store coordinates to reflect update of this site
+c
+            xold(i) = xi
+            yold(i) = yi
+            zold(i) = zi
+c
 c     rebuild the higher numbered neighbors of this site
 c
             j = 0
@@ -758,12 +758,6 @@ c
                end if
             end do
             nelst(i) = j
-c
-c     store new coordinates to reflect update of this site
-c
-            xold(i) = xi
-            yold(i) = yi
-            zold(i) = zi
 c
 c     adjust lists of lower numbered neighbors of this site
 c
@@ -824,12 +818,15 @@ c
       real*8 zold(maxatm)
 c
 c
-c     zero out the list and get coordinates for the site
+c     store new coordinates to reflect update of the site
 c
       ii = ipole(i)
       xi = x(ii)
       yi = y(ii)
       zi = z(ii)
+      xold(i) = xi
+      yold(i) = yi
+      zold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -847,12 +844,6 @@ c
          end if
       end do
       nelst(i) = j
-c
-c     store new coordinates to reflect update of the site
-c
-      xold(i) = xi
-      yold(i) = yi
-      zold(i) = zi
 c
 c     check to see if the neighbor list is too long
 c

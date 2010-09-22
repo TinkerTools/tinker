@@ -160,7 +160,19 @@ c
          mpolecut = ewaldcut
       end if
 c
-c     convert any distance percentages to absolute distances
+c     set buffer region limits for pairwise neighbor lists
+c
+      if (use_list) then
+         lbuf2 = (0.5d0*lbuffer)**2
+         vbuf2 = (vdwcut+lbuffer)**2
+         cbuf2 = (chgcut+lbuffer)**2
+         mbuf2 = (mpolecut+lbuffer)**2
+         vbufx = (vdwcut+2.0d0*lbuffer)**2
+         cbufx = (chgcut+2.0d0*lbuffer)**2
+         mbufx = (mpolecut+2.0d0*lbuffer)**2
+      end if
+c
+c     convert any tapering percentages to absolute distances
 c
       if (vdwtaper .lt. 1.0d0)  vdwtaper = vdwtaper * vdwcut
       if (chgtaper .lt. 1.0d0)  chgtaper = chgtaper * chgcut
@@ -175,15 +187,5 @@ c
          dpltaper = big
          mpoletaper = big
       end if
-c
-c     set buffer region limits for pairwise neighbor lists
-c
-      lbuf2 = (0.5d0*lbuffer)**2
-      vbuf2 = (vdwcut+lbuffer)**2
-      cbuf2 = (chgcut+lbuffer)**2
-      mbuf2 = (mpolecut+lbuffer)**2
-      vbufx = (vdwcut+2.0d0*lbuffer)**2
-      cbufx = (chgcut+2.0d0*lbuffer)**2
-      mbufx = (mpolecut+2.0d0*lbuffer)**2
       return
       end

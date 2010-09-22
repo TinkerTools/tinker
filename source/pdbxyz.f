@@ -431,7 +431,7 @@ c
       include 'pdb.i'
       include 'resdue.i'
       include 'sequen.i'
-      integer i,j,k
+      integer i,j,k,m
       integer ityp,nres
       integer jres,kres
       integer start,stop
@@ -550,8 +550,24 @@ c
          icys(i) = 0
       end do
       do i = 1, ndisulf
-         icys(idisulf(1,i)) = 1
-         icys(idisulf(2,i)) = 1
+         j = idisulf(1,i)
+         k = idisulf(2,i)
+         icys(j) = 1
+         icys(k) = 1
+         seqtyp(j) = cyxtyp
+         seqtyp(k) = cyxtyp
+         seq(j) = 'CYX'
+         seq(k) = 'CYX'
+         start = resatm(1,j)
+         stop = resatm(2,j)
+         do m = start, stop
+            resnam(m) = 'CYX'
+         end do
+         start = resatm(1,k)
+         stop = resatm(2,k)
+         do m = start, stop
+            resnam(m) = 'CYX'
+         end do
       end do
 c
 c     set the current atom to be the first atom
@@ -565,7 +581,7 @@ c
          ityp = seqtyp(i)
          start = resatm(1,i)
          stop = resatm(2,i)
-         resname = resnam(start)
+         resname = seq(i)
 c
 c     check that the maximum allowed atoms is not exceeded
 c
@@ -574,14 +590,6 @@ c
    20       format (/,' RIBOSOME  --  The Maximum of',i8,' Atoms',
      &                 ' has been Exceeded')
             call fatal
-         end if
-c
-c     check for a cysteine that should be changed to cystine
-c
-         if (icys(i) .eq. 1) then
-            resname = 'CYX'
-            seqtyp(i) = cyxtyp
-            ityp = cyxtyp
          end if
 c
 c     test for the final residue of a peptide chain
