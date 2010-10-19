@@ -259,7 +259,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -857,7 +857,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -1783,7 +1783,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -2281,7 +2281,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -3314,7 +3314,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)
@@ -4042,7 +4042,7 @@ c
             pscale(i14(j,ii)) = p4scale
             do k = 1, np11(ii)
                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = 0.5d0 * pscale(i14(j,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
             end do
          end do
          do j = 1, n15(ii)

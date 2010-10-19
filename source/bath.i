@@ -25,6 +25,7 @@ c     xnh         position of each chained Nose-Hoover thermostat
 c     vnh         velocity of each chained Nose-Hoover thermostat
 c     qnh         mass for each chained Nose-Hoover thermostat
 c     gnh         coupling between chained Nose-Hoover thermostats
+c     eta         velocity variable for Bussi-Parrinello barostat
 c     volmove     maximum volume move for Monte Carlo barostat (Ang**3)
 c     voltrial    mean number of steps between Monte Carlo moves
 c     isothermal  logical flag governing use of temperature control
@@ -43,7 +44,7 @@ c
       real*8 tautemp,taupres
       real*8 compress,collide
       real*8 xnh,vnh,qnh,gnh
-      real*8 volmove
+      real*8 eta,volmove
       logical isothermal
       logical isobaric
       logical anisotrop
@@ -52,5 +53,5 @@ c
       character*11 thermostat
       common /bath/ kelvin0,kelvin,atmsph,tautemp,taupres,compress,
      &              collide,xnh(maxnose),vnh(maxnose),qnh(maxnose),
-     &              gnh(maxnose),volmove,voltrial,isothermal,isobaric,
-     &              anisotrop,thermostat,barostat,volscale
+     &              gnh(maxnose),eta,volmove,voltrial,isothermal,
+     &              isobaric,anisotrop,thermostat,barostat,volscale

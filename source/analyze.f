@@ -562,6 +562,7 @@ c
      &                       3x,'Eps 1-4',3x,'Reduction',/)
                end if
                j = class(i)
+               if (vdwindex .eq. 'TYPE')  j = type(i)
                if (rad(j).eq.rad4(j) .and. eps(j).eq.eps4(j)) then
                   radj = rad(j)
                   if (radsiz .eq. 'DIAMETER')  radj = 2.0d0 * radj

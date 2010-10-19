@@ -108,11 +108,6 @@ c
          zt = yab*xbc - xab*ybc
          cosine = xab*xbc + yab*ybc + zab*zbc
          sine = sqrt(max(1.0d0-cosine**2,eps))
-         if (abs(cosine) .ge. 1.0d0) then
-            write (iout,10)  i
-   10       format (/,' XYZATM  --  Undefined Dihedral',
-     &                 ' Angle at Atom',i6)
-         end if
          xt = xt / sine
          yt = yt / sine
          zt = zt / sine
@@ -122,6 +117,25 @@ c
          x(i) = x(ia) + bond * (xu*sin1*cos2 + xt*sin1*sin2 - xab*cos1)
          y(i) = y(ia) + bond * (yu*sin1*cos2 + yt*sin1*sin2 - yab*cos1)
          z(i) = z(ia) + bond * (zu*sin1*cos2 + zt*sin1*sin2 - zab*cos1)
+         if (abs(cosine) .ge. 1.0d0) then
+            cosb = zab
+            sinb = sqrt(xab**2 + yab**2)
+            if (sinb .eq. 0.0d0) then
+               cosg = 1.0d0
+               sing = 0.0d0
+            else
+               cosg = yab / sinb
+               sing = xab / sinb
+            end if
+            xtmp = bond*sin1
+            ztmp = rab - bond*cos1
+            x(i) = x(ib) + xtmp*cosg + ztmp*sing*sinb
+            y(i) = y(ib) - xtmp*sing + ztmp*cosg*sinb
+            z(i) = z(ib) + ztmp*cosb
+            write (iout,10)  i
+   10       format (/,' XYZATM  --  Warning, Undefined Dihedral',
+     &                 ' Angle at Atom',i6)
+         end if
 c
 c     general case where the second angle is a bond angle
 c
@@ -147,8 +161,8 @@ c
          sine2 = max(1.0d0-cosine**2,eps)
          if (abs(cosine) .ge. 1.0d0) then
             write (iout,20)  i
-   20       format (/,' XYZATM  --  Defining Atoms Colinear',
-     &                 ' at Atom',i6)
+   20       format (/,' XYZATM  --  Warning, Collinear Defining',
+     &                 ' Atoms at Atom',i6)
          end if
          a = (-cos2 - cosine*cos1) / sine2
          b = (cos1 + cosine*cos2) / sine2
@@ -163,7 +177,7 @@ c
             c = 0.0d0
             if (debug) then
                write (iout,30)  ia
-   30          format (/,' XYZATM  --  Sum of Bond Angles',
+   30          format (/,' XYZATM  --  Warning, Sum of Bond Angles',
      &                    ' Too Large at Atom',i6)
             end if
          else

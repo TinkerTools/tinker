@@ -77,6 +77,7 @@ c
       anisotrop = .false.
       taupres = 2.0d0
       compress = 0.000046d0
+      eta = 0.0d0
       voltrial = 20
       volmove = 100.0d0
       volscale = 'ATOMIC'

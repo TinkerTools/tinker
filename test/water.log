@@ -18,11 +18,11 @@
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
 
-    Atom         Points        Potential        Target        RMS Diff
+   Structure   Atom      Points      Potential        Target        RMS Diff
 
-       1          1942          -8.8521        -8.9326         0.5959
-       2          1211           6.9490         7.2227         0.4763
-       3          1204           6.9194         7.1950         0.4805
+        1        1        1942        -8.8521        -8.9326         0.5959
+        1        2        1211         6.9490         7.2227         0.4763
+        1        3        1204         6.9194         7.1950         0.4805
 
  Electrostatic Potential over all Grid Points :
 

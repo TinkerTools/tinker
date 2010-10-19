@@ -86,7 +86,7 @@ c
    20    format (/,' Enter Number of Steps in the Initial Set',
      &              ' [100] :  ',$)
          read (input,30)  maxstep
-   30    format (f20.0)
+   30    format (i10)
       end if
       if (maxstep .le. 0)  maxstep = 100
 c

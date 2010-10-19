@@ -1647,7 +1647,7 @@ c
 c
 c     MMFF bond charge increment parameters
 c
-         else if (keyword(1:4) .eq. 'BCI ') then
+         else if (keyword(1:10) .eq. 'MMFF94BCI ') then
             ia = 0
             ib = 0
             cg = 1000.0d0
@@ -1667,7 +1667,7 @@ c
 c
 c     MMFF partial bond charge increment parameters
 c
-         else if (keyword(1:5) .eq. 'PBCI ') then
+         else if (keyword(1:11) .eq. 'MMFF94PBCI ') then
             ia = 0
             string = record(next:120)
             read (string,*,err=590,end=590)  ia,cg,factor
@@ -1679,7 +1679,7 @@ c
 c
 c     MMFF atom class equivalency parameters
 c
-         else if (keyword(1:3) .eq. 'EQ ') then
+         else if (keyword(1:12) .eq. 'MMFF94EQUIV ') then
             string = record(next:120)
             ia = 1000
             ib = 1000
@@ -1735,7 +1735,7 @@ c
             lin(ia) = ih
             sbmb(ia) = ii
 c
-c     MMFF aromatic parameters
+c     MMFF aromatic ion parameters
 c
          else if (keyword(1:11) .eq. 'MMFF94AROM ') then
             string = record(next:120)

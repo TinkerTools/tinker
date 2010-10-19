@@ -352,9 +352,12 @@ c
       character*120 record
 c
 c
-c     store first multipole component on line of GDMA output
+c     store first multipole components on a line of GDMA output
 c
-      if (record(20:23) .eq. 'Q00 ') then
+      if (record(6:8) .eq. 'Q0 ') then
+         read (record(13:23),*)  mp(i)
+         call match2 (i,record)
+      else if (record(20:23) .eq. 'Q00 ') then
          read (record(26:36),*)  mp(i)
       else if (record(20:23) .eq. 'Q10 ') then
          read (record(26:36),*)  dpz(i)
@@ -404,9 +407,12 @@ c
       character*120 record
 c
 c
-c     store second multipole component on line of GDMA output
+c     store second multipole component on a line of GDMA output
 c
-      if (record(39:42) .eq. 'Q11c') then
+      if (record(29:31) .eq. 'Q1 ') then
+         read (record(36:46),*)  dpz(i)
+         call match3 (i,record)
+      else if (record(39:42) .eq. 'Q11c') then
          read (record(45:55),*)  dpx(i)
          call match3 (i,record)
       else if (record(39:42) .eq. 'Q11s') then
@@ -448,9 +454,11 @@ c
       character*120 record
 c
 c
-c     store third multipole component on line of GDMA output
+c     store third multipole component on a line of GDMA output
 c
-      if (record(58:61) .eq. 'Q11s') then
+      if (record(52:54) .eq. 'Q2 ') then
+         read (record(59:69),*)  q20(i)         
+      else if (record(58:61) .eq. 'Q11s') then
          read (record(64:74),*)  dpy(i)
       else if (record(58:61) .eq. 'Q21s') then
          read (record(64:74),*)  q21s(i)
@@ -2234,7 +2242,7 @@ c
             end do
             write (ikey,180)  ipole(i),polarity(i),thole(i),
      &                        (pgrp(j,i),j=1,k)
-  180       format ('polarize',2x,i5,9x,2f11.3,3x,20i5)
+  180       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
          end do
       end if
       close (unit=ikey)
