@@ -1,0 +1,25 @@
+
+                -----------------------------------------------
+                Autoconf configure Files for the TINKER Package
+                -----------------------------------------------
+
+      To make the build a bit easier, I have created two files to build
+      TINKER with GNU autotools, just copy Makefile.am and configure.ac
+      to the TINKER source directory and run:
+
+      $ autoreconf -i -v
+      $ ./configure
+      $ make
+
+      Cheers,
+      Christoph Junghans
+
+      -- 
+      Dipl.-Phys. Christoph Junghans
+      Max Planck Institute for Polymer Research
+      Theory Group
+      PO Box 3148
+      D 55021 Mainz, Germany
+      Phone: +49 6131 379 335
+      Web: http://www.mpip-mainz.mpg.de/~junghans
+
