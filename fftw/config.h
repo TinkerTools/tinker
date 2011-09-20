@@ -39,7 +39,7 @@
 /* #undef FC_DUMMY_MAIN_EQ_F77 */
 
 /* C compiler name and flags */
-#define FFTW_CC "pgcc -Masmkeyword -O3 -D_THREAD_SAFE "
+#define FFTW_CC "icc -std=gnu99 -O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE "
 
 /* Define to enable extra FFTW debugging code. */
 /* #undef FFTW_DEBUG */
@@ -264,10 +264,10 @@
 #define HAVE_XMMINTRIN_H 1
 
 /* Define to 1 if you have the `_mm_free' function. */
-/* #undef HAVE__MM_FREE */
+#define HAVE__MM_FREE 1
 
 /* Define to 1 if you have the `_mm_malloc' function. */
-/* #undef HAVE__MM_MALLOC */
+#define HAVE__MM_MALLOC 1
 
 /* Define if you have the UNICOS _rtc() intrinsic. */
 /* #undef HAVE__RTC */

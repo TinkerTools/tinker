@@ -14,6 +14,7 @@ radiustype              SIGMA
 radiussize              DIAMETER
 epsilonrule             GEOMETRIC
 torsionunit             0.5
+imptorunit              0.5
 vdw-14-scale            2.0
 chg-14-scale            2.0
 dielectric              1.0

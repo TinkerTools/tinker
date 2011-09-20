@@ -183,8 +183,8 @@ c
       allocate (q(nvar))
       allocate (r(nvar))
       allocate (h0(nvar))
-      allocate (s(nvar,msav))
-      allocate (y(nvar,msav))
+      allocate (s(nvar,maxsav))
+      allocate (y(nvar,maxsav))
 c
 c     evaluate the function and get the initial gradient
 c

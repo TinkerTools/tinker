@@ -25,6 +25,7 @@ c
       include 'deriv.i'
       include 'energi.i'
       include 'inter.i'
+      include 'iounit.i'
       include 'potent.i'
       include 'rigid.i'
       include 'vdwpot.i'
@@ -182,5 +183,14 @@ c
             derivs(j,i) = desum(j,i)
          end do
       end do
+c
+c     check for an illegal value for the total energy
+c
+      if (isnan(esum)) then
+         write (iout,10)
+   10    format (/,' GRADIENT  --  Illegal Value for the Total',
+     &              ' Potential Energy')
+         call fatal
+      end if
       return
       end

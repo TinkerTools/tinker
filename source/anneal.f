@@ -32,9 +32,8 @@ c
       include 'solute.i'
       include 'usage.i'
       include 'warp.i'
-      integer i,nequil
+      integer i,nequil,next
       integer nstep,istep
-      integer next,modstep
       real*8 logmass,factor
       real*8 ratio,sigmoid
       real*8 dt,dtdump
@@ -238,8 +237,9 @@ c
          else
             call beeman (istep,dt)
          end if
-         modstep = mod(istep,iprint)
-         if (nuse.eq.n .and. modstep.eq.0)  call mdrest
+         if (irest.gt.0 .and. nuse.eq.n) then
+            if (mod(istep,irest) .eq. 0)  call mdrest
+         end if
       end do
 c
 c     start the cooling phase from the end of equilibration phase
@@ -288,10 +288,11 @@ c
 c
 c     remove center of mass translation and rotation if needed
 c
-         modstep = mod(istep,iprint)
-         if (modstep.eq.0 .and. nuse.eq.n) then
-            if (integrate.ne.'STOCHASTIC' .and.
-     &          thermostat.ne.'ANDERSEN')  call mdrest
+         if (irest.gt.0 .and. nuse.eq.n) then
+            if (mod(istep,irest) .eq. 0) then
+               if (integrate.ne.'STOCHASTIC' .and.
+     &             thermostat.ne.'ANDERSEN')  call mdrest
+            end if
          end if
       end do
 c

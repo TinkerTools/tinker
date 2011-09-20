@@ -5793,7 +5793,7 @@ c
       real*8, allocatable :: cphi(:,:)
       real*8, allocatable :: qgrip(:,:,:,:)
 c
-c     derivative indices into the fphi and fdip_phi arrays
+c     derivative indices into the fphi and fphidp arrays
 c
       data deriv1  / 2, 5,  8,  9, 11, 16, 18, 14, 15, 20 /
       data deriv2  / 3, 8,  6, 10, 14, 12, 19, 16, 20, 17 /
@@ -5955,6 +5955,94 @@ c
          qfac(k1,k2,k3) = expterm
       end do
 c
+c     assign just the induced multipoles to PME grid
+c     and perform the 3-D FFT forward transformation
+c
+      if (use_polar .and. poltyp.eq.'DIRECT') then
+         do i = 1, npole
+            do j = 1, 10
+               cmp(j,i) = 0.0d0
+            end do
+            do j = 2, 4
+               cmp(j,i) = uinp(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgrip(1,i,j,k) = qgrid(1,i,j,k)
+                  qgrip(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = uind(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do i = 1, npole
+            cmp(1,i) = rpole(1,i)
+            cmp(2,i) = rpole(2,i)
+            cmp(3,i) = rpole(3,i)
+            cmp(4,i) = rpole(4,i)
+            cmp(5,i) = rpole(5,i)
+            cmp(6,i) = rpole(9,i)
+            cmp(7,i) = rpole(13,i)
+            cmp(8,i) = 2.0d0 * rpole(6,i)
+            cmp(9,i) = 2.0d0 * rpole(7,i)
+            cmp(10,i) = 2.0d0 * rpole(10,i)
+         end do
+c
+c     make the scalar summation over reciprocal lattice
+c
+         do i = 1, ntot-1
+            k3 = i/nff + 1
+            j = i - (k3-1)*nff
+            k2 = j/nfft1 + 1
+            k1 = j - (k2-1)*nfft1 + 1
+            m1 = k1 - 1
+            m2 = k2 - 1
+            m3 = k3 - 1
+            if (k1 .gt. nf1)  m1 = m1 - nfft1
+            if (k2 .gt. nf2)  m2 = m2 - nfft2
+            if (k3 .gt. nf3)  m3 = m3 - nfft3
+            r1 = dble(m1)
+            r2 = dble(m2)
+            r3 = dble(m3)
+            h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+            h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+            h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+            hsq = h1*h1 + h2*h2 + h3*h3
+            term = -pterm * hsq
+            expterm = 0.0d0
+            if (term .gt. -50.0d0) then
+               denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+               expterm = exp(term) / denom
+               if (.not. use_bounds) then
+                  expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+               else if (octahedron) then
+                  if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+               end if
+               struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
+     &                     + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
+               eterm = 0.5d0 * electric * expterm * struc2
+               vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
+               vxx = vxx - h1*h1*vterm + eterm
+               vyx = vyx - h2*h1*vterm
+               vzx = vzx - h3*h1*vterm
+               vyy = vyy - h2*h2*vterm + eterm
+               vzy = vzy - h3*h2*vterm
+               vzz = vzz - h3*h3*vterm + eterm
+            end if
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (qgrip)
@@ -6057,7 +6145,7 @@ c
          dem(3,i) = dem(3,i) + frc(3,i)
       end do
 c
-c     permanent torque contribution to the internal virial
+c     permanent multipole contribution to the internal virial
 c
       do i = 1, npole
          vxx = vxx - cmp(2,i)*cphi(2,i) - 2.0d0*cmp(5,i)*cphi(5,i)
@@ -6224,7 +6312,7 @@ c
             dep(3,i) = dep(3,i) + frc(3,i)
          end do
 c
-c     induced torque contribution to the internal virial
+c     induced dipole contribution to the internal virial
 c
          do i = 1, npole
             do j = 2, 4
@@ -6276,6 +6364,17 @@ c
      &                     +cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
             vzz = vzz - 2.0d0*cmp(7,i)*cphi(7,i) - cmp(9,i)*cphi(9,i)
      &                - cmp(10,i)*cphi(10,i)
+            if (poltyp .eq. 'DIRECT') then
+               vxx = vxx + 0.5d0*(cphid(2)*uinp(1,i)+cphip(2)*uind(1,i))
+               vyx = vyx + 0.25d0*(cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
+     &                           +cphid(3)*uinp(1,i)+cphip(3)*uind(1,i))
+               vzx = vzx + 0.25d0*(cphid(2)*uinp(3,i)+cphip(2)*uind(3,i)
+     &                           +cphid(4)*uinp(1,i)+cphip(4)*uind(1,i))
+               vyy = vyy + 0.5d0*(cphid(3)*uinp(2,i)+cphip(3)*uind(2,i))
+               vzy = vzy + 0.25d0*(cphid(3)*uinp(3,i)+cphip(3)*uind(3,i)
+     &                           +cphid(4)*uinp(2,i)+cphip(4)*uind(2,i))
+               vzz = vzz + 0.5d0*(cphid(4)*uinp(3,i)+cphip(4)*uind(3,i))
+            end if
          end do
       end if
 c

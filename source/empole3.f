@@ -1066,6 +1066,14 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
+c     compute the reciprocal space part of the Ewald summation
+c
+      call emrecip
+c
+c     compute the real space part of the Ewald summation
+c
+      call ereal3c (eintra)
+c
 c     compute the self-energy part of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
@@ -1129,14 +1137,6 @@ c
          em = em + term*(xd*xd+yd*yd+zd*zd)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
       end if
-c
-c     compute the reciprocal space part of the Ewald summation
-c
-      call emrecip
-c
-c     compute the real space part of the Ewald summation
-c
-      call ereal3c (eintra)
 c
 c     intermolecular energy is total minus intramolecular part
 c
@@ -1780,6 +1780,14 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
+c     compute the reciprocal space part of the Ewald summation
+c
+      call emrecip
+c
+c     compute the real space part of the Ewald summation
+c
+      call ereal3d (eintra)
+c
 c     compute the self-energy part of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
@@ -1843,14 +1851,6 @@ c
          em = em + term*(xd*xd+yd*yd+zd*zd)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
       end if
-c
-c     compute the reciprocal space part of the Ewald summation
-c
-      call emrecip
-c
-c     compute the real space part of the Ewald summation
-c
-      call ereal3d (eintra)
 c
 c     intermolecular energy is total minus intramolecular part
 c

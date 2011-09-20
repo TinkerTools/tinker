@@ -3,362 +3,362 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##            (Windows/Cygwin/GNU g77 Version)            ##
+#  ##          (Windows/Cygwin/GNU gfortran Version)         ##
 #  ##                                                        ##
 #  ############################################################
 #
 #
-g77 -c -O3 -ffast-math -mno-cygwin active.f
-g77 -c -O3 -ffast-math -mno-cygwin alchemy.f
-g77 -c -O3 -ffast-math -mno-cygwin analysis.f
-g77 -c -O3 -ffast-math -mno-cygwin analyze.f
-g77 -c -O3 -ffast-math -mno-cygwin angles.f
-g77 -c -O3 -ffast-math -mno-cygwin anneal.f
-g77 -c -O3 -ffast-math -mno-cygwin archive.f
-g77 -c -O3 -ffast-math -mno-cygwin attach.f
-g77 -c -O3 -ffast-math -mno-cygwin basefile.f
-g77 -c -O3 -ffast-math -mno-cygwin beeman.f
-g77 -c -O3 -ffast-math -mno-cygwin bicubic.f
-g77 -c -O3 -ffast-math -mno-cygwin bitors.f
-g77 -c -O3 -ffast-math -mno-cygwin bonds.f
-g77 -c -O3 -ffast-math -mno-cygwin born.f
-g77 -c -O3 -ffast-math -mno-cygwin bounds.f
-g77 -c -O3 -ffast-math -mno-cygwin calendar.f
-g77 -c -O3 -ffast-math -mno-cygwin center.f
-g77 -c -O3 -ffast-math -mno-cygwin chkpole.f
-g77 -c -O3 -ffast-math -mno-cygwin chkring.f
-g77 -c -O3 -ffast-math -mno-cygwin chkxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin cholesky.f
-g77 -c -O3 -ffast-math -mno-cygwin clock.f
-g77 -c -O3 -ffast-math -mno-cygwin cluster.f
-g77 -c -O3 -ffast-math -mno-cygwin column.f
-g77 -c -O3 -ffast-math -mno-cygwin command.f
-g77 -c -O3 -ffast-math -mno-cygwin connect.f
-g77 -c -O3 -ffast-math -mno-cygwin connolly.f
-g77 -c -O3 -ffast-math -mno-cygwin control.f
-g77 -c -O3 -ffast-math -mno-cygwin correlate.f
-g77 -c -O3 -ffast-math -mno-cygwin crystal.f
-g77 -c -O3 -ffast-math -mno-cygwin cspline.f
-g77 -c -O3 -ffast-math -mno-cygwin cutoffs.f
-g77 -c -O3 -ffast-math -mno-cygwin deflate.f
-g77 -c -O3 -ffast-math -mno-cygwin delete.f
-g77 -c -O3 -ffast-math -mno-cygwin diagq.f
-g77 -c -O3 -ffast-math -mno-cygwin diffeq.f
-g77 -c -O3 -ffast-math -mno-cygwin diffuse.f
-g77 -c -O3 -ffast-math -mno-cygwin distgeom.f
-g77 -c -O3 -ffast-math -mno-cygwin document.f
-g77 -c -O3 -ffast-math -mno-cygwin dynamic.f
-g77 -c -O3 -ffast-math -mno-cygwin eangang.f
-g77 -c -O3 -ffast-math -mno-cygwin eangang1.f
-g77 -c -O3 -ffast-math -mno-cygwin eangang2.f
-g77 -c -O3 -ffast-math -mno-cygwin eangang3.f
-g77 -c -O3 -ffast-math -mno-cygwin eangle.f
-g77 -c -O3 -ffast-math -mno-cygwin eangle1.f
-g77 -c -O3 -ffast-math -mno-cygwin eangle2.f
-g77 -c -O3 -ffast-math -mno-cygwin eangle3.f
-g77 -c -O3 -ffast-math -mno-cygwin ebond.f
-g77 -c -O3 -ffast-math -mno-cygwin ebond1.f
-g77 -c -O3 -ffast-math -mno-cygwin ebond2.f
-g77 -c -O3 -ffast-math -mno-cygwin ebond3.f
-g77 -c -O3 -ffast-math -mno-cygwin ebuck.f
-g77 -c -O3 -ffast-math -mno-cygwin ebuck1.f
-g77 -c -O3 -ffast-math -mno-cygwin ebuck2.f
-g77 -c -O3 -ffast-math -mno-cygwin ebuck3.f
-g77 -c -O3 -ffast-math -mno-cygwin echarge.f
-g77 -c -O3 -ffast-math -mno-cygwin echarge1.f
-g77 -c -O3 -ffast-math -mno-cygwin echarge2.f
-g77 -c -O3 -ffast-math -mno-cygwin echarge3.f
-g77 -c -O3 -ffast-math -mno-cygwin echgdpl.f
-g77 -c -O3 -ffast-math -mno-cygwin echgdpl1.f
-g77 -c -O3 -ffast-math -mno-cygwin echgdpl2.f
-g77 -c -O3 -ffast-math -mno-cygwin echgdpl3.f
-g77 -c -O3 -ffast-math -mno-cygwin edipole.f
-g77 -c -O3 -ffast-math -mno-cygwin edipole1.f
-g77 -c -O3 -ffast-math -mno-cygwin edipole2.f
-g77 -c -O3 -ffast-math -mno-cygwin edipole3.f
-g77 -c -O3 -ffast-math -mno-cygwin egauss.f
-g77 -c -O3 -ffast-math -mno-cygwin egauss1.f
-g77 -c -O3 -ffast-math -mno-cygwin egauss2.f
-g77 -c -O3 -ffast-math -mno-cygwin egauss3.f
-g77 -c -O3 -ffast-math -mno-cygwin egeom.f
-g77 -c -O3 -ffast-math -mno-cygwin egeom1.f
-g77 -c -O3 -ffast-math -mno-cygwin egeom2.f
-g77 -c -O3 -ffast-math -mno-cygwin egeom3.f
-g77 -c -O3 -ffast-math -mno-cygwin ehal.f
-g77 -c -O3 -ffast-math -mno-cygwin ehal1.f
-g77 -c -O3 -ffast-math -mno-cygwin ehal2.f
-g77 -c -O3 -ffast-math -mno-cygwin ehal3.f
-g77 -c -O3 -ffast-math -mno-cygwin eimprop.f
-g77 -c -O3 -ffast-math -mno-cygwin eimprop1.f
-g77 -c -O3 -ffast-math -mno-cygwin eimprop2.f
-g77 -c -O3 -ffast-math -mno-cygwin eimprop3.f
-g77 -c -O3 -ffast-math -mno-cygwin eimptor.f
-g77 -c -O3 -ffast-math -mno-cygwin eimptor1.f
-g77 -c -O3 -ffast-math -mno-cygwin eimptor2.f
-g77 -c -O3 -ffast-math -mno-cygwin eimptor3.f
-g77 -c -O3 -ffast-math -mno-cygwin elj.f
-g77 -c -O3 -ffast-math -mno-cygwin elj1.f
-g77 -c -O3 -ffast-math -mno-cygwin elj2.f
-g77 -c -O3 -ffast-math -mno-cygwin elj3.f
-g77 -c -O3 -ffast-math -mno-cygwin embed.f
-g77 -c -O3 -ffast-math -mno-cygwin emetal.f
-g77 -c -O3 -ffast-math -mno-cygwin emetal1.f
-g77 -c -O3 -ffast-math -mno-cygwin emetal2.f
-g77 -c -O3 -ffast-math -mno-cygwin emetal3.f
-g77 -c -O3 -ffast-math -mno-cygwin emm3hb.f
-g77 -c -O3 -ffast-math -mno-cygwin emm3hb1.f
-g77 -c -O3 -ffast-math -mno-cygwin emm3hb2.f
-g77 -c -O3 -ffast-math -mno-cygwin emm3hb3.f
-g77 -c -O3 -ffast-math -mno-cygwin empole.f
-g77 -c -O3 -ffast-math -mno-cygwin empole1.f
-g77 -c -O3 -ffast-math -mno-cygwin empole2.f
-g77 -c -O3 -ffast-math -mno-cygwin empole3.f
-g77 -c -O3 -ffast-math -mno-cygwin energy.f
-g77 -c -O3 -ffast-math -mno-cygwin eopbend.f
-g77 -c -O3 -ffast-math -mno-cygwin eopbend1.f
-g77 -c -O3 -ffast-math -mno-cygwin eopbend2.f
-g77 -c -O3 -ffast-math -mno-cygwin eopbend3.f
-g77 -c -O3 -ffast-math -mno-cygwin eopdist.f
-g77 -c -O3 -ffast-math -mno-cygwin eopdist1.f
-g77 -c -O3 -ffast-math -mno-cygwin eopdist2.f
-g77 -c -O3 -ffast-math -mno-cygwin eopdist3.f
-g77 -c -O3 -ffast-math -mno-cygwin epitors.f
-g77 -c -O3 -ffast-math -mno-cygwin epitors1.f
-g77 -c -O3 -ffast-math -mno-cygwin epitors2.f
-g77 -c -O3 -ffast-math -mno-cygwin epitors3.f
-g77 -c -O3 -ffast-math -mno-cygwin erf.f
-g77 -c -O3 -ffast-math -mno-cygwin erxnfld.f
-g77 -c -O3 -ffast-math -mno-cygwin erxnfld1.f
-g77 -c -O3 -ffast-math -mno-cygwin erxnfld2.f
-g77 -c -O3 -ffast-math -mno-cygwin erxnfld3.f
-g77 -c -O3 -ffast-math -mno-cygwin esolv.f
-g77 -c -O3 -ffast-math -mno-cygwin esolv1.f
-g77 -c -O3 -ffast-math -mno-cygwin esolv2.f
-g77 -c -O3 -ffast-math -mno-cygwin esolv3.f
-g77 -c -O3 -ffast-math -mno-cygwin estrbnd.f
-g77 -c -O3 -ffast-math -mno-cygwin estrbnd1.f
-g77 -c -O3 -ffast-math -mno-cygwin estrbnd2.f
-g77 -c -O3 -ffast-math -mno-cygwin estrbnd3.f
-g77 -c -O3 -ffast-math -mno-cygwin estrtor.f
-g77 -c -O3 -ffast-math -mno-cygwin estrtor1.f
-g77 -c -O3 -ffast-math -mno-cygwin estrtor2.f
-g77 -c -O3 -ffast-math -mno-cygwin estrtor3.f
-g77 -c -O3 -ffast-math -mno-cygwin etors.f
-g77 -c -O3 -ffast-math -mno-cygwin etors1.f
-g77 -c -O3 -ffast-math -mno-cygwin etors2.f
-g77 -c -O3 -ffast-math -mno-cygwin etors3.f
-g77 -c -O3 -ffast-math -mno-cygwin etortor.f
-g77 -c -O3 -ffast-math -mno-cygwin etortor1.f
-g77 -c -O3 -ffast-math -mno-cygwin etortor2.f
-g77 -c -O3 -ffast-math -mno-cygwin etortor3.f
-g77 -c -O3 -ffast-math -mno-cygwin eurey.f
-g77 -c -O3 -ffast-math -mno-cygwin eurey1.f
-g77 -c -O3 -ffast-math -mno-cygwin eurey2.f
-g77 -c -O3 -ffast-math -mno-cygwin eurey3.f
-g77 -c -O3 -ffast-math -mno-cygwin evcorr.f
-g77 -c -O3 -ffast-math -mno-cygwin extra.f
-g77 -c -O3 -ffast-math -mno-cygwin extra1.f
-g77 -c -O3 -ffast-math -mno-cygwin extra2.f
-g77 -c -O3 -ffast-math -mno-cygwin extra3.f
-g77 -c -O3 -ffast-math -mno-cygwin fatal.f
-g77 -c -O3 -ffast-math -mno-cygwin fft3d.f
-g77 -c -O3 -ffast-math -mno-cygwin fftpack.f
-g77 -c -O3 -ffast-math -mno-cygwin field.f
-g77 -c -O3 -ffast-math -mno-cygwin final.f
-g77 -c -O3 -ffast-math -mno-cygwin flatten.f
-g77 -c -O3 -ffast-math -mno-cygwin freeunit.f
-g77 -c -O3 -ffast-math -mno-cygwin gda.f
-g77 -c -O3 -ffast-math -mno-cygwin geometry.f
-g77 -c -O3 -ffast-math -mno-cygwin getint.f
-g77 -c -O3 -ffast-math -mno-cygwin getkey.f
-g77 -c -O3 -ffast-math -mno-cygwin getmol2.f
-g77 -c -O3 -ffast-math -mno-cygwin getnumb.f
-g77 -c -O3 -ffast-math -mno-cygwin getpdb.f
-g77 -c -O3 -ffast-math -mno-cygwin getprm.f
-g77 -c -O3 -ffast-math -mno-cygwin getref.f
-g77 -c -O3 -ffast-math -mno-cygwin getstring.f
-g77 -c -O3 -ffast-math -mno-cygwin gettext.f
-g77 -c -O3 -ffast-math -mno-cygwin getword.f
-g77 -c -O3 -ffast-math -mno-cygwin getxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin gradient.f
-g77 -c -O3 -ffast-math -mno-cygwin gradrgd.f
-g77 -c -O3 -ffast-math -mno-cygwin gradrot.f
-g77 -c -O3 -ffast-math -mno-cygwin groups.f
-g77 -c -O3 -ffast-math -mno-cygwin grpline.f
-g77 -c -O3 -ffast-math -mno-cygwin gyrate.f
-g77 -c -O3 -ffast-math -mno-cygwin hessian.f
-g77 -c -O3 -ffast-math -mno-cygwin hessrgd.f
-g77 -c -O3 -ffast-math -mno-cygwin hessrot.f
-g77 -c -O3 -ffast-math -mno-cygwin hybrid.f
-g77 -c -O3 -ffast-math -mno-cygwin image.f
-g77 -c -O3 -ffast-math -mno-cygwin impose.f
-g77 -c -O3 -ffast-math -mno-cygwin induce.f
-g77 -c -O3 -ffast-math -mno-cygwin inertia.f
-g77 -c -O3 -ffast-math -mno-cygwin initial.f
-g77 -c -O3 -ffast-math -mno-cygwin initprm.f
-g77 -c -O3 -ffast-math -mno-cygwin initres.f
-g77 -c -O3 -ffast-math -mno-cygwin initrot.f
-g77 -c -O3 -ffast-math -mno-cygwin insert.f
-g77 -c -O3 -ffast-math -mno-cygwin intedit.f
-g77 -c -O3 -ffast-math -mno-cygwin intxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin invbeta.f
-g77 -c -O3 -ffast-math -mno-cygwin invert.f
-g77 -c -O3 -ffast-math -mno-cygwin jacobi.f
-g77 -c -O3 -ffast-math -mno-cygwin kangang.f
-g77 -c -O3 -ffast-math -mno-cygwin kangle.f
-g77 -c -O3 -ffast-math -mno-cygwin katom.f
-g77 -c -O3 -ffast-math -mno-cygwin kbond.f
-g77 -c -O3 -ffast-math -mno-cygwin kcharge.f
-g77 -c -O3 -ffast-math -mno-cygwin kdipole.f
-g77 -c -O3 -ffast-math -mno-cygwin kewald.f
-g77 -c -O3 -ffast-math -mno-cygwin kgeom.f
-g77 -c -O3 -ffast-math -mno-cygwin kimprop.f
-g77 -c -O3 -ffast-math -mno-cygwin kimptor.f
-g77 -c -O3 -ffast-math -mno-cygwin kinetic.f
-g77 -c -O3 -ffast-math -mno-cygwin kmetal.f
-g77 -c -O3 -ffast-math -mno-cygwin kmpole.f
-g77 -c -O3 -ffast-math -mno-cygwin kopbend.f
-g77 -c -O3 -ffast-math -mno-cygwin kopdist.f
-g77 -c -O3 -ffast-math -mno-cygwin korbit.f
-g77 -c -O3 -ffast-math -mno-cygwin kpitors.f
-g77 -c -O3 -ffast-math -mno-cygwin kpolar.f
-g77 -c -O3 -ffast-math -mno-cygwin ksolv.f
-g77 -c -O3 -ffast-math -mno-cygwin kstrbnd.f
-g77 -c -O3 -ffast-math -mno-cygwin kstrtor.f
-g77 -c -O3 -ffast-math -mno-cygwin ktors.f
-g77 -c -O3 -ffast-math -mno-cygwin ktortor.f
-g77 -c -O3 -ffast-math -mno-cygwin kurey.f
-g77 -c -O3 -ffast-math -mno-cygwin kvdw.f
-g77 -c -O3 -ffast-math -mno-cygwin lattice.f
-g77 -c -O3 -ffast-math -mno-cygwin lbfgs.f
-g77 -c -O3 -ffast-math -mno-cygwin lights.f
-g77 -c -O3 -ffast-math -mno-cygwin makeint.f
-g77 -c -O3 -ffast-math -mno-cygwin makepdb.f
-g77 -c -O3 -ffast-math -mno-cygwin makeref.f
-g77 -c -O3 -ffast-math -mno-cygwin makexyz.f
-g77 -c -O3 -ffast-math -mno-cygwin maxwell.f
-g77 -c -O3 -ffast-math -mno-cygwin mdinit.f
-g77 -c -O3 -ffast-math -mno-cygwin mdrest.f
-g77 -c -O3 -ffast-math -mno-cygwin mdsave.f
-g77 -c -O3 -ffast-math -mno-cygwin mdstat.f
-g77 -c -O3 -ffast-math -mno-cygwin mechanic.f
-g77 -c -O3 -ffast-math -mno-cygwin merge.f
-g77 -c -O3 -ffast-math -mno-cygwin minimize.f
-g77 -c -O3 -ffast-math -mno-cygwin minirot.f
-g77 -c -O3 -ffast-math -mno-cygwin minrigid.f
-g77 -c -O3 -ffast-math -mno-cygwin molecule.f
-g77 -c -O3 -ffast-math -mno-cygwin moments.f
-g77 -c -O3 -ffast-math -mno-cygwin monte.f
-g77 -c -O3 -ffast-math -mno-cygwin mutate.f
-g77 -c -O3 -ffast-math -mno-cygwin nblist.f
-g77 -c -O3 -ffast-math -mno-cygwin newton.f
-g77 -c -O3 -ffast-math -mno-cygwin newtrot.f
-g77 -c -O3 -ffast-math -mno-cygwin nextarg.f
-g77 -c -O3 -ffast-math -mno-cygwin nexttext.f
-g77 -c -O3 -ffast-math -mno-cygwin nspline.f
-g77 -c -O3 -ffast-math -mno-cygwin nucleic.f
-g77 -c -O3 -ffast-math -mno-cygwin number.f
-g77 -c -O3 -ffast-math -mno-cygwin numeral.f
-g77 -c -O3 -ffast-math -mno-cygwin numgrad.f
-g77 -c -O3 -ffast-math -mno-cygwin ocvm.f
-g77 -c -O3 -ffast-math -mno-cygwin openend.f
-g77 -c -O3 -ffast-math -mno-cygwin optimize.f
-g77 -c -O3 -ffast-math -mno-cygwin optirot.f
-g77 -c -O3 -ffast-math -mno-cygwin optrigid.f
-g77 -c -O3 -ffast-math -mno-cygwin optsave.f
-g77 -c -O3 -ffast-math -mno-cygwin orbital.f
-g77 -c -O3 -ffast-math -mno-cygwin orient.f
-g77 -c -O3 -ffast-math -mno-cygwin orthog.f
-g77 -c -O3 -ffast-math -mno-cygwin overlap.f
-g77 -c -O3 -ffast-math -mno-cygwin path.f
-g77 -c -O3 -ffast-math -mno-cygwin pdbxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin piscf.f
-g77 -c -O3 -ffast-math -mno-cygwin pmestuff.f
-g77 -c -O3 -ffast-math -mno-cygwin pmpb.f
-g77 -c -O3 -ffast-math -mno-cygwin polarize.f
-g77 -c -O3 -ffast-math -mno-cygwin poledit.f
-g77 -c -O3 -ffast-math -mno-cygwin polymer.f
-g77 -c -O3 -ffast-math -mno-cygwin potential.f
-g77 -c -O3 -ffast-math -mno-cygwin precise.f
-g77 -c -O3 -ffast-math -mno-cygwin pressure.f
-g77 -c -O3 -ffast-math -mno-cygwin prmedit.f
-g77 -c -O3 -ffast-math -mno-cygwin prmkey.f
-g77 -c -O3 -ffast-math -mno-cygwin promo.f
-g77 -c -O3 -ffast-math -mno-cygwin protein.f
-g77 -c -O3 -ffast-math -mno-cygwin prtdyn.f
-g77 -c -O3 -ffast-math -mno-cygwin prterr.f
-g77 -c -O3 -ffast-math -mno-cygwin prtint.f
-g77 -c -O3 -ffast-math -mno-cygwin prtmol2.f
-g77 -c -O3 -ffast-math -mno-cygwin prtpdb.f
-g77 -c -O3 -ffast-math -mno-cygwin prtprm.f
-g77 -c -O3 -ffast-math -mno-cygwin prtseq.f
-g77 -c -O3 -ffast-math -mno-cygwin prtxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin pss.f
-g77 -c -O3 -ffast-math -mno-cygwin pssrigid.f
-g77 -c -O3 -ffast-math -mno-cygwin pssrot.f
-g77 -c -O3 -ffast-math -mno-cygwin quatfit.f
-g77 -c -O3 -ffast-math -mno-cygwin radial.f
-g77 -c -O3 -ffast-math -mno-cygwin random.f
-g77 -c -O3 -ffast-math -mno-cygwin rattle.f
-g77 -c -O3 -ffast-math -mno-cygwin readdyn.f
-g77 -c -O3 -ffast-math -mno-cygwin readgau.f
-g77 -c -O3 -ffast-math -mno-cygwin readint.f
-g77 -c -O3 -ffast-math -mno-cygwin readmol2.f
-g77 -c -O3 -ffast-math -mno-cygwin readpdb.f
-g77 -c -O3 -ffast-math -mno-cygwin readprm.f
-g77 -c -O3 -ffast-math -mno-cygwin readseq.f
-g77 -c -O3 -ffast-math -mno-cygwin readxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin replica.f
-g77 -c -O3 -ffast-math -mno-cygwin rgdstep.f
-g77 -c -O3 -ffast-math -mno-cygwin rings.f
-g77 -c -O3 -ffast-math -mno-cygwin rmsfit.f
-g77 -c -O3 -ffast-math -mno-cygwin rotlist.f
-g77 -c -O3 -ffast-math -mno-cygwin rotpole.f
-g77 -c -O3 -ffast-math -mno-cygwin saddle.f
-g77 -c -O3 -ffast-math -mno-cygwin scan.f
-g77 -c -O3 -ffast-math -mno-cygwin sdstep.f
-g77 -c -O3 -ffast-math -mno-cygwin search.f
-g77 -c -O3 -ffast-math -mno-cygwin server.f
-g77 -c -O3 -ffast-math -mno-cygwin shakeup.f
-g77 -c -O3 -ffast-math -mno-cygwin sigmoid.f
-g77 -c -O3 -ffast-math -mno-cygwin sktstuff.f
-g77 -c -O3 -ffast-math -mno-cygwin sniffer.f
-g77 -c -O3 -ffast-math -mno-cygwin sort.f
-g77 -c -O3 -ffast-math -mno-cygwin spacefill.f
-g77 -c -O3 -ffast-math -mno-cygwin spectrum.f
-g77 -c -O3 -ffast-math -mno-cygwin square.f
-g77 -c -O3 -ffast-math -mno-cygwin suffix.f
-g77 -c -O3 -ffast-math -mno-cygwin superpose.f
-g77 -c -O3 -ffast-math -mno-cygwin surface.f
-g77 -c -O3 -ffast-math -mno-cygwin surfatom.f
-g77 -c -O3 -ffast-math -mno-cygwin switch.f
-g77 -c -O3 -ffast-math -mno-cygwin sybylxyz.f
-g77 -c -O3 -ffast-math -mno-cygwin temper.f
-g77 -c -O3 -ffast-math -mno-cygwin testgrad.f
-g77 -c -O3 -ffast-math -mno-cygwin testhess.f
-g77 -c -O3 -ffast-math -mno-cygwin testpair.f
-g77 -c -O3 -ffast-math -mno-cygwin testrot.f
-g77 -c -O3 -ffast-math -mno-cygwin timer.f
-g77 -c -O3 -ffast-math -mno-cygwin timerot.f
-g77 -c -O3 -ffast-math -mno-cygwin tncg.f
-g77 -c -O3 -ffast-math -mno-cygwin torphase.f
-g77 -c -O3 -ffast-math -mno-cygwin torque.f
-g77 -c -O3 -ffast-math -mno-cygwin torsfit.f
-g77 -c -O3 -ffast-math -mno-cygwin torsions.f
-g77 -c -O3 -ffast-math -mno-cygwin trimtext.f
-g77 -c -O3 -ffast-math -mno-cygwin unitcell.f
-g77 -c -O3 -ffast-math -mno-cygwin valence.f
-g77 -c -O3 -ffast-math -mno-cygwin verlet.f
-g77 -c -O3 -ffast-math -mno-cygwin version.f
-g77 -c -O3 -ffast-math -mno-cygwin vibbig.f
-g77 -c -O3 -ffast-math -mno-cygwin vibrate.f
-g77 -c -O3 -ffast-math -mno-cygwin vibrot.f
-g77 -c -O3 -ffast-math -mno-cygwin volume.f
-g77 -c -O3 -ffast-math -mno-cygwin xtalfit.f
-g77 -c -O3 -ffast-math -mno-cygwin xtalmin.f
-g77 -c -O3 -ffast-math -mno-cygwin xyzatm.f
-g77 -c -O3 -ffast-math -mno-cygwin xyzedit.f
-g77 -c -O3 -ffast-math -mno-cygwin xyzint.f
-g77 -c -O3 -ffast-math -mno-cygwin xyzpdb.f
-g77 -c -O3 -ffast-math -mno-cygwin xyzsybyl.f
-g77 -c -O3 -ffast-math -mno-cygwin zatom.f
+gfortran -c -O active.f
+gfortran -c -O alchemy.f
+gfortran -c -O analysis.f
+gfortran -c -O analyze.f
+gfortran -c -O angles.f
+gfortran -c -O anneal.f
+gfortran -c -O archive.f
+gfortran -c -O attach.f
+gfortran -c -O basefile.f
+gfortran -c -O beeman.f
+gfortran -c -O bicubic.f
+gfortran -c -O bitors.f
+gfortran -c -O bonds.f
+gfortran -c -O born.f
+gfortran -c -O bounds.f
+gfortran -c -O calendar.f
+gfortran -c -O center.f
+gfortran -c -O chkpole.f
+gfortran -c -O chkring.f
+gfortran -c -O chkxyz.f
+gfortran -c -O cholesky.f
+gfortran -c -O clock.f
+gfortran -c -O cluster.f
+gfortran -c -O column.f
+gfortran -c -O command.f
+gfortran -c -O connect.f
+gfortran -c -O connolly.f
+gfortran -c -O control.f
+gfortran -c -O correlate.f
+gfortran -c -O crystal.f
+gfortran -c -O cspline.f
+gfortran -c -O cutoffs.f
+gfortran -c -O deflate.f
+gfortran -c -O delete.f
+gfortran -c -O diagq.f
+gfortran -c -O diffeq.f
+gfortran -c -O diffuse.f
+gfortran -c -O distgeom.f
+gfortran -c -O document.f
+gfortran -c -O dynamic.f
+gfortran -c -O eangang.f
+gfortran -c -O eangang1.f
+gfortran -c -O eangang2.f
+gfortran -c -O eangang3.f
+gfortran -c -O eangle.f
+gfortran -c -O eangle1.f
+gfortran -c -O eangle2.f
+gfortran -c -O eangle3.f
+gfortran -c -O ebond.f
+gfortran -c -O ebond1.f
+gfortran -c -O ebond2.f
+gfortran -c -O ebond3.f
+gfortran -c -O ebuck.f
+gfortran -c -O ebuck1.f
+gfortran -c -O ebuck2.f
+gfortran -c -O ebuck3.f
+gfortran -c -O echarge.f
+gfortran -c -O echarge1.f
+gfortran -c -O echarge2.f
+gfortran -c -O echarge3.f
+gfortran -c -O echgdpl.f
+gfortran -c -O echgdpl1.f
+gfortran -c -O echgdpl2.f
+gfortran -c -O echgdpl3.f
+gfortran -c -O edipole.f
+gfortran -c -O edipole1.f
+gfortran -c -O edipole2.f
+gfortran -c -O edipole3.f
+gfortran -c -O egauss.f
+gfortran -c -O egauss1.f
+gfortran -c -O egauss2.f
+gfortran -c -O egauss3.f
+gfortran -c -O egeom.f
+gfortran -c -O egeom1.f
+gfortran -c -O egeom2.f
+gfortran -c -O egeom3.f
+gfortran -c -O ehal.f
+gfortran -c -O ehal1.f
+gfortran -c -O ehal2.f
+gfortran -c -O ehal3.f
+gfortran -c -O eimprop.f
+gfortran -c -O eimprop1.f
+gfortran -c -O eimprop2.f
+gfortran -c -O eimprop3.f
+gfortran -c -O eimptor.f
+gfortran -c -O eimptor1.f
+gfortran -c -O eimptor2.f
+gfortran -c -O eimptor3.f
+gfortran -c -O elj.f
+gfortran -c -O elj1.f
+gfortran -c -O elj2.f
+gfortran -c -O elj3.f
+gfortran -c -O embed.f
+gfortran -c -O emetal.f
+gfortran -c -O emetal1.f
+gfortran -c -O emetal2.f
+gfortran -c -O emetal3.f
+gfortran -c -O emm3hb.f
+gfortran -c -O emm3hb1.f
+gfortran -c -O emm3hb2.f
+gfortran -c -O emm3hb3.f
+gfortran -c -O empole.f
+gfortran -c -O empole1.f
+gfortran -c -O empole2.f
+gfortran -c -O empole3.f
+gfortran -c -O energy.f
+gfortran -c -O eopbend.f
+gfortran -c -O eopbend1.f
+gfortran -c -O eopbend2.f
+gfortran -c -O eopbend3.f
+gfortran -c -O eopdist.f
+gfortran -c -O eopdist1.f
+gfortran -c -O eopdist2.f
+gfortran -c -O eopdist3.f
+gfortran -c -O epitors.f
+gfortran -c -O epitors1.f
+gfortran -c -O epitors2.f
+gfortran -c -O epitors3.f
+gfortran -c -O erf.f
+gfortran -c -O erxnfld.f
+gfortran -c -O erxnfld1.f
+gfortran -c -O erxnfld2.f
+gfortran -c -O erxnfld3.f
+gfortran -c -O esolv.f
+gfortran -c -O esolv1.f
+gfortran -c -O esolv2.f
+gfortran -c -O esolv3.f
+gfortran -c -O estrbnd.f
+gfortran -c -O estrbnd1.f
+gfortran -c -O estrbnd2.f
+gfortran -c -O estrbnd3.f
+gfortran -c -O estrtor.f
+gfortran -c -O estrtor1.f
+gfortran -c -O estrtor2.f
+gfortran -c -O estrtor3.f
+gfortran -c -O etors.f
+gfortran -c -O etors1.f
+gfortran -c -O etors2.f
+gfortran -c -O etors3.f
+gfortran -c -O etortor.f
+gfortran -c -O etortor1.f
+gfortran -c -O etortor2.f
+gfortran -c -O etortor3.f
+gfortran -c -O eurey.f
+gfortran -c -O eurey1.f
+gfortran -c -O eurey2.f
+gfortran -c -O eurey3.f
+gfortran -c -O evcorr.f
+gfortran -c -O extra.f
+gfortran -c -O extra1.f
+gfortran -c -O extra2.f
+gfortran -c -O extra3.f
+gfortran -c -O fatal.f
+gfortran -c -O fft3d.f
+gfortran -c -O fftpack.f
+gfortran -c -O field.f
+gfortran -c -O final.f
+gfortran -c -O flatten.f
+gfortran -c -O freeunit.f
+gfortran -c -O gda.f
+gfortran -c -O geometry.f
+gfortran -c -O getint.f
+gfortran -c -O getkey.f
+gfortran -c -O getmol2.f
+gfortran -c -O getnumb.f
+gfortran -c -O getpdb.f
+gfortran -c -O getprm.f
+gfortran -c -O getref.f
+gfortran -c -O getstring.f
+gfortran -c -O gettext.f
+gfortran -c -O getword.f
+gfortran -c -O getxyz.f
+gfortran -c -O gradient.f
+gfortran -c -O gradrgd.f
+gfortran -c -O gradrot.f
+gfortran -c -O groups.f
+gfortran -c -O grpline.f
+gfortran -c -O gyrate.f
+gfortran -c -O hessian.f
+gfortran -c -O hessrgd.f
+gfortran -c -O hessrot.f
+gfortran -c -O hybrid.f
+gfortran -c -O image.f
+gfortran -c -O impose.f
+gfortran -c -O induce.f
+gfortran -c -O inertia.f
+gfortran -c -O initial.f
+gfortran -c -O initprm.f
+gfortran -c -O initres.f
+gfortran -c -O initrot.f
+gfortran -c -O insert.f
+gfortran -c -O intedit.f
+gfortran -c -O intxyz.f
+gfortran -c -O invbeta.f
+gfortran -c -O invert.f
+gfortran -c -O jacobi.f
+gfortran -c -O kangang.f
+gfortran -c -O kangle.f
+gfortran -c -O katom.f
+gfortran -c -O kbond.f
+gfortran -c -O kcharge.f
+gfortran -c -O kdipole.f
+gfortran -c -O kewald.f
+gfortran -c -O kgeom.f
+gfortran -c -O kimprop.f
+gfortran -c -O kimptor.f
+gfortran -c -O kinetic.f
+gfortran -c -O kmetal.f
+gfortran -c -O kmpole.f
+gfortran -c -O kopbend.f
+gfortran -c -O kopdist.f
+gfortran -c -O korbit.f
+gfortran -c -O kpitors.f
+gfortran -c -O kpolar.f
+gfortran -c -O ksolv.f
+gfortran -c -O kstrbnd.f
+gfortran -c -O kstrtor.f
+gfortran -c -O ktors.f
+gfortran -c -O ktortor.f
+gfortran -c -O kurey.f
+gfortran -c -O kvdw.f
+gfortran -c -O lattice.f
+gfortran -c -O lbfgs.f
+gfortran -c -O lights.f
+gfortran -c -O makeint.f
+gfortran -c -O makepdb.f
+gfortran -c -O makeref.f
+gfortran -c -O makexyz.f
+gfortran -c -O maxwell.f
+gfortran -c -O mdinit.f
+gfortran -c -O mdrest.f
+gfortran -c -O mdsave.f
+gfortran -c -O mdstat.f
+gfortran -c -O mechanic.f
+gfortran -c -O merge.f
+gfortran -c -O minimize.f
+gfortran -c -O minirot.f
+gfortran -c -O minrigid.f
+gfortran -c -O molecule.f
+gfortran -c -O moments.f
+gfortran -c -O monte.f
+gfortran -c -O mutate.f
+gfortran -c -O nblist.f
+gfortran -c -O newton.f
+gfortran -c -O newtrot.f
+gfortran -c -O nextarg.f
+gfortran -c -O nexttext.f
+gfortran -c -O nspline.f
+gfortran -c -O nucleic.f
+gfortran -c -O number.f
+gfortran -c -O numeral.f
+gfortran -c -O numgrad.f
+gfortran -c -O ocvm.f
+gfortran -c -O openend.f
+gfortran -c -O optimize.f
+gfortran -c -O optirot.f
+gfortran -c -O optrigid.f
+gfortran -c -O optsave.f
+gfortran -c -O orbital.f
+gfortran -c -O orient.f
+gfortran -c -O orthog.f
+gfortran -c -O overlap.f
+gfortran -c -O path.f
+gfortran -c -O pdbxyz.f
+gfortran -c -O piscf.f
+gfortran -c -O pmestuff.f
+gfortran -c -O pmpb.f
+gfortran -c -O polarize.f
+gfortran -c -O poledit.f
+gfortran -c -O polymer.f
+gfortran -c -O potential.f
+gfortran -c -O precise.f
+gfortran -c -O pressure.f
+gfortran -c -O prmedit.f
+gfortran -c -O prmkey.f
+gfortran -c -O promo.f
+gfortran -c -O protein.f
+gfortran -c -O prtdyn.f
+gfortran -c -O prterr.f
+gfortran -c -O prtint.f
+gfortran -c -O prtmol2.f
+gfortran -c -O prtpdb.f
+gfortran -c -O prtprm.f
+gfortran -c -O prtseq.f
+gfortran -c -O prtxyz.f
+gfortran -c -O pss.f
+gfortran -c -O pssrigid.f
+gfortran -c -O pssrot.f
+gfortran -c -O quatfit.f
+gfortran -c -O radial.f
+gfortran -c -O random.f
+gfortran -c -O rattle.f
+gfortran -c -O readdyn.f
+gfortran -c -O readgau.f
+gfortran -c -O readint.f
+gfortran -c -O readmol2.f
+gfortran -c -O readpdb.f
+gfortran -c -O readprm.f
+gfortran -c -O readseq.f
+gfortran -c -O readxyz.f
+gfortran -c -O replica.f
+gfortran -c -O rgdstep.f
+gfortran -c -O rings.f
+gfortran -c -O rmsfit.f
+gfortran -c -O rotlist.f
+gfortran -c -O rotpole.f
+gfortran -c -O saddle.f
+gfortran -c -O scan.f
+gfortran -c -O sdstep.f
+gfortran -c -O search.f
+gfortran -c -O server.f
+gfortran -c -O shakeup.f
+gfortran -c -O sigmoid.f
+gfortran -c -O sktstuff.f
+gfortran -c -O sniffer.f
+gfortran -c -O sort.f
+gfortran -c -O spacefill.f
+gfortran -c -O spectrum.f
+gfortran -c -O square.f
+gfortran -c -O suffix.f
+gfortran -c -O superpose.f
+gfortran -c -O surface.f
+gfortran -c -O surfatom.f
+gfortran -c -O switch.f
+gfortran -c -O sybylxyz.f
+gfortran -c -O temper.f
+gfortran -c -O testgrad.f
+gfortran -c -O testhess.f
+gfortran -c -O testpair.f
+gfortran -c -O testrot.f
+gfortran -c -O timer.f
+gfortran -c -O timerot.f
+gfortran -c -O tncg.f
+gfortran -c -O torphase.f
+gfortran -c -O torque.f
+gfortran -c -O torsfit.f
+gfortran -c -O torsions.f
+gfortran -c -O trimtext.f
+gfortran -c -O unitcell.f
+gfortran -c -O valence.f
+gfortran -c -O verlet.f
+gfortran -c -O version.f
+gfortran -c -O vibbig.f
+gfortran -c -O vibrate.f
+gfortran -c -O vibrot.f
+gfortran -c -O volume.f
+gfortran -c -O xtalfit.f
+gfortran -c -O xtalmin.f
+gfortran -c -O xyzatm.f
+gfortran -c -O xyzedit.f
+gfortran -c -O xyzint.f
+gfortran -c -O xyzpdb.f
+gfortran -c -O xyzsybyl.f
+gfortran -c -O zatom.f

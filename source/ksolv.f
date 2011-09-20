@@ -1587,7 +1587,7 @@ c
 c     apply an overall scale factor to the solvation radii
 c
       rscale = 1.0d0
-      if (radtyp .eq. 'VDW')  rscale = 1.1d0
+c     if (radtyp .eq. 'VDW')  rscale = 1.1d0
       if (radtyp .eq. 'MACROMODEL')  rscale = 1.15d0
       if (radtyp .eq. 'BONDI')  rscale = 1.21d0
       if (radtyp .eq. 'TOMASI')  rscale = 1.47d0

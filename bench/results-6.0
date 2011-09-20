@@ -100,6 +100,9 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
+ MacBook Pro (OSX 10.6.6, Intel 12.0)        2.53         2/1        76 (1.00)
+ MacBook Pro (OSX 10.6.6, Intel 12.0)        2.53         2/2        49 (1.55)
+ MacBook Pro (OSX 10.6.6, Intel 12.0)        2.53         2/4        41 (1.85)
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/1        76 (1.00)
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2        47 (1.62)
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1        81 (1.00)
@@ -111,6 +114,11 @@
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        34 (2.35)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6        30 (2.67)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8        26 (3.08)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/1        75 (1.00)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/4        30 (2.50)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/8        21 (3.57)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/12       21 (3.57)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/24       20 (3.75)
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/1       101 (1.00)
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/2        62 (1.63)
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/4        45 (2.24)
@@ -131,6 +139,9 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
+ MacBook Pro (OSX 10.6.6, Intel 12.0)        2.53         2/1       652 (1.00)
+ MacBook Pro (OSX 10.6.6, Intel 12.0)        2.53         2/2       390 (1.67)
+ MacBook Pro (OSX 10.6.6, Intel 12.0)        2.53         2/4       325 (2.01)
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/1       616 (1.00)
  MacBook Pro (OSX 10.6.4, Intel 11.1)        2.93         2/2       341 (1.83)
  MacBook Pro (OSX 10.6.4, PGI 10.8)          2.93         2/1       750 (1.00)
@@ -142,6 +153,11 @@
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4       228 (2.87)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/6       183 (3.57)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/8       153 (4.27)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/1       630 (1.00)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/4       197 (3.20)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/8       132 (4.77)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/12      119 (5.29)
+ Mac Pro (OSX 10.6.4, Intel 12.0)            2.66        12/24       96 (6.56)
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/1       849 (1.00)
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/2       486 (1.75)
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66         4/4       295 (2.88)

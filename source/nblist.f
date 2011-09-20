@@ -365,7 +365,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "clist" performs and update or a complete rebuild of the
+c     "clist" performs an update or a complete rebuild of the
 c     electrostatic neighbor lists for partial charges
 c
 c
@@ -675,7 +675,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "mlist" performs and update or a complete rebuild of the
+c     "mlist" performs an update or a complete rebuild of the
 c     electrostatic neighbor lists for atomic multipoles
 c
 c
@@ -997,7 +997,7 @@ c
 c
 c
 c     for orthogonal lattice, find the desired image directly;
-c     too save time, this only returns the correct magnitudes
+c     to save time, this only returns the correct magnitudes
 c
       if (orthogonal) then
          xr = abs(xr)

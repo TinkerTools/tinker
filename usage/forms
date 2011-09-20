@@ -13,6 +13,8 @@
   David Albert           Tufts Univ, Physics               11/25/96   dalbert@tufts.edu
   Sebastion Alberti      Univ Nac de Quilmes, Argentina    04/10/01   seba@unq.edu.ar
   Musharaf Ali           Bahbha Atomic Rsch Ctr, Mumbai    08/28/06   musharaf@bare.gov.in
+  Christopher Allen      Univ Alabama, Birmingham          06/20/10   callen79@uab.edu
+  Valmor de Almeida      Oak Ridge National Laboratory     11/18/10   dealmeidav@ornl.gov
   Bjorn Alsberg          Univ Wales, Inst Biol Sci         05/27/97   bka@aber.ac.uk
   Hirofumi Amano         Kyushu Univ, Info Technology      05/01/07   amano@cc.kyushu-u.ac.jp
   Herman Ammon           Univ Maryland, Chem & Biochem     03/12/98   ha3@umail.umd.edu
@@ -226,6 +228,7 @@
   Makoto Ishikawa        Nissan Chemical, Chiba, Japan     03/09/05   ishikawam@nissanchem.co.jp
   Bozhidarka Ivanova     Sofia Univ, Chemistry, Bulgaria   09/26/02   ahbi@chem.uni-sofia.bg
   Petuo Ivanov           Bulgarian Acad Sci, Org Chem      11/27/96   ivanov@bgearn.acad.bg
+  Kensuke Iwahashi       Inst Molecular Sci, Okazaki       03/04/11   iwahashi@ims.ac.jp
   Saul Jacchieri         Hosp A C Camargo, Sao Paulo       07/12/97   jacchier@fcrfvi.ncifcrf.gov
   Henri-Pierre Jacquot   Univ Paul Sabatier, France        03/11/06   hp_jacquot@yahoo.fr
   Jiri Janecek           Brno Univ Tech, Czech Republic    01/30/07   janecek@fch.vutbr.dz
@@ -299,6 +302,7 @@
   Hans-Georg Mack        Univ Tubingen, Inst Phys Chem     03/03/99   hans-georg.mack@uni-tuebingen.de
   Andrei Madami          Menarini Ricerche S.P.A.          03/22/99   menric@tin.it
   Soren Madsen           Univ Arhus, Chemistry             10/22/07   spm@chem.au.dk
+  Chi Mak                Univ Southern Cal, Chemistry      12/06/10   cmak@usc.edu
   Lora Mak               Inst Med Rsch, Zagreb, Croatia    01/16/03   mak@imi.hr
   T. E. Malliavin        IBPC, Lab Biochem Theor, Paris    08/13/01   therese.malliavin@ibpc.fr
   Joao Mano              Univ Minho, Poly Engin, Portugal  03/06/02   jmano@dep.uminho.pt
@@ -425,7 +429,8 @@
   Michael Riedl          Wolfratshausen, Germany           09/17/06   0817121068-0001@t-online.de
   Jordi Robles-Brau      Univ Barcelona, Chemistry         03/12/01   jrobles@qo.ub.es
   Alain Rochefort        CERCA, Montreal                   11/20/97   rochefor@cerca.umontreal.ca
-  Adrian Roitberg        NIST, Biotechnology Div.          05/26/99   adrian@nist.gov
+  Adrian Roitberg        NIST, Biotechnology Div           05/26/99   adrian@nist.gov
+  Ursula Rothlisberger   EPFL, Lausanne                    12/13/10   ursula.rothlisberger@epfl.ch
   Walter Rothschild      Wayne State Univ, Detroit         07/12/06   wrothschild@earthlink.net
   Paul Rowntree          Univ Sherbrooke, Chemistry        11/07/02   paul.rowntree@usherbrooke.ca
   John Routsias          Univ Athens, Pathophysiology      02/06/03   jroutsias@med.uoa.gr
@@ -443,6 +448,7 @@
   Anders Sandstrom       Swedish Univ Agricult Sci, Chem   06/05/06   anders.sandstrom@kemi.slu.se
   Anatole Sarko          SUNY College of ESF, Syracuse     03/13/02   asarko@esf.edu
   Shigeki Sasaki         Kyushu Univ, Fukuoka, Japan       01/16/07   sasaki@phar.kyushu-u.ac.jp
+  Paul Sanders           Univ Alabama, Birmingham          06/20/10   psanders@uab.edu
   Sangeeta Sawant        Univ Pune, Bioinfo Centre         04/09/03   sangeeta@bioinfo.ernet.in
   Robert Scavetta        Mayo Clinic, Scottsdale           02/17/05   scavetta.robert@mayo.edu
   G. Schaftenaar         Univ Nijmegen, CAOS/CAMM          07/08/98   schaft@caos.kun.nl
@@ -466,6 +472,7 @@
   Reza Shojaei           Univ Hasselt, Theochem, Belgium   08/26/10   shojaei81@yahoo.com
   Michael Shokhen        Bar Ilan Univ, Chemistry          07/28/04   shokhen@mail.biu.ac.il
   Thomas Simonson        Ecole Polytechnique, Biology      06/09/10   thomas.simonson@polytechnique.fr
+  Narinder Singh         IIT Ropar, Chemistry              10/26/10   nsingh@iit.rpr.ac.in
   Angelo Sironi          Univ Milano, Chimica Strutturale  04/27/03   angelo.sironi@istm.cnr.it
   V. Sitaramam           Univ Pune, Biotechnology          02/06/00   sitaram@unipune.ernet.in
   Tereza Skalova         Inst Macromol Chem, Prague        04/18/01   skalova@imc.cas.cz
@@ -500,6 +507,7 @@
   Eilmar Thim            Inst Tecnol Aeronautica, Brazil   02/13/06   eilmar@ita.br
   Dominik Thron          Univ Jena, Germany, Phys Chem     03/21/00   cgthdo@uni-jena.de
   Caroline Thurner       Univ Vienna, Inst Theor Chem      08/14/98   caro@asterix.msp.univie.ac.at
+  Shan Xi Tian           Univ Sci & Tech China, Hefei      06/24/11   sxtian@ustc.edu.cn
   Julian Tirado-Rives    Yale Univ, Chemistry              02/20/04   julian.tirado-rives@yale.edu
   Mustafa Toprakci       ONKO-MER Oncology, Istanbul       01/12/05   toprakci@post.com
   Andrew Torda           Univ Hamburg, Bioinformatik       01/29/03   torda@zbh.uni-hamburg.de
@@ -542,13 +550,16 @@
   Hans-Peter Weber       ACCE, ESRF, Grenoble              10/20/05   hpweber@wanadoo.fr
   Gordon Webster         Lexigen Pharm, Billerica, MA      10/23/02   gwebster@lexigenpharm.com
   Noham Weinberg         Univ Cent Fraser Valley, Chem     11/21/01   weinbergn@ucfv.bc.ca
+  Jukka Welling          Tampere, Finland                  02/04/11   j.welling@luukku.com
   Joel Weltman           Brown Univ Med School             08/15/05   joel_weltman@brown.edu
   Adriano Werhli         Unisimas Univ, Brazil             07/10/02   werhli@terra.com.br
   Juergen Wieferink      Fritz-Haber Inst, Berlin          01/26/10   wieferink@fhi-berlin.mpg.de
+  Don Wiff               Retired, Youngstown, OH           04/04/11   don.wiff@wrnms.com
   Mark Wilson            Durham Univ, Durham, UK           07/18/07   mark.durham@durham.ac.uk
   William Wimley         Tulane Univ Med Sch, Biochem      07/14/00   ashish@tulane.edu
   Rob Woods              Univ Georgia, Comp Carb Res Cnt   06/15/04   rwoods@ccrc.uga.edu
   Richard Wu             Natl Inst of Health, Taiwan       08/02/04   richard-wu@msn.com
+  Yanbin Wu              Univ Illinois                     12/15/10   ywu27@uiuc.edu
   Christoph van Wullen   Tech Univ Berlin, Inst Chemie     06/28/01   christoph.vanwullen@tu-berlin.de
   Mao Xiang              Shanghai Inst Plant Physiol       06/16/98   xmao@iris.sipp.ac.cn
   Ami Yang               Cambridge Univ, Pharmacology      09/30/03   aycy2@cam.ac.uk

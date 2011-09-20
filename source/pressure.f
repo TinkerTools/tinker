@@ -123,9 +123,9 @@ c
 c
 c     modify the current periodic box dimension values
 c
-         xbox = scale * xbox
-         ybox = scale * ybox
-         zbox = scale * zbox
+         xbox = xbox * scale
+         ybox = ybox * scale
+         zbox = zbox * scale
 c
 c     propagate the new box dimensions to other lattice values
 c
@@ -136,9 +136,9 @@ c
          if (integrate .ne. 'RIGIDBODY') then
             do i = 1, n
                if (use(i)) then
-                  x(i) = scale * x(i)
-                  y(i) = scale * y(i)
-                  z(i) = scale * z(i)
+                  x(i) = x(i) * scale
+                  y(i) = y(i) * scale
+                  z(i) = z(i) * scale
                end if
             end do
 c
@@ -425,9 +425,9 @@ c
          else
             do i = 1, n
                if (use(i)) then
-                  x(i) = scale * x(i)
-                  y(i) = scale * y(i)
-                  z(i) = scale * z(i)
+                  x(i) = x(i) * scale
+                  y(i) = y(i) * scale
+                  z(i) = z(i) * scale
                end if
             end do
          end if
@@ -471,6 +471,160 @@ c
                z(i) = zold(i)
             end do
          end if
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ptest  --  find pressure via finite-difference  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ptest" compares the virial-based value of dE/dV to an estimate
+c     from finite-difference volume changes; also finds the isotropic
+c     pressure via finite-differences
+c
+c     original version written by John Chodera, December 2010
+c
+c
+      subroutine ptest
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bath.i'
+      include 'bound.i'
+      include 'boxes.i'
+      include 'iounit.i'
+      include 'units.i'
+      include 'virial.i'
+      integer i
+      real*8 pres,delta
+      real*8 energy,third
+      real*8 step,scale,term
+      real*8 vold,xboxold
+      real*8 yboxold,zboxold
+      real*8 epos,eneg
+      real*8 dedv_fd
+      real*8 dedv_vir
+      real*8 xold(maxatm)
+      real*8 yold(maxatm)
+      real*8 zold(maxatm)
+c
+c
+c     set relative volume change for finite-differences
+c
+      if (.not. use_bounds)  return
+      delta = 0.00000001d0
+      step = volbox * delta
+c
+c     store original box dimensions and coordinate values
+c
+      xboxold = xbox
+      yboxold = ybox
+      zboxold = zbox
+      vold = volbox
+      do i = 1, n
+         xold(i) = x(i)
+         yold(i) = y(i)
+         zold(i) = z(i)
+      end do
+c
+c     get scale factor to reflect a negative volume change
+c
+      volbox = vold - step
+      third = 1.0d0 / 3.0d0
+      scale = (volbox/vold)**third
+      if (monoclinic) then
+         term = 1.0d0 / beta_sin
+         scale = 1.0d0 + (scale-1.0d0)*term**third
+      else if (triclinic) then
+         term = 1.0d0 / (gamma_sin*gamma_term)
+         scale = 1.0d0 + (scale-1.0d0)*term**third
+      else if (octahedron) then
+         term = 2.0d0
+         scale = 1.0d0 + (scale-1.0d0)*term**third
+      end if
+c
+c     set new box dimensions and coordinate values
+c
+      xbox = xboxold * scale
+      ybox = yboxold * scale
+      zbox = zboxold * scale
+      call lattice
+      do i = 1, n
+         x(i) = xold(i) * scale
+         y(i) = yold(i) * scale
+         z(i) = zold(i) * scale
+      end do
+c
+c     compute potential energy for negative volume change
+c
+      eneg = energy ()
+c
+c     get scale factor to reflect a positive volume change
+c
+      volbox = vold + step
+      third = 1.0d0 / 3.0d0
+      scale = (volbox/vold)**third
+      if (monoclinic) then
+         term = 1.0d0 / beta_sin
+         scale = 1.0d0 + (scale-1.0d0)*term**third
+      else if (triclinic) then
+         term = 1.0d0 / (gamma_sin*gamma_term)
+         scale = 1.0d0 + (scale-1.0d0)*term**third
+      else if (octahedron) then
+         term = 2.0d0
+         scale = 1.0d0 + (scale-1.0d0)*term**third
+      end if
+c
+c     set new box dimensions and coordinate values
+c
+      xbox = xboxold * scale
+      ybox = yboxold * scale
+      zbox = zboxold * scale
+      call lattice
+      do i = 1, n
+         x(i) = xold(i) * scale
+         y(i) = yold(i) * scale
+         z(i) = zold(i) * scale
+      end do
+c
+c     compute potential energy for positive volume change
+c
+      epos = energy ()
+c
+c     restore original box dimensions and coordinate values
+c
+      xbox = xboxold
+      ybox = yboxold
+      zbox = zboxold
+      call lattice   
+      do i = 1, n
+         x(i) = xold(i)
+         y(i) = yold(i)
+         z(i) = zold(i)
+      end do
+c
+c     get virial and finite difference values of dE/dV
+c
+      dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
+      dedv_fd = (epos-eneg) / (2.0d0*delta*volbox)
+      write (iout,10)  dedv_vir,dedv_fd
+   10 format (/,' dE/dV (Virial-based) :',11x,f15.6,' Kcal/mole/A**3',
+     &        /,' dE/dV (Finite Diff) :',12x,f15.6,' Kcal/mole/A**3')
+c
+c     compute the finite-difference isotropic pressure
+c
+      pres = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_fd)
+      if (kelvin .eq. 0.0d0) then
+         write (iout,20)  pres
+   20    format (/,' Pressure (at 0 K) :',14x,f15.3,' Atmospheres')
+      else
+         write (iout,30)  nint(kelvin),pres
+   30    format (/,' Pressure (at',i4,' K) :',12x,f15.3,' Atmospheres')
       end if
       return
       end

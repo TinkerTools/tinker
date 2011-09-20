@@ -7,24 +7,18 @@
  *  @author  Nathan Baker
  *  @brief   Header file for front end auxiliary routines
  *  @ingroup  Frontend
- *  @version $Id: routines.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version $Id: routines.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @attention
  *  @verbatim
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -59,14 +53,14 @@
 #ifndef _APBSROUTINES_H_
 #define _APBSROUTINES_H_
 
-#include "apbscfg.h"
 #include "apbs/apbs.h"  
 #include "apbs/nosh.h"  
 #include "apbs/mgparm.h"  
 #include "apbs/pbeparm.h"  
 #include "apbs/femparm.h"  
 #include "apbs/vparam.h"  
-
+#include "apbs/vgrid.h"
+#include "apbs/vacc.h"
 
 /**
  * @brief  Return code for APBS during failure
@@ -163,6 +157,23 @@ VEXTERNC int loadKappaMaps(NOsh *nosh, Vgrid *kappa[NOSH_MAXMOL]);
 VEXTERNC void killKappaMaps(NOsh *nosh, Vgrid *kappa[NOSH_MAXMOL]);
 
 /**
+ * @brief  Load the potential maps given in NOsh into grid objects
+ * @ingroup  Frontend
+ * @author  David Gohara
+ * @param  nosh  NOsh object with input file information
+ * @param  pot  List of potential maps
+ * @returns  1 if successful, 0 otherwise */
+VEXTERNC int loadPotMaps(NOsh *nosh, Vgrid *pot[NOSH_MAXMOL]);
+
+/**
+ * @brief  Destroy the loaded potential maps 
+ * @ingroup  Frontend
+ * @author  David Gohara
+ * @param  nosh  NOsh object with input file information
+ * @param  pot  List of potential maps */
+VEXTERNC void killPotMaps(NOsh *nosh, Vgrid *pot[NOSH_MAXMOL]);
+
+/**
  * @brief  Load the charge maps given in NOsh into grid objects
  * @ingroup  Frontend
  * @author  Nathan Baker
@@ -213,7 +224,8 @@ VEXTERNC int initMG(
 					Vgrid *kappaMap[NOSH_MAXMOL],  /**< Array of kappa maps  */
 					Vgrid *chargeMap[NOSH_MAXMOL],  /**< Array of charge maps */
 					Vpmgp *pmgp[NOSH_MAXCALC],  /**< Array of MG parameter objects (one for each calc) */
-					Vpmg *pmg[NOSH_MAXCALC]  /**< Array of MG objects (one for each calc) */
+					Vpmg *pmg[NOSH_MAXCALC],  /**< Array of MG objects (one for each calc) */
+					Vgrid *potMap[NOSH_MAXMOL]  /**< Array of potential maps  */
 					);
 
 /**
@@ -467,6 +479,54 @@ VEXTERNC int printApolForce(
  * @author  Nathan Baker and Robert Konecny */
 VEXTERNC void startVio();
 
+/**
+ * @brief  Calculate non-polar energies
+ * @ingroup  Frontend
+ * @author  David Gohara
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int energyAPOL(
+						APOLparm *apolparm, /** APOLparm object */
+						double sasa, /** Solvent accessible surface area */
+						double sav, /** Solvent accessible volume */
+						double atomsasa[], /** Array for SASA per atom **/
+						double atomwcaEnergy[], /** Array for WCA energy per atom **/
+						int numatoms /** Number of atoms (or size of the above arrays) **/
+						);
+
+/**
+ * @brief  Calculate non-polar forces
+ * @ingroup  Frontend
+ * @author  David Gohara
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int forceAPOL(
+					   Vacc *acc,  /**< Accessiblity object */
+					   Vmem *mem,  /**< Memory manager */
+					   APOLparm *apolparm,  /**< Apolar calculation parameter
+					   object */
+					   int *nforce,  /**< Number of atomic forces to calculate 
+					   statements for */
+					   AtomForce **atomForce,  /**< Object for storing atom
+					   forces */
+					   Valist *alist,  /**< Atom list */
+					   Vclist *clist  /**< Cell list for accessibility object */
+					   );
+
+/**
+ * @brief  Upperlevel routine to the non-polar energy and force routines
+ * @ingroup  Frontend
+ * @author  David Gohara
+ * @return  1 if successful, 0 otherwise */
+VEXTERNC int initAPOL(
+					  NOsh *nosh,  /**< Input parameter object */
+					  Vmem *mem,  /**< Memory manager */
+					  Vparam *param,  /**< Atom parameters */
+					  APOLparm *apolparm,  /**< Apolar calculation parameters */
+					  int *nforce,  /**< Number of force calculations */
+					  AtomForce **atomForce,  /**< Atom force storage object */
+					  Valist *alist  /**< Atom list */
+					  );
+
+
 #ifdef HAVE_MC_H
 #include "apbs/vfetk.h"
 
@@ -592,53 +652,6 @@ VEXTERNC int postRefineFE(int icalc, NOsh *nosh, FEMparm *feparm,
  * @param  fetk  FEtk object (with solution)
  * @return  1 if successful, 0 otherwise */
 VEXTERNC int writedataFE(int rank, NOsh *nosh, PBEparm *pbeparm, Vfetk *fetk);
-
-/**
- * @brief  Calculate non-polar energies
- * @ingroup  Frontend
- * @author  David Gohara
- * @return  1 if successful, 0 otherwise */
-VEXTERNC int energyAPOL(
-						APOLparm *apolparm, /** APOLparm object */
-						double sasa, /** Solvent accessible surface area */
-						double sav, /** Solvent accessible volume */
-						double atomsasa[], /** Array for SASA per atom **/
-						double atomwcaEnergy[], /** Array for WCA energy per atom **/
-						int numatoms /** Number of atoms (or size of the above arrays) **/
-						);
-
-/**
- * @brief  Calculate non-polar forces
- * @ingroup  Frontend
- * @author  David Gohara
- * @return  1 if successful, 0 otherwise */
-VEXTERNC int forceAPOL(
-					   Vacc *acc,  /**< Accessiblity object */
-					   Vmem *mem,  /**< Memory manager */
-					   APOLparm *apolparm,  /**< Apolar calculation parameter
-					   object */
-					   int *nforce,  /**< Number of atomic forces to calculate 
-					   statements for */
-					   AtomForce **atomForce,  /**< Object for storing atom
-					   forces */
-					   Valist *alist,  /**< Atom list */
-					   Vclist *clist  /**< Cell list for accessibility object */
-					   );
-
-/**
- * @brief  Upperlevel routine to the non-polar energy and force routines
- * @ingroup  Frontend
- * @author  David Gohara
- * @return  1 if successful, 0 otherwise */
-VEXTERNC int initAPOL(
-					  NOsh *nosh,  /**< Input parameter object */
-					  Vmem *mem,  /**< Memory manager */
-					  Vparam *param,  /**< Atom parameters */
-					  APOLparm *apolparm,  /**< Apolar calculation parameters */
-					  int *nforce,  /**< Number of force calculations */
-					  AtomForce **atomForce,  /**< Atom force storage object */
-					  Valist *alist  /**< Atom list */
-					  );
 
 /**
  * @brief  Load the meshes given in NOsh into geometry objects

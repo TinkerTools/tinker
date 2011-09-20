@@ -7,7 +7,7 @@
  *  @file     mgparm.h
  *  @ingroup  MGparm
  *  @brief    Contains declarations for class MGparm
- *  @version  $Id: mgparm.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: mgparm.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -15,18 +15,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -123,6 +117,8 @@ struct sMGparm {
     int nlev;  /**< Levels in multigrid hierarchy 
                 *   @deprecated Just ignored now */
     int setnlev;  /**< Flag, @see nlev */
+    double etol;  /**< User-defined error tolerance */ 
+    int setetol;  /**< Flag, @see etol */
     double grid[3];  /**< Grid spacings */
     int setgrid;  /**< Flag, @see grid */
     double glen[3];  /**< Grid side lengths. */

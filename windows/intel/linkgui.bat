@@ -12,7 +12,7 @@ rem
 rem  Create a variable with the static libraries to link against;
 rem  Change "javalib" to reflect location of the Java library
 rem
-set javalib="C:\Program Files\Java\jdk1.5.0_01\lib\jvm.lib"
+set javalib="C:\Program Files\Java\jdk1.6.0_22\lib\jvm.lib"
 rem
 rem  Link using Intel compiler suite and compatibility library
 rem

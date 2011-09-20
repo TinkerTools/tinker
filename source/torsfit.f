@@ -78,8 +78,8 @@ c
    40 continue
       if (query) then
          write(iout,50)
-   50    format (/,' Enter Central Atoms of the 2nd Torsion ',
-     &              '[Optional, <CR>=None] : ',$)
+   50    format (/,' Enter Central Atoms of the 2nd Torsion',
+     &              ' [Optional, <CR>=None] : ',$)
          read (input,60,err=70,end=70)  record
    60    format (a120)
          read (record,*,err=70,end=70)  torbnd(3),torbnd(4)
@@ -165,12 +165,12 @@ c
       integer nvar
       integer refconf(maxconf)
       real*8 xx(maxvar)
-      external minimiz1
-      external optsave
       real*8 energy, geometry
       integer ikey,freeunit
       integer trimtext
       character*120 keyfile
+      external minimiz1
+      external optsave
 c
 c
 c     set initial values
@@ -190,7 +190,7 @@ c
       end do
       do i = 1, 6*maxfittor
          vxx(i) = 0.0d0
-         vxxl(i)= 0.1d0
+         vxxl(i) = 0.1d0
          avedl = 0.0d0
          do j = 1, 6*maxfittor
             tord (i,j) = 0.0d0
@@ -211,7 +211,7 @@ c
          refconf = 0
       end do
       grdmin = 0.01
-      if (torbnd(1) .gt. torbnd(2) ) then
+      if (torbnd(1) .gt. torbnd(2)) then
          itmpa = torbnd(1)
          torbnd(1) = torbnd(2)
          torbnd(2) = itmpa
@@ -242,8 +242,8 @@ c
             itmpa = itmpb
             itmpb = j
          end if
-         if ((torbnd(1) .eq. itmpa .and. torbnd(2) .eq. itmpb)
-     &   .or.(torbnd(3) .eq. itmpa .and. torbnd(4) .eq. itmpb)) then
+         if ((torbnd(1).eq.itmpa .and. torbnd(2).eq.itmpb) .or.
+     &       (torbnd(3).eq.itmpa .and. torbnd(4).eq.itmpb)) then
             ntorcrs = ntorcrs + 1
             torcrs(1,ntorcrs) = ia
             torcrs(2,ntorcrs) = ib
@@ -298,13 +298,13 @@ c     calculate the relative QM conformational energies
 c
       eqmmin = eqm(1)
       do i = 2, nconf
-         if (eqm(i) .lt. eqmmin) eqmmin = eqm(i)
+         if (eqm(i) .lt. eqmmin)  eqmmin = eqm(i)
       end do
       do i = 1, nconf
          erqm(i) = eqm(i) - eqmmin
          write (iout,100)  i,erqm(i)
   100    format (' Relative Conformational Energy (QM) ',
-     &               i5,f9.5,' kcal/mole')
+     &               i5,f9.5,' Kcal/mole')
       end do
 c
 c     get fitting torsion type (atom classes)
@@ -373,7 +373,7 @@ c
          itc = class(ic)
          itd = class(id)
          write (iout,110)  ita,itb,itc,itd,tors1(1,k),tors2(1,k),
-     &                    tors3(1,k),tors4(1,k),tors5(1,k),tors6(1,k)
+     &                     tors3(1,k),tors4(1,k),tors5(1,k),tors6(1,k)
   110    format (' torsion ',4i4,6f8.3)
          do ii = 1, i-1
             jj = ftorid(ii)
@@ -482,7 +482,7 @@ c
             ib = torcrs(2,k)
             ic = torcrs(3,k)
             id = torcrs(4,k)
-            ftv(i,j) = geometry(ia,ib,ic,id)
+            ftv(i,j) = geometry (ia,ib,ic,id)
             write (iout,150)  i,j,ftv(i,j)
   150       format (' Fitting Torsion Value',2i5,f12.4)
             if (tflg(j) .eq. 0) then
@@ -496,7 +496,7 @@ c
             ib = torcrs(2,k)
             ic = torcrs(3,k)
             id = torcrs(4,k)
-            ctv(i,k) = geometry(ia,ib,ic,id)
+            ctv(i,k) = geometry (ia,ib,ic,id)
          end do
 c
 c     scale the coordinates of each active atom
@@ -540,14 +540,14 @@ c
                z(j) = xx(nvar) / scale(nvar)
             end if
          end do
-         emm(i) = energy()
+         emm(i) = energy ()
       end do
 c
 c     calculate relative value for each torsional angle
 c
       do i = 1, nconf
          do j = 1, ntorfit
-            rftv(i,j) = ftv(i,j)-ftv(i,1)
+            rftv(i,j) = ftv(i,j) - ftv(i,1)
          end do
       end do
 c
@@ -555,7 +555,7 @@ c     calculate the relative MM energies
 c
       emmmin = emm(1)
       do i = 2, nconf
-         if (emm(i) .lt. emmmin) emmmin = emm(i)
+         if (emm(i) .lt. emmmin)  emmmin = emm(i)
       end do
 c
 c     calcualte the energy difference and RMS
@@ -568,7 +568,7 @@ c
          rms = rms + delte(i)*delte(i)
          write (iout,170)  i,ermm(i)
   170    format (' Relative Conformational Energy (MM) ',
-     &              i5,f13.5,' kcal/mole')
+     &              i5,f13.5,' Kcal/mole')
       end do
       rms = sqrt(rms/dble(nconf))
       zrms = rms
@@ -586,8 +586,8 @@ c              goto 145
 c           end if
 c        end do
 c 145    continue
-c        do j = 1,nconf
-c           if ((ftv(j,1) .lt. tmpa) .and. (.not. confvisited(j))) then
+c        do j = 1, nconf
+c           if (ftv(j,1).lt.tmpa .and. .not.confvisited(j)) then
 c              confvisited(itmpa) = .false.
 c              itmpa = j
 c              tmpa = ftv(j,1)
@@ -598,22 +598,22 @@ c        confvisited(itmpa) = .true.
 c        write (iout,*)  itmpa,' <===> ',refconf(itmpa)
 c     end do
       if (nconf .gt. 1 .and. torbnd(3) .eq. 0) then
-         if((ftv(nconf,1)+180.0d0) .lt. 1.0d0
-     &       .and. ftv(nconf-1,1) .gt. 0.0d0)
+         if ((ftv(nconf,1)+180.0d0) .lt. 1.0d0
+     &           .and. ftv(nconf-1,1) .gt. 0.0d0)
      &       ftv(nconf,1) = 180.0d0
          tmpa = erqm(2) - erqm(1)
          tmpb = (ftv(2,1) - ftv(1,1))/radian
-         fwt(1) = 1.0d0/sqrt(1+(tmpa/tmpb)**2)
+         fwt(1) = 1.0d0 / sqrt(1.0d0+(tmpa/tmpb)**2)
          if (nconf .gt. 2) then
             do i = 2, nconf-1
                tmpa = erqm(i+1) - erqm(i-1)
                tmpb = (ftv(i+1,1) - ftv(i-1,1))/radian
-               fwt(i) = 1.0d0/sqrt(1+(tmpa/tmpb)**2)
+               fwt(i) = 1.0d0 / sqrt(1.0d0+(tmpa/tmpb)**2)
             end do
          end if
          tmpa = erqm(nconf) - erqm(nconf-1)
          tmpb = (ftv(nconf,1) - ftv(nconf-1,1))/radian
-         fwt(nconf) = 1.0d0/sqrt(1+(tmpa/tmpb)**2)
+         fwt(nconf) = 1.0d0 / sqrt(1.0d0+(tmpa/tmpb)**2)
       end if
       do i = 1, nconf
          write (*,180)  i,fwt(i)
@@ -627,8 +627,8 @@ c
          j = ftorid(i)
          k = ctorid(j)
          do ii = 1, 6
-            if(vflg(ii,i) .and. tflg(i) .eq. 0) then
-               ivxx = ivxx +1
+            if (vflg(ii,i) .and. tflg(i).eq.0) then
+               ivxx = ivxx + 1
                if (ii .eq. 1) then
                   tors1(1,k) = vxx(ivxx)
                else if (ii .eq. 2) then
@@ -644,7 +644,7 @@ c
                end if
                do jj = 1, ntorfit
                   kk = ctorid(ftorid(jj))
-                  if(tflg(jj) .eq. i) then
+                  if (tflg(jj) .eq. i) then
                      if (ii .eq. 1) then
                         tors1(1,kk) = vxx(ivxx)
                      else if (ii .eq. 2) then
@@ -662,7 +662,7 @@ c
                end do
             end if
          end do
-         ivxx = ivxx +1
+         ivxx = ivxx + 1
          vcon = vxx(ivxx)
       end do
 c
@@ -670,7 +670,7 @@ c     fitting the torsion parameters
 c
       maxstep = 1
       avedl = 0.5d0
-      do while (avedl .gt. 0.1 .and. istep .lt. maxstep)
+      do while (avedl.gt.0.1d0 .and. istep.lt.maxstep)
          do i = 1, nconf
             ivxx = 0
             torf(i) = 0.0d0
@@ -685,7 +685,7 @@ c
                itb = class(ib)
                itc = class(ic)
                itd = class(id)
-               tv = ftv(i,j)/radian
+               tv = ftv(i,j) / radian
                tmpa = tors1(1,kk)*(1+cos(tv))
      &                    + tors2(1,kk)*(1-cos(2*tv))
      &                    + tors3(1,kk)*(1+cos(3*tv))
@@ -694,27 +694,26 @@ c
      &                    + tors6(1,kk)*(1-cos(6*tv))
                torf(i) = torf(i) + 0.5*tmpa
                do ii = 1, 6
-                  if(vflg(ii,j) .and. tflg(j) .eq. 0) then
+                  if (vflg(ii,j) .and. tflg(j).eq.0) then
                      ivxx = ivxx +1
                      coeff(i,ivxx) = 0.5*(1+(-1)**(ii+1)
-     &                *cos(dble(ii)*tv))
+     &                                  *cos(dble(ii)*tv))
                      do k = 1, ntorcrs
-                        if(cflg(k) .gt. 0
-     &                     .and. cflg(k) .eq. jj) then
+                        if (cflg(k).gt.0 .and. cflg(k).eq.jj) then
                            coeff(i,ivxx) = coeff(i,ivxx)
-     &                      +0.5*(1+(-1)**(ii+1)
-     &                      *cos(dble(ii)*ctv(i,k)/radian))
+     &                                     +0.5*(1+(-1)**(ii+1)
+     &                               *cos(dble(ii)*ctv(i,k)/radian))
                         end if
                      end do
-c                     write (iout,155)  i,ivxx,coeff(i,ivxx)
-c 155                 format (' Derivative ',2i4,f8.4)
+c                    write (iout,155)  i,ivxx,coeff(i,ivxx)
+c 155                format (' Derivative ',2i4,f8.4)
                   end if
                end do
             end do
             torf(i) = torf(i) + vcon - delte(i)
-            ivxx = ivxx +1
+            ivxx = ivxx + 1
             coeff(i,ivxx) = 1.0d0
-c            write (iout,*)  'Energy Difference ',i,torf(i)
+c           write (iout,*)  'Energy Difference ',i,torf(i)
          end do
 c
 c     set matrix elements for matrix A
@@ -722,8 +721,8 @@ c
          do i = 1, nvxx
             do j = 1, nvxx
                tord(i,j) = 0.0d0
-               do k = 1,nconf
-                  tord(i,j) = tord(i,j)+coeff(k,i)*coeff(k,j)*fwt(k)
+               do k = 1, nconf
+                  tord(i,j) = tord(i,j) + coeff(k,i)*coeff(k,j)*fwt(k)
                end do
             end do
          end do
@@ -740,7 +739,7 @@ c
   190       format (1x,5f12.4)
          end do
 c
-c     multiply vector: Yi*Coeff*Weight
+c     multiply vector: Yi * Coeff * Weight
 c
          do i = 1, nvxx
             torf(i) = 0.0d0
@@ -752,7 +751,7 @@ c
             mata(i,nvxx+1) = torf(i)
          end do
 c
-c     solve the linear matrix equiation with Gauss-Jordan eliminatio
+c     solve the linear equations via Gauss-Jordan elimination
 c
          call gaussjordan (nvxx,mata)
 c
@@ -783,8 +782,7 @@ c
                   end if
                   do jj = 1, ntorcrs
                      kk = ctorid(jj)
-                     if(cflg(j) .gt. 0 .and.
-     &                   cflg(jj) .eq. j) then
+                     if (cflg(j).gt.0 .and. cflg(jj).eq.j) then
                         if (ii .eq. 1) then
                            tors1(1,kk) = vxx(ivxx)
                         else if (ii .eq. 2) then
@@ -868,7 +866,7 @@ c     calculate the relative MM energies
 c
       emmmin = emm(1)
       do i = 2, nconf
-         if (emm(i) .lt. emmmin) emmmin = emm(i)
+         if (emm(i) .lt. emmmin)  emmmin = emm(i)
       end do
 c
 c     calcualte the energy difference and RMS
@@ -885,7 +883,7 @@ c
       if (rms .gt. zrms ) then
          write (iout,210)  zrms
   210    format (/,' Annihilating the torsions is better',
-     &           /,' The Final RMS is :',f12.6,' kcal/mol',/)
+     &           /,' The Final RMS is :',f12.6,' Kcal/mole',/)
       end if
 c
 c     output the fitted parameters
@@ -918,8 +916,8 @@ c
       write (ikey,230)
   230 format (/,'#',/,'# Results of Valence Parameter Fitting',
      &           /,'#',/)
-      write(iout,*)
-      write(iout,*) 'Fitting Torsional Parameters:'
+      write (iout,*)
+      write (iout,*)  'Fitting Torsional Parameters:'
       do i = 1, ntorfit
          if (tflg(i) .eq. 0) then
             j = ftorid(i)
@@ -938,9 +936,9 @@ c
                tors3(1,k) = 0.0d0
             end if
             write (iout,240)  ita,itb,itc,itd,tors1(1,k),
-     &                         tors2(1,k),tors3(1,k)
+     &                        tors2(1,k),tors3(1,k)
             write (ikey,240)  ita,itb,itc,itd,tors1(1,k),
-     &                         tors2(1,k),tors3(1,k)
+     &                        tors2(1,k),tors3(1,k)
   240       format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
      &                 ' 180.0 2 ',f8.3,' 0.0 3')
          end if
@@ -955,6 +953,7 @@ c     ##  subroutine gaussjordan  --  Gauss-Jordan elimination  ##
 c     ##                                                        ##
 c     ############################################################
 c
+c
 c     "gaussjordan" solves a system of linear equations by using
 c     the method of Gaussian elimination with partial pivoting
 c
@@ -964,7 +963,8 @@ c
       integer maxn
       parameter (maxn=72)
       integer i,j,k,l,n
-      real*8 t,a(maxn,maxn),av
+      real*8 t,av
+      real*8 a(maxn,maxn)
 c
 c
       do k = 1, n-1
@@ -972,7 +972,7 @@ c
          do i = k, n
             if (abs(a(i,k)) .gt. abs(av)) then
                av = a(i,k)
-               l=i
+               l = i
             end if
          end do
          if (abs(av) .lt. 1.0d-8) then
@@ -988,15 +988,15 @@ c
          end if
          av = 1.0d0 / av
          do j = k+1, n+1
-            a(k,j) = a(k,j)*av
-            do i = k+1,n
+            a(k,j) = a(k,j) * av
+            do i = k+1, n
                a(i,j) = a(i,j) - a(i,k)*a(k,j)
             end do
          end do
       end do
       a(n,n+1) = a(n,n+1) / a(n,n)
       do k = 1, n-1
-         i = n-k
+         i = n - k
          av = 0.0d0
          do j = i+1, n
             av = av + a(i,j)*a(j,n+1)

@@ -1,365 +1,365 @@
 @echo off
 rem
 rem
-rem  #############################################################
-rem  ##                                                         ##
-rem  ##  generic.bat  --  compile TINKER for generic CPU types  ##
-rem  ##       (Intel Fortran Compiler for Windows Version)      ##
-rem  ##                                                         ##
-rem  #############################################################
+rem  ###########################################################
+rem  ##                                                       ##
+rem  ##  compile.bat  --  compile each of the TINKER modules  ##
+rem  ##      (Intel Fortran Compiler for Windows Version)     ##
+rem  ##                                                       ##
+rem  ###########################################################
 rem
 rem
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 active.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 alchemy.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 analysis.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 analyze.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 angles.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 anneal.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 archive.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 attach.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 basefile.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 beeman.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 bicubic.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 bitors.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 bonds.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 born.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 bounds.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 calendar.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 center.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 chkpole.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 chkring.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 chkxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 cholesky.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 clock.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 cluster.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 column.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 /4Yportlib command.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 connect.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 connolly.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 control.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 correlate.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 crystal.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 cspline.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 cutoffs.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 deflate.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 delete.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 diagq.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 diffeq.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 diffuse.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 distgeom.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 document.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 dynamic.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangang.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangang1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangang2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangang3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangle.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangle1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangle2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eangle3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebond.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebond1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebond2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebond3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebuck.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebuck1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebuck2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ebuck3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echarge.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echarge1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echarge2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echarge3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echgdpl.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echgdpl1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echgdpl2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 echgdpl3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 edipole.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 edipole1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 edipole2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 edipole3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egauss.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egauss1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egauss2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egauss3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egeom.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egeom1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egeom2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 egeom3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ehal.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ehal1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ehal2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ehal3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimprop.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimprop1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimprop2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimprop3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimptor.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimptor1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimptor2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eimptor3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 elj.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 elj1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 elj2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 elj3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 embed.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emetal.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emetal1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emetal2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emetal3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emm3hb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emm3hb1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emm3hb2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 emm3hb3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 empole.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 empole1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 empole2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 empole3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 energy.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopbend.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopbend1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopbend2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopbend3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopdist.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopdist1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopdist2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eopdist3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 epitors.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 epitors1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 epitors2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 epitors3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 erf.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 erxnfld.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 erxnfld1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 erxnfld2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 erxnfld3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 esolv.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 esolv1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 esolv2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 esolv3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrbnd.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrbnd1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrbnd2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrbnd3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrtor.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrtor1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrtor2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 estrtor3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etors.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etors1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etors2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etors3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etortor.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etortor1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etortor2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 etortor3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 eurey3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 evcorr.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra1.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 extra3.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 fatal.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 fft3d.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 fftpack.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 field.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 final.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 flatten.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 freeunit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 gda.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 geometry.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getint.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getkey.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getmol2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getnumb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getpdb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getprm.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getref.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getstring.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 gettext.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getword.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 getxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 gradient.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 gradrgd.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 gradrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 groups.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 grpline.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 gyrate.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 hessian.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 hessrgd.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 hessrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 hybrid.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 image.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 impose.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 induce.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 inertia.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 initial.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 initprm.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 initres.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 initrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 insert.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 intedit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 intxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 invbeta.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 invert.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 jacobi.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kangang.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kangle.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 katom.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kbond.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kcharge.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kdipole.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kewald.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kgeom.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kimprop.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kimptor.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kinetic.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kmetal.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kmpole.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kopbend.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kopdist.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 korbit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kpitors.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kpolar.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ksolv.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kstrbnd.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kstrtor.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ktors.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ktortor.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kurey.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 kvdw.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 lattice.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 lbfgs.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 lights.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 makeint.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 makepdb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 makeref.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 makexyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 maxwell.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 mdinit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 mdrest.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 mdsave.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 mdstat.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 mechanic.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 merge.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 minimize.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 minirot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 minrigid.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 molecule.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 moments.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 monte.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 mutate.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 nblist.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 newton.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 newtrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 nextarg.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 nexttext.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 nspline.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 nucleic.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 number.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 numeral.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 numgrad.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 ocvm.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 openend.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 optimize.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 optirot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 optrigid.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 optsave.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 orbital.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 orient.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 orthog.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 overlap.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 path.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pdbxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 piscf.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pmestuff.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pmpb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 polarize.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 poledit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 polymer.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 potential.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 precise.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pressure.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prmedit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prmkey.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 promo.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 protein.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtdyn.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prterr.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtint.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtmol2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtpdb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtprm.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtseq.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 prtxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pss.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pssrigid.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 pssrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 quatfit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 radial.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 random.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 rattle.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readdyn.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readgau.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readint.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readmol2.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readpdb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readprm.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readseq.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 readxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 replica.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 rgdstep.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 rings.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 rmsfit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 rotlist.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 rotpole.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 saddle.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 scan.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 sdstep.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 search.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 server.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 shakeup.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 sigmoid.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 sktstuff.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 sniffer.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 sort.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 spacefill.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 spectrum.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 square.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 suffix.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 superpose.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 surface.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 surfatom.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 switch.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 sybylxyz.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 temper.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 testgrad.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 testhess.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 testpair.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 testrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 timer.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 timerot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 tncg.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 torphase.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 torque.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 torsfit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 torsions.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 trimtext.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 unitcell.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 valence.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 verlet.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 version.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 vibbig.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 vibrate.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 vibrot.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 volume.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xtalfit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xtalmin.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xyzatm.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xyzedit.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xyzint.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xyzpdb.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 xyzsybyl.f
-ifort /c /O3 /QaxSSE3 /Qno-prec-div /Qno-ipo /w /Qvec-report0 zatom.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp active.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp alchemy.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp analysis.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp analyze.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp angles.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp anneal.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp archive.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp attach.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp basefile.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp beeman.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bicubic.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bitors.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bonds.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp born.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bounds.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp calendar.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp center.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp chkpole.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp chkring.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp chkxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp cholesky.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp clock.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp cluster.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp column.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp /4Yportlib command.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp connect.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp connolly.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp control.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp correlate.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp crystal.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp cspline.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp cutoffs.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp deflate.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp delete.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp diagq.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp diffeq.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp diffuse.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp distgeom.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp document.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp dynamic.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangang.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangang1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangang2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangang3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangle.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangle1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangle2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eangle3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebond.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebond1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebond2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebond3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebuck.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebuck1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebuck2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ebuck3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echarge.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echarge1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echarge2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echarge3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echgdpl.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echgdpl1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echgdpl2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp echgdpl3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp edipole.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp edipole1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp edipole2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp edipole3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egauss.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egauss1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egauss2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egauss3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egeom.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egeom1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egeom2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp egeom3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ehal.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ehal1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ehal2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ehal3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimprop.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimprop1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimprop2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimprop3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimptor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimptor1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimptor2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eimptor3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp elj.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp elj1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp elj2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp elj3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp embed.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emetal.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emetal1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emetal2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emetal3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emm3hb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emm3hb1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emm3hb2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp emm3hb3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp empole.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp empole1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp empole2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp empole3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp energy.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopbend.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopbend1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopbend2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopbend3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopdist.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopdist1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopdist2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eopdist3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp epitors.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp epitors1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp epitors2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp epitors3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp erf.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp erxnfld.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp erxnfld1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp erxnfld2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp erxnfld3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp esolv.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp esolv1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp esolv2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp esolv3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrbnd.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrbnd1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrbnd2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrbnd3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrtor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrtor1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrtor2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp estrtor3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etors.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etors1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etors2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etors3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etortor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etortor1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etortor2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp etortor3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eurey.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eurey1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eurey2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp eurey3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp evcorr.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp extra.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp extra1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp extra2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp extra3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp fatal.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp fft3d.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp fftpack.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp field.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp final.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp flatten.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp freeunit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gda.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp geometry.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getint.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getkey.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getmol2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getnumb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getpdb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getprm.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getref.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getstring.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gettext.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getword.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gradient.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gradrgd.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gradrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp groups.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp grpline.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gyrate.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp hessian.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp hessrgd.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp hessrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp hybrid.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp image.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp impose.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp induce.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp inertia.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp initial.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp initprm.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp initres.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp initrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp insert.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp intedit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp intxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp invbeta.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp invert.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp jacobi.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kangang.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kangle.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp katom.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kbond.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kcharge.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kdipole.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kewald.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kgeom.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kimprop.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kimptor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kinetic.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kmetal.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kmpole.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kopbend.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kopdist.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp korbit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kpitors.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kpolar.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ksolv.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kstrbnd.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kstrtor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ktors.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ktortor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kurey.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kvdw.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp lattice.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp lbfgs.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp lights.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makeint.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makepdb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makeref.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makexyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp maxwell.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp mdinit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp mdrest.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp mdsave.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp mdstat.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp mechanic.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp merge.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp minimize.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp minirot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp minrigid.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp molecule.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp moments.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp monte.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp mutate.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nblist.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp newton.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp newtrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nextarg.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nexttext.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nspline.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nucleic.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp number.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp numeral.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp numgrad.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ocvm.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp openend.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp optimize.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp optirot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp optrigid.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp optsave.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp orbital.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp orient.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp orthog.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp overlap.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp path.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pdbxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp piscf.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pmestuff.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pmpb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp polarize.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp poledit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp polymer.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp potential.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp precise.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pressure.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prmedit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prmkey.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp promo.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp protein.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtdyn.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prterr.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtint.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtmol2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtpdb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtprm.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtseq.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp prtxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pss.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pssrigid.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp pssrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp quatfit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp radial.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp random.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp rattle.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readdyn.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readgau.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readint.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readmol2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readpdb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readprm.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readseq.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp readxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp replica.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp rgdstep.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp rings.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp rmsfit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp rotlist.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp rotpole.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp saddle.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp scan.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp sdstep.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp search.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp server.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp shakeup.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp sigmoid.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp sktstuff.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp sniffer.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp sort.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp spacefill.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp spectrum.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp square.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp suffix.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp superpose.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp surface.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp surfatom.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp switch.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp sybylxyz.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp temper.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testgrad.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testhess.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testpair.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp timer.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp timerot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp tncg.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp torphase.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp torque.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp torsfit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp torsions.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp trimtext.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp unitcell.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp valence.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp verlet.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp version.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp vibbig.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp vibrate.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp vibrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp volume.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xtalfit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xtalmin.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xyzatm.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xyzedit.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xyzint.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xyzpdb.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp xyzsybyl.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp zatom.f

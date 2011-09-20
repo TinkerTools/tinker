@@ -64,6 +64,13 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* have zlib compression enabled */
+#define HAVE_ZLIB 
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+/* #undef LT_OBJDIR */
+
 /* machine error */
 #define MACHINE_EPS 1.19209E-07
 
@@ -77,13 +84,13 @@
 #define PACKAGE_NAME "APBS"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "APBS 1.1.0"
+#define PACKAGE_STRING "APBS 1.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "apbs"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.1.0"
+#define PACKAGE_VERSION "1.3"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -91,8 +98,11 @@
 /* use hierarchical basis method */
 /* #undef USE_HB */
 
+/* APBS diagnostic messages will not display */
+#define VAPBSQUIET 
+
 /* Version number of package */
-#define VERSION "1.1.0"
+#define VERSION "1.3"
 
 /* F77 lowercase */
 #define VF77_LOWERCASE 

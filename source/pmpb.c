@@ -1,11 +1,14 @@
 
 /*
+ * Note: This version of pmpb.c is compatible with APBS Version 1.3
+ *
  * Note: The "routines.h" header file includes apbscfg.h, which
- * defines WITH_TINKER. And WITH_TINKER turns on function prototypes
+ * defines ENABLE_TINKER. ENABLE_TINKER turns on function prototypes
  * in the headers included within "apbs.h". Therefore, "routines.h"
  * needs to be listed first to avoid implicit function definitons.
  */
 
+#include "apbs/apbscfg.h"
 #include "apbs/routines.h"
 #include "apbs/apbs.h"
 
@@ -36,10 +39,10 @@
   into FORTRAN should be avoided.
 ***********************************************************************/
 
-// TINKER MAXATM paramter
-#define maxatm 20000
+// TINKER MAXATM parameter; must match "sizes.i"
+#define maxatm 25000
 
-// TINKER and APBS both define maxion to be 10
+// TINKER MAXION parameter; must match "pbstuf.i"
 #define maxion 10
 
 // APBS configuration objects
@@ -61,6 +64,7 @@ Vgrid *dielXMap[NOSH_MAXMOL];
 Vgrid *dielYMap[NOSH_MAXMOL];
 Vgrid *dielZMap[NOSH_MAXMOL];
 Vgrid *kappaMap[NOSH_MAXMOL];
+Vgrid *potMap[NOSH_MAXMOL];
 Vgrid *chargeMap[NOSH_MAXMOL];
 double realCenter[3];
 
@@ -262,6 +266,7 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
        dielYMap[i] = VNULL;
        dielZMap[i] = VNULL;
        kappaMap[i] = VNULL;
+       potMap[i] = VNULL;
        chargeMap[i] = VNULL;
     }
     for (i=0; i<2; i++) {
@@ -428,7 +433,7 @@ void apbsempole_(int *natom, double x[maxatm][3],
        mgparm->chgs = VCM_PERMANENT;
        if (!initMG(i, nosh, mgparm, pbeparm, realCenter, pbe,
                    alist, dielXMap, dielYMap, dielZMap,
-                   kappaMap, chargeMap, pmgp, pmg)) {
+                   kappaMap, chargeMap, pmgp, pmg, potMap)) {
               Vnm_tprint( 2, "Error setting up MG calculation!\n");
               return;
        }
@@ -496,7 +501,7 @@ void apbsempole_(int *natom, double x[maxatm][3],
        */
 
        data = Vmem_malloc(mem, nx*ny*nz, sizeof(double));
-       Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
+       Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype, pbeparm);
        permU[i] = Vgrid_ctor(nx,ny,nz,hx,hy,hzed,xmin,ymin,zmin,data);
        permU[i]->readdata = 1;
        // set readdata flag to have the dtor to free data
@@ -651,7 +656,7 @@ void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
        mgparm->chgs = VCM_INDUCED;
        if (!initMG(i, nosh, mgparm, pbeparm, realCenter, pbe,
                    alist, dielXMap, dielYMap, dielZMap,
-                   kappaMap, chargeMap, pmgp, pmg)) {
+                   kappaMap, chargeMap, pmgp, pmg, potMap)) {
            Vnm_tprint( 2, "Error setting up MG calculation!\n");
            return;
        }
@@ -681,13 +686,13 @@ void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
 
        if (indU[i] == VNULL) {
           data = Vmem_malloc(mem, nx*ny*nz, sizeof(double));
-          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
+          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype, pbeparm);
           indU[i] = Vgrid_ctor(nx,ny,nz,hx,hy,hzed,xmin,ymin,zmin,data);
           indU[i]->readdata = 1;
           // set readdata flag to have the dtor to free data
        } else {
           data = indU[i]->data;
-          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
+          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype, pbeparm);
        }
 
        if (i == 0){
@@ -787,7 +792,7 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
        mgparm->chgs = VCM_NLINDUCED;
        if (!initMG(i, nosh, mgparm, pbeparm, realCenter, pbe,
                    alist, dielXMap, dielYMap, dielZMap,
-                   kappaMap, chargeMap, pmgp, pmg)) {
+                   kappaMap, chargeMap, pmgp, pmg, potMap)) {
            Vnm_tprint( 2, "Error setting up MG calculation!\n");
            return;
        }
@@ -817,12 +822,12 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
 
        if (nlIndU[i] == VNULL) {
           data = Vmem_malloc(VNULL, nx*ny*nz, sizeof(double));
-          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
+          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype, pbeparm);
           nlIndU[i] = Vgrid_ctor(nx,ny,nz,hx,hy,hzed,xmin,ymin,zmin,data);
           nlIndU[i]->readdata = 1; // set readata flag to have dtor free data
        } else {
           data = nlIndU[i]->data;
-          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype);
+          Vpmg_fillArray(pmg[i], data, VDT_POT, 0.0, pbeparm->pbetype, pbeparm);
        }
 
        if (i == 0){
@@ -907,7 +912,7 @@ void pbdirectpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
        /* Set up problem */
        if (!initMG(i, nosh, mgparm, pbeparm, realCenter, pbe,
                    alist, dielXMap, dielYMap, dielZMap,
-                   kappaMap, chargeMap, pmgp, pmg)) {
+                   kappaMap, chargeMap, pmgp, pmg, potMap)) {
            Vnm_tprint( 2, "Error setting up MG calculation!\n");
            return;
        }
@@ -1038,7 +1043,7 @@ void pbmutualpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
        /* Set up problem */
        if (!initMG(i, nosh, mgparm, pbeparm, realCenter, pbe,
                    alist, dielXMap, dielYMap, dielZMap,
-                   kappaMap, chargeMap, pmgp, pmg)) {
+                   kappaMap, chargeMap, pmgp, pmg, potMap)) {
            Vnm_tprint( 2, "Error setting up MG calculation!\n");
            return;
        }

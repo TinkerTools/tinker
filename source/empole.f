@@ -905,6 +905,14 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
+c     compute the reciprocal space part of the Ewald summation
+c
+      call emrecip
+c
+c     compute the real space portion of the Ewald summation
+c
+      call ereal0c
+c
 c     compute the self-energy portion of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
@@ -962,14 +970,6 @@ c
          em = em + term*(xd*xd+yd*yd+zd*zd)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
       end if
-c
-c     compute the reciprocal space part of the Ewald summation
-c
-      call emrecip
-c
-c     compute the real space portion of the Ewald summation
-c
-      call ereal0c
       return
       end
 c
@@ -1516,6 +1516,14 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
+c     compute the reciprocal space part of the Ewald summation
+c
+      call emrecip
+c
+c     compute the real space portion of the Ewald summation
+c
+      call ereal0d
+c
 c     compute the self-energy portion of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
@@ -1573,14 +1581,6 @@ c
          em = em + term*(xd*xd+yd*yd+zd*zd)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
       end if
-c
-c     compute the reciprocal space part of the Ewald summation
-c
-      call emrecip
-c
-c     compute the real space portion of the Ewald summation
-c
-      call ereal0d
       return
       end
 c

@@ -22,6 +22,7 @@ c
       include 'bound.i'
       include 'cutoff.i'
       include 'energi.i'
+      include 'iounit.i'
       include 'potent.i'
       include 'rigid.i'
       include 'vdwpot.i'
@@ -124,5 +125,14 @@ c
      &          + et + ept + ebt + ett + ev + ec + ecd + ed + em
      &          + ep + er + es + elf + eg + ex
       energy = esum
+c
+c     check for an illegal value for the total energy
+c
+      if (isnan(esum)) then
+         write (iout,10)
+   10    format (/,' ENERGY  --  Illegal Value for the Total',
+     &              ' Potential Energy')
+         call fatal
+      end if
       return
       end

@@ -7,26 +7,21 @@
  *  @ingroup Vgrid
  *  @author  Nathan Baker and Steve Bond
  *  @brief   Potential oracle for Cartesian mesh data
- *  @version $Id: vgrid.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version $Id: vgrid.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *
  *  @attention
  *  @verbatim
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
+ * 
  * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met: 
@@ -219,6 +214,28 @@ VEXTERNC int Vgrid_curvature(Vgrid *thee, double pt[3], int cflag,
  *  @return  1 if successful, 0 if off grid
  */
 VEXTERNC int Vgrid_gradient(Vgrid *thee, double pt[3], double grad[3] );
+
+/** @brief	Read in OpenDX data in GZIP format
+ *	@ingroup Vgrid
+ *	@author Dave Gohara
+ *	@return 1 if successful, 0 otherwise */
+VEXTERNC int Vgrid_readGZ(
+						  Vgrid *thee, /**< Object with grid data to write */
+						  const char *fname /**< Path to write to */
+						  );
+
+/** @brief	Write out OpenDX data in GZIP format
+ *	@author Dave Gohara
+ */
+VEXTERNC void Vgrid_writeGZ(
+							Vgrid *thee, /**< Object to hold new grid data */
+							const char *iodev, /**< I/O device */
+							const char *iofmt, /**< I/O format */
+							const char *thost, /**< Remote host name */
+							const char *fname, /**< File name */
+							char *title, /**< Data title */
+							double *pvec /**< Masking vector (0 = not written) */
+							);
 
 /** @brief Write out the data in UHBD grid format 
  *  @note   \li The mesh spacing should be uniform

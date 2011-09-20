@@ -9,4 +9,4 @@ rem  ##                                                              ##
 rem  ##################################################################
 rem
 rem
-icl /c /O2 /w /Dwindowsintel server.c /I "C:\Program Files\Java\jdk1.5.0_01\include" /I "C:\Program Files\Java\jdk1.5.0_01\include\win32"
+icl /c /O2 /w /Dwindowsintel server.c /I "C:\Program Files\Java\jdk1.6.0_22\include" /I "C:\Program Files\Java\jdk1.6.0_22\include\win32"

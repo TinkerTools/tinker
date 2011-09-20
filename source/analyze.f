@@ -1393,7 +1393,8 @@ c     #################################################################
 c
 c
 c     "propyze" finds and prints the total charge, dipole moment
-c     components, radius of gyration and moments of inertia
+c     components, radius of gyration, moments of inertia, internal
+c     virial and pressure
 c
 c
       subroutine propyze
@@ -1446,6 +1447,10 @@ c
       write (iout,90)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
    90 format (/,' Internal Virial Tensor :',12x,3f12.3,
      &        /,37x,3f12.3,/,37x,3f12.3)
+c
+c     get two alternative dE/dV values and a pressure estimate
+c
+      call ptest
       return
       end
 c

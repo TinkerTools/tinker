@@ -885,6 +885,7 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'couple.i'
+      include 'fields.i'
       include 'sequen.i'
       integer i,nh,hca
       integer ires,jchain
@@ -1083,7 +1084,7 @@ c
             call pdbatm (' HB2',resname,ires,hca+3)
             call pdbatm (' HB3',resname,ires,hca+4)
             call pdbatm (' HG ',resname,ires,hca+5)
-         else
+         else if (biotyp(86) .ne. 0) then
             call pdbatm (' HG ',resname,ires,cbi+2)
          end if
 c
@@ -1126,6 +1127,12 @@ c
             call pdbatm (' HE1',resname,ires,hca+12)
             call pdbatm (' HE2',resname,ires,hca+13)
             call pdbatm (' HZ ',resname,ires,hca+14)
+         else if (biotyp(126) .ne. 0) then
+            call pdbatm (' HD1',resname,ires,cbi+7)
+            call pdbatm (' HD2',resname,ires,cbi+8)
+            call pdbatm (' HE1',resname,ires,cbi+9)
+            call pdbatm (' HE2',resname,ires,cbi+10)
+            call pdbatm (' HZ ',resname,ires,cbi+11)
          end if
 c
 c     tyrosine residue  (TYR)
@@ -1139,8 +1146,14 @@ c
             call pdbatm (' HE1',resname,ires,hca+13)
             call pdbatm (' HE2',resname,ires,hca+14)
             call pdbatm (' HH ',resname,ires,hca+15)
-         else
+         else if (biotyp(141) .ne. 0) then
+            call pdbatm (' HD1',resname,ires,cbi+8)
+            call pdbatm (' HD2',resname,ires,cbi+9)
+            call pdbatm (' HE1',resname,ires,cbi+10)
+            call pdbatm (' HE2',resname,ires,cbi+11)
             call pdbatm (' HH ',resname,ires,cbi+12)
+         else
+            call pdbatm (' HH ',resname,ires,cbi+8)
          end if
 c
 c     deprotonated tyrosine residue  (TYD)
@@ -1153,6 +1166,11 @@ c
             call pdbatm (' HD2',resname,ires,hca+12)
             call pdbatm (' HE1',resname,ires,hca+13)
             call pdbatm (' HE2',resname,ires,hca+14)
+         else if (biotyp(141) .ne. 0) then
+            call pdbatm (' HD1',resname,ires,cbi+8)
+            call pdbatm (' HD2',resname,ires,cbi+9)
+            call pdbatm (' HE1',resname,ires,cbi+10)
+            call pdbatm (' HE2',resname,ires,cbi+11)
          end if
 c
 c     tryptophan residue  (TRP)
@@ -1167,8 +1185,15 @@ c
             call pdbatm (' HZ2',resname,ires,hca+16)
             call pdbatm (' HZ3',resname,ires,hca+17)
             call pdbatm (' HH2',resname,ires,hca+18)
-         else
+         else if (biotyp(172) .ne. 0) then
+            call pdbatm (' HD1',resname,ires,cbi+10)
             call pdbatm (' HE1',resname,ires,cbi+11)
+            call pdbatm (' HE3',resname,ires,cbi+12)
+            call pdbatm (' HZ2',resname,ires,cbi+13)
+            call pdbatm (' HZ3',resname,ires,cbi+14)
+            call pdbatm (' HH2',resname,ires,cbi+15)
+         else
+            call pdbatm (' HE1',resname,ires,cbi+10)
          end if
 c
 c     histidine (HD and HE) residue  (HIS)
@@ -1181,9 +1206,14 @@ c
             call pdbatm (' HD2',resname,ires,hca+10)
             call pdbatm (' HE1',resname,ires,hca+11)
             call pdbatm (' HE2',resname,ires,hca+12)
+         else if (biotyp(197) .ne. 0) then
+            call pdbatm (' HD1',resname,ires,cbi+6)
+            call pdbatm (' HD2',resname,ires,cbi+7)
+            call pdbatm (' HE1',resname,ires,cbi+8)
+            call pdbatm (' HE2',resname,ires,cbi+9)
          else
             call pdbatm (' HD1',resname,ires,cbi+6)
-            call pdbatm (' HE2',resname,ires,cbi+9)
+            call pdbatm (' HE2',resname,ires,cbi+7)
          end if
 c
 c     histidine (HD only) residue  (HID)
@@ -1195,6 +1225,10 @@ c
             call pdbatm (' HD1',resname,ires,hca+9)
             call pdbatm (' HD2',resname,ires,hca+10)
             call pdbatm (' HE1',resname,ires,hca+11)
+         else if (biotyp(214) .ne. 0) then
+            call pdbatm (' HD1',resname,ires,cbi+6)
+            call pdbatm (' HD2',resname,ires,cbi+7)
+            call pdbatm (' HE1',resname,ires,cbi+8)
          else
             call pdbatm (' HD1',resname,ires,cbi+6)
          end if
@@ -1208,8 +1242,12 @@ c
             call pdbatm (' HD2',resname,ires,hca+9)
             call pdbatm (' HE1',resname,ires,hca+10)
             call pdbatm (' HE2',resname,ires,hca+11)
-         else
+         else if (biotyp(229) .ne. 0) then
+            call pdbatm (' HD2',resname,ires,cbi+6)
+            call pdbatm (' HE1',resname,ires,cbi+7)
             call pdbatm (' HE2',resname,ires,cbi+8)
+         else
+            call pdbatm (' HE2',resname,ires,cbi+6)
          end if
 c
 c     aspartic acid residue  (ASP)

@@ -6,7 +6,7 @@
  *  @file     vatom.h
  *  @ingroup  Vatom
  *  @brief    Contains declarations for class Vatom
- *  @version  $Id: vatom.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: vatom.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -14,18 +14,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -63,6 +57,12 @@
 #include "maloc/maloc.h"
 #include "apbs/vhal.h"
 
+/** 
+ *  @ingroup Vatom
+ *  @def VMAX_RECLEN
+ *  @author  Nathan Baker, David Gohara, Mike Schneiders
+ *  @brief   Residue name length
+ */
 #define VMAX_RECLEN		   64
 
 /** 
@@ -235,8 +235,8 @@ VEXTERNC void    Vatom_setResName(Vatom *thee, char resName[VMAX_RECLEN]);
 *  @author  Jason Wagoner
 */
 VEXTERNC void    Vatom_setAtomName(
-		Vatom *thee,  /** Vatom object */
-		char atomName[VMAX_RECLEN]  /** Atom name */
+		Vatom *thee,  /**< Vatom object */
+		char atomName[VMAX_RECLEN]  /**< Atom name */
 		);
 
 /** @brief   Retrieve residue name
@@ -252,8 +252,8 @@ VEXTERNC void    Vatom_getResName(Vatom *thee, char resName[VMAX_RECLEN]);
 *  @author  Jason Wagoner
 */
 VEXTERNC void   Vatom_getAtomName(
-		Vatom *thee, /** Vatom object */
-		char atomName[VMAX_RECLEN] /** Atom name */
+		Vatom *thee, /**< Vatom object */
+		char atomName[VMAX_RECLEN] /**< Atom name */
 		);
 
 /** @brief   Constructor for the Vatom class 

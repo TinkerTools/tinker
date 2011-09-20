@@ -233,7 +233,7 @@ c
                if (use_group)  e = e * fgrp
                neg = neg + 1
                eg = eg + e
-               aeg(ib) = aeg(ib) + 0.5d0*e
+               aeg(ib) = aeg(ib) + e
                if (intermol) then
                   einter = einter + e
                end if

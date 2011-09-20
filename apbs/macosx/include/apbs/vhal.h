@@ -7,7 +7,7 @@
  *  @file       vhal.h
  *  @ingroup    Vhal
  *  @brief      Contains generic macro definitions for APBS
- *  @version  $Id: vhal.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: vhal.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -15,18 +15,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -196,7 +190,6 @@ typedef enum eVhal_NONLINType Vhal_NONLINType;
 enum eVoutput_Format {
     OUTPUT_NULL,   /**< No output */
     OUTPUT_FLAT, /**< Output in flat-file format */
-    OUTPUT_XML   /**< Output in XML format */
 };
 
 /**
@@ -217,7 +210,9 @@ enum eVbcfl {
     BCFL_MDH=2,  /**< Multiple-sphere Debye-Huckel Dirichlet boundary 
                   * condition */
     BCFL_UNUSED=3,  /**< Unused boundary condition method (placeholder) */
-    BCFL_FOCUS=4  /**< Focusing Dirichlet boundary condition */
+    BCFL_FOCUS=4,  /**< Focusing Dirichlet boundary condition */
+    BCFL_MEM=5,  /**< Focusing membrane boundary condition */
+	BCFL_MAP=6	/**< Skip first level of focusing use an external map */
 };
 
 /**
@@ -273,6 +268,7 @@ typedef enum eVchrg_Src Vchrg_Src;
 enum eVdata_Type {
     VDT_CHARGE, /**< Charge distribution (e) */
     VDT_POT,    /**< Potential (kT/e) */
+	VDT_ATOMPOT, /**< Atom potential (kT/e) */
     VDT_SMOL,   /**< Solvent accessibility defined by molecular/Connolly
                  * surface definition (1 = accessible, 0 = inaccessible) */
     VDT_SSPL,   /**< Spline-based solvent accessibility (1 = accessible, 0 =
@@ -313,7 +309,9 @@ enum eVdata_Format {
     VDF_DX=0,  /**< OpenDX (Data Explorer) format */
     VDF_UHBD=1, /**< UHBD format */
     VDF_AVS=2,  /**< AVS UCD format */
-	VDF_MCSF=3  /**< FEtk MC Simplex Format (MCSF) */
+	VDF_MCSF=3,  /**< FEtk MC Simplex Format (MCSF) */
+	VDF_GZ=4,	/**< Binary file (GZip) */
+	VDF_FLAT=5  /**< Write flat file */ 
 };
 
 /** @typedef Vdata_Format
@@ -407,6 +405,12 @@ typedef enum eVdata_Format Vdata_Format;
  */
 #define VAPBS_RIGHT 0
 
+/** @brief	Maximum number of points on a sphere
+	@note	Used by VaccSurf
+	@ingroup	Vhal
+	*/
+#define MAX_SPHERE_PTS 50000
+
 /** @brief   Face definition for a volume
  *  @note    Consistent with PMG if RIGHT = EAST, BACK = SOUTH 
  *  @ingroup Vhal
@@ -442,6 +446,18 @@ typedef enum eVdata_Format Vdata_Format;
  *  @ingroup Vhal
  */
 #define VPMGSMALL 1e-12
+
+/** @brief   Used to set the min values acceptable for sinh chopping
+ *  @def SINH_MIN
+ *  @ingroup Vhal
+ */
+#define SINH_MIN -85.0
+
+/** @brief   Used to set the max values acceptable for sinh chopping
+ *  @def SINH_MAX
+ *  @ingroup Vhal
+ */
+#define SINH_MAX 85.0
 
 
 #if defined(VDEBUG)

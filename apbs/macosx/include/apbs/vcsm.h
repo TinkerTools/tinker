@@ -7,7 +7,7 @@
  *  @file      vcsm.h
  *  @brief     Contains declarations for the Vcsm class
  *  @ingroup   Vcsm
- *  @version   $Id: vcsm.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version   $Id: vcsm.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author    Nathan A. Baker
  *
  *  @attention
@@ -15,18 +15,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -74,8 +68,8 @@
  *  @author  Nathan Baker
  */
 VEXTERNC void Gem_setExternalUpdateFunction(
-        Gem *thee, /** The FEtk geometry managery */ 
-        void (*externalUpdate)(SS **simps, int num) /** Function pointer for
+        Gem *thee, /**< The FEtk geometry manager */ 
+        void (*externalUpdate)(SS **simps, int num) /**< Function pointer for
                                                       call during mesh
                                                       refinement */
         );
@@ -131,7 +125,7 @@ typedef struct sVcsm Vcsm;
      *  @return  Pointer to Valist atom list
      */
     VEXTERNC Valist* Vcsm_getValist(
-            Vcsm *thee /** The Vcsm object */
+            Vcsm *thee /**< The Vcsm object */
             );
 
     /** @brief   Get number of atoms associated with a simplex
@@ -140,8 +134,8 @@ typedef struct sVcsm Vcsm;
      *  @return  Number of atoms associated with a simplex
      */
     VEXTERNC int Vcsm_getNumberAtoms(
-            Vcsm *thee,  /** The Vcsm object */
-            int isimp  /** Simplex ID */
+            Vcsm *thee,  /**< The Vcsm object */
+            int isimp  /**< Simplex ID */
             );
 
     /** @brief   Get particular atom associated with a simplex
@@ -150,9 +144,9 @@ typedef struct sVcsm Vcsm;
      *  @return  Array of atoms associated with a simplex
      */
     VEXTERNC Vatom* Vcsm_getAtom(
-            Vcsm *thee,  /** The Vcsm object */
-            int iatom,  /** Index of atom in Vcsm list ofr this simplex */
-            int isimp  /** Simplex ID */
+            Vcsm *thee,  /**< The Vcsm object */
+            int iatom,  /**< Index of atom in Vcsm list ofr this simplex */
+            int isimp  /**< Simplex ID */
             );
 
     /** @brief   Get ID of particular atom in a simplex
@@ -161,9 +155,9 @@ typedef struct sVcsm Vcsm;
      *  @return  Index of atom in Valist object
      */
     VEXTERNC int Vcsm_getAtomIndex(
-            Vcsm *thee,  /** The Vcsm object */
-            int iatom,  /** Index of atom in Vcsm list for this simplex */
-            int isimp  /** Simplex ID */
+            Vcsm *thee,  /**< The Vcsm object */
+            int iatom,  /**< Index of atom in Vcsm list for this simplex */
+            int isimp  /**< Simplex ID */
             );
 
     /** @brief   Get number of simplices associated with an atom
@@ -172,8 +166,8 @@ typedef struct sVcsm Vcsm;
      *  @return  Number of simplices associated with an atom
      */
     VEXTERNC int Vcsm_getNumberSimplices(
-            Vcsm *thee,  /** The Vcsm object */
-            int iatom  /** The Valist atom index */
+            Vcsm *thee,  /**< The Vcsm object */
+            int iatom  /**< The Valist atom index */
             );
 
     /** @brief   Get particular simplex associated with an atom
@@ -182,9 +176,9 @@ typedef struct sVcsm Vcsm;
      *  @return  Pointer to simplex object
      */ 
     VEXTERNC SS* Vcsm_getSimplex(
-            Vcsm *thee,  /** The Vcsm object */
-            int isimp,  /** Index of simplex in Vcsm list */
-            int iatom  /** Valist atom index */
+            Vcsm *thee,  /**< The Vcsm object */
+            int isimp,  /**< Index of simplex in Vcsm list */
+            int iatom  /**< Valist atom index */
             );
 
     /** @brief   Get index particular simplex associated with an atom
@@ -193,9 +187,9 @@ typedef struct sVcsm Vcsm;
      *  @return  Gem index of specified simplex
      */ 
     VEXTERNC int Vcsm_getSimplexIndex(
-            Vcsm *thee,  /** THe Vcsm object */
-            int isimp,  /** Index of simplex in Vcsm list */
-            int iatom  /** Index of atom in Valist */
+            Vcsm *thee,  /**< The Vcsm object */
+            int isimp,  /**< Index of simplex in Vcsm list */
+            int iatom  /**< Index of atom in Valist */
             );
 
     /** @brief   Return the memory used by this structure (and its contents)
@@ -205,7 +199,7 @@ typedef struct sVcsm Vcsm;
      *  @return  The memory used by this structure and its contents in bytes
      */
     VEXTERNC unsigned long int Vcsm_memChk(
-            Vcsm *thee /** The Vcsm object */
+            Vcsm *thee /**< The Vcsm object */
             );
 
 #else /* if defined(VINLINE_VCSM) */
@@ -232,8 +226,8 @@ typedef struct sVcsm Vcsm;
  *  @return  Pointer to newly allocated Vcsm object 
  */
 VEXTERNC Vcsm* Vcsm_ctor(
-        Valist *alist,  /** List of atoms */
-        Gem *gm  /** FEtk geometry manager defining the mesh */
+        Valist *alist,  /**< List of atoms */
+        Gem *gm  /**< FEtk geometry manager defining the mesh */
         );
 
 /** @brief   FORTRAN stub to construct Vcsm object
@@ -245,9 +239,9 @@ VEXTERNC Vcsm* Vcsm_ctor(
  *  @return  1 if successful, 0 otherwise 
  */
 VEXTERNC int Vcsm_ctor2(
-        Vcsm *thee,  /** The Vcsm object */
-        Valist *alist,  /** The list of atoms */
-        Gem *gm  /** The FEtk geometry manager defining the mesh */
+        Vcsm *thee,  /**< The Vcsm object */
+        Valist *alist,  /**< The list of atoms */
+        Gem *gm  /**< The FEtk geometry manager defining the mesh */
         );
 
 /** @brief   Destroy Vcsm object
@@ -255,7 +249,7 @@ VEXTERNC int Vcsm_ctor2(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vcsm_dtor(
-        Vcsm **thee  /** Pointer to memory location for Vcsm object */
+        Vcsm **thee  /**< Pointer to memory location for Vcsm object */
         );
 
 /** @brief   FORTRAN stub to destroy Vcsm object
@@ -263,7 +257,7 @@ VEXTERNC void Vcsm_dtor(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vcsm_dtor2(
-        Vcsm *thee /** Pointer to Vcsm object */
+        Vcsm *thee /**< Pointer to Vcsm object */
         );
 
 /** @brief   Initialize charge-simplex map with mesh and atom data
@@ -273,7 +267,7 @@ VEXTERNC void Vcsm_dtor2(
  *            procedures to be efficient
  */
 VEXTERNC void Vcsm_init(
-        Vcsm *thee /** The Vcsm object */
+        Vcsm *thee /**< The Vcsm object */
         );
 
 /** @brief   Update the charge-simplex and simplex-charge maps after
@@ -283,13 +277,13 @@ VEXTERNC void Vcsm_init(
  *  @return  1 if successful, 0 otherwise 
  */
 VEXTERNC int Vcsm_update(
-        Vcsm *thee, /** The Vcsm object */
-        SS **simps, /** List of pointer to newly created (by refinement)
+        Vcsm *thee, /**< The Vcsm object */
+        SS **simps, /**< List of pointer to newly created (by refinement)
                       simplex objects.  The first simplex is expected to be
                       derived from the parent simplex and therefore have the
                       same ID.  The remaining simplices are the children and
                       should represent new entries in the charge-simplex map. */
-        int num /** Number of simplices in simps list */
+        int num /**< Number of simplices in simps list */
         );
 
 #endif /* ifndef _VCSM_H_ */

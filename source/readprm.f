@@ -992,32 +992,32 @@ c
             end do
             string = record(next:120)
             read (string,*,err=390,end=390)  ia,ib,ic,id,pl(1)
-            goto 400
+            goto 420
   390       continue
             id = 0
-            read (string,*,err=391,end=391)  ia,ib,ic,pl(1)
-            goto 400
-  391       continue
-            ic = 0
-            read (string,*,err=392,end=392)  ia,ib,pl(1)
-            goto 400
-  392       continue
-            ib = 0
-            read (string,*,err=410,end=410)  ia,pl(1)
+            read (string,*,err=400,end=400)  ia,ib,ic,pl(1)
+            goto 420
   400       continue
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(2),pl(3),pl(4)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(5)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(8),pl(9)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(11),pl(12),pl(13)
+            ic = 0
+            read (string,*,err=410,end=410)  ia,ib,pl(1)
+            goto 420
   410       continue
+            ib = 0
+            read (string,*,err=430,end=430)  ia,pl(1)
+  420       continue
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(2),pl(3),pl(4)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(5)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(8),pl(9)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(11),pl(12),pl(13)
+  430       continue
             if (ib .eq. 0)  axt = 'None'
             if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Only'
             if (ib.lt.0 .or. ic.lt.0)  axt = 'Bisector'
@@ -1057,9 +1057,9 @@ c
                pg(i) = 0
             end do
             string = record(next:120)
-            read (string,*,err=420,end=420)  ia,pol,thl,
+            read (string,*,err=440,end=440)  ia,pol,thl,
      &                                       (pg(i),i=1,maxval)
-  420       continue
+  440       continue
             if (ia .ne. 0) then
                polr(ia) = pol
                athl(ia) = thl
@@ -1076,8 +1076,8 @@ c
             iz = 0.0d0
             rp = 0.0d0
             string = record(next:120)
-            read (string,*,err=430,end=430)  ia,el,iz,rp
-  430       continue
+            read (string,*,err=450,end=450)  ia,el,iz,rp
+  450       continue
             if (ia .ne. 0) then
                electron(ia) = el
                ionize(ia) = iz
@@ -1092,8 +1092,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=440,end=440)  ia,ib,ss,ts
-  440       continue
+            read (string,*,err=460,end=460)  ia,ib,ss,ts
+  460       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi = npi + 1
@@ -1113,8 +1113,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=450,end=450)  ia,ib,ss,ts
-  450       continue
+            read (string,*,err=470,end=470)  ia,ib,ss,ts
+  470       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi5 = npi5 + 1
@@ -1134,8 +1134,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=460,end=460)  ia,ib,ss,ts
-  460       continue
+            read (string,*,err=480,end=480)  ia,ib,ss,ts
+  480       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi4 = npi4 + 1
@@ -1151,8 +1151,8 @@ c     metal ligand field splitting parameters
 c
          else if (keyword(1:6) .eq. 'METAL ') then
             string = record(next:120)
-            read (string,*,err=470,end=470)  ia
-  470       continue
+            read (string,*,err=490,end=490)  ia
+  490       continue
 c
 c     biopolymer atom type conversion definitions
 c
@@ -1160,15 +1160,15 @@ c
             ia = 0
             ib = 0
             string = record(next:120)
-            read (string,*,err=480,end=480)  ia
+            read (string,*,err=500,end=500)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:120)
-            read (string,*,err=480,end=480)  ib
-  480       continue
+            read (string,*,err=500,end=500)  ib
+  500       continue
             if (ia .ge. maxbio) then
                write (iout,40)
-  490          format (/,' READPRM  --  Too many Biopolymer Types;',
+  510          format (/,' READPRM  --  Too many Biopolymer Types;',
      &                    ' Increase MAXBIO')
                call fatal
             end if

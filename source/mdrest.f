@@ -249,9 +249,9 @@ c
 c
 c     print the translational velocity of the overall system
 c
-      if (verbose) then
+      if (debug) then
          write (iout,10)  (vtot(i),i=1,3),etrans
-   10    format (/,' System Linear Velocity :  ',3d12.2,
+   10    format (' System Linear Velocity :  ',3d12.2,
      &           /,' Translational Kinetic Energy :',10x,f12.4,
      &              ' Kcal/mole')
       end if
@@ -281,9 +281,9 @@ c
 c
 c     print the angular velocity of the overall system
 c
-         if (verbose) then
+         if (debug) then
             write (iout,20)  (vang(i),i=1,3),erot
-   20       format (/,' System Angular Velocity : ',3d12.2,
+   20       format (' System Angular Velocity : ',3d12.2,
      &              /,' Rotational Kinetic Energy :',13x,f12.4,
      &                 ' Kcal/mole')
          end if

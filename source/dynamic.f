@@ -33,7 +33,7 @@ c
       include 'stodyn.i'
       include 'usage.i'
       integer istep,nstep
-      integer mode,modstep
+      integer mode
       real*8 dt,dtdump
       logical exist,query
       character*120 string
@@ -241,10 +241,11 @@ c
 c
 c     remove center of mass translation and rotation if needed
 c
-         modstep = mod(istep,iprint)
-         if (modstep.eq.0 .and. nuse.eq.n) then
-            if (isothermal .and. integrate.ne.'STOCHASTIC'
-     &          .and. thermostat.ne.'ANDERSEN')  call mdrest
+         if (irest.gt.0 .and. nuse.eq.n) then
+            if (mod(istep,irest) .eq. 0) then
+               if (isothermal .and. integrate.ne.'STOCHASTIC'
+     &             .and. thermostat.ne.'ANDERSEN')  call mdrest
+            end if
          end if
       end do
 c

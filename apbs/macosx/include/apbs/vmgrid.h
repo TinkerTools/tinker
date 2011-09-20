@@ -7,25 +7,19 @@
  *  @ingroup Vmgrid
  *  @author  Nathan Baker
  *  @brief   Multiresolution oracle for Cartesian mesh data
- *  @version $Id: vmgrid.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version $Id: vmgrid.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *
  *  @attention
  *  @verbatim
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +61,8 @@
 /* Headers specific to this file */
 #include "apbs/vgrid.h"
 
-/** @def VMGRIDMAX   The maximum number of levels in the grid hiearchy
+/** @def VMGRIDMAX
+ *  @brief The maximum number of levels in the grid hiearchy
  *  @ingroup Vmgrid
  */
 #define VMGRIDMAX 20

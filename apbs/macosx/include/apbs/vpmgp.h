@@ -7,7 +7,7 @@
  *  @file     vpmgp.h
  *  @ingroup  Vpmgp
  *  @brief    Contains declarations for class Vpmgp
- *  @version  $Id: vpmgp.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: vpmgp.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *  @note     Variables and many default values taken directly from PMG
  *
@@ -16,18 +16,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -242,5 +236,29 @@ VEXTERNC void Vpmgp_dtor(Vpmgp **thee);
  *  @param   thee  Pointer to Vpmgp object
  */
 VEXTERNC void Vpmgp_dtor2(Vpmgp *thee);
+
+/**	@brief	Determine array sizes and parameters for multigrid solver
+*	@ingroup Vpmgp
+*	@author	Mike Holst and Nathan Baker
+*/
+VEXTERNC void Vpmgp_size(
+	Vpmgp *thee	/**< Object to be sized */
+	);
+
+/**	@brief	Coarsen the grid by the desired number of levels and determine the resulting numbers of grid points.
+*	@ingroup Vpmgp
+*	@author	Mike Holst and Nathan Baker
+*/
+VEXTERNC void Vpmgp_makeCoarse(
+	int numLevel,	/**< Number of levels to coarsen */
+	int nxOld,	/**< Number of old grid points in this direction */
+	int nyOld,	/**< Number of old grid points in this direction */
+	int nzOld,	/**< Number of old grid points in this direction */
+	int *nxNew,	/**< Number of new grid points in this direction */
+	int *nyNew,	/**< Number of new grid points in this direction */
+	int *nzNew	/**< Number of new grid points in this direction */
+	);
+
+
 
 #endif    /* ifndef _VPMGP_H_ */

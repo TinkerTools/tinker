@@ -8,7 +8,7 @@
  *  @file     vpmg.h
  *  @ingroup  Vpmg
  *  @brief    Contains declarations for class Vpmg
- *  @version  $Id: vpmg.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: vpmg.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -16,18 +16,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -101,6 +95,7 @@ struct sVpmg {
   double *epsy;  /**< Y-shifted dielectric map */
   double *epsz;  /**< Y-shifted dielectric map */
   double *kappa;  /**< Ion accessibility map (0 <= kappa(x) <= 1) */
+  double *pot;  /**< Potential map */
   double *charge;  /**< Charge map */
 
   int *iparm;  /**< Passing int parameters to FORTRAN */
@@ -151,6 +146,10 @@ struct sVpmg {
   int useKappaMap;  /**< Indicates whether Vpmg_fillco was called with an
                      * external kappa map */
   Vgrid *kappaMap;  /**< External kappa map */
+  int usePotMap;    /**< Indicates whether Vpmg_fillco was called with an
+					   * external potential map */
+  Vgrid *potMap;    /**< External potential map */
+	
   int useChargeMap;  /**< Indicates whether Vpmg_fillco was called with an
                       * external charge distribution map */
   Vgrid *chargeMap;  /**< External charge distribution map */
@@ -174,7 +173,7 @@ typedef struct sVpmg Vpmg;
      *  @return  The memory used by this structure and its contents in bytes
      */
     VEXTERNC unsigned long int Vpmg_memChk(
-            Vpmg *thee  /** Object for memory check */
+            Vpmg *thee  /**< Object for memory check */
             );
 
 #else /* if defined(VINLINE_VPMG) */
@@ -192,12 +191,12 @@ typedef struct sVpmg Vpmg;
  *  @returns Pointer to newly allocated Vpmg object 
  */
 VEXTERNC Vpmg* Vpmg_ctor(
-        Vpmgp *parms,  /** PMG parameter object */
-        Vpbe *pbe,  /** PBE-specific variables */
-        int focusFlag,  /** 1 for focusing, 0 otherwise */
-        Vpmg *pmgOLD,  /** Old Vpmg object to use for boundary conditions */
-        MGparm *mgparm,  /** MGparm parameter object for boundary conditions */
-        PBEparm_calcEnergy energyFlag  /** What types of energies to calculate */
+        Vpmgp *parms,  /**< PMG parameter object */
+        Vpbe *pbe,  /**< PBE-specific variables */
+        int focusFlag,  /**< 1 for focusing, 0 otherwise */
+        Vpmg *pmgOLD,  /**< Old Vpmg object to use for boundary conditions */
+        MGparm *mgparm,  /**< MGparm parameter object for boundary conditions */
+        PBEparm_calcEnergy energyFlag  /**< What types of energies to calculate */
         );
 
 /** 
@@ -208,15 +207,15 @@ VEXTERNC Vpmg* Vpmg_ctor(
  *  @returns 1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_ctor2(
-        Vpmg *thee,  /** Memory location for object */
-        Vpmgp *parms,  /** PMG parameter object */
-        Vpbe *pbe,  /** PBE-specific variables */
-        int focusFlag,  /** 1 for focusing, 0 otherwise */
-        Vpmg *pmgOLD,  /** Old Vpmg object to use for boundary conditions (can
+        Vpmg *thee,  /**< Memory location for object */
+        Vpmgp *parms,  /**< PMG parameter object */
+        Vpbe *pbe,  /**< PBE-specific variables */
+        int focusFlag,  /**< 1 for focusing, 0 otherwise */
+        Vpmg *pmgOLD,  /**< Old Vpmg object to use for boundary conditions (can
                          be VNULL if focusFlag = 0) */
-        MGparm *mgparm,  /** MGparm parameter object for boundary 
+        MGparm *mgparm,  /**< MGparm parameter object for boundary 
                           * conditions (can be VNULL if focusFlag = 0) */
-        PBEparm_calcEnergy energyFlag  /** What types of energies to 
+        PBEparm_calcEnergy energyFlag  /**< What types of energies to 
                                         * calculate (ignored if focusFlag
                                         * = 0) */
         );
@@ -226,7 +225,7 @@ VEXTERNC int Vpmg_ctor2(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vpmg_dtor(
-        Vpmg **thee  /** Pointer to memory location of object to be 
+        Vpmg **thee  /**< Pointer to memory location of object to be 
                       * destroyed */
         );
 
@@ -235,7 +234,7 @@ VEXTERNC void Vpmg_dtor(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vpmg_dtor2(
-        Vpmg *thee  /** Pointer to object to be destroyed */
+        Vpmg *thee  /**< Pointer to object to be destroyed */
         );
 
 /** @brief  Fill the coefficient arrays prior to solving the equation
@@ -244,21 +243,23 @@ VEXTERNC void Vpmg_dtor2(
  *  @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_fillco(
-        Vpmg *thee,  /** Vpmg object */ 
-        Vsurf_Meth surfMeth,  /** Surface discretization method */
-        double splineWin,  /** Spline window (in A) for surfMeth = 
+        Vpmg *thee,  /**< Vpmg object */ 
+        Vsurf_Meth surfMeth,  /**< Surface discretization method */
+        double splineWin,  /**< Spline window (in A) for surfMeth = 
                             * VSM_SPLINE */
-        Vchrg_Meth chargeMeth,  /** Charge discretization method */ 
-        int useDielXMap,  /** Boolean to use dielectric map argument */
-        Vgrid *dielXMap,  /** External dielectric map */
-        int useDielYMap,  /** Boolean to use dielectric map argument */
-        Vgrid *dielYMap,  /** External dielectric map */
-        int useDielZMap,  /** Boolean to use dielectric map argument */
-        Vgrid *dielZMap,  /** External dielectric map */
-        int useKappaMap,  /** Boolean to use kappa map argument */
-        Vgrid *kappaMap,  /** External kappa map */
-        int useChargeMap,  /** Boolean to use charge map argument */
-        Vgrid *chargeMap  /** External charge map */
+        Vchrg_Meth chargeMeth,  /**< Charge discretization method */ 
+        int useDielXMap,  /**< Boolean to use dielectric map argument */
+        Vgrid *dielXMap,  /**< External dielectric map */
+        int useDielYMap,  /**< Boolean to use dielectric map argument */
+        Vgrid *dielYMap,  /**< External dielectric map */
+        int useDielZMap,  /**< Boolean to use dielectric map argument */
+        Vgrid *dielZMap,  /**< External dielectric map */
+        int useKappaMap,  /**< Boolean to use kappa map argument */
+        Vgrid *kappaMap,  /**< External kappa map */
+        int usePotMap,  /**< Boolean to use potential map argument */
+		Vgrid *potMap,  /**< External potential map */
+        int useChargeMap,  /**< Boolean to use charge map argument */
+        Vgrid *chargeMap  /**< External charge map */
         );
 
 /** @brief   Solve the PBE using PMG
@@ -267,7 +268,7 @@ VEXTERNC int Vpmg_fillco(
  *  @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_solve(
-        Vpmg *thee  /** Vpmg object */
+        Vpmg *thee  /**< Vpmg object */
         );
 
 /** @brief   Solve Poisson's equation with a homogeneous Laplacian operator
@@ -282,7 +283,7 @@ VEXTERNC int Vpmg_solve(
  *           point...
  */
 VEXTERNC int Vpmg_solveLaplace(
-        Vpmg *thee  /** Vpmg object */
+        Vpmg *thee  /**< Vpmg object */
         );
 
 /** @brief   Get the total electrostatic energy.
@@ -295,8 +296,8 @@ VEXTERNC int Vpmg_solveLaplace(
  *  @returns The electrostatic energy in units of k_B T.
  */
 VEXTERNC double Vpmg_energy(
-        Vpmg *thee,  /** Vpmg object */
-        int extFlag  /** If this was a focused calculation, include (1 -- for
+        Vpmg *thee,  /**< Vpmg object */
+        int extFlag  /**< If this was a focused calculation, include (1 -- for
                       * serial calculations) or ignore (0 -- for parallel
                       * calculations) energy contributions from outside the
                       * focusing domain */
@@ -320,8 +321,8 @@ VEXTERNC double Vpmg_energy(
  *  @returns The fixed charge electrostatic energy in units of k_B T.
  */
 VEXTERNC double Vpmg_qfEnergy(
-        Vpmg *thee,  /** Vpmg object */
-        int extFlag  /** If this was a focused calculation, include (1 -- for
+        Vpmg *thee,  /**< Vpmg object */
+        int extFlag  /**< If this was a focused calculation, include (1 -- for
                       * serial calculations) or ignore (0 -- for parallel
                       * calculations) energy contributions from outside the
                       * focusing domain */
@@ -347,8 +348,8 @@ VEXTERNC double Vpmg_qfEnergy(
  *  @returns The fixed charge electrostatic energy in units of k_B T.
  */
 VEXTERNC double Vpmg_qfAtomEnergy(
-        Vpmg *thee,  /** The Vpmg object */
-        Vatom *atom  /** The atom for energy calculations */
+        Vpmg *thee,  /**< The Vpmg object */
+        Vatom *atom  /**< The atom for energy calculations */
         );
 
 /** @brief Get the "mobile charge" contribution to the electrostatic energy.
@@ -376,8 +377,8 @@ VEXTERNC double Vpmg_qfAtomEnergy(
  *  @returns The mobile charge electrostatic energy in units of k_B T.
  */
 VEXTERNC double Vpmg_qmEnergy(
-        Vpmg *thee,  /** Vpmg object */
-        int extFlag  /** If this was a focused calculation, include (1 -- for
+        Vpmg *thee,  /**< Vpmg object */
+        int extFlag  /**< If this was a focused calculation, include (1 -- for
                       * serial calculations) or ignore (0 -- for parallel
                       * calculations) energy contributions from outside the
                       * focusing domain */
@@ -403,8 +404,8 @@ VEXTERNC double Vpmg_qmEnergy(
  *  @returns The polarization electrostatic energy in units of k_B T.
  */
 VEXTERNC double Vpmg_dielEnergy(
-        Vpmg *thee,  /** Vpmg object */
-        int extFlag  /** If this was a focused calculation, include (1 -- for
+        Vpmg *thee,  /**< Vpmg object */
+        int extFlag  /**< If this was a focused calculation, include (1 -- for
                       * serial calculations) or ignore (0 -- for parallel
                       * calculations) energy contributions from outside the
                       * focusing domain */
@@ -428,7 +429,7 @@ VEXTERNC double Vpmg_dielEnergy(
  *  @returns The integral in units of A^2.
  */
 VEXTERNC double Vpmg_dielGradNorm(
-        Vpmg *thee  /** Vpmg object */
+        Vpmg *thee  /**< Vpmg object */
         );
 
 /** @brief    Calculate the total force on the specified atom in units of
@@ -443,12 +444,12 @@ VEXTERNC double Vpmg_dielGradNorm(
  * @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_force(
-        Vpmg *thee,  /** Vpmg object */
-        double *force, /** 3*sizeof(double) space to hold the force in units
+        Vpmg *thee,  /**< Vpmg object */
+        double *force, /**< 3*sizeof(double) space to hold the force in units
                          of k_B T/AA */
-        int atomID,  /** Valist ID of desired atom */
-        Vsurf_Meth srfm,  /** Surface discretization method */ 
-        Vchrg_Meth chgm  /** Charge discretization method */
+        int atomID,  /**< Valist ID of desired atom */
+        Vsurf_Meth srfm,  /**< Surface discretization method */ 
+        Vchrg_Meth chgm  /**< Charge discretization method */
         );
 
 /** @brief    Calculate the "charge-field" force on the specified atom in units
@@ -463,11 +464,11 @@ VEXTERNC int Vpmg_force(
  * @returns  1 if sucessful, 0 otherwise
  */
 VEXTERNC int Vpmg_qfForce(
-        Vpmg *thee,  /** Vpmg object */
-        double *force, /** 3*sizeof(double) space to hold the force in units
+        Vpmg *thee,  /**< Vpmg object */
+        double *force, /**< 3*sizeof(double) space to hold the force in units
                          of k_B T/A */
-        int atomID,  /** Valist ID of desired atom */
-        Vchrg_Meth chgm  /** Charge discretization method */
+        int atomID,  /**< Valist ID of desired atom */
+        Vchrg_Meth chgm  /**< Charge discretization method */
         );
 
 /** @brief   Calculate the dielectric boundary forces on the
@@ -482,11 +483,11 @@ VEXTERNC int Vpmg_qfForce(
  * @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_dbForce(
-        Vpmg *thee,  /** Vpmg object */
-        double *dbForce, /** 3*sizeof(double) space to hold the dielectric
+        Vpmg *thee,  /**< Vpmg object */
+        double *dbForce, /**< 3*sizeof(double) space to hold the dielectric
                            boundary force in units of k_B T/AA */
-        int atomID,  /** Valist ID of desired atom */
-        Vsurf_Meth srfm  /** Surface discretization method */ 
+        int atomID,  /**< Valist ID of desired atom */
+        Vsurf_Meth srfm  /**< Surface discretization method */ 
         );
 
 /** @brief   Calculate the osmotic pressure on the specified atom in units of
@@ -501,11 +502,11 @@ VEXTERNC int Vpmg_dbForce(
  *  @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_ibForce(
-        Vpmg *thee,  /** Vpmg object */
-        double *force, /** 3*sizeof(double) space to hold the 
+        Vpmg *thee,  /**< Vpmg object */
+        double *force, /**< 3*sizeof(double) space to hold the 
                            boundary force in units of k_B T/AA */
-        int atomID,  /** Valist ID of desired atom */
-        Vsurf_Meth srfm  /** Surface discretization method */ 
+        int atomID,  /**< Valist ID of desired atom */
+        Vsurf_Meth srfm  /**< Surface discretization method */ 
         );
 
 /** @brief   Set partition information which restricts the calculation of
@@ -514,10 +515,10 @@ VEXTERNC int Vpmg_ibForce(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vpmg_setPart(
-        Vpmg *thee,  /** Vpmg object */
-        double lowerCorner[3],  /** Partition lower corner */ 
-        double upperCorner[3],  /** Partition upper corner */
-        int bflags[6]  /** Booleans indicating whether a particular processor
+        Vpmg *thee,  /**< Vpmg object */
+        double lowerCorner[3],  /**< Partition lower corner */ 
+        double upperCorner[3],  /**< Partition upper corner */
+        int bflags[6]  /**< Booleans indicating whether a particular processor
                          is on the boundary with another partition.  0 if the
                          face is not bounded (next to) another partition, and
                          1 otherwise. */
@@ -528,7 +529,7 @@ VEXTERNC void Vpmg_setPart(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vpmg_unsetPart(
-        Vpmg *thee  /** Vpmg object */
+        Vpmg *thee  /**< Vpmg object */
         );
 
 /** @brief  Fill the specified array with accessibility values 
@@ -537,12 +538,13 @@ VEXTERNC void Vpmg_unsetPart(
  *  @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int Vpmg_fillArray(
-        Vpmg *thee,  /** Vpmg object */
-        double *vec,  /** A nx*ny*nz*sizeof(double) array to contain the
+        Vpmg *thee,  /**< Vpmg object */
+        double *vec,  /**< A nx*ny*nz*sizeof(double) array to contain the
                         values to be written */
-        Vdata_Type type,  /** What to write */ 
-        double parm,  /** Parameter for data type definition (if needed) */
-        Vhal_PBEType pbetype  /** Parameter for PBE type (if needed) */
+        Vdata_Type type,  /**< What to write */ 
+        double parm,  /**< Parameter for data type definition (if needed) */
+        Vhal_PBEType pbetype, /**< Parameter for PBE type (if needed) */
+		PBEparm * pbeparm /**< Pass in the PBE parameters (if needed) */
         );
 
 /** @brief   Computes the field at an atomic center using a stencil based
@@ -551,9 +553,9 @@ VEXTERNC int Vpmg_fillArray(
  *  @author  Michael Schnieders
  */
 VPUBLIC void Vpmg_fieldSpline4(
-             Vpmg *thee,     /** Vpmg object */
-             int atomID,     /** Atom index */
-             double field[3] /** The (returned) electric field */
+             Vpmg *thee,     /**< Vpmg object */
+             int atomID,     /**< Atom index */
+             double field[3] /**< The (returned) electric field */
              );
 
 /** @brief   Computes the permanent multipole electrostatic hydration 
@@ -564,8 +566,8 @@ VPUBLIC void Vpmg_fieldSpline4(
  *  @returns The permanent multipole electrostatic hydration energy
  */
 VEXTERNC double Vpmg_qfPermanentMultipoleEnergy(
-             Vpmg *thee,     /** Vpmg object */
-             int atomID      /** Atom index */
+             Vpmg *thee,     /**< Vpmg object */
+             int atomID      /**< Atom index */
              );
 
 /** @brief   Computes the q-Phi Force for permanent multipoles based on
@@ -574,10 +576,10 @@ VEXTERNC double Vpmg_qfPermanentMultipoleEnergy(
  *  @author  Michael Schnieders
  */
 VEXTERNC void Vpmg_qfPermanentMultipoleForce(
-             Vpmg *thee,      /** Vpmg object */
-             int atomID,      /** Atom index */
-             double force[3], /** (returned) force */ 
-             double torque[3] /** (returned) torque */
+             Vpmg *thee,      /**< Vpmg object */
+             int atomID,      /**< Atom index */
+             double force[3], /**< (returned) force */ 
+             double torque[3] /**< (returned) torque */
              );
 
 /** @brief   Compute the ionic boundary force for permanent multipoles.
@@ -585,9 +587,9 @@ VEXTERNC void Vpmg_qfPermanentMultipoleForce(
  *  @author  Michael Schnieders
  */
 VEXTERNC void Vpmg_ibPermanentMultipoleForce( 
-             Vpmg *thee,      /** Vpmg object */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Compute the dielectric boundary force for permanent multipoles.
@@ -595,9 +597,9 @@ VEXTERNC void Vpmg_ibPermanentMultipoleForce(
  *  @author  Michael Schnieders
  */                                          
 VEXTERNC void Vpmg_dbPermanentMultipoleForce(
-             Vpmg *thee,      /** Vpmg object */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
                                              
 /** @brief   q-Phi direct polarization force between permanent multipoles and
@@ -607,12 +609,12 @@ VEXTERNC void Vpmg_dbPermanentMultipoleForce(
  *  @author  Michael Schnieders
  */         
 VEXTERNC void Vpmg_qfDirectPolForce( 
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *perm,     /** Permanent multipole potential */
-             Vgrid *induced,  /** Induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3], /** (returned) force */ 
-             double torque[3] /** (returned) torque */
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *perm,     /**< Permanent multipole potential */
+             Vgrid *induced,  /**< Induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3], /**< (returned) force */ 
+             double torque[3] /**< (returned) torque */
              );
 
 /** @brief   q-Phi direct polarization force between permanent multipoles and
@@ -624,12 +626,12 @@ VEXTERNC void Vpmg_qfDirectPolForce(
  *  @author  Michael Schnieders
  */        
 VEXTERNC void Vpmg_qfNLDirectPolForce( 
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *perm,     /** Permanent multipole potential */
-             Vgrid *nlInduced,/** Non-local induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3], /** (returned) force */ 
-             double torque[3] /** (returned) torque */
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *perm,     /**< Permanent multipole potential */
+             Vgrid *nlInduced,/**< Non-local induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3], /**< (returned) force */ 
+             double torque[3] /**< (returned) torque */
              );
 
 /** @brief   Ionic boundary direct polarization force between permanent
@@ -640,11 +642,11 @@ VEXTERNC void Vpmg_qfNLDirectPolForce(
  *  @author  Michael Schnieders
  */  
 VEXTERNC void Vpmg_ibDirectPolForce(
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *perm,     /** Permanent multipole potential */
-             Vgrid *induced,  /** Induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *perm,     /**< Permanent multipole potential */
+             Vgrid *induced,  /**< Induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Ionic boundary direct polarization force between permanent
@@ -656,11 +658,11 @@ VEXTERNC void Vpmg_ibDirectPolForce(
  *  @author  Michael Schnieders
  */  
 VEXTERNC void Vpmg_ibNLDirectPolForce( 
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *perm,     /** Permanent multipole potential */
-             Vgrid *nlInduced,/** Induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *perm,     /**< Permanent multipole potential */
+             Vgrid *nlInduced,/**< Induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Dielectric boundary direct polarization force between permanent
@@ -671,11 +673,11 @@ VEXTERNC void Vpmg_ibNLDirectPolForce(
  *  @author  Michael Schnieders
  */  
 VEXTERNC void Vpmg_dbDirectPolForce(
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *perm,     /** Permanent multipole potential */
-             Vgrid *induced,  /** Induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *perm,     /**< Permanent multipole potential */
+             Vgrid *induced,  /**< Induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Dielectric bounday direct polarization force between
@@ -687,11 +689,11 @@ VEXTERNC void Vpmg_dbDirectPolForce(
  *  @author  Michael Schnieders
  */  
 VEXTERNC void Vpmg_dbNLDirectPolForce(
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *perm,     /** Permanent multipole potential */
-             Vgrid *nlInduced,/** Non-local induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *perm,     /**< Permanent multipole potential */
+             Vgrid *nlInduced,/**< Non-local induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Mutual polarization force for induced dipoles based on 5th
@@ -701,11 +703,11 @@ VEXTERNC void Vpmg_dbNLDirectPolForce(
  *  @author  Michael Schnieders
  */  
 VEXTERNC void Vpmg_qfMutualPolForce(
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *induced,  /** Induced dipole potential */
-             Vgrid *nlInduced,/** Non-local induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *induced,  /**< Induced dipole potential */
+             Vgrid *nlInduced,/**< Non-local induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Ionic boundary mutual polarization force for induced dipoles 
@@ -716,11 +718,11 @@ VEXTERNC void Vpmg_qfMutualPolForce(
  *  @author  Michael Schnieders
  */ 
 VEXTERNC void Vpmg_ibMutualPolForce(
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *induced,  /** Induced dipole potential */
-             Vgrid *nlInduced,/** Non-local induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *induced,  /**< Induced dipole potential */
+             Vgrid *nlInduced,/**< Non-local induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Dielectric boundary mutual polarization force for induced dipoles 
@@ -731,11 +733,11 @@ VEXTERNC void Vpmg_ibMutualPolForce(
  *  @author  Michael Schnieders
  */ 
 VEXTERNC void Vpmg_dbMutualPolForce(
-             Vpmg *thee,      /** Vpmg object */
-             Vgrid *induced,  /** Induced dipole potential */
-             Vgrid *nlInduced,/** Non-local induced dipole potential */
-             int atomID,      /** Atom index */
-             double force[3]  /** (returned) force */ 
+             Vpmg *thee,      /**< Vpmg object */
+             Vgrid *induced,  /**< Induced dipole potential */
+             Vgrid *nlInduced,/**< Non-local induced dipole potential */
+             int atomID,      /**< Atom index */
+             double force[3]  /**< (returned) force */ 
              );
 
 /** @brief   Print out a column-compressed sparse matrix in Harwell-Boeing
@@ -745,10 +747,10 @@ VEXTERNC void Vpmg_dbMutualPolForce(
  *  @bug  Can this path variable be replaced with a Vio socket?
  */
 VEXTERNC void Vpmg_printColComp(
-        Vpmg *thee,  /**  Vpmg object */
-        char path[72],  /** The file to which the matrix is to be written */
-        char title[72],  /** The title of the matrix */
-        char mxtype[3],   /** The type of REAL-valued matrix, a 3-character
+        Vpmg *thee,  /**<  Vpmg object */
+        char path[72],  /**< The file to which the matrix is to be written */
+        char title[72],  /**< The title of the matrix */
+        char mxtype[3],   /**< The type of REAL-valued matrix, a 3-character
                             string of the form "R_A" where the '_' can be one
                             of:  
                             \li S:  symmetric matrix
@@ -756,7 +758,7 @@ VEXTERNC void Vpmg_printColComp(
                             \li H:  Hermitian matrix
                             \li Z:  skew-symmetric matrix
                             \li R:  rectangular matrix */
-        int flag  /** The operator to compress:
+        int flag  /**< The operator to compress:
                     \li 0:  Poisson operator
                     \li 1:  Linearization of the full Poisson-Boltzmann
                             operator around the current solution */

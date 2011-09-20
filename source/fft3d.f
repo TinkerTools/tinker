@@ -20,24 +20,23 @@ c
       implicit none
       include 'sizes.i'
       include 'fft.i'
+      include 'openmp.i'
       include 'pme.i'
 !$    integer ifront,iback
 !$    integer error,iguess
-!$    integer nprocs
-!$    integer omp_get_num_procs
 c
 c
-c     initialization of Fast Fourier transform using FFTW
+c     initialization of Fast Fourier transform using FFTW;
+c     comment "dfftw_init_threads" and "dfftw_plan_with_threads"
+c     calls if serial FFTW is used in place of OpenMP FFTW
 c
 !$    if (ffttyp .eq. 'FFTW') then
 !$       ifront = -1
 !$       iback = 1
 !$       error = 0
 !$       iguess = 0
-!$       nprocs = 1
-!$       nprocs = omp_get_num_procs ()
 !$       call dfftw_init_threads (error)
-!$       call dfftw_plan_with_nthreads (nprocs)
+!$       call dfftw_plan_with_nthreads (nthread)
 !$       call dfftw_plan_dft_3d (planf,nfft1,nfft2,nfft3,qgrid,
 !$   &                              qgrid,ifront,iguess)
 !$       call dfftw_plan_dft_3d (planb,nfft1,nfft2,nfft3,qgrid,

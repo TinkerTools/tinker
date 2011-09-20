@@ -27,6 +27,7 @@ c
       include 'energi.i'
       include 'group.i'
       include 'inter.i'
+      include 'iounit.i'
       include 'potent.i'
       include 'vdwpot.i'
       integer i
@@ -172,5 +173,14 @@ c
      &                 + aec(i) + aecd(i) + aed(i) + aem(i) + aep(i)
      &                 + aer(i) + aes(i) + aelf(i) + aeg(i) + aex(i)
       end do
+c
+c     check for an illegal value for the total energy
+c
+      if (isnan(esum)) then
+         write (iout,10)
+   10    format (/,' ANALYSIS  --  Illegal Value for the Total',
+     &              ' Potential Energy')
+         call fatal
+      end if
       return
       end

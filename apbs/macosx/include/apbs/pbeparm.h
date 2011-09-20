@@ -6,7 +6,7 @@
  *  @file     pbeparm.h
  *  @ingroup  PBEparm
  *  @brief    Contains declarations for class PBEparm
- *  @version  $Id: pbeparm.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: pbeparm.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -14,18 +14,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -69,7 +63,7 @@
 /** @brief   Number of things that can be written out in a single calculation
  *  @ingroup PBEparm
  */
-#define PBEPARM_MAXWRITE 10
+#define PBEPARM_MAXWRITE 20
 
 /**
  * @ingroup PBEparm
@@ -121,6 +115,10 @@ struct sPBEparm {
     int useKappaMap;  /**< Indicates whether we use an external
                        * kappa map */
     int kappaMapID;  /**< Kappa map ID (if used) */
+    int usePotMap;  /**< Indicates whether we use an external
+                       * kappa map */
+    int potMapID;  /**< Kappa map ID (if used) */
+	
     int useChargeMap;  /**< Indicates whether we use an external
                         * charge distribution map */
     int chargeMapID;  /**< Charge distribution map ID (if used) */
@@ -159,6 +157,22 @@ struct sPBEparm {
     int setcalcenergy;  /**< Flag, @see calcenergy */
     PBEparm_calcForce calcforce;  /**< Atomic forces calculation */
     int setcalcforce;  /**< Flag, @see calcforce */
+	
+	/*----------------------------------------------------------------*/
+	/* Added by Michael Grabe                                         */
+	/*----------------------------------------------------------------*/
+	
+    double zmem;               /**< z value of membrane bottom */
+    int setzmem;               /**< Flag */
+    double Lmem;               /**< membrane width */
+    int setLmem;               /**< Flag */
+    double mdie;               /**< membrane dielectric constant */
+    int setmdie;               /**< Flag */
+    double memv;               /**< Membrane potential */
+    int setmemv;               /**< Flag */
+	
+	/*----------------------------------------------------------------*/
+	
     int numwrite;  /**< Number of write statements encountered */
     char writestem[PBEPARM_MAXWRITE][VMAX_ARGLEN]; /**< File stem to write 
                                                     * data to */
@@ -195,8 +209,8 @@ typedef struct sPBEparm PBEparm;
  *  @returns Charge of ion species (e)
  */
 VEXTERNC double PBEparm_getIonCharge(
-        PBEparm *thee, /** PBEparm object */
-        int iion  /** Ion species ID/index */
+        PBEparm *thee, /**< PBEparm object */
+        int iion  /**< Ion species ID/index */
         );
 
 /** @brief   Get concentration (M) of specified ion species
@@ -205,8 +219,8 @@ VEXTERNC double PBEparm_getIonCharge(
  *  @returns Concentration of ion species (M)
  */
 VEXTERNC double PBEparm_getIonConc(
-        PBEparm *thee, /** PBEparm object */
-        int iion /** Ion species ID/index */
+        PBEparm *thee, /**< PBEparm object */
+        int iion /**< Ion species ID/index */
         );
 
 /** @brief   Get radius (A) of specified ion species
@@ -215,8 +229,8 @@ VEXTERNC double PBEparm_getIonConc(
  *  @returns Radius of ion species (A)
  */
 VEXTERNC double PBEparm_getIonRadius(
-        PBEparm *thee, /** PBEparm object */ 
-        int iion /** Ion species ID/index */
+        PBEparm *thee, /**< PBEparm object */ 
+        int iion /**< Ion species ID/index */
         );
 
 
@@ -233,7 +247,7 @@ VEXTERNC PBEparm* PBEparm_ctor();
  *  @returns 1 if succesful, 0 otherwise
  */
 VEXTERNC int PBEparm_ctor2(
-        PBEparm *thee /** Memory location for object */
+        PBEparm *thee /**< Memory location for object */
         );
 
 /** @brief   Object destructor
@@ -241,7 +255,7 @@ VEXTERNC int PBEparm_ctor2(
  *  @author  Nathan Baker
  */
 VEXTERNC void PBEparm_dtor(
-        PBEparm **thee /** Pointer to memory location of object */
+        PBEparm **thee /**< Pointer to memory location of object */
         );
 
 /** @brief   FORTRAN stub for object destructor
@@ -249,7 +263,7 @@ VEXTERNC void PBEparm_dtor(
  *  @author  Nathan Baker
  */
 VEXTERNC void PBEparm_dtor2(
-        PBEparm *thee /** Pointer to object to be destroyed */
+        PBEparm *thee /**< Pointer to object to be destroyed */
         );
 
 /** @brief   Consistency check for parameter values stored in object
@@ -258,7 +272,7 @@ VEXTERNC void PBEparm_dtor2(
  *  @returns 1 if OK, 0 otherwise
  */
 VEXTERNC int PBEparm_check(
-        PBEparm *thee /** Object to be checked */
+        PBEparm *thee /**< Object to be checked */
         );
 
 /** @brief   Copy PBEparm object into thee
@@ -266,8 +280,8 @@ VEXTERNC int PBEparm_check(
  *  @author  Nathan Baker
  */
 VEXTERNC void PBEparm_copy(
-        PBEparm *thee, /** Target for copy */
-        PBEparm *parm /** Source for copy */
+        PBEparm *thee, /**< Target for copy */
+        PBEparm *parm /**< Source for copy */
         );
 
 /** @brief   Parse a keyword from an input file
@@ -277,9 +291,9 @@ VEXTERNC void PBEparm_copy(
  *            of error (i.e., too few args); 0 if not matched
  */
 VEXTERNC int PBEparm_parseToken(
-        PBEparm *thee, /** Parsing object */
-        char tok[VMAX_BUFSIZE], /** Token to parse */ 
-        Vio *sock /** Socket for additional tokens */
+        PBEparm *thee, /**< Parsing object */
+        char tok[VMAX_BUFSIZE], /**< Token to parse */ 
+        Vio *sock /**< Socket for additional tokens */
         );
 
 

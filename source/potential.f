@@ -1755,9 +1755,10 @@ c
                   xx(nvar) = pole(5,i)
                   write (iout,150)  nvar,it,'XX-Quad ',qterm*pole(5,i)
   150             format (i6,7x,i8,13x,a8,5x,f12.5)
+               else
+                  write (iout,160)    it,'XX-Quad ',qterm*pole(5,i)
+  160             format (4x,'--',7x,i8,13x,a8,5x,f12.5)
                end if
-               write (iout,160)    it,'XX-Quad ',qterm*pole(5,i)
-  160          format (4x,'--',7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,170)  it,'XX-Quad ',qterm*pole(5,i)
   170          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
@@ -1787,9 +1788,10 @@ c
                   xx(nvar) = pole(9,i)
                   write (iout,220)  nvar,it,'YY-Quad ',qterm*pole(9,i)
   220             format (i6,7x,i8,13x,a8,5x,f12.5)
+               else
+                  write (iout,230)  it,'YY-Quad ',qterm*pole(9,i)
+  230             format (4x,'--',7x,i8,13x,a8,5x,f12.5)
                end if
-               write (iout,230)  it,'YY-Quad ',qterm*pole(9,i)
-  230          format (4x,'--',7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,240)  it,'YY-Quad ',qterm*pole(9,i)
   240          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
@@ -2354,10 +2356,10 @@ c
                end if
             else if (polaxe(i) .eq. 'Bisector') then
                if (yaxis(i) .eq. 0) then
-                  write (ikey,100)  it,iz,-ix,pole(1,i)
+                  write (ikey,100)  it,-iz,-ix,pole(1,i)
   100             format ('multipole',1x,3i5,11x,f11.5)
                else
-                  write (ikey,110)  it,iz,-ix,iy,pole(1,i)
+                  write (ikey,110)  it,-iz,-ix,iy,pole(1,i)
   110             format ('multipole',1x,4i5,6x,f11.5)
                end if
             else if (polaxe(i) .eq. 'Z-Bisect') then

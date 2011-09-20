@@ -57,10 +57,10 @@ LINKDIR = /usr/local/bin
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 11
+##  Compiler: Intel Fortran for Linux 12.0
 ##
 
-#F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
+#F77 = /opt/intel/bin/ifort
 #LIBS =
 #F77FLAGS = -c -xHost -vec-report0
 #OPTFLAGS = -O3 -no-ipo -no-prec-div
@@ -71,11 +71,11 @@ LINKDIR = /usr/local/bin
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 11
+##  Compiler: Intel Fortran for Linux 12.0
 ##  Parallel: OpenMP
 ##
 
-#F77 = /opt/intel/Compiler/11.1/072/bin/ia32/ifort
+#F77 = /opt/intel/bin/ifort
 #LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
 #F77FLAGS = -c -xHost -assume cc_omp
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
@@ -86,10 +86,10 @@ LINKDIR = /usr/local/bin
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.6 (Snow Leopard)
-##  Compiler: Intel Fortran for Mac 11
+##  Compiler: Intel Fortran for Mac 12.0
 ##
 
-#F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
+#F77 = /opt/intel/bin/ifort
 #LIBS =
 #F77FLAGS = -c -axSSSE3 -vec-report0
 #OPTFLAGS = -O3 -no-ipo -no-prec-div
@@ -100,11 +100,11 @@ LINKDIR = /usr/local/bin
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.6 (Snow Leopard)
-##  Compiler: Intel Fortran for Mac 11
+##  Compiler: Intel Fortran for Mac 12.0
 ##  Parallel: OpenMP
 ##
 
-F77 = /opt/intel/Compiler/11.1/088/bin/intel64/ifort
+F77 = /opt/intel/bin/ifort
 LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
 F77FLAGS = -c -axSSSE3 -assume cc_omp
 OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
@@ -1071,7 +1071,6 @@ libtinker.a: ${OBJS}
         surfatom.o \
         switch.o \
         temper.o \
-        testrot.o \
         tncg.o \
         torphase.o \
         torque.o \

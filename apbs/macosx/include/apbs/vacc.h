@@ -6,7 +6,7 @@
  *  @file     vacc.h
  *  @ingroup  Vacc
  *  @brief    Contains declarations for class Vacc
- *  @version  $Id: vacc.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: vacc.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -14,18 +14,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -81,7 +75,7 @@ struct sVaccSurf {
     double *xpts;  /**< Array of point x-locations */
     double *ypts;  /**< Array of point y-locations */
     double *zpts;  /**< Array of point z-locations */
-    int *bpts;  /**< Array of booleans indicating whether a point is (1) or is
+    char *bpts;  /**< Array of booleans indicating whether a point is (1) or is
                  * not (0) part of the surface */
     double area;  /**< Area spanned by these points */
     int npts;  /**< Length of thee->xpts, ypts, zpts arrays */
@@ -133,7 +127,7 @@ typedef struct sVacc Vacc;
      *  @returns Number of bytes allocated for object
      */
     VEXTERNC unsigned long int Vacc_memChk(
-            Vacc *thee /** Object for memory check */
+            Vacc *thee /**< Object for memory check */
             );
 
 #else /* if defined(VINLINE_VACC) */
@@ -150,9 +144,9 @@ typedef struct sVacc Vacc;
  * @returns  Newly allocated and constructed surface object 
  */
 VEXTERNC VaccSurf* VaccSurf_ctor(
-        Vmem *mem,  /** Memory manager (can be VNULL) */
-        double probe_radius,  /** Probe radius (in A) for this surface */
-        int nsphere  /** Number of points in sphere */
+        Vmem *mem,  /**< Memory manager (can be VNULL) */
+        double probe_radius,  /**< Probe radius (in A) for this surface */
+        int nsphere  /**< Number of points in sphere */
         );
 
 /** 
@@ -163,10 +157,10 @@ VEXTERNC VaccSurf* VaccSurf_ctor(
  * @returns  1 if successful, 0 otherwise
  */
 VEXTERNC int VaccSurf_ctor2(
-        VaccSurf *thee,  /** Allocated memory */
-        Vmem *mem,  /** Memory manager (can be VNULL) */
-        double probe_radius,  /** Probe radius (in A) for this surface */
-        int nsphere  /** Number of points in sphere */
+        VaccSurf *thee,  /**< Allocated memory */
+        Vmem *mem,  /**< Memory manager (can be VNULL) */
+        double probe_radius,  /**< Probe radius (in A) for this surface */
+        int nsphere  /**< Number of points in sphere */
         );
 
 /**
@@ -175,7 +169,7 @@ VEXTERNC int VaccSurf_ctor2(
  * @author  Nathan Baker
  */
 VEXTERNC void VaccSurf_dtor(
-        VaccSurf **thee  /** Object to be destroyed */
+        VaccSurf **thee  /**< Object to be destroyed */
         );
 
 /**
@@ -184,7 +178,7 @@ VEXTERNC void VaccSurf_dtor(
  * @author  Nathan Baker
  */
 VEXTERNC void VaccSurf_dtor2(
-        VaccSurf *thee  /** Object to be destroyed */
+        VaccSurf *thee  /**< Object to be destroyed */
         );
 
 /** 
@@ -202,8 +196,8 @@ VEXTERNC void VaccSurf_dtor2(
  * @return  Reference sphere surface object
  */ 
 VEXTERNC VaccSurf* VaccSurf_refSphere(
-        Vmem *mem,  /** Memory object */
-        int npts /** Requested number of points on sphere */
+        Vmem *mem,  /**< Memory object */
+        int npts /**< Requested number of points on sphere */
         );
 
 /**
@@ -214,11 +208,11 @@ VEXTERNC VaccSurf* VaccSurf_refSphere(
  * @return  Atom sphere surface object
  */
 VEXTERNC VaccSurf* Vacc_atomSurf(
-        Vacc *thee,  /** Accessibility object for molecule */
-        Vatom *atom,  /** Atom for which the surface should be constructed */
-        VaccSurf *ref,  /** Reference sphere which sets the resolution for the
+        Vacc *thee,  /**< Accessibility object for molecule */
+        Vatom *atom,  /**< Atom for which the surface should be constructed */
+        VaccSurf *ref,  /**< Reference sphere which sets the resolution for the
                          * surface. @see VaccSurf_refSphere */
-        double probe_radius  /** Probe radius (in A) */
+        double probe_radius  /**< Probe radius (in A) */
         );
 
 
@@ -227,10 +221,10 @@ VEXTERNC VaccSurf* Vacc_atomSurf(
  *  @author  Nathan Baker
  *  @returns Newly allocated Vacc object */
 VEXTERNC Vacc* Vacc_ctor(
-        Valist *alist,  /** Molecule for accessibility queries */
-        Vclist *clist,  /** Pre-constructed cell list for looking up atoms 
+        Valist *alist,  /**< Molecule for accessibility queries */
+        Vclist *clist,  /**< Pre-constructed cell list for looking up atoms 
                         * near specific positions */
-        double surf_density  /** Minimum per-atom solvent accessible surface
+        double surf_density  /**< Minimum per-atom solvent accessible surface
                              * point density (in pts/A^2)*/
         );
 
@@ -239,11 +233,11 @@ VEXTERNC Vacc* Vacc_ctor(
  *  @author  Nathan Baker
  *  @returns 1 if successful, 0 otherwise */
 VEXTERNC int Vacc_ctor2(
-        Vacc *thee, /** Memory for Vacc objet */
-        Valist *alist, /** Molecule for accessibility queries */
-        Vclist *clist, /** Pre-constructed cell list for looking up atoms 
+        Vacc *thee, /**< Memory for Vacc objet */
+        Valist *alist, /**< Molecule for accessibility queries */
+        Vclist *clist, /**< Pre-constructed cell list for looking up atoms 
                         * near specific positions */
-        double surf_density  /** Minimum per-atom solvent accessible surface
+        double surf_density  /**< Minimum per-atom solvent accessible surface
                              * point density (in pts/A^2)*/
         );
 
@@ -252,7 +246,7 @@ VEXTERNC int Vacc_ctor2(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vacc_dtor(
-        Vacc **thee /** Pointer to memory location of object */
+        Vacc **thee /**< Pointer to memory location of object */
         );
 
 /** @brief   FORTRAN stub to destroy object
@@ -260,7 +254,7 @@ VEXTERNC void Vacc_dtor(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vacc_dtor2(
-        Vacc *thee /** Pointer to object */
+        Vacc *thee /**< Pointer to object */
         );
 
 /** @brief   Report van der Waals accessibility
@@ -274,8 +268,8 @@ VEXTERNC void Vacc_dtor2(
  *          (inaccessible)
  */
 VEXTERNC double Vacc_vdwAcc(
-        Vacc *thee,  /** Accessibility object */
-        double center[VAPBS_DIM] /** Probe center coordinates */
+        Vacc *thee,  /**< Accessibility object */
+        double center[VAPBS_DIM] /**< Probe center coordinates */
         );
 
 /** @brief   Report inflated van der Waals accessibility
@@ -290,9 +284,9 @@ VEXTERNC double Vacc_vdwAcc(
  *          (inaccessible)
  */
 VEXTERNC double Vacc_ivdwAcc(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double radius /** Probe radius (&Aring;) */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double radius /**< Probe radius (&Aring;) */
         );
 
 /** @brief   Report molecular accessibility
@@ -310,9 +304,9 @@ VEXTERNC double Vacc_ivdwAcc(
  *           Jess Swanson for finding this)
  */
 VEXTERNC double Vacc_molAcc(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double radius /** Probe radius (in &Aring;) */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double radius /**< Probe radius (in &Aring;) */
         );
 
 /** @brief   Report molecular accessibility quickly
@@ -334,9 +328,9 @@ VEXTERNC double Vacc_molAcc(
  *           Jess Swanson for finding this)
  */
 VEXTERNC double Vacc_fastMolAcc(
-        Vacc *thee,  /** Accessibility object */
-        double center[VAPBS_DIM],  /** Probe center coordinates */
-        double radius /** Probe radius (in &Aring;) */
+        Vacc *thee,  /**< Accessibility object */
+        double center[VAPBS_DIM],  /**< Probe center coordinates */
+        double radius /**< Probe radius (in &Aring;) */
         );
 
 /** @brief   Report spline-based accessibility
@@ -351,10 +345,10 @@ VEXTERNC double Vacc_fastMolAcc(
  *          (inaccessible)
  */
 VEXTERNC double Vacc_splineAcc(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double win, /** Spline window (&Aring;) */ 
-        double infrad  /** Inflation radius (&Aring;) for ion access. */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double win, /**< Spline window (&Aring;) */ 
+        double infrad  /**< Inflation radius (&Aring;) for ion access. */
         );
 
 /** @brief   Report gradient of spline-based accessibility.
@@ -363,11 +357,11 @@ VEXTERNC double Vacc_splineAcc(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vacc_splineAccGrad(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double win, /** Spline window (&Aring;) */ 
-        double infrad,  /** Inflation radius (&Aring;) for ion access. */
-        double *grad /** 3-vector set to gradient of accessibility */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double win, /**< Spline window (&Aring;) */ 
+        double infrad,  /**< Inflation radius (&Aring;) for ion access. */
+        double *grad /**< 3-vector set to gradient of accessibility */
         );
 
 /** @brief   Report spline-based accessibility for a given atom
@@ -382,11 +376,11 @@ VEXTERNC void Vacc_splineAccGrad(
  *          (inaccessible)
  */
 VEXTERNC double Vacc_splineAccAtom(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double win, /** Spline window (&Aring;) */ 
-        double infrad, /** Inflation radius (&Aring;) for ion access. */
-        Vatom *atom /** Atom */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double win, /**< Spline window (&Aring;) */ 
+        double infrad, /**< Inflation radius (&Aring;) for ion access. */
+        Vatom *atom /**< Atom */
         );
 
 /** @brief   Report gradient of spline-based accessibility with respect to a
@@ -400,12 +394,12 @@ VEXTERNC double Vacc_splineAccAtom(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vacc_splineAccGradAtomUnnorm(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double win, /** Spline window (&Aring;) */ 
-        double infrad, /** Inflation radius (&Aring;) for ion access. */
-        Vatom *atom, /** Atom */ 
-        double *force /** VAPBS_DIM-vector set to gradient of accessibility */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double win, /**< Spline window (&Aring;) */ 
+        double infrad, /**< Inflation radius (&Aring;) for ion access. */
+        Vatom *atom, /**< Atom */ 
+        double *force /**< VAPBS_DIM-vector set to gradient of accessibility */
         );
 
 /** @brief   Report gradient of spline-based accessibility with respect to a
@@ -420,12 +414,12 @@ VEXTERNC void Vacc_splineAccGradAtomUnnorm(
  *  @author  Nathan Baker
  */
 VEXTERNC void Vacc_splineAccGradAtomNorm(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double win, /** Spline window (&Aring;) */ 
-        double infrad, /** Inflation radius (&Aring;) for ion access. */
-        Vatom *atom, /** Atom */ 
-        double *force /** VAPBS_DIM-vector set to gradient of accessibility */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double win, /**< Spline window (&Aring;) */ 
+        double infrad, /**< Inflation radius (&Aring;) for ion access. */
+        Vatom *atom, /**< Atom */ 
+        double *force /**< VAPBS_DIM-vector set to gradient of accessibility */
         );
 
 /** @brief   Report gradient of spline-based accessibility with respect to a
@@ -436,12 +430,12 @@ VEXTERNC void Vacc_splineAccGradAtomNorm(
  *  @author  Michael Schnieders
  */
 VEXTERNC void Vacc_splineAccGradAtomNorm4(
-        Vacc *thee, /** Accessibility object */
-        double center[VAPBS_DIM], /** Probe center coordinates */
-        double win, /** Spline window (&Aring;) */ 
-        double infrad, /** Inflation radius (&Aring;) for ion access. */
-        Vatom *atom, /** Atom */ 
-        double *force /** VAPBS_DIM-vector set to gradient of accessibility */
+        Vacc *thee, /**< Accessibility object */
+        double center[VAPBS_DIM], /**< Probe center coordinates */
+        double win, /**< Spline window (&Aring;) */ 
+        double infrad, /**< Inflation radius (&Aring;) for ion access. */
+        Vatom *atom, /**< Atom */ 
+        double *force /**< VAPBS_DIM-vector set to gradient of accessibility */
         );
 
 /** @brief   Report gradient of spline-based accessibility with respect to a
@@ -452,12 +446,12 @@ VEXTERNC void Vacc_splineAccGradAtomNorm4(
 *  @author  Michael Schnieders
 */
 VEXTERNC void Vacc_splineAccGradAtomNorm3(
-		Vacc *thee, /** Accessibility object */
-		double center[VAPBS_DIM], /** Probe center coordinates */
-		double win, /** Spline window (&Aring;) */ 
-		double infrad, /** Inflation radius (&Aring;) for ion access. */
-		Vatom *atom, /** Atom */ 
-		double *force /** VAPBS_DIM-vector set to gradient of accessibility */
+		Vacc *thee, /**< Accessibility object */
+		double center[VAPBS_DIM], /**< Probe center coordinates */
+		double win, /**< Spline window (&Aring;) */ 
+		double infrad, /**< Inflation radius (&Aring;) for ion access. */
+		Vatom *atom, /**< Atom */ 
+		double *force /**< VAPBS_DIM-vector set to gradient of accessibility */
 		);
 
 
@@ -471,8 +465,8 @@ VEXTERNC void Vacc_splineAccGradAtomNorm3(
  * @return  Total solvent accessible area (A^2)
  */
 VEXTERNC double Vacc_SASA(
-        Vacc *thee,  /** Accessibility object */
-        double radius  /** Probe molecule radius (&Aring;) */
+        Vacc *thee,  /**< Accessibility object */
+        double radius  /**< Probe molecule radius (&Aring;) */
         );
 
 /**
@@ -483,8 +477,8 @@ VEXTERNC double Vacc_SASA(
  * @return  Total solvent accessible area (A^2)
  */
 VEXTERNC double Vacc_totalSASA(
-        Vacc *thee,  /** Accessibility object */
-        double radius  /** Probe molecule radius (&Aring;) */
+        Vacc *thee,  /**< Accessibility object */
+        double radius  /**< Probe molecule radius (&Aring;) */
         );
 
 /**
@@ -495,9 +489,9 @@ VEXTERNC double Vacc_totalSASA(
  * @return  Atomic solvent accessible area (A^2)
  */
 VEXTERNC double Vacc_atomSASA(
-        Vacc *thee,  /** Accessibility object */
-        double radius,  /** Probe molecule radius (&Aring;) */
-        Vatom *atom  /** Atom of interest */
+        Vacc *thee,  /**< Accessibility object */
+        double radius,  /**< Probe molecule radius (&Aring;) */
+        Vatom *atom  /**< Atom of interest */
         );
 
 /**
@@ -507,9 +501,9 @@ VEXTERNC double Vacc_atomSASA(
  * @return  Pointer to VaccSurf object for this atom
  */
 VEXTERNC VaccSurf* Vacc_atomSASPoints(
-        Vacc *thee,  /** Accessibility object */
-        double radius,  /** Probe molecule radius (&Aring;) */
-        Vatom *atom  /** Atom of interest */
+        Vacc *thee,  /**< Accessibility object */
+        double radius,  /**< Probe molecule radius (&Aring;) */
+        Vatom *atom  /**< Atom of interest */
         );
 
 /**
@@ -518,10 +512,10 @@ VEXTERNC VaccSurf* Vacc_atomSASPoints(
  * @author  Jason Wagoner, Nathan Baker
  */	
 VEXTERNC void Vacc_atomdSAV(
-							Vacc *thee, /** Acessibility object */
-							double radius, /** Probe radius (&Aring;) */
-							Vatom *atom, /** Atom of interest */
-							double *dSA /** Array holding answers of calc */
+							Vacc *thee, /**< Acessibility object */
+							double radius, /**< Probe radius (&Aring;) */
+							Vatom *atom, /**< Atom of interest */
+							double *dSA /**< Array holding answers of calc */
 							);
 
 /**
@@ -530,11 +524,11 @@ VEXTERNC void Vacc_atomdSAV(
  * @author  Jason Wagoner, David Gohara, Nathan Baker
  */	
 VEXTERNC void Vacc_atomdSASA(
-							Vacc *thee, /** Acessibility object */
-							double dpos, /** Atom position offset */
-							double radius, /** Probe radius (&Aring;) */
-							Vatom *atom, /** Atom of interest */
-							double *dSA /** Array holding answers of calc */
+							Vacc *thee, /**< Acessibility object */
+							double dpos, /**< Atom position offset */
+							double radius, /**< Probe radius (&Aring;) */
+							Vatom *atom, /**< Atom of interest */
+							double *dSA /**< Array holding answers of calc */
 							);
 
 /**
@@ -543,11 +537,11 @@ VEXTERNC void Vacc_atomdSASA(
  * @author  David Gohara, Nathan Baker
  */	
 VEXTERNC void Vacc_totalAtomdSASA(
-							 Vacc *thee, /** Acessibility object */
-							 double dpos, /** Atom position offset */
-							 double radius, /** Probe radius (&Aring;) */
-							 Vatom *atom, /** Atom of interest */
-							 double *dSA /** Array holding answers of calc */
+							 Vacc *thee, /**< Acessibility object */
+							 double dpos, /**< Atom position offset */
+							 double radius, /**< Probe radius (&Aring;) */
+							 Vatom *atom, /**< Atom of interest */
+							 double *dSA /**< Array holding answers of calc */
 							 );
 
 /**
@@ -556,12 +550,12 @@ VEXTERNC void Vacc_totalAtomdSASA(
  * @author  David Gohara, Nathan Baker
  */	
 VEXTERNC void Vacc_totalAtomdSAV(
-								 Vacc *thee, /** Acessibility object */
-								 double dpos, /** Atom position offset */
-								 double radius, /** Probe radius (&Aring;) */
-								 Vatom *atom, /** Atom of interest */								 
-								 double *dSA, /** Array holding answers of calc */
-								 Vclist *clist /** clist for this calculation */
+								 Vacc *thee, /**< Acessibility object */
+								 double dpos, /**< Atom position offset */
+								 double radius, /**< Probe radius (&Aring;) */
+								 Vatom *atom, /**< Atom of interest */								 
+								 double *dSA, /**< Array holding answers of calc */
+								 Vclist *clist /**< clist for this calculation */
 								 );
 
 /**
@@ -572,24 +566,24 @@ VEXTERNC void Vacc_totalAtomdSAV(
  * @return  Total solvent accessible volume (A^3)
  */
 VEXTERNC double Vacc_totalSAV(
-	Vacc *thee,  /** Accessibility object */
-	Vclist *clist, /** Clist for acc object */
-	APOLparm *apolparm,  /** Apolar parameters -- could be VNULL if none required for this calculation.
+	Vacc *thee,  /**< Accessibility object */
+	Vclist *clist, /**< Clist for acc object */
+	APOLparm *apolparm,  /**< Apolar parameters -- could be VNULL if none required for this calculation.
 		* If VNULL, then default settings are used */
-	double radius  /** Probe molecule radius (&Aring;) */
+	double radius  /**< Probe molecule radius (&Aring;) */
 	);
 
 /**
  * @brief  Return the WCA integral energy
  * @ingroup  Vacc
  * @author  David Gohara
- * @return WCA energy (kJ/mol)
+ * @return Success flag
  */
-VPUBLIC int Vacc_wcaEnergy(
-						   Vacc *thee,  /** Accessibility object */
-							 APOLparm *apolparm,  /** Apolar calculation parameters */
-							 Valist *alist, /** Alist for acc object */
-							 Vclist *clist /** Clist for acc object */
+VEXTERNC int Vacc_wcaEnergy(
+						   Vacc *thee,  /**< Accessibility object */
+							 APOLparm *apolparm,  /**< Apolar calculation parameters */
+							 Valist *alist, /**< Alist for acc object */
+							 Vclist *clist /**< Clist for acc object */
 							 );
 /**
  * @brief  Return the WCA integral force
@@ -597,11 +591,25 @@ VPUBLIC int Vacc_wcaEnergy(
  * @author  David Gohara
  * @return WCA energy (kJ/mol/A)
  */
-VPUBLIC int Vacc_wcaForceAtom(Vacc *thee, /** Accessibility object */
-							  APOLparm *apolparm,  /** Apolar calculation parameters */
-							  Vclist *clist, /** Clist for acc object */
-							  Vatom *atom, /** Current atom */
-							  double *force /** Force for atom */
+VEXTERNC int Vacc_wcaForceAtom(Vacc *thee, /**< Accessibility object */
+							  APOLparm *apolparm,  /**< Apolar calculation parameters */
+							  Vclist *clist, /**< Clist for acc object */
+							  Vatom *atom, /**< Current atom */
+							  double *force /**< Force for atom */
 						   );
+
+/**	@brief	Calculate the WCA energy for an atom
+	@ingroup Vacc
+	@author	Dave Gohara and Nathan Baker
+	@return	Success flag
+	*/
+VEXTERNC int Vacc_wcaEnergyAtom(
+	Vacc *thee,	/**< Accessibility object */
+	APOLparm *apolparm,	/**< Apolar calculation parameters */
+	Valist *alist,	/**< Atom list */
+	Vclist *clist,	/**< Cell list associated with Vacc object */
+	int iatom,	/**< Index for atom of interest */
+	double *value	/**< Set to energy value */
+	);
 
 #endif    /* ifndef _VACC_H_ */

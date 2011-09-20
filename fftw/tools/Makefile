@@ -31,8 +31,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = i386-apple-darwin10.4.0
-host_triplet = i386-apple-darwin10.4.0
+build_triplet = i386-apple-darwin10.8.0
+host_triplet = i386-apple-darwin10.8.0
 bin_PROGRAMS = fftw-wisdom$(EXEEXT)
 subdir = tools
 DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.am \
@@ -101,11 +101,11 @@ AUTOCONF = ${SHELL} /Users/ponder/tinker/fftw/missing --run autoconf
 AUTOHEADER = ${SHELL} /Users/ponder/tinker/fftw/missing --run autoheader
 AUTOMAKE = ${SHELL} /Users/ponder/tinker/fftw/missing --run automake-1.10
 AWK = awk
-CC = pgcc -Masmkeyword
-CCDEPMODE = depmode=none
-CFLAGS = -O3 -D_THREAD_SAFE 
+CC = icc -std=gnu99
+CCDEPMODE = depmode=gcc3
+CFLAGS = -O3 -ansi-alias -malign-double -axssse3 -D_THREAD_SAFE 
 CODELET_OPTIM = 
-CPP = pgcc -E
+CPP = icc -std=gnu99 -E
 CPPFLAGS = 
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
@@ -118,10 +118,10 @@ ECHO_N =
 ECHO_T = 
 EGREP = /usr/bin/grep -E
 EXEEXT = 
-F77 = pgf95
+F77 = ifort
 FFLAGS = -g
 FGREP = /usr/bin/grep -F
-FLIBS =  -L/opt/pgi/osx86-64/10.8/lib -L/usr/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1 -lm -lpgf90 -lpgf90_rpm1 -lpgf902 -lpgf90rtl -lpgftnrtl -lnspgc -lpgc
+FLIBS =  -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl
 GREP = /usr/bin/grep
 INSTALL = /usr/bin/install -c
 INSTALLED_OCAMLC = /Users/ponder/tinker/fftw/bin/ocamlc
@@ -168,7 +168,7 @@ POW_LIB =
 PRECISION = d
 PREC_SUFFIX = 
 PRTDIAG = 
-PTHREAD_CC = pgcc -Masmkeyword
+PTHREAD_CC = icc -std=gnu99
 PTHREAD_CFLAGS = -D_THREAD_SAFE 
 PTHREAD_LIBS = 
 RANLIB = ranlib
@@ -187,7 +187,7 @@ abs_builddir = /Users/ponder/tinker/fftw/tools
 abs_srcdir = /Users/ponder/tinker/fftw/tools
 abs_top_builddir = /Users/ponder/tinker/fftw
 abs_top_srcdir = /Users/ponder/tinker/fftw
-ac_ct_CC = pgcc
+ac_ct_CC = icc
 ac_ct_DUMPBIN = 
 ac_ct_F77 = 
 acx_pthread_config = 
@@ -197,10 +197,10 @@ am__quote =
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
-build = i386-apple-darwin10.4.0
+build = i386-apple-darwin10.8.0
 build_alias = 
 build_cpu = i386
-build_os = darwin10.4.0
+build_os = darwin10.8.0
 build_vendor = apple
 builddir = .
 datadir = ${datarootdir}
@@ -208,10 +208,10 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = i386-apple-darwin10.4.0
+host = i386-apple-darwin10.8.0
 host_alias = 
 host_cpu = i386
-host_os = darwin10.4.0
+host_os = darwin10.8.0
 host_vendor = apple
 htmldir = ${docdir}
 includedir = ${prefix}/include
@@ -349,25 +349,25 @@ distclean-compile:
 include ./$(DEPDIR)/fftw-wisdom.Po
 
 .c.o:
-#	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-#	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-	source='$<' object='$@' libtool=no \
-	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-	$(COMPILE) -c $<
+	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+#	source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(COMPILE) -c $<
 
 .c.obj:
-#	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-#	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-	source='$<' object='$@' libtool=no \
-	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+#	source='$<' object='$@' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
 .c.lo:
-#	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-#	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-	source='$<' object='$@' libtool=yes \
-	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-	$(LTCOMPILE) -c -o $@ $<
+	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+#	source='$<' object='$@' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(LTCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

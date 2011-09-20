@@ -55,6 +55,7 @@ c     set default parameters for the dynamics trajectory
 c
       integrate = 'BEEMAN'
       nfree = 0
+      irest = 1
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
@@ -95,6 +96,8 @@ c
             call upcase (integrate)
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
             read (string,*,err=10,end=10)  nfree
+         else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
+            read (string,*,err=10,end=10)  irest
          else if (keyword(1:14) .eq. 'SAVE-VELOCITY ') then
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then

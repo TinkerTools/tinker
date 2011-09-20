@@ -6,7 +6,7 @@
 *  @file     nosh.h
  *  @ingroup  NOsh
  *  @brief    Contains declarations for class NOsh
- *  @version  $Id: nosh.h 1350 2009-02-12 00:38:48Z yhuang01 $
+ *  @version  $Id: nosh.h 1615 2010-10-20 19:16:35Z sobolevnrm $
  *  @author   Nathan A. Baker
  *
  *  @attention
@@ -14,18 +14,12 @@
  *
  * APBS -- Adaptive Poisson-Boltzmann Solver
  *
- * Nathan A. Baker (baker@biochem.wustl.edu)
- * Dept. of Biochemistry and Molecular Biophysics
- * Center for Computational Biology
- * Washington University in St. Louis
+ * Nathan A. Baker (nathan.baker@pnl.gov)
+ * Pacific Northwest National Laboratory
  *
  * Additional contributing authors listed in the code documentation.
  *
- * Copyright (c) 2002-2009, Washington University in St. Louis.
- * Portions Copyright (c) 2002-2009.  Nathan A. Baker
- * Portions Copyright (c) 1999-2002.  The Regents of the University of California.
- * Portions Copyright (c) 1995.  Michael Holst
- *
+ * Copyright (c) 2010, Pacific Northwest National Laboratory.  Portions Copyright (c) 2002-2010, Washington University in St. Louis.  Portions Copyright (c) 2002-2010, Nathan A. Baker.  Portions Copyright (c) 1999-2002, The Regents of the University of California. Portions Copyright (c) 1995, Michael Holst.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -232,6 +226,9 @@ struct sNOsh {
     int nkappa;  /**< Number of kappa maps */
     char kappapath[NOSH_MAXMOL][VMAX_ARGLEN]; /**< Paths to kappa map files */
     Vdata_Format kappafmt[NOSH_MAXMOL];  /**< Kappa maps file formats */
+	int npot;  /**< Number of potential maps */
+    char potpath[NOSH_MAXMOL][VMAX_ARGLEN]; /**< Paths to potential map files */
+    Vdata_Format potfmt[NOSH_MAXMOL];  /**< Potential maps file formats */
     int ncharge;  /**< Number of charge maps */
     char chargepath[NOSH_MAXMOL][VMAX_ARGLEN];   /**< Paths to charge map files */
     Vdata_Format chargefmt[NOSH_MAXMOL];  /**< Charge maps fileformats */
@@ -307,6 +304,15 @@ VEXTERNC char* NOsh_getDielZpath(NOsh *thee, int imap);
 */
 VEXTERNC char* NOsh_getKappapath(NOsh *thee, int imap);
 
+/** @brief    Returns path to specified potential map
+ *  @ingroup  NOsh
+ *  @author   David Gohara
+ *  @param    thee Pointer to NOsh object
+ *  @param    imap Map ID of interest
+ *  @returns  Path string
+ */
+VEXTERNC char* NOsh_getPotpath(NOsh *thee, int imap);
+
 /** @brief    Returns path to specified charge distribution map
 *  @ingroup  NOsh
 *  @author   Nathan Baker
@@ -343,6 +349,15 @@ VEXTERNC int NOsh_getDielfmt(NOsh *thee, int imap);
 */
 VEXTERNC int NOsh_getKappafmt(NOsh *thee, int imap);
 
+/** @brief    Returns format of specified potential map
+ *  @ingroup  NOsh
+ *  @author   Nathan Baker
+ *  @param    thee Pointer to NOsh object
+ *  @param    imap Calculation ID of interest
+ *  @returns  Format of potential map
+ */
+VEXTERNC int NOsh_getPotfmt(NOsh *thee, int imap);
+
 /** @brief    Returns format of specified charge map
 *  @ingroup  NOsh
 *  @author   Nathan Baker
@@ -359,10 +374,12 @@ VEXTERNC int NOsh_getChargefmt(NOsh *thee, int imap);
 #   define NOsh_getDielYpath(thee, imol) ((thee)->dielYpath[(imol)])
 #   define NOsh_getDielZpath(thee, imol) ((thee)->dielZpath[(imol)])
 #   define NOsh_getKappapath(thee, imol) ((thee)->kappapath[(imol)])
+#   define NOsh_getPotpath(thee, imol) ((thee)->potpath[(imol)])
 #   define NOsh_getChargepath(thee, imol) ((thee)->chargepath[(imol)])
 #   define NOsh_getCalc(thee, icalc) ((thee)->calc[(icalc)])
 #   define NOsh_getDielfmt(thee, imap) ((thee)->dielfmt[(imap)])
 #   define NOsh_getKappafmt(thee, imap) ((thee)->kappafmt[(imap)])
+#   define NOsh_getPotfmt(thee, imap) ((thee)->potfmt[(imap)])
 #   define NOsh_getChargefmt(thee, imap) ((thee)->chargefmt[(imap)])
 
 #endif

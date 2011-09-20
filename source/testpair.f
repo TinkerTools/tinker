@@ -108,6 +108,10 @@ c
 c
 c     get the timing for setup of double nested loop
 c
+      use_lights = .false.
+      use_vlist = .false.
+      use_clist = .false.
+      use_mlist = .false.
       call settime
       do m = 1, nterm
          do i = 1, n-1
@@ -135,6 +139,10 @@ c
 c
 c     get the timing for setup of method of lights
 c
+      use_lights = .true.
+      use_vlist = .false.
+      use_clist = .false.
+      use_mlist = .false.
       call settime
       do m = 1, nterm
          do i = 1, n
@@ -194,6 +202,10 @@ c
 c
 c     get the timing for setup of pair neighbor list
 c
+      use_lights = .false.
+      use_vlist = .true.
+      use_clist = .true.
+      use_mlist = .true.
       call settime
       do m = 1, ncalls
          dovlst = .true.
