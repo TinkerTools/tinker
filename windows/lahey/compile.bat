@@ -24,6 +24,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace bitors.f
 LF95 -c -o1 -tpp -nstchk -ntrace bonds.f
 LF95 -c -o1 -tpp -nstchk -ntrace born.f
 LF95 -c -o1 -tpp -nstchk -ntrace bounds.f
+LF95 -c -o1 -tpp -nstchk -ntrace bussi.f
 LF95 -c -o1 -tpp -nstchk -ntrace calendar.f
 LF95 -c -o1 -tpp -nstchk -ntrace center.f
 LF95 -c -o1 -tpp -nstchk -ntrace chkpole.f

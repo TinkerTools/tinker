@@ -23,6 +23,7 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bitors.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bonds.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp born.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bounds.f
+ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp bussi.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp calendar.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp center.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp chkpole.f

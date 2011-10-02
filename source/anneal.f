@@ -207,7 +207,6 @@ c
       loose = 100.0d0 * dt
       tight = 10.0d0 * dt
       kelvin = hot
-      kelvin0 = kelvin
       tautemp = loose
 c
 c     initialize any rattle constraints and setup dynamics
@@ -264,7 +263,6 @@ c
             ratio = 1.0d0 - exp(-5.0d0*ratio)
          end if
          kelvin = hot*(1.0d0-ratio) + cold*ratio
-         kelvin0 = kelvin
          tautemp = loose*(1.0d0-ratio) + tight*ratio
 c
 c     set the deformation value if potential smoothing is used

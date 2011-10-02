@@ -23,6 +23,7 @@ f77 -c -O -mips4 bitors.f
 f77 -c -O -mips4 bonds.f
 f77 -c -O -mips4 born.f
 f77 -c -O -mips4 bounds.f
+f77 -c -O -mips4 bussi.f
 f77 -c -O -mips4 calendar.f
 f77 -c -O -mips4 center.f
 f77 -c -O -mips4 chkpole.f

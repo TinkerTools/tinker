@@ -23,6 +23,7 @@ pgf77 -c -g -Ktrap=fp bitors.f
 pgf77 -c -g -Ktrap=fp bonds.f
 pgf77 -c -g -Ktrap=fp born.f
 pgf77 -c -g -Ktrap=fp bounds.f
+pgf77 -c -g -Ktrap=fp bussi.f
 pgf77 -c -g -Ktrap=fp calendar.f
 pgf77 -c -g -Ktrap=fp center.f
 pgf77 -c -g -Ktrap=fp chkpole.f

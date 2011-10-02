@@ -80,7 +80,7 @@ c
 c     present a list of possible coordinate modifications
 c
       write (iout,10)
-   10 format (/,' The XYZ Coordinate Editing Facility can Provide :',
+   10 format (/,' The TINKER XYZ Editing Facility can Provide :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
      &        /,4x,'(2) Deletion of Individual Specified Atoms',
      &        /,4x,'(3) Deletion of Specified Types of Atoms',

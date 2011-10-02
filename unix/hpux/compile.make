@@ -23,6 +23,7 @@ fort77 -c -O2 +E1 bitors.f
 fort77 -c -O2 +E1 bonds.f
 fort77 -c -O2 +E1 born.f
 fort77 -c -O2 +E1 bounds.f
+fort77 -c -O2 +E1 bussi.f
 fort77 -c -O2 +E1 calendar.f
 fort77 -c -O2 +E1 center.f
 fort77 -c -O2 +E1 chkpole.f

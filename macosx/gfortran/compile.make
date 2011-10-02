@@ -23,6 +23,7 @@ gfortran -c -O3 bitors.f
 gfortran -c -O3 bonds.f
 gfortran -c -O3 born.f
 gfortran -c -O3 bounds.f
+gfortran -c -O3 bussi.f
 gfortran -c -O3 calendar.f
 gfortran -c -O3 center.f
 gfortran -c -O3 chkpole.f

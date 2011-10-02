@@ -23,6 +23,7 @@ f77 -c -fast -temp=. bitors.f
 f77 -c -fast -temp=. bonds.f
 f77 -c -fast -temp=. born.f
 f77 -c -fast -temp=. bounds.f
+f77 -c -fast -temp=. bussi.f
 f77 -c -fast -temp=. calendar.f
 f77 -c -fast -temp=. center.f
 f77 -c -fast -temp=. chkpole.f

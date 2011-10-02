@@ -23,6 +23,7 @@ g95 -c -O bitors.f
 g95 -c -O bonds.f
 g95 -c -O born.f
 g95 -c -O bounds.f
+g95 -c -O bussi.f
 g95 -c -O calendar.f
 g95 -c -O center.f
 g95 -c -O chkpole.f

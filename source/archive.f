@@ -13,29 +13,35 @@ c     ##############################################################
 c
 c
 c     "archive" is a utility program for coordinate files which
-c     concatenates multiple coordinate sets into a single archive
-c     file, or extracts individual coordinate sets from an archive
+c     concatenates multiple coordinate sets into a new archive or
+c     performs any of several manipulations on an existing archive
 c
 c
       program archive
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'boxes.i'
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
       include 'usage.i'
-      integer i,k,iarc,ixyz
+      integer i,j,k
+      integer iarc,ixyz
       integer start,stop
-      integer step,now
-      integer lext,next
-      integer lengb
+      integer step,now,next
+      integer lext,lengb
+      integer nmode,mode
       integer leng1,leng2
       integer freeunit
       integer list(20)
+      real*8 xr,yr,zr
+      real*8 xold(maxatm)
+      real*8 yold(maxatm)
+      real*8 zold(maxatm)
       logical exist,query
       character*1 answer
-      character*7 ext,mode
+      character*7 ext,modtyp
       character*120 arcfile
       character*120 basename
       character*120 xyzfile
@@ -54,66 +60,96 @@ c
    20    format (a120)
       end if
 c
-c     decide whether to create or extract from an archive file
+c     present a list of possible archive modifications
 c
+      write (iout,30)
+   30 format (/,' The TINKER Archive Facility can Provide :',
+     &        //,4x,'(1) Create an Archive from Individual Frames',
+     &        /,4x,'(2) Extract Individual Frames from an Archive',
+     &        /,4x,'(3) Trim an Archive to Remove Unwanted Frames',
+     &        /,4x,'(4) Unfold Periodic Boundaries for a Trajectory')
+c
+c     get the desired type of archive file modification
+c
+      next = 1
+      nmode = 4
+      mode = 0
       call nextarg (answer,exist)
-      if (.not. exist) then
-         write (iout,30)
-   30    format (/,' Create (C), Extract (E) from or Trim (T)',
-     &              ' an Archive [C] :  ',$)
-         read (input,40)  record
-   40    format (a120)
-         next = 1
-         call gettext (record,answer,next)
-      end if
-      call upcase (answer)
-      if (answer .eq. 'E') then
-         mode = 'EXTRACT'
-      else if (answer .eq. 'T') then
-         mode = 'TRIM'
-      else
-         mode = 'CREATE'
-      end if
+      call getnumb (answer,mode,next)
+   40 continue
+      if (mode .eq. 0)  mode = -1
+      do while (mode.lt.0 .or. mode.gt.nmode)
+         mode = 0
+         write (iout,50)
+   50    format (/,' Number of the Desired Choice [<CR>=Exit] :  ',$)
+         read (input,60,err=40,end=70)  mode
+   60    format (i10)
+   70    continue
+      end do
+      if (mode .eq. 0)  modtyp = 'EXIT'
+      if (mode .eq. 1)  modtyp = 'CREATE'
+      if (mode .eq. 2)  modtyp = 'EXTRACT'
+      if (mode .eq. 3)  modtyp = 'TRIM'
+      if (mode .eq. 4)  modtyp = 'UNFOLD'
 c
-c     open the archive file to be processed
+c     create a new archive file or open an existing one
 c
       iarc = freeunit ()
       call basefile (arcfile)
       basename = arcfile
       lengb = leng
       call suffix (arcfile,'arc')
-      if (mode .eq. 'CREATE') then
+      if (modtyp .eq. 'CREATE') then
          call version (arcfile,'new')
          open (unit=iarc,file=arcfile,status='new')
-      else
+      else if (modtyp .ne. 'EXIT') then
          call version (arcfile,'old')
+         inquire (file=arcfile,exist=exist)
+         do while (.not. exist)
+            write (iout,80)
+   80       format (/,' Enter Name of the Coordinate Archive',
+     &                 ' File :  ',$)
+            read (input,90)  arcfile
+   90       format (a120)
+            call basefile (arcfile)
+            basename = arcfile
+            lengb = leng
+            call suffix (arcfile,'arc')
+            call version (arcfile,'old')
+            inquire (file=arcfile,exist=exist)
+         end do
+         open (unit=iarc,file=arcfile,status='old')
+         rewind (unit=iarc)
+         call readxyz (iarc)
+         rewind (unit=iarc)
       end if
 c
-c     concatenate individual files into a single archive file
+c     combine individual files into a single archive file
 c
-      if (mode .eq. 'CREATE') then
+      if (modtyp .eq. 'CREATE') then
+         modtyp = 'EXIT'
          start = 0
          stop = 0
          step = 0
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=50,end=50)  start
+            read (string,*,err=70,end=70)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=50,end=50)  stop
+         if (exist)  read (string,*,err=100,end=100)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=50,end=50)  step
-   50    continue
+         if (exist)  read (string,*,err=100,end=100)  step
+  100    continue
          if (query) then
-            write (iout,60)
-   60       format (/,' Numbers of First & Last File and Step',
+            write (iout,110)
+  110       format (/,' Numbers of First & Last File and Step',
      &                 ' Increment :  ',$)
-            read (input,70)  record
-   70       format (a120)
-            read (record,*,err=80,end=80)  start,stop,step
-   80       continue
+            read (input,120)  record
+  120       format (a120)
+            read (record,*,err=130,end=130)  start,stop,step
+  130       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -160,46 +196,20 @@ c
          end do
       end if
 c
-c     extract individual files from a concatenated archive file
-c
-      if (mode.eq.'EXTRACT' .or. mode.eq.'TRIM') then
-         inquire (file=arcfile,exist=exist)
-         do while (.not. exist)
-            write (iout,90)
-   90       format (/,' Enter Name of the Coordinate Archive',
-     &                 ' File :  ',$)
-            read (input,100)  arcfile
-  100       format (a120)
-            call basefile (arcfile)
-            basename = arcfile
-            lengb = leng
-            call suffix (arcfile,'arc')
-            call version (arcfile,'old')
-            inquire (file=arcfile,exist=exist)
-         end do
-         open (unit=iarc,file=arcfile,status='old')
-         rewind (unit=iarc)
-         call readxyz (iarc)
-         rewind (unit=iarc)
-c
 c     decide whether atoms are to be removed from each frame
 c
+      if (modtyp .eq. 'TRIM') then
          call active
-         if (mode .eq. 'EXTRACT') then
-            nuse = n
-            do i = 1, nuse
-               use(i) = .true.
-            end do
-         else if (mode.eq.'TRIM' .and. nuse.eq.n) then
+         if (nuse .eq. n) then
             do i = 1, 20
                list(i) = 0
             end do
-            write (iout,110)
-  110       format (/,' Numbers of the Atoms to be Removed :  ',$)
-            read (input,120)  record
-  120       format (a120)
-            read (record,*,err=130,end=130)  (list(i),i=1,20)
-  130       continue
+            write (iout,140)
+  140       format (/,' Numbers of the Atoms to be Removed :  ',$)
+            read (input,150)  record
+  150       format (a120)
+            read (record,*,err=160,end=160)  (list(i),i=1,20)
+  160       continue
             i = 1
             do while (list(i) .ne. 0)
                list(i) = max(-n,min(n,list(i)))
@@ -222,9 +232,25 @@ c
                end if
             end do
          end if
+      else if (modtyp .eq. 'EXTRACT') then
+         call active
+         nuse = n
+         do i = 1, nuse
+            use(i) = .true.
+         end do
+      else if (modtyp .eq. 'UNFOLD') then
+         call active
+         nuse = n
+         do i = 1, nuse
+            use(i) = .true.
+         end do
+         call unitcell
+         call lattice
+      end if
 c
-c     get the initial and final coordinate frames to extract
+c     get the initial and final coordinate frames to process
 c
+      if (modtyp .ne. 'EXIT') then
          now = 1
          leng1 = 1
          leng2 = leng
@@ -244,22 +270,22 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=140,end=140)  start
+            read (string,*,err=170,end=170)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=140,end=140)  stop
+         if (exist)  read (string,*,err=170,end=170)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=140,end=140)  step
-  140    continue
+         if (exist)  read (string,*,err=170,end=170)  step
+  170    continue
          if (query) then
-            write (iout,150)
-  150       format (/,' Numbers of First & Last File and Step',
+            write (iout,180)
+  180       format (/,' Numbers of First & Last File and Step',
      &                 ' [<CR>=Exit] :  ',$)
-            read (input,160)  record
-  160       format (a120)
-            read (record,*,err=170,end=170)  start,stop,step
-  170       continue
+            read (input,190)  record
+  190       format (a120)
+            read (record,*,err=200,end=200)  start,stop,step
+  200       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -275,12 +301,12 @@ c
                call readxyz (iarc)
             end do
             i = start
-            if (mode .eq. 'EXTRACT') then
+            if (modtyp .eq. 'EXTRACT') then
                do while (i.ge.start .and. i.le.stop)
                   lext = 3
                   call numeral (i,ext,lext)
                   call readxyz (iarc)
-                  if (abort)  goto 180
+                  if (abort)  goto 210
                   ixyz = freeunit ()
                   xyzfile = filename(1:leng)//'.'//ext(1:lext)
                   call version (xyzfile,'new')
@@ -292,7 +318,7 @@ c
                      call readxyz (iarc)
                   end do
                end do
-            else if (mode .eq. 'TRIM') then
+            else
                ixyz = freeunit ()
                xyzfile = basename
                call suffix (xyzfile,'arc')
@@ -300,7 +326,28 @@ c
                open (unit=ixyz,file=xyzfile,status='new')
                do while (i.ge.start .and. i.le.stop)
                   call readxyz (iarc)
-                  if (abort)  goto 180
+                  if (abort)  goto 210
+                  if (modtyp .eq. 'UNFOLD') then
+                     if (i .eq. start) then
+                        do j = 1, n
+                           xold(j) = x(j)
+                           yold(j) = y(j)
+                           zold(j) = z(j)
+                        end do
+                     end if
+                     do j = 1, n
+                        xr = x(j) - xold(j)
+                        yr = y(j) - yold(j)
+                        zr = z(j) - zold(j)
+                        call image (xr,yr,zr)
+                        x(j) = xold(j) + xr
+                        y(j) = yold(j) + yr
+                        z(j) = zold(j) + zr
+                        xold(j) = x(j)
+                        yold(j) = y(j)
+                        zold(j) = z(j)
+                     end do
+                  end if
                   call prtarc (ixyz)
                   i = i + step
                   do k = 1, step-1
@@ -309,7 +356,7 @@ c
                end do
                close (unit=ixyz)
             end if
-  180       continue
+  210       continue
             now = stop
             start = 0
             stop = 0
@@ -317,22 +364,22 @@ c
             query = .true.
             call nextarg (string,exist)
             if (exist) then
-               read (string,*,err=190,end=190)  start
+               read (string,*,err=220,end=220)  start
                query = .false.
             end if
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=190,end=190)  stop
+            if (exist)  read (string,*,err=220,end=220)  stop
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=190,end=190)  step
-  190       continue
+            if (exist)  read (string,*,err=220,end=220)  step
+  220       continue
             if (query) then
-               write (iout,200)
-  200          format (/,' Numbers of First & Last File and Step',
+               write (iout,230)
+  230          format (/,' Numbers of First & Last File and Step',
      &                    ' [<CR>=Exit] :  ',$)
-               read (input,210)  record
-  210          format (a120)
-               read (record,*,err=220,end=220)  start,stop,step
-  220          continue
+               read (input,240)  record
+  240          format (a120)
+               read (record,*,err=250,end=250)  start,stop,step
+  250          continue
             end if
             if (stop .eq. 0)  stop = start
             if (step .eq. 0)  step = 1

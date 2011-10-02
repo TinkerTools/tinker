@@ -169,7 +169,7 @@ c
       else if (thermostat .eq. 'BUSSI') then
          if (temp .eq. 0.0d0)  temp = 0.1d0
          c = exp(-dt/tautemp)
-         d = (1.0d00-c) * (kelvin/temp) / dble(nfree)
+         d = (1.0d0-c) * (kelvin/temp) / dble(nfree)
          r = normal ()
          s = 0.0d0
          do i = 1, nfree-1
@@ -179,6 +179,7 @@ c
          scale = c + (s+r*r)*d + 2.0d0*r*sqrt(c*d)
          scale = sqrt(scale)
          if (r+sqrt(c/d) .lt. 0.0d0)  scale = -scale
+         eta = eta * scale
          if (integrate .eq. 'RIGIDBODY') then
             do i = 1, ngrp
                do j = 1, 3

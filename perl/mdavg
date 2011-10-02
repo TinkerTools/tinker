@@ -25,8 +25,6 @@ $start=88+$ARGV[1]*14;
 @polrms=();
 @temp=();
 @temprms=();
-@toff=();
-@toffrms=();
 @press=();
 @pressrms=();
 @den=();
@@ -112,15 +110,6 @@ while(<LOG>){
             push(@temprms, $tmrms);
         }
     }
-    if (substr($_,1,17) eq "Thermostat Offset") {
-        $to=substr($_,23,13);
-        $torms=substr($_,53,7);
-        if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
-            push(@toff, $to);
-            push(@toffrms, $to);
-            push(@toffrms, $torms);
-        }
-    }
     if (substr($_,1,8) eq "Pressure") {
         $pre=substr($_,23,13);
         $prerms=substr($_,53,7);
@@ -173,10 +162,6 @@ if ($#temp != -1) {
     $avgt=&AVG(@temp);
     $stdt=&STD2(@temprms);
 }
-if ($#toff != -1) {
-    $avgto=&AVG(@toff);
-    $stdto=&STD2(@toffrms);
-}
 if ($#press != -1) {
     $avgpr=&AVG(@press);
     $stdpr=&STD2(@pressrms);
@@ -227,38 +212,35 @@ sub STD2{
 }
 
 if ($count > -1) {
-   printf " Total MD Frames     %15d\n", "$count";
+   printf " Total MD Frames     %20d\n", "$count";
 }
 if ($#tot > -1) {
-   printf " Total Energy        %15.4f  (+/-%9.4f)\n", "$avgtot","$stdtot";
+   printf " Total Energy        %20.4f  (+/-%9.4f)\n", "$avgtot","$stdtot";
 }
 if ($#pot > -1) {
-   printf " Potential Energy    %15.4f  (+/-%9.4f)\n", "$avgpot","$stdpot";
+   printf " Potential Energy    %20.4f  (+/-%9.4f)\n", "$avgpot","$stdpot";
 }
 if ($#kin > -1) {
-   printf " Kinetic Energy      %15.4f  (+/-%9.4f)\n", "$avgkin","$stdkin";
+   printf " Kinetic Energy      %20.4f  (+/-%9.4f)\n", "$avgkin","$stdkin";
 }
 if ($#inter > -1) {
-   printf " Intermolecular      %15.4f  (+/-%9.4f)\n", "$avgi","$stdi";
+   printf " Intermolecular      %20.4f  (+/-%9.4f)\n", "$avgi","$stdi";
 }
 if ($#ele > -1) {
-   printf " Electrostatic       %15.4f  (+/-%9.4f)\n", "$avge","$stde";
+   printf " Electrostatic       %20.4f  (+/-%9.4f)\n", "$avge","$stde";
 }
 if ($#vdw > -1) {
-   printf " van der Waals       %15.4f  (+/-%9.4f)\n", "$avgv","$stdv";
+   printf " van der Waals       %20.4f  (+/-%9.4f)\n", "$avgv","$stdv";
 }
 if ($#pol > -1) {
-   printf " Polarization        %15.4f  (+/-%9.4f)\n", "$avgp","$stdp";
+   printf " Polarization        %20.4f  (+/-%9.4f)\n", "$avgp","$stdp";
 }
 if ($#temp > -1) {
-   printf " Temperature         %15.2f  (+/-%9.2f)\n", "$avgt","$stdt";
-}
-if ($#toff > -1) {
-   printf " Thermostat Offset   %15.2f  (+/-%9.2f)\n", "$avgto","$stdto";
+   printf " Temperature         %20.2f  (+/-%9.2f)\n", "$avgt","$stdt";
 }
 if ($#press > -1) {
-   printf " Pressure            %15.2f  (+/-%9.2f)\n", "$avgpr","$stdpr";
+   printf " Pressure            %20.2f  (+/-%9.2f)\n", "$avgpr","$stdpr";
 }
 if ($#den > -1) {
-   printf " Density             %15.4f  (+/-%9.4f)\n", "$avgd","$stdd";
+   printf " Density             %20.4f  (+/-%9.4f)\n", "$avgd","$stdd";
 }

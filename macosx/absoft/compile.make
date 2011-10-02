@@ -24,6 +24,7 @@ f77 -c -O -N11 bitors.f
 f77 -c -O -N11 bonds.f
 f77 -c -O -N11 born.f
 f77 -c -O -N11 bounds.f
+f77 -c -O -N11 bussi.f
 f77 -c -O -N11 calendar.f
 f77 -c -O -N11 center.f
 f77 -c -O -N11 chkpole.f

@@ -24,6 +24,7 @@ DF /compile_only /optimize /fast bitors.f
 DF /compile_only /optimize /fast bonds.f
 DF /compile_only /optimize /fast born.f
 DF /compile_only /optimize /fast bounds.f
+DF /compile_only /optimize /fast bussi.f
 DF /compile_only /optimize /fast calendar.f
 DF /compile_only /optimize /fast center.f
 DF /compile_only /optimize /fast chkpole.f

@@ -23,6 +23,7 @@ pgf77 -c -fast bitors.f
 pgf77 -c -fast bonds.f
 pgf77 -c -fast born.f
 pgf77 -c -fast bounds.f
+pgf77 -c -fast bussi.f
 pgf77 -c -fast calendar.f
 pgf77 -c -fast center.f
 pgf77 -c -fast chkpole.f

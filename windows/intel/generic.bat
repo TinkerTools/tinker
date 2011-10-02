@@ -24,6 +24,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bitors.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bonds.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp born.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bounds.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bussi.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp calendar.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp center.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp chkpole.f

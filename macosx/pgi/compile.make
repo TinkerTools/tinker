@@ -23,6 +23,7 @@ pgf95 -c -fast -mp bitors.f
 pgf95 -c -fast -mp bonds.f
 pgf95 -c -fast -mp born.f
 pgf95 -c -fast -mp bounds.f
+pgf95 -c -fast -mp bussi.f
 pgf95 -c -fast -mp calendar.f
 pgf95 -c -fast -mp center.f
 pgf95 -c -fast -mp chkpole.f

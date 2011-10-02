@@ -185,6 +185,7 @@ OBJS = active.o \
        bonds.o \
        born.o \
        bounds.o \
+       bussi.o \
        calendar.o \
        center.o \
        chkpole.o \
@@ -797,6 +798,7 @@ libtinker.a: ${OBJS}
         bonds.o \
         born.o \
         bounds.o \
+        bussi.o \
         calendar.o \
         center.o \
         chkpole.o \
@@ -1089,11 +1091,11 @@ libtinker.a: ${OBJS}
 
 active.o: atoms.i inform.i iounit.i keys.i sizes.i usage.i
 alchemy.o: analyz.i atoms.i energi.i files.i inform.i iounit.i katoms.i mutant.i potent.i sizes.i units.i usage.i
-analysis.o: analyz.i atoms.i bound.i cutoff.i energi.i group.i inter.i potent.i sizes.i vdwpot.i
+analysis.o: analyz.i atoms.i bound.i cutoff.i energi.i group.i inter.i iounit.i potent.i sizes.i vdwpot.i
 analyze.o: action.i analyz.i angang.i angle.i angpot.i atmtyp.i atoms.i bitor.i bond.i bound.i boxes.i charge.i chgpot.i cutoff.i dipole.i energi.i ewald.i fields.i files.i improp.i imptor.i inform.i inter.i iounit.i korbs.i ktrtor.i kvdws.i math.i molcul.i moment.i mpole.i opbend.i opdist.i piorbs.i pistuf.i pitors.i pme.i polar.i polgrp.i potent.i sizes.i solute.i strbnd.i strtor.i tors.i tortor.i units.i urey.i vdw.i vdwpot.i virial.i
 angles.o: angle.i atmlst.i atoms.i couple.i iounit.i sizes.i
 anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i usage.i warp.i
-archive.o: atmtyp.i atoms.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
+archive.o: atmtyp.i atoms.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
 attach.o: atoms.i couple.i iounit.i sizes.i
 basefile.o: ascii.i files.i
 beeman.o: atmtyp.i atoms.i moldyn.i shake.i sizes.i units.i usage.i
@@ -1102,6 +1104,7 @@ bitors.o: angle.i bitor.i couple.i iounit.i sizes.i
 bonds.o: atmlst.i atoms.i bond.i couple.i iounit.i sizes.i
 born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pbstuf.i potent.i sizes.i solute.i virial.i
 bounds.o: atmtyp.i atoms.i boxes.i molcul.i sizes.i
+bussi.o: atmtyp.i atoms.i bath.i boxes.i mdstuf.i moldyn.i shake.i sizes.i units.i usage.i virial.i
 calendar.o:
 center.o: align.i sizes.i
 chkpole.o: atoms.i mpole.i sizes.i
@@ -1126,7 +1129,7 @@ diffeq.o: atoms.i iounit.i math.i sizes.i warp.i
 diffuse.o: atmtyp.i atoms.i boxes.i iounit.i molcul.i sizes.i
 distgeom.o: angle.i atmtyp.i atoms.i bond.i couple.i disgeo.i files.i inform.i iounit.i kgeoms.i math.i refer.i sizes.i tors.i
 document.o: iounit.i
-dynamic.o: atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i stodyn.i usage.i
+dynamic.o: atoms.i bath.i bond.i bound.i inform.i iounit.i keys.i mdstuf.i potent.i sizes.i solute.i stodyn.i usage.i
 eangang.o: angang.i angle.i angpot.i atoms.i bound.i energi.i group.i math.i sizes.i usage.i
 eangang1.o: angang.i angle.i angpot.i atoms.i bound.i deriv.i energi.i group.i math.i sizes.i usage.i virial.i
 eangang2.o: angang.i angle.i angpot.i atoms.i bound.i deriv.i group.i hessn.i math.i sizes.i
@@ -1192,7 +1195,7 @@ empole.o: atoms.i bound.i boxes.i cell.i chgpot.i couple.i cutoff.i energi.i ewa
 empole1.o: atoms.i bound.i boxes.i cell.i chgpot.i couple.i cutoff.i deriv.i energi.i ewald.i group.i inter.i math.i molcul.i mplpot.i mpole.i neigh.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i usage.i virial.i
 empole2.o: atoms.i bound.i boxes.i chgpot.i couple.i cutoff.i deriv.i group.i hessn.i molcul.i mplpot.i mpole.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i usage.i
 empole3.o: action.i analyz.i atmtyp.i atoms.i bound.i boxes.i cell.i chgpot.i couple.i cutoff.i energi.i ewald.i group.i inform.i inter.i iounit.i math.i molcul.i mplpot.i mpole.i neigh.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i usage.i
-energy.o: bound.i cutoff.i energi.i potent.i rigid.i sizes.i vdwpot.i
+energy.o: bound.i cutoff.i energi.i iounit.i potent.i rigid.i sizes.i vdwpot.i
 eopbend.o: angle.i angpot.i atoms.i bound.i energi.i fields.i group.i math.i opbend.i sizes.i usage.i
 eopbend1.o: angle.i angpot.i atoms.i bound.i deriv.i energi.i group.i math.i opbend.i sizes.i usage.i virial.i
 eopbend2.o: angle.i angpot.i atoms.i bound.i deriv.i group.i hessn.i math.i opbend.i sizes.i
@@ -1240,7 +1243,7 @@ extra1.o: atoms.i deriv.i energi.i sizes.i
 extra2.o: atoms.i hessn.i sizes.i
 extra3.o: action.i analyz.i atoms.i energi.i sizes.i
 fatal.o: iounit.i
-fft3d.o: fft.i pme.i sizes.i
+fft3d.o: fft.i openmp.i pme.i sizes.i
 fftpack.o: math.i
 field.o: keys.i potent.i sizes.i
 final.o: chunks.i inform.i iounit.i pme.i sizes.i socket.i solute.i usage.i vibs.i
@@ -1259,7 +1262,7 @@ getstring.o: ascii.i
 gettext.o: ascii.i
 getword.o: ascii.i
 getxyz.o: inform.i iounit.i output.i
-gradient.o: atoms.i bound.i cutoff.i deriv.i energi.i inter.i potent.i rigid.i sizes.i vdwpot.i virial.i
+gradient.o: atoms.i bound.i cutoff.i deriv.i energi.i inter.i iounit.i potent.i rigid.i sizes.i vdwpot.i virial.i
 gradrgd.o: atoms.i group.i rigid.i sizes.i
 gradrot.o: atoms.i deriv.i domega.i omega.i potent.i rotate.i sizes.i
 groups.o: group.i sizes.i
@@ -1312,7 +1315,7 @@ lattice.o: boxes.i cell.i inform.i iounit.i math.i sizes.i
 lbfgs.o: inform.i iounit.i keys.i linmin.i math.i minima.i output.i scales.i sizes.i
 lights.o: bound.i boxes.i cell.i iounit.i light.i sizes.i
 makeint.o: atoms.i couple.i inform.i iounit.i math.i sizes.i zclose.i zcoord.i
-makepdb.o: atmtyp.i atoms.i couple.i files.i molcul.i pdb.i resdue.i sequen.i sizes.i
+makepdb.o: atmtyp.i atoms.i couple.i fields.i files.i molcul.i pdb.i resdue.i sequen.i sizes.i
 makeref.o: atmtyp.i atoms.i couple.i files.i refer.i sizes.i titles.i
 makexyz.o: atoms.i sizes.i zcoord.i
 maxwell.o: units.i
@@ -1359,7 +1362,7 @@ poledit.o: atmtyp.i atoms.i couple.i dma.i files.i iounit.i keys.i kpolr.i mpole
 polymer.o: atoms.i bond.i bound.i boxes.i iounit.i keys.i sizes.i
 potential.o: atmtyp.i atoms.i bond.i charge.i chgpot.i couple.i dipole.i files.i inform.i iounit.i katoms.i kchrge.i kdipol.i keys.i kmulti.i kpolr.i math.i minima.i moment.i mpole.i output.i polar.i potent.i potfit.i refer.i sizes.i titles.i units.i
 precise.o:
-pressure.o: atmtyp.i atoms.i bath.i bound.i boxes.i group.i math.i mdstuf.i molcul.i sizes.i units.i usage.i virial.i
+pressure.o: atmtyp.i atoms.i bath.i bound.i boxes.i group.i iounit.i math.i mdstuf.i molcul.i sizes.i units.i usage.i virial.i
 prmedit.o: angpot.i bndpot.i iounit.i math.i params.i sizes.i urypot.i vdwpot.i
 prmkey.o: angpot.i bndpot.i chgpot.i fields.i mplpot.i polpot.i potent.i rxnpot.i sizes.i torpot.i urypot.i vdwpot.i
 promo.o: iounit.i

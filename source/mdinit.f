@@ -91,7 +91,7 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:120)
-         if (keyword(1:10) .eq. 'INTEGRATE ') then
+         if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
@@ -171,6 +171,26 @@ c
          if (integrate .eq. 'BEEMAN')  integrate = 'VERLET'
       end if
 c
+c     enforce use of Bussi thermostat/barostat with integrator
+c
+      if (thermostat.eq.'BUSSI' .and. barostat.eq.'BUSSI') then
+         integrate = 'BUSSI'
+      else if (integrate .eq. 'BUSSI') then
+         thermostat = 'BUSSI'
+         barostat = 'BUSSI'
+      end if
+c
+c     check for use of Monte Carlo barostat with constraints
+c
+      if (barostat.eq.'MONTECARLO' .and. volscale.eq.'ATOMIC') then
+         if (use_rattle) then
+            write (iout,40)
+   40       format (/,' MDINIT  --  Atom-based Monte Carlo',
+     &                 ' Barostat Incompatible with RATTLE')
+            call fatal
+         end if
+      end if
+c
 c     set masses for the thermostats in a Nose-Hoover chain
 c
       if (thermostat .eq. 'NOSE-HOOVER') then
@@ -208,18 +228,19 @@ c
                nfree = nfree - 6
             end if
          end if
+         if (barostat .eq. 'BUSSI')  nfree = nfree + 1
       end if
 c
 c     check for a nonzero number of degrees of freedom
 c
       if (nfree .lt. 0)  nfree = 0
       if (debug) then
-         write (iout,40)  nfree
-   40    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
+         write (iout,50)  nfree
+   50    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
       end if
       if (nfree .eq. 0) then
-         write (iout,50)
-   50    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
+         write (iout,60)
+   60    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
          call fatal
       end if
 c

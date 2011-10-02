@@ -940,6 +940,14 @@ c
          if (atmname .eq. '1H5M')  atmname = ' H71'
          if (atmname .eq. '2H5M')  atmname = ' H72'
          if (atmname .eq. '3H5M')  atmname = ' H73'
+c
+c     water molecules (HOH)
+c
+      else if (resname .eq. 'HOH') then
+         if (atmname .eq. ' OT ')  atmname = ' O  '
+         if (atmname .eq. ' OW ')  atmname = ' O  '
+         if (atmname .eq. ' HT ')  atmname = ' H  '
+         if (atmname .eq. ' HW ')  atmname = ' H  '
       end if
       return
       end

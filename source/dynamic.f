@@ -27,15 +27,18 @@ c
       include 'bound.i'
       include 'inform.i'
       include 'iounit.i'
+      include 'keys.i'
       include 'mdstuf.i'
       include 'potent.i'
       include 'solute.i'
       include 'stodyn.i'
       include 'usage.i'
-      integer istep,nstep
-      integer mode
+      integer i,istep,nstep
+      integer mode,next
       real*8 dt,dtdump
       logical exist,query
+      character*20 keyword
+      character*120 record
       character*120 string
 c
 c
@@ -51,6 +54,21 @@ c
       atmsph = 0.0d0
       isothermal = .false.
       isobaric = .false.
+c
+c     check for keywords containing any altered parameters
+c
+      integrate = 'BEEMAN'
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:120)
+         if (keyword(1:11) .eq. 'INTEGRATOR ') then
+            call getword (record,integrate,next)
+            call upcase (integrate)
+         end if
+      end do
 c
 c     initialize the simulation length as number of time steps
 c
@@ -115,6 +133,7 @@ c
          call nextarg (string,exist)
          if (exist)  read (string,*,err=120,end=120)  mode
   120    continue
+         if (integrate .eq. 'BUSSI')  mode = 4
          do while (mode.lt.1 .or. mode.gt.4)
             write (iout,130)
   130       format (/,' Available Statistical Mechanical Ensembles :',
@@ -144,7 +163,6 @@ c
                if (kelvin .le. 0.0d0)  kelvin = 298.0d0
   190          continue
             end do
-            kelvin0 = kelvin
          end if
          if (mode.eq.3 .or. mode.eq.4) then
             isobaric = .true.
@@ -212,17 +230,21 @@ c
          write (iout,320)
   320    format (/,' Molecular Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'STOCHASTIC') then
+      else if (integrate .eq. 'BUSSI') then
          write (iout,330)
-  330    format (/,' Stochastic Dynamics Trajectory via',
+  330    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Bussi-Parrinello NPT Algorithm')
+      else if (integrate .eq. 'STOCHASTIC') then
+         write (iout,340)
+  340    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,340)
-  340    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else
          write (iout,350)
   350    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Rigid Body Algorithm')
+      else
+         write (iout,360)
+  360    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -231,6 +253,8 @@ c
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
+         else if (integrate .eq. 'BUSSI') then
+            call bussi (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
             call sdstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then

@@ -23,6 +23,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bitors.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bonds.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 born.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bounds.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bussi.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 calendar.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 center.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 chkpole.f

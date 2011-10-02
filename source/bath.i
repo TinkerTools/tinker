@@ -14,8 +14,7 @@ c
 c
 c     maxnose     maximum length of the Nose-Hoover chain
 c
-c     kelvin0     target value for the system temperature (K)
-c     kelvin      variable target temperature for thermostat (K)
+c     kelvin      target value for the system temperature (K)
 c     atmsph      target value for the system pressure (atm)
 c     tautemp     time constant for Berendsen thermostat (psec)
 c     taupres     time constant for Berendsen barostat (psec)
@@ -39,8 +38,7 @@ c
       integer maxnose
       parameter (maxnose=2)
       integer voltrial
-      real*8 kelvin0,kelvin
-      real*8 atmsph
+      real*8 kelvin,atmsph
       real*8 tautemp,taupres
       real*8 compress,collide
       real*8 xnh,vnh,qnh,gnh
@@ -51,7 +49,7 @@ c
       character*9 volscale
       character*10 barostat
       character*11 thermostat
-      common /bath/ kelvin0,kelvin,atmsph,tautemp,taupres,compress,
-     &              collide,xnh(maxnose),vnh(maxnose),qnh(maxnose),
-     &              gnh(maxnose),eta,volmove,voltrial,isothermal,
-     &              isobaric,anisotrop,thermostat,barostat,volscale
+      common /bath/ kelvin,atmsph,tautemp,taupres,compress,collide,
+     &              xnh(maxnose),vnh(maxnose),qnh(maxnose),gnh(maxnose),
+     &              eta,volmove,voltrial,isothermal,isobaric,anisotrop,
+     &              thermostat,barostat,volscale

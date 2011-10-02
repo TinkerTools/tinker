@@ -23,6 +23,7 @@ ifort -c -g -warn unused -check uninit -check bounds bitors.f
 ifort -c -g -warn unused -check uninit -check bounds bonds.f
 ifort -c -g -warn unused -check uninit -check bounds born.f
 ifort -c -g -warn unused -check uninit -check bounds bounds.f
+ifort -c -g -warn unused -check uninit -check bounds bussi.f
 ifort -c -g -warn unused -check uninit -check bounds calendar.f
 ifort -c -g -warn unused -check uninit -check bounds center.f
 ifort -c -g -warn unused -check uninit -check bounds chkpole.f

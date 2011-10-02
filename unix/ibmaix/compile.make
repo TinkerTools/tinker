@@ -23,6 +23,7 @@ xlf -c -O bitors.f
 xlf -c -O bonds.f
 xlf -c -O born.f
 xlf -c -O bounds.f
+xlf -c -O bussi.f
 xlf -c -O calendar.f
 xlf -c -O center.f
 xlf -c -O chkpole.f

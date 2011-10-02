@@ -441,7 +441,7 @@ c
 c     set the entropy of mixing term based on system type
 c
          if (isothermal) then
-            kt = gasconst * kelvin0
+            kt = gasconst * kelvin
          else
             kt = gasconst * temp
          end if
