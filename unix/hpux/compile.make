@@ -181,6 +181,7 @@ fort77 -c -O2 +E1 getstring.f
 fort77 -c -O2 +E1 gettext.f
 fort77 -c -O2 +E1 getword.f
 fort77 -c -O2 +E1 getxyz.f
+fort77 -c -O2 +E1 ghmcstep.f
 fort77 -c -O2 +E1 gradient.f
 fort77 -c -O2 +E1 gradrgd.f
 fort77 -c -O2 +E1 gradrot.f

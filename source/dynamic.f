@@ -12,10 +12,9 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dynamic" computes a molecular dynamics trajectory in any of
-c     several statistical mechanical ensembles with optional periodic
-c     boundaries and optional coupling to temperature and pressure baths
-c     alternatively a stochastic dynamics trajectory can be generated
+c     "dynamic" computes a molecular or stochastic dynamics trajectory
+c     in one of the standard statistical mechanical ensembles and using
+c     any of several possible integration methods
 c
 c
       program dynamic
@@ -104,7 +103,7 @@ c
       end do
       dt = 0.001d0 * dt
 c
-c     set bounds on the Berendsen bath coupling parameters
+c     enforce bounds on thermostat and barostat coupling times
 c
       tautemp = max(tautemp,dt)
       taupres = max(taupres,dt)
@@ -133,7 +132,6 @@ c
          call nextarg (string,exist)
          if (exist)  read (string,*,err=120,end=120)  mode
   120    continue
-         if (integrate .eq. 'BUSSI')  mode = 4
          do while (mode.lt.1 .or. mode.gt.4)
             write (iout,130)
   130       format (/,' Available Statistical Mechanical Ensembles :',
@@ -148,6 +146,14 @@ c
             if (mode .le. 0)  mode = 1
   150       continue
          end do
+         if (integrate.eq.'BUSSI' .or. integrate.eq.'GHMC') then
+            if (mode .ne. 4) then
+               mode = 4
+               write (iout,155)  integrate(1:5)
+  155          format (/,' Switching to NPT Ensemble as Required',
+     &                    ' by ',a5,' Integrator')
+            end if
+         end if
          if (mode.eq.2 .or. mode.eq.4) then
             isothermal = .true.
             kelvin = -1.0d0
@@ -230,21 +236,25 @@ c
          write (iout,320)
   320    format (/,' Molecular Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'BUSSI') then
-         write (iout,330)
-  330    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Bussi-Parrinello NPT Algorithm')
       else if (integrate .eq. 'STOCHASTIC') then
-         write (iout,340)
-  340    format (/,' Stochastic Dynamics Trajectory via',
+         write (iout,330)
+  330    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'RIGIDBODY') then
+      else if (integrate .eq. 'BUSSI') then
+         write (iout,340)
+  340    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Bussi-Parrinello NPT Algorithm')
+      else if (integrate .eq. 'GHMC') then
          write (iout,350)
-  350    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else
+  350    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' Generalized Hybrid Monte Carlo')
+      else if (integrate .eq. 'RIGIDBODY') then
          write (iout,360)
   360    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Rigid Body Algorithm')
+      else
+         write (iout,370)
+  370    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -253,23 +263,16 @@ c
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
-         else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
             call sdstep (istep,dt)
+         else if (integrate .eq. 'BUSSI') then
+            call bussi (istep,dt)
+         else if (integrate .eq. 'GHMC') then
+            call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
          else
             call beeman (istep,dt)
-         end if
-c
-c     remove center of mass translation and rotation if needed
-c
-         if (irest.gt.0 .and. nuse.eq.n) then
-            if (mod(istep,irest) .eq. 0) then
-               if (isothermal .and. integrate.ne.'STOCHASTIC'
-     &             .and. thermostat.ne.'ANDERSEN')  call mdrest
-            end if
          end if
       end do
 c

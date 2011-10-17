@@ -172,6 +172,7 @@ getstring.o \
 gettext.o \
 getword.o \
 getxyz.o \
+ghmcstep.o \
 gradient.o \
 gradrgd.o \
 gradrot.o \

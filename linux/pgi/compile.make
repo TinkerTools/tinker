@@ -181,6 +181,7 @@ pgf77 -c -fast getstring.f
 pgf77 -c -fast gettext.f
 pgf77 -c -fast getword.f
 pgf77 -c -fast getxyz.f
+pgf77 -c -fast ghmcstep.f
 pgf77 -c -fast gradient.f
 pgf77 -c -fast gradrgd.f
 pgf77 -c -fast gradrot.f

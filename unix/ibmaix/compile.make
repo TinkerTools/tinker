@@ -181,6 +181,7 @@ xlf -c -O getstring.f
 xlf -c -O gettext.f
 xlf -c -O getword.f
 xlf -c -O getxyz.f
+xlf -c -O ghmcstep.f
 xlf -c -O gradient.f
 xlf -c -O gradrgd.f
 xlf -c -O gradrot.f

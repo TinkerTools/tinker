@@ -54,6 +54,7 @@ c
 c     set default parameters for the dynamics trajectory
 c
       integrate = 'BEEMAN'
+      bmnsplit = 6
       nfree = 0
       irest = 1
       velsave = .false.
@@ -94,6 +95,8 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
+         else if (keyword(1:17) .eq. 'BEEMAN-SPLITTING ') then
+            read (string,*,err=10,end=10)  bmnsplit
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
@@ -108,8 +111,6 @@ c
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
-         else if (keyword(1:9) .eq. 'PRINTOUT ') then
-            read (string,*,err=10,end=10)  iprint
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)
@@ -135,6 +136,8 @@ c
          else if (keyword(1:13) .eq. 'VOLUME-SCALE ') then
             call getword (record,volscale,next)
             call upcase (volscale)
+         else if (keyword(1:9) .eq. 'PRINTOUT ') then
+            read (string,*,err=10,end=10)  iprint
          end if
    10    continue
       end do
@@ -220,8 +223,8 @@ c
                nfree = nfree - kratx(i)
             end do
          end if
-         if (isothermal .and. integrate.ne.'STOCHASTIC'
-     &       .and. thermostat.ne.'ANDERSEN') then
+         if (isothermal .and. thermostat.ne.'ANDERSEN'.and.
+     &       integrate.ne.'STOCHASTIC' .and. integrate.ne.'GHMC') then
             if (use_bounds) then
                nfree = nfree - 3
             else
@@ -243,6 +246,15 @@ c
    60    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
          call fatal
       end if
+c
+c     decide whether to remove center of mass motion
+c
+      dorest = .true.
+      if (irest .eq. 0)  dorest = .false.
+      if (nuse. ne. n)  dorest = .false.
+      if (integrate .eq. 'STOCHASTIC')  dorest = .false.
+      if (integrate .eq. 'GHMC')  dorest = .false.
+      if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c
 c     try to restart using prior velocities and accelerations
 c

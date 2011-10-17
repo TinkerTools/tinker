@@ -5,8 +5,9 @@
 #
 # Written by Pengyu Ren, Ponder Lab, July 2000
 
-if ($#ARGV > 2 or  $#ARGV < 1){die "$0: logfile start(in frame) end\n";}
-if ($#ARGV == 1) {$ARGV[2]=1000000;} 
+if ($#ARGV > 2 or $#ARGV < 0) {die "$0: logfile start(in frame) end\n";}
+if ($#ARGV == 0) {$ARGV[1]=1;$ARGV[2]=1000000000;}
+if ($#ARGV == 1) {$ARGV[2]=1000000000;} 
 #In perl, $ARG[0] is the first argument, $0 is the name of prog
 $start=88+$ARGV[1]*14;
 @tot=();

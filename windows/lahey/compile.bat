@@ -182,6 +182,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace getstring.f
 LF95 -c -o1 -tpp -nstchk -ntrace gettext.f
 LF95 -c -o1 -tpp -nstchk -ntrace getword.f
 LF95 -c -o1 -tpp -nstchk -ntrace getxyz.f
+LF95 -c -o1 -tpp -nstchk -ntrace ghmcstep.f
 LF95 -c -o1 -tpp -nstchk -ntrace gradient.f
 LF95 -c -o1 -tpp -nstchk -ntrace gradrgd.f
 LF95 -c -o1 -tpp -nstchk -ntrace gradrot.f

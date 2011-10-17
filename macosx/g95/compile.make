@@ -181,6 +181,7 @@ g95 -c -O2 getstring.f
 g95 -c -O2 gettext.f
 g95 -c -O2 getword.f
 g95 -c -O2 getxyz.f
+g95 -c -O2 ghmcstep.f
 g95 -c -O2 gradient.f
 g95 -c -O2 gradrgd.f
 g95 -c -O2 gradrot.f

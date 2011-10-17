@@ -29,7 +29,6 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
-      include 'openmp.i'
       include 'pme.i'
       integer maxpower
       parameter (maxpower=54)
@@ -129,19 +128,7 @@ c
 c
 c     set the number of chunks and grid points per chunk
 c
-      nchk1 = 1
-      nchk2 = 1
-      nchk3 = 1
-      if (nthread .gt. 1)  nchk1 = 2
-      if (nthread .gt. 2)  nchk2 = 2
-      if (nthread .gt. 4)  nchk3 = 2
-      ngrd1 = nfft1 / nchk1
-      ngrd2 = nfft2 / nchk2
-      ngrd3 = nfft3 / nchk3
-      nchunk = nchk1 * nchk2 * nchk3
-      nlpts = (bsorder-1) / 2
-      nrpts = bsorder - nlpts - 1
-      grdoff = (bsorder+1)/2 + 1
+      call getchunk
 c
 c     check the B-spline order and charge grid dimension
 c
@@ -290,6 +277,65 @@ c
          end do
       end do
       rmax = sqrt(rmax)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine getchunk  --  find number of chunks per axis  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "getchunk" determines the number of grid point "chunks" used
+c     along each axis of the PME grid for parallelization
+c
+c
+      subroutine getchunk
+      implicit none
+      include 'sizes.i'
+      include 'chunks.i'
+      include 'openmp.i'
+      include 'pme.i'
+      integer i
+c
+c
+c     initialize total chunks and number along each axis
+c
+      nchunk = 1
+      nchk1 = 1
+      nchk2 = 1
+      nchk3 = 1
+c
+c     evaluate use of two to six chunks along each axis
+c
+      do i = 2, 6
+         if (nthread.gt.nchunk .and. mod(nfft1,i).eq.0) then
+            nchk1 = i
+            nchunk = nchk1 * nchk2 * nchk3
+         end if
+         if (nthread.gt.nchunk .and. mod(nfft2,i).eq.0) then
+            nchk2 = i
+            nchunk = nchk1 * nchk2 * nchk3
+         end if
+         if (nthread.gt.nchunk .and. mod(nfft3,i).eq.0) then
+            nchk3 = i
+            nchunk = nchk1 * nchk2 * nchk3
+         end if
+      end do
+c
+c     set number of grid points per chunk along each axis
+c
+      ngrd1 = nfft1 / nchk1
+      ngrd2 = nfft2 / nchk2
+      ngrd3 = nfft3 / nchk3
+c
+c     set grid points to left and right, and B-spline offset
+c
+      nlpts = (bsorder-1) / 2
+      nrpts = bsorder - nlpts - 1
+      grdoff = (bsorder+1)/2 + 1
       return
       end
 c

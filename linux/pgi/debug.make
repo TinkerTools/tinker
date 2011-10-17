@@ -181,6 +181,7 @@ pgf77 -c -g -Ktrap=fp getstring.f
 pgf77 -c -g -Ktrap=fp gettext.f
 pgf77 -c -g -Ktrap=fp getword.f
 pgf77 -c -g -Ktrap=fp getxyz.f
+pgf77 -c -g -Ktrap=fp ghmcstep.f
 pgf77 -c -g -Ktrap=fp gradient.f
 pgf77 -c -g -Ktrap=fp gradrgd.f
 pgf77 -c -g -Ktrap=fp gradrot.f

@@ -182,6 +182,7 @@ ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getstring.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gettext.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getword.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp getxyz.f
+ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp ghmcstep.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gradient.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gradrgd.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp gradrot.f

@@ -343,6 +343,7 @@ OBJS = active.o \
        gettext.o \
        getword.o \
        getxyz.o \
+       ghmcstep.o \
        gradient.o \
        gradrgd.o \
        gradrot.o \
@@ -949,6 +950,7 @@ libtinker.a: ${OBJS}
         gettext.o \
         getword.o \
         getxyz.o \
+        ghmcstep.o \
         gradient.o \
         gradrgd.o \
         gradrot.o \
@@ -1098,13 +1100,13 @@ anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i pote
 archive.o: atmtyp.i atoms.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
 attach.o: atoms.i couple.i iounit.i sizes.i
 basefile.o: ascii.i files.i
-beeman.o: atmtyp.i atoms.i moldyn.i shake.i sizes.i units.i usage.i
+beeman.o: atmtyp.i atoms.i mdstuf.i moldyn.i shake.i sizes.i units.i usage.i
 bicubic.o:
 bitors.o: angle.i bitor.i couple.i iounit.i sizes.i
 bonds.o: atmlst.i atoms.i bond.i couple.i iounit.i sizes.i
 born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pbstuf.i potent.i sizes.i solute.i virial.i
 bounds.o: atmtyp.i atoms.i boxes.i molcul.i sizes.i
-bussi.o: atmtyp.i atoms.i bath.i boxes.i mdstuf.i moldyn.i shake.i sizes.i units.i usage.i virial.i
+bussi.o: atmtyp.i atoms.i bath.i boxes.i mdstuf.i moldyn.i shake.i sizes.i units.i usage.i
 calendar.o:
 center.o: align.i sizes.i
 chkpole.o: atoms.i mpole.i sizes.i
@@ -1262,6 +1264,7 @@ getstring.o: ascii.i
 gettext.o: ascii.i
 getword.o: ascii.i
 getxyz.o: inform.i iounit.i output.i
+ghmcstep.o: atmtyp.i atoms.i bath.i iounit.i mdstuf.i moldyn.i shake.i sizes.i stodyn.i units.i usage.i virial.i
 gradient.o: atoms.i bound.i cutoff.i deriv.i energi.i inter.i iounit.i potent.i rigid.i sizes.i vdwpot.i virial.i
 gradrgd.o: atoms.i group.i rigid.i sizes.i
 gradrot.o: atoms.i deriv.i domega.i omega.i potent.i rotate.i sizes.i
@@ -1296,7 +1299,7 @@ kewald.o: atoms.i bound.i boxes.i chunks.i cutoff.i ewald.i fft.i inform.i iouni
 kgeom.o: atmtyp.i atoms.i bound.i couple.i group.i iounit.i keys.i kgeoms.i molcul.i potent.i sizes.i
 kimprop.o: atmtyp.i atoms.i couple.i improp.i inform.i iounit.i keys.i kiprop.i potent.i sizes.i
 kimptor.o: atmtyp.i atoms.i couple.i imptor.i inform.i iounit.i keys.i kitors.i math.i potent.i sizes.i
-kinetic.o: atmtyp.i atoms.i group.i mdstuf.i moldyn.i rgddyn.i sizes.i units.i usage.i
+kinetic.o: atmtyp.i atoms.i bath.i group.i mdstuf.i moldyn.i rgddyn.i sizes.i units.i usage.i
 kmetal.o:
 kmpole.o: atoms.i couple.i inform.i iounit.i keys.i kmulti.i mpole.i polar.i polgrp.i potent.i sizes.i units.i
 kopbend.o: angle.i angpot.i atmtyp.i atoms.i couple.i inform.i iounit.i keys.i kopbnd.i opbend.i potent.i sizes.i usage.i
@@ -1415,7 +1418,7 @@ surface.o: atoms.i inform.i iounit.i math.i sizes.i usage.i
 surfatom.o: atoms.i iounit.i math.i sizes.i
 switch.o: cutoff.i npolar.i shunt.i sizes.i
 sybylxyz.o: files.i iounit.i titles.i
-temper.o: atmtyp.i atoms.i bath.i group.i mdstuf.i moldyn.i rgddyn.i sizes.i units.i usage.i
+temper.o: atmtyp.i atoms.i bath.i group.i mdstuf.i molcul.i moldyn.i rgddyn.i sizes.i units.i usage.i
 testgrad.o: atoms.i deriv.i energi.i inform.i inter.i iounit.i sizes.i solute.i usage.i
 testhess.o: atoms.i files.i hescut.i inform.i iounit.i sizes.i usage.i
 testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i

@@ -181,6 +181,7 @@ gfortran -c -O getstring.f
 gfortran -c -O gettext.f
 gfortran -c -O getword.f
 gfortran -c -O getxyz.f
+gfortran -c -O ghmcstep.f
 gfortran -c -O gradient.f
 gfortran -c -O gradrgd.f
 gfortran -c -O gradrot.f

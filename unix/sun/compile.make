@@ -181,6 +181,7 @@ f77 -c -fast -temp=. getstring.f
 f77 -c -fast -temp=. gettext.f
 f77 -c -fast -temp=. getword.f
 f77 -c -fast -temp=. getxyz.f
+f77 -c -fast -temp=. ghmcstep.f
 f77 -c -fast -temp=. gradient.f
 f77 -c -fast -temp=. gradrgd.f
 f77 -c -fast -temp=. gradrot.f

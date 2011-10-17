@@ -67,9 +67,9 @@ c
 c
 c     set the iteration counter, termination and tolerance
 c
-      maxiter = 100
+      maxiter = 500
       sor = 1.25d0
-      eps = 0.000001d0
+      eps = rateps
 c
 c     apply rattle to distances and half-step velocity values
 c
@@ -240,7 +240,7 @@ c
       niter = 0
       done = .false.
       sor = 1.25d0
-      eps = 0.000001d0 / dt
+      eps = rateps / dt
       vterm = 2.0d0 / (dt * convert)
 c
 c     apply the rattle algorithm to correct the velocities

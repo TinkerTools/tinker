@@ -16,7 +16,7 @@ c     "mdrest" finds and removes any translational or rotational
 c     kinetic energy of the overall system center of mass
 c
 c
-      subroutine mdrest
+      subroutine mdrest (istep)
       implicit none
       include 'sizes.i'
       include 'atmtyp.i'
@@ -29,7 +29,7 @@ c
       include 'moldyn.i'
       include 'rgddyn.i'
       include 'units.i'
-      integer i,j,k
+      integer i,j,k,istep
       real*8 etrans,erot
       real*8 weigh,totmass,eps
       real*8 xx,yy,zz,xy,xz,yz
@@ -41,6 +41,11 @@ c
       real*8, allocatable :: ycm(:)
       real*8, allocatable :: zcm(:)
 c
+c
+c     check steps between center of mass motion removal
+c
+      if (.not.dorest)  return
+      if (mod(istep,irest) .ne. 0)  return  
 c
 c     zero out the total mass and overall linear velocity
 c

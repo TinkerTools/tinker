@@ -12,6 +12,7 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
+c     rateps       convergence tolerance for rattle constraints
 c     krat         ideal distance value for rattle constraint
 c     nrat         number of rattle distance constraints to apply
 c     nratx        number of atom group spatial constraints to apply
@@ -25,8 +26,8 @@ c
       integer nrat,nratx
       integer irat,iratx
       integer kratx
-      real*8 krat
+      real*8 rateps,krat
       logical ratimage,use_rattle
-      common /shake/ krat(maxfix),nrat,nratx,irat(2,maxfix),
+      common /shake/ rateps,krat(maxfix),nrat,nratx,irat(2,maxfix),
      $               iratx(maxfix),kratx(maxfix),ratimage(maxfix),
      &               use_rattle

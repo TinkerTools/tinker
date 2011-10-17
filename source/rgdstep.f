@@ -14,7 +14,7 @@ c     ##################################################################
 c
 c
 c     "rgdstep" performs a single molecular dynamics time step
-c     for a rigid body calculation
+c     via a rigid body integration algorithm
 c
 c     literature reference:
 c
@@ -269,16 +269,12 @@ c
          vir(3,3) = vir(3,3) - zm(i)*derivs(3,i)
       end do
 c
-c     accumulate the kinetic energy and its outer product
+c     make full-step temperature and pressure corrections
 c
-      call kinetic (eksum,ekin)
-c
-c     compute and control the temperature and pressure
-c
-      call temper2 (dt,eksum,temp)
+      call temper2 (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
-c     system energy is sum of kinetic and potential energies
+c     total energy is sum of kinetic and potential energies
 c
       etot = eksum + epot
 c
@@ -286,6 +282,7 @@ c     compute statistics and save trajectory for this step
 c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot)
+      call mdrest (istep)
       return
       end
 c

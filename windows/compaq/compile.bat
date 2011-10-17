@@ -182,6 +182,7 @@ DF /compile_only /optimize /fast getstring.f
 DF /compile_only /optimize /fast gettext.f
 DF /compile_only /optimize /fast getword.f
 DF /compile_only /optimize /fast getxyz.f
+DF /compile_only /optimize /fast ghmcstep.f
 DF /compile_only /optimize /fast gradient.f
 DF /compile_only /optimize /fast gradrgd.f
 DF /compile_only /optimize /fast gradrot.f

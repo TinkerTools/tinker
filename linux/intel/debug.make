@@ -181,6 +181,7 @@ ifort -c -g -warn unused -check uninit -check bounds getstring.f
 ifort -c -g -warn unused -check uninit -check bounds gettext.f
 ifort -c -g -warn unused -check uninit -check bounds getword.f
 ifort -c -g -warn unused -check uninit -check bounds getxyz.f
+ifort -c -g -warn unused -check uninit -check bounds ghmcstep.f
 ifort -c -g -warn unused -check uninit -check bounds gradient.f
 ifort -c -g -warn unused -check uninit -check bounds gradrgd.f
 ifort -c -g -warn unused -check uninit -check bounds gradrot.f

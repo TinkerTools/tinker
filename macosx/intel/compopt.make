@@ -181,6 +181,7 @@ ifort -c -fast getstring.f
 ifort -c -fast gettext.f
 ifort -c -fast getword.f
 ifort -c -fast getxyz.f
+ifort -c -fast ghmcstep.f
 ifort -c -fast gradient.f
 ifort -c -fast gradrgd.f
 ifort -c -fast gradrot.f

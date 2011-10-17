@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "sdstep" performs a single stochastic dynamics time step
-c     via a velocity Verlet integration algorithm
+c     via the velocity Verlet integration algorithm
 c
 c     literature references:
 c
@@ -59,8 +59,8 @@ c     get frictional and random terms for position and velocity
 c
       call sdterm (istep,dt,pfric,vfric,afric,prand,vrand)
 c
-c     store the current atom positions, then find new atom
-c     positions and half-step velocities via Verlet recursion
+c     store the current atom positions, then find full-step
+c     positions and half-step velocities via modified Verlet
 c
       do i = 1, n
          if (use(i)) then
@@ -85,7 +85,7 @@ c
       call gradient (epot,derivs)
 c
 c     use Newton's second law to get the next accelerations;
-c     find the full-step velocities using the Verlet recursion
+c     find the full-step velocities using modified Verlet
 c
       do i = 1, n
          if (use(i)) then
@@ -123,16 +123,13 @@ c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     accumulate the kinetic energy and its outer product
-c
-      call kinetic (eksum,ekin)
-c
 c     compute and control the temperature and pressure
 c
+      call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
-c     system energy is sum of kinetic and potential energies
+c     total energy is sum of kinetic and potential energies
 c
       etot = eksum + epot
 c
@@ -151,8 +148,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "sdterm" gets frictional and random force terms needed to
-c     update positions and velocities via stochastic dynamics
+c     "sdterm" finds the frictional and random terms needed to
+c     update positions and velocities during stochastic dynamics
 c
 c
       subroutine sdterm (istep,dt,pfric,vfric,afric,prand,vrand)

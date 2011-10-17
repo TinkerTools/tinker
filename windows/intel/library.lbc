@@ -160,6 +160,7 @@ getstring.obj
 gettext.obj
 getword.obj
 getxyz.obj
+ghmcstep.obj
 gradient.obj
 gradrgd.obj
 gradrot.obj

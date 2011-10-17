@@ -181,6 +181,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 getstring.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 gettext.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 getword.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 getxyz.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 ghmcstep.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 gradient.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 gradrgd.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 gradrot.f

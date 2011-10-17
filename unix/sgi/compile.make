@@ -181,6 +181,7 @@ f77 -c -O -mips4 getstring.f
 f77 -c -O -mips4 gettext.f
 f77 -c -O -mips4 getword.f
 f77 -c -O -mips4 getxyz.f
+f77 -c -O -mips4 ghmcstep.f
 f77 -c -O -mips4 gradient.f
 f77 -c -O -mips4 gradrgd.f
 f77 -c -O -mips4 gradrot.f

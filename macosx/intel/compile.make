@@ -181,6 +181,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -o
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp gettext.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp getword.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp getxyz.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp ghmcstep.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp gradient.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp gradrgd.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp gradrot.f

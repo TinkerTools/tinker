@@ -181,6 +181,7 @@ f77 -c -fast -arch generic -tune generic getstring.f
 f77 -c -fast -arch generic -tune generic gettext.f
 f77 -c -fast -arch generic -tune generic getword.f
 f77 -c -fast -arch generic -tune generic getxyz.f
+f77 -c -fast -arch generic -tune generic ghmcstep.f
 f77 -c -fast -arch generic -tune generic gradient.f
 f77 -c -fast -arch generic -tune generic gradrgd.f
 f77 -c -fast -arch generic -tune generic gradrot.f

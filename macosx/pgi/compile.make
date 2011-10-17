@@ -181,6 +181,7 @@ pgf95 -c -fast -mp getstring.f
 pgf95 -c -fast -mp gettext.f
 pgf95 -c -fast -mp getword.f
 pgf95 -c -fast -mp getxyz.f
+pgf95 -c -fast -mp ghmcstep.f
 pgf95 -c -fast -mp gradient.f
 pgf95 -c -fast -mp gradrgd.f
 pgf95 -c -fast -mp gradrot.f

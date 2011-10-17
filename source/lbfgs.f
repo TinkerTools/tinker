@@ -25,7 +25,7 @@ c     for Large Scale Optimization", Mathematical Programming,
 c     45, 503-528 (1989)
 c
 c     J. Nocedal and S. J. Wright, "Numerical Optimization",
-c     Springer-Verlag New York, 1999, Section 9.1
+c     Springer-Verlag, New York, 1999, Section 9.1
 c
 c     variables and parameters:
 c

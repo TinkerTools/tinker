@@ -44,22 +44,33 @@ c
       character*120 string
 c
 c
-c     zero out the number of distance and spatial constraints
+c     set defaults for constraints and convergence tolerance
 c
       nrat = 0
       nratx = 0
+      rateps = 0.000001d0
       use_rattle = .true.
 c
-c     process keywords containing generic constraint options
+c     process keywords containing rattle constraint options
 c
       do k = 1, nkey
          next = 1
          record = keyline(k)
          call upcase (record)
          call gettext (record,keyword,next)
+         if (keyword(1:11) .eq. 'RATTLE-EPS ') then
+            read (string,*,err=10,end=10)  rateps
+         end if
+   10    continue
+      end do
 c
-c     get the distance constraint types for the rattle method
+c     process keywords containing rattle constraint types
 c
+      do k = 1, nkey
+         next = 1
+         record = keyline(k)
+         call upcase (record)
+         call gettext (record,keyword,next)
          if (keyword(1:7) .eq. 'RATTLE ') then
             call getword (record,rattyp,next)
 c
@@ -246,8 +257,8 @@ c
             call getnumb (record,ib,next)
             rab = 0.0d0
             string = record(next:120)
-            read (string,*,err=10,end=10)  rab
-   10       continue
+            read (string,*,err=20,end=20)  rab
+   20       continue
             if (rab .eq. 0.0d0) then
                do i = 1, n12(ia)
                   if (i12(i,ia) .eq. ib) then

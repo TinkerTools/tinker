@@ -39,7 +39,7 @@ c
       include 'usage.i'
       integer i,j
       real*8 dt,eksum
-      real*8 ekt,scale
+      real*8 scale,ekt
       real*8 dt2,dt4,dt8
       real*8 ekin(3,3)
 c
@@ -116,7 +116,7 @@ c     Pressure and/or Temperature", Journal of Chemical Physics,
 c     72, 2384-2393 (1980)
 c
 c
-      subroutine temper2 (dt,eksum,temp)
+      subroutine temper2 (dt,eksum,ekin,temp)
       implicit none
       include 'sizes.i'
       include 'atmtyp.i'
@@ -124,27 +124,26 @@ c
       include 'bath.i'
       include 'group.i'
       include 'mdstuf.i'
+      include 'molcul.i'
       include 'moldyn.i'
       include 'rgddyn.i'
       include 'units.i'
       include 'usage.i'
-      integer i,j
+      integer i,j,k,m
       real*8 dt,eksum,temp
       real*8 scale,speed
       real*8 c,d,r,s,si
       real*8 random,normal
       real*8 kt,rate,trial
       real*8 dt2,dt4,dt8,ekt
+      real*8 ekin(3,3)
 c
-c
-c     get the instantaneous temperature from the kinetic energy
-c
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-      if (.not. isothermal)  return
 c
 c     couple to external temperature bath via Berendsen scaling
 c
       if (thermostat .eq. 'BERENDSEN') then
+         call kinetic (eksum,ekin)
+         temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
          if (temp .eq. 0.0d0)  temp = 0.1d0
          scale = sqrt(1.0d0 + (dt/tautemp)*(kelvin/temp-1.0d0))
          if (integrate .eq. 'RIGIDBODY') then
@@ -167,6 +166,8 @@ c
 c     couple to external temperature bath via Bussi scaling
 c
       else if (thermostat .eq. 'BUSSI') then
+         call kinetic (eksum,ekin)
+         temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
          if (temp .eq. 0.0d0)  temp = 0.1d0
          c = exp(-dt/tautemp)
          d = (1.0d0-c) * (kelvin/temp) / dble(nfree)
@@ -210,6 +211,21 @@ c
                   speed = sqrt(kt/grpmass(i))
                   do j = 1, 3
                      vcm(j,i) = speed * normal ()
+                  end do
+               end if
+            end do
+         else if (barostat.eq.'MONTECARLO' .and.
+     &            volscale.eq.'MOLECULAR') then
+            rate = rate / dble(nmol)**(2.0d0/3.0d0)
+            do i = 1, nmol
+               trial = random ()
+               if (trial .lt. rate) then
+                  do j = imol(1,i), imol(2,i)
+                     k = kmol(j)
+                     speed = sqrt(kt/mass(k))
+                     do m = 1, 3
+                        v(m,k) = speed * normal ()
+                     end do
                   end do
                end if
             end do
@@ -268,5 +284,10 @@ c
          gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
          vnh(2) = vnh(2) + gnh(2)*dt4
       end if
+c
+c     get instantaneous temperature from the kinetic energy
+c
+      call kinetic (eksum,ekin)
+      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
       return
       end

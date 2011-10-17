@@ -24,7 +24,7 @@ c     xnh         position of each chained Nose-Hoover thermostat
 c     vnh         velocity of each chained Nose-Hoover thermostat
 c     qnh         mass for each chained Nose-Hoover thermostat
 c     gnh         coupling between chained Nose-Hoover thermostats
-c     eta         velocity variable for Bussi-Parrinello barostat
+c     eta         velocity value for Bussi-Parrinello barostat
 c     volmove     maximum volume move for Monte Carlo barostat (Ang**3)
 c     voltrial    mean number of steps between Monte Carlo moves
 c     isothermal  logical flag governing use of temperature control

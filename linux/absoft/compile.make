@@ -182,6 +182,7 @@ f77 -c -O getstring.f
 f77 -c -O gettext.f
 f77 -c -O getword.f
 f77 -c -O getxyz.f
+f77 -c -O ghmcstep.f
 f77 -c -O gradient.f
 f77 -c -O gradrgd.f
 f77 -c -O gradrot.f

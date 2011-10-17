@@ -231,13 +231,14 @@ c
             call verlet (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
             call sdstep (istep,dt)
+         else if (integrate .eq. 'BUSSI') then
+            call bussi (istep,dt)
+         else if (integrate .eq. 'GHMC') then
+            call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
          else
             call beeman (istep,dt)
-         end if
-         if (irest.gt.0 .and. nuse.eq.n) then
-            if (mod(istep,irest) .eq. 0)  call mdrest
          end if
       end do
 c
@@ -278,19 +279,14 @@ c
             call verlet (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
             call sdstep (istep,dt)
+         else if (integrate .eq. 'BUSSI') then
+            call bussi (istep,dt)
+         else if (integrate .eq. 'GHMC') then
+            call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
          else
             call beeman (istep,dt)
-         end if
-c
-c     remove center of mass translation and rotation if needed
-c
-         if (irest.gt.0 .and. nuse.eq.n) then
-            if (mod(istep,irest) .eq. 0) then
-               if (integrate.ne.'STOCHASTIC' .and.
-     &             thermostat.ne.'ANDERSEN')  call mdrest
-            end if
          end if
       end do
 c
