@@ -311,6 +311,7 @@ ifort -c -fast readprm.f
 ifort -c -fast readseq.f
 ifort -c -fast readxyz.f
 ifort -c -fast replica.f
+ifort -c -fast respa.f
 ifort -c -fast rgdstep.f
 ifort -c -fast rings.f
 ifort -c -fast rmsfit.f

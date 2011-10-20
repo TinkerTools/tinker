@@ -83,6 +83,10 @@ c
       read (idyn,80)
    80 format ()
 c
+c     set the box volume and additional periodic box values
+c
+      call lattice
+c
 c     get rigid body positions, translational and angular velocities
 c
       quit = .true.
@@ -141,8 +145,8 @@ c
          do i = 1, n
             read (idyn,220)  record
   220       format (a120)
-            read (record,*,err=230,end=230)  aold(1,i),aold(2,i),
-     &                                       aold(3,i)
+            read (record,*,err=230,end=230)  aalt(1,i),aalt(2,i),
+     &                                       aalt(3,i)
          end do
       end if
       quit = .false.

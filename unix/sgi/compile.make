@@ -311,6 +311,7 @@ f77 -c -O -mips4 readprm.f
 f77 -c -O -mips4 readseq.f
 f77 -c -O -mips4 readxyz.f
 f77 -c -O -mips4 replica.f
+f77 -c -O -mips4 respa.f
 f77 -c -O -mips4 rgdstep.f
 f77 -c -O -mips4 rings.f
 f77 -c -O -mips4 rmsfit.f

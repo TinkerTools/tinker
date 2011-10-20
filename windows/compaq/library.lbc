@@ -267,6 +267,7 @@ readprm.obj
 readseq.obj
 readxyz.obj
 replica.obj
+respa.obj
 rgdstep.obj
 rings.obj
 rmsfit.obj

@@ -311,6 +311,7 @@ pgf77 -c -fast readprm.f
 pgf77 -c -fast readseq.f
 pgf77 -c -fast readxyz.f
 pgf77 -c -fast replica.f
+pgf77 -c -fast respa.f
 pgf77 -c -fast rgdstep.f
 pgf77 -c -fast rings.f
 pgf77 -c -fast rmsfit.f

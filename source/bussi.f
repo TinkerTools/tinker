@@ -39,7 +39,7 @@ c
       integer i,j,istep
       real*8 dt,dt_2,dt_x
       real*8 dt2_2,dt3_2
-      real*8 etot,epot,eksum
+      real*8 epot,etot,eksum
       real*8 expterm,sinhterm
       real*8 kt,w,temp,pres
       real*8 part1,part2
@@ -82,7 +82,7 @@ c
             do j = 1, 3
                eta = eta + mass(i)*a(j,i)*v(j,i)*dt2_2/w
      &                   + mass(i)*a(j,i)*a(j,i)*dt3_2/(3.0d0*w)
-               v(j,i) = v(j,i) + (part1*a(j,i)-aold(j,i))*dt_x
+               v(j,i) = v(j,i) + (part1*a(j,i)-aalt(j,i))*dt_x
             end do
         end if
       end do
@@ -128,7 +128,7 @@ c
       do i = 1, n
          if (use(i)) then
             do j = 1, 3
-               aold(j,i) = a(j,i)
+               aalt(j,i) = a(j,i)
                a(j,i) = -convert * derivs(j,i) / mass(i)
             end do
          end if
@@ -143,7 +143,7 @@ c
             do j = 1, 3
                eta = eta + mass(i)*a(j,i)*v(j,i)*dt2_2/w
      &                   + mass(i)*a(j,i)*a(j,i)*dt3_2/(3.0d0*w)
-               v(j,i) = v(j,i) + (part2*a(j,i)+aold(j,i))*dt_x
+               v(j,i) = v(j,i) + (part2*a(j,i)+aalt(j,i))*dt_x
             end do
         end if
       end do

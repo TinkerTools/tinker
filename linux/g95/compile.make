@@ -311,6 +311,7 @@ g95 -c -O readprm.f
 g95 -c -O readseq.f
 g95 -c -O readxyz.f
 g95 -c -O replica.f
+g95 -c -O respa.f
 g95 -c -O rgdstep.f
 g95 -c -O rings.f
 g95 -c -O rmsfit.f

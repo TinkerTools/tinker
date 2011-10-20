@@ -311,6 +311,7 @@ gfortran -c -O3 readprm.f
 gfortran -c -O3 readseq.f
 gfortran -c -O3 readxyz.f
 gfortran -c -O3 replica.f
+gfortran -c -O3 respa.f
 gfortran -c -O3 rgdstep.f
 gfortran -c -O3 rings.f
 gfortran -c -O3 rmsfit.f

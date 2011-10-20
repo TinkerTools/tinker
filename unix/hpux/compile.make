@@ -311,6 +311,7 @@ fort77 -c -O2 +E1 +Onolimit readprm.f
 fort77 -c -O2 +E1 readseq.f
 fort77 -c -O2 +E1 readxyz.f
 fort77 -c -O2 +E1 replica.f
+fort77 -c -O2 +E1 respa.f
 fort77 -c -O2 +E1 rgdstep.f
 fort77 -c -O2 +E1 rings.f
 fort77 -c -O2 +E1 rmsfit.f

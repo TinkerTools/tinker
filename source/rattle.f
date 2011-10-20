@@ -236,7 +236,7 @@ c
 c
 c     set the iteration counter, termination and tolerance
 c
-      maxiter = 100
+      maxiter = 500
       niter = 0
       done = .false.
       sor = 1.25d0

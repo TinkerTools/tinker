@@ -311,6 +311,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readprm.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readseq.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp replica.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp respa.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp rgdstep.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp rings.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp rmsfit.f

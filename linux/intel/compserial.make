@@ -311,6 +311,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 readprm.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 readseq.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 readxyz.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 replica.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 respa.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 rgdstep.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 rings.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 rmsfit.f

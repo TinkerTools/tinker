@@ -37,8 +37,9 @@ c
       include 'usage.i'
       include 'virial.i'
       integer i,j,istep
-      real*8 dt,etot,term
-      real*8 eksum,epot
+      real*8 dt,term
+      real*8 epot,etot
+      real*8 eksum
       real*8 temp,pres
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy

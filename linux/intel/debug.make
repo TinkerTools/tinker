@@ -311,6 +311,7 @@ ifort -c -g -warn unused -check uninit -check bounds readprm.f
 ifort -c -g -warn unused -check uninit -check bounds readseq.f
 ifort -c -g -warn unused -check uninit -check bounds readxyz.f
 ifort -c -g -warn unused -check uninit -check bounds replica.f
+ifort -c -g -warn unused -check uninit -check bounds respa.f
 ifort -c -g -warn unused -check uninit -check bounds rgdstep.f
 ifort -c -g -warn unused -check uninit -check bounds rings.f
 ifort -c -g -warn unused -check uninit -check bounds rmsfit.f

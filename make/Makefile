@@ -473,6 +473,7 @@ OBJS = active.o \
        readseq.o \
        readxyz.o \
        replica.o \
+       respa.o \
        rgdstep.o \
        rings.o \
        rmsfit.o \
@@ -1057,6 +1058,7 @@ libtinker.a: ${OBJS}
         readseq.o \
         readxyz.o \
         replica.o \
+        respa.o \
         rgdstep.o \
         rings.o \
         rmsfit.o \
@@ -1394,6 +1396,7 @@ readprm.o: fields.i iounit.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.
 readseq.o: files.i iounit.i resdue.i sequen.i sizes.i
 readxyz.o: atmtyp.i atoms.i couple.i files.i inform.i iounit.i sizes.i titles.i
 replica.o: bound.i boxes.i cell.i inform.i iounit.i sizes.i
+respa.o: atmtyp.i atoms.i cutoff.i moldyn.i potent.i shake.i sizes.i units.i usage.i virial.i
 rgdstep.o: atmtyp.i atoms.i bound.i group.i iounit.i rgddyn.i sizes.i units.i virial.i
 rings.o: angle.i atoms.i bitor.i bond.i couple.i inform.i iounit.i ring.i sizes.i tors.i
 rmsfit.o: align.i sizes.i

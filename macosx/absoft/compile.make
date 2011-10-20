@@ -312,6 +312,7 @@ f77 -c -O -N11 readprm.f
 f77 -c -O -N11 readseq.f
 f77 -c -O -N11 readxyz.f
 f77 -c -O -N11 replica.f
+f77 -c -O -N11 respa.f
 f77 -c -O -N11 rgdstep.f
 f77 -c -O -N11 rings.f
 f77 -c -O -N11 rmsfit.f

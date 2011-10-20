@@ -139,6 +139,12 @@ c
       real*8 ekin(3,3)
 c
 c
+c     get instantaneous temperature from the kinetic energy
+c
+      call kinetic (eksum,ekin)
+      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      if (.not. isothermal)  return
+c
 c     couple to external temperature bath via Berendsen scaling
 c
       if (thermostat .eq. 'BERENDSEN') then
@@ -285,7 +291,7 @@ c
          vnh(2) = vnh(2) + gnh(2)*dt4
       end if
 c
-c     get instantaneous temperature from the kinetic energy
+c     recompute kinetic energy and instantaneous temperature
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)

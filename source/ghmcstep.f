@@ -46,8 +46,9 @@ c
       integer i,j
       integer istep,nrej
       real*8 dt,dt_2
-      real*8 etot,eksum,epot
-      real*8 epold,etold,de
+      real*8 epot,etot
+      real*8 epold,etold
+      real*8 eksum,de
       real*8 temp,pres,ratio
       real*8 random,term
       real*8 ekin(3,3)
@@ -59,15 +60,14 @@ c
       real*8 derivs(3,maxatm)
       real*8 alpha(3,maxatm)
       real*8 beta(3,maxatm)
-      save nrej
-      save epot
+      save epot,nrej
 c
 c
 c     compute the half time step value
 c
       dt_2 = 0.5d0 * dt
 c
-c     evolve momenta according to midpoint Euler for half timestep
+c     evolve velocities according to midpoint Euler for half-step
 c
       call ghmcterm (istep,dt,alpha,beta)
       do i = 1, n
@@ -91,7 +91,7 @@ c
          if (use(i)) then
             do j = 1, 3
                vold(j,i) = v(j,i)
-               aold(j,i) = a(j,i)
+               aalt(j,i) = a(j,i)
                v(j,i) = v(j,i) + a(j,i)*dt_2
             end do
             xold(i) = x(i)
@@ -103,8 +103,7 @@ c
          end if
       end do
 c
-c     get constraint-corrected positions (TODO: Check to make
-c     sure velocities are supposed to be corrected here)
+c     get constraint-corrected positions and half-step velocities
 c
       if (use_rattle)  call rattle (dt,xold,yold,zold)
 c
@@ -132,11 +131,11 @@ c
          end if
       end do
 c
-c     find the constraint-corrected velocities
+c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     accumulate the kinetic energy, temperature and total energy
+c     determine the kinetic energy, temperature and total energy
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
@@ -159,13 +158,13 @@ c
                z(i) = zold(i)
                do j = 1, 3
                   v(j,i) = -vold(j,i)
-                  a(j,i) = aold(j,i)
+                  a(j,i) = aalt(j,i)
                end do
             end if
          end do         
       end if
 c
-c     evolve momenta according to midpoint Euler for half timestep
+c     evolve velocities according to midpoint Euler for half-step
 c
       call ghmcterm (istep,dt,alpha,beta)
       do i = 1, n
@@ -176,7 +175,7 @@ c
          end if
       end do      
 c
-c     find the constraint-corrected velocities
+c     update the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c

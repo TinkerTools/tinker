@@ -312,6 +312,7 @@ DF /compile_only /optimize /fast readprm.f
 DF /compile_only /optimize /fast readseq.f
 DF /compile_only /optimize /fast readxyz.f
 DF /compile_only /optimize /fast replica.f
+DF /compile_only /optimize /fast respa.f
 DF /compile_only /optimize /fast rgdstep.f
 DF /compile_only /optimize /fast rings.f
 DF /compile_only /optimize /fast rmsfit.f

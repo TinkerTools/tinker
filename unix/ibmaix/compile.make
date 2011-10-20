@@ -311,6 +311,7 @@ xlf -c -O readprm.f
 xlf -c -O readseq.f
 xlf -c -O readxyz.f
 xlf -c -O replica.f
+xlf -c -O respa.f
 xlf -c -O rgdstep.f
 xlf -c -O rings.f
 xlf -c -O rmsfit.f

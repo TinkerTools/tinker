@@ -267,7 +267,6 @@ c
          rewind (unit=idyn)
          call readdyn (idyn)
          close (unit=idyn)
-         call lattice
 c
 c     set translational velocities for rigid body dynamics
 c
@@ -281,7 +280,39 @@ c
                lm(j,i) = 0.0d0
             end do
          end do
-         if (nuse .eq. n)  call mdrest
+         if (nuse .eq. n)  call mdrest (0)
+c
+c     set velocities and fast/slow accelerations for RESPA method
+c
+      else if (integrate .eq. 'RESPA') then
+         allocate (derivs(3,n))
+         call gradslow (e,derivs)
+         do i = 1, n
+            if (use(i)) then
+               speed = maxwell (mass(i),kelvin)
+               call ranvec (vec)
+               do j = 1, 3
+                  v(j,i) = speed * vec(j)
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
+               end do
+            else
+               do j = 1, 3
+                  v(j,i) = 0.0d0
+                  a(j,i) = 0.0d0
+                  aalt(j,i) = 0.0d0
+               end do
+            end if
+         end do
+         call gradfast (e,derivs)
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  aalt(j,i) = -convert * derivs(j,i) / mass(i)
+               end do
+            end if
+         end do
+         deallocate (derivs)
+         if (nuse .eq. n)  call mdrest (0)
 c
 c     set velocities and accelerations for Cartesian dynamics
 c
@@ -295,18 +326,18 @@ c
                do j = 1, 3
                   v(j,i) = speed * vec(j)
                   a(j,i) = -convert * derivs(j,i) / mass(i)
-                  aold(j,i) = a(j,i)
+                  aalt(j,i) = a(j,i)
                end do
             else
                do j = 1, 3
                   v(j,i) = 0.0d0
                   a(j,i) = 0.0d0
-                  aold(j,i) = 0.0d0
+                  aalt(j,i) = 0.0d0
                end do
             end if
          end do
          deallocate (derivs)
-         if (nuse .eq. n)  call mdrest
+         if (nuse .eq. n)  call mdrest (0)
       end if
 c
 c     check for any prior dynamics coordinate sets

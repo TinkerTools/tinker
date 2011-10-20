@@ -311,6 +311,7 @@ pgf77 -c -g -Ktrap=fp readprm.f
 pgf77 -c -g -Ktrap=fp readseq.f
 pgf77 -c -g -Ktrap=fp readxyz.f
 pgf77 -c -g -Ktrap=fp replica.f
+pgf77 -c -g -Ktrap=fp respa.f
 pgf77 -c -g -Ktrap=fp rgdstep.f
 pgf77 -c -g -Ktrap=fp rings.f
 pgf77 -c -g -Ktrap=fp rmsfit.f

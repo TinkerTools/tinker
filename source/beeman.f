@@ -66,7 +66,7 @@ c
       do i = 1, n
          if (use(i)) then
             do j = 1, 3
-               v(j,i) = v(j,i) + (part1*a(j,i)-aold(j,i))*dt_x
+               v(j,i) = v(j,i) + (part1*a(j,i)-aalt(j,i))*dt_x
             end do
             xold(i) = x(i)
             yold(i) = y(i)
@@ -91,9 +91,9 @@ c
       do i = 1, n
          if (use(i)) then
             do j = 1, 3
-               aold(j,i) = a(j,i)
+               aalt(j,i) = a(j,i)
                a(j,i) = -convert * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + (part2*a(j,i)+aold(j,i))*dt_x
+               v(j,i) = v(j,i) + (part2*a(j,i)+aalt(j,i))*dt_x
             end do
          end if
       end do

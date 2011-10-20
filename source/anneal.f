@@ -237,6 +237,8 @@ c
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
+         else if (integrate .eq. 'RESPA') then
+            call respa (istep,dt)
          else
             call beeman (istep,dt)
          end if
@@ -285,6 +287,8 @@ c
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
+         else if (integrate .eq. 'RESPA') then
+            call respa (istep,dt)
          else
             call beeman (istep,dt)
          end if

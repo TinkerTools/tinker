@@ -41,7 +41,7 @@ c
       integer istep,size
       integer start,stop
       integer iter,maxiter
-      real*8 dt,etot,epot
+      real*8 dt,epot,etot
       real*8 eksum,weigh
       real*8 eps,delta
       real*8 temp,pres

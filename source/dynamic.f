@@ -252,9 +252,13 @@ c
          write (iout,360)
   360    format (/,' Molecular Dynamics Trajectory via',
      &              ' Rigid Body Algorithm')
-      else
+      else if (integrate .eq. 'RESPA') then
          write (iout,370)
   370    format (/,' Molecular Dynamics Trajectory via',
+     &              ' r-RESPA MTS Algorithm')
+      else
+         write (iout,380)
+  380    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -271,6 +275,8 @@ c
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
+         else if (integrate .eq. 'RESPA') then
+            call respa (istep,dt)
          else
             call beeman (istep,dt)
          end if

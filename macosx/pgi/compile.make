@@ -311,6 +311,7 @@ pgf95 -c -fast -mp readprm.f
 pgf95 -c -fast -mp readseq.f
 pgf95 -c -fast -mp readxyz.f
 pgf95 -c -fast -mp replica.f
+pgf95 -c -fast -mp respa.f
 pgf95 -c -fast -mp rgdstep.f
 pgf95 -c -fast -mp rings.f
 pgf95 -c -fast -mp rmsfit.f

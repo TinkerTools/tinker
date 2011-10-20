@@ -312,6 +312,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace readprm.f
 LF95 -c -o1 -tpp -nstchk -ntrace readseq.f
 LF95 -c -o1 -tpp -nstchk -ntrace readxyz.f
 LF95 -c -o1 -tpp -nstchk -ntrace replica.f
+LF95 -c -o1 -tpp -nstchk -ntrace respa.f
 LF95 -c -o1 -tpp -nstchk -ntrace rgdstep.f
 LF95 -c -o1 -tpp -nstchk -ntrace rings.f
 LF95 -c -o1 -tpp -nstchk -ntrace rmsfit.f

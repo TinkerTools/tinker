@@ -116,9 +116,9 @@ c
   200       format (3d26.16)
          end do
          write (idyn,210)
-  210    format (' Previous Atomic Accelerations :')
+  210    format (' Alternate Atomic Accelerations :')
          do i = 1, n
-            write (idyn,220)  aold(1,i),aold(2,i),aold(3,i)
+            write (idyn,220)  aalt(1,i),aalt(2,i),aalt(3,i)
   220       format (3d26.16)
          end do
       end if

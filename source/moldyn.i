@@ -14,8 +14,8 @@ c
 c
 c     v       current velocity of each atom along the x,y,z-axes
 c     a       current acceleration of each atom along x,y,z-axes
-c     aold    previous acceleration of each atom along x,y,z-axes
+c     aalt    alternate acceleration of each atom along x,y,z-axes
 c
 c
-      real*8 v,a,aold
-      common /moldyn/ v(3,maxatm),a(3,maxatm),aold(3,maxatm)
+      real*8 v,a,aalt
+      common /moldyn/ v(3,maxatm),a(3,maxatm),aalt(3,maxatm)

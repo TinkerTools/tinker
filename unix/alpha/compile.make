@@ -311,6 +311,7 @@ f77 -c -fast -arch generic -tune generic readprm.f
 f77 -c -fast -arch generic -tune generic readseq.f
 f77 -c -fast -arch generic -tune generic readxyz.f
 f77 -c -fast -arch generic -tune generic replica.f
+f77 -c -fast -arch generic -tune generic respa.f
 f77 -c -fast -arch generic -tune generic rgdstep.f
 f77 -c -fast -arch generic -tune generic rings.f
 f77 -c -fast -arch generic -tune generic rmsfit.f
