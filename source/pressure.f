@@ -487,7 +487,8 @@ c     "ptest" compares the virial-based value of dE/dV to an estimate
 c     from finite-difference volume changes; also finds the isotropic
 c     pressure via finite-differences
 c
-c     original version written by John Chodera, December 2010
+c     original version written by John D. Chodera, University of
+c     California, Berkeley, December 2010
 c
 c
       subroutine ptest

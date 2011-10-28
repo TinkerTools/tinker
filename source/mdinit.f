@@ -54,7 +54,7 @@ c
 c     set default parameters for the dynamics trajectory
 c
       integrate = 'BEEMAN'
-      bmnsplit = 6
+      bmnmix = 8
       nfree = 0
       irest = 1
       velsave = .false.
@@ -95,8 +95,8 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
-         else if (keyword(1:17) .eq. 'BEEMAN-SPLITTING ') then
-            read (string,*,err=10,end=10)  bmnsplit
+         else if (keyword(1:14) .eq. 'BEEMAN-MIXING ') then
+            read (string,*,err=10,end=10)  bmnmix
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then

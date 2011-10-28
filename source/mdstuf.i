@@ -14,7 +14,7 @@ c
 c
 c     nfree       total number of degrees of freedom for a system
 c     irest       steps between removal of COM inertia (0=no removal)
-c     bmnsplit    splitting coefficient for Beeman integrator
+c     bmnmix      mixing coefficient for use with Beeman integrator
 c     dorest      logical flag to remove center of mass inertia
 c     velsave     logical flag to save velocity vector components
 c     frcsave     logical flag to save force vector components
@@ -23,11 +23,11 @@ c     integrate   type of molecular dynamics integration algorithm
 c
 c
       integer nfree,irest
-      integer bmnsplit
+      integer bmnmix
       logical dorest
       logical velsave
       logical frcsave
       logical uindsave
       character*10 integrate
-      common /mdstuf/ nfree,irest,bmnsplit,dorest,velsave,frcsave,
+      common /mdstuf/ nfree,irest,bmnmix,dorest,velsave,frcsave,
      &                uindsave,integrate

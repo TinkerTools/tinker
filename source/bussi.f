@@ -63,7 +63,7 @@ c
 c
 c     get Beeman integration coefficients for velocity updates
 c
-      factor = dble(bmnsplit)
+      factor = dble(bmnmix)
       dt_x = dt / factor
       part1 = 0.5d0*factor + 1.0d0
       part2 = part1 - 2.0d0
