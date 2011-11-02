@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 
-# MDAVG is a Perl script to compute MD averages
-# from a TINKER dynamics trajectory log file
+# MDAVG is a Perl script to compute averages and block average
+# standard deviations from a TINKER dynamics trajectory log file
 #
-# Written by Pengyu Ren, Ponder Lab, July 2000
+# Original version written by Pengyu Ren, Ponder Lab, July 2000
+# Modified to give std dev of block averages, Jay Ponder, Oct 2011
 
 if ($#ARGV > 2 or $#ARGV < 0) {die "$0: logfile start(in frame) end\n";}
 if ($#ARGV == 0) {$ARGV[1]=1;$ARGV[2]=1000000000;}
@@ -12,24 +13,34 @@ if ($#ARGV == 1) {$ARGV[2]=1000000000;}
 $start=88+$ARGV[1]*14;
 @tot=();
 @totrms=();
+@totrms2=();
 @pot=();
 @potrms=();
+@potrms2=();
 @kin=();
 @kinrms=();
+@kinrms2=();
 @inter=();
 @interms=();
+@interms2=();
 @ele=();
 @elerms=();
+@elerms2=();
 @vdw=();
 @vdwrms=();
+@vdwrms2=();
 @pol=();
 @polrms=();
+@polrms2=();
 @temp=();
 @temprms=();
+@temprms2=();
 @press=();
 @pressrms=();
+@pressrms2=();
 @den=();
 @denrms=();
+@denrms2=();
 $i=0;
 $count=0;
 
@@ -45,7 +56,7 @@ while(<LOG>){
             $count++;
             push(@tot, $etot);
             push(@totrms, $etot);
-            push(@totrms, $etotrms);
+            push(@totrms2, $etotrms);
         }
     }
     if (substr($_,1,9) eq "Potential") {
@@ -54,7 +65,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@pot, $epot);
             push(@potrms, $epot);
-            push(@potrms, $epotrms);
+            push(@potrms2, $epotrms);
         }
     }
     if (substr($_,1,7) eq "Kinetic") {
@@ -63,7 +74,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@kin, $ekin);
             push(@kinrms, $ekin);
-            push(@kinrms, $ekinrms);
+            push(@kinrms2, $ekinrms);
         }
     }
     if (substr($_,1,14) eq "Intermolecular") {   
@@ -72,7 +83,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@inter, $ei);
             push(@interms, $ei);
-            push(@interms, $eirms);
+            push(@interms2, $eirms);
         }
     }
     if (substr($_,1,13) eq "Electrostatic") {
@@ -81,7 +92,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@ele, $ee);
             push(@elerms, $ee);
-            push(@elerms, $eerms);
+            push(@elerms2, $eerms);
         }
     }
     if (substr($_,1,13) eq "van der Waals") {
@@ -90,7 +101,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@vdw, $ev);
             push(@vdwrms, $ev);
-            push(@vdwrms, $evrms);
+            push(@vdwrms2, $evrms);
         }
     }
     if (substr($_,1,12) eq "Polarization") {
@@ -99,7 +110,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@pol, $ep);
             push(@polrms, $ep);
-            push(@polrms, $eprms);
+            push(@polrms2, $eprms);
         }
     } 
     if (substr($_,1,11) eq "Temperature") {
@@ -108,7 +119,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@temp, $tm);
             push(@temprms, $tm);
-            push(@temprms, $tmrms);
+            push(@temprms2, $tmrms);
         }
     }
     if (substr($_,1,8) eq "Pressure") {
@@ -117,7 +128,7 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@press, $pre);
             push(@pressrms, $pre);
-            push(@pressrms, $prerms);
+            push(@pressrms2, $prerms);
         }
       }
     if (substr($_,1,7) eq "Density") {
@@ -126,50 +137,60 @@ while(<LOG>){
         if ($i>=$ARGV[1] && $i<=$ARGV[2]) {
             push(@den, $d);
             push(@denrms, $d);
-            push(@denrms, $drms);
+            push(@denrms2, $drms);
         }
       }
 }
 
 if ($#tot != -1) {
     $avgtot=&AVG(@tot);
-    $stdtot=&STD2(@totrms);
+    $stdtot=&STD(@totrms);
+    $stdtot2=&STD2(@totrms2);
 }
 if ($#pot != -1) {
     $avgpot=&AVG(@pot);
-    $stdpot=&STD2(@potrms);
+    $stdpot=&STD(@potrms);
+    $stdpot2=&STD2(@potrms2);
 }
 if ($#kin != -1) {
     $avgkin=&AVG(@kin);
-    $stdkin=&STD2(@kinrms);
+    $stdkin=&STD(@kinrms);
+    $stdkin2=&STD2(@kinrms2);
 }
 if ($#inter != -1) {
     $avgi=&AVG(@inter);
-    $stdi=&STD2(@interms);
+    $stdi=&STD(@interms);
+    $stdi2=&STD2(@interms2);
 }
 if ($#ele != -1) {
     $avge=&AVG(@ele);
-    $stde=&STD2(@elerms);
+    $stde=&STD(@elerms);
+    $stde2=&STD2(@elerms2);
 }
 if ($#vdw != -1) {
     $avgv=&AVG(@vdw);
-    $stdv=&STD2(@vdwrms);
+    $stdv=&STD(@vdwrms);
+    $stdv2=&STD2(@vdwrms2);
 }
 if ($#pol != -1) {
     $avgp=&AVG(@pol);
-    $stdp=&STD2(@polrms);
+    $stdp=&STD(@polrms);
+    $stdp2=&STD2(@polrms2);
 }
 if ($#temp != -1) {
     $avgt=&AVG(@temp);
-    $stdt=&STD2(@temprms);
+    $stdt=&STD(@temprms);
+    $stdt2=&STD2(@temprms2);
 }
 if ($#press != -1) {
     $avgpr=&AVG(@press);
-    $stdpr=&STD2(@pressrms);
+    $stdpr=&STD(@pressrms);
+    $stdpr2=&STD2(@pressrms2);
 }
 if ($#den != -1)  {
-   $avgd=&AVG(@den);
-    $stdd=&STD2(@denrms);
+    $avgd=&AVG(@den);
+    $stdd=&STD(@denrms);
+    $stdd2=&STD2(@denrms2);
 }
 
 sub AVG{

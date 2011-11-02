@@ -3,7 +3,7 @@
 #
 set output "plot.ps"
 set terminal postscript color
-set data style lines
+set style data lines
 set nokey
 set ytics nomirror
 set y2tics nomirror
@@ -12,7 +12,7 @@ set yrange [0:3000]
 set y2range [0:80]
 plot "stats" using 1:4 axes x1y1, "stats" using 1:5 axes x1y2
 set terminal postscript color
-set data style lines
+set style data lines
 set nokey
 set ytics nomirror
 set y2tics nomirror

@@ -1,7 +1,7 @@
 #
 # Plot TINKER Download and Webhits in turn
 #
-set data style lines
+set style data lines
 set nokey
 set title "TINKER Downloads per Month"
 set xlabel "Months (from 4/96)"
