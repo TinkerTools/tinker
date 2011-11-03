@@ -100,7 +100,7 @@ AVX_CFLAGS =
 AWK = awk
 CC = icc -std=gnu99
 CCDEPMODE = depmode=gcc3
-CFLAGS = -O3 -ansi-alias -malign-double
+CFLAGS = -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double
 CHECK_PL_OPTS = 
 CPP = icc -std=gnu99 -E
 CPPFLAGS = 

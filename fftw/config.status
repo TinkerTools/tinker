@@ -601,7 +601,7 @@ old_postinstall_cmds='chmod 644 $oldlib~$RANLIB $oldlib'
 old_postuninstall_cmds=''
 old_archive_cmds='$AR $AR_FLAGS $oldlib$oldobjs~$RANLIB $oldlib'
 CC='icc -std=gnu99'
-CFLAGS='-O3 -ansi-alias -malign-double'
+CFLAGS='-O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double'
 compiler='ifort'
 GCC='yes'
 lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p'\'''
@@ -964,7 +964,7 @@ S["EXEEXT"]=""
 S["ac_ct_CC"]="icc"
 S["CPPFLAGS"]=""
 S["LDFLAGS"]=""
-S["CFLAGS"]="-O3 -ansi-alias -malign-double"
+S["CFLAGS"]="-O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double"
 S["CC"]="icc -std=gnu99"
 S["PREC_SUFFIX"]=""
 S["HAVE_MIPS_PS_FALSE"]=""
@@ -1176,7 +1176,7 @@ D["F77_FUNC_"]=" name ## _"
 D["F77_FUNC_EQUIV"]=" 1"
 D["HAVE_OPENMP"]=" 1"
 D["HAVE_OPENMP"]=" 1"
-D["FFTW_CC"]=" \"icc -std=gnu99 -O3 -ansi-alias -malign-double\""
+D["FFTW_CC"]=" \"icc -std=gnu99 -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double\""
   for (key in D) D_is_set[key] = 1
   FS = ""
 }

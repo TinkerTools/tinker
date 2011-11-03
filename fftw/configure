@@ -12516,7 +12516,7 @@ fi
 
          ;;
 
-    intel) CFLAGS="-O3"
+    intel) CFLAGS="-O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic"
         # Intel seems to have changed the spelling of this flag recently
         icc_ansi_alias="unknown"
 	for flag in -ansi-alias -ansi_alias; do

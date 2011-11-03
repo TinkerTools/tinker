@@ -26,3 +26,9 @@
       After completion of the above commands, the libraries files used
       by TINKER will be in the /lib subdirectory.
 
+      Note modified versions of the configure script are used to enforce
+      processor-specific compiler flags. In particular, there are macosx
+      and linux versions for the Intel compiler that use  -axssse3 and
+      -axsse3, respectively, along with other optimization flags. The
+      original file is available as "configure-orig".
+

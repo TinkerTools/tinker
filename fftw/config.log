@@ -30,8 +30,8 @@ Kernel configured for up to 4 processors.
 Processor type: i486 (Intel 80486)
 Processors active: 0 1 2 3
 Primary memory available: 4.00 gigabytes
-Default processor set: 70 tasks, 297 threads, 4 processors
-Load average: 0.40, Mach factor: 3.59
+Default processor set: 68 tasks, 281 threads, 4 processors
+Load average: 0.39, Mach factor: 3.60
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -561,14 +561,14 @@ configure:12558: checking whether C compiler accepts -malign-double
 configure:12577: icc -std=gnu99 -c -malign-double  conftest.c >&5
 configure:12577: $? = 0
 configure:12587: result: yes
-configure:12771: checking whether C compiler accepts -O3 -ansi-alias -malign-double
-configure:12786: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:12771: checking whether C compiler accepts -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double
+configure:12786: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:12786: $? = 0
 configure:12794: result: yes
 configure:13176: checking for ANSI C header files
 configure:13280: result: yes
 configure:13291: checking libintl.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(58): catastrophic error: cannot open source file "libintl.h"
   #include <libintl.h>
                       ^
@@ -672,7 +672,7 @@ configure:13291: result: no
 configure:13291: checking for libintl.h
 configure:13291: result: no
 configure:13291: checking malloc.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(58): catastrophic error: cannot open source file "malloc.h"
   #include <malloc.h>
                      ^
@@ -776,7 +776,7 @@ configure:13291: result: no
 configure:13291: checking for malloc.h
 configure:13291: result: no
 configure:13291: checking stddef.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13291: $? = 0
 configure:13291: result: yes
 configure:13291: checking stddef.h presence
@@ -792,7 +792,7 @@ configure:13291: result: yes
 configure:13291: checking for strings.h
 configure:13291: result: yes
 configure:13291: checking sys/time.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13291: $? = 0
 configure:13291: result: yes
 configure:13291: checking sys/time.h presence
@@ -804,7 +804,7 @@ configure:13291: result: yes
 configure:13291: checking for unistd.h
 configure:13291: result: yes
 configure:13291: checking limits.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13291: $? = 0
 configure:13291: result: yes
 configure:13291: checking limits.h presence
@@ -814,7 +814,7 @@ configure:13291: result: yes
 configure:13291: checking for limits.h
 configure:13291: result: yes
 configure:13291: checking c_asm.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(65): catastrophic error: cannot open source file "c_asm.h"
   #include <c_asm.h>
                     ^
@@ -932,7 +932,7 @@ configure:13291: result: no
 configure:13291: checking for c_asm.h
 configure:13291: result: no
 configure:13291: checking intrinsics.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(65): catastrophic error: cannot open source file "intrinsics.h"
   #include <intrinsics.h>
                          ^
@@ -1052,7 +1052,7 @@ configure:13291: result: no
 configure:13291: checking for stdint.h
 configure:13291: result: yes
 configure:13291: checking mach/mach_time.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13291: $? = 0
 configure:13291: result: yes
 configure:13291: checking mach/mach_time.h presence
@@ -1062,7 +1062,7 @@ configure:13291: result: yes
 configure:13291: checking for mach/mach_time.h
 configure:13291: result: yes
 configure:13291: checking sys/sysctl.h usability
-configure:13291: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13291: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13291: $? = 0
 configure:13291: result: yes
 configure:13291: checking sys/sysctl.h presence
@@ -1072,7 +1072,7 @@ configure:13291: result: yes
 configure:13291: checking for sys/sysctl.h
 configure:13291: result: yes
 configure:13308: checking altivec.h usability
-configure:13308: icc -std=gnu99 -c -O3 -ansi-alias -malign-double    conftest.c >&5
+configure:13308: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double    conftest.c >&5
 conftest.c(68): catastrophic error: cannot open source file "altivec.h"
   #include <altivec.h>
                       ^
@@ -1196,7 +1196,7 @@ configure:13308: result: no
 configure:13308: checking for altivec.h
 configure:13308: result: no
 configure:13322: checking for an ANSI C-conforming const
-configure:13387: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13387: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(64): warning #592: variable "t" is used before its value is set
       *t++ = 0;
        ^
@@ -1212,13 +1212,13 @@ conftest.c(86): warning #592: variable "cs" is used before its value is set
 configure:13387: $? = 0
 configure:13394: result: yes
 configure:13402: checking for inline
-configure:13418: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13418: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13418: $? = 0
 configure:13426: result: inline
 configure:13444: checking for size_t
-configure:13444: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13444: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13444: $? = 0
-configure:13444: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13444: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(71): error: expected an expression
   if (sizeof ((size_t)))
                       ^
@@ -1303,7 +1303,7 @@ configure: failed program was:
 | }
 configure:13444: result: yes
 configure:13455: checking whether time.h and sys/time.h may both be included
-configure:13475: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13475: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(42): warning #279: controlling expression is constant
   if ((struct tm *) 0)
       ^
@@ -1311,9 +1311,9 @@ conftest.c(42): warning #279: controlling expression is constant
 configure:13475: $? = 0
 configure:13482: result: yes
 configure:13490: checking for long double
-configure:13490: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13490: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13490: $? = 0
-configure:13490: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13490: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(72): error: expected an expression
   if (sizeof ((long double)))
                            ^
@@ -1399,7 +1399,7 @@ configure: failed program was:
 | }
 configure:13490: result: yes
 configure:13503: checking for hrtime_t
-configure:13503: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13503: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(46): error: identifier "hrtime_t" is undefined
   if (sizeof (hrtime_t))
               ^
@@ -1459,57 +1459,57 @@ configure: failed program was:
 | }
 configure:13503: result: no
 configure:13520: checking size of int
-configure:13525: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13525: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13525: $? = 0
 configure:13525: ./conftest
 configure:13525: $? = 0
 configure:13539: result: 4
 configure:13553: checking size of unsigned int
-configure:13558: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13558: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13558: $? = 0
 configure:13558: ./conftest
 configure:13558: $? = 0
 configure:13572: result: 4
 configure:13586: checking size of long
-configure:13591: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13591: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13591: $? = 0
 configure:13591: ./conftest
 configure:13591: $? = 0
 configure:13605: result: 8
 configure:13619: checking size of unsigned long
-configure:13624: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13624: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13624: $? = 0
 configure:13624: ./conftest
 configure:13624: $? = 0
 configure:13638: result: 8
 configure:13652: checking size of long long
-configure:13657: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13657: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13657: $? = 0
 configure:13657: ./conftest
 configure:13657: $? = 0
 configure:13671: result: 8
 configure:13685: checking size of unsigned long long
-configure:13690: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13690: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13690: $? = 0
 configure:13690: ./conftest
 configure:13690: $? = 0
 configure:13704: result: 8
 configure:13718: checking size of size_t
-configure:13723: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13723: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13723: $? = 0
 configure:13723: ./conftest
 configure:13723: $? = 0
 configure:13737: result: 8
 configure:13751: checking size of ptrdiff_t
-configure:13756: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13756: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13756: $? = 0
 configure:13756: ./conftest
 configure:13756: $? = 0
 configure:13770: result: 8
 configure:13781: checking for uintptr_t
-configure:13781: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13781: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:13781: $? = 0
-configure:13781: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:13781: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(85): error: expected an expression
   if (sizeof ((uintptr_t)))
                          ^
@@ -1608,46 +1608,46 @@ configure: failed program was:
 | }
 configure:13781: result: yes
 configure:13834: checking size of float
-configure:13839: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13839: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13839: $? = 0
 configure:13839: ./conftest
 configure:13839: $? = 0
 configure:13853: result: 4
 configure:13867: checking size of double
-configure:13872: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13872: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13872: $? = 0
 configure:13872: ./conftest
 configure:13872: $? = 0
 configure:13886: result: 8
 configure:13901: checking size of fftw_r2r_kind
-configure:13906: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13906: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13906: $? = 0
 configure:13906: ./conftest
 configure:13906: $? = 0
 configure:13925: result: 4
 configure:13941: checking for working alloca.h
-configure:13958: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:13958: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:13958: $? = 0
 configure:13966: result: yes
 configure:13974: checking for alloca
-configure:14011: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:14011: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:14011: $? = 0
 configure:14019: result: yes
 configure:14128: checking for working strtod
-configure:14169: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:14169: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:14169: $? = 0
 configure:14169: ./conftest
 configure:14169: $? = 0
 configure:14179: result: yes
 configure:14243: checking for vprintf
-configure:14243: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:14243: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 configure:14243: $? = 0
 configure:14243: result: yes
 configure:14249: checking for _doprnt
-configure:14249: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c  >&5
+configure:14249: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c  >&5
 Undefined symbols:
   "__doprnt", referenced from:
-      _main in icckwER58.o
+      _main in icc7suvTV.o
 ld: symbol(s) not found
 configure:14249: $? = 1
 configure: failed program was:
@@ -1742,14 +1742,14 @@ configure: failed program was:
 | }
 configure:14249: result: no
 configure:14260: checking for sin in -lm
-configure:14285: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm   >&5
+configure:14285: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm   >&5
 configure:14285: $? = 0
 configure:14294: result: yes
 configure:14399: checking for BSDgettimeofday
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 Undefined symbols:
   "_BSDgettimeofday", referenced from:
-      _main in iccj2MnZF.o
+      _main in iccmxGyyX.o
 ld: symbol(s) not found
 configure:14399: $? = 1
 configure: failed program was:
@@ -1845,14 +1845,14 @@ configure: failed program was:
 | }
 configure:14399: result: no
 configure:14399: checking for gettimeofday
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for gethrtime
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 Undefined symbols:
   "_gethrtime", referenced from:
-      _main in icco4hgSG.o
+      _main in iccqm0JoV.o
 ld: symbol(s) not found
 configure:14399: $? = 1
 configure: failed program was:
@@ -1949,10 +1949,10 @@ configure: failed program was:
 | }
 configure:14399: result: no
 configure:14399: checking for read_real_time
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 Undefined symbols:
   "_read_real_time", referenced from:
-      _main in icczN9DMt.o
+      _main in iccXlb74v.o
 ld: symbol(s) not found
 configure:14399: $? = 1
 configure: failed program was:
@@ -2049,10 +2049,10 @@ configure: failed program was:
 | }
 configure:14399: result: no
 configure:14399: checking for time_base_to_time
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 Undefined symbols:
   "_time_base_to_time", referenced from:
-      _main in iccFCPGCx.o
+      _main in icchpc7oa.o
 ld: symbol(s) not found
 configure:14399: $? = 1
 configure: failed program was:
@@ -2149,26 +2149,26 @@ configure: failed program was:
 | }
 configure:14399: result: no
 configure:14399: checking for drand48
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for sqrt
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for memset
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for posix_memalign
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for memalign
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 Undefined symbols:
   "_memalign", referenced from:
-      _main in iccjH5U4Y.o
+      _main in icc73yZe7.o
 ld: symbol(s) not found
 configure:14399: $? = 1
 configure: failed program was:
@@ -2269,18 +2269,18 @@ configure: failed program was:
 | }
 configure:14399: result: no
 configure:14399: checking for _mm_malloc
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for _mm_free
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for clock_gettime
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 Undefined symbols:
   "_clock_gettime", referenced from:
-      _main in iccUQP8Zg.o
+      _main in icc55Hn5O.o
 ld: symbol(s) not found
 configure:14399: $? = 1
 configure: failed program was:
@@ -2383,39 +2383,39 @@ configure: failed program was:
 | }
 configure:14399: result: no
 configure:14399: checking for mach_absolute_time
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for sysctl
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for abort
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for sinl
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for cosl
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14399: checking for snprintf
-configure:14399: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14399: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14399: $? = 0
 configure:14399: result: yes
 configure:14408: checking whether drand48 is declared
-configure:14408: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14408: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:14408: $? = 0
 configure:14408: result: yes
 configure:14418: checking whether srand48 is declared
-configure:14418: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14418: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:14418: $? = 0
 configure:14418: result: yes
 configure:14428: checking whether memalign is declared
-configure:14428: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14428: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(108): error: identifier "memalign" is undefined
     (void) memalign;
            ^
@@ -2539,11 +2539,11 @@ configure: failed program was:
 | }
 configure:14428: result: no
 configure:14438: checking whether posix_memalign is declared
-configure:14438: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14438: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 configure:14438: $? = 0
 configure:14438: result: yes
 configure:14448: checking whether sinl is declared
-configure:14448: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14448: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(110): error: identifier "sinl" is undefined
     (void) sinl;
            ^
@@ -2669,7 +2669,7 @@ configure: failed program was:
 | }
 configure:14448: result: no
 configure:14458: checking whether cosl is declared
-configure:14458: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14458: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(111): error: identifier "cosl" is undefined
     (void) cosl;
            ^
@@ -2796,7 +2796,7 @@ configure: failed program was:
 | }
 configure:14458: result: no
 configure:14468: checking whether sinq is declared
-configure:14468: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14468: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(112): error: identifier "sinq" is undefined
     (void) sinq;
            ^
@@ -2924,7 +2924,7 @@ configure: failed program was:
 | }
 configure:14468: result: no
 configure:14478: checking whether cosq is declared
-configure:14478: icc -std=gnu99 -c -O3 -ansi-alias -malign-double  conftest.c >&5
+configure:14478: icc -std=gnu99 -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double  conftest.c >&5
 conftest.c(113): error: identifier "cosq" is undefined
     (void) cosq;
            ^
@@ -3053,14 +3053,14 @@ configure: failed program was:
 | }
 configure:14478: result: no
 configure:14490: checking for _rtc intrinsic
-configure:14506: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14506: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 conftest.c(80): warning #266: function "_rtc" declared implicitly
   _rtc()
   ^
 
 Undefined symbols:
   "__rtc", referenced from:
-      _main in icci0fVfw.o
+      _main in iccLkgcbi.o
 ld: symbol(s) not found
 configure:14506: $? = 1
 configure: failed program was:
@@ -3149,7 +3149,7 @@ configure: failed program was:
 | }
 configure:14515: result: no
 configure:14535: checking for isnan
-configure:14549: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm  >&5
+configure:14549: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm  >&5
 configure:14549: $? = 0
 configure:14561: result: yes
 configure:14568: checking whether C compiler accepts -mpreferred-stack-boundary=4
@@ -3329,60 +3329,60 @@ configure:17666: ifort -c -g conftest.f >&5
 configure:17666: $? = 0
 configure:17684: ifort -o conftest -g -v conftest.f -lm
 Version 12.0.5
-/opt/intel/composerxe-2011.5.209/bin/intel64/fortcom    -D__INTEL_COMPILER=1200 -D_MT -D__SSE2__ -D__SSE3__ -D__SSSE3__ -D__SSE__ -D__INTEL_COMPILER_BUILD_DATE=20110719 -D__PIC__ -D__pic__ -D__APPLE__ -D__MACH__ -D__x86_64 -D__x86_64__ -mGLOB_pack_sort_init_list -I. -I/opt/intel/composerxe-2011.5.209/mkl/include -I/opt/intel/composerxe-2011.5.209/tbb/include -I/opt/intel/composerxe-2011.5.209/compiler/include/intel64 -I/opt/intel/composerxe-2011.5.209/compiler/include -I/usr/local/include -I/usr/include -I/usr/lib/gcc/i686-apple-darwin10/4.2.1/include "-fp_modbits honor_f32_conversion" "-fp_modbits honor_f64_conversion" -O0 -g2 -simd -mP1OPT_version=12.0-intel64 -mGLOB_diag_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort1jbRF4.diag -mGLOB_diag_use_message_catalog=FALSE -mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort -mGLOB_use_fort_dope_vector -mP2OPT_static_promotion -mP1OPT_print_version=FALSE -mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE -mGLOB_gcc_version=421 "-mGLOB_options_string=-o conftest -g -v -lm" -mGLOB_position_independent_code -mGLOB_preemption_model=1 -mGLOB_no_compact_unwind=TRUE -mGLOB_cxx_limited_range=FALSE -mP3OPT_emit_line_numbers -mP2OPT_suppress_unreferenced_locals=FALSE -mGLOB_debug_target=GLOB_DEBUG_TARGET_ALL -mGLOB_debug_format=GLOB_DEBUG_FORMAT_DWARF20 -mP3OPT_dwarf_format=P3OPT_DWARF_FORMAT_OBJ_ONLY -mGLOB_as_output_backup_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforteGHFa0as_.s -mIPOPT_activate -mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2 -mGLOB_product_id_code=0x22001ef2 -mGLOB_maintain_errno -mGLOB_noinline_intrinsics -mGLOB_use_base_pointer -mGLOB_extended_instructions=0x80 -mGLOB_advanced_optim=TRUE -mP3OPT_use_mspp_call_convention -mP2OPT_subs_out_of_bound=FALSE -mGLOB_ansi_alias -mIPOPT_ninl_limit=0 -mIPOPT_ninl_user_level=0 -mPGOPTI_value_profile_use=T -mP2OPT_gen_linux_const_pooling=FALSE -mP2OPT_il0_array_sections=TRUE -mGLOB_opt_level=0 -mIPOPT_args_in_regs=0 -mGLOB_imf_mapping_library=/opt/intel/composerxe-2011.5.209/bin/intel64/libiml_attr.dylib -mIPOPT_obj_output_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort1jbRF4.o -mGLOB_long_size_64 -mGLOB_routine_pointer_size_64 -mGLOB_os_target=GLOB_OS_TARGET_MACH -mGLOB_obj_output_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort1jbRF4.o -mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN -mP1OPT_source_file_name=conftest.f -mP2OPT_symtab_type_copy=true conftest.f
-ld    -lcrt1.10.6.o -dynamic -arch x86_64 -weak_reference_mismatches non-weak -macosx_version_min 10.6.8 -no_compact_unwind -o conftest /opt/intel/composerxe-2011.5.209/compiler/lib/for_main.o -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort1jbRF4.o -L/opt/intel/composerxe-2011.5.209/compiler/lib /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lgcc -lgcc_s.10.5 -lgcc -lSystemStubs -lmx -lSystem /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforttg72T5libgcc
+/opt/intel/composerxe-2011.5.209/bin/intel64/fortcom    -D__INTEL_COMPILER=1200 -D_MT -D__SSE2__ -D__SSE3__ -D__SSSE3__ -D__SSE__ -D__INTEL_COMPILER_BUILD_DATE=20110719 -D__PIC__ -D__pic__ -D__APPLE__ -D__MACH__ -D__x86_64 -D__x86_64__ -mGLOB_pack_sort_init_list -I. -I/opt/intel/composerxe-2011.5.209/mkl/include -I/opt/intel/composerxe-2011.5.209/tbb/include -I/opt/intel/composerxe-2011.5.209/compiler/include/intel64 -I/opt/intel/composerxe-2011.5.209/compiler/include -I/usr/local/include -I/usr/include -I/usr/lib/gcc/i686-apple-darwin10/4.2.1/include "-fp_modbits honor_f32_conversion" "-fp_modbits honor_f64_conversion" -O0 -g2 -simd -mP1OPT_version=12.0-intel64 -mGLOB_diag_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortBN0wSI.diag -mGLOB_diag_use_message_catalog=FALSE -mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort -mGLOB_use_fort_dope_vector -mP2OPT_static_promotion -mP1OPT_print_version=FALSE -mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE -mGLOB_gcc_version=421 "-mGLOB_options_string=-o conftest -g -v -lm" -mGLOB_position_independent_code -mGLOB_preemption_model=1 -mGLOB_no_compact_unwind=TRUE -mGLOB_cxx_limited_range=FALSE -mP3OPT_emit_line_numbers -mP2OPT_suppress_unreferenced_locals=FALSE -mGLOB_debug_target=GLOB_DEBUG_TARGET_ALL -mGLOB_debug_format=GLOB_DEBUG_FORMAT_DWARF20 -mP3OPT_dwarf_format=P3OPT_DWARF_FORMAT_OBJ_ONLY -mGLOB_as_output_backup_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortPn3gXYas_.s -mIPOPT_activate -mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2 -mGLOB_product_id_code=0x22001ef2 -mGLOB_maintain_errno -mGLOB_noinline_intrinsics -mGLOB_use_base_pointer -mGLOB_extended_instructions=0x80 -mGLOB_advanced_optim=TRUE -mP3OPT_use_mspp_call_convention -mP2OPT_subs_out_of_bound=FALSE -mGLOB_ansi_alias -mIPOPT_ninl_limit=0 -mIPOPT_ninl_user_level=0 -mPGOPTI_value_profile_use=T -mP2OPT_gen_linux_const_pooling=FALSE -mP2OPT_il0_array_sections=TRUE -mGLOB_opt_level=0 -mIPOPT_args_in_regs=0 -mGLOB_imf_mapping_library=/opt/intel/composerxe-2011.5.209/bin/intel64/libiml_attr.dylib -mIPOPT_obj_output_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortBN0wSI.o -mGLOB_long_size_64 -mGLOB_routine_pointer_size_64 -mGLOB_os_target=GLOB_OS_TARGET_MACH -mGLOB_obj_output_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortBN0wSI.o -mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN -mP1OPT_source_file_name=conftest.f -mP2OPT_symtab_type_copy=true conftest.f
+ld    -lcrt1.10.6.o -dynamic -arch x86_64 -weak_reference_mismatches non-weak -macosx_version_min 10.6.8 -no_compact_unwind -o conftest /opt/intel/composerxe-2011.5.209/compiler/lib/for_main.o -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortBN0wSI.o -L/opt/intel/composerxe-2011.5.209/compiler/lib /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lgcc -lgcc_s.10.5 -lgcc -lSystemStubs -lmx -lSystem /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortuAV4R6libgcc
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortNdOYkWgnudirs
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortsOOpmJgnudirs
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortFmP7DJos
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort2PHmSios
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortjSJuthtos
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortsdfpXmtos
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortK0hmC1gdb_v
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort1nebkvgdb_v
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//iforteGHFa0as_.s
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortPn3gXYas_.s
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortec9WCGarg
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortw8c26Oarg
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortQoIefbgnudirs
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortVmgslIgnudirs
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort1jbRF4.o
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortBN0wSI.o
 configure:17749: result: -v
 configure:17751: checking for Fortran 77 libraries of ifort
 configure:17774: ifort -o conftest -g -v conftest.f -lm
 Version 12.0.5
-/opt/intel/composerxe-2011.5.209/bin/intel64/fortcom    -D__INTEL_COMPILER=1200 -D_MT -D__SSE2__ -D__SSE3__ -D__SSSE3__ -D__SSE__ -D__INTEL_COMPILER_BUILD_DATE=20110719 -D__PIC__ -D__pic__ -D__APPLE__ -D__MACH__ -D__x86_64 -D__x86_64__ -mGLOB_pack_sort_init_list -I. -I/opt/intel/composerxe-2011.5.209/mkl/include -I/opt/intel/composerxe-2011.5.209/tbb/include -I/opt/intel/composerxe-2011.5.209/compiler/include/intel64 -I/opt/intel/composerxe-2011.5.209/compiler/include -I/usr/local/include -I/usr/include -I/usr/lib/gcc/i686-apple-darwin10/4.2.1/include "-fp_modbits honor_f32_conversion" "-fp_modbits honor_f64_conversion" -O0 -g2 -simd -mP1OPT_version=12.0-intel64 -mGLOB_diag_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortjJK2LL.diag -mGLOB_diag_use_message_catalog=FALSE -mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort -mGLOB_use_fort_dope_vector -mP2OPT_static_promotion -mP1OPT_print_version=FALSE -mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE -mGLOB_gcc_version=421 "-mGLOB_options_string=-o conftest -g -v -lm" -mGLOB_position_independent_code -mGLOB_preemption_model=1 -mGLOB_no_compact_unwind=TRUE -mGLOB_cxx_limited_range=FALSE -mP3OPT_emit_line_numbers -mP2OPT_suppress_unreferenced_locals=FALSE -mGLOB_debug_target=GLOB_DEBUG_TARGET_ALL -mGLOB_debug_format=GLOB_DEBUG_FORMAT_DWARF20 -mP3OPT_dwarf_format=P3OPT_DWARF_FORMAT_OBJ_ONLY -mGLOB_as_output_backup_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortq0PhALas_.s -mIPOPT_activate -mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2 -mGLOB_product_id_code=0x22001ef2 -mGLOB_maintain_errno -mGLOB_noinline_intrinsics -mGLOB_use_base_pointer -mGLOB_extended_instructions=0x80 -mGLOB_advanced_optim=TRUE -mP3OPT_use_mspp_call_convention -mP2OPT_subs_out_of_bound=FALSE -mGLOB_ansi_alias -mIPOPT_ninl_limit=0 -mIPOPT_ninl_user_level=0 -mPGOPTI_value_profile_use=T -mP2OPT_gen_linux_const_pooling=FALSE -mP2OPT_il0_array_sections=TRUE -mGLOB_opt_level=0 -mIPOPT_args_in_regs=0 -mGLOB_imf_mapping_library=/opt/intel/composerxe-2011.5.209/bin/intel64/libiml_attr.dylib -mIPOPT_obj_output_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortjJK2LL.o -mGLOB_long_size_64 -mGLOB_routine_pointer_size_64 -mGLOB_os_target=GLOB_OS_TARGET_MACH -mGLOB_obj_output_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortjJK2LL.o -mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN -mP1OPT_source_file_name=conftest.f -mP2OPT_symtab_type_copy=true conftest.f
-ld    -lcrt1.10.6.o -dynamic -arch x86_64 -weak_reference_mismatches non-weak -macosx_version_min 10.6.8 -no_compact_unwind -o conftest /opt/intel/composerxe-2011.5.209/compiler/lib/for_main.o -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortjJK2LL.o -L/opt/intel/composerxe-2011.5.209/compiler/lib /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lgcc -lgcc_s.10.5 -lgcc -lSystemStubs -lmx -lSystem /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortTWfYsBlibgcc
+/opt/intel/composerxe-2011.5.209/bin/intel64/fortcom    -D__INTEL_COMPILER=1200 -D_MT -D__SSE2__ -D__SSE3__ -D__SSSE3__ -D__SSE__ -D__INTEL_COMPILER_BUILD_DATE=20110719 -D__PIC__ -D__pic__ -D__APPLE__ -D__MACH__ -D__x86_64 -D__x86_64__ -mGLOB_pack_sort_init_list -I. -I/opt/intel/composerxe-2011.5.209/mkl/include -I/opt/intel/composerxe-2011.5.209/tbb/include -I/opt/intel/composerxe-2011.5.209/compiler/include/intel64 -I/opt/intel/composerxe-2011.5.209/compiler/include -I/usr/local/include -I/usr/include -I/usr/lib/gcc/i686-apple-darwin10/4.2.1/include "-fp_modbits honor_f32_conversion" "-fp_modbits honor_f64_conversion" -O0 -g2 -simd -mP1OPT_version=12.0-intel64 -mGLOB_diag_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9ZlpxG.diag -mGLOB_diag_use_message_catalog=FALSE -mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort -mGLOB_use_fort_dope_vector -mP2OPT_static_promotion -mP1OPT_print_version=FALSE -mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE -mGLOB_gcc_version=421 "-mGLOB_options_string=-o conftest -g -v -lm" -mGLOB_position_independent_code -mGLOB_preemption_model=1 -mGLOB_no_compact_unwind=TRUE -mGLOB_cxx_limited_range=FALSE -mP3OPT_emit_line_numbers -mP2OPT_suppress_unreferenced_locals=FALSE -mGLOB_debug_target=GLOB_DEBUG_TARGET_ALL -mGLOB_debug_format=GLOB_DEBUG_FORMAT_DWARF20 -mP3OPT_dwarf_format=P3OPT_DWARF_FORMAT_OBJ_ONLY -mGLOB_as_output_backup_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort2QNjFhas_.s -mIPOPT_activate -mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2 -mGLOB_product_id_code=0x22001ef2 -mGLOB_maintain_errno -mGLOB_noinline_intrinsics -mGLOB_use_base_pointer -mGLOB_extended_instructions=0x80 -mGLOB_advanced_optim=TRUE -mP3OPT_use_mspp_call_convention -mP2OPT_subs_out_of_bound=FALSE -mGLOB_ansi_alias -mIPOPT_ninl_limit=0 -mIPOPT_ninl_user_level=0 -mPGOPTI_value_profile_use=T -mP2OPT_gen_linux_const_pooling=FALSE -mP2OPT_il0_array_sections=TRUE -mGLOB_opt_level=0 -mIPOPT_args_in_regs=0 -mGLOB_imf_mapping_library=/opt/intel/composerxe-2011.5.209/bin/intel64/libiml_attr.dylib -mIPOPT_obj_output_file_name=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9ZlpxG.o -mGLOB_long_size_64 -mGLOB_routine_pointer_size_64 -mGLOB_os_target=GLOB_OS_TARGET_MACH -mGLOB_obj_output_file=/var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9ZlpxG.o -mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN -mP1OPT_source_file_name=conftest.f -mP2OPT_symtab_type_copy=true conftest.f
+ld    -lcrt1.10.6.o -dynamic -arch x86_64 -weak_reference_mismatches non-weak -macosx_version_min 10.6.8 -no_compact_unwind -o conftest /opt/intel/composerxe-2011.5.209/compiler/lib/for_main.o -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9ZlpxG.o -L/opt/intel/composerxe-2011.5.209/compiler/lib /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lgcc -lgcc_s.10.5 -lgcc -lSystemStubs -lmx -lSystem /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortP7FwM1libgcc
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortvjDFYugnudirs
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortUXPez9gnudirs
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortYSznu3os
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortG3fWD0os
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortQcvKeytos
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortsrW8Wbtos
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortLnDeG2gdb_v
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortKx8oD8gdb_v
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortq0PhALas_.s
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort2QNjFhas_.s
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort6VDnMuarg
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortbHhwIYarg
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortg0GMIrgnudirs
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortkcivYugnudirs
 
-rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifortjJK2LL.o
+rm /var/folders/3O/3OH2QuX2H38LEnr8sKdHR++++yU/-Tmp-//ifort9ZlpxG.o
 configure:17948: result:  -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl
 configure:17964: checking for dummy main to link with Fortran 77 libraries
-configure:17998: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
+configure:17998: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
 configure:17998: $? = 0
 configure:18043: result: none
 configure:18083: checking for Fortran 77 name-mangling scheme
 configure:18096: ifort -c -g conftest.f >&5
 configure:18096: $? = 0
-configure:18137: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c cfortran_test.o -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
+configure:18137: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c cfortran_test.o -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
 Undefined symbols:
   "_foobar", referenced from:
-      _main in iccR6dP4c.o
+      _main in iccsysxa0.o
      (maybe you meant: _foobar_)
 ld: symbol(s) not found
 configure:18137: $? = 1
@@ -3484,17 +3484,17 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:18137: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c cfortran_test.o -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
+configure:18137: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c cfortran_test.o -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
 configure:18137: $? = 0
-configure:18195: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double   conftest.c cfortran_test.o -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
+configure:18195: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double   conftest.c cfortran_test.o -lm   -L/opt/intel/composerxe-2011.5.209/compiler/lib -L/opt/intel/composerxe-2011.5.209/mkl/lib -L/opt/intel/composerxe-2011.5.209/tbb/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composerxe-2011.5.209/compiler/lib/ -L/opt/intel/composerxe-2011.5.209/mkl/lib/ -L/opt/intel/composerxe-2011.5.209/tbb/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composerxe-2011.5.209/compiler/lib/libimf.a -lm /opt/intel/composerxe-2011.5.209/compiler/lib/libifport.a /opt/intel/composerxe-2011.5.209/compiler/lib/libifcore.a /opt/intel/composerxe-2011.5.209/compiler/lib/libsvml.a /opt/intel/composerxe-2011.5.209/compiler/lib/libipgo.a -lSystemStubs -lmx /opt/intel/composerxe-2011.5.209/compiler/lib/libirc.a -lpthread -ldl >&5
 configure:18195: $? = 0
 configure:18237: result: lower case, underscore, no extra underscore
 configure:18383: checking for OpenMP flag of C compiler
-configure:18427: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double -fopenmp   conftest.c -lm  >&5
+configure:18427: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double -fopenmp   conftest.c -lm  >&5
 icc: command line warning #10006: ignoring unknown option '-fopenmp'
 Undefined symbols:
   "_omp_set_num_threads", referenced from:
-      _main in iccXHKOdu.o
+      _main in iccZ35ebi.o
 ld: symbol(s) not found
 configure:18427: $? = 1
 configure: failed program was:
@@ -3599,7 +3599,7 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:18427: icc -std=gnu99 -o conftest -O3 -ansi-alias -malign-double -openmp   conftest.c -lm  >&5
+configure:18427: icc -std=gnu99 -o conftest -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double -openmp   conftest.c -lm  >&5
 configure:18427: $? = 0
 configure:18436: result: -openmp
 configure:18941: checking whether a cycle counter is available
@@ -3798,7 +3798,7 @@ ac_cv_type_uintptr_t=yes
 ac_cv_working_alloca_h=yes
 am_cv_CC_dependencies_compiler_type=gcc3
 ax_cv_c_compiler_vendor=intel
-ax_cv_c_flags__O3__ansi_alias__malign_double=yes
+ax_cv_c_flags__O3__axSSSE3__no_ipo__no_prec_div__mdynamic_no_pic__ansi_alias__malign_double=yes
 ax_cv_c_flags__ansi_alias=yes
 ax_cv_c_flags__malign_double=yes
 ax_cv_c_flags__mpreferred_stack_boundary_4=no
@@ -3846,7 +3846,7 @@ AVX_CFLAGS=''
 AWK='awk'
 CC='icc -std=gnu99'
 CCDEPMODE='depmode=gcc3'
-CFLAGS='-O3 -ansi-alias -malign-double'
+CFLAGS='-O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double'
 CHECK_PL_OPTS=''
 COMBINED_THREADS_FALSE=''
 COMBINED_THREADS_TRUE='#'
@@ -4078,6 +4078,6 @@ target_alias=''
 #define F77_FUNC_EQUIV 1
 #define HAVE_OPENMP 1
 #define HAVE_OPENMP 1
-#define FFTW_CC "icc -std=gnu99 -O3 -ansi-alias -malign-double"
+#define FFTW_CC "icc -std=gnu99 -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -ansi-alias -malign-double"
 
 configure: exit 0
