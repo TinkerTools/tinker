@@ -27,8 +27,9 @@ c
       include 'titles.i'
       integer i,ipdb,nres
       integer index,serial
-      integer trimtext,next
+      integer next,nxtlast
       integer residue,reslast
+      integer trimtext
       real*8 xx,yy,zz
       logical exist,opened
       character*1 chain,chnlast
@@ -80,7 +81,7 @@ c
 c     process individual atoms from the Protein Data Bank file
 c
       do while (.true.)
-         read (ipdb,20,err=170,end=170)  record
+         read (ipdb,20,err=190,end=190)  record
    20    format (a120)
          call upcase (record)
          remark = record(1:6)
@@ -108,17 +109,24 @@ c
             read (string,60)  chain
    60       format (a1)
             next = next + 11
+            nxtlast = next
             call getnumb (record,residue,next)
+            if (next .eq. nxtlast) then
+               string = record(next:next+3)
+               read (string,70)  residue
+   70          format (i4)
+               next = next + 4
+            end if
             string = record(next:next)
-            read (string,70)  insert
-   70       format (a1)
+            read (string,80)  insert
+   80       format (a1)
             string = record(next+1:120)
             read (string,*)  xx,yy,zz
             if (resname(1:2) .eq. '  ')  resname = resname(3:3)
             if (resname(1:1) .eq. ' ')  resname = resname(2:3)
-            if (chain.ne.' ' .and. index(chntyp,chain).eq.0)  goto 90
-            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 90
-            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 90
+            if (chain.ne.' ' .and. index(chntyp,chain).eq.0)  goto 100
+            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 100
+            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 100
             call fixpdb (resname,atmname)
             if (residue.ne.reslast .or. resname.ne.namelast .or.
      &            chain.ne.chnlast .or. insert.ne.inslast) then
@@ -128,8 +136,8 @@ c
                chnlast = chain
                inslast = insert
                if (nres .gt. maxres) then
-                  write (iout,80)  maxres
-   80             format (/,' READPDB  --  The Maximum of',i6,
+                  write (iout,90)  maxres
+   90             format (/,' READPDB  --  The Maximum of',i6,
      &                       ' Residues has been Exceeded')
                   call fatal
                end if
@@ -143,34 +151,40 @@ c
             resnam(npdb) = resname
             resnum(npdb) = nres
             chnatm(npdb) = chain
-   90       continue
+  100       continue
          else if (remark .eq. 'HETATM') then
             next = 7
             call getnumb (record,serial,next)
             string = record(next+1:next+4)
-            read (string,100)  atmname
-  100       format (a4)
+            read (string,110)  atmname
+  110       format (a4)
             string = record(next+5:next+5)
-            read (string,110)  altloc
-  110       format (a1)
+            read (string,120)  altloc
+  120       format (a1)
             string = record(next+6:next+8)
-            read (string,120)  resname
-  120       format (a3)
+            read (string,130)  resname
+  130       format (a3)
             string = record(next+10:next+10)
-            read (string,130)  chain
-  130       format (a1)
+            read (string,140)  chain
+  140       format (a1)
             next = next + 11
             call getnumb (record,residue,next)
+            if (next .eq. nxtlast) then
+               string = record(next:next+3)
+               read (string,150)  residue
+  150          format (i4)
+               next = next + 4
+            end if
             string = record(next:next)
-            read (string,140)  insert
-  140       format (a1)
+            read (string,160)  insert
+  160       format (a1)
             string = record(next+1:120)
             read (string,*)  xx,yy,zz
             if (resname(1:2) .eq. '  ')  resname = resname(3:3)
             if (resname(1:1) .eq. ' ')  resname = resname(2:3)
-            if (chain.ne.' ' .and. index(chntyp,chain).eq.0)  goto 150
-            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 150
-            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 150
+            if (chain.ne.' ' .and. index(chntyp,chain).eq.0)  goto 170
+            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 170
+            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 170
             call fixpdb (resname,atmname)
             npdb = npdb + 1
             xpdb(npdb) = xx
@@ -181,20 +195,20 @@ c
             resnam(npdb) = resname
             resnum(npdb) = 0
             chnatm(npdb) = chain
-  150       continue
+  170       continue
          else if (remark .eq. 'ENDMDL') then
-            goto 170
+            goto 190
          else if (remark .eq. 'END   ') then
-            goto 170
+            goto 190
          end if
          if (npdb .gt. maxatm) then
-            write (iout,160)  maxatm
-  160       format (/,' READPDB  --  The Maximum of',i6,
+            write (iout,180)  maxatm
+  180       format (/,' READPDB  --  The Maximum of',i6,
      &                 ' Atoms has been Exceeded')
             call fatal
          end if
       end do
-  170 continue
+  190 continue
 c
 c     set the total sequence length and chain termini information
 c
@@ -242,7 +256,8 @@ c
       include 'iounit.i'
       include 'pdb.i'
       include 'sequen.i'
-      integer i,ipdb,next
+      integer i,ipdb
+      integer next,nxtlast
       integer length,dummy
       integer nalt,nins
       logical exist,done,first
@@ -283,7 +298,7 @@ c     scan for multiple chains, alternate locations and inserts
 c
       done = .false.
       do while (.not. done)
-         read (ipdb,10,err=50,end=50)  record
+         read (ipdb,10,err=60,end=60)  record
    10    format (a120)
          call upcase (record)
          remark = record(1:6)
@@ -297,10 +312,17 @@ c
             read (string,30)  chain
    30       format (a1)
             next = next + 11
+            nxtlast = next
             call getnumb (record,dummy,next)
+            if (next .eq. nxtlast) then
+               string = record(next:next+3)
+               read (string,40)  dummy
+   40          format (i4)
+               next = next + 4
+            end if
             string = record(next:next)
-            read (string,40)  insert
-   40       format (a1)
+            read (string,50)  insert
+   50       format (a1)
             if (chain .ne. chnlast) then
                if (index(chntyp,chain) .eq. 0) then
                   nchain = nchain + 1
@@ -328,7 +350,7 @@ c
             done = .true.
          end if
       end do
-   50 continue
+   60 continue
       rewind (unit=ipdb)
 c
 c     find out which of the multiple chains will be used
@@ -355,11 +377,11 @@ c
             end do
             string = string(1:length)//' [ALL]'
             length = length + 6
-            write (iout,60)  string(1:length)
-   60       format (/,' Enter the Chain Names to Include',
+            write (iout,70)  string(1:length)
+   70       format (/,' Enter the Chain Names to Include',
      &                 ' (',a,') :  ',$)
-            read (input,70)  chntemp
-   70       format (a20)
+            read (input,80)  chntemp
+   80       format (a20)
          end if
          call upcase (chntemp)
          next = 1
@@ -383,11 +405,11 @@ c
                string = string(1:length)//' '//alttyp(i:i)
                length = length + 2
             end do
-            write (iout,80)  string(1:length)
-   80       format (/,' Enter a Set of Alternate Atom Locations',
+            write (iout,90)  string(1:length)
+   90       format (/,' Enter a Set of Alternate Atom Locations',
      &                 ' from (',a,') :  ',$)
-            read (input,90)  record
-   90       format (a120)
+            read (input,100)  record
+  100       format (a120)
             next = 1
             call gettext (record,altsym,next)
          end if
@@ -409,11 +431,11 @@ c
             end do
             string = string(1:length)//' [ALL] NONE'
             length = length + 11
-            write (iout,100)  string(1:length)
-  100       format (/,' Enter the Insert Records to Include',
+            write (iout,110)  string(1:length)
+  110       format (/,' Enter the Insert Records to Include',
      &                 ' (',a,') :  ',$)
-            read (input,110)  instemp
-  110       format (a20)
+            read (input,120)  instemp
+  120       format (a20)
          end if
          call upcase (instemp)
          next = 1
