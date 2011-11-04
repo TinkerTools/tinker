@@ -17,6 +17,7 @@ libtinker_la_SOURCES = \
 	bonds.f \
 	born.f \
 	bounds.f \
+	bussi.f \
 	calendar.f \
 	center.f \
 	chkpole.f \
@@ -167,6 +168,7 @@ libtinker_la_SOURCES = \
 	gettext.f \
 	getword.f \
 	getxyz.f \
+	ghmcstep.f \
 	gradient.f \
 	gradrgd.f \
 	gradrot.f \
@@ -273,6 +275,7 @@ libtinker_la_SOURCES = \
 	readseq.f \
 	readxyz.f \
 	replica.f \
+	respa.f \
 	rgdstep.f \
 	rings.f \
 	rmsfit.f \

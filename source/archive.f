@@ -134,7 +134,7 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=70,end=70)  start
+            read (string,*,err=100,end=100)  start
             query = .false.
          end if
          call nextarg (string,exist)
