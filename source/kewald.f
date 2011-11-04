@@ -29,6 +29,7 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
+      include 'openmp.i'
       include 'pme.i'
       integer maxpower
       parameter (maxpower=54)
@@ -53,6 +54,7 @@ c
 c     default boundary treatment, B-spline order and grid density
 c
       ffttyp = 'FFTPACK'
+      if (nthread .gt. 1)  ffttyp = 'FFTW'
       boundary = 'TINFOIL'
       bsorder = 5
       dens = 1.2d0
