@@ -30,12 +30,13 @@ c
       include 'polar.i'
       include 'solute.i'
       include 'units.i'
+      include 'uprior.i'
       integer i,j,k
       real*8 norm
       logical header
 c
 c
-c     choose the method for summing over multipole field
+c     choose the method for computation of induced dipoles
 c
       if (solvtyp .eq. 'PB') then
          call induce0f
@@ -53,6 +54,22 @@ c
          else
             call induce0a
          end if
+      end if
+c
+c     update the lists of previous induced dipole values
+c
+      if (use_aspc) then
+         nualt = min(nualt+1,maxualt)
+         do i = 1, npole
+            do j = 1, 3
+               do k = nualt, 2, -1
+                  udalt(k,j,i) = udalt(k-1,j,i)
+                  upalt(k,j,i) = upalt(k-1,j,i)
+               end do
+               udalt(1,j,i) = uind(j,i)
+               upalt(1,j,i) = uinp(j,i)
+            end do
+         end do
       end if
 c
 c     print out a list of the final induced dipole moments
@@ -174,6 +191,7 @@ c
       include 'potent.i'
       include 'shunt.i'
       include 'units.i'
+      include 'uprior.i'
       integer i,j,k,m
       integer ii,kk
       integer iter,maxiter
@@ -194,6 +212,7 @@ c
       real*8 dkr,dukr,pukr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
+      real*8 udsum,upsum
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 damp,expdamp
@@ -500,6 +519,23 @@ c
          iter = 0
          eps = 100.0d0
 c
+c     predicted values for always stable predictor-corrector method
+c
+         if (use_aspc .and. nualt.eq.maxualt) then
+            do i = 1, npole
+               do j = 1, 3
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + baspc(k)*udalt(k,j,i)
+                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+               end do
+            end do
+         end if
+c
 c     compute mutual induced dipole moments by an iterative method
 c
          do while (.not. done)
@@ -728,12 +764,16 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
+         if (verbose) then
+            write (iout,30)  iter,eps
+   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+         end if
 c
 c     terminate the calculation if dipoles failed to converge
 c
          if (eps .gt. poleps) then
-            write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
             call prterr
             call fatal
@@ -772,6 +812,7 @@ c
       include 'potent.i'
       include 'shunt.i'
       include 'units.i'
+      include 'uprior.i'
       integer i,j,k
       integer ii,kk,kkk
       integer iter,maxiter
@@ -792,6 +833,7 @@ c
       real*8 dkr,dukr,pukr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
+      real*8 udsum,upsum
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 damp,expdamp
@@ -968,6 +1010,23 @@ c
          iter = 0
          eps = 100.0d0
 c
+c     predicted values for always stable predictor-corrector method
+c
+         if (use_aspc .and. nualt.eq.maxualt) then
+            do i = 1, npole
+               do j = 1, 3
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + baspc(k)*udalt(k,j,i)
+                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+               end do
+            end do
+         end if
+c
 c     compute mutual induced dipole moments by an iterative method
 c
          do while (.not. done)
@@ -1098,12 +1157,16 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
+         if (verbose) then
+            write (iout,30)  iter,eps
+   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+         end if
 c
 c     terminate the calculation if dipoles failed to converge
 c
          if (eps .gt. poleps) then
-            write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
             call prterr
             call fatal
@@ -1138,11 +1201,13 @@ c
       include 'polpot.i'
       include 'potent.i'
       include 'units.i'
-      integer i,j,ii
+      include 'uprior.i'
+      integer i,j,k,ii
       integer iter,maxiter
       real*8 eps,term
       real*8 epsd,epsp
       real*8 epsold
+      real*8 udsum,upsum
       real*8 ucell(3)
       real*8 ucellp(3)
       real*8 udir(3,maxatm)
@@ -1229,6 +1294,23 @@ c
          iter = 0
          eps = 100.0d0
 c
+c     predicted values for always stable predictor-corrector method
+c
+         if (use_aspc .and. nualt.eq.maxualt) then
+            do i = 1, npole
+               do j = 1, 3
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + baspc(k)*udalt(k,j,i)
+                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+               end do
+            end do
+         end if
+c
 c     compute mutual induced dipole moments by an iterative method
 c
          do while (.not. done)
@@ -1301,12 +1383,16 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
+         if (verbose) then
+            write (iout,30)  iter,eps
+   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+         end if
 c
 c     terminate the calculation if dipoles failed to converge
 c
          if (eps .gt. poleps) then
-            write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
             call prterr
             call fatal
@@ -1341,11 +1427,13 @@ c
       include 'polpot.i'
       include 'potent.i'
       include 'units.i'
-      integer i,j,ii
+      include 'uprior.i'
+      integer i,j,k,ii
       integer iter,maxiter
       real*8 eps,term
       real*8 epsd,epsp
       real*8 epsold
+      real*8 udsum,upsum
       real*8 ucell(3)
       real*8 ucellp(3)
       real*8 udir(3,maxatm)
@@ -1432,6 +1520,23 @@ c
          iter = 0
          eps = 100.0d0
 c
+c     predicted values for always stable predictor-corrector method
+c
+         if (use_aspc .and. nualt.eq.maxualt) then
+            do i = 1, npole
+               do j = 1, 3
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + baspc(k)*udalt(k,j,i)
+                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+               end do
+            end do
+         end if
+c
 c     compute mutual induced dipole moments by an iterative method
 c
          do while (.not. done)
@@ -1504,12 +1609,16 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
+         if (verbose) then
+            write (iout,30)  iter,eps
+   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+         end if
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps .gt. poleps) then
-            write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
+         if (eps.gt.poleps .and. .not.use_aspc) then
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
             call prterr
             call fatal

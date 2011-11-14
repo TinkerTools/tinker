@@ -2,47 +2,45 @@
                  ---------------------------------------------
                  TINKER -- Software Tools for Molecular Design
                  ---------------------------------------------
-
-      Jay Ponder Lab, Department of Biochemistry and Molecular Biophysics,
-  Washington University School of Medicine, Saint Louis, Missouri 63110 U.S.A.
-     TINKER is a complete package for performing empirical force field
+                    Jay Ponder Lab, Department of Chemistry,           Washington University, Saint Louis, Missouri 63130 U.S.A.     TINKER is a complete package for performing empirical force field
 molecular mechanics and dynamics calculations. It is intended to serve as a
 platform for algorithm development and parameterization, while still being
-efficient enough for most production work. The available potentials include
-Amber ff94, ff96, ff98 and ff99, ff99sb, CHARMM19, CHARMM22-CMAP, DANG, MM2,
-MM3, MMFF, OPLS-UA, OPLS-AA and our AMOEBA polarizable atomic multipole-based
-potential. Other force fields can be added via new parameter files; MM4, ENCAD
-and UFF are under consideration.
+efficient enough for most production work. Available potentials include Amber
+ff94, ff96, ff98 and ff99, ff99sb, CHARMM19, CHARMM22/CMAP, DANG, MM2, MM3,
+MMFF, OPLS-UA, OPLS-AA and our AMOEBA 2004 and 2009 polarizable atomic
+multipole models. Other force fields can be added via new parameter files,
+and some are currently under consideration.
 	Programs are provided to perform many functions including: (1) energy
-minimization over Cartesian coordinates, torsional angles or rigid bodies
-via conjugate gradient, variable metric or our truncated Newton method, (2)
+minimization over Cartesian coordinates, torsional angles or rigid bodies via
+conjugate gradient, variable metric or our truncated Newton method, (2)
 molecular, stochastic and rigid body dynamics with periodic boundaries and
-control of temperature and pressure, (3) normal mode vibrational analysis,
-(4) distance geometry including an efficient random pairwise metrization,
-(5) building protein and nucleic acid structures from sequence, (6) simulated
-annealing with various cooling protocols, (7) analysis and breakdown of single
-point potential energies, (8) verification of analytical derivatives of
-standard and user defined potentials, (9) location of a transition state
-between two minima, (10) full energy surface search via our Conformation
-Scanning method, (11) free energy calculations via free energy perturbation
-or weighted histogram analysis, (12) fitting of intermolecular potential
-parameters to structural and thermodynamic data, and (13) global optimization
-via energy surface smoothing including our own Potential Smoothing and Search
-(PSS) method.	Analytical Cartesian derivatives through the Hessian and analytical
-torsional derivatives through the gradient are available. Energy minimization
-and vibrational analysis can be performed in either Cartesian or torsional
-spaces. The user can define rigid bodies and compute scaled energies between
-or within bodies. Atomic multipoles through the quadrupole and induced dipole
-polarization, as well as simpler electrostatic models, are implemented.
-Restraint potentials may be included in all types of computations or partial
-structures can be frozen in space. Both replicative and image boundary
-conditions are supported for all unit cell types and for truncated octahedra.
-Nonbonded interactions can be cutoff using smoothing windows via double loop
-searches or the Method of Lights. Particle mesh Ewald (PME) is available for
-partial charges as well as for polarizable atomic multipoles. The molecular
-volume and surface area as well as their derivatives are included. Various
-continuum solvation models, such as GB/SA, are implemented. User-defined
-potentials can be easily added.
+control of temperature and pressure, (3) multiple time step RESPA integrator
+for more efficient MD simulation, (4) normal mode vibrational analysis, (5)
+distance geometry including an efficient random pairwise metrization, (6)
+building protein and nucleic acid structures from sequence, (7) analysis and
+breakdown of single point potential energies, (8) verification of analytical
+derivatives of standard and user defined potentials, (9) location of a
+transition state between two minima, (10) full energy surface search via our
+Conformation Scanning method, (11) free energy calculations via free energy
+perturbation or weighted histogram analysis, (12) analysis of and comparison
+to electrostatic potentials, (13) fitting of intermolecular potential
+parameters to structural and thermodynamic data, and (14) global optimization
+via simulated annealing, Monte Carlo minimization, and energy surface
+smoothing via the Potential Smoothing and Search (PSS) method.	Analytical Cartesian derivatives through the Hessian and analytical
+torsional gradients are available. Energy minimization and vibrational analysis
+can be performed in either Cartesian or torsional space. The user can define
+rigid bodies and compute scaled energies between or within bodies. Atomic
+multipoles through the quadrupole and induced dipole polarization, as well as
+simpler electrostatic models, are implemented. Restraint potentials may be
+included in all calculation types, and partial structures can be frozen in
+space. Both replicative and image boundary conditions are supported for all
+unit cell types and for truncated octahedra. Nonbonded interactions can be
+splined over distance windows, and are treated via double loop search, the
+Method of Lights, or pair neighbor lists. Particle mesh Ewald (PME) is
+available for partial charges and for polarizable atomic multipoles. The
+molecular volume and surface area as well as their derivatives are included.
+Various continuum solvation models, such as GB/SA, GK and PB, are implemented.
+User-defined potentials are easily added.
 	The heart of the TINKER package is a modular set of callable routines
 which allow the manipulation of coordinates and evaluation of potential energy
 and derivatives in a straightforward fashion. The author welcomes development
@@ -52,44 +50,34 @@ distribution center for such development efforts.
 available as an adjunct to the basic package. FFE is tightly integrated with
 the TINKER code via a socket mechanism, and can be used to setup, launch and
 visualize TINKER calculations. The GUI allows for interactive use on a single
-machine, as well as connection to jobs running on a remote server.	The TINKER package is written in a portable Fortran dialect that makes
-use of some common extensions to the Fortran77 standard. Program control is
-via an optional Keyword Parameter file. TINKER coordinate input files are also
-compatible with Cambridge Scientific Software's CHEMDRAW & CHEM3D programs
-and with the gOpenMol, MOLDEN and ReView molecule viewers. A modified version
-of RasMol for TINKER is also available for viewing molecular structures.
-Auxiliary programs are provided to convert Protein Data Bank files to and from
-the TINKER formats. TINKER coordinate files are directly supported by the
-PyMol and VMD modeling packages.
-Selected References:
-1.  J. W. Ponder, C. Wu, P. Ren, V. S. Pande, J. D. Chodera, D. L. Mobley,
-M. J. Schnieders, I. Haque, D. S. Lambrecht, R. A. DiStatio, Jr.,
-M. Head-Gordon, G. N. I. Clark, M. E. Johnson and T. Head-Gordon,
-Current Status of the AMOEBA Polarizable Force Field, J. Phys. Chem. B, 113,
-xxx-xxx (2009).  (in press)
-2.  P. Ren and J. W. Ponder, Polarizable Atomic Multipole Water Model for
-Molecular Mechanics Simulation, J. Phys. Chem. B, 107, 5933-5947 (2003).
-
-3.  R. V. Pappu, R. K. Hart and J. W. Ponder, Analysis and Application of
-Potential Energy Smoothing for Global Optimization, J. Phys. Chem. B, 102,
-9725-9742 (1998).
-
-4.  Y. Kong and J. W. Ponder, Reaction Field Methods for Off-Center
-Multipoles, J. Chem. Phys., 107, 481-492 (1997).
-
-5.  M. J. Dudek and J. W. Ponder, Accurate Modeling of the Intramolecular
-Electrostatic Energy of Proteins, J. Comput. Chem., 16, 791-816 (1995).
-
-6.  C. E. Kundrot, J. W. Ponder and F. M. Richards, Algorithms for Calculating
-Excluded Volume and Its Derivatives as a Function of Molecular Conformation
-and Their Use in Energy Minimization, J. Comput. Chem., 12, 402-409 (1991).
-
-7.  J. W. Ponder and F. M. Richards, An Efficient Newton-like Method for
-Molecular Mechanics Energy Minimization of Large Molecules, J. Comput. Chem.,
-8, 1016-1024 (1987).
-
-Availability:   Executables and Source at http://dasher.wustl.edu/tinker/
-Version:        TINKER 5.0 and Force Field Explorer 5.0 of June 2009
-Language:       Fortran77 with common extensions and some C;
-                FFE GUI in Java with Java 3D extensionsLines of Code:  180,000 in TINKER Package (Fortran77 and some C)
-                30,000 in Force Field Explorer (Java and some C)
+machine, as well as connection to jobs running on a remote server.
+	The TINKER package is written in a portable Fortran 95 dialect that
+makes use of dynamid memory allocation. TINKER uses OpenMP to parallelize
+selected CPU intensive calculations on shared-memory multiple core systems.
+Program control is via an optional Keyword Parameter. Auxiliary programs are
+provided to convert Protein Data Bank files to and from the TINKER formats.
+TINKER coordinate files are directly supported by the VMD, PyMOL and MOLDEN
+modeling packages. TINKER structures are also compatible with the ChemDraw &
+ChemOffice programs.Selected References:1.  Polarizable Atomic Multipole-based Molecular Mechanics for Organic
+    Molecules, P. Ren, C. Wu and J. W. Ponder, J. Chem. Theory Comput.,
+    7, 3143-3461 (2011)
+2.  Current Status of the AMOEBA Polarizable Force Field, J. W. Ponder, C. Wu,
+    P. Ren, V. S. Pande, J. D. Chodera, D. L. Mobley, M. J. Schnieders,
+    I. Haque, D. S. Lambrecht, R. A. DiStatio, Jr., M. Head-Gordon,
+    G. N. I. Clark, M. E. Johnson and T. Head-Gordon, J. Phys. Chem. B, 114,
+    2549-2564 (2010).
+3.  Polarizable Atomic Multipole Water Model for Molecular Mechanics
+    Simulation, P. Ren and J. W. Ponder, J. Phys. Chem. B, 107, 5933-5947
+    (2003).
+4.  Analysis and Application of Potential Energy Smoothing for Global
+    Optimization, R. V. Pappu, R. K. Hart and J. W. Ponder, J. Phys. Chem. B,
+    102, 9725-9742 (1998).
+5.  Reaction Field Methods for Off-Center Multipoles, Y. Kong and
+    J. W. Ponder, J. Chem. Phys., 107, 481-492 (1997).
+6.  Algorithms for Calculating Excluded Volume and Its Derivatives as a
+    Function of Molecular Conformation and Their Use in Energy Minimization,
+    C. E. Kundrot, J. W. Ponder and F. M. Richards, J. Comput. Chem., 12,
+    402-409 (1991).
+7.  An Efficient Newton-like Method for Molecular Mechanics Energy Minimization
+    of Large Molecules, J. W. Ponder and F. M. Richards, J. Comput. Chem., 8,
+    1016-1024 (1987).Availability:   Executables and Source at http://dasher.wustl.edu/tinker/Version:        TINKER 6.0 and Force Field Explorer 6.0 of November 2011Language:       Fortran 95 with common extensions and some C;                FFE GUI in Java with Java 3D extensionsLines of Code:  186,000 in TINKER Package (Fortran 95 and some C)                30,000 in Force Field Explorer (Java and some C)

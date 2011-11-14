@@ -1250,7 +1250,7 @@ fatal.o: iounit.i
 fft3d.o: fft.i openmp.i pme.i sizes.i
 fftpack.o: math.i
 field.o: keys.i potent.i sizes.i
-final.o: chunks.i inform.i iounit.i pme.i sizes.i socket.i solute.i usage.i vibs.i
+final.o: chunks.i inform.i iounit.i pme.i sizes.i socket.i solute.i uprior.i usage.i vibs.i
 flatten.o: atoms.i fields.i inform.i iounit.i keys.i sizes.i warp.i
 freeunit.o: iounit.i
 gda.o: atoms.i files.i iounit.i minima.i potent.i sizes.i vdwpot.i warp.i
@@ -1279,7 +1279,7 @@ hessrot.o: math.i omega.i sizes.i zcoord.i
 hybrid.o: angle.i atmlst.i atmtyp.i atoms.i bond.i charge.i couple.i dipole.i imptor.i inform.i iounit.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i kitors.i kpolr.i kstbnd.i ksttor.i ktorsn.i kvdws.i math.i mpole.i mutant.i polar.i sizes.i strbnd.i strtor.i tors.i vdw.i vdwpot.i
 image.o: boxes.i cell.i sizes.i
 impose.o: align.i inform.i iounit.i sizes.i
-induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i
+induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i uprior.i
 inertia.o: atmtyp.i atoms.i iounit.i math.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
 initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
@@ -1324,7 +1324,7 @@ makepdb.o: atmtyp.i atoms.i couple.i fields.i files.i molcul.i pdb.i resdue.i se
 makeref.o: atmtyp.i atoms.i couple.i files.i refer.i sizes.i titles.i
 makexyz.o: atoms.i sizes.i zcoord.i
 maxwell.o: units.i
-mdinit.o: atmtyp.i atoms.i bath.i bound.i files.i group.i inform.i iounit.i keys.i mdstuf.i molcul.i moldyn.i rgddyn.i rigid.i shake.i sizes.i stodyn.i units.i usage.i
+mdinit.o: atmtyp.i atoms.i bath.i bound.i files.i group.i inform.i iounit.i keys.i mdstuf.i molcul.i moldyn.i mpole.i rgddyn.i rigid.i shake.i sizes.i stodyn.i units.i uprior.i usage.i
 mdrest.o: atmtyp.i atoms.i bound.i group.i inform.i iounit.i mdstuf.i moldyn.i rgddyn.i sizes.i units.i
 mdsave.o: atmtyp.i atoms.i bound.i boxes.i files.i group.i inform.i iounit.i mdstuf.i moldyn.i mpole.i output.i polar.i potent.i rgddyn.i sizes.i socket.i titles.i units.i
 mdstat.o: atoms.i bath.i bound.i boxes.i cutoff.i inform.i inter.i iounit.i mdstuf.i molcul.i sizes.i units.i usage.i warp.i
@@ -1435,7 +1435,7 @@ torsfit.o: atmtyp.i atoms.i files.i inform.i iounit.i keys.i kgeoms.i ktorsn.i m
 torsions.o: bond.i couple.i iounit.i sizes.i tors.i
 trimtext.o:
 unitcell.o: bound.i boxes.i iounit.i keys.i sizes.i
-valence.o: angle.i angpot.i atmtyp.i atoms.i bndpot.i bond.i couple.i files.i hescut.i inform.i iounit.i kangs.i kbonds.i keys.i kopbnd.i kstbnd.i ktorsn.i kurybr.i kvdws.i linmin.i math.i minima.i opbend.i output.i polpot.i potent.i qmstuf.i scales.i sizes.i strbnd.i torpot.i tors.i units.i urey.i urypot.i usage.i valfit.i vdwpot.i
+valence.o: angle.i angpot.i atmtyp.i atoms.i bndpot.i bond.i couple.i files.i hescut.i inform.i iounit.i kangs.i kbonds.i keys.i kopbnd.i kstbnd.i ktorsn.i kurybr.i kvdws.i linmin.i math.i minima.i opbend.i output.i potent.i qmstuf.i scales.i sizes.i strbnd.i torpot.i tors.i units.i urey.i urypot.i usage.i valfit.i vdwpot.i
 verlet.o: atmtyp.i atoms.i moldyn.i shake.i sizes.i units.i usage.i
 version.o: iounit.i output.i
 vibbig.o: atmtyp.i atoms.i bound.i couple.i cutoff.i files.i hescut.i hessn.i inform.i iounit.i keys.i mpole.i potent.i rigid.i sizes.i units.i usage.i vdw.i vdwpot.i vibs.i

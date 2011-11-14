@@ -26,7 +26,6 @@ c
       include 'keys.i'
       include 'linmin.i'
       include 'output.i'
-      include 'polpot.i'
       include 'potent.i'
       include 'qmstuf.i'
       include 'valfit.i'
@@ -167,10 +166,7 @@ c
 c
 c     try to increase robustness of polarization calculations
 c
-      if (dofit .and. use_polar) then
-         stpmax = 1.0d0
-         polsor = 0.55d0
-      end if
+      if (dofit .and. use_polar)  stpmax = 1.0d0
 c
 c     comparison of QM and TINKER structure and frequencies
 c

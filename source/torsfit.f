@@ -1032,6 +1032,7 @@ c
       real*8 g(maxvar)
       real*8 derivs(3,maxatm)
       logical analytic
+      external energy
 c
 c
 c     use either analytical or numerical gradients

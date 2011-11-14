@@ -31,13 +31,15 @@ c
       include 'mdstuf.i'
       include 'molcul.i'
       include 'moldyn.i'
+      include 'mpole.i'
       include 'rgddyn.i'
       include 'rigid.i'
       include 'shake.i'
       include 'stodyn.i'
       include 'units.i'
+      include 'uprior.i'
       include 'usage.i'
-      integer i,j,idyn
+      integer i,j,k,idyn
       integer size,next
       integer lext,freeunit
       real*8 e,maxwell,speed
@@ -62,6 +64,7 @@ c
       uindsave = .false.
       friction = 91.0d0
       use_sdarea = .false.
+      use_aspc = .false.
       iprint = 100
 c
 c     set default values for temperature and pressure control
@@ -111,6 +114,8 @@ c
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
+         else if (keyword(1:11) .eq. 'POLAR-ASPC ') then
+            use_aspc = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)
@@ -165,6 +170,33 @@ c
    30          format (/,' MDINIT  --  Warning, Mass of Atom',i6,
      &                    ' Set to 1.0 for Dynamics')
             end if
+         end do
+      end if
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (use_aspc) then
+         if (associated(udalt))  deallocate (udalt)
+         if (associated(upalt))  deallocate (upalt)
+         allocate (udalt(maxualt,3,n))
+         allocate (upalt(maxualt,3,n))
+c
+c     setup always stable predictor-corrector for induced dipoles
+c
+         nualt = 0
+         baspc(1) = 22.0d0 / 7.0d0
+         baspc(2) = -55.0d0 / 14.0d0
+         baspc(3) = 55.0d0 / 21.0d0
+         baspc(4) = -22.0d0 / 21.0d0
+         baspc(5) = 5.0d0 / 21.0d0
+         baspc(6) = -1.0d0 / 42.0d0
+         do i = 1, npole
+            do j = 1, 3
+               do k = 1, maxualt
+                  udalt(k,j,i) = 0.0d0
+                  upalt(k,j,i) = 0.0d0
+               end do
+            end do
          end do
       end if
 c

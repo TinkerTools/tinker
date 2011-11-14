@@ -26,6 +26,7 @@ c
       include 'pme.i'
       include 'socket.i'
       include 'solute.i'
+      include 'uprior.i'
       include 'usage.i'
       include 'vibs.i'
 c
@@ -42,7 +43,7 @@ c
          call apbsfinal
       end if
 c
-c     perform deallocation of any associated pointers arrays
+c     perform deallocation of associated pointers arrays
 c
       if (associated(thetai1))  deallocate (thetai1)
       if (associated(thetai2))  deallocate (thetai2)
@@ -50,6 +51,8 @@ c
       if (associated(qgrid))  deallocate (qgrid)
       if (associated(qfac))  deallocate (qfac)
       if (associated(pmetable))  deallocate (pmetable)
+      if (associated(udalt))  deallocate (udalt)
+      if (associated(upalt))  deallocate (upalt)
       if (associated(iuse))  deallocate (iuse)
       if (associated(use))  deallocate (use)
       if (associated(phi))  deallocate (phi)
