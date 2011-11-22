@@ -121,9 +121,9 @@ c
 c
 c     get polarization energy term for the solvation methods
 c
-      if (solvtyp .eq. 'GK') then
+      if (solvtyp(1:2) .eq. 'GK') then
          call egk3
-      else if (solvtyp .eq. 'PB') then
+      else if (solvtyp(1:2) .eq. 'PB') then
          call epb3
       else if (use_born) then
          if (use_smooth) then

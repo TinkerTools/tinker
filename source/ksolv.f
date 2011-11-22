@@ -146,8 +146,9 @@ c     set a default if no Born radius method was assigned
 c
       if (use_born .and. borntyp.eq.'       ') then
          borntyp = solvtyp
-         if (solvtyp .eq. 'GK')  borntyp = 'GRYCUK'
          if (solvtyp .eq. 'GB-HPMF')  borntyp = 'STILL'
+         if (solvtyp .eq. 'GK')  borntyp = 'GRYCUK'
+         if (solvtyp .eq. 'GK-HPMF')  borntyp = 'GRYCUK'
       end if
 c
 c     invoke the setup needed for specific Born radius models

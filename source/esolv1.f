@@ -99,9 +99,9 @@ c
 c
 c     get polarization energy and derivatives for solvation methods
 c
-      if (solvtyp.eq.'GK' .or. solvtyp.eq.'GK-HPMF') then
+      if (solvtyp(1:2) .eq. 'GK') then
          call egk1
-      else if (solvtyp.eq.'PB' .or. solvtyp.eq.'PB-HPMF') then
+      else if (solvtyp(1:2) .eq. 'PB') then
          call epb1
       else if (use_born) then
          if (use_smooth) then

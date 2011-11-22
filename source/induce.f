@@ -38,9 +38,9 @@ c
 c
 c     choose the method for computation of induced dipoles
 c
-      if (solvtyp .eq. 'PB') then
+      if (solvtyp(1:2) .eq. 'PB') then
          call induce0f
-      else if (solvtyp .eq. 'GK') then
+      else if (solvtyp(1:2) .eq. 'GK') then
          call induce0e
       else if (use_ewald) then
          if (use_mlist) then
@@ -764,9 +764,10 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose) then
+         if (verbose .and. .not.debug) then
             write (iout,30)  iter,eps
-   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge
@@ -1157,9 +1158,10 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose) then
+         if (verbose .and. .not.debug) then
             write (iout,30)  iter,eps
-   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge
@@ -1383,9 +1385,10 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose) then
+         if (verbose .and. .not.debug) then
             write (iout,30)  iter,eps
-   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge
@@ -1609,9 +1612,10 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose) then
+         if (verbose .and. .not.debug) then
             write (iout,30)  iter,eps
-   30       format (17x,'Iter:',i5,6x,'RMS Change:',f15.10)
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge

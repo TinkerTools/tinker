@@ -21,3 +21,9 @@
          call to the subroutine "command" at the bottom of the source
          file "initial.f".
 
+         If you are building an OpenMP-capable version of TINKER with
+         a compiler other than the Intel Fortran compiler, then it may
+         be necessary remove the calls to the Intel-specific extensions
+         "kmp_set_stacksize" and "kmp-set-blocksize" near the top of the
+         file "initial.f".
+

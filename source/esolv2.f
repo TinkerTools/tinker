@@ -42,8 +42,7 @@ c     call surface1 (es,aes,des,rsolv,asolv,probe)
 c
 c     get the generalized Born term for GB/SA solvation
 c
-      if (use_born .and. solvtyp.ne.'GK'
-     &       .and. solvtyp.ne.'GK-HPMF') then
+      if (use_born .and. solvtyp(1:2).ne.'GK') then
          if (use_smooth) then
             call egb2b (i)
          else
