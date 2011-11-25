@@ -244,7 +244,7 @@ c
          end if
          write (iout,70)  mode,method,grdmin
    70    format (/,' Algorithm : ',a6,5x,'Preconditioning : ',a6,5x,
-     &              ' RMS Grad : ',d8.2)
+     &              ' RMS Grad :',d9.2)
          write (iout,80)
    80    format (/,' TN Iter   F Value       G RMS     F Move  ',
      &              '  X Move   CG Iter   Solve   FG Call',/)
