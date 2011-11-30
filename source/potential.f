@@ -2337,6 +2337,15 @@ c
             iz = zaxis(i)
             ix = xaxis(i)
             iy = yaxis(i)
+            if (iy .lt. 0) then
+               yaxis(i) = -yaxis(i)
+               iy = yaxis(i)
+               pole(3,i) = -pole(3,i)
+               pole(6,i) = -pole(6,i)
+               pole(8,i) = -pole(8,i)
+               pole(10,i) = -pole(10,i)
+               pole(12,i) = -pole(12,i)
+            end if
             if (iz .ne. 0)  iz = type(iz)
             if (ix .ne. 0)  ix = type(ix)
             if (iy .ne. 0)  iy = type(iy)

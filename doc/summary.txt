@@ -2,7 +2,11 @@
                  ---------------------------------------------
                  TINKER -- Software Tools for Molecular Design
                  ---------------------------------------------
-                    Jay Ponder Lab, Department of Chemistry,           Washington University, Saint Louis, Missouri 63130 U.S.A.     TINKER is a complete package for performing empirical force field
+
+                    Jay Ponder Lab, Department of Chemistry,
+           Washington University, Saint Louis, Missouri 63130 U.S.A.
+
+     TINKER is a complete package for performing empirical force field
 molecular mechanics and dynamics calculations. It is intended to serve as a
 platform for algorithm development and parameterization, while still being
 efficient enough for most production work. Available potentials include Amber
@@ -58,7 +62,11 @@ Program control is via an optional Keyword Parameter. Auxiliary programs are
 provided to convert Protein Data Bank files to and from the TINKER formats.
 TINKER coordinate files are directly supported by the VMD, PyMOL and MOLDEN
 modeling packages. TINKER structures are also compatible with the ChemDraw &
-ChemOffice programs.Selected References:1.  Polarizable Atomic Multipole-based Molecular Mechanics for Organic
+ChemOffice programs.
+
+Selected References:
+
+1.  Polarizable Atomic Multipole-based Molecular Mechanics for Organic
     Molecules, P. Ren, C. Wu and J. W. Ponder, J. Chem. Theory Comput.,
     7, 3143-3461 (2011)
 2.  Current Status of the AMOEBA Polarizable Force Field, J. W. Ponder, C. Wu,
@@ -80,4 +88,11 @@ ChemOffice programs.Selected References:1.  Polarizable Atomic Multipole-bas
     402-409 (1991).
 7.  An Efficient Newton-like Method for Molecular Mechanics Energy Minimization
     of Large Molecules, J. W. Ponder and F. M. Richards, J. Comput. Chem., 8,
-    1016-1024 (1987).Availability:   Executables and Source at http://dasher.wustl.edu/tinker/Version:        TINKER 6.0 and Force Field Explorer 6.0 of November 2011Language:       Fortran 95 with common extensions and some C;                FFE GUI in Java with Java 3D extensionsLines of Code:  186,000 in TINKER Package (Fortran 95 and some C)                30,000 in Force Field Explorer (Java and some C)
+    1016-1024 (1987).
+
+Availability:   Executables and Source at http://dasher.wustl.edu/tinker/
+Version:        TINKER 6.0 and Force Field Explorer 6.0 of November 2011
+Language:       Fortran 95 with common extensions and some C;
+                FFE GUI in Java with Java 3D extensions
+Lines of Code:  186,000 in TINKER Package (Fortran 95 and some C)
+                30,000 in Force Field Explorer (Java and some C)
