@@ -23,6 +23,7 @@ c
       include 'align.i'
       include 'atmtyp.i'
       include 'atoms.i'
+      include 'bound.i'
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
@@ -47,6 +48,7 @@ c
       real*8 z1(maxatm),z2(maxatm)
       logical header,exist
       logical query,skip
+      logical dopbc,dowrite
       logical self,same
       character*1 answer
       character*3 name1(maxatm)
@@ -61,6 +63,8 @@ c     get atom names and masses for the first structure type
 c
       call initial
       call getxyz
+      call unitcell
+      call lattice
       call field
       call katom
       file1 = filename
@@ -241,15 +245,33 @@ c
   130    continue
       end if
 c
+c     decide on the use of periodic boundary conditions
+c
+      dopbc = .false.
+      if (use_bounds) then
+         call nextarg (answer,exist)
+         if (.not. exist) then
+            write (iout,140)
+  140       format (/,' Apply Periodic Boundary Conditions',
+     &                 ' [N] :  ',$)
+            read (input,150)  record
+  150       format (a120)
+            next = 1
+            call gettext (record,answer,next)
+         end if
+         call upcase (answer)
+         if (answer .eq. 'Y')  dopbc = .true.
+      end if
+c
 c     decide on the weighting to use for the coordinates
 c
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,140)
-  140    format (/,' Use Mass- or Unit-Weighted Coordinates',
+         write (iout,160)
+  160    format (/,' Use Mass- or Unit-Weighted Coordinates',
      &              ' (M or [U]) :  ',$)
-         read (input,150)  record
-  150    format (a120)
+         read (input,170)  record
+  170    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -266,38 +288,40 @@ c
 c
 c     decide whether to write the best fit set of coordinates
 c
+      dowrite = .false.
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,160)
-  160    format (/,' Write Best-Fit Coordinates of 2nd Molecule',
+         write (iout,180)
+  180    format (/,' Write Best-Fit Coordinates of 2nd Molecule',
      &              ' [N] :  ',$)
-         read (input,170)  record
-  170    format (a120)
+         read (input,190)  record
+  190    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
       call upcase (answer)
+      if (answer .eq. 'Y')  dowrite = .true.
 c
 c     chose cutoff value for output of atom pair deviations
 c
       cutoff = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=180,end=180)  cutoff
-  180 continue
+      if (exist)  read (string,*,err=200,end=200)  cutoff
+  200 continue
       if (cutoff .lt. 0.0d0) then
-         write (iout,190)
-  190    format (/,' Cutoff Value for Listing RMS Deviations',
+         write (iout,210)
+  210    format (/,' Cutoff Value for Listing RMS Deviations',
      &              ' [0.0] :  ',$)
-         read (input,200)  cutoff
-  200    format (f20.0)
+         read (input,220)  cutoff
+  220    format (f20.0)
       end if
 c
 c     information about structures to be superimposed
 c
-      write (iout,210)  file1(1:leng1)
-  210 format (/,' Structure File 1 :  ',a)
-      write (iout,220)  file2(1:leng2)
-  220 format (/,' Structure File 2 :  ',a)
+      write (iout,230)  file1(1:leng1)
+  230 format (/,' Structure File 1 :  ',a)
+      write (iout,240)  file2(1:leng2)
+  240 format (/,' Structure File 2 :  ',a)
 c
 c     reopen the coordinate files with structures to superimpose
 c
@@ -359,15 +383,16 @@ c
 c     perform the superposition of a structure pair
 c
       do while (.not. abort)
-         write (iout,230)  frame1,frame2
-  230    format (/,' File 1 Frame :',i6,13x,'File 2 Frame :',i6)
-         write (iout,240)
-  240    format (/,' Summary of Results from Structural',
+         write (iout,250)  frame1,frame2
+  250    format (/,' File 1 Frame :',i6,13x,'File 2 Frame :',i6)
+         write (iout,260)
+  260    format (/,' Summary of Results from Structural',
      &              ' Superposition :')
          verbose = .true.
+         if (dopbc)  call pbcpose (n1,x1,y1,z1,n2,x2,y2,z2)
          call impose (n1,x1,y1,z1,n2,x2,y2,z2,rmsvalue)
-         write (iout,250)  rmsvalue,frame1,frame2
-  250    format (/,' Root Mean Square Distance :',11x,f15.6,2x,2i7)
+         write (iout,270)  rmsvalue,frame1,frame2
+  270    format (/,' Root Mean Square Distance :',11x,f15.6,2x,2i7)
 c
 c     write out the results of the superposition
 c
@@ -380,24 +405,24 @@ c
             if (dist .ge. cutoff) then
                if (header) then
                   header = .false.
-                  write (iout,260)
-  260             format (/,'   Atom in the',9x,'Atom in the',12x,
+                  write (iout,280)
+  280             format (/,'   Atom in the',9x,'Atom in the',12x,
      &                       'Distance',10x,'Weight'
      &                    /,' First Structure',5x,'Second Structure',
      &                       8x,'Separated',10x,'in Fit'/)
                end if
-               write (iout,270)  i1,name1(i1),i2,name2(i2),dist,wfit(i)
-  270          format (5x,i5,'-',a3,11x,i5,'-',a3,7x,f13.6,4x,f12.4)
+               write (iout,290)  i1,name1(i1),i2,name2(i2),dist,wfit(i)
+  290          format (5x,i5,'-',a3,11x,i5,'-',a3,7x,f13.6,4x,f12.4)
             end if
          end do
          if (.not. header) then
-            write (iout,280)  rmsvalue
-  280       format (/,' Root Mean Square Distance :',11x,f15.6)
+            write (iout,300)  rmsvalue
+  300       format (/,' Root Mean Square Distance :',11x,f15.6)
          end if
 c
 c     create output file for superimposed second structure
 c
-         if (answer .eq. 'Y') then
+         if (dowrite) then
             do i = 1, n
                x(i) = x2(i)
                y(i) = y2(i)
@@ -459,4 +484,41 @@ c
       close (unit=ifile1)
       if (.not. self)  close (unit=ifile2)
       call final
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine pbcpose  --  apply bounds during superposition  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "pbcpose" uses periodic boundary conditions to move structures
+c     onto each other prior to coordinate superposition
+c
+c
+      subroutine pbcpose (n1,x1,y1,z1,n2,x2,y2,z2)
+      implicit none
+      include 'sizes.i'
+      integer i,n1,n2,nmin
+      real*8 xr,yr,zr
+      real*8 x1(maxatm),x2(maxatm)
+      real*8 y1(maxatm),y2(maxatm)
+      real*8 z1(maxatm),z2(maxatm)
+c
+c
+c     move atoms in second structure according to periodic bounds
+c
+      nmin = min(n1,n2)
+      do i = 1, nmin
+         xr = x2(i) - x1(i)
+         yr = y2(i) - y1(i)
+         zr = z2(i) - z1(i)
+         call image (xr,yr,zr)
+         x2(i) = x1(i) + xr
+         y2(i) = y1(i) + yr
+         z2(i) = z1(i) + zr
+      end do
+      return
       end

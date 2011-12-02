@@ -66,7 +66,7 @@ c
    30 format (/,' The TINKER Archive Facility can Provide :',
      &        //,4x,'(1) Create an Archive from Individual Frames',
      &        /,4x,'(2) Extract Individual Frames from an Archive',
-     &        /,4x,'(3) Trim an Archive to Remove Unwanted Frames',
+     &        /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
      &        /,4x,'(4) Unfold Periodic Boundaries for a Trajectory')
 c
 c     get the desired type of archive file modification
