@@ -25,6 +25,7 @@ c
       include 'keys.i'
       integer i,next
       real*8 boxmax
+      logical nosymm
       character*20 keyword
       character*120 record
       character*120 string
@@ -48,6 +49,7 @@ c
       triclinic = .false.
       octahedron = .false.
       spacegrp = '          '
+      nosymm = .true.
 c
 c     get keywords containing crystal lattice dimensions
 c
@@ -79,6 +81,8 @@ c
             octahedron = .true.
          else if (keyword(1:11) .eq. 'SPACEGROUP ') then
             call getword (record,spacegrp,next)
+         else if (keyword(1:12) .eq. 'NO-SYMMETRY ') then
+            nosymm = .true.
          end if
    10    continue
       end do
@@ -100,8 +104,10 @@ c
 c
 c     determine the general periodic boundary lattice type
 c
-         if (alpha.eq.90.0d0 .and. beta.eq.90.0d0
-     &          .and. gamma.eq.90.0d0) then
+         if (nosymm) then
+            triclinic = .true.
+         else if (alpha.eq.90.0d0 .and. beta.eq.90.0d0
+     &               .and. gamma.eq.90.0d0) then
             orthogonal = .true.
          else if (alpha.eq.90.0d0 .and. gamma.eq.90.0d0) then
             monoclinic = .true.
@@ -115,6 +121,8 @@ c
       if (octahedron) then
          if (xbox.eq.ybox .and. xbox.eq.zbox .and. orthogonal) then
             orthogonal = .false.
+            monoclinic = .false.
+            triclinic = .false.
          else
             write (iout,20)
    20       format (/,' UNITCELL  --  Truncated Octahedron',

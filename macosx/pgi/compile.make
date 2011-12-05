@@ -235,7 +235,6 @@ pgf95 -c -fast -mp lattice.f
 pgf95 -c -fast -mp lbfgs.f
 pgf95 -c -fast -mp lights.f
 pgf95 -c -fast -mp makeint.f
-pgf95 -c -fast -mp makepdb.f
 pgf95 -c -fast -mp makeref.f
 pgf95 -c -fast -mp makexyz.f
 pgf95 -c -fast -mp maxwell.f

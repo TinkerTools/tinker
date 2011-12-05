@@ -25,8 +25,9 @@ c
       include 'iounit.i'
       include 'resdue.i'
       include 'sequen.i'
-      integer i,j,iseq
+      integer i,j,k,iseq
       integer length,number
+      integer start,stop
       integer next,trimtext
       logical exist,opened,done
       character*1 letter
@@ -99,23 +100,45 @@ c
       end do
       if (nchain .ne. 0)  ichain(2,nchain) = nseq
 c
-c     find the residue type for each sequence element
+c     find residue types and species present in each chain
 c
-      do i = 1, nseq
-         seqtyp(i) = 0
-         do j = 1, maxamino
-            if (seq(i) .eq. amino(j)) then
-               seqtyp(i) = j
-               goto 40
-            end if
+      do i = 1, nchain
+         start = ichain(1,i)
+         stop = ichain(2,i)
+         chntyp(i) = 'GENERIC'
+         do j = start, stop
+            do k = 1, maxamino
+               if (seq(j) .eq. amino(k)) then
+                  seqtyp(j) = k
+                  chntyp(i) = 'PEPTIDE'
+                  goto 40
+               end if
+            end do
+            chntyp(i) = 'GENERIC'
+            goto 50
+   40       continue
          end do
-         do j = 1, maxnuc
-            if (seq(i) .eq. nuclz(j)) then
-               seqtyp(i) = j
-               goto 40
-            end if
-         end do
-   40    continue
+   50    continue
+         if (chntyp(i) .eq. 'GENERIC') then
+            do j = start, stop
+               do k = 1, maxnuc
+                  if (seq(j) .eq. nuclz(k)) then
+                     seqtyp(j) = k
+                     chntyp(i) = 'NUCLEIC'
+                     goto 60
+                  end if
+               end do
+               chntyp(i) = 'GENERIC'
+               goto 70
+   60          continue
+            end do
+   70       continue
+         end if
+         if (chntyp(i) .eq. 'GENERIC') then
+            do j = start, stop
+               seqtyp(j) = 0
+            end do
+         end if
       end do
       if (.not. opened)  close (unit=iseq)
       return

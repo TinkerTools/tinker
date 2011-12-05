@@ -235,7 +235,6 @@ xlf -c -O lattice.f
 xlf -c -O lbfgs.f
 xlf -c -O lights.f
 xlf -c -O makeint.f
-xlf -c -O makepdb.f
 xlf -c -O makeref.f
 xlf -c -O makexyz.f
 xlf -c -O maxwell.f

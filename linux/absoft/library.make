@@ -224,7 +224,6 @@ lattice.o \
 lbfgs.o \
 lights.o \
 makeint.o \
-makepdb.o \
 makeref.o \
 makexyz.o \
 maxwell.o \

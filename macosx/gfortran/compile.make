@@ -235,7 +235,6 @@ gfortran -c -O3 lattice.f
 gfortran -c -O3 lbfgs.f
 gfortran -c -O3 lights.f
 gfortran -c -O3 makeint.f
-gfortran -c -O3 makepdb.f
 gfortran -c -O3 makeref.f
 gfortran -c -O3 makexyz.f
 gfortran -c -O3 maxwell.f

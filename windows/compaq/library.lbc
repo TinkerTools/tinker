@@ -212,7 +212,6 @@ lattice.obj
 lbfgs.obj
 lights.obj
 makeint.obj
-makepdb.obj
 makeref.obj
 makexyz.obj
 maxwell.obj

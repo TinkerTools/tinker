@@ -235,7 +235,6 @@ pgf77 -c -g -Ktrap=fp lattice.f
 pgf77 -c -g -Ktrap=fp lbfgs.f
 pgf77 -c -g -Ktrap=fp lights.f
 pgf77 -c -g -Ktrap=fp makeint.f
-pgf77 -c -g -Ktrap=fp makepdb.f
 pgf77 -c -g -Ktrap=fp makeref.f
 pgf77 -c -g -Ktrap=fp makexyz.f
 pgf77 -c -g -Ktrap=fp maxwell.f

@@ -236,7 +236,6 @@ DF /compile_only /optimize /fast lattice.f
 DF /compile_only /optimize /fast lbfgs.f
 DF /compile_only /optimize /fast lights.f
 DF /compile_only /optimize /fast makeint.f
-DF /compile_only /optimize /fast makepdb.f
 DF /compile_only /optimize /fast makeref.f
 DF /compile_only /optimize /fast makexyz.f
 DF /compile_only /optimize /fast maxwell.f

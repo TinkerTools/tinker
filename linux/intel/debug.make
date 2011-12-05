@@ -235,7 +235,6 @@ ifort -c -g -warn unused -check uninit -check bounds lattice.f
 ifort -c -g -warn unused -check uninit -check bounds lbfgs.f
 ifort -c -g -warn unused -check uninit -check bounds lights.f
 ifort -c -g -warn unused -check uninit -check bounds makeint.f
-ifort -c -g -warn unused -check uninit -check bounds makepdb.f
 ifort -c -g -warn unused -check uninit -check bounds makeref.f
 ifort -c -g -warn unused -check uninit -check bounds makexyz.f
 ifort -c -g -warn unused -check uninit -check bounds maxwell.f

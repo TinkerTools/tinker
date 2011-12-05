@@ -235,7 +235,6 @@ f77 -c -fast -temp=. lattice.f
 f77 -c -fast -temp=. lbfgs.f
 f77 -c -fast -temp=. lights.f
 f77 -c -fast -temp=. makeint.f
-f77 -c -fast -temp=. makepdb.f
 f77 -c -fast -temp=. makeref.f
 f77 -c -fast -temp=. makexyz.f
 f77 -c -fast -temp=. maxwell.f

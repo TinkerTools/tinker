@@ -235,7 +235,6 @@ pgf77 -c -fast lattice.f
 pgf77 -c -fast lbfgs.f
 pgf77 -c -fast lights.f
 pgf77 -c -fast makeint.f
-pgf77 -c -fast makepdb.f
 pgf77 -c -fast makeref.f
 pgf77 -c -fast makexyz.f
 pgf77 -c -fast maxwell.f

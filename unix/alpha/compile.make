@@ -235,7 +235,6 @@ f77 -c -fast -arch generic -tune generic lattice.f
 f77 -c -fast -arch generic -tune generic lbfgs.f
 f77 -c -fast -arch generic -tune generic lights.f
 f77 -c -fast -arch generic -tune generic makeint.f
-f77 -c -fast -arch generic -tune generic makepdb.f
 f77 -c -fast -arch generic -tune generic makeref.f
 f77 -c -fast -arch generic -tune generic makexyz.f
 f77 -c -fast -arch generic -tune generic maxwell.f

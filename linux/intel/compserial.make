@@ -235,7 +235,6 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 lattice.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 lbfgs.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 lights.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 makeint.f
-ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 makepdb.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 makeref.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 makexyz.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 maxwell.f

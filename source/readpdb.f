@@ -23,15 +23,18 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'pdb.i'
+      include 'resdue.i'
       include 'sequen.i'
       include 'titles.i'
-      integer i,ipdb,nres
+      integer i,j,k,ipdb
+      integer start,stop
       integer index,serial
       integer next,nxtlast
       integer residue,reslast
       integer trimtext
       real*8 xx,yy,zz
       logical exist,opened
+      logical first
       character*1 chain,chnlast
       character*1 altloc
       character*1 insert,inslast
@@ -44,6 +47,8 @@ c
       character*120 pdbfile
       character*120 record
       character*120 string
+      save first
+      data first  / .true. /
 c
 c
 c     open the input file if it has not already been done
@@ -66,7 +71,8 @@ c
 c
 c     get alternate sites, chains and insertions to be used
 c
-      call scanpdb (ipdb)
+      if (first)  call scanpdb (ipdb)
+      first = .false.
 c
 c     initialize title, atom and residue counters and name
 c
@@ -124,7 +130,7 @@ c
             read (string,*)  xx,yy,zz
             if (resname(1:2) .eq. '  ')  resname = resname(3:3)
             if (resname(1:1) .eq. ' ')  resname = resname(2:3)
-            if (chain.ne.' ' .and. index(chntyp,chain).eq.0)  goto 100
+            if (chain.ne.' ' .and. index(chnsym,chain).eq.0)  goto 100
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 100
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 100
             call fixpdb (resname,atmname)
@@ -141,6 +147,8 @@ c
      &                       ' Residues has been Exceeded')
                   call fatal
                end if
+               nseq = nres
+               seq(nseq) = resname
             end if
             npdb = npdb + 1
             xpdb(npdb) = xx
@@ -182,7 +190,7 @@ c
             read (string,*)  xx,yy,zz
             if (resname(1:2) .eq. '  ')  resname = resname(3:3)
             if (resname(1:1) .eq. ' ')  resname = resname(2:3)
-            if (chain.ne.' ' .and. index(chntyp,chain).eq.0)  goto 170
+            if (chain.ne.' ' .and. index(chnsym,chain).eq.0)  goto 170
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 170
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 170
             call fixpdb (resname,atmname)
@@ -210,10 +218,9 @@ c
       end do
   190 continue
 c
-c     set the total sequence length and chain termini information
+c     set the total sequence length and chain terminus sites
 c
       if (npdb .ne. 0) then
-         nseq = npdb
          nchain = 0
          chnlast = '#'
          do i = 1, npdb
@@ -230,6 +237,82 @@ c
             end if
          end do
       end if
+c
+c     find the type of species present in each chain
+c
+      do i = 1, nchain
+         start = ichain(1,i)
+         stop = ichain(2,i)
+         chntyp(i) = 'GENERIC'
+         do j = start, stop
+            do k = 1, maxamino
+               if (seq(j) .eq. amino(k)) then
+                  chntyp(i) = 'PEPTIDE'
+                  goto 200
+               end if
+            end do
+            chntyp(i) = 'GENERIC'
+            goto 210
+  200       continue
+         end do
+  210    continue
+         if (chntyp(i) .eq. 'GENERIC') then
+            do j = start, stop
+               do k = 1, maxnuc
+                  if (seq(j) .eq. nuclz(k)) then
+                     chntyp(i) = 'NUCLEIC'
+                     goto 220
+                  end if
+               end do
+               chntyp(i) = 'GENERIC'
+               goto 230
+  220          continue
+            end do
+  230       continue
+         end if
+      end do
+c
+c     get the three-letter sequence and code for each residue
+c
+      do i = 1, nchain
+         start = ichain(1,i)
+         stop = ichain(2,i)
+         do j = start, stop
+            do k = 1, maxamino
+               if (seq(j) .eq. amino(k)) then
+                  seqtyp(j) = k
+                  goto 240
+               end if
+            end do
+            do k = 1, maxnuc
+               if (seq(j) .eq. nuclz(k)) then
+                  seqtyp(j) = k
+                  goto 240
+               end if
+            end do
+            seq(j) = 'UNK'
+            seqtyp(j) = 0
+            if (chntyp(i) .eq. 'PEPTIDE')  seqtyp(j) = maxamino
+            if (chntyp(i) .eq. 'NUCLEIC')  seqtyp(j) = maxnuc
+  240       continue
+         end do
+      end do
+c
+c     set a pointer to the first and last atom of each residue
+c
+      nres = 0
+      k = 0
+      do i = 1, npdb
+         if (pdbtyp(i) .eq. 'ATOM  ') then
+            if (resnum(i) .ne. k) then
+               k = resnum(i)
+               nres = nres + 1
+               resatm(1,nres) = i
+               resatm(2,nres-1) = i - 1
+            end if
+         end if
+      end do
+      if (nres .ne. 0)  resatm(2,nres) = npdb
 c
 c     close the PDB file and quit if there are no coordinates
 c
@@ -260,7 +343,7 @@ c
       integer next,nxtlast
       integer length,dummy
       integer nalt,nins
-      logical exist,done,first
+      logical exist,done
       character*1 chain,chnlast
       character*1 altloc,altlast
       character*1 insert,inslast
@@ -271,14 +354,7 @@ c
       character*20 instemp
       character*120 record
       character*120 string
-      save first
-      data first  / .true. /
 c
-c
-c     only proceed if this routine was not already used
-c
-      if (.not. first)  return
-      first = .false.
 c
 c     initialize chain, alternate site and insertion lists
 c
@@ -289,7 +365,7 @@ c
       altlast = '#'
       inslast = '#'
       blank = '                    '
-      chntyp = '####################'
+      chnsym = '####################'
       altsym = ' '
       alttyp = blank
       instyp = blank
@@ -324,9 +400,9 @@ c
             read (string,50)  insert
    50       format (a1)
             if (chain .ne. chnlast) then
-               if (index(chntyp,chain) .eq. 0) then
+               if (index(chnsym,chain) .eq. 0) then
                   nchain = nchain + 1
-                  chntyp(nchain:nchain) = chain
+                  chnsym(nchain:nchain) = chain
                   chnlast = chain
                end if
             end if
@@ -359,19 +435,19 @@ c
          call nextarg (chntemp,exist)
          if (.not. exist) then
             chntemp = blank
-            if (chntyp(1:1) .eq. ' ') then
+            if (chnsym(1:1) .eq. ' ') then
                string = 'BLANK'
                length = 5
             else
-               string(1:1) = chntyp(1:1)
+               string(1:1) = chnsym(1:1)
                length = 1
             end if
             do i = 2, nchain
-               if (chntyp(i:i) .eq. ' ') then
+               if (chnsym(i:i) .eq. ' ') then
                   string = string(1:length)//' BLANK'
                   length = length + 6
                else
-                  string = string(1:length)//' '//chntyp(i:i)
+                  string = string(1:length)//' '//chnsym(i:i)
                   length = length + 2
                end if
             end do
@@ -387,10 +463,10 @@ c
          next = 1
          call gettext (chntemp,text,next)
          if (text.eq.blank .or. text.eq.'ALL ') then
-            chntyp = chntyp(1:nchain)
+            chnsym = chnsym(1:nchain)
          else
             nchain = 1
-            chntyp = chntemp(1:1)
+            chnsym = chntemp(1:1)
          end if
       end if
 c

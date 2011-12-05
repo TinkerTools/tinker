@@ -235,7 +235,6 @@ fort77 -c -O2 +E1 lattice.f
 fort77 -c -O2 +E1 lbfgs.f
 fort77 -c -O2 +E1 lights.f
 fort77 -c -O2 +E1 makeint.f
-fort77 -c -O2 +E1 makepdb.f
 fort77 -c -O2 +E1 makeref.f
 fort77 -c -O2 +E1 makexyz.f
 fort77 -c -O2 +E1 maxwell.f

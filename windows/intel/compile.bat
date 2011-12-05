@@ -236,7 +236,6 @@ ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp lattice.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp lbfgs.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp lights.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makeint.f
-ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makepdb.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makeref.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp makexyz.f
 ifort /c /O3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp maxwell.f

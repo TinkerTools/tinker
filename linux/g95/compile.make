@@ -235,7 +235,6 @@ g95 -c -O lattice.f
 g95 -c -O lbfgs.f
 g95 -c -O lights.f
 g95 -c -O makeint.f
-g95 -c -O makepdb.f
 g95 -c -O makeref.f
 g95 -c -O makexyz.f
 g95 -c -O maxwell.f

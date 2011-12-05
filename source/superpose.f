@@ -39,6 +39,7 @@ c
       integer range(4)
       integer atomic1(maxatm)
       integer atomic2(maxatm)
+      real*8 xr,yr,zr
       real*8 dist,cutoff
       real*8 rmsvalue
       real*8 mass1(maxatm)
@@ -388,8 +389,20 @@ c
          write (iout,260)
   260    format (/,' Summary of Results from Structural',
      &              ' Superposition :')
+         if (dopbc) then
+            do i = 1, nfit
+               i1 = ifit(1,i)
+               i2 = ifit(2,i)
+               xr = x2(i2) - x1(i1)
+               yr = y2(i2) - y1(i1)
+               zr = z2(i2) - z1(i1)
+               call image (xr,yr,zr)
+               x2(i2) = x1(i1) + xr
+               y2(i2) = y1(i1) + yr
+               z2(i2) = z1(i1) + zr
+            end do
+         end if
          verbose = .true.
-         if (dopbc)  call pbcpose (n1,x1,y1,z1,n2,x2,y2,z2)
          call impose (n1,x1,y1,z1,n2,x2,y2,z2,rmsvalue)
          write (iout,270)  rmsvalue,frame1,frame2
   270    format (/,' Root Mean Square Distance :',11x,f15.6,2x,2i7)
@@ -400,8 +413,10 @@ c
          do i = 1, nfit
             i1 = ifit(1,i)
             i2 = ifit(2,i)
-            dist = sqrt((x1(i1)-x2(i2))**2 + (y1(i1)-y2(i2))**2
-     &                         + (z1(i1)-z2(i2))**2)
+            xr = x2(i2) - x1(i1)
+            yr = y2(i2) - y1(i1)
+            zr = z2(i2) - z1(i1)
+            dist = sqrt(xr*xr + yr*yr + zr*zr)
             if (dist .ge. cutoff) then
                if (header) then
                   header = .false.
@@ -484,41 +499,4 @@ c
       close (unit=ifile1)
       if (.not. self)  close (unit=ifile2)
       call final
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine pbcpose  --  apply bounds during superposition  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "pbcpose" uses periodic boundary conditions to move structures
-c     onto each other prior to coordinate superposition
-c
-c
-      subroutine pbcpose (n1,x1,y1,z1,n2,x2,y2,z2)
-      implicit none
-      include 'sizes.i'
-      integer i,n1,n2,nmin
-      real*8 xr,yr,zr
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
-c
-c
-c     move atoms in second structure according to periodic bounds
-c
-      nmin = min(n1,n2)
-      do i = 1, nmin
-         xr = x2(i) - x1(i)
-         yr = y2(i) - y1(i)
-         zr = z2(i) - z1(i)
-         call image (xr,yr,zr)
-         x2(i) = x1(i) + xr
-         y2(i) = y1(i) + yr
-         z2(i) = z1(i) + zr
-      end do
-      return
       end

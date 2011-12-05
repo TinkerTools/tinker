@@ -18,11 +18,13 @@ c     ichain   first and last residue in each biopolymer chain
 c     seqtyp   residue type for each residue in the sequence
 c     seq      three-letter code for each residue in the sequence
 c     chnnam   one-letter identifier for each sequence chain
+c     chntyp   contents of each chain (GENERIC, PEPTIDE or NUCLEIC)
 c
 c
       integer nseq,seqtyp
       integer nchain,ichain
       character*1 chnnam
       character*3 seq
+      character*7 chntyp
       common /sequen/ nseq,nchain,ichain(2,maxres),seqtyp(maxres),
-     &                seq(maxres),chnnam(maxres)
+     &                seq(maxres),chnnam(maxres),chntyp(maxres)

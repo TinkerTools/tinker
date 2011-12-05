@@ -28,14 +28,14 @@ c
       include 'katoms.i'
       include 'pdb.i'
       include 'resdue.i'
+      include 'sequen.i'
       integer i,j,it,next
       integer ipdb,ixyz,iseq
       integer last,freeunit
       integer size(maxatm)
       real*8 xi,yi,zi,rij
       real*8 rcut,rmax(0:9)
-      logical peptide
-      logical nucacid
+      logical biopoly
       logical clash
       character*1 letter
       character*3 resname
@@ -51,9 +51,9 @@ c
       call getpdb
       call field
 c
-c     decide whether the system contains only polypeptides
+c     decide whether the system contains only biopolymers
 c
-      peptide = .false.
+      biopoly = .false.
       reslast = '***'
       do i = 1, npdb
          if (pdbtyp(i) .eq. 'ATOM  ') then
@@ -62,40 +62,23 @@ c
                reslast = resname
                do j = 1, maxamino
                   if (resname .eq. amino(j)) then
-                     peptide = .true.
+                     biopoly = .true.
                      goto 10
                   end if
                end do
-               peptide = .false.
+               do j = 1, maxnuc
+                  if (resname .eq. nuclz(j)) then
+                     biopoly = .true.
+                     goto 10
+                  end if
+               end do
+               biopoly = .false.
                goto 20
    10          continue
             end if
          end if
       end do
    20 continue
-c
-c     decide whether the system contains only nucleic acids
-c
-      nucacid = .false.
-      reslast = '***'
-      do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
-            resname = resnam(i)
-            if (resname .ne. reslast) then
-               reslast = resname
-               do j = 1, maxnuc
-                  if (resname .eq. nuclz(j)) then
-                     nucacid = .true.
-                     goto 30
-                  end if
-               end do
-               nucacid = .false.
-               goto 40
-   30          continue
-            end if
-         end if
-      end do
-   40 continue
 c
 c     open the TINKER coordinates file to be used for output
 c
@@ -117,9 +100,11 @@ c
 c     use special translation mechanisms used for biopolymers
 c
       do while (.not. abort)
-         if (peptide .or. nucacid) then
-            if (peptide)  call ribosome
-            if (nucacid)  call ligase
+         if (biopoly) then
+            do i = 1, nchain
+               if (chntyp(i) .eq. 'PEPTIDE')  call ribosome (i)
+               if (chntyp(i) .eq. 'NUCLEIC')  call ligase (i)
+            end do
             call hetatom
             last = n
             do i = last, 1, -1
@@ -223,7 +208,7 @@ c
 c
 c     write a sequence file for proteins and nucleic acids
 c
-      if (peptide .or. nucacid) then
+      if (biopoly) then
          iseq = freeunit ()
          seqfile = filename(1:leng)//'.seq'
          call version (seqfile,'new')
@@ -239,177 +224,6 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine oldatm  --  transfer coordinates from PDB  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "oldatm" get the Cartesian coordinates for an atom from
-c     the Protein Data Bank file, then assigns the atom type
-c     and atomic connectivities
-c
-c
-      subroutine oldatm (i,bionum,i1,ires)
-      implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'sequen.i'
-      include 'pdb.i'
-      integer i,bionum
-      integer i1,ires
-c
-c
-c     get coordinates, assign atom type, and update connectivities
-c
-      if (bionum .ne. 0) then
-         if (i .ne. 0) then
-            type(n) = biotyp(bionum)
-            if (type(n) .gt. 0) then
-               name(n) = symbol(type(n))
-            else
-               type(n) = 0
-               name(n) = '   '
-            end if
-            x(n) = xpdb(i)
-            y(n) = ypdb(i)
-            z(n) = zpdb(i)
-            if (i1 .ne. 0)  call addbond (n,i1)
-            n = n + 1
-         else
-            write (iout,10)  bionum,ires,seq(ires)
-   10       format (/,' OLDATM  --  A PDB Atom of Biotype',i5,
-     &                 ' is Missing in Residue',i5,'-',a3)
-            call fatal
-         end if
-      end if
-      return
-      end
-c
-c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine newatm  --  create and define a new atom  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "newatm" creates and defines an atom needed for the
-c     Cartesian coordinates file, but which may not present
-c     in the original Protein Data Bank file
-c
-c
-      subroutine newatm (i,bionum,ia,bond,ib,angle1,ic,angle2,chiral)
-      implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'fields.i'
-      include 'katoms.i'
-      include 'pdb.i'
-      integer i,bionum
-      integer ia,ib,ic
-      integer chiral
-      real*8 bond
-      real*8 angle1
-      real*8 angle2
-c
-c
-c     set the atom type, compute coordinates, assign
-c     connectivities and increment the atom counter
-c
-      if (bionum .ne. 0) then
-         type(n) = biotyp(bionum)
-         if (type(n) .gt. 0) then
-            name(n) = symbol(type(n))
-         else
-            type(n) = 0
-            name(n) = '   '
-         end if
-         if (i .eq. 0) then
-            call xyzatm (n,ia,bond,ib,angle1,ic,angle2,chiral)
-         else
-            x(n) = xpdb(i)
-            y(n) = ypdb(i)
-            z(n) = zpdb(i)
-         end if
-         call addbond (n,ia)
-         n = n + 1
-      end if
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine addbond  --  add a bond between two atoms  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "addbond" adds entries to the attached atoms list in
-c     order to generate a direct connection between two atoms
-c
-c
-      subroutine addbond (i,j)
-      implicit none
-      include 'sizes.i'
-      include 'couple.i'
-      integer i,j
-c
-c
-c     add connectivity between the two atoms
-c
-      if (i.ne.0 .and. j.ne.0) then
-         n12(i) = n12(i) + 1
-         i12(n12(i),i) = j
-         n12(j) = n12(j) + 1
-         i12(n12(j),j) = i
-      end if
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine findatm  --  locate PDB atom in a residue  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "findatm" locates a specific PDB atom name type within a
-c     range of atoms from the PDB file, returns zero if the name
-c     type was not found
-c
-c
-      subroutine findatm (name,start,stop,ipdb)
-      implicit none
-      include 'sizes.i'
-      include 'pdb.i'
-      integer i,ipdb
-      integer start,stop
-      character*4 name
-c
-c
-c     search for the specified atom within the residue
-c
-      ipdb = 0
-      do i = start, stop
-         if (atmnam(i) .eq. name) then
-            ipdb = i
-            goto 10
-         end if
-      end do
-   10 continue
-      return
-      end
-c
-c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine ribosome  --  coordinates from PDB polypeptide  ##
@@ -421,7 +235,7 @@ c     "ribosome" translates a polypeptide structure in Protein Data
 c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
-      subroutine ribosome
+      subroutine ribosome (ichn)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -432,88 +246,54 @@ c
       include 'resdue.i'
       include 'sequen.i'
       integer i,j,k,m
-      integer ityp,nres
+      integer ichn,ityp
       integer jres,kres
       integer start,stop
       integer cyxtyp
       integer ncys,ndisulf
-      integer resatm(2,maxres)
       integer ni(maxres),cai(maxres)
       integer ci(maxres),oi(maxres)
-      integer icyclic(maxres)
+      integer si(maxres)
       integer icys(maxres)
       integer idisulf(2,maxres)
-      real*8 rik,xcys(maxres)
+      real*8 xr,yr,zr,r
+      real*8 xcys(maxres)
       real*8 ycys(maxres)
       real*8 zcys(maxres)
       logical newchain
       logical midchain
       logical endchain
       logical cyclic
-      logical header
       character*3 resname
       character*4 atmname
+      save si
 c
 c
-c     set a pointer to the first and last atom of each residue
+c     set the next atom and the residue range of the chain
 c
-      nres = 0
-      k = 0
-      do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
-            if (resnum(i) .ne. k) then
-               k = resnum(i)
-               if (nres .ne. 0)  resatm(2,nres) = i - 1
-               nres = nres + 1
-               resatm(1,nres) = i
-            end if
+      n = n + 1
+      jres = ichain(1,ichn)
+      kres = ichain(2,ichn)
+c
+c     chcek for the presence of a cyclic polypeptide chain
+c
+      start = resatm(1,jres)
+      stop = resatm(2,jres)
+      call findatm (' N  ',start,stop,j)
+      start = resatm(1,kres)
+      stop = resatm(2,kres)
+      call findatm (' C  ',start,stop,k)
+      if (j.ne.0 .and. k.ne.0) then
+         xr = xpdb(k) - xpdb(j)
+         yr = ypdb(k) - ypdb(j)
+         zr = zpdb(k) - zpdb(j)
+         r = sqrt(xr*xr + yr*yr + zr*zr)
+         if (r .le. 3.0d0) then
+            cyclic = .true.
+            ni(jres) = j
+            ci(kres) = k
          end if
-      end do
-      if (nres .ne. 0)  resatm(2,nres) = npdb
-c
-c     get the three-letter sequence and code for each residue
-c
-      nseq = nres
-      do i = 1, nres
-         start = resatm(1,i)
-         resname = resnam(start)
-         seq(i) = 'UNK'
-         seqtyp(i) = maxamino
-         do k = 1, maxamino
-            if (resname .eq. amino(k)) then
-               seq(i) = amino(k)
-               seqtyp(i) = k
-               goto 10
-            end if
-         end do
-   10    continue
-      end do
-c
-c     search for the presence of cyclic polypeptide chains
-c
-      do i = 1, nres
-         icyclic(i) = 0
-      end do
-      do i = 1, nchain
-         jres = ichain(1,i)
-         kres = ichain(2,i)
-         start = resatm(1,jres)
-         stop = resatm(2,jres)
-         call findatm (' N  ',start,stop,j)
-         start = resatm(1,kres)
-         stop = resatm(2,kres)
-         call findatm (' C  ',start,stop,k)
-         if (j.ne.0 .and. k.ne.0) then
-            rik = sqrt((xpdb(k)-xpdb(j))**2 + (ypdb(k)-ypdb(j))**2
-     &                         + (zpdb(k)-zpdb(j))**2)
-            if (rik .le. 3.0d0) then
-               ni(jres) = j
-               ci(kres) = k
-               icyclic(jres) = kres
-               icyclic(kres) = jres
-            end if
-         end if
-      end do
+      end if
 c
 c     search for any potential cystine disulfide bonds
 c
@@ -537,23 +317,20 @@ c
       ndisulf = 0
       do i = 1, ncys-1
          do k = i+1, ncys
-            rik = sqrt((xcys(i)-xcys(k))**2 + (ycys(i)-ycys(k))**2
-     &                         + (zcys(i)-zcys(k))**2)
-            if (rik .le. 3.0d0) then
+            xr = xcys(k) - xcys(i)
+            yr = ycys(k) - ycys(i)
+            zr = zcys(k) - zcys(i)
+            r = sqrt(xr*xr + yr*yr + zr*zr)
+            if (r .le. 3.0d0) then
                ndisulf = ndisulf + 1
                idisulf(1,ndisulf) = min(icys(i),icys(k))
                idisulf(2,ndisulf) = max(icys(i),icys(k))
             end if
          end do
       end do
-      do i = 1, nres
-         icys(i) = 0
-      end do
       do i = 1, ndisulf
          j = idisulf(1,i)
          k = idisulf(2,i)
-         icys(j) = 1
-         icys(k) = 1
          seqtyp(j) = cyxtyp
          seqtyp(k) = cyxtyp
          seq(j) = 'CYX'
@@ -570,14 +347,9 @@ c
          end do
       end do
 c
-c     set the current atom to be the first atom
-c
-      n = 1
-      newchain = .true.
-c
 c     locate and assign the atoms that make up each residue
 c
-      do i = 1, nres
+      do i = jres, kres
          ityp = seqtyp(i)
          start = resatm(1,i)
          stop = resatm(2,i)
@@ -586,33 +358,20 @@ c
 c     check that the maximum allowed atoms is not exceeded
 c
          if (n+25 .gt. maxatm) then
-            write (iout,20)  maxatm
-   20       format (/,' RIBOSOME  --  The Maximum of',i8,' Atoms',
+            write (iout,10)  maxatm
+   10       format (/,' RIBOSOME  --  The Maximum of',i8,' Atoms',
      &                 ' has been Exceeded')
             call fatal
          end if
 c
-c     test for the final residue of a peptide chain
+c     test location of residue within the current chain
 c
+         newchain = .false.
+         midchain = .false.
          endchain = .false.
-         do k = 1, nchain
-            if (i .eq. ichain(2,k))  endchain = .true.
-         end do
-c
-c     residue not at start or end of chain is in the middle
-c
-         if (newchain .or. endchain) then
-            midchain = .false.
-         else
-            midchain = .true.
-         end if
-c
-c     check to see if the current chain is cyclic
-c
-         cyclic = .false.
-         if (newchain .or. endchain) then
-            if (icyclic(i) .ne. 0)  cyclic = .true.
-         end if
+         if (i .eq. jres)  newchain = .true.
+         if (i .eq. kres)  endchain = .true.
+         if (.not.newchain .and. .not.endchain)  midchain = .true.
 c
 c     build the amide nitrogen of the current residue
 c
@@ -695,7 +454,7 @@ c
          else if (newchain .and. cyclic) then
             j = hntyp(ityp)
             call findatm (' H  ',start,stop,k)
-            call newatm (k,j,ni(i),1.01d0,ci(icyclic(i)),119.0d0,
+            call newatm (k,j,ni(i),1.01d0,ci(kres),119.0d0,
      &                      cai(i),119.0d0,1)
          else if (newchain) then
             j = hnntyp(ityp)
@@ -791,7 +550,7 @@ c
 c
 c     build the side chain atoms of the current residue
 c
-         call addside (resname,i,start,stop,cai(i),ni(i),ci(i),icys(i))
+         call addside (resname,i,start,stop,cai(i),ni(i),ci(i),si(i))
 c
 c     build the terminal oxygen at the end of a peptide chain
 c
@@ -802,49 +561,29 @@ c
             call newatm (k,j,ci(i),1.25d0,cai(i),117.0d0,
      &                      oi(i),126.0d0,1)
          end if
-c
-c     next residue starts a new chain if current one just ended
-c
-         if (endchain) then
-            newchain = .true.
-         else
-            newchain = .false.
-         end if
       end do
 c
-c     connect the terminal residues of a cyclic polypeptide
+c     connect the terminal residues if the chain is cyclic
 c
-      header = .true.
-      do i = 1, nchain
-         j = ichain(1,i)
-         k = icyclic(j)
-         if (k .ne. 0) then
-            call addbond (ni(j),ci(k))
-            if (verbose) then
-               if (header) then
-                  header = .false.
-                  write (iout,30)
-   30             format ()
-               end if
-               write (iout,40)  j,k
-   40          format (' Peptide Cyclization between Residues :  ',2i5)
-            end if
+      if (cyclic) then
+         call addbond (ni(jres),ci(kres))
+         if (verbose) then
+            write (iout,20)  jres,kres
+   20       format (/,' Peptide Cyclization between Residues :  ',2i5)
          end if
-      end do
+      end if
 c
 c     connect the sulfur atoms involved in disulfide bonds
 c
-      header = .true.
       do i = 1, ndisulf
-         call addbond (icys(idisulf(1,i)),icys(idisulf(2,i)))
-         if (verbose) then
-            if (header) then
-               header = .false.
-               write (iout,50)
-   50          format ()
+         j = idisulf(1,i)
+         k = idisulf(2,i)
+         if (k.ge.ichain(1,ichn) .and. k.le.ichain(2,ichn)) then
+            call addbond (si(j),si(k))
+            if (verbose) then
+               write (iout,30)  j,k
+   30          format (/,' Disulfide Bond between Residues :  ',2i5)
             end if
-            write (iout,60)  idisulf(1,i),idisulf(2,i)
-   60       format (' Disulfide Bond between Residues :  ',2i5)
          end if
       end do
 c
@@ -871,7 +610,7 @@ c     note biotypes of CD and HD atoms for N-terminal proline are
 c     set as absolute values, not relative to the CB atom
 c
 c
-      subroutine addside (resname,ires,start,stop,cai,ni,ci,cystype)
+      subroutine addside (resname,ires,start,stop,cai,ni,ci,si)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -879,13 +618,13 @@ c
       include 'sequen.i'
       integer i,k,ires
       integer start,stop
-      integer cai,ni,ci
-      integer cystype
+      integer cai,ni,ci,si
       character*3 resname
 c
 c
-c     set the CB atom as reference site
+c     zero out disulfide and set CB atom as reference site
 c
+      si = 0
       k = cbtyp(seqtyp(ires))
 c
 c     glycine residue  (GLY)
@@ -1048,7 +787,7 @@ c
          call findatm (' CB ',start,stop,i)
          call oldatm (i,k,cai,ires)
          call findatm (' SG ',start,stop,i)
-         cystype = n
+         si = n
          call oldatm (i,k+2,n-1,ires)
          call findatm (' HB2',start,stop,i)
          call newatm (i,k+1,n-2,1.10d0,cai,109.5d0,n-1,107.5d0,1)
@@ -1683,7 +1422,7 @@ c     "ligase" translates a nucleic acid structure in Protein Data
 c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
-      subroutine ligase
+      subroutine ligase (ichn)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -1693,36 +1432,26 @@ c
       include 'resdue.i'
       include 'sequen.i'
       integer i,j,k
-      integer ityp,nres
+      integer ichn,ityp
+      integer jres,kres
       integer start,stop
       integer poi,o5i,c5i
       integer c4i,o4i,c1i
       integer c3i,c2i,o3i,o2i
-      integer resatm(2,maxres)
       logical newchain,endchain
       logical deoxy(maxres)
       character*3 resname
 c
 c
-c     set a pointer to the first and last atom of each residue
+c     set the next atom and the residue range of the chain
 c
-      nres = 0
-      k = 0
-      do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
-            if (resnum(i) .ne. k) then
-               k = resnum(i)
-               if (nres .ne. 0)  resatm(2,nres) = i - 1
-               nres = nres + 1
-               resatm(1,nres) = i
-            end if
-         end if
-      end do
-      if (nres .ne. 0)  resatm(2,nres) = npdb
+      n = n + 1
+      jres = ichain(1,ichn)
+      kres = ichain(2,ichn)
 c
 c     check for deoxyribose and change residue name if necessary
 c
-      do i = 1, nres
+      do i = jres, kres
          deoxy(i) = .false.
          start = resatm(1,i)
          stop = resatm(2,i)
@@ -1740,31 +1469,9 @@ c
          end if
       end do
 c
-c     get the three-letter sequence and code for each residue
-c
-      nseq = nres
-      do i = 1, nres
-         start = resatm(1,i)
-         resname = resnam(start)
-         seq(i) = 'UNK'
-         seqtyp(i) = maxnuc
-         do k = 1, maxnuc
-            if (resname .eq. nuclz(k)) then
-               seq(i) = nuclz(k)
-               seqtyp(i) = k
-               goto 10
-            end if
-         end do
-   10    continue
-      end do
-c
-c     set the current atom to be the first atom
-c
-      n = 1
-c
 c     locate and assign the atoms that make up each residue
 c
-      do i = 1, nres
+      do i = jres, kres
          ityp = seqtyp(i)
          start = resatm(1,i)
          stop = resatm(2,i)
@@ -1773,8 +1480,8 @@ c
 c     check that the maximum allowed atoms is not exceeded
 c
          if (n+25 .gt. maxatm) then
-            write (iout,20)  maxatm
-   20       format (/,' LIGASE  --  The Maximum of',i8,' Atoms',
+            write (iout,10)  maxatm
+   10       format (/,' LIGASE  --  The Maximum of',i8,' Atoms',
      &                 ' has been Exceeded')
             call fatal
          end if
@@ -2264,5 +1971,176 @@ c
          end if
       end do
       n = n - 1
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine oldatm  --  transfer coordinates from PDB  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "oldatm" get the Cartesian coordinates for an atom from
+c     the Protein Data Bank file, then assigns the atom type
+c     and atomic connectivities
+c
+c
+      subroutine oldatm (i,bionum,i1,ires)
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'fields.i'
+      include 'iounit.i'
+      include 'katoms.i'
+      include 'sequen.i'
+      include 'pdb.i'
+      integer i,bionum
+      integer i1,ires
+c
+c
+c     get coordinates, assign atom type, and update connectivities
+c
+      if (bionum .ne. 0) then
+         if (i .ne. 0) then
+            type(n) = biotyp(bionum)
+            if (type(n) .gt. 0) then
+               name(n) = symbol(type(n))
+            else
+               type(n) = 0
+               name(n) = '   '
+            end if
+            x(n) = xpdb(i)
+            y(n) = ypdb(i)
+            z(n) = zpdb(i)
+            if (i1 .ne. 0)  call addbond (n,i1)
+            n = n + 1
+         else
+            write (iout,10)  bionum,ires,seq(ires)
+   10       format (/,' OLDATM  --  A PDB Atom of Biotype',i5,
+     &                 ' is Missing in Residue',i5,'-',a3)
+            call fatal
+         end if
+      end if
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine newatm  --  create and define a new atom  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "newatm" creates and defines an atom needed for the
+c     Cartesian coordinates file, but which may not present
+c     in the original Protein Data Bank file
+c
+c
+      subroutine newatm (i,bionum,ia,bond,ib,angle1,ic,angle2,chiral)
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'fields.i'
+      include 'katoms.i'
+      include 'pdb.i'
+      integer i,bionum
+      integer ia,ib,ic
+      integer chiral
+      real*8 bond
+      real*8 angle1
+      real*8 angle2
+c
+c
+c     set the atom type, compute coordinates, assign
+c     connectivities and increment the atom counter
+c
+      if (bionum .ne. 0) then
+         type(n) = biotyp(bionum)
+         if (type(n) .gt. 0) then
+            name(n) = symbol(type(n))
+         else
+            type(n) = 0
+            name(n) = '   '
+         end if
+         if (i .eq. 0) then
+            call xyzatm (n,ia,bond,ib,angle1,ic,angle2,chiral)
+         else
+            x(n) = xpdb(i)
+            y(n) = ypdb(i)
+            z(n) = zpdb(i)
+         end if
+         call addbond (n,ia)
+         n = n + 1
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine addbond  --  add a bond between two atoms  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "addbond" adds entries to the attached atoms list in
+c     order to generate a direct connection between two atoms
+c
+c
+      subroutine addbond (i,j)
+      implicit none
+      include 'sizes.i'
+      include 'couple.i'
+      integer i,j
+c
+c
+c     add connectivity between the two atoms
+c
+      if (i.ne.0 .and. j.ne.0) then
+         n12(i) = n12(i) + 1
+         i12(n12(i),i) = j
+         n12(j) = n12(j) + 1
+         i12(n12(j),j) = i
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine findatm  --  locate PDB atom in a residue  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "findatm" locates a specific PDB atom name type within a
+c     range of atoms from the PDB file, returns zero if the name
+c     type was not found
+c
+c
+      subroutine findatm (name,start,stop,ipdb)
+      implicit none
+      include 'sizes.i'
+      include 'pdb.i'
+      integer i,ipdb
+      integer start,stop
+      character*4 name
+c
+c
+c     search for the specified atom within the residue
+c
+      ipdb = 0
+      do i = start, stop
+         if (atmnam(i) .eq. name) then
+            ipdb = i
+            goto 10
+         end if
+      end do
+   10 continue
       return
       end

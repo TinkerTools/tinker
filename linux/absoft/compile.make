@@ -236,7 +236,6 @@ f77 -c -O lattice.f
 f77 -c -O lbfgs.f
 f77 -c -O lights.f
 f77 -c -O makeint.f
-f77 -c -O makepdb.f
 f77 -c -O makeref.f
 f77 -c -O makexyz.f
 f77 -c -O maxwell.f

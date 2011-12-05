@@ -236,7 +236,6 @@ LF95 -c -o1 -tpp -nstchk -ntrace lattice.f
 LF95 -c -o1 -tpp -nstchk -ntrace lbfgs.f
 LF95 -c -o1 -tpp -nstchk -ntrace lights.f
 LF95 -c -o1 -tpp -nstchk -ntrace makeint.f
-LF95 -c -o1 -tpp -nstchk -ntrace makepdb.f
 LF95 -c -o1 -tpp -nstchk -ntrace makeref.f
 LF95 -c -o1 -tpp -nstchk -ntrace makexyz.f
 LF95 -c -o1 -tpp -nstchk -ntrace maxwell.f

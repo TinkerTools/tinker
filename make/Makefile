@@ -397,7 +397,6 @@ OBJS = active.o \
        lbfgs.o \
        lights.o \
        makeint.o \
-       makepdb.o \
        makeref.o \
        makexyz.o \
        maxwell.o \
@@ -1003,7 +1002,6 @@ libtinker.a: ${OBJS}
         lbfgs.o \
         lights.o \
         makeint.o \
-        makepdb.o \
         makeref.o \
         makexyz.o \
         maxwell.o \
@@ -1320,7 +1318,6 @@ lattice.o: boxes.i cell.i inform.i iounit.i math.i sizes.i
 lbfgs.o: inform.i iounit.i keys.i linmin.i math.i minima.i output.i scales.i sizes.i
 lights.o: bound.i boxes.i cell.i iounit.i light.i sizes.i
 makeint.o: atoms.i couple.i inform.i iounit.i math.i sizes.i zclose.i zcoord.i
-makepdb.o: atmtyp.i atoms.i couple.i fields.i files.i molcul.i pdb.i resdue.i sequen.i sizes.i
 makeref.o: atmtyp.i atoms.i couple.i files.i refer.i sizes.i titles.i
 makexyz.o: atoms.i sizes.i zcoord.i
 maxwell.o: units.i
@@ -1416,7 +1413,7 @@ spacefill.o: atmtyp.i atoms.i files.i inform.i iounit.i kvdws.i math.i sizes.i u
 spectrum.o: files.i iounit.i math.i units.i
 square.o: inform.i iounit.i keys.i minima.i sizes.i
 suffix.o: ascii.i
-superpose.o: align.i atmtyp.i atoms.i files.i inform.i iounit.i sizes.i titles.i
+superpose.o: align.i atmtyp.i atoms.i bound.i files.i inform.i iounit.i sizes.i titles.i
 surface.o: atoms.i inform.i iounit.i math.i sizes.i usage.i
 surfatom.o: atoms.i iounit.i math.i sizes.i
 switch.o: cutoff.i npolar.i shunt.i sizes.i
@@ -1447,6 +1444,6 @@ xtalmin.o: atoms.i boxes.i files.i inform.i iounit.i keys.i math.i scales.i size
 xyzatm.o: atoms.i inform.i iounit.i math.i sizes.i
 xyzedit.o: atmtyp.i atoms.i bound.i couple.i cutoff.i files.i iounit.i math.i molcul.i refer.i sizes.i titles.i units.i usage.i
 xyzint.o: files.i iounit.i titles.i
-xyzpdb.o: files.i inform.i
+xyzpdb.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i molcul.i pdb.i resdue.i sequen.i sizes.i
 xyzsybyl.o: files.i iounit.i sizes.i titles.i
 zatom.o: atmtyp.i atoms.i fields.i iounit.i katoms.i sizes.i zclose.i zcoord.i

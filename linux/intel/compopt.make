@@ -235,7 +235,6 @@ ifort -c -fast lattice.f
 ifort -c -fast lbfgs.f
 ifort -c -fast lights.f
 ifort -c -fast makeint.f
-ifort -c -fast makepdb.f
 ifort -c -fast makeref.f
 ifort -c -fast makexyz.f
 ifort -c -fast maxwell.f
