@@ -339,7 +339,7 @@ c
       include 'iounit.i'
       include 'pdb.i'
       include 'sequen.i'
-      integer i,ipdb
+      integer i,k,ipdb
       integer next,nxtlast
       integer length,dummy
       integer nalt,nins
@@ -462,13 +462,27 @@ c
          call upcase (chntemp)
          next = 1
          call gettext (chntemp,text,next)
-         if (text.eq.blank .or. text.eq.'ALL ') then
+         if (text.eq.blank .or. text(1:3).eq.'ALL') then
             chnsym = chnsym(1:nchain)
          else
-            nchain = 1
-            chnsym = chntemp(1:1)
+            do i = 1, nchain
+               chain = chnsym(i:i)
+               k = index(chntemp,chain)
+               if (k .eq. 0)  chnsym(i:i) = '#'
+            end do
+            chntemp = chnsym
+            k = 0
+            do i = 1, nchain
+               chain = chntemp(i:i)
+               if (chain .ne. '#') then
+                  k = k + 1
+                  chnsym(k:k) = chain
+               end if
+            end do
+            nchain = k
          end if
       end if
+      chnsym = chnsym(1:nchain)//blank(nchain+1:20)
 c
 c     find out which of the alternate locations will be used
 c
