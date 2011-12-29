@@ -111,6 +111,7 @@ c
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy and first derivatives
@@ -131,7 +132,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     switch from exponential to R^12 at very short range
 c
@@ -575,6 +577,7 @@ c
       real*8 zsort(maxlight)
       logical proceed,usei
       logical prime,repeat
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy and first derivatives
@@ -595,7 +598,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     switch from exponential to R^12 at very short range
 c
@@ -905,6 +909,7 @@ c
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy and first derivatives
@@ -925,7 +930,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     switch from exponential to R^12 at very short range
 c

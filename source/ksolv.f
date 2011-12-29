@@ -814,7 +814,7 @@ c
          string = record(next:120)
          if (keyword(1:4) .eq. 'GKC ') then
             read (string,*,err=10,end=10)  gkc
-         else if (keyword(1:9) .eq. 'GK-RADII ') then
+         else if (keyword(1:10) .eq. 'GK-RADIUS ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:3) .eq. 'VDW') then
@@ -1229,7 +1229,7 @@ c
             if (nx .ge. 33)  dime(1) = nx
             if (ny .ge. 33)  dime(2) = ny
             if (nz .ge. 33)  dime(3) = nz
-         else if (keyword(1:9) .eq. 'PB-RADII ') then
+         else if (keyword(1:10) .eq. 'PB-RADIUS ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:3) .eq. 'VDW') then
@@ -1376,7 +1376,7 @@ c
                   dime(j) = 32*(1+(dime(j)-1)/32) + 1
                end if
             end do
-         else if (keyword(1:5) .eq. 'GRID ') then
+         else if (keyword(1:6) .eq. 'AGRID ') then
             read (string,*,err=100,end=100)  gx,gy,gz
             grid(1) = gx
             grid(2) = gy

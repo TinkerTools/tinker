@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine promo  --  copywrite notice and version info  ##
+c     ##  subroutine promo  --  version info and copywrite notice  ##
 c     ##                                                           ##
 c     ###############################################################
 c

@@ -228,6 +228,7 @@ tinker
 +nblist.obj &
 +nextarg.obj &
 +nexttext.obj &
++nose.obj &
 +nspline.obj &
 +number.obj &
 +numeral.obj &

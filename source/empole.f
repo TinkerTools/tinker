@@ -105,6 +105,7 @@ c
       real*8 mscale(maxatm)
       real*8 pscale(maxatm)
       logical proceed,usei,usek
+      character*6 mode
 c
 c
 c     zero out the multipole and polarization energies
@@ -135,7 +136,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     calculate the multipole interaction energy term
 c
@@ -612,6 +614,7 @@ c
       real*8 mscale(maxatm)
       real*8 pscale(maxatm)
       logical proceed,usei,usek
+      character*6 mode
 c
 c
 c     zero out the multipole and polarization energies
@@ -642,7 +645,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1038,6 +1042,7 @@ c
       real*8 bn(0:4)
       real*8 mscale(maxatm)
       real*8 pscale(maxatm)
+      character*6 mode
       external erfc
 c
 c
@@ -1052,7 +1057,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1649,6 +1655,7 @@ c
       real*8 bn(0:4)
       real*8 mscale(maxatm)
       real*8 pscale(maxatm)
+      character*6 mode
       external erfc
 c
 c
@@ -1663,7 +1670,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     compute the real space portion of the Ewald summation
 c

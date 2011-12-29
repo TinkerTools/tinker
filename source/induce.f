@@ -230,6 +230,7 @@ c
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
       logical proceed,done
+      character*6 mode
 c
 c
 c     zero out the induced dipole and the field at each site
@@ -246,7 +247,8 @@ c
 c
 c     set the switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     compute the direct induced dipole moment at each atom
 c
@@ -852,6 +854,7 @@ c
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
       logical proceed,done
+      character*6 mode
 c
 c
 c     zero out the induced dipole and the field at each site
@@ -868,7 +871,8 @@ c
 c
 c     set the switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     compute the direct induced dipole moment at each atom
 c
@@ -1855,13 +1859,15 @@ c
       real*8 fieldp(3,maxatm)
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
+      character*6 mode
       external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
 c
       if (npole .eq. 0)  return
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2333,13 +2339,15 @@ c
       real*8 fieldp(3,maxatm)
       real*8 fieldt(3,maxatm)
       real*8 fieldtp(3,maxatm)
+      character*6 mode
       external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
 c
       if (npole .eq. 0)  return
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2756,13 +2764,15 @@ c
       real*8 field(3,maxatm)
       real*8 fieldp(3,maxatm)
       real*8 dscale(maxatm)
+      character*6 mode
       external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
 c
       if (npole .eq. 0)  return
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     set array needed to scale connected atom interactions
 c
@@ -3092,13 +3102,15 @@ c
       real*8 fieldp(3,maxatm)
       real*8 fieldt(3,maxatm)
       real*8 fieldtp(3,maxatm)
+      character*6 mode
       external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
 c
       if (npole .eq. 0)  return
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     set array needed to scale connected atom interactions
 c
@@ -3363,6 +3375,7 @@ c
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
       logical proceed,done
+      character*6 mode
 c
 c
 c     zero out the induced dipoles and the fields at each site;
@@ -3390,7 +3403,8 @@ c
 c
 c     set the switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -4099,6 +4113,7 @@ c
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
       logical proceed,done
+      character*6 mode
 c
 c
 c     zero out the induced dipoles and the fields at each site;
@@ -4119,7 +4134,8 @@ c
 c
 c     set the switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     set arrays needed to scale connected atom interactions
 c

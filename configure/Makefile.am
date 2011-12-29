@@ -220,7 +220,6 @@ libtinker_la_SOURCES = \
 	lbfgs.f \
 	lights.f \
 	makeint.f \
-	makepdb.f \
 	makeref.f \
 	makexyz.f \
 	maxwell.f \
@@ -236,6 +235,7 @@ libtinker_la_SOURCES = \
 	nblist.f \
 	nextarg.f \
 	nexttext.f \
+	nose.f \
 	nspline.f \
 	number.f \
 	numeral.f \

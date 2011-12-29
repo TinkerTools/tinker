@@ -256,6 +256,7 @@ g95 -c -O2 newton.f
 g95 -c -O2 newtrot.f
 g95 -c -O2 nextarg.f
 g95 -c -O2 nexttext.f
+g95 -c -O2 nose.f
 g95 -c -O2 nspline.f
 g95 -c -O2 nucleic.f
 g95 -c -O2 number.f

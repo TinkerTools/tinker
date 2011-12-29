@@ -90,13 +90,15 @@ c
       real*8 d2taperxx,d2taperyy,d2taperzz
       real*8 d2taperxy,d2taperxz,d2taperyz
       logical proceed
+      character*6 mode
 c
 c
 c     set conversion factor and switching function coefficients
 c
       if (ndipole .eq. 0)  return
       f = electric / (debye**2 * dielec)
-      call switch ('DIPOLE')
+      mode = 'DIPOLE'
+      call switch (mode)
 c
 c     calculate the dipole interaction energy Hessian elements
 c

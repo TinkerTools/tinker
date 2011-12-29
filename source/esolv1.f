@@ -162,6 +162,7 @@ c
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       logical proceed,usei
+      character*6 mode
 c
 c
 c     set the solvent dielectric and energy conversion factor
@@ -172,7 +173,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -594,6 +596,7 @@ c
       real*8 gqxz(30),gqyy(30)
       real*8 gqyz(30),gqzz(30)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     set the bulk dielectric constant to the water value
@@ -606,7 +609,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     setup the multipoles for solvation only calculations
 c
@@ -2132,13 +2136,15 @@ c
       real*8 ttm1i(3,maxatm)
       real*8 trqi(3,maxatm)
       logical proceed,usei,usek
+      character*6 mode
 c
 c
 c     set conversion factor, cutoff and scaling coefficients
 c
       if (npole .eq. 0)  return
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -3172,6 +3178,7 @@ c
       real*8 aesurf(maxatm)
       real*8 dsurf(3,maxatm)
       real*8 dvol(3,maxatm)
+      character*6 mode
 c
 c
 c     zero out the nonpolar solvation energy and first derivatives
@@ -3216,7 +3223,8 @@ c
 c     find cavity energy from only a tapered volume term
 c
       else if (reff.gt.spcut .and. reff.le.stoff) then
-         call switch ('GKV')
+         mode = 'GKV'
+         call switch (mode)
          taperv = c5*reff5 + c4*reff4 + c3*reff3
      &               + c2*reff2 + c1*reff + c0
          dtaperv = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
@@ -3234,12 +3242,14 @@ c
 c     find cavity energy using both volume and SASA terms
 c
       else if (reff.gt.stoff .and. reff.le.spoff) then
-         call switch ('GKV')
+         mode = 'GKV'
+         call switch (mode)
          taperv = c5*reff5 + c4*reff4 + c3*reff3
      &               + c2*reff2 + c1*reff + c0
          dtaperv = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
      &                 +2.0d0*c2*reff+c1) * dreff
-         call switch ('GKSA')
+         mode = 'GKSA'
+         call switch (mode)
          tapersa = c5*reff5 + c4*reff4 + c3*reff3
      &                + c2*reff2 + c1*reff + c0
          tapersa = 1.0d0 - tapersa
@@ -3265,7 +3275,8 @@ c
 c     find cavity energy from only a tapered SASA term
 c
       else if (reff.gt.spoff .and. reff.le.stcut) then
-         call switch ('GKSA')
+         mode = 'GKSA'
+         call switch (mode)
          tapersa = c5*reff5 + c4*reff4 + c3*reff3
      &                + c2*reff2 + c1*reff + c0
          tapersa = 1.0d0 - tapersa

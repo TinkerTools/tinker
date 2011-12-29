@@ -256,6 +256,7 @@ pgf77 -c -g -Ktrap=fp newton.f
 pgf77 -c -g -Ktrap=fp newtrot.f
 pgf77 -c -g -Ktrap=fp nextarg.f
 pgf77 -c -g -Ktrap=fp nexttext.f
+pgf77 -c -g -Ktrap=fp nose.f
 pgf77 -c -g -Ktrap=fp nspline.f
 pgf77 -c -g -Ktrap=fp nucleic.f
 pgf77 -c -g -Ktrap=fp number.f

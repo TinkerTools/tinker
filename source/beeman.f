@@ -31,9 +31,9 @@ c
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
+      include 'freeze.i'
       include 'mdstuf.i'
       include 'moldyn.i'
-      include 'shake.i'
       include 'units.i'
       include 'usage.i'
       integer i,j,istep

@@ -12,17 +12,19 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     literature reference:
+c     literature references:
+c
+c     P. J. Mohr, B. N. Taylor and D.B. Newell, "The 2010 CODATA
+c     Recommended Values of the Fundamental Physical Constants",
+c     National Institute of Standards & Technology, Gaithersburg, MD
+c     (Web Version 6.0, developed jointly by J. Baker, M. Douma and
+c     S. Kotochigova, available at http://physics.nist.gov/constants)
 c
 c     P. J. Mohr, B. N. Taylor and D. B. Newell, "CODATA Recommended
 c     Values of the Fundamental Physical Constants: 2006", Reviews of
 c     Modern Physics, 80, 633-730 (2008)
 c
-c     The "2006 CODATA Recommended Values" are also available from
-c     the NIST Reference on Constants, Units, and Uncertainty site
-c     at http://physics.nist.gov/cuu/index.html
-c
-c     Most values below are derived from the 2006 CODATA reference
+c     Most values below are derived from 2010 CODATA reference values
 c
 c     The conversion from calorie to Joule is the definition of the
 c     thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
@@ -63,17 +65,17 @@ c
       real*8 hartree,evolt
       real*8 efreq,coulomb
       real*8 debye,prescon
-      parameter (avogadro=6.02214179d+23)
+      parameter (avogadro=6.02214129d+23)
       parameter (lightspd=2.99792458d-2)
-      parameter (boltzmann=0.83144725d0)
-      parameter (gasconst=1.9872066d-3)
-      parameter (emass=5.4857990943d-4)
+      parameter (boltzmann=0.831446215d0)
+      parameter (gasconst=1.98720415d-3)
+      parameter (emass=5.485799095d-4)
       parameter (joule=4.1840d0)
       parameter (convert=4.1840d+2)
-      parameter (bohr=0.52917720859d0)
-      parameter (hartree=627.5094688d0)
-      parameter (evolt=27.21138386d0)
-      parameter (efreq=2.194746313705d+5)
-      parameter (coulomb=332.063709d0)
+      parameter (bohr=0.52917721092d0)
+      parameter (hartree=627.5094743d0)
+      parameter (evolt=27.21138503d0)
+      parameter (efreq=2.194746313708d+5)
+      parameter (coulomb=332.063714d0)
       parameter (debye=4.80321d0)
       parameter (prescon=6.85684112d+4)

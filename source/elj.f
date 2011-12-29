@@ -89,6 +89,7 @@ c
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy contribution
@@ -104,7 +105,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -379,6 +381,7 @@ c
       real*8 zsort(maxlight)
       logical proceed,usei
       logical prime,repeat
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy contribution
@@ -394,7 +397,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -610,6 +614,7 @@ c
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy contribution
@@ -625,7 +630,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     apply any reduction factor to the atomic coordinates
 c

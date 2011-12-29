@@ -2020,8 +2020,8 @@ c
       include 'potfit.i'
       include 'refer.i'
       include 'titles.i'
-      integer i,j,k,ipot
-      integer nmax,npoint
+      integer i,j,k
+      integer ipot,npoint
       integer freeunit
       integer trimtext
       integer natm(maxatm)

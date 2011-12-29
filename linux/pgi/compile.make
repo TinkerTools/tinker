@@ -256,6 +256,7 @@ pgf77 -c -fast newton.f
 pgf77 -c -fast newtrot.f
 pgf77 -c -fast nextarg.f
 pgf77 -c -fast nexttext.f
+pgf77 -c -fast nose.f
 pgf77 -c -fast nspline.f
 pgf77 -c -fast nucleic.f
 pgf77 -c -fast number.f

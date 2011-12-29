@@ -256,6 +256,7 @@ f77 -c -fast -arch generic -tune generic newton.f
 f77 -c -fast -arch generic -tune generic newtrot.f
 f77 -c -fast -arch generic -tune generic nextarg.f
 f77 -c -fast -arch generic -tune generic nexttext.f
+f77 -c -fast -arch generic -tune generic nose.f
 f77 -c -fast -arch generic -tune generic nspline.f
 f77 -c -fast -arch generic -tune generic nucleic.f
 f77 -c -fast -arch generic -tune generic number.f

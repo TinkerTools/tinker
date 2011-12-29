@@ -209,7 +209,7 @@ c
       kelvin = hot
       tautemp = loose
 c
-c     initialize any rattle constraints and setup dynamics
+c     initialize any holonomic constraints and setup dynamics
 c
       call shakeup
       call mdinit
@@ -233,6 +233,8 @@ c
             call sdstep (istep,dt)
          else if (integrate .eq. 'BUSSI') then
             call bussi (istep,dt)
+         else if (integrate .eq. 'NOSE-HOOVER') then
+            call nose (istep,dt)
          else if (integrate .eq. 'GHMC') then
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
@@ -283,6 +285,8 @@ c
             call sdstep (istep,dt)
          else if (integrate .eq. 'BUSSI') then
             call bussi (istep,dt)
+         else if (integrate .eq. 'NOSE-HOOVER') then
+            call nose (istep,dt)
          else if (integrate .eq. 'GHMC') then
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then

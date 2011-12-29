@@ -256,6 +256,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp newton.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp newtrot.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp nextarg.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp nexttext.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp nose.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp nspline.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp nucleic.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp number.f

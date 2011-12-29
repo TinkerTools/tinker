@@ -1566,7 +1566,6 @@ c
       include 'params.i'
       integer i,j,n,iprm
       integer size,next
-      integer trimtext
       integer ia,ib,ic,id
       integer key(maxprm)
       integer line(maxprm)

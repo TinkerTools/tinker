@@ -238,6 +238,7 @@ mutate.o \
 nblist.o \
 nextarg.o \
 nexttext.o \
+nose.o \
 nspline.o \
 number.o \
 numeral.o \

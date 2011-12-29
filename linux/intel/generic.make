@@ -256,6 +256,7 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp newton.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp newtrot.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp nextarg.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp nexttext.f
+ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp nose.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp nspline.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp nucleic.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp number.f
@@ -310,7 +311,6 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp readprm.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp readseq.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp readxyz.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp replica.f
-ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp respa.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp respa.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp rgdstep.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp rings.f

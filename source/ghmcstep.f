@@ -36,10 +36,10 @@ c
       include 'atoms.i'
       include 'atmtyp.i'
       include 'bath.i'
+      include 'freeze.i'
       include 'iounit.i'
       include 'mdstuf.i'
       include 'moldyn.i'
-      include 'shake.i'
       include 'units.i'
       include 'usage.i'
       include 'virial.i'
@@ -49,8 +49,8 @@ c
       real*8 epot,etot
       real*8 epold,etold
       real*8 eksum,de
-      real*8 temp,pres,ratio
-      real*8 random,term
+      real*8 temp,pres
+      real*8 random,ratio
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 xold(maxatm)

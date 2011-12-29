@@ -137,8 +137,8 @@ c
 c     get the kinetic energy for Bussi-Parrinello barostat
 c
       if (isobaric .and. barostat.eq.'BUSSI') then
-         term = dble(nfree) * boltzmann * kelvin * taupres * taupres
-         value = 0.5d0 * term * eta * eta / convert
+         term = dble(nfree) * gasconst * kelvin * taupres * taupres
+         value = 0.5d0 * term * eta * eta
          do j = 1, 3
             ekin(j,j) = ekin(j,j) + value/3.0d0
          end do

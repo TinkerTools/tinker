@@ -256,6 +256,7 @@ f77 -c -fast -temp=. newton.f
 f77 -c -fast -temp=. newtrot.f
 f77 -c -fast -temp=. nextarg.f
 f77 -c -fast -temp=. nexttext.f
+f77 -c -fast -temp=. nose.f
 f77 -c -fast -temp=. nspline.f
 f77 -c -fast -temp=. nucleic.f
 f77 -c -fast -temp=. number.f

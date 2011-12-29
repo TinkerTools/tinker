@@ -46,6 +46,7 @@ c
       real*8 rpk(13)
       logical usei,usek
       logical header,huge
+      character*6 mode
 c
 c
 c     zero out the reaction field energy and partitioning
@@ -59,7 +60,8 @@ c
 c
 c     set the switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     check the sign of multipole components at chiral sites
 c

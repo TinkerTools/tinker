@@ -257,6 +257,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace newton.f
 LF95 -c -o1 -tpp -nstchk -ntrace newtrot.f
 LF95 -c -o1 -tpp -nstchk -ntrace nextarg.f
 LF95 -c -o1 -tpp -nstchk -ntrace nexttext.f
+LF95 -c -o1 -tpp -nstchk -ntrace nose.f
 LF95 -c -o1 -tpp -nstchk -ntrace nspline.f
 LF95 -c -o1 -tpp -nstchk -ntrace nucleic.f
 LF95 -c -o1 -tpp -nstchk -ntrace number.f

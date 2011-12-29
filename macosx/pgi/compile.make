@@ -256,6 +256,7 @@ pgf95 -c -fast -mp newton.f
 pgf95 -c -fast -mp newtrot.f
 pgf95 -c -fast -mp nextarg.f
 pgf95 -c -fast -mp nexttext.f
+pgf95 -c -fast -mp nose.f
 pgf95 -c -fast -mp nspline.f
 pgf95 -c -fast -mp nucleic.f
 pgf95 -c -fast -mp number.f

@@ -39,6 +39,7 @@ c
       real*8 rpi(13)
       real*8 rpk(13)
       logical usei,usek
+      character*6 mode
 c
 c
 c     zero out the macroscopic reaction field energy
@@ -47,7 +48,8 @@ c
 c
 c     set the switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     check the sign of multipole components at chiral sites
 c

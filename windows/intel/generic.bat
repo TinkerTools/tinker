@@ -257,6 +257,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp newton.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp newtrot.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nextarg.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nexttext.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nose.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nspline.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp nucleic.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp number.f

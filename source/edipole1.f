@@ -60,6 +60,7 @@ c
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the overall dipole interaction energy and derivs,
@@ -76,7 +77,8 @@ c
 c     set conversion factor and switching function coefficients
 c
       f = electric / (debye**2 * dielec)
-      call switch ('DIPOLE')
+      mode = 'DIPOLE'
+      call switch (mode)
 c
 c     compute the dipole interaction energy and first derivatives
 c

@@ -49,6 +49,7 @@ c
       real*8 r,r2,r3,r4,r5
       logical proceed
       logical header,huge
+      character*6 mode
 c
 c
 c     zero out the overall dipole interaction energy contribution
@@ -65,7 +66,8 @@ c
 c     set conversion factor and switching function coefficients
 c
       f = electric / (debye**2 * dielec)
-      call switch ('DIPOLE')
+      mode = 'DIPOLE'
+      call switch (mode)
 c
 c     compute and partition the dipole interaction energy
 c

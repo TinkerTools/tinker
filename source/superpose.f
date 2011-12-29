@@ -50,7 +50,7 @@ c
       logical header,exist
       logical query,skip
       logical dopbc,dowrite
-      logical self,same
+      logical self,same,twin
       character*1 answer
       character*3 name1(maxatm)
       character*3 name2(maxatm)
@@ -390,17 +390,35 @@ c
   260    format (/,' Summary of Results from Structural',
      &              ' Superposition :')
          if (dopbc) then
+            twin = .true.
             do i = 1, nfit
                i1 = ifit(1,i)
                i2 = ifit(2,i)
-               xr = x2(i2) - x1(i1)
-               yr = y2(i2) - y1(i1)
-               zr = z2(i2) - z1(i1)
-               call image (xr,yr,zr)
-               x2(i2) = x1(i1) + xr
-               y2(i2) = y1(i1) + yr
-               z2(i2) = z1(i1) + zr
+               if (i1 .ne. i2)  twin = .false.
             end do
+            if (twin) then
+               do i = 1, n
+                  xr = x2(i) - x1(i)
+                  yr = y2(i) - y1(i)
+                  zr = z2(i) - z1(i)
+                  call image (xr,yr,zr)
+                  x2(i) = x1(i) + xr
+                  y2(i) = y1(i) + yr
+                  z2(i) = z1(i) + zr
+               end do
+            else
+               do i = 1, nfit
+                  i1 = ifit(1,i)
+                  i2 = ifit(2,i)
+                  xr = x2(i2) - x1(i1)
+                  yr = y2(i2) - y1(i1)
+                  zr = z2(i2) - z1(i1)
+                  call image (xr,yr,zr)
+                  x2(i2) = x1(i1) + xr
+                  y2(i2) = y1(i1) + yr
+                  z2(i2) = z1(i1) + zr
+               end do
+            end if
          end if
          verbose = .true.
          call impose (n1,x1,y1,z1,n2,x2,y2,z2,rmsvalue)

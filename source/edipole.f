@@ -40,6 +40,7 @@ c
       real*8 doti,dotk,dotp
       real*8 r,r2,r3,r4,r5
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the overall dipole interaction energy
@@ -51,7 +52,8 @@ c
 c     set conversion factor and switching function coefficients
 c
       f = electric / (debye**2 * dielec)
-      call switch ('DIPOLE')
+      mode = 'DIPOLE'
+      call switch (mode)
 c
 c     calculate the pairwise dipole interaction energy term
 c

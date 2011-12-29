@@ -77,6 +77,7 @@ c
       real*8 d2taperzz,d2taperxy
       real*8 d2taperxz,d2taperyz
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the lists of atoms to be skipped
@@ -90,7 +91,8 @@ c
 c     set conversion factor and switching function coefficients
 c
       f = -electric / (debye * dielec)
-      call switch ('CHGDPL')
+      mode = 'CHGDPL'
+      call switch (mode)
 c
 c     first see if the atom of interest carries a charge
 c

@@ -137,6 +137,7 @@ c
       real*8 r5,r6,r7
       real*8 shift,taper,trans
       logical proceed,usei
+      character*6 mode
 c
 c
 c     set the solvent dielectric and energy conversion factor
@@ -147,7 +148,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -397,6 +399,7 @@ c
       real*8 gqxz(10),gqyy(10)
       real*8 gqyz(10),gqzz(10)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     set the bulk dielectric constant to the water value
@@ -409,7 +412,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     setup the multipoles for solvation only calculations
 c
@@ -815,13 +819,15 @@ c
       real*8 gli(3)
       real*8 pscale(maxatm)
       logical proceed,usei,usek
+      character*6 mode
 c
 c
 c     set conversion factor, cutoff and scaling coefficients
 c
       if (npole .eq. 0)  return
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1132,6 +1138,7 @@ c
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8 aesurf(maxatm)
+      character*6 mode
 c
 c
 c     zero out the nonpolar implicit solvation energy terms
@@ -1164,7 +1171,8 @@ c
 c     find cavity energy from only a tapered volume term
 c
       else if (reff.gt.spcut .and. reff.le.stoff) then
-         call switch ('GKV')
+         mode = 'GKV'
+         call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
          ecav = taper * evol
@@ -1172,11 +1180,13 @@ c
 c     find cavity energy using both volume and SASA terms
 c
       else if (reff.gt.stoff .and. reff.le.spoff) then
-         call switch ('GKV')
+         mode = 'GKV'
+         call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
          ecav = taper * evol
-         call switch ('GKSA')
+         mode = 'GKSA'
+         call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
          taper = 1.0d0 - taper
@@ -1185,7 +1195,8 @@ c
 c     find cavity energy from only a tapered SASA term
 c
       else if (reff.gt.spoff .and. reff.le.stcut) then
-         call switch ('GKSA')
+         mode = 'GKSA'
+         call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
          taper = 1.0d0 - taper

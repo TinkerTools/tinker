@@ -256,6 +256,7 @@ fort77 -c -O2 +E1 newton.f
 fort77 -c -O2 +E1 newtrot.f
 fort77 -c -O2 +E1 nextarg.f
 fort77 -c -O2 +E1 nexttext.f
+fort77 -c -O2 +E1 nose.f
 fort77 -c -O2 +E1 nspline.f
 fort77 -c -O2 +E1 nucleic.f
 fort77 -c -O2 +E1 number.f

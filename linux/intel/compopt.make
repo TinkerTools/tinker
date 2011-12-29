@@ -256,6 +256,7 @@ ifort -c -fast newton.f
 ifort -c -fast newtrot.f
 ifort -c -fast nextarg.f
 ifort -c -fast nexttext.f
+ifort -c -fast nose.f
 ifort -c -fast nspline.f
 ifort -c -fast nucleic.f
 ifort -c -fast number.f

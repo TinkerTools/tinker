@@ -210,10 +210,10 @@ c     store the original bond lengths and force constants
 c
       do i = 1, nbpi
          j = ibpi(1,i)
-         ia = ibpi(2,i)
-         ib = ibpi(3,i)
-         ita = class(iorbit(ia))
-         itb = class(iorbit(ib))
+         ia = iorbit(ibpi(2,i))
+         ib = iorbit(ibpi(3,i))
+         ita = class(ia)
+         itb = class(ib)
          size = 4
          call numeral (ita,pa,size)
          call numeral (itb,pb,size)

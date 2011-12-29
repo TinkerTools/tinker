@@ -256,6 +256,7 @@ gfortran -c -O newton.f
 gfortran -c -O newtrot.f
 gfortran -c -O nextarg.f
 gfortran -c -O nexttext.f
+gfortran -c -O nose.f
 gfortran -c -O nspline.f
 gfortran -c -O nucleic.f
 gfortran -c -O number.f

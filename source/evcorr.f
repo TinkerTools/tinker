@@ -44,6 +44,7 @@ c
       real*8 p,p6,p12
       real*8 rho,tau,tau7
       real*8 expterm
+      character*6 mode
 c
 c
 c     zero out the long range van der Waals correction
@@ -56,7 +57,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     set number of steps and range for numerical integration
 c
@@ -162,6 +164,7 @@ c
       real*8 rho,tau,tau7
       real*8 dtau,gtau
       real*8 rvterm,expterm
+      character*6 mode
 c
 c
 c     zero out the long range van der Waals corrections
@@ -175,7 +178,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     set number of steps and range for numerical integration
 c

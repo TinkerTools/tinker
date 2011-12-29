@@ -95,6 +95,7 @@ c
       real*8 zred(maxatm)
       real*8 vscale(maxatm)
       logical proceed
+      character*6 mode
 c
 c
 c     set arrays needed to scale connected atom interactions
@@ -106,7 +107,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
 c
 c     switch from exponential to R^12 at very short range
 c

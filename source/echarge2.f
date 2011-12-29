@@ -76,6 +76,7 @@ c
       real*8 term(3,3)
       real*8 cscale(maxatm)
       logical proceed
+      character*6 mode
 c
 c
 c     first see if the atom of interest carries a charge
@@ -116,7 +117,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     calculate the charge interaction energy Hessian elements
 c

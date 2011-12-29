@@ -61,16 +61,16 @@ c
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
             string = record(next:120)
             read (string,*,err=20)  vlambda
-         else if(keyword(1:11) .eq. 'CHG-LAMBDA ') then
+         else if (keyword(1:11) .eq. 'CHG-LAMBDA ') then
             string = record(next:120)
             read (string,*,err=20)  clambda
-         else if(keyword(1:11) .eq. 'DPL-LAMBDA ') then
+         else if (keyword(1:11) .eq. 'DPL-LAMBDA ') then
             string = record(next:120)
             read (string,*,err=20)  dlambda
-         else if(keyword(1:13) .eq. 'MPOLE-LAMBDA ') then
+         else if (keyword(1:13) .eq. 'MPOLE-LAMBDA ') then
             string = record(next:120)
             read (string,*,err=20)  mlambda
-         else if(keyword(1:13) .eq. 'POLAR-LAMBDA ') then
+         else if (keyword(1:13) .eq. 'POLAR-LAMBDA ') then
             string = record(next:120)
             read (string,*,err=20)  plambda
          else if (keyword(1:7) .eq. 'MUTATE ') then
@@ -83,7 +83,7 @@ c
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
             mut(ia) = .true.
-         else if(keyword(1:7) .eq. 'LIGAND ') then
+         else if (keyword(1:7) .eq. 'LIGAND ') then
             do i = 1, maxlist
                list(i) = 0
             end do

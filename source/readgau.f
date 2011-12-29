@@ -37,7 +37,6 @@ c
       real*8 frcunit,hessunit
       character*4 arcstart
       character*6 gname
-      character*120 keyword
       character*120 gaufile
       character*120 record
       character*120 string
@@ -97,16 +96,16 @@ c     do while (.true. .and. .not.eof(igau))
          read (igau,30,err=160,end=160)  record
    30    format (a120)
          next = 1
-         keyword = record
-         call trimhead (keyword)
-         length = trimtext (keyword)
-         call upcase (keyword)
-         if (waiter.and.keyword (1:12) .ne. 'JOB CPU TIME') then
+         string = record
+         call trimhead (string)
+         length = trimtext (string)
+         call upcase (string)
+         if (waiter .and. string(1:12).ne.'JOB CPU TIME') then
             goto 160
          else
             waiter = .false.
          end if
-         if (keyword(1:20) .eq. 'STANDARD ORIENTATION') then
+         if (string(1:20) .eq. 'STANDARD ORIENTATION') then
             do i = 1, 4
                read (igau,40,err=160,end=160)  record
    40          format (a120)
@@ -122,7 +121,7 @@ c     do while (.true. .and. .not.eof(igau))
             end do
    60       continue
             ngatom = i - 1
-         else if (keyword(37:58) .eq. 'FORCES (HARTREES/BOHR)') then
+         else if (string(37:58) .eq. 'FORCES (HARTREES/BOHR)') then
             read (igau,70,err=160,end=160)  record
    70       format (a120)
             read (igau,80,err=160,end=160)  record
@@ -138,17 +137,16 @@ c     do while (.true. .and. .not.eof(igau))
                end do
   100          continue
             end do
-         else if (keyword(1:14) .eq. 'FREQUENCIES --') then
-            string = keyword(15:120)
-            read (string,*,err=110,end=110)  gfreq(nfreq+1),
-     &                                       gfreq(nfreq+2),
-     &                                       gfreq(nfreq+3)
+         else if (string(1:14) .eq. 'FREQUENCIES --') then
+            read (string(15:120),*,err=110,end=110)  gfreq(nfreq+1),
+     &                                               gfreq(nfreq+2),
+     &                                               gfreq(nfreq+3)
   110       continue
             nfreq = nfreq + 3
 c
 c     read the Hessian from archive section at bottom of output
 c
-         else if (keyword(1:4) .eq. arcstart) then
+         else if (string(1:4) .eq. arcstart) then
             itmp = 0
 c           do while (.true. .and. .not.eof(igau))
             do while (.true.)

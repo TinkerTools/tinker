@@ -24,6 +24,7 @@ c
       include 'bath.i'
       include 'bound.i'
       include 'files.i'
+      include 'freeze.i'
       include 'group.i'
       include 'inform.i'
       include 'iounit.i'
@@ -34,7 +35,6 @@ c
       include 'mpole.i'
       include 'rgddyn.i'
       include 'rigid.i'
-      include 'shake.i'
       include 'stodyn.i'
       include 'units.i'
       include 'uprior.i'
@@ -42,7 +42,8 @@ c
       integer i,j,k,idyn
       integer size,next
       integer lext,freeunit
-      real*8 e,maxwell,speed
+      real*8 e,ekt,qterm
+      real*8 maxwell,speed
       real*8 vec(3)
       real*8, allocatable :: derivs(:,:)
       logical exist
@@ -82,6 +83,10 @@ c
       anisotrop = .false.
       taupres = 2.0d0
       compress = 0.000046d0
+      xbar = 0.0d0
+      vbar = 0.0d0
+      qbar = 0.0d0
+      gbar = 0.0d0
       eta = 0.0d0
       voltrial = 20
       volmove = 100.0d0
@@ -123,8 +128,6 @@ c
             read (string,*,err=10,end=10)  tautemp
          else if (keyword(1:10) .eq. 'COLLISION ') then
             read (string,*,err=10,end=10)  collide
-         else if (keyword(1:10) .eq. 'NOSE-MASS ') then
-            read (string,*,err=10,end=10)  (qnh(j),j=1,maxnose)
          else if (keyword(1:9) .eq. 'BAROSTAT ') then
             call getword (record,barostat,next)
             call upcase (barostat)
@@ -208,11 +211,21 @@ c
 c
 c     enforce use of Bussi thermostat/barostat with integrator
 c
-      if (thermostat.eq.'BUSSI' .and. barostat.eq.'BUSSI') then
-         integrate = 'BUSSI'
-      else if (integrate .eq. 'BUSSI') then
+      if (integrate .eq. 'BUSSI') then
          thermostat = 'BUSSI'
          barostat = 'BUSSI'
+      else if (thermostat.eq.'BUSSI' .and. barostat.eq.'BUSSI') then
+         integrate = 'BUSSI'
+      end if
+c
+c     enforce use of Nose-Hoover thermostat/barostat with integrator
+c
+      if (integrate .eq. 'NOSE-HOOVER') then
+         thermostat = 'NOSE-HOOVER'
+         barostat = 'NOSE-HOOVER'
+      else if (thermostat.eq.'NOSE-HOOVER' .and.
+     &         barostat.eq.'NOSE-HOOVER') then
+         integrate = 'NOSE-HOOVER'
       end if
 c
 c     check for use of Monte Carlo barostat with constraints
@@ -224,15 +237,6 @@ c
      &                 ' Barostat Incompatible with RATTLE')
             call fatal
          end if
-      end if
-c
-c     set masses for the thermostats in a Nose-Hoover chain
-c
-      if (thermostat .eq. 'NOSE-HOOVER') then
-         if (qnh(1) .eq. 0.0d0)  qnh(1) = 0.1d0
-         do j = 2, maxnose
-            if (qnh(j) .eq. 0.0d0)  qnh(j) = qnh(j-1)
-         end do
       end if
 c
 c     set the number of degrees of freedom for the system
@@ -277,6 +281,22 @@ c
          write (iout,60)
    60    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
          call fatal
+      end if
+c
+c     set masses for Nose-Hoover thermostat and barostat
+c
+      if (thermostat .eq. 'NOSE-HOOVER') then
+         ekt = gasconst * kelvin
+         qterm = ekt * tautemp * tautemp
+         do j = 1, maxnose
+            if (qnh(j) .eq. 0.0d0)  qnh(j) = qterm
+         end do
+         qnh(1) = dble(nfree) * qnh(1)
+      end if
+      if (barostat .eq. 'NOSE-HOOVER') then
+         ekt = gasconst * kelvin
+         qterm = ekt * taupres * taupres
+         qbar = dble(nfree+1) * qterm
       end if
 c
 c     decide whether to remove center of mass motion

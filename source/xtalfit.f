@@ -20,10 +20,10 @@ c
 c
       program xtalfit
       implicit none
-      include 'sizes.i'
       integer maxlsq,maxrsd
       parameter (maxlsq=50)
       parameter (maxrsd=100)
+      include 'sizes.i'
       include 'files.i'
       include 'iounit.i'
       include 'molcul.i'
@@ -323,11 +323,11 @@ c
 c
       subroutine xtalprm (mode,ixtal,xx)
       implicit none
-      include 'sizes.i'
       integer maxxtal,maxlsq,maxrsd
       parameter (maxxtal=10)
       parameter (maxlsq=50)
       parameter (maxrsd=100)
+      include 'sizes.i'
       include 'atoms.i'
       include 'atmtyp.i'
       include 'boxes.i'
@@ -680,10 +680,10 @@ c
 c
       subroutine xtalerr (nresid,nvaried,xx,resid)
       implicit none
-      include 'sizes.i'
       integer maxlsq,maxrsd
       parameter (maxlsq=50)
       parameter (maxrsd=100)
+      include 'sizes.i'
       include 'atoms.i'
       include 'boxes.i'
       include 'bound.i'

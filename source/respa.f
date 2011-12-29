@@ -14,8 +14,11 @@ c
 c
 c     "respa" performs a single multiple time step molecular dynamics
 c     step using the reversible reference system propagation algorithm
-c     (r-RESPA) via a velocity Verlet core with a position Verlet inner
-c     loop and potential split into fast- and slow-evolving portions
+c     (r-RESPA) via a Verlet core with the potential split into fast-
+c     and slow-evolving portions
+c
+c     Note the inner RESPA loop is velocity Verlet-based if constraints
+c     are present, and position Verlet in the absence of constraints
 c
 c     literature references:
 c
@@ -34,8 +37,8 @@ c
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
+      include 'freeze.i'
       include 'moldyn.i'
-      include 'shake.i'
       include 'units.i'
       include 'usage.i'
       include 'virial.i'
@@ -79,9 +82,6 @@ c
             do j = 1, 3
                v(j,i) = v(j,i) + a(j,i)*dt_2
             end do
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
          end if
       end do
 c
@@ -93,61 +93,77 @@ c
          end do
       end do
 c
-c     find fast-evolving positions via position Verlet recursion
+c     find fast-evolving velocities and positions via Verlet recursion
 c
       do k = 1, nalt
-         do i = 1, n
-            if (use(i)) then
-               x(i) = x(i) + v(1,i)*dta_2
-               y(i) = y(i) + v(2,i)*dta_2
-               z(i) = z(i) + v(3,i)*dta_2
-            end if
-         end do
+         if (use_rattle) then
+            do i = 1, n
+               if (use(i)) then
+                  do j = 1, 3
+                     v(j,i) = v(j,i) + aalt(j,i)*dta_2
+                  end do
+                  xold(i) = x(i)
+                  yold(i) = y(i)
+                  zold(i) = z(i)
+                  x(i) = x(i) + v(1,i)*dta
+                  y(i) = y(i) + v(2,i)*dta
+                  z(i) = z(i) + v(3,i)*dta
+               end if
+            end do
+            call rattle (dta,xold,yold,zold)
+         else
+            do i = 1, n
+               if (use(i)) then
+                  x(i) = x(i) + v(1,i)*dta_2
+                  y(i) = y(i) + v(2,i)*dta_2
+                  z(i) = z(i) + v(3,i)*dta_2
+               end if
+            end do
+         end if
 c
 c     get the fast-evolving potential energy and atomic forces
 c
          call gradfast (ealt,derivs)
 c
-c     increment average virial from fast-evolving potential energy
+c     use Newton's second law to get fast-evolving accelerations;
+c     update fast-evolving velocities using the Verlet recursion
+c
+         if (use_rattle) then
+            do i = 1, n
+               if (use(i)) then
+                  do j = 1, 3
+                     aalt(j,i) = -convert * derivs(j,i) / mass(i)
+                     v(j,i) = v(j,i) + aalt(j,i)*dta_2
+                  end do
+               end if
+            end do
+            call rattle2 (dta)
+         else
+            do i = 1, n
+               if (use(i)) then
+                  do j = 1, 3
+                     aalt(j,i) = -convert * derivs(j,i) / mass(i)
+                     v(j,i) = v(j,i) + aalt(j,i)*dta
+                  end do
+                  x(i) = x(i) + v(1,i)*dta_2
+                  y(i) = y(i) + v(2,i)*dta_2
+                  z(i) = z(i) + v(3,i)*dta_2
+               end if
+            end do
+         end if
+c
+c     increment average virial from fast-evolving potential terms
 c
          do i = 1, 3
             do j = 1, 3
                viralt(j,i) = viralt(j,i) + vir(j,i)/dalt
             end do
          end do
-c
-c     use Newton's second law to get fast-evolving accelerations;
-c     then velocities and positions via position Verlet recursion
-c
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  aalt(j,i) = -convert * derivs(j,i) / mass(i)
-                  v(j,i) = v(j,i) + aalt(j,i)*dta
-               end do
-               x(i) = x(i) + v(1,i)*dta_2
-               y(i) = y(i) + v(2,i)*dta_2
-               z(i) = z(i) + v(3,i)*dta_2
-            end if
-         end do
       end do
-c
-c     get constraint-corrected positions and half-step velocities
-c
-      if (use_rattle)  call rattle (dt,xold,yold,zold)
 c
 c     get the slow-evolving potential energy and atomic forces
 c
       call gradslow (epot,derivs)
-c
-c     total potential and virial from sum of fast and slow parts
-c
-      epot = epot + ealt
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = vir(j,i) + viralt(j,i)
-         end do
-      end do
 c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
@@ -164,6 +180,15 @@ c
 c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
+c
+c     total potential and virial from sum of fast and slow parts
+c
+      epot = epot + ealt
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + viralt(j,i)
+         end do
+      end do
 c
 c     make full-step temperature and pressure corrections
 c
@@ -292,7 +317,7 @@ c
       save_strtor = use_strtor
       save_tortor = use_tortor
       save_geom = use_geom
-      save_metal = use_metal
+      save_metal = use_geom
       save_extra = use_extra
 c
 c     turn off fast-evolving valence potential energy terms

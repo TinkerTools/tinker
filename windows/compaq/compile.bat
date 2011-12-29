@@ -257,6 +257,7 @@ DF /compile_only /optimize /fast newton.f
 DF /compile_only /optimize /fast newtrot.f
 DF /compile_only /optimize /fast nextarg.f
 DF /compile_only /optimize /fast nexttext.f
+DF /compile_only /optimize /fast nose.f
 DF /compile_only /optimize /fast nspline.f
 DF /compile_only /optimize /fast nucleic.f
 DF /compile_only /optimize /fast number.f

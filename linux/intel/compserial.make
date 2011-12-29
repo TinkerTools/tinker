@@ -256,6 +256,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 newton.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 newtrot.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 nextarg.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 nexttext.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 nose.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 nspline.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 nucleic.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 number.f

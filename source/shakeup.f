@@ -5,15 +5,15 @@ c     ##  COPYRIGHT (C)  1993  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine shakeup  --  setup of rattle constraints  ##
-c     ##                                                       ##
-c     ###########################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine shakeup  --  setup of holonomic constraints  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "shakeup" initializes any holonomic constraints for use
-c     with the rattle algorithm during molecular dynamics
+c     "shakeup" initializes any holonomic constraints for use with
+c     the RATTLE algorithm during molecular dynamics
 c
 c
       subroutine shakeup
@@ -26,10 +26,10 @@ c
       include 'bond.i'
       include 'bound.i'
       include 'couple.i'
+      include 'freeze.i'
       include 'keys.i'
       include 'math.i'
       include 'molcul.i'
-      include 'shake.i'
       include 'usage.i'
       integer i,j,k,m,nh
       integer ia,ib,ic
@@ -51,7 +51,7 @@ c
       rateps = 0.000001d0
       use_rattle = .true.
 c
-c     process keywords containing rattle constraint options
+c     process keywords containing any holonomic constraints
 c
       do k = 1, nkey
          next = 1
@@ -64,7 +64,7 @@ c
    10    continue
       end do
 c
-c     process keywords containing rattle constraint types
+c     process keywords containing various constraint options
 c
       do k = 1, nkey
          next = 1
@@ -345,7 +345,7 @@ c
          end if
       end do
 c
-c     if no rattle constraints are used, turn off its use
+c     if no holonomic constraints are present, turn off their use
 c
       if (nrat.eq.0 .and. nratx.eq.0)  use_rattle = .false.
       return
@@ -371,8 +371,8 @@ c
       implicit none
       include 'sizes.i'
       include 'couple.i'
+      include 'freeze.i'
       include 'ring.i'
-      include 'shake.i'
       integer i,j,k
       integer ia,ib,ic
       integer id,ie,imin
@@ -428,7 +428,7 @@ c
          end do
       end if
 c
-c     if the constraint if redundant, remove it from the list
+c     remove the constraint from the list if it is redundant
 c
       if (remove)  nrat = nrat - 1
       return

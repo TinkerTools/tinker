@@ -256,6 +256,7 @@ xlf -c -O newton.f
 xlf -c -O newtrot.f
 xlf -c -O nextarg.f
 xlf -c -O nexttext.f
+xlf -c -O nose.f
 xlf -c -O nspline.f
 xlf -c -O nucleic.f
 xlf -c -O number.f

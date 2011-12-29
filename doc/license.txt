@@ -4,7 +4,7 @@
                   ---------------------------------------------
 
                             Version 6.0   October 2011
-                    Copyright © 1990-2011   Jay William Ponder
+                   Copyright (C) 1990-2011  Jay William Ponder
 
 TINKER is a modular program package for molecular mechanics-based potential
 energy calculations, geometry optimization, molecular dynamics simulation,

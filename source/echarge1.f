@@ -96,6 +96,7 @@ c
       real*8 vyx,vzx,vzy
       real*8 cscale(maxatm)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     zero out the charge interaction energy and derivatives
@@ -117,7 +118,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     compute the charge interaction energy and first derivatives
 c
@@ -515,6 +517,7 @@ c
       real*8 zsort(maxlight)
       logical proceed,usei
       logical prime,repeat
+      character*6 mode
 c
 c
 c     zero out the charge interaction energy and derivatives
@@ -536,7 +539,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     transfer the interaction site coordinates to sorting arrays
 c
@@ -817,6 +821,7 @@ c
       real*8 vyx,vzx,vzy
       real*8 cscale(maxatm)
       logical proceed,usei
+      character*6 mode
 c
 c
 c     zero out the charge interaction energy and derivatives
@@ -838,7 +843,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     compute the charge interaction energy and first derivatives
 c
@@ -1058,6 +1064,7 @@ c
       real*8 vyx,vzx,vzy
       real*8 cscale(maxatm)
       logical proceed,usei
+      character*6 mode
       external erfc
 c
 c
@@ -1084,7 +1091,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1439,6 +1447,7 @@ c
       real*8 cscale(maxatm)
       logical proceed,usei
       logical prime,repeat
+      character*6 mode
       external erfc
 c
 c
@@ -1465,7 +1474,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1754,6 +1764,7 @@ c
       real*8 dect1(3,maxatm)
       real*8 dect2(3,maxatm)
       logical proceed,usei
+      character*6 mode
       external erfc
 c
 c
@@ -1780,7 +1791,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     compute the Ewald self-energy term over all the atoms
 c

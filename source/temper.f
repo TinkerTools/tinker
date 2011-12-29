@@ -37,10 +37,12 @@ c
       include 'rgddyn.i'
       include 'units.i'
       include 'usage.i'
-      integer i,j
-      real*8 dt,eksum
-      real*8 scale,ekt
+      integer i,j,nc,ns
+      real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8
+      real*8 eksum,ekt
+      real*8 scale,expterm
+      real*8 w(3)
       real*8 ekin(3,3)
 c
 c
@@ -48,19 +50,50 @@ c     make half-step velocity correction for Nose-Hoover system
 c
       if (thermostat .eq. 'NOSE-HOOVER') then
          call kinetic (eksum,ekin)
-         dt2 = dt / 2.0d0
-         dt4 = dt / 4.0d0
-         dt8 = dt / 8.0d0
          ekt = gasconst * kelvin
-         gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
-         vnh(2) = vnh(2) + gnh(2)*dt4
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
-         vnh(1) = vnh(1) + gnh(1)*dt4
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         xnh(1) = xnh(1) + vnh(1)*dt2
-         xnh(2) = xnh(2) + vnh(2)*dt2
-         scale = exp(-vnh(1)*dt2)
+         nc = 5
+         ns = 3
+         dtc = dt / dble(nc)
+         w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
+         w(2) = 1.0d0 - 2.0d0*w(1)
+         w(3) = w(1)
+         scale = 1.0d0
+         do i = 1, nc
+            do j = 1, ns
+               dts = w(j) * dtc
+               dt2 = 0.5d0 * dts
+               dt4 = 0.25d0 * dts
+               dt8 = 0.125d0 * dts
+               gnh(4) = (qnh(3)*vnh(3)*vnh(3)-ekt) / qnh(4)
+               vnh(4) = vnh(4) + gnh(4)*dt4
+               gnh(3) = (qnh(2)*vnh(2)*vnh(2)-ekt) / qnh(3)
+               expterm = exp(-vnh(4)*dt8)
+               vnh(3) = expterm * (vnh(3)*expterm+gnh(3)*dt4)
+               gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
+               expterm = exp(-vnh(3)*dt8)
+               vnh(2) = expterm * (vnh(2)*expterm+gnh(2)*dt4)
+               gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
+               expterm = exp(-vnh(2)*dt8)
+               vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
+               scale = scale * exp(-vnh(1)*dt2)
+               eksum = eksum * scale * scale
+               xnh(1) = xnh(1) + vnh(1)*dt2
+               xnh(2) = xnh(2) + vnh(2)*dt2
+               xnh(3) = xnh(3) + vnh(3)*dt2
+               xnh(4) = xnh(4) + vnh(4)*dt2
+               gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
+               expterm = exp(-vnh(2)*dt8)
+               vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
+               gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
+               expterm = exp(-vnh(3)*dt8)
+               vnh(2) = expterm * (vnh(2)*expterm+gnh(2)*dt4)
+               gnh(3) = (qnh(2)*vnh(2)*vnh(2)-ekt) / qnh(3)
+               expterm = exp(-vnh(4)*dt8)
+               vnh(3) = expterm * (vnh(3)*expterm+gnh(3)*dt4)
+               gnh(4) = (qnh(3)*vnh(3)*vnh(3)-ekt) / qnh(4)
+               vnh(4) = vnh(4) + gnh(4)*dt4
+            end do
+         end do
          if (integrate .eq. 'RIGIDBODY') then
             do i = 1, ngrp
                do j = 1, 3
@@ -77,13 +110,6 @@ c
                end if
             end do
          end if
-         eksum = eksum * scale * scale
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
-         vnh(1) = vnh(1) + gnh(1)*dt4
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
-         vnh(2) = vnh(2) + gnh(2)*dt4
       end if
       return
       end
@@ -130,12 +156,16 @@ c
       include 'units.i'
       include 'usage.i'
       integer i,j,k,m
-      real*8 dt,eksum,temp
+      integer nc,ns
+      real*8 dt,dtc,dts
+      real*8 dt2,dt4,dt8
+      real*8 eksum,ekt
       real*8 scale,speed
       real*8 c,d,r,s,si
       real*8 random,normal
       real*8 kt,rate,trial
-      real*8 dt2,dt4,dt8,ekt
+      real*8 temp,expterm
+      real*8 w(3)
       real*8 ekin(3,3)
 c
 c
@@ -253,19 +283,50 @@ c
 c     make full-step velocity correction for Nose-Hoover system
 c
       else if (thermostat .eq. 'NOSE-HOOVER') then
-         dt2 = dt / 2.0d0
-         dt4 = dt / 4.0d0
-         dt8 = dt / 8.0d0
          ekt = gasconst * kelvin
-         gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
-         vnh(2) = vnh(2) + gnh(2)*dt4
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
-         vnh(1) = vnh(1) + gnh(1)*dt4
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         xnh(1) = xnh(1) + vnh(1)*dt2
-         xnh(2) = xnh(2) + vnh(2)*dt2
-         scale = exp(-vnh(1)*dt2)
+         nc = 5
+         ns = 3
+         dtc = dt / dble(nc)
+         w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
+         w(2) = 1.0d0 - 2.0d0*w(1)
+         w(3) = w(1)
+         scale = 1.0d0
+         do i = 1, nc
+            do j = 1, ns
+               dts = w(j) * dtc
+               dt2 = 0.5d0 * dts
+               dt4 = 0.25d0 * dts
+               dt8 = 0.125d0 * dts
+               gnh(4) = (qnh(3)*vnh(3)*vnh(3)-ekt) / qnh(4)
+               vnh(4) = vnh(4) + gnh(4)*dt4
+               gnh(3) = (qnh(2)*vnh(2)*vnh(2)-ekt) / qnh(3)
+               expterm = exp(-vnh(4)*dt8)
+               vnh(3) = expterm * (vnh(3)*expterm+gnh(3)*dt4)
+               gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
+               expterm = exp(-vnh(3)*dt8)
+               vnh(2) = expterm * (vnh(2)*expterm+gnh(2)*dt4)
+               gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
+               expterm = exp(-vnh(2)*dt8)
+               vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
+               scale = scale * exp(-vnh(1)*dt2)
+               eksum = eksum * scale * scale
+               xnh(1) = xnh(1) + vnh(1)*dt2
+               xnh(2) = xnh(2) + vnh(2)*dt2
+               xnh(3) = xnh(3) + vnh(3)*dt2
+               xnh(4) = xnh(4) + vnh(4)*dt2
+               gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
+               expterm = exp(-vnh(2)*dt8)
+               vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
+               gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
+               expterm = exp(-vnh(3)*dt8)
+               vnh(2) = expterm * (vnh(2)*expterm+gnh(2)*dt4)
+               gnh(3) = (qnh(2)*vnh(2)*vnh(2)-ekt) / qnh(3)
+               expterm = exp(-vnh(4)*dt8)
+               vnh(3) = expterm * (vnh(3)*expterm+gnh(3)*dt4)
+               gnh(4) = (qnh(3)*vnh(3)*vnh(3)-ekt) / qnh(4)
+               vnh(4) = vnh(4) + gnh(4)*dt4
+            end do
+         end do
          if (integrate .eq. 'RIGIDBODY') then
             do i = 1, ngrp
                do j = 1, 3
@@ -282,13 +343,6 @@ c
                end if
             end do
          end if
-         eksum = eksum * scale * scale
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
-         vnh(1) = vnh(1) + gnh(1)*dt4
-         vnh(1) = vnh(1) * exp(-vnh(2)*dt8)
-         gnh(2) = (qnh(1)*vnh(1)*vnh(1)-ekt) / qnh(2)
-         vnh(2) = vnh(2) + gnh(2)*dt4
       end if
 c
 c     recompute kinetic energy and instantaneous temperature

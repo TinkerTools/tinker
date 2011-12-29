@@ -256,6 +256,7 @@ f77 -c -O -mips4 newton.f
 f77 -c -O -mips4 newtrot.f
 f77 -c -O -mips4 nextarg.f
 f77 -c -O -mips4 nexttext.f
+f77 -c -O -mips4 nose.f
 f77 -c -O -mips4 nspline.f
 f77 -c -O -mips4 nucleic.f
 f77 -c -O -mips4 number.f

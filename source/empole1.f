@@ -165,6 +165,7 @@ c
       real*8 dscale(maxatm)
       real*8 uscale(maxatm)
       logical proceed,usei,usek
+      character*6 mode
 c
 c
 c     zero out multipole and polarization energy and derivatives
@@ -203,7 +204,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     set scale factors for permanent multipole and induced terms
 c
@@ -1694,6 +1696,7 @@ c
       real*8 dscale(maxatm)
       real*8 uscale(maxatm)
       logical proceed,usei,usek
+      character*6 mode
 c
 c
 c     zero out multipole and polarization energy and derivatives
@@ -1732,7 +1735,8 @@ c
 c     set conversion factor, cutoff and scaling coefficients
 c
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     set scale factors for permanent multipole and induced terms
 c
@@ -2739,6 +2743,7 @@ c
       real*8 pscale(maxatm)
       real*8 dscale(maxatm)
       real*8 uscale(maxatm)
+      character*6 mode
       external erfc
 c
 c
@@ -2759,7 +2764,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     set the permanent multipole and induced dipole values
 c
@@ -4750,6 +4756,7 @@ c     real*8 demk(3,maxatm)
 c     real*8 depi(3,maxatm)
 c     real*8 depk(3,maxatm)
       logical dorl,dorli
+      character*6 mode
       external erfc
 c
 c
@@ -4781,7 +4788,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('EWALD')
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     initialize local variables for OpenMP calculation
 c

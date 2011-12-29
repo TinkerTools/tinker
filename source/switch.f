@@ -27,7 +27,7 @@ c
       real*8 off6,off7
       real*8 cut3,cut4,cut5
       real*8 cut6,cut7
-      character*(*) mode
+      character*6 mode
 c
 c
 c     get the switching window for the current potential type

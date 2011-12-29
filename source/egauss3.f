@@ -89,6 +89,7 @@ c
       real*8 vscale(maxatm)
       logical proceed,usei
       logical header,huge
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy and partitioning terms
@@ -109,7 +110,8 @@ c
 c
 c     set the coefficients for the switching function
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
       expcut = -50.0d0
 c
 c     apply any reduction factor to the atomic coordinates
@@ -474,6 +476,7 @@ c
       logical proceed,usei
       logical prime,repeat
       logical header,huge
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy and partitioning terms
@@ -494,7 +497,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
       expcut = -50.0d0
 c
 c     apply any reduction factor to the atomic coordinates
@@ -769,6 +773,7 @@ c
       real*8 vscale(maxatm)
       logical proceed,usei
       logical header,huge
+      character*6 mode
 c
 c
 c     zero out the van der Waals energy and partitioning terms
@@ -789,7 +794,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('VDW')
+      mode = 'VDW'
+      call switch (mode)
       expcut = -50.0d0
 c
 c     apply any reduction factor to the atomic coordinates

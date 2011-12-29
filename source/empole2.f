@@ -242,6 +242,7 @@ c
       logical proceed
       logical usei,usek
       logical reinduce
+      character*6 mode
 c
 c
 c     zero out the multipole and polarization first derivatives
@@ -266,7 +267,8 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
-      call switch ('MPOLE')
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     check the sign of multipole components at chiral sites
 c

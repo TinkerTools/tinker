@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C)  1991  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine rattle  --  distance and spatial constraints  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine rattle  --  RATTLE distance constraint method  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "rattle" implements the first portion of the rattle algorithm
+c     "rattle" implements the first portion of the RATTLE algorithm
 c     by correcting atomic positions and half-step velocities to
 c     maintain interatomic distance and absolute spatial constraints
 c
@@ -28,11 +28,11 @@ c
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
+      include 'freeze.i'
       include 'group.i'
       include 'inform.i'
       include 'iounit.i'
       include 'moldyn.i'
-      include 'shake.i'
       include 'usage.i'
       integer i,j,k
       integer ia,ib,mode
@@ -71,7 +71,7 @@ c
       sor = 1.25d0
       eps = rateps
 c
-c     apply rattle to distances and half-step velocity values
+c     apply RATTLE to distances and half-step velocity values
 c
       niter = 0
       done = .false.
@@ -183,12 +183,12 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine rattle2  --  rattle atom velocity constraints  ##
+c     ##  subroutine rattle2  --  RATTLE atom velocity corrections  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "rattle2" implements the second portion of the rattle algorithm
+c     "rattle2" implements the second portion of the RATTLE algorithm
 c     by correcting the full-step velocities in order to maintain
 c     interatomic distance constraints
 c
@@ -198,11 +198,11 @@ c
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
+      include 'freeze.i'
       include 'group.i'
       include 'inform.i'
       include 'iounit.i'
       include 'moldyn.i'
-      include 'shake.i'
       include 'units.i'
       include 'usage.i'
       include 'virial.i'
@@ -241,9 +241,9 @@ c
       done = .false.
       sor = 1.25d0
       eps = rateps / dt
-      vterm = 2.0d0 / (dt * convert)
+      vterm = 2.0d0 / (dt*convert)
 c
-c     apply the rattle algorithm to correct the velocities
+c     apply the RATTLE algorithm to correct the velocities
 c
       do while (.not.done .and. niter.lt.maxiter)
          niter = niter + 1
@@ -280,12 +280,15 @@ c
 c
 c     increment the internal virial tensor components
 c
-                  vxx = xr * xterm * vterm
-                  vyx = yr * xterm * vterm
-                  vzx = zr * xterm * vterm
-                  vyy = yr * yterm * vterm
-                  vzy = zr * yterm * vterm
-                  vzz = zr * zterm * vterm
+                  xterm = term * vterm
+                  yterm = term * vterm
+                  zterm = term * vterm
+                  vxx = xr * xterm
+                  vyx = yr * xterm
+                  vzx = zr * xterm
+                  vyy = yr * yterm
+                  vzy = zr * yterm
+                  vzz = zr * zterm
                   vir(1,1) = vir(1,1) - vxx
                   vir(2,1) = vir(2,1) - vyx
                   vir(3,1) = vir(3,1) - vzx

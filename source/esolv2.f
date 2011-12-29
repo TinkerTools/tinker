@@ -88,6 +88,7 @@ c
       real*8 fgb,fgb2,dfgb
       real*8 dfgb2,d2fgb
       real*8 term(3,3)
+      character*6 mode
 c
 c
 c     first see if the atom of interest carries a charge
@@ -114,7 +115,8 @@ c
 c
 c     set cutoff distances and switching function coefficients
 c
-      call switch ('CHARGE')
+      mode = 'CHARGE'
+      call switch (mode)
 c
 c     calculate GB polarization energy Hessian elements
 c

@@ -12,7 +12,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     maxnose     maximum length of the Nose-Hoover chain
+c     maxnose     maximum length of Nose-Hoover thermostat chain
 c
 c     kelvin      target value for the system temperature (K)
 c     atmsph      target value for the system pressure (atm)
@@ -23,7 +23,11 @@ c     collide     collision frequency for Andersen thermostat
 c     xnh         position of each chained Nose-Hoover thermostat
 c     vnh         velocity of each chained Nose-Hoover thermostat
 c     qnh         mass for each chained Nose-Hoover thermostat
-c     gnh         coupling between chained Nose-Hoover thermostats
+c     gnh         force for each chained Nose-Hoover thermostat
+c     xbar        position of log volume for Nose-Hoover barostat
+c     vbar        velocity of log volume for Nose-Hoover barostat
+c     qbar        mass of the volume for Nose-Hoover barostat
+c     gbar        force for the volume for Nose-Hoover barostat
 c     eta         velocity value for Bussi-Parrinello barostat
 c     volmove     maximum volume move for Monte Carlo barostat (Ang**3)
 c     voltrial    mean number of steps between Monte Carlo moves
@@ -36,20 +40,21 @@ c     volscale    choice of scaling method for Monte Carlo barostat
 c
 c
       integer maxnose
-      parameter (maxnose=2)
+      parameter (maxnose=4)
       integer voltrial
       real*8 kelvin,atmsph
       real*8 tautemp,taupres
       real*8 compress,collide
       real*8 xnh,vnh,qnh,gnh
+      real*8 xbar,vbar,qbar,gbar
       real*8 eta,volmove
       logical isothermal
       logical isobaric
       logical anisotrop
       character*9 volscale
-      character*10 barostat
+      character*11 barostat
       character*11 thermostat
       common /bath/ kelvin,atmsph,tautemp,taupres,compress,collide,
      &              xnh(maxnose),vnh(maxnose),qnh(maxnose),gnh(maxnose),
-     &              eta,volmove,voltrial,isothermal,isobaric,anisotrop,
-     &              thermostat,barostat,volscale
+     &              xbar,vbar,qbar,gbar,eta,volmove,voltrial,isothermal,
+     &              isobaric,anisotrop,thermostat,barostat,volscale

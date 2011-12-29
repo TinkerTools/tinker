@@ -31,9 +31,9 @@ c
       include 'atoms.i'
       include 'bath.i'
       include 'boxes.i'
+      include 'freeze.i'
       include 'mdstuf.i'
       include 'moldyn.i'
-      include 'shake.i'
       include 'units.i'
       include 'usage.i'
       integer i,j,istep
@@ -44,7 +44,6 @@ c
       real*8 kt,w,temp,pres
       real*8 part1,part2
       real*8 factor,term
-      real*8 random,normal
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 xold(maxatm)

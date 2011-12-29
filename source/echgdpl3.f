@@ -50,6 +50,7 @@ c
       real*8 r,r2,r3,r4,r5
       logical proceed
       logical header,huge
+      character*6 mode
 c
 c
 c     zero out the overall charge-dipole interaction energy
@@ -72,7 +73,8 @@ c
 c     set conversion factor and switching function coefficients
 c
       f = electric / (debye * dielec)
-      call switch ('CHGDPL')
+      mode = 'CHGDPL'
+      call switch (mode)
 c
 c     get the total energy by looping over each charge-dipole pair
 c

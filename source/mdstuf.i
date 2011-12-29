@@ -28,6 +28,6 @@ c
       logical velsave
       logical frcsave
       logical uindsave
-      character*10 integrate
+      character*11 integrate
       common /mdstuf/ nfree,irest,bmnmix,dorest,velsave,frcsave,
      &                uindsave,integrate

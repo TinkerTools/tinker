@@ -256,6 +256,7 @@ ifort -c -g -warn unused -check uninit -check bounds newton.f
 ifort -c -g -warn unused -check uninit -check bounds newtrot.f
 ifort -c -g -warn unused -check uninit -check bounds nextarg.f
 ifort -c -g -warn unused -check uninit -check bounds nexttext.f
+ifort -c -g -warn unused -check uninit -check bounds nose.f
 ifort -c -g -warn unused -check uninit -check bounds nspline.f
 ifort -c -g -warn unused -check uninit -check bounds nucleic.f
 ifort -c -g -warn unused -check uninit -check bounds number.f
