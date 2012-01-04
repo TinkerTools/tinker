@@ -77,10 +77,6 @@ c
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
                scale = scale * exp(-vnh(1)*dt2)
                eksum = eksum * scale * scale
-               xnh(1) = xnh(1) + vnh(1)*dt2
-               xnh(2) = xnh(2) + vnh(2)*dt2
-               xnh(3) = xnh(3) + vnh(3)*dt2
-               xnh(4) = xnh(4) + vnh(4)*dt2
                gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
                expterm = exp(-vnh(2)*dt8)
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
@@ -310,10 +306,6 @@ c
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
                scale = scale * exp(-vnh(1)*dt2)
                eksum = eksum * scale * scale
-               xnh(1) = xnh(1) + vnh(1)*dt2
-               xnh(2) = xnh(2) + vnh(2)*dt2
-               xnh(3) = xnh(3) + vnh(3)*dt2
-               xnh(4) = xnh(4) + vnh(4)*dt2
                gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
                expterm = exp(-vnh(2)*dt8)
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)

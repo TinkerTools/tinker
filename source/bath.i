@@ -20,11 +20,9 @@ c     tautemp     time constant for Berendsen thermostat (psec)
 c     taupres     time constant for Berendsen barostat (psec)
 c     compress    isothermal compressibility of medium (atm-1)
 c     collide     collision frequency for Andersen thermostat
-c     xnh         position of each chained Nose-Hoover thermostat
 c     vnh         velocity of each chained Nose-Hoover thermostat
 c     qnh         mass for each chained Nose-Hoover thermostat
 c     gnh         force for each chained Nose-Hoover thermostat
-c     xbar        position of log volume for Nose-Hoover barostat
 c     vbar        velocity of log volume for Nose-Hoover barostat
 c     qbar        mass of the volume for Nose-Hoover barostat
 c     gbar        force for the volume for Nose-Hoover barostat
@@ -45,8 +43,8 @@ c
       real*8 kelvin,atmsph
       real*8 tautemp,taupres
       real*8 compress,collide
-      real*8 xnh,vnh,qnh,gnh
-      real*8 xbar,vbar,qbar,gbar
+      real*8 vnh,qnh,gnh
+      real*8 vbar,qbar,gbar
       real*8 eta,volmove
       logical isothermal
       logical isobaric
@@ -55,6 +53,6 @@ c
       character*11 barostat
       character*11 thermostat
       common /bath/ kelvin,atmsph,tautemp,taupres,compress,collide,
-     &              xnh(maxnose),vnh(maxnose),qnh(maxnose),gnh(maxnose),
-     &              xbar,vbar,qbar,gbar,eta,volmove,voltrial,isothermal,
-     &              isobaric,anisotrop,thermostat,barostat,volscale
+     &              vnh(maxnose),qnh(maxnose),gnh(maxnose),vbar,qbar,
+     &              gbar,eta,volmove,voltrial,isothermal,isobaric,
+     &              anisotrop,thermostat,barostat,volscale

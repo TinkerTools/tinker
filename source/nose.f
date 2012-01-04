@@ -97,10 +97,9 @@ c
 c
 c     update the periodic box size and total volume
 c
-      xbar = xbar + vbar*dt
-      xbox = xbox * exp(xbar)
-      ybox = ybox * exp(xbar)
-      zbox = zbox * exp(xbar)
+      xbox = xbox * eterm2
+      ybox = ybox * eterm2
+      zbox = zbox * eterm2
       call lattice
 c
 c     get the potential energy and atomic forces
@@ -234,18 +233,11 @@ c
             expterm = exp(-vnh(1)*dt8)
             vbar = expterm * (vbar*expterm+gbar*dt4)
 c
-c     compute velocity scale factor and update barostat force
+c     find velocity scale factor and update kinetic energy
 c
             expterm = exp(-(vnh(1)+vbar*odnf)*dt2)
             scale = scale * expterm
             eksum = eksum * expterm * expterm 
-c
-c     find the next thermostat positions via a Verlet step
-c
-            xnh(1) = xnh(1) + vnh(1)*dt2
-            xnh(2) = xnh(2) + vnh(2)*dt2
-            xnh(3) = xnh(3) + vnh(3)*dt2
-            xnh(4) = xnh(4) + vnh(4)*dt2
 c
 c     update barostat and thermostat velocities and forces
 c

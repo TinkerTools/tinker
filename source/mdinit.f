@@ -74,7 +74,6 @@ c
       tautemp = 0.2d0
       collide = 0.1d0
       do i = 1, maxnose
-         xnh(i) = 0.0d0
          vnh(i) = 0.0d0
          qnh(i) = 0.0d0
          gnh(i) = 0.0d0
@@ -83,7 +82,6 @@ c
       anisotrop = .false.
       taupres = 2.0d0
       compress = 0.000046d0
-      xbar = 0.0d0
       vbar = 0.0d0
       qbar = 0.0d0
       gbar = 0.0d0
