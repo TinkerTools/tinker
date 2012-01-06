@@ -317,7 +317,7 @@ c
       save_strtor = use_strtor
       save_tortor = use_tortor
       save_geom = use_geom
-      save_metal = use_geom
+      save_metal = use_metal
       save_extra = use_extra
 c
 c     turn off fast-evolving valence potential energy terms

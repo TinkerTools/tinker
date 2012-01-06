@@ -76,7 +76,7 @@ LINKDIR = /usr/local/bin
 ##
 
 #F77 = /opt/intel/bin/ifort
-#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_omp -lfftw3
 #F77FLAGS = -c -xHost -assume cc_omp
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
 #LIBFLAGS = -crusv
@@ -105,7 +105,7 @@ LINKDIR = /usr/local/bin
 ##
 
 F77 = /opt/intel/bin/ifort
-LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_omp -lfftw3
 F77FLAGS = -c -axSSSE3 -assume cc_omp
 OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
 LIBFLAGS = -crusv
