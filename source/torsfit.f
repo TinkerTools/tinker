@@ -124,51 +124,56 @@ c
       integer maxfittor,maxconf
       parameter (maxfittor=12)
       parameter (maxconf=500)
-      integer torbnd(10)
-      integer torcrs(4,maxfittor)
-      integer ctorid(maxfittor)
-      integer ftorid(maxfittor)
       integer i,j,k,ii,jj,kk
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
       integer itmpa,itmpb,otfix
-      integer ntorfit,ntorcrs,nconf
-      integer size
-      real*8  tmpa,tmpb
-      real*8  eqm(maxconf),emm(maxconf)
-      real*8  eqmmin,emmmin
-      real*8  erqm(maxconf),ermm(maxconf)
-      real*8  delte(maxconf)
-      real*8  ftv(maxconf,maxfittor),tv
-      real*8  ctv(maxconf,9*maxfittor)
-      real*8  rftv(maxconf,maxfittor)
-      real*8  fwt(maxconf)
-      real*8  vxx(6*maxfittor),vcon,vxxl(6*maxfittor)
-      real*8  zrms,rms,torf(maxconf)
-      real*8  tord(6*maxfittor,6*maxfittor)
-      real*8  coeff(maxconf,6*maxfittor)
-      real*8  minimum,grdmin
-      integer istep,maxstep,nvxx,ivxx
-      integer tflg(maxfittor),cflg(9*maxfittor)
-      logical vflg (6,maxfittor),done
+      integer ntorfit,ntorcrs
+      integer nconf,size
+      integer oldleng,oldnkey
+      integer istep,maxstep
+      integer nvxx,ivxx
+      integer ikey,nvar
+      integer freeunit
+      integer trimtext
+      integer torbnd(10)
+      integer ctorid(maxfittor)
+      integer ftorid(maxfittor)
+      integer tflg(maxfittor)
+      integer torcrs(4,maxfittor)
+      integer cflg(9*maxfittor)
+      integer refconf(maxconf)
+      real*8 tmpa,tmpb,tv,vcon
+      real*8 eqmmin,emmmin
+      real*8 rms,zrms,avedl
+      real*8 minimum,grdmin
+      real*8 energy,geometry
+      real*8 vxx(6*maxfittor)
+      real*8 vxxl(6*maxfittor)
+      real*8 eqm(maxconf)
+      real*8 emm(maxconf)
+      real*8 erqm(maxconf)
+      real*8 ermm(maxconf)
+      real*8 delte(maxconf)
+      real*8 fwt(maxconf)
+      real*8 torf(maxconf)
+      real*8 xx(maxvar)
+      real*8 tord(6*maxfittor,6*maxfittor)
+      real*8 mata(6*maxfittor,6*maxfittor)
+      real*8 ftv(maxconf,maxfittor)
+      real*8 rftv(maxconf,maxfittor)
+      real*8 coeff(maxconf,6*maxfittor)
+      real*8 ctv(maxconf,9*maxfittor)
+      logical done
+      logical vflg(6,maxfittor)
       logical confvisited(maxconf)
       character*4 pa,pb,pc,pd
       character*16 kft(maxfittor)
       character*16 kct(9*maxfittor)
       character*120 record
-      character*120 oldfilename
-      integer oldleng
-      character*120 oldkeyline(maxkey)
-      integer oldnkey
-      real*8 mata(6*maxfittor,6*maxfittor)
-      real*8 avedl
-      integer nvar
-      integer refconf(maxconf)
-      real*8 xx(maxvar)
-      real*8 energy, geometry
-      integer ikey,freeunit
-      integer trimtext
       character*120 keyfile
+      character*120 oldfilename
+      character*120 oldkeyline(maxkey)
       external minimiz1
       external optsave
 c
@@ -252,7 +257,7 @@ c
             ctorid(ntorcrs) = i
             write (iout,20)  ntorcrs,ia,name(ia),ib,name(ib),
      &                       ic,name(ic),id,name(id)
-   20       format (' Torsion',i6,' : ',4(i6,'-',a3))
+   20       format (' Torsion',i5,' :',3x,4(i6,'-',a3))
          end if
       end do
 c
@@ -300,11 +305,13 @@ c
       do i = 2, nconf
          if (eqm(i) .lt. eqmmin)  eqmmin = eqm(i)
       end do
+      write (iout,100)
+  100 format ()
       do i = 1, nconf
          erqm(i) = eqm(i) - eqmmin
-         write (iout,100)  i,erqm(i)
-  100    format (' Relative Conformational Energy (QM) ',
-     &               i5,f9.5,' Kcal/mole')
+         write (iout,110)  i,erqm(i)
+  110    format (' Relative Conformational Energy (QM)',i8,f12.4,
+     &              ' Kcal/mole')
       end do
 c
 c     get fitting torsion type (atom classes)
@@ -358,6 +365,8 @@ c
 c
 c     initialize the torsion and geometry restrain parameters
 c
+      write (iout,120)
+  120 format (/,' Initial Torsional Parameters:',/)
       nvxx = 0
       do i = 1, ntorfit
          j = ftorid(i)
@@ -372,16 +381,16 @@ c
          itb = class(ib)
          itc = class(ic)
          itd = class(id)
-         write (iout,110)  ita,itb,itc,itd,tors1(1,k),tors2(1,k),
+         write (iout,130)  ita,itb,itc,itd,tors1(1,k),tors2(1,k),
      &                     tors3(1,k),tors4(1,k),tors5(1,k),tors6(1,k)
-  110    format (' torsion ',4i4,6f8.3)
+  130    format (' torsion ',4i4,6f8.3)
          do ii = 1, i-1
             jj = ftorid(ii)
             kk = ctorid(jj)
             if (kft(i) .eq. kft(ii)) then
                done = .true.
                tflg(i) = ii
-               goto 120
+               goto 150
             end if
          end do
          do ii = 1, ntorcrs
@@ -435,24 +444,26 @@ c
          itfix(3,ntfix) = ic
          itfix(4,ntfix) = id
          tfix(1,ntfix) = 5.0d0
-         write (iout,*)  'Fixed Torsion ',ia,ib,ic,id
-  120    continue
+         write (iout,140)  ia,ib,ic,id
+  140    format (' Fixed Torsion',3x,4i6)
+  150    continue
       end do
 c
 c     print torsion flags (check duplicated torsion types)
 c
       do i = 1, ntorfit
-         write (iout,130)  i,tflg(i)
-  130    format (' Fitting Torsion No. ',i4,' Flag ',i4)
+         write (iout,160)  i,tflg(i)
+  160    format (/,' Fitting Torsion Number',i5,5x,'Flag',i5)
          do j = 1, 6
-            write (iout,140)  i,j,vflg(j,i)
-  140       format (' Variable ',2i4,' Variable Flag ',l4)
+            write (iout,170)  i,j,vflg(j,i)
+  170       format (' Variable',2i4,5x,'Variable Flag',l5)
          end do
       end do
 c
-c     print torsion flags for all the torsions cross the bond
+c     print torsion flags for all the torsions across the bond
 c
-      write (iout,*)  'All the Torsions Cross the Bond'
+      write (iout,180)
+  180 format (/,' All the Torsions Across the Bond :')
       do i = 1, ntorcrs
          k = ctorid(i)
          if (cflg(i) .gt. 0) then
@@ -463,7 +474,8 @@ c
             tors5(1,k) = 0.0d0
             tors6(1,k) = 0.0d0
          end if
-         write (iout,130)  i,cflg(i)
+         write (iout,190)  i,cflg(i)
+  190    format (' Fitting Torsion Number',i5,5x,'Flag',i5)
       end do
 c
 c     add one constant variable
@@ -483,8 +495,8 @@ c
             ic = torcrs(3,k)
             id = torcrs(4,k)
             ftv(i,j) = geometry (ia,ib,ic,id)
-            write (iout,150)  i,j,ftv(i,j)
-  150       format (' Fitting Torsion Value',2i5,f12.4)
+            write (iout,200)  i,j,ftv(i,j)
+  200       format (' Fitting Torsion Value',2i5,f12.4)
             if (tflg(j) .eq. 0) then
                kk = kk+1
                tfix(2,otfix+kk) = ftv(i,j)
@@ -518,8 +530,8 @@ c
 c
 c     make the call to the optimization routine
 c
-         write (iout,160)  i
-  160    format (/,' Minimizing Structure No. ',i3)
+         write (iout,210)  i
+  210    format (/,' Minimizing Structure',i6)
          coordtype = 'CARTESIAN'
          use_geom = .true.
          grdmin = 0.01d0
@@ -558,21 +570,24 @@ c
          if (emm(i) .lt. emmmin)  emmmin = emm(i)
       end do
 c
-c     calcualte the energy difference and RMS
+c     calculate the energy difference and RMS
 c
       rms = 0.0d0
       zrms = 0.0d0
+      write (iout,220)
+  220 format ()
       do i = 1, nconf
          ermm (i) = emm(i) - emmmin
          delte (i) = erqm (i) - ermm(i)
          rms = rms + delte(i)*delte(i)
-         write (iout,170)  i,ermm(i)
-  170    format (' Relative Conformational Energy (MM) ',
-     &              i5,f13.5,' Kcal/mole')
+         write (iout,230)  i,ermm(i)
+  230    format (' Relative Conformational Energy (MM)',i8,f12.4,
+     &              ' Kcal/mole')
       end do
       rms = sqrt(rms/dble(nconf))
       zrms = rms
-      write (iout,*)  'Energy Diff RMS ',rms
+      write (iout,240)  rms
+  240 format (/,' Energy RMS Difference :',8x,f12.4)
 c
 c     calculate the weights
 c
@@ -582,10 +597,10 @@ c           if (.not. confvisited(j)) then
 c              tmpa = ftv(j,1)
 c              itmpa = j
 c              confvisited(j) = .true.
-c              goto 145
+c              goto 241
 c           end if
 c        end do
-c 145    continue
+c 241    continue
 c        do j = 1, nconf
 c           if (ftv(j,1).lt.tmpa .and. .not.confvisited(j)) then
 c              confvisited(itmpa) = .false.
@@ -595,7 +610,8 @@ c           end if
 c        end do
 c        refconf(itmpa) = i
 c        confvisited(itmpa) = .true.
-c        write (iout,*)  itmpa,' <===> ',refconf(itmpa)
+c        write (iout,242)  itmpa,refconf(itmpa)
+c 242    format (i8,' <===> ',i8)
 c     end do
       if (nconf .gt. 1 .and. torbnd(3) .eq. 0) then
          if ((ftv(nconf,1)+180.0d0) .lt. 1.0d0
@@ -615,9 +631,11 @@ c     end do
          tmpb = (ftv(nconf,1) - ftv(nconf-1,1))/radian
          fwt(nconf) = 1.0d0 / sqrt(1.0d0+(tmpa/tmpb)**2)
       end if
+      write (iout,250)
+  250 format ()
       do i = 1, nconf
-         write (*,180)  i,fwt(i)
-  180    format (' Conformation ',i3,' Weight ',f8.4)
+         write (iout,260)  i,fwt(i)
+  260    format (' Conformation',i5,5x,'Weight',f8.4)
       end do
 c
 c     set initial values for torsions to be fitted
@@ -668,6 +686,8 @@ c
 c
 c     fitting the torsion parameters
 c
+      write (iout,270)
+  270 format ()
       maxstep = 1
       avedl = 0.5d0
       do while (avedl.gt.0.1d0 .and. istep.lt.maxstep)
@@ -705,15 +725,16 @@ c
      &                               *cos(dble(ii)*ctv(i,k)/radian))
                         end if
                      end do
-c                    write (iout,155)  i,ivxx,coeff(i,ivxx)
-c 155                format (' Derivative ',2i4,f8.4)
+                     write (iout,280)  i,ivxx,coeff(i,ivxx)
+  280                format (' Derivative :',5x,2i4,f8.4)
                   end if
                end do
             end do
             torf(i) = torf(i) + vcon - delte(i)
             ivxx = ivxx + 1
             coeff(i,ivxx) = 1.0d0
-c           write (iout,*)  'Energy Difference ',i,torf(i)
+            write (iout,290)  i,torf(i)
+  290       format (' Energy Difference :',i8,f12.4)
          end do
 c
 c     set matrix elements for matrix A
@@ -727,16 +748,18 @@ c
             end do
          end do
 c
-c     matrix A elements
+c     print the matrix A elements
 c
-         write (iout,*)  'Total Variable Number ',nvxx
-         write (iout,*)  'Matrix A elements '
+         write (iout,300)  nvxx
+  300    format (/,' Total Variable Number ',i8)
+         write (iout,310)
+  310    format (/,' Matrix A Elements :')
          do i = 1, nvxx
             do j = 1, nvxx
                mata(i,j) = tord(i,j)
             end do
-            write (iout,190)  (mata (i,j),j=1,nvxx)
-  190       format (1x,5f12.4)
+            write (iout,320)  (mata (i,j),j=1,nvxx)
+  320       format (1x,5f12.4)
          end do
 c
 c     multiply vector: Yi * Coeff * Weight
@@ -808,6 +831,8 @@ c
 c
 c     validate the fitted results
 c
+      write (iout,330)
+  330 format ()
       do i = 1, nconf
          call getref (i)
          kk = 0
@@ -841,8 +866,8 @@ c
 c
 c     make the call to the optimization routine
 c
-         write (iout,200)  i
-  200    format (' Minimizing Structure',i4,' with New Parameters')
+         write (iout,340)  i
+  340    format (' Minimizing Structure',i5,2x,'with New Parameters')
          coordtype = 'CARTESIAN'
          call lbfgs (nvar,xx,minimum,grdmin,minimiz1,optsave)
 c
@@ -872,18 +897,23 @@ c
 c     calcualte the energy difference and RMS
 c
       rms = 0.0d0
+      write (iout,350)
+  350 format ()
       do i = 1, nconf
          ermm (i) = emm(i) - emmmin
          delte (i) = erqm (i) - ermm(i)
          rms = rms + delte(i)*delte(i)
-         write (iout,170)  i,ermm(i)
+         write (iout,360)  i,ermm(i)
+  360    format (' Relative Conformational Energy (MM)',i8,f12.4,
+     &              ' Kcal/mole')
       end do
       rms = sqrt(rms/dble(nconf))
-      write (iout,*)  'Energy RMS With Fitting Parmeters = ',rms
+      write (iout,370)  rms
+  370 format (/,' Energy RMS With Fitting Parmeters :',8x,f12.4)
       if (rms .gt. zrms ) then
-         write (iout,210)  zrms
-  210    format (/,' Annihilating the torsions is better',
-     &           /,' The Final RMS is :',f12.6,' Kcal/mole',/)
+         write (iout,380)  zrms
+  380    format (/,' Annihilating the Torsions is Preferable',
+     &           /,' Final RMS :',f12.6,' Kcal/mole',/)
       end if
 c
 c     output the fitted parameters
@@ -907,17 +937,17 @@ c
       do i = 1, nkey
          record = keyline(i)
          size = trimtext (record)
-         write (ikey,220)  record(1:size)
-  220    format (a)
+         write (ikey,390)  record(1:size)
+  390    format (a)
       end do
 c
 c     list the valence parameters
 c
-      write (ikey,230)
-  230 format (/,'#',/,'# Results of Valence Parameter Fitting',
-     &           /,'#',/)
-      write (iout,*)
-      write (iout,*)  'Fitting Torsional Parameters:'
+      write (ikey,400)
+  400 format (/,'#',/,'# Results of Valence Parameter Fitting',
+     &        /,'#',/)
+      write (iout,410)
+  410 format (/,' Optimized Torsional Parameters:',/)
       do i = 1, ntorfit
          if (tflg(i) .eq. 0) then
             j = ftorid(i)
@@ -935,11 +965,13 @@ c
                tors2(1,k) = 0.0d0
                tors3(1,k) = 0.0d0
             end if
-            write (iout,240)  ita,itb,itc,itd,tors1(1,k),
+            write (iout,420)  ita,itb,itc,itd,tors1(1,k),
      &                        tors2(1,k),tors3(1,k)
-            write (ikey,240)  ita,itb,itc,itd,tors1(1,k),
+  420       format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
+     &                 ' 180.0 2 ',f8.3,' 0.0 3')
+            write (ikey,430)  ita,itb,itc,itd,tors1(1,k),
      &                        tors2(1,k),tors3(1,k)
-  240       format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
+  430       format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
      &                 ' 180.0 2 ',f8.3,' 0.0 3')
          end if
       end do
@@ -966,6 +998,8 @@ c
       real*8 t,av
       real*8 a(maxn,maxn)
 c
+c
+c     perform the Gaussian elimination procedure
 c
       do k = 1, n-1
          av = 0.0d0

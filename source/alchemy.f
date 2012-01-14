@@ -222,11 +222,11 @@ c
             if (verbose) then
                if (istep .eq. 1) then
                   write (iout,140)
-  140             format (/,2x,'Step',6x,'EB',8x,'EA',7x,'EIT',
-     &                       8x,'ET',8x,'EV',8x,'EC',/)
+  140             format (/,2x,'Step',7x,'EB',9x,'EA',8x,'EIT',
+     &                       9x,'ET',10x,'EV',10x,'EC',/)
                end if
                write (iout,150)  istep,eb,ea,eit,et,ev,ec
-  150          format (i6,6f10.4)
+  150          format (i6,4f11.4,2f12.4)
             end if
   160       continue
             i = i + 1
@@ -315,11 +315,11 @@ c
          if (verbose) then
             if (modblock.eq.1 .or. nblock.eq.1) then
                write (iout,170)
-  170          format (/,2x,'Step',8x,'E0',10x,'EP',10x,'EM',
-     &                    10x,'DEP',9x,'DEM',/)
+  170          format (/,2x,'Step',12x,'E0',11x,'EP',11x,'EM',
+     &                    11x,'DEP',10x,'DEM',/)
             end if
             write (iout,180)  istep,e0,eplus,eminus,deplus,deminus
-  180       format (i6,5f12.4)
+  180       format (i6,3x,5f13.4)
          end if
          pos = exp(-deplus/rt)
          neg = exp(-deminus/rt)
@@ -364,12 +364,12 @@ c
             sdamb = sdamb + bdam(k)
             if (verbose .or. k.eq.1) then
                write (iout,190)
-  190          format (/,2x,'Block',6x,'NStep',7x,'BADEP',
-     &                    7x,'BADEM',8x,'BDAP',8x,'BDAM',/)
+  190          format (/,2x,'Block',10x,'NStep',8x,'BADEP',
+     &                    8x,'BADEM',9x,'BDAP',9x,'BDAM',/)
             end if
             write (iout,200)  k,istep,badep(k),badem(k),
      &                        bdap(k),bdam(k)
-  200       format (i6,5x,i6,1x,4f12.4)
+  200       format (i6,5x,i6,5x,4f13.4)
          end if
 c
 c     calculate running averages for potential energy

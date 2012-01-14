@@ -280,9 +280,9 @@ c
 c
 c     increment the internal virial tensor components
 c
-                  xterm = term * vterm
-                  yterm = term * vterm
-                  zterm = term * vterm
+                  xterm = xterm * vterm
+                  yterm = yterm * vterm
+                  zterm = zterm * vterm
                   vxx = xr * xterm
                   vyx = yr * xterm
                   vzx = zr * xterm

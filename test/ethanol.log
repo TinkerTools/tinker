@@ -4,9 +4,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 6.0   October 2010                        ##
+ ##                        Version 6.0   October 2011                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2010               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2012               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -18,9 +18,9 @@
  Enter Central Atoms of the 2nd Torsion [Optional, <CR>=None] : 
  Torsions Crossing the Central Bond :
 
- Torsion     1 :      1-C       5-C       8-O       9-H  
- Torsion     2 :      6-H       5-C       8-O       9-H  
- Torsion     3 :      7-H       5-C       8-O       9-H  
+ Torsion    1 :        1-C       5-C       8-O       9-H  
+ Torsion    2 :        6-H       5-C       8-O       9-H  
+ Torsion    3 :        7-H       5-C       8-O       9-H  
 
  Choose Torsions for Fitting from Above List :  
  Enter Total Number of Conformations :  
@@ -53,107 +53,163 @@
 
  Enter the Name of the Gaussian Output File :  
  Finished Reading Conformation  10
- Relative Conformational Energy (QM)     1  1.74837 kcal/mole
- Relative Conformational Energy (QM)     2  1.30528 kcal/mole
- Relative Conformational Energy (QM)     3  0.43832 kcal/mole
- Relative Conformational Energy (QM)     4  0.00000 kcal/mole
- Relative Conformational Energy (QM)     5  0.36910 kcal/mole
- Relative Conformational Energy (QM)     6  1.15939 kcal/mole
- Relative Conformational Energy (QM)     7  1.58910 kcal/mole
- Relative Conformational Energy (QM)     8  1.26782 kcal/mole
- Relative Conformational Energy (QM)     9  0.60291 kcal/mole
- Relative Conformational Energy (QM)    10  0.28037 kcal/mole
+
+ Relative Conformational Energy (QM)       1      1.7484 Kcal/mole
+ Relative Conformational Energy (QM)       2      1.3053 Kcal/mole
+ Relative Conformational Energy (QM)       3      0.4383 Kcal/mole
+ Relative Conformational Energy (QM)       4      0.0000 Kcal/mole
+ Relative Conformational Energy (QM)       5      0.3691 Kcal/mole
+ Relative Conformational Energy (QM)       6      1.1594 Kcal/mole
+ Relative Conformational Energy (QM)       7      1.5891 Kcal/mole
+ Relative Conformational Energy (QM)       8      1.2678 Kcal/mole
+ Relative Conformational Energy (QM)       9      0.6029 Kcal/mole
+ Relative Conformational Energy (QM)      10      0.2804 Kcal/mole
+
+ Initial Torsional Parameters:
+
  torsion   40  40  36  37  -1.447   0.531   0.317   0.000   0.000   0.000
- Fixed Torsion            1           5           8           9
- Fitting Torsion No.    1 Flag    0
- Variable    1   1 Variable Flag    T
- Variable    1   2 Variable Flag    T
- Variable    1   3 Variable Flag    T
- Variable    1   4 Variable Flag    F
- Variable    1   5 Variable Flag    F
- Variable    1   6 Variable Flag    F
- All the Torsions Cross the Bond
- Fitting Torsion No.    1 Flag    0
- Fitting Torsion No.    2 Flag    0
- Fitting Torsion No.    3 Flag    0
+ Fixed Torsion        1     5     8     9
+
+ Fitting Torsion Number    1     Flag    0
+ Variable   1   1     Variable Flag    T
+ Variable   1   2     Variable Flag    T
+ Variable   1   3     Variable Flag    T
+ Variable   1   4     Variable Flag    F
+ Variable   1   5     Variable Flag    F
+ Variable   1   6     Variable Flag    F
+
+ All the Torsions Across the Bond :
+ Fitting Torsion Number    1     Flag    0
+ Fitting Torsion Number    2     Flag    0
+ Fitting Torsion Number    3     Flag    0
  Fitting Torsion Value    1    1      0.0001
 
- Minimizing Structure No.   1
+ Minimizing Structure     1
  Fitting Torsion Value    2    1     19.9998
 
- Minimizing Structure No.   2
+ Minimizing Structure     2
  Fitting Torsion Value    3    1     39.9998
 
- Minimizing Structure No.   3
+ Minimizing Structure     3
  Fitting Torsion Value    4    1     59.9999
 
- Minimizing Structure No.   4
+ Minimizing Structure     4
  Fitting Torsion Value    5    1     79.9999
 
- Minimizing Structure No.   5
+ Minimizing Structure     5
  Fitting Torsion Value    6    1    100.0000
 
- Minimizing Structure No.   6
+ Minimizing Structure     6
  Fitting Torsion Value    7    1    119.9999
 
- Minimizing Structure No.   7
+ Minimizing Structure     7
  Fitting Torsion Value    8    1    140.0001
 
- Minimizing Structure No.   8
+ Minimizing Structure     8
  Fitting Torsion Value    9    1    159.9999
 
- Minimizing Structure No.   9
+ Minimizing Structure     9
  Fitting Torsion Value   10    1    179.9999
 
- Minimizing Structure No.  10
- Relative Conformational Energy (MM)     1      2.60560 kcal/mole
- Relative Conformational Energy (MM)     2      2.29853 kcal/mole
- Relative Conformational Energy (MM)     3      1.59252 kcal/mole
- Relative Conformational Energy (MM)     4      0.96330 kcal/mole
- Relative Conformational Energy (MM)     5      0.74263 kcal/mole
- Relative Conformational Energy (MM)     6      0.83572 kcal/mole
- Relative Conformational Energy (MM)     7      0.86432 kcal/mole
- Relative Conformational Energy (MM)     8      0.59404 kcal/mole
- Relative Conformational Energy (MM)     9      0.18930 kcal/mole
- Relative Conformational Energy (MM)    10      0.00000 kcal/mole
- Energy Diff RMS   0.738563810625778     
- Conformation   1 Weight   0.6188
- Conformation   2 Weight   0.4703
- Conformation   3 Weight   0.4716
- Conformation   4 Weight   0.9951
- Conformation   5 Weight   0.5159
- Conformation   6 Weight   0.4967
- Conformation   7 Weight   0.9882
- Conformation   8 Weight   0.5778
- Conformation   9 Weight   0.5773
- Conformation  10 Weight   0.7345
- Total Variable Number            4
- Matrix A elements 
+ Minimizing Structure    10
+
+ Relative Conformational Energy (MM)       1      2.6056 Kcal/mole
+ Relative Conformational Energy (MM)       2      2.2985 Kcal/mole
+ Relative Conformational Energy (MM)       3      1.5925 Kcal/mole
+ Relative Conformational Energy (MM)       4      0.9633 Kcal/mole
+ Relative Conformational Energy (MM)       5      0.7426 Kcal/mole
+ Relative Conformational Energy (MM)       6      0.8357 Kcal/mole
+ Relative Conformational Energy (MM)       7      0.8643 Kcal/mole
+ Relative Conformational Energy (MM)       8      0.5940 Kcal/mole
+ Relative Conformational Energy (MM)       9      0.1893 Kcal/mole
+ Relative Conformational Energy (MM)      10      0.0000 Kcal/mole
+
+ Energy RMS Difference :              0.7385
+
+ Conformation    1     Weight  0.6188
+ Conformation    2     Weight  0.4703
+ Conformation    3     Weight  0.4716
+ Conformation    4     Weight  0.9951
+ Conformation    5     Weight  0.5159
+ Conformation    6     Weight  0.4967
+ Conformation    7     Weight  0.9882
+ Conformation    8     Weight  0.5778
+ Conformation    9     Weight  0.5773
+ Conformation   10     Weight  0.7345
+
+ Derivative :        1   1  1.0000
+ Derivative :        1   2  0.0000
+ Derivative :        1   3  1.0000
+ Energy Difference :       1      0.2272
+ Derivative :        2   1  0.9698
+ Derivative :        2   2  0.1170
+ Derivative :        2   3  0.7500
+ Energy Difference :       2      0.3897
+ Derivative :        3   1  0.8830
+ Derivative :        3   2  0.4132
+ Derivative :        3   3  0.2500
+ Energy Difference :       3      0.6751
+ Derivative :        4   1  0.7500
+ Derivative :        4   2  0.7500
+ Derivative :        4   3  0.0000
+ Energy Difference :       4      0.7763
+ Derivative :        5   1  0.5868
+ Derivative :        5   2  0.9698
+ Derivative :        5   3  0.2500
+ Energy Difference :       5      0.6186
+ Derivative :        6   1  0.4132
+ Derivative :        6   2  0.9698
+ Derivative :        6   3  0.7500
+ Energy Difference :       6      0.3312
+ Derivative :        7   1  0.2500
+ Derivative :        7   2  0.7500
+ Derivative :        7   3  1.0000
+ Energy Difference :       7      0.1287
+ Derivative :        8   1  0.1170
+ Derivative :        8   2  0.4132
+ Derivative :        8   3  0.7500
+ Energy Difference :       8      0.1141
+ Derivative :        9   1  0.0302
+ Derivative :        9   2  0.1170
+ Derivative :        9   3  0.2500
+ Energy Difference :       9      0.1841
+ Derivative :       10   1  0.0000
+ Derivative :       10   2  0.0000
+ Derivative :       10   3  0.0000
+ Energy Difference :      10      0.2196
+
+ Total Variable Number        4
+
+ Matrix A Elements :
        2.3213      1.4930      1.5967      3.0777
        1.4930      2.2615      1.5134      3.0256
        1.5967      1.5134      2.5737      3.1567
        3.0777      3.0256      3.1567      6.4461
- Minimizing Structure   1 with New Parameters
- Minimizing Structure   2 with New Parameters
- Minimizing Structure   3 with New Parameters
- Minimizing Structure   4 with New Parameters
- Minimizing Structure   5 with New Parameters
- Minimizing Structure   6 with New Parameters
- Minimizing Structure   7 with New Parameters
- Minimizing Structure   8 with New Parameters
- Minimizing Structure   9 with New Parameters
- Minimizing Structure  10 with New Parameters
- Relative Conformational Energy (MM)     1      1.71345 kcal/mole
- Relative Conformational Energy (MM)     2      1.30859 kcal/mole
- Relative Conformational Energy (MM)     3      0.47380 kcal/mole
- Relative Conformational Energy (MM)     4      0.00000 kcal/mole
- Relative Conformational Energy (MM)     5      0.33235 kcal/mole
- Relative Conformational Energy (MM)     6      1.12545 kcal/mole
- Relative Conformational Energy (MM)     7      1.58941 kcal/mole
- Relative Conformational Energy (MM)     8      1.29399 kcal/mole
- Relative Conformational Energy (MM)     9      0.60172 kcal/mole
- Relative Conformational Energy (MM)    10      0.25200 kcal/mole
- Energy RMS With Fitting Parmeters =   2.546199926257160E-002
- 
- Fitting Torsional Parameters:
+
+ Minimizing Structure    1  with New Parameters
+ Minimizing Structure    2  with New Parameters
+ Minimizing Structure    3  with New Parameters
+ Minimizing Structure    4  with New Parameters
+ Minimizing Structure    5  with New Parameters
+ Minimizing Structure    6  with New Parameters
+ Minimizing Structure    7  with New Parameters
+ Minimizing Structure    8  with New Parameters
+ Minimizing Structure    9  with New Parameters
+ Minimizing Structure   10  with New Parameters
+
+ Relative Conformational Energy (MM)       1      1.7135 Kcal/mole
+ Relative Conformational Energy (MM)       2      1.3086 Kcal/mole
+ Relative Conformational Energy (MM)       3      0.4738 Kcal/mole
+ Relative Conformational Energy (MM)       4      0.0000 Kcal/mole
+ Relative Conformational Energy (MM)       5      0.3323 Kcal/mole
+ Relative Conformational Energy (MM)       6      1.1254 Kcal/mole
+ Relative Conformational Energy (MM)       7      1.5894 Kcal/mole
+ Relative Conformational Energy (MM)       8      1.2940 Kcal/mole
+ Relative Conformational Energy (MM)       9      0.6017 Kcal/mole
+ Relative Conformational Energy (MM)      10      0.2520 Kcal/mole
+
+ Energy RMS With Fitting Parmeters :              0.0255
+
+ Optimized Torsional Parameters:
+
  torsion   40  40  36  37  -1.888 0.0 1    0.268 180.0 2    0.744 0.0 3

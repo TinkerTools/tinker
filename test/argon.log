@@ -4,9 +4,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 6.0   October 2010                        ##
+ ##                        Version 6.0   October 2011                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2010               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2012               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -99,9 +99,9 @@
  ##                                                                          ##
  ##             TINKER  ---  Software Tools for Molecular Design             ##
  ##                                                                          ##
- ##                        Version 6.0   October 2010                        ##
+ ##                        Version 6.0   October 2011                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2010               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2012               ##
  ##                            All Rights Reserved                           ##
  ##                                                                          ##
  ##############################################################################
@@ -113,57 +113,57 @@
  Average Values for the last   100 out of      100 Dynamics Steps
 
  Simulation Time              0.2000 Picosecond
- Total Energy               -94.7680 Kcal/mole   (+/-   2.9092)
+ Total Energy               -94.7459 Kcal/mole   (+/-   2.9181)
  Potential Energy          -155.3697 Kcal/mole   (+/-   4.6254)
- Kinetic Energy              60.6017 Kcal/mole   (+/-   3.2036)
- Temperature                  136.45 Kelvin      (+/-     7.21)
- Pressure                     403.44 Atmosphere  (+/-    47.77)
+ Kinetic Energy              60.6238 Kcal/mole   (+/-   3.0644)
+ Temperature                  136.50 Kelvin      (+/-     6.90)
+ Pressure                     403.50 Atmosphere  (+/-    48.08)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      200 Dynamics Steps
 
  Simulation Time              0.4000 Picosecond
- Total Energy               -90.1706 Kcal/mole   (+/-   1.6025)
+ Total Energy               -90.1137 Kcal/mole   (+/-   1.6208)
  Potential Energy          -157.1807 Kcal/mole   (+/-   0.7319)
- Kinetic Energy              67.0101 Kcal/mole   (+/-   1.4980)
- Temperature                  150.88 Kelvin      (+/-     3.37)
- Pressure                     154.85 Atmosphere  (+/-    86.15)
+ Kinetic Energy              67.0671 Kcal/mole   (+/-   1.4817)
+ Temperature                  151.00 Kelvin      (+/-     3.34)
+ Pressure                     154.99 Atmosphere  (+/-    86.14)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      300 Dynamics Steps
 
  Simulation Time              0.6000 Picosecond
- Total Energy               -87.3205 Kcal/mole   (+/-   1.8533)
- Potential Energy          -154.9977 Kcal/mole   (+/-   1.1281)
- Kinetic Energy              67.6772 Kcal/mole   (+/-   1.4631)
- Temperature                  152.38 Kelvin      (+/-     3.29)
- Pressure                     -47.05 Atmosphere  (+/-    43.97)
+ Total Energy               -87.2858 Kcal/mole   (+/-   1.8955)
+ Potential Energy          -154.9978 Kcal/mole   (+/-   1.1281)
+ Kinetic Energy              67.7120 Kcal/mole   (+/-   1.4510)
+ Temperature                  152.46 Kelvin      (+/-     3.27)
+ Pressure                     -46.96 Atmosphere  (+/-    43.80)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      400 Dynamics Steps
 
  Simulation Time              0.8000 Picosecond
- Total Energy               -83.9916 Kcal/mole   (+/-   1.5198)
+ Total Energy               -83.9873 Kcal/mole   (+/-   1.5224)
  Potential Energy          -149.7390 Kcal/mole   (+/-   0.7072)
- Kinetic Energy              65.7474 Kcal/mole   (+/-   1.9809)
- Temperature                  148.03 Kelvin      (+/-     4.46)
- Pressure                    -120.46 Atmosphere  (+/-    22.04)
+ Kinetic Energy              65.7517 Kcal/mole   (+/-   1.9814)
+ Temperature                  148.04 Kelvin      (+/-     4.46)
+ Pressure                    -120.45 Atmosphere  (+/-    21.95)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      500 Dynamics Steps
 
  Simulation Time              1.0000 Picosecond
- Total Energy               -80.7516 Kcal/mole   (+/-   2.8733)
+ Total Energy               -80.6526 Kcal/mole   (+/-   2.9685)
  Potential Energy          -145.4553 Kcal/mole   (+/-   2.0558)
- Kinetic Energy              64.7037 Kcal/mole   (+/-   1.9911)
- Temperature                  145.68 Kelvin      (+/-     4.48)
- Pressure                    -124.28 Atmosphere  (+/-    19.52)
+ Kinetic Energy              64.8027 Kcal/mole   (+/-   2.0334)
+ Temperature                  145.91 Kelvin      (+/-     4.58)
+ Pressure                    -124.02 Atmosphere  (+/-    19.78)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Instantaneous Values for Frame saved at       500 Dynamics Steps
 
  Current Time                 1.0000 Picosecond
- Current Potential         -142.8427 Kcal/mole
+ Current Potential         -142.8428 Kcal/mole
  Lattice Lengths           26.020600     26.020600     26.020600
  Lattice Angles            90.000000     90.000000     90.000000
  Frame Number                      1
@@ -172,57 +172,57 @@
  Average Values for the last   100 out of      600 Dynamics Steps
 
  Simulation Time              1.2000 Picosecond
- Total Energy               -77.9871 Kcal/mole   (+/-   3.7874)
- Potential Energy          -142.8530 Kcal/mole   (+/-   0.5852)
- Kinetic Energy              64.8659 Kcal/mole   (+/-   4.2538)
- Temperature                  146.05 Kelvin      (+/-     9.58)
- Pressure                    -136.53 Atmosphere  (+/-    23.12)
+ Total Energy               -78.0734 Kcal/mole   (+/-   3.7696)
+ Potential Energy          -142.8531 Kcal/mole   (+/-   0.5852)
+ Kinetic Energy              64.7796 Kcal/mole   (+/-   4.2292)
+ Temperature                  145.85 Kelvin      (+/-     9.52)
+ Pressure                    -136.76 Atmosphere  (+/-    23.08)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      700 Dynamics Steps
 
  Simulation Time              1.4000 Picosecond
- Total Energy               -74.1859 Kcal/mole   (+/-   2.2541)
+ Total Energy               -74.0861 Kcal/mole   (+/-   2.1436)
  Potential Energy          -141.5424 Kcal/mole   (+/-   1.1500)
- Kinetic Energy              67.3565 Kcal/mole   (+/-   1.9073)
- Temperature                  151.66 Kelvin      (+/-     4.29)
- Pressure                    -150.47 Atmosphere  (+/-    21.16)
+ Kinetic Energy              67.4563 Kcal/mole   (+/-   1.7873)
+ Temperature                  151.88 Kelvin      (+/-     4.02)
+ Pressure                    -150.21 Atmosphere  (+/-    21.10)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      800 Dynamics Steps
 
  Simulation Time              1.6000 Picosecond
- Total Energy               -71.8637 Kcal/mole   (+/-   2.2284)
- Potential Energy          -138.6187 Kcal/mole   (+/-   0.2095)
- Kinetic Energy              66.7550 Kcal/mole   (+/-   2.0869)
- Temperature                  150.30 Kelvin      (+/-     4.70)
- Pressure                     -76.03 Atmosphere  (+/-    16.42)
+ Total Energy               -71.8381 Kcal/mole   (+/-   2.2464)
+ Potential Energy          -138.6188 Kcal/mole   (+/-   0.2094)
+ Kinetic Energy              66.7807 Kcal/mole   (+/-   2.1107)
+ Temperature                  150.36 Kelvin      (+/-     4.75)
+ Pressure                     -75.97 Atmosphere  (+/-    16.52)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of      900 Dynamics Steps
 
  Simulation Time              1.8000 Picosecond
- Total Energy               -71.2691 Kcal/mole   (+/-   1.5829)
+ Total Energy               -71.3001 Kcal/mole   (+/-   1.5685)
  Potential Energy          -138.8722 Kcal/mole   (+/-   0.2661)
- Kinetic Energy              67.6031 Kcal/mole   (+/-   1.5681)
- Temperature                  152.21 Kelvin      (+/-     3.53)
- Pressure                     -37.20 Atmosphere  (+/-     8.79)
+ Kinetic Energy              67.5721 Kcal/mole   (+/-   1.5749)
+ Temperature                  152.14 Kelvin      (+/-     3.55)
+ Pressure                     -37.28 Atmosphere  (+/-     8.75)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1000 Dynamics Steps
 
  Simulation Time              2.0000 Picosecond
- Total Energy               -72.2438 Kcal/mole   (+/-   2.0296)
- Potential Energy          -139.5697 Kcal/mole   (+/-   0.4747)
- Kinetic Energy              67.3259 Kcal/mole   (+/-   1.8597)
- Temperature                  151.59 Kelvin      (+/-     4.19)
- Pressure                     -42.16 Atmosphere  (+/-    12.84)
+ Total Energy               -72.2873 Kcal/mole   (+/-   2.0718)
+ Potential Energy          -139.5698 Kcal/mole   (+/-   0.4747)
+ Kinetic Energy              67.2825 Kcal/mole   (+/-   1.9011)
+ Temperature                  151.49 Kelvin      (+/-     4.28)
+ Pressure                     -42.27 Atmosphere  (+/-    12.96)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Instantaneous Values for Frame saved at      1000 Dynamics Steps
 
  Current Time                 2.0000 Picosecond
- Current Potential         -140.7682 Kcal/mole
+ Current Potential         -140.7683 Kcal/mole
  Lattice Lengths           26.020600     26.020600     26.020600
  Lattice Angles            90.000000     90.000000     90.000000
  Frame Number                      2
@@ -231,57 +231,57 @@
  Average Values for the last   100 out of     1100 Dynamics Steps
 
  Simulation Time              2.2000 Picosecond
- Total Energy               -77.2564 Kcal/mole   (+/-   1.7889)
- Potential Energy          -144.2756 Kcal/mole   (+/-   1.9039)
- Kinetic Energy              67.0192 Kcal/mole   (+/-   1.1312)
- Temperature                  150.90 Kelvin      (+/-     2.55)
- Pressure                    -114.67 Atmosphere  (+/-    21.13)
+ Total Energy               -77.3039 Kcal/mole   (+/-   1.8286)
+ Potential Energy          -144.2757 Kcal/mole   (+/-   1.9039)
+ Kinetic Energy              66.9718 Kcal/mole   (+/-   1.1199)
+ Temperature                  150.79 Kelvin      (+/-     2.52)
+ Pressure                    -114.79 Atmosphere  (+/-    21.23)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1200 Dynamics Steps
 
  Simulation Time              2.4000 Picosecond
- Total Energy               -83.2930 Kcal/mole   (+/-   1.1277)
- Potential Energy          -145.5255 Kcal/mole   (+/-   0.9324)
- Kinetic Energy              62.2325 Kcal/mole   (+/-   1.7904)
- Temperature                  140.12 Kelvin      (+/-     4.03)
- Pressure                     -79.45 Atmosphere  (+/-    38.06)
+ Total Energy               -83.3223 Kcal/mole   (+/-   1.1099)
+ Potential Energy          -145.5256 Kcal/mole   (+/-   0.9325)
+ Kinetic Energy              62.2032 Kcal/mole   (+/-   1.7701)
+ Temperature                  140.05 Kelvin      (+/-     3.99)
+ Pressure                     -79.53 Atmosphere  (+/-    38.11)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1300 Dynamics Steps
 
  Simulation Time              2.6000 Picosecond
- Total Energy               -77.6816 Kcal/mole   (+/-   4.0315)
- Potential Energy          -143.8095 Kcal/mole   (+/-   0.6132)
- Kinetic Energy              66.1279 Kcal/mole   (+/-   3.6619)
- Temperature                  148.89 Kelvin      (+/-     8.24)
- Pressure                      40.22 Atmosphere  (+/-    31.27)
+ Total Energy               -77.5911 Kcal/mole   (+/-   3.9881)
+ Potential Energy          -143.8096 Kcal/mole   (+/-   0.6133)
+ Kinetic Energy              66.2185 Kcal/mole   (+/-   3.6301)
+ Temperature                  149.09 Kelvin      (+/-     8.17)
+ Pressure                      40.45 Atmosphere  (+/-    31.11)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1400 Dynamics Steps
 
  Simulation Time              2.8000 Picosecond
- Total Energy               -77.5398 Kcal/mole   (+/-   2.1525)
- Potential Energy          -143.6610 Kcal/mole   (+/-   1.5716)
- Kinetic Energy              66.1213 Kcal/mole   (+/-   1.2034)
- Temperature                  148.87 Kelvin      (+/-     2.71)
- Pressure                      60.45 Atmosphere  (+/-    29.32)
+ Total Energy               -77.6162 Kcal/mole   (+/-   2.1968)
+ Potential Energy          -143.6611 Kcal/mole   (+/-   1.5717)
+ Kinetic Energy              66.0449 Kcal/mole   (+/-   1.2077)
+ Temperature                  148.70 Kelvin      (+/-     2.72)
+ Pressure                      60.25 Atmosphere  (+/-    29.48)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1500 Dynamics Steps
 
  Simulation Time              3.0000 Picosecond
- Total Energy               -77.9002 Kcal/mole   (+/-   2.6313)
- Potential Energy          -144.6283 Kcal/mole   (+/-   1.4388)
- Kinetic Energy              66.7280 Kcal/mole   (+/-   1.5218)
- Temperature                  150.24 Kelvin      (+/-     3.43)
- Pressure                      22.26 Atmosphere  (+/-    19.11)
+ Total Energy               -77.8085 Kcal/mole   (+/-   2.6242)
+ Potential Energy          -144.6283 Kcal/mole   (+/-   1.4391)
+ Kinetic Energy              66.8198 Kcal/mole   (+/-   1.5228)
+ Temperature                  150.45 Kelvin      (+/-     3.43)
+ Pressure                      22.49 Atmosphere  (+/-    19.08)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Instantaneous Values for Frame saved at      1500 Dynamics Steps
 
  Current Time                 3.0000 Picosecond
- Current Potential         -142.3905 Kcal/mole
+ Current Potential         -142.3900 Kcal/mole
  Lattice Lengths           26.020600     26.020600     26.020600
  Lattice Angles            90.000000     90.000000     90.000000
  Frame Number                      3
@@ -290,57 +290,57 @@
  Average Values for the last   100 out of     1600 Dynamics Steps
 
  Simulation Time              3.2000 Picosecond
- Total Energy               -75.4999 Kcal/mole   (+/-   1.4565)
- Potential Energy          -145.5988 Kcal/mole   (+/-   1.8794)
- Kinetic Energy              70.0989 Kcal/mole   (+/-   1.7164)
- Temperature                  157.83 Kelvin      (+/-     3.86)
- Pressure                      -6.83 Atmosphere  (+/-    35.89)
+ Total Energy               -75.5044 Kcal/mole   (+/-   1.4509)
+ Potential Energy          -145.5987 Kcal/mole   (+/-   1.8796)
+ Kinetic Energy              70.0943 Kcal/mole   (+/-   1.7707)
+ Temperature                  157.82 Kelvin      (+/-     3.99)
+ Pressure                      -6.84 Atmosphere  (+/-    35.75)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1700 Dynamics Steps
 
  Simulation Time              3.4000 Picosecond
- Total Energy               -74.9327 Kcal/mole   (+/-   0.9665)
- Potential Energy          -144.5913 Kcal/mole   (+/-   1.8979)
- Kinetic Energy              69.6585 Kcal/mole   (+/-   1.9169)
- Temperature                  156.84 Kelvin      (+/-     4.32)
- Pressure                     -16.10 Atmosphere  (+/-    20.43)
+ Total Energy               -74.9356 Kcal/mole   (+/-   0.9639)
+ Potential Energy          -144.5911 Kcal/mole   (+/-   1.8979)
+ Kinetic Energy              69.6555 Kcal/mole   (+/-   1.8896)
+ Temperature                  156.83 Kelvin      (+/-     4.25)
+ Pressure                     -16.11 Atmosphere  (+/-    20.48)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1800 Dynamics Steps
 
  Simulation Time              3.6000 Picosecond
- Total Energy               -80.7316 Kcal/mole   (+/-   2.3542)
- Potential Energy          -144.7285 Kcal/mole   (+/-   0.3659)
- Kinetic Energy              63.9970 Kcal/mole   (+/-   2.3633)
- Temperature                  144.09 Kelvin      (+/-     5.32)
- Pressure                     -65.17 Atmosphere  (+/-    15.98)
+ Total Energy               -80.7832 Kcal/mole   (+/-   2.2650)
+ Potential Energy          -144.7280 Kcal/mole   (+/-   0.3660)
+ Kinetic Energy              63.9448 Kcal/mole   (+/-   2.2574)
+ Temperature                  143.97 Kelvin      (+/-     5.08)
+ Pressure                     -65.31 Atmosphere  (+/-    15.69)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     1900 Dynamics Steps
 
  Simulation Time              3.8000 Picosecond
- Total Energy               -76.6713 Kcal/mole   (+/-   1.8138)
- Potential Energy          -142.2170 Kcal/mole   (+/-   0.4285)
- Kinetic Energy              65.5456 Kcal/mole   (+/-   1.9855)
- Temperature                  147.58 Kelvin      (+/-     4.47)
- Pressure                     -63.48 Atmosphere  (+/-     5.64)
+ Total Energy               -76.6539 Kcal/mole   (+/-   1.7961)
+ Potential Energy          -142.2172 Kcal/mole   (+/-   0.4282)
+ Kinetic Energy              65.5633 Kcal/mole   (+/-   1.9895)
+ Temperature                  147.62 Kelvin      (+/-     4.48)
+ Pressure                     -63.45 Atmosphere  (+/-     5.60)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2000 Dynamics Steps
 
  Simulation Time              4.0000 Picosecond
- Total Energy               -77.8106 Kcal/mole   (+/-   2.0688)
- Potential Energy          -140.6049 Kcal/mole   (+/-   0.6082)
- Kinetic Energy              62.7943 Kcal/mole   (+/-   2.5352)
- Temperature                  141.38 Kelvin      (+/-     5.71)
- Pressure                     -36.26 Atmosphere  (+/-    15.27)
+ Total Energy               -77.8217 Kcal/mole   (+/-   2.0709)
+ Potential Energy          -140.6042 Kcal/mole   (+/-   0.6086)
+ Kinetic Energy              62.7825 Kcal/mole   (+/-   2.5426)
+ Temperature                  141.36 Kelvin      (+/-     5.72)
+ Pressure                     -36.28 Atmosphere  (+/-    15.26)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Instantaneous Values for Frame saved at      2000 Dynamics Steps
 
  Current Time                 4.0000 Picosecond
- Current Potential         -140.5798 Kcal/mole
+ Current Potential         -140.5783 Kcal/mole
  Lattice Lengths           26.020600     26.020600     26.020600
  Lattice Angles            90.000000     90.000000     90.000000
  Frame Number                      4
@@ -349,57 +349,57 @@
  Average Values for the last   100 out of     2100 Dynamics Steps
 
  Simulation Time              4.2000 Picosecond
- Total Energy               -82.0989 Kcal/mole   (+/-   1.9082)
- Potential Energy          -141.9295 Kcal/mole   (+/-   0.5791)
- Kinetic Energy              59.8306 Kcal/mole   (+/-   1.6309)
- Temperature                  134.71 Kelvin      (+/-     3.67)
- Pressure                     -59.75 Atmosphere  (+/-    17.68)
+ Total Energy               -82.1399 Kcal/mole   (+/-   1.8799)
+ Potential Energy          -141.9286 Kcal/mole   (+/-   0.5796)
+ Kinetic Energy              59.7888 Kcal/mole   (+/-   1.6235)
+ Temperature                  134.62 Kelvin      (+/-     3.66)
+ Pressure                     -59.84 Atmosphere  (+/-    17.55)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2200 Dynamics Steps
 
  Simulation Time              4.4000 Picosecond
- Total Energy               -77.5041 Kcal/mole   (+/-   2.3103)
- Potential Energy          -142.9723 Kcal/mole   (+/-   0.9692)
- Kinetic Energy              65.4682 Kcal/mole   (+/-   1.9812)
- Temperature                  147.40 Kelvin      (+/-     4.46)
- Pressure                     -83.78 Atmosphere  (+/-    16.61)
+ Total Energy               -77.3970 Kcal/mole   (+/-   2.3039)
+ Potential Energy          -142.9738 Kcal/mole   (+/-   0.9683)
+ Kinetic Energy              65.5768 Kcal/mole   (+/-   1.9407)
+ Temperature                  147.65 Kelvin      (+/-     4.37)
+ Pressure                     -83.52 Atmosphere  (+/-    16.75)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2300 Dynamics Steps
 
  Simulation Time              4.6000 Picosecond
- Total Energy               -71.4504 Kcal/mole   (+/-   1.3678)
- Potential Energy          -142.8150 Kcal/mole   (+/-   1.7449)
- Kinetic Energy              71.3646 Kcal/mole   (+/-   1.3477)
- Temperature                  160.68 Kelvin      (+/-     3.03)
- Pressure                     -48.21 Atmosphere  (+/-    27.14)
+ Total Energy               -71.3807 Kcal/mole   (+/-   1.4983)
+ Potential Energy          -142.8154 Kcal/mole   (+/-   1.7425)
+ Kinetic Energy              71.4347 Kcal/mole   (+/-   1.3568)
+ Temperature                  160.84 Kelvin      (+/-     3.05)
+ Pressure                     -48.01 Atmosphere  (+/-    27.42)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2400 Dynamics Steps
 
  Simulation Time              4.8000 Picosecond
- Total Energy               -69.8432 Kcal/mole   (+/-   1.5701)
- Potential Energy          -140.1044 Kcal/mole   (+/-   0.9136)
- Kinetic Energy              70.2611 Kcal/mole   (+/-   1.6528)
- Temperature                  158.20 Kelvin      (+/-     3.72)
- Pressure                      19.85 Atmosphere  (+/-    12.82)
+ Total Energy               -69.9101 Kcal/mole   (+/-   1.5114)
+ Potential Energy          -140.1016 Kcal/mole   (+/-   0.9074)
+ Kinetic Energy              70.1915 Kcal/mole   (+/-   1.6242)
+ Temperature                  158.04 Kelvin      (+/-     3.66)
+ Pressure                      19.79 Atmosphere  (+/-    12.79)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2500 Dynamics Steps
 
  Simulation Time              5.0000 Picosecond
- Total Energy               -67.5695 Kcal/mole   (+/-   2.5165)
- Potential Energy          -140.0073 Kcal/mole   (+/-   2.6866)
- Kinetic Energy              72.4378 Kcal/mole   (+/-   5.0508)
- Temperature                  163.10 Kelvin      (+/-    11.37)
- Pressure                      44.73 Atmosphere  (+/-    29.10)
+ Total Energy               -67.5069 Kcal/mole   (+/-   2.4853)
+ Potential Energy          -139.9980 Kcal/mole   (+/-   2.6895)
+ Kinetic Energy              72.4910 Kcal/mole   (+/-   5.0190)
+ Temperature                  163.22 Kelvin      (+/-    11.30)
+ Pressure                      45.05 Atmosphere  (+/-    29.26)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Instantaneous Values for Frame saved at      2500 Dynamics Steps
 
  Current Time                 5.0000 Picosecond
- Current Potential         -144.1912 Kcal/mole
+ Current Potential         -144.1785 Kcal/mole
  Lattice Lengths           26.020600     26.020600     26.020600
  Lattice Angles            90.000000     90.000000     90.000000
  Frame Number                      5
@@ -408,57 +408,57 @@
  Average Values for the last   100 out of     2600 Dynamics Steps
 
  Simulation Time              5.2000 Picosecond
- Total Energy               -66.1450 Kcal/mole   (+/-   2.1366)
- Potential Energy          -140.2298 Kcal/mole   (+/-   2.1129)
- Kinetic Energy              74.0848 Kcal/mole   (+/-   1.9699)
- Temperature                  166.80 Kelvin      (+/-     4.44)
- Pressure                      37.37 Atmosphere  (+/-    27.07)
+ Total Energy               -66.1420 Kcal/mole   (+/-   2.1378)
+ Potential Energy          -140.2184 Kcal/mole   (+/-   2.1061)
+ Kinetic Energy              74.0765 Kcal/mole   (+/-   1.9414)
+ Temperature                  166.79 Kelvin      (+/-     4.37)
+ Pressure                      37.44 Atmosphere  (+/-    27.05)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2700 Dynamics Steps
 
  Simulation Time              5.4000 Picosecond
- Total Energy               -66.3232 Kcal/mole   (+/-   1.8213)
- Potential Energy          -140.1849 Kcal/mole   (+/-   0.8883)
- Kinetic Energy              73.8617 Kcal/mole   (+/-   1.8114)
- Temperature                  166.30 Kelvin      (+/-     4.08)
- Pressure                      10.10 Atmosphere  (+/-     9.10)
+ Total Energy               -66.3144 Kcal/mole   (+/-   1.8207)
+ Potential Energy          -140.1785 Kcal/mole   (+/-   0.8936)
+ Kinetic Energy              73.8641 Kcal/mole   (+/-   1.8056)
+ Temperature                  166.31 Kelvin      (+/-     4.07)
+ Pressure                      10.08 Atmosphere  (+/-     9.17)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2800 Dynamics Steps
 
  Simulation Time              5.6000 Picosecond
- Total Energy               -73.1387 Kcal/mole   (+/-   3.4867)
- Potential Energy          -141.5870 Kcal/mole   (+/-   0.9122)
- Kinetic Energy              68.4484 Kcal/mole   (+/-   3.5695)
- Temperature                  154.11 Kelvin      (+/-     8.04)
- Pressure                     -69.33 Atmosphere  (+/-    21.68)
+ Total Energy               -73.2299 Kcal/mole   (+/-   3.4398)
+ Potential Energy          -141.5668 Kcal/mole   (+/-   0.9265)
+ Kinetic Energy              68.3369 Kcal/mole   (+/-   3.5274)
+ Temperature                  153.86 Kelvin      (+/-     7.94)
+ Pressure                     -69.53 Atmosphere  (+/-    21.68)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     2900 Dynamics Steps
 
  Simulation Time              5.8000 Picosecond
- Total Energy               -72.4514 Kcal/mole   (+/-   2.2335)
- Potential Energy          -141.6794 Kcal/mole   (+/-   0.8050)
- Kinetic Energy              69.2280 Kcal/mole   (+/-   2.9479)
- Temperature                  155.87 Kelvin      (+/-     6.64)
- Pressure                     -78.41 Atmosphere  (+/-     4.16)
+ Total Energy               -72.3806 Kcal/mole   (+/-   2.1929)
+ Potential Energy          -141.6954 Kcal/mole   (+/-   0.8221)
+ Kinetic Energy              69.3149 Kcal/mole   (+/-   2.9246)
+ Temperature                  156.07 Kelvin      (+/-     6.58)
+ Pressure                     -79.07 Atmosphere  (+/-     4.54)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Average Values for the last   100 out of     3000 Dynamics Steps
 
  Simulation Time              6.0000 Picosecond
- Total Energy               -68.7845 Kcal/mole   (+/-   2.7084)
- Potential Energy          -143.6627 Kcal/mole   (+/-   1.1691)
- Kinetic Energy              74.8782 Kcal/mole   (+/-   2.3183)
+ Total Energy               -68.7842 Kcal/mole   (+/-   2.7110)
+ Potential Energy          -143.6622 Kcal/mole   (+/-   1.1919)
+ Kinetic Energy              74.8780 Kcal/mole   (+/-   2.3198)
  Temperature                  168.59 Kelvin      (+/-     5.22)
- Pressure                     -58.46 Atmosphere  (+/-    13.10)
+ Pressure                     -59.18 Atmosphere  (+/-    12.98)
  Density                      0.5648 Grams/cc    (+/-   0.0000)
 
  Instantaneous Values for Frame saved at      3000 Dynamics Steps
 
  Current Time                 6.0000 Picosecond
- Current Potential         -145.6385 Kcal/mole
+ Current Potential         -145.6595 Kcal/mole
  Lattice Lengths           26.020600     26.020600     26.020600
  Lattice Angles            90.000000     90.000000     90.000000
  Frame Number                      6
