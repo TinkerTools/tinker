@@ -23,6 +23,7 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'couple.i'
+      include 'fields.i'
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
@@ -30,13 +31,14 @@ c
       include 'kvdws.i'
       include 'kvdwpr.i'
       include 'math.i'
+      include 'merck.i'
       include 'potent.i'
       include 'vdw.i'
       include 'vdwpot.i'
       integer i,k,it
       integer ia,ib,next
       integer size,number
-      real*8 rd,ep,rdn
+      real*8 rd,ep,rdn,gik
       real*8 srad(maxtyp)
       real*8 srad4(maxtyp)
       real*8 seps(maxtyp)
@@ -311,7 +313,19 @@ c     use combination rules to set pairwise vdw radii sums
 c
       do i = 1, maxclass
          do k = i, maxclass
-            if (rad(i).eq.0.0d0 .and. rad(k).eq.0.0d0) then
+            if (radrule(1:6) .eq. 'MMFF94') then
+               if (i .ne. k) then
+                  if (DA(i).eq.'D' .or. DA(k).eq.'D') then
+                     rd = 0.5d0 * (rad(i)+rad(k))
+                  else
+                     gik = (rad(i)-rad(k))/(rad(i)+rad(k))
+                     rd = 0.5d0 * (rad(i)+rad(k))
+     &                     * (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+                  end if
+               else
+                  rd = rad(i)
+               end if
+            else if (rad(i).eq.0.0d0 .and. rad(k).eq.0.0d0) then
                rd = 0.0d0
             else if (radrule(1:10) .eq. 'ARITHMETIC') then
                rd = rad(i) + rad(k)
@@ -331,7 +345,12 @@ c     use combination rules to set pairwise well depths
 c
       do i = 1, maxclass
          do k = i, maxclass
-            if (eps(i).eq.0.0d0 .and. eps(k).eq.0.0d0) then
+            if (epsrule(1:6) .eq. 'MMFF94') then
+               ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
+     &                 / ((sqrt(alph(i)/Nn(i))+sqrt(alph(k)/Nn(k)))
+     &                              *radmin(i,k)**6)
+               if (i .eq. k)  eps(i) = ep
+            else if (eps(i).eq.0.0d0 .and. eps(k).eq.0.0d0) then
                ep = 0.0d0
             else if (epsrule(1:10) .eq. 'ARITHMETIC') then
                ep = 0.5d0 * (eps(i) + eps(k))
@@ -353,7 +372,19 @@ c     use combination rules to set pairwise 1-4 vdw radii sums
 c
       do i = 1, maxclass
          do k = i, maxclass
-            if (rad4(i).eq.0.0d0 .and. rad4(k).eq.0.0d0) then
+            if (radrule(1:6) .eq. 'MMFF94') then
+               if (i .ne. k) then
+                  if (DA(i).eq.'D' .or. DA(k).eq.'D') then
+                     rd = 0.5d0 * (rad(i)+rad(k))
+                  else
+                     gik = (rad(i)-rad(k))/(rad(i)+rad(k))
+                     rd = 0.5d0 * (rad(i)+rad(k))
+     &                     * (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+                  end if
+               else
+                  rd = rad(i)
+               end if
+            else if (rad4(i).eq.0.0d0 .and. rad4(k).eq.0.0d0) then
                rd = 0.0d0
             else if (radrule(1:10) .eq. 'ARITHMETIC') then
                rd = rad4(i) + rad4(k)
@@ -374,7 +405,12 @@ c     use combination rules to set pairwise 1-4 well depths
 c
       do i = 1, maxclass
          do k = i, maxclass
-            if (eps4(i).eq.0.0d0 .and. eps4(k).eq.0.0d0) then
+            if (epsrule(1:6) .eq. 'MMFF94') then
+               ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
+     &                 / ((sqrt(alph(i)/Nn(i))+sqrt(alph(k)/Nn(k)))
+     &                              *radmin(i,k)**6)
+               if (i .eq. k)  eps4(i) = ep
+            else if (eps4(i).eq.0.0d0 .and. eps4(k).eq.0.0d0) then
                ep = 0.0d0
             else if (epsrule(1:10) .eq. 'ARITHMETIC') then
                ep = 0.5d0 * (eps4(i) + eps4(k))
@@ -391,6 +427,26 @@ c
             epsilon4(k,i) = ep
          end do
       end do
+c
+c     use reduced values for MMFF donor-acceptor pairs
+c
+      if (forcefield .eq. 'MMFF94') then
+         do i = 1, maxclass
+            do k = i, maxclass
+               if ((da(i).eq.'D' .and. da(k).eq.'A') .or.
+     &             (da(i).eq.'A' .and. da(k).eq.'D')) then
+                  epsilon(i,k) = epsilon(i,k) * 0.5d0
+                  epsilon(k,i) = epsilon(k,i) * 0.5d0
+                  radmin(i,k) = radmin(i,k) * 0.8d0
+                  radmin(k,i) = radmin(k,i) * 0.8d0
+                  epsilon4(i,k) = epsilon4(i,k) * 0.5d0
+                  epsilon4(k,i) = epsilon4(k,i) * 0.5d0
+                  radmin4(i,k) = radmin4(i,k) * 0.8d0
+                  radmin4(k,i) = radmin4(k,i) * 0.8d0
+               end if
+            end do
+         end do
+      end if
 c
 c     vdw reduction factor information for each individual atom
 c

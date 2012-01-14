@@ -24,6 +24,7 @@ c
       include 'charge.i'
       include 'chgpot.i'
       include 'couple.i'
+      include 'fields.i'
       include 'inform.i'
       include 'iounit.i'
       include 'kchrge.i'
@@ -80,6 +81,10 @@ c
       do i = 1, n
          pchg(i) = chg(type(i))
       end do
+c
+c     use special charge parameter assignment method for MMFF
+c
+      if (forcefield .eq. 'MMFF94')  call kchargem
 c
 c     process keywords containing atom specific partial charges
 c
@@ -164,5 +169,185 @@ c
          use_charge = .false.
          use_chgdpl = .false.
       end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine kchargem  --  assign MMFF charge parameters  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "kchargem" assigns partial charges to the atoms according to
+c     the Merck Molecular Force Field (MMFF)
+c
+c
+      subroutine kchargem
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'charge.i'
+      include 'couple.i'
+      include 'merck.i'
+      integer i,j,k,m
+      integer it,kt,bt
+      integer ic,kc
+      real*8, allocatable :: pchg0(:)
+      logical emprule
+c
+c
+c     set and store MMFF base atomic partial charge values
+c
+      do i = 1, n
+         it = type(i)
+         pchg(i) = 0.0d0
+         if (it .eq. 107)  pchg(i) = -0.5d0
+         if (it .eq. 113) then
+            pchg(i) = 0.0d0
+            do j = 1, n12(i)
+               k = i12(j,i)
+               kt = type(k)
+               if (kt .eq. 185)  pchg(i) = -0.5d0
+            end do
+         end if
+         if (it .eq. 114)  pchg(i) = -1.0d0 / 3.0d0
+         if (it .eq. 115)  pchg(i) = -3.0d0
+         if (it .eq. 116)  pchg(i) = -0.5d0
+         if (it .eq. 118)  pchg(i) = -0.5d0
+         if (it .eq. 119)  pchg(i) = -2.0d0 / 3.0d0
+         if (it .eq. 121)  pchg(i) = -0.25d0
+         if (it .eq. 123)  pchg(i) = 1.0d0
+         if (it .eq. 124)  pchg(i) = -1.0d0
+         if (it .eq. 125)  pchg(i) = -1.0d0
+         if (it .eq. 154)  pchg(i) = 1.0d0
+         if (it .eq. 156)  pchg(i) = 1.0d0
+         if (it .eq. 159)  pchg(i) = 1.0d0
+         if (it .eq. 160)  pchg(i) = 1.0d0
+         if (it .eq. 161)  pchg(i) = 0.5d0
+         if (it .eq. 162)  pchg(i) = 1.0d0 / 3.0d0
+         if (it .eq. 165)  pchg(i) = 1.0d0
+         if (it .eq. 168) then
+            do j = 1, n12(i)
+               k = i12(j,i)
+               kt = type(k)
+               if (kt.eq.168 .or. kt.eq.142)  pchg(i) = 1.0d0
+            end do
+         end if
+         if (it .eq. 169)  pchg(i) = -1.0d0
+         if (it .eq. 182)  pchg(i) = -0.5d0
+         if (it .eq. 183) then
+            pchg(i) = -1.0d0
+            do j = 1, n12(i)
+               k = i12(j,i)
+               kt = type(k)
+               if (kt .eq. 87)  pchg(i) = -0.5d0
+            end do
+         end if
+         if (it .eq. 195)  pchg(i) = 1.0d0
+         if (it .eq. 196)  pchg(i) = 1.0d0
+         if (it .eq. 197)  pchg(i) = 1.0d0
+         if (it .eq. 201)  pchg(i) = 2.0d0
+         if (it .eq. 202)  pchg(i) = 3.0d0
+         if (it .eq. 203)  pchg(i) = -1.0d0
+         if (it .eq. 204)  pchg(i) = -1.0d0
+         if (it .eq. 205)  pchg(i) = -1.0d0
+         if (it .eq. 206)  pchg(i) = 1.0d0
+         if (it .eq. 207)  pchg(i) = 1.0d0
+         if (it .eq. 208)  pchg(i) = 1.0d0
+         if (it .eq. 209)  pchg(i) = 2.0d0
+         if (it .eq. 210)  pchg(i) = 2.0d0
+         if (it .eq. 211)  pchg(i) = 2.0d0
+         if (it .eq. 212)  pchg(i) = 1.0d0
+         if (it .eq. 213)  pchg(i) = 2.0d0
+         if (it .eq. 214)  pchg(i) = 2.0d0
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pchg0(n))
+c
+c     modify MMFF base charges using a bond increment scheme
+c
+      do i = 1, n
+         pchg0(i) = pchg(i)
+      end do
+      do i = 1, n
+         it = type(i)
+         ic = class(i)
+         if (pchg0(i).lt.0.0d0 .or. it.eq.162) then
+            pchg(i) = (1.0d0-crd(ic)*fcadj(ic)) * pchg0(i)
+         end if
+         do j = 1, n12(i)
+            k = i12(j,i)
+            kt = type(k)
+            kc = class(k)
+            if (pchg0(k).lt.0.0d0 .or. kt.eq.162) then
+               pchg(i) = pchg(i) + fcadj(kc)*pchg0(k)
+            end if
+            bt = 0
+            do m = 1, nlignes
+               if ((i.eq.bt_1(m,1) .and. i12(j,i).eq.bt_1(m,2)).or.
+     &                (i12(j,i).eq.bt_1(m,1) .and. i.eq.bt_1(m,2))) then
+                  bt = 1
+               end if
+            end do
+            emprule = .false.
+            if (bt .eq. 1) then
+               pchg(i) = pchg(i) + bci_1(kc,ic)
+               if (bci_1(kc,ic) .eq. 1000.0d0) then
+                  emprule = .true.
+                  goto 10
+               end if
+            else if (bt .eq. 0) then
+               pchg(i) = pchg(i) + bci(kc,ic)
+               if (bci(kc,ic) .eq. 1000.0d0) then
+                  emprule = .true.
+                  goto 10
+               end if
+            end if
+         end do
+   10    continue
+         if (emprule) then
+            pchg(i) = (1.0d0-crd(ic)*fcadj(ic)) * pchg0(i)
+            do j = 1, n12(i)
+               k = i12(j,i)
+               kc = class(k)
+               pchg(i) = pchg(i) + fcadj(kc)*pchg0(i12(j,i))
+            end do
+            do j = 1, n12(i)
+               k = i12(j,i)
+               kc = class(k)
+               bt = 0
+               do k = 1, nlignes
+                  if ((i.eq.bt_1(k,1) .and.
+     &                      i12(j,i).eq.bt_1(k,2)) .or.
+     &                   (i12(j,i).eq.bt_1(k,1) .and.
+     &                      i.eq.bt_1(k,2))) then
+                     bt = 1
+                  end if
+               end do
+               if (bt .eq. 1) then
+                  if (bci_1(kc,ic) .eq. 1000.0d0) then
+                     pchg(i) = pchg(i) + pbci(ic) - pbci(kc)
+                  else
+                     pchg(i) = pchg(i) + bci_1(kc,ic)
+                  end if
+               else if (bt .eq. 0) then
+                  if (bci(kc,ic) .eq. 1000.0d0) then
+                     pchg(i) = pchg(i) + pbci(ic) - pbci(kc)
+                  else
+                     pchg(i) = pchg(i) + bci(kc,ic)
+                  end if
+               end if
+            end do
+         end if
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pchg0)
       return
       end

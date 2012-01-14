@@ -12,10 +12,10 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     BT_1     atom pairs having a Bond Type = 1
+c     bt_1     atom pairs having a Bond Type = 1
 c     nlignes  number of atom pairs having a Bond Type = 1
-c     eqclass  table containing the atom class equivalencies
-c              to find 'default' parameters when angle bending,
+c     eqclass  table containing atom class equivalencies used
+c              to find default parameters when angle bending,
 c              out-of-plane, or torsion parameters are missing
 c              (see T. A. Halgren, J. Comput. Chem., 17,
 c               490-519, '95, Table IV, page 514)
@@ -30,16 +30,16 @@ c     lin      linearity indicator             |
 c     sbmb     single-bond/multiple-bond       |
 c              indicator                       |
 c
-c     MMFFAROM     aromatic rings parameters
-c     MMFFAROMCAT  cationic aromatic rings parameters
-c     MMFFAROMAN   anionic aromatic rings parameters
+c     mmffarom     aromatic rings parameters
+c     mmffaromcat  cationic aromatic rings parameters
+c     mmffaroman   anionic aromatic rings parameters
 c
-c     MMFF_kb   idem, as a table (the force constant is at the 
+c     mmff_kb   idem, as a table (the force constant is at the 
 c                  intersection of the atom classes of the two atoms)
-c     MMFF_kb1  idem, with Bond Type = 1
-c     MMFF_b0   idem, as a table (the bond length parameter is at the
+c     mmff_kb1  idem, with Bond Type = 1
+c     mmff_b0   idem, as a table (the bond length parameter is at the
 c                  intersection of the atom classes of the two atoms)
-c     MMFF_b01  idem, with Bond Type = 1
+c     mmff_b01  idem, with Bond Type = 1
 c
 c     rad0    covalent radius of atom             |
 c             (R. Blom and A. Haaland, J. Mol.    |  used with MMFF
@@ -49,39 +49,39 @@ c             as defined by Allred and Rochow     |  missing bond
 c     r0ref   reference bond length               |  stretch values
 c     kbref   reference force constant            |
 c
-c     MMFF_ka   idem with an entry for the class of each of the
+c     mmff_ka   idem with an entry for the class of each of the
 c                atoms of the angle
-c     MMFF_ka1  idem with one of the two bonds having a Bond Type = 1
-c     MMFF_ka2  idem with the two bonds having Bond Types of 1;
+c     mmff_ka1  idem with one of the two bonds having a Bond Type = 1
+c     mmff_ka2  idem with the two bonds having Bond Types of 1;
 c                 the sum is 2
-c     MMFF_ka3  idem with both bonds having a Bond Type = 0
+c     mmff_ka3  idem with both bonds having a Bond Type = 0
 c                 and the atoms belonging to a 3-membered ring
-c     MMFF_ka4  idem with both bonds having a Bond Type = 0
+c     mmff_ka4  idem with both bonds having a Bond Type = 0
 c                 and the atoms belonging to a 4-membered ring
-c     MMFF_ka5  idem with one of the bonds having a Bond Type = 1
+c     mmff_ka5  idem with one of the bonds having a Bond Type = 1
 c                 and the atoms belonging to a 3-membered ring
-c     MMFF_ka6  idem with both bonds having a Bond Type = 1
+c     mmff_ka6  idem with both bonds having a Bond Type = 1
 c                 and the atoms belonging to a 3-membered ring
-c     MMFF_ka7  idem with one of the bonds having a Bond Type = 1
+c     mmff_ka7  idem with one of the bonds having a Bond Type = 1
 c                 and the atoms belonging to a 4-membered ring
-c     MMFF_ka8  idem with both bonds having a Bond Type = 1
+c     mmff_ka8  idem with both bonds having a Bond Type = 1
 c                 and the atoms belonging to a 4-membered ring
-c     MMFF_teta0   idem with an entry for the class of each of the
+c     mmff_teta0   idem with an entry for the class of each of the
 c                    atoms of the angle
-c     MMFF_teta01  idem with one of the bonds having a Bond Type = 1
-c     MMFF_teta02  idem with both bonds having Bond Types of 1;
+c     mmff_teta01  idem with one of the bonds having a Bond Type = 1
+c     mmff_teta02  idem with both bonds having Bond Types of 1;
 c                    the sum is 2
-c     MMFF_teta03  idem with both bonds having Bond Types of 0
+c     mmff_teta03  idem with both bonds having Bond Types of 0
 c                    and forming a 3-membered ring
-c     MMFF_teta04  idem with both bonds having Bond Types of 0
+c     mmff_teta04  idem with both bonds having Bond Types of 0
 c                    and forming a 4-membered ring
-c     MMFF_teta05  idem with one of the bonds having Bond Types of 1
+c     mmff_teta05  idem with one of the bonds having Bond Types of 1
 c                    and forming a 3-membered ring
-c     MMFF_teta06  idem with both bonds having Bond Types of 1
+c     mmff_teta06  idem with both bonds having Bond Types of 1
 c                    and forming a 3-membered ring
-c     MMFF_teta07  idem with one of the bonds having Bond Types of 1
+c     mmff_teta07  idem with one of the bonds having Bond Types of 1
 c                    and forming a 4-membered ring
-c     MMFF_teta08  idem with both bonds having Bond Types of 1
+c     mmff_teta08  idem with both bonds having Bond Types of 1
 c
 c     stbn_abc   stretch-bending parameters for each atom class (A-B-C)
 c     stbn_cba   stretch-bending parameters for each atom class (C-B-A)
@@ -149,50 +149,51 @@ c     pbci     partial BCI for building missing BCI's
 c     fcadj    formal charge adjustment factor
 c
 c
-      integer BT_1
+      integer bt_1
       integer nlignes
       integer eqclass
       integer crd,val,pilp,mltb
       integer arom,lin,sbmb
-      integer MMFFAROM,MMFFAROMCAT
-      integer MMFFAROMAN
-      common /merck1/ BT_1(500,2),nlignes,eqclass(500,5),crd(100),
+      integer mmffarom
+      integer mmffaromcat
+      integer mmffaroman
+      common /merck1/ bt_1(500,2),nlignes,eqclass(500,5),crd(100),
      &                val(100),pilp(100),mltb(100),arom(100),lin(100),
-     &                sbmb(100),MMFFAROM(maxtyp,6),
-     &                MMFFAROMCAT(maxtyp,6),MMFFAROMAN(maxtyp,6)
+     &                sbmb(100),mmffarom(maxtyp,6),
+     &                mmffaromcat(maxtyp,6),mmffaroman(maxtyp,6)
 c
-      real*8 MMFF_kb,MMFF_kb1
-      real*8 MMFF_b0,MMFF_b01
+      real*8 mmff_kb,mmff_kb1
+      real*8 mmff_b0,mmff_b01
       real*8 rad0,r0ref
       real*8 kbref,paulel
-      common /merck2/ MMFF_kb(100,100),MMFF_kb1(100,100),
-     &                MMFF_b0(100,100),MMFF_b01(100,100),
+      common /merck2/ mmff_kb(100,100),mmff_kb1(100,100),
+     &                mmff_b0(100,100),mmff_b01(100,100),
      &                rad0(120),r0ref(53,53),kbref(53,53),paulel(120)
 c
-      real*8 MMFF_ka,MMFF_ka1,MMFF_ka2
-      real*8 MMFF_ka3,MMFF_ka4,MMFF_ka5
-      real*8 MMFF_ka6,MMFF_ka7,MMFF_ka8
-      real*8 MMFF_teta0,MMFF_teta01,MMFF_teta02
-      real*8 MMFF_teta03,MMFF_teta04,MMFF_teta05
-      real*8 MMFF_teta06,MMFF_teta07,MMFF_teta08
-      common /merck3/ MMFF_ka(0:99,0:99,0:99),
-     &                MMFF_ka1(0:99,0:99,0:99),
-     &                MMFF_ka2(0:99,0:99,0:99),
-     &                MMFF_ka3(0:99,0:99,0:99),
-     &                MMFF_ka4(0:99,0:99,0:99),
-     &                MMFF_ka5(0:99,0:99,0:99),
-     &                MMFF_ka6(0:99,0:99,0:99),
-     &                MMFF_ka7(0:99,0:99,0:99),
-     &                MMFF_ka8(0:99,0:99,0:99),
-     &                MMFF_teta0(0:99,0:99,0:99),
-     &                MMFF_teta01(0:99,0:99,0:99),
-     &                MMFF_teta02(0:99,0:99,0:99),
-     &                MMFF_teta03(0:99,0:99,0:99),
-     &                MMFF_teta04(0:99,0:99,0:99),
-     &                MMFF_teta05(0:99,0:99,0:99),
-     &                MMFF_teta06(0:99,0:99,0:99),
-     &                MMFF_teta07(0:99,0:99,0:99),
-     &                MMFF_teta08(0:99,0:99,0:99)
+      real*8 mmff_ka,mmff_ka1,mmff_ka2
+      real*8 mmff_ka3,mmff_ka4,mmff_ka5
+      real*8 mmff_ka6,mmff_ka7,mmff_ka8
+      real*8 mmff_teta0,mmff_teta01,mmff_teta02
+      real*8 mmff_teta03,mmff_teta04,mmff_teta05
+      real*8 mmff_teta06,mmff_teta07,mmff_teta08
+      common /merck3/ mmff_ka(0:99,0:99,0:99),
+     &                mmff_ka1(0:99,0:99,0:99),
+     &                mmff_ka2(0:99,0:99,0:99),
+     &                mmff_ka3(0:99,0:99,0:99),
+     &                mmff_ka4(0:99,0:99,0:99),
+     &                mmff_ka5(0:99,0:99,0:99),
+     &                mmff_ka6(0:99,0:99,0:99),
+     &                mmff_ka7(0:99,0:99,0:99),
+     &                mmff_ka8(0:99,0:99,0:99),
+     &                mmff_teta0(0:99,0:99,0:99),
+     &                mmff_teta01(0:99,0:99,0:99),
+     &                mmff_teta02(0:99,0:99,0:99),
+     &                mmff_teta03(0:99,0:99,0:99),
+     &                mmff_teta04(0:99,0:99,0:99),
+     &                mmff_teta05(0:99,0:99,0:99),
+     &                mmff_teta06(0:99,0:99,0:99),
+     &                mmff_teta07(0:99,0:99,0:99),
+     &                mmff_teta08(0:99,0:99,0:99)
 c
       real*8 stbn_abc,stbn_cba
       real*8 stbn_abc1,stbn_cba1

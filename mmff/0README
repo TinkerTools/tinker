@@ -10,24 +10,10 @@ The Info.pdf file in this directory contains some comments from Nicolas
 Staelens regarding his original implementation of MMFF in TINKER.
 
 ------------------
-Build Instructions
-------------------
-
-To build an MMFF-capable TINKER version, make a fresh copy of the standard
-TINKER source, and place the *.f and *.i files from the current directory
-into the copied source directory (overwriting files of the same name). Then
-compile and link new TINKER executables as usual. Once MMFF executables are
-available, you may use the mmff.prm parameter file.
-
-At some future point, we will integrate MMFF directly into the main TINKER
-distribution, but for now it is being kept separate due to the extensive
-MMFF-specific changes needed in the TINKER parameter setup routines.
-
-------------------
 Usage Instructions
 ------------------
 
-Once MMFF executables are available, you may use the mmff.prm parameter
+If MMFF executables are available, you may use the mmff.prm parameter
 file just as you would any other TINKER parameter file. The only caveat
 is that all MMFF "bond type = 1" bonds must be listed in the TINKER
 keyfile via the MMFF-PIBOND keyword. This keyword takes as arguments the
@@ -49,19 +35,4 @@ the Halgren set are those with ionic heteroaromatic rings. TINKER key
 files with MMFF-PIBOND keywords are provided for the 292 molecules
 requiring explicit listing of bonds with MMFF bond type of 1. Output
 files are provided to allow verification of energy components.
-
------------------------------------
-Modified Source and Parameter Files
------------------------------------
-
-mmff.prm
-kangle.f
-kbond.f
-kcharge.f
-kopbend.f
-kstrbnd.f
-ktors.f
-kvdw.f
-merck.i
-readprm.f
 

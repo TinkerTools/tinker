@@ -43,9 +43,11 @@ c
       include 'kurybr.i'
       include 'kvdws.i'
       include 'kvdwpr.i'
+      include 'merck.i'
       include 'params.i'
-      integer i,j,iprm
+      integer i,j,k,iprm
       integer ia,ib,ic,id,ie
+      integer if,ig,ih,ii
       integer size,next
       integer length,trimtext
       integer nb,nb5,nb4,nb3,nel
@@ -57,6 +59,7 @@ c
       integer npi,npi5,npi4
       integer cls,atn,lig
       integer nx,ny,nxy
+      integer bt,at,sbt,tt
       integer ft(6),pg(maxval)
       real*8 wght,rd,ep,rdn
       real*8 an1,an2,an3
@@ -68,15 +71,20 @@ c
       real*8 fc,bd,dl,el
       real*8 pt,pol,thl
       real*8 iz,rp,ss,ts
+      real*8 abc,cba
+      real*8 gi,alphi
+      real*8 nni,factor
       real*8 vt(6),st(6)
       real*8 pl(13)
       real*8 tx(maxtgrd2)
       real*8 ty(maxtgrd2)
       real*8 tf(maxtgrd2)
       logical header
+      character*1 da1
       character*4 pa,pb,pc
       character*4 pd,pe
       character*8 axt
+      character*16 blank
       character*20 keyword
       character*120 record
       character*120 string
@@ -117,6 +125,105 @@ c
       npi5 = 0
       npi4 = 0
 c
+c     initialize values of some MMFF-specific parameters
+c
+      do i = 1, 99
+         do j = 1, 99
+            mmff_kb(j,i) = 1000.0d0
+            mmff_kb1(j,i) = 1000.0d0
+            mmff_b0(j,i) = 1000.0d0
+            mmff_b01(j,i) = 1000.0d0
+            bci(j,i) = 1000.0d0
+            bci_1(j,i) = 1000.0d0
+            do k = 1, 99
+               stbn_abc(k,j,i) = 1000.0d0
+               stbn_cba(k,j,i) = 1000.0d0
+               stbn_abc1(k,j,i) = 1000.0d0
+               stbn_cba1(k,j,i) = 1000.0d0
+               stbn_abc2(k,j,i) = 1000.0d0
+               stbn_cba2(k,j,i) = 1000.0d0
+               stbn_abc3(k,j,i) = 1000.0d0
+               stbn_cba3(k,j,i) = 1000.0d0
+               stbn_abc4(k,j,i) = 1000.0d0
+               stbn_cba4(k,j,i) = 1000.0d0
+               stbn_abc5(k,j,i) = 1000.0d0
+               stbn_cba5(k,j,i) = 1000.0d0
+               stbn_abc6(k,j,i) = 1000.0d0
+               stbn_cba6(k,j,i) = 1000.0d0
+               stbn_abc7(k,j,i) = 1000.0d0
+               stbn_cba7(k,j,i) = 1000.0d0
+               stbn_abc8(k,j,i) = 1000.0d0
+               stbn_cba8(k,j,i) = 1000.0d0
+               stbn_abc9(k,j,i) = 1000.0d0
+               stbn_cba9(k,j,i) = 1000.0d0
+               stbn_abc10(k,j,i) = 1000.0d0
+               stbn_cba10(k,j,i) = 1000.0d0
+               stbn_abc11(k,j,i) = 1000.0d0
+               stbn_cba11(k,j,i) = 1000.0d0
+            end do
+         end do
+      end do
+      do i = 0, 99
+         do j = 1, 99
+            do k = 0, 99
+               mmff_ka(k,j,i) = 1000.0d0
+               mmff_ka1(k,j,i) = 1000.0d0
+               mmff_ka2(k,j,i) = 1000.0d0
+               mmff_ka3(k,j,i) = 1000.0d0
+               mmff_ka4(k,j,i) = 1000.0d0
+               mmff_ka5(k,j,i) = 1000.0d0
+               mmff_ka6(k,j,i) = 1000.0d0
+               mmff_ka7(k,j,i) = 1000.0d0
+               mmff_ka8(k,j,i) = 1000.0d0
+               mmff_teta0(k,j,i) = 1000.0d0
+               mmff_teta01(k,j,i) = 1000.0d0
+               mmff_teta02(k,j,i) = 1000.0d0
+               mmff_teta03(k,j,i) = 1000.0d0
+               mmff_teta04(k,j,i) = 1000.0d0
+               mmff_teta05(k,j,i) = 1000.0d0
+               mmff_teta06(k,j,i) = 1000.0d0
+               mmff_teta07(k,j,i) = 1000.0d0
+               mmff_teta08(k,j,i) = 1000.0d0
+            end do
+         end do
+      end do
+      blank = '                '
+      do i = 1, maxnt
+         kt(i) = blank
+         kt_1(i) = blank
+         kt_2(i) = blank
+         t1(1,i) = 1000.0d0
+         t1(2,i) = 1000.0d0
+         t2(1,i) = 1000.0d0
+         t2(2,i) = 1000.0d0
+         t3(1,i) = 1000.0d0
+         t3(2,i) = 1000.0d0
+         t1_1(1,i) = 1000.0d0
+         t1_1(2,i) = 1000.0d0
+         t2_1(1,i) = 1000.0d0
+         t2_1(2,i) = 1000.0d0
+         t3_1(1,i) = 1000.0d0
+         t3_1(2,i) = 1000.0d0
+         t1_2(1,i) = 1000.0d0
+         t1_2(2,i) = 1000.0d0
+         t2_2(1,i) = 1000.0d0
+         t2_2(2,i) = 1000.0d0
+         t3_2(1,i) = 1000.0d0
+         t3_2(2,i) = 1000.0d0
+      end do
+      do i = 1, 5
+         do j = 1, 500
+            eqclass(j,i) = 1000
+         end do
+      end do
+      do i = 1, 6
+         do j = 1, maxtyp
+            mmffarom(j,i) = 0
+            mmffaromcat(j,i) = 0
+            mmffaroman(j,i) = 0
+         end do
+      end do
+c
 c     number of characters in an atom number text string
 c
       size = 4
@@ -129,7 +236,7 @@ c     process each line of the parameter file, first
 c     extract the keyword at the start of each line
 c
       iprm = 0
-      do while (iprm .lt. nprm)
+      dowhile (iprm .lt. nprm)
          iprm = iprm + 1
          record = prmline(iprm)
          next = 1
@@ -992,34 +1099,24 @@ c
             end do
             string = record(next:120)
             read (string,*,err=390,end=390)  ia,ib,ic,id,pl(1)
-            goto 420
+            goto 400
   390       continue
             id = 0
-            read (string,*,err=400,end=400)  ia,ib,ic,pl(1)
-            goto 420
+            read (string,*,err=410,end=410)  ia,ib,ic,pl(1)
   400       continue
-            ic = 0
-            read (string,*,err=410,end=410)  ia,ib,pl(1)
-            goto 420
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=410,end=410)  pl(2),pl(3),pl(4)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=410,end=410)  pl(5)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=410,end=410)  pl(8),pl(9)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=410,end=410)  pl(11),pl(12),pl(13)
   410       continue
-            ib = 0
-            read (string,*,err=430,end=430)  ia,pl(1)
-  420       continue
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=430,end=430)  pl(2),pl(3),pl(4)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=430,end=430)  pl(5)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=430,end=430)  pl(8),pl(9)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=430,end=430)  pl(11),pl(12),pl(13)
-  430       continue
-            if (ib .eq. 0)  axt = 'None'
-            if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Only'
             if (ib.lt.0 .or. ic.lt.0)  axt = 'Bisector'
             if (ic.lt.0 .and. id.lt.0)  axt = 'Z-Bisect'
             if (max(ib,ic,id) .lt. 0)  axt = '3-Fold'
@@ -1057,9 +1154,9 @@ c
                pg(i) = 0
             end do
             string = record(next:120)
-            read (string,*,err=440,end=440)  ia,pol,thl,
+            read (string,*,err=420,end=420)  ia,pol,thl,
      &                                       (pg(i),i=1,maxval)
-  440       continue
+  420       continue
             if (ia .ne. 0) then
                polr(ia) = pol
                athl(ia) = thl
@@ -1076,8 +1173,8 @@ c
             iz = 0.0d0
             rp = 0.0d0
             string = record(next:120)
-            read (string,*,err=450,end=450)  ia,el,iz,rp
-  450       continue
+            read (string,*,err=430,end=430)  ia,el,iz,rp
+  430       continue
             if (ia .ne. 0) then
                electron(ia) = el
                ionize(ia) = iz
@@ -1092,8 +1189,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=460,end=460)  ia,ib,ss,ts
-  460       continue
+            read (string,*,err=440,end=440)  ia,ib,ss,ts
+  440       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi = npi + 1
@@ -1113,8 +1210,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=470,end=470)  ia,ib,ss,ts
-  470       continue
+            read (string,*,err=450,end=450)  ia,ib,ss,ts
+  450       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi5 = npi5 + 1
@@ -1134,8 +1231,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=480,end=480)  ia,ib,ss,ts
-  480       continue
+            read (string,*,err=460,end=460)  ia,ib,ss,ts
+  460       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi4 = npi4 + 1
@@ -1151,8 +1248,8 @@ c     metal ligand field splitting parameters
 c
          else if (keyword(1:6) .eq. 'METAL ') then
             string = record(next:120)
-            read (string,*,err=490,end=490)  ia
-  490       continue
+            read (string,*,err=470,end=470)  ia
+  470       continue
 c
 c     biopolymer atom type conversion definitions
 c
@@ -1160,19 +1257,481 @@ c
             ia = 0
             ib = 0
             string = record(next:120)
-            read (string,*,err=500,end=500)  ia
+            read (string,*,err=480,end=480)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:120)
-            read (string,*,err=500,end=500)  ib
-  500       continue
+            read (string,*,err=480,end=480)  ib
+  480       continue
             if (ia .ge. maxbio) then
                write (iout,40)
-  510          format (/,' READPRM  --  Too many Biopolymer Types;',
+  490          format (/,' READPRM  --  Too many Biopolymer Types;',
      &                    ' Increase MAXBIO')
                call fatal
             end if
             if (ia .ne. 0)  biotyp(ia) = ib
+c
+c     MMFF van der Waals parameters
+c
+         else if (keyword(1:8) .eq. 'MMFFVDW ') then
+            ia = 0
+            rd = 0.0d0
+            ep = 0.0d0
+            rdn = 0.0d0
+            da1 = 'C'
+            string = record(next:120)
+            read (string,*,err=500,end=500)  ia,rd,alphi,nni,gi,da1
+  500       continue
+            if (ia .ne. 0) then
+               rad(ia) = rd
+               g(ia) = gi
+               alph(ia) = alphi
+               nn(ia) = nni
+               da(ia) = da1
+            end if
+c
+c     MMFF bond stretching parameters
+c
+         else if (keyword(1:9) .eq. 'MMFFBOND ') then
+            ia = 0
+            ib = 0
+            fc = 0.0d0
+            bd = 0.0d0
+            bt = 2
+            string = record(next:120)
+            read (string,*,err=510,end=510)  ia,ib,fc,bd,bt
+  510       continue
+            nb = nb + 1
+            if (bt .eq. 0) then
+               mmff_kb(ia,ib) = fc
+               mmff_kb(ib,ia) = fc
+               mmff_b0(ia,ib) = bd
+               mmff_b0(ib,ia) = bd
+            else if (bt .eq. 1) then
+               mmff_kb1(ia,ib) = fc
+               mmff_kb1(ib,ia) = fc
+               mmff_b01(ia,ib) = bd
+               mmff_b01(ib,ia) = bd
+            end if
+c
+c     MMFF bond stretching empirical rule parameters
+c
+         else if (keyword(1:11) .eq. 'MMFFBONDER ') then
+            ia = 0
+            ib = 0
+            fc = 0.0d0
+            bd = 0.0d0
+            string = record(next:120)
+            read (string,*,err=520,end=520)  ia,ib,fc,bd
+  520       continue
+            r0ref(ia,ib) = fc
+            r0ref(ib,ia) = fc
+            kbref(ia,ib) = bd
+            kbref(ib,ia) = bd
+c
+c     MMFF bond angle bending parameters
+c
+         else if (keyword(1:10) .eq. 'MMFFANGLE ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            fc = 0.0d0
+            an1 = 0.0d0
+            at = 3
+            string = record(next:120)
+            read (string,*,err=530,end=530)  ia,ib,ic,fc,an1,at
+  530       continue
+            na = na + 1
+            if (an1 .ne. 0.0d0) then
+               if (at .eq. 0) then
+                  mmff_ka(ia,ib,ic) = fc
+                  mmff_ka(ic,ib,ia) = fc
+                  mmff_teta0(ia,ib,ic) = an1
+                  mmff_teta0(ic,ib,ia) = an1
+               else if (at .eq. 1) then
+                  mmff_ka1(ia,ib,ic) = fc
+                  mmff_ka1(ic,ib,ia) = fc
+                  mmff_teta01(ia,ib,ic) = an1
+                  mmff_teta01(ic,ib,ia) = an1
+               else if (at .eq. 2) then
+                  mmff_ka2(ia,ib,ic) = fc
+                  mmff_ka2(ic,ib,ia) = fc
+                  mmff_teta02(ia,ib,ic) = an1
+                  mmff_teta02(ic,ib,ia) = an1
+               else if (at .eq. 3) then
+                  mmff_ka3(ia,ib,ic) = fc
+                  mmff_ka3(ic,ib,ia) = fc
+                  mmff_teta03(ia,ib,ic) = an1
+                  mmff_teta03(ic,ib,ia) = an1
+               else if (at .eq. 4) then
+                  mmff_ka4(ia,ib,ic) = fc
+                  mmff_ka4(ic,ib,ia) = fc
+                  mmff_teta04(ia,ib,ic) = an1
+                  mmff_teta04(ic,ib,ia) = an1
+               else if (at .eq. 5) then
+                  mmff_ka5(ia,ib,ic) = fc
+                  mmff_ka5(ic,ib,ia) = fc
+                  mmff_teta05(ia,ib,ic) = an1
+                  mmff_teta05(ic,ib,ia) = an1
+               else if (at .eq. 6) then
+                  mmff_ka6(ia,ib,ic) = fc
+                  mmff_ka6(ic,ib,ia) = fc
+                  mmff_teta06(ia,ib,ic) = an1
+                  mmff_teta06(ic,ib,ia) = an1
+               else if (at .eq. 7) then
+                  mmff_ka7(ia,ib,ic) = fc
+                  mmff_ka7(ic,ib,ia) = fc
+                  mmff_teta07(ia,ib,ic) = an1
+                  mmff_teta07(ic,ib,ia) = an1
+               else if (at .eq. 8) then
+                  mmff_ka8(ia,ib,ic) = fc
+                  mmff_ka8(ic,ib,ia) = fc
+                  mmff_teta08(ia,ib,ic) = an1
+                  mmff_teta08(ic,ib,ia) = an1
+               end if
+            end if
+c
+c     MMFF stretch-bend parameters
+c
+         else if (keyword(1:11) .eq. 'MMFFSTRBND ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            abc = 0.0d0
+            cba = 0.0d0
+            sbt = 4
+            string = record(next:120)
+            read (string,*,err=540,end=540)  ia,ib,ic,abc,cba,sbt
+  540       continue
+            if (ia .ne. 0) then
+               if (sbt .eq. 0) then
+                  stbn_abc(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc(ic,ib,ia) = cba
+                  stbn_cba(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba(ic,ib,ia) = abc
+               else if (sbt .eq. 1) then
+                  stbn_abc1(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc1(ic,ib,ia) = cba
+                  stbn_cba1(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba1(ic,ib,ia) = abc
+               else if (sbt .eq. 2) then
+                  stbn_abc2(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc2(ic,ib,ia) = cba
+                  stbn_cba2(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba2(ic,ib,ia) = abc
+               else if (sbt .eq. 3) then
+                  stbn_abc3(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc3(ic,ib,ia) = cba
+                  stbn_cba3(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba3(ic,ib,ia) = abc
+               else if (sbt .eq. 4) then
+                  stbn_abc4(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc4(ic,ib,ia) = cba
+                  stbn_cba4(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba4(ic,ib,ia) = abc
+               else if (sbt .eq. 5) then
+                  stbn_abc5(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc5(ic,ib,ia) = cba
+                  stbn_cba5(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba5(ic,ib,ia) = abc
+               else if (sbt .eq. 6) then
+                  stbn_abc6(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc6(ic,ib,ia) = cba
+                  stbn_cba6(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba6(ic,ib,ia) = abc
+               else if (sbt .eq. 7) then
+                  stbn_abc7(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc7(ic,ib,ia) = cba
+                  stbn_cba7(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba7(ic,ib,ia) = abc
+               else if (sbt .eq. 8) then
+                  stbn_abc8(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc8(ic,ib,ia) = cba
+                  stbn_cba8(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba8(ic,ib,ia) = abc
+               else if (sbt .eq. 9) then
+                  stbn_abc9(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc9(ic,ib,ia) = cba
+                  stbn_cba9(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba9(ic,ib,ia) = abc
+               else if (sbt .eq. 10) then
+                  stbn_abc10(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc10(ic,ib,ia) = cba
+                  stbn_cba10(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba10(ic,ib,ia) = abc
+               else if (sbt .eq. 11) then
+                  stbn_abc11(ia,ib,ic) = abc
+                  if (ic .ne. ia)  stbn_abc11(ic,ib,ia) = cba
+                  stbn_cba11(ia,ib,ic) = cba
+                  if (ic .ne. ia)  stbn_cba11(ic,ib,ia) = abc
+               end if
+            end if
+c
+c     MMFF out-of-plane bend parameters
+c
+         else if (keyword(1:11) .eq. 'MMFFOPBEND ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            fc = 0.0d0
+            string = record(next:120)
+            read (string,*,err=550,end=550)  ia,ib,ic,id,fc
+  550       continue
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            call numeral (ic,pc,size)
+            call numeral (id,pd,size)
+            nopb = nopb + 1
+            if (ic .le. id) then
+               kopb(nopb) = pa//pb//pc//pd
+            else
+               kopb(nopb) = pa//pb//pd//pc
+            end if
+            opbn(nopb) = fc
+c           if (ic.gt.0 .or. id.gt.0) then
+c              nopb = nopb + 1
+c              if (ib .le. id) then
+c                 kopb(nopb) = pc//pb//pb//pd
+c              else
+c                 kopb(nopb) = pc//pb//pd//pb
+c              end if
+c              opbn(nopb) = fc
+c              nopb = nopb + 1
+c              if (ia .le. ic) then
+c                 kopb(nopb) = pd//pb//pa//pc
+c              else
+c                 kopb(nopb) = pd//pb//pc//pa
+c              end if
+c              opbn(nopb) = fc
+c           end if
+c
+c     MMFF torsional parameters
+c
+         else if (keyword(1:12) .eq. 'MMFFTORSION ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            do i = 1, 6
+               vt(i) = 0.0d0
+               st(i) = 0.0d0
+               ft(i) = 0
+            end do
+            tt = 3
+            string = record(next:120)
+            read (string,*,err=560,end=560)  ia,ib,ic,id,(vt(j),
+     &                                       st(j),ft(j),j=1,3),tt
+  560       continue
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            call numeral (ic,pc,size)
+            call numeral (id,pd,size)
+            nt = nt + 1
+            if (tt .eq. 0) then
+               if (ib .lt. ic) then
+                  kt(nt) = pa//pb//pc//pd
+               else if (ic .lt. ib) then
+                  kt(nt) = pd//pc//pb//pa
+               else if (ia .le. id) then
+                  kt(nt) = pa//pb//pc//pd
+               else if (id .lt. ia) then
+                  kt(nt) = pd//pc//pb//pa
+               end if
+               call torphase (ft,vt,st)
+               t1(1,nt) = vt(1)
+               t1(2,nt) = st(1)
+               t2(1,nt) = vt(2)
+               t2(2,nt) = st(2)
+               t3(1,nt) = vt(3)
+               t3(2,nt) = st(3)
+            else if (tt .eq. 1) then
+               if (ib .lt. ic) then
+                  kt_1(nt) = pa//pb//pc//pd
+               else if (ic .lt. ib) then
+                  kt_1(nt) = pd//pc//pb//pa
+               else if (ia .le. id) then
+                  kt_1(nt) = pa//pb//pc//pd
+               else if (id .lt. ia) then
+                  kt_1(nt) = pd//pc//pb//pa
+               end if
+               call torphase (ft,vt,st)
+               t1_1(1,nt) = vt(1)
+               t1_1(2,nt) = st(1)
+               t2_1(1,nt) = vt(2)
+               t2_1(2,nt) = st(2)
+               t3_1(1,nt) = vt(3)
+               t3_1(2,nt) = st(3)
+            else if (tt .eq. 2) then
+               if (ib .lt. ic) then
+                  kt_2(nt) = pa//pb//pc//pd
+               else if (ic .lt. ib) then
+                  kt_2(nt) = pd//pc//pb//pa
+               else if (ia .le. id) then
+                  kt_2(nt) = pa//pb//pc//pd
+               else if (id .lt. ia) then
+                  kt_2(nt) = pd//pc//pb//pa
+               end if
+               call torphase (ft,vt,st)
+               t1_2(1,nt) = vt(1)
+               t1_2(2,nt) = st(1)
+               t2_2(1,nt) = vt(2)
+               t2_2(2,nt) = st(2)
+               t3_2(1,nt) = vt(3)
+               t3_2(2,nt) = st(3)
+            else if (tt .eq. 4) then
+               nt4 = nt4 + 1
+               if (ib .lt. ic) then
+                  kt4(nt4) = pa//pb//pc//pd
+               else if (ic .lt. ib) then
+                  kt4(nt4) = pd//pc//pb//pa
+               else if (ia .le. id) then
+                  kt4(nt4) = pa//pb//pc//pd
+               else if (id .lt. ia) then
+                  kt4(nt4) = pd//pc//pb//pa
+               end if
+               call torphase (ft,vt,st)
+               t14(1,nt4) = vt(1)
+               t14(2,nt4) = st(1)
+               t24(1,nt4) = vt(2)
+               t24(2,nt4) = st(2)
+               t34(1,nt4) = vt(3)
+               t34(2,nt4) = st(3)
+            else if (tt .eq. 5) then
+               nt5 = nt5 + 1
+               if (ib .lt. ic) then
+                  kt5(nt5) = pa//pb//pc//pd
+               else if (ic .lt. ib) then
+                  kt5(nt5) = pd//pc//pb//pa
+               else if (ia .le. id) then
+                  kt5(nt5) = pa//pb//pc//pd
+               else if (id .lt. ia) then
+                  kt5(nt5) = pd//pc//pb//pa
+               end if
+               call torphase (ft,vt,st)
+               t15(1,nt5) = vt(1)
+               t15(2,nt5) = st(1)
+               t25(1,nt5) = vt(2)
+               t25(2,nt5) = st(2)
+               t35(1,nt5) = vt(3)
+               t35(2,nt5) = st(3)
+            end if
+c
+c     MMFF bond charge increment parameters
+c
+         else if (keyword(1:8) .eq. 'MMFFBCI ') then
+            ia = 0
+            ib = 0
+            cg = 1000.0d0
+            bt = 2
+            string = record(next:120)
+            read (string,*,err=570,end=570)  ia,ib,cg,bt
+  570       continue
+            if (ia .ne. 0) then
+               if (bt .eq. 0) then
+                  bci(ia,ib) = cg
+                  bci(ib,ia) = -cg
+               else if (bt .eq. 1) then
+                  bci_1(ia,ib) = cg
+                  bci_1(ib,ia) = -cg
+               end if
+            end if
+c
+c     MMFF partial bond charge increment parameters
+c
+         else if (keyword(1:9) .eq. 'MMFFPBCI ') then
+            ia = 0
+            string = record(next:120)
+            read (string,*,err=580,end=580)  ia,cg,factor
+  580       continue
+            if (ia .ne. 0) then
+               pbci(ia) = cg
+               fcadj(ia) = factor
+            end if
+c
+c     MMFF atom class equivalency parameters
+c
+         else if (keyword(1:10) .eq. 'MMFFEQUIV ') then
+            string = record(next:120)
+            ia = 1000
+            ib = 1000
+            ic = 1000
+            id = 1000
+            ie = 1000
+            if = 0
+            read (string,*,err=590,end=590)  ia,ib,ic,id,ie,if
+  590       continue
+            eqclass(if,1) = ia
+            eqclass(if,2) = ib
+            eqclass(if,3) = ic
+            eqclass(if,4) = id
+            eqclass(if,5) = ie
+c
+c     MMFF default stretch-bend parameters
+c
+         else if (keyword(1:12) .eq. 'MMFFDEFSTBN ') then
+            string = record(next:120)
+            ia = 1000
+            ib = 1000
+            ic = 1000
+            abc = 0.0d0
+            cba = 0.0d0
+            read (string,*,err=600,end=600)  ia,ib,ic,abc,cba
+  600       continue
+            defstbnd_abc(ia,ib,ic) = abc
+            defstbnd_cba(ia,ib,ic) = cba
+            defstbnd_abc(ic,ib,ia) = cba
+            defstbnd_cba(ic,ib,ia) = abc
+c
+c     MMFF covalent radius and electronegativity parameters
+c
+         else if (keyword(1:11) .eq. 'MMFFCOVRAD ') then
+            ia = 0
+            fc = 0.0d0
+            bd = 0.0d0
+            string = record(next:120)
+            read (string,*,err=610,end=610)  ia,fc,bd
+  610       continue
+            rad0(ia) = fc
+            paulel(ia) = bd
+c
+c     MMFF property parameters
+c
+         else if (keyword(1:9) .eq. 'MMFFPROP ') then
+            string = record(next:120)
+            ia = 1000
+            ib = 1000
+            ic = 1000
+            id = 1000
+            ie = 1000
+            if = 1000
+            ig = 1000
+            ih = 1000
+            ii = 1000
+            read (string,*,err=620,end=620)  ia,ib,ic,id,ie,
+     &                                       if,ig,ih,ii
+  620       continue
+            crd(ia) = ic
+            val(ia) = id
+            pilp(ia) = ie
+            mltb(ia) = if
+            arom(ia) = ig
+            lin(ia) = ih
+            sbmb(ia) = ii
+c
+c     MMFF aromatic ion parameters
+c
+         else if (keyword(1:9) .eq. 'MMFFAROM ') then
+            string = record(next:120)
+            read (string,*,err=630,end=630)  ia,ib,ic,id,ie,if
+  630       continue
+            if (ie.eq.0 .and. id.eq.0) then
+               mmffarom(ia,if) = ic
+            else if (id .eq. 1) then
+               mmffaromcat(ia,if) = ic
+            else if (ie .eq. 1) then
+               mmffaroman(ia,if) = ic
+            end if
          end if
       end do
       return

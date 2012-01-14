@@ -24,6 +24,7 @@ c
       include 'atoms.i'
       include 'bond.i'
       include 'couple.i'
+      include 'fields.i'
       include 'inform.i'
       include 'iounit.i'
       include 'kbonds.i'
@@ -172,6 +173,13 @@ c
       end do
       use_ring = .false.
       if (min(nb5,nb4,nb3) .ne. 0)  use_ring = .true.
+c
+c     use special bond parameter assignment method for MMFF
+c
+      if (forcefield .eq. 'MMFF94') then
+         call kbondm
+         return
+      end if
 c
 c     assign ideal bond length and force constant for each bond
 c
@@ -474,5 +482,141 @@ c
    80       continue
          end do
       end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine kbondm  --  assign MMFF bond stretch parameters  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "kbondm" assigns a force constant and ideal bond length to
+c     each bond according to the Merck Molecular Force Field (MMFF)
+c
+c     literature reference:
+c
+c     R. Blom and A. Haaland, "A Modification of the Schomaker-Stevenson
+c     Rule for Prediction of Single Bond Distances", Journal of
+c     Molecular Structure, 128, 21-27 (1985)
+c
+c
+      subroutine kbondm
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'bond.i'
+      include 'keys.i'
+      include 'merck.i'
+      include 'potent.i'
+      integer i,j
+      integer ia,ib,ita,itb
+      integer next,minat
+      integer list(20)
+      integer mtype(maxatm)
+      integer jlignes(maxbnd)
+      real*8 khia,khib,cst
+      real*8 rad0a,rad0b
+      logical header,done
+      character*20 keyword
+      character*120 record
+      character*120 string
+c
+c
+c     get single bonds that could be double (MMFF bond type=1)
+c
+      nlignes = 0
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:12) .eq. 'MMFF-PIBOND ') then
+            do j = 1, 20
+               list(j) = 0
+            end do
+            string = record(next:120)
+            read (string,*,err=10,end=10)  (list(j),j=1,20)
+   10       continue
+            do j = 1, 20, 2
+               if (list(j).ne.0 .and. list(j+1).ne.0) then
+                  nlignes = nlignes + 1
+                  bt_1(nlignes,1) = list(j)
+                  bt_1(nlignes,2) = list(j+1)
+               else
+                  goto 20
+               end if
+            end do
+   20       continue
+         end if
+      end do
+c
+c     assign MMFF bond length and force constant values
+c
+      header = .true.
+      do i = 1, nbond
+         ia = ibnd(1,i)
+         ib = ibnd(2,i)
+         ita = class(ia)
+         itb = class(ib)
+         if (ia .le. ib) then
+            do j = 1, nlignes
+               if (ia.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) then
+                  bk(i) = mmff_kb1(ita,itb)
+                  bl(i) = mmff_b01(ita,itb)
+                  done = .true.
+                  if (bk(i) .eq. 1000.0d0)  done = .false.
+                  if (bl(i) .eq. 1000.0d0)  done = .false.
+                  goto 30
+               end if
+            end do
+            bk(i) = mmff_kb(ita,itb)
+            bl(i) = mmff_b0(ita,itb)
+            done = .true.
+            if (bk(i) .eq. 1000.0d0)  done = .false.
+            if (bl(i) .eq. 1000.0d0)  done = .false.
+            goto 30
+         else if (ib .le. ia) then
+            do j = 1, nlignes
+               if (ib.eq.bt_1(j,1) .and. ia.eq.bt_1(j,2)) then
+                  bk(i) = mmff_kb1(itb,ita)
+                  bl(i) = mmff_b01(itb,ita)
+                  done = .true.
+                  if (bk(i) .eq. 1000.0d0)  done = .false.
+                  if (bl(i) .eq. 1000.0d0)  done = .false.
+                  goto 30
+               end if
+            end do
+            bk(i) = mmff_kb(itb,ita)
+            bl(i) = mmff_b0(itb,ita)
+            done = .true.
+            if (bk(i) .eq. 1000.0d0)  done = .false.
+            if (bl(i) .eq. 1000.0d0)  done = .false.
+            goto 30
+         end if
+c
+c     estimate missing bond parameters via an empirical rule
+c
+   30    continue
+         minat = min(atomic(ia),atomic(ib))
+         if (minat .eq. 0)  done = .true.
+         if (.not. done) then
+            khia = paulel(atomic(ia))
+            khib = paulel(atomic(ib))
+            rad0a = rad0(atomic(ia))
+            rad0b = rad0(atomic(ib))
+            cst = 0.085d0
+            if (atomic(ia).eq.1 .or. atomic(ib).eq.1)  cst = 0.05d0
+            bl(i) = rad0a + rad0b - cst*abs(khia-khib)**1.4d0
+            bk(i) = kbref(atomic(ia),atomic(ib))
+     &                 * (r0ref(atomic(ia),atomic(ib))/bl(i))**6
+         end if
+      end do
+c
+c     turn off the bond stretch potential if it is not used
+c
+      if (nbond .eq. 0)  use_bond = .false.
       return
       end

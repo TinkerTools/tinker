@@ -24,6 +24,7 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'couple.i'
+      include 'fields.i'
       include 'inform.i'
       include 'iounit.i'
       include 'kangs.i'
@@ -300,6 +301,13 @@ c
          end if
       end do
 c
+c     use special angle parameter assignment method for MMFF
+c
+      if (forcefield .eq. 'MMFF94') then
+         call kanglem
+         return
+      end if
+c
 c     assign ideal bond angle and force constant for each angle
 c
       header = .true.
@@ -431,6 +439,375 @@ c
      &                        ic,name(ic),ita,itb,itc
   230       format (1x,a6,5x,3(i6,'-',a3),7x,3i5)
          end if
+      end do
+c
+c     turn off the angle bending potential if it is not used
+c
+      if (nangle .eq. 0)  use_angle = .false.
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine kanglem  --  MMFF angle parameter assignment  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "kanglem" assigns the force constants and ideal angles for
+c     bond angles according to the Merck Molecular Force Field (MMFF)
+c
+c     literature reference:
+c
+c     T. A. Halgren, "Merck Molecular Force Field. I. Basis, Form,
+c     Scope, Parametrization, and Performance of MMFF94", Journal of
+c     Computational Chemistry, 17, 490-519 (1995)
+c
+c     T. A. Halgren, "Merck Molecular Force Field. V. Extension of
+c     MMFF94 Using Experimental Data, Additional Computational Data,
+c     and Empirical Rules", Journal of Computational Chemistry, 17,
+c     616-641 (1995)
+c
+c
+      subroutine kanglem
+      implicit none
+      include 'sizes.i'
+      include 'angle.i'
+      include 'angpot.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'bond.i'
+      include 'merck.i'
+      include 'potent.i'
+      include 'ring.i'
+      integer i,j,k,l,m
+      integer ia,ib,ic
+      integer ita,itb,itc
+      integer itta,ittb,ittc
+      integer bnd_ab,bnd_bc
+      integer at,minat
+      integer mclass
+      real*8 d,beta
+      real*8 z2(53),c(53)
+      logical done
+      logical ring3,ring4
+c
+c
+c     fill in the tables with the empirical rule parameters; if
+c     parameter does not exist, set to 1000, so we note it later
+c
+      do i = 1, 53
+         z2(i) = 1000.0d0
+         c(i) = 1000.0d0
+      end do
+      z2(1) = 1.395d0
+      z2(5) = 0.0d0
+      z2(6) = 2.494d0
+      z2(7) = 2.711d0
+      z2(8) = 3.045d0
+      z2(9) = 2.847d0
+      z2(14) = 2.350d0
+      z2(15) = 2.350d0
+      z2(16) = 2.980d0
+      z2(17) = 2.909d0
+      z2(35) = 3.017d0
+      z2(33) = 0.0d0
+      z2(53) = 3.086d0
+      c(1) = 0.0d0
+      c(5) = 0.704d0
+      c(6) = 1.016d0
+      c(7) = 1.113d0
+      c(8) = 1.337d0
+      c(9) = 0.0d0
+      c(14) = 0.811d0
+      c(15) = 1.068d0
+      c(16) = 1.249d0
+      c(17) = 1.078d0
+      c(35) = 0.0d0
+      c(33) = 0.825d0
+      c(53) = 0.0d0
+      do i = 1, nangle
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         ita = class(ia)
+         itb = class(ib)
+         itc = class(ic)
+         itta = type(ia)
+         ittb = type(ib)
+         ittc = type(ic)
+c
+c     calculation of the the AT, looks at the BT
+c
+         at = 0
+         do j = 1, nlignes
+            if (((ia.eq.bt_1(j,1)).and.(ib.eq.bt_1(j,2))) .or.
+     &          ((ib.eq.bt_1(j,1)).and.(ia.eq.bt_1(j,2)))) then
+               at = at + 1
+            end if
+            if (((ic.eq.bt_1(j,1)).and.(ib.eq.bt_1(j,2))) .or.
+     &          ((ib.eq.bt_1(j,1)).and.(ic.eq.bt_1(j,2)))) then
+               at = at + 1
+            end if
+         end do
+c
+c     look at whether the atoms belong to a 3- or 4-membered ring
+c
+         ring3 = .false.
+         ring4 = .false.
+         do j = 1, nring3
+            do k = 1, 3
+               if (ia .eq. iring3(k,j)) then
+                  do l = 1, 3
+                     if (ib .eq. iring3(l,j)) then
+                        do m = 1, 3
+                           if (ic .eq. iring3(m,j))  ring3 = .true.
+                        end do
+                     end if
+                  end do
+               end if
+            end do
+         end do
+         if (.not. ring3) then
+            do j = 1, nring4
+               do k = 1, 4
+                  if (ia .eq. iring4(k,j)) then
+                     do l = 1, 4
+                        if (ib .eq. iring4(l,j)) then
+                           do m = 1, 4
+                              if (ic .eq. iring4(m,j))  ring4 = .true.
+                           end do
+                        end if
+                     end do
+                  end if
+               end do
+            end do
+         end if
+c
+c     set special AT values when 3- or 4-rings are present
+c
+         if (at.eq.0 .and. ring4) then
+            at = 4
+         else if (at.eq.1 .and. ring4) then
+            at = 7
+         else if (at.eq.2 .and. ring4) then
+            at = 8
+         else if (at.eq.0 .and. ring3) then
+            at = 3
+         else if (at.eq.1 .and. ring3) then
+            at = 5
+         else if (at.eq.2 .and. ring3) then
+            at = 6
+         end if
+c
+c     setup the atom class equivalencies assignment
+c
+         mclass = 0
+   10    continue
+         mclass = mclass + 1
+         if (mclass .eq. 1) then
+            ita = eqclass(itta,1)
+            itb = eqclass(ittb,1)
+            itc = eqclass(ittc,1)
+         else if (mclass .eq. 2) then
+            ita = eqclass(itta,2)
+            itb = eqclass(ittb,2)
+            itc = eqclass(ittc,2)
+         else if (mclass .eq. 3) then
+            ita = eqclass(itta,3)
+            itb = eqclass(ittb,2)
+            itc = eqclass(ittc,3)
+         else if (mclass .eq. 4) then
+            ita = eqclass(itta,4)
+            itb = eqclass(ittb,2)
+            itc = eqclass(ittc,4)
+         else if (mclass .eq. 5) then
+            ita = eqclass(itta,5)
+            itb = eqclass(ittb,2)
+            itc = eqclass(ittc,5)
+         end if
+         if (mclass .gt. 5) then
+            goto 30
+         else if (at .eq. 0) then
+            ak(i) = mmff_ka(ita,itb,itc)
+            anat(i) = mmff_teta0(ita,itb,itc)
+            if (mclass .eq. 5) then
+   20          continue
+c
+c     if "wild card" parameters: still need to calculate
+c     the force constant by an empirical rule;
+c     if (full) empirical rule: the reference angle
+c     has already been calculated
+c
+               if (z2(atomic(ia)) .eq. 1000.0d0)  goto 30
+               if (z2(atomic(ib)) .eq. 1000.0d0)  goto 30
+               if (z2(atomic(ic)) .eq. 1000.0d0)  goto 30
+               if (c(atomic(ia)) .eq. 1000.0d0)  goto 30
+               if (c(atomic(ib)) .eq. 1000.0d0)  goto 30
+               if (c(atomic(ic)) .eq. 1000.0d0)  goto 30
+c
+c     find the numbers of the two bonds
+c
+               do k = 1, maxbnd
+                  if ((min(ia,ib).eq.ibnd(1,k)) .and.
+     &                (max(ia,ib).eq.ibnd(2,k))) then
+                     bnd_ab = k
+                  end if
+                  if ((min(ic,ib).eq.ibnd(1,k)) .and.
+     &                (max(ic,ib).eq.ibnd(2,k))) then
+                     bnd_bc = k
+                  end if
+               end do
+               d = (bl(bnd_ab)-bl(bnd_bc))**2
+     &                / (bl(bnd_ab)+bl(bnd_bc))**2
+               beta = 1.0d0
+               if (ring4)  beta = 0.85d0
+               if (ring3)  beta = 0.05d0
+               ak(i) = beta*1.75d0*z2(atomic(ia))*z2(atomic(ic))
+     &                    *c(atomic(ib))
+     &                 / ((anat(i)*0.01745329252d0)**2
+     &                    *(bl(bnd_ab)+bl(bnd_bc))*exp(2.0d0*D))
+            end if
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not. done)  goto 10
+            goto 30
+         else if (at .eq. 1) then
+            ak(i) = mmff_ka1(ita,itb,itc)
+            anat(i) = mmff_teta01(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 2) then
+            ak(i) = mmff_ka2(ita,itb,itc)
+            anat(i) = mmff_teta02(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 3) then
+            ak(i) = mmff_ka3(ita,itb,itc)
+            anat(i) = mmff_teta03(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 4) then
+            ak(i) = mmff_ka4(ita,itb,itc)
+            anat(i) = mmff_teta04(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 5) then
+            ak(i) = mmff_ka5(ita,itb,itc)
+            anat(i) = mmff_teta05(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 6) then
+            ak(i) = mmff_ka6(ita,itb,itc)
+            anat(i) = mmff_teta06(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 7) then
+            ak(i) = mmff_ka7(ita,itb,itc)
+            anat(i) = mmff_teta07(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         else if (at .eq. 8) then
+            ak(i) = mmff_ka8(ita,itb,itc)
+            anat(i) = mmff_teta08(ita,itb,itc)
+            done = .true.
+            if (ak(i) .eq. 1000.0d0)  done = .false.
+            if (anat(i) .eq. 1000.0d0)  done = .false.
+            if (.not.done .and. mclass.lt.5) then
+               goto 10
+            else if (mclass .eq. 5) then
+               goto 20
+            end if
+            goto 30
+         end if
+c
+c     warn if suitable angle bending parameter not found
+c
+   30    continue
+         minat = min(atomic(ia),atomic(ib),atomic(ic))
+         if (minat .eq. 0)  done = .true.
+         if (.not. done) then
+            if (use_angle) then
+c
+c     if angle parameters are missing, apply empirical rules
+c
+               anat(i) = 120.0d0
+               if (crd(itb) .eq. 4)  anat(i) = 109.45d0
+               if (crd(itb) .eq. 2) then
+                  if (atomic(ib) .eq. 8) then
+                     anat(i) = 105.0d0
+                  else if (atomic(ib) .gt. 10) then
+                     anat(i) = 95.0d0
+                  else if (lin(itb) .eq. 1) then
+                     anat(i) = 180.0d0
+                  end if
+               end if
+               if (crd(itb).eq.3 .and. val(itb).eq.3
+     &                .and. mltb(itb).eq.0) then
+                  if (atomic(ib) .eq. 7) then
+                     anat(i) = 107.0d0
+                  else
+                     anat(i) = 92.0d0
+                  end if
+               end if
+               if (ring3)  anat(i) = 60.0d0
+               if (ring4)  anat(i) = 90.0d0
+               goto 20
+            end if
+         end if
+         angtyp(i) = 'HARMONIC'
+         if (anat(i) .eq. 180.0d0)  angtyp(i) = 'LINEAR'
       end do
 c
 c     turn off the angle bending potential if it is not used
