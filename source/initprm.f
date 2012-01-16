@@ -46,6 +46,7 @@ c
       include 'kvdws.i'
       include 'kvdwpr.i'
       include 'math.i'
+      include 'merck.i'
       include 'mplpot.i'
       include 'polpot.i'
       include 'rxnpot.i'
@@ -54,7 +55,7 @@ c
       include 'torpot.i'
       include 'units.i'
       include 'vdwpot.i'
-      integer i,j
+      integer i,j,k
       character*3 blank3
       character*8 blank8
       character*12 blank12
@@ -171,7 +172,7 @@ c
          kpi4(i) = blank8
       end do
 c
-c     initialize some of the force field parameters
+c     initialize values of some force field parameters
 c
       forcefield = blank20
       do i = 1, maxtyp
@@ -206,6 +207,104 @@ c
       end do
       do i = 1, maxbio
          biotyp(i) = 0
+      end do
+c
+c     initialize values of some MMFF-specific parameters
+c
+      do i = 1, 100
+         do j = 1, 100
+            mmff_kb(j,i) = 1000.0d0
+            mmff_kb1(j,i) = 1000.0d0
+            mmff_b0(j,i) = 1000.0d0
+            mmff_b01(j,i) = 1000.0d0
+            bci(j,i) = 1000.0d0
+            bci_1(j,i) = 1000.0d0
+            do k = 1, 100
+               stbn_abc(k,j,i) = 1000.0d0
+               stbn_cba(k,j,i) = 1000.0d0
+               stbn_abc1(k,j,i) = 1000.0d0
+               stbn_cba1(k,j,i) = 1000.0d0
+               stbn_abc2(k,j,i) = 1000.0d0
+               stbn_cba2(k,j,i) = 1000.0d0
+               stbn_abc3(k,j,i) = 1000.0d0
+               stbn_cba3(k,j,i) = 1000.0d0
+               stbn_abc4(k,j,i) = 1000.0d0
+               stbn_cba4(k,j,i) = 1000.0d0
+               stbn_abc5(k,j,i) = 1000.0d0
+               stbn_cba5(k,j,i) = 1000.0d0
+               stbn_abc6(k,j,i) = 1000.0d0
+               stbn_cba6(k,j,i) = 1000.0d0
+               stbn_abc7(k,j,i) = 1000.0d0
+               stbn_cba7(k,j,i) = 1000.0d0
+               stbn_abc8(k,j,i) = 1000.0d0
+               stbn_cba8(k,j,i) = 1000.0d0
+               stbn_abc9(k,j,i) = 1000.0d0
+               stbn_cba9(k,j,i) = 1000.0d0
+               stbn_abc10(k,j,i) = 1000.0d0
+               stbn_cba10(k,j,i) = 1000.0d0
+               stbn_abc11(k,j,i) = 1000.0d0
+               stbn_cba11(k,j,i) = 1000.0d0
+            end do
+         end do
+      end do
+      do i = 0, 100
+         do j = 1, 100
+            do k = 0, 100
+               mmff_ka(k,j,i) = 1000.0d0
+               mmff_ka1(k,j,i) = 1000.0d0
+               mmff_ka2(k,j,i) = 1000.0d0
+               mmff_ka3(k,j,i) = 1000.0d0
+               mmff_ka4(k,j,i) = 1000.0d0
+               mmff_ka5(k,j,i) = 1000.0d0
+               mmff_ka6(k,j,i) = 1000.0d0
+               mmff_ka7(k,j,i) = 1000.0d0
+               mmff_ka8(k,j,i) = 1000.0d0
+               mmff_ang0(k,j,i) = 1000.0d0
+               mmff_ang01(k,j,i) = 1000.0d0
+               mmff_ang02(k,j,i) = 1000.0d0
+               mmff_ang03(k,j,i) = 1000.0d0
+               mmff_ang04(k,j,i) = 1000.0d0
+               mmff_ang05(k,j,i) = 1000.0d0
+               mmff_ang06(k,j,i) = 1000.0d0
+               mmff_ang07(k,j,i) = 1000.0d0
+               mmff_ang08(k,j,i) = 1000.0d0
+            end do
+         end do
+      end do
+      do i = 1, maxnt
+         kt(i) = blank16
+         kt_1(i) = blank16
+         kt_2(i) = blank16
+         t1(1,i) = 1000.0d0
+         t1(2,i) = 1000.0d0
+         t2(1,i) = 1000.0d0
+         t2(2,i) = 1000.0d0
+         t3(1,i) = 1000.0d0
+         t3(2,i) = 1000.0d0
+         t1_1(1,i) = 1000.0d0
+         t1_1(2,i) = 1000.0d0
+         t2_1(1,i) = 1000.0d0
+         t2_1(2,i) = 1000.0d0
+         t3_1(1,i) = 1000.0d0
+         t3_1(2,i) = 1000.0d0
+         t1_2(1,i) = 1000.0d0
+         t1_2(2,i) = 1000.0d0
+         t2_2(1,i) = 1000.0d0
+         t2_2(2,i) = 1000.0d0
+         t3_2(1,i) = 1000.0d0
+         t3_2(2,i) = 1000.0d0
+      end do
+      do i = 1, 5
+         do j = 1, 500
+            eqclass(j,i) = 1000
+         end do
+      end do
+      do i = 1, 6
+         do j = 1, maxtyp
+            mmffarom(j,i) = 0
+            mmffaromc(j,i) = 0
+            mmffaroma(j,i) = 0
+         end do
       end do
 c
 c     set default control parameters for local geometry terms

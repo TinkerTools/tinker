@@ -417,8 +417,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 10) then
                if ((stbn_abc10(ita,itb,itc).ne.1000.0d0) .and.
@@ -434,8 +434,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 9) then
                if ((stbn_abc9(ita,itb,itc).ne.1000.0d0) .and.
@@ -451,8 +451,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 8) then
                if ((stbn_abc8(ita,itb,itc).ne.1000.0d0) .and.
@@ -468,8 +468,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 7) then
                if ((stbn_abc7(ita,itb,itc).ne.1000.0d0) .and.
@@ -485,8 +485,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 6) then
                if ((stbn_abc6(ita,itb,itc).ne.1000.0d0) .and.
@@ -502,8 +502,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 5) then
                if (((stbn_abc5(ita,itb,itc).ne.1000.0d0) .and.
@@ -520,8 +520,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 4) then
                if ((stbn_abc4(ita,itb,itc).ne.1000.0d0) .and.
@@ -537,8 +537,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 3) then
                if ((stbn_abc3(ita,itb,itc).ne.1000.0d0) .and.
@@ -554,8 +554,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 2) then
               if ((stbn_abc2(ita,itb,itc).ne.1000.0d0) .and.
@@ -571,8 +571,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 1) then
                if ((stbn_abc1(ita,itb,itc).ne.1000.0d0) .and.
@@ -588,8 +588,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 0) then
                if (((stbn_abc(ita,itb,itc) .ne. 1000.0d0) .and.
@@ -607,8 +607,8 @@ c
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1
                   isb(3,nstrbnd) = nb2
-                  sbk(1,nstrbnd) = defstbnd_abc(ira,irb,irc)
-                  sbk(2,nstrbnd) = defstbnd_cba(ira,irb,irc)
+                  sbk(1,nstrbnd) = defstbn_abc(ira,irb,irc)
+                  sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             end if
          end if

@@ -49,7 +49,7 @@ c
       triclinic = .false.
       octahedron = .false.
       spacegrp = '          '
-      nosymm = .true.
+      nosymm = .false.
 c
 c     get keywords containing crystal lattice dimensions
 c

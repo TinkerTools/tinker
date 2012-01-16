@@ -12,141 +12,22 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     bt_1     atom pairs having a Bond Type = 1
-c     nlignes  number of atom pairs having a Bond Type = 1
-c     eqclass  table containing atom class equivalencies used
-c              to find default parameters when angle bending,
-c              out-of-plane, or torsion parameters are missing
-c              (see T. A. Halgren, J. Comput. Chem., 17,
-c               490-519, '95, Table IV, page 514)
-c
-c     crd      number of attached neighbours   |
-c     val      "valency"                       |  see T. A. Halgren,
-c     pilp     if 0 : no lone pair             |  J. Comput. Chem,
-c              if 1 : one or more lone pair(s) |  17, 616-645 (1995)
-c     mltb     multibond indicator             |
-c     arom     aromaticity indicator           |
-c     lin      linearity indicator             |
-c     sbmb     single-bond/multiple-bond       |
-c              indicator                       |
-c
-c     mmffarom     aromatic rings parameters
-c     mmffaromcat  cationic aromatic rings parameters
-c     mmffaroman   anionic aromatic rings parameters
-c
-c     mmff_kb   idem, as a table (the force constant is at the 
-c                  intersection of the atom classes of the two atoms)
-c     mmff_kb1  idem, with Bond Type = 1
-c     mmff_b0   idem, as a table (the bond length parameter is at the
-c                  intersection of the atom classes of the two atoms)
-c     mmff_b01  idem, with Bond Type = 1
-c
-c     rad0    covalent radius of atom             |
-c             (R. Blom and A. Haaland, J. Mol.    |  used with MMFF
-c             Struct., 128, 21-27 '85)            |  empirical rules
-c     paulel  Pauling-scaled electronegativities  |  for building
-c             as defined by Allred and Rochow     |  missing bond
-c     r0ref   reference bond length               |  stretch values
-c     kbref   reference force constant            |
-c
-c     mmff_ka   idem with an entry for the class of each of the
-c                atoms of the angle
-c     mmff_ka1  idem with one of the two bonds having a Bond Type = 1
-c     mmff_ka2  idem with the two bonds having Bond Types of 1;
-c                 the sum is 2
-c     mmff_ka3  idem with both bonds having a Bond Type = 0
-c                 and the atoms belonging to a 3-membered ring
-c     mmff_ka4  idem with both bonds having a Bond Type = 0
-c                 and the atoms belonging to a 4-membered ring
-c     mmff_ka5  idem with one of the bonds having a Bond Type = 1
-c                 and the atoms belonging to a 3-membered ring
-c     mmff_ka6  idem with both bonds having a Bond Type = 1
-c                 and the atoms belonging to a 3-membered ring
-c     mmff_ka7  idem with one of the bonds having a Bond Type = 1
-c                 and the atoms belonging to a 4-membered ring
-c     mmff_ka8  idem with both bonds having a Bond Type = 1
-c                 and the atoms belonging to a 4-membered ring
-c     mmff_teta0   idem with an entry for the class of each of the
-c                    atoms of the angle
-c     mmff_teta01  idem with one of the bonds having a Bond Type = 1
-c     mmff_teta02  idem with both bonds having Bond Types of 1;
-c                    the sum is 2
-c     mmff_teta03  idem with both bonds having Bond Types of 0
-c                    and forming a 3-membered ring
-c     mmff_teta04  idem with both bonds having Bond Types of 0
-c                    and forming a 4-membered ring
-c     mmff_teta05  idem with one of the bonds having Bond Types of 1
-c                    and forming a 3-membered ring
-c     mmff_teta06  idem with both bonds having Bond Types of 1
-c                    and forming a 3-membered ring
-c     mmff_teta07  idem with one of the bonds having Bond Types of 1
-c                    and forming a 4-membered ring
-c     mmff_teta08  idem with both bonds having Bond Types of 1
-c
-c     stbn_abc   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba   stretch-bending parameters for each atom class (C-B-A)
-c     with A-B having a Bond Type = 1, Stretch-Bend Type = 1,
-c     stbn_abc1   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba1   stretch-bending parameters for each atom class (C-B-A)
-c     with B-C having a Bond Type = 1, Stretch-Bend Type = 2
-c     stbn_abc2   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba2   stretch-bending parameters for each atom class (C-B-A)
-c     with A-B and B-C having a Bond Type = 1, Stretch-Bend Type = 3
-c     stbn_abc3   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba3   stretch-bending parameters for each atom class (C-B-A)
-c     with both Bond Type = 0 and 3-membered ring, 
-c     Stretch-Bend Type = 5
-c     stbn_abc5   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba5   stretch-bending parameters for each atom class (C-B-A)
-c     with both Bond Type = 0 and 4-membered ring,         
-c     Stretch-Bend Type = 4
-c     stbn_abc4   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba4   stretch-bending parameters for each atom class (C-B-A)
-c     with A-B having a Bond Type = 1 and 3-membered ring,
-c     Stretch-Bend Type = 6
-c     stbn_abc6   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba6   stretch-bending parameters for each atom class (C-B-A)
-c     with B-C having a Bond Type = 1 and 3-membered ring,
-c     Stretch-Bend Type = 7
-c     stbn_abc7   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba7   stretch-bending parameters for each atom class (C-B-A)
-c     with both Bond Type = 1 and 3-membered ring,         
-c     Stretch-Bend Type = 8
-c     stbn_abc8   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba8   stretch-bending parameters for each atom class (C-B-A)
-c     with A-B having a Bond Type = 1 and 4-membered ring,
-c     Stretch-Bend Type = 9
-c     stbn_abc9   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba9   stretch-bending parameters for each atom class (C-B-A)
-c     with B-C having a Bond Type = 1 and 4-membered ring,
-c     Stretch-Bend Type = 10
-c     stbn_abc10   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba10   stretch-bending parameters for each atom class (C-B-A)
-c     with both Bond Type = 1 and 4-membered ring,
-c     Stretch-Bend Type = 11
-c     stbn_abc11   stretch-bending parameters for each atom class (A-B-C)
-c     stbn_cba11   stretch-bending parameters for each atom class (C-B-A)
-c
-c     t1_1     torsional parameters for 1-fold, MMFF Torsion Type = 1
-c     t1_2     torsional parameters for 1-fold, MMFF Torsion Type = 2
-c     t2_1     torsional parameters for 2-fold, MMFF Torsion Type = 1
-c     t2_2     torsional parameters for 2-fold, MMFF Torsion Type = 2
-c     t3_1     torsional parameters for 3-fold, MMFF Torsion Type = 1
-c     t3_2     torsional parameters for 3-fold, MMFF Torsion Type = 2
-c     kt_1     string of classes for torsions, MMFF Torsion Type = 1
-c     kt_2     string of classes for torsions, MMFF Torsion Type = 2
-c
-c     G        scale factors for calculation of MMFF eps
-c     alph     atomic polarizabilities for calculation of MMFF eps
-c     Nn       effective numbers of valence electrons 
-c                for calculation of MMFF eps 
-c     DA       donor/acceptor atom classes
-c
-c     bci      bond charge increments for the building of atom charges
-c                 in MMFF depending on the attached neighbours 
-c     bci_1    bond charge increments when Bond Type = 1   
-c     pbci     partial BCI for building missing BCI's
-c     fcadj    formal charge adjustment factor
+c     bt_1       atom pairs having Bond Type 1
+c     nlignes    number of atom pairs having Bond Type 1
+c     eqclass    table of atom class equivalencies used to find
+c                default parameters if explicit values are missing
+c                (see J. Comput. Chem., 17, 490-519, '95, Table IV)
+c     crd        number of attached neighbors    |
+c     val        valency value                   |  see T. A. Halgren,
+c     pilp       if 0, no lone pair              |  J. Comput. Chem.,
+c                if 1, one or more lone pair(s)  |  17, 616-645 (1995)
+c     mltb       multibond indicator             |
+c     arom       aromaticity indicator           |
+c     lin        linearity indicator             |
+c     sbmb       single- vs multiple-bond flag   |
+c     mmffarom   aromatic rings parameters
+c     mmffaromc  cationic aromatic rings parameters
+c     mmffaroma  anionic aromatic rings parameters
 c
 c
       integer bt_1
@@ -155,12 +36,23 @@ c
       integer crd,val,pilp,mltb
       integer arom,lin,sbmb
       integer mmffarom
-      integer mmffaromcat
-      integer mmffaroman
+      integer mmffaromc
+      integer mmffaroma
       common /merck1/ bt_1(500,2),nlignes,eqclass(500,5),crd(100),
      &                val(100),pilp(100),mltb(100),arom(100),lin(100),
      &                sbmb(100),mmffarom(maxtyp,6),
-     &                mmffaromcat(maxtyp,6),mmffaroman(maxtyp,6)
+     &                mmffaromc(maxtyp,6),mmffaroma(maxtyp,6)
+c
+c
+c     mmff_kb   bond force constant for pairs of atom classes
+c     mmff_kb1  bond force constant for class pairs with Bond Type 1
+c     mmff_b0   bond length value for pairs of atom classes
+c     mmff_b01  bond length value for class pairs with Bond Type 1
+c     rad0      covalent atomic radius for empirical bond rules
+c     paulel    Pauling electronegativities for empirical bond rules
+c     r0ref     reference bond length for empirical bond rules
+c     kbref     reference force constant for empirical bond rules
+c
 c
       real*8 mmff_kb,mmff_kb1
       real*8 mmff_b0,mmff_b01
@@ -168,32 +60,95 @@ c
       real*8 kbref,paulel
       common /merck2/ mmff_kb(100,100),mmff_kb1(100,100),
      &                mmff_b0(100,100),mmff_b01(100,100),
-     &                rad0(120),r0ref(53,53),kbref(53,53),paulel(120)
+     &                rad0(100),r0ref(100,100),kbref(100,100),
+     &                paulel(100)
+c
+c
+c     mmff_ka     angle force constant for triples of atom classes
+c     mmff_ka1    angle force constant with one bond of Type 1
+c     mmff_ka2    angle force constant with both bonds of Type 1
+c     mmff_ka3    angle force constant for 3-membered ring
+c     mmff_ka4    angle force constant for 4-membered ring
+c     mmff_ka5    angle force constant for 3-ring and one Bond Type 1
+c     mmff_ka6    angle force constant for 3-ring and both Bond Type 1
+c     mmff_ka7    angle force constant for 4-ring and one Bond Type 1
+c     mmff_ka8    angle force constant for 4-ring and both Bond Type 1
+c     mmff_ang0   ideal bond angle for triples of atom classes
+c     mmff_ang01  ideal bond angle with one bond of Type 1
+c     mmff_ang02  ideal bond angle with both bonds of Type 1
+c     mmff_ang03  ideal bond angle for 3-membered ring
+c     mmff_ang04  ideal bond angle for 4-membered ring
+c     mmff_ang05  ideal bond angle for 3-ring and one Bond Type 1
+c     mmff_ang06  ideal bond angle for 3-ring and both Bond Type 1
+c     mmff_ang07  ideal bond angle for 4-ring and one Bond Type 1
+c     mmff_ang08  ideal bond angle for 4-ring and both Bond Type 1
+c
 c
       real*8 mmff_ka,mmff_ka1,mmff_ka2
       real*8 mmff_ka3,mmff_ka4,mmff_ka5
       real*8 mmff_ka6,mmff_ka7,mmff_ka8
-      real*8 mmff_teta0,mmff_teta01,mmff_teta02
-      real*8 mmff_teta03,mmff_teta04,mmff_teta05
-      real*8 mmff_teta06,mmff_teta07,mmff_teta08
-      common /merck3/ mmff_ka(0:99,0:99,0:99),
-     &                mmff_ka1(0:99,0:99,0:99),
-     &                mmff_ka2(0:99,0:99,0:99),
-     &                mmff_ka3(0:99,0:99,0:99),
-     &                mmff_ka4(0:99,0:99,0:99),
-     &                mmff_ka5(0:99,0:99,0:99),
-     &                mmff_ka6(0:99,0:99,0:99),
-     &                mmff_ka7(0:99,0:99,0:99),
-     &                mmff_ka8(0:99,0:99,0:99),
-     &                mmff_teta0(0:99,0:99,0:99),
-     &                mmff_teta01(0:99,0:99,0:99),
-     &                mmff_teta02(0:99,0:99,0:99),
-     &                mmff_teta03(0:99,0:99,0:99),
-     &                mmff_teta04(0:99,0:99,0:99),
-     &                mmff_teta05(0:99,0:99,0:99),
-     &                mmff_teta06(0:99,0:99,0:99),
-     &                mmff_teta07(0:99,0:99,0:99),
-     &                mmff_teta08(0:99,0:99,0:99)
+      real*8 mmff_ang0,mmff_ang01,mmff_ang02
+      real*8 mmff_ang03,mmff_ang04,mmff_ang05
+      real*8 mmff_ang06,mmff_ang07,mmff_ang08
+      common /merck3/ mmff_ka(0:100,100,0:100),
+     &                mmff_ka1(0:100,100,0:100),
+     &                mmff_ka2(0:100,100,0:100),
+     &                mmff_ka3(0:100,100,0:100),
+     &                mmff_ka4(0:100,100,0:100),
+     &                mmff_ka5(0:100,100,0:100),
+     &                mmff_ka6(0:100,100,0:100),
+     &                mmff_ka7(0:100,100,0:100),
+     &                mmff_ka8(0:100,100,0:100),
+     &                mmff_ang0(0:100,100,0:100),
+     &                mmff_ang01(0:100,100,0:100),
+     &                mmff_ang02(0:100,100,0:100),
+     &                mmff_ang03(0:100,100,0:100),
+     &                mmff_ang04(0:100,100,0:100),
+     &                mmff_ang05(0:100,100,0:100),
+     &                mmff_ang06(0:100,100,0:100),
+     &                mmff_ang07(0:100,100,0:100),
+     &                mmff_ang08(0:100,100,0:100)
+c
+c
+c     Stretch-Bend Type 0
+c     stbn_abc     stretch-bend parameters for A-B-C atom classes
+c     stbn_cba     stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 1  (A-B is Bond Type 1)
+c     stbn_abc1    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba1    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 2  (B-C is Bond Type 1) 
+c     stbn_abc2    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba2    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type = 3  (A-B and B-C are Bond Type 1) 
+c     stbn_abc3    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba3    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 4  (both Bond Types 0, 4-membered ring)
+c     stbn_abc4    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba4    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 5  (both Bond Types 0, 3-membered ring)
+c     stbn_abc5    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba5    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 6  (A-B is Bond Type 1, 3-membered ring)
+c     stbn_abc6    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba6    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 7  (B-C is Bond Type 1, 3-membered ring)
+c     stbn_abc7    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba7    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 8  (both Bond Types 1, 3-membered ring)
+c     stbn_abc8    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba8    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 9  (A-B is Bond Type 1, 4-membered ring)
+c     stbn_abc9    stretch-bend parameters for A-B-C atom classes
+c     stbn_cba9    stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 10  (B-C is Bond Type 1, 4-membered ring)
+c     stbn_abc10   stretch-bend parameters for A-B-C atom classes
+c     stbn_cba10   stretch-bend parameters for C-B-A atom classes
+c     Stretch-Bend Type 11  (both Bond Types 1, 4-membered ring)
+c     stbn_abc11   stretch-bend parameters for A-B-C atom classes
+c     stbn_cba11   stretch-bend parameters for C-B-A atom classes
+c     defstbn_abc  default stretch-bend parameters for A-B-C classes
+c     defstbn_cba  default stretch-bend parameters for C-B-A classes
+c
 c
       real*8 stbn_abc,stbn_cba
       real*8 stbn_abc1,stbn_cba1
@@ -207,7 +162,7 @@ c
       real*8 stbn_abc9,stbn_cba9
       real*8 stbn_abc10,stbn_cba10
       real*8 stbn_abc11,stbn_cba11
-      real*8 defstbnd_abc,defstbnd_cba
+      real*8 defstbn_abc,defstbn_cba
       common /merck4/ stbn_abc(100,100,100),stbn_cba(100,100,100),
      &                stbn_abc1(100,100,100),stbn_cba1(100,100,100),
      &                stbn_abc2(100,100,100),stbn_cba2(100,100,100),
@@ -220,8 +175,18 @@ c
      &                stbn_abc9(100,100,100),stbn_cba9(100,100,100),
      &                stbn_abc10(100,100,100),stbn_cba10(100,100,100),
      &                stbn_abc11(100,100,100),stbn_cba11(100,100,100),
-     &                defstbnd_abc(0:4,0:4,0:4),
-     &                defstbnd_cba(0:4,0:4,0:4)
+     &                defstbn_abc(0:4,0:4,0:4),defstbn_cba(0:4,0:4,0:4)
+c
+c
+c     t1_1     torsional parameters for 1-fold, MMFF Torsion Type 1
+c     t1_2     torsional parameters for 1-fold, MMFF Torsion Type 2
+c     t2_1     torsional parameters for 2-fold, MMFF Torsion Type 1
+c     t2_2     torsional parameters for 2-fold, MMFF Torsion Type 2
+c     t3_1     torsional parameters for 3-fold, MMFF Torsion Type 1
+c     t3_2     torsional parameters for 3-fold, MMFF Torsion Type 2
+c     kt_1     string of classes for torsions, MMFF Torsion Type 1
+c     kt_2     string of classes for torsions, MMFF Torsion Type 2
+c
 c
       real*8 t1_1,t2_1,t3_1
       real*8 t1_2,t2_2,t3_2
@@ -230,10 +195,24 @@ c
      &                t1_2(2,0:2000),t2_2(2,0:2000),t3_2(2,0:2000),
      &                kt_1(0:2000),kt_2(0:2000)
 c
-      real*8 G,alph,Nn
-      character*1 DA
-      common /merck6/ G(maxclass),alph(maxclass),Nn(maxclass),
-     &                DA(maxclass)
+c
+c     g        scale factors for calculation of MMFF eps
+c     alph     atomic polarizabilities for calculation of MMFF eps
+c     nn       effective number of valence electrons for MMFF eps
+c     da       donor/acceptor atom classes
+c
+c
+      real*8 g,alph,nn
+      character*1 da
+      common /merck6/ g(maxclass),alph(maxclass),nn(maxclass),
+     &                da(maxclass)
+c
+c
+c     bci      bond charge increments for building atom charges
+c     bci_1    bond charge increments for Bond Type 1   
+c     pbci     partial BCI for building missing BCI's
+c     fcadj    formal charge adjustment factor
+c
 c
       real*8 bci,bci_1
       real*8 pbci,fcadj

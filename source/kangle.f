@@ -484,20 +484,20 @@ c
       integer i,j,k,l,m
       integer ia,ib,ic
       integer ita,itb,itc
+      integer ina,inb,inc
       integer itta,ittb,ittc
       integer bnd_ab,bnd_bc
       integer at,minat
       integer mclass
       real*8 d,beta
-      real*8 z2(53),c(53)
+      real*8 z2(100),c(100)
       logical done
       logical ring3,ring4
 c
 c
-c     fill in the tables with the empirical rule parameters; if
-c     parameter does not exist, set to 1000, so we note it later
+c     set empirical rule parameters for some common elements
 c
-      do i = 1, 53
+      do i = 1, 100
          z2(i) = 1000.0d0
          c(i) = 1000.0d0
       end do
@@ -527,6 +527,9 @@ c
       c(35) = 0.0d0
       c(33) = 0.825d0
       c(53) = 0.0d0
+c
+c     assign MMFF bond angle and force constant for each angle
+c
       do i = 1, nangle
          ia = iang(1,i)
          ib = iang(2,i)
@@ -537,22 +540,25 @@ c
          itta = type(ia)
          ittb = type(ib)
          ittc = type(ic)
+         ina = atomic(ia)
+         inb = atomic(ib)
+         inc = atomic(ic)
 c
-c     calculation of the the AT, looks at the BT
+c     set angle index value, accounting for MMFF bond type = 1
 c
          at = 0
          do j = 1, nlignes
-            if (((ia.eq.bt_1(j,1)).and.(ib.eq.bt_1(j,2))) .or.
-     &          ((ib.eq.bt_1(j,1)).and.(ia.eq.bt_1(j,2)))) then
+            if ((ia.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) .or.
+     &          (ib.eq.bt_1(j,1) .and. ia.eq.bt_1(j,2))) then
                at = at + 1
             end if
-            if (((ic.eq.bt_1(j,1)).and.(ib.eq.bt_1(j,2))) .or.
-     &          ((ib.eq.bt_1(j,1)).and.(ic.eq.bt_1(j,2)))) then
+            if ((ic.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) .or.
+     &          (ib.eq.bt_1(j,1) .and. ic.eq.bt_1(j,2))) then
                at = at + 1
             end if
          end do
 c
-c     look at whether the atoms belong to a 3- or 4-membered ring
+c     determine if the atoms belong to a 3- or 4-membered ring
 c
          ring3 = .false.
          ring4 = .false.
@@ -585,7 +591,7 @@ c
             end do
          end if
 c
-c     set special AT values when 3- or 4-rings are present
+c     set special index value when 3- or 4-rings are present
 c
          if (at.eq.0 .and. ring4) then
             at = 4
@@ -631,24 +637,18 @@ c
             goto 30
          else if (at .eq. 0) then
             ak(i) = mmff_ka(ita,itb,itc)
-            anat(i) = mmff_teta0(ita,itb,itc)
+            anat(i) = mmff_ang0(ita,itb,itc)
+c
+c     use an empirical rule to calculate the force constant
+c
             if (mclass .eq. 5) then
    20          continue
-c
-c     if "wild card" parameters: still need to calculate
-c     the force constant by an empirical rule;
-c     if (full) empirical rule: the reference angle
-c     has already been calculated
-c
-               if (z2(atomic(ia)) .eq. 1000.0d0)  goto 30
-               if (z2(atomic(ib)) .eq. 1000.0d0)  goto 30
-               if (z2(atomic(ic)) .eq. 1000.0d0)  goto 30
-               if (c(atomic(ia)) .eq. 1000.0d0)  goto 30
-               if (c(atomic(ib)) .eq. 1000.0d0)  goto 30
-               if (c(atomic(ic)) .eq. 1000.0d0)  goto 30
-c
-c     find the numbers of the two bonds
-c
+               if (z2(ina) .eq. 1000.0d0)  goto 30
+               if (z2(inb) .eq. 1000.0d0)  goto 30
+               if (z2(inc) .eq. 1000.0d0)  goto 30
+               if (c(ina) .eq. 1000.0d0)  goto 30
+               if (c(inb) .eq. 1000.0d0)  goto 30
+               if (c(inc) .eq. 1000.0d0)  goto 30
                do k = 1, maxbnd
                   if ((min(ia,ib).eq.ibnd(1,k)) .and.
      &                (max(ia,ib).eq.ibnd(2,k))) then
@@ -664,10 +664,9 @@ c
                beta = 1.0d0
                if (ring4)  beta = 0.85d0
                if (ring3)  beta = 0.05d0
-               ak(i) = beta*1.75d0*z2(atomic(ia))*z2(atomic(ic))
-     &                    *c(atomic(ib))
-     &                 / ((anat(i)*0.01745329252d0)**2
-     &                    *(bl(bnd_ab)+bl(bnd_bc))*exp(2.0d0*D))
+               ak(i) = beta*1.75d0*z2(ina)*z2(inc)*c(inb)
+     &                 / ((0.01745329252d0*anat(i))**2
+     &                      *(bl(bnd_ab)+bl(bnd_bc))*exp(2.0d0*d))
             end if
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
@@ -676,7 +675,7 @@ c
             goto 30
          else if (at .eq. 1) then
             ak(i) = mmff_ka1(ita,itb,itc)
-            anat(i) = mmff_teta01(ita,itb,itc)
+            anat(i) = mmff_ang01(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -688,7 +687,7 @@ c
             goto 30
          else if (at .eq. 2) then
             ak(i) = mmff_ka2(ita,itb,itc)
-            anat(i) = mmff_teta02(ita,itb,itc)
+            anat(i) = mmff_ang02(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -700,7 +699,7 @@ c
             goto 30
          else if (at .eq. 3) then
             ak(i) = mmff_ka3(ita,itb,itc)
-            anat(i) = mmff_teta03(ita,itb,itc)
+            anat(i) = mmff_ang03(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -712,7 +711,7 @@ c
             goto 30
          else if (at .eq. 4) then
             ak(i) = mmff_ka4(ita,itb,itc)
-            anat(i) = mmff_teta04(ita,itb,itc)
+            anat(i) = mmff_ang04(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -724,7 +723,7 @@ c
             goto 30
          else if (at .eq. 5) then
             ak(i) = mmff_ka5(ita,itb,itc)
-            anat(i) = mmff_teta05(ita,itb,itc)
+            anat(i) = mmff_ang05(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -736,7 +735,7 @@ c
             goto 30
          else if (at .eq. 6) then
             ak(i) = mmff_ka6(ita,itb,itc)
-            anat(i) = mmff_teta06(ita,itb,itc)
+            anat(i) = mmff_ang06(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -748,7 +747,7 @@ c
             goto 30
          else if (at .eq. 7) then
             ak(i) = mmff_ka7(ita,itb,itc)
-            anat(i) = mmff_teta07(ita,itb,itc)
+            anat(i) = mmff_ang07(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -760,7 +759,7 @@ c
             goto 30
          else if (at .eq. 8) then
             ak(i) = mmff_ka8(ita,itb,itc)
-            anat(i) = mmff_teta08(ita,itb,itc)
+            anat(i) = mmff_ang08(ita,itb,itc)
             done = .true.
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
@@ -775,7 +774,7 @@ c
 c     warn if suitable angle bending parameter not found
 c
    30    continue
-         minat = min(atomic(ia),atomic(ib),atomic(ic))
+         minat = min(ina,inb,inc)
          if (minat .eq. 0)  done = .true.
          if (.not. done) then
             if (use_angle) then
@@ -785,9 +784,9 @@ c
                anat(i) = 120.0d0
                if (crd(itb) .eq. 4)  anat(i) = 109.45d0
                if (crd(itb) .eq. 2) then
-                  if (atomic(ib) .eq. 8) then
+                  if (inb .eq. 8) then
                      anat(i) = 105.0d0
-                  else if (atomic(ib) .gt. 10) then
+                  else if (inb .gt. 10) then
                      anat(i) = 95.0d0
                   else if (lin(itb) .eq. 1) then
                      anat(i) = 180.0d0
@@ -795,7 +794,7 @@ c
                end if
                if (crd(itb).eq.3 .and. val(itb).eq.3
      &                .and. mltb(itb).eq.0) then
-                  if (atomic(ib) .eq. 7) then
+                  if (inb .eq. 7) then
                      anat(i) = 107.0d0
                   else
                      anat(i) = 92.0d0

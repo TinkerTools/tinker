@@ -45,7 +45,7 @@ c
       include 'kvdwpr.i'
       include 'merck.i'
       include 'params.i'
-      integer i,j,k,iprm
+      integer i,j,iprm
       integer ia,ib,ic,id,ie
       integer if,ig,ih,ii
       integer size,next
@@ -84,7 +84,6 @@ c
       character*4 pa,pb,pc
       character*4 pd,pe
       character*8 axt
-      character*16 blank
       character*20 keyword
       character*120 record
       character*120 string
@@ -124,105 +123,6 @@ c
       npi = 0
       npi5 = 0
       npi4 = 0
-c
-c     initialize values of some MMFF-specific parameters
-c
-      do i = 1, 99
-         do j = 1, 99
-            mmff_kb(j,i) = 1000.0d0
-            mmff_kb1(j,i) = 1000.0d0
-            mmff_b0(j,i) = 1000.0d0
-            mmff_b01(j,i) = 1000.0d0
-            bci(j,i) = 1000.0d0
-            bci_1(j,i) = 1000.0d0
-            do k = 1, 99
-               stbn_abc(k,j,i) = 1000.0d0
-               stbn_cba(k,j,i) = 1000.0d0
-               stbn_abc1(k,j,i) = 1000.0d0
-               stbn_cba1(k,j,i) = 1000.0d0
-               stbn_abc2(k,j,i) = 1000.0d0
-               stbn_cba2(k,j,i) = 1000.0d0
-               stbn_abc3(k,j,i) = 1000.0d0
-               stbn_cba3(k,j,i) = 1000.0d0
-               stbn_abc4(k,j,i) = 1000.0d0
-               stbn_cba4(k,j,i) = 1000.0d0
-               stbn_abc5(k,j,i) = 1000.0d0
-               stbn_cba5(k,j,i) = 1000.0d0
-               stbn_abc6(k,j,i) = 1000.0d0
-               stbn_cba6(k,j,i) = 1000.0d0
-               stbn_abc7(k,j,i) = 1000.0d0
-               stbn_cba7(k,j,i) = 1000.0d0
-               stbn_abc8(k,j,i) = 1000.0d0
-               stbn_cba8(k,j,i) = 1000.0d0
-               stbn_abc9(k,j,i) = 1000.0d0
-               stbn_cba9(k,j,i) = 1000.0d0
-               stbn_abc10(k,j,i) = 1000.0d0
-               stbn_cba10(k,j,i) = 1000.0d0
-               stbn_abc11(k,j,i) = 1000.0d0
-               stbn_cba11(k,j,i) = 1000.0d0
-            end do
-         end do
-      end do
-      do i = 0, 99
-         do j = 1, 99
-            do k = 0, 99
-               mmff_ka(k,j,i) = 1000.0d0
-               mmff_ka1(k,j,i) = 1000.0d0
-               mmff_ka2(k,j,i) = 1000.0d0
-               mmff_ka3(k,j,i) = 1000.0d0
-               mmff_ka4(k,j,i) = 1000.0d0
-               mmff_ka5(k,j,i) = 1000.0d0
-               mmff_ka6(k,j,i) = 1000.0d0
-               mmff_ka7(k,j,i) = 1000.0d0
-               mmff_ka8(k,j,i) = 1000.0d0
-               mmff_teta0(k,j,i) = 1000.0d0
-               mmff_teta01(k,j,i) = 1000.0d0
-               mmff_teta02(k,j,i) = 1000.0d0
-               mmff_teta03(k,j,i) = 1000.0d0
-               mmff_teta04(k,j,i) = 1000.0d0
-               mmff_teta05(k,j,i) = 1000.0d0
-               mmff_teta06(k,j,i) = 1000.0d0
-               mmff_teta07(k,j,i) = 1000.0d0
-               mmff_teta08(k,j,i) = 1000.0d0
-            end do
-         end do
-      end do
-      blank = '                '
-      do i = 1, maxnt
-         kt(i) = blank
-         kt_1(i) = blank
-         kt_2(i) = blank
-         t1(1,i) = 1000.0d0
-         t1(2,i) = 1000.0d0
-         t2(1,i) = 1000.0d0
-         t2(2,i) = 1000.0d0
-         t3(1,i) = 1000.0d0
-         t3(2,i) = 1000.0d0
-         t1_1(1,i) = 1000.0d0
-         t1_1(2,i) = 1000.0d0
-         t2_1(1,i) = 1000.0d0
-         t2_1(2,i) = 1000.0d0
-         t3_1(1,i) = 1000.0d0
-         t3_1(2,i) = 1000.0d0
-         t1_2(1,i) = 1000.0d0
-         t1_2(2,i) = 1000.0d0
-         t2_2(1,i) = 1000.0d0
-         t2_2(2,i) = 1000.0d0
-         t3_2(1,i) = 1000.0d0
-         t3_2(2,i) = 1000.0d0
-      end do
-      do i = 1, 5
-         do j = 1, 500
-            eqclass(j,i) = 1000
-         end do
-      end do
-      do i = 1, 6
-         do j = 1, maxtyp
-            mmffarom(j,i) = 0
-            mmffaromcat(j,i) = 0
-            mmffaroman(j,i) = 0
-         end do
-      end do
 c
 c     number of characters in an atom number text string
 c
@@ -1346,48 +1246,48 @@ c
                if (at .eq. 0) then
                   mmff_ka(ia,ib,ic) = fc
                   mmff_ka(ic,ib,ia) = fc
-                  mmff_teta0(ia,ib,ic) = an1
-                  mmff_teta0(ic,ib,ia) = an1
+                  mmff_ang0(ia,ib,ic) = an1
+                  mmff_ang0(ic,ib,ia) = an1
                else if (at .eq. 1) then
                   mmff_ka1(ia,ib,ic) = fc
                   mmff_ka1(ic,ib,ia) = fc
-                  mmff_teta01(ia,ib,ic) = an1
-                  mmff_teta01(ic,ib,ia) = an1
+                  mmff_ang01(ia,ib,ic) = an1
+                  mmff_ang01(ic,ib,ia) = an1
                else if (at .eq. 2) then
                   mmff_ka2(ia,ib,ic) = fc
                   mmff_ka2(ic,ib,ia) = fc
-                  mmff_teta02(ia,ib,ic) = an1
-                  mmff_teta02(ic,ib,ia) = an1
+                  mmff_ang02(ia,ib,ic) = an1
+                  mmff_ang02(ic,ib,ia) = an1
                else if (at .eq. 3) then
                   mmff_ka3(ia,ib,ic) = fc
                   mmff_ka3(ic,ib,ia) = fc
-                  mmff_teta03(ia,ib,ic) = an1
-                  mmff_teta03(ic,ib,ia) = an1
+                  mmff_ang03(ia,ib,ic) = an1
+                  mmff_ang03(ic,ib,ia) = an1
                else if (at .eq. 4) then
                   mmff_ka4(ia,ib,ic) = fc
                   mmff_ka4(ic,ib,ia) = fc
-                  mmff_teta04(ia,ib,ic) = an1
-                  mmff_teta04(ic,ib,ia) = an1
+                  mmff_ang04(ia,ib,ic) = an1
+                  mmff_ang04(ic,ib,ia) = an1
                else if (at .eq. 5) then
                   mmff_ka5(ia,ib,ic) = fc
                   mmff_ka5(ic,ib,ia) = fc
-                  mmff_teta05(ia,ib,ic) = an1
-                  mmff_teta05(ic,ib,ia) = an1
+                  mmff_ang05(ia,ib,ic) = an1
+                  mmff_ang05(ic,ib,ia) = an1
                else if (at .eq. 6) then
                   mmff_ka6(ia,ib,ic) = fc
                   mmff_ka6(ic,ib,ia) = fc
-                  mmff_teta06(ia,ib,ic) = an1
-                  mmff_teta06(ic,ib,ia) = an1
+                  mmff_ang06(ia,ib,ic) = an1
+                  mmff_ang06(ic,ib,ia) = an1
                else if (at .eq. 7) then
                   mmff_ka7(ia,ib,ic) = fc
                   mmff_ka7(ic,ib,ia) = fc
-                  mmff_teta07(ia,ib,ic) = an1
-                  mmff_teta07(ic,ib,ia) = an1
+                  mmff_ang07(ia,ib,ic) = an1
+                  mmff_ang07(ic,ib,ia) = an1
                else if (at .eq. 8) then
                   mmff_ka8(ia,ib,ic) = fc
                   mmff_ka8(ic,ib,ia) = fc
-                  mmff_teta08(ia,ib,ic) = an1
-                  mmff_teta08(ic,ib,ia) = an1
+                  mmff_ang08(ia,ib,ic) = an1
+                  mmff_ang08(ic,ib,ia) = an1
                end if
             end if
 c
@@ -1678,10 +1578,10 @@ c
             cba = 0.0d0
             read (string,*,err=600,end=600)  ia,ib,ic,abc,cba
   600       continue
-            defstbnd_abc(ia,ib,ic) = abc
-            defstbnd_cba(ia,ib,ic) = cba
-            defstbnd_abc(ic,ib,ia) = cba
-            defstbnd_cba(ic,ib,ia) = abc
+            defstbn_abc(ia,ib,ic) = abc
+            defstbn_cba(ia,ib,ic) = cba
+            defstbn_abc(ic,ib,ia) = cba
+            defstbn_cba(ic,ib,ia) = abc
 c
 c     MMFF covalent radius and electronegativity parameters
 c
@@ -1728,9 +1628,9 @@ c
             if (ie.eq.0 .and. id.eq.0) then
                mmffarom(ia,if) = ic
             else if (id .eq. 1) then
-               mmffaromcat(ia,if) = ic
+               mmffaromc(ia,if) = ic
             else if (ie .eq. 1) then
-               mmffaroman(ia,if) = ic
+               mmffaroma(ia,if) = ic
             end if
          end if
       end do
