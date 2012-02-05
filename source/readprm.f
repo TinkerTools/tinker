@@ -1017,6 +1017,8 @@ c
             record = prmline(iprm)
             read (record,*,err=410,end=410)  pl(11),pl(12),pl(13)
   410       continue
+            if (ib .eq. 0)  axt = 'None'
+            if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Axis'
             if (ib.lt.0 .or. ic.lt.0)  axt = 'Bisector'
             if (ic.lt.0 .and. id.lt.0)  axt = 'Z-Bisect'
             if (max(ib,ic,id) .lt. 0)  axt = '3-Fold'

@@ -12,8 +12,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     bt_1       atom pairs having Bond Type 1
-c     nlignes    number of atom pairs having Bond Type 1
+c     bt_1       atom pairs having MMFF Bond Type 1
+c     nlignes    number of atom pairs having MMFF Bond Type 1
 c     eqclass    table of atom class equivalencies used to find
 c                default parameters if explicit values are missing
 c                (see J. Comput. Chem., 17, 490-519, '95, Table IV)
@@ -209,7 +209,7 @@ c
 c
 c
 c     bci      bond charge increments for building atom charges
-c     bci_1    bond charge increments for Bond Type 1   
+c     bci_1    bond charge increments for MMFF Bond Type 1   
 c     pbci     partial BCI for building missing BCI's
 c     fcadj    formal charge adjustment factor
 c

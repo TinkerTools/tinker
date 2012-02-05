@@ -765,7 +765,7 @@ c
                   tors3(1,i) = t34(1,j)
                   tors3(2,i) = t34(2,j)
                   done = .true.
-                  goto 30
+                  goto 20
                end if
             end do
             if (.not.done .and. mclass.lt.5) then
@@ -811,14 +811,29 @@ c
                   tors3(1,i) = t3_2(1,j)
                   tors3(2,i) = t3_2(2,j)
                   done = .true.
-                  goto 30
+                  goto 20
                end if
             end do
             if (.not.done .and. mclass.lt.5) then
                goto 10
             end if
             if (.not.done .and. mclass.eq.5) then
-               goto 20
+               tt = 0
+               do j = 1, maxnt
+                  if (kt(j) .eq. pt) then
+                     tors1(1,i) = t1(1,j)
+                     tors1(2,i) = t1(2,j)
+                     tors2(1,i) = t2(1,j)
+                     tors2(2,i) = t2(2,j)
+                     tors3(1,i) = t3(1,j)
+                     tors3(2,i) = t3(2,j)
+                     done = .true.
+                     goto 20
+                  end if
+               end do
+               if (.not.done .and. mclass.lt.5) then
+                  goto 10
+               end if
             end if
             if (tors1(1,i) .eq. 1000.0d0)  done = .false.
             if (tors1(2,i) .eq. 1000.0d0)  done = .false.
@@ -826,7 +841,7 @@ c
             if (tors2(2,i) .eq. 1000.0d0)  done = .false.
             if (tors3(1,i) .eq. 1000.0d0)  done = .false.
             if (tors3(2,i) .eq. 1000.0d0)  done = .false.
-            goto 30
+            goto 20
          else if (bc .eq. 1) then
             tt = 1
             do j = 1, maxnt
@@ -838,7 +853,7 @@ c
                   tors3(1,i) = t3_1(1,j)
                   tors3(2,i) = t3_1(2,j)
                   done = .true.
-                  goto 30
+                  goto 20
                end if
             end do
             if (.not.done .and. mclass.lt.5) then
@@ -850,9 +865,8 @@ c
             if (tors2(2,i) .eq. 1000.0d0)  done = .false.
             if (tors3(1,i) .eq. 1000.0d0)  done = .false.
             if (tors3(2,i) .eq. 1000.0d0)  done = .false.
-            goto 30
+            goto 20
          else if (.not. done) then
-   20       continue
             tt = 0
             do j = 1, maxnt
                if (kt(j) .eq. pt) then
@@ -863,7 +877,7 @@ c
                   tors3(1,i) = t3(1,j)
                   tors3(2,i) = t3(2,j)
                   done = .true.
-                  goto 30
+                  goto 20
                end if
             end do
             if (.not.done .and. mclass.lt.5) then
@@ -875,9 +889,9 @@ c
             if (tors2(2,i) .eq. 1000.0d0)  done = .false.
             if (tors3(1,i) .eq. 1000.0d0)  done = .false.
             if (tors3(2,i) .eq. 1000.0d0)  done = .false.
-            goto 30
+            goto 20
          end if
-   30    continue
+   20    continue
 c
 c     use the empirical rules for parameter not located
 c
@@ -945,7 +959,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (arom(itb).eq.1 .and. arom(itc).eq.1) then
                if (pilp(itb).eq.0 .and. pilp(itc).eq.0) then
                   pi_bc = 0.5d0
@@ -970,7 +984,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if ((mltb(itb).eq.2 .and. mltb(itc).eq.2) .or.
      &               (mltb(itc).eq.2 .and. mltb(itb).eq.2)) then
                beta = 6.0d0
@@ -982,7 +996,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (mltb(itb).eq.2 .or. mltb(itc).eq.2) then
                beta = 6.0d0
                pi_bc = 0.4d0
@@ -993,7 +1007,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (crd(itb).eq.4 .and. crd(itc).eq.4) then
                tors1(1,i) = 0.0d0
                tors1(2,i) = 0.0d0
@@ -1002,7 +1016,7 @@ c
                tors3(1,i) = sqrt(vb*vc) / n_bc
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if ((crd(itb).eq.4.and.crd(itc).eq.3.and.
      &              ((val(itc).eq.4.or.val(itc).eq.34).or.
      &                 mltb(itc).ne.0)) .or.
@@ -1016,7 +1030,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if ((crd(itb).eq.4.and.crd(itc).eq.2.and.
      &               (val(itc).eq.3.or.mltb(itc).ne.0)) .or.
      &               (crd(itb).eq.4.and.crd(itc).eq.2.and.
@@ -1028,7 +1042,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (crd(itb).eq.4 .or. crd(itc).eq.4) then
                tors1(1,i) = 0.0d0
                tors1(2,i) = 0.0d0
@@ -1037,7 +1051,7 @@ c
                tors3(1,i) = sqrt(vb*vc) / n_bc
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (pilp(itb).eq.1 .and. pilp(itc).eq.1) then
                tors1(1,i) = 0.0d0
                tors1(2,i) = 0.0d0
@@ -1046,7 +1060,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (pilp(itb).ne.0 .and. mltb(itc).ne.0) then
                beta = 6.0d0
                if (mltb(itb) .eq. 1) then
@@ -1063,7 +1077,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (pilp(itc).ne.0 .and. mltb(itb).ne.0) then
                beta = 6.0d0
                if (mltb(itc) .eq. 1) then
@@ -1080,7 +1094,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if ((mltb(itb).eq.1.or.mltb(itc).eq.1) .and.
      &               (inb.ne.6.or.inc.ne.6)) then
                beta = 6.0d0
@@ -1092,7 +1106,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (mltb(itb).ne.0 .and. mltb(itc).ne.0) then
                beta = 6.0d0
                pi_bc = 0.15d0
@@ -1103,7 +1117,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (inb.eq.8 .and. inc.eq.8) then
                wb = 2.0d0
                wc = 2.0d0
@@ -1114,7 +1128,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if ((inb.eq.8.and.inc.eq.16) .or.
      &               (inb.eq.16.and.inc.eq.8)) then
                wb = 2.0d0
@@ -1126,7 +1140,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else if (inb.eq.16 .and. inc.eq.16) then
                wb = 8.0d0
                wc = 8.0d0
@@ -1137,7 +1151,7 @@ c
                tors3(1,i) = 0.0d0
                tors3(2,i) = 0.0d0
                done = .true.
-               goto 30
+               goto 20
             else
                tors1(1,i) = 0.0
                tors1(2,i) = 0.0
@@ -1146,7 +1160,7 @@ c
                tors3(1,i) = sqrt(vb*vc) / n_bc
                tors3(2,i) = 0.0
                done = .true.
-               goto 30
+               goto 20
             end if
          end if
       end do

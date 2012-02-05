@@ -70,7 +70,7 @@ c
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
-      exfield(1) = 0.001d0
+      exfield(1) = 0.01d0
       call moluind (exfield,umol)
       alpha(1,1) = umol(1) / exfield(1)
       alpha(2,1) = umol(2) / exfield(1)
@@ -78,7 +78,7 @@ c
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
-      exfield(2) = 0.001d0
+      exfield(2) = 0.01d0
       call moluind (exfield,umol)
       alpha(1,2) = umol(1) / exfield(2)
       alpha(2,2) = umol(2) / exfield(2)
@@ -86,7 +86,7 @@ c
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
-      exfield(3) = 0.001d0
+      exfield(3) = 0.01d0
       call moluind (exfield,umol)
       alpha(1,3) = umol(1) / exfield(3)
       alpha(2,3) = umol(2) / exfield(3)
