@@ -146,8 +146,7 @@ c
       call nextarg (dmafile,exist)
       if (exist) then
          call basefile (dmafile)
-         call suffix (dmafile,'dma')
-         call version (dmafile,'old')
+         call suffix (dmafile,'dma','old')
          inquire (file=dmafile,exist=exist)
       end if
 c
@@ -159,8 +158,7 @@ c
          read (input,20)  dmafile
    20    format (a120)
          call basefile (dmafile)
-         call suffix (dmafile,'dma')
-         call version (dmafile,'old')
+         call suffix (dmafile,'dma','old')
          inquire (file=dmafile,exist=exist)
       end do
 c

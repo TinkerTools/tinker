@@ -34,7 +34,8 @@ c
       include 'titles.i'
       include 'units.i'
       integer i,j,k
-      integer ixyz,ipot,igrd
+      integer ixyz,ipot
+      integer igrd,icub
       integer next,mode,nmax
       integer nmodel,nvar
       integer nglist,nflist
@@ -61,6 +62,7 @@ c
       character*120 xyzfile
       character*120 potfile
       character*120 gridfile
+      character*120 cubefile
       external potfit1
       external optsave
 c
@@ -143,41 +145,39 @@ c
 c     read the electrostatic potential from a Gaussian CUBE file
 c
       if (docube) then
-         call nextarg (potfile,exist)
+         call nextarg (cubefile,exist)
          if (exist) then
-            call basefile (potfile)
-            call suffix (potfile,'pot')
-            call version (potfile,'old')
-            inquire (file=potfile,exist=exist)
+            call basefile (cubefile)
+            call suffix (cubefile,'cube','old')
+            inquire (file=cubefile,exist=exist)
          end if
          do while (.not. exist)
             write (iout,60)
    60       format (/,' Enter the Gaussian CUBE File Name :  ',$)
-            read (input,70)  potfile
+            read (input,70)  cubefile
    70       format (a120)
-            call basefile (potfile)
-            call suffix (potfile,'cube')
-            call version (potfile,'old')
-            inquire (file=potfile,exist=exist)
+            call basefile (cubefile)
+            call suffix (cubefile,'cube','old')
+            inquire (file=cubefile,exist=exist)
          end do
-         ipot = freeunit ()
-         open (unit=ipot,file=potfile,status ='old')
-         rewind (unit=ipot)
-         read (ipot,80)  title
+         icub = freeunit ()
+         open (unit=icub,file=cubefile,status ='old')
+         rewind (unit=icub)
+         read (icub,80)  title
    80    format (1x,a120)
          ltitle = trimtext (title)
-         read (ipot,90)
+         read (icub,90)
    90    format ()
-         read (ipot,100)  n
+         read (icub,100)  n
   100    format (i5)
-         read (ipot,110)  npgrid(1)
+         read (icub,110)  npgrid(1)
   110    format (i5)
          do i = 1, n+2
-            read (ipot,120)
+            read (icub,120)
   120       format ()
          end do
          do i = 1, npgrid(1)
-            read (ipot,130)  record
+            read (icub,130)  record
   130       format (a120)
             read (record,*)  xi,yi,zi,pot
             pgrid(1,i,1) = xi
@@ -185,10 +185,12 @@ c
             pgrid(3,i,1) = zi
             epot(1,i,1) = hartree * pot
          end do
-         close (unit=ipot)
-         potfile = filename
-         call suffix (potfile,'pot')
-         call version (potfile,'new')
+         close (unit=icub)
+c
+c     write the electrostatic potential to a TINKER pot file
+c
+         potfile = filename(1:leng)
+         call suffix (potfile,'pot','new')
          open (unit=ipot,file=potfile,status ='new')
          rewind (unit=ipot)
          write (ipot,140)  npgrid(1),title(1:ltitle)
@@ -229,8 +231,7 @@ c     reopen the structure file and read all the structures
 c
       ixyz = freeunit ()
       xyzfile = filename
-      call suffix (xyzfile,'xyz')
-      call version (xyzfile,'old')
+      call suffix (xyzfile,'xyz','old')
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)
@@ -381,8 +382,7 @@ c
          call nextarg (xyzfile,exist)
          if (exist) then
             call basefile (xyzfile)
-            call suffix (xyzfile,'xyz')
-            call version (xyzfile,'old')
+            call suffix (xyzfile,'xyz','old')
             inquire (file=xyzfile,exist=exist)
          end if
          do while (.not. exist)
@@ -391,8 +391,7 @@ c
             read (input,230)  xyzfile
   230       format (a120)
             call basefile (xyzfile)
-            call suffix (xyzfile,'xyz')
-            call version (xyzfile,'old')
+            call suffix (xyzfile,'xyz','old')
             inquire (file=xyzfile,exist=exist)
          end do
       end if
@@ -403,8 +402,7 @@ c
          call nextarg (potfile,exist)
          if (exist) then
             call basefile (potfile)
-            call suffix (potfile,'pot')
-            call version (potfile,'old')
+            call suffix (potfile,'pot','old')
             inquire (file=potfile,exist=exist)
          end if
          do while (.not. exist)
@@ -413,8 +411,7 @@ c
             read (input,250)  potfile
   250       format (a120)
             call basefile (potfile)
-            call suffix (potfile,'pot')
-            call version (potfile,'old')
+            call suffix (potfile,'pot','old')
             inquire (file=potfile,exist=exist)
          end do
       end if
@@ -477,8 +474,7 @@ c
       if (dogrid) then
          igrd = freeunit ()
          gridfile = filename
-         call suffix (gridfile,'grid')
-         call version (gridfile,'new')
+         call suffix (gridfile,'grid','new')
          open (unit=igrd,file=gridfile,status='new')
          do j = 1, nconf
             do i = 1, npgrid(j)

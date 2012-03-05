@@ -31,8 +31,7 @@ c
       call nextarg (sybylfile,exist)
       if (exist) then
          call basefile (sybylfile)
-         call suffix (sybylfile,'mol2')
-         call version (sybylfile,'old')
+         call suffix (sybylfile,'mol2','old')
          inquire (file=sybylfile,exist=exist)
       end if
 c
@@ -44,8 +43,7 @@ c
          read (input,20)  sybylfile
    20    format (a120)
          call basefile (sybylfile)
-         call suffix (sybylfile,'mol2')
-         call version (sybylfile,'old')
+         call suffix (sybylfile,'mol2','old')
          inquire (file=sybylfile,exist=exist)
       end do
 c

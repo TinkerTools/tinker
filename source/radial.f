@@ -68,8 +68,7 @@ c
       call nextarg (arcfile,exist)
       if (exist) then
          call basefile (arcfile)
-         call suffix (arcfile,'arc')
-         call version (arcfile,'old')
+         call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
       end if
 c
@@ -81,8 +80,7 @@ c
          read (input,20)  arcfile
    20    format (a120)
          call basefile (arcfile)
-         call suffix (arcfile,'arc')
-         call version (arcfile,'old')
+         call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
       end do
 c

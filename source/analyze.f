@@ -160,8 +160,7 @@ c
       frame = 0
       ixyz = freeunit ()
       xyzfile = filename
-      call suffix (xyzfile,'xyz')
-      call version (xyzfile,'old')
+      call suffix (xyzfile,'xyz','old')
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)

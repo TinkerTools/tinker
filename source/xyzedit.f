@@ -655,8 +655,7 @@ c
    20 format (/,' Enter Name of Solvent Box Coordinates :  ',$)
       read (input,30)  solvfile
    30 format (a120)
-      call suffix (solvfile,'xyz')
-      call version (solvfile,'old')
+      call suffix (solvfile,'xyz','old')
       isolv = freeunit ()
       open (unit=isolv,file=solvfile,status='old',err=10)
       rewind (unit=isolv)

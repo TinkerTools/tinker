@@ -327,12 +327,10 @@ c
 c     reopen the coordinate files with structures to superimpose
 c
       ifile1 = freeunit ()
-      call suffix (file1,'xyz')
-      call version (file1,'old')
+      call suffix (file1,'xyz','old')
       open (unit=ifile1,file=file1,status ='old')
       rewind (unit=ifile1)
-      call suffix (file2,'xyz')
-      call version (file2,'old')
+      call suffix (file2,'xyz','old')
       if (file1 .eq. file2) then
          ifile2 = ifile1
          self = .true.

@@ -39,15 +39,6 @@ c
       call lowcase (status)
       leng = trimtext (filename)
 c
-c     check for attempt to access an unversioned file
-c
-      if (.not. noversion) then
-         if (filename(leng-1:leng) .eq. '_1') then
-            filename = filename(1:leng-2)
-            if (status .eq. 'old')  return
-         end if
-      end if
-c
 c     no change is needed if the file doesn't exist
 c
       exist = .false.

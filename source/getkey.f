@@ -44,8 +44,7 @@ c
          call upcase (string)
          if (string(1:2) .eq. '-K') then
             keyfile = arg(i+1)
-            call suffix (keyfile,'key')
-            call version (keyfile,'old')
+            call suffix (keyfile,'key','old')
             inquire (file=keyfile,exist=exist)
             if (.not. exist) then
                write (iout,10)

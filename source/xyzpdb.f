@@ -49,8 +49,7 @@ c     reopen the coordinates file and read the first structure
 c
       ixyz = freeunit ()
       xyzfile = filename
-      call suffix (xyzfile,'xyz')
-      call version (xyzfile,'old')
+      call suffix (xyzfile,'xyz','old')
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)

@@ -248,7 +248,7 @@ libtinker_la_SOURCES = \
 	orthog.f \
 	overlap.f \
 	piscf.f \
-	pmepol.f \
+	pmestuff.f \
 	pmpb.f \
 	polymer.f \
 	precise.f \

@@ -113,8 +113,7 @@ c
          isrc = freeunit ()
          call nextarg (srcfile,exist)
          if (exist) then
-            call suffix (srcfile,'txt')
-            call version (srcfile,'old')
+            call suffix (srcfile,'txt','old')
             inquire (file=srcfile,exist=exist)
          end if
          do while (.not. exist)
@@ -122,8 +121,7 @@ c
    50       format (/,' Enter Name of Source Code Listing File :  ',$)
             read (input,60)  srcfile
    60       format (a120)
-            call suffix (srcfile,'txt')
-            call version (srcfile,'old')
+            call suffix (srcfile,'txt','old')
             inquire (file=srcfile,exist=exist)
          end do
          open (unit=isrc,file=srcfile,status='old')

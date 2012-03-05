@@ -12,17 +12,18 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "suffix" checks a filename for the presence of an
-c     extension, and appends an extension if none is found
+c     "suffix" checks a filename for the presence of an extension,
+c     and appends an extension and version if none is found
 c
 c
-      subroutine suffix (filename,extension)
+      subroutine suffix (filename,extension,status)
       implicit none
       include 'ascii.i'
       integer i,leng,lext
       integer last,trimtext
       logical exist
       character*1 letter
+      character*3 status
       character*(*) filename
       character*(*) extension
 c
@@ -47,12 +48,15 @@ c        if (letter .eq. '\')  last = leng
       end do
       if (last .ne. leng)  return
 c
-c     append extension if current name does not exist
+c     append extension and version if filename does not exist
 c
       exist = .false.
       if (leng .ne. 0)  inquire (file=filename(1:leng),exist=exist)
       if (.not. exist) then
          filename = filename(1:leng)//'.'//extension(1:lext)
+      end if
+      if (.not.exist .or. status.eq.'new') then
+         call version (filename,status)
       end if
       return
       end

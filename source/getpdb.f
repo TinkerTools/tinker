@@ -30,8 +30,7 @@ c
       call nextarg (pdbfile,exist)
       if (exist) then
          call basefile (pdbfile)
-         call suffix (pdbfile,'pdb')
-         call version (pdbfile,'old')
+         call suffix (pdbfile,'pdb','old')
          inquire (file=pdbfile,exist=exist)
       end if
 c
@@ -43,8 +42,7 @@ c
          read (input,20)  pdbfile
    20    format (a120)
          call basefile (pdbfile)
-         call suffix (pdbfile,'pdb')
-         call version (pdbfile,'old')
+         call suffix (pdbfile,'pdb','old')
          inquire (file=pdbfile,exist=exist)
       end do
 c

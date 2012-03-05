@@ -55,8 +55,7 @@ c
 c
 c     check existence of default or specified parameter file
 c
-      call suffix (prmfile,'prm')
-      call version (prmfile,'old')
+      call suffix (prmfile,'prm','old')
       inquire (file=prmfile,exist=exist)
 c
 c     test for user specified absence of a parameter file
@@ -75,8 +74,7 @@ c
       if (.not. exist) then
          call nextarg (prmfile,exist)
          if (exist) then
-            call suffix (prmfile,'prm')
-            call version (prmfile,'old')
+            call suffix (prmfile,'prm','old')
             inquire (file=prmfile,exist=exist)
          end if
       end if
@@ -88,8 +86,7 @@ c
    10    format (/,' Enter Potential Parameter File Name :  ',$)
          read (input,20)  prmfile
    20    format (a120)
-         call suffix (prmfile,'prm')
-         call version (prmfile,'old')
+         call suffix (prmfile,'prm','old')
          inquire (file=prmfile,exist=exist)
       end do
 c

@@ -91,8 +91,7 @@ c     reopen the PDB file and read the first coordinate set
 c
       ipdb = freeunit ()
       pdbfile = filename
-      call suffix (pdbfile,'pdb')
-      call version (pdbfile,'old')
+      call suffix (pdbfile,'pdb','old')
       open (unit=ipdb,file=pdbfile,status ='old')
       rewind (unit=ipdb)
       call readpdb (ipdb)

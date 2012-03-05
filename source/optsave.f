@@ -86,8 +86,7 @@ c
       if (cyclesave) then
          if (archive) then
             optfile = filename(1:leng)
-            call suffix (optfile,'arc')
-            call version (optfile,'old')
+            call suffix (optfile,'arc','old')
             inquire (file=optfile,exist=exist)
             if (exist) then
                call openend (iopt,optfile)

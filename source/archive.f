@@ -98,12 +98,11 @@ c
       call basefile (arcfile)
       basename = arcfile
       lengb = leng
-      call suffix (arcfile,'arc')
       if (modtyp .eq. 'CREATE') then
-         call version (arcfile,'new')
+         call suffix (arcfile,'arc','new')
          open (unit=iarc,file=arcfile,status='new')
       else if (modtyp .ne. 'EXIT') then
-         call version (arcfile,'old')
+         call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
             write (iout,80)
@@ -114,8 +113,7 @@ c
             call basefile (arcfile)
             basename = arcfile
             lengb = leng
-            call suffix (arcfile,'arc')
-            call version (arcfile,'old')
+            call suffix (arcfile,'arc','old')
             inquire (file=arcfile,exist=exist)
          end do
          open (unit=iarc,file=arcfile,status='old')
@@ -321,8 +319,7 @@ c
             else
                ixyz = freeunit ()
                xyzfile = basename
-               call suffix (xyzfile,'arc')
-               call version (xyzfile,'new')
+               call suffix (xyzfile,'arc','new')
                open (unit=ixyz,file=xyzfile,status='new')
                do while (i.ge.start .and. i.le.stop)
                   call readxyz (iarc)

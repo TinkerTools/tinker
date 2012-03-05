@@ -32,8 +32,7 @@ c
       call nextarg (xyzfile,exist)
       if (exist) then
          call basefile (xyzfile)
-         call suffix (xyzfile,'xyz')
-         call version (xyzfile,'old')
+         call suffix (xyzfile,'xyz','old')
          inquire (file=xyzfile,exist=exist)
       end if
 c
@@ -45,8 +44,7 @@ c
          read (input,20)  xyzfile
    20    format (a120)
          call basefile (xyzfile)
-         call suffix (xyzfile,'xyz')
-         call version (xyzfile,'old')
+         call suffix (xyzfile,'xyz','old')
          inquire (file=xyzfile,exist=exist)
       end do
 c

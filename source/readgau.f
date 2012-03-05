@@ -59,13 +59,11 @@ c
          inquire (file=gaufile,exist=exist)
          igau = freeunit()
          call basefile (gaufile)
-         call suffix (gaufile,'log')
-         call version (gaufile,'old')
+         call suffix (gaufile,'log','old')
          inquire (file=gaufile,exist=exist)
          if (.not. exist) then
             call basefile (gaufile)
-            call suffix (gaufile,'out')
-            call version (gaufile,'old')
+            call suffix (gaufile,'out','old')
             inquire (file=gaufile,exist=exist)
          end if
       end if
@@ -76,13 +74,11 @@ c
    20    format (a120)
          igau = freeunit ()
          call basefile (gaufile)
-         call suffix (gaufile,'log')
-         call version (gaufile,'old')
+         call suffix (gaufile,'log','old')
          inquire (file=gaufile,exist=exist)
          if (.not. exist) then
             call basefile (gaufile)
-            call suffix (gaufile,'out')
-            call version (gaufile,'old')
+            call suffix (gaufile,'out','old')
             inquire (file=gaufile,exist=exist)
          end if
       end do

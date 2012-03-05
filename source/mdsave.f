@@ -97,8 +97,7 @@ c
       ixyz = freeunit ()
       if (archive) then
          xyzfile = filename(1:leng)
-         call suffix (xyzfile,'arc')
-         call version (xyzfile,'old')
+         call suffix (xyzfile,'arc','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
             call openend (ixyz,xyzfile)
@@ -121,8 +120,7 @@ c
          ivel = freeunit ()
          if (archive) then
             velfile = filename(1:leng)
-            call suffix (velfile,'vel')
-            call version (velfile,'old')
+            call suffix (velfile,'vel','old')
             inquire (file=velfile,exist=exist)
             if (exist) then
                call openend (ivel,velfile)
@@ -162,8 +160,7 @@ c
          ifrc = freeunit ()
          if (archive) then
             frcfile = filename(1:leng)
-            call suffix (frcfile,'frc')
-            call version (frcfile,'old')
+            call suffix (frcfile,'frc','old')
             inquire (file=frcfile,exist=exist)
             if (exist) then
                call openend (ifrc,frcfile)
@@ -193,8 +190,7 @@ c
          iind = freeunit ()
          if (archive) then
             indfile = filename(1:leng)
-            call suffix (indfile,'uind')
-            call version (indfile,'old')
+            call suffix (indfile,'uind','old')
             inquire (file=indfile,exist=exist)
             if (exist) then
                call openend (iind,indfile)
