@@ -47,7 +47,7 @@ c
 c     mmff_kb   bond force constant for pairs of atom classes
 c     mmff_kb1  bond force constant for class pairs with Bond Type 1
 c     mmff_b0   bond length value for pairs of atom classes
-c     mmff_b01  bond length value for class pairs with Bond Type 1
+c     mmff_b1   bond length value for class pairs with Bond Type 1
 c     rad0      covalent atomic radius for empirical bond rules
 c     paulel    Pauling electronegativities for empirical bond rules
 c     r0ref     reference bond length for empirical bond rules
@@ -55,13 +55,12 @@ c     kbref     reference force constant for empirical bond rules
 c
 c
       real*8 mmff_kb,mmff_kb1
-      real*8 mmff_b0,mmff_b01
+      real*8 mmff_b0,mmff_b1
       real*8 rad0,r0ref
       real*8 kbref,paulel
       common /merck2/ mmff_kb(100,100),mmff_kb1(100,100),
-     &                mmff_b0(100,100),mmff_b01(100,100),
-     &                rad0(100),r0ref(100,100),kbref(100,100),
-     &                paulel(100)
+     &                mmff_b0(100,100),mmff_b1(100,100),rad0(100),
+     &                r0ref(100,100),kbref(100,100),paulel(100)
 c
 c
 c     mmff_ka     angle force constant for triples of atom classes
@@ -74,22 +73,22 @@ c     mmff_ka6    angle force constant for 3-ring and both Bond Type 1
 c     mmff_ka7    angle force constant for 4-ring and one Bond Type 1
 c     mmff_ka8    angle force constant for 4-ring and both Bond Type 1
 c     mmff_ang0   ideal bond angle for triples of atom classes
-c     mmff_ang01  ideal bond angle with one bond of Type 1
-c     mmff_ang02  ideal bond angle with both bonds of Type 1
-c     mmff_ang03  ideal bond angle for 3-membered ring
-c     mmff_ang04  ideal bond angle for 4-membered ring
-c     mmff_ang05  ideal bond angle for 3-ring and one Bond Type 1
-c     mmff_ang06  ideal bond angle for 3-ring and both Bond Type 1
-c     mmff_ang07  ideal bond angle for 4-ring and one Bond Type 1
-c     mmff_ang08  ideal bond angle for 4-ring and both Bond Type 1
+c     mmff_ang1   ideal bond angle with one bond of Type 1
+c     mmff_ang2   ideal bond angle with both bonds of Type 1
+c     mmff_ang3   ideal bond angle for 3-membered ring
+c     mmff_ang4   ideal bond angle for 4-membered ring
+c     mmff_ang5   ideal bond angle for 3-ring and one Bond Type 1
+c     mmff_ang6   ideal bond angle for 3-ring and both Bond Type 1
+c     mmff_ang7   ideal bond angle for 4-ring and one Bond Type 1
+c     mmff_ang8   ideal bond angle for 4-ring and both Bond Type 1
 c
 c
       real*8 mmff_ka,mmff_ka1,mmff_ka2
       real*8 mmff_ka3,mmff_ka4,mmff_ka5
       real*8 mmff_ka6,mmff_ka7,mmff_ka8
-      real*8 mmff_ang0,mmff_ang01,mmff_ang02
-      real*8 mmff_ang03,mmff_ang04,mmff_ang05
-      real*8 mmff_ang06,mmff_ang07,mmff_ang08
+      real*8 mmff_ang0,mmff_ang1,mmff_ang2
+      real*8 mmff_ang3,mmff_ang4,mmff_ang5
+      real*8 mmff_ang6,mmff_ang7,mmff_ang8
       common /merck3/ mmff_ka(0:100,100,0:100),
      &                mmff_ka1(0:100,100,0:100),
      &                mmff_ka2(0:100,100,0:100),
@@ -100,14 +99,14 @@ c
      &                mmff_ka7(0:100,100,0:100),
      &                mmff_ka8(0:100,100,0:100),
      &                mmff_ang0(0:100,100,0:100),
-     &                mmff_ang01(0:100,100,0:100),
-     &                mmff_ang02(0:100,100,0:100),
-     &                mmff_ang03(0:100,100,0:100),
-     &                mmff_ang04(0:100,100,0:100),
-     &                mmff_ang05(0:100,100,0:100),
-     &                mmff_ang06(0:100,100,0:100),
-     &                mmff_ang07(0:100,100,0:100),
-     &                mmff_ang08(0:100,100,0:100)
+     &                mmff_ang1(0:100,100,0:100),
+     &                mmff_ang2(0:100,100,0:100),
+     &                mmff_ang3(0:100,100,0:100),
+     &                mmff_ang4(0:100,100,0:100),
+     &                mmff_ang5(0:100,100,0:100),
+     &                mmff_ang6(0:100,100,0:100),
+     &                mmff_ang7(0:100,100,0:100),
+     &                mmff_ang8(0:100,100,0:100)
 c
 c
 c     Stretch-Bend Type 0

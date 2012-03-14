@@ -634,21 +634,46 @@ c
             itc = eqclass(ittc,5)
          end if
          if (mclass .gt. 5) then
-            goto 30
-         else if (at .eq. 0) then
-            ak(i) = mmff_ka(ita,itb,itc)
-            anat(i) = mmff_ang0(ita,itb,itc)
+            goto 20
+         else
+            if (at .eq. 0) then
+               ak(i) = mmff_ka(ita,itb,itc)
+               anat(i) = mmff_ang0(ita,itb,itc)
+            else if (at .eq. 1) then
+               ak(i) = mmff_ka1(ita,itb,itc)
+               anat(i) = mmff_ang1(ita,itb,itc)
+            else if (at .eq. 2) then
+               ak(i) = mmff_ka2(ita,itb,itc)
+               anat(i) = mmff_ang2(ita,itb,itc)
+            else if (at .eq. 3) then
+               ak(i) = mmff_ka3(ita,itb,itc)
+               anat(i) = mmff_ang3(ita,itb,itc)
+            else if (at .eq. 4) then
+               ak(i) = mmff_ka4(ita,itb,itc)
+               anat(i) = mmff_ang4(ita,itb,itc)
+            else if (at .eq. 5) then
+               ak(i) = mmff_ka5(ita,itb,itc)
+               anat(i) = mmff_ang5(ita,itb,itc)
+            else if (at .eq. 6) then
+               ak(i) = mmff_ka6(ita,itb,itc)
+               anat(i) = mmff_ang6(ita,itb,itc)
+            else if (at .eq. 7) then
+               ak(i) = mmff_ka7(ita,itb,itc)
+               anat(i) = mmff_ang7(ita,itb,itc)
+            else if (at .eq. 8) then
+               ak(i) = mmff_ka8(ita,itb,itc)
+               anat(i) = mmff_ang8(ita,itb,itc)
+            end if
 c
-c     use an empirical rule to calculate the force constant
+c     use empirical rule to calculate the force constant
 c
             if (mclass .eq. 5) then
-   20          continue
-               if (z2(ina) .eq. 1000.0d0)  goto 30
-               if (z2(inb) .eq. 1000.0d0)  goto 30
-               if (z2(inc) .eq. 1000.0d0)  goto 30
-               if (c(ina) .eq. 1000.0d0)  goto 30
-               if (c(inb) .eq. 1000.0d0)  goto 30
-               if (c(inc) .eq. 1000.0d0)  goto 30
+               if (z2(ina) .eq. 1000.0d0)  goto 20
+               if (z2(inb) .eq. 1000.0d0)  goto 20
+               if (z2(inc) .eq. 1000.0d0)  goto 20
+               if (c(ina) .eq. 1000.0d0)  goto 20
+               if (c(inb) .eq. 1000.0d0)  goto 20
+               if (c(inc) .eq. 1000.0d0)  goto 20
                do k = 1, maxbnd
                   if ((min(ia,ib).eq.ibnd(1,k)) .and.
      &                (max(ia,ib).eq.ibnd(2,k))) then
@@ -672,115 +697,16 @@ c
             if (ak(i) .eq. 1000.0d0)  done = .false.
             if (anat(i) .eq. 1000.0d0)  done = .false.
             if (.not. done)  goto 10
-            goto 30
-         else if (at .eq. 1) then
-            ak(i) = mmff_ka1(ita,itb,itc)
-            anat(i) = mmff_ang01(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 2) then
-            ak(i) = mmff_ka2(ita,itb,itc)
-            anat(i) = mmff_ang02(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 3) then
-            ak(i) = mmff_ka3(ita,itb,itc)
-            anat(i) = mmff_ang03(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 4) then
-            ak(i) = mmff_ka4(ita,itb,itc)
-            anat(i) = mmff_ang04(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 5) then
-            ak(i) = mmff_ka5(ita,itb,itc)
-            anat(i) = mmff_ang05(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 6) then
-            ak(i) = mmff_ka6(ita,itb,itc)
-            anat(i) = mmff_ang06(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 7) then
-            ak(i) = mmff_ka7(ita,itb,itc)
-            anat(i) = mmff_ang07(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
-         else if (at .eq. 8) then
-            ak(i) = mmff_ka8(ita,itb,itc)
-            anat(i) = mmff_ang08(ita,itb,itc)
-            done = .true.
-            if (ak(i) .eq. 1000.0d0)  done = .false.
-            if (anat(i) .eq. 1000.0d0)  done = .false.
-            if (.not.done .and. mclass.lt.5) then
-               goto 10
-            else if (mclass .eq. 5) then
-               goto 20
-            end if
-            goto 30
+            goto 20
          end if
 c
-c     warn if suitable angle bending parameter not found
+c     use empirical rule for ideal angle and force constant
 c
-   30    continue
+   20    continue
          minat = min(ina,inb,inc)
          if (minat .eq. 0)  done = .true.
          if (.not. done) then
             if (use_angle) then
-c
-c     if angle parameters are missing, apply empirical rules
-c
                anat(i) = 120.0d0
                if (crd(itb) .eq. 4)  anat(i) = 109.45d0
                if (crd(itb) .eq. 2) then
@@ -802,7 +728,24 @@ c
                end if
                if (ring3)  anat(i) = 60.0d0
                if (ring4)  anat(i) = 90.0d0
-               goto 20
+               do k = 1, maxbnd
+                  if ((min(ia,ib).eq.ibnd(1,k)) .and.
+     &                (max(ia,ib).eq.ibnd(2,k))) then
+                     bnd_ab = k
+                  end if
+                  if ((min(ic,ib).eq.ibnd(1,k)) .and.
+     &                (max(ic,ib).eq.ibnd(2,k))) then
+                     bnd_bc = k
+                  end if
+               end do
+               d = (bl(bnd_ab)-bl(bnd_bc))**2
+     &                / (bl(bnd_ab)+bl(bnd_bc))**2
+               beta = 1.0d0
+               if (ring4)  beta = 0.85d0
+               if (ring3)  beta = 0.05d0
+               ak(i) = beta*1.75d0*z2(ina)*z2(inc)*c(inb)
+     &                 / ((0.01745329252d0*anat(i))**2
+     &                      *(bl(bnd_ab)+bl(bnd_bc))*exp(2.0d0*d))
             end if
          end if
          angtyp(i) = 'HARMONIC'

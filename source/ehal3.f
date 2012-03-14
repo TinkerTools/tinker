@@ -829,7 +829,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
 !$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5,molcule,name,verbose,
-!$OMP& debug,header)
+!$OMP& debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(evt,eintert,nevt,aevt)
 !$OMP DO reduction(+:evt,eintert,nevt,aevt) schedule(dynamic)
 c

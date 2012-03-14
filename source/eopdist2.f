@@ -28,7 +28,7 @@ c
       include 'usage.i'
       integer i,kopdist
       integer ia,ib,ic,id
-      real*8 e,force,fgrp
+      real*8 force,fgrp
       real*8 dt,dt2,dt3,dt4
       real*8 deddt,drt2,ddrt
       real*8 dot,dotx,doty,dotz
@@ -128,6 +128,9 @@ c
             dot = xt*xad + yt*yad + zt*zad
             drt2 = dot / rt2
             dt2 = dot * drt2
+            dt = sqrt(dt2)
+            dt3 = dt2 * dt
+            dt4 = dt2 * dt2
             deddt = opdunit * force
      &                 * (2.0d0 + 3.0d0*copd*dt + 4.0d0*qopd*dt2
      &                     + 5.0d0*popd*dt3 + 6.0d0*sopd*dt4)
@@ -135,7 +138,6 @@ c
 c     scale the interaction based on its group membership
 c
             if (use_group) then
-               e = e * fgrp
                deddt = deddt * fgrp
             end if
 c

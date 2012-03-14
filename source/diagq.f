@@ -224,13 +224,16 @@ c
 c
 c     find the eigenvectors via a backtransformation step
 c
+      ia = -1
       do i = 1, nv
          root = ev(i)
          do j = 1, n
             y(j) = 1.0d0
          end do
          ia = ia + 1
-         if (i.eq.1 .or. abs(ev(i-1)-root).ge.eps)  ia = 0
+         if (i .ne. 1) then
+            if (abs(ev(i-1)-root) .ge. eps)  ia = 0
+         end if
          elim1 = a(1) - root
          elim2 = w(1)
          do j = 1, nn

@@ -56,8 +56,9 @@ c
       do k = 1, nkey
          next = 1
          record = keyline(k)
-         call upcase (record)
          call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:120)
          if (keyword(1:11) .eq. 'RATTLE-EPS ') then
             read (string,*,err=10,end=10)  rateps
          end if
@@ -250,8 +251,8 @@ c
       do k = 1, nkey
          next = 1
          record = keyline(k)
-         call upcase (record)
          call gettext (record,keyword,next)
+         call upcase (keyword)
          if (keyword(1:16) .eq. 'RATTLE-DISTANCE ') then
             call getnumb (record,ia,next)
             call getnumb (record,ib,next)

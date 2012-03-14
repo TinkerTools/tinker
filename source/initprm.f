@@ -216,7 +216,7 @@ c
             mmff_kb(j,i) = 1000.0d0
             mmff_kb1(j,i) = 1000.0d0
             mmff_b0(j,i) = 1000.0d0
-            mmff_b01(j,i) = 1000.0d0
+            mmff_b1(j,i) = 1000.0d0
             bci(j,i) = 1000.0d0
             bci_1(j,i) = 1000.0d0
             do k = 1, 100
@@ -260,14 +260,14 @@ c
                mmff_ka7(k,j,i) = 1000.0d0
                mmff_ka8(k,j,i) = 1000.0d0
                mmff_ang0(k,j,i) = 1000.0d0
-               mmff_ang01(k,j,i) = 1000.0d0
-               mmff_ang02(k,j,i) = 1000.0d0
-               mmff_ang03(k,j,i) = 1000.0d0
-               mmff_ang04(k,j,i) = 1000.0d0
-               mmff_ang05(k,j,i) = 1000.0d0
-               mmff_ang06(k,j,i) = 1000.0d0
-               mmff_ang07(k,j,i) = 1000.0d0
-               mmff_ang08(k,j,i) = 1000.0d0
+               mmff_ang1(k,j,i) = 1000.0d0
+               mmff_ang2(k,j,i) = 1000.0d0
+               mmff_ang3(k,j,i) = 1000.0d0
+               mmff_ang4(k,j,i) = 1000.0d0
+               mmff_ang5(k,j,i) = 1000.0d0
+               mmff_ang6(k,j,i) = 1000.0d0
+               mmff_ang7(k,j,i) = 1000.0d0
+               mmff_ang8(k,j,i) = 1000.0d0
             end do
          end do
       end do

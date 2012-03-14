@@ -1212,8 +1212,8 @@ c
             else if (bt .eq. 1) then
                mmff_kb1(ia,ib) = fc
                mmff_kb1(ib,ia) = fc
-               mmff_b01(ia,ib) = bd
-               mmff_b01(ib,ia) = bd
+               mmff_b1(ia,ib) = bd
+               mmff_b1(ib,ia) = bd
             end if
 c
 c     MMFF bond stretching empirical rule parameters
@@ -1253,43 +1253,43 @@ c
                else if (at .eq. 1) then
                   mmff_ka1(ia,ib,ic) = fc
                   mmff_ka1(ic,ib,ia) = fc
-                  mmff_ang01(ia,ib,ic) = an1
-                  mmff_ang01(ic,ib,ia) = an1
+                  mmff_ang1(ia,ib,ic) = an1
+                  mmff_ang1(ic,ib,ia) = an1
                else if (at .eq. 2) then
                   mmff_ka2(ia,ib,ic) = fc
                   mmff_ka2(ic,ib,ia) = fc
-                  mmff_ang02(ia,ib,ic) = an1
-                  mmff_ang02(ic,ib,ia) = an1
+                  mmff_ang2(ia,ib,ic) = an1
+                  mmff_ang2(ic,ib,ia) = an1
                else if (at .eq. 3) then
                   mmff_ka3(ia,ib,ic) = fc
                   mmff_ka3(ic,ib,ia) = fc
-                  mmff_ang03(ia,ib,ic) = an1
-                  mmff_ang03(ic,ib,ia) = an1
+                  mmff_ang3(ia,ib,ic) = an1
+                  mmff_ang3(ic,ib,ia) = an1
                else if (at .eq. 4) then
                   mmff_ka4(ia,ib,ic) = fc
                   mmff_ka4(ic,ib,ia) = fc
-                  mmff_ang04(ia,ib,ic) = an1
-                  mmff_ang04(ic,ib,ia) = an1
+                  mmff_ang4(ia,ib,ic) = an1
+                  mmff_ang4(ic,ib,ia) = an1
                else if (at .eq. 5) then
                   mmff_ka5(ia,ib,ic) = fc
                   mmff_ka5(ic,ib,ia) = fc
-                  mmff_ang05(ia,ib,ic) = an1
-                  mmff_ang05(ic,ib,ia) = an1
+                  mmff_ang5(ia,ib,ic) = an1
+                  mmff_ang5(ic,ib,ia) = an1
                else if (at .eq. 6) then
                   mmff_ka6(ia,ib,ic) = fc
                   mmff_ka6(ic,ib,ia) = fc
-                  mmff_ang06(ia,ib,ic) = an1
-                  mmff_ang06(ic,ib,ia) = an1
+                  mmff_ang6(ia,ib,ic) = an1
+                  mmff_ang6(ic,ib,ia) = an1
                else if (at .eq. 7) then
                   mmff_ka7(ia,ib,ic) = fc
                   mmff_ka7(ic,ib,ia) = fc
-                  mmff_ang07(ia,ib,ic) = an1
-                  mmff_ang07(ic,ib,ia) = an1
+                  mmff_ang7(ia,ib,ic) = an1
+                  mmff_ang7(ic,ib,ia) = an1
                else if (at .eq. 8) then
                   mmff_ka8(ia,ib,ic) = fc
                   mmff_ka8(ic,ib,ia) = fc
-                  mmff_ang08(ia,ib,ic) = an1
-                  mmff_ang08(ic,ib,ia) = an1
+                  mmff_ang8(ia,ib,ic) = an1
+                  mmff_ang8(ic,ib,ia) = an1
                end if
             end if
 c

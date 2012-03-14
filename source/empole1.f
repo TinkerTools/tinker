@@ -4812,7 +4812,7 @@ c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) firstprivate(f) 
-!$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,eintra,damp,expdamp,
+!$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,damp,expdamp,
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
 !$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,usc3,usc5,alsq2,alsq2n,
 !$OMP& exp2a,ralpha,gfd,gfdr,xr,yr,zr,xix,yix,zix,

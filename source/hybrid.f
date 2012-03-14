@@ -1223,8 +1223,8 @@ c
       integer it,it0,it1
       real*8 radius,rd,ep
       real*8 srad(maxtyp)
-      real*8 srad4(maxtyp)
       real*8 seps(maxtyp)
+      real*8 srad4(maxtyp)
       real*8 seps4(maxtyp)
       logical header
 c
@@ -1252,6 +1252,8 @@ c
       do i = 1, maxclass
          srad(i) = sqrt(rad(i))
          seps(i) = sqrt(eps(i))
+         srad4(i) = sqrt(rad4(i))
+         seps4(i) = sqrt(eps4(i))
       end do
 c
 c     use combination rules to set pairwise vdw radii sums

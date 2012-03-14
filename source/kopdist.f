@@ -35,7 +35,8 @@ c
       integer i,j,k,nopd
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
-      integer itmin,size,next
+      integer imin,itmin
+      integer size,next
       real*8 fopd
       logical header
       character*4 pa,pb,pc,pd
@@ -71,21 +72,21 @@ c
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
             call numeral (id,pd,size)
-            itmin = min(itb,itc,itd)
-            if (itb .eq. itmin) then
-               if (itc .le. itd) then
+            imin = min(ib,ic,id)
+            if (ib .eq. imin) then
+               if (ic .le. id) then
                   pt = pa//pb//pc//pd
                else
                   pt = pa//pb//pd//pc
                end if
-            else if (itc .eq. itmin) then
-               if (itb .le. itd) then
+            else if (ic .eq. imin) then
+               if (ib .le. id) then
                   pt = pa//pc//pb//pd
                else
                   pt = pa//pc//pd//pb
                end if
-            else if (itd .eq. itmin) then
-               if (itb .le. itc) then
+            else if (id .eq. imin) then
+               if (ib .le. ic) then
                   pt = pa//pd//pb//pc
                else
                   pt = pa//pd//pc//pb

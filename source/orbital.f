@@ -94,56 +94,54 @@ c
             i = i + 2
          end if
       end do
+c
+c     set number of orbitals and an initial orbital list
+c
       norbit = 0
+      nconj = 0
       do i = 1, n
+         list(i) = 0
          if (listpi(i)) then
             norbit = norbit + 1
             iorbit(norbit) = i
          end if
       end do
 c
-c     zero number of pisystems and pisystem membership list
-c
-      nconj = 0
-      do i = 1, n
-         conjug(i) = 0
-      end do
-c
-c     assign each piatom to its respective pisystem
+c     assign each orbital to its respective pisystem
 c
       do i = 1, norbit
          iorb = iorbit(i)
-         if (conjug(iorb) .eq. 0) then
+         if (list(iorb) .eq. 0) then
             nconj = nconj + 1
-            conjug(iorb) = nconj
+            list(iorb) = nconj
          end if
-         mi = conjug(iorb)
+         mi = list(iorb)
          do ii = 1, n12(iorb)
             j = i12(ii,iorb)
             if (listpi(j)) then
-               mj = conjug(j)
+               mj = list(j)
                if (mj .eq. 0) then
-                  conjug(j) = mi
+                  list(j) = mi
                else if (mi .lt. mj) then
                   nconj = nconj - 1
                   do k = 1, norbit
                      korb = iorbit(k)
-                     mk = conjug(korb)
+                     mk = list(korb)
                      if (mk .eq. mj) then
-                        conjug(korb) = mi
+                        list(korb) = mi
                      else if (mk .gt. mj) then
-                        conjug(korb) = mk - 1
+                        list(korb) = mk - 1
                      end if
                   end do
                else if (mi .gt. mj) then
                   nconj = nconj - 1
                   do k = 1, norbit
                      korb = iorbit(k)
-                     mk = conjug(korb)
+                     mk = list(korb)
                      if (mk .eq. mi) then
-                        conjug(korb) = mj
+                        list(korb) = mj
                      else if (mk .gt. mi) then
-                        conjug(korb) = mk - 1
+                        list(korb) = mk - 1
                      end if
                   end do
                   mi = mj
@@ -154,9 +152,6 @@ c
 c
 c     pack atoms of each pisystem into a contiguous indexed list
 c
-      do i = 1, n
-         list(i) = conjug(i)
-      end do
       call sort3 (n,list,kconj)
       k = n - norbit 
       do i = 1, norbit
@@ -206,7 +201,7 @@ c     find atoms defining a plane perpendicular to each orbital
 c
       call piplane
 c
-c     find and store the pisystem bonds
+c     find and store all of the pisystem bonds
 c
       nbpi = 0
       do ii = 1, nconj

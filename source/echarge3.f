@@ -1665,7 +1665,7 @@ c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
-!$OMP& aewald,molcule,ebuffer,name,verbose,debug,header)
+!$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared(ect,eintrat,nect,aect)
 !$OMP DO reduction(+:ect,eintrat,nect,aect)
 !$OMP& schedule(dynamic)

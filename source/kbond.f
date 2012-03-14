@@ -565,7 +565,7 @@ c
             do j = 1, nlignes
                if (ia.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) then
                   bk(i) = mmff_kb1(ita,itb)
-                  bl(i) = mmff_b01(ita,itb)
+                  bl(i) = mmff_b1(ita,itb)
                   done = .true.
                   if (bk(i) .eq. 1000.0d0)  done = .false.
                   if (bl(i) .eq. 1000.0d0)  done = .false.
@@ -582,7 +582,7 @@ c
             do j = 1, nlignes
                if (ib.eq.bt_1(j,1) .and. ia.eq.bt_1(j,2)) then
                   bk(i) = mmff_kb1(itb,ita)
-                  bl(i) = mmff_b01(itb,ita)
+                  bl(i) = mmff_b1(itb,ita)
                   done = .true.
                   if (bk(i) .eq. 1000.0d0)  done = .false.
                   if (bl(i) .eq. 1000.0d0)  done = .false.
