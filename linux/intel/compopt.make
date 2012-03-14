@@ -274,7 +274,7 @@ ifort -c -fast orthog.f
 ifort -c -fast overlap.f
 ifort -c -fast path.f
 ifort -c -fast pdbxyz.f
-ifort -c -fast piscf.f
+ifort -c -fast picalc.f
 ifort -c -fast pmestuff.f
 ifort -c -fast pmpb.f
 ifort -c -fast polarize.f

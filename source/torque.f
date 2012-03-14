@@ -5,16 +5,16 @@ c     ##  COPYRIGHT (C) 2007 by Pengyu Ren & Jay William Ponder  ##
 c     ##                   All Rights Reserved                   ##
 c     #############################################################
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine torque  --  convert torque to Cartesian force  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine torque  --  convert single site torque to force  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "torque" takes the torque values on sites defined by local
-c     coordinate frames and converts to Cartesian forces on the
-c     original sites and sites specifying the local frames
+c     "torque" takes the torque values on a single site defined by
+c     a local coordinate frame and converts to Cartesian forces on
+c     the original site and sites specifying the local frame
 c
 c     literature reference:
 c
@@ -400,16 +400,16 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine torque2  --  convert torque to Cartesian force  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine torque2  --  convert all site torques to forces  ##        
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "torque2" takes the torque values on sites defined by local
-c     coordinate frames and converts to Cartesian forces on the
-c     original sites and sites specifying the local frames
+c     "torque2" takes the torque values on all sites defined by
+c     local coordinate frames and finds the total Cartesian force
+c     components on original sites and sites specifying local frames
 c
 c     literature reference:
 c
@@ -683,16 +683,17 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine torque3  --  convert torque to Cartesian force  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine torque3  --  convert torque to force components  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "torque3" takes the torque values on sites defined by local
-c     coordinate frames and converts to Cartesian forces on the
-c     original sites and sites specifying the local frames
+c     "torque3" takes the torque values on a single site defined by
+c     a local coordinate frame and converts to Cartesian forces on
+c     the original site and sites specifying the local frame; this
+c     version also returns the individual atomic components
 c
 c     literature reference:
 c

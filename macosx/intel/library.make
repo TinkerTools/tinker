@@ -250,7 +250,7 @@ orbital.o \
 orient.o \
 orthog.o \
 overlap.o \
-piscf.o \
+picalc.o \
 pmestuff.o \
 pmpb.o \
 polymer.o \

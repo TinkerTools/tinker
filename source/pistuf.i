@@ -22,5 +22,5 @@ c
       real*8 bkpi,blpi
       real*8 kslope,lslope
       real*8 torsp2
-      common /pistuf/ bkpi(maxpib),blpi(maxpib),kslope(maxpib),
-     &                lslope(maxpib),torsp2(maxpit)
+      common /pistuf/ bkpi(maxbnd),blpi(maxbnd),kslope(maxbnd),
+     &                lslope(maxbnd),torsp2(maxtors)

@@ -274,7 +274,7 @@ g95 -c -O orthog.f
 g95 -c -O overlap.f
 g95 -c -O path.f
 g95 -c -O pdbxyz.f
-g95 -c -O piscf.f
+g95 -c -O picalc.f
 g95 -c -O pmestuff.f
 g95 -c -O pmpb.f
 g95 -c -O polarize.f

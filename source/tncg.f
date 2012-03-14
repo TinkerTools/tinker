@@ -328,7 +328,7 @@ c     if pisystem is present, update the molecular orbitals
 c
          if (use_orbit) then
             reorbit = 1
-            call piscf
+            call picalc
             fg_call = fg_call + 1
             f = fgvalue (x,g)
             reorbit = 0

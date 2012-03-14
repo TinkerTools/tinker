@@ -275,7 +275,7 @@ f77 -c -O -N11 orthog.f
 f77 -c -O -N11 overlap.f
 f77 -c -O -N11 path.f
 f77 -c -O -N11 pdbxyz.f
-f77 -c -O -N11 piscf.f
+f77 -c -O -N11 picalc.f
 f77 -c -O -N11 pmestuff.f
 f77 -c -O -N11 pmpb.f
 f77 -c -O -N11 polarize.f

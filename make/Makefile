@@ -436,7 +436,7 @@ OBJS = active.o \
        overlap.o \
        path.o \
        pdbxyz.o \
-       piscf.o \
+       picalc.o \
        pmestuff.o \
        pmpb.o \
        polarize.o \
@@ -1030,7 +1030,7 @@ libtinker.a: ${OBJS}
         orient.o \
         orthog.o \
         overlap.o \
-        piscf.o \
+        picalc.o \
         pmestuff.o \
         pmpb.o \
         polymer.o \
@@ -1282,7 +1282,7 @@ impose.o: align.i inform.i iounit.i sizes.i
 induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i uprior.i
 inertia.o: atmtyp.i atoms.i iounit.i math.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
-initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
+initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i merck.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
 initres.o: resdue.i sizes.i
 initrot.o: atoms.i couple.i group.i inform.i iounit.i kgeoms.i math.i omega.i rotate.i sizes.i usage.i zcoord.i
 insert.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
@@ -1359,7 +1359,7 @@ orthog.o:
 overlap.o: units.i
 path.o: align.i atmtyp.i atoms.i files.i inform.i iounit.i linmin.i minima.i output.i paths.i sizes.i
 pdbxyz.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i iounit.i katoms.i pdb.i resdue.i sequen.i sizes.i
-piscf.o: atmtyp.i atoms.i bond.i border.i couple.i inform.i iounit.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
+picalc.o: atmtyp.i atoms.i bond.i border.i couple.i inform.i iounit.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
 pmestuff.o: atoms.i boxes.i charge.i chunks.i mpole.i pme.i potent.i sizes.i
 pmpb.o: iounit.i
 polarize.o: atoms.i inform.i iounit.i molcul.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i

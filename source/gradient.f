@@ -121,7 +121,7 @@ c
 c
 c     alter bond and torsion constants for pisystem
 c
-      if (use_orbit)  call piscf
+      if (use_orbit)  call picalc
 c
 c     call the local geometry energy and gradient routines
 c

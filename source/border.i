@@ -17,4 +17,4 @@ c     pnpl   pi-bond orders for bonds in "nonplanar" pisystem
 c
 c
       real*8 pbpl,pnpl
-      common /border/ pbpl(maxpib),pnpl(maxpib)
+      common /border/ pbpl(maxbnd),pnpl(maxbnd)

@@ -5,15 +5,132 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine picalc  --  Pariser-Parr-Pople MO calculation  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "picalc" performs a modified Pariser-Parr-Pople molecular
+c     orbital calculation for each conjugated pisystem
+c
+c
+      subroutine picalc
+      implicit none
+      include 'sizes.i'
+      include 'bond.i'
+      include 'couple.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'piorbs.i'
+      include 'tors.i'
+      integer i,j,k,m,ib,ic
+      integer ii,jj,kk
+      integer iorb,jorb
+      integer ncalls
+      data ncalls  / 0 /
+      save ncalls
+c
+c
+c     only needs to be done if pisystem is present
+c
+      if (norbit .eq. 0)  return
+c
+c     increment the number of calls to this routine
+c
+      ncalls = ncalls + 1
+      if (reorbit.eq.0 .or. ncalls.lt.reorbit)  return
+      ncalls = 0
+c
+c     loop over all pisystems computing separate MOs for each
+c
+      do i = 1, nconj
+         norbit = 0
+         do j = iconj(1,i), iconj(2,i)
+            norbit = norbit + 1
+            iorbit(norbit) = kconj(j)
+         end do
+c
+c     find and store the pisystem bonds
+c
+         nbpi = 0
+         kk = iconj(2,i) - iconj(1,i) + 1
+         do ii = 1, norbit-1
+            iorb = iorbit(ii)
+            do jj = ii+1, norbit
+               jorb = iorbit(jj)
+               do k = 1, n12(iorb)
+                  if (i12(k,iorb) .eq. jorb) then
+                     nbpi = nbpi + 1
+                     do m = 1, nbond
+                        if (iorb.eq.ibnd(1,m) .and.
+     &                      jorb.eq.ibnd(2,m)) then
+                           ibpi(1,nbpi) = m
+                           ibpi(2,nbpi) = ii
+                           ibpi(3,nbpi) = jj
+                           goto 10
+                        end if
+                     end do
+   10                continue
+                  end if
+               end do
+            end do
+         end do
+c
+c     find and store the pisystem torsions
+c
+         ntpi = 0
+         do ii = 1, ntors
+            ib = itors(2,ii)
+            ic = itors(3,ii)
+            if (listpi(ib) .and. listpi(ic)) then
+               do jj = 1, nbpi
+                  k = ibpi(1,jj)
+                  if (ib.eq.ibnd(1,k).and.ic.eq.ibnd(2,k) .or.
+     &                ib.eq.ibnd(2,k).and.ic.eq.ibnd(1,k)) then
+                     ntpi = ntpi + 1
+                     itpi(1,ntpi) = ii
+                     itpi(2,ntpi) = jj
+                     goto 20
+                  end if
+               end do
+   20          continue
+            end if
+         end do
+c
+c     print a header for the molecular orbital calculation
+c
+         if (debug) then
+            if (nconj .eq. 1) then
+               write (iout,30)
+   30          format (/,' Modified Pariser-Parr-Pople Molecular',
+     &                    ' Orbitals :')
+            else
+               write (iout,40)  i
+   40          format (/,' Modified Pariser-Parr-Pople MOs for',
+     &                    ' Pi-System',i4,' :')
+            end if
+         end if
+c
+c     get SCF-MOs, then scale bond and torsional parameters
+c
+         call piscf
+         call pialter
+      end do
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine piscf  --  scf molecular orbital calculation  ##
+c     ##  subroutine piscf  --  SCF molecular orbital calculation  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "piscf" performs an scf molecular orbital calculation for
-c     the pisystem using a modified Pariser-Parr-Pople method
+c     "piscf" performs an SCF molecular orbital calculation for a
+c     pisystem to determine bond orders used in parameter scaling
 c
 c
       subroutine piscf
@@ -29,10 +146,10 @@ c
       include 'orbits.i'
       include 'piorbs.i'
       include 'units.i'
-      integer i,j,k,m,ncalls
+      integer i,j,k,m
       integer iter,maxiter
       integer iatn,jatn
-      integer iorb,jorb
+      integer iorb,jorb,nfill
       real*8 delta,converge
       real*8 xij,yij,zij,p
       real*8 hcii,gii,gij
@@ -49,40 +166,26 @@ c
       real*8 s1,s2,gjk
       real*8 vij,vik,vmj,vmk
       real*8 xi,xj,xk,xg
-      real*8 povlap(maxpib)
       real*8 en(maxpi)
       real*8 ip(maxpi)
       real*8 work1(maxpi)
       real*8 work2(maxpi)
+      real*8 povlap(maxbnd)
       real*8 fock(maxpi,maxpi)
       real*8 hc(maxpi,maxpi)
       real*8 v(maxpi,maxpi)
       real*8 gamma(maxpi,maxpi)
       real*8 ed(maxpi,maxpi)
-      logical first
       character*6 mode
-      data first  / .true. /
-      data ncalls  / 0 /
-      save first,ncalls,fock
 c
 c
-c     only needs to be done if pisystem is present
+c     initialize some constants and parameters
 c
-      if (norbit .eq. 0)  return
-c
-c     increment the number of calls to this routine
-c
-      ncalls = ncalls + 1
-      if (reorbit.eq.0 .or. ncalls.lt.reorbit)  return
-      ncalls = 0
-c
-c     initialize some constants and parameters:
-c
-c     mode      planar or nonplanar pi-calculation
-c     maxiter   maximum number of scf iterations
-c     converge  criterion for scf convergence
-c     ebeta     value of resonance integral for ethylene
-c     cionize   ionizaton potential of carbon (hartree)
+c     mode       planar or nonplanar pi-calculation
+c     maxiter    maximum number of SCF iterations
+c     converge   criterion for SCF convergence
+c     ebeta      value of resonance integral for ethylene
+c     cionize    ionization potential of carbon (Hartree)
 c
       mode = 'PLANAR'
       maxiter = 50
@@ -91,14 +194,14 @@ c
       cionize = -11.16d0 / evolt
 c
 c     set the bond energies, alpha values and ideal bond length
-c     parameter for carbon-carbon pibond type parameters:
+c     parameter for carbon-carbon pibond type parameters
 c
-c     ebe = equilibrium bond energy in ethylene
-c     ebb = equilibrium bond energy in benzene
-c     aeth = the P-P-P constant "a" in ethylene
-c     abnz = the P-P-P constant "a" in benzene
-c     ble = equilibrium bond length in ethylene
-c     blb = equilibrium bond length in benzene
+c     ebe    equilibrium bond energy in ethylene
+c     ebb    equilibrium bond energy in benzene
+c     aeth   the P-P-P constant "a" in ethylene
+c     abnz   the P-P-P constant "a" in benzene
+c     ble    equilibrium bond length in ethylene
+c     blb    equilibrium bond length in benzene
 c
       ebe = 129.37d0
       ebb = 117.58d0
@@ -111,10 +214,14 @@ c     assign empirical one-center Coulomb integrals, and
 c     first or second ionization potential depending on
 c     whether the orbital contributes one or two electrons
 c
+      nfill = 0
       do i = 1, norbit
-         gamma(i,i) = em(i)
-         ip(i) = w(i) + (1.0d0-q(i))*em(i)
+         iorb = iorbit(i)
+         gamma(i,i) = em(iorb)
+         ip(i) = w(iorb) + (1.0d0-q(iorb))*em(iorb)
+         nfill = nfill + nint(q(iorb))
       end do
+      nfill = nfill / 2
 c
 c     calculate two-center repulsion integrals
 c     according to Ohno's semi-empirical formula
@@ -152,7 +259,8 @@ c
          hcii = ip(i)
          do j = 1, norbit
             if (i .ne. j) then
-               hcii = hcii - q(j)*gamma(i,j)
+               jorb = iorbit(j)
+               hcii = hcii - q(jorb)*gamma(i,j)
             end if
          end do
          hc(i,i) = hcii
@@ -198,13 +306,13 @@ c
             call overlap (6,6,rij,covlap)
             hcij = hcij * (ovlap/covlap)
             iionize = ip(i)
-            if (q(i) .ne. 1.0d0) then
+            if (q(iorb) .ne. 1.0d0) then
                if (iatn .eq. 7)  iionize = 0.595d0 * iionize
                if (iatn .eq. 8)  iionize = 0.525d0 * iionize
                if (iatn .eq. 16)  iionize = 0.89d0 * iionize
             end if
             jionize = ip(j)
-            if (q(j) .ne. 1.0d0) then
+            if (q(jorb) .ne. 1.0d0) then
                if (jatn .eq. 7)  jionize = 0.595d0 * jionize
                if (jatn .eq. 8)  jionize = 0.525d0 * jionize
                if (jatn .eq. 16)  jionize = 0.89d0 * jionize
@@ -218,23 +326,19 @@ c
          hc(j,i) = hcij
       end do
 c
-c     make an initial guess at the Fock matrix if needed
+c     construct an initial guess to the Fock matrix
 c
-      if (first) then
-         first = .false.
-         do i = 1, norbit
-            do j = 1, norbit
-               fock(j,i) = hc(j,i)
-            end do
+      do i = 1, norbit
+         do j = 1, norbit
+            fock(j,i) = hc(j,i)
          end do
-         do i = 1, norbit
-            fock(i,i) = 0.5d0 * ip(i)
-         end do
-      end if
+      end do
+      do i = 1, norbit
+         fock(i,i) = 0.5d0 * ip(i)
+      end do
 c
-c     now, do the scf-mo computation; note that it needs to
-c     be done twice, initially for the planar analog of the
-c     actual system; then for the nonplanar (actual) system
+c     make the SCF-MO computation; do it twice, for a planar analog
+c     of the actual system and for the actual (nonplanar) system
 c
       do while (mode.eq.'PLANAR' .or. mode.eq.'NONPLN')
          if (mode .eq. 'NONPLN') then
@@ -247,11 +351,10 @@ c
             end do
          end if
 c
-c     perform scf iterations until convergence is reached;
-c     diagonalize the Fock matrix "f" to get the mo's,
-c     then use mo's to form the next "f" matrix assuming
-c     zero differential overlap except for one-center
-c     exchange repulsions
+c     perform SCF iterations until convergence is reached; diagonalize
+c     the Fock matrix "f" to get the MOs, then use MOs to form the
+c     next "f" matrix assuming zero differential overlap except for
+c     one-center exchange repulsions
 c
          iter = 0
          delta = 2.0d0 * converge
@@ -271,7 +374,7 @@ c
                         end do
                      end if
                   end do
-                  fock(i,j) =  s1 + s2 + hc(i,j)
+                  fock(i,j) = s1 + s2 + hc(i,j)
                   fock(j,i) = fock(i,j)
                end do
             end do
@@ -279,7 +382,7 @@ c
 c     calculate the ground state energy, where "xi" sums the
 c     molecular core integrals, "xj" sums the molecular coulomb
 c     repulsion integrals, "xk" sums the molecular exchange
-c     repulsion integrals, and "xg" is sums the nuclear repulsion
+c     repulsion integrals, and "xg" sums the nuclear repulsion
 c
             xi = 0.0d0
             xj = 0.0d0
@@ -302,9 +405,11 @@ c
                end do
             end do
             do i = 1, norbit-1
-               qi = q(i)
+               iorb = iorbit(i)
+               qi = q(iorb)
                do j = i+1, norbit
-                  xg = xg + qi*q(j)*gamma(i,j)
+                  jorb = iorbit(j)
+                  xg = xg + qi*q(jorb)*gamma(i,j)
                end do
             end do
             total = xi + xj + xk + xg
@@ -312,15 +417,15 @@ c
             totold = total
          end do
 c
-c     print warning if scf-mo iteration did not converge
+c     print warning if SCF-MO iteration did not converge
 c
          if (delta .gt. converge) then
             write (iout,10)
-   10       format (' PISCF  --  The SCF-MO Iteration has',
-     &                 ' not reached Self-Consistency')
+   10       format (' PISCF  --  The SCF Molecular Orbitals have',
+     &                 ' Failed to Converge')
          end if
 c
-c     calculate electron densities from filled mo's
+c     calculate electron densities from filled MO's
 c
          do i = 1, norbit
             do j = 1, norbit
@@ -331,19 +436,20 @@ c
             end do
          end do
 c
-c     print out results for the scf computation
+c     print out results for the SCF computation
 c
          if (debug) then
             if (mode .eq. 'PLANAR') then
                write (iout,20)
-   20          format (/,' Pi-SCF-MO Calculation for Planar System :')
+   20          format (/,' SCF-MO Calculation for Planar System :')
             else
                write (iout,30)
-   30          format (/,' Pi-SCF-MO Calculation for Non-Planar',
+   30          format (/,' SCF-MO Calculation for Non-Planar',
      &                    ' System :')
             end if
-            write (iout,40)  total,delta,iter
+            write (iout,40)  total,norbit,delta,iter
    40       format (/,' Total Energy',11x,f12.4,
+     &              /,' Number of Orbitals',5x,i12,
      &              /,' Convergence',12x,d12.4,
      &              /,' Iterations',13x,i12)
             write (iout,50)  xi,xj,xk,xg
@@ -368,34 +474,30 @@ c
   110          format (8f9.4)
             end do
             write (iout,120)
-  120       format (/,' Electron Densities')
-            write (iout,130)  (ed(i,i),i=1,norbit)
-  130       format (8f9.4)
-            write (iout,140)
-  140       format (/,' Density Matrix')
+  120       format (/,' Density Matrix')
             do i = 1, norbit
-               write (iout,150)  (ed(i,j),j=1,norbit)
+               write (iout,130)  (ed(i,j),j=1,norbit)
+  130          format (8f9.4)
+            end do
+            write (iout,140)
+  140       format (/,' H-Core Matrix')
+            do i = 1, norbit
+               write (iout,150)  (hc(i,j),j=1,norbit)
   150          format (8f9.4)
             end do
             write (iout,160)
-  160       format (/,' H-Core Matrix')
+  160       format (/,' Gamma Matrix')
             do i = 1, norbit
-               write (iout,170)  (hc(i,j),j=1,norbit)
+               write (iout,170)  (gamma(i,j),j=1,norbit)
   170          format (8f9.4)
-            end do
-            write (iout,180)
-  180       format (/,' Gamma Matrix')
-            do i = 1, norbit
-               write (iout,190)  (gamma(i,j),j=1,norbit)
-  190          format (8f9.4)
             end do
          end if
 c
 c     now, get the bond orders (compute p and p*b)
 c
          if (debug) then
-            write (iout,200)
-  200       format (/,' Pi Bond Orders')
+            write (iout,180)
+  180       format (/,' Pisystem Bond Orders')
          end if
          do k = 1, nbpi
             i = ibpi(2,k)
@@ -412,8 +514,8 @@ c
             if (debug) then
                i = ibnd(1,ibpi(1,k))
                j = ibnd(2,ibpi(1,k))
-               write (iout,210)  i,j,p
-  210          format (4x,2i5,3x,f10.4)
+               write (iout,190)  i,j,p
+  190          format (3x,2i6,2x,f10.4)
             end if
          end do
 c
@@ -426,10 +528,6 @@ c
             mode = '      '
          end if
       end do
-c
-c     alter torsional and bond constants for pisystem
-c
-      call pialter
       return
       end
 c
@@ -461,7 +559,7 @@ c
       real*8 a1,b1,c1,a2,b2,c2
       real*8 x2,y2,z2,x3,y3,z3
       real*8 xr(8),yr(8),zr(8)
-      real*8 povlap(maxpib)
+      real*8 povlap(maxbnd)
 c
 c
 c     planes defining each p-orbital are in "piperp"; transform
@@ -476,8 +574,8 @@ c
          list(1) = iorb
          list(2) = jorb
          do m = 1, 3
-            list(m+2) = piperp(m,i)
-            list(m+5) = piperp(m,j)
+            list(m+2) = piperp(m,iorb)
+            list(m+5) = piperp(m,jorb)
          end do
          call pimove (list,xr,yr,zr)
 c
@@ -549,11 +647,11 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine pimove  --  translate & rotate bond vector  ##
-c     ##                                                         ##
-c     #############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine pimove  --  transform pisystem bond vectors  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "pimove" rotates the vector between atoms "list(1)" and
@@ -609,11 +707,10 @@ c
          end do
       end if
 c
-c     normalize the coordinates of atoms defining the plane
-c     for atom 1 (ie, make all these atoms have unit length to
-c     atom 1) so that the orbital makes equal angles with the
-c     atoms rather than simply being perpendicular to the common
-c     plane of the atoms
+c     normalize the coordinates of atoms defining the plane for atom 1
+c     (ie, make all these atoms have unit length to atom 1) so that the
+c     orbital makes equal angles with the atoms rather than simply being
+c     perpendicular to the common plane of the atoms
 c
       do i = 3, 5
          if (list(i) .ne. list(1)) then
@@ -640,17 +737,16 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine pialter  --  modify constants for pisystem  ##
-c     ##                                                         ##
-c     #############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine pialter  --  modify parameters for pisystem  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "pialter" first modifies bond lengths and force constants
-c     according to the standard bond slope parameters and the
-c     bond order values stored in "pnpl"; also alters some 2-fold
-c     torsional parameters based on the bond-order * beta matrix
+c     "pialter" modifies bond lengths and force constants according
+c     to the "planar" P-P-P bond order values; also alters 2-fold
+c     torsional parameters based on the "nonplanar" bond orders
 c
 c
       subroutine pialter
@@ -678,14 +774,14 @@ c
      &              16x,'Final',/)
       end if
       do i = 1, nbpi
-         k = ibpi(1,i)
-         ia = ibnd(1,k)
-         ib = ibnd(2,k)
-         bk(k) = bkpi(i) - kslope(i) * (1.0d0-pnpl(i))
-         bl(k) = blpi(i) + lslope(i) * (1.0d0-pnpl(i))
+         j = ibpi(1,i)
+         ia = ibnd(1,j)
+         ib = ibnd(2,j)
+         bk(j) = bkpi(j) - kslope(j) * (1.0d0-pnpl(i))
+         bl(j) = blpi(j) + lslope(j) * (1.0d0-pnpl(i))
          if (debug) then
-            write (iout,20)  ia,name(ia),ib,name(ib),bkpi(i),
-     &                       blpi(i),bk(k),bl(k)
+            write (iout,20)  ia,name(ia),ib,name(ib),bkpi(j),
+     &                       blpi(j),bk(j),bl(j)
    20       format (' Bond',7x,i5,'-',a3,1x,i5,'-',a3,
      &                 5x,f9.3,f8.4,2x,'-->',f9.3,f8.4)
          end if
@@ -707,10 +803,10 @@ c
          ib = itors(2,j)
          ic = itors(3,j)
          id = itors(4,j)
-         tors2(1,j) = pbpl(k) * torsp2(i)
+         tors2(1,j) = pbpl(k) * torsp2(j)
          if (debug) then
             write (iout,40)  ia,name(ia),ib,name(ib),ic,name(ic),
-     &                       id,name(id),torsp2(i),tors2(1,j)
+     &                       id,name(id),torsp2(j),tors2(1,j)
    40       format (' Torsion',4x,i5,'-',a3,3(1x,i5,'-',a3),
      &                 3x,f8.3,2x,'-->',f8.3)
          end if

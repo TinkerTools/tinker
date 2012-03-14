@@ -274,7 +274,7 @@ pgf95 -c -fast -mp orthog.f
 pgf95 -c -fast -mp overlap.f
 pgf95 -c -fast -mp path.f
 pgf95 -c -fast -mp pdbxyz.f
-pgf95 -c -fast -mp piscf.f
+pgf95 -c -fast -mp picalc.f
 pgf95 -c -fast -mp pmestuff.f
 pgf95 -c -fast -mp pmpb.f
 pgf95 -c -fast -mp polarize.f

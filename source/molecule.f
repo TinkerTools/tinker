@@ -23,9 +23,8 @@ c
       include 'atoms.i'
       include 'couple.i'
       include 'molcul.i'
-      integer i,j,k
+      integer i,j,k,ii
       integer mi,mj,mk
-      integer iattach
       integer, allocatable :: list(:)
 c
 c
@@ -44,8 +43,8 @@ c
             molcule(i) = nmol
          end if
          mi = molcule(i)
-         do iattach = 1, n12(i)
-            j = i12(iattach,i)
+         do ii = 1, n12(i)
+            j = i12(ii,i)
             mj = molcule(j)
             if (mj .eq. 0) then
                molcule(j) = mi

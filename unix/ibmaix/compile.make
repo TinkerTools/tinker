@@ -274,7 +274,7 @@ xlf -c -O orthog.f
 xlf -c -O overlap.f
 xlf -c -O path.f
 xlf -c -O -qmaxmem=-1 pdbxyz.f
-xlf -c -O piscf.f
+xlf -c -O picalc.f
 xlf -c -O pmestuff.f
 xlf -c -O pmpb.f
 xlf -c -O polarize.f

@@ -28,18 +28,25 @@ c
       include 'piorbs.i'
       include 'potent.i'
       include 'tors.i'
-      integer i,j,k,m,ib,ic
-      integer iorb,jorb,next
-      integer piatoms(maxpi)
+      integer i,j,k,m,ii
+      integer ib,ic,mi,mj,mk
+      integer iorb,jorb,korb
+      integer nlist,next
+      integer, allocatable :: list(:)
       character*20 keyword
       character*120 record
       character*120 string
 c
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
 c     set the default values for the pisystem variables
 c
-      do i = 1, maxpi
-         piatoms(i) = 0
+      nlist = 0
+      do i = 1, n
+         list(i) = 0
       end do
       reorbit = 1
 c
@@ -52,14 +59,18 @@ c
          call upcase (keyword)
          if (keyword(1:9) .eq. 'PISYSTEM ') then
             string = record(next:120)
-            read (string,*,err=10,end=10)  (piatoms(k),k=1,maxpi)
+            read (string,*,err=10,end=10)  (list(k),k=nlist+1,n)
+   10       continue
+            do while (list(nlist+1) .ne. 0)
+               nlist = nlist + 1
+               list(nlist) = max(-n,min(n,list(nlist)))
+            end do
          end if
-   10    continue
       end do
 c
 c     quit if no pisystem was found for consideration
 c
-      if (piatoms(1) .eq. 0) then
+      if (list(1) .eq. 0) then
          use_orbit = .false.
          return
       else
@@ -72,12 +83,12 @@ c
          listpi(i) = .false.
       end do
       i = 1
-      do while (piatoms(i) .ne. 0)
-         if (piatoms(i) .gt. 0) then
-            listpi(piatoms(i)) = .true.
+      do while (list(i) .ne. 0)
+         if (list(i) .gt. 0) then
+            listpi(list(i)) = .true.
             i = i + 1
          else
-            do j = -piatoms(i), piatoms(i+1)
+            do j = -list(i), list(i+1)
                listpi(j) = .true.
             end do
             i = i + 2
@@ -91,64 +102,135 @@ c
          end if
       end do
 c
-c     quit if the molecule contains too many piorbitals
+c     zero number of pisystems and pisystem membership list
 c
-      if (norbit .gt. maxpi) then
-         write (iout,20)
-   20    format (' ORBITAL  --  Too many Pi-Orbitals;',
-     &           ' Increase MAXPI')
-         call fatal
-      end if
+      nconj = 0
+      do i = 1, n
+         conjug(i) = 0
+      end do
 c
-c     find three atoms which define a plane
-c     perpendicular to each orbital
+c     assign each piatom to its respective pisystem
+c
+      do i = 1, norbit
+         iorb = iorbit(i)
+         if (conjug(iorb) .eq. 0) then
+            nconj = nconj + 1
+            conjug(iorb) = nconj
+         end if
+         mi = conjug(iorb)
+         do ii = 1, n12(iorb)
+            j = i12(ii,iorb)
+            if (listpi(j)) then
+               mj = conjug(j)
+               if (mj .eq. 0) then
+                  conjug(j) = mi
+               else if (mi .lt. mj) then
+                  nconj = nconj - 1
+                  do k = 1, norbit
+                     korb = iorbit(k)
+                     mk = conjug(korb)
+                     if (mk .eq. mj) then
+                        conjug(korb) = mi
+                     else if (mk .gt. mj) then
+                        conjug(korb) = mk - 1
+                     end if
+                  end do
+               else if (mi .gt. mj) then
+                  nconj = nconj - 1
+                  do k = 1, norbit
+                     korb = iorbit(k)
+                     mk = conjug(korb)
+                     if (mk .eq. mi) then
+                        conjug(korb) = mj
+                     else if (mk .gt. mi) then
+                        conjug(korb) = mk - 1
+                     end if
+                  end do
+                  mi = mj
+               end if
+            end if
+         end do
+      end do
+c
+c     pack atoms of each pisystem into a contiguous indexed list
+c
+      do i = 1, n
+         list(i) = conjug(i)
+      end do
+      call sort3 (n,list,kconj)
+      k = n - norbit 
+      do i = 1, norbit
+         k = k + 1
+         list(i) = list(k)
+         kconj(i) = kconj(k)
+      end do
+c
+c     find the first and last piatom in each pisystem
+c
+      k = 1
+      iconj(1,1) = 1
+      do i = 2, norbit
+         j = list(i)
+         if (j .ne. k) then
+            iconj(2,k) = i - 1
+            k = j
+            iconj(1,k) = i
+         end if
+      end do
+      iconj(2,nconj) = norbit
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+c
+c     sort atoms in each pisystem, and quit if too many atoms
+c
+      do i = 1, nconj
+         k = iconj(2,i) - iconj(1,i) + 1
+         if (k .gt. maxpi) then
+            write (iout,20)
+   20       format (/,' ORBITAL  --  Too many Atoms in Pi-System;',
+     &                 ' Increase MAXPI')
+            call fatal
+         end if
+         call sort (k,kconj(iconj(1,i)))
+      end do
+c
+c     copy the packed and sorted pisystem list to orbital sites
+c
+      do i = 1, norbit
+         iorbit(i) = kconj(i)
+      end do
+c
+c     find atoms defining a plane perpendicular to each orbital
 c
       call piplane
 c
 c     find and store the pisystem bonds
 c
       nbpi = 0
-      do i = 1, norbit-1
-         iorb = iorbit(i)
-         do j = i, norbit
-            jorb = iorbit(j)
-            do k = 1, n12(iorb)
-               if (i12(k,iorb) .eq. jorb) then
-                  nbpi = nbpi + 1
-                  do m = 1, nbond
-                     if (iorb.eq.ibnd(1,m) .and.
-     &                   jorb.eq.ibnd(2,m)) then
-                        ibpi(1,nbpi) = m
-                        ibpi(2,nbpi) = i
-                        ibpi(3,nbpi) = j
-                        goto 30
-                     end if
-                  end do
-   30             continue
-               end if
+      do ii = 1, nconj
+         do i = iconj(1,ii), iconj(2,ii)-1
+            iorb = kconj(i)
+            do j = i+1, iconj(2,ii)
+               jorb = kconj(j)
+               do k = 1, n12(iorb)
+                  if (i12(k,iorb) .eq. jorb) then
+                     nbpi = nbpi + 1
+                     do m = 1, nbond
+                        if (iorb.eq.ibnd(1,m) .and.
+     &                      jorb.eq.ibnd(2,m)) then
+                           ibpi(1,nbpi) = m
+                           ibpi(2,nbpi) = i
+                           ibpi(3,nbpi) = j
+                           goto 30
+                        end if
+                     end do
+   30                continue
+                  end if
+               end do
             end do
          end do
-      end do
-c
-c     find and store the pisystem torsions
-c
-      ntpi = 0
-      do i = 1, ntors
-         ib = itors(2,i)
-         ic = itors(3,i)
-         if (listpi(ib) .and. listpi(ic)) then
-            do j = 1, nbpi
-               k = ibpi(1,j)
-               if (ib.eq.ibnd(1,k).and.ic.eq.ibnd(2,k) .or.
-     &             ib.eq.ibnd(2,k).and.ic.eq.ibnd(1,k)) then
-                  ntpi = ntpi + 1
-                  itpi(1,ntpi) = i
-                  itpi(2,ntpi) = j
-                  goto 40
-               end if
-            end do
-   40       continue
-         end if
       end do
       return
       end
@@ -186,35 +268,35 @@ c     for each pisystem atom, find a set of atoms which define
 c     the p-orbital's plane based on piatom's atomic number and
 c     the number and type of attached atoms
 c
-      do i = 1, norbit
-         iorb = iorbit(i)
-         attach = n12(iorb)
-         atmnum = atomic(iorb)
+      do iorb = 1, norbit
+         i = iorbit(iorb)
+         attach = n12(i)
+         atmnum = atomic(i)
          done = .false.
 c
 c     most common case of an atom bonded to three atoms
 c
          if (attach .eq. 3) then
-            piperp(1,i) = i12(1,iorb)
-            piperp(2,i) = i12(2,iorb)
-            piperp(3,i) = i12(3,iorb)
+            piperp(1,i) = i12(1,i)
+            piperp(2,i) = i12(2,i)
+            piperp(3,i) = i12(3,i)
             done = .true.
 c
 c     any non-alkyne atom bonded to exactly two atoms
 c
          else if (attach.eq.2 .and. atmnum.ne.6) then
-            piperp(1,i) = iorb
-            piperp(2,i) = i12(1,iorb)
-            piperp(3,i) = i12(2,iorb)
+            piperp(1,i) = i
+            piperp(2,i) = i12(1,i)
+            piperp(3,i) = i12(2,i)
             done = .true.
 c
 c     atom bonded to four different atoms (usually two lone
 c     pairs and two "real" atoms); use the "real" atoms
 c
          else if (attach .eq. 4) then
-            piperp(1,i) = iorb
-            do j = 1, n12(iorb)
-               trial = i12(j,iorb)
+            piperp(1,i) = i
+            do j = 1, n12(i)
+               trial = i12(j,i)
                if (atomic(trial) .ne. 0) then
                   if (piperp(2,i) .eq. 0) then
                      piperp(2,i) = trial
@@ -229,10 +311,10 @@ c     "carbonyl"-type oxygen atom, third atom is any atom
 c     attached to the "carbonyl carbon"; fails for ketenes
 c
          else if (attach.eq.1 .and. atmnum.eq.8) then
-            alpha = i12(1,iorb)
+            alpha = i12(1,i)
             beta = i12(1,alpha)
-            if (beta .eq. iorb)  beta = i12(2,alpha)
-            piperp(1,i) = iorb
+            if (beta .eq. i)  beta = i12(2,alpha)
+            piperp(1,i) = i
             piperp(2,i) = alpha
             piperp(3,i) = beta
             done = .true.
@@ -240,10 +322,10 @@ c
 c     an sp nitrogen atom, third atom must be a gamma atom
 c
          else if (attach.eq.1 .and. atmnum.eq.7) then
-            alpha = i12(1,iorb)
+            alpha = i12(1,i)
             do j = 1, n12(alpha)
                trial = i12(j,alpha)
-               if (trial.ne.iorb .and. listpi(trial) .and.
+               if (trial.ne.i .and. listpi(trial) .and.
      &             n12(trial).eq.3) then
                   beta = trial
                   done = .true.
@@ -251,7 +333,7 @@ c
             end do
             gamma = i12(1,beta)
             if (gamma .eq. alpha)  gamma = i12(2,beta)
-            piperp(1,i) = iorb
+            piperp(1,i) = i
             piperp(2,i) = alpha
             piperp(3,i) = gamma
 c
@@ -259,13 +341,13 @@ c     an sp carbon atom; third atom must be an atom attached
 c     to the non-sp piatom bonded to the original carbon
 c
          else if (attach.eq.2 .and. atmnum.eq.6) then
-            alpha = i12(1,iorb)
+            alpha = i12(1,i)
             if ((n12(alpha).eq.2 .and. atomic(alpha).eq.6) .or.
      &          (n12(alpha).eq.1 .and. atomic(alpha).eq.7))
-     &         alpha = i12(2,iorb)
-            do j = 1, n12(iorb)
-               trial = i12(j,iorb)
-               if (trial.ne.iorb .and. trial.ne.alpha .and.
+     &         alpha = i12(2,i)
+            do j = 1, n12(i)
+               trial = i12(j,i)
+               if (trial.ne.i .and. trial.ne.alpha .and.
      &             listpi(trial) .and. n12(trial).eq.3) then
                   beta = trial
                   done = .true.
@@ -273,15 +355,15 @@ c
             end do
             do j = 1, n12(alpha)
                trial = i12(j,alpha)
-               if (trial.ne.iorb .and. trial.ne.alpha .and.
+               if (trial.ne.i .and. trial.ne.alpha .and.
      &             listpi(trial) .and. n12(trial).eq.3) then
                   beta = trial
                   done = .true.
                end if
             end do
             gamma = i12(1,beta)
-            if (gamma.eq.iorb .or. gamma.eq.alpha)  gamma = i12(2,beta)
-            piperp(1,i) = iorb
+            if (gamma.eq.i .or. gamma.eq.alpha)  gamma = i12(2,beta)
+            piperp(1,i) = i
             piperp(2,i) = alpha
             piperp(3,i) = gamma
          end if
@@ -289,7 +371,7 @@ c
 c     quit if the p-orbital plane remains undefined
 c
          if (.not. done) then
-            write (iout,10)  iorb
+            write (iout,10)  i
    10       format(/,' PIPLANE  --  Failure to Define a',
      &                ' p-Orbital Plane for Atom',i6)
             call fatal

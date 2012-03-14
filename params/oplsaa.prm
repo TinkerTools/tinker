@@ -256,8 +256,8 @@ atom        203   30    Cl    "Chlorobenzene C-Cl"          17    35.453    1
 atom        204   35    N     "N-Phenylacetamide N"          7    14.007    3
 atom        205   38    CA    "N-Phenylacetamide N-CA"       6    12.011    3
 atom        206    3    C     "Carboxylic Acid -COOH"        6    12.011    3
-atom        207    5    OH    "Carboxylic Acid C=O"          8    15.999    1
-atom        208    4    O     "Carboxylic Acid -OH"          8    15.999    2
+atom        207    4    O     "Carboxylic Acid C=O"          8    15.999    1
+atom        208    5    OH    "Carboxylic Acid -OH"          8    15.999    2
 atom        209    7    HO    "Carboxylic Acid -COOH"        1     1.008    1
 atom        210    3    C     "Carboxylate COO-"             6    12.011    3
 atom        211   42    O2    "Carboxylate COO-"             8    15.999    1
@@ -266,7 +266,7 @@ atom        213   13    CT    "Carboxylate RCH2-COO-"        6    12.011    4
 atom        214   13    CT    "Carboxylate R2CH-COO-"        6    12.011    4
 atom        215   13    CT    "Carboxylate R3C-COO-"         6    12.011    4
 atom        216    3    C     "Aldehyde/Acyl Halide C=O"     6    12.011    3
-atom        217    4    O     "Aldyhyde/Acyl Halide C=O"     8    15.999    1
+atom        217    4    O     "Aldehyde/Acyl Halide C=O"     8    15.999    1
 atom        218   36    HC    "Aldehyde/Formamide HCO-"      1     1.008    1
 atom        219    3    C     "Ketone C=O"                   6    12.011    3
 atom        220    4    O     "Ketone C=O"                   8    15.999    1
@@ -456,7 +456,7 @@ atom        403    3    C     "Ester -COOR"                  6    12.011    3
 atom        404    4    O     "Ester C=O"                    8    15.999    1
 atom        405   29    OS    "Ester CO-O-R"                 8    15.999    2
 atom        406   13    CT    "Methyl Ester -OCH3"           6    12.011    4
-atom        407   36    HC    "Methyl Ester -OCH3"           1     1.008    1
+atom        407   36    HC    "Ester -OCH<"                  1     1.008    1
 atom        408    3    C     "Benzoic Acid -COOH"           6    12.011    3
 atom        409    3    C     "Aryl Ester -COOR"             6    12.011    3
 atom        410   38    CA    "Phenyl Ester Cipso"           6    12.011    3
@@ -4232,7 +4232,7 @@ torsion      99   99   99   99      1.423 0.0 1   4.055 180.0 2   0.858 0.0 3
     ##  The torsions listed below were added to official OPLS-AA  ##
     ##  to complete the set needed for proteins; the values were  ##
     ##  obtained by analogy from the closest OPLS-AA torsions;    ##
-    ##  most of the added values are for HIP or N-terminal AAs    ##
+    ##  most of the added values are for HIP or N-terminal AAs;   ##
     ##                                                            ##
     ################################################################
 
@@ -4265,6 +4265,20 @@ torsion      45   38   45   44      0.000 0.0 1   3.900 180.0 2   0.000 0.0 3
 torsion       0   38   71    0      0.000 0.0 1   7.250 180.0 2   0.000 0.0 3
 torsion       0   47   75    0      0.000 0.0 1   5.000 180.0 2   0.000 0.0 3
 torsion       0   75   75    0      0.000 0.0 1  10.750 180.0 2   0.000 0.0 3
+
+
+    ################################################################
+    ##                                                            ##
+    ##  Additional Torsional Parameter Values Used with OPLS-AA   ##
+    ##                                                            ##
+    ##  The torsions listed below were added to official OPLS-AA  ##
+    ##  to complete the values needed for selected organics       ##
+    ##                                                            ##
+    ################################################################
+
+
+torsion      13   13   13   29      1.300 0.0 1  -0.050 180.0 2   0.200 0.0 3
+torsion      13   13   13   37      1.300 0.0 1  -0.050 180.0 2   0.200 0.0 3
 
 
       ########################################

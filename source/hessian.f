@@ -73,7 +73,7 @@ c
 c
 c     alter bond and torsion constants for pisystem
 c
-      if (use_orbit)  call piscf
+      if (use_orbit)  call picalc
 c
 c     compute the induced dipoles at polarizable atoms
 c

@@ -274,7 +274,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 orthog.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 overlap.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 path.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 pdbxyz.f
-ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 piscf.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 picalc.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 pmestuff.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 pmpb.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 polarize.f

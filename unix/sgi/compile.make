@@ -274,7 +274,7 @@ f77 -c -O -mips4 orthog.f
 f77 -c -O -mips4 overlap.f
 f77 -c -O -mips4 path.f
 f77 -c -O -mips4 pdbxyz.f
-f77 -c -O -mips4 piscf.f
+f77 -c -O -mips4 picalc.f
 f77 -c -O -mips4 pmestuff.f
 f77 -c -O -mips4 pmpb.f
 f77 -c -O -mips4 polarize.f

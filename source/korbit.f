@@ -31,7 +31,7 @@ c
       include 'pistuf.i'
       include 'tors.i'
       include 'units.i'
-      integer i,j,k,it
+      integer i,j,k,it,jt
       integer ia,ib,ita,itb
       integer npi,npi5,npi4
       integer size,next,iring
@@ -192,18 +192,15 @@ c
       use_ring = .false.
       if (min(npi5,npi4) .ne. 0)  use_ring = .true.
 c
-c     assign the values characteristic of the piatom types;
-c     count the number of filled pi molecular orbitals
+c     assign the values characteristic of the piatom types
 c
-      nfill = 0
       do i = 1, norbit
-         it = type(iorbit(i))
-         q(i) = electron(it)
-         w(i) = ionize(it) / evolt
-         em(i) = repulse(it) / evolt
-         nfill = nfill + nint(q(i))
+         j = iorbit(i)
+         jt = type(j)
+         q(j) = electron(jt)
+         w(j) = ionize(jt) / evolt
+         em(j) = repulse(jt) / evolt
       end do
-      nfill = nfill / 2
 c
 c     assign parameters for all bonds between piatoms;
 c     store the original bond lengths and force constants
@@ -239,10 +236,10 @@ c
          if (iring .eq. 0) then
             do k = 1, npi
                if (kpi(k) .eq. pt) then
-                  bkpi(i) = bk(j)
-                  blpi(i) = bl(j)
-                  kslope(i) = sslope(k)
-                  lslope(i) = tslope(k)
+                  bkpi(j) = bk(j)
+                  blpi(j) = bl(j)
+                  kslope(j) = sslope(k)
+                  lslope(j) = tslope(k)
                   goto 170
                end if
             end do
@@ -252,10 +249,10 @@ c
          else if (iring .eq. 5) then
             do k = 1, npi5
                if (kpi5(k) .eq. pt) then
-                  bkpi(i) = bk(j)
-                  blpi(i) = bl(j)
-                  kslope(i) = sslope5(k)
-                  lslope(i) = tslope5(k)
+                  bkpi(j) = bk(j)
+                  blpi(j) = bl(j)
+                  kslope(j) = sslope5(k)
+                  lslope(j) = tslope5(k)
                   goto 170
                end if
             end do
@@ -265,10 +262,10 @@ c
          else if (iring .eq. 4) then
             do k = 1, npi4
                if (kpi4(k) .eq. pt) then
-                  bkpi(i) = bk(j)
-                  blpi(i) = bl(j)
-                  kslope(i) = sslope4(k)
-                  lslope(i) = tslope4(k)
+                  bkpi(j) = bk(j)
+                  blpi(j) = bl(j)
+                  kslope(j) = sslope4(k)
+                  lslope(j) = tslope4(k)
                   goto 170
                end if
             end do
@@ -292,11 +289,10 @@ c
   170    continue
       end do
 c
-c     store the original torsional constants across pibonds
+c     store original 2-fold torsional constants across pibonds
 c
-      do i = 1, ntpi
-         j = itpi(1,i)
-         torsp2(i) = tors2(1,j)
+      do i = 1, ntors
+         torsp2(i) = tors2(1,i)
       end do
       return
       end

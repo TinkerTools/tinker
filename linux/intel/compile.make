@@ -274,7 +274,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp orthog.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp overlap.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp path.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp pdbxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp piscf.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp picalc.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp pmestuff.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp pmpb.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp polarize.f

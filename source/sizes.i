@@ -50,8 +50,6 @@ c     maxang          bond angles in molecular system
 c     maxtors         torsional angles in molecular system
 c     maxbitor        bitorsions in molecular system
 c     maxpi           atoms in conjugated pisystem
-c     maxpib          covalent bonds involving pisystem
-c     maxpit          torsional angles involving pisystem
 c
 c
       integer maxatm,maxval,maxgrp
@@ -64,7 +62,6 @@ c
       integer maxbio,maxres,maxamino
       integer maxnuc,maxbnd,maxang
       integer maxtors,maxbitor,maxpi
-      integer maxpib,maxpit
       parameter (maxatm=25000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -94,6 +91,4 @@ c
       parameter (maxang=4*maxatm)
       parameter (maxtors=6*maxatm)
       parameter (maxbitor=8*maxatm)
-      parameter (maxpi=100)
-      parameter (maxpib=2*maxpi)
-      parameter (maxpit=4*maxpi)
+      parameter (maxpi=500)
