@@ -5,25 +5,25 @@ set style data lines
 set nokey
 set title "TINKER Downloads per Month"
 set xlabel "Months (from 4/96)"
-set xrange [0:180]
+set xrange [0:200]
 set yrange [0:3000]
 plot "stats" using 1:4
 pause 10
 set title "Cumulative Downloads (x1000)"
 set xlabel "Months (from 4/96)"
-set xrange [0:180]
-set yrange [0:80]
+set xrange [0:200]
+set yrange [0:100]
 plot "stats" using 1:5
 pause 10
 set title "TINKER Web Site Hits per Month"
 set xlabel "Months (from 4/96)"
-set xrange [0:180]
+set xrange [0:200]
 set yrange [0:7000]
 plot "stats" using 1:6
 pause 10
 set title "Cumulative Web Site Hits (x1000)"
 set xlabel "Months (from 4/96)"
-set xrange [0:180]
+set xrange [0:200]
 set yrange [0:500]
 plot "stats" using 1:7
 pause 10

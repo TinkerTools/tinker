@@ -37,6 +37,7 @@ c     maxvlst         atom neighbors in van der Waals pair list
 c     maxelst         atom neighbors in electrostatics pair list
 c     maxfft          grid points in each FFT dimension
 c     maxfix          geometric constraints and restraints
+c     maxpi           atoms in conjugated pisystem
 c     maxvib          vibrational frequencies
 c     maxgeo          distance geometry points
 c     maxcell         unit cells in replicated crystal
@@ -49,7 +50,6 @@ c     maxbnd          covalent bonds in molecular system
 c     maxang          bond angles in molecular system
 c     maxtors         torsional angles in molecular system
 c     maxbitor        bitorsions in molecular system
-c     maxpi           atoms in conjugated pisystem
 c
 c
       integer maxatm,maxval,maxgrp
@@ -57,11 +57,11 @@ c
       integer maxprm,maxkey,maxrot
       integer maxvar,maxopt,maxhess
       integer maxlight,maxvlst,maxelst
-      integer maxfft,maxfix,maxvib
-      integer maxgeo,maxcell,maxring
-      integer maxbio,maxres,maxamino
-      integer maxnuc,maxbnd,maxang
-      integer maxtors,maxbitor,maxpi
+      integer maxpi,maxfft,maxfix
+      integer maxvib,maxgeo,maxcell
+      integer maxring,maxbio,maxres
+      integer maxamino,maxnuc,maxbnd
+      integer maxang,maxtors,maxbitor
       parameter (maxatm=25000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -77,6 +77,7 @@ c
       parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
+      parameter (maxpi=100)
       parameter (maxfft=200)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)
@@ -91,4 +92,3 @@ c
       parameter (maxang=4*maxatm)
       parameter (maxtors=6*maxatm)
       parameter (maxbitor=8*maxatm)
-      parameter (maxpi=500)
