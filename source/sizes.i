@@ -15,8 +15,8 @@ c
 c     "sizes.i" sets values for critical array dimensions used
 c     throughout the software; these parameters will fix the size
 c     of the largest systems that can be handled; values too large
-c     for the computer's memory and/or swap space to accomodate
-c     will result in poor performance or outright failure
+c     for the computer memory or swap space to accomodate will
+c     result in poor performance or outright failure
 c
 c     parameter:      maximum allowed number of:
 c
@@ -37,7 +37,6 @@ c     maxvlst         atom neighbors in van der Waals pair list
 c     maxelst         atom neighbors in electrostatics pair list
 c     maxfft          grid points in each FFT dimension
 c     maxfix          geometric constraints and restraints
-c     maxpi           atoms in conjugated pisystem
 c     maxvib          vibrational frequencies
 c     maxgeo          distance geometry points
 c     maxcell         unit cells in replicated crystal
@@ -57,11 +56,11 @@ c
       integer maxprm,maxkey,maxrot
       integer maxvar,maxopt,maxhess
       integer maxlight,maxvlst,maxelst
-      integer maxpi,maxfft,maxfix
-      integer maxvib,maxgeo,maxcell
-      integer maxring,maxbio,maxres
-      integer maxamino,maxnuc,maxbnd
-      integer maxang,maxtors,maxbitor
+      integer maxfft,maxfix,maxvib
+      integer maxgeo,maxcell,maxring
+      integer maxbio,maxres,maxamino
+      integer maxnuc,maxbnd,maxang
+      integer maxtors,maxbitor
       parameter (maxatm=25000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -69,7 +68,7 @@ c
       parameter (maxtyp=5000)
       parameter (maxclass=1000)
       parameter (maxprm=25000)
-      parameter (maxkey=10000)
+      parameter (maxkey=25000)
       parameter (maxrot=1000)
       parameter (maxvar=3*maxatm)
       parameter (maxopt=1000)
@@ -77,11 +76,10 @@ c
       parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
-      parameter (maxpi=100)
       parameter (maxfft=200)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)
-      parameter (maxgeo=1000)
+      parameter (maxgeo=2500)
       parameter (maxcell=10000)
       parameter (maxring=10000)
       parameter (maxbio=10000)

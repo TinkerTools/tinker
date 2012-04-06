@@ -68,7 +68,7 @@ c
       abort = .true.
       size = 0
       do while (size .eq. 0)
-         read (ixyz,20,err=60,end=60)  record
+         read (ixyz,20,err=70,end=70)  record
    20    format (a120)
          size = trimtext (record)
       end do
@@ -80,7 +80,7 @@ c
       i = 0
       next = 1
       call gettext (record,string,next)
-      read (string,*,err=60,end=60)  n
+      read (string,*,err=70,end=70)  n
 c
 c     extract the title and determine its length
 c
@@ -95,11 +95,16 @@ c
          ltitle = trimtext (title)
       end if
 c
-c     check for too many total atoms in the file
+c     check for too few or too many total atoms in the file
 c
-      if (n .gt. maxatm) then
-         write (iout,30)  maxatm
-   30    format (/,' READXYZ  --  The Maximum of',i8,' Atoms',
+      if (n .le. 0) then
+         write (iout,30)
+   30    format (/,' READXYZ  --  The Coordinate File Does Not',
+     &              ' Contain Any Atoms')
+         call fatal
+      else if (n .gt. maxatm) then
+         write (iout,40)  maxatm
+   40    format (/,' READXYZ  --  The Maximum of',i8,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if
@@ -124,26 +129,26 @@ c
          next = 1
          size = 0
          do while (size .eq. 0)
-            read (ixyz,40,err=60,end=60)  record
-   40       format (a120)
+            read (ixyz,50,err=70,end=70)  record
+   50       format (a120)
             size = trimtext (record)
          end do
-         read (record,*,err=60,end=60)  tag(i)
+         read (record,*,err=70,end=70)  tag(i)
          call getword (record,name(i),next)
          string = record(next:120)
-         read (string,*,err=50,end=50)  x(i),y(i),z(i),type(i),
+         read (string,*,err=60,end=60)  x(i),y(i),z(i),type(i),
      &                                  (i12(j,i),j=1,maxval)
-   50    continue
+   60    continue
       end do
       quit = .false.
-   60 continue
+   70 continue
       if (.not. opened)  close (unit=ixyz)
 c
 c     an error occurred in reading the coordinate file
 c
       if (quit) then
-         write (iout,70)  i
-   70    format (/,' READXYZ  --  Error in Coordinate File at Atom',i6)
+         write (iout,80)  i
+   80    format (/,' READXYZ  --  Error in Coordinate File at Atom',i6)
          call fatal
       end if
 c
@@ -154,10 +159,10 @@ c
          do j = maxval, 1, -1
             if (i12(j,i) .ne. 0) then
                n12(i) = j
-               goto 80
+               goto 90
             end if
          end do
-   80    continue
+   90    continue
          call sort (n12(i),i12(1,i))
       end do
 c
@@ -169,8 +174,8 @@ c
          if (tag(i) .ne. i)  reorder = .true.
       end do
       if (reorder) then
-         write (iout,90)
-   90    format (/,' READXYZ  --  Atom Labels not Sequential,',
+         write (iout,100)
+  100    format (/,' READXYZ  --  Atom Labels not Sequential,',
      &              ' Attempting to Renumber')
          do i = 1, n
             tag(i) = i
@@ -192,13 +197,13 @@ c
          do j = 1, n12(i)
             k = i12(j,i)
             do m = 1, n12(k)
-               if (i12(m,k) .eq. i)  goto 110
+               if (i12(m,k) .eq. i)  goto 120
             end do
-            write (iout,100)  k,i
-  100       format (/,' READXYZ  --  Check Connection of Atom',
+            write (iout,110)  k,i
+  110       format (/,' READXYZ  --  Check Connection of Atom',
      &                 i6,' to Atom',i6)
             call fatal
-  110       continue
+  120       continue
          end do
       end do
       return

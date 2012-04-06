@@ -46,16 +46,19 @@ c        if (letter .eq. '\')  last = leng
          if (letter .eq. '~')  last = leng
          if (letter .eq. '.')  last = i - 1
       end do
-      if (last .ne. leng)  return
 c
-c     append extension and version if filename does not exist
+c     append an extension or version as appropriate
 c
-      exist = .false.
-      if (leng .ne. 0)  inquire (file=filename(1:leng),exist=exist)
-      if (.not. exist) then
-         filename = filename(1:leng)//'.'//extension(1:lext)
-      end if
-      if (.not.exist .or. status.eq.'new') then
+      if (last .eq. leng) then
+         exist = .false.
+         if (leng .ne. 0) then
+            inquire (file=filename(1:leng),exist=exist)
+         end if
+         if (.not. exist) then
+            filename = filename(1:leng)//'.'//extension(1:lext)
+            call version (filename,status)
+         end if
+      else if (status .eq. 'new') then
          call version (filename,status)
       end if
       return

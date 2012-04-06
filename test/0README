@@ -78,17 +78,21 @@
                           two idealized polyalanine helices using
                           only van der Waals interactions
 
-         (13) SALT        convert sodium chloride asymmetric unit to
+         (13) IFABP       generation of distance geometry structures
+                          for intestinal fatty acid binding protein
+                          from NOE distance and torsional restraints
+
+         (14) SALT        convert sodium chloride asymmetric unit to
                           the unit cell, then a crystal minimization
                           starting from the diffraction structure
                           using Ewald summation for electrostatics
 
-         (14) TETRAALA    generate capped alanine tetrapeptide in an
+         (15) TETRAALA    generate capped alanine tetrapeptide in an
                           extended conformation, then use Monte Carlo
                           Minimization with random torsional moves to
                           find the global minimum energy structure
 
-         (15) WATER       compare the electrostatic potential around
+         (16) WATER       compare the electrostatic potential around
                           an AMOEBA water molecule to the QM-derived
                           potential (MP2/aug-cc-pVTZ) on a grid of
                           points outside the molecular surface.

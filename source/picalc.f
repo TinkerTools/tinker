@@ -166,16 +166,16 @@ c
       real*8 s1,s2,gjk
       real*8 vij,vik,vmj,vmk
       real*8 xi,xj,xk,xg
-      real*8 en(maxpi)
-      real*8 ip(maxpi)
-      real*8 work1(maxpi)
-      real*8 work2(maxpi)
-      real*8 povlap(maxbnd)
-      real*8 fock(maxpi,maxpi)
-      real*8 hc(maxpi,maxpi)
-      real*8 v(maxpi,maxpi)
-      real*8 gamma(maxpi,maxpi)
-      real*8 ed(maxpi,maxpi)
+      real*8, allocatable :: povlap(:)
+      real*8, allocatable :: en(:)
+      real*8, allocatable :: ip(:)
+      real*8, allocatable :: work1(:)
+      real*8, allocatable :: work2(:)
+      real*8, allocatable :: fock(:,:)
+      real*8, allocatable :: hc(:,:)
+      real*8, allocatable :: v(:,:)
+      real*8, allocatable :: gamma(:,:)
+      real*8, allocatable :: ed(:,:)
       character*6 mode
 c
 c
@@ -209,6 +209,19 @@ c
       abnz = 2.142d0
       ble = 1.338d0
       blb = 1.397d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (povlap(nbpi))
+      allocate (en(norbit))
+      allocate (ip(norbit))
+      allocate (work1(norbit))
+      allocate (work2(norbit))
+      allocate (fock(norbit,norbit))
+      allocate (hc(norbit,norbit))
+      allocate (v(norbit,norbit))
+      allocate (gamma(norbit,norbit))
+      allocate (ed(norbit,norbit))
 c
 c     assign empirical one-center Coulomb integrals, and
 c     first or second ionization potential depending on
@@ -360,7 +373,7 @@ c
          delta = 2.0d0 * converge
          do while (delta.gt.converge .and. iter.lt.maxiter)
             iter = iter + 1
-            call jacobi (norbit,maxpi,fock,en,v,work1,work2)
+            call jacobi (norbit,norbit,fock,en,v,work1,work2)
             do i = 1, norbit
                do j = i, norbit
                   s1 = 0.0d0
@@ -528,6 +541,19 @@ c
             mode = '      '
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (povlap)
+      deallocate (en)
+      deallocate (ip)
+      deallocate (work1)
+      deallocate (work2)
+      deallocate (fock)
+      deallocate (hc)
+      deallocate (v)
+      deallocate (gamma)
+      deallocate (ed)
       return
       end
 c
@@ -559,7 +585,7 @@ c
       real*8 a1,b1,c1,a2,b2,c2
       real*8 x2,y2,z2,x3,y3,z3
       real*8 xr(8),yr(8),zr(8)
-      real*8 povlap(maxbnd)
+      real*8 povlap(*)
 c
 c
 c     planes defining each p-orbital are in "piperp"; transform
@@ -784,7 +810,7 @@ c
      &                       blpi(j),bk(j),bl(j)
    20       format (' Bond',7x,i5,'-',a3,1x,i5,'-',a3,
      &                 5x,f9.3,f8.4,2x,'-->',f9.3,f8.4)
-         end if
+         end if 
       end do
 c
 c     modify the 2-fold torsional constants across pibonds

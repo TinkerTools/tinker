@@ -73,11 +73,16 @@ c
       end do
    50 continue
 c
-c     check for too many total atoms in the file
+c     check for too few or too many total atoms in the file
 c
-      if (n .gt. maxatm) then
-         write (iout,60)  maxatm
-   60    format (/,' READMOL2  --  The Maximum of',i8,' Atoms',
+      if (n .le. 0) then
+         write (iout,60)
+   60    format (/,' READMOL2  --  The Coordinate File Does Not',
+     &              ' Contain Any Atoms')
+         call fatal
+      else if (n .gt. maxatm) then
+         write (iout,70)  maxatm
+   70    format (/,' READMOL2  --  The Maximum of',i8,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if
@@ -85,15 +90,15 @@ c
 c     read the atom names and coordinates
 c
       do i = 1, 1000000
-         read (isyb,70)  record
-   70    format (a120)
+         read (isyb,80)  record
+   80    format (a120)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>ATOM') then
             do j = 1, n
-               read (isyb,80)  record
-   80          format (a120)
+               read (isyb,90)  record
+   90          format (a120)
                read (record,*)  number
                next = 1
                call getword (record,atmnam,next)
@@ -110,33 +115,33 @@ c
                end do
                type(j) = 0
             end do
-            goto 90
+            goto 100
          end if
       end do
-   90 continue
+  100 continue
 c
 c     read the bond list to get attached atom lists
 c
       do i = 1, 1000000
-         read (isyb,100)  record
-  100    format (a120)
+         read (isyb,110)  record
+  110    format (a120)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>BOND') then
             do j = 1, nbond
-               read (isyb,110)  record
-  110          format (a120)
+               read (isyb,120)  record
+  120          format (a120)
                read (record,*)  number,ia,ib
                n12(ia) = n12(ia) + 1
                i12(n12(ia),ia) = ib
                n12(ib) = n12(ib) + 1
                i12(n12(ib),ib) = ia
             end do
-            goto 120
+            goto 130
          end if
       end do
-  120 continue
+  130 continue
 c
 c     for each atom, sort its list of attached atoms
 c

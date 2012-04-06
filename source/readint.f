@@ -69,7 +69,7 @@ c
       abort = .true.
       size = 0
       do while (size .eq. 0)
-         read (izmt,20,err=60,end=60)  record
+         read (izmt,20,err=70,end=70)  record
    20    format (a120)
          size = trimtext (record)
       end do
@@ -81,7 +81,7 @@ c
       i = 0
       next = 1
       call gettext (record,string,next)
-      read (string,*,err=60,end=60)  n
+      read (string,*,err=70,end=70)  n
 c
 c     extract the title and determine its length
 c
@@ -98,9 +98,14 @@ c
 c
 c     check for too many total atoms in the file
 c
-      if (n .gt. maxatm) then
-         write (iout,30)  maxatm
-   30    format (' READINT  --  The Maximum of',i8,' Atoms',
+      if (n .le. 0) then
+         write (iout,30)
+   30    format (/,' READINT  --  The Coordinate File Does Not',
+     &              ' Contain Any Atoms')
+         call fatal
+      else if (n .gt. maxatm) then
+         write (iout,40)  maxatm
+   40    format (' READINT  --  The Maximum of',i8,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if
@@ -125,27 +130,27 @@ c
          next = 1
          size = 0
          do while (size .eq. 0)
-            read (izmt,40,err=60,end=60)  record
-   40       format (a120)
+            read (izmt,50,err=70,end=70)  record
+   50       format (a120)
             size = trimtext (record)
          end do
-         read (record,*,err=60,end=60)  tag(i)
+         read (record,*,err=70,end=70)  tag(i)
          call getword (record,name(i),next)
          string = record(next:120)
-         read (string,*,err=50,end=50)  type(i),iz(1,i),zbond(i),
+         read (string,*,err=60,end=60)  type(i),iz(1,i),zbond(i),
      &                                  iz(2,i),zang(i),iz(3,i),
      &                                  ztors(i),iz(4,i)
-   50    continue
+   60    continue
       end do
       quit = .false.
-   60 continue
+   70 continue
       if (.not. opened)  close (unit=izmt)
 c
 c     an error occurred in reading the Z-matrix coordinates
 c
       if (quit) then
-         write (iout,70)  i
-   70    format (' READZ  --  Error in Z-Matrix File at Atom',i6)
+         write (iout,80)  i
+   80    format (' READZ  --  Error in Z-Matrix File at Atom',i6)
          call fatal
       end if
 c
@@ -153,21 +158,21 @@ c     read in any additional bonds to be added or deleted
 c
       nadd = 0
       ndel = 0
-      read (izmt,80,err=120,end=120)
-   80 format ()
+      read (izmt,90,err=130,end=130)
+   90 format ()
       do i = 1, maxatm
-         read (izmt,90,err=120,end=120)  record
-   90    format (a120)
-         read (record,*,err=100,end=100)  (iadd(j,i),j=1,2)
+         read (izmt,100,err=130,end=130)  record
+  100    format (a120)
+         read (record,*,err=110,end=110)  (iadd(j,i),j=1,2)
          nadd = i
       end do
-  100 continue
+  110 continue
       do i = 1, maxatm
-         read (izmt,110,err=120,end=120)  record
-  110    format (a120)
-         read (record,*,err=120,end=120)  (idel(j,i),j=1,2)
+         read (izmt,120,err=130,end=130)  record
+  120    format (a120)
+         read (record,*,err=130,end=130)  (idel(j,i),j=1,2)
          ndel = i
       end do
-  120 continue
+  130 continue
       return
       end

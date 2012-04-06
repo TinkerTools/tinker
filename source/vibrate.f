@@ -73,10 +73,10 @@ c
       call getxyz
       call mechanic
 c
-c     check for too many frequencies or Hessian elements
+c     check for too many vibrational frequencies
 c
       nfreq = 3 * nuse
-      if (nfreq.gt.maxvib .or. nfreq*(nfreq-1)/2.gt.maxhess) then
+      if (nfreq*(nfreq-1)/2 .gt. maxhess) then
          write (iout,10)
    10    format (/,' VIBRATE  --  Too many Atoms in the Molecule')
          call fatal

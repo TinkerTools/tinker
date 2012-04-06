@@ -287,9 +287,9 @@ c
       include 'atoms.i'
       integer i,nvar
       real*8 pss1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -303,6 +303,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -320,6 +324,10 @@ c
          nvar = nvar + 1
          g(nvar) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -341,12 +349,12 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hindex(maxhess)
-      real*8 xx(maxvar)
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
+      integer hinit(*)
+      integer hstop(*)
+      integer hindex(*)
+      real*8 xx(*)
+      real*8 hdiag(*)
+      real*8 h(*)
       character*4 mode
 c
 c
@@ -709,7 +717,7 @@ c
       real*8 minimum,grdmin
       real*8 parent
       real*8 energy,big
-      real*8 step(3,maxvib)
+      real*8 step(3,*)
       real*8 estep(0:maxstep)
       logical done,check,keep
 c
@@ -802,7 +810,7 @@ c
       real*8 minimum,grdmin
       real*8 parent
       real*8 energy,big,size
-      real*8 step(maxrot)
+      real*8 step(*)
       real*8 estep(0:maxstep)
       logical done,check,keep
 c
@@ -962,10 +970,17 @@ c
       integer i
       real*8 parent,grdmin
       real*8 deform0,eps
-      real*8 x0(maxatm)
-      real*8 y0(maxatm)
-      real*8 z0(maxatm)
+      real*8, allocatable :: x0(:)
+      real*8, allocatable :: y0(:)
+      real*8, allocatable :: z0(:)
       logical keep
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x0(n))
+      allocate (y0(n))
+      allocate (z0(n))
 c
 c     store the current smoothing level and coordinates
 c
@@ -999,6 +1014,12 @@ c
          y(i) = y0(i)
          z(i) = z0(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (x0)
+      deallocate (y0)
+      deallocate (z0)
       return
       end
 c

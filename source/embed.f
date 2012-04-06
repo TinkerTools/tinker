@@ -990,7 +990,9 @@ c
       character*120 record
       character*120 string
       save first,method,update
-      save npart,percent,alpha,beta
+      save npart,percent
+      save mean,stdev
+      save alpha,beta
       data first  / .true. /
 c
 c

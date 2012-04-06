@@ -49,12 +49,12 @@ Energies in Molecular Systems", J. Chem. Phys., 105, 1902-1921 (1996)
    ##                                                  ##
    ##  TINKER Atom Class Numbers to CHARMM Atom Names  ##
    ##                                                  ##
-   ##     1  H        7  CH3     13  NC2     19  S     ##
-   ##     2  HC       8  CR1     14  NR      20  SH1   ##
-   ##     3  HT       9  N       15  O                 ##
-   ##     4  C       10  NH1     16  OC                ##
-   ##     5  CH1     11  NH2     17  OH1               ##
-   ##     6  CH2     12  NH3     18  OT                ##
+   ##    1  H        7  CH3     13  NH3     19  OH1    ##
+   ##    2  HC       8  CM      14  NC2     20  OM     ##
+   ##    3  HT       9  CR1     15  NP      21  OT     ##
+   ##    4  C       10  N       16  NR      22  S      ##
+   ##    5  CH1     11  NH1     17  O       23  SH1    ##
+   ##    6  CH2     12  NH2     18  OC      24  FE     ##
    ##                                                  ##
    ######################################################
 
@@ -75,43 +75,59 @@ atom         13    4    C     "TRP CE2 Carbon"               6    12.011    3
 atom         14    4    C     "HID CG/HIE CG"                6    12.011    3
 atom         15    4    C     "HIP CG Carbon"                6    12.011    3
 atom         16    4    C     "ARG CZ Carbon"                6    12.011    3
-atom         17    5    CH1   "Aliphatic Methine"            6    13.019    3
-atom         18    5    CH1   "Backbone CA Methine"          6    13.019    3
-atom         19    5    CH1   "N-Term CA/THR CB"             6    13.019    3
-atom         20    6    CH2   "Aliphatic Methylene"          6    14.027    2
-atom         21    6    CH2   "MET CG Methylene"             6    14.027    2
-atom         22    6    CH2   "GLY CA/PRO CD"                6    14.027    2
-atom         23    6    CH2   "CYS CB Methylene"             6    14.027    2
-atom         24    6    CH2   "SER CB/HIP CB/LYS CE"         6    14.027    2
-atom         25    6    CH2   "ASP CB/GLU CB"                6    14.027    2
-atom         26    7    CH3   "Aliphatic Methyl"             6    15.035    1
-atom         27    7    CH3   "MET CE Methyl"                6    15.035    1
-atom         28    7    CH3   "N-Me Amide Methyl"            6    15.035    1
-atom         29    8    CR1   "Aromatic Methine"             6    13.019    2
-atom         30    8    CR1   "TRP CE3 Methine"              6    13.019    2
-atom         31    8    CR1   "TRP CD1 Methine"              6    13.019    2
-atom         32    8    CR1   "HID CD2/HIE CD2"              6    13.019    2
-atom         33    8    CR1   "HID CE1/HIE CE1"              6    13.019    2
-atom         34    8    CR1   "HIP CD2 Methine"              6    13.019    2
-atom         35    8    CR1   "HIP CE1 Methine"              6    13.019    2
-atom         36    9    N     "PRO Nitrogen"                 7    14.007    3
-atom         37   10    NH1   "Amide NHR Nitrogen"           7    15.015    3
-atom         38   10    NH1   "HIP ND1/HIP NE2"              7    15.015    3
-atom         39   10    NH1   "TRP NE1 Nitrogen"             7    15.015    3
-atom         40   10    NH1   "ARG NE/HIDE NH"               7    15.015    3
-atom         41   11    NH2   "Amide NH2 Nitrogen"           7    16.023    3
-atom         42   12    NH3   "Ammonium Nitrogen"            7    17.031    4
-atom         43   12    NH3   "N-Terminal PRO N"             7    17.031    4
-atom         44   13    NC2   "ARG NH2 Nitrogen"             7    16.023    3
-atom         45   14    NR    "HID NE2/HIE ND1"              7    14.007    2
-atom         46   15    O     "Amide Oxygen"                 8    15.999    1
-atom         47   16    OC    "Carboxylate Oxygen"           8    15.999    1
-atom         48   16    OC    "C-Terminal Oxygen"            8    15.999    1
-atom         49   17    OH1   "Hydroxyl Oxygen"              8    15.999    2
-atom         50   18    OT    "Modified TIP3P O"             8    15.999    2
-atom         51   19    S     "MET Sulfide Sulfur"          16    32.060    2
-atom         52   19    S     "CYS Disulfide Sulfur"        16    32.060    2
-atom         53   20    SH1   "CYS Thiol Sulfur"            16    33.068    1
+atom         17    4    C     "Heme Alpha Carbon"            6    12.011    3
+atom         18    4    C     "Heme Beta Carbon"             6    12.011    3
+atom         19    4    C     "Heme CD Carbon"               6    12.011    3
+atom         20    5    CH1   "Aliphatic Methine"            6    13.019    3
+atom         21    5    CH1   "Backbone CA Methine"          6    13.019    3
+atom         22    5    CH1   "N-Term CA/THR CB"             6    13.019    3
+atom         23    6    CH2   "Aliphatic Methylene"          6    14.027    2
+atom         24    6    CH2   "MET CG Methylene"             6    14.027    2
+atom         25    6    CH2   "GLY CA/PRO CD"                6    14.027    2
+atom         26    6    CH2   "CYS CB Methylene"             6    14.027    2
+atom         27    6    CH2   "SER CB/HIP CB/LYS CE"         6    14.027    2
+atom         28    6    CH2   "ASP CB/GLU CG"                6    14.027    2
+atom         29    6    CH2   "Heme H2C= Carbon"             6    14.027    1
+atom         30    6    CH2   "Heme CB Carbon"               6    14.027    2
+atom         31    6    CH2   "Heme CG Carbon"               6    14.027    2
+atom         32    7    CH3   "Aliphatic Methyl"             6    15.035    1
+atom         33    7    CH3   "MET CE Methyl"                6    15.035    1
+atom         34    7    CH3   "N-Me Amide Methyl"            6    15.035    1
+atom         35    7    CH3   "Heme Methyl Carbon"           6    15.035    1
+atom         36    8    CM    "Heme CO Carbon"               6    12.011    1
+atom         37    9    CR1   "Aromatic Methine"             6    13.019    2
+atom         38    9    CR1   "TRP CE3 Methine"              6    13.019    2
+atom         39    9    CR1   "TRP CD1 Methine"              6    13.019    2
+atom         40    9    CR1   "HID CD2/HIE CD2"              6    13.019    2
+atom         41    9    CR1   "HID CE1/HIE CE1"              6    13.019    2
+atom         42    9    CR1   "HIP CD2 Methine"              6    13.019    2
+atom         43    9    CR1   "HIP CE1 Methine"              6    13.019    2
+atom         44    9    CR1   "Heme Meso Carbon"             6    13.019    2
+atom         45    9    CR1   "Heme RHC= Carbon"             6    13.019    2
+atom         46   10    N     "PRO Nitrogen"                 7    14.007    3
+atom         47   11    NH1   "Amide NHR Nitrogen"           7    15.015    3
+atom         48   11    NH1   "HIP ND1/HIP NE2"              7    15.015    3
+atom         49   11    NH1   "TRP NE1 Nitrogen"             7    15.015    3
+atom         50   11    NH1   "ARG NE/HIDE NH"               7    15.015    3
+atom         51   12    NH2   "Amide NH2 Nitrogen"           7    16.023    3
+atom         52   13    NH3   "Ammonium Nitrogen"            7    17.031    4
+atom         53   13    NH3   "N-Terminal PRO N"             7    17.031    4
+atom         54   14    NC2   "ARG NH2 Nitrogen"             7    16.023    3
+atom         55   15    NP    "Heme Pyrrole Nitrogen"        7    14.007    3
+atom         56   16    NR    "HID NE2/HIE ND1"              7    14.007    2
+atom         57   17    O     "Amide Oxygen"                 8    15.999    1
+atom         58   18    OC    "Carboxylate Oxygen"           8    15.999    1
+atom         59   18    OC    "C-Terminal Oxygen"            8    15.999    1
+atom         60   18    OC    "Heme OD Oxygen"               8    15.999    1
+atom         61   19    OH1   "Hydroxyl Oxygen"              8    15.999    2
+atom         62   20    OM    "Heme CO Oxygen"               8    15.999    1
+atom         63   20    OM    "Heme O2 Oxygen"               8    15.999    1
+atom         64   21    OT    "Modified TIP3P O"             8    15.999    2
+atom         65   22    S     "MET Sulfide Sulfur"          16    32.060    2
+atom         66   22    S     "CYS Disulfide Sulfur"        16    32.060    2
+atom         67   23    SH1   "CYS Thiol Sulfur"            16    33.068    1
+atom         68   24    FE    "Heme Iron"                   26    55.847    4
+atom         69   25    LX    "Heme VDW Ligand"             18    32.000    0
 
 
       ################################
@@ -121,26 +137,31 @@ atom         53   20    SH1   "CYS Thiol Sulfur"            16    33.068    1
       ################################
 
 
-vdw           1               0.8000     0.0498
-vdw           2               0.6000     0.0498
-vdw           3               0.8000     0.0498
-vdw           4               2.1000     0.1200
-vdw           5               2.3650     0.0486
-vdw           6               2.2350     0.1142
-vdw           7               2.1650     0.1811
-vdw           8               2.1000     0.1200
-vdw           9               1.6000     0.2384
-vdw          10               1.6000     0.2384
-vdw          11               1.6000     0.2384
-vdw          12               1.6000     0.2384
-vdw          13               1.6000     0.2384
-vdw          14               1.6000     0.2384
-vdw          15               1.6000     0.1591
-vdw          16               1.6000     0.6469
-vdw          17               1.6000     0.1591
-vdw          18               1.6000     0.1591
-vdw          19               1.8900     0.0430
-vdw          20               1.8900     0.0430
+vdw           1               0.8000    -0.0498
+vdw           2               0.6000    -0.0498
+vdw           3               0.8000    -0.0498
+vdw           4               2.1000    -0.1200
+vdw           5               2.3650    -0.0486
+vdw           6               2.2350    -0.1142
+vdw           7               2.1650    -0.1811
+vdw           8               2.4900    -0.0262
+vdw           9               2.1000    -0.1200
+vdw          10               1.6000    -0.2384
+vdw          11               1.6000    -0.2384
+vdw          12               1.6000    -0.2384
+vdw          13               1.6000    -0.2384
+vdw          14               1.6000    -0.2384
+vdw          16               1.6000    -0.2384
+vdw          17               1.6000    -0.1591
+vdw          18               1.6000    -0.6469
+vdw          19               1.6000    -0.1591
+vdw          20               1.6000    -0.1591
+vdw          21               1.6000    -0.1591
+vdw          22               1.8900    -0.0430
+vdw          23               1.8900    -0.0430
+vdw          15               1.6000    -0.2384
+vdw          24               0.6500     0.0000
+vdw          25               1.4000    -0.0200
 
 
       ####################################
@@ -150,11 +171,12 @@ vdw          20               1.8900     0.0430
       ####################################
 
 
-vdw14         4               1.9000     0.1000
-vdw14         5               1.9000     0.1000
-vdw14         6               1.9000     0.1000
-vdw14         7               1.9000     0.1000
-vdw14         8               1.9000     0.1000
+vdw14         4               1.9000    -0.1000
+vdw14         5               1.9000    -0.1000
+vdw14         6               1.9000    -0.1000
+vdw14         7               1.9000    -0.1000
+vdw14         8               1.9000    -0.1000
+vdw14         9               1.9000    -0.1000
 
 
       #####################################
@@ -164,9 +186,9 @@ vdw14         8               1.9000     0.1000
       #####################################
 
 
-vdwpr         3    3          0.4490     0.04598
-vdwpr         3   18         1.99275     0.08362
-vdwpr        18   18          3.5365     0.152073
+vdwpr         3    3          0.4490    -0.04598
+vdwpr         3   21          1.9927    -0.08363
+vdwpr        21   21          3.5365    -0.152073
 
 
       ##################################
@@ -176,52 +198,54 @@ vdwpr        18   18          3.5365     0.152073
       ##################################
 
 
-bond          1   10          405.00     0.9800
 bond          1   11          405.00     0.9800
-bond          1   17          450.00     0.9600
-bond          2   10          405.00     0.9800
-bond          2   12          405.00     1.0400
-bond          2   13          405.00     1.0000
-bond          3   18          450.00     0.9572
+bond          1   12          405.00     0.9800
+bond          1   19          450.00     0.9600
+bond          2   11          405.00     0.9800
+bond          2   13          405.00     1.0400
+bond          2   14          405.00     1.0000
+bond          3   21          450.00     0.9572
 bond          4    4          450.00     1.3800
 bond          4    5          405.00     1.5200
 bond          4    6          405.00     1.5200
 bond          4    7          405.00     1.5200
-bond          4    8          450.00     1.3800
-bond          4    9          471.00     1.3300
+bond          4    9          450.00     1.3800
 bond          4   10          471.00     1.3300
 bond          4   11          471.00     1.3300
-bond          4   13          400.00     1.3300
-bond          4   14          471.00     1.3300
-bond          4   15          580.00     1.2300
-bond          4   16          580.00     1.2300
-bond          4   17          450.00     1.3800
+bond          4   12          471.00     1.3300
+bond          4   14          400.00     1.3300
+bond          4   15          471.00     1.3300
+bond          4   16          471.00     1.3300
+bond          4   17          580.00     1.2300
+bond          4   18          580.00     1.2300
+bond          4   19          450.00     1.3800
 bond          5    5          225.00     1.5300
 bond          5    6          225.00     1.5200
 bond          5    7          225.00     1.5200
-bond          5    9          422.00     1.4500
 bond          5   10          422.00     1.4500
 bond          5   11          422.00     1.4500
 bond          5   12          422.00     1.4500
-bond          5   17          400.00     1.4200
+bond          5   13          422.00     1.4500
+bond          5   19          400.00     1.4200
 bond          6    6          225.00     1.5200
 bond          6    7          225.00     1.5400
-bond          6    8          250.00     1.4500
-bond          6    9          422.00     1.4500
+bond          6    9          250.00     1.4500
 bond          6   10          422.00     1.4500
 bond          6   11          422.00     1.4500
 bond          6   12          422.00     1.4500
-bond          6   17          400.00     1.4200
-bond          6   19          450.00     1.8100
-bond          6   20          450.00     1.8100
-bond          7   10          422.00     1.4900
-bond          7   14          422.00     1.4900
-bond          7   19          450.00     1.7700
-bond          8    8          450.00     1.3800
-bond          8   10          450.00     1.3050
-bond          8   14          450.00     1.3050
-bond         16   19          400.00     1.4300
-bond         19   19          500.00     2.0200
+bond          6   13          422.00     1.4500
+bond          6   19          400.00     1.4200
+bond          6   22          450.00     1.8100
+bond          6   23          450.00     1.8100
+bond          7   11          422.00     1.4900
+bond          7   16          422.00     1.4900
+bond          7   22          450.00     1.7700
+bond          9    9          450.00     1.3800
+bond          9   11          450.00     1.3050
+bond          9   16          450.00     1.3050
+bond         15   24          500.00     2.0900
+bond         18   22          400.00     1.4300
+bond         22   22          500.00     2.0200
 
 
       ################################
@@ -234,131 +258,136 @@ bond         19   19          500.00     2.0200
 angle         4    4    4      70.00     106.50
 angle         4    4    6      65.00     126.50
 angle         4    4    7      65.00     126.50
-angle         4    4    8      70.00     122.50
-angle         4    4   10      65.00     109.00
-angle         4    4   14      65.00     112.50
-angle         4    4   15      65.00     119.00
+angle         4    4    9      70.00     122.50
+angle         4    4   11      65.00     109.00
+angle         4    4   15      65.00     112.50
+angle         4    4   16      65.00     112.50
 angle         4    4   17      65.00     119.00
-angle         5    4    9      20.00     117.50
+angle         4    4   19      65.00     119.00
 angle         5    4   10      20.00     117.50
-angle         5    4   15      85.00     121.50
-angle         5    4   16      85.00     117.50
-angle         5    4   17      85.00     120.00
-angle         6    4    8      70.00     121.50
-angle         6    4    9      20.00     117.50
+angle         5    4   11      20.00     117.50
+angle         5    4   17      85.00     121.50
+angle         5    4   18      85.00     117.50
+angle         5    4   19      85.00     120.00
+angle         6    4    9      70.00     121.50
 angle         6    4   10      20.00     117.50
 angle         6    4   11      20.00     117.50
-angle         6    4   13      20.00     117.50
-angle         6    4   14      60.00     116.00
-angle         6    4   15      85.00     121.60
-angle         6    4   16      85.00     118.50
-angle         6    4   17      85.00     120.00
-angle         7    4    9      20.00     117.50
+angle         6    4   12      20.00     117.50
+angle         6    4   14      20.00     117.50
+angle         6    4   16      60.00     116.00
+angle         6    4   17      85.00     121.60
+angle         6    4   18      85.00     118.50
+angle         6    4   19      85.00     120.00
 angle         7    4   10      20.00     117.50
-angle         7    4   15      85.00     121.50
-angle         8    4    8      65.00     120.50
-angle         8    4   10      65.00     110.50
-angle         8    4   14      65.00     122.50
-angle         8    4   17      65.00     119.00
-angle         9    4   15      85.00     121.00
-angle        10    4   14      70.00     120.00
-angle        10    4   15      65.00     121.00
-angle        11    4   15      65.00     121.00
-angle        10    4   13      70.00     120.00
-angle        13    4   13      70.00     120.00
-angle        15    4   17      85.00     120.00
-angle        16    4   16      85.00     122.50
+angle         7    4   11      20.00     117.50
+angle         7    4   17      85.00     121.50
+angle         9    4    9      65.00     120.50
+angle         9    4   11      65.00     110.50
+angle         9    4   15      65.00     122.50
+angle         9    4   16      65.00     122.50
+angle         9    4   19      65.00     119.00
+angle        10    4   17      85.00     121.00
+angle        11    4   16      70.00     120.00
+angle        11    4   17      65.00     121.00
+angle        12    4   17      65.00     121.00
+angle        11    4   14      70.00     120.00
+angle        14    4   14      70.00     120.00
+angle        17    4   19      85.00     120.00
+angle        18    4   18      85.00     122.50
 angle         4    5    5      70.00     110.00
 angle         4    5    6      70.00     109.50
 angle         4    5    7      70.00     106.50
-angle         4    5    9      45.00     111.60
 angle         4    5   10      45.00     111.60
 angle         4    5   11      45.00     111.60
 angle         4    5   12      45.00     111.60
+angle         4    5   13      45.00     111.60
 angle         5    5    6      45.00     112.50
 angle         5    5    7      45.00     111.00
-angle         5    5   10      50.00     110.00
-angle         5    5   11      50.00     109.50
-angle         5    5   12      50.00     107.50
-angle         5    5   17      50.00     104.50
+angle         5    5   11      50.00     110.00
+angle         5    5   12      50.00     109.50
+angle         5    5   13      50.00     107.50
+angle         5    5   19      50.00     104.50
 angle         6    5    7      50.00     111.50
-angle         6    5    9      65.00     104.00
-angle         6    5   10      65.00     110.00
+angle         6    5   10      65.00     104.00
 angle         6    5   11      65.00     110.00
 angle         6    5   12      65.00     110.00
+angle         6    5   13      65.00     110.00
 angle         7    5    7      50.00     111.00
-angle         7    5   10      65.00     108.50
-angle         7    5   11      65.00     109.50
+angle         7    5   11      65.00     108.50
 angle         7    5   12      65.00     109.50
-angle         7    5   17      60.00     110.50
+angle         7    5   13      65.00     109.50
+angle         7    5   19      60.00     110.50
 angle         4    6    5      70.00     112.50
 angle         4    6    6      70.00     113.00
-angle         4    6   10      70.00     111.60
 angle         4    6   11      70.00     111.60
 angle         4    6   12      70.00     111.60
+angle         4    6   13      70.00     111.60
 angle         5    6    5      45.00     117.00
 angle         5    6    6      45.00     112.50
 angle         5    6    7      45.00     113.00
-angle         5    6   17      45.00     111.00
-angle         5    6   19      50.00     112.50
-angle         5    6   20      50.00     112.50
+angle         5    6   19      45.00     111.00
+angle         5    6   22      50.00     112.50
+angle         5    6   23      50.00     112.50
 angle         6    6    6      45.00     110.00
 angle         6    6    7      45.00     111.00
-angle         6    6    9      65.00     105.00
-angle         6    6   10      65.00     111.00
-angle         6    6   11      65.00     109.50
-angle         6    6   12      65.00     110.50
-angle         6    6   19      50.00     112.50
-angle         7    6   17      45.00     111.00
-angle         4    8    4      90.00     126.50
-angle         4    8    6      90.00     122.00
-angle         4    8    8      90.00     119.00
-angle         4    8   10      90.00     109.50
-angle         4    8   14      90.00     106.50
-angle         8    8    8      90.00     120.50
-angle        10    8   10      70.00     109.00
-angle        10    8   14      70.00     109.00
-angle         4    9    5      80.00     120.00
-angle         4    9    6      80.00     120.00
-angle         5    9    6      60.00     110.00
-angle         5    9    7      60.00     110.00
-angle         6    9    7      60.00     109.50
-angle         1   10    4      30.00     120.00
-angle         4   10    5      77.50     120.00
-angle         4   10    6      77.50     120.00
-angle         4   10    7      77.50     120.00
-angle         4   10    8      60.00     108.00
-angle         1   10    5      35.00     120.00
-angle         5   10    7      60.00     120.00
-angle         1   10    6      35.00     120.00
-angle         6   10    7      60.00     120.00
-angle         1   10    7      35.00     120.00
-angle         1   10    8      35.00     120.00
-angle         8   10    8      65.00     110.00
-angle         1   11    1      40.00     125.00
-angle         2   11    2      40.00     120.00
+angle         6    6   10      65.00     105.00
+angle         6    6   11      65.00     111.00
+angle         6    6   12      65.00     109.50
+angle         6    6   13      65.00     110.50
+angle         6    6   22      50.00     112.50
+angle         7    6   19      45.00     111.00
+angle         4    9    4      90.00     126.50
+angle         4    9    6      90.00     122.00
+angle         4    9    9      90.00     119.00
+angle         4    9   11      90.00     109.50
+angle         4    9   16      90.00     106.50
+angle         9    9    9      90.00     120.50
+angle        11    9   11      70.00     109.00
+angle        11    9   16      70.00     109.00
+angle         4   10    5      80.00     120.00
+angle         4   10    6      80.00     120.00
+angle         5   10    6      60.00     110.00
+angle         5   10    7      60.00     110.00
+angle         6   10    7      60.00     109.50
 angle         1   11    4      30.00     120.00
+angle         4   11    5      77.50     120.00
+angle         4   11    6      77.50     120.00
+angle         4   11    7      77.50     120.00
+angle         4   11    9      60.00     108.00
 angle         1   11    5      35.00     120.00
-angle         5   11    6      60.00     120.00
+angle         5   11    7      60.00     120.00
 angle         1   11    6      35.00     120.00
-angle         2   12    2      40.00     109.50
-angle         2   12    5      35.00     109.50
-angle         5   12    6      35.00     109.50
-angle         2   12    6      35.00     109.50
-angle         2   13    2      40.00     120.00
-angle         2   13    4      35.00     120.00
-angle         4   14    4      70.00     102.50
-angle         4   14    8      70.00     109.50
-angle         4   14    7      70.00     109.50
-angle         7   14    8      70.00     109.50
-angle         8   14    8      65.00     110.00
-angle         1   17    4      50.00     109.50
-angle         1   17    5      35.00     109.50
-angle         1   17    6      35.00     109.50
-angle         3   18    3      55.00     104.52
-angle         6   19    7      50.00      99.50
-angle         6   19   19      50.00     104.20
-angle        16   19   16      85.00     109.50
+angle         6   11    7      60.00     120.00
+angle         1   11    7      35.00     120.00
+angle         1   11    9      35.00     120.00
+angle         9   11    9      65.00     110.00
+angle         1   12    1      40.00     125.00
+angle         1   12    4      30.00     120.00
+angle         1   12    5      35.00     120.00
+angle         1   12    6      35.00     120.00
+angle         2   12    2      40.00     120.00
+angle         5   12    6      60.00     120.00
+angle         2   13    2      40.00     109.50
+angle         2   13    5      35.00     109.50
+angle         5   13    6      35.00     109.50
+angle         2   13    6      35.00     109.50
+angle         2   14    2      40.00     120.00
+angle         2   14    4      35.00     120.00
+angle         4   16    4      70.00     102.50
+angle         4   16    9      70.00     109.50
+angle         4   16    7      70.00     109.50
+angle         7   16    9      70.00     109.50
+angle         9   16    9      65.00     110.00
+angle         1   19    4      50.00     109.50
+angle         1   19    5      35.00     109.50
+angle         1   19    6      35.00     109.50
+angle         3   21    3      55.00     104.52
+angle         6   22    7      50.00      99.50
+angle         6   22   22      50.00     104.20
+angle        18   22   18      85.00     109.50
+angle         4   15    4      70.00     102.50
+angle         4   15   24      50.00     128.00
+anglef       15   24   15      50.00     180.00        4.0
 
 
       ####################################
@@ -368,37 +397,38 @@ angle        16   19   16      85.00     109.50
       ####################################
 
 
-improper      4    5    9   15           100.00       0.00
-improper      4    5   10   15           100.00       0.00
-improper      4    6    9   15           100.00       0.00
-improper      4    6   10   15           100.00       0.00
-improper      4    7    9   15           100.00       0.00
-improper      4    7   10   15           100.00       0.00
-improper      4    8    4    6            90.00       0.00
-improper      4    8    8    6            90.00       0.00
-improper      4    8    8   17           150.00       0.00
-improper      4   10    8    6            90.00       0.00
-improper      4   13   13   10           100.00       0.00
-improper      4   14    8    6            90.00       0.00
-improper      4   15   11    6            90.00       0.00
-improper      4   16   16    5           100.00       0.00
-improper      4   16   16    6           100.00       0.00
+improper      4    4    4    7            90.00       0.00
+improper      4    5   10   17           100.00       0.00
+improper      4    5   11   17           100.00       0.00
+improper      4    6   10   17           100.00       0.00
+improper      4    6   11   17           100.00       0.00
+improper      4    7   10   17           100.00       0.00
+improper      4    7   11   17           100.00       0.00
+improper      4    9    4    6            90.00       0.00
+improper      4    9    9    6            90.00       0.00
+improper      4    9    9   19           150.00       0.00
+improper      4   11    9    6            90.00       0.00
+improper      4   14   14   11           100.00       0.00
+improper      4   16    9    6            90.00       0.00
+improper      4   17   12    6            90.00       0.00
+improper      4   18   18    5           100.00       0.00
+improper      4   18   18    6           100.00       0.00
 improper      5    6    7    5            55.00      35.26439
 improper      5    7    7    5            55.00      35.26439
 improper      5    7    7    6            55.00      35.26439
-improper      5    9    4    6            55.00      35.26439
-improper      5   10    4    5            55.00      35.26439
 improper      5   10    4    6            55.00      35.26439
-improper      5   10    4    7            55.00      35.26439
-improper      5   17    7    5            55.00      35.26439
-improper      9    5    6    4            45.00       0.00
-improper     10    4    5    1            45.00       0.00
-improper     10    4    6    1            45.00       0.00
-improper     10    4    7    1            45.00       0.00
-improper     10    8    4    1            45.00       0.00
-improper     10    8    8    1            45.00       0.00
-improper     11    1    1    4            45.00       0.00
-improper     13    4    2    2            45.00       0.00
+improper      5   11    4    5            55.00      35.26439
+improper      5   11    4    6            55.00      35.26439
+improper      5   11    4    7            55.00      35.26439
+improper      5   19    7    5            55.00      35.26439
+improper     10    5    6    4            45.00       0.00
+improper     11    4    5    1            45.00       0.00
+improper     11    4    6    1            45.00       0.00
+improper     11    4    7    1            45.00       0.00
+improper     11    9    4    1            45.00       0.00
+improper     11    9    9    1            45.00       0.00
+improper     12    1    1    4            45.00       0.00
+improper     14    4    2    2            45.00       0.00
 
 
    ##########################################################
@@ -411,8 +441,8 @@ improper     13    4    2    2            45.00       0.00
    ##########################################################
 
 
-improper      4    4    4    8            90.00       0.00
-improper      4   10    4    8            90.00       0.00
+improper      4    4    4    9            90.00       0.00
+improper      4   11    4    9            90.00       0.00
 
 
       ############################
@@ -435,176 +465,194 @@ improper      4   10    4    8            90.00       0.00
    ############################################################
 
 
-torsion       4    4    4    6            0.000  180.0  2
-torsion       4    4    4    8            2.500  180.0  2
-torsion       4    4    4   10            0.000  180.0  2
-torsion       6    4    4    8            0.000  180.0  2
-torsion       8    4    4    8            5.000  180.0  2
-torsion       8    4    4   10            2.500  180.0  2
-torsion       9    4    5    5            0.000    0.0  3
-torsion       9    4    5    6            0.000    0.0  3
-torsion       9    4    5    7            0.000    0.0  3
-torsion       9    4    5    9            0.000    0.0  3
-torsion       9    4    5   10            0.000    0.0  3
-torsion       9    4    5   12            0.000    0.0  3
-torsion      10    4    5    5            0.000    0.0  3
-torsion      10    4    5    6            0.000    0.0  3
-torsion      10    4    5    7            0.000    0.0  3
-torsion      10    4    5    9            0.000    0.0  3
-torsion      10    4    5   10            0.000    0.0  3
-torsion      10    4    5   12            0.000    0.0  3
-torsion      15    4    5    5            0.000    0.0  3
-torsion      15    4    5    6            0.000    0.0  3
-torsion      15    4    5    7            0.000    0.0  3
-torsion      15    4    5    9            0.000    0.0  3
-torsion      15    4    5   10            0.000    0.0  3
-torsion      15    4    5   12            0.000    0.0  3
-torsion      16    4    5    5            0.000    0.0  3
-torsion      16    4    5    6            0.000    0.0  3
-torsion      16    4    5    7            0.000    0.0  3
-torsion      16    4    5    9            0.000    0.0  3
-torsion      16    4    5   10            0.000    0.0  3
-torsion       4    4    6    5            0.000    0.0  3
-torsion       8    4    6    5            0.000    0.0  3
-torsion       9    4    6   10            0.000    0.0  3
-torsion      10    4    6    5            0.000    0.0  3
-torsion      10    4    6   10            0.000    0.0  3
-torsion      10    4    6   12            0.000    0.0  3
-torsion      11    4    6    5            0.000    0.0  3
-torsion      11    4    6    6            0.000    0.0  3
-torsion      14    4    6    5            0.000    0.0  3
-torsion      15    4    6    5            0.000    0.0  3
-torsion      15    4    6    6            0.000    0.0  3
-torsion      15    4    6   10            0.000    0.0  3
-torsion      15    4    6   12            0.000    0.0  3
-torsion      16    4    6    5            0.000    0.0  3
-torsion      16    4    6    6            0.000    0.0  3
-torsion      16    4    6   10            0.000    0.0  3
-torsion       4    4    8    8            5.000  180.0  2
-torsion       4    4    8   10            5.000  180.0  2
-torsion       6    4    8    8            5.000  180.0  2
-torsion       6    4    8   10            5.000  180.0  2
-torsion       6    4    8   14            5.000  180.0  2
-torsion       8    4    8    8            5.000  180.0  2
-torsion      10    4    8    8            5.000  180.0  2
-torsion      10    4    8   10            5.000  180.0  2
-torsion      10    4    8   14            5.000  180.0  2
-torsion      14    4    8   10            5.000  180.0  2
-torsion      17    4    8    8            5.000  180.0  2
-torsion       5    4    9    5            2.500  180.0  2
-torsion       5    4    9    6            2.500  180.0  2
-torsion       6    4    9    5            2.500  180.0  2
-torsion       6    4    9    6            2.500  180.0  2
-torsion       7    4    9    5            2.050  180.0  2
-torsion       7    4    9    6            2.050  180.0  2
-torsion      15    4    9    5            2.050  180.0  2
-torsion      15    4    9    6            2.050  180.0  2
-torsion       4    4   10    1            2.050  180.0  2
-torsion       4    4   10    8            2.050  180.0  2
-torsion       5    4   10    1            2.050  180.0  2
-torsion       5    4   10    5            2.050  180.0  2
-torsion       5    4   10    6            2.050  180.0  2
-torsion       5    4   10    7            2.050  180.0  2
-torsion       6    4   10    1            2.050  180.0  2
-torsion       6    4   10    5            2.050  180.0  2
-torsion       6    4   10    6            2.050  180.0  2
-torsion       6    4   10    7            2.050  180.0  2
-torsion       6    4   10    8            2.050  180.0  2
-torsion       7    4   10    1            2.050  180.0  2
+torsion       4    4    4    4
+torsion       4    4    4    6
+torsion       4    4    4    7
+torsion       4    4    4    9            2.500  180.0  2
+torsion       4    4    4   11
+torsion       4    4    4   15
+torsion       6    4    4    7
+torsion       6    4    4    9
+torsion       6    4    4   15
+torsion       7    4    4    9
+torsion       7    4    4   15
+torsion       9    4    4    9            5.000  180.0  2
+torsion       9    4    4   11            2.500  180.0  2
+torsion       9    4    4   15
+torsion      10    4    5    5
+torsion      10    4    5    6
+torsion      10    4    5    7
+torsion      10    4    5   10
+torsion      10    4    5   11
+torsion      10    4    5   13
+torsion      11    4    5    5
+torsion      11    4    5    6
+torsion      11    4    5    7
+torsion      11    4    5   10
+torsion      11    4    5   11
+torsion      11    4    5   13
+torsion      17    4    5    5
+torsion      17    4    5    6
+torsion      17    4    5    7
+torsion      17    4    5   10
+torsion      17    4    5   11
+torsion      17    4    5   13
+torsion      18    4    5    5
+torsion      18    4    5    6
+torsion      18    4    5    7
+torsion      18    4    5   10
+torsion      18    4    5   11
+torsion       4    4    6    5
+torsion       4    4    6    6
+torsion       9    4    6    5
+torsion      10    4    6   11
+torsion      11    4    6    5
+torsion      11    4    6   11
+torsion      11    4    6   13
+torsion      12    4    6    5
+torsion      12    4    6    6
+torsion      16    4    6    5
+torsion      17    4    6    5
+torsion      17    4    6    6
+torsion      17    4    6   11
+torsion      17    4    6   13
+torsion      18    4    6    5
+torsion      18    4    6    6
+torsion      18    4    6   11
+torsion       4    4    9    4            5.000  180.0  2
+torsion       4    4    9    6            5.000  180.0  2
+torsion       4    4    9    9            5.000  180.0  2
+torsion       4    4    9   11            5.000  180.0  2
+torsion       6    4    9    9            5.000  180.0  2
+torsion       6    4    9   11            5.000  180.0  2
+torsion       6    4    9   16            5.000  180.0  2
+torsion       9    4    9    9            5.000  180.0  2
+torsion      11    4    9    9            5.000  180.0  2
+torsion      11    4    9   11            5.000  180.0  2
+torsion      11    4    9   16            5.000  180.0  2
+torsion      15    4    9    4            5.000  180.0  2
+torsion      16    4    9   11            5.000  180.0  2
+torsion      19    4    9    9            5.000  180.0  2
+torsion       5    4   10    5            2.500  180.0  2
+torsion       5    4   10    6            2.500  180.0  2
+torsion       6    4   10    5            2.500  180.0  2
+torsion       6    4   10    6            2.500  180.0  2
 torsion       7    4   10    5            2.050  180.0  2
 torsion       7    4   10    6            2.050  180.0  2
-torsion       8    4   10    1            2.050  180.0  2
-torsion       8    4   10    8            2.050  180.0  2
-torsion      13    4   10    1            2.050  180.0  2
-torsion      13    4   10    6            2.050  180.0  2
-torsion      15    4   10    1            2.050  180.0  2
-torsion      15    4   10    5            2.050  180.0  2
-torsion      15    4   10    6            2.050  180.0  2
-torsion      15    4   10    7            2.050  180.0  2
+torsion      17    4   10    5            2.050  180.0  2
+torsion      17    4   10    6            2.050  180.0  2
+torsion       4    4   11    1            2.050  180.0  2
+torsion       4    4   11    9            2.050  180.0  2
+torsion       5    4   11    1            2.050  180.0  2
+torsion       5    4   11    5            2.050  180.0  2
+torsion       5    4   11    6            2.050  180.0  2
+torsion       5    4   11    7            2.050  180.0  2
 torsion       6    4   11    1            2.050  180.0  2
-torsion      15    4   11    1            2.050  180.0  2
-torsion      10    4   13    2            2.050  180.0  2
-torsion      13    4   13    2            2.050  180.0  2
-torsion       6    4   14    8            0.000  180.0  2
-torsion       8    4   14    8            0.000  180.0  2
-torsion       8    4   17    1            0.900  180.0  2
+torsion       6    4   11    5            2.050  180.0  2
+torsion       6    4   11    6            2.050  180.0  2
+torsion       6    4   11    7            2.050  180.0  2
+torsion       6    4   11    9            2.050  180.0  2
+torsion       7    4   11    1            2.050  180.0  2
+torsion       7    4   11    5            2.050  180.0  2
+torsion       7    4   11    6            2.050  180.0  2
+torsion       9    4   11    1            2.050  180.0  2
+torsion       9    4   11    9            2.050  180.0  2
+torsion      14    4   11    1            2.050  180.0  2
+torsion      14    4   11    6            2.050  180.0  2
+torsion      17    4   11    1            2.050  180.0  2
+torsion      17    4   11    5            2.050  180.0  2
+torsion      17    4   11    6            2.050  180.0  2
+torsion      17    4   11    7            2.050  180.0  2
+torsion       6    4   12    1            2.050  180.0  2
+torsion      17    4   12    1            2.050  180.0  2
+torsion      11    4   14    2            2.050  180.0  2
+torsion      14    4   14    2            2.050  180.0  2
+torsion       4    4   15    4
+torsion       4    4   15   24
+torsion       9    4   15    4
+torsion       9    4   15   24
+torsion       6    4   16    9
+torsion       9    4   16    9
+torsion       9    4   19    1            0.900  180.0  2
 torsion       4    5    5    6            0.400    0.0  3
 torsion       4    5    5    7            0.400    0.0  3
-torsion       4    5    5   17            0.400    0.0  3
-torsion       6    5    5   10            0.400    0.0  3
-torsion       6    5    5   12            0.400    0.0  3
-torsion       7    5    5   10            0.400    0.0  3
-torsion       7    5    5   12            0.400    0.0  3
-torsion      10    5    5   17            0.400    0.0  3
-torsion      12    5    5   17            0.400    0.0  3
+torsion       4    5    5   19            0.400    0.0  3
+torsion       6    5    5   11            0.400    0.0  3
+torsion       6    5    5   13            0.400    0.0  3
+torsion       7    5    5   11            0.400    0.0  3
+torsion       7    5    5   13            0.400    0.0  3
+torsion      11    5    5   19            0.400    0.0  3
+torsion      13    5    5   19            0.400    0.0  3
 torsion       4    5    6    4            0.800    0.0  3
 torsion       4    5    6    5            0.800    0.0  3
 torsion       4    5    6    6            0.800    0.0  3
-torsion       4    5    6   17            0.800    0.0  3
 torsion       4    5    6   19            0.800    0.0  3
-torsion       4    5    6   20            0.800    0.0  3
+torsion       4    5    6   22            0.800    0.0  3
+torsion       4    5    6   23            0.800    0.0  3
 torsion       5    5    6    7            0.800    0.0  3
 torsion       7    5    6    5            0.800    0.0  3
 torsion       7    5    6    7            0.800    0.0  3
-torsion       9    5    6    6            0.800    0.0  3
-torsion      10    5    6    4            0.800    0.0  3
-torsion      10    5    6    5            0.800    0.0  3
 torsion      10    5    6    6            0.800    0.0  3
-torsion      10    5    6   17            0.800    0.0  3
-torsion      10    5    6   19            0.800    0.0  3
-torsion      10    5    6   20            0.800    0.0  3
-torsion      12    5    6    4            0.800    0.0  3
-torsion      12    5    6    5            0.800    0.0  3
-torsion      12    5    6    6            0.800    0.0  3
-torsion      12    5    6   17            0.800    0.0  3
-torsion      12    5    6   20            0.800    0.0  3
-torsion       4    5    9    4            0.075    0.0  3
-torsion       4    5    9    6            0.075    0.0  3
-torsion       6    5    9    4            0.075    0.0  3
-torsion       6    5    9    6            0.075    0.0  3
-torsion       4    5   10    1            0.075    0.0  3
+torsion      11    5    6    4            0.800    0.0  3
+torsion      11    5    6    5            0.800    0.0  3
+torsion      11    5    6    6            0.800    0.0  3
+torsion      11    5    6   19            0.800    0.0  3
+torsion      11    5    6   22            0.800    0.0  3
+torsion      11    5    6   23            0.800    0.0  3
+torsion      13    5    6    4            0.800    0.0  3
+torsion      13    5    6    5            0.800    0.0  3
+torsion      13    5    6    6            0.800    0.0  3
+torsion      13    5    6   19            0.800    0.0  3
+torsion      13    5    6   23            0.800    0.0  3
 torsion       4    5   10    4            0.075    0.0  3
-torsion       5    5   10    1            0.075    0.0  3
-torsion       5    5   10    4            0.075    0.0  3
-torsion       6    5   10    1            0.075    0.0  3
+torsion       4    5   10    6            0.075    0.0  3
 torsion       6    5   10    4            0.075    0.0  3
-torsion       7    5   10    1            0.075    0.0  3
-torsion       7    5   10    4            0.075    0.0  3
-torsion       4    5   12    2            0.100    0.0  3
-torsion       4    5   12    6            0.100    0.0  3
-torsion       5    5   12    2            0.100    0.0  3
-torsion       6    5   12    2            0.100    0.0  3
-torsion       6    5   12    6            0.100    0.0  3
-torsion       7    5   12    2            0.100    0.0  3
-torsion       5    5   17    1            0.250    0.0  3
-torsion       7    5   17    1            0.250    0.0  3
-torsion       5    6   17    1            0.500    0.0  3
+torsion       6    5   10    6            0.075    0.0  3
+torsion       4    5   11    1            0.075    0.0  3
+torsion       4    5   11    4            0.075    0.0  3
+torsion       5    5   11    1            0.075    0.0  3
+torsion       5    5   11    4            0.075    0.0  3
+torsion       6    5   11    1            0.075    0.0  3
+torsion       6    5   11    4            0.075    0.0  3
+torsion       7    5   11    1            0.075    0.0  3
+torsion       7    5   11    4            0.075    0.0  3
+torsion       4    5   13    2            0.100    0.0  3
+torsion       4    5   13    6            0.100    0.0  3
+torsion       5    5   13    2            0.100    0.0  3
+torsion       6    5   13    2            0.100    0.0  3
+torsion       6    5   13    6            0.100    0.0  3
+torsion       7    5   13    2            0.100    0.0  3
+torsion       5    5   19    1            0.250    0.0  3
+torsion       7    5   19    1            0.250    0.0  3
+torsion       5    6   19    1            0.500    0.0  3
+torsion       4    6    6    4            1.600    0.0  3
 torsion       4    6    6    5            1.600    0.0  3
 torsion       5    6    6    6            1.600    0.0  3
-torsion       5    6    6   19            1.600    0.0  3
+torsion       5    6    6   22            1.600    0.0  3
 torsion       6    6    6    6            1.600    0.0  3
-torsion       6    6    6    9            1.600    0.0  3
 torsion       6    6    6   10            1.600    0.0  3
-torsion       6    6    6   12            1.600    0.0  3
-torsion       6    6    9    4            0.150    0.0  3
-torsion       6    6    9    5            0.150    0.0  3
-torsion       4    6   10    1            0.150    0.0  3
-torsion       4    6   10    4            0.150    0.0  3
-torsion       6    6   10    1            0.150    0.0  3
+torsion       6    6    6   11            1.600    0.0  3
+torsion       6    6    6   13            1.600    0.0  3
 torsion       6    6   10    4            0.150    0.0  3
-torsion       4    6   12    2            0.200    0.0  3
-torsion       6    6   12    2            0.200    0.0  3
-torsion       6    6   12    5            0.200    0.0  3
-torsion       5    6   19   19            1.200    0.0  2
-torsion       6    6   19    7            1.200    0.0  2
-torsion       6   19   19    6            4.000    0.0  2
+torsion       6    6   10    5            0.150    0.0  3
+torsion       4    6   11    1            0.150    0.0  3
+torsion       4    6   11    4            0.150    0.0  3
+torsion       6    6   11    1            0.150    0.0  3
+torsion       6    6   11    4            0.150    0.0  3
+torsion       4    6   13    2            0.200    0.0  3
+torsion       6    6   13    2            0.200    0.0  3
+torsion       6    6   13    5            0.200    0.0  3
+torsion       5    6   22   22            1.200    0.0  2
+torsion       6    6   22    7            1.200    0.0  2
+torsion       4   15   24   15
+torsion       6   22   22    6            4.000    0.0  2
 
 
    #############################################################
    ##                                                         ##
    ##  The following torsional parameters involving aromatic  ##
    ##  carbons are all set to zero in the authentic CHARMM19  ##
-   ##  parameter set, but are set to large 2-fold barriers    ##
+   ##  parameter set, but set to large 2-fold barriers here   ##
    ##  to replace improper dihedrals that do not involve      ##
    ##  the three atoms bonded to a trigonal center and thus   ##
    ##  cannot be handled by the TINKER improper formulation   ##
@@ -612,21 +660,21 @@ torsion       6   19   19    6            4.000    0.0  2
    #############################################################
 
 
-torsion       4    8    8    4           10.000  180.0  2
-torsion       4    8    8    8           10.000  180.0  2
-torsion       8    8    8    8           10.000  180.0  2
-torsion       4    8   10    1            4.100  180.0  2
-torsion       4    8   10    4            4.100  180.0  2
-torsion       4    8   10    8            4.100  180.0  2
-torsion      10    8   10    1            4.100  180.0  2
-torsion      10    8   10    4            4.100  180.0  2
-torsion      10    8   10    8            4.100  180.0  2
-torsion      14    8   10    1            4.100  180.0  2
-torsion      14    8   10    4            4.100  180.0  2
-torsion      14    8   10    8            4.100  180.0  2
-torsion       4    8   14    8            8.200  180.0  2
-torsion      10    8   14    4            8.200  180.0  2
-torsion      10    8   14    8            8.200  180.0  2
+torsion       4    9    9    4           10.000  180.0  2
+torsion       4    9    9    9           10.000  180.0  2
+torsion       9    9    9    9           10.000  180.0  2
+torsion       4    9   11    1            4.100  180.0  2
+torsion       4    9   11    4            4.100  180.0  2
+torsion       4    9   11    9            4.100  180.0  2
+torsion      11    9   11    1            4.100  180.0  2
+torsion      11    9   11    4            4.100  180.0  2
+torsion      11    9   11    9            4.100  180.0  2
+torsion      16    9   11    1            4.100  180.0  2
+torsion      16    9   11    4            4.100  180.0  2
+torsion      16    9   11    9            4.100  180.0  2
+torsion       4    9   16    9            8.200  180.0  2
+torsion      11    9   16    4            8.200  180.0  2
+torsion      11    9   16    9            8.200  180.0  2
 
 
       ########################################
@@ -652,43 +700,59 @@ charge       13              -0.0400
 charge       14               0.1000
 charge       15               0.1500
 charge       16               0.5000
-charge       17               0.0000
-charge       18               0.1000
-charge       19               0.2500
+charge       17               0.0250
+charge       18              -0.0075
+charge       19               0.3000
 charge       20               0.0000
-charge       21               0.0600
-charge       22               0.1000
-charge       23               0.1900
-charge       24               0.2500
-charge       25              -0.1600
-charge       26               0.0000
-charge       27               0.0600
-charge       28               0.1000
-charge       29               0.0000
-charge       30              -0.0300
-charge       31               0.0600
-charge       32               0.1000
-charge       33               0.3000
-charge       34               0.2000
-charge       35               0.4500
-charge       36              -0.2000
-charge       37              -0.3500
-charge       38              -0.3000
-charge       39              -0.3600
-charge       40              -0.4000
-charge       41              -0.6000
-charge       42              -0.3000
-charge       43              -0.2000
-charge       44              -0.4500
-charge       45              -0.4000
-charge       46              -0.5500
-charge       47              -0.6000
-charge       48              -0.5700
-charge       49              -0.6500
-charge       50              -0.8340
-charge       51              -0.1200
-charge       52              -0.1900
-charge       53              -0.1900
+charge       21               0.1000
+charge       22               0.2500
+charge       23               0.0000
+charge       24               0.0600
+charge       25               0.1000
+charge       26               0.1900
+charge       27               0.2500
+charge       28              -0.1600
+charge       29              -0.1000
+charge       30               0.0400
+charge       31              -0.1000
+charge       32               0.0000
+charge       33               0.0600
+charge       34               0.1000
+charge       35              -0.0400
+charge       36               0.0210
+charge       37               0.0000
+charge       38              -0.0300
+charge       39               0.0600
+charge       40               0.1000
+charge       41               0.3000
+charge       42               0.2000
+charge       43               0.4500
+charge       44               0.0400
+charge       45               0.0300
+charge       46              -0.2000
+charge       47              -0.3500
+charge       48              -0.3000
+charge       49              -0.3600
+charge       50              -0.4000
+charge       51              -0.6000
+charge       52              -0.3000
+charge       53              -0.2000
+charge       54              -0.4500
+charge       55              -0.1800
+charge       56              -0.4000
+charge       57              -0.5500
+charge       58              -0.6000
+charge       59              -0.5700
+charge       60              -0.5000
+charge       61              -0.6500
+charge       62              -0.0210
+charge       63               0.0000
+charge       64              -0.8340
+charge       65              -0.1200
+charge       66              -0.1900
+charge       67              -0.1900
+charge       68               0.2400
+charge       69               0.0000
 
 
       ########################################
@@ -698,101 +762,101 @@ charge       53              -0.1900
       ########################################
 
 
-biotype       1    N       "Glycine"                          37
-biotype       2    CA      "Glycine"                          22
+biotype       1    N       "Glycine"                          47
+biotype       2    CA      "Glycine"                          25
 biotype       3    C       "Glycine"                           7
 biotype       4    HN      "Glycine"                           1
-biotype       5    O       "Glycine"                          46
+biotype       5    O       "Glycine"                          57
 biotype       6    HA      "Glycine"                           0
-biotype       7    N       "Alanine"                          37
-biotype       8    CA      "Alanine"                          18
+biotype       7    N       "Alanine"                          47
+biotype       8    CA      "Alanine"                          21
 biotype       9    C       "Alanine"                           7
 biotype      10    HN      "Alanine"                           1
-biotype      11    O       "Alanine"                          46
+biotype      11    O       "Alanine"                          57
 biotype      12    HA      "Alanine"                           0
-biotype      13    CB      "Alanine"                          26
+biotype      13    CB      "Alanine"                          32
 biotype      14    HB      "Alanine"                           0
-biotype      15    N       "Valine"                           37
-biotype      16    CA      "Valine"                           18
+biotype      15    N       "Valine"                           47
+biotype      16    CA      "Valine"                           21
 biotype      17    C       "Valine"                            7
 biotype      18    HN      "Valine"                            1
-biotype      19    O       "Valine"                           46
+biotype      19    O       "Valine"                           57
 biotype      20    HA      "Valine"                            0
-biotype      21    CB      "Valine"                           17
+biotype      21    CB      "Valine"                           20
 biotype      22    HB      "Valine"                            0
-biotype      23    CG1     "Valine"                           26
+biotype      23    CG1     "Valine"                           32
 biotype      24    HG1     "Valine"                            0
-biotype      25    CG2     "Valine"                           26
+biotype      25    CG2     "Valine"                           32
 biotype      26    HG2     "Valine"                            0
-biotype      27    N       "Leucine"                          37
-biotype      28    CA      "Leucine"                          18
+biotype      27    N       "Leucine"                          47
+biotype      28    CA      "Leucine"                          21
 biotype      29    C       "Leucine"                           7
 biotype      30    HN      "Leucine"                           1
-biotype      31    O       "Leucine"                          46
+biotype      31    O       "Leucine"                          57
 biotype      32    HA      "Leucine"                           0
-biotype      33    CB      "Leucine"                          20
+biotype      33    CB      "Leucine"                          23
 biotype      34    HB      "Leucine"                           0
-biotype      35    CG      "Leucine"                          17
+biotype      35    CG      "Leucine"                          20
 biotype      36    HG      "Leucine"                           0
-biotype      37    CD1     "Leucine"                          26
+biotype      37    CD1     "Leucine"                          32
 biotype      38    HD1     "Leucine"                           0
-biotype      39    CD2     "Leucine"                          26
+biotype      39    CD2     "Leucine"                          32
 biotype      40    HD2     "Leucine"                           0
-biotype      41    N       "Isoleucine"                       37
-biotype      42    CA      "Isoleucine"                       18
+biotype      41    N       "Isoleucine"                       47
+biotype      42    CA      "Isoleucine"                       21
 biotype      43    C       "Isoleucine"                        7
 biotype      44    HN      "Isoleucine"                        1
-biotype      45    O       "Isoleucine"                       46
+biotype      45    O       "Isoleucine"                       57
 biotype      46    HA      "Isoleucine"                        0
-biotype      47    CB      "Isoleucine"                       17
+biotype      47    CB      "Isoleucine"                       20
 biotype      48    HB      "Isoleucine"                        0
-biotype      49    CG1     "Isoleucine"                       20
+biotype      49    CG1     "Isoleucine"                       23
 biotype      50    HG1     "Isoleucine"                        0
-biotype      51    CG2     "Isoleucine"                       26
+biotype      51    CG2     "Isoleucine"                       32
 biotype      52    HG2     "Isoleucine"                        0
-biotype      53    CD      "Isoleucine"                       26
+biotype      53    CD      "Isoleucine"                       32
 biotype      54    HD      "Isoleucine"                        0
-biotype      55    N       "Serine"                           37
-biotype      56    CA      "Serine"                           18
+biotype      55    N       "Serine"                           47
+biotype      56    CA      "Serine"                           21
 biotype      57    C       "Serine"                            7
 biotype      58    HN      "Serine"                            1
-biotype      59    O       "Serine"                           46
+biotype      59    O       "Serine"                           57
 biotype      60    HA      "Serine"                            0
-biotype      61    CB      "Serine"                           24
+biotype      61    CB      "Serine"                           27
 biotype      62    HB      "Serine"                            0
-biotype      63    OG      "Serine"                           49
+biotype      63    OG      "Serine"                           61
 biotype      64    HG      "Serine"                            4
-biotype      65    N       "Threonine"                        37
-biotype      66    CA      "Threonine"                        18
+biotype      65    N       "Threonine"                        47
+biotype      66    CA      "Threonine"                        21
 biotype      67    C       "Threonine"                         7
 biotype      68    HN      "Threonine"                         1
-biotype      69    O       "Threonine"                        46
+biotype      69    O       "Threonine"                        57
 biotype      70    HA      "Threonine"                         0
-biotype      71    CB      "Threonine"                        19
+biotype      71    CB      "Threonine"                        22
 biotype      72    HB      "Threonine"                         0
-biotype      73    OG1     "Threonine"                        49
+biotype      73    OG1     "Threonine"                        61
 biotype      74    HG1     "Threonine"                         4
-biotype      75    CG2     "Threonine"                        26
+biotype      75    CG2     "Threonine"                        32
 biotype      76    HG2     "Threonine"                         0
-biotype      77    N       "Cysteine (SH)"                    37
-biotype      78    CA      "Cysteine (SH)"                    18
+biotype      77    N       "Cysteine (SH)"                    47
+biotype      78    CA      "Cysteine (SH)"                    21
 biotype      79    C       "Cysteine (SH)"                     7
 biotype      80    HN      "Cysteine (SH)"                     1
-biotype      81    O       "Cysteine (SH)"                    46
+biotype      81    O       "Cysteine (SH)"                    57
 biotype      82    HA      "Cysteine (SH)"                     0
-biotype      83    CB      "Cysteine (SH)"                    23
+biotype      83    CB      "Cysteine (SH)"                    26
 biotype      84    HB      "Cysteine (SH)"                     0
-biotype      85    SG      "Cysteine (SH)"                    53
+biotype      85    SG      "Cysteine (SH)"                    67
 biotype      86    HG      "Cysteine (SH)"                     0
-biotype      87    N       "Cystine (SS)"                     37
-biotype      88    CA      "Cystine (SS)"                     18
+biotype      87    N       "Cystine (SS)"                     47
+biotype      88    CA      "Cystine (SS)"                     21
 biotype      89    C       "Cystine (SS)"                      7
 biotype      90    HN      "Cystine (SS)"                      1
-biotype      91    O       "Cystine (SS)"                     46
+biotype      91    O       "Cystine (SS)"                     57
 biotype      92    HA      "Cystine (SS)"                      0
-biotype      93    CB      "Cystine (SS)"                     23
+biotype      93    CB      "Cystine (SS)"                     26
 biotype      94    HB      "Cystine (SS)"                      0
-biotype      95    SG      "Cystine (SS)"                     52
+biotype      95    SG      "Cystine (SS)"                     66
 biotype      96    N       "Cysteine (S-)"                    -1
 biotype      97    CA      "Cysteine (S-)"                    -1
 biotype      98    C       "Cysteine (S-)"                    -1
@@ -802,47 +866,47 @@ biotype     101    HA      "Cysteine (S-)"                     0
 biotype     102    CB      "Cysteine (S-)"                    -1
 biotype     103    HB      "Cysteine (S-)"                     0
 biotype     104    SG      "Cysteine (S-)"                    -1
-biotype     105    N       "Proline"                          36
-biotype     106    CA      "Proline"                          18
+biotype     105    N       "Proline"                          46
+biotype     106    CA      "Proline"                          21
 biotype     107    C       "Proline"                           7
-biotype     108    O       "Proline"                          46
+biotype     108    O       "Proline"                          57
 biotype     109    HA      "Proline"                           0
-biotype     110    CB      "Proline"                          20
+biotype     110    CB      "Proline"                          23
 biotype     111    HB      "Proline"                           0
-biotype     112    CG      "Proline"                          20
+biotype     112    CG      "Proline"                          23
 biotype     113    HG      "Proline"                           0
-biotype     114    CD      "Proline"                          22
+biotype     114    CD      "Proline"                          25
 biotype     115    HD      "Proline"                           0
-biotype     116    N       "Phenylalanine"                    37
-biotype     117    CA      "Phenylalanine"                    18
+biotype     116    N       "Phenylalanine"                    47
+biotype     117    CA      "Phenylalanine"                    21
 biotype     118    C       "Phenylalanine"                     7
 biotype     119    HN      "Phenylalanine"                     1
-biotype     120    O       "Phenylalanine"                    46
+biotype     120    O       "Phenylalanine"                    57
 biotype     121    HA      "Phenylalanine"                     0
-biotype     122    CB      "Phenylalanine"                    20
+biotype     122    CB      "Phenylalanine"                    23
 biotype     123    HB      "Phenylalanine"                     0
 biotype     124    CG      "Phenylalanine"                    10
-biotype     125    CD      "Phenylalanine"                    29
+biotype     125    CD      "Phenylalanine"                    37
 biotype     126    HD      "Phenylalanine"                     0
-biotype     127    CE      "Phenylalanine"                    29
+biotype     127    CE      "Phenylalanine"                    37
 biotype     128    HE      "Phenylalanine"                     0
-biotype     129    CZ      "Phenylalanine"                    29
+biotype     129    CZ      "Phenylalanine"                    37
 biotype     130    HZ      "Phenylalanine"                     0
-biotype     131    N       "Tyrosine"                         37
-biotype     132    CA      "Tyrosine"                         18
+biotype     131    N       "Tyrosine"                         47
+biotype     132    CA      "Tyrosine"                         21
 biotype     133    C       "Tyrosine"                          7
 biotype     134    HN      "Tyrosine"                          1
-biotype     135    O       "Tyrosine"                         46
+biotype     135    O       "Tyrosine"                         57
 biotype     136    HA      "Tyrosine"                          0
-biotype     137    CB      "Tyrosine"                         20
+biotype     137    CB      "Tyrosine"                         23
 biotype     138    HB      "Tyrosine"                          0
 biotype     139    CG      "Tyrosine"                         10
-biotype     140    CD      "Tyrosine"                         29
+biotype     140    CD      "Tyrosine"                         37
 biotype     141    HD      "Tyrosine"                          0
-biotype     142    CE      "Tyrosine"                         29
+biotype     142    CE      "Tyrosine"                         37
 biotype     143    HE      "Tyrosine"                          0
 biotype     144    CZ      "Tyrosine"                         11
-biotype     145    OH      "Tyrosine"                         49
+biotype     145    OH      "Tyrosine"                         61
 biotype     146    HH      "Tyrosine"                          4
 biotype     147    N       "Tyrosine (O-)"                    -1
 biotype     148    CA      "Tyrosine (O-)"                    -1
@@ -859,88 +923,88 @@ biotype     158    CE      "Tyrosine (O-)"                    -1
 biotype     159    HE      "Tyrosine (O-)"                     0
 biotype     160    CZ      "Tyrosine (O-)"                    -1
 biotype     161    OH      "Tyrosine (O-)"                    -1
-biotype     162    N       "Tryptophan"                       37
-biotype     163    CA      "Tryptophan"                       18
+biotype     162    N       "Tryptophan"                       47
+biotype     163    CA      "Tryptophan"                       21
 biotype     164    C       "Tryptophan"                        7
 biotype     165    HN      "Tryptophan"                        1
-biotype     166    O       "Tryptophan"                       46
+biotype     166    O       "Tryptophan"                       57
 biotype     167    HA      "Tryptophan"                        0
-biotype     168    CB      "Tryptophan"                       20
+biotype     168    CB      "Tryptophan"                       23
 biotype     169    HB      "Tryptophan"                        0
 biotype     170    CG      "Tryptophan"                       12
-biotype     171    CD1     "Tryptophan"                       31
+biotype     171    CD1     "Tryptophan"                       39
 biotype     172    HD1     "Tryptophan"                        0
 biotype     173    CD2     "Tryptophan"                       14
-biotype     174    NE1     "Tryptophan"                       39
+biotype     174    NE1     "Tryptophan"                       49
 biotype     175    HE1     "Tryptophan"                        2
 biotype     176    CE2     "Tryptophan"                       13
-biotype     177    CE3     "Tryptophan"                       30
+biotype     177    CE3     "Tryptophan"                       38
 biotype     178    HE3     "Tryptophan"                        0
-biotype     179    CZ2     "Tryptophan"                       29
+biotype     179    CZ2     "Tryptophan"                       37
 biotype     180    HZ2     "Tryptophan"                        0
-biotype     181    CZ3     "Tryptophan"                       29
+biotype     181    CZ3     "Tryptophan"                       37
 biotype     182    HZ3     "Tryptophan"                        0
-biotype     183    CH2     "Tryptophan"                       29
+biotype     183    CH2     "Tryptophan"                       37
 biotype     184    HH2     "Tryptophan"                        0
-biotype     185    N       "Histidine (+)"                    37
-biotype     186    CA      "Histidine (+)"                    18
+biotype     185    N       "Histidine (+)"                    47
+biotype     186    CA      "Histidine (+)"                    21
 biotype     187    C       "Histidine (+)"                     7
 biotype     188    HN      "Histidine (+)"                     1
-biotype     189    O       "Histidine (+)"                    46
+biotype     189    O       "Histidine (+)"                    57
 biotype     190    HA      "Histidine (+)"                     0
-biotype     191    CB      "Histidine (+)"                    22
+biotype     191    CB      "Histidine (+)"                    25
 biotype     192    HB      "Histidine (+)"                     0
 biotype     193    CG      "Histidine (+)"                    15
-biotype     194    ND1     "Histidine (+)"                    38
+biotype     194    ND1     "Histidine (+)"                    48
 biotype     195    HD1     "Histidine (+)"                     3
-biotype     196    CD2     "Histidine (+)"                    34
+biotype     196    CD2     "Histidine (+)"                    42
 biotype     197    HD2     "Histidine (+)"                     0
-biotype     198    CE1     "Histidine (+)"                    35
+biotype     198    CE1     "Histidine (+)"                    43
 biotype     199    HE1     "Histidine (+)"                     0
-biotype     200    NE2     "Histidine (+)"                    38
+biotype     200    NE2     "Histidine (+)"                    48
 biotype     201    HE2     "Histidine (+)"                     3
-biotype     202    N       "Histidine (HD)"                   37
-biotype     203    CA      "Histidine (HD)"                   18
+biotype     202    N       "Histidine (HD)"                   47
+biotype     203    CA      "Histidine (HD)"                   21
 biotype     204    C       "Histidine (HD)"                    7
 biotype     205    HN      "Histidine (HD)"                    1
-biotype     206    O       "Histidine (HD)"                   46
+biotype     206    O       "Histidine (HD)"                   57
 biotype     207    HA      "Histidine (HD)"                    0
-biotype     208    CB      "Histidine (HD)"                   20
+biotype     208    CB      "Histidine (HD)"                   23
 biotype     209    HB      "Histidine (HD)"                    0
 biotype     210    CG      "Histidine (HD)"                   14
-biotype     211    ND1     "Histidine (HD)"                   40
+biotype     211    ND1     "Histidine (HD)"                   50
 biotype     212    HD1     "Histidine (HD)"                    2
-biotype     213    CD2     "Histidine (HD)"                   32
+biotype     213    CD2     "Histidine (HD)"                   40
 biotype     214    HD2     "Histidine (HD)"                    0
-biotype     215    CE1     "Histidine (HD)"                   33
+biotype     215    CE1     "Histidine (HD)"                   41
 biotype     216    HE1     "Histidine (HD)"                    0
-biotype     217    NE2     "Histidine (HD)"                   45
-biotype     218    N       "Histidine (HE)"                   37
-biotype     219    CA      "Histidine (HE)"                   18
+biotype     217    NE2     "Histidine (HD)"                   56
+biotype     218    N       "Histidine (HE)"                   47
+biotype     219    CA      "Histidine (HE)"                   21
 biotype     220    C       "Histidine (HE)"                    7
 biotype     221    HN      "Histidine (HE)"                    1
-biotype     222    O       "Histidine (HE)"                   46
+biotype     222    O       "Histidine (HE)"                   57
 biotype     223    HA      "Histidine (HE)"                    0
-biotype     224    CB      "Histidine (HE)"                   20
+biotype     224    CB      "Histidine (HE)"                   23
 biotype     225    HB      "Histidine (HE)"                    0
 biotype     226    CG      "Histidine (HE)"                   14
-biotype     227    ND1     "Histidine (HE)"                   45
-biotype     228    CD2     "Histidine (HE)"                   32
+biotype     227    ND1     "Histidine (HE)"                   56
+biotype     228    CD2     "Histidine (HE)"                   40
 biotype     229    HD2     "Histidine (HE)"                    0
-biotype     230    CE1     "Histidine (HE)"                   33
+biotype     230    CE1     "Histidine (HE)"                   41
 biotype     231    HE1     "Histidine (HE)"                    0
-biotype     232    NE2     "Histidine (HE)"                   40
+biotype     232    NE2     "Histidine (HE)"                   50
 biotype     233    HE2     "Histidine (HE)"                    2
-biotype     234    N       "Aspartic Acid"                    37
-biotype     235    CA      "Aspartic Acid"                    18
+biotype     234    N       "Aspartic Acid"                    47
+biotype     235    CA      "Aspartic Acid"                    21
 biotype     236    C       "Aspartic Acid"                     7
 biotype     237    HN      "Aspartic Acid"                     1
-biotype     238    O       "Aspartic Acid"                    46
+biotype     238    O       "Aspartic Acid"                    57
 biotype     239    HA      "Aspartic Acid"                     0
-biotype     240    CB      "Aspartic Acid"                    25
+biotype     240    CB      "Aspartic Acid"                    28
 biotype     241    HB      "Aspartic Acid"                     0
 biotype     242    CG      "Aspartic Acid"                     8
-biotype     243    OD      "Aspartic Acid"                    47
+biotype     243    OD      "Aspartic Acid"                    58
 biotype     244    N       "Aspartic Acid (COOH)"             -1
 biotype     245    CA      "Aspartic Acid (COOH)"             -1
 biotype     246    C       "Aspartic Acid (COOH)"             -1
@@ -953,30 +1017,30 @@ biotype     252    CG      "Aspartic Acid (COOH)"             -1
 biotype     253    OD1     "Aspartic Acid (COOH)"             -1
 biotype     254    OD2     "Aspartic Acid (COOH)"             -1
 biotype     255    HD2     "Aspartic Acid (COOH)"             -1
-biotype     256    N       "Asparagine"                       37
-biotype     257    CA      "Asparagine"                       18
+biotype     256    N       "Asparagine"                       47
+biotype     257    CA      "Asparagine"                       21
 biotype     258    C       "Asparagine"                        7
 biotype     259    HN      "Asparagine"                        1
-biotype     260    O       "Asparagine"                       46
+biotype     260    O       "Asparagine"                       57
 biotype     261    HA      "Asparagine"                        0
-biotype     262    CB      "Asparagine"                       20
+biotype     262    CB      "Asparagine"                       23
 biotype     263    HB      "Asparagine"                        0
 biotype     264    CG      "Asparagine"                        7
-biotype     265    OD1     "Asparagine"                       46
-biotype     266    ND2     "Asparagine"                       41
+biotype     265    OD1     "Asparagine"                       57
+biotype     266    ND2     "Asparagine"                       51
 biotype     267    HD2     "Asparagine"                        2
-biotype     268    N       "Glutamic Acid"                    37
-biotype     269    CA      "Glutamic Acid"                    18
+biotype     268    N       "Glutamic Acid"                    47
+biotype     269    CA      "Glutamic Acid"                    21
 biotype     270    C       "Glutamic Acid"                     7
 biotype     271    HN      "Glutamic Acid"                     1
-biotype     272    O       "Glutamic Acid"                    46
+biotype     272    O       "Glutamic Acid"                    57
 biotype     273    HA      "Glutamic Acid"                     0
-biotype     274    CB      "Glutamic Acid"                    20
+biotype     274    CB      "Glutamic Acid"                    23
 biotype     275    HB      "Glutamic Acid"                     0
-biotype     276    CG      "Glutamic Acid"                    25
+biotype     276    CG      "Glutamic Acid"                    28
 biotype     277    HG      "Glutamic Acid"                     0
 biotype     278    CD      "Glutamic Acid"                     8
-biotype     279    OE      "Glutamic Acid"                    47
+biotype     279    OE      "Glutamic Acid"                    58
 biotype     280    N       "Glutamic Acid (COOH)"             -1
 biotype     281    CA      "Glutamic Acid (COOH)"             -1
 biotype     282    C       "Glutamic Acid (COOH)"             -1
@@ -991,48 +1055,48 @@ biotype     290    CD      "Glutamic Acid (COOH)"             -1
 biotype     291    OE1     "Glutamic Acid (COOH)"             -1
 biotype     292    OE2     "Glutamic Acid (COOH)"             -1
 biotype     293    HE2     "Glutamic Acid (COOH)"             -1
-biotype     294    N       "Glutamine"                        37
-biotype     295    CA      "Glutamine"                        18
+biotype     294    N       "Glutamine"                        47
+biotype     295    CA      "Glutamine"                        21
 biotype     296    C       "Glutamine"                         7
 biotype     297    HN      "Glutamine"                         1
-biotype     298    O       "Glutamine"                        46
+biotype     298    O       "Glutamine"                        57
 biotype     299    HA      "Glutamine"                         0
-biotype     300    CB      "Glutamine"                        20
+biotype     300    CB      "Glutamine"                        23
 biotype     301    HB      "Glutamine"                         0
-biotype     302    CG      "Glutamine"                        20
+biotype     302    CG      "Glutamine"                        23
 biotype     303    HG      "Glutamine"                         0
 biotype     304    CD      "Glutamine"                         7
-biotype     305    OE1     "Glutamine"                        46
-biotype     306    NE2     "Glutamine"                        41
+biotype     305    OE1     "Glutamine"                        57
+biotype     306    NE2     "Glutamine"                        51
 biotype     307    HE2     "Glutamine"                         2
-biotype     308    N       "Methionine"                       37
-biotype     309    CA      "Methionine"                       18
+biotype     308    N       "Methionine"                       47
+biotype     309    CA      "Methionine"                       21
 biotype     310    C       "Methionine"                        7
 biotype     311    HN      "Methionine"                        1
-biotype     312    O       "Methionine"                       46
+biotype     312    O       "Methionine"                       57
 biotype     313    HA      "Methionine"                        0
-biotype     314    CB      "Methionine"                       20
+biotype     314    CB      "Methionine"                       23
 biotype     315    HB      "Methionine"                        0
-biotype     316    CG      "Methionine"                       21
+biotype     316    CG      "Methionine"                       24
 biotype     317    HG      "Methionine"                        0
-biotype     318    SD      "Methionine"                       51
-biotype     319    CE      "Methionine"                       27
+biotype     318    SD      "Methionine"                       65
+biotype     319    CE      "Methionine"                       33
 biotype     320    HE      "Methionine"                        0
-biotype     321    N       "Lysine"                           37
-biotype     322    CA      "Lysine"                           18
+biotype     321    N       "Lysine"                           47
+biotype     322    CA      "Lysine"                           21
 biotype     323    C       "Lysine"                            7
 biotype     324    HN      "Lysine"                            1
-biotype     325    O       "Lysine"                           46
+biotype     325    O       "Lysine"                           57
 biotype     326    HA      "Lysine"                            0
-biotype     327    CB      "Lysine"                           20
+biotype     327    CB      "Lysine"                           23
 biotype     328    HB      "Lysine"                            0
-biotype     329    CG      "Lysine"                           20
+biotype     329    CG      "Lysine"                           23
 biotype     330    HG      "Lysine"                            0
-biotype     331    CD      "Lysine"                           20
+biotype     331    CD      "Lysine"                           23
 biotype     332    HD      "Lysine"                            0
-biotype     333    CE      "Lysine"                           24
+biotype     333    CE      "Lysine"                           27
 biotype     334    HE      "Lysine"                            0
-biotype     335    NZ      "Lysine"                           42
+biotype     335    NZ      "Lysine"                           52
 biotype     336    HZ      "Lysine"                            5
 biotype     337    N       "Lysine (NH2)"                     -1
 biotype     338    CA      "Lysine (NH2)"                     -1
@@ -1050,36 +1114,36 @@ biotype     349    CE      "Lysine (NH2)"                     -1
 biotype     350    HE      "Lysine (NH2)"                      0
 biotype     351    NZ      "Lysine (NH2)"                     -1
 biotype     352    HZ      "Lysine (NH2)"                     -1
-biotype     353    N       "Arginine"                         37
-biotype     354    CA      "Arginine"                         18
+biotype     353    N       "Arginine"                         47
+biotype     354    CA      "Arginine"                         21
 biotype     355    C       "Arginine"                          7
 biotype     356    HN      "Arginine"                          1
-biotype     357    O       "Arginine"                         46
+biotype     357    O       "Arginine"                         57
 biotype     358    HA      "Arginine"                          0
-biotype     359    CB      "Arginine"                         20
+biotype     359    CB      "Arginine"                         23
 biotype     360    HB      "Arginine"                          0
-biotype     361    CG      "Arginine"                         20
+biotype     361    CG      "Arginine"                         23
 biotype     362    HG      "Arginine"                          0
-biotype     363    CD      "Arginine"                         22
+biotype     363    CD      "Arginine"                         25
 biotype     364    HD      "Arginine"                          0
-biotype     365    NE      "Arginine"                         40
+biotype     365    NE      "Arginine"                         50
 biotype     366    HE      "Arginine"                          2
 biotype     367    CZ      "Arginine"                         16
-biotype     368    NH      "Arginine"                         44
+biotype     368    NH      "Arginine"                         54
 biotype     369    HH      "Arginine"                          5
-biotype     370    N       "Ornithine"                        37
-biotype     371    CA      "Ornithine"                        18
+biotype     370    N       "Ornithine"                        47
+biotype     371    CA      "Ornithine"                        21
 biotype     372    C       "Ornithine"                         7
 biotype     373    HN      "Ornithine"                         1
-biotype     374    O       "Ornithine"                        46
+biotype     374    O       "Ornithine"                        57
 biotype     375    HA      "Ornithine"                         0
-biotype     376    CB      "Ornithine"                        20
+biotype     376    CB      "Ornithine"                        23
 biotype     377    HB      "Ornithine"                         0
-biotype     378    CG      "Ornithine"                        20
+biotype     378    CG      "Ornithine"                        23
 biotype     379    HG      "Ornithine"                         0
-biotype     380    CD      "Ornithine"                        24
+biotype     380    CD      "Ornithine"                        27
 biotype     381    HD      "Ornithine"                         0
-biotype     382    NE      "Ornithine"                        42
+biotype     382    NE      "Ornithine"                        52
 biotype     383    HE      "Ornithine"                         5
 biotype     384    N       "MethylAlanine (AIB)"              -1
 biotype     385    CA      "MethylAlanine (AIB)"              -1
@@ -1102,70 +1166,70 @@ biotype     401    CD      "Pyroglutamic Acid"                -1
 biotype     402    OE      "Pyroglutamic Acid"                -1
 biotype     403    C       "Formyl N-Terminus"                 7
 biotype     404    H       "Formyl N-Terminus"                 0
-biotype     405    O       "Formyl N-Terminus"                46
-biotype     406    CH3     "Acetyl N-Terminus"                26
+biotype     405    O       "Formyl N-Terminus"                57
+biotype     406    CH3     "Acetyl N-Terminus"                32
 biotype     407    H       "Acetyl N-Terminus"                 0
 biotype     408    C       "Acetyl N-Terminus"                 7
-biotype     409    O       "Acetyl N-Terminus"                46
-biotype     410    N       "Amide C-Terminus"                 41
+biotype     409    O       "Acetyl N-Terminus"                57
+biotype     410    N       "Amide C-Terminus"                 51
 biotype     411    HN      "Amide C-Terminus"                  2
-biotype     412    N       "N-MeAmide C-Terminus"             37
+biotype     412    N       "N-MeAmide C-Terminus"             47
 biotype     413    HN      "N-MeAmide C-Terminus"              1
-biotype     414    CH3     "N-MeAmide C-Terminus"             28
+biotype     414    CH3     "N-MeAmide C-Terminus"             34
 biotype     415    H       "N-MeAmide C-Terminus"              0
-biotype     416    N       "N-Terminal GLY"                   42
-biotype     417    CA      "N-Terminal GLY"                   24
+biotype     416    N       "N-Terminal GLY"                   52
+biotype     417    CA      "N-Terminal GLY"                   27
 biotype     418    C       "N-Terminal GLY"                    7
 biotype     419    HN      "N-Terminal GLY"                    5
-biotype     420    O       "N-Terminal GLY"                   46
+biotype     420    O       "N-Terminal GLY"                   57
 biotype     421    HA      "N-Terminal GLY"                    0
-biotype     422    N       "N-Terminal ALA"                   42
-biotype     423    CA      "N-Terminal ALA"                   19
+biotype     422    N       "N-Terminal ALA"                   52
+biotype     423    CA      "N-Terminal ALA"                   22
 biotype     424    C       "N-Terminal ALA"                    7
 biotype     425    HN      "N-Terminal ALA"                    5
-biotype     426    O       "N-Terminal ALA"                   46
+biotype     426    O       "N-Terminal ALA"                   57
 biotype     427    HA      "N-Terminal ALA"                    0
-biotype     428    N       "N-Terminal VAL"                   42
-biotype     429    CA      "N-Terminal VAL"                   19
+biotype     428    N       "N-Terminal VAL"                   52
+biotype     429    CA      "N-Terminal VAL"                   22
 biotype     430    C       "N-Terminal VAL"                    7
 biotype     431    HN      "N-Terminal VAL"                    5
-biotype     432    O       "N-Terminal VAL"                   46
+biotype     432    O       "N-Terminal VAL"                   57
 biotype     433    HA      "N-Terminal VAL"                    0
-biotype     434    N       "N-Terminal LEU"                   42
-biotype     435    CA      "N-Terminal LEU"                   19
+biotype     434    N       "N-Terminal LEU"                   52
+biotype     435    CA      "N-Terminal LEU"                   22
 biotype     436    C       "N-Terminal LEU"                    7
 biotype     437    HN      "N-Terminal LEU"                    5
-biotype     438    O       "N-Terminal LEU"                   46
+biotype     438    O       "N-Terminal LEU"                   57
 biotype     439    HA      "N-Terminal LEU"                    0
-biotype     440    N       "N-Terminal ILE"                   42
-biotype     441    CA      "N-Terminal ILE"                   19
+biotype     440    N       "N-Terminal ILE"                   52
+biotype     441    CA      "N-Terminal ILE"                   22
 biotype     442    C       "N-Terminal ILE"                    7
 biotype     443    HN      "N-Terminal ILE"                    5
-biotype     444    O       "N-Terminal ILE"                   46
+biotype     444    O       "N-Terminal ILE"                   57
 biotype     445    HA      "N-Terminal ILE"                    0
-biotype     446    N       "N-Terminal SER"                   42
-biotype     447    CA      "N-Terminal SER"                   19
+biotype     446    N       "N-Terminal SER"                   52
+biotype     447    CA      "N-Terminal SER"                   22
 biotype     448    C       "N-Terminal SER"                    7
 biotype     449    HN      "N-Terminal SER"                    5
-biotype     450    O       "N-Terminal SER"                   46
+biotype     450    O       "N-Terminal SER"                   57
 biotype     451    HA      "N-Terminal SER"                    0
-biotype     452    N       "N-Terminal THR"                   42
-biotype     453    CA      "N-Terminal THR"                   19
+biotype     452    N       "N-Terminal THR"                   52
+biotype     453    CA      "N-Terminal THR"                   22
 biotype     454    C       "N-Terminal THR"                    7
 biotype     455    HN      "N-Terminal THR"                    5
-biotype     456    O       "N-Terminal THR"                   46
+biotype     456    O       "N-Terminal THR"                   57
 biotype     457    HA      "N-Terminal THR"                    0
-biotype     458    N       "N-Terminal CYS (SH)"              42
-biotype     459    CA      "N-Terminal CYS (SH)"              19
+biotype     458    N       "N-Terminal CYS (SH)"              52
+biotype     459    CA      "N-Terminal CYS (SH)"              22
 biotype     460    C       "N-Terminal CYS (SH)"               7
 biotype     461    HN      "N-Terminal CYS (SH)"               5
-biotype     462    O       "N-Terminal CYS (SH)"              46
+biotype     462    O       "N-Terminal CYS (SH)"              57
 biotype     463    HA      "N-Terminal CYS (SH)"               0
-biotype     464    N       "N-Terminal CYX (SS)"              42
-biotype     465    CA      "N-Terminal CYX (SS)"              19
+biotype     464    N       "N-Terminal CYX (SS)"              52
+biotype     465    CA      "N-Terminal CYX (SS)"              22
 biotype     466    C       "N-Terminal CYX (SS)"               7
 biotype     467    HN      "N-Terminal CYX (SS)"               5
-biotype     468    O       "N-Terminal CYX (SS)"              46
+biotype     468    O       "N-Terminal CYX (SS)"              57
 biotype     469    HA      "N-Terminal CYX (SS)"               0
 biotype     470    N       "N-Terminal CYD (S-)"              -1
 biotype     471    CA      "N-Terminal CYD (S-)"              -1
@@ -1173,25 +1237,25 @@ biotype     472    C       "N-Terminal CYD (S-)"              -1
 biotype     473    HN      "N-Terminal CYD (S-)"              -1
 biotype     474    O       "N-Terminal CYD (S-)"              -1
 biotype     475    HA      "N-Terminal CYD (S-)"               0
-biotype     476    N       "N-Terminal PRO"                   43
-biotype     477    CA      "N-Terminal PRO"                   19
+biotype     476    N       "N-Terminal PRO"                   53
+biotype     477    CA      "N-Terminal PRO"                   22
 biotype     478    C       "N-Terminal PRO"                    7
 biotype     479    HN      "N-Terminal PRO"                    5
-biotype     480    O       "N-Terminal PRO"                   46
+biotype     480    O       "N-Terminal PRO"                   57
 biotype     481    HA      "N-Terminal PRO"                    0
-biotype     482    CD      "N-Terminal PRO"                   24
+biotype     482    CD      "N-Terminal PRO"                   27
 biotype     483    HD      "N-Terminal PRO"                    0
-biotype     484    N       "N-Terminal PHE"                   42
-biotype     485    CA      "N-Terminal PHE"                   19
+biotype     484    N       "N-Terminal PHE"                   52
+biotype     485    CA      "N-Terminal PHE"                   22
 biotype     486    C       "N-Terminal PHE"                    7
 biotype     487    HN      "N-Terminal PHE"                    5
-biotype     488    O       "N-Terminal PHE"                   46
+biotype     488    O       "N-Terminal PHE"                   57
 biotype     489    HA      "N-Terminal PHE"                    0
-biotype     490    N       "N-Terminal TYR"                   42
-biotype     491    CA      "N-Terminal TYR"                   19
+biotype     490    N       "N-Terminal TYR"                   52
+biotype     491    CA      "N-Terminal TYR"                   22
 biotype     492    C       "N-Terminal TYR"                    7
 biotype     493    HN      "N-Terminal TYR"                    5
-biotype     494    O       "N-Terminal TYR"                   46
+biotype     494    O       "N-Terminal TYR"                   57
 biotype     495    HA      "N-Terminal TYR"                    0
 biotype     496    N       "N-Terminal TYD (O-)"              -1
 biotype     497    CA      "N-Terminal TYD (O-)"              -1
@@ -1199,35 +1263,35 @@ biotype     498    C       "N-Terminal TYD (O-)"              -1
 biotype     499    HN      "N-Terminal TYD (O-)"              -1
 biotype     500    O       "N-Terminal TYD (O-)"              -1
 biotype     501    HA      "N-Terminal TYD (O-)"               0
-biotype     502    N       "N-Terminal TRP"                   42
-biotype     503    CA      "N-Terminal TRP"                   19
+biotype     502    N       "N-Terminal TRP"                   52
+biotype     503    CA      "N-Terminal TRP"                   22
 biotype     504    C       "N-Terminal TRP"                    7
 biotype     505    HN      "N-Terminal TRP"                    5
-biotype     506    O       "N-Terminal TRP"                   46
+biotype     506    O       "N-Terminal TRP"                   57
 biotype     507    HA      "N-Terminal TRP"                    0
-biotype     508    N       "N-Terminal HIS (+)"               42
-biotype     509    CA      "N-Terminal HIS (+)"               19
+biotype     508    N       "N-Terminal HIS (+)"               52
+biotype     509    CA      "N-Terminal HIS (+)"               22
 biotype     510    C       "N-Terminal HIS (+)"                7
 biotype     511    HN      "N-Terminal HIS (+)"                5
-biotype     512    O       "N-Terminal HIS (+)"               46
+biotype     512    O       "N-Terminal HIS (+)"               57
 biotype     513    HA      "N-Terminal HIS (+)"                0
-biotype     514    N       "N-Terminal HIS (HD)"              42
-biotype     515    CA      "N-Terminal HIS (HD)"              19
+biotype     514    N       "N-Terminal HIS (HD)"              52
+biotype     515    CA      "N-Terminal HIS (HD)"              22
 biotype     516    C       "N-Terminal HIS (HD)"               7
 biotype     517    HN      "N-Terminal HIS (HD)"               5
-biotype     518    O       "N-Terminal HIS (HD)"              46
+biotype     518    O       "N-Terminal HIS (HD)"              57
 biotype     519    HA      "N-Terminal HIS (HD)"               0
-biotype     520    N       "N-Terminal HIS (HE)"              42
-biotype     521    CA      "N-Terminal HIS (HE)"              19
+biotype     520    N       "N-Terminal HIS (HE)"              52
+biotype     521    CA      "N-Terminal HIS (HE)"              22
 biotype     522    C       "N-Terminal HIS (HE)"               7
 biotype     523    HN      "N-Terminal HIS (HE)"               5
-biotype     524    O       "N-Terminal HIS (HE)"              46
+biotype     524    O       "N-Terminal HIS (HE)"              57
 biotype     525    HA      "N-Terminal HIS (HE)"               0
-biotype     526    N       "N-Terminal ASP"                   42
-biotype     527    CA      "N-Terminal ASP"                   19
+biotype     526    N       "N-Terminal ASP"                   52
+biotype     527    CA      "N-Terminal ASP"                   22
 biotype     528    C       "N-Terminal ASP"                    7
 biotype     529    HN      "N-Terminal ASP"                    5
-biotype     530    O       "N-Terminal ASP"                   46
+biotype     530    O       "N-Terminal ASP"                   57
 biotype     531    HA      "N-Terminal ASP"                    0
 biotype     532    N       "N-Terminal ASH (COOH)"            -1
 biotype     533    CA      "N-Terminal ASH (COOH)"            -1
@@ -1235,17 +1299,17 @@ biotype     534    C       "N-Terminal ASH (COOH)"            -1
 biotype     535    HN      "N-Terminal ASH (COOH)"            -1
 biotype     536    O       "N-Terminal ASH (COOH)"            -1
 biotype     537    HA      "N-Terminal ASH (COOH)"             0
-biotype     538    N       "N-Terminal ASN"                   42
-biotype     539    CA      "N-Terminal ASN"                   19
+biotype     538    N       "N-Terminal ASN"                   52
+biotype     539    CA      "N-Terminal ASN"                   22
 biotype     540    C       "N-Terminal ASN"                    7
 biotype     541    HN      "N-Terminal ASN"                    5
-biotype     542    O       "N-Terminal ASN"                   46
+biotype     542    O       "N-Terminal ASN"                   57
 biotype     543    HA      "N-Terminal ASN"                    0
-biotype     544    N       "N-Terminal GLU"                   42
-biotype     545    CA      "N-Terminal GLU"                   19
+biotype     544    N       "N-Terminal GLU"                   52
+biotype     545    CA      "N-Terminal GLU"                   22
 biotype     546    C       "N-Terminal GLU"                    7
 biotype     547    HN      "N-Terminal GLU"                    5
-biotype     548    O       "N-Terminal GLU"                   46
+biotype     548    O       "N-Terminal GLU"                   57
 biotype     549    HA      "N-Terminal GLU"                    0
 biotype     550    N       "N-Terminal GLH (COOH)"            -1
 biotype     551    CA      "N-Terminal GLH (COOH)"            -1
@@ -1253,23 +1317,23 @@ biotype     552    C       "N-Terminal GLH (COOH)"            -1
 biotype     553    HN      "N-Terminal GLH (COOH)"            -1
 biotype     554    O       "N-Terminal GLH (COOH)"            -1
 biotype     555    HA      "N-Terminal GLH (COOH)"             0
-biotype     556    N       "N-Terminal GLN"                   42
-biotype     557    CA      "N-Terminal GLN"                   19
+biotype     556    N       "N-Terminal GLN"                   52
+biotype     557    CA      "N-Terminal GLN"                   22
 biotype     558    C       "N-Terminal GLN"                    7
 biotype     559    HN      "N-Terminal GLN"                    5
-biotype     560    O       "N-Terminal GLN"                   46
+biotype     560    O       "N-Terminal GLN"                   57
 biotype     561    HA      "N-Terminal GLN"                    0
-biotype     562    N       "N-Terminal MET"                   42
-biotype     563    CA      "N-Terminal MET"                   19
+biotype     562    N       "N-Terminal MET"                   52
+biotype     563    CA      "N-Terminal MET"                   22
 biotype     564    C       "N-Terminal MET"                    7
 biotype     565    HN      "N-Terminal MET"                    5
-biotype     566    O       "N-Terminal MET"                   46
+biotype     566    O       "N-Terminal MET"                   57
 biotype     567    HA      "N-Terminal MET"                    0
-biotype     568    N       "N-Terminal LYS"                   42
-biotype     569    CA      "N-Terminal LYS"                   19
+biotype     568    N       "N-Terminal LYS"                   52
+biotype     569    CA      "N-Terminal LYS"                   22
 biotype     570    C       "N-Terminal LYS"                    7
 biotype     571    HN      "N-Terminal LYS"                    5
-biotype     572    O       "N-Terminal LYS"                   46
+biotype     572    O       "N-Terminal LYS"                   57
 biotype     573    HA      "N-Terminal LYS"                    0
 biotype     574    N       "N-Terminal LYD (NH2)"             -1
 biotype     575    CA      "N-Terminal LYD (NH2)"             -1
@@ -1277,76 +1341,76 @@ biotype     576    C       "N-Terminal LYD (NH2)"             -1
 biotype     577    HN      "N-Terminal LYD (NH2)"             -1
 biotype     578    O       "N-Terminal LYD (NH2)"             -1
 biotype     579    HA      "N-Terminal LYD (NH2)"              0
-biotype     580    N       "N-Terminal ARG"                   42
-biotype     581    CA      "N-Terminal ARG"                   19
+biotype     580    N       "N-Terminal ARG"                   52
+biotype     581    CA      "N-Terminal ARG"                   22
 biotype     582    C       "N-Terminal ARG"                    7
 biotype     583    HN      "N-Terminal ARG"                    5
-biotype     584    O       "N-Terminal ARG"                   46
+biotype     584    O       "N-Terminal ARG"                   57
 biotype     585    HA      "N-Terminal ARG"                    0
-biotype     586    N       "N-Terminal ORN"                   42
-biotype     587    CA      "N-Terminal ORN"                   19
+biotype     586    N       "N-Terminal ORN"                   52
+biotype     587    CA      "N-Terminal ORN"                   22
 biotype     588    C       "N-Terminal ORN"                    7
 biotype     589    HN      "N-Terminal ORN"                    5
-biotype     590    O       "N-Terminal ORN"                   46
+biotype     590    O       "N-Terminal ORN"                   57
 biotype     591    HA      "N-Terminal ORN"                    0
 biotype     592    N       "N-Terminal AIB"                   -1
 biotype     593    CA      "N-Terminal AIB"                   -1
 biotype     594    C       "N-Terminal AIB"                   -1
 biotype     595    HN      "N-Terminal AIB"                   -1
 biotype     596    O       "N-Terminal AIB"                   -1
-biotype     597    N       "C-Terminal GLY"                   37
-biotype     598    CA      "C-Terminal GLY"                   22
+biotype     597    N       "C-Terminal GLY"                   47
+biotype     598    CA      "C-Terminal GLY"                   25
 biotype     599    C       "C-Terminal GLY"                    9
 biotype     600    HN      "C-Terminal GLY"                    1
-biotype     601    OXT     "C-Terminal GLY"                   48
+biotype     601    OXT     "C-Terminal GLY"                   59
 biotype     602    HA      "C-Terminal GLY"                    0
-biotype     603    N       "C-Terminal ALA"                   37
-biotype     604    CA      "C-Terminal ALA"                   18
+biotype     603    N       "C-Terminal ALA"                   47
+biotype     604    CA      "C-Terminal ALA"                   21
 biotype     605    C       "C-Terminal ALA"                    9
 biotype     606    HN      "C-Terminal ALA"                    1
-biotype     607    OXT     "C-Terminal ALA"                   48
+biotype     607    OXT     "C-Terminal ALA"                   59
 biotype     608    HA      "C-Terminal ALA"                    0
-biotype     609    N       "C-Terminal VAL"                   37
-biotype     610    CA      "C-Terminal VAL"                   18
+biotype     609    N       "C-Terminal VAL"                   47
+biotype     610    CA      "C-Terminal VAL"                   21
 biotype     611    C       "C-Terminal VAL"                    9
 biotype     612    HN      "C-Terminal VAL"                    1
-biotype     613    OXT     "C-Terminal VAL"                   48
+biotype     613    OXT     "C-Terminal VAL"                   59
 biotype     614    HA      "C-Terminal VAL"                    0
-biotype     615    N       "C-Terminal LEU"                   37
-biotype     616    CA      "C-Terminal LEU"                   18
+biotype     615    N       "C-Terminal LEU"                   47
+biotype     616    CA      "C-Terminal LEU"                   21
 biotype     617    C       "C-Terminal LEU"                    9
 biotype     618    HN      "C-Terminal LEU"                    1
-biotype     619    OXT     "C-Terminal LEU"                   48
+biotype     619    OXT     "C-Terminal LEU"                   59
 biotype     620    HA      "C-Terminal LEU"                    0
-biotype     621    N       "C-Terminal ILE"                   37
-biotype     622    CA      "C-Terminal ILE"                   18
+biotype     621    N       "C-Terminal ILE"                   47
+biotype     622    CA      "C-Terminal ILE"                   21
 biotype     623    C       "C-Terminal ILE"                    9
 biotype     624    HN      "C-Terminal ILE"                    1
-biotype     625    OXT     "C-Terminal ILE"                   48
+biotype     625    OXT     "C-Terminal ILE"                   59
 biotype     626    HA      "C-Terminal ILE"                    0
-biotype     627    N       "C-Terminal SER"                   37
-biotype     628    CA      "C-Terminal SER"                   18
+biotype     627    N       "C-Terminal SER"                   47
+biotype     628    CA      "C-Terminal SER"                   21
 biotype     629    C       "C-Terminal SER"                    9
 biotype     630    HN      "C-Terminal SER"                    1
-biotype     631    OXT     "C-Terminal SER"                   48
+biotype     631    OXT     "C-Terminal SER"                   59
 biotype     632    HA      "C-Terminal SER"                    0
-biotype     633    N       "C-Terminal THR"                   37
-biotype     634    CA      "C-Terminal THR"                   18
+biotype     633    N       "C-Terminal THR"                   47
+biotype     634    CA      "C-Terminal THR"                   21
 biotype     635    C       "C-Terminal THR"                    9
 biotype     636    HN      "C-Terminal THR"                    1
-biotype     637    OXT     "C-Terminal THR"                   48
+biotype     637    OXT     "C-Terminal THR"                   59
 biotype     638    HA      "C-Terminal THR"                    0
-biotype     639    N       "C-Terminal CYS (SH)"              37
-biotype     640    CA      "C-Terminal CYS (SH)"              18
+biotype     639    N       "C-Terminal CYS (SH)"              47
+biotype     640    CA      "C-Terminal CYS (SH)"              21
 biotype     641    C       "C-Terminal CYS (SH)"               9
 biotype     642    HN      "C-Terminal CYS (SH)"               1
-biotype     643    OXT     "C-Terminal CYS (SH)"              48
+biotype     643    OXT     "C-Terminal CYS (SH)"              59
 biotype     644    HA      "C-Terminal CYS (SH)"               0
-biotype     645    N       "C-Terminal CYX (SS)"              37
-biotype     646    CA      "C-Terminal CYX (SS)"              18
+biotype     645    N       "C-Terminal CYX (SS)"              47
+biotype     646    CA      "C-Terminal CYX (SS)"              21
 biotype     647    C       "C-Terminal CYX (SS)"               9
 biotype     648    HN      "C-Terminal CYX (SS)"               1
-biotype     649    OXT     "C-Terminal CYX (SS)"              48
+biotype     649    OXT     "C-Terminal CYX (SS)"              59
 biotype     650    HA      "C-Terminal CYX (SS)"               0
 biotype     651    N       "C-Terminal CYD (S-)"              -1
 biotype     652    CA      "C-Terminal CYD (S-)"              -1
@@ -1354,22 +1418,22 @@ biotype     653    C       "C-Terminal CYD (S-)"              -1
 biotype     654    HN      "C-Terminal CYD (S-)"              -1
 biotype     655    OXT     "C-Terminal CYD (S-)"              -1
 biotype     656    HA      "C-Terminal CYD (S-)"               0
-biotype     657    N       "C-Terminal PRO"                   36
-biotype     658    CA      "C-Terminal PRO"                   18
+biotype     657    N       "C-Terminal PRO"                   46
+biotype     658    CA      "C-Terminal PRO"                   21
 biotype     659    C       "C-Terminal PRO"                    9
-biotype     660    OXT     "C-Terminal PRO"                   48
+biotype     660    OXT     "C-Terminal PRO"                   59
 biotype     661    HA      "C-Terminal PRO"                    0
-biotype     662    N       "C-Terminal PHE"                   37
-biotype     663    CA      "C-Terminal PHE"                   18
+biotype     662    N       "C-Terminal PHE"                   47
+biotype     663    CA      "C-Terminal PHE"                   21
 biotype     664    C       "C-Terminal PHE"                    9
 biotype     665    HN      "C-Terminal PHE"                    1
-biotype     666    OXT     "C-Terminal PHE"                   48
+biotype     666    OXT     "C-Terminal PHE"                   59
 biotype     667    HA      "C-Terminal PHE"                    0
-biotype     668    N       "C-Terminal TYR"                   37
-biotype     669    CA      "C-Terminal TYR"                   18
+biotype     668    N       "C-Terminal TYR"                   47
+biotype     669    CA      "C-Terminal TYR"                   21
 biotype     670    C       "C-Terminal TYR"                    9
 biotype     671    HN      "C-Terminal TYR"                    1
-biotype     672    OXT     "C-Terminal TYR"                   48
+biotype     672    OXT     "C-Terminal TYR"                   59
 biotype     673    HA      "C-Terminal TYR"                    0
 biotype     674    N       "C-Terminal TYD (O-)"              -1
 biotype     675    CA      "C-Terminal TYD (O-)"              -1
@@ -1377,35 +1441,35 @@ biotype     676    C       "C-Terminal TYD (O-)"              -1
 biotype     677    HN      "C-Terminal TYD (O-)"              -1
 biotype     678    OXT     "C-Terminal TYD (O-)"              -1
 biotype     679    HA      "C-Terminal TYD (O-)"               0
-biotype     680    N       "C-Terminal TRP"                   37
-biotype     681    CA      "C-Terminal TRP"                   18
+biotype     680    N       "C-Terminal TRP"                   47
+biotype     681    CA      "C-Terminal TRP"                   21
 biotype     682    C       "C-Terminal TRP"                    9
 biotype     683    HN      "C-Terminal TRP"                    1
-biotype     684    OXT     "C-Terminal TRP"                   48
+biotype     684    OXT     "C-Terminal TRP"                   59
 biotype     685    HA      "C-Terminal TRP"                    0
-biotype     686    N       "C-Terminal HIS (+)"               37
-biotype     687    CA      "C-Terminal HIS (+)"               18
+biotype     686    N       "C-Terminal HIS (+)"               47
+biotype     687    CA      "C-Terminal HIS (+)"               21
 biotype     688    C       "C-Terminal HIS (+)"                9
 biotype     689    HN      "C-Terminal HIS (+)"                1
-biotype     690    OXT     "C-Terminal HIS (+)"               48
+biotype     690    OXT     "C-Terminal HIS (+)"               59
 biotype     691    HA      "C-Terminal HIS (+)"                0
-biotype     692    N       "C-Terminal HIS (HD)"              37
-biotype     693    CA      "C-Terminal HIS (HD)"              18
+biotype     692    N       "C-Terminal HIS (HD)"              47
+biotype     693    CA      "C-Terminal HIS (HD)"              21
 biotype     694    C       "C-Terminal HIS (HD)"               9
 biotype     695    HN      "C-Terminal HIS (HD)"               1
-biotype     696    OXT     "C-Terminal HIS (HD)"              48
+biotype     696    OXT     "C-Terminal HIS (HD)"              59
 biotype     697    HA      "C-Terminal HIS (HD)"               0
-biotype     698    N       "C-Terminal HIS (HE)"              37
-biotype     699    CA      "C-Terminal HIS (HE)"              18
+biotype     698    N       "C-Terminal HIS (HE)"              47
+biotype     699    CA      "C-Terminal HIS (HE)"              21
 biotype     700    C       "C-Terminal HIS (HE)"               9
 biotype     701    HN      "C-Terminal HIS (HE)"               1
-biotype     702    OXT     "C-Terminal HIS (HE)"              48
+biotype     702    OXT     "C-Terminal HIS (HE)"              59
 biotype     703    HA      "C-Terminal HIS (HE)"               0
-biotype     704    N       "C-Terminal ASP"                   37
-biotype     705    CA      "C-Terminal ASP"                   18
+biotype     704    N       "C-Terminal ASP"                   47
+biotype     705    CA      "C-Terminal ASP"                   21
 biotype     706    C       "C-Terminal ASP"                    9
 biotype     707    HN      "C-Terminal ASP"                    1
-biotype     708    OXT     "C-Terminal ASP"                   48
+biotype     708    OXT     "C-Terminal ASP"                   59
 biotype     709    HA      "C-Terminal ASP"                    0
 biotype     710    N       "C-Terminal ASH (COOH)"            -1
 biotype     711    CA      "C-Terminal ASH (COOH)"            -1
@@ -1413,17 +1477,17 @@ biotype     712    C       "C-Terminal ASH (COOH)"            -1
 biotype     713    HN      "C-Terminal ASH (COOH)"            -1
 biotype     714    OXT     "C-Terminal ASH (COOH)"            -1
 biotype     715    HA      "C-Terminal ASH (COOH)"             0
-biotype     716    N       "C-Terminal ASN"                   37
-biotype     717    CA      "C-Terminal ASN"                   18
+biotype     716    N       "C-Terminal ASN"                   47
+biotype     717    CA      "C-Terminal ASN"                   21
 biotype     718    C       "C-Terminal ASN"                    9
 biotype     719    HN      "C-Terminal ASN"                    1
-biotype     720    OXT     "C-Terminal ASN"                   48
+biotype     720    OXT     "C-Terminal ASN"                   59
 biotype     721    HA      "C-Terminal ASN"                    0
-biotype     722    N       "C-Terminal GLU"                   37
-biotype     723    CA      "C-Terminal GLU"                   18
+biotype     722    N       "C-Terminal GLU"                   47
+biotype     723    CA      "C-Terminal GLU"                   21
 biotype     724    C       "C-Terminal GLU"                    9
 biotype     725    HN      "C-Terminal GLU"                    1
-biotype     726    OXT     "C-Terminal GLU"                   48
+biotype     726    OXT     "C-Terminal GLU"                   59
 biotype     727    HA      "C-Terminal GLU"                    0
 biotype     728    N       "C-Terminal GLH (COOH)"            -1
 biotype     729    CA      "C-Terminal GLH (COOH)"            -1
@@ -1431,23 +1495,23 @@ biotype     730    C       "C-Terminal GLH (COOH)"            -1
 biotype     731    HN      "C-Terminal GLH (COOH)"            -1
 biotype     732    OXT     "C-Terminal GLH (COOH)"            -1
 biotype     733    HA      "C-Terminal GLH (COOH)"             0
-biotype     734    N       "C-Terminal GLN"                   37
-biotype     735    CA      "C-Terminal GLN"                   18
+biotype     734    N       "C-Terminal GLN"                   47
+biotype     735    CA      "C-Terminal GLN"                   21
 biotype     736    C       "C-Terminal GLN"                    9
 biotype     737    HN      "C-Terminal GLN"                    1
-biotype     738    OXT     "C-Terminal GLN"                   48
+biotype     738    OXT     "C-Terminal GLN"                   59
 biotype     739    HA      "C-Terminal GLN"                    0
-biotype     740    N       "C-Terminal MET"                   37
-biotype     741    CA      "C-Terminal MET"                   18
+biotype     740    N       "C-Terminal MET"                   47
+biotype     741    CA      "C-Terminal MET"                   21
 biotype     742    C       "C-Terminal MET"                    9
 biotype     743    HN      "C-Terminal MET"                    1
-biotype     744    OXT     "C-Terminal MET"                   48
+biotype     744    OXT     "C-Terminal MET"                   59
 biotype     745    HA      "C-Terminal MET"                    0
-biotype     746    N       "C-Terminal LYS"                   37
-biotype     747    CA      "C-Terminal LYS"                   18
+biotype     746    N       "C-Terminal LYS"                   47
+biotype     747    CA      "C-Terminal LYS"                   21
 biotype     748    C       "C-Terminal LYS"                    9
 biotype     749    HN      "C-Terminal LYS"                    1
-biotype     750    OXT     "C-Terminal LYS"                   48
+biotype     750    OXT     "C-Terminal LYS"                   59
 biotype     751    HA      "C-Terminal LYS"                    0
 biotype     752    N       "C-Terminal LYD (NH2)"             -1
 biotype     753    CA      "C-Terminal LYD (NH2)"             -1
@@ -1455,24 +1519,24 @@ biotype     754    C       "C-Terminal LYD (NH2)"             -1
 biotype     755    HN      "C-Terminal LYD (NH2)"             -1
 biotype     756    OXT     "C-Terminal LYD (NH2)"             -1
 biotype     757    HA      "C-Terminal LYD (NH2)"              0
-biotype     758    N       "C-Terminal ARG"                   37
-biotype     759    CA      "C-Terminal ARG"                   18
+biotype     758    N       "C-Terminal ARG"                   47
+biotype     759    CA      "C-Terminal ARG"                   21
 biotype     760    C       "C-Terminal ARG"                    9
 biotype     761    HN      "C-Terminal ARG"                    1
-biotype     762    OXT     "C-Terminal ARG"                   48
+biotype     762    OXT     "C-Terminal ARG"                   59
 biotype     763    HA      "C-Terminal ARG"                    0
-biotype     764    N       "C-Terminal ORN"                   37
-biotype     765    CA      "C-Terminal ORN"                   18
+biotype     764    N       "C-Terminal ORN"                   47
+biotype     765    CA      "C-Terminal ORN"                   21
 biotype     766    C       "C-Terminal ORN"                    9
 biotype     767    HN      "C-Terminal ORN"                    1
-biotype     768    OXT     "C-Terminal ORN"                   48
+biotype     768    OXT     "C-Terminal ORN"                   59
 biotype     769    HA      "C-Terminal ORN"                    0
 biotype     770    N       "C-Terminal AIB"                   -1
 biotype     771    CA      "C-Terminal AIB"                   -1
 biotype     772    C       "C-Terminal AIB"                   -1
 biotype     773    HN      "C-Terminal AIB"                   -1
 biotype     774    OXT     "C-Terminal AIB"                   -1
-biotype    2001    O       "Water"                            50
+biotype    2001    O       "Water"                            64
 biotype    2002    H       "Water"                             6
 biotype    2003    NA      "Sodium Ion"                       -1
 biotype    2004    K       "Potassium Ion"                    -1

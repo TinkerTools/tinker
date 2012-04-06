@@ -983,7 +983,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "bndguess" sets approximate bond strech force constants based
+c     "bndguess" sets approximate bond stretch force constants based
 c     on atom type and connected atoms
 c
 c
@@ -1857,9 +1857,9 @@ c
       integer oldprt,oldwrt
       integer prtflg,ihess
       integer nvar,nfreq
-      integer hindex(maxhess)
-      integer hinit(3,maxatm)
-      integer hstop(3,maxatm)
+      integer, allocatable :: hindex(:)
+      integer, allocatable :: hinit(:,:)
+      integer, allocatable :: hstop(:,:)
       real*8 xab,yab,zab
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
@@ -1880,21 +1880,21 @@ c
       real*8 gave,grms,gfac
       real*8 have,hrms,hfac
       real*8 fave,frms,ffac,fcut
-      real*8 mass2(maxatm)
-      real*8 xx(maxvar)
-      real*8 eigen(maxvib)
-      real*8 a(maxvib)
-      real*8 b(maxvib)
-      real*8 p(maxvib)
-      real*8 w(maxvib)
-      real*8 ta(maxvib)
-      real*8 tb(maxvib)
-      real*8 ty(maxvib)
-      real*8 h(maxhess)
-      real*8 matrix((maxvib+1)*maxvib/2)
-      real*8 derivs(3,maxatm)
-      real*8 hdiag(3,maxatm)
-      real*8 vects(maxvib,maxvib)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: mass2(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: h(:)
+      real*8, allocatable :: matrix(:)
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: hdiag(:,:)
+      real*8, allocatable :: vects(:,:)
       character*1 axis(3)
       external minimiz1
       external optsave
@@ -1905,6 +1905,7 @@ c     scale the coordinates of each active atom; use the
 c     square root of median eigenvalue of typical Hessian
 c
       if (fit_struct) then
+         allocate (xx(3*n))
          set_scale = .true.
          nvar = 0
          do i = 1, n
@@ -1952,6 +1953,7 @@ c
             z(i) = xx(nvar) / scale(nvar)
             scale(nvar) = 1.0d0
          end do
+         deallocate (xx)
       end if
 c
 c     compute the RMS between QM and TINKER bond lengths
@@ -2151,6 +2153,7 @@ c
       gave = 0.0d0
       grms = 0.0d0
       if (fit_force) then
+         allocate (derivs(3,n))
          call gradient (energy,derivs)
          if (prtflg .eq. 1) then
             write (iout,100)
@@ -2177,7 +2180,27 @@ c
   120       format (/,4x,'Average Unsigned Difference :',17x,f12.4,
      &              /,4x,'Root Mean Square Deviation :',18x,f12.4)
          end if
+         deallocate (derivs)
       end if
+c
+c     check for too many vibrational frequencies
+c
+      nfreq = 3 * n
+      if (nfreq*(nfreq-1)/2 .gt. maxhess) then
+         write (iout,130)
+  130    format (/,' VALENCE  --  Too many Atoms in the Molecule')
+         call fatal
+      end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mass2(n))
+      allocate (hinit(3,n))
+      allocate (hstop(3,n))
+      allocate (hdiag(3,n))
+      allocate (hindex(nfreq*(nfreq-1)/2))
+      allocate (h(nfreq*(nfreq-1)/2))
+      allocate (matrix(nfreq*(nfreq+1)/2))
 c
 c     calculate the full Hessian matrix of second derivatives
 c
@@ -2190,8 +2213,8 @@ c
       hrms = 0.0d0
       if (fit_force) then
          if (prtflg .eq. 1) then
-            write (iout,130)
-  130       format (/,' Comparison of Hessian Elements :',
+            write (iout,140)
+  140       format (/,' Comparison of Hessian Elements :',
      &              //,7x,'Atom',14x,'QM Hess',8x,'MM Hess',
      &                 10x,'Delta',/)
          end if
@@ -2203,8 +2226,8 @@ c
                have = have + abs(delta)
                hrms = hrms + delta*delta
                if (prtflg .eq. 1) then
-                  write (*,140)  i,axis(j),gh(m),hdiag(j,i),delta
-  140             format (4x,i5,1x,a1,8x,f13.2,2x,f13.2,2x,f13.4)
+                  write (iout,150)  i,axis(j),gh(m),hdiag(j,i),delta
+  150             format (4x,i5,1x,a1,8x,f13.2,2x,f13.2,2x,f13.4)
                end if
                m1 = 3*(i-1) + j
                m2 = m1
@@ -2220,20 +2243,14 @@ c
          have = have / dble((9*n*n+3*n)/2)
          hrms = sqrt(hrms/dble((9*n*n+3*n)/2))
          if (prtflg .eq. 1) then
-            write (iout,150)  have,hrms
-  150       format (/,4x,'Average Unsigned Difference :',17x,f12.4,
+            write (iout,160)  have,hrms
+  160       format (/,4x,'Average Unsigned Difference :',17x,f12.4,
      &              /,4x,'Root Mean Square Deviation :',18x,f12.4)
          end if
       end if
 c
 c     set atomic mass roots needed for vibrational analysis
 c
-      nfreq = 3 * n
-      if (nfreq.gt.maxvib .or. nfreq*nfreq.gt.maxhess) then
-         write (iout,160)
-  160    format (/,' VIBRATE  --  Too many Atoms in the Molecule')
-         call fatal
-      end if
       do i = 1, n
          mass2(i) = sqrt(mass(i))
       end do
@@ -2253,9 +2270,21 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(nfreq))
+      allocate (b(nfreq))
+      allocate (p(nfreq))
+      allocate (w(nfreq))
+      allocate (ta(nfreq))
+      allocate (tb(nfreq))
+      allocate (ty(nfreq))
+      allocate (eigen(nfreq))
+      allocate (vects(nfreq,nfreq))
+c
 c     diagonalize to get vibrational frequencies and normal modes
 c
-      call diagq (nfreq,maxvib,nfreq,matrix,eigen,vects,
+      call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
      &                     a,b,p,w,ta,tb,ty)
       factor = sqrt(convert) / (2.0d0*pi*lightspd)
       do i = 1, nfreq
@@ -2295,6 +2324,25 @@ c
      &           /,4x,'Root Mean Square Deviation :',18x,f12.4)
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (mass2)
+      deallocate (hinit)
+      deallocate (hstop)
+      deallocate (hdiag)
+      deallocate (hindex)
+      deallocate (h)
+      deallocate (matrix)
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (eigen)
+      deallocate (vects)
+c
 c     sum weighted RMS values to get overall error function
 c
       bfac = 100.0d0
@@ -2330,9 +2378,9 @@ c
       integer i,nvar
       real*8 minimiz1,e
       real*8 energy,eps
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
       logical analytic
       external energy
 c
@@ -2355,6 +2403,10 @@ c
             z(i) = xx(nvar) / scale(nvar)
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -2379,6 +2431,10 @@ c
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -2414,7 +2470,7 @@ c
       integer ita,itb,itc,itd
       integer kta,ktb,ktc,ktd
       integer nvar,size
-      real*8 xx(maxvar)
+      real*8 xx(*)
       logical done
       character*4  pa,pb,pc,pd
       character*8  pitb,pktb
@@ -2862,7 +2918,7 @@ c
       integer ita,itb,itc,itd
       integer kta,ktb,ktc,ktd
       real*8 eps
-      real*8 xx(maxvar)
+      real*8 xx(*)
       logical done
       character*4 pa,pb,pc,pd
       character*8 pitb,pktb
@@ -3363,14 +3419,18 @@ c
       real*8 delta
       real*8 valrms
       real*8 valfit1
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 eps(maxvar)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: eps(:)
 c
 c
 c     copy optimization values to valence parameters
 c
       call varprm (nvar,xx,0,0.0d0)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (eps(nvar))
 c
 c     set the numerical gradient step size for each parameter
 c
@@ -3393,18 +3453,22 @@ c
          e  = valrms(0)
          g(i) = (e-e0) / eps(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (eps)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##   subroutine prtval  --  print fitted valence parameters  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##   subroutine prtval  --  print final valence parameter fit  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "prtval" writes the final fitted valence parameters to the
+c     "prtval" writes the final valence parameter results to the
 c     standard output and appends the values to a key file
 c
 c

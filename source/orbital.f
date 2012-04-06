@@ -13,8 +13,8 @@ c     ##############################################################
 c
 c
 c     "orbital" finds and organizes lists of atoms in a pisystem,
-c     bonds connecting pisystem atoms and torsions whose two
-c     central atoms are both pisystem atoms
+c     bonds connecting pisystem atoms and torsions whose central
+c     atoms are both pisystem atoms
 c
 c
       subroutine orbital
@@ -178,21 +178,12 @@ c     perform deallocation of some local arrays
 c
       deallocate (list)
 c
-c     sort atoms in each pisystem, and quit if too many atoms
+c     sort atoms in each pisystem, copy list to orbital sites
 c
       do i = 1, nconj
          k = iconj(2,i) - iconj(1,i) + 1
-         if (k .gt. maxpi) then
-            write (iout,20)
-   20       format (/,' ORBITAL  --  Too many Atoms in Pi-System;',
-     &                 ' Increase MAXPI')
-            call fatal
-         end if
          call sort (k,kconj(iconj(1,i)))
       end do
-c
-c     copy the packed and sorted pisystem list to orbital sites
-c
       do i = 1, norbit
          iorbit(i) = kconj(i)
       end do
@@ -218,10 +209,10 @@ c
                            ibpi(1,nbpi) = m
                            ibpi(2,nbpi) = i
                            ibpi(3,nbpi) = j
-                           goto 30
+                           goto 20
                         end if
                      end do
-   30                continue
+   20                continue
                   end if
                end do
             end do
@@ -367,7 +358,7 @@ c     quit if the p-orbital plane remains undefined
 c
          if (.not. done) then
             write (iout,10)  i
-   10       format(/,' PIPLANE  --  Failure to Define a',
+   10       format(/,' PIPLANE  --  Failure to Define',
      &                ' p-Orbital Plane for Atom',i6)
             call fatal
          end if
