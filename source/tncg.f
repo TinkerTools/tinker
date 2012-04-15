@@ -157,7 +157,7 @@ c
 c
 c     set default parameters for the optimization
 c
-      if (fctmin .eq. 0.0d0)  fctmin = -1000000.0d0
+      if (fctmin .eq. 0.0d0)  fctmin = -10000000.0d0
       if (iwrite .lt. 0)  iwrite = 1
       if (iprint .lt. 0)  iprint = 1
       if (maxiter .eq. 0)  maxiter = 1000
@@ -246,8 +246,8 @@ c
    70    format (/,' Algorithm : ',a6,5x,'Preconditioning : ',a6,5x,
      &              ' RMS Grad :',d9.2)
          write (iout,80)
-   80    format (/,' TN Iter   F Value       G RMS     F Move  ',
-     &              '  X Move   CG Iter   Solve   FG Call',/)
+   80    format (/,' TN Iter    F Value       G RMS     F Move  ',
+     &              '  X Move   CG Iter  Solve   FG Call',/)
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -280,12 +280,12 @@ c
 c     print initial information prior to first iteration
 c
       if (iprint .gt. 0) then
-         if (f.lt.1.0d6 .and. f.gt.-1.0d5 .and. g_rms.lt.1.0d6) then
+         if (f.lt.1.0d7 .and. f.gt.-1.0d6 .and. g_rms.lt.1.0d6) then
             write (iout,90)  iter_tn,f,g_rms,fg_call
-   90       format (i6,f12.4,f12.4,41x,i7)
+   90       format (i6,f13.4,f12.4,41x,i7)
          else
             write (iout,100)  iter_tn,f,g_rms,fg_call
-  100       format (i6,d12.4,d12.4,41x,i7)
+  100       format (i6,d13.4,d12.4,41x,i7)
          end if
       end if
 c
@@ -447,15 +447,15 @@ c     print intermediate results for the current iteration
 c
          if (iprint .gt. 0) then
             if (done .or. mod(iter_tn,iprint).eq.0) then
-               if (f.lt.1.0d6 .and. f.gt.-1.0d5 .and.
+               if (f.lt.1.0d7 .and. f.gt.-1.0d6 .and.
      &             g_rms.lt.1.0d6 .and. f_move.lt.1.0d5) then
                   write (iout,140)  iter_tn,f,g_rms,f_move,x_move,
      &                              iter_cg,info_solve,fg_call
-  140             format (i6,f12.4,f12.4,f11.4,f10.4,i8,3x,a9,i7)
+  140             format (i6,f13.4,f12.4,f11.4,f10.4,i8,3x,a9,i7)
                else
                   write (iout,150)  iter_tn,f,g_rms,f_move,x_move,
      &                              iter_cg,info_solve,fg_call
-  150             format (i6,d12.4,d12.4,d11.4,f10.4,i8,3x,a9,i7)
+  150             format (i6,d13.4,d12.4,d11.4,f10.4,i8,3x,a9,i7)
                end if
             end if
          end if

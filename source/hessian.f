@@ -40,12 +40,12 @@ c
       integer hstop(3,*)
       real*8 percent,filled
       real*8 cutoff,rdn,hmax
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
       real*8 h(*)
       real*8 hdiag(3,*)
-      logical keep(maxatm)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
+      logical, allocatable :: keep(:)
 c
 c
 c     zero out total number of indexed Hessian elements
@@ -83,7 +83,14 @@ c
          call induce
       end if
 c
-c     calculate the "reduced" atomic coordinates
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
+      allocate (keep(n))
+c
+c     calculate the reduced atomic coordinates
 c
       if (use_vdw) then
          do i = 1, n
@@ -240,6 +247,13 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
+      deallocate (keep)
 c
 c     print message telling how much storage was finally used
 c

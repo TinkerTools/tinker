@@ -46,9 +46,9 @@ c
       real*8 weigh,dist2
       real*8 delta,term
       real*8 xterm,yterm,zterm
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
+      real*8 xold(*)
+      real*8 yold(*)
+      real*8 zold(*)
       logical done
       logical moved(maxatm)
       logical update(maxatm)

@@ -248,14 +248,14 @@ c
          write (iout,40)
    40    format (/,' Levenberg-Marquardt Nonlinear Least Squares :')
          write (iout,50)
-   50    format (/,' LS Iter    F Value      Total G     Active G',
+   50    format (/,' LS Iter     F Value      Total G     Active G',
      &              '    N Active   F Calls',/)
          if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
             write (iout,60)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   60       format (i6,3f13.4,2i10)
+   60       format (i6,f14.4,2f13.4,2i10)
          else
             write (iout,70)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   70       format (i6,3d13.4,2i10)
+   70       format (i6,f14.4,2d13.4,2i10)
          end if
       end if
 c
@@ -373,11 +373,11 @@ c
             if (abs(xc(j)-xlo(j)) .le. eps) then
                nactive = nactive - 1
                iactive(j) = -1
-c              goto 110
+c              goto 90
             else if (abs(xc(j)-xhi(j)) .le. eps) then
                nactive = nactive - 1
                iactive(j) = 1
-c              goto 110
+c              goto 90
             end if
          end if
       end do
@@ -438,10 +438,10 @@ c
       if (iprint.ne.0 .and. mod(niter,iprint).eq.0) then
          if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
             write (iout,100)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-  100       format (i6,3f13.4,2i10)
+  100       format (i6,f14.4,2f13.4,2i10)
          else
             write (iout,110)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-  110       format (i6,3d13.4,2i10)
+  110       format (i6,f14.4,2d13.4,2i10)
          end if
       end if
 c

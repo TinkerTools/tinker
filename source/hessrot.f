@@ -12,11 +12,10 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "hessrot" computes the numerical Hessian elements with
-c     respect to torsional angles; either the full matrix or
-c     just the diagonal can be calculated; the full matrix
-c     needs nomega+1 gradient evaluations while the diagonal
-c     requires just two gradient calls
+c     "hessrot" computes numerical Hessian elements with respect
+c     to torsional angles; either the diagonal or the full matrix
+c     can be calculated; the full matrix needs nomega+1 gradient
+c     evaluations while the diagonal needs just two evaluations
 c
 c
       subroutine hessrot (mode,hrot)

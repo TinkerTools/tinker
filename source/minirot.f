@@ -200,8 +200,8 @@ c
       include 'zcoord.i'
       integer i
       real*8 minirot1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
+      real*8 xx(*)
+      real*8 g(*)
       real*8 derivs(maxrot)
 c
 c

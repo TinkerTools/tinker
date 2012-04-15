@@ -37,10 +37,10 @@ c
       real*8 xi,yi,zi,ri
       real*8 xmid,ymid,zmid
       real*8 xbnd,ybnd,zbnd
-      real*8 xcm(maxatm)
-      real*8 ycm(maxatm)
-      real*8 zcm(maxatm)
       real*8 work1(3),work2(3)
+      real*8, allocatable :: xcm(:)
+      real*8, allocatable :: ycm(:)
+      real*8, allocatable :: zcm(:)
       real*8 a(3,3),b(3,3)
 c
 c
@@ -63,6 +63,12 @@ c
       zxqdp = 0.0d0
       zyqdp = 0.0d0
       zzqdp = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xcm(n))
+      allocate (ycm(n))
+      allocate (zcm(n))
 c
 c     find the center of mass of the set of active atoms
 c
@@ -191,6 +197,12 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xcm)
+      deallocate (ycm)
+      deallocate (zcm)
+c
 c     convert the quadrupole from traced to traceless form
 c
       qave = (xxqdp + yyqdp + zzqdp) / 3.0d0
@@ -271,8 +283,12 @@ c
       include 'atoms.i'
       include 'usage.i'
       integer i
-      logical temp(maxatm)
+      logical, allocatable :: temp(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (temp(n))
 c
 c     store active atom list, and make all atoms active
 c
@@ -294,4 +310,9 @@ c
             use(i) = temp(i)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (temp)
+      return
       end

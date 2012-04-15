@@ -30,7 +30,8 @@ c
       include 'titles.i'
       include 'units.i'
       include 'usage.i'
-      integer i,j,k,it,ixyz
+      integer i,j,k,m
+      integer it,ixyz
       integer natom,atmnum
       integer nmode,mode
       integer offset,origin
@@ -532,28 +533,29 @@ c
          xyzfile = filename(1:leng)//'.xyz'
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
-         if (ltitle .eq. 0) then
-            write (ixyz,360)  n*nmolecule
-  360       format (i6)
-         else
-            write (ixyz,370)  n*nmolecule,title(1:ltitle)
-  370       format (i6,2x,a)
-         end if
          do k = 1, nmolecule
             offset = (k-1) * n
             xran = xbox * random ()
             yran = ybox * random ()
             zran = zbox * random ()
             do i = 1, n
-               write (ixyz,380)  i+offset,name(i),x(i)+xran,
-     &                           y(i)+yran,z(i)+zran,type(i),
-     &                           (i12(j,i)+offset,j=1,n12(i))
-  380          format (i6,2x,a3,3f12.6,5i6)
+               j = i + offset
+               name(j) = name(i)
+               type(j) = type(i)
+               x(j) = x(i) + xran
+               y(j) = y(i) + yran
+               z(j) = z(i) + zran
+               n12(j) = n12(i)
+               do m = 1, n12(i)
+                  i12(m,j) = i12(m,i) + offset
+               end do
             end do
          end do
+         n = nmolecule * n
+         call prtxyz (ixyz)
          close (unit=ixyz)
-         write (iout,390)  xyzfile
-  390    format (/,' New Coordinates written to :  ',a)
+         write (iout,360)  xyzfile
+  360    format (/,' New Coordinates written to :  ',a)
          write = .false.
       end if
 c
@@ -591,21 +593,21 @@ c
             call prtxyz (ixyz)
          else
             if (ltitle .eq. 0) then
-               write (ixyz,400)  n
-  400          format (i6)
+               write (ixyz,370)  n
+  370          format (i6)
             else
-               write (ixyz,410)  n,title(1:ltitle)
-  410          format (i6,2x,a)
+               write (ixyz,380)  n,title(1:ltitle)
+  380          format (i6,2x,a)
             end if
             do i = 1, n
-               write (ixyz,420)  i+offset,name(i),x(i),y(i),z(i),
+               write (ixyz,390)  i+offset,name(i),x(i),y(i),z(i),
      &                           type(i),(i12(j,i)+offset,j=1,n12(i))
-  420          format (i6,2x,a3,3f12.6,5i6)
+  390          format (i6,2x,a3,3f12.6,5i6)
             end do
          end if
          close (unit=ixyz)
-         write (iout,430)  xyzfile
-  430    format (/,' New Coordinates written to File :  ',a)
+         write (iout,400)  xyzfile
+  400    format (/,' New Coordinates written to File :  ',a)
       end if
 c
 c     perform any final tasks before program exit

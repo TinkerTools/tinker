@@ -31,8 +31,8 @@ c
       real*8 xatom,yatom,zatom
       real*8 xdist,ydist,zdist
       real*8 xterm,yterm,zterm
-      real*8 g(3,maxatm)
       real*8 derivs(*)
+      real*8, allocatable :: g(:,:)
 c
 c
 c     zero out individual components of torsional derivatives
@@ -64,9 +64,17 @@ c
          tex(i) = 0.0d0
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (g(3,n))
+c
 c     calculate the energy and Cartesian first derivatives
 c
       call gradient (energy,g)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (g)
 c
 c     transform Cartesian derivatives to torsional space
 c

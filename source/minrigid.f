@@ -204,8 +204,8 @@ c
       include 'rigid.i'
       integer i,j,nvar
       real*8 minrigid1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
+      real*8 xx(*)
+      real*8 g(*)
       real*8 derivs(6,maxgrp)
 c
 c

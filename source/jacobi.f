@@ -35,8 +35,9 @@ c
       integer nrot,maxrot
       real*8 sm,tresh,s,c,t
       real*8 theta,tau,h,g,p
-      real*8 d(np),b(np),z(np)
-      real*8 a(np,np),v(np,np)
+      real*8 d(*),b(*),z(*)
+      real*8 a(np,*)
+      real*8 v(np,*)
 c
 c
 c     setup and initialization

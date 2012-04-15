@@ -221,14 +221,14 @@ c
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
+      real*8 dscale(maxatm)
+      real*8 pscale(maxatm)
       real*8 field(3,maxatm)
       real*8 fieldp(3,maxatm)
       real*8 udir(3,maxatm)
       real*8 udirp(3,maxatm)
       real*8 uold(3,maxatm)
       real*8 uoldp(3,maxatm)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
       logical proceed,done
       character*6 mode
 c
@@ -845,14 +845,14 @@ c
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
+      real*8 dscale(maxatm)
+      real*8 pscale(maxatm)
       real*8 field(3,maxatm)
       real*8 fieldp(3,maxatm)
       real*8 udir(3,maxatm)
       real*8 udirp(3,maxatm)
       real*8 uold(3,maxatm)
       real*8 uoldp(3,maxatm)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
       logical proceed,done
       character*6 mode
 c
@@ -1216,14 +1216,23 @@ c
       real*8 udsum,upsum
       real*8 ucell(3)
       real*8 ucellp(3)
-      real*8 udir(3,maxatm)
-      real*8 udirp(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 uoldp(3,maxatm)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: uoldp(:,:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (uold(3,npole))
+      allocate (uoldp(3,npole))
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
 c
 c     zero out the induced dipole and the field at each site
 c
@@ -1405,6 +1414,15 @@ c
             call fatal
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (uold)
+      deallocate (uoldp)
+      deallocate (field)
+      deallocate (fieldp)
       return
       end
 c
@@ -1443,14 +1461,23 @@ c
       real*8 udsum,upsum
       real*8 ucell(3)
       real*8 ucellp(3)
-      real*8 udir(3,maxatm)
-      real*8 udirp(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 uoldp(3,maxatm)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: uoldp(:,:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (uold(3,npole))
+      allocate (uoldp(3,npole))
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
 c
 c     zero out the induced dipole and the field at each site
 c
@@ -1632,6 +1659,15 @@ c
             call fatal
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (uold)
+      deallocate (uoldp)
+      deallocate (field)
+      deallocate (fieldp)
       return
       end
 c
@@ -1855,10 +1891,10 @@ c
       real*8 fim(3),fkm(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
       real*8 dscale(maxatm)
       real*8 pscale(maxatm)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
       character*6 mode
       external erfc
 c
@@ -2333,15 +2369,22 @@ c
       real*8 fim(3),fkm(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 fieldt(3,maxatm)
-      real*8 fieldtp(3,maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8, allocatable :: fieldt(:,:)
+      real*8, allocatable :: fieldtp(:,:)
       character*6 mode
       external erfc
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (pscale(n))
+      allocate (fieldt(3,npole))
+      allocate (fieldtp(3,npole))
 c
 c     check for multipoles and set cutoff coefficients
 c
@@ -2570,10 +2613,10 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
 c
 c     end OpenMP directives for the major loop structure
 c
-!$OMP END DO
 !$OMP DO
       do i = 1, npole
          do j = 1, 3
@@ -2583,6 +2626,13 @@ c
       end do
 !$OMP END DO
 !$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      deallocate (fieldt)
+      deallocate (fieldtp)
       return
       end
 c
@@ -2761,9 +2811,9 @@ c
       real*8 fimp(3),fkmp(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
       real*8 dscale(maxatm)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
       character*6 mode
       external erfc
 c
@@ -3097,14 +3147,20 @@ c
       real*8 fimp(3),fkmp(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dscale(maxatm)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 fieldt(3,maxatm)
-      real*8 fieldtp(3,maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8, allocatable :: fieldt(:,:)
+      real*8, allocatable :: fieldtp(:,:)
       character*6 mode
       external erfc
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (fieldt(3,npole))
+      allocate (fieldtp(3,npole))
 c
 c     check for multipoles and set cutoff coefficients
 c
@@ -3264,10 +3320,10 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
 c
 c     end OpenMP directives for the major loop structure
 c
-!$OMP END DO
 !$OMP DO
       do i = 1, npole
          do j = 1, 3
@@ -3277,6 +3333,12 @@ c
       end do
 !$OMP END DO
 !$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (fieldt)
+      deallocate (fieldtp)
       return
       end
 c
@@ -4117,8 +4179,8 @@ c
 c
 c
 c     zero out the induced dipoles and the fields at each site;
-c     uind & uinp are vacuum dipoles, uinds & uinps are SCRF dipoles,
-c     and field & fieldp are solute fields
+c     uind and uinp are vacuum dipoles, uinds and uinps are SCRF
+c     dipoles, field and fieldp are solute fields
 c
       do i = 1, npole
          do j = 1, 3

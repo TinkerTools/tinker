@@ -32,8 +32,10 @@ c
       integer iter,maxiter
       real*8 random,eps
       real*8 dot1,dot2,ratio
-      real*8 ev(nv),vec(np,nv)
-      real*8 a(np,np),work(np)
+      real*8 ev(*)
+      real*8 work(*)
+      real*8 a(np,*)
+      real*8 vec(np,*)
 c
 c
 c     initialize number of iterations and convergence criteria

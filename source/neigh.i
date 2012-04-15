@@ -12,6 +12,15 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
+c     xvold       x-coordinate at last vdw neighbor list update
+c     yvold       y-coordinate at last vdw neighbor list update
+c     zvold       z-coordinate at last vdw neighbor list update
+c     xcold       x-coordinate at last charge neighbor list update
+c     ycold       y-coordinate at last charge neighbor list update
+c     zcold       z-coordinate at last charge neighbor list update
+c     xmold       x-coordinate at last multipole neighbor list update
+c     ymold       y-coordinate at last multipole neighbor list update
+c     zmold       z-coordinate at last multipole neighbor list update
 c     lbuffer     width of the neighbor list buffer region
 c     lbuf2       square of half the neighbor list buffer width
 c     vbuf2       square of vdw cutoff plus neighbor list buffer
@@ -31,11 +40,17 @@ c
 c
       integer nvlst,vlst
       integer nelst,elst
+      real*8 xvold,yvold,zvold
+      real*8 xcold,ycold,zcold
+      real*8 xmold,ymold,zmold
       real*8 lbuffer,lbuf2
       real*8 vbuf2,cbuf2,mbuf2
       real*8 vbufx,cbufx,mbufx
       logical dovlst,doclst,domlst
-      common /neigh/ lbuffer,lbuf2,vbuf2,cbuf2,mbuf2,vbufx,cbufx,
+      common /neigh/ xvold(maxatm),yvold(maxatm),zvold(maxatm),
+     &               xcold(maxatm),ycold(maxatm),zcold(maxatm),
+     &               xmold(maxatm),ymold(maxatm),zmold(maxatm),
+     &               lbuffer,lbuf2,vbuf2,cbuf2,mbuf2,vbufx,cbufx,
      &               mbufx,nvlst(maxatm),vlst(maxvlst,maxatm),
      &               nelst(maxatm),elst(maxelst,maxatm),dovlst,
      &               doclst,domlst

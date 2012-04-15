@@ -57,14 +57,16 @@ c
       real*8 xr,yr,zr
       real*8 radius
       real*8 rdn,r2
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      save xold,yold,zold
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
 c
 c     apply reduction factors to find coordinates for each site
 c
@@ -94,10 +96,10 @@ c
          dovlst = .false.
          if (octahedron) then
             do i = 1, nvdw
-               call vbuild (i,xred,yred,zred,xold,yold,zold)
+               call vbuild (i,xred,yred,zred)
             end do
          else
-            call vfull (xred,yred,zred,xold,yold,zold)
+            call vfull (xred,yred,zred)
          end if
          return
       end if
@@ -108,26 +110,26 @@ c
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
-         xr = xi - xold(i)
-         yr = yi - yold(i)
-         zr = zi - zold(i)
+         xr = xi - xvold(i)
+         yr = yi - yvold(i)
+         zr = zi - zvold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
 c
 c     store coordinates to reflect update of this site
 c
-            xold(i) = xi
-            yold(i) = yi
-            zold(i) = zi
+            xvold(i) = xi
+            yvold(i) = yi
+            zvold(i) = zi
 c
 c     rebuild the higher numbered neighbors of this site
 c
             j = 0
             do k = i+1, nvdw
-               xr = xi - xold(k)
-               yr = yi - yold(k)
-               zr = zi - zold(k)
+               xr = xi - xvold(k)
+               yr = yi - yvold(k)
+               zr = zi - zvold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
@@ -140,9 +142,9 @@ c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
-               xr = xi - xold(k)
-               yr = yi - yold(k)
-               zr = zi - zold(k)
+               xr = xi - xvold(k)
+               yr = yi - yvold(k)
+               zr = zi - zvold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
@@ -165,6 +167,12 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
       return
       end
 c
@@ -180,7 +188,7 @@ c     "vbuild" performs a complete rebuild of the van der Waals
 c     pair neighbor list for a single site
 c
 c
-      subroutine vbuild (i,xred,yred,zred,xold,yold,zold)
+      subroutine vbuild (i,xred,yred,zred)
       implicit none
       include 'sizes.i'
       include 'bound.i'
@@ -190,12 +198,9 @@ c
       integer i,j,k
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
+      real*8 xred(*)
+      real*8 yred(*)
+      real*8 zred(*)
 c
 c
 c     store coordinates to reflect update of the site
@@ -203,9 +208,9 @@ c
       xi = xred(i)
       yi = yred(i)
       zi = zred(i)
-      xold(i) = xi
-      yold(i) = yi
-      zold(i) = zi
+      xvold(i) = xi
+      yvold(i) = yi
+      zvold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -246,11 +251,12 @@ c     "vfull" performs a complete rebuild of the van der Waals
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine vfull (xred,yred,zred,xold,yold,zold)
+      subroutine vfull (xred,yred,zred)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'bound.i'
+      include 'cell.i'
       include 'iounit.i'
       include 'light.i'
       include 'neigh.i'
@@ -261,25 +267,29 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r2,off
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8 xred(*)
+      real*8 yred(*)
+      real*8 zred(*)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       logical repeat
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nlight = (ncell+1) * nvdw
+      allocate (xsort(nlight))
+      allocate (ysort(nlight))
+      allocate (zsort(nlight))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
       do i = 1, nvdw
          nvlst(i) = 0
-         xold(i) = xred(i)
-         yold(i) = yred(i)
-         zold(i) = zred(i)
+         xvold(i) = xred(i)
+         yvold(i) = yred(i)
+         zvold(i) = zred(i)
          xsort(i) = xred(i)
          ysort(i) = yred(i)
          zsort(i) = zred(i)
@@ -344,6 +354,12 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
 c     check to see if the neighbor lists are too long
 c
       do i = 1, nvdw
@@ -382,10 +398,6 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      save xold,yold,zold
 c
 c
 c     neighbor list cannot be used with the replicates method
@@ -405,10 +417,10 @@ c
          doclst = .false.
          if (octahedron) then
             do i = 1, nion
-               call cbuild (i,xold,yold,zold)
+               call cbuild (i)
             end do
          else
-            call cfull (xold,yold,zold)
+            call cfull
          end if
          return
       end if
@@ -420,26 +432,26 @@ c
          xi = x(ii)
          yi = y(ii)
          zi = z(ii)
-         xr = xi - xold(i)
-         yr = yi - yold(i)
-         zr = zi - zold(i)
+         xr = xi - xcold(i)
+         yr = yi - ycold(i)
+         zr = zi - zcold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
 c
 c     store coordinates to reflect update of this site
 c
-            xold(i) = xi
-            yold(i) = yi
-            zold(i) = zi
+            xcold(i) = xi
+            ycold(i) = yi
+            zcold(i) = zi
 c
 c     rebuild the higher numbered neighbors of this site
 c
             j = 0
             do k = i+1, nion
-               xr = xi - xold(k)
-               yr = yi - yold(k)
-               zr = zi - zold(k)
+               xr = xi - xcold(k)
+               yr = yi - ycold(k)
+               zr = zi - zcold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -452,9 +464,9 @@ c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
-               xr = xi - xold(k)
-               yr = yi - yold(k)
-               zr = zi - zold(k)
+               xr = xi - xcold(k)
+               yr = yi - ycold(k)
+               zr = zi - zcold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -492,7 +504,7 @@ c     "cbuild" performs a complete rebuild of the partial charge
 c     electrostatic neighbor list for a single site
 c
 c
-      subroutine cbuild (i,xold,yold,zold)
+      subroutine cbuild (i)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -503,9 +515,6 @@ c
       integer i,j,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
 c
 c
 c     store new coordinates to reflect update of the site
@@ -514,9 +523,9 @@ c
       xi = x(ii)
       yi = y(ii)
       zi = z(ii)
-      xold(i) = xi
-      yold(i) = yi
-      zold(i) = zi
+      xcold(i) = xi
+      ycold(i) = yi
+      zcold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -558,11 +567,12 @@ c     "cfull" performs a complete rebuild of the partial charge
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine cfull (xold,yold,zold)
+      subroutine cfull
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'bound.i'
+      include 'cell.i'
       include 'charge.i'
       include 'iounit.i'
       include 'light.i'
@@ -573,23 +583,27 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r2,off
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       logical repeat
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nlight = (ncell+1) * nion
+      allocate (xsort(nlight))
+      allocate (ysort(nlight))
+      allocate (zsort(nlight))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
       do i = 1, nion
          nelst(i) = 0
          ii = kion(i)
-         xold(i) = x(ii)
-         yold(i) = y(ii)
-         zold(i) = z(ii)
+         xcold(i) = x(ii)
+         ycold(i) = y(ii)
+         zcold(i) = z(ii)
          xsort(i) = x(ii)
          ysort(i) = y(ii)
          zsort(i) = z(ii)
@@ -654,6 +668,12 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
 c     check to see if the neighbor lists are too long
 c
       do i = 1, nion
@@ -692,10 +712,6 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      save xold,yold,zold
 c
 c
 c     neighbor list cannot be used with the replicates method
@@ -715,10 +731,10 @@ c
          domlst = .false.
          if (octahedron) then
             do i = 1, npole
-               call mbuild (i,xold,yold,zold)
+               call mbuild (i)
             end do
          else
-            call mfull (xold,yold,zold)
+            call mfull
          end if
          return
       end if
@@ -730,26 +746,26 @@ c
          xi = x(ii)
          yi = y(ii)
          zi = z(ii)
-         xr = xi - xold(i)
-         yr = yi - yold(i)
-         zr = zi - zold(i)
+         xr = xi - xmold(i)
+         yr = yi - ymold(i)
+         zr = zi - zmold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          if (r2 .ge. lbuf2) then
 c
 c     store coordinates to reflect update of this site
 c
-            xold(i) = xi
-            yold(i) = yi
-            zold(i) = zi
+            xmold(i) = xi
+            ymold(i) = yi
+            zmold(i) = zi
 c
 c     rebuild the higher numbered neighbors of this site
 c
             j = 0
             do k = i+1, npole
-               xr = xi - xold(k)
-               yr = yi - yold(k)
-               zr = zi - zold(k)
+               xr = xi - xmold(k)
+               yr = yi - ymold(k)
+               zr = zi - zmold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -762,9 +778,9 @@ c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
-               xr = xi - xold(k)
-               yr = yi - yold(k)
-               zr = zi - zold(k)
+               xr = xi - xmold(k)
+               yr = yi - ymold(k)
+               zr = zi - zmold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -802,7 +818,7 @@ c     "mbuild" performs a complete rebuild of the atomic multipole
 c     electrostatic neighbor list for a single site
 c
 c
-      subroutine mbuild (i,xold,yold,zold)
+      subroutine mbuild (i)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -813,9 +829,6 @@ c
       integer i,j,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
 c
 c
 c     store new coordinates to reflect update of the site
@@ -824,9 +837,9 @@ c
       xi = x(ii)
       yi = y(ii)
       zi = z(ii)
-      xold(i) = xi
-      yold(i) = yi
-      zold(i) = zi
+      xmold(i) = xi
+      ymold(i) = yi
+      zmold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -868,11 +881,12 @@ c     "mfull" performs a complete rebuild of the atomic multipole
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine mfull (xold,yold,zold)
+      subroutine mfull
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'bound.i'
+      include 'cell.i'
       include 'iounit.i'
       include 'light.i'
       include 'mpole.i'
@@ -883,23 +897,27 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r2,off
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       logical repeat
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nlight = (ncell+1) * npole
+      allocate (xsort(nlight))
+      allocate (ysort(nlight))
+      allocate (zsort(nlight))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
       do i = 1, npole
          nelst(i) = 0
          ii = ipole(i)
-         xold(i) = x(ii)
-         yold(i) = y(ii)
-         zold(i) = z(ii)
+         xmold(i) = x(ii)
+         ymold(i) = y(ii)
+         zmold(i) = z(ii)
          xsort(i) = x(ii)
          ysort(i) = y(ii)
          zsort(i) = z(ii)
@@ -963,6 +981,12 @@ c
             goto 10
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
 c
 c     check to see if the neighbor lists are too long
 c

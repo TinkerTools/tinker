@@ -34,7 +34,7 @@ c
       logical dosystem,doparam
       logical doenergy,doatom
       logical dolarge,dodetail
-      logical doprops
+      logical doprops,doconect
       logical exist
       logical, allocatable :: active(:)
       character*1 letter
@@ -61,7 +61,8 @@ c
      &           /,' Energy Breakdown over Each of the Atoms [A]',
      &           /,' List of the Large Individual Interactions [L]',
      &           /,' Details for All Individual Interactions [D]',
-     &           /,' Electrostatic, Inertial & Virial Properties [M]')
+     &           /,' Electrostatic, Inertial & Virial Properties [M]',
+     &           /,' Connectivity Lists for Each of the Atoms [C]')
    20    continue
          write (iout,30)
    30    format (/,' Enter the Desired Analysis Types',
@@ -79,6 +80,7 @@ c
       dolarge = .false.
       dodetail = .false.
       doprops = .false.
+      doconect = .false.
       call upcase (string)
       do i = 1, trimtext(string)
          letter = string(i:i)
@@ -89,6 +91,7 @@ c
          if (letter .eq. 'L')  dolarge = .true.
          if (letter .eq. 'D')  dodetail = .true.
          if (letter .eq. 'M')  doprops = .true.
+         if (letter .eq. 'C')  doconect = .true.
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -171,7 +174,11 @@ c
 c
 c     get parameters used for molecular mechanics potentials
 c
-      if (doparam)  call paramyze (active)
+      if (doparam .and. doconect) then
+         call amberyze (active)
+      else if (doparam) then
+         call paramyze (active)
+      end if
 c
 c     perform analysis for each successive coordinate structure
 c
@@ -1526,5 +1533,802 @@ c
      &                         aes(i),aelf(i),aeg(i),aex(i)
          end if
       end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine amberyze  --  parameter format for Amber setup  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "amberyze" prints the force field parameters in a format needed
+c     by the Amber setup protocol for using AMOEBA within Amber; this
+c     is essentially the "paramyze" format from TINKER 4.3
+c
+c
+      subroutine amberyze (active)
+      implicit none
+      include 'sizes.i'
+      include 'angang.i'
+      include 'angle.i'
+      include 'angpot.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'bitor.i'
+      include 'bond.i'
+      include 'charge.i'
+      include 'dipole.i'
+      include 'improp.i'
+      include 'imptor.i'
+      include 'iounit.i'
+      include 'korbs.i'
+      include 'ktrtor.i'
+      include 'kvdws.i'
+      include 'math.i'
+      include 'mpole.i'
+      include 'opbend.i'
+      include 'opdist.i'
+      include 'piorbs.i'
+      include 'pistuf.i'
+      include 'pitors.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'potent.i'
+      include 'solute.i'
+      include 'strbnd.i'
+      include 'strtor.i'
+      include 'tors.i'
+      include 'tortor.i'
+      include 'units.i'
+      include 'urey.i'
+      include 'vdw.i'
+      include 'vdwpot.i'
+      integer i,j,k
+      integer ia,ib,ic
+      integer id,ie,ig
+      integer ixaxe
+      integer iyaxe
+      integer izaxe
+      integer fold(6)
+      real*8 bla,blc
+      real*8 sbavg
+      real*8 radj,rad4j
+      real*8 ampli(6)
+      real*8 phase(6)
+      real*8 mpl(13)
+      logical header
+      logical active(*)
+c
+c
+c     number of each type of interaction and site
+c
+      if (n .ne. 0) then
+         write (iout,10)
+   10    format (/,' Total Numbers of Atoms and Interactions :')
+         write (iout,20)  n
+   20    format (/,' Atoms in System',11x,i15)
+      end if
+      if (norbit .ne. 0) then
+         write (iout,30)  norbit
+   30    format (' Pisystem Atoms',12x,i15)
+      end if
+      if (nbond .ne. 0) then
+         write (iout,40)  nbond
+   40    format (' Bond Stretches',12x,i15)
+      end if
+      if (nbpi .ne. 0) then
+         write (iout,50)  nbpi
+   50    format (' Conjugated Pi-Bonds',7x,i15)
+      end if
+      if (nangle .ne. 0) then
+         write (iout,60)  nangle
+   60    format (' Angle Bends',15x,i15)
+      end if
+      if (nstrbnd .ne. 0) then
+         write (iout,70)  nstrbnd
+   70    format (' Stretch-Bends',13x,i15)
+      end if
+      if (nurey .ne. 0) then
+         write (iout,80)  nurey
+   80    format (' Urey-Bradley',14x,i15)
+      end if
+      if (nangang .ne. 0) then
+         write (iout,80)  nangang
+   90    format (' Angle-Angles',14x,i15)
+      end if
+      if (nopbend .ne. 0) then
+         write (iout,100)  nopbend
+  100    format (' Out-of-Plane Bends',8x,i15)
+      end if
+      if (nopdist .ne. 0) then
+         write (iout,110)  nopdist
+  110    format (' Out-of-Plane Distances',4x,i15)
+      end if
+      if (niprop .ne. 0) then
+         write (iout,120)  niprop
+  120    format (' Improper Dihedrals',8x,i15)
+      end if
+      if (nitors .ne. 0) then
+         write (iout,130)  nitors
+  130    format (' Improper Torsions',9x,i15)
+      end if
+      if (ntors .ne. 0) then
+         write (iout,140)  ntors
+  140    format (' Torsional Angles',10x,i15)
+      end if
+      if (npitors .ne. 0) then
+         write (iout,150)  npitors
+  150    format (' Pi-Orbital Torsions',7x,i15)
+      end if
+      if (nstrtor .ne. 0) then
+         write (iout,160)  nstrtor
+  160    format (' Stretch-Torsions',10x,i15)
+      end if
+      if (ntortor .ne. 0) then
+         write (iout,170)  ntortor
+  170    format (' Torsion-Torsions',10x,i15)
+      end if
+      if (nion .ne. 0) then
+         write (iout,180)  nion
+  180    format (' Atomic Partial Charges',4x,i15)
+      end if
+      if (ndipole .ne. 0) then
+         write (iout,190)  ndipole
+  190    format (' Bond Dipole Moments',7x,i15)
+      end if
+      if (npole .ne. 0) then
+         write (iout,200)  npole
+  200    format (' Polarizable Multipoles',4x,i15)
+      end if
+c
+c     parameters used for molecular mechanics atom types
+c
+      header = .true.
+      do i = 1, n
+         if (active(i)) then
+            if (header) then
+               header = .false.
+               write (iout,220)
+  220          format (/,' Atom Type Definition Parameters :',
+     &                 //,3x,'Atom',2x,'Symbol',2x,'Type',
+     &                    2x,'Class',2x,'Atomic',3x,'Mass',
+     &                    2x,'Valence',2x,'Description',/)
+            end if
+            write (iout,230)  i,name(i),type(i),class(i),atomic(i),
+     &                        mass(i),valence(i),story(i)
+  230       format (i6,5x,a3,2i7,i6,f10.3,i5,5x,a24)
+         end if
+      end do
+c
+c     parameters used for van der Waals interactions
+c
+      if (use_vdw) then
+         header = .true.
+         k = 0
+         do i = 1, n
+            if (active(i)) then
+               k = k + 1
+               if (header) then
+                  header = .false.
+                  write (iout,240)
+  240             format (/,' Van der Waals Parameters :',
+     &                    //,10x,'Atom Number',7x,'Radius',
+     &                       3x,'Epsilon',3x,'Rad 1-4',
+     &                       3x,'Eps 1-4',3x,'Reduction',/)
+               end if
+               j = class(i)
+               if (vdwindex .eq. 'TYPE')  j = type(i)
+               if (rad(j).eq.rad4(j) .and. eps(j).eq.eps4(j)) then
+                  radj = rad(j)
+                  if (radtyp .eq. 'SIGMA')  radj = radj / twosix
+                  if (reduct(j) .eq. 0.0d0) then
+                     write (iout,250)  k,i,radj,eps(j)
+  250                format (i6,3x,i6,7x,2f10.4)
+                  else
+                     write (iout,260)  k,i,radj,eps(j),reduct(j)
+  260                format (i6,3x,i6,7x,2f10.4,22x,f10.4)
+                  end if
+               else
+                  radj = rad(j)
+                  rad4j = rad4(j)
+                  if (radtyp .eq. 'SIGMA') then
+                     radj = radj / twosix
+                     rad4j = rad4j / twosix
+                  end if
+                  if (reduct(j) .eq. 0.0d0) then
+                     write (iout,270)  k,i,radj,eps(j),rad4j,eps4(j)
+  270                format (i6,3x,i6,7x,2f10.4,1x,2f10.4)
+                  else
+                     write (iout,280)  k,i,radj,eps(j),rad4j,
+     &                                eps4(j),reduct(j)
+  280                format (i6,3x,i6,7x,2f10.4,1x,2f10.4,1x,f10.4)
+                  end if
+               end if
+            end if
+         end do
+      end if
+c
+c     parameters used for bond stretching interactions
+c
+      if (use_bond) then
+         header = .true.
+         do i = 1, nbond
+            ia = ibnd(1,i)
+            ib = ibnd(2,i)
+            if (active(ia) .or. active(ib)) then
+               if (header) then
+                  header = .false.
+                  write (iout,290)
+  290             format (/,' Bond Stretching Parameters :',
+     &                    //,10x,'Atom Numbers',25x,'KS',7x,'Length',/)
+               end if
+               write (iout,300)  i,ia,ib,bk(i),bl(i)
+  300          format (i6,3x,2i6,19x,f10.3,f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for angle bending interactions
+c
+      if (use_angle) then
+         header = .true.
+         do i = 1, nangle
+            ia = iang(1,i)
+            ib = iang(2,i)
+            ic = iang(3,i)
+            if (active(ia) .or. active(ib) .or. active(ic)) then
+               if (header) then
+                  header = .false.
+                  write (iout,310)
+  310             format (/,' Angle Bending Parameters :',
+     &                    //,13x,'Atom Numbers',22x,'KB',
+     &                       6x,'Angle',3x,'Fold',4x,'Type',/)
+               end if
+               if (angtyp(i) .eq. 'HARMONIC') then
+                  write (iout,320)  i,ia,ib,ic,ak(i),anat(i)
+  320             format (i6,3x,3i6,13x,2f10.3)
+               else if (angtyp(i) .eq. 'IN-PLANE') then
+                  write (iout,330)  i,ia,ib,ic,ak(i),anat(i)
+  330             format (i6,3x,3i6,13x,2f10.3,9x,'In-Plane')
+               else if (angtyp(i) .eq. 'IN-PLANE') then
+                  write (iout,340)  i,ia,ib,ic,ak(i),anat(i)
+  340             format (i6,3x,3i6,13x,2f10.3,9x,'Linear')
+               else if (angtyp(i) .eq. 'FOURIER ') then
+                  write (iout,350)  i,ia,ib,ic,ak(i),anat(i),afld(i)
+  350             format (i6,3x,3i6,13x,2f10.3,f7.1,2x,'Fourier')
+               end if
+            end if
+         end do
+      end if
+c
+c     parameters used for stretch-bend interactions
+c
+      if (use_strbnd) then
+         header = .true.
+         do i = 1, nstrbnd
+            k = isb(1,i)
+            ia = iang(1,k)
+            ib = iang(2,k)
+            ic = iang(3,k)
+            if (active(ia) .or. active(ib) .or. active(ic)) then
+               if (header) then
+                  header = .false.
+                  write (iout,360)
+  360             format (/,' Stretch-Bend Parameters :',
+     &                    //,13x,'Atom Numbers',11x,'KSB',
+     &                       6x,'Angle',3x,'Length1',3x,'Length2',/)
+               end if
+               bla = 0.0d0
+               blc = 0.0d0
+               if (isb(2,i) .ne. 0)  bla = bl(isb(2,i))
+               if (isb(3,i) .ne. 0)  blc = bl(isb(3,i))
+               sbavg = (sbk(1,i)+sbk(2,i)) * 0.5d0
+               write (iout,370)  i,ia,ib,ic,sbavg,anat(k),bla,blc
+  370          format (i6,3x,3i6,f13.4,3f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for Urey-Bradley interactions
+c
+      if (use_urey) then
+         header = .true.
+         do i = 1, nurey
+            ia = iury(1,i)
+            ib = iury(2,i)
+            ic = iury(3,i)
+            if (active(ia) .or. active(ic)) then
+               if (header) then
+                  header = .false.
+                  write (iout,380)
+  380             format (/,' Urey-Bradley Parameters :',
+     &                    //,13x,'Atom Numbers',21x,'KUB',
+     &                       4x,'Distance',/)
+               end if
+               write (iout,390)  i,ia,ib,ic,uk(i),ul(i)
+  390          format (i6,3x,3i6,13x,f10.3,f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for out-of-plane bend interactions
+c
+      if (use_opbend) then
+         header = .true.
+         do i = 1, nopbend
+            k = iopb(i)
+            ia = iang(1,k)
+            ib = iang(2,k)
+            ic = iang(3,k)
+            id = iang(4,k)
+            if (active(ia) .or. active(ib) .or.
+     &             active(ic) .or. active(id)) then
+               if (header) then
+                  header = .false.
+                  write (iout,400)
+  400             format (/,' Out-of-Plane Bending Parameters :',
+     &                    //,17x,'Atom Numbers',19x,'KOPB',/)
+               end if
+               opbk(i) = opbk(i) * (opbunit/.02191418)
+               write (iout,410)  i,id,ib,ia,ic,opbk(i)
+  410          format (i6,3x,4i6,9x,f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for out-of-plane distance interactions
+c
+      if (use_opdist) then
+         header = .true.
+         do i = 1, nopdist
+            ia = iopd(1,i)
+            ib = iopd(2,i)
+            ic = iopd(3,i)
+            id = iopd(4,i)
+            if (active(ia) .or. active(ib) .or.
+     &             active(ic) .or. active(id)) then
+               if (header) then
+                  header = .false.
+                  write (iout,420)
+  420             format (/,' Out-of-Plane Distance Parameters :',
+     &                    //,17x,'Atom Numbers',19x,'KOPD',/)
+               end if
+               write (iout,430)  i,ia,ib,ic,id,opdk(i)
+  430          format (i6,3x,4i6,9x,f10.3)
+            end if
+         end do
+      end if
+c
+c     parameters used for improper dihedral interactions
+c
+      if (use_improp) then
+         header = .true.
+         do i = 1, niprop
+            ia = iiprop(1,i)
+            ib = iiprop(2,i)
+            ic = iiprop(3,i)
+            id = iiprop(4,i)
+            if (active(ia) .or. active(ib) .or.
+     &             active(ic) .or. active(id)) then
+               if (header) then
+                  header = .false.
+                  write (iout,440)
+  440             format (/,' Improper Dihedral Parameters :',
+     &                    //,17x,'Atom Numbers',19x,'KID',
+     &                       4x,'Dihedral',/)
+               end if
+               write (iout,450)  i,ia,ib,ic,id,kprop(i),vprop(i)
+  450          format (i6,3x,4i6,9x,2f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for improper torsion interactions
+c
+      if (use_imptor) then
+         header = .true.
+         do i = 1, nitors
+            ia = iitors(1,i)
+            ib = iitors(2,i)
+            ic = iitors(3,i)
+            id = iitors(4,i)
+            if (active(ia) .or. active(ib) .or.
+     &             active(ic) .or. active(id)) then
+               if (header) then
+                  header = .false.
+                  write (iout,460)
+  460             format (/,' Improper Torsion Parameters :',
+     &                    //,17x,'Atom Numbers',11x,
+     &                       'Amplitude, Phase and Periodicity',/)
+               end if
+               j = 0
+               if (itors1(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 1
+                  ampli(j) = itors1(1,i)
+                  phase(j) = itors1(2,i)
+               end if
+               if (itors2(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 2
+                  ampli(j) = itors2(1,i)
+                  phase(j) = itors2(2,i)
+               end if
+               if (itors3(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 3
+                  ampli(j) = itors3(1,i)
+                  phase(j) = itors3(2,i)
+               end if
+               if (j .eq. 0) then
+                  write (iout,470)  i,ia,ib,ic,id
+  470             format (i6,3x,4i6)
+               else if (j .eq. 1) then
+                  write (iout,480)  i,ia,ib,ic,id,
+     &                              ampli(1),phase(1),fold(1)
+  480             format (i6,3x,4i6,10x,f10.3,f8.1,i4)
+               else if (j .eq. 2) then
+                  write (iout,490)  i,ia,ib,ic,id,(ampli(k),
+     &                              phase(k),fold(k),k=1,j)
+  490             format (i6,3x,4i6,2x,2(f10.3,f6.1,i4))
+               else
+                  write (iout,500)  i,ia,ib,ic,id,(ampli(k),
+     &                              nint(phase(k)),fold(k),k=1,j)
+  500             format (i6,3x,4i6,4x,3(f8.3,i4,'/',i1))
+               end if
+            end if
+         end do
+      end if
+c
+c     parameters used for torsional interactions
+c
+      if (use_tors) then
+         header = .true.
+         do i = 1, ntors
+            ia = itors(1,i)
+            ib = itors(2,i)
+            ic = itors(3,i)
+            id = itors(4,i)
+            if (active(ia) .or. active(ib) .or.
+     &             active(ic) .or. active(id)) then
+               if (header) then
+                  header = .false.
+                  write (iout,510)
+  510             format (/,' Torsional Angle Parameters :',
+     &                    //,17x,'Atom Numbers',11x,
+     &                       'Amplitude, Phase and Periodicity',/)
+               end if
+               j = 0
+               if (tors1(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 1
+                  ampli(j) = tors1(1,i)
+                  phase(j) = tors1(2,i)
+               end if
+               if (tors2(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 2
+                  ampli(j) = tors2(1,i)
+                  phase(j) = tors2(2,i)
+               end if
+               if (tors3(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 3
+                  ampli(j) = tors3(1,i)
+                  phase(j) = tors3(2,i)
+               end if
+               if (tors4(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 4
+                  ampli(j) = tors4(1,i)
+                  phase(j) = tors4(2,i)
+               end if
+               if (tors5(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 5
+                  ampli(j) = tors5(1,i)
+                  phase(j) = tors5(2,i)
+               end if
+               if (tors6(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 6
+                  ampli(j) = tors6(1,i)
+                  phase(j) = tors6(2,i)
+               end if
+               if (j .eq. 0) then
+                  write (iout,520)  i,ia,ib,ic,id
+  520             format (i6,3x,4i6)
+               else
+                  write (iout,530)  i,ia,ib,ic,id,(ampli(k),
+     &                              nint(phase(k)),fold(k),k=1,j)
+  530             format (i6,3x,4i6,4x,6(f8.3,i4,'/',i1))
+               end if
+            end if
+         end do
+      end if
+c
+c     parameters used for pi-orbital torsion interactions
+c
+      if (use_pitors) then
+         header = .true.
+         do i = 1, npitors
+            ia = ipit(1,i)
+            ib = ipit(2,i)
+            ic = ipit(3,i)
+            id = ipit(4,i)
+            ie = ipit(5,i)
+            ig = ipit(6,i)
+            if (active(ia) .or. active(ib) .or. active(ic) .or.
+     &             active(id) .or. active(ie) .or. active(ig)) then
+               if (header) then
+                  header = .false.
+                  write (iout,540)
+  540             format (/,' Pi-Orbital Torsion Parameters :',
+     &                    //,10x,'Atom Numbers',19x,'Amplitude',/)
+               end if
+               write (iout,550)  i,ic,id,kpit(i)
+  550          format (i6,3x,2i6,19x,f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for stretch-torsion interactions
+c
+      if (use_strtor) then
+         header = .true.
+         do i = 1, nstrtor
+            k = ist(1,i)
+            ia = itors(1,k)
+            ib = itors(2,k)
+            ic = itors(3,k)
+            id = itors(4,k)
+            if (active(ia) .or. active(ib) .or.
+     &             active(ic) .or. active(id)) then
+               if (header) then
+                  header = .false.
+                  write (iout,560)
+  560             format (/,' Stretch-Torsion Parameters :',
+     &                    //,17x,'Atom Numbers',10x,'Length',
+     &                       5x,'Torsion Terms',/)
+               end if
+               j = 0
+               if (kst(1,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 1
+                  ampli(j) = kst(1,i)
+                  phase(j) = tors1(2,k)
+               end if
+               if (kst(2,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 2
+                  ampli(j) = kst(2,i)
+                  phase(j) = tors2(2,k)
+               end if
+               if (kst(3,i) .ne. 0.0d0) then
+                  j = j + 1
+                  fold(j) = 3
+                  ampli(j) = kst(3,i)
+                  phase(j) = tors3(2,k)
+               end if
+               write (iout,570)  i,ia,ib,ic,id,bl(ist(2,i)),
+     &                           (ampli(k),nint(phase(k)),
+     &                           fold(k),k=1,j)
+  570          format (i6,3x,4i6,2x,f10.4,1x,3(f8.3,i4,'/',i1))
+            end if
+         end do
+      end if
+c
+c     parameters used for torsion-torsion interactions
+c
+      if (use_tortor) then
+         header = .true.
+         do i = 1, ntortor
+            k = itt(1,i)
+            ia = ibitor(1,k)
+            ib = ibitor(2,k)
+            ic = ibitor(3,k)
+            id = ibitor(4,k)
+            ie = ibitor(5,k)
+            if (active(ia) .or. active(ib) .or. active(ic) .or.
+     &                active(id) .or. active(ie)) then
+               if (header) then
+                  header = .false.
+                  write (iout,580)
+  580             format (/,' Torsion-Torsion Parameters :',
+     &                    //,20x,'Atom Numbers',18x,'Spline Grid',/)
+               end if
+               j = itt(2,i)
+               write (iout,590)  i,ia,ib,ic,id,ie,tnx(j),tny(j)
+  590          format (i6,3x,5i6,10x,2i6)
+            end if
+         end do
+      end if
+c
+c     parameters used for atomic partial charges
+c
+      if (use_charge .or. use_chgdpl) then
+         header = .true.
+         do i = 1, nion
+            ia = iion(i)
+            ib = jion(i)
+            ic = kion(i)
+            if (active(ia) .or. active(ic)) then
+               if (header) then
+                  header = .false.
+                  write (iout,600)
+  600             format (/,' Atomic Partial Charge Parameters :',
+     &                    /,45x,'Neighbor',3x,'Cutoff',
+     &                    /,10x,'Atom Number',13x,'Charge',
+     &                       7x,'Site',6x,'Site',/)
+               end if
+               if (ia.eq.ib .and. ia.eq.ic) then
+                  write (iout,610)  i,ia,pchg(i)
+  610             format (i6,3x,i6,15x,f10.4)
+               else
+                  write (iout,620)  i,ia,pchg(i),ib,ic
+  620             format (i6,3x,i6,15x,f10.4,5x,i6,4x,i6)
+               end if
+            end if
+         end do
+      end if
+c
+c     parameters used for bond dipole moments
+c
+      if (use_dipole .or. use_chgdpl) then
+         header = .true.
+         do i = 1, ndipole
+            ia = idpl(1,i)
+            ib = idpl(2,i)
+            if (active(ia) .or. active(ib)) then
+               if (header) then
+                  header = .false.
+                  write (iout,630)
+  630             format (/,' Bond Dipole Moment Parameters :',
+     &                    //,10x,'Atom Numbers',22x,'Dipole',
+     &                       3x,'Position',/)
+               end if
+               write (iout,640)  i,ia,ib,bdpl(i),sdpl(i)
+  640          format (i6,3x,2i6,19x,f10.4,f10.3)
+            end if
+         end do
+      end if
+c
+c     parameters used for atomic multipole moments
+c
+      if (use_mpole) then
+         header = .true.
+         do i = 1, npole
+            ia = ipole(i)
+            if (active(ia)) then
+               if (header) then
+                  header = .false.
+                  write (iout,650)
+  650             format (/,' Atomic Multipole Parameters :',
+     &                    //,12x,'Atom',4x,'Coordinate Frame',
+     &                       ' Definition',7x,'Multipole Moments',/)
+               end if
+               izaxe = zaxis(i)
+               ixaxe = xaxis(i)
+               iyaxe = yaxis(i)
+               if (iyaxe .lt. 0)  iyaxe = -iyaxe
+               mpl(1) = pole(1,i)
+               do j = 2, 4
+                  mpl(j) = pole(j,i) / bohr
+               end do
+               do j = 5, 13
+                  mpl(j) = 3.0d0 * pole(j,i) / bohr**2
+               end do
+               if (izaxe .eq. 0) then
+                  write (iout,660)  i,ia,polaxe(i),
+     &                              (mpl(j),j=1,5),mpl(8),mpl(9),
+     &                              (mpl(j),j=11,13)
+  660             format (i6,3x,i6,25x,a8,2x,f9.5,/,50x,3f9.5,
+     &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
+               else if (ixaxe .eq. 0) then
+                  write (iout,670)  i,ia,izaxe,polaxe(i),
+     &                              (mpl(j),j=1,5),mpl(8),mpl(9),
+     &                              (mpl(j),j=11,13)
+  670             format (i6,3x,i6,1x,i7,17x,a8,2x,f9.5,/,50x,3f9.5,
+     &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
+               else  if (iyaxe .eq. 0) then
+                  write (iout,680)  i,ia,izaxe,ixaxe,polaxe(i),
+     &                              (mpl(j),j=1,5),mpl(8),mpl(9),
+     &                              (mpl(j),j=11,13)
+  680             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
+     &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
+               else
+                  write (iout,690)  i,ia,izaxe,ixaxe,iyaxe,polaxe(i),
+     &                              (mpl(j),j=1,5),mpl(8),mpl(9),
+     &                              (mpl(j),j=11,13)
+  690             format (i6,3x,i6,1x,3i7,3x,a8,2x,f9.5,/,50x,3f9.5,
+     &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
+               end if
+            end if
+         end do
+      end if
+c
+c     parameters used for dipole polarizability
+c
+c
+      if (use_polar) then
+         header = .true.
+         do i = 1, npole
+            ia = ipole(i)
+            if (active(ia)) then
+               if (header) then
+                  header = .false.
+                  write (iout,700)
+  700             format (/,' Dipole Polarizability Parameters :',
+     &                    //,10x,'Atom Number',9x,'Alpha',8x,
+     &                       'Polarization Group',/)
+               end if
+               write (iout,710)  i,ia,polarity(i),
+     &                           (ip11(j,ia),j=1,np11(ia))
+  710          format (i6,3x,i6,10x,f10.4,5x,20i6)
+            end if
+         end do
+      end if
+c
+c     parameters used for empirical solvation
+c
+      if (use_solv) then
+         header = .true.
+         k = 0
+         do i = 1, n
+            if (active(i)) then
+               k = k + 1
+               if (header) then
+                  header = .false.
+                  write (iout,720)
+  720             format (/,' Empirical Solvation Parameters :',
+     &                    //,10x,'Atom Number',13x,'Radius',
+     &                       3x,'ASP Value',/)
+               end if
+               write (iout,730)  k,i,rsolv(i),asolv(i)
+  730          format (i6,3x,i6,15x,2f10.4)
+            end if
+         end do
+      end if
+c
+c     parameters used for conjugated pisystem atoms
+c
+      if (use_orbit) then
+         header = .true.
+         do i = 1, norbit
+            ia = iorbit(i)
+            j = class(ia)
+            if (header) then
+               header = .false.
+               write (iout,740)
+  740          format (/,' Conjugated Pi-Atom Parameters :',
+     &                 //,10x,'Atom Number',14x,'Nelect',
+     &                    6x,'Ionize',4x,'Repulsion',/)
+            end if
+            write (iout,750)  i,ia,electron(j),ionize(j),repulse(j)
+  750       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
+         end do
+      end if
+c
+c     parameters used for conjugated pibond interactions
+c
+      if (use_orbit) then
+         header = .true.
+         do i = 1, nbpi
+            ia = ibpi(2,i)
+            ib = ibpi(3,i)
+            if (header) then
+               header = .false.
+               write (iout,760)
+  760          format (/,' Conjugated Pi-Bond Parameters :',
+     &                 //,10x,'Atom Numbers',21x,'K Slope',
+     &                    3x,'L Slope',/)
+            end if
+            write (iout,770)  i,ia,ib,kslope(i),lslope(i)
+  770       format (i6,3x,2i6,19x,2f10.4)
+         end do
+      end if
       return
       end

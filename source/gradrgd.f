@@ -31,8 +31,8 @@ c
       real*8 theta,ctheta,stheta
       real*8 ephi(3),etheta(3)
       real*8 epsi(3),tau(3)
-      real*8 g(3,maxatm)
       real*8 derivs(6,*)
+      real*8, allocatable :: g(:,:)
 c
 c
 c     zero out the total of rigid body derivative components
@@ -42,6 +42,10 @@ c
             derivs(j,i) = 0.0d0
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (g(3,n))
 c
 c     calculate the energy and Cartesian first derivatives
 c
@@ -74,7 +78,7 @@ c
          epsi(2) = ctheta * sphi
          epsi(3) = -stheta
 c
-c     first, get the rigid body gradients for translations
+c     find the rigid body gradients for translations
 c
          do j = init, stop
             k = kgrp(j)
@@ -98,7 +102,7 @@ c
             tau(3) = tau(3) + xterm*g(2,k) - yterm*g(1,k)
          end do
 c
-c     now, set the rigid body gradients for rotations
+c     find the rigid body gradients for rotations
 c
          do j = 1, 3
             derivs(4,i) = derivs(4,i) + tau(j)*ephi(j)
@@ -106,5 +110,9 @@ c
             derivs(6,i) = derivs(6,i) + tau(j)*epsi(j)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (g)
       return
       end

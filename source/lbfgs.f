@@ -118,7 +118,7 @@ c
 c     set default parameters for the optimization
 c
       msav = min(nvar,maxsav)
-      if (fctmin .eq. 0.0d0)  fctmin = -1000000.0d0
+      if (fctmin .eq. 0.0d0)  fctmin = -10000000.0d0
       if (maxiter .eq. 0)  maxiter = 1000000
       if (nextiter .eq. 0)  nextiter = 1
       if (iprint .lt. 0)  iprint = 1
@@ -212,22 +212,22 @@ c
             write (iout,40)
    40       format (/,' Steepest Descent Gradient Optimization :')
             write (iout,50)
-   50       format (/,' SD Iter    F Value      G RMS     F Move',
-     &                 '    X Move    Angle  FG Call  Comment',/)
+   50       format (/,' SD Iter     F Value      G RMS     F Move',
+     &                 '    X Move   Angle  FG Call  Comment',/)
          else
             write (iout,60)
    60       format (/,' Limited Memory BFGS Quasi-Newton',
      &                 ' Optimization :')
             write (iout,70)
-   70       format (/,' QN Iter    F Value      G RMS     F Move',
-     &                 '    X Move    Angle  FG Call  Comment',/)
+   70       format (/,' QN Iter     F Value      G RMS     F Move',
+     &                 '    X Move   Angle  FG Call  Comment',/)
          end if
-         if (f.lt.1.0d7 .and. f.gt.-1.0d6 .and. g_rms.lt.1.0d5) then
+         if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and. g_rms.lt.1.0d5) then
             write (iout,80)  niter,f,g_rms,ncalls
-   80       format (i6,f13.4,f11.4,30x,i7)
+   80       format (i6,f14.4,f11.4,29x,i7)
          else
             write (iout,90)  niter,f,g_rms,ncalls
-   90       format (i6,d13.4,d11.4,30x,i7)
+   90       format (i6,d14.4,d11.4,29x,i7)
          end if
       end if
 c
@@ -371,15 +371,15 @@ c     print intermediate results for the current iteration
 c
          if (iprint .gt. 0) then
             if (done .or. mod(niter,iprint).eq.0) then
-               if (f.lt.1.0d7 .and. f.gt.-1.0d6 .and.
+               if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and.
      &             g_rms.lt.1.0d5 .and. f_move.lt.1.0d5) then
                   write (iout,100)  niter,f,g_rms,f_move,x_move,
      &                              angle,ncalls,status
-  100             format (i6,f13.4,f11.4,f11.4,f10.4,f9.2,i7,3x,a9)
+  100             format (i6,f14.4,f11.4,f11.4,f10.4,f8.2,i7,3x,a9)
                else
                   write (iout,110)  niter,f,g_rms,f_move,x_move,
      &                              angle,ncalls,status
-  110             format (i6,d13.4,d11.4,d11.4,f10.4,f9.2,i7,3x,a9)
+  110             format (i6,d14.4,d11.4,d11.4,f10.4,f8.2,i7,3x,a9)
                end if
             end if
          end if

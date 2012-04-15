@@ -24,24 +24,21 @@ c
       subroutine invert (n,np,a)
       implicit none
       include 'iounit.i'
-      integer maxinv
-      parameter (maxinv=100)
       integer i,j,k,n,np
       integer icol,irow
-      integer ipivot(maxinv)
-      integer indxc(maxinv)
-      integer indxr(maxinv)
-      real*8 big,temp,pivot
-      real*8 a(np,np)
+      integer, allocatable :: ipivot(:)
+      integer, allocatable :: indxc(:)
+      integer, allocatable :: indxr(:)
+      real*8 big,temp
+      real*8 pivot
+      real*8 a(np,*)
 c
 c
-c     check to see if the matrix is too large to handle
+c     perform dynamic allocation of some local arrays
 c
-      if (n .gt. maxinv) then
-         write (iout,10)
-   10    format (/,' INVERT  --  Matrix Too Large; Increase MAXINV')
-         call fatal
-      end if
+      allocate (ipivot(n))
+      allocate (indxc(n))
+      allocate (indxr(n))
 c
 c     perform matrix inversion via the Gauss-Jordan algorithm
 c
@@ -60,8 +57,8 @@ c
                         icol = k
                      end if
                   else if (ipivot(k) .gt. 1) then
-                     write (iout,20)
-   20                format (/,' INVERT  --  Cannot Invert',
+                     write (iout,10)
+   10                format (/,' INVERT  --  Cannot Invert',
      &                          ' a Singular Matrix')
                      call fatal
                   end if
@@ -79,8 +76,8 @@ c
          indxr(i) = irow
          indxc(i) = icol
          if (a(icol,icol) .eq. 0.0d0) then
-            write (iout,30)
-   30       format (/,' INVERT  --  Cannot Invert a Singular Matrix')
+            write (iout,20)
+   20       format (/,' INVERT  --  Cannot Invert a Singular Matrix')
             call fatal
          end if
          pivot = a(icol,icol)
@@ -107,5 +104,11 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (ipivot)
+      deallocate (indxc)
+      deallocate (indxr)
       return
       end

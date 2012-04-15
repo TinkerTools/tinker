@@ -222,8 +222,8 @@ c
       include 'rigid.i'
       integer i,j,nvar
       real*8 optrigid1,e
-      real*8 xx(maxopt)
-      real*8 g(maxopt)
+      real*8 xx(*)
+      real*8 g(*)
       real*8 derivs(6,maxgrp)
 c
 c

@@ -609,9 +609,9 @@ c
       include 'hescut.i'
       integer i,j,k
       integer ihess,nfreq
-      integer hinit(3,maxatm)
-      integer hstop(3,maxatm)
       integer hindex(maxhess)
+      real*8, allocatable :: hinit(:,:)
+      real*8, allocatable :: hstop(:,:)
       real*8 h(maxhess)
       real*8 eigen(maxvib)
       real*8 vects(maxvib,maxvib)
@@ -622,6 +622,11 @@ c
       real*8 matrix((maxvib+1)*maxvib/2)
       real*8 hdiag(3,maxatm)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hinit(3,n))
+      allocate (hstop(3,n))
 c
 c     compute the Hessian matrix in Cartesian space
 c
@@ -647,6 +652,11 @@ c
       nfreq = 3 * n
       call diagq (nfreq,maxvib,nfreq,matrix,eigen,vects,
      &                     a,b,p,w,ta,tb,ty)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hinit)
+      deallocate (hstop)
       return
       end
 c
