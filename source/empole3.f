@@ -128,8 +128,8 @@ c
       real*8 scale7
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
       logical proceed
       logical header,huge
       logical usei,usek
@@ -160,6 +160,11 @@ c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -650,6 +655,11 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
       return
       end
 c
@@ -718,8 +728,8 @@ c
       real*8 scale7
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
       logical proceed
       logical header,huge
       logical usei,usek
@@ -750,6 +760,11 @@ c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -1000,6 +1015,11 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
       return
       end
 c
@@ -1219,8 +1239,8 @@ c
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8 bn(0:4)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
       logical header,huge
       logical muse,puse
       character*6 mode
@@ -1232,6 +1252,11 @@ c
       eintra = 0.0d0
       if (npole .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -1716,6 +1741,11 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
       return
       end
 c
@@ -1936,8 +1966,8 @@ c
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8 bn(0:4)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
       logical header,huge
       logical muse,puse
       character*6 mode
@@ -1949,6 +1979,11 @@ c
       eintra = 0.0d0
       if (npole .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2197,5 +2232,10 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
       return
       end

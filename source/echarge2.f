@@ -74,7 +74,7 @@ c
       real*8 r2,r3,r4
       real*8 r5,r6,r7
       real*8 term(3,3)
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed
       character*6 mode
 c
@@ -96,6 +96,10 @@ c
       xi = x(i)
       yi = y(i)
       zi = z(i)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -318,6 +322,10 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end
 c
@@ -363,7 +371,7 @@ c
       real*8 erfterm,expterm
       real*8 scale,scaleterm
       real*8 term(3,3)
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed
       external erfc
 c
@@ -386,6 +394,10 @@ c
       xi = x(i)
       yi = y(i)
       zi = z(i)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -551,6 +563,10 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end
 c
@@ -591,7 +607,7 @@ c
       real*8 wterm,width
       real*8 width2,width3
       real*8 term(3,3)
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed
       external erf
 c
@@ -613,6 +629,10 @@ c
       xi = x(i)
       yi = y(i)
       zi = z(i)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -751,5 +771,9 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end

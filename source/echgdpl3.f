@@ -40,7 +40,7 @@ c
       include 'usage.i'
       integer i,j,k
       integer i1,k1,k2
-      integer skip(maxatm)
+      integer, allocatable :: skip(:)
       real*8 e,rk2,rkr3,dotk
       real*8 taper,fgrp
       real*8 f,fi,fik
@@ -63,6 +63,10 @@ c
       end do
       if (ndipole.eq.0 .or. nion.eq.0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (skip(n))
 c
 c     zero out the list of atoms to be skipped
 c
@@ -274,5 +278,9 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (skip)
       return
       end

@@ -37,30 +37,33 @@ c
       integer option,delta
       integer trimtext,freeunit
       integer range(4)
-      integer atomic1(maxatm)
-      integer atomic2(maxatm)
+      integer, allocatable :: atomic1(:)
+      integer, allocatable :: atomic2(:)
       real*8 xr,yr,zr
       real*8 dist,cutoff
       real*8 rmsvalue
-      real*8 mass1(maxatm)
-      real*8 mass2(maxatm)
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8, allocatable :: mass1(:)
+      real*8, allocatable :: mass2(:)
+      real*8, allocatable :: x1(:)
+      real*8, allocatable :: y1(:)
+      real*8, allocatable :: z1(:)
+      real*8, allocatable :: x2(:)
+      real*8, allocatable :: y2(:)
+      real*8, allocatable :: z2(:)
       logical header,exist
       logical query,skip
       logical dopbc,dowrite
       logical self,same,twin
       character*1 answer
-      character*3 name1(maxatm)
-      character*3 name2(maxatm)
+      character*3, allocatable :: name1(:)
+      character*3, allocatable :: name2(:)
       character*120 file1,file2
       character*120 xyzfile
       character*120 record
       character*120 string
 c
 c
-c     get atom names and masses for the first structure type
+c     get atom names and masses for the first structure
 c
       call initial
       call getxyz
@@ -70,6 +73,18 @@ c
       call katom
       file1 = filename
       leng1 = trimtext (file1)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (atomic1(n))
+      allocate (mass1(n))
+      allocate (x1(n))
+      allocate (y1(n))
+      allocate (z1(n))
+      allocate (name1(n))
+c
+c     store atom names and masses for the first structure
+c
       n1 = n
       do i = 1, n1
          name1(i) = name(i)
@@ -77,13 +92,25 @@ c
          mass1(i) = mass(i)
       end do
 c
-c     get atom names and masses for the second structure type
+c     get atom names and masses for the second structure
 c
       call getxyz
       call field
       call katom
       file2 = filename
       leng2 = trimtext (file2)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (atomic2(n))
+      allocate (mass2(n))
+      allocate (x2(n))
+      allocate (y2(n))
+      allocate (z2(n))
+      allocate (name2(n))
+c
+c     store atom names and masses for the second structure
+c
       n2 = n
       do i = 1, n2
          name2(i) = name(i)
@@ -509,6 +536,21 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (atomic1)
+      deallocate (mass1)
+      deallocate (x1)
+      deallocate (y1)
+      deallocate (z1)
+      deallocate (name1)
+      deallocate (atomic2)
+      deallocate (mass2)
+      deallocate (x2)
+      deallocate (y2)
+      deallocate (z2)
+      deallocate (name2)
 c
 c     perform any final tasks before program exit
 c

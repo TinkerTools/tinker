@@ -37,10 +37,10 @@ c
       real*8 term,probe
       real*8 esurf,ehp,eace
       real*8 ecav,edisp
-      real*8 aecav(maxatm)
-      real*8 aedisp(maxatm)
-      real*8 aehp(maxatm)
-      real*8 aenp(maxatm)
+      real*8, allocatable :: aecav(:)
+      real*8, allocatable :: aedisp(:)
+      real*8, allocatable :: aehp(:)
+      real*8, allocatable :: aenp(:)
       logical header,huge
 c
 c
@@ -60,6 +60,13 @@ c
 c     set a value for the solvent molecule probe radius
 c
       probe = 1.4d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aecav(n))
+      allocate (aedisp(n))
+      allocate (aehp(n))
+      allocate (aenp(n))
 c
 c     total solvation energy for surface area only models
 c
@@ -151,6 +158,13 @@ c
    20       format (' Solvate',7x,i5,'-',a3,15x,3f12.4)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aecav)
+      deallocate (aedisp)
+      deallocate (aehp)
+      deallocate (aenp)
 c
 c     print nonpolar and electrostatic components for selected models
 c
@@ -521,11 +535,16 @@ c
       real*8 gqyz(10),gqzz(10)
       real*8 esym,ewi,ewk
       real*8 esymi,ewii,ewki
-      real*8 eself(maxatm)
-      real*8 ecross(maxatm)
+      real*8, allocatable :: eself(:)
+      real*8, allocatable :: ecross(:)
       logical proceed,usei
       character*6 mode
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (eself(n))
+      allocate (ecross(n))
 c
 c     zero out self energy and cross terms
 c
@@ -922,6 +941,11 @@ c
    20       format (i8,1x,2f15.4)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (eself)
+      deallocate (ecross)
       return
       end
 c
@@ -977,7 +1001,7 @@ c
       real*8 sc(6)
       real*8 sci(8)
       real*8 gli(3)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: pscale(:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -988,6 +1012,10 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1163,6 +1191,10 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pscale)
       return
       end
 c
@@ -1252,9 +1284,9 @@ c
       real*8 evol,esurf,aevol
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
-      real*8 aecav(maxatm)
-      real*8 aedisp(maxatm)
-      real*8 aesurf(maxatm)
+      real*8 aecav(*)
+      real*8 aedisp(*)
+      real*8, allocatable :: aesurf(:)
       character*6 mode
 c
 c
@@ -1266,6 +1298,10 @@ c
          aecav(i) = 0.0d0
          aedisp(i) = 0.0d0
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aesurf(n))
 c
 c     compute SASA and effective radius needed for cavity term
 c
@@ -1345,6 +1381,10 @@ c
          end do
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (aesurf)
+c
 c     find the implicit dispersion solvation energy
 c
       call ewca3 (edisp,aedisp)
@@ -1391,7 +1431,7 @@ c
       real*8 lik5,lik10,lik11,lik12
       real*8 uik,uik2,uik3,uik4
       real*8 uik5,uik10,uik11,uik12
-      real*8 aedisp(maxatm)
+      real*8 aedisp(*)
 c
 c
 c     zero out the WCA dispersion energy and partitioning
@@ -1584,8 +1624,8 @@ c
       real*8 epshi,rminhi
       real*8 oer7,oer14
       real*8 her7,her14
-      real*8 roff(maxatm)
-      real*8 aedisp(maxatm)
+      real*8 aedisp(*)
+      real*8, allocatable :: roff(:)
       logical done
 c
 c
@@ -1619,6 +1659,10 @@ c     rinit = 1.0d0
 c     rmult = 2.0d0
 c     rswitch = 4.0d0
 c     rmax = 7.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (roff(n))
 c
 c     set parameters for atomic radii and probe radii
 c
@@ -1761,6 +1805,10 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (roff)
+c
 c     print the total dispersion energy and energy for each atom
 c
       if (debug) then
@@ -1805,7 +1853,7 @@ c
       integer i,j,k,m
       integer ii,jj,kk
       integer nehp,sschk
-      integer omit(maxatm)
+      integer, allocatable :: omit(:)
       real*8 xr,yr,zr,r,r2
       real*8 e,ehp
       real*8 rsurf,pisurf
@@ -1816,8 +1864,8 @@ c
       real*8 e1,e2,e3,sum
       real*8 arg1,arg2,arg3
       real*8 arg12,arg22,arg32
-      real*8 cutmtx(maxatm)
-      real*8 aehp(maxatm)
+      real*8 aehp(*)
+      real*8, allocatable :: cutmtx(:)
 c
 c
 c     zero out the hydrophobic PMF energy and partitioning
@@ -1833,6 +1881,11 @@ c
       rsurf = rcarbon + 2.0d0*rwater
       pisurf = pi * (rcarbon+rwater)
       hpmfcut2 = hpmfcut * hpmfcut
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (omit(n))
+      allocate (cutmtx(n))
 c
 c     get the solvent accessible surface area for each atom
 c
@@ -1919,5 +1972,10 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (omit)
+      deallocate (cutmtx)
       return
       end

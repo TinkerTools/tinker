@@ -53,19 +53,24 @@ c
       real*8 random,ratio
       real*8 ekin(3,3)
       real*8 stress(3,3)
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      real*8 vold(3,maxatm)
-      real*8 derivs(3,maxatm)
-      real*8 alpha(3,maxatm)
-      real*8 beta(3,maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
+      real*8, allocatable :: vold(:,:)
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: alpha(:,:)
+      real*8, allocatable :: beta(:,:)
       save epot,nrej
 c
 c
 c     compute the half time step value
 c
       dt_2 = 0.5d0 * dt
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (alpha(3,n))
+      allocate (beta(3,n))
 c
 c     evolve velocities according to midpoint Euler for half-step
 c
@@ -83,6 +88,14 @@ c
       call kinetic (eksum,ekin)
       epold = epot
       etold = eksum + epot
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
+      allocate (vold(3,n))
+      allocate (derivs(3,n))
 c
 c     store the current positions and velocities, find half-step
 c     velocities and full-step positions via Verlet recursion
@@ -175,6 +188,16 @@ c
          end if
       end do      
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+      deallocate (vold)
+      deallocate (derivs)
+      deallocate (alpha)
+      deallocate (beta)
+c
 c     update the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
@@ -220,8 +243,8 @@ c
       integer i,j,istep
       real*8 dt,dt_2,dt_4
       real*8 normal,gamma,sigma
-      real*8 alpha(3,maxatm)
-      real*8 beta(3,maxatm)
+      real*8 alpha(3,*)
+      real*8 beta(3,*)
 c
 c
 c     set the atomic friction coefficients to the global value

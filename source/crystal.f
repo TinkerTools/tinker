@@ -353,12 +353,16 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       logical merge,join
-      logical omit(maxatm)
+      logical, allocatable :: omit(:)
 c
 c
 c     parse the system to find molecules and fragments
 c
       call molecule
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (omit(n))
 c
 c     zero out the list of atoms to be deleted
 c
@@ -428,6 +432,10 @@ c
       do i = j, 1, -1
          if (omit(i))  call delete (i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (omit)
 c
 c     parse the system to find molecules and fragments
 c
@@ -539,8 +547,13 @@ c
       integer i,j,k
       integer ii,jj,nsym
       integer na,nb,nc
-      real*8 trans(3,maxcell)
+      real*8, allocatable :: trans(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nsym = na * nb * nc
+      allocate (trans(3,nsym))
 c
 c     construct translation offsets for the replicated cells
 c
@@ -584,6 +597,10 @@ c
          end do
       end do
       n = nsym * n
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (trans)
       return
       end
 c

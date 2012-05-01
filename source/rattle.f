@@ -50,9 +50,14 @@ c
       real*8 yold(*)
       real*8 zold(*)
       logical done
-      logical moved(maxatm)
-      logical update(maxatm)
+      logical, allocatable :: moved(:)
+      logical, allocatable :: update(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (moved(n))
+      allocate (update(n))
 c
 c     initialize the lists of atoms previously corrected
 c
@@ -125,6 +130,11 @@ c
             update(i) = .false.
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (moved)
+      deallocate (update)
 c
 c     write information on the number of iterations needed
 c
@@ -219,9 +229,14 @@ c
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       logical done
-      logical moved(maxatm)
-      logical update(maxatm)
+      logical, allocatable :: moved(:)
+      logical, allocatable :: update(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (moved(n))
+      allocate (update(n))
 c
 c     initialize the lists of atoms previously corrected
 c
@@ -306,6 +321,11 @@ c
             update(i) = .false.
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (moved)
+      deallocate (update)
 c
 c     write information on the number of iterations needed
 c

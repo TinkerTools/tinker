@@ -22,16 +22,19 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'bound.i'
+      include 'boxes.i'
       include 'couple.i'
       include 'cutoff.i'
       include 'files.i'
       include 'iounit.i'
       include 'math.i'
+      include 'molcul.i'
       include 'titles.i'
       include 'units.i'
       include 'usage.i'
       integer i,j,k,m
       integer it,ixyz
+      integer init,stop
       integer natom,atmnum
       integer nmode,mode
       integer offset,origin
@@ -43,7 +46,6 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xran,yran,zran
-      real*8 xbox,ybox,zbox
       real*8 xorig,yorig,zorig
       real*8 xcm,ycm,zcm
       real*8 ri,rij,dij
@@ -97,14 +99,15 @@ c
      &        /,3x,'(13) Translate and Rotate to Inertial Frame',
      &        /,3x,'(14) Move to Specified Rigid Body Coordinates',
      &        /,3x,'(15) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(16) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(17) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(18) Append a Second XYZ file to Current One')
+     &        /,3x,'(16) Delete Molecules outside of Periodic Box',
+     &        /,3x,'(17) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(18) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(19) Append a Second XYZ File to Current One')
 c
 c     get the desired type of coordinate file modification
 c
    20 continue
-      nmode = 18
+      nmode = 19
       mode = -1
       do while (mode.lt.0 .or. mode.gt.nmode)
          mode = 0
@@ -509,23 +512,93 @@ c
          goto 20
       end if
 c
-c     create a random box full of the current coordinates file
+c     remove molecules to trim periodic box to a smaller size
 c
       if (mode .eq. 16) then
-         write (iout,310)
-  310    format (/,' Enter Number of Molecules in Box :  ',$)
-         read (input,320)  nmolecule
-  320    format (i10)
          xbox = 0.0d0
          ybox = 0.0d0
          zbox = 0.0d0
          do while (xbox .eq. 0.0d0)
-            write (iout,330)
-  330       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,340)  record
-  340       format (a120)
-            read (record,*,err=350,end=350)  xbox,ybox,zbox
-  350       continue
+            write (iout,310)
+  310       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,320)  record
+  320       format (a120)
+            read (record,*,err=330,end=330)  xbox,ybox,zbox
+  330       continue
+            if (ybox .eq. 0.0d0)  ybox = xbox
+            if (zbox .eq. 0.0d0)  zbox = xbox
+         end do
+         call lattice
+         call molecule
+         do i = 1, n
+            list(i) = 1
+         end do
+         do i = 1, nmol
+            init = imol(1,i)
+            stop = imol(2,i)
+            xcm = 0.0d0
+            ycm = 0.0d0
+            zcm = 0.0d0
+            do j = init, stop
+               k = kmol(j)
+               weigh = mass(k)
+               xcm = xcm + x(k)*weigh
+               ycm = ycm + y(k)*weigh
+               zcm = zcm + z(k)*weigh
+            end do
+            weigh = molmass(i)
+            xcm = xcm / weigh
+            ycm = ycm / weigh
+            zcm = zcm / weigh
+            if (abs(xcm).gt.xbox2 .or. abs(ycm).gt.ybox2
+     &                .or. abs(zcm).gt.zbox2) then
+               do j = init, stop
+                  k = kmol(j)
+                  list(k) = 0
+               end do
+            end if
+         end do
+         k = 0
+         do i = 1, n
+            if (list(i) .ne. 0) then
+               k = k + 1
+               keep(k) = i
+               list(i) = k
+            end if
+         end do
+         n = k
+         do k = 1, n
+            i = keep(k)
+            name(k) = name(i)
+            x(k) = x(i)
+            y(k) = y(i)
+            z(k) = z(i)
+            type(k) = type(i)
+            n12(k) = n12(i)
+            do j = 1, n12(k)
+               i12(j,k) = list(i12(j,i))
+            end do
+         end do
+         write = .true.
+      end if
+c
+c     create a random box full of the current coordinates file
+c
+      if (mode .eq. 17) then
+         write (iout,340)
+  340    format (/,' Enter Number of Molecules in Box :  ',$)
+         read (input,350)  nmolecule
+  350    format (i10)
+         xbox = 0.0d0
+         ybox = 0.0d0
+         zbox = 0.0d0
+         do while (xbox .eq. 0.0d0)
+            write (iout,360)
+  360       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,370)  record
+  370       format (a120)
+            read (record,*,err=380,end=380)  xbox,ybox,zbox
+  380       continue
             if (ybox .eq. 0.0d0)  ybox = xbox
             if (zbox .eq. 0.0d0)  zbox = xbox
          end do
@@ -554,21 +627,21 @@ c
          n = nmolecule * n
          call prtxyz (ixyz)
          close (unit=ixyz)
-         write (iout,360)  xyzfile
-  360    format (/,' New Coordinates written to :  ',a)
+         write (iout,390)  xyzfile
+  390    format (/,' New Coordinates written to :  ',a)
          write = .false.
       end if
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 17) then
+      if (mode .eq. 18) then
          call soak
          write = .true.
       end if
 c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 18) then
+      if (mode .eq. 19) then
          call makeref (1)
          call getxyz
          call merge (1)
@@ -593,21 +666,21 @@ c
             call prtxyz (ixyz)
          else
             if (ltitle .eq. 0) then
-               write (ixyz,370)  n
-  370          format (i6)
+               write (ixyz,400)  n
+  400          format (i6)
             else
-               write (ixyz,380)  n,title(1:ltitle)
-  380          format (i6,2x,a)
+               write (ixyz,410)  n,title(1:ltitle)
+  410          format (i6,2x,a)
             end if
             do i = 1, n
-               write (ixyz,390)  i+offset,name(i),x(i),y(i),z(i),
+               write (ixyz,420)  i+offset,name(i),x(i),y(i),z(i),
      &                           type(i),(i12(j,i)+offset,j=1,n12(i))
-  390          format (i6,2x,a3,3f12.6,5i6)
+  420          format (i6,2x,a3,3f12.6,5i6)
             end do
          end if
          close (unit=ixyz)
-         write (iout,400)  xyzfile
-  400    format (/,' New Coordinates written to File :  ',a)
+         write (iout,430)  xyzfile
+  430    format (/,' New Coordinates written to File :  ',a)
       end if
 c
 c     perform any final tasks before program exit

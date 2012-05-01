@@ -221,29 +221,43 @@ c
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 udir(3,maxatm)
-      real*8 udirp(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 uoldp(3,maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: uoldp(:,:)
       logical proceed,done
       character*6 mode
 c
 c
-c     zero out the induced dipole and the field at each site
+c     zero out the induced dipoles at each site
 c
       do i = 1, npole
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (pscale(n))
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
+c
+c     zero out the value of the field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
          end do
       end do
-      if (.not. use_polar)  return
 c
 c     set the switching function coefficients
 c
@@ -501,6 +515,13 @@ c
             end do
          end do
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (uold(3,npole))
+      allocate (uoldp(3,npole))
 c
 c     set induced dipoles to polarizability times direct field
 c
@@ -782,6 +803,17 @@ c
             call fatal
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      deallocate (field)
+      deallocate (fieldp)
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (uold)
+      deallocate (uoldp)
       return
       end
 c
@@ -845,29 +877,43 @@ c
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 udir(3,maxatm)
-      real*8 udirp(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 uoldp(3,maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: uoldp(:,:)
       logical proceed,done
       character*6 mode
 c
 c
-c     zero out the induced dipole and the field at each site
+c     zero out the induced dipoles at each site
 c
       do i = 1, npole
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (pscale(n))
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
+c
+c     zero out the value of the field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
          end do
       end do
-      if (.not. use_polar)  return
 c
 c     set the switching function coefficients
 c
@@ -995,6 +1041,13 @@ c
             end if
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (uold(3,npole))
+      allocate (uoldp(3,npole))
 c
 c     set induced dipoles to polarizability times direct field
 c
@@ -1178,6 +1231,17 @@ c
             call fatal
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      deallocate (field)
+      deallocate (fieldp)
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (uold)
+      deallocate (uoldp)
       return
       end
 c
@@ -1891,8 +1955,8 @@ c
       real*8 fim(3),fkm(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
@@ -1904,6 +1968,11 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2311,6 +2380,11 @@ c
             end do
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
       return
       end
 c
@@ -2811,7 +2885,7 @@ c
       real*8 fimp(3),fkmp(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dscale(maxatm)
+      real*8, allocatable :: dscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
@@ -2823,6 +2897,10 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -3095,6 +3173,10 @@ c
             end do
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
       return
       end
 c
@@ -3420,30 +3502,28 @@ c
       real*8 fip(3),fkp(3)
       real*8 fids(3),fkds(3)
       real*8 fips(3),fkps(3)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 fields(3,maxatm)
-      real*8 fieldps(3,maxatm)
-      real*8 gkfield(3,maxatm)
-      real*8 gkfieldp(3,maxatm)
-      real*8 udir(3,maxatm)
-      real*8 udirp(3,maxatm)
-      real*8 udirs(3,maxatm)
-      real*8 udirps(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 uoldp(3,maxatm)
-      real*8 uolds(3,maxatm)
-      real*8 uoldps(3,maxatm)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: fields(:,:)
+      real*8, allocatable :: fieldps(:,:)
+      real*8, allocatable :: gkfield(:,:)
+      real*8, allocatable :: gkfieldp(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: udirs(:,:)
+      real*8, allocatable :: udirps(:,:)
+      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: uoldp(:,:)
+      real*8, allocatable :: uolds(:,:)
+      real*8, allocatable :: uoldps(:,:)
       logical proceed,done
       character*6 mode
 c
 c
-c     zero out the induced dipoles and the fields at each site;
-c     uind & uinp are vacuum dipoles, uinds & uinps are SCRF dipoles,
-c     and field & fieldp are solute fields, gkfield & gkfieldp
-c     are reaction fields
+c     zero out the induced dipoles at each site; uind & uinp are
+c     vacuum dipoles, uinds & uinps are SCRF dipoles
 c
       do i = 1, npole
          do j = 1, 3
@@ -3451,13 +3531,30 @@ c
             uinp(j,i) = 0.0d0
             uinds(j,i) = 0.0d0
             uinps(j,i) = 0.0d0
+         end do
+      end do
+      if (.not.use_polar .and. .not.use_solv)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (pscale(n))
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
+      allocate (gkfield(3,npole))
+      allocate (gkfieldp(3,npole))
+c
+c     zero out the fields at each site; field & fieldp are solute
+c     fields, gkfield & gkfieldp are reaction fields
+c
+      do i = 1, npole
+         do j = 1, 3
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
             gkfield(j,i) = 0.0d0
             gkfieldp(j,i) = 0.0d0
          end do
       end do
-      if (.not.use_polar .and. .not.use_solv)  return
       dwater = 78.3d0
       fc = 1.0d0 * (1.0d0 - dwater)/(0.0d0 + 1.0d0*dwater)
       fd = 2.0d0 * (1.0d0 - dwater)/(1.0d0 + 2.0d0*dwater)
@@ -3798,6 +3895,19 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fields(3,npole))
+      allocate (fieldps(3,npole))
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (udirs(3,npole))
+      allocate (udirps(3,npole))
+      allocate (uold(3,npole))
+      allocate (uoldp(3,npole))
+      allocate (uolds(3,npole))
+      allocate (uoldps(3,npole))
+c
 c     set vacuum induced dipoles to polarizability times direct field;
 c     set SCRF induced dipoles to polarizability times direct field
 c     plus the GK reaction field due to permanent multipoles
@@ -4087,6 +4197,25 @@ c
             call fatal
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      deallocate (field)
+      deallocate (fieldp)
+      deallocate (fields)
+      deallocate (fieldps)
+      deallocate (gkfield)
+      deallocate (gkfieldp)
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (udirs)
+      deallocate (udirps)
+      deallocate (uold)
+      deallocate (uoldp)
+      deallocate (uolds)
+      deallocate (uoldps)
       return
       end
 c
@@ -4158,29 +4287,28 @@ c
       real*8 fip(3),fkp(3)
       real*8 fids(3),fkds(3)
       real*8 fips(3),fkps(3)
-      real*8 field(3,maxatm)
-      real*8 fieldp(3,maxatm)
-      real*8 fields(3,maxatm)
-      real*8 fieldps(3,maxatm)
-      real*8 udir(3,maxatm)
-      real*8 udirp(3,maxatm)
-      real*8 udirs(3,maxatm)
-      real*8 udirps(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 uoldp(3,maxatm)
-      real*8 uolds(3,maxatm)
-      real*8 uoldps(3,maxatm)
-      real*8 indpole(3,maxatm)
-      real*8 inppole(3,maxatm)
-      real*8 dscale(maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: fields(:,:)
+      real*8, allocatable :: fieldps(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: udirs(:,:)
+      real*8, allocatable :: udirps(:,:)
+      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: uoldp(:,:)
+      real*8, allocatable :: uolds(:,:)
+      real*8, allocatable :: uoldps(:,:)
+      real*8, allocatable :: indpole(:,:)
+      real*8, allocatable :: inppole(:,:)
       logical proceed,done
       character*6 mode
 c
 c
-c     zero out the induced dipoles and the fields at each site;
-c     uind and uinp are vacuum dipoles, uinds and uinps are SCRF
-c     dipoles, field and fieldp are solute fields
+c     zero out the induced dipoles; uind and uinp are vacuum dipoles,
+c     uinds and uinps are SCRF dipoles
 c
       do i = 1, npole
          do j = 1, 3
@@ -4188,11 +4316,26 @@ c
             uinp(j,i) = 0.0d0
             uinds(j,i) = 0.0d0
             uinps(j,i) = 0.0d0
+         end do
+      end do
+      if (.not.use_polar .or. .not.use_solv)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+      allocate (pscale(n))
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
+c
+c     zero out the fields at each site; field and fieldp are
+c     the solute fields
+c
+      do i = 1, npole
+         do j = 1, 3
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
          end do
       end do
-      if (.not.use_polar .or. .not.use_solv)  return
 c
 c     set the switching function coefficients
 c
@@ -4359,6 +4502,21 @@ c
 c     find Poisson-Boltzmann reaction field due to permanent multipoles
 c
       call pbempole
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fields(3,npole))
+      allocate (fieldps(3,npole))
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (udirs(3,npole))
+      allocate (udirps(3,npole))
+      allocate (uold(3,npole))
+      allocate (uoldp(3,npole))
+      allocate (uolds(3,npole))
+      allocate (uoldps(3,npole))
+      allocate (indpole(3,n))
+      allocate (inppole(3,n))
 c
 c     set vacuum induced dipoles to polarizability times direct field;
 c     SCRF induced dipoles are polarizability times direct field
@@ -4609,5 +4767,24 @@ c
             call fatal
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      deallocate (field)
+      deallocate (fieldp)
+      deallocate (fields)
+      deallocate (fieldps)
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (udirs)
+      deallocate (udirps)
+      deallocate (uold)
+      deallocate (uoldp)
+      deallocate (uolds)
+      deallocate (uoldps)
+      deallocate (indpole)
+      deallocate (inppole)
       return
       end

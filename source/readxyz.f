@@ -31,7 +31,7 @@ c
       integer first,last
       integer nexttext
       integer trimtext
-      integer list(maxatm)
+      integer, allocatable :: list(:)
       logical exist,opened
       logical quit,reorder
       logical clash
@@ -166,6 +166,10 @@ c
          call sort (n12(i),i12(1,i))
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
 c     check for scrambled atom order and attempt to renumber
 c
       reorder = .false.
@@ -186,10 +190,14 @@ c
          end do
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+c
 c     check for atom pairs with identical coordinates
 c
       clash = .false.
-      call chkxyz (clash)
+      if (n .le. 10000)  call chkxyz (clash)
 c
 c     make sure that all connectivities are bidirectional
 c

@@ -23,6 +23,7 @@ c
       include 'chunks.i'
       include 'inform.i'
       include 'iounit.i'
+      include 'neigh.i'
       include 'pme.i'
       include 'socket.i'
       include 'solute.i'
@@ -45,12 +46,25 @@ c
 c
 c     perform deallocation of associated pointers arrays
 c
+      if (associated(pmetable))  deallocate (pmetable)
+      if (associated(xvold))  deallocate (xvold)
+      if (associated(yvold))  deallocate (yvold)
+      if (associated(zvold))  deallocate (zvold)
+      if (associated(xcold))  deallocate (xcold)
+      if (associated(ycold))  deallocate (ycold)
+      if (associated(zcold))  deallocate (zcold)
+      if (associated(xmold))  deallocate (xmold)
+      if (associated(ymold))  deallocate (ymold)
+      if (associated(zmold))  deallocate (zmold)
+      if (associated(nvlst))  deallocate (nvlst)
+      if (associated(vlst))  deallocate (vlst)
+      if (associated(nelst))  deallocate (nelst)
+      if (associated(elst))  deallocate (elst)
       if (associated(thetai1))  deallocate (thetai1)
       if (associated(thetai2))  deallocate (thetai2)
       if (associated(thetai3))  deallocate (thetai3)
       if (associated(qgrid))  deallocate (qgrid)
       if (associated(qfac))  deallocate (qfac)
-      if (associated(pmetable))  deallocate (pmetable)
       if (associated(udalt))  deallocate (udalt)
       if (associated(upalt))  deallocate (upalt)
       if (associated(iuse))  deallocate (iuse)

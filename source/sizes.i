@@ -61,7 +61,7 @@ c
       integer maxbio,maxres,maxamino
       integer maxnuc,maxbnd,maxang
       integer maxtors,maxbitor
-      parameter (maxatm=300000)
+      parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
       parameter (maxref=10)
@@ -76,7 +76,7 @@ c
       parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
-      parameter (maxfft=200)
+      parameter (maxfft=250)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)
       parameter (maxgeo=2500)

@@ -206,9 +206,9 @@ c
       integer jj,kk
       integer start,stop
       integer nlist,nkeep
-      integer list(maxatm)
-      integer keep(maxatm)
-      integer mask(maxatm)
+      integer, allocatable :: list(:)
+      integer, allocatable :: keep(:)
+      integer, allocatable :: mask(:)
       logical done
 c
 c
@@ -239,6 +239,12 @@ c
    20       continue
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+      allocate (keep(n))
+      allocate (mask(n))
 c
 c     find any other group members for each atom in turn
 c
@@ -418,5 +424,11 @@ c
             abort = .true.
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (keep)
+      deallocate (mask)
       return
       end

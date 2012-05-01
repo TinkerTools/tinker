@@ -606,9 +606,9 @@ c
       implicit none
       integer i,j,k,n,m
       integer p_s,p_e
-      integer ind_x(m)
-      integer ind_y(m)
-      integer ind_z(m)
+      integer ind_x(*)
+      integer ind_y(*)
+      integer ind_z(*)
 c
 c
       p_s = 1

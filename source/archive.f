@@ -36,9 +36,9 @@ c
       integer freeunit
       integer list(20)
       real*8 xr,yr,zr
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
       logical exist,query
       character*1 answer
       character*7 ext,modtyp
@@ -246,6 +246,12 @@ c
          call lattice
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
+c
 c     get the initial and final coordinate frames to process
 c
       if (modtyp .ne. 'EXIT') then
@@ -383,6 +389,12 @@ c
          end do
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+c
 c     perform any final tasks before program exit
 c
       close (unit=iarc)
@@ -412,7 +424,13 @@ c
       include 'titles.i'
       include 'usage.i'
       integer i,k,iarc
+      integer size,crdsiz
+      real*8 crdmin,crdmax
       logical opened
+      character*2 atmc
+      character*2 crdc
+      character*2 digc
+      character*25 fstr
       character*120 arcfile
 c
 c
@@ -425,43 +443,56 @@ c
          open (unit=iarc,file=arcfile,status='new')
       end if
 c
+c     check for large systems needing extended formatting
+c
+      atmc = 'i6'
+      if (n .ge. 100000)  atmc = 'i7'
+      if (n .ge. 1000000)  atmc = 'i8'
+      crdmin = 0.0d0
+      crdmax = 0.0d0
+      do i = 1, n
+         crdmin = min(crdmin,x(i),y(i),z(i))
+         crdmax = max(crdmax,x(i),y(i),z(i))
+      end do
+      crdsiz = 6
+      if (crdmin .le. -1000.0d0)  crdsiz = 7
+      if (crdmax .ge. 10000.0d0)  crdsiz = 7
+      if (crdmin .le. -10000.0d0)  crdsiz = 8
+      if (crdmax .ge. 100000.0d0)  crdsiz = 8
+      crdsiz = crdsiz + max(6,digits)
+      size = 0
+      call numeral (crdsiz,crdc,size)
+      if (digits .le. 6) then
+         digc = '6 '
+      else if (digits .le. 8) then
+         digc = '8'
+      else
+         digc = '10'
+      end if
+c
 c     write out the number of atoms and the title
 c
       if (ltitle .eq. 0) then
-         write (iarc,10)  nuse
-   10    format (i6)
+         fstr = '('//atmc//')'
+         write (iarc,fstr(1:4))  nuse
       else
-         write (iarc,20)  nuse,title(1:ltitle)
-   20    format (i6,2x,a)
+         fstr = '('//atmc//',2x,a)'
+         write (iarc,fstr(1:9))  nuse,title(1:ltitle)
       end if
 c
-c     finally, write the coordinates for each atom
+c     write out the coordinate line for each atom
 c
-      if (digits .le. 6) then
-         do i = 1, n
-            if (use(i)) then
-               write (iarc,30)  i,name(i),x(i),y(i),z(i),type(i),
-     &                          (i12(k,i),k=1,n12(i))
-   30          format (i6,2x,a3,3f12.6,9i6)
-            end if
-         end do
-      else if (digits .le. 8) then
-         do i = 1, n
-            if (use(i)) then
-               write (iarc,40)  i,name(i),x(i),y(i),z(i),type(i),
-     &                          (i12(k,i),k=1,n12(i))
-   40          format (i6,2x,a3,3f14.8,9i6)
-            end if
-         end do
-      else
-         do i = 1, n
-            if (use(i)) then
-               write (iarc,50)  i,name(i),x(i),y(i),z(i),type(i),
-     &                          (i12(k,i),k=1,n12(i))
-   50          format (i6,2x,a3,3f16.10,9i6)
-            end if
-         end do
-      end if
+      fstr = '('//atmc//',2x,a3,3f'//crdc//
+     &          '.'//digc//',i6,8'//atmc//')'
+      do i = 1, n
+         if (use(i)) then
+            write (iarc,fstr)  i,name(i),x(i),y(i),z(i),type(i),
+     &                         (i12(k,i),k=1,n12(i))
+         end if
+      end do
+c
+c     close the output unit if opened by this routine
+c
       if (.not. opened)  close (unit=iarc)
       return
       end

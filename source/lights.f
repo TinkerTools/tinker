@@ -34,12 +34,12 @@ c
       real*8 cutoff,box
       real*8 xcut,ycut,zcut
       real*8 xmove,ymove,zmove
-      real*8 xfrac(maxatm)
-      real*8 yfrac(maxatm)
-      real*8 zfrac(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8 xsort(*)
+      real*8 ysort(*)
+      real*8 zsort(*)
+      real*8, allocatable :: xfrac(:)
+      real*8, allocatable :: yfrac(:)
+      real*8, allocatable :: zfrac(:)
 c
 c
 c     check that maximum number of replicates is not exceeded
@@ -83,6 +83,12 @@ c
          ycut = min(ycut,ycell2)
          zcut = min(zcut,zcell2)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xfrac(nsite))
+      allocate (yfrac(nsite))
+      allocate (zfrac(nsite))
 c
 c     find fractional coordinates for the unitcell atoms
 c
@@ -153,6 +159,12 @@ c
             end do
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xfrac)
+      deallocate (yfrac)
+      deallocate (zfrac)
 c
 c     sort the coordinate components into ascending order
 c

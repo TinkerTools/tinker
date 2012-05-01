@@ -45,9 +45,9 @@ c
       include 'potent.i'
       integer i,j,k
       integer nlist
-      integer list(maxatm)
+      integer, allocatable :: list(:)
       real*8 eps,old
-      real*8 d0(3,maxatm)
+      real*8, allocatable :: d0(:,:)
       logical biglist
       logical reinduce
       logical twosided
@@ -64,6 +64,11 @@ c
          reinduce = .true.
          twosided = .true.
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(npole))
+      allocate (d0(3,n))
 c
 c     find the multipole definitions involving the current atom;
 c     results in a faster but approximate Hessian calculation
@@ -150,6 +155,11 @@ c
             hessz(j,k) = hessz(j,k) + (dem(j,k)+dep(j,k)-d0(j,k))/eps
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (d0)
       return
       end
 c
@@ -190,7 +200,7 @@ c
       integer ii,iii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      integer list(maxatm)
+      integer list(*)
       real*8 f,fgrp,gfd
       real*8 damp,expdamp
       real*8 pdi,pti,pgamma
@@ -235,10 +245,10 @@ c
       real*8 gl(0:8),gli(7),glip(7)
       real*8 sc(10),sci(8),scip(8)
       real*8 gf(7),gfi(6),gti(6)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 dscale(maxatm)
-      real*8 uscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       logical proceed
       logical usei,usek
       logical reinduce
@@ -254,6 +264,13 @@ c
          end do
       end do
       if (nlist .eq. 0)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -870,6 +887,13 @@ c
             uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
 c
 c     zero out the derivatives for terms that are not used
 c

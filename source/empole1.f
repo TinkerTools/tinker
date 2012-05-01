@@ -160,10 +160,10 @@ c
       real*8 gl(0:8),gli(7),glip(7)
       real*8 sc(10),sci(8),scip(8)
       real*8 gf(7),gfi(6),gti(6)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 dscale(maxatm)
-      real*8 uscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -190,6 +190,13 @@ c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -1594,6 +1601,13 @@ c
          end do
       end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
       return
       end
 c
@@ -1691,10 +1705,10 @@ c
       real*8 gl(0:8),gli(7),glip(7)
       real*8 sc(10),sci(8),scip(8)
       real*8 gf(7),gfi(6),gti(6)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 dscale(maxatm)
-      real*8 uscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -1721,6 +1735,13 @@ c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2403,6 +2424,13 @@ c
             uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
       return
       end
 c
@@ -2739,10 +2767,10 @@ c
       real*8 gf(7),gfi(6)
       real*8 gfr(7),gfri(6)
       real*8 gti(6),gtri(6)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 dscale(maxatm)
-      real*8 uscale(maxatm)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       character*6 mode
       external erfc
 c
@@ -2751,6 +2779,13 @@ c     zero out the intramolecular portion of the Ewald energy
 c
       eintra = 0.0d0
       if (npole .eq. 0)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mscale(n))
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -4400,6 +4435,13 @@ c
          end do
       end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mscale)
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
       return
       end
 c
@@ -4739,22 +4781,14 @@ c
       real*8 gfr(7),gfri(6)
       real*8 gti(6),gtri(6)
       real*8 viri(3,3)
-c     real*8, allocatable :: mscale(:)
-c     real*8, allocatable :: pscale(:)
-c     real*8, allocatable :: dscale(:)
-c     real*8, allocatable :: uscale(:)
+      real*8, allocatable :: mscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8, allocatable :: demi(:,:)
       real*8, allocatable :: demk(:,:)
       real*8, allocatable :: depi(:,:)
       real*8, allocatable :: depk(:,:)
-      real*8 mscale(maxatm)
-      real*8 pscale(maxatm)
-      real*8 dscale(maxatm)
-      real*8 uscale(maxatm)
-c     real*8 demi(3,maxatm)
-c     real*8 demk(3,maxatm)
-c     real*8 depi(3,maxatm)
-c     real*8 depk(3,maxatm)
       logical dorl,dorli
       character*6 mode
       external erfc
@@ -4767,10 +4801,10 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-c     allocate (mscale(n))
-c     allocate (pscale(n))
-c     allocate (dscale(n))
-c     allocate (uscale(n))
+      allocate (mscale(n))
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
       allocate (demi(3,n))
       allocate (demk(3,n))
       allocate (depi(3,n))
@@ -5714,10 +5748,10 @@ c
 c
 c     perform deallocation of some local arrays
 c
-c     deallocate (mscale)
-c     deallocate (pscale)
-c     deallocate (dscale)
-c     deallocate (uscale)
+      deallocate (mscale)
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
       deallocate (demi)
       deallocate (demk)
       deallocate (depi)
@@ -5814,7 +5848,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (frc(3,npole))
+      allocate (frc(3,n))
       allocate (trq(3,npole))
       allocate (fuind(3,npole))
       allocate (fuinp(3,npole))

@@ -33,7 +33,7 @@ c
       real*8 term,probe
       real*8 esurf,ehp,eace
       real*8 ecav,edisp
-      real*8 aes(maxatm)
+      real*8, allocatable :: aes(:)
 c
 c
 c     zero out the implicit solvation energy and derivatives
@@ -55,6 +55,10 @@ c
 c     set a value for the solvent molecule probe radius
 c
       probe = 1.4d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aes(n))
 c
 c     solvation energy and derivs for surface area only models
 c
@@ -96,6 +100,10 @@ c
          end do
          es = eace
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aes)
 c
 c     get polarization energy and derivatives for solvation methods
 c
@@ -588,13 +596,13 @@ c
       real*8 b(0:4,0:2)
       real*8 fid(3),fkd(3)
       real*8 fidg(3,3),fkdg(3,3)
-      real*8 trq(3,maxatm)
-      real*8 trqi(3,maxatm)
-      real*8 gc(30)
-      real*8 gux(30),guy(30),guz(30)
+      real*8 gc(30),gux(30)
+      real*8 guy(30),guz(30)
       real*8 gqxx(30),gqxy(30)
       real*8 gqxz(30),gqyy(30)
       real*8 gqyz(30),gqzz(30)
+      real*8, allocatable :: trq(:,:)
+      real*8, allocatable :: trqi(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -618,6 +626,11 @@ c
          call chkpole
          call rotpole
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (trq(3,n))
+      allocate (trqi(3,n))
 c
 c     zero out local accumulation arrays for derivatives
 c
@@ -2047,6 +2060,11 @@ c
       end do
       call torque2 (trq,des)
       call torque2 (trqi,des)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (trq)
+      deallocate (trqi)
       return
       end
 c
@@ -2129,12 +2147,12 @@ c
       real*8 sc(10)
       real*8 sci(8),scip(8)
       real*8 gfi(6),gti(6)
-      real*8 pscale(maxatm)
-      real*8 dscale(maxatm)
-      real*8 uscale(maxatm)
-      real*8 ftm1i(3,maxatm)
-      real*8 ttm1i(3,maxatm)
-      real*8 trqi(3,maxatm)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
+      real*8, allocatable :: trqi(:,:)
+      real*8, allocatable :: ftm1i(:,:)
+      real*8, allocatable :: ttm1i(:,:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -2145,6 +2163,15 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
+      allocate (trqi(3,n))
+      allocate (ftm1i(3,npole))
+      allocate (ttm1i(3,npole))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2963,6 +2990,15 @@ c
          trqi(3,ii) = trqi(3,ii) + f*ttm1i(3,i)
       end do
       call torque2 (trqi,des)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
+      deallocate (trqi)
+      deallocate (ftm1i)
+      deallocate (ttm1i)
       return
       end
 c
@@ -3018,14 +3054,23 @@ c
       include 'potent.i'
       integer i,j,ii
       real*8 sum
-      real*8 detor(3,maxatm)
-      real*8 indpole(3,maxatm)
-      real*8 inppole(3,maxatm)
-      real*8 directf(3,maxatm)
-      real*8 directt(3,maxatm)
-      real*8 mutualf(3,maxatm)
-      real*8 polgrd(3,maxatm)
+      real*8, allocatable :: indpole(:,:)
+      real*8, allocatable :: inppole(:,:)
+      real*8, allocatable :: directf(:,:)
+      real*8, allocatable :: directt(:,:)
+      real*8, allocatable :: mutualf(:,:)
+      real*8, allocatable :: polgrd(:,:)
+      real*8, allocatable :: detor(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (indpole(3,n))
+      allocate (inppole(3,n))
+      allocate (directf(3,n))
+      allocate (directt(3,n))
+      allocate (mutualf(3,n))
+      allocate (polgrd(3,n))
 c
 c     induced dipole implicit energy via their
 c     interaction with the permanent multipoles
@@ -3119,9 +3164,22 @@ c
          call pbempole
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (indpole)
+      deallocate (inppole)
+      deallocate (directf)
+      deallocate (directt)
+      deallocate (mutualf)
+      deallocate (polgrd)
+c
 c     increment solvation energy by Poisson-Boltzmann results
 c
       es = es + pbe
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (detor(3,n))
 c
 c     convert torques on permanent moments due to their own reaction
 c     field into forces on adjacent atoms
@@ -3140,6 +3198,10 @@ c
          des(2,i) = des(2,i) - pbfp(2,i) + detor(2,i)
          des(3,i) = des(3,i) - pbfp(3,i) + detor(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (detor)
       return
       end
 c
@@ -3175,9 +3237,9 @@ c
       real*8 tapersa,dtapersa
       real*8 reff,reff2,reff3
       real*8 reff4,reff5,dreff
-      real*8 aesurf(maxatm)
-      real*8 dsurf(3,maxatm)
-      real*8 dvol(3,maxatm)
+      real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: dsurf(:,:)
+      real*8, allocatable :: dvol(:,:)
       character*6 mode
 c
 c
@@ -3185,7 +3247,13 @@ c     zero out the nonpolar solvation energy and first derivatives
 c
       ecav = 0.0d0
       edisp = 0.0d0
-
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aesurf(n))
+      allocate (dsurf(3,n))
+      allocate (dvol(3,n))
+c
 c     compute SASA and effective radius needed for cavity term
 c
       exclude = 1.4d0
@@ -3300,6 +3368,12 @@ c
             des(3,i) = des(3,i) + dsurf(3,i)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aesurf)
+      deallocate (dsurf)
+      deallocate (dvol)
 c
 c     find the implicit dispersion solvation energy
 c
@@ -3619,7 +3693,7 @@ c
       integer i,j,k,m
       integer ii,jj,kk
       integer sschk
-      integer omit(maxatm)
+      integer, allocatable :: omit(:)
       real*8 xi,yi,zi
       real*8 xk,yk,zk
       real*8 xr,yr,zr
@@ -3636,8 +3710,8 @@ c
       real*8 de1,de2,de3,dsum
       real*8 sumi,sumj,term
       real*8 dedx,dedy,dedz
-      real*8 cutmtx(maxatm)
-      real*8 dcutmtx(maxatm)
+      real*8, allocatable :: cutmtx(:)
+      real*8, allocatable :: dcutmtx(:)
       real*8, allocatable :: dacsa(:,:)
 c
 c
@@ -3653,6 +3727,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (omit(n))
+      allocate (cutmtx(n))
+      allocate (dcutmtx(n))
       allocate (dacsa(n,npmf))
 c
 c     get the surface area and derivative terms for each atom
@@ -3818,6 +3895,9 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (omit)
+      deallocate (cutmtx)
+      deallocate (dcutmtx)
       deallocate (dacsa)
       return
       end

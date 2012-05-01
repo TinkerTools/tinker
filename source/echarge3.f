@@ -92,7 +92,7 @@ c
       real*8 shift,taper,trans
       real*8 rc,rc2,rc3,rc4
       real*8 rc5,rc6,rc7
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -107,6 +107,10 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -392,6 +396,10 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end
 c
@@ -445,10 +453,10 @@ c
       real*8 shift,taper,trans
       real*8 rc,rc2,rc3,rc4
       real*8 rc5,rc6,rc7
-      real*8 cscale(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8, allocatable :: cscale(:)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       logical proceed,usei
       logical prime,repeat
       logical header,huge
@@ -464,6 +472,13 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+      allocate (xsort(8*n))
+      allocate (ysort(8*n))
+      allocate (zsort(8*n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -683,6 +698,13 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
       return
       end
 c
@@ -733,7 +755,7 @@ c
       real*8 shift,taper,trans
       real*8 rc,rc2,rc3,rc4
       real*8 rc5,rc6,rc7
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -748,6 +770,10 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -893,6 +919,10 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end
 c
@@ -945,7 +975,7 @@ c
       real*8 xd,yd,zd
       real*8 erfc,erfterm
       real*8 scale,scaleterm
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -961,6 +991,10 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1232,6 +1266,10 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end
 c
@@ -1286,10 +1324,10 @@ c
       real*8 xd,yd,zd
       real*8 erfc,erfterm
       real*8 scale,scaleterm
-      real*8 cscale(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8, allocatable :: cscale(:)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       logical proceed,usei
       logical prime,repeat
       logical header,huge
@@ -1306,6 +1344,13 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+      allocate (xsort(8*n))
+      allocate (ysort(8*n))
+      allocate (zsort(8*n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1535,6 +1580,13 @@ c
 c     intermolecular energy is total minus intramolecular part
 c
       einter = einter + ec - eintra
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
       return
       end
 c
@@ -1589,8 +1641,8 @@ c
       real*8 erfc,erfterm
       real*8 scale,scaleterm
       real*8 ect,eintrat
-      real*8 cscale(maxatm)
-      real*8 aect(maxatm)
+      real*8, allocatable :: cscale(:)
+      real*8, allocatable :: aect(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -1606,6 +1658,11 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+      allocate (aect(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1797,6 +1854,11 @@ c
 c     intermolecular energy is total minus intramolecular part
 c
       einter = einter + ec - eintra
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
+      deallocate (aect)
       return
       end
 c
@@ -1841,7 +1903,7 @@ c
       real*8 xr,yr,zr
       real*8 erf,wterm,width
       real*8 width2,width3
-      real*8 cscale(maxatm)
+      real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
       external erf
@@ -1856,6 +1918,10 @@ c
       end do
       if (nion .eq. 0)  return
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -2000,5 +2066,9 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
       return
       end

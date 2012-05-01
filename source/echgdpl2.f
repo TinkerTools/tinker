@@ -32,8 +32,8 @@ c
       include 'units.i'
       integer i,k,jcell
       integer ii,i1,k1,k2
-      integer skip(maxatm)
-      integer omit(maxatm)
+      integer, allocatable :: skip(:)
+      integer, allocatable :: omit(:)
       real*8 f,fi,fk,fik
       real*8 fgrp,sk1,sk2
       real*8 xi,yi,zi,xk,yk,zk
@@ -80,9 +80,17 @@ c
       character*6 mode
 c
 c
-c     zero out the lists of atoms to be skipped
+c     check for the presence of both charges and dipoles
 c
       if (ndipole.eq.0 .or. nion.eq.0)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (skip(n))
+      allocate (omit(n))
+c
+c     zero out the lists of atoms to be skipped
+c
       do k = 1, n
          skip(k) = 0
          omit(k) = 0
@@ -1454,5 +1462,10 @@ c
          end do
    40    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (skip)
+      deallocate (omit)
       return
       end

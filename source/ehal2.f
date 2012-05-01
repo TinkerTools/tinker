@@ -34,7 +34,7 @@ c
       integer kk,kv,kt
       integer iatom,jcell
       integer nlist,list(5)
-      integer iv14(maxatm)
+      integer, allocatable :: iv14(:)
       real*8 e,de,d2e,fgrp
       real*8 eps,rv,rv7
       real*8 xi,yi,zi
@@ -52,13 +52,18 @@ c
       real*8 rik6,rik7
       real*8 d2edx,d2edy,d2edz
       real*8 term(3,3)
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 vscale(maxatm)
+      real*8 xred(*)
+      real*8 yred(*)
+      real*8 zred(*)
+      real*8, allocatable :: vscale(:)
       logical proceed
       character*6 mode
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -583,5 +588,10 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (vscale)
       return
       end

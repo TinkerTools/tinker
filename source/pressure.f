@@ -326,10 +326,16 @@ c
       real*8 yboxold,zboxold
       real*8 kt,de,dv,lnv
       real*8 term,expterm
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
 c
 c     make volume move, save old box size and coordinates
 c
@@ -472,6 +478,12 @@ c
             end do
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
       return
       end
 c
@@ -510,9 +522,9 @@ c
       real*8 epos,eneg
       real*8 dedv_fd
       real*8 dedv_vir
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
 c
 c
 c     set relative volume change for finite-differences
@@ -520,6 +532,12 @@ c
       if (.not. use_bounds)  return
       delta = 0.00000001d0
       step = volbox * delta
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
 c
 c     store original box dimensions and coordinate values
 c
@@ -608,6 +626,12 @@ c
          y(i) = yold(i)
          z(i) = zold(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
 c
 c     get virial and finite difference values of dE/dV
 c

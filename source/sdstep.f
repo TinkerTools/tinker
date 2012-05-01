@@ -45,16 +45,28 @@ c
       real*8 vyx,vzx,vzy
       real*8 ekin(3,3)
       real*8 stress(3,3)
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      real*8 pfric(maxatm)
-      real*8 vfric(maxatm)
-      real*8 afric(maxatm)
-      real*8 prand(3,maxatm)
-      real*8 vrand(3,maxatm)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
+      real*8, allocatable :: pfric(:)
+      real*8, allocatable :: vfric(:)
+      real*8, allocatable :: afric(:)
+      real*8, allocatable :: prand(:,:)
+      real*8, allocatable :: vrand(:,:)
+      real*8, allocatable :: derivs(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
+      allocate (pfric(n))
+      allocate (vfric(n))
+      allocate (afric(n))
+      allocate (prand(3,n))
+      allocate (vrand(3,n))
+      allocate (derivs(3,n))
 c
 c     get frictional and random terms for position and velocity
 c
@@ -120,6 +132,18 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+      deallocate (pfric)
+      deallocate (vfric)
+      deallocate (afric)
+      deallocate (prand)
+      deallocate (vrand)
+      deallocate (derivs)
+c
 c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
@@ -174,11 +198,11 @@ c
       real*8 normal
       real*8 psig,vsig
       real*8 rho,rhoc
-      real*8 pfric(maxatm)
-      real*8 vfric(maxatm)
-      real*8 afric(maxatm)
-      real*8 prand(3,maxatm)
-      real*8 vrand(3,maxatm)
+      real*8 pfric(*)
+      real*8 vfric(*)
+      real*8 afric(*)
+      real*8 prand(3,*)
+      real*8 vrand(3,*)
 c
 c
 c     set the atomic friction coefficients to the global value
@@ -306,7 +330,7 @@ c
       integer i,istep
       integer resurf,modstep
       real*8 probe,ratio,area
-      real*8 radius(maxatm)
+      real*8, allocatable :: radius(:)
 c
 c
 c     determine new friction coefficients every few SD steps
@@ -314,6 +338,10 @@ c
       resurf = 100
       modstep = mod(istep,resurf)
       if (modstep .ne. 1)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (radius(n))
 c
 c     set the atomic radii to estimates of sigma values
 c
@@ -344,5 +372,9 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (radius)
       return
       end

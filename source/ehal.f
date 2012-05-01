@@ -71,7 +71,7 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer iv14(maxatm)
+      integer, allocatable :: iv14(:)
       real*8 e,rv,rv7
       real*8 eps,rdn,fgrp
       real*8 xi,yi,zi
@@ -79,10 +79,10 @@ c
       real*8 rho,tau,taper
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 vscale(maxatm)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
+      real*8, allocatable :: vscale(:)
       logical proceed,usei
       character*6 mode
 c
@@ -90,6 +90,14 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
+      allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -330,6 +338,14 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
+      deallocate (vscale)
       return
       end
 c
@@ -366,7 +382,7 @@ c
       integer kk,kv,kt
       integer kgy,kgz
       integer start,stop
-      integer iv14(maxatm)
+      integer, allocatable :: iv14(:)
       real*8 e,rv,rv7
       real*8 eps,rdn,fgrp
       real*8 xi,yi,zi
@@ -374,13 +390,13 @@ c
       real*8 rho,tau,taper
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 vscale(maxatm)
-      real*8 xsort(maxlight)
-      real*8 ysort(maxlight)
-      real*8 zsort(maxlight)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
+      real*8, allocatable :: vscale(:)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       logical proceed,usei
       logical prime,repeat
       character*6 mode
@@ -389,6 +405,17 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
+      allocate (vscale(n))
+      allocate (xsort(8*n))
+      allocate (ysort(8*n))
+      allocate (zsort(8*n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -574,6 +601,17 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
+      deallocate (vscale)
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
       return
       end
 c
@@ -606,7 +644,7 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer iv14(maxatm)
+      integer, allocatable :: iv14(:)
       real*8 e,eps,rdn,evt
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -614,10 +652,10 @@ c
       real*8 rho,tau,taper
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 vscale(maxatm)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
+      real*8, allocatable :: vscale(:)
       logical proceed,usei
       character*6 mode
 c
@@ -625,6 +663,14 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
+      allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -773,5 +819,13 @@ c
 c     transfer local to global copies for OpenMP calculation
 c
       ev = evt
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
+      deallocate (vscale)
       return
       end

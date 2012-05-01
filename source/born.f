@@ -62,7 +62,7 @@ c
       include 'pbstuf.i'
       include 'solute.i'
       integer i,j,k,it,kt
-      integer skip(maxatm)
+      integer, allocatable :: skip(:)
       real*8 area,rold,t
       real*8 shell,fraction
       real*8 inner,outer,tinit
@@ -84,11 +84,20 @@ c
       real*8 b0,gself
       real*8 third,pi43
       real*8 bornmax
-      real*8 roff(maxatm)
-      real*8 pos(3,maxatm)
-      real*8 pbpole(13,maxatm)
+      real*8, allocatable :: roff(:)
+      real*8, allocatable :: pos(:,:)
+      real*8, allocatable :: pbpole(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (borntyp .eq. 'STILL')  allocate (skip(n))
+      allocate (roff(n))
+      if (borntyp .eq. 'PERFECT') then
+         allocate (pos(3,n))
+         allocate (pbpole(13,n))
+      end if
 c
 c     set offset modified radii and OBC chain rule factor
 c
@@ -368,6 +377,15 @@ c
          end do
       end if
 c
+c     perform deallocation of some local arrays
+c
+      if (borntyp .eq. 'STILL')  deallocate (skip)
+      deallocate (roff)
+      if (borntyp .eq. 'PERFECT') then
+         deallocate (pos)
+         deallocate (pbpole)
+      end if
+c
 c     make sure the final values are in a reasonable range
 c
       bornmax = 500.0d0
@@ -417,7 +435,7 @@ c
       include 'solute.i'
       include 'virial.i'
       integer i,j,k,it,kt
-      integer skip(maxatm)
+      integer, allocatable :: skip(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 de,de1,de2
@@ -440,8 +458,13 @@ c
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 roff(maxatm)
+      real*8, allocatable :: roff(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (borntyp .eq. 'STILL')  allocate (skip(n))
+      allocate (roff(n))
 c
 c     compute atomic radii modified by the dielectric offset
 c
@@ -881,5 +904,10 @@ c
             end do
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      if (borntyp .eq. 'STILL')  deallocate (skip)
+      deallocate (roff)
       return
       end

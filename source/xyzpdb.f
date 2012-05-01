@@ -110,8 +110,8 @@ c
       integer op3(maxres)
       logical exist,generic
       logical cbone,nbone,obone
-      logical water(maxatm)
-      logical hetmol(maxatm)
+      logical, allocatable :: water(:)
+      logical, allocatable :: hetmol(:)
       character*3 resname
       character*4 atmname
       character*7 restyp(maxres)
@@ -171,6 +171,10 @@ c
          end do
          if (restyp(j)  .ne. 'GENERIC')  generic = .false.
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (water(nmol))
 c
 c     check each molecule to see if it is a water molecule
 c
@@ -512,6 +516,10 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hetmol(nmol))
+c
 c     copy any water, ions or ligands following biopolymer chains
 c
       if (.not. generic) then
@@ -574,6 +582,11 @@ c
             end if
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (water)
+      deallocate (hetmol)
       return
       end
 c

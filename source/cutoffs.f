@@ -20,6 +20,7 @@ c
       subroutine cutoffs
       implicit none
       include 'sizes.i'
+      include 'atoms.i'
       include 'bound.i'
       include 'cutoff.i'
       include 'hescut.i'
@@ -160,16 +161,6 @@ c
          mpolecut = ewaldcut
       end if
 c
-c     set buffer region limits for pairwise neighbor lists
-c
-      lbuf2 = (0.5d0*lbuffer)**2
-      vbuf2 = (vdwcut+lbuffer)**2
-      cbuf2 = (chgcut+lbuffer)**2
-      mbuf2 = (mpolecut+lbuffer)**2
-      vbufx = (vdwcut+2.0d0*lbuffer)**2
-      cbufx = (chgcut+2.0d0*lbuffer)**2
-      mbufx = (mpolecut+2.0d0*lbuffer)**2
-c
 c     convert any tapering percentages to absolute distances
 c
       if (vdwtaper .lt. 1.0d0)  vdwtaper = vdwtaper * vdwcut
@@ -184,6 +175,55 @@ c
          chgtaper = big
          dpltaper = big
          mpoletaper = big
+      end if
+c
+c     set buffer region limits for pairwise neighbor lists
+c
+      if (use_list) then
+         lbuf2 = (0.5d0*lbuffer)**2
+         vbuf2 = (vdwcut+lbuffer)**2
+         cbuf2 = (chgcut+lbuffer)**2
+         mbuf2 = (mpolecut+lbuffer)**2
+         vbufx = (vdwcut+2.0d0*lbuffer)**2
+         cbufx = (chgcut+2.0d0*lbuffer)**2
+         mbufx = (mpolecut+2.0d0*lbuffer)**2
+      end if
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (use_vlist) then
+         if (associated(nvlst))  deallocate (nvlst)
+         if (associated(vlst))  deallocate (vlst)
+         if (associated(xvold))  deallocate (xvold)
+         if (associated(yvold))  deallocate (yvold)
+         if (associated(zvold))  deallocate (zvold)
+         allocate (nvlst(n))
+         allocate (vlst(maxvlst,n))
+         allocate (xvold(n))
+         allocate (yvold(n))
+         allocate (zvold(n))
+      end if
+      if (use_clist .or. use_mlist) then
+         if (associated(nelst))  deallocate (nelst)
+         if (associated(elst))  deallocate (elst)
+         allocate (nelst(n))
+         allocate (elst(maxelst,n))
+      end if
+      if (use_clist) then
+         if (associated(xcold))  deallocate (xcold)
+         if (associated(ycold))  deallocate (ycold)
+         if (associated(zcold))  deallocate (zcold)
+         allocate (xcold(n))
+         allocate (ycold(n))
+         allocate (zcold(n))
+      end if
+      if (use_mlist) then
+         if (associated(xmold))  deallocate (xmold)
+         if (associated(ymold))  deallocate (ymold)
+         if (associated(zmold))  deallocate (zmold)
+         allocate (xmold(n))
+         allocate (ymold(n))
+         allocate (zmold(n))
       end if
       return
       end

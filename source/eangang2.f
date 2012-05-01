@@ -30,7 +30,7 @@ c
       integer ia,ib,ic,id,ie
       real*8 eps,fgrp
       real*8 old,term
-      real*8 d0(3,maxatm)
+      real*8, allocatable :: d0(:,:)
       logical proceed
       logical twosided
 c
@@ -41,6 +41,10 @@ c
       fgrp = 1.0d0
       twosided = .false.
       if (n .le. 50)  twosided = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (d0(3,n))
 c
 c     compute numerical angle-angle Hessian for current atom
 c
@@ -163,6 +167,10 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (d0)
       return
       end
 c

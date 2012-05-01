@@ -34,8 +34,8 @@ c
       integer i1,i2,i3,i4,i5
       integer adjacent,trial
       integer mode,next
-      integer iz0(0:maxatm)
-      integer iz1(maxatm)
+      integer, allocatable :: iz0(:)
+      integer, allocatable :: iz1(:)
       real*8 geometry,sign
       logical more
       character*1 answer
@@ -43,6 +43,11 @@ c
       character*8 phrase
       character*120 record
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iz0(0:n))
+      allocate (iz1(n))
 c
 c     zero out local values used for the defining atoms
 c
@@ -222,6 +227,11 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iz0)
+      deallocate (iz1)
       return
       end
 c
@@ -260,8 +270,8 @@ c
       integer i,j,k,i1,i2
       integer nc,adjacent,mode
       integer ic(maxval)
-      integer iz0(0:maxatm)
-      integer iz1(maxatm)
+      integer iz0(0:*)
+      integer iz1(*)
       real*8 dist,short
       logical more
 c

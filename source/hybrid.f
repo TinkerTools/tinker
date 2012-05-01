@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 1991 by Shawn Huston & Jay William Ponder  ##
 c     ##                    All Rights Reserved                    ##
 c     ###############################################################
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine hybrid  --  set chimeric force field parameters  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine hybrid  --  set parameters for hybrid system  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "hybrid" constructs the hybrid hamiltonian for a specified
@@ -38,8 +38,6 @@ c
          call hvdw
          call hcharge
          call hdipole
-         call hmpole
-         call hpolar
       end if
       return
       end
@@ -84,7 +82,7 @@ c
       if (maxtyp .lt. ntype+nmut) then
          abort = .true.
          write (iout,20)
-   20    format (' HATOM  --  Too many Sites as Hybrid Atoms;',
+   20    format (' HATOM  --  Too many Sites to be Altered;',
      &              ' Increase MAXTYP')
       end if
 c
@@ -149,7 +147,7 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
-         if (mut(ia) .or. mut(ib)) then
+         if (alter(ia) .or. alter(ib)) then
             ita = class(ia)
             itb = class(ib)
 c
@@ -265,7 +263,7 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
-         if (mut(ia) .or. mut(ib) .or. mut(ic)) then
+         if (alter(ia) .or. alter(ib) .or. alter(ic)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -391,7 +389,7 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
-         if (mut(ia) .or. mut(ib) .or. mut(ic)) then
+         if (alter(ia) .or. alter(ib) .or. alter(ic)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -560,7 +558,8 @@ c
             ib = i12(2,i)
             ic = i
             id = i12(3,i)
-            if (mut(ia) .or. mut(ib) .or. mut(ic) .or. mut(id)) then
+            if (alter(ia) .or. alter(ib) .or.
+     &          alter(ic) .or. alter(id)) then
                ita = class(ia)
                itb = class(ib)
                itc = class(ic)
@@ -799,7 +798,8 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
-         if (mut(ia) .or. mut(ib) .or. mut(ic) .or. mut(id)) then
+         if (alter(ia) .or. alter(ib) .or.
+     &       alter(ic) .or. alter(id)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -1059,7 +1059,8 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
-         if (mut(ia) .or. mut(ib) .or. mut(ic) .or. mut(id)) then
+         if (alter(ia) .or. alter(ib) .or.
+     &       alter(ic) .or. alter(id)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -1222,10 +1223,8 @@ c
       integer i,j,k
       integer it,it0,it1
       real*8 radius,rd,ep
-      real*8 srad(maxtyp)
-      real*8 seps(maxtyp)
-      real*8 srad4(maxtyp)
-      real*8 seps4(maxtyp)
+      real*8 srad(maxclass)
+      real*8 seps(maxclass)
       logical header
 c
 c
@@ -1233,18 +1232,11 @@ c     assign the hybrid van der Waals parameters
 c
       do j = 1, nmut
          i = imut(j)
-         if (vdwindex .eq. 'TYPE') then
-            it = type(i)
-            it0 = type0(j)
-            it1 = type1(j)
-         else
-            it = class(i)
-            it0 = class0(j)
-            it1 = class1(j)
-         end if
-         vlambda = lambda
-         rad(it) = vlambda*rad(it1) + (1.0d0-vlambda)*rad(it0)
-         eps(it) = vlambda*eps(it1) + (1.0d0-vlambda)*eps(it0)
+         it = class(i)
+         it0 = class0(j)
+         it1 = class1(j)
+         rad(it) = lambda*rad(it1) + (1.0d0-lambda)*rad(it0)
+         eps(it) = lambda*eps(it1) + (1.0d0-lambda)*eps(it0)
       end do
 c
 c     get the square roots of the vdw radii and well depths
@@ -1252,8 +1244,6 @@ c
       do i = 1, maxclass
          srad(i) = sqrt(rad(i))
          seps(i) = sqrt(eps(i))
-         srad4(i) = sqrt(rad4(i))
-         seps4(i) = sqrt(eps4(i))
       end do
 c
 c     use combination rules to set pairwise vdw radii sums
@@ -1261,14 +1251,13 @@ c
       do j = 1, nmut
          i = imut(j)
          it = class(i)
-         if (vdwindex .eq. 'TYPE')  it = type(i)
          do k = 1, maxclass
             if (rad(it).eq.0.0d0 .and. rad(k).eq.0.0d0) then
                rd = 0.0d0
             else if (radrule(1:10) .eq. 'ARITHMETIC') then
                rd = rad(it) + rad(k)
             else if (radrule(1:9) .eq. 'GEOMETRIC') then
-               rd = 2.0d0 * (srad(it) * srad(k))
+               rd = 2.0d0*(srad(it)*srad(k))
             else if (radrule(1:10) .eq. 'CUBIC-MEAN') then
                rd = 2.0d0*(rad(it)**3+rad(k)**3)/(rad(it)**2+rad(k)**2)
             else
@@ -1284,7 +1273,6 @@ c
       do j = 1, nmut
          i = imut(j)
          it = class(i)
-         if (vdwindex .eq. 'TYPE')  it = type(i)
          do k = 1, maxclass
             if (eps(it).eq.0.0d0 .and. eps(k).eq.0.0d0) then
                ep = 0.0d0
@@ -1304,68 +1292,16 @@ c
          end do
       end do
 c
-c     use combination rules to set pairwise 1-4 vdw radii sums
-c
-      do j = 1, nmut
-         i = imut(j)
-         it = class(i)
-         if (vdwindex .eq. 'TYPE')  it = type(i)
-         do k = 1, maxclass
-            if (rad4(it).eq.0.0d0 .and. rad4(k).eq.0.0d0) then
-               rd = 0.0d0
-            else if (radrule(1:10) .eq. 'ARITHMETIC') then
-               rd = rad4(it) + rad4(k)
-            else if (radrule(1:9) .eq. 'GEOMETRIC') then
-               rd = 2.0d0 * (srad4(it) * srad4(k))
-            else if (radrule(1:10) .eq. 'CUBIC-MEAN') then
-               rd = 2.0d0 * (rad4(it)**3+rad4(k)**3)
-     &                         / (rad4(it)**2+rad4(k)**2)
-            else
-               rd = rad4(it) + rad4(k)
-            end if
-            radmin4(it,k) = rd
-            radmin4(k,it) = rd
-         end do
-      end do
-c
-c     use combination rules to set pairwise 1-4 well depths
-c
-      do j = 1, nmut
-         i = imut(j)
-         it = class(i)
-         if (vdwindex .eq. 'TYPE')  it = type(i)
-         do k = 1, maxclass
-            if (eps4(it).eq.0.0d0 .and. eps4(k).eq.0.0d0) then
-               ep = 0.0d0
-            else if (epsrule(1:10) .eq. 'ARITHMETIC') then
-               ep = 0.5d0 * (eps4(it) + eps4(k))
-            else if (epsrule(1:9) .eq. 'GEOMETRIC') then
-               ep = seps4(it) * seps4(k)
-            else if (epsrule(1:8) .eq. 'HARMONIC') then
-               ep = 2.0d0 * (eps4(it)*eps4(k)) / (eps4(it)+eps4(k))
-            else if (epsrule(1:3) .eq. 'HHG') then
-               ep = 4.0d0 * (eps4(it)*eps4(k)) / (seps4(it)+seps4(k))**2
-            else
-               ep = seps4(it) * seps4(k)
-            end if
-            epsilon4(it,k) = ep
-            epsilon4(k,it) = ep
-         end do
-      end do
-c
 c     print the van der Waals parameters for hybrid atoms
 c
       header = .true.
       do j = 1, nmut
-         i = imut(j)
-         it = class(i)
-         if (vdwindex .eq. 'TYPE')  it = type(i)
          if (verbose) then
             if (header) then
                header = .false.
                write (iout,10)
    10          format (/,' Hybrid van der Waals Parameters :',
-     &                 //,7x,'Atom Number',5x,'Size',6x,'Epsilon',/)
+     &                 //,7x,'Atom Number    Radius     Epsilon')
             end if
             radius = rad(it)
             if (radsiz .eq. 'DIAMETER')  radius = 2.0d0 * radius
@@ -1401,7 +1337,7 @@ c
       integer i,j,k
       integer it,it0,it1
       real*8 chg0,chg1
-      real*8 hchg
+      real*8 hybchg
       logical header,used
 c
 c
@@ -1414,16 +1350,13 @@ c
          it = type(i)
          it0 = type0(j)
          it1 = type1(j)
-         chg0 = 0.0d0
-         chg1 = 0.0d0
-         if (it0 .ne. 0)  chg0 = chg(it0)
-         if (it1 .ne. 0)  chg1 = chg(it1)
-         clambda = lambda
-         hchg = clambda*chg1 + (1.0d0-clambda)*chg0
+         chg0 = chg(it0)
+         chg1 = chg(it1)
+         hybchg = lambda*chg1 + (1.0d0-lambda)*chg0
          do k = 1, nion
             if (iion(k) .eq. i) then
                used = .true.
-               pchg(k) = hchg
+               pchg(k) = hybchg
                goto 10
             end if
          end do
@@ -1432,7 +1365,7 @@ c
             nion = nion + 1
             iion(nion) = i
             kion(nion) = i
-            pchg(nion) = hchg
+            pchg(nion) = hybchg
          end if
    10    continue
          if (verbose .and. used) then
@@ -1442,7 +1375,7 @@ c
    20          format (/,' Hybrid Atomic Partial Charge Parameters :',
      &                 //,7x,'Atom Number',7x,'Charge',/)
             end if
-            write (iout,30)  i,hchg
+            write (iout,30)  i,hybchg
    30       format (6x,i8,5x,f12.3)
          end if
       end do
@@ -1475,8 +1408,8 @@ c
       integer ia,ib
       integer ita,itb
       integer size
-      real*8 dpl0,dpl1,hdpl
-      real*8 pos0,pos1,hpos
+      real*8 dpl0,dpl1,hybdpl
+      real*8 pos0,pos1,hybpos
       logical header,used
       character*4 pa,pb
       character*8 blank,pt
@@ -1489,7 +1422,7 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
-         if (mut(ia) .or. mut(ib)) then
+         if (alter(ia) .or. alter(ib)) then
             ita = type(ia)
             itb = type(ib)
 c
@@ -1500,31 +1433,29 @@ c
                if (k .eq. ia)  ita = type0(j)
                if (k .eq. ib)  itb = type0(j)
             end do
+            size = 4
+            call numeral (ita,pa,size)
+            call numeral (itb,pb,size)
+            if (ita .le. itb) then
+               pt = pa//pb
+            else
+               pt = pb//pa
+            end if
             dpl0 = 0.0d0
             pos0 = 0.5d0
-            if (ita.ne.0 .and. itb.ne.0) then
-               size = 4
-               call numeral (ita,pa,size)
-               call numeral (itb,pb,size)
-               if (ita .le. itb) then
-                  pt = pa//pb
-               else
-                  pt = pb//pa
-               end if
-               do j = 1, maxnd
-                  if (kd(j) .eq. blank)  goto 10
-                  if (kd(j) .eq. pt) then
-                     if (ita .le. itb) then
-                        dpl0 = bdpl(j)
-                        pos0 = sdpl(j)
-                     else
-                        dpl0 = -bdpl(j)
-                        pos0 = 1.0d0 - sdpl(j)
-                     end if
+            do j = 1, maxnd
+               if (kd(j) .eq. blank)  goto 10
+               if (kd(j) .eq. pt) then
+                  if (ita .le. itb) then
+                     dpl0 = bdpl(j)
+                     pos0 = sdpl(j)
+                  else
+                     dpl0 = -bdpl(j)
+                     pos0 = 1.0d0 - sdpl(j)
                   end if
-               end do
-   10          continue
-            end if
+               end if
+            end do
+   10       continue
 c
 c     find the dipole parameters for the final state
 c
@@ -1533,55 +1464,52 @@ c
                if (k .eq. ia)  ita = type1(j)
                if (k .eq. ib)  itb = type1(j)
             end do
+            size = 4
+            call numeral (ita,pa,size)
+            call numeral (itb,pb,size)
+            if (ita .le. itb) then
+               pt = pa//pb
+            else
+               pt = pb//pa
+            end if
             dpl1 = 0.0d0
             pos1 = 0.5d0
-            if (ita.ne.0 .and. itb.ne.0) then
-               size = 4
-               call numeral (ita,pa,size)
-               call numeral (itb,pb,size)
-               if (ita .le. itb) then
-                  pt = pa//pb
-               else
-                  pt = pb//pa
-               end if
-               do j = 1, maxnd
-                  if (kd(j) .eq. blank)  goto 20
-                 if (kd(j) .eq. pt) then
-                      if (ita .le. itb) then
-                        dpl1 = bdpl(j)
-                        pos1 = sdpl(j)
-                     else
-                        dpl1 = -bdpl(j)
-                        pos1 = 1.0d0 - sdpl(j)
-                     end if
+            do j = 1, maxnd
+               if (kd(j) .eq. blank)  goto 20
+               if (kd(j) .eq. pt) then
+                  if (ita .le. itb) then
+                     dpl1 = bdpl(j)
+                     pos1 = sdpl(j)
+                  else
+                     dpl1 = -bdpl(j)
+                     pos1 = 1.0d0 - sdpl(j)
                   end if
-               end do
-   20          continue
-            end if
+               end if
+            end do
+   20       continue
 c
 c     form the hybrid parameters for the current dipole
 c
-            dlambda = lambda
-            hdpl = dlambda*dpl1 + (1.0d0-dlambda)*dpl0
-            hpos = dlambda*pos1 + (1.0d0-dlambda)*pos0
+            hybdpl = lambda*dpl1 + (1.0d0-lambda)*dpl0
+            hybpos = lambda*pos1 + (1.0d0-lambda)*pos0
             used = .false.
             do j = 1, ndipole
                if ((idpl(1,j).eq.ia .and. idpl(2,j).eq.ib) .or.
      &             (idpl(1,j).eq.ib .and. idpl(2,j).eq.ia)) then
                   idpl(1,j) = ia
                   idpl(2,j) = ib
-                  bdpl(j) = hdpl
-                  sdpl(j) = hpos
+                  bdpl(j) = hybdpl
+                  sdpl(j) = hybpos
                   used = .true.
                   goto 30
                end if
             end do
-            if (hdpl .ne. 0.0d0) then
+            if (hybdpl .ne. 0.0d0) then
                ndipole = ndipole + 1
                idpl(1,ndipole) = ia
                idpl(2,ndipole) = ib
-               bdpl(ndipole) = hdpl
-               sdpl(ndipole) = hpos
+               bdpl(ndipole) = hybdpl
+               sdpl(ndipole) = hybpos
                used = .true.
             end if
    30       continue
@@ -1593,182 +1521,9 @@ c
      &                    //,6x,'Atom Numbers',7x,'Moment',
      &                       7x,'Position',/)
                end if
-               write (iout,50)  ia,ib,hdpl,hpos
+               write (iout,50)  ia,ib,hybdpl,hybpos
    50          format (6x,2i5,2f15.3)
             end if
-         end if
-      end do
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine hmpole  --  find hybrid multipole parameters  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "hmpole" constructs hybrid multipole interaction parameters
-c     given an initial state, final state and "lambda" value
-c
-c
-      subroutine hmpole
-      implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kchrge.i'
-      include 'mpole.i'
-      include 'mutant.i'
-      integer i,j,k,m
-      integer it,it0,it1
-      real*8 mpl0(maxpole)
-      real*8 mpl1(maxpole)
-      real*8 hmpl(maxpole)
-      logical header,used
-c
-c
-c     assign the hybrid parameters for atomic multipoles
-c
-      header = .true.
-      do j = 1, nmut
-         used = .false.
-         i = imut(j)
-         it = type(i)
-         it0 = type0(j)
-         it1 = type1(j)
-         do m = 1, maxpole
-            mpl0(m) = 0.0d0
-            mpl1(m) = 0.0d0
-         end do
-         if (it0 .ne. 0) then
-            do m = 1, maxpole
-               mpl0(m) = pole(m,it0)
-            end do
-         end if
-         if (it1 .ne. 0) then
-            do m = 1, maxpole
-               mpl1(m) = pole(m,it1)
-            end do
-         end if
-         mlambda = lambda
-         do k = 1, maxpole
-            hmpl(k) = mlambda*mpl1(k) + (1.0d0-mlambda)*mpl0(k)
-         end do
-         do k = 1, npole
-            if (ipole(k) .eq. i) then
-               used = .true.
-               do m = 1, maxpole
-                  pole(m,k) = hmpl(m)
-               end do
-               goto 10
-            end if
-         end do
-         if (mpl0(1).ne.0.0d0 .or. mpl1(1).ne.0.0d0) then
-            used = .true.
-            npole = npole + 1
-            ipole(npole) = i
-            do m = 1, maxpole
-               pole(m,npole) = hmpl(m)
-            end do
-         end if
-   10    continue
-         if (verbose .and. used) then
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Hybrid Atomic Multipole Parameters :',
-     &                 //,7x,'Atom Number',7x,'Charge',/)
-            end if
-            write (iout,30)  i,hmpl(1)
-   30       format (6x,i8,5x,f12.3)
-         end if
-      end do
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine hpolar  --  find hybrid polarization parameters  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "hpolar" constructs hybrid atomic polarizability parameters
-c     given an initial state, final state and "lambda" value
-c
-c
-      subroutine hpolar
-      implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kpolr.i'
-      include 'mpole.i'
-      include 'mutant.i'
-      include 'polar.i'
-      integer i,j,k
-      integer it,it0,it1
-      real*8 polr0,athl0
-      real*8 polr1,athl1
-      real*8 hpolr,hathl
-      logical header,used
-c
-c
-c     assign the hybrid parameters for atomic polarizabilities
-c
-      header = .true.
-      do j = 1, nmut
-         used = .false.
-         i = imut(j)
-         it = type(i)
-         it0 = type0(j)
-         it1 = type1(j)
-         polr0 = 0.0d0
-         athl0 = 0.0d0
-         polr1 = 0.0d0
-         athl1 = 0.0d0
-         if (it0 .ne. 0) then
-            polr0 = polr(it0)
-            athl0 = athl(it0)
-         end if
-         if (it1 .ne. 0) then
-            polr1 = polr(it1)
-            athl1 = athl(it1)
-         end if
-         plambda = lambda
-         hpolr = plambda*polr1 + (1.0d0-plambda)*polr0
-         hathl = plambda*athl1 + (1.0d0-plambda)*athl0
-         do k = 1, npole
-            if (ipole(k) .eq. i) then
-               used = .true.
-               polarity(k) = hpolr
-               thole(k) = hathl
-               goto 10
-            end if
-         end do
-         if (polr0.ne.0.0d0 .or. polr1.ne.0.0d0) then
-            used = .true.
-            npole = npole + 1
-            ipole(npole) = i
-            npolar = npolar + 1
-            polarity(npole) = hpolr
-            thole(npole) = hathl
-         end if
-   10    continue
-         if (verbose .and. used) then
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Hybrid Dipole Polarizability Parameters :',
-     &                 //,7x,'Atom Number',7x,'Alpha',8x,'Damp',/)
-            end if
-            write (iout,30)  i,hpolr,hathl
-   30       format (6x,i8,5x,2f12.3)
          end if
       end do
       return

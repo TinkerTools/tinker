@@ -38,19 +38,23 @@ c     doclst      logical flag to rebuild charge neighbor list
 c     domlst      logical flag to rebuild multipole neighbor list
 c
 c
-      integer nvlst,vlst
-      integer nelst,elst
-      real*8 xvold,yvold,zvold
-      real*8 xcold,ycold,zcold
-      real*8 xmold,ymold,zmold
+      integer, pointer :: nvlst(:)
+      integer, pointer :: vlst(:,:)
+      integer, pointer :: nelst(:)
+      integer, pointer :: elst(:,:)
+      real*8, pointer :: xvold(:)
+      real*8, pointer :: yvold(:)
+      real*8, pointer :: zvold(:)
+      real*8, pointer :: xcold(:)
+      real*8, pointer :: ycold(:)
+      real*8, pointer :: zcold(:)
+      real*8, pointer :: xmold(:)
+      real*8, pointer :: ymold(:)
+      real*8, pointer :: zmold(:)
       real*8 lbuffer,lbuf2
       real*8 vbuf2,cbuf2,mbuf2
       real*8 vbufx,cbufx,mbufx
       logical dovlst,doclst,domlst
-      common /neigh/ xvold(maxatm),yvold(maxatm),zvold(maxatm),
-     &               xcold(maxatm),ycold(maxatm),zcold(maxatm),
-     &               xmold(maxatm),ymold(maxatm),zmold(maxatm),
-     &               lbuffer,lbuf2,vbuf2,cbuf2,mbuf2,vbufx,cbufx,
-     &               mbufx,nvlst(maxatm),vlst(maxvlst,maxatm),
-     &               nelst(maxatm),elst(maxelst,maxatm),dovlst,
-     &               doclst,domlst
+      common /neigh/ xvold,yvold,zvold,xcold,ycold,zcold,xmold,ymold,
+     &               zmold,lbuffer,lbuf2,vbuf2,cbuf2,mbuf2,vbufx,cbufx,
+     &               mbufx,nvlst,vlst,nelst,elst,dovlst,doclst,domlst

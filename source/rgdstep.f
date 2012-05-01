@@ -56,17 +56,23 @@ c
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 arot(3,3)
-      real*8 xm(maxatm),xp(maxatm)
-      real*8 ym(maxatm),yp(maxatm)
-      real*8 zm(maxatm),zp(maxatm)
-      real*8 derivs(3,maxatm)
-      save xm,ym,zm
+      real*8, allocatable :: xp(:)
+      real*8, allocatable :: yp(:)
+      real*8, allocatable :: zp(:)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     set iteration limit and tolerance for angular momenta
 c
       maxiter = 15
       eps = 1.0d-12
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xp(n))
+      allocate (yp(n))
+      allocate (zp(n))
+      allocate (derivs(3,n))
 c
 c     get the energy and atomic forces prior to the step
 c
@@ -97,9 +103,9 @@ c
          if (istep .eq. 1) then
             do j = start, stop
                k = kgrp(j)
-               xm(k) = x(k) - rc(1)
-               ym(k) = y(k) - rc(2)
-               zm(k) = z(k) - rc(3)
+               xcmo(k) = x(k) - rc(1)
+               ycmo(k) = y(k) - rc(2)
+               zcmo(k) = z(k) - rc(3)
             end do
          end if
 c
@@ -176,12 +182,12 @@ c
                end do
                do j = start, stop
                   k = kgrp(j)
-                  xr = arot(1,1)*xm(k) + arot(1,2)*ym(k)
-     &                    + arot(1,3)*zm(k)
-                  yr = arot(2,1)*xm(k) + arot(2,2)*ym(k)
-     &                    + arot(2,3)*zm(k)
-                  zr = arot(3,1)*xm(k) + arot(3,2)*ym(k)
-     &                    + arot(3,3)*zm(k)
+                  xr = arot(1,1)*xcmo(k) + arot(1,2)*ycmo(k)
+     &                    + arot(1,3)*zcmo(k)
+                  yr = arot(2,1)*xcmo(k) + arot(2,2)*ycmo(k)
+     &                    + arot(2,3)*zcmo(k)
+                  zr = arot(3,1)*xcmo(k) + arot(3,2)*ycmo(k)
+     &                    + arot(3,3)*zcmo(k)
                   x2 = xr * xr
                   y2 = yr * yr
                   z2 = zr * zr
@@ -250,24 +256,31 @@ c
 c     update the distance to center of mass for each atom
 c
       do i = 1, n
-         xm(i) = xp(i)
-         ym(i) = yp(i)
-         zm(i) = zp(i)
+         xcmo(i) = xp(i)
+         ycmo(i) = yp(i)
+         zcmo(i) = zp(i)
       end do
 c
 c     make center of mass correction to virial for rigid body
 c
       do i = 1, n
-         vir(1,1) = vir(1,1) - xm(i)*derivs(1,i)
-         vir(2,1) = vir(2,1) - ym(i)*derivs(1,i)
-         vir(3,1) = vir(3,1) - zm(i)*derivs(1,i)
-         vir(1,2) = vir(1,2) - xm(i)*derivs(2,i)
-         vir(2,2) = vir(2,2) - ym(i)*derivs(2,i)
-         vir(3,2) = vir(3,2) - zm(i)*derivs(2,i)
-         vir(1,3) = vir(1,3) - xm(i)*derivs(3,i)
-         vir(2,3) = vir(2,3) - ym(i)*derivs(3,i)
-         vir(3,3) = vir(3,3) - zm(i)*derivs(3,i)
+         vir(1,1) = vir(1,1) - xcmo(i)*derivs(1,i)
+         vir(2,1) = vir(2,1) - ycmo(i)*derivs(1,i)
+         vir(3,1) = vir(3,1) - zcmo(i)*derivs(1,i)
+         vir(1,2) = vir(1,2) - xcmo(i)*derivs(2,i)
+         vir(2,2) = vir(2,2) - ycmo(i)*derivs(2,i)
+         vir(3,2) = vir(3,2) - zcmo(i)*derivs(2,i)
+         vir(1,3) = vir(1,3) - xcmo(i)*derivs(3,i)
+         vir(2,3) = vir(2,3) - ycmo(i)*derivs(3,i)
+         vir(3,3) = vir(3,3) - zcmo(i)*derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xp)
+      deallocate (yp)
+      deallocate (zp)
+      deallocate (derivs)
 c
 c     make full-step temperature and pressure corrections
 c

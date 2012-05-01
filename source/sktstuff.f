@@ -27,9 +27,9 @@ c
       integer i,k,ncycle
       integer flag
       real*8 eopt
-      real*8 px(maxatm)
-      real*8 py(maxatm)
-      real*8 pz(maxatm)
+      real*8, allocatable :: px(:)
+      real*8, allocatable :: py(:)
+      real*8, allocatable :: pz(:)
 c
 c
 c     check to see if the Server has been created
@@ -53,11 +53,20 @@ c     get the monitor for the update structure
 c
       call getmonitor ()
 c
-c     load current optimization data
+c     load the coordinates and energy information
 c
       call setcoordinates (n,x,y,z)
       call setstep (ncycle)
       call setenergy (eopt)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (px(n))
+      allocate (py(n))
+      allocate (pz(n))
+c
+c     load the gradient and induced dipole information
+c
       do i = 1, n
          cdx(i) = desum(1,i)
          cdy(i) = desum(2,i)
@@ -76,6 +85,12 @@ c
           end do
           call setinduced (n,px,py,pz)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (px)
+      deallocate (py)
+      deallocate (pz)
 c
 c     release the monitor for the system stucture
 c
@@ -107,15 +122,15 @@ c
       integer i,k,istep
       integer flag
       real*8 dt,time,epot
-      real*8 vx(maxatm)
-      real*8 vy(maxatm)
-      real*8 vz(maxatm)
-      real*8 ax(maxatm)
-      real*8 ay(maxatm)
-      real*8 az(maxatm)
-      real*8 px(maxatm)
-      real*8 py(maxatm)
-      real*8 pz(maxatm)
+      real*8, allocatable :: vx(:)
+      real*8, allocatable :: vy(:)
+      real*8, allocatable :: vz(:)
+      real*8, allocatable :: ax(:)
+      real*8, allocatable :: ay(:)
+      real*8, allocatable :: az(:)
+      real*8, allocatable :: px(:)
+      real*8, allocatable :: py(:)
+      real*8, allocatable :: pz(:)
 c
 c
 c     check to see if the Java objects have been created
@@ -140,12 +155,27 @@ c     get the monitor for the update structure
 c
       call getmonitor ()
 c
-c     load the current dynamics information
+c     load the coordinated, time and energy information
 c
       call setcoordinates (n,x,y,z)
       time = dble(istep) * dt
       call setmdtime (time)
       call setenergy (epot)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (vx(n))
+      allocate (vy(n))
+      allocate (vz(n))
+      allocate (ax(n))
+      allocate (ay(n))
+      allocate (az(n))
+      allocate (px(n))
+      allocate (py(n))
+      allocate (pz(n))
+c
+c     load the velocity and acceleration information
+c
       do i = 1, n
          vx(i) = v(1,i)
          vy(i) = v(2,i)
@@ -168,6 +198,18 @@ c
           end do
           call setinduced (n,px,py,pz)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (vx)
+      deallocate (vy)
+      deallocate (vz)
+      deallocate (ax)
+      deallocate (ay)
+      deallocate (az)
+      deallocate (px)
+      deallocate (py)
+      deallocate (pz)
 c
 c     release the monitor for the update stucture
 c
@@ -205,10 +247,10 @@ c
       include 'socket.i'
       integer i
       integer flag
-      integer b1(maxatm)
-      integer b2(maxatm)
-      integer b3(maxatm)
-      integer b4(maxatm)
+      real*8, allocatable :: b1(:)
+      real*8, allocatable :: b2(:)
+      real*8, allocatable :: b3(:)
+      real*8, allocatable :: b4(:)
 c
 c
 c     set initialization flag and test for socket usage
@@ -244,7 +286,7 @@ c
          return
       end if
 c
-c     load the coordinates and keyfile information
+c     load the keyfile and coordinates information
 c
       call setfile (filename)
       call setforcefield (forcefield)
@@ -252,6 +294,16 @@ c
          call setkeyword (i,keyline(i))
       end do
       call setcoordinates (n,x,y,z)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (b1(n))
+      allocate (b2(n))
+      allocate (b3(n))
+      allocate (b4(n))
+c
+c     load the atom connectivity information
+c
       do i = 1, n
          b1(i) = i12(1,i)
          b2(i) = i12(2,i)
@@ -259,6 +311,13 @@ c
          b4(i) = i12(4,i)
       end do
       call setconnectivity (n,b1,b2,b3,b4)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (b1)
+      deallocate (b2)
+      deallocate (b3)
+      deallocate (b4)
 c
 c     load atom type information for the parameter set
 c

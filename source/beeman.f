@@ -43,10 +43,10 @@ c
       real*8 part1,part2
       real*8 ekin(3,3)
       real*8 stress(3,3)
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     set time values and coefficients for Beeman integration
@@ -59,6 +59,13 @@ c
 c     make half-step temperature and pressure corrections
 c
       call temper (dt)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
+      allocate (derivs(3,n))
 c
 c     store the current atom positions, then find half-step
 c     velocities and full-step positions via Beeman recursion
@@ -97,6 +104,13 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+      deallocate (derivs)
 c
 c     find the constraint-corrected full-step velocities
 c

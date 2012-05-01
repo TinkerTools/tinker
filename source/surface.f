@@ -88,7 +88,6 @@ c
       real*8 area(*)
       real*8 radius(*)
       real*8 weight(*)
-      real*8 r(maxatm)
       real*8 ri(maxarc),risq(maxarc)
       real*8 bsq(maxarc),bsq1(maxarc)
       real*8 dsq(maxarc),dsq1(maxarc)
@@ -101,10 +100,16 @@ c
       real*8 zc(maxarc),zc1(maxarc)
       real*8 ux(maxarc),uy(maxarc)
       real*8 uz(maxarc)
+      real*8, allocatable :: r(:)
       logical moved,top,komit
-      logical skip(maxatm)
       logical omit(maxarc)
+      logical, allocatable :: skip(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (r(n))
+      allocate (skip(n))
 c
 c     zero the area and derivatives, and set the sphere radii
 c
@@ -551,6 +556,11 @@ c
   180    continue
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (r)
+      deallocate (skip)
+c
 c     print out the surface area values for each atom
 c
 c     if (debug) then
@@ -667,7 +677,6 @@ c
       real*8 radius(*)
       real*8 weight(*)
       real*8 darea(3,*)
-      real*8 r(maxatm)
       real*8 ri(maxarc),risq(maxarc)
       real*8 bsq(maxarc),bsq1(maxarc)
       real*8 dsq(maxarc),dsq1(maxarc)
@@ -680,10 +689,16 @@ c
       real*8 zc(maxarc),zc1(maxarc)
       real*8 ux(maxarc),uy(maxarc)
       real*8 uz(maxarc)
+      real*8, allocatable :: r(:)
       logical moved,top,komit
-      logical skip(maxatm)
       logical omit(maxarc)
+      logical, allocatable :: skip(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (r(n))
+      allocate (skip(n))
 c
 c     zero the area and derivatives, and set the sphere radii
 c
@@ -1216,6 +1231,11 @@ c
          total = total + area(ir)
   180    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (r)
+      deallocate (skip)
 c
 c     zero out the area derivatives for the inactive atoms
 c

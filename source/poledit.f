@@ -655,7 +655,7 @@ c
       integer kab,kac,kad
       integer kbc,kbd,kcd
       integer priority
-      logical query,alter
+      logical query,change
       character*120 record
 c
 c
@@ -831,7 +831,7 @@ c
 c     allow the user to manually alter local coordinate frames
 c
       query = .true.
-      alter = .false.
+      change = .false.
       do while (query)
          i = 0
          ia = 0
@@ -847,7 +847,7 @@ c
          if (i .eq. 0) then
             query = .false.
          else
-            alter = .true.
+            change = .true.
             if (ia .eq. 0)  polaxe(i)= 'None'
             if (ia.ne.0 .and. ib.eq.0)  polaxe(i) = 'Z-Only'
             if (ia.gt.0 .and. ib.gt.0)  polaxe(i) = 'Z-then-X'
@@ -862,7 +862,7 @@ c
 c
 c     repeat local frame list if definitions were altered
 c
-      if (alter) then
+      if (change) then
          write (iout,70)
    70    format (/,' Local Frame Definition for Multipole Sites :')
          write (iout,80)
@@ -1079,7 +1079,7 @@ c
       real*8 eps,ci,cj
       real*8 big,sum
       real*8 a(3,3)
-      logical query,alter
+      logical query,change
       character*120 record
 c
 c
@@ -1112,7 +1112,7 @@ c
 c     allow the user to manually alter local coordinate frames
 c
       query = .true.
-      alter = .false.
+      change = .false.
       do while (query)
          ii = 0
          ia = 0
@@ -1129,7 +1129,7 @@ c
          if (ii .eq. 0) then
             query = .false.
          else if (i .ne. 0) then
-            alter = .true.
+            change = .true.
             if (ia .eq. 0)  polaxe(i) = 'None'
             if (ia.ne.0 .and. ib.eq.0)  polaxe(i) = 'Z-Only'
             if (ia.gt.0 .and. ib.gt.0)  polaxe(i) = 'Z-then-X'
@@ -1144,7 +1144,7 @@ c
 c
 c     repeat local frame list if definitions were altered
 c
-      if (alter) then
+      if (change) then
          write (iout,80)
    80    format (/,' Local Frame Definition for Multipole Sites :')
          write (iout,90)
@@ -1311,7 +1311,7 @@ c
       integer i,j,k,ii
       integer ia,ib
       real*8 pol,thl
-      logical query,alter
+      logical query,change
       character*120 record
 c
 c
@@ -1335,7 +1335,7 @@ c
 c     allow the user to manually alter polarizability values
 c
       query = .true.
-      alter = .false.
+      change = .false.
       do while (query)
          ii = 0
          pol = 0.0d0
@@ -1351,7 +1351,7 @@ c
          if (ii .eq. 0) then
             query = .false.
          else if (i .ne. 0) then
-            alter = .true.
+            change = .true.
             polarity(i) = pol
             thole(i) = thl
          end if
@@ -1359,7 +1359,7 @@ c
 c
 c     repeat polarizability values if parameters were altered
 c
-      if (alter) then
+      if (change) then
          write (iout,80)
    80    format (/,' Atomic Polarizabilities for Multipole Sites :')
          write (iout,90)

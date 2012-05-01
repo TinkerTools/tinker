@@ -21,9 +21,9 @@ c
       include 'sizes.i'
       include 'warp.i'
       integer i
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
+      real*8 xred(*)
+      real*8 yred(*)
+      real*8 zred(*)
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -66,7 +66,7 @@ c
       integer kk,kv,kt
       integer iatom,jcell
       integer nlist,list(5)
-      integer iv14(maxatm)
+      integer, allocatable :: iv14(:)
       real*8 de,d2e,rik,rik2
       real*8 eps,rad2,fgrp
       real*8 xi,yi,zi
@@ -81,14 +81,19 @@ c
       real*8 expcut,expterm
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 vscale(maxatm)
+      real*8 xred(*)
+      real*8 yred(*)
+      real*8 zred(*)
+      real*8, allocatable :: vscale(:)
       real*8 term(3,3)
       logical proceed
       character*6 mode
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -586,6 +591,11 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (vscale)
       return
       end
 c
@@ -616,7 +626,7 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer nlist,list(5)
-      integer iv14(maxatm)
+      integer, allocatable :: iv14(:)
       real*8 de,d2e,rik,rik2
       real*8 eps,rad2,fgrp
       real*8 xi,yi,zi
@@ -636,13 +646,18 @@ c
       real*8 t1,t2
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
-      real*8 vscale(maxatm)
+      real*8 xred(*)
+      real*8 yred(*)
+      real*8 zred(*)
+      real*8, allocatable :: vscale(:)
       real*8 term(3,3)
       logical proceed
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -934,5 +949,10 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (vscale)
       return
       end

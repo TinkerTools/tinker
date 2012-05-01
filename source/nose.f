@@ -48,7 +48,7 @@ c
       real*8 e2,e4,e6,e8
       real*8 ekin(3,3)
       real*8 stress(3,3)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: derivs(:,:)
       save press
 c
 c
@@ -102,6 +102,10 @@ c
       zbox = zbox * eterm2
       call lattice
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     get the potential energy and atomic forces
 c
       call gradient (epot,derivs)
@@ -117,6 +121,10 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     constraints under NH-NPT require the ROLL algorithm
 c

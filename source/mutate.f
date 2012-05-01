@@ -2,125 +2,154 @@ c
 c
 c     ###################################################
 c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
+c     ##  Modified by Chuanjie Wu in 2009              ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine mutate  --  set the chimeric atoms and values  ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine mutate  --  set parameters for hybrid system  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "mutate" sets the list of chimeric atoms and mutational
-c     parameters that are used during a free energy calculation
+c     "mutate" constructs the hybrid hamiltonian for a specified
+c     initial state, final state and mutation parameter "lambda"
 c
 c
       subroutine mutate
       implicit none
       include 'sizes.i'
-      include 'atmtyp.i'
       include 'atoms.i'
       include 'iounit.i'
       include 'katoms.i'
       include 'keys.i'
       include 'mutant.i'
-      integer maxlist
-      parameter (maxlist=50)
-      integer i,j,k,ia
+      integer i,j,k,ihyb
       integer it0,it1,next
-      integer list(maxlist)
+      integer liglist(20)
       character*20 keyword
       character*120 record
       character*120 string
 c
 c
-c     zero out the number of mutated atoms and atom list
+c     zero number of hybrid atoms and hybrid atom list
 c
       nmut = 0
       do i = 1, n
-         mut(i) = .false.
+         alter(i) = .false.
+      end do
+      elmd = 1.0d0
+      vlmd = 1.0d0
+      scexp = 5.0d0
+      scalpha = 0.7d0
+      do i = 1, 20
+         liglist(i) = 0
       end do
 c
 c     search keywords for free energy perturbation options
 c
-      do j = 1, nkey
+      do i = 1, nkey
          next = 1
-         record = keyline(j)
+         record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:7) .eq. 'LAMBDA ') then
+            nmut = 0
             lambda = 0.0d0
             string = record(next:120)
-            read (string,*,err=20)  lambda
-            vlambda = lambda
-            clambda = lambda
-            dlambda = lambda
-            mlambda = lambda
-            plambda = lambda
-         else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
-            string = record(next:120)
-            read (string,*,err=20)  vlambda
-         else if (keyword(1:11) .eq. 'CHG-LAMBDA ') then
-            string = record(next:120)
-            read (string,*,err=20)  clambda
-         else if (keyword(1:11) .eq. 'DPL-LAMBDA ') then
-            string = record(next:120)
-            read (string,*,err=20)  dlambda
-         else if (keyword(1:13) .eq. 'MPOLE-LAMBDA ') then
-            string = record(next:120)
-            read (string,*,err=20)  mlambda
-         else if (keyword(1:13) .eq. 'POLAR-LAMBDA ') then
-            string = record(next:120)
-            read (string,*,err=20)  plambda
+            read (string,*,err=10)  lambda
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:120)
-            read (string,*,err=20)  ia,it0,it1
+            read (string,*,err=10)  ihyb,it0,it1
             nmut = nmut + 1
-            imut(nmut) = ia
+            imut(nmut) = ihyb
             type0(nmut) = it0
             type1(nmut) = it1
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
-            mut(ia) = .true.
-         else if (keyword(1:7) .eq. 'LIGAND ') then
-            do i = 1, maxlist
-               list(i) = 0
-            end do
+            alter(ihyb) = .true.
+         else if(keyword(1:7) .eq. 'ELAMDA ') then
+            string = record(next:120) 
+            read (string,*,err=10) elmd
+         else if(keyword(1:7) .eq. 'VLAMDA ') then
             string = record(next:120)
-            read (string,*,err=10,end=10)  (list(i),i=1,maxlist)
-   10       continue
+            read (string,*,err=10) vlmd
+         else if(keyword(1:7) .eq. 'LIGAND ') then
+            string = record(next:120)
+            read (string,*,err=20,end=20) (liglist(k),k=1,20)
+  20        continue
             k = 1
-            do while (list(k) .ne. 0)
-               ia = list(k)
-               if (list(k) .gt. 0) then
-                  if (.not. mut(ia)) then
-                     nmut = nmut + 1
-                     imut(nmut) = ia
-                     type0(nmut) = 0
-                     type1(nmut) = type(ia)
-                     class0(nmut) = 0
-                     class1(nmut) = class(ia)
-                     mut(ia) = .true.
-                  end if
+            dowhile (liglist(k) .ne. 0) 
+               if (liglist(k) .gt. 0) then
+                  alter(liglist(k)) = .true. 
+                  write(*,*) 'Ligand Atom', liglist(k) 
                   k = k + 1
-               else
-                  do i = abs(list(k)), abs(list(k+1))
-                     if (.not. mut(i)) then
-                        nmut = nmut + 1
-                        imut(nmut) = i
-                        type0(nmut) = 0
-                        type1(nmut) = type(i)
-                        class0(nmut) = 0
-                        class1(nmut) = class(i)
-                        mut(i) = .true.
-                     end if
-                  end do
+               else 
+                  do j = abs(liglist(k)), abs(liglist(k+1))
+                     alter(j) = .true.
+                     write(*,*) 'Ligand Atom', j
+                  end do   
                   k = k + 2
                end if
-            end do
+            end do   
          end if
-   20    continue
+   10    continue
       end do
+      if (elmd .ge. 0.0d0 .and. elmd .lt. 1.0d0) call altelec
+      if (elmd .ne. 1.0d0 .and. vlmd .ne. 1.0d0) write(*,30) elmd,vlmd
+   30 format(1x,'Free Energy Perturbation step for Electrostatic: ',
+     &       f7.4,' for VDW : ',f7.4)
       return
       end
+
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine altelec -- alter electrostatic parameters     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "altelec" constructs the mutated electrostatic parameters
+c     electrostatic mutation parameter "elmd (ELAMDA)"
+c
+c
+      subroutine altelec
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'charge.i'
+      include 'mpole.i'
+      include 'mutant.i'
+      include 'polar.i'
+      include 'potent.i'
+      integer i,j,k
+      integer ii,jj,kk
+ 
+      if (use_mpole) then     
+         do i = 1, npole
+            k = ipole(i)
+            if (alter(k)) then
+               do j = 1, 13
+                  pole (j,i) = pole(j,i) * elmd
+               end do
+            end if
+         end do
+         do i = 1, npolar
+            if (alter(i)) then
+               polarity(i) = polarity(i) * elmd
+            end if
+         end do
+      end if
+
+      if (use_charge) then 
+         do i = 1, nion
+            if (alter(i)) then
+               pchg(i) = pchg(i) * elmd
+            end if
+         end do
+      end if
+
+      return
+      end          
+  

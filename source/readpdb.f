@@ -39,7 +39,7 @@ c
       character*1 altloc
       character*1 insert,inslast
       character*1 letter
-      character*1 chnatm(maxatm)
+      character*1, allocatable :: chnatm(:)
       character*3 resname
       character*3 namelast
       character*4 atmname
@@ -83,6 +83,10 @@ c
       reslast = maxres
       namelast = '   '
       chnlast = ' '
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (chnatm(maxatm))
 c
 c     process individual atoms from the Protein Data Bank file
 c
@@ -237,6 +241,10 @@ c
             end if
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (chnatm)
 c
 c     find the type of species present in each chain
 c

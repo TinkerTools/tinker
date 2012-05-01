@@ -28,17 +28,27 @@ c
       include 'warp.i'
       integer i
       real*8 probe
-c     real*8 aes(maxatm)
-c     real*8 des(3,maxatm)
+c     real*8, allocatable :: aes(:)
+c     real*8, allocatable :: des(:,:)
 c
 c
 c     set a value for the solvent molecule probe radius
 c
       probe = 1.4d0
 c
+c     perform dynamic allocation of some local arrays
+c
+c     allocate (aes(n))
+c     allocate (des(3,n))
+c
 c     compute the surface area-based solvation energy term
 c
 c     call surface1 (es,aes,des,rsolv,asolv,probe)
+c
+c     perform deallocation of some local arrays
+c
+c     deallocate (aes)
+c     deallocate (des)
 c
 c     get the generalized Born term for GB/SA solvation
 c
