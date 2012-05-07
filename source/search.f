@@ -64,11 +64,11 @@ c
       real*8 f_a,f_b,f_c
       real*8 sg_0,sg_1
       real*8 sg_a,sg_b,sg_c
-      real*8 x(maxvar)
-      real*8 x_0(maxvar)
-      real*8 g(maxvar)
-      real*8 p(maxvar)
-      real*8 s(maxvar)
+      real*8 x(*)
+      real*8 g(*)
+      real*8 p(*)
+      real*8, allocatable :: x_0(:)
+      real*8, allocatable :: s(:)
       logical restart
       character*9 status
       character*9 blank
@@ -84,6 +84,11 @@ c
       if (slpmax .eq. 0.0d0)  slpmax = 10000.0d0
       if (angmax .eq. 0.0d0)  angmax = 180.0d0
       if (intmax .eq. 0)  intmax = 5
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x_0(nvar))
+      allocate (s(nvar))
 c
 c     copy the search direction into a new vector
 c
@@ -121,6 +126,8 @@ c
       angle = radian * acos(cosang)
       if (angle .gt. angmax) then
          status = 'WideAngle'
+         deallocate (x_0)
+         deallocate (s)
          return
       end if
 c
@@ -175,6 +182,8 @@ c
       if (abs(sg_b/sg_0).le.cappa .and. f_b.lt.f_a) then
          f = f_b
          if (status .eq. blank)  status = ' Success '
+         deallocate (x_0)
+         deallocate (s)
          return
       end if
 c
@@ -205,6 +214,8 @@ c
       if (ttt .lt. 0.0d0) then
          f = f_b
          status = 'IntplnErr'
+         deallocate (x_0)
+         deallocate (s)
          return
       end if
       ttt = sqrt(ttt)
@@ -212,6 +223,8 @@ c
       if (cube.lt.0.0d0 .or. cube.gt.step) then
          f = f_b
          status = 'IntplnErr'
+         deallocate (x_0)
+         deallocate (s)
          return
       end if
       do i = 1, nvar
@@ -229,6 +242,8 @@ c
       if (abs(sg_c/sg_0) .le. cappa) then
          f = f_c
          if (status .eq. blank)  status = ' Success '
+         deallocate (x_0)
+         deallocate (s)
          return
       end if
 c
@@ -303,6 +318,8 @@ c
          ncalls = ncalls + 1
          f = fgvalue (x,g)
          status = 'IntplnErr'
+         deallocate (x_0)
+         deallocate (s)
          return
       end if
       f_0 = f_1
@@ -322,6 +339,8 @@ c
          ncalls = ncalls + 1
          f = fgvalue (x,g)
          status = 'BadIntpln'
+         deallocate (x_0)
+         deallocate (s)
          return
       else
          status = ' ReSearch'

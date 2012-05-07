@@ -26,13 +26,13 @@ c
       integer i,k,ipdb
       integer start,stop
       integer resmax,resnumb
-      integer resid(maxres)
+      integer, allocatable :: resid(:)
       real*8 crdmin,crdmax
       logical opened
       logical rename
       logical reformat
       character*1 chnname
-      character*1 chain(maxres)
+      character*1, allocatable :: chain(:)
       character*2 atmc,resc
       character*3 resname
       character*6 crdc
@@ -63,6 +63,11 @@ c
          fstr = '(''HEADER'',4x,a,/,''COMPND'',/,''SOURCE'')'
          write (ipdb,fstr(1:37))  title(1:ltitle)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (resid(maxres))
+      allocate (chain(maxres))
 c
 c     find the chain name and chain position for each residue
 c
@@ -139,6 +144,11 @@ c
          write (ipdb,fstr)  pdbtyp(i),i,atmnam(i),resname,chnname,
      &                      resnumb,xpdb(i),ypdb(i),zpdb(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (resid)
+      deallocate (chain)
 c
 c     write any connectivity records for PDB atoms
 c

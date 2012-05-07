@@ -21,7 +21,7 @@ c
       include 'sizes.i'
       real*8 exclude,probe
       real*8 volume_tot,area_tot
-      real*8 radius(maxatm)
+      real*8 radius(*)
 c
 c
 c     make call to the volume and surface area routine
@@ -91,13 +91,15 @@ c
       real*8 xr,yr,zr
       real*8 dist2,vdwsum
       real*8 probe,zstep
-      real*8 dex(3,maxatm)
-      real*8 radius(maxatm)
-      real*8 vdwrad(maxatm)
       real*8 arci(maxarc)
       real*8 arcf(maxarc)
-      real*8 dx(maxarc),dy(maxarc)
-      real*8 dsq(maxarc),d(maxarc)
+      real*8 dx(maxarc)
+      real*8 dy(maxarc)
+      real*8 dsq(maxarc)
+      real*8 d(maxarc)
+      real*8 vdwrad(maxatm)
+      real*8 radius(*)
+      real*8 dex(3,*)
       logical skip(maxatm)
 c
 c
@@ -550,13 +552,15 @@ c
       real*8 drdz(2,0:2)
       real*8 arci(maxarc)
       real*8 arcf(maxarc)
-      real*8 dx(maxarc),dy(maxarc)
-      real*8 dsq(maxarc),d(maxarc)
-      real*8 radius(maxatm)
+      real*8 dx(maxarc)
+      real*8 dy(maxarc)
+      real*8 dsq(maxarc)
+      real*8 d(maxarc)
       real*8 vdwrad(maxatm)
-      real*8 xhess(3,maxatm)
-      real*8 yhess(3,maxatm)
-      real*8 zhess(3,maxatm)
+      real*8 radius(*)
+      real*8 xhess(3,*)
+      real*8 yhess(3,*)
+      real*8 zhess(3,*)
       logical covered
 c
 c

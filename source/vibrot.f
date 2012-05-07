@@ -28,7 +28,6 @@ c
       include 'iounit.i'
       include 'omega.i'
       integer i,j,ihess
-      real*8 hrot(maxrot,maxrot)
       real*8, allocatable :: a(:)
       real*8, allocatable :: b(:)
       real*8, allocatable :: p(:)
@@ -39,6 +38,7 @@ c
       real*8, allocatable :: eigen(:)
       real*8, allocatable :: matrix(:)
       real*8, allocatable :: vects(:,:)
+      real*8, allocatable :: hrot(:,:)
 c
 c
 c     set up the mechanics calculation and rotatable bonds
@@ -60,6 +60,7 @@ c
       allocate (eigen(nomega))
       allocate (matrix(nomega*(nomega+1)/2))
       allocate (vects(nomega,nomega))
+      allocate (hrot(nomega,nomega))
 c
 c     calculate the full torsional Hessian matrix
 c
@@ -116,6 +117,7 @@ c
       deallocate (eigen)
       deallocate (matrix)
       deallocate (vects)
+      deallocate (hrot)
 c
 c     perform any final tasks before program exit
 c

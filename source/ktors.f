@@ -38,9 +38,10 @@ c
       integer size,next
       integer iring,minat
       integer nlist,ilist
-      integer kindex(maxnt)
+      integer, allocatable :: kindex(:)
       integer ft(6)
-      real*8 angle,vt(6),st(6)
+      real*8 angle
+      real*8 vt(6),st(6)
       logical header,done
       logical use_ring
       character*4 pa,pb,pc,pd
@@ -49,7 +50,7 @@ c
       character*16 blank
       character*16 pt,pt0
       character*16 pt1,pt2
-      character*16 klist(maxnt)
+      character*16, allocatable :: klist(:)
       character*20 keyword
       character*120 record
       character*120 string
@@ -216,6 +217,11 @@ c
       end do
       use_ring = .false.
       if (min(nt5,nt4) .ne. 0)  use_ring = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (kindex(maxnt))
+      allocate (klist(maxnt))
 c
 c     assign torsional parameters for each torsional angle
 c     by putting the parameter values into the "tors" arrays
@@ -493,6 +499,11 @@ c
   130       format (1x,a7,4x,4(i6,'-',a3),5x,4i5)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (kindex)
+      deallocate (klist)
 c
 c     find the cosine and sine of phase angle for each torsion
 c

@@ -23,11 +23,12 @@ c
       include 'sizes.i'
       include 'cutoff.i'
       include 'iounit.i'
+      include 'omega.i'
       integer i,ncalls,next
       real*8 energy,value
       real*8 wall,cpu
-      real*8 derivs(maxrot)
-      real*8 hrot(maxrot,maxrot)
+      real*8, allocatable :: derivs(:)
+      real*8, allocatable :: hrot(:,:)
       logical exist,query
       logical dohessian
       character*1 answer
@@ -101,6 +102,11 @@ c
    80 format (/,' Potential Energy :  ',f15.3,' Sec (Wall)',
      &           f15.3,' Sec (CPU)')
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
+      allocate (hrot(nomega,nomega))
+c
 c     run the energy and gradient timing experiment
 c
       call settime
@@ -159,6 +165,11 @@ c
   130    format (/,' Hessian Matrix :    ',f15.3,' Sec (Wall)',
      &              f15.3,' Sec (CPU)')
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
+      deallocate (hrot)
 c
 c     perform any final tasks before program exit
 c

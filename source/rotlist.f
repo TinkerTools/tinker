@@ -29,7 +29,7 @@ c
       integer i,k,ia,ib,swap
       integer base,partner
       integer mark,test,nattach
-      integer list(0:maxatm)
+      integer, allocatable :: list(:)
       logical bonded
 c
 c
@@ -77,6 +77,10 @@ c
       do i = 1, n12(base)
          if (i12(i,base) .eq. partner)  bonded = .true.
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(0:n))
 c
 c     make a list of atoms to one side of this pair of atoms,
 c     taking note of any rings in which the atom pair resides
@@ -132,10 +136,14 @@ c
          end do
          goto 20
       end if
+   40 continue
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     remove links added to make intermolecular connections
 c
-   40 continue
       do i = 1, ndel
          ia = idel(1,i)
          ib = idel(2,i)

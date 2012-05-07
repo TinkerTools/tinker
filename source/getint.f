@@ -18,6 +18,8 @@ c
 c
       subroutine getint
       implicit none
+      include 'sizes.i'
+      include 'atoms.i'
       include 'inform.i'
       include 'iounit.i'
       include 'output.i'
@@ -75,6 +77,6 @@ c
 c     check for atoms with identical coordinates
 c
       clash = .false.
-      call chkxyz (clash)
+      if (n .le. 10000)  call chkxyz (clash)
       return
       end

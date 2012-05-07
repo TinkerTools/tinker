@@ -30,8 +30,8 @@ c
       integer freeunit
       real*8 grdmin,gnorm,grms
       real*8 minimum,newtrot1
-      real*8 xx(maxvar)
-      real*8 derivs(maxrot)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: derivs(:)
       logical exist
       character*1 answer
       character*6 mode,method
@@ -133,6 +133,10 @@ c
       close (unit=imin)
       outfile = minfile
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nomega))
+c
 c     translate the initial coordinates
 c
       do i = 1, nomega
@@ -142,7 +146,7 @@ c
 c     make the call to the optimization routine
 c
       call tncg (mode,method,nomega,xx,minimum,grdmin,
-     &               newtrot1,newtrot2,optsave)
+     &                newtrot1,newtrot2,optsave)
 c
 c     untranslate the final coordinates
 c
@@ -150,6 +154,14 @@ c
          dihed(i) = xx(i)
          ztors(zline(i)) = dihed(i) * radian
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
 c
 c     compute the final function and RMS gradient values
 c
@@ -160,6 +172,10 @@ c
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / sqrt(dble(nomega))
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     write out the final function and gradient values
 c
@@ -235,10 +251,14 @@ c
       include 'zcoord.i'
       integer i
       real*8 newtrot1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(maxrot)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
 c
 c     translate optimization variables into dihedrals
 c
@@ -258,6 +278,10 @@ c
       do i = 1, nomega
          g(i) = derivs(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -282,15 +306,14 @@ c
       include 'omega.i'
       include 'zcoord.i'
       integer i,j,ihess
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hindex(maxhess)
-      real*8 xx(maxvar)
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
-      real*8 hrot(maxrot,maxrot)
+      integer hinit(*)
+      integer hstop(*)
+      integer hindex(*)
+      real*8 xx(*)
+      real*8 hdiag(*)
+      real*8 h(*)
+      real*8, allocatable :: hrot(:,:)
       character*4 mode
-      save hrot
 c
 c
 c     translate optimization parameters and compute
@@ -301,6 +324,10 @@ c
          dihed(i) = xx(i)
          ztors(zline(i)) = dihed(i) * radian
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hrot(nomega,nomega))
 c
 c     compute the desired portion of the Hessian
 c
@@ -331,5 +358,9 @@ c
             hdiag(i) = hrot(i,i)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hrot)
       return
       end

@@ -39,10 +39,10 @@ c
       integer ia,ib,next
       integer size,number
       real*8 rd,ep,rdn,gik
-      real*8 srad(maxtyp)
-      real*8 srad4(maxtyp)
-      real*8 seps(maxtyp)
-      real*8 seps4(maxtyp)
+      real*8, allocatable :: srad(:)
+      real*8, allocatable :: srad4(:)
+      real*8, allocatable :: seps(:)
+      real*8, allocatable :: seps4(:)
       logical header
       character*4 pa,pb
       character*8 blank,pt
@@ -288,6 +288,13 @@ c
   220    continue
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (srad(maxtyp))
+      allocate (srad4(maxtyp))
+      allocate (seps(maxtyp))
+      allocate (seps4(maxtyp))
+c
 c     get the vdw radii and well depths for each atom type
 c
       do i = 1, maxtyp
@@ -427,6 +434,13 @@ c
             epsilon4(k,i) = ep
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (srad)
+      deallocate (srad4)
+      deallocate (seps)
+      deallocate (seps4)
 c
 c     use reduced values for MMFF donor-acceptor pairs
 c

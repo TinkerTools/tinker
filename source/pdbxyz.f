@@ -32,7 +32,7 @@ c
       integer i,j,it,next
       integer ipdb,ixyz,iseq
       integer last,freeunit
-      integer size(maxatm)
+      integer, allocatable :: size(:)
       real*8 xi,yi,zi,rij
       real*8 rcut,rmax(0:9)
       logical biopoly
@@ -95,6 +95,10 @@ c
       open (unit=ipdb,file=pdbfile,status ='old')
       rewind (unit=ipdb)
       call readpdb (ipdb)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (size(n))
 c
 c     use special translation mechanisms used for biopolymers
 c
@@ -205,6 +209,10 @@ c
          call readpdb (ipdb)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (size)
+c
 c     write a sequence file for proteins and nucleic acids
 c
       if (biopoly) then
@@ -250,15 +258,17 @@ c
       integer start,stop
       integer cyxtyp
       integer ncys,ndisulf
-      integer ni(maxres),cai(maxres)
-      integer ci(maxres),oi(maxres)
-      integer si(maxres)
-      integer icys(maxres)
-      integer idisulf(2,maxres)
+      integer, allocatable :: ni(:)
+      integer, allocatable :: cai(:)
+      integer, allocatable :: ci(:)
+      integer, allocatable :: oi(:)
+      integer, allocatable :: si(:)
+      integer, allocatable :: icys(:)
+      integer, allocatable :: idisulf(:,:)
       real*8 xr,yr,zr,r
-      real*8 xcys(maxres)
-      real*8 ycys(maxres)
-      real*8 zcys(maxres)
+      real*8, allocatable :: xcys(:)
+      real*8, allocatable :: ycys(:)
+      real*8, allocatable :: zcys(:)
       logical newchain
       logical midchain
       logical endchain
@@ -267,6 +277,19 @@ c
       character*4 atmname
       save si
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (ni(nres))
+      allocate (cai(nres))
+      allocate (ci(nres))
+      allocate (oi(nres))
+      allocate (si(nres))
+      allocate (icys(nres))
+      allocate (idisulf(2,nres))
+      allocate (xcys(nres))
+      allocate (ycys(nres))
+      allocate (zcys(nres))
 c
 c     set the next atom and the residue range of the chain
 c
@@ -589,6 +612,19 @@ c
 c     total number of atoms is one less than the current atom
 c
       n = n - 1
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (ni)
+      deallocate (cai)
+      deallocate (ci)
+      deallocate (oi)
+      deallocate (si)
+      deallocate (icys)
+      deallocate (idisulf)
+      deallocate (xcys)
+      deallocate (ycys)
+      deallocate (zcys)
       return
       end
 c
@@ -1438,7 +1474,7 @@ c
       integer c4i,o4i,c1i
       integer c3i,c2i,o3i,o2i
       logical newchain,endchain
-      logical deoxy(maxres)
+      logical, allocatable :: deoxy(:)
       character*3 resname
 c
 c
@@ -1447,6 +1483,10 @@ c
       n = n + 1
       jres = ichain(1,ichn)
       kres = ichain(2,ichn)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (deoxy(nres))
 c
 c     check for deoxyribose and change residue name if necessary
 c
@@ -1626,6 +1666,10 @@ c
 c     total number of atoms is one less than the current atom
 c
       n = n - 1
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (deoxy)
       return
       end
 c

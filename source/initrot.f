@@ -37,8 +37,8 @@ c
       integer bond1,bond2
       integer attach1,attach2
       integer nlist,nfixed
-      integer list(maxatm)
-      integer ifixed(2,maxbnd)
+      integer, allocatable :: list(:)
+      integer, allocatable :: ifixed(:,:)
       logical exist,query
       logical rotate,rotcheck
       character*120 record
@@ -119,6 +119,10 @@ c
    80    continue
          nomega = nomega - 1
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (ifixed(2,maxrot))
 c
 c     manual selection of the torsional angles to be frozen
 c
@@ -204,6 +208,14 @@ c
          end do
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (ifixed)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
 c     make inactive the atoms not rotatable via any torsion
 c
       if (nuse .eq. n) then
@@ -237,6 +249,10 @@ c
   150       format (3x,10i7)
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     write out the number of rotatable torsions to be used
 c
@@ -278,7 +294,7 @@ c
       include 'usage.i'
       integer i,base,partner
       logical rotcheck,value
-      logical list(maxatm)
+      logical, allocatable :: list(:)
 c
 c
 c     initialize status and find atoms on short side of the bond
@@ -299,6 +315,7 @@ c
 c     if short side had inactive atoms, check the other side
 c
       if (.not. value) then
+         allocate (list(n))
          do i = 1, n
             list(i) = .true.
          end do
@@ -310,6 +327,7 @@ c
          end do
          value = .true.
    20    continue
+         deallocate (list)
       end if
 c
 c     set the final return value of the function

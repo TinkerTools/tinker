@@ -37,8 +37,8 @@ c
       real*8 ett0,ev0,ec0,ecd0
       real*8 ed0,em0,ep0,er0
       real*8 es0,elf0,eg0,ex0
-      real*8 derivs(maxrot)
-      real*8 nderiv(maxrot)
+      real*8, allocatable :: derivs(:)
+      real*8, allocatable :: nderiv(:)
       logical exist,query
       character*120 string
 c
@@ -70,6 +70,10 @@ c
       end if
       if (delta .le. 0.0d0)  delta = delta0
       eps = -delta / radian
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
 c
 c     make the call to get analytical torsional derivatives
 c
@@ -175,6 +179,10 @@ c
      &           /,12x,'d EP',8x,'d ER',8x,'d ES',8x,'d ELF',
      &              7x,'d EG',8x,'d EX')
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (nderiv(nomega))
 c
 c     get numerical derivatives for each of the rotatable torsions
 c
@@ -324,6 +332,11 @@ c
   290       format (1x,i5,'-',i5,10x,2f16.4)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
+      deallocate (nderiv)
 c
 c     perform any final tasks before program exit
 c

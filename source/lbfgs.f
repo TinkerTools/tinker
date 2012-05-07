@@ -174,6 +174,25 @@ c
      &              ' the Maximum of',i5)
       end if
 c
+c     print header information about the optimization method
+c
+      if (iprint .gt. 0) then
+         if (msav .eq. 0) then
+            write (iout,40)
+   40       format (/,' Steepest Descent Gradient Optimization :')
+            write (iout,50)
+   50       format (/,' SD Iter     F Value      G RMS     F Move',
+     &                 '    X Move   Angle  FG Call  Comment',/)
+         else
+            write (iout,60)
+   60       format (/,' Limited Memory BFGS Quasi-Newton',
+     &                 ' Optimization :')
+            write (iout,70)
+   70       format (/,' QN Iter     F Value      G RMS     F Move',
+     &                 '    X Move   Angle  FG Call  Comment',/)
+         end if
+      end if
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (x_old(nvar))
@@ -208,20 +227,6 @@ c
 c     print initial information prior to first iteration
 c
       if (iprint .gt. 0) then
-         if (msav .eq. 0) then
-            write (iout,40)
-   40       format (/,' Steepest Descent Gradient Optimization :')
-            write (iout,50)
-   50       format (/,' SD Iter     F Value      G RMS     F Move',
-     &                 '    X Move   Angle  FG Call  Comment',/)
-         else
-            write (iout,60)
-   60       format (/,' Limited Memory BFGS Quasi-Newton',
-     &                 ' Optimization :')
-            write (iout,70)
-   70       format (/,' QN Iter     F Value      G RMS     F Move',
-     &                 '    X Move   Angle  FG Call  Comment',/)
-         end if
          if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and. g_rms.lt.1.0d5) then
             write (iout,80)  niter,f,g_rms,ncalls
    80       format (i6,f14.4,f11.4,29x,i7)

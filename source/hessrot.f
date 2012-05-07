@@ -26,12 +26,18 @@ c
       include 'zcoord.i'
       integer i,j,line
       real*8 e,eps
-      real*8 g(maxrot)
-      real*8 g0(maxrot)
-      real*8 old(maxrot)
-      real*8 hrot(maxrot,maxrot)
+      real*8 hrot(nomega,*)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: g0(:)
+      real*8, allocatable :: old(:)
       character*4 mode
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (g(nomega))
+      allocate (g0(nomega))
+      allocate (old(nomega))
 c
 c     calculate base values for the torsional gradient
 c
@@ -74,6 +80,12 @@ c
             ztors(line) = old(i)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (g)
+      deallocate (g0)
+      deallocate (old)
 c
 c     restore the Cartesian coordinates to original values
 c

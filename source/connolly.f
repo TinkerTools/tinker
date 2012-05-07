@@ -102,7 +102,7 @@ c
       integer i
       real*8 volume,area
       real*8 probe,exclude
-      real*8 radius(maxatm)
+      real*8 radius(*)
 c
 c
 c     set the probe radius and the number of atoms
@@ -578,15 +578,26 @@ c
       include 'faces.i'
       integer maxmnb
       parameter (maxmnb=500)
-      integer k,ke,kv,l,l1,l2,ia,ja,ka
-      integer ik,ip,jk,km,la,lm,lkf,itt
-      integer nmnb,iend,jend,iptr,jptr
-      integer mnb(maxmnb),ikt(maxmnb)
-      integer jkt(maxmnb),lkcls(maxcls)
-      real*8 dist2,d2,det,hij,hijk
-      real*8 discls(maxmnb),sumcls(maxmnb)
-      real*8 uij(3),bij(3),bijk(3),tempv(3)
-      real*8 uijk(3),aijk(3),pijk(3)
+      integer k,ke,kv
+      integer l,l1,l2
+      integer ia,ja,ka
+      integer ik,ip,jk
+      integer km,la,lm
+      integer lkf,itt,nmnb
+      integer iend,jend
+      integer iptr,jptr
+      integer mnb(maxmnb)
+      integer ikt(maxmnb)
+      integer jkt(maxmnb)
+      integer lkcls(maxcls)
+      real*8 dist2,d2,det
+      real*8 hij,hijk
+      real*8 uij(3),uijk(3)
+      real*8 bij(3),bijk(3)
+      real*8 aijk(3),pijk(3)
+      real*8 tempv(3)
+      real*8 discls(maxmnb)
+      real*8 sumcls(maxmnb)
       logical tb,ttok,prbok
 c
 c
@@ -2835,11 +2846,22 @@ c
       include 'sizes.i'
       include 'faces.i'
       include 'math.i'
-      integer k,ifs,iep,ic,ic1,ic2,it,ia1,ia2,iv1,iv2
-      real*8 areas,vols,areasp,volsp,vecang,phi
-      real*8 dot,d1,d2,w1,w2,theta1,theta2,rat,thetaq
-      real*8 cone1,cone2,term1,term2,term3,spin,volt
-      real*8 vect1(3),vect2(3),aavect(3)
+      integer k,ifs,iep
+      integer ic,ic1,ic2
+      integer it,ia1,ia2
+      integer iv1,iv2
+      real*8 areas,vols
+      real*8 areasp,volsp
+      real*8 vecang,phi
+      real*8 dot,d1,d2,w1,w2
+      real*8 theta1,theta2
+      real*8 rat,thetaq
+      real*8 cone1,cone2
+      real*8 term1,term2,term3
+      real*8 spin,volt
+      real*8 vect1(3)
+      real*8 vect2(3)
+      real*8 aavect(3)
       logical cusp
 c
 c
@@ -2943,9 +2965,13 @@ c
       include 'sizes.i'
       include 'faces.i'
       include 'math.i'
-      integer k,ke,je,ifn,ien,iv,ia,ip
-      real*8 arean,voln,vecang,triple,defect,simplx
-      real*8 pvv(3,3),pav(3,3),planev(3,3),angle(3)
+      integer k,ke,je
+      integer ifn,ien
+      integer iv,ia,ip
+      real*8 arean,voln,vecang
+      real*8 triple,defect,simplx
+      real*8 pvv(3,3),pav(3,3)
+      real*8 planev(3,3),angle(3)
 c
 c
       do ke = 1, 3
@@ -2997,9 +3023,12 @@ c
       implicit none
       include 'sizes.i'
       include 'faces.i'
-      integer k,ke,icy,ia,nedge,iep,iv
-      real*8 dot,dt,f,polev(3),pnt(3)
-      real*8 unvect(3),spv(3,mxcyep)
+      integer k,ke,icy,ia
+      integer nedge,iep,iv
+      real*8 dot,dt,f
+      real*8 polev(3),pnt(3)
+      real*8 unvect(3)
+      real*8 spv(3,mxcyep)
       logical fail
 c
 c
@@ -3108,10 +3137,11 @@ c
 c
       subroutine epuclc (spv,nedge,epu)
       implicit none
-      integer k,ke,ke2,le,nedge
+      integer k,ke,ke2,le
+      integer nedge
       real*8 anorm,epun
-      real*8 spv(3,nedge)
-      real*8 epu(3,nedge)
+      real*8 spv(3,*)
+      real*8 epu(3,*)
 c
 c
 c     calculate unit vectors along edges
@@ -3172,8 +3202,10 @@ c
       function rotang (epu,nedge,unvect)
       implicit none
       integer ke,nedge
-      real*8 rotang,totang,dot,dt,ang
-      real*8 epu(3,nedge),unvect(3),crs(3)
+      real*8 rotang,totang
+      real*8 dot,dt,ang
+      real*8 unvect(3),crs(3)
+      real*8 epu(3,*)
 c
 c
       totang = 0.0d0
@@ -3286,7 +3318,8 @@ c
       subroutine vnorm (x,xn)
       implicit none
       integer k
-      real*8 x(3),xn(3),ax,anorm
+      real*8 ax,anorm
+      real*8 x(3),xn(3)
 c
 c
       ax = anorm(x)
@@ -3311,7 +3344,8 @@ c
 c
       function dist2 (x,y)
       implicit none
-      real*8 dist2,x(3),y(3)
+      real*8 dist2
+      real*8 x(3),y(3)
 c
 c
       dist2 = (x(1)-y(1))**2 + (x(2)-y(2))**2 + (x(3)-y(3))**2
@@ -3333,7 +3367,8 @@ c
 c
       function triple (x,y,z)
       implicit none
-      real*8 triple,x(3),y(3),z(3),xy(3),dot
+      real*8 triple,dot
+      real*8 x(3),y(3),z(3),xy(3)
 c
 c
       call vcross (x,y,xy)
@@ -3356,9 +3391,10 @@ c
       function vecang (v1,v2,axis,hand)
       implicit none
       include 'math.i'
-      real*8 vecang,v1(3),v2(3),axis(3),hand
+      real*8 vecang,hand
       real*8 angle,a1,a2,a12,dt
       real*8 anorm,dot,triple
+      real*8 v1(3),v2(3),axis(3)
 c
 c
       a1 = anorm(v1)
@@ -3393,11 +3429,14 @@ c
      &                        cinsp,cintp,xpnt1,xpnt2)
       implicit none
       integer k
-      real*8 anorm,dot,dcp,dir,ratio,rlen
+      real*8 anorm,dot,dcp,dir
+      real*8 ratio,rlen
       real*8 circen(3),cirrad,cirvec(3)
       real*8 plncen(3),plnvec(3)
-      real*8 xpnt1(3),xpnt2(3),cpvect(3),pnt1(3)
-      real*8 vect1(3),vect2(3),uvect1(3),uvect2(3)
+      real*8 xpnt1(3),xpnt2(3)
+      real*8 cpvect(3),pnt1(3)
+      real*8 vect1(3),vect2(3)
+      real*8 uvect1(3),uvect2(3)
       logical cinsp,cintp
 c
 c
@@ -3455,7 +3494,8 @@ c
       integer nequat,nvert,nhoriz
       real*8 fi,fj,x,y,z,xy
       real*8 xcenter,ycenter,zcenter
-      real*8 radius,dots(3,ndots)
+      real*8 radius
+      real*8 dots(3,ndots)
 c
 c
       nequat = sqrt(pi*dble(ndots))

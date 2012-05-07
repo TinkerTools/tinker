@@ -31,8 +31,8 @@ c
       integer freeunit
       real*8 minimum,optirot1
       real*8 grdmin,gnorm,grms
-      real*8 xx(maxopt)
-      real*8 derivs(maxrot)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: derivs(:)
       logical exist
       character*20 keyword
       character*120 minfile
@@ -107,6 +107,10 @@ c
          scale(i) = 5.0d0
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nomega))
+c
 c     get optimization parameters as scaled dihedral angles
 c
       do i = 1, nomega
@@ -124,6 +128,14 @@ c
          ztors(zline(i)) = dihed(i) * radian
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
+c
 c     compute the final function and RMS gradient values
 c
       call gradrot (minimum,derivs)
@@ -133,6 +145,10 @@ c
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / sqrt(dble(nomega))
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     write out the final function and gradient values
 c
@@ -211,8 +227,12 @@ c
       real*8 optirot1,e
       real*8 xx(*)
       real*8 g(*)
-      real*8 derivs(maxrot)
+      real*8, allocatable :: derivs(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
 c
 c     translate optimization variables into dihedrals
 c
@@ -232,5 +252,9 @@ c
       do i = 1, nomega
          g(i) = derivs(i) / scale(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

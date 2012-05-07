@@ -38,10 +38,10 @@ c
       integer number
       integer kz,kx,ky
       integer ztyp,xtyp,ytyp
-      integer mpt(maxnmp)
-      integer mpz(maxnmp)
-      integer mpx(maxnmp)
-      integer mpy(maxnmp)
+      integer, allocatable :: mpt(:)
+      integer, allocatable :: mpz(:)
+      integer, allocatable :: mpx(:)
+      integer, allocatable :: mpy(:)
       real*8 mpl(13)
       logical header,path
       character*4 pa,pb,pc,pd
@@ -220,6 +220,13 @@ c
          np14(i) = 0
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mpt(maxnmp))
+      allocate (mpz(maxnmp))
+      allocate (mpx(maxnmp))
+      allocate (mpy(maxnmp))
+c
 c     store the atom types associated with each parameter
 c
       do i = 1, nmp
@@ -373,6 +380,13 @@ c
          end do
   140    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mpt)
+      deallocate (mpz)
+      deallocate (mpx)
+      deallocate (mpy)
 c
 c     process keywords with multipole parameters for specific atoms
 c

@@ -25,28 +25,26 @@ c
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
-      integer maxsite,maxblock,maxframe
+      integer maxsite,maxblock
       parameter (maxsite=1000)
       parameter (maxblock=1000)
-      parameter (maxframe=100000)
       integer i,j,k,m
       integer n1,n2,dt,trimtext
       integer first,last,step
       integer start,stop
       integer nfile,nblock,maxgap
       integer blksize,blkgap,blkdiff
-      integer t1(maxblock)
-      integer t2(maxblock)
-      integer icorr(0:maxframe)
+      integer, allocatable :: t1(:)
+      integer, allocatable :: t2(:)
+      integer, allocatable :: icorr(:)
       real*8 value,property
-      real*8 vcorr(0:maxframe)
-      real*8 ucorr(0:maxframe)
-      real*8 x1(maxsite,maxblock)
-      real*8 y1(maxsite,maxblock)
-      real*8 z1(maxsite,maxblock)
-      real*8 x2(maxsite,maxblock)
-      real*8 y2(maxsite,maxblock)
-      real*8 z2(maxsite,maxblock)
+      real*8, allocatable :: vcorr(:)
+      real*8, allocatable :: x1(:,:)
+      real*8, allocatable :: y1(:,:)
+      real*8, allocatable :: z1(:,:)
+      real*8, allocatable :: x2(:,:)
+      real*8, allocatable :: y2(:,:)
+      real*8, allocatable :: z2(:,:)
       logical exist,query,normal
       character*1 letter
       character*120 string
@@ -138,6 +136,19 @@ c
   110 format (/,' Correlation Function Computed using',i5,
      &           ' Blocks of',i6,' Frames')
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (t1(maxblock))
+      allocate (t2(maxblock))
+      allocate (icorr(0:maxgap))
+      allocate (vcorr(0:maxgap))
+      allocate (x1(maxsite,maxblock))
+      allocate (y1(maxsite,maxblock))
+      allocate (z1(maxsite,maxblock))
+      allocate (x2(maxsite,maxblock))
+      allocate (y2(maxsite,maxblock))
+      allocate (z2(maxsite,maxblock))
+c
 c     zero out the time correlation function cumulative values
 c
       do i = 0, maxgap
@@ -196,16 +207,8 @@ c
       do i = 0, maxgap
          if (icorr(i) .ne. 0)  vcorr(i) = vcorr(i)/dble(icorr(i))
       end do
-c
-c     get the normalized correlation function if applicable
-c
       normal = .false.
       if (vcorr(0) .ne. 0.0d0)  normal = .true.
-      if (normal) then
-         do i = 0, maxgap
-            ucorr(i) = vcorr(i) / vcorr(0)
-         end do
-      end if
 c
 c     print the final values of the correlation function
 c
@@ -215,7 +218,8 @@ c
      &              7x,'Normalized',/)
          do i = 0, maxgap
             if (icorr(i) .ne. 0) then
-               write (iout,150)  i*step,icorr(i),vcorr(i),ucorr(i)
+               write (iout,150)  i*step,icorr(i),vcorr(i),
+     &                           vcorr(i)/vcorr(0)
   150          format (i9,6x,i10,6x,2f17.6)
             end if
          end do
@@ -229,6 +233,19 @@ c
             end if
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (t1)
+      deallocate (t2)
+      deallocate (icorr)
+      deallocate (vcorr)
+      deallocate (x1)
+      deallocate (y1)
+      deallocate (z1)
+      deallocate (x2)
+      deallocate (y2)
+      deallocate (z2)
 c
 c     perform any final tasks before program exit
 c
@@ -255,18 +272,17 @@ c
       include 'atoms.i'
       include 'files.i'
       include 'iounit.i'
-      integer maxsite,maxblock
+      integer maxsite
       parameter (maxsite=1000)
-      parameter (maxblock=1000)
       integer i,k,ixyz
       integer start,stop
       integer next,label
       integer step,lext
       integer nt,nb,freeunit
-      integer tb(maxblock)
-      real*8 xb(maxsite,maxblock)
-      real*8 yb(maxsite,maxblock)
-      real*8 zb(maxsite,maxblock)
+      integer tb(*)
+      real*8 xb(maxsite,*)
+      real*8 yb(maxsite,*)
+      real*8 zb(maxsite,*)
       logical exist
       character*7 ext
       character*120 record
@@ -356,24 +372,32 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      integer maxsite,maxblock
+      integer maxsite
       parameter (maxsite=1000)
-      parameter (maxblock=1000)
       integer i,j,k
       real*8 property,value
-      real*8 x1(maxsite)
-      real*8 y1(maxsite)
-      real*8 z1(maxsite)
-      real*8 x2(maxsite)
-      real*8 y2(maxsite)
-      real*8 z2(maxsite)
-      real*8 xi(maxsite,maxblock)
-      real*8 yi(maxsite,maxblock)
-      real*8 zi(maxsite,maxblock)
-      real*8 xk(maxsite,maxblock)
-      real*8 yk(maxsite,maxblock)
-      real*8 zk(maxsite,maxblock)
+      real*8, allocatable :: x1(:)
+      real*8, allocatable :: y1(:)
+      real*8, allocatable :: z1(:)
+      real*8, allocatable :: x2(:)
+      real*8, allocatable :: y2(:)
+      real*8, allocatable :: z2(:)
+      real*8 xi(maxsite,*)
+      real*8 yi(maxsite,*)
+      real*8 zi(maxsite,*)
+      real*8 xk(maxsite,*)
+      real*8 yk(maxsite,*)
+      real*8 zk(maxsite,*)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x1(maxsite))
+      allocate (y1(maxsite))
+      allocate (z1(maxsite))
+      allocate (x2(maxsite))
+      allocate (y2(maxsite))
+      allocate (z2(maxsite))
 c
 c     transfer the input trajectory frames to local vectors
 c
@@ -396,6 +420,15 @@ c
 c     sample code to find the rms deviation upon superposition
 c
       call impose (n,x1,y1,z1,n,x2,y2,z2,value)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (x1)
+      deallocate (y1)
+      deallocate (z1)
+      deallocate (x2)
+      deallocate (y2)
+      deallocate (z2)
 c
 c     set property value to be returned for this frame pair
 c

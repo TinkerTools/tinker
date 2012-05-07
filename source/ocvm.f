@@ -161,6 +161,17 @@ c
    20    continue
       end do
 c
+c     print initial information prior to first iteration
+c
+      if (iprint .gt. 0) then
+         write (iout,30)
+   30    format (/,' Optimally Conditioned Variable Metric',
+     &             ' Optimization :')
+         write (iout,40)
+   40    format (/,' VM Iter     F Value       G RMS     F Move',
+     &              '    X Move      Angle   FG Call',/)
+      end if
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (x0old(nvar))
@@ -189,17 +200,6 @@ c
       ncalls = 1
       f0 = fgvalue (x0,g)
       f0old = f0
-c
-c     print initial information prior to first iteration
-c
-      if (iprint .gt. 0) then
-         write (iout,30)
-   30    format (/,' Optimally Conditioned Variable Metric',
-     &             ' Optimization :')
-         write (iout,40)
-   40    format (/,' VM Iter     F Value       G RMS     F Move',
-     &              '    X Move      Angle   FG Call',/)
-      end if
 c
 c     set the "h" matrix to a diagonal upon restarting
 c
@@ -278,7 +278,7 @@ c     write intermediate results for the current iteration
 c
          if (iwrite .gt. 0) then
             if (mod(niter,iwrite) .eq. 0) then
-               call optsave (niter,f0,x)
+               call optsave (niter,f0,x0)
             end if
          end if
 c

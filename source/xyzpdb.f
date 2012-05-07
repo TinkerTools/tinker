@@ -99,22 +99,30 @@ c
       integer pdbnum,atmnum
       integer justify,cbi
       integer noxy,nhydro
-      integer ni(maxres),cai(maxres)
-      integer ci(maxres),oi(maxres)
-      integer poi(maxres),c1i(maxres)
-      integer c2i(maxres),o2i(maxres)
-      integer c3i(maxres),o3i(maxres)
-      integer c4i(maxres),o4i(maxres)
-      integer c5i(maxres),o5i(maxres)
-      integer op1(maxres),op2(maxres)
-      integer op3(maxres)
+      integer, allocatable :: ni(:)
+      integer, allocatable :: cai(:)
+      integer, allocatable :: ci(:)
+      integer, allocatable :: oi(:)
+      integer, allocatable :: poi(:)
+      integer, allocatable :: op1(:)
+      integer, allocatable :: op2(:)
+      integer, allocatable :: op3(:)
+      integer, allocatable :: c5i(:)
+      integer, allocatable :: o5i(:)
+      integer, allocatable :: c4i(:)
+      integer, allocatable :: o4i(:)
+      integer, allocatable :: c3i(:)
+      integer, allocatable :: o3i(:)
+      integer, allocatable :: c2i(:)
+      integer, allocatable :: o2i(:)
+      integer, allocatable :: c1i(:)
       logical exist,generic
       logical cbone,nbone,obone
       logical, allocatable :: water(:)
       logical, allocatable :: hetmol(:)
       character*3 resname
       character*4 atmname
-      character*7 restyp(maxres)
+      character*7, allocatable :: restyp(:)
       character*120 seqfile
 c
 c
@@ -137,6 +145,27 @@ c
          call readseq (iseq)
          close (unit=iseq)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (ni(maxres))
+      allocate (cai(maxres))
+      allocate (ci(maxres))
+      allocate (oi(maxres))
+      allocate (poi(maxres))
+      allocate (op1(maxres))
+      allocate (op2(maxres))
+      allocate (op3(maxres))
+      allocate (c5i(maxres))
+      allocate (o5i(maxres))
+      allocate (c4i(maxres))
+      allocate (o4i(maxres))
+      allocate (c3i(maxres))
+      allocate (o3i(maxres))
+      allocate (c2i(maxres))
+      allocate (o2i(maxres))
+      allocate (c1i(maxres))
+      allocate (restyp(maxres))
 c
 c     zero out the backbone atoms for biopolymer sequences
 c
@@ -515,6 +544,27 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (ni)
+      deallocate (cai)
+      deallocate (ci)
+      deallocate (oi)
+      deallocate (poi)
+      deallocate (op1)
+      deallocate (op2)
+      deallocate (op3)
+      deallocate (c5i)
+      deallocate (o5i)
+      deallocate (c4i)
+      deallocate (o4i)
+      deallocate (c3i)
+      deallocate (o3i)
+      deallocate (c2i)
+      deallocate (o2i)
+      deallocate (c1i)
+      deallocate (restyp)
 c
 c     perform dynamic allocation of some local arrays
 c

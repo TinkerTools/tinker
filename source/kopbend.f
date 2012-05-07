@@ -40,7 +40,7 @@ c
       integer next,number
       real*8 fopb
       logical header,done
-      logical jopb(maxclass)
+      logical, allocatable :: jopb(:)
       character*4 pa,pb,pc,pd
       character*4 zero4
       character*8 zero8
@@ -118,6 +118,10 @@ c
       do i = maxnopb, 1, -1
          if (kopb(i) .eq. blank)  nopb = i - 1
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (jopb(maxclass))
 c
 c     make list of atom classes using out-of-plane bending
 c
@@ -207,6 +211,10 @@ c
             end if
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (jopb)
 c
 c     mark angles at trigonal sites to use projected in-plane values
 c
