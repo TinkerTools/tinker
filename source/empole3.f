@@ -382,13 +382,13 @@ c
                            write (iout,10)
    10                      format (/,' Individual Multipole and',
      &                                ' Polarization Interactions :',
-     &                             //,' Type',13x,'Atom Names',
-     &                                9x,'Distance',6x,'Energies',
-     &                                ' (MPole, Polar)',/)
+     &                             //,' Type',14x,'Atom Names',
+     &                                15x,'Distance',6x,'Energies',
+     &                                ' (MPol,Polar)',/)
                         end if
                         write (iout,20)  ii,name(ii),kk,name(kk),r,e,ei
-   20                   format (' M-Pole',5x,i5,'-',a3,1x,i5,
-     &                             '-',a3,5x,f8.4,4x,2f12.4)
+   20                   format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                             f10.4,2x,2f12.4)
                      end if
                   end if
                end if
@@ -623,13 +623,13 @@ c
                            write (iout,30)
    30                      format (/,' Individual Multipole and',
      &                                ' Polarization Interactions :',
-     &                             //,' Type',13x,'Atom Names',
-     &                                9x,'Distance',6x,'Energies',
-     &                                ' (MPole, Polar)',/)
+     &                             //,' Type',14x,'Atom Names',
+     &                                15x,'Distance',6x,'Energies',
+     &                                ' (MPol,Polar)',/)
                         end if
                         write (iout,40)  ii,name(ii),kk,name(kk),r,e,ei
-   40                   format (' M-Pole',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             1x,'(X)',1x,f8.4,4x,2f12.4)
+   40                   format (' M-Pole',4x,2(i7,'-',a3),1x,
+     &                             '(X)',5x,f10.4,2x,2f12.4)
                      end if
                   end if
                end do
@@ -983,13 +983,13 @@ c
                            write (iout,10)
    10                      format (/,' Individual Multipole and',
      &                                ' Polarization Interactions :',
-     &                             //,' Type',13x,'Atom Names',
-     &                                9x,'Distance',6x,'Energies',
-     &                                ' (MPole, Polar)',/)
+     &                             //,' Type',14x,'Atom Names',
+     &                                15x,'Distance',6x,'Energies',
+     &                                ' (MPol,Polar)',/)
                         end if
                         write (iout,20)  ii,name(ii),kk,name(kk),r,e,ei
-   20                   format (' M-Pole',5x,i5,'-',a3,1x,i5,
-     &                             '-',a3,5x,f8.4,4x,2f12.4)
+   20                   format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                             f10.4,2x,2f12.4)
                      end if
                   end if
                end if
@@ -1472,14 +1472,14 @@ c
                         write (iout,10)
    10                   format (/,' Real Space Multipole and',
      &                             ' Polarization Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             9x,'Distance',6x,'Energies',
-     &                             ' (MPole, Polar)',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             15x,'Distance',6x,'Energies',
+     &                             ' (MPol,Polar)',/)
                      end if
                      write (iout,20)  ii,name(ii),kk,name(kk),r,
      &                                efix,eifix
-   20                format (' M-Pole',5x,i5,'-',a3,1x,i5,
-     &                          '-',a3,5x,f8.4,4x,2f12.4)
+   20                format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                          f10.4,2x,2f12.4)
                   end if
                end if
             end if
@@ -1709,14 +1709,14 @@ c
                         write (iout,30)
    30                   format (/,' Real Space Multipole and',
      &                             ' Polarization Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             9x,'Distance',6x,'Energies',
-     &                             ' (MPole, Polar)',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             15x,'Distance',6x,'Energies',
+     &                             ' (MPol,Polar)',/)
                      end if
                      write (iout,40)  ii,name(ii),kk,name(kk),r,
      &                                efix,eifix
-   40                format (' M-Pole',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          1x,'(X)',1x,f8.4,4x,2f12.4)
+   40                format (' M-Pole',4x,2(i7,'-',a3),1x,
+     &                          '(X)',5x,f10.4,2x,2f12.4)
                   end if
                end if
             end do
@@ -2200,14 +2200,14 @@ c
                         write (iout,10)
    10                   format (/,' Real Space Multipole and',
      &                             ' Polarization Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             9x,'Distance',6x,'Energies',
-     &                             ' (MPole, Polar)',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             15x,'Distance',6x,'Energies',
+     &                             ' (MPol,Polar)',/)
                      end if
                      write (iout,20)  ii,name(ii),kk,name(kk),r,
      &                                efix,eifix
-   20                format (' M-Pole',5x,i5,'-',a3,1x,i5,
-     &                          '-',a3,5x,f8.4,4x,2f12.4)
+   20                format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                          f10.4,2x,2f12.4)
                   end if
                end if
             end if

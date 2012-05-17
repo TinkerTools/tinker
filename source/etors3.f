@@ -225,13 +225,12 @@ c
                      write (iout,10)
    10                format (/,' Individual Torsional Angle',
      &                          ' Interactions :',
-     &                       //,' Type',23x,'Atom Names',20x,'Angle',
+     &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
                   write (iout,20)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),angle,e
-   20             format (' Torsion',4x,i5,'-',a3,3(1x,i5,'-',a3),
-     &                       2x,f10.4,f12.4)
+   20             format (' Torsion',3x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if
@@ -486,13 +485,12 @@ c
                      write (iout,10)
    10                format (/,' Individual Torsional Angle',
      &                          ' Interactions :',
-     &                       //,' Type',23x,'Atom Names',20x,'Angle',
+     &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
                   write (iout,20)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),angle,e
-   20             format (' Torsion',4x,i5,'-',a3,3(1x,i5,'-',a3),
-     &                       2x,f10.4,f12.4)
+   20             format (' Torsion',3x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if

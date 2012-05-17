@@ -1276,7 +1276,7 @@ c
          write (iout,fstr)  ea,nea
       end if
       if (use_strbnd .and. neba.ne.0) then
-         fstr = '('' Stretch Bend'',15x,'//form1//')'
+         fstr = '('' Stretch-Bend'',15x,'//form1//')'
          write (iout,fstr)  eba,neba
       end if
       if (use_urey .and. neub.ne.0) then

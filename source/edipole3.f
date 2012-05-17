@@ -157,16 +157,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual Dipole-Dipole',
      &                             ' Interactions :',
-     &                          //,' Type',14x,'Dipole 1',14x,
-     &                             'Dipole 2',6x,'Distance',
+     &                          //,' Type',15x,'Dipole 1',14x,
+     &                             'Dipole 2',8x,'Distance',
      &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i1,name(i1),i2,name(i2),
      &                                k1,name(k1),k2,name(k2),
      &                                sqrt(r2),e
-   20                format (' Dipole',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          ' / ',i5,'-',a3,1x,i5,'-',a3,
-     &                          f10.4,f12.4)
+   20                format (' Dipole',4x,4(i7,'-',a3),f11.4,f12.4)
                   end if
                end if
             end if
@@ -276,16 +274,14 @@ c
                            write (iout,30)
    30                      format (/,' Individual Dipole-Dipole',
      &                                ' Interactions :',
-     &                             //,' Type',14x,'Dipole 1',14x,
-     &                               'Dipole 2',6x,'Distance',
+     &                             //,' Type',15x,'Dipole 1',14x,
+     &                                'Dipole 2',8x,'Distance',
      &                                6x,'Energy',/)
                         end if
                         write (iout,40)  i1,name(i1),i2,name(i2),
      &                                   k1,name(k1),k2,name(k2),
      &                                   sqrt(r2),e
-  40                   format (' Dipole',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                            ' / ',i5,'-',a3,1x,i5,'-',a3,
-     &                            f10.4,f12.4)
+   40                format (' Dipole',4x,4(i7,'-',a3),f11.4,f12.4)
                      end if
                   end if
                end do

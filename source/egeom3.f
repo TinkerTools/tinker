@@ -113,26 +113,26 @@ c
                   write (iout,10)
    10             format (/,' Individual Atomic Position Restraint',
      &                       ' Terms :',
-     &                    //,' Type',8x,'Atom Name',11x,'Target',
+     &                    //,' Type',9x,'Atom Name',13x,'Target',
      &                       ' Position',7x,'Distance',6x,'Energy',/)
                end if
                dt = sqrt(dt2)
                if (kpfix(2,i).eq.0 .and. kpfix(3,i).eq.0) then
                   write (iout,20)  ia,name(ia),xpfix(i),dt,e
-   20             format (' Position',3x,i5,'-',a3,2x,f10.4,
+   20             format (' Position',2x,i7,'-',a3,4x,f10.4,
      &                       5x,'----',6x,'----',1x,f10.4,f12.4)
                else if (kpfix(1,i).eq.0 .and. kpfix(3,i).eq.0) then
                   write (iout,30)  ia,name(ia),ypfix(i),dt,e
-   30             format (' Position',3x,i5,'-',a3,7x,'----',1x,
+   30             format (' Position',2x,i7,'-',a3,9x,'----',1x,
      &                       f10.4,5x,'----',1x,f10.4,f12.4)
                else if (kpfix(1,i).eq.0 .and. kpfix(2,i).eq.0) then
                   write (iout,40)  ia,name(ia),zpfix(i),dt,e
-   40             format (' Position',3x,i5,'-',a3,7x,'----',
+   40             format (' Position',2x,i7,'-',a3,9x,'----',
      &                       6x,'----',1x,2f10.4,f12.4)
                else
                   write (iout,50)  ia,name(ia),xpfix(i),ypfix(i),
      &                             zpfix(i),dt,e
-   50             format (' Position',3x,i5,'-',a3,2x,4f10.4,f12.4)
+   50             format (' Position',2x,i7,'-',a3,4x,4f10.4,f12.4)
                end if
             end if
          end if
@@ -178,12 +178,12 @@ c
                   write (iout,60)
    60             format (/,' Individual Interatomic Distance',
      &                       ' Restraint Terms :',
-     &                    //,' Type',13x,'Atom Names',14x,'Ideal Range',
+     &                    //,' Type',14x,'Atom Names',16x,'Ideal Range',
      &                       4x,'Actual',6x,'Energy',/)
                end if
                write (iout,70)  ia,name(ia),ib,name(ib),df1,df2,r,e
-   70          format (' Distance',3x,i5,'-',a3,1x,i5,'-',a3,
-     &                    6x,2f8.2,f10.4,f12.4)
+   70          format (' Distance',2x,2(i7,'-',a3),
+     &                    7x,2f8.2,f10.4,f12.4)
             end if
          end if
       end do
@@ -244,11 +244,11 @@ c
                      write (iout,80)
    80                format (/,' Individual Interatomic Angle',
      &                          ' Restraint Terms :',
-     &                       //,' Type',12x,'Atom Numbers',13x,'Ideal',
+     &                       //,' Type',14x,'Atom Numbers',14x,'Ideal',
      &                          ' Range',4x,'Actual',6x,'Energy',/)
                   end if
                   write (iout,90)  ia,ib,ic,af1,af2,angle,e
-   90             format (' Angle',8x,3i5,8x,2f8.2,f10.4,f12.4)
+   90             format (' Angle',8x,3i6,8x,2f8.2,f10.4,f12.4)
                end if
             end if
          end if
@@ -360,11 +360,11 @@ c
                      write (iout,100)
   100                format (/,' Individual Torsional Angle Restraint
      &',                          ' Terms :',
-     &                       //,' Type',12x,'Atom Numbers',13x,'Ideal',
+     &                       //,' Type',14x,'Atom Numbers',14x,'Ideal',
      &                          ' Range',4x,'Actual',6x,'Energy',/)
                   end if
                   write (iout,110)  ia,ib,ic,id,tf1,tf2,angle,e
-  110             format (' Torsion',4x,4i5,5x,2f8.2,f10.4,f12.4)
+  110             format (' Torsion',4x,4i6,4x,2f8.2,f10.4,f12.4)
                end if
             end if
          end if
@@ -439,11 +439,11 @@ c
                write (iout,120)
   120          format (/,' Individual Intergroup Distance',
      &                    ' Restraint Terms :',
-     &                 //,' Type',12x,'Group Numbers',12x,'Ideal Range',
+     &                 //,' Type',13x,'Group Numbers',14x,'Ideal Range',
      &                    4x,'Actual',6x,'Energy',/)
             end if
             write (iout,130)  ia,ib,gf1,gf2,r,e
-  130       format (' Distance',8x,i5,1x,i5,9x,2f8.2,f10.4,f12.4)
+  130       format (' Distance',7x,2i7,10x,2f8.2,f10.4,f12.4)
          end if
       end do
 c
@@ -495,11 +495,11 @@ c
                   header = .false.
                   write (iout,140)
   140             format (/,' Individual Chirality Restraint Terms :'
-     &,                    //,' Type',12x,'Atom Numbers',13x,'Ideal',
+     &,                    //,' Type',14x,'Atom Numbers',14x,'Ideal',
      &                       ' Range',4x,'Actual',6x,'Energy',/)
                end if
                write (iout,150)  ia,ib,ic,id,cf1,cf2,vol,e
-  150          format (' Chiral',5x,4i5,5x,2f8.2,f10.4,f12.4)
+  150          format (' Chiral',5x,4i6,4x,2f8.2,f10.4,f12.4)
             end if
          end if
       end do
@@ -537,13 +537,13 @@ c
                         write (iout,160)
   160                   format (/,' Individual Gaussian Basin',
      &                             ' Restraint Terms :',
-     &                          //,' Type',13x,'Atom Names',20x,'Ideal',
+     &                          //,' Type',14x,'Atom Names',22x,'Ideal',
      &                             4x,'Actual',6x,'Energy',/)
                      end if
                      r = sqrt(r2)
                      write (iout,170)  i,name(i),k,name(k),0.0d0,r,e
-  170                format (' Distance',3x,i5,'-',a3,1x,i5,'-',a3,
-     &                          12x,2f10.4,f12.4)
+  170                format (' Distance',2x,2(i7,'-',a3),
+     &                          13x,2f10.4,f12.4)
                   end if
                end if
             end do
@@ -582,11 +582,11 @@ c
                      write (iout,180)
   180                format (/,' Individual Spherical Boundary',
      &                          ' Restraint Terms :',
-     &                       //,' Type',13x,'Atom Name',28x,'Distance',
+     &                       //,' Type',14x,'Atom Name',30x,'Distance',
      &                          6x,'Energy',/)
                   end if
                   write (iout,190)  i,name(i),ri,e
-  190             format (' Wall',12x,i5,'-',a3,27x,f10.4,f12.4)
+  190             format (' Wall',11x,i7,'-',a3,29x,f10.4,f12.4)
                end if
             end if
          end do

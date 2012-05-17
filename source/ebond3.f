@@ -110,12 +110,11 @@ c
                   write (iout,10)
    10             format (/,' Individual Bond Stretching',
      &                       ' Interactions :',
-     &                    //,' Type',13x,'Atom Names',20x,'Ideal',
+     &                    //,' Type',14x,'Atom Names',22x,'Ideal',
      &                       4x,'Actual',6x,'Energy',/)
                end if
                write (iout,20)  ia,name(ia),ib,name(ib),ideal,rab,e
-   20          format (' Bond',7x,i5,'-',a3,1x,i5,'-',a3,
-     &                    12x,2f10.4,f12.4)
+   20          format (' Bond',6x,2(i7,'-',a3),13x,2f10.4,f12.4)
             end if
          end if
       end do

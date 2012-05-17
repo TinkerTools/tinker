@@ -72,6 +72,10 @@ c
                      goto 10
                   end if
                end do
+               if (resname .eq. 'HOH') then
+                  pdbtyp(i) = 'HETATM'
+                  goto 10
+               end if
                biopoly = .false.
                goto 20
    10          continue
@@ -96,10 +100,6 @@ c
       rewind (unit=ipdb)
       call readpdb (ipdb)
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (size(n))
-c
 c     use special translation mechanisms used for biopolymers
 c
       do while (.not. abort)
@@ -114,7 +114,7 @@ c
                if (type(i) .eq. 0)  call delete (i)
             end do
 c
-c     get general atom properties for distance-based connectivity
+c     get general atom properties for non-biopolymer structures
 c
          else
             n = npdb
@@ -126,6 +126,15 @@ c
                n12(i) = 0
                next = 1
                call getnumb (resnam(i),type(i),next)
+            end do
+c
+c     perform dynamic allocation of some local arrays
+c
+            allocate (size(n))
+c
+c     assign the size classification for each atom
+c
+            do i = 1, n
                it = type(i)
                if (it .eq. 0) then
                   letter = name(i)(1:1)
@@ -173,9 +182,8 @@ c
                yi = y(i)
                zi = z(i)
                do j = i+1, n
-                  rcut = rmax(size(i)*size(j))
-                  rij = sqrt((xi-x(j))**2 + (yi-y(j))**2
-     &                           + (zi-z(j))**2)
+                  rcut = rmax(size(i)*size(j))**2
+                  rij = (xi-x(j))**2 + (yi-y(j))**2 + (zi-z(j))**2
                   if (rij .le. rcut) then
                      n12(i) = n12(i) + 1
                      i12(n12(i),i) = j
@@ -184,6 +192,10 @@ c
                   end if
                end do
             end do
+c
+c     perform deallocation of some local arrays
+c
+            deallocate (size)
          end if
 c
 c     sort the attached atom lists into ascending order
@@ -208,10 +220,6 @@ c     read the next coordinate set from Protein Data Bank file
 c
          call readpdb (ipdb)
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (size)
 c
 c     write a sequence file for proteins and nucleic acids
 c
@@ -297,8 +305,9 @@ c
       jres = ichain(1,ichn)
       kres = ichain(2,ichn)
 c
-c     chcek for the presence of a cyclic polypeptide chain
+c     check for the presence of a cyclic polypeptide chain
 c
+      cyclic = .false.
       start = resatm(1,jres)
       stop = resatm(2,jres)
       call findatm (' N  ',start,stop,j)

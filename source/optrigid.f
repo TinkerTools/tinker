@@ -30,8 +30,8 @@ c
       integer next,freeunit
       real*8 minimum,optrigid1
       real*8 grdmin,grms,gnorm
-      real*8 xx(maxopt)
-      real*8 derivs(6,maxgrp)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: derivs(:,:)
       logical exist
       character*20 keyword
       character*120 minfile
@@ -102,6 +102,10 @@ c
       close (unit=imin)
       outfile = minfile
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(6*ngrp))
+c
 c     transfer rigid body coordinates to optimization parameters
 c
       nvar = 0
@@ -136,6 +140,14 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(6,ngrp))
+c
 c     compute the final function and RMS gradient values
 c
       call gradrgd (minimum,derivs)
@@ -147,6 +159,10 @@ c
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / sqrt(dble(ngrp))
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     write out the final function and gradient values
 c
@@ -224,8 +240,12 @@ c
       real*8 optrigid1,e
       real*8 xx(*)
       real*8 g(*)
-      real*8 derivs(6,maxgrp)
+      real*8, allocatable :: derivs(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(6,ngrp))
 c
 c     translate optimization parameters to rigid body coordinates
 c
@@ -252,5 +272,9 @@ c
             g(nvar) = derivs(j,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

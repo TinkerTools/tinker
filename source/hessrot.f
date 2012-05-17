@@ -26,10 +26,10 @@ c
       include 'zcoord.i'
       integer i,j,line
       real*8 e,eps
-      real*8 hrot(nomega,*)
       real*8, allocatable :: g(:)
       real*8, allocatable :: g0(:)
       real*8, allocatable :: old(:)
+      real*8 hrot(nomega,*)
       character*4 mode
 c
 c

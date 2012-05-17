@@ -139,13 +139,12 @@ c
                      write (iout,10)
    10                format (/,' Individual Stretch-Bend',
      &                          ' Interactions :',
-     &                       //,' Type',17x,'Atom Names',16x,'dSB 1',
+     &                       //,' Type',18x,'Atom Names',18x,'dSB 1',
      &                          5x,'dSB 2',6x,'Energy',/)
                   end if
                   write (iout,20)  ia,name(ia),ib,name(ib),
      &                             ic,name(ic),dr1*dt,dr2*dt,e
-   20             format (' StrBend',4x,i5,'-',a3,1x,i5,'-',a3,
-     &                       1x,i5,'-',a3,2x,2f10.4,f12.4)
+   20             format (' StrBend',3x,3(i7,'-',a3),2x,2f10.4,f12.4)
                end if
             end if
          end if

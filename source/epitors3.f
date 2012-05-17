@@ -203,12 +203,11 @@ c
                      write (iout,10)
    10                format (/,' Individual Pi-Orbital Torsion',
      &                          ' Interactions :',
-     &                       //,' Type',13x,'Atom Names',30x,'Angle',
+     &                       //,' Type',14x,'Atom Names',32x,'Angle',
      &                          6x,'Energy',/)
                   end if
                   write (iout,20)  ic,name(ic),id,name(id),angle,e
-   20             format (' PiTors',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                       22x,f10.4,f12.4)
+   20             format (' PiTors',4x,2(i7,'-',a3),23x,f10.4,f12.4)
                end if
             end if
          end if

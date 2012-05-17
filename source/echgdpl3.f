@@ -161,13 +161,13 @@ c
                         write (iout,10)
    10                   format (/,' Individual Charge-Dipole',
      &                             ' Interactions :',
-     &                          //,' Type',10x,'Charge',11x,'Dipole',
-     &                             17x,'Distance',6x,'Energy',/)
+     &                          //,' Type',11x,'Charge',10x,'Dipole',
+     &                             20x,'Distance',6x,'Energy',/)
                      end if
                      write (iout,20)  i1,name(i1),k1,name(k1),
      &                                k2,name(k2),sqrt(r2),e
-   20                format (' Chg-Dpl',4x,i5,'-',a3,' / ',i5,'-',a3,
-     &                          1x,i5,'-',a3,10x,f10.4,f12.4)
+   20                format (' Chg-Dpl',3x,3(i7,'-',a3),
+     &                          11x,f11.4,f12.4)
                   end if
                end if
             end if
@@ -264,14 +264,13 @@ c
                            write (iout,30)
    30                      format (/,' Individual Charge-Dipole',
      &                                ' Interactions :',
-     &                             //,' Type',10x,'Charge',11x,'Dipole',
-     &                                17x,'Distance',6x,'Energy',/)
+     &                             //,' Type',11x,'Charge',10x,'Dipole',
+     &                                20x,'Distance',6x,'Energy',/)
                         end if
                         write (iout,40)  i1,name(i1),k1,name(k1),
      &                                   k2,name(k2),sqrt(r2),e
-   40                   format (' Chg-Dpl',4x,i5,'-',a3,' / ',i5,'-',
-     &                             a3,1x,i5,'-',a3,2x,'(XTAL)',
-     &                             2x,f10.4,f12.4)
+   40                   format (' Chg-Dpl',3x,3(i7,'-',a3),
+     &                             2x,'(XTAL)',3x,f11.4,f12.4)
                      end if
                   end if
                end do

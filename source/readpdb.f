@@ -138,8 +138,10 @@ c
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 100
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 100
             call fixpdb (resname,atmname)
-            if (residue.ne.reslast .or. resname.ne.namelast .or.
-     &            chain.ne.chnlast .or. insert.ne.inslast) then
+            if (resname .eq. 'HOH') then
+               remark = 'HETATM'
+            else if (residue.ne.reslast .or. resname.ne.namelast .or.
+     &               chain.ne.chnlast .or. insert.ne.inslast) then
                nres = nres + 1
                reslast = residue
                namelast = resname
@@ -162,6 +164,7 @@ c
             atmnam(npdb) = atmname
             resnam(npdb) = resname
             resnum(npdb) = nres
+            if (resname .eq. 'HOH')  resnum(npdb) = 0
             chnatm(npdb) = chain
   100       continue
          else if (remark .eq. 'HETATM') then
@@ -316,11 +319,11 @@ c
                k = resnum(i)
                nres = nres + 1
                resatm(1,nres) = i
-               resatm(2,nres-1) = i - 1
+               if (nres .gt. 1)  resatm(2,nres-1) = i - 1
             end if
          end if
       end do
-      if (nres .ne. 0)  resatm(2,nres) = npdb
+      if (nres .ge. 1)  resatm(2,nres) = npdb
 c
 c     close the PDB file and quit if there are no coordinates
 c
@@ -599,6 +602,7 @@ c     convert nonstandard names for water molecules
 c
       if (resname .eq. 'H2O')  resname = 'HOH'
       if (resname .eq. 'WAT')  resname = 'HOH'
+      if (resname .eq. 'TIP')  resname = 'HOH'
 c
 c     decide whether residue is protein or nucleic acid
 c
@@ -1066,8 +1070,11 @@ c
       else if (resname .eq. 'HOH') then
          if (atmname .eq. ' OT ')  atmname = ' O  '
          if (atmname .eq. ' OW ')  atmname = ' O  '
+         if (atmname .eq. ' OH2')  atmname = ' O  '
          if (atmname .eq. ' HT ')  atmname = ' H  '
          if (atmname .eq. ' HW ')  atmname = ' H  '
+         if (atmname .eq. ' H1 ')  atmname = ' H  '
+         if (atmname .eq. ' H2 ')  atmname = ' H  '
       end if
       return
       end

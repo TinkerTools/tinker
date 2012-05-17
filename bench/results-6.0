@@ -11,7 +11,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
  ---------------------------                  ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53      1.66      3.32     8.86
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53      1.79      3.39     8.94
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      1.95      3.20     9.30
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66      2.73      4.71    12.78
  Mac Pro (Fedora 14, Intel 12.0, 64-bit)     2.66      2.63      4.69    12.65
@@ -25,7 +25,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
  ---------------------------                  ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53      3.24      4.28    15.36
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53      3.12      4.38    15.78
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80      3.43      4.74    16.96
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66      4.04      5.61    20.16
  Mac Pro (Fedora 14, Intel 12.0, 64-bit)     2.66      3.84      5.12    19.98
@@ -39,7 +39,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53                4.14
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53                4.42
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                3.46
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                4.00
  Mac Pro (Fedora 14, Intel 12.0, 64-bit)     2.66                4.35
@@ -54,7 +54,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53                16.4
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53                15.9
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                20.8
  Mac Pro (Fedora 14, Intel 12.0, 64-bit)     2.66                20.2
  Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                21.7
@@ -68,7 +68,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53                 131
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53                 128
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80                 161
  Mac Pro (OSX 10.6.4, Intel 11.1)            2.66                 210
  Mac Pro (Fedora 14, Intel 12.0, 64-bit)     2.66                 168
@@ -84,9 +84,9 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53         2/1        76 (1.00)
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53         2/2        50 (1.52)
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53         2/4        41 (1.85)
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53         2/1        80 (1.00)
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53         2/2        52 (1.54)
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53         2/4        43 (1.86)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1        80 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2        50 (1.60)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4        34 (2.35)
@@ -117,9 +117,9 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53         2/1       618 (1.00)
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53         2/2       373 (1.66)
- MacBook Pro (OSX 10.6.8, Intel 12.0.5)      2.53         2/4       304 (2.03)
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53         2/1       634 (1.00)
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53         2/2       381 (1.66)
+ MacBook Pro (OSX 10.6.8, Intel 12.0)        2.53         2/4       318 (1.99)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/1       654 (1.00)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/2       373 (1.75)
  Mac Pro (OSX 10.5.5, Intel 11.1)            2.80         8/4       228 (2.87)

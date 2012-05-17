@@ -137,13 +137,12 @@ c
                   write (iout,10)
    10             format (/,' Individual Out-of-Plane Distance',
      &                       ' Interactions :',
-     &                    //,' Type',23x,'Atom Names',17x,'Distance',
+     &                    //,' Type',25x,'Atom Names',18x,'Distance',
      &                       6x,'Energy',/)
                end if
                write (iout,20)  ia,name(ia),ib,name(ib),ic,
      &                          name(ic),id,name(id),sqrt(dt2),e
-   20          format (' O-P-Dist',3x,i5,'-',a3,3(1x,i5,'-',a3),
-     &                    2x,f10.4,f12.4)
+   20          format (' O-P-Dist',2x,(i7,'-',a3),f11.4,f12.4)
             end if
          end if
       end do

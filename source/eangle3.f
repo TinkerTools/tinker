@@ -161,7 +161,7 @@ c
                         write (iout,10)
    10                   format (/,' Individual Angle Bending',
      &                             ' Interactions :',
-     &                          //,' Type',17x,'Atom Names',16x,
+     &                          //,' Type',18x,'Atom Names',18x,
      &                             'Ideal',4x,'Actual',6x,'Energy',/)
                      end if
                      label = 'Angle    '
@@ -175,8 +175,8 @@ c
                      end if
                      write (iout,20)  label,ia,name(ia),ib,name(ib),
      &                                ic,name(ic),ideal,angle,e
-   20                format (1x,a9,2x,i5,'-',a3,1x,i5,'-',a3,
-     &                         1x,i5,'-',a3,2x,2f10.4,f12.4)
+   20                format (1x,a9,1x,i7,'-',a3,i7,'-',a3,i7,
+     &                          '-',a3,2x,2f10.4,f12.4)
                   end if
                end if
 c
@@ -251,13 +251,13 @@ c
                         write (iout,30)
    30                   format (/,' Individual Angle Bending',
      &                             ' Interactions :',
-     &                          //,' Type',17x,'Atom Names',16x,
+     &                          //,' Type',18x,'Atom Names',18x,
      &                             'Ideal',4x,'Actual',6x,'Energy',/)
                      end if
                      write (iout,40)  ia,name(ia),ib,name(ib),ic,
      &                                name(ic),ideal,angle,e
-   40                format (' Angle-IP',3x,i5,'-',a3,1x,i5,'-',a3,
-     &                          1x,i5,'-',a3,2x,2f10.4,f12.4)
+   40                format (' Angle-IP',2x,i7,'-',a3,i7,'-',a3,i7,
+     &                          '-',a3,2x,2f10.4,f12.4)
                   end if
                end if
             end if

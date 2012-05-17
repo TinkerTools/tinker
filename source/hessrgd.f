@@ -27,10 +27,15 @@ c
       parameter (maxrgd=6*maxgrp)
       integer i,j,k,m,nvar
       real*8 e,eps,old
-      real*8 g(6,maxgrp)
-      real*8 g0(6,maxgrp)
       real*8 hrigid(maxrgd,maxrgd)
+      real*8, allocatable :: g(:,:)
+      real*8, allocatable :: g0(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (g(6,ngrp))
+      allocate (g0(6,ngrp))
 c
 c     calculate base values for the rigid body gradient
 c
@@ -59,6 +64,11 @@ c
             hrigid(i,m) = hrigid(m,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (g)
+      deallocate (g0)
 c
 c     restore the Cartesian coordinates to original values
 c

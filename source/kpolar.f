@@ -201,13 +201,16 @@ c
       include 'kpolr.i'
       include 'mpole.i'
       include 'polgrp.i'
+      integer maxlist,maxkeep
+      parameter (maxkeep=100)
+      parameter (maxlist=1000)
       integer i,j,k
       integer it,jt
       integer jj,kk
       integer start,stop
       integer nlist,nkeep
-      integer, allocatable :: list(:)
-      integer, allocatable :: keep(:)
+      integer keep(maxkeep)
+      integer list(maxlist)
       integer, allocatable :: mask(:)
       logical done
 c
@@ -242,14 +245,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (list(n))
-      allocate (keep(n))
       allocate (mask(n))
 c
 c     find any other group members for each atom in turn
 c
       do i = 1, n
-         list(i) = 0
+         mask(i) = 0
       end do
       do i = 1, n
          done = .false.
@@ -264,7 +265,7 @@ c
                   ip11(k,i) = ip11(k,jj)
                end do
             else
-               list(jj) = i
+               mask(jj) = i
             end if
          end do
          do while (.not. done)
@@ -273,7 +274,7 @@ c
                jj = ip11(j,i)
                do k = 1, np11(jj)
                   kk = ip11(k,jj)
-                  if (list(kk) .ne. i) then
+                  if (mask(kk) .ne. i) then
                      np11(i) = np11(i) + 1
                      if (np11(i) .le. maxp11) then
                         ip11(np11(i),i) = kk
@@ -283,7 +284,7 @@ c
      &                             ' in Polarization Group')
                         abort = .true.
                      end if
-                     list(kk) = i
+                     mask(kk) = i
                   end if
                end do
             end do
@@ -302,16 +303,13 @@ c
          mask(i) = 0
       end do
       do i = 1, n
-         nlist = 0
          do j = 1, np11(i)
             jj = ip11(j,i)
-            nlist = nlist + 1
-            list(nlist) = jj
             mask(jj) = i
          end do
          nkeep = 0
-         do j = 1, nlist
-            jj = list(j)
+         do j = 1, np11(i)
+            jj = ip11(j,i)
             do k = 1, n12(jj)
                kk = i12(k,jj)
                if (mask(kk) .ne. i) then
@@ -338,7 +336,7 @@ c
          else
             write (iout,40)
    40       format (/,' POLARGRP  --  Too many Atoms',
-     &                 ' in 1-2 Polarization Groups')
+     &                 ' in 1-2 Polarization Group')
             abort = .true.
          end if
       end do
@@ -377,7 +375,7 @@ c
          else
             write (iout,50)
    50       format (/,' POLARGRP  --  Too many Atoms',
-     &                 ' in 1-3 Polarization Groups')
+     &                 ' in 1-3 Polarization Group')
             abort = .true.
          end if
       end do
@@ -420,15 +418,13 @@ c
          else
             write (iout,60)
    60       format (/,' POLARGRP  --  Too many Atoms',
-     &                 ' in 1-4 Polarization Groups')
+     &                 ' in 1-4 Polarization Group')
             abort = .true.
          end if
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (list)
-      deallocate (keep)
       deallocate (mask)
       return
       end

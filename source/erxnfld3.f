@@ -116,16 +116,15 @@ c
                         write (iout,10)
    10                   format (/,' Individual Reaction Field',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             9x,'Dist from Origin',4x,'R(1-2)',
+     &                          //,' Type',14x,'Atom Names',
+     &                             11x,'Dist from Origin',4x,'R(1-2)',
      &                             6x,'Energy',/)
                      end if
                      r = sqrt(r2)
                      di = sqrt(x(i)**2 + y(i)**2 + z(i)**2)
                      dk = sqrt(x(k)**2 + y(k)**2 + z(k)**2)
                      write (iout,20)  i,name(i),k,name(k),di,dk,r,eik
-   20                format (' RxnFld',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          2x,3f10.4,f12.4)
+   20                format (' RxnFld',4x,2(i7,'-',a3),3x,3f10.4,f12.4)
                   end if
                end if
             end if

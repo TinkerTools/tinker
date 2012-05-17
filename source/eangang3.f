@@ -156,13 +156,12 @@ c
                      header = .false.
                      write (iout,10)
    10                format (/,' Individual Angle-Angle Interactions :',
-     &                       //,' Type',9x,'Center',5x,'Angle1'
-     &                          ,5x,'Angle2',4x,'dAngle1'
-     &                          ,3x,'dAngle2',6x,'Energy',/)
+     &                       //,' Type',10x,'Center',6x,'Angle1',
+     &                          6x,'Angle2',4x,'dAngle1',
+     &                          3x,'dAngle2',6x,'Energy',/)
                   end if
                   write (iout,20)  ib,name(ib),ia,ic,id,ie,dt1,dt2,e
-   20             format (' AngAng',5x,i5,'-',a3,1x,2i5,1x,2i5,
-     &                       2f10.4,f12.4)
+   20             format (' AngAng',4x,i7,'-',a3,4i6,2f10.4,f12.4)
                end if
             end if
          end if

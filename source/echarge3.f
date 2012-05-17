@@ -227,14 +227,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual Charge-Charge',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             16x,'Charges',5x,'Distance',
-     &                             5x,'Energy',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             17x,'Charges',5x,'Distance',
+     &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,e
-   20                format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          8x,2f7.2,f10.4,f12.4)
+   20                format (' Charge',4x,2(i7,'-',a3),8x,
+     &                          2f7.2,f11.4,f12.4)
                   end if
                end if
             end if
@@ -367,14 +367,14 @@ c
                            write (iout,30)
    30                      format (/,' Individual Charge-Charge',
      &                                ' Interactions :',
-     &                             //,' Type',13x,'Atom Names',
-     &                                16x,'Charges',5x,'Distance',
-     &                                5x,'Energy',/)
+     &                             //,' Type',14x,'Atom Names',
+     &                                17x,'Charges',5x,'Distance',
+     &                                6x,'Energy',/)
                         end if
                         write (iout,40)  i,name(i),k,name(k),
      &                                   pchg(ii),pchg(kk),r,e
-   40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)
+   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+     &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
                end do
@@ -652,9 +652,9 @@ c
                         write (iout,20)
    20                   format (/,' Individual Charge-Charge',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             16x,'Charges',5x,'Distance',
-     &                             5x,'Energy',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             17x,'Charges',5x,'Distance',
+     &                             6x,'Energy',/)
                      end if
                      ikmin = min(i,k)
                      ikmax = max(i,k)
@@ -662,14 +662,14 @@ c
                         write (iout,30)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),pchg(ii),
      &                                   pchg(kmap),r,e
-   30                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             8x,2f7.2,f10.4,f12.4)
+   30                   format (' Charge',4x,2(i7,'-',a3),8x,
+     &                             2f7.2,f11.4,f12.4)
                      else
                         write (iout,40)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),pchg(ii),
      &                                   pchg(kmap),r,e
-   40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)
+   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+     &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
                end if
@@ -891,14 +891,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual Charge-Charge',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             16x,'Charges',5x,'Distance',
-     &                             5x,'Energy',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             17x,'Charges',5x,'Distance',
+     &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,e
-   20                format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          8x,2f7.2,f10.4,f12.4)
+   20                format (' Charge',4x,2(i7,'-',a3),8x,
+     &                          2f7.2,f11.4,f12.4)
                   end if
                end if
             end if
@@ -1120,14 +1120,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual Real Space Ewald',
      &                             ' Charge-Charge Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             16x,'Charges',5x,'Distance',
-     &                             5x,'Energy',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             17x,'Charges',5x,'Distance',
+     &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,efix
-   20                format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          8x,2f7.2,f10.4,f12.4)
+   20                format (' Charge',4x,2(i7,'-',a3),8x,
+     &                          2f7.2,f11.4,f12.4)
                   end if
                end if
             end if
@@ -1237,14 +1237,14 @@ c
                            write (iout,30)
    30                      format (/,' Individual Real Space Ewald',
      &                                ' Charge-Charge Interactions :',
-     &                             //,' Type',13x,'Atom Names',
-     &                                16x,'Charges',5x,'Distance',
-     &                                5x,'Energy',/)
+     &                             //,' Type',14x,'Atom Names',
+     &                                17x,'Charges',5x,'Distance',
+     &                                6x,'Energy',/)
                         end if
                         write (iout,40)  i,name(i),k,name(k),
      &                                   pchg(ii),pchg(kk),r,efix
-   40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)
+   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+     &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
                end do
@@ -1534,20 +1534,20 @@ c
                         write (iout,20)
    20                   format (/,' Individual Real Space Ewald',
      &                             ' Charge-Charge Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             16x,'Charges',5x,'Distance',
-     &                             5x,'Energy',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             17x,'Charges',5x,'Distance',
+     &                             6x,'Energy',/)
                      end if
                      if (prime) then
                         write (iout,30)  i,name(i),k,name(k),pchg(ii),
      &                                   pchg(kmap),r,efix
-   30                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             8x,2f7.2,f10.4,f12.4)
+   30                   format (' Charge',4x,2(i7,'-',a3),8x,
+     &                             2f7.2,f11.4,f12.4)
                      else
                         write (iout,40)  i,name(i),k,name(k),pchg(ii),
      &                                   pchg(kmap),r,efix
-   40                   format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                             1x,'(XTAL)',1x,2f7.2,f10.4,f12.4)
+   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+     &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
                end if
@@ -1808,14 +1808,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual Real Space Ewald',
      &                             ' Charge-Charge Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             16x,'Charges',5x,'Distance',
-     &                             5x,'Energy',/)
+     &                          //,' Type',14x,'Atom Names',
+     &                             17x,'Charges',5x,'Distance',
+     &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,efix
-   20                format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                          8x,2f7.2,f10.4,f12.4)
+   20                format (' Charge',4x,2(i7,'-',a3),8x,
+     &                          2f7.2,f11.4,f12.4)
                   end if
                end if
             end if
@@ -2039,14 +2039,14 @@ c
                      write (iout,10)
    10                format (/,' Individual Charge-Charge',
      &                          ' Interactions :',
-     &                       //,' Type',11x,'Atom Names',
-     &                          16x,'Charges',5x,'Distance',
-     &                          5x,'Energy',/)
+     &                       //,' Type',14x,'Atom Names',
+     &                          17x,'Charges',5x,'Distance',
+     &                          6x,'Energy',/)
                   end if
                   write (iout,20)  i,name(i),k,name(k),pchg(ii),
      &                             pchg(kk),r,e
-   20             format (' Charge',5x,i5,'-',a3,1x,i5,'-',a3,
-     &                       8x,2f7.2,f10.4,f12.4)
+   20             format (' Charge',4x,2(i7,'-',a3),8x,
+     &                       2f7.2,f11.4,f12.4)
                end if
             end if
          end do

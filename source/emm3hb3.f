@@ -332,14 +332,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual van der Waals',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             18x,'Minimum',4x,'Actual',
+     &                          //,' Type',14x,'Atom Names',
+     &                             20x,'Minimum',4x,'Actual',
      &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
      &                                rv,sqrt(rik2),e
-   20                format (' VDW-MM3',4x,i5,'-',a3,1x,i5,'-',
-     &                          a3,12x,2f10.4,f12.4)
+   20                format (' VDW-MM3',3x,2(i7,'-',a3),
+     &                          13x,2f10.4,f12.4)
                   end if
                end if
             end if
@@ -523,14 +523,14 @@ c
                            write (iout,30)
    30                      format (/,' Individual van der Waals',
      &                                ' Interactions :',
-     &                             //,' Type',13x,'Atom Names',
-     &                                18x,'Minimum',4x,'Actual',
+     &                             //,' Type',14x,'Atom Names',
+     &                                20x,'Minimum',4x,'Actual',
      &                                6x,'Energy',/)
                         end if
                         write (iout,40)  i,name(i),k,name(k),
      &                                   rv,sqrt(rik2),e
-   40                   format (' VDW-MM3',4x,i5,'-',a3,1x,i5,'-',
-     &                             a3,3x,'(XTAL)',3x,2f10.4,f12.4)
+   40                   format (' VDW-MM3',3x,2(i7,'-',a3),3x,
+     &                             '(XTAL)',4x,2f10.4,f12.4)
                      end if
                   end if
                end do
@@ -904,8 +904,8 @@ c
                         write (iout,20)
    20                   format (/,' Individual van der Waals',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             18x,'Minimum',4x,'Actual',
+     &                          //,' Type',14x,'Atom Names',
+     &                             20x,'Minimum',4x,'Actual',
      &                             6x,'Energy',/)
                      end if
                      ikmin = min(i,k)
@@ -913,13 +913,13 @@ c
                      if (prime) then
                         write (iout,30)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),rv,sqrt(rik2),e
-   30                   format (' VDW-MM3',4x,i5,'-',a3,1x,i5,'-',
-     &                             a3,12x,2f10.4,f12.4)
+   30                   format (' VDW-MM3',3x,2(i7,'-',a3),
+     &                             13x,2f10.4,f12.4)
                      else
                         write (iout,40)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),rv,sqrt(rik2),e
-   40                   format (' VDW-LJ',5x,i5,'-',a3,1x,i5,'-',
-     &                             a3,3x,'(XTAL)',3x,2f10.4,f12.4)
+   40                   format (' VDW-MM3',3x,2(i7,'-',a3),3x,
+     &                             '(XTAL)',4x,2f10.4,f12.4)
                      end if
                   end if
                end if
@@ -1225,14 +1225,14 @@ c
                         write (iout,10)
    10                   format (/,' Individual van der Waals',
      &                             ' Interactions :',
-     &                          //,' Type',13x,'Atom Names',
-     &                             18x,'Minimum',4x,'Actual',
+     &                          //,' Type',14x,'Atom Names',
+     &                             20x,'Minimum',4x,'Actual',
      &                             6x,'Energy',/)
                      end if
                      write (iout,20)  i,name(i),k,name(k),
      &                                rv,sqrt(rik2),e
-   20                format (' VDW-MM3',4x,i5,'-',a3,1x,i5,'-',
-     &                          a3,12x,2f10.4,f12.4)
+   20                format (' VDW-MM3',3x,2(i7,'-',a3),
+     &                          13x,2f10.4,f12.4)
                   end if
                end if
             end if

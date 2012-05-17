@@ -246,11 +246,11 @@ c
                      write (iout,10)
    10                format (/,' Individual Torsion-Torsion',
      &                          ' Interactions :',
-     &                       //,' Type',17x,'Atom Numbers',13x,'Angle1',
+     &                       //,' Type',17x,'Atom Numbers',16x,'Angle1',
      &                          4x,'Angle2',6x,'Energy',/)
                   end if
                   write (iout,20)  ia,ib,ic,id,ie,angle1,angle2,e
-   20             format (' TorTor',4x,5(1x,i5),2x,2f10.4,f12.4)
+   20             format (' TorTor',2x,5i7,2x,2f10.4,f12.4)
                end if
             end if
          end if

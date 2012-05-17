@@ -173,13 +173,12 @@ c
                      write (iout,10)
    10                format (/,' Individual Out-of-Plane Bend',
      &                          ' Interactions :',
-     &                       //,' Type',13x,'Atom Names',30x,'Angle',
+     &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
                   write (iout,20)  id,name(id),ib,name(ib),ia,
      &                             name(ia),ic,name(ic),angle,e
-   20             format (' O-P-Bend',3x,i5,'-',a3,3(1x,i5,'-',a3),
-     &                       2x,f10.4,f12.4)
+   20             format (' O-P-Bend',2x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if

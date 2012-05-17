@@ -97,13 +97,13 @@ c
                   header = .false.
                   write (iout,10)
    10             format (/,' Individual Urey-Bradley Interactions :',
-     &                    //,' Type',17x,'Atom Names',16x,'Ideal',
+     &                    //,' Type',18x,'Atom Names',18x,'Ideal',
      &                       4x,'Actual',6x,'Energy',/)
                end if
                write (iout,20)  ia,name(ia),ib,name(ib),
      &                          ic,name(ic),ideal,rac,e
-   20          format (' UreyBrad',3x,i5,'-',a3,1x,i5,'-',a3,
-     &                    1x,i5,'-',a3,2x,2f10.4,f12.4)
+   20          format (' UreyBrad',2x,i7,'-',a3,i7,'-',a3,
+     &                    i7,'-',a3,2x,2f10.4,f12.4)
             end if
          end if
       end do

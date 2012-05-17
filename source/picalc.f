@@ -796,7 +796,7 @@ c
          write (iout,10)
    10    format (/,' Altered Bond Stretching Parameters',
      &              ' for Pi-System :',
-     &           //,' Type',13x,'Atom Names',15x,'Initial',
+     &           //,' Type',14x,'Atom Names',17x,'Initial',
      &              16x,'Final',/)
       end if
       do i = 1, nbpi
@@ -808,8 +808,8 @@ c
          if (debug) then
             write (iout,20)  ia,name(ia),ib,name(ib),bkpi(j),
      &                       blpi(j),bk(j),bl(j)
-   20       format (' Bond',7x,i5,'-',a3,1x,i5,'-',a3,
-     &                 5x,f9.3,f8.4,2x,'-->',f9.3,f8.4)
+   20       format (' Bond',6x,2(i7,'-',a3),6x,
+     &                 f9.3,f8.4,2x,'-->',f9.3,f8.4)
          end if 
       end do
 c
@@ -819,7 +819,7 @@ c
          write (iout,30)
    30    format (/,' Altered 2-Fold Torsional Parameters',
      &              ' for Pi-System :',
-     &           //,' Type',23x,'Atom Names',17x,'Initial',
+     &           //,' Type',25x,'Atom Names',18x,'Initial',
      &              8x,'Final',/)
       end if
       do i = 1, ntpi
@@ -833,8 +833,7 @@ c
          if (debug) then
             write (iout,40)  ia,name(ia),ib,name(ib),ic,name(ic),
      &                       id,name(id),torsp2(j),tors2(1,j)
-   40       format (' Torsion',4x,i5,'-',a3,3(1x,i5,'-',a3),
-     &                 3x,f8.3,2x,'-->',f8.3)
+   40       format (' Torsion',3x,4(i7,'-',a3),2x,f8.3,2x,'-->',f8.3)
          end if
       end do
       return

@@ -151,11 +151,11 @@ c
                write (iout,10)
    10          format (/,' Individual Atomic Solvation Energy',
      &                    ' Terms :',
-     &                 //,' Type',11x,'Atom Name',18x,'Nonpolar',
+     &                 //,' Type',12x,'Atom Name',20x,'Nonpolar',
      &                    7x,'Polar',6x,'Energy',/)
             end if
             write (iout,20)  i,name(i),aenp(i),aes(i)-aenp(i),aes(i)
-   20       format (' Solvate',7x,i5,'-',a3,15x,3f12.4)
+   20       format (' Solvate',6x,i7,'-',a3,17x,3f12.4)
          end if
       end do
 c
