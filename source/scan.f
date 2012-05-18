@@ -150,13 +150,11 @@ c
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
-      integer maxmap
-      parameter (maxmap=100000)
       integer i,ixyz,lext
       integer nmap,freeunit
       real*8 minimum,grdmin
       real*8 delta,eps,range
-      real*8 emap(maxmap)
+      real*8 emap(*)
       logical unique
       character*7 ext
       character*120 xyzfile
@@ -224,9 +222,9 @@ c
       include 'atoms.i'
       integer i,nvar
       real*8 scan1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -240,6 +238,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -257,6 +259,10 @@ c
          nvar = nvar + 1
          g(nvar) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -278,12 +284,12 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hindex(maxhess)
-      real*8 xx(maxvar)
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
+      integer hinit(*)
+      integer hstop(*)
+      integer hindex(*)
+      real*8 xx(*)
+      real*8 hdiag(*)
+      real*8 h(*)
       character*4 mode
 c
 c
@@ -319,20 +325,24 @@ c
       include 'sizes.i'
       include 'iounit.i'
       include 'omega.i'
-      integer maxmap
-      parameter (maxmap=100000)
       integer i,k,nsearch
       integer nmap,neigen
       real*8 minimum,grdmin,range
-      real*8 step(maxrot)
-      real*8 emap(maxmap)
-      real*8 eigen(maxrot)
-      real*8 vects(maxrot,maxrot)
+      real*8 emap(*)
+      real*8, allocatable :: step(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: vects(:,:)
 c
 c
 c     store the current coordinates as the reference set
 c
       call makeref (1)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (step(nomega))
+      allocate (eigen(nomega))
+      allocate (vects(nomega,nomega))
 c
 c     convert to internal coordinates and find torsional modes
 c
@@ -356,6 +366,12 @@ c
          call climber (nsearch,minimum,step,grdmin)
          call mapcheck (nmap,emap,range,minimum,grdmin)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (step)
+      deallocate (eigen)
+      deallocate (vects)
       return
       end
 c
@@ -374,15 +390,30 @@ c
       include 'omega.i'
       integer i,j,ihess
       real*8 vnorm
-      real*8 a(maxrot),b(maxrot)
-      real*8 p(maxrot),ta(maxrot)
-      real*8 w(maxrot),tb(maxrot)
-      real*8 ty(maxrot)
-      real*8 eigen(maxrot)
-      real*8 vects(maxrot,maxrot)
-      real*8 hrot(maxrot,maxrot)
-      real*8 matrix((maxrot+1)*maxrot/2)
+      real*8 eigen(*)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: matrix(:)
+      real*8 vects(nomega,*)
+      real*8, allocatable :: hrot(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(nomega))
+      allocate (b(nomega))
+      allocate (p(nomega))
+      allocate (w(nomega))
+      allocate (ta(nomega))
+      allocate (tb(nomega))
+      allocate (ty(nomega))
+      allocate (matrix(nomega*(nomega+1)/2))
+      allocate (hrot(nomega,nomega))
 c
 c     compute the Hessian in torsional space
 c
@@ -400,8 +431,20 @@ c
 c
 c     diagonalize the Hessian to obtain eigenvalues
 c
-      call diagq (nomega,maxrot,nomega,matrix,eigen,vects,
+      call diagq (nomega,nomega,nomega,matrix,eigen,vects,
      &                     a,b,p,w,ta,tb,ty)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (matrix)
+      deallocate (hrot)
 c
 c     normalize the torsional Hessian eigenvectors
 c
@@ -440,8 +483,8 @@ c
       integer nstep,nsearch
       real*8 minimum,grdmin
       real*8 big,energy,size
-      real*8 step(maxrot)
       real*8 estep(0:maxstep)
+      real*8 step(*)
       logical done
 c
 c
@@ -538,8 +581,8 @@ c
       real*8 minimum,scan1
       real*8 grdmin,big
       real*8 gnorm,grms
-      real*8 xx(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: derivs(:,:)
       logical oldverb
       character*6 mode,method
       external scan1,scan2
@@ -553,6 +596,10 @@ c
       oldverb = verbose
       verbose = .false.
       big = 100000.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(3*n))
 c
 c     translate the coordinates of each atom
 c
@@ -587,6 +634,14 @@ c
          z(i) = xx(nvar)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     independently check the gradient convergence criterion
 c
       call gradient (minimum,derivs)
@@ -599,5 +654,9 @@ c
       gnorm = sqrt(gnorm)
       grms = gnorm / sqrt(dble(n))
       if (grms .gt. grdmin)  minimum = big
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

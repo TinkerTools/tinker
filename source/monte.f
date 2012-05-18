@@ -40,8 +40,9 @@ c
       include 'zcoord.i'
       integer i,k,m,next
       integer keep,nbig
+      integer nmap,lext
       integer istep,nstep
-      integer imin,freeunit
+      integer ixyz,freeunit
       real*8 global,ratio
       real*8 big,eps,size
       real*8 grdmin,temper
@@ -50,21 +51,22 @@ c
       real*8 beta,boltz
       real*8 random,trial
       real*8 vector(3)
-      real*8 xg(maxatm)
-      real*8 yg(maxatm)
-      real*8 zg(maxatm)
-      real*8 xi(maxatm)
-      real*8 yi(maxatm)
-      real*8 zi(maxatm)
-      real*8 xp(maxatm)
-      real*8 yp(maxatm)
-      real*8 zp(maxatm)
+      real*8, allocatable :: xg(:)
+      real*8, allocatable :: yg(:)
+      real*8, allocatable :: zg(:)
+      real*8, allocatable :: xi(:)
+      real*8, allocatable :: yi(:)
+      real*8, allocatable :: zi(:)
+      real*8, allocatable :: xp(:)
+      real*8, allocatable :: yp(:)
+      real*8, allocatable :: zp(:)
       logical exist
       logical reset
       logical torsmove
       character*1 answer
       character*6 status
-      character*120 minfile
+      character*7 ext
+      character*120 xyzfile
       character*120 record
       character*120 string
 c
@@ -79,6 +81,7 @@ c     initialize values of some counters and parameters
 c
       keep = 0
       nbig = 0
+      nmap = 0
       eps = 0.0001d0
       big = 100000.0d0
       reset = .false.
@@ -193,6 +196,18 @@ c
   200 format (/,' MCM Iter       Current         Global       Temper',
      &           '      Ratio      Status',/)
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xg(n))
+      allocate (yg(n))
+      allocate (zg(n))
+      allocate (xi(n))
+      allocate (yi(n))
+      allocate (zi(n))
+      allocate (xp(n))
+      allocate (yp(n))
+      allocate (zp(n))
+c
 c     store the coordinates, then perform a minimization
 c
       do i = 1, n
@@ -213,12 +228,17 @@ c
          zg(i) = z(i)
       end do
       global = minimum
-      imin = freeunit ()
-      minfile = filename(1:leng)//'.xyz'
-      call version (minfile,'new')
-      open (unit=imin,file=minfile,status='new')
-      call prtxyz (imin)
-      close (unit=imin)
+      nmap = nmap + 1
+      lext = 3
+      call numeral (nmap,ext,lext)
+      ixyz = freeunit ()
+      xyzfile = filename(1:leng)//'.'//ext(1:lext)
+      call version (xyzfile,'new')
+      open (unit=ixyz,file=xyzfile,status='new')
+      call prtxyz (ixyz)
+      close (unit=ixyz)
+      write (iout,99)  nmap,global
+   99 format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
 c
 c     optionally reset coordinates to before the minimization
 c
@@ -317,19 +337,24 @@ c
 c
 c     save coordinates with the best energy as global minimum
 c
-         if (minimum .lt. global) then
+         if (minimum .lt. global-eps) then
             do i = 1, n
                xg(i) = x(i)
                yg(i) = y(i)
                zg(i) = z(i)
             end do
             global = minimum
-            imin = freeunit ()
-            minfile = filename(1:leng)//'.xyz'
-            call version (minfile,'old')
-            open (unit=imin,file=minfile,status='old')
-            call prtxyz (imin)
-            close (unit=imin)
+            nmap = nmap + 1
+            lext = 3
+            call numeral (nmap,ext,lext)
+            ixyz = freeunit ()
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
+            call version (xyzfile,'new')
+            open (unit=ixyz,file=xyzfile,status='new')
+            call prtxyz (ixyz)
+            close (unit=ixyz)
+            write (iout,98)  nmap,global
+   98       format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
          end if
 c
 c     update the overall Monte Carlo acceptance ratio
@@ -385,6 +410,18 @@ c
          if (torsmove)  call makeint (2)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xg)
+      deallocate (yg)
+      deallocate (zg)
+      deallocate (xi)
+      deallocate (yi)
+      deallocate (zi)
+      deallocate (xp)
+      deallocate (yp)
+      deallocate (zp)
+c
 c     write out the final global minimum energy value
 c
       if (digits .ge. 8) then
@@ -424,8 +461,8 @@ c
       include 'output.i'
       include 'usage.i'
       integer i,nvar
-      real*8 xx(maxvar)
       real*8 mcm1,minimum,grdmin
+      real*8, allocatable :: xx(:)
       character*6 mode,method
       external mcm1,mcm2,optsave
 c
@@ -438,6 +475,10 @@ c
       iprint = 0
       iwrite = 0
       coordtype = 'CARTESIAN'
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(3*n))
 c
 c     translate the coordinates of each active atom
 c
@@ -471,6 +512,10 @@ c
             z(i) = xx(nvar)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
       return
       end
 c
@@ -494,9 +539,9 @@ c
       include 'usage.i'
       integer i,nvar
       real*8 mcm1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -512,6 +557,10 @@ c
             z(i) = xx(nvar)
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -531,6 +580,10 @@ c
             g(nvar) = derivs(3,i)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -553,14 +606,14 @@ c
       include 'atoms.i'
       include 'usage.i'
       integer i,j,k,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hvar(maxvar)
-      integer huse(maxvar)
-      integer hindex(maxhess)
-      real*8 xx(maxvar)
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
+      integer hinit(*)
+      integer hstop(*)
+      integer hindex(*)
+      integer, allocatable :: hvar(:)
+      integer, allocatable :: huse(:)
+      real*8 xx(*)
+      real*8 hdiag(*)
+      real*8 h(*)
       character*4 mode
 c
 c
@@ -582,6 +635,11 @@ c
 c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hvar(3*n))
+      allocate (huse(3*n))
 c
 c     transform the sparse Hessian to use only active atoms
 c
@@ -611,5 +669,10 @@ c
             end do
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hvar)
+      deallocate (huse)
       return
       end
