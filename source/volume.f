@@ -97,10 +97,10 @@ c
       real*8 dy(maxarc)
       real*8 dsq(maxarc)
       real*8 d(maxarc)
-      real*8 vdwrad(maxatm)
+      real*8, allocatable :: vdwrad(:)
       real*8 radius(*)
       real*8 dex(3,*)
-      logical skip(maxatm)
+      logical, allocatable :: skip(:)
 c
 c
 c     fix the stepsize in the z-direction; this value sets
@@ -119,6 +119,11 @@ c
       ymax = y(1)
       zmin = z(1)
       zmax = z(1)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (vdwrad(n))
+      allocate (skip(n))
 c
 c     assign van der Waals radii to the atoms; note that
 c     the radii are incremented by the size of the probe;
@@ -486,6 +491,11 @@ c
          dex(2,ir) = 0.5d0 * rrsq * pre_dy
          dex(3,ir) = 0.5d0 * rrsq * pre_dz
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (vdwrad)
+      deallocate (skip)
       return
       end
 c
@@ -556,8 +566,8 @@ c
       real*8 dy(maxarc)
       real*8 dsq(maxarc)
       real*8 d(maxarc)
-      real*8 vdwrad(maxatm)
       real*8 radius(*)
+      real*8, allocatable :: vdwrad(:)
       real*8 xhess(3,*)
       real*8 yhess(3,*)
       real*8 zhess(3,*)
@@ -581,6 +591,10 @@ c
       end do
       if (radius(iatom) .eq. 0.0d0)  return
       pix2 = 2.0d0 * pi
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (vdwrad(n))
 c
 c     assign van der Waals radii to the atoms; note that
 c     the radii are incremented by the size of the probe
@@ -949,5 +963,9 @@ c
             phiold = phi1
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (vdwrad)
       return
       end

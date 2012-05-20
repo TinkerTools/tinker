@@ -211,8 +211,8 @@ c
       integer ncls,nclsa
       integer clsa(maxclsa)
       integer itnl(maxclsa)
-      integer icuptr(maxatm)
-      integer ico(3,maxatm)
+      integer, allocatable :: icuptr(:)
+      integer, allocatable :: ico(:,:)
       integer icube(maxcube,maxcube,maxcube)
       real*8 radmax,width
       real*8 sum,sumi
@@ -259,6 +259,11 @@ c     calculate width of cube from maximum
 c     atom radius and probe radius
 c
       width = 2.0d0 * (radmax+pr)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (icuptr(na))
+      allocate (ico(3,na))
 c
 c     set up cube arrays; first the integer coordinate arrays
 c
@@ -460,6 +465,11 @@ c
          end if
    70    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (icuptr)
+      deallocate (ico)
       return
       end
 c
@@ -589,7 +599,7 @@ c
       integer mnb(maxmnb)
       integer ikt(maxmnb)
       integer jkt(maxmnb)
-      integer lkcls(maxcls)
+      integer lkcls(maxmnb)
       real*8 dist2,d2,det
       real*8 hij,hijk
       real*8 uij(3),uijk(3)
@@ -1653,16 +1663,25 @@ c
       integer maxepa,maxcypa
       parameter (maxepa=300)
       parameter (maxcypa=100)
-      integer i,k,ia,ia2,it,iep,ic,jc,jcy
-      integer nepa,iepa,jepa,ncypa,icya,jcya,kcya
-      integer ncyep,icyep,jcyep,ncyold,nused,lookv
-      integer aic(maxepa),aia(maxepa),aep(maxepa),av(2,maxepa)
-      integer ncyepa(maxcypa),cyepa(mxcyep,maxcypa)
+      integer i,k,ia,ia2,it
+      integer iep,ic,jc,jcy
+      integer nepa,iepa,jepa
+      integer ncypa,icya,jcya,kcya
+      integer ncyep,icyep,jcyep
+      integer ncyold,nused,lookv
+      integer aic(maxepa),aia(maxepa)
+      integer aep(maxepa),av(2,maxepa)
+      integer ncyepa(maxcypa)
+      integer cyepa(mxcyep,maxcypa)
       real*8 anorm,anaa,factor
-      real*8 acvect(3,maxepa),aavect(3,maxepa)
-      real*8 pole(3),unvect(3),acr(maxepa)
-      logical ptincy,epused(maxepa),cycy(maxcypa,maxcypa)
-      logical cyused(maxcypa),samef(maxcypa,maxcypa)
+      real*8 acvect(3,maxepa)
+      real*8 aavect(3,maxepa)
+      real*8 pole(3),unvect(3)
+      real*8 acr(maxepa)
+      logical ptincy,epused(maxepa)
+      logical cycy(maxcypa,maxcypa)
+      logical cyused(maxcypa)
+      logical samef(maxcypa,maxcypa)
 c
 c
 c     zero out the number of cycles and convex faces
@@ -1758,7 +1777,6 @@ c
          if (nepa .le. 0) then
             call cerror ('No Edges for Non-buried, Non-free Atom')
          end if
-c
 c
 c     form cycles; initialize all the
 c     convex edges as not used in cycle
@@ -2097,34 +2115,75 @@ c
       parameter (maxdot=1000)
       parameter (maxop=100)
       parameter (nscale=20)
-      integer k,ke,ke2,kv,ia,ic,ip,it,ien,iep
-      integer ifn,ifp,ifs,iv,iv1,iv2,isc,jfn
-      integer ndots,idot,nop,iop,nate,neat,neatmx
-      integer ivs(3),ispind(3),ispnd2(3)
-      integer nlap(maxfn),ifnop(maxop),enfs(maxen)
-      integer fnt(3,maxfn),nspt(3,maxfn)
+      integer k,ke,ke2,kv
+      integer ia,ic,ip,it
+      integer ien,iep
+      integer ifn,ifp,ifs
+      integer iv,iv1,iv2
+      integer isc,jfn
+      integer ndots,idot
+      integer nop,iop,nate
+      integer neat,neatmx
+      integer ivs(3)
+      integer ispind(3)
+      integer ispnd2(3)
+      integer ifnop(maxop)
+      integer, allocatable :: nlap(:)
+      integer, allocatable :: enfs(:)
+      integer, allocatable :: fnt(:,:)
+      integer, allocatable :: nspt(:,:)
       real*8 volume,area
-      real*8 atmarea(maxatm),alens,vint,vcone,vpyr,vlens
-      real*8 hedron,totap,totvp,totas,totvs,totasp,totvsp
-      real*8 totan,totvn,alenst,alensn,vlenst,vlensn,prism
-      real*8 areap,volp,areas,vols,areasp,volsp,arean,voln
-      real*8 depth,triple,dist2,areado,voldo,dot,dota
-      real*8 ds2,dij2,dt,dpp,rm,rat,rsc,rho
-      real*8 sumsc,sumsig,sumlam,stq,scinc,coran,corvn
-      real*8 depths(maxfn),alts(3,maxfn),fncen(3,maxfn)
-      real*8 cora(maxfn),corv(maxfn),cenop(3,maxop)
-      real*8 sdot(3),dotv(nscale),fnvect(3,3,maxfn)
-      real*8 tau(3),ppm(3),xpnt1(3),xpnt2(3)
-      real*8 qij(3),qji(3),vects(3,3)
-      real*8 vect1(3),vect2(3),vect3(3),vect4(3)
-      real*8 vect5(3),vect6(3),vect7(3),vect8(3)
-      real*8 upp(3),thetaq(3),sigmaq(3)
-      real*8 umq(3),upq(3),uc(3),uq(3),uij(3)
-      real*8 dots(3,maxdot),tdots(3,maxdot)
-      logical fcins(3,maxfn),fcint(3,maxfn)
-      logical cinsp,cintp,usenum,vip(3),ate(maxop)
-      logical spindl,alli,allj,anyi,anyj,case1,case2
-      logical fntrev(3,maxfn),badav(maxfn),badt(maxfn)
+      real*8 alens,vint,vcone
+      real*8 vpyr,vlens,hedron
+      real*8 totap,totvp,totas
+      real*8 totvs,totasp,totvsp
+      real*8 totan,totvn
+      real*8 alenst,alensn
+      real*8 vlenst,vlensn,prism
+      real*8 areap,volp,areas,vols
+      real*8 areasp,volsp,arean,voln
+      real*8 depth,triple,dist2
+      real*8 areado,voldo,dot,dota
+      real*8 ds2,dij2,dt,dpp
+      real*8 rm,rat,rsc,rho
+      real*8 sumsc,sumsig,sumlam
+      real*8 stq,scinc,coran,corvn
+      real*8 cenop(3,maxop)
+      real*8 sdot(3),dotv(nscale)
+      real*8 tau(3),ppm(3)
+      real*8 xpnt1(3),xpnt2(3)
+      real*8 qij(3),qji(3)
+      real*8 vects(3,3)
+      real*8 vect1(3),vect2(3)
+      real*8 vect3(3),vect4(3)
+      real*8 vect5(3),vect6(3)
+      real*8 vect7(3),vect8(3)
+      real*8 upp(3),thetaq(3)
+      real*8 sigmaq(3)
+      real*8 umq(3),upq(3)
+      real*8 uc(3),uq(3),uij(3)
+      real*8 dots(3,maxdot)
+      real*8 tdots(3,maxdot)
+      real*8, allocatable :: atmarea(:)
+      real*8, allocatable :: depths(:)
+      real*8, allocatable :: cora(:)
+      real*8, allocatable :: corv(:)
+      real*8, allocatable :: alts(:,:)
+      real*8, allocatable :: fncen(:,:)
+      real*8, allocatable :: fnvect(:,:,:)
+      logical spindl
+      logical alli,allj
+      logical anyi,anyj
+      logical case1,case2
+      logical cinsp,cintp
+      logical usenum
+      logical vip(3)
+      logical ate(maxop)
+      logical, allocatable :: badav(:)
+      logical, allocatable :: badt(:)
+      logical, allocatable :: fcins(:,:)
+      logical, allocatable :: fcint(:,:)
+      logical, allocatable :: fntrev(:,:)
 c
 c
 c     compute the volume of the interior polyhedron
@@ -2134,6 +2193,25 @@ c
          call measpm (ifn,prism)
          hedron = hedron + prism
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (nlap(nfn))
+      allocate (enfs(5*na))
+      allocate (fnt(3,nfn))
+      allocate (nspt(3,nfn))
+      allocate (atmarea(na))
+      allocate (depths(nfn))
+      allocate (cora(nfn))
+      allocate (corv(nfn))
+      allocate (alts(3,nfn))
+      allocate (fncen(3,nfn))
+      allocate (fnvect(3,3,nfn))
+      allocate (badav(nfn))
+      allocate (badt(nfn))
+      allocate (fcins(3,nfn))
+      allocate (fcint(3,nfn))
+      allocate (fntrev(3,nfn))
 c
 c     compute the area and volume due to convex faces
 c     as well as the area partitioned among the atoms
@@ -2656,6 +2734,25 @@ c
          end if
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (nlap)
+      deallocate (enfs)
+      deallocate (fnt)
+      deallocate (nspt)
+      deallocate (atmarea)
+      deallocate (depths)
+      deallocate (cora)
+      deallocate (corv)
+      deallocate (alts)
+      deallocate (fncen)
+      deallocate (fnvect)
+      deallocate (badav)
+      deallocate (badt)
+      deallocate (fcins)
+      deallocate (fcint)
+      deallocate (fntrev)
+c
 c     finally, compute the total area and total volume
 c
       area = totap + totas + totan - totasp - alenst
@@ -2753,12 +2850,19 @@ c
       include 'sizes.i'
       include 'faces.i'
       include 'math.i'
-      integer k,ke,ifp,iep,ia,ia2,ic,it,iv1,iv2
-      integer ncycle,ieuler,icyptr,icy,nedge
-      real*8 areap,volp,dot,dt,gauss
-      real*8 vecang,angle,geo,pcurve,gcurve
-      real*8 vect1(3),vect2(3),acvect(3),aavect(3)
-      real*8 tanv(3,2,mxcyep),radial(3,mxcyep)
+      integer k,ke,ifp,iep
+      integer ia,ia2,ic
+      integer it,iv1,iv2
+      integer ncycle,ieuler
+      integer icyptr,icy,nedge
+      real*8 areap,volp
+      real*8 dot,dt,gauss
+      real*8 vecang,angle,geo
+      real*8 pcurve,gcurve
+      real*8 vect1(3),vect2(3)
+      real*8 acvect(3),aavect(3)
+      real*8 tanv(3,2,mxcyep)
+      real*8 radial(3,mxcyep)
 c
 c
       ia = fpa(ifp)
@@ -2968,10 +3072,13 @@ c
       integer k,ke,je
       integer ifn,ien
       integer iv,ia,ip
-      real*8 arean,voln,vecang
-      real*8 triple,defect,simplx
-      real*8 pvv(3,3),pav(3,3)
-      real*8 planev(3,3),angle(3)
+      real*8 arean,voln
+      real*8 vecang,triple
+      real*8 defect,simplx
+      real*8 angle(3)
+      real*8 pvv(3,3)
+      real*8 pav(3,3)
+      real*8 planev(3,3)
 c
 c
       do ke = 1, 3
@@ -3026,9 +3133,10 @@ c
       integer k,ke,icy,ia
       integer nedge,iep,iv
       real*8 dot,dt,f
-      real*8 polev(3),pnt(3)
+      real*8 polev(3)
+      real*8 pnt(3)
       real*8 unvect(3)
-      real*8 spv(3,mxcyep)
+      real*8 spv(3,*)
       logical fail
 c
 c
@@ -3084,10 +3192,16 @@ c
       implicit none
       include 'sizes.i'
       include 'faces.i'
-      integer k,ke,icy,iep,ic,it,iatom,iaoth,nedge
-      real*8 unvect(3),dot,rotang,totang
-      real*8 spv(3,mxcyep),epu(3,mxcyep)
-      real*8 pnt(3),acvect(3),cpvect(3)
+      integer k,ke,icy,iep
+      integer ic,it,iatom
+      integer iaoth,nedge
+      real*8 dot,rotang,totang
+      real*8 unvect(3)
+      real*8 pnt(3)
+      real*8 acvect(3)
+      real*8 cpvect(3)
+      real*8 spv(3,mxcyep)
+      real*8 epu(3,mxcyep)
       logical ptincy,fail
 c
 c
@@ -3204,7 +3318,8 @@ c
       integer ke,nedge
       real*8 rotang,totang
       real*8 dot,dt,ang
-      real*8 unvect(3),crs(3)
+      real*8 unvect(3)
+      real*8 crs(3)
       real*8 epu(3,*)
 c
 c
@@ -3368,7 +3483,8 @@ c
       function triple (x,y,z)
       implicit none
       real*8 triple,dot
-      real*8 x(3),y(3),z(3),xy(3)
+      real*8 x(3),y(3)
+      real*8 z(3),xy(3)
 c
 c
       call vcross (x,y,xy)
@@ -3430,8 +3546,8 @@ c
       implicit none
       integer k
       real*8 anorm,dot,dcp,dir
-      real*8 ratio,rlen
-      real*8 circen(3),cirrad,cirvec(3)
+      real*8 ratio,rlen,cirrad
+      real*8 circen(3),cirvec(3)
       real*8 plncen(3),plnvec(3)
       real*8 xpnt1(3),xpnt2(3)
       real*8 cpvect(3),pnt1(3)
@@ -3495,7 +3611,7 @@ c
       real*8 fi,fj,x,y,z,xy
       real*8 xcenter,ycenter,zcenter
       real*8 radius
-      real*8 dots(3,ndots)
+      real*8 dots(3,*)
 c
 c
       nequat = sqrt(pi*dble(ndots))

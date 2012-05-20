@@ -392,18 +392,18 @@ c
       include 'iounit.i'
       include 'omega.i'
       include 'refer.i'
-      integer i,j,k
+      integer i,j,k,nfreq
       integer start,stop
       integer niter,nsearch
       real*8 minimum,grdmin
       real*8 minref,minbest
       real*8 eps,rms,size
-      real*8 step(3,maxvib)
-      real*8 eigen(maxvib)
-      real*8 vects(maxvib,maxvib)
-      real*8 xbest(maxatm)
-      real*8 ybest(maxatm)
-      real*8 zbest(maxatm)
+      real*8, allocatable :: xbest(:)
+      real*8, allocatable :: ybest(:)
+      real*8, allocatable :: zbest(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: step(:,:)
+      real*8, allocatable :: vects(:,:)
       logical done,check
 c
 c
@@ -418,6 +418,16 @@ c
       minref = minimum
       minbest = minimum
       niter = 0
+c
+c     perform dynamic allocation of some local arrays
+c
+      nfreq = 3 * n
+      allocate (xbest(n))
+      allocate (ybest(n))
+      allocate (zbest(n))
+      allocate (eigen(nfreq))
+      allocate (step(3,nfreq))
+      allocate (vects(nfreq,nfreq))
 c
 c     find local minimum along each of the steepest directions
 c
@@ -486,6 +496,15 @@ c
             call getref (1)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xbest)
+      deallocate (ybest)
+      deallocate (zbest)
+      deallocate (eigen)
+      deallocate (step)
+      deallocate (vects)
       return
       end
 c
@@ -510,12 +529,12 @@ c
       real*8 minimum,grdmin
       real*8 minref,minbest
       real*8 eps,rms
-      real*8 step(maxrot)
-      real*8 eigen(maxrot)
-      real*8 vects(maxrot,maxrot)
-      real*8 xbest(maxatm)
-      real*8 ybest(maxatm)
-      real*8 zbest(maxatm)
+      real*8, allocatable :: xbest(:)
+      real*8, allocatable :: ybest(:)
+      real*8, allocatable :: zbest(:)
+      real*8, allocatable :: step(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: vects(:,:)
       logical done,check
 c
 c
@@ -530,6 +549,15 @@ c
       minref = minimum
       minbest = minimum
       niter = 0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xbest(n))
+      allocate (ybest(n))
+      allocate (zbest(n))
+      allocate (step(nomega))
+      allocate (eigen(nomega))
+      allocate (vects(nomega,nomega))
 c
 c     find local minimum along each of the steepest directions
 c
@@ -591,6 +619,15 @@ c
             call getref (1)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xbest)
+      deallocate (ybest)
+      deallocate (zbest)
+      deallocate (step)
+      deallocate (eigen)
+      deallocate (vects)
       return
       end
 c
@@ -607,26 +644,42 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'hescut.i'
-      integer i,j,k
-      integer ihess,nfreq
-      integer hindex(maxhess)
-      real*8, allocatable :: hinit(:,:)
-      real*8, allocatable :: hstop(:,:)
-      real*8 h(maxhess)
-      real*8 eigen(maxvib)
-      real*8 vects(maxvib,maxvib)
-      real*8 a(maxvib),b(maxvib)
-      real*8 p(maxvib),w(maxvib)
-      real*8 ta(maxvib),tb(maxvib)
-      real*8 ty(maxvib)
-      real*8 matrix((maxvib+1)*maxvib/2)
-      real*8 hdiag(3,maxatm)
+      integer i,j,k,nfreq
+      integer ihess,hmax
+      integer, allocatable :: hindex(:)
+      integer, allocatable :: hinit(:,:)
+      integer, allocatable :: hstop(:,:)
+      real*8 eigen(*)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: matrix(:)
+      real*8, allocatable :: h(:)
+      real*8 vects(3*n,*)
+      real*8, allocatable :: hdiag(:,:)
 c
 c
 c     perform dynamic allocation of some local arrays
 c
+      nfreq = 3 * n
+      hmax = min(maxhess,(nfreq*(nfreq-1))/2)
+      allocate (hindex(hmax))
       allocate (hinit(3,n))
       allocate (hstop(3,n))
+      allocate (a(nfreq))
+      allocate (b(nfreq))
+      allocate (p(nfreq))
+      allocate (w(nfreq))
+      allocate (ta(nfreq))
+      allocate (tb(nfreq))
+      allocate (ty(nfreq))
+      allocate (matrix(nfreq*(nfreq+1)/2))
+      allocate (h(hmax))
+      allocate (hdiag(3,n))
 c
 c     compute the Hessian matrix in Cartesian space
 c
@@ -649,14 +702,24 @@ c
 c
 c     diagonalize the Hessian to obtain eigenvalues
 c
-      nfreq = 3 * n
       call diagq (nfreq,maxvib,nfreq,matrix,eigen,vects,
      &                     a,b,p,w,ta,tb,ty)
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (hindex)
       deallocate (hinit)
       deallocate (hstop)
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (matrix)
+      deallocate (h)
+      deallocate (hdiag)
       return
       end
 c
@@ -674,15 +737,30 @@ c
       include 'atoms.i'
       include 'omega.i'
       integer i,j,ihess
-      real*8 eigen(maxrot)
-      real*8 a(maxrot),b(maxrot)
-      real*8 p(maxrot),ta(maxrot)
-      real*8 w(maxrot),tb(maxrot)
-      real*8 ty(maxrot)
-      real*8 matrix((maxrot+1)*maxrot/2)
-      real*8 vects(maxrot,maxrot)
-      real*8 hrot(maxrot,maxrot)
+      real*8 eigen(*)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: matrix(:)
+      real*8 vects(nomega,*)
+      real*8, allocatable :: hrot(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(nomega))
+      allocate (b(nomega))
+      allocate (p(nomega))
+      allocate (w(nomega))
+      allocate (ta(nomega))
+      allocate (tb(nomega))
+      allocate (ty(nomega))
+      allocate (matrix(nomega*(nomega+1)/2))
+      allocate (hrot(nomega,nomega))
 c
 c     compute the Hessian in torsional space
 c
@@ -702,6 +780,18 @@ c     diagonalize the Hessian to obtain eigenvalues
 c
       call diagq (nomega,maxrot,nomega,matrix,eigen,vects,
      &                     a,b,p,w,ta,tb,ty)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (matrix)
+      deallocate (hrot)
       return
       end
 c
@@ -915,13 +1005,17 @@ c
       real*8 minimum
       real*8 grdmin
       real*8 pss1
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical oldverb
       character*6 mode
       character*6 method
       external pss1,pss2
       external optsave
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(3*n))
 c
 c     translate the coordinates of each atom
 c
@@ -956,6 +1050,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
       return
       end
 c

@@ -1,5 +1,5 @@
 cln025
-CLN025 Peptide  (Tyr-Tyr-Asp-Pro-Glu-Thr-Gly-Thr-Trp-Tyr)
+CLN025 PEPTIDE (JACS, 130, 15327 '08)
 tyr
 tyr
 asp
