@@ -644,8 +644,7 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'hescut.i'
-      integer i,j,k,nfreq
-      integer ihess,hmax
+      integer i,j,k,nfreq,ihess
       integer, allocatable :: hindex(:)
       integer, allocatable :: hinit(:,:)
       integer, allocatable :: hstop(:,:)
@@ -666,8 +665,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       nfreq = 3 * n
-      hmax = min(maxhess,(nfreq*(nfreq-1))/2)
-      allocate (hindex(hmax))
+      allocate (hindex((nfreq*(nfreq-1))/2))
       allocate (hinit(3,n))
       allocate (hstop(3,n))
       allocate (a(nfreq))
@@ -677,8 +675,8 @@ c
       allocate (ta(nfreq))
       allocate (tb(nfreq))
       allocate (ty(nfreq))
-      allocate (matrix(nfreq*(nfreq+1)/2))
-      allocate (h(hmax))
+      allocate (matrix((nfreq*(nfreq+1))/2))
+      allocate (h((nfreq*(nfreq-1))/2))
       allocate (hdiag(3,n))
 c
 c     compute the Hessian matrix in Cartesian space

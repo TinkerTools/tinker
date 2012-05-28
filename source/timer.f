@@ -25,8 +25,7 @@ c
       include 'hescut.i'
       include 'inform.i'
       include 'iounit.i'
-      integer i,ncalls
-      integer next,hmax
+      integer i,ncalls,next
       integer, allocatable :: hindex(:)
       integer, allocatable :: hinit(:,:)
       integer, allocatable :: hstop(:,:)
@@ -82,15 +81,14 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (derivs(3,n))
       if (dohessian) then
+         allocate (hindex((3*n*(3*n-1))/2))
          allocate (hinit(3,n))
          allocate (hstop(3,n))
+         allocate (h((3*n*(3*n-1))/2))
          allocate (hdiag(3,n))
-         hmax = min(maxhess,(3*n*(3*n-1))/2)
-         allocate (hindex(hmax))
-         allocate (h(hmax))
       end if
+      allocate (derivs(3,n))
 c
 c     get the timing for setup of the calculation
 c
@@ -107,7 +105,7 @@ c
 c
 c     set a large Hessian cutoff and turn off extra printing
 c
-      hesscut = 100.0d0
+      hesscut = 1.0d0
       verbose = .false.
 c
 c     run the potential energy only timing experiment
@@ -182,14 +180,14 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (derivs)
       if (dohessian) then
+         deallocate (hindex)
          deallocate (hinit)
          deallocate (hstop)
-         deallocate (hdiag)
-         deallocate (hindex)
          deallocate (h)
+         deallocate (hdiag)
       end if
+      deallocate (derivs)
 c
 c     perform any final tasks before program exit
 c

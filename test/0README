@@ -92,8 +92,8 @@
                           Minimization with random torsional moves to
                           find the global minimum energy structure
 
-         (16) WATER       compare the electrostatic potential around
-                          an AMOEBA water molecule to the QM-derived
+         (16) WATER       fit the electrostatic potential around an
+                          AMOEBA water molecule to the QM-derived
                           potential (MP2/aug-cc-pVTZ) on a grid of
                           points outside the molecular surface.
 

@@ -36,23 +36,35 @@ c
       real*8 f,g_rms,g_tan,g2
       real*8 saddle1,grdmin
       real*8 reduce,diverge
-      real*8 beta,gamma,gammamin
-      real*8 sg,sg0,x_move,f_move
+      real*8 beta,sg,sg0
+      real*8 gamma,gammamin
+      real*8 x_move,f_move
       real*8 hg,f_old,g2_old
       real*8 f_0,f_1,f_2,f_3
-      real*8 p,delta,epsilon,angle
-      real*8 rmsvalue,energy1,energy2
-      real*8 zbond1(maxatm),zbond2(maxatm)
-      real*8 zang1(maxatm),zang2(maxatm)
-      real*8 ztors1(maxatm),ztors2(maxatm)
-      real*8 xx(maxvar),x_old(maxvar)
-      real*8 g(maxvar),g_old(maxvar)
-      real*8 tan(maxvar),dgdt(maxvar)
-      real*8 s0(maxvar),s(maxvar)
-      real*8 h0(maxvar)
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8 p,delta,epsilon
+      real*8 angle,rmsvalue
+      real*8 energy1,energy2
+      real*8, allocatable :: x1(:)
+      real*8, allocatable :: y1(:)
+      real*8, allocatable :: z1(:)
+      real*8, allocatable :: zbond1(:)
+      real*8, allocatable :: zang1(:)
+      real*8, allocatable :: ztors1(:)
+      real*8, allocatable :: x2(:)
+      real*8, allocatable :: y2(:)
+      real*8, allocatable :: z2(:)
+      real*8, allocatable :: zbond2(:)
+      real*8, allocatable :: zang2(:)
+      real*8, allocatable :: ztors2(:)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: x_old(:)
+      real*8, allocatable :: g_old(:)
+      real*8, allocatable :: tan(:)
+      real*8, allocatable :: dgdt(:)
+      real*8, allocatable :: s0(:)
+      real*8, allocatable :: s(:)
+      real*8, allocatable :: h0(:)
       logical exist,terminate
       logical scan,spanned
       logical done,newcycle
@@ -65,7 +77,7 @@ c
       external saddle1
 c
 c
-c     set default parameters for the saddle point run
+c     set default parameters for the saddle point method
 c
       call initial
       terminate = .false.
@@ -91,6 +103,18 @@ c
 c     get coordinates for the first endpoint structure
 c
       call getxyz
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x1(n))
+      allocate (y1(n))
+      allocate (z1(n))
+      allocate (zbond1(n))
+      allocate (zang1(n))
+      allocate (ztors1(n))
+c
+c     store coordinates for the first endpoint structure
+c
       do i = 1, n
          x1(i) = x(i)
          y1(i) = y(i)
@@ -100,6 +124,18 @@ c
 c     get coordinates for the second endpoint structure
 c
       call getxyz
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x2(n))
+      allocate (y2(n))
+      allocate (z2(n))
+      allocate (zbond2(n))
+      allocate (zang2(n))
+      allocate (ztors2(n))
+c
+c     store coordinates for the second endpoint structure
+c
       do i = 1, n
          x2(i) = x(i)
          y2(i) = y(i)
@@ -162,7 +198,7 @@ c     superimpose the two conformational endpoints
 c
       call impose (n,x1,y1,z1,n,x2,y2,z2,rmsvalue)
       write (iout,70)  rmsvalue
-   70 format (/,' RMS Fit for All Atoms of both Structures :',f10.4)
+   70 format (/,' RMS Fit for All Atoms of Both Structures :',f10.4)
 c
 c     copy the superimposed structures into vectors
 c
@@ -209,6 +245,18 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+      allocate (g(nvar))
+      allocate (x_old(nvar))
+      allocate (g_old(nvar))
+      allocate (tan(nvar))
+      allocate (dgdt(nvar))
+      allocate (s0(nvar))
+      allocate (s(nvar))
+      allocate (h0(nvar))
+c
 c     get the energies for the two endpoint structures
 c
       ncalls = ncalls + 2
@@ -251,6 +299,21 @@ c
             xx(3*i) = z(i)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (x1)
+      deallocate (y1)
+      deallocate (z1)
+      deallocate (zbond1)
+      deallocate (zang1)
+      deallocate (ztors1)
+      deallocate (x2)
+      deallocate (y2)
+      deallocate (z2)
+      deallocate (zbond2)
+      deallocate (zang2)
+      deallocate (ztors2)
 c
 c     save the initial estimate of the transition state
 c
@@ -467,7 +530,7 @@ c
          status = '         '
          angmax = 90.0d0
          call search (nvar,f,g,xx,s,f_move,angle,
-     &                ncalls,saddle1,status)
+     &                  ncalls,saddle1,status)
 c
 c     if search direction points uphill, use its negative
 c
@@ -476,7 +539,7 @@ c
                s(i) = -s(i)
             end do
             call search (nvar,f,g,xx,s,f_move,angle,
-     &                   ncalls,saddle1,status)
+     &                     ncalls,saddle1,status)
          end if
 c
 c     compute movement and gradient following line search
@@ -594,6 +657,18 @@ c
       call prtxyz (its)
       close (unit=its)
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      deallocate (g)
+      deallocate (x_old)
+      deallocate (g_old)
+      deallocate (tan)
+      deallocate (dgdt)
+      deallocate (s0)
+      deallocate (s)
+      deallocate (h0)
+c
 c     perform any final tasks before program exit
 c
       call final
@@ -618,11 +693,23 @@ c
       include 'syntrn.i'
       integer i,nvar
       real*8 dr,dp,rmsvalue
-      real*8 xx(maxvar)
-      real*8 x1(maxatm),x2(maxatm)
-      real*8 y1(maxatm),y2(maxatm)
-      real*8 z1(maxatm),z2(maxatm)
+      real*8 xx(*)
+      real*8, allocatable :: x1(:)
+      real*8, allocatable :: y1(:)
+      real*8, allocatable :: z1(:)
+      real*8, allocatable :: x2(:)
+      real*8, allocatable :: y2(:)
+      real*8, allocatable :: z2(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (x1(n))
+      allocate (y1(n))
+      allocate (z1(n))
+      allocate (x2(n))
+      allocate (y2(n))
+      allocate (z2(n))
 c
 c     find the value of the transit path coordinate "pm";
 c     it is the ratio of the rms fits to the two endpoints
@@ -666,6 +753,76 @@ c
       do i = 1, nvar
          xm(i) = xx(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (x1)
+      deallocate (y1)
+      deallocate (z1)
+      deallocate (x2)
+      deallocate (y2)
+      deallocate (z2)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine pathscan  --  scan along the transit pathway  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "pathscan" makes a scan of a synchronous transit pathway by
+c     computing structures and energies for specific path values
+c
+c
+      subroutine pathscan (nvar,x0,x1,ncalls)
+      implicit none
+      include 'sizes.i'
+      include 'iounit.i'
+      include 'syntrn.i'
+      integer i,nvar,ncalls
+      real*8 energy,gamma
+      real*8 g_rms,g_tan
+      real*8 saddle1
+      real*8 x0(*)
+      real*8 x1(*)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: tan(:)
+      real*8, allocatable :: dgdt(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+      allocate (g(nvar))
+      allocate (tan(nvar))
+      allocate (dgdt(nvar))
+c
+c     make a scan along the synchronous transit pathway
+c
+      write (iout,10)
+   10 format (/,' Scan of the Synchronous Transit Pathway :',
+     &        /,' N Scan     F Value       Path      RMS G',
+     &           '      G Tan      Gamma   FG Call',/)
+      do i = 0, 10
+         t = 0.1d0 * dble(i)
+         call pathpnt (nvar,t,xx,x0,x1)
+         ncalls = ncalls + 3
+         energy = saddle1 (xx,g)
+         call tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
+         write (iout,20)  i,energy,t,g_rms,g_tan,gamma,ncalls
+   20    format (i6,f13.4,f11.4,f11.4,f11.4,f11.5,i8)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      deallocate (g)
+      deallocate (tan)
+      deallocate (dgdt)
       return
       end
 c
@@ -688,10 +845,11 @@ c
       include 'minima.i'
       integer i,nvar
       real*8 t,value
-      real*8 grdmin,transit
-      real*8 xx(maxvar)
-      real*8 x0(maxvar)
-      real*8 x1(maxvar)
+      real*8 grdmin
+      real*8 transit
+      real*8 xx(*)
+      real*8 x0(*)
+      real*8 x1(*)
       external transit
       external optsave
 c
@@ -721,52 +879,6 @@ c     call lbfgs (nvar,xx,value,grdmin,transit,optsave)
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine pathscan  --  scan along the transit pathway  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "pathscan" makes a scan of a synchronous transit pathway by
-c     computing structures and energies for specific path values
-c
-c
-      subroutine pathscan (nvar,x0,x1,ncalls)
-      implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'syntrn.i'
-      integer i,nvar,ncalls
-      real*8 saddle1,energy
-      real*8 g_rms,g_tan,gamma
-      real*8 xx(maxvar)
-      real*8 x0(maxvar)
-      real*8 x1(maxvar)
-      real*8 g(maxvar)
-      real*8 tan(maxvar)
-      real*8 dgdt(maxvar)
-c
-c
-c     make a scan along the synchronous transit pathway
-c
-      write (iout,10)
-   10 format (/,' Scan of the Synchronous Transit Pathway :',
-     &        /,' N Scan     F Value       Path      RMS G',
-     &           '      G Tan      Gamma   FG Call',/)
-      do i = 0, 10
-         t = 0.1d0 * dble(i)
-         call pathpnt (nvar,t,xx,x0,x1)
-         ncalls = ncalls + 3
-         energy = saddle1 (xx,g)
-         call tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
-         write (iout,20)  i,energy,t,g_rms,g_tan,gamma,ncalls
-   20    format (i6,f13.4,f11.4,f11.4,f11.4,f11.5,i8)
-      end do
-      return
-      end
-c
-c
 c     ###########################################################
 c     ##                                                       ##
 c     ##  subroutine tangent  --  synchronous transit tangent  ##
@@ -787,15 +899,15 @@ c
       real*8 g_rms,g_tan
       real*8 gamma,delta
       real*8 t0,g2,tan_norm
-      real*8 saddle1,energy
-      real*8 xx(maxvar)
-      real*8 xf(maxvar)
-      real*8 xb(maxvar)
-      real*8 g(maxvar)
-      real*8 gf(maxvar)
-      real*8 gb(maxvar)
-      real*8 tan(maxvar)
-      real*8 dgdt(maxvar)
+      real*8 energy,saddle1
+      real*8 xx(*)
+      real*8 g(*)
+      real*8 tan(*)
+      real*8 dgdt(*)
+      real*8, allocatable :: xf(:)
+      real*8, allocatable :: xb(:)
+      real*8, allocatable :: gf(:)
+      real*8, allocatable :: gb(:)
 c
 c
 c     set the finite difference path increment
@@ -810,6 +922,13 @@ c
          g2 = g2 + g(i)**2
       end do
       g_rms = sqrt(g2/dble(n))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xf(nvar))
+      allocate (xb(nvar))
+      allocate (gf(nvar))
+      allocate (gb(nvar))
 c
 c     compute the forward difference
 c
@@ -846,6 +965,13 @@ c
       end do
       g_tan = g_tan / sqrt(dble(n))
       gamma = (g_tan/g_rms)**2
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xf)
+      deallocate (xb)
+      deallocate (gf)
+      deallocate (gb)
       return
       end
 c
@@ -885,8 +1011,8 @@ c
       real*8 ri,ri4,rd
       real*8 wi,wc,wd
       real*8 tq,pq
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
+      real*8 xx(*)
+      real*8 g(*)
       character*9 mode
 c
 c
@@ -1009,10 +1135,12 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i
-      real*8 saddle1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
+      real*8 e,saddle1
+      real*8 xx(*)
+      real*8 g(*)
 c
+c
+c     copy optimization values to coordinates and find gradient
 c
       do i = 1, n
          x(i) = xx(3*i-2)

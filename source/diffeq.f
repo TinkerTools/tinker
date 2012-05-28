@@ -38,18 +38,16 @@ c
       subroutine diffeq (nvar,y,x1,x2,eps,h1,hmin,nok,nbad,gvalue)
       include 'sizes.i'
       include 'iounit.i'
-      integer maxgda,maxstep
       real*8 tiny
-      parameter (maxgda=4*maxatm)
-      parameter (maxstep=1000)
       parameter (tiny=1.0d-30)
-      integer i,nvar,nstep
-      integer nok,nbad
-      real*8 x1,x2,eps,h1,hmin
-      real*8 x,h,hdid,hnext
-      real*8 y(maxgda)
-      real*8 dydx(maxgda)
-      real*8 yscal(maxgda)
+      integer i,nvar,nok,nbad
+      integer nstep,maxstep
+      real*8 x,x1,x2,h,h1
+      real*8 eps,hnext
+      real*8 hmin,hdid
+      real*8 y(*)
+      real*8, allocatable :: dydx(:)
+      real*8, allocatable :: yscal(:)
       logical terminate
       character*7 status
       external gvalue
@@ -63,6 +61,12 @@ c
       nstep = 0
       nok = 0
       nbad = 0
+      maxstep = 1000
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dydx(nvar))
+      allocate (yscal(nvar))
 c
 c     perform a series of individual integration steps
 c
@@ -123,6 +127,11 @@ c
             terminate = .true.
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dydx)
+      deallocate (yscal)
       return
       end
 c
@@ -144,12 +153,13 @@ c     Flannery, Numerical Recipes (Fortran), 2nd Ed., Cambridge
 c     University Press, 1992, Section 16.4
 c
 c
-      subroutine bsstep (nv,x,dydx,y,htry,eps,yscal,hdid,hnext,gvalue)
+      subroutine bsstep (nvar,x,dydx,y,htry,eps,yscal,hdid,hnext,gvalue)
       include 'sizes.i'
       include 'iounit.i'
-      integer maxgda,kmaxx,imax
-      real*8 safe1,safe2,redmax,redmin,tiny,scalmx
-      parameter (maxgda=4*maxatm)
+      integer kmaxx,imax
+      real*8 safe1,safe2
+      real*8 redmax,redmin
+      real*8 tiny,scalmx
       parameter (kmaxx=8)
       parameter (imax=kmaxx+1)
       parameter (safe1=0.25d0)
@@ -158,21 +168,33 @@ c
       parameter (redmin=0.7d0)
       parameter (tiny=1.0d-30)
       parameter (scalmx=0.1d0)
-      integer i,iq,k,kk,km,kmax,kopt
-      integer nv,nseq(imax)
-      real*8 eps,hdid,hnext,htry,x
-      real*8 eps1,epsold,errmax,fact,h,red
-      real*8 scale,work,wrkmin,xest,xnew
-      real*8 dydx(maxgda),y(maxgda),yscal(maxgda)
-      real*8 a(imax),alf(kmaxx,kmaxx),err(kmaxx)
-      real*8 yerr(maxgda),ysav(maxgda),yseq(maxgda)
+      integer i,iq,k,kk,nvar
+      integer km,kmax,kopt
+      integer nseq(imax)
+      real*8 eps,eps1,epsold
+      real*8 h,hdid,hnext,htry
+      real*8 errmax,fact,red
+      real*8 scale,work,wrkmin
+      real*8 x,xest,xnew
+      real*8 dydx(*)
+      real*8 y(*)
+      real*8 yscal(*)
+      real*8 a(imax)
+      real*8 err(kmaxx)
+      real*8 alf(kmaxx,kmaxx)
+      real*8, allocatable :: yerr(:)
+      real*8, allocatable :: ysav(:)
+      real*8, allocatable :: yseq(:)
       logical first,reduct
-      save a,alf,epsold,first,kmax,kopt,nseq,xnew
+      save a,alf,epsold,first
+      save kmax,kopt,nseq,xnew
       external gvalue
       data first  / .true. /
       data epsold / -1.0d0 /
       data nseq   / 2,4,6,8,10,12,14,16,18 /
 c
+c
+c     setup prior to the Bulirsch-Stoer integration step
 c
       if (eps .ne. epsold) then
          hnext = -1.0d29
@@ -190,13 +212,22 @@ c
          end do
          epsold = eps
          do kopt = 2, kmaxx-1
+            kmax = kopt
             if (a(kopt+1) .gt. a(kopt)*alf(kopt-1,kopt))  goto 10
          end do
    10    continue
-         kmax = kopt
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (yerr(nvar))
+      allocate (ysav(nvar))
+      allocate (yseq(nvar))
+c
+c     make an integration step using Bulirsch-Stoer method
+c
       h = htry
-      do i = 1, nv
+      do i = 1, nvar
          ysav(i) = y(i)
       end do
       if (h.ne.hnext .or. x.ne.xnew) then
@@ -212,12 +243,12 @@ c
    30       format (' BSSTEP  --  Underflow of Step Size')
             call fatal
          end if
-         call mmid (nseq(k),h,nv,x,dydx,ysav,yseq,gvalue)
+         call mmid (nseq(k),h,nvar,x,dydx,ysav,yseq,gvalue)
          xest = (h/dble(nseq(k)))**2
-         call pzextr (k,nv,xest,yseq,y,yerr)
+         call pzextr (k,nvar,xest,yseq,y,yerr)
          if (k .ne. 1) then
             errmax = tiny
-            do i = 1, nv
+            do i = 1, nvar
                errmax = max(errmax,abs(yerr(i)/yscal(i)))
             end do
             errmax = errmax / eps
@@ -273,6 +304,12 @@ c
             kopt = kopt + 1
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (yerr)
+      deallocate (ysav)
+      deallocate (yseq)
       return
       end
 c
@@ -290,17 +327,15 @@ c
 c
       subroutine mmid (nstep,htot,nvar,xs,dydx,y,yout,gvalue)
       include 'sizes.i'
-      integer maxgda
-      parameter (maxgda=4*maxatm)
       integer i,k
       integer nstep,nvar
       real*8 htot,h,h2
       real*8 xs,x,temp
-      real*8 y(maxgda)
-      real*8 yout(maxgda)
-      real*8 dydx(maxgda)
-      real*8 ym(maxgda)
-      real*8 yn(maxgda)
+      real*8 dydx(*)
+      real*8 y(*)
+      real*8 yout(*)
+      real*8, allocatable :: ym(:)
+      real*8, allocatable :: yn(:)
       external gvalue
 c
 c
@@ -308,6 +343,11 @@ c     set substep size based on number of steps to be taken
 c
       h = htot / dble(nstep)
       h2 = 2.0d0 * h
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (ym(nvar))
+      allocate (yn(nvar))
 c
 c     take the first substep and get values at ends of step
 c
@@ -335,6 +375,11 @@ c
       do i = 1, nvar
          yout(i) = 0.5d0 * (ym(i)+yn(i)+h*yout(i))
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (ym)
+      deallocate (yn)
       return
       end
 c
@@ -356,12 +401,23 @@ c
       parameter (maxgda=4*maxatm)
       parameter (imax=13)
       integer i,j,iest,nvar
-      real*8 xest,delta,f1,f2,q
-      real*8 yz(maxgda),dy(maxgda)
-      real*8 yest(maxgda),d(maxgda)
-      real*8 x(imax),qcol(maxgda,imax)
-      save x,qcol
+      real*8 xest,delta
+      real*8 f1,f2,q
+      real*8 x(imax)
+      real*8 yz(*)
+      real*8 dy(*)
+      real*8 yest(*)
+      real*8, allocatable :: d(:)
+      real*8, allocatable, save :: qcol(:,:)
+      save x
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (d(nvar))
+      if (.not. allocated(qcol))  allocate (qcol(nvar,imax))
+c
+c     polynomial extrapolation needed for Bulirsch-Stoer step
 c
       x(iest) = xest
       do j = 1, nvar
@@ -393,6 +449,10 @@ c
             qcol(j,iest) = dy(j)
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (d)
       return
       end
 c
@@ -414,14 +474,12 @@ c
       include 'iounit.i'
       include 'math.i'
       include 'warp.i'
-      integer maxgda
-      parameter (maxgda=4*maxatm)
       integer i,nvar
       integer nstep
       real*8 beta
       real*8 e,energy
       real*8 rg,m2ave
-      real*8 xx(maxgda)
+      real*8 xx(*)
       character*7 status
 c
 c

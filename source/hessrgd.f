@@ -23,11 +23,9 @@ c
       include 'atoms.i'
       include 'group.i'
       include 'rigid.i'
-      integer maxrgd
-      parameter (maxrgd=6*maxgrp)
       integer i,j,k,m,nvar
       real*8 e,eps,old
-      real*8 hrigid(maxrgd,maxrgd)
+      real*8 hrigid(6*ngrp,*)
       real*8, allocatable :: g(:,:)
       real*8, allocatable :: g0(:,:)
 c

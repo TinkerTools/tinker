@@ -787,7 +787,7 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose .and. .not.debug) then
+         if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)
@@ -1215,7 +1215,7 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose .and. .not.debug) then
+         if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)
@@ -1462,7 +1462,7 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose .and. .not.debug) then
+         if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)
@@ -1707,7 +1707,7 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. maxiter)  done = .true.
          end do
-         if (verbose .and. .not.debug) then
+         if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)

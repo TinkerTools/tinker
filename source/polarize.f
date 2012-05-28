@@ -150,9 +150,9 @@ c
       real*8 eps,epsold
       real*8 umol(3)
       real*8 exfield(3)
-      real*8 udir(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 field(3,maxatm)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: uold(:,:)
       logical done
 c
 c
@@ -163,6 +163,12 @@ c
             uind(j,i) = polarity(i) * exfield(j)
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (field(3,npole))
+      allocate (udir(3,npole))
+      allocate (uold(3,npole))
 c
 c     compute direct induced dipole moments from direct field
 c
@@ -238,6 +244,12 @@ c
          umol(2) = umol(2) + uind(2,i)
          umol(3) = umol(3) + uind(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (field)
+      deallocate (udir)
+      deallocate (uold)
       return
       end
 c
@@ -273,8 +285,8 @@ c
       real*8 pgamma,damp
       real*8 scale3,scale5
       real*8 fi(3),fk(3)
-      real*8 pscale(maxatm)
-      real*8 field(3,maxatm)
+      real*8, allocatable :: pscale(:)
+      real*8 field(3,*)
 c
 c
 c     zero out the value of the electric field at each site
@@ -284,6 +296,10 @@ c
             field(j,i) = 0.0d0
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pscale(n))
 c
 c     loop over pairs of sites incrementing the electric field
 c
@@ -356,5 +372,9 @@ c
             end do
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pscale)
       return
       end

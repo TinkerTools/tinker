@@ -82,20 +82,24 @@ c
       real*8 rftol,faketol
       real*8 xtemp,stepsz
       real*8 sum,temp
-      real*8 xc(maxlsq)
-      real*8 xlo(maxlsq)
-      real*8 xhi(maxlsq)
-      real*8 fc(maxrsd),gc(maxlsq)
-      real*8 fjac(mdim,maxlsq)
-      real*8 xp(maxlsq),fp(maxrsd)
-      real*8 ga(maxlsq),gs(maxlsq)
-      real*8 sc(maxlsq),sa(maxlsq)
+      real*8 xc(*)
+      real*8 xlo(*)
+      real*8 xhi(*)
+      real*8 fc(*)
+      real*8 gc(*)
+      real*8 xp(maxlsq)
+      real*8 fp(maxrsd)
+      real*8 ga(maxlsq)
+      real*8 gs(maxlsq)
+      real*8 sc(maxlsq)
+      real*8 sa(maxlsq)
       real*8 ftemp(maxrsd)
       real*8 xscale(maxlsq)
       real*8 xsa(maxlsq)
       real*8 rdiag(maxlsq)
       real*8 qtf(maxlsq)
       real*8 work(maxlsq)
+      real*8 fjac(mdim,*)
       logical done,first
       logical gauss,bigstp
       character*20 keyword
@@ -469,12 +473,12 @@ c     if (done) then
                nactive = nactive + 1
                iactive(j) = 0
                done = .false.
-c              goto 140
+c              goto 120
             else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
                nactive = nactive + 1
                iactive(j) = 0
                done = .false.
-c              goto 140
+c              goto 120
             end if
          end do
   120    continue
@@ -607,7 +611,7 @@ c
       parameter (maxrsd=100)
       integer i,j,k,n
       integer lda,nsing
-      integer ipvt(maxlsq)
+      integer ipvt(*)
       real*8 stpmax,delta,amu
       real*8 alow,alpha
       real*8 amulow,amuhi
@@ -617,15 +621,15 @@ c
       real*8 sgnorm,precise
       real*8 high,tiny
       real*8 stplen,temp
-      real*8 ga(maxlsq)
-      real*8 a(lda,maxlsq)
-      real*8 xscale(maxlsq)
-      real*8 qtf(maxlsq)
-      real*8 sa(maxlsq)
+      real*8 ga(*)
+      real*8 xscale(*)
+      real*8 qtf(*)
+      real*8 sa(*)
       real*8 gnstep(maxlsq)
       real*8 diag(maxlsq)
       real*8 work1(maxlsq)
       real*8 work2(maxlsq)
+      real*8 a(lda,*)
       logical first,gauss
       logical done
       save deltap,nsing
@@ -890,10 +894,11 @@ c
       integer i,j,k,jmax
       integer m,n,lda
       integer minmn,itemp
-      integer ipvt(n)
+      integer ipvt(*)
       real*8 aknorm,temp
-      real*8 rdiag(n),work(n)
-      real*8 a(lda,n)
+      real*8 rdiag(*)
+      real*8 work(*)
+      real*8 a(lda,*)
       logical pivot
 c
 c
@@ -1020,17 +1025,19 @@ c
 c
       subroutine qrsolve (n,r,ldr,ipvt,diag,qtb,x,sdiag,work)
       implicit none
-      integer i,j,k,jj
-      integer nsing,n,ldr
-      integer ipvt(n)
+      integer i,j,k,jj,n
+      integer nsing,ldr
+      integer ipvt(*)
       real*8 sine,cosine
       real*8 tangent
       real*8 cotangent
       real*8 qtbpj,temp
-      real*8 diag(n),qtb(n)
-      real*8 x(n),sdiag(n)
-      real*8 work(n)
-      real*8 r(ldr,n)
+      real*8 diag(*)
+      real*8 qtb(*)
+      real*8 x(*)
+      real*8 sdiag(*)
+      real*8 work(*)
+      real*8 r(ldr,*)
 c
 c
 c     copy r and (q transpose)*b to preserve input and
@@ -1217,7 +1224,7 @@ c
       integer i,j,k,m,n
       integer lda,icode
       integer ncalls,nactive
-      integer ipvt(maxlsq)
+      integer ipvt(*)
       real*8 fcnorm,stpmax
       real*8 delta,fpnorm,fpnrmp
       real*8 reduce,predict
@@ -1225,15 +1232,19 @@ c
       real*8 stplen,stpmin
       real*8 rftol,faketol
       real*8 alpha,temp,precise
-      real*8 xc(maxlsq),gc(maxlsq)
-      real*8 a(lda,maxlsq)
-      real*8 sc(maxlsq),sa(maxlsq)
-      real*8 xp(maxlsq)
-      real*8 fc(maxrsd),fp(maxrsd)
-      real*8 xlo(maxlsq),xhi(maxlsq)
-      real*8 xscale(maxlsq)
+      real*8 xc(*)
+      real*8 gc(*)
+      real*8 sc(*)
+      real*8 sa(*)
+      real*8 xp(*)
+      real*8 fc(*)
+      real*8 fp(*)
+      real*8 xlo(*)
+      real*8 xhi(*)
+      real*8 xscale(*)
       real*8 xpprev(maxlsq)
       real*8 fpprev(maxrsd)
+      real*8 a(lda,*)
       logical gauss,bigstp
       logical feas,ltemp
       save xpprev,fpprev

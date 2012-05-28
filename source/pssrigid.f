@@ -47,7 +47,7 @@ c
       real*8 srchmax,rms
       real*8 pssrgd1,deform0
       real*8 ratio,sigmoid
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical exist
       logical use_local
       character*1 answer
@@ -159,6 +159,10 @@ c
       end if
       if (grdmin .le. 0.0d0)  grdmin = 0.0001d0
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(6*ngrp))
+c
 c     perform PSS iteration by looping over smoothed surfaces
 c
       do k = 0, 2*npoint
@@ -198,7 +202,7 @@ c     use normal mode local search to explore adjacent minima
 c
          if (use_local) then
             if (deform.le.srchmax .and. k.ge.npoint)
-     &         call rgdsrch (neigen,minimum,grdmin)
+     &         call modergd (neigen,minimum,grdmin)
          end if
 c
 c     write out final energy function value and smoothing level
@@ -223,6 +227,10 @@ c
          call prtxyz (ixyz)
          close (unit=ixyz)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
 c
 c     perform any final tasks before program exit
 c
@@ -249,9 +257,9 @@ c
       include 'rigid.i'
       integer i,j,nvar
       real*8 pssrgd1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(6,maxgrp)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to rigid body coordinates
@@ -263,6 +271,10 @@ c
             rbc(j,i) = xx(nvar)
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(6,ngrp))
 c
 c     compute and store the energy and gradient
 c
@@ -279,18 +291,22 @@ c
             g(nvar) = derivs(j,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine rgdsrch  --  local search for rigid body PSS  ##
+c     ##  subroutine modergd  --  local search for rigid body PSS  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-      subroutine rgdsrch (neigen,minimum,grdmin)
+      subroutine modergd (neigen,minimum,grdmin)
       implicit none
       include 'sizes.i'
       include 'group.i'
@@ -302,14 +318,22 @@ c
       integer neigen,ndoi
       integer nvar,nsearch
       real*8 minimum,grdmin
-      real*8 minref,minbest
-      real*8 eps,step(maxrgd)
-      real*8 rbref(6,maxgrp)
-      real*8 rbbest(6,maxgrp)
-      real*8 eigen(maxrgd)
-      real*8 vects(maxrgd,maxrgd)
+      real*8 eps,minref,minbest
+      real*8, allocatable :: step(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: rorig(:,:)
+      real*8, allocatable :: rbest(:,:)
+      real*8, allocatable :: vects(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (step(ngrp))
+      allocate (eigen(ngrp))
+      allocate (rorig(6,ngrp))
+      allocate (rbest(6,ngrp))
+      allocate (vects(6*ngrp,6*ngrp))
 c
 c     set parameters related to the local search procedure
 c
@@ -321,7 +345,7 @@ c
       nvar = 6 * ngrp
       do i = 1, ngrp
          do j = 1, 6
-            rbref(j,i) = rbc(j,i)
+            rorig(j,i) = rbc(j,i)
          end do
       end do
 c
@@ -344,7 +368,7 @@ c
             end do
             do k = 1, ngrp
                do j = 1, 6
-                  rbc(j,k) = rbref(j,k)
+                  rbc(j,k) = rorig(j,k)
                end do
             end do
             nsearch = nsearch + 1
@@ -353,7 +377,7 @@ c
                minbest = minimum
                do k = 1, ngrp
                   do j = 1, 6
-                     rbbest(j,k) = rbc(j,k)
+                     rbest(j,k) = rbc(j,k)
                   end do
                end do
             end if
@@ -362,7 +386,7 @@ c
             end do
             do k = 1, ngrp
                do j = 1, 6
-                  rbc(j,k) = rbref(j,k)
+                  rbc(j,k) = rorig(j,k)
                end do
             end do
             nsearch = nsearch + 1
@@ -371,7 +395,7 @@ c
                minbest = minimum
                do k = 1, ngrp
                   do j = 1, 6
-                     rbbest(j,k) = rbc(j,k)
+                     rbest(j,k) = rbc(j,k)
                   end do
                end do
             end if
@@ -384,7 +408,7 @@ c
             minref = minbest
             do k = 1, ngrp
                do j = 1, 6
-                  rbref(j,k) = rbbest(j,k)
+                  rorig(j,k) = rbest(j,k)
                end do
             end do
          else
@@ -392,11 +416,19 @@ c
             minimum = minref
             do k = 1, ngrp
                do j = 1, 6
-                  rbc(j,k) = rbref(j,k)
+                  rbc(j,k) = rorig(j,k)
                end do
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (step)
+      deallocate (eigen)
+      deallocate (rorig)
+      deallocate (rbest)
+      deallocate (vects)
       return
       end
 c
@@ -418,15 +450,30 @@ c
       integer i,j
       integer ihess,nvar
       real*8 vnorm
-      real*8 eigen(maxrgd)
-      real*8 a(maxrgd),b(maxrgd)
-      real*8 p(maxrgd),ta(maxrgd)
-      real*8 w(maxrgd),tb(maxrgd)
-      real*8 ty(maxrgd)
-      real*8 matrix((maxrgd+1)*maxrgd/2)
-      real*8 vects(maxrgd,maxrgd)
-      real*8 hrigid(maxrgd,maxrgd)
+      real*8 eigen(*)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: matrix(:)
+      real*8 vects(6*ngrp,*)
+      real*8, allocatable :: hrigid(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(6*ngrp))
+      allocate (b(6*ngrp))
+      allocate (p(6*ngrp))
+      allocate (w(6*ngrp))
+      allocate (ta(6*ngrp))
+      allocate (tb(6*ngrp))
+      allocate (ty(6*ngrp))
+      allocate (matrix(6*ngrp*(6*ngrp+1)/2))
+      allocate (hrigid(6*ngrp,6*ngrp))
 c
 c     compute the Hessian for rigid body motion
 c
@@ -460,6 +507,18 @@ c
             vects(j,i) = vects(j,i) / vnorm
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (matrix)
+      deallocate (hrigid)
       return
       end
 c
@@ -478,16 +537,14 @@ c
       include 'iounit.i'
       include 'math.i'
       include 'rigid.i'
-      integer maxrgd,maxstep
-      parameter (maxrgd=6*maxgrp)
+      integer maxstep
       parameter (maxstep=500)
-      integer i,j
-      integer nvar,nsearch
-      integer kstep,nstep
+      integer i,j,nsearch
+      integer nvar,kstep,nstep
       real*8 minimum,grdmin
       real*8 big,energy,size
-      real*8 step(maxrgd)
       real*8 estep(0:maxstep)
+      real*8 step(*)
       logical done
 c
 c
@@ -577,11 +634,15 @@ c
       real*8 minimum
       real*8 grdmin
       real*8 pssrgd1
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical oldverb
       external pssrgd1
       external optsave
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(6*ngrp))
 c
 c     transfer rigid body coordinates to optimization parameters
 c
@@ -612,5 +673,9 @@ c
             rbc(j,i) = xx(nvar)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
       return
       end

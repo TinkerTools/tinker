@@ -31,3 +31,109 @@
  Average Signed Potential Difference :         -0.1164
  Average Unsigned Potential Difference :        0.3799
  Root Mean Square Potential Difference :        0.5340
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value        Fixed
+
+     1              1             Monopole         -0.51966
+    --              1             X-Dipole          0.00000          X
+    --              1             Y-Dipole          0.00000          X
+     2              1             Z-Dipole          0.14279
+     3              1             XX-Quad           0.37928
+    --              1             XY-Quad           0.00000          X
+    --              1             XZ-Quad           0.00000          X
+     4              1             YY-Quad          -0.41809
+    --              1             YZ-Quad           0.00000          X
+    --              1             ZZ-Quad           0.03881
+     5              2             Monopole          0.25983
+     6              2             X-Dipole         -0.03859
+    --              2             Y-Dipole          0.00000          X
+     7              2             Z-Dipole         -0.05818
+     8              2             XX-Quad          -0.03673
+    --              2             XY-Quad           0.00000          X
+     9              2             XZ-Quad          -0.00203
+    10              2             YY-Quad          -0.10739
+    --              2             YZ-Quad           0.00000          X
+    --              2             ZZ-Quad           0.14412
+
+ Optimally Conditioned Variable Metric Optimization :
+
+ VM Iter     F Value       G RMS     F Move    X Move      Angle   FG Call
+
+     0        0.5340     23.8250                                        1
+     1        0.5340     11.3676     0.0000    0.0000     0.0000        5
+     2        0.5340     11.0147     0.0000    0.0000    20.5769        6
+     3        0.5118   1162.8457     0.0221    0.0003    25.6852        7
+     4        0.3835    477.4277     0.1283    0.0024    94.7334        9
+     5        0.3822      8.3140     0.0013    0.0001     4.5464       10
+     6        0.3822      8.2081     0.0000    0.0000    59.1901       11
+     7        0.3822      7.0605     0.0000    0.0000    35.5830       12
+     8        0.3820    132.6272     0.0003    0.0000    46.7824       13
+     9        0.3361      9.9313     0.0458    0.0021    82.6262       14
+    10        0.3292      3.2356     0.0069    0.0006    71.9299       15
+    11        0.3291      2.5415     0.0001    0.0001    80.3366       16
+    12        0.3291      2.5398     0.0000    0.0000    15.4283       17
+    13        0.3291      2.5147     0.0000    0.0000    48.0417       18
+    14        0.3229      2.9740     0.0062    0.0006     7.4136       19
+    15        0.3228      2.6811     0.0001    0.0001    80.6325       20
+    16        0.3228      2.6835     0.0000    0.0000    13.9338       21
+    17        0.3228      3.7011     0.0000    0.0000    48.8428       22
+    18        0.3227      5.7117     0.0001    0.0000    58.7097       23
+    19        0.2888      6.1671     0.0339    0.0036    77.6037       24
+    20        0.2804      4.0514     0.0084    0.0005    80.4241       25
+    21        0.2774      1.9682     0.0030    0.0007    85.0123       26
+    22        0.2774      1.7060     0.0000    0.0000    88.7645       27
+    23        0.2774      1.7060     0.0000    0.0000    12.1629       28
+    24        0.2773      1.9135     0.0000    0.0000    48.4474       29
+    25        0.2743      1.6965     0.0031    0.0005    26.8356       30
+    26        0.2743      1.5964     0.0000    0.0000    80.2181       31
+    27        0.2743      1.5960     0.0000    0.0000     5.8703       32
+    28        0.2729    107.4989     0.0013    0.0002    43.8987       33
+    29        0.2647     36.4379     0.0082    0.0023    87.4298       34
+    30        0.2643      0.6041     0.0004    0.0004    85.4968       35
+    31        0.2643      0.0545     0.0000    0.0000    87.4717       36
+
+ OCVM  --  Normal Termination due to SmallGrad
+
+ Potential Fitting of Electrostatic Parameters :
+
+ Parameter      Atom Type         Category            Value        Fixed
+
+     1              1             Monopole         -0.52188
+    --              1             X-Dipole          0.00000          X
+    --              1             Y-Dipole          0.00000          X
+     2              1             Z-Dipole          0.14211
+     3              1             XX-Quad           0.49667
+    --              1             XY-Quad           0.00000          X
+    --              1             XZ-Quad           0.00000          X
+     4              1             YY-Quad          -0.62165
+    --              1             YZ-Quad           0.00000          X
+    --              1             ZZ-Quad           0.12499
+     5              2             Monopole          0.26094
+     6              2             X-Dipole         -0.05297
+    --              2             Y-Dipole          0.00000          X
+     7              2             Z-Dipole         -0.07434
+     8              2             XX-Quad           0.00045
+    --              2             XY-Quad           0.00000          X
+     9              2             XZ-Quad          -0.01782
+    10              2             YY-Quad          -0.06325
+    --              2             YZ-Quad           0.00000          X
+    --              2             ZZ-Quad           0.06281
+
+ Average Electrostatic Potential over Atoms :
+      (Kcal/mole per unit charge)
+
+   Structure   Atom      Points      Potential        Target        RMS Diff
+
+        1        1        1942        -9.0262        -8.9326         0.2918
+        1        2        1211         7.0864         7.2227         0.2395
+        1        3        1204         7.0577         7.1950         0.2402
+
+ Electrostatic Potential over all Grid Points :
+
+ Average Magnitude for Potential :              8.1504
+ Average Magnitude for Target :                 8.1777
+ Average Signed Potential Difference :         -0.1175
+ Average Unsigned Potential Difference :        0.1515
+ Root Mean Square Potential Difference :        0.2643

@@ -26,18 +26,19 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'usage.i'
-      integer maxnum
-      parameter (maxnum=300)
       integer i,j,k,m,ii,jj,ihes
-      integer index,next,freeunit
-      integer hinit(3,maxatm)
-      integer hstop(3,maxatm)
-      integer hindex(maxhess)
+      integer index,maxnum
+      integer next,freeunit
+      integer, allocatable :: hindex(:)
+      integer, allocatable :: hinit(:,:)
+      integer, allocatable :: hstop(:,:)
       real*8 energy,e,old,eps,eps0
       real*8 diff,delta,sum
-      real*8 g(3,maxatm),g0(3,maxatm)
-      real*8 h(maxhess),hdiag(3,maxatm)
-      real*8 nhess(3,maxnum,3,maxnum)
+      real*8, allocatable :: h(:)
+      real*8, allocatable :: g(:,:)
+      real*8, allocatable :: g0(:,:)
+      real*8, allocatable :: hdiag(:,:)
+      real*8, allocatable :: nhess(:,:,:,:)
       logical doanalyt,donumer
       logical dograd,dofull
       logical exist,query
@@ -81,6 +82,7 @@ c
 c     decide whether to do a numerical Hessian calculation
 c
       donumer = .false.
+      maxnum = 300
       if (n .le. maxnum) then
          donumer = .true.
          call nextarg (answer,exist)
@@ -151,6 +153,17 @@ c
          call upcase (answer)
          if (answer .eq. 'Y')  dofull = .true.
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hindex(3*n*(3*n-1)/2))
+      allocate (hinit(3,n))
+      allocate (hstop(3,n))
+      allocate (h(3*n*(3*n-1)/2))
+      allocate (g(3,n))
+      allocate (g0(3,n))
+      allocate (hdiag(3,n))
+      if (n .le. maxnum)  allocate (nhess(3,n,3,n))
 c
 c     get the analytical Hessian matrix elements
 c
@@ -445,6 +458,17 @@ c
          end do
          close (unit=ihes)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hindex)
+      deallocate (hinit)
+      deallocate (hstop)
+      deallocate (h)
+      deallocate (g)
+      deallocate (g0)
+      deallocate (hdiag)
+      if (n .le. maxnum)  deallocate (nhess)
 c
 c     perform any final tasks before program exit
 c

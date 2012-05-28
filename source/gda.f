@@ -32,8 +32,6 @@ c
       include 'potent.i'
       include 'vdwpot.i'
       include 'warp.i'
-      integer maxgda
-      parameter (maxgda=4*maxatm)
       integer i,igda,itrial,ntrial
       integer nstep,nvar,nok,nbad
       integer lext,next,freeunit
@@ -42,8 +40,8 @@ c
       real*8 eps,h1,hmin,gda2
       real*8 minimum,grdmin
       real*8 xcm,ycm,zcm
-      real*8 m2init(maxatm)
-      real*8 xx(maxgda)
+      real*8, allocatable :: m2init(:)
+      real*8, allocatable :: xx(:)
       logical exist,randomize
       character*1 answer
       character*6 mode,method
@@ -62,12 +60,6 @@ c
       use_smooth = .true.
       use_gda = .true.
       call mechanic
-c
-c     store the initial values of the squared mean Gaussian width
-c
-      do i = 1, n
-         m2init(i) = m2(1)
-      end do
 c
 c     get the number of optimized structures to be constructed
 c
@@ -121,6 +113,17 @@ c
       end if
       if (bstart .le. 0.0d0)  bstart = 0.01d0
       if (bstop .le. 0.0d0)  bstop = 1.0d10
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (m2init(n))
+      allocate (xx(4*n))
+c
+c     store the initial values of the squared mean Gaussian width
+c
+      do i = 1, n
+         m2init(i) = m2(1)
+      end do
 c
 c     write out a copy of coordinates for later update
 c
@@ -241,6 +244,11 @@ c
          close (unit=igda)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (m2init)
+      deallocate (xx)
+c
 c     perform any final tasks before program exit
 c
       call final
@@ -260,18 +268,16 @@ c
       include 'atoms.i'
       include 'iounit.i'
       include 'warp.i'
-      integer maxgda
-      parameter (maxgda=4*maxatm)
       integer i,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hindex(maxhess)
+      integer, allocatable :: hinit(:)
+      integer, allocatable :: hstop(:)
+      integer, allocatable :: hindex(:)
       real*8 beta,e,sum
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
-      real*8 xx(maxgda)
-      real*8 g(maxgda)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: hdiag(:)
+      real*8, allocatable :: h(:)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to coordinates and M2's
@@ -296,6 +302,10 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     compute and store the Cartesian energy gradient vector
 c
       call gradient (e,derivs)
@@ -312,6 +322,18 @@ c
          g(nvar) = -(m2(i)/3.0d0) * derivs(3,i)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hinit(3*n))
+      allocate (hstop(3*n))
+      allocate (hindex((3*n*(3*n-1))/2))
+      allocate (hdiag(3*n))
+      allocate (h((3*n*(3*n-1))/2))
+c
 c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
@@ -323,6 +345,14 @@ c
          sum = hdiag(3*i-2) + hdiag(3*i-1) + hdiag(3*i)
          g(nvar) = -(m2(i)/3.0d0)**2 * sum
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hinit)
+      deallocate (hstop)
+      deallocate (hindex)
+      deallocate (hdiag)
+      deallocate (h)
       return
       end
 c
@@ -340,9 +370,9 @@ c
       include 'atoms.i'
       integer i,nvar
       real*8 gda2,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -356,6 +386,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -373,6 +407,10 @@ c
          nvar = nvar + 1
          g(nvar) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -389,12 +427,12 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i,nvar
-      integer hinit(maxvar)
-      integer hstop(maxvar)
-      integer hindex(maxhess)
-      real*8 xx(maxvar)
-      real*8 hdiag(maxvar)
-      real*8 h(maxhess)
+      integer hinit(*)
+      integer hstop(*)
+      integer hindex(*)
+      real*8 xx(*)
+      real*8 hdiag(*)
+      real*8 h(*)
       character*4 mode
 c
 c

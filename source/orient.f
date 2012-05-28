@@ -264,7 +264,7 @@ c
 c
 c     set the tolerance for Euler angles and rotation elements
 c
-      eps = 1.0d-8
+      eps = 1.0d-7
 c
 c     get a trial value of theta from a single rotation element
 c
@@ -328,6 +328,12 @@ c
       if (flip(1) .and. flip(2))  phi = phi - sign(pi,phi)
       if (flip(1) .and. flip(3))  theta = -theta + sign(pi,theta)
       if (flip(2) .and. flip(3))  psi = psi - sign(pi,psi)
+c
+c     convert maximum negative angles to positive values
+c
+      if (phi .le. -pi)  phi = pi
+      if (theta .le. -pi)  theta = pi
+      if (psi .le. -pi)  psi = pi
       return
       end
 c

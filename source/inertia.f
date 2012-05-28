@@ -39,6 +39,7 @@ c
       real*8 xcm,ycm,zcm
       real*8 xx,xy,xz,yy,yz,zz
       real*8 xterm,yterm,zterm
+      real*8 phi,theta,psi
       real*8 moment(3),vec(3,3)
       real*8 work1(3),work2(3)
       real*8 tensor(3,3),a(3,3)
@@ -130,17 +131,6 @@ c
          end do
       end if
 c
-c     print the moments of inertia and the principal axes
-c
-      if (print) then
-         write (iout,20)
-   20    format (/,' Moments of Inertia and Principal Axes :',
-     &           //,13x,'Moments (amu Ang^2)',
-     &              10x,'X-, Y- and Z-Components of Axes')
-         write (iout,30)  (moment(i),vec(1,i),vec(2,i),vec(3,i),i=1,3)
-   30    format (3(/,11x,f16.3,10x,3f12.6))
-      end if
-c
 c     principal moment axes form rows of Euler rotation matrix
 c
       if (move) then
@@ -160,6 +150,29 @@ c
             y(i) = a(2,1)*xterm + a(2,2)*yterm + a(2,3)*zterm
             z(i) = a(3,1)*xterm + a(3,2)*yterm + a(3,3)*zterm
          end do
+      end if
+c
+c     print the center of mass and Euler angle values
+c
+      if (print) then
+         write (iout,20)  xcm,ycm,zcm
+   20    format (/,' Center of Mass Coordinates :',8x,3f12.6)
+         call invert (3,3,vec)
+         call roteuler (vec,phi,theta,psi)
+         phi = radian * phi
+         theta = radian * theta
+         psi = radian * psi
+         write (iout,30)  phi,theta,psi
+   30    format (' Euler Angles (Phi/Theta/Psi) : ',5x,3f12.3)
+c
+c     print the moments of inertia and the principal axes
+c
+         write (iout,40)
+   40    format (/,' Moments of Inertia and Principal Axes :',
+     &           //,13x,'Moments (amu Ang^2)',
+     &              10x,'X-, Y- and Z-Components of Axes')
+         write (iout,50)  (moment(i),vec(1,i),vec(2,i),vec(3,i),i=1,3)
+   50    format (3(/,11x,f16.3,10x,3f12.6))
       end if
       return
       end

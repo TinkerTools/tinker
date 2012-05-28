@@ -38,13 +38,13 @@ c
       integer hindex(*)
       integer hinit(3,*)
       integer hstop(3,*)
-      real*8 percent,filled
-      real*8 cutoff,rdn,hmax
+      real*8 rdn,cutoff
+      real*8 hmax,percent
       real*8 h(*)
-      real*8 hdiag(3,*)
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
+      real*8 hdiag(3,*)
       logical, allocatable :: keep(:)
 c
 c
@@ -231,20 +231,6 @@ c
                end if
             end do
             hstop(3,i) = nhess
-c
-c     check for storage of too many Hessian elements
-c
-            if (nhess .gt. maxhess) then
-               write (iout,10)  i,n,nhess,maxhess,hesscut
-   10          format (/,' Current Atom :',i7,6x,'Total Atoms :',i7,
-     &                 /,' Current Required Hessian Storage : ',i12,
-     &                 /,' Maximum Allowed Hessian Storage :  ',i12,
-     &                 /,' Minimum Significant Hessian Value :',f12.5)
-               write (iout,20)
-   20          format (/,' HESSIAN  --  Increase MAXHESS',
-     &                    ' and/or HESSCUT')
-               call fatal
-            end if
          end if
       end do
 c
@@ -259,10 +245,9 @@ c     print message telling how much storage was finally used
 c
       if (verbose) then
          percent = 100.0d0 * dble(nhess)/dble(3*n*(3*n-1)/2)
-         filled = 100.0d0 * dble(nhess)/dble(maxhess)
-         write (iout,30)  nhess,percent,filled
-   30    format (' HESSIAN  --',i11,' Elements',f9.2,
-     &              ' % Off-diag H',f8.2,' % Storage')
+         write (iout,10)  nhess,percent
+   10    format (' HESSIAN  --',i11,' Elements',f9.2,
+     &              ' % Off-Diag Hessian Storage')
       end if
       return
       end

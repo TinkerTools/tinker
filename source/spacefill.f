@@ -34,7 +34,7 @@ c
       real*8 volume,area
       real*8 random,value
       real*8 probe,exclude
-      real*8 radius(maxatm)
+      real*8, allocatable :: radius(:)
       logical exist,query
       character*1 answer
       character*120 xyzfile
@@ -127,6 +127,10 @@ c
          end do
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (radius(n))
+c
 c     set each atomic radius to the Lennard-Jones sigma value
 c
       do i = 1, n
@@ -181,6 +185,10 @@ c     attempt to read next structure from the coordinate file
 c
          call readxyz (ixyz)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (radius)
 c
 c     perform any final tasks before program exit
 c

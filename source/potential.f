@@ -41,15 +41,15 @@ c
       integer nglist,nflist
       integer freeunit
       integer trimtext
-      integer glist(maxatm)
-      integer flist(maxatm)
+      integer, allocatable :: glist(:)
+      integer, allocatable :: flist(:)
       real*8 xi,yi,zi,pot
       real*8 x0,y0,z0
       real*8 xx0,xy0,xz0
       real*8 yy0,yz0,zz0
       real*8 minimum,grdmin
       real*8 potfit1
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical exist,query
       logical dogrid,docube
       logical domodel,dopair
@@ -248,6 +248,11 @@ c
   170    format (/,' Structures Used for Potential Analysis :',i6)
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (glist(nmax))
+      allocate (flist(nmax))
+c
 c     set defaults for the active grid atoms and fit atoms
 c
       nglist = 0
@@ -366,6 +371,11 @@ c
             i = i + 2
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (glist)
+      deallocate (flist)
 c
 c     generate potential grid based on the molecular surface
 c
@@ -565,6 +575,10 @@ c
          call potstat (dofull,domodel,dopair,dotarget)
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+c
 c     set parameters, run optimization, get final parameters
 c
       if (dofit) then
@@ -594,6 +608,10 @@ c
          end do
          call potstat (dofull,domodel,dopair,dotarget)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
 c
 c     perform any final tasks before program exit
 c
@@ -625,7 +643,7 @@ c
       real*8 xi,yi,zi
       real*8 big,small
       real*8 r2,dist
-      real*8 rad(maxatm)
+      real*8, allocatable :: rad(:)
       character*120 record
 c
 c
@@ -647,6 +665,10 @@ c
      &                                  epot(2,i,iconf)
    40    continue
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (rad(n))
 c
 c     set base atomic radii from traditional Bondi values
 c
@@ -690,6 +712,10 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (rad)
+c
 c     use potential grid points only for active grid atoms
 c
       k = npoint
@@ -729,11 +755,10 @@ c
       include 'keys.i'
       include 'math.i'
       include 'potfit.i'
-      integer maxdot
-      parameter (maxdot=50000)
       integer i,j,k,m
       integer iconf,next
       integer npoint,nshell
+      integer maxdot
       integer ndot,anum
       real*8 r2,roffset
       real*8 spacing
@@ -742,9 +767,9 @@ c
       real*8 xi,yi,zi
       real*8 xj,yj,zj
       real*8 xr,yr,zr
-      real*8 rad(maxatm)
-      real*8 rad2(maxatm)
-      real*8 dot(3,maxdot)
+      real*8, allocatable :: rad(:)
+      real*8, allocatable :: rad2(:)
+      real*8, allocatable :: dot(:,:)
       character*20 keyword
       character*120 record
       character*120 string
@@ -754,6 +779,7 @@ c     set default values for grid point generation parameters
 c
       npoint = 0
       nshell = 4
+      maxdot = 50000
       spacing = 0.35d0
       density = 4.0d0 * pi / spacing**2
       roffset = 1.0d0
@@ -777,6 +803,11 @@ c
          end if
    10    continue
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (rad(n))
+      allocate (rad2(n))
 c
 c     set base atomic radii from traditional Bondi values
 c
@@ -803,6 +834,10 @@ c
          rad(i) = rad(i) + roffset
          rad2(i) = rad(i)**2
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dot(3,maxdot))
 c
 c     find points on each of the molecular surface shells
 c
@@ -856,6 +891,12 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (rad)
+      deallocate (rad2)
+      deallocate (dot)
+c
 c     use potential grid points only for active grid atoms
 c
       k = npoint
@@ -886,7 +927,8 @@ c     multipole parameters for the current structure, as needed
 c     for computation of the electrostatic potential
 c
 c     note this code contains essentially the assignment portions
-c     of the "kcharge", "kdipole", "kmpole" and "kpolar" routines
+c     of the "kcharge", "kdipole", "kmpole" and "kpolar" routines;
+c     it should be updated if those routines are changed
 c
 c
       subroutine setelect
@@ -915,10 +957,10 @@ c
       integer nd,nd5,nd4,nd3
       integer ztyp,xtyp,ytyp
       integer number
-      integer mpt(maxnmp)
-      integer mpz(maxnmp)
-      integer mpx(maxnmp)
-      integer mpy(maxnmp)
+      integer, allocatable :: mpt(:)
+      integer, allocatable :: mpz(:)
+      integer, allocatable :: mpx(:)
+      integer, allocatable :: mpy(:)
       real*8 sixth
       logical path
       logical use_ring
@@ -1066,6 +1108,13 @@ c
             sdpl(ndipole) = sdpl(i)
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (mpt(maxnmp))
+      allocate (mpz(maxnmp))
+      allocate (mpx(maxnmp))
+      allocate (mpy(maxnmp))
 c
 c     setup for the polarizable multipole parameters
 c
@@ -1229,6 +1278,13 @@ c
          end do
    20    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (mpt)
+      deallocate (mpz)
+      deallocate (mpx)
+      deallocate (mpy)
 c
 c     find and assign induced dipole moment parameters
 c
@@ -1455,8 +1511,8 @@ c
       real*8 er,ec,et
       real*8 xi,yi,zi
       real*8 cscale,tscale
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
+      real*8 xx(*)
+      real*8 g(*)
 c
 c
 c     initialize scaling factors for error and gradient
@@ -1621,7 +1677,7 @@ c
       integer k,kk,kt
       integer nvar
       real*8 dterm,qterm
-      real*8 xx(maxvar)
+      real*8 xx(*)
       logical done
       character*17 prmtyp
 c
@@ -1845,7 +1901,7 @@ c
       integer kk,kt
       integer nvar,ivar
       real*8 eps
-      real*8 xx(maxvar)
+      real*8 xx(*)
       logical done
 c
 c
@@ -2020,13 +2076,13 @@ c
       integer ipot,npoint
       integer freeunit
       integer trimtext
-      integer natm(maxatm)
+      integer, allocatable :: natm(:)
       real*8 xi,yi,zi
       real*8 pave1,pave2
       real*8 tave,uave,rmsd
-      real*8 patm1(maxatm)
-      real*8 patm2(maxatm)
-      real*8 rmsa(maxatm)
+      real*8, allocatable :: patm1(:)
+      real*8, allocatable :: patm2(:)
+      real*8, allocatable :: rmsa(:)
       logical dofull,domodel
       logical dopair,dotarget
       character*120 potfile
@@ -2090,6 +2146,13 @@ c
          end if
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (natm(n))
+      allocate (patm1(n))
+      allocate (patm2(n))
+      allocate (rmsa(n))
+c
 c     find average electrostatic potential around each atom
 c
       write (iout,110)
@@ -2141,6 +2204,13 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (natm)
+      deallocate (patm1)
+      deallocate (patm2)
+      deallocate (rmsa)
 c
 c     overall averages for the sets of electrostatic potentials
 c

@@ -2183,24 +2183,16 @@ c
          deallocate (derivs)
       end if
 c
-c     check for too many vibrational frequencies
-c
-      nfreq = 3 * n
-      if (nfreq*(nfreq-1)/2 .gt. maxhess) then
-         write (iout,130)
-  130    format (/,' VALENCE  --  Too many Atoms in the Molecule')
-         call fatal
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
+      nfreq = 3 * n
       allocate (mass2(n))
       allocate (hinit(3,n))
       allocate (hstop(3,n))
       allocate (hdiag(3,n))
-      allocate (hindex(nfreq*(nfreq-1)/2))
-      allocate (h(nfreq*(nfreq-1)/2))
-      allocate (matrix(nfreq*(nfreq+1)/2))
+      allocate (hindex((nfreq*(nfreq-1))/2))
+      allocate (h((nfreq*(nfreq-1))/2))
+      allocate (matrix((nfreq*(nfreq+1))/2))
 c
 c     calculate the full Hessian matrix of second derivatives
 c
@@ -2213,8 +2205,8 @@ c
       hrms = 0.0d0
       if (fit_force) then
          if (prtflg .eq. 1) then
-            write (iout,140)
-  140       format (/,' Comparison of Hessian Elements :',
+            write (iout,130)
+  130       format (/,' Comparison of Hessian Elements :',
      &              //,7x,'Atom',14x,'QM Hess',8x,'MM Hess',
      &                 10x,'Delta',/)
          end if
@@ -2226,8 +2218,8 @@ c
                have = have + abs(delta)
                hrms = hrms + delta*delta
                if (prtflg .eq. 1) then
-                  write (iout,150)  i,axis(j),gh(m),hdiag(j,i),delta
-  150             format (4x,i5,1x,a1,8x,f13.2,2x,f13.2,2x,f13.4)
+                  write (iout,140)  i,axis(j),gh(m),hdiag(j,i),delta
+  140             format (4x,i5,1x,a1,8x,f13.2,2x,f13.2,2x,f13.4)
                end if
                m1 = 3*(i-1) + j
                m2 = m1
@@ -2243,8 +2235,8 @@ c
          have = have / dble((9*n*n+3*n)/2)
          hrms = sqrt(hrms/dble((9*n*n+3*n)/2))
          if (prtflg .eq. 1) then
-            write (iout,160)  have,hrms
-  160       format (/,4x,'Average Unsigned Difference :',17x,f12.4,
+            write (iout,150)  have,hrms
+  150       format (/,4x,'Average Unsigned Difference :',17x,f12.4,
      &              /,4x,'Root Mean Square Deviation :',18x,f12.4)
          end if
       end if
@@ -2299,8 +2291,8 @@ c
       fave = 0.0d0
       frms = 0.0d0
       if (prtflg .eq. 1) then
-         write (iout,170)
-  170    format (/,' Comparison of Vibrational Frequencies :',
+         write (iout,160)
+  160    format (/,' Comparison of Vibrational Frequencies :',
      &           //,6x,'Mode',15x,'QM Freq',8x,'MM Freq',10x,'Delta',/)
       end if
       k = 0
@@ -2311,16 +2303,16 @@ c
             fave = fave + abs(delta)
             frms = frms + delta*delta
             if (prtflg .eq. 1) then
-               write (iout,180)  k,gfreq(i-6),eigen(i),delta
-  180          format (4x,i5,10x,f13.2,2x,f13.2,2x,f13.4)
+               write (iout,170)  k,gfreq(i-6),eigen(i),delta
+  170          format (4x,i5,10x,f13.2,2x,f13.2,2x,f13.4)
             end if
          end if
       end do
       fave = fave / (dble(k))
       frms = sqrt(frms/dble(k))
       if (prtflg .eq. 1) then
-         write (iout,190)  fave,frms
-  190    format (/,4x,'Average Unsigned Difference :',17x,f12.4,
+         write (iout,180)  fave,frms
+  180    format (/,4x,'Average Unsigned Difference :',17x,f12.4,
      &           /,4x,'Root Mean Square Deviation :',18x,f12.4)
       end if
 c

@@ -42,7 +42,8 @@ c
       integer, allocatable :: hindex(:)
       integer, allocatable :: hinit(:,:)
       integer, allocatable :: hstop(:,:)
-      real*8 factor,vnorm,ratio
+      real*8 factor,vnorm
+      real*8 sum,scale,ratio
       real*8, allocatable :: xref(:)
       real*8, allocatable :: yref(:)
       real*8, allocatable :: zref(:)
@@ -73,17 +74,9 @@ c
       call getxyz
       call mechanic
 c
-c     check for too many vibrational frequencies
-c
-      nfreq = 3 * nuse
-      if (nfreq*(nfreq-1)/2 .gt. maxhess) then
-         write (iout,10)
-   10    format (/,' VIBRATE  --  Too many Atoms in the Molecule')
-         call fatal
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
+      nfreq = 3 * nuse
       allocate (mass2(n))
       allocate (hinit(3,n))
       allocate (hstop(3,n))
@@ -144,10 +137,10 @@ c     perform diagonalization to get Hessian eigenvalues
 c
       call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
      &                    a,b,p,w,ta,tb,ty)
-      write (iout,20)
-   20 format (/,' Eigenvalues of the Hessian Matrix :',/)
-      write (iout,30)  (i,eigen(i),i=1,nvib)
-   30 format (5(i5,f10.3))
+      write (iout,10)
+   10 format (/,' Eigenvalues of the Hessian Matrix :',/)
+      write (iout,20)  (i,eigen(i),i=1,nvib)
+   20 format (5(i5,f10.3))
 c
 c     store upper triangle of the mass-weighted Hessian matrix
 c
@@ -176,10 +169,10 @@ c
       do i = 1, nvib
          eigen(i) = factor * sign(1.0d0,eigen(i)) * sqrt(abs(eigen(i)))
       end do
-      write (iout,40)
-   40 format (/,' Vibrational Frequencies (cm-1) :',/)
-      write (iout,50)  (i,eigen(i),i=1,nvib)
-   50 format (5(i5,f10.3))
+      write (iout,30)
+   30 format (/,' Vibrational Frequencies (cm-1) :',/)
+      write (iout,40)  (i,eigen(i),i=1,nvib)
+   40 format (5(i5,f10.3))
 c
 c     perform deallocation of some local arrays
 c
@@ -235,25 +228,34 @@ c
          else
             nlist = 0
             do i = 1, nvib
-               read (string,*,err=60,end=60)  k
+               read (string,*,err=50,end=50)  k
                if (k.ge.1 .and. k.le.nvib) then
                   nlist = nlist + 1
                   list(nlist) = k
+               else
+                  k = abs(k)
+                  call nextarg (string,exist)
+                  read (string,*,err=50,end=50)  m
+                  m = min(abs(m),nvib)
+                  do j = k, m
+                     nlist = nlist + 1
+                     list(nlist) = j
+                  end do
                end if
                call nextarg (string,exist)
             end do
-   60       continue
+   50       continue
          end if
       end if
 c
 c     ask the user for the vibrational modes to be output
 c
       if (query) then
-         write (iout,70)
-   70    format (/,' Enter Vibrations to Output [List, A=All',
+         write (iout,60)
+   60    format (/,' Enter Vibrations to Output [List, A=All',
      &              ' or <CR>=Exit] :  ',$)
-         read (input,80)  record
-   80    format (a120)
+         read (input,70)  record
+   70    format (a120)
          letter = ' '
          next = 1
          call gettext (record,letter,next)
@@ -269,15 +271,25 @@ c
             do i = 1, nvib
                iv(i) = 0
             end do
-            read (record,*,err=90,end=90)  (iv(i),i=1,nvib)
-   90       continue
+            read (record,*,err=80,end=80)  (iv(i),i=1,nvib)
+   80       continue
             nlist = 0
-            do i = 1, nvib
+            i = 1
+            do while (iv(i) .ne. 0)
                k = iv(i)
                if (k.ge.1 .and. k.le.nvib) then
                   nlist = nlist + 1
                   list(nlist) = k
+               else
+                  k = abs(k)
+                  m = min(abs(iv(i+1)),nvib)
+                  do j = k, m
+                     nlist = nlist + 1
+                     list(nlist) = j
+                  end do
+                  i = i + 1
                end if
+               i = i + 1
             end do
          end if
       end if
@@ -286,15 +298,15 @@ c     print the vibrational frequencies and normal modes
 c
       do ilist = 1, nlist
          ivib = list(ilist)
-         write (iout,100)  ivib,eigen(ivib)
-  100    format (/,' Vibrational Normal Mode',i6,' with Frequency',
+         write (iout,90)  ivib,eigen(ivib)
+   90    format (/,' Vibrational Normal Mode',i6,' with Frequency',
      &              f11.3,' cm-1',
      &           //,5x,'Atom',5x,'Delta X',5x,'Delta Y',5x,'Delta Z',/)
          do i = 1, nuse
             j = 3 * (i-1)
-            write (iout,110)  iuse(i),vects(j+1,ivib),vects(j+2,ivib),
+            write (iout,100)  iuse(i),vects(j+1,ivib),vects(j+2,ivib),
      &                        vects(j+3,ivib)
-  110       format (4x,i5,3f12.6)
+  100       format (4x,i5,3f12.6)
          end do
 c
 c     create a name for the vibrational displacement file
@@ -314,11 +326,24 @@ c
             zref(i) = z(i)
          end do
 c
+c     scale based on the maximum displacement along the mode
+c
+         scale = 0.0d0
+         do i = 1, nuse
+            j = 3 * (i-1)
+            sum = 0.0d0
+            do k = 1, 3
+               sum = sum + vects(j+k,ivib)**2
+            end do
+            scale = max(sum,scale)
+         end do
+         scale = 0.1d0 * n**(1.0d0/3.0d0) / sqrt(scale)
+c
 c     make file with plus and minus the current vibration
 c
          nview = 3
          do i = -nview, nview
-            ratio = dble(i) / dble(nview)
+            ratio = scale * dble(i) / dble(nview)
             do k = 1, nuse
                j = 3 * (k-1)
                m = iuse(k)

@@ -58,10 +58,10 @@ c
       real*8 epsfac,mufac
       real*8 stepfac
       real*8 minimum
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 d(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: g(:)
+      real*8, allocatable :: d(:)
+      real*8, allocatable :: derivs(:,:)
       logical exist,done
       character*9 status
       character*120 minfile
@@ -144,6 +144,13 @@ c
             end do
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+      allocate (g(nvar))
+      allocate (d(nvar))
+      allocate (derivs(3,n))
 c
 c     scale the coordinates of each active atom
 c
@@ -353,7 +360,7 @@ c     use lowest energy structure as global minimum estimate
 c
       call getref (1)
 c
-c     write out final function value and gradient
+c     compute the final function and RMS gradient values
 c
       call gradient (minimum,derivs)
       gnorm = 0.0d0
@@ -366,6 +373,16 @@ c
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / rms
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      deallocate (g)
+      deallocate (d)
+      deallocate (derivs)
+c
+c     write out the final function and gradient values
+c
       if (grms .gt. 0.0001d0) then
          write (iout,160)  minimum,grms,gnorm
   160    format (/,' Final Function Value :',f15.4,
@@ -411,9 +428,9 @@ c
       include 'usage.i'
       integer i,nvar
       real*8 sniffer1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -429,6 +446,10 @@ c
             z(i) = xx(nvar) / scale(nvar)
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     compute and store the energy and gradient
 c
@@ -448,5 +469,9 @@ c
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

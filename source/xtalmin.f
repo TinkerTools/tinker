@@ -33,12 +33,12 @@ c
       real*8 gnorm,grms
       real*8 glnorm,glrms
       real*8 xtalmin1,e
-      real*8 xx(maxvar)
-      real*8 glat(maxvar)
-      real*8 xf(maxatm)
-      real*8 yf(maxatm)
-      real*8 zf(maxatm)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: glat(:)
+      real*8, allocatable :: xf(:)
+      real*8, allocatable :: yf(:)
+      real*8, allocatable :: zf(:)
+      real*8, allocatable :: derivs(:,:)
       logical exist
       character*20 keyword
       character*120 minfile
@@ -123,6 +123,16 @@ c
       scale(nvar+4) = 0.02d0 * sqrt(volbox)
       scale(nvar+5) = 0.02d0 * sqrt(volbox)
       scale(nvar+6) = 0.02d0 * sqrt(volbox)
+      nvar = nvar + 6
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+      allocate (glat(nvar))
+      allocate (xf(n))
+      allocate (yf(n))
+      allocate (zf(n))
+      allocate (derivs(3,n))
 c
 c     compute the fractional coordinates for each atom
 c
@@ -257,13 +267,19 @@ c
       integer i,j
       real*8 xtalmin1,energy
       real*8 e,e0,old,eps
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 xf(maxatm)
-      real*8 yf(maxatm)
-      real*8 zf(maxatm)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: xf(:)
+      real*8, allocatable :: yf(:)
+      real*8, allocatable :: zf(:)
+      real*8, allocatable :: derivs(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xf(n))
+      allocate (yf(n))
+      allocate (zf(n))
 c
 c     translate optimization variables to fractional coordinates
 c
@@ -292,6 +308,10 @@ c
          z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     find energy and fractional coordinates deriviatives
 c
       call gradient (e,derivs)
@@ -305,6 +325,10 @@ c
          g(j+3) = derivs(1,i)*lvec(3,1) + derivs(2,i)*lvec(3,2)
      &               + derivs(3,i)*lvec(3,3)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     find derivative with respect to lattice a-axis length
 c
@@ -454,5 +478,11 @@ c
       do i = 1, 3*n+6
          g(i) = g(i) / scale(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xf)
+      deallocate (yf)
+      deallocate (zf)
       return
       end

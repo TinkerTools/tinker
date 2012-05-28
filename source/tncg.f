@@ -110,7 +110,7 @@ c
       integer i,nvar,fg_call
       integer iter_tn,iter_cg
       integer next,newhess
-      integer nerr,maxerr,hmax
+      integer nerr,maxerr
       integer, allocatable :: h_init(:)
       integer, allocatable :: h_stop(:)
       integer, allocatable :: h_index(:)
@@ -258,9 +258,8 @@ c
       allocate (g(nvar))
       allocate (p(nvar))
       allocate (h_diag(nvar))
-      hmax = min(maxhess,(nvar*(nvar-1))/2)
-      allocate (h_index(hmax))
-      allocate (h(hmax))
+      allocate (h_index((nvar*(nvar-1))/2))
+      allocate (h((nvar*(nvar-1))/2))
 c
 c     evaluate the function and get the initial gradient
 c
@@ -765,8 +764,7 @@ c
       integer i,j,k,ii,kk
       integer iii,kkk,iter
       integer nvar,nblock
-      integer ix,iy,iz
-      integer hmax,icount
+      integer ix,iy,iz,icount
       integer h_init(*)
       integer h_stop(*)
       integer h_index(*)
@@ -794,15 +792,14 @@ c     perform dynamic allocation of some local arrays
 c
       if (method .eq. 'SSOR')  allocate (diag(nvar))
       if (method .eq. 'ICCG') then
-         hmax = min(maxhess,(nvar*(nvar-1))/2)
          if (iter .eq. 0) then
             allocate (c_init(nvar))
             allocate (c_stop(nvar))
-            allocate (c_index(hmax))
-            allocate (c_value(hmax))
+            allocate (c_index((nvar*(nvar-1))/2))
+            allocate (c_value((nvar*(nvar-1))/2))
          end if
          if (.not. allocated(f_diag))  allocate (f_diag(nvar))
-         if (.not. allocated(f))  allocate (f(hmax))
+         if (.not. allocated(f))  allocate (f((nvar*(nvar-1))/2))
       end if
 c
 c     use no preconditioning, using M = identity matrix

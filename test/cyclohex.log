@@ -13,7 +13,7 @@
  ##############################################################################
 
 
- RMS Fit for All Atoms of both Structures :    0.9819
+ RMS Fit for All Atoms of Both Structures :    0.9819
 
  Energy Value for Endpoint Structure 1 :       8.0783
  Energy Value for Endpoint Structure 2 :      13.9045
@@ -141,11 +141,11 @@
 
  Algorithm : AUTO       Preconditioning : AUTO        RMS Grad : 0.10D-03
 
- TN Iter   F Value       G RMS     F Move    X Move   CG Iter   Solve   FG Call
+ TN Iter    F Value       G RMS     F Move    X Move   CG Iter  Solve   FG Call
 
-     0     18.8597      0.0818                                               1
-     1     18.8591      0.0016     0.0005    0.0014       4   TruncNewt      6
-     2     18.8591      0.0000     0.0000    0.0001      14   TruncNewt     17
+     0      18.8597      0.0818                                               1
+     1      18.8591      0.0016     0.0005    0.0014       4   TruncNewt      6
+     2      18.8591      0.0000     0.0000    0.0001      14   TruncNewt     17
 
  TNCG  --  Normal Termination due to SmallGrad
 

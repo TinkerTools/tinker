@@ -46,7 +46,7 @@ c
       real*8 pssrot1,rms
       real*8 srchmax
       real*8 deform0,ratio
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical exist
       logical use_local
       character*1 answer
@@ -157,6 +157,10 @@ c
       end if
       if (grdmin .le. 0.0d0)  grdmin = 0.0001d0
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nomega))
+c
 c     perform PSS iteration by looping over smoothed surfaces
 c
       do k = 0, 2*npoint
@@ -210,6 +214,10 @@ c
          close (unit=ixyz)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
 c     perform any final tasks before program exit
 c
       call final
@@ -235,9 +243,9 @@ c
       include 'zcoord.i'
       integer i
       real*8 pssrot1,e
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(maxrot)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:)
 c
 c
 c     translate optimization variables into dihedrals
@@ -246,6 +254,10 @@ c
          dihed(i) = xx(i)
          ztors(zline(i)) = dihed(i) * radian
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
 c
 c     compute and store the energy and gradient
 c
@@ -258,6 +270,10 @@ c
       do i = 1, nomega
          g(i) = derivs(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -279,14 +295,22 @@ c
       integer i,k,neigen
       integer ndoi,nsearch
       real*8 minimum,grdmin
-      real*8 minref,minbest
-      real*8 eps,step(maxrot)
-      real*8 zorig(maxrot)
-      real*8 zbest(maxrot)
-      real*8 eigen(maxrot)
-      real*8 vects(maxrot,maxrot)
+      real*8 eps,minref,minbest
+      real*8, allocatable :: step(:)
+      real*8, allocatable :: eigen(:)
+      real*8, allocatable :: zorig(:)
+      real*8, allocatable :: zbest(:)
+      real*8, allocatable :: vects(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (step(nomega))
+      allocate (eigen(nomega))
+      allocate (zorig(nomega))
+      allocate (zbest(nomega))
+      allocate (vects(nomega,nomega))
 c
 c     set parameters related to the local search procedure
 c
@@ -356,6 +380,14 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (step)
+      deallocate (eigen)
+      deallocate (zorig)
+      deallocate (zbest)
+      deallocate (vects)
       return
       end
 c
@@ -373,15 +405,30 @@ c
       include 'atoms.i'
       include 'omega.i'
       integer i,j,ihess
-      real*8 eigen(maxrot)
-      real*8 a(maxrot),b(maxrot)
-      real*8 p(maxrot),ta(maxrot)
-      real*8 w(maxrot),tb(maxrot)
-      real*8 ty(maxrot)
-      real*8 matrix((maxrot+1)*maxrot/2)
-      real*8 vects(maxrot,maxrot)
-      real*8 hrot(maxrot,maxrot)
+      real*8 eigen(*)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: ty(:)
+      real*8, allocatable :: matrix(:)
+      real*8 vects(nomega,*)
+      real*8, allocatable :: hrot(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(nomega))
+      allocate (b(nomega))
+      allocate (p(nomega))
+      allocate (w(nomega))
+      allocate (ta(nomega))
+      allocate (tb(nomega))
+      allocate (ty(nomega))
+      allocate (matrix(nomega*(nomega+1)/2))
+      allocate (hrot(nomega,nomega))
 c
 c     compute the Hessian in torsional space
 c
@@ -401,6 +448,18 @@ c     diagonalize the Hessian to obtain eigenvalues
 c
       call diagq (nomega,maxrot,nomega,matrix,eigen,vects,
      &                     a,b,p,w,ta,tb,ty)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (ty)
+      deallocate (matrix)
+      deallocate (hrot)
       return
       end
 c
@@ -426,8 +485,8 @@ c
       real*8 minimum,grdmin
       real*8 energy
       real*8 big,small,size
-      real*8 step(maxrot)
       real*8 estep(0:maxstep)
+      real*8 step(*)
       logical done
 c
 c
@@ -508,11 +567,15 @@ c
       real*8 minimum
       real*8 grdmin
       real*8 pssrot1
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical oldverb
       external pssrot1
       external optsave
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nomega))
 c
 c     translate the coordinates of each atom
 c
@@ -537,5 +600,9 @@ c
          dihed(i) = xx(i)
          ztors(zline(i)) = dihed(i) * radian
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
       return
       end
