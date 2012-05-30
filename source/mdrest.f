@@ -221,7 +221,7 @@ c
 c
 c     diagonalize the moment of inertia tensor
 c
-         call invert (3,3,tensor)
+         call invert (3,tensor)
 c
 c     compute angular velocity and rotational kinetic energy
 c

@@ -1223,8 +1223,8 @@ c
       integer i,j,k
       integer it,it0,it1
       real*8 radius,rd,ep
-      real*8 srad(maxclass)
-      real*8 seps(maxclass)
+      real*8, allocatable :: srad(:)
+      real*8, allocatable :: seps(:)
       logical header
 c
 c
@@ -1238,6 +1238,11 @@ c
          rad(it) = lambda*rad(it1) + (1.0d0-lambda)*rad(it0)
          eps(it) = lambda*eps(it1) + (1.0d0-lambda)*eps(it0)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (srad(maxclass))
+      allocate (seps(maxclass))
 c
 c     get the square roots of the vdw radii and well depths
 c
@@ -1310,6 +1315,11 @@ c
    20       format (6x,i8,f14.4,f12.4)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (srad)
+      deallocate (seps)
       return
       end
 c

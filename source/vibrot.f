@@ -28,13 +28,6 @@ c
       include 'iounit.i'
       include 'omega.i'
       integer i,j,ihess
-      real*8, allocatable :: a(:)
-      real*8, allocatable :: b(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: w(:)
-      real*8, allocatable :: ta(:)
-      real*8, allocatable :: tb(:)
-      real*8, allocatable :: ty(:)
       real*8, allocatable :: eigen(:)
       real*8, allocatable :: matrix(:)
       real*8, allocatable :: vects(:,:)
@@ -50,13 +43,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (a(nomega))
-      allocate (b(nomega))
-      allocate (p(nomega))
-      allocate (w(nomega))
-      allocate (ta(nomega))
-      allocate (tb(nomega))
-      allocate (ty(nomega))
       allocate (eigen(nomega))
       allocate (matrix(nomega*(nomega+1)/2))
       allocate (vects(nomega,nomega))
@@ -98,8 +84,7 @@ c
 c
 c     perform diagonalization to get Hessian eigenvalues
 c
-      call diagq (nomega,nomega,nomega,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nomega,nomega,matrix,eigen,vects)
       write (iout,60)
    60 format (/,' Eigenvalues of the Hessian Matrix :',/)
       write (iout,70)  (i,eigen(i),i=1,nomega)
@@ -107,13 +92,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (a)
-      deallocate (b)
-      deallocate (p)
-      deallocate (w)
-      deallocate (ta)
-      deallocate (tb)
-      deallocate (ty)
       deallocate (eigen)
       deallocate (matrix)
       deallocate (vects)

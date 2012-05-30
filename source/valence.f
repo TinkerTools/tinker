@@ -34,7 +34,7 @@ c
       real*8 minimum,grdmin
       real*8 valrms,value
       real*8 valfit1
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       logical exist,query
       logical doguess
       logical dotarget
@@ -168,6 +168,10 @@ c     try to increase robustness of polarization calculations
 c
       if (dofit .and. use_polar)  stpmax = 1.0d0
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(35*n))
+c
 c     comparison of QM and TINKER structure and frequencies
 c
       if (dotarget) then
@@ -204,6 +208,14 @@ c
             call prtval
          end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end
 c
 c
@@ -250,8 +262,8 @@ c
       integer iita,iitb
       integer nv,nb,na
       integer nsb,nop,nt
-      integer nequiv(maxang)
       integer vnum(maxtyp)
+      integer, allocatable :: nequiv(:)
       real*8 xab,yab,zab
       real*8 xcb,ycb,zcb
       real*8 xac,yac,zac
@@ -338,6 +350,10 @@ c
             kb(nb) = ptb
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (nequiv(4*n))
 c
 c     assign initial values to bond stretch parameters
 c
@@ -584,6 +600,7 @@ c
   110    format (/,' Estimated Urey-Bradley Parameters :',/)
       end if
       do i = 1, nsb
+         dst13(i) = dst13(i) / dble(nequiv(i))
          pta = ku(i)
          ia = number(pta(1:4))
          ib = number(pta(5:8))
@@ -591,6 +608,10 @@ c
          write (iout,120)  ia,ib,ic,ucon(i),dst13(i)
   120    format (' ureybrad',2x,3i5,f10.1,f11.4)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (nequiv)
 c
 c     assign initial values to out-of-plane bend parameters
 c
@@ -1883,13 +1904,6 @@ c
       real*8, allocatable :: xx(:)
       real*8, allocatable :: mass2(:)
       real*8, allocatable :: eigen(:)
-      real*8, allocatable :: a(:)
-      real*8, allocatable :: b(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: w(:)
-      real*8, allocatable :: ta(:)
-      real*8, allocatable :: tb(:)
-      real*8, allocatable :: ty(:)
       real*8, allocatable :: h(:)
       real*8, allocatable :: matrix(:)
       real*8, allocatable :: derivs(:,:)
@@ -2264,20 +2278,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (a(nfreq))
-      allocate (b(nfreq))
-      allocate (p(nfreq))
-      allocate (w(nfreq))
-      allocate (ta(nfreq))
-      allocate (tb(nfreq))
-      allocate (ty(nfreq))
       allocate (eigen(nfreq))
       allocate (vects(nfreq,nfreq))
 c
 c     diagonalize to get vibrational frequencies and normal modes
 c
-      call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nfreq,nfreq,matrix,eigen,vects)
       factor = sqrt(convert) / (2.0d0*pi*lightspd)
       do i = 1, nfreq
          eigen(i) = factor * sign(1.0d0,eigen(i))
@@ -2325,13 +2331,6 @@ c
       deallocate (hindex)
       deallocate (h)
       deallocate (matrix)
-      deallocate (a)
-      deallocate (b)
-      deallocate (p)
-      deallocate (w)
-      deallocate (ta)
-      deallocate (tb)
-      deallocate (ty)
       deallocate (eigen)
       deallocate (vects)
 c

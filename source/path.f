@@ -214,7 +214,7 @@ c
 c     perform the matrix inversion to get A matrix
 c     which transforms C into sigma space
 c
-      call invert (7,7,acoeff)
+      call invert (7,acoeff)
 c
 c     set the current path point to be the reactant
 c

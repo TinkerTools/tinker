@@ -16,22 +16,21 @@ c     "invert" inverts a matrix using the Gauss-Jordan method
 c
 c     variables and parameters:
 c
-c     n     logical dimension of the matrix to be inverted
-c     np    physical dimension of the matrix storage area
+c     n     dimension of the matrix to be inverted
 c     a     matrix to invert; contains inverse on exit
 c
 c
-      subroutine invert (n,np,a)
+      subroutine invert (n,a)
       implicit none
       include 'iounit.i'
-      integer i,j,k,n,np
+      integer i,j,k,n
       integer icol,irow
       integer, allocatable :: ipivot(:)
       integer, allocatable :: indxc(:)
       integer, allocatable :: indxr(:)
       real*8 big,temp
       real*8 pivot
-      real*8 a(np,*)
+      real*8 a(n,*)
 c
 c
 c     perform dynamic allocation of some local arrays

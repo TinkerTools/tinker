@@ -31,17 +31,14 @@ c
       character*120 xyzfile
 c
 c
-c     initialization of the various modes of operation
+c     get the Cartesian coordinates and connectivity info
 c
       call initial
-c
-c     read the Cartesian coordinates and connectivity info
-c
       call getxyz
       xyzfile = filename
       length = leng
 c
-c     read structure and vibrational data from Gaussian output
+c     get structure and vibrational data from Gaussian output
 c
       call getkey
       call mechanic
@@ -88,22 +85,26 @@ c
 c
 c     fit the torsional parameters based on potential surface
 c
-      call fittorsion (torbnd)
+      call fittors (torbnd)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine fittorsion  --  torsional parameter refinement  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine fittors  --  torsional parameter refinement  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "fittorsion" refines torsion parameters based on a quantum
+c     "fittors" refines torsion parameters based on a quantum
 c     mechanical optimized energy surface
 c
 c
-      subroutine fittorsion (torbnd)
+      subroutine fittors (torbnd)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -121,8 +122,8 @@ c
       include 'scales.i'
       include 'tors.i'
       include 'usage.i'
-      integer maxfittor,maxconf
-      parameter (maxfittor=12)
+      integer maxfit,maxconf
+      parameter (maxfit=12)
       parameter (maxconf=500)
       integer i,j,k,ii,jj,kk
       integer ia,ib,ic,id
@@ -136,20 +137,20 @@ c
       integer ikey,nvar
       integer freeunit
       integer trimtext
-      integer torbnd(10)
-      integer ctorid(maxfittor)
-      integer ftorid(maxfittor)
-      integer tflg(maxfittor)
-      integer torcrs(4,maxfittor)
-      integer cflg(9*maxfittor)
+      integer torbnd(*)
+      integer ctorid(maxfit)
+      integer ftorid(maxfit)
+      integer tflg(maxfit)
+      integer torcrs(4,maxfit)
+      integer cflg(9*maxfit)
       integer refconf(maxconf)
       real*8 tmpa,tmpb,tv,vcon
       real*8 eqmmin,emmmin
       real*8 rms,zrms,avedl
       real*8 minimum,grdmin
       real*8 energy,geometry
-      real*8 vxx(6*maxfittor)
-      real*8 vxxl(6*maxfittor)
+      real*8 vxx(6*maxfit)
+      real*8 vxxl(6*maxfit)
       real*8 eqm(maxconf)
       real*8 emm(maxconf)
       real*8 erqm(maxconf)
@@ -157,24 +158,24 @@ c
       real*8 delte(maxconf)
       real*8 fwt(maxconf)
       real*8 torf(maxconf)
-      real*8 xx(maxvar)
-      real*8 tord(6*maxfittor,6*maxfittor)
-      real*8 mata(6*maxfittor,6*maxfittor)
-      real*8 ftv(maxconf,maxfittor)
-      real*8 rftv(maxconf,maxfittor)
-      real*8 coeff(maxconf,6*maxfittor)
-      real*8 ctv(maxconf,9*maxfittor)
+      real*8, allocatable :: xx(:)
+      real*8 tord(6*maxfit,6*maxfit)
+      real*8 mata(6*maxfit,6*maxfit)
+      real*8 ftv(maxconf,maxfit)
+      real*8 rftv(maxconf,maxfit)
+      real*8 coeff(maxconf,6*maxfit)
+      real*8 ctv(maxconf,9*maxfit)
       logical done
-      logical vflg(6,maxfittor)
+      logical vflg(6,maxfit)
       logical confvisited(maxconf)
       character*4 pa,pb,pc,pd
-      character*16 kft(maxfittor)
-      character*16 kct(9*maxfittor)
+      character*16 kft(maxfit)
+      character*16 kct(9*maxfit)
       character*120 record
       character*120 keyfile
       character*120 oldfilename
-      character*120 oldkeyline(maxkey)
-      external minimiz1
+      character*120, allocatable :: oldkeyline(:)
+      external torfit1
       external optsave
 c
 c
@@ -186,31 +187,31 @@ c
       istep = 0
       tv = 0.0d0
       vcon = 0.5d0
-      do i = 1, maxfittor
-         ftorid (i) = 0
-         tflg (i) = 0
+      do i = 1, maxfit
+         ftorid(i) = 0
+         tflg(i) = 0
          do j = 1, 6
             vflg(j,i) = .false.
          end do
       end do
-      do i = 1, 6*maxfittor
+      do i = 1, 6*maxfit
          vxx(i) = 0.0d0
          vxxl(i) = 0.1d0
          avedl = 0.0d0
-         do j = 1, 6*maxfittor
-            tord (i,j) = 0.0d0
+         do j = 1, 6*maxfit
+            tord(i,j) = 0.0d0
          end do
       end do
-      do i = 1, 9*maxfittor
+      do i = 1, 9*maxfit
          cflg(i) = 0
       end do
       do i = 1, maxconf
-         fwt (i) = 1.0d0
+         fwt(i) = 1.0d0
          torf(i) = 0.0d0
          confvisited(i) = .false.
       end do
       do i = 1, maxconf
-         do j = 1, 6*maxfittor
+         do j = 1, 6*maxfit
             coeff(i,j) = 0.0d0
          end do
          refconf = 0
@@ -222,7 +223,11 @@ c
          torbnd(2) = itmpa
       end if
 c
-c     store the file system information
+c     perform dynamic allocation of some local arrays
+c
+      allocate (oldkeyline(nkey))
+c
+c     store the information from the keyfile
 c
       oldfilename = filename
       oldleng = leng
@@ -483,10 +488,10 @@ c
       nvxx = nvxx + 1
       vxx(nvxx) = vcon
 c
-c     get inital energy difference
+c     get initial energy difference
 c
       do i = 1, nconf
-         call getref(i)
+         call getref (i)
          kk = 0
          do j = 1, ntorfit
             k = ftorid(j)
@@ -510,6 +515,10 @@ c
             id = torcrs(4,k)
             ctv(i,k) = geometry (ia,ib,ic,id)
          end do
+c
+c     perform dynamic allocation of some local arrays
+c
+         allocate (xx(3*nuse))
 c
 c     scale the coordinates of each active atom
 c
@@ -537,7 +546,7 @@ c
          grdmin = 0.01d0
          iwrite = 0
          iprint = 0
-         call lbfgs (nvar,xx,minimum,grdmin,minimiz1,optsave)
+         call lbfgs (nvar,xx,minimum,grdmin,torfit1,optsave)
 c
 c     unscale the final coordinates for active atoms
 c
@@ -552,6 +561,13 @@ c
                z(j) = xx(nvar) / scale(nvar)
             end if
          end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (xx)
+c
+c     set the energy value for the current minimum
+c
          emm(i) = energy ()
       end do
 c
@@ -618,7 +634,7 @@ c     end do
      &           .and. ftv(nconf-1,1) .gt. 0.0d0)
      &       ftv(nconf,1) = 180.0d0
          tmpa = erqm(2) - erqm(1)
-         tmpb = (ftv(2,1) - ftv(1,1))/radian
+         tmpb = (ftv(2,1)-ftv(1,1)) / radian
          fwt(1) = 1.0d0 / sqrt(1.0d0+(tmpa/tmpb)**2)
          if (nconf .gt. 2) then
             do i = 2, nconf-1
@@ -758,7 +774,7 @@ c
             do j = 1, nvxx
                mata(i,j) = tord(i,j)
             end do
-            write (iout,320)  (mata (i,j),j=1,nvxx)
+            write (iout,320)  (mata(i,j),j=1,nvxx)
   320       format (1x,5f12.4)
          end do
 c
@@ -850,6 +866,10 @@ c
             end if
          end do
 c
+c     perform dynamic allocation of some local arrays
+c
+         allocate (xx(3*nuse))
+c
 c     scale the coordinates of each active atom
 c
          nvar = 0
@@ -869,7 +889,7 @@ c
          write (iout,340)  i
   340    format (' Minimizing Structure',i5,2x,'with New Parameters')
          coordtype = 'CARTESIAN'
-         call lbfgs (nvar,xx,minimum,grdmin,minimiz1,optsave)
+         call lbfgs (nvar,xx,minimum,grdmin,torfit1,optsave)
 c
 c     unscale the final coordinates for active atoms
 c
@@ -884,6 +904,13 @@ c
                z(j) = xx(nvar) / scale(nvar)
             end if
          end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (xx)
+c
+c     set the energy value for the current minimum
+c
          emm(i) = energy ()
       end do
 c
@@ -894,7 +921,7 @@ c
          if (emm(i) .lt. emmmin)  emmmin = emm(i)
       end do
 c
-c     calcualte the energy difference and RMS
+c     calculate the energy difference and RMS
 c
       rms = 0.0d0
       write (iout,350)
@@ -916,7 +943,7 @@ c
      &           /,' Final RMS :',f12.6,' Kcal/mole',/)
       end if
 c
-c     output the fitted parameters
+c     output keyfile information with the fitted parameters
 c
       filename = oldfilename
       leng = oldleng
@@ -924,6 +951,10 @@ c
       do i = 1, nkey
          keyline(i) = oldkeyline(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (oldkeyline)
 c
 c     output some definitions and parameters to a keyfile
 c
@@ -975,6 +1006,7 @@ c
      &                 ' 180.0 2 ',f8.3,' 0.0 3')
          end if
       end do
+      close (unit=ikey)
       return
       end
 c
@@ -992,11 +1024,12 @@ c
 c
       subroutine gaussjordan (n,a)
       implicit none
-      integer maxn
-      parameter (maxn=72)
+      include 'iounit.i'
+      integer maxfit
+      parameter (maxfit=12)
       integer i,j,k,l,n
       real*8 t,av
-      real*8 a(maxn,maxn)
+      real*8 a(6*maxfit,*)
 c
 c
 c     perform the Gaussian elimination procedure
@@ -1010,8 +1043,9 @@ c
             end if
          end do
          if (abs(av) .lt. 1.0d-8) then
-            write (*,*)  'Singular Coefficient Matrix'
-            stop
+            write (iout,10)
+   10       format (/,' GAUSSJORDAN  --  Singular Coefficient Matrix')
+            call fatal
          end if
          if (l .ne. k) then
             do j = k, n+1
@@ -1041,30 +1075,30 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  function minimiz1  --  energy and gradient for minimize  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function torfit1  --  energy and gradient for minimize  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "minimiz1" is a service routine that computes the energy and
+c     "torfit1" is a service routine that computes the energy and
 c     gradient for a low storage BFGS optimization in Cartesian
 c     coordinate space
 c
 c
-      function minimiz1 (xx,g)
+      function torfit1 (xx,g)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'scales.i'
       include 'usage.i'
       integer i,nvar
-      real*8 minimiz1,e
+      real*8 torfit1,e
       real*8 energy,eps
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 derivs(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
       logical analytic
       external energy
 c
@@ -1088,6 +1122,10 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     compute and store the energy and gradient
 c
       if (analytic) then
@@ -1096,7 +1134,7 @@ c
          e = energy ()
          call numgrad (energy,derivs,eps)
       end if
-      minimiz1 = e
+      torfit1 = e
 c
 c     store Cartesian gradient as optimization gradient
 c
@@ -1111,5 +1149,9 @@ c
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

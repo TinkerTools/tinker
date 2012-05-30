@@ -1138,7 +1138,6 @@ c
       real*8 tmass,sum
       real*8 ra,rha,pr
       real*8 cm(3),p(3)
-      real*8 t1(3),t2(3)
       real*8 e(3,3),c(3,3)
       real*8 xe(*)
       real*8 u(maxvar,6)
@@ -1213,7 +1212,7 @@ c
 c
 c     diagonalize to get principal axes
 c
-      call jacobi (3,3,e,cm,c,t1,t2)
+      call jacobi (3,e,cm,c)
 c
 c     construction of principle rotations
 c
@@ -1683,10 +1682,6 @@ c
       parameter (maxbasis=3*maxroot)
       integer i,j,k,nb
       real*8 e1(maxbasis)
-      real*8 a(maxbasis),b(maxbasis)
-      real*8 p(maxbasis),w(maxbasis)
-      real*8 ta(maxbasis),tb(maxbasis)
-      real*8 y(maxbasis)
       real*8 h1((maxbasis+1)*maxbasis/2)
       real*8 h(maxbasis,maxbasis)
       real*8 c(maxbasis,maxbasis)
@@ -1705,7 +1700,7 @@ c
 c
 c     perform the matrix diagonalization
 c
-      call diagq (nb,maxbasis,nb,h1,e1,c1,a,b,p,w,ta,tb,y)
+      call diagq (nb,nb,h1,e1,c1)
 c
 c     copy values into the return arrays
 c
@@ -1739,13 +1734,6 @@ c
       real*8 wres(*)
       real*8 vector(*)
       real*8 hval(maxvib)
-      real*8 a(maxvib)
-      real*8 b(maxvib)
-      real*8 p(maxvib)
-      real*8 w(maxvib)
-      real*8 ta(maxvib)
-      real*8 tb(maxvib)
-      real*8 y(maxvib)
       real*8 hres((maxvib+1)*maxvib/2)
       real*8 hvec(maxvib,maxvib)
 c
@@ -1763,7 +1751,7 @@ c
 c
 c     perform the matrix diagonalization
 c
-      call diagq (n,maxvib,n,hres,hval,hvec,a,b,p,w,ta,tb,y)
+      call diagq (n,n,hres,hval,hvec)
 c
 c     copy values into return arrays
 c

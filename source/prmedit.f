@@ -1567,15 +1567,21 @@ c
       integer i,j,n,iprm
       integer size,next
       integer ia,ib,ic,id
-      integer key(maxprm)
-      integer line(maxprm)
+      integer, allocatable :: key(:)
+      integer, allocatable :: line(:)
       real*8 v1,v2,v3
       character*4 pa,pb,pc,pd
-      character*16 list(maxprm)
+      character*16, allocatable :: list(:)
       character*20 keyword
       character*120 record
       character*120 string
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (key(nprm))
+      allocate (line(nprm))
+      allocate (list(nprm))
 c
 c     find and store atom types for the multipole parameters
 c
@@ -1656,6 +1662,12 @@ c
    80    format (36x,3f11.5)
    90    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (key)
+      deallocate (line)
+      deallocate (list)
       return
       end
 c

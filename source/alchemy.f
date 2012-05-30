@@ -20,9 +20,9 @@ c     intermolecular in finding the perturbation energies
 c
 c     variables and parameters :
 c
-c     nlamb   number of lambda values for energy computation
-c     delta   step size for the perturbation in lambda
-c     nrun    number of steps over which to calculate averages
+c     nlamb        number of lambda values for energy computation
+c     delta        step size for the perturbation in lambda
+c     nstep        number of steps over which to calculate averages
 c
 c     deplus       energy change for postive delta lambda
 c     deminus      energy change for negative delta lambda
@@ -50,16 +50,14 @@ c
       include 'potent.i'
       include 'units.i'
       include 'usage.i'
-      integer maxblock,maxstep
-      parameter (maxblock=100)
-      parameter (maxstep=5000)
       integer i,j,k,ixyz,start,stop
-      integer nblock,nrun
-      integer modrun,modblock
-      integer istep,nstep,ilamb,nlamb
       integer lext,next,freeunit
+      integer istep,ilamb,nlamb
+      integer nstep,modstep
+      integer nblock,modblock
       real*8 delta,lam0,lamp,lamm
-      real*8 rt,e0,energy,pos,neg,temp
+      real*8 rt,e0,energy
+      real*8 pos,neg,temp
       real*8 eplus,eminus
       real*8 deplus,deminus
       real*8 sdep,s2dep,sdep2
@@ -82,12 +80,17 @@ c
       real*8 sbm,sam,sitm,stm,svm,scm
       real*8 abp,aap,aitp,atp,avp,acp
       real*8 abm,aam,aitm,atm,avm,acm
-      real*8 badep(maxblock),badem(maxblock)
-      real*8 bdap(maxblock),bdam(maxblock)
-      real*8 nrg(3,maxstep),cb(3,maxstep)
-      real*8 ca(3,maxstep),cit(3,maxstep)
-      real*8 ct(3,maxstep),cv(3,maxstep)
-      real*8 cc(3,maxstep)
+      real*8, allocatable :: badep(:)
+      real*8, allocatable :: badem(:)
+      real*8, allocatable :: bdap(:)
+      real*8, allocatable :: bdam(:)
+      real*8, allocatable :: nrg(:,:)
+      real*8, allocatable :: cb(:,:)
+      real*8, allocatable :: ca(:,:)
+      real*8, allocatable :: cit(:,:)
+      real*8, allocatable :: ct(:,:)
+      real*8, allocatable :: cv(:,:)
+      real*8, allocatable :: cc(:,:)
       logical dogeom
       character*1 answer
       character*7 ext
@@ -113,7 +116,7 @@ c
    30 continue
       if (start .eq. 0)  start = 1
       if (stop .eq. 0)  stop = start
-      nrun  = stop - start + 1
+      nstep  = stop - start + 1
 c
 c     obtain the lambda values to be calculated
 c
@@ -145,7 +148,7 @@ c
       read (input,90)  nblock
    90 format (i10)
       if (nblock .eq. 0)  nblock = 1
-      nblock = nrun / nblock
+      nblock = nstep / nblock
 c
 c     decide whether to include the intramolecular energies
 c
@@ -168,6 +171,20 @@ c
   130    format (/,' Calculation will Consider Only Intermolecular',
      &              ' Interactions ')
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (badep(nblock))
+      allocate (badem(nblock))
+      allocate (bdap(nblock))
+      allocate (bdam(nblock))
+      allocate (nrg(3,nstep))
+      allocate (cb(3,nstep))
+      allocate (ca(3,nstep))
+      allocate (cit(3,nstep))
+      allocate (ct(3,nstep))
+      allocate (cv(3,nstep))
+      allocate (cc(3,nstep))
 c
 c     cycle over the coordinate files once per lambda value
 c
@@ -260,12 +277,12 @@ c
             etpos = ct(2,istep)
             etneg = ct(3,istep)
          end if
-         modrun = mod(istep-1,nrun)
+         modstep = mod(istep-1,nstep)
          modblock = mod(istep-1,nblock)
 c
 c     zero out summation variables for new running average
 c
-         if (modrun .eq. 0) then
+         if (modstep .eq. 0) then
             sdep = 0.0d0
             s2dep = 0.0d0
             sdep2 = 0.0d0
@@ -305,7 +322,7 @@ c
             bpos = 0.0d0
             bneg = 0.0d0
          end if
-         modrun = mod(istep,nrun)
+         modstep = mod(istep,nstep)
          modblock = mod(istep,nblock)
 c
 c     accumulate statistics
@@ -374,69 +391,69 @@ c
 c
 c     calculate running averages for potential energy
 c
-         if (modrun .eq. 0) then
-            adep = sdep / dble(nrun)
-            adem = sdem / dble(nrun)
-            a2dep = s2dep / dble(nrun)
-            a2dem = s2dem / dble(nrun)
+         if (modstep .eq. 0) then
+            adep = sdep / dble(nstep)
+            adem = sdem / dble(nstep)
+            a2dep = s2dep / dble(nstep)
+            a2dem = s2dem / dble(nstep)
             adep2 = adep * adep
             adem2 = adem * adem
             fdep =  sqrt(a2dep - adep2)
             fdem =  sqrt(a2dem - adem2)
-            do k = 1, nrun / nblock
+            do k = 1, nstep / nblock
                v = (badep(k) - adep)**2
                vdep = vdep + v
                v = (badem(k) - adem)**2
                vdem = vdem + v
             end do
-            vdep = vdep / dble(nrun/nblock)
-            se_ep = sqrt(vdep / dble(nrun/nblock))
-            vdem = vdem / dble(nrun/nblock)
-            se_em = sqrt(vdem / dble(nrun/nblock))
+            vdep = vdep / dble(nstep/nblock)
+            se_ep = sqrt(vdep / dble(nstep/nblock))
+            vdem = vdem / dble(nstep/nblock)
+            se_em = sqrt(vdem / dble(nstep/nblock))
 c
 c     calculate running averages for free energy
 c
-            da = spos / dble(nrun)
+            da = spos / dble(nstep)
             da = -rt * log (da)
             dap = da
-            da = sneg / dble(nrun)
+            da = sneg / dble(nstep)
             da = -rt * log (da)
             dam = da
-            adapb = sdapb / dble(nrun/nblock)
-            adamb = sdamb / dble(nrun/nblock)
-            do k = 1, nrun/nblock
+            adapb = sdapb / dble(nstep/nblock)
+            adamb = sdamb / dble(nstep/nblock)
+            do k = 1, nstep/nblock
                v = (bdap(k) - adapb)**2
                vdap = vdap + v
                v = (bdam(k) - adamb)**2
                vdam = vdam + v
             end do
-            vdap = vdap / dble(nrun/nblock)
-            se_ap = sqrt(vdap / dble(nrun/nblock))
-            vdam = vdam / dble(nrun/nblock)
-            se_am = sqrt(vdam / dble(nrun/nblock))
+            vdap = vdap / dble(nstep/nblock)
+            se_ap = sqrt(vdap / dble(nstep/nblock))
+            vdam = vdam / dble(nstep/nblock)
+            se_am = sqrt(vdam / dble(nstep/nblock))
 c
 c     calculate running averages for energy components
 c
-            avp = svp / dble(nrun)
-            avm = svm / dble(nrun)
-            acp = scp / dble(nrun)
-            acm = scm / dble(nrun)
+            avp = svp / dble(nstep)
+            avm = svm / dble(nstep)
+            acp = scp / dble(nstep)
+            acm = scm / dble(nstep)
             if (dogeom) then
-               abp = sbp / dble(nrun)
-               abm = sbm / dble(nrun)
-               aap = sap / dble(nrun)
-               aam = sam / dble(nrun)
-               aitp = sitp / dble(nrun)
-               aitm = sitm / dble(nrun)
-               atp = stp / dble(nrun)
-               atm = stm / dble(nrun)
+               abp = sbp / dble(nstep)
+               abm = sbm / dble(nstep)
+               aap = sap / dble(nstep)
+               aam = sam / dble(nstep)
+               aitp = sitp / dble(nstep)
+               aitm = sitm / dble(nstep)
+               atp = stp / dble(nstep)
+               atm = stm / dble(nstep)
             end if
             sdep = 0.0d0
             sdem = 0.0d0
 c
 c     write information about running averages and block averages
 c
-            write (iout,210)  nstep,nrun/nblock
+            write (iout,210)  nstep,nstep/nblock
   210       format (/,' Running Averages over',i5,' Steps',
      &                 ' with Std Error from',i4,' Blocks :')
             write (iout,220)
@@ -471,6 +488,20 @@ c
   340       format (' CHG   +/- :',f12.4,5x,f12.4)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (badep)
+      deallocate (badem)
+      deallocate (bdap)
+      deallocate (bdam)
+      deallocate (nrg)
+      deallocate (cb)
+      deallocate (ca)
+      deallocate (cit)
+      deallocate (ct)
+      deallocate (cv)
+      deallocate (cc)
 c
 c     perform any final tasks before program exit
 c

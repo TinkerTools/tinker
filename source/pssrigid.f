@@ -451,13 +451,6 @@ c
       integer ihess,nvar
       real*8 vnorm
       real*8 eigen(*)
-      real*8, allocatable :: a(:)
-      real*8, allocatable :: b(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: w(:)
-      real*8, allocatable :: ta(:)
-      real*8, allocatable :: tb(:)
-      real*8, allocatable :: ty(:)
       real*8, allocatable :: matrix(:)
       real*8 vects(6*ngrp,*)
       real*8, allocatable :: hrigid(:,:)
@@ -465,13 +458,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (a(6*ngrp))
-      allocate (b(6*ngrp))
-      allocate (p(6*ngrp))
-      allocate (w(6*ngrp))
-      allocate (ta(6*ngrp))
-      allocate (tb(6*ngrp))
-      allocate (ty(6*ngrp))
       allocate (matrix(6*ngrp*(6*ngrp+1)/2))
       allocate (hrigid(6*ngrp,6*ngrp))
 c
@@ -492,8 +478,7 @@ c
 c
 c     diagonalize the Hessian to obtain eigenvalues
 c
-      call diagq (nvar,maxrgd,nvar,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nvar,nvar,matrix,eigen,vects)
 c
 c     normalize the rigid body Hessian eigenvectors
 c
@@ -510,13 +495,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (a)
-      deallocate (b)
-      deallocate (p)
-      deallocate (w)
-      deallocate (ta)
-      deallocate (tb)
-      deallocate (ty)
       deallocate (matrix)
       deallocate (hrigid)
       return

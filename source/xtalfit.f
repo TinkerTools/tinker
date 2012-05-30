@@ -20,20 +20,21 @@ c
 c
       program xtalfit
       implicit none
-      integer maxlsq,maxrsd
-      parameter (maxlsq=50)
-      parameter (maxrsd=100)
       include 'sizes.i'
       include 'files.i'
       include 'iounit.i'
       include 'molcul.i'
       include 'potent.i'
       include 'xtals.i'
-      integer i,atom1,atom2
-      integer nresid,ixtal,prmtyp
-      real*8 grdmin,xx(maxlsq)
-      real*8 xhi(maxlsq),xlo(maxlsq)
-      real*8 f(maxrsd),g(maxlsq)
+      integer i,ixtal
+      integer atom1,atom2
+      integer nresid,prmtyp
+      real*8 grdmin
+      real*8 xx(maxlsq)
+      real*8 xhi(maxlsq)
+      real*8 xlo(maxlsq)
+      real*8 f(maxrsd)
+      real*8 g(maxlsq)
       real*8 jacobian(maxrsd,maxlsq)
       logical exist,query
       character*16 blank
@@ -323,10 +324,6 @@ c
 c
       subroutine xtalprm (mode,ixtal,xx)
       implicit none
-      integer maxxtal,maxlsq,maxrsd
-      parameter (maxxtal=10)
-      parameter (maxlsq=50)
-      parameter (maxrsd=100)
       include 'sizes.i'
       include 'atoms.i'
       include 'atmtyp.i'
@@ -339,6 +336,8 @@ c
       include 'molcul.i'
       include 'vdw.i'
       include 'xtals.i'
+      integer maxxtal
+      parameter (maxxtal=10)
       integer i,j,k
       integer ixtal,prmtyp
       integer atom1,atom2
@@ -358,7 +357,16 @@ c
       integer iions(maxatm,maxxtal)
       integer ndipoles(maxxtal)
       integer idpls(2,maxbnd,maxxtal)
-      real*8 xx(maxlsq)
+      real*8 xmid,ymid,zmid
+      real*8 xx(*)
+      real*8 e0_lattices(maxxtal)
+      real*8 xboxs(maxxtal)
+      real*8 yboxs(maxxtal)
+      real*8 zboxs(maxxtal)
+      real*8 alphas(maxxtal)
+      real*8 betas(maxxtal)
+      real*8 gammas(maxxtal)
+      real*8 moment_0s(maxxtal)
       real*8 xs(maxatm,maxxtal)
       real*8 ys(maxatm,maxxtal)
       real*8 zs(maxatm,maxxtal)
@@ -367,18 +375,9 @@ c
       real*8 bdpls(maxbnd,maxxtal)
       real*8 sdpls(maxbnd,maxxtal)
       real*8 kreds(maxatm,maxxtal)
-      real*8 e0_lattices(maxxtal)
-      real*8 moment_0s(maxxtal)
-      real*8 xmid,ymid,zmid
       real*8 xfracs(maxatm,maxxtal)
       real*8 yfracs(maxatm,maxxtal)
       real*8 zfracs(maxatm,maxxtal)
-      real*8 xboxs(maxxtal)
-      real*8 yboxs(maxxtal)
-      real*8 zboxs(maxxtal)
-      real*8 alphas(maxxtal)
-      real*8 betas(maxxtal)
-      real*8 gammas(maxxtal)
       character*3 names(maxatm,maxxtal)
       character*5 mode
       save ns,xs,ys,zs
@@ -680,9 +679,6 @@ c
 c
       subroutine xtalerr (nresid,nvaried,xx,resid)
       implicit none
-      integer maxlsq,maxrsd
-      parameter (maxlsq=50)
-      parameter (maxrsd=100)
       include 'sizes.i'
       include 'atoms.i'
       include 'boxes.i'
@@ -706,7 +702,8 @@ c
       real*8 e_alpha,e_beta,e_gamma
       real*8 g_xbox,g_ybox,g_zbox
       real*8 g_alpha,g_beta,g_gamma
-      real*8 xx(maxlsq),resid(maxrsd)
+      real*8 xx(*)
+      real*8 resid(*)
 c
 c
 c     zero out the number of residual functions
@@ -875,14 +872,20 @@ c
       integer init,stop
       real*8 weigh
       real*8 xmid,ymid,zmid
-      real*8 xoff(maxatm)
-      real*8 yoff(maxatm)
-      real*8 zoff(maxatm)
+      real*8, allocatable :: xoff(:)
+      real*8, allocatable :: yoff(:)
+      real*8, allocatable :: zoff(:)
 c
 c
 c     get values for fractional coordinate interconversion
 c
       call lattice
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xoff(n))
+      allocate (yoff(n))
+      allocate (zoff(n))
 c
 c     locate the center of mass of each molecule
 c
@@ -929,6 +932,12 @@ c
             z(k) = zoff(k) + zmid
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xoff)
+      deallocate (yoff)
+      deallocate (zoff)
       return
       end
 c
@@ -946,15 +955,13 @@ c
 c
       subroutine xtalwrt (niter,xx,gs,nresid,f)
       implicit none
-      integer maxlsq,maxrsd
-      parameter (maxlsq=50)
-      parameter (maxrsd=100)
       include 'iounit.i'
       include 'xtals.i'
-      integer i,niter,nresid
-      real*8 xx(maxlsq)
-      real*8 gs(maxlsq)
-      real*8 f(maxrsd)
+      integer i,niter
+      integer nresid
+      real*8 xx(*)
+      real*8 gs(*)
+      real*8 f(*)
 c
 c
 c     write the values of parameters and scaled derivatives

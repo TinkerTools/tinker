@@ -35,12 +35,11 @@ c
       real*8 xyyx,xyyy,xyyz
       real*8 xzyx,xzyy,xzyz
       real*8 q(4),d(4)
-      real*8 work1(4),work2(4)
-      real*8 rot(3,3)
-      real*8 c(4,4),v(4,4)
       real*8 x1(*),x2(*)
       real*8 y1(*),y2(*)
       real*8 z1(*),z2(*)
+      real*8 rot(3,3)
+      real*8 c(4,4),v(4,4)
 c
 c
 c     build the upper triangle of the quadratic form matrix
@@ -81,7 +80,7 @@ c
 c
 c     diagonalize the quadratic form matrix
 c
-      call jacobi (4,4,c,d,v,work1,work2)
+      call jacobi (4,c,d,v)
 c
 c     extract the desired quaternion
 c

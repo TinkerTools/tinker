@@ -169,8 +169,6 @@ c
       real*8, allocatable :: povlap(:)
       real*8, allocatable :: en(:)
       real*8, allocatable :: ip(:)
-      real*8, allocatable :: work1(:)
-      real*8, allocatable :: work2(:)
       real*8, allocatable :: fock(:,:)
       real*8, allocatable :: hc(:,:)
       real*8, allocatable :: v(:,:)
@@ -215,8 +213,6 @@ c
       allocate (povlap(nbpi))
       allocate (en(norbit))
       allocate (ip(norbit))
-      allocate (work1(norbit))
-      allocate (work2(norbit))
       allocate (fock(norbit,norbit))
       allocate (hc(norbit,norbit))
       allocate (v(norbit,norbit))
@@ -373,7 +369,7 @@ c
          delta = 2.0d0 * converge
          do while (delta.gt.converge .and. iter.lt.maxiter)
             iter = iter + 1
-            call jacobi (norbit,norbit,fock,en,v,work1,work2)
+            call jacobi (norbit,fock,en,v)
             do i = 1, norbit
                do j = i, norbit
                   s1 = 0.0d0
@@ -547,8 +543,6 @@ c
       deallocate (povlap)
       deallocate (en)
       deallocate (ip)
-      deallocate (work1)
-      deallocate (work2)
       deallocate (fock)
       deallocate (hc)
       deallocate (v)

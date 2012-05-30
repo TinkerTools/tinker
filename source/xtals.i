@@ -12,6 +12,9 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
+c     maxlsq       maximum number of least squares variables
+c     maxrsd       maximum number of least squares residuals
+c
 c     e0_lattice   ideal lattice energy for the current crystal
 c     moment_0     ideal dipole moment for monomer from crystal
 c     nxtal        number of crystal structures to be stored
@@ -23,6 +26,9 @@ c     rsdtyp       experimental variable for each of the residuals
 c     vartyp       type of potential parameter to be optimized
 c
 c
+      integer maxlsq,maxrsd
+      parameter (maxlsq=50)
+      parameter (maxrsd=100)
       integer nxtal,nvary,ivary
       integer vary,iresid
       real*8 e0_lattice,moment_0

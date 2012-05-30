@@ -48,13 +48,6 @@ c
       real*8, allocatable :: yref(:)
       real*8, allocatable :: zref(:)
       real*8, allocatable :: mass2(:)
-      real*8, allocatable :: a(:)
-      real*8, allocatable :: b(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: w(:)
-      real*8, allocatable :: ta(:)
-      real*8, allocatable :: tb(:)
-      real*8, allocatable :: ty(:)
       real*8, allocatable :: h(:)
       real*8, allocatable :: eigen(:)
       real*8, allocatable :: matrix(:)
@@ -123,20 +116,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (a(nfreq))
-      allocate (b(nfreq))
-      allocate (p(nfreq))
-      allocate (w(nfreq))
-      allocate (ta(nfreq))
-      allocate (tb(nfreq))
-      allocate (ty(nfreq))
       allocate (eigen(nfreq))
       allocate (vects(nfreq,nfreq))
 c
 c     perform diagonalization to get Hessian eigenvalues
 c
-      call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
-     &                    a,b,p,w,ta,tb,ty)
+      call diagq (nfreq,nfreq,matrix,eigen,vects)
       write (iout,10)
    10 format (/,' Eigenvalues of the Hessian Matrix :',/)
       write (iout,20)  (i,eigen(i),i=1,nvib)
@@ -163,8 +148,7 @@ c
 c
 c     diagonalize to get vibrational frequencies and normal modes
 c
-      call diagq (nfreq,nfreq,nfreq,matrix,eigen,vects,
-     &                    a,b,p,w,ta,tb,ty)
+      call diagq (nfreq,nfreq,matrix,eigen,vects)
       factor = sqrt(convert) / (2.0d0*pi*lightspd)
       do i = 1, nvib
          eigen(i) = factor * sign(1.0d0,eigen(i)) * sqrt(abs(eigen(i)))
@@ -180,13 +164,6 @@ c
       deallocate (hstop)
       deallocate (hdiag)
       deallocate (h)
-      deallocate (a)
-      deallocate (b)
-      deallocate (p)
-      deallocate (w)
-      deallocate (ta)
-      deallocate (tb)
-      deallocate (ty)
       deallocate (matrix)
 c
 c     form Cartesian coordinate displacements from normal modes

@@ -122,7 +122,6 @@ c
       real*8 xx,xy,xz,yy,yz,zz
       real*8 xterm,yterm,zterm
       real*8 moment(3),vec(3,3)
-      real*8 work1(3),work2(3)
       real*8 tensor(3,3),a(3,3)
 c
 c
@@ -182,7 +181,7 @@ c
          tensor(1,3) = -xz
          tensor(2,3) = -yz
          tensor(3,3) = xx + yy
-         call jacobi (3,3,tensor,moment,vec,work1,work2)
+         call jacobi (3,tensor,moment,vec)
 c
 c     select the direction for each principle moment axis
 c

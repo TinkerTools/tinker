@@ -31,8 +31,8 @@ c
       integer i
       real*8 addu,malpha
       real*8 exfield(3)
-      real*8 umol(3),dalpha(3)
-      real*8 work1(3),work2(3)
+      real*8 umol(3)
+      real*8 dalpha(3)
       real*8 alpha(3,3)
       real*8 valpha(3,3)
 c
@@ -108,7 +108,7 @@ c
 c
 c     diagonalize the tensor and get molecular polarizability
 c
-      call jacobi (3,3,alpha,dalpha,valpha,work1,work2)
+      call jacobi (3,alpha,dalpha,valpha)
       write (iout,70)
    70 format (/,' Polarizability Tensor Eigenvalues :',/)
       write (iout,80)  dalpha(1),dalpha(2),dalpha(3)

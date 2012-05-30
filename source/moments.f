@@ -37,7 +37,6 @@ c
       real*8 xi,yi,zi,ri
       real*8 xmid,ymid,zmid
       real*8 xbnd,ybnd,zbnd
-      real*8 work1(3),work2(3)
       real*8, allocatable :: xcm(:)
       real*8, allocatable :: ycm(:)
       real*8, allocatable :: zcm(:)
@@ -260,7 +259,7 @@ c
       a(3,1) = zxqdp
       a(3,2) = zyqdp
       a(3,3) = zzqdp
-      call jacobi (3,3,a,netqdp,b,work1,work2)
+      call jacobi (3,a,netqdp,b)
       return
       end
 c

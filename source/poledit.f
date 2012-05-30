@@ -497,8 +497,12 @@ c
       real*8 xr,yr,zr
       real*8 ri,rij,dij
       real*8 sixth
-      real*8 rad(maxatm)
+      real*8, allocatable :: rad(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (rad(n))
 c
 c     set base atomic radii from covalent radius values
 c
@@ -552,6 +556,10 @@ c
       do i = 1, n
          call sort (n12(i),i12(1,i))
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (rad)
 c
 c     assign unique atom types and set the valence values
 c
@@ -981,7 +989,7 @@ c     rotate the multipoles from global frame to local frame
 c
       do i = 1, npole
          call rotmat (i,a)
-         call invert (3,3,a)
+         call invert (3,a)
          call rotsite (i,a)
       end do
 c
@@ -1178,7 +1186,7 @@ c     rotate the multipoles from global frame to local frame
 c
       do i = 1, npole
          call rotmat (i,a)
-         call invert (3,3,a)
+         call invert (3,a)
          call rotsite (i,a)
       end do
 c
@@ -1506,7 +1514,7 @@ c     rotate the multipoles from global frame to local frame
 c
       do i = 1, npole
          call rotmat (i,a)
-         call invert (3,3,a)
+         call invert (3,a)
          call rotsite (i,a)
       end do
 c
@@ -1612,12 +1620,19 @@ c
       real*8 scale3,scale5
       real*8 scale7
       real*8 fi(3),fk(3)
-      real*8 field(3,maxatm)
-      real*8 udir(3,maxatm)
-      real*8 uold(3,maxatm)
-      real*8 pscale(maxatm)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: uold(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pscale(n))
+      allocate (field(3,npole))
+      allocate (udir(3,npole))
+      allocate (uold(3,npole))
 c
 c     zero out the induced dipole and the field at each site
 c
@@ -1845,6 +1860,13 @@ c
          if (eps .gt. epsold)  done = .true.
          if (iter .ge. maxiter)  done = .true.
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pscale)
+      deallocate (field)
+      deallocate (udir)
+      deallocate (uold)
 c
 c     terminate the calculation if dipoles failed to converge
 c

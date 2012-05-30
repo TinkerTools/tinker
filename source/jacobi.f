@@ -17,8 +17,7 @@ c     symmetric matrix by the method of Jacobi rotations
 c
 c     variables and parameters:
 c
-c     n     logical dimension of the matrix to be diagonalized
-c     np    physical dimension of the matrix storage area
+c     n     dimension of the matrix to be diagonalized
 c     a     input with the matrix to be diagonalized; only
 c              the upper triangle and diagonal are required
 c     d     returned with the eigenvalues in ascending order
@@ -27,18 +26,25 @@ c     b     temporary work vector
 c     z     temporary work vector
 c
 c
-      subroutine jacobi (n,np,a,d,v,b,z)
+      subroutine jacobi (n,a,d,v)
       implicit none
       include 'iounit.i'
       integer i,j,k
-      integer n,np,ip,iq
+      integer n,ip,iq
       integer nrot,maxrot
       real*8 sm,tresh,s,c,t
       real*8 theta,tau,h,g,p
-      real*8 d(*),b(*),z(*)
-      real*8 a(np,*)
-      real*8 v(np,*)
+      real*8 d(*)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: z(:)
+      real*8 a(n,*)
+      real*8 v(n,*)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (b(n))
+      allocate (z(n))
 c
 c     setup and initialization
 c
@@ -129,6 +135,11 @@ c
             z(ip) = 0.0d0
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (b)
+      deallocate (z)
 c
 c     print warning if not converged
 c

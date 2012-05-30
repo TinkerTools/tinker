@@ -18,14 +18,13 @@ c     several modifications to increase the efficiency and accuracy
 c
 c     variables and parameters:
 c
-c     n         logical dimension of the matrix to be diagonalized
-c     np        physical dimension of the eigenvector storage area
+c     n         dimension of the matrix to be diagonalized
 c     nv        number of eigenvalues and eigenvectors desired
 c     dd        upper triangle of the matrix to be diagonalized
 c     ev        returned with the eigenvalues in ascending order
 c     vec       returned with the eigenvectors of the matrix
-c     a,b,p,w   some temporary work vectors of logical dimension
-c     ta,tb,y   more temporary work vectors of logical dimension
+c     a,b,p,w   local vectors containing temporary work space
+c     ta,tb,y   local vectors containing temporary work space
 c
 c     literature reference:
 c
@@ -33,7 +32,7 @@ c     adapted from an original program written by Bernie Brooks,
 c     National Institutes of Health, Bethesda, MD
 c
 c
-      subroutine diagq (n,np,nv,dd,ev,vec,a,b,p,w,ta,tb,y)
+      subroutine diagq (n,nv,dd,ev,vec)
       implicit none
       integer i,j,k,m,n
       integer ia,ii,ji
@@ -54,12 +53,16 @@ c
       real*8 s,sgn,sum1
       real*8 t,term,temp
       real*8 trial,xnorm
-      real*8 ev(*),dd(*)
-      real*8 a(*),b(*)
-      real*8 p(*),w(*)
-      real*8 ta(*),tb(*)
-      real*8 y(*)
-      real*8 vec(np,*)
+      real*8 dd(*)
+      real*8 ev(*)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: w(:)
+      real*8, allocatable :: ta(:)
+      real*8, allocatable :: tb(:)
+      real*8, allocatable :: y(:)
+      real*8 vec(n,*)
       logical done
 c
 c
@@ -77,6 +80,16 @@ c
       rpower = 8388608.0d0
       rpow1 = 0.5d0 * rpower
       rand1 = rpower - 3.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (a(n))
+      allocate (b(n))
+      allocate (p(n))
+      allocate (w(n))
+      allocate (ta(n))
+      allocate (tb(n))
+      allocate (y(n))
 c
 c     get norm of the input matrix and scale
 c
@@ -379,5 +392,15 @@ c
       do i = 1, n
          ev(i) = ev(i) * anorm
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (a)
+      deallocate (b)
+      deallocate (p)
+      deallocate (w)
+      deallocate (ta)
+      deallocate (tb)
+      deallocate (y)
       return
       end

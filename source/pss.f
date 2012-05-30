@@ -649,13 +649,6 @@ c
       integer, allocatable :: hinit(:,:)
       integer, allocatable :: hstop(:,:)
       real*8 eigen(*)
-      real*8, allocatable :: a(:)
-      real*8, allocatable :: b(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: w(:)
-      real*8, allocatable :: ta(:)
-      real*8, allocatable :: tb(:)
-      real*8, allocatable :: ty(:)
       real*8, allocatable :: matrix(:)
       real*8, allocatable :: h(:)
       real*8 vects(3*n,*)
@@ -668,13 +661,6 @@ c
       allocate (hindex((nfreq*(nfreq-1))/2))
       allocate (hinit(3,n))
       allocate (hstop(3,n))
-      allocate (a(nfreq))
-      allocate (b(nfreq))
-      allocate (p(nfreq))
-      allocate (w(nfreq))
-      allocate (ta(nfreq))
-      allocate (tb(nfreq))
-      allocate (ty(nfreq))
       allocate (matrix((nfreq*(nfreq+1))/2))
       allocate (h((nfreq*(nfreq-1))/2))
       allocate (hdiag(3,n))
@@ -700,21 +686,13 @@ c
 c
 c     diagonalize the Hessian to obtain eigenvalues
 c
-      call diagq (nfreq,maxvib,nfreq,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nfreq,nfreq,matrix,eigen,vects)
 c
 c     perform deallocation of some local arrays
 c
       deallocate (hindex)
       deallocate (hinit)
       deallocate (hstop)
-      deallocate (a)
-      deallocate (b)
-      deallocate (p)
-      deallocate (w)
-      deallocate (ta)
-      deallocate (tb)
-      deallocate (ty)
       deallocate (matrix)
       deallocate (h)
       deallocate (hdiag)
@@ -736,13 +714,6 @@ c
       include 'omega.i'
       integer i,j,ihess
       real*8 eigen(*)
-      real*8, allocatable :: a(:)
-      real*8, allocatable :: b(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: w(:)
-      real*8, allocatable :: ta(:)
-      real*8, allocatable :: tb(:)
-      real*8, allocatable :: ty(:)
       real*8, allocatable :: matrix(:)
       real*8 vects(nomega,*)
       real*8, allocatable :: hrot(:,:)
@@ -750,13 +721,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (a(nomega))
-      allocate (b(nomega))
-      allocate (p(nomega))
-      allocate (w(nomega))
-      allocate (ta(nomega))
-      allocate (tb(nomega))
-      allocate (ty(nomega))
       allocate (matrix(nomega*(nomega+1)/2))
       allocate (hrot(nomega,nomega))
 c
@@ -776,18 +740,10 @@ c
 c
 c     diagonalize the Hessian to obtain eigenvalues
 c
-      call diagq (nomega,maxrot,nomega,matrix,eigen,vects,
-     &                     a,b,p,w,ta,tb,ty)
+      call diagq (nomega,nomega,matrix,eigen,vects)
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (a)
-      deallocate (b)
-      deallocate (p)
-      deallocate (w)
-      deallocate (ta)
-      deallocate (tb)
-      deallocate (ty)
       deallocate (matrix)
       deallocate (hrot)
       return
