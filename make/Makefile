@@ -1125,7 +1125,7 @@ control.o: argue.i inform.i keys.i output.i sizes.i
 correlate.o: ascii.i atmtyp.i atoms.i files.i inform.i iounit.i sizes.i
 crystal.o: atmtyp.i atoms.i bound.i boxes.i couple.i files.i iounit.i math.i molcul.i sizes.i
 cspline.o: iounit.i
-cutoffs.o: bound.i cutoff.i hescut.i keys.i neigh.i sizes.i
+cutoffs.o: atoms.i bound.i cutoff.i hescut.i keys.i neigh.i sizes.i
 deflate.o: iounit.i
 delete.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
 diagq.o:
@@ -1250,12 +1250,12 @@ fatal.o: iounit.i
 fft3d.o: fft.i openmp.i pme.i sizes.i
 fftpack.o: math.i
 field.o: keys.i potent.i sizes.i
-final.o: chunks.i inform.i iounit.i pme.i sizes.i socket.i solute.i uprior.i usage.i vibs.i
+final.o: chunks.i inform.i iounit.i neigh.i pme.i sizes.i socket.i solute.i uprior.i usage.i vibs.i
 flatten.o: atoms.i fields.i inform.i iounit.i keys.i sizes.i warp.i
 freeunit.o: iounit.i
 gda.o: atoms.i files.i iounit.i minima.i potent.i sizes.i vdwpot.i warp.i
 geometry.o: atoms.i math.i sizes.i
-getint.o: inform.i iounit.i output.i
+getint.o: atoms.i inform.i iounit.i output.i sizes.i
 getkey.o: argue.i files.i iounit.i keys.i openmp.i sizes.i
 getmol2.o: files.i iounit.i
 getnumb.o: ascii.i
@@ -1276,7 +1276,7 @@ gyrate.o: atoms.i sizes.i usage.i
 hessian.o: atoms.i bound.i couple.i cutoff.i hescut.i hessn.i inform.i iounit.i mpole.i potent.i rigid.i sizes.i usage.i vdw.i vdwpot.i
 hessrgd.o: atoms.i group.i rigid.i sizes.i
 hessrot.o: math.i omega.i sizes.i zcoord.i
-hybrid.o: angle.i atmlst.i atmtyp.i atoms.i bond.i charge.i couple.i dipole.i imptor.i inform.i iounit.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i kitors.i kpolr.i kstbnd.i ksttor.i ktorsn.i kvdws.i math.i mpole.i mutant.i polar.i sizes.i strbnd.i strtor.i tors.i vdw.i vdwpot.i
+hybrid.o: angle.i atmlst.i atmtyp.i atoms.i bond.i charge.i couple.i dipole.i imptor.i inform.i iounit.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i kitors.i kstbnd.i ksttor.i ktorsn.i kvdws.i math.i mutant.i sizes.i strbnd.i strtor.i tors.i vdw.i vdwpot.i
 image.o: boxes.i cell.i sizes.i
 impose.o: align.i inform.i iounit.i sizes.i
 induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i uprior.i
@@ -1335,8 +1335,8 @@ minrigid.o: files.i group.i inform.i iounit.i keys.i math.i output.i rigid.i siz
 molecule.o: atmtyp.i atoms.i couple.i molcul.i sizes.i
 moments.o: atmtyp.i atoms.i charge.i dipole.i moment.i mpole.i polar.i potent.i sizes.i solute.i units.i usage.i
 monte.o: atoms.i files.i inform.i iounit.i omega.i output.i sizes.i units.i usage.i zcoord.i
-mutate.o: atmtyp.i atoms.i iounit.i katoms.i keys.i mutant.i sizes.i
-nblist.o: atoms.i bound.i boxes.i charge.i cutoff.i iounit.i light.i mpole.i neigh.i potent.i sizes.i vdw.i
+mutate.o: atoms.i charge.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
+nblist.o: atoms.i bound.i boxes.i cell.i charge.i cutoff.i iounit.i light.i mpole.i neigh.i potent.i sizes.i vdw.i
 newton.o: atoms.i files.i inform.i iounit.i keys.i sizes.i usage.i
 newtrot.o: files.i hescut.i inform.i iounit.i keys.i math.i omega.i sizes.i zcoord.i
 nextarg.o: argue.i
@@ -1427,7 +1427,7 @@ testhess.o: atoms.i files.i hescut.i inform.i iounit.i sizes.i usage.i
 testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i
 testrot.o: domega.i energi.i inform.i iounit.i math.i omega.i sizes.i zcoord.i
 timer.o: atoms.i cutoff.i hescut.i inform.i iounit.i sizes.i
-timerot.o: cutoff.i iounit.i sizes.i
+timerot.o: cutoff.i iounit.i omega.i sizes.i
 tncg.o: hescut.i inform.i iounit.i keys.i linmin.i math.i minima.i output.i piorbs.i potent.i sizes.i
 torphase.o:
 torque.o: atoms.i deriv.i mpole.i sizes.i
@@ -1445,7 +1445,7 @@ volume.o: atoms.i iounit.i math.i sizes.i
 xtalfit.o: atmtyp.i atoms.i bound.i boxes.i charge.i couple.i dipole.i files.i fracs.i iounit.i kvdws.i math.i molcul.i potent.i sizes.i vdw.i xtals.i
 xtalmin.o: atoms.i boxes.i files.i inform.i iounit.i keys.i math.i scales.i sizes.i
 xyzatm.o: atoms.i inform.i iounit.i math.i sizes.i
-xyzedit.o: atmtyp.i atoms.i bound.i couple.i cutoff.i files.i iounit.i math.i molcul.i refer.i sizes.i titles.i units.i usage.i
+xyzedit.o: atmtyp.i atoms.i bound.i boxes.i couple.i cutoff.i files.i iounit.i math.i molcul.i refer.i sizes.i titles.i units.i usage.i
 xyzint.o: files.i iounit.i titles.i
 xyzpdb.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i molcul.i pdb.i resdue.i sequen.i sizes.i
 xyzsybyl.o: files.i iounit.i sizes.i titles.i

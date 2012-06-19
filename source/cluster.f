@@ -61,7 +61,8 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (list(n))
+      size = max(20,n)
+      allocate (list(size))
 c
 c     get any keywords containing atom group definitions
 c
@@ -169,7 +170,8 @@ c     sort the list of atoms in each group by atom number
 c
          do i = 0, ngrp
             size = igrp(2,i) - igrp(1,i) + 1
-            call sort (size,kgrp(igrp(1,i)))
+            if (igrp(1,i) .ne. 0)
+     &         call sort (size,kgrp(igrp(1,i)))
          end do
       end if
 c

@@ -272,7 +272,7 @@ c
       integer ic(maxval)
       integer iz0(0:*)
       integer iz1(*)
-      real*8 dist,short
+      real*8 dist2,short
       logical more
 c
 c
@@ -305,13 +305,13 @@ c
    10       format (/,' ADJACENT  --  Atom',i6,' not Attached',
      &                 ' to any Prior Atom')
          else
-            short = 1000000.0d0
+            short = 100000000.0d0
             do i = 1, n
                if (iz0(i).ne.0 .and. i.ne.i1 .and. i.ne.i2) then
-                  dist = sqrt((x(i)-x(i1))**2 + (y(i)-y(i1))**2
-     &                              + (z(i)-z(i1))**2)
-                  if (dist .lt. short) then
-                     short = dist
+                  dist2 = (x(i)-x(i1))**2 + (y(i)-y(i1))**2
+     &                           + (z(i)-z(i1))**2
+                  if (dist2 .lt. short) then
+                     short = dist2
                      adjacent = i
                   end if
                end if

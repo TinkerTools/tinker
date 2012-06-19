@@ -79,5 +79,5 @@ charge        2               0.1800
 
 biotype       8    CA      "Alanine"                         1
 biotype      13    CB      "Alanine"                         2
-biotype     423    CA      "N-Terminal ALA"                  1
-biotype     604    CA      "C-Terminal ALA"                  1
+biotype     410    CA      "N-Terminal ALA"                  1
+biotype     591    CA      "C-Terminal ALA"                  1

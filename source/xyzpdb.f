@@ -257,7 +257,9 @@ c
       do i = 1, n
          if (restyp(m) .eq. 'PEPTIDE') then
             resname = amino(seqtyp(m))
-            if (resname .eq. 'FOR') then
+            if (resname .eq. 'H2N') then
+               m = m + 1
+            else if (resname .eq. 'FOR') then
                if (atomic(i) .eq. 6) then
                   nbone = .false.
                   obone = .false.
@@ -293,6 +295,29 @@ c
                      ci(m) = i + 1
                      oi(m) = i + 2
                      m = m + 1
+                  end if
+               end if
+            else if (resname .eq. 'COH') then
+               if (n12(i) .gt. 1) then
+                  if (atomic(i) .eq. 8) then
+                     nbone = .false.
+                     obone = .false.
+                     do j = 1, n13(i)
+                        k = i13(j,i)
+                        if (atomic(k) .eq. 8) then
+                           obone = .true.
+                        end if
+                     end do
+                     do j = 1, n14(i)
+                        k = i14(j,i)
+                        if (atomic(k) .eq. 7) then
+                           nbone = .true.
+                        end if
+                     end do
+                     if (nbone .and. obone) then
+                        ni(m) = i
+                        m = m + 1
+                     end if
                   end if
                end if
             else if (resname .eq. 'NH2') then
@@ -477,13 +502,17 @@ c
          if (chntyp(m) .eq. 'PEPTIDE') then
             do i = start, stop
                resname = amino(seqtyp(i))
-               if (resname .eq. 'FOR') then
+               if (resname .eq. 'H2N') then
+                  continue
+               else if (resname .eq. 'FOR') then
                   call pdbatm (' C  ',resname,i,ci(i))
                   call pdbatm (' O  ',resname,i,oi(i))
                else if (resname .eq. 'ACE') then
                   call pdbatm (' CH3',resname,i,cai(i))
                   call pdbatm (' C  ',resname,i,ci(i))
                   call pdbatm (' O  ',resname,i,oi(i))
+               else if (resname .eq. 'COH') then
+                  call pdbatm (' OH ',resname,i,ni(i))
                else if (resname .eq. 'NH2') then
                   call pdbatm (' N  ',resname,i,ni(i))
                else if (resname .eq. 'NME') then
@@ -703,13 +732,13 @@ c
       character*3 resname
 c
 c
-c     if residue is glycine or a cap, there is no side chain
+c     if residue is a terminal cap, there is no side chain
 c
       cbi = 0
-      if (resname .eq. 'GLY')  return
-      if (resname .eq. 'UNK')  return
+      if (resname .eq. 'H2N')  return
       if (resname .eq. 'FOR')  return
       if (resname .eq. 'ACE')  return
+      if (resname .eq. 'COH')  return
       if (resname .eq. 'NH2')  return
       if (resname .eq. 'NME')  return
 c
@@ -1006,7 +1035,9 @@ c
          if (resname .ne. 'PRO') then
             do i = 1, n
                if (atomic(i).eq.1 .and. i12(1,i).eq.ni) then
-                  if (resname .eq. 'NH2') then
+                  if (resname .eq. 'COH') then
+                     call pdbatm (' HO ',resname,ires,i)
+                  else if (resname .eq. 'NH2') then
                      call pdbatm (' H1 ',resname,ires,i)
                      call pdbatm (' H2 ',resname,ires,i+1)
                   else
@@ -1549,6 +1580,16 @@ c
             call pdbatm (' HA3',resname,ires,hca+1)
          end if
 c
+c     N-terminal deprotonated residue  (H2N)
+c
+      else if (resname .eq. 'H2N') then
+         continue
+c
+c     N-terminal formyl residue  (FOR)
+c
+      else if (resname .eq. 'FOR') then
+         continue
+c
 c     N-terminal acetyl residue  (ACE)
 c
       else if (resname .eq. 'ACE') then
@@ -1557,9 +1598,14 @@ c
             call pdbatm (' H3 ',resname,ires,hca+2)
          end if
 c
-c     N-terminal formyl residue  (FOR)
+c     C-terminal protonated residue (COH)
 c
-      else if (resname .eq. 'FOR') then
+      else if (resname .eq. 'COH') then
+         continue
+c
+c     C-terminal amide residue  (NH2)
+c
+      else if (resname .eq. 'NH2') then
          continue
 c
 c     C-terminal N-methylamide residue  (NME)
@@ -1569,11 +1615,6 @@ c
             call pdbatm (' H2 ',resname,ires,hca+1)
             call pdbatm (' H3 ',resname,ires,hca+2)
          end if
-c
-c     C-terminal amide residue  (NH2)
-c
-      else if (resname .eq. 'NH2') then
-         continue
       end if
       return
       end

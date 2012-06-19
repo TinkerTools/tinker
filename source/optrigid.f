@@ -243,10 +243,6 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (derivs(6,ngrp))
-c
 c     translate optimization parameters to rigid body coordinates
 c
       nvar = 0
@@ -256,6 +252,10 @@ c
             rbc(j,i) = xx(nvar)
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(6,ngrp))
 c
 c     compute and store the energy and gradient
 c

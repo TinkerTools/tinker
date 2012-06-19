@@ -86,8 +86,16 @@ c
    10    format (/,' Enter Potential Parameter File Name :  ',$)
          read (input,20)  prmfile
    20    format (a120)
-         call suffix (prmfile,'prm','old')
-         inquire (file=prmfile,exist=exist)
+         next = 1
+         call getword (prmfile,none,next)
+         call upcase (none)
+         if (none.eq.'NONE' .and. next.eq.5) then
+            exist = .true.
+            useprm = .false.
+         else
+            call suffix (prmfile,'prm','old')
+            inquire (file=prmfile,exist=exist)
+         end if
       end do
 c
 c     initialize force field control and parameter values

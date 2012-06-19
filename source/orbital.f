@@ -29,7 +29,7 @@ c
       include 'potent.i'
       include 'tors.i'
       integer i,j,k,m,ii
-      integer ib,ic,mi,mj,mk
+      integer mi,mj,mk
       integer iorb,jorb,korb
       integer nlist,next
       integer, allocatable :: list(:)

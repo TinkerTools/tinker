@@ -14,7 +14,7 @@ c
 c
 c     "diagq" is a matrix diagonalization routine which is derived
 c     from the classical given, housec, and eigen algorithms with
-c     several modifications to increase the efficiency and accuracy
+c     several modifications to increase efficiency and accuracy
 c
 c     variables and parameters:
 c
@@ -37,8 +37,8 @@ c
       integer i,j,k,m,n
       integer ia,ii,ji
       integer mi,mj,mk
-      integer nn,np,nv
-      integer nom,nomtch,ntot
+      integer nn,nv,ntot
+      integer nom,nomtch
       integer ipt,iter,j1
       integer mi1,mj1,mk1
       real*8 alimit,anorm
@@ -281,14 +281,13 @@ c
             done = .false.
             do while (.not. done)
                done = .true.
-               if (n-m-1 .lt. 0) then
+               k = n - m - 1
+               if (k .lt. 0) then
                   elim1 = y(m)
+               else if (k .eq. 0) then
+                  elim1 = y(m) - y(m+1)*tb(m)
                else
-                  if (n-m-1 .eq. 0) then
-                     elim1 = y(m) - y(m+1)*tb(m)
-                  else
-                     elim1 = y(m) - y(m+1)*tb(m) - y(m+2)*p(m)
-                  end if
+                  elim1 = y(m) - y(m+1)*tb(m) - y(m+2)*p(m)
                end if
                if (abs(elim1) .le. sigma) then
                   temp = ta(m)

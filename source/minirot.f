@@ -221,16 +221,16 @@ c
       real*8, allocatable :: derivs(:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (derivs(nomega))
-c
 c     translate optimization variables into dihedrals
 c
       do i = 1, nomega
          dihed(i) = xx(i) / scale(i)
          ztors(zline(i)) = dihed(i) * radian
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(nomega))
 c
 c     get coordinates, then compute energy and gradient
 c

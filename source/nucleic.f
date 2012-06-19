@@ -42,7 +42,7 @@ c
       call nextarg (filename,exist)
       if (.not. exist) then
          write (iout,10)
-   10    format (/,' Enter Name to be used for Output Files :  ',$)
+   10    format (/,' Enter Name to be Used for Output Files :  ',$)
          read (input,20)  filename
    20    format (a120)
       end if
@@ -141,7 +141,7 @@ c
       integer start,stop
       integer length,trimtext
       logical done
-      logical purine(maxres)
+      logical, allocatable :: purine(:)
       character*1 answer
       character*1 ucase(26)
       character*3 name,resname
@@ -174,7 +174,7 @@ c
      &        /,' followed by Backbone Torsions (6F) and',
      &           ' Glycosidic Torsion (1F)',
      &        //,' Use Residue=MOL to Begin a New Strand,',
-     &           ' Residue=<CR> to End Entry')
+     &           ' Residue=<CR> to End Input')
 c
 c     initially, assume that only a single strand is present
 c
@@ -199,7 +199,7 @@ c
    50    format (a120)
          call upcase (record)
          next = 1
-         call getword (record,name,next)
+         call gettext (record,name,next)
          length = trimtext (name)
          string = record(next:120)
          read (string,*,err=60,end=60)  (bkbone(j,i),j=1,6),glyco(i)
@@ -340,6 +340,10 @@ c
          end do
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (purine(nseq))
+c
 c     set the nucleic acid base and sugar structural type
 c
       do i = 1, nseq
@@ -407,6 +411,10 @@ c
             end if
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (purine)
       return
       end
 c
@@ -1024,14 +1032,16 @@ c
       include 'sequen.i'
       include 'usage.i'
       integer i,j,nvar
-      integer ia,ib,kseq,nbase
-      integer start,stop,offset
-      integer nphos,iphos(maxres)
-      integer root(maxres)
-      integer list(2,maxres)
+      integer ia,ib,ic,id
+      integer start,stop
+      integer kseq,offset
+      integer nbase,nphos
+      integer, allocatable :: iphos(:)
+      integer, allocatable :: root(:)
+      integer, allocatable :: list(:,:)
       real*8 minimum,grdmin
-      real*8 watson1,dist
-      real*8 xx(maxopt)
+      real*8 watson1,sum,dist
+      real*8, allocatable :: xx(:)
       character*3 resname
       external watson1,optsave
 c
@@ -1065,6 +1075,12 @@ c
       use_basin = .false.
       use_wall = .false.
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iphos(nseq+10))
+      allocate (root(nseq))
+      allocate (list(2,nseq))
+c
 c     find root atom and hydrogen bond partners for each base
 c
       kseq = 0
@@ -1072,8 +1088,11 @@ c
       do i = 1, n
          if (atmnum(type(i)).eq.6 .and. n12(i).eq.4) then
             ia = atmnum(type(i12(1,i)))
-            ib = atmnum(type(i12(4,i)))
-            if (ia.eq.8 .and. ib.eq.7) then
+            ib = atmnum(type(i12(2,i)))
+            ic = atmnum(type(i12(3,i)))
+            id = atmnum(type(i12(4,i)))
+            sum = ia + ib + ic + id
+            if (sum .eq. 22) then
                nbase = nbase + 1
                j = i12(4,i)
                root(nbase) = j
@@ -1192,6 +1211,12 @@ c
          dfix(3,ndfix) = dist
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (iphos)
+      deallocate (root)
+      deallocate (list)
+c
 c     assign each strand to a separate molecule-based group
 c
       use_group = .true.
@@ -1214,6 +1239,10 @@ c
 c     get rigid body reference coordinates for each strand
 c
       call orient
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(6*ngrp))
 c
 c     transfer rigid body coordinates to optimization parameters
 c
@@ -1243,6 +1272,10 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
 c     convert from rigid body to Cartesian coordinates
 c
       call rigidxyz
@@ -1270,9 +1303,9 @@ c
       include 'rigid.i'
       integer i,j,nvar
       real*8 watson1,e
-      real*8 xx(maxopt)
-      real*8 g(maxopt)
-      real*8 derivs(6,maxgrp)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to rigid body coordinates
@@ -1284,6 +1317,10 @@ c
             rbc(j,i) = xx(nvar)
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(6,ngrp))
 c
 c     compute and store the energy and gradient
 c
@@ -1300,5 +1337,9 @@ c
             g(nvar) = derivs(j,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

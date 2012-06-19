@@ -124,7 +124,6 @@ c
       include 'polar.i'
       include 'potent.i'
       integer i,j,k
-      integer ii,jj,kk
 c
 c
 c     set electrostatic parameters for partial charge models

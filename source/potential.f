@@ -483,7 +483,7 @@ c     output grid points at which to compute QM potential
 c
       if (dogrid) then
          igrd = freeunit ()
-         gridfile = filename
+         gridfile = filename(1:leng)
          call suffix (gridfile,'grid','new')
          open (unit=igrd,file=gridfile,status='new')
          do j = 1, nconf

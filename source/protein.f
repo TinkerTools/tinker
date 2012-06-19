@@ -41,7 +41,7 @@ c
       call nextarg (filename,exist)
       if (.not. exist) then
          write (iout,10)
-   10    format (/,' Enter Name to be used for Output Files :  ',$)
+   10    format (/,' Enter Name to be Used for Output Files :  ',$)
          read (input,20)  filename
    20    format (a120)
       end if
@@ -149,8 +149,8 @@ c
       integer i,j,next
       integer length,trimtext
       logical done
+      character*1 chir
       character*1 ucase(26)
-      character*1 chir(maxres)
       character*3 name
       character*120 record
       character*120 string
@@ -162,17 +162,28 @@ c
 c     provide a header to explain the method of sequence input
 c
       write (iout,10)
-   10 format (/,' Enter One Residue per Line, Free Format: ',
-     &           ' 1 or 3 Letter Code, then',
-     &        /,' Phi/Psi/Omega (3F), Chi Angles (4F), then',
-     &           ' Disulfide Partner if a',
-     &        /,' CYS (I), and D/L Chirality as desired (A1)',
-     &        //,' The allowed N-Cap Residues are Acetyl=ACE or',
-     &           ' Formyl=FOR, and the',
-     &        /,' possible C-Cap Residues are N-MethylAmide=NME',
-     &           ' or Amide=NH2',
-     &        //,' Use Residue=MOL to Begin a New Strand,',
-     &           ' Residue=<CR> to End Entry')
+   10 format (/,' Enter One Residue Name per Line as the Standard',
+     &           ' Three-Letter Code, then',
+     &        /,' Phi Psi Omega (3F), Chi Angles (4F), then',
+     &           ' Disulfide Partner if CYX (I),',
+     &        /,' and D/L Chirality as Desired (A1)',
+     &        //,' If Only Residue Names are Entered, the Default',
+     &           ' is to Build an Extended',
+     &        /,' Conformation Using D-Amino Acids and Zwitterionic',
+     &           ' Termini',
+     &        //,' Regular Amino Acids:  GLY, ALA, VAL, LEU,',
+     &           ' ILE, SER, THR, CYS, CYX, PRO,',
+     &        /,' PHE, TYR, TRP, HIS, ASP, ASN, GLU, GLN, MET,',
+     &           ' LYS, ARG, ORN, AIB',
+     &        //,' Alternative Protonation States:  CYD, TYD,',
+     &           ' HID, HIE, ASH, GLH, LYD',
+     &        //,' N-Terminal Cap Residues:  H2N=Deprotonated,',
+     &           ' FOR=Formyl, ACE=Acetyl,',
+     &        /,27x,'PCA=Pyroglutamic Acid',
+     &        /,' C-Terminal Cap Residues:  COH=Protonated,',
+     &           ' NH2=Amide, NME=N-MethylAmide',
+     &        //,' Use Residue Name=MOL to Start a New Chain,',
+     &           ' and Use <CR> to End Input')
 c
 c     initially, assume that only a single strand is present
 c
@@ -192,21 +203,22 @@ c
          do j = 1, 4
             chi(j,i) = 0.0d0
          end do
+         chiral(i) = 1
          disulf(i) = 0
-         chir(i) = ' '
+         chir = ' '
          write (iout,20)  i
    20    format (/,' Enter Residue',i4,' :  ',$)
          read (input,30)  record
    30    format (a120)
          call upcase (record)
          next = 1
-         call getword (record,name,next)
+         call gettext (record,name,next)
          length = trimtext (name)
          string = record(next:120)
          read (string,*,err=40,end=40)  phi(i),psi(i),omega(i),
      &                                  (chi(j,i),j=1,4),disulf(i)
    40    continue
-         call getword (record,chir(i),next)
+         call getword (record,chir,next)
 c
 c     handle special names used for certain amino acids
 c
@@ -220,6 +232,10 @@ c
             length = 3
             name = 'CYX'
          end if
+c
+c     check the D/L chirality of the current residue
+c
+         if (chir .eq. 'D')  chiral(i) = -1
 c
 c     process and store the current amino acid residue type
 c
@@ -309,14 +325,6 @@ c
      &                    ' at Residue',i5,' or',i5)
             end if
          end if
-c
-c     check the D/L chirality of the residues
-c
-         if (chir(i) .eq. 'D') then
-            chiral(i) = -1
-         else
-            chiral(i) = 1
-         end if
       end do
       return
       end
@@ -341,10 +349,11 @@ c
       include 'phipsi.i'
       include 'resdue.i'
       include 'sequen.i'
-      integer i,k,m,next
-      integer ni(maxres)
-      integer cai(maxres)
-      integer ci(maxres)
+      integer i,k,m
+      integer  next,nsave
+      integer, allocatable :: ni(:)
+      integer, allocatable :: cai(:)
+      integer, allocatable :: ci(:)
       logical single,cyclic
       character*1 answer
       character*3 resname
@@ -363,11 +372,17 @@ c
       call upcase (answer)
       if (answer .eq. 'Y')  cyclic = .true.
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (ni(nseq))
+      allocate (cai(nseq))
+      allocate (ci(nseq))
+c
 c     initialize the atom counter to the first atom
 c
       n = 1
 c
-c     set atom counter and the first residue number and type
+c     set the first residue number and get the type and name
 c
       do m = 1, nchain
          single = .false.
@@ -549,6 +564,63 @@ c
      &                  cai(i),ni(i),ci(i),-chiral(i))
             call proside (resname,i,cai(i),ni(i),ci(i))
 c
+c     build the first residue for N-terminal deprotonated amino acids
+c
+         else if (resname .eq. 'H2N') then
+            i = i + 1
+            k = seqtyp(i)
+            resname = amino(k)
+            if (m .eq. 1) then
+               ni(i) = n
+               k = seqtyp(i-1)
+               call zatom (nntyp(k),0.0d0,0.0d0,0.0d0,0,0,0,0)
+               k = seqtyp(i)
+               cai(i) = n
+               call zatom (cantyp(k),1.50d0,0.0d0,0.0d0,ni(i),0,0,0)
+               ci(i) = n
+               if (single) then
+                  call zatom (cctyp(k),1.51d0,111.6d0,0.0d0,
+     &                        cai(i),ni(i),0,0)
+               else
+                  call zatom (cntyp(k),1.51d0,110.7d0,0.0d0,
+     &                        cai(i),ni(i),0,0)
+               end if
+            else
+               ni(i) = n
+               k = seqtyp(i-1)
+               call zatom (nntyp(k),30.0d0,150.0d0,180.0d0,
+     &                     n-1,n-2,n-3,0)
+               k = seqtyp(i)
+               call zatom (-2,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
+               cai(i) = n
+               call zatom (cantyp(k),1.50d0,150.0d0,180.0d0,
+     &                     ni(i),n-2,n-3,0)
+               ci(i) = n
+               if (single) then
+                  call zatom (cctyp(k),1.51d0,111.6d0,180.0d0,
+     &                        cai(i),ni(i),n-3,0)
+               else
+                  call zatom (cntyp(k),1.51d0,110.7d0,180.0d0,
+     &                        cai(i),ni(i),n-3,0)
+               end if
+            end if
+            if (single) then
+               call zatom (octyp(k),1.25d0,117.0d0,psi(1)-180.0d0,
+     &                     ci(i),cai(i),ni(i),0)
+            else
+               call zatom (ontyp(k),1.22d0,122.5d0,psi(1)-180.0d0,
+     &                     ci(i),cai(i),ni(i),0)
+            end if
+            k = seqtyp(i-1)
+            call zatom (hnntyp(k),1.02d0,109.5d0,phi(i),
+     &                  ni(i),cai(i),ci(i),0)
+            call zatom (hnntyp(k),1.02d0,109.5d0,108.0d0,
+     &                  ni(i),cai(i),n-1,1)
+            k = seqtyp(i)
+            call zatom (hantyp(k),1.11d0,109.5d0,107.9d0,
+     &                  cai(i),ni(i),ci(i),-chiral(i))
+            call proside (resname,i,cai(i),ni(i),ci(i))
+c
 c     build the first residue for all other standard amino acids
 c
          else
@@ -602,7 +674,8 @@ c
 c
 c     build atoms for residues in the middle of the chain
 c
-         do i = ichain(1,m)+1, ichain(2,m)-1
+         do while (i .lt. ichain(2,m)-1)
+            i = i + 1
             k = seqtyp(i)
             resname = amino(k)
             ni(i) = n
@@ -676,6 +749,21 @@ c
             call zatom (hactyp(k),1.11d0,109.5d0,109.5d0,
      &                  n-4,n-5,n-2,-1)
 c
+c     build the last residue as a protonated C-terminal amino acid
+c
+         else if (resname .eq. 'COH') then
+            nsave = n
+            n = ci(i-1)
+            call zatom (cctyp(k),1.51d0,111.6d0,phi(i),
+     &                  cai(i-1),ni(i-1),ci(i-2),0)
+            call zatom (octyp(k),1.22d0,122.5d0,psi(i)-180.0d0,
+     &                  ci(i-1),cai(i-1),ni(i-1),0)
+            n = nsave
+            call zatom (nctyp(k),1.35d0,112.7d0,psi(i-1),
+     &                  ci(i-1),cai(i-1),ni(i-1),0)
+            call zatom (hnctyp(k),0.98d0,108.7d0,180.0d0,
+     &                  n-1,ci(i-1),cai(i-1),0)
+c
 c     build the last residue for all other standard amino acids
 c
          else
@@ -705,6 +793,12 @@ c
 c     finally, set the total number of atoms
 c
       n = n - 1
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (ni)
+      deallocate (cai)
+      deallocate (ci)
       return
       end
 c
@@ -1248,7 +1342,7 @@ c
       integer i,j,k,nvar
       real*8 minimum,grdmin
       real*8 pauling1
-      real*8 xx(maxopt)
+      real*8, allocatable :: xx(:)
       external pauling1,optsave
 c
 c
@@ -1355,6 +1449,10 @@ c     get rigid body reference coordinates for each chain
 c
       call orient
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(6*ngrp))
+c
 c     transfer rigid body coordinates to optimization parameters
 c
       nvar = 0
@@ -1383,6 +1481,10 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+c
 c     convert from rigid body to Cartesian coordinates
 c
       call rigidxyz
@@ -1410,9 +1512,9 @@ c
       include 'rigid.i'
       integer i,j,nvar
       real*8 pauling1,e
-      real*8 xx(maxopt)
-      real*8 g(maxopt)
-      real*8 derivs(6,maxgrp)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to rigid body coordinates
@@ -1424,6 +1526,10 @@ c
             rbc(j,i) = xx(nvar)
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(6,ngrp))
 c
 c     compute and store the energy and gradient
 c
@@ -1440,5 +1546,9 @@ c
             g(nvar) = derivs(j,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

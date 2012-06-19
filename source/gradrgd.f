@@ -37,7 +37,7 @@ c
 c
 c     zero out the total of rigid body derivative components
 c
-      do i = 1, maxgrp
+      do i = 1, ngrp
          do j = 1, 6
             derivs(j,i) = 0.0d0
          end do

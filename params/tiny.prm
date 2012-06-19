@@ -22,11 +22,10 @@ epsilonrule             GEOMETRIC
       #############################
 
 
-This is a generic parameter file intended to enable simple
-geometry optimization of crude structures to avoid steric
-clashes. The bond, angle and torsion parameters are set to
-idealized values. The vdw values are loosely based on OPLS.
-Electrostatics is neglected completely.
+This is a generic parameter file intended to enable simple geometry
+optimization of crude structures to avoid steric clashes. The bond,
+angle and torsion parameters are set to idealized values. The vdw
+values are based on OPLS. Electrostatics is omitted completely.
 
 
       #############################

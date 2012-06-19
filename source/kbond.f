@@ -515,8 +515,6 @@ c
       integer ia,ib,ita,itb
       integer next,minat
       integer list(20)
-      integer mtype(maxatm)
-      integer jlignes(maxbnd)
       real*8 khia,khib,cst
       real*8 rad0a,rad0b
       logical header,done

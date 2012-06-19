@@ -31,7 +31,7 @@ c
       include 'pistuf.i'
       include 'tors.i'
       include 'units.i'
-      integer i,j,k,it,jt
+      integer i,j,k,jt
       integer ia,ib,ita,itb
       integer npi,npi5,npi4
       integer size,next,iring

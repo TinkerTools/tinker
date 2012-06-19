@@ -84,7 +84,7 @@ c
       parameter (maxring=10000)
       parameter (maxbio=10000)
       parameter (maxres=10000)
-      parameter (maxamino=36)
+      parameter (maxamino=38)
       parameter (maxnuc=12)
       parameter (maxbnd=2*maxatm)
       parameter (maxang=4*maxatm)

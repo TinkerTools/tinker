@@ -254,6 +254,7 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'fields.i'
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
@@ -406,7 +407,9 @@ c
 c
 c     build the amide nitrogen of the current residue
 c
-         call findatm (' N  ',start,stop,k)
+         atmname = ' N  '
+         if (resname .eq. 'COH')  atmname = ' OH '
+         call findatm (atmname,start,stop,k)
          if (k .ne. 0)  ni(i) = n
          if (midchain) then
             j = ntyp(ityp)
@@ -457,7 +460,11 @@ c
             call oldatm (k,j,cai(i),i)
          else if (endchain) then
             j = cctyp(ityp)
-            call oldatm (k,j,cai(i),i)
+            if (resname .eq. 'COH') then
+               type(ci(i-1)) = biotyp(j)
+            else
+               call oldatm (k,j,cai(i),i)
+            end if
          end if
 c
 c     build the carbonyl oxygen of the current residue
@@ -472,7 +479,11 @@ c
             call oldatm (k,j,ci(i),i)
          else if (endchain) then
             j = octyp(ityp)
-            call oldatm (k,j,ci(i),i)
+            if (resname .eq. 'COH') then
+               type(oi(i-1)) = biotyp(j)
+            else
+               call oldatm (k,j,ci(i),i)
+            end if
          end if
 c
 c     build the amide hydrogens of the current residue
@@ -513,7 +524,11 @@ c
             end if
          else if (endchain) then
             j = hnctyp(ityp)
-            if (resname .eq. 'NH2') then
+            if (resname .eq. 'COH') then
+               call findatm (' HO ',start,stop,k)
+               call newatm (k,j,ni(i),0.98d0,ci(i-1),108.7d0,
+     &                         cai(i-1),180.0d0,0)
+            else if (resname .eq. 'NH2') then
                call findatm (' H1 ',start,stop,k)
                call newatm (k,j,ni(i),1.01d0,ci(i-1),120.9d0,
      &                         cai(i-1),0.0d0,0)
@@ -585,7 +600,7 @@ c
 c
 c     build the terminal oxygen at the end of a peptide chain
 c
-         if (endchain .and. .not.cyclic) then
+         if (endchain .and. .not.cyclic .and. resname.ne.'COH') then
             call findatm (' OXT',start,stop,k)
             if (k .eq. 0)  call findatm (' OT2',start,stop,k)
             j = octyp(ityp)
