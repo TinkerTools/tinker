@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##                 (Mac OS X/gfortran Version)               ##
+#  ##              (gfortran for Mac OSX Version)               ##
 #  ##                                                           ##
 #  ###############################################################
 #
@@ -24,6 +24,7 @@ gfortran -O3 -o intxyz.x intxyz.o libtinker.a
 gfortran -O3 -o minimize.x minimize.o libtinker.a
 gfortran -O3 -o minirot.x minirot.o libtinker.a
 gfortran -O3 -o minrigid.x minrigid.o libtinker.a
+gfortran -O3 -o molxyz.x molxyz.o libtinker.a
 gfortran -O3 -o monte.x monte.o libtinker.a
 gfortran -O3 -o newton.x newton.o libtinker.a
 gfortran -O3 -o newtrot.x newtrot.o libtinker.a

@@ -12,7 +12,7 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "gettext" searchs an input string for the first string of
+c     "gettext" searches an input string for the first string of
 c     non-blank characters; the region from a non-blank character
 c     to the first space or tab is returned as "text"; if the
 c     actual text is too long, only the first part is returned

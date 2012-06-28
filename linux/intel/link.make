@@ -24,6 +24,7 @@ ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel 
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o minimize.x minimize.o libtinker.a libfftw3_omp.a libfftw3.a ; strip minimize.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o minirot.x minirot.o libtinker.a libfftw3_omp.a libfftw3.a ; strip minirot.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o minrigid.x minrigid.o libtinker.a libfftw3_omp.a libfftw3.a ; strip minrigid.x
+ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o molxyz.x molxyz.o libtinker.a libfftw3_omp.a libfftw3.a ; strip molxyz.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o monte.x monte.o libtinker.a libfftw3_omp.a libfftw3.a ; strip monte.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o newton.x newton.o libtinker.a libfftw3_omp.a libfftw3.a ; strip newton.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o newtrot.x newtrot.o libtinker.a libfftw3_omp.a libfftw3.a ; strip newtrot.x

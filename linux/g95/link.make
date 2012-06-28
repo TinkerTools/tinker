@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##                    (Linux/g95 Version)                    ##
+#  ##                  (g95 for Linux Version)                  ##
 #  ##                                                           ##
 #  ###############################################################
 #
@@ -24,6 +24,7 @@ g95 -o intxyz.x intxyz.o libtinker.a
 g95 -o minimize.x minimize.o libtinker.a
 g95 -o minirot.x minirot.o libtinker.a
 g95 -o minrigid.x minrigid.o libtinker.a
+g95 -o molxyz.x molxyz.o libtinker.a
 g95 -o monte.x monte.o libtinker.a
 g95 -o newton.x newton.o libtinker.a
 g95 -o newtrot.x newtrot.o libtinker.a

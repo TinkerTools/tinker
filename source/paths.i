@@ -12,21 +12,21 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     p0       reactant Cartesian coordinates as variables
-c     p1       product Cartesian coordinates as variables
-c     pmid     midpoint between the reactant and product
+c     pc0      reactant Cartesian coordinates as variables
+c     pc1      product Cartesian coordinates as variables
 c     pvect    vector connecting the reactant and product
 c     pstep    step per cycle along reactant-product vector
 c     pzet     current projection on reactant-product vector
+c     gc       gradient of the path constraints
 c     pnorm    length of the reactant-product vector
-c     acoeff   transformation matrix 'A' from Elber paper
-c     gc       gradients of the path constraints
+c     acoeff   transformation matrix 'A' from Elber algorithm
 c
 c
-      real*8 p0,p1,pmid
-      real*8 pvect,pstep
-      real*8 pzet,pnorm
-      real*8 acoeff,gc
-      common /paths/ p0(maxvar),p1(maxvar),pmid(maxvar),pvect(maxvar),
-     &               pstep(maxvar),pzet(maxvar),pnorm,acoeff(7,7),
-     &               gc(maxvar,7)
+      real*8, pointer :: pc0(:)
+      real*8, pointer :: pc1(:)
+      real*8, pointer :: pvect(:)
+      real*8, pointer :: pstep(:)
+      real*8, pointer :: pzet(:)
+      real*8, pointer :: gc(:,:)
+      real*8 pnorm,acoeff
+      common /paths/ pc0,pc1,pvect,pstep,pzet,gc,pnorm,acoeff(7,7)

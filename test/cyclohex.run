@@ -1,5 +1,8 @@
 ../bin/saddle cyclohex.chair cyclohex.boat 0.1 y
-cp tstate.xyz cyclohex.xyz
+mv tstate.xyz cyclohex.xyz
 ../bin/newton cyclohex a a 0.0001
 ../bin/vibrate cyclohex 0
-rm cyclohex.xyz* tstate.xyz
+../bin/path cyclohex.chair cyclohex.boat 9 0.0001
+../bin/newton cyclohex.006 a a 0.0001
+../bin/vibrate cyclohex 0
+rm cyclohex.xyz* cyclohex.0*

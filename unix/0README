@@ -7,7 +7,10 @@
           variety of proprietary Unix workstations. Note that these
           scripts and the corresponding flags were all tested and
           worked correctly under vendor-supplied Fortran 77 or 90/95
-          compilers. However, none of these have been used in recent
-          years, and the scripts are provided as a starting point
-          for anyone needing to use TINKER on these workstations.
+          compilers. The scripts have not been used in recent years,
+          and are only provided as a starting point for anyone needing
+          to build TINKER on these workstations. As of TINKER 6, the
+          build process will require a Fortran 95 compiler instead
+          of the Fortran 77 compilers typically used for TINKER 5 and
+          earlier.versions.
 

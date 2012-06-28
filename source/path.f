@@ -43,33 +43,53 @@ c
       real*8 rmsvalue,project
       real*8 epot,etot
       real*8 epot0,epot1
-      real*8 sum,rplen
-      real*8 path1
+      real*8 sum,rplen,path1
       real*8 grdmin,potnrg
-      real*8 g(maxvar)
-      real*8 p(maxvar)
-      real*8 ge(maxvar)
-      real*8 temp(maxvar,7)
-      real*8 xtmp(maxatm)
-      real*8 ytmp(maxatm)
-      real*8 ztmp(maxatm)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: ge(:)
+      real*8, allocatable :: xtmp(:)
+      real*8, allocatable :: ytmp(:)
+      real*8, allocatable :: ztmp(:)
+      real*8, allocatable :: temp(:,:)
       logical exist
       character*120 string
       external path1
       external optsave
 c
 c
-c     initialize some constants and variables
+c     initialize constants and get initial structure
 c
       call initial
+      call getxyz
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      nvar = 3 * n
+      if (associated(pc0))  deallocate (pc0)
+      if (associated(pc1))  deallocate (pc1)
+      if (associated(pvect))  deallocate (pvect)
+      if (associated(pstep))  deallocate (pstep)
+      if (associated(pzet))  deallocate (pzet)
+      if (associated(gc))  deallocate (gc)
+      allocate (pc0(nvar))
+      allocate (pc1(nvar))
+      allocate (pvect(nvar))
+      allocate (pstep(nvar))
+      allocate (pzet(nvar))
+      allocate (gc(nvar,7))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xtmp(n))
+      allocate (ytmp(n))
+      allocate (ztmp(n))
 c
 c     get and store the initial structure coordinates
 c
-      call getxyz
       do i = 1, n
-         p0(3*i-2) = x(i)
-         p0(3*i-1) = y(i)
-         p0(3*i) = z(i)
+         pc0(3*i-2) = x(i)
+         pc0(3*i-1) = y(i)
+         pc0(3*i) = z(i)
          xtmp(i) = x(i)
          ytmp(i) = y(i)
          ztmp(i) = z(i)
@@ -82,7 +102,6 @@ c
 c
 c     set default values for some control variables
 c
-      nvar = 3 * n
       cyclesave = .true.
       stpmax = 1.0d0
       iwrite = 0
@@ -133,18 +152,29 @@ c
       write (iout,70)  rmsvalue
    70 format (/,' RMS Fit for Reactant and Product :',f12.4)
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (xtmp)
+      deallocate (ytmp)
+      deallocate (ztmp)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (p(nvar))
+      allocate (ge(nvar))
+c
 c     store the coordinates for the superimposed product
 c
       do i = 1, n
-         p1(3*i-2) = x(i)
-         p1(3*i-1) = y(i)
-         p1(3*i) = z(i)
+         pc1(3*i-2) = x(i)
+         pc1(3*i-1) = y(i)
+         pc1(3*i) = z(i)
       end do
 c
 c     write out the starting potential energy values
 c
-      epot0 = potnrg (p0,g)
-      epot1 = potnrg (p1,g)
+      epot0 = potnrg (pc0,ge)
+      epot1 = potnrg (pc1,ge)
       write (iout,80)  epot0,epot1
    80 format (/,' Reactant Potential Energy :',f12.4,
      &        /,' Product Potential Energy : ',f12.4)
@@ -155,7 +185,7 @@ c
       rplen = npath + 1
       pnorm = 0.0d0
       do i = 1, nvar
-         pvect(i) = p1(i) - p0(i)
+         pvect(i) = pc1(i) - pc0(i)
          pstep(i) = pvect(i) / rplen
          pnorm = pnorm + pvect(i)**2
       end do
@@ -180,15 +210,19 @@ c
          gc(iy,4) = 0.0d0
          gc(iz,4) = mass(i)
          gc(ix,5) = 0.0d0
-         gc(iy,5) = mass(i) * p0(iz)
-         gc(iz,5) = -mass(i) * p0(iy)
-         gc(ix,6) = -mass(i) * p0(iz)
+         gc(iy,5) = mass(i) * pc0(iz)
+         gc(iz,5) = -mass(i) * pc0(iy)
+         gc(ix,6) = -mass(i) * pc0(iz)
          gc(iy,6) = 0.0d0
-         gc(iz,6) = mass(i) * p0(ix)
-         gc(ix,7) = mass(i) * p0(iy)
-         gc(iy,7) = -mass(i) * p0(ix)
+         gc(iz,6) = mass(i) * pc0(ix)
+         gc(ix,7) = mass(i) * pc0(iy)
+         gc(iy,7) = -mass(i) * pc0(ix)
          gc(iz,7) = 0.0d0
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (temp(nvar,7))
 c
 c     copy to temporary storage and orthogonalize
 c
@@ -197,7 +231,7 @@ c
             temp(j,i) = gc(j,i)
          end do
       end do
-      call orthog (nvar,maxvar,7,gc)
+      call orthog (nvar,7,gc)
 c
 c     set the A matrix to transform sigma into C space
 c
@@ -211,6 +245,10 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (temp)
+c
 c     perform the matrix inversion to get A matrix
 c     which transforms C into sigma space
 c
@@ -219,7 +257,7 @@ c
 c     set the current path point to be the reactant
 c
       do i = 1, nvar
-         p(i) = p0(i)
+         p(i) = pc0(i)
       end do
 c
 c     loop over structures along path to be optimized
@@ -231,7 +269,7 @@ c
 c     get r(zeta), set initial path point and energy
 c
          do i = 1, nvar
-            pzet(i) = p0(i) + ipath*pstep(i)
+            pzet(i) = pc0(i) + ipath*pstep(i)
             p(i) = p(i) + pstep(i)
          end do
          epot = potnrg (p,ge)
@@ -265,6 +303,11 @@ c
   130    format (' Gradient along Path :',6x,f12.4)
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (p)
+      deallocate (ge)
+c
 c     perform any final tasks before program exit
 c
       call final
@@ -292,14 +335,18 @@ c
       real*8 gamma(7)
       real*8 cnst(7)
       real*8 sigma(7)
-      real*8 p(maxvar)
-      real*8 gt(maxvar)
-      real*8 ge(maxvar)
+      real*8 p(*)
+      real*8 gt(*)
+      real*8, allocatable :: ge(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nvar = 3 * n
+      allocate (ge(nvar))
 c
 c     get the value of the potential energy
 c
-      nvar = 3 * n
       path1 = potnrg (p,ge)
 c
 c     construct the Lagrangian multipliers
@@ -324,12 +371,12 @@ c
          yy = p(iy) - pzet(iy)
          zz = p(iz) - pzet(iz)
          cnst(1) = cnst(1) + xx*pvect(ix) + yy*pvect(iy) + zz*pvect(iz)
-         cnst(2) = cnst(2) + mass(i) * (p(ix)-p0(ix))
-         cnst(3) = cnst(3) + mass(i) * (p(iy)-p0(iy))
-         cnst(4) = cnst(4) + mass(i) * (p(iz)-p0(iz))
-         cnst(5) = cnst(5) + mass(i) * (p(iy)*p0(iz)-p(iz)*p0(iy))
-         cnst(6) = cnst(6) + mass(i) * (p(iz)*p0(ix)-p(ix)*p0(iz))
-         cnst(7) = cnst(7) + mass(i) * (p(ix)*p0(iy)-p(iy)*p0(ix))
+         cnst(2) = cnst(2) + mass(i) * (p(ix)-pc0(ix))
+         cnst(3) = cnst(3) + mass(i) * (p(iy)-pc0(iy))
+         cnst(4) = cnst(4) + mass(i) * (p(iz)-pc0(iz))
+         cnst(5) = cnst(5) + mass(i) * (p(iy)*pc0(iz)-p(iz)*pc0(iy))
+         cnst(6) = cnst(6) + mass(i) * (p(iz)*pc0(ix)-p(ix)*pc0(iz))
+         cnst(7) = cnst(7) + mass(i) * (p(ix)*pc0(iy)-p(iy)*pc0(ix))
       end do
 c
 c     construct the orthonormal "sigma" constraints
@@ -357,6 +404,10 @@ c
             gt(i) = gt(i) + gamma(j)*gc(i,j)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (ge)
       return
       end
 c
@@ -376,9 +427,9 @@ c
       integer i
       real*8 energy
       real*8 potnrg
-      real*8 xx(maxvar)
-      real*8 g(maxvar)
-      real*8 deriv(3,maxatm)
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     copy position vector into atomic coordinates
@@ -389,17 +440,25 @@ c
          z(i) = xx(3*i)
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     compute potential energy and Cartesian derivatives
 c
-      call gradient (energy,deriv)
+      call gradient (energy,derivs)
 c
 c     set the energy value and gradient vector
 c
       potnrg = energy
       do i = 1, n
-         g(3*i-2) = deriv(1,i)
-         g(3*i-1) = deriv(2,i)
-         g(3*i) = deriv(3,i)
+         g(3*i-2) = derivs(1,i)
+         g(3*i-1) = derivs(2,i)
+         g(3*i) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end

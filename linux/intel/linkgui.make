@@ -29,6 +29,7 @@ ifort -O3 -no-prec-div -static -o intxyz.x intxyz.o libtinker.a libjvm.so ; stri
 ifort -O3 -no-prec-div -static -o minimize.x minimize.o libtinker.a libjvm.so ; strip minimize.x
 ifort -O3 -no-prec-div -static -o minirot.x minirot.o libtinker.a libjvm.so ; strip minirot.x
 ifort -O3 -no-prec-div -static -o minrigid.x minrigid.o libtinker.a libjvm.so ; strip minrigid.x
+ifort -O3 -no-prec-div -static -o molxyz.x molxyz.o libtinker.a libjvm.so ; strip molxyz.x
 ifort -O3 -no-prec-div -static -o monte.x monte.o libtinker.a libjvm.so ; strip monte.x
 ifort -O3 -no-prec-div -static -o newton.x newton.o libtinker.a libjvm.so ; strip newton.x
 ifort -O3 -no-prec-div -static -o newtrot.x newtrot.o libtinker.a libjvm.so ; strip newtrot.x

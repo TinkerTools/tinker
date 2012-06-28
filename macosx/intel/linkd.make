@@ -24,6 +24,7 @@ ifort -g -o intxyz.x intxyz.o libtinker.a
 ifort -g -o minimize.x minimize.o libtinker.a
 ifort -g -o minirot.x minirot.o libtinker.a
 ifort -g -o minrigid.x minrigid.o libtinker.a
+ifort -g -o molxyz.x molxyz.o libtinker.a
 ifort -g -o monte.x monte.o libtinker.a
 ifort -g -o newton.x newton.o libtinker.a
 ifort -g -o newtrot.x newtrot.o libtinker.a

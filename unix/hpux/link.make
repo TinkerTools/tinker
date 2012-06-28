@@ -24,9 +24,11 @@ fort77 -O2 +E1 +U77 -o intxyz.x intxyz.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o minimize.x minimize.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o minirot.x minirot.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o minrigid.x minrigid.o -L. -ltinker
-fort77 -O2 +E1 +U77 -o newton.x newton.o -L. -ltinker
-fort77 -O2 +E1 +U77 -o newtrot.x newtrot.o -L. -ltinker
+fort77 -O2 +E1 +U77 -o molxyz.x molxyz.o -L. -ltinker
+fort77 -O2 +E1 +U77 -o monte.x monte.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o nucleic.x nucleic.o -L. -ltinker
+fort77 -O2 +E1 +U77 -o minrigid.x minrigid.o -L. -ltinker
+fort77 -O2 +E1 +U77 -o minrigid.x minrigid.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o optimize.x optimize.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o optirot.x optirot.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o optrigid.x optrigid.o -L. -ltinker

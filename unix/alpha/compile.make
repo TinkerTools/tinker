@@ -172,6 +172,7 @@ f77 -c -fast -arch generic -tune generic gda.f
 f77 -c -fast -arch generic -tune generic geometry.f
 f77 -c -fast -arch generic -tune generic getint.f
 f77 -c -fast -arch generic -tune generic getkey.f
+f77 -c -fast -arch generic -tune generic getmol.f
 f77 -c -fast -arch generic -tune generic getmol2.f
 f77 -c -fast -arch generic -tune generic getnumb.f
 f77 -c -fast -arch generic -tune generic getpdb.f
@@ -196,6 +197,7 @@ f77 -c -fast -arch generic -tune generic image.f
 f77 -c -fast -arch generic -tune generic impose.f
 f77 -c -fast -arch generic -tune generic induce.f
 f77 -c -fast -arch generic -tune generic inertia.f
+f77 -c -fast -arch generic -tune generic initatom.f
 f77 -c -fast -arch generic -tune generic initial.f
 f77 -c -fast -arch generic -tune generic initprm.f
 f77 -c -fast -arch generic -tune generic initres.f
@@ -248,6 +250,7 @@ f77 -c -fast -arch generic -tune generic minimize.f
 f77 -c -fast -arch generic -tune generic minirot.f
 f77 -c -fast -arch generic -tune generic minrigid.f
 f77 -c -fast -arch generic -tune generic molecule.f
+f77 -c -fast -arch generic -tune generic molxyz.f
 f77 -c -fast -arch generic -tune generic moments.f
 f77 -c -fast -arch generic -tune generic monte.f
 f77 -c -fast -arch generic -tune generic mutate.f
@@ -305,6 +308,7 @@ f77 -c -fast -arch generic -tune generic rattle.f
 f77 -c -fast -arch generic -tune generic readdyn.f
 f77 -c -fast -arch generic -tune generic readgau.f
 f77 -c -fast -arch generic -tune generic readint.f
+f77 -c -fast -arch generic -tune generic readmol.f
 f77 -c -fast -arch generic -tune generic readmol2.f
 f77 -c -fast -arch generic -tune generic readpdb.f
 f77 -c -fast -arch generic -tune generic readprm.f

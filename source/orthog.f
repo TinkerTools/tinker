@@ -17,18 +17,17 @@ c     via the modified Gram-Schmidt algorithm
 c
 c     variables and parameters:
 c
-c     m     first logical dimension of matrix to orthogonalize
-c     mp    first physical dimension of matrix storage area
-c     n     second logical dimension of matrix to orthogonalize
+c     m     first dimension of the matrix to orthogonalize
+c     n     second dimension of the matrix to orthogonalize
 c     a     matrix to orthogonalize; contains result on exit
 c
 c
-      subroutine orthog (m,mp,n,a)
+      subroutine orthog (m,n,a)
       implicit none
       integer i,j,k
-      integer m,n,mp
+      integer m,n
       real*8 rkk,rkj
-      real*8 a(mp,*)
+      real*8 a(m,*)
 c
 c
 c     compute the modified Gram-Schmidt orthogonalization

@@ -12,7 +12,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "getstring" searchs for a quoted text string within an input
+c     "getstring" searches for a quoted text string within an input
 c     character string; the region between the first and second
 c     quotes is returned as the "text"; if the actual text is too
 c     long, only the first part is returned

@@ -3,7 +3,7 @@
 #  #################################################################
 #  ##                                                             ##
 #  ##  library.make  --  create object library of TINKER modules  ##
-#  ##                    (Mac OS X/g95 Version)                   ##
+#  ##                  (g95 for Mac OSX Version)                  ##
 #  ##                                                             ##
 #  #################################################################
 #
@@ -162,6 +162,7 @@ freeunit.o \
 geometry.o \
 getint.o \
 getkey.o \
+getmol.o \
 getmol2.o \
 getnumb.o \
 getpdb.o \
@@ -186,6 +187,7 @@ image.o \
 impose.o \
 induce.o \
 inertia.o \
+initatom.o \
 initial.o \
 initprm.o \
 initres.o \
@@ -233,6 +235,7 @@ mdstat.o \
 mechanic.o \
 merge.o \
 molecule.o \
+molxyz.o \
 moments.o \
 mutate.o \
 nblist.o \
@@ -272,6 +275,7 @@ rattle.o \
 readdyn.o \
 readgau.o \
 readint.o \
+readmol.o \
 readmol2.o \
 readpdb.o \
 readprm.o \

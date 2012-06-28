@@ -3,7 +3,7 @@
 #  #################################################################
 #  ##                                                             ##
 #  ##  unzip.make  --  uncompress each of the TINKER executables  ##
-#  ##              (Generic Version; Run under Linux)             ##
+#  ##              (Windows Version; Run under Linux)             ##
 #  ##                                                             ##
 #  #################################################################
 #
@@ -24,6 +24,7 @@ unzip intxyz.zip intxyz.exe
 unzip minimize.zip minimize.exe
 unzip minirot.zip minirot.exe
 unzip minrigid.zip minrigid.exe
+unzip molxyz.zip molxyz.exe
 unzip monte.zip monte.exe
 unzip newton.zip newton.exe
 unzip newtrot.zip newtrot.exe

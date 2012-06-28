@@ -34,9 +34,12 @@
                           molecular volume and surface area
 
          (05) CYCLOHEX    location of the transition state between
-                          chair and boat cyclohexane, refinement
-                          of the transition state and vibrational
-                          analysis to show one negative frequency
+                          chair and boat cyclohexane via two methods:
+                          refinement of the transition state using
+                          Muller-Brown saddle point algorithm, then
+                          path sampling using the Elber algorithm;
+                          vibrational analysis of both results shows
+                          the same TS with one negative frequency
 
          (06) DHFR        performs 10 steps of molecular dynamics on
                           a pre-equilibrated system of DHFR protein

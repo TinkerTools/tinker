@@ -172,6 +172,7 @@ f77 -c -O -mips4 gda.f
 f77 -c -O -mips4 geometry.f
 f77 -c -O -mips4 getint.f
 f77 -c -O -mips4 getkey.f
+f77 -c -O -mips4 getmol.f
 f77 -c -O -mips4 getmol2.f
 f77 -c -O -mips4 getnumb.f
 f77 -c -O -mips4 getpdb.f
@@ -196,6 +197,7 @@ f77 -c -O -mips4 image.f
 f77 -c -O -mips4 impose.f
 f77 -c -O -mips4 induce.f
 f77 -c -O -mips4 inertia.f
+f77 -c -O -mips4 initatom.f
 f77 -c -O -mips4 initial.f
 f77 -c -O -mips4 initprm.f
 f77 -c -O -mips4 initres.f
@@ -248,6 +250,7 @@ f77 -c -O -mips4 minimize.f
 f77 -c -O -mips4 minirot.f
 f77 -c -O -mips4 minrigid.f
 f77 -c -O -mips4 molecule.f
+f77 -c -O -mips4 molxyz.f
 f77 -c -O -mips4 moments.f
 f77 -c -O -mips4 monte.f
 f77 -c -O -mips4 mutate.f
@@ -305,6 +308,7 @@ f77 -c -O -mips4 rattle.f
 f77 -c -O -mips4 readdyn.f
 f77 -c -O -mips4 readgau.f
 f77 -c -O -mips4 readint.f
+f77 -c -O -mips4 readmol.f
 f77 -c -O -mips4 readmol2.f
 f77 -c -O -mips4 readpdb.f
 f77 -c -O -mips4 readprm.f

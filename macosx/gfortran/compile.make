@@ -3,7 +3,7 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##               (Mac OS X/gfortran Version)              ##
+#  ##             (gfortran for Mac OSX Version)             ##
 #  ##                                                        ##
 #  ############################################################
 #
@@ -172,6 +172,7 @@ gfortran -c -O3 gda.f
 gfortran -c -O3 geometry.f
 gfortran -c -O3 getint.f
 gfortran -c -O3 getkey.f
+gfortran -c -O3 getmol.f
 gfortran -c -O3 getmol2.f
 gfortran -c -O3 getnumb.f
 gfortran -c -O3 getpdb.f
@@ -196,6 +197,7 @@ gfortran -c -O3 image.f
 gfortran -c -O3 impose.f
 gfortran -c -O3 induce.f
 gfortran -c -O3 inertia.f
+gfortran -c -O3 initatom.f
 gfortran -c -O3 initial.f
 gfortran -c -O3 initprm.f
 gfortran -c -O3 initres.f
@@ -248,6 +250,7 @@ gfortran -c -O3 minimize.f
 gfortran -c -O3 minirot.f
 gfortran -c -O3 minrigid.f
 gfortran -c -O3 molecule.f
+gfortran -c -O3 molxyz.f
 gfortran -c -O3 moments.f
 gfortran -c -O3 monte.f
 gfortran -c -O3 mutate.f
@@ -305,6 +308,7 @@ gfortran -c -O3 rattle.f
 gfortran -c -O3 readdyn.f
 gfortran -c -O3 readgau.f
 gfortran -c -O3 readint.f
+gfortran -c -O3 readmol.f
 gfortran -c -O3 readmol2.f
 gfortran -c -O3 readpdb.f
 gfortran -c -O3 readprm.f

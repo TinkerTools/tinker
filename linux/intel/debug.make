@@ -172,6 +172,7 @@ ifort -c -g -warn unused -check uninit -check bounds gda.f
 ifort -c -g -warn unused -check uninit -check bounds geometry.f
 ifort -c -g -warn unused -check uninit -check bounds getint.f
 ifort -c -g -warn unused -check uninit -check bounds getkey.f
+ifort -c -g -warn unused -check uninit -check bounds getmol.f
 ifort -c -g -warn unused -check uninit -check bounds getmol2.f
 ifort -c -g -warn unused -check uninit -check bounds getnumb.f
 ifort -c -g -warn unused -check uninit -check bounds getpdb.f
@@ -196,6 +197,7 @@ ifort -c -g -warn unused -check uninit -check bounds image.f
 ifort -c -g -warn unused -check uninit -check bounds impose.f
 ifort -c -g -warn unused -check uninit -check bounds induce.f
 ifort -c -g -warn unused -check uninit -check bounds inertia.f
+ifort -c -g -warn unused -check uninit -check bounds initatom.f
 ifort -c -g -warn unused -check uninit -check bounds initial.f
 ifort -c -g -warn unused -check uninit -check bounds initprm.f
 ifort -c -g -warn unused -check uninit -check bounds initres.f
@@ -248,6 +250,7 @@ ifort -c -g -warn unused -check uninit -check bounds minimize.f
 ifort -c -g -warn unused -check uninit -check bounds minirot.f
 ifort -c -g -warn unused -check uninit -check bounds minrigid.f
 ifort -c -g -warn unused -check uninit -check bounds molecule.f
+ifort -c -g -warn unused -check uninit -check bounds molxyz.f
 ifort -c -g -warn unused -check uninit -check bounds moments.f
 ifort -c -g -warn unused -check uninit -check bounds monte.f
 ifort -c -g -warn unused -check uninit -check bounds mutate.f
@@ -305,6 +308,7 @@ ifort -c -g -warn unused -check uninit -check bounds rattle.f
 ifort -c -g -warn unused -check uninit -check bounds readdyn.f
 ifort -c -g -warn unused -check uninit -check bounds readgau.f
 ifort -c -g -warn unused -check uninit -check bounds readint.f
+ifort -c -g -warn unused -check uninit -check bounds readmol.f
 ifort -c -g -warn unused -check uninit -check bounds readmol2.f
 ifort -c -g -warn unused -check uninit -check bounds readpdb.f
 ifort -c -g -warn unused -check uninit -check bounds readprm.f

@@ -172,6 +172,7 @@ xlf -c -O gda.f
 xlf -c -O geometry.f
 xlf -c -O getint.f
 xlf -c -O getkey.f
+xlf -c -O getmol.f
 xlf -c -O getmol2.f
 xlf -c -O getnumb.f
 xlf -c -O getpdb.f
@@ -196,6 +197,7 @@ xlf -c -O image.f
 xlf -c -O impose.f
 xlf -c -O induce.f
 xlf -c -O inertia.f
+xlf -c -O initatom.f
 xlf -c -O initial.f
 xlf -c -O initprm.f
 xlf -c -O initres.f
@@ -248,6 +250,7 @@ xlf -c -O minimize.f
 xlf -c -O minirot.f
 xlf -c -O minrigid.f
 xlf -c -O molecule.f
+xlf -c -O molxyz.f
 xlf -c -O moments.f
 xlf -c -O monte.f
 xlf -c -O mutate.f
@@ -305,6 +308,7 @@ xlf -c -O rattle.f
 xlf -c -O readdyn.f
 xlf -c -O readgau.f
 xlf -c -O readint.f
+xlf -c -O readmol.f
 xlf -c -O readmol2.f
 xlf -c -O readpdb.f
 xlf -c -O readprm.f

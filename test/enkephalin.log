@@ -1,28 +1,37 @@
 
- ##############################################################################
- ##############################################################################
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##             TINKER  ---  Software Tools for Molecular Design             ##
- ##                                                                          ##
- ##                        Version 6.0   October 2011                        ##
+ ##                          Version 6.1  June 2012                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2012               ##
- ##                            All Rights Reserved                           ##
- ##                                                                          ##
- ##############################################################################
- ##############################################################################
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
 
 
- Enter Name to be used for Output Files :  
+ Enter Name to be Used for Output Files :  
  Enter Title :  
- Enter One Residue per Line, Free Format:  1 or 3 Letter Code, then
- Phi/Psi/Omega (3F), Chi Angles (4F), then Disulfide Partner if a
- CYS (I), and D/L Chirality as desired (A1)
+ Enter One Residue Name per Line as the Standard Three-Letter Code, then
+ Phi Psi Omega (3F), Chi Angles (4F), then Disulfide Partner if CYX (I),
+ and D/L Chirality as Desired (A1)
 
- The allowed N-Cap Residues are Acetyl=ACE or Formyl=FOR, and the
- possible C-Cap Residues are N-MethylAmide=NME or Amide=NH2
+ If Only Residue Names are Entered, the Default is to Build an Extended
+ Conformation Using L-Amino Acids and Zwitterionic Termini
 
- Use Residue=MOL to Begin a New Strand, Residue=<CR> to End Entry
+ Regular Amino Acids:  GLY, ALA, VAL, LEU, ILE, SER, THR, CYS, CYX, PRO,
+ PHE, TYR, TRP, HIS, ASP, ASN, GLU, GLN, MET, LYS, ARG, ORN, AIB
+
+ Alternative Protonation States:  CYD, TYD, HID, HIE, ASH, GLH, LYD
+
+ N-Terminal Cap Residues:  H2N=Deprotonated, FOR=Formyl, ACE=Acetyl,
+                           PCA=Pyroglutamic Acid
+ C-Terminal Cap Residues:  COH=Protonated, NH2=Amide, NME=N-MethylAmide
+
+ Use Residue Name=MOL to Start a New Chain, and Use <CR> to End Input
 
  Enter Residue   1 :  
  Enter Residue   2 :  
@@ -31,18 +40,18 @@
  Enter Residue   5 :  
  Enter Residue   6 :  
  Cyclize the Polypeptide Chain [N] :  
- ##############################################################################
- ##############################################################################
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##             TINKER  ---  Software Tools for Molecular Design             ##
- ##                                                                          ##
- ##                        Version 6.0   October 2011                        ##
+ ##                          Version 6.1  June 2012                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2012               ##
- ##                            All Rights Reserved                           ##
- ##                                                                          ##
- ##############################################################################
- ##############################################################################
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
 
 
  Limited Memory BFGS Quasi-Newton Optimization :
@@ -74,18 +83,18 @@
  Final RMS Gradient :              0.00000944
  Final Gradient Norm :             0.00008177
 
- ##############################################################################
- ##############################################################################
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##             TINKER  ---  Software Tools for Molecular Design             ##
- ##                                                                          ##
- ##                        Version 6.0   October 2011                        ##
+ ##                          Version 6.1  June 2012                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2012               ##
- ##                            All Rights Reserved                           ##
- ##                                                                          ##
- ##############################################################################
- ##############################################################################
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
 
 
  Eigenvalues of the Hessian Matrix :

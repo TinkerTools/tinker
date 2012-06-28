@@ -24,19 +24,19 @@ c
 c     print out the informational header message
 c
       write (iout,10)
-   10 format (/,' ',78('#'),
-     &        /,' ',78('#'),
-     &        /,' ##',74x,'##',
-     &        /,' ##',13x,'TINKER  ---  Software Tools for',
-     &           ' Molecular Design',13x,'##',
-     &        /,' ##',74x,'##',
-     &        /,' ##',24x,'Version 6.0   October 2011',24x,'##',
-     &        /,' ##',74x,'##',
-     &        /,' ##',15x,'Copyright (c)  Jay William Ponder',
+   10 format (/,5x,70('#'),
+     &        /,3x,74('#'),
+     &        /,2x,'###',70x,'###',
+     &        /,1x,'###',12x,'TINKER  ---  Software Tools for',
+     &           ' Molecular Design',12x,'###',
+     &        /,1x,'##',74x,'##',
+     &        /,1x,'##',26x,'Version 6.1  June 2012',26x,'##',
+     &        /,1x,'##',74x,'##',
+     &        /,1x,'##',15x,'Copyright (c)  Jay William Ponder',
      &           '  1990-2012',15x,'##',
-     &        /,' ##',28x,'All Rights Reserved',27x,'##',
-     &        /,' ##',74x,'##',
-     &        /,' ',78('#'),
-     &        /,' ',78('#'),/)
+     &        /,1x,'###',27x,'All Rights Reserved',26x,'###',
+     &        /,2x,'###',70x,'###',
+     &        /,3x,74('#'),
+     &        /,5x,70('#'),/)
       return
       end

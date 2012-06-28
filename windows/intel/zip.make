@@ -3,7 +3,7 @@
 #  #############################################################
 #  ##                                                         ##
 #  ##  zip.make  --  compress each of the TINKER executables  ##
-#  ##            (Generic Version; Run under Linux)           ##
+#  ##            (Windows Version; Run under Linux)           ##
 #  ##                                                         ##
 #  #############################################################
 #
@@ -24,6 +24,7 @@ zip intxyz.zip intxyz.exe
 zip minimize.zip minimize.exe
 zip minirot.zip minirot.exe
 zip minrigid.zip minrigid.exe
+zip molxyz.zip molxyz.exe
 zip monte.zip monte.exe
 zip newton.zip newton.exe
 zip newtrot.zip newtrot.exe

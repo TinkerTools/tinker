@@ -151,6 +151,7 @@ freeunit.obj
 geometry.obj
 getint.obj
 getkey.obj
+getmol.obj
 getmol2.obj
 getnumb.obj
 getpdb.obj
@@ -175,6 +176,7 @@ image.obj
 impose.obj
 induce.obj
 inertia.obj
+initatom.obj
 initial.obj
 initprm.obj
 initres.obj
@@ -222,6 +224,7 @@ mdstat.obj
 mechanic.obj
 merge.obj
 molecule.obj
+molxyz.obj
 moments.obj
 mutate.obj
 nblist.obj
@@ -261,6 +264,7 @@ rattle.obj
 readdyn.obj
 readgau.obj
 readint.obj
+readmol.obj
 readmol2.obj
 readpdb.obj
 readprm.obj

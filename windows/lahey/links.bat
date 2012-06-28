@@ -26,6 +26,7 @@ LF95 -o1 -tpp -nstchk -ntrace -nomap intxyz.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap minimize.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap minirot.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap minrigid.obj -lib tinker
+LF95 -o1 -tpp -nstchk -ntrace -nomap molxyz.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap monte.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap newton.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap newtrot.obj -lib tinker

@@ -69,7 +69,7 @@ c
      &        /,4x,'(5) Bond Dipole Moment Magnitude',
      &        /,4x,'(6) Bond Dipole Moment Position')
 c
-c     get the types of potential parameters to be optimized
+c     get types of potential parameters to be optimized
 c
       query = .true.
       do while (query)
@@ -108,7 +108,7 @@ c
          end if
       end do
 c
-c     get the termination criterion as RMS gradient over parameters
+c     get termination criterion as RMS gradient over parameters
 c
       grdmin = -1.0d0
       call nextarg (string,exist)
@@ -123,7 +123,7 @@ c
       end if
       if (grdmin .le. 0.0d0)  grdmin = 0.1d0
 c
-c     get number of crystal structures to include in optimization
+c     get number of crystal structures to use in optimization
 c
       nxtal = 0
       call nextarg (string,exist)
@@ -319,7 +319,7 @@ c
 c     "xtalprm" stores or retrieves a crystal structure; used
 c     to make a previously stored structure the currently active
 c     structure, or to store a structure for later use; only
-c     provides for the intermolecular energy terms
+c     provides for intermolecular energy terms
 c
 c
       subroutine xtalprm (mode,ixtal,xx)
@@ -342,6 +342,9 @@ c
       integer ixtal,prmtyp
       integer atom1,atom2
       integer ns(maxxtal)
+      integer nvdws(maxxtal)
+      integer nions(maxxtal)
+      integer ndipoles(maxxtal)
       integer types(maxatm,maxxtal)
       integer classes(maxatm,maxxtal)
       integer n12s(maxatm,maxxtal)
@@ -350,12 +353,9 @@ c
       integer i13s(12,maxatm,maxxtal)
       integer n14s(maxatm,maxxtal)
       integer i14s(36,maxatm,maxxtal)
-      integer nvdws(maxxtal)
       integer ivdws(maxatm,maxxtal)
       integer ireds(maxatm,maxxtal)
-      integer nions(maxxtal)
       integer iions(maxatm,maxxtal)
-      integer ndipoles(maxxtal)
       integer idpls(2,maxbnd,maxxtal)
       real*8 xmid,ymid,zmid
       real*8 xx(*)

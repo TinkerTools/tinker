@@ -12,7 +12,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "getnumb" searchs an input string from left to right for an
+c     "getnumb" searches an input string from left to right for an
 c     integer and puts the numeric value in "number"; returns zero
 c     with "next" unchanged if no integer value is found
 c

@@ -3,7 +3,7 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##                 (Mac OS X/g95 Version)                 ##
+#  ##                (g95 for Mac OSX Version)               ##
 #  ##                                                        ##
 #  ############################################################
 #
@@ -172,6 +172,7 @@ g95 -c -O2 gda.f
 g95 -c -O2 geometry.f
 g95 -c -O2 getint.f
 g95 -c -O2 getkey.f
+g95 -c -O2 getmol.f
 g95 -c -O2 getmol2.f
 g95 -c -O2 getnumb.f
 g95 -c -O2 getpdb.f
@@ -196,6 +197,7 @@ g95 -c -O2 image.f
 g95 -c -O2 impose.f
 g95 -c -O2 induce.f
 g95 -c -O2 inertia.f
+g95 -c -O2 initatom.f
 g95 -c -O2 initial.f
 g95 -c -O2 initprm.f
 g95 -c -O2 initres.f
@@ -248,6 +250,7 @@ g95 -c -O2 minimize.f
 g95 -c -O2 minirot.f
 g95 -c -O2 minrigid.f
 g95 -c -O2 molecule.f
+g95 -c -O2 molxyz.f
 g95 -c -O2 moments.f
 g95 -c -O2 monte.f
 g95 -c -O2 mutate.f
@@ -305,6 +308,7 @@ g95 -c -O2 rattle.f
 g95 -c -O2 readdyn.f
 g95 -c -O2 readgau.f
 g95 -c -O2 readint.f
+g95 -c -O2 readmol.f
 g95 -c -O2 readmol2.f
 g95 -c -O2 readpdb.f
 g95 -c -O2 readprm.f

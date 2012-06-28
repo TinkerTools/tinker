@@ -15,27 +15,26 @@ c
 c     "deflate" uses the power method with deflation to compute the
 c     few largest eigenvalues and eigenvectors of a symmetric matrix
 c
-c     n     logical dimension of the matrix to be diagonalized
-c     np    physical dimension of the matrix storage area
-c     nv    number of largest eigenvalues to be extracted
-c     a     input with the matrix to be diagonalized; only
-c              the lower triangle and diagonal are required
-c     ev    returned with the eigenvalues in descending order
-c     vec   returned with the eigenvectors of the matrix
-c     work  temporary work vector
+c     n      dimension of the matrix to be diagonalized
+c     nv     number of largest eigenvalues to be extracted
+c     a      input with the matrix to be diagonalized; only
+c               the lower triangle and diagonal are required
+c     ev     returned with the eigenvalues in descending order
+c     vec    returned with the eigenvectors of the matrix
+c     work   local vector containing temporary work space
 c
 c
-      subroutine deflate (n,np,nv,a,ev,vec,work)
+      subroutine deflate (n,nv,a,ev,vec)
       implicit none
       include 'iounit.i'
-      integer i,j,k,n,np,nv
+      integer i,j,k,n,nv
       integer iter,maxiter
       real*8 random,eps
       real*8 dot1,dot2,ratio
       real*8 ev(*)
-      real*8 work(*)
-      real*8 a(np,*)
-      real*8 vec(np,*)
+      real*8, allocatable :: work(:)
+      real*8 a(n,*)
+      real*8 vec(n,*)
 c
 c
 c     initialize number of iterations and convergence criteria
@@ -50,6 +49,10 @@ c
             vec(i,j) = 1.0d0
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (work(n))
 c
 c     find the few largest eigenvalues and eigenvectors
 c
@@ -116,5 +119,9 @@ c
             end do
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (work)
       return
       end

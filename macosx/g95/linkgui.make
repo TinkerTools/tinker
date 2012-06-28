@@ -24,6 +24,7 @@ g95 -o intxyz.x intxyz.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o minimize.x minimize.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o minirot.x minirot.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o minrigid.x minrigid.o libtinker.a -framework JavaVM -framework CoreFoundation
+g95 -o molxyz.x molxyz.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o monte.x monte.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o newton.x newton.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o newtrot.x newtrot.o libtinker.a -framework JavaVM -framework CoreFoundation

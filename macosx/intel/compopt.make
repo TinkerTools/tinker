@@ -172,6 +172,7 @@ ifort -c -fast gda.f
 ifort -c -fast geometry.f
 ifort -c -fast getint.f
 ifort -c -fast getkey.f
+ifort -c -fast getmol.f
 ifort -c -fast getmol2.f
 ifort -c -fast getnumb.f
 ifort -c -fast getpdb.f
@@ -196,6 +197,7 @@ ifort -c -fast image.f
 ifort -c -fast impose.f
 ifort -c -fast induce.f
 ifort -c -fast inertia.f
+ifort -c -fast initatom.f
 ifort -c -fast initial.f
 ifort -c -fast initprm.f
 ifort -c -fast initres.f
@@ -248,6 +250,7 @@ ifort -c -fast minimize.f
 ifort -c -fast minirot.f
 ifort -c -fast minrigid.f
 ifort -c -fast molecule.f
+ifort -c -fast molxyz.f
 ifort -c -fast moments.f
 ifort -c -fast monte.f
 ifort -c -fast mutate.f
@@ -305,6 +308,7 @@ ifort -c -fast rattle.f
 ifort -c -fast readdyn.f
 ifort -c -fast readgau.f
 ifort -c -fast readint.f
+ifort -c -fast readmol.f
 ifort -c -fast readmol2.f
 ifort -c -fast readpdb.f
 ifort -c -fast readprm.f

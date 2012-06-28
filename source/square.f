@@ -563,9 +563,9 @@ c     #############################################################
 c
 c
 c     "lmstep" computes the Levenberg-Marquardt step during a
-c     nonlinear least squares calculation; this version is based
-c     upon ideas from the Minpack routine LMPAR together with
-c     with the internal doubling strategy of Dennis and Schnabel
+c     nonlinear least squares calculation; based on ideas from
+c     the Minpack routine LMPAR together with the internal doubling
+c     strategy of Dennis and Schnabel
 c
 c     arguments and variables :
 c
@@ -1156,8 +1156,8 @@ c     ###########################################################
 c
 c
 c     "trust" updates the model trust region for a nonlinear
-c     least squares calculation; this version is based on the
-c     ideas found in NL2SOL and in Dennis and Schnabel's book
+c     least squares calculation; based on ideas found in NL2SOL
+c     and in Dennis and Schnabel's book
 c
 c     arguments and variables :
 c

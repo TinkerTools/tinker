@@ -173,6 +173,7 @@ DF /compile_only /optimize /fast gda.f
 DF /compile_only /optimize /fast geometry.f
 DF /compile_only /optimize /fast getint.f
 DF /compile_only /optimize /fast getkey.f
+DF /compile_only /optimize /fast getmol.f
 DF /compile_only /optimize /fast getmol2.f
 DF /compile_only /optimize /fast getnumb.f
 DF /compile_only /optimize /fast getpdb.f
@@ -197,6 +198,7 @@ DF /compile_only /optimize /fast image.f
 DF /compile_only /optimize /fast impose.f
 DF /compile_only /optimize /fast induce.f
 DF /compile_only /optimize /fast inertia.f
+DF /compile_only /optimize /fast initatom.f
 DF /compile_only /optimize /fast initial.f
 DF /compile_only /optimize /fast initprm.f
 DF /compile_only /optimize /fast initres.f
@@ -249,6 +251,7 @@ DF /compile_only /optimize /fast minimize.f
 DF /compile_only /optimize /fast minirot.f
 DF /compile_only /optimize /fast minrigid.f
 DF /compile_only /optimize /fast molecule.f
+DF /compile_only /optimize /fast molxyz.f
 DF /compile_only /optimize /fast moments.f
 DF /compile_only /optimize /fast monte.f
 DF /compile_only /optimize /fast mutate.f
@@ -306,6 +309,7 @@ DF /compile_only /optimize /fast rattle.f
 DF /compile_only /optimize /fast readdyn.f
 DF /compile_only /optimize /fast readgau.f
 DF /compile_only /optimize /fast readint.f
+DF /compile_only /optimize /fast readmol.f
 DF /compile_only /optimize /fast readmol2.f
 DF /compile_only /optimize /fast readpdb.f
 DF /compile_only /optimize /fast readprm.f

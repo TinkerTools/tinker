@@ -3,7 +3,7 @@
 #  ################################################################
 #  ##                                                            ##
 #  ##  debug.make  --  compile debug versions of TINKER modules  ##
-#  ##              (PGI Fortran for Linux Version)               ##
+#  ##               (PGI Fortran for Linux Version)              ##
 #  ##                                                            ##
 #  ################################################################
 #
@@ -172,6 +172,7 @@ pgf77 -c -g -Ktrap=fp gda.f
 pgf77 -c -g -Ktrap=fp geometry.f
 pgf77 -c -g -Ktrap=fp getint.f
 pgf77 -c -g -Ktrap=fp getkey.f
+pgf77 -c -g -Ktrap=fp getmol.f
 pgf77 -c -g -Ktrap=fp getmol2.f
 pgf77 -c -g -Ktrap=fp getnumb.f
 pgf77 -c -g -Ktrap=fp getpdb.f
@@ -196,6 +197,7 @@ pgf77 -c -g -Ktrap=fp image.f
 pgf77 -c -g -Ktrap=fp impose.f
 pgf77 -c -g -Ktrap=fp induce.f
 pgf77 -c -g -Ktrap=fp inertia.f
+pgf77 -c -g -Ktrap=fp initatom.f
 pgf77 -c -g -Ktrap=fp initial.f
 pgf77 -c -g -Ktrap=fp initprm.f
 pgf77 -c -g -Ktrap=fp initres.f
@@ -248,6 +250,7 @@ pgf77 -c -g -Ktrap=fp minimize.f
 pgf77 -c -g -Ktrap=fp minirot.f
 pgf77 -c -g -Ktrap=fp minrigid.f
 pgf77 -c -g -Ktrap=fp molecule.f
+pgf77 -c -g -Ktrap=fp molxyz.f
 pgf77 -c -g -Ktrap=fp moments.f
 pgf77 -c -g -Ktrap=fp monte.f
 pgf77 -c -g -Ktrap=fp mutate.f
@@ -305,6 +308,7 @@ pgf77 -c -g -Ktrap=fp rattle.f
 pgf77 -c -g -Ktrap=fp readdyn.f
 pgf77 -c -g -Ktrap=fp readgau.f
 pgf77 -c -g -Ktrap=fp readint.f
+pgf77 -c -g -Ktrap=fp readmol.f
 pgf77 -c -g -Ktrap=fp readmol2.f
 pgf77 -c -g -Ktrap=fp readpdb.f
 pgf77 -c -g -Ktrap=fp readprm.f

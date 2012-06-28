@@ -43,28 +43,39 @@ c
       include 'refer.i'
       integer maxeigen
       parameter (maxeigen=5)
-      integer i,j,nstep,lext
-      integer igeo,freeunit
+      integer i,j,nvar,nstep
+      integer lext,igeo,freeunit
       integer maxneg,nneg
       integer maxinner,ninner
       integer maxouter,nouter
-      real*8 fctval,grdmin,wall,cpu
-      real*8 dt,temp_start,temp_stop
-      real*8 rg,rmsorig,rmsflip,mass
-      real*8 bounds,contact,local
+      real*8 fctval,grdmin
+      real*8 dt,wall,cpu
+      real*8 temp_start
+      real*8 temp_stop
+      real*8 rg,rmsorig
+      real*8 rmsflip,mass
+      real*8 bounds,contact
       real*8 chiral,torsion
-      real*8 bnderr,vdwerr,locerr
+      real*8 local,locerr
+      real*8 bnderr,vdwerr
       real*8 chirer,torser
-      real*8 derivs(3,maxgeo)
-      real*8 matrix(maxgeo,maxgeo)
       real*8 evl(maxeigen)
-      real*8 evc(maxgeo,maxeigen)
-      real*8 v(maxvar),a(maxvar)
-      logical done,valid,exist,info
+      real*8, allocatable :: v(:)
+      real*8, allocatable :: a(:)
+      real*8, allocatable :: evc(:,:)
+      real*8, allocatable :: matrix(:,:)
+      real*8, allocatable :: derivs(:,:)
+      logical done,valid
+      logical exist,info
       character*7 errtyp,ext
       character*120 title
       character*120 geofile
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (evc(n,maxeigen))
+      allocate (matrix(n,n))
 c
 c     initialize any chirality restraints, then smooth the
 c     bounds via triangle and inverse triangle inequalities;
@@ -73,12 +84,12 @@ c
 c     call kchiral
 c     if (verbose .and. n.le.130) then
 c        title = 'Input Distance Bounds :'
-c        call grafic (n,maxgeo,bnd,title)
+c        call grafic (n,bnd,title)
 c     end if
 c     call geodesic
 c     if (verbose .and. n.le.130)) then
 c        title = 'Triangle Smoothed Bounds :'
-c        call grafic (n,maxgeo,bnd,title)
+c        call grafic (n,bnd,title)
 c     end if
 c
 c     generate a distance matrix between the upper and
@@ -185,6 +196,14 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      if (use_anneal) then
+         nvar = 3 * n
+         allocate (v(nvar))
+         allocate (a(nvar))
+      end if
+c
 c     minimize the error function via simulated annealing
 c
       if (verbose)  call settime
@@ -193,7 +212,7 @@ c
          if (verbose)  iprint = 10
          grdmin = 1.0d0
          mass = 10000.0d0
-         do i = 1, 3*n
+         do i = 1, nvar
             v(i) = 0.0d0
             a(i) = 0.0d0
          end do
@@ -231,6 +250,17 @@ c
    40    format (/,' Time Required for Refinement :',10x,f12.2,
      &              ' seconds')
       end if
+c
+c     perform deallocation of some local arrays
+c
+      if (use_anneal) then
+         deallocate (v)
+         deallocate (a)
+      end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     print the final error function and its components
 c
@@ -271,6 +301,12 @@ c
          title = 'after Refinement :'
          call fracdist (title)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (evc)
+      deallocate (matrix)
+      deallocate (derivs)
       return
       end
 c
@@ -454,13 +490,24 @@ c
       include 'atoms.i'
       include 'disgeo.i'
       include 'kgeoms.i'
-      integer maxlist
-      parameter (maxlist=2*maxfix)
       integer i,j,k,nlist
-      integer start(maxatm),stop(maxatm)
-      integer list(maxlist),key(maxlist)
-      real*8 upper(maxatm),lower(maxatm)
+      integer, allocatable :: list(:)
+      integer, allocatable :: key(:)
+      integer, allocatable :: start(:)
+      integer, allocatable :: stop(:)
+      real*8, allocatable :: upper(:)
+      real*8, allocatable :: lower(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nlist = 2 * ndfix
+      allocate (list(nlist))
+      allocate (key(nlist))
+      allocate (start(n))
+      allocate (stop(n))
+      allocate (upper(n))
+      allocate (lower(n))
 c
 c     build an indexed list of atoms in distance restraints
 c
@@ -468,7 +515,6 @@ c
          start(i) = 0
          stop(i) = -1
       end do
-      nlist = 2 * ndfix
       do i = 1, ndfix
          list(i) = idfix(1,i)
          list(i+ndfix) = idfix(2,i)
@@ -508,6 +554,15 @@ c
             bnd(j,i) = max(lower(j),bnd(j,i))
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (key)
+      deallocate (start)
+      deallocate (stop)
+      deallocate (upper)
+      deallocate (lower)
       return
       end
 c
@@ -535,17 +590,26 @@ c
       include 'atoms.i'
       include 'couple.i'
       include 'disgeo.i'
-      integer maxlist
-      parameter (maxlist=2*maxfix)
-      integer i,j,k,root
-      integer narc,iarc(maxatm)
-      integer head,tail,queue(maxatm)
-      integer start(maxatm),stop(maxatm)
-      integer list(maxlist)
-      real*8 big,upper(maxatm)
-      real*8 small,lower(maxatm)
-      logical enter,queued(maxatm)
+      integer i,j,k
+      integer narc,root
+      integer head,tail
+      integer, allocatable :: iarc(:)
+      integer, allocatable :: queue(:)
+      integer start(*)
+      integer stop(*)
+      integer list(*)
+      real*8 big,small
+      real*8 upper(*)
+      real*8 lower(*)
+      logical enter
+      logical, allocatable :: queued(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iarc(n))
+      allocate (queue(n))
+      allocate (queued(n))
 c
 c     initialize candidate atom queue and the path lengths
 c
@@ -639,6 +703,12 @@ c
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iarc)
+      deallocate (queue)
+      deallocate (queued)
       return
       end
 c
@@ -671,13 +741,30 @@ c
       include 'disgeo.i'
       include 'inform.i'
       include 'iounit.i'
-      integer i,k,p,q,ip,iq,np,nq
-      integer pt(maxgeo),qt(maxgeo)
-      real*8 eps,ipmin,ipmax,iqmin,iqmax
-      real*8 pmin(maxgeo),pmax(maxgeo)
-      real*8 qmin(maxgeo),qmax(maxgeo)
-      logical pun(maxgeo),qun(maxgeo)
+      integer i,k,p,q
+      integer ip,iq,np,nq
+      integer, allocatable :: pt(:)
+      integer, allocatable :: qt(:)
+      real*8 eps,ipmin,ipmax
+      real*8 iqmin,iqmax
+      real*8, allocatable :: pmin(:)
+      real*8, allocatable :: pmax(:)
+      real*8, allocatable :: qmin(:)
+      real*8, allocatable :: qmax(:)
+      logical, allocatable :: pun(:)
+      logical, allocatable :: qun(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pt(n))
+      allocate (qt(n))
+      allocate (pmin(n))
+      allocate (pmax(n))
+      allocate (qmin(n))
+      allocate (qmax(n))
+      allocate (pun(n))
+      allocate (qun(n))
 c
 c     initialize the set of nodes that may have changed bounds
 c
@@ -807,6 +894,17 @@ c        write (iout,10)  p,q,np*nq
 c  10    format (' TRIFIX  --  Bounds Update for Atoms',2i6,
 c    &              ' with',i8,' Searches')
 c     end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pt)
+      deallocate (qt)
+      deallocate (pmin)
+      deallocate (pmax)
+      deallocate (qmin)
+      deallocate (qmax)
+      deallocate (pun)
+      deallocate (qun)
       return
       end
 c
@@ -822,25 +920,27 @@ c     "grafic" outputs the upper & lower triangles and diagonal
 c     of a square matrix in a schematic form for visual inspection
 c
 c
-      subroutine grafic (n,np,a,title)
+      subroutine grafic (n,a,title)
       implicit none
       include 'iounit.i'
-      integer i,j,k,m,n,np
+      integer i,j,k,m,n
       integer maxj,nrow,ndash
       integer minrow,maxrow
       integer trimtext
-      real*8 a(np,np),big
+      real*8 big,v
       real*8 amin,dmin,bmin
       real*8 amax,dmax,bmax
-      real*8 v,rcl,scl,tcl
+      real*8 rcl,scl,tcl
       real*8 ca,cb,cc,cd
       real*8 cw,cx,cy,cz
+      real*8 a(n,*)
+      character*1 dash
       character*1 ta,tb,tc,td,te
-      character*1 dash,digit(0:9)
+      character*1 digit(0:9)
       character*1 symbol(130)
       character*120 title
-      data ta,tb,tc,td,te  / ' ','.','+','X','#' /
       data dash   / '-' /
+      data ta,tb,tc,td,te  / ' ','.','+','X','#' /
       data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
 c
@@ -969,20 +1069,18 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'keys.i'
-      integer maxpair
-      parameter (maxpair=maxgeo*(maxgeo-1)/2)
       integer i,j,k,m,index,next
       integer npart,nmetrize,npair
       integer mik,mjk,nik,njk
-      integer list(maxpair)
+      integer, allocatable :: list(:)
       real*8 random,fraction
       real*8 invbeta,alpha,beta
       real*8 corr,mean,stdev
       real*8 denom,swap,delta
       real*8 percent,eps,gap
       real*8 wall,cpu
-      real*8 value(maxpair)
-      real*8 dmx(maxgeo,maxgeo)
+      real*8, allocatable :: value(:)
+      real*8 dmx(n,*)
       logical first,uniform
       logical update
       character*8 method
@@ -1123,6 +1221,12 @@ c
   120    format (/,' Trial Distance Beta Distribution :',
      &              4x,f5.2,' +/-',f5.2,3x,'Alpha-Beta',2f6.2)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      npair = n*(n-1) / 2
+      allocate (list(npair))
+      allocate (value(npair))
 c
 c     uniform or Gaussian distributed distances without metrization
 c
@@ -1343,6 +1447,11 @@ c
          end if
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (value)
+c
 c     get the time required for distance matrix generation
 c
       if (verbose) then
@@ -1389,9 +1498,9 @@ c
       include 'iounit.i'
       integer i,j,nneg
       real*8 total,sum,rg
-      real*8 dsq(maxgeo)
-      real*8 dcm(maxgeo)
-      real*8 gmx(maxgeo,maxgeo)
+      real*8 gmx(n,*)
+      real*8, allocatable :: dsq(:)
+      real*8, allocatable :: dcm(:)
 c
 c
 c     square and sum trial distances to get radius of gyration
@@ -1409,6 +1518,11 @@ c
          write (iout,10)  rg
    10    format (/,' Radius of Gyration before Embedding :',7x,f16.4)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dsq(n))
+      allocate (dcm(n))
 c
 c     sum squared distances from each atom; the center
 c     of mass is derived using the formula shown above
@@ -1444,6 +1558,11 @@ c
             gmx(j,i) = 0.5d0 * (dsq(i)+dsq(j)-gmx(j,i))
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dsq)
+      deallocate (dcm)
       return
       end
 c
@@ -1466,14 +1585,11 @@ c
       include 'atoms.i'
       include 'inform.i'
       include 'iounit.i'
-      integer maxeigen
-      parameter (maxeigen=5)
       integer i,j,neigen
       real*8 wall,cpu
-      real*8 evl(maxeigen)
-      real*8 evc(maxgeo,maxeigen)
-      real*8 gmx(maxgeo,maxgeo)
-      real*8 work(maxgeo)
+      real*8 evl(*)
+      real*8 evc(n,*)
+      real*8 gmx(n,*)
       logical valid
 c
 c
@@ -1484,7 +1600,7 @@ c
 c
 c     compute largest eigenvalues via power method with deflation
 c
-      call deflate (n,maxgeo,neigen,gmx,evl,evc,work)
+      call deflate (n,neigen,gmx,evl,evc)
 c
 c     check to see if the first three eigenvalues are positive
 c
@@ -1541,11 +1657,10 @@ c
       include 'disgeo.i'
       include 'inform.i'
       include 'iounit.i'
-      integer maxeigen
-      parameter (maxeigen=5)
       integer i,j,neigen
-      real*8 rg,evl(maxeigen)
-      real*8 evc(maxgeo,maxeigen)
+      real*8 rg
+      real*8 evl(*)
+      real*8 evc(n,*)
       character*120 title
 c
 c
@@ -1604,10 +1719,14 @@ c
       include 'iounit.i'
       integer i,k,npair,nskip
       integer nlarge,nsmall
-      integer skip(maxatm)
+      integer, allocatable :: skip(:)
       real*8 xi,yi,zi
       real*8 dstsq,bupsq,blosq
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (skip(n))
 c
 c     zero out the list of atoms locally connected to each atom
 c
@@ -1652,6 +1771,10 @@ c        end do
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (skip)
 c
 c     set the value for the overall index of compaction
 c
@@ -1698,11 +1821,11 @@ c
       real*8 target,dist,error
       real*8 rmserr,average
       real*8 xi,yi,zi
-      real*8 b(maxatm)
-      real*8 xx(maxatm)
-      real*8 yy(maxatm)
-      real*8 zz(maxatm)
-      real*8 dmx(maxgeo,maxgeo)
+      real*8, allocatable :: b(:)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: yy(:)
+      real*8, allocatable :: zz(:)
+      real*8 dmx(n,*)
       character*120 title
 c
 c
@@ -1745,6 +1868,13 @@ c
          write (iout,20)  iter,rmserr,average
    20    format (5x,i5,2f16.4)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (b(n))
+      allocate (xx(n))
+      allocate (yy(n))
+      allocate (zz(n))
 c
 c     initialize the transformed coordinates for each atom
 c
@@ -1838,6 +1968,13 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (b)
+      deallocate (xx)
+      deallocate (yy)
+      deallocate (zz)
+c
 c     find the rms bounds deviations and radius of gyration
 c
       if (verbose) then
@@ -1854,6 +1991,7 @@ c
    50    format (/,' Time Required for Majorization :',8x,f12.2,
      &              ' seconds')
       end if
+      return
       end
 c
 c
@@ -1881,11 +2019,16 @@ c
       integer i,nvar
       real*8 initerr,miderr,toterr
       real*8 fctval,grdmin
-      real*8 xx(maxvar)
+      real*8, allocatable :: xx(:)
       character*7 mode
       external initerr,miderr
       external toterr,optsave
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nvar = 3 * n
+      allocate (xx(nvar))
 c
 c     translate the atomic coordinates to optimization variables
 c
@@ -1932,6 +2075,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
       return
       end
 c
@@ -1956,8 +2103,10 @@ c
       include 'iounit.i'
       include 'math.i'
       include 'units.i'
-      integer i,istep,nstep,nvar,period
-      real*8 error,total,prior,change
+      integer i,istep,nstep
+      integer nvar,period
+      real*8 error,total
+      real*8 prior,change
       real*8 dt,dt2,dt_2,dt2_2
       real*8 xbig,xrms,mass,kinetic
       real*8 temp_start,temp_stop
@@ -1965,8 +2114,11 @@ c
       real*8 ratio,sigmoid,scale
       real*8 target,temp,tautemp
       real*8 initerr,miderr,toterr
-      real*8 xx(maxvar),xmove(maxvar)
-      real*8 g(maxvar),v(maxvar),a(maxvar)
+      real*8 v(*)
+      real*8 a(*)
+      real*8, allocatable :: xx(:)
+      real*8, allocatable :: xmove(:)
+      real*8, allocatable :: g(:)
       character*7 mode
 c
 c
@@ -1977,6 +2129,13 @@ c     dt = 0.1d0
 c     temp_start = 200.0d0
 c     temp_stop = 0.0d0
 c     mass = 1000.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      nvar = 3 * n
+      allocate (xx(nvar))
+      allocate (xmove(nvar))
+      allocate (g(nvar))
 c
 c     translate the atomic coordinates to annealing variables
 c
@@ -2127,6 +2286,12 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      deallocate (xmove)
+      deallocate (g)
       return
       end
 c
@@ -2379,8 +2544,9 @@ c
       include 'disgeo.i'
       include 'iounit.i'
       integer i,j
-      real*8 sum,dist,dist2,rgsq
-      real*8 dmd(maxgeo,maxgeo)
+      real*8 sum,rgsq
+      real*8 dist,dist2
+      real*8 dmd(n,*)
       character*120 title
 c
 c
@@ -2418,7 +2584,7 @@ c
 c     write out the interatomic distance and error matrices
 c
       title = 'Final Dist Matrix Above; DCM on Diag; Error Below :'
-      call grafic (n,maxgeo,dmd,title)
+      call grafic (n,dmd,title)
       return
       end
 c
@@ -2440,11 +2606,12 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i,j,nvar
-      real*8 initerr,local,torsion
-      real*8 locerr,torser
-      real*8 xx(maxvar),g(maxvar)
-      real*8 derivs(3,maxgeo)
-      external locerr,torser
+      real*8 initerr
+      real*8 local,locerr
+      real*8 torsion,torser
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -2459,6 +2626,10 @@ c
          z(i) = xx(nvar)
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     zero out the values of the atomic gradient components
 c
       do i = 1, n
@@ -2467,7 +2638,7 @@ c
          end do
       end do
 c
-c     compute the local goemetry and the torsional
+c     compute the local geometry and the torsional
 c     components of the error function and its gradient
 c
       local = locerr (derivs)
@@ -2485,6 +2656,10 @@ c
          nvar = nvar + 1
          g(nvar) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -2507,12 +2682,14 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i,j,nvar
-      real*8 miderr,bounds,local
-      real*8 chiral,torsion
-      real*8 bnderr,locerr
-      real*8 chirer,torser
-      real*8 xx(maxvar),g(maxvar)
-      real*8 derivs(3,maxgeo)
+      real*8 miderr
+      real*8 bounds,bnderr
+      real*8 local,locerr
+      real*8 chiral,chirer
+      real*8 torsion,torser
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -2526,6 +2703,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     zero out the values of the atomic gradient components
 c
@@ -2555,6 +2736,10 @@ c
          nvar = nvar + 1
          g(nvar) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -2577,14 +2762,15 @@ c
       include 'sizes.i'
       include 'atoms.i'
       integer i,j,nvar
-      real*8 toterr,bounds,contact
-      real*8 local,chiral,torsion
-      real*8 bnderr,vdwerr,locerr
-      real*8 chirer,torser
-      real*8 xx(maxvar),g(maxvar)
-      real*8 derivs(3,maxgeo)
-      external bnderr,vdwerr
-      external chirer,torser
+      real*8 toterr
+      real*8 bounds,bnderr
+      real*8 local,locerr
+      real*8 chiral,chirer
+      real*8 torsion,torser
+      real*8 contact,vdwerr
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
 c
 c
 c     translate optimization parameters to atomic coordinates
@@ -2598,6 +2784,10 @@ c
          nvar = nvar + 1
          z(i) = xx(nvar)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
 c
 c     zero out the values of the atomic gradient components
 c
@@ -2628,6 +2818,10 @@ c
          nvar = nvar + 1
          g(nvar) = derivs(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
@@ -2657,7 +2851,7 @@ c
       real*8 gap,buffer,weigh
       real*8 dx,dy,dz,gx,gy,gz
       real*8 dstsq,bupsq,blosq
-      real*8 derivs(3,maxgeo)
+      real*8 derivs(3,*)
 c
 c
 c     zero out the distance bounds error function
@@ -2750,23 +2944,27 @@ c
       include 'disgeo.i'
       include 'light.i'
       integer i,j,k,kgy,kgz
-      integer skip(maxgeo)
+      integer, allocatable :: skip(:)
       real*8 vdwerr,error
       real*8 scale,chain,term
       real*8 xi,yi,zi
       real*8 dx,dy,dz,gx,gy,gz
       real*8 dstsq,blosq
       real*8 radi,radsq
-      real*8 derivs(3,maxgeo)
       real*8 xsort(maxlight)
       real*8 ysort(maxlight)
       real*8 zsort(maxlight)
+      real*8 derivs(3,*)
 c
 c
 c     zero out the distance van der Waals error function
 c
       vdwerr = 0.0d0
       scale = 1.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (skip(n))
 c
 c     transfer coordinates and zero out atoms to be skipped
 c
@@ -2784,7 +2982,7 @@ c
 c     now, loop over all atoms computing the interactions
 c
       do i = 1, n
-         radi = vdwrad(i)
+         radi = georad(i)
          xi = xsort(rgx(i))
          yi = ysort(rgy(i))
          zi = zsort(rgz(i))
@@ -2811,7 +3009,7 @@ c
             dy = yi - ysort(kgy)
             dz = zi - zsort(kgz)
             dstsq = dx*dx + dy*dy + dz*dz
-            radsq = (radi + vdwrad(k))**2
+            radsq = (radi + georad(k))**2
             blosq = min(bnd(k,i),bnd(i,k),radsq)
 c
 c     error and derivatives for lower bound violation
@@ -2834,6 +3032,10 @@ c
    10       continue
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (skip)
       return
       end
 c
@@ -2862,7 +3064,7 @@ c
       real*8 scale,chain,term
       real*8 dx,dy,dz,gx,gy,gz
       real*8 dstsq,bupsq,blosq
-      real*8 derivs(3,maxgeo)
+      real*8 derivs(3,*)
 c
 c
 c     zero out the local geometry error function
@@ -3027,7 +3229,7 @@ c
       real*8 dedxib,dedyib,dedzib
       real*8 dedxic,dedyic,dedzic
       real*8 dedxid,dedyid,dedzid
-      real*8 derivs(3,maxgeo)
+      real*8 derivs(3,*)
 c
 c
 c     zero the chirality restraint error function
@@ -3160,7 +3362,7 @@ c
       real*8 dedxib,dedyib,dedzib
       real*8 dedxic,dedyic,dedzic
       real*8 dedxid,dedyid,dedzid
-      real*8 derivs(3,maxgeo)
+      real*8 derivs(3,*)
       logical bonded
 c
 c

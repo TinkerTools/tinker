@@ -334,6 +334,7 @@ OBJS = active.o \
        geometry.o \
        getint.o \
        getkey.o \
+       getmol.o \
        getmol2.o \
        getnumb.o \
        getpdb.o \
@@ -358,6 +359,7 @@ OBJS = active.o \
        impose.o \
        induce.o \
        inertia.o \
+       initatom.o \
        initial.o \
        initprm.o \
        initres.o \
@@ -410,6 +412,7 @@ OBJS = active.o \
        minirot.o \
        minrigid.o \
        molecule.o \
+       molxyz.o \
        moments.o \
        monte.o \
        mutate.o \
@@ -467,6 +470,7 @@ OBJS = active.o \
        readdyn.o \
        readgau.o \
        readint.o \
+       readmol.o \
        readmol2.o \
        readpdb.o \
        readprm.o \
@@ -544,6 +548,7 @@ EXEFILES = alchemy.x \
            minimize.x \
            minirot.x \
            minrigid.x \
+           molxyz.x \
            monte.x \
            newton.x \
            newtrot.x \
@@ -624,6 +629,7 @@ rename:
 	mv  minimize.x   $(BINDIR)/minimize
 	mv  minirot.x    $(BINDIR)/minirot
 	mv  minrigid.x   $(BINDIR)/minrigid
+	mv  molxyz.x     $(BINDIR)/molxyz
 	mv  monte.x      $(BINDIR)/monte
 	mv  newton.x     $(BINDIR)/newton
 	mv  newtrot.x    $(BINDIR)/newtrot
@@ -684,6 +690,7 @@ remove_links:
 	rm -f $(LINKDIR)/minimize
 	rm -f $(LINKDIR)/minirot
 	rm -f $(LINKDIR)/minrigid
+	rm -f $(LINKDIR)/molxyz
 	rm -f $(LINKDIR)/monte
 	rm -f $(LINKDIR)/newton
 	rm -f $(LINKDIR)/newtrot
@@ -744,6 +751,7 @@ create_links:
 	ln -s $(BINDIR)/minimize   $(LINKDIR)/minimize
 	ln -s $(BINDIR)/minirot    $(LINKDIR)/minirot
 	ln -s $(BINDIR)/minrigid   $(LINKDIR)/minrigid
+	ln -s $(BINDIR)/molxyz     $(LINKDIR)/molxyz
 	ln -s $(BINDIR)/monte      $(LINKDIR)/monte
 	ln -s $(BINDIR)/newton     $(LINKDIR)/newton
 	ln -s $(BINDIR)/newtrot    $(LINKDIR)/newtrot
@@ -942,6 +950,7 @@ libtinker.a: ${OBJS}
         geometry.o \
         getint.o \
         getkey.o \
+        getmol.o \
         getmol2.o \
         getnumb.o \
         getpdb.o \
@@ -966,6 +975,7 @@ libtinker.a: ${OBJS}
         impose.o \
         induce.o \
         inertia.o \
+        initatom.o \
         initial.o \
         initprm.o \
         initres.o \
@@ -1052,6 +1062,7 @@ libtinker.a: ${OBJS}
         readdyn.o \
         readgau.o \
         readint.o \
+        readmol.o \
         readmol2.o \
         readpdb.o \
         readprm.o \
@@ -1257,6 +1268,7 @@ gda.o: atoms.i files.i iounit.i minima.i potent.i sizes.i vdwpot.i warp.i
 geometry.o: atoms.i math.i sizes.i
 getint.o: atoms.i inform.i iounit.i output.i sizes.i
 getkey.o: argue.i files.i iounit.i keys.i openmp.i sizes.i
+getmol.o: files.i iounit.i
 getmol2.o: files.i iounit.i
 getnumb.o: ascii.i
 getpdb.o: iounit.i
@@ -1281,6 +1293,7 @@ image.o: boxes.i cell.i sizes.i
 impose.o: align.i inform.i iounit.i sizes.i
 induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i uprior.i
 inertia.o: atmtyp.i atoms.i iounit.i math.i sizes.i
+initatom.o: ptable.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
 initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i merck.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
 initres.o: resdue.i sizes.i
@@ -1333,6 +1346,7 @@ minimize.o: atoms.i files.i inform.i iounit.i keys.i scales.i sizes.i usage.i
 minirot.o: files.i inform.i iounit.i keys.i math.i omega.i scales.i sizes.i zcoord.i
 minrigid.o: files.i group.i inform.i iounit.i keys.i math.i output.i rigid.i sizes.i
 molecule.o: atmtyp.i atoms.i couple.i molcul.i sizes.i
+molxyz.o: files.i iounit.i titles.i
 moments.o: atmtyp.i atoms.i charge.i dipole.i moment.i mpole.i polar.i potent.i sizes.i solute.i units.i usage.i
 monte.o: atoms.i files.i inform.i iounit.i omega.i output.i sizes.i units.i usage.i zcoord.i
 mutate.o: atoms.i charge.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
@@ -1390,6 +1404,7 @@ rattle.o: atmtyp.i atoms.i freeze.i group.i inform.i iounit.i moldyn.i sizes.i u
 readdyn.o: atoms.i boxes.i files.i group.i iounit.i mdstuf.i moldyn.i rgddyn.i sizes.i
 readgau.o: ascii.i iounit.i qmstuf.i sizes.i units.i
 readint.o: atmtyp.i atoms.i files.i inform.i iounit.i sizes.i titles.i zclose.i zcoord.i
+readmol.o: atmtyp.i atoms.i couple.i files.i iounit.i ptable.i sizes.i titles.i
 readmol2.o: atmtyp.i atoms.i couple.i files.i iounit.i sizes.i titles.i
 readpdb.o: files.i inform.i iounit.i pdb.i resdue.i sequen.i sizes.i titles.i
 readprm.o: fields.i iounit.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i merck.i params.i sizes.i

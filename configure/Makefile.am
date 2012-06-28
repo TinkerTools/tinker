@@ -159,6 +159,7 @@ libtinker_la_SOURCES = \
 	geometry.f \
 	getint.f \
 	getkey.f \
+	getmolf. \
 	getmol2.f \
 	getnumb.f \
 	getpdb.f \
@@ -183,6 +184,7 @@ libtinker_la_SOURCES = \
 	impose.f \
 	induce.f \
 	inertia.f \
+	initatom.f \
 	initial.f \
 	initprm.f \
 	initres.f \
@@ -230,6 +232,7 @@ libtinker_la_SOURCES = \
 	mechanic.f \
 	merge.f \
 	molecule.f \
+	molxyz.f \
 	moments.f \
 	mutate.f \
 	nblist.f \
@@ -269,6 +272,7 @@ libtinker_la_SOURCES = \
 	readdyn.f \
 	readgau.f \
 	readint.f \
+	readmol.f \
 	readmol2.f \
 	readpdb.f \
 	readprm.f \
@@ -326,6 +330,7 @@ bin_PROGRAMS = \
 	minimize \
 	minirot \
 	minrigid \
+	molxyz \
 	monte \
 	newton \
 	newtrot \

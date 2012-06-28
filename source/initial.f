@@ -180,6 +180,10 @@ c     type of coordinates file
 c
       coordtype = 'NONE'
 c
+c     atomic symbols for elements
+c
+      call initatom
+c
 c     names of biopolymer residue types
 c
       call initres

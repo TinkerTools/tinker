@@ -32,6 +32,7 @@ ifort /libs:static intxyz.obj tinker.lib %javalib%
 ifort /libs:static minimize.obj tinker.lib %javalib%
 ifort /libs:static minirot.obj tinker.lib %javalib%
 ifort /libs:static minrigid.obj tinker.lib %javalib%
+ifort /libs:static molxyz.obj tinker.lib %javalib%
 ifort /libs:static monte.obj tinker.lib %javalib%
 ifort /libs:static newton.obj tinker.lib %javalib%
 ifort /libs:static newtrot.obj tinker.lib %javalib%

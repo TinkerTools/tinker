@@ -152,6 +152,7 @@ tinker
 +geometry.obj &
 +getint.obj &
 +getkey.obj &
++getmol.obj &
 +getmol2.obj &
 +getnumb.obj &
 +getpdb.obj &
@@ -176,6 +177,7 @@ tinker
 +impose.obj &
 +induce.obj &
 +inertia.obj &
++initatom.obj &
 +initial.obj &
 +initprm.obj &
 +initres.obj &
@@ -262,6 +264,7 @@ tinker
 +readdyn.obj &
 +readgau.obj &
 +readint.obj &
++readmol.obj &
 +readmol2.obj &
 +readpdb.obj &
 +readprm.obj &

@@ -12,7 +12,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "getword" searchs an input string for the first alphabetic
+c     "getword" searches an input string for the first alphabetic
 c     character (A-Z or a-z); the region from this first character
 c     to the first blank space or separator is returned as a "word";
 c     if the actual word is too long, only the first part is returned

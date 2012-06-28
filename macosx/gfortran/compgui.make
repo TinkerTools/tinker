@@ -3,7 +3,7 @@
 #  ###################################################################
 #  ##                                                               ##
 #  ##  compgui.make  --  compile the TINKER modules needed for FFE  ##
-#  ##                     (Mac OS X/g95 Version)                    ##
+#  ##                 (gfortran for Mac OSX Version)                ##
 #  ##                                                               ##
 #  ###################################################################
 #

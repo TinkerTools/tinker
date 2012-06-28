@@ -71,15 +71,6 @@ c
       call initial
       call getxyz
 c
-c     quit if there are too many atoms for distance geometry
-c
-      if (n .gt. maxgeo) then
-         write (iout,10)
-   10    format (/,' DISTGEOM  --  Too many Distance Geometry Atoms;',
-     &              ' Increase MAXGEO')
-         call fatal
-      end if
-c
 c     set the lists of attached atoms and local interactions
 c
       call attach
@@ -96,30 +87,37 @@ c     store the input structure for later comparison
 c
       call makeref (1)
 c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (associated(bnd))  deallocate (bnd)
+      if (associated(georad))  deallocate (georad)
+      allocate (bnd(n,n))
+      allocate (georad(n))
+c
 c     assign approximate radii to each of the atoms
 c
       do i = 1, n
          letter = name(i)(1:1)
          if (name(i) .eq. 'CH ') then
-            vdwrad(i) = 1.5d0
+            georad(i) = 1.5d0
          else if (name(i) .eq. 'CH2') then
-            vdwrad(i) = 1.6d0
+            georad(i) = 1.6d0
          else if (name(i) .eq. 'CH3') then
-            vdwrad(i) = 1.7d0
+            georad(i) = 1.7d0
          else if (letter .eq. 'H') then
-            vdwrad(i) = 0.95d0
+            georad(i) = 0.95d0
          else if (letter .eq. 'C') then
-            vdwrad(i) = 1.45d0
+            georad(i) = 1.45d0
          else if (letter .eq. 'N') then
-            vdwrad(i) = 1.35d0
+            georad(i) = 1.35d0
          else if (letter .eq. 'O') then
-            vdwrad(i) = 1.35d0
+            georad(i) = 1.35d0
          else if (letter .eq. 'P') then
-            vdwrad(i) = 1.8d0
+            georad(i) = 1.8d0
          else if (letter .eq. 'S') then
-            vdwrad(i) = 1.8d0
+            georad(i) = 1.8d0
          else
-            vdwrad(i) = 0.5d0
+            georad(i) = 0.5d0
          end if
       end do
 c
@@ -128,7 +126,7 @@ c
       big1 = 0.0d0
       big2 = 0.0d0
       do i = 1, n
-         radi = vdwrad(i)
+         radi = georad(i)
          if (radi .gt. big1) then
             big2 = big1
             big1 = radi
@@ -142,14 +140,14 @@ c     set number of distance geometry structures to generate
 c
       ngeo = -1
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=20,end=20)  ngeo
-   20 continue
+      if (exist)  read (string,*,err=10,end=10)  ngeo
+   10 continue
       if (ngeo .le. 0) then
-         write (iout,30)
-   30    format (/,' Number of Distance Geometry Structures',
+         write (iout,20)
+   20    format (/,' Number of Distance Geometry Structures',
      &              ' Desired [1] :  ',$)
-         read (input,40)  ngeo
-   40    format (i10)
+         read (input,30)  ngeo
+   30    format (i10)
          if (ngeo .le. 0)  ngeo = 1
       end if
 c
@@ -158,11 +156,11 @@ c
       nchir = 0
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,50)
-   50    format (/,' Impose Chirality Constraints on Tetrahedral',
+         write (iout,40)
+   40    format (/,' Impose Chirality Constraints on Tetrahedral',
      &              ' Atoms [Y] :  ',$)
-         read (input,60)  record
-   60    format (a120)
+         read (input,50)  record
+   50    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -170,11 +168,11 @@ c
       if (answer .ne. 'N') then
          call nextarg (answer,exist)
          if (.not. exist) then
-            write (iout,70)
-   70       format (/,' Use "Floating" Chirality for -XH2- and -XH3',
+            write (iout,60)
+   60       format (/,' Use "Floating" Chirality for -XH2- and -XH3',
      &                 ' Groups [N] :  ',$)
-            read (input,80)  record
-   80       format (a120)
+            read (input,70)  record
+   70       format (a120)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -202,11 +200,11 @@ c     enforce the planarity or chirality of trigonal centers
 c
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,90)
-   90    format (/,' Impose Planarity and/or Chirality of Trigonal',
+         write (iout,80)
+   80    format (/,' Impose Planarity and/or Chirality of Trigonal',
      &              ' Atoms [Y] :  ',$)
-         read (input,100)  record
-  100    format (a120)
+         read (input,90)  record
+   90    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -227,11 +225,11 @@ c     enforce torsional planarity on adjacent trigonal sites
 c
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,110)
-  110    format (/,' Impose Torsional Planarity on Adjacent Trigonal',
+         write (iout,100)
+  100    format (/,' Impose Torsional Planarity on Adjacent Trigonal',
      &              ' Atoms [Y] :  ',$)
-         read (input,120)  record
-  120    format (a120)
+         read (input,110)  record
+  110    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -263,11 +261,11 @@ c
       query = .false.
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,130)
-  130    format (/,' Do You Wish to Examine or Alter the Bounds',
+         write (iout,120)
+  120    format (/,' Do You Wish to Examine or Alter the Bounds',
      &              ' Matrix [N] :  ',$)
-         read (input,140)  record
-  140    format (a120)
+         read (input,130)  record
+  130    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -279,11 +277,11 @@ c
       use_invert = .false.
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,150)
-  150    format (/,' Select the Enantiomer Closest to the Input',
+         write (iout,140)
+  140    format (/,' Select the Enantiomer Closest to the Input',
      &              ' Structure [N] :  ',$)
-         read (input,160)  record
-  160    format (a120)
+         read (input,150)  record
+  150    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -295,11 +293,11 @@ c
       use_anneal = .true.
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,170)
-  170    format (/,' Refinement via Minimization or Annealing',
+         write (iout,160)
+  160    format (/,' Refinement via Minimization or Annealing',
      &              ' [M or A, <CR>=A] :  ',$)
-         read (input,180)  record
-  180    format (a120)
+         read (input,170)  record
+  170    format (a120)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -328,17 +326,17 @@ c
             bndmax = dfix(3,i)
             if (header) then
                header = .false.
-               write (iout,190)
-  190          format (/,' Interatomic Distance Bound Restraints :',
+               write (iout,180)
+  180          format (/,' Interatomic Distance Bound Restraints :',
      &                 //,12x,'Atom Numbers',7x,'LowerBound',
      &                    4x,'UpperBound',7x,'Weight',/)
             end if
             if (weigh .eq. 1.0d0) then
-               write (iout,200)  i,ia,ib,bndmin,bndmax
-  200          format (i6,5x,2i6,3x,2f14.4)
+               write (iout,190)  i,ia,ib,bndmin,bndmax
+  190          format (i6,5x,2i6,3x,2f14.4)
             else
-               write (iout,210)  i,ia,ib,bndmin,bndmax,weigh
-  210          format (i6,5x,2i6,3x,3f14.4)
+               write (iout,200)  i,ia,ib,bndmin,bndmax,weigh
+  200          format (i6,5x,2i6,3x,3f14.4)
             end if
          end do
 c
@@ -355,13 +353,13 @@ c
             tormax = tfix(3,i)
             if (header) then
                header = .false.
-               write (iout,220)
-  220          format (/,' Intramolecular Torsional Angle Restraints :',
+               write (iout,210)
+  210          format (/,' Intramolecular Torsional Angle Restraints :',
      &                 //,18x,'Atom Numbers',16x,'Torsion Range',
      &                    9x,'Weight',/)
             end if
-            write (iout,230)  i,ia,ib,ic,id,tormin,tormax,weigh
-  230       format (i6,5x,4i6,3x,3f12.4)
+            write (iout,220)  i,ia,ib,ic,id,tormin,tormax,weigh
+  220       format (i6,5x,4i6,3x,3f12.4)
          end do
       end if
 c
@@ -377,9 +375,9 @@ c
          end do
       end do
       do i = 1, n-1
-         radi = vdwrad(i)
+         radi = georad(i)
          do j = i+1, n
-            bnd(j,i) = radi + vdwrad(j)
+            bnd(j,i) = radi + georad(j)
          end do
       end do
 c
@@ -470,10 +468,10 @@ c
                   cosmin = cos(t2)
                   cosmax = cos(t1)
                end if
-               goto 240
+               goto 230
             end if
          end do
-  240    continue
+  230    continue
          qab = min(bnd(ia,ib),bnd(ib,ia))
          qbc = min(bnd(ib,ic),bnd(ic,ib))
          qcd = min(bnd(ic,id),bnd(id,ic))
@@ -560,18 +558,18 @@ c     use the triangle inequalities to smooth the bounds
 c
       if (verbose .and. n.le.130) then
          title = 'Input Distance Bounds :'
-         call grafic (n,maxgeo,bnd,title)
+         call grafic (n,bnd,title)
       end if
-      write (iout,250)
-  250 format (/,' Bounds Smoothing via Triangle and Inverse',
+      write (iout,240)
+  240 format (/,' Bounds Smoothing via Triangle and Inverse',
      &           ' Triangle Inequality :')
       if (verbose)  call settime
       call geodesic
 c     call triangle
       if (verbose) then
          call gettime (wall,cpu)
-         write (iout,260)  wall
-  260    format (/,' Time Required for Bounds Smoothing :',4x,
+         write (iout,250)  wall
+  250    format (/,' Time Required for Bounds Smoothing :',4x,
      &              f12.2,' seconds')
       end if
 c
@@ -580,39 +578,39 @@ c
       done = .false.
       do while (query .and. .not.done)
          done = .true.
-         write (iout,270)
-  270    format (/,' Enter an Atom Pair to Display Bounds',
+         write (iout,260)
+  260    format (/,' Enter an Atom Pair to Display Bounds',
      &              ' [<CR> When Done] :  ',$)
-         read (input,280)  record
-  280    format (a120)
-         read (record,*,err=330,end=330)  b1,b2
+         read (input,270)  record
+  270    format (a120)
+         read (record,*,err=320,end=320)  b1,b2
          done = .false.
-         if (b1.lt.1 .or. b2.gt.n .or. b1.eq.b2)  goto 330
+         if (b1.lt.1 .or. b2.gt.n .or. b1.eq.b2)  goto 320
          if (b1 .gt. b2) then
             swap = b1
             b1 = b2
             b2 = swap
          end if
-         write (iout,290)  bnd(b2,b1),bnd(b1,b2)
-  290    format (/,' Lower Bound :',f8.3,8x,'Upper Bound :',f8.3)
-  300    continue
-         write (iout,310)
-  310    format (/,' Enter New Bounds or <CR> to Leave Unchanged :  ',$)
-         read (input,320)  record
-  320    format (a120)
-         read (record,*,err=330,end=330)  bndmin,bndmax
-         if (bndmin .gt. bndmax)  goto 300
+         write (iout,280)  bnd(b2,b1),bnd(b1,b2)
+  280    format (/,' Lower Bound :',f8.3,8x,'Upper Bound :',f8.3)
+  290    continue
+         write (iout,300)
+  300    format (/,' Enter New Bounds or <CR> to Leave Unchanged :  ',$)
+         read (input,310)  record
+  310    format (a120)
+         read (record,*,err=320,end=320)  bndmin,bndmax
+         if (bndmin .gt. bndmax)  goto 290
          bnd(b2,b1) = bndmin
          bnd(b1,b2) = bndmax
          call trifix (b1,b2)
-  330    continue
+  320    continue
       end do
 c
 c     display the smoothed upper and lower bounds matrix
 c
       if (verbose .and. n.le.130) then
          title = 'Triangle Smoothed Bounds :'
-         call grafic (n,maxgeo,bnd,title)
+         call grafic (n,bnd,title)
       end if
 c
 c     find the largest value of an upper bound between atoms
@@ -623,32 +621,32 @@ c
             if (pathmax .lt. bnd(j,i))  pathmax = bnd(j,i)
          end do
       end do
-      write (iout,340)  pathmax
-  340 format (/,' Largest Upper Bound Distance :',15x,f15.4)
+      write (iout,330)  pathmax
+  330 format (/,' Largest Upper Bound Distance :',15x,f15.4)
 c
 c     check for any atoms that have no distance restraints
 c
       quit = .false.
       do i = 1, n
          do j = 1, i-1
-            if (bnd(j,i) .ne. uppermax)  goto 360
+            if (bnd(j,i) .ne. uppermax)  goto 350
          end do
          do j = i+1, n
-            if (bnd(i,j) .ne. uppermax)  goto 360
+            if (bnd(i,j) .ne. uppermax)  goto 350
          end do
          quit = .true.
-         write (iout,350)  i
-  350    format (/,' DISTGEOM  --  Atom',i6,' has no Distance',
+         write (iout,340)  i
+  340    format (/,' DISTGEOM  --  Atom',i6,' has no Distance',
      &              ' Constraints')
-  360    continue
+  350    continue
       end do
       if (quit)  call fatal
 c
 c     generate the desired number of distance geometry structures
 c
       do j = 1, ngeo
-         write (iout,370)  j
-  370    format (/,' Generation via Distance Geometry of Structure',i5)
+         write (iout,360)  j
+  360    format (/,' Generation via Distance Geometry of Structure',i5)
          call embed
 c
 c     superpose the distance geometry structure on input structure

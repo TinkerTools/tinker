@@ -172,6 +172,7 @@ fort77 -c -O2 +E1 gda.f
 fort77 -c -O2 +E1 geometry.f
 fort77 -c -O2 +E1 getint.f
 fort77 -c -O2 +E1 getkey.f
+fort77 -c -O2 +E1 getmol.f
 fort77 -c -O2 +E1 getmol2.f
 fort77 -c -O2 +E1 getnumb.f
 fort77 -c -O2 +E1 getpdb.f
@@ -196,6 +197,7 @@ fort77 -c -O2 +E1 image.f
 fort77 -c -O2 +E1 impose.f
 fort77 -c -O2 +E1 induce.f
 fort77 -c -O2 +E1 inertia.f
+fort77 -c -O2 +E1 initatom.f
 fort77 -c -O2 +E1 initial.f
 fort77 -c -O2 +E1 initprm.f
 fort77 -c -O2 +E1 initres.f
@@ -248,6 +250,7 @@ fort77 -c -O2 +E1 minimize.f
 fort77 -c -O2 +E1 minirot.f
 fort77 -c -O2 +E1 minrigid.f
 fort77 -c -O2 +E1 molecule.f
+fort77 -c -O2 +E1 molxyz.f
 fort77 -c -O2 +E1 moments.f
 fort77 -c -O2 +E1 monte.f
 fort77 -c -O2 +E1 mutate.f
@@ -305,6 +308,7 @@ fort77 -c -O2 +E1 rattle.f
 fort77 -c -O2 +E1 readdyn.f
 fort77 -c -O2 +E1 readgau.f
 fort77 -c -O2 +E1 readint.f
+fort77 -c -O2 +E1 readmol.f
 fort77 -c -O2 +E1 readmol2.f
 fort77 -c -O2 +E1 +Onolimit readpdb.f
 fort77 -c -O2 +E1 +Onolimit readprm.f

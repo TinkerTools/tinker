@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##                (Mac OS X/PGI pgf95 Version)               ##
+#  ##              (PGI pgf95 for Mac OSX Version)              ##
 #  ##                                                           ##
 #  ###############################################################
 #
@@ -24,6 +24,7 @@ pgf95 -fast -mp -o intxyz.x intxyz.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o minimize.x minimize.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o minirot.x minirot.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o minrigid.x minrigid.o libtinker.a libfftw3_omp.a libfftw3.a
+pgf95 -fast -mp -o molxyz.x molxyz.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o monte.x monte.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o newton.x newton.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o newtrot.x newtrot.o libtinker.a libfftw3_omp.a libfftw3.a

@@ -172,6 +172,7 @@ pgf77 -c -fast gda.f
 pgf77 -c -fast geometry.f
 pgf77 -c -fast getint.f
 pgf77 -c -fast getkey.f
+pgf77 -c -fast getmol.f
 pgf77 -c -fast getmol2.f
 pgf77 -c -fast getnumb.f
 pgf77 -c -fast getpdb.f
@@ -196,6 +197,7 @@ pgf77 -c -fast image.f
 pgf77 -c -fast impose.f
 pgf77 -c -fast induce.f
 pgf77 -c -fast inertia.f
+pgf77 -c -fast initatom.f
 pgf77 -c -fast initial.f
 pgf77 -c -fast initprm.f
 pgf77 -c -fast initres.f
@@ -248,6 +250,7 @@ pgf77 -c -fast minimize.f
 pgf77 -c -fast minirot.f
 pgf77 -c -fast minrigid.f
 pgf77 -c -fast molecule.f
+pgf77 -c -fast molxyz.f
 pgf77 -c -fast moments.f
 pgf77 -c -fast monte.f
 pgf77 -c -fast mutate.f
@@ -305,6 +308,7 @@ pgf77 -c -fast rattle.f
 pgf77 -c -fast readdyn.f
 pgf77 -c -fast readgau.f
 pgf77 -c -fast readint.f
+pgf77 -c -fast readmol.f
 pgf77 -c -fast readmol2.f
 pgf77 -c -fast readpdb.f
 pgf77 -c -fast readprm.f

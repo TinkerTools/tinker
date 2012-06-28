@@ -56,29 +56,29 @@ c
       integer nlock,nconv
       integer irange,ifactor
       integer maxiter,freeunit
-      integer iblk(maxatm)
+      integer, allocatable :: iblk(:)
       real*8 fmax,funit
       real*8 wtol,factor
       real*8 size,space,sum
       real*8 dfreq,rnorm,rcomp
       real*8 ratio,shift
       real*8 uku_min,uku_max
-      real*8 xe(maxvar)
-      real*8 xm(maxvar)
-      real*8 p(maxvar)
-      real*8 pk(maxvar)
-      real*8 hmin(maxvar)
-      real*8 uu(maxhess)
-      real*8 uku(maxvar)
-      real*8 uku0(maxvar)
-      real*8 u(maxvar,6)
-      real*8 ur(maxvar,3)
-      real*8 freq(maxbasis)
-      real*8 freqold(maxbasis)
-      real*8 tmp1(maxbasis)
-      real*8 tmp2(maxbasis)
-      real*8 h(maxbasis,maxbasis)
-      real*8 c(maxbasis,maxbasis)
+      real*8, allocatable :: xe(:)
+      real*8, allocatable :: xm(:)
+      real*8, allocatable :: p(:)
+      real*8, allocatable :: pk(:)
+      real*8, allocatable :: hmin(:)
+      real*8, allocatable :: uku(:)
+      real*8, allocatable :: uku0(:)
+      real*8, allocatable :: uu(:)
+      real*8, allocatable :: freq(:)
+      real*8, allocatable :: freqold(:)
+      real*8, allocatable :: tmp1(:)
+      real*8, allocatable :: tmp2(:)
+      real*8, allocatable :: u(:,:)
+      real*8, allocatable :: ur(:,:)
+      real*8, allocatable :: h(:,:)
+      real*8, allocatable :: c(:,:)
       character*1 answer
       character*20 keyword
       character*120 record
@@ -169,12 +169,6 @@ c
       npair = 2 * nroot
       nbasis = 3 * nroot
 c
-c     perform dynamic allocation of some pointer arrays
-c
-      allocate (phi(nvar,nbasis))
-      allocate (phik(nvar,nbasis))
-      allocate (pwork(nvar,nbasis))
-c
 c     open or create eigenvector file for use during restarts
 c
       ivb1 = freeunit ()
@@ -200,6 +194,26 @@ c
          open (unit=ivb2,file=datafile,status='new',form='unformatted')
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iblk(n))
+      allocate (xe(nvar))
+      allocate (xm(nvar))
+      allocate (p(nvar))
+      allocate (pk(nvar))
+      allocate (hmin(nvar))
+      allocate (uku(nvar))
+      allocate (uku0(nvar))
+      allocate (uu(maxhess))
+      allocate (u(nvar,6))
+      allocate (ur(nvar,3))
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      allocate (phi(nvar,nbasis))
+      allocate (phik(nvar,nbasis))
+      allocate (pwork(nvar,nbasis))
+c
 c     store a coordinate vector for each atom
 c
       do i = 1, n
@@ -221,7 +235,7 @@ c
 c
 c     remove pure translational and rotational modes
 c
-      call trbasis (np,xe,u,ur)
+      call trbasis (nvar,np,xe,u,ur)
 c
 c     set number and size of blocks based on storage space
 c
@@ -330,6 +344,15 @@ c
          if (uku(k) .lt. uku_min)  uku_min = uku(k)
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (freq(nbasis))
+      allocate (freqold(nbasis))
+      allocate (tmp1(nbasis))
+      allocate (tmp2(nbasis))
+      allocate (h(nbasis,nbasis))
+      allocate (c(nbasis,nbasis))
+c
 c     if restarting, read trial vectors and estimate eigenvalues
 c
       if (restart) then
@@ -410,7 +433,7 @@ c
 c
 c     diagonalize and use first nroot solutions as starting basis
 c
-      call transform (nroot,h,c)
+      call transform (nroot,nbasis,h,c)
 c
 c     fill up arrays
 c
@@ -495,7 +518,7 @@ c
 c
 c     diagonalize and use first nroot solutions as new guess
 c
-      call transform (npair,h,c)
+      call transform (npair,nbasis,h,c)
       do k = 1, nvar
          do j = 1, nroot
             tmp1(j) = 0.0d0
@@ -654,7 +677,7 @@ c
 c
 c     diagonalize and use first nroot solutions as new guess
 c
-      call transform (nbasis,h,c)
+      call transform (nbasis,nbasis,h,c)
 c
 c     check for collapse based on leading component of ground state
 c
@@ -686,13 +709,13 @@ c
          iconv = iconv + 1
          goto 190
       end if
-      if (iconv .gt. 0) then
 c
 c     shift levels of preconditioner matrix; since the Hessian
 c     is gradually deflated, reduce effect of the preconditioner
 c     based on a simple 1/x curve, the uku levels are squeezed
 c     upwards to eventually lead to a unit operator
 c
+      if (iconv .gt. 0) then
          ratio = dble(nconv+iconv) / dble(nvar)
          shift = uku_min / (1.0d0-ratio)
          shift = shift + h(iconv+nroot,iconv+nroot)
@@ -1018,10 +1041,30 @@ c     project out locked roots from components of phik
 c
       call projectk (nvar,nconv,ivb1,nroot,npair)
       goto 160
+  280 continue
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iblk)
+      deallocate (xe)
+      deallocate (xm)
+      deallocate (p)
+      deallocate (pk)
+      deallocate (hmin)
+      deallocate (uku)
+      deallocate (uku0)
+      deallocate (uu)
+      deallocate (u)
+      deallocate (ur)
+      deallocate (freq)
+      deallocate (freqold)
+      deallocate (tmp1)
+      deallocate (tmp2)
+      deallocate (h)
+      deallocate (c)
 c
 c     perform any final tasks before program exit
 c
-  280 continue
       call final
       end
 c
@@ -1050,8 +1093,8 @@ c
       real*8 random
       real*8 p(*)
       real*8 uu(*)
-      real*8 u(maxvar,6)
-      real*8 tmp(maxvar)
+      real*8 u(nvar,*)
+      real*8, allocatable :: tmp(:)
 c
 c
 c     set the number of random guesses
@@ -1099,6 +1142,10 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (tmp(nvar))
+c
 c     project the vector onto P-space
 c
       call qonvec (nvar,np,u,p,tmp)
@@ -1113,6 +1160,10 @@ c
       do i = 1, nvar
          p(i) = tmp(i) / sum
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (tmp)
       return
       end
 c
@@ -1128,25 +1179,26 @@ c     "trbasis" forms translation and rotation basis vectors used
 c     during vibrational analysis via block iterative diagonalization
 c
 c
-      subroutine trbasis (np,xe,u,ur)
+      subroutine trbasis (nvar,np,xe,u,ur)
       implicit none
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
       integer i,j,k
-      integer np,nvar
+      integer nvar,np
       real*8 tmass,sum
       real*8 ra,rha,pr
-      real*8 cm(3),p(3)
-      real*8 e(3,3),c(3,3)
+      real*8 cm(3)
+      real*8 p(3)
+      real*8 e(3,3)
+      real*8 c(3,3)
       real*8 xe(*)
-      real*8 u(maxvar,6)
-      real*8 ur(maxvar,3)
+      real*8 u(nvar,*)
+      real*8 ur(nvar,*)
 c
 c
 c     zero out the translation and rotation vectors
 c
-      nvar = 3 * n
       do i = 1, 6
          do j = 1, nvar
             u(j,i) = 0.0d0
@@ -1283,8 +1335,8 @@ c
       real*8 uku(*)
       real*8 pk(*)
       real*8 uu(*)
-      real*8 d(maxvar)
-      real*8 work(maxvar)
+      real*8, allocatable :: d(:)
+      real*8, allocatable :: work(:)
 c
 c
 c     find smallest element of |h-uku|
@@ -1295,6 +1347,11 @@ c
             hmin = abs(h-uku(k))
          end if
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (d(nvar))
+      allocate (work(nvar))
 c
 c     assign values to temporary array
 c
@@ -1348,6 +1405,11 @@ c
             end do
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (d)
+      deallocate (work)
       return
       end
 c
@@ -1371,9 +1433,14 @@ c
       integer nvar,nb
       real*8 sum
       real*8 p0(*)
-      real*8 s(maxbasis)
-      real*8 proj(maxvar)
+      real*8, allocatable :: s(:)
+      real*8, allocatable :: proj(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (s(nb))
+      allocate (proj(nvar))
 c
 c     make overlap between two basis sets
 c
@@ -1415,6 +1482,11 @@ c
       do i = 1, nvar
          p0(i) = proj(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (s)
+      deallocate (proj)
       return
       end
 c
@@ -1434,10 +1506,10 @@ c
       implicit none
       include 'sizes.i'
       integer i,j,nvar,np
+      real*8 pku(6)
       real*8 pk(*)
       real*8 p(*)
-      real*8 u(maxvar,6)
-      real*8 pku(6)
+      real*8 u(nvar,*)
 c
 c
 c     operate on vector pk with u-transpose
@@ -1486,8 +1558,8 @@ c
       integer i,j,k
       integer nvar,nconv
       integer ivb1,ns,m
-      real*8 temp(maxbasis)
-      real*8 u(maxvar)
+      real*8, allocatable :: temp(:)
+      real*8, allocatable :: u(:)
 c
 c
 c     zero the temporary storage array
@@ -1497,6 +1569,11 @@ c
             pwork(k,i+m) = 0.0d0
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (temp(ns))
+      allocate (u(nvar))
 c
 c     read and scan over the locked eigenvectors
 c
@@ -1514,6 +1591,11 @@ c
             end do
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (temp)
+      deallocate (u)
 c
 c     project locked vectors out of the current set
 c
@@ -1546,8 +1628,8 @@ c
       integer i,j,k
       integer nvar,nconv
       integer ivb1,ns,m
-      real*8 temp(maxbasis)
-      real*8 u(maxvar)
+      real*8, allocatable :: temp(:)
+      real*8, allocatable :: u(:)
 c
 c
 c     zero the temporary storage array
@@ -1557,6 +1639,11 @@ c
             pwork(k,i+m) = 0.0d0
          end do
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (temp(ns))
+      allocate (u(nvar))
 c
 c     read and scan over the locked eigenvectors
 c
@@ -1574,6 +1661,11 @@ c
             end do
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (temp)
+      deallocate (u)
 c
 c     project locked vectors out of the current set
 c
@@ -1611,9 +1703,9 @@ c
       real*8 qe(*)
       real*8 uvec(*)
       real*8 kuvec(*)
-      real*8 delta(maxvar)
-      real*8 grd1(3,maxatm)
-      real*8 grd2(3,maxatm)
+      real*8, allocatable :: delta(:)
+      real*8, allocatable :: grd1(:,:)
+      real*8, allocatable :: grd2(:,:)
 c
 c
 c     estimate displacement based on total average
@@ -1622,6 +1714,12 @@ c
       do i = 1, nvar
          sum = sum + uvec(i)*uvec(i)/xm(i)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (delta(nvar))
+      allocate (grd1(3,n))
+      allocate (grd2(3,n))
 c
 c     store the coordinate displacements
 c
@@ -1659,6 +1757,12 @@ c
             kuvec(k+j) = term * (grd1(j,i)-grd2(j,i)) / sqrt(xm(k+j))
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (delta)
+      deallocate (grd1)
+      deallocate (grd2)
       return
       end
 c
@@ -1674,25 +1778,27 @@ c     "transform" diagonalizes the current basis vectors to produce
 c     trial roots for sliding block iterative matrix diagonalization
 c
 c
-      subroutine transform (nb,h,c)
+      subroutine transform (ns,nb,h,c)
       implicit none
-      integer maxroot
-      integer maxbasis
-      parameter (maxroot=50)
-      parameter (maxbasis=3*maxroot)
-      integer i,j,k,nb
-      real*8 e1(maxbasis)
-      real*8 h1((maxbasis+1)*maxbasis/2)
-      real*8 h(maxbasis,maxbasis)
-      real*8 c(maxbasis,maxbasis)
-      real*8 c1(maxbasis,maxbasis)
+      integer i,j,k,ns,nb
+      real*8 h(nb,*)
+      real*8 c(nb,*)
+      real*8, allocatable :: e1(:)
+      real*8, allocatable :: h1(:)
+      real*8, allocatable :: c1(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (e1(ns))
+      allocate (h1((ns+1)*ns/2))
+      allocate (c1(ns,ns))
 c
 c     pack the upper triangle of matrix
 c
       k = 0
-      do i = 1, nb
-         do j = i, nb
+      do i = 1, ns
+         do j = i, ns
             k = k + 1
             h1(k) = h(i,j)
          end do
@@ -1700,17 +1806,23 @@ c
 c
 c     perform the matrix diagonalization
 c
-      call diagq (nb,nb,h1,e1,c1)
+      call diagq (ns,ns,h1,e1,c1)
 c
 c     copy values into the return arrays
 c
-      do i = 1, nb
-         do j = 1, nb
+      do i = 1, ns
+         do j = 1, ns
             h(i,j) = 0.0d0
             c(i,j) = c1(i,j)
          end do
          h(i,i) = e1(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (e1)
+      deallocate (h1)
+      deallocate (c1)
       return
       end
 c
@@ -1733,10 +1845,16 @@ c
       integer n,k0,k1
       real*8 wres(*)
       real*8 vector(*)
-      real*8 hval(maxvib)
-      real*8 hres((maxvib+1)*maxvib/2)
-      real*8 hvec(maxvib,maxvib)
+      real*8, allocatable :: hval(:)
+      real*8, allocatable :: hres(:)
+      real*8, allocatable :: hvec(:,:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hval(n))
+      allocate (hres((n+1)*n/2))
+      allocate (hvec(n,n))
 c
 c     pack the upper triangle of matrix
 c
@@ -1765,6 +1883,12 @@ c
       do i = 1, n
          wres(k1+i-1) = hval(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hval)
+      deallocate (hres)
+      deallocate (hvec)
       return
       end
 c
@@ -1792,9 +1916,9 @@ c
       integer freeunit
       real*8 ratio
       real*8 p(*)
-      real*8 xref(maxatm)
-      real*8 yref(maxatm)
-      real*8 zref(maxatm)
+      real*8, allocatable :: xref(:)
+      real*8, allocatable :: yref(:)
+      real*8, allocatable :: zref(:)
       character*7 ext
       character*120 xyzfile
 c
@@ -1807,6 +1931,12 @@ c
       ixyz = freeunit ()
       call version (xyzfile,'new')
       open (unit=ixyz,file=xyzfile,status='new')
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xref(n))
+      allocate (yref(n))
+      allocate (zref(n))
 c
 c     store the original atomic coordinates
 c
@@ -1838,6 +1968,12 @@ c
          y(i) = yref(i)
          z(i) = zref(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xref)
+      deallocate (yref)
+      deallocate (zref)
       return
       end
 c
@@ -1878,9 +2014,9 @@ c
       real*8 cutoff,rdn
       real*8 amass(*)
       real*8 vector(*)
-      real*8 xred(maxatm)
-      real*8 yred(maxatm)
-      real*8 zred(maxatm)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
 c
 c
 c     maintain any periodic boundary conditions
@@ -1906,6 +2042,12 @@ c
          call rotpole
          call induce
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
 c
 c     calculate the "reduced" atomic coordinates
 c
@@ -2010,5 +2152,11 @@ c
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
       return
       end

@@ -173,6 +173,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace gda.f
 LF95 -c -o1 -tpp -nstchk -ntrace geometry.f
 LF95 -c -o1 -tpp -nstchk -ntrace getint.f
 LF95 -c -o1 -tpp -nstchk -ntrace getkey.f
+LF95 -c -o1 -tpp -nstchk -ntrace getmol.f
 LF95 -c -o1 -tpp -nstchk -ntrace getmol2.f
 LF95 -c -o1 -tpp -nstchk -ntrace getnumb.f
 LF95 -c -o1 -tpp -nstchk -ntrace getpdb.f
@@ -197,6 +198,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace image.f
 LF95 -c -o1 -tpp -nstchk -ntrace impose.f
 LF95 -c -o1 -tpp -nstchk -ntrace induce.f
 LF95 -c -o1 -tpp -nstchk -ntrace inertia.f
+LF95 -c -o1 -tpp -nstchk -ntrace initatom.f
 LF95 -c -o1 -tpp -nstchk -ntrace initial.f
 LF95 -c -o1 -tpp -nstchk -ntrace initprm.f
 LF95 -c -o1 -tpp -nstchk -ntrace initres.f
@@ -249,6 +251,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace minimize.f
 LF95 -c -o1 -tpp -nstchk -ntrace minirot.f
 LF95 -c -o1 -tpp -nstchk -ntrace minrigid.f
 LF95 -c -o1 -tpp -nstchk -ntrace molecule.f
+LF95 -c -o1 -tpp -nstchk -ntrace molxyz.f
 LF95 -c -o1 -tpp -nstchk -ntrace moments.f
 LF95 -c -o1 -tpp -nstchk -ntrace monte.f
 LF95 -c -o1 -tpp -nstchk -ntrace mutate.f
@@ -306,6 +309,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace rattle.f
 LF95 -c -o1 -tpp -nstchk -ntrace readdyn.f
 LF95 -c -o1 -tpp -nstchk -ntrace readgau.f
 LF95 -c -o1 -tpp -nstchk -ntrace readint.f
+LF95 -c -o1 -tpp -nstchk -ntrace readmol.f
 LF95 -c -o1 -tpp -nstchk -ntrace readmol2.f
 LF95 -c -o1 -tpp -nstchk -ntrace readpdb.f
 LF95 -c -o1 -tpp -nstchk -ntrace readprm.f

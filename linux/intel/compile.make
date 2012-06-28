@@ -172,6 +172,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp gda.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp geometry.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp getint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp getkey.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp getmol.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp getmol2.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp getnumb.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp getpdb.f
@@ -196,6 +197,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp image.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp impose.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp induce.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp inertia.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp initatom.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp initial.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp initprm.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp initres.f
@@ -248,6 +250,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp minimize.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp minirot.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp minrigid.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp molecule.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp molxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp moments.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp monte.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp mutate.f
@@ -305,6 +308,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp rattle.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readdyn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readgau.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readint.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readmol.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readmol2.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readpdb.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -assume cc_omp -openmp readprm.f

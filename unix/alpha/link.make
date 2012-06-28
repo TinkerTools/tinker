@@ -24,6 +24,7 @@ f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o intxyz.x intxyz.o libtinke
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o minimize.x minimize.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o minirot.x minirot.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o minrigid.x minrigid.o libtinker.a
+f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o molxyz.x molxyz.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o monte.x monte.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o newton.x newton.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o newtrot.x newtrot.o libtinker.a

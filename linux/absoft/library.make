@@ -163,6 +163,7 @@ freeunit.o \
 geometry.o \
 getint.o \
 getkey.o \
+getmol.o \
 getmol2.o \
 getnumb.o \
 getpdb.o \
@@ -187,6 +188,7 @@ image.o \
 impose.o \
 induce.o \
 inertia.o \
+initatom.o \
 initial.o \
 initprm.o \
 initres.o \
@@ -272,6 +274,7 @@ rattle.o \
 readdyn.o \
 readgau.o \
 readint.o \
+readmol.o \
 readmol2.o \
 readpdb.o \
 readprm.o \

@@ -43,6 +43,7 @@ c     maxcell         unit cells in replicated crystal
 c     maxring         3-, 4-, or 5-membered rings
 c     maxbio          biopolymer atom definitions
 c     maxres          residues in the macromolecule
+c     maxele          elements in periodic table
 c     maxamino        amino acid residue types
 c     maxnuc          nucleic acid residue types
 c     maxbnd          covalent bonds in molecular system
@@ -58,10 +59,10 @@ c
       integer maxlight,maxvlst,maxelst
       integer maxfft,maxfix,maxvib
       integer maxgeo,maxcell,maxring
-      integer maxbio,maxres,maxamino
-      integer maxnuc,maxbnd,maxang
-      integer maxtors,maxbitor
-      parameter (maxatm=1000000)
+      integer maxbio,maxres,maxele
+      integer maxamino,maxnuc,maxbnd
+      integer maxang,maxtors,maxbitor
+      parameter (maxatm=25000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
       parameter (maxref=10)
@@ -84,6 +85,7 @@ c
       parameter (maxring=10000)
       parameter (maxbio=10000)
       parameter (maxres=10000)
+      parameter (maxele=112)
       parameter (maxamino=38)
       parameter (maxnuc=12)
       parameter (maxbnd=2*maxatm)

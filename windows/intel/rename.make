@@ -3,7 +3,7 @@
 #  #############################################################
 #  ##                                                         ##
 #  ##  rename.make  --  rename the TINKER executable modules  ##
-#  ##               (Wintel PC to Unix Version)               ##
+#  ##                (Windows to Unix Version)                ##
 #  ##                                                         ##
 #  #############################################################
 #
@@ -24,6 +24,7 @@ mv INTXYZ.ZIP    intxyz.zip
 mv MINIMIZE.ZIP  minimize.zip
 mv MINIROT.ZIP   minirot.zip
 mv MINRIGID.ZIP  minrigid.zip
+mv MOLXYZ.ZIP    molxyz.zip
 mv MONTE.ZIP     monte.zip
 mv NEWTON.ZIP    newton.zip
 mv NEWTROT.ZIP   newtrot.zip

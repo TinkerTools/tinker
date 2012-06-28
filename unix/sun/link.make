@@ -24,6 +24,7 @@ f77 -fast -o intxyz.x intxyz.o -L. -ltinker
 f77 -fast -o minimize.x minimize.o -L. -ltinker
 f77 -fast -o minirot.x minirot.o -L. -ltinker
 f77 -fast -o minrigid.x minrigid.o -L. -ltinker
+f77 -fast -o molxyz.x molxyz.o -L. -ltinker
 f77 -fast -o monte.x monte.o -L. -ltinker
 f77 -fast -o newton.x newton.o -L. -ltinker
 f77 -fast -o newtrot.x newtrot.o -L. -ltinker

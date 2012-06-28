@@ -24,6 +24,7 @@ f77 -O -mips4 -o intxyz.x intxyz.o libtinker.a
 f77 -O -mips4 -o minimize.x minimize.o libtinker.a
 f77 -O -mips4 -o minirot.x minirot.o libtinker.a
 f77 -O -mips4 -o minrigid.x minrigid.o libtinker.a
+f77 -O -mips4 -o molxyz.x molxyz.o libtinker.a
 f77 -O -mips4 -o monte.x monte.o libtinker.a
 f77 -O -mips4 -o newton.x newton.o libtinker.a
 f77 -O -mips4 -o newtrot.x newtrot.o libtinker.a

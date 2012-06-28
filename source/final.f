@@ -21,9 +21,11 @@ c
       implicit none
       include 'sizes.i'
       include 'chunks.i'
+      include 'disgeo.i'
       include 'inform.i'
       include 'iounit.i'
       include 'neigh.i'
+      include 'paths.i'
       include 'pme.i'
       include 'socket.i'
       include 'solute.i'
@@ -47,6 +49,8 @@ c
 c     perform deallocation of associated pointers arrays
 c
       if (associated(pmetable))  deallocate (pmetable)
+      if (associated(bnd))  deallocate (bnd)
+      if (associated(georad))  deallocate (georad)
       if (associated(xvold))  deallocate (xvold)
       if (associated(yvold))  deallocate (yvold)
       if (associated(zvold))  deallocate (zvold)
@@ -60,6 +64,12 @@ c
       if (associated(vlst))  deallocate (vlst)
       if (associated(nelst))  deallocate (nelst)
       if (associated(elst))  deallocate (elst)
+      if (associated(pc0))  deallocate (pc0)
+      if (associated(pc1))  deallocate (pc1)
+      if (associated(pvect))  deallocate (pvect)
+      if (associated(pstep))  deallocate (pstep)
+      if (associated(pzet))  deallocate (pzet)
+      if (associated(gc))  deallocate (gc)
       if (associated(thetai1))  deallocate (thetai1)
       if (associated(thetai2))  deallocate (thetai2)
       if (associated(thetai3))  deallocate (thetai3)

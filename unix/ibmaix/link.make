@@ -24,6 +24,7 @@ xlf -o intxyz.x intxyz.o -L. -ltinker
 xlf -o minimize.x minimize.o -L. -ltinker
 xlf -o minirot.x minirot.o -L. -ltinker
 xlf -o minrigid.x minrigid.o -L. -ltinker
+xlf -o molxyz.x molxyz.o -L. -ltinker
 xlf -o monte.x monte.o -L. -ltinker
 xlf -o newton.x newton.o -L. -ltinker
 xlf -o newtrot.x newtrot.o -L. -ltinker

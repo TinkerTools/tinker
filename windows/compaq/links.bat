@@ -26,6 +26,7 @@ DF /optimize /fast intxyz.obj tinker.lib
 DF /optimize /fast minimize.obj tinker.lib
 DF /optimize /fast minirot.obj tinker.lib
 DF /optimize /fast minrigid.obj tinker.lib
+DF /optimize /fast molxyz.obj tinker.lib
 DF /optimize /fast monte.obj tinker.lib
 DF /optimize /fast newton.obj tinker.lib
 DF /optimize /fast newtrot.obj tinker.lib

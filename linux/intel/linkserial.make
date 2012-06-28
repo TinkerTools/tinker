@@ -24,6 +24,7 @@ ifort -O3 -no-ipo -no-prec-div -static-intel -o intxyz.x intxyz.o libtinker.a ; 
 ifort -O3 -no-ipo -no-prec-div -static-intel -o minimize.x minimize.o libtinker.a ; strip minimize.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o minirot.x minirot.o libtinker.a ; strip minirot.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o minrigid.x minrigid.o libtinker.a ; strip minrigid.x
+ifort -O3 -no-ipo -no-prec-div -static-intel -o molxyz.x molxyz.o libtinker.a ; strip molxyz.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o monte.x monte.o libtinker.a ; strip monte.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o newton.x newton.o libtinker.a ; strip newton.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o newtrot.x newtrot.o libtinker.a ; strip newtrot.x

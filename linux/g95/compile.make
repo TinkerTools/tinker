@@ -3,7 +3,7 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##                   (Linux/g95 Version)                  ##
+#  ##                 (g95 for Linux Version)                ##
 #  ##                                                        ##
 #  ############################################################
 #
@@ -172,6 +172,7 @@ g95 -c -O gda.f
 g95 -c -O geometry.f
 g95 -c -O getint.f
 g95 -c -O getkey.f
+g95 -c -O getmol.f
 g95 -c -O getmol2.f
 g95 -c -O getnumb.f
 g95 -c -O getpdb.f
@@ -196,6 +197,7 @@ g95 -c -O image.f
 g95 -c -O impose.f
 g95 -c -O induce.f
 g95 -c -O inertia.f
+g95 -c -O initatom.f
 g95 -c -O initial.f
 g95 -c -O initprm.f
 g95 -c -O initres.f
@@ -248,6 +250,7 @@ g95 -c -O minimize.f
 g95 -c -O minirot.f
 g95 -c -O minrigid.f
 g95 -c -O molecule.f
+g95 -c -O molxyz.f
 g95 -c -O moments.f
 g95 -c -O monte.f
 g95 -c -O mutate.f
@@ -305,6 +308,7 @@ g95 -c -O rattle.f
 g95 -c -O readdyn.f
 g95 -c -O readgau.f
 g95 -c -O readint.f
+g95 -c -O readmol.f
 g95 -c -O readmol2.f
 g95 -c -O readpdb.f
 g95 -c -O readprm.f

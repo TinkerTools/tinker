@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##                (Linux/GNU gfortran Version)               ##
+#  ##              (GNU gfortran for Linux Version)             ##
 #  ##                                                           ##
 #  ###############################################################
 #
@@ -24,6 +24,7 @@ gfortran -o intxyz.x intxyz.o libtinker.a
 gfortran -o minimize.x minimize.o libtinker.a
 gfortran -o minirot.x minirot.o libtinker.a
 gfortran -o minrigid.x minrigid.o libtinker.a
+gfortran -o molxyz.x molxyz.o libtinker.a
 gfortran -o monte.x monte.o libtinker.a
 gfortran -o newton.x newton.o libtinker.a
 gfortran -o newtrot.x newtrot.o libtinker.a

@@ -24,6 +24,7 @@ editbin /STACK:60000000 intxyz.exe
 editbin /STACK:60000000 minimize.exe
 editbin /STACK:60000000 minirot.exe
 editbin /STACK:60000000 minrigid.exe
+editbin /STACK:60000000 molxyz.exe
 editbin /STACK:60000000 monte.exe
 editbin /STACK:60000000 newton.exe
 editbin /STACK:60000000 newtrot.exe

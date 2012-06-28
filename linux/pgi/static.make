@@ -24,6 +24,7 @@ pgf77 -Bstatic -s -o intxyz.x intxyz.o libtinker.a
 pgf77 -Bstatic -s -o minimize.x minimize.o libtinker.a
 pgf77 -Bstatic -s -o minirot.x minirot.o libtinker.a
 pgf77 -Bstatic -s -o minrigid.x minrigid.o libtinker.a
+pgf77 -Bstatic -s -o molxyz.x molxyz.o libtinker.a
 pgf77 -Bstatic -s -o monte.x monte.o libtinker.a
 pgf77 -Bstatic -s -o newton.x newton.o libtinker.a
 pgf77 -Bstatic -s -o newtrot.x newtrot.o libtinker.a

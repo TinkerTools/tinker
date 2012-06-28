@@ -24,6 +24,7 @@ ifort -fast -static-intel -vec-report0 -o intxyz.x intxyz.f *.o ; strip intxyz.x
 ifort -fast -static-intel -vec-report0 -o minimize.x minimize.f *.o ; strip minimize.x
 ifort -fast -static-intel -vec-report0 -o minirot.x minirot.f *.o ; strip minirot.x
 ifort -fast -static-intel -vec-report0 -o minrigid.x minrigid.f *.o ; strip minrigid.x
+ifort -fast -static-intel -vec-report0 -o molxyz.x molxyz.f *.o ; strip molxyz.x
 ifort -fast -static-intel -vec-report0 -o monte.x monte.f *.o ; strip monte.x
 ifort -fast -static-intel -vec-report0 -o newton.x newton.f *.o ; strip newton.x
 ifort -fast -static-intel -vec-report0 -o newtrot.x newtrot.f *.o ; strip newtrot.x

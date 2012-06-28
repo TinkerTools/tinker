@@ -25,6 +25,7 @@ ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static intxyz.obj tink
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static minimize.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static minirot.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static minrigid.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static molxyz.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static monte.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static newton.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static newtrot.obj tinker.lib

@@ -3,7 +3,7 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##         (Absoft ProFortran for Linux Version)          ##
+#  ##          (Absoft ProFortran for Linux Version)         ##
 #  ##                                                        ##
 #  ############################################################
 #
@@ -173,6 +173,7 @@ f77 -c -O gda.f
 f77 -c -O geometry.f
 f77 -c -O getint.f
 f77 -c -O getkey.f
+f77 -c -O getmol.f
 f77 -c -O getmol2.f
 f77 -c -O getnumb.f
 f77 -c -O getpdb.f
@@ -197,6 +198,7 @@ f77 -c -O image.f
 f77 -c -O impose.f
 f77 -c -O induce.f
 f77 -c -O inertia.f
+f77 -c -O initatom.f
 f77 -c -O initial.f
 f77 -c -O initprm.f
 f77 -c -O initres.f
@@ -249,6 +251,7 @@ f77 -c -O minimize.f
 f77 -c -O minirot.f
 f77 -c -O minrigid.f
 f77 -c -O molecule.f
+f77 -c -O molxyz.f
 f77 -c -O moments.f
 f77 -c -O monte.f
 f77 -c -O mutate.f
@@ -306,6 +309,7 @@ f77 -c -O rattle.f
 f77 -c -O readdyn.f
 f77 -c -O readint.f
 f77 -c -O readgau.f
+f77 -c -O readmol.f
 f77 -c -O readmol2.f
 f77 -c -O readpdb.f
 f77 -c readprm.f

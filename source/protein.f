@@ -169,7 +169,7 @@ c
      &        /,' and D/L Chirality as Desired (A1)',
      &        //,' If Only Residue Names are Entered, the Default',
      &           ' is to Build an Extended',
-     &        /,' Conformation Using D-Amino Acids and Zwitterionic',
+     &        /,' Conformation Using L-Amino Acids and Zwitterionic',
      &           ' Termini',
      &        //,' Regular Amino Acids:  GLY, ALA, VAL, LEU,',
      &           ' ILE, SER, THR, CYS, CYX, PRO,',

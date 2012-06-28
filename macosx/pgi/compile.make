@@ -3,7 +3,7 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##              (Mac OS X/PGI pgf95 Version)              ##
+#  ##             (PGI pgf95 for Mac OSX Version)            ##
 #  ##                                                        ##
 #  ############################################################
 #
@@ -172,6 +172,7 @@ pgf95 -c -fast -mp gda.f
 pgf95 -c -fast -mp geometry.f
 pgf95 -c -fast -mp getint.f
 pgf95 -c -fast -mp getkey.f
+pgf95 -c -fast -mp getmol.f
 pgf95 -c -fast -mp getmol2.f
 pgf95 -c -fast -mp getnumb.f
 pgf95 -c -fast -mp getpdb.f
@@ -196,6 +197,7 @@ pgf95 -c -fast -mp image.f
 pgf95 -c -fast -mp impose.f
 pgf95 -c -fast -mp induce.f
 pgf95 -c -fast -mp inertia.f
+pgf95 -c -fast -mp initatom.f
 pgf95 -c -fast -mp initial.f
 pgf95 -c -fast -mp initprm.f
 pgf95 -c -fast -mp initres.f
@@ -248,6 +250,7 @@ pgf95 -c -fast -mp minimize.f
 pgf95 -c -fast -mp minirot.f
 pgf95 -c -fast -mp minrigid.f
 pgf95 -c -fast -mp molecule.f
+pgf95 -c -fast -mp molxyz.f
 pgf95 -c -fast -mp moments.f
 pgf95 -c -fast -mp monte.f
 pgf95 -c -fast -mp mutate.f
@@ -305,6 +308,7 @@ pgf95 -c -fast -mp rattle.f
 pgf95 -c -fast -mp readdyn.f
 pgf95 -c -fast -mp readgau.f
 pgf95 -c -fast -mp readint.f
+pgf95 -c -fast -mp readmol.f
 pgf95 -c -fast -mp readmol2.f
 pgf95 -c -fast -mp readpdb.f
 pgf95 -c -fast -mp readprm.f

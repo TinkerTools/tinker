@@ -121,8 +121,10 @@ c
       real*8 weigh,total,dot
       real*8 xx,xy,xz,yy,yz,zz
       real*8 xterm,yterm,zterm
-      real*8 moment(3),vec(3,3)
-      real*8 tensor(3,3),a(3,3)
+      real*8 moment(3)
+      real*8 vec(3,3)
+      real*8 tensor(3,3)
+      real*8 a(3,3)
 c
 c
 c     get the first and last atom in the current group

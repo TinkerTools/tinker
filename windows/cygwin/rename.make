@@ -23,6 +23,7 @@ mv intxyz.x    ../bin/intxyz
 mv minimize.x  ../bin/minimize
 mv minirot.x   ../bin/minirot
 mv minrigid.x  ../bin/minrigid
+mv molxyz.x    ../bin/molxyz
 mv monte.x     ../bin/monte
 mv newton.x    ../bin/newton
 mv newtrot.x   ../bin/newtrot

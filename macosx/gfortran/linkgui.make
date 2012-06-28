@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  linkgui.make  --  link each of the TINKER programs for FFE  ##
-#  ##                  (Mac OS X/gfortran Version)                 ##
+#  ##                (gfortran for Mac OSX Version)                ##
 #  ##                                                              ##
 #  ##################################################################
 #
@@ -24,6 +24,7 @@ gfortran -o intxyz.x intxyz.o libtinker.a -framework JavaVM -framework CoreFound
 gfortran -o minimize.x minimize.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o minirot.x minirot.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o minrigid.x minrigid.o libtinker.a -framework JavaVM -framework CoreFoundation
+gfortran -o molxyz.x molxyz.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o monte.x monte.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o newton.x newton.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o newtrot.x newtrot.o libtinker.a -framework JavaVM -framework CoreFoundation

@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine readmol2  --  input of a Sybyl MOL2 file  ##
-c     ##                                                       ##
-c     ###########################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine readmol2  --  read in a Sybyl MOL2 format file  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "readmol2" gets a set of Sybyl MOL2 coordinates from

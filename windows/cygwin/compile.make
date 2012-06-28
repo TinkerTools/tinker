@@ -172,6 +172,7 @@ gfortran -c -O gda.f
 gfortran -c -O geometry.f
 gfortran -c -O getint.f
 gfortran -c -O getkey.f
+gfortran -c -O getmol.f
 gfortran -c -O getmol2.f
 gfortran -c -O getnumb.f
 gfortran -c -O getpdb.f
@@ -196,6 +197,7 @@ gfortran -c -O image.f
 gfortran -c -O impose.f
 gfortran -c -O induce.f
 gfortran -c -O inertia.f
+gfortran -c -O initatom.f
 gfortran -c -O initial.f
 gfortran -c -O initprm.f
 gfortran -c -O initres.f
@@ -248,6 +250,7 @@ gfortran -c -O minimize.f
 gfortran -c -O minirot.f
 gfortran -c -O minrigid.f
 gfortran -c -O molecule.f
+gfortran -c -O molxyz.f
 gfortran -c -O moments.f
 gfortran -c -O monte.f
 gfortran -c -O mutate.f
@@ -305,6 +308,7 @@ gfortran -c -O rattle.f
 gfortran -c -O readdyn.f
 gfortran -c -O readgau.f
 gfortran -c -O readint.f
+gfortran -c -O readmol.f
 gfortran -c -O readmol2.f
 gfortran -c -O readpdb.f
 gfortran -c -O readprm.f

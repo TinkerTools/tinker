@@ -3,7 +3,7 @@
 #  ############################################################
 #  ##                                                        ##
 #  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##          (Mac OS X/Absoft ProFortran Version)          ##
+#  ##         (Absoft ProFortran for Mac OSX Version)        ##
 #  ##                                                        ##
 #  ############################################################
 #
@@ -173,6 +173,7 @@ f77 -c -O -N11 gda.f
 f77 -c -O -N11 geometry.f
 f77 -c -O -N11 getint.f
 f77 -c -O -N11 getkey.f
+f77 -c -O -N11 getmol.f
 f77 -c -O -N11 getmol2.f
 f77 -c -O -N11 getnumb.f
 f77 -c -O -N11 getpdb.f
@@ -197,6 +198,7 @@ f77 -c -O -N11 image.f
 f77 -c -O -N11 impose.f
 f77 -c -O -N11 induce.f
 f77 -c -O -N11 inertia.f
+f77 -c -O -N11 initatom.f
 f77 -c -O -N11 initial.f
 f77 -c -O -N11 initprm.f
 f77 -c -O -N11 initres.f
@@ -249,6 +251,7 @@ f77 -c -O -N11 minimize.f
 f77 -c -O -N11 minirot.f
 f77 -c -O -N11 minrigid.f
 f77 -c -O -N11 molecule.f
+f77 -c -O -N11 molxyz.f
 f77 -c -O -N11 moments.f
 f77 -c -O -N11 monte.f
 f77 -c -O -N11 mutate.f
@@ -306,6 +309,7 @@ f77 -c -O -N11 rattle.f
 f77 -c -O -N11 readdyn.f
 f77 -c -O -N11 readgau.f
 f77 -c -O -N11 readint.f
+f77 -c -O -N11 readmol.f
 f77 -c -O -N11 readmol2.f
 f77 -c -O -N11 readpdb.f
 f77 -c -O -N11 readprm.f

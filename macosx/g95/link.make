@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##                   (Mac OS X/g95 -O2 Version)                  ##
+#  ##                 (g95 for Mac OSX Version)                 ##
 #  ##                                                           ##
 #  ###############################################################
 #
@@ -24,6 +24,7 @@ g95 -O2 -o intxyz.x intxyz.o libtinker.a
 g95 -O2 -o minimize.x minimize.o libtinker.a
 g95 -O2 -o minirot.x minirot.o libtinker.a
 g95 -O2 -o minrigid.x minrigid.o libtinker.a
+g95 -O2 -o molxyz.x molxyz.o libtinker.a
 g95 -O2 -o monte.x monte.o libtinker.a
 g95 -O2 -o newton.x newton.o libtinker.a
 g95 -O2 -o newtrot.x newtrot.o libtinker.a
