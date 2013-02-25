@@ -999,26 +999,34 @@ c
             end do
             string = record(next:120)
             read (string,*,err=390,end=390)  ia,ib,ic,id,pl(1)
-            goto 400
+            goto 420
   390       continue
             id = 0
-            read (string,*,err=410,end=410)  ia,ib,ic,pl(1)
+            read (string,*,err=400,end=400)  ia,ib,ic,pl(1)
+            goto 420
   400       continue
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(2),pl(3),pl(4)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(5)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(8),pl(9)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=410,end=410)  pl(11),pl(12),pl(13)
+            ic = 0
+            read (string,*,err=410,end=410)  ia,ib,pl(1)
+            goto 420
   410       continue
+            ib = 0
+            read (string,*,err=430,end=430)  ia,pl(1)
+  420       continue
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(2),pl(3),pl(4)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(5)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(8),pl(9)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=430,end=430)  pl(11),pl(12),pl(13)
+  430       continue
             if (ib .eq. 0)  axt = 'None'
-            if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Axis'
+            if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Only'
             if (ib.lt.0 .or. ic.lt.0)  axt = 'Bisector'
             if (ic.lt.0 .and. id.lt.0)  axt = 'Z-Bisect'
             if (max(ib,ic,id) .lt. 0)  axt = '3-Fold'
@@ -1056,9 +1064,9 @@ c
                pg(i) = 0
             end do
             string = record(next:120)
-            read (string,*,err=420,end=420)  ia,pol,thl,
+            read (string,*,err=440,end=440)  ia,pol,thl,
      &                                       (pg(i),i=1,maxval)
-  420       continue
+  440       continue
             if (ia .ne. 0) then
                polr(ia) = pol
                athl(ia) = thl
@@ -1075,8 +1083,8 @@ c
             iz = 0.0d0
             rp = 0.0d0
             string = record(next:120)
-            read (string,*,err=430,end=430)  ia,el,iz,rp
-  430       continue
+            read (string,*,err=450,end=450)  ia,el,iz,rp
+  450       continue
             if (ia .ne. 0) then
                electron(ia) = el
                ionize(ia) = iz
@@ -1091,8 +1099,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=440,end=440)  ia,ib,ss,ts
-  440       continue
+            read (string,*,err=460,end=460)  ia,ib,ss,ts
+  460       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi = npi + 1
@@ -1112,8 +1120,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=450,end=450)  ia,ib,ss,ts
-  450       continue
+            read (string,*,err=470,end=470)  ia,ib,ss,ts
+  470       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi5 = npi5 + 1
@@ -1133,8 +1141,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:120)
-            read (string,*,err=460,end=460)  ia,ib,ss,ts
-  460       continue
+            read (string,*,err=480,end=480)  ia,ib,ss,ts
+  480       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi4 = npi4 + 1
@@ -1150,8 +1158,8 @@ c     metal ligand field splitting parameters
 c
          else if (keyword(1:6) .eq. 'METAL ') then
             string = record(next:120)
-            read (string,*,err=470,end=470)  ia
-  470       continue
+            read (string,*,err=490,end=490)  ia
+  490       continue
 c
 c     biopolymer atom type conversion definitions
 c
@@ -1159,15 +1167,15 @@ c
             ia = 0
             ib = 0
             string = record(next:120)
-            read (string,*,err=480,end=480)  ia
+            read (string,*,err=500,end=500)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:120)
-            read (string,*,err=480,end=480)  ib
-  480       continue
+            read (string,*,err=500,end=500)  ib
+  500       continue
             if (ia .ge. maxbio) then
                write (iout,40)
-  490          format (/,' READPRM  --  Too many Biopolymer Types;',
+  510          format (/,' READPRM  --  Too many Biopolymer Types;',
      &                    ' Increase MAXBIO')
                call fatal
             end if
@@ -1182,8 +1190,8 @@ c
             rdn = 0.0d0
             da1 = 'C'
             string = record(next:120)
-            read (string,*,err=500,end=500)  ia,rd,alphi,nni,gi,da1
-  500       continue
+            read (string,*,err=520,end=520)  ia,rd,alphi,nni,gi,da1
+  520       continue
             if (ia .ne. 0) then
                rad(ia) = rd
                g(ia) = gi
@@ -1201,8 +1209,8 @@ c
             bd = 0.0d0
             bt = 2
             string = record(next:120)
-            read (string,*,err=510,end=510)  ia,ib,fc,bd,bt
-  510       continue
+            read (string,*,err=530,end=530)  ia,ib,fc,bd,bt
+  530       continue
             nb = nb + 1
             if (bt .eq. 0) then
                mmff_kb(ia,ib) = fc
@@ -1224,8 +1232,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:120)
-            read (string,*,err=520,end=520)  ia,ib,fc,bd
-  520       continue
+            read (string,*,err=540,end=540)  ia,ib,fc,bd
+  540       continue
             r0ref(ia,ib) = fc
             r0ref(ib,ia) = fc
             kbref(ia,ib) = bd
@@ -1241,8 +1249,8 @@ c
             an1 = 0.0d0
             at = 3
             string = record(next:120)
-            read (string,*,err=530,end=530)  ia,ib,ic,fc,an1,at
-  530       continue
+            read (string,*,err=550,end=550)  ia,ib,ic,fc,an1,at
+  550       continue
             na = na + 1
             if (an1 .ne. 0.0d0) then
                if (at .eq. 0) then
@@ -1303,8 +1311,8 @@ c
             cba = 0.0d0
             sbt = 4
             string = record(next:120)
-            read (string,*,err=540,end=540)  ia,ib,ic,abc,cba,sbt
-  540       continue
+            read (string,*,err=560,end=560)  ia,ib,ic,abc,cba,sbt
+  560       continue
             if (ia .ne. 0) then
                if (sbt .eq. 0) then
                   stbn_abc(ia,ib,ic) = abc
@@ -1378,8 +1386,8 @@ c
             id = 0
             fc = 0.0d0
             string = record(next:120)
-            read (string,*,err=550,end=550)  ia,ib,ic,id,fc
-  550       continue
+            read (string,*,err=570,end=570)  ia,ib,ic,id,fc
+  570       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1422,9 +1430,9 @@ c
             end do
             tt = 3
             string = record(next:120)
-            read (string,*,err=560,end=560)  ia,ib,ic,id,(vt(j),
+            read (string,*,err=580,end=580)  ia,ib,ic,id,(vt(j),
      &                                       st(j),ft(j),j=1,3),tt
-  560       continue
+  580       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1527,8 +1535,8 @@ c
             cg = 1000.0d0
             bt = 2
             string = record(next:120)
-            read (string,*,err=570,end=570)  ia,ib,cg,bt
-  570       continue
+            read (string,*,err=590,end=590)  ia,ib,cg,bt
+  590       continue
             if (ia .ne. 0) then
                if (bt .eq. 0) then
                   bci(ia,ib) = cg
@@ -1544,8 +1552,8 @@ c
          else if (keyword(1:9) .eq. 'MMFFPBCI ') then
             ia = 0
             string = record(next:120)
-            read (string,*,err=580,end=580)  ia,cg,factor
-  580       continue
+            read (string,*,err=600,end=600)  ia,cg,factor
+  600       continue
             if (ia .ne. 0) then
                pbci(ia) = cg
                fcadj(ia) = factor
@@ -1561,8 +1569,8 @@ c
             id = 1000
             ie = 1000
             if = 0
-            read (string,*,err=590,end=590)  ia,ib,ic,id,ie,if
-  590       continue
+            read (string,*,err=610,end=610)  ia,ib,ic,id,ie,if
+  610       continue
             eqclass(if,1) = ia
             eqclass(if,2) = ib
             eqclass(if,3) = ic
@@ -1578,8 +1586,8 @@ c
             ic = 1000
             abc = 0.0d0
             cba = 0.0d0
-            read (string,*,err=600,end=600)  ia,ib,ic,abc,cba
-  600       continue
+            read (string,*,err=620,end=620)  ia,ib,ic,abc,cba
+  620       continue
             defstbn_abc(ia,ib,ic) = abc
             defstbn_cba(ia,ib,ic) = cba
             defstbn_abc(ic,ib,ia) = cba
@@ -1592,8 +1600,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:120)
-            read (string,*,err=610,end=610)  ia,fc,bd
-  610       continue
+            read (string,*,err=630,end=630)  ia,fc,bd
+  630       continue
             rad0(ia) = fc
             paulel(ia) = bd
 c
@@ -1610,9 +1618,9 @@ c
             ig = 1000
             ih = 1000
             ii = 1000
-            read (string,*,err=620,end=620)  ia,ib,ic,id,ie,
+            read (string,*,err=640,end=640)  ia,ib,ic,id,ie,
      &                                       if,ig,ih,ii
-  620       continue
+  640       continue
             crd(ia) = ic
             val(ia) = id
             pilp(ia) = ie
@@ -1625,8 +1633,8 @@ c     MMFF aromatic ion parameters
 c
          else if (keyword(1:9) .eq. 'MMFFAROM ') then
             string = record(next:120)
-            read (string,*,err=630,end=630)  ia,ib,ic,id,ie,if
-  630       continue
+            read (string,*,err=650,end=650)  ia,ib,ic,id,ie,if
+  650       continue
             if (ie.eq.0 .and. id.eq.0) then
                mmffarom(ia,if) = ic
             else if (id .eq. 1) then

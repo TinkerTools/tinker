@@ -81,7 +81,7 @@ c
       a(2,3) = 0.0d0
       a(3,3) = 1.0d0
 c
-c     Z-only method rotation matrix elements for z-axis only
+c     Z-Only method rotation matrix elements for z-axis only
 c
       if (polaxe(i) .eq. 'Z-Only') then
          dx = x(iz) - xi
@@ -125,7 +125,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     bisector method rotation matrix elements for z- and x-axes
+c     Bisector method rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Bisector') then
          dx = x(iz) - xi
@@ -158,7 +158,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     Z-bisect method rotation matrix elements for z- and x-axes
+c     Z-Bisect method rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Z-Bisect') then
          dx = x(iz) - xi
@@ -198,7 +198,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     3-fold method rotation matrix elements for z- and x-axes
+c     3-Fold method rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. '3-Fold') then
          dx = x(iz) - xi

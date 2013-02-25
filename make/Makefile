@@ -377,6 +377,7 @@ OBJS = active.o \
        kcharge.o \
        kdipole.o \
        kewald.o \
+       kextra.o \
        kgeom.o \
        kimprop.o \
        kimptor.o \
@@ -991,6 +992,7 @@ libtinker.a: ${OBJS}
         kcharge.o \
         kdipole.o \
         kewald.o \
+        kextra.o \
         kgeom.o \
         kimprop.o \
         kimptor.o \
@@ -1311,6 +1313,7 @@ kbond.o: angle.i atmlst.i atmtyp.i atoms.i bond.i couple.i fields.i inform.i iou
 kcharge.o: atmtyp.i atoms.i charge.i chgpot.i couple.i fields.i inform.i iounit.i kchrge.i keys.i merck.i potent.i sizes.i
 kdipole.o: atmlst.i atoms.i bond.i couple.i dipole.i inform.i iounit.i kdipol.i keys.i potent.i sizes.i
 kewald.o: atoms.i bound.i boxes.i chunks.i cutoff.i ewald.i fft.i inform.i iounit.i keys.i math.i openmp.i pme.i sizes.i
+kextra.o:
 kgeom.o: atmtyp.i atoms.i bound.i couple.i group.i iounit.i keys.i kgeoms.i molcul.i potent.i sizes.i
 kimprop.o: atmtyp.i atoms.i couple.i improp.i inform.i iounit.i keys.i kiprop.i potent.i sizes.i
 kimptor.o: atmtyp.i atoms.i couple.i imptor.i inform.i iounit.i keys.i kitors.i math.i potent.i sizes.i

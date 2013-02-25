@@ -65,7 +65,7 @@ c
       uindsave = .false.
       friction = 91.0d0
       use_sdarea = .false.
-      use_aspc = .false.
+      use_pred = .false.
       iprint = 100
 c
 c     set default values for temperature and pressure control
@@ -117,8 +117,8 @@ c
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
-         else if (keyword(1:11) .eq. 'POLAR-ASPC ') then
-            use_aspc = .true.
+         else if (keyword(1:14) .eq. 'POLAR-PREDICT ') then
+            use_pred = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)
@@ -176,21 +176,42 @@ c
 c
 c     perform dynamic allocation of some pointer arrays
 c
-      if (use_aspc) then
+      if (use_pred) then
          if (associated(udalt))  deallocate (udalt)
          if (associated(upalt))  deallocate (upalt)
          allocate (udalt(maxualt,3,n))
          allocate (upalt(maxualt,3,n))
 c
-c     setup always stable predictor-corrector for induced dipoles
+c     set Gear predictor binomial coefficients
+c
+c        bpred(1) = 6.0d0
+c        bpred(2) = -15.0d0
+c        bpred(3) = 20.0d0
+c        bpred(4) = -15.0d0
+c        bpred(5) = 6.0d0
+c        bpred(6) = -1.0d0
+c
+c     set always stable predictor-corrector (ASPC) coefficients
+c
+         bpred(1) = 22.0d0 / 7.0d0
+         bpred(2) = -55.0d0 / 14.0d0
+         bpred(3) = 55.0d0 / 21.0d0
+         bpred(4) = -22.0d0 / 21.0d0
+         bpred(5) = 5.0d0 / 21.0d0
+         bpred(6) = -1.0d0 / 42.0d0
+c
+c     set Challacombe time-reversible coefficients
+c
+c        bpred(1) = 30.0d0 / 13.0d0
+c        bpred(2) = -3.0d0 / 13.0d0
+c        bpred(3) = -28.0d0 / 13.0d0
+c        bpred(4) = -3.0d0 / 13.0d0
+c        bpred(5) = 30.0d0 / 13.0d0
+c        bpred(6) = -1.0d0
+c
+c    initialize prior values of induced dipole moments
 c
          nualt = 0
-         baspc(1) = 22.0d0 / 7.0d0
-         baspc(2) = -55.0d0 / 14.0d0
-         baspc(3) = 55.0d0 / 21.0d0
-         baspc(4) = -22.0d0 / 21.0d0
-         baspc(5) = 5.0d0 / 21.0d0
-         baspc(6) = -1.0d0 / 42.0d0
          do i = 1, npole
             do j = 1, 3
                do k = 1, maxualt

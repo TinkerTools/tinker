@@ -32,7 +32,7 @@ c     numerical derivatives; setting the flag to "true" gives a more
 c     accurate Hessian at the expense of 50% additional computation
 c
 c     in the current version, all of the above accuracy improvements
-c     are turned on for systems containing 50 atoms or fewer
+c     are turned on for systems containing 100 atoms or fewer
 c
 c
       subroutine empole2 (i)
@@ -59,7 +59,7 @@ c
       biglist = .false.
       reinduce = .false.
       twosided = .false.
-      if (n .le. 50) then
+      if (n .le. 100) then
          biglist = .true.
          reinduce = .true.
          twosided = .true.
@@ -378,7 +378,7 @@ c
             xr = x(kk) - x(ii)
             yr = y(kk) - y(ii)
             zr = z(kk) - z(ii)
-            call image (xr,yr,zr)
+            if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)

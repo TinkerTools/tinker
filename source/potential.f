@@ -28,6 +28,7 @@ c
       include 'keys.i'
       include 'minima.i'
       include 'mpole.i'
+      include 'neigh.i'
       include 'output.i'
       include 'potent.i'
       include 'potfit.i'
@@ -562,7 +563,11 @@ c
                call getref (j)
                call setelect
                if (use_mpole)  call rotpole
-               if (use_polar)  call induce
+               if (use_polar) then
+                  domlst = .true.
+                  call nblist
+                  call induce
+               end if
                do i = 1, npgrid(j)
                   xi = pgrid(1,i,j)
                   yi = pgrid(2,i,j)
@@ -596,7 +601,11 @@ c
             call setelect
             call varprm (nvar,xx,0,0.0d0)
             if (use_mpole)  call rotpole
-            if (use_polar)  call induce
+            if (use_polar) then
+               domlst = .true.
+               call nblist
+               call induce
+            end if
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
@@ -1501,6 +1510,7 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'moment.i'
+      include 'neigh.i'
       include 'potent.i'
       include 'potfit.i'
       integer i,j,k,m
@@ -1535,7 +1545,11 @@ c
          call setelect
          call varprm (nvar,xx,0,0.0d0)
          if (use_mpole)  call rotpole
-         if (use_polar)  call induce
+         if (use_polar) then
+            domlst = .true.
+            call nblist
+            call induce
+         end if
 c
 c     get the RMS potential error summed over grid points
 c
@@ -1584,7 +1598,11 @@ c
             call setelect
             call varprm (nvar,xx,k,-0.5d0*eps)
             if (use_mpole)  call rotpole
-            if (use_polar)  call induce
+            if (use_polar) then
+               domlst = .true.
+               call nblist
+               call induce
+            end if
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
@@ -1619,7 +1637,11 @@ c
             call setelect
             call varprm (nvar,xx,k,0.5d0*eps)
             if (use_mpole)  call rotpole
-            if (use_polar)  call induce
+            if (use_polar) then
+               domlst = .true.
+               call nblist
+               call induce
+            end if
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)

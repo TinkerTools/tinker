@@ -12,6 +12,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
+c     politer   maximum number of induced dipole SCF iterations
 c     poleps    induced dipole convergence criterion (rms Debyes/atom)
 c     polsor    induced dipole SOR convergence acceleration factor
 c     p2scale   scale factor for 1-2 polarization energy interactions
@@ -30,6 +31,7 @@ c     u4scale   scale factor for 1-4 group mutual induction
 c     poltyp    type of polarization potential (direct or mutual)
 c
 c
+      integer politer
       real*8 poleps,polsor
       real*8 p2scale,p3scale
       real*8 p4scale,p5scale
@@ -41,4 +43,4 @@ c
       character*6 poltyp
       common /polpot/ poleps,polsor,p2scale,p3scale,p4scale,p41scale,
      &                p5scale,d1scale,d2scale,d3scale,d4scale,u1scale,
-     &                u2scale,u3scale,u4scale,poltyp
+     &                u2scale,u3scale,u4scale,politer,poltyp

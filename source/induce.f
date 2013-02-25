@@ -58,7 +58,7 @@ c
 c
 c     update the lists of previous induced dipole values
 c
-      if (use_aspc) then
+      if (use_pred) then
          nualt = min(nualt+1,maxualt)
          do i = 1, npole
             do j = 1, 3
@@ -193,8 +193,8 @@ c
       include 'units.i'
       include 'uprior.i'
       integer i,j,k,m
-      integer ii,kk
-      integer iter,maxiter
+      integer ii,kk,iter
+      integer maxiter
       real*8 xr,yr,zr
       real*8 fgrp,r,r2
       real*8 rr3,rr5,rr7
@@ -320,7 +320,7 @@ c
                xr = x(kk) - x(ii)
                yr = y(kk) - y(ii)
                zr = z(kk) - z(ii)
-               call image (xr,yr,zr)
+               if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
@@ -544,14 +544,14 @@ c
 c
 c     predicted values for always stable predictor-corrector method
 c
-         if (use_aspc .and. nualt.eq.maxualt) then
+         if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
                   do k = 1, nualt
-                     udsum = udsum + baspc(k)*udalt(k,j,i)
-                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -602,7 +602,7 @@ c
                      xr = x(kk) - x(ii)
                      yr = y(kk) - y(ii)
                      zr = z(kk) - z(ii)
-                     call image (xr,yr,zr)
+                     if (use_bounds)  call image (xr,yr,zr)
                      r2 = xr*xr + yr* yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
@@ -785,7 +785,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
          end do
          if (debug) then
             write (iout,30)  iter,eps
@@ -795,7 +795,7 @@ c
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps .gt. poleps) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,40)
    40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
@@ -977,7 +977,7 @@ c
                xr = x(kk) - x(ii)
                yr = y(kk) - y(ii)
                zr = z(kk) - z(ii)
-               call image (xr,yr,zr)
+               if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
@@ -1070,14 +1070,14 @@ c
 c
 c     predicted values for always stable predictor-corrector method
 c
-         if (use_aspc .and. nualt.eq.maxualt) then
+         if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
                   do k = 1, nualt
-                     udsum = udsum + baspc(k)*udalt(k,j,i)
-                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -1129,7 +1129,7 @@ c
                      xr = x(kk) - x(ii)
                      yr = y(kk) - y(ii)
                      zr = z(kk) - z(ii)
-                     call image (xr,yr,zr)
+                     if (use_bounds)  call image (xr,yr,zr)
                      r2 = xr*xr + yr* yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
@@ -1213,7 +1213,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
          end do
          if (debug) then
             write (iout,30)  iter,eps
@@ -1223,7 +1223,7 @@ c
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps .gt. poleps) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,40)
    40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
@@ -1272,8 +1272,9 @@ c
       include 'potent.i'
       include 'units.i'
       include 'uprior.i'
-      integer i,j,k,ii
-      integer iter,maxiter
+      integer i,j,k
+      integer ii,iter
+      integer maxiter
       real*8 eps,term
       real*8 epsd,epsp
       real*8 epsold
@@ -1375,14 +1376,14 @@ c
 c
 c     predicted values for always stable predictor-corrector method
 c
-         if (use_aspc .and. nualt.eq.maxualt) then
+         if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
                   do k = 1, nualt
-                     udsum = udsum + baspc(k)*udalt(k,j,i)
-                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -1460,7 +1461,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
          end do
          if (debug) then
             write (iout,30)  iter,eps
@@ -1470,7 +1471,7 @@ c
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps .gt. poleps) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,40)
    40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
@@ -1517,8 +1518,9 @@ c
       include 'potent.i'
       include 'units.i'
       include 'uprior.i'
-      integer i,j,k,ii
-      integer iter,maxiter
+      integer i,j,k
+      integer ii,iter
+      integer maxiter
       real*8 eps,term
       real*8 epsd,epsp
       real*8 epsold
@@ -1620,14 +1622,14 @@ c
 c
 c     predicted values for always stable predictor-corrector method
 c
-         if (use_aspc .and. nualt.eq.maxualt) then
+         if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
                   do k = 1, nualt
-                     udsum = udsum + baspc(k)*udalt(k,j,i)
-                     upsum = upsum + baspc(k)*upalt(k,j,i)
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -1705,7 +1707,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
          end do
          if (debug) then
             write (iout,30)  iter,eps
@@ -1715,7 +1717,7 @@ c
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps.gt.poleps .and. .not.use_aspc) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,40)
    40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
@@ -3453,8 +3455,7 @@ c
       include 'shunt.i'
       include 'solute.i'
       include 'units.i'
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii,kk
       integer iter,maxiter
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -4184,12 +4185,12 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
          end do
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps .gt. poleps) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,30)
    30       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
@@ -4249,8 +4250,7 @@ c
       include 'shunt.i'
       include 'solute.i'
       include 'units.i'
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii,kk
       integer iter,maxiter
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -4754,12 +4754,12 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
          end do
 c
 c     terminate the calculation if dipoles failed to converge
 c
-         if (eps .gt. poleps) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,30)
    30       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')

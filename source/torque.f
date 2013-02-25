@@ -108,7 +108,7 @@ c
          w(j) = w(j) / wsiz
       end do
 c
-c     build some additional axes needed for the Z-bisect method
+c     build some additional axes needed for the Z-Bisect method
 c
       if (axetyp .eq. 'Z-Bisect') then
          r(1) = v(1) + w(1)
@@ -218,7 +218,7 @@ c
          dphids = -trq1(1)*s(1) - trq1(2)*s(2) - trq1(3)*s(3)
       end if
 c
-c     force distribution for the Z-only local coordinate method
+c     force distribution for the Z-Only local coordinate method
 c
       if (axetyp .eq. 'Z-Only') then
          do j = 1, 3
@@ -241,7 +241,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the bisector local coordinate method
+c     force distribution for the Bisector local coordinate method
 c
       else if (axetyp .eq. 'Bisector') then
          do j = 1, 3
@@ -254,7 +254,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Z-bisect local coordinate method
+c     force distribution for the Z-Bisect local coordinate method
 c
       else if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -272,7 +272,7 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for the 3-fold local coordinate method
+c     force distribution for the 3-Fold local coordinate method
 c        (correct for uv, uw and vw angles all equal to 90)
 c
       else if (axetyp .eq. '3-Fold') then
@@ -313,7 +313,7 @@ c
          dphids = -trq2(1)*s(1) - trq2(2)*s(2) - trq2(3)*s(3)
       end if
 c
-c     force distribution for the Z-only local coordinate method
+c     force distribution for the Z-Only local coordinate method
 c
       if (axetyp .eq. 'Z-Only') then
          do j = 1, 3
@@ -336,7 +336,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the bisector local coordinate method
+c     force distribution for the Bisector local coordinate method
 c
       else if (axetyp .eq. 'Bisector') then
          do j = 1, 3
@@ -349,7 +349,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Z-bisect local coordinate method
+c     force distribution for the Z-Bisect local coordinate method
 c
       else if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -367,7 +367,7 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for the 3-fold local coordinate method
+c     force distribution for the 3-Fold local coordinate method
 c        (correct for uv, uw and vw angles all equal to 90)
 c
       else if (axetyp .eq. '3-Fold') then
@@ -495,7 +495,7 @@ c
             w(j) = w(j) / wsiz
          end do
 c
-c     build some additional axes needed for the Z-bisect method
+c     build some additional axes needed for the Z-Bisect method
 c
          if (axetyp .eq. 'Z-Bisect') then
             r(1) = v(1) + w(1)
@@ -605,7 +605,7 @@ c
             dphids = -trq(1,i)*s(1) - trq(2,i)*s(2) - trq(3,i)*s(3)
          end if
 c
-c     force distribution for the Z-only local coordinate method
+c     force distribution for the Z-Only local coordinate method
 c
          if (axetyp .eq. 'Z-Only') then
             do j = 1, 3
@@ -625,7 +625,7 @@ c
                derivs(j,ib) = derivs(j,ib) - du - dv
             end do
 c
-c     force distribution for the bisector local coordinate method
+c     force distribution for the Bisector local coordinate method
 c
          else if (axetyp .eq. 'Bisector') then
             do j = 1, 3
@@ -636,7 +636,7 @@ c
                derivs(j,ib) = derivs(j,ib) - du - dv
             end do
 c
-c     force distribution for the Z-bisect local coordinate method
+c     force distribution for the Z-Bisect local coordinate method
 c
          else if (axetyp .eq. 'Z-Bisect') then
             do j = 1, 3
@@ -651,7 +651,7 @@ c
                derivs(j,ib) = derivs(j,ib) - du - dv - dw
             end do
 c
-c     force distribution for the 3-fold local coordinate method
+c     force distribution for the 3-Fold local coordinate method
 c        (correct for uv, uw and vw angles all equal to 90)
 c
          else if (axetyp .eq. '3-Fold') then
@@ -789,7 +789,7 @@ c
          w(j) = w(j) / wsiz
       end do
 c
-c     build some additional axes needed for the Z-bisect method
+c     build some additional axes needed for the Z-Bisect method
 c
       if (axetyp .eq. 'Z-Bisect') then
          r(1) = v(1) + w(1)
@@ -899,7 +899,7 @@ c
          dphids = -trq1(1)*s(1) - trq1(2)*s(2) - trq1(3)*s(3)
       end if
 c
-c     force distribution for the Z-only local coordinate method
+c     force distribution for the Z-Only local coordinate method
 c
       if (axetyp .eq. 'Z-Only') then
          do j = 1, 3
@@ -922,7 +922,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the bisector local coordinate method
+c     force distribution for the Bisector local coordinate method
 c
       else if (axetyp .eq. 'Bisector') then
          do j = 1, 3
@@ -935,7 +935,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Z-bisect local coordinate method
+c     force distribution for the Z-Bisect local coordinate method
 c
       else if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -953,7 +953,7 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for the 3-fold local coordinate method
+c     force distribution for the 3-Fold local coordinate method
 c        (correct for uv, uw and vw angles all equal to 90)
 c
       else if (axetyp .eq. '3-Fold') then
@@ -994,7 +994,7 @@ c
          dphids = -trq2(1)*s(1) - trq2(2)*s(2) - trq2(3)*s(3)
       end if
 c
-c     force distribution for the Z-only local coordinate method
+c     force distribution for the Z-Only local coordinate method
 c
       if (axetyp .eq. 'Z-Only') then
          do j = 1, 3
@@ -1017,7 +1017,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the bisector local coordinate method
+c     force distribution for the Bisector local coordinate method
 c
       else if (axetyp .eq. 'Bisector') then
          do j = 1, 3
@@ -1030,7 +1030,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Z-bisect local coordinate method
+c     force distribution for the Z-Bisect local coordinate method
 c
       else if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -1048,7 +1048,7 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for the 3-fold local coordinate method
+c     force distribution for the 3-Fold local coordinate method
 c        (correct for uv, uw and vw angles all equal to 90)
 c
       else if (axetyp .eq. '3-Fold') then

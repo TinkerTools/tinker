@@ -171,7 +171,7 @@ c
                xc = xic - x(kc)
                yc = yic - y(kc)
                zc = zic - z(kc)
-               call image (xc,yc,zc)
+               if (use_bounds)  call image (xc,yc,zc)
                rc2 = xc*xc + yc*yc + zc*zc
                if (rc2 .le. off2) then
                   xr = xc + xi - x(k) + x(kc)
@@ -919,7 +919,7 @@ c
                xc = xic - x(kc)
                yc = yic - y(kc)
                zc = zic - z(kc)
-               call image (xc,yc,zc)
+               if (use_bounds)  call image (xc,yc,zc)
                rc2 = xc*xc + yc*yc + zc*zc
                if (rc2 .le. off2) then
                   xr = xc + xi - x(k) + x(kc)

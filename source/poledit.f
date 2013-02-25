@@ -626,9 +626,8 @@ c
       sixth = 1.0d0 / 6.0d0
       do i = 1, n
          ipole(i) = i
-         pollist(i) = i
          polsiz(i) = 13
-         polaxe(i) = 'Z-then-X'
+         pollist(i) = i
          if (thole(i) .eq. 0.0d0) then
             pdamp(i) = 0.0d0
          else
@@ -667,25 +666,37 @@ c
       character*120 record
 c
 c
-c     automatically assign local frame for an isolated atom
+c     initialize the local frame type and defining atoms
+c
+      do i = 1, npole
+         polaxe(i) = 'None'
+         zaxis(i) = 0
+         xaxis(i) = 0
+         yaxis(i) = 0
+      end do
+c
+c     assign the local frame definition for an isolated atom
 c
       do i = 1, npole
          j = n12(i)
          if (j .eq. 0) then
+            polaxe(i) = 'None'
             zaxis(i) = 0
             xaxis(i) = 0
             yaxis(i) = 0
-            polaxe(i) = 'None'
 c
-c     automatically assign local frame for a monovalent atom
+c     assign the local frame definition for a monovalent atom
 c
          else if (j .eq. 1) then
             ia = i12(1,i)
-            zaxis(i) = ia
             if (n12(ia) .eq. 1) then
-               xaxis(i) = 0
                polaxe(i) = 'Z-Only'
+               zaxis(i) = ia
+               xaxis(i) = 0
+               yaxis(i) = 0
             else
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ia
                m = 0
                do k = 1, n12(ia)
                   ib = i12(k,ia)
@@ -695,29 +706,33 @@ c
                      m = kb
                   end if
                end do
+               yaxis(i) = 0
             end if
-            yaxis(i) = 0
 c
-c     automatically assign local frame for a divalent atom
+c     assign the local frame definition for a divalent atom
 c
          else if (j .eq. 2) then
             ia = i12(1,i)
             ib = i12(2,i)
             kab = priority (i,ia,ib)
             if (kab .eq. ia) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
+               yaxis(i) = 0
             else if (kab .eq. ib) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
                xaxis(i) = ia
+               yaxis(i) = 0
             else
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ib
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             end if
-            yaxis(i) = 0
 c
-c     automatically assign local frame for a trivalent atom
+c     assign the local frame definition for a trivalent atom
 c
          else if (j .eq. 3) then
             ia = i12(1,i)
@@ -727,35 +742,46 @@ c
             kac = priority (i,ia,ic)
             kbc = priority (i,ib,ic)
             if (kab.eq.0 .and. kac.eq.0) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
+               yaxis(i) = 0
             else if (kab.eq.ia .and. kac.eq.ia) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
                if (kbc .eq. ic)  xaxis(i) = ic
+               yaxis(i) = 0
             else if (kab.eq.ib .and. kbc.eq.ib) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
                xaxis(i) = ia
                if (kac .eq. ic)  xaxis(i) = ic
+               yaxis(i) = 0
             else if (kac.eq.ic .and. kbc.eq.ic) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ic
                xaxis(i) = ia
                if (kab .eq. ib)  xaxis(i) = ib
+               yaxis(i) = 0
             else if (kab .eq. 0) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ib
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kac .eq. 0) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ic
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kbc .eq. 0) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ib
                xaxis(i) = ic
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             end if
 c
-c     automatically assign local frame for a tetravalent atom
+c     assign the local frame definition for a tetravalent atom
 c
          else if (j .eq. 4) then
             ia = i12(1,i)
@@ -769,56 +795,72 @@ c
             kbd = priority (i,ib,id)
             kcd = priority (i,ic,id)
             if (kab.eq.0 .and. kac.eq.0 .and. kad.eq.0) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
+               yaxis(i) = 0
             else if (kab.eq.ia .and. kac.eq.ia .and. kad.eq.ia) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
                if (kbc.eq.ic .and. kcd.eq.ic)  xaxis(i) = ic
                if (kbd.eq.id .and. kcd.eq.id)  xaxis(i) = id
                if (kbc.eq.ic .and. kcd.eq.0)  xaxis(i) = ic
+               yaxis(i) = 0
             else if (kab.eq.ib .and. kbc.eq.ib .and. kbd.eq.ib) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
                xaxis(i) = ia
                if (kac.eq.ic .and. kcd.eq.ic)  xaxis(i) = ic
                if (kad.eq.id .and. kcd.eq.id)  xaxis(i) = id
                if (kac.eq.ic .and. kcd.eq.0)  xaxis(i) = ic
+               yaxis(i) = 0
             else if (kac.eq.ic .and. kbc.eq.ic .and. kcd.eq.ic) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = ic
                xaxis(i) = ia
                if (kab.eq.ib .and. kbd.eq.ib)  xaxis(i) = ib
                if (kad.eq.id .and. kbd.eq.id)  xaxis(i) = id
                if (kab.eq.ib .and. kbd.eq.0)  xaxis(i) = ib
+               yaxis(i) = 0
             else if (kad.eq.id .and. kbd.eq.id .and. kcd.eq.id) then
+               polaxe(i) = 'Z-then-X'
                zaxis(i) = id
                xaxis(i) = ia
                if (kab.eq.ib .and. kbc.eq.ib)  xaxis(i) = ib
                if (kac.eq.ic .and. kbc.eq.ic)  xaxis(i) = ic
                if (kab.eq.ib .and. kbc.eq.0)  xaxis(i) = ib
+               yaxis(i) = 0
             else if (kab.eq.0 .and. kac.eq.ia .and. kad.eq.ia) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ib
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kac.eq.0 .and. kab.eq.ia .and. kad.eq.ia) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ic
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kad.eq.0 .and. kab.eq.ia .and. kac.eq.ia) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = id
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kbc.eq.0 .and. kab.eq.ib .and. kbd.eq.ib) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ib
                xaxis(i) = ic
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kbd.eq.0 .and. kab.eq.ib .and. kbc.eq.ib) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ib
                xaxis(i) = id
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             else if (kcd.eq.0 .and. kac.eq.ic .and. kbc.eq.ic) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ic
                xaxis(i) = id
-               polaxe(i) = 'Bisector'
+               yaxis(i) = 0
             end if
          end if
       end do

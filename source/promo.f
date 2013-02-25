@@ -30,7 +30,7 @@ c
      &        /,1x,'###',12x,'TINKER  ---  Software Tools for',
      &           ' Molecular Design',12x,'###',
      &        /,1x,'##',74x,'##',
-     &        /,1x,'##',26x,'Version 6.1  June 2012',26x,'##',
+     &        /,1x,'##',24x,'Version 6.1   October 2012',24x,'##',
      &        /,1x,'##',74x,'##',
      &        /,1x,'##',15x,'Copyright (c)  Jay William Ponder',
      &           '  1990-2012',15x,'##',

@@ -22,9 +22,9 @@ c     T. Lelievre, M. Rousset and G. Stoltz, "Free Energy Computations:
 c     A Mathematical Perspective", Imperial College Press, London, 2010,
 c     Algorithm 2.11
 c
-c     T. Lelievre, M. Rousset and G. Stoltz, "Langevin Dynamics with
-c     Constraints and Computation of Free Energy Differences", arXiv:
-c     1006.4914v2, 18 Apr 2011, Equations 3.16-3.18
+c     T. Lelievre, M. Rousset and G. Stoltz, "Langevin Dynamics
+c     with Constraints and Computation of Free Energy Differences",
+c     Mathematics of Computation, 81, 2071-2125 (2012) [eq 3.16-3.18]
 c
 c     original version written by John D. Chodera, University of
 c     California, Berkeley, November 2010

@@ -12,15 +12,15 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     lambda    weighting of initial state in hybrid Hamiltonian
-c     nmut      number of atoms mutated from initial to final state
-c     imut      atomic sites differing in initial and final state
-c     type0     atom type of each atom in the initial state system
-c     class0    atom class of each atom in the initial state system
-c     type1     atom type of each atom in the final state system
-c     class1    atom class of each atom in the final state system
-c     alter     true if an atom is to be mutated, false otherwise
-c     eupdated
+c     lambda     weighting of initial state in hybrid Hamiltonian
+c     nmut       number of atoms mutated from initial to final state
+c     imut       atomic sites differing in initial and final state
+c     type0      atom type of each atom in the initial state system
+c     class0     atom class of each atom in the initial state system
+c     type1      atom type of each atom in the final state system
+c     class1     atom class of each atom in the final state system
+c     alter      true if an atom is to be mutated, false otherwise
+c     eupdated   flag to mark updated energy value in BAR method
 c
 c
       integer nmut,imut

@@ -14,17 +14,13 @@ c
 c
 c     literature references:
 c
-c     P. J. Mohr, B. N. Taylor and D.B. Newell, "The 2010 CODATA
-c     Recommended Values of the Fundamental Physical Constants",
-c     National Institute of Standards & Technology, Gaithersburg, MD
-c     (Web Version 6.0, developed jointly by J. Baker, M. Douma and
-c     S. Kotochigova, available at http://physics.nist.gov/constants)
-c
 c     P. J. Mohr, B. N. Taylor and D. B. Newell, "CODATA Recommended
-c     Values of the Fundamental Physical Constants: 2006", Reviews of
-c     Modern Physics, 80, 633-730 (2008)
+c     Values of the Fundamental Physical Constants: 2010", Reviews of
+c     Modern Physics, 84, 1527-1605 (2012)
 c
-c     Most values below are derived from 2010 CODATA reference values
+c     Most values below are taken from 2010 CODATA reference values;
+c     available on the web from the National Institute of Standards
+c     and Technology at http://physics.nist.gov/constants/
 c
 c     The conversion from calorie to Joule is the definition of the
 c     thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
@@ -47,6 +43,7 @@ c     lightspd    speed of light in vacuum (c) in cm/ps
 c     boltzmann   Boltzmann constant (kB) in g*Ang**2/ps**2/mole/K
 c     gasconst    ideal gas constant (R) in kcal/mole/K
 c     emass       mass of an electron in atomic mass units
+c     planck      Planck's constant (h) in J-s
 c     joule       conversion from calories to joules
 c     convert     conversion from kcal to g*Ang**2/ps**2
 c     bohr        conversion from Bohrs to Angstroms
@@ -60,16 +57,18 @@ c
 c
       real*8 avogadro,lightspd
       real*8 boltzmann,gasconst
-      real*8 emass,joule
-      real*8 convert,bohr
-      real*8 hartree,evolt
-      real*8 efreq,coulomb
-      real*8 debye,prescon
+      real*8 emass,planck
+      real*8 joule,convert
+      real*8 bohr,hartree
+      real*8 evolt,efreq
+      real*8 coulomb,debye
+      real*8 prescon
       parameter (avogadro=6.02214129d+23)
       parameter (lightspd=2.99792458d-2)
       parameter (boltzmann=0.831446215d0)
       parameter (gasconst=1.98720415d-3)
       parameter (emass=5.485799095d-4)
+      parameter (planck=6.62606957d-34)
       parameter (joule=4.1840d0)
       parameter (convert=4.1840d+2)
       parameter (bohr=0.52917721092d0)

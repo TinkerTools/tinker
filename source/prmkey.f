@@ -343,6 +343,8 @@ c     set control parameters for polarization potentials
 c
       else if (keyword(1:13) .eq. 'POLARIZATION ') then
          call getword (record,poltyp,next)
+      else if (keyword(1:11) .eq. 'POLAR-ITER ') then
+         read (string,*,err=10,end=10)  politer
       else if (keyword(1:10) .eq. 'POLAR-EPS ') then
          read (string,*,err=10,end=10)  poleps
       else if (keyword(1:10) .eq. 'POLAR-SOR ') then

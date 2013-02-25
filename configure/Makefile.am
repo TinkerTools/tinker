@@ -200,6 +200,7 @@ libtinker_la_SOURCES = \
 	kcharge.f \
 	kdipole.f \
 	kewald.f \
+	kextra.f \
 	kgeom.f \
 	kimprop.f \
 	kimptor.f \

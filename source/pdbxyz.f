@@ -305,6 +305,12 @@ c
       n = n + 1
       jres = ichain(1,ichn)
       kres = ichain(2,ichn)
+      do i = jres, kres
+         ni(i) = 0
+         cai(i) = 0
+         ci(i) = 0
+         oi(i) = 0
+      end do
 c
 c     check for the presence of a cyclic polypeptide chain
 c

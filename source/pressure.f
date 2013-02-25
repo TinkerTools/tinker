@@ -315,7 +315,7 @@ c
       include 'usage.i'
       integer i,j,k
       integer start,stop
-      real*8 epot,temp
+      real*8 epot,temp,term
       real*8 energy,random
       real*8 third,weigh
       real*8 step,scale
@@ -325,7 +325,7 @@ c
       real*8 vold,xboxold
       real*8 yboxold,zboxold
       real*8 kt,de,dv,lnv
-      real*8 term,expterm
+      real*8 expterm
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
@@ -356,16 +356,6 @@ c
          volbox = volbox + step
          third = 1.0d0 / 3.0d0
          scale = (volbox/vold)**third
-         if (monoclinic) then
-            term = 1.0d0 / beta_sin
-            scale = 1.0d0 + (scale-1.0d0)*term**third
-         else if (triclinic) then
-            term = 1.0d0 / (gamma_sin*gamma_term)
-            scale = 1.0d0 + (scale-1.0d0)*term**third
-         else if (octahedron) then
-            term = 2.0d0
-            scale = 1.0d0 + (scale-1.0d0)*term**third
-         end if
 c
 c     set the new box dimensions and other lattice values
 c
@@ -516,7 +506,7 @@ c
       integer i
       real*8 pres,delta
       real*8 energy,third
-      real*8 step,scale,term
+      real*8 step,scale
       real*8 vold,xboxold
       real*8 yboxold,zboxold
       real*8 epos,eneg
@@ -556,16 +546,6 @@ c
       volbox = vold - step
       third = 1.0d0 / 3.0d0
       scale = (volbox/vold)**third
-      if (monoclinic) then
-         term = 1.0d0 / beta_sin
-         scale = 1.0d0 + (scale-1.0d0)*term**third
-      else if (triclinic) then
-         term = 1.0d0 / (gamma_sin*gamma_term)
-         scale = 1.0d0 + (scale-1.0d0)*term**third
-      else if (octahedron) then
-         term = 2.0d0
-         scale = 1.0d0 + (scale-1.0d0)*term**third
-      end if
 c
 c     set new box dimensions and coordinate values
 c
@@ -588,16 +568,6 @@ c
       volbox = vold + step
       third = 1.0d0 / 3.0d0
       scale = (volbox/vold)**third
-      if (monoclinic) then
-         term = 1.0d0 / beta_sin
-         scale = 1.0d0 + (scale-1.0d0)*term**third
-      else if (triclinic) then
-         term = 1.0d0 / (gamma_sin*gamma_term)
-         scale = 1.0d0 + (scale-1.0d0)*term**third
-      else if (octahedron) then
-         term = 2.0d0
-         scale = 1.0d0 + (scale-1.0d0)*term**third
-      end if
 c
 c     set new box dimensions and coordinate values
 c

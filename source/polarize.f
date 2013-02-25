@@ -170,17 +170,6 @@ c
       allocate (udir(3,npole))
       allocate (uold(3,npole))
 c
-c     compute direct induced dipole moments from direct field
-c
-      if (poltyp .eq. 'DIRECT') then
-         call ufield (field)
-         do i = 1, npole
-            do j = 1, 3
-               uind(j,i) = uind(j,i) + polarity(i)*field(j,i)
-            end do
-         end do
-      end if
-c
 c     compute mutual induced dipole moments by an iterative method
 c
       if (poltyp .eq. 'MUTUAL') then
@@ -283,9 +272,10 @@ c
       real*8 ukx,uky,ukz
       real*8 pdi,pti
       real*8 pgamma,damp
+      real*8 expdamp
       real*8 scale3,scale5
       real*8 fi(3),fk(3)
-      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
       real*8 field(3,*)
 c
 c
@@ -299,7 +289,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (pscale(n))
+      allocate (dscale(n))
 c
 c     loop over pairs of sites incrementing the electric field
 c
@@ -311,19 +301,19 @@ c
          uiy = uind(2,i)
          uiz = uind(3,i)
          do j = i+1, npole
-            pscale(ipole(j)) = 1.0d0
+            dscale(ipole(j)) = 1.0d0
          end do
          do j = 1, np11(ii)
-            pscale(ip11(j,ii)) = u1scale
+            dscale(ip11(j,ii)) = u1scale
          end do
          do j = 1, np12(ii)
-            pscale(ip12(j,ii)) = u2scale
+            dscale(ip12(j,ii)) = u2scale
          end do
          do j = 1, np13(ii)
-            pscale(ip13(j,ii)) = u3scale
+            dscale(ip13(j,ii)) = u3scale
          end do
          do j = 1, np14(ii)
-            pscale(ip14(j,ii)) = u4scale
+            dscale(ip14(j,ii)) = u4scale
          end do
          do k = i+1, npole
             kk = ipole(k)
@@ -335,34 +325,31 @@ c
             uky = uind(2,k)
             ukz = uind(3,k)
             r = sqrt(r2)
-            rr3 = 1.0d0 / (r*r2)
-            rr5 = 3.0d0 * rr3 / r2
             uir = xr*uix + yr*uiy + zr*uiz
             ukr = xr*ukx + yr*uky + zr*ukz
 c
 c     adjust the field to account for polarization damping
 c
-            scale3 = 1.0d0
-            scale5 = 1.0d0
+            scale3 = dscale(kk)
+            scale5 = dscale(kk)
             damp = pdi * pdamp(k)
             if (damp .ne. 0.0d0) then
                pgamma = min(pti,thole(k))
                damp = -pgamma * (r/damp)**3
                if (damp .gt. -50.0d0) then
-                  scale3 = 1.0d0 - exp(damp)
-                  scale5 = 1.0d0 - (1.0d0-damp)*exp(damp)
+                  expdamp = exp(damp)
+                  scale3 = scale3 * (1.0d0-expdamp)
+                  scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
                end if
             end if
-            fi(1) = -rr3*ukx*scale3 + rr5*ukr*xr*scale5
-            fi(2) = -rr3*uky*scale3 + rr5*ukr*yr*scale5
-            fi(3) = -rr3*ukz*scale3 + rr5*ukr*zr*scale5
-            fk(1) = -rr3*uix*scale3 + rr5*uir*xr*scale5
-            fk(2) = -rr3*uiy*scale3 + rr5*uir*yr*scale5
-            fk(3) = -rr3*uiz*scale3 + rr5*uir*zr*scale5
-            do j = 1, 3
-               fi(j) = fi(j) * pscale(kk)
-               fk(j) = fk(j) * pscale(kk)
-            end do
+            rr3 = scale3 / (r*r2)
+            rr5 = 3.0d0 * scale5 / (r*r2*r2)
+            fi(1) = -rr3*ukx + rr5*ukr*xr
+            fi(2) = -rr3*uky + rr5*ukr*yr
+            fi(3) = -rr3*ukz + rr5*ukr*zr
+            fk(1) = -rr3*uix + rr5*uir*xr
+            fk(2) = -rr3*uiy + rr5*uir*yr
+            fk(3) = -rr3*uiz + rr5*uir*zr
 c
 c     increment the field at each site due to this interaction
 c
@@ -375,6 +362,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (pscale)
+      deallocate (dscale)
       return
       end

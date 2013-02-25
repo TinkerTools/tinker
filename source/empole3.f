@@ -246,7 +246,7 @@ c
                xr = x(kk) - x(ii)
                yr = y(kk) - y(ii)
                zr = z(kk) - z(ii)
-               call image (xr,yr,zr)
+               if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
@@ -847,7 +847,7 @@ c
                xr = x(kk) - x(ii)
                yr = y(kk) - y(ii)
                zr = z(kk) - z(ii)
-               call image (xr,yr,zr)
+               if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)

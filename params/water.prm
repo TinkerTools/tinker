@@ -40,6 +40,9 @@ Reaction Field Treatment", Ph.D. thesis, DBBS Program in Molecular
 Biophysics, Washington University, St. Louis, August, 1997  [available
 online from http://dasher.wustl.edu/ponder/]
 
+alternative valence parameters to match symmetric and antisymmetric
+bond stretches by David Semrouni, Ecole Polytechnique, Paris
+
 
       #############################
       ##                         ##
@@ -70,7 +73,8 @@ vdw           2               2.6550     0.0135      0.910
       ##################################
 
 
-bond          1    2          529.60     0.9572
+bond          1    2          529.60     0.9572   !! original AMOEBA water
+bond          1    2          556.85     0.9572
 
 
       ################################
@@ -80,7 +84,8 @@ bond          1    2          529.60     0.9572
       ################################
 
 
-angle         2    1    2      34.05     108.50
+angle         2    1    2      34.05     108.50   !! original AMOEBA water
+angle         2    1    2      48.70     108.50
 
 
       ###############################
@@ -90,7 +95,8 @@ angle         2    1    2      34.05     108.50
       ###############################
 
 
-ureybrad      2    1    2      38.25     1.5537
+ureybrad      2    1    2      38.25     1.5537   !! original AMOEBA water
+ureybrad      2    1    2      -7.60     1.5326
 
 
       ###################################

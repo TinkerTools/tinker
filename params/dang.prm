@@ -108,6 +108,10 @@ Vibrational Sum-Frequency Spectra of Sulfur Dioxide at the Air/Water
 Interface: A Comprehensive Molecular Dynamics Study", J. Phys. Chem. B,
 114, 7245-7249 (2010)
 
+L. X. Dang, T. B. Troung and B. Ginovska-Pangovska, "Interionic Potentials
+of Mean Force for Ca+2-Cl- in Polarizable Water", J. Chem. Phys., 136,
+126101 (2012)
+
 Note that benzene and methanol should have rigid bonds, and all other
 species should be rigid bodies to reproduce the published Dang models
 
@@ -223,10 +227,12 @@ vdw          40               3.1540     0.1000
 #vdw         40               3.7863     0.1000  !! alt value for benzene-K+
 vdw          41               3.5280     0.1000
 vdw          42               3.8310     0.1000
-vdw          43               2.9132     0.1000
+vdw          43               2.8790     0.1000  !! 2012 value for Ca+2 Cl-
+#vdw         43               2.9132     0.1000  !! original value
 vdw          44               3.3410     0.1000
 vdw          45               3.3590     0.1000
-vdw          46               4.3387     0.1000
+vdw          46               4.4100     0.1000  !! 2012 value for Ca+2 Cl-
+#vdw         46               4.3387     0.1000  !! original value
 vdw          47               4.5436     0.1000
 vdw          48               5.1245     0.1000
 
