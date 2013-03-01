@@ -61,7 +61,7 @@ c
 c     set up the structure, mechanics calculation and smoothing
 c
       call initial
-      call getxyz
+      call getint
       use_smooth = .true.
       use_dem = .true.
       call mechanic

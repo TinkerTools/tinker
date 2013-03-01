@@ -504,14 +504,13 @@ c
       include 'units.i'
       include 'virial.i'
       integer i
-      real*8 pres,delta
       real*8 energy,third
-      real*8 step,scale
+      real*8 delta,step,scale
       real*8 vold,xboxold
       real*8 yboxold,zboxold
       real*8 epos,eneg
-      real*8 dedv_fd
-      real*8 dedv_vir
+      real*8 dedv_vir,dedv_fd
+      real*8 pres_vir,pres_fd
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
@@ -520,7 +519,7 @@ c
 c     set relative volume change for finite-differences
 c
       if (.not. use_bounds)  return
-      delta = 0.00000001d0
+      delta = 0.000001d0
       step = volbox * delta
 c
 c     perform dynamic allocation of some local arrays
@@ -607,19 +606,26 @@ c     get virial and finite difference values of dE/dV
 c
       dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
       dedv_fd = (epos-eneg) / (2.0d0*delta*volbox)
-      write (iout,10)  dedv_vir,dedv_fd
-   10 format (/,' dE/dV (Virial-based) :',11x,f15.6,' Kcal/mole/A**3',
-     &        /,' dE/dV (Finite Diff) :',12x,f15.6,' Kcal/mole/A**3')
+      write (iout,10)  dedv_vir
+   10 format (/,' dE/dV (Virial-based) :',11x,f15.6,' Kcal/mole/A**3')
+      write (iout,20)  dedv_fd
+   20 format (' dE/dV (Finite Diff) :',12x,f15.6,' Kcal/mole/A**3')
 c
-c     compute the finite-difference isotropic pressure
+c     compute virial and finite-difference isotropic pressure
 c
-      pres = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_fd)
+      pres_vir = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_vir)
+      pres_fd = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_fd)
       if (kelvin .eq. 0.0d0) then
-         write (iout,20)  pres
-   20    format (/,' Pressure (at 0 K) :',14x,f15.3,' Atmospheres')
+         write (iout,30)  pres_vir
+   30    format (/,' Pressure (Virial; 0 K) :',9x,f15.3,' Atmospheres')
+         write (iout,40)  pres_fd
+   40    format (' Pressure (Numer; 0 K) :',10x,f15.3,' Atmospheres')
       else
-         write (iout,30)  nint(kelvin),pres
-   30    format (/,' Pressure (at',i4,' K) :',12x,f15.3,' Atmospheres')
+         write (iout,50)  nint(kelvin),pres_vir
+   50    format (/,' Pressure (Virial;',i4,' K) :',7x,f15.3,
+     &              ' Atmospheres')
+         write (iout,60)  nint(kelvin),pres_fd
+   60    format (' Pressure (Numer;',i4,' K) :',8x,f15.3,' Atmospheres')
       end if
       return
       end
