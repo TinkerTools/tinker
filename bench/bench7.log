@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 6.1  June 2012                          ##
+ ##                        Version 6.2  February 2013                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2012               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2013               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -18,13 +18,9 @@
  Average Values for the last   100 out of      100 Dynamics Steps
 
  Simulation Time              0.1000 Picosecond
- Total Energy            -45621.2584 Kcal/mole   (+/-  55.6136)
- Potential Energy        -66817.8958 Kcal/mole   (+/- 141.0961)
- Kinetic Energy           21196.6374 Kcal/mole   (+/- 148.8824)
+ Total Energy            -45621.2503 Kcal/mole   (+/-  55.6170)
+ Potential Energy        -66817.9119 Kcal/mole   (+/- 141.0986)
+ Kinetic Energy           21196.6616 Kcal/mole   (+/- 148.8808)
  Temperature                  301.87 Kelvin      (+/-     2.12)
- Pressure                    -296.39 Atmosphere  (+/-   258.91)
+ Pressure                    -296.44 Atmosphere  (+/-   258.93)
  Density                      0.9957 Grams/cc    (+/-   0.0000)
-
-real	5m19.003s
-user	19m27.435s
-sys	0m6.597s

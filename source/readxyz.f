@@ -26,7 +26,8 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'titles.i'
-      integer i,j,k,m,ixyz
+      integer i,j,k,m
+      integer ixyz,nmax
       integer next,size
       integer first,last
       integer nexttext
@@ -168,7 +169,14 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (list(n))
+      nmax = 0
+      do i = 1, n
+         nmax = max(tag(i),nmax)
+         do j = 1, n12(i)
+            nmax = max(i12(j,i),nmax)
+         end do
+      end do
+      allocate (list(nmax))
 c
 c     check for scrambled atom order and attempt to renumber
 c

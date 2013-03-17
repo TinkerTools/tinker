@@ -23,7 +23,6 @@ c
       include 'boxes.i'
       include 'cell.i'
       real*8 xr,yr,zr
-      real*8 xf,yf,zf
 c
 c
 c     for orthogonal lattice, find the desired image directly
@@ -44,40 +43,40 @@ c     fractional coordinates, find desired image and then
 c     translate fractional coordinates back to Cartesian
 c
       else if (monoclinic) then
-         zf = zr / beta_sin
-         xf = xr - zf*beta_cos
-         do while (abs(xf) .gt. xcell2)
-            xf = xf - sign(xcell,xf)
+         zr = zr / beta_sin
+         xr = xr - zr*beta_cos
+         do while (abs(xr) .gt. xcell2)
+            xr = xr - sign(xcell,xr)
          end do
          do while (abs(yr) .gt. ycell2)
             yr = yr - sign(ycell,yr)
          end do
-         do while (abs(zf) .gt. zcell2)
-            zf = zf - sign(zcell,zf)
+         do while (abs(zr) .gt. zcell2)
+            zr = zr - sign(zcell,zr)
          end do
-         xr = xf + zf*beta_cos
-         zr = zf * beta_sin
+         xr = xr + zr*beta_cos
+         zr = zr * beta_sin
 c
 c     for triclinic lattice, convert pairwise components to
 c     fractional coordinates, find desired image and then
 c     translate fractional coordinates back to Cartesian
 c
       else if (triclinic) then
-         zf = zr / gamma_term
-         yf = (yr - zf*beta_term) / gamma_sin
-         xf = xr - yf*gamma_cos - zf*beta_cos
-         do while (abs(xf) .gt. xcell2)
-            xf = xf - sign(xcell,xf)
+         zr = zr / gamma_term
+         yr = (yr - zr*beta_term) / gamma_sin
+         xr = xr - yr*gamma_cos - zr*beta_cos
+         do while (abs(xr) .gt. xcell2)
+            xr = xr - sign(xcell,xr)
          end do
-         do while (abs(yf) .gt. ycell2)
-            yf = yf - sign(ycell,yf)
+         do while (abs(yr) .gt. ycell2)
+            yr = yr - sign(ycell,yr)
          end do
-         do while (abs(zf) .gt. zcell2)
-            zf = zf - sign(zcell,zf)
+         do while (abs(zr) .gt. zcell2)
+            zr = zr - sign(zcell,zr)
          end do
-         xr = xf + yf*gamma_cos + zf*beta_cos
-         yr = yf*gamma_sin + zf*beta_term
-         zr = zf * gamma_term
+         xr = xr + yr*gamma_cos + zr*beta_cos
+         yr = yr*gamma_sin + zr*beta_term
+         zr = zr * gamma_term
 c
 c     for truncated octahedron, use orthogonal box equations,
 c     then perform extra tests to remove corner pieces
@@ -121,7 +120,6 @@ c
       include 'cell.i'
       integer i
       real*8 xr,yr,zr
-      real*8 xf,yf,zf
       real*8 xsize,ysize,zsize
       real*8 xsize2,ysize2,zsize2
       real*8 xmove,ymove,zmove
@@ -178,46 +176,46 @@ c     fractional coordinates, find desired image and then
 c     translate fractional coordinates back to Cartesian
 c
       else if (monoclinic) then
-         zf = zr / beta_sin
-         xf = xr - zf*beta_cos
-         xf = xf + xmove
-         do while (abs(xf) .gt. xsize2)
-            xf = xf - sign(xsize,xf)
+         zr = zr / beta_sin
+         xr = xr - zr*beta_cos
+         xr = xr + xmove
+         do while (abs(xr) .gt. xsize2)
+            xr = xr - sign(xsize,xr)
          end do
          yr = yr + ymove
          do while (abs(yr) .gt. ysize2)
             yr = yr - sign(ysize,yr)
          end do
-         zf = zf + zmove
-         do while (abs(zf) .gt. zsize2)
-            zf = zf - sign(zsize,zf)
+         zr = zr + zmove
+         do while (abs(zr) .gt. zsize2)
+            zr = zr - sign(zsize,zr)
          end do
-         xr = xf + zf*beta_cos
-         zr = zf * beta_sin
+         xr = xr + zr*beta_cos
+         zr = zr * beta_sin
 c
 c     for triclinic lattice, convert pairwise components to
 c     fractional coordinates, find desired image and then
 c     translate fractional coordinates back to Cartesian
 c
       else if (triclinic) then
-         zf = zr / gamma_term
-         yf = (yr - zf*beta_term) / gamma_sin
-         xf = xr - yf*gamma_cos - zf*beta_cos
-         xf = xf + xmove
-         do while (abs(xf) .gt. xsize2)
-            xf = xf - sign(xsize,xf)
+         zr = zr / gamma_term
+         yr = (yr - zr*beta_term) / gamma_sin
+         xr = xr - yr*gamma_cos - zr*beta_cos
+         xr = xr + xmove
+         do while (abs(xr) .gt. xsize2)
+            xr = xr - sign(xsize,xr)
          end do
-         yf = yf + ymove
-         do while (abs(yf) .gt. ysize2)
-            yf = yf - sign(ysize,yf)
+         yr = yr + ymove
+         do while (abs(yr) .gt. ysize2)
+            yr = yr - sign(ysize,yr)
          end do
-         zf = zf + zmove
-         do while (abs(zf) .gt. zsize2)
-            zf = zf - sign(zsize,zf)
+         zr = zr + zmove
+         do while (abs(zr) .gt. zsize2)
+            zr = zr - sign(zsize,zr)
          end do
-         xr = xf + yf*gamma_cos + zf*beta_cos
-         yr = yf*gamma_sin + zf*beta_term
-         zr = zf * gamma_term
+         xr = xr + yr*gamma_cos + zr*beta_cos
+         yr = yr*gamma_sin + zr*beta_term
+         zr = zr * gamma_term
 c
 c     for truncated octahedron, use orthogonal box equations,
 c     then perform extra tests to remove corner pieces

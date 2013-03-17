@@ -145,23 +145,29 @@ c     increasing order and the first index changing most rapidly
 c
       do i = 1, ntt
          cyclic = .true.
-         eps = 0.0001d0
+         eps = 0.000001d0
          nx = tnx(i) - 1
          ny = tny(i) - 1
-         if (abs(ttx(1,i)-ttx(tnx(i),i))-360.0d0 .gt. eps)
+         if (abs(abs(ttx(1,i)-ttx(tnx(i),i))-360.0d0) .gt. eps)
      &      cyclic = .false.
-         if (abs(tty(1,i)-tty(tny(i),i))-360.0d0 .gt. eps)
+         if (abs(abs(tty(1,i)-tty(tny(i),i))-360.0d0) .gt. eps)
      &      cyclic = .false.
          if (cyclic) then
             do j = 1, tny(i)
                k = (j-1)*tnx(i) + 1
-               if (abs(tbf(k,i)-tbf(k+nx,i)) .gt. eps)
-     &            cyclic = .false.
+               if (abs(tbf(k,i)-tbf(k+nx,i)) .gt. eps) then
+                  write (iout,60)  tbf(k,i),tbf(k+nx,i)
+   60             format (/,' KTORTOR  --  Warning, Unequal Tor-Tor',
+     &                        ' Values',3x,2f12.5)
+               end if
             end do
             k = ny * tnx(i)
             do j = 1, tnx(i)
-               if (abs(tbf(j,i)-tbf(j+k,i)) .gt. eps)
-     &            cyclic = .false.
+               if (abs(tbf(j,i)-tbf(j+k,i)) .gt. eps) then
+                  write (iout,70)  tbf(j,i),tbf(j+k,i)
+   70             format (/,' KTORTOR  --  Warning, Unequal Tor-Tor',
+     &                        ' Values',3x,2f12.5)
+               end if
             end do
          end if
 c
@@ -263,16 +269,16 @@ c
                itt(1,ntortor) = i
                itt(2,ntortor) = j
                itt(3,ntortor) = 1
-               goto 60
+               goto 80
             else if (ktt(j) .eq. pt2) then
                ntortor = ntortor + 1
                itt(1,ntortor) = i
                itt(2,ntortor) = j
                itt(3,ntortor) = -1
-               goto 60
+               goto 80
             end if
          end do
-   60    continue
+   80    continue
       end do
 c
 c     turn off the torsion-torsion potential if it is not used

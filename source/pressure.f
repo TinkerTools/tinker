@@ -298,7 +298,8 @@ c     D. Frenkel and B. Smit, "Understanding Molecular Simulation,
 c     2nd Edition", Academic Press, San Diego, CA, 2002; Section 5.4
 c
 c     original version written by Alan Grossfield, January 2004;
-c     this version only implements isotropic volume changes
+c     anisotropic modification implemented by Lee-Ping Wang, Stanford
+c     University, March 2013
 c
 c
       subroutine pmonte (epot,temp)
@@ -309,23 +310,29 @@ c
       include 'bath.i'
       include 'boxes.i'
       include 'group.i'
+      include 'math.i'
       include 'mdstuf.i'
       include 'molcul.i'
       include 'units.i'
       include 'usage.i'
       integer i,j,k
       integer start,stop
-      real*8 epot,temp,term
+      real*8 epot,temp
+      real*8 term,part
       real*8 energy,random
       real*8 third,weigh
       real*8 step,scale
-      real*8 enew,diff
+      real*8 enew,rnd6
       real*8 xcm,ycm,zcm
+      real*8 vold,vfrac
+      real*8 cosine,diff
       real*8 xmove,ymove,zmove
-      real*8 vold,xboxold
-      real*8 yboxold,zboxold
-      real*8 kt,de,dv,lnv
-      real*8 expterm
+      real*8 xboxold,yboxold,zboxold
+      real*8 alphaold,betaold,gammaold
+      real*8 kt,de,dv,lnv,expterm
+      real*8 temp3(3,3)
+      real*8 hbox(3,3)
+      real*8 ascale(3,3)
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
@@ -337,95 +344,261 @@ c
       allocate (yold(n))
       allocate (zold(n))
 c
-c     make volume move, save old box size and coordinates
+c     save the old lattice parameters, box size and coordinates
 c
       if (random() .lt. 1.0d0/dble(voltrial)) then
          xboxold = xbox
          yboxold = ybox
          zboxold = zbox
+         alphaold = alpha
+         betaold  = beta
+         gammaold = gamma
          vold = volbox
          do i = 1, n
             xold(i) = x(i)
             yold(i) = y(i)
             zold(i) = z(i)
          end do
-c
-c     get scale factor that reflects the chosen volume change
-c
-         step = volmove * (2.0d0*random()-1.0d0)
-         volbox = volbox + step
          third = 1.0d0 / 3.0d0
-         scale = (volbox/vold)**third
 c
-c     set the new box dimensions and other lattice values
+c     for the isotropic case, change the lattice lengths uniformly
 c
-         xbox = xbox * scale
-         ybox = ybox * scale
-         zbox = zbox * scale
-         call lattice
-c
-c     scale the coordinates by groups, molecules or atoms
-c
-         if (integrate .eq. 'RIGIDBODY') then
-            diff = scale - 1.0d0
-            do i = 1, ngrp
-               xcm = 0.0d0
-               ycm = 0.0d0
-               zcm = 0.0d0
-               start = igrp(1,i)
-               stop = igrp(2,i)
-               do j = start, stop
-                  k = kgrp(j)
-                  weigh = mass(k)
-                  xcm = xcm + x(k)*weigh
-                  ycm = ycm + y(k)*weigh
-                  zcm = zcm + z(k)*weigh
-               end do
-               xmove = diff * xcm/grpmass(i)
-               ymove = diff * ycm/grpmass(i)
-               zmove = diff * zcm/grpmass(i)
-               do j = start, stop
-                  k = kgrp(j)
-                  x(k) = x(k) + xmove
-                  y(k) = y(k) + ymove
-                  z(k) = z(k) + zmove
-               end do
-            end do
-         else if (volscale .eq. 'MOLECULAR') then
-            diff = scale - 1.0d0
-            do i = 1, nmol
-               xcm = 0.0d0
-               ycm = 0.0d0
-               zcm = 0.0d0
-               start = imol(1,i)
-               stop = imol(2,i)
-               do j = start, stop
-                  k = kmol(j)
-                  weigh = mass(k)
-                  xcm = xcm + x(k)*weigh
-                  ycm = ycm + y(k)*weigh
-                  zcm = zcm + z(k)*weigh
-               end do
-               xmove = diff * xcm/molmass(i)
-               ymove = diff * ycm/molmass(i)
-               zmove = diff * zcm/molmass(i)
-               do j = start, stop
-                  k = kmol(j)
-                  if (use(k)) then
+         if (.not.anisotrop .or. random().lt.0.5d0) then
+            step = volmove * (2.0d0*random()-1.0d0)
+            volbox = volbox + step
+            scale = (volbox/vold)**third
+            xbox = xbox * scale
+            ybox = ybox * scale
+            zbox = zbox * scale
+            call lattice
+            if (integrate .eq. 'RIGIDBODY') then
+               diff = scale - 1.0d0
+               do i = 1, ngrp
+                  xcm = 0.0d0
+                  ycm = 0.0d0
+                  zcm = 0.0d0
+                  start = igrp(1,i)
+                  stop = igrp(2,i)
+                  do j = start, stop
+                     k = kgrp(j)
+                     weigh = mass(k)
+                     xcm = xcm + x(k)*weigh
+                     ycm = ycm + y(k)*weigh
+                     zcm = zcm + z(k)*weigh
+                  end do
+                  xmove = diff * xcm/grpmass(i)
+                  ymove = diff * ycm/grpmass(i)
+                  zmove = diff * zcm/grpmass(i)
+                  do j = start, stop
+                     k = kgrp(j)
                      x(k) = x(k) + xmove
                      y(k) = y(k) + ymove
                      z(k) = z(k) + zmove
+                  end do
+               end do
+            else if (volscale .eq. 'MOLECULAR') then
+               diff = scale - 1.0d0
+               do i = 1, nmol
+                  xcm = 0.0d0
+                  ycm = 0.0d0
+                  zcm = 0.0d0
+                  start = imol(1,i)
+                  stop = imol(2,i)
+                  do j = start, stop
+                     k = kmol(j)
+                     weigh = mass(k)
+                     xcm = xcm + x(k)*weigh
+                     ycm = ycm + y(k)*weigh
+                     zcm = zcm + z(k)*weigh
+                  end do
+                  xmove = diff * xcm/molmass(i)
+                  ymove = diff * ycm/molmass(i)
+                  zmove = diff * zcm/molmass(i)
+                  do j = start, stop
+                     k = kmol(j)
+                     if (use(k)) then
+                        x(k) = x(k) + xmove
+                        y(k) = y(k) + ymove
+                        z(k) = z(k) + zmove
+                     end if
+                  end do
+               end do
+            else
+               do i = 1, n
+                  if (use(i)) then
+                     x(i) = x(i) * scale
+                     y(i) = y(i) * scale
+                     z(i) = z(i) * scale
                   end if
                end do
-            end do
+            end if
+c     
+c     for anisotropic case alter lattice angles, then scale lengths
+c
          else
-            do i = 1, n
-               if (use(i)) then
-                  x(i) = x(i) * scale
-                  y(i) = y(i) * scale
-                  z(i) = z(i) * scale
+            rnd6 = 6.0d0*random()
+            step  = volmove * (2.0d0*random()-1.0d0)
+            scale = (1.0d0+step/vold)**third
+            ascale(1,1) = 1.0d0
+            ascale(2,2) = 1.0d0
+            ascale(3,3) = 1.0d0
+            if (monoclinic .or. triclinic) then
+               if (rnd6 .lt. 1.0d0) then
+                  ascale(1,1) = scale
+               else if (rnd6 .lt. 2.0d0) then
+                  ascale(2,2) = scale
+               else if (rnd6 .lt. 3.0d0) then
+                  ascale(3,3) = scale
+               else if (rnd6 .lt. 4.0d0) then
+                  ascale(1,2) = scale - 1.0d0
+                  ascale(2,1) = scale - 1.0d0
+               else if (rnd6 .lt. 5.0d0) then
+                  ascale(1,3) = scale - 1.0d0
+                  ascale(3,1) = scale - 1.0d0
+               else
+                  ascale(2,3) = scale - 1.0d0
+                  ascale(3,2) = scale - 1.0d0
                end if
+            else
+               if (rnd6 .lt. 2.0d0) then
+                  ascale(1,1) = scale
+               else if (rnd6 .lt. 4.0d0) then
+                  ascale(2,2) = scale
+               else
+                  ascale(3,3) = scale
+               end if
+            end if
+c     
+c     modify the current periodic box dimension values
+c     
+            temp3(1,1) = xbox
+            temp3(2,1) = 0.0d0
+            temp3(3,1) = 0.0d0
+            temp3(1,2) = ybox * gamma_cos
+            temp3(2,2) = ybox * gamma_sin
+            temp3(3,2) = 0.0d0
+            temp3(1,3) = zbox * beta_cos
+            temp3(2,3) = zbox * beta_term
+            temp3(3,3) = zbox * gamma_term
+            do i = 1, 3
+               do j = 1, 3
+                  hbox(j,i) = 0.0d0
+                  do k = 1, 3
+                     hbox(j,i) = hbox(j,i) + ascale(j,k)*temp3(k,i)
+                  end do
+               end do
             end do
+            xbox = sqrt(hbox(1,1)**2 + hbox(2,1)**2 + hbox(3,1)**2)
+            ybox = sqrt(hbox(1,2)**2 + hbox(2,2)**2 + hbox(3,2)**2)
+            zbox = sqrt(hbox(1,3)**2 + hbox(2,3)**2 + hbox(3,3)**2)
+            if (monoclinic) then
+               cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
+     &                     + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
+               beta = radian * acos(cosine)
+            else if (triclinic) then
+               cosine = (hbox(1,2)*hbox(1,3) + hbox(2,2)*hbox(2,3)
+     &                     + hbox(3,2)*hbox(3,3)) / (ybox*zbox)
+               alpha = radian * acos(cosine)
+               cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
+     &                     + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
+               beta = radian * acos(cosine)
+               cosine = (hbox(1,1)*hbox(1,2) + hbox(2,1)*hbox(2,2)
+     &                     + hbox(3,1)*hbox(3,2)) / (xbox*ybox)
+               gamma = radian * acos(cosine)
+            end if
+c
+c     find the new box dimensions and other lattice values
+c
+            call lattice
+            vfrac = vold / volbox
+            scale = vfrac**third
+            xbox = xbox * scale
+            ybox = ybox * scale
+            zbox = zbox * scale
+            call lattice
+c
+c     scale the coordinates by groups, molecules or atoms
+c
+            if (integrate .eq. 'RIGIDBODY') then
+               ascale(1,1) = ascale(1,1) - 1.0d0
+               ascale(2,2) = ascale(2,2) - 1.0d0
+               ascale(3,3) = ascale(3,3) - 1.0d0
+               do i = 1, ngrp
+                  xcm = 0.0d0
+                  ycm = 0.0d0
+                  zcm = 0.0d0
+                  start = igrp(1,i)
+                  stop = igrp(2,i)
+                  do j = start, stop
+                     k = kgrp(j)
+                     weigh = mass(k)
+                     xcm = xcm + x(k)*weigh
+                     ycm = ycm + y(k)*weigh
+                     zcm = zcm + z(k)*weigh
+                  end do
+                  xcm = xcm / grpmass(i)
+                  ycm = ycm / grpmass(i)
+                  zcm = zcm / grpmass(i)
+                  xmove = ascale(1,1)*xcm + ascale(1,2)*ycm
+     &                       + ascale(1,3)*zcm
+                  ymove = ascale(2,1)*xcm + ascale(2,2)*ycm
+     &                       + ascale(2,3)*zcm
+                  zmove = ascale(3,1)*xcm + ascale(3,2)*ycm
+     &                       + ascale(3,3)*zcm
+                  do j = start, stop
+                     k = kgrp(j)
+                     x(k) = x(k) + xmove
+                     y(k) = y(k) + ymove
+                     z(k) = z(k) + zmove
+                  end do
+               end do
+            else if (volscale .eq. 'MOLECULAR') then
+               ascale(1,1) = ascale(1,1) - 1.0d0
+               ascale(2,2) = ascale(2,2) - 1.0d0
+               ascale(3,3) = ascale(3,3) - 1.0d0
+               do i = 1, nmol
+                  xcm = 0.0d0
+                  ycm = 0.0d0
+                  zcm = 0.0d0
+                  start = imol(1,i)
+                  stop = imol(2,i)
+                  do j = start, stop
+                     k = kmol(j)
+                     weigh = mass(k)
+                     xcm = xcm + x(k)*weigh
+                     ycm = ycm + y(k)*weigh
+                     zcm = zcm + z(k)*weigh
+                  end do
+                  xcm = xcm / molmass(i)
+                  ycm = ycm / molmass(i)
+                  zcm = zcm / molmass(i)
+                  xmove = ascale(1,1)*xcm + ascale(1,2)*ycm
+     &                       + ascale(1,3)*zcm
+                  ymove = ascale(2,1)*xcm + ascale(2,2)*ycm
+     &                       + ascale(2,3)*zcm
+                  zmove = ascale(3,1)*xcm + ascale(3,2)*ycm
+     &                       + ascale(3,3)*zcm
+                  do j = start, stop
+                     k = kmol(j)
+                     if (use(k)) then
+                        x(k) = x(k) + xmove
+                        y(k) = y(k) + ymove
+                        z(k) = z(k) + zmove
+                     end if
+                  end do
+               end do
+            else
+               do i = 1, n
+                  if (use(i)) then
+                     x(i) = ascale(1,1)*x(i) + ascale(1,2)*y(i)
+     &                         + ascale(1,3)*z(i)
+                     y(i) = ascale(2,1)*x(i) + ascale(2,2)*y(i)
+     &                         + ascale(2,3)*z(i)
+                     z(i) = ascale(3,1)*x(i) + ascale(3,2)*y(i)
+     &                         + ascale(3,3)*z(i)
+                  end if
+               end do
+            end if
          end if
 c
 c     find the energy change and PV term for the trial move
@@ -611,21 +784,24 @@ c
       write (iout,20)  dedv_fd
    20 format (' dE/dV (Finite Diff) :',12x,f15.6,' Kcal/mole/A**3')
 c
-c     compute virial and finite-difference isotropic pressure
+c     compute analytical and finite-difference isotropic pressure
 c
       pres_vir = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_vir)
       pres_fd = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_fd)
       if (kelvin .eq. 0.0d0) then
          write (iout,30)  pres_vir
-   30    format (/,' Pressure (Virial; 0 K) :',9x,f15.3,' Atmospheres')
          write (iout,40)  pres_fd
-   40    format (' Pressure (Numer; 0 K) :',10x,f15.3,' Atmospheres')
+   30    format (/,' Pressure (Analytical, 0 K) :',5x,f15.3,
+     &              ' Atmospheres')
+   40    format (' Pressure (Numerical, 0 K) :',6x,f15.3,
+     &              ' Atmospheres')
       else
          write (iout,50)  nint(kelvin),pres_vir
-   50    format (/,' Pressure (Virial;',i4,' K) :',7x,f15.3,
-     &              ' Atmospheres')
          write (iout,60)  nint(kelvin),pres_fd
-   60    format (' Pressure (Numer;',i4,' K) :',8x,f15.3,' Atmospheres')
+   50    format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
+     &              ' Atmospheres')
+   60    format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
+     &              ' Atmospheres')
       end if
       return
       end

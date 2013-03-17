@@ -9,8 +9,8 @@
 ##
 ##   1. make all              Build all the TINKER executables
 ##   2. make rename           Move the executables to BINDIR
-##   3. make remove_links     Create soft links in LINKDIR
-##   4. make create_links     Remove soft links from LINKDIR
+##   3. make create_links     Create soft links in LINKDIR
+##   4. make remove_links     Remove soft links from LINKDIR
 ##   6. make listing          Concatenate source to tinker.txt
 ##   5. make clean            Delete objects and executables
 ##

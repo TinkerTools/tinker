@@ -66,7 +66,7 @@ c
    20    continue
          write (iout,30)
    30    format (/,' Enter the Desired Analysis Types',
-     &              ' [G,P,E,A,L,D,M] :  ',$)
+     &              ' [G,P,E,A,L,D,M,C] :  ',$)
          read (input,40,err=20)  string
    40    format (a120)
       end if
@@ -100,7 +100,7 @@ c
 c
 c     get the list of atoms for which output is desired
 c
-      if (doatom .or. doparam) then
+      if (doatom .or. doparam .or. doconect) then
          do i = 1, 20
             list(i) = 0
          end do
@@ -179,6 +179,10 @@ c
       else if (doparam) then
          call paramyze (active)
       end if
+c
+c     provide connectivity lists for the individual atoms
+c
+      if (doconect)  call connyze (active)
 c
 c     perform analysis for each successive coordinate structure
 c
@@ -2222,16 +2226,16 @@ c
                   mpl(j) = 3.0d0 * pole(j,i) / bohr**2
                end do
                if (izaxe .eq. 0) then
-                  write (iout,660)  i,ia,polaxe(i),
+                  write (iout,660)  i,ia,0,0,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  660             format (i6,3x,i6,25x,a8,2x,f9.5,/,50x,3f9.5,
+  660             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else if (ixaxe .eq. 0) then
-                  write (iout,670)  i,ia,izaxe,polaxe(i),
+                  write (iout,670)  i,ia,izaxe,0,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  670             format (i6,3x,i6,1x,i7,17x,a8,2x,f9.5,/,50x,3f9.5,
+  670             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else  if (iyaxe .eq. 0) then
                   write (iout,680)  i,ia,izaxe,ixaxe,polaxe(i),
@@ -2328,6 +2332,151 @@ c
             end if
             write (iout,770)  i,ia,ib,kslope(i),lslope(i)
   770       format (i6,3x,2i6,19x,2f10.4)
+         end do
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine connyze  --  connected atom list analysis  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "connyze" prints information onconnected atoms as lists
+c     of all atom pairs that are 1-2 through 1-5 interactions
+c
+c
+      subroutine connyze (active)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'couple.i'
+      include 'iounit.i'
+      integer i,j,k
+      integer ntot
+      integer ntot2,ntot3
+      integer ntot4,ntot5
+      logical active(*)
+c
+c
+c     count the number of 1-2 through 1-5 interatomic pairs
+c
+      ntot2 = 0
+      ntot3 = 0
+      ntot4 = 0
+      ntot5 = 0
+      do i = 1, n
+         ntot2 = ntot2 + n12(i)
+         ntot3 = ntot3 + n13(i)
+         ntot4 = ntot4 + n14(i)
+         ntot5 = ntot5 + n15(i)
+      end do
+      ntot2 = ntot2 / 2
+      ntot3 = ntot3 / 2
+      ntot4 = ntot4 / 2
+      ntot5 = ntot5 / 2
+      ntot = ntot2 + ntot3 + ntot4 + ntot5
+      if (ntot .ne. 0) then
+         write (iout,10)
+   10    format (/,' Total Number of Pairwise Atomic Interactions :',/)
+      end if
+      if (ntot2 .ne. 0) then
+         write (iout,20)  ntot2
+   20    format (' Number of 1-2 Pairs',7x,i15)
+      end if
+      if (ntot3 .ne. 0) then
+         write (iout,30)  ntot3
+   30    format (' Number of 1-3 Pairs',7x,i15)
+      end if
+      if (ntot4 .ne. 0) then
+         write (iout,40)  ntot4
+   40    format (' Number of 1-4 Pairs',7x,i15)
+      end if
+      if (ntot5 .ne. 0) then
+         write (iout,50)  ntot5
+   50    format (' Number of 1-5 Pairs',7x,i15)
+      end if
+c
+c     generate and print the 1-2 connected atomic interactions
+c
+      if (ntot2 .ne. 0) then
+         write (iout,60)
+   60    format (/,' List of 1-2 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,70)  i,k
+   70                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     generate and print the 1-3 connected atomic interactions
+c
+      if (ntot3 .ne. 0) then
+         write (iout,80)
+   80    format (/,' List of 1-3 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n13(i)
+                  k = i13(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,90)  i,k
+   90                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     generate and print the 1-4 connected atomic interactions
+c
+      if (ntot4 .ne. 0) then
+         write (iout,100)
+  100    format (/,' List of 1-4 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n14(i)
+                  k = i14(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,110)  i,k
+  110                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     generate and print the 1-5 connected atomic interactions
+c
+      if (ntot5 .ne. 0) then
+         write (iout,120)
+  120    format (/,' List of 1-5 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n15(i)
+                  k = i15(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,130)  i,k
+  130                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
          end do
       end if
       return

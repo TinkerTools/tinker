@@ -115,10 +115,10 @@ c
          zr = zi - zvold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .ge. lbuf2) then
 c
 c     store coordinates to reflect update of this site
 c
+         if (r2 .ge. lbuf2) then
             xvold(i) = xi
             yvold(i) = yi
             zvold(i) = zi
@@ -300,12 +300,18 @@ c
       off = sqrt(vbuf2)
       call lights (off,nvdw,xsort,ysort,zsort)
 c
-c     loop over all atoms computing the interactions
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
+c     loop over all atoms computing the neighbor lists
 c
       do i = 1, nvdw
-         xi = xsort(rgx(i))
-         yi = ysort(rgy(i))
-         zi = zsort(rgz(i))
+         xi = xred(i)
+         yi = yred(i)
+         zi = zred(i)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
             start = kbx(i) + 1
@@ -330,9 +336,9 @@ c
             else
                if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
             end if
-            xr = xi - xsort(j)
-            yr = yi - ysort(kgy)
-            zr = zi - zsort(kgz)
+            xr = xi - xred(k)
+            yr = yi - yred(k)
+            zr = zi - zred(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. vbuf2) then
@@ -353,12 +359,6 @@ c
             goto 10
          end if
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (xsort)
-      deallocate (ysort)
-      deallocate (zsort)
 c
 c     check to see if the neighbor lists are too long
 c
@@ -437,10 +437,10 @@ c
          zr = zi - zcold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .ge. lbuf2) then
 c
 c     store coordinates to reflect update of this site
 c
+         if (r2 .ge. lbuf2) then
             xcold(i) = xi
             ycold(i) = yi
             zcold(i) = zi
@@ -577,7 +577,8 @@ c
       include 'iounit.i'
       include 'light.i'
       include 'neigh.i'
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       integer kgy,kgz
       integer start,stop
       real*8 xi,yi,zi
@@ -614,12 +615,19 @@ c
       off = sqrt(cbuf2)
       call lights (off,nion,xsort,ysort,zsort)
 c
-c     loop over all atoms computing the interactions
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
+c     loop over all atoms computing the neighbor lists
 c
       do i = 1, nion
-         xi = xsort(rgx(i))
-         yi = ysort(rgy(i))
-         zi = zsort(rgz(i))
+         ii = kion(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
             start = kbx(i) + 1
@@ -632,6 +640,7 @@ c
    10    continue
          do j = start, stop
             k = locx(j)
+            kk = kion(k)
             kgy = rgy(k)
             if (kby(i) .le. key(i)) then
                if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
@@ -644,9 +653,9 @@ c
             else
                if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
             end if
-            xr = xi - xsort(j)
-            yr = yi - ysort(kgy)
-            zr = zi - zsort(kgz)
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. cbuf2) then
@@ -667,12 +676,6 @@ c
             goto 10
          end if
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (xsort)
-      deallocate (ysort)
-      deallocate (zsort)
 c
 c     check to see if the neighbor lists are too long
 c
@@ -751,10 +754,10 @@ c
          zr = zi - zmold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .ge. lbuf2) then
 c
 c     store coordinates to reflect update of this site
 c
+         if (r2 .ge. lbuf2) then
             xmold(i) = xi
             ymold(i) = yi
             zmold(i) = zi
@@ -891,7 +894,8 @@ c
       include 'light.i'
       include 'mpole.i'
       include 'neigh.i'
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       integer kgy,kgz
       integer start,stop
       real*8 xi,yi,zi
@@ -928,12 +932,19 @@ c
       off = sqrt(mbuf2)
       call lights (off,npole,xsort,ysort,zsort)
 c
-c     loop over all atoms computing the interactions
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
+c     loop over all atoms computing the neighbor lists
 c
       do i = 1, npole
-         xi = xsort(rgx(i))
-         yi = ysort(rgy(i))
-         zi = zsort(rgz(i))
+         ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
             start = kbx(i) + 1
@@ -946,6 +957,7 @@ c
    10    continue
          do j = start, stop
             k = locx(j)
+            kk = ipole(k)
             kgy = rgy(k)
             if (kby(i) .le. key(i)) then
                if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
@@ -958,9 +970,9 @@ c
             else
                if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
             end if
-            xr = xi - xsort(j)
-            yr = yi - ysort(kgy)
-            zr = zi - zsort(kgz)
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. mbuf2) then
@@ -981,12 +993,6 @@ c
             goto 10
          end if
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (xsort)
-      deallocate (ysort)
-      deallocate (zsort)
 c
 c     check to see if the neighbor lists are too long
 c
@@ -1012,6 +1018,7 @@ c
 c     "imagen" takes the components of pairwise distance between
 c     two points and converts to the components of the minimum
 c     image distance; fast version for neighbor list generation
+c     which only returns the correct component magnitudes
 c
 c
       subroutine imagen (xr,yr,zr)
@@ -1020,8 +1027,7 @@ c
       real*8 xr,yr,zr
 c
 c
-c     for orthogonal lattice, find the desired image directly;
-c     to save time, this only returns the correct magnitudes
+c     for orthogonal lattice, find the desired image directly
 c
       if (orthogonal) then
          xr = abs(xr)
@@ -1034,8 +1040,11 @@ c
 c     for monoclinic lattice, convert "xr" and "zr" specially
 c
       else if (monoclinic) then
+         zr = zr / beta_sin
+         yr = abs(yr)
+         xr = xr - zr*beta_cos
          if (abs(xr) .gt. xbox2)  xr = xr - sign(xbox,xr)
-         if (abs(yr) .gt. ybox2)  yr = yr - sign(ybox,yr)
+         if (yr .gt. ybox2)  yr = yr - ybox
          if (abs(zr) .gt. zbox2)  zr = zr - sign(zbox,zr)
          xr = xr + zr*beta_cos
          zr = zr * beta_sin
@@ -1043,6 +1052,9 @@ c
 c     for triclinic lattice, use general conversion equations
 c
       else if (triclinic) then
+         zr = zr / gamma_term
+         yr = (yr - zr*beta_term) / gamma_sin
+         xr = xr - yr*gamma_cos - zr*beta_cos
          if (abs(xr) .gt. xbox2)  xr = xr - sign(xbox,xr)
          if (abs(yr) .gt. ybox2)  yr = yr - sign(ybox,yr)
          if (abs(zr) .gt. zbox2)  zr = zr - sign(zbox,zr)

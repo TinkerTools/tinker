@@ -108,6 +108,7 @@ c
             if (kpfix(1,i) .ne. 0)  xr = x(ia) - xpfix(i)
             if (kpfix(2,i) .ne. 0)  yr = y(ia) - ypfix(i)
             if (kpfix(3,i) .ne. 0)  zr = z(ia) - zpfix(i)
+            if (use_bounds)  call image (xr,yr,zr)
             r = sqrt(xr*xr + yr*yr + zr*zr)
             force = pfix(1,i)
             dt = max(0.0d0,r-pfix(2,i))

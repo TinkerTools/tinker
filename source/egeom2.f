@@ -145,6 +145,7 @@ c
             if (kpfix(1,i) .ne. 0)  xr = x(ia) - xpfix(kpos)
             if (kpfix(2,i) .ne. 0)  yr = y(ia) - ypfix(kpos)
             if (kpfix(3,i) .ne. 0)  zr = z(ia) - zpfix(kpos)
+            if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             r = sqrt(r2)
             force = pfix(1,kpos)

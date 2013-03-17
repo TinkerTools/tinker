@@ -92,6 +92,13 @@
 
       hoch       Simple NMR-NOE force field of Hoch and Stern.
 
+      iwater     The current AMOEBA water parameters for a polarizable
+                 multipole model including only "direct" (non-iterative)
+                 polarization. The parameters were fit to a variety of
+                 water properties using the Force Balance method of
+                 Lee-Ping Wang.
+
+
       mm2        Full MM2(1991) parameters including pi-systems. The
                  anomeric and electronegativity correction terms are
                  not implemented.

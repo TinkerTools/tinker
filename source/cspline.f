@@ -43,9 +43,9 @@ c     check the periodicity of fn, and for subsequent call
 c
       eps = 0.000001d0
       if (abs(fn(n)-fn(0)) .gt. eps) then
-         write (iout,10)
-   10    format (' CSPLINE  --  Warning, Input Values are Not',
-     &              ' Periodic')
+         write (iout,10)  fn(0),fn(n)
+   10    format (' CSPLINE  --  Warning, Non-Periodic Input',
+     &             ' Values',2f12.5)
       end if
       average = 0.5d0 * (fn(0) + fn(n))
       fn(0) = average
