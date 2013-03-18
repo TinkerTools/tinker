@@ -215,6 +215,7 @@ g95 -c -O2 kbond.f
 g95 -c -O2 kcharge.f
 g95 -c -O2 kdipole.f
 g95 -c -O2 kewald.f
+g95 -c -O2 kextra.f
 g95 -c -O2 kgeom.f
 g95 -c -O2 kimprop.f
 g95 -c -O2 kimptor.f
@@ -344,6 +345,7 @@ g95 -c -O2 temper.f
 g95 -c -O2 testgrad.f
 g95 -c -O2 testhess.f
 g95 -c -O2 testpair.f
+g95 -c -O2 testpol.f
 g95 -c -O2 testrot.f
 g95 -c -O2 timer.f
 g95 -c -O2 timerot.f

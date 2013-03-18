@@ -215,6 +215,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kbond.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kcharge.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kdipole.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kewald.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kextra.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kgeom.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kimprop.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kimptor.f
@@ -344,6 +345,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 temper.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 testgrad.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 testhess.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 testpair.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 testpol.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 testrot.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 timer.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 timerot.f

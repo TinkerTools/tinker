@@ -53,6 +53,7 @@ pgf77 -Bstatic -s -o sybylxyz.x sybylxyz.o libtinker.a
 pgf77 -Bstatic -s -o testgrad.x testgrad.o libtinker.a
 pgf77 -Bstatic -s -o testhess.x testhess.o libtinker.a
 pgf77 -Bstatic -s -o testpair.x testpair.o libtinker.a
+pgf77 -Bstatic -s -o testpol.x testpol.o libtinker.a
 pgf77 -Bstatic -s -o testrot.x testrot.o libtinker.a
 pgf77 -Bstatic -s -o timer.x timer.o libtinker.a
 pgf77 -Bstatic -s -o timerot.x timerot.o libtinker.a

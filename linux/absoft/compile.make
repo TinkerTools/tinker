@@ -216,6 +216,7 @@ f77 -c -O kbond.f
 f77 -c -O kcharge.f
 f77 -c -O kdipole.f
 f77 -c -O kewald.f
+f77 -c -O kextra.f
 f77 -c -O kgeom.f
 f77 -c -O kimprop.f
 f77 -c -O kimptor.f
@@ -345,6 +346,7 @@ f77 -c -O temper.f
 f77 -c -O testgrad.f
 f77 -c -O testhess.f
 f77 -c -O testpair.f
+f77 -c -O testpol.f
 f77 -c -O testrot.f
 f77 -c -O timer.f
 f77 -c -O timerot.f

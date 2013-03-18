@@ -55,6 +55,7 @@ LF95 -o1 -tpp -nstchk -ntrace -nomap sybylxyz.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap testgrad.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap testhess.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap testpair.obj -lib tinker
+LF95 -o1 -tpp -nstchk -ntrace -nomap testpol.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap testrot.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap timer.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap timerot.obj -lib tinker

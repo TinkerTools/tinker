@@ -215,6 +215,7 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kbond.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kcharge.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kdipole.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kewald.f
+ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kextra.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kgeom.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kimprop.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp kimptor.f
@@ -344,6 +345,7 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp temper.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp testgrad.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp testhess.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp testpair.f
+ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp testpol.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp testrot.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp timer.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -assume cc_omp -openmp timerot.f

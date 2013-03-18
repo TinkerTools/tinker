@@ -53,6 +53,7 @@ ifort -g -o sybylxyz.x sybylxyz.o libtinker.a
 ifort -g -o testgrad.x testgrad.o libtinker.a
 ifort -g -o testhess.x testhess.o libtinker.a
 ifort -g -o testpair.x testpair.o libtinker.a
+ifort -g -o testpol.x testpol.o libtinker.a
 ifort -g -o testrot.x testrot.o libtinker.a
 ifort -g -o timer.x timer.o libtinker.a
 ifort -g -o timerot.x timerot.o libtinker.a

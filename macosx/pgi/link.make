@@ -53,6 +53,7 @@ pgf95 -fast -mp -o sybylxyz.x sybylxyz.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o testgrad.x testgrad.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o testhess.x testhess.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o testpair.x testpair.o libtinker.a libfftw3_omp.a libfftw3.a
+pgf95 -fast -mp -o testpol.x testpol.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o testrot.x testrot.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o timer.x timer.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o timerot.x timerot.o libtinker.a libfftw3_omp.a libfftw3.a

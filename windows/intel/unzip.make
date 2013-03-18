@@ -53,6 +53,7 @@ unzip sybylxyz.zip sybylxyz.exe
 unzip testgrad.zip testgrad.exe
 unzip testhess.zip testhess.exe
 unzip testpair.zip testpair.exe
+unzip testpol.zip testpol.exe
 unzip testrot.zip testrot.exe
 unzip timer.zip timer.exe
 unzip timerot.zip timerot.exe

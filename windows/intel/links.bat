@@ -54,6 +54,7 @@ ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static sybylxyz.obj ti
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static testgrad.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static testhess.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static testpair.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static testpol.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static testrot.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static timer.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static timerot.obj tinker.lib

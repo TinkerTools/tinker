@@ -53,6 +53,7 @@ zip sybylxyz.zip sybylxyz.exe
 zip testgrad.zip testgrad.exe
 zip testhess.zip testhess.exe
 zip testpair.zip testpair.exe
+zip testpol.zip testpol.exe
 zip testrot.zip testrot.exe
 zip timer.zip timer.exe
 zip timerot.zip timerot.exe

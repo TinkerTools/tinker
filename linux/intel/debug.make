@@ -215,6 +215,7 @@ ifort -c -g -warn unused -check uninit -check bounds kbond.f
 ifort -c -g -warn unused -check uninit -check bounds kcharge.f
 ifort -c -g -warn unused -check uninit -check bounds kdipole.f
 ifort -c -g -warn unused -check uninit -check bounds kewald.f
+ifort -c -g -warn unused -check uninit -check bounds kextra.f
 ifort -c -g -warn unused -check uninit -check bounds kgeom.f
 ifort -c -g -warn unused -check uninit -check bounds kimprop.f
 ifort -c -g -warn unused -check uninit -check bounds kimptor.f
@@ -344,6 +345,7 @@ ifort -c -g -warn unused -check uninit -check bounds temper.f
 ifort -c -g -warn unused -check uninit -check bounds testgrad.f
 ifort -c -g -warn unused -check uninit -check bounds testhess.f
 ifort -c -g -warn unused -check uninit -check bounds testpair.f
+ifort -c -g -warn unused -check uninit -check bounds testpol.f
 ifort -c -g -warn unused -check uninit -check bounds testrot.f
 ifort -c -g -warn unused -check uninit -check bounds timer.f
 ifort -c -g -warn unused -check uninit -check bounds timerot.f

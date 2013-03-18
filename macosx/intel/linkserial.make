@@ -53,6 +53,7 @@ ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o sybylx
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o testgrad.x testgrad.o libtinker.a ; strip testgrad.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o testhess.x testhess.o libtinker.a ; strip testhess.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o testpair.x testpair.o libtinker.a ; strip testpair.x
+ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o testpol.x testpol.o libtinker.a ; strip testpol.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o testrot.x testrot.o libtinker.a ; strip testrot.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o timer.x timer.o libtinker.a ; strip timer.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o timerot.x timerot.o libtinker.a ; strip timerot.x

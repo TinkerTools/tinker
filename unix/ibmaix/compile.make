@@ -215,6 +215,7 @@ xlf -c -O kbond.f
 xlf -c -O kcharge.f
 xlf -c -O kdipole.f
 xlf -c -O kewald.f
+xlf -c -O kextra.f
 xlf -c -O kgeom.f
 xlf -c -O kimprop.f
 xlf -c -O kimptor.f
@@ -344,6 +345,7 @@ xlf -c -O temper.f
 xlf -c -O testgrad.f
 xlf -c -O testhess.f
 xlf -c -O testpair.f
+xlf -c -O testpol.f
 xlf -c -O testrot.f
 xlf -c -O timer.f
 xlf -c -O timerot.f

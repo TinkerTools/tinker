@@ -53,6 +53,7 @@ editbin /STACK:60000000 sybylxyz.exe
 editbin /STACK:60000000 testgrad.exe
 editbin /STACK:60000000 testhess.exe
 editbin /STACK:60000000 testpair.exe
+editbin /STACK:60000000 testpol.exe
 editbin /STACK:60000000 testrot.exe
 editbin /STACK:60000000 timer.exe
 editbin /STACK:60000000 timerot.exe

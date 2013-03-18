@@ -345,6 +345,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -o
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp testgrad.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp testhess.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp testpair.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp testpol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp testrot.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp timer.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -assume cc_omp -openmp timerot.f

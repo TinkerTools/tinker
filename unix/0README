@@ -12,5 +12,5 @@
           to build TINKER on these workstations. As of TINKER 6, the
           build process will require a Fortran 95 compiler instead
           of the Fortran 77 compilers typically used for TINKER 5 and
-          earlier.versions.
+          earlier versions.
 

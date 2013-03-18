@@ -215,6 +215,7 @@ fort77 -c -O2 +E1 kbond.f
 fort77 -c -O2 +E1 kcharge.f
 fort77 -c -O2 +E1 kdipole.f
 fort77 -c -O2 +E1 kewald.f
+fort77 -c -O2 +E1 kextra.f
 fort77 -c -O2 +E1 kgeom.f
 fort77 -c -O2 +E1 kimprop.f
 fort77 -c -O2 +E1 kimptor.f
@@ -344,6 +345,7 @@ fort77 -c -O2 +E1 temper.f
 fort77 -c -O2 +E1 testgrad.f
 fort77 -c -O2 +E1 testhess.f
 fort77 -c -O2 +E1 testpair.f
+fort77 -c -O2 +E1 testpol.f
 fort77 -c -O2 +E1 testrot.f
 fort77 -c -O2 +E1 timer.f
 fort77 -c -O2 +E1 timerot.f

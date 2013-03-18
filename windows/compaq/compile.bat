@@ -216,6 +216,7 @@ DF /compile_only /optimize /fast kbond.f
 DF /compile_only /optimize /fast kcharge.f
 DF /compile_only /optimize /fast kdipole.f
 DF /compile_only /optimize /fast kewald.f
+DF /compile_only /optimize /fast kextra.f
 DF /compile_only /optimize /fast kgeom.f
 DF /compile_only /optimize /fast kimprop.f
 DF /compile_only /optimize /fast kimptor.f
@@ -345,6 +346,7 @@ DF /compile_only /optimize /fast temper.f
 DF /compile_only /optimize /fast testgrad.f
 DF /compile_only /optimize /fast testhess.f
 DF /compile_only /optimize /fast testpair.f
+DF /compile_only /optimize /fast testpol.f
 DF /compile_only /optimize /fast testrot.f
 DF /compile_only /optimize /fast timer.f
 DF /compile_only /optimize /fast timerot.f

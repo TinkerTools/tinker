@@ -53,6 +53,7 @@ mv SYBYLXYZ.ZIP  sybylxyz.zip
 mv TESTGRAD.ZIP  testgrad.zip
 mv TESTHESS.ZIP  testhess.zip
 mv TESTPAIR.ZIP  testpair.zip
+mv TESTPOL.ZIP   testpol.zip
 mv TESTROT.ZIP   testrot.zip
 mv TIMER.ZIP     timer.zip
 mv TIMEROT.ZIP   timerot.zip

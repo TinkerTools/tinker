@@ -215,6 +215,7 @@ pgf77 -c -fast kbond.f
 pgf77 -c -fast kcharge.f
 pgf77 -c -fast kdipole.f
 pgf77 -c -fast kewald.f
+pgf77 -c -fast kextra.f
 pgf77 -c -fast kgeom.f
 pgf77 -c -fast kimprop.f
 pgf77 -c -fast kimptor.f
@@ -344,6 +345,7 @@ pgf77 -c -fast temper.f
 pgf77 -c -fast testgrad.f
 pgf77 -c -fast testhess.f
 pgf77 -c -fast testpair.f
+pgf77 -c -fast testpol.f
 pgf77 -c -fast testrot.f
 pgf77 -c -fast timer.f
 pgf77 -c -fast timerot.f

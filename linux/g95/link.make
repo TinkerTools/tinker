@@ -53,6 +53,7 @@ g95 -o sybylxyz.x sybylxyz.o libtinker.a
 g95 -o testgrad.x testgrad.o libtinker.a
 g95 -o testhess.x testhess.o libtinker.a
 g95 -o testpair.x testpair.o libtinker.a
+g95 -o testpol.x testpol.o libtinker.a
 g95 -o testrot.x testrot.o libtinker.a
 g95 -o timer.x timer.o libtinker.a
 g95 -o timerot.x timerot.o libtinker.a

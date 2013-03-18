@@ -53,6 +53,7 @@ pgf77 -s -o sybylxyz.x sybylxyz.o libtinker.a
 pgf77 -s -o testgrad.x testgrad.o libtinker.a
 pgf77 -s -o testhess.x testhess.o libtinker.a
 pgf77 -s -o testpair.x testpair.o libtinker.a
+pgf77 -s -o testpol.x testpol.o libtinker.a
 pgf77 -s -o testrot.x testrot.o libtinker.a
 pgf77 -s -o timer.x timer.o libtinker.a
 pgf77 -s -o timerot.x timerot.o libtinker.a

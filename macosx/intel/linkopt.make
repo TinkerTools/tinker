@@ -53,6 +53,7 @@ ifort -fast -static-intel -vec-report0 -o sybylxyz.x sybylxyz.f *.o ; strip syby
 ifort -fast -static-intel -vec-report0 -o testgrad.x testgrad.f *.o ; strip testgrad.x
 ifort -fast -static-intel -vec-report0 -o testhess.x testhess.f *.o ; strip testhess.x
 ifort -fast -static-intel -vec-report0 -o testpair.x testpair.f *.o ; strip testpair.x
+ifort -fast -static-intel -vec-report0 -o testpol.x testpol.f *.o ; strip testpol.x
 ifort -fast -static-intel -vec-report0 -o testrot.x testrot.f *.o ; strip testrot.x
 ifort -fast -static-intel -vec-report0 -o timer.x timer.f *.o ; strip timer.x
 ifort -fast -static-intel -vec-report0 -o timerot.x timerot.f *.o ; strip timerot.x

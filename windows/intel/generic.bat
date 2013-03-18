@@ -216,6 +216,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kbond.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kcharge.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kdipole.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kewald.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kextra.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kgeom.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kimprop.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp kimptor.f
@@ -345,6 +346,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp temper.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testgrad.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testhess.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testpair.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testpol.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp testrot.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp timer.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp timerot.f

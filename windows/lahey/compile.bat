@@ -216,6 +216,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace kbond.f
 LF95 -c -o1 -tpp -nstchk -ntrace kcharge.f
 LF95 -c -o1 -tpp -nstchk -ntrace kdipole.f
 LF95 -c -o1 -tpp -nstchk -ntrace kewald.f
+LF95 -c -o1 -tpp -nstchk -ntrace kextra.f
 LF95 -c -o1 -tpp -nstchk -ntrace kgeom.f
 LF95 -c -o1 -tpp -nstchk -ntrace kimprop.f
 LF95 -c -o1 -tpp -nstchk -ntrace kimptor.f
@@ -345,6 +346,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace temper.f
 LF95 -c -o1 -tpp -nstchk -ntrace testgrad.f
 LF95 -c -o1 -tpp -nstchk -ntrace testhess.f
 LF95 -c -o1 -tpp -nstchk -ntrace testpair.f
+LF95 -c -o1 -tpp -nstchk -ntrace testpol.f
 LF95 -c -o1 -tpp -nstchk -ntrace testrot.f
 LF95 -c -o1 -tpp -nstchk -ntrace timer.f
 LF95 -c -o1 -tpp -nstchk -ntrace timerot.f

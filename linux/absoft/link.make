@@ -53,6 +53,7 @@ f77 -o sybylxyz.x sybylxyz.o libtinker.a
 f77 -o testgrad.x testgrad.o libtinker.a
 f77 -o testhess.x testhess.o libtinker.a
 f77 -o testpair.x testpair.o libtinker.a
+f77 -o testpol.x testpol.o libtinker.a
 f77 -o testrot.x testrot.o libtinker.a
 f77 -o timer.x timer.o libtinker.a
 f77 -o timerot.x timerot.o libtinker.a

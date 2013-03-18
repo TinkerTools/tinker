@@ -345,6 +345,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 temp
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 testgrad.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 testhess.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 testpair.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 testpol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 testrot.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 timer.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 timerot.f

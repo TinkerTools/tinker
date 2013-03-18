@@ -58,6 +58,7 @@ ifort -O3 -no-prec-div -static -o sybylxyz.x sybylxyz.o libtinker.a libjvm.so ; 
 ifort -O3 -no-prec-div -static -o testgrad.x testgrad.o libtinker.a libjvm.so ; strip testgrad.x
 ifort -O3 -no-prec-div -static -o testhess.x testhess.o libtinker.a libjvm.so ; strip testhess.x
 ifort -O3 -no-prec-div -static -o testpair.x testpair.o libtinker.a libjvm.so ; strip testpair.x
+ifort -O3 -no-prec-div -static -o testpol.x testpol.o libtinker.a libjvm.so ; strip testpol.x
 ifort -O3 -no-prec-div -static -o testrot.x testrot.o libtinker.a libjvm.so ; strip testrot.x
 ifort -O3 -no-prec-div -static -o timer.x timer.o libtinker.a libjvm.so ; strip timer.x
 ifort -O3 -no-prec-div -static -o timerot.x timerot.o libtinker.a libjvm.so ; strip timerot.x

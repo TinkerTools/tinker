@@ -215,6 +215,7 @@ gfortran -c -O3 kbond.f
 gfortran -c -O3 kcharge.f
 gfortran -c -O3 kdipole.f
 gfortran -c -O3 kewald.f
+gfortran -c -O3 kextra.f
 gfortran -c -O3 kgeom.f
 gfortran -c -O3 kimprop.f
 gfortran -c -O3 kimptor.f
@@ -344,6 +345,7 @@ gfortran -c -O3 temper.f
 gfortran -c -O3 testgrad.f
 gfortran -c -O3 testhess.f
 gfortran -c -O3 testpair.f
+gfortran -c -O3 testpol.f
 gfortran -c -O3 testrot.f
 gfortran -c -O3 timer.f
 gfortran -c -O3 timerot.f

@@ -53,6 +53,7 @@ f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o sybylxyz.x sybylxyz.o libt
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testgrad.x testgrad.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testhess.x testhess.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testpair.x testpair.o libtinker.a
+f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testpol.x testpol.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o testrot.x testrot.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o timer.x timer.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o timerot.x timerot.o libtinker.a

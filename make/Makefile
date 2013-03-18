@@ -507,6 +507,7 @@ OBJS = active.o \
        testgrad.o \
        testhess.o \
        testpair.o \
+       testpol.o \
        testrot.o \
        timer.o \
        timerot.o \
@@ -578,6 +579,7 @@ EXEFILES = alchemy.x \
            testgrad.x \
            testhess.x \
            testpair.x \
+           testpol.x \
            testrot.x \
            timer.x \
            timerot.x \
@@ -659,6 +661,7 @@ rename:
 	mv  testgrad.x   $(BINDIR)/testgrad
 	mv  testhess.x   $(BINDIR)/testhess
 	mv  testpair.x   $(BINDIR)/testpair
+	mv  testpol.x    $(BINDIR)/testpol
 	mv  testrot.x    $(BINDIR)/testrot
 	mv  timer.x      $(BINDIR)/timer
 	mv  timerot.x    $(BINDIR)/timerot
@@ -720,6 +723,7 @@ remove_links:
 	rm -f $(LINKDIR)/testgrad
 	rm -f $(LINKDIR)/testhess
 	rm -f $(LINKDIR)/testpair
+	rm -f $(LINKDIR)/testpol
 	rm -f $(LINKDIR)/testrot
 	rm -f $(LINKDIR)/timer
 	rm -f $(LINKDIR)/timerot
@@ -781,6 +785,7 @@ create_links:
 	ln -s $(BINDIR)/testgrad   $(LINKDIR)/testgrad
 	ln -s $(BINDIR)/testhess   $(LINKDIR)/testhess
 	ln -s $(BINDIR)/testpair   $(LINKDIR)/testpair
+	ln -s $(BINDIR)/testpol    $(LINKDIR)/testpol
 	ln -s $(BINDIR)/testrot    $(LINKDIR)/testrot
 	ln -s $(BINDIR)/timer      $(LINKDIR)/timer
 	ln -s $(BINDIR)/timerot    $(LINKDIR)/timerot
@@ -1109,7 +1114,7 @@ libtinker.a: ${OBJS}
 active.o: atoms.i inform.i iounit.i keys.i sizes.i usage.i
 alchemy.o: analyz.i atoms.i energi.i files.i inform.i iounit.i katoms.i mutant.i potent.i sizes.i units.i usage.i
 analysis.o: analyz.i atoms.i bound.i cutoff.i energi.i group.i inter.i iounit.i potent.i sizes.i vdwpot.i
-analyze.o: action.i analyz.i angang.i angle.i angpot.i atmtyp.i atoms.i bitor.i bond.i bound.i boxes.i charge.i chgpot.i cutoff.i dipole.i energi.i ewald.i fields.i files.i improp.i imptor.i inform.i inter.i iounit.i korbs.i ktrtor.i kvdws.i math.i molcul.i moment.i mpole.i opbend.i opdist.i piorbs.i pistuf.i pitors.i pme.i polar.i polgrp.i potent.i sizes.i solute.i strbnd.i strtor.i tors.i tortor.i units.i urey.i vdw.i vdwpot.i virial.i
+analyze.o: action.i analyz.i angang.i angle.i angpot.i atmtyp.i atoms.i bitor.i bond.i bound.i boxes.i charge.i chgpot.i couple.i cutoff.i dipole.i energi.i ewald.i fields.i files.i improp.i imptor.i inform.i inter.i iounit.i korbs.i ktrtor.i kvdws.i math.i molcul.i moment.i mpole.i opbend.i opdist.i piorbs.i pistuf.i pitors.i pme.i polar.i polgrp.i potent.i sizes.i solute.i strbnd.i strtor.i tors.i tortor.i units.i urey.i vdw.i vdwpot.i virial.i
 angles.o: angle.i atmlst.i atoms.i couple.i iounit.i sizes.i
 anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i usage.i warp.i
 archive.o: atmtyp.i atoms.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
@@ -1263,7 +1268,7 @@ fatal.o: iounit.i
 fft3d.o: fft.i openmp.i pme.i sizes.i
 fftpack.o: math.i
 field.o: keys.i potent.i sizes.i
-final.o: chunks.i inform.i iounit.i neigh.i pme.i sizes.i socket.i solute.i uprior.i usage.i vibs.i
+final.o: chunks.i disgeo.i inform.i iounit.i neigh.i paths.i pme.i sizes.i socket.i solute.i uprior.i usage.i vibs.i
 flatten.o: atoms.i fields.i inform.i iounit.i keys.i sizes.i warp.i
 freeunit.o: iounit.i
 gda.o: atoms.i files.i iounit.i minima.i potent.i sizes.i vdwpot.i warp.i
@@ -1382,7 +1387,7 @@ pmpb.o: iounit.i
 polarize.o: atoms.i inform.i iounit.i molcul.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
 poledit.o: atmtyp.i atoms.i couple.i dma.i files.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i units.i
 polymer.o: atoms.i bond.i bound.i boxes.i iounit.i keys.i sizes.i
-potential.o: atmtyp.i atoms.i bond.i charge.i chgpot.i couple.i dipole.i files.i inform.i iounit.i katoms.i kchrge.i kdipol.i keys.i kmulti.i kpolr.i math.i minima.i moment.i mpole.i output.i polar.i potent.i potfit.i refer.i sizes.i titles.i units.i
+potential.o: atmtyp.i atoms.i bond.i charge.i chgpot.i couple.i dipole.i files.i inform.i iounit.i katoms.i kchrge.i kdipol.i keys.i kmulti.i kpolr.i math.i minima.i moment.i mpole.i neigh.i output.i polar.i potent.i potfit.i refer.i sizes.i titles.i units.i
 precise.o:
 pressure.o: atmtyp.i atoms.i bath.i bound.i boxes.i group.i iounit.i math.i mdstuf.i molcul.i sizes.i units.i usage.i virial.i
 prmedit.o: angpot.i bndpot.i iounit.i math.i params.i sizes.i urypot.i vdwpot.i
@@ -1443,6 +1448,7 @@ temper.o: atmtyp.i atoms.i bath.i group.i mdstuf.i molcul.i moldyn.i rgddyn.i si
 testgrad.o: atoms.i deriv.i energi.i inform.i inter.i iounit.i sizes.i solute.i usage.i
 testhess.o: atoms.i files.i hescut.i inform.i iounit.i sizes.i usage.i
 testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i
+testpol.o: atoms.i bound.i cutoff.i inform.i iounit.i polar.i polpot.i rigid.i sizes.i units.i
 testrot.o: domega.i energi.i inform.i iounit.i math.i omega.i sizes.i zcoord.i
 timer.o: atoms.i cutoff.i hescut.i inform.i iounit.i sizes.i
 timerot.o: cutoff.i iounit.i omega.i sizes.i

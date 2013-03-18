@@ -215,6 +215,7 @@ pgf95 -c -fast -mp kbond.f
 pgf95 -c -fast -mp kcharge.f
 pgf95 -c -fast -mp kdipole.f
 pgf95 -c -fast -mp kewald.f
+pgf95 -c -fast -mp kextra.f
 pgf95 -c -fast -mp kgeom.f
 pgf95 -c -fast -mp kimprop.f
 pgf95 -c -fast -mp kimptor.f
@@ -344,6 +345,7 @@ pgf95 -c -fast -mp temper.f
 pgf95 -c -fast -mp testgrad.f
 pgf95 -c -fast -mp testhess.f
 pgf95 -c -fast -mp testpair.f
+pgf95 -c -fast -mp testpol.f
 pgf95 -c -fast -mp testrot.f
 pgf95 -c -fast -mp timer.f
 pgf95 -c -fast -mp timerot.f

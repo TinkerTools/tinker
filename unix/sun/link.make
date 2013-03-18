@@ -53,6 +53,7 @@ f77 -fast -o sybylxyz.x sybylxyz.o -L. -ltinker
 f77 -fast -o testgrad.x testgrad.o -L. -ltinker
 f77 -fast -o testhess.x testhess.o -L. -ltinker
 f77 -fast -o testpair.x testpair.o -L. -ltinker
+f77 -fast -o testpol.x testpol.o -L. -ltinker
 f77 -fast -o testrot.x testrot.o -L. -ltinker
 f77 -fast -o timer.x timer.o -L. -ltinker
 f77 -fast -o timerot.x timerot.o -L. -ltinker

@@ -192,6 +192,7 @@ kbond.obj
 kcharge.obj
 kdipole.obj
 kewald.obj
+kextra.obj
 kgeom.obj
 kimprop.obj
 kimptor.obj

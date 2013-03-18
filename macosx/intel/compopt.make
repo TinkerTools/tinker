@@ -345,6 +345,7 @@ ifort -c -fast temper.f
 ifort -c -fast testgrad.f
 ifort -c -fast testhess.f
 ifort -c -fast testpair.f
+ifort -c -fast testpol.f
 ifort -c -fast testrot.f
 ifort -c -fast timer.f
 ifort -c -fast timerot.f

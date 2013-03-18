@@ -215,6 +215,7 @@ f77 -c -fast -arch generic -tune generic kbond.f
 f77 -c -fast -arch generic -tune generic kcharge.f
 f77 -c -fast -arch generic -tune generic kdipole.f
 f77 -c -fast -arch generic -tune generic kewald.f
+f77 -c -fast -arch generic -tune generic kextra.f
 f77 -c -fast -arch generic -tune generic kgeom.f
 f77 -c -fast -arch generic -tune generic kimprop.f
 f77 -c -fast -arch generic -tune generic kimptor.f
@@ -344,6 +345,7 @@ f77 -c -fast -arch generic -tune generic temper.f
 f77 -c -fast -arch generic -tune generic testgrad.f
 f77 -c -fast -arch generic -tune generic testhess.f
 f77 -c -fast -arch generic -tune generic testpair.f
+f77 -c -fast -arch generic -tune generic testpol.f
 f77 -c -fast -arch generic -tune generic testrot.f
 f77 -c -fast -arch generic -tune generic timer.f
 f77 -c -fast -arch generic -tune generic timerot.f

@@ -203,6 +203,7 @@ kbond.o \
 kcharge.o \
 kdipole.o \
 kewald.o \
+kextra.o \
 kgeom.o \
 kimprop.o \
 kimptor.o \

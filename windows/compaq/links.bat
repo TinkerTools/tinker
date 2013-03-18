@@ -55,6 +55,7 @@ DF /optimize /fast sybylxyz.obj tinker.lib
 DF /optimize /fast testgrad.obj tinker.lib
 DF /optimize /fast testhess.obj tinker.lib
 DF /optimize /fast testpair.obj tinker.lib
+DF /optimize /fast testpol.obj tinker.lib
 DF /optimize /fast testrot.obj tinker.lib
 DF /optimize /fast timer.obj tinker.lib
 DF /optimize /fast timerot.obj tinker.lib

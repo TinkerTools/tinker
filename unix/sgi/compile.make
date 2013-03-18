@@ -215,6 +215,7 @@ f77 -c -O -mips4 kbond.f
 f77 -c -O -mips4 kcharge.f
 f77 -c -O -mips4 kdipole.f
 f77 -c -O -mips4 kewald.f
+f77 -c -O -mips4 kextra.f
 f77 -c -O -mips4 kgeom.f
 f77 -c -O -mips4 kimprop.f
 f77 -c -O -mips4 kimptor.f
@@ -344,6 +345,7 @@ f77 -c -O -mips4 temper.f
 f77 -c -O -mips4 testgrad.f
 f77 -c -O -mips4 testhess.f
 f77 -c -O -mips4 testpair.f
+f77 -c -O -mips4 testpol.f
 f77 -c -O -mips4 testrot.f
 f77 -c -O -mips4 timer.f
 f77 -c -O -mips4 timerot.f

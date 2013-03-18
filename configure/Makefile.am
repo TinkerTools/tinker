@@ -360,6 +360,7 @@ bin_PROGRAMS = \
 	testgrad \
 	testhess \
 	testpair \
+	testpol \
 	testrot \
 	timer \
 	timerot \

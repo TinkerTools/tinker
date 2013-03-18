@@ -53,6 +53,7 @@ ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel 
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o testgrad.x testgrad.o libtinker.a libfftw3_omp.a libfftw3.a ; strip testgrad.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o testhess.x testhess.o libtinker.a libfftw3_omp.a libfftw3.a ; strip testhess.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o testpair.x testpair.o libtinker.a libfftw3_omp.a libfftw3.a ; strip testpair.x
+ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o testpol.x testpol.o libtinker.a libfftw3_omp.a libfftw3.a ; strip testpol.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o testrot.x testrot.o libtinker.a libfftw3_omp.a libfftw3.a ; strip testrot.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o timer.x timer.o libtinker.a libfftw3_omp.a libfftw3.a ; strip timer.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o timerot.x timerot.o libtinker.a libfftw3_omp.a libfftw3.a ; strip timerot.x

@@ -215,6 +215,7 @@ ifort -c -fast kbond.f
 ifort -c -fast kcharge.f
 ifort -c -fast kdipole.f
 ifort -c -fast kewald.f
+ifort -c -fast kextra.f
 ifort -c -fast kgeom.f
 ifort -c -fast kimprop.f
 ifort -c -fast kimptor.f
@@ -344,6 +345,7 @@ ifort -c -fast temper.f
 ifort -c -fast testgrad.f
 ifort -c -fast testhess.f
 ifort -c -fast testpair.f
+ifort -c -fast testpol.f
 ifort -c -fast testrot.f
 ifort -c -fast timer.f
 ifort -c -fast timerot.f

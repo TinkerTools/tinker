@@ -52,6 +52,7 @@ mv sybylxyz.x  ../bin/sybylxyz
 mv testgrad.x  ../bin/testgrad
 mv testhess.x  ../bin/testhess
 mv testpair.x  ../bin/testpair
+mv testpol.x   ../bin/testpol
 mv testrot.x   ../bin/testrot
 mv timer.x     ../bin/timer
 mv timerot.x   ../bin/timerot

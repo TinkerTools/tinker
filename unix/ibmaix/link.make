@@ -53,6 +53,7 @@ xlf -o sybylxyz.x sybylxyz.o -L. -ltinker
 xlf -o testgrad.x testgrad.o -L. -ltinker
 xlf -o testhess.x testhess.o -L. -ltinker
 xlf -o testpair.x testpair.o -L. -ltinker
+xlf -o testpol.x testpol.o -L. -ltinker
 xlf -o testrot.x testrot.o -L. -ltinker
 xlf -o timer.x timer.o -L. -ltinker
 xlf -o timerot.x timerot.o -L. -ltinker

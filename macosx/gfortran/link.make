@@ -53,6 +53,7 @@ gfortran -O3 -o sybylxyz.x sybylxyz.o libtinker.a
 gfortran -O3 -o testgrad.x testgrad.o libtinker.a
 gfortran -O3 -o testhess.x testhess.o libtinker.a
 gfortran -O3 -o testpair.x testpair.o libtinker.a
+gfortran -O3 -o testpol.x testpol.o libtinker.a
 gfortran -O3 -o testrot.x testrot.o libtinker.a
 gfortran -O3 -o timer.x timer.o libtinker.a
 gfortran -O3 -o timerot.x timerot.o libtinker.a
