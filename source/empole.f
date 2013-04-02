@@ -62,8 +62,8 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
       include 'bound.i'
+      include 'boxes.i'
       include 'cell.i'
       include 'chgpot.i'
       include 'couple.i'
@@ -581,8 +581,8 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
       include 'bound.i'
+      include 'boxes.i'
       include 'chgpot.i'
       include 'couple.i'
       include 'energi.i'
@@ -1019,8 +1019,8 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
       include 'bound.i'
+      include 'boxes.i'
       include 'cell.i'
       include 'chgpot.i'
       include 'couple.i'
@@ -1642,8 +1642,8 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
       include 'bound.i'
+      include 'boxes.i'
       include 'chgpot.i'
       include 'couple.i'
       include 'energi.i'

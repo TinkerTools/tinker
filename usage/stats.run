@@ -1,2 +1,0 @@
-download /var/adm/syslog/daemon.log
-webhits.pl /usr/internet/httpd/logs/access_log
