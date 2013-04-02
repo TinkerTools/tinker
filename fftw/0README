@@ -1,0 +1,34 @@
+
+                 --------------------------------------------
+                 FFTW -- Fast, Parallel FFT for OpenMP TINKER
+                 --------------------------------------------
+
+      This directory contains FFTW-3.3.3 which is required by the OpenMP
+      version of TINKER. In particular, TINKER needs the two fftw static
+      object libraries, libfftw3.a and libfftw3_omp.a. To build fftw
+      using the Intel compilers, issue the following set of commands as
+      shown below. Note that the 'setenv" syntax is for csh/tcsh shells,
+      and should be modified for other shells. Also. the --prefix in the
+      "configure" command should be changed to the correct path on your
+      local machine (ie, the current /fftw area under the TINKER tree).
+
+      setenv CC gcc          (or use "export CC=gcc" for bash)
+      setenv F77 gfortran    (or use "export F77=gfortran" for bash)
+      make distclean
+      configure --prefix=/Users/ponder/tinker/fftw --enable-openmp
+      make
+      make install
+
+      The above "setenv" commands are for use of the GNU compilers. To
+      use the Intel or PGI compilers, substitute "icc" or "pgcc" for
+      "gcc", and "ifort" or "pgf95" for "gfortran".
+
+      After completion of the above commands, the libraries files used
+      by TINKER will be in the /lib subdirectory.
+
+      Note modified versions of the configure script are used to enforce
+      processor-specific compiler flags. In particular, there are macosx
+      and linux versions for the Intel compiler that use  -axssse3 and
+      -axsse3, respectively, along with other optimization flags. The
+      original file is available as "configure-orig".
+
