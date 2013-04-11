@@ -89,12 +89,12 @@ atom          9    9    Rb+   "Rubidium Ion Rb+"            37    85.468    0
 atom         10   10    Cs+   "Cesium Ion Cs+"              55   132.905    0
 atom         11   11    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
 atom         12   12    Ca+   "Calcium Ion Ca+2"            20    40.078    0
-atom         13   13    Zn+   "Zinc Ion Zn+2"               30    65.370    0
+atom         13   13    Zn+   "Zinc Ion Zn+2"               30    65.390    0
 atom         14   14    F-    "Fluoride Ion F-"              9    18.998    0
 atom         15   15    Cl-   "Chloride Ion Cl-"            17    35.453    0
 atom         16   16    Br-   "Bromide Ion Br-"             35    79.904    0
 atom         17   17    I-    "Iodide Ion I-"               53   126.904    0
-atom         18   18    C     "Cyanide Ion C"                6    12.001    1
+atom         18   18    C     "Cyanide Ion C"                6    12.011    1
 atom         19   19    N     "Cyanide Ion N"                7    14.007    1
 atom         20   20    B     "Tetrafluoroborate B"          5    10.810    4
 atom         21   21    F     "Tetrafluoroborate F"          9    18.998    1

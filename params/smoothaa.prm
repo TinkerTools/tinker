@@ -171,7 +171,7 @@ atom        114   13    CT    "Diol & Triol -CR2OH"          6    12.011    4
 atom        115   36    HC    "Diol & Triol H-COH"           1     1.008    1
 atom        116   29    OS    "Diphenyl Ether"               8    15.999    2
 atom        117   40    C=    "Diene =CR-CR="                6    12.011    3
-atom        118   29    OS    "Anisole -OCH3"                8    15.999    1
+atom        118   29    OS    "Anisole -OCH3"                8    15.999    2
 atom        119   29    OS    "Dialkyl Ether -O-"            8    15.999    2
 atom        120   13    CT    "Methyl Ether CH3OR"           6    12.011    4
 atom        121   13    CT    "Ethyl Ether -CH2OR"           6    12.011    4
@@ -191,7 +191,7 @@ atom        134   41    CO    "Hemiacetal RO-CHR-OH"         6    12.011    4
 atom        135   36    HC    "Hemiacetal RO-CHR-OH"         1     1.008    1
 atom        136   41    CO    "Acetal RO-CR2-OR"             6    12.011    4
 atom        137   41    CO    "Hemiacetal RO-CR2-OH"         6    12.011    4
-atom        138   38    CA    "Anisole C-OCH3"               6    12.011    4
+atom        138   38    CA    "Anisole C-OCH3"               6    12.011    3
 atom        139   15    SH    "Thiol -SH"                   16    32.060    2
 atom        140   15    SH    "Hydrogen Sulfide H2S"        16    32.060    2
 atom        141   16    S     "Sulfide -S-"                 16    32.060    2

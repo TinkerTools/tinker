@@ -56,18 +56,19 @@ mutual-14-scale         1.0
       #############################
 
 
-P. Ren and J. W. Ponder, "Polarizable Atomic Multipole-based Potential
-for Proteins: Model and Parameterization", in preparation.
+Y. Shi, Z. Xia, J. Zhang, R. Best, J. W. Ponder and P. Ren, "The Polarizable
+Atomic Multipole-Based AMOEBA Force Field for Proteins", J. Chem. Theory
+Comput., 9, xxx-xxx (2013)
+
+P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-Based
+Molecular Mechanics for Organic Molecules", J. Chem. Theory Comput.,
+7, 3143-3161 (2011)
 
 J. W. Ponder and D. A. Case, "Force Fields for Protein Simulation",
 Adv. Prot. Chem., 66, 27-85 (2003)
 
 P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Water Model for
 Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947 (2003)
-
-P. Ren and J. W. Ponder, "A Consistent Treatment of Inter- and
-Intramolecular Polarization in Molecular Mechanics Calculations",
-J. Comput. Chem., 23, 1497-1506 (2002)
 
 
    ###############################################

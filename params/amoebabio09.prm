@@ -56,26 +56,28 @@ mutual-14-scale         1.0
       #############################
 
 
-This file contains the 2009 AMOEBA biopolymer force fields, with updates
+This file contains the 2009 AMOEBA biopolymer force field, with updates
 to the original AMOEBA protein parameters made during Fall 2009, and a
-beta version of AMOEBA nucleic acid parameters due to Chuanjie Wu; this
-file must be used with TINKER 5.0 or later
+beta version of AMOEBA nucleic acid parameters due to Chuanjie Wu
 
-P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-based
-Potential for Proteins: Model and Parameterization", in preparation.
+Y. Shi, Z. Xia, J. Zhang, R. Best, J. W. Ponder and P. Ren, "The Polarizable
+Atomic Multipole-Based AMOEBA Force Field for Proteins", J. Chem. Theory
+Comput., 9, xxx-xxx (2013)
 
-P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-based
-Potentials for Organic Molecules", in preparation
+P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-Based
+Molecular Mechanics for Organic Molecules", J. Chem. Theory Comput.,
+7, 3143-3161 (2011)
 
-J. W. Ponder and D. A. Case, "Force Fields for Protein Simulation",
-Adv. Prot. Chem., 66, 27-85 (2003)
+J. C. Wu, J.-P. Piquemal, R. Chaudret, P. Reinhardt and P. Ren,
+"Polarizable Molecular Dynamics Simulation of Zn(II) in Water Using
+the AMOEBA Force Field", J. Chem. Theory Comput., 6, 2059-2070 (2010)
+
+A. Grossfield, P. Ren, J. W. Ponder, "Ion Solvation Thermodynamics from
+Simulation with a Polarizable Force Field", J. Am. Chem. Soc., 125,
+15671-15682 (2003)
 
 P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Water Model for
 Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947 (2003)
-
-P. Ren and J. W. Ponder, "A Consistent Treatment of Inter- and
-Intramolecular Polarization in Molecular Mechanics Calculations",
-J. Comput. Chem., 23, 1497-1506 (2002)
 
 
    ###############################################
@@ -338,7 +340,7 @@ atom        200    9    H     "Lysine (Neutral) HD"          1     1.008    1
 atom        201    8    C     "Lysine (Neutral) CE"          6    12.011    4
 atom        202    9    H     "Lysine (Neutral) HE"          1     1.008    1
 atom        203   35    N     "Lysine (Neutral) NZ"          7    14.007    3
-atom        204   37    H     "Lysine (Neutral) HN"          1     1.008    1
+atom        204   37    HN    "Lysine (Neutral) HN"          1     1.008    1
 atom        205    8    C     "Arginine CB"                  6    12.000    4
 atom        206    9    H     "Arginine HB"                  1     1.008    1
 atom        207    8    C     "Arginine CG"                  6    12.000    4
@@ -546,7 +548,8 @@ atom        408   79    Cs+   "Cesium Ion Cs+"              55   132.905    0
 atom        409   80    Be+   "Beryllium Ion Be+2"           4     9.012    0
 atom        410   81    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
 atom        411   82    Ca+   "Calcium Ion Ca+2"            20    40.078    0
-atom        412   83    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        412   83    Zn+   "Zinc Ion Zn+2"               30    65.380    0
+atom        413   84    Cl-   "Chloride Ion Cl-"            17    35.453    0
 
 
       ################################
@@ -636,9 +639,10 @@ vdw          77               3.7100     0.3500
 vdw          78               4.1400     0.4400
 vdw          79               4.3700     0.5300
 vdw          80               1.8800     0.0910
-vdw          81               2.5500     0.8500
-vdw          82               3.1300     1.6000
-vdw          83               4.1300     0.3400
+vdw          81               2.9400     0.3000
+vdw          82               3.6300     0.3500
+vdw          83               2.6800     0.2220
+vdw          84               4.1300     0.3400
 
 
       ##################################
@@ -10089,7 +10093,12 @@ multipole   411    0    0               2.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole   412    0    0              -1.00000
+multipole   412    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   413    0    0              -1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
@@ -10512,9 +10521,10 @@ polarize    406          0.7800     0.3900
 polarize    407          1.3500     0.3900
 polarize    408          2.2600     0.3900
 polarize    409          0.0100     0.0650
-polarize    410          0.0800     0.0950
-polarize    411          0.5500     0.1100
-polarize    412          4.0000     0.3900
+polarize    410          0.0800     0.0952
+polarize    411          0.5500     0.1585
+polarize    412          0.2600     0.2096
+polarize    413          4.0000     0.3900
 
 
       ########################################

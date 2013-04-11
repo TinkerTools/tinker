@@ -99,7 +99,7 @@ c
                call vbuild (i,xred,yred,zred)
             end do
          else
-            call vfull (xred,yred,zred)
+            call vlight (xred,yred,zred)
          end if
          return
       end if
@@ -240,18 +240,18 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine vfull  --  make vdw pair list for all sites  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine vlight  --  make vdw pair list for all sites  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "vfull" performs a complete rebuild of the van der Waals
+c     "vlight" performs a complete rebuild of the van der Waals
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine vfull (xred,yred,zred)
+      subroutine vlight (xred,yred,zred)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -420,7 +420,7 @@ c
                call cbuild (i)
             end do
          else
-            call cfull
+            call clight
          end if
          return
       end if
@@ -556,18 +556,18 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine cfull  --  make charge pair list for all sites  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine clight  --  make charge pair list for all sites  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "cfull" performs a complete rebuild of the partial charge
+c     "clight" performs a complete rebuild of the partial charge
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine cfull
+      subroutine clight
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -737,7 +737,7 @@ c
                call mbuild (i)
             end do
          else
-            call mfull
+            call mlight
          end if
          return
       end if
@@ -873,18 +873,18 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine mfull  --  make mpole pair list for all sites  ##
-c     ##                                                            ##
-c     ################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine mlight  --  make mpole pair list for all sites  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "mfull" performs a complete rebuild of the atomic multipole
+c     "mlight" performs a complete rebuild of the atomic multipole
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine mfull
+      subroutine mlight
       implicit none
       include 'sizes.i'
       include 'atoms.i'
