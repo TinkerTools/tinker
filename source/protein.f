@@ -832,12 +832,19 @@ c
       include 'sequen.i'
       integer i,k
       integer cai,ni,ci
+      integer ntprocd
+      integer ntprohd
       character*3 resname
 c
 c
 c     set the CB atom as reference site
 c
       k = cbtyp(seqtyp(i))
+c
+c     set biotypes for CD and HD of N-terminal PRO residue
+c
+      ntprocd = 469
+      ntprohd = 470
 c
 c     glycine residue  (GLY)
 c
@@ -960,7 +967,7 @@ c
          call zatom (k,1.54d0,107.0d0,109.5d0,cai,ni,ci,chiral(i))
          call zatom (k+2,1.54d0,107.0d0,chi(1,i),n-1,cai,ni,0)
          if (i .eq. 1) then
-            call zatom (482,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
+            call zatom (ntprocd,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
          else
             call zatom (k+4,1.54d0,107.0d0,chi(2,i),n-1,n-2,cai,0)
          end if
@@ -970,8 +977,8 @@ c
          call zatom (k+3,1.11d0,109.4d0,109.4d0,n-4,n-5,n-3,1)
          call zatom (k+3,1.11d0,109.4d0,109.4d0,n-5,n-6,n-4,-1)
          if (i .eq. 1) then
-            call zatom (483,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
-            call zatom (483,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)
+            call zatom (ntprohd,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
+            call zatom (ntprohd,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)
          else
             call zatom (k+5,1.11d0,109.4d0,109.4d0,n-5,n-6,ni,1)
             call zatom (k+5,1.11d0,109.4d0,109.4d0,n-6,n-7,ni,-1)

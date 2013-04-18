@@ -174,7 +174,7 @@ atom        121   13    CT    "Ethyl Ether -CH2OR"           6    12.011    4
 atom        122   13    CT    "Isopropyl Ether >CHOR"        6    12.011    4
 atom        123   13    CT    "t-Butyl Ether COR"            6    12.011    4
 atom        124   36    HC    "Alkyl Ether H-COR"            1     1.008    1
-atom        125   29    OS    "Acetal RO-CR2OX"              8    15.999    4
+atom        125   29    OS    "Acetal RO-CR2OX"              8    15.999    2
 atom        126    5    OH    "Hemiacetal -OH"               8    15.999    2
 atom        127    7    HO    "Hemiacetal -OH"               1     1.008    1
 atom        128   41    CO    "Acetal RO-CH2-OR"             6    12.011    4

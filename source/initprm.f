@@ -384,7 +384,7 @@ c
       p3scale = 0.0d0
       p4scale = 1.0d0
       p5scale = 1.0d0
-      p41scale = 1.0d0
+      p41scale = 0.5d0
 c
 c     set default control parameters for induced dipoles
 c

@@ -1842,18 +1842,17 @@ c
          header = .true.
          do i = 1, nurey
             ia = iury(1,i)
-            ib = iury(2,i)
             ic = iury(3,i)
             if (active(ia) .or. active(ic)) then
                if (header) then
                   header = .false.
                   write (iout,380)
   380             format (/,' Urey-Bradley Parameters :',
-     &                    //,13x,'Atom Numbers',21x,'KUB',
+     &                    //,10x,'Atom Numbers',24x,'KUB',
      &                       4x,'Distance',/)
                end if
-               write (iout,390)  i,ia,ib,ic,uk(i),ul(i)
-  390          format (i6,3x,3i6,13x,f10.3,f10.4)
+               write (iout,390)  i,ia,ic,uk(i),ul(i)
+  390          format (i6,3x,2i6,13x,f16.4,f10.4)
             end if
          end do
       end if
