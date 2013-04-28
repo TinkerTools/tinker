@@ -4,13 +4,15 @@
            ---------------------------------------------------------
 
         This directory contains five protein structures used for APBS
-        implicit solvation energy calculations in Mike Schnieders paper.
+        implicit solvation energy calculations in Mike Schnieders' paper.
         See Table VI in JCP, 126, 124114 (2007). To obtain approximately
         the same energy values as in the paper, use the tinker.key file
         provided in this directory and make sure AMOEBA Rmin values are
-        used for the PB radii (ie, use PB-RADII VDW).
+        used for the PB radii (use PB-RADII VDW). Differences between
+        the JCP values and those from the current TINKER are due to the
+        correction of small bugs in APBS since publication. 
 
-        PROTEIN     SPACING      GRID SIZE         JCP       TINKER-6
+        PROTEIN     SPACING      GRID SIZE         JCP         TINKER
 
           CRN         0.61        65x65x65      -679.1      -669.3312
           CRN         0.31     129x129x129      -641.3      -629.7348

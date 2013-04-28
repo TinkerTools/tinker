@@ -28,6 +28,7 @@ c
       include 'iounit.i'
       include 'mpole.i'
       include 'polar.i'
+      include 'potent.i'
       include 'solute.i'
       include 'units.i'
       include 'uprior.i'
@@ -39,15 +40,11 @@ c
 c     choose the method for computation of induced dipoles
 c
       if (solvtyp(1:2) .eq. 'PB') then
-         call induce0f
-      else if (solvtyp(1:2) .eq. 'GK') then
          call induce0e
+      else if (solvtyp(1:2) .eq. 'GK') then
+         call induce0d
       else if (use_ewald) then
-         if (use_mlist) then
-            call induce0d
-         else
-            call induce0c
-         end if
+         call induce0c
       else
          if (use_mlist) then
             call induce0b
@@ -68,6 +65,14 @@ c
                end do
                udalt(1,j,i) = uind(j,i)
                upalt(1,j,i) = uinp(j,i)
+               if (use_solv) then
+                  do k = nualt, 2, -1
+                     usalt(k,j,i) = usalt(k-1,j,i)
+                     upsalt(k,j,i) = upsalt(k-1,j,i)
+                  end do
+                  usalt(1,j,i) = uinds(j,i)
+                  upsalt(1,j,i) = uinps(j,i)
+               end if
             end do
          end do
       end if
@@ -177,59 +182,35 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'group.i'
       include 'inform.i'
       include 'iounit.i'
       include 'mpole.i'
       include 'polar.i'
-      include 'polgrp.i'
       include 'polpot.i'
       include 'potent.i'
-      include 'shunt.i'
       include 'units.i'
       include 'uprior.i'
-      integer i,j,k,m
-      integer ii,kk,iter
+      integer i,j,k,iter
       integer maxiter
-      real*8 xr,yr,zr
-      real*8 fgrp,r,r2
-      real*8 rr3,rr5,rr7
-      real*8 ci,dix,diy,diz
-      real*8 duix,duiy,duiz
-      real*8 puix,puiy,puiz
-      real*8 qixx,qixy,qixz
-      real*8 qiyy,qiyz,qizz
-      real*8 ck,dkx,dky,dkz
-      real*8 dukx,duky,dukz
-      real*8 pukx,puky,pukz
-      real*8 qkxx,qkxy,qkxz
-      real*8 qkyy,qkyz,qkzz
-      real*8 dir,duir,puir
-      real*8 dkr,dukr,pukr
-      real*8 qix,qiy,qiz,qir
-      real*8 qkx,qky,qkz,qkr
-      real*8 udsum,upsum
       real*8 eps,epsold
       real*8 epsd,epsp
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 pdi,pti,pgamma
-      real*8 fid(3),fkd(3)
-      real*8 fip(3),fkp(3)
-      real*8, allocatable :: dscale(:)
-      real*8, allocatable :: pscale(:)
+      real*8 udsum,upsum
+      real*8 a,ap,b,bp
+      real*8 sum,sump
+      real*8 denom,denomp
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: udir(:,:)
       real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: uold(:,:)
-      real*8, allocatable :: uoldp(:,:)
-      logical proceed,done
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: conjp(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: vecp(:,:)
+      real*8, allocatable :: usav(:,:)
+      real*8, allocatable :: usavp(:,:)
+      logical done
       character*6 mode
 c
 c
@@ -243,12 +224,254 @@ c
       end do
       if (.not. use_polar)  return
 c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
+c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dscale(n))
-      allocate (pscale(n))
       allocate (field(3,npole))
       allocate (fieldp(3,npole))
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+c
+c     compute the field at each atom due to permanent multipoles
+c
+      call dfield0a (field,fieldp)
+c
+c     set induced dipoles to polarizability times direct field
+c
+      do i = 1, npole
+         do j = 1, 3
+            udir(j,i) = polarity(i) * field(j,i)
+            udirp(j,i) = polarity(i) * fieldp(j,i)
+            uind(j,i) = udir(j,i)
+            uinp(j,i) = udirp(j,i)
+         end do
+      end do
+c
+c     set tolerances for computation of mutual induced dipoles
+c
+      if (poltyp .eq. 'MUTUAL') then
+         done = .false.
+         maxiter = 500
+         iter = 0
+         eps = 100.0d0
+c
+c     estimated induced dipoles from polynomial predictor
+c
+         if (use_pred .and. nualt.eq.maxualt) then
+            do i = 1, npole
+               do j = 1, 3
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+               end do
+            end do
+         end if
+c
+c     perform dynamic allocation of some local arrays
+c
+         allocate (rsd(3,npole))
+         allocate (rsdp(3,npole))
+         allocate (conj(3,npole))
+         allocate (conjp(3,npole))
+         allocate (vec(3,npole))
+         allocate (vecp(3,npole))
+         allocate (usav(3,npole))
+         allocate (usavp(3,npole))
+c
+c     set initial conjugate gradient residual and conjugate vector
+c
+         call ufield0a (field,fieldp)
+         do i = 1, npole
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                       + fieldp(j,i)
+               conj(j,i) = rsd(j,i)
+               conjp(j,i) = rsdp(j,i)
+            end do
+         end do
+c
+c     conjugate gradient iteration of the mutual induced dipoles
+c
+         do while (.not. done)
+            iter = iter + 1
+            do i = 1, npole
+               do j = 1, 3
+                  usav(j,i) = uind(j,i)
+                  usavp(j,i) = uinp(j,i)
+                  uind(j,i) = conj(j,i)
+                  uinp(j,i) = conjp(j,i)
+               end do
+            end do
+            call ufield0a (field,fieldp)
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = usav(j,i)
+                  uinp(j,i) = usavp(j,i)
+                  vec(j,i) = -field(j,i)
+                  vecp(j,i) = -fieldp(j,i)
+               end do
+            end do
+            sum = 0.0d0
+            sump = 0.0d0
+            denom = 0.0d0
+            denomp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
+                  sum = sum + rsd(j,i)*rsd(j,i)
+                  sump = sump + rsdp(j,i)*rsdp(j,i)
+                  denom = denom + conj(j,i)*vec(j,i)
+                  denomp = denomp + conjp(j,i)*vecp(j,i)
+               end do
+            end do
+            a = sum / denom
+            ap = sump / denomp
+            epsd = 0.0d0
+            epsp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
+               end do
+            end do
+            b = epsd / sum
+            bp = epsp / sump
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + a*conj(j,i)
+                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                  conj(j,i) = rsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+               end do
+            end do
+c
+c     check the convergence of the mutual induced dipoles
+c
+            epsold = eps
+            eps = max(epsd,epsp)
+            eps = debye * sqrt(eps/dble(npolar))
+            if (debug) then
+               if (iter .eq. 1) then
+                  write (iout,10)
+   10             format (/,' Determination of Induced Dipole',
+     &                       ' Moments :',
+     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
+               end if
+               write (iout,20)  iter,eps
+   20          format (i8,7x,f16.10)
+            end if
+            if (eps .lt. poleps)  done = .true.
+            if (eps .gt. epsold)  done = .true.
+            if (iter .ge. politer)  done = .true.
+         end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (rsd)
+         deallocate (rsdp)
+         deallocate (conj)
+         deallocate (conjp)
+         deallocate (vec)
+         deallocate (vecp)
+         deallocate (usav)
+         deallocate (usavp)
+c
+c     print the results from the conjugate gradient iteration
+c
+         if (debug) then
+            write (iout,30)  iter,eps
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
+         end if
+c
+c     terminate the calculation if dipoles failed to converge
+c
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
+     &                 ' are not Converged')
+            call prterr
+            call fatal
+         end if
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (field)
+      deallocate (fieldp)
+      deallocate (udir)
+      deallocate (udirp)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine dfield0a  --  direct induction via double loop  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "dfield0a" computes the direct electricstatic field due to
+c     permanent multipole moments via a double loop
+c
+c
+      subroutine dfield0a (field,fieldp)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'cell.i'
+      include 'couple.i'
+      include 'group.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'shunt.i'
+      integer i,j,k,m
+      integer ii,kk
+      real*8 xr,yr,zr
+      real*8 fgrp,r,r2
+      real*8 rr3,rr5,rr7
+      real*8 ci,dix,diy,diz
+      real*8 duix,duiy,duiz
+      real*8 qixx,qixy,qixz
+      real*8 qiyy,qiyz,qizz
+      real*8 ck,dkx,dky,dkz
+      real*8 dukx,duky,dukz
+      real*8 qkxx,qkxy,qkxz
+      real*8 qkyy,qkyz,qkzz
+      real*8 dir,duir
+      real*8 dkr,dukr
+      real*8 qix,qiy,qiz,qir
+      real*8 qkx,qky,qkz,qkr
+      real*8 damp,expdamp
+      real*8 scale3,scale5
+      real*8 scale7
+      real*8 pdi,pti,pgamma
+      real*8 fid(3),fkd(3)
+      real*8 fip(3),fkp(3)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      logical proceed
+c
 c
 c     zero out the value of the field at each site
 c
@@ -259,12 +482,12 @@ c
          end do
       end do
 c
-c     set the switching function coefficients
+c     perform dynamic allocation of some local arrays
 c
-      mode = 'MPOLE'
-      call switch (mode)
+      allocate (dscale(n))
+      allocate (pscale(n))
 c
-c     compute the direct induced dipole moment at each atom
+c     find the electrostatic field due to permanent multipoles
 c
       do i = 1, npole-1
          ii = ipole(i)
@@ -516,12 +739,337 @@ c
          end do
       end if
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ufield0a  --  mutual induction via double loop  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ufield0a" computes the mutual electricstatic field due to
+c     induced dipole moments via a double loop
+c
+c
+      subroutine ufield0a (field,fieldp)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'cell.i'
+      include 'group.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'shunt.i'
+      integer i,j,k,m
+      integer ii,kk
+      real*8 xr,yr,zr
+      real*8 fgrp,r,r2
+      real*8 rr3,rr5,rr7
+      real*8 duix,duiy,duiz
+      real*8 puix,puiy,puiz
+      real*8 dukx,duky,dukz
+      real*8 pukx,puky,pukz
+      real*8 duir,puir
+      real*8 dukr,pukr
+      real*8 damp,expdamp
+      real*8 scale3,scale5
+      real*8 scale7
+      real*8 pdi,pti,pgamma
+      real*8 fid(3),fkd(3)
+      real*8 fip(3),fkp(3)
+      real*8, allocatable :: dscale(:)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      logical proceed
+c
+c
+c     zero out the value of the field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+         end do
+      end do
+c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (dscale(n))
+c
+c     find the electrostatic field due to mutual induced dipoles
+c
+      do i = 1, npole-1
+         ii = ipole(i)
+         pdi = pdamp(i)
+         pti = thole(i)
+         duix = uind(1,i)
+         duiy = uind(2,i)
+         duiz = uind(3,i)
+         puix = uinp(1,i)
+         puiy = uinp(2,i)
+         puiz = uinp(3,i)
+         do j = i+1, npole
+            dscale(ipole(j)) = 1.0d0
+         end do
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = u1scale
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = u2scale
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = u3scale
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = u4scale
+         end do
+         do k = i+1, npole
+            kk = ipole(k)
+            proceed = .true.
+            if (use_intra)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (proceed) then
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               if (use_bounds)  call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  dukx = uind(1,k)
+                  duky = uind(2,k)
+                  dukz = uind(3,k)
+                  pukx = uinp(1,k)
+                  puky = uinp(2,k)
+                  pukz = uinp(3,k)
+                  scale3 = dscale(kk)
+                  scale5 = dscale(kk)
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(k))
+                     damp = -pgamma * (r/damp)**3
+                     if (damp .gt. -50.0d0) then
+                        expdamp = exp(damp)
+                        scale3 = scale3 * (1.0d0-expdamp)
+                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+                     end if
+                  end if
+                  rr3 = scale3 / (r*r2)
+                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                  duir = xr*duix + yr*duiy + zr*duiz
+                  dukr = xr*dukx + yr*duky + zr*dukz
+                  puir = xr*puix + yr*puiy + zr*puiz
+                  pukr = xr*pukx + yr*puky + zr*pukz
+                  fid(1) = -rr3*dukx + rr5*dukr*xr
+                  fid(2) = -rr3*duky + rr5*dukr*yr
+                  fid(3) = -rr3*dukz + rr5*dukr*zr
+                  fkd(1) = -rr3*duix + rr5*duir*xr
+                  fkd(2) = -rr3*duiy + rr5*duir*yr
+                  fkd(3) = -rr3*duiz + rr5*duir*zr
+                  fip(1) = -rr3*pukx + rr5*pukr*xr
+                  fip(2) = -rr3*puky + rr5*pukr*yr
+                  fip(3) = -rr3*pukz + rr5*pukr*zr
+                  fkp(1) = -rr3*puix + rr5*puir*xr
+                  fkp(2) = -rr3*puiy + rr5*puir*yr
+                  fkp(3) = -rr3*puiz + rr5*puir*zr
+                  do j = 1, 3
+                     field(j,i) = field(j,i) + fid(j)
+                     field(j,k) = field(j,k) + fkd(j)
+                     fieldp(j,i) = fieldp(j,i) + fip(j)
+                     fieldp(j,k) = fieldp(j,k) + fkp(j)
+                  end do
+               end if
+            end if
+         end do
+      end do
+c
+c     periodic boundary for large cutoffs via replicates method
+c
+      if (use_replica) then
+         do i = 1, npole
+            ii = ipole(i)
+            pdi = pdamp(i)
+            pti = thole(i)
+            duix = uind(1,i)
+            duiy = uind(2,i)
+            duiz = uind(3,i)
+            puix = uinp(1,i)
+            puiy = uinp(2,i)
+            puiz = uinp(3,i)
+            do j = i, npole
+               dscale(ipole(j)) = 1.0d0
+            end do
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = u1scale
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = u2scale
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = u3scale
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = u4scale
+            end do
+            do k = i, npole
+               kk = ipole(k)
+               dukx = uind(1,k)
+               duky = uind(2,k)
+               dukz = uind(3,k)
+               pukx = uinp(1,k)
+               puky = uinp(2,k)
+               pukz = uinp(3,k)
+               proceed = .true.
+               do m = 1, ncell
+                  xr = x(kk) - x(ii)
+                  yr = y(kk) - y(ii)
+                  zr = z(kk) - z(ii)
+                  call imager (xr,yr,zr,m)
+                  r2 = xr*xr + yr* yr + zr*zr
+                  if (r2 .le. off2) then
+                     r = sqrt(r2)
+                     scale3 = 1.0d0
+                     scale5 = 1.0d0
+                     damp = pdi * pdamp(k)
+                     if (damp .ne. 0.0d0) then
+                        pgamma = min(pti,thole(k))
+                        damp = -pgamma * (r/damp)**3
+                        if (damp .gt. -50.0d0) then
+                           expdamp = exp(damp)
+                           scale3 = 1.0d0 - expdamp
+                           scale5 = 1.0d0 - expdamp*(1.0d0-damp)
+                        end if
+                     end if
+                     rr3 = scale3 / (r*r2)
+                     rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                     duir = xr*duix + yr*duiy + zr*duiz
+                     dukr = xr*dukx + yr*duky + zr*dukz
+                     puir = xr*puix + yr*puiy + zr*puiz
+                     pukr = xr*pukx + yr*puky + zr*pukz
+                     fid(1) = -rr3*dukx + rr5*dukr*xr
+                     fid(2) = -rr3*duky + rr5*dukr*yr
+                     fid(3) = -rr3*dukz + rr5*dukr*zr
+                     fkd(1) = -rr3*duix + rr5*duir*xr
+                     fkd(2) = -rr3*duiy + rr5*duir*yr
+                     fkd(3) = -rr3*duiz + rr5*duir*zr
+                     fip(1) = -rr3*pukx + rr5*pukr*xr
+                     fip(2) = -rr3*puky + rr5*pukr*yr
+                     fip(3) = -rr3*pukz + rr5*pukr*zr
+                     fkp(1) = -rr3*puix + rr5*puir*xr
+                     fkp(2) = -rr3*puiy + rr5*puir*yr
+                     fkp(3) = -rr3*puiz + rr5*puir*zr
+                     if (use_polymer) then
+                        if (r2 .le. polycut2) then
+                           do j = 1, 3
+                              fid(j) = fid(j) * dscale(kk)
+                              fkd(j) = fkd(j) * dscale(kk)
+                              fip(j) = fip(j) * dscale(kk)
+                              fkp(j) = fkp(j) * dscale(kk)
+                           end do
+                        end if
+                     end if
+                     do j = 1, 3
+                        field(j,i) = field(j,i) + fid(j)
+                        fieldp(j,i) = fieldp(j,i) + fip(j)
+                        if (ii .ne. kk) then
+                           field(j,k) = field(j,k) + fkd(j)
+                           fieldp(j,k) = fieldp(j,k) + fkp(j)
+                        end if
+                     end do
+                  end if
+               end do
+            end do
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine induce0b  --  induced dipoles via neighbor list  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "induce0b" computes the induced dipole moments at polarizable
+c     sites using a neighbor list
+c
+c
+      subroutine induce0b
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polpot.i'
+      include 'potent.i'
+      include 'units.i'
+      include 'uprior.i'
+      integer i,j,k
+      integer iter,maxiter
+      real*8 udsum,upsum
+      real*8 eps,epsold
+      real*8 epsd,epsp
+      real*8 a,ap,b,bp
+      real*8 sum,sump
+      real*8 denom,denomp
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: conjp(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: vecp(:,:)
+      real*8, allocatable :: usav(:,:)
+      real*8, allocatable :: usavp(:,:)
+      logical done
+      character*6 mode
+c
+c
+c     zero out the induced dipoles at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
       allocate (udir(3,npole))
       allocate (udirp(3,npole))
-      allocate (uold(3,npole))
-      allocate (uoldp(3,npole))
+c
+c     compute the field at each atom due to permanent multipoles
+c
+      call dfield0b (field,fieldp)
 c
 c     set induced dipoles to polarizability times direct field
 c
@@ -542,7 +1090,7 @@ c
          iter = 0
          eps = 100.0d0
 c
-c     predicted values for always stable predictor-corrector method
+c     estimated induced dipoles from polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
@@ -559,218 +1107,92 @@ c
             end do
          end if
 c
-c     compute mutual induced dipole moments by an iterative method
+c     perform dynamic allocation of some local arrays
+c
+         allocate (rsd(3,npole))
+         allocate (rsdp(3,npole))
+         allocate (conj(3,npole))
+         allocate (conjp(3,npole))
+         allocate (vec(3,npole))
+         allocate (vecp(3,npole))
+         allocate (usav(3,npole))
+         allocate (usavp(3,npole))
+c
+c     set initial conjugate gradient residual and conjugate vector
+c
+         call ufield0b (field,fieldp)
+         do i = 1, npole
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                       + fieldp(j,i)
+               conj(j,i) = rsd(j,i)
+               conjp(j,i) = rsdp(j,i)
+            end do
+         end do
+c
+c     conjugate gradient iteration of the mutual induced dipoles
 c
          do while (.not. done)
+            iter = iter + 1
             do i = 1, npole
                do j = 1, 3
-                  field(j,i) = 0.0d0
-                  fieldp(j,i) = 0.0d0
+                  usav(j,i) = uind(j,i)
+                  usavp(j,i) = uinp(j,i)
+                  uind(j,i) = conj(j,i)
+                  uinp(j,i) = conjp(j,i)
                end do
             end do
-            do i = 1, npole-1
-               ii = ipole(i)
-               pdi = pdamp(i)
-               pti = thole(i)
-               duix = uind(1,i)
-               duiy = uind(2,i)
-               duiz = uind(3,i)
-               puix = uinp(1,i)
-               puiy = uinp(2,i)
-               puiz = uinp(3,i)
-               do j = i+1, npole
-                  dscale(ipole(j)) = 1.0d0
-               end do
-               do j = 1, np11(ii)
-                  dscale(ip11(j,ii)) = u1scale
-               end do
-               do j = 1, np12(ii)
-                  dscale(ip12(j,ii)) = u2scale
-               end do
-               do j = 1, np13(ii)
-                  dscale(ip13(j,ii)) = u3scale
-               end do
-               do j = 1, np14(ii)
-                  dscale(ip14(j,ii)) = u4scale
-               end do
-               do k = i+1, npole
-                  kk = ipole(k)
-                  proceed = .true.
-                  if (use_intra)
-     &               call groups (proceed,fgrp,ii,kk,0,0,0,0)
-                  if (proceed) then
-                     xr = x(kk) - x(ii)
-                     yr = y(kk) - y(ii)
-                     zr = z(kk) - z(ii)
-                     if (use_bounds)  call image (xr,yr,zr)
-                     r2 = xr*xr + yr* yr + zr*zr
-                     if (r2 .le. off2) then
-                        r = sqrt(r2)
-                        dukx = uind(1,k)
-                        duky = uind(2,k)
-                        dukz = uind(3,k)
-                        pukx = uinp(1,k)
-                        puky = uinp(2,k)
-                        pukz = uinp(3,k)
-                        scale3 = dscale(kk)
-                        scale5 = dscale(kk)
-                        damp = pdi * pdamp(k)
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(k))
-                           damp = -pgamma * (r/damp)**3
-                           if (damp .gt. -50.0d0) then
-                              expdamp = exp(damp)
-                              scale3 = scale3 * (1.0d0-expdamp)
-                              scale5 = scale5 * (1.0d0-expdamp
-     &                                              *(1.0d0-damp))
-                           end if
-                        end if
-                        rr3 = scale3 / (r*r2)
-                        rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                        duir = xr*duix + yr*duiy + zr*duiz
-                        dukr = xr*dukx + yr*duky + zr*dukz
-                        puir = xr*puix + yr*puiy + zr*puiz
-                        pukr = xr*pukx + yr*puky + zr*pukz
-                        fid(1) = -rr3*dukx + rr5*dukr*xr
-                        fid(2) = -rr3*duky + rr5*dukr*yr
-                        fid(3) = -rr3*dukz + rr5*dukr*zr
-                        fkd(1) = -rr3*duix + rr5*duir*xr
-                        fkd(2) = -rr3*duiy + rr5*duir*yr
-                        fkd(3) = -rr3*duiz + rr5*duir*zr
-                        fip(1) = -rr3*pukx + rr5*pukr*xr
-                        fip(2) = -rr3*puky + rr5*pukr*yr
-                        fip(3) = -rr3*pukz + rr5*pukr*zr
-                        fkp(1) = -rr3*puix + rr5*puir*xr
-                        fkp(2) = -rr3*puiy + rr5*puir*yr
-                        fkp(3) = -rr3*puiz + rr5*puir*zr
-                        do j = 1, 3
-                           field(j,i) = field(j,i) + fid(j)
-                           field(j,k) = field(j,k) + fkd(j)
-                           fieldp(j,i) = fieldp(j,i) + fip(j)
-                           fieldp(j,k) = fieldp(j,k) + fkp(j)
-                        end do
-                     end if
-                  end if
+            call ufield0b (field,fieldp)
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = usav(j,i)
+                  uinp(j,i) = usavp(j,i)
+                  vec(j,i) = -field(j,i)
+                  vecp(j,i) = -fieldp(j,i)
                end do
             end do
-c
-c     periodic boundary for large cutoffs via replicates method
-c
-            if (use_replica) then
-               do i = 1, npole
-                  ii = ipole(i)
-                  pdi = pdamp(i)
-                  pti = thole(i)
-                  duix = uind(1,i)
-                  duiy = uind(2,i)
-                  duiz = uind(3,i)
-                  puix = uinp(1,i)
-                  puiy = uinp(2,i)
-                  puiz = uinp(3,i)
-                  do j = i, npole
-                     dscale(ipole(j)) = 1.0d0
-                  end do
-                  do j = 1, np11(ii)
-                     dscale(ip11(j,ii)) = u1scale
-                  end do
-                  do j = 1, np12(ii)
-                     dscale(ip12(j,ii)) = u2scale
-                  end do
-                  do j = 1, np13(ii)
-                     dscale(ip13(j,ii)) = u3scale
-                  end do
-                  do j = 1, np14(ii)
-                     dscale(ip14(j,ii)) = u4scale
-                  end do
-                  do k = i, npole
-                     kk = ipole(k)
-                     dukx = uind(1,k)
-                     duky = uind(2,k)
-                     dukz = uind(3,k)
-                     pukx = uinp(1,k)
-                     puky = uinp(2,k)
-                     pukz = uinp(3,k)
-                     proceed = .true.
-                     do m = 1, ncell
-                        xr = x(kk) - x(ii)
-                        yr = y(kk) - y(ii)
-                        zr = z(kk) - z(ii)
-                        call imager (xr,yr,zr,m)
-                        r2 = xr*xr + yr* yr + zr*zr
-                        if (r2 .le. off2) then
-                           r = sqrt(r2)
-                           scale3 = 1.0d0
-                           scale5 = 1.0d0
-                           damp = pdi * pdamp(k)
-                           if (damp .ne. 0.0d0) then
-                              pgamma = min(pti,thole(k))
-                              damp = -pgamma * (r/damp)**3
-                              if (damp .gt. -50.0d0) then
-                                 expdamp = exp(damp)
-                                 scale3 = 1.0d0 - expdamp
-                                 scale5 = 1.0d0 - expdamp*(1.0d0-damp)
-                              end if
-                           end if
-                           rr3 = scale3 / (r*r2)
-                           rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                           duir = xr*duix + yr*duiy + zr*duiz
-                           dukr = xr*dukx + yr*duky + zr*dukz
-                           puir = xr*puix + yr*puiy + zr*puiz
-                           pukr = xr*pukx + yr*puky + zr*pukz
-                           fid(1) = -rr3*dukx + rr5*dukr*xr
-                           fid(2) = -rr3*duky + rr5*dukr*yr
-                           fid(3) = -rr3*dukz + rr5*dukr*zr
-                           fkd(1) = -rr3*duix + rr5*duir*xr
-                           fkd(2) = -rr3*duiy + rr5*duir*yr
-                           fkd(3) = -rr3*duiz + rr5*duir*zr
-                           fip(1) = -rr3*pukx + rr5*pukr*xr
-                           fip(2) = -rr3*puky + rr5*pukr*yr
-                           fip(3) = -rr3*pukz + rr5*pukr*zr
-                           fkp(1) = -rr3*puix + rr5*puir*xr
-                           fkp(2) = -rr3*puiy + rr5*puir*yr
-                           fkp(3) = -rr3*puiz + rr5*puir*zr
-                           if (use_polymer) then
-                              if (r2 .le. polycut2) then
-                                 do j = 1, 3
-                                    fid(j) = fid(j) * dscale(kk)
-                                    fkd(j) = fkd(j) * dscale(kk)
-                                    fip(j) = fip(j) * dscale(kk)
-                                    fkp(j) = fkp(j) * dscale(kk)
-                                 end do
-                              end if
-                           end if
-                           do j = 1, 3
-                              field(j,i) = field(j,i) + fid(j)
-                              fieldp(j,i) = fieldp(j,i) + fip(j)
-                              if (ii .ne. kk) then
-                                 field(j,k) = field(j,k) + fkd(j)
-                                 fieldp(j,k) = fieldp(j,k) + fkp(j)
-                              end if
-                           end do
-                        end if
-                     end do
-                  end do
+            sum = 0.0d0
+            sump = 0.0d0
+            denom = 0.0d0
+            denomp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
+                  sum = sum + rsd(j,i)*rsd(j,i)
+                  sump = sump + rsdp(j,i)*rsdp(j,i)
+                  denom = denom + conj(j,i)*vec(j,i)
+                  denomp = denomp + conjp(j,i)*vecp(j,i)
                end do
-            end if
-c
-c     check to see if the mutual induced dipoles have converged
-c
-            iter = iter + 1
-            epsold = eps
+            end do
+            a = sum / denom
+            ap = sump / denomp
             epsd = 0.0d0
             epsp = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uoldp(j,i) = uinp(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  uinp(j,i) = uoldp(j,i) + polsor*(uinp(j,i)-uoldp(j,i))
-                  epsd = epsd + (uind(j,i)-uold(j,i))**2
-                  epsp = epsp + (uinp(j,i)-uoldp(j,i))**2
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
                end do
             end do
+            b = epsd / sum
+            bp = epsp / sump
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + a*conj(j,i)
+                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                  conj(j,i) = rsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+               end do
+            end do
+c
+c     check the convergence of the mutual induced dipoles
+c
+            epsold = eps
             eps = max(epsd,epsp)
             eps = debye * sqrt(eps/dble(npolar))
             if (debug) then
@@ -787,6 +1209,20 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. politer)  done = .true.
          end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (rsd)
+         deallocate (rsdp)
+         deallocate (conj)
+         deallocate (conjp)
+         deallocate (vec)
+         deallocate (vecp)
+         deallocate (usav)
+         deallocate (usavp)
+c
+c     print the results from the conjugate gradient iteration
+c
          if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
@@ -806,51 +1242,40 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
-      deallocate (pscale)
       deallocate (field)
       deallocate (fieldp)
       deallocate (udir)
       deallocate (udirp)
-      deallocate (uold)
-      deallocate (uoldp)
       return
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine induce0b  --  induced dipoles via neighbor list  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dfield0b  --  direct induction via pair list  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "induce0b" computes the induced dipole moments at polarizable
-c     sites using a neighbor list
+c     "dfield0b" computes the mutual electricstatic field due to
+c     permanent multipole moments via a pair list
 c
 c
-      subroutine induce0b
+      subroutine dfield0b (field,fieldp)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
       include 'bound.i'
       include 'couple.i'
       include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
       include 'mpole.i'
       include 'neigh.i'
       include 'polar.i'
       include 'polgrp.i'
       include 'polpot.i'
-      include 'potent.i'
       include 'shunt.i'
-      include 'units.i'
-      include 'uprior.i'
       integer i,j,k
       integer ii,kk,kkk
-      integer iter,maxiter
       real*8 xr,yr,zr
       real*8 fgrp,r,r2
       real*8 rr3,rr5,rr7
@@ -868,9 +1293,6 @@ c
       real*8 dkr,dukr,pukr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
-      real*8 udsum,upsum
-      real*8 eps,epsold
-      real*8 epsd,epsp
       real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7
@@ -879,32 +1301,10 @@ c
       real*8 fip(3),fkp(3)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: field(:,:)
-      real*8, allocatable :: fieldp(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: uold(:,:)
-      real*8, allocatable :: uoldp(:,:)
-      logical proceed,done
-      character*6 mode
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      logical proceed
 c
-c
-c     zero out the induced dipoles at each site
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
-         end do
-      end do
-      if (.not. use_polar)  return
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dscale(n))
-      allocate (pscale(n))
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
 c
 c     zero out the value of the field at each site
 c
@@ -915,12 +1315,12 @@ c
          end do
       end do
 c
-c     set the switching function coefficients
+c     perform dynamic allocation of some local arrays
 c
-      mode = 'MPOLE'
-      call switch (mode)
+      allocate (dscale(n))
+      allocate (pscale(n))
 c
-c     compute the direct induced dipole moment at each atom
+c     find the electrostatic field due to permanent multipoles
 c
       do i = 1, npole
          ii = ipole(i)
@@ -1042,318 +1442,233 @@ c
          end do
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-      allocate (uold(3,npole))
-      allocate (uoldp(3,npole))
-c
-c     set induced dipoles to polarizability times direct field
-c
-      do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-         end do
-      end do
-c
-c     set tolerances for computation of mutual induced dipoles
-c
-      if (poltyp .eq. 'MUTUAL') then
-         done = .false.
-         maxiter = 500
-         iter = 0
-         eps = 100.0d0
-c
-c     predicted values for always stable predictor-corrector method
-c
-         if (use_pred .and. nualt.eq.maxualt) then
-            do i = 1, npole
-               do j = 1, 3
-                  udsum = 0.0d0
-                  upsum = 0.0d0
-                  do k = 1, nualt
-                     udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
-                  end do
-                  uind(j,i) = udsum
-                  uinp(j,i) = upsum
-               end do
-            end do
-         end if
-c
-c     compute mutual induced dipole moments by an iterative method
-c
-         do while (.not. done)
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = 0.0d0
-                  fieldp(j,i) = 0.0d0
-               end do
-            end do
-            do i = 1, npole
-               ii = ipole(i)
-               pdi = pdamp(i)
-               pti = thole(i)
-               duix = uind(1,i)
-               duiy = uind(2,i)
-               duiz = uind(3,i)
-               puix = uinp(1,i)
-               puiy = uinp(2,i)
-               puiz = uinp(3,i)
-               do j = 1, nelst(i)
-                  dscale(ipole(elst(j,i))) = 1.0d0
-               end do
-               do j = 1, np11(ii)
-                  dscale(ip11(j,ii)) = u1scale
-               end do
-               do j = 1, np12(ii)
-                  dscale(ip12(j,ii)) = u2scale
-               end do
-               do j = 1, np13(ii)
-                  dscale(ip13(j,ii)) = u3scale
-               end do
-               do j = 1, np14(ii)
-                  dscale(ip14(j,ii)) = u4scale
-               end do
-               do kkk = 1, nelst(i)
-                  k = elst(kkk,i)
-                  kk = ipole(k)
-                  proceed = .true.
-                  if (use_intra)
-     &               call groups (proceed,fgrp,ii,kk,0,0,0,0)
-                  if (proceed) then
-                     xr = x(kk) - x(ii)
-                     yr = y(kk) - y(ii)
-                     zr = z(kk) - z(ii)
-                     if (use_bounds)  call image (xr,yr,zr)
-                     r2 = xr*xr + yr* yr + zr*zr
-                     if (r2 .le. off2) then
-                        r = sqrt(r2)
-                        dukx = uind(1,k)
-                        duky = uind(2,k)
-                        dukz = uind(3,k)
-                        pukx = uinp(1,k)
-                        puky = uinp(2,k)
-                        pukz = uinp(3,k)
-                        scale3 = dscale(kk)
-                        scale5 = dscale(kk)
-                        damp = pdi * pdamp(k)
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(k))
-                           damp = -pgamma * (r/damp)**3
-                           if (damp .gt. -50.0d0) then
-                              expdamp = exp(damp)
-                              scale3 = scale3 * (1.0d0-expdamp)
-                              scale5 = scale5 * (1.0d0-(1.0d0-damp)
-     &                                              *expdamp)
-                           end if
-                        end if
-                        rr3 = scale3 / (r*r2)
-                        rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                        duir = xr*duix + yr*duiy + zr*duiz
-                        dukr = xr*dukx + yr*duky + zr*dukz
-                        puir = xr*puix + yr*puiy + zr*puiz
-                        pukr = xr*pukx + yr*puky + zr*pukz
-                        fid(1) = -rr3*dukx + rr5*dukr*xr
-                        fid(2) = -rr3*duky + rr5*dukr*yr
-                        fid(3) = -rr3*dukz + rr5*dukr*zr
-                        fkd(1) = -rr3*duix + rr5*duir*xr
-                        fkd(2) = -rr3*duiy + rr5*duir*yr
-                        fkd(3) = -rr3*duiz + rr5*duir*zr
-                        fip(1) = -rr3*pukx + rr5*pukr*xr
-                        fip(2) = -rr3*puky + rr5*pukr*yr
-                        fip(3) = -rr3*pukz + rr5*pukr*zr
-                        fkp(1) = -rr3*puix + rr5*puir*xr
-                        fkp(2) = -rr3*puiy + rr5*puir*yr
-                        fkp(3) = -rr3*puiz + rr5*puir*zr
-                        do j = 1, 3
-                           field(j,i) = field(j,i) + fid(j)
-                           field(j,k) = field(j,k) + fkd(j)
-                           fieldp(j,i) = fieldp(j,i) + fip(j)
-                           fieldp(j,k) = fieldp(j,k) + fkp(j)
-                        end do
-                     end if
-                  end if
-               end do
-            end do
-c
-c     check to see if the mutual induced dipoles have converged
-c
-            iter = iter + 1
-            epsold = eps
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uoldp(j,i) = uinp(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  uinp(j,i) = uoldp(j,i) + polsor*(uinp(j,i)-uoldp(j,i))
-                  epsd = epsd + (uind(j,i)-uold(j,i))**2
-                  epsp = epsp + (uinp(j,i)-uoldp(j,i))**2
-               end do
-            end do
-            eps = max(epsd,epsp)
-            eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
-               if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
-     &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
-               end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
-            end if
-            if (eps .lt. poleps)  done = .true.
-            if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
-         end do
-         if (debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
-     &                 6x,'RMS Change',f15.10)
-         end if
-c
-c     terminate the calculation if dipoles failed to converge
-c
-         if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
-         end if
-      end if
-c
 c     perform deallocation of some local arrays
 c
       deallocate (dscale)
       deallocate (pscale)
-      deallocate (field)
-      deallocate (fieldp)
-      deallocate (udir)
-      deallocate (udirp)
-      deallocate (uold)
-      deallocate (uoldp)
       return
       end
 c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine induce0c  --  Ewald induced dipoles via loop  ##
+c     ##  subroutine ufield0b  --  mutual induction via pair list  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
+c     "ufield0b" computes the mutual electricstatic field due to
+c     induced dipole moments via a pair list
+c
+c
+      subroutine ufield0b (field,fieldp)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'group.i'
+      include 'mpole.i'
+      include 'neigh.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'shunt.i'
+      integer i,j,k
+      integer ii,kk,kkk
+      real*8 xr,yr,zr
+      real*8 fgrp,r,r2
+      real*8 rr3,rr5,rr7
+      real*8 duix,duiy,duiz
+      real*8 puix,puiy,puiz
+      real*8 dukx,duky,dukz
+      real*8 pukx,puky,pukz
+      real*8 duir,puir
+      real*8 dukr,pukr
+      real*8 damp,expdamp
+      real*8 scale3,scale5
+      real*8 scale7
+      real*8 pdi,pti,pgamma
+      real*8 fid(3),fkd(3)
+      real*8 fip(3),fkp(3)
+      real*8, allocatable :: dscale(:)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      logical proceed
+c
+c
+c     zero out the value of the field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+         end do
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+c
+c     find the electrostatic field due to mutual induced dipoles
+c
+      do i = 1, npole
+         ii = ipole(i)
+         pdi = pdamp(i)
+         pti = thole(i)
+         duix = uind(1,i)
+         duiy = uind(2,i)
+         duiz = uind(3,i)
+         puix = uinp(1,i)
+         puiy = uinp(2,i)
+         puiz = uinp(3,i)
+         do j = 1, nelst(i)
+            dscale(ipole(elst(j,i))) = 1.0d0
+         end do
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = u1scale
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = u2scale
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = u3scale
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = u4scale
+         end do
+         do kkk = 1, nelst(i)
+            k = elst(kkk,i)
+            kk = ipole(k)
+            proceed = .true.
+            if (use_intra)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (proceed) then
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               if (use_bounds)  call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  dukx = uind(1,k)
+                  duky = uind(2,k)
+                  dukz = uind(3,k)
+                  pukx = uinp(1,k)
+                  puky = uinp(2,k)
+                  pukz = uinp(3,k)
+                  scale3 = dscale(kk)
+                  scale5 = dscale(kk)
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(k))
+                     damp = -pgamma * (r/damp)**3
+                     if (damp .gt. -50.0d0) then
+                        expdamp = exp(damp)
+                        scale3 = scale3 * (1.0d0-expdamp)
+                        scale5 = scale5 * (1.0d0-(1.0d0-damp)*expdamp)
+                     end if
+                  end if
+                  rr3 = scale3 / (r*r2)
+                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                  duir = xr*duix + yr*duiy + zr*duiz
+                  dukr = xr*dukx + yr*duky + zr*dukz
+                  puir = xr*puix + yr*puiy + zr*puiz
+                  pukr = xr*pukx + yr*puky + zr*pukz
+                  fid(1) = -rr3*dukx + rr5*dukr*xr
+                  fid(2) = -rr3*duky + rr5*dukr*yr
+                  fid(3) = -rr3*dukz + rr5*dukr*zr
+                  fkd(1) = -rr3*duix + rr5*duir*xr
+                  fkd(2) = -rr3*duiy + rr5*duir*yr
+                  fkd(3) = -rr3*duiz + rr5*duir*zr
+                  fip(1) = -rr3*pukx + rr5*pukr*xr
+                  fip(2) = -rr3*puky + rr5*pukr*yr
+                  fip(3) = -rr3*pukz + rr5*pukr*zr
+                  fkp(1) = -rr3*puix + rr5*puir*xr
+                  fkp(2) = -rr3*puiy + rr5*puir*yr
+                  fkp(3) = -rr3*puiz + rr5*puir*zr
+                  do j = 1, 3
+                     field(j,i) = field(j,i) + fid(j)
+                     field(j,k) = field(j,k) + fkd(j)
+                     fieldp(j,i) = fieldp(j,i) + fip(j)
+                     fieldp(j,k) = fieldp(j,k) + fkp(j)
+                  end do
+               end if
+            end if
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine induce0c  --  induced dipole moments via Ewald  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
 c     "induce0c" computes the induced dipole moments at polarizable
-c     sites using particle mesh Ewald summation a double loop
+c     sites using particle mesh Ewald summation
 c
 c
       subroutine induce0c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
-      include 'boxes.i'
-      include 'ewald.i'
       include 'inform.i'
       include 'iounit.i'
-      include 'math.i'
       include 'mpole.i'
       include 'polar.i'
       include 'polpot.i'
       include 'potent.i'
       include 'units.i'
       include 'uprior.i'
-      integer i,j,k
-      integer ii,iter
+      integer i,j,k,iter
       integer maxiter
-      real*8 eps,term
+      real*8 eps,epsold
       real*8 epsd,epsp
-      real*8 epsold
       real*8 udsum,upsum
-      real*8 ucell(3)
-      real*8 ucellp(3)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: uold(:,:)
-      real*8, allocatable :: uoldp(:,:)
+      real*8 a,ap,b,bp
+      real*8 sum,sump
+      real*8 denom,denomp
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: conjp(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: vecp(:,:)
+      real*8, allocatable :: usav(:,:)
+      real*8, allocatable :: usavp(:,:)
       logical done
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-      allocate (uold(3,npole))
-      allocate (uoldp(3,npole))
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-c
-c     zero out the induced dipole and the field at each site
+c     zero out the induced dipoles at each site
 c
       do i = 1, npole
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
-            field(j,i) = 0.0d0
-            fieldp(j,i) = 0.0d0
          end do
       end do
       if (.not. use_polar)  return
 c
-c     get the reciprical space part of the electrostatic field
+c     perform dynamic allocation of some local arrays
 c
-      call udirect1 (field)
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
 c
-c     get the real space portion of the electrostatic field
+c     get the electrostatic field due to permanent multipoles
 c
-      do i = 1, npole
-         do j = 1, 3
-            fieldp(j,i) = field(j,i)
-         end do
-      end do
-      call udirect2a (field,fieldp)
-c
-c     get the self-energy portion of the electrostatic field
-c
-      term = (4.0d0/3.0d0) * aewald**3 / sqrtpi
-      do i = 1, npole
-         do j = 1, 3
-            field(j,i) = field(j,i) + term*rpole(j+1,i)
-            fieldp(j,i) = fieldp(j,i) + term*rpole(j+1,i)
-         end do
-      end do
-c
-c     compute the cell dipole boundary correction to field
-c
-      if (boundary .eq. 'VACUUM') then
-         do i = 1, 3
-            ucell(i) = 0.0d0
-         end do
-         do i = 1, npole
-            ii = ipole(i)
-            ucell(1) = ucell(1) + rpole(2,i) + rpole(1,i)*x(ii)
-            ucell(2) = ucell(2) + rpole(3,i) + rpole(1,i)*y(ii)
-            ucell(3) = ucell(3) + rpole(4,i) + rpole(1,i)*z(ii)
-         end do
-         term = (4.0d0/3.0d0) * pi/volbox
-         do i = 1, npole
-            do j = 1, 3
-               field(j,i) = field(j,i) - term*ucell(j)
-               fieldp(j,i) = fieldp(j,i) - term*ucell(j)
-            end do
-         end do
-      end if
+      call dfield0c (field,fieldp)
 c
 c     set induced dipoles to polarizability times direct field
 c
@@ -1374,7 +1689,7 @@ c
          iter = 0
          eps = 100.0d0
 c
-c     predicted values for always stable predictor-corrector method
+c     estimated induced dipoles from polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
@@ -1391,62 +1706,92 @@ c
             end do
          end if
 c
-c     compute mutual induced dipole moments by an iterative method
+c     perform dynamic allocation of some local arrays
+c
+         allocate (rsd(3,n))
+         allocate (rsdp(3,n))
+         allocate (conj(3,n))
+         allocate (conjp(3,n))
+         allocate (vec(3,n))
+         allocate (vecp(3,n))
+         allocate (usav(3,n))
+         allocate (usavp(3,n))
+c
+c     set initial conjugate gradient residual and conjugate vector
+c
+         call ufield0c (field,fieldp)
+         do i = 1, npole
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                       + fieldp(j,i)
+               conj(j,i) = rsd(j,i)
+               conjp(j,i) = rsdp(j,i)
+            end do
+         end do
+c
+c     conjugate gradient iteration of the mutual induced dipoles
 c
          do while (.not. done)
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = 0.0d0
-                  fieldp(j,i) = 0.0d0
-               end do
-            end do
-            call umutual1 (field,fieldp)
-            call umutual2a (field,fieldp)
-            term = (4.0d0/3.0d0) * aewald**3 / sqrtpi
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = field(j,i) + term*uind(j,i)
-                  fieldp(j,i) = fieldp(j,i) + term*uinp(j,i)
-               end do
-            end do
-            if (boundary .eq. 'VACUUM') then
-               do i = 1, 3
-                  ucell(i) = 0.0d0
-                  ucellp(i) = 0.0d0
-               end do
-               do i = 1, npole
-                  do j = 1, 3
-                     ucell(j) = ucell(j) + uind(j,i)
-                     ucellp(j) = ucellp(j) + uinp(j,i)
-                  end do
-               end do
-               term = (4.0d0/3.0d0) * pi/volbox
-               do i = 1, npole
-                  do j = 1, 3
-                     field(j,i) = field(j,i) - term*ucell(j)
-                     fieldp(j,i) = fieldp(j,i) - term*ucellp(j)
-                  end do
-               end do
-            end if
-c
-c     check to see if the mutual induced dipoles have converged
-c
             iter = iter + 1
-            epsold = eps
+            do i = 1, npole
+               do j = 1, 3
+                  usav(j,i) = uind(j,i)
+                  usavp(j,i) = uinp(j,i)
+                  uind(j,i) = conj(j,i)
+                  uinp(j,i) = conjp(j,i)
+               end do
+            end do
+            call ufield0c (field,fieldp)
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = usav(j,i)
+                  uinp(j,i) = usavp(j,i)
+                  vec(j,i) = -field(j,i)
+                  vecp(j,i) = -fieldp(j,i)
+               end do
+            end do
+            sum = 0.0d0
+            sump = 0.0d0
+            denom = 0.0d0
+            denomp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
+                  sum = sum + rsd(j,i)*rsd(j,i)
+                  sump = sump + rsdp(j,i)*rsdp(j,i)
+                  denom = denom + conj(j,i)*vec(j,i)
+                  denomp = denomp + conjp(j,i)*vecp(j,i)
+               end do
+            end do
+            a = sum / denom
+            ap = sump / denomp
             epsd = 0.0d0
             epsp = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uoldp(j,i) = uinp(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  uinp(j,i) = uoldp(j,i) + polsor*(uinp(j,i)-uoldp(j,i))
-                  epsd = epsd + (uind(j,i)-uold(j,i))**2
-                  epsp = epsp + (uinp(j,i)-uoldp(j,i))**2
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
                end do
             end do
+            b = epsd / sum
+            bp = epsp / sump
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + a*conj(j,i)
+                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                  conj(j,i) = rsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+               end do
+            end do
+c
+c     check the convergence of the mutual induced dipoles
+c
+            epsold = eps
             eps = max(epsd,epsp)
             eps = debye * sqrt(eps/dble(npolar))
             if (debug) then
@@ -1463,6 +1808,20 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. politer)  done = .true.
          end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (rsd)
+         deallocate (rsdp)
+         deallocate (conj)
+         deallocate (conjp)
+         deallocate (vec)
+         deallocate (vecp)
+         deallocate (usav)
+         deallocate (usavp)
+c
+c     print the results from the conjugate gradient iteration
+c
          if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
@@ -1482,93 +1841,68 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (udir)
-      deallocate (udirp)
-      deallocate (uold)
-      deallocate (uoldp)
       deallocate (field)
       deallocate (fieldp)
+      deallocate (udir)
+      deallocate (udirp)
       return
       end
 c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine induce0d  --  Ewald induced dipoles via list  ##
+c     ##  subroutine dfield0c  --  direct induction via Ewald sum  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "induce0d" computes the induced dipole moments at polarizable
-c     sites using particle mesh Ewald summation and a neighbor list
+c     "dfield0c" computes the mutual electricstatic field due to
+c     permanent multipole moments via Ewald summation
 c
 c
-      subroutine induce0d
+      subroutine dfield0c (field,fieldp)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'boxes.i'
+      include 'cutoff.i'
       include 'ewald.i'
-      include 'inform.i'
-      include 'iounit.i'
       include 'math.i'
       include 'mpole.i'
       include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'uprior.i'
-      integer i,j,k
-      integer ii,iter
-      integer maxiter
-      real*8 eps,term
-      real*8 epsd,epsp
-      real*8 epsold
-      real*8 udsum,upsum
+      integer i,j,ii
+      real*8 term
       real*8 ucell(3)
       real*8 ucellp(3)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: uold(:,:)
-      real*8, allocatable :: uoldp(:,:)
-      real*8, allocatable :: field(:,:)
-      real*8, allocatable :: fieldp(:,:)
-      logical done
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-      allocate (uold(3,npole))
-      allocate (uoldp(3,npole))
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-c
-c     zero out the induced dipole and the field at each site
+c     zero out the value of the field at each site
 c
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
          end do
       end do
-      if (.not. use_polar)  return
 c
-c     get the reciprical space part of the electrostatic field
+c     get the reciprocal space part of the electrostatic field
 c
       call udirect1 (field)
-c
-c     get the real space portion of the electrostatic field
-c
       do i = 1, npole
          do j = 1, 3
             fieldp(j,i) = field(j,i)
          end do
       end do
-      call udirect2b (field,fieldp)
+c
+c     get the real space portion of the electrostatic field
+c
+      if (use_mlist) then
+         call udirect2b (field,fieldp)
+      else
+         call udirect2a (field,fieldp)
+      end if
 c
 c     get the self-energy portion of the electrostatic field
 c
@@ -1600,140 +1934,91 @@ c
             end do
          end do
       end if
+      return
+      end
 c
-c     set induced dipoles to polarizability times direct field
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ufield0c  --  mutual induction via Ewald sum  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ufield0c" computes the mutual electricstatic field due to
+c     induced dipole moments via Ewald summation
+c
+c
+      subroutine ufield0c (field,fieldp)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'boxes.i'
+      include 'cutoff.i'
+      include 'ewald.i'
+      include 'math.i'
+      include 'mpole.i'
+      include 'polar.i'
+      integer i,j
+      real*8 term
+      real*8 ucell(3)
+      real*8 ucellp(3)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+c
+c
+c     zero out the electrostatic field at each site
 c
       do i = 1, npole
          do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
          end do
       end do
 c
-c     set tolerances for computation of mutual induced dipoles
+c     get the reciprocal space part of the electrostatic field
 c
-      if (poltyp .eq. 'MUTUAL') then
-         done = .false.
-         maxiter = 500
-         iter = 0
-         eps = 100.0d0
+      call umutual1 (field,fieldp)
 c
-c     predicted values for always stable predictor-corrector method
+c     get the real space portion of the electrostatic field
 c
-         if (use_pred .and. nualt.eq.maxualt) then
-            do i = 1, npole
-               do j = 1, 3
-                  udsum = 0.0d0
-                  upsum = 0.0d0
-                  do k = 1, nualt
-                     udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
-                  end do
-                  uind(j,i) = udsum
-                  uinp(j,i) = upsum
-               end do
-            end do
-         end if
-c
-c     compute mutual induced dipole moments by an iterative method
-c
-         do while (.not. done)
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = 0.0d0
-                  fieldp(j,i) = 0.0d0
-               end do
-            end do
-            call umutual1 (field,fieldp)
-            call umutual2b (field,fieldp)
-            term = (4.0d0/3.0d0) * aewald**3 / sqrtpi
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = field(j,i) + term*uind(j,i)
-                  fieldp(j,i) = fieldp(j,i) + term*uinp(j,i)
-               end do
-            end do
-            if (boundary .eq. 'VACUUM') then
-               do i = 1, 3
-                  ucell(i) = 0.0d0
-                  ucellp(i) = 0.0d0
-               end do
-               do i = 1, npole
-                  do j = 1, 3
-                     ucell(j) = ucell(j) + uind(j,i)
-                     ucellp(j) = ucellp(j) + uinp(j,i)
-                  end do
-               end do
-               term = (4.0d0/3.0d0) * pi/volbox
-               do i = 1, npole
-                  do j = 1, 3
-                     field(j,i) = field(j,i) - term*ucell(j)
-                     fieldp(j,i) = fieldp(j,i) - term*ucellp(j)
-                  end do
-               end do
-            end if
-c
-c     check to see if the mutual induced dipoles have converged
-c
-            iter = iter + 1
-            epsold = eps
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uoldp(j,i) = uinp(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  uinp(j,i) = uoldp(j,i) + polsor*(uinp(j,i)-uoldp(j,i))
-                  epsd = epsd + (uind(j,i)-uold(j,i))**2
-                  epsp = epsp + (uinp(j,i)-uoldp(j,i))**2
-               end do
-            end do
-            eps = max(epsd,epsp)
-            eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
-               if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
-     &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
-               end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
-            end if
-            if (eps .lt. poleps)  done = .true.
-            if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
-         end do
-         if (debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
-     &                 6x,'RMS Change',f15.10)
-         end if
-c
-c     terminate the calculation if dipoles failed to converge
-c
-         if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
-         end if
+      if (use_mlist) then
+         call umutual2b (field,fieldp)
+      else
+         call umutual2a (field,fieldp)
       end if
 c
-c     perform deallocation of some local arrays
+c     get the self-energy portion of the electrostatic field
 c
-      deallocate (udir)
-      deallocate (udirp)
-      deallocate (uold)
-      deallocate (uoldp)
-      deallocate (field)
-      deallocate (fieldp)
+      term = (4.0d0/3.0d0) * aewald**3 / sqrtpi
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = field(j,i) + term*uind(j,i)
+            fieldp(j,i) = fieldp(j,i) + term*uinp(j,i)
+         end do
+      end do
+c
+c     compute the cell dipole boundary correction to the field
+c
+      if (boundary .eq. 'VACUUM') then
+         do i = 1, 3
+            ucell(i) = 0.0d0
+            ucellp(i) = 0.0d0
+         end do
+         do i = 1, npole
+            do j = 1, 3
+               ucell(j) = ucell(j) + uind(j,i)
+               ucellp(j) = ucellp(j) + uinp(j,i)
+            end do
+         end do
+         term = (4.0d0/3.0d0) * pi/volbox
+         do i = 1, npole
+            do j = 1, 3
+               field(j,i) = field(j,i) - term*ucell(j)
+               fieldp(j,i) = fieldp(j,i) - term*ucellp(j)
+            end do
+         end do
+      end if
       return
       end
 c
@@ -1979,8 +2264,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         pscale(i) = 1.0d0
          dscale(i) = 1.0d0
+         pscale(i) = 1.0d0
       end do
 c
 c     compute the real space portion of the Ewald summation
@@ -2471,8 +2756,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         pscale(i) = 1.0d0
          dscale(i) = 1.0d0
+         pscale(i) = 1.0d0
       end do
 c
 c     initialize local variables for OpenMP calculation
@@ -3429,34 +3714,378 @@ c
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine induce0e  --  Kirkwood SCRF induced dipoles  ##
+c     ##  subroutine induce0d  --  Kirkwood SCRF induced dipoles  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "induce0e" computes the induced dipole moments at polarizable
+c     "induce0d" computes the induced dipole moments at polarizable
 c     sites for generalized Kirkwood SCRF and vacuum environments
 c
 c
-      subroutine induce0e
+      subroutine induce0d
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polpot.i'
+      include 'potent.i'
+      include 'units.i'
+      include 'uprior.i'
+      integer i,j,k,iter
+      integer maxiter
+      real*8 eps,epsold
+      real*8 epsd,epsp
+      real*8 epsds,epsps
+      real*8 udsum,upsum
+      real*8 ussum,upssum
+      real*8 a,ap,b,bp
+      real*8 as,aps,bs,bps
+      real*8 sum,sump
+      real*8 sums,sumps
+      real*8 denom,denomp
+      real*8 denoms,denomps
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: fields(:,:)
+      real*8, allocatable :: fieldps(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: udirs(:,:)
+      real*8, allocatable :: udirps(:,:)
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: rsds(:,:)
+      real*8, allocatable :: rsdps(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: conjp(:,:)
+      real*8, allocatable :: conjs(:,:)
+      real*8, allocatable :: conjps(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: vecp(:,:)
+      real*8, allocatable :: vecs(:,:)
+      real*8, allocatable :: vecps(:,:)
+      real*8, allocatable :: usav(:,:)
+      real*8, allocatable :: usavp(:,:)
+      real*8, allocatable :: usavs(:,:)
+      real*8, allocatable :: usavps(:,:)
+      logical done
+      character*6 mode
+c
+c
+c     zero out the induced dipoles at each site; uind & uinp are
+c     vacuum dipoles, uinds & uinps are SCRF dipoles
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+            uinds(j,i) = 0.0d0
+            uinps(j,i) = 0.0d0
+         end do
+      end do
+      if (.not.use_polar .and. .not.use_solv)  return
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
+      allocate (fields(3,npole))
+      allocate (fieldps(3,npole))
+      allocate (udir(3,npole))
+      allocate (udirp(3,npole))
+      allocate (udirs(3,npole))
+      allocate (udirps(3,npole))
+c
+c     compute the direct induced dipole moment at each atom, and
+c     another set that also includes RF due to permanent multipoles
+c
+      call dfield0d (field,fieldp,fields,fieldps)
+c
+c     set vacuum induced dipoles to polarizability times direct field;
+c     set SCRF induced dipoles to polarizability times direct field
+c     plus the GK reaction field due to permanent multipoles
+c
+      do i = 1, npole
+         do j = 1, 3
+            udir(j,i) = polarity(i) * field(j,i)
+            udirp(j,i) = polarity(i) * fieldp(j,i)
+            udirs(j,i) = polarity(i) * fields(j,i)
+            udirps(j,i) = polarity(i) * fieldps(j,i)
+            uind(j,i) = udir(j,i)
+            uinp(j,i) = udirp(j,i)
+            uinds(j,i) = udirs(j,i)
+            uinps(j,i) = udirps(j,i)
+         end do
+      end do
+c
+c     set tolerances for computation of mutual induced dipoles
+c
+      if (poltyp .eq. 'MUTUAL') then
+         done = .false.
+         maxiter = 500
+         iter = 0
+         eps = 100.0d0
+c
+c     estimated induced dipoles from polynomial predictor
+c
+         if (use_pred .and. nualt.eq.maxualt) then
+            do i = 1, npole
+               do j = 1, 3
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  ussum = 0.0d0
+                  upssum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
+                     ussum = ussum + bpred(k)*usalt(k,j,i)
+                     upssum = upssum + bpred(k)*upsalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+                  uinds(j,i) = ussum
+                  uinps(j,i) = upssum
+               end do
+            end do
+         end if
+c
+c     perform dynamic allocation of some local arrays
+c
+         allocate (rsd(3,npole))
+         allocate (rsdp(3,npole))
+         allocate (rsds(3,npole))
+         allocate (rsdps(3,npole))
+         allocate (conj(3,npole))
+         allocate (conjp(3,npole))
+         allocate (conjs(3,npole))
+         allocate (conjps(3,npole))
+         allocate (vec(3,npole))
+         allocate (vecp(3,npole))
+         allocate (vecs(3,npole))
+         allocate (vecps(3,npole))
+         allocate (usav(3,npole))
+         allocate (usavp(3,npole))
+         allocate (usavs(3,npole))
+         allocate (usavps(3,npole))
+c
+c     set initial conjugate gradient residual and conjugate vector
+c
+         call ufield0d (field,fieldp,fields,fieldps)
+         do i = 1, npole
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                       + fieldp(j,i)
+               rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
+     &                       + fields(j,i)
+               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
+     &                       + fieldps(j,i)
+               conj(j,i) = rsd(j,i)
+               conjp(j,i) = rsdp(j,i)
+               conjs(j,i) = rsds(j,i)
+               conjps(j,i) = rsdps(j,i)
+            end do
+         end do
+c
+c     conjugate gradient iteration of the mutual induced dipoles
+c
+         do while (.not. done)
+            iter = iter + 1
+            do i = 1, npole
+               do j = 1, 3
+                  usav(j,i) = uind(j,i)
+                  usavp(j,i) = uinp(j,i)
+                  usavs(j,i) = uinds(j,i)
+                  usavps(j,i) = uinps(j,i)
+                  uind(j,i) = conj(j,i)
+                  uinp(j,i) = conjp(j,i)
+                  uinds(j,i) = conjs(j,i)
+                  uinps(j,i) = conjps(j,i)
+               end do
+            end do
+            call ufield0d (field,fieldp,fields,fieldps)
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = usav(j,i)
+                  uinp(j,i) = usavp(j,i)
+                  uinds(j,i) = usavs(j,i)
+                  uinps(j,i) = usavps(j,i)
+                  vec(j,i) = -field(j,i)
+                  vecp(j,i) = -fieldp(j,i)
+                  vecs(j,i) = -fields(j,i)
+                  vecps(j,i) = -fieldps(j,i)
+               end do
+            end do
+            sum = 0.0d0
+            sump = 0.0d0
+            sums = 0.0d0
+            sumps = 0.0d0
+            denom = 0.0d0
+            denomp = 0.0d0
+            denoms = 0.0d0
+            denomps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
+                  vecs(j,i) = vecs(j,i) + conjs(j,i)/polarity(i)
+                  vecps(j,i) = vecps(j,i) + conjps(j,i)/polarity(i)
+                  sum = sum + rsd(j,i)*rsd(j,i)
+                  sump = sump + rsdp(j,i)*rsdp(j,i)
+                  sums = sums + rsds(j,i)*rsds(j,i)
+                  sumps = sumps + rsdps(j,i)*rsdps(j,i)
+                  denom = denom + conj(j,i)*vec(j,i)
+                  denomp = denomp + conjp(j,i)*vecp(j,i)
+                  denoms = denoms + conjs(j,i)*vecs(j,i)
+                  denomps = denomps + conjps(j,i)*vecps(j,i)
+               end do
+            end do
+            a = sum / denom
+            ap = sump / denomp
+            as = sums / denoms
+            aps = sumps / denomps
+            epsd = 0.0d0
+            epsp = 0.0d0
+            epsds = 0.0d0
+            epsps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
+                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                  epsds = epsds + rsds(j,i)*rsds(j,i)
+                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
+               end do
+            end do
+            b = epsd / sum
+            bp = epsp / sump
+            bs = epsds / sums
+            bps = epsps / sumps
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + a*conj(j,i)
+                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                  uinds(j,i) = uinds(j,i) + as*conjs(j,i)
+                  uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
+                  conj(j,i) = rsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+                  conjs(j,i) = rsds(j,i) + bs*conjs(j,i)
+                  conjps(j,i) = rsdps(j,i) + bps*conjps(j,i)
+               end do
+            end do
+c
+c     check the convergence of the mutual induced dipoles
+c
+            epsold = eps
+            eps = max(epsd,epsp,epsds,epsps)
+            eps = debye * sqrt(eps/dble(npolar))
+            if (debug) then
+               if (iter .eq. 1) then
+                  write (iout,10)
+   10             format (/,' Determination of Induced Dipole',
+     &                       ' Moments :',
+     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
+               end if
+               write (iout,20)  iter,eps
+   20          format (i8,7x,f16.10)
+            end if
+            if (eps .lt. poleps)  done = .true.
+            if (eps .gt. epsold)  done = .true.
+            if (iter .ge. politer)  done = .true.
+         end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (rsd)
+         deallocate (rsdp)
+         deallocate (rsds)
+         deallocate (rsdps)
+         deallocate (conj)
+         deallocate (conjp)
+         deallocate (conjs)
+         deallocate (conjps)
+         deallocate (vec)
+         deallocate (vecp)
+         deallocate (vecs)
+         deallocate (vecps)
+         deallocate (usav)
+         deallocate (usavp)
+         deallocate (usavs)
+         deallocate (usavps)
+c
+c     print the results from the conjugate gradient iteration
+c
+         if (debug) then
+            write (iout,30)  iter,eps
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
+         end if
+c
+c     terminate the calculation if dipoles failed to converge
+c
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
+     &                 ' are not Converged')
+            call prterr
+            call fatal
+         end if
+      end if
+
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (field)
+      deallocate (fieldp)
+      deallocate (fields)
+      deallocate (fieldps)
+      deallocate (udir)
+      deallocate (udirp)
+      deallocate (udirs)
+      deallocate (udirps)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine dfield0d  --  generalized Kirkwood direct field  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "dfield0d" computes the direct electrostatic field due to
+c     permanent multipole moments for use with with generalized
+c     Kirkwood implicit solvation
+c
+c
+      subroutine dfield0d (field,fieldp,fields,fieldps)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'couple.i'
       include 'gkstuf.i'
       include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
       include 'mpole.i'
       include 'polar.i'
       include 'polgrp.i'
       include 'polpot.i'
-      include 'potent.i'
       include 'shunt.i'
       include 'solute.i'
-      include 'units.i'
       integer i,j,k,ii,kk
-      integer iter,maxiter
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
       real*8 fgrp,r,r2
@@ -3481,9 +4110,6 @@ c
       real*8 dukrs,pukrs
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
-      real*8 eps,epsold
-      real*8 epsd,epsp
-      real*8 epsds,epsps
       real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7
@@ -3505,72 +4131,41 @@ c
       real*8 fips(3),fkps(3)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: field(:,:)
-      real*8, allocatable :: fieldp(:,:)
-      real*8, allocatable :: fields(:,:)
-      real*8, allocatable :: fieldps(:,:)
-      real*8, allocatable :: gkfield(:,:)
-      real*8, allocatable :: gkfieldp(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: udirs(:,:)
-      real*8, allocatable :: udirps(:,:)
-      real*8, allocatable :: uold(:,:)
-      real*8, allocatable :: uoldp(:,:)
-      real*8, allocatable :: uolds(:,:)
-      real*8, allocatable :: uoldps(:,:)
-      logical proceed,done
-      character*6 mode
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8 fields(3,*)
+      real*8 fieldps(3,*)
+      logical proceed
 c
 c
-c     zero out the induced dipoles at each site; uind & uinp are
-c     vacuum dipoles, uinds & uinps are SCRF dipoles
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
-            uinds(j,i) = 0.0d0
-            uinps(j,i) = 0.0d0
-         end do
-      end do
-      if (.not.use_polar .and. .not.use_solv)  return
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dscale(n))
-      allocate (pscale(n))
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-      allocate (gkfield(3,npole))
-      allocate (gkfieldp(3,npole))
-c
-c     zero out the fields at each site; field & fieldp are solute
-c     fields, gkfield & gkfieldp are reaction fields
+c     zero out the value of the field at each site
 c
       do i = 1, npole
          do j = 1, 3
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
-            gkfield(j,i) = 0.0d0
-            gkfieldp(j,i) = 0.0d0
+            fields(j,i) = 0.0d0
+            fieldps(j,i) = 0.0d0
          end do
       end do
+c
+c     set dielectric constant and scaling factors for water
+c
       dwater = 78.3d0
-      fc = 1.0d0 * (1.0d0 - dwater)/(0.0d0 + 1.0d0*dwater)
-      fd = 2.0d0 * (1.0d0 - dwater)/(1.0d0 + 2.0d0*dwater)
-      fq = 3.0d0 * (1.0d0 - dwater)/(2.0d0 + 3.0d0*dwater)
+      fc = 1.0d0 * (1.0d0-dwater) / (1.0d0*dwater)
+      fd = 2.0d0 * (1.0d0-dwater) / (1.0d0+2.0d0*dwater)
+      fq = 3.0d0 * (1.0d0-dwater) / (2.0d0+3.0d0*dwater)
 c
-c     set the switching function coefficients
+c     perform dynamic allocation of some local arrays
 c
-      mode = 'MPOLE'
-      call switch (mode)
+      allocate (dscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         pscale(i) = 1.0d0
          dscale(i) = 1.0d0
+         pscale(i) = 1.0d0
       end do
 c
 c     compute the direct induced dipole moment at each atom, and
@@ -3695,6 +4290,9 @@ c
                         fieldp(j,k) = fieldp(j,k) + fkd(j)*pscale(kk)
                      end do
                   end if
+c
+c     set the reaction potential auxiliary terms
+c
                   rb2 = rbi * rbk
                   expterm = exp(-r2/(gkc*rb2))
                   expc = expterm / gkc
@@ -3704,15 +4302,12 @@ c
                   gf3 = gf2 * gf
                   gf5 = gf3 * gf2
                   gf7 = gf5 * gf2
-c
-c     reaction potential auxiliary terms
-c
                   a(0,0) = gf
                   a(1,0) = -gf3
                   a(2,0) = 3.0d0 * gf5
                   a(3,0) = -15.0d0 * gf7
 c
-c     reaction potential gradient auxiliary terms
+c     set the reaction potential gradient auxiliary terms
 c
                   expc1 = 1.0d0 - expc
                   a(0,1) = expc1 * a(1,0)
@@ -3724,7 +4319,7 @@ c
                   expcdexpc = -expc * dexpc
                   a(1,2) = expc1*a(2,1) + expcdexpc*a(2,0)
 c
-c     multiply the auxillary terms by dielectric functions
+c     multiply the auxiliary terms by dielectric functions
 c
                   a(0,1) = fc * a(0,1)
                   a(1,0) = fd * a(1,0)
@@ -3853,16 +4448,16 @@ c
 c     scale the self-field by half, such that it sums to one below
 c
                   if (i .eq. k) then
-                     do j = 1,3
+                     do j = 1, 3
                         fid(j) = 0.5d0 * fid(j)
                         fkd(j) = 0.5d0 * fkd(j)
                      end do
                   end if
                   do j = 1, 3
-                     gkfield(j,i) = gkfield(j,i) + fid(j)
-                     gkfield(j,k) = gkfield(j,k) + fkd(j)
-                     gkfieldp(j,i) = gkfieldp(j,i) + fid(j)
-                     gkfieldp(j,k) = gkfieldp(j,k) + fkd(j)
+                     fields(j,i) = fields(j,i) + fid(j)
+                     fields(j,k) = fields(j,k) + fkd(j)
+                     fieldps(j,i) = fieldps(j,i) + fid(j)
+                     fieldps(j,k) = fieldps(j,k) + fkd(j)
                   end do
                end if
             end if
@@ -3896,29 +4491,417 @@ c
          end do
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+c
+c     combine permanent multipole field and GK reaction field
+c
+c
+      do i = 1, npole
+         do j = 1, 3
+            fields(j,i) = field(j,i) + fields(j,i)
+            fieldps(j,i) = fieldp(j,i) + fieldps(j,i)
+         end do
+      end do
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ufield0d  --  generalized Kirkwood mutual field  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "ufield0d" computes the mutual electrostatic field due to
+c     induced dipole moments for use with with generalized Kirkwood
+c     implicit solvation
+c
+c
+      subroutine ufield0d (field,fieldp,fields,fieldps)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'gkstuf.i'
+      include 'group.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'shunt.i'
+      include 'solute.i'
+      integer i,j,k,ii,kk
+      real*8 xr,yr,zr
+      real*8 xr2,yr2,zr2
+      real*8 fgrp,r,r2
+      real*8 rr3,rr5
+      real*8 duix,duiy,duiz
+      real*8 puix,puiy,puiz
+      real*8 dukx,duky,dukz
+      real*8 pukx,puky,pukz
+      real*8 dir,duir,puir
+      real*8 dkr,dukr,pukr
+      real*8 duixs,duiys,duizs
+      real*8 puixs,puiys,puizs
+      real*8 dukxs,dukys,dukzs
+      real*8 pukxs,pukys,pukzs
+      real*8 duirs,puirs
+      real*8 dukrs,pukrs
+      real*8 damp,expdamp
+      real*8 scale3,scale5
+      real*8 pdi,pti,pgamma
+      real*8 rb2,rbi,rbk
+      real*8 dwater,fd
+      real*8 gf,gf2,gf3,gf5
+      real*8 expterm,expc
+      real*8 expc1,dexpc
+      real*8 a(0:3,0:2)
+      real*8 gux(10),guy(10)
+      real*8 guz(10)
+      real*8 fid(3),fkd(3)
+      real*8 fip(3),fkp(3)
+      real*8 fids(3),fkds(3)
+      real*8 fips(3),fkps(3)
+      real*8, allocatable :: dscale(:)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8 fields(3,*)
+      real*8 fieldps(3,*)
+      logical proceed
+c
+c
+c     zero out the value of the field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+            fields(j,i) = 0.0d0
+            fieldps(j,i) = 0.0d0
+         end do
+      end do
+c
+c     set dielectric constant and scaling factor for water
+c
+      dwater = 78.3d0
+      fd = 2.0d0 * (1.0d0-dwater) / (1.0d0+2.0d0*dwater)
+c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (dscale(n))
+c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         dscale(i) = 1.0d0
+      end do
+c
+c     compute the mutual electrostatic field at each atom,
+c     and another field including RF due to induced dipoles
+c
+      do i = 1, npole
+         ii = ipole(i)
+         pdi = pdamp(i)
+         pti = thole(i)
+         rbi = rborn(ii)
+         duix = uind(1,i)
+         duiy = uind(2,i)
+         duiz = uind(3,i)
+         puix = uinp(1,i)
+         puiy = uinp(2,i)
+         puiz = uinp(3,i)
+         duixs = uinds(1,i)
+         duiys = uinds(2,i)
+         duizs = uinds(3,i)
+         puixs = uinps(1,i)
+         puiys = uinps(2,i)
+         puizs = uinps(3,i)
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = u1scale
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = u2scale
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = u3scale
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = u4scale
+         end do
+         do k = i, npole
+            kk = ipole(k)
+            rbk = rborn(kk)
+            proceed = .true.
+            if (use_intra)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (proceed) then
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               xr2 = xr * xr
+               yr2 = yr * yr
+               zr2 = zr * zr
+               r2 = xr2 + yr2 + zr2
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  dukx = uind(1,k)
+                  duky = uind(2,k)
+                  dukz = uind(3,k)
+                  pukx = uinp(1,k)
+                  puky = uinp(2,k)
+                  pukz = uinp(3,k)
+                  dukxs = uinds(1,k)
+                  dukys = uinds(2,k)
+                  dukzs = uinds(3,k)
+                  pukxs = uinps(1,k)
+                  pukys = uinps(2,k)
+                  pukzs = uinps(3,k)
+                  if (i .ne. k) then
+                     scale3 = dscale(kk)
+                     scale5 = dscale(kk)
+                     damp = pdi * pdamp(k)
+                     if (damp .ne. 0.0d0) then
+                        pgamma = min(pti,thole(k))
+                        damp = -pgamma * (r/damp)**3
+                        if (damp .gt. -50.0d0) then
+                           expdamp = exp(damp)
+                           scale3 = scale3 * (1.0d0-expdamp)
+                           scale5 = scale5 * (1.0d0-(1.0d0-damp)
+     &                                           *expdamp)       
+                        end if
+                     end if
+                     rr3 = scale3 / (r*r2)
+                     rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                     duir = xr*duix + yr*duiy + zr*duiz
+                     dukr = xr*dukx + yr*duky + zr*dukz
+                     puir = xr*puix + yr*puiy + zr*puiz
+                     pukr = xr*pukx + yr*puky + zr*pukz
+                     duirs = xr*duixs + yr*duiys + zr*duizs
+                     dukrs = xr*dukxs + yr*dukys + zr*dukzs
+                     puirs = xr*puixs + yr*puiys + zr*puizs
+                     pukrs = xr*pukxs + yr*pukys + zr*pukzs
+                     fid(1) = -rr3*dukx + rr5*dukr*xr
+                     fid(2) = -rr3*duky + rr5*dukr*yr
+                     fid(3) = -rr3*dukz + rr5*dukr*zr
+                     fkd(1) = -rr3*duix + rr5*duir*xr
+                     fkd(2) = -rr3*duiy + rr5*duir*yr
+                     fkd(3) = -rr3*duiz + rr5*duir*zr
+                     fip(1) = -rr3*pukx + rr5*pukr*xr
+                     fip(2) = -rr3*puky + rr5*pukr*yr
+                     fip(3) = -rr3*pukz + rr5*pukr*zr
+                     fkp(1) = -rr3*puix + rr5*puir*xr
+                     fkp(2) = -rr3*puiy + rr5*puir*yr
+                     fkp(3) = -rr3*puiz + rr5*puir*zr
+                     fids(1) = -rr3*dukxs + rr5*dukrs*xr
+                     fids(2) = -rr3*dukys + rr5*dukrs*yr
+                     fids(3) = -rr3*dukzs + rr5*dukrs*zr
+                     fkds(1) = -rr3*duixs + rr5*duirs*xr
+                     fkds(2) = -rr3*duiys + rr5*duirs*yr
+                     fkds(3) = -rr3*duizs + rr5*duirs*zr
+                     fips(1) = -rr3*pukxs + rr5*pukrs*xr
+                     fips(2) = -rr3*pukys + rr5*pukrs*yr
+                     fips(3) = -rr3*pukzs + rr5*pukrs*zr
+                     fkps(1) = -rr3*puixs + rr5*puirs*xr
+                     fkps(2) = -rr3*puiys + rr5*puirs*yr
+                     fkps(3) = -rr3*puizs + rr5*puirs*zr
+                     do j = 1, 3
+                        field(j,i) = field(j,i) + fid(j)
+                        field(j,k) = field(j,k) + fkd(j)
+                        fieldp(j,i) = fieldp(j,i) + fip(j)
+                        fieldp(j,k) = fieldp(j,k) + fkp(j)
+                        fields(j,i) = fields(j,i) + fids(j)
+                        fields(j,k) = fields(j,k) + fkds(j)
+                        fieldps(j,i) = fieldps(j,i) + fips(j)
+                        fieldps(j,k) = fieldps(j,k) + fkps(j)
+                     end do
+                  end if
+c
+c     unweighted dipole reaction potential gradient tensor
+c
+                  rb2 = rbi * rbk
+                  expterm = exp(-r2/(gkc*rb2))
+                  expc = expterm / gkc
+                  dexpc = -2.0d0 / (gkc*rbi*rbk)
+                  gf2 = 1.0d0 / (r2+rb2*expterm)
+                  gf = sqrt(gf2)
+                  gf3 = gf2 * gf
+                  gf5 = gf3 * gf2
+                  a(1,0) = -gf3
+                  a(2,0) = 3.0d0 * gf5
+                  expc1 = 1.0d0 - expc
+                  a(1,1) = expc1 * a(2,0)
+                  gux(2) = fd * (a(1,0) + xr2*a(1,1))
+                  gux(3) = fd * xr*yr*a(1,1)
+                  gux(4) = fd * xr*zr*a(1,1)
+                  guy(2) = gux(3)
+                  guy(3) = fd * (a(1,0) + yr2*a(1,1))
+                  guy(4) = fd * yr*zr*a(1,1)
+                  guz(2) = gux(4)
+                  guz(3) = guy(4)
+                  guz(4) = fd * (a(1,0) + zr2*a(1,1))
+                  fids(1) = dukxs*gux(2) + dukys*guy(2) + dukzs*guz(2)
+                  fids(2) = dukxs*gux(3) + dukys*guy(3) + dukzs*guz(3)
+                  fids(3) = dukxs*gux(4) + dukys*guy(4) + dukzs*guz(4)
+                  fkds(1) = duixs*gux(2) + duiys*guy(2) + duizs*guz(2)
+                  fkds(2) = duixs*gux(3) + duiys*guy(3) + duizs*guz(3)
+                  fkds(3) = duixs*gux(4) + duiys*guy(4) + duizs*guz(4)
+                  fips(1) = pukxs*gux(2) + pukys*guy(2) + pukzs*guz(2)
+                  fips(2) = pukxs*gux(3) + pukys*guy(3) + pukzs*guz(3)
+                  fips(3) = pukxs*gux(4) + pukys*guy(4) + pukzs*guz(4)
+                  fkps(1) = puixs*gux(2) + puiys*guy(2) + puizs*guz(2)
+                  fkps(2) = puixs*gux(3) + puiys*guy(3) + puizs*guz(3)
+                  fkps(3) = puixs*gux(4) + puiys*guy(4) + puizs*guz(4)
+                  if (i .eq. k) then
+                     do j = 1, 3
+                        fids(j) = 0.5d0 * fids(j)
+                        fkds(j) = 0.5d0 * fkds(j)
+                        fips(j) = 0.5d0 * fips(j)
+                        fkps(j) = 0.5d0 * fkps(j)
+                     end do
+                  end if
+                  do j = 1, 3
+                     fields(j,i) = fields(j,i) + fids(j)
+                     fields(j,k) = fields(j,k) + fkds(j)
+                     fieldps(j,i) = fieldps(j,i) + fips(j)
+                     fieldps(j,k) = fieldps(j,k) + fkps(j)
+                  end do
+               end if
+            end if
+         end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = 1.0d0
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine induce0e  --  Poisson-Boltzmann induced dipoles  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "induce0e" computes the induced dipole moments at polarizable
+c     sites for Poisson-Boltzmann SCRF and vacuum environments
+c
+c
+      subroutine induce0e
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polpot.i'
+      include 'potent.i'
+      include 'units.i'
+      include 'uprior.i'
+      integer i,j,k,iter
+      integer maxiter
+      real*8 eps,epsold
+      real*8 epsd,epsp
+      real*8 epsds,epsps
+      real*8 udsum,upsum
+      real*8 ussum,upssum
+      real*8 a,ap,b,bp
+      real*8 as,aps,bs,bps
+      real*8 sum,sump
+      real*8 sums,sumps
+      real*8 denom,denomp
+      real*8 denoms,denomps
+      real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
+      real*8, allocatable :: fields(:,:)
+      real*8, allocatable :: fieldps(:,:)
+      real*8, allocatable :: udir(:,:)
+      real*8, allocatable :: udirp(:,:)
+      real*8, allocatable :: udirs(:,:)
+      real*8, allocatable :: udirps(:,:)
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: rsds(:,:)
+      real*8, allocatable :: rsdps(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: conjp(:,:)
+      real*8, allocatable :: conjs(:,:)
+      real*8, allocatable :: conjps(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: vecp(:,:)
+      real*8, allocatable :: vecs(:,:)
+      real*8, allocatable :: vecps(:,:)
+      real*8, allocatable :: usav(:,:)
+      real*8, allocatable :: usavp(:,:)
+      real*8, allocatable :: usavs(:,:)
+      real*8, allocatable :: usavps(:,:)
+      logical done
+      character*6 mode
+c
+c
+c     zero out the induced dipoles; uind and uinp are vacuum dipoles,
+c     uinds and uinps are Poisson-Boltzmann SCRF dipoles
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+            uinds(j,i) = 0.0d0
+            uinps(j,i) = 0.0d0
+         end do
+      end do
+      if (.not.use_polar .or. .not.use_solv)  return
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (field(3,npole))
+      allocate (fieldp(3,npole))
       allocate (fields(3,npole))
       allocate (fieldps(3,npole))
       allocate (udir(3,npole))
       allocate (udirp(3,npole))
       allocate (udirs(3,npole))
       allocate (udirps(3,npole))
-      allocate (uold(3,npole))
-      allocate (uoldp(3,npole))
-      allocate (uolds(3,npole))
-      allocate (uoldps(3,npole))
+c
+c     compute the direct induced dipole moment at each atom, and
+c     another set that also includes RF due to permanent multipoles
+c
+      call dfield0e (field,fieldp,fields,fieldps)
 c
 c     set vacuum induced dipoles to polarizability times direct field;
-c     set SCRF induced dipoles to polarizability times direct field
-c     plus the GK reaction field due to permanent multipoles
+c     SCRF induced dipoles are polarizability times direct field
+c     plus the reaction field due to permanent multipoles
 c
       do i = 1, npole
          do j = 1, 3
             udir(j,i) = polarity(i) * field(j,i)
             udirp(j,i) = polarity(i) * fieldp(j,i)
-            udirs(j,i) = polarity(i) * (field(j,i)+gkfield(j,i))
-            udirps(j,i) = polarity(i) * (fieldp(j,i)+gkfieldp(j,i))
+            udirs(j,i) = polarity(i) * fields(j,i)
+            udirps(j,i) = polarity(i) * fieldps(j,i)
             uind(j,i) = udir(j,i)
             uinp(j,i) = udirp(j,i)
             uinds(j,i) = udirs(j,i)
@@ -3934,243 +4917,161 @@ c
          iter = 0
          eps = 100.0d0
 c
-c     compute mutual induced dipole moments by an iterative method
+c     estimated induced dipoles from polynomial predictor
 c
-         do while (.not. done)
+         if (use_pred .and. nualt.eq.maxualt) then
             do i = 1, npole
                do j = 1, 3
-                  field(j,i) = 0.0d0
-                  fieldp(j,i) = 0.0d0
-                  fields(j,i) = 0.0d0
-                  fieldps(j,i) = 0.0d0
-                  gkfield(j,i) = 0.0d0
-                  gkfieldp(j,i) = 0.0d0
+                  udsum = 0.0d0
+                  upsum = 0.0d0
+                  ussum = 0.0d0
+                  upssum = 0.0d0
+                  do k = 1, nualt
+                     udsum = udsum + bpred(k)*udalt(k,j,i)
+                     upsum = upsum + bpred(k)*upalt(k,j,i)
+                     ussum = ussum + bpred(k)*usalt(k,j,i)
+                     upssum = upssum + bpred(k)*upsalt(k,j,i)
+                  end do
+                  uind(j,i) = udsum
+                  uinp(j,i) = upsum
+                  uinds(j,i) = ussum
+                  uinps(j,i) = upssum
                end do
             end do
-            do i = 1, npole
-               ii = ipole(i)
-               pdi = pdamp(i)
-               pti = thole(i)
-               rbi = rborn(ii)
-               duix = uind(1,i)
-               duiy = uind(2,i)
-               duiz = uind(3,i)
-               puix = uinp(1,i)
-               puiy = uinp(2,i)
-               puiz = uinp(3,i)
-               duixs = uinds(1,i)
-               duiys = uinds(2,i)
-               duizs = uinds(3,i)
-               puixs = uinps(1,i)
-               puiys = uinps(2,i)
-               puizs = uinps(3,i)
-               do j = 1, np11(ii)
-                  dscale(ip11(j,ii)) = u1scale
-               end do
-               do j = 1, np12(ii)
-                  dscale(ip12(j,ii)) = u2scale
-               end do
-               do j = 1, np13(ii)
-                  dscale(ip13(j,ii)) = u3scale
-               end do
-               do j = 1, np14(ii)
-                  dscale(ip14(j,ii)) = u4scale
-               end do
-               do k = i, npole
-                  kk = ipole(k)
-                  rbk = rborn(kk)
-                  proceed = .true.
-                  if (use_intra)
-     &               call groups (proceed,fgrp,ii,kk,0,0,0,0)
-                  if (proceed) then
-                     xr = x(kk) - x(ii)
-                     yr = y(kk) - y(ii)
-                     zr = z(kk) - z(ii)
-                     xr2 = xr * xr
-                     yr2 = yr * yr
-                     zr2 = zr * zr
-                     r2 = xr2 + yr2 + zr2
-                     if (r2 .le. off2) then
-                        r = sqrt(r2)
-                        dukx = uind(1,k)
-                        duky = uind(2,k)
-                        dukz = uind(3,k)
-                        pukx = uinp(1,k)
-                        puky = uinp(2,k)
-                        pukz = uinp(3,k)
-                        dukxs = uinds(1,k)
-                        dukys = uinds(2,k)
-                        dukzs = uinds(3,k)
-                        pukxs = uinps(1,k)
-                        pukys = uinps(2,k)
-                        pukzs = uinps(3,k)
-                        if (i .ne. k) then
-                           scale3 = dscale(kk)
-                           scale5 = dscale(kk)
-                           damp = pdi * pdamp(k)
-                           if (damp .ne. 0.0d0) then
-                              pgamma = min(pti,thole(k))
-                              damp = -pgamma * (r/damp)**3
-                              if (damp .gt. -50.0d0) then
-                                 expdamp = exp(damp)
-                                 scale3 = scale3 * (1.0d0-expdamp)
-                                 scale5 = scale5 * (1.0d0-(1.0d0-damp)
-     &                                                 *expdamp)
-                              end if
-                           end if
-                           rr3 = scale3 / (r*r2)
-                           rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                           duir = xr*duix + yr*duiy + zr*duiz
-                           dukr = xr*dukx + yr*duky + zr*dukz
-                           puir = xr*puix + yr*puiy + zr*puiz
-                           pukr = xr*pukx + yr*puky + zr*pukz
-                           duirs = xr*duixs + yr*duiys + zr*duizs
-                           dukrs = xr*dukxs + yr*dukys + zr*dukzs
-                           puirs = xr*puixs + yr*puiys + zr*puizs
-                           pukrs = xr*pukxs + yr*pukys + zr*pukzs
-                           fid(1) = -rr3*dukx + rr5*dukr*xr
-                           fid(2) = -rr3*duky + rr5*dukr*yr
-                           fid(3) = -rr3*dukz + rr5*dukr*zr
-                           fkd(1) = -rr3*duix + rr5*duir*xr
-                           fkd(2) = -rr3*duiy + rr5*duir*yr
-                           fkd(3) = -rr3*duiz + rr5*duir*zr
-                           fip(1) = -rr3*pukx + rr5*pukr*xr
-                           fip(2) = -rr3*puky + rr5*pukr*yr
-                           fip(3) = -rr3*pukz + rr5*pukr*zr
-                           fkp(1) = -rr3*puix + rr5*puir*xr
-                           fkp(2) = -rr3*puiy + rr5*puir*yr
-                           fkp(3) = -rr3*puiz + rr5*puir*zr
-                           fids(1) = -rr3*dukxs + rr5*dukrs*xr
-                           fids(2) = -rr3*dukys + rr5*dukrs*yr
-                           fids(3) = -rr3*dukzs + rr5*dukrs*zr
-                           fkds(1) = -rr3*duixs + rr5*duirs*xr
-                           fkds(2) = -rr3*duiys + rr5*duirs*yr
-                           fkds(3) = -rr3*duizs + rr5*duirs*zr
-                           fips(1) = -rr3*pukxs + rr5*pukrs*xr
-                           fips(2) = -rr3*pukys + rr5*pukrs*yr
-                           fips(3) = -rr3*pukzs + rr5*pukrs*zr
-                           fkps(1) = -rr3*puixs + rr5*puirs*xr
-                           fkps(2) = -rr3*puiys + rr5*puirs*yr
-                           fkps(3) = -rr3*puizs + rr5*puirs*zr
-                           do j = 1, 3
-                              field(j,i) = field(j,i) + fid(j)
-                              field(j,k) = field(j,k) + fkd(j)
-                              fieldp(j,i) = fieldp(j,i) + fip(j)
-                              fieldp(j,k) = fieldp(j,k) + fkp(j)
-                              fields(j,i) = fields(j,i) + fids(j)
-                              fields(j,k) = fields(j,k) + fkds(j)
-                              fieldps(j,i) = fieldps(j,i) + fips(j)
-                              fieldps(j,k) = fieldps(j,k) + fkps(j)
-                           end do
-                        end if
-                        rb2 = rbi * rbk
-                        expterm = exp(-r2/(gkc*rb2))
-                        expc = expterm / gkc
-                        dexpc = -2.0d0 / (gkc*rbi*rbk)
-                        gf2 = 1.0d0 / (r2+rb2*expterm)
-                        gf = sqrt(gf2)
-                        gf3 = gf2 * gf
-                        gf5 = gf3 * gf2
+         end if
 c
-c     reaction potential auxiliary terms
+c     perform dynamic allocation of some local arrays
 c
-                        a(1,0) = -gf3
-                        a(2,0) = 3.0d0 * gf5
+         allocate (rsd(3,npole))
+         allocate (rsdp(3,npole))
+         allocate (rsds(3,npole))
+         allocate (rsdps(3,npole))
+         allocate (conj(3,npole))
+         allocate (conjp(3,npole))
+         allocate (conjs(3,npole))
+         allocate (conjps(3,npole))
+         allocate (vec(3,npole))
+         allocate (vecp(3,npole))
+         allocate (vecs(3,npole))
+         allocate (vecps(3,npole))
+         allocate (usav(3,npole))
+         allocate (usavp(3,npole))
+         allocate (usavs(3,npole))
+         allocate (usavps(3,npole))
 c
-c     reaction potential gradient auxiliary terms
+c     set initial conjugate gradient residual and conjugate vector
 c
-                        expc1 = 1.0d0 - expc
-                        a(1,1) = expc1 * a(2,0)
-c
-c     unweighted dipole reaction potential gradient tensor
-c
-                        gux(2) = fd * (a(1,0) + xr2*a(1,1))
-                        gux(3) = fd * xr*yr*a(1,1)
-                        gux(4) = fd * xr*zr*a(1,1)
-                        guy(2) = gux(3)
-                        guy(3) = fd * (a(1,0) + yr2*a(1,1))
-                        guy(4) = fd * yr*zr*a(1,1)
-                        guz(2) = gux(4)
-                        guz(3) = guy(4)
-                        guz(4) = fd * (a(1,0) + zr2*a(1,1))
-                        fids(1) = dukxs*gux(2)+dukys*guy(2)+dukzs*guz(2)
-                        fids(2) = dukxs*gux(3)+dukys*guy(3)+dukzs*guz(3)
-                        fids(3) = dukxs*gux(4)+dukys*guy(4)+dukzs*guz(4)
-                        fkds(1) = duixs*gux(2)+duiys*guy(2)+duizs*guz(2)
-                        fkds(2) = duixs*gux(3)+duiys*guy(3)+duizs*guz(3)
-                        fkds(3) = duixs*gux(4)+duiys*guy(4)+duizs*guz(4)
-                        fips(1) = pukxs*gux(2)+pukys*guy(2)+pukzs*guz(2)
-                        fips(2) = pukxs*gux(3)+pukys*guy(3)+pukzs*guz(3)
-                        fips(3) = pukxs*gux(4)+pukys*guy(4)+pukzs*guz(4)
-                        fkps(1) = puixs*gux(2)+puiys*guy(2)+puizs*guz(2)
-                        fkps(2) = puixs*gux(3)+puiys*guy(3)+puizs*guz(3)
-                        fkps(3) = puixs*gux(4)+puiys*guy(4)+puizs*guz(4)
-                        if (i .eq. k) then
-                           do j = 1, 3
-                              fids(j) = 0.5d0 * fids(j)
-                              fkds(j) = 0.5d0 * fkds(j)
-                              fips(j) = 0.5d0 * fips(j)
-                              fkps(j) = 0.5d0 * fkps(j)
-                           end do
-                        end if
-                        do j = 1, 3
-                           gkfield(j,i) = gkfield(j,i) + fids(j)
-                           gkfield(j,k) = gkfield(j,k) + fkds(j)
-                           gkfieldp(j,i) = gkfieldp(j,i) + fips(j)
-                           gkfieldp(j,k) = gkfieldp(j,k) + fkps(j)
-                        end do
-                     end if
-                  end if
-               end do
-c
-c     reset interaction scaling coefficients for connected atoms
-c
-               do j = 1, np11(ii)
-                  dscale(ip11(j,ii)) = 1.0d0
-               end do
-               do j = 1, np12(ii)
-                  dscale(ip12(j,ii)) = 1.0d0
-               end do
-               do j = 1, np13(ii)
-                  dscale(ip13(j,ii)) = 1.0d0
-               end do
-               do j = 1, np14(ii)
-                  dscale(ip14(j,ii)) = 1.0d0
-               end do
+         call ufield0e (field,fieldp,fields,fieldps)
+         do i = 1, npole
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                       + fieldp(j,i)
+               rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
+     &                       + fields(j,i)
+               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
+     &                       + fieldps(j,i)
+               conj(j,i) = rsd(j,i)
+               conjp(j,i) = rsdp(j,i)
+               conjs(j,i) = rsds(j,i)
+               conjps(j,i) = rsdps(j,i)
             end do
+         end do
 c
-c     check to see if the mutual induced dipoles have converged
+c     conjugate gradient iteration of the mutual induced dipoles
 c
+         do while (.not. done)
             iter = iter + 1
-            epsold = eps
+            do i = 1, npole
+               do j = 1, 3
+                  usav(j,i) = uind(j,i)
+                  usavp(j,i) = uinp(j,i)
+                  usavs(j,i) = uinds(j,i)
+                  usavps(j,i) = uinps(j,i)
+                  uind(j,i) = conj(j,i)
+                  uinp(j,i) = conjp(j,i)
+                  uinds(j,i) = conjs(j,i)
+                  uinps(j,i) = conjps(j,i)
+               end do
+            end do
+            call ufield0e (field,fieldp,fields,fieldps)
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = usav(j,i)
+                  uinp(j,i) = usavp(j,i)
+                  uinds(j,i) = usavs(j,i)
+                  uinps(j,i) = usavps(j,i)
+                  vec(j,i) = -field(j,i)
+                  vecp(j,i) = -fieldp(j,i)
+                  vecs(j,i) = -fields(j,i)
+                  vecps(j,i) = -fieldps(j,i)
+               end do
+            end do
+            sum = 0.0d0
+            sump = 0.0d0
+            sums = 0.0d0
+            sumps = 0.0d0
+            denom = 0.0d0
+            denomp = 0.0d0
+            denoms = 0.0d0
+            denomps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
+                  vecs(j,i) = vecs(j,i) + conjs(j,i)/polarity(i)
+                  vecps(j,i) = vecps(j,i) + conjps(j,i)/polarity(i)
+                  sum = sum + rsd(j,i)*rsd(j,i)
+                  sump = sump + rsdp(j,i)*rsdp(j,i)
+                  sums = sums + rsds(j,i)*rsds(j,i)
+                  sumps = sumps + rsdps(j,i)*rsdps(j,i)
+                  denom = denom + conj(j,i)*vec(j,i)
+                  denomp = denomp + conjp(j,i)*vecp(j,i)
+                  denoms = denoms + conjs(j,i)*vecs(j,i)
+                  denomps = denomps + conjps(j,i)*vecps(j,i)
+               end do
+            end do
+            a = sum / denom
+            ap = sump / denomp
+            as = sums / denoms
+            aps = sumps / denomps
             epsd = 0.0d0
             epsp = 0.0d0
             epsds = 0.0d0
             epsps = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uoldp(j,i) = uinp(j,i)
-                  uolds(j,i) = uinds(j,i)
-                  uoldps(j,i) = uinps(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
-                  uinds(j,i) = udirs(j,i) + polarity(i)
-     &                               *(fields(j,i)+gkfield(j,i))
-                  uinps(j,i) = udirps(j,i) + polarity(i)
-     &                                *(fieldps(j,i)+gkfieldp(j,i))
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  uinp(j,i) = uoldp(j,i) + polsor*(uinp(j,i)-uoldp(j,i))
-                  uinds(j,i) = uolds(j,i) + polsor
-     &                              *(uinds(j,i)-uolds(j,i))
-                  uinps(j,i) = uoldps(j,i) + polsor
-     &                               *(uinps(j,i)-uoldps(j,i))
-                  epsd = epsd + (uind(j,i)-uold(j,i))**2
-                  epsp = epsp + (uinp(j,i)-uoldp(j,i))**2
-                  epsds = epsds + (uinds(j,i)-uolds(j,i))**2
-                  epsps = epsps + (uinps(j,i)-uoldps(j,i))**2
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
+                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                  epsds = epsds + rsds(j,i)*rsds(j,i)
+                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
                end do
             end do
+            b = epsd / sum
+            bp = epsp / sump
+            bs = epsds / sums
+            bps = epsps / sumps
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + a*conj(j,i)
+                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                  uinds(j,i) = uinds(j,i) + as*conjs(j,i)
+                  uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
+                  conj(j,i) = rsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+                  conjs(j,i) = rsds(j,i) + bs*conjs(j,i)
+                  conjps(j,i) = rsdps(j,i) + bps*conjps(j,i)
+               end do
+            end do
+c
+c     check the convergence of the mutual induced dipoles
+c
+            epsold = eps
             eps = max(epsd,epsp,epsds,epsps)
             eps = debye * sqrt(eps/dble(npolar))
             if (debug) then
@@ -4188,11 +5089,38 @@ c
             if (iter .ge. politer)  done = .true.
          end do
 c
+c     perform deallocation of some local arrays
+c
+         deallocate (rsd)
+         deallocate (rsdp)
+         deallocate (rsds)
+         deallocate (rsdps)
+         deallocate (conj)
+         deallocate (conjp)
+         deallocate (conjs)
+         deallocate (conjps)
+         deallocate (vec)
+         deallocate (vecp)
+         deallocate (vecs)
+         deallocate (vecps)
+         deallocate (usav)
+         deallocate (usavp)
+         deallocate (usavs)
+         deallocate (usavps)
+c
+c     print the results from the conjugate gradient iteration
+c
+         if (debug) then
+            write (iout,30)  iter,eps
+   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+     &                 6x,'RMS Change',f15.10)
+         end if
+c
 c     terminate the calculation if dipoles failed to converge
 c
          if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
+            write (iout,40)
+   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
             call prterr
             call fatal
@@ -4201,134 +5129,71 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
-      deallocate (pscale)
       deallocate (field)
       deallocate (fieldp)
       deallocate (fields)
       deallocate (fieldps)
-      deallocate (gkfield)
-      deallocate (gkfieldp)
       deallocate (udir)
       deallocate (udirp)
       deallocate (udirs)
       deallocate (udirps)
-      deallocate (uold)
-      deallocate (uoldp)
-      deallocate (uolds)
-      deallocate (uoldps)
       return
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine induce0f  --  Poisson-Boltzmann induced dipoles  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dfield0e  --  Poisson-Boltzmann direct field  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "induce0f" computes the induced dipole moments at polarizable
-c     sites for Poisson-Boltzmann SCRF and vacuum environments
+c     "dfield0e" computes the direct electrostatic field due to
+c     permanent multipole moments for use with in Poisson-Boltzmann
 c
 c
-      subroutine induce0f
+      subroutine dfield0e (field,fieldp,fields,fieldps)
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'couple.i'
-      include 'gkstuf.i'
       include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
       include 'mpole.i'
       include 'pbstuf.i'
       include 'polar.i'
       include 'polgrp.i'
       include 'polpot.i'
-      include 'potent.i'
       include 'shunt.i'
       include 'solute.i'
-      include 'units.i'
       integer i,j,k,ii,kk
-      integer iter,maxiter
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
       real*8 fgrp,r,r2
       real*8 rr3,rr5,rr7
-      real*8 ci,uxi,uyi,uzi
-      real*8 qxxi,qxyi,qxzi
-      real*8 qyyi,qyzi,qzzi
-      real*8 ck,uxk,uyk,uzk
-      real*8 qxxk,qxyk,qxzk
-      real*8 qyyk,qyzk,qzzk
-      real*8 duix,duiy,duiz
-      real*8 puix,puiy,puiz
-      real*8 dukx,duky,dukz
-      real*8 pukx,puky,pukz
-      real*8 dir,duir,puir
-      real*8 dkr,dukr,pukr
-      real*8 duixs,duiys,duizs
-      real*8 puixs,puiys,puizs
-      real*8 dukxs,dukys,dukzs
-      real*8 pukxs,pukys,pukzs
-      real*8 duirs,puirs
-      real*8 dukrs,pukrs
+      real*8 ci,dix,diy,diz
+      real*8 qixx,qixy,qixz
+      real*8 qiyy,qiyz,qizz
+      real*8 ck,dkx,dky,dkz
+      real*8 qkxx,qkxy,qkxz
+      real*8 qkyy,qkyz,qkzz
+      real*8 dir,dkr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
-      real*8 eps,epsold
-      real*8 epsd,epsp
-      real*8 epsds,epsps
       real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
-      real*8 fip(3),fkp(3)
-      real*8 fids(3),fkds(3)
-      real*8 fips(3),fkps(3)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8 fields(3,*)
+      real*8 fieldps(3,*)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: field(:,:)
-      real*8, allocatable :: fieldp(:,:)
-      real*8, allocatable :: fields(:,:)
-      real*8, allocatable :: fieldps(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: udirs(:,:)
-      real*8, allocatable :: udirps(:,:)
-      real*8, allocatable :: uold(:,:)
-      real*8, allocatable :: uoldp(:,:)
-      real*8, allocatable :: uolds(:,:)
-      real*8, allocatable :: uoldps(:,:)
-      real*8, allocatable :: indpole(:,:)
-      real*8, allocatable :: inppole(:,:)
-      logical proceed,done
-      character*6 mode
+      logical proceed
 c
 c
-c     zero out the induced dipoles; uind and uinp are vacuum dipoles,
-c     uinds and uinps are SCRF dipoles
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
-            uinds(j,i) = 0.0d0
-            uinps(j,i) = 0.0d0
-         end do
-      end do
-      if (.not.use_polar .or. .not.use_solv)  return
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dscale(n))
-      allocate (pscale(n))
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-c
-c     zero out the fields at each site; field and fieldp are
-c     the solute fields
+c     zero out the value of the field at each site
 c
       do i = 1, npole
          do j = 1, 3
@@ -4337,10 +5202,10 @@ c
          end do
       end do
 c
-c     set the switching function coefficients
+c     perform dynamic allocation of some local arrays
 c
-      mode = 'MPOLE'
-      call switch (mode)
+      allocate (dscale(n))
+      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -4349,23 +5214,24 @@ c
          dscale(i) = 1.0d0
       end do
 c
-c     compute the direct induced dipole moment at each atom, and
-c     another set that also includes RF due to permanent multipoles
+c     compute the direct electrostatic field at each atom, and
+c     another field including RF due to permanent multipoles;
+c     note self-interactions for the solute field are skipped
 c
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
-         uxi = rpole(2,i)
-         uyi = rpole(3,i)
-         uzi = rpole(4,i)
-         qxxi = rpole(5,i)
-         qxyi = rpole(6,i)
-         qxzi = rpole(7,i)
-         qyyi = rpole(9,i)
-         qyzi = rpole(10,i)
-         qzzi = rpole(13,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -4409,18 +5275,15 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   ck = rpole(1,k)
-                  uxk = rpole(2,k)
-                  uyk = rpole(3,k)
-                  uzk = rpole(4,k)
-                  qxxk = rpole(5,k)
-                  qxyk = rpole(6,k)
-                  qxzk = rpole(7,k)
-                  qyyk = rpole(9,k)
-                  qyzk = rpole(10,k)
-                  qzzk = rpole(13,k)
-c
-c     self-interactions for the solute field are skipped
-c
+                  dkx = rpole(2,k)
+                  dky = rpole(3,k)
+                  dkz = rpole(4,k)
+                  qkxx = rpole(5,k)
+                  qkxy = rpole(6,k)
+                  qkxz = rpole(7,k)
+                  qkyy = rpole(9,k)
+                  qkyz = rpole(10,k)
+                  qkzz = rpole(13,k)
                   scale3 = 1.0d0
                   scale5 = 1.0d0
                   scale7 = 1.0d0
@@ -4439,28 +5302,28 @@ c
                   rr3 = scale3 / (r*r2)
                   rr5 = 3.0d0 * scale5 / (r*r2*r2)
                   rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
-                  dir = uxi*xr + uyi*yr + uzi*zr
-                  qix = qxxi*xr + qxyi*yr + qxzi*zr
-                  qiy = qxyi*xr + qyyi*yr + qyzi*zr
-                  qiz = qxzi*xr + qyzi*yr + qzzi*zr
+                  dir = dix*xr + diy*yr + diz*zr
+                  qix = qixx*xr + qixy*yr + qixz*zr
+                  qiy = qixy*xr + qiyy*yr + qiyz*zr
+                  qiz = qixz*xr + qiyz*yr + qizz*zr
                   qir = qix*xr + qiy*yr + qiz*zr
-                  dkr = uxk*xr + uyk*yr + uzk*zr
-                  qkx = qxxk*xr + qxyk*yr + qxzk*zr
-                  qky = qxyk*xr + qyyk*yr + qyzk*zr
-                  qkz = qxzk*xr + qyzk*yr + qzzk*zr
+                  dkr = dkx*xr + dky*yr + dkz*zr
+                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qky = qkxy*xr + qkyy*yr + qkyz*zr
+                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
                   qkr = qkx*xr + qky*yr + qkz*zr
                   fid(1) = -xr*(rr3*ck-rr5*dkr+rr7*qkr)
-     &                        - rr3*uxk + 2.0d0*rr5*qkx
+     &                        - rr3*dkx + 2.0d0*rr5*qkx
                   fid(2) = -yr*(rr3*ck-rr5*dkr+rr7*qkr)
-     &                        - rr3*uyk + 2.0d0*rr5*qky
+     &                        - rr3*dky + 2.0d0*rr5*qky
                   fid(3) = -zr*(rr3*ck-rr5*dkr+rr7*qkr)
-     &                        - rr3*uzk + 2.0d0*rr5*qkz
+     &                        - rr3*dkz + 2.0d0*rr5*qkz
                   fkd(1) = xr*(rr3*ci+rr5*dir+rr7*qir)
-     &                        - rr3*uxi - 2.0d0*rr5*qix
+     &                        - rr3*dix - 2.0d0*rr5*qix
                   fkd(2) = yr*(rr3*ci+rr5*dir+rr7*qir)
-     &                        - rr3*uyi - 2.0d0*rr5*qiy
+     &                        - rr3*diy - 2.0d0*rr5*qiy
                   fkd(3) = zr*(rr3*ci+rr5*dir+rr7*qir)
-     &                        - rr3*uzi - 2.0d0*rr5*qiz
+     &                        - rr3*diz - 2.0d0*rr5*qiz
                   do j = 1, 3
                      field(j,i) = field(j,i) + fid(j)*dscale(kk)
                      field(j,k) = field(j,k) + fkd(j)*dscale(kk)
@@ -4499,292 +5362,284 @@ c
          end do
       end do
 c
-c     find Poisson-Boltzmann reaction field due to permanent multipoles
-c
-      call pbempole
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (fields(3,npole))
-      allocate (fieldps(3,npole))
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-      allocate (udirs(3,npole))
-      allocate (udirps(3,npole))
-      allocate (uold(3,npole))
-      allocate (uoldp(3,npole))
-      allocate (uolds(3,npole))
-      allocate (uoldps(3,npole))
-      allocate (indpole(3,n))
-      allocate (inppole(3,n))
-c
-c     set vacuum induced dipoles to polarizability times direct field;
-c     SCRF induced dipoles are polarizability times direct field
-c     plus the reaction field due to permanent multipoles
-c
-      do i = 1, npole
-         ii = ipole(i)
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            udirs(j,i) = polarity(i) * (field(j,i)+pbep(j,ii))
-            udirps(j,i) = polarity(i) * (fieldp(j,i)+pbep(j,ii))
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-            uinds(j,i) = udirs(j,i)
-            uinps(j,i) = udirps(j,i)
-         end do
-      end do
-c
-c     set tolerances for computation of mutual induced dipoles
-c
-      if (poltyp .eq. 'MUTUAL') then
-         done = .false.
-         maxiter = 500
-         iter = 0
-         eps = 100.0d0
-c
-c     get mutual induced dipole moments by an iterative method
-c
-         do while (.not. done)
-            do i = 1, n
-               do j = 1, 3
-                  indpole(j,i) = 0.0d0
-                  inppole(j,i) = 0.0d0
-                  pbeuind(j,i) = 0.0d0
-                  pbeuinp(j,i) = 0.0d0
-               end do
-            end do
-            do i = 1, npole
-               ii = ipole(i)
-               do j = 1, 3
-                  indpole(j,ii) = uinds(j,i)
-                  inppole(j,ii) = uinps(j,i)
-               end do
-            end do
-            call apbsinduce (indpole,pbeuind)
-            call apbsnlinduce (inppole,pbeuinp)
-c
-c     compute intra-solute mutual polarization
-c
-            do i = 1, npole
-               do j = 1, 3
-                  field(j,i) = 0.0d0
-                  fieldp(j,i) = 0.0d0
-                  fields(j,i) = 0.0d0
-                  fieldps(j,i) = 0.0d0
-               end do
-            end do
-            do i = 1, npole
-               ii = ipole(i)
-               pdi = pdamp(i)
-               pti = thole(i)
-               duix = uind(1,i)
-               duiy = uind(2,i)
-               duiz = uind(3,i)
-               puix = uinp(1,i)
-               puiy = uinp(2,i)
-               puiz = uinp(3,i)
-               duixs = uinds(1,i)
-               duiys = uinds(2,i)
-               duizs = uinds(3,i)
-               puixs = uinps(1,i)
-               puiys = uinps(2,i)
-               puizs = uinps(3,i)
-               do j = 1, np11(ii)
-                  dscale(ip11(j,ii)) = u1scale
-               end do
-               do j = 1, np12(ii)
-                  dscale(ip12(j,ii)) = u2scale
-               end do
-               do j = 1, np13(ii)
-                  dscale(ip13(j,ii)) = u3scale
-               end do
-               do j = 1, np14(ii)
-                  dscale(ip14(j,ii)) = u4scale
-               end do
-               do k = i+1, npole
-                  kk = ipole(k)
-                  proceed = .true.
-                  if (use_intra)
-     &               call groups (proceed,fgrp,ii,kk,0,0,0,0)
-                  if (proceed) then
-                     xr = x(kk) - x(ii)
-                     yr = y(kk) - y(ii)
-                     zr = z(kk) - z(ii)
-                     xr2 = xr * xr
-                     yr2 = yr * yr
-                     zr2 = zr * zr
-                     r2 = xr2 + yr2 + zr2
-                     if (r2 .le. off2) then
-                        r = sqrt(r2)
-                        dukx = uind(1,k)
-                        duky = uind(2,k)
-                        dukz = uind(3,k)
-                        pukx = uinp(1,k)
-                        puky = uinp(2,k)
-                        pukz = uinp(3,k)
-                        dukxs = uinds(1,k)
-                        dukys = uinds(2,k)
-                        dukzs = uinds(3,k)
-                        pukxs = uinps(1,k)
-                        pukys = uinps(2,k)
-                        pukzs = uinps(3,k)
-                        scale3 = dscale(kk)
-                        scale5 = dscale(kk)
-                        damp = pdi * pdamp(k)
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(k))
-                           damp = -pgamma * (r/damp)**3
-                           if (damp .gt. -50.0d0) then
-                              expdamp = exp(damp)
-                              scale3 = scale3 * (1.0d0-expdamp)
-                              scale5 = scale5 * (1.0d0-(1.0d0-damp)
-     &                                              *expdamp)
-                           end if
-                        end if
-                        rr3 = scale3 / (r*r2)
-                        rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                        duir = xr*duix + yr*duiy + zr*duiz
-                        dukr = xr*dukx + yr*duky + zr*dukz
-                        puir = xr*puix + yr*puiy + zr*puiz
-                        pukr = xr*pukx + yr*puky + zr*pukz
-                        duirs = xr*duixs + yr*duiys + zr*duizs
-                        dukrs = xr*dukxs + yr*dukys + zr*dukzs
-                        puirs = xr*puixs + yr*puiys + zr*puizs
-                        pukrs = xr*pukxs + yr*pukys + zr*pukzs
-                        fid(1) = -rr3*dukx + rr5*dukr*xr
-                        fid(2) = -rr3*duky + rr5*dukr*yr
-                        fid(3) = -rr3*dukz + rr5*dukr*zr
-                        fkd(1) = -rr3*duix + rr5*duir*xr
-                        fkd(2) = -rr3*duiy + rr5*duir*yr
-                        fkd(3) = -rr3*duiz + rr5*duir*zr
-                        fip(1) = -rr3*pukx + rr5*pukr*xr
-                        fip(2) = -rr3*puky + rr5*pukr*yr
-                        fip(3) = -rr3*pukz + rr5*pukr*zr
-                        fkp(1) = -rr3*puix + rr5*puir*xr
-                        fkp(2) = -rr3*puiy + rr5*puir*yr
-                        fkp(3) = -rr3*puiz + rr5*puir*zr
-                        fids(1) = -rr3*dukxs + rr5*dukrs*xr
-                        fids(2) = -rr3*dukys + rr5*dukrs*yr
-                        fids(3) = -rr3*dukzs + rr5*dukrs*zr
-                        fkds(1) = -rr3*duixs + rr5*duirs*xr
-                        fkds(2) = -rr3*duiys + rr5*duirs*yr
-                        fkds(3) = -rr3*duizs + rr5*duirs*zr
-                        fips(1) = -rr3*pukxs + rr5*pukrs*xr
-                        fips(2) = -rr3*pukys + rr5*pukrs*yr
-                        fips(3) = -rr3*pukzs + rr5*pukrs*zr
-                        fkps(1) = -rr3*puixs + rr5*puirs*xr
-                        fkps(2) = -rr3*puiys + rr5*puirs*yr
-                        fkps(3) = -rr3*puizs + rr5*puirs*zr
-                        do j = 1, 3
-                           field(j,i) = field(j,i) + fid(j)
-                           field(j,k) = field(j,k) + fkd(j)
-                           fieldp(j,i) = fieldp(j,i) + fip(j)
-                           fieldp(j,k) = fieldp(j,k) + fkp(j)
-                           fields(j,i) = fields(j,i) + fids(j)
-                           fields(j,k) = fields(j,k) + fkds(j)
-                           fieldps(j,i) = fieldps(j,i) + fips(j)
-                           fieldps(j,k) = fieldps(j,k) + fkps(j)
-                        end do
-                     end if
-                  end if
-               end do
-c
-c     reset interaction scaling coefficients for connected atoms
-c
-               do j = 1, np11(ii)
-                  dscale(ip11(j,ii)) = 1.0d0
-               end do
-               do j = 1, np12(ii)
-                  dscale(ip12(j,ii)) = 1.0d0
-               end do
-               do j = 1, np13(ii)
-                  dscale(ip13(j,ii)) = 1.0d0
-               end do
-               do j = 1, np14(ii)
-                  dscale(ip14(j,ii)) = 1.0d0
-               end do
-            end do
-c
-c     check to see if the mutual induced dipoles have converged
-c
-            iter = iter + 1
-            epsold = eps
-            epsd = 0.0d0
-            epsp = 0.0d0
-            epsds = 0.0d0
-            epsps = 0.0d0
-            do i = 1, npole
-               ii = ipole(i)
-               do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uoldp(j,i) = uinp(j,i)
-                  uolds(j,i) = uinds(j,i)
-                  uoldps(j,i) = uinps(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
-                  uinds(j,i) = udirs(j,i) + polarity(i)
-     &                              *(fields(j,i)+pbeuind(j,ii))
-                  uinps(j,i) = udirps(j,i) + polarity(i)
-     &                              *(fieldps(j,i)+pbeuinp(j,ii))
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  uinp(j,i) = uoldp(j,i) + polsor*(uinp(j,i)-uoldp(j,i))
-                  uinds(j,i) = uolds(j,i) + polsor
-     &                              *(uinds(j,i)-uolds(j,i))
-                  uinps(j,i) = uoldps(j,i) + polsor
-     &                              *(uinps(j,i)-uoldps(j,i))
-                  epsd = epsd + (uind(j,i)-uold(j,i))**2
-                  epsp = epsp + (uinp(j,i)-uoldp(j,i))**2
-                  epsds = epsds + (uinds(j,i)-uolds(j,i))**2
-                  epsps = epsps + (uinps(j,i)-uoldps(j,i))**2
-               end do
-            end do
-            eps = max(epsd,epsp,epsds,epsps)
-            eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
-               if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
-     &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
-               end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
-            end if
-            if (eps .lt. poleps)  done = .true.
-            if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
-         end do
-c
-c     terminate the calculation if dipoles failed to converge
-c
-         if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,30)
-   30       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
-         end if
-      end if
-c
 c     perform deallocation of some local arrays
 c
       deallocate (dscale)
       deallocate (pscale)
-      deallocate (field)
-      deallocate (fieldp)
-      deallocate (fields)
-      deallocate (fieldps)
-      deallocate (udir)
-      deallocate (udirp)
-      deallocate (udirs)
-      deallocate (udirps)
-      deallocate (uold)
-      deallocate (uoldp)
-      deallocate (uolds)
-      deallocate (uoldps)
+c
+c     find the Poisson-Boltzmann reaction field at each site
+c
+      call pbempole
+c
+c     combine permanent multipole field and PB reaction field
+c
+      do i = 1, npole
+         ii = ipole(i)
+         do j = 1, 3
+            fields(j,i) = field(j,i) + pbep(j,ii)
+            fieldps(j,i) = fieldp(j,i) + pbep(j,ii)
+         end do
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ufield0e  --  Poisson-Boltzmann mutual field  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ufield0e" computes the mutual electrostatic field due to
+c     induced dipole moments via a Poisson-Boltzmann solver
+c
+c
+      subroutine ufield0e (field,fieldp,fields,fieldps)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'group.i'
+      include 'mpole.i'
+      include 'pbstuf.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'shunt.i'
+      include 'solute.i'
+      integer i,j,k,ii,kk
+      real*8 xr,yr,zr
+      real*8 xr2,yr2,zr2
+      real*8 fgrp,r,r2
+      real*8 rr3,rr5
+      real*8 duix,duiy,duiz
+      real*8 puix,puiy,puiz
+      real*8 dukx,duky,dukz
+      real*8 pukx,puky,pukz
+      real*8 duir,puir
+      real*8 dukr,pukr
+      real*8 duixs,duiys,duizs
+      real*8 puixs,puiys,puizs
+      real*8 dukxs,dukys,dukzs
+      real*8 pukxs,pukys,pukzs
+      real*8 duirs,puirs
+      real*8 dukrs,pukrs
+      real*8 damp,expdamp
+      real*8 scale3,scale5
+      real*8 pdi,pti,pgamma
+      real*8 fid(3),fkd(3)
+      real*8 fip(3),fkp(3)
+      real*8 fids(3),fkds(3)
+      real*8 fips(3),fkps(3)
+      real*8 field(3,*)
+      real*8 fieldp(3,*)
+      real*8 fields(3,*)
+      real*8 fieldps(3,*)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: indpole(:,:)
+      real*8, allocatable :: inppole(:,:)
+      logical proceed
+c
+c
+c     zero out the value of the field at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+            fields(j,i) = 0.0d0
+            fieldps(j,i) = 0.0d0
+         end do
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dscale(n))
+c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         dscale(i) = 1.0d0
+      end do
+c
+c     compute the mutual electrostatic field at each atom,
+c     and another field including RF due to induced dipoles
+c
+      do i = 1, npole
+         ii = ipole(i)
+         pdi = pdamp(i)
+         pti = thole(i)
+         duix = uind(1,i)
+         duiy = uind(2,i)
+         duiz = uind(3,i)
+         puix = uinp(1,i)
+         puiy = uinp(2,i)
+         puiz = uinp(3,i)
+         duixs = uinds(1,i)
+         duiys = uinds(2,i)
+         duizs = uinds(3,i)
+         puixs = uinps(1,i)
+         puiys = uinps(2,i)
+         puizs = uinps(3,i)
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = u1scale
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = u2scale
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = u3scale
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = u4scale
+         end do
+         do k = i+1, npole
+            kk = ipole(k)
+            proceed = .true.
+            if (use_intra)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (proceed) then
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               xr2 = xr * xr
+               yr2 = yr * yr
+               zr2 = zr * zr
+               r2 = xr2 + yr2 + zr2
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  dukx = uind(1,k)
+                  duky = uind(2,k)
+                  dukz = uind(3,k)
+                  pukx = uinp(1,k)
+                  puky = uinp(2,k)
+                  pukz = uinp(3,k)
+                  dukxs = uinds(1,k)
+                  dukys = uinds(2,k)
+                  dukzs = uinds(3,k)
+                  pukxs = uinps(1,k)
+                  pukys = uinps(2,k)
+                  pukzs = uinps(3,k)
+                  scale3 = dscale(kk)
+                  scale5 = dscale(kk)
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(k))
+                     damp = -pgamma * (r/damp)**3
+                     if (damp .gt. -50.0d0) then
+                        expdamp = exp(damp)
+                        scale3 = scale3 * (1.0d0-expdamp)
+                        scale5 = scale5 * (1.0d0-(1.0d0-damp)*expdamp)
+                     end if
+                  end if
+                  rr3 = scale3 / (r*r2)
+                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                  duir = xr*duix + yr*duiy + zr*duiz
+                  dukr = xr*dukx + yr*duky + zr*dukz
+                  puir = xr*puix + yr*puiy + zr*puiz
+                  pukr = xr*pukx + yr*puky + zr*pukz
+                  duirs = xr*duixs + yr*duiys + zr*duizs
+                  dukrs = xr*dukxs + yr*dukys + zr*dukzs
+                  puirs = xr*puixs + yr*puiys + zr*puizs
+                  pukrs = xr*pukxs + yr*pukys + zr*pukzs
+                  fid(1) = -rr3*dukx + rr5*dukr*xr
+                  fid(2) = -rr3*duky + rr5*dukr*yr
+                  fid(3) = -rr3*dukz + rr5*dukr*zr
+                  fkd(1) = -rr3*duix + rr5*duir*xr
+                  fkd(2) = -rr3*duiy + rr5*duir*yr
+                  fkd(3) = -rr3*duiz + rr5*duir*zr
+                  fip(1) = -rr3*pukx + rr5*pukr*xr
+                  fip(2) = -rr3*puky + rr5*pukr*yr
+                  fip(3) = -rr3*pukz + rr5*pukr*zr
+                  fkp(1) = -rr3*puix + rr5*puir*xr
+                  fkp(2) = -rr3*puiy + rr5*puir*yr
+                  fkp(3) = -rr3*puiz + rr5*puir*zr
+                  fids(1) = -rr3*dukxs + rr5*dukrs*xr
+                  fids(2) = -rr3*dukys + rr5*dukrs*yr
+                  fids(3) = -rr3*dukzs + rr5*dukrs*zr
+                  fkds(1) = -rr3*duixs + rr5*duirs*xr
+                  fkds(2) = -rr3*duiys + rr5*duirs*yr
+                  fkds(3) = -rr3*duizs + rr5*duirs*zr
+                  fips(1) = -rr3*pukxs + rr5*pukrs*xr
+                  fips(2) = -rr3*pukys + rr5*pukrs*yr
+                  fips(3) = -rr3*pukzs + rr5*pukrs*zr
+                  fkps(1) = -rr3*puixs + rr5*puirs*xr
+                  fkps(2) = -rr3*puiys + rr5*puirs*yr
+                  fkps(3) = -rr3*puizs + rr5*puirs*zr
+                  do j = 1, 3
+                     field(j,i) = field(j,i) + fid(j)
+                     field(j,k) = field(j,k) + fkd(j)
+                     fieldp(j,i) = fieldp(j,i) + fip(j)
+                     fieldp(j,k) = fieldp(j,k) + fkp(j)
+                     fields(j,i) = fields(j,i) + fids(j)
+                     fields(j,k) = fields(j,k) + fkds(j)
+                     fieldps(j,i) = fieldps(j,i) + fips(j)
+                     fieldps(j,k) = fieldps(j,k) + fkps(j)
+                  end do
+               end if
+            end if
+         end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = 1.0d0
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (indpole(3,n))
+      allocate (inppole(3,n))
+c
+c     zero out the PB reaction field at each atomic site
+c
+      do i = 1, n
+         do j = 1, 3
+            indpole(j,i) = 0.0d0
+            inppole(j,i) = 0.0d0
+            pbeuind(j,i) = 0.0d0
+            pbeuinp(j,i) = 0.0d0
+         end do
+      end do
+c
+c     find the Poisson-Boltzmann reaction field at each site
+c
+      do i = 1, npole
+         ii = ipole(i)
+         do j = 1, 3
+            indpole(j,ii) = uinds(j,i)
+            inppole(j,ii) = uinps(j,i)
+         end do
+      end do
+      call apbsinduce (indpole,pbeuind)
+      call apbsnlinduce (inppole,pbeuinp)
+c
+c     perform deallocation of some local arrays
+c
       deallocate (indpole)
       deallocate (inppole)
+c
+c     combine mutual induced dipole field and PB reaction field
+c
+      do i = 1, npole
+         ii = ipole(i)
+         do j = 1, 3
+            fields(j,i) = fields(j,i) + pbeuind(j,ii)
+            fieldps(j,i) = fieldps(j,i) + pbeuinp(j,ii)
+         end do
+      end do
       return
       end

@@ -21,7 +21,6 @@ radiussize              DIAMETER
 epsilonrule             HHG
 dielectric              1.0
 polarization            MUTUAL
-polar-sor               0.75
 
 
       #############################

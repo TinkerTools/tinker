@@ -179,8 +179,12 @@ c
       if (use_pred) then
          if (associated(udalt))  deallocate (udalt)
          if (associated(upalt))  deallocate (upalt)
+         if (associated(usalt))  deallocate (usalt)
+         if (associated(upsalt))  deallocate (upsalt)
          allocate (udalt(maxualt,3,n))
          allocate (upalt(maxualt,3,n))
+         allocate (usalt(maxualt,3,n))
+         allocate (upsalt(maxualt,3,n))
 c
 c     set Gear predictor binomial coefficients
 c
@@ -217,6 +221,8 @@ c
                do k = 1, maxualt
                   udalt(k,j,i) = 0.0d0
                   upalt(k,j,i) = 0.0d0
+                  usalt(k,j,i) = 0.0d0
+                  upsalt(k,j,i) = 0.0d0
                end do
             end do
          end do

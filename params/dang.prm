@@ -15,7 +15,6 @@ radiussize              DIAMETER
 epsilonrule             GEOMETRIC
 dielectric              1.0
 polarization            MUTUAL
-polar-sor               0.75
 mutual-11-scale         0.0
 
 

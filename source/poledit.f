@@ -63,7 +63,7 @@ c
          call setframe
          call rotframe
          call setpolar
-         call intrapol
+         call alterpol
          call fixpolar
          call prtpolar
       else if (mode .eq. 2) then
@@ -82,7 +82,7 @@ c
          call katom
          call kmpole
          call kpolar
-         call intrapol
+         call alterpol
          call fixpolar
          call prtpolar
       end if
@@ -1498,12 +1498,12 @@ c
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine intrapol  --  alter multipoles for polarization  ##
+c     ##  subroutine alterpol  --  alter multipoles for polarization  ##
 c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "intrapol" finds an output set of TINKER multipole parameters
+c     "alterpol" finds an output set of TINKER multipole parameters
 c     which when used with an intergroup polarization model will
 c     give the same electrostatic potential around the molecule as
 c     the input set of multipole parameters with all atoms in one
@@ -1515,7 +1515,7 @@ c     will be the parameter values that achieve the same potential
 c     in the presence of intergroup (intramolecular) polarization
 c
 c
-      subroutine intrapol
+      subroutine alterpol
       implicit none
       include 'sizes.i'
       include 'atmtyp.i'
@@ -1539,7 +1539,7 @@ c
 c
 c     compute induced dipoles to be removed from QM multipoles
 c
-      call intrapol1
+      call interpol
 c
 c     remove induced dipole from global frame multipoles
 c
@@ -1619,53 +1619,37 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine intrapol1  --  induced dipoles via double loop  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine interpol  --  get intergroup induced dipoles  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "intrapol1" is a service routine that computes induced dipole
+c     "interpol" is a service routine that computes induced dipole
 c     moments for use during removal of intergroup polarization
 c
 c
-      subroutine intrapol1
+      subroutine interpol
       implicit none
       include 'sizes.i'
       include 'atoms.i'
       include 'iounit.i'
       include 'mpole.i'
       include 'polar.i'
-      include 'polgrp.i'
       include 'polpot.i'
-      include 'potent.i'
       include 'units.i'
-      integer i,j,k,ii,kk
-      integer iter,maxiter
-      real*8 r,r2,xr,yr,zr
-      real*8 rr3,rr5,rr7
-      real*8 pdi,pti,pgamma
-      real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
-      real*8 qixx,qixy,qixz
-      real*8 qiyy,qiyz,qizz
-      real*8 ck,dkx,dky,dkz
-      real*8 ukx,uky,ukz
-      real*8 qkxx,qkxy,qkxz
-      real*8 qkyy,qkyz,qkzz
-      real*8 dir,uir,dkr,ukr
-      real*8 qix,qiy,qiz,qir
-      real*8 qkx,qky,qkz,qkr
+      integer i,j,k,iter
+      integer maxiter
       real*8 eps,epsold
-      real*8 damp,norm
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 fi(3),fk(3)
+      real*8 a,b,sum
+      real*8 norm,denom
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: field(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: usav(:,:)
       logical done
 c
 c
@@ -1673,8 +1657,174 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
       allocate (field(3,npole))
-      allocate (udir(3,npole))
-      allocate (uold(3,npole))
+      allocate (rsd(3,npole))
+      allocate (conj(3,npole))
+      allocate (vec(3,npole))
+      allocate (usav(3,npole))
+c
+c     compute induced dipoles as polarizability times field
+c
+      call dfieldi (field,pscale)
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = polarity(i) * field(j,i)
+         end do
+      end do
+c
+c     for direct-only models set mutual scale factors to zero
+c
+      if (poltyp .eq. 'DIRECT') then
+         u1scale = 0.0d0
+         u2scale = 0.0d0
+         u3scale = 0.0d0
+         u4scale = 0.0d0
+      end if
+c
+c     compute intergroup induced dipole moments via CG algorithm
+c
+      done = .false.
+      maxiter = 500
+      iter = 0
+      eps = 100.0d0
+      call ufieldi (field,pscale)
+      do i = 1, npole
+         do j = 1, 3
+            rsd(j,i) = field(j,i)
+            conj(j,i) = rsd(j,i)
+         end do
+      end do
+c
+c     iterate the intergroup induced dipoles and check convergence
+c
+      do while (.not. done)
+         iter = iter + 1
+         do i = 1, npole
+            do j = 1, 3
+               usav(j,i) = uind(j,i)
+               uind(j,i) = conj(j,i)
+            end do
+         end do
+         call ufieldi (field,pscale)
+         do i = 1, npole
+            do j = 1, 3
+               uind(j,i) = usav(j,i)
+               vec(j,i) = -field(j,i)
+            end do
+         end do
+         sum = 0.0d0
+         denom = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+               sum = sum + rsd(j,i)*rsd(j,i)
+               denom = denom + conj(j,i)*vec(j,i)
+            end do
+         end do
+         a = sum / denom
+         eps = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               rsd(j,i) = rsd(j,i) - a*vec(j,i)
+               eps = eps + rsd(j,i)*rsd(j,i)
+            end do
+         end do
+         b = eps / sum
+         eps = debye * sqrt(eps/dble(npolar))
+         do i = 1, npole
+            do j = 1, 3
+               uind(j,i) = uind(j,i) + a*conj(j,i)
+               conj(j,i) = rsd(j,i) + b*conj(j,i)
+            end do
+         end do
+         epsold = eps
+         if (iter .eq. 1) then
+            write (iout,10)
+   10       format (/,' Determination of Intergroup Induced',
+     &                 ' Dipoles :',
+     &              //,4x,'Iter',8x,'RMS Change (Debyes)',/)
+         end if
+         write (iout,20)  iter,eps
+   20    format (i8,7x,f16.10)
+         if (eps .lt. poleps)  done = .true.
+         if (eps .gt. epsold)  done = .true.
+         if (iter .ge. maxiter)  done = .true.
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pscale)
+      deallocate (field)
+      deallocate (rsd)
+      deallocate (conj)
+      deallocate (vec)
+      deallocate (usav)
+c
+c     terminate the calculation if dipoles failed to converge
+c
+      if (eps .gt. poleps) then
+         write (iout,30)
+   30    format (/,' INTERPOL  --  Warning, Induced Dipoles',
+     &              ' are not Converged')
+         call prterr
+         call fatal
+      end if
+c
+c     print out a list of the final induced dipole moments
+c
+      write (iout,40)
+   40 format (/,' Intergroup Induced Dipoles to be Removed',
+     &           ' (Debyes) :')
+      write (iout,50)
+   50 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
+     &           9x,'Total'/)
+      do i = 1, npole
+         k = ipole(i)
+         norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
+         write (iout,60)  k,(debye*uind(j,i),j=1,3),debye*norm
+   60    format (i8,5x,4f12.4)
+      end do
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine dfieldi  --  find permanent multipole field  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "dfieldi" computes the electrostatic field due to permanent
+c     multipole moments
+c
+c
+      subroutine dfieldi (field,pscale)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      integer i,j,k,ii,kk
+      real*8 r,r2,xr,yr,zr
+      real*8 rr3,rr5,rr7
+      real*8 pdi,pti,pgamma
+      real*8 ci,dix,diy,diz
+      real*8 qixx,qixy,qixz
+      real*8 qiyy,qiyz,qizz
+      real*8 ck,dkx,dky,dkz
+      real*8 qkxx,qkxy,qkxz
+      real*8 qkyy,qkyz,qkzz
+      real*8 dir,dkr
+      real*8 qix,qiy,qiz,qir
+      real*8 qkx,qky,qkz,qkr
+      real*8 scale3,scale5
+      real*8 scale7,damp
+      real*8 fi(3),fk(3)
+      real*8 pscale(*)
+      real*8 field(3,*)
+c
 c
 c     zero out the induced dipole and the field at each site
 c
@@ -1685,7 +1835,7 @@ c
          end do
       end do
 c
-c     compute the direct induced dipole moment at each atom
+c     compute the electrostatic field due to permanent multipoles
 c
       do i = 1, npole-1
          ii = ipole(i)
@@ -1778,161 +1928,110 @@ c
             end do
          end do
       end do
+      return
+      end
 c
-c     compute induced dipoles as polarizability times field
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine ufieldi  --  find induced intergroup field  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "ufieldi" computes the electrostatic field due to intergroup
+c     induced dipole moments
+c
+c
+      subroutine ufieldi (field,pscale)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      integer i,j,k,ii,kk
+      real*8 xr,yr,zr
+      real*8 r,r2,rr3,rr5
+      real*8 pdi,pti,pgamma
+      real*8 uix,uiy,uiz
+      real*8 ukx,uky,ukz
+      real*8 uir,ukr,damp
+      real*8 scale3,scale5
+      real*8 fi(3),fk(3)
+      real*8 pscale(*)
+      real*8 field(3,*)
+c
+c
+c     zero out the value of the field at each site
 c
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = polarity(i) * field(j,i)
+            field(j,i) = 0.0d0
          end do
       end do
 c
-c     for direct-only models set mutual scale factors to zero
+c     find the electrostatic field due to induced dipoles
 c
-      if (poltyp .eq. 'DIRECT') then
-         u1scale = 0.0d0
-         u2scale = 0.0d0
-         u3scale = 0.0d0
-         u4scale = 0.0d0
-      end if
-c
-c     set tolerances for computation of mutual induced dipoles
-c
-      done = .false.
-      maxiter = 500
-      iter = 0
-      eps = 1.0d0
-      do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = uind(j,i)
+      do i = 1, npole-1
+         ii = ipole(i)
+         pdi = pdamp(i)
+         pti = thole(i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
+         do j = i+1, npole
+            pscale(ipole(j)) = 0.0d0
          end do
-      end do
-c
-c     compute mutual induced dipole moments by an iterative method
-c
-      do while (.not. done)
-         do i = 1, npole
-            do j = 1, 3
-               field(j,i) = 0.0d0
-            end do
+         do j = 1, np11(ii)
+            pscale(ip11(j,ii)) = u1scale - d1scale
          end do
-         do i = 1, npole-1
-            ii = ipole(i)
-            pdi = pdamp(i)
-            pti = thole(i)
-            uix = uind(1,i)
-            uiy = uind(2,i)
-            uiz = uind(3,i)
-            do j = i+1, npole
-               pscale(ipole(j)) = 0.0d0
-            end do
-            do j = 1, np11(ii)
-               pscale(ip11(j,ii)) = u1scale - d1scale
-            end do
-            do j = 1, np12(ii)
-               pscale(ip12(j,ii)) = u2scale - d2scale
-            end do
-            do j = 1, np13(ii)
-               pscale(ip13(j,ii)) = u3scale - d3scale
-            end do
-            do j = 1, np14(ii)
-               pscale(ip14(j,ii)) = u4scale - d4scale
-            end do
-            do k = i+1, npole
-               kk = ipole(k)
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
-               r2 = xr*xr + yr* yr + zr*zr
-               r = sqrt(r2)
-               ukx = uind(1,k)
-               uky = uind(2,k)
-               ukz = uind(3,k)
-               scale3 = pscale(kk)
-               scale5 = pscale(kk)
-               damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     scale3 = scale3*(1.0d0-exp(damp))
-                     scale5 = scale5*(1.0d0-(1.0d0-damp)*exp(damp))
-                  end if
+         do j = 1, np12(ii)
+            pscale(ip12(j,ii)) = u2scale - d2scale
+         end do
+         do j = 1, np13(ii)
+            pscale(ip13(j,ii)) = u3scale - d3scale
+         end do
+         do j = 1, np14(ii)
+            pscale(ip14(j,ii)) = u4scale - d4scale
+         end do
+         do k = i+1, npole
+            kk = ipole(k)
+            xr = x(kk) - x(ii)
+            yr = y(kk) - y(ii)
+            zr = z(kk) - z(ii)
+            r2 = xr*xr + yr* yr + zr*zr
+            r = sqrt(r2)
+            ukx = uind(1,k)
+            uky = uind(2,k)
+            ukz = uind(3,k)
+            scale3 = pscale(kk)
+            scale5 = pscale(kk)
+            damp = pdi * pdamp(k)
+            if (damp .ne. 0.0d0) then
+               pgamma = min(pti,thole(k))
+               damp = -pgamma * (r/damp)**3
+               if (damp .gt. -50.0d0) then
+                  scale3 = scale3*(1.0d0-exp(damp))
+                  scale5 = scale5*(1.0d0-(1.0d0-damp)*exp(damp))
                end if
-               rr3 = scale3 / (r*r2)
-               rr5 = 3.0d0 * scale5 / (r*r2*r2)
-               uir = xr*uix + yr*uiy + zr*uiz
-               ukr = xr*ukx + yr*uky + zr*ukz
-               fi(1) = -rr3*ukx + rr5*ukr*xr
-               fi(2) = -rr3*uky + rr5*ukr*yr
-               fi(3) = -rr3*ukz + rr5*ukr*zr
-               fk(1) = -rr3*uix + rr5*uir*xr
-               fk(2) = -rr3*uiy + rr5*uir*yr
-               fk(3) = -rr3*uiz + rr5*uir*zr
-               do j = 1, 3
-                  field(j,i) = field(j,i) + fi(j)
-                  field(j,k) = field(j,k) + fk(j)
-               end do
-            end do
-         end do
-c
-c     check to see if the mutual induced dipoles have converged
-c
-         iter = iter + 1
-         epsold = eps
-         eps = 0.0d0
-         do i = 1, npole
+            end if
+            rr3 = scale3 / (r*r2)
+            rr5 = 3.0d0 * scale5 / (r*r2*r2)
+            uir = xr*uix + yr*uiy + zr*uiz
+            ukr = xr*ukx + yr*uky + zr*ukz
+            fi(1) = -rr3*ukx + rr5*ukr*xr
+            fi(2) = -rr3*uky + rr5*ukr*yr
+            fi(3) = -rr3*ukz + rr5*ukr*zr
+            fk(1) = -rr3*uix + rr5*uir*xr
+            fk(2) = -rr3*uiy + rr5*uir*yr
+            fk(3) = -rr3*uiz + rr5*uir*zr
             do j = 1, 3
-               uold(j,i) = uind(j,i)
-               uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-               uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-               eps = eps + (uind(j,i)-uold(j,i))**2
+               field(j,i) = field(j,i) + fi(j)
+               field(j,k) = field(j,k) + fk(j)
             end do
          end do
-         eps = debye * sqrt(eps/dble(npolar))
-         if (iter .eq. 1) then
-            write (iout,10)
-   10       format (/,' Determination of Intergroup Induced',
-     &                 ' Dipoles :',
-     &              //,4x,'Iter',8x,'RMS Change (Debyes)',/)
-         end if
-         write (iout,20)  iter,eps
-   20    format (i8,7x,f16.10)
-         if (eps .lt. poleps)  done = .true.
-         if (eps .gt. epsold)  done = .true.
-         if (iter .ge. maxiter)  done = .true.
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (pscale)
-      deallocate (field)
-      deallocate (udir)
-      deallocate (uold)
-c
-c     terminate the calculation if dipoles failed to converge
-c
-      if (eps .gt. poleps) then
-         write (iout,30)
-   30    format (/,' INTRAPOL1  --  Warning, Induced Dipoles',
-     &              ' are not Converged')
-         call prterr
-         call fatal
-      end if
-c
-c     print out a list of the final induced dipole moments
-c
-      write (iout,40)
-   40 format (/,' Intergroup Induced Dipoles to be Removed',
-     &           ' (Debyes) :')
-      write (iout,50)
-   50 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
-     &           9x,'Total'/)
-      do i = 1, npole
-         k = ipole(i)
-         norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
-         write (iout,60)  k,(debye*uind(j,i),j=1,3),debye*norm
-   60    format (i8,5x,4f12.4)
       end do
       return
       end

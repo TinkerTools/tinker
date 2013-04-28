@@ -77,6 +77,8 @@ c
       if (associated(qfac))  deallocate (qfac)
       if (associated(udalt))  deallocate (udalt)
       if (associated(upalt))  deallocate (upalt)
+      if (associated(usalt))  deallocate (usalt)
+      if (associated(upsalt))  deallocate (upsalt)
       if (associated(iuse))  deallocate (iuse)
       if (associated(use))  deallocate (use)
       if (associated(phi))  deallocate (phi)

@@ -148,11 +148,14 @@ c
       integer i,j,iter
       integer maxiter
       real*8 eps,epsold
+      real*8 a,b,sum,denom
       real*8 umol(3)
       real*8 exfield(3)
       real*8, allocatable :: field(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: uold(:,:)
+      real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: conj(:,:)
+      real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: usav(:,:)
       logical done
 c
 c
@@ -167,38 +170,69 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (field(3,npole))
-      allocate (udir(3,npole))
-      allocate (uold(3,npole))
+      allocate (rsd(3,npole))
+      allocate (conj(3,npole))
+      allocate (vec(3,npole))
+      allocate (usav(3,npole))
 c
-c     compute mutual induced dipole moments by an iterative method
+c     compute mutual induced dipole moments via CG algorithm
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
          maxiter = 500
          iter = 0
-         eps = 1.0d0
+         eps = 100.0d0
+         call ufield (field)
          do i = 1, npole
             do j = 1, 3
-               udir(j,i) = uind(j,i)
+               rsd(j,i) = field(j,i)
+               conj(j,i) = rsd(j,i)
             end do
          end do
 c
-c     check to see if the mutual induced dipoles have converged
+c     iterate the mutual induced dipoles and check convergence
 c
          do while (.not. done)
-            call ufield (field)
             iter = iter + 1
-            epsold = eps
+            do i = 1, npole
+               do j = 1, 3
+                  usav(j,i) = uind(j,i)
+                  uind(j,i) = conj(j,i)
+               end do
+            end do
+            call ufield (field)
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = usav(j,i)
+                  vec(j,i) = -field(j,i)
+               end do
+            end do
+            sum = 0.0d0
+            denom = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
+                  sum = sum + rsd(j,i)*rsd(j,i)
+                  denom = denom + conj(j,i)*vec(j,i)
+               end do
+            end do
+            a = sum / denom
             eps = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  uold(j,i) = uind(j,i)
-                  uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
-                  uind(j,i) = uold(j,i) + polsor*(uind(j,i)-uold(j,i))
-                  eps = eps + (uind(j,i)-uold(j,i))**2
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  eps = eps + rsd(j,i)*rsd(j,i)
                end do
             end do
+            b = eps / sum
             eps = debye * sqrt(eps/dble(npolar))
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + a*conj(j,i)
+                  conj(j,i) = rsd(j,i) + b*conj(j,i)
+               end do
+            end do
+            epsold = eps
             if (debug) then
                if (iter .eq. 1) then
                   write (iout,10)
@@ -237,8 +271,10 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (field)
-      deallocate (udir)
-      deallocate (uold)
+      deallocate (rsd)
+      deallocate (conj)
+      deallocate (vec)
+      deallocate (usav)
       return
       end
 c

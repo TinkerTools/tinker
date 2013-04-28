@@ -54,7 +54,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      maxiter = 100
+      maxiter = 500
       allocate (rms(0:maxiter))
       allocate (drms(maxiter))
       allocate (uexact(3,n))
@@ -88,19 +88,20 @@ c
                ustore(j,i,k) = debye * uind(j,i)
             end do
          end do
-      end do
 c
 c     find the RMS difference per atom between iterations
 c
-      do k = 1, maxiter
          sum = 0.0d0
          do i = 1, n
             do j = 1, 3
                sum = sum + (ustore(j,i,k)-ustore(j,i,k-1))**2
             end do
          end do
-         drms(k) = sqrt(sum/dble(n)) 
+         drms(k) = sqrt(sum/dble(npolar))
+         if (drms(k) .lt. 0.5d0*poleps)  goto 10
       end do
+   10 continue
+      maxiter = politer
 c
 c     find the RMS of each iteration from converged dipoles
 c
@@ -116,22 +117,22 @@ c
                sum = sum + (ustore(j,i,k)-uexact(j,i))**2
             end do
          end do
-         rms(k) = sqrt(sum/dble(n)) 
+         rms(k) = sqrt(sum/dble(npolar))
       end do
 c
 c     print the RMS between iterations and to converged dipoles
 c
-      write (iout,10)
-   10 format (/,' Convergence of Induced Dipole Moments :',
+      write (iout,20)
+   20 format (/,' Convergence of Induced Dipole Moments :',
      &        //,2x,'Iteration',10x,'RMS Change',11x,'RMS vs Final')
-      write (iout,20)  0,rms(0)
-   20 format (/,i8,16x,'----',6x,f20.10)
+      write (iout,30)  0,rms(0)
+   30 format (/,i8,16x,'----',6x,f20.10)
       do k = 1, maxiter
-         write (iout,30)  k,drms(k),rms(k)
-   30    format (i8,3x,f20.10,3x,f20.10)
-         if (rms(k) .lt. 0.5d0*poleps)  goto 40
+         write (iout,40)  k,drms(k),rms(k)
+   40    format (i8,3x,f20.10,3x,f20.10)
+         if (rms(k) .lt. 0.5d0*poleps)  goto 50
       end do
-   40 continue
+   50 continue
 c
 c     perform deallocation of some local arrays
 c
