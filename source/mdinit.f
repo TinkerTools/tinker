@@ -66,6 +66,7 @@ c
       friction = 91.0d0
       use_sdarea = .false.
       use_pred = .false.
+      polpred = 'LSQR'
       iprint = 100
 c
 c     set default values for temperature and pressure control
@@ -119,6 +120,8 @@ c
             use_sdarea = .true.
          else if (keyword(1:14) .eq. 'POLAR-PREDICT ') then
             use_pred = .true.
+            call getword (record,polpred,next)
+            call upcase (polpred)
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)
@@ -186,32 +189,25 @@ c
          allocate (usalt(maxualt,3,n))
          allocate (upsalt(maxualt,3,n))
 c
-c     set Gear predictor binomial coefficients
+c     set the Gear predictor binomial coefficients
 c
-c        bpred(1) = 6.0d0
-c        bpred(2) = -15.0d0
-c        bpred(3) = 20.0d0
-c        bpred(4) = -15.0d0
-c        bpred(5) = 6.0d0
-c        bpred(6) = -1.0d0
+         gear(1) = 6.0d0
+         gear(2) = -15.0d0
+         gear(3) = 20.0d0
+         gear(4) = -15.0d0
+         gear(5) = 6.0d0
+         gear(6) = -1.0d0
+         gear(7) = 0.0d0
 c
 c     set always stable predictor-corrector (ASPC) coefficients
 c
-         bpred(1) = 22.0d0 / 7.0d0
-         bpred(2) = -55.0d0 / 14.0d0
-         bpred(3) = 55.0d0 / 21.0d0
-         bpred(4) = -22.0d0 / 21.0d0
-         bpred(5) = 5.0d0 / 21.0d0
-         bpred(6) = -1.0d0 / 42.0d0
-c
-c     set Challacombe time-reversible coefficients
-c
-c        bpred(1) = 30.0d0 / 13.0d0
-c        bpred(2) = -3.0d0 / 13.0d0
-c        bpred(3) = -28.0d0 / 13.0d0
-c        bpred(4) = -3.0d0 / 13.0d0
-c        bpred(5) = 30.0d0 / 13.0d0
-c        bpred(6) = -1.0d0
+         aspc(1) = 22.0d0 / 7.0d0
+         aspc(2) = -55.0d0 / 14.0d0
+         aspc(3) = 55.0d0 / 21.0d0
+         aspc(4) = -22.0d0 / 21.0d0
+         aspc(5) = 5.0d0 / 21.0d0
+         aspc(6) = -1.0d0 / 42.0d0
+         aspc(7) = 0.0d0
 c
 c    initialize prior values of induced dipole moments
 c

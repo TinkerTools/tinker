@@ -169,6 +169,117 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
+c     ##  subroutine ulspred  --  induced dipole prediction coeffs  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "ulspred" standard extrapolation values or a least squares fit
+c     to set coefficients of an induced dipole predictor polynomial
+c
+c     literature references:
+c
+c     J. Kolafa, "Time-Reversible Always Stable Predictor-Corrector
+c     Method for Molecular Dynamics of Polarizable Molecules", Journal
+c     of Computational Chemistry, 25, 335-342 (2004)
+c
+c     W. Wang and R. D. Skeel, "Fast Evaluation of Polarizable Forces",
+c     Journal of Chemical Physics, 123, 164107 (2005)
+c
+c
+      subroutine ulspred
+      implicit none
+      include 'sizes.i'
+      include 'mpole.i'
+      include 'uprior.i'
+      integer i,j,k,m
+      real*8 coeff,udk,upk
+      real*8 b(maxualt)
+      real*8 bp(maxualt)
+      real*8 a(maxualt*(maxualt+1)/2)
+      real*8 ap(maxualt*(maxualt+1)/2)
+      real*8 c(maxualt,maxualt)
+      real*8 cp(maxualt,maxualt)
+c
+c
+c     set the Gear predictor binomial coefficients
+c
+      if (polpred .eq. 'GEAR') then
+         do i = 1, nualt
+            coeff = gear(i)
+            bpred(i) = coeff
+            bpredp(i) = coeff
+            bpreds(i) = coeff
+            bpredps(i) = coeff
+         end do
+c
+c     set always stable predictor-corrector (ASPC) coefficients
+c
+      else if (polpred .eq. 'ASPC') then
+         do i = 1, nualt
+            coeff = aspc(i)
+            bpred(i) = coeff
+            bpredp(i) = coeff
+            bpreds(i) = coeff
+            bpredps(i) = coeff
+         end do
+c
+c     derive normal equations corresponding to least squares fit
+c
+      else
+         do k = 1, nualt
+            b(k) = 0.0d0
+            bp(k) = 0.0d0
+            do m = k, nualt
+               c(k,m) = 0.0d0
+               cp(k,m) = 0.0d0
+            end do
+         end do
+         do i = 1, npole
+            do j = 1, 3
+               do k = 1, nualt
+                  udk = udalt(k,j,i)
+                  upk = upalt(k,j,i)
+                  do m = k, nualt
+                     c(k,m) = c(k,m) + udk*udalt(m,j,i)
+                     cp(k,m) = cp(k,m) + upk*upalt(m,j,i)
+                  end do
+               end do
+            end do
+         end do
+         i = 0
+         do k = 2, nualt
+            b(k-1) = c(1,k)
+            bp(k-1) = cp(1,k)
+            do m = k, nualt
+               i = i + 1
+               a(i) = c(k,m)
+               ap(i) = cp(k,m)
+            end do
+         end do
+c
+c     solve normal equations and transfer to coefficient vector
+c
+         k = nualt - 1
+         call cholesky (k,a,b)
+         call cholesky (k,ap,bp)
+         do k = 1, nualt-1
+            bpred(k) = b(k)
+            bpredp(k) = bp(k)
+            bpreds(k) = b(k)
+            bpredps(k) = bp(k)
+         end do
+         bpred(nualt) = 0.0d0
+         bpredp(nualt) = 0.0d0
+         bpreds(nualt) = 0.0d0
+         bpredps(nualt) = 0.0d0
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
 c     ##  subroutine induce0a  --  induced dipoles via double loop  ##
 c     ##                                                            ##
 c     ################################################################
@@ -197,19 +308,18 @@ c
       real*8 udsum,upsum
       real*8 a,ap,b,bp
       real*8 sum,sump
-      real*8 denom,denomp
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: udir(:,:)
       real*8, allocatable :: udirp(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: zrsd(:,:)
+      real*8, allocatable :: zrsdp(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: conjp(:,:)
       real*8, allocatable :: vec(:,:)
       real*8, allocatable :: vecp(:,:)
-      real*8, allocatable :: usav(:,:)
-      real*8, allocatable :: usavp(:,:)
       logical done
       character*6 mode
 c
@@ -262,13 +372,14 @@ c
 c     estimated induced dipoles from polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
+            call ulspred
             do i = 1, npole
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
-                  do k = 1, nualt
+                  do k = 1, nualt-1
                      udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
+                     upsum = upsum + bpredp(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -280,12 +391,12 @@ c     perform dynamic allocation of some local arrays
 c
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
+         allocate (zrsd(3,npole))
+         allocate (zrsdp(3,npole))
          allocate (conj(3,npole))
          allocate (conjp(3,npole))
          allocate (vec(3,npole))
          allocate (vecp(3,npole))
-         allocate (usav(3,npole))
-         allocate (usavp(3,npole))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
@@ -296,8 +407,10 @@ c
      &                       + field(j,i)
                rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
      &                       + fieldp(j,i)
-               conj(j,i) = rsd(j,i)
-               conjp(j,i) = rsdp(j,i)
+               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsdp(j,i) = rsdp(j,i) * polarity(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
             end do
          end do
 c
@@ -307,8 +420,8 @@ c
             iter = iter + 1
             do i = 1, npole
                do j = 1, 3
-                  usav(j,i) = uind(j,i)
-                  usavp(j,i) = uinp(j,i)
+                  vec(j,i) = uind(j,i)
+                  vecp(j,i) = uinp(j,i)
                   uind(j,i) = conj(j,i)
                   uinp(j,i) = conjp(j,i)
                end do
@@ -316,46 +429,54 @@ c
             call ufield0a (field,fieldp)
             do i = 1, npole
                do j = 1, 3
-                  uind(j,i) = usav(j,i)
-                  uinp(j,i) = usavp(j,i)
-                  vec(j,i) = -field(j,i)
-                  vecp(j,i) = -fieldp(j,i)
+                  uind(j,i) = vec(j,i)
+                  uinp(j,i) = vecp(j,i)
+                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
                end do
             end do
+            a = 0.0d0
+            ap = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
-            denom = 0.0d0
-            denomp = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
-                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
-                  sum = sum + rsd(j,i)*rsd(j,i)
-                  sump = sump + rsdp(j,i)*rsdp(j,i)
-                  denom = denom + conj(j,i)*vec(j,i)
-                  denomp = denomp + conjp(j,i)*vecp(j,i)
+                  a = a + conj(j,i)*vec(j,i)
+                  ap = ap + conjp(j,i)*vecp(j,i)
+                  sum = sum + rsd(j,i)*zrsd(j,i)
+                  sump = sump + rsdp(j,i)*zrsdp(j,i)
                end do
             end do
-            a = sum / denom
-            ap = sump / denomp
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-               end do
-            end do
-            b = epsd / sum
-            bp = epsp / sump
+            a = sum / a
+            ap = sump / ap
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
                   uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  conj(j,i) = rsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+               end do
+            end do
+            b = 0.0d0
+            bp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  b = b + rsd(j,i)*zrsd(j,i)
+                  bp = bp + rsdp(j,i)*zrsdp(j,i)
+               end do
+            end do
+            b = b / sum
+            bp = bp / sump
+            epsd = 0.0d0
+            epsp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
                end do
             end do
 c
@@ -383,12 +504,12 @@ c     perform deallocation of some local arrays
 c
          deallocate (rsd)
          deallocate (rsdp)
+         deallocate (zrsd)
+         deallocate (zrsdp)
          deallocate (conj)
          deallocate (conjp)
          deallocate (vec)
          deallocate (vecp)
-         deallocate (usav)
-         deallocate (usavp)
 c
 c     print the results from the conjugate gradient iteration
 c
@@ -1028,19 +1149,18 @@ c
       real*8 epsd,epsp
       real*8 a,ap,b,bp
       real*8 sum,sump
-      real*8 denom,denomp
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: udir(:,:)
       real*8, allocatable :: udirp(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: zrsd(:,:)
+      real*8, allocatable :: zrsdp(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: conjp(:,:)
       real*8, allocatable :: vec(:,:)
       real*8, allocatable :: vecp(:,:)
-      real*8, allocatable :: usav(:,:)
-      real*8, allocatable :: usavp(:,:)
       logical done
       character*6 mode
 c
@@ -1097,9 +1217,9 @@ c
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
-                  do k = 1, nualt
+                  do k = 1, nualt-1
                      udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
+                     upsum = upsum + bpredp(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -1111,12 +1231,12 @@ c     perform dynamic allocation of some local arrays
 c
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
+         allocate (zrsd(3,npole))
+         allocate (zrsdp(3,npole))
          allocate (conj(3,npole))
          allocate (conjp(3,npole))
          allocate (vec(3,npole))
          allocate (vecp(3,npole))
-         allocate (usav(3,npole))
-         allocate (usavp(3,npole))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
@@ -1127,8 +1247,10 @@ c
      &                       + field(j,i)
                rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
      &                       + fieldp(j,i)
-               conj(j,i) = rsd(j,i)
-               conjp(j,i) = rsdp(j,i)
+               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsdp(j,i) = rsdp(j,i) * polarity(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
             end do
          end do
 c
@@ -1138,8 +1260,8 @@ c
             iter = iter + 1
             do i = 1, npole
                do j = 1, 3
-                  usav(j,i) = uind(j,i)
-                  usavp(j,i) = uinp(j,i)
+                  vec(j,i) = uind(j,i)
+                  vecp(j,i) = uinp(j,i)
                   uind(j,i) = conj(j,i)
                   uinp(j,i) = conjp(j,i)
                end do
@@ -1147,46 +1269,54 @@ c
             call ufield0b (field,fieldp)
             do i = 1, npole
                do j = 1, 3
-                  uind(j,i) = usav(j,i)
-                  uinp(j,i) = usavp(j,i)
-                  vec(j,i) = -field(j,i)
-                  vecp(j,i) = -fieldp(j,i)
+                  uind(j,i) = vec(j,i)
+                  uinp(j,i) = vecp(j,i)
+                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
                end do
             end do
+            a = 0.0d0
+            ap = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
-            denom = 0.0d0
-            denomp = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
-                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
-                  sum = sum + rsd(j,i)*rsd(j,i)
-                  sump = sump + rsdp(j,i)*rsdp(j,i)
-                  denom = denom + conj(j,i)*vec(j,i)
-                  denomp = denomp + conjp(j,i)*vecp(j,i)
+                  a = a + conj(j,i)*vec(j,i)
+                  ap = ap + conjp(j,i)*vecp(j,i)
+                  sum = sum + rsd(j,i)*zrsd(j,i)
+                  sump = sump + rsdp(j,i)*zrsdp(j,i)
                end do
             end do
-            a = sum / denom
-            ap = sump / denomp
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-               end do
-            end do
-            b = epsd / sum
-            bp = epsp / sump
+            a = sum / a
+            ap = sump / ap
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
                   uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  conj(j,i) = rsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+               end do
+            end do
+            b = 0.0d0
+            bp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  b = b + rsd(j,i)*zrsd(j,i)
+                  bp = bp + rsdp(j,i)*zrsdp(j,i)
+               end do
+            end do
+            b = b / sum
+            bp = bp / sump
+            epsd = 0.0d0
+            epsp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
                end do
             end do
 c
@@ -1214,12 +1344,12 @@ c     perform deallocation of some local arrays
 c
          deallocate (rsd)
          deallocate (rsdp)
+         deallocate (zrsd)
+         deallocate (zrsdp)
          deallocate (conj)
          deallocate (conjp)
          deallocate (vec)
          deallocate (vecp)
-         deallocate (usav)
-         deallocate (usavp)
 c
 c     print the results from the conjugate gradient iteration
 c
@@ -1633,19 +1763,18 @@ c
       real*8 udsum,upsum
       real*8 a,ap,b,bp
       real*8 sum,sump
-      real*8 denom,denomp
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: udir(:,:)
       real*8, allocatable :: udirp(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: rsdp(:,:)
+      real*8, allocatable :: zrsd(:,:)
+      real*8, allocatable :: zrsdp(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: conjp(:,:)
       real*8, allocatable :: vec(:,:)
       real*8, allocatable :: vecp(:,:)
-      real*8, allocatable :: usav(:,:)
-      real*8, allocatable :: usavp(:,:)
       logical done
 c
 c
@@ -1692,13 +1821,14 @@ c
 c     estimated induced dipoles from polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
+            call ulspred
             do i = 1, npole
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
-                  do k = 1, nualt
+                  do k = 1, nualt-1
                      udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
+                     upsum = upsum + bpredp(k)*upalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -1710,12 +1840,12 @@ c     perform dynamic allocation of some local arrays
 c
          allocate (rsd(3,n))
          allocate (rsdp(3,n))
+         allocate (zrsd(3,n))
+         allocate (zrsdp(3,n))
          allocate (conj(3,n))
          allocate (conjp(3,n))
          allocate (vec(3,n))
          allocate (vecp(3,n))
-         allocate (usav(3,n))
-         allocate (usavp(3,n))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
@@ -1726,8 +1856,10 @@ c
      &                       + field(j,i)
                rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
      &                       + fieldp(j,i)
-               conj(j,i) = rsd(j,i)
-               conjp(j,i) = rsdp(j,i)
+               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsdp(j,i) = rsdp(j,i) * polarity(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
             end do
          end do
 c
@@ -1737,8 +1869,8 @@ c
             iter = iter + 1
             do i = 1, npole
                do j = 1, 3
-                  usav(j,i) = uind(j,i)
-                  usavp(j,i) = uinp(j,i)
+                  vec(j,i) = uind(j,i)
+                  vecp(j,i) = uinp(j,i)
                   uind(j,i) = conj(j,i)
                   uinp(j,i) = conjp(j,i)
                end do
@@ -1746,46 +1878,54 @@ c
             call ufield0c (field,fieldp)
             do i = 1, npole
                do j = 1, 3
-                  uind(j,i) = usav(j,i)
-                  uinp(j,i) = usavp(j,i)
-                  vec(j,i) = -field(j,i)
-                  vecp(j,i) = -fieldp(j,i)
+                  uind(j,i) = vec(j,i)
+                  uinp(j,i) = vecp(j,i)
+                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
                end do
             end do
+            a = 0.0d0
+            ap = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
-            denom = 0.0d0
-            denomp = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
-                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
-                  sum = sum + rsd(j,i)*rsd(j,i)
-                  sump = sump + rsdp(j,i)*rsdp(j,i)
-                  denom = denom + conj(j,i)*vec(j,i)
-                  denomp = denomp + conjp(j,i)*vecp(j,i)
+                  a = a + conj(j,i)*vec(j,i)
+                  ap = ap + conjp(j,i)*vecp(j,i)
+                  sum = sum + rsd(j,i)*zrsd(j,i)
+                  sump = sump + rsdp(j,i)*zrsdp(j,i)
                end do
             end do
-            a = sum / denom
-            ap = sump / denomp
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-               end do
-            end do
-            b = epsd / sum
-            bp = epsp / sump
+            a = sum / a
+            ap = sump / ap
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
                   uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  conj(j,i) = rsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+               end do
+            end do
+            b = 0.0d0
+            bp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  b = b + rsd(j,i)*zrsd(j,i)
+                  bp = bp + rsdp(j,i)*zrsdp(j,i)
+               end do
+            end do
+            b = b / sum
+            bp = bp / sump
+            epsd = 0.0d0
+            epsp = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
                end do
             end do
 c
@@ -1813,12 +1953,12 @@ c     perform deallocation of some local arrays
 c
          deallocate (rsd)
          deallocate (rsdp)
+         deallocate (zrsd)
+         deallocate (zrsdp)
          deallocate (conj)
          deallocate (conjp)
          deallocate (vec)
          deallocate (vecp)
-         deallocate (usav)
-         deallocate (usavp)
 c
 c     print the results from the conjugate gradient iteration
 c
@@ -3742,12 +3882,10 @@ c
       real*8 epsds,epsps
       real*8 udsum,upsum
       real*8 ussum,upssum
-      real*8 a,ap,b,bp
-      real*8 as,aps,bs,bps
+      real*8 a,ap,as,aps
+      real*8 b,bp,bs,bps
       real*8 sum,sump
       real*8 sums,sumps
-      real*8 denom,denomp
-      real*8 denoms,denomps
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
@@ -3760,6 +3898,10 @@ c
       real*8, allocatable :: rsdp(:,:)
       real*8, allocatable :: rsds(:,:)
       real*8, allocatable :: rsdps(:,:)
+      real*8, allocatable :: zrsd(:,:)
+      real*8, allocatable :: zrsdp(:,:)
+      real*8, allocatable :: zrsds(:,:)
+      real*8, allocatable :: zrsdps(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: conjp(:,:)
       real*8, allocatable :: conjs(:,:)
@@ -3768,10 +3910,6 @@ c
       real*8, allocatable :: vecp(:,:)
       real*8, allocatable :: vecs(:,:)
       real*8, allocatable :: vecps(:,:)
-      real*8, allocatable :: usav(:,:)
-      real*8, allocatable :: usavp(:,:)
-      real*8, allocatable :: usavs(:,:)
-      real*8, allocatable :: usavps(:,:)
       logical done
       character*6 mode
 c
@@ -3844,11 +3982,11 @@ c
                   upsum = 0.0d0
                   ussum = 0.0d0
                   upssum = 0.0d0
-                  do k = 1, nualt
+                  do k = 1, nualt-1
                      udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
-                     ussum = ussum + bpred(k)*usalt(k,j,i)
-                     upssum = upssum + bpred(k)*upsalt(k,j,i)
+                     upsum = upsum + bpredp(k)*upalt(k,j,i)
+                     ussum = ussum + bpreds(k)*usalt(k,j,i)
+                     upssum = upssum + bpredps(k)*upsalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -3864,6 +4002,10 @@ c
          allocate (rsdp(3,npole))
          allocate (rsds(3,npole))
          allocate (rsdps(3,npole))
+         allocate (zrsd(3,npole))
+         allocate (zrsdp(3,npole))
+         allocate (zrsds(3,npole))
+         allocate (zrsdps(3,npole))
          allocate (conj(3,npole))
          allocate (conjp(3,npole))
          allocate (conjs(3,npole))
@@ -3872,10 +4014,6 @@ c
          allocate (vecp(3,npole))
          allocate (vecs(3,npole))
          allocate (vecps(3,npole))
-         allocate (usav(3,npole))
-         allocate (usavp(3,npole))
-         allocate (usavs(3,npole))
-         allocate (usavps(3,npole))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
@@ -3885,15 +4023,19 @@ c
                rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
      &                       + field(j,i)
                rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                       + fieldp(j,i)
+     &                        + fieldp(j,i)
                rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
-     &                       + fields(j,i)
+     &                        + fields(j,i)
                rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
-     &                       + fieldps(j,i)
-               conj(j,i) = rsd(j,i)
-               conjp(j,i) = rsdp(j,i)
-               conjs(j,i) = rsds(j,i)
-               conjps(j,i) = rsdps(j,i)
+     &                         + fieldps(j,i)
+               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsdp(j,i) = rsdp(j,i) * polarity(i)
+               zrsds(j,i) = rsds(j,i) * polarity(i)
+               zrsdps(j,i) = rsdps(j,i) * polarity(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
+               conjs(j,i) = zrsds(j,i)
+               conjps(j,i) = zrsdps(j,i)
             end do
          end do
 c
@@ -3903,10 +4045,10 @@ c
             iter = iter + 1
             do i = 1, npole
                do j = 1, 3
-                  usav(j,i) = uind(j,i)
-                  usavp(j,i) = uinp(j,i)
-                  usavs(j,i) = uinds(j,i)
-                  usavps(j,i) = uinps(j,i)
+                  vec(j,i) = uind(j,i)
+                  vecp(j,i) = uinp(j,i)
+                  vecs(j,i) = uinds(j,i)
+                  vecps(j,i) = uinps(j,i)
                   uind(j,i) = conj(j,i)
                   uinp(j,i) = conjp(j,i)
                   uinds(j,i) = conjs(j,i)
@@ -3916,74 +4058,86 @@ c
             call ufield0d (field,fieldp,fields,fieldps)
             do i = 1, npole
                do j = 1, 3
-                  uind(j,i) = usav(j,i)
-                  uinp(j,i) = usavp(j,i)
-                  uinds(j,i) = usavs(j,i)
-                  uinps(j,i) = usavps(j,i)
-                  vec(j,i) = -field(j,i)
-                  vecp(j,i) = -fieldp(j,i)
-                  vecs(j,i) = -fields(j,i)
-                  vecps(j,i) = -fieldps(j,i)
+                  uind(j,i) = vec(j,i)
+                  uinp(j,i) = vecp(j,i)
+                  uinds(j,i) = vecs(j,i)
+                  uinps(j,i) = vecps(j,i)
+                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
+                  vecs(j,i) = conjs(j,i)/polarity(i) - fields(j,i)
+                  vecps(j,i) = conjps(j,i)/polarity(i) - fieldps(j,i)
                end do
             end do
+            a = 0.0d0
+            ap = 0.0d0
+            as = 0.0d0
+            aps = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
             sums = 0.0d0
             sumps = 0.0d0
-            denom = 0.0d0
-            denomp = 0.0d0
-            denoms = 0.0d0
-            denomps = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
-                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
-                  vecs(j,i) = vecs(j,i) + conjs(j,i)/polarity(i)
-                  vecps(j,i) = vecps(j,i) + conjps(j,i)/polarity(i)
-                  sum = sum + rsd(j,i)*rsd(j,i)
-                  sump = sump + rsdp(j,i)*rsdp(j,i)
-                  sums = sums + rsds(j,i)*rsds(j,i)
-                  sumps = sumps + rsdps(j,i)*rsdps(j,i)
-                  denom = denom + conj(j,i)*vec(j,i)
-                  denomp = denomp + conjp(j,i)*vecp(j,i)
-                  denoms = denoms + conjs(j,i)*vecs(j,i)
-                  denomps = denomps + conjps(j,i)*vecps(j,i)
+                  a = a + conj(j,i)*vec(j,i)
+                  ap = ap + conjp(j,i)*vecp(j,i)
+                  as = as + conjs(j,i)*vecs(j,i)
+                  aps = aps + conjps(j,i)*vecps(j,i)
+                  sum = sum + rsd(j,i)*zrsd(j,i)
+                  sump = sump + rsdp(j,i)*zrsdp(j,i)
+                  sums = sums + rsds(j,i)*zrsds(j,i)
+                  sumps = sumps + rsdps(j,i)*zrsdps(j,i)
                end do
             end do
-            a = sum / denom
-            ap = sump / denomp
-            as = sums / denoms
-            aps = sumps / denomps
-            epsd = 0.0d0
-            epsp = 0.0d0
-            epsds = 0.0d0
-            epsps = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
-                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-                  epsds = epsds + rsds(j,i)*rsds(j,i)
-                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
-               end do
-            end do
-            b = epsd / sum
-            bp = epsp / sump
-            bs = epsds / sums
-            bps = epsps / sumps
+            a = sum / a
+            ap = sump / ap
+            as = sums / as
+            aps = sumps / aps
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
                   uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
                   uinds(j,i) = uinds(j,i) + as*conjs(j,i)
                   uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
-                  conj(j,i) = rsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
-                  conjs(j,i) = rsds(j,i) + bs*conjs(j,i)
-                  conjps(j,i) = rsdps(j,i) + bps*conjps(j,i)
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
+                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
+               end do
+            end do
+            b = 0.0d0
+            bp = 0.0d0
+            bs = 0.0d0
+            bps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  zrsds(j,i) = rsds(j,i) * polarity(i)
+                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
+                  b = b + rsd(j,i)*zrsd(j,i)
+                  bp = bp + rsdp(j,i)*zrsdp(j,i)
+                  bs = bs + rsds(j,i)*zrsds(j,i)
+                  bps = bps + rsdps(j,i)*zrsdps(j,i)
+               end do
+            end do
+            b = b / sum
+            bp = bp / sump
+            bs = bs / sums
+            bps = bps / sumps
+            epsd = 0.0d0
+            epsp = 0.0d0
+            epsds = 0.0d0
+            epsps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                  conjs(j,i) = zrsds(j,i) + bs*conjs(j,i)
+                  conjps(j,i) = zrsdps(j,i) + bps*conjps(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                  epsds = epsds + rsds(j,i)*rsds(j,i)
+                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
                end do
             end do
 c
@@ -4013,6 +4167,10 @@ c
          deallocate (rsdp)
          deallocate (rsds)
          deallocate (rsdps)
+         deallocate (zrsd)
+         deallocate (zrsdp)
+         deallocate (zrsds)
+         deallocate (zrsdps)
          deallocate (conj)
          deallocate (conjp)
          deallocate (conjs)
@@ -4021,10 +4179,6 @@ c
          deallocate (vecp)
          deallocate (vecs)
          deallocate (vecps)
-         deallocate (usav)
-         deallocate (usavp)
-         deallocate (usavs)
-         deallocate (usavps)
 c
 c     print the results from the conjugate gradient iteration
 c
@@ -4824,12 +4978,10 @@ c
       real*8 epsds,epsps
       real*8 udsum,upsum
       real*8 ussum,upssum
-      real*8 a,ap,b,bp
-      real*8 as,aps,bs,bps
+      real*8 a,ap,as,aps
+      real*8 b,bp,bs,bps
       real*8 sum,sump
       real*8 sums,sumps
-      real*8 denom,denomp
-      real*8 denoms,denomps
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
@@ -4842,6 +4994,10 @@ c
       real*8, allocatable :: rsdp(:,:)
       real*8, allocatable :: rsds(:,:)
       real*8, allocatable :: rsdps(:,:)
+      real*8, allocatable :: zrsd(:,:)
+      real*8, allocatable :: zrsdp(:,:)
+      real*8, allocatable :: zrsds(:,:)
+      real*8, allocatable :: zrsdps(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: conjp(:,:)
       real*8, allocatable :: conjs(:,:)
@@ -4850,10 +5006,6 @@ c
       real*8, allocatable :: vecp(:,:)
       real*8, allocatable :: vecs(:,:)
       real*8, allocatable :: vecps(:,:)
-      real*8, allocatable :: usav(:,:)
-      real*8, allocatable :: usavp(:,:)
-      real*8, allocatable :: usavs(:,:)
-      real*8, allocatable :: usavps(:,:)
       logical done
       character*6 mode
 c
@@ -4926,11 +5078,11 @@ c
                   upsum = 0.0d0
                   ussum = 0.0d0
                   upssum = 0.0d0
-                  do k = 1, nualt
+                  do k = 1, nualt-1
                      udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpred(k)*upalt(k,j,i)
-                     ussum = ussum + bpred(k)*usalt(k,j,i)
-                     upssum = upssum + bpred(k)*upsalt(k,j,i)
+                     upsum = upsum + bpredp(k)*upalt(k,j,i)
+                     ussum = ussum + bpreds(k)*usalt(k,j,i)
+                     upssum = upssum + bpredps(k)*upsalt(k,j,i)
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
@@ -4946,6 +5098,10 @@ c
          allocate (rsdp(3,npole))
          allocate (rsds(3,npole))
          allocate (rsdps(3,npole))
+         allocate (zrsd(3,npole))
+         allocate (zrsdp(3,npole))
+         allocate (zrsds(3,npole))
+         allocate (zrsdps(3,npole))
          allocate (conj(3,npole))
          allocate (conjp(3,npole))
          allocate (conjs(3,npole))
@@ -4954,10 +5110,6 @@ c
          allocate (vecp(3,npole))
          allocate (vecs(3,npole))
          allocate (vecps(3,npole))
-         allocate (usav(3,npole))
-         allocate (usavp(3,npole))
-         allocate (usavs(3,npole))
-         allocate (usavps(3,npole))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
@@ -4967,15 +5119,19 @@ c
                rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
      &                       + field(j,i)
                rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                       + fieldp(j,i)
+     &                        + fieldp(j,i)
                rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
-     &                       + fields(j,i)
+     &                        + fields(j,i)
                rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
-     &                       + fieldps(j,i)
-               conj(j,i) = rsd(j,i)
-               conjp(j,i) = rsdp(j,i)
-               conjs(j,i) = rsds(j,i)
-               conjps(j,i) = rsdps(j,i)
+     &                         + fieldps(j,i)
+               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsdp(j,i) = rsdp(j,i) * polarity(i)
+               zrsds(j,i) = rsds(j,i) * polarity(i)
+               zrsdps(j,i) = rsdps(j,i) * polarity(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
+               conjs(j,i) = zrsds(j,i)
+               conjps(j,i) = zrsdps(j,i)
             end do
          end do
 c
@@ -4985,10 +5141,10 @@ c
             iter = iter + 1
             do i = 1, npole
                do j = 1, 3
-                  usav(j,i) = uind(j,i)
-                  usavp(j,i) = uinp(j,i)
-                  usavs(j,i) = uinds(j,i)
-                  usavps(j,i) = uinps(j,i)
+                  vec(j,i) = uind(j,i)
+                  vecp(j,i) = uinp(j,i)
+                  vecs(j,i) = uinds(j,i)
+                  vecps(j,i) = uinps(j,i)
                   uind(j,i) = conj(j,i)
                   uinp(j,i) = conjp(j,i)
                   uinds(j,i) = conjs(j,i)
@@ -4998,74 +5154,86 @@ c
             call ufield0e (field,fieldp,fields,fieldps)
             do i = 1, npole
                do j = 1, 3
-                  uind(j,i) = usav(j,i)
-                  uinp(j,i) = usavp(j,i)
-                  uinds(j,i) = usavs(j,i)
-                  uinps(j,i) = usavps(j,i)
-                  vec(j,i) = -field(j,i)
-                  vecp(j,i) = -fieldp(j,i)
-                  vecs(j,i) = -fields(j,i)
-                  vecps(j,i) = -fieldps(j,i)
+                  uind(j,i) = vec(j,i)
+                  uinp(j,i) = vecp(j,i)
+                  uinds(j,i) = vecs(j,i)
+                  uinps(j,i) = vecps(j,i)
+                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
+                  vecs(j,i) = conjs(j,i)/polarity(i) - fields(j,i)
+                  vecps(j,i) = conjps(j,i)/polarity(i) - fieldps(j,i)
                end do
             end do
+            a = 0.0d0
+            ap = 0.0d0
+            as = 0.0d0
+            aps = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
             sums = 0.0d0
             sumps = 0.0d0
-            denom = 0.0d0
-            denomp = 0.0d0
-            denoms = 0.0d0
-            denomps = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
-                  vecp(j,i) = vecp(j,i) + conjp(j,i)/polarity(i)
-                  vecs(j,i) = vecs(j,i) + conjs(j,i)/polarity(i)
-                  vecps(j,i) = vecps(j,i) + conjps(j,i)/polarity(i)
-                  sum = sum + rsd(j,i)*rsd(j,i)
-                  sump = sump + rsdp(j,i)*rsdp(j,i)
-                  sums = sums + rsds(j,i)*rsds(j,i)
-                  sumps = sumps + rsdps(j,i)*rsdps(j,i)
-                  denom = denom + conj(j,i)*vec(j,i)
-                  denomp = denomp + conjp(j,i)*vecp(j,i)
-                  denoms = denoms + conjs(j,i)*vecs(j,i)
-                  denomps = denomps + conjps(j,i)*vecps(j,i)
+                  a = a + conj(j,i)*vec(j,i)
+                  ap = ap + conjp(j,i)*vecp(j,i)
+                  as = as + conjs(j,i)*vecs(j,i)
+                  aps = aps + conjps(j,i)*vecps(j,i)
+                  sum = sum + rsd(j,i)*zrsd(j,i)
+                  sump = sump + rsdp(j,i)*zrsdp(j,i)
+                  sums = sums + rsds(j,i)*zrsds(j,i)
+                  sumps = sumps + rsdps(j,i)*zrsdps(j,i)
                end do
             end do
-            a = sum / denom
-            ap = sump / denomp
-            as = sums / denoms
-            aps = sumps / denomps
-            epsd = 0.0d0
-            epsp = 0.0d0
-            epsds = 0.0d0
-            epsps = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
-                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-                  epsds = epsds + rsds(j,i)*rsds(j,i)
-                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
-               end do
-            end do
-            b = epsd / sum
-            bp = epsp / sump
-            bs = epsds / sums
-            bps = epsps / sumps
+            a = sum / a
+            ap = sump / ap
+            as = sums / as
+            aps = sumps / aps
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
                   uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
                   uinds(j,i) = uinds(j,i) + as*conjs(j,i)
                   uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
-                  conj(j,i) = rsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = rsdp(j,i) + bp*conjp(j,i)
-                  conjs(j,i) = rsds(j,i) + bs*conjs(j,i)
-                  conjps(j,i) = rsdps(j,i) + bps*conjps(j,i)
+                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
+                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
+               end do
+            end do
+            b = 0.0d0
+            bp = 0.0d0
+            bs = 0.0d0
+            bps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  zrsds(j,i) = rsds(j,i) * polarity(i)
+                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
+                  b = b + rsd(j,i)*zrsd(j,i)
+                  bp = bp + rsdp(j,i)*zrsdp(j,i)
+                  bs = bs + rsds(j,i)*zrsds(j,i)
+                  bps = bps + rsdps(j,i)*zrsdps(j,i)
+               end do
+            end do
+            b = b / sum
+            bp = bp / sump
+            bs = bs / sums
+            bps = bps / sumps
+            epsd = 0.0d0
+            epsp = 0.0d0
+            epsds = 0.0d0
+            epsps = 0.0d0
+            do i = 1, npole
+               do j = 1, 3
+                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                  conjs(j,i) = zrsds(j,i) + bs*conjs(j,i)
+                  conjps(j,i) = zrsdps(j,i) + bps*conjps(j,i)
+                  epsd = epsd + rsd(j,i)*rsd(j,i)
+                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                  epsds = epsds + rsds(j,i)*rsds(j,i)
+                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
                end do
             end do
 c
@@ -5095,6 +5263,10 @@ c
          deallocate (rsdp)
          deallocate (rsds)
          deallocate (rsdps)
+         deallocate (zrsd)
+         deallocate (zrsdp)
+         deallocate (zrsds)
+         deallocate (zrsdps)
          deallocate (conj)
          deallocate (conjp)
          deallocate (conjs)
@@ -5103,10 +5275,6 @@ c
          deallocate (vecp)
          deallocate (vecs)
          deallocate (vecps)
-         deallocate (usav)
-         deallocate (usavp)
-         deallocate (usavs)
-         deallocate (usavps)
 c
 c     print the results from the conjugate gradient iteration
 c

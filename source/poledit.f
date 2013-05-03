@@ -1642,14 +1642,13 @@ c
       integer i,j,k,iter
       integer maxiter
       real*8 eps,epsold
-      real*8 a,b,sum
-      real*8 norm,denom
+      real*8 a,b,sum,norm
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: rsd(:,:)
+      real*8, allocatable :: zrsd(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
-      real*8, allocatable :: usav(:,:)
       logical done
 c
 c
@@ -1658,9 +1657,9 @@ c
       allocate (pscale(n))
       allocate (field(3,npole))
       allocate (rsd(3,npole))
+      allocate (zrsd(3,npole))
       allocate (conj(3,npole))
       allocate (vec(3,npole))
-      allocate (usav(3,npole))
 c
 c     compute induced dipoles as polarizability times field
 c
@@ -1690,7 +1689,8 @@ c
       do i = 1, npole
          do j = 1, 3
             rsd(j,i) = field(j,i)
-            conj(j,i) = rsd(j,i)
+            zrsd(j,i) = rsd(j,i) * polarity(i)
+            conj(j,i) = zrsd(j,i)
          end do
       end do
 c
@@ -1700,42 +1700,48 @@ c
          iter = iter + 1
          do i = 1, npole
             do j = 1, 3
-               usav(j,i) = uind(j,i)
+               vec(j,i) = uind(j,i)
                uind(j,i) = conj(j,i)
             end do
          end do
          call ufieldi (field,pscale)
          do i = 1, npole
             do j = 1, 3
-               uind(j,i) = usav(j,i)
-               vec(j,i) = -field(j,i)
+               uind(j,i) = vec(j,i)
+               vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
             end do
          end do
+         a = 0.0d0
          sum = 0.0d0
-         denom = 0.0d0
          do i = 1, npole
             do j = 1, 3
-               vec(j,i) = vec(j,i) + conj(j,i)/polarity(i)
-               sum = sum + rsd(j,i)*rsd(j,i)
-               denom = denom + conj(j,i)*vec(j,i)
+               a = a + conj(j,i)*vec(j,i)
+               sum = sum + rsd(j,i)*zrsd(j,i)
             end do
          end do
-         a = sum / denom
-         eps = 0.0d0
-         do i = 1, npole
-            do j = 1, 3
-               rsd(j,i) = rsd(j,i) - a*vec(j,i)
-               eps = eps + rsd(j,i)*rsd(j,i)
-            end do
-         end do
-         b = eps / sum
-         eps = debye * sqrt(eps/dble(npolar))
+         a = sum / a
          do i = 1, npole
             do j = 1, 3
                uind(j,i) = uind(j,i) + a*conj(j,i)
-               conj(j,i) = rsd(j,i) + b*conj(j,i)
+               rsd(j,i) = rsd(j,i) - a*vec(j,i)
             end do
          end do
+         b = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               zrsd(j,i) = rsd(j,i) * polarity(i)
+               b = b + rsd(j,i)*zrsd(j,i)
+            end do
+         end do
+         b = b / sum
+         eps = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               conj(j,i) = zrsd(j,i) + b*conj(j,i)
+               eps = eps + rsd(j,i)*rsd(j,i)
+            end do
+         end do
+         eps = debye * sqrt(eps/dble(npolar))
          epsold = eps
          if (iter .eq. 1) then
             write (iout,10)
@@ -1755,9 +1761,9 @@ c
       deallocate (pscale)
       deallocate (field)
       deallocate (rsd)
+      deallocate (zrsd)
       deallocate (conj)
       deallocate (vec)
-      deallocate (usav)
 c
 c     terminate the calculation if dipoles failed to converge
 c

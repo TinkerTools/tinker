@@ -19,7 +19,8 @@ c     diagonal) stored by rows
 c
 c     literature reference:
 c
-c     R. S. Martin, G. Peters and J. H. Wilkinson, Numerische
+c     R. S. Martin, G. Peters and J. H. Wilkinson, "Symmetric
+c     Decomposition of a Positive Definite Matrix", Numerische
 c     Mathematik, 7, 362-383 (1965)
 c
 c
