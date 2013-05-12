@@ -31,6 +31,7 @@ c
       include 'solute.i'
       include 'uprior.i'
       include 'usage.i'
+      include 'usolve.i'
       include 'vibs.i'
 c
 c
@@ -64,6 +65,8 @@ c
       if (associated(vlst))  deallocate (vlst)
       if (associated(nelst))  deallocate (nelst)
       if (associated(elst))  deallocate (elst)
+      if (associated(nulst))  deallocate (nulst)
+      if (associated(ulst))  deallocate (ulst)
       if (associated(pc0))  deallocate (pc0)
       if (associated(pc1))  deallocate (pc1)
       if (associated(pvect))  deallocate (pvect)
@@ -81,6 +84,8 @@ c
       if (associated(upsalt))  deallocate (upsalt)
       if (associated(iuse))  deallocate (iuse)
       if (associated(use))  deallocate (use)
+      if (associated(mindex))  deallocate (mindex)
+      if (associated(minv))  deallocate (minv)
       if (associated(phi))  deallocate (phi)
       if (associated(phik))  deallocate (phik)
       if (associated(pwork))  deallocate (pwork)

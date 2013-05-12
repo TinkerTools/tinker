@@ -21,22 +21,26 @@ c     chgtaper    distance at which charge-charge switching begins
 c     dpltaper    distance at which dipole-dipole switching begins
 c     mpoletaper  distance at which atomic multipole switching begins
 c     ewaldcut    cutoff distance for direct space Ewald summation
+c     usolvcut    cutoff distance for dipole solver preconditioner
 c     use_ewald   logical flag governing use of Ewald summation
 c     use_lights  logical flag governing use of method of lights
 c     use_list    logical flag governing use of any neighbor lists
-c     use_vlist   logical flag governing use of vdw neighbor lists
-c     use_clist   logical flag governing use of charge neighbor lists
-c     use_mlist   logical flag governing use of multipole neighbor lists
+c     use_vlist   logical flag governing use of vdw neighbor list
+c     use_clist   logical flag governing use of charge neighbor list
+c     use_mlist   logical flag governing use of multipole neighbor list
+c     use_ulist   logical flag governing use of preconditioner list
 c
 c
       real*8 vdwcut,chgcut
       real*8 dplcut,mpolecut
       real*8 vdwtaper,chgtaper
       real*8 dpltaper,mpoletaper
-      real*8 ewaldcut
+      real*8 ewaldcut,usolvcut
       logical use_ewald,use_lights
       logical use_list,use_vlist
       logical use_clist,use_mlist
+      logical use_ulist
       common /cutoff/ vdwcut,chgcut,dplcut,mpolecut,vdwtaper,chgtaper,
-     &                dpltaper,mpoletaper,ewaldcut,use_ewald,use_lights,
-     &                use_list,use_vlist,use_clist,use_mlist
+     &                dpltaper,mpoletaper,ewaldcut,usolvcut,use_ewald,
+     &                use_lights,use_list,use_vlist,use_clist,use_mlist,
+     &                use_ulist

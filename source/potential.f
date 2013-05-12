@@ -565,6 +565,7 @@ c
                if (use_mpole)  call rotpole
                if (use_polar) then
                   domlst = .true.
+                  doulst = .true.
                   call nblist
                   call induce
                end if
@@ -603,6 +604,7 @@ c
             if (use_mpole)  call rotpole
             if (use_polar) then
                domlst = .true.
+               doulst = .true.
                call nblist
                call induce
             end if
@@ -1547,6 +1549,7 @@ c
          if (use_mpole)  call rotpole
          if (use_polar) then
             domlst = .true.
+            doulst = .true.
             call nblist
             call induce
          end if
@@ -1600,6 +1603,7 @@ c
             if (use_mpole)  call rotpole
             if (use_polar) then
                domlst = .true.
+               doulst = .true.
                call nblist
                call induce
             end if
@@ -1639,6 +1643,7 @@ c
             if (use_mpole)  call rotpole
             if (use_polar) then
                domlst = .true.
+               doulst = .true.
                call nblist
                call induce
             end if

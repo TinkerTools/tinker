@@ -33,8 +33,9 @@ c     maxvar          optimization variables (vector storage)
 c     maxopt          optimization variables (matrix storage)
 c     maxhess         off-diagonal Hessian elements
 c     maxlight        sites for method of lights neighbors
-c     maxvlst         atom neighbors in van der Waals pair list
-c     maxelst         atom neighbors in electrostatics pair list
+c     maxvlst         neighbors in van der Waals pair list
+c     maxelst         neighbors in electrostatics pair list
+c     maxulst         neighbors in dipole preconditioner list
 c     maxfft          grid points in each FFT dimension
 c     maxfix          geometric constraints and restraints
 c     maxvib          vibrational frequencies
@@ -57,11 +58,12 @@ c
       integer maxprm,maxkey,maxrot
       integer maxvar,maxopt,maxhess
       integer maxlight,maxvlst,maxelst
-      integer maxfft,maxfix,maxvib
-      integer maxgeo,maxcell,maxring
-      integer maxbio,maxres,maxele
-      integer maxamino,maxnuc,maxbnd
-      integer maxang,maxtors,maxbitor
+      integer maxulst,maxfft,maxfix
+      integer maxvib,maxgeo,maxcell
+      integer maxring,maxbio,maxres
+      integer maxele,maxamino,maxnuc
+      integer maxbnd,maxang,maxtors
+      integer maxbitor
       parameter (maxatm=100000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -77,6 +79,7 @@ c
       parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
+      parameter (maxulst=60)
       parameter (maxfft=250)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)

@@ -347,6 +347,8 @@ c
          read (string,*,err=10,end=10)  politer
       else if (keyword(1:10) .eq. 'POLAR-EPS ') then
          read (string,*,err=10,end=10)  poleps
+      else if (keyword(1:12) .eq. 'USOLVE-DIAG ') then
+         read (string,*,err=10,end=10)  udiag
       else if (keyword(1:15) .eq. 'POLAR-12-SCALE ') then
          read (string,*,err=10,end=10)  p2scale
          if (p2scale .gt. 1.0d0)  p2scale = 1.0d0 / p2scale

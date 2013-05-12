@@ -28,6 +28,7 @@ c
       include 'polar.i'
       include 'polpot.i'
       include 'potent.i'
+      include 'usolve.i'
       integer i,j,k
       integer npg,next
       integer pg(maxval)
@@ -175,6 +176,15 @@ c     turn off polarizable multipole potential if it is not used
 c
       if (npole .eq. 0)  use_mpole = .false.
       if (npolar .eq. 0)  use_polar = .false.
+c
+c     perform dynamic allocation of some pointer arrays
+c
+      if (use_polar) then
+         if (associated(mindex))  deallocate (mindex)
+         if (associated(minv))  deallocate (minv)
+         allocate (mindex(npole))
+         allocate (minv(3*maxulst*npole))
+      end if
       return
       end
 c

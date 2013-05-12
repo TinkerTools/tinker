@@ -154,6 +154,7 @@ c
       dovlst = .true.
       doclst = .true.
       domlst = .true.
+      doulst = .true.
 c
 c     flag for use of rigid bodies
 c

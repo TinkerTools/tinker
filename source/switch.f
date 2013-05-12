@@ -50,6 +50,9 @@ c
       else if (mode(1:5) .eq. 'EWALD') then
          off = ewaldcut
          cut = ewaldcut
+      else if (mode(1:6) .eq. 'USOLVE') then
+         off = usolvcut
+         cut = usolvcut
       else if (mode(1:3) .eq. 'GKV') then
          off = spoff
          cut = spcut

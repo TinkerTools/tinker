@@ -27,6 +27,7 @@ c
       if (use_vdw .and. use_vlist)  call vlist
       if (use_charge .and. use_clist)  call clist
       if ((use_mpole.or.use_polar) .and. use_mlist)  call mlist
+      if (use_polar .and. use_ulist)  call ulist
       return
       end
 c
@@ -1001,6 +1002,324 @@ c
             write (iout,30)
    30       format (/,' MFULL  --  Too many Neighbors;',
      &                 ' Increase MAXELST')
+            call fatal
+         end if
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ulist  --  build preconditioner neighbor lists  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ulist" performs an update or a complete rebuild of the
+c     neighbor lists for the polarization preconditioner
+c
+c
+      subroutine ulist
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'boxes.i'
+      include 'iounit.i'
+      include 'mpole.i'
+      include 'neigh.i'
+      integer i,j,k,ii
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 radius,r2
+c
+c
+c     neighbor list cannot be used with the replicates method
+c
+      radius = sqrt(ubuf2)
+      call replica (radius)
+      if (use_replica) then
+         write (iout,10)
+   10    format (/,' ULIST  --  Pairwise Neighbor List cannot',
+     &              ' be used with Replicas')
+         call fatal
+      end if
+c
+c     perform a complete list build instead of an update
+c
+      if (doulst) then
+         doulst = .false.
+         if (octahedron) then
+            do i = 1, npole
+               call ubuild (i)
+            end do
+         else
+            call ulight
+         end if
+         return
+      end if
+c
+c     test each site for displacement exceeding half the buffer
+c
+      do i = 1, npole
+         ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         xr = xi - xuold(i)
+         yr = yi - yuold(i)
+         zr = zi - zuold(i)
+         call imagen (xr,yr,zr)
+         r2 = xr*xr + yr*yr + zr*zr
+c
+c     store coordinates to reflect update of this site
+c
+         if (r2 .ge. pbuf2) then
+            xuold(i) = xi
+            yuold(i) = yi
+            zuold(i) = zi
+c
+c     rebuild the higher numbered neighbors of this site
+c
+            j = 0
+            do k = i+1, npole
+               xr = xi - xuold(k)
+               yr = yi - yuold(k)
+               zr = zi - zuold(k)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. ubuf2) then
+                  j = j + 1
+                  ulst(j,i) = k
+               end if
+            end do
+            nulst(i) = j
+c
+c     adjust lists of lower numbered neighbors of this site
+c
+            do k = 1, i-1
+               xr = xi - xuold(k)
+               yr = yi - yuold(k)
+               zr = zi - zuold(k)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. ubuf2) then
+                  do j = 1, nulst(k)
+                     if (ulst(j,k) .eq. i)  goto 20
+                  end do
+                  nulst(k) = nulst(k) + 1
+                  ulst(nulst(k),k) = i
+   20             continue
+               else if (r2 .le. ubufx) then
+                  do j = 1, nulst(k)
+                     if (ulst(j,k) .eq. i) then
+                        ulst(j,k) = ulst(nulst(k),k)
+                        nulst(k) = nulst(k) - 1
+                        goto 30
+                     end if
+                  end do
+   30             continue
+               end if
+            end do
+         end if
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ubuild  --  preconditioner list for one site  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ubuild" performs a complete rebuild of the polarization
+c     preconditioner neighbor list for a single site
+c
+c
+      subroutine ubuild (i)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'iounit.i'
+      include 'mpole.i'
+      include 'neigh.i'
+      integer i,j,k,ii,kk
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr,r2
+c
+c
+c     store new coordinates to reflect update of the site
+c
+      ii = ipole(i)
+      xi = x(ii)
+      yi = y(ii)
+      zi = z(ii)
+      xuold(i) = xi
+      yuold(i) = yi
+      zuold(i) = zi
+c
+c     generate all neighbors for the site being rebuilt
+c
+      j = 0
+      do k = i+1, npole
+         kk = ipole(k)
+         xr = xi - x(kk)
+         yr = yi - y(kk)
+         zr = zi - z(kk)
+         call imagen (xr,yr,zr)
+         r2 = xr*xr + yr*yr + zr*zr
+         if (r2 .le. ubuf2) then
+            j = j + 1
+            ulst(j,i) = k
+         end if
+      end do
+      nulst(i) = j
+c
+c     check to see if the neighbor list is too long
+c
+      if (nulst(i) .ge. maxulst) then
+         write (iout,10)
+   10    format (/,' UBUILD  --  Too many Neighbors;',
+     &              ' Increase MAXULST')
+         call fatal
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ulight  --  preconditioner list for all sites  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "ulight" performs a complete rebuild of the polarization
+c     preconditioner pair neighbor list for all sites using the
+c     method of lights
+c
+c
+      subroutine ulight
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'cell.i'
+      include 'iounit.i'
+      include 'light.i'
+      include 'mpole.i'
+      include 'neigh.i'
+      integer i,j,k
+      integer ii,kk
+      integer kgy,kgz
+      integer start,stop
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r2,off
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
+      logical repeat
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      nlight = (ncell+1) * npole
+      allocate (xsort(nlight))
+      allocate (ysort(nlight))
+      allocate (zsort(nlight))
+c
+c     transfer interaction site coordinates to sorting arrays
+c
+      do i = 1, npole
+         nulst(i) = 0
+         ii = ipole(i)
+         xuold(i) = x(ii)
+         yuold(i) = y(ii)
+         zuold(i) = z(ii)
+         xsort(i) = x(ii)
+         ysort(i) = y(ii)
+         zsort(i) = z(ii)
+      end do
+c
+c     use the method of lights to generate neighbors
+c
+      off = sqrt(ubuf2)
+      call lights (off,npole,xsort,ysort,zsort)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
+c     loop over all atoms computing the neighbor lists
+c
+      do i = 1, npole
+         ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         if (kbx(i) .le. kex(i)) then
+            repeat = .false.
+            start = kbx(i) + 1
+            stop = kex(i)
+         else
+            repeat = .true.
+            start = 1
+            stop = kex(i)
+         end if
+   10    continue
+         do j = start, stop
+            k = locx(j)
+            kk = ipole(k)
+            kgy = rgy(k)
+            if (kby(i) .le. key(i)) then
+               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            else
+               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+            end if
+            kgz = rgz(k)
+            if (kbz(i) .le. kez(i)) then
+               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            else
+               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+            end if
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. ubuf2) then
+               if (i .lt. k) then
+                  nulst(i) = nulst(i) + 1
+                  ulst(nulst(i),i) = k
+               else
+                  nulst(k) = nulst(k) + 1
+                  ulst(nulst(k),k) = i
+               end if
+            end if
+   20       continue
+         end do
+         if (repeat) then
+            repeat = .false.
+            start = kbx(i) + 1
+            stop = nlight
+            goto 10
+         end if
+      end do
+c
+c     check to see if the neighbor lists are too long
+c
+      do i = 1, npole
+         if (nulst(i) .ge. maxulst) then
+            write (iout,30)
+   30       format (/,' UFULL  --  Too many Neighbors;',
+     &                 ' Increase MAXULST')
             call fatal
          end if
       end do

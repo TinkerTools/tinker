@@ -1,7 +1,7 @@
 
-               --------------------------------------------------
-               Benchmark Results from TINKER 6.2  (February 2013)
-               --------------------------------------------------
+                 ---------------------------------------------
+                 Benchmark Results from TINKER 6.2  (May 2013)
+                 ---------------------------------------------
 
  Benchmark #1: Calmodulin Energy Evaluation (Serial)
 
@@ -11,11 +11,11 @@
  MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
  ---------------------------                  ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53      1.66      3.30     8.80
- Mac Pro (OSX 10.6, Intel 12.0)              2.80      1.99      3.37     9.46
- Mac Pro (OSX 10.6, Intel 12.0)              2.66      1.65      3.29     8.77
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40      1.35      3.42     9.73
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40      2.42      4.69    15.43
+ MacBook Pro (OSX 10.6, Intel 12)            2.53      1.67      3.31     8.80
+ Mac Pro (OSX 10.6, Intel 12)                2.80      2.00      3.37     9.41
+ Mac Pro (OSX 10.6, Intel 12)                2.66      1.65      3.29     8.77
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40      1.35      3.38     9.68
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40      2.42      4.69    15.43
 
  Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
 
@@ -25,11 +25,11 @@
  MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
  ---------------------------                  ---    ------  --------  -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53      3.10      4.35    15.74
- Mac Pro (OSX 10.6, Intel 12.0)              2.80      3.63      4.86    17.65
- Mac Pro (OSX 10.6, Intel 12.0)              2.66      3.07      4.31    15.66
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40      3.04      4.33    17.01
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40      5.76      7.68    30.61
+ MacBook Pro (OSX 10.6, Intel 12)            2.53      3.09      4.36    15.80
+ Mac Pro (OSX 10.6, Intel 12)                2.80      3.64      4.88    17.61
+ Mac Pro (OSX 10.6, Intel 12)                2.66      3.07      4.31    15.66
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40      2.96      4.17    16.68
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40      5.76      7.68    30.61
 
  Benchmark #3: Peptide Normal Mode Calculation (Serial)
 
@@ -39,11 +39,11 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53                4.46
- Mac Pro (OSX 10.6, Intel 12.0)              2.80                5.54
- Mac Pro (OSX 10.6, Intel 12.0)              2.66                3.51
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40                3.96
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                7.98
+ MacBook Pro (OSX 10.6, Intel 12)            2.53                4.43
+ Mac Pro (OSX 10.6, Intel 12)                2.80                5.53
+ Mac Pro (OSX 10.6, Intel 12)                2.66                3.51
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40                3.95
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40                7.98
 
  Benchmark #4: TIP3P Water Box Molecular Dynamics (Serial)
 
@@ -54,26 +54,27 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53                16.8
- Mac Pro (OSX 10.6, Intel 12.0)              2.80                16.8
- Mac Pro (OSX 10.6, Intel 12.0)              2.66                16.6
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40                15.6
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                21.7
+ MacBook Pro (OSX 10.6, Intel 12)            2.53                16.9
+ Mac Pro (OSX 10.6, Intel 12)                2.80                16.8
+ Mac Pro (OSX 10.6, Intel 12)                2.66                16.6
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40                15.4
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40                21.7
 
  Benchmark #5: AMOEBA Water Box Molecular Dynamics (Serial)
 
  MD run of 1000 MD Steps for 216 AMOEBA Waters in a 18.643 Ang Box,
  Neighbor Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff,
- 9.0 Ang vdW Cutoff, and 1.0 fs Time Step with Modified Beeman Integration
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
+ and 0.00001 RMS Induced Dipole Convergence
 
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53                 128
- Mac Pro (OSX 10.6, Intel 12.0)              2.80                 143
- Mac Pro (OSX 10.6, Intel 12.0)              2.66                 127
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40                 141
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40                 293
+ MacBook Pro (OSX 10.6, Intel 12)            2.53                 132
+ Mac Pro (OSX 10.6, Intel 12)                2.80                 169
+ Mac Pro (OSX 10.6, Intel 12)                2.66                 127
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40                 162
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40                 293
 
  Benchmark #6: CHARMM DHFR-Water Molecular Dynamics (Parallel, OpenMP)
 
@@ -85,69 +86,70 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53         2/1        80 (1.00)
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53         2/2        51 (1.57)
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53         2/4        43 (1.86)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66         4/1       101 (1.00)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66         4/2        62 (1.63)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66         4/4        45 (2.24)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/1        86 (1.00)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/2        54 (1.59)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/4        36 (2.39)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/6        31 (2.77)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/8        27 (3.19)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/1        76 (1.00)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/4        30 (2.53)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/8        22 (3.45)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/12       21 (3.62)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/24       25 (3.04)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/1        80 (1.00)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/2        60 (1.33)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/4        47 (1.70)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/6        31 (2.58)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/8        41 (1.95)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/1       138 (1.00)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/2        85 (1.62)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/4        58 (2.38)
+ MacBook Pro (OSX 10.6, Intel 12)            2.53         2/1        80 (1.00)
+ MacBook Pro (OSX 10.6, Intel 12)            2.53         2/2        52 (1.54)
+ MacBook Pro (OSX 10.6, Intel 12)            2.53         2/4        44 (1.82)
+ Mac Pro (OSX 10.6, Intel 12)                2.66         4/1       112 (1.00)
+ Mac Pro (OSX 10.6, Intel 12)                2.66         4/2        69 (1.62)
+ Mac Pro (OSX 10.6, Intel 12)                2.66         4/4        48 (2.33)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/1        87 (1.00)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/2        54 (1.61)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/4        36 (2.42)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/6        31 (2.81)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/8        27 (3.22)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/1        76 (1.00)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/4        30 (2.53)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/8        22 (3.45)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/12       21 (3.62)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/24       25 (3.04)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/1        80 (1.00)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/2        48 (1.67)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/4        54 (1.48)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/6        45 (1.78)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/8        44 (1.82)
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40         4/1       138 (1.00)
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40         4/2        85 (1.62)
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40         4/4        58 (2.38)
 
  Benchmark #7: AMOEBA DHFR-Water Molecular Dynamics (Parallel, OpenMP)
 
  MD run of 100 MD Steps for AMOEBA DHFR-Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
- OpenMP timings reported as "wall clock" time for benchmark
+ and 0.00001 RMS Induced Dipole Convergence, OpenMP timings reported as
+ "wall clock" time for benchmark
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53         2/1       632 (1.00)
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53         2/2       383 (1.65)
- MacBook Pro (OSX 10.6, Intel 12.0)          2.53         2/4       319 (1.98)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66         4/1       849 (1.00)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66         4/2       486 (1.75)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66         4/4       295 (2.88)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/1       659 (1.00)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/2       385 (1.71)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/4       218 (3.02)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/6       168 (3.92)
- Mac Pro (OSX 10.6, Intel 12.0)              2.80         8/8       141 (4.67)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/1       575 (1.00)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/4       182 (3.16)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/8       123 (4.67)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/12      109 (5.28)
- Mac Pro (OSX 10.6, Intel 12.0)              2.66        12/24       95 (6.05)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/1       635 (1.00)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/2       382 (1.66)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/4       255 (2.49)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/6       223 (2.85)
- Intel ES-2609 (CentOS 5.8, Intel 12.0)      2.40         8/8       201 (3.16)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/1      1366 (1.00)
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/2       804 (1.70) 
- Opteron 280 (CentOS 5.2, Intel 11.1)        2.40         4/4       474 (2.88)
+ MacBook Pro (OSX 10.6, Intel 12)            2.53         2/1       661 (1.00)
+ MacBook Pro (OSX 10.6, Intel 12)            2.53         2/2       395 (1.67)
+ MacBook Pro (OSX 10.6, Intel 12)            2.53         2/4       338 (1.96)
+ Mac Pro (OSX 10.6, Intel 12)                2.66         4/1       816 (1.00)
+ Mac Pro (OSX 10.6, Intel 12)                2.66         4/2       482 (1.69)
+ Mac Pro (OSX 10.6, Intel 12)                2.66         4/4       279 (2.92)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/1       616 (1.00)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/2       365 (1.69)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/4       207 (2.98)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/6       159 (3.87)
+ Mac Pro (OSX 10.6, Intel 12)                2.80         8/8       133 (4.63)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/1       575 (1.00)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/4       182 (3.16)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/8       123 (4.67)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/12      109 (5.28)
+ Mac Pro (OSX 10.6, Intel 12)                2.66        12/24       95 (6.05)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/1       588 (1.00)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/2       324 (1.81)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/4       175 (3.36)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/6       183 (3.21)
+ Intel ES-2609 (CentOS 5.8, Intel 12)        2.40         8/8       177 (3.32)
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40         4/1      1366 (1.00)
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40         4/2       804 (1.70) 
+ Opteron 280 (CentOS 5.2, Intel 12)          2.40         4/4       474 (2.88)
 
  ----------------------
  Times are reported in seconds and were measured with TINKER Version 6.2,
  dimensioned to MAXATM=100000 and MAXHESS=1000000. Each benchmark ran twice
  in rapid succession on a quiet machine, and times shown were taken from
- the second run. The first 5 benchmarks were run with serial executables,
- while the last two benchmarks are a test of OpenMP parallel performance.
+ the second run. The first 5 benchmarks were run with a single thread in
+ serial, while the last two benchmarks test OpenMP parallel performance.

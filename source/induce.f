@@ -43,14 +43,8 @@ c
          call induce0e
       else if (solvtyp(1:2) .eq. 'GK') then
          call induce0d
-      else if (use_ewald) then
-         call induce0c
       else
-         if (use_mlist) then
-            call induce0b
-         else
-            call induce0a
-         end if
+         call induce0a
       end if
 c
 c     update the lists of previous induced dipole values
@@ -167,132 +161,22 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine ulspred  --  induced dipole prediction coeffs  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "ulspred" standard extrapolation values or a least squares fit
-c     to set coefficients of an induced dipole predictor polynomial
-c
-c     literature references:
-c
-c     J. Kolafa, "Time-Reversible Always Stable Predictor-Corrector
-c     Method for Molecular Dynamics of Polarizable Molecules", Journal
-c     of Computational Chemistry, 25, 335-342 (2004)
-c
-c     W. Wang and R. D. Skeel, "Fast Evaluation of Polarizable Forces",
-c     Journal of Chemical Physics, 123, 164107 (2005)
-c
-c
-      subroutine ulspred
-      implicit none
-      include 'sizes.i'
-      include 'mpole.i'
-      include 'uprior.i'
-      integer i,j,k,m
-      real*8 coeff,udk,upk
-      real*8 b(maxualt)
-      real*8 bp(maxualt)
-      real*8 a(maxualt*(maxualt+1)/2)
-      real*8 ap(maxualt*(maxualt+1)/2)
-      real*8 c(maxualt,maxualt)
-      real*8 cp(maxualt,maxualt)
-c
-c
-c     set the Gear predictor binomial coefficients
-c
-      if (polpred .eq. 'GEAR') then
-         do i = 1, nualt
-            coeff = gear(i)
-            bpred(i) = coeff
-            bpredp(i) = coeff
-            bpreds(i) = coeff
-            bpredps(i) = coeff
-         end do
-c
-c     set always stable predictor-corrector (ASPC) coefficients
-c
-      else if (polpred .eq. 'ASPC') then
-         do i = 1, nualt
-            coeff = aspc(i)
-            bpred(i) = coeff
-            bpredp(i) = coeff
-            bpreds(i) = coeff
-            bpredps(i) = coeff
-         end do
-c
-c     derive normal equations corresponding to least squares fit
-c
-      else
-         do k = 1, nualt
-            b(k) = 0.0d0
-            bp(k) = 0.0d0
-            do m = k, nualt
-               c(k,m) = 0.0d0
-               cp(k,m) = 0.0d0
-            end do
-         end do
-         do i = 1, npole
-            do j = 1, 3
-               do k = 1, nualt
-                  udk = udalt(k,j,i)
-                  upk = upalt(k,j,i)
-                  do m = k, nualt
-                     c(k,m) = c(k,m) + udk*udalt(m,j,i)
-                     cp(k,m) = cp(k,m) + upk*upalt(m,j,i)
-                  end do
-               end do
-            end do
-         end do
-         i = 0
-         do k = 2, nualt
-            b(k-1) = c(1,k)
-            bp(k-1) = cp(1,k)
-            do m = k, nualt
-               i = i + 1
-               a(i) = c(k,m)
-               ap(i) = cp(k,m)
-            end do
-         end do
-c
-c     solve normal equations and transfer to coefficient vector
-c
-         k = nualt - 1
-         call cholesky (k,a,b)
-         call cholesky (k,ap,bp)
-         do k = 1, nualt-1
-            bpred(k) = b(k)
-            bpredp(k) = bp(k)
-            bpreds(k) = b(k)
-            bpredps(k) = bp(k)
-         end do
-         bpred(nualt) = 0.0d0
-         bpredp(nualt) = 0.0d0
-         bpreds(nualt) = 0.0d0
-         bpredps(nualt) = 0.0d0
-      end if
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine induce0a  --  induced dipoles via double loop  ##
-c     ##                                                            ##
-c     ################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine induce0a  --  conjugate gradient dipole solver  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "induce0a" computes the induced dipole moments at polarizable
-c     sites using a pairwise double loop
+c     sites using a preconditioned conjugate gradient solver
 c
 c
       subroutine induce0a
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'cutoff.i'
       include 'inform.i'
       include 'iounit.i'
       include 'mpole.i'
@@ -334,11 +218,6 @@ c
       end do
       if (.not. use_polar)  return
 c
-c     set the switching function coefficients
-c
-      mode = 'MPOLE'
-      call switch (mode)
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (field(3,npole))
@@ -346,9 +225,15 @@ c
       allocate (udir(3,npole))
       allocate (udirp(3,npole))
 c
-c     compute the field at each atom due to permanent multipoles
+c     get the electrostatic field due to permanent multipoles
 c
-      call dfield0a (field,fieldp)
+      if (use_ewald) then
+         call dfield0c (field,fieldp)
+      else if (use_mlist) then
+         call dfield0b (field,fieldp)
+      else
+         call dfield0a (field,fieldp)
+      end if
 c
 c     set induced dipoles to polarizability times direct field
 c
@@ -389,26 +274,47 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (rsd(3,npole))
-         allocate (rsdp(3,npole))
-         allocate (zrsd(3,npole))
-         allocate (zrsdp(3,npole))
-         allocate (conj(3,npole))
-         allocate (conjp(3,npole))
-         allocate (vec(3,npole))
-         allocate (vecp(3,npole))
+         allocate (rsd(3,n))
+         allocate (rsdp(3,n))
+         allocate (zrsd(3,n))
+         allocate (zrsdp(3,n))
+         allocate (conj(3,n))
+         allocate (conjp(3,n))
+         allocate (vec(3,n))
+         allocate (vecp(3,n))
+c
+c     get the electrostatic field due to induced dipoles
+c
+         if (use_ewald) then
+            call ufield0c (field,fieldp)
+         else if (use_mlist) then
+            call ufield0b (field,fieldp)
+         else
+            call ufield0a (field,fieldp)
+         end if
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
-         call ufield0a (field,fieldp)
          do i = 1, npole
             do j = 1, 3
                rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
      &                       + field(j,i)
                rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
      &                       + fieldp(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
-               zrsdp(j,i) = rsdp(j,i) * polarity(i)
+            end do
+         end do
+         mode = 'BUILD'
+         if (use_mlist) then
+            call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+            mode = 'APPLY'
+            call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+         else
+            call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+            mode = 'APPLY'
+            call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+         end if
+         do i = 1, npole
+            do j = 1, 3
                conj(j,i) = zrsd(j,i)
                conjp(j,i) = zrsdp(j,i)
             end do
@@ -426,7 +332,13 @@ c
                   uinp(j,i) = conjp(j,i)
                end do
             end do
-            call ufield0a (field,fieldp)
+            if (use_ewald) then
+               call ufield0c (field,fieldp)
+            else if (use_mlist) then
+               call ufield0b (field,fieldp)
+            else
+               call ufield0a (field,fieldp)
+            end if
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = vec(j,i)
@@ -457,12 +369,15 @@ c
                   rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
                end do
             end do
+            if (use_mlist) then
+               call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+            else
+               call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+            end if
             b = 0.0d0
             bp = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
                   b = b + rsd(j,i)*zrsd(j,i)
                   bp = bp + rsdp(j,i)*zrsdp(j,i)
                end do
@@ -592,6 +507,7 @@ c
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the value of the field at each site
@@ -602,6 +518,11 @@ c
             fieldp(j,i) = 0.0d0
          end do
       end do
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -912,6 +833,7 @@ c
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the value of the field at each site
@@ -922,6 +844,11 @@ c
             fieldp(j,i) = 0.0d0
          end do
       end do
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1119,267 +1046,6 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine induce0b  --  induced dipoles via neighbor list  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "induce0b" computes the induced dipole moments at polarizable
-c     sites using a neighbor list
-c
-c
-      subroutine induce0b
-      implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'uprior.i'
-      integer i,j,k
-      integer iter,maxiter
-      real*8 udsum,upsum
-      real*8 eps,epsold
-      real*8 epsd,epsp
-      real*8 a,ap,b,bp
-      real*8 sum,sump
-      real*8, allocatable :: field(:,:)
-      real*8, allocatable :: fieldp(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: rsd(:,:)
-      real*8, allocatable :: rsdp(:,:)
-      real*8, allocatable :: zrsd(:,:)
-      real*8, allocatable :: zrsdp(:,:)
-      real*8, allocatable :: conj(:,:)
-      real*8, allocatable :: conjp(:,:)
-      real*8, allocatable :: vec(:,:)
-      real*8, allocatable :: vecp(:,:)
-      logical done
-      character*6 mode
-c
-c
-c     zero out the induced dipoles at each site
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
-         end do
-      end do
-      if (.not. use_polar)  return
-c
-c     set the switching function coefficients
-c
-      mode = 'MPOLE'
-      call switch (mode)
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-c
-c     compute the field at each atom due to permanent multipoles
-c
-      call dfield0b (field,fieldp)
-c
-c     set induced dipoles to polarizability times direct field
-c
-      do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-         end do
-      end do
-c
-c     set tolerances for computation of mutual induced dipoles
-c
-      if (poltyp .eq. 'MUTUAL') then
-         done = .false.
-         maxiter = 500
-         iter = 0
-         eps = 100.0d0
-c
-c     estimated induced dipoles from polynomial predictor
-c
-         if (use_pred .and. nualt.eq.maxualt) then
-            do i = 1, npole
-               do j = 1, 3
-                  udsum = 0.0d0
-                  upsum = 0.0d0
-                  do k = 1, nualt-1
-                     udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpredp(k)*upalt(k,j,i)
-                  end do
-                  uind(j,i) = udsum
-                  uinp(j,i) = upsum
-               end do
-            end do
-         end if
-c
-c     perform dynamic allocation of some local arrays
-c
-         allocate (rsd(3,npole))
-         allocate (rsdp(3,npole))
-         allocate (zrsd(3,npole))
-         allocate (zrsdp(3,npole))
-         allocate (conj(3,npole))
-         allocate (conjp(3,npole))
-         allocate (vec(3,npole))
-         allocate (vecp(3,npole))
-c
-c     set initial conjugate gradient residual and conjugate vector
-c
-         call ufield0b (field,fieldp)
-         do i = 1, npole
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                       + fieldp(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
-               zrsdp(j,i) = rsdp(j,i) * polarity(i)
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-            end do
-         end do
-c
-c     conjugate gradient iteration of the mutual induced dipoles
-c
-         do while (.not. done)
-            iter = iter + 1
-            do i = 1, npole
-               do j = 1, 3
-                  vec(j,i) = uind(j,i)
-                  vecp(j,i) = uinp(j,i)
-                  uind(j,i) = conj(j,i)
-                  uinp(j,i) = conjp(j,i)
-               end do
-            end do
-            call ufield0b (field,fieldp)
-            do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  uinp(j,i) = vecp(j,i)
-                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
-               end do
-            end do
-            a = 0.0d0
-            ap = 0.0d0
-            sum = 0.0d0
-            sump = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  a = a + conj(j,i)*vec(j,i)
-                  ap = ap + conjp(j,i)*vecp(j,i)
-                  sum = sum + rsd(j,i)*zrsd(j,i)
-                  sump = sump + rsdp(j,i)*zrsdp(j,i)
-               end do
-            end do
-            a = sum / a
-            ap = sump / ap
-            do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = uind(j,i) + a*conj(j,i)
-                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-               end do
-            end do
-            b = 0.0d0
-            bp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
-                  b = b + rsd(j,i)*zrsd(j,i)
-                  bp = bp + rsdp(j,i)*zrsdp(j,i)
-               end do
-            end do
-            b = b / sum
-            bp = bp / sump
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-               end do
-            end do
-c
-c     check the convergence of the mutual induced dipoles
-c
-            epsold = eps
-            eps = max(epsd,epsp)
-            eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
-               if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
-     &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
-               end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
-            end if
-            if (eps .lt. poleps)  done = .true.
-            if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
-         end do
-c
-c     perform deallocation of some local arrays
-c
-         deallocate (rsd)
-         deallocate (rsdp)
-         deallocate (zrsd)
-         deallocate (zrsdp)
-         deallocate (conj)
-         deallocate (conjp)
-         deallocate (vec)
-         deallocate (vecp)
-c
-c     print the results from the conjugate gradient iteration
-c
-         if (debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
-     &                 6x,'RMS Change',f15.10)
-         end if
-c
-c     terminate the calculation if dipoles failed to converge
-c
-         if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
-         end if
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (field)
-      deallocate (fieldp)
-      deallocate (udir)
-      deallocate (udirp)
-      return
-      end
-c
-c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine dfield0b  --  direct induction via pair list  ##
@@ -1434,6 +1100,7 @@ c
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the value of the field at each site
@@ -1444,6 +1111,11 @@ c
             fieldp(j,i) = 0.0d0
          end do
       end do
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1624,6 +1296,7 @@ c
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical proceed
+      character*6 mode
 c
 c
 c     zero out the value of the field at each site
@@ -1634,6 +1307,11 @@ c
             fieldp(j,i) = 0.0d0
          end do
       end do
+c
+c     set the switching function coefficients
+c
+      mode = 'MPOLE'
+      call switch (mode)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1729,262 +1407,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (dscale)
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine induce0c  --  induced dipole moments via Ewald  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "induce0c" computes the induced dipole moments at polarizable
-c     sites using particle mesh Ewald summation
-c
-c
-      subroutine induce0c
-      implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'uprior.i'
-      integer i,j,k,iter
-      integer maxiter
-      real*8 eps,epsold
-      real*8 epsd,epsp
-      real*8 udsum,upsum
-      real*8 a,ap,b,bp
-      real*8 sum,sump
-      real*8, allocatable :: field(:,:)
-      real*8, allocatable :: fieldp(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: rsd(:,:)
-      real*8, allocatable :: rsdp(:,:)
-      real*8, allocatable :: zrsd(:,:)
-      real*8, allocatable :: zrsdp(:,:)
-      real*8, allocatable :: conj(:,:)
-      real*8, allocatable :: conjp(:,:)
-      real*8, allocatable :: vec(:,:)
-      real*8, allocatable :: vecp(:,:)
-      logical done
-c
-c
-c     zero out the induced dipoles at each site
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
-         end do
-      end do
-      if (.not. use_polar)  return
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-c
-c     get the electrostatic field due to permanent multipoles
-c
-      call dfield0c (field,fieldp)
-c
-c     set induced dipoles to polarizability times direct field
-c
-      do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-         end do
-      end do
-c
-c     set tolerances for computation of mutual induced dipoles
-c
-      if (poltyp .eq. 'MUTUAL') then
-         done = .false.
-         maxiter = 500
-         iter = 0
-         eps = 100.0d0
-c
-c     estimated induced dipoles from polynomial predictor
-c
-         if (use_pred .and. nualt.eq.maxualt) then
-            call ulspred
-            do i = 1, npole
-               do j = 1, 3
-                  udsum = 0.0d0
-                  upsum = 0.0d0
-                  do k = 1, nualt-1
-                     udsum = udsum + bpred(k)*udalt(k,j,i)
-                     upsum = upsum + bpredp(k)*upalt(k,j,i)
-                  end do
-                  uind(j,i) = udsum
-                  uinp(j,i) = upsum
-               end do
-            end do
-         end if
-c
-c     perform dynamic allocation of some local arrays
-c
-         allocate (rsd(3,n))
-         allocate (rsdp(3,n))
-         allocate (zrsd(3,n))
-         allocate (zrsdp(3,n))
-         allocate (conj(3,n))
-         allocate (conjp(3,n))
-         allocate (vec(3,n))
-         allocate (vecp(3,n))
-c
-c     set initial conjugate gradient residual and conjugate vector
-c
-         call ufield0c (field,fieldp)
-         do i = 1, npole
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                       + fieldp(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
-               zrsdp(j,i) = rsdp(j,i) * polarity(i)
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-            end do
-         end do
-c
-c     conjugate gradient iteration of the mutual induced dipoles
-c
-         do while (.not. done)
-            iter = iter + 1
-            do i = 1, npole
-               do j = 1, 3
-                  vec(j,i) = uind(j,i)
-                  vecp(j,i) = uinp(j,i)
-                  uind(j,i) = conj(j,i)
-                  uinp(j,i) = conjp(j,i)
-               end do
-            end do
-            call ufield0c (field,fieldp)
-            do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  uinp(j,i) = vecp(j,i)
-                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
-               end do
-            end do
-            a = 0.0d0
-            ap = 0.0d0
-            sum = 0.0d0
-            sump = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  a = a + conj(j,i)*vec(j,i)
-                  ap = ap + conjp(j,i)*vecp(j,i)
-                  sum = sum + rsd(j,i)*zrsd(j,i)
-                  sump = sump + rsdp(j,i)*zrsdp(j,i)
-               end do
-            end do
-            a = sum / a
-            ap = sump / ap
-            do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = uind(j,i) + a*conj(j,i)
-                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-               end do
-            end do
-            b = 0.0d0
-            bp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
-                  b = b + rsd(j,i)*zrsd(j,i)
-                  bp = bp + rsdp(j,i)*zrsdp(j,i)
-               end do
-            end do
-            b = b / sum
-            bp = bp / sump
-            epsd = 0.0d0
-            epsp = 0.0d0
-            do i = 1, npole
-               do j = 1, 3
-                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-               end do
-            end do
-c
-c     check the convergence of the mutual induced dipoles
-c
-            epsold = eps
-            eps = max(epsd,epsp)
-            eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
-               if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
-     &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
-               end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
-            end if
-            if (eps .lt. poleps)  done = .true.
-            if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
-         end do
-c
-c     perform deallocation of some local arrays
-c
-         deallocate (rsd)
-         deallocate (rsdp)
-         deallocate (zrsd)
-         deallocate (zrsdp)
-         deallocate (conj)
-         deallocate (conjp)
-         deallocate (vec)
-         deallocate (vecp)
-c
-c     print the results from the conjugate gradient iteration
-c
-         if (debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
-     &                 6x,'RMS Change',f15.10)
-         end if
-c
-c     terminate the calculation if dipoles failed to converge
-c
-         if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
-         end if
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (field)
-      deallocate (fieldp)
-      deallocate (udir)
-      deallocate (udirp)
       return
       end
 c
@@ -5809,5 +5231,475 @@ c
             fieldps(j,i) = fieldps(j,i) + pbeuinp(j,ii)
          end do
       end do
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ulspred  --  induced dipole prediction coeffs  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "ulspred" standard extrapolation values or a least squares fit
+c     to set coefficients of an induced dipole predictor polynomial
+c
+c     literature references:
+c
+c     J. Kolafa, "Time-Reversible Always Stable Predictor-Corrector
+c     Method for Molecular Dynamics of Polarizable Molecules", Journal
+c     of Computational Chemistry, 25, 335-342 (2004)
+c
+c     W. Wang and R. D. Skeel, "Fast Evaluation of Polarizable Forces",
+c     Journal of Chemical Physics, 123, 164107 (2005)
+c
+c
+      subroutine ulspred
+      implicit none
+      include 'sizes.i'
+      include 'mpole.i'
+      include 'uprior.i'
+      integer i,j,k,m
+      real*8 coeff,udk,upk
+      real*8 b(maxualt)
+      real*8 bp(maxualt)
+      real*8 a(maxualt*(maxualt+1)/2)
+      real*8 ap(maxualt*(maxualt+1)/2)
+      real*8 c(maxualt,maxualt)
+      real*8 cp(maxualt,maxualt)
+c
+c
+c     set the Gear predictor binomial coefficients
+c
+      if (polpred .eq. 'GEAR') then
+         do i = 1, nualt
+            coeff = gear(i)
+            bpred(i) = coeff
+            bpredp(i) = coeff
+            bpreds(i) = coeff
+            bpredps(i) = coeff
+         end do
+c
+c     set always stable predictor-corrector (ASPC) coefficients
+c
+      else if (polpred .eq. 'ASPC') then
+         do i = 1, nualt
+            coeff = aspc(i)
+            bpred(i) = coeff
+            bpredp(i) = coeff
+            bpreds(i) = coeff
+            bpredps(i) = coeff
+         end do
+c
+c     derive normal equations corresponding to least squares fit
+c
+      else
+         do k = 1, nualt
+            b(k) = 0.0d0
+            bp(k) = 0.0d0
+            do m = k, nualt
+               c(k,m) = 0.0d0
+               cp(k,m) = 0.0d0
+            end do
+         end do
+         do i = 1, npole
+            do j = 1, 3
+               do k = 1, nualt
+                  udk = udalt(k,j,i)
+                  upk = upalt(k,j,i)
+                  do m = k, nualt
+                     c(k,m) = c(k,m) + udk*udalt(m,j,i)
+                     cp(k,m) = cp(k,m) + upk*upalt(m,j,i)
+                  end do
+               end do
+            end do
+         end do
+         i = 0
+         do k = 2, nualt
+            b(k-1) = c(1,k)
+            bp(k-1) = cp(1,k)
+            do m = k, nualt
+               i = i + 1
+               a(i) = c(k,m)
+               ap(i) = cp(k,m)
+            end do
+         end do
+c
+c     solve normal equations and transfer to coefficient vector
+c
+         k = nualt - 1
+         call cholesky (k,a,b)
+         call cholesky (k,ap,bp)
+         do k = 1, nualt-1
+            bpred(k) = b(k)
+            bpredp(k) = bp(k)
+            bpreds(k) = b(k)
+            bpredps(k) = bp(k)
+         end do
+         bpred(nualt) = 0.0d0
+         bpredp(nualt) = 0.0d0
+         bpreds(nualt) = 0.0d0
+         bpredps(nualt) = 0.0d0
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine uscale0a  --  dipole preconditioner via loop  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "uscale0a" builds and applies a preconditioner for the conjugate
+c     gradient induced dipole solver using a double loop
+c
+c
+      subroutine uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'cutoff.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'usolve.i'
+      integer i,j,k,m
+      integer ii,kk
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,rr3,rr5
+      real*8 pdi,pti
+      real*8 poli,polik
+      real*8 damp,expdamp
+      real*8 pgamma,off2
+      real*8 scale3,scale5
+      real*8 m1,m2,m3
+      real*8 m4,m5,m6
+      real*8, allocatable :: dscale(:)
+      real*8 rsd(3,*)
+      real*8 rsdp(3,*)
+      real*8 zrsd(3,*)
+      real*8 zrsdp(3,*)
+      character*6 mode
+c
+c
+c     apply the preconditioning matrix to the current residual
+c
+      if (mode .eq. 'APPLY') then
+         do i = 1, npole
+            do j = 1, 3
+               zrsd(j,i) = udiag * polarity(i) * rsd(j,i)
+               zrsdp(j,i) = udiag * polarity(i) * rsdp(j,i)
+            end do
+         end do
+         off2 = usolvcut * usolvcut
+         j = 0
+         do i = 1, npole-1
+            ii = ipole(i)
+            do k = i+1, npole
+               kk = ipole(k)
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  m1 = minv(j+1)
+                  m2 = minv(j+2)
+                  m3 = minv(j+3)
+                  m4 = minv(j+4)
+                  m5 = minv(j+5)
+                  m6 = minv(j+6)
+                  j = j + 6
+                  zrsd(1,i) = zrsd(1,i) + m1*rsd(1,k) + m2*rsd(2,k)
+     &                           + m3*rsd(3,k)
+                  zrsd(2,i) = zrsd(2,i) + m2*rsd(1,k) + m4*rsd(2,k)
+     &                           + m5*rsd(3,k)
+                  zrsd(3,i) = zrsd(3,i) + m3*rsd(1,k) + m5*rsd(2,k)
+     &                           + m6*rsd(3,k)
+                  zrsd(1,k) = zrsd(1,k) + m1*rsd(1,i) + m2*rsd(2,i)
+     &                           + m3*rsd(3,i)
+                  zrsd(2,k) = zrsd(2,k) + m2*rsd(1,i) + m4*rsd(2,i)
+     &                           + m5*rsd(3,i)
+                  zrsd(3,k) = zrsd(3,k) + m3*rsd(1,i) + m5*rsd(2,i)
+     &                           + m6*rsd(3,i)
+                  zrsdp(1,i) = zrsdp(1,i) + m1*rsdp(1,k) + m2*rsdp(2,k)
+     &                            + m3*rsdp(3,k)
+                  zrsdp(2,i) = zrsdp(2,i) + m2*rsdp(1,k) + m4*rsdp(2,k)
+     &                            + m5*rsdp(3,k)
+                  zrsdp(3,i) = zrsdp(3,i) + m3*rsdp(1,k) + m5*rsdp(2,k)
+     &                            + m6*rsdp(3,k)
+                  zrsdp(1,k) = zrsdp(1,k) + m1*rsdp(1,i) + m2*rsdp(2,i)
+     &                            + m3*rsdp(3,i)
+                  zrsdp(2,k) = zrsdp(2,k) + m2*rsdp(1,i) + m4*rsdp(2,i)
+     &                            + m5*rsdp(3,i)
+                  zrsdp(3,k) = zrsdp(3,k) + m3*rsdp(1,i) + m5*rsdp(2,i)
+     &                            + m6*rsdp(3,i)
+               end if
+            end do
+         end do
+c
+c     construct off-diagonal elements of preconditioning matrix
+c
+      else if (mode .eq. 'BUILD') then
+         allocate (dscale(n))
+         off2 = usolvcut * usolvcut
+         m = 0
+         do i = 1, npole-1
+            ii = ipole(i)
+            pdi = pdamp(i)
+            pti = thole(i)
+            poli = polarity(i)
+            do j = i+1, npole
+               dscale(ipole(j)) = 1.0d0
+            end do
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = u1scale
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = u2scale
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = u3scale
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = u4scale
+            end do
+            do k = i+1, npole
+               kk = ipole(k)
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  scale3 = dscale(kk)
+                  scale5 = dscale(kk)
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(k))
+                     damp = -pgamma * (r/damp)**3
+                     if (damp .gt. -50.0d0) then
+                        expdamp = exp(damp)
+                        scale3 = scale3 * (1.0d0-expdamp)
+                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+                     end if
+                  end if
+                  polik = poli * polarity(k)
+                  rr3 = scale3 * polik / (r*r2)
+                  rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
+                  minv(m+1) = rr5*xr*xr - rr3
+                  minv(m+2) = rr5*xr*yr
+                  minv(m+3) = rr5*xr*zr
+                  minv(m+4) = rr5*yr*yr - rr3
+                  minv(m+5) = rr5*yr*zr
+                  minv(m+6) = rr5*zr*zr - rr3
+                  m = m + 6
+               end if
+            end do
+         end do
+         deallocate (dscale)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine uscale0b  --  dipole preconditioner via list  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "uscale0b" builds and applies a preconditioner for the conjugate
+c     gradient induced dipole solver using a neighbor pair list
+c
+c
+      subroutine uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'mpole.i'
+      include 'neigh.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'usolve.i'
+      integer i,j,k,m
+      integer ii,kk,kkk
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,rr3,rr5
+      real*8 pdi,pti
+      real*8 poli,polik
+      real*8 damp,expdamp
+      real*8 pgamma
+      real*8 scale3,scale5
+      real*8 m1,m2,m3
+      real*8 m4,m5,m6
+      real*8, allocatable :: dscale(:)
+      real*8 rsd(3,*)
+      real*8 rsdp(3,*)
+      real*8 zrsd(3,*)
+      real*8 zrsdp(3,*)
+      real*8, allocatable :: zrsdt(:,:)
+      real*8, allocatable :: zrsdtp(:,:)
+      character*6 mode
+c
+c
+c     apply the preconditioning matrix to the current residual
+c
+      if (mode .eq. 'APPLY') then
+         allocate (zrsdt(3,npole))
+         allocate (zrsdtp(3,npole))
+         do i = 1, npole
+            do j = 1, 3
+               zrsd(j,i) = 0.0d0
+               zrsdp(j,i) = 0.0d0
+               zrsdt(j,i) = udiag * polarity(i) * rsd(j,i)
+               zrsdtp(j,i) = udiag * polarity(i) * rsdp(j,i)
+            end do
+         end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,k,m,kk,m1,m2,m3,m4,m5,m6)
+!$OMP& firstprivate(dscale)
+!$OMP DO reduction(+:zrsdt,zrsdtp) schedule(dynamic)
+         do i = 1, npole
+            m = mindex(i)
+            do kk = 1, nulst(i)
+               k = ulst(kk,i)
+               m1 = minv(m+1)
+               m2 = minv(m+2)
+               m3 = minv(m+3)
+               m4 = minv(m+4)
+               m5 = minv(m+5)
+               m6 = minv(m+6)
+               m = m + 6
+               zrsdt(1,i) = zrsdt(1,i) + m1*rsd(1,k) + m2*rsd(2,k)
+     &                        + m3*rsd(3,k)
+               zrsdt(2,i) = zrsdt(2,i) + m2*rsd(1,k) + m4*rsd(2,k)
+     &                        + m5*rsd(3,k)
+               zrsdt(3,i) = zrsdt(3,i) + m3*rsd(1,k) + m5*rsd(2,k)
+     &                        + m6*rsd(3,k)
+               zrsdt(1,k) = zrsdt(1,k) + m1*rsd(1,i) + m2*rsd(2,i)
+     &                        + m3*rsd(3,i)
+               zrsdt(2,k) = zrsdt(2,k) + m2*rsd(1,i) + m4*rsd(2,i)
+     &                        + m5*rsd(3,i)
+               zrsdt(3,k) = zrsdt(3,k) + m3*rsd(1,i) + m5*rsd(2,i)
+     &                        + m6*rsd(3,i)
+               zrsdtp(1,i) = zrsdtp(1,i) + m1*rsdp(1,k) + m2*rsdp(2,k)
+     &                         + m3*rsdp(3,k)
+               zrsdtp(2,i) = zrsdtp(2,i) + m2*rsdp(1,k) + m4*rsdp(2,k)
+     &                         + m5*rsdp(3,k)
+               zrsdtp(3,i) = zrsdtp(3,i) + m3*rsdp(1,k) + m5*rsdp(2,k)
+     &                         + m6*rsdp(3,k)
+               zrsdtp(1,k) = zrsdtp(1,k) + m1*rsdp(1,i) + m2*rsdp(2,i)
+     &                         + m3*rsdp(3,i)
+               zrsdtp(2,k) = zrsdtp(2,k) + m2*rsdp(1,i) + m4*rsdp(2,i)
+     &                         + m5*rsdp(3,i)
+               zrsdtp(3,k) = zrsdtp(3,k) + m3*rsdp(1,i) + m5*rsdp(2,i)
+     &                         + m6*rsdp(3,i)
+            end do
+         end do
+!$OMP END DO
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP DO
+         do i = 1, npole
+            do j = 1, 3
+               zrsd(j,i) = zrsdt(j,i) + zrsd(j,i)
+               zrsdp(j,i) = zrsdtp(j,i) + zrsdp(j,i)
+            end do
+         end do
+!$OMP END DO
+!$OMP END PARALLEL
+         deallocate (zrsdt)
+         deallocate (zrsdtp)
+c
+c     build the off-diagonal elements of preconditioning matrix
+c
+      else if (mode .eq. 'BUILD') then
+         m = 0
+         do i = 1, npole
+            mindex(i) = m
+            m = m + 6*nulst(i)
+         end do
+         allocate (dscale(n))
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(xr,yr,zr,r,r2,rr3,rr5,pdi,pti,
+!$OMP& poli,polik,pgamma,damp,expdamp,scale3,scale5,i,j,k,m,ii,kk,kkk)
+!$OMP& firstprivate(dscale)
+!$OMP DO schedule(dynamic)
+         do i = 1, npole
+            ii = ipole(i)
+            pdi = pdamp(i)
+            pti = thole(i)
+            poli = polarity(i)
+            do j = i+1, npole
+               dscale(ipole(j)) = 1.0d0
+            end do
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = u1scale
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = u2scale
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = u3scale
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = u4scale
+            end do
+            m = mindex(i)
+            do kkk = 1, nulst(i)
+               k = ulst(kkk,i)
+               kk = ipole(k)
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               r = sqrt(r2)
+               scale3 = dscale(kk)
+               scale5 = dscale(kk)
+               damp = pdi * pdamp(k)
+               if (damp .ne. 0.0d0) then
+                  pgamma = min(pti,thole(k))
+                  damp = -pgamma * (r/damp)**3
+                  if (damp .gt. -50.0d0) then
+                     expdamp = exp(damp)
+                     scale3 = scale3 * (1.0d0-expdamp)
+                     scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+                  end if
+               end if
+               polik = poli * polarity(k)
+               rr3 = scale3 * polik / (r*r2)
+               rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
+               minv(m+1) = rr5*xr*xr - rr3
+               minv(m+2) = rr5*xr*yr
+               minv(m+3) = rr5*xr*zr
+               minv(m+4) = rr5*yr*yr - rr3
+               minv(m+5) = rr5*yr*zr
+               minv(m+6) = rr5*zr*zr - rr3
+               m = m + 6
+            end do
+         end do
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     end OpenMP directives for the major loop structure
+c
+         deallocate (dscale)
+      end if
       return
       end

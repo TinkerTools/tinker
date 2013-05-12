@@ -270,7 +270,7 @@ c
          if (answer .ne. 'N')  dblhlx = .true.
       end if
 c
-c     build a second strand as the reverse-compliment sequence
+c     build a second strand as the reverse-complement sequence
 c
       if (nchain.eq.1 .and. dblhlx) then
          start = 1

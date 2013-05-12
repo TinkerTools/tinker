@@ -3,7 +3,6 @@
                  Benchmark Results from TINKER 4.0  (Feb 2003)
                  ---------------------------------------------
 
-
                    Benchmark #1: Calmodulin Energy Evaluation
 
             Isolated Calmodulin Molecule, 2264 Atoms, Amber parm94
@@ -32,7 +31,6 @@
  Compaq AlphaServer DS10 (Tru64 5.0)      466     0.35    1.33    1.93    8.40
  SGI IndigoII R10K (Irix 6.5, MIPS)       195     1.17    3.49    6.35   23.03
 
-
                 Benchmark #2: Crambin Crystal Energy Evaluation
 
             1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
@@ -60,7 +58,6 @@
  Apple Power Mac G4 (OSX 10.2, g77 3.3)   733     0.31    0.42    0.79    2.37
  Compaq AlphaServer DS10 (Tru64 5.0)      466     0.29    0.38    0.64    1.95
  SGI IndigoII R10K (Irix 6.5, MIPS)       195     0.92    0.74    1.41    3.89
-
 
                  Benchmark #3: Peptide Normal Mode Calculation
 
@@ -91,7 +88,6 @@
  Compaq AlphaServer DS10 (Tru64 5.0)      466               39
  SGI IndigoII R10K (Irix 6.5, MIPS)       195              144
 
-
                 Benchmark #4: TIP3P Water Box Molecular Dynamics
 
             1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic
@@ -120,7 +116,6 @@
  Apple Power Mac G4 (OSX 10.2, g77 3.3)   733              170
  Compaq AlphaServer DS10 (Tru64 5.0)      466              106
  SGI IndigoII R10K (Irix 6.5, MIPS)       195              280
-
 
                Benchmark #5: AMOEBA Water Box Molecular Dynamics
 
@@ -151,7 +146,6 @@
  Apple Power Mac G4 (OSX 10.2, g77 3.3)   733              479
  Compaq AlphaServer DS10 (Tru64 5.0)      466              358
  SGI IndigoII R10K (Irix 6.5, MIPS)       195              868
-
 
  ----------------------
  Times are reported in seconds and were measured with TINKER Version 4.0,

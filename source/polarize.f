@@ -156,6 +156,7 @@ c
       real*8, allocatable :: zrsd(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
+      character*6 mode
       logical done
 c
 c
@@ -186,7 +187,15 @@ c
          do i = 1, npole
             do j = 1, 3
                rsd(j,i) = field(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
+            end do
+         end do
+         mode = 'BUILD'
+         call uscale (mode,rsd,zrsd)
+         mode = 'APPLY'
+         call uscale (mode,rsd,zrsd)
+         do i = 1, npole
+            do j = 1, 3
+c              zrsd(j,i) = rsd(j,i) * polarity(i)
                conj(j,i) = zrsd(j,i)
             end do
          end do
@@ -223,10 +232,11 @@ c
                   rsd(j,i) = rsd(j,i) - a*vec(j,i)
                end do
             end do
+            call uscale (mode,rsd,zrsd)
             b = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
+c                 zrsd(j,i) = rsd(j,i) * polarity(i)
                   b = b + rsd(j,i)*zrsd(j,i)
                end do
             end do
@@ -406,5 +416,155 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (dscale)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine uscale  --  build & apply dipole preconditioner  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "uscale" builds and applies a preconditioner for the conjugate
+c     gradient induced dipole solver using a double loop
+c
+c
+      subroutine uscale (mode,rsd,zrsd)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'cutoff.i'
+      include 'mpole.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'usolve.i'
+      integer i,j,k,m
+      integer ii,kk
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,rr3,rr5
+      real*8 pdi,pti
+      real*8 poli,polik
+      real*8 damp,expdamp
+      real*8 pgamma
+      real*8 off2,dterm
+      real*8 scale3,scale5
+      real*8 m1,m2,m3
+      real*8 m4,m5,m6
+      real*8, allocatable :: dscale(:)
+      real*8 rsd(3,*)
+      real*8 zrsd(3,*)
+      character*6 mode
+c
+c
+c     apply the preconditioning matrix to the current residual
+c
+      if (mode .eq. 'APPLY') then
+         dterm = 2.0d0
+         do i = 1, npole
+            do j = 1, 3
+               zrsd(j,i) = dterm * polarity(i) * rsd(j,i)
+            end do
+         end do
+         off2 = usolvcut * usolvcut
+         m = 0
+         do i = 1, npole-1
+            ii = ipole(i)
+            do k = i+1, npole
+               kk = ipole(k)
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  m1 = minv(m+1)
+                  m2 = minv(m+2)
+                  m3 = minv(m+3)
+                  m4 = minv(m+4)
+                  m5 = minv(m+5)
+                  m6 = minv(m+6)
+                  m = m + 6
+                  zrsd(1,i) = zrsd(1,i) + m1*rsd(1,k) + m2*rsd(2,k)
+     &                           + m3*rsd(3,k)
+                  zrsd(2,i) = zrsd(2,i) + m2*rsd(1,k) + m4*rsd(2,k)
+     &                           + m5*rsd(3,k)
+                  zrsd(3,i) = zrsd(3,i) + m3*rsd(1,k) + m5*rsd(2,k)
+     &                           + m6*rsd(3,k)
+                  zrsd(1,k) = zrsd(1,k) + m1*rsd(1,i) + m2*rsd(2,i)
+     &                           + m3*rsd(3,i)
+                  zrsd(2,k) = zrsd(2,k) + m2*rsd(1,i) + m4*rsd(2,i)
+     &                           + m5*rsd(3,i)
+                  zrsd(3,k) = zrsd(3,k) + m3*rsd(1,i) + m5*rsd(2,i)
+     &                           + m6*rsd(3,i)
+               end if
+            end do
+         end do
+c
+c     construct off-diagonal elements of preconditioning matrix
+c
+      else if (mode .eq. 'BUILD') then
+         allocate (dscale(n))
+         off2 = usolvcut * usolvcut
+         m = 0
+         do i = 1, npole-1
+            ii = ipole(i)
+            pdi = pdamp(i)
+            pti = thole(i)
+            poli = polarity(i)
+            do j = i+1, npole
+               dscale(ipole(j)) = 1.0d0
+            end do
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = u1scale
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = u2scale
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = u3scale
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = u4scale
+            end do
+            do k = i+1, npole
+               kk = ipole(k)
+               xr = x(kk) - x(ii)
+               yr = y(kk) - y(ii)
+               zr = z(kk) - z(ii)
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  scale3 = dscale(kk)
+                  scale5 = dscale(kk)
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(k))
+                     damp = -pgamma * (r/damp)**3
+                     if (damp .gt. -50.0d0) then
+                        expdamp = exp(damp)
+                        scale3 = scale3 * (1.0d0-expdamp)
+                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+                     end if
+                  end if
+                  polik = poli * polarity(k)
+                  rr3 = scale3 * polik / (r*r2)
+                  rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
+                  minv(m+1) = rr5*xr*xr - rr3
+                  minv(m+2) = rr5*xr*yr
+                  minv(m+3) = rr5*xr*zr
+                  minv(m+4) = rr5*yr*yr - rr3
+                  minv(m+5) = rr5*yr*zr
+                  minv(m+6) = rr5*zr*zr - rr3
+                  m = m + 6
+               end if
+            end do
+         end do
+         deallocate (dscale)
+      end if
       return
       end

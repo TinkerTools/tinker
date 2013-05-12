@@ -38,6 +38,10 @@ c
       call bitors
       call rings
 c
+c     get the base force field from parameter file and keyfile
+c
+      call field
+c
 c     find unit cell type, lattice parameters and cutoff values
 c
       call unitcell
@@ -49,12 +53,11 @@ c     setup needed for potential energy smoothing methods
 c
       call flatten
 c
-c     get the force field parameters and assign atom types
+c     assign atom types, classes and other atomic information
 c
-      call field
       call katom
 c
-c     assign atoms to molcules and set the atom groups
+c     assign atoms to molecules and set the atom groups
 c
       call molecule
       call cluster

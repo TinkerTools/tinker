@@ -1,0 +1,81 @@
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  2013  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  function erf  --  evaluate error function via polynomial  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "erf" evaluates the error function via rational approximation
+c
+c     literature reference:
+c
+c     M. Abramowitz and I. A. Stegun, "Handbook of Mathematical
+c     Functions with Formulas, Graphs, and Mathematical Tables",
+c     Dover Publications, 1965, Equation 7.1.28
+c
+c
+      function erf (x)
+      implicit none
+      real*8 x,z
+      real*8 erf,erfc
+      external erfc
+c
+c
+c     get error function value via difference from the complement
+c
+      z = 1.0d0 - erfc(x)
+      erf = z
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  function erfc  --  evaluate complementary error function  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "erfc" evaluates the error function via rational approximation
+c
+c     literature reference:
+c
+c     M. Abramowitz and I. A. Stegun, "Handbook of Mathematical
+c     Functions with Formulas, Graphs, and Mathematical Tables",
+c     Dover Publications, 1965, Equation 7.1.28
+c
+c
+      function erfc (x)
+      implicit none
+      real*8 erfc,x
+      real*8 y,z
+      real*8 x2,x3,x4
+      real*8 x5,x6
+c
+c
+c     get rational approximation to complementary error function
+c
+      x2 = x * x
+      x3 = x * x2
+      x4 = x * x3
+      x5 = x * x4
+      x6 = x * x5
+      y = 1.0d0 + 0.0705230784d0*x + 0.0422820123d0*x2
+     &       + 0.0092705272d0*x3 + 0.0001520143d0*x4
+     &       + 0.0002765672d0*x5 + 0.0000430638d0*x6
+      y = y * y
+      y = y * y
+      y = y * y
+      y = y * y
+      z = 1.0d0 / y
+      if (x .lt. 0.0d0)  z = -z
+      erfc = z
+      return
+      end
