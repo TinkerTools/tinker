@@ -1143,7 +1143,7 @@ control.o: argue.i inform.i keys.i output.i sizes.i
 correlate.o: ascii.i atmtyp.i atoms.i files.i inform.i iounit.i sizes.i
 crystal.o: atmtyp.i atoms.i bound.i boxes.i couple.i files.i iounit.i math.i molcul.i sizes.i
 cspline.o: iounit.i
-cutoffs.o: atoms.i bound.i cutoff.i hescut.i keys.i neigh.i sizes.i
+cutoffs.o: atoms.i bound.i cutoff.i hescut.i keys.i neigh.i polpot.i sizes.i
 deflate.o: iounit.i
 delete.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
 diagq.o:
@@ -1268,7 +1268,7 @@ fatal.o: iounit.i
 fft3d.o: fft.i openmp.i pme.i sizes.i
 fftpack.o: math.i
 field.o: keys.i potent.i sizes.i
-final.o: chunks.i disgeo.i inform.i iounit.i neigh.i paths.i pme.i sizes.i socket.i solute.i uprior.i usage.i vibs.i
+final.o: chunks.i disgeo.i inform.i iounit.i neigh.i paths.i pme.i sizes.i socket.i solute.i uprior.i usage.i usolve.i vibs.i
 flatten.o: atoms.i fields.i inform.i iounit.i keys.i sizes.i warp.i
 freeunit.o: iounit.i
 gda.o: atoms.i files.i iounit.i minima.i potent.i sizes.i vdwpot.i warp.i
@@ -1298,7 +1298,7 @@ hessrot.o: math.i omega.i sizes.i zcoord.i
 hybrid.o: angle.i atmlst.i atmtyp.i atoms.i bond.i charge.i couple.i dipole.i imptor.i inform.i iounit.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i kitors.i kstbnd.i ksttor.i ktorsn.i kvdws.i math.i mutant.i sizes.i strbnd.i strtor.i tors.i vdw.i vdwpot.i
 image.o: boxes.i cell.i sizes.i
 impose.o: align.i inform.i iounit.i sizes.i
-induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i uprior.i
+induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i group.i inform.i iounit.i math.i mpole.i neigh.i pbstuf.i pme.i polar.i polgrp.i polpot.i potent.i shunt.i sizes.i solute.i units.i uprior.i usolve.i
 inertia.o: atmtyp.i atoms.i iounit.i math.i sizes.i
 initatom.o: ptable.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
@@ -1329,7 +1329,7 @@ kopbend.o: angle.i angpot.i atmtyp.i atoms.i couple.i fields.i inform.i iounit.i
 kopdist.o: angle.i angpot.i atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i keys.i kopdst.i opdist.i potent.i sizes.i
 korbit.o: atmtyp.i atoms.i bond.i inform.i iounit.i keys.i korbs.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
 kpitors.o: atmtyp.i atoms.i bond.i couple.i inform.i iounit.i keys.i kpitor.i pitors.i potent.i sizes.i
-kpolar.o: atoms.i couple.i inform.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i
+kpolar.o: atoms.i couple.i inform.i iounit.i keys.i kpolr.i mpole.i polar.i polgrp.i polpot.i potent.i sizes.i usolve.i
 ksolv.o: angle.i atmlst.i atmtyp.i atoms.i bath.i bond.i chgpot.i couple.i gkstuf.i hpmf.i inform.i iounit.i keys.i kvdws.i math.i npolar.i pbstuf.i potent.i sizes.i solute.i
 kstrbnd.o: angle.i angpot.i atmlst.i atmtyp.i atoms.i couple.i fields.i inform.i iounit.i keys.i kstbnd.i merck.i potent.i ring.i sizes.i strbnd.i
 kstrtor.o: atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i keys.i ksttor.i potent.i sizes.i strtor.i tors.i
@@ -1448,7 +1448,7 @@ temper.o: atmtyp.i atoms.i bath.i group.i mdstuf.i molcul.i moldyn.i rgddyn.i si
 testgrad.o: atoms.i deriv.i energi.i inform.i inter.i iounit.i sizes.i solute.i usage.i
 testhess.o: atoms.i files.i hescut.i inform.i iounit.i sizes.i usage.i
 testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i
-testpol.o: atoms.i bound.i cutoff.i inform.i iounit.i polar.i polpot.i rigid.i sizes.i units.i
+testpol.o: atoms.i bound.i cutoff.i inform.i iounit.i polar.i polpot.i potent.i rigid.i sizes.i units.i
 testrot.o: domega.i energi.i inform.i iounit.i math.i omega.i sizes.i zcoord.i
 timer.o: atoms.i cutoff.i hescut.i inform.i iounit.i sizes.i
 timerot.o: cutoff.i iounit.i omega.i sizes.i

@@ -296,12 +296,14 @@ c
 c     set initial conjugate gradient residual and conjugate vector
 c
          do i = 1, npole
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                       + fieldp(j,i)
-            end do
+            if (polarity(i) .ne. 0.0d0) then
+               do j = 1, 3
+                  rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                          + field(j,i)
+                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                          + fieldp(j,i)
+               end do
+            end if
          end do
          mode = 'BUILD'
          if (use_mlist) then
@@ -340,12 +342,14 @@ c
                call ufield0a (field,fieldp)
             end if
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  uinp(j,i) = vecp(j,i)
-                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
-               end do
+               if (polarity(i) .ne. 0.0d0) then
+                  do j = 1, 3
+                     uind(j,i) = vec(j,i)
+                     uinp(j,i) = vecp(j,i)
+                     vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+                     vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
+                  end do
+               end if
             end do
             a = 0.0d0
             ap = 0.0d0
@@ -359,8 +363,8 @@ c
                   sump = sump + rsdp(j,i)*zrsdp(j,i)
                end do
             end do
-            a = sum / a
-            ap = sump / ap
+            if (a .ne. 0.0d0)  a = sum / a
+            if (ap .ne. 0.0d0)  ap = sump / ap
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
@@ -382,8 +386,8 @@ c
                   bp = bp + rsdp(j,i)*zrsdp(j,i)
                end do
             end do
-            b = b / sum
-            bp = bp / sump
+            if (sum .ne. 0.0d0)  b = b / sum
+            if (sump .ne. 0.0d0)  bp = bp / sump
             epsd = 0.0d0
             epsp = 0.0d0
             do i = 1, npole
@@ -3441,24 +3445,26 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0d (field,fieldp,fields,fieldps)
          do i = 1, npole
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                        + fieldp(j,i)
-               rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
-     &                        + fields(j,i)
-               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
-     &                         + fieldps(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
-               zrsdp(j,i) = rsdp(j,i) * polarity(i)
-               zrsds(j,i) = rsds(j,i) * polarity(i)
-               zrsdps(j,i) = rsdps(j,i) * polarity(i)
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-               conjs(j,i) = zrsds(j,i)
-               conjps(j,i) = zrsdps(j,i)
-            end do
+            if (polarity(i) .ne. 0.0d0) then
+               do j = 1, 3
+                  rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                          + field(j,i)
+                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                           + fieldp(j,i)
+                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
+     &                           + fields(j,i)
+                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
+     &                            + fieldps(j,i)
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  zrsds(j,i) = rsds(j,i) * polarity(i)
+                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
+                  conj(j,i) = zrsd(j,i)
+                  conjp(j,i) = zrsdp(j,i)
+                  conjs(j,i) = zrsds(j,i)
+                  conjps(j,i) = zrsdps(j,i)
+               end do
+            end if
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -3510,10 +3516,10 @@ c
                   sumps = sumps + rsdps(j,i)*zrsdps(j,i)
                end do
             end do
-            a = sum / a
-            ap = sump / ap
-            as = sums / as
-            aps = sumps / aps
+            if (a .ne. 0.0d0)  a = sum / a
+            if (ap .ne. 0.0d0)  ap = sump / ap
+            if (as .ne. 0.0d0)  as = sums / as
+            if (aps .ne. 0.0d0)  aps = sumps / aps
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
@@ -3542,10 +3548,10 @@ c
                   bps = bps + rsdps(j,i)*zrsdps(j,i)
                end do
             end do
-            b = b / sum
-            bp = bp / sump
-            bs = bs / sums
-            bps = bps / sumps
+            if (sum .ne. 0.0d0)  b = b / sum
+            if (sump .ne. 0.0d0)  bp = bp / sump
+            if (sums .ne. 0.0d0)  bs = bs / sums
+            if (sumps .ne. 0.0d0)  bps = bps / sumps
             epsd = 0.0d0
             epsp = 0.0d0
             epsds = 0.0d0
@@ -4537,24 +4543,26 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0e (field,fieldp,fields,fieldps)
          do i = 1, npole
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                        + fieldp(j,i)
-               rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
-     &                        + fields(j,i)
-               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
-     &                         + fieldps(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
-               zrsdp(j,i) = rsdp(j,i) * polarity(i)
-               zrsds(j,i) = rsds(j,i) * polarity(i)
-               zrsdps(j,i) = rsdps(j,i) * polarity(i)
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-               conjs(j,i) = zrsds(j,i)
-               conjps(j,i) = zrsdps(j,i)
-            end do
+            if (polarity(i) .ne. 0.0d0) then
+               do j = 1, 3
+                  rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
+     &                          + field(j,i)
+                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
+     &                           + fieldp(j,i)
+                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
+     &                           + fields(j,i)
+                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
+     &                            + fieldps(j,i)
+                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
+                  zrsds(j,i) = rsds(j,i) * polarity(i)
+                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
+                  conj(j,i) = zrsd(j,i)
+                  conjp(j,i) = zrsdp(j,i)
+                  conjs(j,i) = zrsds(j,i)
+                  conjps(j,i) = zrsdps(j,i)
+               end do
+            end if
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -4606,10 +4614,10 @@ c
                   sumps = sumps + rsdps(j,i)*zrsdps(j,i)
                end do
             end do
-            a = sum / a
-            ap = sump / ap
-            as = sums / as
-            aps = sumps / aps
+            if (a .ne. 0.0d0)  a = sum / a
+            if (ap .ne. 0.0d0)  ap = sump / ap
+            if (as .ne. 0.0d0)  as = sums / as
+            if (aps .ne. 0.0d0)  aps = sumps / aps
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
@@ -4638,10 +4646,10 @@ c
                   bps = bps + rsdps(j,i)*zrsdps(j,i)
                end do
             end do
-            b = b / sum
-            bp = bp / sump
-            bs = bs / sums
-            bps = bps / sumps
+            if (sum .ne. 0.0d0)  b = b / sum
+            if (sump .ne. 0.0d0)  bp = bp / sump
+            if (sums .ne. 0.0d0)  bs = bs / sums
+            if (sumps .ne. 0.0d0)  bps = bps / sumps
             epsd = 0.0d0
             epsp = 0.0d0
             epsds = 0.0d0
@@ -5390,12 +5398,18 @@ c
 c     apply the preconditioning matrix to the current residual
 c
       if (mode .eq. 'APPLY') then
+c
+c     use diagonal preconditioner elements as first approximation
+c
          do i = 1, npole
             do j = 1, 3
                zrsd(j,i) = udiag * polarity(i) * rsd(j,i)
                zrsdp(j,i) = udiag * polarity(i) * rsdp(j,i)
             end do
          end do
+c
+c     use the off-diagonal preconditioner elements in second phase
+c
          off2 = usolvcut * usolvcut
          j = 0
          do i = 1, npole-1
@@ -5446,7 +5460,19 @@ c
 c     construct off-diagonal elements of preconditioning matrix
 c
       else if (mode .eq. 'BUILD') then
+c
+c     perform dynamic allocation of some local arrays
+c
          allocate (dscale(n))
+c
+c     set array needed to scale connected atom interactions
+c
+         do i = 1, n
+            dscale(i) = 1.0d0
+         end do
+c
+c     use a double loop to compute the off-diagonal elements
+c
          off2 = usolvcut * usolvcut
          m = 0
          do i = 1, npole-1
@@ -5502,7 +5528,25 @@ c
                   m = m + 6
                end if
             end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = 1.0d0
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = 1.0d0
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = 1.0d0
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = 1.0d0
+            end do
          end do
+c
+c     perform deallocation of some local arrays
+c
          deallocate (dscale)
       end if
       return
@@ -5555,8 +5599,14 @@ c
 c     apply the preconditioning matrix to the current residual
 c
       if (mode .eq. 'APPLY') then
+c
+c     perform dynamic allocation of some local arrays
+c
          allocate (zrsdt(3,npole))
          allocate (zrsdtp(3,npole))
+c
+c     use diagonal preconditioner elements as first approximation
+c
          do i = 1, npole
             do j = 1, 3
                zrsd(j,i) = 0.0d0
@@ -5621,6 +5671,9 @@ c
          end do
 !$OMP END DO
 !$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
          deallocate (zrsdt)
          deallocate (zrsdtp)
 c
@@ -5632,7 +5685,16 @@ c
             mindex(i) = m
             m = m + 6*nulst(i)
          end do
+c
+c     perform dynamic allocation of some local arrays
+c
          allocate (dscale(n))
+c
+c     set array needed to scale connected atom interactions
+c
+         do i = 1, n
+            dscale(i) = 1.0d0
+         end do
 c
 c     set OpenMP directives for the major loop structure
 c
@@ -5645,9 +5707,6 @@ c
             pdi = pdamp(i)
             pti = thole(i)
             poli = polarity(i)
-            do j = i+1, npole
-               dscale(ipole(j)) = 1.0d0
-            end do
             do j = 1, np11(ii)
                dscale(ip11(j,ii)) = u1scale
             end do
@@ -5693,11 +5752,26 @@ c
                minv(m+6) = rr5*zr*zr - rr3
                m = m + 6
             end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = 1.0d0
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = 1.0d0
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = 1.0d0
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = 1.0d0
+            end do
          end do
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     end OpenMP directives for the major loop structure
+c     perform deallocation of some local arrays
 c
          deallocate (dscale)
       end if

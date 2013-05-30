@@ -562,11 +562,11 @@ SHELL='/bin/sh'
 ECHO='printf %s\n'
 PATH_SEPARATOR=':'
 host_alias=''
-host='x86_64-apple-darwin10.8.0'
-host_os='darwin10.8.0'
+host='x86_64-apple-darwin12.3.0'
+host_os='darwin12.3.0'
 build_alias=''
-build='x86_64-apple-darwin10.8.0'
-build_os='darwin10.8.0'
+build='x86_64-apple-darwin12.3.0'
+build_os='darwin12.3.0'
 SED='/usr/bin/sed'
 Xsed='/usr/bin/sed -e 1s/^X//'
 GREP='/usr/bin/grep'
@@ -672,7 +672,7 @@ postuninstall_cmds=''
 finish_cmds=''
 finish_eval=''
 hardcode_into_libs='no'
-sys_lib_search_path_spec='/opt/intel/composer_xe_2011_sp1.13.380/compiler/lib  /usr/local/lib'
+sys_lib_search_path_spec='/opt/intel/composer_xe_2013.1.119/compiler/lib  /usr/local/lib'
 sys_lib_dlsearch_path_spec='/usr/local/lib /lib /usr/lib'
 hardcode_action='immediate'
 enable_dlopen='unknown'
@@ -909,13 +909,16 @@ S["PTHREAD_LIBS"]=""
 S["PTHREAD_CC"]=""
 S["acx_pthread_config"]=""
 S["OPENMP_CFLAGS"]="-fopenmp"
-S["FLIBS"]=" -L/opt/intel/composer_xe_2011_sp1.13.380/compiler/lib -L/opt/intel/composer_xe_2011_sp1.13.380/mkl/lib -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86"\
-"_64/ -L/usr/lib/i686-apple-darwin10/4.2.1/ -L/usr/lib/ -L/opt/intel/composer_xe_2011_sp1.13.380/compiler/lib/ -L/opt/intel/composer_xe_2011_sp1.13.3"\
-"80/mkl/lib/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/x86_64 -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../.."\
-"/../i686-apple-darwin10/4.2.1/ -L/usr/lib/gcc/i686-apple-darwin10/4.2.1/../../.. /opt/intel/composer_xe_2011_sp1.13.380/compiler/lib/libimf.a -lm /o"\
-"pt/intel/composer_xe_2011_sp1.13.380/compiler/lib/libifport.a /opt/intel/composer_xe_2011_sp1.13.380/compiler/lib/libifcore.a /opt/intel/composer_xe"\
-"_2011_sp1.13.380/compiler/lib/libsvml.a /opt/intel/composer_xe_2011_sp1.13.380/compiler/lib/libipgo.a /opt/intel/composer_xe_2011_sp1.13.380/compile"\
-"r/lib/libirc.a -lpthread -ldl"
+S["FLIBS"]=" -L/opt/intel/composer_xe_2013.1.119/compiler/lib -L/opt/intel/composer_xe_2013.1.119/mkl/lib -L/opt/intel/composer_xe_2013.1.119/tbb/lib -L/usr/llv"\
+"m-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/x86_64/ -L/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11"\
+"/4.2.1/x86_64/ -L/usr/lib/ -L/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2.1/x86_64 -L/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin1"\
+"1/4.2.1/ -L/usr/llvm-gcc-4.2/bin/../lib/gcc/ -L/opt/intel/composer_xe_2013.1.119/compiler/lib/ -L/opt/intel/composer_xe_2013.1.119/mkl/lib/ -L/opt/i"\
+"ntel/composer_xe_2013.1.119/tbb/lib/ -L/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/x86_64 -L/Appli"\
+"cations/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/ -L/usr/llvm-gcc-4.2/bin/../lib/gcc/i686-apple-darwin11/4.2."\
+"1/../../../ -L/Applications/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/lib/gcc/i686-apple-darwin11/4.2.1/../../.. /opt/intel/composer_xe_2013.1.1"\
+"19/compiler/lib/libimf.a -lm /opt/intel/composer_xe_2013.1.119/compiler/lib/libifport.a /opt/intel/composer_xe_2013.1.119/compiler/lib/libifcore.a /"\
+"opt/intel/composer_xe_2013.1.119/compiler/lib/libsvml.a /opt/intel/composer_xe_2013.1.119/compiler/lib/libipgo.a /opt/intel/composer_xe_2013.1.119/c"\
+"ompiler/lib/libirc.a -lpthread -ldl"
 S["ac_ct_F77"]=""
 S["FFLAGS"]="-g"
 S["F77"]="ifort"
@@ -993,14 +996,14 @@ S["LDOUBLE_FALSE"]=""
 S["LDOUBLE_TRUE"]="#"
 S["SINGLE_FALSE"]=""
 S["SINGLE_TRUE"]="#"
-S["host_os"]="darwin10.8.0"
+S["host_os"]="darwin12.3.0"
 S["host_vendor"]="apple"
 S["host_cpu"]="x86_64"
-S["host"]="x86_64-apple-darwin10.8.0"
-S["build_os"]="darwin10.8.0"
+S["host"]="x86_64-apple-darwin12.3.0"
+S["build_os"]="darwin12.3.0"
 S["build_vendor"]="apple"
 S["build_cpu"]="x86_64"
-S["build"]="x86_64-apple-darwin10.8.0"
+S["build"]="x86_64-apple-darwin12.3.0"
 S["SHARED_VERSION_INFO"]="6:2:3"
 S["MAINT"]="#"
 S["MAINTAINER_MODE_FALSE"]=""

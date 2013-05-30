@@ -33,6 +33,7 @@ c
       integer leng1,leng2
       integer ifile1,ifile2
       integer frame1,frame2
+      integer last1
       integer start,stop
       integer option,delta
       integer trimtext,freeunit
@@ -375,6 +376,7 @@ c
 c
 c     read initial structure set from the first coordinate file
 c
+      last1 = 0
       frame1 = 1
       call readxyz (ifile1)
       n1 = n
@@ -488,8 +490,14 @@ c
             end do
             ixyz = freeunit ()
             xyzfile = file2(1:leng)//'.xyz'
-            call version (xyzfile,'new')
-            open (unit=ixyz,file=xyzfile,status='new')
+            if (frame1 .eq. last1) then
+               call version (xyzfile,'old')
+               open (unit=ixyz,file=xyzfile,status='old')
+            else
+               last1 = frame1
+               call version (xyzfile,'new')
+               open (unit=ixyz,file=xyzfile,status='new')
+            end if
             call prtxyz (ixyz)
             close (unit=ixyz)
          end if

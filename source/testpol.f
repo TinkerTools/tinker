@@ -27,6 +27,7 @@ c
       include 'iounit.i'
       include 'polar.i'
       include 'polpot.i'
+      include 'potent.i'
       include 'rigid.i'
       include 'units.i'
       integer i,j,k
@@ -43,6 +44,14 @@ c
       call initial
       call getxyz
       call mechanic
+c
+c     check to make sure mutual polarization is being used
+c
+      if (.not.use_polar .or. poltyp.eq.'DIRECT') then
+         write (iout,10)
+   10    format (' TESTPOL  --  Mutual Polarization Model not in Use')
+         call fatal
+      end if
 c
 c     maintain any periodic boundary conditions
 c
@@ -98,9 +107,9 @@ c
             end do
          end do
          drms(k) = sqrt(sum/dble(npolar))
-         if (drms(k) .lt. 0.5d0*poleps)  goto 10
+         if (drms(k) .lt. 0.5d0*poleps)  goto 20
       end do
-   10 continue
+   20 continue
       maxiter = politer
 c
 c     find the RMS of each iteration from converged dipoles
@@ -122,17 +131,17 @@ c
 c
 c     print the RMS between iterations and to converged dipoles
 c
-      write (iout,20)
-   20 format (/,' Convergence of Induced Dipole Moments :',
+      write (iout,30)
+   30 format (/,' Convergence of Induced Dipole Moments :',
      &        //,2x,'Iteration',10x,'RMS Change',11x,'RMS vs Final')
-      write (iout,30)  0,rms(0)
-   30 format (/,i8,16x,'----',6x,f20.10)
+      write (iout,40)  0,rms(0)
+   40 format (/,i8,16x,'----',6x,f20.10)
       do k = 1, maxiter
-         write (iout,40)  k,drms(k),rms(k)
-   40    format (i8,3x,f20.10,3x,f20.10)
-         if (rms(k) .lt. 0.5d0*poleps)  goto 50
+         write (iout,50)  k,drms(k),rms(k)
+   50    format (i8,3x,f20.10,3x,f20.10)
+         if (rms(k) .lt. 0.5d0*poleps)  goto 60
       end do
-   50 continue
+   60 continue
 c
 c     perform deallocation of some local arrays
 c

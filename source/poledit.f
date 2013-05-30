@@ -1706,10 +1706,12 @@ c
          end do
          call ufieldi (field,pscale)
          do i = 1, npole
-            do j = 1, 3
-               uind(j,i) = vec(j,i)
-               vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-            end do
+            if (polarity(i) .ne. 0.0d0) then
+               do j = 1, 3
+                  uind(j,i) = vec(j,i)
+                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
+               end do
+            end if
          end do
          a = 0.0d0
          sum = 0.0d0
@@ -1719,7 +1721,7 @@ c
                sum = sum + rsd(j,i)*zrsd(j,i)
             end do
          end do
-         a = sum / a
+         if (a .ne. 0.0d0)  a = sum / a
          do i = 1, npole
             do j = 1, 3
                uind(j,i) = uind(j,i) + a*conj(j,i)
@@ -1733,7 +1735,7 @@ c
                b = b + rsd(j,i)*zrsd(j,i)
             end do
          end do
-         b = b / sum
+         if (sum .ne. 0.0d0)  b = b / sum
          eps = 0.0d0
          do i = 1, npole
             do j = 1, 3

@@ -2,7 +2,7 @@
 
 # libtool - Provide generalized library-building support services.
 # Generated automatically by config.status (fftw) 3.3.3
-# Libtool was configured on host sleigh.local:
+# Libtool was configured on host sleigh:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 #
 #   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
@@ -75,13 +75,13 @@ PATH_SEPARATOR=":"
 
 # The host system.
 host_alias=
-host=x86_64-apple-darwin10.8.0
-host_os=darwin10.8.0
+host=x86_64-apple-darwin12.3.0
+host_os=darwin12.3.0
 
 # The build system.
 build_alias=
-build=x86_64-apple-darwin10.8.0
-build_os=darwin10.8.0
+build=x86_64-apple-darwin12.3.0
+build_os=darwin12.3.0
 
 # A sed program that does not truncate output.
 SED="/usr/bin/sed"
@@ -275,7 +275,7 @@ finish_eval=""
 hardcode_into_libs=no
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/opt/intel/composer_xe_2011_sp1.13.380/compiler/lib  /usr/local/lib"
+sys_lib_search_path_spec="/opt/intel/composer_xe_2013.1.119/compiler/lib  /usr/local/lib"
 
 # Run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/usr/local/lib /lib /usr/lib"
