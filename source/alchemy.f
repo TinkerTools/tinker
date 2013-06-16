@@ -186,6 +186,15 @@ c
       allocate (cv(3,nstep))
       allocate (cc(3,nstep))
 c
+c     zero out block average potential and free energy changes
+c
+      do i = 1, nblock
+         badep(i) = 0.0d0
+         badem(i) = 0.0d0
+         bdap(i) = 0.0d0
+         bdam(i) = 0.0d0
+      end do
+c
 c     cycle over the coordinate files once per lambda value
 c
       do ilamb = 1, nlamb
@@ -381,12 +390,12 @@ c
             sdamb = sdamb + bdam(k)
             if (verbose .or. k.eq.1) then
                write (iout,190)
-  190          format (/,2x,'Block',10x,'NStep',8x,'BADEP',
+  190          format (/,2x,'Block',9x,'NStep',9x,'BADEP',
      &                    8x,'BADEM',9x,'BDAP',9x,'BDAM',/)
             end if
             write (iout,200)  k,istep,badep(k),badem(k),
      &                        bdap(k),bdam(k)
-  200       format (i6,5x,i6,5x,4f13.4)
+  200       format (i6,8x,i6,2x,4f13.4)
          end if
 c
 c     calculate running averages for potential energy

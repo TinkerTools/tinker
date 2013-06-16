@@ -27,7 +27,7 @@ c
       include 'files.i'
       include 'math.i'
       integer maxspace
-      parameter (maxspace=52)
+      parameter (maxspace=56)
       integer i,ixyz,mode
       integer na,nb,nc
       integer next,freeunit
@@ -38,8 +38,9 @@ c
       character*120 record
       character*120 string
       data sgroup / 'P1        ', 'P2        ', 'P1(-)     ',
-     &              'P21       ', 'C2        ', 'Pc        ',
-     &              'Cc        ', 'P21/m     ', 'C2/m      ',
+     &              'P21       ', 'C2        ', 'Pm        ',
+     &              'Pc        ', 'Cm        ', 'Cc        ',
+     &              'P2/m      ', 'P21/m     ', 'C2/m      ',
      &              'P2/c      ', 'P21/c     ', 'P21/n     ',
      &              'P21/a     ', 'C2/c      ', 'P21212    ',
      &              'P212121   ', 'C2221     ', 'Pca21     ',
@@ -47,14 +48,14 @@ c
      &              'Cmc21     ', 'Aba2      ', 'Fdd2      ',
      &              'Pnna      ', 'Pmna      ', 'Pcca      ',
      &              'Pbam      ', 'Pccn      ', 'Pbcm      ',
-     &              'Pbcn      ', 'Pbca      ', 'Pnma      ',
-     &              'Cmcm      ', 'Cmca      ', 'P41       ',
-     &              'P43       ', 'I4(-)     ', 'P42/n     ',
-     &              'I41/a     ', 'P41212    ', 'P43212    ',
-     &              'P4(-)21m  ', 'P4(-)21c  ', 'P4(-)m2   ',
-     &              'R3(-)     ', 'R3c       ', 'P63/m     ',
-     &              'P6(3)/mmc ', 'Pa3(-)    ', 'Fm3(-)m   ',
-     &              'Im3(-)m   '/
+     &              'Pnnm      ', 'Pbcn      ', 'Pbca      ',
+     &              'Pnma      ', 'Cmcm      ', 'Cmca      ',
+     &              'P41       ', 'P43       ', 'I4(-)     ',
+     &              'P42/n     ', 'I41/a     ', 'P41212    ',
+     &              'P43212    ', 'P4(-)21m  ', 'P4(-)21c  ',
+     &              'P4(-)m2   ', 'R3(-)     ', 'R3c       ',
+     &              'P63/m     ', 'P6(3)/mmc ', 'Pa3(-)    ',
+     &              'Fm3(-)m   ', 'Im3(-)m   '/
 c
 c
 c     get and read the Cartesian coordinates file
@@ -128,7 +129,9 @@ c
      &           /,2x,'(45) ',a10,2x,'(46) ',a10,2x,'(47) ',a10,
      &              2x,'(48) ',a10,
      &           /,2x,'(49) ',a10,2x,'(50) ',a10,2x,'(51) ',a10,
-     &              2x,'(52) ',a10)
+     &              2x,'(52) ',a10,
+     &           /,2x,'(53) ',a10,2x,'(54) ',a10,2x,'(55) ',a10,
+     &              2x,'(56) ',a10)
          write (iout,80)
    80    format (/,' Enter the Number of the Desired Choice :  ',$)
          read (input,90)  i
@@ -248,18 +251,10 @@ c
          end do
       end if
 c
-c     translate any stray molecules back into the unit cell
-c
-      if (mode .eq. 3) then
-         call field
-         call katom
-         call molecule
-         call bounds
-      end if
-c
 c     merge fragments to form complete connected molecules
 c
       if (mode .eq. 4) then
+         answer = ' '
          call nextarg (answer,exist)
          if (.not. exist) then
             write (iout,240)
@@ -274,16 +269,45 @@ c
          if (answer .eq. 'Y')  call molmerge
       end if
 c
-c     optionally move unit cell center to coordinate origin
+c     translate any stray molecules back into the unit cell
 c
-      if (mode .eq. 4) then
+      if (mode .eq. 3) then
+         call field
+         call katom
+         call molecule
+         call bounds
+      else if (mode .eq. 4) then
+         answer = ' '
          call nextarg (answer,exist)
          if (.not. exist) then
             write (iout,260)
-  260       format (/,' Locate Center of Unit Cell at Coordinate',
-     &                 ' Origin [N] :   ',$)
+  260       format (/,' Move Any Stray Molecules into Unit Cell',
+     &                 ' [N] :   ',$)
             read (input,270)  record
   270       format (a120)
+            next = 1
+            call gettext (record,answer,next)
+         end if
+         call upcase (answer)
+         if (answer .eq. 'Y') then
+            call field
+            call katom
+            call molecule
+            call bounds
+         end if
+      end if
+c
+c     optionally move unit cell center to coordinate origin
+c
+      if (mode .eq. 4) then
+         answer = ' '
+         call nextarg (answer,exist)
+         if (.not. exist) then
+            write (iout,280)
+  280       format (/,' Locate Center of Unit Cell at Coordinate',
+     &                 ' Origin [N] :   ',$)
+            read (input,290)  record
+  290       format (a120)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -714,6 +738,23 @@ c
             end do
          end do
 c
+c     Pm space group  (International Tables 6)
+c
+      else if (spacegrp .eq. 'Pm        ') then
+         nsym = 2
+         do i = 2, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 2) then
+                  x(jj) = x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
 c     Pc space group  (International Tables 7)
 c
       else if (spacegrp .eq. 'Pc        ') then
@@ -726,6 +767,31 @@ c
                   x(jj) = x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
+c     Cm space group  (International Tables 8)
+c
+      else if (spacegrp .eq. 'Cm        ') then
+         nsym = 4
+         do i = 2, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 2) then
+                  x(jj) = x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 3) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 4) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 - y(j)
+                  z(jj) = z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -751,6 +817,31 @@ c
                   x(jj) = 0.5d0 + x(j)
                   y(jj) = 0.5d0 - y(j)
                   z(jj) = 0.5d0 + z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
+c     P2/m space group  (International Tables 10)
+c
+      else if (spacegrp .eq. 'P2/m      ') then
+         nsym = 4
+         do i = 2, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 2) then
+                  x(jj) = -x(j)
+                  y(jj) = y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 3) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 4) then
+                  x(jj) = x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -1550,6 +1641,47 @@ c
                   x(jj) = -x(j)
                   y(jj) = 0.5d0 + y(j)
                   z(jj) = z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
+c     Pnnm space group  (International Tables 58)
+c
+      else if (spacegrp .eq. 'Pnnm      ') then
+         nsym = 8
+         do i = 2, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 2) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 3) then
+                  x(jj) = 0.5d0 - x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 4) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 - y(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 5) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 6) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 7) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 - y(j)
+                  z(jj) = 0.5d0 + z(j)
+               else if (i .eq. 8) then
+                  x(jj) = 0.5d0 - x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = 0.5d0 + z(j)
                end if
                call cellatom (jj,j)
             end do

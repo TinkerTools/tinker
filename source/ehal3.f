@@ -86,6 +86,7 @@ c
       include 'inter.i'
       include 'iounit.i'
       include 'molcul.i'
+      include 'mutant.i'
       include 'shunt.i'
       include 'usage.i'
       include 'vdw.i'
@@ -99,6 +100,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 rho,tau,taper
+      real*8 scal,t1,t2
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
       real*8, allocatable :: xred(:)
@@ -106,6 +108,7 @@ c
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -160,6 +163,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -182,6 +186,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -208,12 +213,25 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  rv7 = rv**7
-                  rik7 = rik**7
-                  rho = rik7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (rik + dhal*rv)
-                  e = eps * rv7 * tau**7
-     &                   * ((ghal+1.0d0)*rv7/rho-2.0d0)
+c
+c     get the interaction energy, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
+                     t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
+                     e = eps * t1 * (t2-2.0d0)
+                  else 
+                     rv7 = rv**7
+                     rik7 = rik**7
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     e = eps * rv7 * tau**7
+     &                      * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -300,6 +318,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -322,6 +341,7 @@ c
          do kk = ii, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -352,12 +372,25 @@ c
                            eps = eps * vscale(k)
                         end if
                      end if
-                     rv7 = rv**7
-                     rik7 = rik**7
-                     rho = rik7 + ghal*rv7
-                     tau = (dhal+1.0d0) / (rik + dhal*rv)
-                     e = eps * rv7 * tau**7
-     &                      * ((ghal+1.0d0)*rv7/rho-2.0d0)
+c
+c     get the interaction energy, via soft core if necessary
+c
+                     if ((muti .and. .not.mutk) .or.
+     &                   (mutk .and. .not.muti)) then
+                        rho = rik / rv
+                        eps = eps * vlambda**scexp
+                        scal = scalpha * (1.0d0-vlambda)**2
+                        t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
+                        t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
+                        e = eps * t1 * (t2-2.0d0)
+                     else 
+                        rv7 = rv**7
+                        rik7 = rik**7
+                        rho = rik7 + ghal*rv7
+                        tau = (dhal+1.0d0) / (rik + dhal*rv)
+                        e = eps * rv7 * tau**7
+     &                         * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                     end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -474,6 +507,7 @@ c
       include 'iounit.i'
       include 'light.i'
       include 'molcul.i'
+      include 'mutant.i'
       include 'shunt.i'
       include 'usage.i'
       include 'vdw.i'
@@ -490,6 +524,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 rho,tau,taper
+      real*8 scal,t1,t2
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
       real*8, allocatable :: xred(:)
@@ -500,6 +535,7 @@ c
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
       logical proceed,usei
+      logical muti,mutk
       logical prime,repeat
       logical header,huge
       character*6 mode
@@ -570,6 +606,7 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -615,6 +652,7 @@ c
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kv = ired(k)
+            mutk = mut(k)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -658,12 +696,25 @@ c
                      end if
                      eps = eps * vscale(k)
                   end if
-                  rv7 = rv**7
-                  rik7 = rik**7
-                  rho = rik7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (rik + dhal*rv)
-                  e = eps * rv7 * tau**7
-     &                   * ((ghal+1.0d0)*rv7/rho-2.0d0)
+c
+c     get the interaction energy, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
+                     t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
+                     e = eps * t1 * (t2-2.0d0)
+                  else 
+                     rv7 = rv**7
+                     rik7 = rik**7
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     e = eps * rv7 * tau**7
+     &                      * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -791,6 +842,7 @@ c
       include 'inter.i'
       include 'iounit.i'
       include 'molcul.i'
+      include 'mutant.i'
       include 'neigh.i'
       include 'shunt.i'
       include 'usage.i'
@@ -806,6 +858,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 rho,tau,taper
+      real*8 scal,t1,t2
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
       real*8 evt,eintert
@@ -815,6 +868,7 @@ c
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: aevt(:)
       logical proceed,usei
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -872,11 +926,11 @@ c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
-!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& jvdw,xred,yred,zred,use,mut,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
-!$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5,molcule,name,verbose,
-!$OMP& debug,header,iout)
+!$OMP& ghal,dhal,vlambda,scalpha,scexp,cut2,c0,c1,c2,c3,c4,c5,
+!$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(evt,eintert,nevt,aevt)
 !$OMP DO reduction(+:evt,eintert,nevt,aevt) schedule(dynamic)
 c
@@ -890,6 +944,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -912,6 +967,7 @@ c
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -937,12 +993,25 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  rv7 = rv**7
-                  rik7 = rik**7
-                  rho = rik7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (rik + dhal*rv)
-                  e = eps * rv7 * tau**7
-     &                   * ((ghal+1.0d0)*rv7/rho-2.0d0)
+c
+c     get the interaction energy, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
+                     t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
+                     e = eps * t1 * (t2-2.0d0)
+                  else 
+                     rv7 = rv**7
+                     rik7 = rik**7
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     e = eps * rv7 * tau**7
+     &                      * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c

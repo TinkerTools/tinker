@@ -187,11 +187,13 @@ c
       include 'uprior.i'
       integer i,j,k,iter
       integer maxiter
+      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 udsum,upsum
       real*8 a,ap,b,bp
       real*8 sum,sump
+      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: udir(:,:)
@@ -252,6 +254,7 @@ c
          done = .false.
          maxiter = 500
          iter = 0
+         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -274,14 +277,15 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (rsd(3,n))
-         allocate (rsdp(3,n))
-         allocate (zrsd(3,n))
-         allocate (zrsdp(3,n))
-         allocate (conj(3,n))
-         allocate (conjp(3,n))
-         allocate (vec(3,n))
-         allocate (vecp(3,n))
+         allocate (poli(npole))
+         allocate (rsd(3,npole))
+         allocate (rsdp(3,npole))
+         allocate (zrsd(3,npole))
+         allocate (zrsdp(3,npole))
+         allocate (conj(3,npole))
+         allocate (conjp(3,npole))
+         allocate (vec(3,npole))
+         allocate (vecp(3,npole))
 c
 c     get the electrostatic field due to induced dipoles
 c
@@ -296,14 +300,13 @@ c
 c     set initial conjugate gradient residual and conjugate vector
 c
          do i = 1, npole
-            if (polarity(i) .ne. 0.0d0) then
-               do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                          + fieldp(j,i)
-               end do
-            end if
+            poli(i) = max(polmin,polarity(i))
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                       + fieldp(j,i)
+            end do
          end do
          mode = 'BUILD'
          if (use_mlist) then
@@ -342,14 +345,12 @@ c
                call ufield0a (field,fieldp)
             end if
             do i = 1, npole
-               if (polarity(i) .ne. 0.0d0) then
-                  do j = 1, 3
-                     uind(j,i) = vec(j,i)
-                     uinp(j,i) = vecp(j,i)
-                     vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                     vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
-                  end do
-               end if
+               do j = 1, 3
+                  uind(j,i) = vec(j,i)
+                  uinp(j,i) = vecp(j,i)
+                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+               end do
             end do
             a = 0.0d0
             ap = 0.0d0
@@ -421,6 +422,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+         deallocate (poli)
          deallocate (rsd)
          deallocate (rsdp)
          deallocate (zrsd)
@@ -3303,6 +3305,7 @@ c
       include 'uprior.i'
       integer i,j,k,iter
       integer maxiter
+      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 epsds,epsps
@@ -3312,6 +3315,7 @@ c
       real*8 b,bp,bs,bps
       real*8 sum,sump
       real*8 sums,sumps
+      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
@@ -3397,6 +3401,7 @@ c
          done = .false.
          maxiter = 500
          iter = 0
+         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -3424,6 +3429,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+         allocate (poli(npole))
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
          allocate (rsds(3,npole))
@@ -3445,26 +3451,25 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0d (field,fieldp,fields,fieldps)
          do i = 1, npole
-            if (polarity(i) .ne. 0.0d0) then
-               do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                           + fieldp(j,i)
-                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
-     &                           + fields(j,i)
-                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
-     &                            + fieldps(j,i)
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
-                  zrsds(j,i) = rsds(j,i) * polarity(i)
-                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
-                  conj(j,i) = zrsd(j,i)
-                  conjp(j,i) = zrsdp(j,i)
-                  conjs(j,i) = zrsds(j,i)
-                  conjps(j,i) = zrsdps(j,i)
-               end do
-            end if
+            poli(i) = max(polmin,polarity(i))
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                        + fieldp(j,i)
+               rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
+     &                        + fields(j,i)
+               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
+     &                         + fieldps(j,i)
+               zrsd(j,i) = rsd(j,i) * poli(i)
+               zrsdp(j,i) = rsdp(j,i) * poli(i)
+               zrsds(j,i) = rsds(j,i) * poli(i)
+               zrsdps(j,i) = rsdps(j,i) * poli(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
+               conjs(j,i) = zrsds(j,i)
+               conjps(j,i) = zrsdps(j,i)
+            end do
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -3490,10 +3495,10 @@ c
                   uinp(j,i) = vecp(j,i)
                   uinds(j,i) = vecs(j,i)
                   uinps(j,i) = vecps(j,i)
-                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
-                  vecs(j,i) = conjs(j,i)/polarity(i) - fields(j,i)
-                  vecps(j,i) = conjps(j,i)/polarity(i) - fieldps(j,i)
+                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                  vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
+                  vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
                end do
             end do
             a = 0.0d0
@@ -3538,10 +3543,10 @@ c
             bps = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
-                  zrsds(j,i) = rsds(j,i) * polarity(i)
-                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
+                  zrsd(j,i) = rsd(j,i) * poli(i)
+                  zrsdp(j,i) = rsdp(j,i) * poli(i)
+                  zrsds(j,i) = rsds(j,i) * poli(i)
+                  zrsdps(j,i) = rsdps(j,i) * poli(i)
                   b = b + rsd(j,i)*zrsd(j,i)
                   bp = bp + rsdp(j,i)*zrsdp(j,i)
                   bs = bs + rsds(j,i)*zrsds(j,i)
@@ -3591,6 +3596,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+         deallocate (poli)
          deallocate (rsd)
          deallocate (rsdp)
          deallocate (rsds)
@@ -4401,6 +4407,7 @@ c
       include 'uprior.i'
       integer i,j,k,iter
       integer maxiter
+      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 epsds,epsps
@@ -4410,6 +4417,7 @@ c
       real*8 b,bp,bs,bps
       real*8 sum,sump
       real*8 sums,sumps
+      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
@@ -4495,6 +4503,7 @@ c
          done = .false.
          maxiter = 500
          iter = 0
+         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -4522,6 +4531,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+         allocate (poli(npole))
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
          allocate (rsds(3,npole))
@@ -4543,26 +4553,25 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0e (field,fieldp,fields,fieldps)
          do i = 1, npole
-            if (polarity(i) .ne. 0.0d0) then
-               do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/polarity(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/polarity(i)
-     &                           + fieldp(j,i)
-                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/polarity(i)
-     &                           + fields(j,i)
-                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/polarity(i)
-     &                            + fieldps(j,i)
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
-                  zrsds(j,i) = rsds(j,i) * polarity(i)
-                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
-                  conj(j,i) = zrsd(j,i)
-                  conjp(j,i) = zrsdp(j,i)
-                  conjs(j,i) = zrsds(j,i)
-                  conjps(j,i) = zrsdps(j,i)
-               end do
-            end if
+            poli(i) = max(polmin,polarity(i))
+            do j = 1, 3
+               rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                       + field(j,i)
+               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                        + fieldp(j,i)
+               rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
+     &                        + fields(j,i)
+               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
+     &                         + fieldps(j,i)
+               zrsd(j,i) = rsd(j,i) * poli(i)
+               zrsdp(j,i) = rsdp(j,i) * poli(i)
+               zrsds(j,i) = rsds(j,i) * poli(i)
+               zrsdps(j,i) = rsdps(j,i) * poli(i)
+               conj(j,i) = zrsd(j,i)
+               conjp(j,i) = zrsdp(j,i)
+               conjs(j,i) = zrsds(j,i)
+               conjps(j,i) = zrsdps(j,i)
+            end do
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -4588,10 +4597,10 @@ c
                   uinp(j,i) = vecp(j,i)
                   uinds(j,i) = vecs(j,i)
                   uinps(j,i) = vecps(j,i)
-                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/polarity(i) - fieldp(j,i)
-                  vecs(j,i) = conjs(j,i)/polarity(i) - fields(j,i)
-                  vecps(j,i) = conjps(j,i)/polarity(i) - fieldps(j,i)
+                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                  vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                  vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
+                  vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
                end do
             end do
             a = 0.0d0
@@ -4636,10 +4645,10 @@ c
             bps = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
-                  zrsdp(j,i) = rsdp(j,i) * polarity(i)
-                  zrsds(j,i) = rsds(j,i) * polarity(i)
-                  zrsdps(j,i) = rsdps(j,i) * polarity(i)
+                  zrsd(j,i) = rsd(j,i) * poli(i)
+                  zrsdp(j,i) = rsdp(j,i) * poli(i)
+                  zrsds(j,i) = rsds(j,i) * poli(i)
+                  zrsdps(j,i) = rsdps(j,i) * poli(i)
                   b = b + rsd(j,i)*zrsd(j,i)
                   bp = bp + rsdp(j,i)*zrsdp(j,i)
                   bs = bs + rsds(j,i)*zrsds(j,i)
@@ -4689,6 +4698,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+         deallocate (poli)
          deallocate (rsd)
          deallocate (rsdp)
          deallocate (rsds)
@@ -5381,6 +5391,7 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
       real*8 pdi,pti
+      real*8 polmin
       real*8 poli,polik
       real*8 damp,expdamp
       real*8 pgamma,off2
@@ -5401,10 +5412,12 @@ c
 c
 c     use diagonal preconditioner elements as first approximation
 c
+         polmin = 0.00000001d0
          do i = 1, npole
+            poli = udiag * max(polmin,polarity(i))
             do j = 1, 3
-               zrsd(j,i) = udiag * polarity(i) * rsd(j,i)
-               zrsdp(j,i) = udiag * polarity(i) * rsdp(j,i)
+               zrsd(j,i) = poli * rsd(j,i)
+               zrsdp(j,i) = poli * rsdp(j,i)
             end do
          end do
 c
@@ -5580,6 +5593,7 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
       real*8 pdi,pti
+      real*8 polmin
       real*8 poli,polik
       real*8 damp,expdamp
       real*8 pgamma
@@ -5607,12 +5621,14 @@ c
 c
 c     use diagonal preconditioner elements as first approximation
 c
+         polmin = 0.00000001d0
          do i = 1, npole
+            poli = udiag * max(polmin,polarity(i))
             do j = 1, 3
                zrsd(j,i) = 0.0d0
                zrsdp(j,i) = 0.0d0
-               zrsdt(j,i) = udiag * polarity(i) * rsd(j,i)
-               zrsdtp(j,i) = udiag * polarity(i) * rsdp(j,i)
+               zrsdt(j,i) = poli * rsd(j,i)
+               zrsdtp(j,i) = poli * rsdp(j,i)
             end do
          end do
 c

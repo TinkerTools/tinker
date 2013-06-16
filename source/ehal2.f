@@ -157,6 +157,7 @@ c
 c     check for an interaction distance less than the cutoff
 c
                if (rik2 .le. off2) then
+                  rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)
                   if (iv14(k) .eq. i) then
@@ -164,7 +165,6 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  rik = sqrt(rik2)
                   rv7 = rv**7
                   rik6 = rik2**3
                   rik7 = rik6 * rik
@@ -390,6 +390,7 @@ c
 c     check for an interaction distance less than the cutoff
 c
                   if (rik2 .le. off2) then
+                     rik = sqrt(rik2)
                      rv = radmin(kt,it)
                      eps = epsilon(kt,it)
                      if (use_polymer) then
@@ -401,7 +402,6 @@ c
                            eps = eps * vscale(k)
                         end if
                      end if
-                     rik = sqrt(rik2)
                      rv7 = rv**7
                      rik6 = rik2**3
                      rik7 = rik6 * rik

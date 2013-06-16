@@ -831,6 +831,26 @@ c
                if (kac.eq.ic .and. kbc.eq.ic)  xaxis(i) = ic
                if (kab.eq.ib .and. kbc.eq.0)  xaxis(i) = ib
                yaxis(i) = 0
+            else if (kab.eq.0 .and. kac.eq.0 .and. kbc.eq.0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = ia
+               xaxis(i) = ib
+               yaxis(i) = ic
+            else if (kab.eq.0 .and. kad.eq.0 .and. kbd.eq.0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = ia
+               xaxis(i) = ib
+               yaxis(i) = id
+            else if (kac.eq.0 .and. kad.eq.0 .and. kcd.eq.0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = ia
+               xaxis(i) = ic
+               yaxis(i) = id
+            else if (kbc.eq.0 .and. kbd.eq.0 .and. kcd.eq.0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = ib
+               xaxis(i) = ic
+               yaxis(i) = id
             else if (kab.eq.0 .and. kac.eq.ia .and. kad.eq.ia) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ia
@@ -949,6 +969,8 @@ c
       integer i,k,m
       integer ia,ib
       integer ka,kb
+      integer ka1,kb1
+      integer ka2,kb2
       integer priority
 c
 c
@@ -961,29 +983,45 @@ c
       else if (kb .gt. ka) then
          priority = ib
       else
-         ka = 0
+         ka1 = 0
+         ka2 = 0
          do k = 1, n12(ia)
             m = i12(k,ia)
             if (i .ne. m) then
                m = atomic(m)
-               if (m .gt. ka)  ka = m
+               if (m .ge. ka1) then
+                  ka2 = ka1
+                  ka1 = m
+               else if (m .gt. ka2) then
+                  ka2 = m
+               end if
             end if
          end do
-         kb = 0
+         kb1 = 0
+         kb2 = 0
          do k = 1, n12(ib)
             m = i12(k,ib)
             if (i .ne. m) then
                m = atomic(m)
-               if (m .gt. kb)  kb = m
+               if (m .gt. kb1) then
+                  kb2 = kb1
+                  kb1 = m
+               else
+                  kb2 = m
+               end if
             end if
          end do
          if (n12(ia) .lt. n12(ib)) then
             priority = ia
          else if (n12(ib) .lt. n12(ia)) then
             priority = ib
-         else if (ka .gt. kb) then
+         else if (ka1 .gt. kb1) then
             priority = ia
-         else if (kb .gt. ka) then
+         else if (kb1 .gt. ka1) then
+            priority = ib
+         else if (ka2 .gt. kb2) then
+            priority = ia
+         else if (kb2 .gt. ka2) then
             priority = ib
          else
             priority = 0
@@ -1642,8 +1680,10 @@ c
       integer i,j,k,iter
       integer maxiter
       real*8 eps,epsold
-      real*8 a,b,sum,norm
+      real*8 polmin,norm
+      real*8 a,b,sum
       real*8, allocatable :: pscale(:)
+      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: zrsd(:,:)
@@ -1655,6 +1695,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
+      allocate (poli(npole))
       allocate (field(3,npole))
       allocate (rsd(3,npole))
       allocate (zrsd(3,npole))
@@ -1685,11 +1726,13 @@ c
       maxiter = 500
       iter = 0
       eps = 100.0d0
+      polmin = 0.00000001d0
       call ufieldi (field,pscale)
       do i = 1, npole
+         poli(i) = max(polmin,polarity(i))
          do j = 1, 3
             rsd(j,i) = field(j,i)
-            zrsd(j,i) = rsd(j,i) * polarity(i)
+            zrsd(j,i) = rsd(j,i) * poli(i)
             conj(j,i) = zrsd(j,i)
          end do
       end do
@@ -1706,12 +1749,10 @@ c
          end do
          call ufieldi (field,pscale)
          do i = 1, npole
-            if (polarity(i) .ne. 0.0d0) then
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-               end do
-            end if
+            do j = 1, 3
+               uind(j,i) = vec(j,i)
+               vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+            end do
          end do
          a = 0.0d0
          sum = 0.0d0
@@ -1731,7 +1772,7 @@ c
          b = 0.0d0
          do i = 1, npole
             do j = 1, 3
-               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsd(j,i) = rsd(j,i) * poli(i)
                b = b + rsd(j,i)*zrsd(j,i)
             end do
          end do
@@ -1761,6 +1802,7 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
+      deallocate (poli)
       deallocate (field)
       deallocate (rsd)
       deallocate (zrsd)

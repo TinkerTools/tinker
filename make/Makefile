@@ -595,14 +595,11 @@ EXEFILES = alchemy.x \
            xyzpdb.x \
            xyzsybyl.x
 
-.f.o:
-	${F77} ${F77FLAGS} ${OPTFLAGS} $*.f 
+%.o: %.f
+	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
-pmpb.o:
-	${F77} ${F77FLAGS} ${OPTFLAGS} pmpb.f
-
-server.o:
-	${F77} ${F77FLAGS} ${OPTFLAGS} server.f
+%.o: %.c
+	${CC} ${CFLAGS} ${INCLUDEDIR} ${OPTFLAGS} $<
 
 %.x: %.o libtinker.a
 	${F77} ${LINKFLAGS} -o $@ $^ ${LIBS}; strip $@

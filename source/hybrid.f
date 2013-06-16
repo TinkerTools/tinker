@@ -147,7 +147,7 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
-         if (alter(ia) .or. alter(ib)) then
+         if (mut(ia) .or. mut(ib)) then
             ita = class(ia)
             itb = class(ib)
 c
@@ -263,7 +263,7 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
-         if (alter(ia) .or. alter(ib) .or. alter(ic)) then
+         if (mut(ia) .or. mut(ib) .or. mut(ic)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -389,7 +389,7 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
-         if (alter(ia) .or. alter(ib) .or. alter(ic)) then
+         if (mut(ia) .or. mut(ib) .or. mut(ic)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -558,8 +558,7 @@ c
             ib = i12(2,i)
             ic = i
             id = i12(3,i)
-            if (alter(ia) .or. alter(ib) .or.
-     &          alter(ic) .or. alter(id)) then
+            if (mut(ia) .or. mut(ib) .or. mut(ic) .or. mut(id)) then
                ita = class(ia)
                itb = class(ib)
                itc = class(ic)
@@ -798,8 +797,7 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
-         if (alter(ia) .or. alter(ib) .or.
-     &       alter(ic) .or. alter(id)) then
+         if (mut(ia) .or. mut(ib) .or. mut(ic) .or. mut(id)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -1059,8 +1057,7 @@ c
          ib = itors(2,i)
          ic = itors(3,i)
          id = itors(4,i)
-         if (alter(ia) .or. alter(ib) .or.
-     &       alter(ic) .or. alter(id)) then
+         if (mut(ia) .or. mut(ib) .or. mut(ic) .or. mut(id)) then
             ita = class(ia)
             itb = class(ib)
             itc = class(ic)
@@ -1432,7 +1429,7 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
-         if (alter(ia) .or. alter(ib)) then
+         if (mut(ia) .or. mut(ib)) then
             ita = type(ia)
             itb = type(ib)
 c

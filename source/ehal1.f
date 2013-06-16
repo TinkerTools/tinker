@@ -73,6 +73,7 @@ c
       include 'group.i'
       include 'inter.i'
       include 'molcul.i'
+      include 'mutant.i'
       include 'shunt.i'
       include 'usage.i'
       include 'vdw.i'
@@ -89,7 +90,10 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,tau,tau7
+      real*8 rho,rho6,rho7
+      real*8 tau,tau7,scal
+      real*8 s1,s2,t1,t2
+      real*8 dt1drho,dt2drho
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -102,6 +106,7 @@ c
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -157,6 +162,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -179,6 +185,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -196,6 +203,7 @@ c
 c     check for an interaction distance less than the cutoff
 c
                if (rik2 .le. off2) then
+                  rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)
                   if (iv14(k) .eq. i) then
@@ -203,17 +211,36 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  rik = sqrt(rik2)
-                  rv7 = rv**7
-                  rik6 = rik2**3
-                  rik7 = rik6 * rik
-                  rho = rik7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (rik + dhal*rv)
-                  tau7 = tau**7
-                  dtau = tau / (dhal+1.0d0)
-                  gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
-                  e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
-                  de = -7.0d0 * (dtau*e+gtau)
+c
+c     get the energy and gradient, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     rho6 = rho**6
+                     rho7 = rho6 * rho
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
+                     s2 = 1.0d0 / (scal+rho7+ghal)
+                     t1 = (1.0d0+dhal)**7 * s1
+                     t2 = (1.0d0+ghal) * s2
+                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
+                     dt2drho = -7.0d0*rho6 * t2 * s2
+                     e = eps * t1 * (t2-2.0d0)
+                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                  else
+                     rv7 = rv**7
+                     rik6 = rik2**3
+                     rik7 = rik6 * rik
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     tau7 = tau**7
+                     dtau = tau / (dhal+1.0d0)
+                     gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
+                     e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
+                     de = -7.0d0 * (dtau*e+gtau)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -333,6 +360,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -355,6 +383,7 @@ c
          do kk = ii, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -373,6 +402,7 @@ c
 c     check for an interaction distance less than the cutoff
 c
                   if (rik2 .le. off2) then
+                     rik = sqrt(rik2)
                      rv = radmin(kt,it)
                      eps = epsilon(kt,it)
                      if (use_polymer) then
@@ -384,17 +414,36 @@ c
                            eps = eps * vscale(k)
                         end if
                      end if
-                     rik = sqrt(rik2)
-                     rv7 = rv**7
-                     rik6 = rik2**3
-                     rik7 = rik6 * rik
-                     rho = rik7 + ghal*rv7
-                     tau = (dhal+1.0d0) / (rik + dhal*rv)
-                     tau7 = tau**7
-                     dtau = tau / (dhal+1.0d0)
-                     gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
-                     e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
-                     de = -7.0d0 * (dtau*e+gtau)
+c
+c     get the energy and gradient, via soft core if necessary
+c
+                     if ((muti .and. .not.mutk) .or.
+     &                   (mutk .and. .not.muti)) then
+                        rho = rik / rv
+                        rho6 = rho**6
+                        rho7 = rho6 * rho
+                        eps = eps * vlambda**scexp
+                        scal = scalpha * (1.0d0-vlambda)**2
+                        s1 = 1.0d0 / (scal+(rho+dhal)**7)
+                        s2 = 1.0d0 / (scal+rho7+ghal)
+                        t1 = (1.0d0+dhal)**7 * s1
+                        t2 = (1.0d0+ghal) * s2
+                        dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
+                        dt2drho = -7.0d0*rho6 * t2 * s2
+                        e = eps * t1 * (t2-2.0d0)
+                        de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                     else
+                        rv7 = rv**7
+                        rik6 = rik2**3
+                        rik7 = rik6 * rik
+                        rho = rik7 + ghal*rv7
+                        tau = (dhal+1.0d0) / (rik + dhal*rv)
+                        tau7 = tau**7
+                        dtau = tau / (dhal+1.0d0)
+                        gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
+                        e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
+                        de = -7.0d0 * (dtau*e+gtau)
+                     end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -538,6 +587,7 @@ c
       include 'iounit.i'
       include 'light.i'
       include 'molcul.i'
+      include 'mutant.i'
       include 'shunt.i'
       include 'usage.i'
       include 'vdw.i'
@@ -556,7 +606,10 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,tau,tau7
+      real*8 rho,rho6,rho7
+      real*8 tau,tau7,scal
+      real*8 s1,s2,t1,t2
+      real*8 dt1drho,dt2drho
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -572,6 +625,7 @@ c
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
       logical proceed,usei
+      logical muti,mutk
       logical prime,repeat
       character*6 mode
 c
@@ -643,6 +697,7 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -688,6 +743,7 @@ c
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kv = ired(k)
+            mutk = mut(k)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -721,6 +777,7 @@ c
 c     check for an interaction distance less than the cutoff
 c
                if (rik2 .le. off2) then
+                  rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)
                   if (prime) then
@@ -730,17 +787,36 @@ c
                      end if
                      eps = eps * vscale(k)
                   end if
-                  rik = sqrt(rik2)
-                  rv7 = rv**7
-                  rik6 = rik2**3
-                  rik7 = rik6 * rik
-                  rho = rik7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (rik + dhal*rv)
-                  tau7 = tau**7
-                  dtau = tau / (dhal+1.0d0)
-                  gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
-                  e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
-                  de = -7.0d0 * (dtau*e+gtau)
+c
+c     get the energy and gradient, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     rho6 = rho**6
+                     rho7 = rho6 * rho
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
+                     s2 = 1.0d0 / (scal+rho7+ghal)
+                     t1 = (1.0d0+dhal)**7 * s1
+                     t2 = (1.0d0+ghal) * s2
+                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
+                     dt2drho = -7.0d0*rho6 * t2 * s2
+                     e = eps * t1 * (t2-2.0d0)
+                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                  else
+                     rv7 = rv**7
+                     rik6 = rik2**3
+                     rik7 = rik6 * rik
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     tau7 = tau**7
+                     dtau = tau / (dhal+1.0d0)
+                     gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
+                     e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
+                     de = -7.0d0 * (dtau*e+gtau)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -888,6 +964,7 @@ c
       include 'group.i'
       include 'inter.i'
       include 'molcul.i'
+      include 'mutant.i'
       include 'neigh.i'
       include 'shunt.i'
       include 'usage.i'
@@ -905,7 +982,10 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,tau,tau7
+      real*8 rho,rho6,rho7
+      real*8 tau,tau7,scal
+      real*8 s1,s2,t1,t2
+      real*8 dt1drho,dt2drho
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -921,6 +1001,7 @@ c
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: devt(:,:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -986,7 +1067,8 @@ c
 !$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
-!$OMP& ghal,dhal,cut2,c0,c1,c2,c3,c4,c5,molcule)
+!$OMP& ghal,dhal,cut2,vlambda,scalpha,scexp,c0,c1,c2,c3,c4,c5,
+!$OMP& molcule)
 !$OMP& firstprivate(vscale,iv14) shared(evt,devt,virt,eintert)
 !$OMP DO reduction(+:evt,devt,virt,eintert) schedule(dynamic)
 c
@@ -1002,6 +1084,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
@@ -1024,6 +1107,7 @@ c
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -1041,6 +1125,7 @@ c
 c     check for an interaction distance less than the cutoff
 c
                if (rik2 .le. off2) then
+                  rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)
                   if (iv14(k) .eq. i) then
@@ -1048,17 +1133,36 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  rik = sqrt(rik2)
-                  rv7 = rv**7
-                  rik6 = rik2**3
-                  rik7 = rik6 * rik
-                  rho = rik7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (rik + dhal*rv)
-                  tau7 = tau**7
-                  dtau = tau / (dhal+1.0d0)
-                  gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
-                  e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
-                  de = -7.0d0 * (dtau*e+gtau)
+c
+c     get the energy and gradient, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     rho6 = rho**6
+                     rho7 = rho6 * rho
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
+                     s2 = 1.0d0 / (scal+rho7+ghal)
+                     t1 = (1.0d0+dhal)**7 * s1
+                     t2 = (1.0d0+ghal) * s2
+                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
+                     dt2drho = -7.0d0*rho6 * t2 * s2
+                     e = eps * t1 * (t2-2.0d0)
+                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                  else
+                     rv7 = rv**7
+                     rik6 = rik2**3
+                     rik7 = rik6 * rik
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     tau7 = tau**7
+                     dtau = tau / (dhal+1.0d0)
+                     gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
+                     e = eps*tau7*rv7*((ghal+1.0d0)*rv7/rho-2.0d0)
+                     de = -7.0d0 * (dtau*e+gtau)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c

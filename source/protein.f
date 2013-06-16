@@ -291,6 +291,7 @@ c
       do i = 1, nseq
          if (phi(i).eq.0.0d0 .and. psi(i).eq.0.0d0) then
             phi(i) = -135.0d0
+            if (seq(i) .eq. 'PRO')  phi(i) = -60.0d0
             psi(i) = 135.0d0
          end if
          if (omega(i) .eq. 0.0d0) then

@@ -30,6 +30,7 @@ c
       include 'potent.i'
       integer i
       real*8 addu,malpha
+      real*8 external
       real*8 exfield(3)
       real*8 umol(3)
       real*8 dalpha(3)
@@ -44,6 +45,7 @@ c
       call field
       call molecule
       call kpolar
+      call mutate
 c
 c     sum atomic polarizabilities to get additive molecular value
 c
@@ -67,10 +69,11 @@ c
 c
 c     compute each column of the polarizability tensor
 c
+      external = 0.01d0
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
-      exfield(1) = 0.01d0
+      exfield(1) = external
       call moluind (exfield,umol)
       alpha(1,1) = umol(1) / exfield(1)
       alpha(2,1) = umol(2) / exfield(1)
@@ -78,7 +81,7 @@ c
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
-      exfield(2) = 0.01d0
+      exfield(2) = external
       call moluind (exfield,umol)
       alpha(1,2) = umol(1) / exfield(2)
       alpha(2,2) = umol(2) / exfield(2)
@@ -86,7 +89,7 @@ c
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
-      exfield(3) = 0.01d0
+      exfield(3) = external
       call moluind (exfield,umol)
       alpha(1,3) = umol(1) / exfield(3)
       alpha(2,3) = umol(2) / exfield(3)
@@ -148,9 +151,11 @@ c
       integer i,j,iter
       integer maxiter
       real*8 eps,epsold
+      real*8 polmin
       real*8 a,b,sum
       real*8 umol(3)
       real*8 exfield(3)
+      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: zrsd(:,:)
@@ -170,6 +175,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (poli(npole))
       allocate (field(3,npole))
       allocate (rsd(3,npole))
       allocate (zrsd(3,npole))
@@ -183,11 +189,13 @@ c
          maxiter = 500
          iter = 0
          eps = 100.0d0
+         polmin = 0.00000001d0
          call ufield (field)
          do i = 1, npole
+            poli(i) = max(polmin,polarity(i))
             do j = 1, 3
                rsd(j,i) = field(j,i)
-               zrsd(j,i) = rsd(j,i) * polarity(i)
+               zrsd(j,i) = rsd(j,i) * poli(i)
                conj(j,i) = zrsd(j,i)
             end do
          end do
@@ -204,12 +212,10 @@ c
             end do
             call ufield (field)
             do i = 1, npole
-               if (polarity(i) .ne. 0.0d0) then
-                  do j = 1, 3
-                     uind(j,i) = vec(j,i)
-                     vec(j,i) = conj(j,i)/polarity(i) - field(j,i)
-                  end do
-               end if
+               do j = 1, 3
+                  uind(j,i) = vec(j,i)
+                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+               end do
             end do
             a = 0.0d0
             sum = 0.0d0
@@ -229,7 +235,7 @@ c
             b = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * polarity(i)
+                  zrsd(j,i) = rsd(j,i) * poli(i)
                   b = b + rsd(j,i)*zrsd(j,i)
                end do
             end do
@@ -280,6 +286,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (poli)
       deallocate (field)
       deallocate (rsd)
       deallocate (zrsd)

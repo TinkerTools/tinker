@@ -19,12 +19,14 @@ c
       subroutine mutate
       implicit none
       include 'sizes.i'
+      include 'atmtyp.i'
       include 'atoms.i'
       include 'iounit.i'
       include 'katoms.i'
       include 'keys.i'
       include 'mutant.i'
-      integer i,j,k,ihyb
+      integer i,j,k
+      integer ihyb,ia
       integer it0,it1,next
       integer list(20)
       character*20 keyword
@@ -36,10 +38,11 @@ c     zero number of hybrid atoms and hybrid atom list
 c
       nmut = 0
       do i = 1, n
-         alter(i) = .false.
+         mut(i) = .false.
       end do
-      elmd = 1.0d0
-      vlmd = 1.0d0
+      lambda = 1.0d0
+      vlambda = 1.0d0
+      elambda = 1.0d0
       scexp = 5.0d0
       scalpha = 0.7d0
       do i = 1, 20
@@ -54,26 +57,24 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:7) .eq. 'LAMBDA ') then
-            nmut = 0
-            lambda = 0.0d0
             string = record(next:120)
             read (string,*,err=20)  lambda
+         else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
+            string = record(next:120)
+            read (string,*,err=20)  vlambda
+         else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
+            string = record(next:120) 
+            read (string,*,err=20)  elambda
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:120)
             read (string,*,err=20)  ihyb,it0,it1
             nmut = nmut + 1
             imut(nmut) = ihyb
+            mut(ihyb) = .true.
             type0(nmut) = it0
             type1(nmut) = it1
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
-            alter(ihyb) = .true.
-         else if (keyword(1:7) .eq. 'ELAMDA ') then
-            string = record(next:120) 
-            read (string,*,err=20)  elmd
-         else if (keyword(1:7) .eq. 'VLAMDA ') then
-            string = record(next:120)
-            read (string,*,err=20)  vlmd
          else if (keyword(1:7) .eq. 'LIGAND ') then
             string = record(next:120)
             read (string,*,err=10,end=10)  (list(k),k=1,20)
@@ -81,11 +82,24 @@ c
             k = 1
             do while (list(k) .ne. 0) 
                if (list(k) .gt. 0) then
-                  alter(list(k)) = .true. 
+                  ia = list(k)
+                  nmut = nmut + 1
+                  imut(nmut) = ia
+                  mut(ia) = .true.
+                  type0(nmut) = 0
+                  type1(nmut) = type(ia)
+                  class0(nmut) = 0
+                  class1(nmut) = class(ia)
                   k = k + 1
                else
                   do j = abs(list(k)), abs(list(k+1))
-                     alter(j) = .true.
+                     nmut = nmut + 1
+                     imut(nmut) = i
+                     mut(j) = .true.
+                     type0(nmut) = 0
+                     type1(nmut) = type(i)
+                     class0(nmut) = 0
+                     class1(nmut) = class(i)
                   end do
                   k = k + 2
                end if
@@ -93,11 +107,20 @@ c
          end if
    20    continue
       end do
-      if (elmd.ge.0.0d0 .and. elmd.lt.1.0d0)  call altelec
-      if (elmd.ne.1.0d0 .and. vlmd.ne.1.0d0) then
-         write (*,30)  elmd,vlmd
-   30    format (' Free Energy Perturbation Step for Electrostatics : ',
-     &           f7.4,2x,'for VDW : ',f7.4)
+c
+c     scale electrostatic parameter values based on lambda
+c
+      if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0)  call altelec
+c
+c     write the status of the current free energy perturbation step
+c
+      if (nmut .ne. 0) then
+         write (iout,30)  vlambda
+   30    format (/,' Free Energy Perturbation :',f15.3,
+     &              ' Lambda for van der Waals')
+         write (iout,40)  elambda
+   40    format (' Free Energy Perturbation :',f15.3,
+     &              ' Lambda for Electrostatics')
       end if
       return
       end
@@ -130,8 +153,8 @@ c     set electrostatic parameters for partial charge models
 c
       if (use_charge) then
          do i = 1, nion
-            if (alter(i)) then
-               pchg(i) = pchg(i) * elmd
+            if (mut(i)) then
+               pchg(i) = pchg(i) * elambda
             end if
          end do
       end if
@@ -141,15 +164,15 @@ c
       if (use_mpole) then
          do i = 1, npole
             k = ipole(i)
-            if (alter(k)) then
+            if (mut(k)) then
                do j = 1, 13
-                  pole (j,i) = pole(j,i) * elmd
+                  pole (j,i) = pole(j,i) * elambda
                end do
             end if
          end do
          do i = 1, npolar
-            if (alter(i)) then
-               polarity(i) = polarity(i) * elmd
+            if (mut(i)) then
+               polarity(i) = polarity(i) * elambda
             end if
          end do
       end if
