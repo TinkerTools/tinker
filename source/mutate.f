@@ -25,8 +25,7 @@ c
       include 'katoms.i'
       include 'keys.i'
       include 'mutant.i'
-      integer i,j,k
-      integer ihyb,ia
+      integer i,j,k,ihyb
       integer it0,it1,next
       integer list(20)
       character*20 keyword
@@ -82,14 +81,14 @@ c
             k = 1
             do while (list(k) .ne. 0) 
                if (list(k) .gt. 0) then
-                  ia = list(k)
+                  j = list(k)
                   nmut = nmut + 1
-                  imut(nmut) = ia
-                  mut(ia) = .true.
+                  imut(nmut) = j
+                  mut(j) = .true.
                   type0(nmut) = 0
-                  type1(nmut) = type(ia)
+                  type1(nmut) = type(j)
                   class0(nmut) = 0
-                  class1(nmut) = class(ia)
+                  class1(nmut) = class(j)
                   k = k + 1
                else
                   do j = abs(list(k)), abs(list(k+1))

@@ -1185,10 +1185,10 @@ egeom.o: atmtyp.i atoms.i bound.i energi.i group.i kgeoms.i math.i molcul.i size
 egeom1.o: atmtyp.i atoms.i bound.i deriv.i energi.i group.i inter.i kgeoms.i math.i molcul.i sizes.i usage.i virial.i
 egeom2.o: atmtyp.i atoms.i bound.i deriv.i group.i hessn.i kgeoms.i math.i molcul.i sizes.i
 egeom3.o: action.i analyz.i atmtyp.i atoms.i bound.i energi.i group.i inform.i inter.i iounit.i kgeoms.i math.i molcul.i sizes.i usage.i
-ehal.o: atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i energi.i group.i light.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i
-ehal1.o: atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i deriv.i energi.i group.i inter.i iounit.i light.i molcul.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i virial.i
+ehal.o: atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i energi.i group.i light.i mutant.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i
+ehal1.o: atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i deriv.i energi.i group.i inter.i iounit.i light.i molcul.i mutant.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i virial.i
 ehal2.o: atmtyp.i atoms.i bound.i cell.i couple.i group.i hessn.i shunt.i sizes.i vdw.i vdwpot.i
-ehal3.o: action.i analyz.i atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i energi.i group.i inform.i inter.i iounit.i light.i molcul.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i
+ehal3.o: action.i analyz.i atmtyp.i atoms.i bound.i boxes.i cell.i couple.i cutoff.i energi.i group.i inform.i inter.i iounit.i light.i molcul.i mutant.i neigh.i shunt.i sizes.i usage.i vdw.i vdwpot.i
 eimprop.o: atoms.i bound.i energi.i group.i improp.i math.i sizes.i torpot.i usage.i
 eimprop1.o: atoms.i bound.i deriv.i energi.i group.i improp.i math.i sizes.i torpot.i usage.i virial.i
 eimprop2.o: atoms.i bound.i group.i hessn.i improp.i math.i sizes.i torpot.i
@@ -1354,7 +1354,7 @@ molecule.o: atmtyp.i atoms.i couple.i molcul.i sizes.i
 molxyz.o: files.i iounit.i titles.i
 moments.o: atmtyp.i atoms.i charge.i dipole.i moment.i mpole.i polar.i potent.i sizes.i solute.i units.i usage.i
 monte.o: atoms.i files.i inform.i iounit.i omega.i output.i sizes.i units.i usage.i zcoord.i
-mutate.o: atoms.i charge.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
+mutate.o: atmtyp.i atoms.i charge.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
 nblist.o: atoms.i bound.i boxes.i cell.i charge.i cutoff.i iounit.i light.i mpole.i neigh.i potent.i sizes.i vdw.i
 newton.o: atoms.i files.i inform.i iounit.i keys.i sizes.i usage.i
 newtrot.o: files.i hescut.i inform.i iounit.i keys.i math.i omega.i sizes.i zcoord.i
@@ -1470,4 +1470,4 @@ xyzedit.o: atmtyp.i atoms.i bound.i boxes.i couple.i cutoff.i files.i iounit.i m
 xyzint.o: files.i iounit.i titles.i
 xyzpdb.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i molcul.i pdb.i resdue.i sequen.i sizes.i
 xyzsybyl.o: files.i iounit.i sizes.i titles.i
-zatom.o: atmtyp.i atoms.i fields.i iounit.i katoms.i sizes.i zclose.i zcoord.i
+zatom.o: angle.i atmtyp.i atoms.i bond.i fields.i iounit.i kangs.i katoms.i kbonds.i sizes.i zclose.i zcoord.i
