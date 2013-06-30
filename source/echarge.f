@@ -1310,7 +1310,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
-      real*8 e,fs,fgrp
+      real*8 e,ect
+      real*8 fs,fgrp
       real*8 f,fi,fik
       real*8 r,r2,rb,rew
       real*8 xi,yi,zi
@@ -1373,6 +1374,19 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call ecrecip
 c
+c     initialize local variables for OpenMP calculation
+c
+      ect = ec
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
+!$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c2scale,
+!$OMP& c3scale,c4scale,c5scale,use_group,off2,aewald,ebuffer)
+!$OMP& firstprivate(cscale) shared(ect)
+!$OMP DO reduction(+:ect)
+!$OMP& schedule(dynamic)
+c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, nion
@@ -1430,7 +1444,7 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-                  ec = ec + e
+                  ect = ect + e
                end if
             end if
          end do
@@ -1450,6 +1464,15 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ec = ect
 c
 c     perform deallocation of some local arrays
 c

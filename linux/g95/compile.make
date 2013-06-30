@@ -16,6 +16,7 @@ g95 -c -O angles.f
 g95 -c -O anneal.f
 g95 -c -O archive.f
 g95 -c -O attach.f
+g95 -c -O bar.f
 g95 -c -O basefile.f
 g95 -c -O beeman.f
 g95 -c -O bicubic.f

@@ -17,6 +17,7 @@ ifort -O3 -no-prec-div -static -o alchemy.x alchemy.o libtinker.a libjvm.so ; st
 ifort -O3 -no-prec-div -static -o analyze.x analyze.o libtinker.a libjvm.so ; strip analyze.x
 ifort -O3 -no-prec-div -static -o anneal.x anneal.o libtinker.a libjvm.so ; strip anneal.x
 ifort -O3 -no-prec-div -static -o archive.x archive.o libtinker.a libjvm.so ; strip archive.x
+ifort -O3 -no-prec-div -static -o bar.x bar.o libtinker.a libjvm.so ; strip bar.x
 ifort -O3 -no-prec-div -static -o correlate.x correlate.o libtinker.a libjvm.so ; strip correlate.x
 ifort -O3 -no-prec-div -static -o crystal.x crystal.o libtinker.a libjvm.so ; strip crystal.x
 ifort -O3 -no-prec-div -static -o diffuse.x diffuse.o libtinker.a libjvm.so ; strip diffuse.x

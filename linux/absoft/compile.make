@@ -17,6 +17,7 @@ f77 -c -O angles.f
 f77 -c -O anneal.f
 f77 -c -O archive.f
 f77 -c -O attach.f
+f77 -c -O bar.f
 f77 -c -O basefile.f
 f77 -c -O beeman.f
 f77 -c -O bicubic.f

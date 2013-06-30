@@ -16,6 +16,7 @@ pgf77 -c -g -Ktrap=fp angles.f
 pgf77 -c -g -Ktrap=fp anneal.f
 pgf77 -c -g -Ktrap=fp archive.f
 pgf77 -c -g -Ktrap=fp attach.f
+pgf77 -c -g -Ktrap=fp bar.f
 pgf77 -c -g -Ktrap=fp basefile.f
 pgf77 -c -g -Ktrap=fp beeman.f
 pgf77 -c -g -Ktrap=fp bicubic.f

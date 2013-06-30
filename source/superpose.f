@@ -492,7 +492,8 @@ c
             xyzfile = file2(1:leng)//'.xyz'
             if (frame1 .eq. last1) then
                call version (xyzfile,'old')
-               open (unit=ixyz,file=xyzfile,status='old')
+               open (unit=ixyz,file=xyzfile,status='old',
+     &                  position='append')
             else
                last1 = frame1
                call version (xyzfile,'new')

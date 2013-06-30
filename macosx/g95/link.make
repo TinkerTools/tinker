@@ -12,6 +12,7 @@ g95 -O2 -o alchemy.x alchemy.o libtinker.a
 g95 -O2 -o analyze.x analyze.o libtinker.a
 g95 -O2 -o anneal.x anneal.o libtinker.a
 g95 -O2 -o archive.x archive.o libtinker.a
+g95 -O2 -o bar.x bar.o libtinker.a
 g95 -O2 -o correlate.x correlate.o libtinker.a
 g95 -O2 -o crystal.x crystal.o libtinker.a
 g95 -O2 -o diffuse.x diffuse.o libtinker.a

@@ -12,6 +12,7 @@ mv ALCHEMY.ZIP   alchemy.zip
 mv ANALYZE.ZIP   analyze.zip
 mv ANNEAL.ZIP    anneal.zip
 mv ARCHIVE.ZIP   archive.zip
+mv BAR.ZIP       bar.zip
 mv CORRELATE.ZIP correlate.zip
 mv CRYSTAL.ZIP   crystal.zip
 mv DIFFUSE.ZIP   diffuse.zip

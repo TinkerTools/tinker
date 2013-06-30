@@ -16,6 +16,7 @@ ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp angles.f
 ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp anneal.f
 ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp archive.f
 ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp attach.f
+ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp bar.f
 ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp basefile.f
 ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp beeman.f
 ifort -c -O3 -mia32 -no-ipo -no-prec-div -assume cc_omp -openmp bicubic.f

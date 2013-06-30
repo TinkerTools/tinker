@@ -12,6 +12,7 @@ zip alchemy.zip alchemy.exe
 zip analyze.zip analyze.exe
 zip anneal.zip anneal.exe
 zip archive.zip archive.exe
+zip bar.zip bar.exe
 zip correlate.zip correlate.exe
 zip crystal.zip crystal.exe
 zip diffuse.zip diffuse.exe

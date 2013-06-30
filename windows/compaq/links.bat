@@ -14,6 +14,7 @@ DF /optimize /fast alchemy.obj tinker.lib
 DF /optimize /fast analyze.obj tinker.lib
 DF /optimize /fast anneal.obj tinker.lib
 DF /optimize /fast archive.obj tinker.lib
+DF /optimize /fast bar.obj tinker.lib
 DF /optimize /fast correlate.obj tinker.lib
 DF /optimize /fast crystal.obj tinker.lib
 DF /optimize /fast diffuse.obj tinker.lib

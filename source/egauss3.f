@@ -168,7 +168,6 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (proceed)  proceed = (vscale(k) .ne. 0.0d0)
 c
 c     compute the energy contribution for this interaction
 c

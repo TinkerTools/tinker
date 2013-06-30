@@ -13,6 +13,7 @@ ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static alchemy.obj tin
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static analyze.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static anneal.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static archive.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static bar.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static correlate.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static crystal.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /libs:static /Qopenmp-link:static diffuse.obj tinker.lib

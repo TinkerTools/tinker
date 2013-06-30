@@ -16,6 +16,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 angles.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 anneal.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 archive.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 attach.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bar.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 basefile.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 beeman.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 bicubic.f

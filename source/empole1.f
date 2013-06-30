@@ -4850,9 +4850,9 @@ c
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
 !$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,usc3,usc5,alsq2,alsq2n,
 !$OMP& exp2a,ralpha,gfd,gfdr,xr,yr,zr,xix,yix,zix,
-!$OMP& xiz,yiz,ziz,xkx,ykx,zkx,xkz,ykz,zkz,r,r2,rr1,rr3,
-!$OMP& xiy,yiy,ziy,xky,yky,zky,
-!$OMP& rr5,rr7,rr9,rr11,erl,erli,vxx,vyy,vzz,vyx,vzx,vzy,
+!$OMP& xiy,yiy,ziy,xiz,yiz,ziz,xkx,ykx,zkx,xky,yky,zky,
+!$OMP& xkz,ykz,zkz,r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
+!$OMP& erl,erli,vxx,vyy,vzz,vyx,vzx,vzy,
 !$OMP& frcxi,frcyi,frczi,frcxk,frcyk,frczk,ci,di,qi,ck,dk,qk,
 !$OMP& fridmp,findmp,ftm2,ftm2i,ftm2r,ftm2ri,ttm2,ttm3,
 !$OMP& ttm2i,ttm3i,ttm2r,ttm3r,ttm2ri,ttm3ri,fdir,dixdk,
@@ -4866,7 +4866,7 @@ c
 !$OMP DO reduction(+:emtt,eptt,viri,demi,depi,demk,depk)
 !$OMP& schedule(dynamic)
 c
-c     set the permanent multipole and induced dipole values
+c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole
          ii = ipole(i)

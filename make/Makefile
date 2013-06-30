@@ -178,6 +178,7 @@ OBJS = active.o \
        anneal.o \
        archive.o \
        attach.o \
+       bar.o \
        basefile.o \
        beeman.o \
        bicubic.o \
@@ -538,6 +539,7 @@ EXEFILES = alchemy.x \
            analyze.x \
            anneal.x \
            archive.x \
+           bar.x \
            correlate.x \
            crystal.x \
            diffuse.x \
@@ -617,6 +619,7 @@ rename:
 	mv  analyze.x    $(BINDIR)/analyze
 	mv  anneal.x     $(BINDIR)/anneal
 	mv  archive.x    $(BINDIR)/archive
+	mv  bar.x        $(BINDIR)/bar
 	mv  correlate.x  $(BINDIR)/correlate
 	mv  crystal.x    $(BINDIR)/crystal
 	mv  diffuse.x    $(BINDIR)/diffuse
@@ -679,6 +682,7 @@ remove_links:
 	rm -f $(LINKDIR)/analyze
 	rm -f $(LINKDIR)/anneal
 	rm -f $(LINKDIR)/archive
+	rm -f $(LINKDIR)/bar
 	rm -f $(LINKDIR)/correlate
 	rm -f $(LINKDIR)/crystal
 	rm -f $(LINKDIR)/diffuse
@@ -741,6 +745,7 @@ create_links:
 	ln -s $(BINDIR)/analyze    $(LINKDIR)/analyze
 	ln -s $(BINDIR)/anneal     $(LINKDIR)/anneal
 	ln -s $(BINDIR)/archive    $(LINKDIR)/archive
+	ln -s $(BINDIR)/bar        $(LINKDIR)/bar
 	ln -s $(BINDIR)/correlate  $(LINKDIR)/correlate
 	ln -s $(BINDIR)/crystal    $(LINKDIR)/crystal
 	ln -s $(BINDIR)/diffuse    $(LINKDIR)/diffuse
@@ -1116,6 +1121,7 @@ angles.o: angle.i atmlst.i atoms.i couple.i iounit.i sizes.i
 anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i usage.i warp.i
 archive.o: atmtyp.i atoms.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
 attach.o: atoms.i couple.i iounit.i sizes.i
+bar.o: atmtyp.i atoms.i couple.i files.i inform.i iounit.i sizes.i titles.i
 basefile.o: ascii.i files.i
 beeman.o: atmtyp.i atoms.i freeze.i mdstuf.i moldyn.i sizes.i units.i usage.i
 bicubic.o:

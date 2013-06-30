@@ -12,6 +12,7 @@ fort77 -O2 +E1 +U77 -o alchemy.x alchemy.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o analyze.x analyze.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o anneal.x anneal.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o archive.x archive.o -L. -ltinker
+fort77 -O2 +E1 +U77 -o bar.x bar.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o correlate.x correlate.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o crystal.x crystal.o -L. -ltinker
 fort77 -O2 +E1 +U77 -o diffuse.x distgeom.o -L. -ltinker

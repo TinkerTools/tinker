@@ -16,6 +16,7 @@ gfortran -c -O3 angles.f
 gfortran -c -O3 anneal.f
 gfortran -c -O3 archive.f
 gfortran -c -O3 attach.f
+gfortran -c -O3 bar.f
 gfortran -c -O3 basefile.f
 gfortran -c -O3 beeman.f
 gfortran -c -O3 bicubic.f

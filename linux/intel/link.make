@@ -12,6 +12,7 @@ ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel 
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o analyze.x analyze.o libtinker.a libfftw3_omp.a libfftw3.a ; strip analyze.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o anneal.x anneal.o libtinker.a libfftw3_omp.a libfftw3.a ; strip anneal.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o archive.x archive.o libtinker.a libfftw3_omp.a libfftw3.a ; strip archive.x
+ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o bar.x bar.o libtinker.a libfftw3_omp.a libfftw3.a ; strip bar.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o correlate.x correlate.o libtinker.a libfftw3_omp.a libfftw3.a ; strip correlate.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o crystal.x crystal.o libtinker.a libfftw3_omp.a libfftw3.a ; strip crystal.x
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o diffuse.x diffuse.o libtinker.a libfftw3_omp.a libfftw3.a ; strip diffuse.x

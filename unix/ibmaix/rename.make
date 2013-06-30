@@ -11,6 +11,7 @@ mv alchemy.x   ../bin/alchemy
 mv analyze.x   ../bin/analyze
 mv anneal.x    ../bin/anneal
 mv archive.x   ../bin/archive
+mv bar.x       ../bin/bar
 mv correlate.x ../bin/correlate
 mv crystal.x   ../bin/crystal
 mv diffuse.x   ../bin/diffuse

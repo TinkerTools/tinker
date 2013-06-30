@@ -12,6 +12,7 @@ f77 -o alchemy.x alchemy.o libtinker.a
 f77 -o analyze.x analyze.o libtinker.a
 f77 -o anneal.x anneal.o libtinker.a
 f77 -o archive.x archive.o libtinker.a
+f77 -o bar.x bar.o libtinker.a
 f77 -o correlate.x correlate.o libtinker.a
 f77 -o crystal.x crystal.o libtinker.a
 f77 -o diffuse.x diffuse.o libtinker.a

@@ -16,6 +16,7 @@ xlf -c -O angles.f
 xlf -c -O anneal.f
 xlf -c -O archive.f
 xlf -c -O attach.f
+xlf -c -O bar.f
 xlf -c -O basefile.f
 xlf -c -O beeman.f
 xlf -c -O bicubic.f

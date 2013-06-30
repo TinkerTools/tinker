@@ -12,6 +12,7 @@ pgf77 -s -o alchemy.x alchemy.o libtinker.a
 pgf77 -s -o analyze.x analyze.o libtinker.a
 pgf77 -s -o anneal.x anneal.o libtinker.a
 pgf77 -s -o archive.x archive.o libtinker.a
+pgf77 -s -o bar.x bar.o libtinker.a
 pgf77 -s -o correlate.x correlate.o libtinker.a
 pgf77 -s -o crystal.x crystal.o libtinker.a
 pgf77 -s -o diffuse.x diffuse.o libtinker.a

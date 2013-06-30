@@ -16,6 +16,7 @@ f77 -c -fast -temp=. angles.f
 f77 -c -fast -temp=. anneal.f
 f77 -c -fast -temp=. archive.f
 f77 -c -fast -temp=. attach.f
+f77 -c -fast -temp=. bar.f
 f77 -c -fast -temp=. basefile.f
 f77 -c -fast -temp=. beeman.f
 f77 -c -fast -temp=. bicubic.f

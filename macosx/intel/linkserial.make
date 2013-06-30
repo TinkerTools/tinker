@@ -12,6 +12,7 @@ ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o alchem
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o analyze.x analyze.o libtinker.a ; strip analyze.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o anneal.x anneal.o libtinker.a ; strip anneal.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o archive.x archive.o libtinker.a ; strip archive.x
+ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o bar.x bar.o libtinker.a ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o correlate.x correlate.o libtinker.a ; strip correlate.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o crystal.x crystal.o libtinker.a ; strip crystal.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.5 -o diffuse.x diffuse.o libtinker.a ; strip diffuse.x

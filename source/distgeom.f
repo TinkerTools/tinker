@@ -33,6 +33,7 @@ c
       include 'inform.i'
       include 'iounit.i'
       include 'kgeoms.i'
+      include 'kvdws.i'
       include 'math.i'
       include 'refer.i'
       include 'tors.i'
@@ -79,6 +80,11 @@ c
       call angles
       call torsions
 c
+c     get force field vdw radii and any modifications
+c
+      call field
+      call kvdw
+c
 c     get distance bound and torsional angle restraints
 c
       call kgeom
@@ -94,7 +100,7 @@ c
       allocate (bnd(n,n))
       allocate (georad(n))
 c
-c     assign approximate radii to each of the atoms
+c     assign approximate radii based on the atom names
 c
       do i = 1, n
          letter = name(i)(1:1)
@@ -119,6 +125,12 @@ c
          else
             georad(i) = 0.5d0
          end if
+      end do
+c
+c     assign atomic radii from force field vdw parameters
+c
+      do i = 1, n
+         if (type(i) .ne. 0)  georad(i) = rad(type(i))
       end do
 c
 c     find maximum value of vdw radii sum for an atom pair

@@ -16,6 +16,7 @@ fort77 -c -O2 +E1 angles.f
 fort77 -c -O2 +E1 anneal.f
 fort77 -c -O2 +E1 archive.f
 fort77 -c -O2 +E1 attach.f
+fort77 -c -O2 +E1 bar.f
 fort77 -c -O2 +E1 basefile.f
 fort77 -c -O2 +E1 beeman.f
 fort77 -c -O2 +E1 bicubic.f

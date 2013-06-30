@@ -16,6 +16,7 @@ f77 -c -O -mips4 angles.f
 f77 -c -O -mips4 anneal.f
 f77 -c -O -mips4 archive.f
 f77 -c -O -mips4 attach.f
+f77 -c -O -mips4 bar.f
 f77 -c -O -mips4 basefile.f
 f77 -c -O -mips4 beeman.f
 f77 -c -O -mips4 bicubic.f

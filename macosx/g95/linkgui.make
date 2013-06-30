@@ -1,3 +1,4 @@
+g95 -o archive.x archive.o libtinker.a -framework JavaVM -framework CoreFoundat$
 #
 #
 #  ##################################################################
@@ -12,6 +13,7 @@ g95 -o alchemy.x alchemy.o libtinker.a -framework JavaVM -framework CoreFoundati
 g95 -o analyze.x analyze.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o anneal.x anneal.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o archive.x archive.o libtinker.a -framework JavaVM -framework CoreFoundation
+g95 -o bar.x bar.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o correlate.x correlate.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o crystal.x crystal.o libtinker.a -framework JavaVM -framework CoreFoundation
 g95 -o diffuse.x diffuse.o libtinker.a -framework JavaVM -framework CoreFoundation

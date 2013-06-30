@@ -14,6 +14,7 @@ LF95 -o1 -tpp -nstchk -ntrace -nomap alchemy.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap analyze.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap anneal.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap archive.obj -lib tinker
+LF95 -o1 -tpp -nstchk -ntrace -nomap bar.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap correlate.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap crystal.obj -lib tinker
 LF95 -o1 -tpp -nstchk -ntrace -nomap diffuse.obj -lib tinker

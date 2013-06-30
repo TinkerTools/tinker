@@ -12,6 +12,7 @@ gfortran -o alchemy.x alchemy.o libtinker.a -framework JavaVM -framework CoreFou
 gfortran -o analyze.x analyze.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o anneal.x anneal.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o archive.x archive.o libtinker.a -framework JavaVM -framework CoreFoundation
+gfortran -o bar.x bar.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o correlate.x correlate.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o crystal.x crystal.o libtinker.a -framework JavaVM -framework CoreFoundation
 gfortran -o diffuse.x diffuse.o libtinker.a -framework JavaVM -framework CoreFoundation

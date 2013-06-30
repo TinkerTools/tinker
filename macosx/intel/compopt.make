@@ -16,6 +16,7 @@ ifort -c -fast angles.f
 ifort -c -fast anneal.f
 ifort -c -fast archive.f
 ifort -c -fast attach.f
+ifort -c -fast bar.f
 ifort -c -fast basefile.f
 ifort -c -fast beeman.f
 ifort -c -fast bicubic.f

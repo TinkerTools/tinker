@@ -16,6 +16,7 @@ pgf77 -c -fast angles.f
 pgf77 -c -fast anneal.f
 pgf77 -c -fast archive.f
 pgf77 -c -fast attach.f
+pgf77 -c -fast bar.f
 pgf77 -c -fast basefile.f
 pgf77 -c -fast beeman.f
 pgf77 -c -fast bicubic.f

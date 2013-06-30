@@ -12,6 +12,7 @@ pgf95 -fast -mp -o alchemy.x alchemy.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o analyze.x analyze.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o anneal.x anneal.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o archive.x archive.o libtinker.a libfftw3_omp.a libfftw3.a
+pgf95 -fast -mp -o bar.x bar.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o correlate.x correlate.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o crystal.x crystal.o libtinker.a libfftw3_omp.a libfftw3.a
 pgf95 -fast -mp -o diffuse.x diffuse.o libtinker.a libfftw3_omp.a libfftw3.a

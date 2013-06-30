@@ -12,6 +12,7 @@ f77 -fast -o alchemy.x alchemy.o -L. -ltinker
 f77 -fast -o analyze.x analyze.o -L. -ltinker
 f77 -fast -o anneal.x anneal.o -L. -ltinker
 f77 -fast -o archive.x archive.o -L. -ltinker
+f77 -fast -o bar.x bar.o -L. -ltinker
 f77 -fast -o correlate.x correlate.o -L. -ltinker
 f77 -fast -o crystal.x crystal.o -L. -ltinker
 f77 -fast -o diffuse.x diffuse.o -L. -ltinker

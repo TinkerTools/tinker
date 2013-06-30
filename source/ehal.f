@@ -757,8 +757,8 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
 !$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
-!$OMP& ghal,dhal,vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5)
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
+!$OMP& vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(evt)
 !$OMP DO reduction(+:evt) schedule(dynamic)
 c

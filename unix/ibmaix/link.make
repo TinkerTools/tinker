@@ -12,6 +12,7 @@ xlf -o alchemy.x alchemy.o -L. -ltinker
 xlf -o analyze.x analyze.o -L. -ltinker
 xlf -o anneal.x anneal.o -L. -ltinker
 xlf -o archive.x archive.o -L. -ltinker
+xlf -o bar.x bar.o -L. -ltinker
 xlf -o correlate.x correlate.o -L. -ltinker
 xlf -o crystal.x crystal.o -L. -ltinker
 xlf -o diffuse.x diffuse.o -L. -ltinker

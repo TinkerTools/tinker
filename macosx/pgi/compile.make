@@ -16,6 +16,7 @@ pgf95 -c -fast -mp angles.f
 pgf95 -c -fast -mp anneal.f
 pgf95 -c -fast -mp archive.f
 pgf95 -c -fast -mp attach.f
+pgf95 -c -fast -mp bar.f
 pgf95 -c -fast -mp basefile.f
 pgf95 -c -fast -mp beeman.f
 pgf95 -c -fast -mp bicubic.f

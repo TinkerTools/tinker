@@ -17,6 +17,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace angles.f
 LF95 -c -o1 -tpp -nstchk -ntrace anneal.f
 LF95 -c -o1 -tpp -nstchk -ntrace archive.f
 LF95 -c -o1 -tpp -nstchk -ntrace attach.f
+LF95 -c -o1 -tpp -nstchk -ntrace bar.f
 LF95 -c -o1 -tpp -nstchk -ntrace basefile.f
 LF95 -c -o1 -tpp -nstchk -ntrace beeman.f
 LF95 -c -o1 -tpp -nstchk -ntrace bicubic.f

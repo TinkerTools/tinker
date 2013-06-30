@@ -140,6 +140,15 @@ c
             end do
             nvlst(i) = j
 c
+c     check to see if the neighbor list is too long
+c
+            if (nvlst(i) .ge. maxvlst) then
+               write (iout,20)
+   20          format (/,' VLIST  --  Too many Neighbors;',
+     &                    ' Increase MAXVLST')
+               call fatal
+            end if
+c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
@@ -150,20 +159,20 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
                   do j = 1, nvlst(k)
-                     if (vlst(j,k) .eq. i)  goto 20
+                     if (vlst(j,k) .eq. i)  goto 30
                   end do
                   nvlst(k) = nvlst(k) + 1
                   vlst(nvlst(k),k) = i
-   20             continue
+   30             continue
                else if (r2 .le. vbufx) then
                   do j = 1, nvlst(k)
                      if (vlst(j,k) .eq. i) then
                         vlst(j,k) = vlst(nvlst(k),k)
                         nvlst(k) = nvlst(k) - 1
-                        goto 30
+                        goto 40
                      end if
                   end do
-   30             continue
+   40             continue
                end if
             end do
          end if
@@ -462,6 +471,15 @@ c
             end do
             nelst(i) = j
 c
+c     check to see if the neighbor list is too long
+c
+            if (nelst(i) .ge. maxelst) then
+               write (iout,20)
+   20          format (/,' CLIST  --  Too many Neighbors;',
+     &                    ' Increase MAXELST')
+               call fatal
+            end if
+c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
@@ -472,20 +490,20 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
                   do j = 1, nelst(k)
-                     if (elst(j,k) .eq. i)  goto 20
+                     if (elst(j,k) .eq. i)  goto 30
                   end do
                   nelst(k) = nelst(k) + 1
                   elst(nelst(k),k) = i
-   20             continue
+   30             continue
                else if (r2 .le. cbufx) then
                   do j = 1, nelst(k)
                      if (elst(j,k) .eq. i) then
                         elst(j,k) = elst(nelst(k),k)
                         nelst(k) = nelst(k) - 1
-                        goto 30
+                        goto 40
                      end if
                   end do
-   30             continue
+   40             continue
                end if
             end do
          end if
@@ -779,6 +797,15 @@ c
             end do
             nelst(i) = j
 c
+c     check to see if the neighbor list is too long
+c
+            if (nelst(i) .ge. maxelst) then
+               write (iout,20)
+   20          format (/,' MLIST  --  Too many Neighbors;',
+     &                    ' Increase MAXELST')
+               call fatal
+            end if
+c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
@@ -789,20 +816,20 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
                   do j = 1, nelst(k)
-                     if (elst(j,k) .eq. i)  goto 20
+                     if (elst(j,k) .eq. i)  goto 30
                   end do
                   nelst(k) = nelst(k) + 1
                   elst(nelst(k),k) = i
-   20             continue
+   30             continue
                else if (r2 .le. mbufx) then
                   do j = 1, nelst(k)
                      if (elst(j,k) .eq. i) then
                         elst(j,k) = elst(nelst(k),k)
                         nelst(k) = nelst(k) - 1
-                        goto 30
+                        goto 40
                      end if
                   end do
-   30             continue
+   40             continue
                end if
             end do
          end if
@@ -1096,6 +1123,15 @@ c
             end do
             nulst(i) = j
 c
+c     check to see if the neighbor list is too long
+c
+            if (nulst(i) .ge. maxulst) then
+               write (iout,20)
+   20          format (/,' ULIST  --  Too many Neighbors;',
+     &                    ' Increase MAXULST')
+               call fatal
+            end if
+c
 c     adjust lists of lower numbered neighbors of this site
 c
             do k = 1, i-1
@@ -1106,20 +1142,20 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. ubuf2) then
                   do j = 1, nulst(k)
-                     if (ulst(j,k) .eq. i)  goto 20
+                     if (ulst(j,k) .eq. i)  goto 30
                   end do
                   nulst(k) = nulst(k) + 1
                   ulst(nulst(k),k) = i
-   20             continue
+   30             continue
                else if (r2 .le. ubufx) then
                   do j = 1, nulst(k)
                      if (ulst(j,k) .eq. i) then
                         ulst(j,k) = ulst(nulst(k),k)
                         nulst(k) = nulst(k) - 1
-                        goto 30
+                        goto 40
                      end if
                   end do
-   30             continue
+   40             continue
                end if
             end do
          end if

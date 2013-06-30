@@ -16,6 +16,7 @@ f77 -c -fast -arch generic -tune generic angles.f
 f77 -c -fast -arch generic -tune generic anneal.f
 f77 -c -fast -arch generic -tune generic archive.f
 f77 -c -fast -arch generic -tune generic attach.f
+f77 -c -fast -arch generic -tune generic bar.f
 f77 -c -fast -arch generic -tune generic basefile.f
 f77 -c -fast -arch generic -tune generic beeman.f
 f77 -c -fast -arch generic -tune generic bicubic.f

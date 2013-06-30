@@ -189,7 +189,6 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (proceed)  proceed = (vscale(k) .ne. 0.0d0)
 c
 c     compute the energy contribution for this interaction
 c
@@ -865,7 +864,7 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
 !$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,cut2,
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(evt,eintert,nevt,aevt)
 !$OMP DO reduction(+:evt,eintert,nevt,aevt) schedule(dynamic)

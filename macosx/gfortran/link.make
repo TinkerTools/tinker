@@ -12,6 +12,7 @@ gfortran -O3 -o alchemy.x alchemy.o libtinker.a
 gfortran -O3 -o analyze.x analyze.o libtinker.a
 gfortran -O3 -o anneal.x anneal.o libtinker.a
 gfortran -O3 -o archive.x archive.o libtinker.a
+gfortran -O3 -o bar.x bar.o libtinker.a
 gfortran -O3 -o correlate.x correlate.o libtinker.a
 gfortran -O3 -o crystal.x crystal.o libtinker.a
 gfortran -O3 -o diffuse.x diffuse.o libtinker.a

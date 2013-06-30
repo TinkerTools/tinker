@@ -190,7 +190,6 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (proceed)  proceed = (vscale(k) .ne. 0.0d0)
 c
 c     compute the energy contribution for this interaction
 c
@@ -918,7 +917,7 @@ c     transfer global to local copies for OpenMP calculation
 c
       evt = ev
       eintert = einter
-      nevt= nev
+      nevt = nev
       do i = 1, n
          aevt(i) = aev(i)
       end do
@@ -928,11 +927,12 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
 !$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,fgrp,off2,radmin,epsilon,radmin4,epsilon4,
-!$OMP& ghal,dhal,vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5,
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
+!$OMP& vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(evt,eintert,nevt,aevt)
-!$OMP DO reduction(+:evt,eintert,nevt,aevt) schedule(dynamic)
+!$OMP DO reduction(+:evt,eintert,nevt,aevt)
+!$OMP& schedule(dynamic)
 c
 c     find the van der Waals energy via neighbor list search
 c

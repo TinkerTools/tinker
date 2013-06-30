@@ -12,6 +12,7 @@ ifort -g -o alchemy.x alchemy.o libtinker.a
 ifort -g -o analyze.x analyze.o libtinker.a
 ifort -g -o anneal.x anneal.o libtinker.a
 ifort -g -o archive.x archive.o libtinker.a
+ifort -g -o bar.x bar.o libtinker.a
 ifort -g -o correlate.x correlate.o libtinker.a
 ifort -g -o crystal.x crystal.o libtinker.a
 ifort -g -o diffuse.x diffuse.o libtinker.a

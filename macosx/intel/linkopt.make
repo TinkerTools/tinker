@@ -12,6 +12,7 @@ ifort -fast -static-intel -vec-report0 -o alchemy.x alchemy.f *.o ; strip alchem
 ifort -fast -static-intel -vec-report0 -o analyze.x analyze.f *.o ; strip analyze.x
 ifort -fast -static-intel -vec-report0 -o anneal.x anneal.f *.o ; strip anneal.x
 ifort -fast -static-intel -vec-report0 -o archive.x archive.f *.o ; strip archive.x
+ifort -fast -static-intel -vec-report0 -o bar.x bar.f *.o ; strip bar.x
 ifort -fast -static-intel -vec-report0 -o correlate.x correlate.f *.o ; strip correlate.x
 ifort -fast -static-intel -vec-report0 -o crystal.x crystal.f *.o ; strip crystal.x
 ifort -fast -static-intel -vec-report0 -o diffuse.x diffuse.f *.o ; strip diffuse.x

@@ -17,6 +17,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp angles.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp anneal.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp archive.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp attach.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bar.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp basefile.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp beeman.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /assume:cc_omp /Qopenmp bicubic.f

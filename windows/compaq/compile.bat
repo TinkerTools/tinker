@@ -17,6 +17,7 @@ DF /compile_only /optimize /fast angles.f
 DF /compile_only /optimize /fast anneal.f
 DF /compile_only /optimize /fast archive.f
 DF /compile_only /optimize /fast attach.f
+DF /compile_only /optimize /fast bar.f
 DF /compile_only /optimize /fast basefile.f
 DF /compile_only /optimize /fast beeman.f
 DF /compile_only /optimize /fast bicubic.f

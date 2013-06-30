@@ -12,6 +12,7 @@ unzip alchemy.zip alchemy.exe
 unzip analyze.zip analyze.exe
 unzip anneal.zip anneal.exe
 unzip archive.zip archive.exe
+unzip bar.zip bar.exe
 unzip correlate.zip correlate.exe
 unzip crystal.zip crystal.exe
 unzip diffuse.zip diffuse.exe

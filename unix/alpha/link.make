@@ -12,6 +12,7 @@ f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o alchemy.x alchemy.o libtin
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o analyze.x analyze.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o anneal.x anneal.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o archive.x archive.o libtinker.a
+f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o bar.x bar.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o correlate.x correlate.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o crystal.x crystal.o libtinker.a
 f77 -fast -s -non_shared -om -WL,-om_no_inst_sched -o diffuse.x diffuse.o libtinker.a

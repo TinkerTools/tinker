@@ -319,6 +319,7 @@ bin_PROGRAMS = \
 	analyze \
 	anneal \
 	archive \
+	bar \
 	correlate \
 	crystal \
 	diffuse \

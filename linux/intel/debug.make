@@ -16,6 +16,7 @@ ifort -c -g -warn unused -check uninit -check bounds angles.f
 ifort -c -g -warn unused -check uninit -check bounds anneal.f
 ifort -c -g -warn unused -check uninit -check bounds archive.f
 ifort -c -g -warn unused -check uninit -check bounds attach.f
+ifort -c -g -warn unused -check uninit -check bounds bar.f
 ifort -c -g -warn unused -check uninit -check bounds basefile.f
 ifort -c -g -warn unused -check uninit -check bounds beeman.f
 ifort -c -g -warn unused -check uninit -check bounds bicubic.f

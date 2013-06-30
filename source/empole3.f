@@ -1940,6 +1940,7 @@ c
       include 'shunt.i'
       integer i,j,k,m
       integer ii,kk,kkk
+      integer nemtt,neptt
       real*8 e,ei,eintra
       real*8 f,erfc
       real*8 r,r2,xr,yr,zr
@@ -1963,11 +1964,15 @@ c
       real*8 qkx,qky,qkz
       real*8 scale3,scale5
       real*8 scale7
+      real*8 emtt,eptt
+      real*8 eintrat
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: pscale(:)
+      real*8, allocatable :: aemtt(:)
+      real*8, allocatable :: aeptt(:)
       logical header,huge
       logical muse,puse
       character*6 mode
@@ -1984,6 +1989,8 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (pscale(n))
+      allocate (aemtt(n))
+      allocate (aeptt(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -1998,9 +2005,34 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     initialize local variables for OpenMP calculation
+c
+      emtt = 0.0d0
+      eptt = 0.0d0
+      eintrat = eintra
+      nemtt = nem
+      neptt = nep
+      do i = 1, n
+         aemtt(i) = aem(i)
+         aeptt(i) = aep(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP& private(i,j,k,ii,kk,kkk,e,ei,efix,eifix,bfac,damp,expdamp,
+!$OMP& pdi,pti,pgamma,scale3,scale5,scale7,alsq2,alsq2n,
+!$OMP& exp2a,ralpha,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
+!$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
+!$OMP& ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,
+!$OMP& bn,sc,gl,sci,gli)
+!$OMP& firstprivate(mscale,pscale)
+!$OMP DO reduction(+:emtt,eptt,eintrat,nemtt,neptt,aemtt,aeptt)
+!$OMP& schedule(dynamic)
+c
 c     compute the real space portion of the Ewald summation
 c
-      do i = 1, npole-1
+      do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
          pti = thole(i)
@@ -2171,14 +2203,14 @@ c
                ei = 0.5d0 * f * ei
                muse = use_mpole
                puse = use_polar
-               if (muse)  nem = nem + 1
-               if (puse)  nep = nep + 1
-               em = em + e
-               ep = ep + ei
-               aem(ii) = aem(ii) + 0.5d0*e
-               aem(kk) = aem(kk) + 0.5d0*e
-               aep(ii) = aep(ii) + 0.5d0*ei
-               aep(kk) = aep(kk) + 0.5d0*ei
+               if (muse)  nemtt = nemtt + 1
+               if (puse)  neptt = neptt + 1
+               emtt = emtt + e
+               eptt = eptt + ei
+               aemtt(ii) = aemtt(ii) + 0.5d0*e
+               aemtt(kk) = aemtt(kk) + 0.5d0*e
+               aeptt(ii) = aeptt(ii) + 0.5d0*ei
+               aeptt(kk) = aeptt(kk) + 0.5d0*ei
 c
 c     increment the total intramolecular energy
 c
@@ -2187,7 +2219,7 @@ c
      &                    + gli(3)*rr7*scale7
                eifix = 0.5d0 * f * eifix
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintra = eintra + efix + eifix
+                  eintrat = eintrat + efix + eifix
                end if
 c
 c     print a message if the energy of this interaction is large
@@ -2233,9 +2265,28 @@ c
          end do
       end do
 c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      em = em + emtt
+      ep = ep + eptt
+      eintra = eintrat
+      nem = nemtt
+      nep = neptt
+      do i = 1, n
+         aem(i) = aemtt(i)
+         aep(i) = aeptt(i)
+      end do
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (pscale)
+      deallocate (aemtt)
+      deallocate (aeptt)
       return
       end
