@@ -1121,7 +1121,7 @@ angles.o: angle.i atmlst.i atoms.i couple.i iounit.i sizes.i
 anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i usage.i warp.i
 archive.o: atmtyp.i atoms.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
 attach.o: atoms.i couple.i iounit.i sizes.i
-bar.o: atmtyp.i atoms.i couple.i files.i inform.i iounit.i sizes.i titles.i
+bar.o: energi.i files.i inform.i iounit.i keys.i sizes.i units.i
 basefile.o: ascii.i files.i
 beeman.o: atmtyp.i atoms.i freeze.i mdstuf.i moldyn.i sizes.i units.i usage.i
 bicubic.o:
@@ -1152,7 +1152,7 @@ delete.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
 diagq.o:
 diffeq.o: atoms.i iounit.i math.i sizes.i warp.i
 diffuse.o: atmtyp.i atoms.i boxes.i iounit.i molcul.i sizes.i
-distgeom.o: angle.i atmtyp.i atoms.i bond.i couple.i disgeo.i files.i inform.i iounit.i kgeoms.i math.i refer.i sizes.i tors.i
+distgeom.o: angle.i atmtyp.i atoms.i bond.i couple.i disgeo.i files.i inform.i iounit.i kgeoms.i kvdws.i math.i refer.i sizes.i tors.i
 document.o: iounit.i
 dynamic.o: atoms.i bath.i bond.i bound.i inform.i iounit.i keys.i mdstuf.i potent.i sizes.i solute.i stodyn.i usage.i
 eangang.o: angang.i angle.i angpot.i atoms.i bound.i energi.i group.i math.i sizes.i usage.i
@@ -1360,7 +1360,7 @@ molecule.o: atmtyp.i atoms.i couple.i molcul.i sizes.i
 molxyz.o: files.i iounit.i titles.i
 moments.o: atmtyp.i atoms.i charge.i dipole.i moment.i mpole.i polar.i potent.i sizes.i solute.i units.i usage.i
 monte.o: atoms.i files.i inform.i iounit.i omega.i output.i sizes.i units.i usage.i zcoord.i
-mutate.o: atmtyp.i atoms.i charge.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
+mutate.o: atmtyp.i atoms.i charge.i inform.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
 nblist.o: atoms.i bound.i boxes.i cell.i charge.i cutoff.i iounit.i light.i mpole.i neigh.i potent.i sizes.i vdw.i
 newton.o: atoms.i files.i inform.i iounit.i keys.i sizes.i usage.i
 newtrot.o: files.i hescut.i inform.i iounit.i keys.i math.i omega.i sizes.i zcoord.i

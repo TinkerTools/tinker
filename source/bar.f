@@ -19,7 +19,8 @@ c     current version takes as input the coordinate archive and key
 c     file for state A, and similar for state B; it then computes the
 c     total potential energy for all frames of each state under the
 c     control of both key files; finally the BAR equation is iterated
-c     to compute the free energy difference for state A --> state B 
+c     to compute the free energy difference for state A --> state B
+c     and a bootstrap estimate of the standard deviation
 c
 c     literature reference:
 c
@@ -37,18 +38,23 @@ c
       include 'iounit.i'
       include 'keys.i'
       include 'units.i'
-      integer i,k,ixyz
+      integer i,j,k
+      integer ixyz,nbst
       integer iter,maxiter
       integer nkey1,nfrm1
       integer nkey2,nfrm2
       integer maxframe
       integer freeunit
+      integer, allocatable :: bst1(:)
+      integer, allocatable :: bst2(:)
       real*8 energy
       real*8 temp,rt
       real*8 delta,eps
       real*8 cold,cnew
       real*8 top,bot,rfrm
-      real*8 value1,value2
+      real*8 sum,sum2
+      real*8 mean,stdev
+      real*8 random,ratio
       real*8, allocatable :: ua0(:)
       real*8, allocatable :: ua1(:)
       real*8, allocatable :: ub0(:)
@@ -97,7 +103,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      maxframe = 10000
+      maxframe = 20000
       allocate (ua0(maxframe))
       allocate (ua1(maxframe))
       allocate (ub0(maxframe))
@@ -192,17 +198,20 @@ c
       deallocate (keys1)
       deallocate (keys2)
 c
-c     compute the initial free energy via the BAR equation
+c     set various constants and parameter values for BAR
 c
       write (iout,50)
    50 format (/,' Estimation of Free Energy Difference',
      &           ' via BAR Method :',/)
-      done = .false.
+      maxiter = 100
+      eps = 0.0001d0
+      rfrm = dble(nfrm1) / dble(nfrm2)
       temp = 298.0d0
       rt = gasconst * temp
-      rfrm = dble(nfrm1) / dble(nfrm2)
-      eps = 0.0001d0
-      maxiter = 100
+c
+c     compute the initial free energy via the BAR equation
+c
+      done = .false.
       iter = 0
       cold = 0.0d0
       top = 0.0d0
@@ -218,11 +227,11 @@ c
       if (delta .lt. eps) then
          done = .true.
          write (iout,60)  cnew,iter
-   60    format (' Free Energy Estimate:',4x,f12.4,
+   60    format (' BAR Free Energy Estimate',1x,f12.4,
      &              ' Kcal/mol at',i4,' Iterations')  
       else
          write (iout,70)  iter,cnew
-   70    format (' BAR Iteration',i4,' :',6x,f12.4,' Kcal/mol')  
+   70    format (' BAR Iteration',i4,8x,f12.4,' Kcal/mol')  
       end if
 c
 c     iterate the BAR equation to converge the free energy
@@ -243,11 +252,11 @@ c
          if (delta .lt. eps) then
             done = .true.
             write (iout,80)  cnew,iter
-   80       format (/,' Free Energy Estimate:',4x,f12.4,
+   80       format (/,' BAR Free Energy Estimate',1x,f12.4,
      &                 ' Kcal/mol at',i4,' Iterations')  
          else
             write (iout,90)  iter,cnew
-   90       format (' BAR Iteration',i4,' :',6x,f12.4,' Kcal/mol')  
+   90       format (' BAR Iteration',i4,8x,f12.4,' Kcal/mol')  
          end if
          if (iter.ge.maxiter .and. .not.done) then
             done = .true.
@@ -257,12 +266,83 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      nbst = 50000
+      allocate (bst1(nbst))
+      allocate (bst2(nbst))
+c
+c     use bootstrapping analysis to estimate statistical error
+c
+      write (iout,110)
+  110 format (/,' Bootstrapping Error Analysis of BAR',
+     &           ' Free Energy :',/)
+      sum = 0.0d0
+      sum2 = 0.0d0
+      do k = 1, nbst
+         done = .false.
+         iter = 0
+         cold = 0.0d0
+         top = 0.0d0
+         do i = 1, nfrm2
+            bst2(i) = int(dble(nfrm2)*random()) + 1
+            j = bst2(i)
+            top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cold)/rt)) 
+         end do
+         bot = 0.0d0
+         do i = 1, nfrm1
+            bst1(i) = int(dble(nfrm1)*random()) + 1
+            j = bst1(i)
+            bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cold)/rt)) 
+         end do
+         cnew = rt*log(rfrm*top/bot) + cold
+         delta = abs(cnew-cold)
+         do while (.not. done)
+            iter = iter + 1
+            cold = cnew
+            top = 0.0d0
+            do i = 1, nfrm2
+               j = bst2(i)
+               top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cold)/rt)) 
+            end do
+            bot = 0.0d0
+            do i = 1, nfrm1
+               j = bst1(i)
+               bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cold)/rt)) 
+            end do
+            cnew = rt*log(rfrm*top/bot) + cold
+            delta = abs(cnew-cold)
+            if (delta .lt. eps) then
+               done = .true.
+               sum = sum + cnew
+               sum2 = sum2 + cnew*cnew
+               if (debug) then
+                  write (iout,120)  k,cnew,iter
+  120             format (' Bootstrap Estimate',i6,1x,f12.4,
+     &                       ' Kcal/mol at',i4,' Iterations')
+               end if  
+            end if
+         end do
+      end do
+      mean = sum / dble(nbst)
+      ratio = dble(nbst/(nbst-1))
+      stdev = sqrt(ratio*(sum2/dble(nbst)-mean*mean))
+      if (verbose) then
+         write (iout,130)
+  130    format ()
+      end if
+      write (iout,140)  mean,stdev
+  140 format (' Bootstrap Free Energy',4x,f12.4,
+     &           ' +/-',f8.4,' Kcal/mol')  
+c
 c     perform deallocation of some local arrays
 c
       deallocate (ua0)
       deallocate (ua1)
       deallocate (ub0)
       deallocate (ub1)
+      deallocate (bst1)
+      deallocate (bst2)
 c
 c     perform any final tasks before program exit
 c
