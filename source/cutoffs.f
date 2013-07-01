@@ -72,6 +72,10 @@ c
       use_clist = .false.
       use_mlist = .false.
       use_ulist = .false.
+      dovlst = .true.
+      doclst = .true.
+      domlst = .true.
+      doulst = .true.
 c
 c     search the keywords for various cutoff parameters
 c

@@ -21,6 +21,7 @@ c
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
+      include 'inform.i'
       include 'iounit.i'
       include 'katoms.i'
       include 'keys.i'
@@ -113,7 +114,7 @@ c
 c
 c     write the status of the current free energy perturbation step
 c
-      if (nmut .ne. 0) then
+      if (verbose .and. nmut.ne.0) then
          write (iout,30)  vlambda
    30    format (/,' Free Energy Perturbation :',f15.3,
      &              ' Lambda for van der Waals')

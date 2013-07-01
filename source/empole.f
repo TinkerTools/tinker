@@ -1898,8 +1898,8 @@ c     increment the overall multipole and polarization energies
 c
                e = f * e
                ei = 0.5d0 * f * ei
-               em = em + e
-               ep = ep + ei
+               emtt = emtt + e
+               eptt = eptt + ei
             end if
          end do
 c
