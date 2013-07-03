@@ -5280,6 +5280,7 @@ c
       include 'uprior.i'
       integer i,j,k,m
       real*8 coeff,udk,upk
+      real*8 amax,apmax
       real*8 b(maxualt)
       real*8 bp(maxualt)
       real*8 a(maxualt*(maxualt+1)/2)
@@ -5344,11 +5345,20 @@ c
             end do
          end do
 c
-c     solve normal equations and transfer to coefficient vector
+c     check for nonzero coefficients and solve normal equations
 c
          k = nualt - 1
-         call cholesky (k,a,b)
-         call cholesky (k,ap,bp)
+         amax = 0.0d0
+         apmax = 0.0d0
+         do i = 1, k*(k+1)/2
+            amax = max(amax,a(i))
+            apmax = max(apmax,ap(i))
+         end do
+         if (amax .ne. 0.0d0)  call cholesky (k,a,b)
+         if (apmax .ne. 0.0d0)  call cholesky (k,ap,bp)
+c
+c     transfer the final solution to the coefficient vector
+c
          do k = 1, nualt-1
             bpred(k) = b(k)
             bpredp(k) = bp(k)
