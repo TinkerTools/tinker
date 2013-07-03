@@ -1121,7 +1121,7 @@ angles.o: angle.i atmlst.i atoms.i couple.i iounit.i sizes.i
 anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i usage.i warp.i
 archive.o: atmtyp.i atoms.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
 attach.o: atoms.i couple.i iounit.i sizes.i
-bar.o: energi.i files.i inform.i iounit.i keys.i sizes.i units.i
+bar.o: atoms.i energi.i files.i inform.i iounit.i keys.i sizes.i units.i
 basefile.o: ascii.i files.i
 beeman.o: atmtyp.i atoms.i freeze.i mdstuf.i moldyn.i sizes.i units.i usage.i
 bicubic.o:
