@@ -66,15 +66,17 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,ic,id,bt1,bt2,bt3
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Stretch-Torsion Parameters :',
-     &                 //,5x,'Atom Classes',7x,'1-Fold',6x,'2-Fold',
-     &                    6x,'3-Fold',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Stretch-Torsion Parameters :',
+     &                    //,5x,'Atom Classes',7x,'1-Fold',6x,'2-Fold',
+     &                       6x,'3-Fold',/)
+               end if
+               write (iout,30)  ia,ib,ic,id,bt1,bt2,bt3
+   30          format (1x,4i4,1x,3f12.3)
             end if
-            write (iout,30)  ia,ib,ic,id,bt1,bt2,bt3
-   30       format (1x,4i4,1x,3f12.3)
             size = 4
             call numeral (ita,pa,size)
             call numeral (itb,pb,size)

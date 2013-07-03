@@ -54,7 +54,7 @@ c
             string = record(next:120)
             read (string,*,err=40,end=40)  ia,cg
             if (ia .gt. 0) then
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,10)
    10             format (/,' Additional Atomic Partial Charge',
@@ -63,8 +63,10 @@ c
                end if
                if (ia .le. maxtyp) then
                   chg(ia) = cg
-                  write (iout,20)  ia,cg
-   20             format (4x,i6,8x,f12.4)
+                  if (.not. silent) then
+                     write (iout,20)  ia,cg
+   20                format (4x,i6,8x,f12.4)
+                  end if
                else
                   write (iout,30)
    30             format (/,' KCHARGE  --  Too many Partial Charge',
@@ -101,15 +103,17 @@ c
             read (string,*,err=70,end=70)  ia,cg
             if (ia.lt.0 .and. ia.ge.-n) then
                ia = -ia
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,50)
    50             format (/,' Additional Partial Charges for',
      &                       ' Specific Atoms :',
      &                    //,6x,'Atom',14x,'Charge',/)
                end if
-               write (iout,60)  ia,cg
-   60          format (4x,i6,8x,f12.4)
+               if (.not. silent) then
+                  write (iout,60)  ia,cg
+   60             format (4x,i6,8x,f12.4)
+               end if
                pchg(ia) = cg
             end if
    70       continue

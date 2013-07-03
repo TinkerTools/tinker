@@ -62,7 +62,7 @@ c
             string = record(next:120)
             read (string,*,err=40,end=40)  atn,wght,lig
             if (k.ge.1 .and. k.le.maxtyp) then
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,10)
    10             format (/,' Additional Atom Type Parameters :',
@@ -74,8 +74,10 @@ c
                atmnum(k) = atn
                weight(k) = wght
                ligand(k) = lig
-               write (iout,20)  k,cls,symb,notice,atn,wght,lig
-   20          format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+               if (.not. silent) then
+                  write (iout,20)  k,cls,symb,notice,atn,wght,lig
+   20             format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+               end if
             else if (k .ge. maxtyp) then
                write (iout,30)
    30          format (/,' KATOM   --  Too many Atom Types;',
@@ -128,7 +130,7 @@ c
             string = record(next:120)
             read (string,*,err=70,end=70)  atn,wght,lig
             if (k.lt.0 .and. k.ge.-n) then
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,50)
    50             format (/,' Additional Atom Types for',
@@ -144,8 +146,10 @@ c
                atomic(k) = atn
                mass(k) = wght
                valence(k) = lig
-               write (iout,60)  k,cls,symb,notice,atn,wght,lig
-   60          format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+               if (.not. silent) then
+                  write (iout,60)  k,cls,symb,notice,atn,wght,lig
+   60             format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+               end if
             end if
    70       continue
          end if

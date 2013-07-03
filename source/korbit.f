@@ -65,15 +65,17 @@ c
             string = record(next:120)
             read (string,*,err=10)  ia,elect,ioniz,repuls
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Pisystem Atom Parameters :',
-     &                 //,6x,'Atom Type',3x,'Electron',3x,'Ionization',
-     &                    3x,'Repulsion',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Pisystem Atom Parameters :',
+     &                    //,6x,'Atom Type',3x,'Electron',
+     &                       3x,'Ionization',3x,'Repulsion',/)
+               end if
+               write (iout,30)  ia,elect,ioniz,repuls
+   30          format (8x,i4,3x,f10.3,3x,f10.3,2x,f10.3)
             end if
-            write (iout,30)  ia,elect,ioniz,repuls
-   30       format (8x,i4,3x,f10.3,3x,f10.3,2x,f10.3)
             if (ia.gt.0 .and. ia.le.maxclass) then
                electron(ia) = elect
                ionize(ia) = ioniz
@@ -106,20 +108,23 @@ c
             string = record(next:120)
             read (string,*,err=50)  ia,ib,sslop,tslop
    50       continue
-            if (header) then
-               header = .false.
-               write (iout,60)
-   60          format (/,' Additional Pisystem Bond Parameters :',
-     &                 //,6x,'Atom Types',7x,'d Force',4x,'d Length',/)
-            end if
-            if (iring .eq. 0) then
-               write (iout,70)  ia,ib,sslop,tslop
-   70          format (6x,2i4,5x,2f11.3)
-            else
-               if (iring .eq. 5)  label = '5-Ring'
-               if (iring .eq. 4)  label = '4-Ring'
-               write (iout,80)  ia,ib,sslop,tslop,label
-   80          format (6x,2i4,5x,2f11.3,3x,a6)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,60)
+   60             format (/,' Additional Pisystem Bond Parameters :',
+     &                    //,6x,'Atom Types',7x,'d Force',4x,
+     &                       'd Length',/)
+               end if
+               if (iring .eq. 0) then
+                  write (iout,70)  ia,ib,sslop,tslop
+   70             format (6x,2i4,5x,2f11.3)
+               else
+                  if (iring .eq. 5)  label = '5-Ring'
+                  if (iring .eq. 4)  label = '4-Ring'
+                  write (iout,80)  ia,ib,sslop,tslop,label
+   80             format (6x,2i4,5x,2f11.3,3x,a6)
+               end if
             end if
             size = 4
             call numeral (ia,pa,size)

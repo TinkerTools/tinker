@@ -78,46 +78,48 @@ c
             read (string,*,err=10,end=10)  ia,ib,ic,fc,an1,an2,an3
    10       continue
             if (an2.ne.0.0d0 .or. an3.ne.0.0d0)  jen = 1
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Angle Bending Parameters :',
-     &                 //,5x,'Atom Classes',9x,'K(B)',7x,'Angle',/)
-            end if
-            if (iring .eq. 0) then
-               if (jen .eq. 0) then
-                  write (iout,30)  ia,ib,ic,fc,an1
-   30             format (4x,3i4,2x,2f12.3)
-               else if (an1 .ne. 0.0d0) then
-                  write (iout,40)  ia,ib,ic,fc,an1
-   40             format (4x,3i4,2x,2f12.3,3x,'0-H''s')
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Angle Bending Parameters :',
+     &                    //,5x,'Atom Classes',9x,'K(B)',7x,'Angle',/)
                end if
-               if (an2 .ne. 0.0d0) then
-                  write (iout,50)  ia,ib,ic,fc,an2
-   50             format (4x,3i4,2x,2f12.3,3x,'1-H''s')
-               end if
-               if (an3 .ne. 0.0d0) then
-                  write (iout,60)  ia,ib,ic,fc,an3
-   60             format (4x,3i4,2x,2f12.3,3x,'2-H''s')
-               end if
-            else
-               if (iring .eq. 5)  label = '5-Ring'
-               if (iring .eq. 4)  label = '4-Ring'
-               if (iring .eq. 3)  label = '3-Ring'
-               if (jen .eq. 0) then
-                  write (iout,70)  ia,ib,ic,fc,an1,label
-   70             format (4x,3i4,2x,2f12.3,3x,a6)
-               else if (an1 .ne. 0.0d0) then
-                  write (iout,80)  ia,ib,ic,fc,an1,label
-   80             format (4x,3i4,2x,2f12.3,3x,a6,3x,'0-H''s')
-               end if
-               if (an2 .ne. 0.0d0) then
-                  write (iout,90)  ia,ib,ic,fc,an2,label
-   90             format (4x,3i4,2x,2f12.3,3x,a6,3x,'1-H''s')
-               end if
-               if (an3 .ne. 0.0d0) then
-                  write (iout,100)  ia,ib,ic,fc,an3,label
-  100             format (4x,3i4,2x,2f12.3,3x,a6,3x,'2-H''s')
+               if (iring .eq. 0) then
+                  if (jen .eq. 0) then
+                     write (iout,30)  ia,ib,ic,fc,an1
+   30                format (4x,3i4,2x,2f12.3)
+                  else if (an1 .ne. 0.0d0) then
+                     write (iout,40)  ia,ib,ic,fc,an1
+   40                format (4x,3i4,2x,2f12.3,3x,'0-H''s')
+                  end if
+                  if (an2 .ne. 0.0d0) then
+                     write (iout,50)  ia,ib,ic,fc,an2
+   50                format (4x,3i4,2x,2f12.3,3x,'1-H''s')
+                  end if
+                  if (an3 .ne. 0.0d0) then
+                     write (iout,60)  ia,ib,ic,fc,an3
+   60                format (4x,3i4,2x,2f12.3,3x,'2-H''s')
+                  end if
+               else
+                  if (iring .eq. 5)  label = '5-Ring'
+                  if (iring .eq. 4)  label = '4-Ring'
+                  if (iring .eq. 3)  label = '3-Ring'
+                  if (jen .eq. 0) then
+                     write (iout,70)  ia,ib,ic,fc,an1,label
+   70                format (4x,3i4,2x,2f12.3,3x,a6)
+                  else if (an1 .ne. 0.0d0) then
+                     write (iout,80)  ia,ib,ic,fc,an1,label
+   80                format (4x,3i4,2x,2f12.3,3x,a6,3x,'0-H''s')
+                  end if
+                  if (an2 .ne. 0.0d0) then
+                     write (iout,90)  ia,ib,ic,fc,an2,label
+   90                format (4x,3i4,2x,2f12.3,3x,a6,3x,'1-H''s')
+                  end if
+                  if (an3 .ne. 0.0d0) then
+                     write (iout,100)  ia,ib,ic,fc,an3,label
+  100                format (4x,3i4,2x,2f12.3,3x,a6,3x,'2-H''s')
+                  end if
                end if
             end if
             size = 4
@@ -213,16 +215,18 @@ c
             string = record(next:120)
             read (string,*,err=160,end=160)  ia,ib,ic,fc,an,pr
   160       continue
-            if (header) then
-               header = .false.
-               write (iout,170)
-  170          format (/,' Additional Fourier Angle Bending',
-     &                    ' Parameters :',
-     &                 //,5x,'Atom Classes',9x,'K(B)',7x,'Shift',
-     &                    6x,'Period',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,170)
+  170             format (/,' Additional Fourier Angle Bending',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',9x,'K(B)',7x,'Shift',
+     &                       6x,'Period',/)
+               end if
+               write (iout,180)  ia,ib,ic,fc,an,pr
+  180          format (4x,3i4,2x,3f12.3)
             end if
-            write (iout,180)  ia,ib,ic,fc,an,pr
-  180       format (4x,3i4,2x,3f12.3)
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

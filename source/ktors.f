@@ -99,24 +99,26 @@ c
                pt = pd//pc//pb//pa
             end if
             call torphase (ft,vt,st)
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Torsional Parameters :',
-     &                 //,5x,'Atom Classes',4x,'1-Fold',4x,'2-Fold',
-     &                    4x,'3-Fold',4x,'4-Fold',4x,'5-Fold',
-     &                    4x,'6-Fold',/)
-            end if
-            if (iring .eq. 0) then
-               write (iout,30)  ia,ib,ic,id,
-     &                          (vt(j),nint(st(j)),j=1,6)
-   30          format (1x,4i4,1x,6(f6.2,i4))
-            else
-               if (iring .eq. 5)  label = '5-Ring '
-               if (iring .eq. 4)  label = '4-Ring '
-               write (iout,40)  ia,ib,ic,id,
-     &                          (vt(j),nint(st(j)),j=1,6),label(1:6)
-   40          format (1x,4i4,1x,6(f6.2,i4),3x,a6)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Torsional Parameters :',
+     &                    //,5x,'Atom Classes',4x,'1-Fold',4x,'2-Fold',
+     &                       4x,'3-Fold',4x,'4-Fold',4x,'5-Fold',
+     &                       4x,'6-Fold',/)
+               end if
+               if (iring .eq. 0) then
+                  write (iout,30)  ia,ib,ic,id,
+     &                             (vt(j),nint(st(j)),j=1,6)
+   30             format (1x,4i4,1x,6(f6.2,i4))
+               else
+                  if (iring .eq. 5)  label = '5-Ring '
+                  if (iring .eq. 4)  label = '4-Ring '
+                  write (iout,40)  ia,ib,ic,id,
+     &                             (vt(j),nint(st(j)),j=1,6),label(1:6)
+   40             format (1x,4i4,1x,6(f6.2,i4),3x,a6)
+               end if
             end if
             if (iring .eq. 0) then
                do j = 1, maxnt

@@ -87,15 +87,17 @@ c
                read (record,*,err=10,end=10)  tx(j),ty(j),tf(j)
             end do
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Torsion-Torsion Parameters :',
-     &                 //,5x,'Atom Classes',12x,'GridSize1',
-     &                    5x,'GridSize2',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Torsion-Torsion Parameters :',
+     &                    //,5x,'Atom Classes',12x,'GridSize1',
+     &                       5x,'GridSize2',/)
+               end if
+               write (iout,30)  ia,ib,ic,id,ie,nx,ny
+   30          format (1x,5i4,6x,i8,6x,i8)
             end if
-            write (iout,30)  ia,ib,ic,id,ie,nx,ny
-   30       format (1x,5i4,6x,i8,6x,i8)
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

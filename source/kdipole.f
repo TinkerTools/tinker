@@ -67,23 +67,25 @@ c
             read (string,*,err=10,end=10)  ia,ib,dp,ps
    10       continue
             if (ia.gt.0 .and. ib.gt.0) then
-               if (header) then
-                  header = .false.
-                  write (iout,20)
-   20             format (/,' Additional Bond Dipole Moment ',
-     &                       'Parameters :',
-     &                    //,5x,'Atom Types',9x,'Moment',
-     &                       5x,'Position',/)
-               end if
-               if (iring .eq. 0) then
-                  write (iout,30)  ia,ib,dp,ps
-   30             format (6x,2i4,4x,2f12.3)
-               else
-                  if (iring .eq. 5)  label = '5-Ring'
-                  if (iring .eq. 4)  label = '4-Ring'
-                  if (iring .eq. 3)  label = '3-Ring'
-                  write (iout,40)  ia,ib,dp,ps,label
-   40             format (6x,2i4,4x,2f12.3,3x,a6)
+               if (.not. silent) then
+                  if (header) then
+                     header = .false.
+                     write (iout,20)
+   20                format (/,' Additional Bond Dipole Moment ',
+     &                          'Parameters :',
+     &                       //,5x,'Atom Types',9x,'Moment',
+     &                          5x,'Position',/)
+                  end if
+                  if (iring .eq. 0) then
+                     write (iout,30)  ia,ib,dp,ps
+   30                format (6x,2i4,4x,2f12.3)
+                  else
+                     if (iring .eq. 5)  label = '5-Ring'
+                     if (iring .eq. 4)  label = '4-Ring'
+                     if (iring .eq. 3)  label = '3-Ring'
+                     write (iout,40)  ia,ib,dp,ps,label
+   40                format (6x,2i4,4x,2f12.3,3x,a6)
+                  end if
                end if
                size = 4
                call numeral (ia,pa,size)
@@ -305,7 +307,7 @@ c
             if (ia.lt.0 .and. ib.lt.0) then
                ia = -ia
                ib = -ib
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,120)
   120             format (/,' Additional Bond Dipoles for',
@@ -324,8 +326,10 @@ c
                         bdpl(k) = -dp
                         sdpl(k) = 1.0d0 - ps
                      end if
-                     write (iout,130)  ia,ib,dp,ps
-  130                format (4x,i5,' -',i5,2x,2f12.3)
+                     if (.not. silent) then
+                        write (iout,130)  ia,ib,dp,ps
+  130                   format (4x,i5,' -',i5,2x,2f12.3)
+                     end if
                      goto 140
                   end if
                end do

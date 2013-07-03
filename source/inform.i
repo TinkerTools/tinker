@@ -16,13 +16,16 @@ c     digits    decimal places output for energy and coordinates
 c     iprint    steps between status printing (0=no printing)
 c     iwrite    steps between coordinate dumps (0=no dumps)
 c     isend     steps between socket communication (0=no sockets)
-c     verbose   logical flag to turn on extra information
+c     silent    logical flag to turn off all information printing
+c     verbose   logical flag to turn on extra information printing
 c     debug     logical flag to turn on full debug printing
 c     holdup    logical flag to wait for carriage return on exit
 c     abort     logical flag to stop execution at next chance
 c
 c
-      integer digits,iprint,iwrite,isend
-      logical verbose,debug,holdup,abort
-      common /inform/ digits,iprint,iwrite,isend,verbose,debug,holdup,
-     &                abort
+      integer digits,iprint
+      integer iwrite,isend
+      logical silent,verbose
+      logical debug,holdup,abort
+      common /inform/ digits,iprint,iwrite,isend,silent,verbose,debug,
+     &                holdup,abort

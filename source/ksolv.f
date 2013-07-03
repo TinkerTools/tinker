@@ -121,7 +121,7 @@ c
             read (string,*,err=10,end=10)  k,rd
    10       continue
             if (k.ge.1 .and. k.le.maxclass) then
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Implicit Solvation',
@@ -130,8 +130,10 @@ c
                end if
                if (rd .lt. 0.0d0)  rd = 0.0d0
                gkr(k) = rd
-               write (iout,30)  k,rd
-   30          format (4x,i6,8x,f12.4)
+               if (.not. silent) then
+                  write (iout,30)  k,rd
+   30             format (4x,i6,8x,f12.4)
+               end if
             else if (k .gt. maxtyp) then
                write (iout,40)  maxtyp
    40          format (/,' KSOLV  --  Only Atom Types Through',i4,

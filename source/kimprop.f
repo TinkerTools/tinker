@@ -71,14 +71,18 @@ c
             call numeral (ic,pc,size)
             call numeral (id,pd,size)
             pti = pa//pb//pc//pd
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Improper Dihedral Parameters :',
-     &                 //,5x,'Atom Classes',20x,'K(ID)',7x,'Angle',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Improper Dihedral',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',20x,'K(ID)',
+     &                       7x,'Angle',/)
+               end if
+               write (iout,30)  ia,ib,ic,id,tk,tv
+   30          format (4x,4i4,10x,2f12.3)
             end if
-            write (iout,30)  ia,ib,ic,id,tk,tv
-   30       format (4x,4i4,10x,2f12.3)
             do j = 1, maxndi
                if (kdi(j).eq.blank .or. kdi(j).eq.pti) then
                   kdi(j) = pti

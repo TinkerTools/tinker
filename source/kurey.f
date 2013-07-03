@@ -60,14 +60,17 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,ic,bb,tt
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Urey-Bradley Parameters :',
-     &                 //,5x,'Atom Classes',8x,'K(UB)',5x,'Distance',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Urey-Bradley Parameters :',
+     &                    //,5x,'Atom Classes',8x,'K(UB)',5x,
+     &                       'Distance',/)
+               end if
+               write (iout,30)  ia,ib,ic,bb,tt
+   30          format (4x,3i4,2x,f12.3,f12.4)
             end if
-            write (iout,30)  ia,ib,ic,bb,tt
-   30       format (4x,3i4,2x,f12.3,f12.4)
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

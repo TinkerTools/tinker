@@ -34,17 +34,20 @@ c
       character*120 string
 c
 c
+c     set defaults for lambda and soft core vdw parameters
+c
+      lambda = 1.0d0
+      vlambda = 1.0d0
+      elambda = 1.0d0
+      scexp = 5.0d0
+      scalpha = 0.7d0
+c
 c     zero number of hybrid atoms and hybrid atom list
 c
       nmut = 0
       do i = 1, n
          mut(i) = .false.
       end do
-      lambda = 1.0d0
-      vlambda = 1.0d0
-      elambda = 1.0d0
-      scexp = 5.0d0
-      scalpha = 0.7d0
       do i = 1, 20
          list(i) = 0
       end do
@@ -114,7 +117,7 @@ c
 c
 c     write the status of the current free energy perturbation step
 c
-      if (verbose .and. nmut.ne.0) then
+      if (nmut.ne.0 .and. .not.silent) then
          write (iout,30)  vlambda
    30    format (/,' Free Energy Perturbation :',f15.3,
      &              ' Lambda for van der Waals')

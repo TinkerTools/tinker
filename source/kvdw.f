@@ -69,7 +69,7 @@ c
                string = record(next:120)
                read (string,*,err=10,end=10)  rd,ep,rdn
    10          continue
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   if (vdwindex .eq. 'CLASS') then
                      write (iout,20)
@@ -86,8 +86,10 @@ c
                rad(k) = rd
                eps(k) = ep
                reduct(k) = rdn
-               write (iout,40)  k,rd,ep,rdn
-   40          format (4x,i6,8x,2f12.4,f12.3)
+               if (.not. silent) then
+                  write (iout,40)  k,rd,ep,rdn
+   40             format (4x,i6,8x,2f12.4,f12.3)
+               end if
             else if (k .gt. maxclass) then
                write (iout,50)  maxclass
    50          format (/,' KVDW  --  Only Atom Classes through',i4,
@@ -113,7 +115,7 @@ c
                string = record(next:120)
                read (string,*,err=60,end=60)  rd,ep
    60          continue
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   if (vdwindex .eq. 'CLASS') then
                      write (iout,70)
@@ -131,8 +133,10 @@ c
                end if
                rad4(k) = rd
                eps4(k) = ep
-               write (iout,90)  k,rd,ep
-   90          format (4x,i6,8x,2f12.4)
+               if (.not. silent) then
+                  write (iout,90)  k,rd,ep
+   90             format (4x,i6,8x,2f12.4)
+               end if
             else if (k .gt. maxclass) then
                write (iout,100)  maxclass
   100          format (/,' KVDW  --  Only Atom Classes through',i4,
@@ -157,7 +161,7 @@ c
             ep = 0.0d0
             string = record(next:120)
             read (string,*,err=150,end=150)  ia,ib,rd,ep
-            if (header) then
+            if (header .and. .not.silent) then
                header = .false.
                if (vdwindex .eq. 'CLASS') then
                   write (iout,110)
@@ -173,8 +177,10 @@ c
      &                       4x,'Epsilon',/)
                end if
             end if
-            write (iout,130)  ia,ib,rd,ep
-  130       format (6x,2i4,4x,2f12.4)
+            if (.not. silent) then
+               write (iout,130)  ia,ib,rd,ep
+  130          format (6x,2i4,4x,2f12.4)
+            end if
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -214,7 +220,7 @@ c
             ep = 0.0d0
             string = record(next:120)
             read (string,*,err=200,end=200)  ia,ib,rd,ep
-            if (header) then
+            if (header .and. .not.silent) then
                header = .false.
                if (vdwindex .eq. 'CLASS') then
                   write (iout,160)
@@ -230,8 +236,10 @@ c
      &                       4x,'Epsilon',/)
                end if
             end if
-            write (iout,180)  ia,ib,rd,ep
-  180       format (6x,2i4,4x,2f12.4)
+            if (.not. silent) then
+               write (iout,180)  ia,ib,rd,ep
+  180          format (6x,2i4,4x,2f12.4)
+            end if
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

@@ -173,18 +173,20 @@ c
                mpl(6) = mpl(8)
                mpl(7) = mpl(11)
                mpl(10) = mpl(12)
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,110)
   110             format (/,' Additional Atomic Multipole Parameters :',
      &                    //,5x,'Atom Type',5x,'Coordinate Frame',
      &                       ' Definition',8x,'Multipole Moments')
                end if
-               write (iout,120)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
-     &                          mpl(8),mpl(9),(mpl(j),j=11,13)
-  120          format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
-     &                    /,48x,3f9.5,/,48x,f9.5,
-     &                    /,48x,2f9.5,/,48x,3f9.5)
+               if (.not. silent) then
+                  write (iout,120)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
+     &                             mpl(8),mpl(9),(mpl(j),j=11,13)
+  120             format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
+     &                       /,48x,3f9.5,/,48x,f9.5,
+     &                       /,48x,2f9.5,/,48x,3f9.5)
+               end if
                size = 4
                call numeral (k,pa,size)
                call numeral (kz,pb,size)
@@ -441,7 +443,7 @@ c
                mpl(6) = mpl(8)
                mpl(7) = mpl(11)
                mpl(10) = mpl(12)
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,190)
   190             format (/,' Additional Atomic Multipoles',
@@ -449,11 +451,13 @@ c
      &                    //,6x,'Atom',9x,'Coordinate Frame',
      &                       ' Definition',8x,'Multipole Moments')
                end if
-               write (iout,200)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
-     &                           mpl(8),mpl(9),(mpl(j),j=11,13)
-  200          format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
-     &                    /,48x,3f9.5,/,48x,f9.5,
-     &                    /,48x,2f9.5,/,48x,3f9.5)
+               if (.not. silent) then
+                  write (iout,200)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
+     &                              mpl(8),mpl(9),(mpl(j),j=11,13)
+  200             format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
+     &                       /,48x,3f9.5,/,48x,f9.5,
+     &                       /,48x,2f9.5,/,48x,3f9.5)
+               end if
                zaxis(k) = kz
                xaxis(k) = kx
                yaxis(k) = ky

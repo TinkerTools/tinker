@@ -81,14 +81,17 @@ c
             else
                pt = pa//pb//pd//pc
             end if
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Out-of-Plane Bend Parameters :',
-     &                 //,5x,'Atom Classes',19x,'K(OPB)',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Out-of-Plane Bend',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',19x,'K(OPB)',/)
+               end if
+               write (iout,30)  ia,ib,ic,id,fopb
+   30          format (4x,4i4,10x,f12.3)
             end if
-            write (iout,30)  ia,ib,ic,id,fopb
-   30       format (4x,4i4,10x,f12.3)
             size = 4
             do j = 1, maxnopb
                if (kopb(j).eq.blank .or. kopb(j).eq.pt) then

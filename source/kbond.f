@@ -69,21 +69,23 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,fc,bd
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Bond Stretching Parameters :',
-     &                 //,5x,'Atom Classes',9x,'K(S)',6x,'Length',/)
-            end if
-            if (iring .eq. 0) then
-               write (iout,30)  ia,ib,fc,bd
-   30          format (6x,2i4,4x,f12.3,f12.4)
-            else
-               if (iring .eq. 5)  label = '5-Ring'
-               if (iring .eq. 4)  label = '4-Ring'
-               if (iring .eq. 3)  label = '3-Ring'
-               write (iout,40)  ia,ib,fc,bd,label
-   40          format (6x,2i4,4x,f12.3,f12.4,3x,a6)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Bond Stretching Parameters :',
+     &                    //,5x,'Atom Classes',9x,'K(S)',6x,'Length',/)
+               end if
+               if (iring .eq. 0) then
+                  write (iout,30)  ia,ib,fc,bd
+   30             format (6x,2i4,4x,f12.3,f12.4)
+               else
+                  if (iring .eq. 5)  label = '5-Ring'
+                  if (iring .eq. 4)  label = '4-Ring'
+                  if (iring .eq. 3)  label = '3-Ring'
+                  write (iout,40)  ia,ib,fc,bd,label
+   40             format (6x,2i4,4x,f12.3,f12.4,3x,a6)
+               end if
             end if
             size = 4
             call numeral (ia,pa,size)
@@ -353,14 +355,17 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,ic,dl
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Electronegativity Parameters :',
-     &                 //,5x,'Atom Classes',18x,'dLength',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Electronegativity',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',18x,'dLength',/)
+               end if
+               write (iout,30)  ia,ib,ic,dl
+   30          format (4x,3i4,14x,f12.4)
             end if
-            write (iout,30)  ia,ib,ic,dl
-   30       format (4x,3i4,14x,f12.4)
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

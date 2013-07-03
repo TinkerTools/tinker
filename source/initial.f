@@ -130,6 +130,7 @@ c
 c
 c     flags for information levels within the program
 c
+      silent = .false.
       verbose = .false.
       debug = .false.
       abort = .false.

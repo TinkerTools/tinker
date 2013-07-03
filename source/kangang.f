@@ -25,6 +25,7 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'couple.i'
+      include 'inform.i'
       include 'iounit.i'
       include 'kanang.i'
       include 'keys.i'
@@ -55,15 +56,17 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  it,(aak(j),j=1,3)
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Angle-Angle Parameters :',
-     &                 //,5x,'Atom Class',8x,'K(AA) 1',4x,'K(AA) 2',
-     &                    4x,'K(AA) 3',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Angle-Angle Parameters :',
+     &                    //,5x,'Atom Class',8x,'K(AA) 1',4x,'K(AA) 2',
+     &                       4x,'K(AA) 3',/)
+               end if
+               write (iout,30)  it,(aak(j),j=1,3)
+   30          format (9x,i3,7x,3f11.3)
             end if
-            write (iout,30)  it,(aak(j),j=1,3)
-   30       format (9x,i3,7x,3f11.3)
             do j = 1, 3
                anan(j,it) = aak(j)
             end do

@@ -20,5 +20,7 @@ c
       implicit none
 c
 c
+c     add any setup for ligand field parameters below here
+c
       return
       end

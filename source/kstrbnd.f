@@ -64,14 +64,17 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,ic,sb1,sb2
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Stretch-Bend Parameters :',
-     &                 //,5x,'Atom Classes',6x,'K(SB)-1',5x,'K(SB)-2',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Stretch-Bend Parameters :',
+     &                    //,5x,'Atom Classes',6x,'K(SB)-1',5x,
+     &                       'K(SB)-2',/)
+               end if
+               write (iout,30)  ia,ib,ic,sb1,sb2
+   30          format (4x,3i4,2x,2f12.3)
             end if
-            write (iout,30)  ia,ib,ic,sb1,sb2
-   30       format (4x,3i4,2x,2f12.3)
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

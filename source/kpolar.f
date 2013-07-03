@@ -60,7 +60,7 @@ c
             read (string,*,err=10,end=10)  pol,thl,(pg(j),j=1,maxval)
    10       continue
             if (k .gt. 0) then
-               if (header) then
+               if (header .and. .not.silent) then
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Atomic Dipole',
@@ -79,8 +79,10 @@ c
                      end if
                   end do
    30             continue
-                  write (iout,40)  k,pol,thl,(pg(j),j=1,npg)
-   40             format (4x,i6,10x,f10.3,2x,f10.3,7x,20i5)
+                  if (.not. silent) then
+                     write (iout,40)  k,pol,thl,(pg(j),j=1,npg)
+   40                format (4x,i6,10x,f10.3,2x,f10.3,7x,20i5)
+                  end if
                else
                   write (iout,50)
    50             format (/,' KPOLAR  --  Too many Dipole',
@@ -123,8 +125,10 @@ c
      &                       ' for Specific Atoms :',
      &                    //,6x,'Atom',15x,'Alpha',8x,'Damp',/)
                end if
-               write (iout,80)  k,pol,thl
-   80          format (4x,i6,10x,f10.3,2x,f10.3)
+               if (.not. silent) then
+                  write (iout,80)  k,pol,thl
+   80             format (4x,i6,10x,f10.3,2x,f10.3)
+               end if
                polarity(k) = pol
                thole(k) = thl
             end if

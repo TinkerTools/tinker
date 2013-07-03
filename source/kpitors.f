@@ -58,14 +58,17 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,tp
    10       continue
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Pi-Orbital Torsion Parameters :',
-     &                 //,5x,'Atom Classes',7x,'2-Fold',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Pi-Orbital Torsion',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',7x,'2-Fold',/)
+               end if
+               write (iout,30)  ia,ib,tp
+   30          format (6x,2i4,4x,f12.3)
             end if
-            write (iout,30)  ia,ib,tp
-   30       format (6x,2i4,4x,f12.3)
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

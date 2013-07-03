@@ -92,15 +92,17 @@ c
                   pt = pa//pd//pc//pb
                end if
             end if
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Out-of-Plane Distance',
-     &                    ' Parameters :',
-     &                 //,5x,'Atom Classes',19x,'K(OPD)',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Out-of-Plane Distance',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',19x,'K(OPD)',/)
+               end if
+               write (iout,30)  ia,ib,ic,id,fopd
+   30          format (4x,4i4,10x,2f12.3)
             end if
-            write (iout,30)  ia,ib,ic,id,fopd
-   30       format (4x,4i4,10x,2f12.3)
             do j = 1, maxnopd
                if (kopd(j).eq.blank .or. kopd(j).eq.pt) then
                   kopd(j) = pt

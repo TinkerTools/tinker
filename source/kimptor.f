@@ -79,15 +79,17 @@ c
             call numeral (id,pd,size)
             pti = pa//pb//pc//pd
             call torphase (ft,vt,st)
-            if (header) then
-               header = .false.
-               write (iout,20)
-   20          format (/,' Additional Improper Torsion Parameters :',
-     &                 //,5x,'Atom Classes',15x,'1-Fold',12x,'2-Fold',
-     &                    12x,'3-Fold',/)
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Improper Torsion Parameters :',
+     &                    //,5x,'Atom Classes',15x,'1-Fold',12x,
+     &                       '2-Fold',12x,'3-Fold',/)
+               end if
+               write (iout,30)  ia,ib,ic,id,(vt(j),st(j),j=1,3)
+   30          format (4x,4i4,2x,3(f11.3,f7.1))
             end if
-            write (iout,30)  ia,ib,ic,id,(vt(j),st(j),j=1,3)
-   30       format (4x,4i4,2x,3(f11.3,f7.1))
             do j = 1, maxnti
                if (kti(j).eq.blank .or. kti(j).eq.pti) then
                   kti(j) = pti

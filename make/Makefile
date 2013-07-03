@@ -1314,7 +1314,7 @@ intxyz.o: files.i iounit.i titles.i
 invbeta.o:
 invert.o: iounit.i
 jacobi.o: iounit.i
-kangang.o: angang.i angle.i atmlst.i atmtyp.i atoms.i couple.i iounit.i kanang.i keys.i potent.i sizes.i
+kangang.o: angang.i angle.i atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i kanang.i keys.i potent.i sizes.i
 kangle.o: angle.i angpot.i atmtyp.i atoms.i bond.i couple.i fields.i inform.i iounit.i kangs.i keys.i merck.i potent.i ring.i sizes.i usage.i
 katom.o: atmtyp.i atoms.i couple.i inform.i iounit.i katoms.i keys.i sizes.i
 kbond.o: angle.i atmlst.i atmtyp.i atoms.i bond.i couple.i fields.i inform.i iounit.i kbonds.i keys.i merck.i potent.i sizes.i tors.i usage.i
