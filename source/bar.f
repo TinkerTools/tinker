@@ -43,18 +43,22 @@ c
       integer n1,n2
       integer ixyz,nbst
       integer iter,maxiter
-      integer nkey1,nfrm1
-      integer nkey2,nfrm2
-      integer start1,stop1,step1
-      integer start2,stop2,step2
+      integer nkey1,nkey2
+      integer nfrm1,nfrm2
+      integer start1,start2
+      integer stop1,stop2
+      integer step1,step2
       integer maxframe,freeunit
       integer, allocatable :: bst1(:)
       integer, allocatable :: bst2(:)
       real*8 energy
       real*8 temp,rt
       real*8 delta,eps
+      real*8 frm1,frm2
       real*8 cold,cnew
-      real*8 top,bot,rfrm
+      real*8 top,top2
+      real*8 bot,bot2
+      real*8 fterm,rfrm
       real*8 sum,sum2
       real*8 mean,stdev
       real*8 random,ratio
@@ -217,10 +221,9 @@ c
          if (k .ge. stop1)  abort = .true.
          if (mod(j,100).eq.0 .or. abort) then
             write (iout,120)  j
-  120       format (7x,'Completed',i7,' Coordinate Frames')
+  120       format (7x,'Completed',i8,' Coordinate Frames')
          end if
       end do
-      nfrm1 = j
 c
 c     reset trajectory A and process the initial structure
 c
@@ -261,6 +264,7 @@ c
          if (k .ge. stop1)  abort = .true.
       end do
       nfrm1 = j
+      frm1 = dble(nfrm1)
       close (unit=ixyz)
 c
 c     reopen trajectory B and process the initial structure
@@ -303,10 +307,9 @@ c
          if (k .ge. stop2)  abort = .true.
          if (mod(j,100).eq.0 .or. abort) then
             write (iout,200)  j
-  200       format (7x,'Completed',i7,' Coordinate Frames')
+  200       format (7x,'Completed',i8,' Coordinate Frames')
          end if
       end do
-      nfrm2 = j
 c
 c     reset trajectory B and process the initial structure
 c
@@ -347,6 +350,7 @@ c
          if (k .ge. stop2)  abort = .true.
       end do
       nfrm2 = j
+      frm2 = dble(nfrm2)
       close (unit=ixyz)
 c
 c     perform deallocation of some local arrays
@@ -356,7 +360,7 @@ c
 c
 c     set the frame ratio, temperature and Boltzmann factor
 c
-      rfrm = dble(nfrm1) / dble(nfrm2)
+      rfrm = frm1 / frm2
       temp = 298.0d0
       rt = gasconst * temp
 c
@@ -369,12 +373,12 @@ c
       do i = 1, nfrm1
          sum = sum + exp((ua0(i)-ua1(i))/rt)
       end do
-      forward = -rt * log(sum/dble(nfrm1))
+      forward = -rt * log(sum/frm1)
       sum = 0.0d0
       do i = 1, nfrm2
          sum = sum + exp((ub1(i)-ub0(i))/rt)
       end do
-      backward = -rt * log(sum/dble(nfrm2))
+      backward = -rt * log(sum/frm2)
       write (iout,260)  forward
   260 format (' FEP Forward Free Energy',4x,f12.4,' Kcal/mol')
       write (iout,270)  backward
@@ -391,23 +395,30 @@ c
       iter = 0
       cold = 0.0d0
       top = 0.0d0
+      top2 = 0.0d0
       do i = 1, nfrm2
-         top = top + 1.0d0/(1.0d0+exp((ub0(i)-ub1(i)+cold)/rt))
+         fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+cold)/rt))
+         top = top + fterm
+         top2 = top2 + fterm*fterm
       end do
       bot = 0.0d0
+      bot2 = 0.0d0
       do i = 1, nfrm1
-         bot = bot + 1.0d0/(1.0d0+exp((ua1(i)-ua0(i)-cold)/rt))
+         fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)-cold)/rt))
+         bot = bot + fterm
+         bot2 = bot2 + fterm*fterm
       end do
       cnew = rt*log(rfrm*top/bot) + cold
+      stdev = sqrt((bot2-bot*bot/frm1)/(bot*bot)
+     &                + (top2-top*top/frm2)/(top*top))
       delta = abs(cnew-cold)
+      write (iout,290)  iter,cnew
+  290 format (' BAR Iteration',i4,10x,f12.4,' Kcal/mol')
       if (delta .lt. eps) then
          done = .true.
-         write (iout,290)  cnew,iter
-  290    format (' BAR Free Energy Estimate',3x,f12.4,
-     &              ' Kcal/mol at',i4,' Iterations')
-      else
-         write (iout,300)  iter,cnew
-  300    format (' BAR Iteration',i4,10x,f12.4,' Kcal/mol')
+         write (iout,300)  cnew,stdev
+  300    format (' BAR Free Energy Estimate',3x,f12.4,
+     &              ' +/-',f8.4,' Kcal/mol')
       end if
 c
 c     iterate the BAR equation to converge the free energy
@@ -416,23 +427,30 @@ c
          iter = iter + 1
          cold = cnew
          top = 0.0d0
+         top2 = 0.0d0
          do i = 1, nfrm2
-            top = top + 1.0d0/(1.0d0+exp((ub0(i)-ub1(i)+cold)/rt))
+            fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+cold)/rt))
+            top = top + fterm
+            top2 = top2 + fterm*fterm
          end do
          bot = 0.0d0
+         bot2 = 0.0d0
          do i = 1, nfrm1
-            bot = bot + 1.0d0/(1.0d0+exp((ua1(i)-ua0(i)-cold)/rt))
+            fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)-cold)/rt))
+            bot = bot + fterm
+            bot2 = bot2 + fterm*fterm
          end do
          cnew = rt*log(rfrm*top/bot) + cold
+         stdev = sqrt((bot2-bot*bot/frm1)/(bot*bot)
+     &                   + (top2-top*top/frm2)/(top*top))
          delta = abs(cnew-cold)
+         write (iout,310)  iter,cnew
+  310    format (' BAR Iteration',i4,10x,f12.4,' Kcal/mol')
          if (delta .lt. eps) then
             done = .true.
-            write (iout,310)  cnew,iter
-  310       format (/,' BAR Free Energy Estimate',3x,f12.4,
-     &                 ' Kcal/mol at',i4,' Iterations')
-         else
-            write (iout,320)  iter,cnew
-  320       format (' BAR Iteration',i4,10x,f12.4,' Kcal/mol')
+            write (iout,320)  cnew,stdev
+  320       format (/,' BAR Free Energy Estimate',3x,f12.4,
+     &                 ' +/-',f8.4,' Kcal/mol')
          end if
          if (iter.ge.maxiter .and. .not.done) then
             done = .true.
@@ -461,13 +479,13 @@ c
          cold = 0.0d0
          top = 0.0d0
          do i = 1, nfrm2
-            bst2(i) = int(dble(nfrm2)*random()) + 1
+            bst2(i) = int(frm2*random()) + 1
             j = bst2(i)
             top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cold)/rt))
          end do
          bot = 0.0d0
          do i = 1, nfrm1
-            bst1(i) = int(dble(nfrm1)*random()) + 1
+            bst1(i) = int(frm1*random()) + 1
             j = bst1(i)
             bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cold)/rt))
          end do
