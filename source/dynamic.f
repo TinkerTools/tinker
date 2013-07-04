@@ -39,12 +39,19 @@ c
       character*20 keyword
       character*120 record
       character*120 string
+
+	  integer rank
 c
 c
 c     set up the structure and molecular mechanics calculation
 c
       call initial
+
+c	  call mpi_get_rank(rank)
+
       call getxyz
+
+	  if ( rank .eq. 0) then
       call mechanic
 c
 c     initialize the temperature, pressure and coupling baths
@@ -266,9 +273,11 @@ c
   400    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
+
 c
 c     integrate equations of motion to take a time step
 c
+	  
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
@@ -288,8 +297,14 @@ c
             call beeman (istep,dt)
          end if
       end do
+	  else
+	    write(*,*) 'Number of Atoms for rank: ',rank,' is ',n
+		call start_work_nodes(n)
+	  end if
 c
 c     perform any final tasks before program exit
 c
+c	  call mpi_cleanup()
       call final
+
       end

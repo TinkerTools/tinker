@@ -32,6 +32,7 @@ c
       include 'linmin.i'
       include 'minima.i'
       include 'molcul.i'
+c      include 'mpi.i'
       include 'mutant.i'
       include 'neigh.i'
       include 'openmp.i'
@@ -63,6 +64,14 @@ c
 !$    call kmp_set_stacksize (2**28)
 !$    call kmp_set_blocktime (0)
 c
+c
+c
+c      if (nrank .ne. 0) then
+c         call start_work_nodes (%val(nrank),%val(nnode))
+c         call mpi_cleanup_work
+c         stop
+c      end if
+c
 c     default unit numbers for input and output
 c
       input = 5
@@ -75,6 +84,12 @@ c
 c     command line arguments to the program
 c
       call command
+c
+c     setup OpenMPI
+c
+c      nrank = 0
+c      nnode = 0
+c      call mpi_setup (nrank,nnode)
 c
 c     values of machine precision constants
 c

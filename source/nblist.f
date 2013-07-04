@@ -50,6 +50,7 @@ c
       include 'bound.i'
       include 'boxes.i'
       include 'iounit.i'
+c      include 'mpi.i'
       include 'neigh.i'
       include 'vdw.i'
       integer i,j,k
@@ -90,9 +91,27 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
+      lbuffer_2 = lbuffer/2
 c
 c     perform a complete list build instead of an update
 c
+cccccccccccccccccccccccccccccccccccccccccccccccc
+c
+c      if (dovlst) then
+c         dovlst = .false. 
+c         call setup_nlist_builder(%val(nvdw), %val(nnode), 
+c     &                            %val(radius), 
+c     &                            %val(lbuffer_2), %val(xbox),
+c     &                            %val(ybox), %val(zbox), %val(maxvlst))
+c         call initial_nlist_build (xred,yred,zred,vlst,nvlst)
+c         return
+c      else
+c         call subsequent_nlist_build (xred, yred, zred, vlst, nvlst)
+c        return
+c      end if
+c
+c
+cccccccccccccccccccccccccccccccccccccccccccccccc
       if (dovlst) then
          dovlst = .false.
          if (octahedron) then

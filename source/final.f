@@ -98,6 +98,11 @@ c
      &              ' of the Program',/)
       end if
 c
+c     gracious exit from MPI
+c
+c      call cleanup_nlist_builder
+c      call mpi_cleanup
+c
 c     may need a pause to avoid closing the execution window
 c
       if (holdup) then
