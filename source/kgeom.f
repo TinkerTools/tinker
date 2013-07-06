@@ -134,7 +134,7 @@ c
 c     get atoms restrained to a specified distance range
 c
          else if (keyword(1:18) .eq. 'RESTRAIN-DISTANCE ') then
-            d1 = 0.0d0
+            d1 = 100.0d0
             d2 = 0.0d0
             d3 = 0.0d0
             exist = .false.
@@ -143,7 +143,6 @@ c
    40       continue
             read (string,*,err=50,end=50)  ia,ib,d1,d2,d3
    50       continue
-            if (d1 .eq. 0.0d0)  d1 = 100.0d0
             if (.not. exist) then
                xr = x(ia) - x(ib)
                yr = y(ia) - y(ib)
@@ -169,7 +168,7 @@ c
 c     get atoms restrained to a specified angle range
 c
          else if (keyword(1:15) .eq. 'RESTRAIN-ANGLE ') then
-            a1 = 0.0d0
+            a1 = 10.0d0
             a2 = 0.0d0
             a3 = 0.0d0
             exist = .false.
@@ -178,7 +177,6 @@ c
    70       continue
             read (string,*,err=80,end=80)  ia,ib,ic,a1,a2,a3
    80       continue
-            if (a1 .eq. 0.0d0)  a1 = 10.0d0
             if (.not. exist)  a2 = geometry (ia,ib,ic,0)
             if (a3 .eq. 0.0d0)  a3 = a2
             nafix = nafix + 1
@@ -198,7 +196,7 @@ c
 c     get atoms restrained to a specified torsion range
 c
          else if (keyword(1:17).eq.'RESTRAIN-TORSION ') then
-            t1 = 0.0d0
+            t1 = 1.0d0
             t2 = 0.0d0
             t3 = 0.0d0
             exist = .false.
@@ -208,7 +206,6 @@ c
             read (string,*,err=110,end=110)  ia,ib,ic,id,t1,t2,t3
             exist = .true.
   110       continue
-            if (t1 .eq. 0.0d0)  t1 = 1.0d0
             if (.not. exist)  t2 = geometry (ia,ib,ic,id)
             if (t3 .eq. 0.0d0)  t3 = t2
             do while (t2 .gt. 180.0d0)
@@ -241,7 +238,7 @@ c
 c     get groups restrained to a specified distance range
 c
          else if (keyword(1:16) .eq. 'RESTRAIN-GROUPS ') then
-            g1 = 0.0d0
+            g1 = 100.0d0
             g2 = 0.0d0
             g3 = 0.0d0
             exist = .false.
@@ -250,7 +247,6 @@ c
   130       continue
             read (string,*,err=140,end=140)  ia,ib,g1,g2,g3
   140       continue
-            if (g1 .eq. 0.0d0)  g1 = 100.0d0
             if (.not. exist) then
                xcm = 0.0d0
                ycm = 0.0d0
@@ -354,6 +350,8 @@ c
 c     setup any shallow Gaussian basin restraint between atoms
 c
          else if (keyword(1:6) .eq. 'BASIN ') then
+            depth = 0.0d0
+            width = 0.0d0
             read (string,*,err=160,end=160)  depth,width
   160       continue
             use_basin = .true.
@@ -364,6 +362,7 @@ c
 c     setup any spherical droplet restraint between atoms
 c
          else if (keyword(1:5) .eq. 'WALL ') then
+            rwall = 0.0d0
             read (string,*,err=170,end=170)  rwall
   170       continue
             if (rwall .gt. 0.0d0)  use_wall = .true.
