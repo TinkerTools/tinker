@@ -35,6 +35,7 @@ c
       include 'boxes.i'
       include 'iounit.i'
       include 'molcul.i'
+      include 'usage.i'
       integer maxframe
       parameter (maxframe=2000)
       integer i,j,k,m
@@ -175,6 +176,27 @@ c
       call katom
       call molecule
 c
+c     alter the molecule list to include only active molecules
+c
+      call active
+      do i = 1, nmol
+         do j = imol(1,i), imol(2,i)
+            k = kmol(j)
+            if (.not. use(k))  imol(1,i) = 0
+         end do
+      end do
+      k = 0
+      do i = 1, nmol
+         if (imol(1,i) .ne. 0) then
+            k = k + 1
+            imol(1,k) = imol(1,i)
+            imol(2,k) = imol(2,i)
+         end if
+      end do
+      nmol = k
+      write (iout,140)  nmol
+  140 format (/,' Number of Molecules for Diffusion Calculation :',i10)
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (xcm(nmol,maxframe))
@@ -183,30 +205,30 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,140)
-  140 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,150)
+  150 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
       do while (iframe.ge.start .and. iframe.le.stop)
          skip = (skip-1) * (n+1)
          do j = 1, skip
-            read (iarc,150,err=160,end=160)
-  150       format ()
+            read (iarc,160,err=170,end=170)
+  160       format ()
          end do
-  160    continue
+  170    continue
          iframe = iframe + step
          skip = step
          call readxyz (iarc)
-         if (n .eq. 0)  goto 190
+         if (n .eq. 0)  goto 200
          nframe = nframe + 1
          if (mod(nframe,100) .eq. 0) then
-            write (iout,170)  nframe
-  170       format (4x,'Processing Coordinate Frame',i13)
+            write (iout,180)  nframe
+  180       format (4x,'Processing Coordinate Frame',i13)
          end if
          if (nframe .gt. maxframe) then
-            write (iout,180)  maxframe
-  180       format (/,' DIFFUSE  --  The Maximum of',i6,
+            write (iout,190)  maxframe
+  190       format (/,' DIFFUSE  --  The Maximum of',i6,
      &                 ' Frames has been Exceeded')
             call fatal
          end if
@@ -263,10 +285,10 @@ c
             zcm(i,nframe) = zold + dz
          end do
       end do
-  190 continue
+  200 continue
       close (unit=iarc)
-      write (iout,200)  nframe
-  200 format (/,' Total Number of Coordinate Frames :',i8)
+      write (iout,210)  nframe
+  210 format (/,' Total Number of Coordinate Frames :',i8)
 c
 c     increment the squared displacements for each frame pair
 c
@@ -310,8 +332,8 @@ c
 c
 c     estimate the diffusion constant via the Einstein relation
 c
-      write (iout,210)
-  210 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
+      write (iout,220)
+  220 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
      &           ' Constant :',
      &        //,5x,'Time Step',5x,'X MSD',7x,'Y MSD',7x,'Z MSD',
      &           7x,'R MSD',4x,'Diff Const',/)
@@ -322,8 +344,8 @@ c
          zvalue = zmsd(i) / 2.0d0
          rvalue = (xmsd(i) + ymsd(i) + zmsd(i)) / 6.0d0
          dvalue = rvalue / delta
-         write (iout,220)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
-  220    format (f12.2,4f12.2,f12.4)
+         write (iout,230)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
+  230    format (f12.2,4f12.2,f12.4)
       end do
 c
 c     perform any final tasks before program exit
