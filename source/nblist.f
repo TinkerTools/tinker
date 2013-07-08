@@ -62,6 +62,7 @@ c      include 'mpi.i'
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
+c      real*8 lbuffer_2
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -91,7 +92,7 @@ c
      &              ' be used with Replicas')
          call fatal
       end if
-      lbuffer_2 = lbuffer/2
+c      lbuffer_2 = lbuffer/2
 c
 c     perform a complete list build instead of an update
 c
