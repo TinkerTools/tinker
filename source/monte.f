@@ -42,7 +42,8 @@ c
       integer keep,nbig
       integer nmap,lext
       integer istep,nstep
-      integer ixyz,freeunit
+      integer ixyz,nusave
+      integer freeunit
       real*8 global,ratio
       real*8 big,eps,size
       real*8 grdmin,temper
@@ -63,6 +64,7 @@ c
       logical exist
       logical reset
       logical torsmove
+      logical, allocatable :: usave(:)
       character*1 answer
       character*6 status
       character*7 ext
@@ -115,13 +117,19 @@ c
       call upcase (answer)
       if (answer .eq. 'T')  torsmove = .true.
 c
-c     generate the internal coordinates, keep all atoms active
+c     perform dynamic allocation of some local arrays
+c
+      allocate (usave(n))
+c
+c     generate the internal coordinates, keep active atom list
 c
       if (torsmove) then
          call makeint (0)
          call initrot
+         nusave = nuse
          nuse = n
          do i = 1, n
+            usave(i) = use(i)
             use(i) = .true.
          end do
       end if
@@ -214,8 +222,21 @@ c
          xi(i) = x(i)
          yi(i) = y(i)
          zi(i) = z(i)
+         use(i) = usave(i)
       end do
+      if (torsmove) then
+         nuse = nusave
+         do i = 1, n
+            use(i) = usave(i)
+         end do
+      end if
       call mcmstep (minimum,grdmin)
+      if (torsmove) then
+         nuse = n
+         do i = 1, n
+            use(i) = .true.
+         end do
+      end if
       pminimum = minimum
       write (iout,210)  0,minimum
   210 format (i8,3x,f12.4)
@@ -298,7 +319,19 @@ c
             yi(i) = y(i)
             zi(i) = z(i)
          end do
+         if (torsmove) then
+            nuse = nusave
+            do i = 1, n
+               use(i) = usave(i)
+            end do
+         end if
          call mcmstep (minimum,grdmin)
+         if (torsmove) then
+            nuse = n
+            do i = 1, n
+               use(i) = .true.
+            end do
+         end if
 c
 c     test for an unreasonably low energy at the minimum
 c
@@ -412,6 +445,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (usave)
       deallocate (xg)
       deallocate (yg)
       deallocate (zg)
@@ -527,8 +561,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "mcm1" is a service routine that computes the energy
-c     and gradient for truncated Newton optimization in Cartesian
+c     "mcm1" is a service routine that computes the energy and
+c     gradient for truncated Newton optimization in Cartesian
 c     coordinate space
 c
 c
@@ -595,9 +629,9 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "mcm2" is a service routine that computes the sparse
-c     matrix Hessian elements for truncated Newton optimization
-c     in Cartesian coordinate space
+c     "mcm2" is a service routine that computes the sparse matrix
+c     Hessian elements for truncated Newton optimization in Cartesian
+c     coordinate space
 c
 c
       subroutine mcm2 (mode,xx,h,hinit,hstop,hindex,hdiag)
