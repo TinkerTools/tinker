@@ -29,7 +29,7 @@ c
 c
       integer maxp11,maxp12
       integer maxp13,maxp14
-      parameter (maxp11=100)
+      parameter (maxp11=150)
       parameter (maxp12=50)
       parameter (maxp13=50)
       parameter (maxp14=50)

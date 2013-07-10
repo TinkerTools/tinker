@@ -2197,7 +2197,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (nlap(nfn))
-      allocate (enfs(5*na))
+      allocate (enfs(20*na))
       allocate (fnt(3,nfn))
       allocate (nspt(3,nfn))
       allocate (atmarea(na))
