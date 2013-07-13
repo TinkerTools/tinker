@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine tncg  --  truncated newton optimization method  ##
+c     ##  subroutine tncg  --  truncated Newton optimization method  ##
 c     ##                                                             ##
 c     #################################################################
 c
@@ -46,7 +46,7 @@ c     nvar       number of parameters in the objective function
 c     minimum    upon return contains the best value of the
 c                  function found during the optimization
 c     f          contains current best value of function
-c     x          contains starting point upon input, upon
+c     x0         contains starting point upon input, upon
 c                  return contains the best point found
 c     g          contains gradient of current best point
 c     h          contains the Hessian matrix values in an
@@ -93,10 +93,11 @@ c                  and large off-diagonal matrix elements
 c     optsave    subroutine to write out info about current status
 c
 c
-      subroutine tncg (mode,method,nvar,x,minimum,grdmin,
-     &                      fgvalue,hmatrix,optsave)
+      subroutine tncg (mode,method,nvar,x0,minimum,grdmin,
+     &                       fgvalue,hmatrix,optsave)
       implicit none
       include 'sizes.i'
+      include 'atoms.i'
       include 'hescut.i'
       include 'inform.i'
       include 'iounit.i'
@@ -107,7 +108,8 @@ c
       include 'output.i'
       include 'piorbs.i'
       include 'potent.i'
-      integer i,nvar,fg_call
+      integer i,fg_call
+      integer nvar,nmax
       integer iter_tn,iter_cg
       integer next,newhess
       integer nerr,maxerr
@@ -118,7 +120,7 @@ c
       real*8 minimum,angle,rms
       real*8 x_move,f_move,f_old
       real*8 g_norm,g_rms
-      real*8 x(*)
+      real*8 x0(*)
       real*8, allocatable :: x_old(:)
       real*8, allocatable :: g(:)
       real*8, allocatable :: p(:)
@@ -252,24 +254,25 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (h_init(nvar))
-      allocate (h_stop(nvar))
-      allocate (x_old(nvar))
-      allocate (g(nvar))
-      allocate (p(nvar))
-      allocate (h_diag(nvar))
-      allocate (h_index((nvar*(nvar-1))/2))
-      allocate (h((nvar*(nvar-1))/2))
+      nmax = 3 * n
+      allocate (h_init(nmax))
+      allocate (h_stop(nmax))
+      allocate (x_old(nmax))
+      allocate (g(nmax))
+      allocate (p(nmax))
+      allocate (h_diag(nmax))
+      allocate (h_index((nmax*(nmax-1))/2))
+      allocate (h((nmax*(nmax-1))/2))
 c
 c     evaluate the function and get the initial gradient
 c
       iter_cg = 0
       fg_call = fg_call + 1
-      f = fgvalue (x,g)
+      f = fgvalue (x0,g)
       f_old = f
       g_norm = 0.0d0
       do i = 1, nvar
-         x_old(i) = x(i)
+         x_old(i) = x0(i)
          g_norm = g_norm + g(i)**2
       end do
       g_norm = sqrt(g_norm)
@@ -290,7 +293,7 @@ c
 c
 c     write initial intermediate prior to first iteration
 c
-      if (iwrite .gt. 0)  call optsave (iter_tn,f,x)
+      if (iwrite .gt. 0)  call optsave (iter_tn,f,x0)
 c
 c     check for termination criteria met by initial point
 c
@@ -329,7 +332,7 @@ c
             reorbit = 1
             call picalc
             fg_call = fg_call + 1
-            f = fgvalue (x,g)
+            f = fgvalue (x0,g)
             reorbit = 0
          end if
 c
@@ -369,18 +372,18 @@ c
          if (mod(iter_tn-1,newhess) .ne. 0)  h_mode = 'NONE'
          if (mode.eq.'DTNCG' .and. method.eq.'NONE')  h_mode = 'NONE'
          if (mode.eq.'DTNCG' .and. method.eq.'DIAG')  h_mode = 'DIAG'
-         call hmatrix (h_mode,x,h,h_init,h_stop,h_index,h_diag)
+         call hmatrix (h_mode,x0,h,h_init,h_stop,h_index,h_diag)
 c
 c     find the next approximate Newton search direction
 c
-         call tnsolve (mode,method,negtest,nvar,p,x,g,h,
+         call tnsolve (mode,method,negtest,nvar,p,x0,g,h,
      &                 h_init,h_stop,h_index,h_diag,iter_tn,
      &                 iter_cg,fg_call,fgvalue,info_solve)
 c
 c     perform a line search in the chosen direction
 c
          info_search = '         '
-         call search (nvar,f,g,x,p,f_move,angle,fg_call,
+         call search (nvar,f,g,x0,p,f_move,angle,fg_call,
      &                fgvalue,info_search)
          if (info_search .ne. ' Success ') then
             info_solve = info_search
@@ -393,8 +396,8 @@ c
          x_move = 0.0d0
          g_norm = 0.0d0
          do i = 1, nvar
-            x_move = x_move + (x(i)-x_old(i))**2
-            x_old(i) = x(i)
+            x_move = x_move + (x0(i)-x_old(i))**2
+            x_old(i) = x0(i)
             g_norm = g_norm + g(i)**2
          end do
          x_move = sqrt(x_move)
@@ -463,7 +466,7 @@ c     write intermediate results for the current iteration
 c
          if (iwrite .gt. 0) then
             if (done .or. mod(iter_tn,iwrite).eq.0) then
-               call optsave (iter_tn,f,x)
+               call optsave (iter_tn,f,x0)
             end if
          end if
 c
@@ -516,7 +519,7 @@ c     NegCurve     termination upon detecting negative curvature
 c     OverLimit    maximum number of CG iterations exceeded
 c
 c
-      subroutine tnsolve (mode,method,negtest,nvar,p,x,g,h,
+      subroutine tnsolve (mode,method,negtest,nvar,p,x0,g,h,
      &                    h_init,h_stop,h_index,h_diag,cycle,
      &                    iter_cg,fg_call,fgvalue,status)
       implicit none
@@ -535,7 +538,7 @@ c
       real*8 hj,gg,dq,rr,dd
       real*8 rs,rs_new,r_norm
       real*8 converge
-      real*8 x(*)
+      real*8 x0(*)
       real*8 g(*)
       real*8 p(*)
       real*8 h_diag(*)
@@ -590,7 +593,7 @@ c
       end do
       g_norm = sqrt(gg)
       call precond (method,iter,nvar,s,r,h,h_init,
-     &                 h_stop,h_index,h_diag)
+     &                  h_stop,h_index,h_diag)
       rs = 0.0d0
       do i = 1, nvar
          d(i) = s(i)
@@ -636,7 +639,7 @@ c
                sigma = 1.0d-4 / sqrt(dd)
             end if
             do i = 1, nvar
-               x_sigma(i) = x(i) + sigma*d(i)
+               x_sigma(i) = x0(i) + sigma*d(i)
             end do
             fg_call = fg_call + 1
             f_sigma = fgvalue (x_sigma,g_sigma)
@@ -681,7 +684,7 @@ c
 c     solve the preconditioning equations
 c
          call precond (method,iter,nvar,s,r,h,h_init,
-     &                    h_stop,h_index,h_diag)
+     &                     h_stop,h_index,h_diag)
 c
 c     update the truncated Newton direction
 c

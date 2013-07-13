@@ -362,7 +362,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (hvar(nvar))
-      allocate (huse(nvar))
+      allocate (huse(3*n))
 c
 c     transform the sparse Hessian to use only active atoms
 c

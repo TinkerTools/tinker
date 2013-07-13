@@ -30,7 +30,7 @@ c
 c     variables and parameters:
 c
 c     nvar      number of parameters in the objective function
-c     x         contains starting point upon input, upon return
+c     x0        contains starting point upon input, upon return
 c                 contains the best point found
 c     minimum   during optimization contains best current function
 c                 value; returns final best function value
@@ -43,7 +43,7 @@ c     fgvalue    function to evaluate function and gradient values
 c     optsave    subroutine to write out info about current status
 c
 c
-      subroutine lbfgs (nvar,x,minimum,grdmin,fgvalue,optsave)
+      subroutine lbfgs (nvar,x0,minimum,grdmin,fgvalue,optsave)
       implicit none
       include 'sizes.i'
       include 'inform.i'
@@ -67,7 +67,7 @@ c
       real*8 minimum,grdmin
       real*8 angle,rms,beta
       real*8 ys,yy,gamma
-      real*8 x(*)
+      real*8 x0(*)
       real*8 rho(maxsav)
       real*8 alpha(maxsav)
       real*8, allocatable :: x_old(:)
@@ -210,7 +210,7 @@ c
       niter = nextiter - 1
       maxiter = niter + maxiter
       ncalls = ncalls + 1
-      f = fgvalue (x,g)
+      f = fgvalue (x0,g)
       f_old = f
       m = 0
       gamma = 1.0d0
@@ -238,7 +238,7 @@ c
 c
 c     write initial intermediate prior to first iteration
 c
-      if (iwrite .gt. 0)  call optsave (niter,f,x)
+      if (iwrite .gt. 0)  call optsave (niter,f,x0)
 c
 c     tests of the various termination criteria
 c
@@ -302,21 +302,21 @@ c     set search direction and store current point and gradient
 c
          do i = 1, nvar
             p(i) = -r(i)
-            x_old(i) = x(i)
+            x_old(i) = x0(i)
             g_old(i) = g(i)
          end do
 c
 c     perform line search along the new conjugate direction
 c
          status = blank
-         call search (nvar,f,g,x,p,f_move,angle,ncalls,fgvalue,status)
+         call search (nvar,f,g,x0,p,f_move,angle,ncalls,fgvalue,status)
 c
 c     update variables based on results of this iteration
 c
          ys = 0.0d0
          yy = 0.0d0
          do i = 1, nvar
-            s(i,m) = x(i) - x_old(i)
+            s(i,m) = x0(i) - x_old(i)
             y(i,m) = g(i) - g_old(i)
             ys = ys + y(i,m)*s(i,m)
             yy = yy + y(i,m)*y(i,m)
@@ -330,7 +330,7 @@ c
          f_old = f
          x_move = 0.0d0
          do i = 1, nvar
-            x_move = x_move + ((x(i)-x_old(i))/scale(i))**2
+            x_move = x_move + ((x0(i)-x_old(i))/scale(i))**2
          end do
          x_move = sqrt(x_move) / rms
          if (coordtype .eq. 'INTERNAL') then
@@ -393,7 +393,7 @@ c     write intermediate results for the current iteration
 c
          if (iwrite .gt. 0) then
             if (done .or. mod(niter,iwrite).eq.0) then
-               call optsave (niter,f,x)
+               call optsave (niter,f,x0)
             end if
          end if
       end do

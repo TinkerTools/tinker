@@ -5260,7 +5260,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ulspred" standard extrapolation values or a least squares fit
+c     "ulspred" uses standard extrapolation or a least squares fit
 c     to set coefficients of an induced dipole predictor polynomial
 c
 c     literature references:

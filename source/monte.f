@@ -222,7 +222,6 @@ c
          xi(i) = x(i)
          yi(i) = y(i)
          zi(i) = z(i)
-         use(i) = usave(i)
       end do
       if (torsmove) then
          nuse = nusave
@@ -258,8 +257,8 @@ c
       open (unit=ixyz,file=xyzfile,status='new')
       call prtxyz (ixyz)
       close (unit=ixyz)
-      write (iout,99)  nmap,global
-   99 format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
+      write (iout,220)  nmap,global
+  220 format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
 c
 c     optionally reset coordinates to before the minimization
 c
@@ -386,8 +385,8 @@ c
             open (unit=ixyz,file=xyzfile,status='new')
             call prtxyz (ixyz)
             close (unit=ixyz)
-            write (iout,98)  nmap,global
-   98       format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
+            write (iout,230)  nmap,global
+  230       format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
          end if
 c
 c     update the overall Monte Carlo acceptance ratio
@@ -399,12 +398,12 @@ c     print intermediate results for the current iteration
 c
          if (minimum .lt. big) then
             nbig = 0
-            write (iout,220)  istep,minimum,global,temper,ratio,status
-  220       format (i8,3x,f12.4,3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
+            write (iout,240)  istep,minimum,global,temper,ratio,status
+  240       format (i8,3x,f12.4,3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
          else
             nbig = nbig + 1
-            write (iout,230)  istep,global,temper,ratio,status
-  230       format (i8,9x,'------',3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
+            write (iout,250)  istep,global,temper,ratio,status
+  250       format (i8,9x,'------',3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
          end if
 c
 c     restore global minimum after repeated bad iterations
@@ -459,14 +458,14 @@ c
 c     write out the final global minimum energy value
 c
       if (digits .ge. 8) then
-         write (iout,240)  global
-  240    format (/,' Global Minimum Energy Value :',1x,f20.8)
-      else if (digits .ge. 6) then
-         write (iout,250)  global
-  250    format (/,' Global Minimum Energy Value :',3x,f18.6)
-      else
          write (iout,260)  global
-  260    format (/,' Global Minimum Energy Value :',5x,f16.4)
+  260    format (/,' Global Minimum Energy Value :',1x,f20.8)
+      else if (digits .ge. 6) then
+         write (iout,270)  global
+  270    format (/,' Global Minimum Energy Value :',3x,f18.6)
+      else
+         write (iout,280)  global
+  280    format (/,' Global Minimum Energy Value :',5x,f16.4)
       end if
 c
 c     perform any final tasks before program exit
@@ -672,7 +671,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (hvar(3*n))
+      allocate (hvar(nvar))
       allocate (huse(3*n))
 c
 c     transform the sparse Hessian to use only active atoms
