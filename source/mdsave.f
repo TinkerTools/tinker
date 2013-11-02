@@ -17,7 +17,7 @@ c     auxiliary files with velocity, force or induced dipole data;
 c     also checks for user requested termination of a simulation
 c
 c
-      subroutine mdsave (istep,dt,epot)
+      subroutine mdsave (istep,dt,epot,ekin)
       implicit none
       include 'sizes.i'
       include 'atmtyp.i'
@@ -44,7 +44,7 @@ c
       integer iend,idump,lext
       integer freeunit,trimtext
       integer moddump
-      real*8 dt,epot,pico,wt
+      real*8 dt,epot,ekin,pico,wt
       logical exist
       character*7 ext
       character*120 endfile
@@ -83,21 +83,29 @@ c
  20      format (/,' Current Time',6x,f21.10,' Picosecond')
          write (iout,30)  epot
  30      format (' Current Potential',1x,f21.10,' Kcal/mole')
+         write (iout,35)  ekin
+ 35      format (' Current Kinetic',3x,f21.10,' Kcal/mole')
       else if (digits .ge. 8) then
          write (iout,21)  pico
  21      format (/,' Current Time',6x,f19.8,' Picosecond')
          write (iout,31)  epot
  31      format (' Current Potential',1x,f19.8,' Kcal/mole')
+         write (iout,36)  ekin
+ 36      format (' Current Kinetic',3x,f19.8,' Kcal/mole')
       else if (digits .ge. 6) then
          write (iout,22)  pico
  22      format (/,' Current Time',6x,f17.6,' Picosecond')
          write (iout,32)  epot
  32      format (' Current Potential',1x,f17.6,' Kcal/mole')
+         write (iout,37)  ekin
+ 37      format (' Current Kinetic',3x,f17.6,' Kcal/mole')
       else 
          write (iout,23)  pico
  23      format (/,' Current Time',8x,f15.4,' Picosecond')
          write (iout,33)  epot
  33      format (' Current Potential',3x,f15.4,' Kcal/mole')
+         write (iout,38)  ekin
+ 38      format (' Current Kinetic',5x,f15.4,' Kcal/mole')
       end if
       if (use_bounds) then
          if (digits .ge. 10) then
