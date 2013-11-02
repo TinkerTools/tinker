@@ -78,18 +78,24 @@ c
       write (iout,10)  istep
    10 format (/,' Instantaneous Values for Frame saved at',
      &           i10,' Dynamics Steps')
-      write (iout,20)  pico
-   20 format (/,' Current Time',8x,f15.4,' Picosecond')
       if (digits .ge. 10) then
+         write (iout,20)  pico
+ 20      format (/,' Current Time',6x,f21.10,' Picosecond')
          write (iout,30)  epot
- 30      format (' Current Potential',3x,f21.10,' Kcal/mole')
+ 30      format (' Current Potential',1x,f21.10,' Kcal/mole')
       else if (digits .ge. 8) then
+         write (iout,21)  pico
+ 21      format (/,' Current Time',6x,f19.8,' Picosecond')
          write (iout,31)  epot
- 31      format (' Current Potential',3x,f19.8,' Kcal/mole')
+ 31      format (' Current Potential',1x,f19.8,' Kcal/mole')
       else if (digits .ge. 6) then
+         write (iout,22)  pico
+ 22      format (/,' Current Time',6x,f17.6,' Picosecond')
          write (iout,32)  epot
- 32      format (' Current Potential',3x,f17.6,' Kcal/mole')
+ 32      format (' Current Potential',1x,f17.6,' Kcal/mole')
       else 
+         write (iout,23)  pico
+ 23      format (/,' Current Time',8x,f15.4,' Picosecond')
          write (iout,33)  epot
  33      format (' Current Potential',3x,f15.4,' Kcal/mole')
       end if
@@ -99,20 +105,24 @@ c
  40         format (' Lattice Lengths',6x,3f18.10)
             write (iout,50)  alpha,beta,gamma
  50         format (' Lattice Angles',7x,3f18.10)
+            write (iout,60)  idump
+ 60         format (' Frame Number',17x,i10)
          else if (digits .ge. 8) then
             write (iout,41)  xbox,ybox,zbox
  41         format (' Lattice Lengths',6x,3f16.8)
             write (iout,51)  alpha,beta,gamma
  51         format (' Lattice Angles',7x,3f16.8)
+            write (iout,61)  idump
+ 61         format (' Frame Number',15x,i10)
          else 
             write (iout,42)  xbox,ybox,zbox
  42         format (' Lattice Lengths',6x,3f14.6)
             write (iout,52)  alpha,beta,gamma
  52         format (' Lattice Angles',7x,3f14.6)
+            write (iout,62)  idump
+ 62         format (' Frame Number',13x,i10)
          end if
       end if
-      write (iout,60)  idump
-   60 format (' Frame Number',13x,i10)
 c
 c     update the information needed to restart the trajectory
 c

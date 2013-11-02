@@ -177,17 +177,16 @@ c     LPW open the box file if it exists
       ibox = freeunit ()
       boxfile = filename(1:leng)
       call suffix (boxfile,'box','old')
-      inquire (file=boxfile,exist=havebox)
       xyz1 = filename(1:leng)
       call suffix (xyz1,'xyz','old')
-      if (havebox) then
-         if (filename .ne. xyz1) then
+      if (filename .ne. xyz1) then
+         inquire (file=boxfile,exist=havebox)
+         if (havebox) then
             open(unit=ibox,file=boxfile,status ='old')
             call readbox (ibox)
             call lattice
          end if
       end if
-
 c
 c     get info on the molecular system and force field
 c
@@ -238,13 +237,13 @@ c
 c
 c     attempt to read next structure from the coordinate file
 c
-         call readxyz (ixyz)
 c     LPW read the periodic box into the coordinates
          if (havebox) then
-            if (filename .ne. xyz1) then
-               call readbox (ibox)
-               call lattice
-            end if
+            call readbox (ibox)
+         end if
+         call readxyz (ixyz)
+         if (havebox) then
+            call lattice
          end if
       end do
 c
