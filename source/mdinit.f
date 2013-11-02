@@ -63,6 +63,8 @@ c
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
+c     LPW
+      boxsave = .false.
       friction = 91.0d0
       use_sdarea = .false.
       use_pred = .false.
@@ -114,6 +116,9 @@ c
             frcsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then
             uindsave = .true.
+c     LPW
+         else if (keyword(1:9) .eq. 'SAVE-BOX ') then
+            boxsave = .true.
          else if (keyword(1:9) .eq. 'FRICTION ') then
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then

@@ -224,3 +224,72 @@ c
       end do
       return
       end
+
+c
+c     LPW "readbox" gets a set of periodic box vectors from
+c     an external disk file
+c
+      subroutine readbox (ibox)
+      implicit none
+      include 'boxes.i'
+      include 'files.i'
+      include 'inform.i'
+      include 'iounit.i'
+      integer ibox
+      integer size
+      integer trimtext
+      logical exist,opened
+      logical quit
+      real*8 timestep
+      character*120 boxfile
+      character*120 record
+c
+c     open the input file if it has not already been done
+c
+      inquire (unit=ibox,opened=opened)
+      if (.not. opened) then
+         boxfile = filename(1:leng)//'.box'
+         call version (boxfile,'old')
+         inquire (file=boxfile,exist=exist)
+         if (exist) then
+            open (unit=ibox,file=boxfile,status='old')
+            rewind (unit=ibox)
+         else
+            write (iout,11)
+   11       format (/,' READBOX  --  Unable to Find the Periodic',
+     &                 ' Box File')
+            call fatal
+         end if
+      end if
+c
+c     read first line and return if already at end of file
+c
+      quit = .false.
+      abort = .true.
+      size = 0
+      do while (size .eq. 0)
+         read (ibox,21,err=71,end=71)  record
+   21    format (a120)
+         size = trimtext (record)
+      end do
+      abort = .false.
+      quit = .true.
+c
+c     parse the line to get the box vectors
+c
+      read (record,*,err=71,end=71)  timestep,xbox,ybox,zbox,
+     &                               alpha,beta,gamma
+      quit = .false.
+
+   71 continue
+      if (.not. opened)  close (unit=ibox)
+c
+c     an error occurred in reading the box file
+c
+      if (quit) then
+         write (iout,81)
+   81    format (/,' READBOX  --  Error in Periodic Box File')
+         call fatal
+      end if
+      return
+      end

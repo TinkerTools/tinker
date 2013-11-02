@@ -17,7 +17,7 @@ c     auxiliary files with velocity, force or induced dipole data;
 c     also checks for user requested termination of a simulation
 c
 c
-      subroutine mdsave (istep,dt,epot)
+      subroutine mdsave (istep,dt,epot,ekin)
       implicit none
       include 'sizes.i'
       include 'atmtyp.i'
@@ -44,7 +44,7 @@ c
       integer iend,idump,lext
       integer freeunit,trimtext
       integer moddump
-      real*8 dt,epot,pico,wt
+      real*8 dt,epot,ekin,pico,wt
       logical exist
       character*7 ext
       character*120 endfile
@@ -52,6 +52,9 @@ c
       character*120 velfile
       character*120 frcfile
       character*120 indfile
+c     LPW
+      integer ibox
+      character*120 boxfile
 c
 c
 c     send data via external socket communication if desired
@@ -75,18 +78,59 @@ c
       write (iout,10)  istep
    10 format (/,' Instantaneous Values for Frame saved at',
      &           i10,' Dynamics Steps')
-      write (iout,20)  pico
-   20 format (/,' Current Time',8x,f15.4,' Picosecond')
-      write (iout,30)  epot
-   30 format (' Current Potential',3x,f15.4,' Kcal/mole')
-      if (use_bounds) then
-         write (iout,40)  xbox,ybox,zbox
-   40    format (' Lattice Lengths',6x,3f14.6)
-         write (iout,50)  alpha,beta,gamma
-   50    format (' Lattice Angles',7x,3f14.6)
+      if (digits .ge. 10) then
+         write (iout,20)  pico
+ 20      format (/,' Current Time',6x,f21.10,' Picosecond')
+         write (iout,30)  epot
+ 30      format (' Current Potential',1x,f21.10,' Kcal/mole')
+         write (iout,35)  ekin
+ 35      format (' Current Kinetic',3x,f21.10,' Kcal/mole')
+      else if (digits .ge. 8) then
+         write (iout,21)  pico
+ 21      format (/,' Current Time',6x,f19.8,' Picosecond')
+         write (iout,31)  epot
+ 31      format (' Current Potential',1x,f19.8,' Kcal/mole')
+         write (iout,36)  ekin
+ 36      format (' Current Kinetic',3x,f19.8,' Kcal/mole')
+      else if (digits .ge. 6) then
+         write (iout,22)  pico
+ 22      format (/,' Current Time',6x,f17.6,' Picosecond')
+         write (iout,32)  epot
+ 32      format (' Current Potential',1x,f17.6,' Kcal/mole')
+         write (iout,37)  ekin
+ 37      format (' Current Kinetic',3x,f17.6,' Kcal/mole')
+      else 
+         write (iout,23)  pico
+ 23      format (/,' Current Time',8x,f15.4,' Picosecond')
+         write (iout,33)  epot
+ 33      format (' Current Potential',3x,f15.4,' Kcal/mole')
+         write (iout,38)  ekin
+ 38      format (' Current Kinetic',5x,f15.4,' Kcal/mole')
       end if
-      write (iout,60)  idump
-   60 format (' Frame Number',13x,i10)
+      if (use_bounds) then
+         if (digits .ge. 10) then
+            write (iout,40)  xbox,ybox,zbox
+ 40         format (' Lattice Lengths',6x,3f18.10)
+            write (iout,50)  alpha,beta,gamma
+ 50         format (' Lattice Angles',7x,3f18.10)
+            write (iout,60)  idump
+ 60         format (' Frame Number',17x,i10)
+         else if (digits .ge. 8) then
+            write (iout,41)  xbox,ybox,zbox
+ 41         format (' Lattice Lengths',6x,3f16.8)
+            write (iout,51)  alpha,beta,gamma
+ 51         format (' Lattice Angles',7x,3f16.8)
+            write (iout,61)  idump
+ 61         format (' Frame Number',15x,i10)
+         else 
+            write (iout,42)  xbox,ybox,zbox
+ 42         format (' Lattice Lengths',6x,3f14.6)
+            write (iout,52)  alpha,beta,gamma
+ 52         format (' Lattice Angles',7x,3f14.6)
+            write (iout,62)  idump
+ 62         format (' Frame Number',13x,i10)
+         end if
+      end if
 c
 c     update the information needed to restart the trajectory
 c
@@ -113,6 +157,32 @@ c
       close (unit=ixyz)
       write (iout,70)  xyzfile(1:trimtext(xyzfile))
    70 format (' Coordinate File',12x,a)
+c
+c     LPW save the box vectors to a .box file
+c
+      if (boxsave .and. use_bounds) then
+         ibox = freeunit ()
+         if (archive) then
+            boxfile = filename(1:leng)
+            call suffix (boxfile,'box','old')
+            inquire (file=boxfile,exist=exist)
+            if (exist) then
+               call openend (ibox,boxfile)
+            else
+               open (unit=ibox,file=boxfile,status='new')
+            end if
+         else
+            boxfile = filename(1:leng)//'.'//ext(1:lext)//'b'
+            call version (boxfile,'new')
+            open (unit=ibox,file=boxfile,status='new')
+         end if
+         write (ibox,183)  pico,xbox,ybox,zbox,alpha,beta,gamma
+ 183     format (f16.4,6f16.10)
+         close (unit=ibox)
+         write (iout,193)  boxfile(1:trimtext(boxfile))
+ 193     format (' Periodic Box File',10x,a)
+      end if
+c     end LPW modifications
 c
 c     save the velocity vector components at the current step
 c

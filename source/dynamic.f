@@ -297,9 +297,9 @@ c
             call beeman (istep,dt)
          end if
       end do
-	  else
-	    write(*,*) 'Number of Atoms for rank: ',rank,' is ',n
-		call start_work_nodes(n)
+c	  else
+c	    write(*,*) 'Number of Atoms for rank: ',rank,' is ',n
+c		call start_work_nodes(n)
 	  end if
 c
 c     perform any final tasks before program exit
