@@ -32,9 +32,29 @@ c
       include 'solute.i'
       include 'units.i'
       include 'uprior.i'
+      include 'atoms.i'
       integer i,j,k
       real*8 norm
       logical header
+c     LPW Flag for whether induced dipoles have already been computed.
+      logical already
+c
+c     LPW Check to see whether the induced dipoles have already
+c         been computed for these coordinates
+c
+      already = .true.
+      do i = 1, n
+         if (x(i) .ne. xstor(i)) then
+            already = .false.
+         else if (y(i) .ne. ystor(i)) then
+            already = .false.
+         else if (z(i) .ne. zstor(i)) then
+            already = .false.
+         end if
+      end do
+      if (already) then
+         goto 137
+      end if
 c
 c
 c     choose the method for computation of induced dipoles
@@ -157,6 +177,15 @@ c
             end do
          end if
       end if
+c
+c     LPW Save the coordinates that induce has been called for
+c 
+      do i = 1, n
+         xstor(i) = x(i)
+         ystor(i) = y(i)
+         zstor(i) = z(i)
+      end do
+ 137  continue
       return
       end
 c

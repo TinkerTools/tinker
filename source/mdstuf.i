@@ -19,6 +19,7 @@ c     dorest      logical flag to remove center of mass inertia
 c     velsave     logical flag to save velocity vector components
 c     frcsave     logical flag to save force vector components
 c     uindsave    logical flag to save induced atomic dipoles
+c     boxsave     logical flag to save box vectors LPW
 c     integrate   type of molecular dynamics integration algorithm
 c
 c
@@ -28,6 +29,7 @@ c
       logical velsave
       logical frcsave
       logical uindsave
+      logical boxsave
       character*11 integrate
       common /mdstuf/ nfree,irest,bmnmix,dorest,velsave,frcsave,
-     &                uindsave,integrate
+     &                uindsave,boxsave,integrate

@@ -52,6 +52,9 @@ c
       character*120 velfile
       character*120 frcfile
       character*120 indfile
+c     LPW
+      integer ibox
+      character*120 boxfile
 c
 c
 c     send data via external socket communication if desired
@@ -77,13 +80,36 @@ c
      &           i10,' Dynamics Steps')
       write (iout,20)  pico
    20 format (/,' Current Time',8x,f15.4,' Picosecond')
-      write (iout,30)  epot
-   30 format (' Current Potential',3x,f15.4,' Kcal/mole')
+      if (digits .ge. 10) then
+         write (iout,30)  epot
+ 30      format (' Current Potential',3x,f21.10,' Kcal/mole')
+      else if (digits .ge. 8) then
+         write (iout,31)  epot
+ 31      format (' Current Potential',3x,f19.8,' Kcal/mole')
+      else if (digits .ge. 6) then
+         write (iout,32)  epot
+ 32      format (' Current Potential',3x,f17.6,' Kcal/mole')
+      else 
+         write (iout,33)  epot
+ 33      format (' Current Potential',3x,f15.4,' Kcal/mole')
+      end if
       if (use_bounds) then
-         write (iout,40)  xbox,ybox,zbox
-   40    format (' Lattice Lengths',6x,3f14.6)
-         write (iout,50)  alpha,beta,gamma
-   50    format (' Lattice Angles',7x,3f14.6)
+         if (digits .ge. 10) then
+            write (iout,40)  xbox,ybox,zbox
+ 40         format (' Lattice Lengths',6x,3f18.10)
+            write (iout,50)  alpha,beta,gamma
+ 50         format (' Lattice Angles',7x,3f18.10)
+         else if (digits .ge. 8) then
+            write (iout,41)  xbox,ybox,zbox
+ 41         format (' Lattice Lengths',6x,3f16.8)
+            write (iout,51)  alpha,beta,gamma
+ 51         format (' Lattice Angles',7x,3f16.8)
+         else 
+            write (iout,42)  xbox,ybox,zbox
+ 42         format (' Lattice Lengths',6x,3f14.6)
+            write (iout,52)  alpha,beta,gamma
+ 52         format (' Lattice Angles',7x,3f14.6)
+         end if
       end if
       write (iout,60)  idump
    60 format (' Frame Number',13x,i10)
@@ -113,6 +139,32 @@ c
       close (unit=ixyz)
       write (iout,70)  xyzfile(1:trimtext(xyzfile))
    70 format (' Coordinate File',12x,a)
+c
+c     LPW save the box vectors to a .box file
+c
+      if (boxsave .and. use_bounds) then
+         ibox = freeunit ()
+         if (archive) then
+            boxfile = filename(1:leng)
+            call suffix (boxfile,'box','old')
+            inquire (file=boxfile,exist=exist)
+            if (exist) then
+               call openend (ibox,boxfile)
+            else
+               open (unit=ibox,file=boxfile,status='new')
+            end if
+         else
+            boxfile = filename(1:leng)//'.'//ext(1:lext)//'b'
+            call version (boxfile,'new')
+            open (unit=ibox,file=boxfile,status='new')
+         end if
+         write (ibox,183)  pico,xbox,ybox,zbox,alpha,beta,gamma
+ 183     format (f16.4,6f16.10)
+         close (unit=ibox)
+         write (iout,193)  boxfile(1:trimtext(boxfile))
+ 193     format (' Periodic Box File',10x,a)
+      end if
+c     end LPW modifications
 c
 c     save the velocity vector components at the current step
 c

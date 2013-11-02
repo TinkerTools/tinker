@@ -60,11 +60,33 @@ c
          addu = polarity(i) + addu
       end do
       if (nmol .eq. 1) then
-         write (iout,20)  addu
-   20    format (/,' Additive Molecular Polarizability :',f15.4)
+         if (digits .ge. 10) then
+            write (iout,20)  addu
+ 20         format (/,' Additive Molecular Polarizability :',f21.10)
+         else if (digits .ge. 8) then
+            write (iout,21)  addu
+ 21         format (/,' Additive Molecular Polarizability :',f19.8)
+         else if (digits .ge. 6) then
+            write (iout,22)  addu
+ 22         format (/,' Additive Molecular Polarizability :',f17.6)
+         else
+            write (iout,23)  addu
+ 23         format (/,' Additive Molecular Polarizability :',f15.4)
+         end if
       else
-         write (iout,30)  addu
-   30    format (/,' Additive Total Polarizability :',4x,f15.4)
+         if (digits .ge. 10) then
+            write (iout,30)  addu
+ 30         format (/,' Additive Total Polarizability :',4x,f21.10)
+         else if (digits .ge. 8) then
+            write (iout,30)  addu
+ 31         format (/,' Additive Total Polarizability :',4x,f19.8)
+         else if (digits .ge. 6) then
+            write (iout,30)  addu
+ 32         format (/,' Additive Total Polarizability :',4x,f17.6)
+         else 
+            write (iout,30)  addu
+ 33         format (/,' Additive Total Polarizability :',4x,f15.4)
+         end if
       end if
 c
 c     compute each column of the polarizability tensor
@@ -104,25 +126,76 @@ c
          write (iout,50)
    50    format (/,' Total Polarizability Tensor:',/)
       end if
-      write (iout,60)  alpha(1,1),alpha(1,2),alpha(1,3),
-     &                 alpha(2,1),alpha(2,2),alpha(2,3),
-     &                 alpha(3,1),alpha(3,2),alpha(3,3)
-   60 format (15x,3f12.4,/,15x,3f12.4,/,15x,3f12.4)
+
+      if (digits .ge. 10) then
+         write (iout,60)  alpha(1,1),alpha(1,2),alpha(1,3),
+     &        alpha(2,1),alpha(2,2),alpha(2,3),
+     &        alpha(3,1),alpha(3,2),alpha(3,3)
+ 60      format (15x,3f18.10,/,15x,3f18.10,/,15x,3f18.10)
+      else if (digits .ge. 8) then
+         write (iout,61)  alpha(1,1),alpha(1,2),alpha(1,3),
+     &        alpha(2,1),alpha(2,2),alpha(2,3),
+     &        alpha(3,1),alpha(3,2),alpha(3,3)
+ 61      format (15x,3f16.8,/,15x,3f16.8,/,15x,3f16.8)
+      else if (digits .ge. 6) then
+         write (iout,62)  alpha(1,1),alpha(1,2),alpha(1,3),
+     &        alpha(2,1),alpha(2,2),alpha(2,3),
+     &        alpha(3,1),alpha(3,2),alpha(3,3)
+ 62      format (15x,3f14.6,/,15x,3f14.6,/,15x,3f14.6)
+      else 
+         write (iout,63)  alpha(1,1),alpha(1,2),alpha(1,3),
+     &        alpha(2,1),alpha(2,2),alpha(2,3),
+     &        alpha(3,1),alpha(3,2),alpha(3,3)
+ 63      format (15x,3f12.4,/,15x,3f12.4,/,15x,3f12.4)
+      end if
 c
 c     diagonalize the tensor and get molecular polarizability
 c
       call jacobi (3,alpha,dalpha,valpha)
       write (iout,70)
    70 format (/,' Polarizability Tensor Eigenvalues :',/)
-      write (iout,80)  dalpha(1),dalpha(2),dalpha(3)
-   80 format (15x,3f12.4)
+      if (digits .ge. 10) then
+         write (iout,80)  dalpha(1),dalpha(2),dalpha(3)
+ 80      format (15x,3f18.10)
+      else if (digits .ge. 8) then
+         write (iout,81)  dalpha(1),dalpha(2),dalpha(3)
+ 81      format (15x,3f16.8)
+      else if (digits .ge. 6) then
+         write (iout,82)  dalpha(1),dalpha(2),dalpha(3)
+ 82      format (15x,3f14.6)
+      else 
+         write (iout,83)  dalpha(1),dalpha(2),dalpha(3)
+ 83      format (15x,3f12.4)
+      end if
       malpha = (dalpha(1)+dalpha(2)+dalpha(3)) / 3.0d0
       if (nmol .eq. 1) then
-         write (iout,90)  malpha
-   90    format (/,' Interactive Molecular Polarizability :',f12.4)
+         if (digits .ge. 10) then
+            write (iout,90)  malpha
+ 90         format (/,' Interactive Molecular Polarizability :',f18.10)
+         else if (digits .ge. 8) then
+            write (iout,91)  malpha
+ 91         format (/,' Interactive Molecular Polarizability :',f16.8)
+         else if (digits .ge. 6) then
+            write (iout,92)  malpha
+ 92         format (/,' Interactive Molecular Polarizability :',f14.6)
+         else 
+            write (iout,93)  malpha
+ 93         format (/,' Interactive Molecular Polarizability :',f12.4)
+         end if
       else
-         write (iout,100)  malpha
-  100    format (/,' Interactive Total Polarizability :',4x,f12.4)
+         if (digits .ge. 10) then
+            write (iout,100)  malpha
+ 100        format (/,' Interactive Total Polarizability :',4x,f18.10)
+         else if (digits .ge. 8) then
+            write (iout,101)  malpha
+ 101        format (/,' Interactive Total Polarizability :',4x,f16.8)
+         else if (digits .ge. 6) then
+            write (iout,102)  malpha
+ 102        format (/,' Interactive Total Polarizability :',4x,f14.6)
+         else 
+            write (iout,103)  malpha
+ 103        format (/,' Interactive Total Polarizability :',4x,f12.4)
+         end if
       end if
       end
 c

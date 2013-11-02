@@ -23,6 +23,7 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'boxes.i'
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
@@ -41,6 +42,11 @@ c
       character*120 record
       character*120 string
       character*120 xyzfile
+c     LPW Stuff for periodic box.
+      integer ibox
+      logical havebox
+      character*120 xyz1
+      character*120 boxfile
 c
 c
 c     set up the structure and mechanics calculation
@@ -167,6 +173,21 @@ c
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)
+c     LPW open the box file if it exists
+      ibox = freeunit ()
+      boxfile = filename(1:leng)
+      call suffix (boxfile,'box','old')
+      inquire (file=boxfile,exist=havebox)
+      xyz1 = filename(1:leng)
+      call suffix (xyz1,'xyz','old')
+      if (havebox) then
+         if (filename .ne. xyz1) then
+            open(unit=ibox,file=boxfile,status ='old')
+            call readbox (ibox)
+            call lattice
+         end if
+      end if
+
 c
 c     get info on the molecular system and force field
 c
@@ -218,6 +239,13 @@ c
 c     attempt to read next structure from the coordinate file
 c
          call readxyz (ixyz)
+c     LPW read the periodic box into the coordinates
+         if (havebox) then
+            if (filename .ne. xyz1) then
+               call readbox (ibox)
+               call lattice
+            end if
+         end if
       end do
 c
 c     perform deallocation of some local arrays
@@ -227,6 +255,9 @@ c
 c     perform any final tasks before program exit
 c
       close (unit=ixyz)
+      if (havebox) then
+         close (unit=ibox)
+      end if
       if (dodetail)  debug = .false.
       call final
       end
@@ -1211,6 +1242,8 @@ c
       include 'inter.i'
       include 'iounit.i'
       include 'molcul.i'
+      include 'chgpot.i'
+      include 'moment.i'
       real*8 energy
       character*120 fstr
 c
@@ -1235,6 +1268,95 @@ c
       if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
       if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald)
      &   write (iout,fstr)  einter
+c
+c     LPW get the total charge, dipole and quadrupole moments
+c     This is to avoid doing so in "propyze" which can be slow.
+c
+      call moments
+      if (digits .ge. 8) then
+         write (iout,10)  netchg
+ 10      format (/,' Total Electric Charge :',13x,f15.8,' Electrons')
+         write (iout,20)  netdpl,xdpl,ydpl,zdpl
+ 20      format (/,' Dipole Moment Magnitude :',11x,f17.8,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f17.8)
+         write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 30      format (/,' Quadrupole Moment Tensor :',10x,3f17.8,
+     &        /,6x,'(Buckinghams)',18x,3f17.8,
+     &        /,37x,3f17.8)
+         write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
+ 40      format (/,' Principal Axes Quadrupole :',9x,3f17.8)
+      else if (digits .ge. 6) then
+         write (iout,11)  netchg
+ 11      format (/,' Total Electric Charge :',13x,f13.6,' Electrons')
+         write (iout,21)  netdpl,xdpl,ydpl,zdpl
+ 21      format (/,' Dipole Moment Magnitude :',11x,f15.6,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f15.6)
+         write (iout,31)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 31      format (/,' Quadrupole Moment Tensor :',10x,3f15.6,
+     &        /,6x,'(Buckinghams)',18x,3f15.6,
+     &        /,37x,3f15.6)
+         write (iout,41)  netqdp(1),netqdp(2),netqdp(3)
+ 41      format (/,' Principal Axes Quadrupole :',9x,3f15.6)
+      else if (digits .ge. 4) then
+         write (iout,12)  netchg
+ 12      format (/,' Total Electric Charge :',13x,f12.5,' Electrons')
+         write (iout,22)  netdpl,xdpl,ydpl,zdpl
+ 22      format (/,' Dipole Moment Magnitude :',11x,f13.4,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f13.4)
+         write (iout,32)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 32      format (/,' Quadrupole Moment Tensor :',10x,3f13.4,
+     &        /,6x,'(Buckinghams)',18x,3f13.4,
+     &        /,37x,3f13.4)
+         write (iout,42)  netqdp(1),netqdp(2),netqdp(3)
+ 42      format (/,' Principal Axes Quadrupole :',9x,3f13.4)
+      else 
+         write (iout,13)  netchg
+ 13      format (/,' Total Electric Charge :',13x,f12.5,' Electrons')
+         write (iout,23)  netdpl,xdpl,ydpl,zdpl
+ 23      format (/,' Dipole Moment Magnitude :',11x,f12.3,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f12.3)
+         write (iout,33)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 33      format (/,' Quadrupole Moment Tensor :',10x,3f12.3,
+     &        /,6x,'(Buckinghams)',18x,3f12.3,
+     &        /,37x,3f12.3)
+         write (iout,43)  netqdp(1),netqdp(2),netqdp(3)
+ 43      format (/,' Principal Axes Quadrupole :',9x,3f12.3)
+      end if
+      if (dielec .ne. 1.0d0) then
+         if (digits .ge. 8) then
+            write (iout,50)  dielec
+ 50         format (/,' Dielectric Constant :',15x,f17.8)
+            write (iout,60)  netchg/sqrt(dielec)
+ 60         format (' Effective Total Charge :',12x,f15.8,' Electrons')
+            write (iout,70)  netdpl/sqrt(dielec)
+ 70         format (' Effective Dipole Moment :',11x,f17.8,' Debyes')
+         else if (digits .ge. 6) then
+            write (iout,51)  dielec
+ 51         format (/,' Dielectric Constant :',15x,f17.6)
+            write (iout,61)  netchg/sqrt(dielec)
+ 61         format (' Effective Total Charge :',12x,f14.6,' Electrons')
+            write (iout,71)  netdpl/sqrt(dielec)
+ 71         format (' Effective Dipole Moment :',11x,f17.6,' Debyes')
+         else if (digits .ge. 4) then
+            write (iout,52)  dielec
+ 52         format (/,' Dielectric Constant :',15x,f13.4)
+            write (iout,62)  netchg/sqrt(dielec)
+ 62         format (' Effective Total Charge :',12x,f12.5,' Electrons')
+            write (iout,72)  netdpl/sqrt(dielec)
+ 72         format (' Effective Dipole Moment :',11x,f13.4,' Debyes')
+         else 
+            write (iout,53)  dielec
+ 53         format (/,' Dielectric Constant :',15x,f12.3)
+            write (iout,63)  netchg/sqrt(dielec)
+ 63         format (' Effective Total Charge :',12x,f12.5,' Electrons')
+            write (iout,73)  netdpl/sqrt(dielec)
+ 73         format (' Effective Dipole Moment :',11x,f12.3,' Debyes')
+         end if
+      end if
       return
       end
 c
@@ -1411,6 +1533,7 @@ c
       include 'sizes.i'
       include 'atoms.i'
       include 'chgpot.i'
+      include 'inform.i'
       include 'iounit.i'
       include 'moment.i'
       include 'virial.i'
@@ -1421,32 +1544,107 @@ c
 c     get the total charge, dipole and quadrupole moments
 c
       call moments
-      write (iout,10)  netchg
-   10 format (/,' Total Electric Charge :',13x,f12.5,' Electrons')
-      write (iout,20)  netdpl,xdpl,ydpl,zdpl
-   20 format (/,' Dipole Moment Magnitude :',11x,f12.3,' Debyes',
+      if (digits .ge. 8) then
+         write (iout,10)  netchg
+ 10      format (/,' Total Electric Charge :',13x,f15.8,' Electrons')
+         write (iout,20)  netdpl,xdpl,ydpl,zdpl
+ 20      format (/,' Dipole Moment Magnitude :',11x,f17.8,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f17.8)
+         write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 30      format (/,' Quadrupole Moment Tensor :',10x,3f17.8,
+     &        /,6x,'(Buckinghams)',18x,3f17.8,
+     &        /,37x,3f17.8)
+         write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
+ 40      format (/,' Principal Axes Quadrupole :',9x,3f17.8)
+      else if (digits .ge. 6) then
+         write (iout,11)  netchg
+ 11      format (/,' Total Electric Charge :',13x,f13.6,' Electrons')
+         write (iout,21)  netdpl,xdpl,ydpl,zdpl
+ 21      format (/,' Dipole Moment Magnitude :',11x,f15.6,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f15.6)
+         write (iout,31)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 31      format (/,' Quadrupole Moment Tensor :',10x,3f15.6,
+     &        /,6x,'(Buckinghams)',18x,3f15.6,
+     &        /,37x,3f15.6)
+         write (iout,41)  netqdp(1),netqdp(2),netqdp(3)
+ 41      format (/,' Principal Axes Quadrupole :',9x,3f15.6)
+      else if (digits .ge. 4) then
+         write (iout,12)  netchg
+ 12      format (/,' Total Electric Charge :',13x,f12.5,' Electrons')
+         write (iout,22)  netdpl,xdpl,ydpl,zdpl
+ 22      format (/,' Dipole Moment Magnitude :',11x,f13.4,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',11x,3f13.4)
+         write (iout,32)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 32      format (/,' Quadrupole Moment Tensor :',10x,3f13.4,
+     &        /,6x,'(Buckinghams)',18x,3f13.4,
+     &        /,37x,3f13.4)
+         write (iout,42)  netqdp(1),netqdp(2),netqdp(3)
+ 42      format (/,' Principal Axes Quadrupole :',9x,3f13.4)
+      else 
+         write (iout,13)  netchg
+ 13      format (/,' Total Electric Charge :',13x,f12.5,' Electrons')
+         write (iout,23)  netdpl,xdpl,ydpl,zdpl
+ 23      format (/,' Dipole Moment Magnitude :',11x,f12.3,' Debyes',
      &        //,' Dipole X,Y,Z-Components :',11x,3f12.3)
-      write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
-     &                 yzqdp,zxqdp,zyqdp,zzqdp
-   30 format (/,' Quadrupole Moment Tensor :',10x,3f12.3,
+         write (iout,33)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &        yzqdp,zxqdp,zyqdp,zzqdp
+ 33      format (/,' Quadrupole Moment Tensor :',10x,3f12.3,
      &        /,6x,'(Buckinghams)',18x,3f12.3,
      &        /,37x,3f12.3)
-      write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
-   40 format (/,' Principal Axes Quadrupole :',9x,3f12.3)
-      if (dielec .ne. 1.0d0) then
-         write (iout,50)  dielec
-   50    format (/,' Dielectric Constant :',15x,f12.3)
-         write (iout,60)  netchg/sqrt(dielec)
-   60    format (' Effective Total Charge :',12x,f12.5,' Electrons')
-         write (iout,70)  netdpl/sqrt(dielec)
-   70    format (' Effective Dipole Moment :',11x,f12.3,' Debyes')
+         write (iout,43)  netqdp(1),netqdp(2),netqdp(3)
+ 43      format (/,' Principal Axes Quadrupole :',9x,3f12.3)
       end if
-c
+      if (dielec .ne. 1.0d0) then
+         if (digits .ge. 8) then
+            write (iout,50)  dielec
+ 50         format (/,' Dielectric Constant :',15x,f17.8)
+            write (iout,60)  netchg/sqrt(dielec)
+ 60         format (' Effective Total Charge :',12x,f15.8,' Electrons')
+            write (iout,70)  netdpl/sqrt(dielec)
+ 70         format (' Effective Dipole Moment :',11x,f17.8,' Debyes')
+         else if (digits .ge. 6) then
+            write (iout,51)  dielec
+ 51         format (/,' Dielectric Constant :',15x,f17.6)
+            write (iout,61)  netchg/sqrt(dielec)
+ 61         format (' Effective Total Charge :',12x,f14.6,' Electrons')
+            write (iout,71)  netdpl/sqrt(dielec)
+ 71         format (' Effective Dipole Moment :',11x,f17.6,' Debyes')
+         else if (digits .ge. 4) then
+            write (iout,52)  dielec
+ 52         format (/,' Dielectric Constant :',15x,f13.4)
+            write (iout,62)  netchg/sqrt(dielec)
+ 62         format (' Effective Total Charge :',12x,f12.5,' Electrons')
+            write (iout,72)  netdpl/sqrt(dielec)
+ 72         format (' Effective Dipole Moment :',11x,f13.4,' Debyes')
+         else 
+            write (iout,53)  dielec
+ 53         format (/,' Dielectric Constant :',15x,f12.3)
+            write (iout,63)  netchg/sqrt(dielec)
+ 63         format (' Effective Total Charge :',12x,f12.5,' Electrons')
+            write (iout,73)  netdpl/sqrt(dielec)
+ 73         format (' Effective Dipole Moment :',11x,f12.3,' Debyes')
+         end if
+      end if
+c     
 c     get the radius of gyration and moments of inertia
 c
       call gyrate (rg)
-      write (iout,80)  rg
-   80 format (/,' Radius of Gyration :',16x,f12.3,' Angstroms')
+      if (digits .ge. 8) then
+         write (iout,80)  rg
+ 80      format (/,' Radius of Gyration :',16x,f17.8,' Angstroms')
+      else if (digits .ge. 6) then
+         write (iout,81)  rg
+ 81      format (/,' Radius of Gyration :',16x,f15.6,' Angstroms')
+      else if (digits .ge. 4) then
+         write (iout,82)  rg
+ 82      format (/,' Radius of Gyration :',16x,f13.4' Angstroms')
+      else 
+         write (iout,83)  rg
+ 83      format (/,' Radius of Gyration :',16x,f12.3,' Angstroms')
+      end if
       call inertia (1)
 c
 c     get the internal virial tensor via gradient calculation
@@ -1454,10 +1652,24 @@ c
       allocate (derivs(3,n))
       call gradient (energy,derivs)
       deallocate (derivs)
-      write (iout,90)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
-   90 format (/,' Internal Virial Tensor :',12x,3f12.3,
+      if (digits .ge. 8) then
+         write (iout,90)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
+ 90      format (/,' Internal Virial Tensor :',12x,3f17.8,
+     &        /,37x,3f17.8,/,37x,3f17.8)
+      else if (digits .ge. 6) then
+         write (iout,91)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
+ 91      format (/,' Internal Virial Tensor :',12x,3f15.6,
+     &        /,37x,3f15.6,/,37x,3f15.6)
+      else if (digits .ge. 4) then
+         write (iout,92)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
+ 92      format (/,' Internal Virial Tensor :',12x,3f13.4,
+     &        /,37x,3f13.4,/,37x,3f13.4)
+      else 
+         write (iout,93)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
+ 93      format (/,' Internal Virial Tensor :',12x,3f12.3,
      &        /,37x,3f12.3,/,37x,3f12.3)
-c
+      end if
+c     
 c     get two alternative dE/dV values and a pressure estimate
 c
       call ptest
