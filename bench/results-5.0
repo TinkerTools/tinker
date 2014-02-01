@@ -1,0 +1,90 @@
+
+                 ----------------------------------------------
+                 Benchmark Results from TINKER 5.0  (June 2009)
+                 ----------------------------------------------
+
+                   Benchmark #1: Calmodulin Energy Evaluation
+
+              Isolated Calmodulin Molecule, 2264 Atoms, Amber ff94
+              Force Field, No Nonbonded Cutoffs, 10 Evaluations
+
+ MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
+ ------------                                 ---    ------  --------  -------
+
+ MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93      1.56      2.97     9.20
+ Mac Pro (OSX 10.5.5, Intel 11.0)            2.80      1.63      3.10     9.61
+ Mac Pro (OSX 10.5.7, Intel 11.0)            2.66      2.40      4.61    13.03
+ Mac Pro (Fedora 9, Intel 11.0)              2.66      2.02      4.42    12.98
+ AMD Opteron 280 (CentOS 5.2, Intel 11.0)    2.40      1.93      4.01    12.69
+ Dell SC420 P4 (CentOS5.2, Intel 11.0)       2.80      2.24      5.85    19.53
+
+                Benchmark #2: Crambin Crystal Energy Evaluation
+
+          1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field with
+          PME for Electrostatics, 9.0 Ang vdw Cutoff, 100 Evaluations
+
+ MACHINE TYPE                                 GHz    ENERGY  GRADIENT  HESSIAN
+ ------------                                 ---    ------  --------  -------
+
+ MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93      3.16      4.44    16.85
+ Mac Pro (OSX 10.5.5, Intel 11.0)            2.80      3.27      4.67    17.62
+ Mac Pro (OSX 10.5.7, Intel 11.0)            2.66      3.89      5.66    20.78
+ Mac Pro (Fedora 9, Intel 11.0)              2.66      3.50      5.39    19.61
+ AMD Opteron 280 (CentOS 5.2, Intel 11.0)    2.40      5.21      7.23    25.95
+ Dell SC420 P4 (CentOS5.2, Intel 11.0)       2.80      7.92     10.65    40.26
+
+                 Benchmark #3: Peptide Normal Mode Calculation
+
+            Normal Modes of the Hessian and Vibration Freqencies of
+            a 20-Amino Acid, 328-Atom Peptide, OPLS-AA Force Field
+            without Cutoffs
+
+ MACHINE TYPE                                 GHz          VIBRATIONS
+ ------------                                 ---          ----------
+
+ MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93                3.26
+ Mac Pro (OSX 10.5.5, Intel 11.0)            2.80                3.39
+ Mac Pro (OSX 10.5.7, Intel 11.0)            2.66                3.92
+ Mac Pro (Fedora 9, Intel 11.0)              2.66                4.21
+ AMD Opteron 280 (CentOS 5.2, Intel 11.0)    2.40                7.80
+ Dell SC420 P4 (CentOS5.2, Intel 11.0)       2.80               10.43
+
+                Benchmark #4: TIP3P Water Box Molecular Dynamics
+
+            1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic
+            Box, 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid
+            TIP3P, 1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                                 GHz            DYNAMICS
+ ------------                                 ---            --------
+
+ MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93                14.8
+ Mac Pro (OSX 10.5.5, Intel 11.0)            2.80                16.9
+ Mac Pro (OSX 10.5.7, Intel 11.0)            2.66                21.3
+ Mac Pro (Fedora 9, Intel 11.0)              2.66                19.4
+ AMD Opteron 280 (CentOS 5.2 Intel 11.0)     2.40                21.9
+ Dell SC420 P4 (CentOS5.2, Intel 11.0)       2.80                33.5
+
+               Benchmark #5: AMOEBA Water Box Molecular Dynamics
+
+            100 MD Steps for 216 AMOEBA Flexible Polarizable Atomic
+            Multipole Waters in a 18.643 Ang Periodic Box, Neighbor
+            Lists and Particle-Mesh Ewald for Electrostatics with a
+            7.0 Ang Real-Space Cutoff, 9.0 Ang Cutoff for vdW, and
+            1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                                 GHz            DYNAMICS
+ ------------                                 ---            --------
+
+ MacBook Pro (OSX 10.5.7, Intel 11.0)        2.93                12.0
+ Mac Pro (OSX 10.5.5, Intel 11.0)            2.80                12.7
+ Mac Pro (OSX 10.5.7, Intel 11.0)            2.66                16.0
+ Mac Pro (Fedora 9, Intel 11.0)              2.66                15.4
+ AMD Opteron 280 (CentOS 5.2, Intel 11.0)    2.40                20.6
+ Dell SC420 P4 (CentOS5.2, Intel 11.0)       2.80                32.9
+
+ ----------------------
+ Times are reported in seconds and were measured with TINKER Version 5.0,
+ dimensioned to MAXATM=25000 and MAXHESS=1000000. Each benchmark ran twice
+ in rapid succession on a quiet machine, and times shown were taken from
+ the second run.

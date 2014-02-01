@@ -1,0 +1,34 @@
+
+                -----------------------------------------------
+                TINKER Notes for Alpha CPUs under HP Tru64 Unix
+                -----------------------------------------------
+
+          This subdirectory contains a set of script files that can
+          be used to build the TINKER program package on HP/Compaq
+          Alpha CPU systems under Tru64 Unix and using the vendor
+          Fortran (FORTRAN-77) compiler. The same code will also
+          build under the Fortran 90 compiler.
+
+          Note that use of the -om flag during the link phase greatly
+          slows the linking speed, but reduces the CPU time for some
+          calculations by a factor of 50% or more. The additional flag
+          -WL,-om_no_inst_sched retains most of the run time advantage
+          with little of the link time penalty. For linking of very
+          large versions of TINKER these -om flags may need to be
+          removed, or the -WL,-om_Gcommon,num flag can be added with
+          "num" set as large as possible while avoiding link errors.
+
+          If some or all of the executables fail via a segmentation
+          fault or mystereous loader error, check the limits for your
+          processes by issuing the "limit" command at a C shell prompt
+          (or similar under other shells). On many workstations these
+          limits are set to quite small values for ordinary users. To
+          eliminate the problem issue the following three commands:
+
+                         limit filesize unlimited
+                         limit datasize unlimited
+                         limit stacksize unlimited
+
+          These same commands can also be put in your .cshrc file or
+          equivalent startup file to be run at login time.
+

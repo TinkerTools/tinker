@@ -1,0 +1,10 @@
+
+                   -----------------------------------------
+                   TINKER Notes for Lahey/Fujitsu Fortran 95
+                   -----------------------------------------
+
+           This subdirectory contains a set of batch files that can
+           be used to build the TINKER program package on an Intel
+           compatible PC under Windows9X/NT/2000 using the Lahey/
+           Fujitsu Fortran 95 Express v5.5 compiler.
+

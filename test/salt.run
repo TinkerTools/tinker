@@ -1,0 +1,4 @@
+../bin/crystal salt.cell 1
+../bin/crystal salt 4 n n y
+../bin/xtalmin salt 0.0001
+rm salt.xyz*

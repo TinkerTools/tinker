@@ -1,0 +1,112 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                        Version 6.3  February 2014                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2014               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Unit Cell Dimensions :      a    =    5.6280
+                             b    =    5.6280
+                             c    =    5.6280
+                            Alpha =   90.0000
+                            Beta  =   90.0000
+                            Gamma =   90.0000
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                        Version 6.3  February 2014                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2014               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Unit Cell Dimensions :      a    =    5.6280
+                             b    =    5.6280
+                             c    =    5.6280
+                            Alpha =   90.0000
+                            Beta  =   90.0000
+                            Gamma =   90.0000
+
+ Space Group Symbol :            Fm3(-)m   
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                        Version 6.3  February 2014                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2014               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Type Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+       1      1     Na+   Na+ Sodium Ion              11     22.990     0
+       2      2     Cl-   Cl- Chloride Ion            17     35.453     0
+
+ Additional van der Waals Parameters :
+
+     Atom Class          Size      Epsilon     Reduction
+
+         1              3.3304      0.0028       0.000
+         2              4.4172      0.1180       0.000
+
+ Additional Atomic Partial Charge Parameters :
+
+     Atom Type          Charge
+
+         1              1.0000
+         2             -1.0000
+
+ Initial Lattice Dimensions :    a         5.6280
+                                 b         5.6280
+                                 c         5.6280
+                                Alpha     90.0000
+                                Beta      90.0000
+                                Gamma     90.0000
+
+ Optimally Conditioned Variable Metric Optimization :
+
+ VM Iter     F Value       G RMS     F Move    X Move      Angle   FG Call
+
+     0     -751.1316      9.3298                                        1
+     1     -752.4790      6.9604     1.3474    0.0166     0.0000        2
+     2     -754.3746      1.0719     1.8956    0.0487     0.0000        3
+     3     -754.4286      0.1521     0.0539    0.0089     0.0000        4
+     4     -754.4297      0.0041     0.0011    0.0015     0.0000        5
+     5     -754.4297      0.0000     0.0000    0.0000     0.0001        6
+
+ OCVM  --  Normal Termination due to SmallGrad
+
+ Final Potential Function Value :       -754.4297
+ Final RMS Coordinate Gradient :       0.2715D-12
+ Final Coordinate Gradient Norm :      0.7678D-12
+ Final RMS Lattice Gradient :          0.2082D-04
+ Final Lattice Gradient Norm :         0.5099D-04
+
+ Final Lattice Dimensions :      a         5.7661
+                                 b         5.7661
+                                 c         5.7661
+                                Alpha     90.0000
+                                Beta      90.0000
+                                Gamma     90.0000

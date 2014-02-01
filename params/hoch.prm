@@ -1,0 +1,83 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              HOCH-STERN
+
+torsionterm             NONE
+strtorterm              NONE
+vdwterm                 NONE
+chg-14-scale            1.0
+dielectric              1.0
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+J. C. Hoch and A. S. Stern, "A Method for Determining Overall Protein
+Fold from NMR Distance Restraints", J. Biomol. NMR, 2, 535-543 (1992)
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom          1    CA    "Backbone Site"                6    70.000    3
+atom          2    CB    "Sidechain Site"               6    40.000    1
+
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond          1    1          105.00     3.7000
+bond          1    2          105.00     1.5400
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle         1    1    1       2.50     109.00
+angle         1    1    2      50.00     109.00
+
+
+      ########################################
+      ##                                    ##
+      ##  Atomic Partial Charge Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+charge        1               0.1800
+charge        2               0.1800
+
+
+      ########################################
+      ##                                    ##
+      ##  Biopolymer Atom Type Conversions  ##
+      ##                                    ##
+      ########################################
+
+
+biotype       8    CA      "Alanine"                         1
+biotype      13    CB      "Alanine"                         2
+biotype     410    CA      "N-Terminal ALA"                  1
+biotype     591    CA      "C-Terminal ALA"                  1

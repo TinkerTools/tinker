@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+# TRACELESS is a Perl script to find multipole parameters
+# that are not traceless, ie, whose diagonal elements do
+# not add to zero; prints the atom types and diagonal sum
+#
+# Written by Alan Grossfield, Ponder Lab, July 2004
+
+open(FILE, "$ARGV[0]") || die "Could not open $ARGV[0]: $!\n";
+
+while (<FILE>)
+    {
+    if (/^multipole/)
+        {
+        $keep_line = $_;
+        $dip = <FILE>;
+        $quad1 = <FILE>;
+        $quad2 = <FILE>;
+        $quad3 = <FILE>;
+        
+        @fields = split(' ', $quad1);
+        $x = $fields[0];
+
+        @fields = split(' ', $quad2);
+        $y = $fields[1];
+
+        @fields = split(' ', $quad3);
+        $z = $fields[2];
+
+        $sum = $x + $y + $z;
+        if (abs($sum) > 1.0e-6)
+            {
+            $keep_line =~ s/(\s*\S*\n)$//;
+            printf "%-35s %12.5f\n", $keep_line, $sum
+            }
+        }
+    }

@@ -1,0 +1,24 @@
+
+                -----------------------------------------------
+                TINKER Notes for GNU gfortran on Macintosh OS X
+                -----------------------------------------------
+
+         This subdirectory contains a set of script files that can be
+         used to build the TINKER program package on a Macintosh OS X
+         system using the GNU gfortran Fortran compiler. The current
+         TINKER code builds correctly in serial under gfortran, but
+         Open MP executables generally give a "Bus Error", perhaps due
+         to problems with putting local arrays onto stack space.
+
+         If some or all of the executables fail via a segmentation
+         fault, check the limits for your processes by issuing the
+         "limit" command at the tcsh shell prompt (or similar under
+         other shells). By default, these limits are set to quite small
+         values. To eliminate the problem issue the following commands:
+
+                        limit datasize unlimited
+                        limit stacksize unlimited
+
+         These same commands can also be put in your .tcshrc file or
+         equivalent startup file to be run at login time.
+

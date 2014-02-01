@@ -1,0 +1,16 @@
+
+                 -------------------------------------------
+                 TINKER Notes for IBM Systems under AIX Unix
+                 -------------------------------------------
+
+          This subdirectory contains a set of script files that can
+          be used to build the TINKER program package on IBM AIX Unix
+          machines using the xlf Fortran compiler.
+
+          Note that IBM AIX Unix the Fortran 77 version of TINKER
+          required special system-dependent version of the clock.f
+          and openend.f routines. These modification should not be
+          necessary for more recent compiler versions supporting the
+          Fortran 95 standard, but the TINKER developers no longer
+          have access to a current AIX machine for testing.
+

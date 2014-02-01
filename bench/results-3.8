@@ -1,0 +1,129 @@
+
+                 ---------------------------------------------
+                 Benchmark Results from TINKER 3.8  (Oct 2000)
+                 ---------------------------------------------
+
+                   Benchmark #1: Calmodulin Energy Evaluation
+
+            Isolated Calmodulin Molecule, 2264 Atoms, Amber-94 Force
+            Field, All Interactions Computed with No Cutoffs
+
+ MACHINE TYPE                           MHz    SETUP  ENERGY  GRADIENT HESSIAN
+ ------------                           ---    -----  ------  -------- -------
+
+ Compaq DS10 (Tru64 5.0)                466     0.22    1.27    2.01     7.47
+ DEC Alpha 4100 (Tru64 5.0)             400     0.37    3.20    4.92    17.28
+ DEC Alpha 200 4/233 (Tru64 5.0)        233     1.22    6.92   11.81    55.17
+ SGI IndigoII R10K (Irix 6.5)           195     0.86    3.61    5.98    22.93
+ SGI IndigoII R4400 (Irix 6.5)          200     1.96    8.10   16.24    63.52
+ Target-USA Athlon (RH 6.2, PGI)        950     0.27    0.77    1.63     7.32
+ Target-USA Athlon (RH 6.2, Absoft)     950     0.25    0.96    1.73     8.56
+ Target-USA Athlon (RH 6.2, g77)        950     0.30    0.81    1.57     9.91
+ Target-USA Athlon (RH 6.2, f2c,gcc)    950     0.29    0.76    1.87     9.79
+ Compaq Armada M700 (RH 6.2, PGI)       650     0.29    1.37    3.25    13.57
+ Compaq Armada M700 (RH 6.2, Absoft)    650     0.27    1.57    3.31    15.53
+ Compaq Armada M700 (RH 6.2, g77)       650     0.30    1.75    3.44    17.94
+ Compaq Armada M700 (RH 6.2, f2c,gcc)   650     0.30    1.62    3.87    16.55
+ Compaq Armada M700 (Win2K, CVF 6.5)    650     0.25    1.25    2.85    12.13
+
+                Benchmark #2: Crambin Crystal Energy Evaluation
+
+            1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
+            with PM Ewald for Electrostatics, 9.0 Ang vdw Cutoff
+
+ MACHINE TYPE                           MHz    SETUP  ENERGY  GRADIENT HESSIAN
+ ------------                           ---    -----  ------  -------- -------
+
+ Compaq DS10 (Tru64 5.0)                466     0.21    0.49    0.65     1.92
+ DEC Alpha 4100 (Tru64 5.0)             400     0.35    0.81    1.04     3.15
+ DEC Alpha 200 4/233 (Tru64 5.0)        233     1.13    2.36    3.26     9.52
+ SGI IndigoII R10K (Irix 6.5)           195     0.78    0.94    1.42     3.96
+ SGI IndigoII R4400 (Irix 6.5)          200     1.81    2.81    4.29    12.96
+ Target-USA Athlon (RH 6.2, PGI)        950     0.27    0.32    0.47     1.34
+ Target-USA Athlon (RH 6.2, Absoft)     950     0.22    0.37    0.53     1.58
+ Target-USA Athlon (RH 6.2, g77)        950     0.27    0.41    0.58     1.77
+ Target-USA Athlon (RH 6.2, f2c,gcc)    950     0.29    0.45    0.69     1.75
+ Compaq Armada M700 (RH 6.2, PGI)       650     0.28    0.51    0.75     2.45
+ Compaq Armada M700 (RH 6.2, Absoft)    650     0.22    0.64    0.89     3.19
+ Compaq Armada M700 (RH 6.2, g77)       650     0.31    0.70    0.98     3.27
+ Compaq Armada M700 (RH 6.2, f2c,gcc)   650     0.29    0.71    1.06     3.26
+ Compaq Armada M700 (Win2K, CVF 6.5)    650     0.23    0.50    0.69     2.32
+
+                 Benchmark #3: Peptide Normal Mode Calculation
+
+            Normal Modes of the Hessian and Vibration Freqencies of
+            a 20-Amino Acid, 328-Atom Peptide, OPLS-AA Force Field
+            without Cutoffs
+
+ MACHINE TYPE                           MHz         NORMAL MODES
+ ------------                           ---         ------------
+
+ Compaq DS10 (Tru64 5.0)                466               41
+ DEC Alpha 4100 (Tru64 5.0)             400               90
+ DEC Alpha 200 4/233 (Tru64 5.0)        233              343
+ SGI IndigoII R10K (Irix 6.5)           195              145
+ SGI IndigoII R4400 (Irix 6.5)          200              362
+ Target-USA Athlon (RH 6.2, PGI)        950               51
+ Target-USA Athlon (RH 6.2, Absoft)     950               54
+ Target-USA Athlon (RH 6.2, g77)        950               63
+ Target-USA Athlon (RH 6.2, f2c,gcc)    950               84
+ Compaq Armada M700 (RH 6.2, PGI)       650               64
+ Compaq Armada M700 (RH 6.2, Absoft)    650               69
+ Compaq Armada M700 (RH 6.2, g77)       650              117
+ Compaq Armada M700 (RH 6.2, f2c/gcc)   650              119
+ Compaq Armada M700 (Win2K, CVF 6.5)    650               63
+
+                Benchmark #4: TIP3P Water Box Molecular Dynamics
+
+            1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic
+            Box, 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid
+            TIP3P, 1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                           MHz           DYNAMICS
+ ------------                           ---           --------
+
+ Compaq DS10 (Tru64 5.0)                466               99
+ DEC Alpha 4100 (Tru64 5.0)             400              221
+ DEC Alpha 200 4/233 (Tru64 5.0)        233              577
+ SGI IndigoII R10K (Irix 6.5)           195              263
+ SGI IndigoII R4400 (Irix 6.5)          200              866
+ Target-USA Athlon (RH 6.2, PGI)        950               70
+ Target-USA Athlon (RH 6.2, Absoft)     950               78
+ Target-USA Athlon (RH 6.2, g77)        950               86
+ Target-USA Athlon (RH 6.2, f2c,gcc)    950               93
+ Compaq Armada M700 (RH 6.2, PGI)       650              130
+ Compaq Armada M700 (RH 6.2, Absoft)    650              142
+ Compaq Armada M700 (RH 6.2, g77)       650              155
+ Compaq Armada M700 (RH 6.2, f2c/gcc)   650              169
+ Compaq Armada M700 (Win2K, CVF 6.5)    650              130
+
+               Benchmark #5: TINKER Water Box Molecular Dynamics
+
+            100 MD Steps for 216 TINKER Flexible Polarizable Atomic
+            Multipole Waters in a 18.643 Ang Periodic Box, Standard
+            Ewald Sum for Electrostatics, 12.0 Ang Cutoffs for vdW,
+            1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                           MHz           DYNAMICS
+ ------------                           ---           --------
+
+ Compaq DS10 (Tru64 5.0)                466              288
+ DEC Alpha 4100 (Tru64 5.0)             400              515
+ DEC Alpha 200 4/233 (Tru64 5.0)        233             2016
+ SGI IndigoII R10K (Irix 6.5)           195              816
+ SGI IndigoII R4400 (Irix 6.5)          200             3048
+ Target-USA Athlon (RH 6.2, PGI)        950              287
+ Target-USA Athlon (RH 6.2, Absoft)     950              316
+ Target-USA Athlon (RH 6.2, g77)        950              365
+ Target-USA Athlon (RH 6.2, f2c,gcc)    950              370
+ Compaq Armada M700 (RH 6.2, PGI)       650              490
+ Compaq Armada M700 (RH 6.2, Absoft)    650              520
+ Compaq Armada M700 (RH 6.2, g77)       650              606
+ Compaq Armada M700 (RH 6.2, f2c/gcc)   650              603
+ Compaq Armada M700 (Win2K, CVF 6.5)    650              446
+
+ ----------------------
+ All times are reported in seconds and were measured with TINKER version 3.8,
+ dimensioned to MAXATM=10000 and MAXHESS=1000000. Each benchmark ran twice
+ in rapid succession on a quiet machine, and times reported are the fastest
+ results from the second run.

@@ -1,0 +1,836 @@
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine eopbend  --  out-of-plane bending energy  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "eopbend" computes the out-of-plane bend potential energy
+c     at trigonal centers via a Wilson-Decius-Cross angle bend
+c
+c
+      subroutine eopbend
+      implicit none
+      include 'sizes.i'
+      include 'angle.i'
+      include 'angpot.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'energi.i'
+      include 'group.i'
+      include 'math.i'
+      include 'opbend.i'
+      include 'usage.i'
+      integer i,iopbend
+      integer ia,ib,ic,id
+      real*8 e,force,angle
+      real*8 dot,cosine,fgrp
+      real*8 dt,dt2,dt3,dt4
+      real*8 xia,yia,zia
+      real*8 xib,yib,zib
+      real*8 xic,yic,zic
+      real*8 xid,yid,zid
+      real*8 xad,yad,zad
+      real*8 xbd,ybd,zbd
+      real*8 xcd,ycd,zcd
+      real*8 xpd,ypd,zpd
+      real*8 rbd2,rpd2
+      real*8 xt,yt,zt
+      real*8 rt2,delta
+      logical proceed
+c
+c
+c     zero out the out-of-plane bending energy component
+c
+      eopb = 0.0d0
+c
+c     calculate the out-of-plane bending energy term
+c
+      do iopbend = 1, nopbend
+         i = iopb(iopbend)
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         id = iang(4,i)
+         force = kopb(iopbend)
+c
+c     decide whether to compute the current interaction
+c
+         proceed = .true.
+         if (use_group)  call groups (proceed,fgrp,4,ia,ib,ic,id,0)
+         if (proceed)  proceed = (use(ia) .or. use(ib) .or.
+     &                              use(ic) .or. use(id))
+c
+c     get the coordinates of the atoms in the angle
+c
+         if (proceed) then
+            xia = x(ia)
+            yia = y(ia)
+            zia = z(ia)
+            xib = x(ib)
+            yib = y(ib)
+            zib = z(ib)
+            xic = x(ic)
+            yic = y(ic)
+            zic = z(ic)
+            xid = x(id)
+            yid = y(id)
+            zid = z(id)
+c
+c     compute the out-of-plane bending angle
+c
+            xad = xia - xid
+            yad = yia - yid
+            zad = zia - zid
+            xbd = xib - xid
+            ybd = yib - yid
+            zbd = zib - zid
+            xcd = xic - xid
+            ycd = yic - yid
+            zcd = zic - zid
+            if (use_polymer) then
+               call image (xad,yad,zad,0)
+               call image (xbd,ybd,zbd,0)
+               call image (xcd,ycd,zcd,0)
+            end if
+            xt = yad*zcd - zad*ycd
+            yt = zad*xcd - xad*zcd
+            zt = xad*ycd - yad*xcd
+            rt2 = xt*xt + yt*yt + zt*zt
+            delta = -(xt*xbd + yt*ybd + zt*zbd) / rt2
+            xpd = xbd + xt*delta
+            ypd = ybd + yt*delta
+            zpd = zbd + zt*delta
+            rbd2 = xbd*xbd + ybd*ybd + zbd*zbd
+            rpd2 = xpd*xpd + ypd*ypd + zpd*zpd
+            if (rbd2.ne.0.0d0 .and. rpd2.ne.0.0d0) then
+               dot = xbd*xpd + ybd*ypd + zbd*zpd
+               cosine = dot / sqrt(rbd2*rpd2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+c
+c     find the out-of-plane angle bending energy
+c
+               dt = angle
+               dt2 = dt * dt
+               dt3 = dt2 * dt
+               dt4 = dt2 * dt2
+               e = opbunit * force * dt2
+     &                * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+c
+c     scale the interaction based on its group membership
+c
+               if (use_group)  e = e * fgrp
+c
+c     increment the total out-of-plane bending energy
+c
+               eopb = eopb + e
+            end if
+         end if
+      end do
+      return
+      end
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine eopbend1  --  out-of-plane bend energy & derivs  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "eopbend1" computes the out-of-plane bend potential
+c     energy and first derivatives at trigonal centers via
+c     a Wilson-Decius-Cross angle bend
+c
+c
+      subroutine eopbend1
+      implicit none
+      include 'sizes.i'
+      include 'angle.i'
+      include 'angpot.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'deriv.i'
+      include 'energi.i'
+      include 'group.i'
+      include 'math.i'
+      include 'opbend.i'
+      include 'usage.i'
+      include 'virial.i'
+      integer i,iopbend
+      integer ia,ib,ic,id
+      real*8 e,force,angle
+      real*8 dot,cosine,fgrp
+      real*8 dt,dt2,dt3,dt4
+      real*8 deddt,term
+      real*8 xia,yia,zia
+      real*8 xib,yib,zib
+      real*8 xic,yic,zic
+      real*8 xid,yid,zid
+      real*8 xad,yad,zad
+      real*8 xbd,ybd,zbd
+      real*8 xcd,ycd,zcd
+      real*8 xpd,ypd,zpd
+      real*8 rbd2,rpd2
+      real*8 xt,yt,zt
+      real*8 rt2,ptrt2
+      real*8 xm,ym,zm,rm
+      real*8 delta,delta2
+      real*8 dedxia,dedyia,dedzia
+      real*8 dedxib,dedyib,dedzib
+      real*8 dedxic,dedyic,dedzic
+      real*8 dedxid,dedyid,dedzid
+      real*8 dedxip,dedyip,dedzip
+      real*8 vxx,vyy,vzz
+      real*8 vyx,vzx,vzy
+      logical proceed
+c
+c
+c     zero out out-of-plane energy and first derivatives
+c
+      eopb = 0.0d0
+      do i = 1, n
+         deopb(1,i) = 0.0d0
+         deopb(2,i) = 0.0d0
+         deopb(3,i) = 0.0d0
+      end do
+c
+c     calculate the out-of-plane bending energy and derivatives
+c
+      do iopbend = 1, nopbend
+         i = iopb(iopbend)
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         id = iang(4,i)
+         force = kopb(iopbend)
+c
+c     decide whether to compute the current interaction
+c
+         proceed = .true.
+         if (use_group)  call groups (proceed,fgrp,4,ia,ib,ic,id,0)
+         if (proceed)  proceed = (use(ia) .or. use(ib) .or.
+     &                              use(ic) .or. use(id))
+c
+c     get the coordinates of the atoms in the angle
+c
+         if (proceed) then
+            xia = x(ia)
+            yia = y(ia)
+            zia = z(ia)
+            xib = x(ib)
+            yib = y(ib)
+            zib = z(ib)
+            xic = x(ic)
+            yic = y(ic)
+            zic = z(ic)
+            xid = x(id)
+            yid = y(id)
+            zid = z(id)
+c
+c     compute the out-of-plane bending angle
+c
+            xad = xia - xid
+            yad = yia - yid
+            zad = zia - zid
+            xbd = xib - xid
+            ybd = yib - yid
+            zbd = zib - zid
+            xcd = xic - xid
+            ycd = yic - yid
+            zcd = zic - zid
+            if (use_polymer) then
+               call image (xad,yad,zad,0)
+               call image (xbd,ybd,zbd,0)
+               call image (xcd,ycd,zcd,0)
+            end if
+            xt = yad*zcd - zad*ycd
+            yt = zad*xcd - xad*zcd
+            zt = xad*ycd - yad*xcd
+            rt2 = xt*xt + yt*yt + zt*zt
+            delta = -(xt*xbd + yt*ybd + zt*zbd) / rt2
+            xpd = xbd + xt*delta
+            ypd = ybd + yt*delta
+            zpd = zbd + zt*delta
+            rbd2 = xbd*xbd + ybd*ybd + zbd*zbd
+            rpd2 = xpd*xpd + ypd*ypd + zpd*zpd
+            xm = ypd*zbd - zpd*ybd
+            ym = zpd*xbd - xpd*zbd
+            zm = xpd*ybd - ypd*xbd
+            rm = sqrt(xm*xm + ym*ym + zm*zm)
+            if (rm .ne. 0.0d0) then
+               dot = xbd*xpd + ybd*ypd + zbd*zpd
+               cosine = dot / sqrt(rbd2*rpd2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+c
+c     find the out-of-plane energy and master chain rule terms
+c
+               dt = angle
+               dt2 = dt * dt
+               dt3 = dt2 * dt
+               dt4 = dt2 * dt2
+               e = opbunit * force * dt2
+     &                * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+               deddt = opbunit * force * dt * radian
+     &                    * (2.0d0 + 3.0d0*cang*dt + 4.0d0*qang*dt2
+     &                        + 5.0d0*pang*dt3 + 6.0d0*sang*dt4)
+c
+c     scale the interaction based on its group membership
+c
+               if (use_group) then
+                  e = e * fgrp
+                  deddt = deddt * fgrp
+               end if
+c
+c     chain rule terms for central atom and its projection
+c
+               term = -deddt / (rbd2*rm)
+               dedxib = term * (ybd*zm-zbd*ym)
+               dedyib = term * (zbd*xm-xbd*zm)
+               dedzib = term * (xbd*ym-ybd*xm)
+               term = deddt / (rpd2*rm)
+               dedxip = term * (ypd*zm-zpd*ym)
+               dedyip = term * (zpd*xm-xpd*zm)
+               dedzip = term * (xpd*ym-ypd*xm)
+c
+c     chain rule terms for peripheral plane-defining atoms
+c
+               delta2 = 2.0d0 * delta
+               ptrt2 = (dedxip*xt + dedyip*yt + dedzip*zt) / rt2
+               term = (zcd*ybd-ycd*zbd) + delta2*(yt*zcd-zt*ycd)
+               dedxia = delta*(ycd*dedzip-zcd*dedyip) + term*ptrt2
+               term = (xcd*zbd-zcd*xbd) + delta2*(zt*xcd-xt*zcd)
+               dedyia = delta*(zcd*dedxip-xcd*dedzip) + term*ptrt2
+               term = (ycd*xbd-xcd*ybd) + delta2*(xt*ycd-yt*xcd)
+               dedzia = delta*(xcd*dedyip-ycd*dedxip) + term*ptrt2
+               term = (yad*zbd-zad*ybd) + delta2*(zt*yad-yt*zad)
+               dedxic = delta*(zad*dedyip-yad*dedzip) + term*ptrt2
+               term = (zad*xbd-xad*zbd) + delta2*(xt*zad-zt*xad)
+               dedyic = delta*(xad*dedzip-zad*dedxip) + term*ptrt2
+               term = (xad*ybd-yad*xbd) + delta2*(yt*xad-xt*yad)
+               dedzic = delta*(yad*dedxip-xad*dedyip) + term*ptrt2
+c
+c     get out-of-plane atom chain rule terms by difference
+c
+               dedxid = -dedxia - dedxib - dedxic
+               dedyid = -dedyia - dedyib - dedyic
+               dedzid = -dedzia - dedzib - dedzic
+c
+c     increment the out-of-plane bending energy and gradient
+c
+               eopb = eopb + e
+               deopb(1,ia) = deopb(1,ia) + dedxia
+               deopb(2,ia) = deopb(2,ia) + dedyia
+               deopb(3,ia) = deopb(3,ia) + dedzia
+               deopb(1,ib) = deopb(1,ib) + dedxib
+               deopb(2,ib) = deopb(2,ib) + dedyib
+               deopb(3,ib) = deopb(3,ib) + dedzib
+               deopb(1,ic) = deopb(1,ic) + dedxic
+               deopb(2,ic) = deopb(2,ic) + dedyic
+               deopb(3,ic) = deopb(3,ic) + dedzic
+               deopb(1,id) = deopb(1,id) + dedxid
+               deopb(2,id) = deopb(2,id) + dedyid
+               deopb(3,id) = deopb(3,id) + dedzid
+c
+c     increment the internal virial tensor components
+c
+               vxx = xad*dedxia + xbd*dedxib + xcd*dedxic
+               vyx = yad*dedxia + ybd*dedxib + ycd*dedxic
+               vzx = zad*dedxia + zbd*dedxib + zcd*dedxic
+               vyy = yad*dedyia + ybd*dedyib + ycd*dedyic
+               vzy = zad*dedyia + zbd*dedyib + zcd*dedyic
+               vzz = zad*dedzia + zbd*dedzib + zcd*dedzic
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
+            end if
+         end if
+      end do
+      return
+      end
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine eopbend2  --  out-of-plane bend Hessian; numer  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "eopbend2" calculates second derivatives of the out-of-plane
+c     bend energy via a Wilson-Decius-Cross angle bend for a single
+c     atom using finite difference methods
+c
+c
+      subroutine eopbend2 (i)
+      implicit none
+      include 'sizes.i'
+      include 'angle.i'
+      include 'atoms.i'
+      include 'deriv.i'
+      include 'group.i'
+      include 'hessn.i'
+      include 'opbend.i'
+      integer i,j,k,iopbend
+      integer ia,ib,ic,id
+      real*8 eps,fgrp
+      real*8 old,term
+      real*8 d0(3,maxatm)
+      logical proceed
+c
+c
+c     set stepsize for derivatives and default group weight
+c
+      eps = 1.0d-7
+      fgrp = 1.0d0
+c
+c     compute numerical out-of-plane Hessian for current atom
+c
+      do iopbend = 1, nopbend
+         k = iopb(iopbend)
+         ia = iang(1,k)
+         ib = iang(2,k)
+         ic = iang(3,k)
+         id = iang(4,k)
+c
+c     decide whether to compute the current interaction
+c
+         proceed = (i.eq.ia .or. i.eq.ib .or. i.eq.ic .or. i.eq.id)
+         if (proceed .and. use_group)
+     &      call groups (proceed,fgrp,4,ia,ib,ic,id,0)
+c
+c     find first derivatives for the base structure
+c
+         if (proceed) then
+            term = fgrp / eps
+            call eopbend2a (iopbend)
+            do j = 1, 3
+               d0(j,ia) = deopb(j,ia)
+               d0(j,ib) = deopb(j,ib)
+               d0(j,ic) = deopb(j,ic)
+               d0(j,id) = deopb(j,id)
+            end do
+c
+c     find numerical x-components via perturbed structures
+c
+            old = x(i)
+            x(i) = x(i) + eps
+            call eopbend2a (iopbend)
+            x(i) = old
+            do j = 1, 3
+               hessx(j,ia) = hessx(j,ia) + term*(deopb(j,ia)-d0(j,ia))
+               hessx(j,ib) = hessx(j,ib) + term*(deopb(j,ib)-d0(j,ib))
+               hessx(j,ic) = hessx(j,ic) + term*(deopb(j,ic)-d0(j,ic))
+               hessx(j,id) = hessx(j,id) + term*(deopb(j,id)-d0(j,id))
+            end do
+c
+c     find numerical y-components via perturbed structures
+c
+            old = y(i)
+            y(i) = y(i) + eps
+            call eopbend2a (iopbend)
+            y(i) = old
+            do j = 1, 3
+               hessy(j,ia) = hessy(j,ia) + term*(deopb(j,ia)-d0(j,ia))
+               hessy(j,ib) = hessy(j,ib) + term*(deopb(j,ib)-d0(j,ib))
+               hessy(j,ic) = hessy(j,ic) + term*(deopb(j,ic)-d0(j,ic))
+               hessy(j,id) = hessy(j,id) + term*(deopb(j,id)-d0(j,id))
+            end do
+c
+c     find numerical z-components via perturbed structures
+c
+            old = z(i)
+            z(i) = z(i) + eps
+            call eopbend2a (iopbend)
+            z(i) = old
+            do j = 1, 3
+               hessz(j,ia) = hessz(j,ia) + term*(deopb(j,ia)-d0(j,ia))
+               hessz(j,ib) = hessz(j,ib) + term*(deopb(j,ib)-d0(j,ib))
+               hessz(j,ic) = hessz(j,ic) + term*(deopb(j,ic)-d0(j,ic))
+               hessz(j,id) = hessz(j,id) + term*(deopb(j,id)-d0(j,id))
+            end do
+         end if
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine eopbend2a  --  out-of-plane bend derivatives  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "eopbend2a" calculates out-of-plane bending first derivatives
+c     at a trigonal center via a Wilson-Decius-Cross angle bend;
+c     used in computation of finite difference second derivatives
+c
+c
+      subroutine eopbend2a (i)
+      implicit none
+      include 'sizes.i'
+      include 'angle.i'
+      include 'angpot.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'deriv.i'
+      include 'math.i'
+      include 'opbend.i'
+      integer i,k
+      integer ia,ib,ic,id
+      real*8 angle,force
+      real*8 dot,cosine
+      real*8 dt,dt2,dt3,dt4
+      real*8 deddt,term
+      real*8 xia,yia,zia
+      real*8 xib,yib,zib
+      real*8 xic,yic,zic
+      real*8 xid,yid,zid
+      real*8 xad,yad,zad
+      real*8 xbd,ybd,zbd
+      real*8 xcd,ycd,zcd
+      real*8 xpd,ypd,zpd
+      real*8 rbd2,rpd2
+      real*8 xt,yt,zt
+      real*8 rt2,ptrt2
+      real*8 xm,ym,zm,rm
+      real*8 delta,delta2
+      real*8 dedxia,dedyia,dedzia
+      real*8 dedxib,dedyib,dedzib
+      real*8 dedxic,dedyic,dedzic
+      real*8 dedxid,dedyid,dedzid
+      real*8 dedxip,dedyip,dedzip
+c
+c
+c     set the atom numbers and parameters for this angle
+c
+      k = iopb(i)
+      ia = iang(1,k)
+      ib = iang(2,k)
+      ic = iang(3,k)
+      id = iang(4,k)
+      force = kopb(i)
+c
+c     get the coordinates of the atoms in the angle
+c
+      xia = x(ia)
+      yia = y(ia)
+      zia = z(ia)
+      xib = x(ib)
+      yib = y(ib)
+      zib = z(ib)
+      xic = x(ic)
+      yic = y(ic)
+      zic = z(ic)
+      xid = x(id)
+      yid = y(id)
+      zid = z(id)
+c
+c     zero out the first derivative components
+c
+      deopb(1,ia) = 0.0d0
+      deopb(2,ia) = 0.0d0
+      deopb(3,ia) = 0.0d0
+      deopb(1,ib) = 0.0d0
+      deopb(2,ib) = 0.0d0
+      deopb(3,ib) = 0.0d0
+      deopb(1,ic) = 0.0d0
+      deopb(2,ic) = 0.0d0
+      deopb(3,ic) = 0.0d0
+      deopb(1,id) = 0.0d0
+      deopb(2,id) = 0.0d0
+      deopb(3,id) = 0.0d0
+c
+c     compute the out-of-plane bending angle
+c
+      xad = xia - xid
+      yad = yia - yid
+      zad = zia - zid
+      xbd = xib - xid
+      ybd = yib - yid
+      zbd = zib - zid
+      xcd = xic - xid
+      ycd = yic - yid
+      zcd = zic - zid
+      if (use_polymer) then
+         call image (xad,yad,zad,0)
+         call image (xbd,ybd,zbd,0)
+         call image (xcd,ycd,zcd,0)
+      end if
+      xt = yad*zcd - zad*ycd
+      yt = zad*xcd - xad*zcd
+      zt = xad*ycd - yad*xcd
+      rt2 = xt*xt + yt*yt + zt*zt
+      delta = -(xt*xbd + yt*ybd + zt*zbd) / rt2
+      xpd = xbd + xt*delta
+      ypd = ybd + yt*delta
+      zpd = zbd + zt*delta
+      rbd2 = xbd*xbd + ybd*ybd + zbd*zbd
+      rpd2 = xpd*xpd + ypd*ypd + zpd*zpd
+      xm = ypd*zbd - zpd*ybd
+      ym = zpd*xbd - xpd*zbd
+      zm = xpd*ybd - ypd*xbd
+      rm = sqrt(xm*xm + ym*ym + zm*zm)
+      if (rm .ne. 0.0d0) then
+         dot = xbd*xpd + ybd*ypd + zbd*zpd
+         cosine = dot / sqrt(rbd2*rpd2)
+         cosine = min(1.0d0,max(-1.0d0,cosine))
+         angle = radian * acos(cosine)
+c
+c     get the out-of-plane bending master chain rule terms
+c
+         dt = angle
+         dt2 = dt * dt
+         dt3 = dt2 * dt
+         dt4 = dt2 * dt2
+         deddt = opbunit * force * dt * radian
+     &              * (2.0d0 + 3.0d0*cang*dt + 4.0d0*qang*dt2
+     &                  + 5.0d0*pang*dt3 + 6.0d0*sang*dt4)
+c
+c     chain rule terms for central atom and its projection
+c
+         term = -deddt / (rbd2*rm)
+         dedxib = term * (ybd*zm-zbd*ym)
+         dedyib = term * (zbd*xm-xbd*zm)
+         dedzib = term * (xbd*ym-ybd*xm)
+         term = deddt / (rpd2*rm)
+         dedxip = term * (ypd*zm-zpd*ym)
+         dedyip = term * (zpd*xm-xpd*zm)
+         dedzip = term * (xpd*ym-ypd*xm)
+c
+c     chain rule terms for peripheral plane-defining atoms
+c
+         delta2 = 2.0d0 * delta
+         ptrt2 = (dedxip*xt + dedyip*yt + dedzip*zt) / rt2
+         term = (zcd*ybd-ycd*zbd) + delta2*(yt*zcd-zt*ycd)
+         dedxia = delta*(ycd*dedzip-zcd*dedyip) + term*ptrt2
+         term = (xcd*zbd-zcd*xbd) + delta2*(zt*xcd-xt*zcd)
+         dedyia = delta*(zcd*dedxip-xcd*dedzip) + term*ptrt2
+         term = (ycd*xbd-xcd*ybd) + delta2*(xt*ycd-yt*xcd)
+         dedzia = delta*(xcd*dedyip-ycd*dedxip) + term*ptrt2
+         term = (yad*zbd-zad*ybd) + delta2*(zt*yad-yt*zad)
+         dedxic = delta*(zad*dedyip-yad*dedzip) + term*ptrt2
+         term = (zad*xbd-xad*zbd) + delta2*(xt*zad-zt*xad)
+         dedyic = delta*(xad*dedzip-zad*dedxip) + term*ptrt2
+         term = (xad*ybd-yad*xbd) + delta2*(yt*xad-xt*yad)
+         dedzic = delta*(yad*dedxip-xad*dedyip) + term*ptrt2
+c
+c     get out-of-plane atom chain rule terms by difference
+c
+         dedxid = -dedxia - dedxib - dedxic
+         dedyid = -dedyia - dedyib - dedyic
+         dedzid = -dedzia - dedzib - dedzic
+c
+c     set the out-of-plane bending derivatives
+c
+         deopb(1,ia) = dedxia
+         deopb(2,ia) = dedyia
+         deopb(3,ia) = dedzia
+         deopb(1,ib) = dedxib
+         deopb(2,ib) = dedyib
+         deopb(3,ib) = dedzib
+         deopb(1,ic) = dedxic
+         deopb(2,ic) = dedyic
+         deopb(3,ic) = dedzic
+         deopb(1,id) = dedxid
+         deopb(2,id) = dedyid
+         deopb(3,id) = dedzid
+      end if
+      return
+      end
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine eopbend3  --  out-of-plane bending & analysis  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "eopbend3" computes the out-of-plane bend potential energy at
+c     trigonal centers via a Wilson-Decius-Cross angle bend; also
+c     partitions the energy among the atoms
+c
+c
+      subroutine eopbend3
+      implicit none
+      include 'sizes.i'
+      include 'action.i'
+      include 'analyz.i'
+      include 'angle.i'
+      include 'angpot.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'energi.i'
+      include 'group.i'
+      include 'inform.i'
+      include 'iounit.i'
+      include 'math.i'
+      include 'opbend.i'
+      include 'usage.i'
+      integer i,iopbend
+      integer ia,ib,ic,id
+      real*8 e,angle,force
+      real*8 dot,cosine,fgrp
+      real*8 dt,dt2,dt3,dt4
+      real*8 xia,yia,zia
+      real*8 xib,yib,zib
+      real*8 xic,yic,zic
+      real*8 xid,yid,zid
+      real*8 xad,yad,zad
+      real*8 xbd,ybd,zbd
+      real*8 xcd,ycd,zcd
+      real*8 xpd,ypd,zpd
+      real*8 rbd2,rpd2
+      real*8 xt,yt,zt
+      real*8 rt2,delta
+      logical proceed
+      logical header,huge
+c
+c
+c     zero out the out-of-plane bend energy and partitioning
+c
+      neopb = 0
+      eopb = 0.0d0
+      do i = 1, n
+         aeopb(i) = 0.0d0
+      end do
+      header = .true.
+c
+c     calculate the out-of-plane bending energy term
+c
+      do iopbend = 1, nopbend
+         i = iopb(iopbend)
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         id = iang(4,i)
+         force = kopb(iopbend)
+c
+c     decide whether to compute the current interaction
+c
+         proceed = .true.
+         if (use_group)  call groups (proceed,fgrp,4,ia,ib,ic,id,0)
+         if (proceed)  proceed = (use(ia) .or. use(ib) .or.
+     &                              use(ic) .or. use(id))
+c
+c     get the coordinates of the atoms in the angle
+c
+         if (proceed) then
+            xia = x(ia)
+            yia = y(ia)
+            zia = z(ia)
+            xib = x(ib)
+            yib = y(ib)
+            zib = z(ib)
+            xic = x(ic)
+            yic = y(ic)
+            zic = z(ic)
+            xid = x(id)
+            yid = y(id)
+            zid = z(id)
+c
+c     compute the out-of-plane bending angle
+c
+            xad = xia - xid
+            yad = yia - yid
+            zad = zia - zid
+            xbd = xib - xid
+            ybd = yib - yid
+            zbd = zib - zid
+            xcd = xic - xid
+            ycd = yic - yid
+            zcd = zic - zid
+            if (use_polymer) then
+               call image (xad,yad,zad,0)
+               call image (xbd,ybd,zbd,0)
+               call image (xcd,ycd,zcd,0)
+            end if
+            xt = yad*zcd - zad*ycd
+            yt = zad*xcd - xad*zcd
+            zt = xad*ycd - yad*xcd
+            rt2 = xt*xt + yt*yt + zt*zt
+            delta = -(xt*xbd + yt*ybd + zt*zbd) / rt2
+            xpd = xbd + xt*delta
+            ypd = ybd + yt*delta
+            zpd = zbd + zt*delta
+            rbd2 = xbd*xbd + ybd*ybd + zbd*zbd
+            rpd2 = xpd*xpd + ypd*ypd + zpd*zpd
+            if (rbd2.ne.0.0d0 .and. rpd2.ne.0.0d0) then
+               dot = xbd*xpd + ybd*ypd + zbd*zpd
+               cosine = dot / sqrt(rbd2*rpd2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+c
+c     find the out-of-plane angle bending energy
+c
+               dt = angle
+               dt2 = dt * dt
+               dt3 = dt2 * dt
+               dt4 = dt2 * dt2
+               e = opbunit * force * dt2
+     &                * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+c
+c     scale the interaction based on its group membership
+c
+               if (use_group)  e = e * fgrp
+c
+c     increment the total out-of-plane bending energy
+c
+               neopb = neopb + 1
+               eopb = eopb + e
+               aeopb(ib) = aeopb(ib) + e
+c
+c     print a message if the energy of this interaction is large
+c
+               huge = (e .gt. 2.0d0)
+               if (debug .or. (verbose.and.huge)) then
+                  if (header) then
+                     header = .false.
+                     write (iout,10)
+   10                format (/,' Individual Out-of-Plane Bending',
+     &                          ' Interactions :',
+     &                       //,' Type',13x,'Atom Names',30x,'Angle',
+     &                          6x,'Energy',/)
+                  end if
+                  write (iout,20)  ib,name(ib),id,name(id),angle,e
+   20             format (' O-P-Bend',3x,i5,'-',a3,1x,i5,'-',a3,
+     &                       22x,f10.4,f12.4)
+               end if
+            end if
+         end if
+      end do
+      return
+      end

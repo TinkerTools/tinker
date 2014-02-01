@@ -1,0 +1,202 @@
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine beeman  --  Beeman rigid 5-site water MD step  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "beeman" performs a single molecular dynamics time step
+c     via the Beeman multistep recursion formula; uses original
+c     coefficients or Bernie Brooks' "Better Beeman" values
+c
+c     literature reference:
+c
+c     D. Beeman, "Some Multistep Methods for Use in Molecular
+c     Dynamics Calculations", Journal of Computational Physics,
+c     20, 130-139 (1976)
+c
+c     B. R. Brooks, "Algorithms for Molecular Dynamics at Constant
+c     Temperature and Pressure", DCRT Report, NIH, April 1988
+c
+c     this is a special version for the rigid 5-site water model
+c     of Ken Jordan, which is a modified Dang-Chang model with the
+c     polarization site M* slightly closer to oxygen than the
+c     change site M
+c
+c     literature reference:
+c
+c     G. Ciccotti, M. Ferrario and J. P. Ryckaert, "Molecular Dynamics
+c     of Rigid Systems in Cartesian Coordinates. A General Formulation",
+c     Molecular Physics, 47, 1253-1264 (1982)
+c
+c
+      subroutine beeman (istep,dt)
+      implicit none
+      include 'sizes.i'
+      include 'atmtyp.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'freeze.i'
+      include 'mdstuf.i'
+      include 'moldyn.i'
+      include 'units.i'
+      include 'usage.i'
+      integer i,j,istep,nm
+      real*8 dt,dt_x,factor
+      real*8 etot,eksum,epot
+      real*8 temp,pres
+      real*8 part1,part2
+      real*8 oterm1,hterm1
+      real*8 oterm2,hterm2
+      real*8 ekin(3,3)
+      real*8 stress(3,3)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
+      real*8, allocatable :: derivs(:,:)
+c
+c
+c     set linear combination factors for modified Dang-Chang water
+c
+      oterm1 = 0.6330320807091532d0
+      hterm1 = 0.1834839596454234d0
+      oterm2 = 0.7781124208939066d0
+      hterm2 = 0.1109437895530467d0
+c
+c     set time values and coefficients for Beeman integration
+c
+      factor = dble(bmnmix)
+      dt_x = dt / factor
+      part1 = 0.5d0*factor + 1.0d0
+      part2 = part1 - 2.0d0
+c
+c     make half-step temperature and pressure corrections
+c
+      call temper (dt)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
+      allocate (derivs(3,n))
+c
+c     store the current atom positions, then find half-step
+c     velocities and full-step positions via Beeman recursion
+c
+      do i = 1, n
+         if (use(i)) then
+            do j = 1, 3
+               v(j,i) = v(j,i) + (part1*a(j,i)-aalt(j,i))*dt_x
+            end do
+            xold(i) = x(i)
+            yold(i) = y(i)
+            zold(i) = z(i)
+            x(i) = x(i) + v(1,i)*dt
+            y(i) = y(i) + v(2,i)*dt
+            z(i) = z(i) + v(3,i)*dt
+         end if
+      end do
+c
+c     get constraint-corrected positions and half-step velocities
+c
+      if (use_rattle)  call rattle (dt,xold,yold,zold)
+c
+c     move M center to linear combination of H-O-H coordinates
+c
+      do i = 1, n
+         if (atomic(i) .eq. -1) then
+            x(i) = oterm1*x(i-3) + hterm1*x(i-2) + hterm1*x(i-1)
+            y(i) = oterm1*y(i-3) + hterm1*y(i-2) + hterm1*y(i-1)
+            z(i) = oterm1*z(i-3) + hterm1*z(i-2) + hterm1*z(i-1)
+         else if (atomic(i) .eq. -2) then
+            x(i) = oterm2*x(i-4) + hterm2*x(i-3) + hterm2*x(i-2)
+            y(i) = oterm2*y(i-4) + hterm2*y(i-3) + hterm2*y(i-2)
+            z(i) = oterm2*z(i-4) + hterm2*z(i-3) + hterm2*z(i-2)
+         end if
+      end do
+c
+c     get the potential energy and atomic forces
+c
+      call gradient (epot,derivs)
+c
+c     transfer the forces on the M center to the H-O-H sites
+c
+      do i = 1, n
+         if (atomic(i) .eq. -1) then
+            do j = 1, 3
+               derivs(j,i-3) = derivs(j,i-3) + oterm1*derivs(j,i)
+               derivs(j,i-2) = derivs(j,i-2) + hterm1*derivs(j,i)
+               derivs(j,i-1) = derivs(j,i-1) + hterm1*derivs(j,i)
+            end do
+         else if (atomic(i) .eq. -2) then
+            do j = 1, 3
+               derivs(j,i-4) = derivs(j,i-4) + oterm2*derivs(j,i)
+               derivs(j,i-3) = derivs(j,i-3) + hterm2*derivs(j,i)
+               derivs(j,i-2) = derivs(j,i-2) + hterm2*derivs(j,i)
+            end do
+         end if
+      end do
+c
+c     use Newton's second law to get the next accelerations;
+c     find the full-step velocities using the Beeman recursion
+c
+      do i = 1, n
+         if (atomic(i) .le. 0) then
+            do j = 1, 3
+               v(j,i) = 0.0d0
+               a(j,i) = 0.0d0
+            end do
+         else if (use(i)) then
+            do j = 1, 3
+               aalt(j,i) = a(j,i)
+               a(j,i) = -convert * derivs(j,i) / mass(i)
+               v(j,i) = v(j,i) + (part2*a(j,i)+aalt(j,i))*dt_x
+            end do
+         end if
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+      deallocate (derivs)
+c
+c     find the constraint-corrected full-step velocities
+c
+      if (use_rattle)  call rattle2 (dt)
+c
+c     modify degrees of freedom to account for rigid 4-site water;
+c     assumes that only the 5-site waters are to be held rigid
+c
+      nm = 0
+      do i = 1, n
+         if (atomic(i) .le. 0)  nm = nm + 1
+      end do
+      nfree = 3*n - 9*nm/2 - 6
+      if (use_bounds)  nfree = nfree + 3
+c
+c     make full-step temperature and pressure corrections
+c
+      call temper2 (dt,eksum,ekin,temp)
+      call pressure (dt,epot,ekin,temp,pres,stress)
+c
+c     total energy is sum of kinetic and potential energies
+c
+      etot = eksum + epot
+c
+c     compute statistics and save trajectory for this step
+c
+      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
+      call mdsave (istep,dt,epot)
+      call mdrest (istep)
+      return
+      end

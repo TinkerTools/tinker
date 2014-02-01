@@ -1,0 +1,17 @@
+
+                     --------------------------------------
+                     TINKER Notes for Compaq Visual Fortran
+                     --------------------------------------
+
+           This subdirectory contains a set of batch files that can
+           be used to build the TINKER program package on an Intel
+           compatible PC under Windows9X/NT/2000 using the Compaq
+           Visual Fortran (CVF) 6.5 compiler.
+
+           Note that the Intel PC/Compaq Fortran code section must
+           be uncommented in the system-dependent routine clock.f
+           prior to compiling. There is also a special version of
+           command.f which includes the DFLIB and DFPORT libraries
+           in order to resolve calls to the getarg and iargc system
+           routines.
+

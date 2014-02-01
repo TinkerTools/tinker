@@ -1,0 +1,14 @@
+
+              ---------------------------------------------------
+              TINKER Notes for Intel Fortran Compiler for Mac OSX
+              ---------------------------------------------------
+
+         This subdirectory contains a set of script files that can be
+         used to build the TINKER program package on an Intel-based
+         Macintosh system using the Intel Fortran Compiler for Mac OSX.
+
+         Please note that by default The Mac OSX distributions limit
+         stacksize and datasize for processes as can be checked via
+         the csh limit command or similar. Large TINKER executables
+         will need these values increased to avoid failure at startup. 
+

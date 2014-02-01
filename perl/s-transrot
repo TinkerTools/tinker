@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+$file=$ARGV[0];
+$key=$ARGV[1];
+if ($#ARGV<1){die "command line syntax: xyz_file key_file\n";}
+
+$k=1.3806503*10**-23;
+$T=298;
+$sig=1;
+$h=(6.6260693*10**-34);#/(2*3.14159)???????;
+$rho= 4.72973855516282e+26;
+
+open file, "$file";
+@file=<file>;
+
+$M=0;
+
+foreach(1..$#file){	
+	$name=(split '', (split ' ',$file[$_])[1])[0];
+	if($name eq 'C'){$m=12.0107;}
+	elsif($name eq 'O'){$m=15.9994;}
+	elsif($name eq 'H'){$m=1.00794;}
+	elsif($name eq 'N'){$m=14.0067;}
+	elsif($name eq 'S'){$m=32.065;}
+	elsif($name eq 'M'){$m=24.3050;}
+	elsif($name eq 'Z'){$m=65.409;}
+	elsif($name eq 'P'){$m=30.973;}
+	else{die "error\n";}
+	$M+=$m;
+	}
+	
+	
+$M=$M*.001/(6.0221415*10**23);   #convert g/mol -> kg
+
+$At=1.5*$k*$T-(2.5+1.5*log(2*3.14159*$M*$k*$T*$h**-2)-log($rho))*$k*$T;	
+$At=0.001*($At)*6.0221415*10**23;       #corrected for J-->kJ/mol
+print "A(trans) = $At kJ/mol\n";
+$At=0.239005736*($At);
+print "A(trans) = $At kcal/mol\n\n";
+
+
+
+`analyze.x $file -k $key em >tmp`;
+@I=`grep -A 4 'Moments (' tmp`;
+$Ia=(split ' ', $I[2])[0];
+$Ib=(split ' ', $I[3])[0];
+$Ic=(split ' ', $I[4])[0];
+
+$Ia=$Ia*.001/(6.0221415*10**23)*10**-20;    #convert amu*ang^2 -> kg*m^2
+$Ib=$Ib*.001/(6.0221415*10**23)*10**-20;
+$Ic=$Ic*.001/(6.0221415*10**23)*10**-20;
+
+	#$III=4.731*10**16*(.001/(6.0221415*10**23)*10**-20)**3;
+	
+	#$Ar=1.5*$k*$T-(1.5+0.5*log(3.14159*$III)+1.5*log(8*3.14159**2*$k*$T/$h**2) -log($sig))*$k*$T;
+	
+$Ar=1.5*$k*$T-(1.5+0.5*log(3.14159*$Ia*$Ib*$Ic)+1.5*log(8*3.14159**2*$k*$T/$h**2) -log($sig))*$k*$T;
+
+$Ar=0.001*($Ar)*6.0221415*10**23;       #corrected for J-->kJ/mol
+print "A(rot) = $Ar kJ/mol\n";
+$Ar=0.239005736*($Ar);
+print "A(rot) = $Ar kcal/mol\n\n";

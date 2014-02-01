@@ -1,0 +1,26 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            TINKER  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                        Version 6.3  February 2014                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2014               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Molecular Dynamics Trajectory via Modified Beeman Algorithm
+
+ Average Values for the last   100 out of      100 Dynamics Steps
+
+ Simulation Time              0.1000 Picosecond
+ Total Energy            -46263.3963 Kcal/mole   (+/-  60.3609)
+ Potential Energy        -67497.0454 Kcal/mole   (+/- 145.2905)
+ Kinetic Energy           21233.6491 Kcal/mole   (+/- 146.2116)
+ Temperature                  302.39 Kelvin      (+/-     2.08)
+ Pressure                    -586.35 Atmosphere  (+/-   262.64)
+ Density                      0.9957 Grams/cc    (+/-   0.0000)

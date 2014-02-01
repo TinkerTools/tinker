@@ -1,0 +1,441 @@
+c
+c
+c     ###################################################
+c     ##  COPYRIGHT (C)  1993  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  program xtalmin  --  full lattice crystal minimization  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "xtalmin" performs a full crystal energy minimization by
+c     alternating cycles of truncated Newton optimization over
+c     atomic coordinates with variable metric optimization over
+c     the six lattice dimensions and angles
+c
+c
+      program xtalmin
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'boxes.i'
+      include 'files.i'
+      include 'iounit.i'
+      include 'minima.i'
+      include 'output.i'
+      integer i,j,imin,nvar
+      integer ncycle,freeunit
+      real*8 minimum,grdmin
+      real*8 gnorm,grms
+      real*8 anorm,arms
+      real*8 xx(maxvar)
+      real*8 derivs(3,maxatm)
+      real*8 x_lat(6),g_lat(6)
+      real*8 xtalmol1,xtallat1
+      logical exist,done
+      character*6 mode,method
+      character*60 minfile
+      character*80 string
+      external xtalmol1,xtalmol2
+      external xtallat1,optsave
+c
+c
+c     set up the structure and mechanics calculation
+c
+      call initial
+      call getxyz
+      call mechanic
+c
+c     get termination criterion as RMS gradient per atom
+c
+      grdmin = -1.0d0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=10,end=10)  grdmin
+   10 continue
+      if (grdmin .le. 0.0d0) then
+         write (iout,20)
+   20    format (/,' Enter RMS Gradient per Atom Criterion',
+     &              ' [0.1] :  ',$)
+         read (input,30)  grdmin
+   30    format (f20.0)
+      end if
+      if (grdmin .le. 0.0d0)  grdmin = 0.1d0
+c
+c     write out a copy of coordinates for later update
+c
+      imin = freeunit ()
+      minfile = filename(1:leng)//'.xyz'
+      call version (minfile,'new')
+      open (unit=imin,file=minfile,status='new')
+      call prtxyz (imin)
+      close (unit=imin)
+      outfile = minfile
+c
+c     perform a cycle of optimization on atomic coordinates
+c
+      done = .false.
+      ncycle = 0
+      dowhile (.not. done)
+         ncycle = ncycle + 1
+         mode = 'DTNCG'
+         method = 'AUTO'
+         coordtype = 'CARTESIAN'
+         maxiter = 1
+         nextiter = ncycle
+         nvar = 0
+         do i = 1, n
+            nvar = nvar + 1
+            xx(nvar) = x(i)
+            nvar = nvar + 1
+            xx(nvar) = y(i)
+            nvar = nvar + 1
+            xx(nvar) = z(i)
+         end do
+         call lattice
+         call tncg (mode,method,nvar,xx,minimum,grdmin,
+     &                  xtalmol1,xtalmol2,optsave)
+         nvar = 0
+         do i = 1, n
+            nvar = nvar + 1
+            x(i) = xx(nvar)
+            nvar = nvar + 1
+            y(i) = xx(nvar)
+            nvar = nvar + 1
+            z(i) = xx(nvar)
+         end do
+         call gradient (minimum,derivs)
+         gnorm = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               gnorm = gnorm + derivs(j,i)**2
+            end do
+         end do
+         gnorm = sqrt(gnorm)
+         grms = gnorm / sqrt(dble(nvar/3))
+         if (grms .lt. grdmin) then
+            done = .true.
+            arms = grms
+            anorm = gnorm
+         end if
+c
+c     write out the current values of the lattice parameters
+c
+         write (iout,40)  xbox,ybox,zbox,alpha,beta,gamma
+   40    format (/,' Unit Cell Dimensions :      a    =',f10.4,
+     &           /,'                             b    =',f10.4,
+     &           /,'                             c    =',f10.4,
+     &           /,'                            Alpha =',f10.4,
+     &           /,'                            Beta  =',f10.4,
+     &           /,'                            Gamma =',f10.4)
+c
+c     perform a few optimization cycles on lattice parameters
+c
+         coordtype = 'NONE'
+         maxiter = 3
+         nextiter = 1
+         hguess = 0.1d0
+         nvar = 6
+         x_lat(1) = xbox
+         x_lat(2) = ybox
+         x_lat(3) = zbox
+         x_lat(4) = alpha
+         x_lat(5) = beta
+         x_lat(6) = gamma
+         if (done) then
+            minimum = xtallat1 (x_lat,g_lat)
+            gnorm = 0.0d0
+            do i = 1, nvar
+               gnorm = gnorm + g_lat(i)**2
+            end do
+            gnorm = sqrt(gnorm)
+            grms = gnorm / sqrt(dble(nvar))
+            if (grms .gt. grdmin) then
+               done = .false.
+               maxiter = 6
+            end if
+         end if
+         if (.not. done) then
+            call ocvm (nvar,x_lat,minimum,grdmin,xtallat1,optsave)
+            xbox = x_lat(1)
+            ybox = x_lat(2)
+            zbox = x_lat(3)
+            alpha = x_lat(4)
+            beta = x_lat(5)
+            gamma = x_lat(6)
+         end if
+      end do
+c
+c     write out the final potential energy value and gradients
+c
+      if (arms.gt.0.0001d0 .and. grms.gt.0.0001d0) then
+         write (iout,50)  minimum,arms,anorm,grms,gnorm
+   50    format (/,' Final Potential Function Value :',f16.4,
+     &           /,' Final RMS Coordinate Gradient : ',f16.4,
+     &           /,' Final Coordinate Gradient Norm :',f16.4,
+     &           /,' Final RMS Lattice Gradient :    ',f16.4,
+     &           /,' Final Lattice Gradient Norm :   ',f16.4)
+      else
+         write (iout,60)  minimum,arms,anorm,grms,gnorm
+   60    format (/,' Final Potential Function Value :',f16.4,
+     &           /,' Final RMS Coordinate Gradient : ',d16.4,
+     &           /,' Final Coordinate Gradient Norm :',d16.4,
+     &           /,' Final RMS Lattice Gradient :    ',d16.4,
+     &           /,' Final Lattice Gradient Norm :   ',d16.4)
+      end if
+c
+c     write the final coordinates into a file
+c
+      imin = freeunit ()
+      open (unit=imin,file=minfile,status='old')
+      rewind (unit=imin)
+      call prtxyz (imin)
+      close (unit=imin)
+c
+c     perform any final tasks before program exit
+c
+      call final
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  function xtalmol1  --  energy and gradient for atoms  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "xtalmol1" is a service routine that computes the energy and
+c     gradient with respect to the atomic Cartesian coordinates for
+c     a crystal energy minimization
+c
+c
+      function xtalmol1 (xx,g)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'usage.i'
+      integer i,nvar
+      real*8 xtalmol1,e
+      real*8 xx(maxvar)
+      real*8 g(maxvar)
+      real*8 derivs(3,maxatm)
+c
+c
+c     translate optimization parameters to atomic coordinates
+c
+      nvar = 0
+      do i = 1, n
+         if (use(i)) then
+            nvar = nvar + 1
+            x(i) = xx(nvar)
+            nvar = nvar + 1
+            y(i) = xx(nvar)
+            nvar = nvar + 1
+            z(i) = xx(nvar)
+         end if
+      end do
+c
+c     compute and store the energy and gradient
+c
+      call gradient (e,derivs)
+      xtalmol1 = e
+c
+c     store Cartesian gradient as optimization gradient
+c
+      nvar = 0
+      do i = 1, n
+         if (use(i)) then
+            nvar = nvar + 1
+            g(nvar) = derivs(1,i)
+            nvar = nvar + 1
+            g(nvar) = derivs(2,i)
+            nvar = nvar + 1
+            g(nvar) = derivs(3,i)
+         end if
+      end do
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine xtalmol2  --  Hessian values for the atoms  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "xtalmol2" is a service routine that computes the sparse
+c     matrix Hessian elements with respect to the atomic Cartesian
+c     coordinates for a crystal energy minimization
+c
+c
+      subroutine xtalmol2 (mode,xx,h,hinit,hstop,hindex,hdiag)
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'usage.i'
+      integer i,j,k,nvar
+      integer hinit(maxvar)
+      integer hstop(maxvar)
+      integer hindex(maxhess)
+      integer hvar(maxvar)
+      integer huse(maxvar)
+      real*8 xx(maxvar)
+      real*8 hdiag(maxvar)
+      real*8 h(maxhess)
+      character*4 mode
+c
+c
+c     translate optimization parameters to atomic coordinates
+c
+      if (mode .eq. 'NONE')  return
+      nvar = 0
+      do i = 1, n
+         if (use(i)) then
+            nvar = nvar + 1
+            x(i) = xx(nvar)
+            nvar = nvar + 1
+            y(i) = xx(nvar)
+            nvar = nvar + 1
+            z(i) = xx(nvar)
+         end if
+      end do
+c
+c     compute and store the Hessian elements
+c
+      call hessian (h,hinit,hstop,hindex,hdiag)
+c
+c     transform the sparse Hessian to use only active atoms
+c
+      nvar = 0
+      if (nuse .ne. n) then
+         do i = 1, n
+            k = 3 * (i-1)
+            if (use(i)) then
+               do j = 1, 3
+                  nvar = nvar + 1
+                  hvar(nvar) = j + k
+                  huse(j+k) = nvar
+               end do
+            else
+               do j = 1, 3
+                  huse(j+k) = 0
+               end do
+            end if
+         end do
+         do i = 1, nvar
+            k = hvar(i)
+            hinit(i) = hinit(k)
+            hstop(i) = hstop(k)
+            hdiag(i) = hdiag(k)
+            do j = hinit(i), hstop(i)
+               hindex(j) = huse(hindex(j))
+            end do
+         end do
+      end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function xtallat1  --  energy and gradient for lattice  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "xtalmol1" is a service routine that computes the energy and
+c     numerical gradient with respect to the six lattice lengths
+c     and angles for a crystal energy minimization
+c
+c
+      function xtallat1 (xx,g)
+      implicit none
+      include 'boxes.i'
+      real*8 xtallat1,energy
+      real*8 e,e0,old,eps
+      real*8 xx(6),g(6)
+c
+c
+c     translate optimization variables to lattice parameters
+c
+      xbox = xx(1)
+      ybox = xx(2)
+      zbox = xx(3)
+      alpha = xx(4)
+      beta = xx(5)
+      gamma = xx(6)
+c
+c     compute and store the base potential energy value
+c
+      call lattice
+      e0 = energy ()
+      xtallat1 = e0
+c
+c     find derivatives with respect to lattice dimensions
+c
+      eps = 0.00001d0
+      old = xbox
+      xbox = xbox - 0.5d0*eps
+      call lattice
+      e0 = energy ()
+      xbox = xbox + eps
+      call lattice
+      e = energy ()
+      g(1) = (e - e0) / eps
+      xbox = old
+      old = ybox
+      ybox = ybox - 0.5d0*eps
+      call lattice
+      e0 = energy ()
+      ybox = ybox + eps
+      call lattice
+      e = energy ()
+      g(2) = (e - e0) / eps
+      ybox = old
+      old = zbox
+      zbox = zbox - 0.5d0*eps
+      call lattice
+      e0 = energy ()
+      zbox = zbox + eps
+      call lattice
+      e = energy ()
+      g(3) = (e - e0) / eps
+      zbox = old
+c
+c     find derivatives with respect to lattice angles
+c
+      eps = 0.0001d0
+      old = alpha
+      alpha = alpha - 0.5d0*eps
+      call lattice
+      e0 = energy ()
+      alpha = alpha + eps
+      call lattice
+      e = energy ()
+      g(4) = (e - e0) / eps
+      alpha = old
+      old = beta
+      beta = beta - 0.5d0*eps
+      call lattice
+      e0 = energy ()
+      beta = beta + eps
+      call lattice
+      e = energy ()
+      g(5) = (e - e0) / eps
+      beta = old
+      old = gamma
+      gamma = gamma - 0.5d0*eps
+      call lattice
+      e0 = energy ()
+      gamma = gamma + eps
+      call lattice
+      e = energy ()
+      g(6) = (e - e0) / eps
+      gamma = old
+      return
+      end

@@ -1,0 +1,109 @@
+
+                 ----------------------------------------------
+                 Benchmark Results from TINKER 4.2  (June 2004)
+                 ----------------------------------------------
+
+                   Benchmark #1: Calmodulin Energy Evaluation
+
+              Isolated Calmodulin Molecule, 2264 Atoms, Amber ff94
+              Force Field, No Nonbonded Cutoffs, 10 Evaluations
+
+ MACHINE TYPE                                 MHz    ENERGY  GRADIENT  HESSIAN
+ ------------                                 ---    ------  --------  -------
+
+ AMD Opteron 246 (Fedora2/64, Intel/32)      2000      2.46     5.53    19.43
+ AMD Opteron 246 (Fedora2/64, gcc 3.3/64)    2000      2.45     5.39    17.72
+ Athlon XP 2400+ (RH 8.0, Intel)             2000      2.67     5.68    32.60
+ Dell P4/533 Desktop (Fedora1, Intel)        2660      3.28     6.57    23.70
+ Dell 600SC P4 Server (RH 8.0, Intel)        2400      3.60     7.16    26.61
+ Compaq Evo N610c P4 (RH 9.0, Intel)         2000      4.32     8.93    32.11
+ Compaq Evo N610c P4 (WinXP, Intel)          2000      4.31     8.70    33.12
+ Apple Macintosh G5 (OSX 10.3, g77 3.3)      2000      3.73     8.47    27.11
+ Apple Macintosh G4 (OSX 10.3, g77 3.3)       733     21.25    42.71   161.92
+ Compaq AlphaServer DS10 (Tru64 5.0)          466     13.73    25.78    90.04
+
+                Benchmark #2: Crambin Crystal Energy Evaluation
+
+           1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field with
+           PME for Electrostatics, 9.0 Ang vdw Cutoff, 10 Evaluations
+
+ MACHINE TYPE                                 MHz    ENERGY  GRADIENT  HESSIAN
+ ------------                                 ---    ------  --------  -------
+
+ AMD Opteron 246 (Fedora2/64, Intel/32)      2000      0.95     1.80     4.81
+ AMD Opteron 246 (Fedora2/64, gcc 3.3/64)    2000      0.96     1.66     3.94
+ Athlon XP 2400+ (RH 8.0, Intel)             2000      1.13     2.18     7.08
+ Dell P4/533 Desktop (Fedora1, Intel)        2660      0.96     1.97     5.19
+ Dell 600SC P4 Server (RH 8.0, Intel)        2400      1.06     2.18     5.69
+ Compaq Evo N610c P4 (RH 9.0, Intel)         2000      1.27     2.61     6.82
+ Compaq Evo N610c P4 (WinXP, Intel)          2000      1.20     2.63     6.79
+ Apple Macintosh G5 (OSX 10.3, g77 3.3)      2000      1.06     1.99     4.83
+ Apple Macintosh G4 (OSX 10.3, g77 3.3)       733      4.47     8.49    26.47
+ Compaq AlphaServer DS10 (Tru64 5.0)          466      3.98     6.74    19.52
+
+                 Benchmark #3: Peptide Normal Mode Calculation
+
+            Normal Modes of the Hessian and Vibration Freqencies of
+            a 20-Amino Acid, 328-Atom Peptide, OPLS-AA Force Field
+            without Cutoffs
+
+ MACHINE TYPE                                 MHz         NORMAL MODES
+ ------------                                 ---         ------------
+
+ AMD Opteron 246 (Fedora2/64, Intel/32)      2000               10
+ AMD Opteron 246 (Fedora2/64, gcc 3.3/64)    2000               13
+ Athlon XP 2400+ (RH 8.0, Intel)             2000               23
+ Dell P4/533 Desktop (Fedora1, Intel)        2660               13
+ Dell 600SC P4 Server (RH 8.0, Intel)        2400               15
+ Compaq Evo N610c P4 (RH 9.0, Intel)         2000               18
+ Compaq Evo N610c P4 (WinXP, Intel)          2000               20
+ Apple Macintosh G5 (OSX 10.3, g77 3.3)      2000               14
+ Apple Macintosh G4 (OSX 10.3, g77 3.3)       733               66
+ Compaq AlphaServer DS10 (Tru64 5.0)          466               39
+
+                Benchmark #4: TIP3P Water Box Molecular Dynamics
+
+            1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic
+            Box, 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid
+            TIP3P, 1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                                 MHz           DYNAMICS
+ ------------                                 ---           --------
+
+ AMD Opteron 246 (Fedora2/64, Intel/32)      2000               32
+ AMD Opteron 246 (Fedora2/64, gcc 3.3/64)    2000               29
+ Athlon XP 2400+ (RH 8.0, Intel)             2000               37
+ Dell P4/533 Desktop (Fedora1, Intel)        2660               41
+ Dell 600SC P4 Server (RH 8.0, Intel)        2400               44
+ Compaq Evo N610c P4 (RH 9.0, Intel)         2000               60
+ Compaq Evo N610c P4 (WinXP, Intel)          2000               58
+ Apple Macintosh G5 (OSX 10.3, g77 3.3)      2000               42
+ Apple Macintosh G4 (OSX 10.3, g77 3.3)       733              184
+ Compaq AlphaServer DS10 (Tru64 5.0)          466              127
+
+               Benchmark #5: AMOEBA Water Box Molecular Dynamics
+
+            100 MD Steps for 216 AMOEBA Flexible Polarizable Atomic
+            Multipole Waters in a 18.643 Ang Periodic Box, Standard
+            Ewald Sum for Electrostatics, 12.0 Ang Cutoffs for vdW,
+            1.0 fs Time Step with Modified Beeman Integration
+
+ MACHINE TYPE                                 MHz           DYNAMICS
+ ------------                                 ---           --------
+
+ AMD Opteron 246 (Fedora2/64, Intel/32)      2000               93
+ AMD Opteron 246 (Fedora2/64, gcc 3.3/64)    2000               95
+ Athlon XP 2400+ (RH 8.0, Intel)             2000              113
+ Dell P4/533 Desktop (Fedora1, Intel)        2660              126
+ Dell 600SC P4 Server (RH 8.0, Intel)        2400              137
+ Compaq Evo N610c P4 (RH 9.0, Intel)         2000              167
+ Compaq Evo N610c P4 (WinXP, Intel)          2000              169
+ Apple Macintosh G5 (OSX 10.3, g77 3.3)      2000              107
+ Apple Macintosh G4 (OSX 10.3, g77 3.3)       733              416
+ Compaq AlphaServer DS10 (Tru64 5.0)          466              360
+
+ ----------------------
+ Times are reported in seconds and were measured with TINKER Version 4.2,
+ dimensioned to MAXATM=10000 and MAXHESS=1000000. Each benchmark ran twice
+ in rapid succession on a quiet machine, and times shown were taken from
+ the second run.

@@ -1,0 +1,325 @@
+c
+c
+c     ############################################################
+c     ##  COPYRIGHT (C) 1996 by Yong Kong & Jay William Ponder  ##
+c     ##                  All Rights Reserved                   ##
+c     ############################################################
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine erxnfld  --  reaction field potential energy  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "erxnfld" calculates the macroscopic reaction field energy
+c
+c
+      subroutine erxnfld
+      implicit none
+      include 'sizes.i'
+      include 'energi.i'
+      integer maxterm
+      parameter (maxterm=30)
+      integer i
+      real*8 a,epi
+      real*8 a_r,a_r_sq,a_r_factor
+      real*8 h(0:maxterm)
+      character*8 method
+c
+c
+c     zero out the macroscopic reaction field energy
+c
+      er = 0.0d0
+c
+c     set the sphere size and the bulk dielectric constant
+c
+      a = 22.0d0
+      epi = 80.0d0
+c
+      a_r = 1.0d0 / a
+      a_r_sq = a_r * a_r
+      a_r_factor = a_r
+      do i = 0, maxterm
+         h(i) = 0.5d0*(i+1.0d0)*(1.0d0-epi)/((i+1.0d0)*epi+i)*a_r_factor
+         a_r_factor = a_r_factor * a_r_sq
+      end do
+c
+c     select the reaction field method
+c
+      method = 'IMAGE'
+c     method = 'LINEAR'
+c     method = 'NEUMANN'
+c     method = 'PAIRWISE'
+c
+c     perform the desired reaction field calculation
+c
+c     if (method .eq. 'IMAGE') then
+         call eimgchg (a,epi)
+      else if (method .eq. 'LINEAR') then
+         call elinear
+      else if (method .eq. 'NEUMANN') then
+         call eneumann
+      else if (method .eq. 'PAIRWISE') then
+         call epairwise
+      end if
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine eimgchg  --  some image charge variants  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "eimgchg" calculates the macroscopic reaction field energy
+c
+c
+      subroutine eimgchg (a,epi)
+      implicit none
+      include 'sizes.i'
+      include 'action.i'
+      include 'atoms.i'
+      include 'charge.i'
+      include 'energi.i'
+      integer i,k,ii,kk
+      integer method
+      real*8 a,epi,a2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,rimg2
+      real*8 e,f,fi,fik
+      real*8 factor,total,e_corr
+      real*8 qimg(maxatm)
+      real*8 ximg(maxatm),yimg(maxatm),zimg(maxatm)
+c
+c
+c     image charge methods
+c
+      method = 2
+c     f = electric
+      f = 1.0d0
+      a2 = a * a
+c
+c     1=Original Friedman, 2=Method from JMB paper, 3=Mike's Method
+c
+      if (method .eq. 1) then
+         factor = -(epi-1.0d0) * a / (epi+1.0d0)
+      else if (method .eq. 2) then
+         factor = -(epi-1) * a / epi
+      else if (method .eq. 3) then
+         factor = (2.0d0-epi) * a / epi
+      end if
+
+      do ii = 1, nion
+         i = iion(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         r2 = xi*xi + yi*yi + zi*zi
+         r = sqrt(r2)
+         qimg(ii) = factor * pchg(ii) / r
+         rimg2 = a2 / r2
+         ximg(i) = x(i) * rimg2
+         yimg(i) = y(i) * rimg2
+         zimg(i) = z(i) * rimg2
+      end do
+
+      er = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         fi = f * pchg(ii)
+         do kk = 1, nion
+            k = iion(kk)
+            xr = xi - ximg(k)
+            yr = yi - yimg(k)
+            zr = zi - zimg(k)
+            r2 = xr*xr + yr*yr + zr*zr
+            r = sqrt(r2)
+            fik = fi * qimg(kk)
+            e = fik / r
+            er = er + e
+         end do
+      end do
+
+      ner = nion * nion
+      er = 0.5d0 * er
+
+      if (method.eq.1 .or. method.eq.3) then
+         total = 0.0d0
+         do i = 1, nion
+            total = total + pchg(i)
+         end do
+         e_corr = 0.5d0 * (epi-1.0d0)/(a*epi*(epi+1.0d0)) * total**2
+      end if
+
+      if (method .eq. 1) then
+         write (*,10) er,er-e_corr
+   10    format (/,' Image Charge Method 1 :',5x,2f16.8)
+      else if (method .eq. 2) then
+         write (*,20) er
+   20    format (/,' Image Charge Method 2 :',21x,f16.8)
+      else if (method .eq. 3) then
+         write (*,30) er,er-e_corr
+   30    format (/,' Image Charge Method 3 :',5x,2f16.8)
+      end if
+
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine elinear  --  linear time reaction field  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "elinear" calculates the macroscopic reaction field energy
+c
+c
+      subroutine elinear
+c
+c
+c     Mike's fast algorithm
+c
+      er = 0.0d0
+
+      do i = 1, n
+         dx(i) = 0.0d0
+         dy(i) = 0.0d0
+         dz(i) = 0.0d0
+      end do
+
+      do ii=0, upper_n
+
+         call tr_trless_index(ii,deg)
+         trace_num = (ii+1)*(ii+2)/2
+c
+c     trace multipoles (Notice the order: first
+c        looping over a given site)
+c
+         do j=1,trace_num
+            mn(j) = 0.0d0
+         end do
+         do i=1,n
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            z_power(0) = 1.0d0
+            do j=1,ii
+               z_power(j) = z_power(j-1)*zi
+            end do
+
+            count_t1 = 1
+            xip = q(i)
+            do j=0,ii
+               yip = 1.0d0
+               do k=0,ii-j
+                  mn(count_t1) = mn(count_t1)
+     &                           + xip*yip*z_power(ii-j-k)
+                  yip = yip*yi
+                  count_t1 = count_t1 + 1
+               end do
+               xip = xip*xi
+            end do
+         end do
+
+         if(ii .eq. 0) then
+            yn(1) = mn(1)
+         else if(ii .eq. 1) then
+            call mtoy_1(3, mn, yn)
+         else if(ii .eq. 2) then
+            call mtoy_2(5, mn, yn)
+         else if(ii .eq. 3) then
+            call mtoy_3(7, mn, yn)
+         else if(ii .eq. 4) then
+            call mtoy_4(9, mn, yn)
+         else if(ii .eq. 5) then
+            call mtoy_5(11, mn, yn)
+         else if(ii .eq. 6) then
+            call mtoy_6(13, mn, yn)
+         else if(ii .eq. 7) then
+            call mtoy_7(15, mn, yn)
+         else if(ii .eq. 8) then
+            call mtoy_8(17, mn, yn)
+         else if(ii .eq. 9) then
+            call mtoy_9(19, mn, yn)
+         else if(ii .eq. 10) then
+            call mtoy_10(21, mn, yn)
+         else if(ii .eq. 11) then
+            call mtoy_11(23, mn, yn)
+         else if(ii. eq. 12) then
+            call mtoy_12(25, mn, yn)
+         else if(ii .eq. 13) then
+            call mtoy_13(27, mn, yn)
+         else if(ii .eq. 14) then
+            call mtoy_14(29, mn, yn)
+         else if(ii .eq. 15) then
+            call mtoy_15(31, mn, yn)
+         else if(ii .eq. 16) then
+            call mtoy_16(33, mn, yn)
+         else if(ii .eq. 17) then
+            call mtoy_17(35, mn, yn)
+         else if(ii .eq. 18) then
+            call mtoy_18(37, mn, yn)
+         else if(ii .eq. 19) then
+            call mtoy_19(39, mn, yn)
+         else if(ii .eq. 20) then
+            call mtoy_20(41, mn, yn)
+         else if(ii .eq. 21) then
+            call mtoy_21(43, mn, yn)
+         else if(ii .eq. 22) then
+            call mtoy_22(45, mn, yn)
+         else if(ii .eq. 23) then
+            call mtoy_23(47, mn, yn)
+         else if(ii .eq. 24) then
+            call mtoy_24(49, mn, yn)
+         else if(ii .eq. 25) then
+            call mtoy_25(51, mn, yn)
+         else if(ii .eq. 26) then
+            call mtoy_26(53, mn, yn)
+         else if(ii .eq. 27) then
+            call mtoy_27(55, mn, yn)
+         else if(ii .eq. 28) then
+            call mtoy_28(57, mn, yn)
+         else if(ii .eq. 29) then
+            call mtoy_29(59, mn, yn)
+         else if(ii .eq. 30) then
+            call mtoy_30(61, mn, yn)
+         end if
+
+         count_t1 = 2*ii+2
+         count_t2 = ii - 1
+         count_t3 = 1
+         dowhile (count_t1 .le. trace_num)
+            do i=1,count_t2
+               yn(count_t1) = -yn(count_t3)-yn(count_t3+2)
+               count_t1 = count_t1 + 1
+               count_t3 = count_t3 + 1
+            end do
+            count_t3 = count_t3 + 2
+            count_t2 = count_t2 - 1
+         end do
+
+         e = 0.0d0
+         do i = 1, trace_num
+            e = e + yn(i)*mn(i)*deg(i)
+         end do
+         e = e * h(ii)
+         er = er + e
+         write (*,11)  ii,e,er
+
+      end do
+
+      write (*,*)  "ENERGY BY THE LINEAR METHOD"
+      write (*,100)  er,delta_t
+  100 format (f65.50,f65.50)
+
+      return
+      end

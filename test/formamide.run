@@ -1,0 +1,5 @@
+../bin/crystal formamide.cell 1
+../bin/crystal formamide 4 n n y
+../bin/newton formamide a a 0.0001
+../bin/xtalfit < formamide.dat
+rm formamide.xyz*

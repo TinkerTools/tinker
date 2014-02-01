@@ -1,0 +1,69 @@
+c
+c
+c     ############################################################
+c     ##  COPYRIGHT (C) 1996 by Yong Kong & Jay William Ponder  ##
+c     ##                  All Rights Reserved                   ##
+c     ############################################################
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine erxnfld3  --  reaction field energy & analysis  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "erxnfld3" calculates the macroscopic reaction field energy,
+c     and also partitions the energy among the atoms
+c
+c
+      subroutine erxnfld3
+      implicit none
+      include 'sizes.i'
+      include 'action.i'
+      include 'analyz.i'
+      include 'atoms.i'
+      include 'energi.i'
+      integer maxterm
+      parameter (maxterm=30)
+      integer i
+      real*8 a,epi
+      real*8 a_r,a_r_sq,a_r_factor
+      real*8 h(0:maxterm)
+c
+c
+c     zero out the reaction field energy and partitioning
+c
+      ner = 0
+      er = 0.0d0
+      do i = 1, n
+         aer(i) = 0.0d0
+      end do
+c
+c     set the sphere size and the bulk dielectric constant
+c
+      a = 22.0d0
+      epi = 80.0d0
+c
+c
+c
+      a_r = 1.0d0 / a
+      a_r_sq = a_r * a_r
+      a_r_factor = a_r
+      do i = 0, maxterm
+         h(i) = 0.5d0*(i+1.0d0)*(1.0d0-epi)/((i+1.0d0)*epi+i)*a_r_factor
+         a_r_factor = a_r_factor * a_r_sq
+      end do
+c
+c     perform the desired reaction field calculation
+c
+c     if ( ) then
+         call eimgchg (a,epi)
+c     else if ( ) then
+c        call elinear
+c     else if ( ) then
+c        call eneumann
+c     else if ( ) then
+c        call epairwise
+c     end if
+      return
+      end
