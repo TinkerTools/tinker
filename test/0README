@@ -89,17 +89,21 @@
                           for intestinal fatty acid binding protein
                           from NOE distance and torsional restraints
 
-         (15) SALT        convert sodium chloride asymmetric unit to
+         (15) NITROGEN    calculate the self-diffusion constant and
+                          N-N radial distribution function for liquid
+                          nitrogen via analysis of a 50ps MD trajectory
+
+         (16) SALT        convert sodium chloride asymmetric unit to
                           the unit cell, then a crystal minimization
                           starting from the diffraction structure
                           using Ewald summation for electrostatics
 
-         (16) TETRAALA    generate capped alanine tetrapeptide in an
+         (17) TETRAALA    generate capped alanine tetrapeptide in an
                           extended conformation, then use Monte Carlo
                           Minimization with random torsional moves to
                           find the global minimum energy structure
 
-         (17) WATER       fit the electrostatic potential around an
+         (18) WATER       fit the electrostatic potential around an
                           AMOEBA water molecule to the QM-derived
                           potential (MP2/aug-cc-pVTZ) on a grid of
                           points outside the molecular surface.

@@ -1,0 +1,2 @@
+../bin/diffuse nitrogen.arc 1 50 1 1.0
+../bin/radial nitrogen.arc 1 50 1 N N 0.01 N

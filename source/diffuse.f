@@ -20,11 +20,8 @@ c
 c     the estimate for the self-diffusion constant in 10-5 cm**2/sec
 c     is printed in the far right column of output and can be checked
 c     by plotting mean square displacements as a function of the time
-c     separation
-c
-c     diffusion values for very large time separation are inaccurate
-c     due to the small amount of data; the current version requires
-c     an orthogonal unit cell
+c     separation; values for very large time separation are inaccurate
+c     due to the small amount of data
 c
 c
       program diffuse
@@ -32,7 +29,8 @@ c
       include 'sizes.i'
       include 'atmtyp.i'
       include 'atoms.i'
-      include 'boxes.i'
+      include 'bound.i'
+      include 'inform.i'
       include 'iounit.i'
       include 'molcul.i'
       include 'usage.i'
@@ -45,7 +43,7 @@ c
       real*8 xmid,ymid,zmid
       real*8 xold,yold,zold
       real*8 xdiff,ydiff,zdiff
-      real*8 dx,dy,dz,weigh
+      real*8 xr,yr,zr,weigh
       real*8 tstep,dunits,delta
       real*8 xvalue,yvalue,zvalue
       real*8 rvalue,dvalue,counts
@@ -91,7 +89,6 @@ c
       iarc = freeunit ()
       open (unit=iarc,file=arcfile,status='old')
       call readxyz (iarc)
-      rewind (unit=iarc)
 c
 c     get numbers of the coordinate frames to be processed
 c
@@ -134,41 +131,11 @@ c
       end if
       if (tstep .le. 0.0d0)  tstep = 1.0d0
 c
-c     try to find the unit cell axis lengths in the keyfile
-c
-      call unitcell
-c
-c     get cell axis lengths from command line or interactively
-c
-      do while (xbox .eq. 0.0d0)
-         write (iout,100)
-  100    format (/,' Enter Unit Cell Axis Lengths :  ',$)
-         read (input,110)  record
-  110    format (a120)
-         read (record,*,err=120,end=120)  xbox,ybox,zbox
-  120    continue
-         if (ybox .eq. 0.0d0)  ybox = xbox
-         if (zbox .eq. 0.0d0)  zbox = xbox
-      end do
-c
-c     check for possible non-orthogonal system unit cell
-c
-      if (.not. orthogonal) then
-         write (iout,130)
-  130    format (/,' DIFFUSE  --  Non-Orthogonal Unit Cell is',
-     &              ' Not Supported')
-         call fatal
-      end if
-c
-c     set the half width values for the periodic box
-c
-      xbox2 = 0.5d0 * xbox
-      ybox2 = 0.5d0 * ybox
-      zbox2 = 0.5d0 * zbox
-c
-c     assign the atom parameters and count the molecules
+c     get the atom parameters, lattice type and molecule count
 c
       call field
+      call unitcell
+      call lattice
       call katom
       call molecule
 c
@@ -190,24 +157,24 @@ c
          end if
       end do
       nmol = k
-      write (iout,140)  nmol
-  140 format (/,' Number of Molecules for Diffusion Calculation :',i10)
+      write (iout,100)  nmol
+  100 format (/,' Total Number of Molecules :',i16)
 c
 c     count the number of coordinate frames in the archive file
 c
+      abort = .false.
+      rewind (unit=iarc)
       nframe = 0
-      do while (.true.)
-         do i = 1, n+1
-            read (iarc,*,err=150,end=150)
-         end do
+      do while (.not. abort)
+         call readxyz (iarc)
          nframe = nframe + 1
       end do
-  150 continue
+      nframe = nframe - 1
       rewind (unit=iarc)
       stop = min(nframe,stop)
       nframe = (stop-start)/step + 1
-      write (iout,160)  nframe
-  160 format (/,' Number of Frames for Diffusion Calculation :',i13)
+      write (iout,110)  nframe
+  110 format (/,' Number of Coordinate Frames :',i14)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -221,25 +188,23 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,170)
-  170 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,120)
+  120 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
       do while (iframe.ge.start .and. iframe.le.stop)
-         skip = (skip-1) * (n+1)
-         do j = 1, skip
-            read (iarc,*,err=180,end=180)
+         do j = 1, skip-1
+            call readxyz (iarc)
          end do
-  180    continue
          iframe = iframe + step
          skip = step
          call readxyz (iarc)
-         if (n .eq. 0)  goto 200
+         if (n .eq. 0)  goto 140
          nframe = nframe + 1
          if (mod(nframe,100) .eq. 0) then
-            write (iout,190)  nframe
-  190       format (4x,'Processing Coordinate Frame',i13)
+            write (iout,130)  nframe
+  130       format (4x,'Processing Coordinate Frame',i13)
          end if
 c
 c     unfold each molecule to get its corrected center of mass
@@ -268,37 +233,20 @@ c
                yold = ycm(i,nframe-1)
                zold = zcm(i,nframe-1)
             end if
-            dx = xmid - xold
-            dy = ymid - yold
-            dz = zmid - zold
-            do while (dx .gt. xbox2)
-               dx = dx - xbox
-            end do
-            do while (dx .lt. -xbox2)
-               dx = dx + xbox
-            end do
-            do while (dy .gt. ybox2)
-               dy = dy - ybox
-            end do
-            do while (dy .lt. -ybox2)
-               dy = dy + ybox
-            end do
-            do while (dz .gt. zbox2)
-               dz = dz - zbox
-            end do
-            do while (dz .lt. -zbox2)
-               dz = dz + zbox
-            end do
-            xcm(i,nframe) = xold + dx
-            ycm(i,nframe) = yold + dy
-            zcm(i,nframe) = zold + dz
+            xr = xmid - xold
+            yr = ymid - yold
+            zr = zmid - zold
+            if (use_bounds)  call image (xr,yr,zr)
+            xcm(i,nframe) = xold + xr
+            ycm(i,nframe) = yold + yr
+            zcm(i,nframe) = zold + zr
          end do
       end do
-  200 continue
+  140 continue
       close (unit=iarc)
       if (mod(nframe,100) .ne. 0) then
-         write (iout,210)  nframe
-  210    format (4x,'Processing Coordinate Frame',i13)
+         write (iout,150)  nframe
+  150    format (4x,'Processing Coordinate Frame',i13)
       end if
 c
 c     increment the squared displacements for each frame pair
@@ -343,8 +291,8 @@ c
 c
 c     estimate the diffusion constant via the Einstein relation
 c
-      write (iout,220)
-  220 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
+      write (iout,160)
+  160 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
      &           ' Constant :',
      &        //,5x,'Time Step',5x,'X MSD',7x,'Y MSD',7x,'Z MSD',
      &           7x,'R MSD',4x,'Diff Const',/)
@@ -355,8 +303,8 @@ c
          zvalue = zmsd(i) / 2.0d0
          rvalue = (xmsd(i) + ymsd(i) + zmsd(i)) / 6.0d0
          dvalue = rvalue / delta
-         write (iout,230)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
-  230    format (f12.2,4f12.2,f12.4)
+         write (iout,170)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
+  170    format (f12.2,4f12.2,f12.4)
       end do
 c
 c     perform deallocation of some local arrays

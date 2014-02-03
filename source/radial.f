@@ -89,7 +89,6 @@ c
       iarc = freeunit ()
       open (unit=iarc,file=arcfile,status='old')
       call readxyz (iarc)
-      rewind (unit=iarc)
 c
 c     get the unitcell parameters and number of molecules
 c
@@ -186,9 +185,11 @@ c
          if (rmax .le. 0.0d0)  rmax = 10.0d0
       else if (octahedron) then
          rmax = (sqrt(3.0d0)/4.0d0) * xbox
+         rmax = 0.95d0 * rmax
       else
          rmax = min(xbox2*beta_sin*gamma_sin,ybox2*gamma_sin,
      &                         zbox2*beta_sin)
+         rmax = 0.95d0 * rmax
       end if
 c
 c     get the desired width of the radial distance bins
@@ -227,25 +228,25 @@ c
 c
 c     count the number of coordinate frames in the archive file
 c
+      abort = .false.
+      rewind (unit=iarc)
       nframe = 0
-      do while (.true.)
-         do i = 1, n+1
-            read (iarc,*,err=190,end=190)
-         end do
+      do while (.not. abort)
+         call readxyz (iarc)
          nframe = nframe + 1
       end do
-  190 continue
+      nframe = nframe - 1
       rewind (unit=iarc)
       stop = min(nframe,stop)
       nframe = (stop-start)/step + 1
-      write (iout,200)  nframe
-  200 format (/,' Number of Coordinate Frames :',i14)
+      write (iout,190)  nframe
+  190 format (/,' Number of Coordinate Frames :',i14)
 c
 c     set the number of distance bins to be accumulated
 c
       nbin = int(rmax/width)
-      write (*,210)  nbin
-  210 format (' Number of Distance Bins :',i18)
+      write (*,200)  nbin
+  200 format (' Number of Distance Bins :',i18)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -263,25 +264,23 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,220)
-  220 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,210)
+  210 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
       do while (iframe.ge.start .and. iframe.le.stop)
-         skip = (skip-1) * (n+1)
-         do j = 1, skip
-            read (iarc,*,err=230,end=230)
+         do j = 1, skip-1
+            call readxyz (iarc)
          end do
-  230    continue
          iframe = iframe + step
          skip = step
          call readxyz (iarc)
          if (.not. abort) then
             nframe = nframe + 1
             if (mod(nframe,100) .eq. 0) then
-               write (iout,240)  nframe
-  240          format (4x,'Processing Coordinate Frame',i13)
+               write (iout,220)  nframe
+  220          format (4x,'Processing Coordinate Frame',i13)
             end if
             do j = 1, n
                if (name(j).eq.namej .or. type(j).eq.typej) then
@@ -291,15 +290,17 @@ c
                   molj = molcule(j)
                   do k = 1, n
                      if (name(k).eq.namek .or. type(k).eq.typek) then
-                        molk = molcule(k)
-                        if (intramol .or. molj.ne.molk) then
-                           dx = x(k) - xj
-                           dy = y(k) - yj
-                           dz = z(k) - zj
-                           call image (dx,dy,dz)
-                           rjk = sqrt(dx*dx + dy*dy + dz*dz)
-                           bin = int(rjk/width) + 1
-                           hist(bin) = hist(bin) + 1
+                        if (j .ne. k) then
+                           molk = molcule(k)
+                           if (intramol .or. molj.ne.molk) then
+                              dx = x(k) - xj
+                              dy = y(k) - yj
+                              dz = z(k) - zj
+                              call image (dx,dy,dz)
+                              rjk = sqrt(dx*dx + dy*dy + dz*dz)
+                              bin = int(rjk/width) + 1
+                              hist(bin) = hist(bin) + 1
+                           end if
                         end if
                      end if
                   end do
@@ -316,8 +317,8 @@ c
       end if
       close (unit=iarc)
       if (mod(nframe,100) .ne. 0) then
-         write (iout,250)  nframe
-  250    format (4x,'Processing Coordinate Frame',i13)
+         write (iout,230)  nframe
+  230    format (4x,'Processing Coordinate Frame',i13)
       end if
 c
 c     count the number of occurrences of each atom type
@@ -370,23 +371,23 @@ c
 c
 c     output the final radial distribution function results
 c
-      write (iout,260)  labelj,labelk
-  260 format (/,' Pairwise Radial Distribution Function :'
+      write (iout,240)  labelj,labelk
+  240 format (/,' Pairwise Radial Distribution Function :'
      &        //,7x,'First Name or Type :  ',a6,
      &           5x,'Second Name or Type :  ',a6)
-      write (iout,270)
-  270 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
+      write (iout,250)
+  250 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
      &           4x,'Smooth g(r)',/)
       do i = 1, nbin
-         write (iout,280)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
-  280    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
+         write (iout,260)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
+  260    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (hist)
-      deallocate (gr)
-      deallocate (gs)
+c     deallocate (hist)
+c     deallocate (gr)
+c     deallocate (gs)
 c
 c     perform any final tasks before program exit
 c
