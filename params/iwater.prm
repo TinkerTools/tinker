@@ -21,6 +21,7 @@ radiussize              DIAMETER
 epsilonrule             HHG
 dielectric              1.0
 polarization            DIRECT
+vdw-12-scale            0.0
 vdw-13-scale            0.0
 vdw-14-scale            1.0
 vdw-15-scale            1.0
@@ -50,9 +51,9 @@ mutual-14-scale         1.0
       #############################
 
 
-L.-P. Wang, T. Head-Gordon, J. W. Ponder, P. Ren, J. D. Chodera,
-P. K. Eastman, T. J. Martinez and V. S. Pande, "A Systematic Improvement
-on the Molecular Description of Water", to be submitted, March 2013
+L.-P. Wang, T. L. Head-Gordon, J. W. Ponder, P. Ren, J. D. Chodera,
+P. K. Eastman, T. J. Martinez and V. S. Pande, "Systematic Improvement
+of a Classical Model of Water", J. Phys. Chem. B, 117, 9956-9972 (2013)
 
 
       #############################
@@ -119,13 +120,13 @@ multipole     1   -2   -2              -0.59402
                                         0.22618
                                         0.00000   -0.32244
                                         0.00000    0.00000    0.09626
-     
+
 multipole     2    1    2               0.29701
                                        -0.09391    0.00000   -0.12560
                                         0.18754
                                         0.00000    0.02174
                                        -0.03635    0.00000   -0.20928
-     
+
 
       ########################################
       ##                                    ##
