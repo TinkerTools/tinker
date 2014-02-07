@@ -225,6 +225,7 @@ c
             end do
          end if
       end if
+
 c
 c     initialize any holonomic constraints and setup dynamics
 c
@@ -261,9 +262,13 @@ c
          write (iout,390)
   390    format (/,' Molecular Dynamics Trajectory via',
      &              ' r-RESPA MTS Algorithm')
-      else
+      else if (integrate .eq. 'STOCH-ISOK') then
          write (iout,400)
   400    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Stochastic Isokinetic Algorithm')
+      else
+         write (iout,410)
+  410    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -284,6 +289,8 @@ c
             call rgdstep (istep,dt)
          else if (integrate .eq. 'RESPA') then
             call respa (istep,dt)
+         else if (integrate .eq. 'STOCH-ISOK') then
+            call stochisok (istep,dt)
          else
             call beeman (istep,dt)
          end if
