@@ -76,35 +76,11 @@ c
          end if
       end do
 
-c
-c   print some velocities and v_1j
-c
-
-c      do i = 1, 2
-c         do j = 1, 3
-c            write (iout,10) v(j,i)
-c            do k = 1, len_nhc
-c               write (iout,10) v_iso1(k,j,i)
-c            end do
-c         end do
-c      end do
-10    format (3f16.6) 
-
-      do i = 1, 1
-         do j = 1, 1
-            tempstor = mass(i)*v(j,i)*v(j,i)
-            do k = 1, len_nhc
-               tempstor = tempstor + dble(len_nhc)*q_iso1(k,j,i)*
-     &         v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_nhc+1)
-            end do
-            write (iout,10) tempstor/LkT  
-         end do
-      end do    
 
 c
 c    {v1-v2} evolution and Nose-like isokinetic term
 c
-      call applyisok (dt_2)
+      call applyisok (dt)
 c
 c    Random noise
 c
@@ -157,7 +133,7 @@ c
 c
 c    {v1-v2} evolution and Nose-like isokinetic term
 c
-      call applyisok (dt_2)
+      call applyisok (dt)
 
 c
 c     perform deallocation of some local arrays
@@ -173,7 +149,7 @@ c
 
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-        
+      etot = eksum + epot
 c
 c     compute statistics and save trajectory for this step
 c
@@ -216,8 +192,6 @@ c
 
       kBT = boltzmann*kelvin
       LkT = len_nhc*kBT
-c      write (*,40) dt
-40    format (3f16.6)       
 
 
       nc = 5
@@ -283,15 +257,7 @@ c
 
          end do
       end do
-c      do i = 1, 1
-c         do j = 1, 1
-c            write (*,10) v(j,i)
-c            do k = 1, len_nhc
-c               write (*,10) v_iso1(k,j,i)
-c            end do
-c         end do
-c      end do
-10    format (3f16.6)
+
       return
       end
 c
@@ -333,9 +299,7 @@ c
             isoB = mass(iatom)*a(ixyz,iatom)*a(ixyz,iatom)/LkT
             rootB = sqrt(isoB)
             arg = dt_2*rootB
-c            write (*,10) isoA
-c            write (*,10) isoB
-c            write (*,10) LkT
+
             if (arg > 0.00001) then
                iso_s = (1.0/rootB)*sinh(arg) + 
      &             (isoA/isoB)*(cosh(arg)-1.0)
@@ -346,6 +310,7 @@ c            write (*,10) LkT
                iso_sdot = (((isoB*isoA/6.0)*dt_2 +0.5*isoB)*dt_2 + 
      &             isoA)*dt_2 + 1.0
             end if
+
             v(ixyz,iatom) = (v(ixyz,iatom) + (a(ixyz,iatom))*iso_s)
      &       /iso_sdot
             do inhc = 1, len_nhc
@@ -353,16 +318,6 @@ c            write (*,10) LkT
             end do
          end do
       end do
-
-c      do i = 1, 1
-c         do j = 1, 1
-c            write (*,10) v(j,i)
-c            do k = 1, len_nhc
-c               write (*,10) v_iso1(k,j,i)
-c            end do
-c         end do
-c      end do
-10    format (3f16.6)      
 
       return
       end
@@ -410,37 +365,4 @@ c
       end do
 
       return
-      end
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine checkisok                                        ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c
-c
-      subroutine checkisok 
-      implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'freeze.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
-      real*8 dt,dt_2,kBT
-      real*8 gamma,stoch_e,sigma
-      real*8 normal
-      integer iatom,inhc,ixyz
-
-      kBT = boltzmann*kelvin
-      gamma = 1.0 / (20.0*dt)
-      sigma = sqrt(kBT* (1.0-exp(-2.0*gamma*dt) )/q_iso2(1,1,1) )
-      stoch_e = exp(-gamma*dt)
-
-      return 
       end
