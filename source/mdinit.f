@@ -155,7 +155,8 @@ c
             read (string,*,err=10,end=10)  isok_M    
          else if (keyword(1:11) .eq. 'NHC-LENGTH ') then
             read (string,*,err=10,end=10)  len_nhc     
-
+         else if (keyword(1:6) .eq. 'NRESPA ') then
+            read (string,*,err=10,end=10)  nrespa    
          end if
    10    continue
       end do
