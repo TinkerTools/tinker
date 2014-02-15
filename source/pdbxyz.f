@@ -73,7 +73,7 @@ c
                   end if
                end do
                biopoly = .false.
-               goto 30
+               goto 20
    10          continue
             end if
          else if (pdbtyp(i) .eq. 'HETATM') then
@@ -85,15 +85,11 @@ c
      &             resname.eq.'CA ' .or. resname.eq.'CL ') then
                   biopoly = .true.
                   pdbtyp(i) = 'HETATM'
-                  goto 20
                end if
-               biopoly = .false.
-               goto 30
-   20          continue
             end if
          end if
       end do
-   30 continue
+   20 continue
 c
 c     open the TINKER coordinates file to be used for output
 c

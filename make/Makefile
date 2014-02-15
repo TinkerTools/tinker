@@ -1151,7 +1151,7 @@ deflate.o: iounit.i
 delete.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
 diagq.o:
 diffeq.o: atoms.i iounit.i math.i sizes.i warp.i
-diffuse.o: atmtyp.i atoms.i boxes.i iounit.i molcul.i sizes.i usage.i
+diffuse.o: atmtyp.i atoms.i bound.i inform.i iounit.i molcul.i sizes.i usage.i
 distgeom.o: angle.i atmtyp.i atoms.i bond.i couple.i disgeo.i files.i inform.i iounit.i kgeoms.i kvdws.i math.i refer.i sizes.i tors.i
 document.o: iounit.i
 dynamic.o: atoms.i bath.i bond.i bound.i inform.i iounit.i keys.i mdstuf.i potent.i sizes.i solute.i stodyn.i usage.i
@@ -1450,7 +1450,7 @@ sybylxyz.o: files.i iounit.i titles.i
 temper.o: atmtyp.i atoms.i bath.i group.i mdstuf.i molcul.i moldyn.i rgddyn.i sizes.i units.i usage.i
 testgrad.o: atoms.i deriv.i energi.i files.i inform.i inter.i iounit.i sizes.i solute.i usage.i
 testhess.o: atoms.i files.i hescut.i inform.i iounit.i sizes.i usage.i
-testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i potent.i sizes.i vdwpot.i
+testpair.o: atoms.i cutoff.i deriv.i energi.i inform.i iounit.i light.i neigh.i polpot.i potent.i sizes.i tarray.i vdwpot.i
 testpol.o: atoms.i bound.i cutoff.i inform.i iounit.i polar.i polpot.i potent.i rigid.i sizes.i units.i
 testrot.o: domega.i energi.i inform.i iounit.i math.i omega.i sizes.i zcoord.i
 timer.o: atoms.i cutoff.i hescut.i inform.i iounit.i sizes.i

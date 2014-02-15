@@ -25,7 +25,8 @@ c
       include 'output.i'
       integer maxmap
       parameter (maxmap=100000)
-      integer ixyz,lext,freeunit
+      integer i,ixyz
+      integer lext,freeunit
       integer nmap,niter,neigen
       real*8 minimum,grdmin,range
       real*8 emap(maxmap)
@@ -116,12 +117,21 @@ c
          niter = niter + 1
          write (iout,110)  niter
   110    format (/,' Normal Mode Local Search',7x,'Minimum',i7,/)
-         lext = 3
-         call numeral (niter,ext,lext)
          ixyz = freeunit ()
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
-         call version (xyzfile,'old')
-         open (unit=ixyz,file=xyzfile,status='old')
+         if (archive) then
+            xyzfile = filename(1:leng)
+            call suffix (xyzfile,'arc','old')
+            open (unit=ixyz,file=xyzfile,status='old')
+            do i = 1, niter-1
+               call readxyz (ixyz)
+            end do
+         else
+            lext = 3
+            call numeral (niter,ext,lext)
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
+            call version (xyzfile,'old')
+            open (unit=ixyz,file=xyzfile,status='old')
+         end if
          call readxyz (ixyz)
          close (unit=ixyz)
          call modesrch (nmap,emap,range,neigen,grdmin)
@@ -150,12 +160,13 @@ c
       include 'files.i'
       include 'inform.i'
       include 'iounit.i'
+      include 'output.i'
       integer i,ixyz,lext
       integer nmap,freeunit
       real*8 minimum,grdmin
       real*8 delta,eps,range
       real*8 emap(*)
-      logical unique
+      logical unique,exist
       character*7 ext
       character*120 xyzfile
 c
@@ -191,12 +202,23 @@ c
 c
 c     write the coordinates of the new minimum to a file
 c
-         lext = 3
-         call numeral (nmap,ext,lext)
          ixyz = freeunit ()
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
-         call version (xyzfile,'new')
-         open (unit=ixyz,file=xyzfile,status='new')
+         if (archive) then
+            xyzfile = filename(1:leng)
+            call suffix (xyzfile,'arc','old')
+            inquire (file=xyzfile,exist=exist)
+            if (exist) then
+               call openend (ixyz,xyzfile)
+            else
+               open (unit=ixyz,file=xyzfile,status='new')
+            end if
+         else
+            lext = 3
+            call numeral (nmap,ext,lext)
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
+            call version (xyzfile,'new')
+            open (unit=ixyz,file=xyzfile,status='new')
+         end if
          call prtxyz (ixyz)
          close (unit=ixyz)
       end if

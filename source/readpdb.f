@@ -626,6 +626,7 @@ c
       if (resname .eq. 'H2O')  resname = 'HOH'
       if (resname .eq. 'WAT')  resname = 'HOH'
       if (resname .eq. 'TIP')  resname = 'HOH'
+      if (resname .eq. 'DOD')  resname = 'HOH'
 c
 c     decide whether residue is protein or nucleic acid
 c
@@ -637,9 +638,12 @@ c
          if (resname .eq. nuclz(i))  restype = 'NUCLEIC'
       end do
 c
-c     convert any generically used unusual atom names
+c     convert unusual names common to many protein residues
 c
-      if (atmname .eq. ' HN ')  atmname = ' H  '
+      if (restype .eq. 'PROTEIN') then
+         if (atmname .eq. ' HN ')  atmname = ' H  '
+         if (atmname .eq. ' D  ')  atmname = ' H  '
+      end if
 c
 c     convert unusual names in protein terminal residues
 c
@@ -1094,10 +1098,15 @@ c
          if (atmname .eq. ' OT ')  atmname = ' O  '
          if (atmname .eq. ' OW ')  atmname = ' O  '
          if (atmname .eq. ' OH2')  atmname = ' O  '
+         if (atmname .eq. ' OD2')  atmname = ' O  '
          if (atmname .eq. ' HT ')  atmname = ' H  '
          if (atmname .eq. ' HW ')  atmname = ' H  '
          if (atmname .eq. ' H1 ')  atmname = ' H  '
          if (atmname .eq. ' H2 ')  atmname = ' H  '
+         if (atmname .eq. ' DT ')  atmname = ' H  '
+         if (atmname .eq. ' DW ')  atmname = ' H  '
+         if (atmname .eq. ' D1 ')  atmname = ' H  '
+         if (atmname .eq. ' D2 ')  atmname = ' H  '
       end if
       return
       end
