@@ -3,8 +3,8 @@
                   TINKER -- Software Tools for Molecular Design
                   ---------------------------------------------
 
-                           Version 6.2   February 2013
-                   Copyright (C) 1990-2013  Jay William Ponder
+                           Version 6.3   February 2014
+                   Copyright (C) 1990-2014  Jay William Ponder
 
 TINKER is a modular program package for molecular mechanics-based potential
 energy calculations, geometry optimization, molecular dynamics simulation,
@@ -14,22 +14,22 @@ distance geometry and structural analysis.
 Selected References for the TINKER Package
 ------------------------------------------
 
-P. Ren, C. Wu and J. W. Ponder, J. Chem. Theory Comput., 7, 3143-3161 (2011)
+(1)  Y. Shi, et al., J. Chem. Theory Comput., 9, 4046-4063 (2013)
 
-M. J. Schnieders and J. W. Ponder, J. Chem. Theory Comput., 3, 2083-2097 (2007)
+(2)  P. Ren, C. Wu and J. W. Ponder, J. Chem. Theory Comput., 7, 3143-3161
+     (2011)
 
-P. Ren and J. W. Ponder, J. Phys. Chem. B, 107, 5933-5947 (2003)
+(3)  J. W. Ponder, et al., J. Phys. Chem. B, 114, 2549-2564 (2010)
 
-R. V. Pappu, R. K. Hart and J. W. Ponder, J. Phys. Chem. B, 102, 9725-9742
-   (1998)
+(4)  P. Ren and J. W. Ponder, J. Phys. Chem. B, 107, 5933-5947 (2003)
 
-M. E. Hodsdon, J. W. Ponder and D. P. Cistola, J. Mol. Biol., 264, 585-602
-   (1996)
+(5)  R. V. Pappu, R. K. Hart and J. W. Ponder, J. Phys. Chem. B, 102,
+     9725-9742 (1998)
 
-C. E. Kundrot, J. W. Ponder and F. M. Richards, J. Comput. Chem., 12, 402-409
-   (1991)
+(6)  C. E. Kundrot, J. W. Ponder and F. M. Richards, J. Comput. Chem., 12,
+     402-409 (1991)
 
-J. W. Ponder and F. M. Richards, J. Comput. Chem., 8, 1016-1024 (1987)
+(7)  J. W. Ponder and F. M. Richards, J. Comput. Chem., 8, 1016-1024 (1987)
 
 ----------------------------------------
 Conditions for Use of the TINKER Package
@@ -37,8 +37,8 @@ Conditions for Use of the TINKER Package
 
 The TINKER software is registered under U.S. Copyright Law. The source code
 was developed by the author and is distributed solely through the Department
-of Biochemistry and Molecular Biophysics at Washington University. Its use
-is subject to the following conditions:
+of Chemistry at Washington University in Saint Louis. Its use is subject to
+the following conditions:
 
 (1)  Use of this software is restricted to the individual, laboratory or
      organization to which it is supplied. The package and portions thereof
