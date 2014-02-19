@@ -266,9 +266,13 @@ c
          write (iout,400)
   400    format (/,' Molecular Dynamics Trajectory via',
      &              ' Stochastic Isokinetic Algorithm')
-      else
+      else if (integrate .eq. 'ISOKINETIC') then
          write (iout,410)
   410    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Isokinetic NHC Algorithm')  
+      else
+         write (iout,420)
+  420    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -289,6 +293,8 @@ c
             call rgdstep (istep,dt)
          else if (integrate .eq. 'RESPA') then
             call respa (istep,dt)
+         else if (integrate .eq. 'ISOKINETIC') then
+            call isokinetic (istep,dt)
          else if (integrate .eq. 'STOCH-ISOK') then
             call stochisok (istep,dt)
          else

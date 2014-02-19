@@ -69,6 +69,8 @@ c
       use_pred = .false.
       polpred = 'LSQR'
       iprint = 100
+      nrespa = 1
+      len_nhc = 4
 c
 c     set default values for temperature and pressure control
 c
@@ -148,11 +150,7 @@ c
             call getword (record,volscale,next)
             call upcase (volscale)
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
-            read (string,*,err=10,end=10)  iprint
-         else if (keyword(1:6) .eq. 'ISOKL ') then
-            read (string,*,err=10,end=10)  isok_L                
-         else if (keyword(1:6) .eq. 'ISOKM ') then
-            read (string,*,err=10,end=10)  isok_M    
+            read (string,*,err=10,end=10)  iprint 
          else if (keyword(1:11) .eq. 'NHC-LENGTH ') then
             read (string,*,err=10,end=10)  len_nhc     
          else if (keyword(1:6) .eq. 'NRESPA ') then
@@ -399,7 +397,61 @@ c
          deallocate (derivs)
          if (nuse .eq. n)  call mdrest (0)
 
+c
+c     set physical and extended velocities,
+c     physical accelerations, and extended
+c     masses for isokinetic dynamics
+c
+      else if (integrate .eq. 'ISOKINETIC') then
+         kT = boltzmann*kelvin
+         len_isok=1
+         LkT = len_isok*kT
+         allocate (derivs(3,n))      
+         call gradient (e,derivs)
+         do i = 1, n
+               do j = 1, 3
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  do k = 1, len_nhc
+                     q_iso1(k,j,i) = kT*tautemp*tautemp
+                     q_iso2(k,j,i) = kT*tautemp*tautemp
+                     speed = maxwell (q_iso1(k,j,i),kelvin)
+                     call ranvec (vec)
+                     v_iso1(k,j,i) = speed * vec(1)
+                     v_iso2(k,j,i) = speed * vec(2)
+                  end do  
 
+                  v(j,i) = random () 
+                  do k = 1, len_isok
+                     v_iso1(k,j,i) = random ()
+                  end do
+                  tempstor = v(j,i) * v(j,i)
+                  do k = 1, len_isok
+                     tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
+                  end do
+                  tempstor = sqrt(tempstor)
+                  v(j,i) = v(j,i) / tempstor
+                  do k = 1, len_isok
+                     v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
+                  end do
+                  v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
+                  do k = 1, len_isok
+                     tempstor=(sqrt(q_iso1(k,j,i)
+     &                /(kT*dble(len_isok+1))))
+                     v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
+                  end do
+                  tempstor = mass(i)*v(j,i)*v(j,i)                      
+                  do k = 1, len_isok
+                     tempstor = tempstor + dble(len_isok)*q_iso1(k,j,i)*
+     &               v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_isok+1)
+                  end do
+                  do k = 1, len_nhc
+                  end do   
+
+               end do
+         end do
+         deallocate (derivs)
+         call prtdyn
+         if (nuse .eq. n)  call mdrest (0)
 
 c
 c     set physical and extended velocities,
@@ -442,7 +494,6 @@ c
                      tempstor = tempstor + dble(len_nhc)*q_iso1(k,j,i)*
      &               v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_nhc+1)
                   end do
-                  write (iout,94) tempstor/LkT            
                end do
          end do
          deallocate (derivs)

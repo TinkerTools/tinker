@@ -33,16 +33,15 @@ c
       include 'solute.i'
       include 'stodyn.i'
       include 'usage.i'
-
       integer i,j,k
       integer istep
-      integer nalt
-      real*8 dt,dt_2,tempstor
-      real*8 dta,dta_2,kBT,LkT
+      real*8 dt,dt_2
+      real*8 dta,dta_2
       real*8 epot,etot
       real*8 eksum,eps
       real*8 temp,pres
       real*8 ealt,dalt
+      real*8 kBT,LkT,tempstor,len_fac
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 viralt(3,3)
@@ -50,106 +49,196 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: derivs(:,:)
+
+
 c
 c
-c     set some time values for the dynamics integration
+c     set some values for the dynamics integration
 c
       dt_2 = 0.5d0 * dt
+      dta = dt / (dble(nrespa))
+      dta_2 = 0.5d0 * dta
+
       kBT = boltzmann*kelvin
       LkT = len_nhc*kBT
+      len_fac=dble(len_nhc)/dble(len_nhc+1)
+c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (derivs(3,n))
       allocate (xold(n))
       allocate (yold(n))
       allocate (zold(n))
-      allocate (derivs(3,n))
 
 c
-c     save atom positions
 c
-      do i = 1, n
-         if (use(i)) then
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-         end if
+c     initialize virial from fast-evolving potential energy terms
+c
+      do i = 1, 3
+         do j = 1, 3
+            viralt(j,i) = 0.0d0
+         end do
       end do
 
+c
+c
+c     begin inner RESPA loop
+c
+
+      do k = 1, nrespa
+            do i = 1, n
+                  if (use(i)) then         
+                        xold(i) = x(i)
+                        yold(i) = y(i) 
+                        zold(i) = z(i) 
+                  end if
+            end do
 
 c
-c    {v1-v2} evolution and Nose-like isokinetic term
 c
-      call applyisok (dt)
+c     nose-like isokinetic operator
 c
-c    Random noise
+            call applyisok (dta)
 c
-      call v2random (dt)
 c
-c    Force-like isokinetic term
+c     stochastic noise operator
+c      
+            call v2random (dta)
 c
-      call applyisok2 (dt)
+c
+c     force-like isokinetic operator
+c
+
+            call applyisok2 (dta)
 c
 c    Evolve positions
 c
-
-      if (use_rattle) then
-         do i = 1, n
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            x(i) = x(i) + v(1,i)*dt
-            y(i) = y(i) + v(2,i)*dt
-            z(i) = z(i) + v(3,i)*dt
-         end do
-         call rattle (dta,xold,yold,zold)
-      else
-         do i = 1, n
-            if (use(i)) then
-               x(i) = x(i) + v(1,i)*dt
-               y(i) = y(i) + v(2,i)*dt
-               z(i) = z(i) + v(3,i)*dt
+            if (use_rattle) then
+                  do i = 1, n
+                    xold(i) = x(i)
+                    yold(i) = y(i)
+                    zold(i) = z(i)
+                    x(i) = x(i) + v(1,i)*dta
+                    y(i) = y(i) + v(2,i)*dta
+                    z(i) = z(i) + v(3,i)*dta
+                  end do
+                  call rattle (dta,xold,yold,zold)
+            else
+                  do i = 1, n
+                    if (use(i)) then
+                        x(i) = x(i) + v(1,i)*dta
+                        y(i) = y(i) + v(2,i)*dta
+                        z(i) = z(i) + v(3,i)*dta
+                    end if
+                  end do
             end if
-         end do
-      end if
-
 c
 c     get the potential energy and atomic forces
 c
-      call gradient (epot,derivs)
+            if (k.eq.nrespa) then
+               call gradfast (ealt,derivs)
+
+               if (use_rattle) then
+                  do i = 1, n
+                     if (use(i)) then
+                        do j = 1, 3
+                           a(j,i) = -convert * derivs(j,i) / mass(i)
+                        end do
+                     end if
+                  end do
+                  call gradslow (epot,derivs)
+                  do i = 1, n
+                     do j = 1, 3
+                        a(j,i) = a(j,i) - ( nrespa * convert 
+     &                        * derivs(j,i) / mass(i) )
+                     end do
+                  end do
+                  call rattle2 (dta)
+               else
+                  do i = 1, n
+                     if (use(i)) then
+                        do j = 1, 3
+                           a(j,i) = -convert * derivs(j,i) / mass(i)
+                        end do
+                     end if
+                  end do
+                  call gradslow (epot,derivs)
+                  do i = 1, n
+                     do j = 1, 3
+                        a(j,i) = a(j,i) - ( nrespa * convert 
+     &                        * derivs(j,i) / mass(i) )
+                     end do
+                  end do                  
+               end if
+            
+            else 
+               call gradfast (ealt,derivs)
+               if (use_rattle) then
+                  do i = 1, n
+                     if (use(i)) then
+                        do j = 1, 3
+                           a(j,i) = -convert * derivs(j,i) / mass(i)
+                        end do
+                     end if
+                  end do
+                  call rattle2 (dta)
+               else
+                  do i = 1, n
+                     if (use(i)) then
+                        do j = 1, 3
+                           a(j,i) = -convert * derivs(j,i) / mass(i)
+                        end do
+                     end if
+                  end do
+               end if               
+            end if
 
 c
-c     use Newton's second law to get the next accelerations    
 c
-      do i = 1, n
-         do j = 1, 3
-            a(j,i) = -convert * derivs(j,i) / mass(i)
-         end do
+c     force-like isokinetic operator
+c
+            call applyisok2 (dta)
+c
+c
+c     nose-like isokinetic operator
+c
+            call applyisok (dta)
+
       end do
-c
-c    Force-like isokinetic term
-c
-      call applyisok2 (dt)
-c
-c    {v1-v2} evolution and Nose-like isokinetic term
-c
-      call applyisok (dt)
-
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (xold)
-      deallocate (yold)
-      deallocate (zold)
-      deallocate (derivs)
+ 
 c
 c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
+c
+c     total potential and virial from sum of fast and slow parts
+c
+      epot = epot + ealt
+      do i = 1, 3
+            do j = 1, 3
+                  vir(j,i) = vir(j,i) + viralt(j,i)
+            end do
+      end do
+
+
+c
+c     perform deallocation of some local arrays
+c
+
+      deallocate (derivs)    
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)  
+c
+c     total energy is sum of kinetic and potential energies
+c
+      etot = eksum + epot
 
       call kinetic (eksum,ekin)
+      call pressure (dt,epot,ekin,temp,pres,stress)      
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-      etot = eksum + epot  
+
 c
 c     compute statistics and save trajectory for this step
 c
@@ -159,6 +248,7 @@ c
       return
       end
 
+
 c
 c     ##################################################################
 c     ##                                                              ##
@@ -167,7 +257,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "applyisok" represents the Liuville operator iL_N in Leimkuhler, Margul, and Tuckerman (2013)
+c     "applyisok" represents the Liouville operator iL_N in Leimkuhler, Margul, and Tuckerman (2013)
 c
 c
       subroutine applyisok (dt)
@@ -191,8 +281,7 @@ c
       len_fac = dble(len_nhc)/dble(len_nhc+1)
 
       kBT = boltzmann*kelvin
-      LkT = len_nhc*kBT
-
+      LkT = (dble(len_nhc))*kBT    
 
       nc = 5
       ns = 3
@@ -257,6 +346,15 @@ c
 
          end do
       end do
+c      do i = 1, 1
+c         do j = 1, 1
+c            write (*,10) v(j,i)
+c            do k = 1, len_nhc
+c               write (*,10) v_iso1(k,j,i)
+c            end do
+c         end do
+c      end do
+10    format (3f16.6)
       return
       end
 c
@@ -289,7 +387,7 @@ c
 
       dt_2 = 0.5d0*dt
       kBT = boltzmann*kelvin
-      LkT = len_nhc*kBT
+      LkT = (dble(len_nhc))*kBT
 
 
       do iatom = 1, n
@@ -298,7 +396,9 @@ c
             isoB = mass(iatom)*a(ixyz,iatom)*a(ixyz,iatom)/LkT
             rootB = sqrt(isoB)
             arg = dt_2*rootB
-
+c            write (*,10) isoA
+c            write (*,10) isoB
+c            write (*,10) LkT
             if (arg > 0.00001) then
                iso_s = (1.0/rootB)*sinh(arg) + 
      &             (isoA/isoB)*(cosh(arg)-1.0)
@@ -309,7 +409,6 @@ c
                iso_sdot = (((isoB*isoA/6.0)*dt_2 +0.5*isoB)*dt_2 + 
      &             isoA)*dt_2 + 1.0
             end if
-
             v(ixyz,iatom) = (v(ixyz,iatom) + (a(ixyz,iatom))*iso_s)
      &       /iso_sdot
             do inhc = 1, len_nhc
@@ -317,6 +416,7 @@ c
             end do
          end do
       end do
+
 
       return
       end
@@ -348,8 +448,8 @@ c
       integer iatom,inhc,ixyz
 
       kBT = boltzmann*kelvin
-      gamma = 1.0 / (200.0*dt)
-      sigma = sqrt(kBT* (1.0-exp(-2.0*gamma*dt) )/q_iso2(1,1,1) )
+      gamma = 1.0d0 / (200.0d0*dt)
+      sigma = sqrt(kBT* (1.0d0-exp(-2.0d0*gamma*dt) )/q_iso2(1,1,1) )
       stoch_e = exp(-gamma*dt)
 
       do iatom = 1, n
