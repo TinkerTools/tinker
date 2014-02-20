@@ -20,14 +20,14 @@ c     velsave     logical flag to save velocity vector components
 c     frcsave     logical flag to save force vector components
 c     uindsave    logical flag to save induced atomic dipoles
 c     integrate   type of molecular dynamics integration algorithm
+c 	  nrespa      number of small time steps per large time step in RESPA
 c
-c
-      integer nfree,irest
+      integer nfree,irest,nrespa
       integer bmnmix
       logical dorest
       logical velsave
       logical frcsave
       logical uindsave
       character*11 integrate
-      common /mdstuf/ nfree,irest,bmnmix,dorest,velsave,frcsave,
+      common /mdstuf/ nfree,irest,nrespa,bmnmix,dorest,velsave,frcsave,
      &                uindsave,integrate
