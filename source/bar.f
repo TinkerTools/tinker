@@ -39,7 +39,7 @@ c
       include 'iounit.i'
       include 'keys.i'
       include 'units.i'
-      integer i,j,k,m
+      integer i,j,k
       integer n1,n2
       integer ixyz,nbst
       integer iter,maxiter
@@ -188,11 +188,9 @@ c
       call suffix (xyzfile,'xyz','old')
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
-      m = (n1+1) * (start1-1)
-      do i = 1, m
-         read (ixyz,*,err=90,end=90)
+      do i = 1, start1-1
+         call readxyz (ixyz)
       end do
-   90 continue
       call readxyz (ixyz)
       nkey = nkey1
       do i = 1, nkey
@@ -217,11 +215,9 @@ c
          k = k + 1
          call cutoffs
          ua0(j) = energy ()
-         m = (n1+1) * (step1-1)
-         do i = 1, m
-            read (ixyz,*,err=120,end=120)
+         do i = 1, step1-1
+            call readxyz (ixyz)
          end do
-  120    continue
          call readxyz (ixyz)
          k = k + step1 - 1
          if (k .ge. stop1)  abort = .true.
@@ -234,11 +230,9 @@ c
 c     reset trajectory A and process the initial structure
 c
       rewind (unit=ixyz)
-      m = (n1+1) * (start1-1)
-      do i = 1, m
-         read (ixyz,*,err=140,end=140)
+      do i = 1, start1-1
+         call readxyz (ixyz)
       end do
-  140 continue
       call readxyz (ixyz)
       nkey = nkey2
       do i = 1, nkey
@@ -260,11 +254,9 @@ c
          ua1(j) = energy ()
          write (iout,160)  k,ua0(j),ua1(j),ua1(j)-ua0(j)
   160    format (i11,2x,3f16.4)
-         m = (n1+1) * (step1-1)
-         do i = 1, m
-            read (ixyz,*,err=170,end=170)
+         do i = 1, step1-1
+            call readxyz (ixyz)
          end do
-  170    continue
          call readxyz (ixyz)
          k = k + step1 - 1
          if (k .ge. stop1)  abort = .true.
@@ -280,11 +272,9 @@ c
       call suffix (xyzfile,'xyz','old')
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
-      m = (n2+1) * (start2-1)
-      do i = 1, m
-         read (ixyz,*,err=180,end=180)
+      do i = 1, start2-1
+         call readxyz (ixyz)
       end do
-  180 continue
       call readxyz (ixyz)
       nkey = nkey1
       do i = 1, nkey
@@ -309,11 +299,9 @@ c
          k = k + 1
          call cutoffs
          ub0(j) = energy ()
-         m = (n2+1) * (step2-1)
-         do i = 1, m
-            read (ixyz,*,err=210,end=210)
+         do i = 1, step2-1
+            call readxyz (ixyz)
          end do
-  210    continue
          call readxyz (ixyz)
          k = k + step2 - 1
          if (k .ge. stop2)  abort = .true.
@@ -326,11 +314,9 @@ c
 c     reset trajectory B and process the initial structure
 c
       rewind (unit=ixyz)
-      m = (n2+1) * (start2-1)
-      do i = 1, m
-         read (ixyz,*,err=230,end=230)
+      do i = 1, start2-1
+         call readxyz (ixyz)
       end do
-  230 continue
       call readxyz (ixyz)
       nkey = nkey2
       do i = 1, nkey
@@ -352,11 +338,9 @@ c
          ub1(j) = energy ()
          write (iout,250)  k,ub0(j),ub1(j),ub0(j)-ub1(j)
   250    format (i11,2x,3f16.4)
-         m = (n2+1) * (step2-1)
-         do i = 1, m
-            read (ixyz,*,err=260,end=260)
+         do i = 1, step2-1
+            call readxyz (ixyz)
          end do
-  260    continue
          call readxyz (ixyz)
          k = k + step2 - 1
          if (k .ge. stop2)  abort = .true.
