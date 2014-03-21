@@ -1361,7 +1361,7 @@ molxyz.o: files.i iounit.i titles.i
 moments.o: atmtyp.i atoms.i bound.i charge.i cutoff.i dipole.i moment.i mpole.i polar.i potent.i rigid.i sizes.i solute.i units.i usage.i
 monte.o: atoms.i files.i inform.i iounit.i omega.i output.i sizes.i units.i usage.i zcoord.i
 mutate.o: atmtyp.i atoms.i charge.i inform.i iounit.i katoms.i keys.i mpole.i mutant.i polar.i potent.i sizes.i
-nblist.o: atoms.i bound.i boxes.i cell.i charge.i cutoff.i iounit.i light.i mpole.i neigh.i potent.i sizes.i vdw.i
+nblist.o: atoms.i bound.i boxes.i cell.i charge.i cutoff.i iounit.i light.i mpole.i neigh.i openmp.i potent.i sizes.i vdw.i
 newton.o: atoms.i files.i inform.i iounit.i keys.i sizes.i usage.i
 newtrot.o: files.i hescut.i inform.i iounit.i keys.i math.i omega.i sizes.i zcoord.i
 nextarg.o: argue.i
