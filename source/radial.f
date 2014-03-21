@@ -151,7 +151,7 @@ c
       typej = -1
       read (labelj,*,err=90,end=90)  typej
    90 continue
-      if (typej .lt. 0) then
+      if (typej .le. 0) then
          next = 1
          call gettext (labelj,namej,next)
       end if
@@ -159,7 +159,7 @@ c
       typek = -1
       read (labelk,*,err=100,end=100)  typek
   100 continue
-      if (typek .lt. 0) then
+      if (typek .le. 0) then
          next = 1
          call gettext (labelk,namek,next)
       end if

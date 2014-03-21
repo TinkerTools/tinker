@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  moldyn.i  --  velocity and acceleration on MD trajectory  ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  moldyn.i  --  velocity & acceleration for MD trajectory  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     v       current velocity of each atom along the x,y,z-axes

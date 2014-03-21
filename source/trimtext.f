@@ -56,6 +56,45 @@ c
       end
 c
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine trimhead  --  remove spaces before first text  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "trimhead" removes blank spaces before the first non-blank
+c     character in a text string by shifting the string to the left
+c
+c
+      subroutine trimhead (string)
+      implicit none
+      integer i,j,k
+      character*120 string
+      character*120 temp
+c
+c
+c     loop over characters, removing blank beginning spaces
+c
+      do i = 1, 120
+         temp(i:i) = ' '
+      end do
+      j = 0
+      k = 0
+      do i = 1, 120
+         if (string(i:i) .ne. ' ')  j = 1
+         if (j .eq. 1) then
+            k = k + 1
+            temp(k:k) = string(i:i)
+         end if
+      end do
+      do i = 1, 120
+         string(i:i) = temp(i:i)
+      end do
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine justify  --  convert string to right justified  ##
