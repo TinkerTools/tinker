@@ -50,6 +50,7 @@ c
       call initial
       call getpdb
       call field
+      call unitcell
 c
 c     decide whether the system has only biopolymers and water
 c
