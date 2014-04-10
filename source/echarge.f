@@ -611,7 +611,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn,ic,kc
-      real*8 e,fgrp
+      real*8 e,ect,fgrp
       real*8 r,r2,rb
       real*8 f,fi,fik
       real*8 xi,yi,zi
@@ -646,6 +646,20 @@ c
       f = electric / dielec
       mode = 'CHARGE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      ect = ec
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
+!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
+!$OMP& c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,off,off2,
+!$OMP& cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,ebuffer)
+!$OMP& firstprivate(cscale) shared(ect)
+!$OMP DO reduction(+:ect)
+!$OMP& schedule(guided)
 c
 c     calculate the charge interaction energy term
 c
@@ -730,7 +744,7 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-                  ec = ec + e
+                  ect = ect + e
                end if
             end if
          end do
@@ -750,6 +764,15 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ec = ect
 c
 c     perform deallocation of some local arrays
 c

@@ -22,6 +22,7 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'cutoff.i'
       include 'deriv.i'
       include 'energi.i'
       include 'math.i'
@@ -113,6 +114,8 @@ c
          call epb1
       else if (use_born) then
          if (use_smooth) then
+            call egb1c
+         else if (use_clist) then
             call egb1b
          else
             call egb1a
@@ -123,11 +126,11 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine egb1a  --  generalized Born energy and derivs  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine egb1a  --  GB energy and derivs via double loop  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "egb1a" calculates the generalized Born electrostatic energy
@@ -155,7 +158,7 @@ c
       integer i,k,ii,kk
       real*8 e,de,fgrp
       real*8 f,fi,fik
-      real*8 fgb,fgb2
+      real*8 fgb,fgb2,fgm
       real*8 rb2,rm2
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -169,6 +172,12 @@ c
       real*8 trans,dtrans
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 est,eintert
+      real*8 virt(3,3)
+      real*8, allocatable :: drb1(:)
+      real*8, allocatable :: drb2(:)
+      real*8, allocatable :: dest1(:,:)
+      real*8, allocatable :: dest2(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -183,6 +192,42 @@ c     set cutoff distances and switching function coefficients
 c
       mode = 'CHARGE'
       call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dest1(3,n))
+      allocate (dest2(3,n))
+      allocate (drb1(n))
+      allocate (drb2(n))
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = es
+      eintert = einter
+      do i = 1, n
+         dest1(1,i) = 0.0d0
+         dest1(2,i) = 0.0d0
+         dest1(3,i) = 0.0d0
+         dest2(1,i) = 0.0d0
+         dest2(2,i) = 0.0d0
+         dest2(3,i) = 0.0d0
+         drb1(i) = 0.0d0
+         drb2(i) = 0.0d0
+      end do
+      do i = 1, 3
+         virt(1,i) = vir(1,i)
+         virt(2,i) = vir(2,i)
+         virt(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
+!$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
+!$OMP% f0,f1,f2,f3,f4,f5,f6,f7,molcule)
+!$OMP& shared(est,eintert,dest1,dest2,drb1,drb2,virt)
+!$OMP DO reduction(+:est,eintert,dest1,dest2,drb1,drb2,virt)
+!$OMP& schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -225,7 +270,8 @@ c
 c     use energy switching if near the cutoff distance
 c
                   rm2 = (0.5d0 * (off+cut))**2
-                  shift = fik / sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
+                  fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
+                  shift = fik / fgm
                   e = e - shift
                   if (r2 .gt. cut2) then
                      r3 = r2 * r
@@ -259,25 +305,25 @@ c     increment the overall energy and derivative expressions
 c
                   if (i .eq. k) then
                      e = 0.5d0 * e
-                     es = es + e
+                     est = est + e
                      drbi = derb * rbk
-                     drb(i) = drb(i) + drbi
+                     drb1(i) = drb1(i) + drbi
                   else
-                     es = es + e
+                     est = est + e
                      de = de / r
                      dedx = de * xr
                      dedy = de * yr
                      dedz = de * zr
-                     des(1,i) = des(1,i) + dedx
-                     des(2,i) = des(2,i) + dedy
-                     des(3,i) = des(3,i) + dedz
-                     des(1,k) = des(1,k) - dedx
-                     des(2,k) = des(2,k) - dedy
-                     des(3,k) = des(3,k) - dedz
+                     dest1(1,i) = dest1(1,i) + dedx
+                     dest1(2,i) = dest1(2,i) + dedy
+                     dest1(3,i) = dest1(3,i) + dedz
+                     dest2(1,k) = dest2(1,k) - dedx
+                     dest2(2,k) = dest2(2,k) - dedy
+                     dest2(3,k) = dest2(3,k) - dedz
                      drbi = derb * rbk
                      drbk = derb * rbi
-                     drb(i) = drb(i) + drbi
-                     drb(k) = drb(k) + drbk
+                     drb1(i) = drb1(i) + drbi
+                     drb2(k) = drb2(k) + drbk
 c
 c     increment the internal virial tensor components
 c
@@ -287,25 +333,46 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     vir(1,1) = vir(1,1) + vxx
-                     vir(2,1) = vir(2,1) + vyx
-                     vir(3,1) = vir(3,1) + vzx
-                     vir(1,2) = vir(1,2) + vyx
-                     vir(2,2) = vir(2,2) + vyy
-                     vir(3,2) = vir(3,2) + vzy
-                     vir(1,3) = vir(1,3) + vzx
-                     vir(2,3) = vir(2,3) + vzy
-                     vir(3,3) = vir(3,3) + vzz
+                     virt(1,1) = virt(1,1) + vxx
+                     virt(2,1) = virt(2,1) + vyx
+                     virt(3,1) = virt(3,1) + vzx
+                     virt(1,2) = virt(1,2) + vyx
+                     virt(2,2) = virt(2,2) + vyy
+                     virt(3,2) = virt(3,2) + vzy
+                     virt(1,3) = virt(1,3) + vzx
+                     virt(2,3) = virt(2,3) + vzy
+                     virt(3,3) = virt(3,3) + vzz
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
+                     eintert = eintert + e
                   end if
                end if
             end if
          end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = est
+      einter = eintert
+      do i = 1, n
+         des(1,i) = des(1,i) + dest1(1,i) + dest2(1,i)
+         des(2,i) = des(2,i) + dest1(2,i) + dest2(2,i)
+         des(3,i) = des(3,i) + dest1(3,i) + dest2(3,i)
+         drb(i) = drb(i) + drb1(i) + drb2(i)
+      end do
+      do i = 1, 3
+         vir(1,i) = virt(1,i)
+         vir(2,i) = virt(2,i)
+         vir(3,i) = virt(3,i)
       end do
       return
       end
@@ -313,17 +380,279 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine egb1b  --  GB energy and derivs for smoothing  ##
+c     ##  subroutine egb1b  --  GB energy and derivs via pair list  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "egb1b" calculates the generalized Born energy and first
+c     "egb1b" calculates the generalized Born electrostatic energy
+c     and first derivatives of the GB/SA solvation models
+c
+c     note application of distance cutoff scaling directly to
+c     the Born radii chain rule term "derb" is an approximation
+c
+c
+      subroutine egb1b
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'charge.i'
+      include 'chgpot.i'
+      include 'deriv.i'
+      include 'energi.i'
+      include 'group.i'
+      include 'inter.i'
+      include 'molcul.i'
+      include 'neigh.i'
+      include 'shunt.i'
+      include 'solute.i'
+      include 'usage.i'
+      include 'virial.i'
+      integer i,k
+      integer ii,kk,kkk
+      real*8 e,de,fgrp
+      real*8 f,fi,fik
+      real*8 fgb,fgb2,fgm
+      real*8 rb2,rm2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,r3,r4
+      real*8 r5,r6,r7
+      real*8 dwater,rbi,rbk
+      real*8 dedx,dedy,dedz
+      real*8 derb,drbi,drbk
+      real*8 expterm,shift
+      real*8 taper,dtaper
+      real*8 trans,dtrans
+      real*8 vxx,vyy,vzz
+      real*8 vyx,vzx,vzy
+      real*8 est,eintert
+      real*8 virt(3,3)
+      real*8, allocatable :: drb1(:)
+      real*8, allocatable :: drb2(:)
+      real*8, allocatable :: dest1(:,:)
+      real*8, allocatable :: dest2(:,:)
+      logical proceed,usei
+      character*6 mode
+c
+c
+c     set the solvent dielectric and energy conversion factor
+c
+      if (nion .eq. 0)  return
+      dwater = 78.3d0
+      f = -electric * (1.0d0 - 1.0d0/dwater)
+c
+c     set cutoff distances and switching function coefficients
+c
+      mode = 'CHARGE'
+      call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dest1(3,n))
+      allocate (dest2(3,n))
+      allocate (drb1(n))
+      allocate (drb2(n))
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = es
+      eintert = einter
+      do i = 1, n
+         dest1(1,i) = 0.0d0
+         dest1(2,i) = 0.0d0
+         dest1(3,i) = 0.0d0
+         dest2(1,i) = 0.0d0
+         dest2(2,i) = 0.0d0
+         dest2(3,i) = 0.0d0
+         drb1(i) = 0.0d0
+         drb2(i) = 0.0d0
+      end do
+      do i = 1, 3
+         virt(1,i) = vir(1,i)
+         virt(2,i) = vir(2,i)
+         virt(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+c!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
+c!$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
+c!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,molcule)
+c!$OMP& shared(est,eintert,dest1,dest2,drb1,drb2,virt)
+c!$OMP DO reduction(+:est,eintert,dest1,dest2,drb1,drb2,virt)
+c!$OMP& schedule(guided)
+c
+c     calculate GB electrostatic polarization energy term
+c
+      do ii = 1, nion
+         i = iion(ii)
+         usei = use(i)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         fi = f * pchg(ii)
+         rbi = rborn(i)
+c
+c     calculate the self-energy term for the current atom
+c
+         fik = fi * pchg(ii)
+         rb2 = rbi * rbi
+         e = fik / rbi
+         derb = -0.5d0 * e / rb2
+         rm2 = (0.5d0 * (off+cut))**2
+         fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
+         shift = fik / fgm
+         e = e - shift
+         est = est + 0.5d0*e
+         drbi = derb * rbi
+         drb1(i) = drb1(i) + drbi
+c
+c     decide whether to compute the current interaction
+c
+         do kkk = 1, nelst(ii)
+            kk = elst(kkk,ii)
+            k = iion(kk)
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               xr = xi - x(k)
+               yr = yi - y(k)
+               zr = zi - z(k)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  rbk = rborn(k)
+                  fik = fi * pchg(kk)
+                  rb2 = rbi * rbk
+                  expterm = exp(-0.25d0*r2/rb2)
+                  fgb2 = r2 + rb2*expterm
+                  fgb = sqrt(fgb2)
+                  e = fik / fgb
+                  de = -e * (r-0.25d0*r*expterm) / fgb2
+                  derb = -e * expterm*(0.5d0+0.125d0*r2/rb2) / fgb2
+c
+c     use energy switching if near the cutoff distance
+c
+                  rm2 = (0.5d0 * (off+cut))**2
+                  fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
+                  shift = fik / fgm
+                  e = e - shift
+                  if (r2 .gt. cut2) then
+                     r3 = r2 * r
+                     r4 = r2 * r2
+                     r5 = r2 * r3
+                     r6 = r3 * r3
+                     r7 = r3 * r4
+                     taper = c5*r5 + c4*r4 + c3*r3
+     &                          + c2*r2 + c1*r + c0
+                     dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
+     &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                     trans = fik * (f7*r7 + f6*r6 + f5*r5 + f4*r4
+     &                               + f3*r3 + f2*r2 + f1*r + f0)
+                     dtrans = fik * (7.0d0*f7*r6 + 6.0d0*f6*r5
+     &                               + 5.0d0*f5*r4 + 4.0d0*f4*r3
+     &                             + 3.0d0*f3*r2 + 2.0d0*f2*r + f1)
+                     derb = derb * taper
+                     de = e*dtaper + de*taper + dtrans
+                     e = e*taper + trans
+                  end if
+c
+c     scale the interaction based on its group membership
+c
+                  if (use_group) then
+                     e = e * fgrp
+                     de = de * fgrp
+                     derb = derb * fgrp
+                  end if
+c
+c     increment the overall energy and derivative expressions
+c
+                  est = est + e
+                  de = de / r
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+                  dest1(1,i) = dest1(1,i) + dedx
+                  dest1(2,i) = dest1(2,i) + dedy
+                  dest1(3,i) = dest1(3,i) + dedz
+                  dest2(1,k) = dest2(1,k) - dedx
+                  dest2(2,k) = dest2(2,k) - dedy
+                  dest2(3,k) = dest2(3,k) - dedz
+                  drbi = derb * rbk
+                  drbk = derb * rbi
+                  drb1(i) = drb1(i) + drbi
+                  drb2(k) = drb2(k) + drbk
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  virt(1,1) = virt(1,1) + vxx
+                  virt(2,1) = virt(2,1) + vyx
+                  virt(3,1) = virt(3,1) + vzx
+                  virt(1,2) = virt(1,2) + vyx
+                  virt(2,2) = virt(2,2) + vyy
+                  virt(3,2) = virt(3,2) + vzy
+                  virt(1,3) = virt(1,3) + vzx
+                  virt(2,3) = virt(2,3) + vzy
+                  virt(3,3) = virt(3,3) + vzz
+c
+c     increment the total intermolecular energy
+c
+                  if (molcule(i) .ne. molcule(k)) then
+                     eintert = eintert + e
+                  end if
+               end if
+            end if
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+c!$OMP END DO
+c!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = est
+      einter = eintert
+      do i = 1, n
+         des(1,i) = des(1,i) + dest1(1,i) + dest2(1,i)
+         des(2,i) = des(2,i) + dest1(2,i) + dest2(2,i)
+         des(3,i) = des(3,i) + dest1(3,i) + dest2(3,i)
+         drb(i) = drb(i) + drb1(i) + drb2(i)
+      end do
+      do i = 1, 3
+         vir(1,i) = virt(1,i)
+         vir(2,i) = virt(2,i)
+         vir(3,i) = virt(3,i)
+      end do
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine egb1c  --  GB energy and derivs for smoothing  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "egb1c" calculates the generalized Born energy and first
 c     derivatives of the GB/SA solvation models for use with
 c     potential smoothing methods
 c
 c
-      subroutine egb1b
+      subroutine egb1c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -498,8 +827,20 @@ c
 c
       subroutine egk1
       implicit none
+      include 'sizes.i'
       include 'energi.i'
+      include 'potent.i'
+      include 'deriv.i'
+      integer i
 c
+c
+c     setup the multipoles for solvation only calculations
+c
+      if (.not.use_mpole .and. .not.use_polar) then
+         call chkpole
+         call rotpole
+         call induce
+      end if
 c
 c     compute the generalized Kirkwood energy and gradient
 c
@@ -540,7 +881,6 @@ c
       include 'mpole.i'
       include 'polar.i'
       include 'polpot.i'
-      include 'potent.i'
       include 'shunt.i'
       include 'solute.i'
       include 'usage.i'
@@ -579,7 +919,7 @@ c
       real*8 expc,dexpc
       real*8 expc1,expcdexpc
       real*8 expcr,dexpcr
-      real*8 dgfdR
+      real*8 dgfdr
       real*8 esym,ewi,ewk
       real*8 desymdx,dewidx,dewkdx
       real*8 desymdy,dewidy,dewkdy
@@ -619,13 +959,6 @@ c     set cutoff distances and switching function coefficients
 c
       mode = 'MPOLE'
       call switch (mode)
-c
-c     setup the multipoles for solvation only calculations
-c
-      if (.not.use_mpole .and. .not.use_polar) then
-         call chkpole
-         call rotpole
-      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -781,7 +1114,7 @@ c
                   a(0,3) = expc1*a(1,2) + expcdexpc*a(1,1)
                   a(1,3) = expc1*a(2,2) + expcdexpc*a(2,1)
                   a(2,3) = expc1*a(3,2) + expcdexpc*a(3,1)
-                  expcdexpc = -expc * dexpc**2
+                  expcdexpc = -expc * dexpc * dexpc
                   a(0,3) = a(0,3) + expcdexpc*a(1,0)
                   a(1,3) = a(1,3) + expcdexpc*a(2,0)
                   a(2,3) = a(2,3) + expcdexpc*a(3,0)
@@ -1175,336 +1508,336 @@ c
 c     electrostatic solvation energy of the permanent multipoles
 c     in their own GK reaction potential
 c
-                 esym = ci * ck * gc(1)
-     &                     - (uxi*(uxk*gux(2)+uyk*guy(2)+uzk*guz(2))
-     &                       +uyi*(uxk*gux(3)+uyk*guy(3)+uzk*guz(3))
-     &                       +uzi*(uxk*gux(4)+uyk*guy(4)+uzk*guz(4)))
-                 ewi = ci*(uxk*gc(2)+uyk*gc(3)+uzk*gc(4))
-     &                -ck*(uxi*gux(1)+uyi*guy(1)+uzi*guz(1))
-     &           +ci*(qxxk*gc(5)+qyyk*gc(8)+qzzk*gc(10)
-     &        +2.0d0*(qxyk*gc(6)+qxzk*gc(7)+qyzk*gc(9)))
-     &           +ck*(qxxi*gqxx(1)+qyyi*gqyy(1)+qzzi*gqzz(1)
-     &        +2.0d0*(qxyi*gqxy(1)+qxzi*gqxz(1)+qyzi*gqyz(1)))
-     &         - uxi*(qxxk*gux(5)+qyyk*gux(8)+qzzk*gux(10)
-     &        +2.0d0*(qxyk*gux(6)+qxzk*gux(7)+qyzk*gux(9)))
-     &         - uyi*(qxxk*guy(5)+qyyk*guy(8)+qzzk*guy(10)
-     &        +2.0d0*(qxyk*guy(6)+qxzk*guy(7)+qyzk*guy(9)))
-     &         - uzi*(qxxk*guz(5)+qyyk*guz(8)+qzzk*guz(10)
-     &        +2.0d0*(qxyk*guz(6)+qxzk*guz(7)+qyzk*guz(9)))
-     &         + uxk*(qxxi*gqxx(2)+qyyi*gqyy(2)+qzzi*gqzz(2)
-     &        +2.0d0*(qxyi*gqxy(2)+qxzi*gqxz(2)+qyzi*gqyz(2)))
-     &         + uyk*(qxxi*gqxx(3)+qyyi*gqyy(3)+qzzi*gqzz(3)
-     &        +2.0d0*(qxyi*gqxy(3)+qxzi*gqxz(3)+qyzi*gqyz(3)))
-     &         + uzk*(qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
-     &        +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
-     &        + qxxi*(qxxk*gqxx(5)+qyyk*gqxx(8)+qzzk*gqxx(10)
-     &        +2.0d0*(qxyk*gqxx(6)+qxzk*gqxx(7)+qyzk*gqxx(9)))
-     &        + qyyi*(qxxk*gqyy(5)+qyyk*gqyy(8)+qzzk*gqyy(10)
-     &        +2.0d0*(qxyk*gqyy(6)+qxzk*gqyy(7)+qyzk*gqyy(9)))
-     &        + qzzi*(qxxk*gqzz(5)+qyyk*gqzz(8)+qzzk*gqzz(10)
-     &        +2.0d0*(qxyk*gqzz(6)+qxzk*gqzz(7)+qyzk*gqzz(9)))
-     & + 2.0d0*(qxyi*(qxxk*gqxy(5)+qyyk*gqxy(8)+qzzk*gqxy(10)
-     &        +2.0d0*(qxyk*gqxy(6)+qxzk*gqxy(7)+qyzk*gqxy(9)))
-     &        + qxzi*(qxxk*gqxz(5)+qyyk*gqxz(8)+qzzk*gqxz(10)
-     &        +2.0d0*(qxyk*gqxz(6)+qxzk*gqxz(7)+qyzk*gqxz(9)))
-     &        + qyzi*(qxxk*gqyz(5)+qyyk*gqyz(8)+qzzk*gqyz(10)
-     &        +2.0d0*(qxyk*gqyz(6)+qxzk*gqyz(7)+qyzk*gqyz(9))))
-                 ewk = ci*(uxk*gux(1)+uyk*guy(1)+uzk*guz(1))
-     &                -ck*(uxi*gc(2)+uyi*gc(3)+uzi*gc(4))
-     &           +ci*(qxxk*gqxx(1)+qyyk*gqyy(1)+qzzk*gqzz(1)
-     &        +2.0d0*(qxyk*gqxy(1)+qxzk*gqxz(1)+qyzk*gqyz(1)))
-     &           +ck*(qxxi*gc(5)+qyyi*gc(8)+qzzi*gc(10)
-     &        +2.0d0*(qxyi*gc(6)+qxzi*gc(7)+qyzi*gc(9)))
-     &         - uxi*(qxxk*gqxx(2)+qyyk*gqyy(2)+qzzk*gqzz(2)
-     &        +2.0d0*(qxyk*gqxy(2)+qxzk*gqxz(2)+qyzk*gqyz(2)))
-     &         - uyi*(qxxk*gqxx(3)+qyyk*gqyy(3)+qzzk*gqzz(3)
-     &        +2.0d0*(qxyk*gqxy(3)+qxzk*gqxz(3)+qyzk*gqyz(3)))
-     &         - uzi*(qxxk*gqxx(4)+qyyk*gqyy(4)+qzzk*gqzz(4)
-     &        +2.0d0*(qxyk*gqxy(4)+qxzk*gqxz(4)+qyzk*gqyz(4)))
-     &         + uxk*(qxxi*gux(5)+qyyi*gux(8)+qzzi*gux(10)
-     &        +2.0d0*(qxyi*gux(6)+qxzi*gux(7)+qyzi*gux(9)))
-     &         + uyk*(qxxi*guy(5)+qyyi*guy(8)+qzzi*guy(10)
-     &        +2.0d0*(qxyi*guy(6)+qxzi*guy(7)+qyzi*guy(9)))
-     &         + uzk*(qxxi*guz(5)+qyyi*guz(8)+qzzi*guz(10)
-     &        +2.0d0*(qxyi*guz(6)+qxzi*guz(7)+qyzi*guz(9)))
-     &        + qxxi*(qxxk*gqxx(5)+qyyk*gqyy(5)+qzzk*gqzz(5)
-     &        +2.0d0*(qxyk*gqxy(5)+qxzk*gqxz(5)+qyzk*gqyz(5)))
-     &        + qyyi*(qxxk*gqxx(8)+qyyk*gqyy(8)+qzzk*gqzz(8)
-     &        +2.0d0*(qxyk*gqxy(8)+qxzk*gqxz(8)+qyzk*gqyz(8)))
-     &        + qzzi*(qxxk*gqxx(10)+qyyk*gqyy(10)+qzzk*gqzz(10)
-     &        +2.0d0*(qxyk*gqxy(10)+qxzk*gqxz(10)+qyzk*gqyz(10)))
-     & + 2.0d0*(qxyi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
-     &        +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
-     &        + qxzi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
-     &        +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
-     &        + qyzi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
-     &        +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9))))
+                  esym = ci * ck * gc(1)
+     &                   - (uxi*(uxk*gux(2)+uyk*guy(2)+uzk*guz(2))
+     &                     +uyi*(uxk*gux(3)+uyk*guy(3)+uzk*guz(3))
+     &                     +uzi*(uxk*gux(4)+uyk*guy(4)+uzk*guz(4)))
+                  ewi = ci*(uxk*gc(2)+uyk*gc(3)+uzk*gc(4))
+     &                 -ck*(uxi*gux(1)+uyi*guy(1)+uzi*guz(1))
+     &                 +ci*(qxxk*gc(5)+qyyk*gc(8)+qzzk*gc(10)
+     &                 +2.0d0*(qxyk*gc(6)+qxzk*gc(7)+qyzk*gc(9)))
+     &                 +ck*(qxxi*gqxx(1)+qyyi*gqyy(1)+qzzi*gqzz(1)
+     &                 +2.0d0*(qxyi*gqxy(1)+qxzi*gqxz(1)+qyzi*gqyz(1)))
+     &                 - uxi*(qxxk*gux(5)+qyyk*gux(8)+qzzk*gux(10)
+     &                 +2.0d0*(qxyk*gux(6)+qxzk*gux(7)+qyzk*gux(9)))
+     &                 - uyi*(qxxk*guy(5)+qyyk*guy(8)+qzzk*guy(10)
+     &                 +2.0d0*(qxyk*guy(6)+qxzk*guy(7)+qyzk*guy(9)))
+     &                 - uzi*(qxxk*guz(5)+qyyk*guz(8)+qzzk*guz(10)
+     &                 +2.0d0*(qxyk*guz(6)+qxzk*guz(7)+qyzk*guz(9)))
+     &                 + uxk*(qxxi*gqxx(2)+qyyi*gqyy(2)+qzzi*gqzz(2)
+     &                 +2.0d0*(qxyi*gqxy(2)+qxzi*gqxz(2)+qyzi*gqyz(2)))
+     &                 + uyk*(qxxi*gqxx(3)+qyyi*gqyy(3)+qzzi*gqzz(3)
+     &                 +2.0d0*(qxyi*gqxy(3)+qxzi*gqxz(3)+qyzi*gqyz(3)))
+     &                 + uzk*(qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
+     &                 +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
+     &                 + qxxi*(qxxk*gqxx(5)+qyyk*gqxx(8)+qzzk*gqxx(10)
+     &                 +2.0d0*(qxyk*gqxx(6)+qxzk*gqxx(7)+qyzk*gqxx(9)))
+     &                 + qyyi*(qxxk*gqyy(5)+qyyk*gqyy(8)+qzzk*gqyy(10)
+     &                 +2.0d0*(qxyk*gqyy(6)+qxzk*gqyy(7)+qyzk*gqyy(9)))
+     &                 + qzzi*(qxxk*gqzz(5)+qyyk*gqzz(8)+qzzk*gqzz(10)
+     &                 +2.0d0*(qxyk*gqzz(6)+qxzk*gqzz(7)+qyzk*gqzz(9)))
+     &           + 2.0d0*(qxyi*(qxxk*gqxy(5)+qyyk*gqxy(8)+qzzk*gqxy(10)
+     &                 +2.0d0*(qxyk*gqxy(6)+qxzk*gqxy(7)+qyzk*gqxy(9)))
+     &                 + qxzi*(qxxk*gqxz(5)+qyyk*gqxz(8)+qzzk*gqxz(10)
+     &                 +2.0d0*(qxyk*gqxz(6)+qxzk*gqxz(7)+qyzk*gqxz(9)))
+     &                 + qyzi*(qxxk*gqyz(5)+qyyk*gqyz(8)+qzzk*gqyz(10)
+     &                 +2.0d0*(qxyk*gqyz(6)+qxzk*gqyz(7)+qyzk*gqyz(9))))
+                  ewk = ci*(uxk*gux(1)+uyk*guy(1)+uzk*guz(1))
+     &                 -ck*(uxi*gc(2)+uyi*gc(3)+uzi*gc(4))
+     &                 +ci*(qxxk*gqxx(1)+qyyk*gqyy(1)+qzzk*gqzz(1)
+     &                 +2.0d0*(qxyk*gqxy(1)+qxzk*gqxz(1)+qyzk*gqyz(1)))
+     &                 +ck*(qxxi*gc(5)+qyyi*gc(8)+qzzi*gc(10)
+     &                 +2.0d0*(qxyi*gc(6)+qxzi*gc(7)+qyzi*gc(9)))
+     &                 - uxi*(qxxk*gqxx(2)+qyyk*gqyy(2)+qzzk*gqzz(2)
+     &                 +2.0d0*(qxyk*gqxy(2)+qxzk*gqxz(2)+qyzk*gqyz(2)))
+     &                 - uyi*(qxxk*gqxx(3)+qyyk*gqyy(3)+qzzk*gqzz(3)
+     &                 +2.0d0*(qxyk*gqxy(3)+qxzk*gqxz(3)+qyzk*gqyz(3)))
+     &                 - uzi*(qxxk*gqxx(4)+qyyk*gqyy(4)+qzzk*gqzz(4)
+     &                 +2.0d0*(qxyk*gqxy(4)+qxzk*gqxz(4)+qyzk*gqyz(4)))
+     &                 + uxk*(qxxi*gux(5)+qyyi*gux(8)+qzzi*gux(10)
+     &                 +2.0d0*(qxyi*gux(6)+qxzi*gux(7)+qyzi*gux(9)))
+     &                 + uyk*(qxxi*guy(5)+qyyi*guy(8)+qzzi*guy(10)
+     &                 +2.0d0*(qxyi*guy(6)+qxzi*guy(7)+qyzi*guy(9)))
+     &                 + uzk*(qxxi*guz(5)+qyyi*guz(8)+qzzi*guz(10)
+     &                 +2.0d0*(qxyi*guz(6)+qxzi*guz(7)+qyzi*guz(9)))
+     &                 + qxxi*(qxxk*gqxx(5)+qyyk*gqyy(5)+qzzk*gqzz(5)
+     &                 +2.0d0*(qxyk*gqxy(5)+qxzk*gqxz(5)+qyzk*gqyz(5)))
+     &                 + qyyi*(qxxk*gqxx(8)+qyyk*gqyy(8)+qzzk*gqzz(8)
+     &                 +2.0d0*(qxyk*gqxy(8)+qxzk*gqxz(8)+qyzk*gqyz(8)))
+     &                 + qzzi*(qxxk*gqxx(10)+qyyk*gqyy(10)+qzzk*gqzz(10)
+     &           +2.0d0*(qxyk*gqxy(10)+qxzk*gqxz(10)+qyzk*gqyz(10)))
+     &           + 2.0d0*(qxyi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
+     &                 +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
+     &                 + qxzi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
+     &                 +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
+     &                 + qyzi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
+     &                 +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9))))
 c
-              desymdx = ci * ck * gc(2)
-     &                     - (uxi*(uxk*gux(5)+uyk*guy(5)+uzk*guz(5))
-     &                       +uyi*(uxk*gux(6)+uyk*guy(6)+uzk*guz(6))
-     &                       +uzi*(uxk*gux(7)+uyk*guy(7)+uzk*guz(7)))
-              dewidx = ci*(uxk*gc(5)+uyk*gc(6)+uzk*gc(7))
-     &                -ck*(uxi*gux(2)+uyi*guy(2)+uzi*guz(2))
-     &           +ci*(qxxk*gc(11)+qyyk*gc(14)+qzzk*gc(16)
-     &        +2.0d0*(qxyk*gc(12)+qxzk*gc(13)+qyzk*gc(15)))
-     &           +ck*(qxxi*gqxx(2)+qyyi*gqyy(2)+qzzi*gqzz(2)
-     &        +2.0d0*(qxyi*gqxy(2)+qxzi*gqxz(2)+qyzi*gqyz(2)))
-     &         - uxi*(qxxk*gux(11)+qyyk*gux(14)+qzzk*gux(16)
-     &        +2.0d0*(qxyk*gux(12)+qxzk*gux(13)+qyzk*gux(15)))
-     &         - uyi*(qxxk*guy(11)+qyyk*guy(14)+qzzk*guy(16)
-     &        +2.0d0*(qxyk*guy(12)+qxzk*guy(13)+qyzk*guy(15)))
-     &         - uzi*(qxxk*guz(11)+qyyk*guz(14)+qzzk*guz(16)
-     &        +2.0d0*(qxyk*guz(12)+qxzk*guz(13)+qyzk*guz(15)))
-     &         + uxk*(qxxi*gqxx(5)+qyyi*gqyy(5)+qzzi*gqzz(5)
-     &        +2.0d0*(qxyi*gqxy(5)+qxzi*gqxz(5)+qyzi*gqyz(5)))
-     &         + uyk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
-     &        +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
-     &         + uzk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
-     &        +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
-     &        + qxxi*(qxxk*gqxx(11)+qyyk*gqxx(14)+qzzk*gqxx(16)
-     &        +2.0d0*(qxyk*gqxx(12)+qxzk*gqxx(13)+qyzk*gqxx(15)))
-     &        + qyyi*(qxxk*gqyy(11)+qyyk*gqyy(14)+qzzk*gqyy(16)
-     &        +2.0d0*(qxyk*gqyy(12)+qxzk*gqyy(13)+qyzk*gqyy(15)))
-     &        + qzzi*(qxxk*gqzz(11)+qyyk*gqzz(14)+qzzk*gqzz(16)
-     &        +2.0d0*(qxyk*gqzz(12)+qxzk*gqzz(13)+qyzk*gqzz(15)))
-     & + 2.0d0*(qxyi*(qxxk*gqxy(11)+qyyk*gqxy(14)+qzzk*gqxy(16)
-     &        +2.0d0*(qxyk*gqxy(12)+qxzk*gqxy(13)+qyzk*gqxy(15)))
-     &        + qxzi*(qxxk*gqxz(11)+qyyk*gqxz(14)+qzzk*gqxz(16)
-     &        +2.0d0*(qxyk*gqxz(12)+qxzk*gqxz(13)+qyzk*gqxz(15)))
-     &        + qyzi*(qxxk*gqyz(11)+qyyk*gqyz(14)+qzzk*gqyz(16)
-     &        +2.0d0*(qxyk*gqyz(12)+qxzk*gqyz(13)+qyzk*gqyz(15))))
-              dewkdx = ci*(uxk*gux(2)+uyk*guy(2)+uzk*guz(2))
-     &                -ck*(uxi*gc(5)+uyi*gc(6)+uzi*gc(7))
-     &           +ci*(qxxk*gqxx(2)+qyyk*gqyy(2)+qzzk*gqzz(2)
-     &        +2.0d0*(qxyk*gqxy(2)+qxzk*gqxz(2)+qyzk*gqyz(2)))
-     &           +ck*(qxxi*gc(11)+qyyi*gc(14)+qzzi*gc(16)
-     &        +2.0d0*(qxyi*gc(12)+qxzi*gc(13)+qyzi*gc(15)))
-     &         - uxi*(qxxk*gqxx(5)+qyyk*gqyy(5)+qzzk*gqzz(5)
-     &        +2.0d0*(qxyk*gqxy(5)+qxzk*gqxz(5)+qyzk*gqyz(5)))
-     &         - uyi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
-     &        +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
-     &         - uzi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
-     &        +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
-     &         + uxk*(qxxi*gux(11)+qyyi*gux(14)+qzzi*gux(16)
-     &        +2.0d0*(qxyi*gux(12)+qxzi*gux(13)+qyzi*gux(15)))
-     &         + uyk*(qxxi*guy(11)+qyyi*guy(14)+qzzi*guy(16)
-     &        +2.0d0*(qxyi*guy(12)+qxzi*guy(13)+qyzi*guy(15)))
-     &         + uzk*(qxxi*guz(11)+qyyi*guz(14)+qzzi*guz(16)
-     &        +2.0d0*(qxyi*guz(12)+qxzi*guz(13)+qyzi*guz(15)))
-     &        + qxxi*(qxxk*gqxx(11)+qyyk*gqyy(11)+qzzk*gqzz(11)
-     &        +2.0d0*(qxyk*gqxy(11)+qxzk*gqxz(11)+qyzk*gqyz(11)))
-     &        + qyyi*(qxxk*gqxx(14)+qyyk*gqyy(14)+qzzk*gqzz(14)
-     &        +2.0d0*(qxyk*gqxy(14)+qxzk*gqxz(14)+qyzk*gqyz(14)))
-     &        + qzzi*(qxxk*gqxx(16)+qyyk*gqyy(16)+qzzk*gqzz(16)
-     &        +2.0d0*(qxyk*gqxy(16)+qxzk*gqxz(16)+qyzk*gqyz(16)))
-     & + 2.0d0*(qxyi*(qxxk*gqxx(12)+qyyk*gqyy(12)+qzzk*gqzz(12)
-     &        +2.0d0*(qxyk*gqxy(12)+qxzk*gqxz(12)+qyzk*gqyz(12)))
-     &        + qxzi*(qxxk*gqxx(13)+qyyk*gqyy(13)+qzzk*gqzz(13)
-     &        +2.0d0*(qxyk*gqxy(13)+qxzk*gqxz(13)+qyzk*gqyz(13)))
-     &        + qyzi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
-     &        +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15))))
-               dedx = desymdx + 0.5d0*(dewidx + dewkdx)
+                  desymdx = ci * ck * gc(2)
+     &                      - (uxi*(uxk*gux(5)+uyk*guy(5)+uzk*guz(5))
+     &                        +uyi*(uxk*gux(6)+uyk*guy(6)+uzk*guz(6))
+     &                        +uzi*(uxk*gux(7)+uyk*guy(7)+uzk*guz(7)))
+                  dewidx = ci*(uxk*gc(5)+uyk*gc(6)+uzk*gc(7))
+     &                    -ck*(uxi*gux(2)+uyi*guy(2)+uzi*guz(2))
+     &                 +ci*(qxxk*gc(11)+qyyk*gc(14)+qzzk*gc(16)
+     &              +2.0d0*(qxyk*gc(12)+qxzk*gc(13)+qyzk*gc(15)))
+     &                 +ck*(qxxi*gqxx(2)+qyyi*gqyy(2)+qzzi*gqzz(2)
+     &              +2.0d0*(qxyi*gqxy(2)+qxzi*gqxz(2)+qyzi*gqyz(2)))
+     &                 - uxi*(qxxk*gux(11)+qyyk*gux(14)+qzzk*gux(16)
+     &              +2.0d0*(qxyk*gux(12)+qxzk*gux(13)+qyzk*gux(15)))
+     &                 - uyi*(qxxk*guy(11)+qyyk*guy(14)+qzzk*guy(16)
+     &              +2.0d0*(qxyk*guy(12)+qxzk*guy(13)+qyzk*guy(15)))
+     &                 - uzi*(qxxk*guz(11)+qyyk*guz(14)+qzzk*guz(16)
+     &              +2.0d0*(qxyk*guz(12)+qxzk*guz(13)+qyzk*guz(15)))
+     &                 + uxk*(qxxi*gqxx(5)+qyyi*gqyy(5)+qzzi*gqzz(5)
+     &              +2.0d0*(qxyi*gqxy(5)+qxzi*gqxz(5)+qyzi*gqyz(5)))
+     &                 + uyk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
+     &              +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
+     &                 + uzk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
+     &              +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
+     &                 + qxxi*(qxxk*gqxx(11)+qyyk*gqxx(14)+qzzk*gqxx(16)
+     &              +2.0d0*(qxyk*gqxx(12)+qxzk*gqxx(13)+qyzk*gqxx(15)))
+     &                 + qyyi*(qxxk*gqyy(11)+qyyk*gqyy(14)+qzzk*gqyy(16)
+     &              +2.0d0*(qxyk*gqyy(12)+qxzk*gqyy(13)+qyzk*gqyy(15)))
+     &                 + qzzi*(qxxk*gqzz(11)+qyyk*gqzz(14)+qzzk*gqzz(16)
+     &              +2.0d0*(qxyk*gqzz(12)+qxzk*gqzz(13)+qyzk*gqzz(15)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxy(11)+qyyk*gqxy(14)+qzzk*gqxy(16)
+     &              +2.0d0*(qxyk*gqxy(12)+qxzk*gqxy(13)+qyzk*gqxy(15)))
+     &                 + qxzi*(qxxk*gqxz(11)+qyyk*gqxz(14)+qzzk*gqxz(16)
+     &              +2.0d0*(qxyk*gqxz(12)+qxzk*gqxz(13)+qyzk*gqxz(15)))
+     &                 + qyzi*(qxxk*gqyz(11)+qyyk*gqyz(14)+qzzk*gqyz(16)
+     &              +2.0d0*(qxyk*gqyz(12)+qxzk*gqyz(13)+qyzk*gqyz(15))))
+                  dewkdx = ci*(uxk*gux(2)+uyk*guy(2)+uzk*guz(2))
+     &                    -ck*(uxi*gc(5)+uyi*gc(6)+uzi*gc(7))
+     &                 +ci*(qxxk*gqxx(2)+qyyk*gqyy(2)+qzzk*gqzz(2)
+     &              +2.0d0*(qxyk*gqxy(2)+qxzk*gqxz(2)+qyzk*gqyz(2)))
+     &                 +ck*(qxxi*gc(11)+qyyi*gc(14)+qzzi*gc(16)
+     &              +2.0d0*(qxyi*gc(12)+qxzi*gc(13)+qyzi*gc(15)))
+     &                 - uxi*(qxxk*gqxx(5)+qyyk*gqyy(5)+qzzk*gqzz(5)
+     &              +2.0d0*(qxyk*gqxy(5)+qxzk*gqxz(5)+qyzk*gqyz(5)))
+     &                 - uyi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
+     &              +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
+     &                 - uzi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
+     &              +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
+     &                 + uxk*(qxxi*gux(11)+qyyi*gux(14)+qzzi*gux(16)
+     &              +2.0d0*(qxyi*gux(12)+qxzi*gux(13)+qyzi*gux(15)))
+     &                 + uyk*(qxxi*guy(11)+qyyi*guy(14)+qzzi*guy(16)
+     &              +2.0d0*(qxyi*guy(12)+qxzi*guy(13)+qyzi*guy(15)))
+     &                 + uzk*(qxxi*guz(11)+qyyi*guz(14)+qzzi*guz(16)
+     &              +2.0d0*(qxyi*guz(12)+qxzi*guz(13)+qyzi*guz(15)))
+     &                 + qxxi*(qxxk*gqxx(11)+qyyk*gqyy(11)+qzzk*gqzz(11)
+     &              +2.0d0*(qxyk*gqxy(11)+qxzk*gqxz(11)+qyzk*gqyz(11)))
+     &                 + qyyi*(qxxk*gqxx(14)+qyyk*gqyy(14)+qzzk*gqzz(14)
+     &              +2.0d0*(qxyk*gqxy(14)+qxzk*gqxz(14)+qyzk*gqyz(14)))
+     &                 + qzzi*(qxxk*gqxx(16)+qyyk*gqyy(16)+qzzk*gqzz(16)
+     &              +2.0d0*(qxyk*gqxy(16)+qxzk*gqxz(16)+qyzk*gqyz(16)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxx(12)+qyyk*gqyy(12)+qzzk*gqzz(12)
+     &              +2.0d0*(qxyk*gqxy(12)+qxzk*gqxz(12)+qyzk*gqyz(12)))
+     &                 + qxzi*(qxxk*gqxx(13)+qyyk*gqyy(13)+qzzk*gqzz(13)
+     &              +2.0d0*(qxyk*gqxy(13)+qxzk*gqxz(13)+qyzk*gqyz(13)))
+     &                 + qyzi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
+     &              +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15))))
+                  dedx = desymdx + 0.5d0*(dewidx + dewkdx)
 c
-              desymdy = ci * ck * gc(3)
-     &                     - (uxi*(uxk*gux(6)+uyk*guy(6)+uzk*guz(6))
-     &                       +uyi*(uxk*gux(8)+uyk*guy(8)+uzk*guz(8))
-     &                       +uzi*(uxk*gux(9)+uyk*guy(9)+uzk*guz(9)))
-              dewidy = ci*(uxk*gc(6)+uyk*gc(8)+uzk*gc(9))
-     &                -ck*(uxi*gux(3)+uyi*guy(3)+uzi*guz(3))
-     &           +ci*(qxxk*gc(12)+qyyk*gc(17)+qzzk*gc(19)
-     &        +2.0d0*(qxyk*gc(14)+qxzk*gc(15)+qyzk*gc(18)))
-     &           +ck*(qxxi*gqxx(3)+qyyi*gqyy(3)+qzzi*gqzz(3)
-     &        +2.0d0*(qxyi*gqxy(3)+qxzi*gqxz(3)+qyzi*gqyz(3)))
-     &         - uxi*(qxxk*gux(12)+qyyk*gux(17)+qzzk*gux(19)
-     &        +2.0d0*(qxyk*gux(14)+qxzk*gux(15)+qyzk*gux(18)))
-     &         - uyi*(qxxk*guy(12)+qyyk*guy(17)+qzzk*guy(19)
-     &        +2.0d0*(qxyk*guy(14)+qxzk*guy(15)+qyzk*guy(18)))
-     &         - uzi*(qxxk*guz(12)+qyyk*guz(17)+qzzk*guz(19)
-     &        +2.0d0*(qxyk*guz(14)+qxzk*guz(15)+qyzk*guz(18)))
-     &         + uxk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
-     &        +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
-     &         + uyk*(qxxi*gqxx(8)+qyyi*gqyy(8)+qzzi*gqzz(8)
-     &        +2.0d0*(qxyi*gqxy(8)+qxzi*gqxz(8)+qyzi*gqyz(8)))
-     &         + uzk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
-     &        +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
-     &        + qxxi*(qxxk*gqxx(12)+qyyk*gqxx(17)+qzzk*gqxx(19)
-     &        +2.0d0*(qxyk*gqxx(14)+qxzk*gqxx(15)+qyzk*gqxx(18)))
-     &        + qyyi*(qxxk*gqyy(12)+qyyk*gqyy(17)+qzzk*gqyy(19)
-     &        +2.0d0*(qxyk*gqyy(14)+qxzk*gqyy(15)+qyzk*gqyy(18)))
-     &        + qzzi*(qxxk*gqzz(12)+qyyk*gqzz(17)+qzzk*gqzz(19)
-     &        +2.0d0*(qxyk*gqzz(14)+qxzk*gqzz(15)+qyzk*gqzz(18)))
-     & + 2.0d0*(qxyi*(qxxk*gqxy(12)+qyyk*gqxy(17)+qzzk*gqxy(19)
-     &        +2.0d0*(qxyk*gqxy(14)+qxzk*gqxy(15)+qyzk*gqxy(18)))
-     &        + qxzi*(qxxk*gqxz(12)+qyyk*gqxz(17)+qzzk*gqxz(19)
-     &        +2.0d0*(qxyk*gqxz(14)+qxzk*gqxz(15)+qyzk*gqxz(18)))
-     &        + qyzi*(qxxk*gqyz(12)+qyyk*gqyz(17)+qzzk*gqyz(19)
-     &        +2.0d0*(qxyk*gqyz(14)+qxzk*gqyz(15)+qyzk*gqyz(18))))
-              dewkdy = ci*(uxk*gux(3)+uyk*guy(3)+uzk*guz(3))
-     &                -ck*(uxi*gc(6)+uyi*gc(8)+uzi*gc(9))
-     &           +ci*(qxxk*gqxx(3)+qyyk*gqyy(3)+qzzk*gqzz(3)
-     &        +2.0d0*(qxyk*gqxy(3)+qxzk*gqxz(3)+qyzk*gqyz(3)))
-     &           +ck*(qxxi*gc(12)+qyyi*gc(17)+qzzi*gc(19)
-     &        +2.0d0*(qxyi*gc(14)+qxzi*gc(15)+qyzi*gc(18)))
-     &         - uxi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
-     &        +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
-     &         - uyi*(qxxk*gqxx(8)+qyyk*gqyy(8)+qzzk*gqzz(8)
-     &        +2.0d0*(qxyk*gqxy(8)+qxzk*gqxz(8)+qyzk*gqyz(8)))
-     &         - uzi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
-     &        +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
-     &         + uxk*(qxxi*gux(12)+qyyi*gux(17)+qzzi*gux(19)
-     &        +2.0d0*(qxyi*gux(14)+qxzi*gux(15)+qyzi*gux(18)))
-     &         + uyk*(qxxi*guy(12)+qyyi*guy(17)+qzzi*guy(19)
-     &        +2.0d0*(qxyi*guy(14)+qxzi*guy(15)+qyzi*guy(18)))
-     &         + uzk*(qxxi*guz(12)+qyyi*guz(17)+qzzi*guz(19)
-     &        +2.0d0*(qxyi*guz(14)+qxzi*guz(15)+qyzi*guz(18)))
-     &        + qxxi*(qxxk*gqxx(12)+qyyk*gqyy(12)+qzzk*gqzz(12)
-     &        +2.0d0*(qxyk*gqxy(12)+qxzk*gqxz(12)+qyzk*gqyz(12)))
-     &        + qyyi*(qxxk*gqxx(17)+qyyk*gqyy(17)+qzzk*gqzz(17)
-     &        +2.0d0*(qxyk*gqxy(17)+qxzk*gqxz(17)+qyzk*gqyz(17)))
-     &        + qzzi*(qxxk*gqxx(19)+qyyk*gqyy(19)+qzzk*gqzz(19)
-     &        +2.0d0*(qxyk*gqxy(19)+qxzk*gqxz(19)+qyzk*gqyz(19)))
-     & + 2.0d0*(qxyi*(qxxk*gqxx(14)+qyyk*gqyy(14)+qzzk*gqzz(14)
-     &        +2.0d0*(qxyk*gqxy(14)+qxzk*gqxz(14)+qyzk*gqyz(14)))
-     &        + qxzi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
-     &        +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15)))
-     &        + qyzi*(qxxk*gqxx(18)+qyyk*gqyy(18)+qzzk*gqzz(18)
-     &        +2.0d0*(qxyk*gqxy(18)+qxzk*gqxz(18)+qyzk*gqyz(18))))
-               dedy = desymdy + 0.5d0*(dewidy + dewkdy)
+                  desymdy = ci * ck * gc(3)
+     &                      - (uxi*(uxk*gux(6)+uyk*guy(6)+uzk*guz(6))
+     &                        +uyi*(uxk*gux(8)+uyk*guy(8)+uzk*guz(8))
+     &                        +uzi*(uxk*gux(9)+uyk*guy(9)+uzk*guz(9)))
+                  dewidy = ci*(uxk*gc(6)+uyk*gc(8)+uzk*gc(9))
+     &                    -ck*(uxi*gux(3)+uyi*guy(3)+uzi*guz(3))
+     &                 +ci*(qxxk*gc(12)+qyyk*gc(17)+qzzk*gc(19)
+     &              +2.0d0*(qxyk*gc(14)+qxzk*gc(15)+qyzk*gc(18)))
+     &                 +ck*(qxxi*gqxx(3)+qyyi*gqyy(3)+qzzi*gqzz(3)
+     &              +2.0d0*(qxyi*gqxy(3)+qxzi*gqxz(3)+qyzi*gqyz(3)))
+     &                 - uxi*(qxxk*gux(12)+qyyk*gux(17)+qzzk*gux(19)
+     &              +2.0d0*(qxyk*gux(14)+qxzk*gux(15)+qyzk*gux(18)))
+     &                 - uyi*(qxxk*guy(12)+qyyk*guy(17)+qzzk*guy(19)
+     &              +2.0d0*(qxyk*guy(14)+qxzk*guy(15)+qyzk*guy(18)))
+     &                 - uzi*(qxxk*guz(12)+qyyk*guz(17)+qzzk*guz(19)
+     &              +2.0d0*(qxyk*guz(14)+qxzk*guz(15)+qyzk*guz(18)))
+     &                 + uxk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
+     &              +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
+     &                 + uyk*(qxxi*gqxx(8)+qyyi*gqyy(8)+qzzi*gqzz(8)
+     &              +2.0d0*(qxyi*gqxy(8)+qxzi*gqxz(8)+qyzi*gqyz(8)))
+     &                 + uzk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
+     &              +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
+     &                 + qxxi*(qxxk*gqxx(12)+qyyk*gqxx(17)+qzzk*gqxx(19)
+     &              +2.0d0*(qxyk*gqxx(14)+qxzk*gqxx(15)+qyzk*gqxx(18)))
+     &                 + qyyi*(qxxk*gqyy(12)+qyyk*gqyy(17)+qzzk*gqyy(19)
+     &              +2.0d0*(qxyk*gqyy(14)+qxzk*gqyy(15)+qyzk*gqyy(18)))
+     &                 + qzzi*(qxxk*gqzz(12)+qyyk*gqzz(17)+qzzk*gqzz(19)
+     &              +2.0d0*(qxyk*gqzz(14)+qxzk*gqzz(15)+qyzk*gqzz(18)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxy(12)+qyyk*gqxy(17)+qzzk*gqxy(19)
+     &              +2.0d0*(qxyk*gqxy(14)+qxzk*gqxy(15)+qyzk*gqxy(18)))
+     &                 + qxzi*(qxxk*gqxz(12)+qyyk*gqxz(17)+qzzk*gqxz(19)
+     &              +2.0d0*(qxyk*gqxz(14)+qxzk*gqxz(15)+qyzk*gqxz(18)))
+     &                 + qyzi*(qxxk*gqyz(12)+qyyk*gqyz(17)+qzzk*gqyz(19)
+     &              +2.0d0*(qxyk*gqyz(14)+qxzk*gqyz(15)+qyzk*gqyz(18))))
+                  dewkdy = ci*(uxk*gux(3)+uyk*guy(3)+uzk*guz(3))
+     &                    -ck*(uxi*gc(6)+uyi*gc(8)+uzi*gc(9))
+     &                 +ci*(qxxk*gqxx(3)+qyyk*gqyy(3)+qzzk*gqzz(3)
+     &              +2.0d0*(qxyk*gqxy(3)+qxzk*gqxz(3)+qyzk*gqyz(3)))
+     &                 +ck*(qxxi*gc(12)+qyyi*gc(17)+qzzi*gc(19)
+     &              +2.0d0*(qxyi*gc(14)+qxzi*gc(15)+qyzi*gc(18)))
+     &                 - uxi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
+     &              +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
+     &                 - uyi*(qxxk*gqxx(8)+qyyk*gqyy(8)+qzzk*gqzz(8)
+     &              +2.0d0*(qxyk*gqxy(8)+qxzk*gqxz(8)+qyzk*gqyz(8)))
+     &                 - uzi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
+     &              +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
+     &                 + uxk*(qxxi*gux(12)+qyyi*gux(17)+qzzi*gux(19)
+     &              +2.0d0*(qxyi*gux(14)+qxzi*gux(15)+qyzi*gux(18)))
+     &                 + uyk*(qxxi*guy(12)+qyyi*guy(17)+qzzi*guy(19)
+     &              +2.0d0*(qxyi*guy(14)+qxzi*guy(15)+qyzi*guy(18)))
+     &                 + uzk*(qxxi*guz(12)+qyyi*guz(17)+qzzi*guz(19)
+     &              +2.0d0*(qxyi*guz(14)+qxzi*guz(15)+qyzi*guz(18)))
+     &                 + qxxi*(qxxk*gqxx(12)+qyyk*gqyy(12)+qzzk*gqzz(12)
+     &              +2.0d0*(qxyk*gqxy(12)+qxzk*gqxz(12)+qyzk*gqyz(12)))
+     &                 + qyyi*(qxxk*gqxx(17)+qyyk*gqyy(17)+qzzk*gqzz(17)
+     &              +2.0d0*(qxyk*gqxy(17)+qxzk*gqxz(17)+qyzk*gqyz(17)))
+     &                 + qzzi*(qxxk*gqxx(19)+qyyk*gqyy(19)+qzzk*gqzz(19)
+     &              +2.0d0*(qxyk*gqxy(19)+qxzk*gqxz(19)+qyzk*gqyz(19)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxx(14)+qyyk*gqyy(14)+qzzk*gqzz(14)
+     &              +2.0d0*(qxyk*gqxy(14)+qxzk*gqxz(14)+qyzk*gqyz(14)))
+     &                 + qxzi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
+     &              +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15)))
+     &                 + qyzi*(qxxk*gqxx(18)+qyyk*gqyy(18)+qzzk*gqzz(18)
+     &              +2.0d0*(qxyk*gqxy(18)+qxzk*gqxz(18)+qyzk*gqyz(18))))
+                  dedy = desymdy + 0.5d0*(dewidy + dewkdy)
 c
-              desymdz = ci * ck * gc(4)
-     &                     - (uxi*(uxk*gux(7)+uyk*guy(7)+uzk*guz(7))
-     &                       +uyi*(uxk*gux(9)+uyk*guy(9)+uzk*guz(9))
+                  desymdz = ci * ck * gc(4)
+     &                      - (uxi*(uxk*gux(7)+uyk*guy(7)+uzk*guz(7))
+     &                        +uyi*(uxk*gux(9)+uyk*guy(9)+uzk*guz(9))
      &                       +uzi*(uxk*gux(10)+uyk*guy(10)+uzk*guz(10)))
-              dewidz = ci*(uxk*gc(7)+uyk*gc(9)+uzk*gc(10))
-     &                -ck*(uxi*gux(4)+uyi*guy(4)+uzi*guz(4))
-     &           +ci*(qxxk*gc(13)+qyyk*gc(18)+qzzk*gc(20)
-     &        +2.0d0*(qxyk*gc(15)+qxzk*gc(16)+qyzk*gc(19)))
-     &           +ck*(qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
-     &        +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
-     &         - uxi*(qxxk*gux(13)+qyyk*gux(18)+qzzk*gux(20)
-     &        +2.0d0*(qxyk*gux(15)+qxzk*gux(16)+qyzk*gux(19)))
-     &         - uyi*(qxxk*guy(13)+qyyk*guy(18)+qzzk*guy(20)
-     &        +2.0d0*(qxyk*guy(15)+qxzk*guy(16)+qyzk*guy(19)))
-     &         - uzi*(qxxk*guz(13)+qyyk*guz(18)+qzzk*guz(20)
-     &        +2.0d0*(qxyk*guz(15)+qxzk*guz(16)+qyzk*guz(19)))
-     &         + uxk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
-     &        +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
-     &         + uyk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
-     &        +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
-     &         + uzk*(qxxi*gqxx(10)+qyyi*gqyy(10)+qzzi*gqzz(10)
-     &        +2.0d0*(qxyi*gqxy(10)+qxzi*gqxz(10)+qyzi*gqyz(10)))
-     &        + qxxi*(qxxk*gqxx(13)+qyyk*gqxx(18)+qzzk*gqxx(20)
-     &        +2.0d0*(qxyk*gqxx(15)+qxzk*gqxx(16)+qyzk*gqxx(19)))
-     &        + qyyi*(qxxk*gqyy(13)+qyyk*gqyy(18)+qzzk*gqyy(20)
-     &        +2.0d0*(qxyk*gqyy(15)+qxzk*gqyy(16)+qyzk*gqyy(19)))
-     &        + qzzi*(qxxk*gqzz(13)+qyyk*gqzz(18)+qzzk*gqzz(20)
-     &        +2.0d0*(qxyk*gqzz(15)+qxzk*gqzz(16)+qyzk*gqzz(19)))
-     & + 2.0d0*(qxyi*(qxxk*gqxy(13)+qyyk*gqxy(18)+qzzk*gqxy(20)
-     &        +2.0d0*(qxyk*gqxy(15)+qxzk*gqxy(16)+qyzk*gqxy(19)))
-     &        + qxzi*(qxxk*gqxz(13)+qyyk*gqxz(18)+qzzk*gqxz(20)
-     &        +2.0d0*(qxyk*gqxz(15)+qxzk*gqxz(16)+qyzk*gqxz(19)))
-     &        + qyzi*(qxxk*gqyz(13)+qyyk*gqyz(18)+qzzk*gqyz(20)
-     &        +2.0d0*(qxyk*gqyz(15)+qxzk*gqyz(16)+qyzk*gqyz(19))))
-              dewkdz = ci*(uxk*gux(4)+uyk*guy(4)+uzk*guz(4))
-     &                -ck*(uxi*gc(7)+uyi*gc(9)+uzi*gc(10))
-     &           +ci*(qxxk*gqxx(4)+qyyk*gqyy(4)+qzzk*gqzz(4)
-     &        +2.0d0*(qxyk*gqxy(4)+qxzk*gqxz(4)+qyzk*gqyz(4)))
-     &           +ck*(qxxi*gc(13)+qyyi*gc(18)+qzzi*gc(20)
-     &        +2.0d0*(qxyi*gc(15)+qxzi*gc(16)+qyzi*gc(19)))
-     &         - uxi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
-     &        +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
-     &         - uyi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
-     &        +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
-     &         - uzi*(qxxk*gqxx(10)+qyyk*gqyy(10)+qzzk*gqzz(10)
-     &        +2.0d0*(qxyk*gqxy(10)+qxzk*gqxz(10)+qyzk*gqyz(10)))
-     &         + uxk*(qxxi*gux(13)+qyyi*gux(18)+qzzi*gux(20)
-     &        +2.0d0*(qxyi*gux(15)+qxzi*gux(16)+qyzi*gux(19)))
-     &         + uyk*(qxxi*guy(13)+qyyi*guy(18)+qzzi*guy(20)
-     &        +2.0d0*(qxyi*guy(15)+qxzi*guy(16)+qyzi*guy(19)))
-     &         + uzk*(qxxi*guz(13)+qyyi*guz(18)+qzzi*guz(20)
-     &        +2.0d0*(qxyi*guz(15)+qxzi*guz(16)+qyzi*guz(19)))
-     &        + qxxi*(qxxk*gqxx(13)+qyyk*gqyy(13)+qzzk*gqzz(13)
-     &        +2.0d0*(qxyk*gqxy(13)+qxzk*gqxz(13)+qyzk*gqyz(13)))
-     &        + qyyi*(qxxk*gqxx(18)+qyyk*gqyy(18)+qzzk*gqzz(18)
-     &        +2.0d0*(qxyk*gqxy(18)+qxzk*gqxz(18)+qyzk*gqyz(18)))
-     &        + qzzi*(qxxk*gqxx(20)+qyyk*gqyy(20)+qzzk*gqzz(20)
-     &        +2.0d0*(qxyk*gqxy(20)+qxzk*gqxz(20)+qyzk*gqyz(20)))
-     & + 2.0d0*(qxyi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
-     &        +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15)))
-     &        + qxzi*(qxxk*gqxx(16)+qyyk*gqyy(16)+qzzk*gqzz(16)
-     &        +2.0d0*(qxyk*gqxy(16)+qxzk*gqxz(16)+qyzk*gqyz(16)))
-     &        + qyzi*(qxxk*gqxx(19)+qyyk*gqyy(19)+qzzk*gqzz(19)
-     &        +2.0d0*(qxyk*gqxy(19)+qxzk*gqxz(19)+qyzk*gqyz(19))))
-               dedz = desymdz + 0.5d0*(dewidz + dewkdz)
+                  dewidz = ci*(uxk*gc(7)+uyk*gc(9)+uzk*gc(10))
+     &                    -ck*(uxi*gux(4)+uyi*guy(4)+uzi*guz(4))
+     &                 +ci*(qxxk*gc(13)+qyyk*gc(18)+qzzk*gc(20)
+     &              +2.0d0*(qxyk*gc(15)+qxzk*gc(16)+qyzk*gc(19)))
+     &                 +ck*(qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
+     &              +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
+     &                 - uxi*(qxxk*gux(13)+qyyk*gux(18)+qzzk*gux(20)
+     &              +2.0d0*(qxyk*gux(15)+qxzk*gux(16)+qyzk*gux(19)))
+     &                 - uyi*(qxxk*guy(13)+qyyk*guy(18)+qzzk*guy(20)
+     &              +2.0d0*(qxyk*guy(15)+qxzk*guy(16)+qyzk*guy(19)))
+     &                 - uzi*(qxxk*guz(13)+qyyk*guz(18)+qzzk*guz(20)
+     &              +2.0d0*(qxyk*guz(15)+qxzk*guz(16)+qyzk*guz(19)))
+     &                 + uxk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
+     &              +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
+     &                 + uyk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
+     &              +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
+     &                 + uzk*(qxxi*gqxx(10)+qyyi*gqyy(10)+qzzi*gqzz(10)
+     &              +2.0d0*(qxyi*gqxy(10)+qxzi*gqxz(10)+qyzi*gqyz(10)))
+     &                 + qxxi*(qxxk*gqxx(13)+qyyk*gqxx(18)+qzzk*gqxx(20)
+     &              +2.0d0*(qxyk*gqxx(15)+qxzk*gqxx(16)+qyzk*gqxx(19)))
+     &                 + qyyi*(qxxk*gqyy(13)+qyyk*gqyy(18)+qzzk*gqyy(20)
+     &              +2.0d0*(qxyk*gqyy(15)+qxzk*gqyy(16)+qyzk*gqyy(19)))
+     &                 + qzzi*(qxxk*gqzz(13)+qyyk*gqzz(18)+qzzk*gqzz(20)
+     &              +2.0d0*(qxyk*gqzz(15)+qxzk*gqzz(16)+qyzk*gqzz(19)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxy(13)+qyyk*gqxy(18)+qzzk*gqxy(20)
+     &              +2.0d0*(qxyk*gqxy(15)+qxzk*gqxy(16)+qyzk*gqxy(19)))
+     &                 + qxzi*(qxxk*gqxz(13)+qyyk*gqxz(18)+qzzk*gqxz(20)
+     &              +2.0d0*(qxyk*gqxz(15)+qxzk*gqxz(16)+qyzk*gqxz(19)))
+     &                 + qyzi*(qxxk*gqyz(13)+qyyk*gqyz(18)+qzzk*gqyz(20)
+     &              +2.0d0*(qxyk*gqyz(15)+qxzk*gqyz(16)+qyzk*gqyz(19))))
+                  dewkdz = ci*(uxk*gux(4)+uyk*guy(4)+uzk*guz(4))
+     &                    -ck*(uxi*gc(7)+uyi*gc(9)+uzi*gc(10))
+     &                 +ci*(qxxk*gqxx(4)+qyyk*gqyy(4)+qzzk*gqzz(4)
+     &              +2.0d0*(qxyk*gqxy(4)+qxzk*gqxz(4)+qyzk*gqyz(4)))
+     &                 +ck*(qxxi*gc(13)+qyyi*gc(18)+qzzi*gc(20)
+     &              +2.0d0*(qxyi*gc(15)+qxzi*gc(16)+qyzi*gc(19)))
+     &                 - uxi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
+     &              +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
+     &                 - uyi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
+     &              +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
+     &                 - uzi*(qxxk*gqxx(10)+qyyk*gqyy(10)+qzzk*gqzz(10)
+     &              +2.0d0*(qxyk*gqxy(10)+qxzk*gqxz(10)+qyzk*gqyz(10)))
+     &                 + uxk*(qxxi*gux(13)+qyyi*gux(18)+qzzi*gux(20)
+     &              +2.0d0*(qxyi*gux(15)+qxzi*gux(16)+qyzi*gux(19)))
+     &                 + uyk*(qxxi*guy(13)+qyyi*guy(18)+qzzi*guy(20)
+     &              +2.0d0*(qxyi*guy(15)+qxzi*guy(16)+qyzi*guy(19)))
+     &                 + uzk*(qxxi*guz(13)+qyyi*guz(18)+qzzi*guz(20)
+     &              +2.0d0*(qxyi*guz(15)+qxzi*guz(16)+qyzi*guz(19)))
+     &                 + qxxi*(qxxk*gqxx(13)+qyyk*gqyy(13)+qzzk*gqzz(13)
+     &              +2.0d0*(qxyk*gqxy(13)+qxzk*gqxz(13)+qyzk*gqyz(13)))
+     &                 + qyyi*(qxxk*gqxx(18)+qyyk*gqyy(18)+qzzk*gqzz(18)
+     &              +2.0d0*(qxyk*gqxy(18)+qxzk*gqxz(18)+qyzk*gqyz(18)))
+     &                 + qzzi*(qxxk*gqxx(20)+qyyk*gqyy(20)+qzzk*gqzz(20)
+     &              +2.0d0*(qxyk*gqxy(20)+qxzk*gqxz(20)+qyzk*gqyz(20)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
+     &              +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15)))
+     &                 + qxzi*(qxxk*gqxx(16)+qyyk*gqyy(16)+qzzk*gqzz(16)
+     &              +2.0d0*(qxyk*gqxy(16)+qxzk*gqxz(16)+qyzk*gqyz(16)))
+     &                 + qyzi*(qxxk*gqxx(19)+qyyk*gqyy(19)+qzzk*gqzz(19)
+     &              +2.0d0*(qxyk*gqxy(19)+qxzk*gqxz(19)+qyzk*gqyz(19))))
+                  dedz = desymdz + 0.5d0*(dewidz + dewkdz)
 c
-              desymdr = ci * ck * gc(21)
-     &                     - (uxi*(uxk*gux(22)+uyk*guy(22)+uzk*guz(22))
-     &                       +uyi*(uxk*gux(23)+uyk*guy(23)+uzk*guz(23))
+                  desymdr = ci * ck * gc(21)
+     &                      - (uxi*(uxk*gux(22)+uyk*guy(22)+uzk*guz(22))
+     &                        +uyi*(uxk*gux(23)+uyk*guy(23)+uzk*guz(23))
      &                       +uzi*(uxk*gux(24)+uyk*guy(24)+uzk*guz(24)))
-              dewidr = ci*(uxk*gc(22)+uyk*gc(23)+uzk*gc(24))
-     &                -ck*(uxi*gux(21)+uyi*guy(21)+uzi*guz(21))
-     &           +ci*(qxxk*gc(25)+qyyk*gc(28)+qzzk*gc(30)
-     &        +2.0d0*(qxyk*gc(26)+qxzk*gc(27)+qyzk*gc(29)))
-     &           +ck*(qxxi*gqxx(21)+qyyi*gqyy(21)+qzzi*gqzz(21)
-     &        +2.0d0*(qxyi*gqxy(21)+qxzi*gqxz(21)+qyzi*gqyz(21)))
-     &         - uxi*(qxxk*gux(25)+qyyk*gux(28)+qzzk*gux(30)
-     &        +2.0d0*(qxyk*gux(26)+qxzk*gux(27)+qyzk*gux(29)))
-     &         - uyi*(qxxk*guy(25)+qyyk*guy(28)+qzzk*guy(30)
-     &        +2.0d0*(qxyk*guy(26)+qxzk*guy(27)+qyzk*guy(29)))
-     &         - uzi*(qxxk*guz(25)+qyyk*guz(28)+qzzk*guz(30)
-     &        +2.0d0*(qxyk*guz(26)+qxzk*guz(27)+qyzk*guz(29)))
-     &         + uxk*(qxxi*gqxx(22)+qyyi*gqyy(22)+qzzi*gqzz(22)
-     &        +2.0d0*(qxyi*gqxy(22)+qxzi*gqxz(22)+qyzi*gqyz(22)))
-     &         + uyk*(qxxi*gqxx(23)+qyyi*gqyy(23)+qzzi*gqzz(23)
-     &        +2.0d0*(qxyi*gqxy(23)+qxzi*gqxz(23)+qyzi*gqyz(23)))
-     &         + uzk*(qxxi*gqxx(24)+qyyi*gqyy(24)+qzzi*gqzz(24)
-     &        +2.0d0*(qxyi*gqxy(24)+qxzi*gqxz(24)+qyzi*gqyz(24)))
-     &        + qxxi*(qxxk*gqxx(25)+qyyk*gqxx(28)+qzzk*gqxx(30)
-     &        +2.0d0*(qxyk*gqxx(26)+qxzk*gqxx(27)+qyzk*gqxx(29)))
-     &        + qyyi*(qxxk*gqyy(25)+qyyk*gqyy(28)+qzzk*gqyy(30)
-     &        +2.0d0*(qxyk*gqyy(26)+qxzk*gqyy(27)+qyzk*gqyy(29)))
-     &        + qzzi*(qxxk*gqzz(25)+qyyk*gqzz(28)+qzzk*gqzz(30)
-     &        +2.0d0*(qxyk*gqzz(26)+qxzk*gqzz(27)+qyzk*gqzz(29)))
-     & + 2.0d0*(qxyi*(qxxk*gqxy(25)+qyyk*gqxy(28)+qzzk*gqxy(30)
-     &        +2.0d0*(qxyk*gqxy(26)+qxzk*gqxy(27)+qyzk*gqxy(29)))
-     &        + qxzi*(qxxk*gqxz(25)+qyyk*gqxz(28)+qzzk*gqxz(30)
-     &        +2.0d0*(qxyk*gqxz(26)+qxzk*gqxz(27)+qyzk*gqxz(29)))
-     &        + qyzi*(qxxk*gqyz(25)+qyyk*gqyz(28)+qzzk*gqyz(30)
-     &        +2.0d0*(qxyk*gqyz(26)+qxzk*gqyz(27)+qyzk*gqyz(29))))
-              dewkdr = ci*(uxk*gux(21)+uyk*guy(21)+uzk*guz(21))
-     &                -ck*(uxi*gc(22)+uyi*gc(23)+uzi*gc(24))
-     &           +ci*(qxxk*gqxx(21)+qyyk*gqyy(21)+qzzk*gqzz(21)
-     &        +2.0d0*(qxyk*gqxy(21)+qxzk*gqxz(21)+qyzk*gqyz(21)))
-     &           +ck*(qxxi*gc(25)+qyyi*gc(28)+qzzi*gc(30)
-     &        +2.0d0*(qxyi*gc(26)+qxzi*gc(27)+qyzi*gc(29)))
-     &         - uxi*(qxxk*gqxx(22)+qyyk*gqyy(22)+qzzk*gqzz(22)
-     &        +2.0d0*(qxyk*gqxy(22)+qxzk*gqxz(22)+qyzk*gqyz(22)))
-     &         - uyi*(qxxk*gqxx(23)+qyyk*gqyy(23)+qzzk*gqzz(23)
-     &        +2.0d0*(qxyk*gqxy(23)+qxzk*gqxz(23)+qyzk*gqyz(23)))
-     &         - uzi*(qxxk*gqxx(24)+qyyk*gqyy(24)+qzzk*gqzz(24)
-     &        +2.0d0*(qxyk*gqxy(24)+qxzk*gqxz(24)+qyzk*gqyz(24)))
-     &         + uxk*(qxxi*gux(25)+qyyi*gux(28)+qzzi*gux(30)
-     &        +2.0d0*(qxyi*gux(26)+qxzi*gux(27)+qyzi*gux(29)))
-     &         + uyk*(qxxi*guy(25)+qyyi*guy(28)+qzzi*guy(30)
-     &        +2.0d0*(qxyi*guy(26)+qxzi*guy(27)+qyzi*guy(29)))
-     &         + uzk*(qxxi*guz(25)+qyyi*guz(28)+qzzi*guz(30)
-     &        +2.0d0*(qxyi*guz(26)+qxzi*guz(27)+qyzi*guz(29)))
-     &        + qxxi*(qxxk*gqxx(25)+qyyk*gqyy(25)+qzzk*gqzz(25)
-     &        +2.0d0*(qxyk*gqxy(25)+qxzk*gqxz(25)+qyzk*gqyz(25)))
-     &        + qyyi*(qxxk*gqxx(28)+qyyk*gqyy(28)+qzzk*gqzz(28)
-     &        +2.0d0*(qxyk*gqxy(28)+qxzk*gqxz(28)+qyzk*gqyz(28)))
-     &        + qzzi*(qxxk*gqxx(30)+qyyk*gqyy(30)+qzzk*gqzz(30)
-     &        +2.0d0*(qxyk*gqxy(30)+qxzk*gqxz(30)+qyzk*gqyz(30)))
-     & + 2.0d0*(qxyi*(qxxk*gqxx(26)+qyyk*gqyy(26)+qzzk*gqzz(26)
-     &        +2.0d0*(qxyk*gqxy(26)+qxzk*gqxz(26)+qyzk*gqyz(26)))
-     &        + qxzi*(qxxk*gqxx(27)+qyyk*gqyy(27)+qzzk*gqzz(27)
-     &        +2.0d0*(qxyk*gqxy(27)+qxzk*gqxz(27)+qyzk*gqyz(27)))
-     &        + qyzi*(qxxk*gqxx(29)+qyyk*gqyy(29)+qzzk*gqzz(29)
-     &        +2.0d0*(qxyk*gqxy(29)+qxzk*gqxz(29)+qyzk*gqyz(29))))
-               dsumdr = desymdr + 0.5d0*(dewidr + dewkdr)
-               drbi = rbk*dsumdr
-               drbk = rbi*dsumdr
+                  dewidr = ci*(uxk*gc(22)+uyk*gc(23)+uzk*gc(24))
+     &                    -ck*(uxi*gux(21)+uyi*guy(21)+uzi*guz(21))
+     &                 +ci*(qxxk*gc(25)+qyyk*gc(28)+qzzk*gc(30)
+     &              +2.0d0*(qxyk*gc(26)+qxzk*gc(27)+qyzk*gc(29)))
+     &                 +ck*(qxxi*gqxx(21)+qyyi*gqyy(21)+qzzi*gqzz(21)
+     &              +2.0d0*(qxyi*gqxy(21)+qxzi*gqxz(21)+qyzi*gqyz(21)))
+     &                 - uxi*(qxxk*gux(25)+qyyk*gux(28)+qzzk*gux(30)
+     &              +2.0d0*(qxyk*gux(26)+qxzk*gux(27)+qyzk*gux(29)))
+     &                 - uyi*(qxxk*guy(25)+qyyk*guy(28)+qzzk*guy(30)
+     &              +2.0d0*(qxyk*guy(26)+qxzk*guy(27)+qyzk*guy(29)))
+     &                 - uzi*(qxxk*guz(25)+qyyk*guz(28)+qzzk*guz(30)
+     &              +2.0d0*(qxyk*guz(26)+qxzk*guz(27)+qyzk*guz(29)))
+     &                 + uxk*(qxxi*gqxx(22)+qyyi*gqyy(22)+qzzi*gqzz(22)
+     &              +2.0d0*(qxyi*gqxy(22)+qxzi*gqxz(22)+qyzi*gqyz(22)))
+     &                 + uyk*(qxxi*gqxx(23)+qyyi*gqyy(23)+qzzi*gqzz(23)
+     &              +2.0d0*(qxyi*gqxy(23)+qxzi*gqxz(23)+qyzi*gqyz(23)))
+     &                 + uzk*(qxxi*gqxx(24)+qyyi*gqyy(24)+qzzi*gqzz(24)
+     &              +2.0d0*(qxyi*gqxy(24)+qxzi*gqxz(24)+qyzi*gqyz(24)))
+     &                 + qxxi*(qxxk*gqxx(25)+qyyk*gqxx(28)+qzzk*gqxx(30)
+     &              +2.0d0*(qxyk*gqxx(26)+qxzk*gqxx(27)+qyzk*gqxx(29)))
+     &                 + qyyi*(qxxk*gqyy(25)+qyyk*gqyy(28)+qzzk*gqyy(30)
+     &              +2.0d0*(qxyk*gqyy(26)+qxzk*gqyy(27)+qyzk*gqyy(29)))
+     &                 + qzzi*(qxxk*gqzz(25)+qyyk*gqzz(28)+qzzk*gqzz(30)
+     &              +2.0d0*(qxyk*gqzz(26)+qxzk*gqzz(27)+qyzk*gqzz(29)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxy(25)+qyyk*gqxy(28)+qzzk*gqxy(30)
+     &              +2.0d0*(qxyk*gqxy(26)+qxzk*gqxy(27)+qyzk*gqxy(29)))
+     &                 + qxzi*(qxxk*gqxz(25)+qyyk*gqxz(28)+qzzk*gqxz(30)
+     &              +2.0d0*(qxyk*gqxz(26)+qxzk*gqxz(27)+qyzk*gqxz(29)))
+     &                 + qyzi*(qxxk*gqyz(25)+qyyk*gqyz(28)+qzzk*gqyz(30)
+     &              +2.0d0*(qxyk*gqyz(26)+qxzk*gqyz(27)+qyzk*gqyz(29))))
+                  dewkdr = ci*(uxk*gux(21)+uyk*guy(21)+uzk*guz(21))
+     &                    -ck*(uxi*gc(22)+uyi*gc(23)+uzi*gc(24))
+     &                 +ci*(qxxk*gqxx(21)+qyyk*gqyy(21)+qzzk*gqzz(21)
+     &              +2.0d0*(qxyk*gqxy(21)+qxzk*gqxz(21)+qyzk*gqyz(21)))
+     &                 +ck*(qxxi*gc(25)+qyyi*gc(28)+qzzi*gc(30)
+     &              +2.0d0*(qxyi*gc(26)+qxzi*gc(27)+qyzi*gc(29)))
+     &                 - uxi*(qxxk*gqxx(22)+qyyk*gqyy(22)+qzzk*gqzz(22)
+     &              +2.0d0*(qxyk*gqxy(22)+qxzk*gqxz(22)+qyzk*gqyz(22)))
+     &                 - uyi*(qxxk*gqxx(23)+qyyk*gqyy(23)+qzzk*gqzz(23)
+     &              +2.0d0*(qxyk*gqxy(23)+qxzk*gqxz(23)+qyzk*gqyz(23)))
+     &                 - uzi*(qxxk*gqxx(24)+qyyk*gqyy(24)+qzzk*gqzz(24)
+     &              +2.0d0*(qxyk*gqxy(24)+qxzk*gqxz(24)+qyzk*gqyz(24)))
+     &                 + uxk*(qxxi*gux(25)+qyyi*gux(28)+qzzi*gux(30)
+     &              +2.0d0*(qxyi*gux(26)+qxzi*gux(27)+qyzi*gux(29)))
+     &                 + uyk*(qxxi*guy(25)+qyyi*guy(28)+qzzi*guy(30)
+     &              +2.0d0*(qxyi*guy(26)+qxzi*guy(27)+qyzi*guy(29)))
+     &                 + uzk*(qxxi*guz(25)+qyyi*guz(28)+qzzi*guz(30)
+     &              +2.0d0*(qxyi*guz(26)+qxzi*guz(27)+qyzi*guz(29)))
+     &                 + qxxi*(qxxk*gqxx(25)+qyyk*gqyy(25)+qzzk*gqzz(25)
+     &              +2.0d0*(qxyk*gqxy(25)+qxzk*gqxz(25)+qyzk*gqyz(25)))
+     &                 + qyyi*(qxxk*gqxx(28)+qyyk*gqyy(28)+qzzk*gqzz(28)
+     &              +2.0d0*(qxyk*gqxy(28)+qxzk*gqxz(28)+qyzk*gqyz(28)))
+     &                 + qzzi*(qxxk*gqxx(30)+qyyk*gqyy(30)+qzzk*gqzz(30)
+     &              +2.0d0*(qxyk*gqxy(30)+qxzk*gqxz(30)+qyzk*gqyz(30)))
+     &        + 2.0d0*(qxyi*(qxxk*gqxx(26)+qyyk*gqyy(26)+qzzk*gqzz(26)
+     &              +2.0d0*(qxyk*gqxy(26)+qxzk*gqxz(26)+qyzk*gqyz(26)))
+     &                 + qxzi*(qxxk*gqxx(27)+qyyk*gqyy(27)+qzzk*gqzz(27)
+     &              +2.0d0*(qxyk*gqxy(27)+qxzk*gqxz(27)+qyzk*gqyz(27)))
+     &                 + qyzi*(qxxk*gqxx(29)+qyyk*gqyy(29)+qzzk*gqzz(29)
+     &              +2.0d0*(qxyk*gqxy(29)+qxzk*gqxz(29)+qyzk*gqyz(29))))
+                  dsumdr = desymdr + 0.5d0*(dewidr+dewkdr)
+                  drbi = rbk*dsumdr
+                  drbk = rbi*dsumdr
 c
 c     torque on permanent dipoles due to permanent reaction field
 c
@@ -1661,149 +1994,149 @@ c
 c     electrostatic solvation energy of the permanent multipoles in
 c     the GK reaction potential of the induced dipoles
 c
-                 esymi = -uxi*(dxk*gux(2)+dyk*guy(2)+dzk*guz(2))
-     &                  - uyi*(dxk*gux(3)+dyk*guy(3)+dzk*guz(3))
-     &                  - uzi*(dxk*gux(4)+dyk*guy(4)+dzk*guz(4))
-     &                  - uxk*(dxi*gux(2)+dyi*guy(2)+dzi*guz(2))
-     &                  - uyk*(dxi*gux(3)+dyi*guy(3)+dzi*guz(3))
-     &                  - uzk*(dxi*gux(4)+dyi*guy(4)+dzi*guz(4))
-                 ewii = ci*(dxk*gc(2)+dyk*gc(3)+dzk*gc(4))
-     &                - ck*(dxi*gux(1)+dyi*guy(1)+dzi*guz(1))
-     &                - dxi*(qxxk*gux(5)+qyyk*gux(8)+qzzk*gux(10)
-     &               +2.0d0*(qxyk*gux(6)+qxzk*gux(7)+qyzk*gux(9)))
-     &                - dyi*(qxxk*guy(5)+qyyk*guy(8)+qzzk*guy(10)
-     &               +2.0d0*(qxyk*guy(6)+qxzk*guy(7)+qyzk*guy(9)))
-     &                - dzi*(qxxk*guz(5)+qyyk*guz(8)+qzzk*guz(10)
-     &               +2.0d0*(qxyk*guz(6)+qxzk*guz(7)+qyzk*guz(9)))
-     &                + dxk*(qxxi*gqxx(2)+qyyi*gqyy(2)+qzzi*gqzz(2)
-     &               +2.0d0*(qxyi*gqxy(2)+qxzi*gqxz(2)+qyzi*gqyz(2)))
-     &                + dyk*(qxxi*gqxx(3)+qyyi*gqyy(3)+qzzi*gqzz(3)
-     &               +2.0d0*(qxyi*gqxy(3)+qxzi*gqxz(3)+qyzi*gqyz(3)))
-     &                + dzk*(qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
-     &               +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
-                 ewki = ci*(dxk*gux(1)+dyk*guy(1)+dzk*guz(1))
-     &                - ck*(dxi*gc(2)+dyi*gc(3)+dzi*gc(4))
-     &                - dxi*(qxxk*gqxx(2)+qyyk*gqyy(2)+qzzk*gqzz(2)
-     &               +2.0d0*(qxyk*gqxy(2)+qxzk*gqxz(2)+qyzk*gqyz(2)))
-     &                - dyi*(qxxk*gqxx(3)+qyyk*gqyy(3)+qzzk*gqzz(3)
-     &               +2.0d0*(qxyk*gqxy(3)+qxzk*gqxz(3)+qyzk*gqyz(3)))
-     &                - dzi*(qxxk*gqxx(4)+qyyk*gqyy(4)+qzzk*gqzz(4)
-     &               +2.0d0*(qxyk*gqxy(4)+qxzk*gqxz(4)+qyzk*gqyz(4)))
-     &                + dxk*(qxxi*gux(5)+qyyi*gux(8)+qzzi*gux(10)
-     &               +2.0d0*(qxyi*gux(6)+qxzi*gux(7)+qyzi*gux(9)))
-     &                + dyk*(qxxi*guy(5)+qyyi*guy(8)+qzzi*guy(10)
-     &               +2.0d0*(qxyi*guy(6)+qxzi*guy(7)+qyzi*guy(9)))
-     &                + dzk*(qxxi*guz(5)+qyyi*guz(8)+qzzi*guz(10)
-     &               +2.0d0*(qxyi*guz(6)+qxzi*guz(7)+qyzi*guz(9)))
+                  esymi = -uxi*(dxk*gux(2)+dyk*guy(2)+dzk*guz(2))
+     &                   - uyi*(dxk*gux(3)+dyk*guy(3)+dzk*guz(3))
+     &                   - uzi*(dxk*gux(4)+dyk*guy(4)+dzk*guz(4))
+     &                   - uxk*(dxi*gux(2)+dyi*guy(2)+dzi*guz(2))
+     &                   - uyk*(dxi*gux(3)+dyi*guy(3)+dzi*guz(3))
+     &                   - uzk*(dxi*gux(4)+dyi*guy(4)+dzi*guz(4))
+                  ewii = ci*(dxk*gc(2)+dyk*gc(3)+dzk*gc(4))
+     &                 - ck*(dxi*gux(1)+dyi*guy(1)+dzi*guz(1))
+     &                 - dxi*(qxxk*gux(5)+qyyk*gux(8)+qzzk*gux(10)
+     &                +2.0d0*(qxyk*gux(6)+qxzk*gux(7)+qyzk*gux(9)))
+     &                 - dyi*(qxxk*guy(5)+qyyk*guy(8)+qzzk*guy(10)
+     &                +2.0d0*(qxyk*guy(6)+qxzk*guy(7)+qyzk*guy(9)))
+     &                 - dzi*(qxxk*guz(5)+qyyk*guz(8)+qzzk*guz(10)
+     &                +2.0d0*(qxyk*guz(6)+qxzk*guz(7)+qyzk*guz(9)))
+     &                 + dxk*(qxxi*gqxx(2)+qyyi*gqyy(2)+qzzi*gqzz(2)
+     &                +2.0d0*(qxyi*gqxy(2)+qxzi*gqxz(2)+qyzi*gqyz(2)))
+     &                 + dyk*(qxxi*gqxx(3)+qyyi*gqyy(3)+qzzi*gqzz(3)
+     &                +2.0d0*(qxyi*gqxy(3)+qxzi*gqxz(3)+qyzi*gqyz(3)))
+     &                 + dzk*(qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
+     &                +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
+                  ewki = ci*(dxk*gux(1)+dyk*guy(1)+dzk*guz(1))
+     &                 - ck*(dxi*gc(2)+dyi*gc(3)+dzi*gc(4))
+     &                 - dxi*(qxxk*gqxx(2)+qyyk*gqyy(2)+qzzk*gqzz(2)
+     &                +2.0d0*(qxyk*gqxy(2)+qxzk*gqxz(2)+qyzk*gqyz(2)))
+     &                 - dyi*(qxxk*gqxx(3)+qyyk*gqyy(3)+qzzk*gqzz(3)
+     &                +2.0d0*(qxyk*gqxy(3)+qxzk*gqxz(3)+qyzk*gqyz(3)))
+     &                 - dzi*(qxxk*gqxx(4)+qyyk*gqyy(4)+qzzk*gqzz(4)
+     &                +2.0d0*(qxyk*gqxy(4)+qxzk*gqxz(4)+qyzk*gqyz(4)))
+     &                 + dxk*(qxxi*gux(5)+qyyi*gux(8)+qzzi*gux(10)
+     &                +2.0d0*(qxyi*gux(6)+qxzi*gux(7)+qyzi*gux(9)))
+     &                 + dyk*(qxxi*guy(5)+qyyi*guy(8)+qzzi*guy(10)
+     &                +2.0d0*(qxyi*guy(6)+qxzi*guy(7)+qyzi*guy(9)))
+     &                 + dzk*(qxxi*guz(5)+qyyi*guz(8)+qzzi*guz(10)
+     &                +2.0d0*(qxyi*guz(6)+qxzi*guz(7)+qyzi*guz(9)))
 c
 c     electrostatic solvation free energy gradient of the permanent
 c     multipoles in the reaction potential of the induced dipoles
 c
-                 dpsymdx = -uxi*(sxk*gux(5)+syk*guy(5)+szk*guz(5))
-     &                    - uyi*(sxk*gux(6)+syk*guy(6)+szk*guz(6))
-     &                    - uzi*(sxk*gux(7)+syk*guy(7)+szk*guz(7))
-     &                    - uxk*(sxi*gux(5)+syi*guy(5)+szi*guz(5))
-     &                    - uyk*(sxi*gux(6)+syi*guy(6)+szi*guz(6))
-     &                    - uzk*(sxi*gux(7)+syi*guy(7)+szi*guz(7))
-                 dpwidx = ci*(sxk*gc(5)+syk*gc(6)+szk*gc(7))
-     &                  - ck*(sxi*gux(2)+syi*guy(2)+szi*guz(2))
-     &                - sxi*(qxxk*gux(11)+qyyk*gux(14)+qzzk*gux(16)
-     &               +2.0d0*(qxyk*gux(12)+qxzk*gux(13)+qyzk*gux(15)))
-     &                - syi*(qxxk*guy(11)+qyyk*guy(14)+qzzk*guy(16)
-     &               +2.0d0*(qxyk*guy(12)+qxzk*guy(13)+qyzk*guy(15)))
-     &                - szi*(qxxk*guz(11)+qyyk*guz(14)+qzzk*guz(16)
-     &               +2.0d0*(qxyk*guz(12)+qxzk*guz(13)+qyzk*guz(15)))
-     &                + sxk*(qxxi*gqxx(5)+qyyi*gqyy(5)+qzzi*gqzz(5)
-     &               +2.0d0*(qxyi*gqxy(5)+qxzi*gqxz(5)+qyzi*gqyz(5)))
-     &                + syk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
-     &               +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
-     &                + szk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
-     &               +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
-                 dpwkdx = ci*(sxk*gux(2)+syk*guy(2)+szk*guz(2))
-     &                  - ck*(sxi*gc(5)+syi*gc(6)+szi*gc(7))
-     &                - sxi*(qxxk*gqxx(5)+qyyk*gqyy(5)+qzzk*gqzz(5)
-     &               +2.0d0*(qxyk*gqxy(5)+qxzk*gqxz(5)+qyzk*gqyz(5)))
-     &                - syi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
-     &               +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
-     &                - szi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
-     &               +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
-     &                + sxk*(qxxi*gux(11)+qyyi*gux(14)+qzzi*gux(16)
-     &               +2.0d0*(qxyi*gux(12)+qxzi*gux(13)+qyzi*gux(15)))
-     &                + syk*(qxxi*guy(11)+qyyi*guy(14)+qzzi*guy(16)
-     &               +2.0d0*(qxyi*guy(12)+qxzi*guy(13)+qyzi*guy(15)))
-     &                + szk*(qxxi*guz(11)+qyyi*guz(14)+qzzi*guz(16)
-     &               +2.0d0*(qxyi*guz(12)+qxzi*guz(13)+qyzi*guz(15)))
-                 dpdx = 0.5d0 * (dpsymdx + 0.5d0*(dpwidx + dpwkdx))
-                 dpsymdy = -uxi*(sxk*gux(6)+syk*guy(6)+szk*guz(6))
-     &                    - uyi*(sxk*gux(8)+syk*guy(8)+szk*guz(8))
-     &                    - uzi*(sxk*gux(9)+syk*guy(9)+szk*guz(9))
-     &                    - uxk*(sxi*gux(6)+syi*guy(6)+szi*guz(6))
-     &                    - uyk*(sxi*gux(8)+syi*guy(8)+szi*guz(8))
-     &                    - uzk*(sxi*gux(9)+syi*guy(9)+szi*guz(9))
-                 dpwidy = ci*(sxk*gc(6)+syk*gc(8)+szk*gc(9))
-     &                  - ck*(sxi*gux(3)+syi*guy(3)+szi*guz(3))
+                  dpsymdx = -uxi*(sxk*gux(5)+syk*guy(5)+szk*guz(5))
+     &                     - uyi*(sxk*gux(6)+syk*guy(6)+szk*guz(6))
+     &                     - uzi*(sxk*gux(7)+syk*guy(7)+szk*guz(7))
+     &                     - uxk*(sxi*gux(5)+syi*guy(5)+szi*guz(5))
+     &                     - uyk*(sxi*gux(6)+syi*guy(6)+szi*guz(6))
+     &                     - uzk*(sxi*gux(7)+syi*guy(7)+szi*guz(7))
+                  dpwidx = ci*(sxk*gc(5)+syk*gc(6)+szk*gc(7))
+     &                   - ck*(sxi*gux(2)+syi*guy(2)+szi*guz(2))
+     &                   - sxi*(qxxk*gux(11)+qyyk*gux(14)+qzzk*gux(16)
+     &                +2.0d0*(qxyk*gux(12)+qxzk*gux(13)+qyzk*gux(15)))
+     &                   - syi*(qxxk*guy(11)+qyyk*guy(14)+qzzk*guy(16)
+     &                +2.0d0*(qxyk*guy(12)+qxzk*guy(13)+qyzk*guy(15)))
+     &                   - szi*(qxxk*guz(11)+qyyk*guz(14)+qzzk*guz(16)
+     &                +2.0d0*(qxyk*guz(12)+qxzk*guz(13)+qyzk*guz(15)))
+     &                   + sxk*(qxxi*gqxx(5)+qyyi*gqyy(5)+qzzi*gqzz(5)
+     &                +2.0d0*(qxyi*gqxy(5)+qxzi*gqxz(5)+qyzi*gqyz(5)))
+     &                   + syk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
+     &                +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
+     &                   + szk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
+     &                +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
+                  dpwkdx = ci*(sxk*gux(2)+syk*guy(2)+szk*guz(2))
+     &                   - ck*(sxi*gc(5)+syi*gc(6)+szi*gc(7))
+     &                   - sxi*(qxxk*gqxx(5)+qyyk*gqyy(5)+qzzk*gqzz(5)
+     &                +2.0d0*(qxyk*gqxy(5)+qxzk*gqxz(5)+qyzk*gqyz(5)))
+     &                   - syi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
+     &                +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
+     &                   - szi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
+     &                +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
+     &                   + sxk*(qxxi*gux(11)+qyyi*gux(14)+qzzi*gux(16)
+     &                +2.0d0*(qxyi*gux(12)+qxzi*gux(13)+qyzi*gux(15)))
+     &                   + syk*(qxxi*guy(11)+qyyi*guy(14)+qzzi*guy(16)
+     &                +2.0d0*(qxyi*guy(12)+qxzi*guy(13)+qyzi*guy(15)))
+     &                   + szk*(qxxi*guz(11)+qyyi*guz(14)+qzzi*guz(16)
+     &                +2.0d0*(qxyi*guz(12)+qxzi*guz(13)+qyzi*guz(15)))
+                  dpdx = 0.5d0 * (dpsymdx + 0.5d0*(dpwidx + dpwkdx))
+                  dpsymdy = -uxi*(sxk*gux(6)+syk*guy(6)+szk*guz(6))
+     &                     - uyi*(sxk*gux(8)+syk*guy(8)+szk*guz(8))
+     &                     - uzi*(sxk*gux(9)+syk*guy(9)+szk*guz(9))
+     &                     - uxk*(sxi*gux(6)+syi*guy(6)+szi*guz(6))
+     &                     - uyk*(sxi*gux(8)+syi*guy(8)+szi*guz(8))
+     &                     - uzk*(sxi*gux(9)+syi*guy(9)+szi*guz(9))
+                  dpwidy = ci*(sxk*gc(6)+syk*gc(8)+szk*gc(9))
+     &                   - ck*(sxi*gux(3)+syi*guy(3)+szi*guz(3))
      &                   - sxi*(qxxk*gux(12)+qyyk*gux(17)+qzzk*gux(19)
-     &                  +2.0d0*(qxyk*gux(14)+qxzk*gux(15)+qyzk*gux(18)))
+     &                +2.0d0*(qxyk*gux(14)+qxzk*gux(15)+qyzk*gux(18)))
      &                   - syi*(qxxk*guy(12)+qyyk*guy(17)+qzzk*guy(19)
-     &                  +2.0d0*(qxyk*guy(14)+qxzk*guy(15)+qyzk*guy(18)))
+     &                +2.0d0*(qxyk*guy(14)+qxzk*guy(15)+qyzk*guy(18)))
      &                   - szi*(qxxk*guz(12)+qyyk*guz(17)+qzzk*guz(19)
-     &                  +2.0d0*(qxyk*guz(14)+qxzk*guz(15)+qyzk*guz(18)))
+     &                +2.0d0*(qxyk*guz(14)+qxzk*guz(15)+qyzk*guz(18)))
      &                   + sxk*(qxxi*gqxx(6)+qyyi*gqyy(6)+qzzi*gqzz(6)
-     &                  +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
+     &                +2.0d0*(qxyi*gqxy(6)+qxzi*gqxz(6)+qyzi*gqyz(6)))
      &                   + syk*(qxxi*gqxx(8)+qyyi*gqyy(8)+qzzi*gqzz(8)
-     &                  +2.0d0*(qxyi*gqxy(8)+qxzi*gqxz(8)+qyzi*gqyz(8)))
+     &                +2.0d0*(qxyi*gqxy(8)+qxzi*gqxz(8)+qyzi*gqyz(8)))
      &                   + szk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
-     &                  +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
-                 dpwkdy = ci*(sxk*gux(3)+syk*guy(3)+szk*guz(3))
-     &                  - ck*(sxi*gc(6)+syi*gc(8)+szi*gc(9))
-     &                - sxi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
-     &               +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
-     &                - syi*(qxxk*gqxx(8)+qyyk*gqyy(8)+qzzk*gqzz(8)
-     &               +2.0d0*(qxyk*gqxy(8)+qxzk*gqxz(8)+qyzk*gqyz(8)))
-     &                - szi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
-     &               +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
-     &                + sxk*(qxxi*gux(12)+qyyi*gux(17)+qzzi*gux(19)
-     &               +2.0d0*(qxyi*gux(14)+qxzi*gux(15)+qyzi*gux(18)))
-     &                + syk*(qxxi*guy(12)+qyyi*guy(17)+qzzi*guy(19)
-     &               +2.0d0*(qxyi*guy(14)+qxzi*guy(15)+qyzi*guy(18)))
-     &                + szk*(qxxi*guz(12)+qyyi*guz(17)+qzzi*guz(19)
-     &               +2.0d0*(qxyi*guz(14)+qxzi*guz(15)+qyzi*guz(18)))
-                 dpdy = 0.5d0 * (dpsymdy + 0.5d0*(dpwidy + dpwkdy))
-                 dpsymdz = -uxi*(sxk*gux(7)+syk*guy(7)+szk*guz(7))
-     &                    - uyi*(sxk*gux(9)+syk*guy(9)+szk*guz(9))
-     &                    - uzi*(sxk*gux(10)+syk*guy(10)+szk*guz(10))
-     &                    - uxk*(sxi*gux(7)+syi*guy(7)+szi*guz(7))
-     &                    - uyk*(sxi*gux(9)+syi*guy(9)+szi*guz(9))
-     &                    - uzk*(sxi*gux(10)+syi*guy(10)+szi*guz(10))
-                 dpwidz = ci*(sxk*gc(7)+syk*gc(9)+szk*gc(10))
-     &                  - ck*(sxi*gux(4)+syi*guy(4)+szi*guz(4))
-     &                - sxi*(qxxk*gux(13)+qyyk*gux(18)+qzzk*gux(20)
-     &               +2.0d0*(qxyk*gux(15)+qxzk*gux(16)+qyzk*gux(19)))
-     &                - syi*(qxxk*guy(13)+qyyk*guy(18)+qzzk*guy(20)
-     &               +2.0d0*(qxyk*guy(15)+qxzk*guy(16)+qyzk*guy(19)))
-     &                - szi*(qxxk*guz(13)+qyyk*guz(18)+qzzk*guz(20)
-     &               +2.0d0*(qxyk*guz(15)+qxzk*guz(16)+qyzk*guz(19)))
-     &                + sxk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
-     &               +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
-     &                + syk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
-     &               +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
-     &                + szk*(qxxi*gqxx(10)+qyyi*gqyy(10)+qzzi*gqzz(10)
+     &                +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
+                  dpwkdy = ci*(sxk*gux(3)+syk*guy(3)+szk*guz(3))
+     &                   - ck*(sxi*gc(6)+syi*gc(8)+szi*gc(9))
+     &                   - sxi*(qxxk*gqxx(6)+qyyk*gqyy(6)+qzzk*gqzz(6)
+     &                +2.0d0*(qxyk*gqxy(6)+qxzk*gqxz(6)+qyzk*gqyz(6)))
+     &                   - syi*(qxxk*gqxx(8)+qyyk*gqyy(8)+qzzk*gqzz(8)
+     &                +2.0d0*(qxyk*gqxy(8)+qxzk*gqxz(8)+qyzk*gqyz(8)))
+     &                   - szi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
+     &                +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
+     &                   + sxk*(qxxi*gux(12)+qyyi*gux(17)+qzzi*gux(19)
+     &                +2.0d0*(qxyi*gux(14)+qxzi*gux(15)+qyzi*gux(18)))
+     &                   + syk*(qxxi*guy(12)+qyyi*guy(17)+qzzi*guy(19)
+     &                +2.0d0*(qxyi*guy(14)+qxzi*guy(15)+qyzi*guy(18)))
+     &                   + szk*(qxxi*guz(12)+qyyi*guz(17)+qzzi*guz(19)
+     &                +2.0d0*(qxyi*guz(14)+qxzi*guz(15)+qyzi*guz(18)))
+                  dpdy = 0.5d0 * (dpsymdy + 0.5d0*(dpwidy + dpwkdy))
+                  dpsymdz = -uxi*(sxk*gux(7)+syk*guy(7)+szk*guz(7))
+     &                     - uyi*(sxk*gux(9)+syk*guy(9)+szk*guz(9))
+     &                     - uzi*(sxk*gux(10)+syk*guy(10)+szk*guz(10))
+     &                     - uxk*(sxi*gux(7)+syi*guy(7)+szi*guz(7))
+     &                     - uyk*(sxi*gux(9)+syi*guy(9)+szi*guz(9))
+     &                     - uzk*(sxi*gux(10)+syi*guy(10)+szi*guz(10))
+                  dpwidz = ci*(sxk*gc(7)+syk*gc(9)+szk*gc(10))
+     &                   - ck*(sxi*gux(4)+syi*guy(4)+szi*guz(4))
+     &                   - sxi*(qxxk*gux(13)+qyyk*gux(18)+qzzk*gux(20)
+     &                +2.0d0*(qxyk*gux(15)+qxzk*gux(16)+qyzk*gux(19)))
+     &                   - syi*(qxxk*guy(13)+qyyk*guy(18)+qzzk*guy(20)
+     &                +2.0d0*(qxyk*guy(15)+qxzk*guy(16)+qyzk*guy(19)))
+     &                   - szi*(qxxk*guz(13)+qyyk*guz(18)+qzzk*guz(20)
+     &                +2.0d0*(qxyk*guz(15)+qxzk*guz(16)+qyzk*guz(19)))
+     &                   + sxk*(qxxi*gqxx(7)+qyyi*gqyy(7)+qzzi*gqzz(7)
+     &                +2.0d0*(qxyi*gqxy(7)+qxzi*gqxz(7)+qyzi*gqyz(7)))
+     &                   + syk*(qxxi*gqxx(9)+qyyi*gqyy(9)+qzzi*gqzz(9)
+     &                +2.0d0*(qxyi*gqxy(9)+qxzi*gqxz(9)+qyzi*gqyz(9)))
+     &                  + szk*(qxxi*gqxx(10)+qyyi*gqyy(10)+qzzi*gqzz(10)
      &               +2.0d0*(qxyi*gqxy(10)+qxzi*gqxz(10)+qyzi*gqyz(10)))
-                 dpwkdz = ci*(sxk*gux(4)+syk*guy(4)+szk*guz(4))
-     &                  - ck*(sxi*gc(7)+syi*gc(9)+szi*gc(10))
-     &                - sxi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
-     &               +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
-     &                - syi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
-     &               +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
-     &                - szi*(qxxk*gqxx(10)+qyyk*gqyy(10)+qzzk*gqzz(10)
+                  dpwkdz = ci*(sxk*gux(4)+syk*guy(4)+szk*guz(4))
+     &                   - ck*(sxi*gc(7)+syi*gc(9)+szi*gc(10))
+     &                   - sxi*(qxxk*gqxx(7)+qyyk*gqyy(7)+qzzk*gqzz(7)
+     &                +2.0d0*(qxyk*gqxy(7)+qxzk*gqxz(7)+qyzk*gqyz(7)))
+     &                   - syi*(qxxk*gqxx(9)+qyyk*gqyy(9)+qzzk*gqzz(9)
+     &                +2.0d0*(qxyk*gqxy(9)+qxzk*gqxz(9)+qyzk*gqyz(9)))
+     &                  - szi*(qxxk*gqxx(10)+qyyk*gqyy(10)+qzzk*gqzz(10)
      &               +2.0d0*(qxyk*gqxy(10)+qxzk*gqxz(10)+qyzk*gqyz(10)))
-     &                + sxk*(qxxi*gux(13)+qyyi*gux(18)+qzzi*gux(20)
-     &               +2.0d0*(qxyi*gux(15)+qxzi*gux(16)+qyzi*gux(19)))
-     &                + syk*(qxxi*guy(13)+qyyi*guy(18)+qzzi*guy(20)
-     &               +2.0d0*(qxyi*guy(15)+qxzi*guy(16)+qyzi*guy(19)))
-     &                + szk*(qxxi*guz(13)+qyyi*guz(18)+qzzi*guz(20)
-     &               +2.0d0*(qxyi*guz(15)+qxzi*guz(16)+qyzi*guz(19)))
-                 dpdz = 0.5d0 * (dpsymdz + 0.5d0*(dpwidz + dpwkdz))
+     &                   + sxk*(qxxi*gux(13)+qyyi*gux(18)+qzzi*gux(20)
+     &                +2.0d0*(qxyi*gux(15)+qxzi*gux(16)+qyzi*gux(19)))
+     &                   + syk*(qxxi*guy(13)+qyyi*guy(18)+qzzi*guy(20)
+     &                +2.0d0*(qxyi*guy(15)+qxzi*guy(16)+qyzi*guy(19)))
+     &                   + szk*(qxxi*guz(13)+qyyi*guz(18)+qzzi*guz(20)
+     &                +2.0d0*(qxyi*guz(15)+qxzi*guz(16)+qyzi*guz(19)))
+                  dpdz = 0.5d0 * (dpsymdz + 0.5d0*(dpwidz + dpwkdz))
 c
 c     effective radii chain rule terms for the
 c     electrostatic solvation free energy gradient of the permanent
@@ -1843,43 +2176,43 @@ c
      &               +2.0d0*(qxyi*guy(26)+qxzi*guy(27)+qyzi*guy(29)))
      &                + szk*(qxxi*guz(25)+qyyi*guz(28)+qzzi*guz(30)
      &               +2.0d0*(qxyi*guz(26)+qxzi*guz(27)+qyzi*guz(29)))
-               dsumdr = dsymdr + 0.5d0*(dwipdr + dwkpdr)
-               dpbi = 0.5d0*rbk*dsumdr
-               dpbk = 0.5d0*rbi*dsumdr
+                  dsumdr = dsymdr + 0.5d0*(dwipdr + dwkpdr)
+                  dpbi = 0.5d0*rbk*dsumdr
+                  dpbk = 0.5d0*rbi*dsumdr
 c
 c     mutual polarization electrostatic solvation free energy gradient
 c
-               if (poltyp .eq. 'MUTUAL') then
-                 dpdx = dpdx - 0.5d0 *
-     &                     (dxi*(pxk*gux(5)+pyk*gux(6)+pzk*gux(7))
-     &                     +dyi*(pxk*guy(5)+pyk*guy(6)+pzk*guy(7))
-     &                     +dzi*(pxk*guz(5)+pyk*guz(6)+pzk*guz(7))
-     &                     +dxk*(pxi*gux(5)+pyi*gux(6)+pzi*gux(7))
-     &                     +dyk*(pxi*guy(5)+pyi*guy(6)+pzi*guy(7))
-     &                     +dzk*(pxi*guz(5)+pyi*guz(6)+pzi*guz(7)))
-                 dpdy = dpdy - 0.5d0 *
-     &                     (dxi*(pxk*gux(6)+pyk*gux(8)+pzk*gux(9))
-     &                     +dyi*(pxk*guy(6)+pyk*guy(8)+pzk*guy(9))
-     &                     +dzi*(pxk*guz(6)+pyk*guz(8)+pzk*guz(9))
-     &                     +dxk*(pxi*gux(6)+pyi*gux(8)+pzi*gux(9))
-     &                     +dyk*(pxi*guy(6)+pyi*guy(8)+pzi*guy(9))
-     &                     +dzk*(pxi*guz(6)+pyi*guz(8)+pzi*guz(9)))
-                 dpdz = dpdz - 0.5d0 *
-     &                     (dxi*(pxk*gux(7)+pyk*gux(9)+pzk*gux(10))
-     &                     +dyi*(pxk*guy(7)+pyk*guy(9)+pzk*guy(10))
-     &                     +dzi*(pxk*guz(7)+pyk*guz(9)+pzk*guz(10))
-     &                     +dxk*(pxi*gux(7)+pyi*gux(9)+pzi*gux(10))
-     &                     +dyk*(pxi*guy(7)+pyi*guy(9)+pzi*guy(10))
-     &                     +dzk*(pxi*guz(7)+pyi*guz(9)+pzi*guz(10)))
-                 duvdr = dxi*(pxk*gux(22)+pyk*gux(23)+pzk*gux(24))
+                  if (poltyp .eq. 'MUTUAL') then
+                     dpdx = dpdx - 0.5d0 *
+     &                      (dxi*(pxk*gux(5)+pyk*gux(6)+pzk*gux(7))
+     &                      + dyi*(pxk*guy(5)+pyk*guy(6)+pzk*guy(7))
+     &                      + dzi*(pxk*guz(5)+pyk*guz(6)+pzk*guz(7))
+     &                      + dxk*(pxi*gux(5)+pyi*gux(6)+pzi*gux(7))
+     &                      + dyk*(pxi*guy(5)+pyi*guy(6)+pzi*guy(7))
+     &                      + dzk*(pxi*guz(5)+pyi*guz(6)+pzi*guz(7)))
+                     dpdy = dpdy - 0.5d0 *
+     &                      (dxi*(pxk*gux(6)+pyk*gux(8)+pzk*gux(9))
+     &                      + dyi*(pxk*guy(6)+pyk*guy(8)+pzk*guy(9))
+     &                      + dzi*(pxk*guz(6)+pyk*guz(8)+pzk*guz(9))
+     &                      + dxk*(pxi*gux(6)+pyi*gux(8)+pzi*gux(9))
+     &                      + dyk*(pxi*guy(6)+pyi*guy(8)+pzi*guy(9))
+     &                      + dzk*(pxi*guz(6)+pyi*guz(8)+pzi*guz(9)))
+                     dpdz = dpdz - 0.5d0 *
+     &                      (dxi*(pxk*gux(7)+pyk*gux(9)+pzk*gux(10))
+     &                      + dyi*(pxk*guy(7)+pyk*guy(9)+pzk*guy(10))
+     &                      + dzi*(pxk*guz(7)+pyk*guz(9)+pzk*guz(10))
+     &                      + dxk*(pxi*gux(7)+pyi*gux(9)+pzi*gux(10))
+     &                      + dyk*(pxi*guy(7)+pyi*guy(9)+pzi*guy(10))
+     &                      + dzk*(pxi*guz(7)+pyi*guz(9)+pzi*guz(10)))
+                     duvdr = dxi*(pxk*gux(22)+pyk*gux(23)+pzk*gux(24))
      &                      + dyi*(pxk*guy(22)+pyk*guy(23)+pzk*guy(24))
      &                      + dzi*(pxk*guz(22)+pyk*guz(23)+pzk*guz(24))
      &                      + dxk*(pxi*gux(22)+pyi*gux(23)+pzi*gux(24))
      &                      + dyk*(pxi*guy(22)+pyi*guy(23)+pzi*guy(24))
      &                      + dzk*(pxi*guz(22)+pyi*guz(23)+pzi*guz(24))
-                 dpbi = dpbi - 0.5d0*rbk*duvdr
-                 dpbk = dpbk - 0.5d0*rbi*duvdr
-               end if
+                     dpbi = dpbi - 0.5d0*rbk*duvdr
+                     dpbk = dpbk - 0.5d0*rbi*duvdr
+                  end if
 c
 c     torque due to induced reaction field on permanent dipoles
 c
@@ -1907,44 +2240,44 @@ c
 c     torque due to induced reaction field gradient on quadrupoles
 c
                   fidg(1,1) = -0.25d0 *
-     &                        ( (sxk*gqxx(2)+syk*gqxx(3)+szk*gqxx(4))
-     &                        + (sxk*gux(5)+syk*guy(5)+szk*guz(5)))
+     &                           ((sxk*gqxx(2)+syk*gqxx(3)+szk*gqxx(4))
+     &                          + (sxk*gux(5)+syk*guy(5)+szk*guz(5)))
                   fidg(1,2) = -0.25d0 *
-     &                        ( (sxk*gqxy(2)+syk*gqxy(3)+szk*gqxy(4))
-     &                        + (sxk*gux(6)+syk*guy(6)+szk*guz(6)))
+     &                           ((sxk*gqxy(2)+syk*gqxy(3)+szk*gqxy(4))
+     &                          + (sxk*gux(6)+syk*guy(6)+szk*guz(6)))
                   fidg(1,3) = -0.25d0 *
-     &                        ( (sxk*gqxz(2)+syk*gqxz(3)+szk*gqxz(4))
-     &                        + (sxk*gux(7)+syk*guy(7)+szk*guz(7)))
+     &                           ((sxk*gqxz(2)+syk*gqxz(3)+szk*gqxz(4))
+     &                          + (sxk*gux(7)+syk*guy(7)+szk*guz(7)))
                   fidg(2,2) = -0.25d0 *
-     &                        ( (sxk*gqyy(2)+syk*gqyy(3)+szk*gqyy(4))
-     &                        + (sxk*gux(8)+syk*guy(8)+szk*guz(8)))
+     &                           ((sxk*gqyy(2)+syk*gqyy(3)+szk*gqyy(4))
+     &                          + (sxk*gux(8)+syk*guy(8)+szk*guz(8)))
                   fidg(2,3) = -0.25d0 *
-     &                        ( (sxk*gqyz(2)+syk*gqyz(3)+szk*gqyz(4))
-     &                        + (sxk*gux(9)+syk*guy(9)+szk*guz(9)))
+     &                           ((sxk*gqyz(2)+syk*gqyz(3)+szk*gqyz(4))
+     &                          + (sxk*gux(9)+syk*guy(9)+szk*guz(9)))
                   fidg(3,3) = -0.25d0 *
-     &                        ( (sxk*gqzz(2)+syk*gqzz(3)+szk*gqzz(4))
-     &                        + (sxk*gux(10)+syk*guy(10)+szk*guz(10)))
+     &                           ((sxk*gqzz(2)+syk*gqzz(3)+szk*gqzz(4))
+     &                          + (sxk*gux(10)+syk*guy(10)+szk*guz(10)))
                   fidg(2,1) = fidg(1,2)
                   fidg(3,1) = fidg(1,3)
                   fidg(3,2) = fidg(2,3)
                   fkdg(1,1) = 0.25d0 *
-     &                        ( (sxi*gqxx(2)+syi*gqxx(3)+szi*gqxx(4))
-     &                        + (sxi*gux(5)+syi*guy(5)+szi*guz(5)))
+     &                           ((sxi*gqxx(2)+syi*gqxx(3)+szi*gqxx(4))
+     &                          + (sxi*gux(5)+syi*guy(5)+szi*guz(5)))
                   fkdg(1,2) = 0.25d0 *
-     &                        ( (sxi*gqxy(2)+syi*gqxy(3)+szi*gqxy(4))
-     &                        + (sxi*gux(6)+syi*guy(6)+szi*guz(6)))
+     &                           ((sxi*gqxy(2)+syi*gqxy(3)+szi*gqxy(4))
+     &                          + (sxi*gux(6)+syi*guy(6)+szi*guz(6)))
                   fkdg(1,3) = 0.25d0 *
-     &                        ( (sxi*gqxz(2)+syi*gqxz(3)+szi*gqxz(4))
-     &                        + (sxi*gux(7)+syi*guy(7)+szi*guz(7)))
+     &                           ((sxi*gqxz(2)+syi*gqxz(3)+szi*gqxz(4))
+     &                          + (sxi*gux(7)+syi*guy(7)+szi*guz(7)))
                   fkdg(2,2) = 0.25d0 *
-     &                        ( (sxi*gqyy(2)+syi*gqyy(3)+szi*gqyy(4))
-     &                        + (sxi*gux(8)+syi*guy(8)+szi*guz(8)))
+     &                           ((sxi*gqyy(2)+syi*gqyy(3)+szi*gqyy(4))
+     &                          + (sxi*gux(8)+syi*guy(8)+szi*guz(8)))
                   fkdg(2,3) = 0.25d0 *
-     &                        ( (sxi*gqyz(2)+syi*gqyz(3)+szi*gqyz(4))
-     &                        + (sxi*gux(9)+syi*guy(9)+szi*guz(9)))
+     &                           ((sxi*gqyz(2)+syi*gqyz(3)+szi*gqyz(4))
+     &                          + (sxi*gux(9)+syi*guy(9)+szi*guz(9)))
                   fkdg(3,3) = 0.25d0 *
-     &                        ( (sxi*gqzz(2)+syi*gqzz(3)+szi*gqzz(4))
-     &                        + (sxi*gux(10)+syi*guy(10)+szi*guz(10)))
+     &                           ((sxi*gqzz(2)+syi*gqzz(3)+szi*gqzz(4))
+     &                          + (sxi*gux(10)+syi*guy(10)+szi*guz(10)))
                   fkdg(2,1) = fkdg(1,2)
                   fkdg(3,1) = fkdg(1,3)
                   fkdg(3,2) = fkdg(2,3)
@@ -2656,15 +2989,6 @@ c
      &            + gti(3)*dkxr(3) - gti(4)*((uixqkr(3)+rxqkui(3))*psc5
      &            +(uixqkrp(3)+rxqkuip(3))*dsc5)*0.5d0 - gti(6)*rxqkr(3)
 c
-c     update force and torque on site k
-c
-               ftm1i(1,k) = ftm1i(1,k) + ftm2i(1)
-               ftm1i(2,k) = ftm1i(2,k) + ftm2i(2)
-               ftm1i(3,k) = ftm1i(3,k) + ftm2i(3)
-               ttm1i(1,k) = ttm1i(1,k) + ttm3i(1)
-               ttm1i(2,k) = ttm1i(2,k) + ttm3i(2)
-               ttm1i(3,k) = ttm1i(3,k) + ttm3i(3)
-c
 c     update force and torque on site i
 c
                ftm1i(1,i) = ftm1i(1,i) - ftm2i(1)
@@ -2673,6 +2997,15 @@ c
                ttm1i(1,i) = ttm1i(1,i) + ttm2i(1)
                ttm1i(2,i) = ttm1i(2,i) + ttm2i(2)
                ttm1i(3,i) = ttm1i(3,i) + ttm2i(3)
+c
+c     update force and torque on site k
+c
+               ftm1i(1,k) = ftm1i(1,k) + ftm2i(1)
+               ftm1i(2,k) = ftm1i(2,k) + ftm2i(2)
+               ftm1i(3,k) = ftm1i(3,k) + ftm2i(3)
+               ttm1i(1,k) = ttm1i(1,k) + ttm3i(1)
+               ttm1i(2,k) = ttm1i(2,k) + ttm3i(2)
+               ttm1i(3,k) = ttm1i(3,k) + ttm3i(3)
 c
 c     construct auxiliary vectors for induced terms
 c
@@ -2925,15 +3258,6 @@ c
      &            + gti(3)*dkxr(3) - gti(4)*((uixqkr(3)+rxqkui(3))*psc5
      &            +(uixqkrp(3)+rxqkuip(3))*dsc5)*0.5d0 - gti(6)*rxqkr(3)
 c
-c     update force and torque on site k
-c
-               ftm1i(1,k) = ftm1i(1,k) - ftm2i(1)
-               ftm1i(2,k) = ftm1i(2,k) - ftm2i(2)
-               ftm1i(3,k) = ftm1i(3,k) - ftm2i(3)
-               ttm1i(1,k) = ttm1i(1,k) - ttm3i(1)
-               ttm1i(2,k) = ttm1i(2,k) - ttm3i(2)
-               ttm1i(3,k) = ttm1i(3,k) - ttm3i(3)
-c
 c     update force and torque on site i
 c
                ftm1i(1,i) = ftm1i(1,i) + ftm2i(1)
@@ -2942,6 +3266,15 @@ c
                ttm1i(1,i) = ttm1i(1,i) - ttm2i(1)
                ttm1i(2,i) = ttm1i(2,i) - ttm2i(2)
                ttm1i(3,i) = ttm1i(3,i) - ttm2i(3)
+c
+c     update force and torque on site k
+c
+               ftm1i(1,k) = ftm1i(1,k) - ftm2i(1)
+               ftm1i(2,k) = ftm1i(2,k) - ftm2i(2)
+               ftm1i(3,k) = ftm1i(3,k) - ftm2i(3)
+               ttm1i(1,k) = ttm1i(1,k) - ttm3i(1)
+               ttm1i(2,k) = ttm1i(2,k) - ttm3i(2)
+               ttm1i(3,k) = ttm1i(3,k) - ttm3i(3)
             end if
    10       continue
          end do

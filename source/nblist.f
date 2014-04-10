@@ -25,8 +25,9 @@ c
 c     update the vdw and electrostatic neighbor lists
 c
       if (use_vdw .and. use_vlist)  call vlist
-      if (use_charge .and. use_clist)  call clist
-      if ((use_mpole.or.use_polar) .and. use_mlist)  call mlist
+      if ((use_charge.or.use_solv) .and. use_clist)  call clist
+      if ((use_mpole.or.use_polar.or.use_solv) .and. use_mlist)
+     &      call mlist
       if (use_polar .and. use_ulist)  call ulist
       return
       end
@@ -95,6 +96,7 @@ c
 c
 c     choose between serial and parallel list building
 c
+      parallel = .false.
       if (nthread .gt. 1)  parallel = .true.
 c
 c     perform a complete list build instead of an update
@@ -102,7 +104,7 @@ c
       if (dovlst) then
          dovlst = .false.
          if (parallel .or. octahedron) then
-!$OMP PARALLEL default(shared) private(i)
+!$OMP PARALLEL default(private) shared(nvdw,xred,yred,zred)
 !$OMP DO schedule(guided)
             do i = 1, nvdw
                call vbuild (i,xred,yred,zred)
@@ -443,6 +445,7 @@ c
 c
 c     choose between serial and parallel list building
 c
+      parallel = .false.
       if (nthread .gt. 1)  parallel = .true.
 c
 c     perform a complete list build instead of an update
@@ -450,7 +453,7 @@ c
       if (doclst) then
          doclst = .false.
          if (parallel .or. octahedron) then
-!$OMP PARALLEL default(shared) private(i)
+!$OMP PARALLEL default(private) shared(nion)
 !$OMP DO schedule(guided)
             do i = 1, nion
                call cbuild (i)
@@ -787,6 +790,7 @@ c
 c
 c     choose between serial and parallel list building
 c
+      parallel = .false.
       if (nthread .gt. 1)  parallel = .true.
 c
 c     perform a complete list build instead of an update
@@ -1131,6 +1135,7 @@ c
 c
 c     choose between serial and parallel list building
 c
+      parallel = .false.
       if (nthread .gt. 1)  parallel = .true.
 c
 c     perform a complete list build instead of an update

@@ -741,7 +741,7 @@ c
       include 'neigh.i'
       include 'shunt.i'
       include 'usage.i'
-      integer i,j,k
+      integer i,j,k,nect
       integer ii,kk,kkk
       integer in,kn
       integer ic,kc
@@ -755,7 +755,9 @@ c
       real*8 shift,taper,trans
       real*8 rc,rc2,rc3,rc4
       real*8 rc5,rc6,rc7
+      real*8 ect,eintert
       real*8, allocatable :: cscale(:)
+      real*8, allocatable :: aect(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -774,6 +776,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
+      allocate (aect(n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -786,6 +789,26 @@ c
       f = electric / dielec
       mode = 'CHARGE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      ect = ec
+      eintert = einter
+      nect = nec
+      do i = 1, n
+         aect(i) = aec(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
+!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
+!$OMP& c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,off,
+!$OMP& off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
+!$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
+!$OMP& firstprivate(cscale) shared(ect,eintert,nect,aect)
+!$OMP DO reduction(+:ect,eintert,nect,aect)
+!$OMP& schedule(guided)
 c
 c     compute and partition the charge interaction energy
 c
@@ -871,15 +894,15 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-                  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
+                  nect = nect + 1
+                  ect = ect + e
+                  aect(i) = aect(i) + 0.5d0*e
+                  aect(k) = aect(k) + 0.5d0*e
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
+                     eintert = eintert + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -920,9 +943,24 @@ c
          end do
       end do
 c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ec = ect
+      einter = eintert
+      nec = nect
+      do i = 1, n
+         aec(i) = aect(i)
+      end do
+c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
+      deallocate (aect)
       return
       end
 c

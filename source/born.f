@@ -431,7 +431,6 @@ c
       include 'couple.i'
       include 'deriv.i'
       include 'math.i'
-      include 'potent.i'
       include 'solute.i'
       include 'virial.i'
       integer i,j,k,it,kt
@@ -453,12 +452,14 @@ c
       real*8 t1,t2,t3
       real*8 rbi,rbi2,vi
       real*8 ws2,s2ik,uik4
-      real*8 third,pi43,dbr
+      real*8 third,pi43
+      real*8 dbr,dborn
       real*8 expterm,rusum
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       real*8, allocatable :: roff(:)
+      logical use_gk
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -471,6 +472,11 @@ c
       do i = 1, n
          roff(i) = rsolv(i) - doffset
       end do
+c
+c     set flag for use of generalized Kirkwood with polarization
+c
+      use_gk = .false.
+      if (solvtyp(1:2) .eq. 'GK')  use_gk = .true.
 c
 c     get Born radius chain rule components for the Still method
 c
@@ -513,7 +519,9 @@ c
                      sinq = sin(theta)
                      dccf = 2.0d0 * term * sinq * pip5 * ratio
                   end if
-                  de = drb(i) * p4 * gpi * vk * (4.0d0*ccf-dccf) / r6
+                  dborn = drb(i)
+                  if (use_gk)  dborn = dborn + drbp(i)
+                  de = dborn * p4 * gpi * vk * (4.0d0*ccf-dccf)/r6
 c
 c     increment the overall implicit solvation derivatives
 c
@@ -583,7 +591,9 @@ c
      &                       + 0.25d0*(uik/r+uik3*r)
                      t3 = 0.125d0*(1.0d0+sk2/r2)*(lik2-uik2)
      &                       + 0.25d0*log(uik/lik)/r2
-                     de = drb(i) * rb2 * (dlik*t1+duik*t2+t3) / r
+                     dborn = drb(i)
+                     if (use_gk)  dborn = dborn + drbp(i)
+                     de = dborn * rb2 * (dlik*t1+duik*t2+t3) / r
 c
 c     increment the overall implicit solvation derivatives
 c
@@ -654,7 +664,9 @@ c
      &                       + 0.25d0*(uik/r+uik3*r)
                      t3 = 0.125d0*(1.0d0+sk2/r2)*(lik2-uik2)
      &                       + 0.25d0*log(uik/lik)/r2
-                     de = drb(i) * rb2 * (dlik*t1+duik*t2+t3) / r
+                     dborn = drb(i)
+                     if (use_gk)  dborn = dborn + drbp(i)
+                     de = dborn * rb2 * (dlik*t1+duik*t2+t3) / r
 c
 c     increment the overall permanent solvation derivatives
 c
@@ -685,39 +697,6 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
-c
-c     increment the polarization solvation derivatives
-c
-                     if (use_mpole .or. use_polar) then
-                        de = drbp(i) * rb2 * (dlik*t1+duik*t2+t3) / r
-                        dedx = de * xr
-                        dedy = de * yr
-                        dedz = de * zr
-                        des(1,i) = des(1,i) + dedx
-                        des(2,i) = des(2,i) + dedy
-                        des(3,i) = des(3,i) + dedz
-                        des(1,k) = des(1,k) - dedx
-                        des(2,k) = des(2,k) - dedy
-                        des(3,k) = des(3,k) - dedz
-c
-c     increment the internal virial tensor components
-c
-                        vxx = xr * dedx
-                        vyx = yr * dedx
-                        vzx = zr * dedx
-                        vyy = yr * dedy
-                        vzy = zr * dedy
-                        vzz = zr * dedz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vyx
-                        vir(3,1) = vir(3,1) + vzx
-                        vir(1,2) = vir(1,2) + vyx
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vzy
-                        vir(1,3) = vir(1,3) + vzx
-                        vir(2,3) = vir(2,3) + vzy
-                        vir(3,3) = vir(3,3) + vzz
-                     end if
                   end if
                end if
             end do
@@ -769,7 +748,9 @@ c
                      de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
      &                            / (r2*uik**4)
                      dbr = term * de/r
-                     de = dbr * drb(i)
+                     dborn = drb(i)
+                     if (use_gk)  dborn = dborn + drbp(i)
+                     de = dbr * dborn
 c
 c     increment the overall permanent solvation derivatives
 c
@@ -800,39 +781,6 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
-c
-c     increment the polarization solvation derivatives
-c
-                     if (use_mpole .or. use_polar) then
-                        de = dbr * drbp(i)
-                        dedx = de * xr
-                        dedy = de * yr
-                        dedz = de * zr
-                        des(1,i) = des(1,i) + dedx
-                        des(2,i) = des(2,i) + dedy
-                        des(3,i) = des(3,i) + dedz
-                        des(1,k) = des(1,k) - dedx
-                        des(2,k) = des(2,k) - dedy
-                        des(3,k) = des(3,k) - dedz
-c
-c     increment the internal virial tensor components
-c
-                        vxx = xr * dedx
-                        vyx = yr * dedx
-                        vzx = zr * dedx
-                        vyy = yr * dedy
-                        vzy = zr * dedy
-                        vzz = zr * dedz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vyx
-                        vir(3,1) = vir(3,1) + vzx
-                        vir(1,2) = vir(1,2) + vyx
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vzy
-                        vir(1,3) = vir(1,3) + vzx
-                        vir(2,3) = vir(2,3) + vzy
-                        vir(3,3) = vir(3,3) + vzz
-                     end if
                   end if
                end do
             end if
@@ -869,7 +817,9 @@ c
                   expterm = exp(-r2*s2ik)
                   de1 = -4.0d0 * r * ws2 * expterm
                   de2 = 3.0d0*r2/rusum - 4.0d0*r6/rusum**2
-                  de = drb(i) * rbi2 * (de1+vk*ratio**3*de2/pi) / r
+                  dborn = drb(i)
+                  if (use_gk)  dborn = dborn + drbp(i)
+                  de = dborn * rbi2 * (de1+vk*ratio**3*de2/pi) / r
 c
 c     increment the overall implicit solvation derivatives
 c

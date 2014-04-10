@@ -194,7 +194,6 @@ c
       real*8, allocatable :: zrsd(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
-      character*6 mode
       logical done
 c
 c

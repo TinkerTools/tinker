@@ -317,8 +317,7 @@ c
       include 'usage.i'
       integer i,j,k
       integer start,stop
-      real*8 epot,temp
-      real*8 term,part
+      real*8 epot,temp,term
       real*8 energy,random
       real*8 third,weigh
       real*8 step,scale

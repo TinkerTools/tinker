@@ -1127,7 +1127,7 @@ beeman.o: atmtyp.i atoms.i freeze.i mdstuf.i moldyn.i sizes.i units.i usage.i
 bicubic.o:
 bitors.o: angle.i bitor.i couple.i iounit.i sizes.i
 bonds.o: atmlst.i atoms.i bond.i couple.i iounit.i sizes.i
-born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pbstuf.i potent.i sizes.i solute.i virial.i
+born.o: atmtyp.i atoms.i bath.i chgpot.i couple.i deriv.i inform.i iounit.i math.i pbstuf.i sizes.i solute.i virial.i
 bounds.o: atmtyp.i atoms.i boxes.i molcul.i sizes.i
 bussi.o: atmtyp.i atoms.i bath.i boxes.i freeze.i mdstuf.i moldyn.i sizes.i units.i usage.i
 calendar.o:

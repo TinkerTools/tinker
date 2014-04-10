@@ -453,6 +453,7 @@ c
             write (iout,270)  maxiter
   270       format (/,' BAR Free Energy Estimate not Converged',
      &                 ' after',i4,' Iterations')
+            call fatal
          end if
       end do
 c

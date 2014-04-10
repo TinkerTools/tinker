@@ -22,6 +22,7 @@ c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
+      include 'cutoff.i'
       include 'energi.i'
       include 'math.i'
       include 'potent.i'
@@ -104,6 +105,8 @@ c
          call epb
       else if (use_born) then
          if (use_smooth) then
+            call egb0c
+         else if (use_clist) then
             call egb0b
          else
             call egb0a
@@ -113,15 +116,15 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine egb0a  --  generalized Born polarization energy  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine egb0a  --  GB polarization via double loop  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "egb0a" calculates the generalized Born polarization energy
-c     for the GB/SA solvation models
+c     for the GB/SA solvation models using a pairwise double loop
 c
 c
       subroutine egb0a
@@ -136,7 +139,8 @@ c
       include 'solute.i'
       include 'usage.i'
       integer i,k,ii,kk
-      real*8 e,f,fi,fik
+      real*8 e,est
+      real*8 f,fi,fik
       real*8 dwater,fgrp
       real*8 rb2,rm2,fgb,fgm
       real*8 xi,yi,zi
@@ -158,6 +162,19 @@ c     set cutoff distances and switching function coefficients
 c
       mode = 'CHARGE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = es
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
+!$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
+!$OMP% f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& shared(est)
+!$OMP DO reduction(+:est)
+!$OMP& schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -217,28 +234,188 @@ c
 c     increment the overall GB solvation energy component
 c
                   if (i .eq. k)  e = 0.5d0 * e
-                  es = es + e
+                  est = est + e
                end if
             end if
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = est
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine egb0b  --  GB polarization via neighbor list  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "egb0b" calculates the generalized Born polarization energy
+c     for the GB/SA solvation models using a pairwise neighbor list
+c
+c
+      subroutine egb0b
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'charge.i'
+      include 'chgpot.i'
+      include 'energi.i'
+      include 'group.i'
+      include 'neigh.i'
+      include 'shunt.i'
+      include 'solute.i'
+      include 'usage.i'
+      integer i,k
+      integer ii,kk,kkk
+      real*8 e,est
+      real*8 f,fi,fik
+      real*8 dwater,fgrp
+      real*8 rbi,rb2,rm2
+      real*8 fgb,fgm
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,r3,r4
+      real*8 r5,r6,r7
+      real*8 shift,taper,trans
+      logical proceed,usei
+      character*6 mode
+c
+c
+c     set the solvent dielectric and energy conversion factor
+c
+      if (nion .eq. 0)  return
+      dwater = 78.3d0
+      f = -electric * (1.0d0 - 1.0d0/dwater)
+c
+c     set cutoff distances and switching function coefficients
+c
+      mode = 'CHARGE'
+      call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = es
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
+!$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
+!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& shared(est)
+!$OMP DO reduction(+:est)
+!$OMP& schedule(guided)
+c
+c     calculate GB electrostatic polarization energy term
+c
+      do ii = 1, nion
+         i = iion(ii)
+         usei = use(i)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         fi = f * pchg(ii)
+         rbi = rborn(i)
+c
+c     calculate the self-energy term for the current atom
+c
+         fik = fi * pchg(ii)
+         rb2 = rbi * rbi
+         e = fik / rbi
+         rm2 = (0.5d0 * (off+cut))**2
+         fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
+         shift = fik / fgm
+         e = e - shift
+         est = est + 0.5d0*e
+c
+c     decide whether to compute the current interaction
+c
+         do kkk = 1, nelst(ii)
+            kk = elst(kkk,ii)
+            k = iion(kk)
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               xr = xi - x(k)
+               yr = yi - y(k)
+               zr = zi - z(k)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. off2) then
+                  fik = fi * pchg(kk)
+                  rb2 = rbi * rborn(k)
+                  fgb = sqrt(r2 + rb2*exp(-0.25d0*r2/rb2))
+                  e = fik / fgb
+c
+c     use shifted energy switching if near the cutoff distance
+c
+                  rm2 = (0.5d0 * (off+cut))**2
+                  fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
+                  shift = fik / fgm
+                  e = e - shift
+                  if (r2 .gt. cut2) then
+                     r = sqrt(r2)
+                     r3 = r2 * r
+                     r4 = r2 * r2
+                     r5 = r2 * r3
+                     r6 = r3 * r3
+                     r7 = r3 * r4
+                     taper = c5*r5 + c4*r4 + c3*r3
+     &                          + c2*r2 + c1*r + c0
+                     trans = fik * (f7*r7 + f6*r6 + f5*r5 + f4*r4
+     &                               + f3*r3 + f2*r2 + f1*r + f0)
+                     e = e*taper + trans
+                  end if
+c
+c     scale the interaction based on its group membership
+c
+                  if (use_group)  e = e * fgrp
+c
+c     increment the overall GB solvation energy component
+c
+                  est = est + e
+               end if
+            end if
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = est
       return
       end
 c
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine egb0b  --  GB polarization energy for smoothing  ##
+c     ##  subroutine egb0c  --  GB polarization energy for smoothing  ##
 c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "egb0b" calculates the generalized Born polarization energy
+c     "egb0c" calculates the generalized Born polarization energy
 c     for the GB/SA solvation models for use with potential smoothing
 c     methods via analogy to the smoothing of Coulomb's law
 c
 c
-      subroutine egb0b
+      subroutine egb0c
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -337,7 +514,16 @@ c
 c
       subroutine egk
       implicit none
+      include 'potent.i'
 c
+c
+c     setup the multipoles for solvation only calculations
+c
+      if (.not.use_mpole .and. .not.use_polar) then
+         call chkpole
+         call rotpole
+         call induce
+      end if
 c
 c     compute the generalized Kirkwood electrostatic energy
 c
@@ -371,7 +557,6 @@ c
       include 'group.i'
       include 'mpole.i'
       include 'polar.i'
-      include 'potent.i'
       include 'shunt.i'
       include 'solute.i'
       include 'usage.i'
@@ -422,13 +607,6 @@ c     set cutoff distances and switching function coefficients
 c
       mode = 'MPOLE'
       call switch (mode)
-c
-c     setup the multipoles for solvation only calculations
-c
-      if (.not.use_mpole .and. .not.use_polar) then
-         call chkpole
-         call rotpole
-      end if
 c
 c     calculate GK electrostatic solvation free energy
 c

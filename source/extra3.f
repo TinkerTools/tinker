@@ -26,7 +26,7 @@ c
       integer i
 c
 c
-c     zero out the energy due to extra potential terms
+c     zero out energy and partitioning due to extra potential terms
 c
       nex = 0
       ex = 0.0d0

@@ -707,6 +707,7 @@ c
       integer ii,kk,kkk
       integer ix,iy,iz
       integer kx,ky,kz
+      integer nemtt,neptt
       real*8 e,ei,fgrp
       real*8 f,fm,fp
       real*8 r,r2,xr,yr,zr
@@ -726,10 +727,14 @@ c
       real*8 qkx,qky,qkz
       real*8 scale3,scale5
       real*8 scale7
+      real*8 emtt,eptt
+      real*8 eintert
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: pscale(:)
+      real*8, allocatable :: aemtt(:)
+      real*8, allocatable :: aeptt(:)
       logical proceed
       logical header,huge
       logical usei,usek
@@ -765,6 +770,8 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (pscale(n))
+      allocate (aemtt(n))
+      allocate (aeptt(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -779,6 +786,30 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      emtt = 0.0d0
+      eptt = 0.0d0
+      eintert = einter
+      nemtt = nem
+      neptt = nep
+      do i = 1, n
+         aemtt(i) = aem(i)
+         aeptt(i) = aep(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,pdi,pti,pgamma,
+!$OMP& scale3,scale5,scale7,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
+!$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
+!$OMP& ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,
+!$OMP& fgrp,fm,fp,sc,gl,sci,gli)
+!$OMP& firstprivate(mscale,pscale)
+!$OMP DO reduction(+:emtt,eptt,eintert,nemtt,neptt,aemtt,aeptt)
+!$OMP& schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -958,19 +989,19 @@ c     increment the overall multipole and polarization energies
 c
                   muse = (use_mpole .and. mscale(kk).ne.0.0d0)
                   puse = (use_polar .and. pscale(kk).ne.0.0d0)
-                  if (muse)  nem = nem + 1
-                  if (puse)  nep = nep + 1
-                  em = em + e
-                  ep = ep + ei
-                  aem(ii) = aem(ii) + 0.5d0*e
-                  aem(kk) = aem(kk) + 0.5d0*e
-                  aep(ii) = aep(ii) + 0.5d0*ei
-                  aep(kk) = aep(kk) + 0.5d0*ei
+                  if (muse)  nemtt = nemtt + 1
+                  if (puse)  neptt = neptt + 1
+                  emtt = emtt + e
+                  eptt = eptt + ei
+                  aemtt(ii) = aemtt(ii) + 0.5d0*e
+                  aemtt(kk) = aemtt(kk) + 0.5d0*e
+                  aeptt(ii) = aeptt(ii) + 0.5d0*ei
+                  aeptt(kk) = aeptt(kk) + 0.5d0*ei
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(ii) .ne. molcule(kk)) then
-                     einter = einter + e + ei
+                     eintert = eintert + e + ei
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1016,10 +1047,29 @@ c
          end do
       end do
 c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      em = em + emtt
+      ep = ep + eptt
+      einter = eintert
+      nem = nemtt
+      nep = neptt
+      do i = 1, n
+         aem(i) = aemtt(i)
+         aep(i) = aeptt(i)
+      end do
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (pscale)
+      deallocate (aemtt)
+      deallocate (aeptt)
       return
       end
 c
@@ -1942,8 +1992,8 @@ c
       integer ii,kk,kkk
       integer nemtt,neptt
       real*8 e,ei,eintra
-      real*8 f,erfc
-      real*8 r,r2,xr,yr,zr
+      real*8 f,erfc,r,r2
+      real*8 xr,yr,zr
       real*8 bfac,exp2a
       real*8 efix,eifix
       real*8 ralpha

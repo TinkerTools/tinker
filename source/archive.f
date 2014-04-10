@@ -231,6 +231,17 @@ c
          end if
       end if
 c
+c     store index to use in renumbering the untrimmed atoms
+c
+      k = 0
+      do i = 1, n
+         iuse(i) = 0
+         if (use(i)) then
+            k = k + 1
+            iuse(i) = k
+         end if
+      end do
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (xold(n))
@@ -490,8 +501,8 @@ c
      &          '.'//digc//',i6,8'//atmc//')'
       do i = 1, n
          if (use(i)) then
-            write (iarc,fstr)  i,name(i),x(i),y(i),z(i),type(i),
-     &                         (i12(k,i),k=1,n12(i))
+            write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),type(i),
+     &                         (iuse(i12(k,i)),k=1,n12(i))
          end if
       end do
 c

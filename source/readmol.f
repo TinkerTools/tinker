@@ -27,12 +27,10 @@ c
       include 'ptable.i'
       include 'titles.i'
       integer i,j,ia,ib,imdl
-      integer nbond,number
+      integer nbond
       integer trimtext
       logical exist,opened
       character*120 mdlfile
-      character*120 record
-      character*120 string
 c
 c
 c     open the input file if it has not already been done

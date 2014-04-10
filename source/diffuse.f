@@ -39,6 +39,7 @@ c
       integer iarc,freeunit
       integer start,stop
       integer step,skip
+      integer list(20)
       integer, allocatable :: ntime(:)
       real*8 xmid,ymid,zmid
       real*8 xold,yold,zold
@@ -139,9 +140,44 @@ c
       call katom
       call molecule
 c
-c     alter the molecule list to include only active molecules
+c     find atoms and molecules to be excluded from consideration
 c
       call active
+      if (nuse .eq. n) then
+         do i = 1, 20
+            list(i) = 0
+         end do
+         write (iout,100)
+  100    format (/,' Numbers of any Atoms to be Removed :  ',$)
+         read (input,110)  record
+  110    format (a120)
+         read (record,*,err=120,end=120)  (list(i),i=1,20)
+  120    continue
+         i = 1
+         do while (list(i) .ne. 0)
+            list(i) = max(-n,min(n,list(i)))
+            if (list(i) .gt. 0) then
+               k = list(i)
+               if (use(k)) then
+                  use(k) = .false.
+                  nuse = nuse - 1
+               end if
+               i = i + 1
+            else
+               list(i+1) = max(-n,min(n,list(i+1)))
+               do k = abs(list(i)), abs(list(i+1))
+                  if (use(k)) then
+                     use(k) = .false.
+                     nuse = nuse - 1
+                  end if
+               end do
+               i = i + 2
+            end if
+         end do
+      end if
+c
+c     alter the molecule list to include only active molecules
+c
       do i = 1, nmol
          do j = imol(1,i), imol(2,i)
             k = kmol(j)
@@ -157,8 +193,8 @@ c
          end if
       end do
       nmol = k
-      write (iout,100)  nmol
-  100 format (/,' Total Number of Molecules :',i16)
+      write (iout,130)  nmol
+  130 format (/,' Total Number of Molecules :',i16)
 c
 c     count the number of coordinate frames in the archive file
 c
@@ -173,8 +209,8 @@ c
       rewind (unit=iarc)
       stop = min(nframe,stop)
       nframe = (stop-start)/step + 1
-      write (iout,110)  nframe
-  110 format (/,' Number of Coordinate Frames :',i14)
+      write (iout,140)  nframe
+  140 format (/,' Number of Coordinate Frames :',i14)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -188,8 +224,8 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,120)
-  120 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,150)
+  150 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
@@ -200,11 +236,11 @@ c
          iframe = iframe + step
          skip = step
          call readxyz (iarc)
-         if (n .eq. 0)  goto 140
+         if (n .eq. 0)  goto 170
          nframe = nframe + 1
          if (mod(nframe,100) .eq. 0) then
-            write (iout,130)  nframe
-  130       format (4x,'Processing Coordinate Frame',i13)
+            write (iout,160)  nframe
+  160       format (4x,'Processing Coordinate Frame',i13)
          end if
 c
 c     unfold each molecule to get its corrected center of mass
@@ -242,11 +278,11 @@ c
             zcm(i,nframe) = zold + zr
          end do
       end do
-  140 continue
+  170 continue
       close (unit=iarc)
       if (mod(nframe,100) .ne. 0) then
-         write (iout,150)  nframe
-  150    format (4x,'Processing Coordinate Frame',i13)
+         write (iout,180)  nframe
+  180    format (4x,'Processing Coordinate Frame',i13)
       end if
 c
 c     increment the squared displacements for each frame pair
@@ -291,8 +327,8 @@ c
 c
 c     estimate the diffusion constant via the Einstein relation
 c
-      write (iout,160)
-  160 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
+      write (iout,190)
+  190 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
      &           ' Constant :',
      &        //,5x,'Time Step',5x,'X MSD',7x,'Y MSD',7x,'Z MSD',
      &           7x,'R MSD',4x,'Diff Const',/)
@@ -303,8 +339,8 @@ c
          zvalue = zmsd(i) / 2.0d0
          rvalue = (xmsd(i) + ymsd(i) + zmsd(i)) / 6.0d0
          dvalue = rvalue / delta
-         write (iout,170)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
-  170    format (f12.2,4f12.2,f12.4)
+         write (iout,200)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
+  200    format (f12.2,4f12.2,f12.4)
       end do
 c
 c     perform deallocation of some local arrays

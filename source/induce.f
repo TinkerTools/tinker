@@ -468,7 +468,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dfield0a" computes the direct electricstatic field due to
+c     "dfield0a" computes the direct electrostatic field due to
 c     permanent multipole moments via a double loop
 c
 c
@@ -491,15 +491,12 @@ c
       real*8 fgrp,r,r2
       real*8 rr3,rr5,rr7
       real*8 ci,dix,diy,diz
-      real*8 duix,duiy,duiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
-      real*8 dukx,duky,dukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 dir,duir
-      real*8 dkr,dukr
+      real*8 dir,dkr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
       real*8 damp,expdamp
@@ -802,7 +799,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "ufield0a" computes the mutual electricstatic field due to
+c     "ufield0a" computes the mutual electrostatic field due to
 c     induced dipole moments via a double loop
 c
 c
@@ -822,7 +819,7 @@ c
       integer ii,kk
       real*8 xr,yr,zr
       real*8 fgrp,r,r2
-      real*8 rr3,rr5,rr7
+      real*8 rr3,rr5
       real*8 duix,duiy,duiz
       real*8 puix,puiy,puiz
       real*8 dukx,duky,dukz
@@ -831,7 +828,6 @@ c
       real*8 dukr,pukr
       real*8 damp,expdamp
       real*8 scale3,scale5
-      real*8 scale7
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
@@ -1059,7 +1055,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "dfield0b" computes the mutual electricstatic field due to
+c     "dfield0b" computes the mutual electrostatic field due to
 c     permanent multipole moments via a pair list
 c
 c
@@ -1082,17 +1078,12 @@ c
       real*8 fgrp,r,r2
       real*8 rr3,rr5,rr7
       real*8 ci,dix,diy,diz
-      real*8 duix,duiy,duiz
-      real*8 puix,puiy,puiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
-      real*8 dukx,duky,dukz
-      real*8 pukx,puky,pukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 dir,duir,puir
-      real*8 dkr,dukr,pukr
+      real*8 dir,dkr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
       real*8 damp,expdamp
@@ -1100,7 +1091,6 @@ c
       real*8 scale7
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
-      real*8 fip(3),fkp(3)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
@@ -1265,7 +1255,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "ufield0b" computes the mutual electricstatic field due to
+c     "ufield0b" computes the mutual electrostatic field due to
 c     induced dipole moments via a pair list
 c
 c
@@ -1285,7 +1275,7 @@ c
       integer ii,kk,kkk
       real*8 xr,yr,zr
       real*8 fgrp,r,r2
-      real*8 rr3,rr5,rr7
+      real*8 rr3,rr5
       real*8 duix,duiy,duiz
       real*8 puix,puiy,puiz
       real*8 dukx,duky,dukz
@@ -1294,7 +1284,6 @@ c
       real*8 dukr,pukr
       real*8 damp,expdamp
       real*8 scale3,scale5
-      real*8 scale7
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
@@ -1424,7 +1413,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "dfield0c" computes the mutual electricstatic field due to
+c     "dfield0c" computes the mutual electrostatic field due to
 c     permanent multipole moments via Ewald summation
 c
 c
@@ -1441,7 +1430,6 @@ c
       integer i,j,ii
       real*8 term
       real*8 ucell(3)
-      real*8 ucellp(3)
       real*8 field(3,*)
       real*8 fieldp(3,*)
 c
@@ -1513,7 +1501,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "ufield0c" computes the mutual electricstatic field due to
+c     "ufield0c" computes the mutual electrostatic field due to
 c     induced dipole moments via Ewald summation
 c
 c
@@ -3527,7 +3515,6 @@ c
             call fatal
          end if
       end if
-
 c
 c     perform deallocation of some local arrays
 c
@@ -3579,18 +3566,7 @@ c
       real*8 ck,uxk,uyk,uzk
       real*8 qxxk,qxyk,qxzk
       real*8 qyyk,qyzk,qzzk
-      real*8 duix,duiy,duiz
-      real*8 puix,puiy,puiz
-      real*8 dukx,duky,dukz
-      real*8 pukx,puky,pukz
-      real*8 dir,duir,puir
-      real*8 dkr,dukr,pukr
-      real*8 duixs,duiys,duizs
-      real*8 puixs,puiys,puizs
-      real*8 dukxs,dukys,dukzs
-      real*8 pukxs,pukys,pukzs
-      real*8 duirs,puirs
-      real*8 dukrs,pukrs
+      real*8 dir,dkr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
       real*8 damp,expdamp
@@ -3609,15 +3585,16 @@ c
       real*8 gqxz(4),gqyy(4)
       real*8 gqyz(4),gqzz(4)
       real*8 fid(3),fkd(3)
-      real*8 fip(3),fkp(3)
-      real*8 fids(3),fkds(3)
-      real*8 fips(3),fkps(3)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       real*8 fields(3,*)
       real*8 fieldps(3,*)
+      real*8, allocatable :: fieldt(:,:)
+      real*8, allocatable :: fieldtp(:,:)
+      real*8, allocatable :: fieldts(:,:)
+      real*8, allocatable :: fieldtps(:,:)
       logical proceed
 c
 c
@@ -3650,6 +3627,41 @@ c
          dscale(i) = 1.0d0
          pscale(i) = 1.0d0
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fieldt(3,npole))
+      allocate (fieldtp(3,npole))
+      allocate (fieldts(3,npole))
+      allocate (fieldtps(3,npole))
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
+!$OMP& rpole,n12,n13,n14,n15,np11,np12,np13,np14,i12,i13,i14,i15,
+!$OMP% ip11,ip12,ip13,ip14,p2scale,p3scale,p4scale,p41scale,p5scale,
+!$OMP& d1scale,d2scale,d3scale,d4scale,use_intra,x,y,z,off2,fc,fd,fq,
+!$OMP& gkc,field,fieldp,fields,fieldps)
+!$OMP& firstprivate(dscale,pscale)
+!$OMP% shared(fieldt,fieldtp,fieldts,fieldtps)
+c
+c     initialize local variables for OpenMP calculation
+c
+!$OMP DO collapse(2)
+      do i = 1, npole
+         do j = 1, 3
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+            fieldts(j,i) = 0.0d0
+            fieldtps(j,i) = 0.0d0
+         end do
+      end do
+!$OMP END DO
+c
+c     find the field terms for each pairwise interaction
+c
+!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
+!$OMP& schedule(guided)
 c
 c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
@@ -3767,10 +3779,10 @@ c
                      fkd(3) = zr*(rr3*ci+rr5*dir+rr7*qir)
      &                           - rr3*uzi - 2.0d0*rr5*qiz
                      do j = 1, 3
-                        field(j,i) = field(j,i) + fid(j)*dscale(kk)
-                        field(j,k) = field(j,k) + fkd(j)*dscale(kk)
-                        fieldp(j,i) = fieldp(j,i) + fid(j)*pscale(kk)
-                        fieldp(j,k) = fieldp(j,k) + fkd(j)*pscale(kk)
+                        fieldt(j,i) = fieldt(j,i) + fid(j)*dscale(kk)
+                        fieldt(j,k) = fieldt(j,k) + fkd(j)*dscale(kk)
+                        fieldtp(j,i) = fieldtp(j,i) + fid(j)*pscale(kk)
+                        fieldtp(j,k) = fieldtp(j,k) + fkd(j)*pscale(kk)
                      end do
                   end if
 c
@@ -3937,10 +3949,10 @@ c
                      end do
                   end if
                   do j = 1, 3
-                     fields(j,i) = fields(j,i) + fid(j)
-                     fields(j,k) = fields(j,k) + fkd(j)
-                     fieldps(j,i) = fieldps(j,i) + fid(j)
-                     fieldps(j,k) = fieldps(j,k) + fkd(j)
+                     fieldts(j,i) = fieldts(j,i) + fid(j)
+                     fieldts(j,k) = fieldts(j,k) + fkd(j)
+                     fieldtps(j,i) = fieldtps(j,i) + fid(j)
+                     fieldtps(j,k) = fieldtps(j,k) + fkd(j)
                   end do
                end if
             end if
@@ -3973,21 +3985,41 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
 c
-c     perform deallocation of some local arrays
+c     add local copies to global variables for OpenMP calculation
 c
-      deallocate (dscale)
-      deallocate (pscale)
+!$OMP DO
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
+            fields(j,i) = fields(j,i) + fieldts(j,i)
+            fieldps(j,i) = fieldps(j,i) + fieldtps(j,i)
+         end do
+      end do
+!$OMP END DO
 c
 c     combine permanent multipole field and GK reaction field
 c
-c
+!$OMP DO
       do i = 1, npole
          do j = 1, 3
             fields(j,i) = field(j,i) + fields(j,i)
             fieldps(j,i) = fieldp(j,i) + fieldps(j,i)
          end do
       end do
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dscale)
+      deallocate (pscale)
+      deallocate (fieldt)
+      deallocate (fieldtp)
+      deallocate (fieldts)
+      deallocate (fieldtps)
       return
       end
 c
@@ -4025,8 +4057,8 @@ c
       real*8 puix,puiy,puiz
       real*8 dukx,duky,dukz
       real*8 pukx,puky,pukz
-      real*8 dir,duir,puir
-      real*8 dkr,dukr,pukr
+      real*8 duir,dukr
+      real*8 puir,pukr
       real*8 duixs,duiys,duizs
       real*8 puixs,puiys,puizs
       real*8 dukxs,dukys,dukzs
@@ -4053,6 +4085,10 @@ c
       real*8 fieldp(3,*)
       real*8 fields(3,*)
       real*8 fieldps(3,*)
+      real*8, allocatable :: fieldt(:,:)
+      real*8, allocatable :: fieldtp(:,:)
+      real*8, allocatable :: fieldts(:,:)
+      real*8, allocatable :: fieldtps(:,:)
       logical proceed
 c
 c
@@ -4081,6 +4117,39 @@ c
       do i = 1, n
          dscale(i) = 1.0d0
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fieldt(3,npole))
+      allocate (fieldtp(3,npole))
+      allocate (fieldts(3,npole))
+      allocate (fieldtps(3,npole))
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
+!$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
+!$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
+!$OMP& field,fieldp,fields,fieldps)
+!$OMP& firstprivate(dscale) shared(fieldt,fieldtp,fieldts,fieldtps)
+c
+c     initialize local variables for OpenMP calculation
+c
+!$OMP DO collapse(2)
+      do i = 1, npole
+         do j = 1, 3
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+            fieldts(j,i) = 0.0d0
+            fieldtps(j,i) = 0.0d0
+         end do
+      end do
+!$OMP END DO
+c
+c     find the field terms for each pairwise interaction
+c
+!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
+!$OMP& schedule(guided)
 c
 c     compute the mutual electrostatic field at each atom,
 c     and another field including RF due to induced dipoles
@@ -4190,14 +4259,14 @@ c
                      fkps(2) = -rr3*puiys + rr5*puirs*yr
                      fkps(3) = -rr3*puizs + rr5*puirs*zr
                      do j = 1, 3
-                        field(j,i) = field(j,i) + fid(j)
-                        field(j,k) = field(j,k) + fkd(j)
-                        fieldp(j,i) = fieldp(j,i) + fip(j)
-                        fieldp(j,k) = fieldp(j,k) + fkp(j)
-                        fields(j,i) = fields(j,i) + fids(j)
-                        fields(j,k) = fields(j,k) + fkds(j)
-                        fieldps(j,i) = fieldps(j,i) + fips(j)
-                        fieldps(j,k) = fieldps(j,k) + fkps(j)
+                        fieldt(j,i) = fieldt(j,i) + fid(j)
+                        fieldt(j,k) = fieldt(j,k) + fkd(j)
+                        fieldtp(j,i) = fieldtp(j,i) + fip(j)
+                        fieldtp(j,k) = fieldtp(j,k) + fkp(j)
+                        fieldts(j,i) = fieldts(j,i) + fids(j)
+                        fieldts(j,k) = fieldts(j,k) + fkds(j)
+                        fieldtps(j,i) = fieldtps(j,i) + fips(j)
+                        fieldtps(j,k) = fieldtps(j,k) + fkps(j)
                      end do
                   end if
 c
@@ -4245,10 +4314,10 @@ c
                      end do
                   end if
                   do j = 1, 3
-                     fields(j,i) = fields(j,i) + fids(j)
-                     fields(j,k) = fields(j,k) + fkds(j)
-                     fieldps(j,i) = fieldps(j,i) + fips(j)
-                     fieldps(j,k) = fieldps(j,k) + fkps(j)
+                     fieldts(j,i) = fieldts(j,i) + fids(j)
+                     fieldts(j,k) = fieldts(j,k) + fkds(j)
+                     fieldtps(j,i) = fieldtps(j,i) + fips(j)
+                     fieldtps(j,k) = fieldtps(j,k) + fkps(j)
                   end do
                end if
             end if
@@ -4269,10 +4338,29 @@ c
             dscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+!$OMP END DO
+c
+c     add local copies to global variables for OpenMP calculation
+c
+!$OMP DO
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
+            fields(j,i) = fields(j,i) + fieldts(j,i)
+            fieldps(j,i) = fieldps(j,i) + fieldtps(j,i)
+         end do
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c
       deallocate (dscale)
+      deallocate (fieldt)
+      deallocate (fieldtp)
+      deallocate (fieldts)
+      deallocate (fieldtps)
       return
       end
 c
@@ -5395,6 +5483,9 @@ c
          m = 0
          do i = 1, npole-1
             ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             pdi = pdamp(i)
             pti = thole(i)
             poli = polarity(i)
@@ -5415,9 +5506,9 @@ c
             end do
             do k = i+1, npole
                kk = ipole(k)
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -5608,8 +5699,8 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(xr,yr,zr,r,r2,rr3,rr5,
-!$OMP& pdi,pti,poli,polik,pgamma,damp,expdamp,scale3,scale5,
+!$OMP PARALLEL default(shared) private(xi,yi,zi,xr,yr,zr,r,r2,rr3,
+!$OMP& rr5,pdi,pti,poli,polik,pgamma,damp,expdamp,scale3,scale5,
 !$OMP& i,j,k,m,ii,kk,kkk,dscale)
 c
 c     perform dynamic allocation of some local arrays
@@ -5627,6 +5718,9 @@ c
 !$OMP DO schedule(guided)
          do i = 1, npole
             ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             pdi = pdamp(i)
             pti = thole(i)
             poli = polarity(i)
@@ -5646,9 +5740,9 @@ c
             do kkk = 1, nulst(i)
                k = ulst(kkk,i)
                kk = ipole(k)
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                r = sqrt(r2)

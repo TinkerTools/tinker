@@ -619,6 +619,7 @@ c
       real*8 qkx,qky,qkz
       real*8 scale3,scale5
       real*8 scale7
+      real*8 emtt,eptt
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8, allocatable :: mscale(:)
@@ -662,6 +663,23 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      emtt = 0.0d0
+      eptt = 0.0d0
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,pdi,pti,pgamma,
+!$OMP& scale3,scale5,scale7,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
+!$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
+!$OMP& ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,
+!$OMP& fgrp,fm,fp,sc,gl,sci,gli)
+!$OMP& firstprivate(mscale,pscale)
+!$OMP DO reduction(+:emtt,eptt)
+!$OMP& schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -839,8 +857,8 @@ c                    ei = ei * fgrp
 c
 c     increment the overall multipole and polarization energies
 c
-                  em = em + e
-                  ep = ep + ei
+                  emtt = emtt + e
+                  eptt = eptt + ei
                end if
             end if
          end do
@@ -864,6 +882,16 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      em = em + emtt
+      ep = ep + eptt
 c
 c     perform deallocation of some local arrays
 c

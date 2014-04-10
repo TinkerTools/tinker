@@ -1673,6 +1673,7 @@ c
       real*8 rr5,rr7,rr9,rr11
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 emtt,eptt,eintert
       real*8 ci,di(3),qi(9)
       real*8 ck,dk(3),qk(9)
       real*8 frcxi(3),frcxk(3)
@@ -1705,10 +1706,15 @@ c
       real*8 gl(0:8),gli(7),glip(7)
       real*8 sc(10),sci(8),scip(8)
       real*8 gf(7),gfi(6),gti(6)
+      real*8 virt(3,3)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
+      real*8, allocatable :: demt1(:,:)
+      real*8, allocatable :: demt2(:,:)
+      real*8, allocatable :: dept1(:,:)
+      real*8, allocatable :: dept2(:,:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -1742,6 +1748,10 @@ c
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
+      allocate (demt1(3,n))
+      allocate (demt2(3,n))
+      allocate (dept1(3,n))
+      allocate (dept2(3,n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -1758,6 +1768,44 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      emtt = 0.0d0
+      eptt = 0.0d0
+      eintert = einter
+      do i = 1, n
+         do j = 1, 3
+            demt1(j,i) = 0.0d0
+            demt2(j,i) = 0.0d0
+            dept1(j,i) = 0.0d0
+            dept2(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            virt(j,i) = 0.0d0
+         end do
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,
+!$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
+!$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,gfd,xr,yr,zr,xix,yix,zix,
+!$OMP& xiy,yiy,ziy,xiz,yiz,ziz,xkx,ykx,zkx,xky,yky,zky,xkz,ykz,zkz,
+!$OMP& r,r2,rr1,rr3,rr5,rr7,rr9,rr11,iax,iay,iaz,kax,kay,kaz,
+!$OMP& vxx,vyy,vzz,vyx,vzx,vzy,frcxi,frcyi,frczi,frcxk,frcyk,frczk,
+!$OMP& ci,di,qi,ck,dk,qk,fridmp,findmp,ftm2,ftm2i,ttm2,ttm3,ttm2i,ttm3i,
+!$OMP& fdir,dixdk,dkxui,dixuk,dixukp,dkxuip,uixqkr,ukxqir,uixqkrp,
+!$OMP& ukxqirp,qiuk,qkui,qiukp,qkuip,rxqiuk,rxqkui,rxqiukp,rxqkuip,
+!$OMP& qidk,qkdi,qir,qkr,qiqkr,qkqir,qixqk,rxqir,dixr,dkxr,dixqkr,
+!$OMP& dkxqir,rxqkr,qkrxqir,rxqikr,rxqkir,rxqidk,rxqkdi,
+!$OMP& ddsc3,ddsc5,ddsc7,sc,gl,sci,scip,gli,glip,gf,gfi)
+!$OMP& firstprivate(mscale,pscale,dscale,uscale)
+!$OMP DO reduction(+:emtt,eptt,eintert,demt1,demt2,dept1,dept2,virt)
+!$OMP& schedule(guided)
 c
 c     set scale factors for permanent multipole and induced terms
 c
@@ -2108,7 +2156,7 @@ c
 c     increment the total intermolecular energy
 c
                if (molcule(ii) .ne. molcule(kk)) then
-                  einter = einter + e + ei
+                  eintert = eintert + e + ei
                end if
 c
 c     intermediate variables for the permanent components
@@ -2308,23 +2356,23 @@ c
 c
 c     increment gradient due to force and torque on first site
 c
-               dem(1,ii) = dem(1,ii) + ftm2(1)
-               dem(2,ii) = dem(2,ii) + ftm2(2)
-               dem(3,ii) = dem(3,ii) + ftm2(3)
-               dep(1,ii) = dep(1,ii) + ftm2i(1)
-               dep(2,ii) = dep(2,ii) + ftm2i(2)
-               dep(3,ii) = dep(3,ii) + ftm2i(3)
-               call torque (i,ttm2,ttm2i,frcxi,frcyi,frczi)
+               demt1(1,ii) = demt1(1,ii) + ftm2(1)
+               demt1(2,ii) = demt1(2,ii) + ftm2(2)
+               demt1(3,ii) = demt1(3,ii) + ftm2(3)
+               dept1(1,ii) = dept1(1,ii) + ftm2i(1)
+               dept1(2,ii) = dept1(2,ii) + ftm2i(2)
+               dept1(3,ii) = dept1(3,ii) + ftm2i(3)
+               call torque3 (i,ttm2,ttm2i,frcxi,frcyi,frczi,demt1,dept1)
 c
 c     increment gradient due to force and torque on second site
 c
-               dem(1,kk) = dem(1,kk) - ftm2(1)
-               dem(2,kk) = dem(2,kk) - ftm2(2)
-               dem(3,kk) = dem(3,kk) - ftm2(3)
-               dep(1,kk) = dep(1,kk) - ftm2i(1)
-               dep(2,kk) = dep(2,kk) - ftm2i(2)
-               dep(3,kk) = dep(3,kk) - ftm2i(3)
-               call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk)
+               demt2(1,kk) = demt2(1,kk) - ftm2(1)
+               demt2(2,kk) = demt2(2,kk) - ftm2(2)
+               demt2(3,kk) = demt2(3,kk) - ftm2(3)
+               dept2(1,kk) = dept2(1,kk) - ftm2i(1)
+               dept2(2,kk) = dept2(2,kk) - ftm2i(2)
+               dept2(3,kk) = dept2(3,kk) - ftm2i(3)
+               call torque3 (k,ttm3,ttm3i,frcxk,frcyk,frczk,demt2,dept2)
 c
 c     increment the internal virial tensor components
 c
@@ -2376,15 +2424,15 @@ c
                vzz = -zr*(ftm2(3)+ftm2i(3)) + zix*frcxi(3)
      &                  + ziy*frcyi(3) + ziz*frczi(3) + zkx*frcxk(3)
      &                  + zky*frcyk(3) + zkz*frczk(3)
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
+               virt(1,1) = virt(1,1) + vxx
+               virt(2,1) = virt(2,1) + vyx
+               virt(3,1) = virt(3,1) + vzx
+               virt(1,2) = virt(1,2) + vyx
+               virt(2,2) = virt(2,2) + vyy
+               virt(3,2) = virt(3,2) + vzy
+               virt(1,3) = virt(1,3) + vzx
+               virt(2,3) = virt(2,3) + vzy
+               virt(3,3) = virt(3,3) + vzz
             end if
    10       continue
          end do
@@ -2425,12 +2473,38 @@ c
          end do
       end do
 c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      em = em + emtt
+      ep = ep + eptt
+      einter = eintert
+      do i = 1, n
+         do j = 1, 3
+            dem(j,i) = dem(j,i) + demt1(j,i) + demt2(j,i)
+            dep(j,i) = dep(j,i) + dept1(j,i) + dept2(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + virt(j,i)
+         end do
+      end do
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
+      deallocate (demt1)
+      deallocate (demt2)
+      deallocate (dept1)
+      deallocate (dept2)
       return
       end
 c
@@ -4740,7 +4814,7 @@ c
       real*8 erl,erli
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 emtt,eptt
+      real*8 emtt,eptt,eintrat
       real*8 frcxi(3),frcxk(3)
       real*8 frcyi(3),frcyk(3)
       real*8 frczi(3),frczk(3)
@@ -4780,15 +4854,15 @@ c
       real*8 gf(7),gfi(6)
       real*8 gfr(7),gfri(6)
       real*8 gti(6),gtri(6)
-      real*8 viri(3,3)
+      real*8 virt(3,3)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: demi(:,:)
-      real*8, allocatable :: demk(:,:)
-      real*8, allocatable :: depi(:,:)
-      real*8, allocatable :: depk(:,:)
+      real*8, allocatable :: demt1(:,:)
+      real*8, allocatable :: demt2(:,:)
+      real*8, allocatable :: dept1(:,:)
+      real*8, allocatable :: dept2(:,:)
       logical dorl,dorli
       character*6 mode
       external erfc
@@ -4805,10 +4879,10 @@ c
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
-      allocate (demi(3,n))
-      allocate (demk(3,n))
-      allocate (depi(3,n))
-      allocate (depk(3,n))
+      allocate (demt1(3,n))
+      allocate (demt2(3,n))
+      allocate (dept1(3,n))
+      allocate (dept2(3,n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -4829,17 +4903,18 @@ c     initialize local variables for OpenMP calculation
 c
       emtt = 0.0d0
       eptt = 0.0d0
+      eintrat = eintra
       do i = 1, n
          do j = 1, 3
-            demi(j,i) = 0.0d0
-            demk(j,i) = 0.0d0
-            depi(j,i) = 0.0d0
-            depk(j,i) = 0.0d0
+            demt1(j,i) = 0.0d0
+            demt2(j,i) = 0.0d0
+            dept1(j,i) = 0.0d0
+            dept2(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            viri(j,i) = 0.0d0
+            virt(j,i) = 0.0d0
          end do
       end do
 c
@@ -4863,7 +4938,7 @@ c
 !$OMP& ddsc3,ddsc5,ddsc7,bn,sc,gl,sci,scip,gli,glip,gf,gfi,
 !$OMP& gfr,gfri,gti,gtri,dorl,dorli)
 !$OMP& firstprivate(mscale,pscale,dscale,uscale)
-!$OMP DO reduction(+:emtt,eptt,viri,demi,depi,demk,depk)
+!$OMP DO reduction(+:emtt,eptt,eintrat,demt1,demt2,dept1,dept2,virt)
 !$OMP& schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
@@ -5228,9 +5303,9 @@ c     intramolecular distances are less than half of cell
 c     length and less than the ewald cutoff
 c
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintra = eintra + mscale(kk)*erl*f
-                  eintra = eintra + 0.5d0*pscale(kk)
-     &                        * (rr3*(gli(1)+gli(6))*scale3
+                  eintrat = eintrat + mscale(kk)*erl*f
+                  eintrat = eintrat + 0.5d0*pscale(kk)
+     &                         * (rr3*(gli(1)+gli(6))*scale3
      &                              + rr5*(gli(2)+gli(7))*scale5
      &                              + rr7*gli(3)*scale7)
                end if
@@ -5609,23 +5684,23 @@ c
 c
 c     increment gradient due to force and torque on first site
 c
-               demi(1,ii) = demi(1,ii) + ftm2(1)
-               demi(2,ii) = demi(2,ii) + ftm2(2)
-               demi(3,ii) = demi(3,ii) + ftm2(3)
-               depi(1,ii) = depi(1,ii) + ftm2i(1)
-               depi(2,ii) = depi(2,ii) + ftm2i(2)
-               depi(3,ii) = depi(3,ii) + ftm2i(3)
-               call torque3 (i,ttm2,ttm2i,frcxi,frcyi,frczi,demi,depi)
+               demt1(1,ii) = demt1(1,ii) + ftm2(1)
+               demt1(2,ii) = demt1(2,ii) + ftm2(2)
+               demt1(3,ii) = demt1(3,ii) + ftm2(3)
+               dept1(1,ii) = dept1(1,ii) + ftm2i(1)
+               dept1(2,ii) = dept1(2,ii) + ftm2i(2)
+               dept1(3,ii) = dept1(3,ii) + ftm2i(3)
+               call torque3 (i,ttm2,ttm2i,frcxi,frcyi,frczi,demt1,dept1)
 c
 c     increment gradient due to force and torque on second site
 c
-               demk(1,kk) = demk(1,kk) - ftm2(1)
-               demk(2,kk) = demk(2,kk) - ftm2(2)
-               demk(3,kk) = demk(3,kk) - ftm2(3)
-               depk(1,kk) = depk(1,kk) - ftm2i(1)
-               depk(2,kk) = depk(2,kk) - ftm2i(2)
-               depk(3,kk) = depk(3,kk) - ftm2i(3)
-               call torque3 (k,ttm3,ttm3i,frcxk,frcyk,frczk,demk,depk)
+               demt2(1,kk) = demt2(1,kk) - ftm2(1)
+               demt2(2,kk) = demt2(2,kk) - ftm2(2)
+               demt2(3,kk) = demt2(3,kk) - ftm2(3)
+               dept2(1,kk) = dept2(1,kk) - ftm2i(1)
+               dept2(2,kk) = dept2(2,kk) - ftm2i(2)
+               dept2(3,kk) = dept2(3,kk) - ftm2i(3)
+               call torque3 (k,ttm3,ttm3i,frcxk,frcyk,frczk,demt2,dept2)
 c
 c     increment the internal virial tensor components
 c
@@ -5677,15 +5752,15 @@ c
                vzz = -zr*(ftm2(3)+ftm2i(3)) + zix*frcxi(3)
      &                  + ziy*frcyi(3) + ziz*frczi(3) + zkx*frcxk(3)
      &                  + zky*frcyk(3) + zkz*frczk(3)
-               viri(1,1) = viri(1,1) + vxx
-               viri(2,1) = viri(2,1) + vyx
-               viri(3,1) = viri(3,1) + vzx
-               viri(1,2) = viri(1,2) + vyx
-               viri(2,2) = viri(2,2) + vyy
-               viri(3,2) = viri(3,2) + vzy
-               viri(1,3) = viri(1,3) + vzx
-               viri(2,3) = viri(2,3) + vzy
-               viri(3,3) = viri(3,3) + vzz
+               virt(1,1) = virt(1,1) + vxx
+               virt(2,1) = virt(2,1) + vyx
+               virt(3,1) = virt(3,1) + vzx
+               virt(1,2) = virt(1,2) + vyx
+               virt(2,2) = virt(2,2) + vyy
+               virt(3,2) = virt(3,2) + vzy
+               virt(1,3) = virt(1,3) + vzx
+               virt(2,3) = virt(2,3) + vzy
+               virt(3,3) = virt(3,3) + vzz
             end if
          end do
 c
@@ -5734,15 +5809,16 @@ c     add local copies to global variables for OpenMP calculation
 c
       em = em + emtt
       ep = ep + eptt
+      eintra = eintrat
       do i = 1, n
          do j = 1, 3
-            dem(j,i) = dem(j,i) + demi(j,i) + demk(j,i)
-            dep(j,i) = dep(j,i) + depi(j,i) + depk(j,i)
+            dem(j,i) = dem(j,i) + demt1(j,i) + demt2(j,i)
+            dep(j,i) = dep(j,i) + dept1(j,i) + dept2(j,i)
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            vir(j,i) = vir(j,i) + viri(j,i)
+            vir(j,i) = vir(j,i) + virt(j,i)
          end do
       end do
 c
@@ -5752,10 +5828,10 @@ c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
-      deallocate (demi)
-      deallocate (demk)
-      deallocate (depi)
-      deallocate (depk)
+      deallocate (demt1)
+      deallocate (demt2)
+      deallocate (dept1)
+      deallocate (dept2)
       return
       end
 c
