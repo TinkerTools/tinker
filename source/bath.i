@@ -35,24 +35,38 @@ c     anisotrop   logical flag governing use of anisotropic pressure
 c     thermostat  choice of temperature control method to be used
 c     barostat    choice of pressure control method to be used
 c     volscale    choice of scaling method for Monte Carlo barostat
+c     q_iso1/2    masses of isokinetic thermostats
+c     v_iso1/2    velocities of isokinetic thermostats
+c     f_iso1/2    forces acting on isokinetic thermostats
+c     len_nhc     In isokinetic dynamics, this is the Nose-Hoover chain length M. 
+c                 In stochastic isokinetic dynamics, this is the chain length L
 c
-c
-      integer maxnose
-      parameter (maxnose=4)
-      integer voltrial
+      real*8 q_iso1,q_iso2,v_iso1,v_iso2
+      real*8 vnh,qnh,gnh
       real*8 kelvin,atmsph
       real*8 tautemp,taupres
       real*8 compress,collide
-      real*8 vnh,qnh,gnh
       real*8 vbar,qbar,gbar
       real*8 eta,volmove
+      integer maxnose
+      parameter (maxnose=4)
+      integer len_nhc,isok_L,isok_M
+      integer isok_chain
+      parameter (isok_chain=4)
+      integer voltrial
       logical isothermal
       logical isobaric
       logical anisotrop
       character*9 volscale
       character*11 barostat
       character*11 thermostat
-      common /bath/ kelvin,atmsph,tautemp,taupres,compress,collide,
+      common /bath/ q_iso1(isok_chain,3,maxatm),
+     &              q_iso2(isok_chain,3,maxatm),
+     &              v_iso1(isok_chain,3,maxatm),
+     &              v_iso2(isok_chain,3,maxatm),
+     &              f_iso1(isok_chain,3,maxatm),
+     &              kelvin,atmsph,tautemp,taupres,compress,collide,
      &              vnh(maxnose),qnh(maxnose),gnh(maxnose),vbar,qbar,
-     &              gbar,eta,volmove,voltrial,isothermal,isobaric,
-     &              anisotrop,thermostat,barostat,volscale
+     &              gbar,eta,volmove,voltrial,len_nhc,isothermal,
+     &              isobaric,anisotrop,thermostat,
+     &              barostat,volscale            

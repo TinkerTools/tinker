@@ -38,6 +38,7 @@ c
       include 'atmtyp.i'
       include 'atoms.i'
       include 'freeze.i'
+      include 'mdstuf.i'
       include 'moldyn.i'
       include 'units.i'
       include 'usage.i'
@@ -62,12 +63,8 @@ c
 c
 c     set some time values for the dynamics integration
 c
-      eps =  0.00000001d0
-      dalt = 0.00025d0
-      nalt = int(dt/(dalt+eps)) + 1
-      dalt = dble(nalt)
       dt_2 = 0.5d0 * dt
-      dta = dt / dalt
+      dta = dt / (dble(nrespa))
       dta_2 = 0.5d0 * dta
 c
 c     make half-step temperature and pressure corrections
@@ -102,7 +99,7 @@ c
 c
 c     find fast-evolving velocities and positions via Verlet recursion
 c
-      do k = 1, nalt
+      do k = 1, nrespa
          if (use_rattle) then
             do i = 1, n
                if (use(i)) then
