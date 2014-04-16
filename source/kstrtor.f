@@ -66,6 +66,20 @@ c
             string = record(next:120)
             read (string,*,err=10,end=10)  ia,ib,ic,id,bt1,bt2,bt3
    10       continue
+            size = 4
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            call numeral (ic,pc,size)
+            call numeral (id,pd,size)
+            if (ib .lt. ic) then
+               pt = pa//pb//pc//pd
+            else if (ic .lt. ib) then
+               pt = pd//pc//pb//pa
+            else if (ia .le. id) then
+               pt = pa//pb//pc//pd
+            else if (id .lt. ia) then
+               pt = pd//pc//pb//pa
+            end if
             if (.not. silent) then
                if (header) then
                   header = .false.
@@ -76,20 +90,6 @@ c
                end if
                write (iout,30)  ia,ib,ic,id,bt1,bt2,bt3
    30          format (1x,4i4,1x,3f12.3)
-            end if
-            size = 4
-            call numeral (ita,pa,size)
-            call numeral (itb,pb,size)
-            call numeral (itc,pc,size)
-            call numeral (itd,pd,size)
-            if (itb .lt. itc) then
-               pt = pa//pb//pc//pd
-            else if (itc .lt. itb) then
-               pt = pd//pc//pb//pa
-            else if (ita .le. itd) then
-               pt = pa//pb//pc//pd
-            else if (itd .lt. ita) then
-               pt = pd//pc//pb//pa
             end if
             do j = 1, maxnbt
                if (kbt(j).eq.blank .or. kbt(j).eq.pt) then

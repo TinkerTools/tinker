@@ -165,7 +165,7 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      est = es
+      est = 0.0d0
 c
 c     set OpenMP directives for the major loop structure
 c
@@ -247,7 +247,7 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      es = est
+      es = es + est
       return
       end
 c
@@ -304,7 +304,7 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      est = es
+      est = 0.0d0
 c
 c     set OpenMP directives for the major loop structure
 c
@@ -398,7 +398,7 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      es = est
+      es = es + est
       return
       end
 c
@@ -561,7 +561,7 @@ c
       include 'solute.i'
       include 'usage.i'
       integer i,k,ii,kk
-      real*8 e,ei
+      real*8 e,ei,est
       real*8 fc,fd,fq
       real*8 dwater,fgrp
       real*8 r2,rb2
@@ -607,6 +607,18 @@ c     set cutoff distances and switching function coefficients
 c
       mode = 'MPOLE'
       call switch (mode)
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = 0.0d0
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
+!$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
+!$OMP& shared(est)
+!$OMP DO reduction(+:est)
+!$OMP& schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -944,11 +956,20 @@ c
                      e = 0.5d0 * e
                      ei = 0.5d0 * ei
                   end if
-                  es = es + e + ei
+                  est = est + e + ei
                end if
             end if
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
       return
       end
 c
@@ -983,9 +1004,11 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,f,fikp
-      real*8 fgrp,damp
-      real*8 r,r2,xr,yr,zr
+      real*8 ei,est
+      real*8 f,fikp,fgrp
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r,r2,damp
       real*8 rr1,rr3,rr5,rr7
       real*8 pdi,pti,pgamma
       real*8 ci,dix,diy,diz
@@ -1025,10 +1048,27 @@ c
          pscale(i) = 1.0d0
       end do
 c
+c     initialize local variables for OpenMP calculation
+c
+      est = 0.0d0
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
+!$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
+!$OMP% i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p41scale,p5scale,
+!$OMP% use_group,use_intra,off2,f)
+!$OMP& firstprivate(pscale) shared(est)
+!$OMP DO reduction(+:est)
+!$OMP& schedule(guided)
+c
 c     calculate the multipole interaction energy term
 c
       do i = 1, npole-1
          ii = ipole(i)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
@@ -1081,9 +1121,9 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -1171,7 +1211,7 @@ c
 c
 c     increment the total GK electrostatic solvation energy
 c
-                  es = es + ei
+                  est = est + ei
                end if
             end if
          end do
@@ -1191,6 +1231,15 @@ c
             pscale(i15(j,ii)) = 1.0d0
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
 c
 c     perform deallocation of some local arrays
 c

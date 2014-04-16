@@ -12,12 +12,12 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
-c     nuse   total number of active atoms in energy calculation
 c     iuse   numbers of the atoms active in energy calculation
 c     use    true if an atom is active, false if inactive
+c     nuse   total number of active atoms in energy calculation
 c
 c
       integer nuse
       integer, pointer :: iuse(:)
       logical, pointer :: use(:)
-      common /usage/ nuse,iuse,use
+      common /usage/ iuse,use,nuse

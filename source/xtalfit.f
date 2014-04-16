@@ -135,9 +135,18 @@ c
          read (input,110)  nxtal
   110    format (i10)
       end if
-      if (nxtal .eq. 0)  nxtal = 1
 c
-c     get the structural data for each crystal in turn
+c     check for too few or too many crystal structures
+c
+      if (nxtal .eq. 0)  nxtal = 1
+      if (nxtal .gt. maxref) then
+         write (iout,120)
+  120    format (/,' XTALFIT  --  Too many Crystals,',
+     &              ' Increase the Value of MAXREF')
+         call fatal
+      end if
+c
+c     get the coordinates and parameters for current crystal
 c
       do ixtal = 1, nxtal
          call getxyz
@@ -148,16 +157,16 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=120,end=120)  e0_lattice
+            read (string,*,err=130,end=130)  e0_lattice
             query = .false.
          end if
-  120    continue
+  130    continue
          if (query) then
-            write (iout,130)
-  130       format (/,' Enter Lattice Energy Value [<CR> to omit]',
+            write (iout,140)
+  140       format (/,' Enter Lattice Energy Value [<CR> to omit]',
      &                 ' :  ',$)
-            read (input,140)  e0_lattice
-  140       format (f20.0)
+            read (input,150)  e0_lattice
+  150       format (f20.0)
          end if
          if (e0_lattice .gt. 0.0d0)  e0_lattice = -e0_lattice
 c
@@ -166,16 +175,16 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=150,end=150)  moment_0
+            read (string,*,err=160,end=160)  moment_0
             query = .false.
          end if
-  150    continue
+  160    continue
          if (query) then
-            write (iout,160)
-  160       format (/,' Enter Dipole Moment Value [<CR> to omit]',
+            write (iout,170)
+  170       format (/,' Enter Monomer Dipole Moment [<CR> to Omit]',
      &                 ' :   ',$)
-            read (input,170)  moment_0
-  170       format (f20.0)
+            read (input,180)  moment_0
+  180       format (f20.0)
          end if
 c
 c     set the types of residuals for use in optimization
@@ -193,22 +202,22 @@ c
 c
 c     print molecules per unit cell, lattice energy and dipole
 c
-         write (iout,180)  ixtal,filename(1:35),nmol
-  180    format (/,' File Name of Crystal Structure',i4,' :  ',5x,a35,
+         write (iout,190)  ixtal,filename(1:35),nmol
+  190    format (/,' File Name of Crystal Structure',i4,' :  ',5x,a35,
      &           /,' Number of Molecules per Unit Cell :',i13)
          if (e0_lattice .ne. 0.0d0) then
             nresid = nresid + 1
             iresid(nresid) = ixtal
             rsdtyp(nresid) = 'Lattice Energy  '
-            write (iout,190)  e0_lattice
-  190       format (' Value of Crystal Lattice Energy :  ',f13.2)
+            write (iout,200)  e0_lattice
+  200       format (' Value of Crystal Lattice Energy :  ',f13.2)
          end if
          if (moment_0 .ne. 0.0d0) then
             nresid = nresid + 1
             iresid(nresid) = ixtal
             rsdtyp(nresid) = 'Dipole Moment   '
-            write (iout,200)  moment_0
-  200       format (' Value of Molecular Dipole Moment : ',f13.2)
+            write (iout,210)  moment_0
+  210       format (' Value of Molecular Dipole Moment : ',f13.2)
          end if
 c
 c     set the initial values of the parameters
@@ -238,18 +247,18 @@ c
 c
 c     print the initial parameter values
 c
-      write (iout,210)
-  210 format (/,' Initial Values of the Parameters :',/)
+      write (iout,220)
+  220 format (/,' Initial Values of the Parameters :',/)
       do i = 1, nvary
          if (ivary(i) .le. 3) then
-            write (iout,220)  i,vartyp(i),vary(1,i),xx(i)
-  220       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,f12.4)
-         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,230)  i,vartyp(i),vary(1,i),xx(i)
-  230       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,f12.4)
+  230       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,f12.4)
+         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
+            write (iout,240)  i,vartyp(i),vary(1,i),xx(i)
+  240       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,f12.4)
          else if (ivary(i) .eq. 6) then
-            write (iout,240)  i,vartyp(i),vary(1,i),vary(2,i),xx(i)
-  240       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,f12.4)
+            write (iout,250)  i,vartyp(i),vary(1,i),vary(2,i),xx(i)
+  250       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,f12.4)
          end if
       end do
 c
@@ -287,19 +296,19 @@ c
 c
 c     print the final parameter values
 c
-      write (iout,250)
-  250 format (/,' Final Values of the Parameters and Scaled',
+      write (iout,260)
+  260 format (/,' Final Values of the Parameters and Scaled',
      &            ' Derivatives :',/)
       do i = 1, nvary
          if (ivary(i) .le. 3) then
-            write (iout,260)  i,vartyp(i),vary(1,i),xx(i),g(i)
-  260       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,2f12.4)
-         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,270)  i,vartyp(i),vary(1,i),xx(i),g(i)
-  270       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,2f12.4)
+  270       format (3x,'(',i2,')',2x,a16,4x,'Atom Class',i5,4x,2f12.4)
+         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
+            write (iout,280)  i,vartyp(i),vary(1,i),xx(i),g(i)
+  280       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,2f12.4)
          else if (ivary(i) .eq. 6) then
-            write (iout,280)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),g(i)
-  280       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,2f12.4)
+            write (iout,290)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),g(i)
+  290       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,2f12.4)
          end if
       end do
 c
@@ -318,8 +327,10 @@ c
 c
 c     "xtalprm" stores or retrieves a crystal structure; used
 c     to make a previously stored structure the currently active
-c     structure, or to store a structure for later use; only
-c     provides for intermolecular energy terms
+c     structure, or to store a structure for later use
+c
+c     the current version only provides for intermolecular potential
+c     energy terms
 c
 c
       subroutine xtalprm (mode,ixtal,xx)
@@ -329,163 +340,39 @@ c
       include 'atmtyp.i'
       include 'boxes.i'
       include 'charge.i'
-      include 'couple.i'
       include 'dipole.i'
+      include 'files.i'
       include 'fracs.i'
       include 'kvdws.i'
       include 'molcul.i'
       include 'vdw.i'
       include 'xtals.i'
-      integer maxxtal
-      parameter (maxxtal=10)
       integer i,j,k
       integer ixtal,prmtyp
       integer atom1,atom2
-      integer ns(maxxtal)
-      integer nvdws(maxxtal)
-      integer nions(maxxtal)
-      integer ndipoles(maxxtal)
-      integer types(maxatm,maxxtal)
-      integer classes(maxatm,maxxtal)
-      integer n12s(maxatm,maxxtal)
-      integer i12s(4,maxatm,maxxtal)
-      integer n13s(maxatm,maxxtal)
-      integer i13s(12,maxatm,maxxtal)
-      integer n14s(maxatm,maxxtal)
-      integer i14s(36,maxatm,maxxtal)
-      integer ivdws(maxatm,maxxtal)
-      integer ireds(maxatm,maxxtal)
-      integer iions(maxatm,maxxtal)
-      integer idpls(2,maxbnd,maxxtal)
       real*8 xmid,ymid,zmid
+      real*8 e0_lattices(maxref)
+      real*8 moment_0s(maxref)
       real*8 xx(*)
-      real*8 e0_lattices(maxxtal)
-      real*8 xboxs(maxxtal)
-      real*8 yboxs(maxxtal)
-      real*8 zboxs(maxxtal)
-      real*8 alphas(maxxtal)
-      real*8 betas(maxxtal)
-      real*8 gammas(maxxtal)
-      real*8 moment_0s(maxxtal)
-      real*8 xs(maxatm,maxxtal)
-      real*8 ys(maxatm,maxxtal)
-      real*8 zs(maxatm,maxxtal)
-      real*8 masses(maxatm,maxxtal)
-      real*8 pchgs(maxatm,maxxtal)
-      real*8 bdpls(maxbnd,maxxtal)
-      real*8 sdpls(maxbnd,maxxtal)
-      real*8 kreds(maxatm,maxxtal)
-      real*8 xfracs(maxatm,maxxtal)
-      real*8 yfracs(maxatm,maxxtal)
-      real*8 zfracs(maxatm,maxxtal)
-      character*3 names(maxatm,maxxtal)
       character*5 mode
-      save ns,xs,ys,zs
-      save types,classes
-      save names,masses
-      save nvdws,ivdws
-      save ireds,kreds
-      save nions,iions
-      save ndipoles,idpls
-      save n12s,n13s,n14s
-      save i12s,i13s,i14s
-      save pchgs,bdpls,sdpls
-      save e0_lattices,moment_0s
-      save xfracs,yfracs,zfracs
-      save xboxs,yboxs,zboxs
-      save alphas,betas,gammas
+      save e0_lattices
+      save moment_0s
 c
 c
-c     number of atoms, atomic coordinates and other info
+c     save or restore the key values for the current crystal
 c
       if (mode .eq. 'STORE') then
-         ns(ixtal) = n
-         do i = 1, n
-            xs(i,ixtal) = x(i)
-            ys(i,ixtal) = y(i)
-            zs(i,ixtal) = z(i)
-            types(i,ixtal) = type(i)
-            classes(i,ixtal) = class(i)
-            names(i,ixtal) = name(i)
-            masses(i,ixtal) = mass(i)
-         end do
+         call makeref (ixtal)
       else if (mode .eq. 'RESET') then
-         n = ns(ixtal)
-         do i = 1, n
-            x(i) = xs(i,ixtal)
-            y(i) = ys(i,ixtal)
-            z(i) = zs(i,ixtal)
-            type(i) = types(i,ixtal)
-            class(i) = classes(i,ixtal)
-            name(i) = names(i,ixtal)
-            mass(i) = masses(i,ixtal)
-         end do
-      end if
-c
-c     lists of the attached atoms and neighbors
-c
-      if (mode .eq. 'STORE') then
-         do i = 1, n
-            n12s(i,ixtal) = n12(i)
-            do j = 1, n12(i)
-               i12s(j,i,ixtal) = i12(j,i)
-            end do
-            n13s(i,ixtal) = n13(i)
-            do j = 1, n13(i)
-               i13s(j,i,ixtal) = i13(j,i)
-            end do
-            n14s(i,ixtal) = n14(i)
-            do j = 1, n14(i)
-               i14s(j,i,ixtal) = i14(j,i)
-            end do
-         end do
-      else if (mode .eq. 'RESET') then
-         do i = 1, n
-            n12(i) = n12s(i,ixtal)
-            do j = 1, n12(i)
-               i12(j,i) = i12s(j,i,ixtal)
-            end do
-            n13(i) = n13s(i,ixtal)
-            do j = 1, n13(i)
-               i13(j,i) = i13s(j,i,ixtal)
-            end do
-            n14(i) = n14s(i,ixtal)
-            do j = 1, n14(i)
-               i14(j,i) = i14s(j,i,ixtal)
-            end do
-         end do
-      end if
-c
-c     lattice type and unit cell parameters
-c
-      if (mode .eq. 'STORE') then
-         xboxs(ixtal) = xbox
-         yboxs(ixtal) = ybox
-         zboxs(ixtal) = zbox
-         alphas(ixtal) = alpha
-         betas(ixtal) = beta
-         gammas(ixtal) = gamma
-      else if (mode .eq. 'RESET') then
-         xbox = xboxs(ixtal)
-         ybox = yboxs(ixtal)
-         zbox = zboxs(ixtal)
-         alpha = alphas(ixtal)
-         beta = betas(ixtal)
-         gamma = gammas(ixtal)
-      end if
-c
-c     find number of molecules and atoms in molecules;
-c     type of crystal lattice; enforce periodic bounds
-c
-      if (mode .eq. 'RESET') then
-         call molecule
-         call lattice
+         call getref (ixtal)
+         call basefile (filename)
+         call mechanic
          call bounds
       end if
 c
-c     fractional coordinates of molecular center of mass
+c     get fractional coordinates of molecular centers of mass
 c
-      if (mode .eq. 'STORE') then
+      if (mode .eq. 'RESET') then
          do i = 1, nmol
             xmid = 0.0d0
             ymid = 0.0d0
@@ -499,69 +386,9 @@ c
             zmid = zmid / gamma_term
             ymid = (ymid - zmid*beta_term) / gamma_sin
             xmid = xmid - ymid*gamma_cos - zmid*beta_cos
-            xfracs(i,ixtal) = xmid / (xbox * molmass(i))
-            yfracs(i,ixtal) = ymid / (ybox * molmass(i))
-            zfracs(i,ixtal) = zmid / (zbox * molmass(i))
-         end do
-      else if (mode .eq. 'RESET') then
-         do i = 1, nmol
-            xfrac(i) = xfracs(i,ixtal)
-            yfrac(i) = yfracs(i,ixtal)
-            zfrac(i) = zfracs(i,ixtal)
-         end do
-      end if
-c
-c     number and types of van der Waals sites
-c
-      if (mode .eq. 'STORE') then
-         nvdws(ixtal) = nvdw
-         do i = 1, n
-            ivdws(i,ixtal) = ivdw(i)
-            ireds(i,ixtal) = ired(i)
-            kreds(i,ixtal) = kred(i)
-         end do
-      else if (mode .eq. 'RESET') then
-         nvdw = nvdws(ixtal)
-         do i = 1, n
-            ivdw(i) = ivdws(i,ixtal)
-            ired(i) = ireds(i,ixtal)
-            kred(i) = kreds(i,ixtal)
-         end do
-      end if
-c
-c     number and types of atomic partial charges
-c
-      if (mode .eq. 'STORE') then
-         nions(ixtal) = nion
-         do i = 1, nion
-            iions(i,ixtal) = iion(i)
-            pchgs(i,ixtal) = pchg(i)
-         end do
-      else if (mode .eq. 'RESET') then
-         nion = nions(ixtal)
-         do i = 1, nion
-            iion(i) = iions(i,ixtal)
-            pchg(i) = pchgs(i,ixtal)
-         end do
-      end if
-c
-c     number and types of bond dipole moments
-c
-      if (mode .eq. 'STORE') then
-         ndipoles(ixtal) = ndipole
-         do i = 1, ndipole
-            idpls(1,i,ixtal) = idpl(1,i)
-            idpls(2,i,ixtal) = idpl(2,i)
-            bdpls(i,ixtal) = bdpl(i)
-            sdpls(i,ixtal) = sdpl(i)
-         end do
-      else if (mode .eq. 'RESET') then
-         ndipole = ndipoles(ixtal)
-         do i = 1, ndipole
-            idpl(1,i) = idpls(1,i,ixtal)
-            idpl(2,i) = idpls(2,i,ixtal)
-            bdpl(i) = bdpls(i,ixtal)
-            sdpl(i) = sdpls(i,ixtal)
+            xfrac(i) = xmid / (xbox * molmass(i))
+            yfrac(i) = ymid / (ybox * molmass(i))
+            zfrac(i) = zmid / (zbox * molmass(i))
          end do
       end if
 c

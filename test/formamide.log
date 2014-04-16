@@ -57,83 +57,35 @@
      ######################################################################
 
 
- Additional Bond Stretching Parameters :
-
-     Atom Classes         K(S)      Length
-
-         3   7           8.000      1.2550
-         3   9           6.500      1.3600
-         9  28           5.900      1.0220
-
- Additional Angle Bending Parameters :
-
-     Atom Classes         K(B)       Angle
-
-       5   3   7         0.370     120.300
-       5   3   9         0.420     114.000
-       7   3   9         1.200     125.700
-       3   9  28         0.520     118.500
-
- Additional Out-of-Plane Bend Parameters :
-
-     Atom Classes                   K(OPB)
-
-       3   5   0   0                 0.000
-       3   7   0   0                 0.000
-       3   9   0   0                 0.000
-       9   3   0   0                 0.000
-       9  28   0   0                 0.000
-
- Additional Torsional Parameters :
-
-     Atom Classes    1-Fold    2-Fold    3-Fold    4-Fold    5-Fold    6-Fold
-
-    7   3   9  28   1.10   0  5.00 180  0.00   0  0.00   0  0.00   0  0.00   0
-
- Additional van der Waals Parameters :
-
-     Atom Class          Size      Epsilon     Reduction
-
-         3              1.9400      0.0440       0.000
-         5              1.5000      0.0470       0.915
-         7              1.7400      0.0660       0.000
-        28              1.3250      0.0280       0.500
-
- Additional Bond Dipole Moment Parameters :
-
-     Atom Types         Moment     Position
-
-         3   5           0.000       0.500
-         3   7           3.650       0.500
-         3   9           1.000       0.500
-         9  28          -1.950       0.500
-
  Variable-Mode Truncated-Newton Conjugate-Gradient Optimization :
 
  Algorithm : AUTO       Preconditioning : AUTO        RMS Grad : 0.10D-03
 
  TN Iter    F Value       G RMS     F Move    X Move   CG Iter  Solve   FG Call
 
-     0    -215.4175     20.6153                                               1
-     1    -218.8200      4.3219     3.4025    0.0197       1   TruncNewt      2
-     2    -224.5806      5.1270     5.7606    0.1695       2    NegCurve      5
-     3    -230.3462      8.5991     5.7656    0.2374       4    NegCurve      7
-     4    -234.0435      5.0795     3.6973    0.2325       6    NegCurve     10
-     5    -235.0034      3.2868     0.9599    0.1297       8    NegCurve     12
-     6    -235.5740      3.7765     0.5706    0.1526      12    NegCurve     16
-     7    -236.8581      4.1534     1.2841    0.2305      15   TruncNewt     19
-     8    -237.5562      1.2404     0.6982    0.1772      16   TruncNewt     22
-     9    -237.6087      1.5477     0.0525    0.0805      24    ReSearch     41
-    10    -237.6805      0.3301     0.0717    0.0532      27   TruncNewt     47
-    11    -237.6850      0.0582     0.0045    0.0232      32   TruncNewt     53
-    12    -237.6852      0.0041     0.0003    0.0064      39   TruncNewt     61
-    13    -237.6852      0.0000     0.0000    0.0003      47   TruncNewt     70
+     0    -127.9844     51.0284                                               1
+     1    -137.4567     11.3799     9.4722    0.0214       1   TruncNewt      3
+     2    -139.7717      8.6122     2.3151    0.1044      13    NegCurve      6
+     3    -141.4728      2.1378     1.7011    0.0661      14   TruncNewt      7
+     4    -142.9226      6.0310     1.4499    0.2157      15    NegCurve     12
+     5    -145.3769      9.5744     2.4543    0.1504      17    NegCurve     16
+     6    -147.8245      7.1440     2.4475    0.1018      19   TruncNewt     18
+     7    -149.3718      1.5181     1.5474    0.1121      21   TruncNewt     19
+     8    -149.8061      2.4130     0.4342    0.0870      26   TruncNewt     26
+     9    -149.9652      1.2989     0.1592    0.0672      28   TruncNewt     31
+    10    -150.0126      1.4181     0.0473    0.0546      33   TruncNewt     38
+    11    -150.0511      0.9321     0.0385    0.0510      37   TruncNewt     45
+    12    -150.0607      0.1069     0.0096    0.0131      38   TruncNewt     47
+    13    -150.0700      0.3811     0.0093    0.0351      50   TruncNewt     61
+    14    -150.0733      0.0588     0.0032    0.0180      54   TruncNewt     68
+    15    -150.0735      0.0101     0.0003    0.0105      63   TruncNewt     78
+    16    -150.0735      0.0001     0.0000    0.0002      75   TruncNewt     91
 
  TNCG  --  Normal Termination due to SmallGrad
 
- Final Function Value :         -237.6852
- Final RMS Gradient :          0.1116D-04
- Final Gradient Norm :         0.5467D-04
+ Final Function Value :         -150.0735
+ Final RMS Gradient :          0.5703D-04
+ Final Gradient Norm :         0.2794D-03
 
      ######################################################################
    ##########################################################################
@@ -164,59 +116,8 @@
  Enter RMS Gradient Termination Criterion [0.1] :  
  Enter Number of Crystals to be Used [1] :  
  Enter Cartesian Coordinate File Name :  
- Additional Bond Stretching Parameters :
-
-     Atom Classes         K(S)      Length
-
-         3   7           8.000      1.2550
-         3   9           6.500      1.3600
-         9  28           5.900      1.0220
-
- Additional Angle Bending Parameters :
-
-     Atom Classes         K(B)       Angle
-
-       5   3   7         0.370     120.300
-       5   3   9         0.420     114.000
-       7   3   9         1.200     125.700
-       3   9  28         0.520     118.500
-
- Additional Out-of-Plane Bend Parameters :
-
-     Atom Classes                   K(OPB)
-
-       3   5   0   0                 0.000
-       3   7   0   0                 0.000
-       3   9   0   0                 0.000
-       9   3   0   0                 0.000
-       9  28   0   0                 0.000
-
- Additional Torsional Parameters :
-
-     Atom Classes    1-Fold    2-Fold    3-Fold    4-Fold    5-Fold    6-Fold
-
-    7   3   9  28   1.10   0  5.00 180  0.00   0  0.00   0  0.00   0  0.00   0
-
- Additional van der Waals Parameters :
-
-     Atom Class          Size      Epsilon     Reduction
-
-         3              1.9400      0.0440       0.000
-         5              1.5000      0.0470       0.915
-         7              1.7400      0.0660       0.000
-        28              1.3250      0.0280       0.500
-
- Additional Bond Dipole Moment Parameters :
-
-     Atom Types         Moment     Position
-
-         3   5           0.000       0.500
-         3   7           3.650       0.500
-         3   9           1.000       0.500
-         9  28          -1.950       0.500
-
  Enter Lattice Energy Value [<CR> to omit] :  
- Enter Dipole Moment Value [<CR> to omit] :   
+ Enter Monomer Dipole Moment [<CR> to Omit] :   
  File Name of Crystal Structure   1 :       formamide                          
  Number of Molecules per Unit Cell :            4
  Value of Crystal Lattice Energy :         -17.66
@@ -230,79 +131,79 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0       72.7626    2510.3352    2510.3352         2         3
+     0       97.7217     636.9754     636.9754         2         3
 
  Parameters and Scaled Derivatives at Iteration   0 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.7400   3526.0925
-   ( 2)  Well Depth          Atom Class    7          0.0660    412.5980
+   ( 1)  Atomic Radius       Atom Class    7          1.7400    898.5017
+   ( 2)  Well Depth          Atom Class    7          0.0660     64.5744
 
  Residual Error Function Values at Iteration   0 :
 
-   ( 1)  Force a-Axis          Crystal   1         -4.8418
-   ( 2)  Force b-Axis          Crystal   1          1.0594
-   ( 3)  Force c-Axis          Crystal   1         -4.1200
+   ( 1)  Force a-Axis          Crystal   1         -0.1901
+   ( 2)  Force b-Axis          Crystal   1         -0.3900
+   ( 3)  Force c-Axis          Crystal   1         -2.9693
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1        -10.0132
+   ( 5)  Force Beta            Crystal   1         13.4865
    ( 6)  Force Gamma           Crystal   1         -0.0000
-   ( 7)  Lattice Energy        Crystal   1          1.9290
+   ( 7)  Lattice Energy        Crystal   1          2.1337
 
-     1        6.0945     212.3166     212.3166         2         6
+     1       71.4310     249.6604     352.1127         1         6
 
  Parameters and Scaled Derivatives at Iteration   1 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.7050    298.7211
-   ( 2)  Well Depth          Atom Class    7          0.0570     30.3705
+   ( 1)  Atomic Radius       Atom Class    7          1.6918    352.1127
+   ( 2)  Well Depth          Atom Class    7          0.0528     26.0246
 
  Residual Error Function Values at Iteration   1 :
 
-   ( 1)  Force a-Axis          Crystal   1         -1.9326
-   ( 2)  Force b-Axis          Crystal   1          2.4619
-   ( 3)  Force c-Axis          Crystal   1         -0.6152
+   ( 1)  Force a-Axis          Crystal   1          2.3282
+   ( 2)  Force b-Axis          Crystal   1          1.1761
+   ( 3)  Force c-Axis          Crystal   1         -1.1078
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1         -0.6695
+   ( 5)  Force Beta            Crystal   1         11.4629
    ( 6)  Force Gamma           Crystal   1         -0.0000
-   ( 7)  Lattice Energy        Crystal   1          1.2515
+   ( 7)  Lattice Energy        Crystal   1          1.8526
 
-     2        5.0729      32.4239      32.4239         2         9
+     2       62.1454      26.4386      37.0748         1         9
 
  Parameters and Scaled Derivatives at Iteration   2 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.6753    -45.1770
-   ( 2)  Well Depth          Atom Class    7          0.0635     -7.8524
+   ( 1)  Atomic Radius       Atom Class    7          1.6029     37.0748
+   ( 2)  Well Depth          Atom Class    7          0.0528      4.8433
 
  Residual Error Function Values at Iteration   2 :
 
-   ( 1)  Force a-Axis          Crystal   1         -1.1859
-   ( 2)  Force b-Axis          Crystal   1          2.7727
-   ( 3)  Force c-Axis          Crystal   1         -0.0404
+   ( 1)  Force a-Axis          Crystal   1          4.7073
+   ( 2)  Force b-Axis          Crystal   1          2.6355
+   ( 3)  Force c-Axis          Crystal   1          0.6072
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1          0.2700
+   ( 5)  Force Beta            Crystal   1          9.6267
    ( 6)  Force Gamma           Crystal   1         -0.0000
-   ( 7)  Lattice Energy        Crystal   1          0.9885
+   ( 7)  Lattice Energy        Crystal   1          1.4645
 
-     3        4.9255      65.3006      65.3006         2        12
+     3       61.9424       2.4903       2.2144         1        12
 
  Parameters and Scaled Derivatives at Iteration   3 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.6472    -91.7193
-   ( 2)  Well Depth          Atom Class    7          0.0730    -10.7662
+   ( 1)  Atomic Radius       Atom Class    7          1.5860      2.2144
+   ( 2)  Well Depth          Atom Class    7          0.0528      2.7386
 
  Residual Error Function Values at Iteration   3 :
 
-   ( 1)  Force a-Axis          Crystal   1         -0.6981
-   ( 2)  Force b-Axis          Crystal   1          2.9509
-   ( 3)  Force c-Axis          Crystal   1          0.1748
+   ( 1)  Force a-Axis          Crystal   1          5.0868
+   ( 2)  Force b-Axis          Crystal   1          2.8733
+   ( 3)  Force c-Axis          Crystal   1          0.8867
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1          0.1663
+   ( 5)  Force Beta            Crystal   1          9.3266
    ( 6)  Force Gamma           Crystal   1         -0.0000
-   ( 7)  Lattice Energy        Crystal   1          0.7729
+   ( 7)  Lattice Energy        Crystal   1          1.4079
 
-     4        4.8608       0.0329       0.0329         2        15
+     4       61.9416       1.8548       0.0969         1        15
 
  SQUARE  --  Normal Termination of Least Squares
 
  Final Values of the Parameters and Scaled Derivatives :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.6477     -0.0279
-   ( 2)  Well Depth          Atom Class    7          0.0737     -0.0980
+   ( 1)  Atomic Radius       Atom Class    7          1.5848      0.0612
+   ( 2)  Well Depth          Atom Class    7          0.0528     49.6460

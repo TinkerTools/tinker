@@ -134,7 +134,8 @@ c     ##################################################################
 c
 c
 c     "egb1a" calculates the generalized Born electrostatic energy
-c     and first derivatives of the GB/SA solvation models
+c     and first derivatives of the GB/SA solvation models using a
+c     double loop
 c
 c     note application of distance cutoff scaling directly to
 c     the Born radii chain rule term "derb" is an approximation
@@ -174,10 +175,8 @@ c
       real*8 vyx,vzx,vzy
       real*8 est,eintert
       real*8 virt(3,3)
-      real*8, allocatable :: drb1(:)
-      real*8, allocatable :: drb2(:)
-      real*8, allocatable :: dest1(:,:)
-      real*8, allocatable :: dest2(:,:)
+      real*8, allocatable :: drbt(:)
+      real*8, allocatable :: dest(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -195,29 +194,23 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dest1(3,n))
-      allocate (dest2(3,n))
-      allocate (drb1(n))
-      allocate (drb2(n))
+      allocate (drbt(n))
+      allocate (dest(3,n))
 c
 c     initialize local variables for OpenMP calculation
 c
-      est = es
-      eintert = einter
+      est = 0.0d0
+      eintert = 0.0d0
       do i = 1, n
-         dest1(1,i) = 0.0d0
-         dest1(2,i) = 0.0d0
-         dest1(3,i) = 0.0d0
-         dest2(1,i) = 0.0d0
-         dest2(2,i) = 0.0d0
-         dest2(3,i) = 0.0d0
-         drb1(i) = 0.0d0
-         drb2(i) = 0.0d0
+         drbt(i) = 0.0d0
+         dest(1,i) = 0.0d0
+         dest(2,i) = 0.0d0
+         dest(3,i) = 0.0d0
       end do
       do i = 1, 3
-         virt(1,i) = vir(1,i)
-         virt(2,i) = vir(2,i)
-         virt(3,i) = vir(3,i)
+         virt(1,i) = 0.0d0
+         virt(2,i) = 0.0d0
+         virt(3,i) = 0.0d0
       end do
 c
 c     set OpenMP directives for the major loop structure
@@ -225,8 +218,8 @@ c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP% f0,f1,f2,f3,f4,f5,f6,f7,molcule)
-!$OMP& shared(est,eintert,dest1,dest2,drb1,drb2,virt)
-!$OMP DO reduction(+:est,eintert,dest1,dest2,drb1,drb2,virt)
+!$OMP& shared(est,eintert,dest,drbt,virt)
+!$OMP DO reduction(+:est,eintert,dest,drbt,virt)
 !$OMP& schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
@@ -307,23 +300,23 @@ c
                      e = 0.5d0 * e
                      est = est + e
                      drbi = derb * rbk
-                     drb1(i) = drb1(i) + drbi
+                     drbt(i) = drbt(i) + drbi
                   else
                      est = est + e
                      de = de / r
                      dedx = de * xr
                      dedy = de * yr
                      dedz = de * zr
-                     dest1(1,i) = dest1(1,i) + dedx
-                     dest1(2,i) = dest1(2,i) + dedy
-                     dest1(3,i) = dest1(3,i) + dedz
-                     dest2(1,k) = dest2(1,k) - dedx
-                     dest2(2,k) = dest2(2,k) - dedy
-                     dest2(3,k) = dest2(3,k) - dedz
+                     dest(1,i) = dest(1,i) + dedx
+                     dest(2,i) = dest(2,i) + dedy
+                     dest(3,i) = dest(3,i) + dedz
+                     dest(1,k) = dest(1,k) - dedx
+                     dest(2,k) = dest(2,k) - dedy
+                     dest(3,k) = dest(3,k) - dedz
                      drbi = derb * rbk
                      drbk = derb * rbi
-                     drb1(i) = drb1(i) + drbi
-                     drb2(k) = drb2(k) + drbk
+                     drbt(i) = drbt(i) + drbi
+                     drbt(k) = drbt(k) + drbk
 c
 c     increment the internal virial tensor components
 c
@@ -361,19 +354,24 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      es = est
-      einter = eintert
+      es = es + est
+      einter = einter + eintert
       do i = 1, n
-         des(1,i) = des(1,i) + dest1(1,i) + dest2(1,i)
-         des(2,i) = des(2,i) + dest1(2,i) + dest2(2,i)
-         des(3,i) = des(3,i) + dest1(3,i) + dest2(3,i)
-         drb(i) = drb(i) + drb1(i) + drb2(i)
+         des(1,i) = des(1,i) + dest(1,i)
+         des(2,i) = des(2,i) + dest(2,i)
+         des(3,i) = des(3,i) + dest(3,i)
+         drb(i) = drb(i) + drbt(i)
       end do
       do i = 1, 3
-         vir(1,i) = virt(1,i)
-         vir(2,i) = virt(2,i)
-         vir(3,i) = virt(3,i)
+         vir(1,i) = vir(1,i) + virt(1,i)
+         vir(2,i) = vir(2,i) + virt(2,i)
+         vir(3,i) = vir(3,i) + virt(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (drbt)
+      deallocate (dest)
       return
       end
 c
@@ -386,7 +384,8 @@ c     ################################################################
 c
 c
 c     "egb1b" calculates the generalized Born electrostatic energy
-c     and first derivatives of the GB/SA solvation models
+c     and first derivatives of the GB/SA solvation models using a
+c     neighbor list
 c
 c     note application of distance cutoff scaling directly to
 c     the Born radii chain rule term "derb" is an approximation
@@ -428,10 +427,8 @@ c
       real*8 vyx,vzx,vzy
       real*8 est,eintert
       real*8 virt(3,3)
-      real*8, allocatable :: drb1(:)
-      real*8, allocatable :: drb2(:)
-      real*8, allocatable :: dest1(:,:)
-      real*8, allocatable :: dest2(:,:)
+      real*8, allocatable :: drbt(:)
+      real*8, allocatable :: dest(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -449,39 +446,33 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dest1(3,n))
-      allocate (dest2(3,n))
-      allocate (drb1(n))
-      allocate (drb2(n))
+      allocate (drbt(n))
+      allocate (dest(3,n))
 c
 c     initialize local variables for OpenMP calculation
 c
-      est = es
-      eintert = einter
+      est = 0.0d0
+      eintert = 0.0d0
       do i = 1, n
-         dest1(1,i) = 0.0d0
-         dest1(2,i) = 0.0d0
-         dest1(3,i) = 0.0d0
-         dest2(1,i) = 0.0d0
-         dest2(2,i) = 0.0d0
-         dest2(3,i) = 0.0d0
-         drb1(i) = 0.0d0
-         drb2(i) = 0.0d0
+         drbt(i) = 0.0d0
+         dest(1,i) = 0.0d0
+         dest(2,i) = 0.0d0
+         dest(3,i) = 0.0d0
       end do
       do i = 1, 3
-         virt(1,i) = vir(1,i)
-         virt(2,i) = vir(2,i)
-         virt(3,i) = vir(3,i)
+         virt(1,i) = 0.0d0
+         virt(2,i) = 0.0d0
+         virt(3,i) = 0.0d0
       end do
 c
 c     set OpenMP directives for the major loop structure
 c
-c!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
-c!$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
-c!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,molcule)
-c!$OMP& shared(est,eintert,dest1,dest2,drb1,drb2,virt)
-c!$OMP DO reduction(+:est,eintert,dest1,dest2,drb1,drb2,virt)
-c!$OMP& schedule(guided)
+!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
+!$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
+!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,molcule)
+!$OMP& shared(est,eintert,dest,drbt,virt)
+!$OMP DO reduction(+:est,eintert,dest,drbt,virt)
+!$OMP& schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -506,7 +497,7 @@ c
          e = e - shift
          est = est + 0.5d0*e
          drbi = derb * rbi
-         drb1(i) = drb1(i) + drbi
+         drbt(i) = drbt(i) + drbi
 c
 c     decide whether to compute the current interaction
 c
@@ -577,16 +568,16 @@ c
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
-                  dest1(1,i) = dest1(1,i) + dedx
-                  dest1(2,i) = dest1(2,i) + dedy
-                  dest1(3,i) = dest1(3,i) + dedz
-                  dest2(1,k) = dest2(1,k) - dedx
-                  dest2(2,k) = dest2(2,k) - dedy
-                  dest2(3,k) = dest2(3,k) - dedz
+                  dest(1,i) = dest(1,i) + dedx
+                  dest(2,i) = dest(2,i) + dedy
+                  dest(3,i) = dest(3,i) + dedz
+                  dest(1,k) = dest(1,k) - dedx
+                  dest(2,k) = dest(2,k) - dedy
+                  dest(3,k) = dest(3,k) - dedz
                   drbi = derb * rbk
                   drbk = derb * rbi
-                  drb1(i) = drb1(i) + drbi
-                  drb2(k) = drb2(k) + drbk
+                  drbt(i) = drbt(i) + drbi
+                  drbt(k) = drbt(k) + drbk
 c
 c     increment the internal virial tensor components
 c
@@ -618,24 +609,29 @@ c
 c
 c     end OpenMP directives for the major loop structure
 c
-c!$OMP END DO
-c!$OMP END PARALLEL
+!$OMP END DO
+!$OMP END PARALLEL
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      es = est
-      einter = eintert
+      es = es + est
+      einter = einter + eintert
       do i = 1, n
-         des(1,i) = des(1,i) + dest1(1,i) + dest2(1,i)
-         des(2,i) = des(2,i) + dest1(2,i) + dest2(2,i)
-         des(3,i) = des(3,i) + dest1(3,i) + dest2(3,i)
-         drb(i) = drb(i) + drb1(i) + drb2(i)
+         des(1,i) = des(1,i) + dest(1,i)
+         des(2,i) = des(2,i) + dest(2,i)
+         des(3,i) = des(3,i) + dest(3,i)
+         drb(i) = drb(i) + drbt(i)
       end do
       do i = 1, 3
-         vir(1,i) = virt(1,i)
-         vir(2,i) = virt(2,i)
-         vir(3,i) = virt(3,i)
+         vir(1,i) = vir(1,i) + virt(1,i)
+         vir(2,i) = vir(2,i) + virt(2,i)
+         vir(3,i) = vir(3,i) + virt(3,i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (drbt)
+      deallocate (dest)
       return
       end
 c
@@ -828,10 +824,9 @@ c
       subroutine egk1
       implicit none
       include 'sizes.i'
+      include 'cutoff.i'
       include 'energi.i'
       include 'potent.i'
-      include 'deriv.i'
-      integer i
 c
 c
 c     setup the multipoles for solvation only calculations
@@ -849,7 +844,11 @@ c
 c
 c     correct energy and derivatives for vacuum to polarized state
 c
-      call ediff1
+      if (use_mlist) then
+         call ediff1b
+      else
+         call ediff1a
+      end if
       return
       end
 c
@@ -885,8 +884,9 @@ c
       include 'solute.i'
       include 'usage.i'
       include 'virial.i'
-      integer i,k,ii,kk
+      integer i,j,k,ii,kk
       real*8 e,ei,fgrp
+      real*8 est,eintert
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -936,11 +936,15 @@ c
       real*8 b(0:4,0:2)
       real*8 fid(3),fkd(3)
       real*8 fidg(3,3),fkdg(3,3)
+      real*8 virt(3,3)
       real*8 gc(30),gux(30)
       real*8 guy(30),guz(30)
       real*8 gqxx(30),gqxy(30)
       real*8 gqxz(30),gqyy(30)
       real*8 gqyz(30),gqzz(30)
+      real*8, allocatable :: drbt(:)
+      real*8, allocatable :: drbpt(:)
+      real*8, allocatable :: dest(:,:)
       real*8, allocatable :: trq(:,:)
       real*8, allocatable :: trqi(:,:)
       logical proceed,usei
@@ -962,17 +966,38 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (drbt(n))
+      allocate (drbpt(n))
+      allocate (dest(3,n))
       allocate (trq(3,n))
       allocate (trqi(3,n))
 c
-c     zero out local accumulation arrays for derivatives
+c     initialize local variables for OpenMP calculation
 c
+      est = 0.0d0
+      eintert = 0.0d0
       do i = 1, n
-         do k = 1, 3
-            trq(k,i) = 0.0d0
-            trqi(k,i) = 0.0d0
+         drbt(i) = 0.0d0
+         drbpt(i) = 0.0d0
+         do j = 1, 3
+            dest(j,i) = 0.0d0
+            trq(j,i) = 0.0d0
+            trqi(j,i) = 0.0d0
          end do
       end do
+      do i = 1, 3
+         virt(1,i) = 0.0d0
+         virt(2,i) = 0.0d0
+         virt(3,i) = 0.0d0
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,rborn,
+!$OMP& rpole,uinds,uinps,use_group,off2,gkc,fc,fd,fq,poltyp,molcule)
+!$OMP& shared(est,eintert,dest,drbt,drbpt,trq,trqi,virt)
+!$OMP DO reduction(+:est,eintert,dest,drbt,drbpt,trq,trqi,virt)
+!$OMP& schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -982,6 +1007,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         rbi = rborn(i)
          ci = rpole(1,ii)
          uxi = rpole(2,ii)
          uyi = rpole(3,ii)
@@ -1001,7 +1027,6 @@ c
          sxi = dxi + pxi
          syi = dyi + pyi
          szi = dzi + pzi
-         rbi = rborn(i)
 c
 c     decide whether to compute the current interaction
 c
@@ -1074,7 +1099,7 @@ c
                   b(3,0) = dgfdr * a(4,0)
                   b(4,0) = dgfdr * a(5,0)
 c
-c     reaction potential gradient auxiliary terms
+c     get reaction potential gradient auxiliary terms
 c
                   expc1 = 1.0d0 - expc
                   a(0,1) = expc1 * a(1,0)
@@ -1090,7 +1115,7 @@ c
                   b(2,1) = b(3,0) - expcr*a(3,0) - expc*b(3,0)
                   b(3,1) = b(4,0) - expcr*a(4,0) - expc*b(4,0)
 c
-c     2nd reaction potential gradient auxiliary terms
+c     get 2nd reaction potential gradient auxiliary terms
 c
                   expcdexpc = -expc * dexpc
                   a(0,2) = expc1*a(1,1) + expcdexpc*a(1,0)
@@ -1108,7 +1133,7 @@ c
                   b(2,2) = b(3,1) - (expcr*(a(3,1) + dexpc*a(3,0))
      &                     + expc*(b(3,1)+dexpcr*a(3,0)+dexpc*b(3,0)))
 c
-c     3rd reaction potential gradient auxiliary terms
+c     get 3rd reaction potential gradient auxiliary terms
 c
                   expcdexpc = 2.0d0 * expcdexpc
                   a(0,3) = expc1*a(1,2) + expcdexpc*a(1,1)
@@ -1119,7 +1144,7 @@ c
                   a(1,3) = a(1,3) + expcdexpc*a(2,0)
                   a(2,3) = a(2,3) + expcdexpc*a(3,0)
 c
-c     multiply the auxillary terms by their dieletric functions
+c     multiply the auxillary terms by their dielectric functions
 c
                   a(0,0) = fc * a(0,0)
                   a(0,1) = fc * a(0,1)
@@ -1637,7 +1662,7 @@ c
      &              +2.0d0*(qxyk*gqxy(13)+qxzk*gqxz(13)+qyzk*gqyz(13)))
      &                 + qyzi*(qxxk*gqxx(15)+qyyk*gqyy(15)+qzzk*gqzz(15)
      &              +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15))))
-                  dedx = desymdx + 0.5d0*(dewidx + dewkdx)
+                  dedx = desymdx + 0.5d0*(dewidx+dewkdx)
 c
                   desymdy = ci * ck * gc(3)
      &                      - (uxi*(uxk*gux(6)+uyk*guy(6)+uzk*guz(6))
@@ -1703,7 +1728,7 @@ c
      &              +2.0d0*(qxyk*gqxy(15)+qxzk*gqxz(15)+qyzk*gqyz(15)))
      &                 + qyzi*(qxxk*gqxx(18)+qyyk*gqyy(18)+qzzk*gqzz(18)
      &              +2.0d0*(qxyk*gqxy(18)+qxzk*gqxz(18)+qyzk*gqyz(18))))
-                  dedy = desymdy + 0.5d0*(dewidy + dewkdy)
+                  dedy = desymdy + 0.5d0*(dewidy+dewkdy)
 c
                   desymdz = ci * ck * gc(4)
      &                      - (uxi*(uxk*gux(7)+uyk*guy(7)+uzk*guz(7))
@@ -1769,7 +1794,7 @@ c
      &              +2.0d0*(qxyk*gqxy(16)+qxzk*gqxz(16)+qyzk*gqyz(16)))
      &                 + qyzi*(qxxk*gqxx(19)+qyyk*gqyy(19)+qzzk*gqzz(19)
      &              +2.0d0*(qxyk*gqxy(19)+qxzk*gqxz(19)+qyzk*gqyz(19))))
-                  dedz = desymdz + 0.5d0*(dewidz + dewkdz)
+                  dedz = desymdz + 0.5d0*(dewidz+dewkdz)
 c
                   desymdr = ci * ck * gc(21)
      &                      - (uxi*(uxk*gux(22)+uyk*guy(22)+uzk*guz(22))
@@ -2136,11 +2161,11 @@ c
      &                +2.0d0*(qxyi*guy(15)+qxzi*guy(16)+qyzi*guy(19)))
      &                   + szk*(qxxi*guz(13)+qyyi*guz(18)+qzzi*guz(20)
      &                +2.0d0*(qxyi*guz(15)+qxzi*guz(16)+qyzi*guz(19)))
-                  dpdz = 0.5d0 * (dpsymdz + 0.5d0*(dpwidz + dpwkdz))
+                  dpdz = 0.5d0 * (dpsymdz + 0.5d0*(dpwidz+dpwkdz))
 c
-c     effective radii chain rule terms for the
-c     electrostatic solvation free energy gradient of the permanent
-c     multipoles in the reaction potential of the induced dipoles
+c     effective radii chain rule terms for the electrostatic solvation
+c     free energy gradient of the permanent multipoles in the reaction
+c     potential of the induced dipoles
 c
                   dsymdr = -uxi*(sxk*gux(22)+syk*guy(22)+szk*guz(22))
      &                    - uyi*(sxk*gux(23)+syk*guy(23)+szk*guz(23))
@@ -2176,7 +2201,7 @@ c
      &               +2.0d0*(qxyi*guy(26)+qxzi*guy(27)+qyzi*guy(29)))
      &                + szk*(qxxi*guz(25)+qyyi*guz(28)+qzzi*guz(30)
      &               +2.0d0*(qxyi*guz(26)+qxzi*guz(27)+qyzi*guz(29)))
-                  dsumdr = dsymdr + 0.5d0*(dwipdr + dwkpdr)
+                  dsumdr = dsymdr + 0.5d0*(dwipdr+dwkpdr)
                   dpbi = 0.5d0*rbk*dsumdr
                   dpbk = 0.5d0*rbi*dsumdr
 c
@@ -2347,21 +2372,21 @@ c
                   if (i .eq. k) then
                      e = 0.5d0 * e
                      ei = 0.5d0 * ei
-                     es = es + e + ei
-                     drb(i) = drb(i) + drbi
-                     drbp(i) = drbp(i) + dpbi
+                     est = est + e + ei
+                     drbt(i) = drbt(i) + drbi
+                     drbpt(i) = drbpt(i) + dpbi
                   else
-                     es = es + e + ei
-                     des(1,i) = des(1,i) - dedx - dpdx
-                     des(2,i) = des(2,i) - dedy - dpdy
-                     des(3,i) = des(3,i) - dedz - dpdz
-                     des(1,k) = des(1,k) + dedx + dpdx
-                     des(2,k) = des(2,k) + dedy + dpdy
-                     des(3,k) = des(3,k) + dedz + dpdz
-                     drb(i) = drb(i) + drbi
-                     drb(k) = drb(k) + drbk
-                     drbp(i) = drbp(i) + dpbi
-                     drbp(k) = drbp(k) + dpbk
+                     est = est + e + ei
+                     dest(1,i) = dest(1,i) - dedx - dpdx
+                     dest(2,i) = dest(2,i) - dedy - dpdy
+                     dest(3,i) = dest(3,i) - dedz - dpdz
+                     dest(1,k) = dest(1,k) + dedx + dpdx
+                     dest(2,k) = dest(2,k) + dedy + dpdy
+                     dest(3,k) = dest(3,k) + dedz + dpdz
+                     drbt(i) = drbt(i) + drbi
+                     drbt(k) = drbt(k) + drbk
+                     drbpt(i) = drbpt(i) + dpbi
+                     drbpt(k) = drbpt(k) + dpbk
 c
 c     increment the internal virial tensor components
 c
@@ -2371,49 +2396,78 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     vir(1,1) = vir(1,1) + vxx
-                     vir(2,1) = vir(2,1) + vyx
-                     vir(3,1) = vir(3,1) + vzx
-                     vir(1,2) = vir(1,2) + vyx
-                     vir(2,2) = vir(2,2) + vyy
-                     vir(3,2) = vir(3,2) + vzy
-                     vir(1,3) = vir(1,3) + vzx
-                     vir(2,3) = vir(2,3) + vzy
-                     vir(3,3) = vir(3,3) + vzz
+                     virt(1,1) = virt(1,1) + vxx
+                     virt(2,1) = virt(2,1) + vyx
+                     virt(3,1) = virt(3,1) + vzx
+                     virt(1,2) = virt(1,2) + vyx
+                     virt(2,2) = virt(2,2) + vyy
+                     virt(3,2) = virt(3,2) + vzy
+                     virt(1,3) = virt(1,3) + vzx
+                     virt(2,3) = virt(2,3) + vzy
+                     virt(3,3) = virt(3,3) + vzz
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e + ei
+                     eintert = eintert + e + ei
                   end if
                end if
             end if
          end do
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
+      einter = einter + eintert
+      do i = 1, n
+         des(1,i) = des(1,i) + dest(1,i)
+         des(2,i) = des(2,i) + dest(2,i)
+         des(3,i) = des(3,i) + dest(3,i)
+         drb(i) = drb(i) + drbt(i)
+         drbp(i) = drbp(i) + drbpt(i)
+      end do
+      do i = 1, 3
+         vir(1,i) = vir(1,i) + virt(1,i)
+         vir(2,i) = vir(2,i) + virt(2,i)
+         vir(3,i) = vir(3,i) + virt(3,i)
+      end do
+c
+c     convert torque derivative components to Cartesian form
+c
       call torque2 (trq,des)
       call torque2 (trqi,des)
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (drbt)
+      deallocate (drbpt)
+      deallocate (dest)
       deallocate (trq)
       deallocate (trqi)
       return
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine ediff1  --  correct vacuum to SCRF derivatives  ##
-c     ##                                                             ##
-c     #################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ediff1a  --  vacuum to SCRF via pair list  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "ediff1" calculates the energy and derivatives of polarizing
-c     the vacuum induced dipoles to their SCRF polarized values
+c     "ediff1a" calculates the energy and derivatives of polarizing
+c     the vacuum induced dipoles to their SCRF polarized values using
+c     a double loop
 c
 c
-      subroutine ediff1
+      subroutine ediff1a
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -2439,10 +2493,12 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,f,fgrp
+      real*8 ei,est
+      real*8 f,fgrp
       real*8 damp,gfd
       real*8 scale3,scale5
       real*8 scale7,scale9
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 psc3,psc5,psc7,psc9
       real*8 dsc3,dsc5,dsc7,dsc9
@@ -2483,9 +2539,8 @@ c
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
+      real*8, allocatable :: dest(:,:)
       real*8, allocatable :: trqi(:,:)
-      real*8, allocatable :: ftm1i(:,:)
-      real*8, allocatable :: ttm1i(:,:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -2502,9 +2557,8 @@ c
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
+      allocate (dest(3,n))
       allocate (trqi(3,n))
-      allocate (ftm1i(3,npole))
-      allocate (ttm1i(3,npole))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2514,27 +2568,36 @@ c
          uscale(i) = 1.0d0
       end do
 c
-c     zero out local accumulation arrays for derivatives
+c     initialize local variables for OpenMP calculation
 c
+      est = 0.0d0
       do i = 1, n
-         trqi(1,i) = 0.0d0
-         trqi(2,i) = 0.0d0
-         trqi(3,i) = 0.0d0
-      end do
-c
-c     initialise temporary force and torque accumulators
-c
-      do i = 1, npole
          do j = 1, 3
-            ftm1i(j,i) = 0.0d0
-            ttm1i(j,i) = 0.0d0
+            dest(j,i) = 0.0d0
+            trqi(j,i) = 0.0d0
          end do
       end do
 c
-c     set scale factors for permanent multipole and induced terms
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
+!$OMP& zaxis,pdamp,thole,rpole,uind,uinp,uinds,uinps,use,n12,n13,n14,
+!$OMP% n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP% p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
+!$OMP% d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,use_group,
+!$OMP% use_intra,off2,f)
+!$OMP& firstprivate(pscale,dscale,uscale)
+!$OMP% shared(est,dest,trqi)
+!$OMP DO reduction(+:est,dest,trqi)
+!$OMP& schedule(guided)
+c
+c     calculate the multipole interaction energy and gradient
 c
       do i = 1, npole-1
          ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
@@ -2610,9 +2673,9 @@ c
             qk(7) = rpole(11,k)
             qk(8) = rpole(12,k)
             qk(9) = rpole(13,k)
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -2846,7 +2909,7 @@ c
      &                          + rr5*(gli(2)+gli(7))*psc5
      &                          + rr7*gli(3)*psc7)
                ei = f * ei
-               es = es + ei
+               est = est + ei
 c
 c     intermediate variables for the induced-permanent terms
 c
@@ -2989,23 +3052,23 @@ c
      &            + gti(3)*dkxr(3) - gti(4)*((uixqkr(3)+rxqkui(3))*psc5
      &            +(uixqkrp(3)+rxqkuip(3))*dsc5)*0.5d0 - gti(6)*rxqkr(3)
 c
-c     update force and torque on site i
+c     update the force components on sites i and k
 c
-               ftm1i(1,i) = ftm1i(1,i) - ftm2i(1)
-               ftm1i(2,i) = ftm1i(2,i) - ftm2i(2)
-               ftm1i(3,i) = ftm1i(3,i) - ftm2i(3)
-               ttm1i(1,i) = ttm1i(1,i) + ttm2i(1)
-               ttm1i(2,i) = ttm1i(2,i) + ttm2i(2)
-               ttm1i(3,i) = ttm1i(3,i) + ttm2i(3)
+               dest(1,ii) = dest(1,ii) + f*ftm2i(1)
+               dest(2,ii) = dest(2,ii) + f*ftm2i(2)
+               dest(3,ii) = dest(3,ii) + f*ftm2i(3)
+               dest(1,kk) = dest(1,kk) - f*ftm2i(1)
+               dest(2,kk) = dest(2,kk) - f*ftm2i(2)
+               dest(3,kk) = dest(3,kk) - f*ftm2i(3)
 c
-c     update force and torque on site k
+c     update the torque components on sites i and k
 c
-               ftm1i(1,k) = ftm1i(1,k) + ftm2i(1)
-               ftm1i(2,k) = ftm1i(2,k) + ftm2i(2)
-               ftm1i(3,k) = ftm1i(3,k) + ftm2i(3)
-               ttm1i(1,k) = ttm1i(1,k) + ttm3i(1)
-               ttm1i(2,k) = ttm1i(2,k) + ttm3i(2)
-               ttm1i(3,k) = ttm1i(3,k) + ttm3i(3)
+               trqi(1,ii) = trqi(1,ii) + f*ttm2i(1)
+               trqi(2,ii) = trqi(2,ii) + f*ttm2i(2)
+               trqi(3,ii) = trqi(3,ii) + f*ttm2i(3)
+               trqi(1,kk) = trqi(1,kk) + f*ttm3i(1)
+               trqi(2,kk) = trqi(2,kk) + f*ttm3i(2)
+               trqi(3,kk) = trqi(3,kk) + f*ttm3i(3)
 c
 c     construct auxiliary vectors for induced terms
 c
@@ -3115,7 +3178,7 @@ c
      &                           + rr5*(gli(2)+gli(7))*psc5
      &                           + rr7*gli(3)*psc7)
                ei = f * ei
-               es = es + ei
+               est = est + ei
 c
 c     intermediate variables for the induced-permanent terms
 c
@@ -3258,23 +3321,23 @@ c
      &            + gti(3)*dkxr(3) - gti(4)*((uixqkr(3)+rxqkui(3))*psc5
      &            +(uixqkrp(3)+rxqkuip(3))*dsc5)*0.5d0 - gti(6)*rxqkr(3)
 c
-c     update force and torque on site i
+c     update the force components on sites i and k
 c
-               ftm1i(1,i) = ftm1i(1,i) + ftm2i(1)
-               ftm1i(2,i) = ftm1i(2,i) + ftm2i(2)
-               ftm1i(3,i) = ftm1i(3,i) + ftm2i(3)
-               ttm1i(1,i) = ttm1i(1,i) - ttm2i(1)
-               ttm1i(2,i) = ttm1i(2,i) - ttm2i(2)
-               ttm1i(3,i) = ttm1i(3,i) - ttm2i(3)
+               dest(1,ii) = dest(1,ii) - f*ftm2i(1)
+               dest(2,ii) = dest(2,ii) - f*ftm2i(2)
+               dest(3,ii) = dest(3,ii) - f*ftm2i(3)
+               dest(1,kk) = dest(1,kk) + f*ftm2i(1)
+               dest(2,kk) = dest(2,kk) + f*ftm2i(2)
+               dest(3,kk) = dest(3,kk) + f*ftm2i(3)
 c
-c     update force and torque on site k
+c     update the torque components on sites i and k
 c
-               ftm1i(1,k) = ftm1i(1,k) - ftm2i(1)
-               ftm1i(2,k) = ftm1i(2,k) - ftm2i(2)
-               ftm1i(3,k) = ftm1i(3,k) - ftm2i(3)
-               ttm1i(1,k) = ttm1i(1,k) - ttm3i(1)
-               ttm1i(2,k) = ttm1i(2,k) - ttm3i(2)
-               ttm1i(3,k) = ttm1i(3,k) - ttm3i(3)
+               trqi(1,ii) = trqi(1,ii) - f*ttm2i(1)
+               trqi(2,ii) = trqi(2,ii) - f*ttm2i(2)
+               trqi(3,ii) = trqi(3,ii) - f*ttm2i(3)
+               trqi(1,kk) = trqi(1,kk) - f*ttm3i(1)
+               trqi(2,kk) = trqi(2,kk) - f*ttm3i(2)
+               trqi(3,kk) = trqi(3,kk) - f*ttm3i(3)
             end if
    10       continue
          end do
@@ -3311,16 +3374,18 @@ c
          end do
       end do
 c
-c     increment the total forces and torques
+c     end OpenMP directives for the major loop structure
 c
-      do i = 1, npole
-         ii = ipole(i)
-         des(1,ii) = des(1,ii) - f*ftm1i(1,i)
-         des(2,ii) = des(2,ii) - f*ftm1i(2,i)
-         des(3,ii) = des(3,ii) - f*ftm1i(3,i)
-         trqi(1,ii) = trqi(1,ii) + f*ttm1i(1,i)
-         trqi(2,ii) = trqi(2,ii) + f*ttm1i(2,i)
-         trqi(3,ii) = trqi(3,ii) + f*ttm1i(3,i)
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
+      do i = 1, n
+         des(1,i) = des(1,i) + dest(1,i)
+         des(2,i) = des(2,i) + dest(2,i)
+         des(3,i) = des(3,i) + dest(3,i)
       end do
       call torque2 (trqi,des)
 c
@@ -3329,9 +3394,955 @@ c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
+      deallocate (dest)
       deallocate (trqi)
-      deallocate (ftm1i)
-      deallocate (ttm1i)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ediff1b  --  vacuum to SCRF via pair list  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "ediff1b" calculates the energy and derivatives of polarizing
+c     the vacuum induced dipoles to their SCRF polarized values using
+c     a neighbor list
+c
+c
+      subroutine ediff1b
+      implicit none
+      include 'sizes.i'
+      include 'atoms.i'
+      include 'bound.i'
+      include 'boxes.i'
+      include 'chgpot.i'
+      include 'couple.i'
+      include 'cutoff.i'
+      include 'deriv.i'
+      include 'energi.i'
+      include 'group.i'
+      include 'inter.i'
+      include 'molcul.i'
+      include 'mplpot.i'
+      include 'mpole.i'
+      include 'neigh.i'
+      include 'polar.i'
+      include 'polgrp.i'
+      include 'polpot.i'
+      include 'potent.i'
+      include 'shunt.i'
+      include 'usage.i'
+      integer i,j,k
+      integer ii,kk,kkk
+      integer ix,iy,iz
+      integer kx,ky,kz
+      real*8 ei,est
+      real*8 f,fgrp
+      real*8 damp,gfd
+      real*8 scale3,scale5
+      real*8 scale7,scale9
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 psc3,psc5,psc7,psc9
+      real*8 dsc3,dsc5,dsc7,dsc9
+      real*8 scale3i,scale5i
+      real*8 scale7i
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
+      real*8 pdi,pti,pgamma
+      real*8 ci,di(3),qi(9)
+      real*8 ck,dk(3),qk(9)
+      real*8 fridmp(3),findmp(3)
+      real*8 ftm2i(3)
+      real*8 ttm2i(3),ttm3i(3)
+      real*8 dixdk(3),fdir(3)
+      real*8 dixuk(3),dkxui(3)
+      real*8 dixukp(3),dkxuip(3)
+      real*8 uixqkr(3),ukxqir(3)
+      real*8 uixqkrp(3),ukxqirp(3)
+      real*8 qiuk(3),qkui(3)
+      real*8 qiukp(3),qkuip(3)
+      real*8 rxqiuk(3),rxqkui(3)
+      real*8 rxqiukp(3),rxqkuip(3)
+      real*8 qidk(3),qkdi(3)
+      real*8 qir(3),qkr(3)
+      real*8 qiqkr(3),qkqir(3)
+      real*8 qixqk(3),rxqir(3)
+      real*8 dixr(3),dkxr(3)
+      real*8 dixqkr(3),dkxqir(3)
+      real*8 rxqkr(3),qkrxqir(3)
+      real*8 rxqikr(3),rxqkir(3)
+      real*8 rxqidk(3),rxqkdi(3)
+      real*8 ddsc3(3),ddsc5(3)
+      real*8 ddsc7(3)
+      real*8 gli(7),glip(7)
+      real*8 sc(10)
+      real*8 sci(8),scip(8)
+      real*8 gfi(6),gti(6)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
+      real*8, allocatable :: dest(:,:)
+      real*8, allocatable :: trqi(:,:)
+      logical proceed,usei,usek
+      character*6 mode
+c
+c
+c     set conversion factor, cutoff and scaling coefficients
+c
+      if (npole .eq. 0)  return
+      f = electric / dielec
+      mode = 'MPOLE'
+      call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pscale(n))
+      allocate (dscale(n))
+      allocate (uscale(n))
+      allocate (dest(3,n))
+      allocate (trqi(3,n))
+c
+c     set arrays needed to scale connected atom interactions
+c
+      do i = 1, n
+         pscale(i) = 1.0d0
+         dscale(i) = 1.0d0
+         uscale(i) = 1.0d0
+      end do
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = 0.0d0
+      do i = 1, n
+         do j = 1, 3
+            dest(j,i) = 0.0d0
+            trqi(j,i) = 0.0d0
+         end do
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
+!$OMP& zaxis,pdamp,thole,rpole,uind,uinp,uinds,uinps,nelst,elst,
+!$OMP% use,n12,n13,n14,n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,
+!$OMP% ip13,np14,ip14,p2scale,p3scale,p4scale,p41scale,p5scale,
+!$OMP% d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
+!$OMP% use_group,use_intra,off2,f)
+!$OMP& firstprivate(pscale,dscale,uscale)
+!$OMP% shared(est,dest,trqi)
+!$OMP DO reduction(+:est,dest,trqi)
+!$OMP& schedule(guided)
+c
+c     calculate the multipole interaction energy and gradient
+c
+      do i = 1, npole-1
+         ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = yaxis(i)
+         pdi = pdamp(i)
+         pti = thole(i)
+         ci = rpole(1,i)
+         di(1) = rpole(2,i)
+         di(2) = rpole(3,i)
+         di(3) = rpole(4,i)
+         qi(1) = rpole(5,i)
+         qi(2) = rpole(6,i)
+         qi(3) = rpole(7,i)
+         qi(4) = rpole(8,i)
+         qi(5) = rpole(9,i)
+         qi(6) = rpole(10,i)
+         qi(7) = rpole(11,i)
+         qi(8) = rpole(12,i)
+         qi(9) = rpole(13,i)
+         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
+         do j = 1, n12(ii)
+            pscale(i12(j,ii)) = p2scale
+         end do
+         do j = 1, n13(ii)
+            pscale(i13(j,ii)) = p3scale
+         end do
+         do j = 1, n14(ii)
+            pscale(i14(j,ii)) = p4scale
+            do k = 1, np11(ii)
+                if (i14(j,ii) .eq. ip11(k,ii))
+     &            pscale(i14(j,ii)) = p4scale * p41scale
+            end do
+         end do
+         do j = 1, n15(ii)
+            pscale(i15(j,ii)) = p5scale
+         end do
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = d1scale
+            uscale(ip11(j,ii)) = u1scale
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = d2scale
+            uscale(ip12(j,ii)) = u2scale
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = d3scale
+            uscale(ip13(j,ii)) = u3scale
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = d4scale
+            uscale(ip14(j,ii)) = u4scale
+         end do
+         do kkk = 1, nelst(i)
+            k = elst(kkk,i)
+            kk = ipole(k)
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = yaxis(k)
+            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (.not. use_intra)  proceed = .true.
+            if (proceed)  proceed = (usei .or. usek)
+            if (.not. proceed)  goto 10
+            ck = rpole(1,k)
+            dk(1) = rpole(2,k)
+            dk(2) = rpole(3,k)
+            dk(3) = rpole(4,k)
+            qk(1) = rpole(5,k)
+            qk(2) = rpole(6,k)
+            qk(3) = rpole(7,k)
+            qk(4) = rpole(8,k)
+            qk(5) = rpole(9,k)
+            qk(6) = rpole(10,k)
+            qk(7) = rpole(11,k)
+            qk(8) = rpole(12,k)
+            qk(9) = rpole(13,k)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
+            call image (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. off2) then
+               r = sqrt(r2)
+               rr1 = 1.0d0 / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               scale3 = 1.0d0
+               scale5 = 1.0d0
+               scale7 = 1.0d0
+               scale9 = 1.0d0
+               do j = 1, 3
+                  ddsc3(j) = 0.0d0
+                  ddsc5(j) = 0.0d0
+                  ddsc7(j) = 0.0d0
+               end do
+c
+c     apply Thole polarization damping to scale factors
+c
+               damp = pdi * pdamp(k)
+               if (damp .ne. 0.0d0) then
+                  pgamma = min(pti,thole(k))
+                  damp = -pgamma * (r/damp)**3
+                  if (damp .gt. -50.0d0) then
+                     scale3 = 1.0d0 - exp(damp)
+                     scale5 = 1.0d0 - (1.0d0-damp)*exp(damp)
+                     scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
+     &                                       *exp(damp)
+                     scale9 = 1.0d0 - (1.0d0-damp+(18.0d0*damp**2
+     &                                 -9.0d0*damp**3)/35.0d0)*exp(damp)
+                     ddsc3(1) = -3.0d0*damp*exp(damp) * xr/r2
+                     ddsc3(2) = -3.0d0*damp*exp(damp) * yr/r2
+                     ddsc3(3) = -3.0d0*damp*exp(damp) * zr/r2
+                     ddsc5(1) = -damp * ddsc3(1)
+                     ddsc5(2) = -damp * ddsc3(2)
+                     ddsc5(3) = -damp * ddsc3(3)
+                     ddsc7(1) = (-0.2d0-0.6d0*damp) * ddsc5(1)
+                     ddsc7(2) = (-0.2d0-0.6d0*damp) * ddsc5(2)
+                     ddsc7(3) = (-0.2d0-0.6d0*damp) * ddsc5(3)
+                  end if
+               end if
+               scale3i = scale3 * uscale(kk)
+               scale5i = scale5 * uscale(kk)
+               scale7i = scale7 * uscale(kk)
+               dsc3 = scale3 * dscale(kk)
+               dsc5 = scale5 * dscale(kk)
+               dsc7 = scale7 * dscale(kk)
+               dsc9 = scale9 * dscale(kk)
+               psc3 = scale3 * pscale(kk)
+               psc5 = scale5 * pscale(kk)
+               psc7 = scale7 * pscale(kk)
+               psc9 = scale9 * pscale(kk)
+c
+c     construct auxiliary vectors for permanent terms
+c
+               dixdk(1) = di(2)*dk(3) - di(3)*dk(2)
+               dixdk(2) = di(3)*dk(1) - di(1)*dk(3)
+               dixdk(3) = di(1)*dk(2) - di(2)*dk(1)
+               dixr(1) = di(2)*zr - di(3)*yr
+               dixr(2) = di(3)*xr - di(1)*zr
+               dixr(3) = di(1)*yr - di(2)*xr
+               dkxr(1) = dk(2)*zr - dk(3)*yr
+               dkxr(2) = dk(3)*xr - dk(1)*zr
+               dkxr(3) = dk(1)*yr - dk(2)*xr
+               qir(1) = qi(1)*xr + qi(4)*yr + qi(7)*zr
+               qir(2) = qi(2)*xr + qi(5)*yr + qi(8)*zr
+               qir(3) = qi(3)*xr + qi(6)*yr + qi(9)*zr
+               qkr(1) = qk(1)*xr + qk(4)*yr + qk(7)*zr
+               qkr(2) = qk(2)*xr + qk(5)*yr + qk(8)*zr
+               qkr(3) = qk(3)*xr + qk(6)*yr + qk(9)*zr
+               qiqkr(1) = qi(1)*qkr(1) + qi(4)*qkr(2) + qi(7)*qkr(3)
+               qiqkr(2) = qi(2)*qkr(1) + qi(5)*qkr(2) + qi(8)*qkr(3)
+               qiqkr(3) = qi(3)*qkr(1) + qi(6)*qkr(2) + qi(9)*qkr(3)
+               qkqir(1) = qk(1)*qir(1) + qk(4)*qir(2) + qk(7)*qir(3)
+               qkqir(2) = qk(2)*qir(1) + qk(5)*qir(2) + qk(8)*qir(3)
+               qkqir(3) = qk(3)*qir(1) + qk(6)*qir(2) + qk(9)*qir(3)
+               qixqk(1) = qi(2)*qk(3) + qi(5)*qk(6) + qi(8)*qk(9)
+     &                       - qi(3)*qk(2) - qi(6)*qk(5) - qi(9)*qk(8)
+               qixqk(2) = qi(3)*qk(1) + qi(6)*qk(4) + qi(9)*qk(7)
+     &                       - qi(1)*qk(3) - qi(4)*qk(6) - qi(7)*qk(9)
+               qixqk(3) = qi(1)*qk(2) + qi(4)*qk(5) + qi(7)*qk(8)
+     &                       - qi(2)*qk(1) - qi(5)*qk(4) - qi(8)*qk(7)
+               rxqir(1) = yr*qir(3) - zr*qir(2)
+               rxqir(2) = zr*qir(1) - xr*qir(3)
+               rxqir(3) = xr*qir(2) - yr*qir(1)
+               rxqkr(1) = yr*qkr(3) - zr*qkr(2)
+               rxqkr(2) = zr*qkr(1) - xr*qkr(3)
+               rxqkr(3) = xr*qkr(2) - yr*qkr(1)
+               rxqikr(1) = yr*qiqkr(3) - zr*qiqkr(2)
+               rxqikr(2) = zr*qiqkr(1) - xr*qiqkr(3)
+               rxqikr(3) = xr*qiqkr(2) - yr*qiqkr(1)
+               rxqkir(1) = yr*qkqir(3) - zr*qkqir(2)
+               rxqkir(2) = zr*qkqir(1) - xr*qkqir(3)
+               rxqkir(3) = xr*qkqir(2) - yr*qkqir(1)
+               qkrxqir(1) = qkr(2)*qir(3) - qkr(3)*qir(2)
+               qkrxqir(2) = qkr(3)*qir(1) - qkr(1)*qir(3)
+               qkrxqir(3) = qkr(1)*qir(2) - qkr(2)*qir(1)
+               qidk(1) = qi(1)*dk(1) + qi(4)*dk(2) + qi(7)*dk(3)
+               qidk(2) = qi(2)*dk(1) + qi(5)*dk(2) + qi(8)*dk(3)
+               qidk(3) = qi(3)*dk(1) + qi(6)*dk(2) + qi(9)*dk(3)
+               qkdi(1) = qk(1)*di(1) + qk(4)*di(2) + qk(7)*di(3)
+               qkdi(2) = qk(2)*di(1) + qk(5)*di(2) + qk(8)*di(3)
+               qkdi(3) = qk(3)*di(1) + qk(6)*di(2) + qk(9)*di(3)
+               dixqkr(1) = di(2)*qkr(3) - di(3)*qkr(2)
+               dixqkr(2) = di(3)*qkr(1) - di(1)*qkr(3)
+               dixqkr(3) = di(1)*qkr(2) - di(2)*qkr(1)
+               dkxqir(1) = dk(2)*qir(3) - dk(3)*qir(2)
+               dkxqir(2) = dk(3)*qir(1) - dk(1)*qir(3)
+               dkxqir(3) = dk(1)*qir(2) - dk(2)*qir(1)
+               rxqidk(1) = yr*qidk(3) - zr*qidk(2)
+               rxqidk(2) = zr*qidk(1) - xr*qidk(3)
+               rxqidk(3) = xr*qidk(2) - yr*qidk(1)
+               rxqkdi(1) = yr*qkdi(3) - zr*qkdi(2)
+               rxqkdi(2) = zr*qkdi(1) - xr*qkdi(3)
+               rxqkdi(3) = xr*qkdi(2) - yr*qkdi(1)
+c
+c     get intermediate variables for permanent energy terms
+c
+               sc(3) = di(1)*xr + di(2)*yr + di(3)*zr
+               sc(4) = dk(1)*xr + dk(2)*yr + dk(3)*zr
+               sc(5) = qir(1)*xr + qir(2)*yr + qir(3)*zr
+               sc(6) = qkr(1)*xr + qkr(2)*yr + qkr(3)*zr
+c
+c     construct auxiliary vectors for induced terms
+c
+               dixuk(1) = di(2)*uinds(3,k) - di(3)*uinds(2,k)
+               dixuk(2) = di(3)*uinds(1,k) - di(1)*uinds(3,k)
+               dixuk(3) = di(1)*uinds(2,k) - di(2)*uinds(1,k)
+               dkxui(1) = dk(2)*uinds(3,i) - dk(3)*uinds(2,i)
+               dkxui(2) = dk(3)*uinds(1,i) - dk(1)*uinds(3,i)
+               dkxui(3) = dk(1)*uinds(2,i) - dk(2)*uinds(1,i)
+               dixukp(1) = di(2)*uinps(3,k) - di(3)*uinps(2,k)
+               dixukp(2) = di(3)*uinps(1,k) - di(1)*uinps(3,k)
+               dixukp(3) = di(1)*uinps(2,k) - di(2)*uinps(1,k)
+               dkxuip(1) = dk(2)*uinps(3,i) - dk(3)*uinps(2,i)
+               dkxuip(2) = dk(3)*uinps(1,i) - dk(1)*uinps(3,i)
+               dkxuip(3) = dk(1)*uinps(2,i) - dk(2)*uinps(1,i)
+               qiuk(1) = qi(1)*uinds(1,k) + qi(4)*uinds(2,k)
+     &                      + qi(7)*uinds(3,k)
+               qiuk(2) = qi(2)*uinds(1,k) + qi(5)*uinds(2,k)
+     &                      + qi(8)*uinds(3,k)
+               qiuk(3) = qi(3)*uinds(1,k) + qi(6)*uinds(2,k)
+     &                      + qi(9)*uinds(3,k)
+               qkui(1) = qk(1)*uinds(1,i) + qk(4)*uinds(2,i)
+     &                      + qk(7)*uinds(3,i)
+               qkui(2) = qk(2)*uinds(1,i) + qk(5)*uinds(2,i)
+     &                      + qk(8)*uinds(3,i)
+               qkui(3) = qk(3)*uinds(1,i) + qk(6)*uinds(2,i)
+     &                      + qk(9)*uinds(3,i)
+               qiukp(1) = qi(1)*uinps(1,k) + qi(4)*uinps(2,k)
+     &                       + qi(7)*uinps(3,k)
+               qiukp(2) = qi(2)*uinps(1,k) + qi(5)*uinps(2,k)
+     &                       + qi(8)*uinps(3,k)
+               qiukp(3) = qi(3)*uinps(1,k) + qi(6)*uinps(2,k)
+     &                       + qi(9)*uinps(3,k)
+               qkuip(1) = qk(1)*uinps(1,i) + qk(4)*uinps(2,i)
+     &                       + qk(7)*uinps(3,i)
+               qkuip(2) = qk(2)*uinps(1,i) + qk(5)*uinps(2,i)
+     &                       + qk(8)*uinps(3,i)
+               qkuip(3) = qk(3)*uinps(1,i) + qk(6)*uinps(2,i)
+     &                       + qk(9)*uinps(3,i)
+               uixqkr(1) = uinds(2,i)*qkr(3) - uinds(3,i)*qkr(2)
+               uixqkr(2) = uinds(3,i)*qkr(1) - uinds(1,i)*qkr(3)
+               uixqkr(3) = uinds(1,i)*qkr(2) - uinds(2,i)*qkr(1)
+               ukxqir(1) = uinds(2,k)*qir(3) - uinds(3,k)*qir(2)
+               ukxqir(2) = uinds(3,k)*qir(1) - uinds(1,k)*qir(3)
+               ukxqir(3) = uinds(1,k)*qir(2) - uinds(2,k)*qir(1)
+               uixqkrp(1) = uinps(2,i)*qkr(3) - uinps(3,i)*qkr(2)
+               uixqkrp(2) = uinps(3,i)*qkr(1) - uinps(1,i)*qkr(3)
+               uixqkrp(3) = uinps(1,i)*qkr(2) - uinps(2,i)*qkr(1)
+               ukxqirp(1) = uinps(2,k)*qir(3) - uinps(3,k)*qir(2)
+               ukxqirp(2) = uinps(3,k)*qir(1) - uinps(1,k)*qir(3)
+               ukxqirp(3) = uinps(1,k)*qir(2) - uinps(2,k)*qir(1)
+               rxqiuk(1) = yr*qiuk(3) - zr*qiuk(2)
+               rxqiuk(2) = zr*qiuk(1) - xr*qiuk(3)
+               rxqiuk(3) = xr*qiuk(2) - yr*qiuk(1)
+               rxqkui(1) = yr*qkui(3) - zr*qkui(2)
+               rxqkui(2) = zr*qkui(1) - xr*qkui(3)
+               rxqkui(3) = xr*qkui(2) - yr*qkui(1)
+               rxqiukp(1) = yr*qiukp(3) - zr*qiukp(2)
+               rxqiukp(2) = zr*qiukp(1) - xr*qiukp(3)
+               rxqiukp(3) = xr*qiukp(2) - yr*qiukp(1)
+               rxqkuip(1) = yr*qkuip(3) - zr*qkuip(2)
+               rxqkuip(2) = zr*qkuip(1) - xr*qkuip(3)
+               rxqkuip(3) = xr*qkuip(2) - yr*qkuip(1)
+c
+c     get intermediate variables for induction energy terms
+c
+               sci(1) = uinds(1,i)*dk(1) + uinds(2,i)*dk(2)
+     &                     + uinds(3,i)*dk(3) + di(1)*uinds(1,k)
+     &                     + di(2)*uinds(2,k) + di(3)*uinds(3,k)
+               sci(2) = uinds(1,i)*uinds(1,k) + uinds(2,i)*uinds(2,k)
+     &                     + uinds(3,i)*uinds(3,k)
+               sci(3) = uinds(1,i)*xr + uinds(2,i)*yr + uinds(3,i)*zr
+               sci(4) = uinds(1,k)*xr + uinds(2,k)*yr + uinds(3,k)*zr
+               sci(7) = qir(1)*uinds(1,k) + qir(2)*uinds(2,k)
+     &                     + qir(3)*uinds(3,k)
+               sci(8) = qkr(1)*uinds(1,i) + qkr(2)*uinds(2,i)
+     &                     + qkr(3)*uinds(3,i)
+               scip(1) = uinps(1,i)*dk(1) + uinps(2,i)*dk(2)
+     &                      + uinps(3,i)*dk(3) + di(1)*uinps(1,k)
+     &                      + di(2)*uinps(2,k) + di(3)*uinps(3,k)
+               scip(2) = uinds(1,i)*uinps(1,k) + uinds(2,i)*uinps(2,k)
+     &                 + uinds(3,i)*uinps(3,k) + uinps(1,i)*uinds(1,k)
+     &                 + uinps(2,i)*uinds(2,k) + uinps(3,i)*uinds(3,k)
+               scip(3) = uinps(1,i)*xr + uinps(2,i)*yr + uinps(3,i)*zr
+               scip(4) = uinps(1,k)*xr + uinps(2,k)*yr + uinps(3,k)*zr
+               scip(7) = qir(1)*uinps(1,k) + qir(2)*uinps(2,k)
+     &                      + qir(3)*uinps(3,k)
+               scip(8) = qkr(1)*uinps(1,i) + qkr(2)*uinps(2,i)
+     &                      + qkr(3)*uinps(3,i)
+c
+c     calculate the gl functions for potential energy
+c
+               gli(1) = ck*sci(3) - ci*sci(4)
+               gli(2) = -sc(3)*sci(4) - sci(3)*sc(4)
+               gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
+               gli(6) = sci(1)
+               gli(7) = 2.0d0 * (sci(7)-sci(8))
+               glip(1) = ck*scip(3) - ci*scip(4)
+               glip(2) = -sc(3)*scip(4) - scip(3)*sc(4)
+               glip(3) = scip(3)*sc(6) - scip(4)*sc(5)
+               glip(6) = scip(1)
+               glip(7) = 2.0d0 * (scip(7)-scip(8))
+c
+c     get the permanent multipole and induced energies
+c
+               ei = 0.5d0 * (rr3*(gli(1)+gli(6))*psc3
+     &                          + rr5*(gli(2)+gli(7))*psc5
+     &                          + rr7*gli(3)*psc7)
+               ei = f * ei
+               est = est + ei
+c
+c     intermediate variables for the induced-permanent terms
+c
+               gfi(1) = 0.5d0*rr5*((gli(1)+gli(6))*psc3
+     &                     +(glip(1)+glip(6))*dsc3+scip(2)*scale3i)
+     &                + 0.5d0*rr7*((gli(7)+gli(2))*psc5
+     &                            +(glip(7)+glip(2))*dsc5
+     &                     -(sci(3)*scip(4)+scip(3)*sci(4))*scale5i)
+     &                + 0.5d0*rr9*(gli(3)*psc7+glip(3)*dsc7)
+               gfi(2) = -rr3*ck + rr5*sc(4) - rr7*sc(6)
+               gfi(3) = rr3*ci + rr5*sc(3) + rr7*sc(5)
+               gfi(4) = 2.0d0 * rr5
+               gfi(5) = rr7 * (sci(4)*psc7+scip(4)*dsc7)
+               gfi(6) = -rr7 * (sci(3)*psc7+scip(3)*dsc7)
+c
+c     get the induced force
+c
+               ftm2i(1) = gfi(1)*xr + 0.5d0*
+     &            (- rr3*ck*(uinds(1,i)*psc3+uinps(1,i)*dsc3)
+     &             + rr5*sc(4)*(uinds(1,i)*psc5+uinps(1,i)*dsc5)
+     &             - rr7*sc(6)*(uinds(1,i)*psc7+uinps(1,i)*dsc7))
+     &             +(rr3*ci*(uinds(1,k)*psc3+uinps(1,k)*dsc3)
+     &             + rr5*sc(3)*(uinds(1,k)*psc5+uinps(1,k)*dsc5)
+     &             + rr7*sc(5)*(uinds(1,k)*psc7+uinps(1,k)*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uinps(1,i)+scip(4)*uinds(1,i)
+     &             + sci(3)*uinps(1,k)+scip(3)*uinds(1,k))*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(1)
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(1)
+     &             + 0.5d0*gfi(4)*((qkui(1)-qiuk(1))*psc5
+     &             + (qkuip(1)-qiukp(1))*dsc5)
+     &             + gfi(5)*qir(1) + gfi(6)*qkr(1)
+               ftm2i(2) = gfi(1)*yr + 0.5d0*
+     &            (- rr3*ck*(uinds(2,i)*psc3+uinps(2,i)*dsc3)
+     &             + rr5*sc(4)*(uinds(2,i)*psc5+uinps(2,i)*dsc5)
+     &             - rr7*sc(6)*(uinds(2,i)*psc7+uinps(2,i)*dsc7))
+     &             +(rr3*ci*(uinds(2,k)*psc3+uinps(2,k)*dsc3)
+     &             + rr5*sc(3)*(uinds(2,k)*psc5+uinps(2,k)*dsc5)
+     &             + rr7*sc(5)*(uinds(2,k)*psc7+uinps(2,k)*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uinps(2,i)+scip(4)*uinds(2,i)
+     &             + sci(3)*uinps(2,k)+scip(3)*uinds(2,k))*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(2)
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(2)
+     &             + 0.5d0*gfi(4)*((qkui(2)-qiuk(2))*psc5
+     &             + (qkuip(2)-qiukp(2))*dsc5)
+     &             + gfi(5)*qir(2) + gfi(6)*qkr(2)
+               ftm2i(3) = gfi(1)*zr  + 0.5d0*
+     &            (- rr3*ck*(uinds(3,i)*psc3+uinps(3,i)*dsc3)
+     &             + rr5*sc(4)*(uinds(3,i)*psc5+uinps(3,i)*dsc5)
+     &             - rr7*sc(6)*(uinds(3,i)*psc7+uinps(3,i)*dsc7))
+     &             +(rr3*ci*(uinds(3,k)*psc3+uinps(3,k)*dsc3)
+     &             + rr5*sc(3)*(uinds(3,k)*psc5+uinps(3,k)*dsc5)
+     &             + rr7*sc(5)*(uinds(3,k)*psc7+uinps(3,k)*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uinps(3,i)+scip(4)*uinds(3,i)
+     &             + sci(3)*uinps(3,k)+scip(3)*uinds(3,k))*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(3)
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(3)
+     &             + 0.5d0*gfi(4)*((qkui(3)-qiuk(3))*psc5
+     &             + (qkuip(3)-qiukp(3))*dsc5)
+     &             + gfi(5)*qir(3) + gfi(6)*qkr(3)
+c
+c     intermediate values needed for partially excluded interactions
+c
+               fridmp(1) = 0.5d0 * (rr3*((gli(1)+gli(6))*pscale(kk)
+     &                        +(glip(1)+glip(6))*dscale(kk))*ddsc3(1)
+     &            + rr5*((gli(2)+gli(7))*pscale(kk)
+     &                +(glip(2)+glip(7))*dscale(kk))*ddsc5(1)
+     &            + rr7*(gli(3)*pscale(kk)+glip(3)*dscale(kk))*ddsc7(1))
+               fridmp(2) = 0.5d0 * (rr3*((gli(1)+gli(6))*pscale(kk)
+     &                        +(glip(1)+glip(6))*dscale(kk))*ddsc3(2)
+     &            + rr5*((gli(2)+gli(7))*pscale(kk)
+     &                +(glip(2)+glip(7))*dscale(kk))*ddsc5(2)
+     &            + rr7*(gli(3)*pscale(kk)+glip(3)*dscale(kk))*ddsc7(2))
+               fridmp(3) = 0.5d0 * (rr3*((gli(1)+gli(6))*pscale(kk)
+     &                        +(glip(1)+glip(6))*dscale(kk))*ddsc3(3)
+     &            + rr5*((gli(2)+gli(7))*pscale(kk)
+     &                +(glip(2)+glip(7))*dscale(kk))*ddsc5(3)
+     &            + rr7*(gli(3)*pscale(kk)+glip(3)*dscale(kk))*ddsc7(3))
+c
+c     get the induced-induced derivative terms
+c
+               findmp(1) = 0.5d0 * uscale(kk) * (scip(2)*rr3*ddsc3(1)
+     &                   - rr5*ddsc5(1)*(sci(3)*scip(4)+scip(3)*sci(4)))
+               findmp(2) = 0.5d0 * uscale(kk) * (scip(2)*rr3*ddsc3(2)
+     &                   - rr5*ddsc5(2)*(sci(3)*scip(4)+scip(3)*sci(4)))
+               findmp(3) = 0.5d0 * uscale(kk) * (scip(2)*rr3*ddsc3(3)
+     &                   - rr5*ddsc5(3)*(sci(3)*scip(4)+scip(3)*sci(4)))
+c
+c     handle of scaling for partially excluded interactions
+c
+               ftm2i(1) = ftm2i(1) - fridmp(1) - findmp(1)
+               ftm2i(2) = ftm2i(2) - fridmp(2) - findmp(2)
+               ftm2i(3) = ftm2i(3) - fridmp(3) - findmp(3)
+c
+c     correction to convert mutual to direct polarization force
+c
+               if (poltyp .eq. 'DIRECT') then
+                  gfd = 0.5d0 * (rr5*scip(2)*scale3i
+     &                  - rr7*(scip(3)*sci(4)+sci(3)*scip(4))*scale5i)
+                  fdir(1) = gfd*xr + 0.5d0*rr5*scale5i
+     &                         * (sci(4)*uinps(1,i)+scip(4)*uinds(1,i)
+     &                           +sci(3)*uinps(1,k)+scip(3)*uinds(1,k))
+                  fdir(2) = gfd*yr + 0.5d0*rr5*scale5i
+     &                         * (sci(4)*uinps(2,i)+scip(4)*uinds(2,i)
+     &                           +sci(3)*uinps(2,k)+scip(3)*uinds(2,k))
+                  fdir(3) = gfd*zr + 0.5d0*rr5*scale5i
+     &                         * (sci(4)*uinps(3,i)+scip(4)*uinds(3,i)
+     &                           +sci(3)*uinps(3,k)+scip(3)*uinds(3,k))
+                  ftm2i(1) = ftm2i(1) - fdir(1) + findmp(1)
+                  ftm2i(2) = ftm2i(2) - fdir(2) + findmp(2)
+                  ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
+               end if
+c
+c     now perform the torque calculation
+c     intermediate terms for torque between multipoles i and k
+c
+               gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
+               gti(3) = 0.5d0 * (sci(3)*psc5+scip(3)*dsc5) * rr5
+               gti(4) = gfi(4)
+               gti(5) = gfi(5)
+               gti(6) = gfi(6)
+c
+c     calculate the induced torque components
+c
+               ttm2i(1) = -rr3*(dixuk(1)*psc3+dixukp(1)*dsc3)*0.5d0
+     &            + gti(2)*dixr(1) + gti(4)*((ukxqir(1)+rxqiuk(1))*psc5
+     &            +(ukxqirp(1)+rxqiukp(1))*dsc5)*0.5d0 - gti(5)*rxqir(1)
+               ttm2i(2) = -rr3*(dixuk(2)*psc3+dixukp(2)*dsc3)*0.5d0
+     &            + gti(2)*dixr(2) + gti(4)*((ukxqir(2)+rxqiuk(2))*psc5
+     &            +(ukxqirp(2)+rxqiukp(2))*dsc5)*0.5d0 - gti(5)*rxqir(2)
+               ttm2i(3) = -rr3*(dixuk(3)*psc3+dixukp(3)*dsc3)*0.5d0
+     &            + gti(2)*dixr(3) + gti(4)*((ukxqir(3)+rxqiuk(3))*psc5
+     &            +(ukxqirp(3)+rxqiukp(3))*dsc5)*0.5d0 - gti(5)*rxqir(3)
+               ttm3i(1) = -rr3*(dkxui(1)*psc3+dkxuip(1)*dsc3)*0.5d0
+     &            + gti(3)*dkxr(1) - gti(4)*((uixqkr(1)+rxqkui(1))*psc5
+     &            +(uixqkrp(1)+rxqkuip(1))*dsc5)*0.5d0 - gti(6)*rxqkr(1)
+               ttm3i(2) = -rr3*(dkxui(2)*psc3+dkxuip(2)*dsc3)*0.5d0
+     &            + gti(3)*dkxr(2) - gti(4)*((uixqkr(2)+rxqkui(2))*psc5
+     &            +(uixqkrp(2)+rxqkuip(2))*dsc5)*0.5d0 - gti(6)*rxqkr(2)
+               ttm3i(3) = -rr3*(dkxui(3)*psc3+dkxuip(3)*dsc3)*0.5d0
+     &            + gti(3)*dkxr(3) - gti(4)*((uixqkr(3)+rxqkui(3))*psc5
+     &            +(uixqkrp(3)+rxqkuip(3))*dsc5)*0.5d0 - gti(6)*rxqkr(3)
+c
+c     update the force components on sites i and k
+c
+               dest(1,ii) = dest(1,ii) + f*ftm2i(1)
+               dest(2,ii) = dest(2,ii) + f*ftm2i(2)
+               dest(3,ii) = dest(3,ii) + f*ftm2i(3)
+               dest(1,kk) = dest(1,kk) - f*ftm2i(1)
+               dest(2,kk) = dest(2,kk) - f*ftm2i(2)
+               dest(3,kk) = dest(3,kk) - f*ftm2i(3)
+c
+c     update the torque components on sites i and k
+c
+               trqi(1,ii) = trqi(1,ii) + f*ttm2i(1)
+               trqi(2,ii) = trqi(2,ii) + f*ttm2i(2)
+               trqi(3,ii) = trqi(3,ii) + f*ttm2i(3)
+               trqi(1,kk) = trqi(1,kk) + f*ttm3i(1)
+               trqi(2,kk) = trqi(2,kk) + f*ttm3i(2)
+               trqi(3,kk) = trqi(3,kk) + f*ttm3i(3)
+c
+c     construct auxiliary vectors for induced terms
+c
+               dixuk(1) = di(2)*uind(3,k) - di(3)*uind(2,k)
+               dixuk(2) = di(3)*uind(1,k) - di(1)*uind(3,k)
+               dixuk(3) = di(1)*uind(2,k) - di(2)*uind(1,k)
+               dkxui(1) = dk(2)*uind(3,i) - dk(3)*uind(2,i)
+               dkxui(2) = dk(3)*uind(1,i) - dk(1)*uind(3,i)
+               dkxui(3) = dk(1)*uind(2,i) - dk(2)*uind(1,i)
+               dixukp(1) = di(2)*uinp(3,k) - di(3)*uinp(2,k)
+               dixukp(2) = di(3)*uinp(1,k) - di(1)*uinp(3,k)
+               dixukp(3) = di(1)*uinp(2,k) - di(2)*uinp(1,k)
+               dkxuip(1) = dk(2)*uinp(3,i) - dk(3)*uinp(2,i)
+               dkxuip(2) = dk(3)*uinp(1,i) - dk(1)*uinp(3,i)
+               dkxuip(3) = dk(1)*uinp(2,i) - dk(2)*uinp(1,i)
+               qiuk(1) = qi(1)*uind(1,k) + qi(4)*uind(2,k)
+     &                      + qi(7)*uind(3,k)
+               qiuk(2) = qi(2)*uind(1,k) + qi(5)*uind(2,k)
+     &                      + qi(8)*uind(3,k)
+               qiuk(3) = qi(3)*uind(1,k) + qi(6)*uind(2,k)
+     &                      + qi(9)*uind(3,k)
+               qkui(1) = qk(1)*uind(1,i) + qk(4)*uind(2,i)
+     &                      + qk(7)*uind(3,i)
+               qkui(2) = qk(2)*uind(1,i) + qk(5)*uind(2,i)
+     &                      + qk(8)*uind(3,i)
+               qkui(3) = qk(3)*uind(1,i) + qk(6)*uind(2,i)
+     &                      + qk(9)*uind(3,i)
+               qiukp(1) = qi(1)*uinp(1,k) + qi(4)*uinp(2,k)
+     &                       + qi(7)*uinp(3,k)
+               qiukp(2) = qi(2)*uinp(1,k) + qi(5)*uinp(2,k)
+     &                       + qi(8)*uinp(3,k)
+               qiukp(3) = qi(3)*uinp(1,k) + qi(6)*uinp(2,k)
+     &                       + qi(9)*uinp(3,k)
+               qkuip(1) = qk(1)*uinp(1,i) + qk(4)*uinp(2,i)
+     &                       + qk(7)*uinp(3,i)
+               qkuip(2) = qk(2)*uinp(1,i) + qk(5)*uinp(2,i)
+     &                       + qk(8)*uinp(3,i)
+               qkuip(3) = qk(3)*uinp(1,i) + qk(6)*uinp(2,i)
+     &                       + qk(9)*uinp(3,i)
+               uixqkr(1) = uind(2,i)*qkr(3) - uind(3,i)*qkr(2)
+               uixqkr(2) = uind(3,i)*qkr(1) - uind(1,i)*qkr(3)
+               uixqkr(3) = uind(1,i)*qkr(2) - uind(2,i)*qkr(1)
+               ukxqir(1) = uind(2,k)*qir(3) - uind(3,k)*qir(2)
+               ukxqir(2) = uind(3,k)*qir(1) - uind(1,k)*qir(3)
+               ukxqir(3) = uind(1,k)*qir(2) - uind(2,k)*qir(1)
+               uixqkrp(1) = uinp(2,i)*qkr(3) - uinp(3,i)*qkr(2)
+               uixqkrp(2) = uinp(3,i)*qkr(1) - uinp(1,i)*qkr(3)
+               uixqkrp(3) = uinp(1,i)*qkr(2) - uinp(2,i)*qkr(1)
+               ukxqirp(1) = uinp(2,k)*qir(3) - uinp(3,k)*qir(2)
+               ukxqirp(2) = uinp(3,k)*qir(1) - uinp(1,k)*qir(3)
+               ukxqirp(3) = uinp(1,k)*qir(2) - uinp(2,k)*qir(1)
+               rxqiuk(1) = yr*qiuk(3) - zr*qiuk(2)
+               rxqiuk(2) = zr*qiuk(1) - xr*qiuk(3)
+               rxqiuk(3) = xr*qiuk(2) - yr*qiuk(1)
+               rxqkui(1) = yr*qkui(3) - zr*qkui(2)
+               rxqkui(2) = zr*qkui(1) - xr*qkui(3)
+               rxqkui(3) = xr*qkui(2) - yr*qkui(1)
+               rxqiukp(1) = yr*qiukp(3) - zr*qiukp(2)
+               rxqiukp(2) = zr*qiukp(1) - xr*qiukp(3)
+               rxqiukp(3) = xr*qiukp(2) - yr*qiukp(1)
+               rxqkuip(1) = yr*qkuip(3) - zr*qkuip(2)
+               rxqkuip(2) = zr*qkuip(1) - xr*qkuip(3)
+               rxqkuip(3) = xr*qkuip(2) - yr*qkuip(1)
+c
+c     get intermediate variables for induction energy terms
+c
+               sci(1) = uind(1,i)*dk(1) + uind(2,i)*dk(2)
+     &                     + uind(3,i)*dk(3) + di(1)*uind(1,k)
+     &                     + di(2)*uind(2,k) + di(3)*uind(3,k)
+               sci(2) = uind(1,i)*uind(1,k) + uind(2,i)*uind(2,k)
+     &                     + uind(3,i)*uind(3,k)
+               sci(3) = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
+               sci(4) = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
+               sci(7) = qir(1)*uind(1,k) + qir(2)*uind(2,k)
+     &                     + qir(3)*uind(3,k)
+               sci(8) = qkr(1)*uind(1,i) + qkr(2)*uind(2,i)
+     &                     + qkr(3)*uind(3,i)
+               scip(1) = uinp(1,i)*dk(1) + uinp(2,i)*dk(2)
+     &                      + uinp(3,i)*dk(3) + di(1)*uinp(1,k)
+     &                      + di(2)*uinp(2,k) + di(3)*uinp(3,k)
+               scip(2) = uind(1,i)*uinp(1,k)+uind(2,i)*uinp(2,k)
+     &                      + uind(3,i)*uinp(3,k)+uinp(1,i)*uind(1,k)
+     &                      + uinp(2,i)*uind(2,k)+uinp(3,i)*uind(3,k)
+               scip(3) = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
+               scip(4) = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
+               scip(7) = qir(1)*uinp(1,k) + qir(2)*uinp(2,k)
+     &                      + qir(3)*uinp(3,k)
+               scip(8) = qkr(1)*uinp(1,i) + qkr(2)*uinp(2,i)
+     &                      + qkr(3)*uinp(3,i)
+c
+c     calculate the gl functions for potential energy
+c
+               gli(1) = ck*sci(3) - ci*sci(4)
+               gli(2) = -sc(3)*sci(4) - sci(3)*sc(4)
+               gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
+               gli(6) = sci(1)
+               gli(7) = 2.0d0 * (sci(7)-sci(8))
+               glip(1) = ck*scip(3) - ci*scip(4)
+               glip(2) = -sc(3)*scip(4) - scip(3)*sc(4)
+               glip(3) = scip(3)*sc(6) - scip(4)*sc(5)
+               glip(6) = scip(1)
+               glip(7) = 2.0d0 * (scip(7)-scip(8))
+c
+c     get the permanent multipole and induced energies
+c
+               ei = -0.5d0 * (rr3*(gli(1)+gli(6))*psc3
+     &                           + rr5*(gli(2)+gli(7))*psc5
+     &                           + rr7*gli(3)*psc7)
+               ei = f * ei
+               est = est + ei
+c
+c     intermediate variables for the induced-permanent terms
+c
+               gfi(1) = 0.5d0*rr5*((gli(1)+gli(6))*psc3
+     &                     +(glip(1)+glip(6))*dsc3+scip(2)*scale3i)
+     &                + 0.5d0*rr7*((gli(7)+gli(2))*psc5
+     &                            +(glip(7)+glip(2))*dsc5
+     &                     -(sci(3)*scip(4)+scip(3)*sci(4))*scale5i)
+     &                + 0.5d0*rr9*(gli(3)*psc7+glip(3)*dsc7)
+               gfi(2) = -rr3*ck + rr5*sc(4) - rr7*sc(6)
+               gfi(3) = rr3*ci + rr5*sc(3) + rr7*sc(5)
+               gfi(4) = 2.0d0 * rr5
+               gfi(5) = rr7 * (sci(4)*psc7+scip(4)*dsc7)
+               gfi(6) = -rr7 * (sci(3)*psc7+scip(3)*dsc7)
+c
+c     get the induced force
+c
+               ftm2i(1) = gfi(1)*xr + 0.5d0*
+     &            (- rr3*ck*(uind(1,i)*psc3+uinp(1,i)*dsc3)
+     &             + rr5*sc(4)*(uind(1,i)*psc5+uinp(1,i)*dsc5)
+     &             - rr7*sc(6)*(uind(1,i)*psc7+uinp(1,i)*dsc7))
+     &             +(rr3*ci*(uind(1,k)*psc3+uinp(1,k)*dsc3)
+     &             + rr5*sc(3)*(uind(1,k)*psc5+uinp(1,k)*dsc5)
+     &             + rr7*sc(5)*(uind(1,k)*psc7+uinp(1,k)*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uinp(1,i)+scip(4)*uind(1,i)
+     &             + sci(3)*uinp(1,k)+scip(3)*uind(1,k))*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(1)
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(1)
+     &             + 0.5d0*gfi(4)*((qkui(1)-qiuk(1))*psc5
+     &             + (qkuip(1)-qiukp(1))*dsc5)
+     &             + gfi(5)*qir(1) + gfi(6)*qkr(1)
+               ftm2i(2) = gfi(1)*yr + 0.5d0*
+     &            (- rr3*ck*(uind(2,i)*psc3+uinp(2,i)*dsc3)
+     &             + rr5*sc(4)*(uind(2,i)*psc5+uinp(2,i)*dsc5)
+     &             - rr7*sc(6)*(uind(2,i)*psc7+uinp(2,i)*dsc7))
+     &             +(rr3*ci*(uind(2,k)*psc3+uinp(2,k)*dsc3)
+     &             + rr5*sc(3)*(uind(2,k)*psc5+uinp(2,k)*dsc5)
+     &             + rr7*sc(5)*(uind(2,k)*psc7+uinp(2,k)*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uinp(2,i)+scip(4)*uind(2,i)
+     &             + sci(3)*uinp(2,k)+scip(3)*uind(2,k))*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(2)
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(2)
+     &             + 0.5d0*gfi(4)*((qkui(2)-qiuk(2))*psc5
+     &             + (qkuip(2)-qiukp(2))*dsc5)
+     &             + gfi(5)*qir(2) + gfi(6)*qkr(2)
+               ftm2i(3) = gfi(1)*zr  + 0.5d0*
+     &            (- rr3*ck*(uind(3,i)*psc3+uinp(3,i)*dsc3)
+     &             + rr5*sc(4)*(uind(3,i)*psc5+uinp(3,i)*dsc5)
+     &             - rr7*sc(6)*(uind(3,i)*psc7+uinp(3,i)*dsc7))
+     &             +(rr3*ci*(uind(3,k)*psc3+uinp(3,k)*dsc3)
+     &             + rr5*sc(3)*(uind(3,k)*psc5+uinp(3,k)*dsc5)
+     &             + rr7*sc(5)*(uind(3,k)*psc7+uinp(3,k)*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uinp(3,i)+scip(4)*uind(3,i)
+     &             + sci(3)*uinp(3,k)+scip(3)*uind(3,k))*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(3)
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(3)
+     &             + 0.5d0*gfi(4)*((qkui(3)-qiuk(3))*psc5
+     &             + (qkuip(3)-qiukp(3))*dsc5)
+     &             + gfi(5)*qir(3) + gfi(6)*qkr(3)
+c
+c     intermediate values needed for partially excluded interactions
+c
+               fridmp(1) = 0.5d0 * (rr3*((gli(1)+gli(6))*pscale(kk)
+     &                        +(glip(1)+glip(6))*dscale(kk))*ddsc3(1)
+     &            + rr5*((gli(2)+gli(7))*pscale(kk)
+     &                +(glip(2)+glip(7))*dscale(kk))*ddsc5(1)
+     &            + rr7*(gli(3)*pscale(kk)+glip(3)*dscale(kk))*ddsc7(1))
+               fridmp(2) = 0.5d0 * (rr3*((gli(1)+gli(6))*pscale(kk)
+     &                        +(glip(1)+glip(6))*dscale(kk))*ddsc3(2)
+     &            + rr5*((gli(2)+gli(7))*pscale(kk)
+     &                +(glip(2)+glip(7))*dscale(kk))*ddsc5(2)
+     &            + rr7*(gli(3)*pscale(kk)+glip(3)*dscale(kk))*ddsc7(2))
+               fridmp(3) = 0.5d0 * (rr3*((gli(1)+gli(6))*pscale(kk)
+     &                        +(glip(1)+glip(6))*dscale(kk))*ddsc3(3)
+     &            + rr5*((gli(2)+gli(7))*pscale(kk)
+     &                +(glip(2)+glip(7))*dscale(kk))*ddsc5(3)
+     &            + rr7*(gli(3)*pscale(kk)+glip(3)*dscale(kk))*ddsc7(3))
+c
+c     get the induced-induced derivative terms
+c
+               findmp(1) = 0.5d0 * uscale(kk) * (scip(2)*rr3*ddsc3(1)
+     &                   - rr5*ddsc5(1)*(sci(3)*scip(4)+scip(3)*sci(4)))
+               findmp(2) = 0.5d0 * uscale(kk) * (scip(2)*rr3*ddsc3(2)
+     &                   - rr5*ddsc5(2)*(sci(3)*scip(4)+scip(3)*sci(4)))
+               findmp(3) = 0.5d0 * uscale(kk) * (scip(2)*rr3*ddsc3(3)
+     &                   - rr5*ddsc5(3)*(sci(3)*scip(4)+scip(3)*sci(4)))
+c
+c     handle of scaling for partially excluded interactions
+c
+               ftm2i(1) = ftm2i(1) - fridmp(1) - findmp(1)
+               ftm2i(2) = ftm2i(2) - fridmp(2) - findmp(2)
+               ftm2i(3) = ftm2i(3) - fridmp(3) - findmp(3)
+c
+c     correction to convert mutual to direct polarization force
+c
+               if (poltyp .eq. 'DIRECT') then
+                  gfd = 0.5d0 * (rr5*scip(2)*scale3i
+     &                  - rr7*(scip(3)*sci(4)+sci(3)*scip(4))*scale5i)
+                  fdir(1) = gfd*xr + 0.5d0*rr5*scale5i
+     &                         * (sci(4)*uinp(1,i)+scip(4)*uind(1,i)
+     &                           +sci(3)*uinp(1,k)+scip(3)*uind(1,k))
+                  fdir(2) = gfd*yr + 0.5d0*rr5*scale5i
+     &                         * (sci(4)*uinp(2,i)+scip(4)*uind(2,i)
+     &                           +sci(3)*uinp(2,k)+scip(3)*uind(2,k))
+                  fdir(3) = gfd*zr + 0.5d0*rr5*scale5i
+     &                         * (sci(4)*uinp(3,i)+scip(4)*uind(3,i)
+     &                           +sci(3)*uinp(3,k)+scip(3)*uind(3,k))
+                  ftm2i(1) = ftm2i(1) - fdir(1) + findmp(1)
+                  ftm2i(2) = ftm2i(2) - fdir(2) + findmp(2)
+                  ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
+               end if
+c
+c     now perform the torque calculation
+c     intermediate terms for torque between multipoles i and k
+c
+               gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
+               gti(3) = 0.5d0 * (sci(3)*psc5+scip(3)*dsc5) * rr5
+               gti(4) = gfi(4)
+               gti(5) = gfi(5)
+               gti(6) = gfi(6)
+c
+c     calculate the induced torque components
+c
+               ttm2i(1) = -rr3*(dixuk(1)*psc3+dixukp(1)*dsc3)*0.5d0
+     &            + gti(2)*dixr(1) + gti(4)*((ukxqir(1)+rxqiuk(1))*psc5
+     &            +(ukxqirp(1)+rxqiukp(1))*dsc5)*0.5d0 - gti(5)*rxqir(1)
+               ttm2i(2) = -rr3*(dixuk(2)*psc3+dixukp(2)*dsc3)*0.5d0
+     &            + gti(2)*dixr(2) + gti(4)*((ukxqir(2)+rxqiuk(2))*psc5
+     &            +(ukxqirp(2)+rxqiukp(2))*dsc5)*0.5d0 - gti(5)*rxqir(2)
+               ttm2i(3) = -rr3*(dixuk(3)*psc3+dixukp(3)*dsc3)*0.5d0
+     &            + gti(2)*dixr(3) + gti(4)*((ukxqir(3)+rxqiuk(3))*psc5
+     &            +(ukxqirp(3)+rxqiukp(3))*dsc5)*0.5d0 - gti(5)*rxqir(3)
+               ttm3i(1) = -rr3*(dkxui(1)*psc3+dkxuip(1)*dsc3)*0.5d0
+     &            + gti(3)*dkxr(1) - gti(4)*((uixqkr(1)+rxqkui(1))*psc5
+     &            +(uixqkrp(1)+rxqkuip(1))*dsc5)*0.5d0 - gti(6)*rxqkr(1)
+               ttm3i(2) = -rr3*(dkxui(2)*psc3+dkxuip(2)*dsc3)*0.5d0
+     &            + gti(3)*dkxr(2) - gti(4)*((uixqkr(2)+rxqkui(2))*psc5
+     &            +(uixqkrp(2)+rxqkuip(2))*dsc5)*0.5d0 - gti(6)*rxqkr(2)
+               ttm3i(3) = -rr3*(dkxui(3)*psc3+dkxuip(3)*dsc3)*0.5d0
+     &            + gti(3)*dkxr(3) - gti(4)*((uixqkr(3)+rxqkui(3))*psc5
+     &            +(uixqkrp(3)+rxqkuip(3))*dsc5)*0.5d0 - gti(6)*rxqkr(3)
+c
+c     update the force components on sites i and k
+c
+               dest(1,ii) = dest(1,ii) - f*ftm2i(1)
+               dest(2,ii) = dest(2,ii) - f*ftm2i(2)
+               dest(3,ii) = dest(3,ii) - f*ftm2i(3)
+               dest(1,kk) = dest(1,kk) + f*ftm2i(1)
+               dest(2,kk) = dest(2,kk) + f*ftm2i(2)
+               dest(3,kk) = dest(3,kk) + f*ftm2i(3)
+c
+c     update the torque components on sites i and k
+c
+               trqi(1,ii) = trqi(1,ii) - f*ttm2i(1)
+               trqi(2,ii) = trqi(2,ii) - f*ttm2i(2)
+               trqi(3,ii) = trqi(3,ii) - f*ttm2i(3)
+               trqi(1,kk) = trqi(1,kk) - f*ttm3i(1)
+               trqi(2,kk) = trqi(2,kk) - f*ttm3i(2)
+               trqi(3,kk) = trqi(3,kk) - f*ttm3i(3)
+            end if
+   10       continue
+         end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(ii)
+            pscale(i12(j,ii)) = 1.0d0
+         end do
+         do j = 1, n13(ii)
+            pscale(i13(j,ii)) = 1.0d0
+         end do
+         do j = 1, n14(ii)
+            pscale(i14(j,ii)) = 1.0d0
+         end do
+         do j = 1, n15(ii)
+            pscale(i15(j,ii)) = 1.0d0
+         end do
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = 1.0d0
+            uscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = 1.0d0
+            uscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = 1.0d0
+            uscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = 1.0d0
+            uscale(ip14(j,ii)) = 1.0d0
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
+      do i = 1, n
+         des(1,i) = des(1,i) + dest(1,i)
+         des(2,i) = des(2,i) + dest(2,i)
+         des(3,i) = des(3,i) + dest(3,i)
+      end do
+      call torque2 (trqi,des)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
+      deallocate (dest)
+      deallocate (trqi)
       return
       end
 c
@@ -3357,7 +4368,7 @@ c
 c
 c     correct energy and derivatives for vacuum to polarized state
 c
-      call ediff1
+      call ediff1a
       return
       end
 c

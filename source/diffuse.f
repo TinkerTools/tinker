@@ -19,7 +19,7 @@ c     squared displacements are computed versus time separation
 c
 c     the estimate for the self-diffusion constant in 10-5 cm**2/sec
 c     is printed in the far right column of output and can be checked
-c     by plotting mean square displacements as a function of the time
+c     by plotting mean squared displacements as a function of the time
 c     separation; values for very large time separation are inaccurate
 c     due to the small amount of data
 c
@@ -190,6 +190,7 @@ c
             k = k + 1
             imol(1,k) = imol(1,i)
             imol(2,k) = imol(2,i)
+            molmass(k) = molmass(i)
          end if
       end do
       nmol = k
@@ -328,10 +329,12 @@ c
 c     estimate the diffusion constant via the Einstein relation
 c
       write (iout,190)
-  190 format (/,' Mean Squared Diffusion Distance and Self-Diffusion',
+  190 format (/,' Mean Squared Displacements and Self-Diffusion',
      &           ' Constant :',
-     &        //,5x,'Time Step',5x,'X MSD',7x,'Y MSD',7x,'Z MSD',
-     &           7x,'R MSD',4x,'Diff Const',/)
+     &        //,5x,'Time Gap',6x,'X MSD',7x,'Y MSD',7x,'Z MSD',
+     &           7x,'R MSD',4x,'Diff Const',
+     &        /,7x,'(ps)',9x,'(/2)',8x,'(/2)',8x,'(/2)',8x,'(/6)',
+     &           5x,'(x 10^5)',/)
       do i = 1, nframe-1
          delta = tstep * dble(i)
          xvalue = xmsd(i) / 2.0d0

@@ -260,21 +260,21 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      est = es
-      eintert = einter
-      nest = nes
+      est = 0.0d0
+      eintert = 0.0d0
+      nest = 0
       do i = 1, n
-         aest(i) = aes(i)
+         aest(i) = 0.0d0
       end do
 c
 c     set OpenMP directives for the major loop structure
 c
-c!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
-c!$OMP& f,pchg,rborn,use_group,off,off2,cut,cut2,molcule,
-c!$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
-c!$OMP& shared(est,eintert,nest,aest)
-c!$OMP DO reduction(+:est,eintert,nest,aest)
-c!$OMP& schedule(guided)
+!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
+!$OMP& f,pchg,rborn,use_group,off,off2,cut,cut2,molcule,
+!$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& shared(est,eintert,nest,aest)
+!$OMP DO reduction(+:est,eintert,nest,aest)
+!$OMP& schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -356,16 +356,16 @@ c
 c
 c     end OpenMP directives for the major loop structure
 c
-c!$OMP END DO
-c!$OMP END PARALLEL
+!$OMP END DO
+!$OMP END PARALLEL
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      es = est
-      einter = eintert
-      nes = nest
+      es = es + est
+      einter = einter + eintert
+      nes = nes + nest
       do i = 1, n
-         aes(i) = aest(i)
+         aes(i) = aes(i) + aest(i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -437,21 +437,21 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      est = es
-      eintert = einter
-      nest = nes
+      est = 0.0d0
+      eintert = 0.0d0
+      nest = 0
       do i = 1, n
-         aest(i) = aes(i)
+         aest(i) = 0.0d0
       end do
 c
 c     set OpenMP directives for the major loop structure
 c
-c!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
-c!$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
-c!$OMP& molcule,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
-c!$OMP& shared(est,eintert,nest,aest)
-c!$OMP DO reduction(+:est,eintert,nest,aest)
-c!$OMP& schedule(guided)
+!$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
+!$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
+!$OMP& molcule,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& shared(est,eintert,nest,aest)
+!$OMP DO reduction(+:est,eintert,nest,aest)
+!$OMP& schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -542,16 +542,16 @@ c
 c
 c     end OpenMP directives for the major loop structure
 c
-c!$OMP END DO
-c!$OMP END PARALLEL
+!$OMP END DO
+!$OMP END PARALLEL
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      es = est
-      einter = eintert
-      nes = nest
+      es = es + est
+      einter = einter + eintert
+      nes = nes+ nest
       do i = 1, n
-         aes(i) = aest(i)
+         aes(i) = aes(i) + aest(i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -748,8 +748,10 @@ c
       include 'shunt.i'
       include 'solute.i'
       include 'usage.i'
-      integer i,k,ii,kk
-      real*8 e,ei
+      integer i,k,nest
+      integer ii,kk
+      real*8 e,ei,est
+      real*8 eintert
       real*8 fc,fd,fq
       real*8 dwater,fgrp
       real*8 r2,rb2
@@ -779,23 +781,12 @@ c
       real*8 gqyz(10),gqzz(10)
       real*8 esym,ewi,ewk
       real*8 esymi,ewii,ewki
+      real*8, allocatable :: aest(:)
       real*8, allocatable :: eself(:)
       real*8, allocatable :: ecross(:)
       logical proceed,usei
       character*6 mode
 c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (eself(n))
-      allocate (ecross(n))
-c
-c     zero out self energy and cross terms
-c
-      do i = 1, n
-         eself(i) = 0.0d0
-         ecross(i) = 0.0d0
-      end do
 c
 c     set the bulk dielectric constant to the water value
 c
@@ -809,6 +800,31 @@ c     set cutoff distances and switching function coefficients
 c
       mode = 'MPOLE'
       call switch (mode)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aest(n))
+      allocate (eself(n))
+      allocate (ecross(n))
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = 0.0d0
+      eintert = 0.0d0
+      nest = 0
+      do i = 1, n
+         aest(i) = 0.0d0
+         eself(i) = 0.0d0
+         ecross(i) = 0.0d0
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
+!$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
+!$OMP& shared(est,eintert,nest,aest,eself,ecross)
+!$OMP DO reduction(+:est,eintert,nest,aest,eself,ecross)
+!$OMP& schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -1142,17 +1158,17 @@ c
 c
 c     increment the total GK electrostatic solvation energy
 c
-                  nes = nes + 1
+                  nest = nest + 1
                   if (i .eq. k) then
                      e = 0.5d0 * e
                      ei = 0.5d0 * ei
-                     es = es + e + ei
-                     aes(i) = aes(i) + e + ei
+                     est = est + e + ei
+                     aest(i) = aest(i) + e + ei
                      eself(i) = eself(i) + e + ei
                   else
-                     es = es + e + ei
-                     aes(i) = aes(i) + 0.5d0*(e+ei)
-                     aes(k) = aes(k) + 0.5d0*(e+ei)
+                     est = est + e + ei
+                     aest(i) = aest(i) + 0.5d0*(e+ei)
+                     aest(k) = aest(k) + 0.5d0*(e+ei)
                      ecross(i) = ecross(i) + 0.5d0*(e+ei)
                      ecross(k) = ecross(k) + 0.5d0*(e+ei)
                   end if
@@ -1160,11 +1176,25 @@ c
 c     increment the total intermolecule energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e + ei
+                     eintert = eintert + e + ei
                   end if
                end if
             end if
          end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
+      einter = einter + eintert
+      nes = nes + nest
+      do i = 1, n
+         aes(i) = aes(i) + aest(i)
       end do
 c
 c     print the self-energy and cross-energy terms
@@ -1181,6 +1211,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (aest)
       deallocate (eself)
       deallocate (ecross)
       return
@@ -1201,6 +1232,7 @@ c
       subroutine ediff3
       implicit none
       include 'sizes.i'
+      include 'action.i'
       include 'analyz.i'
       include 'atoms.i'
       include 'bound.i'
@@ -1218,7 +1250,9 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,f,fikp
+      integer nest
+      real*8 ei,est
+      real*8 f,fikp
       real*8 fgrp,damp
       real*8 r,r2,xr,yr,zr
       real*8 rr1,rr3,rr5,rr7
@@ -1238,6 +1272,7 @@ c
       real*8 sc(6)
       real*8 sci(8)
       real*8 gli(3)
+      real*8, allocatable :: aest(:)
       real*8, allocatable :: pscale(:)
       logical proceed,usei,usek
       character*6 mode
@@ -1252,6 +1287,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (aest(n))
       allocate (pscale(n))
 c
 c     set array needed to scale connected atom interactions
@@ -1259,6 +1295,24 @@ c
       do i = 1, n
          pscale(i) = 1.0d0
       end do
+c
+c     initialize local variables for OpenMP calculation
+c
+      est = 0.0d0
+      nest = 0
+      do i = 1, n
+         aest(i) = 0.0d0
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
+!$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
+!$OMP% i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p41scale,p5scale,
+!$OMP% use_group,use_intra,off2,f)
+!$OMP& firstprivate(pscale) shared(est,nest,aest)
+!$OMP DO reduction(+:est,nest,aest)
+!$OMP& schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1406,9 +1460,10 @@ c                    ei = ei * fgrp
 c
 c     increment the total GK electrostatic solvation energy
 c
-                  es = es + ei
-                  aes(ii) = aes(ii) + 0.5d0*ei
-                  aes(kk) = aes(kk) + 0.5d0*ei
+                  est = est + ei
+                  nest = nest + 1
+                  aest(ii) = aest(ii) + 0.5d0*ei
+                  aest(kk) = aest(kk) + 0.5d0*ei
                end if
             end if
          end do
@@ -1429,8 +1484,22 @@ c
          end do
       end do
 c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      es = es + est
+      nes = nes + nest
+      do i = 1, n
+         aes(i) = aes(i) + aest(i)
+      end do
+c
 c     perform deallocation of some local arrays
 c
+      deallocate (aest)
       deallocate (pscale)
       return
       end
