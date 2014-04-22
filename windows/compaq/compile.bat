@@ -59,6 +59,10 @@ DF /compile_only /optimize /fast eangle.f
 DF /compile_only /optimize /fast eangle1.f
 DF /compile_only /optimize /fast eangle2.f
 DF /compile_only /optimize /fast eangle3.f
+DF /compile_only /optimize /fast eangtor.f
+DF /compile_only /optimize /fast eangtor1.f
+DF /compile_only /optimize /fast eangtor2.f
+DF /compile_only /optimize /fast eangtor3.f
 DF /compile_only /optimize /fast ebond.f
 DF /compile_only /optimize /fast ebond1.f
 DF /compile_only /optimize /fast ebond2.f
@@ -212,6 +216,7 @@ DF /compile_only /optimize /fast invert.f
 DF /compile_only /optimize /fast jacobi.f
 DF /compile_only /optimize /fast kangang.f
 DF /compile_only /optimize /fast kangle.f
+DF /compile_only /optimize /fast kangtor.f
 DF /compile_only /optimize /fast katom.f
 DF /compile_only /optimize /fast kbond.f
 DF /compile_only /optimize /fast kcharge.f

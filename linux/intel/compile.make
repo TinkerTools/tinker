@@ -58,6 +58,10 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle1.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle2.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle3.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor1.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor2.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor3.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond1.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond2.f
@@ -211,6 +215,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp invert.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp jacobi.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangang.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangle.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangtor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katom.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbond.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcharge.f

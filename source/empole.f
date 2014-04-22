@@ -112,6 +112,7 @@ c     zero out the multipole and polarization energies
 c
       em = 0.0d0
       ep = 0.0d0
+      if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -132,7 +133,6 @@ c
 c
 c     set arrays needed to scale connected atom interactions
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
          pscale(i) = 1.0d0
@@ -632,6 +632,7 @@ c     zero out the multipole and polarization energies
 c
       em = 0.0d0
       ep = 0.0d0
+      if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -652,7 +653,6 @@ c
 c
 c     set arrays needed to scale connected atom interactions
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
          pscale(i) = 1.0d0
@@ -940,6 +940,7 @@ c     zero out the multipole and polarization energies
 c
       em = 0.0d0
       ep = 0.0d0
+      if (npole .eq. 0)  return
 c
 c     set the energy unit conversion factor
 c
@@ -1101,7 +1102,6 @@ c
 c
 c     set arrays needed to scale connected atom interactions
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
          pscale(i) = 1.0d0
@@ -1563,6 +1563,7 @@ c     zero out the multipole and polarization energies
 c
       em = 0.0d0
       ep = 0.0d0
+      if (npole .eq. 0)  return
 c
 c     set the energy unit conversion factor
 c
@@ -1725,7 +1726,6 @@ c
 c
 c     set arrays needed to scale connected atom interactions
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
          pscale(i) = 1.0d0

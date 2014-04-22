@@ -58,6 +58,10 @@ fort77 -c -O2 +E1 eangle.f
 fort77 -c -O2 +E1 eangle1.f
 fort77 -c -O2 +E1 eangle2.f
 fort77 -c -O2 +E1 eangle3.f
+fort77 -c -O2 +E1 eangtor.f
+fort77 -c -O2 +E1 eangtor1.f
+fort77 -c -O2 +E1 eangtor2.f
+fort77 -c -O2 +E1 eangtor3.f
 fort77 -c -O2 +E1 ebond.f
 fort77 -c -O2 +E1 ebond1.f
 fort77 -c -O2 +E1 ebond2.f
@@ -211,6 +215,7 @@ fort77 -c -O2 +E1 invert.f
 fort77 -c -O2 +E1 jacobi.f
 fort77 -c -O2 +E1 kangang.f
 fort77 -c -O2 +E1 kangle.f
+fort77 -c -O2 +E1 kangtor.f
 fort77 -c -O2 +E1 katom.f
 fort77 -c -O2 +E1 kbond.f
 fort77 -c -O2 +E1 kcharge.f

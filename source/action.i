@@ -24,6 +24,7 @@ c     neit    number of improper torsion energy terms computed
 c     net     number of torsional energy terms computed
 c     nept    number of pi-orbital torsion energy terms computed
 c     nebt    number of stretch-torsion energy terms computed
+c     neat    number of angle-torsion energy terms computed
 c     nett    number of torsion-torsion energy terms computed
 c     nev     number of van der Waals energy terms computed
 c     nec     number of charge-charge energy terms computed
@@ -42,9 +43,10 @@ c
       integer neb,nea,neba,neub
       integer neaa,neopb,neopd
       integer neid,neit,net,nept
-      integer nebt,nett,nev,nec
-      integer necd,ned,nem,nep,new
-      integer ner,nes,nelf,neg,nex
-      common /action/ neb,nea,neba,neub,neaa,neopb,neopd,neid,neit,
-     &                net,nept,nebt,nett,nev,nec,necd,ned,nem,nep,new,
+      integer nebt,neat,nett,nev
+      integer nec,necd,ned,nem
+      integer nep,new,ner,nes
+      integer nelf,neg,nex
+      common /action/ neb,nea,neba,neub,neaa,neopb,neopd,neid,neit,net,
+     &                nept,nebt,neat,nett,nev,nec,necd,ned,nem,nep,new,
      &                ner,nes,nelf,neg,nex

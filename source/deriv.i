@@ -25,6 +25,7 @@ c     deit    improper torsion Cartesian coordinate derivatives
 c     det     torsional Cartesian coordinate derivatives
 c     dept    pi-orbital torsion Cartesian coordinate derivatives
 c     debt    stretch-torsion Cartesian coordinate derivatives
+c     deat    angle-torsion Cartesian coordinate derivatives
 c     dett    torsion-torsion Cartesian coordinate derivatives
 c     dev     van der Waals Cartesian coordinate derivatives
 c     dec     charge-charge Cartesian coordinate derivatives
@@ -42,15 +43,16 @@ c
       real*8 desum,deb,dea,deba
       real*8 deub,deaa,deopb,deopd
       real*8 deid,det,dept,deit
-      real*8 debt,dett,dev,dec
-      real*8 decd,ded,dem,dep,der
-      real*8 des,delf,deg,dex
+      real*8 debt,deat,dett,dev
+      real*8 dec,decd,ded,dem
+      real*8 dep,der,des,delf
+      real*8 deg,dex
       common /deriv/ desum(3,maxatm),deb(3,maxatm),dea(3,maxatm),
      &               deba(3,maxatm),deub(3,maxatm),deaa(3,maxatm),
      &               deopb(3,maxatm),deopd(3,maxatm),deid(3,maxatm),
      &               deit(3,maxatm),det(3,maxatm),dept(3,maxatm),
-     &               debt(3,maxatm),dett(3,maxatm),dev(3,maxatm),
-     &               dec(3,maxatm),decd(3,maxatm),ded(3,maxatm),
-     &               dem(3,maxatm),dep(3,maxatm),der(3,maxatm),
-     &               des(3,maxatm),delf(3,maxatm),deg(3,maxatm),
-     &               dex(3,maxatm)
+     &               debt(3,maxatm),deat(3,maxatm),dett(3,maxatm),
+     &               dev(3,maxatm),dec(3,maxatm),decd(3,maxatm),
+     &               ded(3,maxatm),dem(3,maxatm),dep(3,maxatm),
+     &               der(3,maxatm),des(3,maxatm),delf(3,maxatm),
+     &               deg(3,maxatm),dex(3,maxatm)

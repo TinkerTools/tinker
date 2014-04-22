@@ -58,6 +58,10 @@ ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangle
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangle1.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangle2.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangle3.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangtor.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangtor1.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangtor2.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp eangtor3.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp ebond.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp ebond1.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp ebond2.f
@@ -211,6 +215,7 @@ ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp invert
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp jacobi.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp kangang.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp kangle.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp kangtor.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp katom.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp kbond.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -openmp kcharge.f

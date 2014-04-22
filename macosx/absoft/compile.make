@@ -59,6 +59,10 @@ f77 -c -O -N11 eangle.f
 f77 -c -O -N11 eangle1.f
 f77 -c -O -N11 eangle2.f
 f77 -c -O -N11 eangle3.f
+f77 -c -O -N11 eangtor.f
+f77 -c -O -N11 eangtor1.f
+f77 -c -O -N11 eangtor2.f
+f77 -c -O -N11 eangtor3.f
 f77 -c -O -N11 ebond.f
 f77 -c -O -N11 ebond1.f
 f77 -c -O -N11 ebond2.f
@@ -212,6 +216,7 @@ f77 -c -O -N11 invert.f
 f77 -c -O -N11 jacobi.f
 f77 -c -O -N11 kangang.f
 f77 -c -O -N11 kangle.f
+f77 -c -O -N11 kangtor.f
 f77 -c -O -N11 katom.f
 f77 -c -O -N11 kbond.f
 f77 -c -O -N11 kcharge.f

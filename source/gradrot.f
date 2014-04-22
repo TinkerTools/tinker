@@ -50,6 +50,7 @@ c
          tet(i) = 0.0d0
          tept(i) = 0.0d0
          tebt(i) = 0.0d0
+         teat(i) = 0.0d0
          tett(i) = 0.0d0
          tev(i) = 0.0d0
          tec(i) = 0.0d0
@@ -121,6 +122,8 @@ c
      &                              + dept(3,k)*zterm
             tebt(i) = tebt(i) + debt(1,k)*xterm + debt(2,k)*yterm
      &                              + debt(3,k)*zterm
+            teat(i) = teat(i) + deat(1,k)*xterm + deat(2,k)*yterm
+     &                              + deat(3,k)*zterm
             tett(i) = tett(i) + dett(1,k)*xterm + dett(2,k)*yterm
      &                              + dett(3,k)*zterm
             tev(i) = tev(i) + dev(1,k)*xterm + dev(2,k)*yterm
@@ -153,9 +156,10 @@ c
       do i = 1, nomega
          tesum(i) = teb(i) + tea(i) + teba(i) + teub(i) + teaa(i)
      &                 + teopb(i) + teopd(i) + teid(i) + teit(i)
-     &                 + tet(i) + tept(i) + tebt(i) + tett(i) + tev(i)
-     &                 + tec(i) + tecd(i) + ted(i) + tem(i) + tep(i)
-     &                 + ter(i) + tes(i) + telf(i) + teg(i) + tex(i)
+     &                 + tet(i) + tept(i) + tebt(i) + teat(i) + tett(i)
+     &                 + tev(i) + tec(i) + tecd(i) + ted(i) + tem(i)
+     &                 + tep(i) + ter(i) + tes(i) + telf(i) + teg(i)
+     &                 + tex(i)
          derivs(i) = tesum(i)
       end do
       return

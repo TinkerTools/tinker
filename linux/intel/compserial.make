@@ -58,6 +58,10 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangle.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangle1.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangle2.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangle3.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangtor.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangtor1.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangtor2.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 eangtor3.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 ebond.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 ebond1.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 ebond2.f
@@ -211,6 +215,7 @@ ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 invert.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 jacobi.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kangang.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kangle.f
+ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kangtor.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 katom.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kbond.f
 ifort -c -O3 -axsse3 -no-ipo -no-prec-div -vec-report0 kcharge.f

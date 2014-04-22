@@ -64,6 +64,7 @@ c
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
       logical parallel
+      logical, allocatable :: update(:)
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -71,6 +72,7 @@ c
       allocate (xred(n))
       allocate (yred(n))
       allocate (zred(n))
+      allocate (update(n))
 c
 c     apply reduction factors to find coordinates for each site
 c
@@ -104,20 +106,14 @@ c
       if (dovlst) then
          dovlst = .false.
          if (parallel .or. octahedron) then
-!$OMP PARALLEL default(private) shared(nvdw,xred,yred,zred)
-!$OMP DO schedule(guided)
-            do i = 1, nvdw
-               call vbuild (i,xred,yred,zred)
-            end do
-!$OMP END DO
-!$OMP END PARALLEL
+            call vbuild (xred,yred,zred)
          else
             call vlight (xred,yred,zred)
          end if
          return
       end if
 c
-c     test each site for displacement exceeding half the buffer
+c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -130,21 +126,29 @@ c
          zr = zi - zvold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-c
-c     store coordinates to reflect update of this site
-c
+         update(i) = .false.
          if (r2 .ge. lbuf2) then
+            update(i) = .true.
             xvold(i) = xi
             yvold(i) = yi
             zvold(i) = zi
+         end if
+      end do
+!$OMP END DO
 c
-c     rebuild the higher numbered neighbors of this site
+c     rebuild the higher numbered neighbors of updated sites
 c
+!$OMP DO schedule(guided)
+      do i = 1, nvdw
+         if (update(i)) then
+            xi = xred(i)
+            yi = yred(i)
+            zi = zred(i)
             j = 0
             do k = i+1, nvdw
-               xr = xi - xvold(k)
-               yr = yi - yvold(k)
-               zr = zi - zvold(k)
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
@@ -154,45 +158,51 @@ c
             end do
             nvlst(i) = j
 c
-c     check to see if the neighbor list is too long
-c
-            if (nvlst(i) .ge. maxvlst) then
-               write (iout,20)
-   20          format (/,' VLIST  --  Too many Neighbors;',
-     &                    ' Increase MAXVLST')
-               call fatal
-            end if
-c
-c     adjust lists of lower numbered neighbors of this site
+c     adjust lists of lower numbered neighbors of updated sites
 c
             do k = 1, i-1
-               xr = xi - xvold(k)
-               yr = yi - yvold(k)
-               zr = zi - zvold(k)
-               call imagen (xr,yr,zr)
-               r2 = xr*xr + yr*yr + zr*zr
-               if (r2 .le. vbuf2) then
-                  do j = 1, nvlst(k)
-                     if (vlst(j,k) .eq. i)  goto 30
-                  end do
+               if (.not. update(k)) then
+                  xr = xi - xvold(k)
+                  yr = yi - yvold(k)
+                  zr = zi - zvold(k)
+                  call imagen (xr,yr,zr)
+                  r2 = xr*xr + yr*yr + zr*zr
+                  if (r2 .le. vbuf2) then
+                     do j = 1, nvlst(k)
+                        if (vlst(j,k) .eq. i)  goto 20
+                     end do
 !$OMP CRITICAL
-                  nvlst(k) = nvlst(k) + 1
-                  vlst(nvlst(k),k) = i
+                     nvlst(k) = nvlst(k) + 1
+                     vlst(nvlst(k),k) = i
 !$OMP END CRITICAL
-   30             continue
-               else if (r2 .le. vbufx) then
-                  do j = 1, nvlst(k)
-                     if (vlst(j,k) .eq. i) then
+   20                continue
+                  else if (r2 .le. vbufx) then
+                     do j = 1, nvlst(k)
+                        if (vlst(j,k) .eq. i) then
 !$OMP CRITICAL
-                        vlst(j,k) = vlst(nvlst(k),k)
-                        nvlst(k) = nvlst(k) - 1
+                           vlst(j,k) = vlst(nvlst(k),k)
+                           nvlst(k) = nvlst(k) - 1
 !$OMP END CRITICAL
-                        goto 40
-                     end if
-                  end do
-   40             continue
+                           goto 30
+                        end if
+                     end do
+   30                continue
+                  end if
                end if
             end do
+         end if
+      end do
+!$OMP END DO
+c
+c     check to see if any neighbor lists are too long
+c
+!$OMP DO
+      do i = 1, nvdw
+         if (nvlst(i) .ge. maxvlst) then
+            write (iout,40)
+   40       format (/,' VLIST  --  Too many Neighbors;',
+     &                 ' Increase MAXVLST')
+            call fatal
          end if
       end do
 !$OMP END DO
@@ -203,22 +213,23 @@ c
       deallocate (xred)
       deallocate (yred)
       deallocate (zred)
+      deallocate (update)
       return
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine vbuild  --  make vdw pair list for one site  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine vbuild  --  build vdw list for all sites  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "vbuild" performs a complete rebuild of the van der Waals
-c     pair neighbor list for a single site
+c     pair neighbor for each site
 c
 c
-      subroutine vbuild (i,xred,yred,zred)
+      subroutine vbuild (xred,yred,zred)
       implicit none
       include 'sizes.i'
       include 'bound.i'
@@ -235,37 +246,43 @@ c
 c
 c     store coordinates to reflect update of the site
 c
-      xi = xred(i)
-      yi = yred(i)
-      zi = zred(i)
-      xvold(i) = xi
-      yvold(i) = yi
-      zvold(i) = zi
+!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP DO schedule(guided)
+      do i = 1, nvdw
+         xi = xred(i)
+         yi = yred(i)
+         zi = zred(i)
+         xvold(i) = xi
+         yvold(i) = yi
+         zvold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
-      j = 0
-      do k = i+1, nvdw
-         xr = xi - xred(k)
-         yr = yi - yred(k)
-         zr = zi - zred(k)
-         call imagen (xr,yr,zr)
-         r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .le. vbuf2) then
-            j = j + 1
-            vlst(j,i) = k
-         end if
-      end do
-      nvlst(i) = j
+         j = 0
+         do k = i+1, nvdw
+            xr = xi - xred(k)
+            yr = yi - yred(k)
+            zr = zi - zred(k)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. vbuf2) then
+               j = j + 1
+               vlst(j,i) = k
+            end if
+         end do
+         nvlst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
-      if (nvlst(i) .ge. maxvlst) then
-         write (iout,10)
-   10    format (/,' VBUILD  --  Too many Neighbors;',
-     &              ' Increase MAXVLST')
-         call fatal
-      end if
+         if (nvlst(i) .ge. maxvlst) then
+            write (iout,10)
+   10       format (/,' VBUILD  --  Too many Neighbors;',
+     &                 ' Increase MAXVLST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -425,12 +442,18 @@ c
       include 'iounit.i'
       include 'neigh.i'
       include 'openmp.i'
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
       logical parallel
+      logical, allocatable :: update(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     neighbor list cannot be used with the replicates method
 c
@@ -453,22 +476,16 @@ c
       if (doclst) then
          doclst = .false.
          if (parallel .or. octahedron) then
-!$OMP PARALLEL default(private) shared(nion)
-!$OMP DO schedule(guided)
-            do i = 1, nion
-               call cbuild (i)
-            end do
-!$OMP END DO
-!$OMP END PARALLEL
+            call cbuild
          else
             call clight
          end if
          return
       end if
 c
-c     test each site for displacement exceeding half the buffer
+c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, nion
          ii = kion(i)
@@ -480,21 +497,31 @@ c
          zr = zi - zcold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-c
-c     store coordinates to reflect update of this site
-c
+         update(i) = .false.
          if (r2 .ge. lbuf2) then
+            update(i) = .true.
             xcold(i) = xi
             ycold(i) = yi
             zcold(i) = zi
+         end if
+      end do
+!$OMP END DO
 c
-c     rebuild the higher numbered neighbors of this site
+c     rebuild the higher numbered neighbors of updated sites
 c
+!$OMP DO schedule(guided)
+       do i = 1, nion
+         if (update(i)) then
+            ii = kion(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             j = 0
             do k = i+1, nion
-               xr = xi - xcold(k)
-               yr = yi - ycold(k)
-               zr = zi - zcold(k)
+               kk = kion(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -504,65 +531,75 @@ c
             end do
             nelst(i) = j
 c
-c     check to see if the neighbor list is too long
-c
-            if (nelst(i) .ge. maxelst) then
-               write (iout,20)
-   20          format (/,' CLIST  --  Too many Neighbors;',
-     &                    ' Increase MAXELST')
-               call fatal
-            end if
-c
-c     adjust lists of lower numbered neighbors of this site
+c     adjust lists of lower numbered neighbors of updated sites
 c
             do k = 1, i-1
-               xr = xi - xcold(k)
-               yr = yi - ycold(k)
-               zr = zi - zcold(k)
-               call imagen (xr,yr,zr)
-               r2 = xr*xr + yr*yr + zr*zr
-               if (r2 .le. cbuf2) then
-                  do j = 1, nelst(k)
-                     if (elst(j,k) .eq. i)  goto 30
-                  end do
+               if (.not. update(k)) then
+                  xr = xi - xcold(k)
+                  yr = yi - ycold(k)
+                  zr = zi - zcold(k)
+                  call imagen (xr,yr,zr)
+                  r2 = xr*xr + yr*yr + zr*zr
+                  if (r2 .le. cbuf2) then
+                     do j = 1, nelst(k)
+                        if (elst(j,k) .eq. i)  goto 20
+                     end do
 !$OMP CRITICAL
-                  nelst(k) = nelst(k) + 1
-                  elst(nelst(k),k) = i
+                     nelst(k) = nelst(k) + 1
+                     elst(nelst(k),k) = i
 !$OMP END CRITICAL
-   30             continue
-               else if (r2 .le. cbufx) then
-                  do j = 1, nelst(k)
-                     if (elst(j,k) .eq. i) then
+   20                continue
+                  else if (r2 .le. cbufx) then
+                     do j = 1, nelst(k)
+                        if (elst(j,k) .eq. i) then
 !$OMP CRITICAL
-                        elst(j,k) = elst(nelst(k),k)
-                        nelst(k) = nelst(k) - 1
+                           elst(j,k) = elst(nelst(k),k)
+                           nelst(k) = nelst(k) - 1
 !$OMP END CRITICAL
-                        goto 40
-                     end if
-                  end do
-   40             continue
+                           goto 30
+                        end if
+                     end do
+   30                continue
+                  end if
                end if
             end do
          end if
       end do
 !$OMP END DO
+c
+c     check to see if any neighbor lists are too long
+c
+!$OMP DO
+      do i = 1, nion
+         if (nelst(i) .ge. maxelst) then
+            write (iout,40)
+   40       format (/,' CLIST  --  Too many Neighbors;',
+     &                 ' Increase MAXELST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
 !$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (update)
       return
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine cbuild  --  make charge pair list for one site  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine cbuild  --  build charge list for all sites  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "cbuild" performs a complete rebuild of the partial charge
-c     electrostatic neighbor list for a single site
+c     electrostatic neighbor list for all sites
 c
 c
-      subroutine cbuild (i)
+      subroutine cbuild
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -570,46 +607,53 @@ c
       include 'charge.i'
       include 'iounit.i'
       include 'neigh.i'
-      integer i,j,k,ii,kk
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
 c
 c     store new coordinates to reflect update of the site
 c
-      ii = kion(i)
-      xi = x(ii)
-      yi = y(ii)
-      zi = z(ii)
-      xcold(i) = xi
-      ycold(i) = yi
-      zcold(i) = zi
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP DO schedule(guided)
+      do i = 1, nion
+         ii = kion(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         xcold(i) = xi
+         ycold(i) = yi
+         zcold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
-      j = 0
-      do k = i+1, nion
-         kk = kion(k)
-         xr = xi - x(kk)
-         yr = yi - y(kk)
-         zr = zi - z(kk)
-         call imagen (xr,yr,zr)
-         r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .le. cbuf2) then
-            j = j + 1
-            elst(j,i) = k
-         end if
-      end do
-      nelst(i) = j
+         j = 0
+         do k = i+1, nion
+            kk = kion(k)
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. cbuf2) then
+               j = j + 1
+               elst(j,i) = k
+            end if
+         end do
+         nelst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
-      if (nelst(i) .ge. maxelst) then
-         write (iout,10)
-   10    format (/,' CBUILD  --  Too many Neighbors;',
-     &              ' Increase MAXELST')
-         call fatal
-      end if
+         if (nelst(i) .ge. maxelst) then
+            write (iout,10)
+   10       format (/,' CBUILD  --  Too many Neighbors;',
+     &                 ' Increase MAXELST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -770,12 +814,18 @@ c
       include 'mpole.i'
       include 'neigh.i'
       include 'openmp.i'
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
       logical parallel
+      logical, allocatable :: update(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     neighbor list cannot be used with the replicates method
 c
@@ -798,22 +848,16 @@ c
       if (domlst) then
          domlst = .false.
          if (parallel .or. octahedron) then
-!$OMP PARALLEL default(shared) private(i)
-!$OMP DO schedule(guided)
-            do i = 1, npole
-               call mbuild (i)
-            end do
-!$OMP END DO
-!$OMP END PARALLEL
+            call mbuild
          else
             call mlight
          end if
          return
       end if
 c
-c     test each site for displacement exceeding half the buffer
+c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
@@ -825,21 +869,31 @@ c
          zr = zi - zmold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-c
-c     store coordinates to reflect update of this site
-c
+         update(i) = .false.
          if (r2 .ge. lbuf2) then
+            update(i) = .true.
             xmold(i) = xi
             ymold(i) = yi
             zmold(i) = zi
+         end if
+      end do
+!$OMP END DO
 c
-c     rebuild the higher numbered neighbors of this site
+c     rebuild the higher numbered neighbors of updated sites
 c
+!$OMP DO schedule(guided)
+       do i = 1, npole
+         if (update(i)) then
+            ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             j = 0
             do k = i+1, npole
-               xr = xi - xmold(k)
-               yr = yi - ymold(k)
-               zr = zi - zmold(k)
+               kk = ipole(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -849,65 +903,75 @@ c
             end do
             nelst(i) = j
 c
-c     check to see if the neighbor list is too long
-c
-            if (nelst(i) .ge. maxelst) then
-               write (iout,20)
-   20          format (/,' MLIST  --  Too many Neighbors;',
-     &                    ' Increase MAXELST')
-               call fatal
-            end if
-c
-c     adjust lists of lower numbered neighbors of this site
+c     adjust lists of lower numbered neighbors of updated sites
 c
             do k = 1, i-1
-               xr = xi - xmold(k)
-               yr = yi - ymold(k)
-               zr = zi - zmold(k)
-               call imagen (xr,yr,zr)
-               r2 = xr*xr + yr*yr + zr*zr
-               if (r2 .le. mbuf2) then
-                  do j = 1, nelst(k)
-                     if (elst(j,k) .eq. i)  goto 30
-                  end do
+               if (.not. update(k)) then
+                  xr = xi - xmold(k)
+                  yr = yi - ymold(k)
+                  zr = zi - zmold(k)
+                  call imagen (xr,yr,zr)
+                  r2 = xr*xr + yr*yr + zr*zr
+                  if (r2 .le. mbuf2) then
+                     do j = 1, nelst(k)
+                        if (elst(j,k) .eq. i)  goto 20
+                     end do
 !$OMP CRITICAL
-                  nelst(k) = nelst(k) + 1
-                  elst(nelst(k),k) = i
+                     nelst(k) = nelst(k) + 1
+                     elst(nelst(k),k) = i
 !$OMP END CRITICAL
-   30             continue
-               else if (r2 .le. mbufx) then
-                  do j = 1, nelst(k)
-                     if (elst(j,k) .eq. i) then
+   20                continue
+                  else if (r2 .le. mbufx) then
+                     do j = 1, nelst(k)
+                        if (elst(j,k) .eq. i) then
 !$OMP CRITICAL
-                        elst(j,k) = elst(nelst(k),k)
-                        nelst(k) = nelst(k) - 1
+                           elst(j,k) = elst(nelst(k),k)
+                           nelst(k) = nelst(k) - 1
 !$OMP END CRITICAL
-                        goto 40
-                     end if
-                  end do
-   40             continue
+                           goto 30
+                        end if
+                     end do
+   30                continue
+                  end if
                end if
             end do
          end if
       end do
 !$OMP END DO
+c
+c     check to see if any neighbor lists are too long
+c
+!$OMP DO
+      do i = 1, npole
+         if (nelst(i) .ge. maxelst) then
+            write (iout,40)
+   40       format (/,' MLIST  --  Too many Neighbors;',
+     &                 ' Increase MAXELST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
 !$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (update)
       return
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine mbuild  --  make mpole pair list for one site  ##
-c     ##                                                            ##
-c     ################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine mbuild  --  make mpole list for all sites  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "mbuild" performs a complete rebuild of the atomic multipole
-c     electrostatic neighbor list for a single site
+c     electrostatic neighbor list for all sites
 c
 c
-      subroutine mbuild (i)
+      subroutine mbuild
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -922,39 +986,45 @@ c
 c
 c     store new coordinates to reflect update of the site
 c
-      ii = ipole(i)
-      xi = x(ii)
-      yi = y(ii)
-      zi = z(ii)
-      xmold(i) = xi
-      ymold(i) = yi
-      zmold(i) = zi
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP DO schedule(guided)
+      do i = 1, npole
+         ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         xmold(i) = xi
+         ymold(i) = yi
+         zmold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
-      j = 0
-      do k = i+1, npole
-         kk = ipole(k)
-         xr = xi - x(kk)
-         yr = yi - y(kk)
-         zr = zi - z(kk)
-         call imagen (xr,yr,zr)
-         r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .le. mbuf2) then
-            j = j + 1
-            elst(j,i) = k
-         end if
-      end do
-      nelst(i) = j
+         j = 0
+         do k = i+1, npole
+            kk = ipole(k)
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. mbuf2) then
+               j = j + 1
+               elst(j,i) = k
+            end if
+         end do
+         nelst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
-      if (nelst(i) .ge. maxelst) then
-         write (iout,10)
-   10    format (/,' MBUILD  --  Too many Neighbors;',
-     &              ' Increase MAXELST')
-         call fatal
-      end if
+         if (nelst(i) .ge. maxelst) then
+            write (iout,10)
+   10       format (/,' MBUILD  --  Too many Neighbors;',
+     &                 ' Increase MAXELST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -1115,12 +1185,18 @@ c
       include 'mpole.i'
       include 'neigh.i'
       include 'openmp.i'
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
       logical parallel
+      logical, allocatable :: update(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     neighbor list cannot be used with the replicates method
 c
@@ -1143,22 +1219,16 @@ c
       if (doulst) then
          doulst = .false.
          if (parallel .or. octahedron) then
-!$OMP PARALLEL default(shared) private(i)
-!$OMP DO schedule(guided)
-            do i = 1, npole
-               call ubuild (i)
-            end do
-!$OMP END DO
-!$OMP END PARALLEL
+            call ubuild
          else
             call ulight
          end if
          return
       end if
 c
-c     test each site for displacement exceeding half the buffer
+c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
@@ -1170,21 +1240,31 @@ c
          zr = zi - zuold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
-c
-c     store coordinates to reflect update of this site
-c
+         update(i) = .false.
          if (r2 .ge. pbuf2) then
+            update(i) = .true.
             xuold(i) = xi
             yuold(i) = yi
             zuold(i) = zi
+         end if
+      end do
+!$OMP END DO
 c
-c     rebuild the higher numbered neighbors of this site
+c     rebuild the higher numbered neighbors of updated sites
 c
+!$OMP DO schedule(guided)
+      do i = 1, npole
+         if (update(i)) then
+            ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             j = 0
             do k = i+1, npole
-               xr = xi - xuold(k)
-               yr = yi - yuold(k)
-               zr = zi - zuold(k)
+               kk = ipole(k)
+               xr = xi - x(kk)
+               yr = yi - y(kk)
+               zr = zi - z(kk)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. ubuf2) then
@@ -1194,65 +1274,75 @@ c
             end do
             nulst(i) = j
 c
-c     check to see if the neighbor list is too long
-c
-            if (nulst(i) .ge. maxulst) then
-               write (iout,20)
-   20          format (/,' ULIST  --  Too many Neighbors;',
-     &                    ' Increase MAXULST')
-               call fatal
-            end if
-c
-c     adjust lists of lower numbered neighbors of this site
+c     adjust lists of lower numbered neighbors of updated sites
 c
             do k = 1, i-1
-               xr = xi - xuold(k)
-               yr = yi - yuold(k)
-               zr = zi - zuold(k)
-               call imagen (xr,yr,zr)
-               r2 = xr*xr + yr*yr + zr*zr
-               if (r2 .le. ubuf2) then
-                  do j = 1, nulst(k)
-                     if (ulst(j,k) .eq. i)  goto 30
-                  end do
+               if (.not. update(k)) then
+                  xr = xi - xuold(k)
+                  yr = yi - yuold(k)
+                  zr = zi - zuold(k)
+                  call imagen (xr,yr,zr)
+                  r2 = xr*xr + yr*yr + zr*zr
+                  if (r2 .le. ubuf2) then
+                     do j = 1, nulst(k)
+                        if (ulst(j,k) .eq. i)  goto 20
+                     end do
 !$OMP CRITICAL
-                  nulst(k) = nulst(k) + 1
-                  ulst(nulst(k),k) = i
+                     nulst(k) = nulst(k) + 1
+                     ulst(nulst(k),k) = i
 !$OMP END CRITICAL
-   30             continue
-               else if (r2 .le. ubufx) then
-                  do j = 1, nulst(k)
-                     if (ulst(j,k) .eq. i) then
+   20                continue
+                  else if (r2 .le. ubufx) then
+                     do j = 1, nulst(k)
+                        if (ulst(j,k) .eq. i) then
 !$OMP CRITICAL
-                        ulst(j,k) = ulst(nulst(k),k)
-                        nulst(k) = nulst(k) - 1
+                           ulst(j,k) = ulst(nulst(k),k)
+                           nulst(k) = nulst(k) - 1
 !$OMP END CRITICAL
-                        goto 40
-                     end if
-                  end do
-   40             continue
+                           goto 30
+                        end if
+                     end do
+   30                continue
+                  end if
                end if
             end do
          end if
       end do
 !$OMP END DO
+c
+c     check to see if any neighbor lists are too long
+c
+!$OMP DO
+      do i = 1, npole
+         if (nulst(i) .ge. maxulst) then
+            write (iout,40)
+   40       format (/,' ULIST  --  Too many Neighbors;',
+     &                 ' Increase MAXULST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
 !$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (update)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ubuild  --  preconditioner list for one site  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ubuild  --  preconditioner list for all sites  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "ubuild" performs a complete rebuild of the polarization
-c     preconditioner neighbor list for a single site
+c     preconditioner neighbor list for all sites
 c
 c
-      subroutine ubuild (i)
+      subroutine ubuild
       implicit none
       include 'sizes.i'
       include 'atoms.i'
@@ -1267,39 +1357,45 @@ c
 c
 c     store new coordinates to reflect update of the site
 c
-      ii = ipole(i)
-      xi = x(ii)
-      yi = y(ii)
-      zi = z(ii)
-      xuold(i) = xi
-      yuold(i) = yi
-      zuold(i) = zi
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP DO schedule(guided)
+      do i = 1, npole
+         ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         xuold(i) = xi
+         yuold(i) = yi
+         zuold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
-      j = 0
-      do k = i+1, npole
-         kk = ipole(k)
-         xr = xi - x(kk)
-         yr = yi - y(kk)
-         zr = zi - z(kk)
-         call imagen (xr,yr,zr)
-         r2 = xr*xr + yr*yr + zr*zr
-         if (r2 .le. ubuf2) then
-            j = j + 1
-            ulst(j,i) = k
-         end if
-      end do
-      nulst(i) = j
+         j = 0
+         do k = i+1, npole
+            kk = ipole(k)
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. ubuf2) then
+               j = j + 1
+               ulst(j,i) = k
+            end if
+         end do
+         nulst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
-      if (nulst(i) .ge. maxulst) then
-         write (iout,10)
-   10    format (/,' UBUILD  --  Too many Neighbors;',
-     &              ' Increase MAXULST')
-         call fatal
-      end if
+         if (nulst(i) .ge. maxulst) then
+            write (iout,10)
+   10       format (/,' UBUILD  --  Too many Neighbors;',
+     &                 ' Increase MAXULST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c

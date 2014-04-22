@@ -59,6 +59,10 @@ LF95 -c -o1 -tpp -nstchk -ntrace eangle.f
 LF95 -c -o1 -tpp -nstchk -ntrace eangle1.f
 LF95 -c -o1 -tpp -nstchk -ntrace eangle2.f
 LF95 -c -o1 -tpp -nstchk -ntrace eangle3.f
+LF95 -c -o1 -tpp -nstchk -ntrace eangtor.f
+LF95 -c -o1 -tpp -nstchk -ntrace eangtor1.f
+LF95 -c -o1 -tpp -nstchk -ntrace eangtor2.f
+LF95 -c -o1 -tpp -nstchk -ntrace eangtor3.f
 LF95 -c -o1 -tpp -nstchk -ntrace ebond.f
 LF95 -c -o1 -tpp -nstchk -ntrace ebond1.f
 LF95 -c -o1 -tpp -nstchk -ntrace ebond2.f
@@ -212,6 +216,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace invert.f
 LF95 -c -o1 -tpp -nstchk -ntrace jacobi.f
 LF95 -c -o1 -tpp -nstchk -ntrace kangang.f
 LF95 -c -o1 -tpp -nstchk -ntrace kangle.f
+LF95 -c -o1 -tpp -nstchk -ntrace kangtor.f
 LF95 -c -o1 -tpp -nstchk -ntrace katom.f
 LF95 -c -o1 -tpp -nstchk -ntrace kbond.f
 LF95 -c -o1 -tpp -nstchk -ntrace kcharge.f

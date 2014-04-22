@@ -59,6 +59,10 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangle.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangle1.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangle2.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangle3.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangtor.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangtor1.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangtor2.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp eangtor3.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp ebond.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp ebond1.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp ebond2.f
@@ -212,6 +216,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp invert.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp jacobi.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp kangang.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp kangle.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp kangtor.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp katom.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp kbond.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp kcharge.f

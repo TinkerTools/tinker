@@ -25,6 +25,7 @@ c     teit    improper torsion derivatives over torsions
 c     tet     torsional derivatives over torsions
 c     tept    pi-orbital torsion derivatives over torsions
 c     tebt    stretch-torsion derivatives over torsions
+c     teat    angle-torsion derivatives over torsions
 c     tett    torsion-torsion derivatives over torsions
 c     tev     van der Waals derivatives over torsions
 c     tec     charge-charge derivatives over torsions
@@ -42,15 +43,16 @@ c
       real*8 tesum,teb,tea,teba
       real*8 teub,teaa,teopb,teopd
       real*8 teid,teit,tet,tept
-      real*8 tebt,tett,tev,tec
-      real*8 tecd,ted,tem,tep,ter
-      real*8 tes,telf,teg,tex
+      real*8 tebt,teat,tett,tev
+      real*8 tec,tecd,ted,tem
+      real*8 tep,ter,tes,telf
+      real*8 teg,tex
       common /domega/ tesum(maxrot),teb(maxrot),tea(maxrot),
      &                teba(maxrot),teub(maxrot),teaa(maxrot),
      &                teopb(maxrot),teopd(maxrot),teid(maxrot),
      &                teit(maxrot),tet(maxrot),tept(maxrot),
-     &                tebt(maxrot),tett(maxrot),tev(maxrot),
-     &                tec(maxrot),tecd(maxrot),ted(maxrot),
-     &                tem(maxrot),tep(maxrot),ter(maxrot),
-     &                tes(maxrot),telf(maxrot),teg(maxrot),
-     &                tex(maxrot)
+     &                tebt(maxrot),teat(maxrot),tett(maxrot),
+     &                tev(maxrot),tec(maxrot),tecd(maxrot),
+     &                ted(maxrot),tem(maxrot),tep(maxrot),
+     &                ter(maxrot),tes(maxrot),telf(maxrot),
+     &                teg(maxrot),tex(maxrot)

@@ -58,6 +58,10 @@ ifort -c -g -warn unused -check uninit -check bounds eangle.f
 ifort -c -g -warn unused -check uninit -check bounds eangle1.f
 ifort -c -g -warn unused -check uninit -check bounds eangle2.f
 ifort -c -g -warn unused -check uninit -check bounds eangle3.f
+ifort -c -g -warn unused -check uninit -check bounds eangtor.f
+ifort -c -g -warn unused -check uninit -check bounds eangtor1.f
+ifort -c -g -warn unused -check uninit -check bounds eangtor2.f
+ifort -c -g -warn unused -check uninit -check bounds eangtor3.f
 ifort -c -g -warn unused -check uninit -check bounds ebond.f
 ifort -c -g -warn unused -check uninit -check bounds ebond1.f
 ifort -c -g -warn unused -check uninit -check bounds ebond2.f
@@ -211,6 +215,7 @@ ifort -c -g -warn unused -check uninit -check bounds invert.f
 ifort -c -g -warn unused -check uninit -check bounds jacobi.f
 ifort -c -g -warn unused -check uninit -check bounds kangang.f
 ifort -c -g -warn unused -check uninit -check bounds kangle.f
+ifort -c -g -warn unused -check uninit -check bounds kangtor.f
 ifort -c -g -warn unused -check uninit -check bounds katom.f
 ifort -c -g -warn unused -check uninit -check bounds kbond.f
 ifort -c -g -warn unused -check uninit -check bounds kcharge.f

@@ -49,6 +49,7 @@ c
       et = 0.0d0
       ept = 0.0d0
       ebt = 0.0d0
+      eat = 0.0d0
       ett = 0.0d0
       ev = 0.0d0
       ec = 0.0d0
@@ -78,6 +79,7 @@ c
             det(j,i) = 0.0d0
             dept(j,i) = 0.0d0
             debt(j,i) = 0.0d0
+            deat(j,i) = 0.0d0
             dett(j,i) = 0.0d0
             dev(j,i) = 0.0d0
             dec(j,i) = 0.0d0
@@ -137,6 +139,7 @@ c
       if (use_tors)  call etors1
       if (use_pitors)  call epitors1
       if (use_strtor)  call estrtor1
+      if (use_angtor)  call eangtor1
       if (use_tortor)  call etortor1
 c
 c     call the van der Waals energy and gradient routines
@@ -167,8 +170,8 @@ c
 c     sum up to get the total energy and first derivatives
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
-     &          + et + ept + ebt + ett + ev + ec + ecd + ed + em
-     &          + ep + er + es + elf + eg + ex
+     &          + et + ept + ebt + eat + ett + ev + ec + ecd + ed
+     &          + em + ep + er + es + elf + eg + ex
       energy = esum
       do i = 1, n
          do j = 1, 3
@@ -176,10 +179,11 @@ c
      &                      + deub(j,i) + deaa(j,i) + deopb(j,i)
      &                      + deopd(j,i) + deid(j,i) + deit(j,i)
      &                      + det(j,i) + dept(j,i) + debt(j,i)
-     &                      + dett(j,i) + dev(j,i) + dec(j,i)
-     &                      + decd(j,i) + ded(j,i) + dem(j,i)
-     &                      + dep(j,i) + der(j,i) + des(j,i)
-     &                      + delf(j,i) + deg(j,i) + dex(j,i)
+     &                      + deat(j,i) + dett(j,i) + dev(j,i)
+     &                      + dec(j,i) + decd(j,i) + ded(j,i)
+     &                      + dem(j,i) + dep(j,i) + der(j,i)
+     &                      + des(j,i) + delf(j,i) + deg(j,i)
+     &                      + dex(j,i)
             derivs(j,i) = desum(j,i)
          end do
       end do

@@ -58,6 +58,10 @@ pgf77 -c -fast eangle.f
 pgf77 -c -fast eangle1.f
 pgf77 -c -fast eangle2.f
 pgf77 -c -fast eangle3.f
+pgf77 -c -fast eangtor.f
+pgf77 -c -fast eangtor1.f
+pgf77 -c -fast eangtor2.f
+pgf77 -c -fast eangtor3.f
 pgf77 -c -fast ebond.f
 pgf77 -c -fast ebond1.f
 pgf77 -c -fast ebond2.f
@@ -211,6 +215,7 @@ pgf77 -c -fast invert.f
 pgf77 -c -fast jacobi.f
 pgf77 -c -fast kangang.f
 pgf77 -c -fast kangle.f
+pgf77 -c -fast kangtor.f
 pgf77 -c -fast katom.f
 pgf77 -c -fast kbond.f
 pgf77 -c -fast kcharge.f

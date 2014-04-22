@@ -58,6 +58,10 @@ gfortran -c -O3 -ffast-math -fopenmp eangle.f
 gfortran -c -O3 -ffast-math -fopenmp eangle1.f
 gfortran -c -O3 -ffast-math -fopenmp eangle2.f
 gfortran -c -O3 -ffast-math -fopenmp eangle3.f
+gfortran -c -O3 -ffast-math -fopenmp eangtor.f
+gfortran -c -O3 -ffast-math -fopenmp eangtor1.f
+gfortran -c -O3 -ffast-math -fopenmp eangtor2.f
+gfortran -c -O3 -ffast-math -fopenmp eangtor3.f
 gfortran -c -O3 -ffast-math -fopenmp ebond.f
 gfortran -c -O3 -ffast-math -fopenmp ebond1.f
 gfortran -c -O3 -ffast-math -fopenmp ebond2.f
@@ -211,6 +215,7 @@ gfortran -c -O3 -ffast-math -fopenmp invert.f
 gfortran -c -O3 -ffast-math -fopenmp jacobi.f
 gfortran -c -O3 -ffast-math -fopenmp kangang.f
 gfortran -c -O3 -ffast-math -fopenmp kangle.f
+gfortran -c -O3 -ffast-math -fopenmp kangtor.f
 gfortran -c -O3 -ffast-math -fopenmp katom.f
 gfortran -c -O3 -ffast-math -fopenmp kbond.f
 gfortran -c -O3 -ffast-math -fopenmp kcharge.f

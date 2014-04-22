@@ -133,6 +133,7 @@ c
             if (use_tors)  call etors2 (i)
             if (use_pitors)  call epitors2 (i)
             if (use_strtor)  call estrtor2 (i)
+            if (use_angtor)  call eangtor2 (i)
             if (use_tortor)  call etortor2 (i)
 c
 c     call the van der Waals Hessian component routines

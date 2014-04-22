@@ -25,6 +25,7 @@ c     aeit    improper torsion energy partitioned over atoms
 c     aet     torsional energy partitioned over atoms
 c     aept    pi-orbital torsion energy partitioned over atoms
 c     aebt    stretch-torsion energy partitioned over atoms
+c     aeat    angle-torsion energy partitioned over atoms
 c     aett    torsion-torsion energy partitioned over atoms
 c     aev     van der Waals energy partitioned over atoms
 c     aec     charge-charge energy partitioned over atoms
@@ -42,15 +43,16 @@ c
       real*8 aesum,aeb,aea,aeba
       real*8 aeub,aeaa,aeopb,aeopd
       real*8 aeid,aeit,aet,aept
-      real*8 aebt,aett,aev,aec
-      real*8 aecd,aed,aem,aep,aer
-      real*8 aes,aelf,aeg,aex
+      real*8 aebt,aeat,aett,aev
+      real*8 aec,aecd,aed,aem
+      real*8 aep,aer,aes,aelf
+      real*8 aeg,aex
       common /analyz/ aesum(maxatm),aeb(maxatm),aea(maxatm),
      &                aeba(maxatm),aeub(maxatm),aeaa(maxatm),
      &                aeopb(maxatm),aeopd(maxatm),aeid(maxatm),
      &                aeit(maxatm),aet(maxatm),aept(maxatm),
-     &                aebt(maxatm),aett(maxatm),aev(maxatm),
-     &                aec(maxatm),aecd(maxatm),aed(maxatm),
-     &                aem(maxatm),aep(maxatm),aer(maxatm),
-     &                aes(maxatm),aelf(maxatm),aeg(maxatm),
-     &                aex(maxatm)
+     &                aebt(maxatm),aeat(maxatm),aett(maxatm),
+     &                aev(maxatm),aec(maxatm),aecd(maxatm),
+     &                aed(maxatm),aem(maxatm),aep(maxatm),
+     &                aer(maxatm),aes(maxatm),aelf(maxatm),
+     &                aeg(maxatm),aex(maxatm)

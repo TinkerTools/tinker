@@ -58,6 +58,10 @@ ifort -c -fast eangle.f
 ifort -c -fast eangle1.f
 ifort -c -fast eangle2.f
 ifort -c -fast eangle3.f
+ifort -c -fast eangtor.f
+ifort -c -fast eangtor1.f
+ifort -c -fast eangtor2.f
+ifort -c -fast eangtor3.f
 ifort -c -fast ebond.f
 ifort -c -fast ebond1.f
 ifort -c -fast ebond2.f
@@ -211,6 +215,7 @@ ifort -c -fast invert.f
 ifort -c -fast jacobi.f
 ifort -c -fast kangang.f
 ifort -c -fast kangle.f
+ifort -c -fast kangtor.f
 ifort -c -fast katom.f
 ifort -c -fast kbond.f
 ifort -c -fast kcharge.f

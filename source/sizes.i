@@ -78,7 +78,7 @@ c
       parameter (maxhess=1000000)
       parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
-      parameter (maxelst=1800)
+      parameter (maxelst=1200)
       parameter (maxulst=100)
       parameter (maxfft=250)
       parameter (maxfix=maxatm)

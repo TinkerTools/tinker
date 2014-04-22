@@ -58,6 +58,10 @@ pgf95 -c -fast -mp eangle.f
 pgf95 -c -fast -mp eangle1.f
 pgf95 -c -fast -mp eangle2.f
 pgf95 -c -fast -mp eangle3.f
+pgf95 -c -fast -mp eangtor.f
+pgf95 -c -fast -mp eangtor1.f
+pgf95 -c -fast -mp eangtor2.f
+pgf95 -c -fast -mp eangtor3.f
 pgf95 -c -fast -mp ebond.f
 pgf95 -c -fast -mp ebond1.f
 pgf95 -c -fast -mp ebond2.f
@@ -211,6 +215,7 @@ pgf95 -c -fast -mp invert.f
 pgf95 -c -fast -mp jacobi.f
 pgf95 -c -fast -mp kangang.f
 pgf95 -c -fast -mp kangle.f
+pgf95 -c -fast -mp kangtor.f
 pgf95 -c -fast -mp katom.f
 pgf95 -c -fast -mp kbond.f
 pgf95 -c -fast -mp kcharge.f

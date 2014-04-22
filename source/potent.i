@@ -24,6 +24,7 @@ c     use_imptor  logical flag governing use of improper torsion term
 c     use_tors    logical flag governing use of torsional potential
 c     use_pitors  logical flag governing use of pi-orbital torsion term
 c     use_strtor  logical flag governing use of stretch-torsion term
+c     use_angtor  logical flag governing use of angle-torsion term
 c     use_tortor  logical flag governing use of torsion-torsion term
 c     use_vdw     logical flag governing use of vdw der Waals potential
 c     use_charge  logical flag governing use of charge-charge potential
@@ -44,14 +45,15 @@ c
       logical use_urey,use_angang,use_opbend
       logical use_opdist,use_improp,use_imptor
       logical use_tors,use_pitors,use_strtor
-      logical use_tortor,use_vdw,use_charge
-      logical use_chgdpl,use_dipole,use_mpole
-      logical use_polar,use_rxnfld,use_solv
-      logical use_metal,use_geom,use_extra
-      logical use_born,use_orbit
+      logical use_angtor,use_tortor,use_vdw
+      logical use_charge,use_chgdpl,use_dipole
+      logical use_mpole,use_polar,use_rxnfld
+      logical use_solv,use_metal,use_geom
+      logical use_extra,use_born,use_orbit
       common /potent/ use_bond,use_angle,use_strbnd,use_urey,use_angang,
      &                use_opbend,use_opdist,use_improp,use_imptor,
-     &                use_tors,use_pitors,use_strtor,use_tortor,use_vdw,
-     &                use_charge,use_chgdpl,use_dipole,use_mpole,
-     &                use_polar,use_rxnfld,use_solv,use_metal,use_geom,
-     &                use_extra,use_born,use_orbit
+     &                use_tors,use_pitors,use_strtor,use_angtor,
+     &                use_tortor,use_vdw,use_charge,use_chgdpl,
+     &                use_dipole,use_mpole,use_polar,use_rxnfld,
+     &                use_solv,use_metal,use_geom,use_extra,use_born,
+     &                use_orbit

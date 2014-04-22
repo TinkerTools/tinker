@@ -68,9 +68,10 @@ c
 c
 c     assign bond, angle and cross term potential parameters
 c
-      if (use_bond .or. use_strbnd .or. use_strtor
-     &    .or. (use_vdw .and. vdwtyp.eq.'MM3-HBOND'))  call kbond
-      if (use_angle .or. use_strbnd .or. use_angang)  call kangle
+      if (use_bond .or. use_strbnd .or. use_strtor .or.
+     &    (use_vdw .and. vdwtyp.eq.'MM3-HBOND'))  call kbond
+      if (use_angle .or. use_strbnd .or.
+     &    use_angang .or. use_angtor)  call kangle
       if (use_strbnd)  call kstrbnd
       if (use_urey)  call kurey
       if (use_angang)  call kangang
@@ -84,15 +85,18 @@ c
 c
 c     assign torsion and torsion cross term potential parameters
 c
-      if (use_tors .or. use_strtor .or. use_tortor)  call ktors
+      if (use_tors .or. use_strtor .or.
+     &    use_angtor .or. use_tortor)  call ktors
       if (use_pitors)  call kpitors
       if (use_strtor)  call kstrtor
+      if (use_angtor)  call kangtor
       if (use_tortor)  call ktortor
 c
 c     assign van der Waals and electrostatic potential parameters
 c
       if (use_vdw .or. use_solv)  call kvdw
-      if (use_charge .or. use_chgdpl .or. use_solv)  call kcharge
+      if (use_charge .or. use_chgdpl .or.
+     &    use_solv)  call kcharge
       if (use_dipole .or. use_chgdpl)  call kdipole
       if (use_mpole .or. use_polar .or.
      &    use_solv .or. use_rxnfld)  call kmpole

@@ -148,6 +148,7 @@ c
          aep(i) = 0.0d0
       end do
       header = .true.
+      if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -168,7 +169,6 @@ c
 c
 c     set arrays needed to scale connected atom interactions
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
          pscale(i) = 1.0d0
@@ -775,7 +775,6 @@ c
 c
 c     set arrays needed to scale connected atom interactions
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
          pscale(i) = 1.0d0
@@ -1123,6 +1122,7 @@ c
          aem(i) = 0.0d0
          aep(i) = 0.0d0
       end do
+      if (npole .eq. 0)  return
 c
 c     set the energy unit conversion factor
 c
@@ -1300,7 +1300,6 @@ c
 c     zero out the intramolecular portion of the Ewald energy
 c
       eintra = 0.0d0
-      if (npole .eq. 0)  return
       header = .true.
 c
 c     perform dynamic allocation of some local arrays
@@ -1849,6 +1848,7 @@ c
          aem(i) = 0.0d0
          aep(i) = 0.0d0
       end do
+      if (npole .eq. 0)  return
 c
 c     set the energy unit conversion factor
 c
@@ -2032,7 +2032,6 @@ c
 c     zero out the intramolecular portion of the Ewald energy
 c
       eintra = 0.0d0
-      if (npole .eq. 0)  return
       header = .true.
 c
 c     perform dynamic allocation of some local arrays

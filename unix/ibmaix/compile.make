@@ -58,6 +58,10 @@ xlf -c -O eangle.f
 xlf -c -O eangle1.f
 xlf -c -O eangle2.f
 xlf -c -O eangle3.f
+xlf -c -O eangtor.f
+xlf -c -O eangtor1.f
+xlf -c -O eangtor2.f
+xlf -c -O eangtor3.f
 xlf -c -O ebond.f
 xlf -c -O ebond1.f
 xlf -c -O ebond2.f
@@ -211,6 +215,7 @@ xlf -c -O invert.f
 xlf -c -O jacobi.f
 xlf -c -O kangang.f
 xlf -c -O kangle.f
+xlf -c -O kangtor.f
 xlf -c -O katom.f
 xlf -c -O kbond.f
 xlf -c -O kcharge.f

@@ -2248,7 +2248,7 @@ c
       integer nlocal,maxlocal
       integer tid,toffset0
 !$    integer omp_get_thread_num
-      integer toffset(0:nthread-1)
+      integer, allocatable :: toffset(:)
       integer, allocatable :: ilocal(:,:)
       real*8 xr,yr,zr,r,r2
       real*8 rr1,rr2,rr3
@@ -2294,32 +2294,16 @@ c
       if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
       nlocal = 0
       toffset0 = 0
+      maxlocal = int((npole*maxelst)/nthread)
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
-c
-c     set OpenMP directives for the major loop structure
-c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,pdi,pti,ci,dix,diy,
-!$OMP& diz,qixx,qixy,qixz,qiyy,qiyz,qizz,kkk,kk,xr,yr,zr,r2,r,rr1,rr2,
-!$OMP& rr3,rr5,rr7,ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,
-!$OMP& ralpha,bn,bcn,aefac,exp2a,bfac,scale3,scale5,scale7,damp,pgamma,
-!$OMP& dir,qix,qiy,qiz,qir,dkr,qkx,qky,qkz,qkr,fimd,fkmd,fimp,fkmp,
-!$OMP& expdamp,pscale,dscale,uscale,tid,ilocal,dlocal)
-!$OMP& firstprivate(nlocal)
-c
-c     perform dynamic allocation of some local arrays
-c
+      allocate (toffset(0:nthread-1))
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
-      if (poltyp .eq. 'MUTUAL') then
-         maxlocal = int(npole*maxelst/nthread)
-         allocate (ilocal(2,maxlocal))
-         allocate (dlocal(6,maxlocal))
-      end if
+      allocate (fieldt(3,npole))
+      allocate (fieldtp(3,npole))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2328,6 +2312,23 @@ c
          dscale(i) = 1.0d0
          uscale(i) = 1.0d0
       end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,thole,
+!$OMP& rpole,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
+!$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,i13,
+!$OMP& n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,nelst,
+!$OMP& elst,cut2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,tdipdip,
+!$OMP& toffset,toffset0,field,fieldp,fieldt,fieldtp,maxlocal)
+!$OMP& firstprivate(pscale,dscale,uscale,nlocal)
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (poltyp .eq. 'MUTUAL') then
+         allocate (ilocal(2,maxlocal))
+         allocate (dlocal(6,maxlocal))
+      end if
 c
 c     initialize local variables for OpenMP calculation
 c
@@ -2548,7 +2549,7 @@ c
       end do
 !$OMP END DO
 c
-c     end OpenMP directives for the major loop structure
+c     transfer the results from local to global arrays
 c
 !$OMP DO
       do i = 1, npole
@@ -2562,6 +2563,7 @@ c
 c     store terms needed later to compute mutual polarization
 c
 !$OMP CRITICAL
+      tid = 0
 !$    tid = omp_get_thread_num ()
       toffset(tid) = toffset0
       toffset0 = toffset0 + nlocal
@@ -2580,16 +2582,14 @@ c
          deallocate (ilocal)
          deallocate (dlocal)
       end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (pscale)
-      deallocate (dscale)
-      deallocate (uscale)
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (toffset)
+      deallocate (pscale)
+      deallocate (dscale)
+      deallocate (uscale)
       deallocate (fieldt)
       deallocate (fieldtp)
       return
@@ -3088,7 +3088,8 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,fimd,fkmd,fimp,fkmp)
+!$OMP PARALLEL default(private) shared(npole,uind,uinp,ntpair,tindex,
+!$OMP& tdipdip,field,fieldp,fieldt,fieldtp)
 c
 c     initialize local variables for OpenMP calculation
 c
@@ -3103,7 +3104,7 @@ c
 c
 c     find the field terms for each pairwise interaction
 c
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(static,500)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
       do m = 1, ntpair
          i = tindex(1,m)
          k = tindex(2,m)
@@ -5630,7 +5631,8 @@ c
 c
 c     use the off-diagonal preconditioner elements in second phase
 c
-!$OMP PARALLEL default(shared) private(i,k,m,kk,m1,m2,m3,m4,m5,m6)
+!$OMP PARALLEL default(private) shared(npole,mindex,minv,nulst,ulst,
+!$OMP& rsd,rsdp,zrsd,zrsdp,zrsdt,zrsdtp)
 !$OMP DO reduction(+:zrsdt,zrsdtp) schedule(guided)
          do i = 1, npole
             m = mindex(i)
@@ -5697,12 +5699,6 @@ c
             m = m + 6*nulst(i)
          end do
 c
-c     set OpenMP directives for the major loop structure
-c
-!$OMP PARALLEL default(shared) private(xi,yi,zi,xr,yr,zr,r,r2,rr3,
-!$OMP& rr5,pdi,pti,poli,polik,pgamma,damp,expdamp,scale3,scale5,
-!$OMP& i,j,k,m,ii,kk,kkk,dscale)
-c
 c     perform dynamic allocation of some local arrays
 c
          allocate (dscale(n))
@@ -5712,6 +5708,13 @@ c
          do i = 1, n
             dscale(i) = 1.0d0
          end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,
+!$OMP& thole,polarity,u1scale,u2scale,u3scale,u4scale,np11,ip11,
+!$OMP& np12,ip12,np13,ip13,np14,ip14,nulst,ulst,mindex,minv)
+!$OMP& firstprivate (dscale)
 c
 c     determine the off-diagonal elements of the preconditioner
 c
@@ -5786,11 +5789,11 @@ c
             end do
          end do
 !$OMP END DO
+!$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c
          deallocate (dscale)
-!$OMP END PARALLEL
       end if
       return
       end

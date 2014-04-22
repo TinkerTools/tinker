@@ -14,8 +14,10 @@ c
 c
 c     "initrot" sets the torsional angles which are to be rotated
 c     in subsequent computation, by default automatically selects
-c     all rotatable single bonds; assumes internal coordinates have
-c     already been setup
+c     all rotatable single bonds; optionally makes atoms inactive
+c     when they are not moved by any torsional rotation
+c
+c     note that internal coordinates must already be setup
 c
 c
       subroutine initrot
@@ -29,6 +31,7 @@ c
       include 'kgeoms.i'
       include 'math.i'
       include 'omega.i'
+      include 'potent.i'
       include 'rotate.i'
       include 'usage.i'
       include 'zcoord.i'
@@ -41,6 +44,7 @@ c
       integer, allocatable :: ifixed(:,:)
       logical exist,query
       logical rotate,rotcheck
+      logical use_partial
       character*120 record
       character*120 string
 c
@@ -48,6 +52,12 @@ c
 c     initialize the number of rotatable torsional angles
 c
       nomega = 0
+c
+c     use partial structure, mark inactive any atoms that do not move;
+c     faster for limited torsions, only use with pairwise potentials
+c
+      use_partial = .true.
+      if (use_polar)  use_partial = .false.
 c
 c     use shortest rotlist if there is no absolute coordinate frame
 c
@@ -218,7 +228,7 @@ c
 c
 c     make inactive the atoms not rotatable via any torsion
 c
-      if (nuse .eq. n) then
+      if (use_partial .and. nuse.eq.n) then
          do i = 1, n
             use(i) = .false.
          end do

@@ -43,7 +43,7 @@ c
 c     set flags for residue naming and large value formatting
 c
       rename = .false.
-      reformat = .false.
+      reformat = .true.
 c
 c     open the output unit if not already done
 c
@@ -104,19 +104,19 @@ c
 c
 c     check for large values requiring extended formatting
 c
-      resmax = 0
-      crdmin = 0.0d0
-      crdmax = 0.0d0
-      do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
-            resmax = max(resmax,resid(resnum(i)))
-         else
-            resmax = max(resmax,resnum(i))
-         end if
-         crdmin = min(crdmin,xpdb(i),ypdb(i),zpdb(i))
-         crdmax = max(crdmax,xpdb(i),ypdb(i),zpdb(i))
-      end do
       if (reformat) then
+         resmax = 0
+         crdmin = 0.0d0
+         crdmax = 0.0d0
+         do i = 1, npdb
+            if (pdbtyp(i) .eq. 'ATOM  ') then
+               resmax = max(resmax,resid(resnum(i)))
+            else
+               resmax = max(resmax,resnum(i))
+            end if
+            crdmin = min(crdmin,xpdb(i),ypdb(i),zpdb(i))
+            crdmax = max(crdmax,xpdb(i),ypdb(i),zpdb(i))
+         end do
          if (npdb .ge. 100000)  atmc = 'i6'
          if (resmax .ge. 10000)  resc = 'i5'
          if (resmax .ge. 100000)  resc = 'i6'
@@ -149,6 +149,13 @@ c     perform deallocation of some local arrays
 c
       deallocate (resid)
       deallocate (chain)
+c
+c     check for large values requiring extended formatting
+c
+      if (reformat) then
+         if (npdb .ge. 100000)  atmc = 'i7'
+         if (npdb .ge. 10000)  atmc = 'i6'
+      end if
 c
 c     write any connectivity records for PDB atoms
 c

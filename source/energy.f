@@ -44,6 +44,7 @@ c
       et = 0.0d0
       ept = 0.0d0
       ebt = 0.0d0
+      eat = 0.0d0
       ett = 0.0d0
       ev = 0.0d0
       ec = 0.0d0
@@ -92,6 +93,7 @@ c
       if (use_tors)  call etors
       if (use_pitors)  call epitors
       if (use_strtor)  call estrtor
+      if (use_angtor)  call eangtor
       if (use_tortor)  call etortor
 c
 c     call the van der Waals energy component routines
@@ -122,8 +124,8 @@ c
 c     sum up to give the total potential energy
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
-     &          + et + ept + ebt + ett + ev + ec + ecd + ed + em
-     &          + ep + er + es + elf + eg + ex
+     &          + et + ept + ebt + eat + ett + ev + ec + ecd + ed
+     &          + em + ep + er + es + elf + eg + ex
       energy = esum
 c
 c     check for an illegal value for the total energy

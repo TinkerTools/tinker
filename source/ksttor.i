@@ -14,7 +14,7 @@ c
 c
 c     maxnbt   maximum number of stretch-torsion parameter entries
 c
-c     btcon    force constant parameters for stretch-torsion
+c     btcon    torsional amplitude parameters for stretch-torsion
 c     kbt      string of atom classes for stretch-torsion terms
 c
 c

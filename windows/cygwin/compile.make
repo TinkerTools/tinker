@@ -58,6 +58,10 @@ gfortran -c -O eangle.f
 gfortran -c -O eangle1.f
 gfortran -c -O eangle2.f
 gfortran -c -O eangle3.f
+gfortran -c -O eangtor.f
+gfortran -c -O eangtor1.f
+gfortran -c -O eangtor2.f
+gfortran -c -O eangtor3.f
 gfortran -c -O ebond.f
 gfortran -c -O ebond1.f
 gfortran -c -O ebond2.f
@@ -211,6 +215,7 @@ gfortran -c -O invert.f
 gfortran -c -O jacobi.f
 gfortran -c -O kangang.f
 gfortran -c -O kangle.f
+gfortran -c -O kangtor.f
 gfortran -c -O katom.f
 gfortran -c -O kbond.f
 gfortran -c -O kcharge.f

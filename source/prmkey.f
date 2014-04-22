@@ -108,6 +108,11 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_strtor = .true.
          if (value .eq. 'NONE')  use_strtor = .false.
+      else if (keyword(1:11) .eq. 'ANGTORTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call potoff
+         use_angtor = .true.
+         if (value .eq. 'NONE')  use_strtor = .false.
       else if (keyword(1:11) .eq. 'TORTORTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -255,6 +260,8 @@ c
          read (string,*,err=10,end=10)  ptorunit
       else if (keyword(1:11) .eq. 'STRTORUNIT ') then
          read (string,*,err=10,end=10)  storunit
+      else if (keyword(1:11) .eq. 'ANGTORUNIT ') then
+         read (string,*,err=10,end=10)  atorunit
       else if (keyword(1:11) .eq. 'TORTORUNIT ') then
          read (string,*,err=10,end=10)  ttorunit
 c
@@ -432,6 +439,7 @@ c
       use_tors = .false.
       use_pitors = .false.
       use_strtor = .false.
+      use_angtor = .false.
       use_tortor = .false.
       use_vdw = .false.
       use_charge = .false.

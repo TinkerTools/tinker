@@ -58,6 +58,10 @@ f77 -c -O -mips4 eangle.f
 f77 -c -O -mips4 eangle1.f
 f77 -c -O -mips4 eangle2.f
 f77 -c -O -mips4 eangle3.f
+f77 -c -O -mips4 eangtor.f
+f77 -c -O -mips4 eangtor1.f
+f77 -c -O -mips4 eangtor2.f
+f77 -c -O -mips4 eangtor3.f
 f77 -c -O -mips4 ebond.f
 f77 -c -O -mips4 ebond1.f
 f77 -c -O -mips4 ebond2.f
@@ -211,6 +215,7 @@ f77 -c -O -mips4 invert.f
 f77 -c -O -mips4 jacobi.f
 f77 -c -O -mips4 kangang.f
 f77 -c -O -mips4 kangle.f
+f77 -c -O -mips4 kangtor.f
 f77 -c -O -mips4 katom.f
 f77 -c -O -mips4 kbond.f
 f77 -c -O -mips4 kcharge.f

@@ -58,6 +58,10 @@ g95 -c -O2 eangle.f
 g95 -c -O2 eangle1.f
 g95 -c -O2 eangle2.f
 g95 -c -O2 eangle3.f
+g95 -c -O2 eangtor.f
+g95 -c -O2 eangtor1.f
+g95 -c -O2 eangtor2.f
+g95 -c -O2 eangtor3.f
 g95 -c -O2 ebond.f
 g95 -c -O2 ebond1.f
 g95 -c -O2 ebond2.f
@@ -211,6 +215,7 @@ g95 -c -O2 invert.f
 g95 -c -O2 jacobi.f
 g95 -c -O2 kangang.f
 g95 -c -O2 kangle.f
+g95 -c -O2 kangtor.f
 g95 -c -O2 katom.f
 g95 -c -O2 kbond.f
 g95 -c -O2 kcharge.f

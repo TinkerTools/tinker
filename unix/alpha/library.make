@@ -48,6 +48,10 @@ eangle.o \
 eangle1.o \
 eangle2.o \
 eangle3.o \
+eangtor.o \
+eangtor1.o \
+eangtor2.o \
+eangtor3.o \
 ebond.o \
 ebond1.o \
 ebond2.o \
@@ -198,6 +202,7 @@ invert.o \
 jacobi.o \
 kangang.o \
 kangle.o \
+kangtor.o \
 katom.o \
 kbond.o \
 kcharge.o \

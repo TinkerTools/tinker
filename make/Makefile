@@ -216,6 +216,10 @@ OBJS = active.o \
        eangle1.o \
        eangle2.o \
        eangle3.o \
+       eangtor.o \
+       eangtor1.o \
+       eangtor2.o \
+       eangtor3.o \
        ebond.o \
        ebond1.o \
        ebond2.o \
@@ -369,6 +373,7 @@ OBJS = active.o \
        jacobi.o \
        kangang.o \
        kangle.o \
+       kangtor.o \
        katom.o \
        kbond.o \
        kcharge.o \
@@ -840,6 +845,10 @@ libtinker.a: ${OBJS}
         eangle1.o \
         eangle2.o \
         eangle3.o \
+        eangtor.o \
+        eangtor1.o \
+        eangtor2.o \
+        eangtor3.o \
         ebond.o \
         ebond1.o \
         ebond2.o \
@@ -990,6 +999,7 @@ libtinker.a: ${OBJS}
         jacobi.o \
         kangang.o \
         kangle.o \
+        kangtor.o \
         katom.o \
         kbond.o \
         kcharge.o \
@@ -1159,6 +1169,10 @@ eangle.o: angle.i angpot.i atoms.i bound.i energi.i group.i math.i sizes.i usage
 eangle1.o: angle.i angpot.i atoms.i bound.i deriv.i energi.i group.i math.i sizes.i usage.i virial.i
 eangle2.o: angle.i angpot.i atoms.i bound.i deriv.i group.i hessn.i math.i sizes.i
 eangle3.o: action.i analyz.i angle.i angpot.i atmtyp.i atoms.i bound.i energi.i group.i inform.i iounit.i math.i sizes.i usage.i
+eangtor.o: angle.i angpot.i angtor.i atoms.i bound.i energi.i group.i math.i sizes.i torpot.i tors.i usage.i
+eangtor1.o: angle.i angpot.i angtor.i atoms.i bound.i deriv.i energi.i group.i math.i sizes.i torpot.i tors.i usage.i virial.i
+eangtor2.o: angle.i angpot.i angtor.i atoms.i bound.i group.i hessn.i math.i sizes.i torpot.i tors.i
+eangtor3.o: action.i analyz.i angle.i angpot.i angtor.i atmtyp.i atoms.i bound.i energi.i group.i inform.i iounit.i math.i sizes.i torpot.i tors.i usage.i
 ebond.o: atoms.i bndpot.i bond.i bound.i energi.i group.i sizes.i usage.i
 ebond1.o: atoms.i bndpot.i bond.i bound.i deriv.i energi.i group.i sizes.i usage.i virial.i
 ebond2.o: atmlst.i atoms.i bndpot.i bond.i bound.i couple.i group.i hessn.i sizes.i
@@ -1301,7 +1315,7 @@ induce.o: atoms.i bound.i boxes.i cell.i couple.i cutoff.i ewald.i gkstuf.i grou
 inertia.o: atmtyp.i atoms.i iounit.i math.i sizes.i
 initatom.o: ptable.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i boxes.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
-initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i merck.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
+initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i kantor.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i merck.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
 initres.o: resdue.i sizes.i
 initrot.o: atoms.i couple.i group.i inform.i iounit.i kgeoms.i math.i omega.i rotate.i sizes.i usage.i zcoord.i
 insert.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
@@ -1312,6 +1326,7 @@ invert.o: iounit.i
 jacobi.o: iounit.i
 kangang.o: angang.i angle.i atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i kanang.i keys.i potent.i sizes.i
 kangle.o: angle.i angpot.i atmtyp.i atoms.i bond.i couple.i fields.i inform.i iounit.i kangs.i keys.i merck.i potent.i ring.i sizes.i usage.i
+kangtor.o: angtor.i atmlst.i atmtyp.i atoms.i couple.i inform.i iounit.i kantor.i keys.i potent.i sizes.i tors.i
 katom.o: atmtyp.i atoms.i couple.i inform.i iounit.i katoms.i keys.i sizes.i
 kbond.o: angle.i atmlst.i atmtyp.i atoms.i bond.i couple.i fields.i inform.i iounit.i kbonds.i keys.i merck.i potent.i sizes.i tors.i usage.i
 kcharge.o: atmtyp.i atoms.i charge.i chgpot.i couple.i fields.i inform.i iounit.i kchrge.i keys.i merck.i potent.i sizes.i

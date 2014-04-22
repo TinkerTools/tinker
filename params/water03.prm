@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              AMOEBA-WATER
+forcefield              AMOEBA-WATER-2003
 
 bond-cubic              -2.55
 bond-quartic            3.793125
@@ -21,6 +21,27 @@ radiussize              DIAMETER
 epsilonrule             HHG
 dielectric              1.0
 polarization            MUTUAL
+vdw-12-scale            0.0
+vdw-13-scale            0.0
+vdw-14-scale            1.0
+vdw-15-scale            1.0
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.0
+polar-14-scale          1.0
+polar-15-scale          1.0
+polar-14-intra          0.5
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
 
 
       #############################

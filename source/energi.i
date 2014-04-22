@@ -25,6 +25,7 @@ c     eit    improper torsion potential energy of the system
 c     et     torsional potential energy of the system
 c     ept    pi-orbital torsion potential energy of the system
 c     ebt    stretch-torsion potential energy of the system
+c     eat    angle-torsion potential energy of the system
 c     ett    torsion-torsion potential energy of the system
 c     ev     van der Waals potential energy of the system
 c     ec     charge-charge potential energy of the system
@@ -42,8 +43,9 @@ c
       real*8 esum,eb,ea,eba
       real*8 eub,eaa,eopb,eopd
       real*8 eid,eit,et,ept
-      real*8 ebt,ett,ev,ec
-      real*8 ecd,ed,em,ep,er
-      real*8 es,elf,eg,ex
+      real*8 ebt,eat,ett,ev
+      real*8 ec,ecd,ed,em
+      real*8 ep,er,es,elf
+      real*8 eg,ex
       common /energi/ esum,eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,et,ept,
-     &                ebt,ett,ev,ec,ecd,ed,em,ep,er,es,elf,eg,ex
+     &                ebt,eat,ett,ev,ec,ecd,ed,em,ep,er,es,elf,eg,ex

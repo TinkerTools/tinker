@@ -58,6 +58,10 @@ pathf90 -c -O -msse3 -openmp eangle.f
 pathf90 -c -O -msse3 -openmp eangle1.f
 pathf90 -c -O -msse3 -openmp eangle2.f
 pathf90 -c -O -msse3 -openmp eangle3.f
+pathf90 -c -O -msse3 -openmp eangtor.f
+pathf90 -c -O -msse3 -openmp eangtor1.f
+pathf90 -c -O -msse3 -openmp eangtor2.f
+pathf90 -c -O -msse3 -openmp eangtor3.f
 pathf90 -c -O -msse3 -openmp ebond.f
 pathf90 -c -O -msse3 -openmp ebond1.f
 pathf90 -c -O -msse3 -openmp ebond2.f
@@ -211,6 +215,7 @@ pathf90 -c -O -msse3 -openmp invert.f
 pathf90 -c -O -msse3 -openmp jacobi.f
 pathf90 -c -O -msse3 -openmp kangang.f
 pathf90 -c -O -msse3 -openmp kangle.f
+pathf90 -c -O -msse3 -openmp kangtor.f
 pathf90 -c -O -msse3 -openmp katom.f
 pathf90 -c -O -msse3 -openmp kbond.f
 pathf90 -c -O -msse3 -openmp kcharge.f

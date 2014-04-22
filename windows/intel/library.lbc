@@ -37,6 +37,10 @@ eangle.obj
 eangle1.obj
 eangle2.obj
 eangle3.obj
+eangtor.obj
+eangtor1.obj
+eangtor2.obj
+eangtor3.obj
 ebond.obj
 ebond1.obj
 ebond2.obj
@@ -187,6 +191,7 @@ invert.obj
 jacobi.obj
 kangang.obj
 kangle.obj
+kangtor.obj
 katom.obj
 kbond.obj
 kcharge.obj

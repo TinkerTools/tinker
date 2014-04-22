@@ -58,6 +58,10 @@ f77 -c -fast -arch generic -tune generic eangle.f
 f77 -c -fast -arch generic -tune generic eangle1.f
 f77 -c -fast -arch generic -tune generic eangle2.f
 f77 -c -fast -arch generic -tune generic eangle3.f
+f77 -c -fast -arch generic -tune generic eangtor.f
+f77 -c -fast -arch generic -tune generic eangtor1.f
+f77 -c -fast -arch generic -tune generic eangtor2.f
+f77 -c -fast -arch generic -tune generic eangtor3.f
 f77 -c -fast -arch generic -tune generic ebond.f
 f77 -c -fast -arch generic -tune generic ebond1.f
 f77 -c -fast -arch generic -tune generic ebond2.f
@@ -211,6 +215,7 @@ f77 -c -fast -arch generic -tune generic invert.f
 f77 -c -fast -arch generic -tune generic jacobi.f
 f77 -c -fast -arch generic -tune generic kangang.f
 f77 -c -fast -arch generic -tune generic kangle.f
+f77 -c -fast -arch generic -tune generic kangtor.f
 f77 -c -fast -arch generic -tune generic katom.f
 f77 -c -fast -arch generic -tune generic kbond.f
 f77 -c -fast -arch generic -tune generic kcharge.f

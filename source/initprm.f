@@ -25,6 +25,7 @@ c
       include 'fields.i'
       include 'kanang.i'
       include 'kangs.i'
+      include 'kantor.i'
       include 'katoms.i'
       include 'kbonds.i'
       include 'kchrge.i'
@@ -143,6 +144,9 @@ c
       end do
       do i = 1, maxnbt
          kbt(i) = blank16
+      end do
+      do i = 1, maxnat
+         kat(i) = blank16
       end do
       do i = 1, maxntt
          ktt(i) = blank20
@@ -339,6 +343,7 @@ c
       torsunit = 1.0d0
       ptorunit = 1.0d0
       storunit = 1.0d0
+      atorunit = 1.0d0
       ttorunit = 1.0d0
 c
 c     set default control parameters for van der Waals terms
