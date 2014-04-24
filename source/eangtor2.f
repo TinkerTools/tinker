@@ -20,7 +20,6 @@ c
       implicit none
       include 'sizes.i'
       include 'angle.i'
-      include 'angpot.i'
       include 'angtor.i'
       include 'atoms.i'
       include 'bound.i'
@@ -34,18 +33,19 @@ c
       real*8 dedphi,d2edphi2,fgrp
       real*8 rt2,ru2,rtru,rcb
       real*8 rba2,rcb2,rdc2
-      real*8 xt,yt,zt,xu,yu,zu
+      real*8 dot,dt,d2dt
+      real*8 xt,yt,zt
+      real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
       real*8 v1,v2,v3
       real*8 c1,c2,c3
       real*8 s1,s2,s3
-      real*8 angle,dot
-      real*8 cosang,force
       real*8 terma,termb
       real*8 termc,termd
       real*8 sine,cosine
       real*8 sine2,cosine2
       real*8 sine3,cosine3
+      real*8 angle,cosang
       real*8 xia,yia,zia
       real*8 xib,yib,zib
       real*8 xic,yic,zic
@@ -68,10 +68,6 @@ c
       real*8 phi1,phi2,phi3
       real*8 dphi1,dphi2,dphi3
       real*8 d2phi1,d2phi2,d2phi3
-      real*8 dr,ddr,d2dr
-      real*8 ddrdx,ddrdy,ddrdz
-      real*8 d2drdxx,d2drdyy,d2drdzz
-      real*8 d2drdxy,d2drdxz,d2drdyz
       real*8 dphidxt,dphidyt,dphidzt
       real*8 dphidxu,dphidyu,dphidzu
       real*8 dphidxia,dphidyia,dphidzia
@@ -216,11 +212,21 @@ c
             ru2 = xu*xu + yu*yu + zu*zu
             rtru = sqrt(rt2 * ru2)
             if (rtru .ne. 0.0d0) then
+               xca = xic - xia
+               yca = yic - yia
+               zca = zic - zia
+               xdb = xid - xib
+               ydb = yid - yib
+               zdb = zid - zib
+               if (use_polymer) then
+                  call image (xca,yca,zca)
+                  call image (xdb,ydb,zdb)
+               end if
                rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
-c     compute the multiple angle trigonometry and the phase terms
+c     compute multiple angle trigonometry and phase terms
 c
                c1 = tors1(3,i)
                s1 = tors1(4,i)
@@ -242,42 +248,33 @@ c
                d2phi2 = -4.0d0 * (cosine2*c2 + sine2*s2)
                d2phi3 = -9.0d0 * (cosine3*c3 + sine3*s3)
 c
-c     set the angle-torsion parameters for this angle
+c     set the angle-torsion parameters for the first angle
 c
                v1 = kant(1,iangtor)
                v2 = kant(2,iangtor)
                v3 = kant(3,iangtor)
-c
-c     calculate the angle-torsion for the first angle 
-c
                k = iat(2,iangtor)
                dot = xab*xcb + yab*ycb + zab*zcb
                cosang = dot / sqrt(rba2*rcb2)
                angle = radian * acos(cosang)
-               dr = angle - anat(k)
-               force = ak(k)
-c
-c     calculate the angle-torsion master chain rule terms
-c
-               dedphi = -2.0d0 * angunit * force
-     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2 = -2.0d0 * angunit * force * dr
+               dt = angle - anat(k)
+               dedphi = atorunit * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2edphi2 = atorunit * dt
      &                       * (v1*d2phi1 + v2* d2phi2 + v3*d2phi3)
-               d2dr = -2.0d0 * angunit * force * radian
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               d2dt = atorunit * radian * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
                if (use_group) then
                   dedphi = dedphi * fgrp
                   d2edphi2 = d2edphi2 * fgrp
-                  d2dr = d2dr * fgrp
+                  d2dt = d2dt * fgrp
                end if
-               terma = -1.0d0 / (rba2*sqrt(rt2))
-               termc = 1.0d0 / (rcb2*sqrt(rt2))
 c
 c     first and second derivative components for the first angle
 c
+               terma = -1.0d0 / (rba2*sqrt(rt2))
+               termc = 1.0d0 / (rcb2*sqrt(rt2))
                domegadxia = terma * (zba*yt-yba*zt)
                domegadyia = terma * (xba*zt-zba*xt)
                domegadzia = terma * (yba*xt-xba*yt)
@@ -354,7 +351,7 @@ c
                doyibzib = -doyibzia - doyibzic
                dozibzib = -dozibzia - dozibzic
 c
-c     scale the first-derivatives of the first angle
+c     scale the first derivatives of the first angle
 c
                domegadxia = domegadxia * radian 
                domegadyia = domegadyia * radian
@@ -366,66 +363,56 @@ c
                domegadyib = domegadyib * radian
                domegadzib = domegadzib * radian
 c
-c     scale the second-derivatives of the first angle 
+c     scale the second derivatives of the first angle 
 c
-               doxiaxia = doxiaxia * d2dr 
-               doxiayia = doxiayia * d2dr 
-               doxiazia = doxiazia * d2dr 
-               doyiayia = doyiayia * d2dr 
-               doyiazia = doyiazia * d2dr 
-               doziazia = doziazia * d2dr 
-               doxicxic = doxicxic * d2dr 
-               doxicyic = doxicyic * d2dr 
-               doxiczic = doxiczic * d2dr 
-               doyicyic = doyicyic * d2dr 
-               doyiczic = doyiczic * d2dr 
-               doziczic = doziczic * d2dr 
-               doxiaxic = doxiaxic * d2dr 
-               doxiayic = doxiayic * d2dr 
-               doxiazic = doxiazic * d2dr 
-               doyiaxic = doyiaxic * d2dr 
-               doyiayic = doyiayic * d2dr 
-               doyiazic = doyiazic * d2dr 
-               doziaxic = doziaxic * d2dr 
-               doziayic = doziayic * d2dr 
-               doziazic = doziazic * d2dr 
-               doxibxia = doxibxia * d2dr 
-               doxibyia = doxibyia * d2dr 
-               doxibzia = doxibzia * d2dr 
-               doyibxia = doyibxia * d2dr 
-               doyibyia = doyibyia * d2dr 
-               doyibzia = doyibzia * d2dr 
-               dozibxia = dozibxia * d2dr 
-               dozibyia = dozibyia * d2dr 
-               dozibzia = dozibzia * d2dr 
-               doxibxic = doxibxic * d2dr 
-               doxibyic = doxibyic * d2dr 
-               doxibzic = doxibzic * d2dr 
-               doyibxic = doyibxic * d2dr 
-               doyibyic = doyibyic * d2dr 
-               doyibzic = doyibzic * d2dr 
-               dozibxic = dozibxic * d2dr 
-               dozibyic = dozibyic * d2dr 
-               dozibzic = dozibzic * d2dr 
-               doxibxib = doxibxib * d2dr 
-               doxibyib = doxibyib * d2dr 
-               doxibzib = doxibzib * d2dr 
-               doyibyib = doyibyib * d2dr 
-               doyibzib = doyibzib * d2dr 
-               dozibzib = dozibzib * d2dr 
+               doxiaxia = doxiaxia * d2dt 
+               doxiayia = doxiayia * d2dt 
+               doxiazia = doxiazia * d2dt 
+               doyiayia = doyiayia * d2dt 
+               doyiazia = doyiazia * d2dt 
+               doziazia = doziazia * d2dt 
+               doxicxic = doxicxic * d2dt 
+               doxicyic = doxicyic * d2dt 
+               doxiczic = doxiczic * d2dt 
+               doyicyic = doyicyic * d2dt 
+               doyiczic = doyiczic * d2dt 
+               doziczic = doziczic * d2dt 
+               doxiaxic = doxiaxic * d2dt 
+               doxiayic = doxiayic * d2dt 
+               doxiazic = doxiazic * d2dt 
+               doyiaxic = doyiaxic * d2dt 
+               doyiayic = doyiayic * d2dt 
+               doyiazic = doyiazic * d2dt 
+               doziaxic = doziaxic * d2dt 
+               doziayic = doziayic * d2dt 
+               doziazic = doziazic * d2dt 
+               doxibxia = doxibxia * d2dt 
+               doxibyia = doxibyia * d2dt 
+               doxibzia = doxibzia * d2dt 
+               doyibxia = doyibxia * d2dt 
+               doyibyia = doyibyia * d2dt 
+               doyibzia = doyibzia * d2dt 
+               dozibxia = dozibxia * d2dt 
+               dozibyia = dozibyia * d2dt 
+               dozibzia = dozibzia * d2dt 
+               doxibxic = doxibxic * d2dt 
+               doxibyic = doxibyic * d2dt 
+               doxibzic = doxibzic * d2dt 
+               doyibxic = doyibxic * d2dt 
+               doyibyic = doyibyic * d2dt 
+               doyibzic = doyibzic * d2dt 
+               dozibxic = dozibxic * d2dt 
+               dozibyic = dozibyic * d2dt 
+               dozibzic = dozibzic * d2dt 
+               doxibxib = doxibxib * d2dt 
+               doxibyib = doxibyib * d2dt 
+               doxibzib = doxibzib * d2dt 
+               doyibyib = doyibyib * d2dt 
+               doyibzib = doyibzib * d2dt 
+               dozibzib = dozibzib * d2dt 
 c
 c     abbreviations for first derivative chain rule terms
 c
-               xca = xic - xia
-               yca = yic - yia
-               zca = zic - zia
-               xdb = xid - xib
-               ydb = yid - yib
-               zdb = zid - zib
-               if (use_polymer) then
-                  call image (xca,yca,zca)
-                  call image (xdb,ydb,zdb)
-               end if
                dphidxt = (yt*zcb-ycb*zt) / (rt2*rcb)
                dphidyt = (zt*xcb-zcb*xt) / (rt2*rcb)
                dphidzt = (xt*ycb-xcb*yt) / (rt2*rcb)
@@ -488,7 +475,7 @@ c
                dxid = dedphi * dphidxid
                dyid = dedphi * dphidyid
                dzid = dedphi * dphidzid
-               dedphi = dedphi * dr
+               dedphi = dedphi * dt
 c
 c     chain rule terms for second derivative components
 c
@@ -1135,42 +1122,33 @@ c
      &                             + domegadzic*dzid
                end if
 c
-c     set the angle-torsion parameters for the second angle
+c     get the angle-torsion values for the second angle
 c
                v1 = kant(4,iangtor)
                v2 = kant(5,iangtor)
                v3 = kant(6,iangtor)
-c
-c     calculate the angle-torsion for the second angle
-c
                k = iat(3,iangtor)
                dot = xbc*xdc + ybc*ydc + zbc*zdc
                cosang = dot / sqrt(rcb2*rdc2)
                angle = radian * acos(cosang)
-               dr = angle - anat(k)
-               force = ak(k)
-c
-c     calculate the angle-torsion master chain rule terms
-c
-               dedphi = -2.0d0 * angunit * force
-     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2 = -2.0d0 * angunit * force * dr
+               dt = angle - anat(k)
+               dedphi = atorunit * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2edphi2 = atorunit * dt
      &                       * (v1*d2phi1 + v2* d2phi2 + v3*d2phi3)
-               d2dr = -2.0d0 * angunit * force * radian
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               d2dt = atorunit * radian * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
                if (use_group) then
                   dedphi = dedphi * fgrp
                   d2edphi2 = d2edphi2 * fgrp
-                  d2dr = d2dr * fgrp
+                  d2dt = d2dt * fgrp
                end if
-               termb = -1.0d0 / (rcb2*sqrt(ru2))
-               termd = 1.0d0 / (rdc2*sqrt(ru2))
 c
 c     first and second derivative components for the second angle
 c
+               termb = -1.0d0 / (rcb2*sqrt(ru2))
+               termd = 1.0d0 / (rdc2*sqrt(ru2))
                domegadxib = termb * (ybc*zu - zbc*yu)
                domegadyib = termb * (zbc*xu - xbc*zu)
                domegadzib = termb * (xbc*yu - ybc*xu)
@@ -1261,51 +1239,51 @@ c
 c
 c     scale the second-derivatives of the second angle 
 c
-               doxibxib = doxibxib * d2dr 
-               doxibyib = doxibyib * d2dr 
-               doxibzib = doxibzib * d2dr 
-               doyibyib = doyibyib * d2dr 
-               doyibzib = doyibzib * d2dr 
-               dozibzib = dozibzib * d2dr 
-               doxidxid = doxidxid * d2dr 
-               doxidyid = doxidyid * d2dr 
-               doxidzid = doxidzid * d2dr 
-               doyidyid = doyidyid * d2dr 
-               doyidzid = doyidzid * d2dr 
-               dozidzid = dozidzid * d2dr 
-               doxibxid = doxibxid * d2dr 
-               doxibyid = doxibyid * d2dr 
-               doxibzid = doxibzid * d2dr 
-               doyibxid = doyibxid * d2dr 
-               doyibyid = doyibyid * d2dr 
-               doyibzid = doyibzid * d2dr 
-               dozibxid = dozibxid * d2dr 
-               dozibyid = dozibyid * d2dr 
-               dozibzid = dozibzid * d2dr 
-               doxicxib = doxicxib * d2dr 
-               doxicyib = doxicyib * d2dr 
-               doxiczib = doxiczib * d2dr 
-               doyicxib = doyicxib * d2dr 
-               doyicyib = doyicyib * d2dr 
-               doyiczib = doyiczib * d2dr 
-               dozicxib = dozicxib * d2dr 
-               dozicyib = dozicyib * d2dr 
-               doziczib = doziczib * d2dr 
-               doxicxid = doxicxid * d2dr 
-               doxicyid = doxicyid * d2dr 
-               doxiczid = doxiczid * d2dr 
-               doyicxid = doyicxid * d2dr 
-               doyicyid = doyicyid * d2dr 
-               doyiczid = doyiczid * d2dr
-               dozicxid = dozicxid * d2dr
-               dozicyid = dozicyid * d2dr
-               doziczid = doziczid * d2dr
-               doxicxic = doxicxic * d2dr
-               doxicyic = doxicyic * d2dr
-               doxiczic = doxiczic * d2dr
-               doyicyic = doyicyic * d2dr
-               doyiczic = doyiczic * d2dr
-               doziczic = doziczic * d2dr 
+               doxibxib = doxibxib * d2dt
+               doxibyib = doxibyib * d2dt 
+               doxibzib = doxibzib * d2dt 
+               doyibyib = doyibyib * d2dt 
+               doyibzib = doyibzib * d2dt 
+               dozibzib = dozibzib * d2dt 
+               doxidxid = doxidxid * d2dt 
+               doxidyid = doxidyid * d2dt 
+               doxidzid = doxidzid * d2dt 
+               doyidyid = doyidyid * d2dt 
+               doyidzid = doyidzid * d2dt 
+               dozidzid = dozidzid * d2dt 
+               doxibxid = doxibxid * d2dt 
+               doxibyid = doxibyid * d2dt 
+               doxibzid = doxibzid * d2dt 
+               doyibxid = doyibxid * d2dt 
+               doyibyid = doyibyid * d2dt 
+               doyibzid = doyibzid * d2dt 
+               dozibxid = dozibxid * d2dt 
+               dozibyid = dozibyid * d2dt 
+               dozibzid = dozibzid * d2dt 
+               doxicxib = doxicxib * d2dt 
+               doxicyib = doxicyib * d2dt 
+               doxiczib = doxiczib * d2dt 
+               doyicxib = doyicxib * d2dt 
+               doyicyib = doyicyib * d2dt 
+               doyiczib = doyiczib * d2dt 
+               dozicxib = dozicxib * d2dt 
+               dozicyib = dozicyib * d2dt 
+               doziczib = doziczib * d2dt 
+               doxicxid = doxicxid * d2dt 
+               doxicyid = doxicyid * d2dt 
+               doxiczid = doxiczid * d2dt 
+               doyicxid = doyicxid * d2dt 
+               doyicyid = doyicyid * d2dt 
+               doyiczid = doyiczid * d2dt
+               dozicxid = dozicxid * d2dt
+               dozicyid = dozicyid * d2dt
+               doziczid = doziczid * d2dt
+               doxicxic = doxicxic * d2dt
+               doxicyic = doxicyic * d2dt
+               doxiczic = doxiczic * d2dt
+               doyicyic = doyicyic * d2dt
+               doyiczic = doyiczic * d2dt
+               doziczic = doziczic * d2dt 
 c
 c     chain rule terms for first derivative components
 c
@@ -1321,7 +1299,7 @@ c
                dxid = dedphi * dphidxid
                dyid = dedphi * dphidyid
                dzid = dedphi * dphidzid
-               dedphi = dedphi * dr
+               dedphi = dedphi * dt
 c
 c     increment diagonal and off-diagonal Hessian elements
 c

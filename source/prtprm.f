@@ -25,6 +25,7 @@ c
       include 'fields.i'
       include 'kanang.i'
       include 'kangs.i'
+      include 'kantor.i'
       include 'katoms.i'
       include 'kbonds.i'
       include 'kchrge.i'
@@ -792,41 +793,65 @@ c
  1000    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
          write (itxt,1010)
  1010    format (//,15x,'Stretch-Torsion Parameters',
-     &           ///,17x,'Classes',15x,'KST1',8x,'KST2',8x,'KST3',/)
+     &           ///,17x,'Classes',12x,'Bond',8x,'KST1',
+     &              8x,'KST2',8x,'KST3',/)
          do i = 1, maxnbt
             if (kbt(i) .eq. blank16)  goto 1030
             k1 = number(kbt(i)(1:4))
             k2 = number(kbt(i)(5:8))
             k3 = number(kbt(i)(9:12))
             k4 = number(kbt(i)(13:16))
-            write (itxt,1020)  i,k1,k2,k3,k4,(btcon(j,i),j=1,3)
- 1020       format (2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,3x,3f12.3)
+            write (itxt,1020)  i,k1,k2,k3,k4,(btcon(j,i),j=1,9)
+ 1020       format (2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,9x,'1st',3f12.3,
+     &              /,37x,'2nd',3f12.3,/,37x,'3rd',3f12.3)
          end do
  1030    continue
+      end if
+c
+c     angle-torsion parameters
+c
+      if (kat(1) .ne. blank16) then
+         write (itxt,1040)  formfeed,forcefield
+ 1040    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1050)
+ 1050    format (//,15x,'Angle-Torsion Parameters',
+     &           ///,17x,'Classes',12x,'Angle',7x,'KAT1',
+     &              8x,'KAT2',8x,'KAT3',/)
+         do i = 1, maxnat
+            if (kat(i) .eq. blank16)  goto 1070
+            k1 = number(kat(i)(1:4))
+            k2 = number(kat(i)(5:8))
+            k3 = number(kat(i)(9:12))
+            k4 = number(kat(i)(13:16))
+            write (itxt,1060)  i,k1,k2,k3,k4,(atcon(j,i),j=1,6)
+ 1060       format (2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,9x,'1st',3f12.3
+     &              /,37x,'2nd',3f12.3)
+         end do
+ 1070    continue
       end if
 c
 c     torsion-torsion parameters
 c
       if (ktt(1) .ne. blank20) then
-         write (itxt,1040)  formfeed,forcefield
- 1040    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
-         write (itxt,1050)
- 1050    format (//,15x,'Torsion-Torsion Parameters',
+         write (itxt,1080)  formfeed,forcefield
+ 1080    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1090)
+ 1090    format (//,15x,'Torsion-Torsion Parameters',
      &           ///,19x,'Classes',18x,'KNX',9x,'KNY')
          do i = 1, maxntt
-            if (ktt(i) .eq. blank20)  goto 1080
+            if (ktt(i) .eq. blank20)  goto 1120
             k1 = number(ktt(i)(1:4))
             k2 = number(ktt(i)(5:8))
             k3 = number(ktt(i)(9:12))
             k4 = number(ktt(i)(13:16))
             k5 = number(ktt(i)(17:20))
-            write (itxt,1060)  i,k1,k2,k3,k4,k5,tnx(i),tny(i)
- 1060       format (/,2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,'-',i4,2x,2i12,/)
+            write (itxt,1100)  i,k1,k2,k3,k4,k5,tnx(i),tny(i)
+ 1100       format (/,2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,'-',i4,2x,2i12,/)
             k = tnx(i) * tny(i)
-            write (itxt,1070)  (tbf(j,i),j=1,k)
- 1070       format (3x,6f12.4)
+            write (itxt,1110)  (tbf(j,i),j=1,k)
+ 1110       format (3x,6f12.4)
          end do
- 1080    continue
+ 1120    continue
       end if
 c
 c     atomic partial charge parameters
@@ -836,24 +861,24 @@ c
          if (chg(i) .ne. 0.0d0)  exist = .true.
       end do
       if (exist) then
-         write (itxt,1090)  formfeed,forcefield
- 1090    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
-         write (itxt,1100)
- 1100    format (//,15x,'Atomic Partial Charge Parameters',
+         write (itxt,1130)  formfeed,forcefield
+ 1130    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1140)
+ 1140    format (//,15x,'Atomic Partial Charge Parameters',
      &           ///,24x,'Type',9x,'Partial Chg',/)
          k = 0
          do i = 1, maxtyp
             if (chg(i) .ne. 0.0d0) then
                k = k + 1
-               write (itxt,1110)  k,i,chg(i)
- 1110          format (12x,i5,7x,i3,6x,f12.3)
+               write (itxt,1150)  k,i,chg(i)
+ 1150          format (12x,i5,7x,i3,6x,f12.3)
             end if
          end do
 c
 c     atomic partial charge scaling parameters
 c
-         write (itxt,1120)  c2scale,c3scale,c4scale,c5scale
- 1120    format (//,15x,'Atomic Partial Charge Scaling Factors',
+         write (itxt,1160)  c2scale,c3scale,c4scale,c5scale
+ 1160    format (//,15x,'Atomic Partial Charge Scaling Factors',
      &           ///,20x,'1-2 Atoms',f17.3,/,20x,'1-3 Atoms',f17.3,
      &           /,20x,'1-4 Atoms',f17.3,/,20x,'1-5 Atoms',f17.3)
       end if
@@ -861,98 +886,98 @@ c
 c     bond dipole moment parameters
 c
       if (kd(1) .ne. blank8) then
-         write (itxt,1130)  formfeed,forcefield
- 1130    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
-         write (itxt,1140)
- 1140    format (//,15x,'Bond Dipole Moment Parameters',
+         write (itxt,1170)  formfeed,forcefield
+ 1170    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1180)
+ 1180    format (//,15x,'Bond Dipole Moment Parameters',
      &           ///,25x,'Types',10x,'Bond Dipole',4x,'Position',/)
          do i = 1, maxnd
-            if (kd(i) .eq. blank8)  goto 1160
+            if (kd(i) .eq. blank8)  goto 1200
             k1 = number(kd(i)(1:4))
             k2 = number(kd(i)(5:8))
-            write (itxt,1150)  i,k1,k2,dpl(i),pos(i)
- 1150       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+            write (itxt,1190)  i,k1,k2,dpl(i),pos(i)
+ 1190       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
          end do
- 1160    continue
+ 1200    continue
       end if
 c
 c     bond dipole moment parameters for 5-membered rings
 c
       if (kd5(1) .ne. blank8) then
-         write (itxt,1170)
- 1170    format (//,15x,'5-Membered Ring Bond Dipole Parameters',
+         write (itxt,1210)
+ 1210    format (//,15x,'5-Membered Ring Bond Dipole Parameters',
      &           ///,25x,'Types',10x,'Bond Dipole',4x,'Position',/)
          do i = 1, maxnd5
-            if (kd5(i) .eq. blank8)  goto 1190
+            if (kd5(i) .eq. blank8)  goto 1230
             k1 = number(kd5(i)(1:4))
             k2 = number(kd5(i)(5:8))
-            write (itxt,1180)  i,k1,k2,dpl5(i),pos5(i)
- 1180       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+            write (itxt,1220)  i,k1,k2,dpl5(i),pos5(i)
+ 1220       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
          end do
- 1190    continue
+ 1230    continue
       end if
 c
 c     bond dipole moment parameters for 4-membered rings
 c
       if (kd4(1) .ne. blank8) then
-         write (itxt,1200)
- 1200    format (//,15x,'4-Membered Ring Bond Dipole Parameters',
+         write (itxt,1240)
+ 1240    format (//,15x,'4-Membered Ring Bond Dipole Parameters',
      &           ///,25x,'Types',10x,'Bond Dipole',4x,'Position',/)
          do i = 1, maxnd4
-            if (kd4(i) .eq. blank8)  goto 1220
+            if (kd4(i) .eq. blank8)  goto 1260
             k1 = number(kd4(i)(1:4))
             k2 = number(kd4(i)(5:8))
-            write (itxt,1210)  i,k1,k2,dpl4(i),pos4(i)
- 1210       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+            write (itxt,1250)  i,k1,k2,dpl4(i),pos4(i)
+ 1250       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
          end do
- 1220    continue
+ 1260    continue
       end if
 c
 c     bond dipole moment parameters for 3-membered rings
 c
       if (kd3(1) .ne. blank8) then
-         write (itxt,1230)
- 1230    format (//,15x,'3-Membered Ring Bond Dipole Parameters',
+         write (itxt,1270)
+ 1270    format (//,15x,'3-Membered Ring Bond Dipole Parameters',
      &           ///,25x,'Types',10x,'Bond Dipole',4x,'Position',/)
          do i = 1, maxnd3
-            if (kd3(i) .eq. blank8)  goto 1250
+            if (kd3(i) .eq. blank8)  goto 1290
             k1 = number(kd3(i)(1:4))
             k2 = number(kd3(i)(5:8))
-            write (itxt,1240)  i,k1,k2,dpl3(i),pos3(i)
- 1240       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+            write (itxt,1280)  i,k1,k2,dpl3(i),pos3(i)
+ 1280       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
          end do
- 1250    continue
+ 1290    continue
       end if
 c
 c     atomic multipole electrostatic parameters
 c
       if (kmp(1) .ne. blank16) then
-         write (itxt,1260)  formfeed,forcefield
- 1260    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
-         write (itxt,1270)
- 1270    format (//,17x,'Atomic Multipole Parameters',
+         write (itxt,1300)  formfeed,forcefield
+ 1300    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1310)
+ 1310    format (//,17x,'Atomic Multipole Parameters',
      &           ///,11x,'Type',7x,'Axis Types',8x,'Frame',
      &              9x,'Multipoles (M-D-Q)',/)
          do i = 1, maxnmp
-            if (kmp(i) .eq. blank16)  goto 1290
+            if (kmp(i) .eq. blank16)  goto 1330
             k1 = number(kmp(i)(1:4))
             k2 = number(kmp(i)(5:8))
             k3 = number(kmp(i)(9:12))
             k4 = number(kmp(i)(13:16))
-            write (itxt,1280)  i,k1,k2,k3,k4,mpaxis(i),multip(1,i),
+            write (itxt,1320)  i,k1,k2,k3,k4,mpaxis(i),multip(1,i),
      &                         multip(2,i),multip(3,i),multip(4,i),
      &                         multip(5,i),multip(8,i),multip(9,i),
      &                         multip(11,i),multip(12,i),multip(13,i)
- 1280       format (2x,i5,3x,i4,3x,i4,2x,i4,2x,i4,5x,a8,2x,f10.5,
+ 1320       format (2x,i5,3x,i4,3x,i4,2x,i4,2x,i4,5x,a8,2x,f10.5,
      &                 /,48x,3f10.5,/,48x,f10.5,
      &                 /,48x,2f10.5,/,48x,3f10.5)
          end do
- 1290    continue
+ 1330    continue
 c
 c     atomic multipole scaling parameters
 c
-         write (itxt,1300)  m2scale,m3scale,m4scale,m5scale
- 1300    format (//,15x,'Atomic Multipole Scaling Factors',
+         write (itxt,1340)  m2scale,m3scale,m4scale,m5scale
+ 1340    format (//,15x,'Atomic Multipole Scaling Factors',
      &           ///,20x,'1-2 Atoms',f17.3,/,20x,'1-3 Atoms',f17.3,
      &           /,20x,'1-4 Atoms',f17.3,/,20x,'1-5 Atoms',f17.3)
       end if
@@ -964,10 +989,10 @@ c
          if (polr(i) .ne. 0.0d0)  exist = .true.
       end do
       if (exist) then
-         write (itxt,1310)  formfeed,forcefield
- 1310    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
-         write (itxt,1320)
- 1320    format (//,15x,'Dipole Polarizability Parameters',
+         write (itxt,1350)  formfeed,forcefield
+ 1350    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1360)
+ 1360    format (//,15x,'Dipole Polarizability Parameters',
      &           ///,23x,'Type',7x,'Alpha',6x,'Damp',
      &              6x,'Group Atom Types',/)
          k = 0
@@ -979,28 +1004,28 @@ c
                   if (pgrp(j,i) .ne. 0)  npg = npg + 1
                end do
                if (npg .eq. 0) then
-                  write (itxt,1330)  k,i,polr(i),athl(i)
- 1330             format (10x,i5,7x,i4,3x,2f10.3)
+                  write (itxt,1370)  k,i,polr(i),athl(i)
+ 1370             format (10x,i5,7x,i4,3x,2f10.3)
                else
-                  write (itxt,1340)  k,i,polr(i),athl(i),
+                  write (itxt,1380)  k,i,polr(i),athl(i),
      &                               (pgrp(j,i),j=1,npg)
- 1340             format (10x,i5,7x,i4,3x,2f10.3,4x,6i5)
+ 1380             format (10x,i5,7x,i4,3x,2f10.3,4x,6i5)
                end if
             end if
          end do
 c
 c     dipole polarizability scaling parameters
 c
-         write (itxt,1350)  d1scale,d2scale,d3scale,d4scale
- 1350    format (//,15x,'Direct Induction Scaling Factors',
+         write (itxt,1390)  d1scale,d2scale,d3scale,d4scale
+ 1390    format (//,15x,'Direct Induction Scaling Factors',
      &           ///,20x,'1-1 Groups',f15.3,/,20x,'1-2 Groups',f15.3,
      &           /,20x,'1-3 Groups',f15.3,/,20x,'1-4 Groups',f15.3)
-         write (itxt,1360)  u1scale,u2scale,u3scale,u4scale
- 1360    format (//,15x,'Mutual Induction Scaling Factors',
+         write (itxt,1400)  u1scale,u2scale,u3scale,u4scale
+ 1400    format (//,15x,'Mutual Induction Scaling Factors',
      &           ///,20x,'1-1 Groups',f15.3,/,20x,'1-2 Groups',f15.3,
      &           /,20x,'1-3 Groups',f15.3,/,20x,'1-4 Groups',f15.3)
-         write (itxt,1370)  p2scale,p3scale,p4scale,p5scale,p41scale
- 1370    format (//,15x,'Polarizability Energy Scaling Factors',
+         write (itxt,1410)  p2scale,p3scale,p4scale,p5scale,p41scale
+ 1410    format (//,15x,'Polarizability Energy Scaling Factors',
      &           ///,20x,'1-2 Atoms',f16.3,/,20x,'1-3 Atoms',f16.3,
      &           /,20x,'1-4 Atoms',f16.3,/,20x,'1-5 Atoms',f16.3,
      &           /,20x,'1-4 Intra',f16.3)
@@ -1013,18 +1038,18 @@ c
          if (ionize(i) .ne. 0.0d0)  exist = .true.
       end do
       if (exist) then
-         write (itxt,1380)  formfeed,forcefield
- 1380    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
-         write (itxt,1390)
- 1390    format (//,15x,'Conjugated Pisystem Atom Parameters',
+         write (itxt,1420)  formfeed,forcefield
+ 1420    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+         write (itxt,1430)
+ 1430    format (//,15x,'Conjugated Pisystem Atom Parameters',
      &           ///,20x,'Class',3x,'Electron',
      &              3x,'Ionization',3x,'Repulsion',/)
          k = 0
          do i = 1, maxclass
             if (ionize(i) .ne. 0.0d0) then
                k = k + 1
-               write (itxt,1400)  k,i,electron(i),ionize(i),repulse(i)
- 1400          format (8x,i5,7x,i4,f10.1,2x,2f12.3)
+               write (itxt,1440)  k,i,electron(i),ionize(i),repulse(i)
+ 1440          format (8x,i5,7x,i4,f10.1,2x,2f12.3)
             end if
          end do
       end if
@@ -1032,49 +1057,49 @@ c
 c     conjugated pisystem bond parameters
 c
       if (kpi(1) .ne. blank8) then
-         write (itxt,1410)
- 1410    format (//,15x,'Conjugated Pisystem Bond Parameters',
+         write (itxt,1450)
+ 1450    format (//,15x,'Conjugated Pisystem Bond Parameters',
      &           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi
-            if (kpi(i) .eq. blank8)  goto 1430
+            if (kpi(i) .eq. blank8)  goto 1470
             k1 = number(kpi(i)(1:4))
             k2 = number(kpi(i)(5:8))
-            write (itxt,1420)  i,k1,k2,sslope(i),tslope(i)
- 1420       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1460)  i,k1,k2,sslope(i),tslope(i)
+ 1460       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
          end do
- 1430    continue
+ 1470    continue
       end if
 c
 c     conjugated pisystem bond parameters for 5-membered rings
 c
       if (kpi5(1) .ne. blank8) then
-         write (itxt,1440)
- 1440    format (//,15x,'5-Membered Ring Pisystem Bond Parameters',
+         write (itxt,1480)
+ 1480    format (//,15x,'5-Membered Ring Pisystem Bond Parameters',
      &           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi5
-            if (kpi5(i) .eq. blank8)  goto 1460
+            if (kpi5(i) .eq. blank8)  goto 1500
             k1 = number(kpi5(i)(1:4))
             k2 = number(kpi5(i)(5:8))
-            write (itxt,1450)  i,k1,k2,sslope5(i),tslope5(i)
- 1450       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1490)  i,k1,k2,sslope5(i),tslope5(i)
+ 1490       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
          end do
- 1460    continue
+ 1500    continue
       end if
 c
 c     conjugated pisystem bond parameters for 4-membered rings
 c
       if (kpi4(1) .ne. blank8) then
-         write (itxt,1470)
- 1470    format (//,15x,'4-Membered Ring Pisystem Bond Parameters',
+         write (itxt,1510)
+ 1510    format (//,15x,'4-Membered Ring Pisystem Bond Parameters',
      &           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi4
-            if (kpi4(i) .eq. blank8)  goto 1490
+            if (kpi4(i) .eq. blank8)  goto 1530
             k1 = number(kpi4(i)(1:4))
             k2 = number(kpi4(i)(5:8))
-            write (itxt,1480)  i,k1,k2,sslope4(i),tslope4(i)
- 1480       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1520)  i,k1,k2,sslope4(i),tslope4(i)
+ 1520       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
          end do
- 1490    continue
+ 1530    continue
       end if
       return
       end

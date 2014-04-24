@@ -22,4 +22,4 @@ c
       parameter (maxnbt=500)
       real*8 btcon
       character*16 kbt
-      common /ksttor/ btcon(3,maxnbt),kbt(maxnbt)
+      common /ksttor/ btcon(9,maxnbt),kbt(maxnbt)

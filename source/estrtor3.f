@@ -36,9 +36,10 @@ c
       include 'usage.i'
       integer i,k,istrtor
       integer ia,ib,ic,id
-      real*8 e,rcb,dr
-      real*8 angle,fgrp
+      real*8 e,dr,fgrp,angle
       real*8 rt2,ru2,rtru
+      real*8 rba,rcb,rdc
+      real*8 e1,e2,e3
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
@@ -127,27 +128,23 @@ c
             ru2 = xu*xu + yu*yu + zu*zu
             rtru = sqrt(rt2 * ru2)
             if (rtru .ne. 0.0d0) then
+               rba = sqrt(xba*xba + yba*yba + zba*zba)
                rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
+               rdc = sqrt(xdc*xdc + ydc*ydc + zdc*zdc)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
                cosine = min(1.0d0,max(-1.0d0,cosine))
                angle = radian * acos(cosine)
                if (sine .lt. 0.0d0)  angle = -angle
 c
-c     set the stretch-torsional parameters for this angle
+c     compute multiple angle trigonometry and phase terms
 c
-               v1 = kst(1,istrtor)
                c1 = tors1(3,i)
                s1 = tors1(4,i)
-               v2 = kst(2,istrtor)
                c2 = tors2(3,i)
                s2 = tors2(4,i)
-               v3 = kst(3,istrtor)
                c3 = tors3(3,i)
                s3 = tors3(4,i)
-c
-c     compute the multiple angle trigonometry and the phase terms
-c
                cosine2 = cosine*cosine - sine*sine
                sine2 = 2.0d0 * cosine * sine
                cosine3 = cosine*cosine2 - sine*sine2
@@ -156,26 +153,50 @@ c
                phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
                phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
 c
-c     calculate the bond-stretch for the central bond
+c     get the stretch-torsion values for the first bond
 c
+               v1 = kst(1,istrtor)
+               v2 = kst(2,istrtor)
+               v3 = kst(3,istrtor)
                k = ist(2,istrtor)
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
+               dr = rba - bl(k)
+               e1 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
+c
+c     get the stretch-torsion values for the second bond
+c
+               v1 = kst(4,istrtor)
+               v2 = kst(5,istrtor)
+               v3 = kst(6,istrtor)
+               k = ist(3,istrtor)
                dr = rcb - bl(k)
+               e2 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
-c     compute the stretch-torsion energy for this angle
+c     get the stretch-torsion values for the third bond
 c
-               e = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
+               v1 = kst(7,istrtor)
+               v2 = kst(8,istrtor)
+               v3 = kst(9,istrtor)
+               k = ist(4,istrtor)
+               dr = rdc - bl(k)
+               e3 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
-c
+               if (use_group) then
+                  e1 = e1 * fgrp
+                  e2 = e2 * fgrp
+                  e3 = e3 * fgrp
+               end if
+
 c     increment the total stretch-torsion energy
 c
                nebt = nebt + 1
+               e = e1 + e2 + e3
                ebt = ebt + e
-               aebt(ib) = aebt(ib) + 0.5d0*e
-               aebt(ic) = aebt(ic) + 0.5d0*e
+               aebt(ia) = aebt(ia) + 0.5d0*e1
+               aebt(ib) = aebt(ib) + 0.5d0*(e1+e2)
+               aebt(ic) = aebt(ic) + 0.5d0*(e2+e3)
+               aebt(id) = aebt(id) + 0.5d0*e3
 c
 c     print a message if the energy of this interaction is large
 c

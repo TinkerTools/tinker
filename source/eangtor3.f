@@ -22,7 +22,6 @@ c
       include 'action.i'
       include 'analyz.i'
       include 'angle.i'
-      include 'angpot.i'
       include 'angtor.i'
       include 'atmtyp.i'
       include 'atoms.i'
@@ -37,9 +36,11 @@ c
       include 'usage.i'
       integer i,k,iangtor
       integer ia,ib,ic,id
-      real*8 e,rcb,dr,fgrp
+      real*8 e,e1,e2
+      real*8 rcb,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba2,rcb2,rdc2
+      real*8 dot,dt,tangle
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
@@ -50,6 +51,7 @@ c
       real*8 sine2,cosine2
       real*8 sine3,cosine3
       real*8 phi1,phi2,phi3
+      real*8 angle,cosang
       real*8 xia,yia,zia
       real*8 xib,yib,zib
       real*8 xic,yic,zic
@@ -57,8 +59,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8 angle,dot,tangle
-      real*8 cosang,force
       logical proceed      
       logical header,huge
 c
@@ -139,7 +139,7 @@ c
                tangle = radian * acos(cosine) 
                if (sine .lt. 0.0d0)  tangle = -tangle
 c
-c     compute the multiple angle trigonometry and the phase terms
+c     compute multiple angle trigonometry and phase terms
 c
                c1 = tors1(3,i)
                s1 = tors1(4,i)
@@ -155,50 +155,46 @@ c
                phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
                phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
 c
-c     set the angle-torsion parameters for the first angle
+c     get the angle-torsion values for the first angle
 c
                v1 = kant(1,iangtor)
                v2 = kant(2,iangtor)
                v3 = kant(3,iangtor)
-c
-c     calculate the angle-torsion energy for the first angle 
-c
                k = iat(2,iangtor)
                dot = xba*xcb + yba*ycb + zba*zcb
                cosang = -dot / sqrt(rba2*rcb2)
                angle = radian * acos(cosang)
-               dr = angle - anat(k)
-               force = ak(k)
-               e = -2.0d0 * angunit * force * dr
-     &                * (v1*phi1 + v2*phi2 + v3*phi3)
+               dt = angle - anat(k)
+               e1 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
 c
-c     set the angle-torsion parameters for the second angle
+c     get the angle-torsion values for the second angle
 c
                v1 = kant(4,iangtor)
                v2 = kant(5,iangtor)
                v3 = kant(6,iangtor)
-c
-c     calculate the angle-torsion energy for the second angle
-c
                k = iat(3,iangtor)
                dot = xcb*xdc + ycb*ydc + zcb*zdc
                cosang = -dot / sqrt(rcb2*rdc2)
                angle = radian * acos(cosang)
-               dr = angle - anat(k)
-               force = ak(k)
-               e = e - 2.0d0 * angunit * force * dr
-     &                * (v1*phi1 + v2*phi2 + v3*phi3)
+               dt = angle - anat(k)
+               e2 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+               if (use_group) then
+                  e1 = e1 * fgrp
+                  e2 = e2 * fgrp
+               end if
 c
 c     increment the total torsional angle energy
 c
                neat = neat + 1
+               e = e1 + e2
                eat = eat + e
-               aeat(ib) = aeat(ib) + 0.5d0*e
-               aeat(ic) = aeat(ic) + 0.5d0*e
+               aeat(ia) = aeat(ia) + e1/3.0d0
+               aeat(ib) = aeat(ib) + e/3.0d0
+               aeat(ic) = aeat(ic) + e/3.0d0
+               aeat(id) = aeat(id) + e2/3.0d0
 c
 c     print a message if the energy of this interaction is large
 c

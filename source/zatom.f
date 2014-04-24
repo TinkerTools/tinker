@@ -114,7 +114,7 @@ c
                goto 20
             end if
          end do
-20       continue
+   20    continue
          if (iz4 .ne. 0) then
             call numeral (ita,pa,size)
             call numeral (itb,pb,size)

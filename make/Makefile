@@ -1122,7 +1122,7 @@ libtinker.a: ${OBJS}
 active.o: atoms.i inform.i iounit.i keys.i sizes.i usage.i
 alchemy.o: analyz.i atoms.i energi.i files.i inform.i iounit.i katoms.i mutant.i potent.i sizes.i units.i usage.i
 analysis.o: analyz.i atoms.i bound.i cutoff.i energi.i group.i inter.i iounit.i potent.i sizes.i vdwpot.i
-analyze.o: action.i analyz.i angang.i angle.i angpot.i atmtyp.i atoms.i bitor.i bond.i bound.i boxes.i charge.i chgpot.i couple.i cutoff.i dipole.i energi.i ewald.i fields.i files.i improp.i imptor.i inform.i inter.i iounit.i korbs.i ktrtor.i kvdws.i math.i molcul.i moment.i mpole.i opbend.i opdist.i piorbs.i pistuf.i pitors.i pme.i polar.i polgrp.i potent.i sizes.i solute.i strbnd.i strtor.i tors.i tortor.i units.i urey.i vdw.i vdwpot.i virial.i
+analyze.o: action.i analyz.i angang.i angle.i angpot.i angtor.i atmtyp.i atoms.i bitor.i bond.i bound.i boxes.i charge.i chgpot.i couple.i cutoff.i dipole.i energi.i ewald.i fields.i files.i improp.i imptor.i inform.i inter.i iounit.i korbs.i ktrtor.i kvdws.i math.i molcul.i moment.i mpole.i opbend.i opdist.i piorbs.i pistuf.i pitors.i pme.i polar.i polgrp.i potent.i sizes.i solute.i strbnd.i strtor.i tors.i tortor.i units.i urey.i vdw.i vdwpot.i virial.i
 angles.o: angle.i atmlst.i atoms.i couple.i iounit.i sizes.i
 anneal.o: atmtyp.i atoms.i bath.i bond.i bound.i inform.i iounit.i mdstuf.i potent.i sizes.i solute.i usage.i warp.i
 archive.o: atmtyp.i atoms.i bound.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i usage.i
@@ -1169,10 +1169,10 @@ eangle.o: angle.i angpot.i atoms.i bound.i energi.i group.i math.i sizes.i usage
 eangle1.o: angle.i angpot.i atoms.i bound.i deriv.i energi.i group.i math.i sizes.i usage.i virial.i
 eangle2.o: angle.i angpot.i atoms.i bound.i deriv.i group.i hessn.i math.i sizes.i
 eangle3.o: action.i analyz.i angle.i angpot.i atmtyp.i atoms.i bound.i energi.i group.i inform.i iounit.i math.i sizes.i usage.i
-eangtor.o: angle.i angpot.i angtor.i atoms.i bound.i energi.i group.i math.i sizes.i torpot.i tors.i usage.i
-eangtor1.o: angle.i angpot.i angtor.i atoms.i bound.i deriv.i energi.i group.i math.i sizes.i torpot.i tors.i usage.i virial.i
-eangtor2.o: angle.i angpot.i angtor.i atoms.i bound.i group.i hessn.i math.i sizes.i torpot.i tors.i
-eangtor3.o: action.i analyz.i angle.i angpot.i angtor.i atmtyp.i atoms.i bound.i energi.i group.i inform.i iounit.i math.i sizes.i torpot.i tors.i usage.i
+eangtor.o: angle.i angtor.i atoms.i bound.i energi.i group.i math.i sizes.i torpot.i tors.i usage.i
+eangtor1.o: angle.i angtor.i atoms.i bound.i deriv.i energi.i group.i math.i sizes.i torpot.i tors.i usage.i virial.i
+eangtor2.o: angle.i angtor.i atoms.i bound.i group.i hessn.i math.i sizes.i torpot.i tors.i
+eangtor3.o: action.i analyz.i angle.i angtor.i atmtyp.i atoms.i bound.i energi.i group.i inform.i iounit.i math.i sizes.i torpot.i tors.i usage.i
 ebond.o: atoms.i bndpot.i bond.i bound.i energi.i group.i sizes.i usage.i
 ebond1.o: atoms.i bndpot.i bond.i bound.i deriv.i energi.i group.i sizes.i usage.i virial.i
 ebond2.o: atmlst.i atoms.i bndpot.i bond.i bound.i couple.i group.i hessn.i sizes.i
@@ -1317,7 +1317,7 @@ initatom.o: ptable.i sizes.i
 initial.o: align.i atoms.i bath.i bound.i boxes.i cell.i files.i group.i inform.i iounit.i keys.i linmin.i minima.i molcul.i mutant.i neigh.i openmp.i output.i params.i pdb.i precis.i rigid.i scales.i sequen.i sizes.i socket.i warp.i zclose.i
 initprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i kantor.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i math.i merck.i mplpot.i polpot.i rxnpot.i sizes.i solute.i torpot.i units.i urypot.i vdwpot.i
 initres.o: resdue.i sizes.i
-initrot.o: atoms.i couple.i group.i inform.i iounit.i kgeoms.i math.i omega.i rotate.i sizes.i usage.i zcoord.i
+initrot.o: atoms.i couple.i group.i inform.i iounit.i kgeoms.i math.i omega.i potent.i rotate.i sizes.i usage.i zcoord.i
 insert.o: atmtyp.i atoms.i couple.i inform.i iounit.i sizes.i
 intedit.o: atmtyp.i atoms.i files.i iounit.i katoms.i sizes.i zcoord.i
 intxyz.o: files.i iounit.i titles.i
@@ -1394,7 +1394,7 @@ orient.o: atmtyp.i atoms.i group.i math.i rigid.i sizes.i
 orthog.o:
 overlap.o: units.i
 path.o: align.i atmtyp.i atoms.i files.i inform.i iounit.i linmin.i minima.i output.i paths.i sizes.i
-pdbxyz.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i iounit.i katoms.i pdb.i resdue.i sequen.i sizes.i
+pdbxyz.o: atmtyp.i atoms.i couple.i fields.i files.i inform.i iounit.i katoms.i pdb.i resdue.i sequen.i sizes.i titles.i
 picalc.o: atmtyp.i atoms.i bond.i border.i couple.i inform.i iounit.i orbits.i piorbs.i pistuf.i sizes.i tors.i units.i
 pmestuff.o: atoms.i boxes.i charge.i chunks.i mpole.i pme.i potent.i sizes.i
 pmpb.o: iounit.i
@@ -1413,7 +1413,7 @@ prterr.o: files.i output.i
 prtint.o: atmtyp.i atoms.i files.i inform.i sizes.i titles.i zclose.i zcoord.i
 prtmol2.o: atmtyp.i atoms.i bond.i couple.i files.i iounit.i sizes.i titles.i
 prtpdb.o: files.i pdb.i sequen.i sizes.i titles.i
-prtprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i mplpot.i polpot.i sizes.i urypot.i vdwpot.i
+prtprm.o: angpot.i bndpot.i chgpot.i fields.i kanang.i kangs.i kantor.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i mplpot.i polpot.i sizes.i urypot.i vdwpot.i
 prtseq.o: files.i sequen.i sizes.i
 prtxyz.o: atmtyp.i atoms.i bound.i boxes.i couple.i files.i inform.i sizes.i titles.i
 pss.o: atoms.i files.i hescut.i inform.i iounit.i math.i omega.i refer.i sizes.i tree.i warp.i zcoord.i
@@ -1429,7 +1429,7 @@ readint.o: atmtyp.i atoms.i files.i inform.i iounit.i sizes.i titles.i zclose.i 
 readmol.o: atmtyp.i atoms.i couple.i files.i iounit.i ptable.i sizes.i titles.i
 readmol2.o: atmtyp.i atoms.i couple.i files.i iounit.i sizes.i titles.i
 readpdb.o: files.i inform.i iounit.i pdb.i resdue.i sequen.i sizes.i titles.i
-readprm.o: fields.i iounit.i kanang.i kangs.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i merck.i params.i sizes.i
+readprm.o: fields.i iounit.i kanang.i kangs.i kantor.i katoms.i kbonds.i kchrge.i kdipol.i khbond.i kiprop.i kitors.i kmulti.i kopbnd.i kopdst.i korbs.i kpitor.i kpolr.i kstbnd.i ksttor.i ktorsn.i ktrtor.i kurybr.i kvdwpr.i kvdws.i merck.i params.i sizes.i
 readseq.o: files.i iounit.i resdue.i sequen.i sizes.i
 readxyz.o: atmtyp.i atoms.i bound.i boxes.i couple.i files.i inform.i iounit.i sizes.i titles.i
 replica.o: bound.i boxes.i cell.i inform.i iounit.i sizes.i

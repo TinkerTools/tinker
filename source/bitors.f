@@ -12,8 +12,8 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "bitors" finds the total number of bitorsions, pairs of
-c     overlapping dihedral angles, and the numbers of the five
+c     "bitors" finds the total number of bitorsions as pairs
+c     of adjacent dihedral angles, and the numbers of the five
 c     atoms defining each bitorsion
 c
 c

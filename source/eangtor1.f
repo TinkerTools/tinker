@@ -18,27 +18,27 @@ c
 c
       subroutine eangtor1
       implicit none
-      include 'math.i'
       include 'sizes.i'
       include 'angle.i'
-      include 'angpot.i'
       include 'angtor.i'
       include 'atoms.i'
       include 'bound.i'
       include 'deriv.i'
       include 'energi.i'
       include 'group.i'
+      include 'math.i'
       include 'torpot.i'
       include 'tors.i'
       include 'usage.i'
       include 'virial.i'
       integer i,k,iangtor
       integer ia,ib,ic,id
-      real*8 e,rcb,dr,fgrp
-      real*8 ddr,dedphi
+      real*8 e,e1,e2
+      real*8 rcb,fgrp
+      real*8 ddt,dedphi
       real*8 rt2,ru2,rtru
       real*8 rba2,rcb2,rdc2
-      real*8 ddrdx,ddrdy,ddrdz
+      real*8 dot,dt
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
@@ -50,6 +50,7 @@ c
       real*8 sine3,cosine3
       real*8 phi1,phi2,phi3
       real*8 dphi1,dphi2,dphi3
+      real*8 angle,cosang
       real*8 xia,yia,zia
       real*8 xib,yib,zib
       real*8 xic,yic,zic
@@ -59,8 +60,6 @@ c
       real*8 xdc,ydc,zdc
       real*8 xca,yca,zca
       real*8 xdb,ydb,zdb
-      real*8 angle,dot
-      real*8 cosang,force
       real*8 terma,termb
       real*8 termc,termd
       real*8 dedxt,dedyt,dedzt
@@ -144,11 +143,21 @@ c
             ru2 = xu*xu + yu*yu + zu*zu
             rtru = sqrt(rt2 * ru2)
             if (rtru .ne. 0.0d0) then
+               xca = xic - xia
+               yca = yic - yia
+               zca = zic - zia
+               xdb = xid - xib
+               ydb = yid - yib
+               zdb = zid - zib
+               if (use_polymer) then
+                  call image (xca,yca,zca)
+                  call image (xdb,ydb,zdb)
+               end if
                rcb = sqrt(rcb2)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
-c     compute the multiple angle trigonometry and the phase terms
+c     compute multiple angle trigonometry and phase terms
 c
                c1 = tors1(3,i)
                s1 = tors1(4,i)
@@ -172,43 +181,25 @@ c
                v1 = kant(1,iangtor)
                v2 = kant(2,iangtor)
                v3 = kant(3,iangtor)
-c
-c     calculate the angle-torsion for the first angle 
-c
                k = iat(2,iangtor)
                dot = xba*xcb + yba*ycb + zba*zcb
                cosang = -dot / sqrt(rba2*rcb2)
                angle = radian * acos(cosang)
-               dr = angle - anat(k)
-               force = ak(k)
-               e = -2.0d0 * angunit * force * dr
-     &                * (v1*phi1 + v2*phi2 + v3*phi3)
-               dedphi = -2.0d0 * angunit * force * dr
-     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               ddr = -2.0d0 * angunit * force * radian
-     &                  * (v1*phi1 + v2*phi2 + v3*phi3)
+               dt = angle - anat(k)
+               e1 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
+               dedphi = atorunit * dt * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               ddt = atorunit * radian * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
                if (use_group) then
+                  e1 = e1 * fgrp
                   dedphi = dedphi * fgrp
-                  ddr = ddr * fgrp
+                  ddt = ddt * fgrp
                end if
-               terma = -ddr / (rba2*sqrt(rt2))
-               termc = ddr / (rcb2*sqrt(rt2))
 c
-c     chain rule terms for first derivative components
+c     compute derivative components for this interaction
 c
-               xca = xic - xia
-               yca = yic - yia
-               zca = zic - zia
-               xdb = xid - xib
-               ydb = yid - yib
-               zdb = zid - zib
-               if (use_polymer) then
-                  call image (xca,yca,zca)
-                  call image (xdb,ydb,zdb)
-               end if
                dedxt = dedphi * (zcb*yt-ycb*zt) / (rt2*rcb)
                dedyt = dedphi * (xcb*zt-zcb*xt) / (rt2*rcb)
                dedzt = dedphi * (ycb*xt-xcb*yt) / (rt2*rcb)
@@ -216,59 +207,55 @@ c
                dedyu = dedphi * (zcb*xu-xcb*zu) / (ru2*rcb)
                dedzu = dedphi * (xcb*yu-ycb*xu) / (ru2*rcb)
 c
-c     compute derivative components for first interaction
+c     increment chain rule components for the first angle
 c
+               terma = -ddt / (rba2*sqrt(rt2))
+               termc = ddt / (rcb2*sqrt(rt2))
                dedxia = terma*(zba*yt-yba*zt) + zcb*dedyt - ycb*dedzt
                dedyia = terma*(xba*zt-zba*xt) + xcb*dedzt - zcb*dedxt
                dedzia = terma*(yba*xt-xba*yt) + ycb*dedxt - xcb*dedyt
                dedxib = terma*(yba*zt-zba*yt) + termc*(zcb*yt-ycb*zt)
-     &                  + yca*dedzt - zca*dedyt + zdc*dedyu - ydc*dedzu
+     &                     + yca*dedzt - zca*dedyt
+     &                     + zdc*dedyu - ydc*dedzu
                dedyib = terma*(zba*xt-xba*zt) + termc*(xcb*zt-zcb*xt)
-     &                  + zca*dedxt - xca*dedzt + xdc*dedzu - zdc*dedxu
+     &                     + zca*dedxt - xca*dedzt
+     &                     + xdc*dedzu - zdc*dedxu
                dedzib = terma*(xba*yt-yba*xt) + termc*(ycb*xt-xcb*yt)
-     &                  + xca*dedyt - yca*dedxt + ydc*dedxu - xdc*dedyu
+     &                     + xca*dedyt - yca*dedxt
+     &                     + ydc*dedxu - xdc*dedyu
                dedxic = termc*(ycb*zt-zcb*yt) + zba*dedyt 
-     &                  - yba*dedzt + ydb*dedzu - zdb*dedyu
+     &                     - yba*dedzt + ydb*dedzu - zdb*dedyu
                dedyic = termc*(zcb*xt-xcb*zt) + xba*dedzt 
-     &                  - zba*dedxt + zdb*dedxu - xdb*dedzu
+     &                     - zba*dedxt + zdb*dedxu - xdb*dedzu
                dedzic = termc*(xcb*yt-ycb*xt) + yba*dedxt 
-     &                  - xba*dedyt + xdb*dedyu - ydb*dedxu
+     &                     - xba*dedyt + xdb*dedyu - ydb*dedxu
                dedxid = zcb*dedyu - ycb*dedzu
                dedyid = xcb*dedzu - zcb*dedxu
                dedzid = ycb*dedxu - xcb*dedyu
 c
-c     set the angle-torsion parameters for the second angle
+c     get the angle-torsion values for the second angle
 c
                v1 = kant(4,iangtor)
                v2 = kant(5,iangtor)
                v3 = kant(6,iangtor)
-c
-c     calculate the angle-torsion for the second angle
-c
                k = iat(3,iangtor)
                dot = xcb*xdc + ycb*ydc + zcb*zdc
                cosang = -dot / sqrt(rcb2*rdc2)
                angle = radian * acos(cosang)
-               dr = angle - anat(k)
-               force = ak(k)               
-               e = e - 2.0d0 * angunit * force * dr
-     &                * (v1*phi1 + v2*phi2 + v3*phi3)
-               dedphi = -2.0d0 * angunit * force * dr
-     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               ddr = -2.0d0 * angunit * force * radian
-     &                  * (v1*phi1 + v2*phi2 + v3*phi3)
+               dt = angle - anat(k)
+               e2 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
+               dedphi = atorunit * dt * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               ddt = atorunit * radian * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
                if (use_group) then
-                  e = e * fgrp
+                  e2 = e2 * fgrp
                   dedphi = dedphi * fgrp
-                  ddr = ddr * fgrp
+                  ddt = ddt * fgrp
                end if
-               termb = -ddr / (rcb2*sqrt(ru2))
-               termd = ddr / (rdc2*sqrt(ru2))
 c
-c     chain rule terms for first derivative components
+c     compute derivative components for this interaction
 c
                dedxt = dedphi * (zcb*yt-ycb*zt) / (rt2*rcb)
                dedyt = dedphi * (xcb*zt-zcb*xt) / (rt2*rcb)
@@ -277,35 +264,38 @@ c
                dedyu = dedphi * (zcb*xu-xcb*zu) / (ru2*rcb)
                dedzu = dedphi * (xcb*yu-ycb*xu) / (ru2*rcb) 
 c
-c     compute derivative components for second interaction
+c     increment chain rule components for the second angle
 c
+               termb = -ddt / (rcb2*sqrt(ru2))
+               termd = ddt / (rdc2*sqrt(ru2))
                dedxia = dedxia + zcb*dedyt - ycb*dedzt
                dedyia = dedyia + xcb*dedzt - zcb*dedxt
                dedzia = dedzia + ycb*dedxt - xcb*dedyt
                dedxib = dedxib + termb*(zcb*yu-ycb*zu) + yca*dedzt
-     &                  - zca*dedyt + zdc*dedyu - ydc*dedzu
+     &                     - zca*dedyt + zdc*dedyu - ydc*dedzu
                dedyib = dedyib + termb*(xcb*zu-zcb*xu) + zca*dedxt
-     &                  - xca*dedzt + xdc*dedzu - zdc*dedxu
+     &                     - xca*dedzt + xdc*dedzu - zdc*dedxu
                dedzib = dedzib + termb*(ycb*xu-xcb*yu) + xca*dedyt
-     &                  - yca*dedxt + ydc*dedxu - xdc*dedyu
+     &                     - yca*dedxt + ydc*dedxu - xdc*dedyu
                dedxic = dedxic + termb*(ycb*zu-zcb*yu)
-     &                  + termd*(zdc*yu-ydc*zu) + zba*dedyt
-     &                  - yba*dedzt + ydb*dedzu - zdb*dedyu
+     &                     + termd*(zdc*yu-ydc*zu) + zba*dedyt
+     &                     - yba*dedzt + ydb*dedzu - zdb*dedyu
                dedyic = dedyic + termb*(zcb*xu-xcb*zu)
-     &                  + termd*(xdc*zu-zdc*xu) + xba*dedzt
-     &                  - zba*dedxt + zdb*dedxu - xdb*dedzu
+     &                     + termd*(xdc*zu-zdc*xu) + xba*dedzt
+     &                     - zba*dedxt + zdb*dedxu - xdb*dedzu
                dedzic = dedzic + termb*(xcb*yu-ycb*xu)
-     &                  + termd*(ydc*xu-xdc*yu) + yba*dedxt
-     &                  - xba*dedyt + xdb*dedyu - ydb*dedxu
+     &                     + termd*(ydc*xu-xdc*yu) + yba*dedxt
+     &                     - xba*dedyt + xdb*dedyu - ydb*dedxu
                dedxid = dedxid + termd*(ydc*zu-zdc*yu)
-     &                  + zcb*dedyu - ycb*dedzu
+     &                     + zcb*dedyu - ycb*dedzu
                dedyid = dedyid + termd*(zdc*xu-xdc*zu)
-     &                  + xcb*dedzu - zcb*dedxu
+     &                     + xcb*dedzu - zcb*dedxu
                dedzid = dedzid + termd*(xdc*yu-ydc*xu)
-     &                  + ycb*dedxu - xcb*dedyu
+     &                     + ycb*dedxu - xcb*dedyu
 c
 c     increment the angle-torsion energy and gradient
 c
+               e = e1 + e2
                eat = eat + e
                deat(1,ia) = deat(1,ia) + dedxia
                deat(2,ia) = deat(2,ia) + dedyia

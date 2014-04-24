@@ -19,4 +19,4 @@ c
 c
       integer nstrtor,ist
       real*8 kst
-      common /strtor/ kst(3,maxtors),nstrtor,ist(2,maxtors)
+      common /strtor/ kst(9,maxtors),nstrtor,ist(4,maxtors)

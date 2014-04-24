@@ -292,27 +292,27 @@ c
   140                   format (/,' Comparison of Analytical and',
      &                             ' Numerical Hessian Elements :',
      &                          //,3x,'1st Atom',4x,'2nd Atom',
-     &                             10x,'Analytical',8x,'Numerical',
-     &                             6x,'Difference',/)
+     &                             9x,'Analytical',8x,'Numerical',
+     &                             7x,'Difference',/)
                      end if
                      if (digits .ge. 8) then
                         write (iout,150)  i,axis(j),i,axis(j),
      &                                    hdiag(j,i),nhess(j,i,j,i),
      &                                    hdiag(j,i)-nhess(j,i,j,i)
-  150                   format (1x,i6,' (',a1,') ',1x,i6,' (', a1,') ',
-     &                             2x,2f17.8,f16.8)
+  150                   format (1x,i6,' (',a1,') ',1x,i6,' (',
+     &                             a1,') ',1x,3f17.8)
                      else if (digits .ge. 6) then
                         write (iout,160)  i,axis(j),i,axis(j),
      &                                    hdiag(j,i),nhess(j,i,j,i),
      &                                    hdiag(j,i)-nhess(j,i,j,i)
-  160                   format (1x,i6,' (',a1,') ',1x,i6,' (', a1,') ',
-     &                             2x,2f17.6,f16.6)
+  160                   format (1x,i6,' (',a1,') ',1x,i6,' (',
+     &                             a1,') ',1x,3f17.6)
                      else
                         write (iout,170)  i,axis(j),i,axis(j),
      &                                    hdiag(j,i),nhess(j,i,j,i),
      &                                    hdiag(j,i)-nhess(j,i,j,i)
-  170                   format (1x,i6,' (',a1,') ',1x,i6,' (', a1,') ',
-     &                             2x,2f17.4,f16.4)
+  170                   format (1x,i6,' (',a1,') ',1x,i6,' (',
+     &                             a1,') ',1x,3f17.4)
                      end if
                   end if
 c
@@ -331,27 +331,27 @@ c
   180                      format (/,' Comparison of Analytical and',
      &                                ' Numerical Hessian Elements :',
      &                             //,3x,'1st Atom',4x,'2nd Atom',
-     &                                10x,'Analytical',8x,'Numerical',
-     &                                6x,'Difference',/)
+     &                                9x,'Analytical',8x,'Numerical',
+     &                                7x,'Difference',/)
                         end if
                         if (digits .ge. 8) then
                            write (iout,190)  i,axis(j),ii,axis(jj),
      &                                       h(k),nhess(jj,ii,j,i),
      &                                       h(k)-nhess(jj,ii,j,i)
-  190                      format (1x,i6,' (',a1,') ',1x,i6,' (', a1,')
-     &',                              2x,2f17.8,f16.8)
+  190                      format (1x,i6,' (',a1,') ',1x,i6,' (',
+     &                                a1,') ',1x,3f17.8)
                         else if (digits .ge. 6) then
                            write (iout,200)  i,axis(j),ii,axis(jj),
      &                                       h(k),nhess(jj,ii,j,i),
      &                                       h(k)-nhess(jj,ii,j,i)
-  200                      format (1x,i6,' (',a1,') ',1x,i6,' (', a1,')
-     &',                              2x,2f17.6,f16.6)
+  200                      format (1x,i6,' (',a1,') ',1x,i6,' (',
+     &                                a1,') ',1x,3f17.6)
                         else
                            write (iout,210)  i,axis(j),ii,axis(jj),
      &                                       h(k),nhess(jj,ii,j,i),
      &                                       h(k)-nhess(jj,ii,j,i)
-  210                      format (1x,i6,' (',a1,') ',1x,i6,' (', a1,')
-     &',                              2x,2f17.4,f16.4)
+  210                      format (1x,i6,' (',a1,') ',1x,i6,' (',
+     &                                a1,') ',1x,3f17.4)
                         end if
                      end if
                   end do

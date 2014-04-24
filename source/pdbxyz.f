@@ -29,9 +29,11 @@ c
       include 'pdb.i'
       include 'resdue.i'
       include 'sequen.i'
+      include 'titles.i'
       integer i,j,it,next
       integer ipdb,ixyz,iseq
-      integer last,freeunit
+      integer last,pdbleng
+      integer freeunit
       integer, allocatable :: size(:)
       real*8 xi,yi,zi,rij
       real*8 rcut,rmax(0:9)
@@ -43,6 +45,7 @@ c
       character*120 pdbfile
       character*120 xyzfile
       character*120 seqfile
+      character*120 pdbtitle
 c
 c
 c     get the Protein Data Bank file and a parameter set
@@ -51,6 +54,11 @@ c
       call getpdb
       call field
       call unitcell
+c
+c     save the title line from the PDB file for later use
+c
+      pdbleng = ltitle
+      pdbtitle = title(1:ltitle)
 c
 c     decide whether the system has only biopolymers and water
 c
@@ -112,6 +120,7 @@ c     use special translation mechanisms used for biopolymers
 c
       do while (.not. abort)
          if (biopoly) then
+            n = 0
             do i = 1, nchain
                if (chntyp(i) .eq. 'PEPTIDE')  call ribosome (i)
                if (chntyp(i) .eq. 'NUCLEIC')  call ligase (i)
@@ -219,6 +228,8 @@ c
 c
 c     write the TINKER coordinates and reset the connectivities
 c
+         ltitle = pdbleng
+         title = pdbtitle(1:ltitle)
          call prtxyz (ixyz)
          do i = 1, n
             n12(i) = 0

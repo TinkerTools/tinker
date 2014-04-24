@@ -32,7 +32,7 @@ c
       parameter (maxline=100)
       parameter (maxunit=1000)
       parameter (maxword=1000)
-      parameter (maxfunc=71)
+      parameter (maxfunc=73)
       include 'iounit.i'
       integer i,j,k,mode
       integer idoc,isrc
@@ -76,9 +76,10 @@ c
      &             'PSS1',      'PSSRGD1',   'PSSROT1',   'PTINCY',
      &             'RANDOM',    'RMSFIT',    'ROTANG',    'ROTCHECK',
      &             'SADDLE1',   'SCAN1',     'SIGMOID',   'SNIFFER1',
-     &             'TORSER',    'TOTERR',    'TRANSIT',   'TRIMTEXT',
-     &             'TRIPLE',    'VALFIT1',   'VALRMS',    'VDWERR',
-     &             'VECANG',    'WATSON1',   'XTALLAT1' /
+     &             'TORFIT1',   'TORSER',    'TOTERR',    'TRANSIT',
+     &             'TRIMTEXT',  'TRIPLE',    'URYGUESS',  'VALFIT1',
+     &             'VALRMS',    'VDWERR',    'VECANG',    'WATSON1',
+     &             'XTALMIN1' /
 c
 c
 c     set flag to format for TINKER User's Guide under MediaWiki
