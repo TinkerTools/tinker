@@ -90,24 +90,25 @@ c
      &        /,4x,'(4) Deletion of Atoms outside Cutoff Range',
      &        /,4x,'(5) Insertion of Individual Specified Atoms',
      &        /,4x,'(6) Replace Old Atom Type with a New Type',
-     &        /,4x,'(7) Assign Connectivities based on Distance',
-     &        /,4x,'(8) Convert Units from Bohrs to Angstroms',
-     &        /,4x,'(9) Invert thru Origin to give Mirror Image',
-     &        /,3x,'(10) Translate All Atoms by an X,Y,Z-Vector',
-     &        /,3x,'(11) Translate Center of Mass to the Origin',
-     &        /,3x,'(12) Translate a Specified Atom to the Origin',
-     &        /,3x,'(13) Translate and Rotate to Inertial Frame',
-     &        /,3x,'(14) Move to Specified Rigid Body Coordinates',
-     &        /,3x,'(15) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(16) Delete Molecules outside of Periodic Box',
-     &        /,3x,'(17) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(18) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(19) Append a Second XYZ File to Current One')
+     &        /,4x,'(7) Assign Connectivities for Linear Chain',
+     &        /,4x,'(8) Assign Connectivities based on Distance',
+     &        /,4x,'(9) Convert Units from Bohrs to Angstroms',
+     &        /,3x,'(10) Invert thru Origin to give Mirror Image',
+     &        /,3x,'(11) Translate All Atoms by an X,Y,Z-Vector',
+     &        /,3x,'(12) Translate Center of Mass to the Origin',
+     &        /,3x,'(13) Translate a Specified Atom to the Origin',
+     &        /,3x,'(14) Translate and Rotate to Inertial Frame',
+     &        /,3x,'(15) Move to Specified Rigid Body Coordinates',
+     &        /,3x,'(16) Move Stray Molecules into Periodic Box',
+     &        /,3x,'(17) Delete Molecules outside of Periodic Box',
+     &        /,3x,'(18) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(19) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(20) Append a Second XYZ File to Current One')
 c
 c     get the desired type of coordinate file modification
 c
    20 continue
-      nmode = 19
+      nmode = 20
       mode = -1
       do while (mode.lt.0 .or. mode.gt.nmode)
          mode = 0
@@ -299,9 +300,27 @@ c
          goto 20
       end if
 c
-c     assign atom connectivities based on interatomic distances
+c     assign atom connectivities to produce a linear chain
 c
       if (mode .eq. 7) then
+         do i = 1, n
+            n12(i) = 0
+            if (i .ne. 1) then
+               n12(i) = n12(i) + 1
+               i12(n12(i),i) = i - 1
+            end if
+            if (i .ne. n) then
+               n12(i) = n12(i) + 1
+               i12(n12(i),i) = i + 1
+            end if
+         end do
+         write = .true.
+         goto 20
+      end if
+c
+c     assign atom connectivities based on interatomic distances
+c
+      if (mode .eq. 8) then
          call unitcell
          call lattice
          do i = 1, n
@@ -357,7 +376,7 @@ c
 c
 c     convert the coordinate units from Bohrs to Angstroms
 c
-      if (mode .eq. 8) then
+      if (mode .eq. 9) then
          do i = 1, n
             x(i) = x(i) * bohr
             y(i) = y(i) * bohr
@@ -369,7 +388,7 @@ c
 c
 c     get mirror image by inverting coordinates through origin
 c
-      if (mode .eq. 9) then
+      if (mode .eq. 10) then
          do i = 1, n
             x(i) = -x(i)
             y(i) = -y(i)
@@ -381,7 +400,7 @@ c
 c
 c     translate the entire system by a specified x,y,z-vector
 c
-      if (mode .eq. 10) then
+      if (mode .eq. 11) then
          xr = 0.0d0
          yr = 0.0d0
          zr = 0.0d0
@@ -402,7 +421,7 @@ c
 c
 c     translate the center of mass to the coordinate origin
 c
-      if (mode .eq. 11) then
+      if (mode .eq. 12) then
          xcm = 0.0d0
          ycm = 0.0d0
          zcm = 0.0d0
@@ -428,7 +447,7 @@ c
 c
 c     translate to place a specified atom at the origin
 c
-      if (mode .eq. 12) then
+      if (mode .eq. 13) then
          write (iout,260)
   260    format (/,' Number of the Atom to Move to the Origin :  ',$)
          read (input,270)  origin
@@ -447,7 +466,7 @@ c
 c
 c     translate and rotate into standard orientation
 c
-      if (mode .eq. 13) then
+      if (mode .eq. 14) then
          call inertia (2)
          write = .true.
          goto 20
@@ -455,7 +474,7 @@ c
 c
 c     translate and rotate to specified rigid body coordinates
 c
-      if (mode .eq. 14) then
+      if (mode .eq. 15) then
          xcm = 0.0d0
          ycm = 0.0d0
          zcm = 0.0d0
@@ -501,7 +520,7 @@ c
 c
 c     move stray molecules back into original periodic box
 c
-      if (mode .eq. 15) then
+      if (mode .eq. 16) then
          call unitcell
          if (use_bounds) then
             call lattice
@@ -514,7 +533,7 @@ c
 c
 c     remove molecules to trim periodic box to a smaller size
 c
-      if (mode .eq. 16) then
+      if (mode .eq. 17) then
          xbox = 0.0d0
          ybox = 0.0d0
          zbox = 0.0d0
@@ -584,7 +603,7 @@ c
 c
 c     create a random box full of the current coordinates file
 c
-      if (mode .eq. 17) then
+      if (mode .eq. 18) then
          write (iout,340)
   340    format (/,' Enter Number of Molecules in Box :  ',$)
          read (input,350)  nmolecule
@@ -634,14 +653,14 @@ c
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 18) then
+      if (mode .eq. 19) then
          call soak
          write = .true.
       end if
 c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 19) then
+      if (mode .eq. 20) then
          call makeref (1)
          call getxyz
          call merge (1)
