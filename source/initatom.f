@@ -17,9 +17,9 @@ c     periodic table
 c
 c
       subroutine initatom
+      use sizes
+      use ptable
       implicit none
-      include 'sizes.i'
-      include 'ptable.i'
       integer i
       character*3 atmsym(maxele)
 c

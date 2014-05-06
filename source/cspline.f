@@ -22,8 +22,8 @@ c     Springer Verlag, 1996, Section 10.1.2  [see routine "isplpe"]
 c
 c
       subroutine cspline (n,xn,fn,b,c,d,h,du,dm,rc,rs)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer i,n,iflag
       real*8 eps,average
       real*8 temp1,temp2

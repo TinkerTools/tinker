@@ -17,8 +17,8 @@ c     energy contribution
 c
 c
       subroutine extra
+      use energi
       implicit none
-      include 'energi.i'
 c
 c
 c     zero out the energy due to extra potential terms

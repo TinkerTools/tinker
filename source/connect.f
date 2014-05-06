@@ -17,12 +17,12 @@ c     starting from a set of internal coordinates
 c
 c
       subroutine connect
+      use sizes
+      use atoms
+      use couple
+      use zcoord
+      use zclose
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'zcoord.i'
-      include 'zclose.i'
       integer i,j,k
       integer id1,id2
 c

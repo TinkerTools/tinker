@@ -18,16 +18,16 @@ c     and contact-reentrant definitions are available
 c
 c
       program spacefill
+      use sizes
+      use atomid
+      use atoms
+      use files
+      use inform
+      use iounit
+      use kvdws
+      use math
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'usage.i'
       integer i,ixyz,next
       integer mode,frame
       integer freeunit

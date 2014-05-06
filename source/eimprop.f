@@ -16,16 +16,16 @@ c     "eimprop" calculates the improper dihedral potential energy
 c
 c
       subroutine eimprop
+      use sizes
+      use atoms
+      use bound
+      use energi
+      use group
+      use improp
+      use math
+      use torpot
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'improp.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'usage.i'
       integer i,ia,ib,ic,id
       real*8 e,dt,fgrp
       real*8 ideal,force

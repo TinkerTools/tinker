@@ -17,19 +17,19 @@ c     charge-dipole interaction energy for a single atom
 c
 c
       subroutine echgdpl2 (i)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use dipole
+      use group
+      use hessn
+      use shunt
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'dipole.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'shunt.i'
-      include 'units.i'
       integer i,k,jcell
       integer ii,i1,k1,k2
       integer, allocatable :: skip(:)

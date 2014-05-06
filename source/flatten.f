@@ -17,14 +17,14 @@ c     surface deformation for use with potential energy smoothing
 c
 c
       subroutine flatten
+      use sizes
+      use atoms
+      use fields
+      use inform
+      use iounit
+      use keys
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'warp.i'
       integer i,next
       logical query,exist
       character*7 stype

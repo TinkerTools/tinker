@@ -17,8 +17,8 @@ c     given the atomic numbers and distance of separation
 c
 c
       subroutine overlap (atmnum1,atmnum2,rang,ovlap)
+      use units
       implicit none
-      include 'units.i'
       integer atmnum1
       integer atmnum2
       integer na,nb,la,lb

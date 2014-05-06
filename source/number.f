@@ -17,9 +17,9 @@ c     the input string must contain only numeric characters
 c
 c
       function number (string)
+      use inform
+      use iounit
       implicit none
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,number
       integer first,last,trimtext
       integer digit,place(10)

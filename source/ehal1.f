@@ -17,12 +17,12 @@ c     its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine ehal1
+      use energi
+      use limits
+      use vdwpot
+      use virial
       implicit none
       real*8 elrc,vlrc
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'vdwpot.i'
-      include 'virial.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -61,24 +61,24 @@ c     using a pairwise double loop
 c
 c
       subroutine ehal1a
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use mutant
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mutant.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -572,27 +572,27 @@ c     using the method of lights
 c
 c
       subroutine ehal1b
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use iounit
+      use light
+      use molcul
+      use mutant
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'mutant.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -953,24 +953,24 @@ c     using a pairwise neighbor list
 c
 c
       subroutine ehal1c
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use mutant
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mutant.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -1059,7 +1059,7 @@ c
          virt(1,i) = vir(1,i)
          virt(2,i) = vir(2,i)
          virt(3,i) = vir(3,i)
-      end do 
+      end do
 c
 c     set OpenMP directives for the major loop structure
 c

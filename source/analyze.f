@@ -20,12 +20,12 @@ c     interactions and find electrostatic and inertial properties
 c
 c
       program analyze
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,ixyz
       integer frame
       integer freeunit
@@ -257,20 +257,20 @@ c     and the force field model
 c
 c
       subroutine systyze
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use ewald
+      use fields
+      use iounit
+      use limits
+      use molcul
+      use pme
+      use potent
+      use units
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'ewald.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'pme.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'vdwpot.i'
       integer i
       real*8 dens
       character*20 value
@@ -409,43 +409,43 @@ c     computation of each of the potential energy terms
 c
 c
       subroutine paramyze (active)
+      use sizes
+      use angang
+      use angbnd
+      use angpot
+      use angtor
+      use atomid
+      use atoms
+      use bitor
+      use bndstr
+      use charge
+      use dipole
+      use improp
+      use imptor
+      use iounit
+      use korbs
+      use ktrtor
+      use kvdws
+      use math
+      use mpole
+      use opbend
+      use opdist
+      use piorbs
+      use pistuf
+      use pitors
+      use polar
+      use polgrp
+      use potent
+      use solute
+      use strbnd
+      use strtor
+      use tors
+      use tortor
+      use units
+      use urey
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'angtor.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bond.i'
-      include 'charge.i'
-      include 'dipole.i'
-      include 'improp.i'
-      include 'imptor.i'
-      include 'iounit.i'
-      include 'korbs.i'
-      include 'ktrtor.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'opbend.i'
-      include 'opdist.i'
-      include 'piorbs.i'
-      include 'pistuf.i'
-      include 'pitors.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'strbnd.i'
-      include 'strtor.i'
-      include 'tors.i'
-      include 'tortor.i'
-      include 'units.i'
-      include 'urey.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ia,ib,ic
       integer id,ie,ig
@@ -1264,14 +1264,14 @@ c     intermolecular energies
 c
 c
       subroutine enrgyze
+      use sizes
+      use atoms
+      use inform
+      use inter
+      use iounit
+      use limits
+      use molcul
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
       real*8 energy
       character*120 fstr
 c
@@ -1312,12 +1312,13 @@ c     interactions for each of the potential energy terms
 c
 c
       subroutine partyze
-      include 'action.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'potent.i'
+      use action
+      use energi
+      use inform
+      use iounit
+      use limits
+      use potent
+      implicit none
       character*12 form1
       character*12 form2
       character*120 fstr
@@ -1472,10 +1473,11 @@ c     components, radius of gyration and moments of inertia
 c
 c
       subroutine momyze
-      include 'sizes.i'
-      include 'chgpot.i'
-      include 'iounit.i'
-      include 'moment.i'
+      use sizes
+      use chgpot
+      use iounit
+      use moment
+      implicit none
       real*8 rg
 c
 c
@@ -1525,10 +1527,12 @@ c     numerical dE/dV values, and the pressure
 c
 c
       subroutine viriyze
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'virial.i'
+      use sizes
+      use atoms
+      use iounit
+      use virial
+      implicit none
+      integer i
       real*8 energy
       real*8, allocatable :: derivs(:,:)
 c
@@ -1564,11 +1568,12 @@ c     down by atom and to a choice of precision
 c
 c
       subroutine atomyze (active)
-      include 'sizes.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
+      use sizes
+      use analyz
+      use atoms
+      use inform
+      use iounit
+      implicit none
       integer i
       logical active(*)
       character*120 fstr
@@ -1645,43 +1650,43 @@ c     is essentially the "paramyze" format from TINKER 4.3
 c
 c
       subroutine amberyze (active)
+      use sizes
+      use angang
+      use angbnd
+      use angpot
+      use angtor
+      use atomid
+      use atoms
+      use bitor
+      use bndstr
+      use charge
+      use dipole
+      use improp
+      use imptor
+      use iounit
+      use korbs
+      use ktrtor
+      use kvdws
+      use math
+      use mpole
+      use opbend
+      use opdist
+      use piorbs
+      use pistuf
+      use pitors
+      use polar
+      use polgrp
+      use potent
+      use solute
+      use strbnd
+      use strtor
+      use tors
+      use tortor
+      use units
+      use urey
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'angtor.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bond.i'
-      include 'charge.i'
-      include 'dipole.i'
-      include 'improp.i'
-      include 'imptor.i'
-      include 'iounit.i'
-      include 'korbs.i'
-      include 'ktrtor.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'opbend.i'
-      include 'opdist.i'
-      include 'piorbs.i'
-      include 'pistuf.i'
-      include 'pitors.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'strbnd.i'
-      include 'strtor.i'
-      include 'tors.i'
-      include 'tortor.i'
-      include 'units.i'
-      include 'urey.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k,m
       integer ia,ib,ic
       integer id,ie,ig
@@ -1972,7 +1977,7 @@ c
   400             format (/,' Out-of-Plane Bending Parameters :',
      &                    //,17x,'Atom Numbers',19x,'KOPB',/)
                end if
-               opbk(i) = opbk(i) * (opbunit/.02191418)
+               opbk(i) = opbk(i) * (opbunit/0.02191418d0)
                write (iout,410)  i,id,ib,ia,ic,opbk(i)
   410          format (i6,3x,4i6,9x,f10.4)
             end if
@@ -2478,11 +2483,11 @@ c     of all atom pairs that are 1-2 through 1-5 interactions
 c
 c
       subroutine connyze (active)
+      use sizes
+      use atoms
+      use couple
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
       integer i,j,k
       integer ntot
       integer ntot2,ntot3

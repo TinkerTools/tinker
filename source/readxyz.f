@@ -17,17 +17,17 @@ c     an external disk file
 c
 c
       subroutine readxyz (ixyz)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use couple
+      use files
+      use inform
+      use iounit
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'titles.i'
       integer i,j,k,m
       integer ixyz,nmax
       integer next,size

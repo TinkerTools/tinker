@@ -17,18 +17,18 @@ c     trigonal centers via a Wilson-Decius-Cross or Allinger angle
 c
 c
       subroutine eopbend
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use energi
+      use fields
+      use group
+      use math
+      use opbend
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'fields.i'
-      include 'group.i'
-      include 'math.i'
-      include 'opbend.i'
-      include 'usage.i'
       integer i,iopbend
       integer ia,ib,ic,id
       real*8 e,force,angle

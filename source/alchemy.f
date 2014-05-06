@@ -37,19 +37,19 @@ c     se_ap,se_am  standard error of free energy changes
 c
 c
       program alchemy
+      use sizes
+      use analyz
+      use atoms
+      use energi
+      use files
+      use inform
+      use iounit
+      use katoms
+      use mutant
+      use potent
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'energi.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'mutant.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k,ixyz,start,stop
       integer lext,next,freeunit
       integer istep,ilamb,nlamb

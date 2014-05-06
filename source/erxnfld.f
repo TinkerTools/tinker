@@ -22,14 +22,14 @@ c     Multipoles", Journal of Chemical Physics, 107, 481-492 (1997)
 c
 c
       subroutine erxnfld
+      use sizes
+      use atoms
+      use chgpot
+      use energi
+      use mpole
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'mpole.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer ix,iy,iz
@@ -111,13 +111,13 @@ c     of atomic multipoles
 c
 c
       subroutine erfik (ii,kk,i,k,rpi,rpk,eik)
+      use sizes
+      use atoms
+      use chgpot
+      use mpole
+      use rxnfld
+      use rxnpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chgpot.i'
-      include 'mpole.i'
-      include 'rxnfld.i'
-      include 'rxnpot.i'
       integer i,k,ii,kk
       integer isiz,ksiz
       integer m,n1,n2,nn
@@ -656,8 +656,8 @@ c     "ijkpts" stores a set of indices used during calculation
 c     of macroscopic reaction field energetics
 c
       subroutine ijkpts
+      use rxnfld
       implicit none
-      include 'rxnfld.i'
       integer i,j,k
 c
 c
@@ -686,8 +686,8 @@ c     reaction field recursive summation elements
 c
 c
       function d1d2 (n,x1,y1,z1,x2,y2,z2,d,r1sq,r2sq,i,j,k,s,t,u)
+      use rxnfld
       implicit none
-      include 'rxnfld.i'
       integer n,i,j,k
       integer s,t,u
       integer is,it,iu

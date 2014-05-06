@@ -18,17 +18,17 @@ c     new or changed parameter values
 c
 c
       subroutine kurey
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use inform
+      use iounit
+      use keys
+      use kurybr
+      use potent
+      use urey
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kurybr.i'
-      include 'potent.i'
-      include 'urey.i'
       integer i,j,nu
       integer ia,ib,ic
       integer ita,itb,itc
@@ -102,6 +102,12 @@ c
       do i = maxnu, 1, -1
          if (ku(i) .eq. blank)  nu = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iury))  allocate (iury(3,maxang))
+      if (.not. allocated(uk))  allocate (uk(maxang))
+      if (.not. allocated(ul))  allocate (ul(maxang))
 c
 c     assign the Urey-Bradley parameters for each angle
 c

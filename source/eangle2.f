@@ -20,14 +20,14 @@ c     optionally used
 c
 c
       subroutine eangle2 (i)
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use deriv
+      use group
+      use hessn
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'group.i'
-      include 'hessn.i'
       integer i,j,k
       integer ia,ib,ic,id
       real*8 eps,fgrp
@@ -170,15 +170,15 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangle2a (iatom)
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use group
+      use hessn
+      use math
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'math.i'
       integer i,iatom
       integer ia,ib,ic
       real*8 ideal,force
@@ -618,14 +618,14 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine eangle2b (i)
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use math
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'math.i'
       integer i,ia,ib,ic,id
       real*8 ideal,force
       real*8 dot,cosine,angle

@@ -17,22 +17,22 @@ c     for each atom in turn with respect to Cartesian coordinates
 c
 c
       subroutine hessian (h,hinit,hstop,hindex,hdiag)
+      use sizes
+      use atoms
+      use bound
+      use couple
+      use hescut
+      use hessn
+      use inform
+      use iounit
+      use limits
+      use mpole
+      use potent
+      use rigid
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'hescut.i'
-      include 'hessn.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,nhess
       integer hindex(*)
@@ -45,7 +45,10 @@ c
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
       real*8 hdiag(3,*)
+      logical first
       logical, allocatable :: keep(:)
+      save first
+      data first  / .true. /
 c
 c
 c     zero out total number of indexed Hessian elements
@@ -100,6 +103,15 @@ c
             yred(i) = rdn*(y(i)-y(ii)) + y(ii)
             zred(i) = rdn*(z(i)-z(ii)) + z(ii)
          end do
+      end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(hessx))  allocate (hessx(3,maxatm))
+         if (.not. allocated(hessy))  allocate (hessy(3,maxatm))
+         if (.not. allocated(hessz))  allocate (hessz(3,maxatm))
       end if
 c
 c     zero out the Hessian elements for the current atom

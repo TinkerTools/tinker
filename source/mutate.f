@@ -17,15 +17,15 @@ c     initial state, final state and mutation parameter "lambda"
 c
 c
       subroutine mutate
+      use sizes
+      use atomid
+      use atoms
+      use inform
+      use iounit
+      use katoms
+      use keys
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'keys.i'
-      include 'mutant.i'
       integer i,j,k,ihyb
       integer it0,it1,next
       integer list(20)
@@ -33,6 +33,15 @@ c
       character*120 record
       character*120 string
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(imut))  allocate (imut(n))
+      if (.not. allocated(type0))  allocate (type0(n))
+      if (.not. allocated(class0))  allocate (class0(n))
+      if (.not. allocated(type1))  allocate (type1(n))
+      if (.not. allocated(class1))  allocate (class1(n))
+      if (.not. allocated(mut))  allocate (mut(n))
 c
 c     set defaults for lambda and soft core vdw parameters
 c
@@ -66,7 +75,7 @@ c
             string = record(next:120)
             read (string,*,err=20)  vlambda
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
-            string = record(next:120) 
+            string = record(next:120)
             read (string,*,err=20)  elambda
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:120)
@@ -83,7 +92,7 @@ c
             read (string,*,err=10,end=10)  (list(k),k=1,20)
    10       continue
             k = 1
-            do while (list(k) .ne. 0) 
+            do while (list(k) .ne. 0)
                if (list(k) .gt. 0) then
                   j = list(k)
                   nmut = nmut + 1
@@ -141,14 +150,14 @@ c     based on the lambda mutation parameter "elmd"
 c
 c
       subroutine altelec
+      use sizes
+      use atoms
+      use charge
+      use mpole
+      use mutant
+      use polar
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'mpole.i'
-      include 'mutant.i'
-      include 'polar.i'
-      include 'potent.i'
       integer i,j,k
 c
 c

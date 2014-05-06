@@ -21,8 +21,8 @@ c     a     matrix to invert; contains inverse on exit
 c
 c
       subroutine invert (n,a)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer i,j,k,n
       integer icol,irow
       integer, allocatable :: ipivot(:)

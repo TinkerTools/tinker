@@ -17,9 +17,9 @@ c     in PDB file conversion and automated generation of structures
 c
 c
       subroutine initres
+      use sizes
+      use resdue
       implicit none
-      include 'sizes.i'
-      include 'resdue.i'
       integer i
       integer nt(maxamino),cat(maxamino)
       integer ct(maxamino),hnt(maxamino)
@@ -56,7 +56,7 @@ c
      &              'CYS', 'CYX', 'CYD', 'PRO', 'PHE', 'TYR', 'TYD',
      &              'TRP', 'HIS', 'HID', 'HIE', 'ASP', 'ASH', 'ASN',
      &              'GLU', 'GLH', 'GLN', 'MET', 'LYS', 'LYD', 'ARG',
-     &              'ORN', 'AIB', 'PCA', 'H2N', 'FOR', 'ACE', 'COH', 
+     &              'ORN', 'AIB', 'PCA', 'H2N', 'FOR', 'ACE', 'COH',
      &              'NH2', 'NME', 'UNK' /
 c
 c     supported nucleotide 1-letter and 3-letter codes

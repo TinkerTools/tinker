@@ -17,9 +17,9 @@ c     second derivatives for a single atom at a time
 c
 c
       subroutine egauss2 (i,xred,yred,zred)
+      use sizes
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'warp.i'
       integer i
       real*8 xred(*)
       real*8 yred(*)
@@ -49,18 +49,18 @@ c     second derivatives using a pairwise double loop
 c
 c
       subroutine egauss2a (iatom,xred,yred,zred)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use group
+      use hessn
+      use shunt
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'shunt.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -612,16 +612,16 @@ c     second derivatives for use with potential energy smoothing
 c
 c
       subroutine egauss2b (iatom,xred,yred,zred)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use group
+      use hessn
+      use vdw
+      use vdwpot
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'warp.i'
       integer i,j,k,iatom
       integer ii,iv,it
       integer kk,kv,kt

@@ -46,10 +46,10 @@ c
 c
       subroutine search (nvar,f,g,x,p,f_move,angle,ncalls,
      &                          fgvalue,status)
+      use sizes
+      use linmin
+      use math
       implicit none
-      include 'sizes.i'
-      include 'linmin.i'
-      include 'math.i'
       integer i,nvar
       integer ncalls
       integer intpln

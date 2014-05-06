@@ -23,15 +23,15 @@ c     101, 533-541 (1994)
 c
 c
       program gda
+      use sizes
+      use atoms
+      use files
+      use iounit
+      use minima
+      use potent
+      use vdwpot
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'minima.i'
-      include 'potent.i'
-      include 'vdwpot.i'
-      include 'warp.i'
       integer i,igda,itrial,ntrial
       integer nstep,nvar,nok,nbad
       integer lext,next,freeunit
@@ -263,11 +263,11 @@ c     ################################################################
 c
 c
       subroutine gda1 (beta,xx,g)
+      use sizes
+      use atoms
+      use iounit
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'warp.i'
       integer i,nvar
       integer, allocatable :: hinit(:)
       integer, allocatable :: hstop(:)
@@ -365,9 +365,9 @@ c     ################################################################
 c
 c
       function gda2 (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,nvar
       real*8 gda2,e
       real*8 xx(*)
@@ -423,9 +423,9 @@ c     #################################################################
 c
 c
       subroutine gda3 (mode,xx,h,hinit,hstop,hindex,hdiag)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,nvar
       integer hinit(*)
       integer hstop(*)

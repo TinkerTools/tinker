@@ -18,22 +18,22 @@ c     droplet restraints; also partitions energy among the atoms
 c
 c
       subroutine egeom3
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use math
+      use molcul
+      use restrn
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'kgeoms.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'usage.i'
       integer i,j,k
       integer ia,ib,ic,id
       real*8 e,dt,dt2,fgrp

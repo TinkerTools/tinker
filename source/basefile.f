@@ -17,9 +17,9 @@ c     consisting of any directory name and the base filename
 c
 c
       subroutine basefile (string)
+      use ascii
+      use files
       implicit none
-      include 'ascii.i'
-      include 'files.i'
       integer i,k,trimtext
       character*1 letter
       character*120 string

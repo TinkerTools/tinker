@@ -18,18 +18,18 @@ c     order to monitor the degree and rate of convergence
 c
 c
       program testpol
+      use sizes
+      use atoms
+      use bound
+      use inform
+      use iounit
+      use limits
+      use polar
+      use polpot
+      use potent
+      use rigid
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cutoff.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'units.i'
       integer i,j,k
       integer maxiter
       real*8 sum

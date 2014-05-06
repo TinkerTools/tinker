@@ -36,8 +36,8 @@ c                  first-order differential equations
 c
 c
       subroutine diffeq (nvar,y,x1,x2,eps,h1,hmin,nok,nbad,gvalue)
-      include 'sizes.i'
-      include 'iounit.i'
+      use iounit
+      implicit none
       real*8 tiny
       parameter (tiny=1.0d-30)
       integer i,nvar,nok,nbad
@@ -154,8 +154,8 @@ c     University Press, 1992, Section 16.4
 c
 c
       subroutine bsstep (nvar,x,dydx,y,htry,eps,yscal,hdid,hnext,gvalue)
-      include 'sizes.i'
-      include 'iounit.i'
+      use iounit
+      implicit none
       integer kmaxx,imax
       real*8 safe1,safe2
       real*8 redmax,redmin
@@ -265,7 +265,7 @@ c
                   red = 1.0d0 / err(km)
                   goto 40
                end if
-            else if (kopt .eq. kmax)then
+            else if (kopt .eq. kmax) then
                if (alf(km,kmax-1) .lt. err(km)) then
                   red = alf(km,kmax-1) * safe2 / err(km)
                   goto 40
@@ -326,7 +326,7 @@ c     integration of a set of first order differential equations
 c
 c
       subroutine mmid (nstep,htot,nvar,xs,dydx,y,yout,gvalue)
-      include 'sizes.i'
+      implicit none
       integer i,k
       integer nstep,nvar
       real*8 htot,h,h2
@@ -396,7 +396,8 @@ c     Bulirsch-Stoer integration of ordinary differential equations
 c
 c
       subroutine pzextr (iest,nvar,xest,yest,yz,dy)
-      include 'sizes.i'
+      use sizes
+      implicit none
       integer maxgda,imax
       parameter (maxgda=4*maxatm)
       parameter (imax=13)
@@ -468,12 +469,12 @@ c     for a GDA integration step; also saves the coordinates
 c
 c
       subroutine gdastat (nstep,beta,xx,status)
+      use sizes
+      use atoms
+      use iounit
+      use math
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'warp.i'
       integer i,nvar
       integer nstep
       real*8 beta

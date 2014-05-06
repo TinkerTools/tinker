@@ -23,13 +23,13 @@ c     Physics, 61, 138-153 (1985)
 c
 c
       subroutine lights (cutoff,nsite,xsort,ysort,zsort)
+      use sizes
+      use bound
+      use boxes
+      use cell
+      use iounit
+      use light
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'iounit.i'
-      include 'light.i'
       integer i,j,k,nsite
       real*8 cutoff,box
       real*8 xcut,ycut,zcut
@@ -40,6 +40,9 @@ c
       real*8, allocatable :: xfrac(:)
       real*8, allocatable :: yfrac(:)
       real*8, allocatable :: zfrac(:)
+      logical first
+      save first
+      data first  / .true. /
 c
 c
 c     check that maximum number of replicates is not exceeded
@@ -166,9 +169,27 @@ c
       deallocate (yfrac)
       deallocate (zfrac)
 c
-c     sort the coordinate components into ascending order
+c     perform dynamic allocation of some global arrays
 c
       nlight = (ncell+1) * nsite
+      if (first) then
+         first = .false.
+         if (.not. allocated(kbx))  allocate (kbx(nsite))
+         if (.not. allocated(kby))  allocate (kby(nsite))
+         if (.not. allocated(kbz))  allocate (kbz(nsite))
+         if (.not. allocated(kex))  allocate (kex(nsite))
+         if (.not. allocated(key))  allocate (key(nsite))
+         if (.not. allocated(kez))  allocate (kez(nsite))
+         if (.not. allocated(locx))  allocate (locx(nlight))
+         if (.not. allocated(locy))  allocate (locy(nlight))
+         if (.not. allocated(locz))  allocate (locz(nlight))
+         if (.not. allocated(rgx))  allocate (rgx(nlight))
+         if (.not. allocated(rgy))  allocate (rgy(nlight))
+         if (.not. allocated(rgz))  allocate (rgz(nlight))
+      end if
+c
+c     sort the coordinate components into ascending order
+c
       call sort2 (nlight,xsort,locx)
       call sort2 (nlight,ysort,locy)
       call sort2 (nlight,zsort,locz)

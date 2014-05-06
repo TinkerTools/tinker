@@ -16,15 +16,15 @@ c     "ebond" calculates the bond stretching energy
 c
 c
       subroutine ebond
+      use sizes
+      use atoms
+      use bndpot
+      use bndstr
+      use bound
+      use energi
+      use group
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bndpot.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'usage.i'
       integer i,ia,ib
       real*8 e,ideal,force
       real*8 expterm,bde

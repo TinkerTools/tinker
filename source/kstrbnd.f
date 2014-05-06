@@ -17,21 +17,21 @@ c     and processes new or changed parameter values
 c
 c
       subroutine kstrbnd
+      use sizes
+      use angbnd
+      use angpot
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use fields
+      use inform
+      use iounit
+      use keys
+      use kstbnd
+      use potent
+      use strbnd
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kstbnd.i'
-      include 'potent.i'
-      include 'strbnd.i'
       integer i,j,k,nsb
       integer ia,ib,ic
       integer ita,itb,itc
@@ -109,6 +109,11 @@ c
       do i = maxnsb, 1, -1
          if (ksb(i) .eq. blank)  nsb = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(isb))  allocate (isb(3,maxang))
+      if (.not. allocated(sbk))  allocate (sbk(2,maxang))
 c
 c     use special stretch-bend parameter assignment method for MMFF
 c
@@ -207,16 +212,16 @@ c     616-641 (1995)
 c
 c
       subroutine kstrbndm
+      use sizes
+      use angbnd
+      use atmlst
+      use atomid
+      use couple
+      use merck
+      use potent
+      use ring
+      use strbnd
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'couple.i'
-      include 'merck.i'
-      include 'potent.i'
-      include 'ring.i'
-      include 'strbnd.i'
       integer i,j,k,l,m
       integer ia,ib,ic
       integer ita,itb,itc
@@ -305,7 +310,7 @@ c
                if (ab.eq.1 .and. bc.eq.0)  stbnt = 1
                if (ab.eq.0 .and. bc.eq.1)  stbnt = 2
                if (ab.eq.1 .and. bc.eq.1)  stbnt = 3
-               if (stbnt.eq.0 .AND. ring3) then           
+               if (stbnt.eq.0 .AND. ring3) then
                   stbnt = 5
                else if (stbnt.eq.1 .and. ring3) then
                   stbnt = 6
@@ -364,8 +369,8 @@ c
                      ab = 1
                   end if
                end do
-               if (ab.eq.1 .and. bc.eq.0)  stbnt = 1 
-               if (ab.eq.0 .and. bc.eq.1)  stbnt = 2 
+               if (ab.eq.1 .and. bc.eq.0)  stbnt = 1
+               if (ab.eq.0 .and. bc.eq.1)  stbnt = 2
                if (ab.eq.1 .and. bc.eq.1)  stbnt = 3
                if (stbnt.eq.0 .and. ring3) then
                   stbnt = 5
@@ -586,7 +591,7 @@ c
                   isb(3,nstrbnd) = nb2
                   sbk(1,nstrbnd) = stbn_abc1(ita,itb,itc)
                   sbk(2,nstrbnd) = stbn_cba1(ita,itb,itc)
-               else 
+               else
                   nstrbnd = nstrbnd + 1
                   isb(1,nstrbnd) = i
                   isb(2,nstrbnd) = nb1

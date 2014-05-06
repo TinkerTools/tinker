@@ -17,17 +17,17 @@ c     dipole-dipole interaction energy for a single atom
 c
 c
       subroutine edipole2 (i)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use chgpot
+      use dipole
+      use group
+      use hessn
+      use units
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'dipole.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'units.i'
-      include 'shunt.i'
       integer i,i1,i2,k1,k2
       integer jcell,idipole,kdipole
       real*8 f,fi,fik,fgrp

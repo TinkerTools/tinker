@@ -18,22 +18,22 @@ c     all atom pairs or only those specified by the user
 c
 c
       program superpose
+      use sizes
+      use align
+      use atomid
+      use atoms
+      use bound
+      use files
+      use inform
+      use iounit
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'align.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'titles.i'
       integer i,ixyz,next
       integer n1,i1,n2,i2
       integer leng1,leng2
       integer ifile1,ifile2
       integer frame1,frame2
-      integer last1
+      integer nmax,last1
       integer start,stop
       integer option,delta
       integer trimtext,freeunit
@@ -183,6 +183,12 @@ c
      &                 ' Different Numbers of Atoms')
          end if
       end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      nmax = max(n1,n2)
+      allocate (ifit(2,nmax))
+      allocate (wfit(nmax))
 c
 c     setup automatic superposition with option to omit hydrogens
 c

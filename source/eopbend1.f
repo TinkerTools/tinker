@@ -18,19 +18,19 @@ c     or Allinger angle
 c
 c
       subroutine eopbend1
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use math
+      use opbend
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'opbend.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,iopbend
       integer ia,ib,ic,id
       real*8 e,angle,force

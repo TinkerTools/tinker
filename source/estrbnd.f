@@ -16,18 +16,18 @@ c     "estrbnd" calculates the stretch-bend potential energy
 c
 c
       subroutine estrbnd
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bndstr
+      use bound
+      use energi
+      use group
+      use math
+      use strbnd
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'strbnd.i'
-      include 'usage.i'
       integer i,j,k,istrbnd
       integer ia,ib,ic
       real*8 e,dr1,dr2,dt

@@ -17,9 +17,9 @@ c     their presence within a single 3- to 6-membered ring
 c
 c
       subroutine chkring (iring,ia,ib,ic,id)
+      use sizes
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'couple.i'
       integer i,j,k,m,p,q,r
       integer ia,ib,ic,id
       integer iring,nset

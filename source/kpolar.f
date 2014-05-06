@@ -17,18 +17,18 @@ c     within the structure and processes any new or changed values
 c
 c
       subroutine kpolar
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use keys
+      use kpolr
+      use mpole
+      use polar
+      use polpot
+      use potent
+      use usolve
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kpolr.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'usolve.i'
       integer i,j,k
       integer npg,next
       integer pg(maxval)
@@ -92,6 +92,16 @@ c
             end if
          end if
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(polarity))  allocate (polarity(maxatm))
+      if (.not. allocated(thole))  allocate (thole(maxatm))
+      if (.not. allocated(pdamp))  allocate (pdamp(maxatm))
+      if (.not. allocated(uind))  allocate (uind(3,maxatm))
+      if (.not. allocated(uinp))  allocate (uinp(3,maxatm))
+      if (.not. allocated(uinds))  allocate (uinds(3,maxatm))
+      if (.not. allocated(uinps))  allocate (uinps(3,maxatm))
 c
 c     find and store the atomic dipole polarizability parameters
 c
@@ -181,13 +191,11 @@ c
       if (npole .eq. 0)  use_mpole = .false.
       if (npolar .eq. 0)  use_polar = .false.
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
       if (use_polar) then
-         if (associated(mindex))  deallocate (mindex)
-         if (associated(minv))  deallocate (minv)
-         allocate (mindex(npole))
-         allocate (minv(3*maxulst*npole))
+         if (.not. allocated(mindex))  allocate (mindex(npole))
+         if (.not. allocated(minv))  allocate (minv(3*maxulst*npole))
       end if
       return
       end
@@ -206,15 +214,15 @@ c     connectivities
 c
 c
       subroutine polargrp
+      use sizes
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use kpolr
+      use mpole
+      use polgrp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kpolr.i'
-      include 'mpole.i'
-      include 'polgrp.i'
       integer maxlist,maxkeep
       parameter (maxkeep=100)
       parameter (maxlist=1000)
@@ -223,11 +231,28 @@ c
       integer jj,kk
       integer start,stop
       integer nlist,nkeep
+      integer maxp11,maxp12
+      integer maxp13,maxp14
       integer keep(maxkeep)
       integer list(maxlist)
       integer, allocatable :: mask(:)
       logical done
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      maxp11 = 150
+      maxp12 = 50
+      maxp13 = 50
+      maxp14 = 50
+      if (.not. allocated(np11))  allocate (np11(maxatm))
+      if (.not. allocated(np12))  allocate (np12(maxatm))
+      if (.not. allocated(np13))  allocate (np13(maxatm))
+      if (.not. allocated(np14))  allocate (np14(maxatm))
+      if (.not. allocated(ip11))  allocate (ip11(maxp11,maxatm))
+      if (.not. allocated(ip12))  allocate (ip12(maxp12,maxatm))
+      if (.not. allocated(ip13))  allocate (ip13(maxp13,maxatm))
+      if (.not. allocated(ip14))  allocate (ip14(maxp14,maxatm))
 c
 c     find the directly connected group members for each atom
 c

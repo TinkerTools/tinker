@@ -17,9 +17,9 @@ c     set to the origin during least squares superposition
 c
 c
       subroutine center (n1,x1,y1,z1,n2,x2,y2,z2,xmid,ymid,zmid)
+      use sizes
+      use align
       implicit none
-      include 'sizes.i'
-      include 'align.i'
       integer i,k,n1,n2
       real*8 weigh,norm
       real*8 xmid,ymid,zmid

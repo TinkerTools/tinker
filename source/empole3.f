@@ -18,13 +18,13 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine empole3
+      use sizes
+      use analyz
+      use energi
+      use limits
+      use mpole
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'analyz.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'mpole.i'
-      include 'potent.i'
       integer i,ii
 c
 c
@@ -77,32 +77,32 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine empole3a
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use math
+      use molcul
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer ix,iy,iz
@@ -677,32 +677,32 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine empole3b
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use math
+      use molcul
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk,kkk
       integer ix,iy,iz
@@ -800,7 +800,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP PARALLEL default(shared) firstprivate(f)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,pdi,pti,pgamma,
 !$OMP& scale3,scale5,scale7,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
 !$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
@@ -1087,19 +1087,19 @@ c     among the atoms
 c
 c
       subroutine empole3c
+      use sizes
+      use action
+      use analyz
+      use atoms
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use inter
+      use math
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,ii
       real*8 e,ei,eintra
       real*8 f,term,fterm
@@ -1237,30 +1237,30 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine ereal3c (eintra)
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use inform
+      use iounit
+      use math
+      use molcul
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
       integer i,j,k,m
       integer ii,kk
       real*8 e,ei,eintra
@@ -1813,19 +1813,19 @@ c     energy among the atoms
 c
 c
       subroutine empole3d
+      use sizes
+      use action
+      use analyz
+      use atoms
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use inter
+      use math
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,ii
       real*8 e,ei,eintra
       real*8 f,term,fterm
@@ -1964,30 +1964,30 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine ereal3d (eintra)
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use inform
+      use iounit
+      use math
+      use molcul
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
       integer i,j,k,m
       integer ii,kk,kkk
       integer nemtt,neptt
@@ -2068,7 +2068,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP PARALLEL default(shared) firstprivate(f)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,efix,eifix,bfac,damp,expdamp,
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,alsq2,alsq2n,
 !$OMP& exp2a,ralpha,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,

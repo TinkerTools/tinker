@@ -95,10 +95,10 @@ c     fpcy    convex face cycle numbers
 c
 c
       subroutine connolly (volume,area,radius,probe,exclude)
+      use sizes
+      use atoms
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'faces.i'
       integer i
       real*8 volume,area
       real*8 probe,exclude
@@ -152,8 +152,9 @@ c     to avoid numerical instabilities for symmetrical structures
 c
 c
       subroutine wiggle
-      include 'sizes.i'
-      include 'faces.i'
+      use sizes
+      use faces
+      implicit none
       integer i
       real*8 size
       real*8 vector(3)
@@ -194,9 +195,9 @@ c     itnl     temporary neighbor list, before sorting
 c
 c
       subroutine nearby
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer maxclsa,maxcube
       parameter (maxclsa=1000)
       parameter (maxcube=40)
@@ -486,9 +487,9 @@ c     by testing for a torus between each atom and its neighbors
 c
 c
       subroutine torus
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer ia,ja,jn
       integer ibeg,iend
       real*8 ttr
@@ -583,9 +584,9 @@ c     tangent to each triple of neighboring atoms
 c
 c
       subroutine place
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer maxmnb
       parameter (maxmnb=500)
       integer k,ke,kv
@@ -954,9 +955,9 @@ c     linked list for its temporary torus
 c
 c
       subroutine inedge (ien,itt)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer ien,itt,iepen
 c
 c
@@ -993,9 +994,9 @@ c     the temporary tori arrays to the final tori arrays
 c
 c
       subroutine compress
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer itt,ia,ja
       integer iptr,ned
       integer ip1,ip2
@@ -1063,10 +1064,10 @@ c     "saddles" constructs circles, convex edges and saddle faces
 c
 c
       subroutine saddles
+      use sizes
+      use faces
+      use math
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
-      include 'math.i'
       integer maxent
       parameter (maxent=500)
       integer k,ia,in,ip
@@ -1463,9 +1464,9 @@ c     between two atoms, and finds the torus radius, center and axis
 c
 c
       subroutine gettor (ia,ja,ttok,torcen,torad,torax)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer k,ia,ja
       real*8 dist2,dij,temp
       real*8 temp1,temp2
@@ -1533,9 +1534,9 @@ c     between three neighboring atoms
 c
 c
       subroutine getprb (ia,ja,ka,prbok,tb,bijk,hijk,uijk)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer k,ia,ja,ka
       real*8 dot,dotijk,dotut
       real*8 wijk,swijk,fact
@@ -1619,9 +1620,9 @@ c     "ipedge" inserts convex edge into linked list for atom
 c
 c
       subroutine ipedge (iep,ia)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer iep,ia,iepen
 c
 c
@@ -1657,9 +1658,9 @@ c     "contact" constructs the contact surface, cycles and convex faces
 c
 c
       subroutine contact
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer maxepa,maxcypa
       parameter (maxepa=300)
       parameter (maxcypa=100)
@@ -2105,12 +2106,12 @@ c     and uses it to compute the volume and surface area
 c
 c
       subroutine vam (volume,area)
+      use sizes
+      use faces
+      use inform
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
       integer maxdot,maxop,nscale
       parameter (maxdot=1000)
       parameter (maxop=100)
@@ -2769,9 +2770,9 @@ c     ######################
 c
 c
       function depth (ip,alt)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer k,ip,ia1,ia2,ia3
       real*8 depth,dot,alt(3)
       real*8 vect1(3),vect2(3)
@@ -2808,9 +2809,9 @@ c     the full interior polyhedron
 c
 c
       subroutine measpm (ifn,prism)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer k,ke,ien,iv,ia,ip,ifn
       real*8 prism,height,pav(3,3)
       real*8 vect1(3),vect2(3),vect3(3)
@@ -2846,10 +2847,10 @@ c     #########################
 c
 c
       subroutine measfp (ifp,areap,volp)
+      use sizes
+      use faces
+      use math
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
-      include 'math.i'
       integer k,ke,ifp,iep
       integer ia,ia2,ic
       integer it,iv1,iv2
@@ -2946,10 +2947,10 @@ c     #########################
 c
 c
       subroutine measfs (ifs,areas,vols,areasp,volsp)
+      use sizes
+      use faces
+      use math
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
-      include 'math.i'
       integer k,ifs,iep
       integer ic,ic1,ic2
       integer it,ia1,ia2
@@ -3065,10 +3066,10 @@ c     #########################
 c
 c
       subroutine measfn (ifn,arean,voln)
+      use sizes
+      use faces
+      use math
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
-      include 'math.i'
       integer k,ke,je
       integer ifn,ien
       integer iv,ia,ip
@@ -3127,9 +3128,9 @@ c     #########################
 c
 c
       subroutine projct (pnt,unvect,icy,ia,spv,nedge,fail)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer k,ke,icy,ia
       integer nedge,iep,iv
       real*8 dot,dt,f
@@ -3189,9 +3190,9 @@ c     #######################
 c
 c
       function ptincy (pnt,unvect,icy)
+      use sizes
+      use faces
       implicit none
-      include 'sizes.i'
-      include 'faces.i'
       integer k,ke,icy,iep
       integer ic,it,iatom
       integer iaoth,nedge
@@ -3505,8 +3506,8 @@ c     to a coordinate axis; returns an angle in the range [0,2*pi]
 c
 c
       function vecang (v1,v2,axis,hand)
+      use math
       implicit none
-      include 'math.i'
       real*8 vecang,hand
       real*8 angle,a1,a2,a12,dt
       real*8 anorm,dot,triple
@@ -3604,8 +3605,8 @@ c     points for a sphere with the input radius and coordinate center
 c
 c
       subroutine gendot (ndots,dots,radius,xcenter,ycenter,zcenter)
+      use math
       implicit none
-      include 'math.i'
       integer i,j,k,ndots
       integer nequat,nvert,nhoriz
       real*8 fi,fj,x,y,z,xy
@@ -3653,8 +3654,8 @@ c     surface area and volume computation
 c
 c
       subroutine cerror (string)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer leng,trimtext
       character*(*) string
 c

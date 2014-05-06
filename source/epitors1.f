@@ -17,17 +17,17 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine epitors1
+      use sizes
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use pitors
+      use torpot
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'pitors.i'
-      include 'torpot.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,ia,ib,ic
       integer id,ie,ig
       real*8 e,dedphi,fgrp

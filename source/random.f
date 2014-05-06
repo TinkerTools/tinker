@@ -25,11 +25,11 @@ c     University Press, 1992, Section 7.1
 c
 c
       function random ()
+      use sizes
+      use inform
+      use iounit
+      use keys
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
       integer im1,ia1,iq1,ir1
       integer im2,ia2,iq2,ir2
       integer big,nshuffle
@@ -147,9 +147,9 @@ c     distribution with a mean of zero and a variance of one
 c
 c
       function normal ()
+      use inform
+      use iounit
       implicit none
-      include 'inform.i'
-      include 'iounit.i'
       real*8 random,v1,v2,rsq
       real*8 factor,store,normal
       logical compute
@@ -206,9 +206,9 @@ c     2nd Edition, Cambridge University Press, 2004, Section 18.4
 c
 c
       subroutine ranvec (vector)
+      use inform
+      use iounit
       implicit none
-      include 'inform.i'
-      include 'iounit.i'
       real*8 x,y,s
       real*8 random
       real*8 vector(3)
@@ -258,8 +258,8 @@ c     19, 5-11 (1997)
 c
 c
       subroutine sphere (ndot,dot)
+      use math
       implicit none
-      include 'math.i'
       integer i,ndot
       real*8 theta,phi
       real*8 h,phiold

@@ -17,8 +17,8 @@ c     error or some other nonstandard condition
 c
 c
       subroutine fatal
+      use iounit
       implicit none
-      include 'iounit.i'
 c
 c
 c     print a final warning message, then quit

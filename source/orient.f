@@ -17,11 +17,11 @@ c     in standard orientation for each rigid body atom group
 c
 c
       subroutine orient
+      use sizes
+      use atoms
+      use group
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'rigid.i'
       integer i,j,k
       integer init,stop
       real*8 xcm,ycm,zcm
@@ -31,6 +31,13 @@ c
       real*8 sphi,stheta,spsi
       real*8 a(3,3)
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(xrb))  allocate (xrb(n))
+      if (.not. allocated(yrb))  allocate (yrb(n))
+      if (.not. allocated(zrb))  allocate (zrb(n))
+      if (.not. allocated(rbc))  allocate (rbc(6,ngrp))
 c
 c     use current coordinates as default reference coordinates
 c
@@ -108,12 +115,12 @@ c     xyz convention in Appendix B
 c
 c
       subroutine xyzrigid
+      use sizes
+      use atoms
+      use atomid
+      use group
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'group.i'
-      include 'rigid.i'
       integer i,j,k,m
       integer init,stop
       real*8 xcm,ycm,zcm
@@ -253,8 +260,8 @@ c     with an input rotation matrix
 c
 c
       subroutine roteuler (a,phi,theta,psi)
+      use math
       implicit none
-      include 'math.i'
       integer i
       real*8 phi,theta,psi,eps
       real*8 cphi,ctheta,cpsi
@@ -357,11 +364,11 @@ c     xyz convention in Appendix B
 c
 c
       subroutine rigidxyz
+      use sizes
+      use atoms
+      use group
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'rigid.i'
       integer i,j,k
       integer init,stop
       real*8 xcm,ycm,zcm

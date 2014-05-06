@@ -18,18 +18,18 @@ c     for biopolymers, a sequence file
 c
 c
       program pdbxyz
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use inform
+      use katoms
+      use pdb
+      use resdue
+      use sequen
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'katoms.i'
-      include 'pdb.i'
-      include 'resdue.i'
-      include 'sequen.i'
-      include 'titles.i'
       integer i,j,it,next
       integer ipdb,ixyz,iseq
       integer last,pdbleng
@@ -66,7 +66,7 @@ c
       reslast = '***'
       do i = 1, npdb
          if (pdbtyp(i) .eq. 'ATOM  ') then
-            resname = resnam(i)
+            resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
                do j = 1, maxamino
@@ -86,7 +86,7 @@ c
    10          continue
             end if
          else if (pdbtyp(i) .eq. 'HETATM') then
-            resname = resnam(i)
+            resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
                if (resname.eq.'HOH' .or. resname.eq.'NA ' .or.
@@ -139,10 +139,10 @@ c
                x(i) = xpdb(i)
                y(i) = ypdb(i)
                z(i) = zpdb(i)
-               name(i) = atmnam(i)(2:4)
+               name(i) = pdbatm(i)(2:4)
                n12(i) = 0
                next = 1
-               call getnumb (resnam(i),type(i),next)
+               call getnumb (pdbres(i),type(i),next)
             end do
 c
 c     perform dynamic allocation of some local arrays
@@ -270,16 +270,16 @@ c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
       subroutine ribosome (ichn)
+      use sizes
+      use atoms
+      use fields
+      use files
+      use inform
+      use iounit
+      use pdb
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'fields.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'pdb.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,j,k,m
       integer ichn,ityp
       integer jres,kres
@@ -360,7 +360,7 @@ c
       ncys = 0
       do i = 1, nres
          start = resatm(1,i)
-         resname = resnam(start)
+         resname = pdbres(start)
          if (resname.eq.'CYS' .or. resname.eq.'CYX') then
             stop = resatm(2,i)
             call findatm (' SG ',start,stop,k)
@@ -395,12 +395,12 @@ c
          start = resatm(1,j)
          stop = resatm(2,j)
          do m = start, stop
-            resnam(m) = 'CYX'
+            pdbres(m) = 'CYX'
          end do
          start = resatm(1,k)
          stop = resatm(2,k)
          do m = start, stop
-            resnam(m) = 'CYX'
+            pdbres(m) = 'CYX'
          end do
       end do
 c
@@ -695,11 +695,11 @@ c     set as absolute values, not relative to the CB atom
 c
 c
       subroutine addside (resname,ires,start,stop,cai,ni,ci,si)
+      use sizes
+      use atoms
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,k,ires
       integer start,stop
       integer cai,ni,ci,si
@@ -1507,14 +1507,14 @@ c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
       subroutine ligase (ichn)
+      use sizes
+      use atoms
+      use files
+      use iounit
+      use pdb
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'pdb.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,j,k
       integer ichn,ityp
       integer jres,kres
@@ -1543,16 +1543,16 @@ c
          deoxy(i) = .false.
          start = resatm(1,i)
          stop = resatm(2,i)
-         resname = resnam(start)
+         resname = pdbres(start)
          call findatm (' O2''',start,stop,k)
          if (k .eq. 0) then
             deoxy(i) = .true.
             do j = start, stop
-               if (resname .eq. 'A  ')  resnam(j) = 'DA '
-               if (resname .eq. 'G  ')  resnam(j) = 'DG '
-               if (resname .eq. 'C  ')  resnam(j) = 'DC '
-               if (resname .eq. 'U  ')  resnam(j) = 'DU '
-               if (resname .eq. 'T  ')  resnam(j) = 'DT '
+               if (resname .eq. 'A  ')  pdbres(j) = 'DA '
+               if (resname .eq. 'G  ')  pdbres(j) = 'DG '
+               if (resname .eq. 'C  ')  pdbres(j) = 'DC '
+               if (resname .eq. 'U  ')  pdbres(j) = 'DU '
+               if (resname .eq. 'T  ')  pdbres(j) = 'DT '
             end do
          end if
       end do
@@ -1563,7 +1563,7 @@ c
          ityp = seqtyp(i)
          start = resatm(1,i)
          stop = resatm(2,i)
-         resname = resnam(start)
+         resname = pdbres(start)
 c
 c     check that the maximum allowed atoms is not exceeded
 c
@@ -1737,9 +1737,9 @@ c     and connectivity data generated
 c
 c
       subroutine addbase (resname,ires,start,stop,c1i)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,ires
       integer start,stop
       integer c1i
@@ -2020,10 +2020,10 @@ c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
       subroutine hetatom
+      use sizes
+      use atoms
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'pdb.i'
       integer i
 c
 c
@@ -2034,11 +2034,11 @@ c
       do while (i .lt. npdb)
          i = i + 1
          if (pdbtyp(i) .eq. 'HETATM') then
-            if (resnam(i) .eq. 'HOH') then
-               if (atmnam(i) .eq. ' O  ') then
+            if (pdbres(i) .eq. 'HOH') then
+               if (pdbatm(i) .eq. ' O  ') then
                   call oldatm (i,2001,0,0)
-                  if (atmnam(i+1).eq.' H  ' .and.
-     &                atmnam(i+2).eq.' H  ') then
+                  if (pdbatm(i+1).eq.' H  ' .and.
+     &                pdbatm(i+2).eq.' H  ') then
                      call oldatm (i+1,2002,n-1,0)
                      call oldatm (i+2,2002,n-2,0)
                      i = i + 2
@@ -2049,15 +2049,15 @@ c
      &                               n-3,120.0d0,0)
                   end if
                end if
-            else if (resnam(i) .eq. 'NA ') then
+            else if (pdbres(i) .eq. 'NA ') then
                call oldatm (i,2003,0,0)
-            else if (resnam(i) .eq. 'K  ') then
+            else if (pdbres(i) .eq. 'K  ') then
                call oldatm (i,2004,0,0)
-            else if (resnam(i) .eq. 'MG ') then
+            else if (pdbres(i) .eq. 'MG ') then
                call oldatm (i,2005,0,0)
-            else if (resnam(i) .eq. 'CA ') then
+            else if (pdbres(i) .eq. 'CA ') then
                call oldatm (i,2006,0,0)
-            else if (resnam(i) .eq. 'CL ') then
+            else if (pdbres(i) .eq. 'CL ') then
                call oldatm (i,2007,0,0)
             end if
          end if
@@ -2080,15 +2080,15 @@ c     and atomic connectivities
 c
 c
       subroutine oldatm (i,bionum,i1,ires)
+      use sizes
+      use atomid
+      use atoms
+      use fields
+      use iounit
+      use katoms
+      use sequen
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'sequen.i'
-      include 'pdb.i'
       integer i,bionum
       integer i1,ires
 c
@@ -2133,13 +2133,13 @@ c     in the original Protein Data Bank file
 c
 c
       subroutine newatm (i,bionum,ia,bond,ib,angle1,ic,angle2,chiral)
+      use sizes
+      use atomid
+      use atoms
+      use fields
+      use katoms
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'fields.i'
-      include 'katoms.i'
-      include 'pdb.i'
       integer i,bionum
       integer ia,ib,ic
       integer chiral
@@ -2185,9 +2185,9 @@ c     order to generate a direct connection between two atoms
 c
 c
       subroutine addbond (i,j)
+      use sizes
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'couple.i'
       integer i,j
 c
 c
@@ -2216,9 +2216,9 @@ c     type was not found
 c
 c
       subroutine findatm (name,start,stop,ipdb)
+      use sizes
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'pdb.i'
       integer i,ipdb
       integer start,stop
       character*4 name
@@ -2228,7 +2228,7 @@ c     search for the specified atom within the residue
 c
       ipdb = 0
       do i = start, stop
-         if (atmnam(i) .eq. name) then
+         if (pdbatm(i) .eq. name) then
             ipdb = i
             goto 10
          end if

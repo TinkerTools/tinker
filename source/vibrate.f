@@ -20,16 +20,16 @@ c     well as the vibrational frequencies and displacements
 c
 c
       program vibrate
+      use sizes
+      use atomid
+      use atoms
+      use files
+      use hescut
+      use iounit
+      use math
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'hescut.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k,m
       integer ixyz,ihess
       integer lext,freeunit

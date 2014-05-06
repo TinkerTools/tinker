@@ -17,17 +17,17 @@ c     and stores a list of the group to which each atom belongs
 c
 c
       subroutine cluster
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use group
+      use inform
+      use iounit
+      use keys
+      use limits
+      use molcul
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cutoff.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'molcul.i'
       integer i,j,k
       integer next,size
       integer gnum,ga,gb
@@ -38,6 +38,14 @@ c
       character*120 record
       character*120 string
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(kgrp))  allocate (kgrp(n))
+      if (.not. allocated(grplist))  allocate (grplist(n))
+      if (.not. allocated(igrp))  allocate (igrp(2,0:maxgrp))
+      if (.not. allocated(grpmass))  allocate (grpmass(0:maxgrp))
+      if (.not. allocated(wgrp))  allocate (wgrp(0:maxgrp,0:maxgrp))
 c
 c     set defaults for the group atom list and weight options
 c
@@ -230,7 +238,7 @@ c
 c     output the final list of atoms in each group
 c
       if (debug .and. use_group) then
-         do i = 1, ngrp
+         do i = 0, ngrp
             size = igrp(2,i) - igrp(1,i) + 1
             if (size .ne. 0) then
                write (iout,50)  i
@@ -245,7 +253,7 @@ c     output the weights for intragroup and intergroup interactions
 c
       if (debug .and. use_group) then
          header = .true.
-         do i = 1, ngrp
+         do i = 0, ngrp
             do j = i, ngrp
                if (wgrp(j,i) .ne. 0.0d0) then
                   if (header) then

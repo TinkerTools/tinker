@@ -19,12 +19,12 @@ c     actual sequence is read from subsequent nonblank characters
 c
 c
       subroutine readseq (iseq)
+      use sizes
+      use files
+      use iounit
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,j,k,iseq
       integer length,number
       integer start,stop

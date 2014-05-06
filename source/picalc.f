@@ -17,14 +17,14 @@ c     orbital calculation for each conjugated pisystem
 c
 c
       subroutine picalc
+      use sizes
+      use bndstr
+      use couple
+      use inform
+      use iounit
+      use piorbs
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'piorbs.i'
-      include 'tors.i'
       integer i,j,k,m,ib,ic
       integer ii,jj,kk
       integer iorb,jorb
@@ -52,7 +52,7 @@ c
             iorbit(norbit) = kconj(j)
          end do
 c
-c     find and store the pisystem bonds
+c     find and store the pisystem bonds for this pisystem
 c
          nbpi = 0
          kk = iconj(2,i) - iconj(1,i) + 1
@@ -78,7 +78,7 @@ c
             end do
          end do
 c
-c     find and store the pisystem torsions
+c     find and store the pisystem torsions for this pisystem
 c
          ntpi = 0
          do ii = 1, ntors
@@ -134,18 +134,18 @@ c     pisystem to determine bond orders used in parameter scaling
 c
 c
       subroutine piscf
+      use sizes
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use inform
+      use iounit
+      use orbits
+      use piorbs
+      use pistuf
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'border.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'orbits.i'
-      include 'piorbs.i'
-      include 'units.i'
       integer i,j,k,m
       integer iter,maxiter
       integer iatn,jatn
@@ -226,9 +226,9 @@ c
       nfill = 0
       do i = 1, norbit
          iorb = iorbit(i)
-         gamma(i,i) = em(iorb)
-         ip(i) = w(iorb) + (1.0d0-q(iorb))*em(iorb)
-         nfill = nfill + nint(q(iorb))
+         gamma(i,i) = emorb(iorb)
+         ip(i) = worb(iorb) + (1.0d0-qorb(iorb))*emorb(iorb)
+         nfill = nfill + nint(qorb(iorb))
       end do
       nfill = nfill / 2
 c
@@ -269,7 +269,7 @@ c
          do j = 1, norbit
             if (i .ne. j) then
                jorb = iorbit(j)
-               hcii = hcii - q(jorb)*gamma(i,j)
+               hcii = hcii - qorb(jorb)*gamma(i,j)
             end if
          end do
          hc(i,i) = hcii
@@ -315,13 +315,13 @@ c
             call overlap (6,6,rij,covlap)
             hcij = hcij * (ovlap/covlap)
             iionize = ip(i)
-            if (q(iorb) .ne. 1.0d0) then
+            if (qorb(iorb) .ne. 1.0d0) then
                if (iatn .eq. 7)  iionize = 0.595d0 * iionize
                if (iatn .eq. 8)  iionize = 0.525d0 * iionize
                if (iatn .eq. 16)  iionize = 0.89d0 * iionize
             end if
             jionize = ip(j)
-            if (q(jorb) .ne. 1.0d0) then
+            if (qorb(jorb) .ne. 1.0d0) then
                if (jatn .eq. 7)  jionize = 0.595d0 * jionize
                if (jatn .eq. 8)  jionize = 0.525d0 * jionize
                if (jatn .eq. 16)  jionize = 0.89d0 * jionize
@@ -415,10 +415,10 @@ c
             end do
             do i = 1, norbit-1
                iorb = iorbit(i)
-               qi = q(iorb)
+               qi = qorb(iorb)
                do j = i+1, norbit
                   jorb = iorbit(j)
-                  xg = xg + qi*q(jorb)*gamma(i,j)
+                  xg = xg + qi*qorb(jorb)*gamma(i,j)
                end do
             end do
             total = xi + xj + xk + xg
@@ -565,12 +565,12 @@ c     if the same orbitals were perfectly parallel
 c
 c
       subroutine pitilt (povlap)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use piorbs
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'piorbs.i'
       integer i,j,k,m
       integer iorb,jorb
       integer list(8)
@@ -681,9 +681,9 @@ c     also moved and their bond lengths normalized
 c
 c
       subroutine pimove (list,xr,yr,zr)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,j,list(8)
       real*8 xt,yt,zt
       real*8 denom,xold
@@ -770,16 +770,15 @@ c     torsional parameters based on the "nonplanar" bond orders
 c
 c
       subroutine pialter
+      use sizes
+      use atomid
+      use bndstr
+      use inform
+      use iounit
+      use piorbs
+      use pistuf
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'bond.i'
-      include 'border.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'piorbs.i'
-      include 'pistuf.i'
-      include 'tors.i'
       integer i,j,k
       integer ia,ib,ic,id
 c
@@ -804,7 +803,7 @@ c
      &                       blpi(j),bk(j),bl(j)
    20       format (' Bond',6x,2(i7,'-',a3),6x,
      &                 f9.3,f8.4,2x,'-->',f9.3,f8.4)
-         end if 
+         end if
       end do
 c
 c     modify the 2-fold torsional constants across pibonds

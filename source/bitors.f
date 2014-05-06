@@ -18,15 +18,19 @@ c     atoms defining each bitorsion
 c
 c
       subroutine bitors
+      use sizes
+      use angbnd
+      use bitor
+      use couple
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'bitor.i'
-      include 'couple.i'
-      include 'iounit.i'
       integer i,j,k
       integer ia,ib,ic,id,ie
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ibitor))  allocate (ibitor(5,maxbitor))
 c
 c     loop over all angles, storing the atoms in each bitorsion
 c

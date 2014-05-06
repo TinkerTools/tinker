@@ -16,15 +16,15 @@ c     "eimptor" calculates the improper torsion potential energy
 c
 c
       subroutine eimptor
+      use sizes
+      use atoms
+      use bound
+      use energi
+      use group
+      use imptor
+      use torpot
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'imptor.i'
-      include 'torpot.i'
-      include 'usage.i'
       integer i,ia,ib,ic,id
       real*8 e,rcb,fgrp
       real*8 xt,yt,zt

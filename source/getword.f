@@ -26,8 +26,8 @@ c                 output with the position following word
 c
 c
       subroutine getword (string,word,next)
+      use ascii
       implicit none
-      include 'ascii.i'
       integer i,j
       integer len,length
       integer size,next

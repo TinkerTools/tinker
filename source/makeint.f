@@ -22,14 +22,14 @@ c        mode = 3     use dihedral angles in all cases
 c
 c
       subroutine makeint (mode)
+      use sizes
+      use atoms
+      use couple
+      use iounit
+      use math
+      use zclose
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'zclose.i'
-      include 'zcoord.i'
       integer i,j
       integer i1,i2,i3,i4,i5
       integer adjacent,trial
@@ -260,13 +260,13 @@ c              defining the bond length to a given atom is defined
 c
 c
       function adjacent (i1,i2,mode,more,iz0,iz1)
+      use sizes
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use zclose
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'zclose.i'
       integer i,j,k,i1,i2
       integer nc,adjacent,mode
       integer ic(maxval)

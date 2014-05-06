@@ -21,20 +21,20 @@ c     note that internal coordinates must already be setup
 c
 c
       subroutine initrot
+      use sizes
+      use atoms
+      use couple
+      use group
+      use inform
+      use iounit
+      use math
+      use omega
+      use potent
+      use restrn
+      use rotbnd
+      use usage
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kgeoms.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'potent.i'
-      include 'rotate.i'
-      include 'usage.i'
-      include 'zcoord.i'
       integer i,j,j1,j2
       integer mode,iring
       integer bond1,bond2
@@ -297,11 +297,11 @@ c     sides of the candidate bond
 c
 c
       function rotcheck (base,partner)
+      use sizes
+      use atoms
+      use rotbnd
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'rotate.i'
-      include 'usage.i'
       integer i,base,partner
       logical rotcheck,value
       logical, allocatable :: list(:)

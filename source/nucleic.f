@@ -19,14 +19,14 @@ c     angle values for the nucleic acid backbone and side chains
 c
 c
       program nucleic
+      use sizes
+      use atoms
+      use couple
+      use files
+      use iounit
+      use nucleo
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'nucleo.i'
-      include 'titles.i'
       integer i,natom,mode
       integer izmt,ixyz,iseq
       integer freeunit,trimtext
@@ -131,12 +131,12 @@ c     torsional angle values needed to define a nucleic acid
 c
 c
       subroutine getseqn
+      use sizes
+      use iounit
+      use nucleo
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'nucleo.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,j,k,next
       integer start,stop
       integer length,trimtext
@@ -432,12 +432,12 @@ c     torsional values
 c
 c
       subroutine nucchain
+      use sizes
+      use atoms
+      use nucleo
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'nucleo.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,k,m
       integer poi,o2i,c1i
       integer c2i,c3i,c4i
@@ -836,10 +836,10 @@ c     Verlag, 1984, page 52
 c
 c
       subroutine nucbase (resname,i,c1i,o4i,c2i)
+      use sizes
+      use atoms
+      use nucleo
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'nucleo.i'
       integer i,c1i,o4i,c2i
       character*3 resname
 c
@@ -1015,22 +1015,22 @@ c     align the paired strands of a nucleic acid double helix
 c
 c
       subroutine watson
+      use sizes
+      use atoms
+      use couple
+      use group
+      use inform
+      use katoms
+      use molcul
+      use nucleo
+      use output
+      use potent
+      use resdue
+      use restrn
+      use rigid
+      use sequen
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'katoms.i'
-      include 'kgeoms.i'
-      include 'molcul.i'
-      include 'nucleo.i'
-      include 'output.i'
-      include 'potent.i'
-      include 'resdue.i'
-      include 'rigid.i'
-      include 'sequen.i'
-      include 'usage.i'
       integer i,j,nvar
       integer ia,ib,ic,id
       integer start,stop
@@ -1046,12 +1046,10 @@ c
       external watson1,optsave
 c
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
-      if (associated(iuse))  deallocate (iuse)
-      if (associated(use))  deallocate (use)
-      allocate (iuse(n))
-      allocate (use(0:n))
+      if (.not. allocated(iuse))  allocate (iuse(n))
+      if (.not. allocated(use))  allocate (use(0:n))
 c
 c     set all atoms to be active during energy evaluations
 c
@@ -1217,10 +1215,21 @@ c
       deallocate (root)
       deallocate (list)
 c
-c     assign each strand to a separate molecule-based group
+c     enable use of groups based on number of molecules
 c
       use_group = .true.
       ngrp = nmol
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(kgrp))  allocate (kgrp(n))
+      if (.not. allocated(grplist))  allocate (grplist(n))
+      if (.not. allocated(igrp))  allocate (igrp(2,0:ngrp))
+      if (.not. allocated(grpmass))  allocate (grpmass(0:ngrp))
+      if (.not. allocated(wgrp))  allocate (wgrp(0:ngrp,0:ngrp))
+c
+c     assign each strand to a separate molecule-based group
+c
       do i = 1, ngrp
          igrp(1,i) = imol(1,i)
          igrp(2,i) = imol(2,i)
@@ -1296,11 +1305,11 @@ c     optimization of rigid bodies
 c
 c
       function watson1 (xx,g)
+      use sizes
+      use group
+      use math
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'rigid.i'
       integer i,j,nvar
       real*8 watson1,e
       real*8 xx(*)

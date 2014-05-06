@@ -17,19 +17,19 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kcharge
+      use sizes
+      use atomid
+      use atoms
+      use charge
+      use chgpot
+      use couple
+      use fields
+      use inform
+      use iounit
+      use kchrge
+      use keys
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kchrge.i'
-      include 'keys.i'
-      include 'potent.i'
       integer i,j,k,m
       integer ia,next
       integer, allocatable :: nc12(:)
@@ -77,6 +77,14 @@ c
    40       continue
          end if
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iion))  allocate (iion(maxatm))
+      if (.not. allocated(jion))  allocate (jion(maxatm))
+      if (.not. allocated(kion))  allocate (kion(maxatm))
+      if (.not. allocated(chglist))  allocate (chglist(maxatm))
+      if (.not. allocated(pchg))  allocate (pchg(maxatm))
 c
 c     find and store all the atomic partial charges
 c
@@ -189,13 +197,13 @@ c     the Merck Molecular Force Field (MMFF)
 c
 c
       subroutine kchargem
+      use sizes
+      use atomid
+      use atoms
+      use charge
+      use couple
+      use merck
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'couple.i'
-      include 'merck.i'
       integer i,j,k,m
       integer it,kt,bt
       integer ic,kc

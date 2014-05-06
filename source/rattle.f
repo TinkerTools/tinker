@@ -24,16 +24,16 @@ c     Computational Physics, 52, 24-34 (1983)
 c
 c
       subroutine rattle (dt,xold,yold,zold)
+      use sizes
+      use atomid
+      use atoms
+      use freeze
+      use group
+      use inform
+      use iounit
+      use moldyn
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'freeze.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'moldyn.i'
-      include 'usage.i'
       integer i,j,k
       integer ia,ib,mode
       integer niter,maxiter
@@ -204,18 +204,18 @@ c     interatomic distance constraints
 c
 c
       subroutine rattle2 (dt)
+      use sizes
+      use atomid
+      use atoms
+      use freeze
+      use group
+      use inform
+      use iounit
+      use moldyn
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'freeze.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ia,ib,mode
       integer niter,maxiter

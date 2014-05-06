@@ -17,11 +17,11 @@ c     energy contribution and its first derivatives
 c
 c
       subroutine extra1
+      use sizes
+      use atoms
+      use deriv
+      use energi
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'energi.i'
       integer i
 c
 c

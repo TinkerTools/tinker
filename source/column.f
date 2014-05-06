@@ -18,8 +18,8 @@ c
 c
       subroutine column (nvar,hinit,hstop,hindex,
      &                   cinit,cstop,cindex,cvalue)
+      use sizes
       implicit none
-      include 'sizes.i'
       integer i,j,k
       integer m,nvar
       integer hinit(*)

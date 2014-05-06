@@ -16,17 +16,17 @@ c     "estrtor" calculates the stretch-torsion potential energy
 c
 c
       subroutine estrtor
+      use sizes
+      use atoms
+      use bndstr
+      use bound
+      use energi
+      use group
+      use strtor
+      use torpot
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'strtor.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,k,istrtor
       integer ia,ib,ic,id
       real*8 e,dr,fgrp

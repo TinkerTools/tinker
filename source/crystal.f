@@ -18,14 +18,14 @@ c     asymmetric units
 c
 c
       program crystal
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use iounit
+      use files
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'files.i'
-      include 'math.i'
       integer maxspace
       parameter (maxspace=56)
       integer i,ixyz,mode
@@ -365,11 +365,11 @@ c     during generation of a unit cell from an asymmetric unit
 c
 c
       subroutine molmerge
+      use sizes
+      use atoms
+      use couple
+      use molcul
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'molcul.i'
       integer i,j,k,m,h
       integer im,km,in,kn
       real*8 r,eps
@@ -531,11 +531,11 @@ c     to a unit cell by updating the atom type and attachment arrays
 c
 c
       subroutine cellatom (jj,j)
+      use sizes
+      use atomid
+      use atoms
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
       integer i,j,jj,delta
 c
 c
@@ -564,10 +564,10 @@ c     to give a larger unit cell as a block of repeated units
 c
 c
       subroutine bigblock (na,nb,nc)
+      use sizes
+      use atoms
+      use boxes
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
       integer i,j,k
       integer ii,jj,nsym
       integer na,nb,nc
@@ -653,9 +653,9 @@ c     the symmetry related atoms of the full unit cell
 c
 c
       subroutine symmetry (spacegrp)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,j,ii,jj
       integer nsym
       real*8 one3,two3

@@ -17,16 +17,16 @@ c     stretching energy for a single atom at a time
 c
 c
       subroutine ebond2 (i)
+      use sizes
+      use atmlst
+      use atoms
+      use bndpot
+      use bndstr
+      use bound
+      use couple
+      use group
+      use hessn
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atoms.i'
-      include 'bndpot.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
       integer i,j,k,ia,ib
       real*8 ideal,force,fgrp
       real*8 xab,yab,zab

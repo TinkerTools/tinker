@@ -18,16 +18,16 @@ c     of the resulting polarizability tensor
 c
 c
       program polarize
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use molcul
+      use mpole
+      use polar
+      use polpot
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
       integer i
       real*8 addu,malpha
       real*8 external
@@ -172,15 +172,15 @@ c     in the presence of an external electric field
 c
 c
       subroutine moluind (exfield,umol)
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use mpole
+      use polar
+      use polpot
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'units.i'
       integer i,j,iter
       integer maxiter
       real*8 eps,epsold
@@ -341,13 +341,13 @@ c     damp the field at close range
 c
 c
       subroutine ufield (field)
+      use sizes
+      use atoms
+      use mpole
+      use polar
+      use polgrp
+      use polpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
       integer i,j,k
       integer ii,kk
       real*8 r,r2,rr3,rr5

@@ -19,18 +19,18 @@ c     or Fourier angle bending terms are optionally used
 c
 c
       subroutine eangle1
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use math
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,ia,ib,ic,id
       real*8 e,ideal,force
       real*8 fold,factor,dot

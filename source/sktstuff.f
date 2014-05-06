@@ -16,14 +16,14 @@ c     "sktopt" sends the current optimization info via a socket
 c
 c
       subroutine sktopt (ncycle,eopt)
+      use sizes
+      use atoms
+      use deriv
+      use mpole
+      use polar
+      use potent
+      use socket
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'potent.i'
-      include 'socket.i'
       integer i,k,ncycle
       integer flag
       real*8 eopt
@@ -111,14 +111,14 @@ c     "sktdyn" sends the current dynamics info via a socket
 c
 c
       subroutine sktdyn (istep,dt,epot)
+      use sizes
+      use atoms
+      use moldyn
+      use mpole
+      use polar
+      use potent
+      use socket
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'moldyn.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'potent.i'
-      include 'socket.i'
       integer i,k,istep
       integer flag
       real*8 dt,time,epot
@@ -232,19 +232,19 @@ c     a server, and loading an object with system information
 c
 c
       subroutine sktinit
+      use sizes
+      use atomid
+      use atoms
+      use charge
+      use couple
+      use files
+      use fields
+      use iounit
+      use inform
+      use keys
+      use polar
+      use socket
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'inform.i'
-      include 'keys.i'
-      include 'polar.i'
-      include 'socket.i'
       integer i
       integer flag
       real*8, allocatable :: b1(:)
@@ -360,9 +360,9 @@ c     "sktkill" closes the server and Java virtual machine
 c
 c
       subroutine sktkill
+      use sizes
+      use socket
       implicit none
-      include 'sizes.i'
-      include 'socket.i'
 c
 c
 c     check to see if there is anything to close

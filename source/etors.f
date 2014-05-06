@@ -16,9 +16,9 @@ c     "etors" calculates the torsional potential energy
 c
 c
       subroutine etors
+      use sizes
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'warp.i'
 c
 c
 c     choose standard or potential energy smoothing version
@@ -44,15 +44,15 @@ c     using a standard sum of Fourier terms
 c
 c
       subroutine etors0a
+      use sizes
+      use atoms
+      use bound
+      use energi
+      use group
+      use torpot
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,ia,ib,ic,id
       real*8 e,rcb,fgrp
       real*8 xt,yt,zt,rt2
@@ -213,16 +213,16 @@ c     for use with potential energy smoothing methods
 c
 c
       subroutine etors0b
+      use sizes
+      use atoms
+      use energi
+      use group
+      use math
+      use torpot
+      use tors
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
-      include 'warp.i'
       integer i,ia,ib,ic,id
       real*8 e,rcb,fgrp
       real*8 width,wterm

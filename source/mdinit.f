@@ -17,28 +17,28 @@ c     for a molecular dynamics trajectory, including restarts
 c
 c
       subroutine mdinit
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use bound
+      use files
+      use freeze
+      use group
+      use inform
+      use iounit
+      use keys
+      use mdstuf
+      use molcul
+      use moldyn
+      use mpole
+      use rgddyn
+      use rigid
+      use stodyn
+      use units
+      use uprior
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'bound.i'
-      include 'files.i'
-      include 'freeze.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'mdstuf.i'
-      include 'molcul.i'
-      include 'moldyn.i'
-      include 'mpole.i'
-      include 'rgddyn.i'
-      include 'rigid.i'
-      include 'stodyn.i'
-      include 'units.i'
-      include 'uprior.i'
-      include 'usage.i'
       integer i,j,k,idyn
       integer size,next
       integer lext,freeunit
@@ -177,17 +177,13 @@ c
          end do
       end if
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
       if (use_pred) then
-         if (associated(udalt))  deallocate (udalt)
-         if (associated(upalt))  deallocate (upalt)
-         if (associated(usalt))  deallocate (usalt)
-         if (associated(upsalt))  deallocate (upsalt)
-         allocate (udalt(maxualt,3,n))
-         allocate (upalt(maxualt,3,n))
-         allocate (usalt(maxualt,3,n))
-         allocate (upsalt(maxualt,3,n))
+         if (.not. allocated(udalt))  allocate (udalt(maxualt,3,n))
+         if (.not. allocated(upalt))  allocate (upalt(maxualt,3,n))
+         if (.not. allocated(usalt))  allocate (usalt(maxualt,3,n))
+         if (.not. allocated(upsalt))  allocate (upsalt(maxualt,3,n))
 c
 c     set the Gear predictor binomial coefficients
 c

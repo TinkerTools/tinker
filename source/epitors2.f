@@ -17,15 +17,15 @@ c     torsion energy for a single atom using finite difference methods
 c
 c
       subroutine epitors2 (i)
+      use sizes
+      use angbnd
+      use atoms
+      use deriv
+      use group
+      use hessn
+      use pitors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'pitors.i'
-      include 'usage.i'
       integer i,j,ipitors
       integer ia,ib,ic
       integer id,ie,ig
@@ -182,13 +182,13 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine epitors2a (i)
+      use sizes
+      use atoms
+      use bound
+      use deriv
+      use pitors
+      use torpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'pitors.i'
-      include 'torpot.i'
       integer i,ia,ib,ic
       integer id,ie,ig
       real*8 dedphi,dphi2

@@ -17,15 +17,15 @@ c     space using a low storage BFGS nonlinear optimization
 c
 c
       program minimize
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
+      use keys
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,j,imin,nvar
       integer next,freeunit
       real*8 minimum,minimiz1
@@ -237,11 +237,11 @@ c     coordinate space
 c
 c
       function minimiz1 (xx,g)
+      use sizes
+      use atoms
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,nvar
       real*8 minimiz1,e
       real*8 energy,eps

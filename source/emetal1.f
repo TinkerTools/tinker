@@ -17,14 +17,14 @@ c     and its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine emetal1
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use deriv
+      use energi
+      use kchrge
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'kchrge.i'
       integer maxneigh
       parameter (maxneigh=10)
       integer i,j,k,jj,k0

@@ -17,25 +17,25 @@ c     also partitions the energy among the atoms
 c
 c
       subroutine edipole3
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use chgpot
+      use dipole
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use shunt
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'dipole.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k
       integer i1,i2,k1,k2
       real*8 xi,yi,zi

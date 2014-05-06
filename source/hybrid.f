@@ -17,10 +17,10 @@ c     initial state, final state and mutation parameter "lambda"
 c
 c
       subroutine hybrid
+      use sizes
+      use iounit
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'mutant.i'
 c
 c
 c     set the potential energy parameters for hybrid atoms
@@ -54,14 +54,14 @@ c     "hatom" assigns a new atom type to each hybrid site
 c
 c
       subroutine hatom
+      use sizes
+      use atomid
+      use atoms
+      use inform
+      use iounit
+      use katoms
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'mutant.i'
       integer i,k,ntype
       integer it,it0,it1
 c
@@ -121,15 +121,15 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hbond
+      use sizes
+      use atomid
+      use atoms
+      use bndstr
+      use iounit
+      use inform
+      use kbonds
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'iounit.i'
-      include 'inform.i'
-      include 'kbonds.i'
-      include 'mutant.i'
       integer i,j,k
       integer ia,ib
       integer ita,itb
@@ -237,15 +237,15 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hangle
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use iounit
+      use inform
+      use kangs
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'inform.i'
-      include 'kangs.i'
-      include 'mutant.i'
       integer i,j,k,size
       integer ia,ib,ic
       integer ita,itb,itc
@@ -358,19 +358,19 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hstrbnd
+      use sizes
+      use angbnd
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use inform
+      use katoms
+      use kstbnd
+      use mutant
+      use strbnd
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'inform.i'
-      include 'katoms.i'
-      include 'kstbnd.i'
-      include 'mutant.i'
-      include 'strbnd.i'
       integer i,j,k,size
       integer ia,ib,ic
       integer ita,itb,itc
@@ -509,17 +509,17 @@ c     a single trigonal site
 c
 c
       subroutine himptor
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use inform
+      use imptor
+      use kitors
+      use math
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'inform.i'
-      include 'imptor.i'
-      include 'kitors.i'
-      include 'math.i'
-      include 'mutant.i'
       integer i,j,k
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -760,16 +760,16 @@ c     initial state, final state and "lambda" value
 c
 c
       subroutine htors
+      use sizes
+      use atomid
+      use atoms
+      use inform
+      use iounit
+      use ktorsn
+      use math
+      use mutant
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'ktorsn.i'
-      include 'math.i'
-      include 'mutant.i'
-      include 'tors.i'
       integer i,j,k,size
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -1026,18 +1026,18 @@ c     given an initial state, final state and "lambda" value
 c
 c
       subroutine hstrtor
+      use sizes
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use ksttor
+      use mutant
+      use strtor
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'ksttor.i'
-      include 'mutant.i'
-      include 'strtor.i'
-      include 'tors.i'
       integer i,j,k,size
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -1206,17 +1206,17 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hvdw
+      use sizes
+      use atomid
+      use atoms
+      use inform
+      use iounit
+      use kvdws
+      use math
+      use mutant
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'mutant.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer it,it0,it1
       real*8 radius,rd,ep
@@ -1333,14 +1333,14 @@ c     given an initial state, final state and "lambda" value
 c
 c
       subroutine hcharge
+      use sizes
+      use atoms
+      use charge
+      use inform
+      use iounit
+      use kchrge
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kchrge.i'
-      include 'mutant.i'
       integer i,j,k
       integer it,it0,it1
       real*8 chg0,chg1
@@ -1402,15 +1402,15 @@ c     given an initial state, final state and "lambda" value
 c
 c
       subroutine hdipole
+      use sizes
+      use atoms
+      use bndstr
+      use dipole
+      use inform
+      use iounit
+      use kdipol
+      use mutant
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'dipole.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kdipol.i'
-      include 'mutant.i'
       integer i,j,k
       integer ia,ib
       integer ita,itb

@@ -18,26 +18,26 @@ c     also checks for user requested termination of a simulation
 c
 c
       subroutine mdsave (istep,dt,epot,eksum)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use files
+      use group
+      use inform
+      use iounit
+      use mdstuf
+      use moldyn
+      use mpole
+      use output
+      use polar
+      use potent
+      use rgddyn
+      use socket
+      use titles
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'files.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'mpole.i'
-      include 'output.i'
-      include 'polar.i'
-      include 'potent.i'
-      include 'rgddyn.i'
-      include 'socket.i'
-      include 'titles.i'
-      include 'units.i'
       integer i,j,k,istep
       integer ixyz,iind
       integer ivel,ifrc

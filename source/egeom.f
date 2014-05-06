@@ -18,17 +18,17 @@ c     spherical droplet restraints
 c
 c
       subroutine egeom
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use energi
+      use group
+      use math
+      use molcul
+      use restrn
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'kgeoms.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'usage.i'
       integer i,j,k
       integer ia,ib,ic,id
       real*8 e,dt,dt2,fgrp

@@ -17,16 +17,16 @@ c     from an external file
 c
 c
       subroutine readint (izmt)
+      use sizes
+      use atomid
+      use atoms
+      use files
+      use inform
+      use iounit
+      use titles
+      use zclose
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'titles.i'
-      include 'zclose.i'
-      include 'zcoord.i'
       integer i,j,izmt
       integer next,size
       integer first,last

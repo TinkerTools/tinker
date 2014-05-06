@@ -19,8 +19,8 @@ c     they have special meaning as the default I/O units
 c
 c
       function freeunit ()
+      use iounit
       implicit none
-      include 'iounit.i'
       integer freeunit
       logical used
 c

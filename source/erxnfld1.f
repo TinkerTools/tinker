@@ -17,11 +17,11 @@ c     and derivatives with respect to Cartesian coordinates
 c
 c
       subroutine erxnfld1
+      use sizes
+      use atoms
+      use deriv
+      use energi
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'energi.i'
       integer i,j
 c
 c

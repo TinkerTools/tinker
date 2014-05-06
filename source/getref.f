@@ -17,14 +17,14 @@ c     into the standard variables for the current system structure
 c
 c
       subroutine getref (iref)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use refer
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'refer.i'
-      include 'titles.i'
       integer i,j,iref
 c
 c

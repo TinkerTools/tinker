@@ -17,13 +17,13 @@ c     energy and derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
+      use sizes
+      use deriv
+      use energi
+      use limits
+      use mpole
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'mpole.i'
-      include 'potent.i'
       integer i,j,ii
 c
 c
@@ -80,28 +80,28 @@ c     using a pairwise double loop
 c
 c
       subroutine empole1a
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use limits
+      use molcul
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,jcell
       integer ix,iy,iz
@@ -1625,28 +1625,28 @@ c     using a neighbor list
 c
 c
       subroutine empole1b
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use limits
+      use molcul
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,kkk
       integer ix,iy,iz
@@ -1791,7 +1791,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP PARALLEL default(shared) firstprivate(f)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
 !$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,gfd,xr,yr,zr,xix,yix,zix,
@@ -2523,20 +2523,20 @@ c     using particle mesh Ewald summation and a double loop
 c
 c
       subroutine empole1c
+      use sizes
+      use atoms
+      use boxes
+      use chgpot
+      use deriv
+      use energi
+      use ewald
+      use inter
+      use math
+      use mpole
+      use polar
+      use polpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'virial.i'
       integer i,j,ii
       real*8 e,ei,eintra
       real*8 f,term,fterm
@@ -2754,27 +2754,27 @@ c     and dipole polarizability
 c
 c
       subroutine ereal1c (eintra)
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use limits
+      use math
+      use molcul
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,jcell
       integer iax,iay,iaz
@@ -4534,20 +4534,20 @@ c     using particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine empole1d
+      use sizes
+      use atoms
+      use boxes
+      use chgpot
+      use deriv
+      use energi
+      use ewald
+      use inter
+      use math
+      use mpole
+      use polar
+      use polpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'virial.i'
       integer i,j,ii
       real*8 e,ei,eintra
       real*8 f,term,fterm
@@ -4765,28 +4765,28 @@ c     and dipole polarizability
 c
 c
       subroutine ereal1d (eintra)
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use limits
+      use math
+      use molcul
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,kkk
       integer iax,iay,iaz
@@ -4921,7 +4921,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP PARALLEL default(shared) firstprivate(f)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,damp,expdamp,
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
 !$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,usc3,usc5,alsq2,alsq2n,
@@ -5861,22 +5861,22 @@ c     during May 2007
 c
 c
       subroutine emrecip1
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use deriv
+      use energi
+      use ewald
+      use math
+      use mpole
+      use pme
+      use polar
+      use polpot
+      use potent
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'pme.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'virial.i'
       integer i,j,k,ii
       integer j1,j2,j3
       integer k1,k2,k3

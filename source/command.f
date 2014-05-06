@@ -18,8 +18,8 @@ c     command line at program runtime
 c
 c
       subroutine command
+      use argue
       implicit none
-      include 'argue.i'
       integer i,iargc
       character*1 letter
       character*20 blank

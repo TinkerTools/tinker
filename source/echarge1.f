@@ -17,10 +17,10 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine echarge1
+      use sizes
+      use limits
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -59,22 +59,22 @@ c     using a pairwise double loop
 c
 c
       subroutine echarge1a
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk
       integer in,kn
@@ -482,24 +482,24 @@ c     using the method of lights
 c
 c
       subroutine echarge1b
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use light
+      use molcul
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k,ii,kk
       integer in,ic,kn,kc
       integer kgy,kgz,kmap
@@ -807,22 +807,22 @@ c     using a pairwise neighbor list
 c
 c
       subroutine echarge1c
+      use sizes
+      use atoms
+      use bound
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn,ic,kc
@@ -1089,7 +1089,7 @@ c
          vir(1,i) = virt(1,i)
          vir(2,i) = virt(2,i)
          vir(3,i) = virt(3,i)
-      end do	  
+      end do
 c
 c     perform deallocation of some local arrays
 c
@@ -1113,25 +1113,25 @@ c     using a particle mesh Ewald summation
 c
 c
       subroutine echarge1d
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use group
+      use inter
+      use math
+      use molcul
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk
       integer in,kn
@@ -1498,26 +1498,26 @@ c     using a particle mesh Ewald summation and the method of lights
 c
 c
       subroutine echarge1e
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use group
+      use inter
+      use light
+      use math
+      use molcul
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'light.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,in,kn
       integer kgy,kgz,kmap
@@ -1831,25 +1831,25 @@ c     using a particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine echarge1f
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use group
+      use inter
+      use math
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
@@ -1977,7 +1977,7 @@ c
 !$OMP& schedule(guided)
 c
 c     compute the real space Ewald energy and first derivatives
-c	  
+c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
@@ -2116,7 +2116,7 @@ c
          vir(1,i) = virt(1,i)
          vir(2,i) = virt(2,i)
          vir(3,i) = virt(3,i)
-      end do	  
+      end do
 c
 c     intermolecular energy is total minus intramolecular part
 c
@@ -2144,20 +2144,20 @@ c     for use with potential smoothing methods
 c
 c
       subroutine echarge1g
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use math
+      use molcul
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'usage.i'
-      include 'warp.i'
       integer i,j,k
       integer ii,kk
       integer in,kn
@@ -2378,19 +2378,19 @@ c     during May 2007
 c
 c
       subroutine ecrecip1
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use charge
+      use chgpot
+      use deriv
+      use energi
+      use ewald
+      use math
+      use pme
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'pme.i'
-      include 'virial.i'
       integer i,j,k
       integer isite,iatm
       integer i0,j0,k0

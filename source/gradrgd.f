@@ -17,11 +17,11 @@ c     and first derivatives with respect to rigid body coordinates
 c
 c
       subroutine gradrgd (energy,derivs)
+      use sizes
+      use atoms
+      use group
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'rigid.i'
       integer i,j,k
       integer init,stop
       real*8 energy

@@ -16,18 +16,18 @@ c     "eangtor" calculates the angle-torsion potential energy
 c
 c
       subroutine eangtor
+      use sizes
+      use angtor
+      use atoms
+      use angbnd
+      use bound
+      use energi
+      use group
+      use math
+      use torpot
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angtor.i'
-      include 'atoms.i'
-      include 'angle.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,k,iangtor
       integer ia,ib,ic,id
       real*8 e,e1,e2
@@ -53,7 +53,7 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      logical proceed      
+      logical proceed
 c
 c
 c     zero out the energy due to extra potential terms

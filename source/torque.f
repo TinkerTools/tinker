@@ -24,11 +24,11 @@ c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c
       subroutine torque (i,trq1,trq2,frcx,frcy,frcz)
+      use sizes
+      use atoms
+      use deriv
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'mpole.i'
       integer i,j
       integer ia,ib,ic,id
       real*8 du,dv,dw,random
@@ -402,7 +402,7 @@ c
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine torque2  --  convert all site torques to forces  ##        
+c     ##  subroutine torque2  --  convert all site torques to forces  ##
 c     ##                                                              ##
 c     ##################################################################
 c
@@ -419,10 +419,10 @@ c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c
       subroutine torque2 (trq,derivs)
+      use sizes
+      use atoms
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
       integer i,j
       integer ia,ib,ic,id
       real*8 du,dv,dw,random
@@ -703,11 +703,11 @@ c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c
       subroutine torque3 (i,trq1,trq2,frcx,frcy,frcz,demi,depi)
+      use sizes
+      use atoms
+      use deriv
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'mpole.i'
       integer i,j
       integer ia,ib,ic,id
       real*8 du,dv,dw,random

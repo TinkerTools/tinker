@@ -27,16 +27,16 @@ c     Molecular Physics, 87, 1117-1157 (1996)
 c
 c
       subroutine temper (dt)
+      use sizes
+      use atoms
+      use bath
+      use group
+      use mdstuf
+      use moldyn
+      use rgddyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'group.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'rgddyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,nc,ns
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8
@@ -139,18 +139,18 @@ c     72, 2384-2393 (1980)
 c
 c
       subroutine temper2 (dt,eksum,ekin,temp)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use group
+      use mdstuf
+      use molcul
+      use moldyn
+      use rgddyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'group.i'
-      include 'mdstuf.i'
-      include 'molcul.i'
-      include 'moldyn.i'
-      include 'rgddyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k,m
       integer nc,ns
       real*8 dt,dtc,dts

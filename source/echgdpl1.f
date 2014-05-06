@@ -17,24 +17,24 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine echgdpl1
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use dipole
+      use energi
+      use group
+      use inter
+      use molcul
+      use shunt
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'dipole.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer i1,k1,k2
       integer, allocatable :: skip(:)

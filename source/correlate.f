@@ -18,13 +18,13 @@ c     from a molecular dynamics or other trajectory
 c
 c
       program correlate
+      use sizes
+      use ascii
+      use atoms
+      use files
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'ascii.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer maxsite,maxblock
       parameter (maxsite=1000)
       parameter (maxblock=1000)
@@ -266,12 +266,12 @@ c     of time correlation functions
 c
 c
       subroutine readblk (start,stop,step,nb,tb,xb,yb,zb)
+      use sizes
+      use atomid
+      use atoms
+      use files
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
       integer maxsite
       parameter (maxsite=1000)
       integer i,k,ixyz
@@ -369,9 +369,9 @@ c     function to compute other properties to be correlated
 c
 c
       function property (i,xi,yi,zi,k,xk,yk,zk)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer maxsite
       parameter (maxsite=1000)
       integer i,j,k

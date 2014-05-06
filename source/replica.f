@@ -18,13 +18,13 @@ c     list if the replicates method is to be used
 c
 c
       subroutine replica (cutoff)
+      use sizes
+      use bound
+      use boxes
+      use cell
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,k
       integer nx,ny,nz
       real*8 cutoff,maximage

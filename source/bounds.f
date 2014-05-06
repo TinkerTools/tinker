@@ -17,12 +17,12 @@ c     translates any stray molecules back into the periodic box
 c
 c
       subroutine bounds
+      use sizes
+      use atomid
+      use atoms
+      use boxes
+      use molcul
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'molcul.i'
       integer i,j,k
       integer init,stop
       real*8 weigh

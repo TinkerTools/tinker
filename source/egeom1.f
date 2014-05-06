@@ -19,20 +19,20 @@ c     Gaussian basin and spherical droplet restraints
 c
 c
       subroutine egeom1
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use math
+      use restrn
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'kgeoms.i'
-      include 'molcul.i'
-      include 'math.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer ia,ib,ic,id
       real*8 e,xr,yr,zr,fgrp

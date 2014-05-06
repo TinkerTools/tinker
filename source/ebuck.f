@@ -16,14 +16,14 @@ c     "ebuck" calculates the Buckingham exp-6 van der Waals energy
 c
 c
       subroutine ebuck
+      use sizes
+      use energi
+      use iounit
+      use limits
+      use vdwpot
+      use warp
       implicit none
       real*8 elrc
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'iounit.i'
-      include 'vdwpot.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -64,19 +64,19 @@ c     using a pairwise double loop
 c
 c
       subroutine ebuck0a
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use energi
+      use group
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -388,21 +388,21 @@ c     using the method of lights
 c
 c
       subroutine ebuck0b
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use energi
+      use group
+      use light
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'light.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -667,19 +667,19 @@ c     using a pairwise neighbor list
 c
 c
       subroutine ebuck0c
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use energi
+      use group
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -872,9 +872,9 @@ c     via a Gaussian approximation for potential energy smoothing
 c
 c
       subroutine ebuck0d
+      use math
+      use vdwpot
       implicit none
-      include 'math.i'
-      include 'vdwpot.i'
 c
 c
 c     set coefficients for a two-Gaussian fit to MM2 vdw form

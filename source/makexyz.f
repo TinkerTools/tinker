@@ -17,10 +17,10 @@ c     for a full structure from the internal coordinate values
 c
 c
       subroutine makexyz
+      use sizes
+      use atoms
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'zcoord.i'
       integer i,chiral
       integer ia,ib,ic
       real*8 bond

@@ -17,20 +17,20 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine etortor1
+      use sizes
+      use atoms
+      use bitor
+      use bound
+      use deriv
+      use energi
+      use group
+      use ktrtor
+      use math
+      use torpot
+      use tortor
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'ktrtor.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tortor.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,k,itortor
       integer pos1,pos2
       integer ia,ib,ic,id,ie

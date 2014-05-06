@@ -17,15 +17,15 @@ c     energy at trigonal centers via the central atom height
 c
 c
       subroutine eopdist
+      use sizes
+      use angpot
+      use atoms
+      use bound
+      use energi
+      use group
+      use opdist
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'opdist.i'
-      include 'usage.i'
       integer i,ia,ib,ic,id
       real*8 e,force,fgrp
       real*8 dt,dt2,dt3,dt4

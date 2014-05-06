@@ -31,21 +31,21 @@ c     19, 1001-1016 (1998)
 c
 c
       subroutine emm3hb2 (iatom,xred,yred,zred)
+      use sizes
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use cell
+      use chgpot
+      use couple
+      use group
+      use hessn
+      use shunt
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'shunt.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt

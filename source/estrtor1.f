@@ -17,19 +17,19 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine estrtor1
+      use sizes
+      use atoms
+      use bndstr
+      use bound
+      use deriv
+      use energi
+      use group
+      use strtor
+      use torpot
+      use tors
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'strtor.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,k,istrtor
       integer ia,ib,ic,id
       real*8 e,dr,fgrp
@@ -214,11 +214,11 @@ c
                dedzib = xca*dedyt - yca*dedxt + ydc*dedxu
      &                     - xdc*dedyu + ddrdz
                dedxic = zba*dedyt - yba*dedzt + ydb*dedzu
-     &                     - zdb*dedyu 
+     &                     - zdb*dedyu
                dedyic = xba*dedzt - zba*dedxt + zdb*dedxu
-     &                     - xdb*dedzu 
+     &                     - xdb*dedzu
                dedzic = yba*dedxt - xba*dedyt + xdb*dedyu
-     &                     - ydb*dedxu 
+     &                     - ydb*dedxu
                dedxid = zcb*dedyu - ycb*dedzu
                dedyid = xcb*dedzu - zcb*dedxu
                dedzid = ycb*dedxu - xcb*dedyu
@@ -257,8 +257,8 @@ c
 c     increment chain rule components for the second bond
 c
                dedxia = dedxia + zcb*dedyt - ycb*dedzt
-               dedyia = dedyia + xcb*dedzt - zcb*dedxt 
-               dedzia = dedzia + ycb*dedxt - xcb*dedyt 
+               dedyia = dedyia + xcb*dedzt - zcb*dedxt
+               dedzia = dedzia + ycb*dedxt - xcb*dedyt
                dedxib = dedxib + yca*dedzt - zca*dedyt + zdc*dedyu
      &                     - ydc*dedzu - ddrdx
                dedyib = dedyib + zca*dedxt - xca*dedzt + xdc*dedzu
@@ -312,11 +312,11 @@ c
                dedyia = dedyia + xcb*dedzt - zcb*dedxt
                dedzia = dedzia + ycb*dedxt - xcb*dedyt
                dedxib = dedxib + yca*dedzt - zca*dedyt + zdc*dedyu
-     &                     - ydc*dedzu 
+     &                     - ydc*dedzu
                dedyib = dedyib + zca*dedxt - xca*dedzt + xdc*dedzu
-     &                     - zdc*dedxu 
+     &                     - zdc*dedxu
                dedzib = dedzib + xca*dedyt - yca*dedxt + ydc*dedxu
-     &                     - xdc*dedyu 
+     &                     - xdc*dedyu
                dedxic = dedxic + zba*dedyt - yba*dedzt + ydb*dedzu
      &                     - zdb*dedyu - ddrdx
                dedyic = dedyic + xba*dedzt - zba*dedxt + zdb*dedxu

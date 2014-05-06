@@ -17,20 +17,20 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangtor1
+      use sizes
+      use angbnd
+      use angtor
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use math
+      use torpot
+      use tors
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angtor.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,k,iangtor
       integer ia,ib,ic,id
       real*8 e,e1,e2
@@ -223,11 +223,11 @@ c
                dedzib = terma*(xba*yt-yba*xt) + termc*(ycb*xt-xcb*yt)
      &                     + xca*dedyt - yca*dedxt
      &                     + ydc*dedxu - xdc*dedyu
-               dedxic = termc*(ycb*zt-zcb*yt) + zba*dedyt 
+               dedxic = termc*(ycb*zt-zcb*yt) + zba*dedyt
      &                     - yba*dedzt + ydb*dedzu - zdb*dedyu
-               dedyic = termc*(zcb*xt-xcb*zt) + xba*dedzt 
+               dedyic = termc*(zcb*xt-xcb*zt) + xba*dedzt
      &                     - zba*dedxt + zdb*dedxu - xdb*dedzu
-               dedzic = termc*(xcb*yt-ycb*xt) + yba*dedxt 
+               dedzic = termc*(xcb*yt-ycb*xt) + yba*dedxt
      &                     - xba*dedyt + xdb*dedyu - ydb*dedxu
                dedxid = zcb*dedyu - ycb*dedzu
                dedyid = xcb*dedzu - zcb*dedxu
@@ -262,7 +262,7 @@ c
                dedzt = dedphi * (ycb*xt-xcb*yt) / (rt2*rcb)
                dedxu = dedphi * (ycb*zu-zcb*yu) / (ru2*rcb)
                dedyu = dedphi * (zcb*xu-xcb*zu) / (ru2*rcb)
-               dedzu = dedphi * (xcb*yu-ycb*xu) / (ru2*rcb) 
+               dedzu = dedphi * (xcb*yu-ycb*xu) / (ru2*rcb)
 c
 c     increment chain rule components for the second angle
 c

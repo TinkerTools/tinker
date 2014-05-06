@@ -17,18 +17,18 @@ c     kinetic energy of the overall system center of mass
 c
 c
       subroutine mdrest (istep)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use group
+      use inform
+      use iounit
+      use mdstuf
+      use moldyn
+      use rgddyn
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'rgddyn.i'
-      include 'units.i'
       integer i,j,k,istep
       real*8 etrans,erot
       real*8 weigh,totmass,eps
@@ -45,7 +45,7 @@ c
 c     check steps between center of mass motion removal
 c
       if (.not.dorest)  return
-      if (mod(istep,irest) .ne. 0)  return  
+      if (mod(istep,irest) .ne. 0)  return
 c
 c     zero out the total mass and overall linear velocity
 c

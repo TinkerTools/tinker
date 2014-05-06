@@ -23,8 +23,8 @@ c     New York, 1990; see section 24.2 for general discussion
 c
 c
       function maxwell (mass,temper)
+      use units
       implicit none
-      include 'units.i'
       real*8 maxwell
       real*8 mass,temper
       real*8 rho,beta

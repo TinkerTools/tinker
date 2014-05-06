@@ -16,18 +16,18 @@ c     "edipole" calculates the dipole-dipole interaction energy
 c
 c
       subroutine edipole
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use chgpot
+      use dipole
+      use energi
+      use group
+      use shunt
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'dipole.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'shunt.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k
       integer i1,i2,k1,k2
       real*8 xi,yi,zi

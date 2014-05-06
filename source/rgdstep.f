@@ -27,16 +27,16 @@ c     Center, Chelyabinsk, Russia, February 2001
 c
 c
       subroutine rgdstep (istep,dt)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use group
+      use iounit
+      use rgddyn
+      use units
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'iounit.i'
-      include 'rgddyn.i'
-      include 'units.i'
-      include 'virial.i'
       integer i,j,k
       integer istep,size
       integer start,stop
@@ -363,10 +363,10 @@ c     given the inertia tensor and angular momentum
 c
 c
       subroutine linbody (i,inert,wcp)
+      use sizes
+      use atoms
+      use group
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
       integer i,j,k
       real*8 rinv,rmin
       real*8 a11,a12,a22

@@ -18,21 +18,24 @@ c     in terms of type of interaction or atom number
 c
 c
       subroutine analysis (energy)
+      use sizes
+      use analyz
+      use atoms
+      use bound
+      use energi
+      use group
+      use inter
+      use iounit
+      use limits
+      use potent
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'potent.i'
-      include 'vdwpot.i'
       integer i
       real*8 energy
       real*8 cutoff
+      logical first
+      save first
+      data first  / .true. /
 c
 c
 c     zero out each of the potential energy components
@@ -62,6 +65,38 @@ c
       elf = 0.0d0
       eg = 0.0d0
       ex = 0.0d0
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(aesum))  allocate (aesum(maxatm))
+         if (.not. allocated(aeb))  allocate (aeb(maxatm))
+         if (.not. allocated(aea))  allocate (aea(maxatm))
+         if (.not. allocated(aeba))  allocate (aeba(maxatm))
+         if (.not. allocated(aeub))  allocate (aeub(maxatm))
+         if (.not. allocated(aeaa))  allocate (aeaa(maxatm))
+         if (.not. allocated(aeopb))  allocate (aeopb(maxatm))
+         if (.not. allocated(aeopd))  allocate (aeopd(maxatm))
+         if (.not. allocated(aeid))  allocate (aeid(maxatm))
+         if (.not. allocated(aeit))  allocate (aeit(maxatm))
+         if (.not. allocated(aet))  allocate (aet(maxatm))
+         if (.not. allocated(aept))  allocate (aept(maxatm))
+         if (.not. allocated(aebt))  allocate (aebt(maxatm))
+         if (.not. allocated(aeat))  allocate (aeat(maxatm))
+         if (.not. allocated(aett))  allocate (aett(maxatm))
+         if (.not. allocated(aev))  allocate (aev(maxatm))
+         if (.not. allocated(aec))  allocate (aec(maxatm))
+         if (.not. allocated(aecd))  allocate (aecd(maxatm))
+         if (.not. allocated(aed))  allocate (aed(maxatm))
+         if (.not. allocated(aem))  allocate (aem(maxatm))
+         if (.not. allocated(aep))  allocate (aep(maxatm))
+         if (.not. allocated(aer))  allocate (aer(maxatm))
+         if (.not. allocated(aes))  allocate (aes(maxatm))
+         if (.not. allocated(aelf))  allocate (aelf(maxatm))
+         if (.not. allocated(aeg))  allocate (aeg(maxatm))
+         if (.not. allocated(aex))  allocate (aex(maxatm))
+      end if
 c
 c     zero out energy partitioning components for each atom
 c

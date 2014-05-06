@@ -17,11 +17,11 @@ c     order polynomial switching functions for spherical cutoffs
 c
 c
       subroutine switch (mode)
+      use sizes
+      use limits
+      use nonpol
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'npolar.i'
-      include 'shunt.i'
       real*8 denom,term
       real*8 off3,off4,off5
       real*8 off6,off7

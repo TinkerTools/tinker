@@ -17,9 +17,9 @@ c     partitions the energy among the atoms
 c
 c
       subroutine etors3
+      use sizes
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'warp.i'
 c
 c
 c     choose standard or potential energy smoothing version
@@ -46,21 +46,21 @@ c     among the atoms
 c
 c
       subroutine etors3a
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use math
+      use torpot
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,ia,ib,ic,id
       real*8 e,rcb,angle,fgrp
       real*8 xt,yt,zt,rt2
@@ -251,21 +251,21 @@ c     energy among the atoms
 c
 c
       subroutine etors3b
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use energi
+      use group
+      use inform
+      use iounit
+      use math
+      use torpot
+      use tors
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
-      include 'warp.i'
       integer i,ia,ib,ic,id
       real*8 e,rcb,angle,fgrp
       real*8 width,wterm

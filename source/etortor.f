@@ -16,18 +16,18 @@ c     "etortor" calculates the torsion-torsion potential energy
 c
 c
       subroutine etortor
+      use sizes
+      use atoms
+      use bitor
+      use bound
+      use energi
+      use group
+      use ktrtor
+      use math
+      use torpot
+      use tortor
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'ktrtor.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tortor.i'
-      include 'usage.i'
       integer i,k,itortor
       integer pos1,pos2
       integer ia,ib,ic,id,ie
@@ -246,11 +246,11 @@ c     correctly handle enantiomeric sugar rings in nucleic acids
 c
 c
       subroutine chkttor (ib,ic,id,sign,value1,value2)
+      use sizes
+      use atomid
+      use atoms
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
       integer i,j,k,m
       integer ia,ib,ic,id
       real*8 sign

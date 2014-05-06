@@ -17,39 +17,39 @@ c     set of potential energy parameters for a force field
 c
 c
       subroutine prtprm (itxt)
+      use sizes
+      use angpot
+      use bndpot
+      use chgpot
+      use fields
+      use kanang
+      use kangs
+      use kantor
+      use katoms
+      use kbonds
+      use kchrge
+      use kdipol
+      use khbond
+      use kiprop
+      use kitors
+      use kmulti
+      use kopbnd
+      use kopdst
+      use korbs
+      use kpitor
+      use kpolr
+      use kstbnd
+      use ksttor
+      use ktorsn
+      use ktrtor
+      use kurybr
+      use kvdws
+      use kvdwpr
+      use mplpot
+      use polpot
+      use urypot
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'bndpot.i'
-      include 'chgpot.i'
-      include 'fields.i'
-      include 'kanang.i'
-      include 'kangs.i'
-      include 'kantor.i'
-      include 'katoms.i'
-      include 'kbonds.i'
-      include 'kchrge.i'
-      include 'kdipol.i'
-      include 'khbond.i'
-      include 'kiprop.i'
-      include 'kitors.i'
-      include 'kmulti.i'
-      include 'kopbnd.i'
-      include 'kopdst.i'
-      include 'korbs.i'
-      include 'kpitor.i'
-      include 'kpolr.i'
-      include 'kstbnd.i'
-      include 'ksttor.i'
-      include 'ktorsn.i'
-      include 'ktrtor.i'
-      include 'kurybr.i'
-      include 'kvdws.i'
-      include 'kvdwpr.i'
-      include 'mplpot.i'
-      include 'polpot.i'
-      include 'urypot.i'
-      include 'vdwpot.i'
       integer i,j,k,itxt
       integer number,npg
       integer k1,k2,k3

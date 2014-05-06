@@ -17,20 +17,20 @@ c     the bond angles; also processes new or changed parameters
 c
 c
       subroutine kangle
+      use sizes
+      use angbnd
+      use angpot
+      use atomid
+      use atoms
+      use couple
+      use fields
+      use inform
+      use iounit
+      use kangs
+      use keys
+      use potent
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kangs.i'
-      include 'keys.i'
-      include 'potent.i'
-      include 'usage.i'
       integer i,j
       integer ia,ib,ic
       integer ita,itb,itc
@@ -305,6 +305,13 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ak))  allocate (ak(maxang))
+      if (.not. allocated(anat))  allocate (anat(maxang))
+      if (.not. allocated(afld))  allocate (afld(maxang))
+      if (.not. allocated(angtyp))  allocate (angtyp(maxang))
+c
 c     use special angle parameter assignment method for MMFF
 c
       if (forcefield .eq. 'MMFF94') then
@@ -475,16 +482,16 @@ c     616-641 (1995)
 c
 c
       subroutine kanglem
+      use sizes
+      use angbnd
+      use angpot
+      use atomid
+      use atoms
+      use bndstr
+      use merck
+      use potent
+      use ring
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'merck.i'
-      include 'potent.i'
-      include 'ring.i'
       integer i,j,k,l,m
       integer ia,ib,ic
       integer ita,itb,itc

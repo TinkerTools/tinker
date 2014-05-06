@@ -19,15 +19,21 @@ c     atom is stored for use in out-of-plane bending
 c
 c
       subroutine angles
+      use sizes
+      use angbnd
+      use atmlst
+      use atoms
+      use couple
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
       integer i,j,k,m
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iang))  allocate (iang(4,maxang))
+      if (.not. allocated(anglist))
+     &   allocate (anglist(maxval*(maxval-1)/2,maxatm))
 c
 c     loop over all atoms, storing the atoms in each bond angle
 c

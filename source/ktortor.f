@@ -17,17 +17,17 @@ c     torsion pairs and processes any new or changed values
 c
 c
       subroutine ktortor
+      use sizes
+      use atomid
+      use atoms
+      use bitor
+      use inform
+      use iounit
+      use keys
+      use ktrtor
+      use potent
+      use tortor
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'ktrtor.i'
-      include 'potent.i'
-      include 'tortor.i'
       integer i,j,k,m
       integer ia,ib,ic,id,ie
       integer ita,itb,itc,itd,ite
@@ -140,6 +140,10 @@ c
       do i = maxntt, 1, -1
          if (ktt(i) .eq. blank)  ntt = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(itt))  allocate (itt(3,maxbitor))
 c
 c     check whether each torsion-torsion parameter is periodic;
 c     assumes the "tbf" array is sorted with both indices in

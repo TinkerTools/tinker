@@ -17,9 +17,9 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine etors1
+      use sizes
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'warp.i'
 c
 c
 c     choose standard or potential energy smoothing version
@@ -46,17 +46,17 @@ c     standard sum of Fourier terms
 c
 c
       subroutine etors1a
+      use sizes
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use torpot
+      use tors
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,ia,ib,ic,id
       real*8 e,dedphi,rcb,fgrp
       real*8 v1,v2,v3,v4,v5,v6
@@ -311,18 +311,18 @@ c     potential energy smoothing methods
 c
 c
       subroutine etors1b
+      use sizes
+      use atoms
+      use deriv
+      use energi
+      use group
+      use math
+      use torpot
+      use tors
+      use usage
+      use virial
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
-      include 'virial.i'
-      include 'warp.i'
       integer i,ia,ib,ic,id
       real*8 e,dedphi,rcb
       real*8 width,wterm,fgrp

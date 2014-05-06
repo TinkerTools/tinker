@@ -30,15 +30,15 @@ c     245-268 (1976)
 c
 c
       program bar
+      use sizes
+      use atoms
+      use energi
+      use files
+      use inform
+      use iounit
+      use keys
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'energi.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'units.i'
       integer i,j,k
       integer n1,n2
       integer ixyz,nbst

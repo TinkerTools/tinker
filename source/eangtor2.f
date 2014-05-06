@@ -17,17 +17,17 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangtor2 (i)
+      use sizes
+      use angbnd
+      use angtor
+      use atoms
+      use bound
+      use group
+      use hessn
+      use math
+      use torpot
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angtor.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
       integer i,j,k,iangtor
       integer ia,ib,ic,id
       real*8 dedphi,d2edphi2,fgrp
@@ -84,7 +84,7 @@ c
       real*8 dxia,dyia,dzia
       real*8 dxib,dyib,dzib
       real*8 dxic,dyic,dzic
-      real*8 dxid,dyid,dzid      
+      real*8 dxid,dyid,dzid
       real*8 dxiaxia,dyiayia,dziazia
       real*8 dxibxib,dyibyib,dzibzib
       real*8 dxicxic,dyicyic,dziczic
@@ -353,63 +353,63 @@ c
 c
 c     scale the first derivatives of the first angle
 c
-               domegadxia = domegadxia * radian 
+               domegadxia = domegadxia * radian
                domegadyia = domegadyia * radian
                domegadzia = domegadzia * radian
                domegadxic = domegadxic * radian
-               domegadyic = domegadyic * radian 
+               domegadyic = domegadyic * radian
                domegadzic = domegadzic * radian
                domegadxib = domegadxib * radian
                domegadyib = domegadyib * radian
                domegadzib = domegadzib * radian
 c
-c     scale the second derivatives of the first angle 
+c     scale the second derivatives of the first angle
 c
-               doxiaxia = doxiaxia * d2dt 
-               doxiayia = doxiayia * d2dt 
-               doxiazia = doxiazia * d2dt 
-               doyiayia = doyiayia * d2dt 
-               doyiazia = doyiazia * d2dt 
-               doziazia = doziazia * d2dt 
-               doxicxic = doxicxic * d2dt 
-               doxicyic = doxicyic * d2dt 
-               doxiczic = doxiczic * d2dt 
-               doyicyic = doyicyic * d2dt 
-               doyiczic = doyiczic * d2dt 
-               doziczic = doziczic * d2dt 
-               doxiaxic = doxiaxic * d2dt 
-               doxiayic = doxiayic * d2dt 
-               doxiazic = doxiazic * d2dt 
-               doyiaxic = doyiaxic * d2dt 
-               doyiayic = doyiayic * d2dt 
-               doyiazic = doyiazic * d2dt 
-               doziaxic = doziaxic * d2dt 
-               doziayic = doziayic * d2dt 
-               doziazic = doziazic * d2dt 
-               doxibxia = doxibxia * d2dt 
-               doxibyia = doxibyia * d2dt 
-               doxibzia = doxibzia * d2dt 
-               doyibxia = doyibxia * d2dt 
-               doyibyia = doyibyia * d2dt 
-               doyibzia = doyibzia * d2dt 
-               dozibxia = dozibxia * d2dt 
-               dozibyia = dozibyia * d2dt 
-               dozibzia = dozibzia * d2dt 
-               doxibxic = doxibxic * d2dt 
-               doxibyic = doxibyic * d2dt 
-               doxibzic = doxibzic * d2dt 
-               doyibxic = doyibxic * d2dt 
-               doyibyic = doyibyic * d2dt 
-               doyibzic = doyibzic * d2dt 
-               dozibxic = dozibxic * d2dt 
-               dozibyic = dozibyic * d2dt 
-               dozibzic = dozibzic * d2dt 
-               doxibxib = doxibxib * d2dt 
-               doxibyib = doxibyib * d2dt 
-               doxibzib = doxibzib * d2dt 
-               doyibyib = doyibyib * d2dt 
-               doyibzib = doyibzib * d2dt 
-               dozibzib = dozibzib * d2dt 
+               doxiaxia = doxiaxia * d2dt
+               doxiayia = doxiayia * d2dt
+               doxiazia = doxiazia * d2dt
+               doyiayia = doyiayia * d2dt
+               doyiazia = doyiazia * d2dt
+               doziazia = doziazia * d2dt
+               doxicxic = doxicxic * d2dt
+               doxicyic = doxicyic * d2dt
+               doxiczic = doxiczic * d2dt
+               doyicyic = doyicyic * d2dt
+               doyiczic = doyiczic * d2dt
+               doziczic = doziczic * d2dt
+               doxiaxic = doxiaxic * d2dt
+               doxiayic = doxiayic * d2dt
+               doxiazic = doxiazic * d2dt
+               doyiaxic = doyiaxic * d2dt
+               doyiayic = doyiayic * d2dt
+               doyiazic = doyiazic * d2dt
+               doziaxic = doziaxic * d2dt
+               doziayic = doziayic * d2dt
+               doziazic = doziazic * d2dt
+               doxibxia = doxibxia * d2dt
+               doxibyia = doxibyia * d2dt
+               doxibzia = doxibzia * d2dt
+               doyibxia = doyibxia * d2dt
+               doyibyia = doyibyia * d2dt
+               doyibzia = doyibzia * d2dt
+               dozibxia = dozibxia * d2dt
+               dozibyia = dozibyia * d2dt
+               dozibzia = dozibzia * d2dt
+               doxibxic = doxibxic * d2dt
+               doxibyic = doxibyic * d2dt
+               doxibzic = doxibzic * d2dt
+               doyibxic = doyibxic * d2dt
+               doyibyic = doyibyic * d2dt
+               doyibzic = doyibzic * d2dt
+               dozibxic = dozibxic * d2dt
+               dozibyic = dozibyic * d2dt
+               dozibzic = dozibzic * d2dt
+               doxibxib = doxibxib * d2dt
+               doxibyib = doxibyib * d2dt
+               doxibzib = doxibzib * d2dt
+               doyibyib = doyibyib * d2dt
+               doyibzib = doyibzib * d2dt
+               dozibzib = dozibzib * d2dt
 c
 c     abbreviations for first derivative chain rule terms
 c
@@ -616,7 +616,7 @@ c
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxia
      &                             + d2edphi2*dphidxia*dphidxia
      &                             + 2.0d0 * domegadxia*dxia
-     &                             + doxiaxia 
+     &                             + doxiaxia
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
      &                             + domegadxia*dyia + domegadyia*dxia
@@ -712,7 +712,7 @@ c
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiazic
      &                             + d2edphi2*dphidxia*dphidzic
      &                             + domegadxia*dzic + domegadzic*dxia
-     &                             + doxiazic 
+     &                             + doxiazic
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiazic
      &                             + d2edphi2*dphidyia*dphidzic
      &                             + domegadyia*dzic + domegadzic*dyia
@@ -936,7 +936,7 @@ c
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxic
      &                             + d2edphi2*dphidxic*dphidyia
      &                             + domegadyia*dxic + domegadxic*dyia
-     &                             + doyiaxic     
+     &                             + doyiaxic
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayic
      &                             + d2edphi2*dphidyic*dphidyia
      &                             + domegadyia*dyic + domegadyic*dyia
@@ -952,10 +952,10 @@ c
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayic
      &                             + d2edphi2*dphidyic*dphidzia
      &                             + domegadzia*dyic + domegadyic*dzia
-     &                             + doziayic  
+     &                             + doziayic
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazic
      &                             + d2edphi2*dphidzic*dphidzia
-     &                             + domegadzia*dzic + domegadzic*dzia 
+     &                             + domegadzia*dzic + domegadzic*dzia
      &                             + doziazic
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
      &                             + d2edphi2*dphidxic*dphidxib
@@ -995,19 +995,19 @@ c
      &                             + dozibzic
                   hessx(1,id) = hessx(1,id) + dedphi*dxicxid
      &                             + d2edphi2*dphidxic*dphidxid
-     &                             + domegadxic*dxid 
+     &                             + domegadxic*dxid
                   hessy(1,id) = hessy(1,id) + dedphi*dyicxid
      &                             + d2edphi2*dphidyic*dphidxid
-     &                             + domegadyic*dxid 
+     &                             + domegadyic*dxid
                   hessz(1,id) = hessz(1,id) + dedphi*dzicxid
      &                             + d2edphi2*dphidzic*dphidxid
-     &                             + domegadzic*dxid 
+     &                             + domegadzic*dxid
                   hessx(2,id) = hessx(2,id) + dedphi*dxicyid
      &                             + d2edphi2*dphidxic*dphidyid
      &                             + domegadxic*dyid
                   hessy(2,id) = hessy(2,id) + dedphi*dyicyid
      &                             + d2edphi2*dphidyic*dphidyid
-     &                             + domegadyic*dyid 
+     &                             + domegadyic*dyid
                   hessz(2,id) = hessz(2,id) + dedphi*dzicyid
      &                             + d2edphi2*dphidzic*dphidyid
      &                             + domegadzic*dyid
@@ -1227,7 +1227,7 @@ c
 c
 c     scale the first-derivatives of the second angle
 c
-               domegadxib = domegadxib * radian 
+               domegadxib = domegadxib * radian
                domegadyib = domegadyib * radian
                domegadzib = domegadzib * radian
                domegadxid = domegadxid * radian
@@ -1237,43 +1237,43 @@ c
                domegadyic = domegadyic * radian
                domegadzic = domegadzic * radian
 c
-c     scale the second-derivatives of the second angle 
+c     scale the second-derivatives of the second angle
 c
                doxibxib = doxibxib * d2dt
-               doxibyib = doxibyib * d2dt 
-               doxibzib = doxibzib * d2dt 
-               doyibyib = doyibyib * d2dt 
-               doyibzib = doyibzib * d2dt 
-               dozibzib = dozibzib * d2dt 
-               doxidxid = doxidxid * d2dt 
-               doxidyid = doxidyid * d2dt 
-               doxidzid = doxidzid * d2dt 
-               doyidyid = doyidyid * d2dt 
-               doyidzid = doyidzid * d2dt 
-               dozidzid = dozidzid * d2dt 
-               doxibxid = doxibxid * d2dt 
-               doxibyid = doxibyid * d2dt 
-               doxibzid = doxibzid * d2dt 
-               doyibxid = doyibxid * d2dt 
-               doyibyid = doyibyid * d2dt 
-               doyibzid = doyibzid * d2dt 
-               dozibxid = dozibxid * d2dt 
-               dozibyid = dozibyid * d2dt 
-               dozibzid = dozibzid * d2dt 
-               doxicxib = doxicxib * d2dt 
-               doxicyib = doxicyib * d2dt 
-               doxiczib = doxiczib * d2dt 
-               doyicxib = doyicxib * d2dt 
-               doyicyib = doyicyib * d2dt 
-               doyiczib = doyiczib * d2dt 
-               dozicxib = dozicxib * d2dt 
-               dozicyib = dozicyib * d2dt 
-               doziczib = doziczib * d2dt 
-               doxicxid = doxicxid * d2dt 
-               doxicyid = doxicyid * d2dt 
-               doxiczid = doxiczid * d2dt 
-               doyicxid = doyicxid * d2dt 
-               doyicyid = doyicyid * d2dt 
+               doxibyib = doxibyib * d2dt
+               doxibzib = doxibzib * d2dt
+               doyibyib = doyibyib * d2dt
+               doyibzib = doyibzib * d2dt
+               dozibzib = dozibzib * d2dt
+               doxidxid = doxidxid * d2dt
+               doxidyid = doxidyid * d2dt
+               doxidzid = doxidzid * d2dt
+               doyidyid = doyidyid * d2dt
+               doyidzid = doyidzid * d2dt
+               dozidzid = dozidzid * d2dt
+               doxibxid = doxibxid * d2dt
+               doxibyid = doxibyid * d2dt
+               doxibzid = doxibzid * d2dt
+               doyibxid = doyibxid * d2dt
+               doyibyid = doyibyid * d2dt
+               doyibzid = doyibzid * d2dt
+               dozibxid = dozibxid * d2dt
+               dozibyid = dozibyid * d2dt
+               dozibzid = dozibzid * d2dt
+               doxicxib = doxicxib * d2dt
+               doxicyib = doxicyib * d2dt
+               doxiczib = doxiczib * d2dt
+               doyicxib = doyicxib * d2dt
+               doyicyib = doyicyib * d2dt
+               doyiczib = doyiczib * d2dt
+               dozicxib = dozicxib * d2dt
+               dozicyib = dozicyib * d2dt
+               doziczib = doziczib * d2dt
+               doxicxid = doxicxid * d2dt
+               doxicyid = doxicyid * d2dt
+               doxiczid = doxiczid * d2dt
+               doyicxid = doyicxid * d2dt
+               doyicyid = doyicyid * d2dt
                doyiczid = doyiczid * d2dt
                dozicxid = dozicxid * d2dt
                dozicyid = dozicyid * d2dt
@@ -1283,7 +1283,7 @@ c
                doxiczic = doxiczic * d2dt
                doyicyic = doyicyic * d2dt
                doyiczic = doyiczic * d2dt
-               doziczic = doziczic * d2dt 
+               doziczic = doziczic * d2dt
 c
 c     chain rule terms for first derivative components
 c

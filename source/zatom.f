@@ -18,19 +18,19 @@ c     atoms and internal coordinates are passed as arguments
 c
 c
       subroutine zatom (bionum,bond,angle,dihed,iz1,iz2,iz3,iz4)
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use bndstr
+      use fields
+      use iounit
+      use kangs
+      use katoms
+      use kbonds
+      use zclose
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'kangs.i'
-      include 'katoms.i'
-      include 'kbonds.i'
-      include 'zclose.i'
-      include 'zcoord.i'
       integer i,size
       integer bionum
       integer na,nb

@@ -17,13 +17,13 @@ c     coordinates list and shifts the remaining atoms
 c
 c
       subroutine delete (iatom)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,k,m,iatom
 c
 c

@@ -17,14 +17,14 @@ c     energy and its torsional first derivatives
 c
 c
       subroutine gradrot (energy,derivs)
+      use sizes
+      use atoms
+      use deriv
+      use domega
+      use omega
+      use potent
+      use rotbnd
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'domega.i'
-      include 'omega.i'
-      include 'potent.i'
-      include 'rotate.i'
       integer i,j,k
       integer base,partner
       real*8 energy,norm

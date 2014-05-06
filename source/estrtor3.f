@@ -17,23 +17,23 @@ c     also partitions the energy terms among the atoms
 c
 c
       subroutine estrtor3
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use math
+      use strtor
+      use torpot
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'strtor.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,k,istrtor
       integer ia,ib,ic,id
       real*8 e,dr,fgrp,angle

@@ -12,7 +12,7 @@
          machine/operating system.
 
          Only a few source files may require editing prior to building:
-         "sizes.i" which contains the master array dimensions used
+         "sizes.f" which contains some master array dimensions used
          throughout the package, and "openend.f" which is a system
          dependent routine to open a file at the end.
 
@@ -22,8 +22,8 @@
          file "initial.f".
 
          If you are building an OpenMP-capable version of TINKER with
-         a compiler other than the Intel Fortran compiler, then it may
-         be necessary remove the calls to the Intel-specific extensions
-         "kmp_set_stacksize" and "kmp-set-blocksize" near the top of the
-         file "initial.f".
+         a compiler other than the Intel Fortran compiler, then it is
+         necessary to remove the calls to the Intel-specific extensions
+         "kmp_set_stacksize" and "kmp-set-blocksize" near the top of
+         the file "initial.f".
 

@@ -26,16 +26,16 @@ c     Computational Chemistry, 15, 1302-1310 (1994)
 c
 c
       subroutine sdstep (istep,dt)
+      use sizes
+      use atoms
+      use atomid
+      use freeze
+      use mdstuf
+      use moldyn
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'freeze.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,istep
       real*8 dt,term
       real*8 epot,etot
@@ -178,14 +178,14 @@ c     update positions and velocities during stochastic dynamics
 c
 c
       subroutine sdterm (istep,dt,pfric,vfric,afric,prand,vrand)
+      use sizes
+      use atoms
+      use atomid
+      use bath
+      use stodyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'bath.i'
-      include 'stodyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,istep
       real*8 dt,ktm
       real*8 gdt,egdt
@@ -203,11 +203,19 @@ c
       real*8 afric(*)
       real*8 prand(3,*)
       real*8 vrand(3,*)
+      logical first
+      save first
+      data first  / .true. /
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(fgamma))  allocate (fgamma(n))
 c
 c     set the atomic friction coefficients to the global value
 c
-      if (istep .eq. 1) then
          do i = 1, n
             fgamma(i) = friction
          end do
@@ -318,15 +326,15 @@ c     Molecular Simulation, 1, 369-383 (1988)
 c
 c
       subroutine sdarea (istep)
+      use sizes
+      use atoms
+      use atomid
+      use couple
+      use kvdws
+      use math
+      use stodyn
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'couple.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'stodyn.i'
-      include 'usage.i'
       integer i,istep
       integer resurf,modstep
       real*8 probe,ratio,area

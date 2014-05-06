@@ -17,15 +17,15 @@ c     dihedral angle energy for a single atom
 c
 c
       subroutine eimprop2 (i)
+      use sizes
+      use atoms
+      use bound
+      use group
+      use hessn
+      use improp
+      use math
+      use torpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'improp.i'
-      include 'math.i'
-      include 'torpot.i'
       integer i,kiprop
       integer ia,ib,ic,id
       real*8 ideal,force

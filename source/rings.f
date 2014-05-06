@@ -21,17 +21,17 @@ c     are needed for force field parameter assignment
 c
 c
       subroutine rings
+      use sizes
+      use angbnd
+      use atoms
+      use bitor
+      use bndstr
+      use couple
+      use inform
+      use iounit
+      use ring
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'ring.i'
-      include 'tors.i'
       integer i,j,k,m,imax
       integer ia,ib,ic
       integer id,ie,ig
@@ -55,6 +55,13 @@ c
       if (nangle .eq. 0)  call angles
       if (ntors .eq. 0)  call torsions
       if (nbitor .eq. 0)  call bitors
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iring3))  allocate (iring3(3,maxring))
+      if (.not. allocated(iring4))  allocate (iring4(4,maxring))
+      if (.not. allocated(iring5))  allocate (iring5(5,maxring))
+      if (.not. allocated(iring6))  allocate (iring6(6,maxring))
 c
 c     search for and store all of the 3-membered rings
 c

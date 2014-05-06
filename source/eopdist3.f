@@ -18,20 +18,20 @@ c     the energy among the atoms
 c
 c
       subroutine eopdist3
+      use sizes
+      use action
+      use analyz
+      use angpot
+      use atomid
+      use atoms
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use opdist
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'opdist.i'
-      include 'usage.i'
       integer i,ia,ib,ic,id
       real*8 e,force,fgrp
       real*8 dt,dt2,dt3,dt4

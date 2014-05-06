@@ -30,18 +30,18 @@ c     Optimization, 5, 871-891 (1995)
 c
 c
       program sniffer
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
+      use linmin
+      use math
+      use minima
+      use output
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'linmin.i'
-      include 'math.i'
-      include 'minima.i'
-      include 'output.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,j,imin
       integer nvar,niter
       integer start,stop
@@ -421,11 +421,11 @@ c     and gradient for the Sniffer global optimization method
 c
 c
       function sniffer1 (xx,g)
+      use sizes
+      use atoms
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,nvar
       real*8 sniffer1,e
       real*8 xx(*)

@@ -95,19 +95,19 @@ c
 c
       subroutine tncg (mode,method,nvar,x0,minimum,grdmin,
      &                       fgvalue,hmatrix,optsave)
+      use sizes
+      use atoms
+      use hescut
+      use inform
+      use iounit
+      use keys
+      use linmin
+      use math
+      use minima
+      use output
+      use piorbs
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'hescut.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'linmin.i'
-      include 'math.i'
-      include 'minima.i'
-      include 'output.i'
-      include 'piorbs.i'
-      include 'potent.i'
       integer i,fg_call
       integer nvar,nmax
       integer iter_tn,iter_cg
@@ -522,9 +522,9 @@ c
       subroutine tnsolve (mode,method,negtest,nvar,p,x0,g,h,
      &                    h_init,h_stop,h_index,h_diag,cycle,
      &                    iter_cg,fg_call,fgvalue,status)
+      use sizes
+      use output
       implicit none
-      include 'sizes.i'
-      include 'output.i'
       integer i,j,k,nvar,cycle
       integer iter,iter_cg
       integer fg_call,maxiter
@@ -760,10 +760,10 @@ c
 c
       subroutine precond (method,iter,nvar,s,r,h,h_init,
      &                       h_stop,h_index,h_diag)
+      use sizes
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,k,ii,kk
       integer iii,kkk,iter
       integer nvar,nblock

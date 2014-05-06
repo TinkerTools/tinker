@@ -17,18 +17,18 @@ c     torsion in the structure and processes any changed values
 c
 c
       subroutine kimptor
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use imptor
+      use inform
+      use iounit
+      use keys
+      use kitors
+      use math
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'imptor.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kitors.i'
-      include 'math.i'
-      include 'potent.i'
       integer i,j,k,nti
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -116,6 +116,13 @@ c
       do i = maxnti, 1, -1
          if (kti(i) .eq. blank)  nti = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iitors))  allocate (iitors(4,maxtors))
+      if (.not. allocated(itors1))  allocate (itors1(4,maxtors))
+      if (.not. allocated(itors2))  allocate (itors2(4,maxtors))
+      if (.not. allocated(itors3))  allocate (itors3(4,maxtors))
 c
 c     assign improper torsional parameters for each improper torsion;
 c     multiple symmetrical parameters are given partial weights

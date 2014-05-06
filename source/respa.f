@@ -33,15 +33,15 @@ c     115, 4019-4029 (2001)
 c
 c
       subroutine respa (istep,dt)
+      use sizes
+      use atomid
+      use atoms
+      use freeze
+      use moldyn
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'freeze.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k
       integer istep
       integer nalt
@@ -234,9 +234,9 @@ c     for the fast-evolving local valence potential energy terms
 c
 c
       subroutine gradfast (energy,derivs)
+      use limits
+      use potent
       implicit none
-      include 'cutoff.i'
-      include 'potent.i'
       real*8 energy
       real*8 derivs(3,*)
       logical save_vdw,save_charge
@@ -301,8 +301,8 @@ c     for the slow-evolving nonbonded potential energy terms
 c
 c
       subroutine gradslow (energy,derivs)
+      use potent
       implicit none
-      include 'potent.i'
       real*8 energy
       real*8 derivs(3,*)
       logical save_bond,save_angle

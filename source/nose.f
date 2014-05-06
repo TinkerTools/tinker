@@ -25,18 +25,18 @@ c     original version written by Teresa Head-Gordon, November 2011
 c
 c
       subroutine nose (istep,dt)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use boxes
+      use freeze
+      use mdstuf
+      use moldyn
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'boxes.i'
-      include 'freeze.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,istep
       real*8 dt,dt_2
       real*8 epot,etot
@@ -180,15 +180,15 @@ c     Nose-Hoover chain algorithm
 c
 c
       subroutine hoover (dt,press)
+      use sizes
+      use atoms
+      use bath
+      use boxes
+      use mdstuf
+      use moldyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'boxes.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k
       integer nc,ns
       real*8 dt,dtc,dts
@@ -246,7 +246,7 @@ c     find velocity scale factor and update kinetic energy
 c
             expterm = exp(-(vnh(1)+vbar*odnf)*dt2)
             scale = scale * expterm
-            eksum = eksum * expterm * expterm 
+            eksum = eksum * expterm * expterm
 c
 c     update barostat and thermostat velocities and forces
 c

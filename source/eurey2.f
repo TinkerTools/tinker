@@ -17,15 +17,15 @@ c     interaction energy for a single atom at a time
 c
 c
       subroutine eurey2 (i)
+      use sizes
+      use atoms
+      use bound
+      use couple
+      use group
+      use hessn
+      use urey
+      use urypot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'urey.i'
-      include 'urypot.i'
       integer i,j,ia,ic,iurey
       real*8 ideal,force,fgrp
       real*8 xac,yac,zac

@@ -22,17 +22,17 @@ c     Liquids", Oxford University Press, 1987, Section 2.8
 c
 c
       subroutine evcorr (elrc)
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use limits
+      use math
+      use mutant
+      use shunt
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'math.i'
-      include 'mutant.i'
-      include 'shunt.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k,it,kt
       integer nstep,ndelta,nvt
       integer, allocatable :: ivt(:)
@@ -112,7 +112,7 @@ c
             fkm = dble(mvt(k))
             fik = fi*fk - vlam1*(fim*fk+(fi-fim)*fkm)
             if (k .eq. i)  fik = 0.5d0 * fik
-	    rv = radmin(kt,it) 
+	    rv = radmin(kt,it)
 	    eps = epsilon(kt,it)
             rv2 = rv * rv
             rv6 = rv2 * rv2 * rv2
@@ -125,7 +125,7 @@ c
                r6 = r3 * r3
                r7 = r6 * r
                e = 0.0d0
-               if (vdwtyp .eq. 'LENNARD-JONES') then     
+               if (vdwtyp .eq. 'LENNARD-JONES') then
                   p6 = rv6 / r6
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)
@@ -180,17 +180,17 @@ c     Liquids", Oxford University Press, 1987, Section 2.8
 c
 c
       subroutine evcorr1 (elrc,vlrc)
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use limits
+      use math
+      use mutant
+      use shunt
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'math.i'
-      include 'mutant.i'
-      include 'shunt.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k,it,kt
       integer nstep,ndelta,nvt
       integer, allocatable :: ivt(:)
@@ -274,7 +274,7 @@ c
             fkm = dble(mvt(k))
             fik = fi*fk - vlam1*(fim*fk+(fi-fim)*fkm)
             if (k .eq. i)  fik = 0.5d0 * fik
-	    rv = radmin(kt,it) 
+	    rv = radmin(kt,it)
 	    eps = epsilon(kt,it)
             rv2 = rv * rv
             rv6 = rv2 * rv2 * rv2
@@ -289,7 +289,7 @@ c
                r7 = r6 * r
                e = 0.0d0
                de = 0.0d0
-               if (vdwtyp .eq. 'LENNARD-JONES') then     
+               if (vdwtyp .eq. 'LENNARD-JONES') then
                   p6 = rv6 / r6
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)

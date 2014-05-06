@@ -16,13 +16,13 @@ c     "elj" calculates the Lennard-Jones 6-12 van der Waals energy
 c
 c
       subroutine elj
+      use sizes
+      use energi
+      use limits
+      use vdwpot
+      use warp
       implicit none
       real*8 elrc
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'vdwpot.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -61,19 +61,19 @@ c     using a pairwise double loop
 c
 c
       subroutine elj0a
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use energi
+      use group
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -361,21 +361,21 @@ c     using the method of lights
 c
 c
       subroutine elj0b
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use energi
+      use group
+      use light
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'light.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -623,19 +623,19 @@ c     using a pairwise neighbor list
 c
 c
       subroutine elj0c
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use energi
+      use group
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -835,9 +835,9 @@ c     via a Gaussian approximation for potential energy smoothing
 c
 c
       subroutine elj0d
+      use math
+      use vdwpot
       implicit none
-      include 'math.i'
-      include 'vdwpot.i'
 c
 c
 c     set coefficients for a two-Gaussian fit to Lennard-Jones
@@ -867,17 +867,17 @@ c     for use with stophat potential energy smoothing
 c
 c
       subroutine elj0e
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use energi
+      use group
+      use usage
+      use vdw
+      use vdwpot
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'warp.i'
       integer i,j,k,ii,kk
       integer iv,kv,it,kt
       integer, allocatable :: iv14(:)

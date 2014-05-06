@@ -17,14 +17,14 @@ c     via the velocity Verlet multistep recursion formula
 c
 c
       subroutine verlet (istep,dt)
+      use sizes
+      use atomid
+      use atoms
+      use freeze
+      use moldyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'freeze.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,istep
       real*8 dt,dt_2
       real*8 etot,epot

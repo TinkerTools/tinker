@@ -17,20 +17,20 @@ c     for a periodic system
 c
 c
       subroutine kewald
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chunks
+      use ewald
+      use fft
+      use inform
+      use iounit
+      use keys
+      use limits
+      use openmp
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chunks.i'
-      include 'cutoff.i'
-      include 'ewald.i'
-      include 'fft.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'openmp.i'
-      include 'pme.i'
       integer maxpower
       parameter (maxpower=54)
       integer i,k,next
@@ -152,20 +152,14 @@ c
      &              ' may give Poor Accuracy')
       end if
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
-      if (associated(thetai1))  deallocate (thetai1)
-      if (associated(thetai2))  deallocate (thetai2)
-      if (associated(thetai3))  deallocate (thetai3)
-      if (associated(qgrid))  deallocate (qgrid)
-      if (associated(qfac))  deallocate (qfac)
-      if (associated(pmetable))  deallocate (pmetable)
-      allocate (thetai1(4,bsorder,n))
-      allocate (thetai2(4,bsorder,n))
-      allocate (thetai3(4,bsorder,n))
-      allocate (qgrid(2,nfft1,nfft2,nfft3))
-      allocate (qfac(nfft1,nfft2,nfft3))
-      allocate (pmetable(n,nchunk))
+      if (.not. allocated(thetai1))  allocate (thetai1(4,bsorder,n))
+      if (.not. allocated(thetai2))  allocate (thetai2(4,bsorder,n))
+      if (.not. allocated(thetai3))  allocate (thetai3(4,bsorder,n))
+      if (.not. allocated(qgrid))  allocate (qgrid(2,nfft1,nfft2,nfft3))
+      if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
+      if (.not. allocated(pmetable))  allocate (pmetable(n,nchunk))
 c
 c     initialize the PME arrays that can be precomputed
 c
@@ -254,9 +248,9 @@ c     "extent" finds the largest interatomic distance in a system
 c
 c
       subroutine extent (rmax)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,k
       real*8 xi,yi,zi
       real*8 xk,yk,zk
@@ -295,11 +289,11 @@ c     along each axis of the PME grid for parallelization
 c
 c
       subroutine getchunk
+      use sizes
+      use chunks
+      use openmp
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'chunks.i'
-      include 'openmp.i'
-      include 'pme.i'
       integer i
 c
 c
@@ -354,9 +348,9 @@ c     transform of the B-splines
 c
 c
       subroutine moduli
+      use sizes
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'pme.i'
       integer i
       real*8 x
       real*8 array(maxorder)
@@ -430,8 +424,8 @@ c     of "bsarray" and stores it in "bsmod"
 c
 c
       subroutine dftmod (bsmod,bsarray,nfft,order)
+      use math
       implicit none
-      include 'math.i'
       integer i,j,k
       integer nfft,jcut
       integer order,order2

@@ -26,8 +26,8 @@ c                 output with the position following text
 c
 c
       subroutine gettext (string,text,next)
+      use ascii
       implicit none
-      include 'ascii.i'
       integer i,j
       integer len,length
       integer size,next

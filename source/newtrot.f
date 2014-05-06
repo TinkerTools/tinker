@@ -17,15 +17,15 @@ c     space using a truncated Newton conjugate gradient method
 c
 c
       program newtrot
+      use sizes
+      use files
+      use inform
+      use iounit
+      use keys
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i,imin,next
       integer freeunit
       real*8 grdmin,gnorm,grms
@@ -244,11 +244,11 @@ c     optimization in torsional angle space
 c
 c
       function newtrot1 (xx,g)
+      use sizes
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i
       real*8 newtrot1,e
       real*8 xx(*)
@@ -299,12 +299,12 @@ c     in torsional angle space
 c
 c
       subroutine newtrot2 (mode,xx,h,hinit,hstop,hindex,hdiag)
+      use sizes
+      use hescut
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'hescut.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i,j,ihess
       integer hinit(*)
       integer hstop(*)

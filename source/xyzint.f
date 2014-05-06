@@ -17,10 +17,10 @@ c     converts to and writes out an internal coordinates file
 c
 c
       program xyzint
+      use files
+      use iounit
+      use titles
       implicit none
-      include 'files.i'
-      include 'iounit.i'
-      include 'titles.i'
       integer izmt,mode
       integer next,freeunit
       logical exist

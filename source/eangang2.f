@@ -18,14 +18,14 @@ c     using finite difference methods
 c
 c
       subroutine eangang2 (i)
+      use sizes
+      use angang
+      use angbnd
+      use atoms
+      use deriv
+      use group
+      use hessn
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'group.i'
-      include 'hessn.i'
       integer i,j,k,iangang
       integer ia,ib,ic,id,ie
       real*8 eps,fgrp
@@ -188,15 +188,15 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine eangang2a (i)
+      use sizes
+      use angang
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use math
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'math.i'
       integer i,j,k
       integer ia,ib,ic,id,ie
       real*8 angle,term

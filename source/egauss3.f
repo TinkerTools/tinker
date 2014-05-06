@@ -17,10 +17,10 @@ c     interaction energy and partitions the energy among the atoms
 c
 c
       subroutine egauss3
+      use sizes
+      use limits
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -51,25 +51,25 @@ c     pairwise double loop
 c
 c
       subroutine egauss3a
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k,m
       integer ii,iv,it
       integer kk,kv,kt
@@ -444,27 +444,27 @@ c     method of lights
 c
 c
       subroutine egauss3b
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use light
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k,m
       integer ii,iv,it
       integer kk,kv,kt
@@ -772,25 +772,25 @@ c     pairwise neighbor list
 c
 c
       subroutine egauss3c
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -1013,24 +1013,24 @@ c     for use with potential energy smoothing
 c
 c
       subroutine egauss3d
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use math
+      use molcul
+      use usage
+      use vdw
+      use vdwpot
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'warp.i'
       integer i,j,k,ii,kk
       integer iv,kv,it,kt
       integer, allocatable :: iv14(:)

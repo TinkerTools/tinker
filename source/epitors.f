@@ -16,15 +16,15 @@ c     "epitors" calculates the pi-orbital torsion potential energy
 c
 c
       subroutine epitors
+      use sizes
+      use atoms
+      use bound
+      use energi
+      use group
+      use pitors
+      use torpot
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'pitors.i'
-      include 'torpot.i'
-      include 'usage.i'
       integer i,ia,ib,ic
       integer id,ie,ig
       real*8 e,rdc,fgrp

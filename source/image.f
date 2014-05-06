@@ -18,10 +18,10 @@ c     of the minimum image distance
 c
 c
       subroutine image (xr,yr,zr)
+      use sizes
+      use boxes
+      use cell
       implicit none
-      include 'sizes.i'
-      include 'boxes.i'
-      include 'cell.i'
       real*8 xr,yr,zr
 c
 c
@@ -114,10 +114,10 @@ c     converts to the components of the minimum image distance
 c
 c
       subroutine imager (xr,yr,zr,i)
+      use sizes
+      use boxes
+      use cell
       implicit none
-      include 'sizes.i'
-      include 'boxes.i'
-      include 'cell.i'
       integer i
       real*8 xr,yr,zr
       real*8 xsize,ysize,zsize

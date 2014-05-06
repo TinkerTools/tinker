@@ -25,15 +25,15 @@ c     due to the small amount of data
 c
 c
       program diffuse
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use inform
+      use iounit
+      use molcul
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'usage.i'
       integer i,j,k,m
       integer nframe,iframe
       integer iarc,freeunit

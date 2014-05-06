@@ -17,15 +17,15 @@ c     format to an external disk file
 c
 c
       subroutine prtmol2 (isyb)
+      use sizes
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use files
+      use iounit
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'titles.i'
       integer i,j,k,isyb
       integer thousand,hundred
       integer tens,ones

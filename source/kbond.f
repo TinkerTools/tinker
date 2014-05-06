@@ -18,19 +18,19 @@ c     changed parameter values
 c
 c
       subroutine kbond
+      use sizes
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use fields
+      use inform
+      use iounit
+      use kbonds
+      use keys
+      use potent
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kbonds.i'
-      include 'keys.i'
-      include 'potent.i'
-      include 'usage.i'
       integer i,j
       integer ia,ib,ita,itb
       integer nb,nb5,nb4,nb3
@@ -176,6 +176,11 @@ c
       use_ring = .false.
       if (min(nb5,nb4,nb3) .ne. 0)  use_ring = .true.
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(bk))  allocate (bk(maxbnd))
+      if (.not. allocated(bl))  allocate (bl(maxbnd))
+c
 c     use special bond parameter assignment method for MMFF
 c
       if (forcefield .eq. 'MMFF94') then
@@ -312,18 +317,18 @@ c     same bond by increasing powers of 0.62 as in MM3
 c
 c
       subroutine keneg
+      use sizes
+      use angbnd
+      use atmlst
+      use atomid
+      use bndstr
+      use couple
+      use inform
+      use iounit
+      use kbonds
+      use keys
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kbonds.i'
-      include 'keys.i'
-      include 'tors.i'
       integer i,j,k,m,nel
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -509,13 +514,13 @@ c     Molecular Structure, 128, 21-27 (1985)
 c
 c
       subroutine kbondm
+      use sizes
+      use atomid
+      use bndstr
+      use keys
+      use merck
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'bond.i'
-      include 'keys.i'
-      include 'merck.i'
-      include 'potent.i'
       integer i,j
       integer ia,ib,ita,itb
       integer next,minat

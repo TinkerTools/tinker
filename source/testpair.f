@@ -18,17 +18,17 @@ c     different methods for finding pairwise neighbors
 c
 c
       program testpair
+      use sizes
+      use atoms
+      use deriv
+      use energi
+      use inform
+      use iounit
+      use light
+      use neigh
+      use potent
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'neigh.i'
-      include 'potent.i'
-      include 'vdwpot.i'
       integer i,j,k,m
       integer kgy,kgz
       integer start,stop
@@ -91,6 +91,8 @@ c
       nterm = 0
       if (use_vdw)  nterm = nterm + 1
       if (use_charge)  nterm = nterm + 1
+      if (use_chgdpl)  nterm = nterm + 1
+      if (use_dipole)  nterm = nterm + 1
       if (use_mpole .or. use_polar)  nterm = nterm + 1
       nterm = nterm * ncalls
       off = 5.0d0
@@ -212,6 +214,15 @@ c
       write (iout,100)  wall,cpu
   100 format (' Pair Neighbor List',3x,2f11.3)
 c
+c     perform dynamic allocation of some global arrays
+c
+      allocate (dev(3,maxatm))
+      allocate (dec(3,maxatm))
+      allocate (decd(3,maxatm))
+      allocate (ded(3,maxatm))
+      allocate (dem(3,maxatm))
+      allocate (dep(3,maxatm))
+c
 c     get the timing for energy terms via double nested loop
 c
       mode = 'LOOP'
@@ -226,21 +237,23 @@ c
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
          if (use_charge)  call echarge
+         if (use_chgdpl)  call echgdpl
+         if (use_dipole)  call edipole
          if (use_mpole .or. use_polar)  call empole
       end do
       call gettime (wall,cpu)
       write (iout,110)
   110 format (/,' Potential Energy Only',7x,'Wall',8x,'CPU',
      &           13x,'Evdw',11x,'Eelect')
-      eloop = ev + ec + em + ep
+      eloop = ev + ec + ecd + ed + em + ep
       if (digits .ge. 8) then
-         write (iout,120)  wall,cpu,ev,ec+em+ep
+         write (iout,120)  wall,cpu,ev,eloop-ev
   120    format (/,' Double Nested Loop',3x,2f11.3,2f17.8)
       else if (digits .ge. 6) then
-         write (iout,130)  wall,cpu,ev,ec+em+ep
+         write (iout,130)  wall,cpu,ev,eloop-ev
   130    format (/,' Double Nested Loop',3x,2f11.3,2f17.6)
       else
-         write (iout,140)  wall,cpu,ev,ec+em+ep
+         write (iout,140)  wall,cpu,ev,eloop-ev
   140    format (/,' Double Nested Loop',3x,2f11.3,2f17.4)
       end if
 c
@@ -258,18 +271,20 @@ c
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
          if (use_charge)  call echarge
+         if (use_chgdpl)  call echgdpl
+         if (use_dipole)  call edipole
          if (use_mpole .or. use_polar)  call empole
       end do
       call gettime (wall,cpu)
-      elight = ev + ec + em + ep
+      elight = ev + ec + ecd + ed + em + ep
       if (digits .ge. 8) then
-         write (iout,150)  wall,cpu,ev,ec+em+ep
+         write (iout,150)  wall,cpu,ev,elight-ev
   150    format (' Method of Lights',5x,2f11.3,2f17.8)
       else if (digits .ge. 6) then
-         write (iout,160)  wall,cpu,ev,ec+em+ep
+         write (iout,160)  wall,cpu,ev,elight-ev
   160    format (' Method of Lights',5x,2f11.3,2f17.6)
       else
-         write (iout,170)  wall,cpu,ev,ec+em+ep
+         write (iout,170)  wall,cpu,ev,elight-ev
   170    format (' Method of Lights',5x,2f11.3,2f17.4)
       end if
 c
@@ -287,18 +302,20 @@ c
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
          if (use_charge)  call echarge
+         if (use_chgdpl)  call echgdpl
+         if (use_dipole)  call edipole
          if (use_mpole .or. use_polar)  call empole
       end do
       call gettime (wall,cpu)
-      elist = ev + ec + em + ep
+      elist = ev + ec + ecd + ed + em + ep
       if (digits .ge. 8) then
-         write (iout,180)  wall,cpu,ev,ec+em+ep
+         write (iout,180)  wall,cpu,ev,elist-ev
   180    format (' Pair Neighbor List',3x,2f11.3,2f17.8)
       else if (digits .ge. 6) then
-         write (iout,190)  wall,cpu,ev,ec+em+ep
+         write (iout,190)  wall,cpu,ev,elist-ev
   190    format (' Pair Neighbor List',3x,2f11.3,2f17.6)
       else
-         write (iout,200)  wall,cpu,ev,ec+em+ep
+         write (iout,200)  wall,cpu,ev,elist-ev
   200    format (' Pair Neighbor List',3x,2f11.3,2f17.4)
       end if
 c
@@ -327,6 +344,8 @@ c
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
          if (use_charge)  call echarge1
+         if (use_chgdpl)  call echgdpl1
+         if (use_dipole)  call edipole1
          if (use_mpole .or. use_polar)  call empole1
       end do
       call gettime (wall,cpu)
@@ -337,9 +356,11 @@ c
       erms = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dloop(j,i) = dev(j,i) + dec(j,i) + dem(j,i) + dep(j,i)
+            dloop(j,i) = dev(j,i) + dec(j,i) + decd(j,i)
+     &                      + ded(j,i) + dem(j,i) + dep(j,i)
             vrms = vrms + dev(j,i)**2
-            erms = erms + dec(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
+            erms = erms + dec(j,i)**2 + decd(j,i)**2
+     &                + ded(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
          end do
       end do
       vrms = sqrt(vrms/dble(n))
@@ -372,6 +393,8 @@ c
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
          if (use_charge)  call echarge1
+         if (use_chgdpl)  call echgdpl1
+         if (use_dipole)  call edipole1
          if (use_mpole .or. use_polar)  call empole1
       end do
       call gettime (wall,cpu)
@@ -382,9 +405,11 @@ c
       erms = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dlight(j,i) = dev(j,i) + dec(j,i) + dem(j,i) + dep(j,i)
+            dlight(j,i) = dev(j,i) + dec(j,i) + decd(j,i)
+     &                       + ded(j,i) + dem(j,i) + dep(j,i)
             vrms = vrms + dev(j,i)**2
-            erms = erms + dec(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
+            erms = erms + dec(j,i)**2 + decd(j,i)**2
+     &                + ded(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
          end do
       end do
       vrms = sqrt(vrms/dble(n))
@@ -414,6 +439,8 @@ c
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
          if (use_charge)  call echarge1
+         if (use_chgdpl)  call echgdpl1
+         if (use_dipole)  call edipole1
          if (use_mpole .or. use_polar)  call empole1
       end do
       call gettime (wall,cpu)
@@ -424,9 +451,11 @@ c
       erms = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dlist(j,i) = dev(j,i) + dec(j,i) + dem(j,i) + dep(j,i)
+            dlist(j,i) = dev(j,i) + dec(j,i) + decd(j,i)
+     &                      + ded(j,i) + dem(j,i) + dep(j,i)
             vrms = vrms + dev(j,i)**2
-            erms = erms + dec(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
+            erms = erms + dec(j,i)**2 + decd(j,i)**2
+     &                + ded(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
          end do
       end do
       vrms = sqrt(vrms/dble(n))
@@ -508,13 +537,13 @@ c     and allocates arrays used by different pairwise neighbor methods
 c
 c
       subroutine setpair (mode)
+      use sizes
+      use atoms
+      use limits
+      use neigh
+      use polpot
+      use tarray
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'neigh.i'
-      include 'polpot.i'
-      include 'tarray.i'
       character*6 mode
 c
 c
@@ -557,54 +586,32 @@ c
          ubufx = (usolvcut+2.0d0*pbuffer)**2
       end if
 c
-c     remove any previously allocated neighbor list arrays
-c
-      if (associated(nvlst))  deallocate (nvlst)
-      if (associated(vlst))  deallocate (vlst)
-      if (associated(xvold))  deallocate (xvold)
-      if (associated(yvold))  deallocate (yvold)
-      if (associated(zvold))  deallocate (zvold)
-      if (associated(nelst))  deallocate (nelst)
-      if (associated(elst))  deallocate (elst)
-      if (associated(xcold))  deallocate (xcold)
-      if (associated(ycold))  deallocate (ycold)
-      if (associated(zcold))  deallocate (zcold)
-      if (associated(xmold))  deallocate (xmold)
-      if (associated(ymold))  deallocate (ymold)
-      if (associated(zmold))  deallocate (zmold)
-      if (associated(tindex))  deallocate (tindex)
-      if (associated(tdipdip))  deallocate (tdipdip)
-      if (associated(nulst))  deallocate (nulst)
-      if (associated(ulst))  deallocate (ulst)
-      if (associated(xuold))  deallocate (xuold)
-      if (associated(yuold))  deallocate (yuold)
-      if (associated(zuold))  deallocate (zuold)
-c
 c     allocate the arrays needed by the pair neighbor lists
 c
       if (mode .eq. 'LIST') then
-         allocate (nvlst(n))
-         allocate (vlst(maxvlst,n))
-         allocate (xvold(n))
-         allocate (yvold(n))
-         allocate (zvold(n))
-         allocate (nelst(n))
-         allocate (elst(maxelst,n))
-         allocate (xcold(n))
-         allocate (ycold(n))
-         allocate (zcold(n))
-         allocate (xmold(n))
-         allocate (ymold(n))
-         allocate (zmold(n))
+         if (.not.allocated(nvlst))  allocate (nvlst(n))
+         if (.not.allocated(vlst))  allocate (vlst(maxvlst,n))
+         if (.not.allocated(xvold))  allocate (xvold(n))
+         if (.not.allocated(yvold))  allocate (yvold(n))
+         if (.not.allocated(zvold))  allocate (zvold(n))
+         if (.not.allocated(nelst))  allocate (nelst(n))
+         if (.not.allocated(elst))  allocate (elst(maxelst,n))
+         if (.not.allocated(xcold))  allocate (xcold(n))
+         if (.not.allocated(ycold))  allocate (ycold(n))
+         if (.not.allocated(zcold))  allocate (zcold(n))
+         if (.not.allocated(xmold))  allocate (xmold(n))
+         if (.not.allocated(ymold))  allocate (ymold(n))
+         if (.not.allocated(zmold))  allocate (zmold(n))
          if (poltyp .eq. 'MUTUAL') then
-            allocate (tindex(2,n*maxelst))
-            allocate (tdipdip(6,n*maxelst))
+            if (.not.allocated(tindex))  allocate (tindex(2,n*maxelst))
+            if (.not.allocated(tdipdip))
+     &         allocate (tdipdip(6,n*maxelst))
          end if
-         allocate (nulst(n))
-         allocate (ulst(maxulst,n))
-         allocate (xuold(n))
-         allocate (yuold(n))
-         allocate (zuold(n))
+         if (.not.allocated(nulst))  allocate (nulst(n))
+         if (.not.allocated(ulst))  allocate (ulst(maxulst,n))
+         if (.not.allocated(xuold))  allocate (xuold(n))
+         if (.not.allocated(yuold))  allocate (yuold(n))
+         if (.not.allocated(zuold))  allocate (zuold(n))
       end if
 c
 c     generate the pair neighbor lists if they are in use

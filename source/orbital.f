@@ -18,16 +18,16 @@ c     atoms are both pisystem atoms
 c
 c
       subroutine orbital
+      use sizes
+      use atoms
+      use bndstr
+      use couple
+      use iounit
+      use keys
+      use piorbs
+      use potent
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'piorbs.i'
-      include 'potent.i'
-      include 'tors.i'
       integer i,j,k,m,ii
       integer mi,mj,mk
       integer iorb,jorb,korb
@@ -37,6 +37,18 @@ c
       character*120 record
       character*120 string
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iorbit))  allocate (iorbit(n))
+      if (.not. allocated(iconj))  allocate (iconj(2,n))
+      if (.not. allocated(kconj))  allocate (kconj(n))
+      if (.not. allocated(piperp))  allocate (piperp(3,n))
+      if (.not. allocated(ibpi))  allocate (ibpi(3,nbond))
+      if (.not. allocated(itpi))  allocate (itpi(2,ntors))
+      if (.not. allocated(pbpl))  allocate (pbpl(nbond))
+      if (.not. allocated(pnpl))  allocate (pnpl(nbond))
+      if (.not. allocated(listpi))  allocate (listpi(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -153,7 +165,7 @@ c
 c     pack atoms of each pisystem into a contiguous indexed list
 c
       call sort3 (n,list,kconj)
-      k = n - norbit 
+      k = n - norbit
       do i = 1, norbit
          k = k + 1
          list(i) = list(k)
@@ -236,13 +248,13 @@ c     and isolated or adjacent triple bonds
 c
 c
       subroutine piplane
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use piorbs
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'piorbs.i'
       integer i,j,iorb
       integer atmnum,trial
       integer alpha,beta,gamma

@@ -17,8 +17,8 @@ c     then reads in the coordinates file
 c
 c
       subroutine getpdb
+      use iounit
       implicit none
-      include 'iounit.i'
       integer ipdb
       integer freeunit
       logical exist

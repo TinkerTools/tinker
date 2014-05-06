@@ -17,10 +17,10 @@ c     then reads in the coordinates file
 c
 c
       subroutine getxyz
+      use inform
+      use iounit
+      use output
       implicit none
-      include 'inform.i'
-      include 'iounit.i'
-      include 'output.i'
       integer ixyz
       integer freeunit
       logical exist

@@ -17,15 +17,15 @@ c     an external disk file
 c
 c
       subroutine readmol (imdl)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use iounit
+      use ptable
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'ptable.i'
-      include 'titles.i'
       integer i,j,ia,ib,imdl
       integer nbond
       integer trimtext

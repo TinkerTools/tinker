@@ -27,8 +27,8 @@ c     z     temporary work vector
 c
 c
       subroutine jacobi (n,a,d,v)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer i,j,k
       integer n,ip,iq
       integer nrot,maxrot

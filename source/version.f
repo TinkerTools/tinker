@@ -19,9 +19,9 @@ c     of the next available unused version is generated
 c
 c
       subroutine version (filename,status)
+      use iounit
+      use output
       implicit none
-      include 'iounit.i'
-      include 'output.i'
       integer i,leng,trimtext
       integer thousand,hundred
       integer tens,ones

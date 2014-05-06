@@ -17,35 +17,35 @@ c     and variables that might not otherwise get initialized
 c
 c
       subroutine initial
+      use sizes
+      use align
+      use atoms
+      use bath
+      use bound
+      use boxes
+      use cell
+      use files
+      use group
+      use inform
+      use iounit
+      use keys
+      use linmin
+      use minima
+      use molcul
+      use mutant
+      use neigh
+      use openmp
+      use output
+      use params
+      use pdb
+      use precis
+      use rigid
+      use scales
+      use sequen
+      use socket
+      use warp
+      use zclose
       implicit none
-      include 'sizes.i'
-      include 'align.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'files.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'linmin.i'
-      include 'minima.i'
-      include 'molcul.i'
-      include 'mutant.i'
-      include 'neigh.i'
-      include 'openmp.i'
-      include 'output.i'
-      include 'params.i'
-      include 'pdb.i'
-      include 'precis.i'
-      include 'rigid.i'
-      include 'scales.i'
-      include 'sequen.i'
-      include 'socket.i'
-      include 'warp.i'
-      include 'zclose.i'
 !$    integer omp_get_num_procs
       real*8 precise
 c

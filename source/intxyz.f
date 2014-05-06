@@ -17,10 +17,10 @@ c     converts to and then writes out Cartesian coordinates
 c
 c
       program intxyz
+      use files
+      use iounit
+      use titles
       implicit none
-      include 'files.i'
-      include 'iounit.i'
-      include 'titles.i'
       integer ixyz,freeunit
       character*120 xyzfile
 c

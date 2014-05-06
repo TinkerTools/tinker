@@ -18,14 +18,14 @@ c     a single atom using finite difference methods
 c
 c
       subroutine eopbend2 (i)
+      use sizes
+      use angbnd
+      use atoms
+      use deriv
+      use group
+      use hessn
+      use opbend
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'opbend.i'
       integer i,j,k,iopbend
       integer ia,ib,ic,id
       real*8 eps,fgrp
@@ -167,15 +167,15 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine eopbend2a (i)
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use math
+      use opbend
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'math.i'
-      include 'opbend.i'
       integer i,k
       integer ia,ib,ic,id
       real*8 angle,force

@@ -27,17 +27,17 @@ c     Chemistry, 99, 8374-8378 (1995)
 c
 c
       program pssrot
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
+      use math
+      use omega
+      use refer
+      use warp
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'refer.i'
-      include 'warp.i'
-      include 'zcoord.i'
       integer i,k
       integer ixyz,next
       integer npoint,neigen
@@ -236,11 +236,11 @@ c     gradient during PSS global optimization in torsional space
 c
 c
       function pssrot1 (xx,g)
+      use sizes
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i
       real*8 pssrot1,e
       real*8 xx(*)
@@ -286,12 +286,12 @@ c     ##############################################################
 c
 c
       subroutine moderot (neigen,minimum,grdmin)
+      use sizes
+      use iounit
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i,k,neigen
       integer ndoi,nsearch
       real*8 minimum,grdmin
@@ -400,10 +400,10 @@ c     ###############################################################
 c
 c
       subroutine eigenrot (eigen,vects)
+      use sizes
+      use atoms
+      use omega
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'omega.i'
       integer i,j,ihess
       real*8 eigen(*)
       real*8, allocatable :: matrix(:)
@@ -450,12 +450,12 @@ c     ################################################################
 c
 c
       subroutine climbrot (nsearch,minimum,step,grdmin)
+      use sizes
+      use iounit
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer maxstep
       parameter (maxstep=500)
       integer i,nsearch
@@ -534,13 +534,13 @@ c     to perform a torsional space energy minimization
 c
 c
       subroutine localrot (minimum,grdmin)
+      use sizes
+      use inform
+      use minima
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'minima.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i,oldprt
       real*8 minimum
       real*8 grdmin

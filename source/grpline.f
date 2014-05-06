@@ -17,12 +17,12 @@ c     contained in the group
 c
 c
       subroutine grpline
+      use sizes
+      use atomid
+      use atoms
+      use group
+      use rgddyn
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'rgddyn.i'
       integer i,j,k,size
       integer start,stop
       real*8 xx,yy,zz

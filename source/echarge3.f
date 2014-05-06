@@ -17,10 +17,10 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine echarge3
+      use sizes
+      use limits
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -59,25 +59,25 @@ c     double loop
 c
 c
       subroutine echarge3a
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer in,kn
@@ -417,27 +417,27 @@ c     of lights
 c
 c
       subroutine echarge3b
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use light
+      use molcul
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k,ii,kk
       integer in,ic,kn,kc
       integer kgy,kgz,kmap
@@ -722,25 +722,25 @@ c     neighbor list
 c
 c
       subroutine echarge3c
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use neigh
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k,nect
       integer ii,kk,kkk
       integer in,kn
@@ -978,28 +978,28 @@ c     mesh Ewald summation
 c
 c
       subroutine echarge3d
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use group
+      use inform
+      use inter
+      use iounit
+      use math
+      use molcul
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer in,kn
@@ -1325,29 +1325,29 @@ c     mesh Ewald summation and the method of lights
 c
 c
       subroutine echarge3e
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use group
+      use inform
+      use inter
+      use iounit
+      use light
+      use math
+      use molcul
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk,in,kn
       integer kgy,kgz,kmap
@@ -1642,28 +1642,28 @@ c     mesh Ewald summation and a pairwise neighbor list
 c
 c
       subroutine echarge3f
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use group
+      use inform
+      use inter
+      use iounit
+      use math
+      use molcul
+      use neigh
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
@@ -1914,23 +1914,23 @@ c     potential smoothing methods
 c
 c
       subroutine echarge3g
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use charge
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'usage.i'
-      include 'warp.i'
       integer i,j,k
       integer ii,kk
       integer in,kn

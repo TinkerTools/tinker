@@ -17,12 +17,12 @@ c     to an external disk file
 c
 c
       subroutine prtpdb (ipdb)
+      use sizes
+      use files
+      use pdb
+      use sequen
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'pdb.i'
-      include 'sequen.i'
-      include 'titles.i'
       integer i,k,ipdb
       integer start,stop
       integer resmax,resnumb
@@ -84,15 +84,15 @@ c     change some TINKER residue names to match PDB standards
 c
       if (rename) then
          do i = 1, npdb
-            if (resnam(i) .eq. 'CYX')  resnam(i) = 'CYS'
-            if (resnam(i) .eq. 'CYD')  resnam(i) = 'CYS'
-            if (resnam(i) .eq. 'TYD')  resnam(i) = 'TYR'
-            if (resnam(i) .eq. 'HID')  resnam(i) = 'HIS'
-            if (resnam(i) .eq. 'HIE')  resnam(i) = 'HIS'
-            if (resnam(i) .eq. 'HIP')  resnam(i) = 'HIS'
-            if (resnam(i) .eq. 'ASH')  resnam(i) = 'ASP'
-            if (resnam(i) .eq. 'GLH')  resnam(i) = 'GLU'
-            if (resnam(i) .eq. 'LYD')  resnam(i) = 'LYS'
+            if (pdbres(i) .eq. 'CYX')  pdbres(i) = 'CYS'
+            if (pdbres(i) .eq. 'CYD')  pdbres(i) = 'CYS'
+            if (pdbres(i) .eq. 'TYD')  pdbres(i) = 'TYR'
+            if (pdbres(i) .eq. 'HID')  pdbres(i) = 'HIS'
+            if (pdbres(i) .eq. 'HIE')  pdbres(i) = 'HIS'
+            if (pdbres(i) .eq. 'HIP')  pdbres(i) = 'HIS'
+            if (pdbres(i) .eq. 'ASH')  pdbres(i) = 'ASP'
+            if (pdbres(i) .eq. 'GLH')  pdbres(i) = 'GLU'
+            if (pdbres(i) .eq. 'LYD')  pdbres(i) = 'LYS'
          end do
       end if
 c
@@ -131,7 +131,7 @@ c
       fstr = '(a6,'//atmc//',1x,a4,1x,a3,1x,a1,'//resc//
      &          ',4x,'//crdc//')'
       do i = 1, npdb
-         resname = resnam(i)
+         resname = pdbres(i)
          if (resname(2:3) .eq. '  ')  resname = '  '//resname(1:1)
          if (resname(3:3) .eq. ' ')  resname = ' '//resname(1:2)
          if (pdbtyp(i) .eq. 'ATOM  ') then
@@ -141,7 +141,7 @@ c
             resnumb = resnum(i)
             chnname = ' '
          end if
-         write (ipdb,fstr)  pdbtyp(i),i,atmnam(i),resname,chnname,
+         write (ipdb,fstr)  pdbtyp(i),i,pdbatm(i),resname,chnname,
      &                      resnumb,xpdb(i),ypdb(i),zpdb(i)
       end do
 c

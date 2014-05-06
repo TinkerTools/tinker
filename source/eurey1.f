@@ -17,17 +17,17 @@ c     its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eurey1
+      use sizes
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use urey
+      use urypot
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'urey.i'
-      include 'urypot.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,ia,ic
       real*8 e,de,ideal,force
       real*8 dt,dt2,deddt,fgrp

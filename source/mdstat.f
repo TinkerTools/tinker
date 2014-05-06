@@ -18,21 +18,21 @@ c     and to periodically save the state of the trajectory
 c
 c
       subroutine mdstat (istep,dt,etot,epot,ekin,temp,pres)
+      use sizes
+      use atoms
+      use bath
+      use bound
+      use boxes
+      use inform
+      use inter
+      use iounit
+      use limits
+      use mdstuf
+      use molcul
+      use units
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'mdstuf.i'
-      include 'molcul.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'warp.i'
       integer istep,modstep
       real*8 dt,temp,pres
       real*8 etot,epot,ekin

@@ -19,15 +19,15 @@ c     solvation models
 c
 c
       subroutine esolv
+      use sizes
+      use atoms
+      use energi
+      use limits
+      use math
+      use potent
+      use solute
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'math.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'warp.i'
       integer i
       real*8 e,ai,ri,rb
       real*8 term,probe
@@ -128,16 +128,16 @@ c     for the GB/SA solvation models using a pairwise double loop
 c
 c
       subroutine egb0a
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use energi
+      use group
+      use shunt
+      use solute
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'shunt.i'
-      include 'solute.i'
-      include 'usage.i'
       integer i,k,ii,kk
       real*8 e,est
       real*8 f,fi,fik
@@ -264,17 +264,17 @@ c     for the GB/SA solvation models using a pairwise neighbor list
 c
 c
       subroutine egb0b
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use energi
+      use group
+      use neigh
+      use shunt
+      use solute
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'solute.i'
-      include 'usage.i'
       integer i,k
       integer ii,kk,kkk
       real*8 e,est
@@ -416,16 +416,16 @@ c     methods via analogy to the smoothing of Coulomb's law
 c
 c
       subroutine egb0c
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use energi
+      use group
+      use solute
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'solute.i'
-      include 'usage.i'
-      include 'warp.i'
       integer i,k,ii,kk
       real*8 e,fgrp
       real*8 f,fi,fik
@@ -513,8 +513,8 @@ c     solvation free energy for the GK/NP implicit solvation model
 c
 c
       subroutine egk
+      use potent
       implicit none
-      include 'potent.i'
 c
 c
 c     setup the multipoles for solvation only calculations
@@ -548,18 +548,18 @@ c     solvation energy via the generalized Kirkwood model
 c
 c
       subroutine egk0a
+      use sizes
+      use atoms
+      use chgpot
+      use energi
+      use gkstuf
+      use group
+      use mpole
+      use polar
+      use shunt
+      use solute
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'gkstuf.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'shunt.i'
-      include 'solute.i'
-      include 'usage.i'
       integer i,k,ii,kk
       real*8 e,ei,est
       real*8 fc,fd,fq
@@ -986,20 +986,20 @@ c     dipoles to their SCRF polarized values
 c
 c
       subroutine ediff
+      use sizes
+      use atoms
+      use bound
+      use chgpot
+      use couple
+      use energi
+      use group
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer ix,iy,iz
@@ -1260,14 +1260,14 @@ c     Poisson-Boltzmann plus nonpolar implicit solvation
 c
 c
       subroutine epb
+      use sizes
+      use chgpot
+      use energi
+      use mpole
+      use pbstuf
+      use polar
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'mpole.i'
-      include 'pbstuf.i'
-      include 'polar.i'
-      include 'potent.i'
       integer i,ii
       real*8 e
 c
@@ -1310,12 +1310,12 @@ c     field, forces and torques
 c
 c
       subroutine pbempole
+      use sizes
+      use atoms
+      use mpole
+      use pbstuf
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
-      include 'pbstuf.i'
-      include 'solute.i'
       integer i,j,ii
       real*8, allocatable :: pos(:,:)
       real*8, allocatable :: pbpole(:,:)
@@ -1374,17 +1374,17 @@ c     as a sum of cavity and dispersion terms
 c
 c
       subroutine enp (ecav,edisp)
+      use sizes
+      use atomid
+      use atoms
+      use energi
+      use kvdws
+      use math
+      use mpole
+      use nonpol
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'energi.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'npolar.i'
-      include 'shunt.i'
-      include 'solute.i'
       real*8 ecav,edisp
       real*8 exclude,taper
       real*8 evol,esurf
@@ -1489,16 +1489,16 @@ c     of a solute using an HCT-like method
 c
 c
       subroutine ewca (edisp)
+      use sizes
+      use atoms
+      use atomid
+      use deriv
+      use kvdws
+      use math
+      use nonpol
+      use solute
+      use vdw
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'deriv.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'npolar.i'
-      include 'solute.i'
-      include 'vdw.i'
       integer i,k
       real*8 edisp,e,idisp
       real*8 xi,yi,zi
@@ -1662,16 +1662,16 @@ c     of a solute using a numerical "onion shell" method
 c
 c
       subroutine ewcax (edisp)
+      use sizes
+      use atoms
+      use atomid
+      use couple
+      use kvdws
+      use math
+      use nonpol
+      use solute
+      use vdw
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'couple.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'npolar.i'
-      include 'solute.i'
-      include 'vdw.i'
       integer i,j,k
       real*8 edisp,e
       real*8 t,tinit,offset
@@ -1871,13 +1871,13 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine ehpmf (ehp)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use hpmf
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'hpmf.i'
-      include 'math.i'
       integer i,j,k,m
       integer ii,jj,kk
       integer sschk
@@ -1924,7 +1924,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                rbig = rpmf(k) + rsurf
                if (r2 .le. rbig*rbig) then
-                  r = sqrt(r2)         
+                  r = sqrt(r2)
                   rsmall = rpmf(k) - rcarbon
                   part = pisurf * (rbig-r) * (1.0d0+rsmall/r)
                   sasa = sasa * (1.0d0-saterm*part)

@@ -17,15 +17,15 @@ c     groups using a low storage BFGS nonlinear optimization
 c
 c
       program minrigid
+      use sizes
+      use files
+      use group
+      use inform
+      use iounit
+      use keys
+      use output
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'output.i'
-      include 'rigid.i'
       integer i,j,imin,nvar
       integer next,freeunit
       real*8 minimum,minrigid1
@@ -213,11 +213,11 @@ c     of rigid bodies
 c
 c
       function minrigid1 (xx,g)
+      use sizes
+      use group
+      use math
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'rigid.i'
       integer i,j,nvar
       real*8 minrigid1,e
       real*8 xx(*)

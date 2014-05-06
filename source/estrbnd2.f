@@ -17,17 +17,17 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine estrbnd2 (iatom)
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bndstr
+      use bound
+      use group
+      use hessn
+      use math
+      use strbnd
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'math.i'
-      include 'strbnd.i'
       integer i,j,k,iatom
       integer ia,ib,ic,istrbnd
       real*8 angle,fgrp

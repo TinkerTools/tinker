@@ -18,14 +18,14 @@ c     to Cartesian coordinates
 c
 c
       program testhess
+      use sizes
+      use atoms
+      use files
+      use hescut
+      use inform
+      use iounit
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'hescut.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'usage.i'
       integer i,j,k,m
       integer ii,jj
       integer ixyz,ihes

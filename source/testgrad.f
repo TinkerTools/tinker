@@ -18,17 +18,17 @@ c     to Cartesian coordinates
 c
 c
       program testgrad
+      use sizes
+      use atoms
+      use deriv
+      use energi
+      use files
+      use inform
+      use inter
+      use iounit
+      use solute
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'solute.i'
-      include 'usage.i'
       integer i,j,ixyz
       integer next,frame
       integer freeunit

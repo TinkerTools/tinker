@@ -41,13 +41,13 @@ c                offending atom is shifted by this small amount
 c
 c
       subroutine surface (total,area,radius,weight,probe)
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use math
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'usage.i'
       integer maxarc
       parameter (maxarc=1000)
       integer i,j,k,l,m
@@ -618,13 +618,13 @@ c                offending atom is shifted by this small amount
 c
 c
       subroutine surface1 (total,area,darea,radius,weight,probe)
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use math
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'usage.i'
       integer maxarc
       parameter (maxarc=1000)
       integer i,j,k,l,m

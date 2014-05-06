@@ -17,16 +17,23 @@ c     its molecule and computes the mass of each molecule
 c
 c
       subroutine molecule
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use molcul
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'molcul.i'
       integer i,j,k,ii
       integer mi,mj,mk
       integer, allocatable :: list(:)
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(imol))  allocate (imol(2,n))
+      if (.not. allocated(kmol))  allocate (kmol(n))
+      if (.not. allocated(molcule))  allocate (molcule(n))
+      if (.not. allocated(molmass))  allocate (molmass(n))
 c
 c     zero number of molecules and molecule membership list
 c

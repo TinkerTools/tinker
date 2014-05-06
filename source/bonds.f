@@ -17,15 +17,20 @@ c     stores the atom numbers of the atoms defining each bond
 c
 c
       subroutine bonds
+      use sizes
+      use atmlst
+      use atoms
+      use bndstr
+      use couple
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'iounit.i'
       integer i,j,k,m
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ibnd))  allocate (ibnd(2,maxbnd))
+      if (.not. allocated(bndlist))  allocate (bndlist(maxval,maxatm))
 c
 c     loop over all atoms, storing the atoms in each bond
 c

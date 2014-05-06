@@ -18,20 +18,20 @@ c     any of several possible integration methods
 c
 c
       program dynamic
+      use sizes
+      use atoms
+      use bath
+      use bndstr
+      use bound
+      use inform
+      use iounit
+      use keys
+      use mdstuf
+      use potent
+      use solute
+      use stodyn
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'mdstuf.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'stodyn.i'
-      include 'usage.i'
       integer i,istep,nstep
       integer mode,next
       real*8 dt,dtdump

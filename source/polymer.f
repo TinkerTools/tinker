@@ -17,14 +17,14 @@ c     extending across periodic boundaries
 c
 c
       subroutine polymer
+      use sizes
+      use atoms
+      use bndstr
+      use bound
+      use boxes
+      use iounit
+      use keys
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'keys.i'
       integer i,j,next
       integer ia,ib
       real*8 xr,yr,zr

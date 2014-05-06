@@ -28,16 +28,16 @@ c     Section 6.7.4
 c
 c
       program monte
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
+      use omega
+      use units
+      use usage
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'omega.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'zcoord.i'
       integer i,k,m,next
       integer keep,nbig
       integer nmap,lext
@@ -486,13 +486,13 @@ c     via Cartesian minimization following a Monte Carlo step
 c
 c
       subroutine mcmstep (minimum,grdmin)
+      use sizes
+      use atoms
+      use files
+      use inform
+      use output
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'output.i'
-      include 'usage.i'
       integer i,nvar
       real*8 mcm1,minimum,grdmin
       real*8, allocatable :: xx(:)
@@ -566,10 +566,10 @@ c     coordinate space
 c
 c
       function mcm1 (xx,g)
+      use sizes
+      use atoms
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'usage.i'
       integer i,nvar
       real*8 mcm1,e
       real*8 xx(*)
@@ -634,10 +634,10 @@ c     coordinate space
 c
 c
       subroutine mcm2 (mode,xx,h,hinit,hstop,hindex,hdiag)
+      use sizes
+      use atoms
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'usage.i'
       integer i,j,k,nvar
       integer hinit(*)
       integer hstop(*)

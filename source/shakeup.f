@@ -17,20 +17,20 @@ c     the RATTLE algorithm during molecular dynamics
 c
 c
       subroutine shakeup
+      use sizes
+      use angbnd
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use couple
+      use freeze
+      use keys
+      use math
+      use molcul
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'freeze.i'
-      include 'keys.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'usage.i'
       integer i,j,k,m,nh
       integer ia,ib,ic
       integer ja,jb,jc
@@ -51,7 +51,15 @@ c
       rateps = 0.000001d0
       use_rattle = .true.
 c
-c     process keywords containing any holonomic constraints
+c     perform dynamic allocation of some global arrays
+c
+      allocate (iratx(maxfix))
+      allocate (kratx(maxfix))
+      allocate (irat(2,maxfix))
+      allocate (krat(maxfix))
+      allocate (ratimage(maxfix))
+c
+c     process keywords containing holonomic constraint options
 c
       do k = 1, nkey
          next = 1
@@ -65,7 +73,7 @@ c
    10    continue
       end do
 c
-c     process keywords containing various constraint options
+c     process keywords containing various constraint types
 c
       do k = 1, nkey
          next = 1
@@ -377,11 +385,11 @@ c     each ring fusion
 c
 c
       subroutine chkangle (ia,ib,ic)
+      use sizes
+      use couple
+      use freeze
+      use ring
       implicit none
-      include 'sizes.i'
-      include 'couple.i'
-      include 'freeze.i'
-      include 'ring.i'
       integer i,j,k
       integer ia,ib,ic
       integer id,ie,imin

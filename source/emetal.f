@@ -22,13 +22,13 @@ c     Journal, 81, 1-10 (2001)
 c
 c
       subroutine emetal
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use energi
+      use kchrge
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'kchrge.i'
       integer maxneigh
       parameter (maxneigh=10)
       integer i,j,k,jj,k0

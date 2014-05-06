@@ -17,14 +17,14 @@ c     torsion energy for a single atom
 c
 c
       subroutine eimptor2 (i)
+      use sizes
+      use atoms
+      use bound
+      use group
+      use hessn
+      use imptor
+      use torpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'imptor.i'
-      include 'torpot.i'
       integer i,kitors
       integer ia,ib,ic,id
       real*8 dedphi,d2edphi2

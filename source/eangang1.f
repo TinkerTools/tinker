@@ -17,19 +17,19 @@ c     first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangang1
+      use sizes
+      use angang
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use math
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,k,iangang
       integer ia,ib,ic,id,ie
       real*8 e,angle,fgrp

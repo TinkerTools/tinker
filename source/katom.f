@@ -17,15 +17,15 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine katom
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use katoms
+      use keys
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'keys.i'
       integer i,k,next
       integer cls,atn,lig
       real*8 wght

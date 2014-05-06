@@ -17,12 +17,12 @@ c     energy surface via an iterative series of local searches
 c
 c
       program scan
+      use sizes
+      use files
+      use inform
+      use iounit
+      use output
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'output.i'
       integer maxmap
       parameter (maxmap=100000)
       integer i,ixyz
@@ -155,12 +155,12 @@ c     for possible addition to the master list of local minima
 c
 c
       subroutine mapcheck (nmap,emap,range,minimum,grdmin)
+      use sizes
+      use files
+      use inform
+      use iounit
+      use output
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'output.i'
       integer i,ixyz,lext
       integer nmap,freeunit
       real*8 minimum,grdmin
@@ -239,9 +239,9 @@ c     via iterative local search
 c
 c
       function scan1 (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,nvar
       real*8 scan1,e
       real*8 xx(*)
@@ -302,9 +302,9 @@ c     surface via iterative local search
 c
 c
       subroutine scan2 (mode,xx,h,hinit,hstop,hindex,hdiag)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,nvar
       integer hinit(*)
       integer hstop(*)
@@ -343,10 +343,10 @@ c     #########################################################
 c
 c
       subroutine modesrch (nmap,emap,range,neigen,grdmin)
+      use sizes
+      use iounit
+      use omega
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'omega.i'
       integer i,k,nsearch
       integer nmap,neigen
       real*8 minimum,grdmin,range
@@ -406,10 +406,10 @@ c     ###############################################################
 c
 c
       subroutine eigenrot (eigen,vects)
+      use sizes
+      use atoms
+      use omega
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'omega.i'
       integer i,j,ihess
       real*8 vnorm
       real*8 eigen(*)
@@ -470,13 +470,13 @@ c     ###############################################################
 c
 c
       subroutine climber (nsearch,minimum,step,grdmin)
+      use sizes
+      use inform
+      use iounit
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer maxstep
       parameter (maxstep=500)
       integer i,kstep
@@ -572,11 +572,11 @@ c     perform a Cartesian coordinate energy minimization
 c
 c
       subroutine localmin (minimum,grdmin)
+      use sizes
+      use atoms
+      use inform
+      use minima
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'minima.i'
       integer i,j,nvar
       real*8 minimum,scan1
       real*8 grdmin,big

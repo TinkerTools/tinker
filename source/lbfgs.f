@@ -44,16 +44,16 @@ c     optsave    subroutine to write out info about current status
 c
 c
       subroutine lbfgs (nvar,x0,minimum,grdmin,fgvalue,optsave)
+      use sizes
+      use inform
+      use iounit
+      use keys
+      use linmin
+      use math
+      use minima
+      use output
+      use scales
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'linmin.i'
-      include 'math.i'
-      include 'minima.i'
-      include 'output.i'
-      include 'scales.i'
       integer maxsav
       parameter (maxsav=20)
       integer i,j,k,m

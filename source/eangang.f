@@ -15,17 +15,17 @@ c     "eangang" calculates the angle-angle potential energy
 c
 c
       subroutine eangang
+      use sizes
+      use angang
+      use angbnd
+      use angpot
+      use atoms
+      use bound
+      use energi
+      use group
+      use math
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'usage.i'
       integer i,k,iangang
       integer ia,ib,ic,id,ie
       real*8 e,dt1,dt2,fgrp

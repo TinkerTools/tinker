@@ -27,18 +27,18 @@ c     Chemistry, 99, 8374-8378 (1995)
 c
 c
       program pssrigid
+      use sizes
+      use atoms
+      use files
+      use group
+      use inform
+      use iounit
+      use math
+      use molcul
+      use refer
+      use rigid
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'refer.i'
-      include 'rigid.i'
-      include 'warp.i'
       integer i,j,k,ixyz
       integer nvar,lext
       integer npoint,neigen
@@ -250,11 +250,11 @@ c     gradient during PSS global optimization over rigid bodies
 c
 c
       function pssrgd1 (xx,g)
+      use sizes
+      use group
+      use math
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'rigid.i'
       integer i,j,nvar
       real*8 pssrgd1,e
       real*8 xx(*)
@@ -307,11 +307,11 @@ c     ###############################################################
 c
 c
       subroutine modergd (neigen,minimum,grdmin)
+      use sizes
+      use group
+      use iounit
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'iounit.i'
-      include 'rigid.i'
       integer maxrgd
       parameter (maxrgd=6*maxgrp)
       integer i,j,k
@@ -441,10 +441,10 @@ c     ################################################################
 c
 c
       subroutine eigenrgd (eigen,vects)
+      use sizes
+      use atoms
+      use group
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
       integer maxrgd
       parameter (maxrgd=6*maxgrp)
       integer i,j
@@ -509,12 +509,12 @@ c     ################################################################
 c
 c
       subroutine climbrgd (nsearch,minimum,step,grdmin)
+      use sizes
+      use group
+      use iounit
+      use math
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'rigid.i'
       integer maxstep
       parameter (maxstep=500)
       integer i,j,nsearch
@@ -601,12 +601,12 @@ c     to perform a rigid body energy minimization
 c
 c
       subroutine localrgd (minimum,grdmin)
+      use sizes
+      use inform
+      use group
+      use minima
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'group.i'
-      include 'minima.i'
-      include 'rigid.i'
       integer i,j,nvar
       integer oldprt
       real*8 minimum

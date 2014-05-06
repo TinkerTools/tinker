@@ -17,35 +17,35 @@ c     in order to define the default force field parameters
 c
 c
       subroutine readprm
+      use sizes
+      use fields
+      use iounit
+      use kanang
+      use kangs
+      use kantor
+      use katoms
+      use kbonds
+      use kchrge
+      use kdipol
+      use khbond
+      use kiprop
+      use kitors
+      use kmulti
+      use kopbnd
+      use kopdst
+      use korbs
+      use kpitor
+      use kpolr
+      use kstbnd
+      use ksttor
+      use ktorsn
+      use ktrtor
+      use kurybr
+      use kvdws
+      use kvdwpr
+      use merck
+      use params
       implicit none
-      include 'sizes.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'kanang.i'
-      include 'kangs.i'
-      include 'kantor.i'
-      include 'katoms.i'
-      include 'kbonds.i'
-      include 'kchrge.i'
-      include 'kdipol.i'
-      include 'khbond.i'
-      include 'kiprop.i'
-      include 'kitors.i'
-      include 'kmulti.i'
-      include 'kopbnd.i'
-      include 'kopdst.i'
-      include 'korbs.i'
-      include 'kpitor.i'
-      include 'kpolr.i'
-      include 'kstbnd.i'
-      include 'ksttor.i'
-      include 'ktorsn.i'
-      include 'ktrtor.i'
-      include 'kurybr.i'
-      include 'kvdws.i'
-      include 'kvdwpr.i'
-      include 'merck.i'
-      include 'params.i'
       integer i,j,iprm
       integer ia,ib,ic,id,ie
       integer if,ig,ih,ii

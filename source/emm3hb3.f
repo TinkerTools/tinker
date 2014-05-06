@@ -28,17 +28,17 @@ c     19, 1001-1016 (1998)
 c
 c
       subroutine emm3hb3
+      use sizes
+      use analyz
+      use atoms
+      use energi
+      use inform
+      use iounit
+      use limits
+      use vdwpot
       implicit none
       integer i
       real*8 elrc,aelrc
-      include 'sizes.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'vdwpot.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -82,28 +82,28 @@ c     partitions the energy among the atoms
 c
 c
       subroutine emm3hb3a
+      use sizes
+      use action
+      use analyz
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -576,30 +576,30 @@ c     the method of lights
 c
 c
       subroutine emm3hb3b
+      use sizes
+      use action
+      use analyz
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use light
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -975,28 +975,28 @@ c     a pairwise neighbor list
 c
 c
       subroutine emm3hb3c
+      use sizes
+      use action
+      use analyz
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use chgpot
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt

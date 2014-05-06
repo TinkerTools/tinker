@@ -19,11 +19,11 @@ c     Hessian matrix evaluation
 c
 c
       program timerot
+      use sizes
+      use iounit
+      use limits
+      use omega
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'iounit.i'
-      include 'omega.i'
       integer i,ncalls,next
       real*8 energy,value
       real*8 wall,cpu

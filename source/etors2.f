@@ -17,9 +17,9 @@ c     energy for a single atom
 c
 c
       subroutine etors2 (i)
+      use sizes
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'warp.i'
       integer i
 c
 c
@@ -46,14 +46,14 @@ c     energy for a single atom using a standard sum of Fourier terms
 c
 c
       subroutine etors2a (i)
+      use sizes
+      use atoms
+      use bound
+      use group
+      use hessn
+      use torpot
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'torpot.i'
-      include 'tors.i'
       integer i,ktors
       integer ia,ib,ic,id
       real*8 dedphi,d2edphi2,fgrp
@@ -751,15 +751,15 @@ c     smoothing methods
 c
 c
       subroutine etors2b (i)
+      use sizes
+      use atoms
+      use group
+      use hessn
+      use math
+      use torpot
+      use tors
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'warp.i'
       integer i,ktors
       integer ia,ib,ic,id
       real*8 dedphi,d2edphi2

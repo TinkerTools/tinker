@@ -23,10 +23,10 @@ c     Journal of Molecular Biology, 181, 423-447 (1985)
 c
 c
       program vibrot
+      use sizes
+      use iounit
+      use omega
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'omega.i'
       integer i,j,ihess
       real*8, allocatable :: eigen(:)
       real*8, allocatable :: matrix(:)

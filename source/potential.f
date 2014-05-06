@@ -18,28 +18,29 @@ c     target potential or optimizes electrostatic parameters
 c
 c
       program potential
+      use sizes
+      use atoms
+      use charge
+      use files
+      use inform
+      use iounit
+      use keys
+      use minima
+      use mpole
+      use neigh
+      use output
+      use potent
+      use potfit
+      use titles
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'minima.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'output.i'
-      include 'potent.i'
-      include 'potfit.i'
-      include 'titles.i'
-      include 'units.i'
       integer i,j,k
       integer ixyz,ipot
       integer igrd,icub
       integer next,mode
       integer nmax,nvar
       integer nmodel
+      integer maxpgrd
       integer nglist,nflist
       integer freeunit
       integer trimtext
@@ -73,21 +74,30 @@ c     setup the computation and assign some default values
 c
       call initial
       nmodel = 1
-      nconf = 0
       dogrid = .false.
       docube = .false.
       domodel = .false.
       dopair = .false.
       dotarget = .false.
       dofit = .false.
-      fit_mpl = .true.
-      fit_dpl = .true.
-      fit_qdp = .true.
+c
+c     perform dynamic allocation of some global arrays
+c
+      maxpgrd = 100000
+      allocate (ipgrid(maxpgrd,maxref))
+      allocate (pgrid(3,maxpgrd,maxref))
+      allocate (epot(2,maxpgrd,maxref))
+      allocate (gatm(maxatm))
+      allocate (fatm(maxatm))
 c
 c     initialize target molecular dipole and quadrupole values
 c
+      nconf = 0
       use_dpl = .false.
       use_qdp = .false.
+      fit_mpl = .true.
+      fit_dpl = .true.
+      fit_qdp = .true.
       do i = 1, maxref
          xdpl0(i) = 0.0d0
          ydpl0(i) = 0.0d0
@@ -644,11 +654,11 @@ c     potential values from an external disk file
 c
 c
       subroutine readpot (ipot,iconf)
+      use sizes
+      use atoms
+      use katoms
+      use potfit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'katoms.i'
-      include 'potfit.i'
       integer i,j,k
       integer ipot,iconf
       integer npoint,anum
@@ -759,14 +769,14 @@ c     radially distributed shells outside the molecular surface
 c
 c
       subroutine potgrid (iconf)
+      use sizes
+      use atoms
+      use iounit
+      use katoms
+      use keys
+      use math
+      use potfit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'keys.i'
-      include 'math.i'
-      include 'potfit.i'
       integer i,j,k,m
       integer iconf,next
       integer npoint,nshell
@@ -944,21 +954,21 @@ c     it should be updated if those routines are changed
 c
 c
       subroutine setelect
+      use sizes
+      use atoms
+      use bndstr
+      use charge
+      use couple
+      use dipole
+      use kchrge
+      use kdipol
+      use kmulti
+      use kpolr
+      use mpole
+      use polar
+      use potent
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'charge.i'
-      include 'couple.i'
-      include 'dipole.i'
-      include 'kchrge.i'
-      include 'kdipol.i'
-      include 'kmulti.i'
-      include 'kpolr.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'potent.i'
-      include 'units.i'
       integer i,j,k,l,m
       integer ia,ib
       integer ita,itb
@@ -1367,15 +1377,15 @@ c     the system with a positive charge located at the grid point
 c
 c
       subroutine potpoint (xi,yi,zi,pot)
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use dipole
+      use mpole
+      use polar
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'dipole.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'units.i'
       integer k,kk,k1,k2
       real*8 e,ei,pot
       real*8 ec,ed,em,ep
@@ -1509,13 +1519,13 @@ c     and gradient for electrostatic parameters fit to a potential
 c
 c
       function potfit1 (xx,g)
+      use sizes
+      use atoms
+      use moment
+      use neigh
+      use potent
+      use potfit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'moment.i'
-      include 'neigh.i'
-      include 'potent.i'
-      include 'potfit.i'
       integer i,j,k,m
       integer nvar,npoint
       real*8 potfit1
@@ -1692,15 +1702,15 @@ c     corresponding electrostatic potential energy parameters
 c
 c
       subroutine prmvar (nvar,xx)
+      use sizes
+      use atomid
+      use atoms
+      use charge
+      use iounit
+      use mpole
+      use potfit
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'potfit.i'
-      include 'units.i'
       integer i,ii,it
       integer k,kk,kt
       integer nvar
@@ -1917,13 +1927,13 @@ c     corresponding electrostatic potential energy parameters
 c
 c
       subroutine varprm (nvar,xx,ivar,eps)
+      use sizes
+      use atoms
+      use charge
+      use mpole
+      use potent
+      use potfit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'mpole.i'
-      include 'potent.i'
-      include 'potfit.i'
       integer i,j,k
       integer ii,it
       integer kk,kt
@@ -2092,14 +2102,14 @@ c     potential over a set of grid points
 c
 c
       subroutine potstat (dofull,domodel,dopair,dotarget)
+      use sizes
+      use atoms
+      use files
+      use iounit
+      use potfit
+      use refer
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'potfit.i'
-      include 'refer.i'
-      include 'titles.i'
       integer i,j,k
       integer ipot,npoint
       integer freeunit
@@ -2301,16 +2311,16 @@ c     charge or multipole model to an electrostatic potential grid
 c
 c
       subroutine prtfit
+      use sizes
+      use atoms
+      use atomid
+      use charge
+      use files
+      use keys
+      use mpole
+      use potfit
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'charge.i'
-      include 'files.i'
-      include 'keys.i'
-      include 'mpole.i'
-      include 'potfit.i'
-      include 'units.i'
       integer i,j,k
       integer ii,kk
       integer it,kt

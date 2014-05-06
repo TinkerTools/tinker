@@ -18,10 +18,10 @@ c     to Cartesian coordinates
 c
 c
       subroutine egauss1
+      use sizes
+      use limits
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -52,23 +52,23 @@ c     double loop
 c
 c
       subroutine egauss1a
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k,m
       integer ii,iv,it
       integer kk,kv,kt
@@ -523,26 +523,26 @@ c     coordinates using the method of lights
 c
 c
       subroutine egauss1b
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use iounit
+      use light
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k,m
       integer ii,iv,it
       integer kk,kv,kt
@@ -882,23 +882,23 @@ c     coordinates using a pairwise neighbor list
 c
 c
       subroutine egauss1c
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -1166,22 +1166,22 @@ c     potential energy smoothing
 c
 c
       subroutine egauss1d
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use math
+      use molcul
+      use usage
+      use vdw
+      use vdwpot
+      use virial
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
-      include 'warp.i'
       integer i,j,k,ii,kk
       integer iv,kv,it,kt
       integer, allocatable :: iv14(:)

@@ -28,12 +28,12 @@ c     xyz convention in Appendix B
 c
 c
       subroutine inertia (mode)
+      use sizes
+      use atoms
+      use atomid
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'iounit.i'
-      include 'math.i'
       integer i,j,k,mode
       real*8 weigh,total,dot
       real*8 xcm,ycm,zcm

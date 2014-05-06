@@ -20,18 +20,24 @@ c     the final root mean square fit is returned in "rmsvalue"
 c
 c
       subroutine impose (n1,x1,y1,z1,n2,x2,y2,z2,rmsvalue)
+      use sizes
+      use align
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'align.i'
-      include 'inform.i'
-      include 'iounit.i'
-      integer i,n1,n2
+      integer i,n1,n2,nmax
       real*8 xmid,ymid,zmid
       real*8 rmsvalue,rmsfit
       real*8 x1(*),x2(*)
       real*8 y1(*),y2(*)
       real*8 z1(*),z2(*)
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      nmax = max(n1,n2)
+      if (.not. allocated(ifit))  allocate (ifit(2,nmax))
+      if (.not. allocated(wfit))  allocate (wfit(nmax))
 c
 c     superimpose the full structures if not specified
 c

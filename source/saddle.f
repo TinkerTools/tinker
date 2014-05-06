@@ -18,15 +18,15 @@ c     (Halgren-Lipscomb) and quadratic path (Bell-Crighton) methods
 c
 c
       program saddle
+      use sizes
+      use atoms
+      use iounit
+      use keys
+      use linmin
+      use syntrn
+      use titles
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'linmin.i'
-      include 'syntrn.i'
-      include 'titles.i'
-      include 'zcoord.i'
       integer i,its,next
       integer nvar,freeunit
       integer ncalls,niter
@@ -200,9 +200,15 @@ c
       write (iout,70)  rmsvalue
    70 format (/,' RMS Fit for All Atoms of Both Structures :',f10.4)
 c
-c     copy the superimposed structures into vectors
+c     perform dynamic allocation of some global arrays
 c
       nvar = 3 * n
+      if (.not. allocated(xmin1))  allocate (xmin1(nvar))
+      if (.not. allocated(xmin2))  allocate (xmin2(nvar))
+      if (.not. allocated(xm))  allocate (xm(nvar))
+c
+c     copy the superimposed structures into vectors
+c
       do i = 1, n
          xmin1(3*i-2) = x1(i)
          xmin1(3*i-1) = y1(i)
@@ -286,11 +292,11 @@ c
             xx(3*i) = z(i)
          end do
       else
-         t = 0.5d0
+         tpath = 0.5d0
          do i = 1, n
-            zbond(i) = (1.0d0-t)*zbond1(i) + t*zbond2(i)
-            zang(i) = (1.0d0-t)*zang1(i) + t*zang2(i)
-            ztors(i) = (1.0d0-t)*ztors1(i) + t*ztors2(i)
+            zbond(i) = (1.0d0-tpath)*zbond1(i) + tpath*zbond2(i)
+            zang(i) = (1.0d0-tpath)*zang1(i) + tpath*zang2(i)
+            ztors(i) = (1.0d0-tpath)*ztors1(i) + tpath*ztors2(i)
          end do
          call makexyz
          do i = 1, n
@@ -355,8 +361,8 @@ c
 c
 c     compute initial point for quadratic line maximization
 c
-      t = pm
-      call pathpnt (nvar,t,xx,xmin1,xmin2)
+      tpath = ppath
+      call pathpnt (nvar,tpath,xx,xmin1,xmin2)
       ncalls = ncalls + 3
       f = saddle1 (xx,g)
       call tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
@@ -364,47 +370,47 @@ c
   110 format (/,' Search for a Maximum along Synchronous Transit :',
      &        /' ST Iter    F Value       Path      RMS G',
      &          '      G Tan      Gamma   FG Call',/)
-      write (iout,120)  niter,f,t,g_rms,g_tan,gamma,ncalls
+      write (iout,120)  niter,f,tpath,g_rms,g_tan,gamma,ncalls
   120 format (i6,f13.4,f11.4,f11.4,f11.4,f11.5,i8)
 c
 c     make an iterative search for quadratic line maximum
 c
       do while (.not. done)
          f_0 = f
-         t = t + delta
-         call pathpnt (nvar,t,xx,xmin1,xmin2)
+         tpath = tpath + delta
+         call pathpnt (nvar,tpath,xx,xmin1,xmin2)
          ncalls = ncalls + 1
          f_1 = saddle1 (xx,g)
-         t = t - 2.0d0*delta
-         call pathpnt (nvar,t,xx,xmin1,xmin2)
-         t = t + delta
+         tpath = tpath - 2.0d0*delta
+         call pathpnt (nvar,tpath,xx,xmin1,xmin2)
+         tpath = tpath + delta
          ncalls = ncalls + 1
          f_2 = saddle1 (xx,g)
          if (f_1.gt.f_0 .and. f_2.gt.f_0) then
             goto 150
          else if (f_1 .gt. f_0) then
-            t = t + delta
+            tpath = tpath + delta
             p = 1.0d0
          else if (f_2 .gt. f_0) then
-            t = t - delta
+            tpath = tpath - delta
             p = -1.0d0
             f_1 = f_2
          else
-            t = t + 0.5d0*delta*(f_2-f_1)/(f_1-2.0d0*f_0+f_2)
+            tpath = tpath + 0.5d0*delta*(f_2-f_1)/(f_1-2.0d0*f_0+f_2)
             goto 130
          end if
          spanned = .false.
          do while (.not. spanned)
             p = 2.0d0 * p
-            t = t + p*delta
-            if (t .le. 0.0d0) then
-               t = 0.0d0
+            tpath = tpath + p*delta
+            if (tpath .le. 0.0d0) then
+               tpath = 0.0d0
                f_2 = energy1
-            else if (t .ge. 1.0d0) then
-               t = 1.0d0
+            else if (tpath .ge. 1.0d0) then
+               tpath = 1.0d0
                f_2 = energy2
             else
-               call pathpnt (nvar,t,xx,xmin1,xmin2)
+               call pathpnt (nvar,tpath,xx,xmin1,xmin2)
                ncalls = ncalls + 1
                f_2 = saddle1 (xx,g)
             end if
@@ -416,31 +422,33 @@ c
             end if
          end do
          p = 0.5d0 * p
-         t = t - p*delta
-         if (t .le. 0.0d0) then
-            t = 0.0d0
+         tpath = tpath - p*delta
+         if (tpath .le. 0.0d0) then
+            tpath = 0.0d0
             f_3 = energy1
-         else if (t .ge. 1.0d0) then
-            t = 1.0d0
+         else if (tpath .ge. 1.0d0) then
+            tpath = 1.0d0
             f_3 = energy2
          else
-            call pathpnt (nvar,t,xx,xmin1,xmin2)
+            call pathpnt (nvar,tpath,xx,xmin1,xmin2)
             ncalls = ncalls + 1
             f_3 = saddle1 (xx,g)
          end if
          if (f_3 .gt. f_1) then
-            t = t + 0.5d0*abs(p)*delta*(f_1-f_2)/(f_2-2.0d0*f_3+f_1)
+            tpath = tpath + 0.5d0*abs(p)*delta*(f_1-f_2)
+     &                         / (f_2-2.0d0*f_3+f_1)
          else
-            t = t - p*delta
-            t = t + 0.5d0*abs(p)*delta*(f_0-f_3)/(f_3-2.0d0*f_1+f_0)
+            tpath = tpath - p*delta
+            tpath = tpath + 0.5d0*abs(p)*delta*(f_0-f_3)
+     &                         / (f_3-2.0d0*f_1+f_0)
          end if
   130    continue
          niter = niter + 1
-         call pathpnt (nvar,t,xx,xmin1,xmin2)
+         call pathpnt (nvar,tpath,xx,xmin1,xmin2)
          ncalls = ncalls + 3
          f = saddle1 (xx,g)
          call tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
-         write (iout,140)  niter,f,t,g_rms,g_tan,gamma,ncalls
+         write (iout,140)  niter,f,tpath,g_rms,g_tan,gamma,ncalls
   140    format (i6,f13.4,f11.4,f11.4,f11.4,f11.5,i8)
          if (ncycle.ge.maxcycle .or. gamma.lt.gammamin) then
             done = .true.
@@ -453,7 +461,7 @@ c
 c     if the path maximum is too near to an endpoint,
 c     then negative curvature has probably been lost
 c
-      if (t.le.0.05d0 .or. t.ge.0.95d0) then
+      if (tpath.le.0.05d0 .or. tpath.ge.0.95d0) then
          if (.not. scan)  call pathscan (nvar,xmin1,xmin2,ncalls)
          write (iout,160)
   160    format (/,' SADDLE  --  Termination due to Loss',
@@ -605,15 +613,15 @@ c     then jump to the start of the next maximization cycle
 c
                if (reduce .ne. 0.0d0) then
                   call pathval (nvar,xx)
-                  t = reduce * pm
-                  call pathpnt (nvar,t,x_old,xmin1,xmin2)
+                  tpath = reduce * ppath
+                  call pathpnt (nvar,tpath,x_old,xmin1,xmin2)
                   do i = 1, nvar
                      xmin1(i) = x_old(i)
                   end do
                   ncalls = ncalls + 1
                   energy1 = saddle1 (xmin1,g)
-                  t = 1.0d0 - reduce*(1.0d0-pm)
-                  call pathpnt (nvar,t,x_old,xmin1,xmin2)
+                  tpath = 1.0d0 - reduce*(1.0d0-ppath)
+                  call pathpnt (nvar,tpath,x_old,xmin1,xmin2)
                   do i = 1, nvar
                      xmin2(i) = x_old(i)
                   end do
@@ -687,10 +695,10 @@ c     the specified structure
 c
 c
       subroutine pathval (nvar,xx)
+      use sizes
+      use atoms
+      use syntrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'syntrn.i'
       integer i,nvar
       real*8 dr,dp,rmsvalue
       real*8 xx(*)
@@ -711,7 +719,7 @@ c
       allocate (y2(n))
       allocate (z2(n))
 c
-c     find the value of the transit path coordinate "pm";
+c     find the value of the transit path coordinate "ppath";
 c     it is the ratio of the rms fits to the two endpoints
 c
       do i = 1, n
@@ -732,14 +740,14 @@ c
          z2(i) = xx(3*i)
       end do
       call impose (n,x1,y1,z1,n,x2,y2,z2,dp)
-      pm = dr / (dr+dp)
+      ppath = dr / (dr+dp)
 c
 c     superimpose on linear transit structure of same path value
 c
       do i = 1, n
-         x1(i) = (1.0d0-pm)*xmin1(3*i-2) + pm*xmin2(3*i-2)
-         y1(i) = (1.0d0-pm)*xmin1(3*i-1) + pm*xmin2(3*i-1)
-         z1(i) = (1.0d0-pm)*xmin1(3*i) + pm*xmin2(3*i)
+         x1(i) = (1.0d0-ppath)*xmin1(3*i-2) + ppath*xmin2(3*i-2)
+         y1(i) = (1.0d0-ppath)*xmin1(3*i-1) + ppath*xmin2(3*i-1)
+         z1(i) = (1.0d0-ppath)*xmin1(3*i) + ppath*xmin2(3*i)
          x2(i) = xx(3*i-2)
          y2(i) = xx(3*i-1)
          z2(i) = xx(3*i)
@@ -778,10 +786,10 @@ c     computing structures and energies for specific path values
 c
 c
       subroutine pathscan (nvar,x0,x1,ncalls)
+      use sizes
+      use iounit
+      use syntrn
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'syntrn.i'
       integer i,nvar,ncalls
       real*8 energy,gamma
       real*8 g_rms,g_tan
@@ -808,12 +816,12 @@ c
      &        /,' N Scan     F Value       Path      RMS G',
      &           '      G Tan      Gamma   FG Call',/)
       do i = 0, 10
-         t = 0.1d0 * dble(i)
-         call pathpnt (nvar,t,xx,x0,x1)
+         tpath = 0.1d0 * dble(i)
+         call pathpnt (nvar,tpath,xx,x0,x1)
          ncalls = ncalls + 3
          energy = saddle1 (xx,g)
          call tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
-         write (iout,20)  i,energy,t,g_rms,g_tan,gamma,ncalls
+         write (iout,20)  i,energy,tpath,g_rms,g_tan,gamma,ncalls
    20    format (i6,f13.4,f11.4,f11.4,f11.4,f11.5,i8)
       end do
 c
@@ -835,16 +843,17 @@ c     #############################################################
 c
 c
 c     "pathpnt" finds a structure on the synchronous transit path
-c     with the specified path value "t"
+c     with the specified path value "tpath"
 c
 c
-      subroutine pathpnt (nvar,t,xx,x0,x1)
+      subroutine pathpnt (nvar,tpath,xx,x0,x1)
+      use sizes
+      use inform
+      use minima
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'minima.i'
       integer i,nvar
-      real*8 t,value
+      real*8 tpath
+      real*8 value
       real*8 grdmin
       real*8 transit
       real*8 xx(*)
@@ -868,7 +877,7 @@ c
 c     interpolate coordinates to give initial estimate
 c
       do i = 1, nvar
-         xx(i) = (1.0d0-t)*x0(i) + t*x1(i)
+         xx(i) = (1.0d0-tpath)*x0(i) + tpath*x1(i)
       end do
 c
 c     optimize the synchronous transit function
@@ -891,10 +900,10 @@ c     transit path for a point along the transit pathway
 c
 c
       subroutine tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
+      use sizes
+      use atoms
+      use syntrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'syntrn.i'
       integer i,nvar
       real*8 g_rms,g_tan
       real*8 gamma,delta
@@ -916,7 +925,7 @@ c
 c
 c     store the initial pathpnt and compute gradient norm
 c
-      t0 = t
+      t0 = tpath
       g2 = 0.0d0
       do i = 1, nvar
          g2 = g2 + g(i)**2
@@ -935,8 +944,8 @@ c
       do i = 1, nvar
          xf(i) = xx(i)
       end do
-      t = t0 + delta
-      call pathpnt (nvar,t,xf,xf,xf)
+      tpath = t0 + delta
+      call pathpnt (nvar,tpath,xf,xf,xf)
       energy = saddle1 (xf,gf)
 c
 c     compute the backward difference
@@ -944,10 +953,10 @@ c
       do i = 1, nvar
          xb(i) = xx(i)
       end do
-      t = t0 - delta
-      call pathpnt (nvar,t,xb,xb,xb)
+      tpath = t0 - delta
+      call pathpnt (nvar,tpath,xb,xb,xb)
       energy = saddle1 (xb,gb)
-      t = t0
+      tpath = t0
 c
 c     compute tangent to the path, and projected gradient
 c
@@ -988,10 +997,10 @@ c     gradient; linear and quadratic transit paths are available
 c
 c
       function transit (xx,g)
+      use sizes
+      use atoms
+      use syntrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'syntrn.i'
       integer i,j,nvar
       integer ix,iy,iz
       integer jx,jy,jz
@@ -1023,7 +1032,7 @@ c
       do i = 1, nvar
          g(i) = 0.0d0
       end do
-      tq = 1.0d0 - t
+      tq = 1.0d0 - tpath
 c
 c     set the cutoff distance for interatomic distances
 c
@@ -1032,11 +1041,11 @@ c
 c
 c     set the type of synchronous transit path to be used
 c
-      if (pm .eq. 0.0d0) then
+      if (ppath .eq. 0.0d0) then
          mode = 'LINEAR'
       else
          mode = 'QUADRATIC'
-         pq = 1.0d0 - pm
+         pq = 1.0d0 - ppath
       end if
 c
 c     portion based on interpolated interatomic distances
@@ -1079,14 +1088,14 @@ c
                rc = sqrt(rc)
                r1 = sqrt(r1)
                r2 = sqrt(r2)
-               ri = tq*r1 + t*r2
+               ri = tq*r1 + tpath*r2
                if (mode .eq. 'QUADRATIC') then
                   xmd = xmi - xm(jx)
                   ymd = ymi - xm(jy)
                   zmd = zmi - xm(jz)
                   rm = sqrt(xmd**2+ymd**2+zmd**2)
-                  gamma = (rm-pq*r1-pm*r2) / (pm*pq)
-                  ri = ri + gamma*t*tq
+                  gamma = (rm-pq*r1-ppath*r2) / (ppath*pq)
+                  ri = ri + gamma*tpath*tq
                end if
                ri4 = ri**4
                rd = rc - ri
@@ -1109,7 +1118,7 @@ c     portion used to supress rigid rotations and translations
 c
       do i = 1, nvar
          wc = xx(i)
-         wi = tq*xmin1(i) + t*xmin2(i)
+         wi = tq*xmin1(i) + tpath*xmin2(i)
          wd = wc - wi
          value = value + 0.000001d0*wd**2
          g(i) = g(i) + 0.000002d0*wd
@@ -1131,9 +1140,9 @@ c     gradient for transition state optimization
 c
 c
       function saddle1 (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i
       real*8 e,saddle1
       real*8 xx(*)

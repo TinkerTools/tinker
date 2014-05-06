@@ -17,20 +17,20 @@ c     systems and processes any new or changed parameters
 c
 c
       subroutine korbit
+      use sizes
+      use atomid
+      use atoms
+      use bndstr
+      use inform
+      use iounit
+      use keys
+      use korbs
+      use orbits
+      use piorbs
+      use pistuf
+      use tors
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'korbs.i'
-      include 'orbits.i'
-      include 'piorbs.i'
-      include 'pistuf.i'
-      include 'tors.i'
-      include 'units.i'
       integer i,j,k,jt
       integer ia,ib,ita,itb
       integer npi,npi5,npi4
@@ -197,15 +197,29 @@ c
       use_ring = .false.
       if (min(npi5,npi4) .ne. 0)  use_ring = .true.
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(qorb))  allocate (qorb(n))
+      if (.not. allocated(worb))  allocate (worb(n))
+      if (.not. allocated(emorb))  allocate (emorb(n))
+c
 c     assign the values characteristic of the piatom types
 c
       do i = 1, norbit
          j = iorbit(i)
          jt = type(j)
-         q(j) = electron(jt)
-         w(j) = ionize(jt) / evolt
-         em(j) = repulse(jt) / evolt
+         qorb(j) = electron(jt)
+         worb(j) = ionize(jt) / evolt
+         emorb(j) = repulse(jt) / evolt
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(bkpi))  allocate (bkpi(nbond))
+      if (.not. allocated(blpi))  allocate (blpi(nbond))
+      if (.not. allocated(kslope))  allocate (kslope(nbond))
+      if (.not. allocated(lslope))  allocate (lslope(nbond))
+      if (.not. allocated(torsp2))  allocate (torsp2(ntors))
 c
 c     assign parameters for all bonds between piatoms;
 c     store the original bond lengths and force constants

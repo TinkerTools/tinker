@@ -17,9 +17,9 @@ c     then reads the coordinates from the file
 c
 c
       subroutine getmol
+      use files
+      use iounit
       implicit none
-      include 'files.i'
-      include 'iounit.i'
       integer imdl
       integer freeunit
       logical exist

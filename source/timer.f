@@ -18,13 +18,13 @@ c     and gradient computation, and Hessian matrix evaluation
 c
 c
       program timer
+      use sizes
+      use atoms
+      use hescut
+      use inform
+      use iounit
+      use limits
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'hescut.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,ncalls,next
       integer, allocatable :: hindex(:)
       integer, allocatable :: hinit(:,:)

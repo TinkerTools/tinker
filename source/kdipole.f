@@ -17,18 +17,18 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kdipole
+      use sizes
+      use atmlst
+      use atoms
+      use bndstr
+      use couple
+      use dipole
+      use inform
+      use iounit
+      use kdipol
+      use keys
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'dipole.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kdipol.i'
-      include 'keys.i'
-      include 'potent.i'
       integer i,j,k
       integer ia,ib,ita,itb
       integer nd,nd5,nd4,nd3
@@ -193,6 +193,12 @@ c
       end do
       use_ring = .false.
       if (min(nd5,nd4,nd3) .ne. 0)  use_ring = .true.
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(idpl))  allocate (idpl(2,maxbnd))
+      if (.not. allocated(bdpl))  allocate (bdpl(maxbnd))
+      if (.not. allocated(sdpl))  allocate (sdpl(maxbnd))
 c
 c     find and store all the bond dipole moments
 c

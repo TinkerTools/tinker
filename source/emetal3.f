@@ -17,14 +17,14 @@ c     and also partitions the energy among the atoms
 c
 c
       subroutine emetal3
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use energi
+      use kchrge
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'energi.i'
-      include 'kchrge.i'
       integer i
 c
 c

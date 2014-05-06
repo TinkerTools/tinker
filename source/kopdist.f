@@ -18,20 +18,20 @@ c     also processes any new or changed parameter values
 c
 c
       subroutine kopdist
+      use sizes
+      use angbnd
+      use angpot
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use keys
+      use kopdst
+      use opdist
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kopdst.i'
-      include 'opdist.i'
-      include 'potent.i'
       integer i,j,k,nopd
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -124,6 +124,12 @@ c
       do i = maxnopd, 1, -1
          if (kopd(i) .eq. blank)  nopd = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iopd))  allocate (iopd(4,maxatm))
+      if (.not. allocated(opdk))  allocate (opdk(maxatm))
+      if (.not. allocated(angtyp))  allocate (angtyp(maxang))
 c
 c     assign out-of-plane distance parameters for trigonal sites
 c

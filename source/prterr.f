@@ -17,9 +17,9 @@ c     file prior to aborting on a serious error
 c
 c
       subroutine prterr
+      use files
+      use output
       implicit none
-      include 'files.i'
-      include 'output.i'
       integer ierr,freeunit
       character*120 errorfile
 c

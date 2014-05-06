@@ -18,15 +18,15 @@ c     to rotatable torsional angles
 c
 c
       program testrot
+      use sizes
+      use domega
+      use energi
+      use inform
+      use iounit
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'domega.i'
-      include 'energi.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer i
       real*8 e,e0,etot,energy
       real*8 delta,delta0,eps

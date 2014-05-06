@@ -19,16 +19,16 @@ c     and Poisson-Boltzmann solvation models
 c
 c
       subroutine esolv1
+      use sizes
+      use atoms
+      use deriv
+      use energi
+      use limits
+      use math
+      use potent
+      use solute
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'math.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'warp.i'
       integer i
       real*8 e,ai,ri,rb
       real*8 term,probe
@@ -142,20 +142,20 @@ c     the Born radii chain rule term "derb" is an approximation
 c
 c
       subroutine egb1a
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use shunt
+      use solute
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'solute.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,k,ii,kk
       real*8 e,de,fgrp
       real*8 f,fi,fik
@@ -392,21 +392,21 @@ c     the Born radii chain rule term "derb" is an approximation
 c
 c
       subroutine egb1b
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use neigh
+      use shunt
+      use solute
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'solute.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,k
       integer ii,kk,kkk
       real*8 e,de,fgrp
@@ -649,21 +649,21 @@ c     potential smoothing methods
 c
 c
       subroutine egb1c
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use deriv
+      use energi
+      use group
+      use inter
+      use math
+      use molcul
+      use solute
+      use usage
+      use virial
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'solute.i'
-      include 'usage.i'
-      include 'virial.i'
-      include 'warp.i'
       integer i,k,ii,kk
       real*8 e,de,fgrp
       real*8 f,fi,fik
@@ -822,11 +822,11 @@ c     via the generalized Kirkwood plus nonpolar implicit solvation
 c
 c
       subroutine egk1
+      use sizes
+      use energi
+      use limits
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'potent.i'
 c
 c
 c     setup the multipoles for solvation only calculations
@@ -866,24 +866,24 @@ c     model
 c
 c
       subroutine egk1a
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use deriv
+      use energi
+      use gkstuf
+      use group
+      use inter
+      use molcul
+      use mpole
+      use polar
+      use polpot
+      use shunt
+      use solute
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'gkstuf.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'solute.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k,ii,kk
       real*8 e,ei,fgrp
       real*8 est,eintert
@@ -2468,27 +2468,27 @@ c     a double loop
 c
 c
       subroutine ediff1a
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use limits
+      use molcul
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer ix,iy,iz
@@ -3413,28 +3413,28 @@ c     a neighbor list
 c
 c
       subroutine ediff1b
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use limits
+      use molcul
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk,kkk
       integer ix,iy,iz
@@ -4385,17 +4385,17 @@ c     PB/NP solvation model
 c
 c
       subroutine epb1a
+      use sizes
+      use atoms
+      use chgpot
+      use deriv
+      use energi
+      use mpole
+      use pbstuf
+      use polar
+      use polpot
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chgpot.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'mpole.i'
-      include 'pbstuf.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
       integer i,j,ii
       real*8 sum
       real*8, allocatable :: indpole(:,:)
@@ -4562,17 +4562,17 @@ c     and derivatives as a sum of cavity and dispersion terms
 c
 c
       subroutine enp1 (ecav,edisp)
+      use sizes
+      use atoms
+      use atomid
+      use deriv
+      use kvdws
+      use math
+      use mpole
+      use nonpol
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'deriv.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'npolar.i'
-      include 'shunt.i'
-      include 'solute.i'
       integer i
       real*8 ecav,edisp
       real*8 exclude
@@ -4738,16 +4738,16 @@ c     and derivatives of a solute
 c
 c
       subroutine ewca1 (edisp)
+      use sizes
+      use atoms
+      use atomid
+      use deriv
+      use kvdws
+      use math
+      use nonpol
+      use solute
+      use vdw
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'deriv.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'npolar.i'
-      include 'solute.i'
-      include 'vdw.i'
       integer i,k
       real*8 edisp,e,idisp
       real*8 xi,yi,zi
@@ -5025,15 +5025,15 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine ehpmf1 (ehp)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use deriv
+      use hpmf
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'hpmf.i'
-      include 'iounit.i'
-      include 'math.i'
       integer i,j,k,m
       integer ii,jj,kk
       integer sschk
@@ -5090,7 +5090,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                rbig = rpmf(k) + rsurf
                if (r2 .le. rbig*rbig) then
-                  r = sqrt(r2)         
+                  r = sqrt(r2)
                   rsmall = rpmf(k) - rcarbon
                   part = pisurf * (rbig-r) * (1.0d0+rsmall/r)
                   sasa = sasa * (1.0d0-saterm*part)
@@ -5110,7 +5110,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                rbig = rpmf(k) + rsurf
                if (r2 .le. rbig*rbig) then
-                  r = sqrt(r2)         
+                  r = sqrt(r2)
                   rsmall = rpmf(k) - rcarbon
                   part = pisurf * (rbig-r) * (1.0d0+rsmall/r)
                   t1b = -pisurf * (1.0d0+rbig*rsmall/r2)

@@ -17,12 +17,12 @@ c     atom from its defining internal coordinate values
 c
 c
       subroutine xyzatm (i,ia,bond,ib,angle1,ic,angle2,chiral)
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
       integer i,ia,ib,ic,chiral
       real*8 bond,angle1,angle2
       real*8 eps,rad1,rad2

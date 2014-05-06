@@ -17,16 +17,16 @@ c     molecular dynamics trajectory to an external disk file
 c
 c
       subroutine prtdyn
+      use sizes
+      use atoms
+      use boxes
+      use files
+      use group
+      use mdstuf
+      use moldyn
+      use rgddyn
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'files.i'
-      include 'group.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'rgddyn.i'
-      include 'titles.i'
       integer i,idyn
       integer freeunit
       logical exist

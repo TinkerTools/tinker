@@ -17,16 +17,16 @@ c     angle space using a low storage BFGS nonlinear optimization
 c
 c
       program minirot
+      use sizes
+      use files
+      use inform
+      use iounit
+      use keys
+      use math
+      use omega
+      use scales
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'scales.i'
-      include 'zcoord.i'
       integer i,imin,next
       integer freeunit
       real*8 minimum,minirot1
@@ -208,12 +208,12 @@ c     in torsional angle space
 c
 c
       function minirot1 (xx,g)
+      use sizes
+      use math
+      use omega
+      use scales
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'scales.i'
-      include 'zcoord.i'
       integer i
       real*8 minirot1,e
       real*8 xx(*)

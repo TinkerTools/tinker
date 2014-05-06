@@ -33,11 +33,11 @@ c     radius   radii of each of the individual atoms
 c
 c
       subroutine surfatom (ir,area,radius)
+      use sizes
+      use atoms
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'math.i'
       integer maxarc
       parameter (maxarc=1000)
       integer i,j,k,m
@@ -505,11 +505,11 @@ c     of a specified atom
 c
 c
       subroutine surfatom1 (ir,area,darea,radius)
+      use sizes
+      use atoms
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'math.i'
       integer maxarc
       parameter (maxarc=1000)
       integer i,j,k,m

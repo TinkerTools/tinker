@@ -25,8 +25,8 @@ c                 output with the position following the number
 c
 c
       subroutine getnumb (string,number,next)
+      use ascii
       implicit none
-      include 'ascii.i'
       integer i,j,length
       integer number,digit
       integer next,trimtext

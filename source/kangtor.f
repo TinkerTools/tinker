@@ -17,19 +17,19 @@ c     and processes new or changed parameter values
 c
 c
       subroutine kangtor
+      use sizes
+      use angtor
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use keys
+      use kantor
+      use potent
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'angtor.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kantor.i'
-      include 'potent.i'
-      include 'tors.i'
       integer i,j,k,l,m,nat
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -40,7 +40,7 @@ c
       character*4 pa,pb,pc,pd
       character*4 zeros
       character*16 blank
-      character*16 pt,pt0
+      character*16 pt
       character*20 keyword
       character*120 record
       character*120 string
@@ -137,6 +137,11 @@ c
       do i = maxnat, 1, -1
          if (kat(i) .eq. blank)  nat = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iat))  allocate (iat(3,maxtors))
+      if (.not. allocated(kant))  allocate (kant(6,maxtors))
 c
 c     assign the angle-torsion parameters for each torsion
 c

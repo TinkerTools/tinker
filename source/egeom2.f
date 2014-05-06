@@ -21,17 +21,17 @@ c     lower bound range is used instead of a single distance
 c
 c
       subroutine egeom2 (i)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use deriv
+      use group
+      use hessn
+      use math
+      use molcul
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'kgeoms.i'
-      include 'math.i'
-      include 'molcul.i'
       integer i,j,k,m
       integer ia,ib,ic,id
       integer kpos,kdist,kang

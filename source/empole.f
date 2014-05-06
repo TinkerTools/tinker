@@ -17,10 +17,10 @@ c     atomic multipole and dipole polarizability interactions
 c
 c
       subroutine empole
+      use energi
+      use limits
+      use potent
       implicit none
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'potent.i'
 c
 c
 c     choose the method for summing over multipole interactions
@@ -59,24 +59,24 @@ c     polarizability interaction energy using a double loop
 c
 c
       subroutine empole0a
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use group
+      use math
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer ix,iy,iz
@@ -578,24 +578,24 @@ c     polarizability interaction energy using a neighbor list
 c
 c
       subroutine empole0b
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use energi
+      use group
+      use math
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk,kkk
       integer ix,iy,iz
@@ -671,7 +671,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP PARALLEL default(shared) firstprivate(f)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,pdi,pti,pgamma,
 !$OMP& scale3,scale5,scale7,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
 !$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
@@ -914,16 +914,16 @@ c     Ewald summation and double loop
 c
 c
       subroutine empole0c
+      use sizes
+      use atoms
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use math
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,ii
       real*8 e,ei,f
       real*8 term,fterm
@@ -1045,23 +1045,23 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine ereal0c
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use math
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
       integer i,j,k,m
       integer ii,kk
       real*8 e,ei,f,erfc
@@ -1537,16 +1537,16 @@ c     Ewald summation and a neighbor list
 c
 c
       subroutine empole0d
+      use sizes
+      use atoms
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use math
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,ii
       real*8 e,ei,f
       real*8 term,fterm
@@ -1668,23 +1668,23 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine ereal0d
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use energi
+      use ewald
+      use math
+      use mplpot
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
       integer i,j,k,m
       integer ii,kk,kkk
       real*8 e,ei,f,erfc
@@ -1744,7 +1744,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) 
+!$OMP PARALLEL default(shared) firstprivate(f)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,efix,eifix,bfac,damp,expdamp,
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,alsq2,alsq2n,
 !$OMP& exp2a,ralpha,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
@@ -1993,18 +1993,18 @@ c     during May 2007
 c
 c
       subroutine emrecip
+      use sizes
+      use bound
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use math
+      use mpole
+      use pme
+      use polar
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'pme.i'
-      include 'polar.i'
-      include 'potent.i'
       integer i,j,k,ntot
       integer k1,k2,k3
       integer m1,m2,m3

@@ -16,15 +16,15 @@ c     "eurey" calculates the Urey-Bradley 1-3 interaction energy
 c
 c
       subroutine eurey
+      use sizes
+      use atoms
+      use bound
+      use energi
+      use group
+      use urey
+      use urypot
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'urey.i'
-      include 'urypot.i'
-      include 'usage.i'
       integer i,ia,ic
       real*8 e,ideal,force
       real*8 dt,dt2,fgrp

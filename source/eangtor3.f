@@ -17,23 +17,23 @@ c     also partitions the energy terms among the atoms
 c
 c
       subroutine eangtor3
+      use sizes
+      use action
+      use analyz
+      use angbnd
+      use angtor
+      use atomid
+      use atoms
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use math
+      use torpot
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'angle.i'
-      include 'angtor.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,k,iangtor
       integer ia,ib,ic,id
       real*8 e,e1,e2
@@ -59,7 +59,7 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      logical proceed      
+      logical proceed
       logical header,huge
 c
 c
@@ -136,7 +136,7 @@ c
                rcb = sqrt(rcb2)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
-               tangle = radian * acos(cosine) 
+               tangle = radian * acos(cosine)
                if (sine .lt. 0.0d0)  tangle = -tangle
 c
 c     compute multiple angle trigonometry and phase terms
@@ -211,7 +211,7 @@ c
                   write (iout,20)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),tangle,e
    20             format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
-               end if 
+               end if
             end if
          end if
       end do

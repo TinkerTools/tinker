@@ -17,20 +17,20 @@ c     pair of atom types via analysis of a set of coordinate frames
 c
 c
       program radial
+      use sizes
+      use argue
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use files
+      use inform
+      use iounit
+      use limits
+      use math
+      use molcul
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'argue.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'potent.i'
       integer i,j,k,iarc
       integer nframe,iframe
       integer freeunit,next

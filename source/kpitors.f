@@ -17,18 +17,18 @@ c     needing them, and processes any new or changed values
 c
 c
       subroutine kpitors
+      use sizes
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use inform
+      use iounit
+      use keys
+      use kpitor
+      use pitors
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kpitor.i'
-      include 'pitors.i'
-      include 'potent.i'
       integer i,j,npt
       integer ia,ib
       integer ita,itb
@@ -98,6 +98,11 @@ c
       do i = maxnpt, 1, -1
          if (kpt(i) .eq. blank)  npt = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ipit))  allocate (ipit(6,maxtors))
+      if (.not. allocated(kpit))  allocate (kpit(maxtors))
 c
 c     assign pi-orbital torsion parameters as required
 c

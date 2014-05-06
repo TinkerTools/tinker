@@ -25,17 +25,17 @@ c     original version written by Teresa Head-Gordon, October 2010
 c
 c
       subroutine bussi (istep,dt)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use boxes
+      use freeze
+      use mdstuf
+      use moldyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'boxes.i'
-      include 'freeze.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,istep
       real*8 dt,dt_2,dt_x
       real*8 dt2_2,dt3_2
@@ -94,7 +94,7 @@ c
       allocate (derivs(3,n))
 c
 c     store the current atom positions, then alter positions
-c     and velocities via coupling to the barostat 
+c     and velocities via coupling to the barostat
 c
       term = eta * dt
       expterm = exp(term)

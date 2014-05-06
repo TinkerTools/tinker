@@ -17,14 +17,14 @@ c     or alter the values within an internal coordinates file
 c
 c
       program intedit
+      use sizes
+      use atomid
+      use atoms
+      use files
+      use iounit
+      use katoms
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'katoms.i'
-      include 'zcoord.i'
       integer i,j,k,l,m
       integer izmt,space
       integer freeunit
@@ -311,8 +311,8 @@ c     for the Z-matrix editing program
 c
 c
       subroutine zhelp
+      use iounit
       implicit none
-      include 'iounit.i'
 c
 c
 c     print the help and information message for Z-matrix editing
@@ -358,8 +358,8 @@ c     as needed by the internal coordinate editing program
 c
 c
       subroutine zvalue (text,x,changed)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer length
       integer trimtext
       real*8 x,xnew

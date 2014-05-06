@@ -17,10 +17,10 @@ c     at sites with chiral local reference frame definitions
 c
 c
       subroutine chkpole
+      use sizes
+      use atoms
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
       integer i,k
       integer ia,ib,ic,id
       real*8 xad,yad,zad

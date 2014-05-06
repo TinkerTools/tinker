@@ -17,12 +17,12 @@ c     Hessian and frequencies from a Gaussian 09 output file
 c
 c
       subroutine readgau
+      use sizes
+      use ascii
+      use iounit
+      use qmstuf
+      use units
       implicit none
-      include 'sizes.i'
-      include 'ascii.i'
-      include 'iounit.i'
-      include 'qmstuf.i'
-      include 'units.i'
       integer i,j
       integer igau,code
       integer ngfreq,nghess
@@ -31,7 +31,7 @@ c
       integer freeunit
       integer trimtext
       logical hasinputxyz
-      logical hasMP2
+      logical hasmp2
       logical exist
       real*8 frcunit,hessunit
       character*4 arcstart
@@ -81,13 +81,13 @@ c
          end if
       end do
 c
-c     read structure, forces and frequencies from Gaussian output
+c     scan the Gaussian output file to get the number of atoms
 c
       open (unit=igau,file=gaufile,status='old')
       rewind (unit=igau)
 c     do while (.true. .and. .not.eof(igau))
       do while (.true.)
-         read (igau,30,err=170,end=170)  record
+         read (igau,30,err=70,end=70)  record
    30    format (a120)
          next = 1
          string = record
@@ -96,12 +96,12 @@ c     do while (.true. .and. .not.eof(igau))
          call upcase (string)
          if (string(1:20) .eq. 'STANDARD ORIENTATION') then
             do i = 1, 4
-               read (igau,40,err=170,end=170)  record
+               read (igau,40,err=70,end=70)  record
    40          format (a120)
             end do
             i = 1
             do while (.true.)
-               read (igau,50,err=170,end=170)  record
+               read (igau,50,err=70,end=70)  record
    50          format (a120)
                read (record,*,err=60,end=60)  itmp,jtmp,ktmp,
      &                                        gx(i),gy(i),gz(i)
@@ -110,33 +110,75 @@ c     do while (.true. .and. .not.eof(igau))
             end do
    60       continue
             ngatom = i - 1
+         end if
+      end do
+   70 continue
+c
+c     perform dynamic allocation of some global arrays
+c
+      nghess = (3*ngatom*(3*ngatom+1)) / 2
+      if (.not. allocated(gx))  allocate (gx(ngatom))
+      if (.not. allocated(gy))  allocate (gy(ngatom))
+      if (.not. allocated(gz))  allocate (gz(ngatom))
+      if (.not. allocated(gfreq))  allocate (gfreq(3*ngatom))
+      if (.not. allocated(gforce))  allocate (gforce(3,ngatom))
+      if (.not. allocated(gh))  allocate (gh(nghess))
+c
+c     read structure, forces and frequencies from Gaussian output
+c
+      rewind (unit=igau)
+c     do while (.true. .and. .not.eof(igau))
+      do while (.true.)
+         read (igau,80,err=220,end=220)  record
+   80    format (a120)
+         next = 1
+         string = record
+         call trimhead (string)
+         length = trimtext (string)
+         call upcase (string)
+         if (string(1:20) .eq. 'STANDARD ORIENTATION') then
+            do i = 1, 4
+               read (igau,90,err=220,end=220)  record
+   90          format (a120)
+            end do
+            i = 1
+            do while (.true.)
+               read (igau,100,err=220,end=220)  record
+  100          format (a120)
+               read (record,*,err=110,end=110)  itmp,jtmp,ktmp,
+     &                                        gx(i),gy(i),gz(i)
+               if (jtmp .le. 0)  goto 110
+               i = i + 1
+            end do
+  110       continue
+            ngatom = i - 1
          else if (string(37:58) .eq. 'FORCES (HARTREES/BOHR)') then
-            read (igau,70,err=170,end=170)  record
-   70       format (a120)
-            read (igau,80,err=170,end=170)  record
-   80       format (a120)
+            read (igau,120,err=220,end=220)  record
+  120       format (a120)
+            read (igau,130,err=220,end=220)  record
+  130       format (a120)
             frcunit = hartree / bohr
             do i = 1, ngatom
                gforce(1,i) = 0.0d0
                gforce(2,i) = 0.0d0
                gforce(3,i) = 0.0d0
-               read (igau,90,err=170,end=170)  record
-   90          format (a120)
-               read (record,*,err=100,end=100)  itmp,jtmp,gforce(1,i),
+               read (igau,140,err=220,end=220)  record
+  140          format (a120)
+               read (record,*,err=150,end=150)  itmp,jtmp,gforce(1,i),
      &                                          gforce(2,i),gforce(3,i)
                do j = 1, 3
                   gforce(j,i) = frcunit * gforce(j,i)
                end do
-  100          continue
+  150          continue
             end do
          else if (string(1:14) .eq. 'FREQUENCIES --') then
             gfreq(ngfreq+1) = 0.0d0
             gfreq(ngfreq+2) = 0.0d0
             gfreq(ngfreq+3) = 0.0d0
-            read (string(15:120),*,err=110,end=110)  gfreq(ngfreq+1),
+            read (string(15:120),*,err=160,end=160)  gfreq(ngfreq+1),
      &                                               gfreq(ngfreq+2),
      &                                               gfreq(ngfreq+3)
-  110       continue
+  160       continue
             ngfreq = ngfreq + 3
 c
 c     read the Hessian from archive section at bottom of output
@@ -146,21 +188,21 @@ c
 c           do while (.true. .and. .not.eof(igau))
             do while (.true.)
                if (next .gt. 73) then
-                  read (igau,120,err=170,end=170)  record
-  120             format (a120)
+                  read (igau,170,err=220,end=220)  record
+  170             format (a120)
                   next = 1
                end if
-               call readarcword (igau,record,word,length,next)
+               call readgarc (igau,record,word,length,next)
                if (word(1:1) .eq. char(backslash))  itmp = itmp + 1
                if (itmp.eq.16 .and. hasinputxyz) then
                   do i = 1, ngatom
                      do j = 1, 5
                         if (next .gt. 73) then
-                           read (igau,130,err=170,end=170)  record
-  130                      format (a120)
+                           read (igau,180,err=220,end=220)  record
+  180                      format (a120)
                            next = 1
                         end if
-                        call readarcword (igau,record,word,length,next)
+                        call readgarc (igau,record,word,length,next)
                         if (j .eq. 1)  read(word(1:length),*)  gname
                         if (j .eq. 2)  read(word(1:length),*)  gx(i)
                         if (j .eq. 3)  read(word(1:length),*)  gy(i)
@@ -171,11 +213,11 @@ c           do while (.true. .and. .not.eof(igau))
                if (itmp.gt.16 .and. word(1:2).eq.'HF') then
                   do i = 1, 2
                      if (next .gt. 73) then
-                        read (igau,140,err=170,end=170)  record
-  140                   format (a120)
+                        read (igau,190,err=220,end=220)  record
+  190                   format (a120)
                         next = 1
                      end if
-                     call readarcword (igau,record,word,length,next)
+                     call readgarc (igau,record,word,length,next)
                   end do
                   read (word(1:length),*)  egau
                   egau = hartree * egau
@@ -183,34 +225,33 @@ c           do while (.true. .and. .not.eof(igau))
                   hasmp2 = .true.
                   do i = 1, 2
                      if (next .gt. 73) then
-                        read (igau,150,err=170,end=170)  record
-  150                   format (a120)
+                        read (igau,200,err=220,end=220)  record
+  200                   format (a120)
                         next = 1
                      end if
-                     call readarcword (igau,record,word,length,next)
+                     call readgarc (igau,record,word,length,next)
                   end do
                   read (word(1:length),*)  egau
                   egau = hartree * egau
                else if (word(1:5) .eq. 'NImag') then
                   do i = 1, 4
-                     call readarcword (igau,record,word,length,next)
+                     call readgarc (igau,record,word,length,next)
                   end do
                   hessunit = hartree / bohr**2
-                  nghess = (3*ngatom*(3*ngatom+1)) / 2
                   do i = 1, nghess
-                     call readarcword (igau,record,word,length,next)
+                     call readgarc (igau,record,word,length,next)
                      read (word(1:length),*)  gh(i)
                      gh(i) = hessunit * gh(i)
                   end do
-                  goto 170
+                  goto 220
                end if
                code = ichar(word(1:1))
-               if (code .eq. atsign)  goto 160
+               if (code .eq. atsign)  goto 210
             end do
          end if
-  160    continue
+  210    continue
       end do
-  170 continue
+  220 continue
       close (unit=igau)
 c
 c     zero out the frequencies if none were in Gaussian output
@@ -224,24 +265,20 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine readarcword  --  read Gaussian archive section  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine readgarc  --  read Gaussian archive section  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "readarcword" reads data from Gaussian archive section; each
+c     "readgarc" reads data from Gaussian archive section; each
 c     entry is terminated with a backslash symbol
 c
-c     igau     file unit of the Gaussian output file
-c     word     information to be read
-c     length   length of the word
 c
-c
-      subroutine readarcword (igau,string,word,length,next)
+      subroutine readgarc (igau,string,word,length,next)
+      use ascii
       implicit none
-      include 'ascii.i'
       integer i,igau,code
       integer next,length
       character*1 letter

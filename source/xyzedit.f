@@ -17,21 +17,21 @@ c     of the contents of a Cartesian coordinates file
 c
 c
       program xyzedit
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use couple
+      use files
+      use iounit
+      use limits
+      use math
+      use molcul
+      use titles
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'titles.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k,m
       integer it,ixyz
       integer init,stop
@@ -721,13 +721,13 @@ c     that overlap the solute
 c
 c
       subroutine soak
+      use sizes
+      use atoms
+      use bound
+      use iounit
+      use molcul
+      use refer
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'refer.i'
       integer i,k,isolv
       integer ntot,freeunit
       real*8 xi,yi,zi

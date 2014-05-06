@@ -17,20 +17,20 @@ c     first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine estrbnd1
+      use sizes
+      use angbnd
+      use angpot
+      use atoms
+      use bndstr
+      use bound
+      use deriv
+      use energi
+      use group
+      use math
+      use strbnd
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'math.i'
-      include 'strbnd.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,k,istrbnd
       integer ia,ib,ic
       real*8 e,dr1,dr2,dt

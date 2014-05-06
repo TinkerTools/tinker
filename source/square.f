@@ -56,12 +56,12 @@ c
 c
       subroutine square (m,n,xlo,xhi,xc,fc,gc,fjac,mdim,
      &                      grdmin,rsdvalue,lsqwrite)
+      use sizes
+      use inform
+      use iounit
+      use keys
+      use minima
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'minima.i'
       integer maxlsq,maxrsd
       parameter (maxlsq=50)
       parameter (maxrsd=100)

@@ -17,19 +17,19 @@ c     needing them, and processes any new or changed values
 c
 c
       subroutine kstrtor
+      use sizes
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use keys
+      use ksttor
+      use potent
+      use strtor
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'ksttor.i'
-      include 'potent.i'
-      include 'strtor.i'
-      include 'tors.i'
       integer i,j,k,nbt
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -145,6 +145,11 @@ c
       do i = maxnbt, 1, -1
          if (kbt(i) .eq. blank)  nbt = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ist))  allocate (ist(4,maxtors))
+      if (.not. allocated(kst))  allocate (kst(9,maxtors))
 c
 c     assign the stretch-torsion parameters for each torsion
 c

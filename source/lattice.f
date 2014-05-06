@@ -17,13 +17,13 @@ c     values to be used in computing fractional coordinates
 c
 c
       subroutine lattice
+      use sizes
+      use boxes
+      use cell
+      use inform
+      use iounit
+      use math
       implicit none
-      include 'sizes.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
       real*8 alpha_cos
       real*8 ar1,ar2,ar3
       real*8 br1,br2,br3

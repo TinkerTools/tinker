@@ -32,15 +32,15 @@ c     in Biophysics and Molecular Biology, 56, 43-78 (1991)
 c
 c
       subroutine embed
+      use sizes
+      use atoms
+      use disgeo
+      use files
+      use inform
+      use iounit
+      use minima
+      use refer
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'minima.i'
-      include 'refer.i'
       integer maxeigen
       parameter (maxeigen=5)
       integer i,j,nvar,nstep
@@ -192,7 +192,7 @@ c     square the bounds for use during structure refinement
 c
       do i = 1, n
          do j = 1, n
-            bnd(j,i) = bnd(j,i)**2
+            dbnd(j,i) = dbnd(j,i)**2
          end do
       end do
 c
@@ -282,7 +282,7 @@ c     take the root of the currently squared distance bounds
 c
       do i = 1, n
          do j = 1, n
-            bnd(j,i) = sqrt(bnd(j,i))
+            dbnd(j,i) = sqrt(dbnd(j,i))
          end do
       end do
 c
@@ -325,12 +325,12 @@ c     each of three other atoms
 c
 c
       subroutine kchiral
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kgeoms.i'
       integer i,j,ia,ib,ic,id
       real*8 xad,yad,zad
       real*8 xbd,ybd,zbd
@@ -405,11 +405,11 @@ c     129-144 (1988)
 c
 c
       subroutine triangle
+      use sizes
+      use atoms
+      use disgeo
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'iounit.i'
       integer i,j,k
       integer ik1,ik2
       integer jk1,jk2
@@ -425,15 +425,15 @@ c
          do i = 1, n-1
             ik1 = min(i,k)
             ik2 = max(i,k)
-            lik = bnd(ik2,ik1)
-            uik = bnd(ik1,ik2)
+            lik = dbnd(ik2,ik1)
+            uik = dbnd(ik1,ik2)
             do j = i+1, n
-               lij = bnd(j,i)
-               uij = bnd(i,j)
+               lij = dbnd(j,i)
+               uij = dbnd(i,j)
                jk1 = min(j,k)
                jk2 = max(j,k)
-               ljk = bnd(jk2,jk1)
-               ujk = bnd(jk1,jk2)
+               ljk = dbnd(jk2,jk1)
+               ujk = dbnd(jk1,jk2)
                lij = max(lij,lik-ujk,ljk-uik)
                uij = min(uij,uik+ujk)
                if (lij-uij .gt. eps) then
@@ -447,18 +447,18 @@ c
      &                    /,17x,2i6,3x,2f9.4)
                   call fatal
                end if
-               if (lij-bnd(j,i) .gt. eps) then
-                  write (iout,40)  i,j,bnd(j,i),lij
+               if (lij-dbnd(j,i) .gt. eps) then
+                  write (iout,40)  i,j,dbnd(j,i),lij
    40             format (' TRIANGLE  --  Altered Lower Bound at',
      &                       2x,2i6,3x,f9.4,' -->',f9.4)
                end if
-               if (bnd(i,j)-uij .gt. eps) then
-                  write (iout,50)  i,j,bnd(i,j),uij
+               if (dbnd(i,j)-uij .gt. eps) then
+                  write (iout,50)  i,j,dbnd(i,j),uij
    50             format (' TRIANGLE  --  Altered Upper Bound at',
      &                       2x,2i6,3x,f9.4,' -->',f9.4)
                end if
-               bnd(j,i) = lij
-               bnd(i,j) = uij
+               dbnd(j,i) = lij
+               dbnd(i,j) = uij
             end do
          end do
       end do
@@ -485,11 +485,11 @@ c     John Wiley and Sons, U.S. distributor, see section 6-2
 c
 c
       subroutine geodesic
+      use sizes
+      use atoms
+      use disgeo
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'kgeoms.i'
       integer i,j,k,nlist
       integer, allocatable :: list(:)
       integer, allocatable :: key(:)
@@ -550,8 +550,8 @@ c
       do i = 1, n
          call minpath (i,upper,lower,start,stop,list)
          do j = i+1, n
-            bnd(i,j) = upper(j)
-            bnd(j,i) = max(lower(j),bnd(j,i))
+            dbnd(i,j) = upper(j)
+            dbnd(j,i) = max(lower(j),dbnd(j,i))
          end do
       end do
 c
@@ -585,11 +585,11 @@ c     for Shortest Paths", Networks, 23, 703-709 (1993)
 c
 c
       subroutine minpath (root,upper,lower,start,stop,list)
+      use sizes
+      use atoms
+      use couple
+      use disgeo
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'disgeo.i'
       integer i,j,k
       integer narc,root
       integer head,tail
@@ -671,11 +671,11 @@ c
          do i = 1, narc
             k = iarc(i)
             if (k .lt. j) then
-               big = upper(j) + bnd(k,j)
-               small = max(bnd(j,k)-upper(j),lower(j)-bnd(k,j))
+               big = upper(j) + dbnd(k,j)
+               small = max(dbnd(j,k)-upper(j),lower(j)-dbnd(k,j))
             else
-               big = upper(j) + bnd(j,k)
-               small = max(bnd(k,j)-upper(j),lower(j)-bnd(j,k))
+               big = upper(j) + dbnd(j,k)
+               small = max(dbnd(k,j)-upper(j),lower(j)-dbnd(j,k))
             end if
             enter = .false.
             if (upper(k) .gt. big) then
@@ -735,12 +735,12 @@ c     Infor, 16, 132-146 (1978)
 c
 c
       subroutine trifix (p,q)
+      use sizes
+      use atoms
+      use disgeo
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,k,p,q
       integer ip,iq,np,nq
       integer, allocatable :: pt(:)
@@ -779,20 +779,20 @@ c
 c     store the upper and lower bounds to "p" and "q"
 c
       do i = 1, p
-         pmin(i) = bnd(p,i)
-         pmax(i) = bnd(i,p)
+         pmin(i) = dbnd(p,i)
+         pmax(i) = dbnd(i,p)
       end do
       do i = p+1, n
-         pmin(i) = bnd(i,p)
-         pmax(i) = bnd(p,i)
+         pmin(i) = dbnd(i,p)
+         pmax(i) = dbnd(p,i)
       end do
       do i = 1, q
-         qmin(i) = bnd(q,i)
-         qmax(i) = bnd(i,q)
+         qmin(i) = dbnd(q,i)
+         qmax(i) = dbnd(i,q)
       end do
       do i = q+1, n
-         qmin(i) = bnd(i,q)
-         qmax(i) = bnd(q,i)
+         qmin(i) = dbnd(i,q)
+         qmax(i) = dbnd(q,i)
       end do
 c
 c     check for changes in the upper bounds to "p" and "q"
@@ -823,9 +823,9 @@ c
          do iq = 1, nq
             k = qt(iq)
             if (i .lt. k) then
-               bnd(i,k) = min(bnd(i,k),ipmax+pmax(k))
+               dbnd(i,k) = min(dbnd(i,k),ipmax+pmax(k))
             else
-               bnd(k,i) = min(bnd(k,i),ipmax+pmax(k))
+               dbnd(k,i) = min(dbnd(k,i),ipmax+pmax(k))
             end if
          end do
       end do
@@ -861,9 +861,9 @@ c
          do iq = 1, nq
             k = qt(iq)
             if (i .lt. k) then
-               bnd(k,i) = max(bnd(k,i),ipmin-pmax(k),pmin(k)-ipmax)
+               dbnd(k,i) = max(dbnd(k,i),ipmin-pmax(k),pmin(k)-ipmax)
             else
-               bnd(i,k) = max(bnd(i,k),ipmin-pmax(k),pmin(k)-ipmax)
+               dbnd(i,k) = max(dbnd(i,k),ipmin-pmax(k),pmin(k)-ipmax)
             end if
          end do
       end do
@@ -871,20 +871,20 @@ c
 c     update the upper and lower bounds to "p" and "q"
 c
       do i = 1, p
-         bnd(p,i) = pmin(i)
-         bnd(i,p) = pmax(i)
+         dbnd(p,i) = pmin(i)
+         dbnd(i,p) = pmax(i)
       end do
       do i = p+1, n
-         bnd(i,p) = pmin(i)
-         bnd(p,i) = pmax(i)
+         dbnd(i,p) = pmin(i)
+         dbnd(p,i) = pmax(i)
       end do
       do i = 1, q
-         bnd(q,i) = qmin(i)
-         bnd(i,q) = qmax(i)
+         dbnd(q,i) = qmin(i)
+         dbnd(i,q) = qmax(i)
       end do
       do i = q+1, n
-         bnd(i,q) = qmin(i)
-         bnd(q,i) = qmax(i)
+         dbnd(i,q) = qmin(i)
+         dbnd(q,i) = qmax(i)
       end do
 c
 c     output the atoms updated and amount of work required
@@ -921,8 +921,8 @@ c     of a square matrix in a schematic form for visual inspection
 c
 c
       subroutine grafic (n,a,title)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer i,j,k,m,n
       integer maxj,nrow,ndash
       integer minrow,maxrow
@@ -1062,13 +1062,13 @@ c     correlated fashion, or using random partial metrization
 c
 c
       subroutine dstmat (dmx)
+      use sizes
+      use atoms
+      use disgeo
+      use inform
+      use iounit
+      use keys
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
       integer i,j,k,m,index,next
       integer npart,nmetrize,npair
       integer mik,mjk,nik,njk
@@ -1240,8 +1240,8 @@ c
                if (method .eq. 'RANDOM') then
                   fraction = invbeta (alpha,beta,fraction)
                end if
-               delta = bnd(i,j) - bnd(j,i)
-               dmx(j,i) = bnd(j,i) + delta*fraction
+               delta = dbnd(i,j) - dbnd(j,i)
+               dmx(j,i) = dbnd(j,i) + delta*fraction
                dmx(i,j) = dmx(j,i)
             end do
          end do
@@ -1271,22 +1271,26 @@ c
                      if (k .eq. j) then
                         dmx(i,j) = dmx(i,j) + dmx(j,i)
                         denom = denom + 1.0d0
-                     else if (bnd(njk,mjk) .le. 0.2d0*bnd(nik,mik)) then
+                     else if (dbnd(njk,mjk) .le.
+     &                        0.2d0*dbnd(nik,mik)) then
                         if (i .gt. k)  corr = 0.9d0 * dmx(i,k)
                         if (k .gt. i)  corr = 0.9d0 * dmx(k,i)
                         dmx(i,j) = dmx(i,j) + corr
                         denom = denom + 0.9d0
-                     else if (bnd(nik,mik) .le. 0.2d0*bnd(njk,mjk)) then
+                     else if (dbnd(nik,mik) .le.
+     &                        0.2d0*dbnd(njk,mjk)) then
                         if (j .gt. k)  corr = 0.9d0 * dmx(j,k)
                         if (k .gt. j)  corr = 0.9d0 * dmx(k,j)
                         dmx(i,j) = dmx(i,j) + corr
                         denom = denom + 0.9d0
-                     else if (bnd(mik,nik) .ge. 0.9d0*bnd(njk,mjk)) then
+                     else if (dbnd(mik,nik) .ge.
+     &                        0.9d0*dbnd(njk,mjk)) then
                         if (j .gt. k)  corr = 0.5d0 * (1.0d0-dmx(j,k))
                         if (k .gt. j)  corr = 0.5d0 * (1.0d0-dmx(k,j))
                         dmx(i,j) = dmx(i,j) + corr
                         denom = denom + 0.5d0
-                     else if (bnd(mjk,njk) .ge. 0.9d0*bnd(nik,mik)) then
+                     else if (dbnd(mjk,njk) .ge.
+     &                        0.9d0*dbnd(nik,mik)) then
                         if (i .gt. k)  corr = 0.5d0 * (1.0d0-dmx(i,k))
                         if (k .gt. i)  corr = 0.5d0 * (1.0d0-dmx(k,i))
                         dmx(i,j) = dmx(i,j) + corr
@@ -1299,8 +1303,8 @@ c
          end do
          do i = 1, n-1
             do j = i+1, n
-               delta = bnd(i,j) - bnd(j,i)
-               dmx(i,j) = bnd(j,i) + delta*dmx(i,j)
+               delta = dbnd(i,j) - dbnd(j,i)
+               dmx(i,j) = dbnd(j,i) + delta*dmx(i,j)
                dmx(j,i) = dmx(i,j)
             end do
          end do
@@ -1310,7 +1314,7 @@ c
       else if (method.eq.'HAVEL' .or. method.eq.'PARTIAL') then
          do i = 1, n
             do j = 1, n
-               dmx(j,i) = bnd(j,i)
+               dmx(j,i) = dbnd(j,i)
             end do
          end do
          do i = 1, n
@@ -1326,13 +1330,13 @@ c
                if (method .eq. 'PARTIAL') then
                   fraction = invbeta (alpha,beta,fraction)
                end if
-               delta = abs(bnd(k,m) - bnd(m,k))
+               delta = abs(dbnd(k,m) - dbnd(m,k))
                if (k .lt. m) then
-                  bnd(k,m) = bnd(m,k) + delta*fraction
-                  bnd(m,k) = bnd(k,m)
+                  dbnd(k,m) = dbnd(m,k) + delta*fraction
+                  dbnd(m,k) = dbnd(k,m)
                else
-                  bnd(k,m) = bnd(k,m) + delta*fraction
-                  bnd(m,k) = bnd(k,m)
+                  dbnd(k,m) = dbnd(k,m) + delta*fraction
+                  dbnd(m,k) = dbnd(k,m)
                end if
                if (i .le. npart)  call trifix (k,m)
                if (i .gt. npart)  gap = gap + delta
@@ -1341,8 +1345,8 @@ c
          do i = 1, n
             do j = 1, n
                swap = dmx(j,i)
-               dmx(j,i) = bnd(j,i)
-               bnd(j,i) = swap
+               dmx(j,i) = dbnd(j,i)
+               dbnd(j,i) = swap
             end do
          end do
          if (verbose .and. npart.lt.n-1) then
@@ -1358,14 +1362,14 @@ c
          nmetrize = nint(0.01d0*percent*dble(npair))
          do i = 1, n
             do j = 1, n
-               dmx(j,i) = bnd(j,i)
+               dmx(j,i) = dbnd(j,i)
             end do
          end do
          do i = 1, nmetrize
   140       continue
             k = int(dble(n)*random()) + 1
             m = int(dble(n)*random()) + 1
-            if (bnd(k,m) .eq. bnd(m,k))  goto 140
+            if (dbnd(k,m) .eq. dbnd(m,k))  goto 140
             if (k .gt. m) then
                swap = k
                k = m
@@ -1373,29 +1377,29 @@ c
             end if
             fraction = random ()
             fraction = invbeta (alpha,beta,fraction)
-            delta = bnd(k,m) - bnd(m,k)
-            bnd(k,m) = bnd(m,k) + delta*fraction
-            bnd(m,k) = bnd(k,m)
+            delta = dbnd(k,m) - dbnd(m,k)
+            dbnd(k,m) = dbnd(m,k) + delta*fraction
+            dbnd(m,k) = dbnd(k,m)
             call trifix (k,m)
          end do
          gap = 0.0d0
          do i = 1, n-1
             do j = i, n
-               delta = bnd(i,j) - bnd(j,i)
+               delta = dbnd(i,j) - dbnd(j,i)
                if (delta .ne. 0.0d0) then
                   gap = gap + delta
                   fraction = random ()
                   fraction = invbeta (alpha,beta,fraction)
-                  bnd(i,j) = bnd(j,i) + delta*fraction
-                  bnd(j,i) = bnd(i,j)
+                  dbnd(i,j) = dbnd(j,i) + delta*fraction
+                  dbnd(j,i) = dbnd(i,j)
                end if
             end do
          end do
          do i = 1, n
             do j = 1, n
                swap = dmx(j,i)
-               dmx(j,i) = bnd(j,i)
-               bnd(j,i) = swap
+               dmx(j,i) = dbnd(j,i)
+               dbnd(j,i) = swap
             end do
          end do
          if (verbose .and. nmetrize.lt.npair) then
@@ -1411,7 +1415,7 @@ c
          nmetrize = nint(0.01d0*percent*dble(npair))
          do i = 1, n
             do j = 1, n
-               dmx(j,i) = bnd(j,i)
+               dmx(j,i) = dbnd(j,i)
             end do
          end do
          do i = 1, npair
@@ -1427,17 +1431,17 @@ c
             m = n*(1-k) + k*(k+1)/2 + index
             fraction = random ()
             fraction = invbeta (alpha,beta,fraction)
-            delta = bnd(k,m) - bnd(m,k)
-            bnd(k,m) = bnd(m,k) + delta*fraction
-            bnd(m,k) = bnd(k,m)
+            delta = dbnd(k,m) - dbnd(m,k)
+            dbnd(k,m) = dbnd(m,k) + delta*fraction
+            dbnd(m,k) = dbnd(k,m)
             if (i .le. nmetrize)  call trifix (k,m)
             if (i .gt. nmetrize)  gap = gap + delta
          end do
          do i = 1, n
             do j = 1, n
                swap = dmx(j,i)
-               dmx(j,i) = bnd(j,i)
-               bnd(j,i) = swap
+               dmx(j,i) = dbnd(j,i)
+               dbnd(j,i) = swap
             end do
          end do
          if (verbose .and. nmetrize.lt.npair) then
@@ -1490,12 +1494,12 @@ c     from Distance Information", Acta Cryst., A34, 282-284 (1978)
 c
 c
       subroutine metric (gmx,nneg)
+      use sizes
+      use atoms
+      use disgeo
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,nneg
       real*8 total,sum,rg
       real*8 gmx(n,*)
@@ -1580,11 +1584,11 @@ c     first three eigenvalues are positive
 c
 c
       subroutine eigen (evl,evc,gmx,valid)
+      use sizes
+      use atoms
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,neigen
       real*8 wall,cpu
       real*8 evl(*)
@@ -1651,12 +1655,12 @@ c     to compute the rms deviation from the bounds
 c
 c
       subroutine coords (evl,evc)
+      use sizes
+      use atoms
+      use disgeo
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,j,neigen
       real*8 rg
       real*8 evl(*)
@@ -1710,13 +1714,13 @@ c     or lower bounds matrix violations
 c
 c
       subroutine chksize
+      use sizes
+      use atoms
+      use couple
+      use disgeo
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'disgeo.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,k,npair,nskip
       integer nlarge,nsmall
       integer, allocatable :: skip(:)
@@ -1761,8 +1765,8 @@ c        end do
                nskip = nskip + 1
             else
                dstsq = (x(k)-xi)**2 + (y(k)-yi)**2 + (z(k)-zi)**2
-               bupsq = bnd(i,k)**2
-               blosq = bnd(k,i)**2
+               bupsq = dbnd(i,k)**2
+               blosq = dbnd(k,i)**2
                if (dstsq .gt. bupsq) then
                   nlarge = nlarge + 1
                else if (blosq .gt. dstsq) then
@@ -1808,11 +1812,11 @@ c     in Biophysics and Molecular Biology, 56, 43-78 (1991)
 c
 c
       subroutine majorize (dmx)
+      use sizes
+      use atoms
+      use inform
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
       integer i,k,iter
       integer niter,period
       real*8 pairs,rg
@@ -2008,14 +2012,14 @@ c     the bound, chirality, planarity and torsional error functions
 c
 c
       subroutine refine (mode,fctval,grdmin)
+      use sizes
+      use atoms
+      use disgeo
+      use inform
+      use iounit
+      use minima
+      use output
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'minima.i'
-      include 'output.i'
       integer i,nvar
       real*8 initerr,miderr,toterr
       real*8 fctval,grdmin
@@ -2096,13 +2100,13 @@ c     bound, chirality, planarity and torsional error functions
 c
 c
       subroutine explore (mode,nstep,dt,mass,temp_start,temp_stop,v,a)
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use math
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'units.i'
       integer i,istep,nstep
       integer nvar,period
       real*8 error,total
@@ -2314,11 +2318,11 @@ c     Biopolymers, 31, 1049-1064 (1991)
 c
 c
       subroutine fracdist (title)
+      use sizes
+      use atoms
+      use disgeo
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'iounit.i'
       integer start,stop
       parameter (start=-20)
       parameter (stop=120)
@@ -2349,9 +2353,9 @@ c
          zi = z(i)
          do j = i+1, n
             dist = sqrt((x(j)-xi)**2 + (y(j)-yi)**2 + (z(j)-zi)**2)
-            range = bnd(i,j) - bnd(j,i)
+            range = dbnd(i,j) - dbnd(j,i)
             if (range .ge. 1.0d0) then
-               fraction = (dist-bnd(j,i)) / range
+               fraction = (dist-dbnd(j,i)) / range
                k = nint(fraction / size)
                k = max(start,min(stop,k))
                bin(k) = bin(k) + 1
@@ -2403,12 +2407,12 @@ c     rms value of the distance restraint violations
 c
 c
       subroutine rmserror (title)
+      use sizes
+      use atoms
+      use disgeo
+      use iounit
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'iounit.i'
-      include 'kgeoms.i'
       integer i,j,k,npair
       integer nhierr,nloerr
       integer ihi,jhi,ilo,jlo
@@ -2434,7 +2438,7 @@ c
          do j = i+1, n
             dist = (x(i)-x(j))**2 + (y(i)-y(j))**2 + (z(i)-z(j))**2
             dist = sqrt(dist)
-            hierr = dist - bnd(i,j)
+            hierr = dist - dbnd(i,j)
             if (hierr .gt. 0.0d0) then
                nhierr = nhierr + 1
                rms = rms + hierr**2
@@ -2444,7 +2448,7 @@ c
                   jhi = j
                end if
             end if
-            loerr = bnd(j,i) - dist
+            loerr = dbnd(j,i) - dist
             if (loerr .gt. 0.0d0) then
                nloerr = nloerr + 1
                rms = rms + loerr**2
@@ -2538,11 +2542,11 @@ c     of the bounds errors into the lower half of the matrix
 c
 c
       subroutine dmdump (dmd)
+      use sizes
+      use atoms
+      use disgeo
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'disgeo.i'
-      include 'iounit.i'
       integer i,j
       real*8 sum,rgsq
       real*8 dist,dist2
@@ -2564,10 +2568,10 @@ c
             dmd(j,j) = dmd(j,j) + dist2
             dist = sqrt(dist2)
             dmd(i,j) = dist
-            if (dist .gt. bnd(i,j)) then
-               dmd(j,i) = dist - bnd(i,j)
-            else if (dist .lt. bnd(j,i)) then
-               dmd(j,i) = bnd(j,i) - dist
+            if (dist .gt. dbnd(i,j)) then
+               dmd(j,i) = dist - dbnd(i,j)
+            else if (dist .lt. dbnd(j,i)) then
+               dmd(j,i) = dbnd(j,i) - dist
             else
                dmd(j,i) = 0.0d0
             end if
@@ -2602,9 +2606,9 @@ c     the local geometry and torsional restraint errors
 c
 c
       function initerr (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,j,nvar
       real*8 initerr
       real*8 local,locerr
@@ -2678,9 +2682,9 @@ c     torsional restraint errors
 c
 c
       function miderr (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,j,nvar
       real*8 miderr
       real*8 bounds,bnderr
@@ -2758,9 +2762,9 @@ c     torsional restraint errors
 c
 c
       function toterr (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,j,nvar
       real*8 toterr
       real*8 bounds,bnderr
@@ -2841,10 +2845,10 @@ c     original penalty is needed if large lower bounds are present
 c
 c
       function bnderr (derivs)
+      use sizes
+      use atoms
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'kgeoms.i'
       integer i,j,k
       real*8 bnderr,error,cutsq
       real*8 scale,chain,term
@@ -2937,12 +2941,12 @@ c     pairwise neighbors are generated via the method of lights
 c
 c
       function vdwerr (derivs)
+      use sizes
+      use atoms
+      use couple
+      use disgeo
+      use light
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'disgeo.i'
-      include 'light.i'
       integer i,j,k,kgy,kgz
       integer, allocatable :: skip(:)
       real*8 vdwerr,error
@@ -3010,7 +3014,7 @@ c
             dz = zi - zsort(kgz)
             dstsq = dx*dx + dy*dy + dz*dz
             radsq = (radi + georad(k))**2
-            blosq = min(bnd(k,i),bnd(i,k),radsq)
+            blosq = min(dbnd(k,i),dbnd(i,k),radsq)
 c
 c     error and derivatives for lower bound violation
 c
@@ -3052,13 +3056,13 @@ c     including the 1-2, 1-3 and 1-4 distance bound restraints
 c
 c
       function locerr (derivs)
+      use sizes
+      use angbnd
+      use atoms
+      use bndstr
+      use disgeo
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'disgeo.i'
-      include 'tors.i'
       integer i,ia,ib,ic,id
       real*8 locerr,error
       real*8 scale,chain,term
@@ -3081,8 +3085,8 @@ c
          dy = y(ia) - y(ib)
          dz = z(ia) - z(ib)
          dstsq = dx*dx + dy*dy + dz*dz
-         bupsq = bnd(ia,ib)
-         blosq = bnd(ib,ia)
+         bupsq = dbnd(ia,ib)
+         blosq = dbnd(ib,ia)
          if (dstsq .gt. bupsq) then
             term = (dstsq-bupsq) / bupsq
             chain = 4.0d0 * scale * term / bupsq
@@ -3123,8 +3127,8 @@ c
          dy = y(ia) - y(ic)
          dz = z(ia) - z(ic)
          dstsq = dx*dx + dy*dy + dz*dz
-         bupsq = bnd(ia,ic)
-         blosq = bnd(ic,ia)
+         bupsq = dbnd(ia,ic)
+         blosq = dbnd(ic,ia)
          if (dstsq .gt. bupsq) then
             term = (dstsq-bupsq) / bupsq
             chain = 4.0d0 * scale * term / bupsq
@@ -3165,8 +3169,8 @@ c
          dy = y(ia) - y(id)
          dz = z(ia) - z(id)
          dstsq = dx*dx + dy*dy + dz*dz
-         bupsq = bnd(ia,id)
-         blosq = bnd(id,ia)
+         bupsq = dbnd(ia,id)
+         blosq = dbnd(id,ia)
          if (dstsq .gt. bupsq) then
             term = (dstsq-bupsq) / bupsq
             chain = 4.0d0 * scale * term / bupsq
@@ -3214,10 +3218,10 @@ c     squares of deviations of chiral volumes from target values
 c
 c
       function chirer (derivs)
+      use sizes
+      use atoms
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'kgeoms.i'
       integer i,ia,ib,ic,id
       real*8 chirer,error,scale
       real*8 vol,dt,dedt
@@ -3311,14 +3315,14 @@ c     to avoid a numerical instability
 c
 c
       function torser (derivs)
+      use sizes
+      use atoms
+      use couple
+      use disgeo
+      use math
+      use refer
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'disgeo.i'
-      include 'kgeoms.i'
-      include 'math.i'
-      include 'refer.i'
       integer i,j,k,iref
       integer ia,ib,ic,id
       real*8 torser,error,force
@@ -3427,16 +3431,16 @@ c
 c     get maximum and minimum distances from distance matrix
 c
          if (bonded) then
-            bamax = sqrt(bnd(min(ib,ia),max(ib,ia)))
-            bamin = sqrt(bnd(max(ib,ia),min(ib,ia)))
-            cbmax = sqrt(bnd(min(ic,ib),max(ic,ib)))
-            cbmin = sqrt(bnd(max(ic,ib),min(ic,ib)))
-            dcmax = sqrt(bnd(min(id,ic),max(id,ic)))
-            dcmin = sqrt(bnd(max(id,ic),min(id,ic)))
-            camax = sqrt(bnd(min(ic,ia),max(ic,ia)))
-            camin = sqrt(bnd(max(ic,ia),min(ic,ia)))
-            dbmax = sqrt(bnd(min(id,ib),max(id,ib)))
-            dbmin = sqrt(bnd(max(id,ib),min(id,ib)))
+            bamax = sqrt(dbnd(min(ib,ia),max(ib,ia)))
+            bamin = sqrt(dbnd(max(ib,ia),min(ib,ia)))
+            cbmax = sqrt(dbnd(min(ic,ib),max(ic,ib)))
+            cbmin = sqrt(dbnd(max(ic,ib),min(ic,ib)))
+            dcmax = sqrt(dbnd(min(id,ic),max(id,ic)))
+            dcmin = sqrt(dbnd(max(id,ic),min(id,ic)))
+            camax = sqrt(dbnd(min(ic,ia),max(ic,ia)))
+            camin = sqrt(dbnd(max(ic,ia),min(ic,ia)))
+            dbmax = sqrt(dbnd(min(id,ib),max(id,ib)))
+            dbmin = sqrt(dbnd(max(id,ib),min(id,ib)))
 c
 c     get maximum and minimum distances from input structure
 c

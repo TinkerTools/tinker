@@ -49,18 +49,18 @@ c     284, 835-848 (1998)  (ACE Method)
 c
 c
       subroutine born
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use chgpot
+      use couple
+      use inform
+      use iounit
+      use math
+      use pbstuf
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'pbstuf.i'
-      include 'solute.i'
       integer i,j,k,it,kt
       integer, allocatable :: skip(:)
       real*8 area,rold,t
@@ -423,16 +423,16 @@ c     and virial components for potentials involving Born radii
 c
 c
       subroutine born1
+      use sizes
+      use atomid
+      use atoms
+      use chgpot
+      use couple
+      use deriv
+      use math
+      use solute
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'math.i'
-      include 'solute.i'
-      include 'virial.i'
       integer i,j,k,it,kt
       integer, allocatable :: skip(:)
       real*8 xi,yi,zi

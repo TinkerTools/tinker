@@ -27,15 +27,15 @@ c     Temperature and Pressure", DCRT Report, NIH, April 1988
 c
 c
       subroutine beeman (istep,dt)
+      use sizes
+      use atomid
+      use atoms
+      use freeze
+      use mdstuf
+      use moldyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'freeze.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,istep
       real*8 dt,dt_x,factor
       real*8 etot,eksum,epot

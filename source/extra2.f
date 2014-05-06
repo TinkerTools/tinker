@@ -18,10 +18,10 @@ c     atom at a time
 c
 c
       subroutine extra2 (i)
+      use sizes
+      use atoms
+      use hessn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'hessn.i'
       integer i
 c
 c

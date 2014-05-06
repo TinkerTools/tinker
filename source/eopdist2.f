@@ -17,15 +17,15 @@ c     distance energy for a single atom via the central atom height
 c
 c
       subroutine eopdist2 (i)
+      use sizes
+      use angpot
+      use atoms
+      use bound
+      use group
+      use hessn
+      use opdist
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'opdist.i'
-      include 'usage.i'
       integer i,kopdist
       integer ia,ib,ic,id
       real*8 force,fgrp

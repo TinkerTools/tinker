@@ -17,15 +17,19 @@ c     the numbers of the four atoms defining each dihedral angle
 c
 c
       subroutine torsions
+      use sizes
+      use bndstr
+      use couple
+      use iounit
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'tors.i'
       integer i,j,k
       integer ia,ib,ic,id
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(itors))  allocate (itors(4,maxtors))
 c
 c     loop over all bonds, storing the atoms in each torsion
 c

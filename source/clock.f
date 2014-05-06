@@ -16,8 +16,8 @@ c     "settime" initializes the wall clock and elapsed CPU times
 c
 c
       subroutine settime
+      use chrono
       implicit none
-      include 'chrono.i'
       integer count,crate,cmax
       real time
 c
@@ -44,8 +44,8 @@ c     since the last call to "settime"
 c
 c
       subroutine gettime (wall,cpu)
+      use chrono
       implicit none
-      include 'chrono.i'
       integer count,crate,cmax
       real time
       real*8 wall,cpu

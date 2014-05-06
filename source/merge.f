@@ -18,13 +18,13 @@ c     atoms followed by the atoms of the current structure
 c
 c
       subroutine merge (iref)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use refer
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'refer.i'
       integer i,j,k
       integer iref
       integer ntotal

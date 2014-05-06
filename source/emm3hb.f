@@ -27,11 +27,11 @@ c     19, 1001-1016 (1998)
 c
 c
       subroutine emm3hb
+      use energi
+      use limits
+      use vdwpot
       implicit none
       real*8 elrc
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'vdwpot.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -67,22 +67,22 @@ c     a pairwise double loop
 c
 c
       subroutine emm3hb0a
+      use sizes
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use group
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -486,24 +486,24 @@ c     the method of lights
 c
 c
       subroutine emm3hb0b
+      use sizes
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use boxes
+      use cell
+      use chgpot
+      use couple
+      use energi
+      use group
+      use light
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'light.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -832,22 +832,22 @@ c     a pairwise neighbor list
 c
 c
       subroutine emm3hb0c
+      use sizes
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use bound
+      use chgpot
+      use couple
+      use energi
+      use group
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt

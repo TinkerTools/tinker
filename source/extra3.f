@@ -17,12 +17,12 @@ c     contribution and also partitions the energy among the atoms
 c
 c
       subroutine extra3
+      use sizes
+      use action
+      use analyz
+      use atoms
+      use energi
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'energi.i'
       integer i
 c
 c

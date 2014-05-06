@@ -17,18 +17,18 @@ c     first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eimprop1
+      use sizes
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use improp
+      use math
+      use torpot
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'improp.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,ia,ib,ic,id
       real*8 e,dedphi
       real*8 dt,fgrp

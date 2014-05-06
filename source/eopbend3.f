@@ -18,22 +18,22 @@ c     also partitions the energy among the atoms
 c
 c
       subroutine eopbend3
+      use sizes
+      use action
+      use analyz
+      use angbnd
+      use angpot
+      use atomid
+      use atoms
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use math
+      use opbend
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'opbend.i'
-      include 'usage.i'
       integer i,iopbend
       integer ia,ib,ic,id
       real*8 e,angle,force

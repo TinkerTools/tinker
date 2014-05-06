@@ -17,45 +17,44 @@ c     parameters to zero and using defaults for control values
 c
 c
       subroutine initprm
+      use sizes
+      use angpot
+      use bndpot
+      use chgpot
+      use fields
+      use kanang
+      use kangs
+      use kantor
+      use katoms
+      use kbonds
+      use kchrge
+      use kdipol
+      use khbond
+      use kiprop
+      use kitors
+      use kmulti
+      use kopbnd
+      use kopdst
+      use korbs
+      use kpitor
+      use kpolr
+      use kstbnd
+      use ksttor
+      use ktorsn
+      use ktrtor
+      use kurybr
+      use kvdws
+      use kvdwpr
+      use math
+      use mplpot
+      use polpot
+      use rxnpot
+      use solute
+      use urypot
+      use torpot
+      use units
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'bndpot.i'
-      include 'chgpot.i'
-      include 'fields.i'
-      include 'kanang.i'
-      include 'kangs.i'
-      include 'kantor.i'
-      include 'katoms.i'
-      include 'kbonds.i'
-      include 'kchrge.i'
-      include 'kdipol.i'
-      include 'khbond.i'
-      include 'kiprop.i'
-      include 'kitors.i'
-      include 'kmulti.i'
-      include 'kopbnd.i'
-      include 'kopdst.i'
-      include 'korbs.i'
-      include 'kpitor.i'
-      include 'kpolr.i'
-      include 'kstbnd.i'
-      include 'ksttor.i'
-      include 'ktorsn.i'
-      include 'ktrtor.i'
-      include 'kurybr.i'
-      include 'kvdws.i'
-      include 'kvdwpr.i'
-      include 'math.i'
-      include 'merck.i'
-      include 'mplpot.i'
-      include 'polpot.i'
-      include 'rxnpot.i'
-      include 'solute.i'
-      include 'urypot.i'
-      include 'torpot.i'
-      include 'units.i'
-      include 'vdwpot.i'
       integer i,j,k
       character*3 blank3
       character*8 blank8
@@ -213,104 +212,6 @@ c
          biotyp(i) = 0
       end do
 c
-c     initialize values of some MMFF-specific parameters
-c
-      do i = 1, 100
-         do j = 1, 100
-            mmff_kb(j,i) = 1000.0d0
-            mmff_kb1(j,i) = 1000.0d0
-            mmff_b0(j,i) = 1000.0d0
-            mmff_b1(j,i) = 1000.0d0
-            bci(j,i) = 1000.0d0
-            bci_1(j,i) = 1000.0d0
-            do k = 1, 100
-               stbn_abc(k,j,i) = 1000.0d0
-               stbn_cba(k,j,i) = 1000.0d0
-               stbn_abc1(k,j,i) = 1000.0d0
-               stbn_cba1(k,j,i) = 1000.0d0
-               stbn_abc2(k,j,i) = 1000.0d0
-               stbn_cba2(k,j,i) = 1000.0d0
-               stbn_abc3(k,j,i) = 1000.0d0
-               stbn_cba3(k,j,i) = 1000.0d0
-               stbn_abc4(k,j,i) = 1000.0d0
-               stbn_cba4(k,j,i) = 1000.0d0
-               stbn_abc5(k,j,i) = 1000.0d0
-               stbn_cba5(k,j,i) = 1000.0d0
-               stbn_abc6(k,j,i) = 1000.0d0
-               stbn_cba6(k,j,i) = 1000.0d0
-               stbn_abc7(k,j,i) = 1000.0d0
-               stbn_cba7(k,j,i) = 1000.0d0
-               stbn_abc8(k,j,i) = 1000.0d0
-               stbn_cba8(k,j,i) = 1000.0d0
-               stbn_abc9(k,j,i) = 1000.0d0
-               stbn_cba9(k,j,i) = 1000.0d0
-               stbn_abc10(k,j,i) = 1000.0d0
-               stbn_cba10(k,j,i) = 1000.0d0
-               stbn_abc11(k,j,i) = 1000.0d0
-               stbn_cba11(k,j,i) = 1000.0d0
-            end do
-         end do
-      end do
-      do i = 0, 100
-         do j = 1, 100
-            do k = 0, 100
-               mmff_ka(k,j,i) = 1000.0d0
-               mmff_ka1(k,j,i) = 1000.0d0
-               mmff_ka2(k,j,i) = 1000.0d0
-               mmff_ka3(k,j,i) = 1000.0d0
-               mmff_ka4(k,j,i) = 1000.0d0
-               mmff_ka5(k,j,i) = 1000.0d0
-               mmff_ka6(k,j,i) = 1000.0d0
-               mmff_ka7(k,j,i) = 1000.0d0
-               mmff_ka8(k,j,i) = 1000.0d0
-               mmff_ang0(k,j,i) = 1000.0d0
-               mmff_ang1(k,j,i) = 1000.0d0
-               mmff_ang2(k,j,i) = 1000.0d0
-               mmff_ang3(k,j,i) = 1000.0d0
-               mmff_ang4(k,j,i) = 1000.0d0
-               mmff_ang5(k,j,i) = 1000.0d0
-               mmff_ang6(k,j,i) = 1000.0d0
-               mmff_ang7(k,j,i) = 1000.0d0
-               mmff_ang8(k,j,i) = 1000.0d0
-            end do
-         end do
-      end do
-      do i = 1, maxnt
-         kt(i) = blank16
-         kt_1(i) = blank16
-         kt_2(i) = blank16
-         t1(1,i) = 1000.0d0
-         t1(2,i) = 1000.0d0
-         t2(1,i) = 1000.0d0
-         t2(2,i) = 1000.0d0
-         t3(1,i) = 1000.0d0
-         t3(2,i) = 1000.0d0
-         t1_1(1,i) = 1000.0d0
-         t1_1(2,i) = 1000.0d0
-         t2_1(1,i) = 1000.0d0
-         t2_1(2,i) = 1000.0d0
-         t3_1(1,i) = 1000.0d0
-         t3_1(2,i) = 1000.0d0
-         t1_2(1,i) = 1000.0d0
-         t1_2(2,i) = 1000.0d0
-         t2_2(1,i) = 1000.0d0
-         t2_2(2,i) = 1000.0d0
-         t3_2(1,i) = 1000.0d0
-         t3_2(2,i) = 1000.0d0
-      end do
-      do i = 1, 5
-         do j = 1, 500
-            eqclass(j,i) = 1000
-         end do
-      end do
-      do i = 1, 6
-         do j = 1, maxtyp
-            mmffarom(j,i) = 0
-            mmffaromc(j,i) = 0
-            mmffaroma(j,i) = 0
-         end do
-      end do
-c
 c     set default control parameters for local geometry terms
 c
       bndtyp = 'HARMONIC'
@@ -416,5 +317,247 @@ c
       rfsize = 1000000.0d0
       rfbulkd = 80.0d0
       rfterms = 1
+c
+c     initialize some Merck Molecular force field parameters
+c
+      call initmmff
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine initmmff  --  initialize some MMFF parameters  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "initmmff" initializes some parameter values for the Merck
+c     Molecular force field
+c
+c
+      subroutine initmmff
+      use sizes
+      use ktorsn
+      use merck
+      implicit none
+      integer i,j,k
+      character*16 blank16
+c
+c
+c     define blank character strings of various lengths
+c
+      blank16 = '                '
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(mmff_ka))
+     &   allocate (mmff_ka(0:100,100,0:100))
+      if (.not. allocated(mmff_ka1))
+     &   allocate (mmff_ka1(0:100,100,0:100))
+      if (.not. allocated(mmff_ka2))
+     &   allocate (mmff_ka2(0:100,100,0:100))
+      if (.not. allocated(mmff_ka3))
+     &   allocate (mmff_ka3(0:100,100,0:100))
+      if (.not. allocated(mmff_ka4))
+     &   allocate (mmff_ka4(0:100,100,0:100))
+      if (.not. allocated(mmff_ka5))
+     &   allocate (mmff_ka5(0:100,100,0:100))
+      if (.not. allocated(mmff_ka6))
+     &   allocate (mmff_ka6(0:100,100,0:100))
+      if (.not. allocated(mmff_ka7))
+     &   allocate (mmff_ka7(0:100,100,0:100))
+      if (.not. allocated(mmff_ka8))
+     &   allocate (mmff_ka8(0:100,100,0:100))
+      if (.not. allocated(mmff_ang0))
+     &   allocate (mmff_ang0(0:100,100,0:100))
+      if (.not. allocated(mmff_ang1))
+     &   allocate (mmff_ang1(0:100,100,0:100))
+      if (.not. allocated(mmff_ang2))
+     &   allocate (mmff_ang2(0:100,100,0:100))
+      if (.not. allocated(mmff_ang3))
+     &   allocate (mmff_ang3(0:100,100,0:100))
+      if (.not. allocated(mmff_ang4))
+     &   allocate (mmff_ang4(0:100,100,0:100))
+      if (.not. allocated(mmff_ang5))
+     &   allocate (mmff_ang5(0:100,100,0:100))
+      if (.not. allocated(mmff_ang6))
+     &   allocate (mmff_ang6(0:100,100,0:100))
+      if (.not. allocated(mmff_ang7))
+     &   allocate (mmff_ang7(0:100,100,0:100))
+      if (.not. allocated(mmff_ang8))
+     &   allocate (mmff_ang8(0:100,100,0:100))
+      if (.not. allocated(stbn_abc))
+     &   allocate (stbn_abc(100,100,100))
+      if (.not. allocated(stbn_cba))
+     &   allocate (stbn_cba(100,100,100))
+      if (.not. allocated(stbn_abc1))
+     &   allocate (stbn_abc1(100,100,100))
+      if (.not. allocated(stbn_cba1))
+     &   allocate (stbn_cba1(100,100,100))
+      if (.not. allocated(stbn_abc2))
+     &   allocate (stbn_abc2(100,100,100))
+      if (.not. allocated(stbn_cba2))
+     &   allocate (stbn_cba2(100,100,100))
+      if (.not. allocated(stbn_abc3))
+     &   allocate (stbn_abc3(100,100,100))
+      if (.not. allocated(stbn_cba3))
+     &   allocate (stbn_cba3(100,100,100))
+      if (.not. allocated(stbn_abc4))
+     &   allocate (stbn_abc4(100,100,100))
+      if (.not. allocated(stbn_cba4))
+     &   allocate (stbn_cba4(100,100,100))
+      if (.not. allocated(stbn_abc5))
+     &   allocate (stbn_abc5(100,100,100))
+      if (.not. allocated(stbn_cba5))
+     &   allocate (stbn_cba5(100,100,100))
+      if (.not. allocated(stbn_abc6))
+     &   allocate (stbn_abc6(100,100,100))
+      if (.not. allocated(stbn_cba6))
+     &   allocate (stbn_cba6(100,100,100))
+      if (.not. allocated(stbn_abc7))
+     &   allocate (stbn_abc7(100,100,100))
+      if (.not. allocated(stbn_cba7))
+     &   allocate (stbn_cba7(100,100,100))
+      if (.not. allocated(stbn_abc8))
+     &   allocate (stbn_abc8(100,100,100))
+      if (.not. allocated(stbn_cba8))
+     &   allocate (stbn_cba8(100,100,100))
+      if (.not. allocated(stbn_abc9))
+     &   allocate (stbn_abc9(100,100,100))
+      if (.not. allocated(stbn_cba9))
+     &   allocate (stbn_cba9(100,100,100))
+      if (.not. allocated(stbn_abc10))
+     &   allocate (stbn_abc10(100,100,100))
+      if (.not. allocated(stbn_cba10))
+     &   allocate (stbn_cba10(100,100,100))
+      if (.not. allocated(stbn_abc11))
+     &   allocate (stbn_abc11(100,100,100))
+      if (.not. allocated(stbn_cba11))
+     &   allocate (stbn_cba11(100,100,100))
+c
+c     initialize values for MMFF atom class equivalencies
+c
+      do i = 1, 5
+         do j = 1, 500
+            eqclass(j,i) = 1000
+         end do
+      end do
+c
+c     initialize values for MMFF aromatic ring parameters
+c
+      do i = 1, 6
+         do j = 1, maxtyp
+            mmffarom(j,i) = 0
+            mmffaromc(j,i) = 0
+            mmffaroma(j,i) = 0
+         end do
+      end do
+c
+c     initialize values for MMFF bond stretching parameters
+c
+      do i = 1, 100
+         do j = 1, 100
+            mmff_kb(j,i) = 1000.0d0
+            mmff_kb1(j,i) = 1000.0d0
+            mmff_b0(j,i) = 1000.0d0
+            mmff_b1(j,i) = 1000.0d0
+         end do
+      end do
+c
+c     initialize values for MMFF angle bending parameters
+c
+      do i = 0, 100
+         do j = 1, 100
+            do k = 0, 100
+               mmff_ka(k,j,i) = 1000.0d0
+               mmff_ka1(k,j,i) = 1000.0d0
+               mmff_ka2(k,j,i) = 1000.0d0
+               mmff_ka3(k,j,i) = 1000.0d0
+               mmff_ka4(k,j,i) = 1000.0d0
+               mmff_ka5(k,j,i) = 1000.0d0
+               mmff_ka6(k,j,i) = 1000.0d0
+               mmff_ka7(k,j,i) = 1000.0d0
+               mmff_ka8(k,j,i) = 1000.0d0
+               mmff_ang0(k,j,i) = 1000.0d0
+               mmff_ang1(k,j,i) = 1000.0d0
+               mmff_ang2(k,j,i) = 1000.0d0
+               mmff_ang3(k,j,i) = 1000.0d0
+               mmff_ang4(k,j,i) = 1000.0d0
+               mmff_ang5(k,j,i) = 1000.0d0
+               mmff_ang6(k,j,i) = 1000.0d0
+               mmff_ang7(k,j,i) = 1000.0d0
+               mmff_ang8(k,j,i) = 1000.0d0
+            end do
+         end do
+      end do
+c
+c     initialize values for MMFF stretch-bend parameters
+c
+      do i = 1, 100
+         do j = 1, 100
+            do k = 1, 100
+               stbn_abc(k,j,i) = 1000.0d0
+               stbn_cba(k,j,i) = 1000.0d0
+               stbn_abc1(k,j,i) = 1000.0d0
+               stbn_cba1(k,j,i) = 1000.0d0
+               stbn_abc2(k,j,i) = 1000.0d0
+               stbn_cba2(k,j,i) = 1000.0d0
+               stbn_abc3(k,j,i) = 1000.0d0
+               stbn_cba3(k,j,i) = 1000.0d0
+               stbn_abc4(k,j,i) = 1000.0d0
+               stbn_cba4(k,j,i) = 1000.0d0
+               stbn_abc5(k,j,i) = 1000.0d0
+               stbn_cba5(k,j,i) = 1000.0d0
+               stbn_abc6(k,j,i) = 1000.0d0
+               stbn_cba6(k,j,i) = 1000.0d0
+               stbn_abc7(k,j,i) = 1000.0d0
+               stbn_cba7(k,j,i) = 1000.0d0
+               stbn_abc8(k,j,i) = 1000.0d0
+               stbn_cba8(k,j,i) = 1000.0d0
+               stbn_abc9(k,j,i) = 1000.0d0
+               stbn_cba9(k,j,i) = 1000.0d0
+               stbn_abc10(k,j,i) = 1000.0d0
+               stbn_cba10(k,j,i) = 1000.0d0
+               stbn_abc11(k,j,i) = 1000.0d0
+               stbn_cba11(k,j,i) = 1000.0d0
+            end do
+         end do
+      end do
+c
+c     initialize values for MMFF torsional parameters
+c
+      do i = 1, maxnt
+         kt(i) = blank16
+         kt_1(i) = blank16
+         kt_2(i) = blank16
+         t1(1,i) = 1000.0d0
+         t1(2,i) = 1000.0d0
+         t2(1,i) = 1000.0d0
+         t2(2,i) = 1000.0d0
+         t3(1,i) = 1000.0d0
+         t3(2,i) = 1000.0d0
+         t1_1(1,i) = 1000.0d0
+         t1_1(2,i) = 1000.0d0
+         t2_1(1,i) = 1000.0d0
+         t2_1(2,i) = 1000.0d0
+         t3_1(1,i) = 1000.0d0
+         t3_1(2,i) = 1000.0d0
+         t1_2(1,i) = 1000.0d0
+         t1_2(2,i) = 1000.0d0
+         t2_2(1,i) = 1000.0d0
+         t2_2(2,i) = 1000.0d0
+         t3_2(1,i) = 1000.0d0
+         t3_2(2,i) = 1000.0d0
+      end do
+c
+c     initialize values for MMFF bond charge increment parameters
+c
+      do i = 1, 100
+         do j = 1, 100
+            bci(j,i) = 1000.0d0
+            bci_1(j,i) = 1000.0d0
+         end do
+      end do
       return
       end

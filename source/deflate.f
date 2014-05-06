@@ -25,8 +25,8 @@ c     work   local vector containing temporary work space
 c
 c
       subroutine deflate (n,nv,a,ev,vec)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer i,j,k,n,nv
       integer iter,maxiter
       real*8 random,eps

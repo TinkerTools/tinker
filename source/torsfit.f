@@ -17,12 +17,12 @@ c     a quantum mechanical potential surface and analytical gradient
 c
 c
       program torsfit
+      use sizes
+      use files
+      use inform
+      use iounit
+      use keys
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
       integer i,length
       integer torbnd(10)
       logical exist,query
@@ -38,7 +38,7 @@ c
       xyzfile = filename
       length = leng
 c
-c     get structure and vibrational data from Gaussian output
+c     find keyword options and setup force field parameters
 c
       call getkey
       call mechanic
@@ -105,23 +105,23 @@ c     mechanical optimized energy surface
 c
 c
       subroutine fittors (torbnd)
+      use sizes
+      use atoms
+      use atomid
+      use files
+      use inform
+      use iounit
+      use keys
+      use ktorsn
+      use math
+      use output
+      use potent
+      use qmstuf
+      use restrn
+      use scales
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'ktorsn.i'
-      include 'kgeoms.i'
-      include 'math.i'
-      include 'output.i'
-      include 'potent.i'
-      include 'qmstuf.i'
-      include 'scales.i'
-      include 'tors.i'
-      include 'usage.i'
       integer maxfit,maxconf
       parameter (maxfit=12)
       parameter (maxconf=500)
@@ -1023,8 +1023,8 @@ c     the method of Gaussian elimination with partial pivoting
 c
 c
       subroutine gaussjordan (n,a)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer maxfit
       parameter (maxfit=12)
       integer i,j,k,l,n
@@ -1032,7 +1032,7 @@ c
       real*8 a(6*maxfit,*)
 c
 c
-c     perform the Gaussian elimination procedure
+c     perform the Gauss-Jordan elimination procedure
 c
       do k = 1, n-1
          av = 0.0d0
@@ -1088,11 +1088,11 @@ c     coordinate space
 c
 c
       function torfit1 (xx,g)
+      use sizes
+      use atoms
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,nvar
       real*8 torfit1,e
       real*8 energy,eps

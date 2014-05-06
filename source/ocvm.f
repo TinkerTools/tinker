@@ -44,17 +44,17 @@ c     optsave    subroutine to write out info about current status
 c
 c
       subroutine ocvm (nvar,x0,f0,grdmin,fgvalue,optsave)
+      use sizes
+      use inform
+      use iounit
+      use keys
+      use linmin
+      use math
+      use minima
+      use output
+      use potent
+      use scales
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'linmin.i'
-      include 'math.i'
-      include 'minima.i'
-      include 'output.i'
-      include 'potent.i'
-      include 'scales.i'
       integer i,j,nvar
       integer mvar,next
       integer niter,ncalls

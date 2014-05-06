@@ -18,14 +18,29 @@ c     atoms (ie, 1-2 connectivity)
 c
 c
       subroutine attach
+      use sizes
+      use atoms
+      use couple
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
       integer i,j,k,m
       integer jj,kk
+      integer maxn13
+      integer maxn14
+      integer maxn15
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      maxn13 = 3 * maxval
+      maxn14 = 9 * maxval
+      maxn15 = 27 * maxval
+      if (.not. allocated(n13))  allocate (n13(maxatm))
+      if (.not. allocated(n14))  allocate (n14(maxatm))
+      if (.not. allocated(n15))  allocate (n15(maxatm))
+      if (.not. allocated(i13))  allocate (i13(maxn13,maxatm))
+      if (.not. allocated(i14))  allocate (i14(maxn14,maxatm))
+      if (.not. allocated(i15))  allocate (i15(maxn15,maxatm))
 c
 c     loop over all atoms finding all the 1-3 relationships;
 c     note "n12" and "i12" have already been setup elsewhere

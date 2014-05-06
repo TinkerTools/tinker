@@ -35,16 +35,16 @@ c     and Computation, 2, 166-174 (2006)
 c
 c
       program vibbig
+      use sizes
+      use atomid
+      use atoms
+      use files
+      use inform
+      use iounit
+      use keys
+      use units
+      use vibs
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'units.i'
-      include 'vibs.i'
       integer i,j,k,ii,next
       integer i1,i2,k0,k1,k2
       integer ivib,ivb1,ivb2
@@ -55,7 +55,9 @@ c
       integer np,npair
       integer nlock,nconv
       integer irange,ifactor
-      integer maxiter,freeunit
+      integer maxroot,maxiter
+      integer maxhess
+      integer freeunit
       integer, allocatable :: iblk(:)
       real*8 fmax,funit
       real*8 wtol,factor
@@ -98,10 +100,11 @@ c
 c     set default parameters for the normal mode computation
 c
       nvar = 3 * n
-      nroot = maxroot
+      maxroot = 50
       np = 6
       iter = 0
       idump = 10
+      maxhess = nvar * (nvar-1) / 2
       maxiter = 100000
       wtol = 0.00001d0
       header = .true.
@@ -208,7 +211,7 @@ c
       allocate (u(nvar,6))
       allocate (ur(nvar,3))
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
       allocate (phi(nvar,nbasis))
       allocate (phik(nvar,nbasis))
@@ -1081,8 +1084,8 @@ c     use during sliding block iterative matrix diagonalization
 c
 c
       subroutine trigger (nvar,nbasis,np,ifactor,nblk,iblk,u,uu,p)
+      use sizes
       implicit none
-      include 'sizes.i'
       integer i,j,k,m
       integer k0,k1,k2
       integer nvar,nbasis
@@ -1180,10 +1183,10 @@ c     during vibrational analysis via block iterative diagonalization
 c
 c
       subroutine trbasis (nvar,np,xe,u,ur)
+      use sizes
+      use atomid
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
       integer i,j,k
       integer nvar,np
       real*8 tmass,sum
@@ -1325,8 +1328,8 @@ c     of the Hessian matrix
 c
 c
       subroutine preconblk (nvar,nblk,iblk,uku,uu,h,hmin,pk)
+      use sizes
       implicit none
-      include 'sizes.i'
       integer i,j,k,l
       integer nvar,nblk
       integer k0,k1,k2,l2
@@ -1426,9 +1429,9 @@ c     vectors for sliding block interative matrix diagonalization
 c
 c
       subroutine gsort (nvar,nb,p0)
+      use sizes
+      use vibs
       implicit none
-      include 'sizes.i'
-      include 'vibs.i'
       integer i,j
       integer nvar,nb
       real*8 sum
@@ -1503,8 +1506,8 @@ c     block iterative matrix diagonalization
 c
 c
       subroutine qonvec (nvar,np,u,pk,p)
+      use sizes
       implicit none
-      include 'sizes.i'
       integer i,j,nvar,np
       real*8 pku(6)
       real*8 pk(*)
@@ -1552,9 +1555,9 @@ c     using the relation Y = X - U * U^T * X
 c
 c
       subroutine project (nvar,nconv,ivb1,ns,m)
+      use sizes
+      use vibs
       implicit none
-      include 'sizes.i'
-      include 'vibs.i'
       integer i,j,k
       integer nvar,nconv
       integer ivb1,ns,m
@@ -1622,9 +1625,9 @@ c     using the relation Y = X - U * U^T * X
 c
 c
       subroutine projectk (nvar,nconv,ivb1,ns,m)
+      use sizes
+      use vibs
       implicit none
-      include 'sizes.i'
-      include 'vibs.i'
       integer i,j,k
       integer nvar,nconv
       integer ivb1,ns,m
@@ -1691,11 +1694,11 @@ c     evaluation of the gradient based on atomic displacements
 c
 c
       subroutine konvec (nvar,xm,qe,uvec,kuvec)
+      use sizes
+      use atomid
+      use atoms
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'units.i'
       integer i,j,k,nvar
       real*8 e,term
       real*8 sum,eps
@@ -1839,8 +1842,8 @@ c     block of atoms within a larger system
 c
 c
       subroutine diagblk (k0,k1,n,vector,wres)
+      use sizes
       implicit none
-      include 'sizes.i'
       integer i,j,k,m
       integer n,k0,k1
       real*8 wres(*)
@@ -1906,10 +1909,10 @@ c     normal mode
 c
 c
       subroutine prtvib (ivib,p)
+      use sizes
+      use atoms
+      use files
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
       integer i,j,k
       integer ivib,ixyz
       integer lext,nview
@@ -1990,23 +1993,23 @@ c     for each atom in turn with respect to Cartesian coordinates
 c
 c
       subroutine hessblk (amass,k0,i1,i2,vector)
+      use sizes
+      use atoms
+      use bound
+      use couple
+      use hescut
+      use hessn
+      use inform
+      use iounit
+      use limits
+      use mpole
+      use potent
+      use rigid
+      use usage
+      use vdw
+      use vdwpot
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'hescut.i'
-      include 'hessn.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'units.i'
       integer i,j,k
       integer ii,k0
       integer i1,i2
@@ -2017,6 +2020,9 @@ c
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
+      logical first
+      save first
+      data first  / .true. /
 c
 c
 c     maintain any periodic boundary conditions
@@ -2059,6 +2065,15 @@ c
             yred(i) = rdn*(y(i)-y(ii)) + y(ii)
             zred(i) = rdn*(z(i)-z(ii)) + z(ii)
          end do
+      end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(hessx))  allocate (hessx(3,maxatm))
+         if (.not. allocated(hessy))  allocate (hessy(3,maxatm))
+         if (.not. allocated(hessz))  allocate (hessz(3,maxatm))
       end if
 c
 c     zero out the Hessian elements for the current atom

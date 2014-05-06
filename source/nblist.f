@@ -17,9 +17,9 @@ c     for vdw and electrostatic interactions
 c
 c
       subroutine nblist
+      use limits
+      use potent
       implicit none
-      include 'cutoff.i'
-      include 'potent.i'
 c
 c
 c     update the vdw and electrostatic neighbor lists
@@ -45,15 +45,15 @@ c     van der Waals neighbor list
 c
 c
       subroutine vlist
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use iounit
+      use neigh
+      use openmp
+      use vdw
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'neigh.i'
-      include 'openmp.i'
-      include 'vdw.i'
       integer i,j,k
       integer ii,iv
       real*8 xi,yi,zi
@@ -230,12 +230,12 @@ c     pair neighbor for each site
 c
 c
       subroutine vbuild (xred,yred,zred)
+      use sizes
+      use bound
+      use iounit
+      use neigh
+      use vdw
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'iounit.i'
-      include 'neigh.i'
-      include 'vdw.i'
       integer i,j,k
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
@@ -299,15 +299,15 @@ c     pair neighbor list for all sites using the method of lights
 c
 c
       subroutine vlight (xred,yred,zred)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use iounit
+      use light
+      use neigh
+      use vdw
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'neigh.i'
-      include 'vdw.i'
       integer i,j,k
       integer kgy,kgz
       integer start,stop
@@ -433,15 +433,15 @@ c     electrostatic neighbor lists for partial charges
 c
 c
       subroutine clist
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use charge
+      use iounit
+      use neigh
+      use openmp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'charge.i'
-      include 'iounit.i'
-      include 'neigh.i'
-      include 'openmp.i'
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
@@ -600,13 +600,13 @@ c     electrostatic neighbor list for all sites
 c
 c
       subroutine cbuild
+      use sizes
+      use atoms
+      use bound
+      use charge
+      use iounit
+      use neigh
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'charge.i'
-      include 'iounit.i'
-      include 'neigh.i'
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
@@ -670,15 +670,15 @@ c     pair neighbor list for all sites using the method of lights
 c
 c
       subroutine clight
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use charge
+      use iounit
+      use light
+      use neigh
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'neigh.i'
       integer i,j,k
       integer ii,kk
       integer kgy,kgz
@@ -805,15 +805,15 @@ c     electrostatic neighbor lists for atomic multipoles
 c
 c
       subroutine mlist
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use iounit
+      use mpole
+      use neigh
+      use openmp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'openmp.i'
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
@@ -972,13 +972,13 @@ c     electrostatic neighbor list for all sites
 c
 c
       subroutine mbuild
+      use sizes
+      use atoms
+      use bound
+      use iounit
+      use mpole
+      use neigh
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'neigh.i'
       integer i,j,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
@@ -1041,15 +1041,15 @@ c     pair neighbor list for all sites using the method of lights
 c
 c
       subroutine mlight
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use iounit
+      use light
+      use mpole
+      use neigh
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'mpole.i'
-      include 'neigh.i'
       integer i,j,k
       integer ii,kk
       integer kgy,kgz
@@ -1176,15 +1176,15 @@ c     neighbor lists for the polarization preconditioner
 c
 c
       subroutine ulist
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use iounit
+      use mpole
+      use neigh
+      use openmp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'openmp.i'
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
@@ -1343,13 +1343,13 @@ c     preconditioner neighbor list for all sites
 c
 c
       subroutine ubuild
+      use sizes
+      use atoms
+      use bound
+      use iounit
+      use mpole
+      use neigh
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'neigh.i'
       integer i,j,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
@@ -1413,15 +1413,15 @@ c     method of lights
 c
 c
       subroutine ulight
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use iounit
+      use light
+      use mpole
+      use neigh
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'mpole.i'
-      include 'neigh.i'
       integer i,j,k
       integer ii,kk
       integer kgy,kgz
@@ -1550,8 +1550,8 @@ c     which only returns the correct component magnitudes
 c
 c
       subroutine imagen (xr,yr,zr)
+      use boxes
       implicit none
-      include 'boxes.i'
       real*8 xr,yr,zr
 c
 c

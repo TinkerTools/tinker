@@ -17,8 +17,8 @@ c     and appends an extension and version if none is found
 c
 c
       subroutine suffix (filename,extension,status)
+      use ascii
       implicit none
-      include 'ascii.i'
       integer i,leng,lext
       integer last,trimtext
       logical exist

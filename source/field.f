@@ -17,10 +17,10 @@ c     a parameter file and modifications specified in a keyfile
 c
 c
       subroutine field
+      use sizes
+      use keys
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'keys.i'
-      include 'potent.i'
       integer i
       character*120 record
 c

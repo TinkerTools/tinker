@@ -18,14 +18,14 @@ c     and Poisson-Boltzmann, cavity-dispersion and HPMF models
 c
 c
       subroutine ksolv
+      use sizes
+      use gkstuf
+      use inform
+      use iounit
+      use keys
+      use potent
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'gkstuf.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'potent.i'
-      include 'solute.i'
       integer i,k,next
       real*8 rd
       logical header
@@ -205,12 +205,12 @@ c     Hydration of Peptides", PNAS, 84, 3086-3090 (1987)  (SASA)
 c
 c
       subroutine ksa
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'solute.i'
       integer i,j,k
       integer atmnum
 c
@@ -339,18 +339,18 @@ c     Computational Chemistry, 22, 1857-1879 (2001)  (ACE)
 c
 c
       subroutine kgb
+      use sizes
+      use angbnd
+      use atmlst
+      use atomid
+      use atoms
+      use bndstr
+      use chgpot
+      use couple
+      use math
+      use potent
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'math.i'
-      include 'potent.i'
-      include 'solute.i'
       integer i,j,k,m
       integer mm,nh,kc
       integer ia,ib,ic,id
@@ -781,15 +781,15 @@ c     Kirkwood implicit solvation model
 c
 c
       subroutine kgk
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use gkstuf
+      use keys
+      use kvdws
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'gkstuf.i'
-      include 'keys.i'
-      include 'kvdws.i'
-      include 'solute.i'
       integer i,j,k,l,m
       integer atmnum,next
       real*8 rscale
@@ -1103,22 +1103,22 @@ c     implicit solvation model implemented via APBS
 c
 c
       subroutine kpb
+      use sizes
+      use atoms
+      use atomid
+      use bath
+      use couple
+      use gkstuf
+      use inform
+      use iounit
+      use keys
+      use kvdws
+      use math
+      use nonpol
+      use pbstuf
+      use potent
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'bath.i'
-      include 'couple.i'
-      include 'gkstuf.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'npolar.i'
-      include 'pbstuf.i'
-      include 'potent.i'
-      include 'solute.i'
       integer i,j,k,l,m
       integer nx,ny,nz
       integer maxgrd,next
@@ -1642,17 +1642,17 @@ c     dispersion nonpolar implicit solvation model
 c
 c
       subroutine knp
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use keys
+      use kvdws
+      use math
+      use nonpol
+      use potent
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'keys.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'npolar.i'
-      include 'potent.i'
-      include 'solute.i'
       integer i,next
       real*8 cavoff,dispoff
       real*8 cross,ah,ao
@@ -1706,6 +1706,12 @@ c
       do i = 1, n
          asolv(i) = surften
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(rcav))  allocate (rcav(n))
+      if (.not. allocated(rdisp))  allocate (rdisp(n))
+      if (.not. allocated(cdisp))  allocate (cdisp(n))
 c
 c     set cavity and dispersion radii for nonpolar solvation
 c
@@ -1774,16 +1780,22 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine khpmf
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use hpmf
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'hpmf.i'
       integer i,j,k
       integer nh,atmnum
       logical keep
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ipmf))  allocate (ipmf(n))
+      if (.not. allocated(rpmf))  allocate (rpmf(n))
+      if (.not. allocated(acsa))  allocate (acsa(n))
 c
 c     get carbons for PMF and set surface area screening values
 c

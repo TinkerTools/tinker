@@ -17,15 +17,15 @@ c     from an external disk file
 c
 c
       subroutine readpdb (ipdb)
+      use sizes
+      use files
+      use inform
+      use iounit
+      use pdb
+      use resdue
+      use sequen
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'pdb.i'
-      include 'resdue.i'
-      include 'sequen.i'
-      include 'titles.i'
       integer i,j,k,ipdb
       integer start,stop
       integer index,serial
@@ -72,7 +72,6 @@ c
 c     get alternate sites, chains and insertions to be used
 c
       if (first)  call scanpdb (ipdb)
-      first = .false.
 c
 c     initialize title, atom and residue counters and name
 c
@@ -87,6 +86,20 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (chnatm(maxatm))
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(resnum))  allocate (resnum(maxatm))
+         if (.not. allocated(resatm))  allocate (resatm(2,maxatm))
+         if (.not. allocated(xpdb))  allocate (xpdb(maxatm))
+         if (.not. allocated(ypdb))  allocate (ypdb(maxatm))
+         if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
+         if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
+         if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
+         if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
+      end if
 c
 c     process individual atoms from the Protein Data Bank file
 c
@@ -170,8 +183,8 @@ c
             ypdb(npdb) = yy
             zpdb(npdb) = zz
             pdbtyp(npdb) = remark
-            atmnam(npdb) = atmname
-            resnam(npdb) = resname
+            pdbatm(npdb) = atmname
+            pdbres(npdb) = resname
             resnum(npdb) = nres
             if (resname .eq. 'HOH')  resnum(npdb) = 0
             chnatm(npdb) = chain
@@ -224,8 +237,8 @@ c
             ypdb(npdb) = yy
             zpdb(npdb) = zz
             pdbtyp(npdb) = remark
-            atmnam(npdb) = atmname
-            resnam(npdb) = resname
+            pdbatm(npdb) = atmname
+            pdbres(npdb) = resname
             resnum(npdb) = 0
             chnatm(npdb) = chain
   210       continue
@@ -363,11 +376,11 @@ c     sets chains, alternate sites and insertion records to be used
 c
 c
       subroutine scanpdb (ipdb)
+      use sizes
+      use iounit
+      use pdb
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'pdb.i'
-      include 'sequen.i'
       integer i,k,ipdb
       integer next,nxtlast
       integer length,dummy
@@ -583,9 +596,9 @@ c     and atom names to the standard forms used by TINKER
 c
 c
       subroutine fixpdb (resname,atmname)
+      use sizes
+      use resdue
       implicit none
-      include 'sizes.i'
-      include 'resdue.i'
       integer i
       character*3 resname
       character*4 atmname

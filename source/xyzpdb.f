@@ -17,9 +17,9 @@ c     then converts to and writes out a Protein Data Bank file
 c
 c
       program xyzpdb
+      use files
+      use inform
       implicit none
-      include 'files.i'
-      include 'inform.i'
       integer ipdb,ixyz
       integer freeunit
       character*120 pdbfile
@@ -82,16 +82,16 @@ c     consisting of biopolymer chains, ligands and water molecules
 c
 c
       subroutine makepdb
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use molcul
+      use pdb
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'molcul.i'
-      include 'pdb.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,j,k,m,ii
       integer kp,ka,kn
       integer iseq,freeunit
@@ -118,13 +118,33 @@ c
       integer, allocatable :: c1i(:)
       logical exist,generic
       logical cbone,nbone,obone
+      logical first
       logical, allocatable :: water(:)
       logical, allocatable :: hetmol(:)
       character*3 resname
       character*4 atmname
       character*7, allocatable :: restyp(:)
       character*120 seqfile
+      save first
+      data first  / .true. /
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(resnum))  allocate (resnum(maxatm))
+         if (.not. allocated(resatm))  allocate (resatm(2,maxatm))
+         if (.not. allocated(npdb12))  allocate (npdb12(maxatm))
+         if (.not. allocated(ipdb12))  allocate (ipdb12(maxval,maxatm))
+         if (.not. allocated(pdblist))  allocate (pdblist(maxatm))
+         if (.not. allocated(xpdb))  allocate (xpdb(maxatm))
+         if (.not. allocated(ypdb))  allocate (ypdb(maxatm))
+         if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
+         if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
+         if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
+         if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
+      end if
 c
 c     initialize number of PDB atoms and atom mapping
 c
@@ -235,7 +255,7 @@ c
                   call numeral (type(k),resname,justify)
                end if
                pdbnum = i
-               call pdbatm (atmname,resname,pdbnum,k)
+               call pdbatom (atmname,resname,pdbnum,k)
                pdbtyp(npdb) = 'HETATM'
             end do
          end do
@@ -505,24 +525,24 @@ c
                if (resname .eq. 'H2N') then
                   continue
                else if (resname .eq. 'FOR') then
-                  call pdbatm (' C  ',resname,i,ci(i))
-                  call pdbatm (' O  ',resname,i,oi(i))
+                  call pdbatom (' C  ',resname,i,ci(i))
+                  call pdbatom (' O  ',resname,i,oi(i))
                else if (resname .eq. 'ACE') then
-                  call pdbatm (' CH3',resname,i,cai(i))
-                  call pdbatm (' C  ',resname,i,ci(i))
-                  call pdbatm (' O  ',resname,i,oi(i))
+                  call pdbatom (' CH3',resname,i,cai(i))
+                  call pdbatom (' C  ',resname,i,ci(i))
+                  call pdbatom (' O  ',resname,i,oi(i))
                else if (resname .eq. 'COH') then
-                  call pdbatm (' OH ',resname,i,ni(i))
+                  call pdbatom (' OH ',resname,i,ni(i))
                else if (resname .eq. 'NH2') then
-                  call pdbatm (' N  ',resname,i,ni(i))
+                  call pdbatom (' N  ',resname,i,ni(i))
                else if (resname .eq. 'NME') then
-                  call pdbatm (' N  ',resname,i,ni(i))
-                  call pdbatm (' CH3',resname,i,cai(i))
+                  call pdbatom (' N  ',resname,i,ni(i))
+                  call pdbatom (' CH3',resname,i,cai(i))
                else
-                  call pdbatm (' N  ',resname,i,ni(i))
-                  call pdbatm (' CA ',resname,i,cai(i))
-                  call pdbatm (' C  ',resname,i,ci(i))
-                  call pdbatm (' O  ',resname,i,oi(i))
+                  call pdbatom (' N  ',resname,i,ni(i))
+                  call pdbatom (' CA ',resname,i,cai(i))
+                  call pdbatom (' C  ',resname,i,ci(i))
+                  call pdbatom (' O  ',resname,i,oi(i))
                end if
                call getside (resname,i,ci(i),cai(i),cbi)
                if (resname.eq.'CYS' .or. resname.eq.'CYX') then
@@ -535,7 +555,7 @@ c
                   do j = 1, n12(ci(i))
                      k = i12(j,ci(i))
                      if (atomic(k).eq.8 .and. k.ne.oi(i)) then
-                        call pdbatm (' OXT',resname,i,k)
+                        call pdbatom (' OXT',resname,i,k)
                         goto 20
                      end if
                   end do
@@ -547,25 +567,25 @@ c
             do i = start, stop
                resname = nuclz(seqtyp(i))
                if (resname .eq. 'MP ') then
-                  call pdbatm (' P  ',resname,i,poi(i))
-                  call pdbatm (' OP1',resname,i,op1(i))
-                  call pdbatm (' OP2',resname,i,op2(i))
-                  call pdbatm (' OP3',resname,i,op3(i))
+                  call pdbatom (' P  ',resname,i,poi(i))
+                  call pdbatom (' OP1',resname,i,op1(i))
+                  call pdbatom (' OP2',resname,i,op2(i))
+                  call pdbatom (' OP3',resname,i,op3(i))
                else if (resname .eq. 'DP ') then
                else if (resname .eq. 'TP ') then
                else
-                  call pdbatm (' P  ',resname,i,poi(i))
-                  call pdbatm (' OP1',resname,i,op1(i))
-                  call pdbatm (' OP2',resname,i,op2(i))
-                  call pdbatm (' O5''',resname,i,o5i(i))
-                  call pdbatm (' C5''',resname,i,c5i(i))
-                  call pdbatm (' C4''',resname,i,c4i(i))
-                  call pdbatm (' O4''',resname,i,o4i(i))
-                  call pdbatm (' C3''',resname,i,c3i(i))
-                  call pdbatm (' O3''',resname,i,o3i(i))
-                  call pdbatm (' C2''',resname,i,c2i(i))
-                  call pdbatm (' O2''',resname,i,o2i(i))
-                  call pdbatm (' C1''',resname,i,c1i(i))
+                  call pdbatom (' P  ',resname,i,poi(i))
+                  call pdbatom (' OP1',resname,i,op1(i))
+                  call pdbatom (' OP2',resname,i,op2(i))
+                  call pdbatom (' O5''',resname,i,o5i(i))
+                  call pdbatom (' C5''',resname,i,c5i(i))
+                  call pdbatom (' C4''',resname,i,c4i(i))
+                  call pdbatom (' O4''',resname,i,o4i(i))
+                  call pdbatom (' C3''',resname,i,c3i(i))
+                  call pdbatom (' O3''',resname,i,o3i(i))
+                  call pdbatom (' C2''',resname,i,c2i(i))
+                  call pdbatom (' O2''',resname,i,o2i(i))
+                  call pdbatom (' C1''',resname,i,c1i(i))
                   call getbase (resname,i,ni(i))
                   call getnuch (resname,i,ni(i),c1i(i),c2i(i),o2i(i),
      &                          c3i(i),o3i(i),c4i(i),c5i(i),o5i(i))
@@ -643,7 +663,7 @@ c
                      resname = '  I'
                   end if
                   pdbnum = nseq + i - 1
-                  call pdbatm (atmname,resname,pdbnum,k)
+                  call pdbatom (atmname,resname,pdbnum,k)
                   pdbtyp(npdb) = 'HETATM'
                end do
             end if
@@ -672,19 +692,19 @@ c
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  subroutine pdbatm  --  add a single atom to PDB file  ##
+c     ##  subroutine pdbatom  --  add a single atom to PDB file  ##
 c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "pdbatm" adds an atom to the Protein Data Bank file
+c     "pdbatom" adds an atom to the Protein Data Bank file
 c
 c
-      subroutine pdbatm (atmname,resname,ires,icoord)
+      subroutine pdbatom (atmname,resname,ires,icoord)
+      use sizes
+      use atoms
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'pdb.i'
       integer ires,icoord
       character*3 resname
       character*4 atmname
@@ -696,8 +716,8 @@ c
       if (icoord .ne. 0) then
          npdb = npdb + 1
          pdbtyp(npdb) = 'ATOM  '
-         atmnam(npdb) = atmname
-         resnam(npdb) = resname
+         pdbatm(npdb) = atmname
+         pdbres(npdb) = resname
          resnum(npdb) = ires
          xpdb(npdb) = x(icoord)
          ypdb(npdb) = y(icoord)
@@ -722,11 +742,11 @@ c     Data Bank file
 c
 c
       subroutine getside (resname,ires,ci,cai,cbi)
+      use sizes
+      use atomid
+      use atoms
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
       integer i,j,ires
       integer ci,cai,cbi
       character*3 resname
@@ -750,9 +770,9 @@ c
                if (i12(j,i) .eq. cai) then
                   cbi = i
                   if (resname .ne. 'AIB') then
-                     call pdbatm (' CB ',resname,ires,cbi)
+                     call pdbatom (' CB ',resname,ires,cbi)
                   else
-                     call pdbatm (' CB1',resname,ires,cbi)
+                     call pdbatom (' CB1',resname,ires,cbi)
                   end if
                   goto 10
                end if
@@ -774,223 +794,223 @@ c
 c     valine residue  (VAL)
 c
       else if (resname .eq. 'VAL') then
-         call pdbatm (' CG1',resname,ires,cbi+1)
-         call pdbatm (' CG2',resname,ires,cbi+2)
+         call pdbatom (' CG1',resname,ires,cbi+1)
+         call pdbatom (' CG2',resname,ires,cbi+2)
 c
 c     leucine residue  (LEU)
 c
       else if (resname .eq. 'LEU') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
 c
 c     isoleucine residue  (ILE)
 c
       else if (resname .eq. 'ILE') then
-         call pdbatm (' CG1',resname,ires,cbi+1)
-         call pdbatm (' CG2',resname,ires,cbi+2)
-         call pdbatm (' CD1',resname,ires,cbi+3)
+         call pdbatom (' CG1',resname,ires,cbi+1)
+         call pdbatom (' CG2',resname,ires,cbi+2)
+         call pdbatom (' CD1',resname,ires,cbi+3)
 c
 c     serine residue  (SER)
 c
       else if (resname .eq. 'SER') then
-         call pdbatm (' OG ',resname,ires,cbi+1)
+         call pdbatom (' OG ',resname,ires,cbi+1)
 c
 c     threonine residue  (THR)
 c
       else if (resname .eq. 'THR') then
-         call pdbatm (' OG1',resname,ires,cbi+1)
-         call pdbatm (' CG2',resname,ires,cbi+2)
+         call pdbatom (' OG1',resname,ires,cbi+1)
+         call pdbatom (' CG2',resname,ires,cbi+2)
 c
 c     cysteine residue  (CYS)
 c
       else if (resname .eq. 'CYS') then
-         call pdbatm (' SG ',resname,ires,cbi+1)
+         call pdbatom (' SG ',resname,ires,cbi+1)
 c
 c     cysteine residue  (CYX)
 c
       else if (resname .eq. 'CYX') then
-         call pdbatm (' SG ',resname,ires,cbi+1)
+         call pdbatom (' SG ',resname,ires,cbi+1)
 c
 c     deprotonated cysteine residue  (CYD)
 c
       else if (resname .eq. 'CYD') then
-         call pdbatm (' SG ',resname,ires,cbi+1)
+         call pdbatom (' SG ',resname,ires,cbi+1)
 c
 c     proline residue  (PRO)
 c
       else if (resname .eq. 'PRO') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
 c
 c     phenylalanine residue  (PHE)
 c
       else if (resname .eq. 'PHE') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' CE1',resname,ires,cbi+4)
-         call pdbatm (' CE2',resname,ires,cbi+5)
-         call pdbatm (' CZ ',resname,ires,cbi+6)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CE1',resname,ires,cbi+4)
+         call pdbatom (' CE2',resname,ires,cbi+5)
+         call pdbatom (' CZ ',resname,ires,cbi+6)
 c
 c     tyrosine residue  (TYR)
 c
       else if (resname .eq. 'TYR') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' CE1',resname,ires,cbi+4)
-         call pdbatm (' CE2',resname,ires,cbi+5)
-         call pdbatm (' CZ ',resname,ires,cbi+6)
-         call pdbatm (' OH ',resname,ires,cbi+7)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CE1',resname,ires,cbi+4)
+         call pdbatom (' CE2',resname,ires,cbi+5)
+         call pdbatom (' CZ ',resname,ires,cbi+6)
+         call pdbatom (' OH ',resname,ires,cbi+7)
 c
 c     deprotonated tyrosine residue  (TYD)
 c
       else if (resname .eq. 'TYD') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' CE1',resname,ires,cbi+4)
-         call pdbatm (' CE2',resname,ires,cbi+5)
-         call pdbatm (' CZ ',resname,ires,cbi+6)
-         call pdbatm (' OH ',resname,ires,cbi+7)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CE1',resname,ires,cbi+4)
+         call pdbatom (' CE2',resname,ires,cbi+5)
+         call pdbatom (' CZ ',resname,ires,cbi+6)
+         call pdbatom (' OH ',resname,ires,cbi+7)
 c
 c     tryptophan residue  (TRP)
 c
       else if (resname .eq. 'TRP') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' NE1',resname,ires,cbi+4)
-         call pdbatm (' CE2',resname,ires,cbi+5)
-         call pdbatm (' CE3',resname,ires,cbi+6)
-         call pdbatm (' CZ2',resname,ires,cbi+7)
-         call pdbatm (' CZ3',resname,ires,cbi+8)
-         call pdbatm (' CH2',resname,ires,cbi+9)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' NE1',resname,ires,cbi+4)
+         call pdbatom (' CE2',resname,ires,cbi+5)
+         call pdbatom (' CE3',resname,ires,cbi+6)
+         call pdbatom (' CZ2',resname,ires,cbi+7)
+         call pdbatom (' CZ3',resname,ires,cbi+8)
+         call pdbatom (' CH2',resname,ires,cbi+9)
 c
 c     histidine (HD and HE) residue  (HIS)
 c
       else if (resname .eq. 'HIS') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' ND1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' CE1',resname,ires,cbi+4)
-         call pdbatm (' NE2',resname,ires,cbi+5)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' ND1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CE1',resname,ires,cbi+4)
+         call pdbatom (' NE2',resname,ires,cbi+5)
 c
 c     histidine (HD only) residue  (HID)
 c
       else if (resname .eq. 'HID') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' ND1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' CE1',resname,ires,cbi+4)
-         call pdbatm (' NE2',resname,ires,cbi+5)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' ND1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CE1',resname,ires,cbi+4)
+         call pdbatom (' NE2',resname,ires,cbi+5)
 c
 c     histidine (HE only) residue  (HIE)
 c
       else if (resname .eq. 'HIE') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' ND1',resname,ires,cbi+2)
-         call pdbatm (' CD2',resname,ires,cbi+3)
-         call pdbatm (' CE1',resname,ires,cbi+4)
-         call pdbatm (' NE2',resname,ires,cbi+5)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' ND1',resname,ires,cbi+2)
+         call pdbatom (' CD2',resname,ires,cbi+3)
+         call pdbatom (' CE1',resname,ires,cbi+4)
+         call pdbatom (' NE2',resname,ires,cbi+5)
 c
 c     aspartic acid residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' OD1',resname,ires,cbi+2)
-         call pdbatm (' OD2',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' OD1',resname,ires,cbi+2)
+         call pdbatom (' OD2',resname,ires,cbi+3)
 c
 c     protonated aspartic acid residue  (ASH)
 c
       else if (resname .eq. 'ASH') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' OD1',resname,ires,cbi+2)
-         call pdbatm (' OD2',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' OD1',resname,ires,cbi+2)
+         call pdbatom (' OD2',resname,ires,cbi+3)
 c
 c     asparagine residue  (ASN)
 c
       else if (resname .eq. 'ASN') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' OD1',resname,ires,cbi+2)
-         call pdbatm (' ND2',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' OD1',resname,ires,cbi+2)
+         call pdbatom (' ND2',resname,ires,cbi+3)
 c
 c     glutamic acid residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' OE1',resname,ires,cbi+3)
-         call pdbatm (' OE2',resname,ires,cbi+4)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' OE1',resname,ires,cbi+3)
+         call pdbatom (' OE2',resname,ires,cbi+4)
 c
 c     protonated glutamic acid residue  (GLH)
 c
       else if (resname .eq. 'GLH') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' OE1',resname,ires,cbi+3)
-         call pdbatm (' OE2',resname,ires,cbi+4)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' OE1',resname,ires,cbi+3)
+         call pdbatom (' OE2',resname,ires,cbi+4)
 c
 c     glutamine residue  (GLN)
 c
       else if (resname .eq. 'GLN') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' OE1',resname,ires,cbi+3)
-         call pdbatm (' NE2',resname,ires,cbi+4)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' OE1',resname,ires,cbi+3)
+         call pdbatom (' NE2',resname,ires,cbi+4)
 c
 c     methionine residue  (MET)
 c
       else if (resname .eq. 'MET') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' SD ',resname,ires,cbi+2)
-         call pdbatm (' CE ',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' SD ',resname,ires,cbi+2)
+         call pdbatom (' CE ',resname,ires,cbi+3)
 c
 c     lysine residue  (LYS)
 c
       else if (resname .eq. 'LYS') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' CE ',resname,ires,cbi+3)
-         call pdbatm (' NZ ',resname,ires,cbi+4)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' CE ',resname,ires,cbi+3)
+         call pdbatom (' NZ ',resname,ires,cbi+4)
 c
 c     deprotonated lysine residue  (LYD)
 c
       else if (resname .eq. 'LYD') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' CE ',resname,ires,cbi+3)
-         call pdbatm (' NZ ',resname,ires,cbi+4)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' CE ',resname,ires,cbi+3)
+         call pdbatom (' NZ ',resname,ires,cbi+4)
 c
 c     arginine residue  (ARG)
 c
       else if (resname .eq. 'ARG') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' NE ',resname,ires,cbi+3)
-         call pdbatm (' CZ ',resname,ires,cbi+4)
-         call pdbatm (' NH1',resname,ires,cbi+5)
-         call pdbatm (' NH2',resname,ires,cbi+6)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' NE ',resname,ires,cbi+3)
+         call pdbatom (' CZ ',resname,ires,cbi+4)
+         call pdbatom (' NH1',resname,ires,cbi+5)
+         call pdbatom (' NH2',resname,ires,cbi+6)
 c
 c     ornithine residue  (ORN)
 c
       else if (resname .eq. 'ORN') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' NE ',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' NE ',resname,ires,cbi+3)
 c
 c     methylalanine residue  (AIB)
 c
       else if (resname .eq. 'AIB') then
-         call pdbatm (' CB2',resname,ires,cbi+1)
+         call pdbatom (' CB2',resname,ires,cbi+1)
 c
 c     pyroglutamic acid residue  (PCA)
 c
       else if (resname .eq. 'PCA') then
-         call pdbatm (' CG ',resname,ires,cbi+1)
-         call pdbatm (' CD ',resname,ires,cbi+2)
-         call pdbatm (' OE ',resname,ires,cbi+3)
+         call pdbatom (' CG ',resname,ires,cbi+1)
+         call pdbatom (' CD ',resname,ires,cbi+2)
+         call pdbatom (' OE ',resname,ires,cbi+3)
 c
 c     unknown residue  (UNK)
 c
@@ -1014,13 +1034,13 @@ c     Data Bank file
 c
 c
       subroutine getproh (resname,ires,jchain,ni,cai,cbi)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use fields
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'sequen.i'
       integer i,nh,hca
       integer ires,jchain
       integer ni,cai,cbi
@@ -1036,12 +1056,12 @@ c
             do i = 1, n
                if (atomic(i).eq.1 .and. i12(1,i).eq.ni) then
                   if (resname .eq. 'COH') then
-                     call pdbatm (' HO ',resname,ires,i)
+                     call pdbatom (' HO ',resname,ires,i)
                   else if (resname .eq. 'NH2') then
-                     call pdbatm (' H1 ',resname,ires,i)
-                     call pdbatm (' H2 ',resname,ires,i+1)
+                     call pdbatom (' H1 ',resname,ires,i)
+                     call pdbatom (' H2 ',resname,ires,i+1)
                   else
-                     call pdbatm (' H  ',resname,ires,i)
+                     call pdbatom (' H  ',resname,ires,i)
                   end if
                   goto 10
                end if
@@ -1061,7 +1081,7 @@ c
                   else if (nh .eq. 2) then
                      atmname = ' H2 '
                   end if
-                  call pdbatm (atmname,resname,ires,i)
+                  call pdbatom (atmname,resname,ires,i)
                   if (nh .eq. 2)  goto 10
                end if
             end do
@@ -1069,7 +1089,7 @@ c
             do i = 1, n
                if (atomic(i).eq.1 .and. i12(1,i).eq.ni) then
                   atmname = ' H  '
-                  call pdbatm (atmname,resname,ires,i)
+                  call pdbatom (atmname,resname,ires,i)
                   goto 10
                end if
             end do
@@ -1085,7 +1105,7 @@ c
                   else if (nh .eq. 3) then
                      atmname = ' H3 '
                   end if
-                  call pdbatm (atmname,resname,ires,i)
+                  call pdbatom (atmname,resname,ires,i)
                   if (nh .eq. 3)  goto 10
                end if
             end do
@@ -1110,7 +1130,7 @@ c
             else
                atmname = ' HA '
             end if
-            call pdbatm (atmname,resname,ires,i)
+            call pdbatom (atmname,resname,ires,i)
             goto 20
          end if
       end do
@@ -1134,450 +1154,450 @@ c     glycine residue  (GLY)
 c
       if (resname .eq. 'GLY') then
          if (allatom) then
-            call pdbatm (' HA3',resname,ires,hca+1)
+            call pdbatom (' HA3',resname,ires,hca+1)
          end if
 c
 c     alanine residue  (ALA)
 c
       else if (resname .eq. 'ALA') then
          if (allatom) then
-            call pdbatm (' HB1',resname,ires,hca+2)
-            call pdbatm (' HB2',resname,ires,hca+3)
-            call pdbatm (' HB3',resname,ires,hca+4)
+            call pdbatom (' HB1',resname,ires,hca+2)
+            call pdbatom (' HB2',resname,ires,hca+3)
+            call pdbatom (' HB3',resname,ires,hca+4)
          end if
 c
 c     valine residue  (VAL)
 c
       else if (resname .eq. 'VAL') then
          if (allatom) then
-            call pdbatm (' HB ',resname,ires,hca+4)
-            call pdbatm ('HG11',resname,ires,hca+5)
-            call pdbatm ('HG12',resname,ires,hca+6)
-            call pdbatm ('HG13',resname,ires,hca+7)
-            call pdbatm ('HG21',resname,ires,hca+8)
-            call pdbatm ('HG22',resname,ires,hca+9)
-            call pdbatm ('HG23',resname,ires,hca+10)
+            call pdbatom (' HB ',resname,ires,hca+4)
+            call pdbatom ('HG11',resname,ires,hca+5)
+            call pdbatom ('HG12',resname,ires,hca+6)
+            call pdbatom ('HG13',resname,ires,hca+7)
+            call pdbatom ('HG21',resname,ires,hca+8)
+            call pdbatom ('HG22',resname,ires,hca+9)
+            call pdbatom ('HG23',resname,ires,hca+10)
          end if
 c
 c     leucine residue  (LEU)
 c
       else if (resname .eq. 'LEU') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
-            call pdbatm (' HG ',resname,ires,hca+7)
-            call pdbatm ('HD11',resname,ires,hca+8)
-            call pdbatm ('HD12',resname,ires,hca+9)
-            call pdbatm ('HD13',resname,ires,hca+10)
-            call pdbatm ('HD21',resname,ires,hca+11)
-            call pdbatm ('HD22',resname,ires,hca+12)
-            call pdbatm ('HD23',resname,ires,hca+13)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
+            call pdbatom (' HG ',resname,ires,hca+7)
+            call pdbatom ('HD11',resname,ires,hca+8)
+            call pdbatom ('HD12',resname,ires,hca+9)
+            call pdbatom ('HD13',resname,ires,hca+10)
+            call pdbatom ('HD21',resname,ires,hca+11)
+            call pdbatom ('HD22',resname,ires,hca+12)
+            call pdbatom ('HD23',resname,ires,hca+13)
          end if
 c
 c     isoleucine residue  (ILE)
 c
       else if (resname .eq. 'ILE') then
          if (allatom) then
-            call pdbatm (' HB ',resname,ires,hca+5)
-            call pdbatm ('HG12',resname,ires,hca+6)
-            call pdbatm ('HG13',resname,ires,hca+7)
-            call pdbatm ('HG21',resname,ires,hca+8)
-            call pdbatm ('HG22',resname,ires,hca+9)
-            call pdbatm ('HG23',resname,ires,hca+10)
-            call pdbatm ('HD11',resname,ires,hca+11)
-            call pdbatm ('HD12',resname,ires,hca+12)
-            call pdbatm ('HD13',resname,ires,hca+13)
+            call pdbatom (' HB ',resname,ires,hca+5)
+            call pdbatom ('HG12',resname,ires,hca+6)
+            call pdbatom ('HG13',resname,ires,hca+7)
+            call pdbatom ('HG21',resname,ires,hca+8)
+            call pdbatom ('HG22',resname,ires,hca+9)
+            call pdbatom ('HG23',resname,ires,hca+10)
+            call pdbatom ('HD11',resname,ires,hca+11)
+            call pdbatom ('HD12',resname,ires,hca+12)
+            call pdbatom ('HD13',resname,ires,hca+13)
          end if
 c
 c     serine residue  (SER)
 c
       else if (resname .eq. 'SER') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+3)
-            call pdbatm (' HB3',resname,ires,hca+4)
-            call pdbatm (' HG ',resname,ires,hca+5)
+            call pdbatom (' HB2',resname,ires,hca+3)
+            call pdbatom (' HB3',resname,ires,hca+4)
+            call pdbatom (' HG ',resname,ires,hca+5)
          else
-            call pdbatm (' HG ',resname,ires,cbi+2)
+            call pdbatom (' HG ',resname,ires,cbi+2)
          end if
 c
 c     threonine residue  (THR)
 c
       else if (resname .eq. 'THR') then
          if (allatom) then
-            call pdbatm (' HB ',resname,ires,hca+4)
-            call pdbatm (' HG1',resname,ires,hca+5)
-            call pdbatm ('HG21',resname,ires,hca+6)
-            call pdbatm ('HG22',resname,ires,hca+7)
-            call pdbatm ('HG23',resname,ires,hca+8)
+            call pdbatom (' HB ',resname,ires,hca+4)
+            call pdbatom (' HG1',resname,ires,hca+5)
+            call pdbatom ('HG21',resname,ires,hca+6)
+            call pdbatom ('HG22',resname,ires,hca+7)
+            call pdbatom ('HG23',resname,ires,hca+8)
          else
-            call pdbatm (' HG1',resname,ires,cbi+3)
+            call pdbatom (' HG1',resname,ires,cbi+3)
          end if
 c
 c     cysteine residue  (CYS)
 c
       else if (resname .eq. 'CYS') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+3)
-            call pdbatm (' HB3',resname,ires,hca+4)
-            call pdbatm (' HG ',resname,ires,hca+5)
+            call pdbatom (' HB2',resname,ires,hca+3)
+            call pdbatom (' HB3',resname,ires,hca+4)
+            call pdbatom (' HG ',resname,ires,hca+5)
          else if (biotyp(86) .ne. 0) then
-            call pdbatm (' HG ',resname,ires,cbi+2)
+            call pdbatom (' HG ',resname,ires,cbi+2)
          end if
 c
 c     cystine residue  (CYX)
 c
       else if (resname .eq. 'CYX') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+3)
-            call pdbatm (' HB3',resname,ires,hca+4)
+            call pdbatom (' HB2',resname,ires,hca+3)
+            call pdbatom (' HB3',resname,ires,hca+4)
          end if
 c
 c     deprotonated cysteine residue  (CYD)
 c
       else if (resname .eq. 'CYD') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+3)
-            call pdbatm (' HB3',resname,ires,hca+4)
+            call pdbatom (' HB2',resname,ires,hca+3)
+            call pdbatom (' HB3',resname,ires,hca+4)
          end if
 c
 c     proline residue  (PRO)
 c
       else if (resname .eq. 'PRO') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+4)
-            call pdbatm (' HB3',resname,ires,hca+5)
-            call pdbatm (' HG2',resname,ires,hca+6)
-            call pdbatm (' HG3',resname,ires,hca+7)
-            call pdbatm (' HD2',resname,ires,hca+8)
-            call pdbatm (' HD3',resname,ires,hca+9)
+            call pdbatom (' HB2',resname,ires,hca+4)
+            call pdbatom (' HB3',resname,ires,hca+5)
+            call pdbatom (' HG2',resname,ires,hca+6)
+            call pdbatom (' HG3',resname,ires,hca+7)
+            call pdbatom (' HD2',resname,ires,hca+8)
+            call pdbatom (' HD3',resname,ires,hca+9)
          end if
 c
 c     phenylalanine residue  (PHE)
 c
       else if (resname .eq. 'PHE') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+8)
-            call pdbatm (' HB3',resname,ires,hca+9)
-            call pdbatm (' HD1',resname,ires,hca+10)
-            call pdbatm (' HD2',resname,ires,hca+11)
-            call pdbatm (' HE1',resname,ires,hca+12)
-            call pdbatm (' HE2',resname,ires,hca+13)
-            call pdbatm (' HZ ',resname,ires,hca+14)
+            call pdbatom (' HB2',resname,ires,hca+8)
+            call pdbatom (' HB3',resname,ires,hca+9)
+            call pdbatom (' HD1',resname,ires,hca+10)
+            call pdbatom (' HD2',resname,ires,hca+11)
+            call pdbatom (' HE1',resname,ires,hca+12)
+            call pdbatom (' HE2',resname,ires,hca+13)
+            call pdbatom (' HZ ',resname,ires,hca+14)
          else if (biotyp(126) .ne. 0) then
-            call pdbatm (' HD1',resname,ires,cbi+7)
-            call pdbatm (' HD2',resname,ires,cbi+8)
-            call pdbatm (' HE1',resname,ires,cbi+9)
-            call pdbatm (' HE2',resname,ires,cbi+10)
-            call pdbatm (' HZ ',resname,ires,cbi+11)
+            call pdbatom (' HD1',resname,ires,cbi+7)
+            call pdbatom (' HD2',resname,ires,cbi+8)
+            call pdbatom (' HE1',resname,ires,cbi+9)
+            call pdbatom (' HE2',resname,ires,cbi+10)
+            call pdbatom (' HZ ',resname,ires,cbi+11)
          end if
 c
 c     tyrosine residue  (TYR)
 c
       else if (resname .eq. 'TYR') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+9)
-            call pdbatm (' HB3',resname,ires,hca+10)
-            call pdbatm (' HD1',resname,ires,hca+11)
-            call pdbatm (' HD2',resname,ires,hca+12)
-            call pdbatm (' HE1',resname,ires,hca+13)
-            call pdbatm (' HE2',resname,ires,hca+14)
-            call pdbatm (' HH ',resname,ires,hca+15)
+            call pdbatom (' HB2',resname,ires,hca+9)
+            call pdbatom (' HB3',resname,ires,hca+10)
+            call pdbatom (' HD1',resname,ires,hca+11)
+            call pdbatom (' HD2',resname,ires,hca+12)
+            call pdbatom (' HE1',resname,ires,hca+13)
+            call pdbatom (' HE2',resname,ires,hca+14)
+            call pdbatom (' HH ',resname,ires,hca+15)
          else if (biotyp(141) .ne. 0) then
-            call pdbatm (' HD1',resname,ires,cbi+8)
-            call pdbatm (' HD2',resname,ires,cbi+9)
-            call pdbatm (' HE1',resname,ires,cbi+10)
-            call pdbatm (' HE2',resname,ires,cbi+11)
-            call pdbatm (' HH ',resname,ires,cbi+12)
+            call pdbatom (' HD1',resname,ires,cbi+8)
+            call pdbatom (' HD2',resname,ires,cbi+9)
+            call pdbatom (' HE1',resname,ires,cbi+10)
+            call pdbatom (' HE2',resname,ires,cbi+11)
+            call pdbatom (' HH ',resname,ires,cbi+12)
          else
-            call pdbatm (' HH ',resname,ires,cbi+8)
+            call pdbatom (' HH ',resname,ires,cbi+8)
          end if
 c
 c     deprotonated tyrosine residue  (TYD)
 c
       else if (resname .eq. 'TYD') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+9)
-            call pdbatm (' HB3',resname,ires,hca+10)
-            call pdbatm (' HD1',resname,ires,hca+11)
-            call pdbatm (' HD2',resname,ires,hca+12)
-            call pdbatm (' HE1',resname,ires,hca+13)
-            call pdbatm (' HE2',resname,ires,hca+14)
+            call pdbatom (' HB2',resname,ires,hca+9)
+            call pdbatom (' HB3',resname,ires,hca+10)
+            call pdbatom (' HD1',resname,ires,hca+11)
+            call pdbatom (' HD2',resname,ires,hca+12)
+            call pdbatom (' HE1',resname,ires,hca+13)
+            call pdbatom (' HE2',resname,ires,hca+14)
          else if (biotyp(141) .ne. 0) then
-            call pdbatm (' HD1',resname,ires,cbi+8)
-            call pdbatm (' HD2',resname,ires,cbi+9)
-            call pdbatm (' HE1',resname,ires,cbi+10)
-            call pdbatm (' HE2',resname,ires,cbi+11)
+            call pdbatom (' HD1',resname,ires,cbi+8)
+            call pdbatom (' HD2',resname,ires,cbi+9)
+            call pdbatom (' HE1',resname,ires,cbi+10)
+            call pdbatom (' HE2',resname,ires,cbi+11)
          end if
 c
 c     tryptophan residue  (TRP)
 c
       else if (resname .eq. 'TRP') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+11)
-            call pdbatm (' HB3',resname,ires,hca+12)
-            call pdbatm (' HD1',resname,ires,hca+13)
-            call pdbatm (' HE1',resname,ires,hca+14)
-            call pdbatm (' HE3',resname,ires,hca+15)
-            call pdbatm (' HZ2',resname,ires,hca+16)
-            call pdbatm (' HZ3',resname,ires,hca+17)
-            call pdbatm (' HH2',resname,ires,hca+18)
+            call pdbatom (' HB2',resname,ires,hca+11)
+            call pdbatom (' HB3',resname,ires,hca+12)
+            call pdbatom (' HD1',resname,ires,hca+13)
+            call pdbatom (' HE1',resname,ires,hca+14)
+            call pdbatom (' HE3',resname,ires,hca+15)
+            call pdbatom (' HZ2',resname,ires,hca+16)
+            call pdbatom (' HZ3',resname,ires,hca+17)
+            call pdbatom (' HH2',resname,ires,hca+18)
          else if (biotyp(172) .ne. 0) then
-            call pdbatm (' HD1',resname,ires,cbi+10)
-            call pdbatm (' HE1',resname,ires,cbi+11)
-            call pdbatm (' HE3',resname,ires,cbi+12)
-            call pdbatm (' HZ2',resname,ires,cbi+13)
-            call pdbatm (' HZ3',resname,ires,cbi+14)
-            call pdbatm (' HH2',resname,ires,cbi+15)
+            call pdbatom (' HD1',resname,ires,cbi+10)
+            call pdbatom (' HE1',resname,ires,cbi+11)
+            call pdbatom (' HE3',resname,ires,cbi+12)
+            call pdbatom (' HZ2',resname,ires,cbi+13)
+            call pdbatom (' HZ3',resname,ires,cbi+14)
+            call pdbatom (' HH2',resname,ires,cbi+15)
          else
-            call pdbatm (' HE1',resname,ires,cbi+10)
+            call pdbatom (' HE1',resname,ires,cbi+10)
          end if
 c
 c     histidine (HD and HE) residue  (HIS)
 c
       else if (resname .eq. 'HIS') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+7)
-            call pdbatm (' HB3',resname,ires,hca+8)
-            call pdbatm (' HD1',resname,ires,hca+9)
-            call pdbatm (' HD2',resname,ires,hca+10)
-            call pdbatm (' HE1',resname,ires,hca+11)
-            call pdbatm (' HE2',resname,ires,hca+12)
+            call pdbatom (' HB2',resname,ires,hca+7)
+            call pdbatom (' HB3',resname,ires,hca+8)
+            call pdbatom (' HD1',resname,ires,hca+9)
+            call pdbatom (' HD2',resname,ires,hca+10)
+            call pdbatom (' HE1',resname,ires,hca+11)
+            call pdbatom (' HE2',resname,ires,hca+12)
          else if (biotyp(197) .ne. 0) then
-            call pdbatm (' HD1',resname,ires,cbi+6)
-            call pdbatm (' HD2',resname,ires,cbi+7)
-            call pdbatm (' HE1',resname,ires,cbi+8)
-            call pdbatm (' HE2',resname,ires,cbi+9)
+            call pdbatom (' HD1',resname,ires,cbi+6)
+            call pdbatom (' HD2',resname,ires,cbi+7)
+            call pdbatom (' HE1',resname,ires,cbi+8)
+            call pdbatom (' HE2',resname,ires,cbi+9)
          else
-            call pdbatm (' HD1',resname,ires,cbi+6)
-            call pdbatm (' HE2',resname,ires,cbi+7)
+            call pdbatom (' HD1',resname,ires,cbi+6)
+            call pdbatom (' HE2',resname,ires,cbi+7)
          end if
 c
 c     histidine (HD only) residue  (HID)
 c
       else if (resname .eq. 'HID') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+7)
-            call pdbatm (' HB3',resname,ires,hca+8)
-            call pdbatm (' HD1',resname,ires,hca+9)
-            call pdbatm (' HD2',resname,ires,hca+10)
-            call pdbatm (' HE1',resname,ires,hca+11)
+            call pdbatom (' HB2',resname,ires,hca+7)
+            call pdbatom (' HB3',resname,ires,hca+8)
+            call pdbatom (' HD1',resname,ires,hca+9)
+            call pdbatom (' HD2',resname,ires,hca+10)
+            call pdbatom (' HE1',resname,ires,hca+11)
          else if (biotyp(214) .ne. 0) then
-            call pdbatm (' HD1',resname,ires,cbi+6)
-            call pdbatm (' HD2',resname,ires,cbi+7)
-            call pdbatm (' HE1',resname,ires,cbi+8)
+            call pdbatom (' HD1',resname,ires,cbi+6)
+            call pdbatom (' HD2',resname,ires,cbi+7)
+            call pdbatom (' HE1',resname,ires,cbi+8)
          else
-            call pdbatm (' HD1',resname,ires,cbi+6)
+            call pdbatom (' HD1',resname,ires,cbi+6)
          end if
 c
 c     histidine (HE only) residue  (HIE)
 c
       else if (resname .eq. 'HIE') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+7)
-            call pdbatm (' HB3',resname,ires,hca+8)
-            call pdbatm (' HD2',resname,ires,hca+9)
-            call pdbatm (' HE1',resname,ires,hca+10)
-            call pdbatm (' HE2',resname,ires,hca+11)
+            call pdbatom (' HB2',resname,ires,hca+7)
+            call pdbatom (' HB3',resname,ires,hca+8)
+            call pdbatom (' HD2',resname,ires,hca+9)
+            call pdbatom (' HE1',resname,ires,hca+10)
+            call pdbatom (' HE2',resname,ires,hca+11)
          else if (biotyp(229) .ne. 0) then
-            call pdbatm (' HD2',resname,ires,cbi+6)
-            call pdbatm (' HE1',resname,ires,cbi+7)
-            call pdbatm (' HE2',resname,ires,cbi+8)
+            call pdbatom (' HD2',resname,ires,cbi+6)
+            call pdbatom (' HE1',resname,ires,cbi+7)
+            call pdbatom (' HE2',resname,ires,cbi+8)
          else
-            call pdbatm (' HE2',resname,ires,cbi+6)
+            call pdbatom (' HE2',resname,ires,cbi+6)
          end if
 c
 c     aspartic acid residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
          end if
 c
 c     protonated aspartic acid residue  (ASH)
 c
       else if (resname .eq. 'ASH') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
-            call pdbatm (' HD2',resname,ires,hca+7)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
+            call pdbatom (' HD2',resname,ires,hca+7)
          else
-            call pdbatm (' HD2',resname,ires,cbi+4)
+            call pdbatom (' HD2',resname,ires,cbi+4)
          end if
 c
 c     asparagine residue  (ASN)
 c
       else if (resname .eq. 'ASN') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
-            call pdbatm ('HD21',resname,ires,hca+7)
-            call pdbatm ('HD22',resname,ires,hca+8)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
+            call pdbatom ('HD21',resname,ires,hca+7)
+            call pdbatom ('HD22',resname,ires,hca+8)
          else
-            call pdbatm ('HD21',resname,ires,cbi+4)
-            call pdbatm ('HD22',resname,ires,cbi+5)
+            call pdbatom ('HD21',resname,ires,cbi+4)
+            call pdbatom ('HD22',resname,ires,cbi+5)
          end if
 c
 c     glutamic acid residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+6)
-            call pdbatm (' HB3',resname,ires,hca+7)
-            call pdbatm (' HG2',resname,ires,hca+8)
-            call pdbatm (' HG3',resname,ires,hca+9)
+            call pdbatom (' HB2',resname,ires,hca+6)
+            call pdbatom (' HB3',resname,ires,hca+7)
+            call pdbatom (' HG2',resname,ires,hca+8)
+            call pdbatom (' HG3',resname,ires,hca+9)
          end if
 c
 c     protonated glutamic acid residue  (GLH)
 c
       else if (resname .eq. 'GLH') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+6)
-            call pdbatm (' HB3',resname,ires,hca+7)
-            call pdbatm (' HG2',resname,ires,hca+8)
-            call pdbatm (' HG3',resname,ires,hca+9)
-            call pdbatm (' HE2',resname,ires,hca+10)
+            call pdbatom (' HB2',resname,ires,hca+6)
+            call pdbatom (' HB3',resname,ires,hca+7)
+            call pdbatom (' HG2',resname,ires,hca+8)
+            call pdbatom (' HG3',resname,ires,hca+9)
+            call pdbatom (' HE2',resname,ires,hca+10)
          else
-            call pdbatm (' HE2',resname,ires,cbi+5)
+            call pdbatom (' HE2',resname,ires,cbi+5)
          end if
 c
 c     glutamine residue  (GLN)
 c
       else if (resname .eq. 'GLN') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+6)
-            call pdbatm (' HB3',resname,ires,hca+7)
-            call pdbatm (' HG2',resname,ires,hca+8)
-            call pdbatm (' HG3',resname,ires,hca+9)
-            call pdbatm ('HE21',resname,ires,hca+10)
-            call pdbatm ('HE22',resname,ires,hca+11)
+            call pdbatom (' HB2',resname,ires,hca+6)
+            call pdbatom (' HB3',resname,ires,hca+7)
+            call pdbatom (' HG2',resname,ires,hca+8)
+            call pdbatom (' HG3',resname,ires,hca+9)
+            call pdbatom ('HE21',resname,ires,hca+10)
+            call pdbatom ('HE22',resname,ires,hca+11)
          else
-            call pdbatm ('HE21',resname,ires,cbi+5)
-            call pdbatm ('HE22',resname,ires,cbi+6)
+            call pdbatom ('HE21',resname,ires,cbi+5)
+            call pdbatom ('HE22',resname,ires,cbi+6)
          end if
 c
 c     methionine residue  (MET)
 c
       else if (resname .eq. 'MET') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
-            call pdbatm (' HG2',resname,ires,hca+7)
-            call pdbatm (' HG3',resname,ires,hca+8)
-            call pdbatm (' HE1',resname,ires,hca+9)
-            call pdbatm (' HE2',resname,ires,hca+10)
-            call pdbatm (' HE3',resname,ires,hca+11)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
+            call pdbatom (' HG2',resname,ires,hca+7)
+            call pdbatom (' HG3',resname,ires,hca+8)
+            call pdbatom (' HE1',resname,ires,hca+9)
+            call pdbatom (' HE2',resname,ires,hca+10)
+            call pdbatom (' HE3',resname,ires,hca+11)
          end if
 c
 c     lysine residue  (LYS)
 c
       else if (resname .eq. 'LYS') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+6)
-            call pdbatm (' HB3',resname,ires,hca+7)
-            call pdbatm (' HG2',resname,ires,hca+8)
-            call pdbatm (' HG3',resname,ires,hca+9)
-            call pdbatm (' HD2',resname,ires,hca+10)
-            call pdbatm (' HD3',resname,ires,hca+11)
-            call pdbatm (' HE2',resname,ires,hca+12)
-            call pdbatm (' HE3',resname,ires,hca+13)
-            call pdbatm (' HZ1',resname,ires,hca+14)
-            call pdbatm (' HZ2',resname,ires,hca+15)
-            call pdbatm (' HZ3',resname,ires,hca+16)
+            call pdbatom (' HB2',resname,ires,hca+6)
+            call pdbatom (' HB3',resname,ires,hca+7)
+            call pdbatom (' HG2',resname,ires,hca+8)
+            call pdbatom (' HG3',resname,ires,hca+9)
+            call pdbatom (' HD2',resname,ires,hca+10)
+            call pdbatom (' HD3',resname,ires,hca+11)
+            call pdbatom (' HE2',resname,ires,hca+12)
+            call pdbatom (' HE3',resname,ires,hca+13)
+            call pdbatom (' HZ1',resname,ires,hca+14)
+            call pdbatom (' HZ2',resname,ires,hca+15)
+            call pdbatom (' HZ3',resname,ires,hca+16)
          else
-            call pdbatm (' HZ1',resname,ires,cbi+5)
-            call pdbatm (' HZ2',resname,ires,cbi+6)
-            call pdbatm (' HZ3',resname,ires,cbi+7)
+            call pdbatom (' HZ1',resname,ires,cbi+5)
+            call pdbatom (' HZ2',resname,ires,cbi+6)
+            call pdbatom (' HZ3',resname,ires,cbi+7)
          end if
 c
 c     deprotonated lysine residue  (LYD)
 c
       else if (resname .eq. 'LYD') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+6)
-            call pdbatm (' HB3',resname,ires,hca+7)
-            call pdbatm (' HG2',resname,ires,hca+8)
-            call pdbatm (' HG3',resname,ires,hca+9)
-            call pdbatm (' HD2',resname,ires,hca+10)
-            call pdbatm (' HD3',resname,ires,hca+11)
-            call pdbatm (' HE2',resname,ires,hca+12)
-            call pdbatm (' HE3',resname,ires,hca+13)
-            call pdbatm (' HZ1',resname,ires,hca+14)
-            call pdbatm (' HZ2',resname,ires,hca+15)
+            call pdbatom (' HB2',resname,ires,hca+6)
+            call pdbatom (' HB3',resname,ires,hca+7)
+            call pdbatom (' HG2',resname,ires,hca+8)
+            call pdbatom (' HG3',resname,ires,hca+9)
+            call pdbatom (' HD2',resname,ires,hca+10)
+            call pdbatom (' HD3',resname,ires,hca+11)
+            call pdbatom (' HE2',resname,ires,hca+12)
+            call pdbatom (' HE3',resname,ires,hca+13)
+            call pdbatom (' HZ1',resname,ires,hca+14)
+            call pdbatom (' HZ2',resname,ires,hca+15)
          else
-            call pdbatm (' HZ1',resname,ires,cbi+5)
-            call pdbatm (' HZ2',resname,ires,cbi+6)
+            call pdbatom (' HZ1',resname,ires,cbi+5)
+            call pdbatom (' HZ2',resname,ires,cbi+6)
          end if
 c
 c     arginine residue  (ARG)
 c
       else if (resname .eq. 'ARG') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+8)
-            call pdbatm (' HB3',resname,ires,hca+9)
-            call pdbatm (' HG2',resname,ires,hca+10)
-            call pdbatm (' HG3',resname,ires,hca+11)
-            call pdbatm (' HD2',resname,ires,hca+12)
-            call pdbatm (' HD3',resname,ires,hca+13)
-            call pdbatm (' HE ',resname,ires,hca+14)
-            call pdbatm ('HH11',resname,ires,hca+15)
-            call pdbatm ('HH12',resname,ires,hca+16)
-            call pdbatm ('HH21',resname,ires,hca+17)
-            call pdbatm ('HH22',resname,ires,hca+18)
+            call pdbatom (' HB2',resname,ires,hca+8)
+            call pdbatom (' HB3',resname,ires,hca+9)
+            call pdbatom (' HG2',resname,ires,hca+10)
+            call pdbatom (' HG3',resname,ires,hca+11)
+            call pdbatom (' HD2',resname,ires,hca+12)
+            call pdbatom (' HD3',resname,ires,hca+13)
+            call pdbatom (' HE ',resname,ires,hca+14)
+            call pdbatom ('HH11',resname,ires,hca+15)
+            call pdbatom ('HH12',resname,ires,hca+16)
+            call pdbatom ('HH21',resname,ires,hca+17)
+            call pdbatom ('HH22',resname,ires,hca+18)
          else
-            call pdbatm (' HE ',resname,ires,cbi+7)
-            call pdbatm ('HH11',resname,ires,cbi+8)
-            call pdbatm ('HH12',resname,ires,cbi+9)
-            call pdbatm ('HH21',resname,ires,cbi+10)
-            call pdbatm ('HH22',resname,ires,cbi+11)
+            call pdbatom (' HE ',resname,ires,cbi+7)
+            call pdbatom ('HH11',resname,ires,cbi+8)
+            call pdbatom ('HH12',resname,ires,cbi+9)
+            call pdbatom ('HH21',resname,ires,cbi+10)
+            call pdbatom ('HH22',resname,ires,cbi+11)
          end if
 c
 c     ornithine residue  (ORN)
 c
       else if (resname .eq. 'ORN') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
-            call pdbatm (' HG2',resname,ires,hca+7)
-            call pdbatm (' HG3',resname,ires,hca+8)
-            call pdbatm (' HD2',resname,ires,hca+9)
-            call pdbatm (' HD3',resname,ires,hca+10)
-            call pdbatm (' HE1',resname,ires,hca+11)
-            call pdbatm (' HE2',resname,ires,hca+12)
-            call pdbatm (' HE3',resname,ires,hca+13)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
+            call pdbatom (' HG2',resname,ires,hca+7)
+            call pdbatom (' HG3',resname,ires,hca+8)
+            call pdbatom (' HD2',resname,ires,hca+9)
+            call pdbatom (' HD3',resname,ires,hca+10)
+            call pdbatom (' HE1',resname,ires,hca+11)
+            call pdbatom (' HE2',resname,ires,hca+12)
+            call pdbatom (' HE3',resname,ires,hca+13)
          else
-            call pdbatm (' HE1',resname,ires,cbi+4)
-            call pdbatm (' HE2',resname,ires,cbi+5)
-            call pdbatm (' HE3',resname,ires,cbi+6)
+            call pdbatom (' HE1',resname,ires,cbi+4)
+            call pdbatom (' HE2',resname,ires,cbi+5)
+            call pdbatom (' HE3',resname,ires,cbi+6)
          end if
 c
 c     methylalanine residue  (AIB)
 c
       else if (resname .eq. 'AIB') then
          if (allatom) then
-            call pdbatm ('HB11',resname,ires,cbi+2)
-            call pdbatm ('HB12',resname,ires,cbi+3)
-            call pdbatm ('HB13',resname,ires,cbi+4)
-            call pdbatm ('HB21',resname,ires,cbi+5)
-            call pdbatm ('HB22',resname,ires,cbi+6)
-            call pdbatm ('HB23',resname,ires,cbi+7)
+            call pdbatom ('HB11',resname,ires,cbi+2)
+            call pdbatom ('HB12',resname,ires,cbi+3)
+            call pdbatom ('HB13',resname,ires,cbi+4)
+            call pdbatom ('HB21',resname,ires,cbi+5)
+            call pdbatom ('HB22',resname,ires,cbi+6)
+            call pdbatom ('HB23',resname,ires,cbi+7)
          end if
 c
 c     pyroglutamic acid residue  (PCA)
 c
       else if (resname .eq. 'PCA') then
          if (allatom) then
-            call pdbatm (' HB2',resname,ires,hca+5)
-            call pdbatm (' HB3',resname,ires,hca+6)
-            call pdbatm (' HG2',resname,ires,hca+7)
-            call pdbatm (' HG3',resname,ires,hca+8)
+            call pdbatom (' HB2',resname,ires,hca+5)
+            call pdbatom (' HB3',resname,ires,hca+6)
+            call pdbatom (' HG2',resname,ires,hca+7)
+            call pdbatom (' HG3',resname,ires,hca+8)
          end if
 c
 c     unknown residue  (UNK)
 c
       else if (resname .eq. 'UNK') then
          if (allatom) then
-            call pdbatm (' HA3',resname,ires,hca+1)
+            call pdbatom (' HA3',resname,ires,hca+1)
          end if
 c
 c     N-terminal deprotonated residue  (H2N)
@@ -1594,8 +1614,8 @@ c     N-terminal acetyl residue  (ACE)
 c
       else if (resname .eq. 'ACE') then
          if (allatom) then
-            call pdbatm (' H2 ',resname,ires,hca+1)
-            call pdbatm (' H3 ',resname,ires,hca+2)
+            call pdbatom (' H2 ',resname,ires,hca+1)
+            call pdbatom (' H3 ',resname,ires,hca+2)
          end if
 c
 c     C-terminal protonated residue (COH)
@@ -1612,8 +1632,8 @@ c     C-terminal N-methylamide residue  (NME)
 c
       else if (resname .eq. 'NME') then
          if (allatom) then
-            call pdbatm (' H2 ',resname,ires,hca+1)
-            call pdbatm (' H3 ',resname,ires,hca+2)
+            call pdbatom (' H2 ',resname,ires,hca+1)
+            call pdbatom (' H3 ',resname,ires,hca+2)
          end if
       end if
       return
@@ -1641,109 +1661,109 @@ c
 c     adenine in adenosine residue  (A)
 c
       if (resname .eq. 'A  ') then
-         call pdbatm (' N9 ',resname,ires,ni)
-         call pdbatm (' C8 ',resname,ires,ni+1)
-         call pdbatm (' N7 ',resname,ires,ni+2)
-         call pdbatm (' C5 ',resname,ires,ni+3)
-         call pdbatm (' C6 ',resname,ires,ni+4)
-         call pdbatm (' N6 ',resname,ires,ni+5)
-         call pdbatm (' N1 ',resname,ires,ni+6)
-         call pdbatm (' C2 ',resname,ires,ni+7)
-         call pdbatm (' N3 ',resname,ires,ni+8)
-         call pdbatm (' C4 ',resname,ires,ni+9)
+         call pdbatom (' N9 ',resname,ires,ni)
+         call pdbatom (' C8 ',resname,ires,ni+1)
+         call pdbatom (' N7 ',resname,ires,ni+2)
+         call pdbatom (' C5 ',resname,ires,ni+3)
+         call pdbatom (' C6 ',resname,ires,ni+4)
+         call pdbatom (' N6 ',resname,ires,ni+5)
+         call pdbatom (' N1 ',resname,ires,ni+6)
+         call pdbatom (' C2 ',resname,ires,ni+7)
+         call pdbatom (' N3 ',resname,ires,ni+8)
+         call pdbatom (' C4 ',resname,ires,ni+9)
 c
 c     guanine in guanosine residue  (G)
 c
       else if (resname .eq. 'G  ') then
-         call pdbatm (' N9 ',resname,ires,ni)
-         call pdbatm (' C8 ',resname,ires,ni+1)
-         call pdbatm (' N7 ',resname,ires,ni+2)
-         call pdbatm (' C5 ',resname,ires,ni+3)
-         call pdbatm (' C6 ',resname,ires,ni+4)
-         call pdbatm (' O6 ',resname,ires,ni+5)
-         call pdbatm (' N1 ',resname,ires,ni+6)
-         call pdbatm (' C2 ',resname,ires,ni+7)
-         call pdbatm (' N2 ',resname,ires,ni+8)
-         call pdbatm (' N3 ',resname,ires,ni+9)
-         call pdbatm (' C4 ',resname,ires,ni+10)
+         call pdbatom (' N9 ',resname,ires,ni)
+         call pdbatom (' C8 ',resname,ires,ni+1)
+         call pdbatom (' N7 ',resname,ires,ni+2)
+         call pdbatom (' C5 ',resname,ires,ni+3)
+         call pdbatom (' C6 ',resname,ires,ni+4)
+         call pdbatom (' O6 ',resname,ires,ni+5)
+         call pdbatom (' N1 ',resname,ires,ni+6)
+         call pdbatom (' C2 ',resname,ires,ni+7)
+         call pdbatom (' N2 ',resname,ires,ni+8)
+         call pdbatom (' N3 ',resname,ires,ni+9)
+         call pdbatom (' C4 ',resname,ires,ni+10)
 c
 c     cytosine in cytidine residue  (C)
 c
       else if (resname .eq. 'C  ') then
-         call pdbatm (' N1 ',resname,ires,ni)
-         call pdbatm (' C2 ',resname,ires,ni+1)
-         call pdbatm (' O2 ',resname,ires,ni+2)
-         call pdbatm (' N3 ',resname,ires,ni+3)
-         call pdbatm (' C4 ',resname,ires,ni+4)
-         call pdbatm (' N4 ',resname,ires,ni+5)
-         call pdbatm (' C5 ',resname,ires,ni+6)
-         call pdbatm (' C6 ',resname,ires,ni+7)
+         call pdbatom (' N1 ',resname,ires,ni)
+         call pdbatom (' C2 ',resname,ires,ni+1)
+         call pdbatom (' O2 ',resname,ires,ni+2)
+         call pdbatom (' N3 ',resname,ires,ni+3)
+         call pdbatom (' C4 ',resname,ires,ni+4)
+         call pdbatom (' N4 ',resname,ires,ni+5)
+         call pdbatom (' C5 ',resname,ires,ni+6)
+         call pdbatom (' C6 ',resname,ires,ni+7)
 c
 c     uracil in uridine residue  (U)
 c
       else if (resname .eq. 'U  ') then
-         call pdbatm (' N1 ',resname,ires,ni)
-         call pdbatm (' C2 ',resname,ires,ni+1)
-         call pdbatm (' O2 ',resname,ires,ni+2)
-         call pdbatm (' N3 ',resname,ires,ni+3)
-         call pdbatm (' C4 ',resname,ires,ni+4)
-         call pdbatm (' O4 ',resname,ires,ni+5)
-         call pdbatm (' C5 ',resname,ires,ni+6)
-         call pdbatm (' C6 ',resname,ires,ni+7)
+         call pdbatom (' N1 ',resname,ires,ni)
+         call pdbatom (' C2 ',resname,ires,ni+1)
+         call pdbatom (' O2 ',resname,ires,ni+2)
+         call pdbatom (' N3 ',resname,ires,ni+3)
+         call pdbatom (' C4 ',resname,ires,ni+4)
+         call pdbatom (' O4 ',resname,ires,ni+5)
+         call pdbatom (' C5 ',resname,ires,ni+6)
+         call pdbatom (' C6 ',resname,ires,ni+7)
 c
 c     adenine in deoxyadenosine residue  (DA)
 c
       else if (resname .eq. 'DA ') then
-         call pdbatm (' N9 ',resname,ires,ni)
-         call pdbatm (' C8 ',resname,ires,ni+1)
-         call pdbatm (' N7 ',resname,ires,ni+2)
-         call pdbatm (' C5 ',resname,ires,ni+3)
-         call pdbatm (' C6 ',resname,ires,ni+4)
-         call pdbatm (' N6 ',resname,ires,ni+5)
-         call pdbatm (' N1 ',resname,ires,ni+6)
-         call pdbatm (' C2 ',resname,ires,ni+7)
-         call pdbatm (' N3 ',resname,ires,ni+8)
-         call pdbatm (' C4 ',resname,ires,ni+9)
+         call pdbatom (' N9 ',resname,ires,ni)
+         call pdbatom (' C8 ',resname,ires,ni+1)
+         call pdbatom (' N7 ',resname,ires,ni+2)
+         call pdbatom (' C5 ',resname,ires,ni+3)
+         call pdbatom (' C6 ',resname,ires,ni+4)
+         call pdbatom (' N6 ',resname,ires,ni+5)
+         call pdbatom (' N1 ',resname,ires,ni+6)
+         call pdbatom (' C2 ',resname,ires,ni+7)
+         call pdbatom (' N3 ',resname,ires,ni+8)
+         call pdbatom (' C4 ',resname,ires,ni+9)
 c
 c     guanine in deoxyguanosine residue  (DG)
 c
       else if (resname .eq. 'DG ') then
-         call pdbatm (' N9 ',resname,ires,ni)
-         call pdbatm (' C8 ',resname,ires,ni+1)
-         call pdbatm (' N7 ',resname,ires,ni+2)
-         call pdbatm (' C5 ',resname,ires,ni+3)
-         call pdbatm (' C6 ',resname,ires,ni+4)
-         call pdbatm (' O6 ',resname,ires,ni+5)
-         call pdbatm (' N1 ',resname,ires,ni+6)
-         call pdbatm (' C2 ',resname,ires,ni+7)
-         call pdbatm (' N2 ',resname,ires,ni+8)
-         call pdbatm (' N3 ',resname,ires,ni+9)
-         call pdbatm (' C4 ',resname,ires,ni+10)
+         call pdbatom (' N9 ',resname,ires,ni)
+         call pdbatom (' C8 ',resname,ires,ni+1)
+         call pdbatom (' N7 ',resname,ires,ni+2)
+         call pdbatom (' C5 ',resname,ires,ni+3)
+         call pdbatom (' C6 ',resname,ires,ni+4)
+         call pdbatom (' O6 ',resname,ires,ni+5)
+         call pdbatom (' N1 ',resname,ires,ni+6)
+         call pdbatom (' C2 ',resname,ires,ni+7)
+         call pdbatom (' N2 ',resname,ires,ni+8)
+         call pdbatom (' N3 ',resname,ires,ni+9)
+         call pdbatom (' C4 ',resname,ires,ni+10)
 c
 c     cytosine in deoxycytidine residue  (DC)
 c
       else if (resname .eq. 'DC ') then
-         call pdbatm (' N1 ',resname,ires,ni)
-         call pdbatm (' C2 ',resname,ires,ni+1)
-         call pdbatm (' O2 ',resname,ires,ni+2)
-         call pdbatm (' N3 ',resname,ires,ni+3)
-         call pdbatm (' C4 ',resname,ires,ni+4)
-         call pdbatm (' N4 ',resname,ires,ni+5)
-         call pdbatm (' C5 ',resname,ires,ni+6)
-         call pdbatm (' C6 ',resname,ires,ni+7)
+         call pdbatom (' N1 ',resname,ires,ni)
+         call pdbatom (' C2 ',resname,ires,ni+1)
+         call pdbatom (' O2 ',resname,ires,ni+2)
+         call pdbatom (' N3 ',resname,ires,ni+3)
+         call pdbatom (' C4 ',resname,ires,ni+4)
+         call pdbatom (' N4 ',resname,ires,ni+5)
+         call pdbatom (' C5 ',resname,ires,ni+6)
+         call pdbatom (' C6 ',resname,ires,ni+7)
 c
 c     thymine in deoxythymidine residue  (DT)
 c
       else if (resname .eq. 'DT ') then
-         call pdbatm (' N1 ',resname,ires,ni)
-         call pdbatm (' C2 ',resname,ires,ni+1)
-         call pdbatm (' O2 ',resname,ires,ni+2)
-         call pdbatm (' N3 ',resname,ires,ni+3)
-         call pdbatm (' C4 ',resname,ires,ni+4)
-         call pdbatm (' O4 ',resname,ires,ni+5)
-         call pdbatm (' C5 ',resname,ires,ni+6)
-         call pdbatm (' C7 ',resname,ires,ni+7)
-         call pdbatm (' C6 ',resname,ires,ni+8)
+         call pdbatom (' N1 ',resname,ires,ni)
+         call pdbatom (' C2 ',resname,ires,ni+1)
+         call pdbatom (' O2 ',resname,ires,ni+2)
+         call pdbatom (' N3 ',resname,ires,ni+3)
+         call pdbatom (' C4 ',resname,ires,ni+4)
+         call pdbatom (' O4 ',resname,ires,ni+5)
+         call pdbatom (' C5 ',resname,ires,ni+6)
+         call pdbatom (' C7 ',resname,ires,ni+7)
+         call pdbatom (' C6 ',resname,ires,ni+8)
       end if
       return
       end
@@ -1763,10 +1783,10 @@ c
 c
       subroutine getnuch (resname,ires,ni,c1i,c2i,
      &                    o2i,c3i,o3i,c4i,c5i,o5i)
+      use sizes
+      use atomid
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'couple.i'
       integer i,k
       integer ires,ni
       integer c1i,c4i
@@ -1789,146 +1809,146 @@ c
          k = i12(i,c5i)
          if (atomic(k).eq.1) then
             if (.not. done) then
-               call pdbatm (' H5''',resname,ires,k)
+               call pdbatom (' H5''',resname,ires,k)
                done = .true.
             else
-               call pdbatm ('H5''''',resname,ires,k)
+               call pdbatom ('H5''''',resname,ires,k)
             end if
          end if
       end do
       do i = 1, n12(c4i)
          k = i12(i,c4i)
-         if (atomic(k) .eq. 1)  call pdbatm (' H4''',resname,ires,k)
+         if (atomic(k) .eq. 1)  call pdbatom (' H4''',resname,ires,k)
       end do
       do i = 1, n12(c3i)
          k = i12(i,c3i)
-         if (atomic(k) .eq. 1)  call pdbatm (' H3''',resname,ires,k)
+         if (atomic(k) .eq. 1)  call pdbatom (' H3''',resname,ires,k)
       end do
       done = .false.
       do i = 1, n12(c2i)
          k = i12(i,c2i)
          if (atomic(k) .eq. 1) then
             if (.not. done) then
-               call pdbatm (' H2''',resname,ires,k)
+               call pdbatom (' H2''',resname,ires,k)
                done = .true.
             else
-               call pdbatm ('H2''''',resname,ires,k)
+               call pdbatom ('H2''''',resname,ires,k)
             end if
          end if
       end do
       if (o2i .ne. 0) then
          do i = 1, n12(o2i)
             k = i12(i,o2i)
-            if (atomic(k) .eq. 1)  call pdbatm ('HO2''',resname,ires,k)
+            if (atomic(k) .eq. 1)  call pdbatom ('HO2''',resname,ires,k)
          end do
       end if
       do i = 1, n12(c1i)
          k = i12(i,c1i)
-         if (atomic(k) .eq. 1)  call pdbatm (' H1''',resname,ires,k)
+         if (atomic(k) .eq. 1)  call pdbatom (' H1''',resname,ires,k)
       end do
 c
 c     adenine in adenosine residue  (A)
 c
       if (resname .eq. 'A  ') then
          if (allatom) then
-            call pdbatm (' H8 ',resname,ires,ni+10)
-            call pdbatm (' H61',resname,ires,ni+11)
-            call pdbatm (' H62',resname,ires,ni+12)
-            call pdbatm (' H2 ',resname,ires,ni+13)
+            call pdbatom (' H8 ',resname,ires,ni+10)
+            call pdbatom (' H61',resname,ires,ni+11)
+            call pdbatom (' H62',resname,ires,ni+12)
+            call pdbatom (' H2 ',resname,ires,ni+13)
          else
-            call pdbatm (' H61',resname,ires,ni+10)
-            call pdbatm (' H62',resname,ires,ni+11)
+            call pdbatom (' H61',resname,ires,ni+10)
+            call pdbatom (' H62',resname,ires,ni+11)
          end if
 c
 c     guanine in guanosine residue  (G)
 c
       else if (resname .eq. 'G  ') then
          if (allatom) then
-            call pdbatm (' H8 ',resname,ires,ni+11)
-            call pdbatm (' H1 ',resname,ires,ni+12)
-            call pdbatm (' H21',resname,ires,ni+13)
-            call pdbatm (' H22',resname,ires,ni+14)
+            call pdbatom (' H8 ',resname,ires,ni+11)
+            call pdbatom (' H1 ',resname,ires,ni+12)
+            call pdbatom (' H21',resname,ires,ni+13)
+            call pdbatom (' H22',resname,ires,ni+14)
          else
-            call pdbatm (' H1 ',resname,ires,ni+11)
-            call pdbatm (' H21',resname,ires,ni+12)
-            call pdbatm (' H22',resname,ires,ni+13)
+            call pdbatom (' H1 ',resname,ires,ni+11)
+            call pdbatom (' H21',resname,ires,ni+12)
+            call pdbatom (' H22',resname,ires,ni+13)
          end if
 c
 c     cytosine in cytidine residue  (C)
 c
       else if (resname .eq. 'C  ') then
          if (allatom) then
-            call pdbatm (' H41',resname,ires,ni+8)
-            call pdbatm (' H42',resname,ires,ni+9)
-            call pdbatm (' H5 ',resname,ires,ni+10)
-            call pdbatm (' H6 ',resname,ires,ni+11)
+            call pdbatom (' H41',resname,ires,ni+8)
+            call pdbatom (' H42',resname,ires,ni+9)
+            call pdbatom (' H5 ',resname,ires,ni+10)
+            call pdbatom (' H6 ',resname,ires,ni+11)
          else
-            call pdbatm (' H41',resname,ires,ni+8)
-            call pdbatm (' H42',resname,ires,ni+9)
+            call pdbatom (' H41',resname,ires,ni+8)
+            call pdbatom (' H42',resname,ires,ni+9)
          end if
 c
 c     uracil in uridine residue  (U)
 c
       else if (resname .eq. 'U  ') then
          if (allatom) then
-            call pdbatm (' H3 ',resname,ires,ni+8)
-            call pdbatm (' H5 ',resname,ires,ni+9)
-            call pdbatm (' H6 ',resname,ires,ni+10)
+            call pdbatom (' H3 ',resname,ires,ni+8)
+            call pdbatom (' H5 ',resname,ires,ni+9)
+            call pdbatom (' H6 ',resname,ires,ni+10)
          else
-            call pdbatm (' H3 ',resname,ires,ni+8)
+            call pdbatom (' H3 ',resname,ires,ni+8)
          end if
 c
 c     adenine in deoxyadenosine residue  (DA)
 c
       else if (resname .eq. 'DA ') then
          if (allatom) then
-            call pdbatm (' H8 ',resname,ires,ni+10)
-            call pdbatm (' H61',resname,ires,ni+11)
-            call pdbatm (' H62',resname,ires,ni+12)
-            call pdbatm (' H2 ',resname,ires,ni+13)
+            call pdbatom (' H8 ',resname,ires,ni+10)
+            call pdbatom (' H61',resname,ires,ni+11)
+            call pdbatom (' H62',resname,ires,ni+12)
+            call pdbatom (' H2 ',resname,ires,ni+13)
          else
-            call pdbatm (' H61',resname,ires,ni+10)
-            call pdbatm (' H62',resname,ires,ni+11)
+            call pdbatom (' H61',resname,ires,ni+10)
+            call pdbatom (' H62',resname,ires,ni+11)
          end if
 c
 c     guanine in deoxyguanosine residue  (DG)
 c
       else if (resname .eq. 'DG ') then
          if (allatom) then
-            call pdbatm (' H8 ',resname,ires,ni+11)
-            call pdbatm (' H1 ',resname,ires,ni+12)
-            call pdbatm (' H21',resname,ires,ni+13)
-            call pdbatm (' H22',resname,ires,ni+14)
+            call pdbatom (' H8 ',resname,ires,ni+11)
+            call pdbatom (' H1 ',resname,ires,ni+12)
+            call pdbatom (' H21',resname,ires,ni+13)
+            call pdbatom (' H22',resname,ires,ni+14)
          else
-            call pdbatm (' H1 ',resname,ires,ni+11)
-            call pdbatm (' H21',resname,ires,ni+12)
-            call pdbatm (' H22',resname,ires,ni+13)
+            call pdbatom (' H1 ',resname,ires,ni+11)
+            call pdbatom (' H21',resname,ires,ni+12)
+            call pdbatom (' H22',resname,ires,ni+13)
          end if
 c
 c     cytosine in deoxycytidine residue  (DC)
 c
       else if (resname .eq. 'DC ') then
          if (allatom) then
-            call pdbatm (' H41',resname,ires,ni+8)
-            call pdbatm (' H42',resname,ires,ni+9)
-            call pdbatm (' H5 ',resname,ires,ni+10)
-            call pdbatm (' H6 ',resname,ires,ni+11)
+            call pdbatom (' H41',resname,ires,ni+8)
+            call pdbatom (' H42',resname,ires,ni+9)
+            call pdbatom (' H5 ',resname,ires,ni+10)
+            call pdbatom (' H6 ',resname,ires,ni+11)
          else
-            call pdbatm (' H41',resname,ires,ni+8)
-            call pdbatm (' H42',resname,ires,ni+9)
+            call pdbatom (' H41',resname,ires,ni+8)
+            call pdbatom (' H42',resname,ires,ni+9)
          end if
 c
 c     thymine in deoxythymidine residue  (DT)
 c
       else if (resname .eq. 'DT ') then
          if (allatom) then
-            call pdbatm (' H3 ',resname,ires,ni+9)
-            call pdbatm (' H71',resname,ires,ni+10)
-            call pdbatm (' H72',resname,ires,ni+11)
-            call pdbatm (' H73',resname,ires,ni+12)
-            call pdbatm (' H6 ',resname,ires,ni+13)
+            call pdbatom (' H3 ',resname,ires,ni+9)
+            call pdbatom (' H71',resname,ires,ni+10)
+            call pdbatom (' H72',resname,ires,ni+11)
+            call pdbatom (' H73',resname,ires,ni+12)
+            call pdbatom (' H6 ',resname,ires,ni+13)
          else
-            call pdbatm (' H3 ',resname,ires,ni+9)
+            call pdbatom (' H3 ',resname,ires,ni+9)
          end if
       end if
 c
@@ -1936,11 +1956,11 @@ c     get any capping hydrogen atoms for the current residue
 c
       do i = 1, n12(o5i)
          k = i12(i,o5i)
-         if (atomic(k) .eq. 1)  call pdbatm (' H5T',resname,ires,k)
+         if (atomic(k) .eq. 1)  call pdbatom (' H5T',resname,ires,k)
       end do
       do i = 1, n12(o3i)
          k = i12(i,o3i)
-         if (atomic(k) .eq. 1)  call pdbatm (' H3T',resname,ires,k)
+         if (atomic(k) .eq. 1)  call pdbatom (' H3T',resname,ires,k)
       end do
       return
       end

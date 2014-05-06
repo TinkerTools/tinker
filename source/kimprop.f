@@ -17,17 +17,17 @@ c     dihedral in the structure and processes any changed values
 c
 c
       subroutine kimprop
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use improp
+      use inform
+      use iounit
+      use keys
+      use kiprop
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'improp.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kiprop.i'
-      include 'potent.i'
       integer i,j,k,ndi
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -105,6 +105,12 @@ c
       do i = maxndi, 1, -1
          if (kdi(i) .eq. blank)  ndi = i - 1
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iiprop))  allocate (iiprop(4,maxtors))
+      if (.not. allocated(kprop))  allocate (kprop(maxtors))
+      if (.not. allocated(vprop))  allocate (vprop(maxtors))
 c
 c     assign improper dihedral parameters for each improper angle;
 c     multiple symmetrical parameters are given partial weights

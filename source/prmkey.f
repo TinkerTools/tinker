@@ -17,19 +17,19 @@ c     force field potential energy functional forms and constants
 c
 c
       subroutine prmkey (text)
+      use sizes
+      use angpot
+      use bndpot
+      use chgpot
+      use fields
+      use mplpot
+      use polpot
+      use potent
+      use rxnpot
+      use torpot
+      use urypot
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'bndpot.i'
-      include 'chgpot.i'
-      include 'fields.i'
-      include 'mplpot.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'rxnpot.i'
-      include 'torpot.i'
-      include 'urypot.i'
-      include 'vdwpot.i'
       integer next
       character*4 value
       character*20 keyword
@@ -421,8 +421,8 @@ c     the use of each of the potential energy functions
 c
 c
       subroutine potoff
+      use potent
       implicit none
-      include 'potent.i'
 c
 c
 c     turn off the use of each of the potential energy functions

@@ -17,17 +17,17 @@ c     contributions to the pressure tensor by summing over velocities
 c
 c
       subroutine kinetic (eksum,ekin)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use group
+      use mdstuf
+      use moldyn
+      use rgddyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'group.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'rgddyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k
       integer start,stop
       real*8 eksum,weigh

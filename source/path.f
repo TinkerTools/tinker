@@ -25,18 +25,18 @@ c     to Peptides", Journal of Chemical Physics, 92, 5580-5601 (1990)
 c
 c
       program path
+      use sizes
+      use align
+      use atomid
+      use atoms
+      use files
+      use inform
+      use iounit
+      use linmin
+      use minima
+      use output
+      use paths
       implicit none
-      include 'sizes.i'
-      include 'align.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'linmin.i'
-      include 'minima.i'
-      include 'output.i'
-      include 'paths.i'
       integer i,j,k,nvar
       integer ix,iy,iz
       integer ipath,npath
@@ -62,21 +62,17 @@ c
       call initial
       call getxyz
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
       nvar = 3 * n
-      if (associated(pc0))  deallocate (pc0)
-      if (associated(pc1))  deallocate (pc1)
-      if (associated(pvect))  deallocate (pvect)
-      if (associated(pstep))  deallocate (pstep)
-      if (associated(pzet))  deallocate (pzet)
-      if (associated(gc))  deallocate (gc)
       allocate (pc0(nvar))
       allocate (pc1(nvar))
       allocate (pvect(nvar))
       allocate (pstep(nvar))
       allocate (pzet(nvar))
       allocate (gc(nvar,7))
+      allocate (ifit(2,n))
+      allocate (wfit(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -322,11 +318,11 @@ c     #################################################################
 c
 c
       function path1 (p,gt)
+      use sizes
+      use atomid
+      use atoms
+      use paths
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'paths.i'
       integer i,j,nvar
       integer ix,iy,iz
       real*8 xx,yy,zz
@@ -420,10 +416,10 @@ c     ##########################################################
 c
 c
       function potnrg (xx,g)
+      use sizes
+      use atoms
+      use paths
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'paths.i'
       integer i
       real*8 energy
       real*8 potnrg

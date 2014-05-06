@@ -28,15 +28,15 @@ c     Chemistry, 99, 8374-8378 (1995)
 c
 c
       program pss
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use omega
+      use refer
+      use tree
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'omega.i'
-      include 'refer.i'
-      include 'tree.i'
-      include 'warp.i'
       integer i,next,range
       integer start,stop
       real*8 minimum,grdmin
@@ -282,9 +282,9 @@ c     coordinate space
 c
 c
       function pss1 (xx,g)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,nvar
       real*8 pss1,e
       real*8 xx(*)
@@ -345,9 +345,9 @@ c     in Cartesian coordinate space
 c
 c
       subroutine pss2 (mode,xx,h,hinit,hstop,hindex,hdiag)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i,nvar
       integer hinit(*)
       integer hstop(*)
@@ -386,12 +386,12 @@ c     ###############################################################
 c
 c
       subroutine modecart (start,stop,minimum,grdmin,check)
+      use sizes
+      use atoms
+      use iounit
+      use omega
+      use refer
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'omega.i'
-      include 'refer.i'
       integer i,j,k,nfreq
       integer start,stop
       integer niter,nsearch
@@ -517,12 +517,12 @@ c     ###############################################################
 c
 c
       subroutine modetors (start,stop,minimum,grdmin,check)
+      use sizes
+      use atoms
+      use iounit
+      use omega
+      use refer
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'omega.i'
-      include 'refer.i'
       integer i,k
       integer start,stop
       integer niter,nsearch
@@ -640,10 +640,10 @@ c     ###############################################################
 c
 c
       subroutine eigenxyz (eigen,vects)
+      use sizes
+      use atoms
+      use hescut
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'hescut.i'
       integer i,j,k,nfreq,ihess
       integer, allocatable :: hindex(:)
       integer, allocatable :: hinit(:,:)
@@ -708,10 +708,10 @@ c     ###############################################################
 c
 c
       subroutine eigentor (eigen,vects)
+      use sizes
+      use atoms
+      use omega
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'omega.i'
       integer i,j,ihess
       real*8 eigen(*)
       real*8, allocatable :: matrix(:)
@@ -758,12 +758,12 @@ c     #################################################################
 c
 c
       subroutine climbxyz (nsearch,minimum,step,grdmin,check)
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use refer
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'refer.i'
       integer maxstep
       parameter (maxstep=500)
       integer i,kstep
@@ -850,13 +850,13 @@ c     #################################################################
 c
 c
       subroutine climbtor (nsearch,minimum,step,grdmin,check)
+      use sizes
+      use inform
+      use iounit
+      use math
+      use omega
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'zcoord.i'
       integer maxstep
       parameter (maxstep=500)
       integer i,kstep
@@ -951,10 +951,10 @@ c     smoothing level
 c
 c
       subroutine localxyz (minimum,grdmin)
+      use sizes
+      use atoms
+      use inform
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
       integer i,nvar
       real*8 minimum
       real*8 grdmin
@@ -1024,11 +1024,11 @@ c     belongs to the correct progenitor in the existing map
 c
 c
       subroutine chktree (parent,grdmin,keep)
+      use sizes
+      use atoms
+      use tree
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'tree.i'
-      include 'warp.i'
       integer i
       real*8 parent,grdmin
       real*8 deform0,eps
@@ -1094,8 +1094,8 @@ c     ##############################################################
 c
 c
       subroutine psswrite (i)
+      use files
       implicit none
-      include 'files.i'
       integer i,ixyz
       integer lext,freeunit
       character*7 ext

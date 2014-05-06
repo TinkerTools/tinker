@@ -18,21 +18,21 @@ c     also processes any new or changed parameter values
 c
 c
       subroutine kopbend
+      use sizes
+      use angbnd
+      use angpot
+      use atomid
+      use atoms
+      use couple
+      use fields
+      use inform
+      use iounit
+      use keys
+      use kopbnd
+      use opbend
+      use potent
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kopbnd.i'
-      include 'opbend.i'
-      include 'potent.i'
-      include 'usage.i'
       integer i,j,it
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -137,6 +137,12 @@ c
          jopb(it) = .true.
       end do
    60 continue
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iopb))  allocate (iopb(maxang))
+      if (.not. allocated(opbk))  allocate (opbk(maxang))
+      if (.not. allocated(angtyp))  allocate (angtyp(maxang))
 c
 c     assign out-of-plane bending parameters for each angle
 c
@@ -245,15 +251,15 @@ c     according to the Merck Molecular Force Field (MMFF)
 c
 c
       subroutine kopbendm
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use kopbnd
+      use merck
+      use opbend
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'kopbnd.i'
-      include 'merck.i'
-      include 'opbend.i'
-      include 'potent.i'
       integer i,j,m
       integer nopb,size
       integer ia,ib,ic,id

@@ -17,18 +17,18 @@ c     to be included in the potential energy calculation
 c
 c
       subroutine kgeom
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use group
+      use iounit
+      use keys
+      use molcul
+      use potent
+      use restrn
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kgeoms.i'
-      include 'molcul.i'
-      include 'potent.i'
       integer i,j,k
       integer ip,next
       integer ia,ib,ic,id
@@ -47,10 +47,13 @@ c
       real*8 vol,ratio
       logical exist,keep
       logical intermol
+      logical first
       character*1 letter
       character*20 keyword
       character*120 record
       character*120 string
+      save first
+      data first  / .true. /
 c
 c
 c     set the default values for the restraint variables
@@ -63,8 +66,31 @@ c
       nchir = 0
       depth = 0.0d0
       width = 0.0d0
+      rwall = 0.0d0
       use_basin = .false.
       use_wall = .false.
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
+         if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
+         if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
+         if (.not. allocated(iafix))  allocate (iafix(3,maxfix))
+         if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
+         if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
+         if (.not. allocated(ichir))  allocate (ichir(4,maxfix))
+         if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
+         if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
+         if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
+         if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
+         if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
+         if (.not. allocated(afix))  allocate (afix(3,maxfix))
+         if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
+         if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
+         if (.not. allocated(chir))  allocate (chir(3,maxfix))
+      end if
 c
 c     search the keywords for restraint parameters
 c

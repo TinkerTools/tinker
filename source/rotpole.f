@@ -17,9 +17,9 @@ c     frame by applying the correct rotation matrix for each site
 c
 c
       subroutine rotpole
+      use sizes
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
       integer i
       real*8 a(3,3)
 c
@@ -46,10 +46,10 @@ c     coordinate system to the global frame at a multipole site
 c
 c
       subroutine rotmat (i,a)
+      use sizes
+      use atoms
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
       integer i,ii
       integer ix,iy,iz
       real*8 r,dot
@@ -260,10 +260,10 @@ c     in the global coordinate frame by applying a rotation matrix
 c
 c
       subroutine rotsite (isite,a)
+      use sizes
+      use atoms
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
       integer i,j,k,m
       integer isite
       real*8 a(3,3)

@@ -18,17 +18,17 @@ c     the central atom height
 c
 c
       subroutine eopdist1
+      use sizes
+      use angpot
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use group
+      use opdist
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'opdist.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,ia,ib,ic,id
       real*8 e,force,fgrp
       real*8 dot,deddt

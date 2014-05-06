@@ -17,10 +17,10 @@ c     coordinates, and prints a warning message
 c
 c
       subroutine chkxyz (clash)
+      use sizes
+      use atoms
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
       integer i,j
       real*8 xi,yi,zi
       real*8 eps,r2

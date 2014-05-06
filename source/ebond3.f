@@ -17,20 +17,20 @@ c     partitions the energy among the atoms
 c
 c
       subroutine ebond3
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bndpot
+      use bndstr
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bndpot.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'usage.i'
       integer i,ia,ib
       real*8 e,ideal,force
       real*8 expterm,bde

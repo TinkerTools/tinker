@@ -22,19 +22,19 @@ c     Multipoles", Journal of Chemical Physics, 107, 481-492 (1997)
 c
 c
       subroutine erxnfld3
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use chgpot
+      use energi
+      use inform
+      use iounit
+      use mpole
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'chgpot.i'
-      include 'energi.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k
       integer ii,kk
       integer ix,iy,iz

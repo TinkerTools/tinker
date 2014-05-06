@@ -18,13 +18,13 @@ c     angle values for the peptide backbone and side chains
 c
 c
       program protein
+      use sizes
+      use atoms
+      use files
+      use iounit
+      use sequen
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'sequen.i'
-      include 'titles.i'
       integer i,izmt
       integer ixyz,iseq
       integer natom,mode
@@ -140,12 +140,12 @@ c     and torsional angle values needed to define a peptide
 c
 c
       subroutine getseq
+      use sizes
+      use iounit
+      use phipsi
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'phipsi.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,j,next
       integer length,trimtext
       logical done
@@ -343,13 +343,13 @@ c     acid sequence from the phi, psi, omega and chi values
 c
 c
       subroutine prochain
+      use sizes
+      use atoms
+      use iounit
+      use phipsi
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'phipsi.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,k,m
       integer  next,nsave
       integer, allocatable :: ni(:)
@@ -825,12 +825,12 @@ c     are set as absolute values, not relative to the CB atom
 c
 c
       subroutine proside (resname,i,cai,ni,ci)
+      use sizes
+      use atoms
+      use phipsi
+      use resdue
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'phipsi.i'
-      include 'resdue.i'
-      include 'sequen.i'
       integer i,k
       integer cai,ni,ci
       integer ntprocd
@@ -1333,20 +1333,20 @@ c     pack multiple polypeptide chains
 c
 c
       subroutine pauling
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use group
+      use inform
+      use katoms
+      use molcul
+      use output
+      use potent
+      use restrn
+      use rigid
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'katoms.i'
-      include 'kgeoms.i'
-      include 'molcul.i'
-      include 'output.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'usage.i'
       integer i,j,k,nvar
       real*8 minimum,grdmin
       real*8 pauling1
@@ -1354,12 +1354,10 @@ c
       external pauling1,optsave
 c
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
-      if (associated(iuse))  deallocate (iuse)
-      if (associated(use))  deallocate (use)
-      allocate (iuse(n))
-      allocate (use(0:n))
+      if (.not. allocated(iuse))  allocate (iuse(n))
+      if (.not. allocated(use))  allocate (use(0:n))
 c
 c     set all atoms to be active during energy evaluations
 c
@@ -1385,10 +1383,21 @@ c
       width = 1.5d0
       use_wall = .false.
 c
-c     assign each chain to a separate molecule-based group
+c     enable use of groups based on number of molecules
 c
       use_group = .true.
       ngrp = nmol
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(kgrp))  allocate (kgrp(n))
+      if (.not. allocated(grplist))  allocate (grplist(n))
+      if (.not. allocated(igrp))  allocate (igrp(2,0:ngrp))
+      if (.not. allocated(grpmass))  allocate (grpmass(0:ngrp))
+      if (.not. allocated(wgrp))  allocate (wgrp(0:ngrp,0:ngrp))
+c
+c     assign each chain to a separate molecule-based group
+c
       do i = 1, ngrp
          igrp(1,i) = imol(1,i)
          igrp(2,i) = imol(2,i)
@@ -1513,11 +1522,11 @@ c     optimization of rigid bodies
 c
 c
       function pauling1 (xx,g)
+      use sizes
+      use group
+      use math
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'rigid.i'
       integer i,j,nvar
       real*8 pauling1,e
       real*8 xx(*)

@@ -17,12 +17,12 @@ c     calculation and reads in many of the user selectable options
 c
 c
       subroutine mechanic
+      use inform
+      use iounit
+      use limits
+      use potent
+      use vdwpot
       implicit none
-      include 'cutoff.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'potent.i'
-      include 'vdwpot.i'
 c
 c
 c     set the bonded connectivity lists and active atoms

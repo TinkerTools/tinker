@@ -19,11 +19,11 @@ c     evaluations while the diagonal needs just two evaluations
 c
 c
       subroutine hessrot (mode,hrot)
+      use sizes
+      use omega
+      use math
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'omega.i'
-      include 'math.i'
-      include 'zcoord.i'
       integer i,j,line
       real*8 e,eps
       real*8, allocatable :: g(:)

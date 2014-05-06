@@ -18,18 +18,18 @@ c     user requested termination of an optimization
 c
 c
       subroutine optsave (ncycle,f,xx)
+      use sizes
+      use atoms
+      use files
+      use iounit
+      use math
+      use omega
+      use output
+      use scales
+      use socket
+      use usage
+      use zcoord
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'omega.i'
-      include 'output.i'
-      include 'scales.i'
-      include 'socket.i'
-      include 'usage.i'
-      include 'zcoord.i'
       integer i,iopt,iend
       integer ncycle,nvar
       integer lext,freeunit

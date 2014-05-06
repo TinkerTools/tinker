@@ -17,19 +17,19 @@ c     interactions and processes new or changed parameter values
 c
 c
       subroutine kangang
+      use sizes
+      use angang
+      use angbnd
+      use atmlst
+      use atomid
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use kanang
+      use keys
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'angang.i'
-      include 'angle.i'
-      include 'atmlst.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kanang.i'
-      include 'keys.i'
-      include 'potent.i'
       integer i,j,k,m,next
       integer it,ia,ic
       integer nang,jang,kang
@@ -72,6 +72,11 @@ c
             end do
          end if
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iaa))  allocate (iaa(2,maxtors))
+      if (.not. allocated(kaa))  allocate (kaa(maxtors))
 c
 c     assign the angle-angle parameters for each angle pair
 c

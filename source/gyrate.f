@@ -17,10 +17,10 @@ c     from its atomic coordinates; only active atoms are included
 c
 c
       subroutine gyrate (rg)
+      use sizes
+      use atoms
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'usage.i'
       integer i,k
       real*8 rg,xc,yc,zc
 c

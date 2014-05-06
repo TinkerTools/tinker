@@ -48,8 +48,8 @@ c     #########################
 c
 c
       subroutine cffti1 (n,wa,ifac)
+      use math
       implicit none
-      include 'math.i'
       integer i,j,ii,n,ip,ipm
       integer ib,ido,idot
       integer i1,k1,l1,l2,ld

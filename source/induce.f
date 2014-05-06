@@ -21,17 +21,17 @@ c     on full system, use of active or inactive atoms is ignored
 c
 c
       subroutine induce
+      use sizes
+      use inform
+      use iounit
+      use limits
+      use mpole
+      use polar
+      use potent
+      use solute
+      use units
+      use uprior
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'units.i'
-      include 'uprior.i'
       integer i,j,k
       real*8 norm
       logical header
@@ -173,18 +173,18 @@ c     sites using a preconditioned conjugate gradient solver
 c
 c
       subroutine induce0a
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use limits
+      use mpole
+      use polar
+      use polpot
+      use potent
+      use units
+      use uprior
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'uprior.i'
       integer i,j,k,iter
       integer maxiter
       real*8 polmin
@@ -473,18 +473,18 @@ c     permanent multipole moments via a double loop
 c
 c
       subroutine dfield0a (field,fieldp)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use couple
+      use group
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
       integer i,j,k,m
       integer ii,kk
       real*8 xr,yr,zr
@@ -804,17 +804,17 @@ c     induced dipole moments via a double loop
 c
 c
       subroutine ufield0a (field,fieldp)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use group
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
       integer i,j,k,m
       integer ii,kk
       real*8 xr,yr,zr
@@ -1060,18 +1060,18 @@ c     permanent multipole moments via a pair list
 c
 c
       subroutine dfield0b (field,fieldp)
+      use sizes
+      use atoms
+      use bound
+      use couple
+      use group
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
       integer i,j,k
       integer ii,kk,kkk
       real*8 xr,yr,zr
@@ -1260,17 +1260,17 @@ c     induced dipole moments via a pair list
 c
 c
       subroutine ufield0b (field,fieldp)
+      use sizes
+      use atoms
+      use bound
+      use group
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
       integer i,j,k
       integer ii,kk,kkk
       real*8 xr,yr,zr
@@ -1418,15 +1418,15 @@ c     permanent multipole moments via Ewald summation
 c
 c
       subroutine dfield0c (field,fieldp)
+      use sizes
+      use atoms
+      use boxes
+      use ewald
+      use limits
+      use math
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,j,ii
       real*8 term
       real*8 ucell(3)
@@ -1506,15 +1506,15 @@ c     induced dipole moments via Ewald summation
 c
 c
       subroutine ufield0c (field,fieldp)
+      use sizes
+      use atoms
+      use boxes
+      use ewald
+      use limits
+      use math
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'cutoff.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,j
       real*8 term
       real*8 ucell(3)
@@ -1591,14 +1591,14 @@ c     permanent atomic multipole moments to the field
 c
 c
       subroutine udirect1 (field)
+      use sizes
+      use bound
+      use boxes
+      use ewald
+      use math
+      use mpole
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'pme.i'
       integer i,j,k,ntot
       integer k1,k2,k3
       integer m1,m2,m3
@@ -1756,21 +1756,21 @@ c     atomic multipole moments to the field via a double loop
 c
 c
       subroutine udirect2a (field,fieldp)
+      use sizes
+      use atoms
+      use boxes
+      use bound
+      use cell
+      use couple
+      use ewald
+      use math
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'units.i'
       integer i,j,k,m
       integer ii,kk
       real*8 xr,yr,zr,r,r2
@@ -2226,23 +2226,23 @@ c     atomic multipole moments to the field via a neighbor list
 c
 c
       subroutine udirect2b (field,fieldp)
+      use sizes
+      use atoms
+      use boxes
+      use bound
+      use couple
+      use ewald
+      use math
+      use mpole
+      use neigh
+      use openmp
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use tarray
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'openmp.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'tarray.i'
-      include 'units.i'
       integer i,j,k,m
       integer ii,kk,kkk
       integer nlocal,maxlocal
@@ -2608,14 +2608,14 @@ c     induced atomic dipole moments to the field
 c
 c
       subroutine umutual1 (field,fieldp)
+      use sizes
+      use boxes
+      use ewald
+      use math
+      use mpole
+      use pme
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'boxes.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'pme.i'
-      include 'polar.i'
       integer i,j,k
       real*8 term
       real*8 a(3,3)
@@ -2734,21 +2734,21 @@ c     atomic dipole moments to the field via a double loop
 c
 c
       subroutine umutual2a (field,fieldp)
+      use sizes
+      use atoms
+      use boxes
+      use bound
+      use cell
+      use couple
+      use ewald
+      use math
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'ewald.i'
-      include 'math.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'units.i'
       integer i,j,k,m
       integer ii,kk
       real*8 xr,yr,zr,r,r2
@@ -3063,11 +3063,11 @@ c     atomic dipole moments to the field via a neighbor list
 c
 c
       subroutine umutual2b (field,fieldp)
+      use sizes
+      use mpole
+      use polar
+      use tarray
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'tarray.i'
       integer i,j,k,m
       real*8 fimd(3),fkmd(3)
       real*8 fimp(3),fkmp(3)
@@ -3176,17 +3176,17 @@ c     sites for generalized Kirkwood SCRF and vacuum environments
 c
 c
       subroutine induce0d
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use mpole
+      use polar
+      use polpot
+      use potent
+      use units
+      use uprior
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'uprior.i'
       integer i,j,k,iter
       integer maxiter
       real*8 polmin
@@ -3544,18 +3544,18 @@ c     Kirkwood implicit solvation
 c
 c
       subroutine dfield0d (field,fieldp,fields,fieldps)
+      use sizes
+      use atoms
+      use couple
+      use gkstuf
+      use group
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'gkstuf.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'solute.i'
       integer i,j,k,ii,kk
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -4038,17 +4038,17 @@ c     implicit solvation
 c
 c
       subroutine ufield0d (field,fieldp,fields,fieldps)
+      use sizes
+      use atoms
+      use gkstuf
+      use group
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'gkstuf.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'solute.i'
       integer i,j,k,ii,kk
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -4222,7 +4222,7 @@ c
                            expdamp = exp(damp)
                            scale3 = scale3 * (1.0d0-expdamp)
                            scale5 = scale5 * (1.0d0-(1.0d0-damp)
-     &                                           *expdamp)       
+     &                                           *expdamp)
                         end if
                      end if
                      rr3 = scale3 / (r*r2)
@@ -4378,17 +4378,17 @@ c     sites for Poisson-Boltzmann SCRF and vacuum environments
 c
 c
       subroutine induce0e
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use mpole
+      use polar
+      use polpot
+      use potent
+      use units
+      use uprior
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'uprior.i'
       integer i,j,k,iter
       integer maxiter
       real*8 polmin
@@ -4745,18 +4745,18 @@ c     permanent multipole moments for use with in Poisson-Boltzmann
 c
 c
       subroutine dfield0e (field,fieldp,fields,fieldps)
+      use sizes
+      use atoms
+      use couple
+      use group
+      use mpole
+      use pbstuf
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'pbstuf.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'solute.i'
       integer i,j,k,ii,kk
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -4988,17 +4988,17 @@ c     induced dipole moments via a Poisson-Boltzmann solver
 c
 c
       subroutine ufield0e (field,fieldp,fields,fieldps)
+      use sizes
+      use atoms
+      use group
+      use mpole
+      use pbstuf
+      use polar
+      use polgrp
+      use polpot
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'mpole.i'
-      include 'pbstuf.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'shunt.i'
-      include 'solute.i'
       integer i,j,k,ii,kk
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -5258,10 +5258,10 @@ c     Journal of Chemical Physics, 123, 164107 (2005)
 c
 c
       subroutine ulspred
+      use sizes
+      use mpole
+      use uprior
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
-      include 'uprior.i'
       integer i,j,k,m
       real*8 coeff,udk,upk
       real*8 amax,apmax
@@ -5370,15 +5370,15 @@ c     gradient induced dipole solver using a double loop
 c
 c
       subroutine uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+      use sizes
+      use atoms
+      use limits
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use usolve
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'usolve.i'
       integer i,j,k,m
       integer ii,kk
       real*8 xi,yi,zi
@@ -5575,15 +5575,15 @@ c     gradient induced dipole solver using a neighbor pair list
 c
 c
       subroutine uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+      use sizes
+      use atoms
+      use mpole
+      use neigh
+      use polar
+      use polgrp
+      use polpot
+      use usolve
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
-      include 'neigh.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'usolve.i'
       integer i,j,k,m
       integer ii,kk,kkk
       real*8 xi,yi,zi

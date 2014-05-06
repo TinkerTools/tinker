@@ -17,16 +17,33 @@ c     of the current structure into corresponding reference areas
 c
 c
       subroutine makeref (iref)
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use refer
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'refer.i'
-      include 'titles.i'
       integer i,j,iref
+      logical first
+      save first
+      data first  / .true. /
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(reftyp))  allocate (reftyp(maxatm,maxref))
+         if (.not. allocated(n12ref))  allocate (n12ref(maxatm,maxref))
+         if (.not. allocated(i12ref))
+     &      allocate (i12ref(maxval,maxatm,maxref))
+         if (.not. allocated(xref))  allocate (xref(maxatm,maxref))
+         if (.not. allocated(yref))  allocate (yref(maxatm,maxref))
+         if (.not. allocated(zref))  allocate (zref(maxatm,maxref))
+         if (.not. allocated(refnam))  allocate (refnam(maxatm,maxref))
+      end if
 c
 c     copy the filename and title line for the structure
 c

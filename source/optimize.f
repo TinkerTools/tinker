@@ -17,15 +17,15 @@ c     space using an optimally conditioned variable metric method
 c
 c
       program optimize
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
+      use keys
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,j,imin,nvar
       integer next,freeunit
       real*8 minimum,optimiz1
@@ -246,11 +246,11 @@ c     in Cartesian coordinate space
 c
 c
       function optimiz1 (xx,g)
+      use sizes
+      use atoms
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,nvar
       real*8 optimiz1,e
       real*8 energy,eps

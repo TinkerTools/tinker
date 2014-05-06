@@ -17,15 +17,15 @@ c     energy terms and sums up to form the total energy
 c
 c
       function energy ()
+      use sizes
+      use bound
+      use energi
+      use iounit
+      use limits
+      use potent
+      use rigid
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'iounit.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'vdwpot.i'
       real*8 energy
       real*8 cutoff
 c

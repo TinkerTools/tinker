@@ -17,18 +17,18 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine ebuck3
+      use sizes
+      use analyz
+      use atoms
+      use energi
+      use inform
+      use iounit
+      use limits
+      use vdwpot
+      use warp
       implicit none
       integer i
       real*8 elrc,aelrc
-      include 'sizes.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'vdwpot.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -79,25 +79,25 @@ c     a pairwise double loop
 c
 c
       subroutine ebuck3a
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -479,27 +479,27 @@ c     the method of lights
 c
 c
       subroutine ebuck3b
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use light
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -812,25 +812,25 @@ c     neighbor list
 c
 c
       subroutine ebuck3c
+      use sizes
+      use action
+      use analyz
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use energi
+      use group
+      use inform
+      use inter
+      use iounit
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -1060,9 +1060,9 @@ c     via a Gaussian approximation for potential energy smoothing
 c
 c
       subroutine ebuck3d
+      use math
+      use vdwpot
       implicit none
-      include 'math.i'
-      include 'vdwpot.i'
 c
 c
 c     set coefficients for a two-Gaussian fit to MM2 vdw form

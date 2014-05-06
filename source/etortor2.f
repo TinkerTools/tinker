@@ -17,18 +17,18 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine etortor2 (i)
+      use sizes
+      use atoms
+      use bitor
+      use bound
+      use group
+      use hessn
+      use ktrtor
+      use math
+      use torpot
+      use tortor
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'ktrtor.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tortor.i'
-      include 'units.i'
       integer i,j,k,itortor
       integer pos1,pos2
       integer ia,ib,ic,id,ie

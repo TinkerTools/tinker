@@ -18,9 +18,9 @@ c     via a one-sided or two-sided numerical differentiation
 c
 c
       subroutine numgrad (fvalue,g,eps)
+      use sizes
+      use atoms
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
       integer i
       real*8 fvalue,eps
       real*8 f,f0,old

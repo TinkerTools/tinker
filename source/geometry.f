@@ -17,10 +17,10 @@ c     or dihedral angle defined by two to four input atoms
 c
 c
       function geometry (ia,ib,ic,id)
+      use sizes
+      use atoms
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'math.i'
       integer ia,ib,ic,id
       real*8 xab,yab,zab
       real*8 xba,yba,zba

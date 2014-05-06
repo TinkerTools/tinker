@@ -17,12 +17,12 @@ c     values from an external keyword file
 c
 c
       subroutine unitcell
+      use sizes
+      use bound
+      use boxes
+      use iounit
+      use keys
       implicit none
-      include 'sizes.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'keys.i'
       integer i,next
       real*8 boxmax
       logical nosymm

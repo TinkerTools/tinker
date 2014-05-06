@@ -17,10 +17,10 @@ c     charge-charge interaction energy for a single atom
 c
 c
       subroutine echarge2 (i)
+      use sizes
+      use limits
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'warp.i'
       integer i
 c
 c
@@ -49,17 +49,17 @@ c     interaction energy for a single atom using a pairwise double loop
 c
 c
       subroutine echarge2a (i)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use group
+      use hessn
+      use shunt
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'shunt.i'
       integer i,j,k,kk
       integer in,kn,jcell
       real*8 e,de,d2e
@@ -346,19 +346,19 @@ c     contribution to the Hessian calculation
 c
 c
       subroutine echarge2b (i)
+      use sizes
+      use atoms
+      use bound
+      use cell
+      use charge
+      use chgpot
+      use couple
+      use ewald
+      use group
+      use hessn
+      use limits
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'ewald.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'math.i'
       integer i,j,k,kk
       integer in,kn,jcell
       real*8 fi,fik,fgrp
@@ -584,16 +584,16 @@ c     smoothing methods
 c
 c
       subroutine echarge2c (i)
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use couple
+      use group
+      use hessn
+      use math
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'math.i'
-      include 'warp.i'
       integer i,j,k,kk
       integer in,kn
       real*8 fi,fik,fgrp

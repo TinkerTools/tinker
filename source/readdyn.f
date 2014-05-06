@@ -17,16 +17,16 @@ c     for a molecular dynamics restart from an external disk file
 c
 c
       subroutine readdyn (idyn)
+      use sizes
+      use atoms
+      use boxes
+      use files
+      use group
+      use iounit
+      use mdstuf
+      use moldyn
+      use rgddyn
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'files.i'
-      include 'group.i'
-      include 'iounit.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'rgddyn.i'
       integer i,idyn,ndyn
       logical exist,opened,quit
       character*120 dynfile

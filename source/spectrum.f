@@ -17,11 +17,11 @@ c     from the velocity autocorrelation as a function of time
 c
 c
       program spectrum
+      use files
+      use iounit
+      use math
+      use units
       implicit none
-      include 'files.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'units.i'
       integer maxvel,maxfreq
       parameter (maxvel=100000)
       parameter (maxfreq=5000)

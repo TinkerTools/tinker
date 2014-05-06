@@ -17,9 +17,9 @@ c     the atomic multipole electrostatic models used in TINKER
 c
 c
       program poledit
+      use iounit
+      use potent
       implicit none
-      include 'iounit.i'
-      include 'potent.i'
       integer mode
       logical exist,query
       character*120 string
@@ -105,14 +105,14 @@ c     GDMA 2.2.04 released by Anthony Stone in Fall 2008
 c
 c
       subroutine readgdma
+      use sizes
+      use atomid
+      use atoms
+      use dma
+      use iounit
+      use mpole
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'dma.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'units.i'
       integer i,j,k
       integer idma,next
       integer freeunit
@@ -123,6 +123,18 @@ c
       character*120 record
       character*120 dmafile
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(mp))  allocate (mp(maxatm))
+      if (.not. allocated(dpx))  allocate (dpx(maxatm))
+      if (.not. allocated(dpy))  allocate (dpy(maxatm))
+      if (.not. allocated(dpz))  allocate (dpz(maxatm))
+      if (.not. allocated(q20))  allocate (q20(maxatm))
+      if (.not. allocated(q21c))  allocate (q21c(maxatm))
+      if (.not. allocated(q21s))  allocate (q21s(maxatm))
+      if (.not. allocated(q22c))  allocate (q22c(maxatm))
+      if (.not. allocated(q22s))  allocate (q22s(maxatm))
 c
 c     zero out the atomic coordinates and DMA values
 c
@@ -343,9 +355,9 @@ c     on a line of output from Stone's GDMA program
 c
 c
       subroutine match1 (i,record)
+      use sizes
+      use dma
       implicit none
-      include 'sizes.i'
-      include 'dma.i'
       integer i
       character*120 record
 c
@@ -398,9 +410,9 @@ c     on a line of output from Stone's GDMA program
 c
 c
       subroutine match2 (i,record)
+      use sizes
+      use dma
       implicit none
-      include 'sizes.i'
-      include 'dma.i'
       integer i
       character*120 record
 c
@@ -445,9 +457,9 @@ c     on a line of output from Stone's GDMA program
 c
 c
       subroutine match3 (i,record)
+      use sizes
+      use dma
       implicit none
-      include 'sizes.i'
-      include 'dma.i'
       integer i
       character*120 record
 c
@@ -455,7 +467,7 @@ c
 c     store third multipole component on a line of GDMA output
 c
       if (record(52:54) .eq. 'Q2 ') then
-         read (record(59:69),*)  q20(i)         
+         read (record(59:69),*)  q20(i)
       else if (record(58:61) .eq. 'Q11s') then
          read (record(64:74),*)  dpy(i)
       else if (record(58:61) .eq. 'Q21s') then
@@ -482,14 +494,14 @@ c     from a GDMA output file
 c
 c
       subroutine molsetup
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use mpole
+      use polar
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'mpole.i'
-      include 'polar.i'
       integer i,j,ixyz
       integer atmnum,size
       integer freeunit
@@ -650,13 +662,13 @@ c     multipole site using high priority connected atoms along axes
 c
 c
       subroutine setframe
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'mpole.i'
       integer i,j,k,m,kb
       integer ia,ib,ic,id
       integer kab,kac,kad
@@ -962,10 +974,10 @@ c     priority then a zero is returned
 c
 c
       function priority (i,ia,ib)
+      use sizes
+      use atomid
+      use couple
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'couple.i'
       integer i,k,m
       integer ia,ib
       integer ka,kb
@@ -1043,13 +1055,13 @@ c     into the local coordinate frame defined at each atomic site
 c
 c
       subroutine rotframe
+      use sizes
+      use atomid
+      use atoms
+      use iounit
+      use mpole
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'units.i'
       integer i,j,ii
       integer ixaxe
       integer iyaxe
@@ -1147,18 +1159,18 @@ c     definition for specified atoms
 c
 c
       subroutine fixframe
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use files
+      use keys
+      use kpolr
+      use iounit
+      use mpole
+      use polar
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'keys.i'
-      include 'kpolr.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'units.i'
       integer i,j,k,ii
       integer ia,ib,ic
       integer ixaxe
@@ -1386,16 +1398,16 @@ c     parameters and allows user alteration of these values
 c
 c
       subroutine setpolar
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use kpolr
+      use mpole
+      use polar
+      use polgrp
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'kpolr.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
       integer i,j,k,ii
       integer ia,ib
       real*8 pol,thl
@@ -1554,14 +1566,14 @@ c     in the presence of intergroup (intramolecular) polarization
 c
 c
       subroutine alterpol
+      use sizes
+      use atomid
+      use atoms
+      use iounit
+      use mpole
+      use polar
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'units.i'
       integer i,j,ii
       integer ixaxe
       integer iyaxe
@@ -1669,14 +1681,14 @@ c     moments for use during removal of intergroup polarization
 c
 c
       subroutine interpol
+      use sizes
+      use atoms
+      use iounit
+      use mpole
+      use polar
+      use polpot
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polpot.i'
-      include 'units.i'
       integer i,j,k,iter
       integer maxiter
       real*8 eps,epsold
@@ -1849,13 +1861,13 @@ c     multipole moments
 c
 c
       subroutine dfieldi (field,pscale)
+      use sizes
+      use atoms
+      use mpole
+      use polar
+      use polgrp
+      use polpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
       integer i,j,k,ii,kk
       real*8 r,r2,xr,yr,zr
       real*8 rr3,rr5,rr7
@@ -1994,13 +2006,13 @@ c     induced dipole moments
 c
 c
       subroutine ufieldi (field,pscale)
+      use sizes
+      use atoms
+      use mpole
+      use polar
+      use polgrp
+      use polpot
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
       integer i,j,k,ii,kk
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
@@ -2100,14 +2112,14 @@ c     an integer net charge and traceless quadrupoles
 c
 c
       subroutine fixpolar
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use iounit
+      use mpole
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'units.i'
       integer i,j,k,m
       integer ii,kk
       integer ixaxe
@@ -2331,16 +2343,16 @@ c     multipole analysis or removal of intramolecular polarization
 c
 c
       subroutine prtpolar
+      use sizes
+      use atoms
+      use atomid
+      use files
+      use keys
+      use kpolr
+      use mpole
+      use polar
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'files.i'
-      include 'keys.i'
-      include 'kpolr.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'units.i'
       integer i,j,k,it
       integer ikey,size
       integer ixaxe

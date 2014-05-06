@@ -17,11 +17,11 @@ c     transform (FFTW) or three separate 1-D transforms (FFTPACK)
 c
 c
       subroutine fftsetup
+      use sizes
+      use fft
+      use openmp
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'fft.i'
-      include 'openmp.i'
-      include 'pme.i'
 !$    integer ifront,iback
 !$    integer error,iguess
 c
@@ -65,10 +65,10 @@ c     3-D transform or three separate 1-D transforms
 c
 c
       subroutine fftfront
+      use sizes
+      use fft
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'fft.i'
-      include 'pme.i'
       integer i,j,k
       real*8, allocatable :: work(:,:)
 c
@@ -139,10 +139,10 @@ c     3-D transform or three separate 1-D transforms
 c
 c
       subroutine fftback
+      use sizes
+      use fft
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'fft.i'
-      include 'pme.i'
       integer i,j,k
       real*8, allocatable :: work(:,:)
 c

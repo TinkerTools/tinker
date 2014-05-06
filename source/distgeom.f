@@ -21,22 +21,22 @@ c     the triangle smoothed bounds matrix prior to embedding
 c
 c
       program distgeom
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use disgeo
+      use files
+      use inform
+      use iounit
+      use kvdws
+      use math
+      use refer
+      use restrn
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'couple.i'
-      include 'disgeo.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'kgeoms.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'refer.i'
-      include 'tors.i'
       integer i,j,k,ja,kb
       integer ia,ib,ic,id
       integer swap,lext
@@ -93,11 +93,9 @@ c     store the input structure for later comparison
 c
       call makeref (1)
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
-      if (associated(bnd))  deallocate (bnd)
-      if (associated(georad))  deallocate (georad)
-      allocate (bnd(n,n))
+      allocate (dbnd(n,n))
       allocate (georad(n))
 c
 c     assign approximate radii based on the atom names
@@ -378,18 +376,18 @@ c
 c     initialize the upper and lower bounds matrix
 c
       do i = 1, n
-         bnd(i,i) = 0.0d0
+         dbnd(i,i) = 0.0d0
       end do
       uppermax = 1000000.0d0
       do i = 1, n
          do j = 1, i-1
-            bnd(j,i) = uppermax
+            dbnd(j,i) = uppermax
          end do
       end do
       do i = 1, n-1
          radi = georad(i)
          do j = i+1, n
-            bnd(j,i) = radi + georad(j)
+            dbnd(j,i) = radi + georad(j)
          end do
       end do
 c
@@ -405,11 +403,11 @@ c     bndfac = 0.01d0
          bndmin = (1.0d0 - bndfac) * rab
          bndmax = (1.0d0 + bndfac) * rab
          if (ia .gt. ib) then
-            bnd(ia,ib) = bndmin
-            bnd(ib,ia) = bndmax
+            dbnd(ia,ib) = bndmin
+            dbnd(ib,ia) = bndmax
          else
-            bnd(ia,ib) = bndmax
-            bnd(ib,ia) = bndmin
+            dbnd(ia,ib) = bndmax
+            dbnd(ib,ia) = bndmin
          end if
       end do
 c
@@ -430,20 +428,20 @@ c     angfac = 0.01d0
          angle = acos((rab**2+rbc**2-rac**2) / (2.0d0*rab*rbc))
          cosmin = cos(angle*(1.0d0-angfac))
          cosmax = cos(min(pi,angle*(1.0d0+angfac)))
-         qab = min(bnd(ia,ib),bnd(ib,ia))
-         qbc = min(bnd(ic,ib),bnd(ib,ic))
+         qab = min(dbnd(ia,ib),dbnd(ib,ia))
+         qbc = min(dbnd(ic,ib),dbnd(ib,ic))
          bndmin = qab**2 + qbc**2 - 2.0d0*qab*qbc*cosmin
          bndmin = sqrt(max(0.0d0,bndmin))
-         qab = max(bnd(ia,ib),bnd(ib,ia))
-         qbc = max(bnd(ic,ib),bnd(ib,ic))
+         qab = max(dbnd(ia,ib),dbnd(ib,ia))
+         qbc = max(dbnd(ic,ib),dbnd(ib,ic))
          bndmax = qab**2 + qbc**2 - 2.0d0*qab*qbc*cosmax
          bndmax = sqrt(max(0.0d0,bndmax))
          if (ia .gt. ic) then
-            bnd(ia,ic) = bndmin
-            bnd(ic,ia) = bndmax
+            dbnd(ia,ic) = bndmin
+            dbnd(ic,ia) = bndmax
          else
-            bnd(ia,ic) = bndmax
-            bnd(ic,ia) = bndmin
+            dbnd(ia,ic) = bndmax
+            dbnd(ic,ia) = bndmin
          end if
       end do
 c
@@ -484,11 +482,11 @@ c
             end if
          end do
   230    continue
-         qab = min(bnd(ia,ib),bnd(ib,ia))
-         qbc = min(bnd(ib,ic),bnd(ic,ib))
-         qcd = min(bnd(ic,id),bnd(id,ic))
-         qac = min(bnd(ia,ic),bnd(ic,ia))
-         qbd = min(bnd(ib,id),bnd(id,ib))
+         qab = min(dbnd(ia,ib),dbnd(ib,ia))
+         qbc = min(dbnd(ib,ic),dbnd(ic,ib))
+         qcd = min(dbnd(ic,id),dbnd(id,ic))
+         qac = min(dbnd(ia,ic),dbnd(ic,ia))
+         qbd = min(dbnd(ib,id),dbnd(id,ib))
          cosabc = (qab**2+qbc**2-qac**2)/(2.0d0*qab*qbc)
          sinabc = sqrt(max(0.0d0,1.0d0-cosabc**2))
          cosbcd = (qbc**2+qcd**2-qbd**2)/(2.0d0*qbc*qcd)
@@ -498,11 +496,11 @@ c
      &               - 2.0d0*qab*qcd*sinabc*sinbcd*cosmin
      &               - 2.0d0*qbc*(qab*cosabc+qcd*cosbcd)
          bndmin = sqrt(max(0.0d0,bndmin))
-         qab = max(bnd(ia,ib),bnd(ib,ia))
-         qbc = max(bnd(ib,ic),bnd(ic,ib))
-         qcd = max(bnd(ic,id),bnd(id,ic))
-         qac = max(bnd(ia,ic),bnd(ic,ia))
-         qbd = max(bnd(ib,id),bnd(id,ib))
+         qab = max(dbnd(ia,ib),dbnd(ib,ia))
+         qbc = max(dbnd(ib,ic),dbnd(ic,ib))
+         qcd = max(dbnd(ic,id),dbnd(id,ic))
+         qac = max(dbnd(ia,ic),dbnd(ic,ia))
+         qbd = max(dbnd(ib,id),dbnd(id,ib))
          cosabc = (qab**2+qbc**2-qac**2)/(2.0d0*qab*qbc)
          sinabc = sqrt(max(0.0d0,1.0d0-cosabc**2))
          cosbcd = (qbc**2+qcd**2-qbd**2)/(2.0d0*qbc*qcd)
@@ -513,11 +511,11 @@ c
      &               - 2.0d0*qbc*(qab*cosabc+qcd*cosbcd)
          bndmax = sqrt(max(0.0d0,bndmax))
          if (ia .gt. id) then
-            bnd(ia,id) = bndmin
-            bnd(id,ia) = bndmax
+            dbnd(ia,id) = bndmin
+            dbnd(id,ia) = bndmax
          else
-            bnd(ia,id) = bndmax
-            bnd(id,ia) = bndmin
+            dbnd(ia,id) = bndmax
+            dbnd(id,ia) = bndmin
          end if
       end do
 c
@@ -529,11 +527,11 @@ c
          bndmin = dfix(2,i)
          bndmax = dfix(3,i)
          if (ia .gt. ib) then
-            bnd(ia,ib) = bndmin
-            bnd(ib,ia) = bndmax
+            dbnd(ia,ib) = bndmin
+            dbnd(ib,ia) = bndmax
          else
-            bnd(ia,ib) = bndmax
-            bnd(ib,ia) = bndmin
+            dbnd(ia,ib) = bndmax
+            dbnd(ib,ia) = bndmin
          end if
       end do
 c
@@ -551,14 +549,14 @@ c
                   letter = name(k)(1:1)
                   if (letter.eq.'N' .or. letter.eq.'O') then
                      if (j .gt. i) then
-                        bnd(j,i) = min(hbond1,bnd(j,i))
+                        dbnd(j,i) = min(hbond1,dbnd(j,i))
                      else
-                        bnd(i,j) = min(hbond1,bnd(i,j))
+                        dbnd(i,j) = min(hbond1,dbnd(i,j))
                      end if
                      if (k .gt. i) then
-                        bnd(k,i) = min(hbond2,bnd(k,i))
+                        dbnd(k,i) = min(hbond2,dbnd(k,i))
                      else
-                        bnd(i,k) = min(hbond2,bnd(i,k))
+                        dbnd(i,k) = min(hbond2,dbnd(i,k))
                      end if
                   end if
                end if
@@ -570,7 +568,7 @@ c     use the triangle inequalities to smooth the bounds
 c
       if (verbose .and. n.le.130) then
          title = 'Input Distance Bounds :'
-         call grafic (n,bnd,title)
+         call grafic (n,dbnd,title)
       end if
       write (iout,240)
   240 format (/,' Bounds Smoothing via Triangle and Inverse',
@@ -603,7 +601,7 @@ c
             b1 = b2
             b2 = swap
          end if
-         write (iout,280)  bnd(b2,b1),bnd(b1,b2)
+         write (iout,280)  dbnd(b2,b1),dbnd(b1,b2)
   280    format (/,' Lower Bound :',f8.3,8x,'Upper Bound :',f8.3)
   290    continue
          write (iout,300)
@@ -612,8 +610,8 @@ c
   310    format (a120)
          read (record,*,err=320,end=320)  bndmin,bndmax
          if (bndmin .gt. bndmax)  goto 290
-         bnd(b2,b1) = bndmin
-         bnd(b1,b2) = bndmax
+         dbnd(b2,b1) = bndmin
+         dbnd(b1,b2) = bndmax
          call trifix (b1,b2)
   320    continue
       end do
@@ -622,7 +620,7 @@ c     display the smoothed upper and lower bounds matrix
 c
       if (verbose .and. n.le.130) then
          title = 'Triangle Smoothed Bounds :'
-         call grafic (n,bnd,title)
+         call grafic (n,dbnd,title)
       end if
 c
 c     find the largest value of an upper bound between atoms
@@ -630,7 +628,7 @@ c
       pathmax = 0.0d0
       do i = 1, n
          do j = 1, i-1
-            if (pathmax .lt. bnd(j,i))  pathmax = bnd(j,i)
+            if (pathmax .lt. dbnd(j,i))  pathmax = dbnd(j,i)
          end do
       end do
       write (iout,330)  pathmax
@@ -641,10 +639,10 @@ c
       quit = .false.
       do i = 1, n
          do j = 1, i-1
-            if (bnd(j,i) .ne. uppermax)  goto 350
+            if (dbnd(j,i) .ne. uppermax)  goto 350
          end do
          do j = i+1, n
-            if (bnd(i,j) .ne. uppermax)  goto 350
+            if (dbnd(i,j) .ne. uppermax)  goto 350
          end do
          quit = .true.
          write (iout,340)  i

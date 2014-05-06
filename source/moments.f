@@ -18,22 +18,22 @@ c     partial charges, bond dipoles and atomic multipole moments
 c
 c
       subroutine moments
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use charge
+      use dipole
+      use limits
+      use moment
+      use mpole
+      use polar
+      use potent
+      use rigid
+      use solute
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'charge.i'
-      include 'cutoff.i'
-      include 'dipole.i'
-      include 'moment.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'solute.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k
       real*8 weigh,qave
       real*8 xc,yc,zc
@@ -285,10 +285,10 @@ c     multipole moments
 c
 c
       subroutine momfull
+      use sizes
+      use atoms
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'usage.i'
       integer i
       logical, allocatable :: temp(:)
 c

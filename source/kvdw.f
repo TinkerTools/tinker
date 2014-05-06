@@ -18,23 +18,23 @@ c     values for these parameters
 c
 c
       subroutine kvdw
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use fields
+      use inform
+      use iounit
+      use keys
+      use khbond
+      use kvdws
+      use kvdwpr
+      use math
+      use merck
+      use potent
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'khbond.i'
-      include 'kvdws.i'
-      include 'kvdwpr.i'
-      include 'math.i'
-      include 'merck.i'
-      include 'potent.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,k,ia,ib
       integer next,size
       integer number
@@ -263,6 +263,25 @@ c
   200       continue
          end if
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ivdw))  allocate (ivdw(maxatm))
+      if (.not. allocated(jvdw))  allocate (jvdw(maxatm))
+      if (.not. allocated(ired))  allocate (ired(maxatm))
+      if (.not. allocated(kred))  allocate (kred(maxatm))
+      if (.not. allocated(radmin))
+     &   allocate (radmin(maxclass,maxclass))
+      if (.not. allocated(epsilon))
+     &   allocate (epsilon(maxclass,maxclass))
+      if (.not. allocated(radmin4))
+     &   allocate (radmin4(maxclass,maxclass))
+      if (.not. allocated(epsilon4))
+     &   allocate (epsilon4(maxclass,maxclass))
+      if (.not. allocated(radhbnd))
+     &   allocate (radhbnd(maxclass,maxclass))
+      if (.not. allocated(epshbnd))
+     &   allocate (epshbnd(maxclass,maxclass))
 c
 c     use atom class or type as index into vdw parameters
 c

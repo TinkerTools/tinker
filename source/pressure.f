@@ -18,13 +18,13 @@ c     via a barostat method
 c
 c
       subroutine pressure (dt,epot,ekin,temp,pres,stress)
+      use sizes
+      use bath
+      use boxes
+      use bound
+      use units
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'bath.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'units.i'
-      include 'virial.i'
       integer i,j
       real*8 dt,epot
       real*8 temp,pres
@@ -90,16 +90,16 @@ c     Raos, Dipartimento di Chimica, Politecnico di Milano, Italy
 c
 c
       subroutine pscale (dt,pres,stress)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use boxes
+      use group
+      use math
+      use mdstuf
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'boxes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'mdstuf.i'
-      include 'usage.i'
       integer i,j,k
       integer start,stop
       real*8 dt,pres
@@ -303,18 +303,18 @@ c     University, March 2013
 c
 c
       subroutine pmonte (epot,temp)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use boxes
+      use group
+      use math
+      use mdstuf
+      use molcul
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'boxes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'mdstuf.i'
-      include 'molcul.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,k
       integer start,stop
       real*8 epot,temp,term
@@ -431,7 +431,7 @@ c
                   end if
                end do
             end if
-c     
+c
 c     for anisotropic case alter lattice angles, then scale lengths
 c
          else
@@ -467,9 +467,9 @@ c
                   ascale(3,3) = scale
                end if
             end if
-c     
+c
 c     modify the current periodic box dimension values
-c     
+c
             temp3(1,1) = xbox
             temp3(2,1) = 0.0d0
             temp3(3,1) = 0.0d0
@@ -666,15 +666,15 @@ c     California, Berkeley, December 2010
 c
 c
       subroutine ptest
+      use sizes
+      use atoms
+      use bath
+      use bound
+      use boxes
+      use iounit
+      use units
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'iounit.i'
-      include 'units.i'
-      include 'virial.i'
       integer i
       real*8 energy,third
       real*8 delta,step,scale
@@ -761,7 +761,7 @@ c
       xbox = xboxold
       ybox = yboxold
       zbox = zboxold
-      call lattice   
+      call lattice
       do i = 1, n
          x(i) = xold(i)
          y(i) = yold(i)

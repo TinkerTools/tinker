@@ -18,14 +18,14 @@ c     finds the minimal list by choosing the side with fewer atoms
 c
 c
       subroutine rotlist (base,partner)
+      use sizes
+      use atoms
+      use couple
+      use iounit
+      use molcul
+      use rotbnd
+      use zclose
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'rotate.i'
-      include 'zclose.i'
       integer i,k,ia,ib,swap
       integer base,partner
       integer mark,test,nattach

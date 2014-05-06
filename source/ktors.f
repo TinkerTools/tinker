@@ -17,20 +17,20 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine ktors
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use fields
+      use inform
+      use iounit
+      use keys
+      use ktorsn
+      use math
+      use potent
+      use tors
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'fields.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'ktorsn.i'
-      include 'math.i'
-      include 'potent.i'
-      include 'tors.i'
-      include 'usage.i'
       integer i,j
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
@@ -195,6 +195,15 @@ c
             end if
          end if
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(tors1))  allocate (tors1(4,maxtors))
+      if (.not. allocated(tors2))  allocate (tors2(4,maxtors))
+      if (.not. allocated(tors3))  allocate (tors3(4,maxtors))
+      if (.not. allocated(tors4))  allocate (tors4(4,maxtors))
+      if (.not. allocated(tors5))  allocate (tors5(4,maxtors))
+      if (.not. allocated(tors6))  allocate (tors6(4,maxtors))
 c
 c     use special torsional parameter assignment method for MMFF
 c
@@ -560,16 +569,16 @@ c     616-641 (1995)
 c
 c
       subroutine ktorsm
+      use sizes
+      use atomid
+      use atoms
+      use ktorsn
+      use math
+      use merck
+      use potent
+      use ring
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'ktorsn.i'
-      include 'math.i'
-      include 'merck.i'
-      include 'potent.i'
-      include 'ring.i'
-      include 'tors.i'
       integer i,j,k,l,m,o
       integer size,tt
       integer ia,ib,ic,id

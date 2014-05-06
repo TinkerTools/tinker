@@ -18,14 +18,14 @@ c     performs any of several manipulations on an existing archive
 c
 c
       program archive
+      use sizes
+      use atoms
+      use bound
+      use files
+      use inform
+      use iounit
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'usage.i'
       integer i,j,k
       integer iarc,ixyz
       integer start,stop
@@ -420,17 +420,17 @@ c     all active atoms in the TINKER XYZ archive format
 c
 c
       subroutine prtarc (iarc)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use couple
+      use files
+      use inform
+      use titles
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'couple.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'titles.i'
-      include 'usage.i'
       integer i,k,iarc
       integer size,crdsiz
       real*8 crdmin,crdmax

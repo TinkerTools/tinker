@@ -18,11 +18,11 @@ c     evaluations
 c
 c
       subroutine hessrgd (hrigid)
+      use sizes
+      use atoms
+      use group
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'group.i'
-      include 'rigid.i'
       integer i,j,k,m,nvar
       real*8 e,eps,old
       real*8 hrigid(6*ngrp,*)

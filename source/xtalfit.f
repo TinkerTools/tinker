@@ -19,13 +19,13 @@ c     and monomer dipole moment data
 c
 c
       program xtalfit
+      use sizes
+      use files
+      use iounit
+      use molcul
+      use potent
+      use xtals
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'molcul.i'
-      include 'potent.i'
-      include 'xtals.i'
       integer i,ixtal
       integer atom1,atom2
       integer nresid,prmtyp
@@ -334,19 +334,19 @@ c     energy terms
 c
 c
       subroutine xtalprm (mode,ixtal,xx)
+      use sizes
+      use atoms
+      use atomid
+      use boxes
+      use charge
+      use dipole
+      use files
+      use fracs
+      use kvdws
+      use molcul
+      use vdw
+      use xtals
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'boxes.i'
-      include 'charge.i'
-      include 'dipole.i'
-      include 'files.i'
-      include 'fracs.i'
-      include 'kvdws.i'
-      include 'molcul.i'
-      include 'vdw.i'
-      include 'xtals.i'
       integer i,j,k
       integer ixtal,prmtyp
       integer atom1,atom2
@@ -354,9 +354,12 @@ c
       real*8 e0_lattices(maxref)
       real*8 moment_0s(maxref)
       real*8 xx(*)
+      logical first
       character*5 mode
       save e0_lattices
       save moment_0s
+      save first
+      data first  / .true. /
 c
 c
 c     save or restore the key values for the current crystal
@@ -370,7 +373,18 @@ c
          call bounds
       end if
 c
-c     get fractional coordinates of molecular centers of mass
+c     perform dynamic allocation of some global arrays
+c
+      if (mode .eq. 'RESET') then
+         if (first) then
+            first = .false.
+            allocate (xfrac(nmol))
+            allocate (yfrac(nmol))
+            allocate (zfrac(nmol))
+         end if
+      end if
+c
+c     coordinates of molecular centers of mass
 c
       if (mode .eq. 'RESET') then
          do i = 1, nmol
@@ -505,17 +519,17 @@ c     energy and monomer dipole moments
 c
 c
       subroutine xtalerr (nresid,nvaried,xx,resid)
+      use sizes
+      use atoms
+      use boxes
+      use bound
+      use charge
+      use dipole
+      use math
+      use molcul
+      use vdw
+      use xtals
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'charge.i'
-      include 'dipole.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'vdw.i'
-      include 'xtals.i'
       integer i,i1,i2,ixtal
       integer nresid,nvaried
       integer n_old,nvdw_old
@@ -688,13 +702,13 @@ c     crystal structure data
 c
 c
       subroutine xtalmove
+      use sizes
+      use atoms
+      use atomid
+      use boxes
+      use fracs
+      use molcul
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'fracs.i'
-      include 'molcul.i'
       integer i,j,k
       integer init,stop
       real*8 weigh
@@ -746,7 +760,7 @@ c
 c     convert fractional center of mass to Cartesian coordinates
 c
          xmid = xfrac(i)*xbox + yfrac(i)*ybox*gamma_cos
-     &               + zfrac(i)*zbox*beta_cos
+     &             + zfrac(i)*zbox*beta_cos
          ymid = yfrac(i)*ybox*gamma_sin + zfrac(i)*zbox*beta_term
          zmid = zfrac(i)*zbox*gamma_term
 c
@@ -769,11 +783,11 @@ c
       end
 c
 c
-c     ########################################################
-c     ##                                                    ##
-c     ##  subroutine xtalwrt  --  write current parameters  ##
-c     ##                                                    ##
-c     ########################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine xtalwrt  --  output optimization parameters  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "xtalwrt" is a utility that prints intermediate results
@@ -781,9 +795,9 @@ c     during fitting of force field parameters to crystal data
 c
 c
       subroutine xtalwrt (niter,xx,gs,nresid,f)
+      use iounit
+      use xtals
       implicit none
-      include 'iounit.i'
-      include 'xtals.i'
       integer i,niter
       integer nresid
       real*8 xx(*)

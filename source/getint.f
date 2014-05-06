@@ -17,12 +17,12 @@ c     the internal coordinates and computes Cartesian coordinates
 c
 c
       subroutine getint
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use output
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'output.i'
       integer izmt
       integer freeunit
       logical exist

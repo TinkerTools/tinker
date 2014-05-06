@@ -17,15 +17,15 @@ c     groups using an optimally conditioned variable metric method
 c
 c
       program optrigid
+      use sizes
+      use files
+      use group
+      use inform
+      use iounit
+      use keys
+      use output
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'output.i'
-      include 'rigid.i'
       integer i,j,imin,nvar
       integer next,freeunit
       real*8 minimum,optrigid1
@@ -231,11 +231,11 @@ c     optimization of rigid bodies
 c
 c
       function optrigid1 (xx,g)
+      use sizes
+      use group
+      use math
+      use rigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'math.i'
-      include 'rigid.i'
       integer i,j,nvar
       real*8 optrigid1,e
       real*8 xx(*)

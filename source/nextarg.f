@@ -17,8 +17,8 @@ c     and returns it in the input character string
 c
 c
       subroutine nextarg (string,exist)
+      use argue
       implicit none
-      include 'argue.i'
       integer i,length
       logical exist
       character*(*) string

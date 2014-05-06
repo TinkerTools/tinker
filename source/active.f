@@ -17,13 +17,13 @@ c     each potential energy function calculation
 c
 c
       subroutine active
+      use sizes
+      use atoms
+      use inform
+      use iounit
+      use keys
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'usage.i'
       integer i,j,next
       integer nmobile,nfixed
       integer center,nsphere
@@ -36,12 +36,10 @@ c
       character*120 string
 c
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
-      if (associated(iuse))  deallocate (iuse)
-      if (associated(use))  deallocate (use)
-      allocate (iuse(n))
-      allocate (use(0:n))
+      if (.not. allocated(iuse))  allocate (iuse(n))
+      if (.not. allocated(use))  allocate (use(0:n))
 c
 c     perform dynamic allocation of some local arrays
 c

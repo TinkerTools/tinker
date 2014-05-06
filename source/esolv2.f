@@ -21,11 +21,11 @@ c     for derivatives of Born radii with respect to coordinates
 c
 c
       subroutine esolv2 (i)
+      use sizes
+      use potent
+      use solute
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'warp.i'
       integer i
       real*8 probe
 c     real*8, allocatable :: aes(:)
@@ -75,14 +75,14 @@ c     Born energy term for the GB/SA solvation models
 c
 c
       subroutine egb2a (i)
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use hessn
+      use shunt
+      use solute
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'hessn.i'
-      include 'shunt.i'
-      include 'solute.i'
       integer i,j,k,kk
       real*8 e,de,d2e
       real*8 fi,fik
@@ -231,15 +231,15 @@ c     potential smoothing methods
 c
 c
       subroutine egb2b (i)
+      use sizes
+      use atoms
+      use charge
+      use chgpot
+      use hessn
+      use math
+      use solute
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chgpot.i'
-      include 'hessn.i'
-      include 'math.i'
-      include 'solute.i'
-      include 'warp.i'
       integer i,j,k,kk
       real*8 fi,fik,de,d2e
       real*8 xi,yi,zi

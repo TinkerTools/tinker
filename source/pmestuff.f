@@ -26,15 +26,25 @@ c     for PME atomic sites along the fractional coordinate axes
 c
 c
       subroutine bspline_fill
+      use sizes
+      use atoms
+      use boxes
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'pme.i'
       integer i,ifr
       real*8 xi,yi,zi
       real*8 w,fr,eps
+      logical first
+      save first
+      data first  / .true. /
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(igrid))  allocate (igrid(3,n))
+      end if
 c
 c     offset used to shift sites off exact lattice bounds
 c
@@ -81,10 +91,10 @@ c     a single PME atomic site along a particular direction
 c
 c
       subroutine bsplgen (w,thetai)
+      use sizes
+      use pme
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'pme.i'
-      include 'potent.i'
       integer i,j,k
       integer level
       real*8 w,denom
@@ -189,11 +199,11 @@ c     from each electrostatic site
 c
 c
       subroutine table_fill
+      use sizes
+      use atoms
+      use chunks
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chunks.i'
-      include 'pme.i'
       integer i,k
       integer cid(3)
       integer nearpt(3)
@@ -322,10 +332,10 @@ c     overlapped by the B-splines for an electrostatic site
 c
 c
       subroutine setchunk (i,cid,off1,off2,off3)
+      use sizes
+      use chunks
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'chunks.i'
-      include 'pme.i'
       integer i,k
       integer off1,off2,off3
       integer cid(3),temp(3)
@@ -360,12 +370,12 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine grid_pchg
+      use sizes
+      use atoms
+      use charge
+      use chunks
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'charge.i'
-      include 'chunks.i'
-      include 'pme.i'
       integer i,j,k,m
       integer ii,jj,kk
       integer ichk,isite,iatm
@@ -471,12 +481,12 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine grid_mpole (fmp)
+      use sizes
+      use atoms
+      use chunks
+      use mpole
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chunks.i'
-      include 'mpole.i'
-      include 'pme.i'
       integer i,j,k,m
       integer ii,jj,kk
       integer ichk,isite,iatm
@@ -597,12 +607,12 @@ c     particle mesh Ewald grid
 c
 c
       subroutine grid_uind (fuind,fuinp)
+      use sizes
+      use atoms
+      use chunks
+      use mpole
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'chunks.i'
-      include 'mpole.i'
-      include 'pme.i'
       integer i,j,k,m
       integer ii,jj,kk
       integer ichk,isite,iatm
@@ -770,10 +780,10 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine fphi_mpole (fphi)
+      use sizes
+      use mpole
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
-      include 'pme.i'
       integer i,j,k
       integer isite,iatm
       integer i0,j0,k0
@@ -871,9 +881,9 @@ c
                tu20 = tu20 + t2*u0
                tu11 = tu11 + t1*u1
                tu02 = tu02 + t0*u2
-               tu30 = tu30 + t3*u0 
-               tu21 = tu21 + t2*u1 
-               tu12 = tu12 + t1*u2 
+               tu30 = tu30 + t3*u0
+               tu21 = tu21 + t2*u1
+               tu12 = tu12 + t1*u2
                tu03 = tu03 + t0*u3
             end do
             tuv000 = tuv000 + tu00*v0
@@ -939,10 +949,10 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine fphi_uind (fdip_phi1,fdip_phi2,fdip_sum_phi)
+      use sizes
+      use mpole
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
-      include 'pme.i'
       integer i,j,k
       integer isite,iatm
       integer i0,j0,k0
@@ -1107,9 +1117,9 @@ c
                tu20 = tu20 + t2*u0
                tu11 = tu11 + t1*u1
                tu02 = tu02 + t0*u2
-               tu30 = tu30 + t3*u0 
-               tu21 = tu21 + t2*u1 
-               tu12 = tu12 + t1*u2 
+               tu30 = tu30 + t3*u0
+               tu21 = tu21 + t2*u1
+               tu12 = tu12 + t1*u2
                tu03 = tu03 + t0*u3
             end do
             tuv100_1 = tuv100_1 + tu10_1*v0
@@ -1211,9 +1221,9 @@ c     to fractional coordinates
 c
 c
       subroutine cmp_to_fmp (cmp,fmp)
+      use sizes
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
       integer i,j,k
       real*8 ctf(10,10)
       real*8 cmp(10,*)
@@ -1260,10 +1270,10 @@ c     order (m,dx,dy,dz,qxx,qyy,qzz,qxy,qxz,qyz)
 c
 c
       subroutine cart_to_frac (ctf)
+      use sizes
+      use boxes
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'boxes.i'
-      include 'pme.i'
       integer i,j,k,m
       integer i1,i2
       integer qi1(6)
@@ -1328,9 +1338,9 @@ c     fractional to Cartesian coordinates
 c
 c
       subroutine fphi_to_cphi (fphi,cphi)
+      use sizes
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'mpole.i'
       integer i,j,k
       real*8 ftc(10,10)
       real*8 cphi(10,*)
@@ -1377,10 +1387,10 @@ c     order (m,dx,dy,dz,qxx,qyy,qzz,qxy,qxz,qyz)
 c
 c
       subroutine frac_to_cart (ftc)
+      use sizes
+      use boxes
+      use pme
       implicit none
-      include 'sizes.i'
-      include 'boxes.i'
-      include 'pme.i'
       integer i,j,k,m
       integer i1,i2
       integer qi1(6)

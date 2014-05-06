@@ -18,10 +18,10 @@ c     separated by blank lines
 c
 c
       subroutine prtseq (iseq)
+      use sizes
+      use files
+      use sequen
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'sequen.i'
       integer i,k,iseq
       integer smax,smin
       integer size,start,stop

@@ -17,12 +17,12 @@ c     and then opens and reads the parameters
 c
 c
       subroutine getprm
+      use sizes
+      use files
+      use iounit
+      use keys
+      use params
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'params.i'
       integer i,iprm,next
       integer freeunit
       logical exist,useprm

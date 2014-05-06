@@ -17,12 +17,12 @@ c     the output style and information level provided by TINKER
 c
 c
       subroutine control
+      use sizes
+      use argue
+      use inform
+      use keys
+      use output
       implicit none
-      include 'sizes.i'
-      include 'argue.i'
-      include 'inform.i'
-      include 'keys.i'
-      include 'output.i'
       integer i,next
       logical exist
       character*20 keyword

@@ -36,13 +36,13 @@ c     are turned on for systems containing 100 atoms or fewer
 c
 c
       subroutine empole2 (i)
+      use sizes
+      use atoms
+      use deriv
+      use hessn
+      use mpole
+      use potent
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'deriv.i'
-      include 'hessn.i'
-      include 'mpole.i'
-      include 'potent.i'
       integer i,j,k
       integer nlist
       integer, allocatable :: list(:)
@@ -177,25 +177,25 @@ c     coordinates; used to get finite difference second derivatives
 c
 c
       subroutine empole2a (nlist,list,reinduce)
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use couple
+      use deriv
+      use group
+      use limits
+      use molcul
+      use mplpot
+      use mpole
+      use polar
+      use polgrp
+      use polpot
+      use potent
+      use shunt
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'chgpot.i'
-      include 'couple.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'group.i'
-      include 'molcul.i'
-      include 'mplpot.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'polpot.i'
-      include 'potent.i'
-      include 'shunt.i'
-      include 'usage.i'
       integer i,j,k,nlist
       integer ii,iii,kk
       integer ix,iy,iz

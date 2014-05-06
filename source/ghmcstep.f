@@ -31,18 +31,18 @@ c     California, Berkeley, November 2010
 c
 c
       subroutine ghmcstep (istep,dt)
+      use sizes
+      use atoms
+      use atomid
+      use bath
+      use freeze
+      use iounit
+      use mdstuf
+      use moldyn
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'bath.i'
-      include 'freeze.i'
-      include 'iounit.i'
-      include 'mdstuf.i'
-      include 'moldyn.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j
       integer istep,nrej
       real*8 dt,dt_2
@@ -81,7 +81,7 @@ c
                v(j,i) = v(j,i)*alpha(j,i) + beta(j,i)
             end do
          end if
-      end do      
+      end do
 c
 c     accumulate the kinetic energy and store the energy values
 c
@@ -110,7 +110,7 @@ c
             xold(i) = x(i)
             yold(i) = y(i)
             zold(i) = z(i)
-            x(i) = x(i) + v(1,i)*dt 
+            x(i) = x(i) + v(1,i)*dt
             y(i) = y(i) + v(2,i)*dt
             z(i) = z(i) + v(3,i)*dt
          end if
@@ -174,7 +174,7 @@ c
                   a(j,i) = aalt(j,i)
                end do
             end if
-         end do         
+         end do
       end if
 c
 c     evolve velocities according to midpoint Euler for half-step
@@ -186,7 +186,7 @@ c
                v(j,i) = v(j,i)*alpha(j,i) + beta(j,i)
             end do
          end if
-      end do      
+      end do
 c
 c     perform deallocation of some local arrays
 c
@@ -232,24 +232,32 @@ c     to update velocities during GHMC stochastic dynamics
 c
 c
       subroutine ghmcterm (istep,dt,alpha,beta)
+      use sizes
+      use atoms
+      use atomid
+      use bath
+      use stodyn
+      use units
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'bath.i'
-      include 'stodyn.i'
-      include 'units.i'
-      include 'usage.i'
       integer i,j,istep
       real*8 dt,dt_2,dt_4
       real*8 normal,gamma,sigma
       real*8 alpha(3,*)
       real*8 beta(3,*)
+      logical first
+      save first
+      data first  / .true. /
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(fgamma))  allocate (fgamma(n))
 c
 c     set the atomic friction coefficients to the global value
 c
-      if (istep .eq. 1) then
          do i = 1, n
             fgamma(i) = friction * mass(i)
          end do
@@ -269,7 +277,7 @@ c
             sigma = sqrt(2.0d0*boltzmann*kelvin*fgamma(i))
             do j = 1, 3
                alpha(j,i) = (1.0d0-gamma) / (1.0d0+gamma)
-               beta(j,i) = normal() * sqrt(dt_2) * sigma 
+               beta(j,i) = normal() * sqrt(dt_2) * sigma
      &                        / ((1.0d0+gamma)*mass(i))
             end do
          end if

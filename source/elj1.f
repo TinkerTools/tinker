@@ -17,14 +17,14 @@ c     and its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine elj1
+      use sizes
+      use energi
+      use limits
+      use vdwpot
+      use virial
+      use warp
       implicit none
       real*8 elrc,vlrc
-      include 'sizes.i'
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'vdwpot.i'
-      include 'virial.i'
-      include 'warp.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -66,23 +66,23 @@ c     and its first derivatives using a pairwise double loop
 c
 c
       subroutine elj1a
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -512,25 +512,25 @@ c     and its first derivatives using the method of lights
 c
 c
       subroutine elj1b
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use light
+      use molcul
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'light.i'
-      include 'molcul.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -855,23 +855,23 @@ c     and its first derivatives using a pairwise neighbor list
 c
 c
       subroutine elj1c
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -953,7 +953,7 @@ c
          virt(1,i) = vir(1,i)
          virt(2,i) = vir(2,i)
          virt(3,i) = vir(3,i)
-      end do 
+      end do
 c
 c     set OpenMP directives for the major loop structure
 c
@@ -1175,9 +1175,9 @@ c      potential energy smoothing
 c
 c
       subroutine elj1d
+      use math
+      use vdwpot
       implicit none
-      include 'math.i'
-      include 'vdwpot.i'
 c
 c
 c     set coefficients for a two-Gaussian fit to Lennard-Jones
@@ -1207,20 +1207,20 @@ c     first derivatives for use with stophat potential energy smoothing
 c
 c
       subroutine elj1e
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use molcul
+      use usage
+      use vdw
+      use vdwpot
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inter.i'
-      include 'molcul.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
-      include 'warp.i'
       integer i,j,k,ii,kk
       integer iv,kv,it,kt
       integer, allocatable :: iv14(:)

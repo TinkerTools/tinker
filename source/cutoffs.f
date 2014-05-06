@@ -18,16 +18,16 @@ c     and the pairwise neighbor generation method
 c
 c
       subroutine cutoffs
+      use sizes
+      use atoms
+      use bound
+      use hescut
+      use keys
+      use limits
+      use neigh
+      use polpot
+      use tarray
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cutoff.i'
-      include 'hescut.i'
-      include 'keys.i'
-      include 'neigh.i'
-      include 'polpot.i'
-      include 'tarray.i'
       integer i,next
       real*8 big,value
       logical truncate
@@ -213,59 +213,40 @@ c
       mbufx = (mpolecut+2.0d0*lbuffer)**2
       ubufx = (usolvcut+2.0d0*pbuffer)**2
 c
-c     perform dynamic allocation of some pointer arrays
+c     perform dynamic allocation of some global arrays
 c
       if (use_vlist) then
-         if (associated(nvlst))  deallocate (nvlst)
-         if (associated(vlst))  deallocate (vlst)
-         if (associated(xvold))  deallocate (xvold)
-         if (associated(yvold))  deallocate (yvold)
-         if (associated(zvold))  deallocate (zvold)
-         allocate (nvlst(n))
-         allocate (vlst(maxvlst,n))
-         allocate (xvold(n))
-         allocate (yvold(n))
-         allocate (zvold(n))
+         if (.not.allocated(nvlst))  allocate (nvlst(n))
+         if (.not.allocated(vlst))  allocate (vlst(maxvlst,n))
+         if (.not.allocated(xvold))  allocate (xvold(n))
+         if (.not.allocated(yvold))  allocate (yvold(n))
+         if (.not.allocated(zvold))  allocate (zvold(n))
       end if
       if (use_clist .or. use_mlist) then
-         if (associated(nelst))  deallocate (nelst)
-         if (associated(elst))  deallocate (elst)
-         allocate (nelst(n))
-         allocate (elst(maxelst,n))
+         if (.not.allocated(nelst))  allocate (nelst(n))
+         if (.not.allocated(elst))  allocate (elst(maxelst,n))
       end if
       if (use_clist) then
-         if (associated(xcold))  deallocate (xcold)
-         if (associated(ycold))  deallocate (ycold)
-         if (associated(zcold))  deallocate (zcold)
-         allocate (xcold(n))
-         allocate (ycold(n))
-         allocate (zcold(n))
+         if (.not.allocated(xcold))  allocate (xcold(n))
+         if (.not.allocated(ycold))  allocate (ycold(n))
+         if (.not.allocated(zcold))  allocate (zcold(n))
       end if
       if (use_mlist) then
-         if (associated(xmold))  deallocate (xmold)
-         if (associated(ymold))  deallocate (ymold)
-         if (associated(zmold))  deallocate (zmold)
-         allocate (xmold(n))
-         allocate (ymold(n))
-         allocate (zmold(n))
+         if (.not.allocated(xmold))  allocate (xmold(n))
+         if (.not.allocated(ymold))  allocate (ymold(n))
+         if (.not.allocated(zmold))  allocate (zmold(n))
          if (poltyp .eq. 'MUTUAL') then
-            if (associated(tindex))  deallocate (tindex)
-            if (associated(tdipdip))  deallocate (tdipdip)
-            allocate (tindex(2,n*maxelst))
-            allocate (tdipdip(6,n*maxelst))
+            if (.not.allocated(tindex))  allocate (tindex(2,n*maxelst))
+            if (.not.allocated(tdipdip))
+     &         allocate (tdipdip(6,n*maxelst))
          end if
       end if
       if (use_ulist) then
-         if (associated(nulst))  deallocate (nulst)
-         if (associated(ulst))  deallocate (ulst)
-         if (associated(xuold))  deallocate (xuold)
-         if (associated(yuold))  deallocate (yuold)
-         if (associated(zuold))  deallocate (zuold)
-         allocate (nulst(n))
-         allocate (ulst(maxulst,n))
-         allocate (xuold(n))
-         allocate (yuold(n))
-         allocate (zuold(n))
+         if (.not.allocated(nulst))  allocate (nulst(n))
+         if (.not.allocated(ulst))  allocate (ulst(maxulst,n))
+         if (.not.allocated(xuold))  allocate (xuold(n))
+         if (.not.allocated(yuold))  allocate (yuold(n))
+         if (.not.allocated(zuold))  allocate (zuold(n))
       end if
       return
       end

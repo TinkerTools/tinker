@@ -17,8 +17,8 @@ c     type and class numbers based on the "atom" parameter ordering
 c
 c
       program prmedit
+      use iounit
       implicit none
-      include 'iounit.i'
       integer iprm,mode
       integer freeunit
       integer trimtext
@@ -141,13 +141,13 @@ c     to a consistent text layout
 c
 c
       subroutine prmform (iprm)
+      use sizes
+      use angpot
+      use bndpot
+      use math
+      use params
+      use urypot
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'bndpot.i'
-      include 'math.i'
-      include 'params.i'
-      include 'urypot.i'
       integer i,j,iprm
       integer ia,ib,ic
       integer id,ie
@@ -903,11 +903,11 @@ c     canonical order for potential energy parameter definitions
 c
 c
       subroutine prmorder (iprm,dotype,doclass)
+      use sizes
+      use iounit
+      use params
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'iounit.i'
-      include 'params.i'
-      include 'vdwpot.i'
       integer i,j,iprm
       integer it,ic,kt,kc
       integer ia,ib,id,ie
@@ -1605,9 +1605,9 @@ c     on the atom types of centers involved
 c
 c
       subroutine polesort (iprm)
+      use sizes
+      use params
       implicit none
-      include 'sizes.i'
-      include 'params.i'
       integer i,j,n,iprm
       integer size,next
       integer ia,ib,ic,id
@@ -1728,9 +1728,9 @@ c     convert biomolecular structure into force field atom types
 c
 c
       subroutine biosort (iprm)
+      use sizes
+      use params
       implicit none
-      include 'sizes.i'
-      include 'params.i'
       integer i,n,iprm
       integer next
       integer length

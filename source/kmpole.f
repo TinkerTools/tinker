@@ -17,19 +17,19 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kmpole
+      use sizes
+      use atoms
+      use couple
+      use inform
+      use iounit
+      use keys
+      use kmulti
+      use mpole
+      use polar
+      use polgrp
+      use potent
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'couple.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'kmulti.i'
-      include 'mpole.i'
-      include 'polar.i'
-      include 'polgrp.i'
-      include 'potent.i'
-      include 'units.i'
       integer i,j,k,l,m
       integer ji,ki,li
       integer it,jt,kt,lt
@@ -204,10 +204,27 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ipole))  allocate (ipole(maxatm))
+      if (.not. allocated(polsiz))  allocate (polsiz(maxatm))
+      if (.not. allocated(pollist))  allocate (pollist(maxatm))
+      if (.not. allocated(zaxis))  allocate (zaxis(maxatm))
+      if (.not. allocated(xaxis))  allocate (xaxis(maxatm))
+      if (.not. allocated(yaxis))  allocate (yaxis(maxatm))
+      if (.not. allocated(pole))  allocate (pole(maxpole,maxatm))
+      if (.not. allocated(rpole))  allocate (rpole(maxpole,maxatm))
+      if (.not. allocated(polaxe))  allocate (polaxe(maxatm))
+      if (.not. allocated(np11))  allocate (np11(maxatm))
+      if (.not. allocated(np12))  allocate (np12(maxatm))
+      if (.not. allocated(np13))  allocate (np13(maxatm))
+      if (.not. allocated(np14))  allocate (np14(maxatm))
+c
 c     zero out local axes, multipoles and polarization attachments
 c
       npole = n
       do i = 1, n
+         polsiz(i) = 0
          pollist(i) = 0
          zaxis(i) = 0
          xaxis(i) = 0

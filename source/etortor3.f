@@ -17,22 +17,22 @@ c     also partitions the energy terms among the atoms
 c
 c
       subroutine etortor3
+      use sizes
+      use action
+      use analyz
+      use atoms
+      use bitor
+      use bound
+      use energi
+      use group
+      use inform
+      use iounit
+      use ktrtor
+      use math
+      use torpot
+      use tortor
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'action.i'
-      include 'analyz.i'
-      include 'atoms.i'
-      include 'bitor.i'
-      include 'bound.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'ktrtor.i'
-      include 'math.i'
-      include 'torpot.i'
-      include 'tortor.i'
-      include 'usage.i'
       integer i,k,itortor
       integer pos1,pos2
       integer ia,ib,ic,id,ie

@@ -16,11 +16,11 @@ c     "ehal" calculates the buffered 14-7 van der Waals energy
 c
 c
       subroutine ehal
+      use energi
+      use limits
+      use vdwpot
       implicit none
       real*8 elrc
-      include 'cutoff.i'
-      include 'energi.i'
-      include 'vdwpot.i'
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -55,20 +55,20 @@ c     using a pairwise double loop
 c
 c
       subroutine ehal0a
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use energi
+      use group
+      use mutant
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'mutant.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -195,7 +195,7 @@ c
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
-                  else 
+                  else
                      rv7 = rv**7
                      rik7 = rik**7
                      rho = rik7 + ghal*rv7
@@ -321,7 +321,7 @@ c
                         t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                         t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                         e = eps * t1 * (t2-2.0d0)
-                     else 
+                     else
                         rv7 = rv**7
                         rik7 = rik**7
                         rho = rik7 + ghal*rv7
@@ -394,22 +394,22 @@ c     using the method of lights
 c
 c
       subroutine ehal0b
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use cell
+      use couple
+      use energi
+      use group
+      use light
+      use mutant
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'boxes.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'light.i'
-      include 'mutant.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -598,7 +598,7 @@ c
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
-                  else 
+                  else
                      rv7 = rv**7
                      rik7 = rik**7
                      rho = rik7 + ghal*rv7
@@ -678,20 +678,20 @@ c     using a pairwise neighbor list
 c
 c
       subroutine ehal0c
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use energi
+      use group
+      use mutant
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'couple.i'
-      include 'energi.i'
-      include 'group.i'
-      include 'mutant.i'
-      include 'neigh.i'
-      include 'shunt.i'
-      include 'usage.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
@@ -832,7 +832,7 @@ c
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
-                  else 
+                  else
                      rv7 = rv**7
                      rik7 = rik**7
                      rho = rik7 + ghal*rv7

@@ -226,9 +226,9 @@ c     same name; Matlab, version 4.2c, March 1995
 c
 c
       function erfinv (x)
+      use iounit
+      use math
       implicit none
-      include 'iounit.i'
-      include 'math.i'
       real*8 erfinv,erf
       real*8 x,y,z
       real*8 a(4),b(4)

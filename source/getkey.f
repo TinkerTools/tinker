@@ -17,13 +17,13 @@ c     line images for subsequent keyword parameter searching
 c
 c
       subroutine getkey
+      use sizes
+      use argue
+      use files
+      use iounit
+      use keys
+      use openmp
       implicit none
-      include 'sizes.i'
-      include 'argue.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'openmp.i'
       integer i,ikey
       integer next,length
       integer freeunit

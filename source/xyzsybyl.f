@@ -17,11 +17,11 @@ c     converts to and then writes out a Sybyl MOL2 file
 c
 c
       program xyzsybyl
+      use sizes
+      use files
+      use iounit
+      use titles
       implicit none
-      include 'sizes.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'titles.i'
       integer isyb,freeunit
       character*120 sybylfile
 c

@@ -25,8 +25,8 @@ c
      &                        kelvin,ionn,ionc,ionq,ionr,pbtyp,
      &                        pbtyplen,pbsoln,pbsolnlen,bcfl,
      &                        bcfllen,chgm,chgmlen,srfm,srfmlen)
+      use iounit
       implicit none
-      include 'iounit.i'
       integer dime(*)
       integer ionn
       integer ionq(*)

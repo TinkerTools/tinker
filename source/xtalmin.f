@@ -18,15 +18,15 @@ c     lattice lengths and angles
 c
 c
       program xtalmin
+      use sizes
+      use atoms
+      use boxes
+      use files
+      use inform
+      use iounit
+      use keys
+      use scales
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'scales.i'
       integer i,j,imin,nvar
       integer next,freeunit
       real*8 minimum,grdmin
@@ -258,12 +258,12 @@ c     dimensions for a crystal energy minimization
 c
 c
       function xtalmin1 (xx,g)
+      use sizes
+      use atoms
+      use boxes
+      use math
+      use scales
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'math.i'
-      include 'scales.i'
       integer i,j
       real*8 xtalmin1,energy
       real*8 e,e0,old,eps

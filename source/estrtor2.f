@@ -17,16 +17,16 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine estrtor2 (i)
+      use sizes
+      use atoms
+      use bndstr
+      use bound
+      use group
+      use hessn
+      use strtor
+      use torpot
+      use tors
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'strtor.i'
-      include 'torpot.i'
-      include 'tors.i'
       integer i,j,k,istrtor
       integer ia,ib,ic,id
       real*8 fgrp,dedphi
@@ -629,7 +629,7 @@ c
      &                             + dxic*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyibxic
      &                             + d2edphi2*dphidyib*dphidxic
-     &                             + dxic*ddrdy 
+     &                             + dxic*ddrdy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
      &                             + d2edphi2*dphidzib*dphidxic
      &                             + dxic*ddrdz
@@ -726,31 +726,31 @@ c
      &                             - dzic*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
      &                             + d2edphi2*dphidxic*dphidxib
-     &                             + dxic*ddrdx 
+     &                             + dxic*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
      &                             + d2edphi2*dphidyic*dphidxib
-     &                             + dyic*ddrdx 
+     &                             + dyic*ddrdx
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
      &                             + d2edphi2*dphidzic*dphidxib
-     &                             + dzic*ddrdx 
+     &                             + dzic*ddrdx
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
      &                             + d2edphi2*dphidxic*dphidyib
-     &                             + dxic*ddrdy 
+     &                             + dxic*ddrdy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
      &                             + d2edphi2*dphidyic*dphidyib
      &                             + dyic*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
      &                             + d2edphi2*dphidzic*dphidyib
-     &                             + dzic*ddrdy 
+     &                             + dzic*ddrdy
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
      &                             + d2edphi2*dphidxic*dphidzib
-     &                             + dxic*ddrdz 
+     &                             + dxic*ddrdz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
      &                             + d2edphi2*dphidyic*dphidzib
-     &                             + dyic*ddrdz 
+     &                             + dyic*ddrdz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
      &                             + d2edphi2*dphidzic*dphidzib
-     &                             + dzic*ddrdz 
+     &                             + dzic*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxicxid
      &                             + d2edphi2*dphidxic*dphidxid
                   hessy(1,id) = hessy(1,id) + dedphi*dyicxid
@@ -1502,25 +1502,25 @@ c
      &                             - dyib*ddrdx
                   hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
      &                             + d2edphi2*dphidzib*dphidxic
-     &                             - dzib*ddrdx 
+     &                             - dzib*ddrdx
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxibyic
      &                             + d2edphi2*dphidxib*dphidyic
-     &                             - dxib*ddrdy 
+     &                             - dxib*ddrdy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyibyic
      &                             + d2edphi2*dphidyib*dphidyic
      &                             - dyib*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dzibyic
      &                             + d2edphi2*dphidzib*dphidyic
-     &                             - dzib*ddrdy 
+     &                             - dzib*ddrdy
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxibzic
      &                             + d2edphi2*dphidxib*dphidzic
-     &                             - dxib*ddrdz 
+     &                             - dxib*ddrdz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyibzic
      &                             + d2edphi2*dphidyib*dphidzic
-     &                             - dyib*ddrdz 
+     &                             - dyib*ddrdz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dzibzic
      &                             + d2edphi2*dphidzib*dphidzic
-     &                             - dzib*ddrdz 
+     &                             - dzib*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxibxid
      &                             + d2edphi2*dphidxib*dphidxid
      &                             + dxib*ddrdx
@@ -1605,34 +1605,34 @@ c
      &                             - dzia*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
      &                             + d2edphi2*dphidxic*dphidxib
-     &                             - dxib*ddrdx 
+     &                             - dxib*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
      &                             + d2edphi2*dphidyic*dphidxib
-     &                             - dxib*ddrdy 
+     &                             - dxib*ddrdy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
      &                             + d2edphi2*dphidzic*dphidxib
-     &                             - dxib*ddrdz 
+     &                             - dxib*ddrdz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
      &                             + d2edphi2*dphidxic*dphidyib
-     &                             - dyib*ddrdx 
+     &                             - dyib*ddrdx
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
      &                             + d2edphi2*dphidyic*dphidyib
-     &                             - dyib*ddrdy 
+     &                             - dyib*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
      &                             + d2edphi2*dphidzic*dphidyib
-     &                             - dyib*ddrdz 
+     &                             - dyib*ddrdz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
      &                             + d2edphi2*dphidxic*dphidzib
      &                             - dzib*ddrdx
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
      &                             + d2edphi2*dphidyic*dphidzib
-     &                             - dzib*ddrdy 
+     &                             - dzib*ddrdy
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
      &                             + d2edphi2*dphidzic*dphidzib
-     &                             - dzib*ddrdz 
+     &                             - dzib*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxicxid
      &                             + d2edphi2*dphidxic*dphidxid
-     &                             - dxid*ddrdx + dxic*ddrdx 
+     &                             - dxid*ddrdx + dxic*ddrdx
      &                             - d2drdxx
                   hessy(1,id) = hessy(1,id) + dedphi*dyicxid
      &                             + d2edphi2*dphidyic*dphidxid
@@ -1764,7 +1764,7 @@ c
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyid
      &                             + d2edphi2*dphidyid*dphidxic
      &                             + dxic*ddrdy - dyid*ddrdx
-     &                             - d2drdxy 
+     &                             - d2drdxy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczid
      &                             + d2edphi2*dphidzid*dphidxic
      &                             + dxic*ddrdz - dzid*ddrdx

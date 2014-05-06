@@ -17,22 +17,25 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine gradient (energy,derivs)
+      use sizes
+      use atoms
+      use bound
+      use deriv
+      use energi
+      use inter
+      use iounit
+      use limits
+      use potent
+      use rigid
+      use vdwpot
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cutoff.i'
-      include 'deriv.i'
-      include 'energi.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'potent.i'
-      include 'rigid.i'
-      include 'vdwpot.i'
-      include 'virial.i'
       integer i,j
       real*8 energy,cutoff
       real*8 derivs(3,*)
+      logical first
+      save first
+      data first  / .true. /
 c
 c
 c     zero out each of the potential energy components
@@ -62,6 +65,38 @@ c
       elf = 0.0d0
       eg = 0.0d0
       ex = 0.0d0
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (first) then
+         first = .false.
+         if (.not. allocated(desum))  allocate (desum(3,maxatm))
+         if (.not. allocated(deb))  allocate (deb(3,maxatm))
+         if (.not. allocated(dea))  allocate (dea(3,maxatm))
+         if (.not. allocated(deba))  allocate (deba(3,maxatm))
+         if (.not. allocated(deub))  allocate (deub(3,maxatm))
+         if (.not. allocated(deaa))  allocate (deaa(3,maxatm))
+         if (.not. allocated(deopb))  allocate (deopb(3,maxatm))
+         if (.not. allocated(deopd))  allocate (deopd(3,maxatm))
+         if (.not. allocated(deid))  allocate (deid(3,maxatm))
+         if (.not. allocated(deit))  allocate (deit(3,maxatm))
+         if (.not. allocated(det))  allocate (det(3,maxatm))
+         if (.not. allocated(dept))  allocate (dept(3,maxatm))
+         if (.not. allocated(debt))  allocate (debt(3,maxatm))
+         if (.not. allocated(deat))  allocate (deat(3,maxatm))
+         if (.not. allocated(dett))  allocate (dett(3,maxatm))
+         if (.not. allocated(dev))  allocate (dev(3,maxatm))
+         if (.not. allocated(dec))  allocate (dec(3,maxatm))
+         if (.not. allocated(decd))  allocate (decd(3,maxatm))
+         if (.not. allocated(ded))  allocate (ded(3,maxatm))
+         if (.not. allocated(dem))  allocate (dem(3,maxatm))
+         if (.not. allocated(dep))  allocate (dep(3,maxatm))
+         if (.not. allocated(der))  allocate (der(3,maxatm))
+         if (.not. allocated(des))  allocate (des(3,maxatm))
+         if (.not. allocated(delf))  allocate (delf(3,maxatm))
+         if (.not. allocated(deg))  allocate (deg(3,maxatm))
+         if (.not. allocated(dex))  allocate (dex(3,maxatm))
+      end if
 c
 c     zero out each of the first derivative components
 c

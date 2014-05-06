@@ -18,20 +18,20 @@ c     exponential or sigmoidal cooling schedules
 c
 c
       program anneal
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use bndstr
+      use bound
+      use inform
+      use iounit
+      use mdstuf
+      use potent
+      use solute
+      use usage
+      use warp
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bath.i'
-      include 'bond.i'
-      include 'bound.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'mdstuf.i'
-      include 'potent.i'
-      include 'solute.i'
-      include 'usage.i'
-      include 'warp.i'
       integer i,nequil,next
       integer nstep,istep
       real*8 logmass,factor

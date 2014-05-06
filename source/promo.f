@@ -17,8 +17,8 @@ c     about the TINKER version number and the copyright notice
 c
 c
       subroutine promo
+      use iounit
       implicit none
-      include 'iounit.i'
 c
 c
 c     print out the informational header message
@@ -30,7 +30,7 @@ c
      &        /,1x,'###',12x,'TINKER  ---  Software Tools for',
      &           ' Molecular Design',12x,'###',
      &        /,1x,'##',74x,'##',
-     &        /,1x,'##',24x,'Version 6.3  February 2014',24x,'##',
+     &        /,1x,'##',26x,'Version 7.0  June 2014',26x,'##',
      &        /,1x,'##',74x,'##',
      &        /,1x,'##',15x,'Copyright (c)  Jay William Ponder',
      &           '  1990-2014',15x,'##',

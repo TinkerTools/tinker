@@ -17,18 +17,18 @@ c     derivatives for a single atom at a time
 c
 c
       subroutine ehal2 (iatom,xred,yred,zred)
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use cell
+      use couple
+      use group
+      use hessn
+      use shunt
+      use vdw
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bound.i'
-      include 'cell.i'
-      include 'couple.i'
-      include 'group.i'
-      include 'hessn.i'
-      include 'shunt.i'
-      include 'vdw.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt

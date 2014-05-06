@@ -17,18 +17,18 @@ c     on a quantum mechanical optimized structure and frequencies
 c
 c
       program valence
+      use sizes
+      use atoms
+      use files
+      use inform
+      use iounit
+      use keys
+      use linmin
+      use output
+      use potent
+      use qmstuf
+      use valfit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'inform.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'linmin.i'
-      include 'output.i'
-      include 'potent.i'
-      include 'qmstuf.i'
-      include 'valfit.i'
       integer i,nvar,next
       integer mode,length
       real*8 minimum,grdmin
@@ -231,28 +231,28 @@ c     quantum mechanical structure and frequency data
 c
 c
       subroutine valguess
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use bndstr
+      use iounit
+      use kangs
+      use kbonds
+      use kopbnd
+      use kstbnd
+      use ktorsn
+      use kurybr
+      use kvdws
+      use math
+      use opbend
+      use qmstuf
+      use strbnd
+      use tors
+      use urey
+      use valfit
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'iounit.i'
-      include 'kangs.i'
-      include 'kbonds.i'
-      include 'kopbnd.i'
-      include 'kstbnd.i'
-      include 'ktorsn.i'
-      include 'kurybr.i'
-      include 'kvdws.i'
-      include 'math.i'
-      include 'opbend.i'
-      include 'qmstuf.i'
-      include 'strbnd.i'
-      include 'tors.i'
-      include 'urey.i'
-      include 'valfit.i'
-      include 'vdwpot.i'
       integer i,j,k
       integer size,number
       integer ia,ib,ic,id
@@ -795,12 +795,12 @@ c     and connected atoms
 c
 c
       subroutine vdwguess (ia,rad,eps,reduce)
+      use sizes
+      use atomid
+      use couple
+      use math
+      use vdwpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'couple.i'
-      include 'math.i'
-      include 'vdwpot.i'
       integer i,j,k,ia
       integer ita,itb
       integer iva,ivb
@@ -1009,10 +1009,10 @@ c     on atom type and connected atoms
 c
 c
       function bndguess (ia,ib)
+      use sizes
+      use atomid
+      use bndpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'bndpot.i'
       integer ia,ib,tmp
       integer ita,itb
       integer iva,ivb
@@ -1190,11 +1190,11 @@ c     on atom type and connected atoms
 c
 c
       function angguess (ia,ib,ic)
+      use sizes
+      use atomid
+      use angpot
+      use math
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'angpot.i'
-      include 'math.i'
       integer ia,ib,ic,tmp
       integer ita,itb,itc
       integer iva,ivb,ivc
@@ -1394,11 +1394,11 @@ c     on atom type and connected atoms
 c
 c
       subroutine sbguess (ia,ib,ic,sb1,sb2)
+      use sizes
+      use angpot
+      use atomid
+      use math
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'math.i'
       integer ia,ib,ic
       integer ita,itb,itc
       integer iva,ivb,ivc
@@ -1545,10 +1545,10 @@ c     based on atom type and connected atoms
 c
 c
       function uryguess (ia,ib,ic)
+      use sizes
+      use atomid
+      use urypot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'urypot.i'
       integer ia,ib,ic
       integer ita,itb,itc
       integer iva,ivb,ivc
@@ -1587,11 +1587,11 @@ c     based on atom type and connected atoms
 c
 c
       function opbguess (ia,ib,ic,id)
+      use sizes
+      use angpot
+      use atomid
+      use math
       implicit none
-      include 'sizes.i'
-      include 'angpot.i'
-      include 'atmtyp.i'
-      include 'math.i'
       integer ia,ib,ic,id
       integer ita,itb
       integer iva,ivb
@@ -1628,10 +1628,10 @@ c     on atom type and connected atoms
 c
 c
       subroutine torguess (ia,ib,ic,id,tf1,tf2,tf3)
+      use sizes
+      use atomid
+      use torpot
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'torpot.i'
       integer ia,ib,ic,id,tmp
       integer ita,itb,itc,itd
       integer iva,ivb,ivc,ivd
@@ -1845,32 +1845,32 @@ c     lengths and angles to QM results
 c
 c
       function valrms (prtflg)
+      use sizes
+      use angbnd
+      use atoms
+      use atomid
+      use bndstr
+      use hescut
+      use iounit
+      use inform
+      use kangs
+      use kbonds
+      use kopbnd
+      use kstbnd
+      use ktorsn
+      use kvdws
+      use linmin
+      use math
+      use minima
+      use opbend
+      use output
+      use qmstuf
+      use scales
+      use strbnd
+      use tors
+      use units
+      use valfit
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'bond.i'
-      include 'hescut.i'
-      include 'iounit.i'
-      include 'inform.i'
-      include 'kangs.i'
-      include 'kbonds.i'
-      include 'kopbnd.i'
-      include 'kstbnd.i'
-      include 'ktorsn.i'
-      include 'kvdws.i'
-      include 'linmin.i'
-      include 'math.i'
-      include 'minima.i'
-      include 'opbend.i'
-      include 'output.i'
-      include 'qmstuf.i'
-      include 'scales.i'
-      include 'strbnd.i'
-      include 'tors.i'
-      include 'units.i'
-      include 'valfit.i'
       integer i,j,k
       integer m,m1,m2
       integer ia,ib,ic,id
@@ -2360,11 +2360,11 @@ c     coordinate space
 c
 c
       function minimiz1 (xx,g)
+      use sizes
+      use atoms
+      use scales
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'scales.i'
-      include 'usage.i'
       integer i,nvar
       real*8 minimiz1,e
       real*8 energy,eps
@@ -2441,19 +2441,19 @@ c     corresponding valence potential energy parameters
 c
 c
       subroutine prmvar (nvar,xx)
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use bndstr
+      use iounit
+      use opbend
+      use strbnd
+      use tors
+      use units
+      use urey
+      use valfit
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'iounit.i'
-      include 'opbend.i'
-      include 'strbnd.i'
-      include 'tors.i'
-      include 'units.i'
-      include 'urey.i'
-      include 'valfit.i'
       integer i,k,ii,kk
       integer ia,ib,ic,id
       integer ka,kb,kc,kd
@@ -2889,18 +2889,18 @@ c     corresponding valence potential energy parameters
 c
 c
       subroutine varprm (nvar,xx,ivar,eps)
+      use sizes
+      use angbnd
+      use atoms
+      use atomid
+      use bndstr
+      use opbend
+      use potent
+      use strbnd
+      use tors
+      use urey
+      use valfit
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atoms.i'
-      include 'atmtyp.i'
-      include 'bond.i'
-      include 'opbend.i'
-      include 'potent.i'
-      include 'strbnd.i'
-      include 'tors.i'
-      include 'urey.i'
-      include 'valfit.i'
       integer i,k,ii,kk
       integer nvar,ivar,size
       integer ia,ib,ic,id
@@ -3398,11 +3398,11 @@ c     and gradient for valence parameters fit to QM results
 c
 c
       function valfit1 (xx,g)
+      use sizes
+      use atoms
+      use potent
+      use valfit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'potent.i'
-      include 'valfit.i'
       integer i,k
       integer nvar
       real*8 e,e0
@@ -3463,21 +3463,21 @@ c     standard output and appends the values to a key file
 c
 c
       subroutine prtval
+      use sizes
+      use angbnd
+      use atomid
+      use atoms
+      use bndstr
+      use files
+      use iounit
+      use keys
+      use opbend
+      use strbnd
+      use tors
+      use units
+      use urey
+      use valfit
       implicit none
-      include 'sizes.i'
-      include 'angle.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'bond.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'keys.i'
-      include 'opbend.i'
-      include 'strbnd.i'
-      include 'tors.i'
-      include 'units.i'
-      include 'urey.i'
-      include 'valfit.i'
       integer i,k,ii,kk
       integer ia,ib,ic,id
       integer ka,kb,kc,kd
