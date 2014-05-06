@@ -1,11 +1,11 @@
 #
 #
-#  #############################################################
-#  ##                                                         ##
-#  ##  rename.make  --  rename the TINKER executable modules  ##
-#  ##                (Windows to Unix Version)                ##
-#  ##                                                         ##
-#  #############################################################
+#  ###############################################################
+#  ##                                                           ##
+#  ##  rename.make  --  move and rename the TINKER executables  ##
+#  ##                 (Windows to Unix Version)                 ##
+#  ##                                                           ##
+#  ###############################################################
 #
 #
 mv ALCHEMY.ZIP   alchemy.zip

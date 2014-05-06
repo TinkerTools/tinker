@@ -1,13 +1,171 @@
 @echo off
 rem
 rem
-rem  ###########################################################
-rem  ##                                                       ##
-rem  ##  compile.bat  --  compile each of the TINKER modules  ##
-rem  ##        (Lahey/Fujitsu LF95 for Windows Version)       ##
-rem  ##                                                       ##
-rem  ###########################################################
+rem  ############################################################
+rem  ##                                                        ##
+rem  ##  compile.bat  --  compile each of the TINKER routines  ##
+rem  ##        (Lahey/Fujitsu LF95 for Windows Version)        ##
+rem  ##                                                        ##
+rem  ############################################################
 rem
+rem
+rem  compile all the modules; "sizes" must be first since it is used
+rem  to set static array dimensions in many of the other modules
+rem
+rem
+LF95 -c -o1 -tpp -nstchk -ntrace sizes.f
+LF95 -c -o1 -tpp -nstchk -ntrace action.f
+LF95 -c -o1 -tpp -nstchk -ntrace align.f
+LF95 -c -o1 -tpp -nstchk -ntrace analyz.f
+LF95 -c -o1 -tpp -nstchk -ntrace angang.f
+LF95 -c -o1 -tpp -nstchk -ntrace angbnd.f
+LF95 -c -o1 -tpp -nstchk -ntrace angpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace angtor.f
+LF95 -c -o1 -tpp -nstchk -ntrace argue.f
+LF95 -c -o1 -tpp -nstchk -ntrace ascii.f
+LF95 -c -o1 -tpp -nstchk -ntrace atmlst.f
+LF95 -c -o1 -tpp -nstchk -ntrace atomid.f
+LF95 -c -o1 -tpp -nstchk -ntrace atoms.f
+LF95 -c -o1 -tpp -nstchk -ntrace bath.f
+LF95 -c -o1 -tpp -nstchk -ntrace bitor.f
+LF95 -c -o1 -tpp -nstchk -ntrace bndpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace bndstr.f
+LF95 -c -o1 -tpp -nstchk -ntrace bound.f
+LF95 -c -o1 -tpp -nstchk -ntrace boxes.f
+LF95 -c -o1 -tpp -nstchk -ntrace cell.f
+LF95 -c -o1 -tpp -nstchk -ntrace charge.f
+LF95 -c -o1 -tpp -nstchk -ntrace chgpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace chrono.f
+LF95 -c -o1 -tpp -nstchk -ntrace chunks.f
+LF95 -c -o1 -tpp -nstchk -ntrace couple.f
+LF95 -c -o1 -tpp -nstchk -ntrace deriv.f
+LF95 -c -o1 -tpp -nstchk -ntrace dipole.f
+LF95 -c -o1 -tpp -nstchk -ntrace disgeo.f
+LF95 -c -o1 -tpp -nstchk -ntrace dma.f
+LF95 -c -o1 -tpp -nstchk -ntrace domega.f
+LF95 -c -o1 -tpp -nstchk -ntrace energi.f
+LF95 -c -o1 -tpp -nstchk -ntrace ewald.f
+LF95 -c -o1 -tpp -nstchk -ntrace faces.f
+LF95 -c -o1 -tpp -nstchk -ntrace fft.f
+LF95 -c -o1 -tpp -nstchk -ntrace fields.f
+LF95 -c -o1 -tpp -nstchk -ntrace files.f
+LF95 -c -o1 -tpp -nstchk -ntrace fracs.f
+LF95 -c -o1 -tpp -nstchk -ntrace freeze.f
+LF95 -c -o1 -tpp -nstchk -ntrace gkstuf.f
+LF95 -c -o1 -tpp -nstchk -ntrace group.f
+LF95 -c -o1 -tpp -nstchk -ntrace hescut.f
+LF95 -c -o1 -tpp -nstchk -ntrace hessn.f
+LF95 -c -o1 -tpp -nstchk -ntrace hpmf.f
+LF95 -c -o1 -tpp -nstchk -ntrace improp.f
+LF95 -c -o1 -tpp -nstchk -ntrace imptor.f
+LF95 -c -o1 -tpp -nstchk -ntrace inform.f
+LF95 -c -o1 -tpp -nstchk -ntrace inter.f
+LF95 -c -o1 -tpp -nstchk -ntrace iounit.f
+LF95 -c -o1 -tpp -nstchk -ntrace kanang.f
+LF95 -c -o1 -tpp -nstchk -ntrace kangs.f
+LF95 -c -o1 -tpp -nstchk -ntrace kantor.f
+LF95 -c -o1 -tpp -nstchk -ntrace katoms.f
+LF95 -c -o1 -tpp -nstchk -ntrace kbonds.f
+LF95 -c -o1 -tpp -nstchk -ntrace kchrge.f
+LF95 -c -o1 -tpp -nstchk -ntrace kdipol.f
+LF95 -c -o1 -tpp -nstchk -ntrace keys.f
+LF95 -c -o1 -tpp -nstchk -ntrace khbond.f
+LF95 -c -o1 -tpp -nstchk -ntrace kiprop.f
+LF95 -c -o1 -tpp -nstchk -ntrace kitors.f
+LF95 -c -o1 -tpp -nstchk -ntrace kmulti.f
+LF95 -c -o1 -tpp -nstchk -ntrace kopbnd.f
+LF95 -c -o1 -tpp -nstchk -ntrace kopdst.f
+LF95 -c -o1 -tpp -nstchk -ntrace korbs.f
+LF95 -c -o1 -tpp -nstchk -ntrace kpitor.f
+LF95 -c -o1 -tpp -nstchk -ntrace kpolr.f
+LF95 -c -o1 -tpp -nstchk -ntrace kstbnd.f
+LF95 -c -o1 -tpp -nstchk -ntrace ksttor.f
+LF95 -c -o1 -tpp -nstchk -ntrace ktorsn.f
+LF95 -c -o1 -tpp -nstchk -ntrace ktrtor.f
+LF95 -c -o1 -tpp -nstchk -ntrace kurybr.f
+LF95 -c -o1 -tpp -nstchk -ntrace kvdwpr.f
+LF95 -c -o1 -tpp -nstchk -ntrace kvdws.f
+LF95 -c -o1 -tpp -nstchk -ntrace light.f
+LF95 -c -o1 -tpp -nstchk -ntrace limits.f
+LF95 -c -o1 -tpp -nstchk -ntrace linmin.f
+LF95 -c -o1 -tpp -nstchk -ntrace math.f
+LF95 -c -o1 -tpp -nstchk -ntrace mdstuf.f
+LF95 -c -o1 -tpp -nstchk -ntrace merck.f
+LF95 -c -o1 -tpp -nstchk -ntrace minima.f
+LF95 -c -o1 -tpp -nstchk -ntrace molcul.f
+LF95 -c -o1 -tpp -nstchk -ntrace moldyn.f
+LF95 -c -o1 -tpp -nstchk -ntrace moment.f
+LF95 -c -o1 -tpp -nstchk -ntrace mplpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace mpole.f
+LF95 -c -o1 -tpp -nstchk -ntrace mutant.f
+LF95 -c -o1 -tpp -nstchk -ntrace neigh.f
+LF95 -c -o1 -tpp -nstchk -ntrace nonpol.f
+LF95 -c -o1 -tpp -nstchk -ntrace nucleo.f
+LF95 -c -o1 -tpp -nstchk -ntrace omega.f
+LF95 -c -o1 -tpp -nstchk -ntrace opbend.f
+LF95 -c -o1 -tpp -nstchk -ntrace opdist.f
+LF95 -c -o1 -tpp -nstchk -ntrace openmp.f
+LF95 -c -o1 -tpp -nstchk -ntrace orbits.f
+LF95 -c -o1 -tpp -nstchk -ntrace output.f
+LF95 -c -o1 -tpp -nstchk -ntrace params.f
+LF95 -c -o1 -tpp -nstchk -ntrace paths.f
+LF95 -c -o1 -tpp -nstchk -ntrace pbstuf.f
+LF95 -c -o1 -tpp -nstchk -ntrace pdb.f
+LF95 -c -o1 -tpp -nstchk -ntrace phipsi.f
+LF95 -c -o1 -tpp -nstchk -ntrace piorbs.f
+LF95 -c -o1 -tpp -nstchk -ntrace pistuf.f
+LF95 -c -o1 -tpp -nstchk -ntrace pitors.f
+LF95 -c -o1 -tpp -nstchk -ntrace pme.f
+LF95 -c -o1 -tpp -nstchk -ntrace polar.f
+LF95 -c -o1 -tpp -nstchk -ntrace polgrp.f
+LF95 -c -o1 -tpp -nstchk -ntrace polpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace potent.f
+LF95 -c -o1 -tpp -nstchk -ntrace potfit.f
+LF95 -c -o1 -tpp -nstchk -ntrace precis.f
+LF95 -c -o1 -tpp -nstchk -ntrace ptable.f
+LF95 -c -o1 -tpp -nstchk -ntrace qmstuf.f
+LF95 -c -o1 -tpp -nstchk -ntrace refer.f
+LF95 -c -o1 -tpp -nstchk -ntrace resdue.f
+LF95 -c -o1 -tpp -nstchk -ntrace restrn.f
+LF95 -c -o1 -tpp -nstchk -ntrace rgddyn.f
+LF95 -c -o1 -tpp -nstchk -ntrace rigid.f
+LF95 -c -o1 -tpp -nstchk -ntrace ring.f
+LF95 -c -o1 -tpp -nstchk -ntrace rotbnd.f
+LF95 -c -o1 -tpp -nstchk -ntrace rxnfld.f
+LF95 -c -o1 -tpp -nstchk -ntrace rxnpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace scales.f
+LF95 -c -o1 -tpp -nstchk -ntrace sequen.f
+LF95 -c -o1 -tpp -nstchk -ntrace shunt.f
+LF95 -c -o1 -tpp -nstchk -ntrace sizes.f
+LF95 -c -o1 -tpp -nstchk -ntrace socket.f
+LF95 -c -o1 -tpp -nstchk -ntrace solute.f
+LF95 -c -o1 -tpp -nstchk -ntrace stodyn.f
+LF95 -c -o1 -tpp -nstchk -ntrace strbnd.f
+LF95 -c -o1 -tpp -nstchk -ntrace strtor.f
+LF95 -c -o1 -tpp -nstchk -ntrace syntrn.f
+LF95 -c -o1 -tpp -nstchk -ntrace tarray.f
+LF95 -c -o1 -tpp -nstchk -ntrace titles.f
+LF95 -c -o1 -tpp -nstchk -ntrace torpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace tors.f
+LF95 -c -o1 -tpp -nstchk -ntrace tortor.f
+LF95 -c -o1 -tpp -nstchk -ntrace tree.f
+LF95 -c -o1 -tpp -nstchk -ntrace units.f
+LF95 -c -o1 -tpp -nstchk -ntrace uprior.f
+LF95 -c -o1 -tpp -nstchk -ntrace urey.f
+LF95 -c -o1 -tpp -nstchk -ntrace urypot.f
+LF95 -c -o1 -tpp -nstchk -ntrace usage.f
+LF95 -c -o1 -tpp -nstchk -ntrace usolve.f
+LF95 -c -o1 -tpp -nstchk -ntrace valfit.f
+LF95 -c -o1 -tpp -nstchk -ntrace vdw.f
+LF95 -c -o1 -tpp -nstchk -ntrace vdwpot.f
+LF95 -c -o1 -tpp -nstchk -ntrace vibs.f
+LF95 -c -o1 -tpp -nstchk -ntrace virial.f
+LF95 -c -o1 -tpp -nstchk -ntrace warp.f
+LF95 -c -o1 -tpp -nstchk -ntrace xtals.f
+LF95 -c -o1 -tpp -nstchk -ntrace zclose.f
+LF95 -c -o1 -tpp -nstchk -ntrace zcoord.f
+rem
+rem  now compile separately each of the Fortran source files
 rem
 LF95 -c -o1 -tpp -nstchk -ntrace active.f
 LF95 -c -o1 -tpp -nstchk -ntrace alchemy.f
