@@ -1,11 +1,11 @@
 #
 #
-#  #################################################################
-#  ##                                                             ##
-#  ##  link.make  --  link all of the TINKER programs for OpenMP  ##
-#  ##         (Intel Fortran Compiler for Linux Version)          ##
-#  ##                                                             ##
-#  #################################################################
+#  ###############################################################
+#  ##                                                           ##
+#  ##  link.make  --  link each of the TINKER package programs  ##
+#  ##             (Intel Fortran for Linux Version)             ##
+#  ##                                                           ##
+#  ###############################################################
 #
 #
 ifort -O3 -no-prec-div -fno-omit-frame-pointer -openmp -recursive -static-intel -o alchemy.x alchemy.o libtinker.a libfftw3_threads.a libfftw3.a ; strip alchemy.x

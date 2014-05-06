@@ -1,12 +1,170 @@
 #
 #
-#  ############################################################
-#  ##                                                        ##
-#  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##          (PathScale pathf90 for Linux Version)         ##
-#  ##                                                        ##
-#  ############################################################
+#  #############################################################
+#  ##                                                         ##
+#  ##  compile.make  --  compile each of the TINKER routines  ##
+#  ##          (PathScale pathf90 for Linux Version)          ##
+#  ##                                                         ##
+#  #############################################################
 #
+#
+#  compile all the modules; "sizes" must be first since it is used
+#  to set static array dimensions in many of the other modules
+#
+#
+pathf90 -c -O -msse3 -openmp sizes.f
+pathf90 -c -O -msse3 -openmp action.f
+pathf90 -c -O -msse3 -openmp align.f
+pathf90 -c -O -msse3 -openmp analyz.f
+pathf90 -c -O -msse3 -openmp angang.f
+pathf90 -c -O -msse3 -openmp angbnd.f
+pathf90 -c -O -msse3 -openmp angpot.f
+pathf90 -c -O -msse3 -openmp angtor.f
+pathf90 -c -O -msse3 -openmp argue.f
+pathf90 -c -O -msse3 -openmp ascii.f
+pathf90 -c -O -msse3 -openmp atmlst.f
+pathf90 -c -O -msse3 -openmp atomid.f
+pathf90 -c -O -msse3 -openmp atoms.f
+pathf90 -c -O -msse3 -openmp bath.f
+pathf90 -c -O -msse3 -openmp bitor.f
+pathf90 -c -O -msse3 -openmp bndpot.f
+pathf90 -c -O -msse3 -openmp bndstr.f
+pathf90 -c -O -msse3 -openmp bound.f
+pathf90 -c -O -msse3 -openmp boxes.f
+pathf90 -c -O -msse3 -openmp cell.f
+pathf90 -c -O -msse3 -openmp charge.f
+pathf90 -c -O -msse3 -openmp chgpot.f
+pathf90 -c -O -msse3 -openmp chrono.f
+pathf90 -c -O -msse3 -openmp chunks.f
+pathf90 -c -O -msse3 -openmp couple.f
+pathf90 -c -O -msse3 -openmp deriv.f
+pathf90 -c -O -msse3 -openmp dipole.f
+pathf90 -c -O -msse3 -openmp disgeo.f
+pathf90 -c -O -msse3 -openmp dma.f
+pathf90 -c -O -msse3 -openmp domega.f
+pathf90 -c -O -msse3 -openmp energi.f
+pathf90 -c -O -msse3 -openmp ewald.f
+pathf90 -c -O -msse3 -openmp faces.f
+pathf90 -c -O -msse3 -openmp fft.f
+pathf90 -c -O -msse3 -openmp fields.f
+pathf90 -c -O -msse3 -openmp files.f
+pathf90 -c -O -msse3 -openmp fracs.f
+pathf90 -c -O -msse3 -openmp freeze.f
+pathf90 -c -O -msse3 -openmp gkstuf.f
+pathf90 -c -O -msse3 -openmp group.f
+pathf90 -c -O -msse3 -openmp hescut.f
+pathf90 -c -O -msse3 -openmp hessn.f
+pathf90 -c -O -msse3 -openmp hpmf.f
+pathf90 -c -O -msse3 -openmp improp.f
+pathf90 -c -O -msse3 -openmp imptor.f
+pathf90 -c -O -msse3 -openmp inform.f
+pathf90 -c -O -msse3 -openmp inter.f
+pathf90 -c -O -msse3 -openmp iounit.f
+pathf90 -c -O -msse3 -openmp kanang.f
+pathf90 -c -O -msse3 -openmp kangs.f
+pathf90 -c -O -msse3 -openmp kantor.f
+pathf90 -c -O -msse3 -openmp katoms.f
+pathf90 -c -O -msse3 -openmp kbonds.f
+pathf90 -c -O -msse3 -openmp kchrge.f
+pathf90 -c -O -msse3 -openmp kdipol.f
+pathf90 -c -O -msse3 -openmp keys.f
+pathf90 -c -O -msse3 -openmp khbond.f
+pathf90 -c -O -msse3 -openmp kiprop.f
+pathf90 -c -O -msse3 -openmp kitors.f
+pathf90 -c -O -msse3 -openmp kmulti.f
+pathf90 -c -O -msse3 -openmp kopbnd.f
+pathf90 -c -O -msse3 -openmp kopdst.f
+pathf90 -c -O -msse3 -openmp korbs.f
+pathf90 -c -O -msse3 -openmp kpitor.f
+pathf90 -c -O -msse3 -openmp kpolr.f
+pathf90 -c -O -msse3 -openmp kstbnd.f
+pathf90 -c -O -msse3 -openmp ksttor.f
+pathf90 -c -O -msse3 -openmp ktorsn.f
+pathf90 -c -O -msse3 -openmp ktrtor.f
+pathf90 -c -O -msse3 -openmp kurybr.f
+pathf90 -c -O -msse3 -openmp kvdwpr.f
+pathf90 -c -O -msse3 -openmp kvdws.f
+pathf90 -c -O -msse3 -openmp light.f
+pathf90 -c -O -msse3 -openmp limits.f
+pathf90 -c -O -msse3 -openmp linmin.f
+pathf90 -c -O -msse3 -openmp math.f
+pathf90 -c -O -msse3 -openmp mdstuf.f
+pathf90 -c -O -msse3 -openmp merck.f
+pathf90 -c -O -msse3 -openmp minima.f
+pathf90 -c -O -msse3 -openmp molcul.f
+pathf90 -c -O -msse3 -openmp moldyn.f
+pathf90 -c -O -msse3 -openmp moment.f
+pathf90 -c -O -msse3 -openmp mplpot.f
+pathf90 -c -O -msse3 -openmp mpole.f
+pathf90 -c -O -msse3 -openmp mutant.f
+pathf90 -c -O -msse3 -openmp neigh.f
+pathf90 -c -O -msse3 -openmp nonpol.f
+pathf90 -c -O -msse3 -openmp nucleo.f
+pathf90 -c -O -msse3 -openmp omega.f
+pathf90 -c -O -msse3 -openmp opbend.f
+pathf90 -c -O -msse3 -openmp opdist.f
+pathf90 -c -O -msse3 -openmp openmp.f
+pathf90 -c -O -msse3 -openmp orbits.f
+pathf90 -c -O -msse3 -openmp output.f
+pathf90 -c -O -msse3 -openmp params.f
+pathf90 -c -O -msse3 -openmp paths.f
+pathf90 -c -O -msse3 -openmp pbstuf.f
+pathf90 -c -O -msse3 -openmp pdb.f
+pathf90 -c -O -msse3 -openmp phipsi.f
+pathf90 -c -O -msse3 -openmp piorbs.f
+pathf90 -c -O -msse3 -openmp pistuf.f
+pathf90 -c -O -msse3 -openmp pitors.f
+pathf90 -c -O -msse3 -openmp pme.f
+pathf90 -c -O -msse3 -openmp polar.f
+pathf90 -c -O -msse3 -openmp polgrp.f
+pathf90 -c -O -msse3 -openmp polpot.f
+pathf90 -c -O -msse3 -openmp potent.f
+pathf90 -c -O -msse3 -openmp potfit.f
+pathf90 -c -O -msse3 -openmp precis.f
+pathf90 -c -O -msse3 -openmp ptable.f
+pathf90 -c -O -msse3 -openmp qmstuf.f
+pathf90 -c -O -msse3 -openmp refer.f
+pathf90 -c -O -msse3 -openmp resdue.f
+pathf90 -c -O -msse3 -openmp restrn.f
+pathf90 -c -O -msse3 -openmp rgddyn.f
+pathf90 -c -O -msse3 -openmp rigid.f
+pathf90 -c -O -msse3 -openmp ring.f
+pathf90 -c -O -msse3 -openmp rotbnd.f
+pathf90 -c -O -msse3 -openmp rxnfld.f
+pathf90 -c -O -msse3 -openmp rxnpot.f
+pathf90 -c -O -msse3 -openmp scales.f
+pathf90 -c -O -msse3 -openmp sequen.f
+pathf90 -c -O -msse3 -openmp shunt.f
+pathf90 -c -O -msse3 -openmp sizes.f
+pathf90 -c -O -msse3 -openmp socket.f
+pathf90 -c -O -msse3 -openmp solute.f
+pathf90 -c -O -msse3 -openmp stodyn.f
+pathf90 -c -O -msse3 -openmp strbnd.f
+pathf90 -c -O -msse3 -openmp strtor.f
+pathf90 -c -O -msse3 -openmp syntrn.f
+pathf90 -c -O -msse3 -openmp tarray.f
+pathf90 -c -O -msse3 -openmp titles.f
+pathf90 -c -O -msse3 -openmp torpot.f
+pathf90 -c -O -msse3 -openmp tors.f
+pathf90 -c -O -msse3 -openmp tortor.f
+pathf90 -c -O -msse3 -openmp tree.f
+pathf90 -c -O -msse3 -openmp units.f
+pathf90 -c -O -msse3 -openmp uprior.f
+pathf90 -c -O -msse3 -openmp urey.f
+pathf90 -c -O -msse3 -openmp urypot.f
+pathf90 -c -O -msse3 -openmp usage.f
+pathf90 -c -O -msse3 -openmp usolve.f
+pathf90 -c -O -msse3 -openmp valfit.f
+pathf90 -c -O -msse3 -openmp vdw.f
+pathf90 -c -O -msse3 -openmp vdwpot.f
+pathf90 -c -O -msse3 -openmp vibs.f
+pathf90 -c -O -msse3 -openmp virial.f
+pathf90 -c -O -msse3 -openmp warp.f
+pathf90 -c -O -msse3 -openmp xtals.f
+pathf90 -c -O -msse3 -openmp zclose.f
+pathf90 -c -O -msse3 -openmp zcoord.f
+#
+#  now compile separately each of the Fortran source files
 #
 pathf90 -c -O -msse3 -openmp active.f
 pathf90 -c -O -msse3 -openmp alchemy.f

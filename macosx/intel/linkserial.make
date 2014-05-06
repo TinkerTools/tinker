@@ -1,11 +1,11 @@
 #
 #
-#  ####################################################################
-#  ##                                                                ##
-#  ##  linkserial.make  --  link all the TINKER programs for serial  ##
-#  ##          (Intel Fortran Compiler for Mac OSX Version)          ##
-#  ##                                                                ##
-#  ####################################################################
+#  ################################################################
+#  ##                                                            ##
+#  ##  linkserial.make  --  link the TINKER programs for serial  ##
+#  ##             (Intel Fortran for Mac OSX Version)            ##
+#  ##                                                            ##
+#  ################################################################
 #
 #
 ifort -O3 -no-ipo -no-prec-div -static-intel -mmacosx-version-min=10.6 -o alchemy.x alchemy.o libtinker.a ; strip alchemy.x

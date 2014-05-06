@@ -1,12 +1,170 @@
 #
 #
-#  ################################################################
-#  ##                                                            ##
-#  ##  debug.make  --  debug compile each of the TINKER modules  ##
-#  ##        (Intel Fortran Compiler for Mac OSX Version)        ##
-#  ##                                                            ##
-#  ################################################################
+#  #################################################################
+#  ##                                                             ##
+#  ##  debug.make  --  compile the TINKER routines for debugging  ##
+#  ##             (Intel Fortran for Mac OSX Version)             ##
+#  ##                                                             ##
+#  #################################################################
 #
+#
+#  compile all the modules; "sizes" must be first since it is used
+#  to set static array dimensions in many of the other modules
+#
+#
+ifort -c -g -warn unused -check uninit -check bounds sizes.f
+ifort -c -g -warn unused -check uninit -check bounds action.f
+ifort -c -g -warn unused -check uninit -check bounds align.f
+ifort -c -g -warn unused -check uninit -check bounds analyz.f
+ifort -c -g -warn unused -check uninit -check bounds angang.f
+ifort -c -g -warn unused -check uninit -check bounds angbnd.f
+ifort -c -g -warn unused -check uninit -check bounds angpot.f
+ifort -c -g -warn unused -check uninit -check bounds angtor.f
+ifort -c -g -warn unused -check uninit -check bounds argue.f
+ifort -c -g -warn unused -check uninit -check bounds ascii.f
+ifort -c -g -warn unused -check uninit -check bounds atmlst.f
+ifort -c -g -warn unused -check uninit -check bounds atomid.f
+ifort -c -g -warn unused -check uninit -check bounds atoms.f
+ifort -c -g -warn unused -check uninit -check bounds bath.f
+ifort -c -g -warn unused -check uninit -check bounds bitor.f
+ifort -c -g -warn unused -check uninit -check bounds bndpot.f
+ifort -c -g -warn unused -check uninit -check bounds bndstr.f
+ifort -c -g -warn unused -check uninit -check bounds bound.f
+ifort -c -g -warn unused -check uninit -check bounds boxes.f
+ifort -c -g -warn unused -check uninit -check bounds cell.f
+ifort -c -g -warn unused -check uninit -check bounds charge.f
+ifort -c -g -warn unused -check uninit -check bounds chgpot.f
+ifort -c -g -warn unused -check uninit -check bounds chrono.f
+ifort -c -g -warn unused -check uninit -check bounds chunks.f
+ifort -c -g -warn unused -check uninit -check bounds couple.f
+ifort -c -g -warn unused -check uninit -check bounds deriv.f
+ifort -c -g -warn unused -check uninit -check bounds dipole.f
+ifort -c -g -warn unused -check uninit -check bounds disgeo.f
+ifort -c -g -warn unused -check uninit -check bounds dma.f
+ifort -c -g -warn unused -check uninit -check bounds domega.f
+ifort -c -g -warn unused -check uninit -check bounds energi.f
+ifort -c -g -warn unused -check uninit -check bounds ewald.f
+ifort -c -g -warn unused -check uninit -check bounds faces.f
+ifort -c -g -warn unused -check uninit -check bounds fft.f
+ifort -c -g -warn unused -check uninit -check bounds fields.f
+ifort -c -g -warn unused -check uninit -check bounds files.f
+ifort -c -g -warn unused -check uninit -check bounds fracs.f
+ifort -c -g -warn unused -check uninit -check bounds freeze.f
+ifort -c -g -warn unused -check uninit -check bounds gkstuf.f
+ifort -c -g -warn unused -check uninit -check bounds group.f
+ifort -c -g -warn unused -check uninit -check bounds hescut.f
+ifort -c -g -warn unused -check uninit -check bounds hessn.f
+ifort -c -g -warn unused -check uninit -check bounds hpmf.f
+ifort -c -g -warn unused -check uninit -check bounds improp.f
+ifort -c -g -warn unused -check uninit -check bounds imptor.f
+ifort -c -g -warn unused -check uninit -check bounds inform.f
+ifort -c -g -warn unused -check uninit -check bounds inter.f
+ifort -c -g -warn unused -check uninit -check bounds iounit.f
+ifort -c -g -warn unused -check uninit -check bounds kanang.f
+ifort -c -g -warn unused -check uninit -check bounds kangs.f
+ifort -c -g -warn unused -check uninit -check bounds kantor.f
+ifort -c -g -warn unused -check uninit -check bounds katoms.f
+ifort -c -g -warn unused -check uninit -check bounds kbonds.f
+ifort -c -g -warn unused -check uninit -check bounds kchrge.f
+ifort -c -g -warn unused -check uninit -check bounds kdipol.f
+ifort -c -g -warn unused -check uninit -check bounds keys.f
+ifort -c -g -warn unused -check uninit -check bounds khbond.f
+ifort -c -g -warn unused -check uninit -check bounds kiprop.f
+ifort -c -g -warn unused -check uninit -check bounds kitors.f
+ifort -c -g -warn unused -check uninit -check bounds kmulti.f
+ifort -c -g -warn unused -check uninit -check bounds kopbnd.f
+ifort -c -g -warn unused -check uninit -check bounds kopdst.f
+ifort -c -g -warn unused -check uninit -check bounds korbs.f
+ifort -c -g -warn unused -check uninit -check bounds kpitor.f
+ifort -c -g -warn unused -check uninit -check bounds kpolr.f
+ifort -c -g -warn unused -check uninit -check bounds kstbnd.f
+ifort -c -g -warn unused -check uninit -check bounds ksttor.f
+ifort -c -g -warn unused -check uninit -check bounds ktorsn.f
+ifort -c -g -warn unused -check uninit -check bounds ktrtor.f
+ifort -c -g -warn unused -check uninit -check bounds kurybr.f
+ifort -c -g -warn unused -check uninit -check bounds kvdwpr.f
+ifort -c -g -warn unused -check uninit -check bounds kvdws.f
+ifort -c -g -warn unused -check uninit -check bounds light.f
+ifort -c -g -warn unused -check uninit -check bounds limits.f
+ifort -c -g -warn unused -check uninit -check bounds linmin.f
+ifort -c -g -warn unused -check uninit -check bounds math.f
+ifort -c -g -warn unused -check uninit -check bounds mdstuf.f
+ifort -c -g -warn unused -check uninit -check bounds merck.f
+ifort -c -g -warn unused -check uninit -check bounds minima.f
+ifort -c -g -warn unused -check uninit -check bounds molcul.f
+ifort -c -g -warn unused -check uninit -check bounds moldyn.f
+ifort -c -g -warn unused -check uninit -check bounds moment.f
+ifort -c -g -warn unused -check uninit -check bounds mplpot.f
+ifort -c -g -warn unused -check uninit -check bounds mpole.f
+ifort -c -g -warn unused -check uninit -check bounds mutant.f
+ifort -c -g -warn unused -check uninit -check bounds neigh.f
+ifort -c -g -warn unused -check uninit -check bounds nonpol.f
+ifort -c -g -warn unused -check uninit -check bounds nucleo.f
+ifort -c -g -warn unused -check uninit -check bounds omega.f
+ifort -c -g -warn unused -check uninit -check bounds opbend.f
+ifort -c -g -warn unused -check uninit -check bounds opdist.f
+ifort -c -g -warn unused -check uninit -check bounds openmp.f
+ifort -c -g -warn unused -check uninit -check bounds orbits.f
+ifort -c -g -warn unused -check uninit -check bounds output.f
+ifort -c -g -warn unused -check uninit -check bounds params.f
+ifort -c -g -warn unused -check uninit -check bounds paths.f
+ifort -c -g -warn unused -check uninit -check bounds pbstuf.f
+ifort -c -g -warn unused -check uninit -check bounds pdb.f
+ifort -c -g -warn unused -check uninit -check bounds phipsi.f
+ifort -c -g -warn unused -check uninit -check bounds piorbs.f
+ifort -c -g -warn unused -check uninit -check bounds pistuf.f
+ifort -c -g -warn unused -check uninit -check bounds pitors.f
+ifort -c -g -warn unused -check uninit -check bounds pme.f
+ifort -c -g -warn unused -check uninit -check bounds polar.f
+ifort -c -g -warn unused -check uninit -check bounds polgrp.f
+ifort -c -g -warn unused -check uninit -check bounds polpot.f
+ifort -c -g -warn unused -check uninit -check bounds potent.f
+ifort -c -g -warn unused -check uninit -check bounds potfit.f
+ifort -c -g -warn unused -check uninit -check bounds precis.f
+ifort -c -g -warn unused -check uninit -check bounds ptable.f
+ifort -c -g -warn unused -check uninit -check bounds qmstuf.f
+ifort -c -g -warn unused -check uninit -check bounds refer.f
+ifort -c -g -warn unused -check uninit -check bounds resdue.f
+ifort -c -g -warn unused -check uninit -check bounds restrn.f
+ifort -c -g -warn unused -check uninit -check bounds rgddyn.f
+ifort -c -g -warn unused -check uninit -check bounds rigid.f
+ifort -c -g -warn unused -check uninit -check bounds ring.f
+ifort -c -g -warn unused -check uninit -check bounds rotbnd.f
+ifort -c -g -warn unused -check uninit -check bounds rxnfld.f
+ifort -c -g -warn unused -check uninit -check bounds rxnpot.f
+ifort -c -g -warn unused -check uninit -check bounds scales.f
+ifort -c -g -warn unused -check uninit -check bounds sequen.f
+ifort -c -g -warn unused -check uninit -check bounds shunt.f
+ifort -c -g -warn unused -check uninit -check bounds sizes.f
+ifort -c -g -warn unused -check uninit -check bounds socket.f
+ifort -c -g -warn unused -check uninit -check bounds solute.f
+ifort -c -g -warn unused -check uninit -check bounds stodyn.f
+ifort -c -g -warn unused -check uninit -check bounds strbnd.f
+ifort -c -g -warn unused -check uninit -check bounds strtor.f
+ifort -c -g -warn unused -check uninit -check bounds syntrn.f
+ifort -c -g -warn unused -check uninit -check bounds tarray.f
+ifort -c -g -warn unused -check uninit -check bounds titles.f
+ifort -c -g -warn unused -check uninit -check bounds torpot.f
+ifort -c -g -warn unused -check uninit -check bounds tors.f
+ifort -c -g -warn unused -check uninit -check bounds tortor.f
+ifort -c -g -warn unused -check uninit -check bounds tree.f
+ifort -c -g -warn unused -check uninit -check bounds units.f
+ifort -c -g -warn unused -check uninit -check bounds uprior.f
+ifort -c -g -warn unused -check uninit -check bounds urey.f
+ifort -c -g -warn unused -check uninit -check bounds urypot.f
+ifort -c -g -warn unused -check uninit -check bounds usage.f
+ifort -c -g -warn unused -check uninit -check bounds usolve.f
+ifort -c -g -warn unused -check uninit -check bounds valfit.f
+ifort -c -g -warn unused -check uninit -check bounds vdw.f
+ifort -c -g -warn unused -check uninit -check bounds vdwpot.f
+ifort -c -g -warn unused -check uninit -check bounds vibs.f
+ifort -c -g -warn unused -check uninit -check bounds virial.f
+ifort -c -g -warn unused -check uninit -check bounds warp.f
+ifort -c -g -warn unused -check uninit -check bounds xtals.f
+ifort -c -g -warn unused -check uninit -check bounds zclose.f
+ifort -c -g -warn unused -check uninit -check bounds zcoord.f
+#
+#  now compile separately each of the Fortran source files
 #
 ifort -c -g -warn unused -check uninit -check bounds active.f
 ifort -c -g -warn unused -check uninit -check bounds alchemy.f

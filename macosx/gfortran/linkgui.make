@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  linkgui.make  --  link each of the TINKER programs for FFE  ##
-#  ##                (gfortran for Mac OSX Version)                ##
+#  ##              (GNU gfortran for Mac OSX Version)              ##
 #  ##                                                              ##
 #  ##################################################################
 #

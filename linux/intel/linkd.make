@@ -1,11 +1,11 @@
 #
 #
-#  ################################################################
-#  ##                                                            ##
-#  ##  link.make  --  link debug version of the TINKER programs  ##
-#  ##         (Intel Fortran Compiler for Linux Version)         ##
-#  ##                                                            ##
-#  ################################################################
+#  #############################################################
+#  ##                                                         ##
+#  ##  link.make  --  link the TINKER programs for debugging  ##
+#  ##            (Intel Fortran for Linux Version)            ##
+#  ##                                                         ##
+#  #############################################################
 #
 #
 ifort -g -o alchemy.x alchemy.o libtinker.a

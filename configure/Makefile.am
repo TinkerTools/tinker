@@ -6,24 +6,47 @@ lib_LTLIBRARIES = libtinker.la
 
 libtinker_la_LDFLAGS = $(FLIBS)
 libtinker_la_SOURCES = \
+	action.f \
 	active.f \
+	align.f \
 	analysis.f \
+	analyz.f \
+	angang.f \
+	angbnd.f \
 	angles.f \
+	angpot.f \
+	angtor.f \
+	argue.f \
+	ascii.f \
+	atmlst.f \
+	atomid.f \
+	atoms.f \
 	attach.f \
 	basefile.f \
+	bath.f \
 	beeman.f \
 	bicubic.f \
+	bitor.f \
 	bitors.f \
+	bndpot.f \
+	bndstr.f \
 	bonds.f \
 	born.f \
+	bound.f \
 	bounds.f \
+	boxes.f \
 	bussi.f \
 	calendar.f \
+	cell.f \
 	center.f \
+	charge.f \
+	chgpot.f \
 	chkpole.f \
 	chkring.f \
 	chkxyz.f \
 	cholesky.f \
+	chrono.f \
+	chunks.f \
 	clock.f \
 	cluster.f \
 	column.f \
@@ -31,12 +54,18 @@ libtinker_la_SOURCES = \
 	connect.f \
 	connolly.f \
 	control.f \
+	couple.f \
 	cspline.f \
 	cutoffs.f \
 	deflate.f \
 	delete.f \
+	deriv.f \
 	diagq.f \
 	diffeq.f \
+	dipole.f \
+	disgeo.f \
+	dma.f \
+	domega.f \
 	eangang.f \
 	eangang1.f \
 	eangang2.f \
@@ -45,6 +74,10 @@ libtinker_la_SOURCES = \
 	eangle1.f \
 	eangle2.f \
 	eangle3.f \
+	eangtor.f \
+	eangtor1.f \
+	eangtor2.f \
+	eangtor3.f \
 	ebond.f \
 	ebond1.f \
 	ebond2.f \
@@ -102,6 +135,7 @@ libtinker_la_SOURCES = \
 	empole1.f \
 	empole2.f \
 	empole3.f \
+	energi.f \
 	energy.f \
 	eopbend.f \
 	eopbend1.f \
@@ -145,21 +179,28 @@ libtinker_la_SOURCES = \
 	eurey2.f \
 	eurey3.f \
 	evcorr.f \
+	ewald.f \
 	extra.f \
 	extra1.f \
 	extra2.f \
 	extra3.f \
+	faces.f \
 	fatal.f \
+	fft.f \
 	fft3d.f \
 	fftpack.f \
 	field.f \
+	fields.f \
+	files.f \
 	final.f \
 	flatten.f \
+	fracs.f \
 	freeunit.f \
+	freeze.f \
 	geometry.f \
 	getint.f \
 	getkey.f \
-	getmolf. \
+	getmol.f \
 	getmol2.f \
 	getnumb.f \
 	getpdb.f \
@@ -170,91 +211,162 @@ libtinker_la_SOURCES = \
 	getword.f \
 	getxyz.f \
 	ghmcstep.f \
+	gkstuf.f \
 	gradient.f \
 	gradrgd.f \
 	gradrot.f \
+	group.f \
 	groups.f \
 	grpline.f \
 	gyrate.f \
+	hescut.f \
 	hessian.f \
+	hessn.f \
 	hessrgd.f \
 	hessrot.f \
+	hpmf.f \
 	hybrid.f \
 	image.f \
 	impose.f \
+	improp.f \
+	imptor.f \
 	induce.f \
 	inertia.f \
+	inform.f \
 	initatom.f \
 	initial.f \
 	initprm.f \
 	initres.f \
 	initrot.f \
 	insert.f \
+	inter.f \
 	invbeta.f \
 	invert.f \
+	iounit.f \
 	jacobi.f \
+	kanang.f \
 	kangang.f \
 	kangle.f \
+	kangs.f \
+	kangtor.f \
+	kantor.f \
 	katom.f \
+	katoms.f \
 	kbond.f \
+	kbonds.f \
 	kcharge.f \
+	kchrge.f \
+	kdipol.f \
 	kdipole.f \
 	kewald.f \
 	kextra.f \
+	keys.f \
 	kgeom.f \
+	khbond.f \
 	kimprop.f \
 	kimptor.f \
 	kinetic.f \
+	kiprop.f \
+	kitors.f \
 	kmetal.f \
 	kmpole.f \
+	kmulti.f \
 	kopbend.f \
+	kopbnd.f \
 	kopdist.f \
+	kopdst.f \
 	korbit.f \
+	korbs.f \
+	kpitor.f \
 	kpitors.f \
 	kpolar.f \
+	kpolr.f \
 	ksolv.f \
+	kstbnd.f \
 	kstrbnd.f \
 	kstrtor.f \
+	ksttor.f \
 	ktors.f \
+	ktorsn.f \
 	ktortor.f \
+	ktrtor.f \
 	kurey.f \
+	kurybr.f \
 	kvdw.f \
+	kvdwpr.f \
+	kvdws.f \
 	lattice.f \
 	lbfgs.f \
+	light.f \
 	lights.f \
+	limits.f \
+	linmin.f \
 	makeint.f \
 	makeref.f \
 	makexyz.f \
+	math.f \
 	maxwell.f \
 	mdinit.f \
 	mdrest.f \
 	mdsave.f \
 	mdstat.f \
+	mdstuf.f \
 	mechanic.f \
+	merck.f \
 	merge.f \
+	minima.f \
+	molcul.f \
+	moldyn.f \
 	molecule.f \
-	molxyz.f \
+	moment.f \
 	moments.f \
+	mplpot.f \
+	mpole.f \
+	mutant.f \
 	mutate.f \
 	nblist.f \
+	neigh.f \
 	nextarg.f \
 	nexttext.f \
+	nonpol.f \
 	nose.f \
 	nspline.f \
+	nucleo.f \
 	number.f \
 	numeral.f \
 	numgrad.f \
 	ocvm.f \
+	omega.f \
+	opbend.f \
+	opdist.f \
 	openend.f \
+	openmp.f \
 	optsave.f \
 	orbital.f \
+	orbits.f \
 	orient.f \
 	orthog.f \
+	output.f \
 	overlap.f \
+	params.f \
+	paths.f \
+	pbstuf.f \
+	pdb.f \
+	phipsi.f \
 	picalc.f \
+	piorbs.f \
+	pistuf.f \
+	pitors.f \
+	pme.f \
 	pmestuff.f \
 	pmpb.f \
+	polar.f \
+	polgrp.f \
+	polpot.f \
 	polymer.f \
+	potent.f \
+	potfit.f \
+	precis.f \
 	precise.f \
 	pressure.f \
 	prmkey.f \
@@ -267,6 +379,8 @@ libtinker_la_SOURCES = \
 	prtprm.f \
 	prtseq.f \
 	prtxyz.f \
+	ptable.f \
+	qmstuf.f \
 	quatfit.f \
 	random.f \
 	rattle.f \
@@ -279,37 +393,78 @@ libtinker_la_SOURCES = \
 	readprm.f \
 	readseq.f \
 	readxyz.f \
+	refer.f \
 	replica.f \
+	resdue.f \
 	respa.f \
+	restrn.f \
+	rgddyn.f \
 	rgdstep.f \
+	rigid.f \
+	ring.f \
 	rings.f \
 	rmsfit.f \
+	rotbnd.f \
 	rotlist.f \
 	rotpole.f \
+	rxnfld.f \
+	rxnpot.f \
+	scales.f \
 	sdstep.f \
 	search.f \
+	sequen.f \
 	server.f \
 	shakeup.f \
+	shunt.f \
 	sigmoid.f \
+	sizes.f \
+	sizes.f \
 	sktstuff.f \
+	socket.f \
+	solute.f \
 	sort.f \
 	square.f \
+	stodyn.f \
+	strbnd.f \
+	strtor.f \
 	suffix.f \
 	surface.f \
 	surfatom.f \
 	switch.f \
+	syntrn.f \
+	tarray.f \
 	temper.f \
+	titles.f \
 	tncg.f \
 	torphase.f \
+	torpot.f \
 	torque.f \
+	tors.f \
 	torsions.f \
+	tortor.f \
+	tree.f \
 	trimtext.f \
 	unitcell.f \
+	units.f \
+	uprior.f \
+	urey.f \
+	urypot.f \
+	usage.f \
+	usolve.f \
+	valfit.f \
+	vdw.f \
+	vdwpot.f \
 	verlet.f \
 	version.f \
+	vibs.f \
+	virial.f \
 	volume.f \
+	warp.f \
+	xtals.f \
 	xyzatm.f \
-	zatom.f
+	zatom.f \
+	zclose.f \
+	zcoord.f
 
 AM_LDFLAGS = $(BIN_LDFLAGS)
 LDADD = libtinker.la

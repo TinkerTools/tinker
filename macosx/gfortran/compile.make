@@ -1,12 +1,170 @@
 #
 #
-#  ############################################################
-#  ##                                                        ##
-#  ##  compile.make  --  compile each of the TINKER modules  ##
-#  ##             (gfortran for Mac OSX Version)             ##
-#  ##                                                        ##
-#  ############################################################
+#  #############################################################
+#  ##                                                         ##
+#  ##  compile.make  --  compile each of the TINKER routines  ##
+#  ##            (GNU gfortran for Mac OSX Version)           ##
+#  ##                                                         ##
+#  #############################################################
 #
+#
+#  compile all the modules; "sizes" must be first since it is used
+#  to set static array dimensions in many of the other modules
+#
+#
+gfortran -c -O3 -ffast-math -fopenmp sizes.f
+gfortran -c -O3 -ffast-math -fopenmp action.f
+gfortran -c -O3 -ffast-math -fopenmp align.f
+gfortran -c -O3 -ffast-math -fopenmp analyz.f
+gfortran -c -O3 -ffast-math -fopenmp angang.f
+gfortran -c -O3 -ffast-math -fopenmp angbnd.f
+gfortran -c -O3 -ffast-math -fopenmp angpot.f
+gfortran -c -O3 -ffast-math -fopenmp angtor.f
+gfortran -c -O3 -ffast-math -fopenmp argue.f
+gfortran -c -O3 -ffast-math -fopenmp ascii.f
+gfortran -c -O3 -ffast-math -fopenmp atmlst.f
+gfortran -c -O3 -ffast-math -fopenmp atomid.f
+gfortran -c -O3 -ffast-math -fopenmp atoms.f
+gfortran -c -O3 -ffast-math -fopenmp bath.f
+gfortran -c -O3 -ffast-math -fopenmp bitor.f
+gfortran -c -O3 -ffast-math -fopenmp bndpot.f
+gfortran -c -O3 -ffast-math -fopenmp bndstr.f
+gfortran -c -O3 -ffast-math -fopenmp bound.f
+gfortran -c -O3 -ffast-math -fopenmp boxes.f
+gfortran -c -O3 -ffast-math -fopenmp cell.f
+gfortran -c -O3 -ffast-math -fopenmp charge.f
+gfortran -c -O3 -ffast-math -fopenmp chgpot.f
+gfortran -c -O3 -ffast-math -fopenmp chrono.f
+gfortran -c -O3 -ffast-math -fopenmp chunks.f
+gfortran -c -O3 -ffast-math -fopenmp couple.f
+gfortran -c -O3 -ffast-math -fopenmp deriv.f
+gfortran -c -O3 -ffast-math -fopenmp dipole.f
+gfortran -c -O3 -ffast-math -fopenmp disgeo.f
+gfortran -c -O3 -ffast-math -fopenmp dma.f
+gfortran -c -O3 -ffast-math -fopenmp domega.f
+gfortran -c -O3 -ffast-math -fopenmp energi.f
+gfortran -c -O3 -ffast-math -fopenmp ewald.f
+gfortran -c -O3 -ffast-math -fopenmp faces.f
+gfortran -c -O3 -ffast-math -fopenmp fft.f
+gfortran -c -O3 -ffast-math -fopenmp fields.f
+gfortran -c -O3 -ffast-math -fopenmp files.f
+gfortran -c -O3 -ffast-math -fopenmp fracs.f
+gfortran -c -O3 -ffast-math -fopenmp freeze.f
+gfortran -c -O3 -ffast-math -fopenmp gkstuf.f
+gfortran -c -O3 -ffast-math -fopenmp group.f
+gfortran -c -O3 -ffast-math -fopenmp hescut.f
+gfortran -c -O3 -ffast-math -fopenmp hessn.f
+gfortran -c -O3 -ffast-math -fopenmp hpmf.f
+gfortran -c -O3 -ffast-math -fopenmp improp.f
+gfortran -c -O3 -ffast-math -fopenmp imptor.f
+gfortran -c -O3 -ffast-math -fopenmp inform.f
+gfortran -c -O3 -ffast-math -fopenmp inter.f
+gfortran -c -O3 -ffast-math -fopenmp iounit.f
+gfortran -c -O3 -ffast-math -fopenmp kanang.f
+gfortran -c -O3 -ffast-math -fopenmp kangs.f
+gfortran -c -O3 -ffast-math -fopenmp kantor.f
+gfortran -c -O3 -ffast-math -fopenmp katoms.f
+gfortran -c -O3 -ffast-math -fopenmp kbonds.f
+gfortran -c -O3 -ffast-math -fopenmp kchrge.f
+gfortran -c -O3 -ffast-math -fopenmp kdipol.f
+gfortran -c -O3 -ffast-math -fopenmp keys.f
+gfortran -c -O3 -ffast-math -fopenmp khbond.f
+gfortran -c -O3 -ffast-math -fopenmp kiprop.f
+gfortran -c -O3 -ffast-math -fopenmp kitors.f
+gfortran -c -O3 -ffast-math -fopenmp kmulti.f
+gfortran -c -O3 -ffast-math -fopenmp kopbnd.f
+gfortran -c -O3 -ffast-math -fopenmp kopdst.f
+gfortran -c -O3 -ffast-math -fopenmp korbs.f
+gfortran -c -O3 -ffast-math -fopenmp kpitor.f
+gfortran -c -O3 -ffast-math -fopenmp kpolr.f
+gfortran -c -O3 -ffast-math -fopenmp kstbnd.f
+gfortran -c -O3 -ffast-math -fopenmp ksttor.f
+gfortran -c -O3 -ffast-math -fopenmp ktorsn.f
+gfortran -c -O3 -ffast-math -fopenmp ktrtor.f
+gfortran -c -O3 -ffast-math -fopenmp kurybr.f
+gfortran -c -O3 -ffast-math -fopenmp kvdwpr.f
+gfortran -c -O3 -ffast-math -fopenmp kvdws.f
+gfortran -c -O3 -ffast-math -fopenmp light.f
+gfortran -c -O3 -ffast-math -fopenmp limits.f
+gfortran -c -O3 -ffast-math -fopenmp linmin.f
+gfortran -c -O3 -ffast-math -fopenmp math.f
+gfortran -c -O3 -ffast-math -fopenmp mdstuf.f
+gfortran -c -O3 -ffast-math -fopenmp merck.f
+gfortran -c -O3 -ffast-math -fopenmp minima.f
+gfortran -c -O3 -ffast-math -fopenmp molcul.f
+gfortran -c -O3 -ffast-math -fopenmp moldyn.f
+gfortran -c -O3 -ffast-math -fopenmp moment.f
+gfortran -c -O3 -ffast-math -fopenmp mplpot.f
+gfortran -c -O3 -ffast-math -fopenmp mpole.f
+gfortran -c -O3 -ffast-math -fopenmp mutant.f
+gfortran -c -O3 -ffast-math -fopenmp neigh.f
+gfortran -c -O3 -ffast-math -fopenmp nonpol.f
+gfortran -c -O3 -ffast-math -fopenmp nucleo.f
+gfortran -c -O3 -ffast-math -fopenmp omega.f
+gfortran -c -O3 -ffast-math -fopenmp opbend.f
+gfortran -c -O3 -ffast-math -fopenmp opdist.f
+gfortran -c -O3 -ffast-math -fopenmp openmp.f
+gfortran -c -O3 -ffast-math -fopenmp orbits.f
+gfortran -c -O3 -ffast-math -fopenmp output.f
+gfortran -c -O3 -ffast-math -fopenmp params.f
+gfortran -c -O3 -ffast-math -fopenmp paths.f
+gfortran -c -O3 -ffast-math -fopenmp pbstuf.f
+gfortran -c -O3 -ffast-math -fopenmp pdb.f
+gfortran -c -O3 -ffast-math -fopenmp phipsi.f
+gfortran -c -O3 -ffast-math -fopenmp piorbs.f
+gfortran -c -O3 -ffast-math -fopenmp pistuf.f
+gfortran -c -O3 -ffast-math -fopenmp pitors.f
+gfortran -c -O3 -ffast-math -fopenmp pme.f
+gfortran -c -O3 -ffast-math -fopenmp polar.f
+gfortran -c -O3 -ffast-math -fopenmp polgrp.f
+gfortran -c -O3 -ffast-math -fopenmp polpot.f
+gfortran -c -O3 -ffast-math -fopenmp potent.f
+gfortran -c -O3 -ffast-math -fopenmp potfit.f
+gfortran -c -O3 -ffast-math -fopenmp precis.f
+gfortran -c -O3 -ffast-math -fopenmp ptable.f
+gfortran -c -O3 -ffast-math -fopenmp qmstuf.f
+gfortran -c -O3 -ffast-math -fopenmp refer.f
+gfortran -c -O3 -ffast-math -fopenmp resdue.f
+gfortran -c -O3 -ffast-math -fopenmp restrn.f
+gfortran -c -O3 -ffast-math -fopenmp rgddyn.f
+gfortran -c -O3 -ffast-math -fopenmp rigid.f
+gfortran -c -O3 -ffast-math -fopenmp ring.f
+gfortran -c -O3 -ffast-math -fopenmp rotbnd.f
+gfortran -c -O3 -ffast-math -fopenmp rxnfld.f
+gfortran -c -O3 -ffast-math -fopenmp rxnpot.f
+gfortran -c -O3 -ffast-math -fopenmp scales.f
+gfortran -c -O3 -ffast-math -fopenmp sequen.f
+gfortran -c -O3 -ffast-math -fopenmp shunt.f
+gfortran -c -O3 -ffast-math -fopenmp sizes.f
+gfortran -c -O3 -ffast-math -fopenmp socket.f
+gfortran -c -O3 -ffast-math -fopenmp solute.f
+gfortran -c -O3 -ffast-math -fopenmp stodyn.f
+gfortran -c -O3 -ffast-math -fopenmp strbnd.f
+gfortran -c -O3 -ffast-math -fopenmp strtor.f
+gfortran -c -O3 -ffast-math -fopenmp syntrn.f
+gfortran -c -O3 -ffast-math -fopenmp tarray.f
+gfortran -c -O3 -ffast-math -fopenmp titles.f
+gfortran -c -O3 -ffast-math -fopenmp torpot.f
+gfortran -c -O3 -ffast-math -fopenmp tors.f
+gfortran -c -O3 -ffast-math -fopenmp tortor.f
+gfortran -c -O3 -ffast-math -fopenmp tree.f
+gfortran -c -O3 -ffast-math -fopenmp units.f
+gfortran -c -O3 -ffast-math -fopenmp uprior.f
+gfortran -c -O3 -ffast-math -fopenmp urey.f
+gfortran -c -O3 -ffast-math -fopenmp urypot.f
+gfortran -c -O3 -ffast-math -fopenmp usage.f
+gfortran -c -O3 -ffast-math -fopenmp usolve.f
+gfortran -c -O3 -ffast-math -fopenmp valfit.f
+gfortran -c -O3 -ffast-math -fopenmp vdw.f
+gfortran -c -O3 -ffast-math -fopenmp vdwpot.f
+gfortran -c -O3 -ffast-math -fopenmp vibs.f
+gfortran -c -O3 -ffast-math -fopenmp virial.f
+gfortran -c -O3 -ffast-math -fopenmp warp.f
+gfortran -c -O3 -ffast-math -fopenmp xtals.f
+gfortran -c -O3 -ffast-math -fopenmp zclose.f
+gfortran -c -O3 -ffast-math -fopenmp zcoord.f
+#
+#  now compile separately each of the Fortran source files
 #
 gfortran -c -O3 -ffast-math -fopenmp active.f
 gfortran -c -O3 -ffast-math -fopenmp alchemy.f

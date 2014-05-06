@@ -3,7 +3,7 @@
 #  #################################################################
 #  ##                                                             ##
 #  ##  linkprof.make  --  link the TINKER programs for profiling  ##
-#  ##        (Intel Fortran Compiler for Mac OSX Version)         ##
+#  ##             (Intel Fortran for Mac OSX Version)             ##
 #  ##                                                             ##
 #  #################################################################
 #

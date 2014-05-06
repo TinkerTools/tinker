@@ -3,7 +3,7 @@
 #  #############################################################
 #  ##                                                         ##
 #  ##  linkapbs.make  --  link the TINKER programs with APBS  ##
-#  ##        (Intel Fortran Compiler for Linux Version)       ##
+#  ##            (Intel Fortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################
 #

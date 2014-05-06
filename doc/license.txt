@@ -3,7 +3,7 @@
                   TINKER -- Software Tools for Molecular Design
                   ---------------------------------------------
 
-                           Version 6.3   February 2014
+                             Version 7.0   June 2014
                    Copyright (C) 1990-2014  Jay William Ponder
 
 TINKER is a modular program package for molecular mechanics-based potential
@@ -16,8 +16,8 @@ Selected References for the TINKER Package
 
 (1)  Y. Shi, et al., J. Chem. Theory Comput., 9, 4046-4063 (2013)
 
-(2)  P. Ren, C. Wu and J. W. Ponder, J. Chem. Theory Comput., 7, 3143-3161
-     (2011)
+(2)  P. Ren, C. Wu and J. W. Ponder, J. Chem. Theory Comput., 7,
+     3143-3161 (2011)
 
 (3)  J. W. Ponder, et al., J. Phys. Chem. B, 114, 2549-2564 (2010)
 
@@ -70,10 +70,10 @@ the following conditions:
 		_____________________________________	E-mail
 
 If the above conditions are accepted, please sign this form and return a copy
-by mail to the following address:
+by mail to the address shown below:
 
-		Prof. Jay W. Ponder
-		Department of Chemistry, Box 1134
-		Washington University in Saint Louis
-		One Brookings Drive
-		Saint Louis, MO  63130   U.S.A.
+	Prof. Jay W. Ponder
+	Department of Chemistry, Box 1134     phone:  1-314-9354275
+	Washington University in St Louis     fax:    1-314-9354481
+	One Brookings Drive                   email:  ponder@dasher.wustl.edu
+	Saint Louis, MO 63130  U.S.A.

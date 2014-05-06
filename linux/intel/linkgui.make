@@ -1,11 +1,11 @@
 #
 #
-#  ##################################################################
-#  ##                                                              ##
-#  ##  linkgui.make  --  link each of the TINKER programs for FFE  ##
-#  ##          (Intel Fortran Compiler for Linux Version)          ##
-#  ##                                                              ##
-#  ##################################################################
+#  ##############################################################
+#  ##                                                          ##
+#  ##  linkgui.make  --  link the TINKER programs for FFE use  ##
+#  ##             (Intel Fortran for Linux Version)            ##
+#  ##                                                          ##
+#  ##############################################################
 #
 #
 #  Copy the Java libjvm.so library from ../jre/lib/i386/client

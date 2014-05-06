@@ -1,4 +1,4 @@
-AC_INIT([tinker], [6.0], [ponder@dasher.wustl.edu])
+AC_INIT([tinker], [7.0], [ponder@dasher.wustl.edu])
 AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_MACRO_DIR([.])
 AM_INIT_AUTOMAKE([1.8 foreign])
