@@ -27,6 +27,7 @@ c
       use keys
       use kiprop
       use potent
+      use tors
       implicit none
       integer i,j,k,ndi
       integer ia,ib,ic,id
@@ -108,9 +109,9 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iiprop))  allocate (iiprop(4,maxtors))
-      if (.not. allocated(kprop))  allocate (kprop(maxtors))
-      if (.not. allocated(vprop))  allocate (vprop(maxtors))
+      if (.not. allocated(iiprop))  allocate (iiprop(4,ntors))
+      if (.not. allocated(kprop))  allocate (kprop(ntors))
+      if (.not. allocated(vprop))  allocate (vprop(ntors))
 c
 c     assign improper dihedral parameters for each improper angle;
 c     multiple symmetrical parameters are given partial weights

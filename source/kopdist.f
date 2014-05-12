@@ -127,9 +127,9 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iopd))  allocate (iopd(4,maxatm))
-      if (.not. allocated(opdk))  allocate (opdk(maxatm))
-      if (.not. allocated(angtyp))  allocate (angtyp(maxang))
+      if (.not. allocated(iopd))  allocate (iopd(4,n))
+      if (.not. allocated(opdk))  allocate (opdk(n))
+      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
 c
 c     assign out-of-plane distance parameters for trigonal sites
 c

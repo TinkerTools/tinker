@@ -28,6 +28,7 @@ c
       use kpitor
       use pitors
       use potent
+      use tors
       implicit none
       integer i,j,npt
       integer ia,ib
@@ -101,8 +102,8 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ipit))  allocate (ipit(6,maxtors))
-      if (.not. allocated(kpit))  allocate (kpit(maxtors))
+      if (.not. allocated(ipit))  allocate (ipit(6,ntors))
+      if (.not. allocated(kpit))  allocate (kpit(ntors))
 c
 c     assign pi-orbital torsion parameters as required
 c

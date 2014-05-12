@@ -31,9 +31,9 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iang))  allocate (iang(4,maxang))
+      if (.not. allocated(iang))  allocate (iang(4,4*n))
       if (.not. allocated(anglist))
-     &   allocate (anglist(maxval*(maxval-1)/2,maxatm))
+     &   allocate (anglist(maxval*(maxval-1)/2,n))
 c
 c     loop over all atoms, storing the atoms in each bond angle
 c

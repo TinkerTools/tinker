@@ -20,6 +20,7 @@ c
       subroutine bitors
       use sizes
       use angbnd
+      use atoms
       use bitor
       use couple
       use iounit
@@ -30,7 +31,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ibitor))  allocate (ibitor(5,maxbitor))
+      if (.not. allocated(ibitor))  allocate (ibitor(5,8*n))
 c
 c     loop over all angles, storing the atoms in each bitorsion
 c

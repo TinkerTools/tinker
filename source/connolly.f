@@ -44,7 +44,7 @@ c     fpncy   number of cycles bounding convex face
 c     nfp     number of convex faces
 c     cynep   number of convex edges in cycle
 c
-c     a       atomic coordinates
+c     axyz    atomic coordinates
 c     ar      atomic radii
 c     pr      probe radius
 c     skip    if true, atom is not used
@@ -72,7 +72,7 @@ c     tfree   torus free of neighbors
 c
 c     p       probe coordinates
 c     pa      probe atom numbers
-c     v       vertex coordinates
+c     vxyz    vertex coordinates
 c     va      vertex atom number
 c     vp      vertex probe number
 c     c       circle center
@@ -105,6 +105,70 @@ c
       real*8 radius(*)
 c
 c
+c     dimensions for arrays used by Connolly routines
+c
+      maxcls = 50 * n
+      maxtt = 25 * n
+      maxt = 3 * n
+      maxp = 2 * n
+      maxv = 5 * n
+      maxen = 5 * n
+      maxfn = 2 * n
+      maxc = 5 * n
+      maxep = 5 * n
+      maxfs = 3 * n
+      maxcy = n
+      mxcyep = 30
+      maxfp = n
+      mxfpcy = 10
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ar))  allocate (ar(n))
+      if (.not. allocated(axyz))  allocate (axyz(3,n))
+      if (.not. allocated(skip))  allocate (skip(n))
+      if (.not. allocated(nosurf))  allocate (nosurf(n))
+      if (.not. allocated(afree))  allocate (afree(n))
+      if (.not. allocated(abur))  allocate (abur(n))
+      if (.not. allocated(cls))  allocate (cls(maxcls))
+      if (.not. allocated(clst))  allocate (clst(maxcls))
+      if (.not. allocated(acls))  allocate (acls(2,n))
+      if (.not. allocated(ttfe))  allocate (ttfe(maxtt))
+      if (.not. allocated(ttle))  allocate (ttle(maxtt))
+      if (.not. allocated(enext))  allocate (enext(maxen))
+      if (.not. allocated(tta))  allocate (tta(2,maxtt))
+      if (.not. allocated(ttbur))  allocate (ttbur(maxtt))
+      if (.not. allocated(ttfree))  allocate (ttfree(maxtt))
+      if (.not. allocated(tfe))  allocate (tfe(maxt))
+      if (.not. allocated(ta))  allocate (ta(2,maxt))
+      if (.not. allocated(tr))  allocate (tr(maxt))
+      if (.not. allocated(t))  allocate (t(3,maxt))
+      if (.not. allocated(tax))  allocate (tax(3,maxt))
+      if (.not. allocated(tfree))  allocate (tfree(maxt))
+      if (.not. allocated(pa))  allocate (pa(3,maxp))
+      if (.not. allocated(p))  allocate (p(3,maxp))
+      if (.not. allocated(va))  allocate (va(maxv))
+      if (.not. allocated(vp))  allocate (vp(maxv))
+      if (.not. allocated(vxyz))  allocate (vxyz(3,maxv))
+      if (.not. allocated(env))  allocate (env(2,maxen))
+      if (.not. allocated(fnen))  allocate (fnen(3,maxfn))
+      if (.not. allocated(ca))  allocate (ca(maxc))
+      if (.not. allocated(ct))  allocate (ct(maxc))
+      if (.not. allocated(cr))  allocate (cr(maxc))
+      if (.not. allocated(c))  allocate (c(3,maxc))
+      if (.not. allocated(epc))  allocate (epc(maxep))
+      if (.not. allocated(epv))  allocate (epv(2,maxep))
+      if (.not. allocated(afe))  allocate (afe(n))
+      if (.not. allocated(ale))  allocate (ale(n))
+      if (.not. allocated(epnext))  allocate (epnext(maxep))
+      if (.not. allocated(fsen))  allocate (fsen(2,maxfs))
+      if (.not. allocated(fsep))  allocate (fsep(2,maxfs))
+      if (.not. allocated(cynep))  allocate (cynep(maxcy))
+      if (.not. allocated(cyep))  allocate (cyep(mxcyep,maxcy))
+      if (.not. allocated(fpa))  allocate (fpa(maxfp))
+      if (.not. allocated(fpncy))  allocate (fpncy(maxfp))
+      if (.not. allocated(fpcy))  allocate (fpcy(mxfpcy,maxfp))
+c
 c     set the probe radius and the number of atoms
 c
       pr = probe
@@ -114,9 +178,9 @@ c     set atom coordinates and radii, the excluded buffer
 c     radius ("exclude") is added to atomic radii
 c
       do i = 1, na
-         a(1,i) = x(i)
-         a(2,i) = y(i)
-         a(3,i) = z(i)
+         axyz(1,i) = x(i)
+         axyz(2,i) = y(i)
+         axyz(3,i) = z(i)
          ar(i) = radius(i)
          if (ar(i) .eq. 0.0d0) then
             skip(i) = .true.
@@ -152,7 +216,6 @@ c     to avoid numerical instabilities for symmetrical structures
 c
 c
       subroutine wiggle
-      use sizes
       use faces
       implicit none
       integer i
@@ -165,9 +228,9 @@ c
       size = 0.000001d0
       do i = 1, na
          call ranvec (vector)
-         a(1,i) = a(1,i) + size*vector(1)
-         a(2,i) = a(2,i) + size*vector(2)
-         a(3,i) = a(3,i) + size*vector(3)
+         axyz(1,i) = axyz(1,i) + size*vector(1)
+         axyz(2,i) = axyz(2,i) + size*vector(2)
+         axyz(3,i) = axyz(3,i) + size*vector(3)
       end do
       return
       end
@@ -195,12 +258,10 @@ c     itnl     temporary neighbor list, before sorting
 c
 c
       subroutine nearby
-      use sizes
       use faces
       implicit none
-      integer maxclsa,maxcube
+      integer maxclsa
       parameter (maxclsa=1000)
-      parameter (maxcube=40)
       integer i,j,k,m
       integer iptr,juse
       integer i1,j1,k1
@@ -210,18 +271,19 @@ c
       integer jcls,jmin
       integer jmincls,jmold
       integer ncls,nclsa
+      integer maxcube
       integer clsa(maxclsa)
       integer itnl(maxclsa)
       integer, allocatable :: icuptr(:)
       integer, allocatable :: ico(:,:)
-      integer icube(maxcube,maxcube,maxcube)
+      integer, allocatable :: icube(:,:,:)
       real*8 radmax,width
       real*8 sum,sumi
       real*8 dist2,d2,r2
       real*8 vect1,vect2,vect3
       real*8 comin(3)
-      logical scube(maxcube,maxcube,maxcube)
-      logical sscube(maxcube,maxcube,maxcube)
+      logical, allocatable :: scube(:,:,:)
+      logical, allocatable :: sscube(:,:,:)
 c
 c
 c     ignore all atoms that are completely inside another atom;
@@ -230,7 +292,7 @@ c
       do i = 1, na-1
          if (.not. skip(i)) then
             do j = i+1, na
-               d2 = dist2(a(1,i),a(1,j))
+               d2 = dist2(axyz(1,i),axyz(1,j))
                r2 = (ar(i) - ar(j))**2
                if (.not.skip(j) .and. d2.lt.r2) then
                   if (ar(i) .lt. ar(j)) then
@@ -247,11 +309,11 @@ c     check for new coordinate minima and radii maxima
 c
       radmax = 0.0d0
       do k = 1, 3
-         comin(k) = a(k,1)
+         comin(k) = axyz(k,1)
       end do
       do i = 1, na
          do k = 1, 3
-            if (a(k,i) .lt. comin(k))  comin(k) = a(k,i)
+            if (axyz(k,i) .lt. comin(k))  comin(k) = axyz(k,i)
          end do
          if (ar(i) .gt. radmax)  radmax = ar(i)
       end do
@@ -263,14 +325,18 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      maxcube = 40
       allocate (icuptr(na))
       allocate (ico(3,na))
+      allocate (icube(maxcube,maxcube,maxcube))
+      allocate (scube(maxcube,maxcube,maxcube))
+      allocate (sscube(maxcube,maxcube,maxcube))
 c
 c     set up cube arrays; first the integer coordinate arrays
 c
       do i = 1, na
          do k = 1, 3
-            ico(k,i) = (a(k,i)-comin(k))/width + 1
+            ico(k,i) = (axyz(k,i)-comin(k))/width + 1
             if (ico(k,i) .lt. 1) then
                call cerror ('Cube Coordinate Too Small')
             else if (ico(k,i) .gt. maxcube) then
@@ -321,7 +387,7 @@ c
 c
 c     check for duplicate atoms, turn off one of them
 c
-            if (dist2(a(1,iatom),a(1,iptr)) .le. 0.0d0) then
+            if (dist2(axyz(1,iatom),axyz(1,iptr)) .le. 0.0d0) then
                skip(iatom) = .true.
                goto 30
             end if
@@ -400,11 +466,11 @@ c
 c     distance check
 c
                   sum = sumi + ar(j)
-                  vect1 = abs(a(1,j) - a(1,i))
+                  vect1 = abs(axyz(1,j) - axyz(1,i))
                   if (vect1 .ge. sum)  goto 50
-                  vect2 = abs(a(2,j) - a(2,i))
+                  vect2 = abs(axyz(2,j) - axyz(2,i))
                   if (vect2 .ge. sum)  goto 50
-                  vect3 = abs(a(3,j) - a(3,i))
+                  vect3 = abs(axyz(3,j) - axyz(3,i))
                   if (vect3 .ge. sum)  goto 50
                   d2 = vect1**2 + vect2**2 + vect3**2
                   if (d2 .ge. sum**2)  goto 50
@@ -471,6 +537,9 @@ c     perform deallocation of some local arrays
 c
       deallocate (icuptr)
       deallocate (ico)
+      deallocate (icube)
+      deallocate (scube)
+      deallocate (sscube)
       return
       end
 c
@@ -487,7 +556,6 @@ c     by testing for a torus between each atom and its neighbors
 c
 c
       subroutine torus
-      use sizes
       use faces
       implicit none
       integer ia,ja,jn
@@ -693,7 +761,7 @@ c
          call gettor (ia,ja,ttok,bij,hij,uij)
          do km = 1, nmnb
             ka = mnb(km)
-            discls(km) = dist2(bij,a(1,ka))
+            discls(km) = dist2(bij,axyz(1,ka))
             sumcls(km) = (pr+ar(ka))**2
 c
 c     initialize link to next farthest out neighbor
@@ -802,7 +870,7 @@ c
 c
 c     compare distance to sum of radii
 c
-               d2 = dist2(pijk,a(1,la))
+               d2 = dist2(pijk,axyz(1,la))
                if (d2 .le. sumcls(lm))  goto 110
    90          continue
                lm = lkcls(lm)
@@ -832,26 +900,26 @@ c     calculate vectors from probe to atom centers
 c
                if (nv+3 .gt. maxv)  call cerror ('Too many Vertices')
                do k = 1, 3
-                  v(k,nv+1) = a(k,ia) - p(k,np)
-                  v(k,nv+2) = a(k,ja) - p(k,np)
-                  v(k,nv+3) = a(k,ka) - p(k,np)
+                  vxyz(k,nv+1) = axyz(k,ia) - p(k,np)
+                  vxyz(k,nv+2) = axyz(k,ja) - p(k,np)
+                  vxyz(k,nv+3) = axyz(k,ka) - p(k,np)
                end do
 c
 c     calculate determinant of vectors defining triangle
 c
-               det = v(1,nv+1)*v(2,nv+2)*v(3,nv+3)
-     &                  + v(1,nv+2)*v(2,nv+3)*v(3,nv+1)
-     &                  + v(1,nv+3)*v(2,nv+1)*v(3,nv+2)
-     &                  - v(1,nv+3)*v(2,nv+2)*v(3,nv+1)
-     &                  - v(1,nv+2)*v(2,nv+1)*v(3,nv+3)
-     &                  - v(1,nv+1)*v(2,nv+3)*v(3,nv+2)
+               det = vxyz(1,nv+1)*vxyz(2,nv+2)*vxyz(3,nv+3)
+     &                  + vxyz(1,nv+2)*vxyz(2,nv+3)*vxyz(3,nv+1)
+     &                  + vxyz(1,nv+3)*vxyz(2,nv+1)*vxyz(3,nv+2)
+     &                  - vxyz(1,nv+3)*vxyz(2,nv+2)*vxyz(3,nv+1)
+     &                  - vxyz(1,nv+2)*vxyz(2,nv+1)*vxyz(3,nv+3)
+     &                  - vxyz(1,nv+1)*vxyz(2,nv+3)*vxyz(3,nv+2)
 c
 c     now add probe coordinates to vertices
 c
                do k = 1, 3
-                  v(k,nv+1) = p(k,np) + v(k,nv+1)*pr/(ar(ia)+pr)
-                  v(k,nv+2) = p(k,np) + v(k,nv+2)*pr/(ar(ja)+pr)
-                  v(k,nv+3) = p(k,np) + v(k,nv+3)*pr/(ar(ka)+pr)
+                  vxyz(k,nv+1) = p(k,np) + vxyz(k,nv+1)*pr/(ar(ia)+pr)
+                  vxyz(k,nv+2) = p(k,np) + vxyz(k,nv+2)*pr/(ar(ja)+pr)
+                  vxyz(k,nv+3) = p(k,np) + vxyz(k,nv+3)*pr/(ar(ka)+pr)
                end do
 c
 c     want the concave face to have counter-clockwise orientation
@@ -861,9 +929,9 @@ c
 c     swap second and third vertices
 c
                   do k = 1, 3
-                     tempv(k) = v(k,nv+2)
-                     v(k,nv+2) = v(k,nv+3)
-                     v(k,nv+3) = tempv(k)
+                     tempv(k) = vxyz(k,nv+2)
+                     vxyz(k,nv+2) = vxyz(k,nv+3)
+                     vxyz(k,nv+3) = tempv(k)
                   end do
 c
 c     set up pointers from probe to atoms
@@ -1116,7 +1184,7 @@ c
 c     vector from atom to torus center
 c
             do k = 1, 3
-               atvect(k) = t(k,it) - a(k,ia)
+               atvect(k) = t(k,it) - axyz(k,ia)
             end do
             factor = ar(ia) / (ar(ia)+pr)
 c
@@ -1128,15 +1196,12 @@ c
 c     circle center
 c
             do k = 1, 3
-               c(k,nc) = a(k,ia) + factor*atvect(k)
+               c(k,nc) = axyz(k,ia) + factor*atvect(k)
             end do
 c
-c     pointer from circle to atom
+c     pointer from circle to atom and to torus
 c
             ca(nc) = ia
-c
-c     pointer from circle to torus
-c
             ct(nc) = it
 c
 c     circle radius
@@ -1444,7 +1509,7 @@ c     second convex edge for saddle face
 c
          fsep(2,nfs) = nep
 c
-c     buried torus; do nothing with it
+c     nothing to do for buried torus
 c
    80    continue
       end do
@@ -1468,8 +1533,9 @@ c
       use faces
       implicit none
       integer k,ia,ja
-      real*8 dist2,dij,temp
-      real*8 temp1,temp2
+      real*8 dist2,dij
+      real*8 temp,temp1
+      real*8 temp2
       real*8 torad
       real*8 torcen(3)
       real*8 torax(3)
@@ -1482,12 +1548,12 @@ c
 c     get the distance between the two atoms
 c
       ttok = .false.
-      dij = sqrt(dist2(a(1,ia),a(1,ja)))
+      dij = sqrt(dist2(axyz(1,ia),axyz(1,ja)))
 c
 c     find a unit vector along interatomic (torus) axis
 c
       do k = 1, 3
-         vij(k) = a(k,ja) - a(k,ia)
+         vij(k) = axyz(k,ja) - axyz(k,ia)
          uij(k) = vij(k) / dij
       end do
 c
@@ -1495,7 +1561,7 @@ c     find coordinates of the center of the torus
 c
       temp = 1.0d0 + ((ar(ia)+pr)**2-(ar(ja)+pr)**2)/dij**2
       do k = 1, 3
-         bij(k) = a(k,ia) + 0.5d0*vij(k)*temp
+         bij(k) = axyz(k,ia) + 0.5d0*vij(k)*temp
       end do
 c
 c     skip if atoms too far apart (should not happen)
@@ -1557,7 +1623,7 @@ c
       tb = .false.
       call gettor (ia,ja,tok,tij,rij,uij)
       if (.not. tok)  return
-      dat2 = dist2(a(1,ka),tij)
+      dat2 = dist2(axyz(1,ka),tij)
       rad2 = (ar(ka)+pr)**2 - rij**2
 c
 c     if "ka" less than "ja", then all we care about
@@ -1596,7 +1662,7 @@ c
       do k = 1, 3
          bijk(k) = tij(k) + utb(k)*fact
       end do
-      dba = dist2(a(1,ia),bijk)
+      dba = dist2(axyz(1,ia),bijk)
       rip2 = (ar(ia) + pr)**2
       rad = rip2 - dba
       if (rad .lt. 0.0d0) then
@@ -1670,8 +1736,10 @@ c
       integer ncypa,icya,jcya,kcya
       integer ncyep,icyep,jcyep
       integer ncyold,nused,lookv
-      integer aic(maxepa),aia(maxepa)
-      integer aep(maxepa),av(2,maxepa)
+      integer aic(maxepa)
+      integer aia(maxepa)
+      integer aep(maxepa)
+      integer av(2,maxepa)
       integer ncyepa(maxcypa)
       integer cyepa(mxcyep,maxcypa)
       real*8 anorm,anaa,factor
@@ -1762,8 +1830,8 @@ c     vector from atom to center of neighboring atom
 c     sometimes we use one vector, sometimes the other
 c
          do k = 1, 3
-            acvect(k,nepa) = c(k,ic) - a(k,ia)
-            aavect(k,nepa) = a(k,ia2) - a(k,ia)
+            acvect(k,nepa) = c(k,ic) - axyz(k,ia)
+            aavect(k,nepa) = axyz(k,ia2) - axyz(k,ia)
          end do
 c
 c     circle radius
@@ -1898,8 +1966,7 @@ c
          end if
    70    continue
 c
-c     this cycle is finished
-c     store number of edges in cycle
+c     this cycle is finished, store number of edges in cycle
 c
          ncyepa(ncypa) = ncyep
          cynep(ncy) = ncyep
@@ -1916,13 +1983,7 @@ c
          do icya = 1, ncypa
             do jcya = 1, ncypa
                jcy = ncyold + jcya
-c
-c     initialize
-c
                cycy(icya,jcya) = .true.
-c
-c     check for same cycle
-c
                if (icya .eq. jcya)  goto 90
 c
 c     if cycle j has two or fewer edges, nothing can
@@ -1952,7 +2013,7 @@ c
 c     north pole and unit vector pointing south
 c
                do k = 1, 3
-                  pole(k) = factor*aavect(k,iepa) + a(k,ia)
+                  pole(k) = factor*aavect(k,iepa) + axyz(k,ia)
                   unvect(k) = -aavect(k,iepa) / anaa
                end do
                cycy(icya,jcya) = ptincy(pole,unvect,jcy)
@@ -2305,7 +2366,7 @@ c
          end do
          do ke = 1, 3
             do k = 1, 3
-               vects(k,ke) = v(k,ivs(ke)) - p(k,ip)
+               vects(k,ke) = vxyz(k,ivs(ke)) - p(k,ip)
             end do
          end do
 c
@@ -2439,8 +2500,8 @@ c
                iv1 = env(1,ien)
                iv2 = env(2,ien)
                do k = 1, 3
-                  vect3(k) = v(k,iv1) - fncen(k,ifn)
-                  vect4(k) = v(k,iv2) - fncen(k,ifn)
+                  vect3(k) = vxyz(k,iv1) - fncen(k,ifn)
+                  vect4(k) = vxyz(k,iv2) - fncen(k,ifn)
                end do
                do ke2 = 1, 3
                   if (ispind(ke) .eq. ispnd2(ke2))  goto 40
@@ -2453,8 +2514,8 @@ c
                   iv1 = env(1,ien)
                   iv2 = env(2,ien)
                   do k = 1, 3
-                     vect7(k) = v(k,iv1) - fncen(k,jfn)
-                     vect8(k) = v(k,iv2) - fncen(k,jfn)
+                     vect7(k) = vxyz(k,iv1) - fncen(k,jfn)
+                     vect8(k) = vxyz(k,iv2) - fncen(k,jfn)
                   end do
 c
 c     check whether point lies on spindle arc
@@ -2493,8 +2554,8 @@ c
                iv1 = env(1,ien)
                iv2 = env(2,ien)
                do k = 1, 3
-                  vect3(k) = v(k,iv1) - fncen(k,ifn)
-                  vect4(k) = v(k,iv2) - fncen(k,ifn)
+                  vect3(k) = vxyz(k,iv1) - fncen(k,ifn)
+                  vect4(k) = vxyz(k,iv2) - fncen(k,ifn)
                end do
                do ke2 = 1, 3
                   if (ispind(ke) .eq. ispnd2(ke2))  goto 70
@@ -2507,8 +2568,8 @@ c
                   iv1 = env(1,ien)
                   iv2 = env(2,ien)
                   do k = 1, 3
-                     vect7(k) = v(k,iv1) - fncen(k,jfn)
-                     vect8(k) = v(k,iv2) - fncen(k,jfn)
+                     vect7(k) = vxyz(k,iv1) - fncen(k,jfn)
+                     vect8(k) = vxyz(k,iv2) - fncen(k,jfn)
                   end do
 c
 c     check whether point lies on spindle arc
@@ -2569,11 +2630,11 @@ c
                ien = fnen(kv,jfn)
                iv = env(1,ien)
                do k = 1, 3
-                  vect1(k) = v(k,iv) - fncen(k,ifn)
+                  vect1(k) = vxyz(k,iv) - fncen(k,ifn)
                end do
                call vnorm (vect1,vect1)
                do ke = 1, 3
-                  dt = dot(fnvect(1,ke,ifn),v(1,iv))
+                  dt = dot(fnvect(1,ke,ifn),vxyz(1,iv))
                   if (dt .gt. 0.0d0)  goto 80
                end do
                vip(kv) = .true.
@@ -2770,7 +2831,6 @@ c     ######################
 c
 c
       function depth (ip,alt)
-      use sizes
       use faces
       implicit none
       integer k,ip,ia1,ia2,ia3
@@ -2783,9 +2843,9 @@ c
       ia2 = pa(2,ip)
       ia3 = pa(3,ip)
       do k = 1, 3
-         vect1(k) = a(k,ia1) - a(k,ia3)
-         vect2(k) = a(k,ia2) - a(k,ia3)
-         vect3(k) = p(k,ip) - a(k,ia3)
+         vect1(k) = axyz(k,ia1) - axyz(k,ia3)
+         vect2(k) = axyz(k,ia2) - axyz(k,ia3)
+         vect3(k) = p(k,ip) - axyz(k,ia3)
       end do
       call vcross (vect1,vect2,vect4)
       call vnorm (vect4,vect4)
@@ -2809,12 +2869,15 @@ c     the full interior polyhedron
 c
 c
       subroutine measpm (ifn,prism)
-      use sizes
       use faces
       implicit none
-      integer k,ke,ien,iv,ia,ip,ifn
-      real*8 prism,height,pav(3,3)
-      real*8 vect1(3),vect2(3),vect3(3)
+      integer k,ke,ien
+      integer iv,ia,ip,ifn
+      real*8 prism,height
+      real*8 vect1(3)
+      real*8 vect2(3)
+      real*8 vect3(3)
+      real*8 pav(3,3)
 c
 c
       height = 0.0d0
@@ -2822,10 +2885,10 @@ c
          ien = fnen(ke,ifn)
          iv = env(1,ien)
          ia = va(iv)
-         height = height + a(3,ia)
+         height = height + axyz(3,ia)
          ip = vp(iv)
          do k = 1, 3
-            pav(k,ke) = a(k,ia) - p(k,ip)
+            pav(k,ke) = axyz(k,ia) - p(k,ip)
          end do
       end do
       height = height / 3.0d0
@@ -2847,7 +2910,6 @@ c     #########################
 c
 c
       subroutine measfp (ifp,areap,volp)
-      use sizes
       use faces
       use math
       implicit none
@@ -2855,15 +2917,18 @@ c
       integer ia,ia2,ic
       integer it,iv1,iv2
       integer ncycle,ieuler
-      integer icyptr,icy,nedge
+      integer icyptr,icy
+      integer nedge
       real*8 areap,volp
       real*8 dot,dt,gauss
       real*8 vecang,angle,geo
       real*8 pcurve,gcurve
-      real*8 vect1(3),vect2(3)
-      real*8 acvect(3),aavect(3)
-      real*8 tanv(3,2,mxcyep)
+      real*8 vect1(3)
+      real*8 vect2(3)
+      real*8 acvect(3)
+      real*8 aavect(3)
       real*8 radial(3,mxcyep)
+      real*8 tanv(3,2,mxcyep)
 c
 c
       ia = fpa(ifp)
@@ -2888,8 +2953,8 @@ c
                ia2 = ta(1,it)
             end if
             do k = 1, 3
-               acvect(k) = c(k,ic) - a(k,ia)
-               aavect(k) = a(k,ia2) - a(k,ia)
+               acvect(k) = c(k,ic) - axyz(k,ia)
+               aavect(k) = axyz(k,ia2) - axyz(k,ia)
             end do
             call vnorm (aavect,aavect)
             dt = dot(acvect,aavect)
@@ -2900,9 +2965,9 @@ c
                angle = 2.0d0 * pi
             else
                do k = 1, 3
-                  vect1(k) = v(k,iv1) - c(k,ic)
-                  vect2(k) = v(k,iv2) - c(k,ic)
-                  radial(k,ke) = v(k,iv1) - a(k,ia)
+                  vect1(k) = vxyz(k,iv1) - c(k,ic)
+                  vect2(k) = vxyz(k,iv2) - c(k,ic)
+                  radial(k,ke) = vxyz(k,iv1) - axyz(k,ia)
                end do
                call vnorm (radial(1,ke),radial(1,ke))
                call vcross (vect1,aavect,tanv(1,1,ke))
@@ -2947,7 +3012,6 @@ c     #########################
 c
 c
       subroutine measfs (ifs,areas,vols,areasp,volsp)
-      use sizes
       use faces
       use math
       implicit none
@@ -2962,7 +3026,8 @@ c
       real*8 theta1,theta2
       real*8 rat,thetaq
       real*8 cone1,cone2
-      real*8 term1,term2,term3
+      real*8 term1,term2
+      real*8 term3
       real*8 spin,volt
       real*8 vect1(3)
       real*8 vect2(3)
@@ -2976,7 +3041,7 @@ c
       ia1 = ta(1,it)
       ia2 = ta(2,it)
       do k = 1, 3
-         aavect(k) = a(k,ia2) - a(k,ia1)
+         aavect(k) = axyz(k,ia2) - axyz(k,ia1)
       end do
       call vnorm (aavect,aavect)
       iv1 = epv(1,iep)
@@ -2985,14 +3050,14 @@ c
          phi = 2.0d0 * pi
       else
          do k = 1, 3
-            vect1(k) = v(k,iv1) - c(k,ic)
-            vect2(k) = v(k,iv2) - c(k,ic)
+            vect1(k) = vxyz(k,iv1) - c(k,ic)
+            vect2(k) = vxyz(k,iv2) - c(k,ic)
          end do
          phi = vecang(vect1,vect2,aavect,1.0d0)
       end if
       do k = 1, 3
-         vect1(k) = a(k,ia1) - t(k,it)
-         vect2(k) = a(k,ia2) - t(k,it)
+         vect1(k) = axyz(k,ia1) - t(k,it)
+         vect2(k) = axyz(k,ia2) - t(k,it)
       end do
       d1 = -dot(vect1,aavect)
       d2 = dot(vect2,aavect)
@@ -3030,8 +3095,8 @@ c
          call cerror ('IA1 Inconsistency in MEASFS')
       end if
       do k = 1, 3
-         vect1(k) = c(k,ic1) - a(k,ia1)
-         vect2(k) = c(k,ic2) - a(k,ia2)
+         vect1(k) = c(k,ic1) - axyz(k,ia1)
+         vect2(k) = c(k,ic2) - axyz(k,ia2)
       end do
       w1 = dot(vect1,aavect)
       w2 = -dot(vect2,aavect)
@@ -3039,10 +3104,10 @@ c
       cone2 = phi * (w2*cr(ic2)**2)/6.0d0
       term1 = (tr(it)**2) * pr * (sin(theta1)+sin(theta2))
       term2 = sin(theta1)*cos(theta1) + theta1
-     &          + sin(theta2)*cos(theta2) + theta2
+     &           + sin(theta2)*cos(theta2) + theta2
       term2 = tr(it) * (pr**2) * term2
       term3 = sin(theta1)*cos(theta1)**2 + 2.0d0*sin(theta1)
-     &          + sin(theta2)*cos(theta2)**2 + 2.0d0*sin(theta2)
+     &           + sin(theta2)*cos(theta2)**2 + 2.0d0*sin(theta2)
       term3 = (pr**3 / 3.0d0) * term3
       volt = (phi/2.0d0) * (term1-term2+term3)
       vols = volt + cone1 + cone2
@@ -3066,7 +3131,6 @@ c     #########################
 c
 c
       subroutine measfn (ifn,arean,voln)
-      use sizes
       use faces
       use math
       implicit none
@@ -3088,8 +3152,8 @@ c
          ia = va(iv)
          ip = vp(iv)
          do k = 1, 3
-            pvv(k,ke) = v(k,iv) - p(k,ip)
-            pav(k,ke) = a(k,ia) - p(k,ip)
+            pvv(k,ke) = vxyz(k,iv) - p(k,ip)
+            pav(k,ke) = axyz(k,ia) - p(k,ip)
          end do
          if (pr .gt. 0.0d0)  call vnorm (pvv(1,ke),pvv(1,ke))
       end do
@@ -3128,7 +3192,6 @@ c     #########################
 c
 c
       subroutine projct (pnt,unvect,icy,ia,spv,nedge,fail)
-      use sizes
       use faces
       implicit none
       integer k,ke,icy,ia
@@ -3154,7 +3217,7 @@ c
 c     vector from north pole to vertex
 c
             do k = 1, 3
-               polev(k) = v(k,iv) - pnt(k)
+               polev(k) = vxyz(k,iv) - pnt(k)
             end do
 c
 c     calculate multiplication factor
@@ -3190,13 +3253,13 @@ c     #######################
 c
 c
       function ptincy (pnt,unvect,icy)
-      use sizes
       use faces
       implicit none
       integer k,ke,icy,iep
       integer ic,it,iatom
       integer iaoth,nedge
-      real*8 dot,rotang,totang
+      real*8 dot,rotang
+      real*8 totang
       real*8 unvect(3)
       real*8 pnt(3)
       real*8 acvect(3)
@@ -3219,7 +3282,7 @@ c
             iaoth = ta(1,it)
          end if
          do k = 1, 3
-            acvect(k) = a(k,iaoth) - a(k,iatom)
+            acvect(k) = axyz(k,iaoth) - axyz(k,iatom)
             cpvect(k) = pnt(k) - c(k,ic)
          end do
          if (dot(acvect,cpvect) .ge. 0.0d0) then
@@ -3509,9 +3572,12 @@ c
       use math
       implicit none
       real*8 vecang,hand
-      real*8 angle,a1,a2,a12,dt
-      real*8 anorm,dot,triple
-      real*8 v1(3),v2(3),axis(3)
+      real*8 angle,dt
+      real*8 a1,a2,a12
+      real*8 anorm,dot
+      real*8 triple
+      real*8 v1(3),v2(3)
+      real*8 axis(3)
 c
 c
       a1 = anorm(v1)
@@ -3546,15 +3612,24 @@ c
      &                        cinsp,cintp,xpnt1,xpnt2)
       implicit none
       integer k
-      real*8 anorm,dot,dcp,dir
-      real*8 ratio,rlen,cirrad
-      real*8 circen(3),cirvec(3)
-      real*8 plncen(3),plnvec(3)
-      real*8 xpnt1(3),xpnt2(3)
-      real*8 cpvect(3),pnt1(3)
-      real*8 vect1(3),vect2(3)
-      real*8 uvect1(3),uvect2(3)
-      logical cinsp,cintp
+      real*8 anorm,dot
+      real*8 dcp,dir
+      real*8 ratio,rlen
+      real*8 cirrad
+      real*8 circen(3)
+      real*8 cirvec(3)
+      real*8 plncen(3)
+      real*8 plnvec(3)
+      real*8 xpnt1(3)
+      real*8 xpnt2(3)
+      real*8 cpvect(3)
+      real*8 pnt1(3)
+      real*8 vect1(3)
+      real*8 vect2(3)
+      real*8 uvect1(3)
+      real*8 uvect2(3)
+      logical cinsp
+      logical cintp
 c
 c
       do k = 1, 3
@@ -3607,10 +3682,16 @@ c
       subroutine gendot (ndots,dots,radius,xcenter,ycenter,zcenter)
       use math
       implicit none
-      integer i,j,k,ndots
-      integer nequat,nvert,nhoriz
-      real*8 fi,fj,x,y,z,xy
-      real*8 xcenter,ycenter,zcenter
+      integer i,j,k
+      integer ndots
+      integer nequat
+      integer nvert
+      integer nhoriz
+      real*8 fi,fj
+      real*8 x,y,z,xy
+      real*8 xcenter
+      real*8 ycenter
+      real*8 zcenter
       real*8 radius
       real*8 dots(3,*)
 c

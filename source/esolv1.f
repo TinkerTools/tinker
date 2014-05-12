@@ -47,11 +47,15 @@ c
       eace = 0.0d0
       do i = 1, n
          drb(i) = 0.0d0
-         drbp(i) = 0.0d0
          des(1,i) = 0.0d0
          des(2,i) = 0.0d0
          des(3,i) = 0.0d0
       end do
+      if (solvtyp(1:2) .eq. 'GK') then
+         do i = 1, n
+            drbp(i) = 0.0d0
+         end do
+      end if
 c
 c     set a value for the solvent molecule probe radius
 c

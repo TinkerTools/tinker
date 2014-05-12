@@ -266,10 +266,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ivdw))  allocate (ivdw(maxatm))
-      if (.not. allocated(jvdw))  allocate (jvdw(maxatm))
-      if (.not. allocated(ired))  allocate (ired(maxatm))
-      if (.not. allocated(kred))  allocate (kred(maxatm))
+      if (.not. allocated(ivdw))  allocate (ivdw(n))
+      if (.not. allocated(jvdw))  allocate (jvdw(n))
+      if (.not. allocated(ired))  allocate (ired(n))
+      if (.not. allocated(kred))  allocate (kred(n))
       if (.not. allocated(radmin))
      &   allocate (radmin(maxclass,maxclass))
       if (.not. allocated(epsilon))

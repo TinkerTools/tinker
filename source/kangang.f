@@ -29,6 +29,7 @@ c
       use kanang
       use keys
       use potent
+      use tors
       implicit none
       integer i,j,k,m,next
       integer it,ia,ic
@@ -75,8 +76,8 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iaa))  allocate (iaa(2,maxtors))
-      if (.not. allocated(kaa))  allocate (kaa(maxtors))
+      if (.not. allocated(iaa))  allocate (iaa(2,ntors))
+      if (.not. allocated(kaa))  allocate (kaa(ntors))
 c
 c     assign the angle-angle parameters for each angle pair
 c

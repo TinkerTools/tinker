@@ -216,12 +216,12 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      allocate (dev(3,maxatm))
-      allocate (dec(3,maxatm))
-      allocate (decd(3,maxatm))
-      allocate (ded(3,maxatm))
-      allocate (dem(3,maxatm))
-      allocate (dep(3,maxatm))
+      allocate (dev(3,n))
+      allocate (dec(3,n))
+      allocate (decd(3,n))
+      allocate (ded(3,n))
+      allocate (dem(3,n))
+      allocate (dep(3,n))
 c
 c     get the timing for energy terms via double nested loop
 c

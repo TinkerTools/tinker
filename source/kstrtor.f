@@ -148,8 +148,8 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ist))  allocate (ist(4,maxtors))
-      if (.not. allocated(kst))  allocate (kst(9,maxtors))
+      if (.not. allocated(ist))  allocate (ist(4,ntors))
+      if (.not. allocated(kst))  allocate (kst(9,ntors))
 c
 c     assign the stretch-torsion parameters for each torsion
 c

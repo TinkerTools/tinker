@@ -28,6 +28,7 @@ c
       use kitors
       use math
       use potent
+      use tors
       implicit none
       integer i,j,k,nti
       integer ia,ib,ic,id
@@ -119,10 +120,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iitors))  allocate (iitors(4,maxtors))
-      if (.not. allocated(itors1))  allocate (itors1(4,maxtors))
-      if (.not. allocated(itors2))  allocate (itors2(4,maxtors))
-      if (.not. allocated(itors3))  allocate (itors3(4,maxtors))
+      if (.not. allocated(iitors))  allocate (iitors(4,ntors))
+      if (.not. allocated(itors1))  allocate (itors1(4,ntors))
+      if (.not. allocated(itors2))  allocate (itors2(4,ntors))
+      if (.not. allocated(itors3))  allocate (itors3(4,ntors))
 c
 c     assign improper torsional parameters for each improper torsion;
 c     multiple symmetrical parameters are given partial weights

@@ -140,9 +140,9 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iopb))  allocate (iopb(maxang))
-      if (.not. allocated(opbk))  allocate (opbk(maxang))
-      if (.not. allocated(angtyp))  allocate (angtyp(maxang))
+      if (.not. allocated(iopb))  allocate (iopb(nangle))
+      if (.not. allocated(opbk))  allocate (opbk(nangle))
+      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
 c
 c     assign out-of-plane bending parameters for each angle
 c

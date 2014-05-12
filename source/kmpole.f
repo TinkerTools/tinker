@@ -206,19 +206,19 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ipole))  allocate (ipole(maxatm))
-      if (.not. allocated(polsiz))  allocate (polsiz(maxatm))
-      if (.not. allocated(pollist))  allocate (pollist(maxatm))
-      if (.not. allocated(zaxis))  allocate (zaxis(maxatm))
-      if (.not. allocated(xaxis))  allocate (xaxis(maxatm))
-      if (.not. allocated(yaxis))  allocate (yaxis(maxatm))
-      if (.not. allocated(pole))  allocate (pole(maxpole,maxatm))
-      if (.not. allocated(rpole))  allocate (rpole(maxpole,maxatm))
-      if (.not. allocated(polaxe))  allocate (polaxe(maxatm))
-      if (.not. allocated(np11))  allocate (np11(maxatm))
-      if (.not. allocated(np12))  allocate (np12(maxatm))
-      if (.not. allocated(np13))  allocate (np13(maxatm))
-      if (.not. allocated(np14))  allocate (np14(maxatm))
+      if (.not. allocated(ipole))  allocate (ipole(n))
+      if (.not. allocated(polsiz))  allocate (polsiz(n))
+      if (.not. allocated(pollist))  allocate (pollist(n))
+      if (.not. allocated(zaxis))  allocate (zaxis(n))
+      if (.not. allocated(xaxis))  allocate (xaxis(n))
+      if (.not. allocated(yaxis))  allocate (yaxis(n))
+      if (.not. allocated(pole))  allocate (pole(maxpole,n))
+      if (.not. allocated(rpole))  allocate (rpole(maxpole,n))
+      if (.not. allocated(polaxe))  allocate (polaxe(n))
+      if (.not. allocated(np11))  allocate (np11(n))
+      if (.not. allocated(np12))  allocate (np12(n))
+      if (.not. allocated(np13))  allocate (np13(n))
+      if (.not. allocated(np14))  allocate (np14(n))
 c
 c     zero out local axes, multipoles and polarization attachments
 c
@@ -514,9 +514,16 @@ c
          polsiz(i) = size
       end do
 c
-c     if polarization not used, zero out induced dipoles
+c     perform dynamic allocation of some global arrays
 c
       if (.not. use_polar) then
+         if (.not. allocated(uind))  allocate (uind(3,n))
+         if (.not. allocated(uinp))  allocate (uinp(3,n))
+         if (.not. allocated(uinds))  allocate (uinds(3,n))
+         if (.not. allocated(uinps))  allocate (uinps(3,n))
+c
+c     if polarization not used, zero out induced dipoles
+c
          do i = 1, n
             do j = 1, 3
                uind(j,i) = 0.0d0

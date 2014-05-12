@@ -18,6 +18,7 @@ c
 c
       subroutine torsions
       use sizes
+      use atoms
       use bndstr
       use couple
       use iounit
@@ -29,7 +30,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(itors))  allocate (itors(4,maxtors))
+      if (.not. allocated(itors))  allocate (itors(4,6*n))
 c
 c     loop over all bonds, storing the atoms in each torsion
 c

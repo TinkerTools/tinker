@@ -99,7 +99,7 @@ c
 c     choose between serial and parallel list building
 c
       parallel = .false.
-      if (nthread .gt. 1)  parallel = .true.
+      if (nthread .gt. 12)  parallel = .true.
 c
 c     perform a complete list build instead of an update
 c
@@ -469,7 +469,7 @@ c
 c     choose between serial and parallel list building
 c
       parallel = .false.
-      if (nthread .gt. 1)  parallel = .true.
+      if (nthread .gt. 12)  parallel = .true.
 c
 c     perform a complete list build instead of an update
 c
@@ -841,7 +841,7 @@ c
 c     choose between serial and parallel list building
 c
       parallel = .false.
-      if (nthread .gt. 1)  parallel = .true.
+      if (nthread .gt. 12)  parallel = .true.
 c
 c     perform a complete list build instead of an update
 c
@@ -1212,7 +1212,7 @@ c
 c     choose between serial and parallel list building
 c
       parallel = .false.
-      if (nthread .gt. 1)  parallel = .true.
+      if (nthread .gt. 12)  parallel = .true.
 c
 c     perform a complete list build instead of an update
 c

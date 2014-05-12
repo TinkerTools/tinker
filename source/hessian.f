@@ -109,9 +109,9 @@ c     perform dynamic allocation of some global arrays
 c
       if (first) then
          first = .false.
-         if (.not. allocated(hessx))  allocate (hessx(3,maxatm))
-         if (.not. allocated(hessy))  allocate (hessy(3,maxatm))
-         if (.not. allocated(hessz))  allocate (hessz(3,maxatm))
+         if (.not. allocated(hessx))  allocate (hessx(3,n))
+         if (.not. allocated(hessy))  allocate (hessy(3,n))
+         if (.not. allocated(hessz))  allocate (hessz(3,n))
       end if
 c
 c     zero out the Hessian elements for the current atom
