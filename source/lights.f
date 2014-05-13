@@ -15,6 +15,9 @@ c
 c     "lights" computes the set of nearest neighbor interactions
 c     using the method of lights algorithm
 c
+c     note this version generates each pair only once via setting
+c     of the negative x-coordinate boundaries
+c
 c     literature reference:
 c
 c     F. Sullivan, R. D. Mountain and J. O'Connell, "Molecular

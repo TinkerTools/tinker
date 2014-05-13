@@ -10,8 +10,8 @@
          compiler to SSE3-compatible instructions, and the resulting
          executables should run on most AMD-based machines.
 
-         Please note that by default some Linux distributions limit
-         stacksize and datasize for processes as can be checked via
-         the csh limit command or similar. Large TINKER executables
+         Please note that by default most Linux distributions limit
+         stacksize and datasize for processes, as can be checked via
+         the csh limit command or similar. Calculations on big systems
          will need these values increased to avoid failure at startup.
 

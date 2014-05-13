@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "nblist" constructs and maintains nonbonded pair neighbor lists
-c     for vdw and electrostatic interactions
+c     for vdw, electrostatic and polarization interactions
 c
 c
       subroutine nblist
@@ -51,7 +51,6 @@ c
       use boxes
       use iounit
       use neigh
-      use openmp
       use vdw
       implicit none
       integer i,j,k
@@ -63,7 +62,6 @@ c
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
-      logical parallel
       logical, allocatable :: update(:)
 c
 c
@@ -96,16 +94,11 @@ c
          call fatal
       end if
 c
-c     choose between serial and parallel list building
-c
-      parallel = .false.
-      if (nthread .gt. 12)  parallel = .true.
-c
 c     perform a complete list build instead of an update
 c
       if (dovlst) then
          dovlst = .false.
-         if (parallel .or. octahedron) then
+         if (octahedron) then
             call vbuild (xred,yred,zred)
          else
             call vlight (xred,yred,zred)
@@ -325,7 +318,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = (ncell+1) * nvdw
+      nlight = nvdw
       allocate (xsort(nlight))
       allocate (ysort(nlight))
       allocate (zsort(nlight))
@@ -345,7 +338,7 @@ c
 c     use the method of lights to generate neighbors
 c
       off = sqrt(vbuf2)
-      call lights (off,nvdw,xsort,ysort,zsort)
+      call lightn (off,nvdw,xsort,ysort,zsort)
 c
 c     perform deallocation of some local arrays
 c
@@ -355,6 +348,9 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
+!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,
+!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP DO schedule(guided)
       do i = 1, nvdw
          xi = xred(i)
          yi = yred(i)
@@ -371,6 +367,7 @@ c
    10    continue
          do j = start, stop
             k = locx(j)
+            if (k .le. i)  goto 20
             kgy = rgy(k)
             if (kby(i) .le. key(i)) then
                if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
@@ -389,13 +386,8 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. vbuf2) then
-               if (i .lt. k) then
-                  nvlst(i) = nvlst(i) + 1
-                  vlst(nvlst(i),i) = k
-               else
-                  nvlst(k) = nvlst(k) + 1
-                  vlst(nvlst(k),k) = i
-               end if
+               nvlst(i) = nvlst(i) + 1
+               vlst(nvlst(i),i) = k
             end if
    20       continue
          end do
@@ -405,18 +397,18 @@ c
             stop = nlight
             goto 10
          end if
-      end do
 c
-c     check to see if the neighbor lists are too long
+c     check to see if the neighbor list is too long
 c
-      do i = 1, nvdw
          if (nvlst(i) .ge. maxvlst) then
             write (iout,30)
-   30       format (/,' VFULL  --  Too many Neighbors;',
+   30       format (/,' VLIGHT  --  Too many Neighbors;',
      &                 ' Increase MAXVLST')
             call fatal
          end if
       end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -440,14 +432,12 @@ c
       use charge
       use iounit
       use neigh
-      use openmp
       implicit none
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      logical parallel
       logical, allocatable :: update(:)
 c
 c
@@ -466,16 +456,11 @@ c
          call fatal
       end if
 c
-c     choose between serial and parallel list building
-c
-      parallel = .false.
-      if (nthread .gt. 12)  parallel = .true.
-c
 c     perform a complete list build instead of an update
 c
       if (doclst) then
          doclst = .false.
-         if (parallel .or. octahedron) then
+         if (octahedron) then
             call cbuild
          else
             call clight
@@ -694,7 +679,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = (ncell+1) * nion
+      nlight = nion
       allocate (xsort(nlight))
       allocate (ysort(nlight))
       allocate (zsort(nlight))
@@ -715,7 +700,7 @@ c
 c     use the method of lights to generate neighbors
 c
       off = sqrt(cbuf2)
-      call lights (off,nion,xsort,ysort,zsort)
+      call lightn (off,nion,xsort,ysort,zsort)
 c
 c     perform deallocation of some local arrays
 c
@@ -725,6 +710,9 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
+!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP DO schedule(guided)
       do i = 1, nion
          ii = kion(i)
          xi = x(ii)
@@ -742,6 +730,7 @@ c
    10    continue
          do j = start, stop
             k = locx(j)
+            if (k .le. i)  goto 20
             kk = kion(k)
             kgy = rgy(k)
             if (kby(i) .le. key(i)) then
@@ -761,13 +750,8 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. cbuf2) then
-               if (i .lt. k) then
-                  nelst(i) = nelst(i) + 1
-                  elst(nelst(i),i) = k
-               else
-                  nelst(k) = nelst(k) + 1
-                  elst(nelst(k),k) = i
-               end if
+               nelst(i) = nelst(i) + 1
+               elst(nelst(i),i) = k
             end if
    20       continue
          end do
@@ -777,18 +761,18 @@ c
             stop = nlight
             goto 10
          end if
-      end do
 c
-c     check to see if the neighbor lists are too long
+c     check to see if the neighbor list is too long
 c
-      do i = 1, nion
          if (nelst(i) .ge. maxelst) then
             write (iout,30)
-   30       format (/,' CFULL  --  Too many Neighbors;',
+   30       format (/,' CLIGHT  --  Too many Neighbors;',
      &                 ' Increase MAXELST')
             call fatal
          end if
       end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -812,14 +796,12 @@ c
       use iounit
       use mpole
       use neigh
-      use openmp
       implicit none
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      logical parallel
       logical, allocatable :: update(:)
 c
 c
@@ -838,16 +820,11 @@ c
          call fatal
       end if
 c
-c     choose between serial and parallel list building
-c
-      parallel = .false.
-      if (nthread .gt. 12)  parallel = .true.
-c
 c     perform a complete list build instead of an update
 c
       if (domlst) then
          domlst = .false.
-         if (parallel .or. octahedron) then
+         if (octahedron) then
             call mbuild
          else
             call mlight
@@ -1065,7 +1042,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = (ncell+1) * npole
+      nlight = npole
       allocate (xsort(nlight))
       allocate (ysort(nlight))
       allocate (zsort(nlight))
@@ -1086,7 +1063,7 @@ c
 c     use the method of lights to generate neighbors
 c
       off = sqrt(mbuf2)
-      call lights (off,npole,xsort,ysort,zsort)
+      call lightn (off,npole,xsort,ysort,zsort)
 c
 c     perform deallocation of some local arrays
 c
@@ -1096,6 +1073,9 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
+!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
@@ -1113,6 +1093,7 @@ c
    10    continue
          do j = start, stop
             k = locx(j)
+            if (k .le. i)  goto 20
             kk = ipole(k)
             kgy = rgy(k)
             if (kby(i) .le. key(i)) then
@@ -1132,13 +1113,8 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. mbuf2) then
-               if (i .lt. k) then
-                  nelst(i) = nelst(i) + 1
-                  elst(nelst(i),i) = k
-               else
-                  nelst(k) = nelst(k) + 1
-                  elst(nelst(k),k) = i
-               end if
+               nelst(i) = nelst(i) + 1
+               elst(nelst(i),i) = k
             end if
    20       continue
          end do
@@ -1148,18 +1124,18 @@ c
             stop = nlight
             goto 10
          end if
-      end do
 c
-c     check to see if the neighbor lists are too long
+c     check to see if the neighbor list is too long
 c
-      do i = 1, npole
          if (nelst(i) .ge. maxelst) then
             write (iout,30)
-   30       format (/,' MFULL  --  Too many Neighbors;',
+   30       format (/,' MLIGHT  --  Too many Neighbors;',
      &                 ' Increase MAXELST')
             call fatal
          end if
       end do
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -1183,14 +1159,12 @@ c
       use iounit
       use mpole
       use neigh
-      use openmp
       implicit none
       integer i,j,k
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
-      logical parallel
       logical, allocatable :: update(:)
 c
 c
@@ -1209,16 +1183,11 @@ c
          call fatal
       end if
 c
-c     choose between serial and parallel list building
-c
-      parallel = .false.
-      if (nthread .gt. 12)  parallel = .true.
-c
 c     perform a complete list build instead of an update
 c
       if (doulst) then
          doulst = .false.
-         if (parallel .or. octahedron) then
+         if (octahedron) then
             call ubuild
          else
             call ulight
@@ -1437,7 +1406,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = (ncell+1) * npole
+      nlight = npole
       allocate (xsort(nlight))
       allocate (ysort(nlight))
       allocate (zsort(nlight))
@@ -1458,7 +1427,7 @@ c
 c     use the method of lights to generate neighbors
 c
       off = sqrt(ubuf2)
-      call lights (off,npole,xsort,ysort,zsort)
+      call lightn (off,npole,xsort,ysort,zsort)
 c
 c     perform deallocation of some local arrays
 c
@@ -1468,6 +1437,9 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
+!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
@@ -1485,6 +1457,7 @@ c
    10    continue
          do j = start, stop
             k = locx(j)
+            if (k .le. i)  goto 20
             kk = ipole(k)
             kgy = rgy(k)
             if (kby(i) .le. key(i)) then
@@ -1504,13 +1477,8 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. ubuf2) then
-               if (i .lt. k) then
-                  nulst(i) = nulst(i) + 1
-                  ulst(nulst(i),i) = k
-               else
-                  nulst(k) = nulst(k) + 1
-                  ulst(nulst(k),k) = i
-               end if
+               nulst(i) = nulst(i) + 1
+               ulst(nulst(i),i) = k
             end if
    20       continue
          end do
@@ -1520,17 +1488,332 @@ c
             stop = nlight
             goto 10
          end if
-      end do
 c
-c     check to see if the neighbor lists are too long
+c     check to see if the neighbor list is too long
 c
-      do i = 1, npole
          if (nulst(i) .ge. maxulst) then
             write (iout,30)
-   30       format (/,' UFULL  --  Too many Neighbors;',
+   30       format (/,' ULIGHT  --  Too many Neighbors;',
      &                 ' Increase MAXULST')
             call fatal
          end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine lightn  --  method of lights for list building  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "lightn" computes the set of nearest neighbor interactions
+c     using the method of lights algorithm
+c
+c     note this is a special version for neighbor list generation
+c     which generates each pair in both directions, (A,B) and (B,A)
+c
+c     literature reference:
+c
+c     F. Sullivan, R. D. Mountain and J. O'Connell, "Molecular
+c     Dynamics on Vector Computers", Journal of Computational
+c     Physics, 61, 138-153 (1985)
+c
+c
+      subroutine lightn (cutoff,nsite,xsort,ysort,zsort)
+      use sizes
+      use bound
+      use boxes
+      use cell
+      use iounit
+      use light
+      implicit none
+      integer i,j,k,nsite
+      real*8 cutoff,box
+      real*8 xcut,ycut,zcut
+      real*8 xmove,ymove,zmove
+      real*8 xsort(*)
+      real*8 ysort(*)
+      real*8 zsort(*)
+      real*8, allocatable :: xfrac(:)
+      real*8, allocatable :: yfrac(:)
+      real*8, allocatable :: zfrac(:)
+      logical first
+      save first
+      data first  / .true. /
+c
+c
+c     truncated octahedron periodicity is not handled at present
+c
+      if (use_bounds) then
+         if (octahedron) then
+            write (iout,10)
+   10       format (/,' LIGHTS  --  Truncated Octahedron not',
+     &                 ' Supported by Method of Lights')
+            call fatal
+         end if
+      end if
+c
+c     set the light width based on input distance cutoff
+c
+      xcut = cutoff
+      ycut = cutoff
+      zcut = cutoff
+      if (use_bounds) then
+         if (monoclinic) then
+            zcut = zcut / beta_sin
+            xcut = xcut + zcut*abs(beta_cos)
+         else if (triclinic) then
+            zcut = zcut / gamma_term
+            ycut = (ycut + zcut*abs(beta_term)) / gamma_sin
+            xcut = xcut + ycut*abs(gamma_cos) + zcut*abs(beta_cos)
+         end if
+         xcut = min(xcut,xcell2)
+         ycut = min(ycut,ycell2)
+         zcut = min(zcut,zcell2)
+      end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xfrac(nsite))
+      allocate (yfrac(nsite))
+      allocate (zfrac(nsite))
+c
+c     find fractional coordinates for the unitcell atoms
+c
+      if (use_bounds) then
+         if (orthogonal) then
+            do i = 1, nsite
+               zfrac(i) = zsort(i)
+               yfrac(i) = ysort(i)
+               xfrac(i) = xsort(i)
+            end do
+         else if (monoclinic) then
+            do i = 1, nsite
+               zfrac(i) = zsort(i) / beta_sin
+               yfrac(i) = ysort(i)
+               xfrac(i) = xsort(i) - zfrac(i)*beta_cos
+            end do
+         else if (triclinic) then
+            do i = 1, nsite
+               zfrac(i) = zsort(i) / gamma_term
+               yfrac(i) = (ysort(i) - zfrac(i)*beta_term) / gamma_sin
+               xfrac(i) = xsort(i) - yfrac(i)*gamma_cos
+     &                       - zfrac(i)*beta_cos
+            end do
+         end if
+      end if
+c
+c     use images to move coordinates into periodic cell
+c
+      if (use_bounds) then
+         do i = 1, nsite
+            xsort(i) = xfrac(i)
+            ysort(i) = yfrac(i)
+            zsort(i) = zfrac(i)
+            do while (abs(xsort(i)) .gt. xcell2)
+               xsort(i) = xsort(i) - sign(xcell,xsort(i))
+            end do
+            do while (abs(ysort(i)) .gt. ycell2)
+               ysort(i) = ysort(i) - sign(ycell,ysort(i))
+            end do
+            do while (abs(zsort(i)) .gt. zcell2)
+               zsort(i) = zsort(i) - sign(zcell,zsort(i))
+            end do
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xfrac)
+      deallocate (yfrac)
+      deallocate (zfrac)
+c
+c     perform dynamic allocation of some global arrays
+c
+      nlight = nsite
+      if (first) then
+         first = .false.
+         if (.not. allocated(kbx))  allocate (kbx(nsite))
+         if (.not. allocated(kby))  allocate (kby(nsite))
+         if (.not. allocated(kbz))  allocate (kbz(nsite))
+         if (.not. allocated(kex))  allocate (kex(nsite))
+         if (.not. allocated(key))  allocate (key(nsite))
+         if (.not. allocated(kez))  allocate (kez(nsite))
+         if (.not. allocated(locx))  allocate (locx(nlight))
+         if (.not. allocated(locy))  allocate (locy(nlight))
+         if (.not. allocated(locz))  allocate (locz(nlight))
+         if (.not. allocated(rgx))  allocate (rgx(nlight))
+         if (.not. allocated(rgy))  allocate (rgy(nlight))
+         if (.not. allocated(rgz))  allocate (rgz(nlight))
+      end if
+c
+c     sort the coordinate components into ascending order
+c
+      call sort2 (nlight,xsort,locx)
+      call sort2 (nlight,ysort,locy)
+      call sort2 (nlight,zsort,locz)
+c
+c     index the position of each atom in the sorted coordinates
+c
+      do i = 1, nlight
+         rgx(locx(i)) = i
+         rgy(locy(i)) = i
+         rgz(locz(i)) = i
+      end do
+c
+c     find the negative x-coordinate boundary for each atom
+c
+      j = nlight
+      box = 0.0d0
+      do i = nlight, 1, -1
+         k = locx(i)
+         do while (xsort(i)-xsort(j)+box .le. xcut)
+            if (j .eq. 1) then
+               if (use_bounds) then
+                  j = nlight + 1
+                  box = xcell
+               end if
+            end if
+            j = j - 1
+            if (j .lt. 1)  goto 20
+         end do
+   20    continue
+         j = j + 1
+         if (j .gt. nlight) then
+            j = 1
+            box = 0.0d0
+         end if
+         kbx(k) = j
+      end do
+c
+c     find the positive x-coordinate boundary for each atom
+c
+      j = 1
+      box = 0.0d0
+      do i = 1, nlight
+         k = locx(i)
+         do while (xsort(j)-xsort(i)+box .lt. xcut)
+            if (j .eq. nlight) then
+               if (use_bounds) then
+                  j = 0
+                  box = xcell
+               end if
+            end if
+            j = j + 1
+            if (j .gt. nlight)  goto 30
+         end do
+   30    continue
+         j = j - 1
+         if (j .lt. 1) then
+            j = nlight
+            box = 0.0d0
+         end if
+         kex(k) = j
+      end do
+c
+c     find the negative y-coordinate boundary for each atom
+c
+      j = nlight
+      box = 0.0d0
+      do i = nlight, 1, -1
+         k = locy(i)
+         do while (ysort(i)-ysort(j)+box .le. ycut)
+            if (j .eq. 1) then
+               if (use_bounds) then
+                  j = nlight + 1
+                  box = ycell
+               end if
+            end if
+            j = j - 1
+            if (j .lt. 1)  goto 40
+         end do
+   40    continue
+         j = j + 1
+         if (j .gt. nlight) then
+            j = 1
+            box = 0.0d0
+         end if
+         kby(k) = j
+      end do
+c
+c     find the positive y-coordinate boundary for each atom
+c
+      j = 1
+      box = 0.0d0
+      do i = 1, nlight
+         k = locy(i)
+         do while (ysort(j)-ysort(i)+box .lt. ycut)
+            if (j .eq. nlight) then
+               if (use_bounds) then
+                  j = 0
+                  box = ycell
+               end if
+            end if
+            j = j + 1
+            if (j .gt. nlight)  goto 50
+         end do
+   50    continue
+         j = j - 1
+         if (j .lt. 1) then
+            j = nlight
+            box = 0.0d0
+         end if
+         key(k) = j
+      end do
+c
+c     find the negative z-coordinate boundary for each atom
+c
+      j = nlight
+      box = 0.0d0
+      do i = nlight, 1, -1
+         k = locz(i)
+         do while (zsort(i)-zsort(j)+box .le. zcut)
+            if (j .eq. 1) then
+               if (use_bounds) then
+                  j = nlight + 1
+                  box = zcell
+               end if
+            end if
+            j = j - 1
+            if (j .lt. 1)  goto 60
+         end do
+   60    continue
+         j = j + 1
+         if (j .gt. nlight) then
+            j = 1
+            box = 0.0d0
+         end if
+         kbz(k) = j
+      end do
+c
+c     find the positive z-coordinate boundary for each atom
+c
+      j = 1
+      box = 0.0d0
+      do i = 1, nlight
+         k = locz(i)
+         do while (zsort(j)-zsort(i)+box .lt. zcut)
+            if (j .eq. nlight) then
+               if (use_bounds) then
+                  j = 0
+                  box = zcell
+               end if
+            end if
+            j = j + 1
+            if (j .gt. nlight)  goto 70
+         end do
+   70    continue
+         j = j - 1
+         if (j .lt. 1) then
+            j = nlight
+            box = 0.0d0
+         end if
+         kez(k) = j
       end do
       return
       end
@@ -1545,7 +1828,9 @@ c
 c
 c     "imagen" takes the components of pairwise distance between
 c     two points and converts to the components of the minimum
-c     image distance; fast version for neighbor list generation
+c     image distance
+c
+c     note this is a fast version for neighbor list generation
 c     which only returns the correct component magnitudes
 c
 c
