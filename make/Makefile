@@ -46,25 +46,25 @@ LINKDIR = /usr/local/bin
 ##  CPU Type: Intel x86 Compatible
 ##  Compiler: GNU gfortran
 
-#F77 = /usr/local/bin/gfortran
+#F77 = gfortran
 #LIBS =
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math
 #LIBFLAGS = -crusv
-#RANLIB =
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
-##  Machine:  Generic Linux or Macintosh OS X
+##  Machine:  Generic Linux or Macintosh
 ##  CPU Type: Intel x86 Compatible
 ##  Compiler: GNU gfortran
 ##  Parallel: OpenMP
 
-#F77 = /usr/local/bin/gfortran
-#LIBS =
+#F77 = gfortran
+#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math -fopenmp
 #LIBFLAGS = -crusv
-#RANLIB =
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
@@ -72,12 +72,12 @@ LINKDIR = /usr/local/bin
 ##  Oper Sys: Fedora Core
 ##  Compiler: Intel Fortran for Linux 14.0
 
-#F77 = /opt/intel/bin/ifort
+#F77 = ifort
 #LIBS =
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
-#RANLIB =
+#RANLIB = ranlib -c
 #LINKFLAGS = -static-libgcc -static-intel
 
 ##  Machine:  Generic Linux
@@ -86,12 +86,12 @@ LINKDIR = /usr/local/bin
 ##  Compiler: Intel Fortran for Linux 14.0
 ##  Parallel: OpenMP
 
-#F77 = /opt/intel/bin/ifort
+#F77 = ifort
 #LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
 #LIBFLAGS = -crusv
-#RANLIB =
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Macintosh
@@ -99,12 +99,12 @@ LINKDIR = /usr/local/bin
 ##  Oper Sys: OS X 10.9 (Mavericks)
 ##  Compiler: Intel Fortran for Mac 14.0
 
-#F77 = /opt/intel/bin/ifort
+#F77 = ifort
 #LIBS =
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
 #LIBFLAGS = -crusv
-#RANLIB =
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
              -Wl,-stack_size,0x10000000
 
@@ -114,12 +114,12 @@ LINKDIR = /usr/local/bin
 ##  Compiler: Intel Fortran for Mac 14.0
 ##  Parallel: OpenMP
 
-F77 = /opt/intel/bin/ifort
+F77 = ifort
 LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
 F77FLAGS = -c -axSSSE3
 OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
 LIBFLAGS = -crusv
-RANLIB = /usr/bin/ranlib -c
+RANLIB = ranlib -c
 LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
             -Wl,-stack_size,0x10000000
 
@@ -1330,7 +1330,6 @@ libtinker.a: ${OBJS}
         shunt.o \
         sigmoid.o \
         sizes.o \
-        sizes.o \
         sktstuff.o \
         socket.o \
         solute.o \
@@ -1452,7 +1451,7 @@ disgeo.o:
 distgeom.o: angbnd.o atomid.o atoms.o bndstr.o couple.o disgeo.o files.o inform.o iounit.o kvdws.o math.o refer.o restrn.o sizes.o tors.o
 dma.o:
 document.o: iounit.o
-domega.o: sizes.o
+domega.o:
 dynamic.o: atoms.o bath.o bndstr.o bound.o inform.o iounit.o keys.o mdstuf.o potent.o sizes.o solute.o stodyn.o usage.o
 eangang.o: angang.o angbnd.o angpot.o atoms.o bound.o energi.o group.o math.o sizes.o usage.o
 eangang1.o: angang.o angbnd.o angpot.o atoms.o bound.o deriv.o energi.o group.o math.o sizes.o usage.o virial.o
@@ -1580,7 +1579,7 @@ fftpack.o: math.o
 field.o: keys.o potent.o sizes.o
 fields.o: sizes.o
 files.o:
-final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o charge.o chunks.o couple.o deriv.o dipole.o disgeo.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o improp.o imptor.o inform.o iounit.o light.o merck.o molcul.o moldyn.o mpole.o mutant.o neigh.o nonpol.o opbend.o opdist.o orbits.o paths.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o qmstuf.o refer.o restrn.o rgddyn.o rigid.o ring.o sizes.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o usolve.o vdw.o vibs.o
+final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o charge.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o improp.o imptor.o inform.o iounit.o light.o merck.o molcul.o moldyn.o mpole.o mutant.o neigh.o nonpol.o opbend.o opdist.o orbits.o paths.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o qmstuf.o refer.o restrn.o rgddyn.o rigid.o ring.o sizes.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o usolve.o vdw.o vibs.o warp.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o sizes.o warp.o
 fracs.o:
 freeunit.o: iounit.o
@@ -1588,12 +1587,12 @@ freeze.o:
 gda.o: atoms.o files.o iounit.o minima.o potent.o sizes.o vdwpot.o warp.o
 geometry.o: atoms.o math.o sizes.o
 getint.o: atoms.o inform.o iounit.o output.o sizes.o
-getkey.o: argue.o files.o iounit.o keys.o openmp.o sizes.o
+getkey.o: argue.o files.o iounit.o keys.o openmp.o
 getmol.o: files.o iounit.o
 getmol2.o: files.o iounit.o
 getnumb.o: ascii.o
 getpdb.o: iounit.o
-getprm.o: files.o iounit.o keys.o params.o sizes.o
+getprm.o: files.o iounit.o keys.o params.o
 getref.o: atomid.o atoms.o couple.o files.o refer.o sizes.o titles.o
 getstring.o: ascii.o
 gettext.o: ascii.o
@@ -1651,7 +1650,7 @@ kdipol.o:
 kdipole.o: atmlst.o atoms.o bndstr.o couple.o dipole.o inform.o iounit.o kdipol.o keys.o potent.o sizes.o
 kewald.o: atoms.o bound.o boxes.o chunks.o ewald.o fft.o inform.o iounit.o keys.o limits.o math.o openmp.o pme.o sizes.o
 kextra.o:
-keys.o: sizes.o
+keys.o:
 kgeom.o: atomid.o atoms.o bound.o couple.o group.o iounit.o keys.o molcul.o potent.o restrn.o sizes.o
 khbond.o:
 kimprop.o: atomid.o atoms.o couple.o improp.o inform.o iounit.o keys.o kiprop.o potent.o sizes.o tors.o
@@ -1687,7 +1686,7 @@ kvdw.o: atomid.o atoms.o couple.o fields.o inform.o iounit.o keys.o khbond.o kvd
 kvdwpr.o:
 kvdws.o: sizes.o
 lattice.o: boxes.o cell.o inform.o iounit.o math.o sizes.o
-lbfgs.o: inform.o iounit.o keys.o linmin.o math.o minima.o output.o scales.o sizes.o
+lbfgs.o: inform.o iounit.o keys.o linmin.o math.o minima.o output.o scales.o
 light.o:
 lights.o: bound.o boxes.o cell.o iounit.o light.o sizes.o
 limits.o:
@@ -1720,7 +1719,7 @@ mplpot.o:
 mpole.o:
 mutant.o:
 mutate.o: atomid.o atoms.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o
-nblist.o: atoms.o bound.o boxes.o cell.o charge.o iounit.o light.o limits.o mpole.o neigh.o openmp.o potent.o sizes.o vdw.o
+nblist.o: atoms.o bound.o boxes.o cell.o charge.o iounit.o light.o limits.o mpole.o neigh.o potent.o sizes.o vdw.o
 neigh.o:
 newton.o: atoms.o files.o inform.o iounit.o keys.o sizes.o usage.o
 newtrot.o: files.o hescut.o inform.o iounit.o keys.o math.o omega.o sizes.o zcoord.o
@@ -1750,7 +1749,7 @@ orient.o: atomid.o atoms.o group.o math.o rigid.o sizes.o
 orthog.o:
 output.o:
 overlap.o: units.o
-params.o: sizes.o
+params.o:
 path.o: align.o atomid.o atoms.o files.o inform.o iounit.o linmin.o minima.o output.o paths.o sizes.o
 paths.o:
 pbstuf.o: sizes.o
@@ -1891,7 +1890,7 @@ vibrot.o: iounit.o omega.o sizes.o
 vibs.o:
 virial.o:
 volume.o: atoms.o iounit.o math.o sizes.o
-warp.o: sizes.o
+warp.o:
 xtalfit.o: atomid.o atoms.o bound.o boxes.o charge.o dipole.o files.o fracs.o iounit.o kvdws.o math.o molcul.o potent.o sizes.o vdw.o xtals.o
 xtalmin.o: atoms.o boxes.o files.o inform.o iounit.o keys.o math.o scales.o sizes.o
 xtals.o:

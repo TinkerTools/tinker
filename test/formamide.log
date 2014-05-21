@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -25,7 +25,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -48,7 +48,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -71,28 +71,28 @@
      5    -145.3769      9.5744     2.4543    0.1504      17    NegCurve     16
      6    -147.8245      7.1440     2.4475    0.1018      19   TruncNewt     18
      7    -149.3718      1.5181     1.5474    0.1121      21   TruncNewt     19
-     8    -149.8061      2.4130     0.4342    0.0870      26   TruncNewt     26
-     9    -149.9652      1.2989     0.1592    0.0672      28   TruncNewt     31
-    10    -150.0126      1.4181     0.0473    0.0546      33   TruncNewt     38
-    11    -150.0511      0.9321     0.0385    0.0510      37   TruncNewt     45
-    12    -150.0607      0.1069     0.0096    0.0131      38   TruncNewt     47
-    13    -150.0700      0.3811     0.0093    0.0351      50   TruncNewt     61
-    14    -150.0733      0.0588     0.0032    0.0180      54   TruncNewt     68
-    15    -150.0735      0.0101     0.0003    0.0105      63   TruncNewt     78
-    16    -150.0735      0.0001     0.0000    0.0002      75   TruncNewt     91
+     8    -149.8060      2.4149     0.4341    0.0870      26   TruncNewt     26
+     9    -149.9652      1.2978     0.1592    0.0671      28   TruncNewt     31
+    10    -150.0124      1.4193     0.0472    0.0545      33   TruncNewt     38
+    11    -150.0510      0.9354     0.0386    0.0509      37   TruncNewt     45
+    12    -150.0606      0.1075     0.0096    0.0132      38   TruncNewt     47
+    13    -150.0700      0.3827     0.0094    0.0352      49   TruncNewt     60
+    14    -150.0733      0.0589     0.0033    0.0181      53   TruncNewt     67
+    15    -150.0735      0.0101     0.0003    0.0106      62   TruncNewt     77
+    16    -150.0735      0.0000     0.0000    0.0002      76   TruncNewt     92
 
  TNCG  --  Normal Termination due to SmallGrad
 
  Final Function Value :         -150.0735
- Final RMS Gradient :          0.5703D-04
- Final Gradient Norm :         0.2794D-03
+ Final RMS Gradient :          0.2248D-04
+ Final Gradient Norm :         0.1102D-03
 
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -131,79 +131,79 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0       97.7217     636.9754     636.9754         2         3
+     0       97.7249     636.9885     636.9885         2         3
 
  Parameters and Scaled Derivatives at Iteration   0 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.7400    898.5017
-   ( 2)  Well Depth          Atom Class    7          0.0660     64.5744
+   ( 1)  Atomic Radius       Atom Class    7          1.7400    898.5204
+   ( 2)  Well Depth          Atom Class    7          0.0660     64.5747
 
  Residual Error Function Values at Iteration   0 :
 
-   ( 1)  Force a-Axis          Crystal   1         -0.1901
+   ( 1)  Force a-Axis          Crystal   1         -0.1902
    ( 2)  Force b-Axis          Crystal   1         -0.3900
    ( 3)  Force c-Axis          Crystal   1         -2.9693
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1         13.4865
-   ( 6)  Force Gamma           Crystal   1         -0.0000
+   ( 5)  Force Beta            Crystal   1         13.4867
+   ( 6)  Force Gamma           Crystal   1          0.0000
    ( 7)  Lattice Energy        Crystal   1          2.1337
 
-     1       71.4310     249.6604     352.1127         1         6
+     1       71.4324     249.6489     352.0963         1         6
 
  Parameters and Scaled Derivatives at Iteration   1 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.6918    352.1127
-   ( 2)  Well Depth          Atom Class    7          0.0528     26.0246
+   ( 1)  Atomic Radius       Atom Class    7          1.6918    352.0963
+   ( 2)  Well Depth          Atom Class    7          0.0528     26.0258
 
  Residual Error Function Values at Iteration   1 :
 
-   ( 1)  Force a-Axis          Crystal   1          2.3282
-   ( 2)  Force b-Axis          Crystal   1          1.1761
-   ( 3)  Force c-Axis          Crystal   1         -1.1078
+   ( 1)  Force a-Axis          Crystal   1          2.3283
+   ( 2)  Force b-Axis          Crystal   1          1.1762
+   ( 3)  Force c-Axis          Crystal   1         -1.1077
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1         11.4629
-   ( 6)  Force Gamma           Crystal   1         -0.0000
+   ( 5)  Force Beta            Crystal   1         11.4630
+   ( 6)  Force Gamma           Crystal   1          0.0000
    ( 7)  Lattice Energy        Crystal   1          1.8526
 
-     2       62.1454      26.4386      37.0748         1         9
+     2       62.1475      26.4612      37.1028         1         9
 
  Parameters and Scaled Derivatives at Iteration   2 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.6029     37.0748
-   ( 2)  Well Depth          Atom Class    7          0.0528      4.8433
+   ( 1)  Atomic Radius       Atom Class    7          1.6029     37.1028
+   ( 2)  Well Depth          Atom Class    7          0.0528      4.8754
 
  Residual Error Function Values at Iteration   2 :
 
    ( 1)  Force a-Axis          Crystal   1          4.7073
-   ( 2)  Force b-Axis          Crystal   1          2.6355
-   ( 3)  Force c-Axis          Crystal   1          0.6072
+   ( 2)  Force b-Axis          Crystal   1          2.6356
+   ( 3)  Force c-Axis          Crystal   1          0.6073
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1          9.6267
-   ( 6)  Force Gamma           Crystal   1         -0.0000
+   ( 5)  Force Beta            Crystal   1          9.6268
+   ( 6)  Force Gamma           Crystal   1          0.0000
    ( 7)  Lattice Energy        Crystal   1          1.4645
 
-     3       61.9424       2.4903       2.2144         1        12
+     3       61.9444       2.4854       2.1898         1        12
 
  Parameters and Scaled Derivatives at Iteration   3 :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.5860      2.2144
-   ( 2)  Well Depth          Atom Class    7          0.0528      2.7386
+   ( 1)  Atomic Radius       Atom Class    7          1.5859      2.1898
+   ( 2)  Well Depth          Atom Class    7          0.0528      2.7494
 
  Residual Error Function Values at Iteration   3 :
 
-   ( 1)  Force a-Axis          Crystal   1          5.0868
-   ( 2)  Force b-Axis          Crystal   1          2.8733
-   ( 3)  Force c-Axis          Crystal   1          0.8867
+   ( 1)  Force a-Axis          Crystal   1          5.0872
+   ( 2)  Force b-Axis          Crystal   1          2.8735
+   ( 3)  Force c-Axis          Crystal   1          0.8870
    ( 4)  Force Alpha           Crystal   1         -0.0000
-   ( 5)  Force Beta            Crystal   1          9.3266
-   ( 6)  Force Gamma           Crystal   1         -0.0000
+   ( 5)  Force Beta            Crystal   1          9.3265
+   ( 6)  Force Gamma           Crystal   1          0.0000
    ( 7)  Lattice Energy        Crystal   1          1.4079
 
-     4       61.9416       1.8548       0.0969         1        15
+     4       61.9436       1.8447       0.0862         1        15
 
  SQUARE  --  Normal Termination of Least Squares
 
  Final Values of the Parameters and Scaled Derivatives :
 
-   ( 1)  Atomic Radius       Atom Class    7          1.5848      0.0612
-   ( 2)  Well Depth          Atom Class    7          0.0528     49.6460
+   ( 1)  Atomic Radius       Atom Class    7          1.5848      0.0544
+   ( 2)  Well Depth          Atom Class    7          0.0528     49.3825

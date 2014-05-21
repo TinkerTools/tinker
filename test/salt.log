@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -25,7 +25,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -48,7 +48,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -99,10 +99,10 @@
  OCVM  --  Normal Termination due to SmallGrad
 
  Final Potential Function Value :       -754.4297
- Final RMS Coordinate Gradient :       0.2715D-12
- Final Coordinate Gradient Norm :      0.7678D-12
- Final RMS Lattice Gradient :          0.2082D-04
- Final Lattice Gradient Norm :         0.5099D-04
+ Final RMS Coordinate Gradient :       0.2964D-12
+ Final Coordinate Gradient Norm :      0.8384D-12
+ Final RMS Lattice Gradient :          0.2079D-04
+ Final Lattice Gradient Norm :         0.5093D-04
 
  Final Lattice Dimensions :      a         5.7661
                                  b         5.7661

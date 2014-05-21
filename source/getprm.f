@@ -17,7 +17,6 @@ c     and then opens and reads the parameters
 c
 c
       subroutine getprm
-      use sizes
       use files
       use iounit
       use keys

@@ -144,12 +144,6 @@ c
 c
 c     check number of variables and get type of optimization
 c
-      if (nvar .gt. maxvar) then
-         write (iout,10)
-   10    format (/,' TNCG  --  Too many Parameters,',
-     &              ' Increase the Value of MAXVAR')
-         return
-      end if
       rms = sqrt(dble(nvar))
       if (coordtype .eq. 'CARTESIAN') then
          rms = rms / sqrt(3.0d0)

@@ -17,7 +17,6 @@ c     line images for subsequent keyword parameter searching
 c
 c
       subroutine getkey
-      use sizes
       use argue
       use files
       use iounit

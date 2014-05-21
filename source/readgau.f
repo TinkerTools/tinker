@@ -33,6 +33,7 @@ c
       logical hasinputxyz
       logical hasmp2
       logical exist
+      real*8 xtmp,ytmp,ztmp
       real*8 frcunit,hessunit
       character*4 arcstart
       character*6 gname
@@ -104,7 +105,7 @@ c     do while (.true. .and. .not.eof(igau))
                read (igau,50,err=70,end=70)  record
    50          format (a120)
                read (record,*,err=60,end=60)  itmp,jtmp,ktmp,
-     &                                        gx(i),gy(i),gz(i)
+     &                                        xtmp,ytmp,ztmp
                if (jtmp .le. 0)  goto 60
                i = i + 1
             end do
@@ -146,7 +147,7 @@ c     do while (.true. .and. .not.eof(igau))
                read (igau,100,err=220,end=220)  record
   100          format (a120)
                read (record,*,err=110,end=110)  itmp,jtmp,ktmp,
-     &                                        gx(i),gy(i),gz(i)
+     &                                          gx(i),gy(i),gz(i)
                if (jtmp .le. 0)  goto 110
                i = i + 1
             end do

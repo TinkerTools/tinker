@@ -12,13 +12,16 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
+c     maxkey    maximum number of lines in the keyword file
+c
 c     nkey      number of nonblank lines in the keyword file
 c     keyline   contents of each individual keyword file line
 c
 c
       module keys
-      use sizes
       implicit none
+      integer maxkey
+      parameter (maxkey=25000)
       integer nkey
       character*120 keyline(maxkey)
       save

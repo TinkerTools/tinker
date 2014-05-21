@@ -26,11 +26,13 @@ c
       implicit none
       integer i,j,k
       integer ia,ib,ic,id
+      integer maxtors
 c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(itors))  allocate (itors(4,6*n))
+      maxtors = 6 * n
+      if (.not. allocated(itors))  allocate (itors(4,maxtors))
 c
 c     loop over all bonds, storing the atoms in each torsion
 c

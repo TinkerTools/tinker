@@ -229,7 +229,7 @@ c
       use neigh
       use vdw
       implicit none
-      integer i,j,k
+      integer i,k
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
       real*8 xred(*)
@@ -239,7 +239,7 @@ c
 c
 c     store coordinates to reflect update of the site
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,k,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, nvdw
          xi = xred(i)
@@ -251,7 +251,7 @@ c
 c
 c     generate all neighbors for the site being rebuilt
 c
-         j = 0
+         nvlst(i) = 0
          do k = i+1, nvdw
             xr = xi - xred(k)
             yr = yi - yred(k)
@@ -259,11 +259,10 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. vbuf2) then
-               j = j + 1
-               vlst(j,i) = k
+               nvlst(i) = nvlst(i) + 1
+               vlst(nvlst(i),i) = k
             end if
          end do
-         nvlst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
@@ -318,10 +317,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = nvdw
-      allocate (xsort(nlight))
-      allocate (ysort(nlight))
-      allocate (zsort(nlight))
+      allocate (xsort(nvdw))
+      allocate (ysort(nvdw))
+      allocate (zsort(nvdw))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
@@ -394,7 +392,7 @@ c
          if (repeat) then
             repeat = .false.
             start = kbx(i) + 1
-            stop = nlight
+            stop = nvdw
             goto 10
          end if
 c
@@ -592,7 +590,7 @@ c
       use iounit
       use neigh
       implicit none
-      integer i,j,k
+      integer i,k
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
@@ -600,7 +598,7 @@ c
 c
 c     store new coordinates to reflect update of the site
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, nion
          ii = kion(i)
@@ -613,7 +611,7 @@ c
 c
 c     generate all neighbors for the site being rebuilt
 c
-         j = 0
+         nelst(i) = 0
          do k = i+1, nion
             kk = kion(k)
             xr = xi - x(kk)
@@ -622,11 +620,10 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. cbuf2) then
-               j = j + 1
-               elst(j,i) = k
+               nelst(i) = nelst(i) + 1
+               elst(nelst(i),i) = k
             end if
          end do
-         nelst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
@@ -679,10 +676,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = nion
-      allocate (xsort(nlight))
-      allocate (ysort(nlight))
-      allocate (zsort(nlight))
+      allocate (xsort(nion))
+      allocate (ysort(nion))
+      allocate (zsort(nion))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
@@ -758,7 +754,7 @@ c
          if (repeat) then
             repeat = .false.
             start = kbx(i) + 1
-            stop = nlight
+            stop = nion
             goto 10
          end if
 c
@@ -956,14 +952,15 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,j,k,ii,kk
+      integer i,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
 c
 c     store new coordinates to reflect update of the site
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
@@ -976,7 +973,7 @@ c
 c
 c     generate all neighbors for the site being rebuilt
 c
-         j = 0
+         nelst(i) = 0
          do k = i+1, npole
             kk = ipole(k)
             xr = xi - x(kk)
@@ -985,11 +982,10 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. mbuf2) then
-               j = j + 1
-               elst(j,i) = k
+               nelst(i) = nelst(i) + 1
+               elst(nelst(i),i) = k
             end if
          end do
-         nelst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
@@ -1042,10 +1038,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = npole
-      allocate (xsort(nlight))
-      allocate (ysort(nlight))
-      allocate (zsort(nlight))
+      allocate (xsort(npole))
+      allocate (ysort(npole))
+      allocate (zsort(npole))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
@@ -1121,7 +1116,7 @@ c
          if (repeat) then
             repeat = .false.
             start = kbx(i) + 1
-            stop = nlight
+            stop = npole
             goto 10
          end if
 c
@@ -1319,14 +1314,15 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,j,k,ii,kk
+      integer i,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
 c
 c     store new coordinates to reflect update of the site
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
@@ -1339,7 +1335,7 @@ c
 c
 c     generate all neighbors for the site being rebuilt
 c
-         j = 0
+         nulst(i) = 0
          do k = i+1, npole
             kk = ipole(k)
             xr = xi - x(kk)
@@ -1348,11 +1344,10 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. ubuf2) then
-               j = j + 1
-               ulst(j,i) = k
+               nulst(i) = nulst(i) + 1
+               ulst(nulst(i),i) = k
             end if
          end do
-         nulst(i) = j
 c
 c     check to see if the neighbor list is too long
 c
@@ -1406,10 +1401,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      nlight = npole
-      allocate (xsort(nlight))
-      allocate (ysort(nlight))
-      allocate (zsort(nlight))
+      allocate (xsort(npole))
+      allocate (ysort(npole))
+      allocate (zsort(npole))
 c
 c     transfer interaction site coordinates to sorting arrays
 c
@@ -1485,7 +1479,7 @@ c
          if (repeat) then
             repeat = .false.
             start = kbx(i) + 1
-            stop = nlight
+            stop = npole
             goto 10
          end if
 c
@@ -1532,19 +1526,17 @@ c
       use iounit
       use light
       implicit none
-      integer i,j,k,nsite
+      integer i,j,k
+      integer nsite
+      integer extent
       real*8 cutoff,box
       real*8 xcut,ycut,zcut
-      real*8 xmove,ymove,zmove
       real*8 xsort(*)
       real*8 ysort(*)
       real*8 zsort(*)
       real*8, allocatable :: xfrac(:)
       real*8, allocatable :: yfrac(:)
       real*8, allocatable :: zfrac(:)
-      logical first
-      save first
-      data first  / .true. /
 c
 c
 c     truncated octahedron periodicity is not handled at present
@@ -1636,20 +1628,33 @@ c
 c     perform dynamic allocation of some global arrays
 c
       nlight = nsite
-      if (first) then
-         first = .false.
-         if (.not. allocated(kbx))  allocate (kbx(nsite))
-         if (.not. allocated(kby))  allocate (kby(nsite))
-         if (.not. allocated(kbz))  allocate (kbz(nsite))
-         if (.not. allocated(kex))  allocate (kex(nsite))
-         if (.not. allocated(key))  allocate (key(nsite))
-         if (.not. allocated(kez))  allocate (kez(nsite))
-         if (.not. allocated(locx))  allocate (locx(nlight))
-         if (.not. allocated(locy))  allocate (locy(nlight))
-         if (.not. allocated(locz))  allocate (locz(nlight))
-         if (.not. allocated(rgx))  allocate (rgx(nlight))
-         if (.not. allocated(rgy))  allocate (rgy(nlight))
-         if (.not. allocated(rgz))  allocate (rgz(nlight))
+      extent = 0
+      if (allocated(rgx))  extent = size(rgx)
+      if (extent .lt. nlight) then
+         if (allocated(kbx))  deallocate (kbx)
+         if (allocated(kby))  deallocate (kby)
+         if (allocated(kbz))  deallocate (kbz)
+         if (allocated(kex))  deallocate (kex)
+         if (allocated(key))  deallocate (key)
+         if (allocated(kez))  deallocate (kez)
+         if (allocated(locx))  deallocate (locx)
+         if (allocated(locy))  deallocate (locy)
+         if (allocated(locz))  deallocate (locz)
+         if (allocated(rgx))  deallocate (rgx)
+         if (allocated(rgy))  deallocate (rgy)
+         if (allocated(rgz))  deallocate (rgz)
+         allocate (kbx(nsite))
+         allocate (kby(nsite))
+         allocate (kbz(nsite))
+         allocate (kex(nsite))
+         allocate (key(nsite))
+         allocate (kez(nsite))
+         allocate (locx(nlight))
+         allocate (locy(nlight))
+         allocate (locz(nlight))
+         allocate (rgx(nlight))
+         allocate (rgy(nlight))
+         allocate (rgz(nlight))
       end if
 c
 c     sort the coordinate components into ascending order

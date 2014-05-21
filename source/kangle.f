@@ -685,7 +685,7 @@ c
                if (c(ina) .eq. 1000.0d0)  goto 20
                if (c(inb) .eq. 1000.0d0)  goto 20
                if (c(inc) .eq. 1000.0d0)  goto 20
-               do k = 1, maxbnd
+               do k = 1, nbond
                   if ((min(ia,ib).eq.ibnd(1,k)) .and.
      &                (max(ia,ib).eq.ibnd(2,k))) then
                      bnd_ab = k
@@ -739,7 +739,7 @@ c
                end if
                if (ring3)  anat(i) = 60.0d0
                if (ring4)  anat(i) = 90.0d0
-               do k = 1, maxbnd
+               do k = 1, nbond
                   if ((min(ia,ib).eq.ibnd(1,k)) .and.
      &                (max(ia,ib).eq.ibnd(2,k))) then
                      bnd_ab = k

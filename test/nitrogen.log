@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -21,9 +21,10 @@
 
     Processing Coordinate Frame           50
 
- Mean Squared Diffusion Distance and Self-Diffusion Constant :
+ Mean Squared Displacements and Self-Diffusion Constant :
 
-     Time Step     X MSD       Y MSD       Z MSD       R MSD    Diff Const
+     Time Gap      X MSD       Y MSD       Z MSD       R MSD    Diff Const
+       (ps)         (/2)        (/2)        (/2)        (/6)     (x 10^5)
 
         1.00        2.91        2.85        2.95        2.90      2.9014
         2.00        5.76        5.36        5.68        5.60      2.8013
@@ -80,7 +81,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###

@@ -44,7 +44,6 @@ c     optsave    subroutine to write out info about current status
 c
 c
       subroutine lbfgs (nvar,x0,minimum,grdmin,fgvalue,optsave)
-      use sizes
       use inform
       use iounit
       use keys
@@ -89,12 +88,6 @@ c
 c
 c     initialize some values to be used below
 c
-      if (nvar .gt. maxvar) then
-         write (iout,10)
-   10    format (/,' LBFGS  --  Too many Parameters,',
-     &              ' Increase the Value of MAXVAR')
-         return
-      end if
       ncalls = 0
       rms = sqrt(dble(nvar))
       if (coordtype .eq. 'CARTESIAN') then

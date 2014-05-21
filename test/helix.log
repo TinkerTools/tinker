@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 6.3  February 2014                        ##
+ ##                          Version 7.0  June 2014                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2014               ##
  ###                           All Rights Reserved                          ###
@@ -35,6 +35,8 @@
 
            Groups               Type              Weight
 
+          0     1            InterGroup           1.0000
+          0     2            InterGroup           1.0000
           1     2            InterGroup           1.0000
 
  Optimally Conditioned Variable Metric Optimization :

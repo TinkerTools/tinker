@@ -33,7 +33,9 @@ c
       use iounit
       use light
       implicit none
-      integer i,j,k,nsite
+      integer i,j,k
+      integer nsite
+      integer extent
       real*8 cutoff,box
       real*8 xcut,ycut,zcut
       real*8 xmove,ymove,zmove
@@ -43,9 +45,6 @@ c
       real*8, allocatable :: xfrac(:)
       real*8, allocatable :: yfrac(:)
       real*8, allocatable :: zfrac(:)
-      logical first
-      save first
-      data first  / .true. /
 c
 c
 c     check that maximum number of replicates is not exceeded
@@ -175,20 +174,33 @@ c
 c     perform dynamic allocation of some global arrays
 c
       nlight = (ncell+1) * nsite
-      if (first) then
-         first = .false.
-         if (.not. allocated(kbx))  allocate (kbx(nsite))
-         if (.not. allocated(kby))  allocate (kby(nsite))
-         if (.not. allocated(kbz))  allocate (kbz(nsite))
-         if (.not. allocated(kex))  allocate (kex(nsite))
-         if (.not. allocated(key))  allocate (key(nsite))
-         if (.not. allocated(kez))  allocate (kez(nsite))
-         if (.not. allocated(locx))  allocate (locx(nlight))
-         if (.not. allocated(locy))  allocate (locy(nlight))
-         if (.not. allocated(locz))  allocate (locz(nlight))
-         if (.not. allocated(rgx))  allocate (rgx(nlight))
-         if (.not. allocated(rgy))  allocate (rgy(nlight))
-         if (.not. allocated(rgz))  allocate (rgz(nlight))
+      extent = 0
+      if (allocated(rgx))  extent = size(rgx)
+      if (extent .lt. nlight) then
+         if (allocated(kbx))  deallocate (kbx)
+         if (allocated(kby))  deallocate (kby)
+         if (allocated(kbz))  deallocate (kbz)
+         if (allocated(kex))  deallocate (kex)
+         if (allocated(key))  deallocate (key)
+         if (allocated(kez))  deallocate (kez)
+         if (allocated(locx))  deallocate (locx)
+         if (allocated(locy))  deallocate (locy)
+         if (allocated(locz))  deallocate (locz)
+         if (allocated(rgx))  deallocate (rgx)
+         if (allocated(rgy))  deallocate (rgy)
+         if (allocated(rgz))  deallocate (rgz)
+         allocate (kbx(nsite))
+         allocate (kby(nsite))
+         allocate (kbz(nsite))
+         allocate (kex(nsite))
+         allocate (key(nsite))
+         allocate (kez(nsite))
+         allocate (locx(nlight))
+         allocate (locy(nlight))
+         allocate (locz(nlight))
+         allocate (rgx(nlight))
+         allocate (rgy(nlight))
+         allocate (rgz(nlight))
       end if
 c
 c     sort the coordinate components into ascending order
