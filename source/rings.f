@@ -21,7 +21,6 @@ c     are needed for force field parameter assignment
 c
 c
       subroutine rings
-      use sizes
       use angbnd
       use atoms
       use bitor
@@ -37,6 +36,7 @@ c
       integer id,ie,ig
       integer list1,list2
       integer list3,list4
+      integer maxring
       integer, allocatable :: list(:)
       logical reduce
 c
@@ -58,6 +58,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
+      maxring = 10000
       if (.not. allocated(iring3))  allocate (iring3(3,maxring))
       if (.not. allocated(iring4))  allocate (iring4(4,maxring))
       if (.not. allocated(iring5))  allocate (iring5(5,maxring))
@@ -75,7 +76,8 @@ c
                   nring3 = nring3 + 1
                   if (nring3 .gt. maxring) then
                      write (iout,10)
-   10                format (/,' RINGS  --  Too many 3-Membered Rings')
+   10                format (/,' RINGS  --  Too many 3-Membered Rings;',
+     &                          ' Increase MAXRING')
                      call fatal
                   end if
                   iring3(1,nring3) = ia
@@ -108,7 +110,8 @@ c
                   nring4 = nring4 + 1
                   if (nring4 .gt. maxring) then
                      write (iout,30)
-   30                format (/,' RINGS  --  Too many 4-Membered Rings')
+   30                format (/,' RINGS  --  Too many 4-Membered Rings;',
+     &                          ' Increase MAXRING')
                      call fatal
                   end if
                   iring4(1,nring4) = ia
@@ -162,7 +165,8 @@ c
                   nring5 = nring5 + 1
                   if (nring5 .gt. maxring) then
                      write (iout,50)
-   50                format (/,' RINGS  --  Too many 5-Membered Rings')
+   50                format (/,' RINGS  --  Too many 5-Membered Rings;',    
+     &                          ' Increase MAXRING')
                      call fatal
                   end if
                   iring5(1,nring5) = ia
@@ -222,8 +226,8 @@ c
                      nring6 = nring6 + 1
                      if (nring6 .gt. maxring) then
                         write (iout,70)
-   70                   format (/,' RINGS  --  Too many',
-     &                             ' 6-Membered Rings')
+   70                   format (/,' RINGS  --  Too many 6-Membered',
+     &                             ' Rings; Increase MAXRING')
                         call fatal
                      end if
                      iring6(1,nring6) = ia

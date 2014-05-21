@@ -17,7 +17,6 @@ c     in PDB file conversion and automated generation of structures
 c
 c
       subroutine initres
-      use sizes
       use resdue
       implicit none
       integer i

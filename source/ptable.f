@@ -12,12 +12,15 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
+c     maxele   maximum number of elements from periodic table
+c
 c     elemnt   atomic symbol for each chemical element
 c
 c
       module ptable
-      use sizes
       implicit none
+      integer maxele
+      parameter (maxele=112)
       character*3 elemnt(maxele)
       save
       end

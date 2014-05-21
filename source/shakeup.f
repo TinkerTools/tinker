@@ -385,7 +385,6 @@ c     each ring fusion
 c
 c
       subroutine chkangle (ia,ib,ic)
-      use sizes
       use couple
       use freeze
       use ring

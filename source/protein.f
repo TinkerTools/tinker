@@ -140,7 +140,6 @@ c     and torsional angle values needed to define a peptide
 c
 c
       subroutine getseq
-      use sizes
       use iounit
       use phipsi
       use resdue

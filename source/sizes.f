@@ -36,12 +36,8 @@ c     maxfix          geometric constraints and restraints
 c     maxvib          vibrational frequencies
 c     maxgeo          distance geometry points
 c     maxcell         unit cells in replicated crystal
-c     maxring         3-, 4-, or 5-membered rings
 c     maxbio          biopolymer atom definitions
 c     maxres          residues in the macromolecule
-c     maxele          elements in periodic table
-c     maxamino        amino acid residue types
-c     maxnuc          nucleic acid residue types
 c
 c
       module sizes
@@ -54,9 +50,7 @@ c
       integer maxulst,maxfft
       integer maxfix,maxvib
       integer maxgeo,maxcell
-      integer maxring,maxbio
-      integer maxres,maxele
-      integer maxamino,maxnuc
+      integer maxbio,maxres
       parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -73,11 +67,7 @@ c
       parameter (maxvib=1000)
       parameter (maxgeo=2500)
       parameter (maxcell=10000)
-      parameter (maxring=10000)
       parameter (maxbio=10000)
       parameter (maxres=10000)
-      parameter (maxele=112)
-      parameter (maxamino=38)
-      parameter (maxnuc=12)
       save
       end
