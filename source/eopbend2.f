@@ -230,10 +230,6 @@ c
       yid = y(id)
       zid = z(id)
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(deopb))  allocate (deopb(3,n))
-c
 c     zero out the first derivative components
 c
       deopb(1,ia) = 0.0d0

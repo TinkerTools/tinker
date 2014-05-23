@@ -133,7 +133,7 @@ c
    70    continue
          if (query) then
             write (iout,80)  eps0
-   80       format (/,' Enter Finite Difference Stepsize [',d8.1,
+   80       format (/,' Enter a Numerical Stepsize [',d7.1,
      &                 ' Ang] :  ',$)
             read (input,90,err=70)  eps
    90       format (f20.0)

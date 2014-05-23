@@ -35,12 +35,12 @@ c
       maxn13 = 3 * maxval
       maxn14 = 9 * maxval
       maxn15 = 27 * maxval
-      if (.not. allocated(n13))  allocate (n13(n))
-      if (.not. allocated(n14))  allocate (n14(n))
-      if (.not. allocated(n15))  allocate (n15(n))
-      if (.not. allocated(i13))  allocate (i13(maxn13,n))
-      if (.not. allocated(i14))  allocate (i14(maxn14,n))
-      if (.not. allocated(i15))  allocate (i15(maxn15,n))
+      if (.not. allocated(n13))  allocate (n13(maxatm))
+      if (.not. allocated(n14))  allocate (n14(maxatm))
+      if (.not. allocated(n15))  allocate (n15(maxatm))
+      if (.not. allocated(i13))  allocate (i13(maxn13,maxatm))
+      if (.not. allocated(i14))  allocate (i14(maxn14,maxatm))
+      if (.not. allocated(i15))  allocate (i15(maxn15,maxatm))
 c
 c     loop over all atoms finding all the 1-3 relationships;
 c     note "n12" and "i12" have already been setup elsewhere

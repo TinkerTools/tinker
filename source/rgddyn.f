@@ -24,15 +24,16 @@ c     linear  logical flag to mark group as linear or nonlinear
 c
 c
       module rgddyn
+      use sizes
       implicit none
-      real*8, allocatable :: xcmo(:)
-      real*8, allocatable :: ycmo(:)
-      real*8, allocatable :: zcmo(:)
-      real*8, allocatable :: vcm(:,:)
-      real*8, allocatable :: wcm(:,:)
-      real*8, allocatable :: lm(:,:)
-      real*8, allocatable :: vc(:,:)
-      real*8, allocatable :: wc(:,:)
-      logical, allocatable :: linear(:)
+      real*8 xcmo(maxatm)
+      real*8 ycmo(maxatm)
+      real*8 zcmo(maxatm)
+      real*8 vcm(3,maxgrp)
+      real*8 wcm(3,maxgrp)
+      real*8 lm(3,maxgrp)
+      real*8 vc(3,maxgrp)
+      real*8 wc(3,maxgrp)
+      logical linear(maxgrp)
       save
       end

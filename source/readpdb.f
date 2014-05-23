@@ -17,6 +17,7 @@ c     from an external disk file
 c
 c
       subroutine readpdb (ipdb)
+      use sizes
       use files
       use inform
       use iounit
@@ -375,6 +376,7 @@ c     sets chains, alternate sites and insertion records to be used
 c
 c
       subroutine scanpdb (ipdb)
+      use sizes
       use iounit
       use pdb
       use sequen
@@ -594,6 +596,7 @@ c     and atom names to the standard forms used by TINKER
 c
 c
       subroutine fixpdb (resname,atmname)
+      use sizes
       use resdue
       implicit none
       integer i

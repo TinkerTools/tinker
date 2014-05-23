@@ -29,12 +29,10 @@ c
       use kanang
       use keys
       use potent
-      use tors
       implicit none
       integer i,j,k,m,next
       integer it,ia,ic
       integer nang,jang,kang
-      integer maxaa
       real*8 fa,faa,aak(3)
       logical header
       character*20 keyword
@@ -77,9 +75,8 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      maxaa = 15 * n
-      if (.not. allocated(iaa))  allocate (iaa(2,maxaa))
-      if (.not. allocated(kaa))  allocate (kaa(maxaa))
+      if (.not. allocated(iaa))  allocate (iaa(2,maxtors))
+      if (.not. allocated(kaa))  allocate (kaa(maxtors))
 c
 c     assign the angle-angle parameters for each angle pair
 c

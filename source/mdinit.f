@@ -40,12 +40,13 @@ c
       use usage
       implicit none
       integer i,j,k,idyn
-      integer size,next
+      integer size,next,len_isok
       integer lext,freeunit
       real*8 e,ekt,qterm
       real*8 maxwell,speed
       real*8 vec(3)
       real*8, allocatable :: derivs(:,:)
+      real*8 tempstor,LkT,kT,random
       logical exist
       character*7 ext
       character*20 keyword
@@ -68,6 +69,8 @@ c
       use_pred = .false.
       polpred = 'LSQR'
       iprint = 100
+      nrespa = 1
+      len_nhc = 4
 c
 c     set default values for temperature and pressure control
 c
@@ -147,6 +150,10 @@ c
             call upcase (volscale)
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
+         else if (keyword(1:11) .eq. 'NHC-LENGTH ') then
+            read (string,*,err=10,end=10)  len_nhc     
+         else if (keyword(1:6) .eq. 'NRESPA ') then
+            read (string,*,err=10,end=10)  nrespa             
          end if
    10    continue
       end do
@@ -325,24 +332,6 @@ c
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (integrate .eq. 'RIGIDBODY') then
-         if (.not. allocated(xcmo))  allocate (xcmo(n))
-         if (.not. allocated(ycmo))  allocate (ycmo(n))
-         if (.not. allocated(zcmo))  allocate (zcmo(n))
-         if (.not. allocated(vcm))  allocate (vcm(3,ngrp))
-         if (.not. allocated(wcm))  allocate (wcm(3,ngrp))
-         if (.not. allocated(lm))  allocate (lm(3,ngrp))
-         if (.not. allocated(vc))  allocate (vc(3,ngrp))
-         if (.not. allocated(wc))  allocate (wc(3,ngrp))
-         if (.not. allocated(linear))  allocate (linear(ngrp))
-      else
-         if (.not. allocated(v))  allocate (v(3,n))
-         if (.not. allocated(a))  allocate (a(3,n))
-         if (.not. allocated(aalt))  allocate (aalt(3,n))
-      end if
-c
 c     try to restart using prior velocities and accelerations
 c
       dynfile = filename(1:leng)//'.dyn'
@@ -403,6 +392,110 @@ c
          end do
          deallocate (derivs)
          if (nuse .eq. n)  call mdrest (0)
+
+c
+c     set physical and extended velocities,
+c     physical accelerations, and extended
+c     masses for isokinetic dynamics
+c
+      else if (integrate .eq. 'ISOKINETIC') then
+         kT = boltzmann*kelvin
+         len_isok=1
+         LkT = len_isok*kT
+         allocate (derivs(3,n))      
+         call gradient (e,derivs)
+         do i = 1, n
+               do j = 1, 3
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  do k = 1, len_nhc
+                     q_iso1(k,j,i) = kT*tautemp*tautemp
+                     q_iso2(k,j,i) = kT*tautemp*tautemp
+                     speed = maxwell (q_iso1(k,j,i),kelvin)
+                     call ranvec (vec)
+                     v_iso1(k,j,i) = speed * vec(1)
+                     v_iso2(k,j,i) = speed * vec(2)
+                  end do  
+
+                  v(j,i) = random () 
+                  do k = 1, len_isok
+                     v_iso1(k,j,i) = random ()
+                  end do
+                  tempstor = v(j,i) * v(j,i)
+                  do k = 1, len_isok
+                     tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
+                  end do
+                  tempstor = sqrt(tempstor)
+                  v(j,i) = v(j,i) / tempstor
+                  do k = 1, len_isok
+                     v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
+                  end do
+                  v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
+                  do k = 1, len_isok
+                     tempstor=(sqrt(q_iso1(k,j,i)
+     &                /(kT*dble(len_isok+1))))
+                     v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
+                  end do
+                  tempstor = mass(i)*v(j,i)*v(j,i)                      
+                  do k = 1, len_isok
+                     tempstor = tempstor + dble(len_isok)*q_iso1(k,j,i)*
+     &               v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_isok+1)
+                  end do
+                  do k = 1, len_nhc
+                  end do   
+
+               end do
+         end do
+         deallocate (derivs)
+         call prtdyn
+         if (nuse .eq. n)  call mdrest (0)
+
+c
+c     set physical and extended velocities,
+c     physical accelerations, and extended
+c     masses for stochastic isokinetic dynamics
+c
+      else if (integrate .eq. 'STOCH-ISOK') then
+         kT = boltzmann*kelvin
+         LkT = len_nhc*kT
+         allocate (derivs(3,n))      
+         call gradient (e,derivs)
+         do i = 1, n
+               do j = 1, 3
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  do k = 1, len_nhc
+                     q_iso1(k,j,i) = kT*tautemp*tautemp
+                     q_iso2(k,j,i) = kT*tautemp*tautemp
+                     v_iso2(k,j,i) = kT*random ()/q_iso2(k,j,i)
+                  end do                 
+                  v(j,i) = random () 
+                  do k = 1, len_nhc
+                     v_iso1(k,j,i) = random ()
+                  end do
+                  tempstor = v(j,i) * v(j,i)
+                  do k = 1, len_nhc
+                     tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
+                  end do
+                  tempstor = sqrt(tempstor)
+                  v(j,i) = v(j,i) / tempstor
+                  do k = 1, len_nhc
+                     v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
+                  end do
+                  v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
+                  do k = 1, len_nhc
+                     tempstor=(sqrt(q_iso1(k,j,i)/(kT*dble(len_nhc+1))))
+                     v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
+                  end do
+                  tempstor = mass(i)*v(j,i)*v(j,i)                  
+                  do k = 1, len_nhc
+                     tempstor = tempstor + dble(len_nhc)*q_iso1(k,j,i)*
+     &               v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_nhc+1)
+                  end do
+               end do
+         end do
+         deallocate (derivs)
+         call prtdyn
+         if (nuse .eq. n)  call mdrest (0)
+                  
 c
 c     set velocities and accelerations for Cartesian dynamics
 c

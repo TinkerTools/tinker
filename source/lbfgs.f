@@ -44,6 +44,7 @@ c     optsave    subroutine to write out info about current status
 c
 c
       subroutine lbfgs (nvar,x0,minimum,grdmin,fgvalue,optsave)
+      use sizes
       use inform
       use iounit
       use keys
@@ -88,6 +89,12 @@ c
 c
 c     initialize some values to be used below
 c
+      if (nvar .gt. maxvar) then
+         write (iout,10)
+   10    format (/,' LBFGS  --  Too many Parameters,',
+     &              ' Increase the Value of MAXVAR')
+         return
+      end if
       ncalls = 0
       rms = sqrt(dble(nvar))
       if (coordtype .eq. 'CARTESIAN') then
@@ -135,35 +142,35 @@ c
          call upcase (keyword)
          string = record(next:120)
          if (keyword(1:14) .eq. 'LBFGS-VECTORS ') then
-            read (string,*,err=10,end=10)  msav
+            read (string,*,err=20,end=20)  msav
          else if (keyword(1:17) .eq. 'STEEPEST-DESCENT ') then
             msav = 0
          else if (keyword(1:7) .eq. 'FCTMIN ') then
-            read (string,*,err=10,end=10)  fctmin
+            read (string,*,err=20,end=20)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then
-            read (string,*,err=10,end=10)  maxiter
+            read (string,*,err=20,end=20)  maxiter
          else if (keyword(1:8) .eq. 'STEPMAX ') then
-            read (string,*,err=10,end=10)  stpmax
+            read (string,*,err=20,end=20)  stpmax
          else if (keyword(1:8) .eq. 'STEPMIN ') then
-            read (string,*,err=10,end=10)  stpmin
+            read (string,*,err=20,end=20)  stpmin
          else if (keyword(1:6) .eq. 'CAPPA ') then
-            read (string,*,err=10,end=10)  cappa
+            read (string,*,err=20,end=20)  cappa
          else if (keyword(1:9) .eq. 'SLOPEMAX ') then
-            read (string,*,err=10,end=10)  slpmax
+            read (string,*,err=20,end=20)  slpmax
          else if (keyword(1:7) .eq. 'ANGMAX ') then
-            read (string,*,err=10,end=10)  angmax
+            read (string,*,err=20,end=20)  angmax
          else if (keyword(1:7) .eq. 'INTMAX ') then
-            read (string,*,err=10,end=10)  intmax
+            read (string,*,err=20,end=20)  intmax
          end if
-   10    continue
+   20    continue
       end do
 c
 c     check the number of saved correction vectors
 c
       if (msav.lt.0 .or. msav.gt.min(nvar,maxsav)) then
          msav = min(nvar,maxsav)
-         write (iout,20)  msav
-   20    format (/,' LBFGS  --  Number of Saved Vectors Set to',
+         write (iout,30)  msav
+   30    format (/,' LBFGS  --  Number of Saved Vectors Set to',
      &              ' the Maximum of',i5)
       end if
 c
@@ -171,17 +178,17 @@ c     print header information about the optimization method
 c
       if (iprint .gt. 0) then
          if (msav .eq. 0) then
-            write (iout,30)
-   30       format (/,' Steepest Descent Gradient Optimization :')
             write (iout,40)
-   40       format (/,' SD Iter     F Value      G RMS     F Move',
+   40       format (/,' Steepest Descent Gradient Optimization :')
+            write (iout,50)
+   50       format (/,' SD Iter     F Value      G RMS     F Move',
      &                 '    X Move   Angle  FG Call  Comment',/)
          else
-            write (iout,50)
-   50       format (/,' Limited Memory BFGS Quasi-Newton',
-     &                 ' Optimization :')
             write (iout,60)
-   60       format (/,' QN Iter     F Value      G RMS     F Move',
+   60       format (/,' Limited Memory BFGS Quasi-Newton',
+     &                 ' Optimization :')
+            write (iout,70)
+   70       format (/,' QN Iter     F Value      G RMS     F Move',
      &                 '    X Move   Angle  FG Call  Comment',/)
          end if
       end if
@@ -221,11 +228,11 @@ c     print initial information prior to first iteration
 c
       if (iprint .gt. 0) then
          if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and. g_rms.lt.1.0d5) then
-            write (iout,70)  niter,f,g_rms,ncalls
-   70       format (i6,f14.4,f11.4,29x,i7)
-         else
             write (iout,80)  niter,f,g_rms,ncalls
-   80       format (i6,d14.4,d11.4,29x,i7)
+   80       format (i6,f14.4,f11.4,29x,i7)
+         else
+            write (iout,90)  niter,f,g_rms,ncalls
+   90       format (i6,d14.4,d11.4,29x,i7)
          end if
       end if
 c
@@ -371,13 +378,13 @@ c
             if (done .or. mod(niter,iprint).eq.0) then
                if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and.
      &             g_rms.lt.1.0d5 .and. f_move.lt.1.0d5) then
-                  write (iout,90)  niter,f,g_rms,f_move,x_move,
-     &                              angle,ncalls,status
-   90             format (i6,f14.4,f11.4,f11.4,f10.4,f8.2,i7,3x,a9)
-               else
                   write (iout,100)  niter,f,g_rms,f_move,x_move,
      &                              angle,ncalls,status
-  100             format (i6,d14.4,d11.4,d11.4,f10.4,f8.2,i7,3x,a9)
+  100             format (i6,f14.4,f11.4,f11.4,f10.4,f8.2,i7,3x,a9)
+               else
+                  write (iout,110)  niter,f,g_rms,f_move,x_move,
+     &                              angle,ncalls,status
+  110             format (i6,d14.4,d11.4,d11.4,f10.4,f8.2,i7,3x,a9)
                end if
             end if
          end if
@@ -408,11 +415,11 @@ c
       minimum = f
       if (iprint .gt. 0) then
          if (status.eq.'SmallGrad' .or. status.eq.'SmallFct ') then
-            write (iout,110)  status
-  110       format (/,' LBFGS  --  Normal Termination due to ',a9)
-         else
             write (iout,120)  status
-  120       format (/,' LBFGS  --  Incomplete Convergence due to ',a9)
+  120       format (/,' LBFGS  --  Normal Termination due to ',a9)
+         else
+            write (iout,130)  status
+  130       format (/,' LBFGS  --  Incomplete Convergence due to ',a9)
          end if
       end if
       return

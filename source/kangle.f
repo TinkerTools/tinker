@@ -307,10 +307,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ak))  allocate (ak(nangle))
-      if (.not. allocated(anat))  allocate (anat(nangle))
-      if (.not. allocated(afld))  allocate (afld(nangle))
-      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
+      if (.not. allocated(ak))  allocate (ak(maxang))
+      if (.not. allocated(anat))  allocate (anat(maxang))
+      if (.not. allocated(afld))  allocate (afld(maxang))
+      if (.not. allocated(angtyp))  allocate (angtyp(maxang))
 c
 c     use special angle parameter assignment method for MMFF
 c
@@ -685,7 +685,7 @@ c
                if (c(ina) .eq. 1000.0d0)  goto 20
                if (c(inb) .eq. 1000.0d0)  goto 20
                if (c(inc) .eq. 1000.0d0)  goto 20
-               do k = 1, nbond
+               do k = 1, maxbnd
                   if ((min(ia,ib).eq.ibnd(1,k)) .and.
      &                (max(ia,ib).eq.ibnd(2,k))) then
                      bnd_ab = k
@@ -739,7 +739,7 @@ c
                end if
                if (ring3)  anat(i) = 60.0d0
                if (ring4)  anat(i) = 90.0d0
-               do k = 1, nbond
+               do k = 1, maxbnd
                   if ((min(ia,ib).eq.ibnd(1,k)) .and.
      &                (max(ia,ib).eq.ibnd(2,k))) then
                      bnd_ab = k

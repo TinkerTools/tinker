@@ -29,26 +29,40 @@ c     mxfpcy   maximum number of convex face cycles
 c
 c
       module faces
+      use sizes
       implicit none
       integer maxcls,maxtt
-      integer maxt,maxp
-      integer maxv,maxen
-      integer maxfn,maxc
+      integer maxt,maxp,maxv
+      integer maxen,maxfn,maxc
       integer maxep,maxfs
       integer maxcy,mxcyep
       integer maxfp,mxfpcy
+      parameter (maxcls=50*maxatm)
+      parameter (maxtt=25*maxatm)
+      parameter (maxt=3*maxatm)
+      parameter (maxp=2*maxatm)
+      parameter (maxv=5*maxatm)
+      parameter (maxen=5*maxatm)
+      parameter (maxfn=2*maxatm)
+      parameter (maxc=5*maxatm)
+      parameter (maxep=5*maxatm)
+      parameter (maxfs=3*maxatm)
+      parameter (maxcy=maxatm)
+      parameter (mxcyep=30)
+      parameter (maxfp=maxatm)
+      parameter (mxfpcy=10)
 c
 c
 c     na       number of atoms
 c     pr       probe radius
 c     ar       atomic radii
-c     axyz     atomic coordinates
+c     a        atomic coordinates
 c
 c
       integer na
       real*8 pr
-      real*8, allocatable :: ar(:)
-      real*8, allocatable :: axyz(:,:)
+      real*8 ar(maxatm)
+      real*8 a(3,maxatm)
 c
 c
 c     skip     if true, atom is not used
@@ -57,10 +71,10 @@ c     afree    atom free of neighbors
 c     abur     atom buried
 c
 c
-      logical, allocatable :: skip(:)
-      logical, allocatable :: nosurf(:)
-      logical, allocatable :: afree(:)
-      logical, allocatable :: abur(:)
+      logical skip(maxatm)
+      logical nosurf(maxatm)
+      logical afree(maxatm)
+      logical abur(maxatm)
 c
 c
 c     cls      atom numbers of neighbors
@@ -68,9 +82,9 @@ c     clst     pointer from neighbor to torus
 c     acls     begin and end pointers for atoms neighbors
 c
 c
-      integer, allocatable :: cls(:)
-      integer, allocatable :: clst(:)
-      integer, allocatable :: acls(:,:)
+      integer cls(maxcls)
+      integer clst(maxcls)
+      integer acls(2,maxatm)
 c
 c
 c     ntt      number of temporary tori
@@ -83,12 +97,12 @@ c     ttfree   temporary torus free
 c
 c
       integer ntt
-      integer, allocatable :: ttfe(:)
-      integer, allocatable :: ttle(:)
-      integer, allocatable :: enext(:)
-      integer, allocatable :: tta(:,:)
-      logical, allocatable :: ttbur(:)
-      logical, allocatable :: ttfree(:)
+      integer ttfe(maxtt)
+      integer ttle(maxtt)
+      integer enext(maxen)
+      integer tta(2,maxtt)
+      logical ttbur(maxtt)
+      logical ttfree(maxtt)
 c
 c
 c     nt       number of tori
@@ -101,12 +115,12 @@ c     tfree    torus free of neighbors
 c
 c
       integer nt
-      integer, allocatable :: tfe(:)
-      integer, allocatable :: ta(:,:)
-      real*8, allocatable :: tr(:)
-      real*8, allocatable :: t(:,:)
-      real*8, allocatable :: tax(:,:)
-      logical, allocatable :: tfree(:)
+      integer tfe(maxt)
+      integer ta(2,maxt)
+      real*8 tr(maxt)
+      real*8 t(3,maxt)
+      real*8 tax(3,maxt)
+      logical tfree(maxt)
 c
 c
 c     np       number of probe positions
@@ -115,20 +129,20 @@ c     p        probe position coordinates
 c
 c
       integer np
-      integer, allocatable :: pa(:,:)
-      real*8, allocatable :: p(:,:)
+      integer pa(3,maxp)
+      real*8 p(3,maxp)
 c
 c
+c     v        vertex coordinates
 c     nv       number of vertices
 c     va       vertex atom number
 c     vp       vertex probe number
-c     vxyz     vertex coordinates
 c
 c
       integer nv
-      integer, allocatable :: va(:)
-      integer, allocatable :: vp(:)
-      real*8, allocatable :: vxyz(:,:)
+      integer va(maxv)
+      integer vp(maxv)
+      real*8 v(3,maxv)
 c
 c
 c     nen      number of concave edges
@@ -139,8 +153,8 @@ c
 c
       integer nen
       integer nfn
-      integer, allocatable :: env(:,:)
-      integer, allocatable :: fnen(:,:)
+      integer env(2,maxen)
+      integer fnen(3,maxfn)
 c
 c
 c     nc       number of circles
@@ -151,10 +165,10 @@ c     c        circle center
 c
 c
       integer nc
-      integer, allocatable :: ca(:)
-      integer, allocatable :: ct(:)
-      real*8, allocatable :: cr(:)
-      real*8, allocatable :: c(:,:)
+      integer ca(maxc)
+      integer ct(maxc)
+      real*8 cr(maxc)
+      real*8 c(3,maxc)
 c
 c
 c     nep      number of convex edges
@@ -166,11 +180,11 @@ c     epnext   pointer to next convex edge of atom
 c
 c
       integer nep
-      integer, allocatable :: epc(:)
-      integer, allocatable :: epv(:,:)
-      integer, allocatable :: afe(:)
-      integer, allocatable :: ale(:)
-      integer, allocatable :: epnext(:)
+      integer epc(maxep)
+      integer epv(2,maxep)
+      integer afe(maxatm)
+      integer ale(maxatm)
+      integer epnext(maxep)
 c
 c
 c     nfs      number of saddle faces
@@ -179,8 +193,8 @@ c     fsep     saddle face convex edge numbers
 c
 c
       integer nfs
-      integer, allocatable :: fsen(:,:)
-      integer, allocatable :: fsep(:,:)
+      integer fsen(2,maxfs)
+      integer fsep(2,maxfs)
 c
 c
 c     ncy      number of cycles
@@ -189,8 +203,8 @@ c     cyep     cycle convex edge numbers
 c
 c
       integer ncy
-      integer, allocatable :: cynep(:)
-      integer, allocatable :: cyep(:,:)
+      integer cynep(maxcy)
+      integer cyep(mxcyep,maxcy)
 c
 c
 c     nfp      number of convex faces
@@ -200,8 +214,8 @@ c     fpcy     convex face cycle numbers
 c
 c
       integer nfp
-      integer, allocatable :: fpa(:)
-      integer, allocatable :: fpncy(:)
-      integer, allocatable :: fpcy(:,:)
+      integer fpa(maxfp)
+      integer fpncy(maxfp)
+      integer fpcy(mxfpcy,maxfp)
       save
       end

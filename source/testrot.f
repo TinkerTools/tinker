@@ -63,7 +63,7 @@ c
    10 continue
       if (query) then
          write (iout,20)  delta0
-   20    format (/,' Enter Finite Difference Stepsize [',d8.1,
+   20    format (/,' Enter Numerical Derivative Stepsize [',d7.1,
      &              ' Deg] :  ',$)
          read (input,30,err=10)  delta
    30    format (f20.0)

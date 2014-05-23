@@ -19,6 +19,7 @@ c     actual sequence is read from subsequent nonblank characters
 c
 c
       subroutine readseq (iseq)
+      use sizes
       use files
       use iounit
       use resdue

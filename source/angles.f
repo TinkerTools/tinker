@@ -27,15 +27,13 @@ c
       use iounit
       implicit none
       integer i,j,k,m
-      integer maxang
 c
 c
 c     perform dynamic allocation of some global arrays
 c
-      maxang = 6 * n
       if (.not. allocated(iang))  allocate (iang(4,maxang))
       if (.not. allocated(anglist))
-     &   allocate (anglist(maxval*(maxval-1)/2,n))
+     &   allocate (anglist(maxval*(maxval-1)/2,maxatm))
 c
 c     loop over all atoms, storing the atoms in each bond angle
 c

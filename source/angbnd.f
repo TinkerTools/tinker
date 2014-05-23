@@ -20,6 +20,7 @@ c     afld     periodicity for Fourier angle bending term
 c
 c
       module angbnd
+      use sizes
       implicit none
       integer nangle
       integer, allocatable :: iang(:,:)

@@ -140,8 +140,8 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iat))  allocate (iat(3,ntors))
-      if (.not. allocated(kant))  allocate (kant(6,ntors))
+      if (.not. allocated(iat))  allocate (iat(3,maxtors))
+      if (.not. allocated(kant))  allocate (kant(6,maxtors))
 c
 c     assign the angle-torsion parameters for each torsion
 c

@@ -26,8 +26,12 @@ c     maxgrp          user-defined groups of atoms
 c     maxref          stored reference molecular systems
 c     maxtyp          force field atom type definitions
 c     maxclass        force field atom class definitions
+c     maxprm          lines in the parameter file
+c     maxkey          lines in the keyword file
 c     maxrot          bonds for torsional rotation
+c     maxvar          optimization variables (vector storage)
 c     maxopt          optimization variables (matrix storage)
+c     maxlight        sites for method of lights neighbors
 c     maxvlst         neighbors in van der Waals pair list
 c     maxelst         neighbors in electrostatics pair list
 c     maxulst         neighbors in dipole preconditioner list
@@ -36,8 +40,16 @@ c     maxfix          geometric constraints and restraints
 c     maxvib          vibrational frequencies
 c     maxgeo          distance geometry points
 c     maxcell         unit cells in replicated crystal
+c     maxring         3-, 4-, or 5-membered rings
 c     maxbio          biopolymer atom definitions
 c     maxres          residues in the macromolecule
+c     maxele          elements in periodic table
+c     maxamino        amino acid residue types
+c     maxnuc          nucleic acid residue types
+c     maxbnd          covalent bonds in molecular system
+c     maxang          bond angles in molecular system
+c     maxtors         torsional angles in molecular system
+c     maxbitor        bitorsions in molecular system
 c
 c
       module sizes
@@ -45,20 +57,30 @@ c
       integer maxatm,maxval
       integer maxgrp,maxref
       integer maxtyp,maxclass
-      integer maxrot,maxopt
+      integer maxprm,maxkey
+      integer maxrot,maxvar
+      integer maxopt,maxlight
       integer maxvlst,maxelst
       integer maxulst,maxfft
       integer maxfix,maxvib
       integer maxgeo,maxcell
-      integer maxbio,maxres
+      integer maxring,maxbio
+      integer maxres,maxele
+      integer maxamino,maxnuc
+      integer maxbnd,maxang
+      integer maxtors,maxbitor
       parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
       parameter (maxref=10)
       parameter (maxtyp=5000)
       parameter (maxclass=1000)
+      parameter (maxprm=25000)
+      parameter (maxkey=25000)
       parameter (maxrot=1000)
+      parameter (maxvar=3*maxatm)
       parameter (maxopt=1000)
+      parameter (maxlight=8*maxatm)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
       parameter (maxulst=100)
@@ -67,7 +89,15 @@ c
       parameter (maxvib=1000)
       parameter (maxgeo=2500)
       parameter (maxcell=10000)
+      parameter (maxring=10000)
       parameter (maxbio=10000)
       parameter (maxres=10000)
+      parameter (maxele=112)
+      parameter (maxamino=38)
+      parameter (maxnuc=12)
+      parameter (maxbnd=2*maxatm)
+      parameter (maxang=4*maxatm)
+      parameter (maxtors=6*maxatm)
+      parameter (maxbitor=8*maxatm)
       save
       end

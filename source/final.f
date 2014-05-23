@@ -33,8 +33,6 @@ c
       use deriv
       use dipole
       use disgeo
-      use domega
-      use faces
       use fracs
       use freeze
       use group
@@ -47,7 +45,6 @@ c
       use light
       use merck
       use molcul
-      use moldyn
       use mpole
       use mutant
       use neigh
@@ -66,7 +63,6 @@ c
       use qmstuf
       use refer
       use restrn
-      use rgddyn
       use rigid
       use ring
       use socket
@@ -84,7 +80,6 @@ c
       use usolve
       use vdw
       use vibs
-      use warp
       implicit none
 c
 c
@@ -215,82 +210,6 @@ c
       if (allocated(dbnd))  deallocate (dbnd)
       if (allocated(georad))  deallocate (georad)
 c
-c     deallocation of global arrays from module domega
-c
-      if (allocated(tesum))  deallocate (tesum)
-      if (allocated(teb))  deallocate (teb)
-      if (allocated(tea))  deallocate (tea)
-      if (allocated(teba))  deallocate (teba)
-      if (allocated(teub))  deallocate (teub)
-      if (allocated(teaa))  deallocate (teaa)
-      if (allocated(teopb))  deallocate (teopb)
-      if (allocated(teopd))  deallocate (teopd)
-      if (allocated(teid))  deallocate (teid)
-      if (allocated(teit))  deallocate (teit)
-      if (allocated(tet))  deallocate (tet)
-      if (allocated(tept))  deallocate (tept)
-      if (allocated(tebt))  deallocate (tebt)
-      if (allocated(teat))  deallocate (teat)
-      if (allocated(tett))  deallocate (tett)
-      if (allocated(tev))  deallocate (tev)
-      if (allocated(tec))  deallocate (tec)
-      if (allocated(tecd))  deallocate (tecd)
-      if (allocated(ted))  deallocate (ted)
-      if (allocated(tem))  deallocate (tem)
-      if (allocated(tep))  deallocate (tep)
-      if (allocated(ter))  deallocate (ter)
-      if (allocated(tes))  deallocate (tes)
-      if (allocated(telf))  deallocate (telf)
-      if (allocated(teg))  deallocate (teg)
-      if (allocated(tex))  deallocate (tex)
-c
-c     deallocation of global arrays from module faces
-c
-      if (allocated(ar))  deallocate (ar)
-      if (allocated(axyz))  deallocate (axyz)
-      if (allocated(skip))  deallocate (skip)
-      if (allocated(nosurf))  deallocate (nosurf)
-      if (allocated(afree))  deallocate (afree)
-      if (allocated(abur))  deallocate (abur)
-      if (allocated(cls))  deallocate (cls)
-      if (allocated(clst))  deallocate (clst)
-      if (allocated(acls))  deallocate (acls)
-      if (allocated(ttfe))  deallocate (ttfe)
-      if (allocated(ttle))  deallocate (ttle)
-      if (allocated(enext))  deallocate (enext)
-      if (allocated(tta))  deallocate (tta)
-      if (allocated(ttbur))  deallocate (ttbur)
-      if (allocated(ttfree))  deallocate (ttfree)
-      if (allocated(tfe))  deallocate (tfe)
-      if (allocated(ta))  deallocate (ta)
-      if (allocated(tr))  deallocate (tr)
-      if (allocated(t))  deallocate (t)
-      if (allocated(tax))  deallocate (tax)
-      if (allocated(tfree))  deallocate (tfree)
-      if (allocated(pa))  deallocate (pa)
-      if (allocated(p))  deallocate (p)
-      if (allocated(va))  deallocate (va)
-      if (allocated(vp))  deallocate (vp)
-      if (allocated(vxyz))  deallocate (vxyz)
-      if (allocated(env))  deallocate (env)
-      if (allocated(fnen))  deallocate (fnen)
-      if (allocated(ca))  deallocate (ca)
-      if (allocated(ct))  deallocate (ct)
-      if (allocated(cr))  deallocate (cr)
-      if (allocated(c))  deallocate (c)
-      if (allocated(epc))  deallocate (epc)
-      if (allocated(epv))  deallocate (epv)
-      if (allocated(afe))  deallocate (afe)
-      if (allocated(ale))  deallocate (ale)
-      if (allocated(epnext))  deallocate (epnext)
-      if (allocated(fsen))  deallocate (fsen)
-      if (allocated(fsep))  deallocate (fsep)
-      if (allocated(cynep))  deallocate (cynep)
-      if (allocated(cyep))  deallocate (cyep)
-      if (allocated(fpa))  deallocate (fpa)
-      if (allocated(fpncy))  deallocate (fpncy)
-      if (allocated(fpcy))  deallocate (fpcy)
-c
 c     deallocation of global arrays from module fracs
 c
       if (allocated(xfrac))  deallocate (xfrac)
@@ -404,12 +323,6 @@ c
       if (allocated(kmol))  deallocate (kmol)
       if (allocated(molcule))  deallocate (molcule)
       if (allocated(molmass))  deallocate (molmass)
-c
-c     deallocation of global arrays from module moldyn
-c
-      if (allocated(v))  deallocate (v)
-      if (allocated(a))  deallocate (a)
-      if (allocated(aalt))  deallocate (aalt)
 c
 c     deallocation of global arrays from module mpole
 c
@@ -584,18 +497,6 @@ c
       if (allocated(gfix))  deallocate (gfix)
       if (allocated(chir))  deallocate (chir)
 c
-c     deallocation of global arrays from module rgddyn
-c
-      if (allocated(xcmo))  deallocate (xcmo)
-      if (allocated(ycmo))  deallocate (ycmo)
-      if (allocated(zcmo))  deallocate (zcmo)
-      if (allocated(vcm))  deallocate (vcm)
-      if (allocated(wcm))  deallocate (wcm)
-      if (allocated(lm))  deallocate (lm)
-      if (allocated(vc))  deallocate (vc)
-      if (allocated(wc))  deallocate (wc)
-      if (allocated(linear))  deallocate (linear)
-c
 c     deallocation of global arrays from module rigid
 c
       if (allocated(xrb))  deallocate (xrb)
@@ -610,32 +511,14 @@ c
       if (allocated(iring5))  deallocate (iring5)
       if (allocated(iring6))  deallocate (iring6)
 c
-c     deallocation of global arrays from module solute
-c
-      if (allocated(rsolv))  deallocate (rsolv)
-      if (allocated(asolv))  deallocate (asolv)
-      if (allocated(rborn))  deallocate (rborn)
-      if (allocated(drb))  deallocate (drb)
-      if (allocated(drbp))  deallocate (drbp)
-      if (allocated(drobc))  deallocate (drobc)
-      if (allocated(gpol))  deallocate (gpol)
-      if (allocated(shct))  deallocate (shct)
-      if (allocated(aobc))  deallocate (aobc)
-      if (allocated(bobc))  deallocate (bobc)
-      if (allocated(gobc))  deallocate (gobc)
-      if (allocated(vsolv))  deallocate (vsolv)
-      if (allocated(wace))  deallocate (wace)
-      if (allocated(s2ace))  deallocate (s2ace)
-      if (allocated(uace))  deallocate (uace)
-c
 c     deallocation of global arrays from module stodyn
 c
       if (allocated(fgamma))  deallocate (fgamma)
 c
 c     deallocation of global arrays from module strbnd
 c
-      if (allocated(isb))  deallocate (isb)
-      if (allocated(sbk))  deallocate (sbk)
+      if (allocated(ist))  deallocate (isb)
+      if (allocated(kst))  deallocate (sbk)
 c
 c     deallocation of global arrays from module strtor
 c
@@ -708,10 +591,6 @@ c
       if (allocated(phi))  deallocate (phi)
       if (allocated(phik))  deallocate (phik)
       if (allocated(pwork))  deallocate (pwork)
-c
-c     deallocation of global arrays from module warp
-c
-      if (allocated(m2))  deallocate (m2)
 c
 c     free memory used by the APBS Poisson-Boltzmann solver
 c

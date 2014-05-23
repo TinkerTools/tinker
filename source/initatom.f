@@ -17,6 +17,7 @@ c     periodic table
 c
 c
       subroutine initatom
+      use sizes
       use ptable
       implicit none
       integer i

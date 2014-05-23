@@ -238,7 +238,7 @@ c
 c     output the final list of atoms in each group
 c
       if (debug .and. use_group) then
-         do i = 1, ngrp
+         do i = 0, ngrp
             size = igrp(2,i) - igrp(1,i) + 1
             if (size .ne. 0) then
                write (iout,50)  i

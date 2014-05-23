@@ -144,6 +144,12 @@ c
 c
 c     check number of variables and get type of optimization
 c
+      if (nvar .gt. maxvar) then
+         write (iout,10)
+   10    format (/,' TNCG  --  Too many Parameters,',
+     &              ' Increase the Value of MAXVAR')
+         return
+      end if
       rms = sqrt(dble(nvar))
       if (coordtype .eq. 'CARTESIAN') then
          rms = rms / sqrt(3.0d0)
@@ -186,29 +192,29 @@ c
          call upcase (keyword)
          string = record(next:120)
          if (keyword(1:7) .eq. 'FCTMIN ') then
-            read (string,*,err=10,end=10)  fctmin
+            read (string,*,err=20,end=20)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then
-            read (string,*,err=10,end=10)  maxiter
+            read (string,*,err=20,end=20)  maxiter
          else if (keyword(1:9) .eq. 'NEXTITER ') then
-            read (string,*,err=10,end=10)  nextiter
+            read (string,*,err=20,end=20)  nextiter
          else if (keyword(1:8) .eq. 'NEWHESS ') then
-            read (string,*,err=10,end=10)  newhess
+            read (string,*,err=20,end=20)  newhess
          else if (keyword(1:12) .eq. 'SADDLEPOINT ') then
             negtest = .false.
          else if (keyword(1:8) .eq. 'STEPMIN ') then
-            read (string,*,err=10,end=10)  stpmin
+            read (string,*,err=20,end=20)  stpmin
          else if (keyword(1:8) .eq. 'STEPMAX ') then
-            read (string,*,err=10,end=10)  stpmax
+            read (string,*,err=20,end=20)  stpmax
          else if (keyword(1:6) .eq. 'CAPPA ') then
-            read (string,*,err=10,end=10)  cappa
+            read (string,*,err=20,end=20)  cappa
          else if (keyword(1:9) .eq. 'SLOPEMAX ') then
-            read (string,*,err=10,end=10)  slpmax
+            read (string,*,err=20,end=20)  slpmax
          else if (keyword(1:7) .eq. 'ANGMAX ') then
-            read (string,*,err=10,end=10)  angmax
+            read (string,*,err=20,end=20)  angmax
          else if (keyword(1:7) .eq. 'INTMAX ') then
-            read (string,*,err=10,end=10)  intmax
+            read (string,*,err=20,end=20)  intmax
          end if
-   10    continue
+   20    continue
       end do
 c
 c     initialize the function call and iteration counters
@@ -222,27 +228,27 @@ c     print header information about the method used
 c
       if (iprint .gt. 0) then
          if (mode .eq. 'NEWTON') then
-            write (iout,20)
-   20       format (/,' Full-Newton Conjugate-Gradient',
+            write (iout,30)
+   30       format (/,' Full-Newton Conjugate-Gradient',
      &                 ' Optimization :')
          else if (mode .eq. 'TNCG') then
-            write (iout,30)
-   30       format (/,' Truncated-Newton Conjugate-Gradient',
+            write (iout,40)
+   40       format (/,' Truncated-Newton Conjugate-Gradient',
      &                 ' Optimization :')
          else if (mode .eq. 'DTNCG') then
-            write (iout,40)
-   40       format (/,' Finite-Difference Truncated-Newton',
+            write (iout,50)
+   50       format (/,' Finite-Difference Truncated-Newton',
      &                 ' Conjugate-Gradient Optimization :')
          else if (mode .eq. 'AUTO') then
-            write (iout,50)
-   50       format (/,' Variable-Mode Truncated-Newton',
+            write (iout,60)
+   60       format (/,' Variable-Mode Truncated-Newton',
      &                 ' Conjugate-Gradient Optimization :')
          end if
-         write (iout,60)  mode,method,grdmin
-   60    format (/,' Algorithm : ',a6,5x,'Preconditioning : ',a6,5x,
+         write (iout,70)  mode,method,grdmin
+   70    format (/,' Algorithm : ',a6,5x,'Preconditioning : ',a6,5x,
      &              ' RMS Grad :',d9.2)
-         write (iout,70)
-   70    format (/,' TN Iter    F Value       G RMS     F Move  ',
+         write (iout,80)
+   80    format (/,' TN Iter    F Value       G RMS     F Move  ',
      &              '  X Move   CG Iter  Solve   FG Call',/)
       end if
 c
@@ -277,11 +283,11 @@ c     print initial information prior to first iteration
 c
       if (iprint .gt. 0) then
          if (f.lt.1.0d7 .and. f.gt.-1.0d6 .and. g_rms.lt.1.0d6) then
-            write (iout,80)  iter_tn,f,g_rms,fg_call
-   80       format (i6,f13.4,f12.4,41x,i7)
-         else
             write (iout,90)  iter_tn,f,g_rms,fg_call
-   90       format (i6,d13.4,d12.4,41x,i7)
+   90       format (i6,f13.4,f12.4,41x,i7)
+         else
+            write (iout,100)  iter_tn,f,g_rms,fg_call
+  100       format (i6,d13.4,d12.4,41x,i7)
          end if
       end if
 c
@@ -295,22 +301,22 @@ c
          done = .true.
          minimum = f
          if (iprint .gt. 0) then
-            write (iout,100)
-  100       format (/,' TNCG  --  Normal Termination due to SmallGrad')
+            write (iout,110)
+  110       format (/,' TNCG  --  Normal Termination due to SmallGrad')
          end if
       else if (f .le. fctmin) then
          done = .true.
          minimum = f
          if (iprint .gt. 0) then
-            write (iout,110)
-  110       format (/,' TNCG  --  Normal Termination due to SmallFct')
+            write (iout,120)
+  120       format (/,' TNCG  --  Normal Termination due to SmallFct')
          end if
       else if (iter_tn .ge. maxiter) then
          done = .true.
          minimum = f
          if (iprint .gt. 0) then
-            write (iout,120)
-  120       format (/,' TNCG  --  Incomplete Convergence',
+            write (iout,130)
+  130       format (/,' TNCG  --  Incomplete Convergence',
      &                 ' due to IterLimit')
          end if
       end if
@@ -445,13 +451,13 @@ c
             if (done .or. mod(iter_tn,iprint).eq.0) then
                if (f.lt.1.0d7 .and. f.gt.-1.0d6 .and.
      &             g_rms.lt.1.0d6 .and. f_move.lt.1.0d5) then
-                  write (iout,130)  iter_tn,f,g_rms,f_move,x_move,
-     &                              iter_cg,info_solve,fg_call
-  130             format (i6,f13.4,f12.4,f11.4,f10.4,i8,3x,a9,i7)
-               else
                   write (iout,140)  iter_tn,f,g_rms,f_move,x_move,
      &                              iter_cg,info_solve,fg_call
-  140             format (i6,d13.4,d12.4,d11.4,f10.4,i8,3x,a9,i7)
+  140             format (i6,f13.4,f12.4,f11.4,f10.4,i8,3x,a9,i7)
+               else
+                  write (iout,150)  iter_tn,f,g_rms,f_move,x_move,
+     &                              iter_cg,info_solve,fg_call
+  150             format (i6,d13.4,d12.4,d11.4,f10.4,i8,3x,a9,i7)
                end if
             end if
          end if
@@ -470,11 +476,11 @@ c
             minimum = f
             if (iprint .gt. 0) then
                if (g_rms.le.grdmin .or. f.le.fctmin) then
-                  write (iout,150)  status
-  150             format (/,' TNCG  --  Normal Termination due to ',a9)
-               else
                   write (iout,160)  status
-  160             format (/,' TNCG  --  Incomplete Convergence',
+  160             format (/,' TNCG  --  Normal Termination due to ',a9)
+               else
+                  write (iout,170)  status
+  170             format (/,' TNCG  --  Incomplete Convergence',
      &                       ' due to ',a9)
                end if
             end if
