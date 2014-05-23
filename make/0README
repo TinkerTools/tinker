@@ -8,8 +8,8 @@
         modification to point to the local TINKER directory, and for use
         with machine and compiler combinations not described near the top
         of the Makefile. A list of the dependencies of source files on
-        included files is generated via the TINKER "document" program by
-        running the depend.make script from within the source directory.
+        each other is generated via the TINKER "document" program by
+        running the "depend.make" script from within the source directory.
 
         Alternatively, TINKER can be built by running the compile.make,
         library.make and link.make scripts provided in machine specific

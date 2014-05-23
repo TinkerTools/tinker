@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##            (GNU gfortran for Mac OSX Version)             ##
+#  ##             (GNU gfortran for Mac OSX Version)            ##
 #  ##                                                           ##
 #  ###############################################################
 #

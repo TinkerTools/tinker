@@ -59,13 +59,13 @@ LINKDIR = /usr/local/bin
 ##  Compiler: GNU gfortran
 ##  Parallel: OpenMP
 
-#F77 = gfortran
-#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
-#F77FLAGS = -c
-#OPTFLAGS = -O3 -ffast-math -fopenmp
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+F77 = gfortran
+LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+F77FLAGS = -c
+OPTFLAGS = -O3 -ffast-math -fopenmp
+LIBFLAGS = -crusv
+RANLIB = ranlib -c
+LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
@@ -114,14 +114,14 @@ LINKDIR = /usr/local/bin
 ##  Compiler: Intel Fortran for Mac 14.0
 ##  Parallel: OpenMP
 
-F77 = ifort
-LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
-F77FLAGS = -c -axSSSE3
-OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
-LIBFLAGS = -crusv
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-            -Wl,-stack_size,0x10000000
+#F77 = ifort
+#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+#F77FLAGS = -c -axSSSE3
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
+#            -Wl,-stack_size,0x10000000
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
