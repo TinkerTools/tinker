@@ -18,9 +18,10 @@ c     aalt    alternate acceleration of each atom along x,y,z-axes
 c
 c
       module moldyn
+      use sizes
       implicit none
-      real*8, allocatable :: v(:,:)
-      real*8, allocatable :: a(:,:)
-      real*8, allocatable :: aalt(:,:)
+      real*8 v(3,maxatm)
+      real*8 a(3,maxatm)
+      real*8 aalt(3,maxatm)
       save
       end

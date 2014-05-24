@@ -25,14 +25,12 @@ c
       use iounit
       implicit none
       integer i,j,k,m
-      integer maxbnd
 c
 c
 c     perform dynamic allocation of some global arrays
 c
-      maxbnd = 4 * n
       if (.not. allocated(ibnd))  allocate (ibnd(2,maxbnd))
-      if (.not. allocated(bndlist))  allocate (bndlist(maxval,n))
+      if (.not. allocated(bndlist))  allocate (bndlist(maxval,maxatm))
 c
 c     loop over all atoms, storing the atoms in each bond
 c

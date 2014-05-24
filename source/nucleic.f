@@ -131,6 +131,7 @@ c     torsional angle values needed to define a nucleic acid
 c
 c
       subroutine getseqn
+      use sizes
       use iounit
       use nucleo
       use resdue

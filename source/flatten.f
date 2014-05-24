@@ -112,12 +112,6 @@ c
          end if
       end if
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (use_gda) then
-         if (.not. allocated(m2))  allocate (m2(n))
-      end if
-c
 c     set second moment of Gaussian on each atom for GDA methods
 c
       if (use_gda) then

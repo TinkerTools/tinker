@@ -19,7 +19,7 @@ c
       module scales
       use sizes
       implicit none
-      real*8 scale(3*maxatm)
+      real*8 scale(maxvar)
       logical set_scale
       save
       end

@@ -215,11 +215,6 @@ c
       integer atmnum
 c
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(asolv))  allocate (asolv(n))
-c
 c     assign the Eisenberg-McLachlan ASP solvation parameters;
 c     parameters only available for protein-peptide groups
 c
@@ -372,23 +367,6 @@ c
       real*8 s2ik,s3ik,omgik
       logical amide
 c
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(asolv))  allocate (asolv(n))
-      if (.not. allocated(rborn))  allocate (rborn(n))
-      if (.not. allocated(drb))  allocate (drb(n))
-      if (.not. allocated(drobc))  allocate (drobc(n))
-      if (.not. allocated(gpol))  allocate (gpol(n))
-      if (.not. allocated(shct))  allocate (shct(n))
-      if (.not. allocated(aobc))  allocate (aobc(n))
-      if (.not. allocated(bobc))  allocate (bobc(n))
-      if (.not. allocated(gobc))  allocate (gobc(n))
-      if (.not. allocated(vsolv))  allocate (vsolv(n))
-      if (.not. allocated(wace))  allocate (wace(maxclass,maxclass)) 
-      if (.not. allocated(s2ace))  allocate (s2ace(maxclass,maxclass)) 
-      if (.not. allocated(uace))  allocate (uace(maxclass,maxclass)) 
 c
 c     set offset and scaling values for analytical Still method
 c
@@ -823,14 +801,6 @@ c
       character*120 string
 c
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(rborn))  allocate (rborn(n))
-      if (.not. allocated(drb))  allocate (drb(n))
-      if (.not. allocated(drbp))  allocate (drbp(n))
-      if (.not. allocated(shct))  allocate (shct(n))
-c
 c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
@@ -1134,8 +1104,8 @@ c
 c
       subroutine kpb
       use sizes
-      use atomid
       use atoms
+      use atomid
       use bath
       use couple
       use gkstuf
@@ -1171,11 +1141,6 @@ c
       character*120 record
       character*120 string
 c
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(shct))  allocate (shct(n))
 c
 c     assign some default APBS configuration parameters
 c
@@ -1736,18 +1701,17 @@ c
       stcut = cross + 3.9d0
       stoff = cross - 3.5d0
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(asolv))  allocate (asolv(n))
-      if (.not. allocated(rcav))  allocate (rcav(n))
-      if (.not. allocated(rdisp))  allocate (rdisp(n))
-      if (.not. allocated(cdisp))  allocate (cdisp(n))
-c
 c     assign surface area factors for nonpolar solvation
 c
       do i = 1, n
          asolv(i) = surften
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(rcav))  allocate (rcav(n))
+      if (.not. allocated(rdisp))  allocate (rdisp(n))
+      if (.not. allocated(cdisp))  allocate (cdisp(n))
 c
 c     set cavity and dispersion radii for nonpolar solvation
 c

@@ -18,6 +18,7 @@ c     kaa       force constant for angle-angle cross terms
 c
 c
       module angang
+      use sizes
       implicit none
       integer nangang
       integer, allocatable :: iaa(:,:)

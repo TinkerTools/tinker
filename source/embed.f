@@ -2955,9 +2955,9 @@ c
       real*8 dx,dy,dz,gx,gy,gz
       real*8 dstsq,blosq
       real*8 radi,radsq
-      real*8, allocatable ::  xsort(:)
-      real*8, allocatable ::  ysort(:)
-      real*8, allocatable ::  zsort(:)
+      real*8 xsort(maxlight)
+      real*8 ysort(maxlight)
+      real*8 zsort(maxlight)
       real*8 derivs(3,*)
 c
 c
@@ -2969,9 +2969,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (skip(n))
-      allocate (xsort(n))
-      allocate (ysort(n))
-      allocate (zsort(n))
 c
 c     transfer coordinates and zero out atoms to be skipped
 c
@@ -3043,9 +3040,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (skip)
-      deallocate (xsort)
-      deallocate (ysort)
-      deallocate (zsort)
       return
       end
 c
