@@ -1509,7 +1509,7 @@ c     "lightn" computes the set of nearest neighbor interactions
 c     using the method of lights algorithm
 c
 c     note this is a special version for neighbor list generation
-c     which generates each pair in both directions, (A,B) and (B,A)
+c     which includes each pair in both directions, (A,B) and (B,A)
 c
 c     literature reference:
 c
