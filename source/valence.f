@@ -289,6 +289,11 @@ c
          call fatal
       end if
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(bl))  allocate (bl(nbond))
+      if (.not. allocated(anat))  allocate (anat(nangle))
+c
 c     assign initial values to van der Waals parameters
 c
       nv = 0
@@ -321,7 +326,7 @@ c
    30       format (' vdw',7x,i5,10x,f10.3,f11.4)
          else
             write (iout,40)  ia,rad(ia),eps(ia),reduct(ia)
-   40       format(' vdw',7x,i5,10x,f10.3,f11.4,f9.2)
+   40       format (' vdw',7x,i5,10x,f10.3,f11.4,f9.2)
          end if
       end do
 c

@@ -203,6 +203,10 @@ c
    50 continue
       n = i
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(rpole))  allocate (rpole(maxpole,n))
+c
 c     convert quadrupole from spherical harmonic to Cartesian
 c
       term = sqrt(0.75d0)
@@ -587,6 +591,15 @@ c
       ixyz = freeunit ()
       call prtxyz (ixyz)
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(polarity))  allocate (polarity(n))
+      if (.not. allocated(thole))  allocate (thole(n))
+      if (.not. allocated(pdamp))  allocate (pdamp(n))
+      if (.not. allocated(ipole))  allocate (ipole(n))
+      if (.not. allocated(polsiz))  allocate (polsiz(n))
+      if (.not. allocated(pollist))  allocate (pollist(n))
+c
 c     assign atomic mass and polarizability by atomic number
 c
       do i = 1, n
@@ -677,6 +690,13 @@ c
       logical query,change
       character*120 record
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(zaxis))  allocate (zaxis(npole))
+      if (.not. allocated(xaxis))  allocate (xaxis(npole))
+      if (.not. allocated(yaxis))  allocate (yaxis(npole))
+      if (.not. allocated(polaxe))  allocate (polaxe(npole))
 c
 c     initialize the local frame type and defining atoms
 c
@@ -1069,6 +1089,10 @@ c
       real*8 a(3,3)
 c
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(pole))  allocate (pole(maxpole,npole))
+c
 c     store the global multipoles in the local frame array
 c
       do i = 1, npole
@@ -1214,6 +1238,7 @@ c
       query = .true.
       change = .false.
       do while (query)
+         i = 0
          ii = 0
          ia = 0
          ib = 0
@@ -1225,10 +1250,12 @@ c
    60    format (a120)
          read (record,*,err=70,end=70)  ii,ia,ib,ic
    70    continue
-         i = pollist(ii)
          if (ii .eq. 0) then
             query = .false.
-         else if (i .ne. 0) then
+         else
+            i = pollist(ii)
+         end if
+         if (i .ne. 0) then
             change = .true.
             if (ia .eq. 0)  polaxe(i) = 'None'
             if (ia.ne.0 .and. ib.eq.0)  polaxe(i) = 'Z-Only'
@@ -1437,6 +1464,7 @@ c
       query = .true.
       change = .false.
       do while (query)
+         i = 0
          ii = 0
          pol = 0.0d0
          thl = 0.39d0
@@ -1447,10 +1475,12 @@ c
    60    format (a120)
          read (record,*,err=70,end=70)  ii,pol,thl
    70    continue
-         i = pollist(ii)
          if (ii .eq. 0) then
             query = .false.
-         else if (i .ne. 0) then
+         else
+            i = pollist(ii)
+         end if
+         if (i .ne. 0) then
             change = .true.
             polarity(i) = pol
             thole(i) = thl
@@ -1703,6 +1733,10 @@ c
       real*8, allocatable :: vec(:,:)
       logical done
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(uind))  allocate (uind(3,npole))
 c
 c     perform dynamic allocation of some local arrays
 c
