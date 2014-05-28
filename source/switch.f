@@ -17,7 +17,6 @@ c     order polynomial switching functions for spherical cutoffs
 c
 c
       subroutine switch (mode)
-      use sizes
       use limits
       use nonpol
       use shunt

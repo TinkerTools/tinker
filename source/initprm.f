@@ -17,7 +17,6 @@ c     parameters to zero and using defaults for control values
 c
 c
       subroutine initprm
-      use sizes
       use angpot
       use bndpot
       use chgpot
@@ -337,7 +336,6 @@ c     Molecular force field
 c
 c
       subroutine initmmff
-      use sizes
       use ktorsn
       use merck
       implicit none

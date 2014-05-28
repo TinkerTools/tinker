@@ -44,7 +44,6 @@ c     optsave    subroutine to write out info about current status
 c
 c
       subroutine ocvm (nvar,x0,f0,grdmin,fgvalue,optsave)
-      use sizes
       use inform
       use iounit
       use keys

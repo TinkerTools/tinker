@@ -18,7 +18,6 @@ c     then the correct intra- or intergroup weight is assigned
 c
 c
       subroutine groups (proceed,weigh,ia,ib,ic,id,ie,ig)
-      use sizes
       use group
       implicit none
       integer ia,ib,ic

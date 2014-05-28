@@ -25,7 +25,6 @@ c     University Press, 1992, Section 7.1
 c
 c
       function random ()
-      use sizes
       use inform
       use iounit
       use keys

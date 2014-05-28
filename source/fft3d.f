@@ -17,7 +17,6 @@ c     transform (FFTW) or three separate 1-D transforms (FFTPACK)
 c
 c
       subroutine fftsetup
-      use sizes
       use fft
       use openmp
       use pme
@@ -65,7 +64,6 @@ c     3-D transform or three separate 1-D transforms
 c
 c
       subroutine fftfront
-      use sizes
       use fft
       use pme
       implicit none
@@ -139,7 +137,6 @@ c     3-D transform or three separate 1-D transforms
 c
 c
       subroutine fftback
-      use sizes
       use fft
       use pme
       implicit none

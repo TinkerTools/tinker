@@ -17,7 +17,6 @@ c     a parameter file and modifications specified in a keyfile
 c
 c
       subroutine field
-      use sizes
       use keys
       use potent
       implicit none

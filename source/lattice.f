@@ -17,7 +17,6 @@ c     values to be used in computing fractional coordinates
 c
 c
       subroutine lattice
-      use sizes
       use boxes
       use cell
       use inform

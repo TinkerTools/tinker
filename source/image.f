@@ -18,7 +18,6 @@ c     of the minimum image distance
 c
 c
       subroutine image (xr,yr,zr)
-      use sizes
       use boxes
       use cell
       implicit none

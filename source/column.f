@@ -18,7 +18,6 @@ c
 c
       subroutine column (nvar,hinit,hstop,hindex,
      &                   cinit,cstop,cindex,cvalue)
-      use sizes
       implicit none
       integer i,j,k
       integer m,nvar

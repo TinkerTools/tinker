@@ -17,7 +17,6 @@ c     values from an external keyword file
 c
 c
       subroutine unitcell
-      use sizes
       use bound
       use boxes
       use iounit

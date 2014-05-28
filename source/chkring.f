@@ -17,7 +17,6 @@ c     their presence within a single 3- to 6-membered ring
 c
 c
       subroutine chkring (iring,ia,ib,ic,id)
-      use sizes
       use couple
       implicit none
       integer i,j,k,m,p,q,r

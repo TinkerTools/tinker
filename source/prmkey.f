@@ -17,7 +17,6 @@ c     force field potential energy functional forms and constants
 c
 c
       subroutine prmkey (text)
-      use sizes
       use angpot
       use bndpot
       use chgpot

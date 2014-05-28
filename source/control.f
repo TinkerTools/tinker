@@ -17,7 +17,6 @@ c     the output style and information level provided by TINKER
 c
 c
       subroutine control
-      use sizes
       use argue
       use inform
       use keys

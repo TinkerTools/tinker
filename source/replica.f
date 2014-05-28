@@ -18,7 +18,6 @@ c     list if the replicates method is to be used
 c
 c
       subroutine replica (cutoff)
-      use sizes
       use bound
       use boxes
       use cell
