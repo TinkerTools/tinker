@@ -87,10 +87,16 @@ c
       end if
       if (mode.ne.1 .and. mode.ne.2)  mode = 0
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(iomega))  allocate (iomega(2,n))
+      if (.not. allocated(zline))  allocate (zline(n))
+      if (.not. allocated(dihed))  allocate (dihed(n))
+c
 c     manual selection of the torsional angles to be rotated
 c
       if (mode .eq. 1) then
-         do while (nomega .lt. maxrot)
+         do while (.true.)
             nomega = nomega + 1
             j1 = 0
             j2 = 0
@@ -132,13 +138,13 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (ifixed(2,maxrot))
+      allocate (ifixed(2,n))
 c
 c     manual selection of the torsional angles to be frozen
 c
       nfixed = 0
       if (mode .eq. 2) then
-         do i = 1, maxrot
+         do i = 1, n
             ifixed(1,i) = 0
             ifixed(2,i) = 0
             write (iout,90)  i
@@ -146,7 +152,7 @@ c
             read (input,100)  record
   100       format (a120)
             read (record,*,err=110,end=110)  ifixed(1,i),ifixed(2,i)
-            if (ifixed(1,i).eq.0 .and. ifixed(2,i).eq.0)  goto 110
+            if (ifixed(1,i).eq.0 .or. ifixed(2,i).eq.0)  goto 110
             nfixed = nfixed + 1
          end do
   110    continue
@@ -271,14 +277,9 @@ c
   160    format (/,' INITROT  --  No Torsions for Subsequent',
      &              ' Computation')
          call fatal
-      else if (nomega .gt. maxrot) then
-         write (iout,170)
-  170    format (/,' INITROT  --  Too many Torsions;',
-     &              ' Increase MAXROT')
-         call fatal
       end if
-      write (iout,180)  nomega
-  180 format (/,' Number of Torsions Used in Derivative',
+      write (iout,170)  nomega
+  170 format (/,' Number of Torsions Used in Derivative',
      &           ' Computation :',i6)
       return
       end

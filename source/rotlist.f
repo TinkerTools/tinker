@@ -78,6 +78,10 @@ c
          if (i12(i,base) .eq. partner)  bonded = .true.
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(rot))  allocate (rot(n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (list(0:n))

@@ -26,7 +26,6 @@ c     maxgrp          user-defined groups of atoms
 c     maxref          stored reference molecular systems
 c     maxtyp          force field atom type definitions
 c     maxclass        force field atom class definitions
-c     maxrot          bonds for torsional rotation
 c     maxopt          optimization variables (matrix storage)
 c     maxvlst         neighbors in van der Waals pair list
 c     maxelst         neighbors in electrostatics pair list
@@ -36,7 +35,6 @@ c     maxfix          geometric constraints and restraints
 c     maxvib          vibrational frequencies
 c     maxgeo          distance geometry points
 c     maxcell         unit cells in replicated crystal
-c     maxbio          biopolymer atom definitions
 c     maxres          residues in the macromolecule
 c
 c
@@ -45,19 +43,17 @@ c
       integer maxatm,maxval
       integer maxgrp,maxref
       integer maxtyp,maxclass
-      integer maxrot,maxopt
-      integer maxvlst,maxelst
-      integer maxulst,maxfft
-      integer maxfix,maxvib
-      integer maxgeo,maxcell
-      integer maxbio,maxres
+      integer maxopt,maxvlst
+      integer maxelst,maxulst
+      integer maxfft,maxfix
+      integer maxvib,maxgeo
+      integer maxcell,maxres
       parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
       parameter (maxref=10)
       parameter (maxtyp=5000)
       parameter (maxclass=1000)
-      parameter (maxrot=1000)
       parameter (maxopt=1000)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
@@ -67,7 +63,6 @@ c
       parameter (maxvib=1000)
       parameter (maxgeo=2500)
       parameter (maxcell=10000)
-      parameter (maxbio=10000)
       parameter (maxres=10000)
       save
       end

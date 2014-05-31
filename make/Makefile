@@ -1577,9 +1577,9 @@ fft.o: sizes.o
 fft3d.o: fft.o openmp.o pme.o
 fftpack.o: math.o
 field.o: keys.o potent.o
-fields.o: sizes.o
+fields.o:
 files.o:
-final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o charge.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o improp.o imptor.o inform.o iounit.o light.o merck.o molcul.o moldyn.o mpole.o mutant.o neigh.o nonpol.o opbend.o opdist.o orbits.o paths.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o qmstuf.o refer.o restrn.o rgddyn.o rigid.o ring.o sizes.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o usolve.o vdw.o vibs.o warp.o
+final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o charge.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o improp.o imptor.o inform.o iounit.o light.o merck.o molcul.o moldyn.o mpole.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o qmstuf.o refer.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o sizes.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o usolve.o vdw.o vibs.o warp.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o sizes.o warp.o
 fracs.o:
 freeunit.o: iounit.o
@@ -1734,7 +1734,7 @@ number.o: inform.o iounit.o
 numeral.o:
 numgrad.o: atoms.o sizes.o
 ocvm.o: inform.o iounit.o keys.o linmin.o math.o minima.o output.o potent.o scales.o
-omega.o: sizes.o
+omega.o:
 opbend.o:
 opdist.o:
 openend.o:
@@ -1816,7 +1816,7 @@ rigid.o:
 ring.o:
 rings.o: angbnd.o atoms.o bitor.o bndstr.o couple.o inform.o iounit.o ring.o tors.o
 rmsfit.o: align.o sizes.o
-rotbnd.o: sizes.o
+rotbnd.o:
 rotlist.o: atoms.o couple.o iounit.o molcul.o rotbnd.o sizes.o zclose.o
 rotpole.o: atoms.o mpole.o sizes.o
 rxnfld.o:

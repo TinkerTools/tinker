@@ -18,10 +18,9 @@ c     use_short   logical flag governing use of shortest atom list
 c
 c
       module rotbnd
-      use sizes
       implicit none
       integer nrot
-      integer rot(maxatm)
+      integer, allocatable :: rot(:)
       logical use_short
       save
       end

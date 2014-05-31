@@ -52,6 +52,7 @@ c
       use mutant
       use neigh
       use nonpol
+      use omega
       use opbend
       use opdist
       use orbits
@@ -69,6 +70,7 @@ c
       use rgddyn
       use rigid
       use ring
+      use rotbnd
       use socket
       use solute
       use stodyn
@@ -456,6 +458,12 @@ c
       if (allocated(rdisp))  deallocate (rdisp)
       if (allocated(cdisp))  deallocate (cdisp)
 c
+c     deallocation of global arrays from module omega
+c
+      if (allocated(iomega))  deallocate (iomega)
+      if (allocated(zline))  deallocate (zline)
+      if (allocated(dihed))  deallocate (dihed)
+c
 c     deallocation of global arrays from module opbend
 c
       if (allocated(iopb))  deallocate (iopb)
@@ -609,6 +617,10 @@ c
       if (allocated(iring4))  deallocate (iring4)
       if (allocated(iring5))  deallocate (iring5)
       if (allocated(iring6))  deallocate (iring6)
+c
+c     deallocation of global arrays from module rotbnd
+c
+      if (allocated(rot))  deallocate (rot)
 c
 c     deallocation of global arrays from module solute
 c

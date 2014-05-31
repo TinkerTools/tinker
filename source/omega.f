@@ -19,11 +19,10 @@ c     dihed    current value in radians of each dihedral angle
 c
 c
       module omega
-      use sizes
       implicit none
       integer nomega
-      integer iomega(2,maxrot)
-      integer zline(maxrot)
-      real*8 dihed(maxrot)
+      integer, allocatable :: iomega(:,:)
+      integer, allocatable :: zline(:)
+      real*8, allocatable :: dihed(:)
       save
       end
