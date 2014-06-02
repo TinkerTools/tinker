@@ -12,15 +12,6 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     pbe      Poisson-Boltzmann permanent multipole solvation energy
-c     apbe     Poisson-Boltzmann permanent multipole energy over atoms
-c     pbr      Poisson-Boltzmann cavity radii for atom types
-c     pbep     Poisson-Boltzmann energies on permanent multipoles
-c     pbfp     Poisson-Boltzmann forces on permanent multipoles
-c     pbtp     Poisson-Boltzmann torques on permanent multipoles
-c     pbeuind  Poisson-Boltzmann field due to induced dipoles
-c     pbeuinp  Poisson-Boltzmann field due to non-local induced dipoles
-c
 c     APBS configuration parameters (see APBS documentation for details)
 c     In the column on the right are possible values for each variable,
 c     with default values given in brackets. Only a subset of the APBS
@@ -73,9 +64,17 @@ c
 c     smin     minimum distance between an      [10.0]
 c              atom and the grid boundary (A)
 c
+c     pbe      Poisson-Boltzmann permanent multipole solvation energy
+c     apbe     Poisson-Boltzmann permanent multipole energy over atoms
+c     pbr      Poisson-Boltzmann cavity radii for atom types
+c     pbep     Poisson-Boltzmann energies on permanent multipoles
+c     pbfp     Poisson-Boltzmann forces on permanent multipoles
+c     pbtp     Poisson-Boltzmann torques on permanent multipoles
+c     pbeuind  Poisson-Boltzmann field due to induced dipoles
+c     pbeuinp  Poisson-Boltzmann field due to non-local induced dipoles
+c
 c
       module pbstuf
-      use sizes
       implicit none
       integer maxion
       parameter (maxion=10)
@@ -83,13 +82,6 @@ c
       integer ionn(maxion)
       integer ionq(maxion)
       real*8 pbe
-      real*8 apbe(maxatm)
-      real*8 pbr(maxatm)
-      real*8 pbep(3,maxatm)
-      real*8 pbfp(3,maxatm)
-      real*8 pbtp(3,maxatm)
-      real*8 pbeuind(3,maxatm)
-      real*8 pbeuinp(3,maxatm)
       real*8 pdie,sdie
       real*8 srad,swin
       real*8 sdens,smin
@@ -101,6 +93,13 @@ c
       real*8 fgcent(3)
       real*8 ionr(maxion)
       real*8 ionc(maxion)
+      real*8, allocatable :: apbe(:)
+      real*8, allocatable :: pbr(:)
+      real*8, allocatable :: pbep(:,:)
+      real*8, allocatable :: pbfp(:,:)
+      real*8, allocatable :: pbtp(:,:)
+      real*8, allocatable :: pbeuind(:,:)
+      real*8, allocatable :: pbeuinp(:,:)
       character*20 pbtyp,pbsoln
       character*20 bcfl,chgm,srfm
       save

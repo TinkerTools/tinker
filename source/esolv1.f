@@ -4456,11 +4456,16 @@ c
             end do
          end do
 c
+c     perform dynamic allocation of some global arrays
+c
+         if (poltyp .eq. 'DIRECT') then
+            if (.not. allocated(pbeuind))  allocate (pbeuind(3,n))
+            if (.not. allocated(pbeuinp))  allocate (pbeuinp(3,n))
+c
 c     for direct polarization, the reaction field due to the
 c     induced dipoles still needs to be computed because
 c     the mutual portion of "apbsinduce" was not called
 c
-         if (poltyp .eq. 'DIRECT') then
             do i = 1, n
                do j = 1, 3
                   pbeuind(j,i) = 0.0d0

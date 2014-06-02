@@ -98,12 +98,6 @@ c
 c
 c     initialization and set-up for the optimization
 c
-      if (nvar .gt. maxopt) then
-         write (iout,10)
-   10    format (/,' OCVM  --  Too many Parameters,',
-     &              ' Increase the Value of MAXOPT')
-         return
-      end if
       mvar = nvar
       rms = sqrt(dble(nvar))
       if (coordtype .eq. 'CARTESIAN') then
@@ -145,29 +139,29 @@ c
          call upcase (keyword)
          string = record(next:120)
          if (keyword(1:7) .eq. 'FCTMIN ') then
-            read (string,*,err=20,end=20)  fctmin
+            read (string,*,err=10,end=10)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then
-            read (string,*,err=20,end=20)  maxiter
+            read (string,*,err=10,end=10)  maxiter
          else if (keyword(1:9) .eq. 'NEXTITER ') then
-            read (string,*,err=20,end=20)  nextiter
+            read (string,*,err=10,end=10)  nextiter
          else if (keyword(1:7) .eq. 'HGUESS ') then
-            read (string,*,err=20,end=20)  hguess
+            read (string,*,err=10,end=10)  hguess
          else if (keyword(1:8) .eq. 'STEPMAX ') then
-            read (string,*,err=20,end=20)  stpmax
+            read (string,*,err=10,end=10)  stpmax
          else if (keyword(1:7) .eq. 'ANGMAX ') then
-            read (string,*,err=20,end=20)  angmax
+            read (string,*,err=10,end=10)  angmax
          end if
-   20    continue
+   10    continue
       end do
 c
 c     print initial information prior to first iteration
 c
       if (iprint .gt. 0) then
-         write (iout,30)
-   30    format (/,' Optimally Conditioned Variable Metric',
+         write (iout,20)
+   20    format (/,' Optimally Conditioned Variable Metric',
      &             ' Optimization :')
-         write (iout,40)
-   40    format (/,' VM Iter     F Value       G RMS     F Move',
+         write (iout,30)
+   30    format (/,' VM Iter     F Value       G RMS     F Move',
      &              '    X Move      Angle   FG Call',/)
       end if
 c
@@ -253,22 +247,22 @@ c
             if (niter .eq. 0) then
                if (f0.lt.1.0d8 .and. f0.gt.-1.0d7 .and.
      &                    grms.lt.1.0d6) then
-                  write (iout,50)  niter,f0,grms,ncalls
-   50             format (i6,f14.4,f12.4,32x,i9)
+                  write (iout,40)  niter,f0,grms,ncalls
+   40             format (i6,f14.4,f12.4,32x,i9)
                else
-                  write (iout,60)  niter,f0,grms,ncalls
-   60             format (i6,d14.4,d12.4,32x,i9)
+                  write (iout,50)  niter,f0,grms,ncalls
+   50             format (i6,d14.4,d12.4,32x,i9)
                end if
             else if (mod(niter,iprint) .eq. 0) then
                if (f0.lt.1.0d8 .and. f0.gt.-1.0d7 .and.
      &             grms.lt.1.0d6 .and. fmove.lt.1.0d5) then
+                  write (iout,60)  niter,f0,grms,fmove,
+     &                             xmove,sgangle,ncalls
+   60             format (i6,f14.4,f12.4,f11.4,f10.4,f11.4,i9)
+               else
                   write (iout,70)  niter,f0,grms,fmove,
      &                             xmove,sgangle,ncalls
-   70             format (i6,f14.4,f12.4,f11.4,f10.4,f11.4,i9)
-               else
-                  write (iout,80)  niter,f0,grms,fmove,
-     &                             xmove,sgangle,ncalls
-   80             format (i6,d14.4,d12.4,d11.4,f10.4,f11.4,i9)
+   70             format (i6,d14.4,d12.4,d11.4,f10.4,f11.4,i9)
                end if
             end if
          end if
@@ -291,25 +285,25 @@ c
                if (niter.ne.0 .and. mod(niter,iprint).ne.0) then
                   if (f0.lt.1.0d8 .and. f0.gt.-1.0d7 .and.
      &                grms.lt.1.0d6 .and. fmove.lt.1.0d5) then
-                     write (iout,90)  niter,f0,grms,fmove,
+                     write (iout,80)  niter,f0,grms,fmove,
      &                                xmove,sgangle,ncalls
-   90                format (i6,f14.4,f12.4,f11.4,f10.4,f11.4,i9)
+   80                format (i6,f14.4,f12.4,f11.4,f10.4,f11.4,i9)
                   else
-                     write (iout,100)  niter,f0,grms,fmove,
+                     write (iout,90)  niter,f0,grms,fmove,
      &                                 xmove,sgangle,ncalls
-  100                format (i6,d14.4,d12.4,d11.4,f10.4,f11.4,i9)
+   90                format (i6,d14.4,d12.4,d11.4,f10.4,f11.4,i9)
                   end if
                end if
                if (niter .ge. maxiter)  status = 'IterLimit'
                if (f0 .lt. fctmin)  status = 'SmallFct '
                if (grms .lt. grdmin)  status = 'SmallGrad'
                if (status .eq. 'IterLimit') then
-                  write (iout,110)  status
-  110             format (/,' OCVM  --  Incomplete Convergence',
+                  write (iout,100)  status
+  100             format (/,' OCVM  --  Incomplete Convergence',
      &                       ' due to ',a9)
                else
-                  write (iout,120)  status
-  120             format (/,' OCVM  --  Normal Termination',
+                  write (iout,110)  status
+  110             format (/,' OCVM  --  Normal Termination',
      &                       ' due to ',a9)
                end if
             end if
@@ -319,7 +313,7 @@ c
                end if
             end if
             done = .true.
-            goto 170
+            goto 160
          end if
 c
 c     start of the next iteration
@@ -353,7 +347,7 @@ c
 c     location of the next starting point
 c
          nstep = 0
-  130    continue
+  120    continue
          do i = 1, nvar
             search(i) = 0.0d0
          end do
@@ -385,18 +379,18 @@ c
                if (niter.ne.0 .and. mod(niter,iprint).ne.0) then
                   if (f0.lt.1.0d8 .and. f0.gt.-1.0d7 .and.
      &                       grms.lt.1.0d6) then
+                     write (iout,130)  niter,f0,grms,0.0,0.0,
+     &                                 sgangle,ncalls
+  130                format (i6,f14.4,f12.4,f11.4,f10.4,f11.4,i9)
+                  else
                      write (iout,140)  niter,f0,grms,0.0,0.0,
      &                                 sgangle,ncalls
-  140                format (i6,f14.4,f12.4,f11.4,f10.4,f11.4,i9)
-                  else
-                     write (iout,150)  niter,f0,grms,0.0,0.0,
-     &                                 sgangle,ncalls
-  150                format (i6,d14.4,d12.4,f11.4,f10.4,f11.4,i9)
+  140                format (i6,d14.4,d12.4,f11.4,f10.4,f11.4,i9)
                   end if
                end if
                status = 'SmallMove'
-               write (iout,160)  status
-  160          format (/,' OCVM  --  Incomplete Convergence',
+               write (iout,150)  status
+  150          format (/,' OCVM  --  Incomplete Convergence',
      &                    ' due to ',a9)
             end if
             if (iwrite .gt. 0) then
@@ -405,7 +399,7 @@ c
                end if
             end if
             done = .true.
-            goto 170
+            goto 160
          end if
          do i = 1, nvar
             x(i) = x0(i) + search(i)
@@ -418,7 +412,7 @@ c
             end do
             f0prime = 0.5d0 * f0prime
             zeta = 0.5d0
-            goto 130
+            goto 120
          end if
 c
 c     decide whether to update or take another step
@@ -447,27 +441,27 @@ c
             nstep = nstep + 1
             if (nstep .ge. maxstep) then
                restart = .true.
-               goto 170
+               goto 160
             end if
             do j = 1, mvar
                s(j) = s(j) * zeta
             end do
             f0prime = f0prime * zeta
-            goto 130
+            goto 120
          end if
 c
 c     check to see if we need to update
 c
          if (nbig .ge. maxbig) then
             restart = .true.
-            goto 170
+            goto 160
          end if
          m2 = 0.0d0
          do j = 1, mvar
             m2 = m2 + m(j)**2
          end do
          if (m2 .lt. eps) then
-            goto 170
+            goto 160
          end if
          v = 0.0d0
          do j = 1, mvar
@@ -562,7 +556,7 @@ c
                w(j) = k0(j)
             end do
          end if
-  170    continue
+  160    continue
       end do
 c
 c     perform deallocation of some local arrays

@@ -160,11 +160,8 @@ c
 c
 c     make the call to the optimization routine
 c
-      if (nvar .le. maxopt) then
-         call ocvm (nvar,xx,minimum,grdmin,xtalmin1,optsave)
-      else
-         call lbfgs (nvar,xx,minimum,grdmin,xtalmin1,optsave)
-      end if
+      call ocvm (nvar,xx,minimum,grdmin,xtalmin1,optsave)
+c     call lbfgs (nvar,xx,minimum,grdmin,xtalmin1,optsave)
 c
 c     unscale fractional coordinates and get atomic coordinates
 c

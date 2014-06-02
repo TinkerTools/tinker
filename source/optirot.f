@@ -49,15 +49,6 @@ c
       call mechanic
       call initrot
 c
-c     check for too many parameters to be optimized
-c
-      if (nomega .gt. maxopt) then
-         write (iout,10)
-   10    format (/,' OPTIROT  --  Too many Parameters,',
-     &              ' Increase the Value of MAXOPT')
-         call fatal
-      end if
-c
 c     search the keywords for output frequency parameters
 c
       do i = 1, nkey
@@ -67,25 +58,25 @@ c
          call upcase (keyword)
          string = record(next:120)
          if (keyword(1:9) .eq. 'PRINTOUT ') then
-            read (string,*,err=20,end=20)  iprint
+            read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
-            read (string,*,err=20,end=20)  iwrite
+            read (string,*,err=10,end=10)  iwrite
          end if
-   20    continue
+   10    continue
       end do
 c
 c     get termination criterion as RMS torsional gradient
 c
       grdmin = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  grdmin
-   30 continue
+      if (exist)  read (string,*,err=20,end=20)  grdmin
+   20 continue
       if (grdmin .le. 0.0d0) then
-         write (iout,40)
-   40    format (/,' Enter RMS Gradient per Torsion Criterion',
+         write (iout,30)
+   30    format (/,' Enter RMS Gradient per Torsion Criterion',
      &              ' [0.01] :  ',$)
-         read (input,50)  grdmin
-   50    format (f20.0)
+         read (input,40)  grdmin
+   40    format (f20.0)
       end if
       if (grdmin .eq. 0.0d0)  grdmin = 0.01d0
 c
@@ -154,37 +145,37 @@ c     write out the final function and gradient values
 c
       if (digits .ge. 8) then
          if (grms .gt. 1.0d-8) then
-            write (iout,60)  minimum,grms,gnorm
-   60       format (/,' Final Function Value :',2x,f20.8,
+            write (iout,50)  minimum,grms,gnorm
+   50       format (/,' Final Function Value :',2x,f20.8,
      &              /,' Final RMS Gradient :',4x,f20.8,
      &              /,' Final Gradient Norm :',3x,f20.8)
          else
-            write (iout,70)  minimum,grms,gnorm
-   70       format (/,' Final Function Value :',2x,f20.8,
+            write (iout,60)  minimum,grms,gnorm
+   60       format (/,' Final Function Value :',2x,f20.8,
      &              /,' Final RMS Gradient :',4x,d20.8,
      &              /,' Final Gradient Norm :',3x,d20.8)
          end if
       else if (digits .ge. 6) then
          if (grms .gt. 1.0d-6) then
-            write (iout,80)  minimum,grms,gnorm
-   80       format (/,' Final Function Value :',2x,f18.6,
+            write (iout,70)  minimum,grms,gnorm
+   70       format (/,' Final Function Value :',2x,f18.6,
      &              /,' Final RMS Gradient :',4x,f18.6,
      &              /,' Final Gradient Norm :',3x,f18.6)
          else
-            write (iout,90)  minimum,grms,gnorm
-   90       format (/,' Final Function Value :',2x,f18.6,
+            write (iout,80)  minimum,grms,gnorm
+   80       format (/,' Final Function Value :',2x,f18.6,
      &              /,' Final RMS Gradient :',4x,d18.6,
      &              /,' Final Gradient Norm :',3x,d18.6)
          end if
       else
          if (grms .gt. 1.0d-4) then
-            write (iout,100)  minimum,grms,gnorm
-  100       format (/,' Final Function Value :',2x,f16.4,
+            write (iout,90)  minimum,grms,gnorm
+   90       format (/,' Final Function Value :',2x,f16.4,
      &              /,' Final RMS Gradient :',4x,f16.4,
      &              /,' Final Gradient Norm :',3x,f16.4)
          else
-            write (iout,110)  minimum,grms,gnorm
-  110       format (/,' Final Function Value :',2x,f16.4,
+            write (iout,100)  minimum,grms,gnorm
+  100       format (/,' Final Function Value :',2x,f16.4,
      &              /,' Final RMS Gradient :',4x,d16.4,
      &              /,' Final Gradient Norm :',3x,d16.4)
          end if

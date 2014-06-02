@@ -25,15 +25,14 @@ c     skt_close   logical flag to indicate socket shutdown
 c
 c
       module socket
-      use sizes
       implicit none
       integer runtyp
       integer cstep
       real*8 cdt
       real*8 cenergy
-      real*8 cdx(maxatm)
-      real*8 cdy(maxatm)
-      real*8 cdz(maxatm)
+      real*8, allocatable :: cdx(:)
+      real*8, allocatable :: cdy(:)
+      real*8, allocatable :: cdz(:)
       logical use_socket
       logical skt_init
       logical skt_close

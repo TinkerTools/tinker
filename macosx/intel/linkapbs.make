@@ -17,7 +17,7 @@ setenv APBSLIBS "../apbs/macosx/lib/libapbsmainroutines.a ../apbs/macosx/lib/lib
 ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o alchemy.x alchemy.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip alchemy.x
 ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o analyze.x analyze.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip analyze.x
 ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o anneal.x anneal.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip anneal.x
-ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip archiv$
+ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip archive.x
 ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip correlate.x
 ifort -O3 -no-ipo -no-prec-div -openmp -static-intel -mmacosx-version-min=10.6 -o crystal.x crystal.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip crystal.x

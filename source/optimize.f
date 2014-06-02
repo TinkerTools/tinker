@@ -109,15 +109,6 @@ c
          end if
       end do
 c
-c     check for too many parameters to be optimized
-c
-      if (nvar .gt. maxopt) then
-         write (iout,50)
-   50    format (/,' OPTIMIZE  --  Too many Parameters,',
-     &              ' Increase the Value of MAXOPT')
-         call fatal
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (xx(nvar))
@@ -183,37 +174,37 @@ c     write out the final function and gradient values
 c
       if (digits .ge. 8) then
          if (grms .gt. 1.0d-8) then
-            write (iout,60)  minimum,grms,gnorm
-   60       format (/,' Final Function Value :',2x,f20.8,
+            write (iout,50)  minimum,grms,gnorm
+   50       format (/,' Final Function Value :',2x,f20.8,
      &              /,' Final RMS Gradient :',4x,f20.8,
      &              /,' Final Gradient Norm :',3x,f20.8)
          else
-            write (iout,70)  minimum,grms,gnorm
-   70       format (/,' Final Function Value :',2x,f20.8,
+            write (iout,60)  minimum,grms,gnorm
+   60       format (/,' Final Function Value :',2x,f20.8,
      &              /,' Final RMS Gradient :',4x,d20.8,
      &              /,' Final Gradient Norm :',3x,d20.8)
          end if
       else if (digits .ge. 6) then
          if (grms .gt. 1.0d-6) then
-            write (iout,80)  minimum,grms,gnorm
-   80       format (/,' Final Function Value :',2x,f18.6,
+            write (iout,70)  minimum,grms,gnorm
+   70       format (/,' Final Function Value :',2x,f18.6,
      &              /,' Final RMS Gradient :',4x,f18.6,
      &              /,' Final Gradient Norm :',3x,f18.6)
          else
-            write (iout,90)  minimum,grms,gnorm
-   90       format (/,' Final Function Value :',2x,f18.6,
+            write (iout,80)  minimum,grms,gnorm
+   80       format (/,' Final Function Value :',2x,f18.6,
      &              /,' Final RMS Gradient :',4x,d18.6,
      &              /,' Final Gradient Norm :',3x,d18.6)
          end if
       else
          if (grms .gt. 1.0d-4) then
-            write (iout,100)  minimum,grms,gnorm
-  100       format (/,' Final Function Value :',2x,f16.4,
+            write (iout,90)  minimum,grms,gnorm
+   90       format (/,' Final Function Value :',2x,f16.4,
      &              /,' Final RMS Gradient :',4x,f16.4,
      &              /,' Final Gradient Norm :',3x,f16.4)
          else
-            write (iout,110)  minimum,grms,gnorm
-  110       format (/,' Final Function Value :',2x,f16.4,
+            write (iout,100)  minimum,grms,gnorm
+  100       format (/,' Final Function Value :',2x,f16.4,
      &              /,' Final RMS Gradient :',4x,d16.4,
      &              /,' Final Gradient Norm :',3x,d16.4)
          end if

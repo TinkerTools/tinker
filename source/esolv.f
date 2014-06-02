@@ -1321,6 +1321,13 @@ c
       real*8, allocatable :: pbpole(:,:)
 c
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(apbe))  allocate (apbe(n))
+      if (.not. allocated(pbep))  allocate (pbep(3,n))
+      if (.not. allocated(pbfp))  allocate (pbfp(3,n))
+      if (.not. allocated(pbtp))  allocate (pbtp(3,n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pos(3,n))

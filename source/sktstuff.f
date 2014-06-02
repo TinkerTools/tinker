@@ -59,6 +59,12 @@ c
       call setstep (ncycle)
       call setenergy (eopt)
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(cdx))  allocate (cdx(n))
+      if (.not. allocated(cdy))  allocate (cdy(n))
+      if (.not. allocated(cdz))  allocate (cdz(n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (px(n))

@@ -5191,6 +5191,11 @@ c     perform deallocation of some local arrays
 c
       deallocate (dscale)
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(pbeuind))  allocate (pbeuind(3,n))
+      if (.not. allocated(pbeuinp))  allocate (pbeuinp(3,n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (indpole(3,n))
