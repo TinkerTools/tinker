@@ -39,23 +39,25 @@ c
       integer nmode,mode
       integer offset,origin
       integer oldtype,newtype
-      integer nlist,nmolecule
+      integer nlist,ncopy
       integer freeunit
       integer, allocatable :: list(:)
       integer, allocatable :: keep(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xran,yran,zran
-      real*8 xorig,yorig,zorig
       real*8 xcm,ycm,zcm
+      real*8 xorig,yorig,zorig
       real*8 ri,rij,dij
       real*8 phi,theta,psi
       real*8 cphi,ctheta,cpsi
       real*8 sphi,stheta,spsi
       real*8 dist2,cut2
       real*8 random,norm,weigh
-      real*8 a(3,3)
       real*8, allocatable :: rad(:)
+      real*8, allocatable :: x0(:)
+      real*8, allocatable :: y0(:)
+      real*8, allocatable :: z0(:)
+      real*8 a(3,3)
       logical write
       character*120 xyzfile
       character*120 record
@@ -605,8 +607,8 @@ c     create a random box full of the current coordinates file
 c
       if (mode .eq. 18) then
          write (iout,340)
-  340    format (/,' Enter Number of Molecules in Box :  ',$)
-         read (input,350)  nmolecule
+  340    format (/,' Enter Number of Copies to put in Box :  ',$)
+         read (input,350)  ncopy
   350    format (i10)
          xbox = 0.0d0
          ybox = 0.0d0
@@ -621,29 +623,80 @@ c
             if (ybox .eq. 0.0d0)  ybox = xbox
             if (zbox .eq. 0.0d0)  zbox = xbox
          end do
-         ixyz = freeunit ()
-         xyzfile = filename(1:leng)//'.xyz'
-         call version (xyzfile,'new')
-         open (unit=ixyz,file=xyzfile,status='new')
-         do k = 1, nmolecule
+         orthogonal = .true.
+         xcm = 0.0d0
+         ycm = 0.0d0
+         zcm = 0.0d0
+         norm = 0.0d0
+         do i = 1, n
+            weigh = mass(i)
+            xcm = xcm + x(i)*weigh
+            ycm = ycm + y(i)*weigh
+            zcm = zcm + z(i)*weigh
+            norm = norm + weigh
+         end do
+         xcm = xcm / norm
+         ycm = ycm / norm
+         zcm = zcm / norm
+         allocate (x0(n))
+         allocate (y0(n))
+         allocate (z0(n))
+         do i = 1, n
+            x(i) = x(i) - xcm
+            y(i) = y(i) - ycm
+            z(i) = z(i) - zcm
+            x0(i) = x(i)
+            y0(i) = y(i)
+            z0(i) = z(i)
+         end do
+         do k = 1, ncopy
             offset = (k-1) * n
-            xran = xbox * random ()
-            yran = ybox * random ()
-            zran = zbox * random ()
+            xcm = xbox * (random()-0.5d0)
+            ycm = ybox * (random()-0.5d0)
+            zcm = zbox * (random()-0.5d0)
+            phi = 360.0d0 * random ()
+            theta = 360.0d0 * random ()
+            psi = 360.0d0 * random ()
+            cphi = cos(phi)
+            sphi = sin(phi)
+            ctheta = cos(theta)
+            stheta = sin(theta)
+            cpsi = cos(psi)
+            spsi = sin(psi)
+            a(1,1) = ctheta * cphi
+            a(2,1) = spsi*stheta*cphi - cpsi*sphi
+            a(3,1) = cpsi*stheta*cphi + spsi*sphi
+            a(1,2) = ctheta * sphi
+            a(2,2) = spsi*stheta*sphi + cpsi*cphi
+            a(3,2) = cpsi*stheta*sphi - spsi*cphi
+            a(1,3) = -stheta
+            a(2,3) = ctheta * spsi
+            a(3,3) = ctheta * cpsi
             do i = 1, n
                j = i + offset
                name(j) = name(i)
                type(j) = type(i)
-               x(j) = x(i) + xran
-               y(j) = y(i) + yran
-               z(j) = z(i) + zran
+               mass(j) = mass(i)
+               x(j) = a(1,1)*x0(i) + a(2,1)*y0(i) + a(3,1)*z0(i) + xcm
+               y(j) = a(1,2)*x0(i) + a(2,2)*y0(i) + a(3,2)*z0(i) + ycm
+               z(j) = a(1,3)*x0(i) + a(2,3)*y0(i) + a(3,3)*z0(i) + zcm
                n12(j) = n12(i)
                do m = 1, n12(i)
                   i12(m,j) = i12(m,i) + offset
                end do
             end do
          end do
-         n = nmolecule * n
+         deallocate (x0)
+         deallocate (y0)
+         deallocate (z0)
+         n = ncopy * n
+         call lattice
+         call molecule
+         call bounds
+         ixyz = freeunit ()
+         xyzfile = filename(1:leng)//'.xyz'
+         call version (xyzfile,'new')
+         open (unit=ixyz,file=xyzfile,status='new')
          call prtxyz (ixyz)
          close (unit=ixyz)
          write (iout,390)  xyzfile

@@ -65,6 +65,11 @@ c
          twosided = .true.
       end if
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(dem))  allocate (dem(3,n))
+      if (.not. allocated(dep))  allocate (dep(3,n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (list(npole))

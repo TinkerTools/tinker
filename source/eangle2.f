@@ -48,6 +48,10 @@ c
       twosided = .false.
       if (n .le. 50)  twosided = .true.
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(dea))  allocate (dea(3,n))
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (d0(3,n))
