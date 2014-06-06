@@ -125,8 +125,9 @@ c     get the offset value to be used in atom renumbering
 c
       if (mode .eq. 1) then
    60    continue
+         offset = 0
          write (iout,70)
-   70    format (/,' Offset used to Renumber the Current Atoms :  ',$)
+   70    format (/,' Offset used to Renumber the Atoms [0] :  ',$)
          read (input,80,err=60)  offset
    80    format (i10)
          write = .true.

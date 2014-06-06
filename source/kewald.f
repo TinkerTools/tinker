@@ -32,7 +32,9 @@ c
       use pme
       implicit none
       integer maxpower
+      integer maxfft
       parameter (maxpower=54)
+      parameter (maxfft=576)
       integer i,k,next
       integer ifft1,ifft2,ifft3
       integer multi(maxpower)
@@ -132,28 +134,25 @@ c     set the number of chunks and grid points per chunk
 c
       call getchunk
 c
-c     check the B-spline order and charge grid dimension
+c     check the particle mesh Ewald charge grid dimensions
 c
-      if (bsorder .gt. maxorder) then
-         write (iout,30)
-   30    format (/,' KEWALD  --  B-Spline Order Too Large;',
-     &              ' Increase MAXORDER')
-         call fatal
-      end if
       if (max(nfft1,nfft2,nfft3) .gt. maxfft) then
-         write (iout,40)
-   40    format (/,' KEWALD  --  FFT Charge Grid Too Large;',
+         write (iout,30)
+   30    format (/,' KEWALD  --  FFT Charge Grid Too Large;',
      &              ' Increase MAXFFT')
          call fatal
       else if (nfft1.lt.ifft1 .or. nfft2.lt.ifft2
      &             .or. nfft3.lt.ifft3) then
-         write (iout,50)
-   50    format (/,' KEWALD  --  Warning, Small Charge Grid',
+         write (iout,40)
+   40    format (/,' KEWALD  --  Warning, Small Charge Grid',
      &              ' may give Poor Accuracy')
       end if
 c
 c     perform dynamic allocation of some global arrays
 c
+      if (.not. allocated(bsmod1))  allocate (bsmod1(maxfft))
+      if (.not. allocated(bsmod2))  allocate (bsmod2(maxfft))
+      if (.not. allocated(bsmod3))  allocate (bsmod3(maxfft))
       if (.not. allocated(thetai1))  allocate (thetai1(4,bsorder,n))
       if (.not. allocated(thetai2))  allocate (thetai2(4,bsorder,n))
       if (.not. allocated(thetai3))  allocate (thetai3(4,bsorder,n))
@@ -169,8 +168,8 @@ c
 c     print a message listing some of the Ewald parameters
 c
       if (verbose) then
-         write (iout,60)  aewald,nfft1,nfft2,nfft3,bsorder
-   60    format (/,' Smooth Particle Mesh Ewald Parameters :',
+         write (iout,50)  aewald,nfft1,nfft2,nfft3,bsorder
+   50    format (/,' Smooth Particle Mesh Ewald Parameters :',
      &           //,4x,'Ewald Coefficient',6x,'Charge Grid',
      &              ' Dimensions',6x,'B-Spline Order',
      &           //,8x,f8.4,11x,3i6,12x,i6)
@@ -289,7 +288,6 @@ c     along each axis of the PME grid for parallelization
 c
 c
       subroutine getchunk
-      use sizes
       use chunks
       use openmp
       use pme
@@ -348,14 +346,19 @@ c     transform of the B-splines
 c
 c
       subroutine moduli
-      use sizes
       use pme
       implicit none
-      integer i
+      integer i,maxfft
       real*8 x
-      real*8 array(maxorder)
-      real*8 bsarray(maxfft)
+      real*8, allocatable :: array(:)
+      real*8, allocatable :: bsarray(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      maxfft = max(nfft1,nfft2,nfft3)
+      allocate (array(bsorder))
+      allocate (bsarray(maxfft))
 c
 c     compute and load the moduli values
 c
@@ -364,12 +367,17 @@ c
       do i = 1, maxfft
          bsarray(i) = 0.0d0
       end do
-      do i = 2, bsorder+1
-         bsarray(i) = array(i-1)
+      do i = 1, bsorder
+         bsarray(i+1) = array(i)
       end do
       call dftmod (bsmod1,bsarray,nfft1,bsorder)
       call dftmod (bsmod2,bsarray,nfft2,bsorder)
       call dftmod (bsmod3,bsarray,nfft3,bsorder)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (array)
+      deallocate (bsarray)
       return
       end
 c

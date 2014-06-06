@@ -12,8 +12,6 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     maxorder   maximum order of the B-spline approximation
-c
 c     nfft1      number of grid points along the a-axis direction
 c     nfft2      number of grid points along the b-axis direction
 c     nfft3      number of grid points along the c-axis direction
@@ -30,18 +28,15 @@ c     qfac       prefactors for particle mesh Ewald charge grid
 c
 c
       module pme
-      use sizes
       implicit none
-      integer maxorder
-      parameter (maxorder=10)
       integer nfft1
       integer nfft2
       integer nfft3
       integer bsorder
       integer, allocatable :: igrid(:,:)
-      real*8 bsmod1(maxfft)
-      real*8 bsmod2(maxfft)
-      real*8 bsmod3(maxfft)
+      real*8, allocatable :: bsmod1(:)
+      real*8, allocatable :: bsmod2(:)
+      real*8, allocatable :: bsmod3(:)
       real*8, allocatable :: thetai1(:,:,:)
       real*8, allocatable :: thetai2(:,:,:)
       real*8, allocatable :: thetai3(:,:,:)

@@ -91,7 +91,6 @@ c     a single PME atomic site along a particular direction
 c
 c
       subroutine bsplgen (w,thetai)
-      use sizes
       use pme
       use potent
       implicit none
@@ -99,13 +98,17 @@ c
       integer level
       real*8 w,denom
       real*8 thetai(4,*)
-      real*8 temp(maxorder,maxorder)
+      real*8, allocatable :: temp(:,:)
 c
 c
 c     set B-spline depth for partial charges or multipoles
 c
       level = 2
       if (use_mpole .or. use_polar)  level = 4
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (temp(bsorder,bsorder))
 c
 c     initialization to get to 2nd order recursion
 c
@@ -182,6 +185,10 @@ c
             thetai(j,i) = temp(bsorder-j+1,i)
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (temp)
       return
       end
 c

@@ -1573,7 +1573,7 @@ extra2.o: atoms.o hessn.o sizes.o
 extra3.o: action.o analyz.o atoms.o energi.o sizes.o
 faces.o:
 fatal.o: iounit.o
-fft.o: sizes.o
+fft.o:
 fft3d.o: fft.o openmp.o pme.o
 fftpack.o: math.o
 field.o: keys.o potent.o
@@ -1760,7 +1760,7 @@ picalc.o: atomid.o atoms.o bndstr.o couple.o inform.o iounit.o orbits.o piorbs.o
 piorbs.o:
 pistuf.o:
 pitors.o:
-pme.o: sizes.o
+pme.o:
 pmestuff.o: atoms.o boxes.o charge.o chunks.o mpole.o pme.o potent.o sizes.o
 pmpb.o: iounit.o
 polar.o:

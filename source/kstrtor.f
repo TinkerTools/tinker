@@ -110,23 +110,23 @@ c
             do j = 1, maxnbt
                if (kbt(j).eq.blank .or. kbt(j).eq.pt) then
                   kbt(j) = pt
-                  btcon(4,nbt) = bt4
-                  btcon(5,nbt) = bt5
-                  btcon(6,nbt) = bt6
+                  btcon(4,j) = bt4
+                  btcon(5,j) = bt5
+                  btcon(6,j) = bt6
                   if (sane) then
-                     btcon(1,nbt) = bt1
-                     btcon(2,nbt) = bt2
-                     btcon(3,nbt) = bt3
-                     btcon(7,nbt) = bt7
-                     btcon(8,nbt) = bt8
-                     btcon(9,nbt) = bt9
+                     btcon(1,j) = bt1
+                     btcon(2,j) = bt2
+                     btcon(3,j) = bt3
+                     btcon(7,j) = bt7
+                     btcon(8,j) = bt8
+                     btcon(9,j) = bt9
                   else
-                     btcon(1,nbt) = bt7
-                     btcon(2,nbt) = bt8
-                     btcon(3,nbt) = bt9
-                     btcon(7,nbt) = bt1
-                     btcon(8,nbt) = bt2
-                     btcon(9,nbt) = bt3
+                     btcon(1,j) = bt7
+                     btcon(2,j) = bt8
+                     btcon(3,j) = bt9
+                     btcon(7,j) = bt1
+                     btcon(8,j) = bt2
+                     btcon(9,j) = bt3
                   end if
                   goto 50
                end if

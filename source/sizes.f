@@ -29,7 +29,6 @@ c     maxclass        force field atom class definitions
 c     maxvlst         neighbors in van der Waals pair list
 c     maxelst         neighbors in electrostatics pair list
 c     maxulst         neighbors in dipole preconditioner list
-c     maxfft          grid points in each FFT dimension
 c     maxfix          geometric constraints and restraints
 c     maxvib          vibrational frequencies
 c     maxcell         unit cells in replicated crystal
@@ -42,9 +41,9 @@ c
       integer maxgrp,maxref
       integer maxtyp,maxclass
       integer maxvlst,maxelst
-      integer maxulst,maxfft
-      integer maxfix,maxvib
-      integer maxcell,maxres
+      integer maxulst,maxfix
+      integer maxvib,maxcell
+      integer maxres
       parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -54,7 +53,6 @@ c
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
       parameter (maxulst=100)
-      parameter (maxfft=250)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)
       parameter (maxcell=10000)

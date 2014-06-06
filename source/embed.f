@@ -2955,9 +2955,9 @@ c
       real*8 dx,dy,dz,gx,gy,gz
       real*8 dstsq,blosq
       real*8 radi,radsq
-      real*8, allocatable ::  xsort(:)
-      real*8, allocatable ::  ysort(:)
-      real*8, allocatable ::  zsort(:)
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
       real*8 derivs(3,*)
 c
 c
