@@ -150,9 +150,11 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(bsmod1))  allocate (bsmod1(maxfft))
-      if (.not. allocated(bsmod2))  allocate (bsmod2(maxfft))
-      if (.not. allocated(bsmod3))  allocate (bsmod3(maxfft))
+      if (.not. allocated(bsmod1))  allocate (bsmod1(nfft1))
+      if (.not. allocated(bsmod2))  allocate (bsmod2(nfft2))
+      if (.not. allocated(bsmod3))  allocate (bsmod3(nfft3))
+      if (.not. allocated(bsbuild))
+     &   allocate (bsbuild(bsorder,bsorder))
       if (.not. allocated(thetai1))  allocate (thetai1(4,bsorder,n))
       if (.not. allocated(thetai2))  allocate (thetai2(4,bsorder,n))
       if (.not. allocated(thetai3))  allocate (thetai3(4,bsorder,n))
