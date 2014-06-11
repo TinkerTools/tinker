@@ -107,19 +107,19 @@ c
 c
 c     dimensions for arrays used by Connolly routines
 c
-      maxcls = 50 * n
-      maxtt = 25 * n
-      maxt = 3 * n
-      maxp = 2 * n
-      maxv = 5 * n
-      maxen = 5 * n
-      maxfn = 2 * n
-      maxc = 5 * n
-      maxep = 5 * n
-      maxfs = 3 * n
-      maxcy = n
+      maxcls = 75 * n
+      maxtt = 40 * n
+      maxt = 4 * n
+      maxp = 4 * n
+      maxv = 12 * n
+      maxen = 12 * n
+      maxfn = 4 * n
+      maxc = 8 * n
+      maxep = 12 * n
+      maxfs = 6 * n
+      maxcy = 3 * n
       mxcyep = 30
-      maxfp = n
+      maxfp = 2 * n
       mxfpcy = 10
 c
 c     perform dynamic allocation of some global arrays

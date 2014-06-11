@@ -829,6 +829,7 @@ c
       if (.not. allocated(rborn))  allocate (rborn(n))
       if (.not. allocated(drb))  allocate (drb(n))
       if (.not. allocated(drbp))  allocate (drbp(n))
+      if (.not. allocated(drobc))  allocate (drobc(n))
       if (.not. allocated(shct))  allocate (shct(n))
 c
 c     set default value for exponent in the GB/GK function
