@@ -1,3 +1,1 @@
-cp bench4.dyn0 bench4.dyn
 time ../bin/dynamic bench4 1000 1.0 10.0 2 298.0
-rm bench4.dyn

@@ -13,8 +13,8 @@ c     ############################################################
 c
 c
 c     "ksolv" assigns implicit solvation energy parameters for
-c     the surface area, generalized Born, generalized Kirkwood
-c     and Poisson-Boltzmann, cavity-dispersion and HPMF models
+c     the surface area, generalized Born, generalized Kirkwood,
+c     Poisson-Boltzmann, cavity-dispersion and HPMF models
 c
 c
       subroutine ksolv

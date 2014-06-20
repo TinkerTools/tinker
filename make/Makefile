@@ -577,7 +577,6 @@ OBJS = action.o \
        shunt.o \
        sigmoid.o \
        sizes.o \
-       sizes.o \
        sktstuff.o \
        sniffer.o \
        socket.o \
@@ -1832,7 +1831,6 @@ shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o
 shunt.o:
 sigmoid.o:
 sizes.o:
-sizes.o:
 sktstuff.o: atomid.o atoms.o charge.o couple.o deriv.o fields.o files.o inform.o iounit.o keys.o moldyn.o mpole.o polar.o potent.o sizes.o socket.o
 sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o scales.o sizes.o usage.o
 socket.o:
@@ -1895,7 +1893,7 @@ xtalfit.o: atomid.o atoms.o bound.o boxes.o charge.o dipole.o files.o fracs.o io
 xtalmin.o: atoms.o boxes.o files.o inform.o iounit.o keys.o math.o scales.o sizes.o
 xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o sizes.o
-xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o iounit.o limits.o math.o molcul.o refer.o sizes.o titles.o units.o usage.o
+xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o math.o molcul.o refer.o sizes.o titles.o units.o usage.o
 xyzint.o: files.o iounit.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o sizes.o
 xyzsybyl.o: files.o iounit.o sizes.o titles.o

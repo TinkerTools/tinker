@@ -216,7 +216,7 @@ c
       call nextarg (answer,exist)
       if (.not. exist) then
          write (iout,170)
-  170    format (/,' Include Intramolecular Pairs in Distributions',
+  170    format (/,' Include Intramolecular Pairs in Distribution',
      &              ' [N] :  ',$)
          read (input,180)  record
   180    format (a120)
@@ -299,7 +299,8 @@ c
                               call image (dx,dy,dz)
                               rjk = sqrt(dx*dx + dy*dy + dz*dz)
                               bin = int(rjk/width) + 1
-                              hist(bin) = hist(bin) + 1
+                              if (bin .le. nbin)
+     &                           hist(bin) = hist(bin) + 1
                            end if
                         end if
                      end if

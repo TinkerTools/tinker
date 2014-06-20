@@ -43,8 +43,10 @@ c     get the coordinates and required force field parameters
 c
       call initial
       call getxyz
+      call attach
       call field
       call molecule
+      call kmpole
       call kpolar
       call mutate
 c
@@ -144,13 +146,13 @@ c
       fstr = ' Interactive Total Polarizability :    '
       if (nmol .eq. 1)  fstr = ' Interactive Molecular Polarizability :'
       if (digits .ge. 8) then
-         write (iout,130)  fstr(1:39),addu
+         write (iout,130)  fstr(1:39),malpha
   130    format (/,a39,f16.8)
       else if (digits .ge. 6) then
-         write (iout,140)  fstr(1:39),addu
+         write (iout,140)  fstr(1:39),malpha
   140    format (/,a39,f14.6)
       else
-         write (iout,150)  fstr(1:39),addu
+         write (iout,150)  fstr(1:39),malpha
   150    format (/,a39,f12.4)
       end if
 c
