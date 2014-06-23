@@ -1670,7 +1670,7 @@ kpitor.o:
 kpitors.o: atomid.o atoms.o bndstr.o couple.o inform.o iounit.o keys.o kpitor.o pitors.o potent.o sizes.o tors.o
 kpolar.o: atoms.o couple.o inform.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o usolve.o
 kpolr.o: sizes.o
-ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o kvdws.o math.o nonpol.o pbstuf.o potent.o sizes.o solute.o
+ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o kvdws.o math.o nonpol.o pbstuf.o potent.o ptable.o sizes.o solute.o
 kstbnd.o:
 kstrbnd.o: angbnd.o angpot.o atmlst.o atomid.o atoms.o couple.o fields.o inform.o iounit.o keys.o kstbnd.o merck.o potent.o ring.o sizes.o strbnd.o
 kstrtor.o: atmlst.o atomid.o atoms.o couple.o inform.o iounit.o keys.o ksttor.o potent.o sizes.o strtor.o tors.o
@@ -1893,7 +1893,7 @@ xtalfit.o: atomid.o atoms.o bound.o boxes.o charge.o dipole.o files.o fracs.o io
 xtalmin.o: atoms.o boxes.o files.o inform.o iounit.o keys.o math.o scales.o sizes.o
 xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o sizes.o
-xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o math.o molcul.o refer.o sizes.o titles.o units.o usage.o
+xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o math.o molcul.o ptable.o refer.o sizes.o titles.o units.o usage.o
 xyzint.o: files.o iounit.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o sizes.o
 xyzsybyl.o: files.o iounit.o sizes.o titles.o

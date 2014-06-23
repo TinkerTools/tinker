@@ -29,6 +29,7 @@ c
       use limits
       use math
       use molcul
+      use ptable
       use titles
       use units
       use usage
@@ -36,11 +37,11 @@ c
       integer i,j,k,m,it
       integer ixyz,imod
       integer init,stop
-      integer natom,atmnum
       integer nmode,mode
+      integer natom,atmnum
+      integer nlist,ncopy
       integer offset,origin
       integer oldtype,newtype
-      integer nlist,ncopy
       integer freeunit
       integer, allocatable :: list(:)
       integer, allocatable :: keep(:)
@@ -130,9 +131,9 @@ c
      &        /,3x,'(15) Move to Specified Rigid Body Coordinates',
      &        /,3x,'(16) Move Stray Molecules into Periodic Box',
      &        /,3x,'(17) Delete Molecules outside of Periodic Box',
-     &        /,3x,'(18) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(19) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(20) Append a Second XYZ File to Current One')
+     &        /,3x,'(18) Append a Second XYZ File to Current One',
+     &        /,3x,'(19) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(20) Soak Current Molecule in Box of Solvent')
 c
 c     get the desired type of coordinate file modification
 c
@@ -174,22 +175,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               if (ltitle .eq. 0) then
-                  write (imod,110)  n
-  110             format (i6)
-               else
-                  write (imod,120)  n,title(1:ltitle)
-  120             format (i6,2x,a)
-               end if
-               if (use_bounds) then
-                  write (imod,130)  xbox,ybox,zbox,alpha,beta,gamma
-  130             format (1x,6f12.6)
-               end if
-               do i = 1, n
-                  write (imod,140)  i+offset,name(i),x(i),y(i),z(i),
-     &                              type(i),(i12(j,i)+offset,j=1,n12(i))
-  140             format (i6,2x,a3,3f12.6,5i6)
-               end do
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -207,12 +193,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,150)
-  150    format (/,' Numbers of the Atoms to be Removed :  ',$)
-         read (input,160)  record
-  160    format (a120)
-         read (record,*,err=170,end=170)  (list(i),i=1,n)
-  170    continue
+         write (iout,110)
+  110    format (/,' Numbers of the Atoms to be Removed :  ',$)
+         read (input,120)  record
+  120    format (a120)
+         read (record,*,err=130,end=130)  (list(i),i=1,n)
+  130    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -241,7 +227,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -260,12 +246,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,180)
-  180    format (/,' Atom Types to be Removed :  ',$)
-         read (input,190)  record
-  190    format (a120)
-         read (record,*,err=200,end=200)  (list(i),i=1,n)
-  200    continue
+         write (iout,140)
+  140    format (/,' Atom Types to be Removed :  ',$)
+         read (input,150)  record
+  150    format (a120)
+         read (record,*,err=160,end=160)  (list(i),i=1,n)
+  160    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -276,10 +262,10 @@ c
                do j = 1, nlist
                   if (list(j) .eq. it) then
                      call delete (i)
-                     goto 210
+                     goto 170
                   end if
                end do
-  210          continue
+  170          continue
             end do
             call makeref (1)
             call readxyz (ixyz)
@@ -287,7 +273,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -332,14 +318,14 @@ c
                   zi = z(i)
                   do j = 1, n
                      if (use(j)) then
-                        if (keep(j) .eq. i)  goto 220
+                        if (keep(j) .eq. i)  goto 180
                         dist2 = (x(j)-xi)**2+(y(j)-yi)**2+(z(j)-zi)**2
-                        if (dist2 .le. cut2)  goto 220
+                        if (dist2 .le. cut2)  goto 180
                      end if
                   end do
                   nlist = nlist + 1
                   list(nlist) = i
-  220             continue
+  180             continue
                end if
             end do
             do i = nlist, 1, -1
@@ -351,7 +337,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -371,12 +357,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,230)
-  230    format (/,' Numbers of the Atoms to be Inserted :  ',$)
-         read (input,240)  record
-  240    format (a120)
-         read (record,*,err=250,end=250)  (list(i),i=1,n)
-  250    continue
+         write (iout,190)
+  190    format (/,' Numbers of the Atoms to be Inserted :  ',$)
+         read (input,200)  record
+  200    format (a120)
+         read (record,*,err=210,end=210)  (list(i),i=1,n)
+  210    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -401,7 +387,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -415,14 +401,14 @@ c
 c     get an old atom type and new atom type for replacement
 c
       if (mode .eq. 6) then
-  260    continue
+  220    continue
          oldtype = 0
          newtype = 0
-         write (iout,270)
-  270    format (/,' Numbers of the Old and New Atom Types :  ',$)
-         read (input,280)  record
-  280    format (a120)
-         read (record,*,err=260,end=260)  oldtype,newtype
+         write (iout,230)
+  230    format (/,' Numbers of the Old and New Atom Types :  ',$)
+         read (input,240)  record
+  240    format (a120)
+         read (record,*,err=220,end=220)  oldtype,newtype
          dowhile (.not. abort)
             do i = 1, n
                if (type(i) .eq. oldtype)  type(i) = newtype
@@ -434,7 +420,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -465,7 +451,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -483,26 +469,10 @@ c
             call unitcell
             call lattice
             do i = 1, n
-               rad(i) = 0.77d0
+               rad(i) = 0.76d0
                atmnum = atomic(i)
-               if (atmnum .eq. 0)  rad(i) = 0.00d0
-               if (atmnum .eq. 1)  rad(i) = 0.37d0
-               if (atmnum .eq. 2)  rad(i) = 0.32d0
-               if (atmnum .eq. 6)  rad(i) = 0.77d0
-               if (atmnum .eq. 7)  rad(i) = 0.75d0
-               if (atmnum .eq. 8)  rad(i) = 0.73d0
-               if (atmnum .eq. 9)  rad(i) = 0.71d0
-               if (atmnum .eq. 10)  rad(i) = 0.69d0
-               if (atmnum .eq. 14)  rad(i) = 1.11d0
-               if (atmnum .eq. 15)  rad(i) = 1.06d0
-               if (atmnum .eq. 16)  rad(i) = 1.02d0
-               if (atmnum .eq. 17)  rad(i) = 0.99d0
-               if (atmnum .eq. 18)  rad(i) = 0.97d0
-               if (atmnum .eq. 35)  rad(i) = 1.14d0
-               if (atmnum .eq. 36)  rad(i) = 1.10d0
-               if (atmnum .eq. 53)  rad(i) = 1.33d0
-               if (atmnum .eq. 54)  rad(i) = 1.30d0
-               rad(i) = 1.1d0 * rad(i)
+               if (atmnum .ne. 0)  rad(i) = covrad(atmnum)
+               rad(i) = 1.15d0 * rad(i)
             end do
             do i = 1, n
                n12(i) = 0
@@ -535,7 +505,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -561,7 +531,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -586,7 +556,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -602,12 +572,12 @@ c
          xr = 0.0d0
          yr = 0.0d0
          zr = 0.0d0
-         write (iout,290)
-  290    format (/,' Enter Translation Vector Components :  ',$)
-         read (input,300)  record
-  300    format (a120)
-         read (record,*,err=310,end=310)  xr,yr,zr
-  310    continue
+         write (iout,250)
+  250    format (/,' Enter Translation Vector Components :  ',$)
+         read (input,260)  record
+  260    format (a120)
+         read (record,*,err=270,end=270)  xr,yr,zr
+  270    continue
          dowhile (.not. abort)
             do i = 1, n
                x(i) = x(i) + xr
@@ -620,7 +590,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -659,7 +629,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -672,10 +642,10 @@ c
 c     translate to place a specified atom at the origin
 c
       if (mode .eq. 13) then
-         write (iout,320)
-  320    format (/,' Number of the Atom to Move to the Origin :  ',$)
-         read (input,330)  origin
-  330    format (i10)
+         write (iout,280)
+  280    format (/,' Number of the Atom to Move to the Origin :  ',$)
+         read (input,290)  origin
+  290    format (i10)
          dowhile (.not. abort)
             xorig = x(origin)
             yorig = y(origin)
@@ -691,7 +661,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -712,7 +682,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -731,12 +701,12 @@ c
          phi = 0.0d0
          theta = 0.0d0
          psi = 0.0d0
-         write (iout,340)
-  340    format (/,' Enter Rigid Body Coordinates :  ',$)
-         read (input,350)  record
-  350    format (a120)
-         read (record,*,err=360,end=360)  xcm,ycm,zcm,phi,theta,psi
-  360    continue
+         write (iout,300)
+  300    format (/,' Enter Rigid Body Coordinates :  ',$)
+         read (input,310)  record
+  310    format (a120)
+         read (record,*,err=320,end=320)  xcm,ycm,zcm,phi,theta,psi
+  320    continue
          call inertia (2)
          phi = phi / radian
          theta = theta / radian
@@ -771,7 +741,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -797,7 +767,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -814,12 +784,12 @@ c
          ynew = 0.0d0
          znew = 0.0d0
          do while (xbox .eq. 0.0d0)
-            write (iout,370)
-  370       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,380)  record
-  380       format (a120)
-            read (record,*,err=390,end=390)  xnew,ynew,znew
-  390       continue
+            write (iout,330)
+  330       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,340)  record
+  340       format (a120)
+            read (record,*,err=350,end=350)  xnew,ynew,znew
+  350       continue
             if (ynew .eq. 0.0d0)  ynew = xnew
             if (znew .eq. 0.0d0)  znew = xnew
          end do
@@ -886,7 +856,7 @@ c
             if (multi) then
                call makeref (2)
                call getref (1)
-               call prtxyz (imod)
+               call prtmod (imod,offset)
                call getref (2)
             end if
          end do
@@ -898,23 +868,53 @@ c
          end if
       end if
 c
-c     create random box full of the current coordinates file
+c     append a second file to the current coordinates file
 c
       if (mode .eq. 18) then
-         write (iout,400)
-  400    format (/,' Enter Number of Copies to put in Box :  ',$)
-         read (input,410)  ncopy
-  410    format (i10)
+         append = .false.
+         dowhile (.not. abort)
+            call makeref (1)
+            if (append) then
+               call getref (3)
+            else
+               call getxyz
+               call makeref (3)
+               append = .true.
+            end if
+            call merge (1)
+            call makeref (1)
+            call readxyz (ixyz)
+            if (.not. abort)  multi = .true.
+            if (multi) then
+               call makeref (2)
+               call getref (1)
+               call prtmod (imod,offset)
+               call getref (2)
+            end if
+         end do
+         if (.not. multi) then
+            call getref (1)
+            goto 40
+         end if
+      end if
+c
+c     create random box full of the current coordinates file
+c
+      if (mode .eq. 19) then
+         write (iout,360)
+  360    format (/,' Enter Number of Copies to put in Box :  ',$)
+         read (input,370)  ncopy
+  370    format (i10)
          xbox = 0.0d0
          ybox = 0.0d0
          zbox = 0.0d0
          do while (xbox .eq. 0.0d0)
-            write (iout,420)
-  420       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,430)  record
-  430       format (a120)
-            read (record,*,err=440,end=440)  xbox,ybox,zbox
-  440       continue
+            write (iout,380)
+  380       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,390)  record
+  390       format (a120)
+            read (record,*,err=400,end=400)  xbox,ybox,zbox
+  400       continue
             if (ybox .eq. 0.0d0)  ybox = xbox
             if (zbox .eq. 0.0d0)  zbox = xbox
          end do
@@ -992,50 +992,20 @@ c
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 19) then
-         call soak
-      end if
-c
-c     append a second file to the current coordinates file
-c
       if (mode .eq. 20) then
-         append = .false.
-         dowhile (.not. abort)
-            call makeref (1)
-            if (append) then
-               call getref (3)
-            else
-               call getxyz
-               call makeref (3)
-               append = .true.
-            end if
-            call merge (1)
-            call makeref (1)
-            call readxyz (ixyz)
-            if (.not. abort)  multi = .true.
-            if (multi) then
-               call makeref (2)
-               call getref (1)
-               call prtxyz (imod)
-               call getref (2)
-            end if
-         end do
-         if (.not. multi) then
-            call getref (1)
-            goto 40
-         end if
+         call soak
       end if
 c
 c     output final coordinates for single frame input file
 c
-      if (.not. multi)  call prtoff (imod,offset)
+      if (.not. multi)  call prtmod (imod,offset)
 c
 c     perform any final tasks before program exit
 c
       if (opened) then
          close (unit=imod)
-         write (iout,490)  modfile
-  490    format (/,' New Coordinates written to File :  ',a)
+         write (iout,410)  modfile
+  410    format (/,' New Coordinates written to File :  ',a)
       end if
       close (unit=ixyz)
       call final
@@ -1044,16 +1014,16 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine prtoff  --  Cartesian coordinates with offset  ##
+c     ##  subroutine prtmod  --  Cartesian coordinates with offset  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "prtoff" writes out a set of Cartesian coordinates with a
-c     specified atom number offset to an external disk file
+c     "prtmod" writes out a set of modified Cartesian coordinates
+c     with an optional atom number offset to an external disk file
 c
 c
-      subroutine prtoff (imod,offset)
+      subroutine prtmod (imod,offset)
       use sizes
       use atomid
       use atoms

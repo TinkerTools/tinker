@@ -810,6 +810,7 @@ c
       use gkstuf
       use keys
       use kvdws
+      use ptable
       use solute
       implicit none
       integer i,j,k,l,m
@@ -878,8 +879,9 @@ c     assign standard solvation radii adapted from Macromodel
 c
       else if (radtyp .eq. 'MACROMODEL') then
          do i = 1, n
-            rsolv(i) = 2.0d0
             atmnum = atomic(i)
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
             if (atmnum .eq. 1) then
                rsolv(i) = 1.25d0
                k = i12(1,i)
@@ -937,12 +939,13 @@ c
             end if
          end do
 c
-c     assign base atomic radii from traditional Bondi values
+c     assign base atomic radii as modified Bondi values
 c
       else if (radtyp .eq. 'AMOEBA') then
          do i = 1, n
-            rsolv(i) = 2.0d0
             atmnum = atomic(i)
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
             if (atmnum .eq. 1) then
                rsolv(i) = 1.32d0
                k = i12(1,i)
@@ -968,51 +971,15 @@ c
                rsolv(i) = 1.55d0
                if (n12(i) .eq. 2)  rsolv(i) = 1.45d0
             end if
-            if (atmnum .eq. 9)  rsolv(i) = 1.54d0
-            if (atmnum .eq. 10)  rsolv(i) = 1.46d0
-            if (atmnum .eq. 11)  rsolv(i) = 2.09d0
-            if (atmnum .eq. 12)  rsolv(i) = 1.79d0
-            if (atmnum .eq. 14)  rsolv(i) = 1.89d0
-            if (atmnum .eq. 15)  rsolv(i) = 1.96d0
-            if (atmnum .eq. 16)  rsolv(i) = 1.86d0
-            if (atmnum .eq. 17)  rsolv(i) = 1.82d0
-            if (atmnum .eq. 18)  rsolv(i) = 1.79d0
-            if (atmnum .eq. 19)  rsolv(i) = 2.23d0
-            if (atmnum .eq. 20)  rsolv(i) = 1.91d0
-            if (atmnum .eq. 35)  rsolv(i) = 2.00d0
-            if (atmnum .eq. 36)  rsolv(i) = 1.90d0
-            if (atmnum .eq. 37)  rsolv(i) = 2.26d0
-            if (atmnum .eq. 53)  rsolv(i) = 2.37d0
-            if (atmnum .eq. 54)  rsolv(i) = 2.07d0
-            if (atmnum .eq. 55)  rsolv(i) = 2.63d0
-            if (atmnum .eq. 56)  rsolv(i) = 2.30d0
          end do
 c
-c     assign base atomic radii from traditional Bondi values
+c     assign base atomic radii as traditional Bondi values
 c
       else
          do i = 1, n
-            rsolv(i) = 2.0d0
             atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.00d0
-            if (atmnum .eq. 1)  rsolv(i) = 1.20d0
-            if (atmnum .eq. 2)  rsolv(i) = 1.40d0
-            if (atmnum .eq. 5)  rsolv(i) = 1.80d0
-            if (atmnum .eq. 6)  rsolv(i) = 1.70d0
-            if (atmnum .eq. 7)  rsolv(i) = 1.55d0
-            if (atmnum .eq. 8)  rsolv(i) = 1.52d0
-            if (atmnum .eq. 9)  rsolv(i) = 1.47d0
-            if (atmnum .eq. 10)  rsolv(i) = 1.54d0
-            if (atmnum .eq. 14)  rsolv(i) = 2.10d0
-            if (atmnum .eq. 15)  rsolv(i) = 1.80d0
-            if (atmnum .eq. 16)  rsolv(i) = 1.80d0
-            if (atmnum .eq. 17)  rsolv(i) = 1.75d0
-            if (atmnum .eq. 18)  rsolv(i) = 1.88d0
-            if (atmnum .eq. 34)  rsolv(i) = 1.90d0
-            if (atmnum .eq. 35)  rsolv(i) = 1.85d0
-            if (atmnum .eq. 36)  rsolv(i) = 2.02d0
-            if (atmnum .eq. 53)  rsolv(i) = 1.98d0
-            if (atmnum .eq. 54)  rsolv(i) = 2.16d0
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
          end do
       end if
 c
@@ -1148,6 +1115,7 @@ c
       use nonpol
       use pbstuf
       use potent
+      use ptable
       use solute
       implicit none
       integer i,j,k,l,m
@@ -1465,8 +1433,9 @@ c     assign standard solvation radii adapted from Macromodel
 c
       else if (radtyp .eq. 'MACROMODEL') then
          do i = 1, n
-            rsolv(i) = 2.0d0
             atmnum = atomic(i)
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
             if (atmnum .eq. 1) then
                rsolv(i) = 1.25d0
                k = i12(1,i)
@@ -1528,27 +1497,9 @@ c     assign base atomic radii from traditional Bondi values
 c
       else
          do i = 1, n
-            rsolv(i) = 2.0d0
             atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.00d0
-            if (atmnum .eq. 1)  rsolv(i) = 1.20d0
-            if (atmnum .eq. 2)  rsolv(i) = 1.40d0
-            if (atmnum .eq. 5)  rsolv(i) = 1.80d0
-            if (atmnum .eq. 6)  rsolv(i) = 1.70d0
-            if (atmnum .eq. 7)  rsolv(i) = 1.55d0
-            if (atmnum .eq. 8)  rsolv(i) = 1.52d0
-            if (atmnum .eq. 9)  rsolv(i) = 1.47d0
-            if (atmnum .eq. 10)  rsolv(i) = 1.54d0
-            if (atmnum .eq. 14)  rsolv(i) = 2.10d0
-            if (atmnum .eq. 15)  rsolv(i) = 1.80d0
-            if (atmnum .eq. 16)  rsolv(i) = 1.80d0
-            if (atmnum .eq. 17)  rsolv(i) = 1.75d0
-            if (atmnum .eq. 18)  rsolv(i) = 1.88d0
-            if (atmnum .eq. 34)  rsolv(i) = 1.90d0
-            if (atmnum .eq. 35)  rsolv(i) = 1.85d0
-            if (atmnum .eq. 36)  rsolv(i) = 2.02d0
-            if (atmnum .eq. 53)  rsolv(i) = 1.98d0
-            if (atmnum .eq. 54)  rsolv(i) = 2.16d0
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
          end do
       end if
 c

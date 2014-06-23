@@ -51,7 +51,7 @@ c
       x(iatom) = 0.0d0
       y(iatom) = 0.0d0
       z(iatom) = 0.0d0
-      type(iatom) = maxtyp
+      type(iatom) = maxtyp + 1
       n12(iatom) = 0
 c
 c     shift the connected atom lists to allow the insertion

@@ -13,10 +13,8 @@ c     ############################################################
 c
 c
 c     "sizes" sets values for critical array dimensions used
-c     throughout the software; these parameters will fix the size
-c     of the largest systems that can be handled; values too large
-c     for the computer memory or swap space to accomodate will
-c     result in poor performance or outright failure
+c     throughout the software; these parameters fix the size of
+c     the largest systems that can be handled
 c
 c     parameter:      maximum allowed number of:
 c

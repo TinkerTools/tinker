@@ -97,7 +97,7 @@ c
       real*8 dy(maxarc)
       real*8 dsq(maxarc)
       real*8 d(maxarc)
-      real*8, allocatable :: vdwrad(:)
+      real*8, allocatable :: volrad(:)
       real*8 radius(*)
       real*8 dex(3,*)
       logical, allocatable :: skip(:)
@@ -122,7 +122,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (vdwrad(n))
+      allocate (volrad(n))
       allocate (skip(n))
 c
 c     assign van der Waals radii to the atoms; note that
@@ -130,13 +130,13 @@ c     the radii are incremented by the size of the probe;
 c     then get the maximum and minimum ranges of atoms
 c
       do i = 1, n
-         vdwrad(i) = radius(i)
-         if (vdwrad(i) .eq. 0.0d0) then
+         volrad(i) = radius(i)
+         if (volrad(i) .eq. 0.0d0) then
             skip(i) = .true.
          else
             skip(i) = .false.
-            vdwrad(i) = vdwrad(i) + probe
-            if (vdwrad(i) .gt. rmax)  rmax = vdwrad(i)
+            volrad(i) = volrad(i) + probe
+            if (volrad(i) .gt. rmax)  rmax = volrad(i)
             if (x(i) .lt. xmin)  xmin = x(i)
             if (x(i) .gt. xmax)  xmax = x(i)
             if (y(i) .lt. ymin)  ymin = y(i)
@@ -241,7 +241,7 @@ c
          pre_dy = 0.0d0
          pre_dz = 0.0d0
          if (skip(ir))  goto 50
-         rr = vdwrad(ir)
+         rr = volrad(ir)
          rrx2 = 2.0d0 * rr
          rrsq = rr * rr
          xr = x(ir)
@@ -283,7 +283,7 @@ c
                            dy(io) = y(in) - yr
                            dsq(io) = dx(io)**2 + dy(io)**2
                            dist2 = dsq(io) + (z(in)-zr)**2
-                           vdwsum = (rr+vdwrad(in))**2
+                           vdwsum = (rr+volrad(in))**2
                            if (dist2.gt.vdwsum .or. dist2.eq.0.0d0) then
                               io = io - 1
                            else
@@ -339,7 +339,7 @@ c
                narc = 0
                do k = 1, io
                   in = inov(k)
-                  rinsq = vdwrad(in)**2
+                  rinsq = volrad(in)**2
                   rsec2n = rinsq - (zgrid-z(in))**2
                   if (rsec2n .gt. 0.0d0) then
                      rsecn = sqrt(rsec2n)
@@ -494,7 +494,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (vdwrad)
+      deallocate (volrad)
       deallocate (skip)
       return
       end
@@ -567,7 +567,7 @@ c
       real*8 dsq(maxarc)
       real*8 d(maxarc)
       real*8 radius(*)
-      real*8, allocatable :: vdwrad(:)
+      real*8, allocatable :: volrad(:)
       real*8 xhess(3,*)
       real*8 yhess(3,*)
       real*8 zhess(3,*)
@@ -594,19 +594,19 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (vdwrad(n))
+      allocate (volrad(n))
 c
 c     assign van der Waals radii to the atoms; note that
 c     the radii are incremented by the size of the probe
 c
       do i = 1, n
-         vdwrad(i) = radius(i)
-         if (vdwrad(i) .ne. 0.0d0)  vdwrad(i) = vdwrad(i) + probe
+         volrad(i) = radius(i)
+         if (volrad(i) .ne. 0.0d0)  volrad(i) = volrad(i) + probe
       end do
 c
 c     set the radius and coordinates for current atom
 c
-      rr = vdwrad(iatom)
+      rr = volrad(iatom)
       rrx2 = 2.0d0 * rr
       rrsq = rr**2
       xr = x(iatom)
@@ -617,12 +617,12 @@ c     select potential intersecting atoms
 c
       nnear = 1
       do j = 1, n
-         if (j.ne.iatom .and. vdwrad(j).ne.0.0d0) then
+         if (j.ne.iatom .and. volrad(j).ne.0.0d0) then
             dx(nnear) = x(j) - xr
             dy(nnear) = y(j) - yr
             dsq(nnear) = dx(nnear)**2 + dy(nnear)**2
             dist2 = dsq(nnear) + (z(j)-zr)**2
-            rcut2 = (vdwrad(j) + rr)**2
+            rcut2 = (volrad(j) + rr)**2
             if (dist2 .lt. rcut2) then
                d(nnear) = sqrt(dsq(nnear))
                inear(nnear) = j
@@ -681,7 +681,7 @@ c
      &                   .and. narc.lt.maxarc)
                k = k + 1
                in = inear(k)
-               rinsq = vdwrad(in)**2
+               rinsq = volrad(in)**2
                rsec2n = rinsq - (zgrid-z(in))**2
                if (rsec2n .gt. 0.0d0) then
                   rsecn = sqrt(rsec2n)
@@ -870,7 +870,7 @@ c
                      s2 = delx(i)**2 + dely(i)**2
                      r_s(i) = 1.0d0 / sqrt(s2)
                      r_s2(i) = r_s(i)**2
-                     r(i) = sqrt(vdwrad(id(i))**2 - delz(i)**2)
+                     r(i) = sqrt(volrad(id(i))**2 - delz(i)**2)
                      r_r(i) = 1.0d0 / r(i)
                      u(i) = (ri**2+s2-r(i)**2) * (0.5d0*r_s(i)/ri)
                   end do
@@ -966,6 +966,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (vdwrad)
+      deallocate (volrad)
       return
       end
