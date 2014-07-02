@@ -58,7 +58,8 @@ c
       use virial
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,dedphi,rcb,fgrp
+      real*8 e,eto
+      real*8 dedphi,rcb,fgrp
       real*8 v1,v2,v3,v4,v5,v6
       real*8 c1,c2,c3,c4,c5,c6
       real*8 s1,s2,s3,s4,s5,s6
@@ -91,6 +92,8 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 viro(3,3)
+      real*8, allocatable :: deto(:,:)
       logical proceed
 c
 c
@@ -102,6 +105,31 @@ c
          det(2,i) = 0.0d0
          det(3,i) = 0.0d0
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (deto(3,n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      eto = et
+      do i = 1, n
+         deto(1,i) = det(1,i)
+         deto(2,i) = det(2,i)
+         deto(3,i) = det(3,i)
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
+!$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,use_group,use_polymer)
+!$OMP& shared(eto,deto,viro)
+!$OMP DO reduction(+:eto,deto,viro) schedule(guided)
 c
 c     calculate the torsional angle energy and first derivatives
 c
@@ -260,19 +288,19 @@ c
 c
 c     increment the total torsional angle energy and gradient
 c
-               et = et + e
-               det(1,ia) = det(1,ia) + dedxia
-               det(2,ia) = det(2,ia) + dedyia
-               det(3,ia) = det(3,ia) + dedzia
-               det(1,ib) = det(1,ib) + dedxib
-               det(2,ib) = det(2,ib) + dedyib
-               det(3,ib) = det(3,ib) + dedzib
-               det(1,ic) = det(1,ic) + dedxic
-               det(2,ic) = det(2,ic) + dedyic
-               det(3,ic) = det(3,ic) + dedzic
-               det(1,id) = det(1,id) + dedxid
-               det(2,id) = det(2,id) + dedyid
-               det(3,id) = det(3,id) + dedzid
+               eto = eto + e
+               deto(1,ia) = deto(1,ia) + dedxia
+               deto(2,ia) = deto(2,ia) + dedyia
+               deto(3,ia) = deto(3,ia) + dedzia
+               deto(1,ib) = deto(1,ib) + dedxib
+               deto(2,ib) = deto(2,ib) + dedyib
+               deto(3,ib) = deto(3,ib) + dedzib
+               deto(1,ic) = deto(1,ic) + dedxic
+               deto(2,ic) = deto(2,ic) + dedyic
+               deto(3,ic) = deto(3,ic) + dedzic
+               deto(1,id) = deto(1,id) + dedxid
+               deto(2,id) = deto(2,id) + dedyid
+               deto(3,id) = deto(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -282,18 +310,41 @@ c
                vyy = ycb*(dedyic+dedyid) - yba*dedyia + ydc*dedyid
                vzy = zcb*(dedyic+dedyid) - zba*dedyia + zdc*dedyid
                vzz = zcb*(dedzic+dedzid) - zba*dedzia + zdc*dedzid
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
+               viro(1,1) = viro(1,1) + vxx
+               viro(2,1) = viro(2,1) + vyx
+               viro(3,1) = viro(3,1) + vzx
+               viro(1,2) = viro(1,2) + vyx
+               viro(2,2) = viro(2,2) + vyy
+               viro(3,2) = viro(3,2) + vzy
+               viro(1,3) = viro(1,3) + vzx
+               viro(2,3) = viro(2,3) + vzy
+               viro(3,3) = viro(3,3) + vzz
             end if
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      et = eto
+      do i = 1, n
+         det(1,i) = deto(1,i)
+         det(2,i) = deto(2,i)
+         det(3,i) = deto(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (deto)
       return
       end
 c

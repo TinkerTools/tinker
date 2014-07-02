@@ -707,7 +707,7 @@ c
       integer ii,kk,kkk
       integer ix,iy,iz
       integer kx,ky,kz
-      integer nemtt,neptt
+      integer nemo,nepo
       real*8 e,ei,fgrp
       real*8 f,fm,fp
       real*8 r,r2,xr,yr,zr
@@ -727,14 +727,14 @@ c
       real*8 qkx,qky,qkz
       real*8 scale3,scale5
       real*8 scale7
-      real*8 emtt,eptt
-      real*8 eintert
+      real*8 emo,epo
+      real*8 eintero
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: aemtt(:)
-      real*8, allocatable :: aeptt(:)
+      real*8, allocatable :: aemo(:)
+      real*8, allocatable :: aepo(:)
       logical proceed
       logical header,huge
       logical usei,usek
@@ -770,8 +770,8 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (pscale(n))
-      allocate (aemtt(n))
-      allocate (aeptt(n))
+      allocate (aemo(n))
+      allocate (aepo(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -788,26 +788,26 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      emtt = 0.0d0
-      eptt = 0.0d0
-      eintert = einter
-      nemtt = nem
-      neptt = nep
+      emo = 0.0d0
+      epo = 0.0d0
+      eintero = einter
+      nemo = nem
+      nepo = nep
       do i = 1, n
-         aemtt(i) = aem(i)
-         aeptt(i) = aep(i)
+         aemo(i) = aem(i)
+         aepo(i) = aep(i)
       end do
 c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) firstprivate(f)
-!$OMP& private(i,j,k,ii,kk,kkk,e,ei,damp,expdamp,pdi,pti,pgamma,
-!$OMP& scale3,scale5,scale7,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
-!$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
-!$OMP& ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,
-!$OMP& fgrp,fm,fp,sc,gl,sci,gli)
+!$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,ei,
+!$OMP& damp,expdamp,pdi,pti,pgamma,scale3,scale5,scale7,xr,yr,zr,r,r2,
+!$OMP& rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,qix,qiy,qiz,qixx,qixy,qixz,
+!$OMP& qiyy,qiyz,qizz,uix,uiy,uiz,ck,dkx,dky,dkz,qkx,qky,qkz,qkxx,qkxy,
+!$OMP& qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,fgrp,fm,fp,sc,gl,sci,gli)
 !$OMP& firstprivate(mscale,pscale)
-!$OMP DO reduction(+:emtt,eptt,eintert,nemtt,neptt,aemtt,aeptt)
+!$OMP DO reduction(+:emo,epo,eintero,nemo,nepo,aemo,aepo)
 !$OMP& schedule(guided)
 c
 c     calculate the multipole interaction energy term
@@ -988,19 +988,19 @@ c     increment the overall multipole and polarization energies
 c
                   muse = (use_mpole .and. mscale(kk).ne.0.0d0)
                   puse = (use_polar .and. pscale(kk).ne.0.0d0)
-                  if (muse)  nemtt = nemtt + 1
-                  if (puse)  neptt = neptt + 1
-                  emtt = emtt + e
-                  eptt = eptt + ei
-                  aemtt(ii) = aemtt(ii) + 0.5d0*e
-                  aemtt(kk) = aemtt(kk) + 0.5d0*e
-                  aeptt(ii) = aeptt(ii) + 0.5d0*ei
-                  aeptt(kk) = aeptt(kk) + 0.5d0*ei
+                  if (muse)  nemo = nemo + 1
+                  if (puse)  nepo = nepo + 1
+                  emo = emo + e
+                  epo = epo + ei
+                  aemo(ii) = aemo(ii) + 0.5d0*e
+                  aemo(kk) = aemo(kk) + 0.5d0*e
+                  aepo(ii) = aepo(ii) + 0.5d0*ei
+                  aepo(kk) = aepo(kk) + 0.5d0*ei
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(ii) .ne. molcule(kk)) then
-                     eintert = eintert + e + ei
+                     eintero = eintero + e + ei
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1053,22 +1053,22 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      em = em + emtt
-      ep = ep + eptt
-      einter = eintert
-      nem = nemtt
-      nep = neptt
+      em = em + emo
+      ep = ep + epo
+      einter = eintero
+      nem = nemo
+      nep = nepo
       do i = 1, n
-         aem(i) = aemtt(i)
-         aep(i) = aeptt(i)
+         aem(i) = aemo(i)
+         aep(i) = aepo(i)
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (pscale)
-      deallocate (aemtt)
-      deallocate (aeptt)
+      deallocate (aemo)
+      deallocate (aepo)
       return
       end
 c
@@ -1990,7 +1990,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
-      integer nemtt,neptt
+      integer nemo,nepo
       real*8 e,ei,eintra
       real*8 f,erfc,r,r2
       real*8 xr,yr,zr
@@ -2014,15 +2014,15 @@ c
       real*8 qkx,qky,qkz
       real*8 scale3,scale5
       real*8 scale7
-      real*8 emtt,eptt
-      real*8 eintrat
+      real*8 emo,epo
+      real*8 eintrao
       real*8 sc(10),sci(8)
       real*8 gl(0:4),gli(3)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: aemtt(:)
-      real*8, allocatable :: aeptt(:)
+      real*8, allocatable :: aemo(:)
+      real*8, allocatable :: aepo(:)
       logical header,huge
       logical muse,puse
       character*6 mode
@@ -2038,8 +2038,8 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (pscale(n))
-      allocate (aemtt(n))
-      allocate (aeptt(n))
+      allocate (aemo(n))
+      allocate (aepo(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -2056,14 +2056,14 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      emtt = 0.0d0
-      eptt = 0.0d0
-      eintrat = eintra
-      nemtt = nem
-      neptt = nep
+      emo = 0.0d0
+      epo = 0.0d0
+      eintrao = eintra
+      nemo = nem
+      nepo = nep
       do i = 1, n
-         aemtt(i) = aem(i)
-         aeptt(i) = aep(i)
+         aemo(i) = aem(i)
+         aepo(i) = aep(i)
       end do
 c
 c     set OpenMP directives for the major loop structure
@@ -2076,7 +2076,7 @@ c
 !$OMP& ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,
 !$OMP& bn,sc,gl,sci,gli)
 !$OMP& firstprivate(mscale,pscale)
-!$OMP DO reduction(+:emtt,eptt,eintrat,nemtt,neptt,aemtt,aeptt)
+!$OMP DO reduction(+:emo,epo,eintrao,nemo,nepo,aemo,aepo)
 !$OMP& schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
@@ -2252,14 +2252,14 @@ c
                ei = 0.5d0 * f * ei
                muse = use_mpole
                puse = use_polar
-               if (muse)  nemtt = nemtt + 1
-               if (puse)  neptt = neptt + 1
-               emtt = emtt + e
-               eptt = eptt + ei
-               aemtt(ii) = aemtt(ii) + 0.5d0*e
-               aemtt(kk) = aemtt(kk) + 0.5d0*e
-               aeptt(ii) = aeptt(ii) + 0.5d0*ei
-               aeptt(kk) = aeptt(kk) + 0.5d0*ei
+               if (muse)  nemo = nemo + 1
+               if (puse)  nepo = nepo + 1
+               emo = emo + e
+               epo = epo + ei
+               aemo(ii) = aemo(ii) + 0.5d0*e
+               aemo(kk) = aemo(kk) + 0.5d0*e
+               aepo(ii) = aepo(ii) + 0.5d0*ei
+               aepo(kk) = aepo(kk) + 0.5d0*ei
 c
 c     increment the total intramolecular energy
 c
@@ -2268,7 +2268,7 @@ c
      &                    + gli(3)*rr7*scale7
                eifix = 0.5d0 * f * eifix
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintrat = eintrat + efix + eifix
+                  eintrao = eintrao + efix + eifix
                end if
 c
 c     print a message if the energy of this interaction is large
@@ -2321,21 +2321,21 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      em = em + emtt
-      ep = ep + eptt
-      eintra = eintrat
-      nem = nemtt
-      nep = neptt
+      em = em + emo
+      ep = ep + epo
+      eintra = eintrao
+      nem = nemo
+      nep = nepo
       do i = 1, n
-         aem(i) = aemtt(i)
-         aep(i) = aeptt(i)
+         aem(i) = aemo(i)
+         aep(i) = aepo(i)
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (pscale)
-      deallocate (aemtt)
-      deallocate (aeptt)
+      deallocate (aemo)
+      deallocate (aepo)
       return
       end

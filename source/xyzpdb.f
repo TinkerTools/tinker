@@ -545,7 +545,8 @@ c
                   call pdbatom (' O  ',resname,i,oi(i))
                end if
                call getside (resname,i,ci(i),cai(i),cbi)
-               if (resname.eq.'CYS' .or. resname.eq.'CYX') then
+               if ((resname.eq.'CYS'.or.resname.eq.'CYX')
+     &               .and. cbi.ne.0) then
                   resname = 'CYS'
                   do j = 1, n13(cbi)
                      if (atomic(i13(j,cbi)) .eq. 16)  resname = 'CYX'
@@ -780,6 +781,7 @@ c
          end if
       end do
    10 continue
+      if (cbi .eq. 0)  return
 c
 c     glycine residue  (GLY)
 c
@@ -1135,6 +1137,10 @@ c
          end if
       end do
    20 continue
+c
+c     backbone only if no alpha hydrogen or beta carbon
+c
+      if (hca.eq.0 .and. cbi.eq.0)  return
 c
 c     if no alpha hydrogen, then united atom force field
 c

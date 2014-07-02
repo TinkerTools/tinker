@@ -841,11 +841,11 @@ c
       real*8 rc5,rc6,rc7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 ect,eintert
-      real*8 virt(3,3)
+      real*8 eco,eintero
+      real*8 viro(3,3)
       real*8, allocatable :: cscale(:)
-      real*8, allocatable :: dect1(:,:)
-      real*8, allocatable :: dect2(:,:)
+      real*8, allocatable :: deco1(:,:)
+      real*8, allocatable :: deco2(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -863,8 +863,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
-      allocate (dect1(3,n))
-      allocate (dect2(3,n))
+      allocate (deco1(3,n))
+      allocate (deco2(3,n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -880,20 +880,20 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      ect = ec
-      eintert = einter
+      eco = ec
+      eintero = einter
       do i = 1, n
-         dect1(1,i) = 0.0d0
-         dect1(2,i) = 0.0d0
-         dect1(3,i) = 0.0d0
-         dect2(1,i) = 0.0d0
-         dect2(2,i) = 0.0d0
-         dect2(3,i) = 0.0d0
+         deco1(1,i) = 0.0d0
+         deco1(2,i) = 0.0d0
+         deco1(3,i) = 0.0d0
+         deco2(1,i) = 0.0d0
+         deco2(2,i) = 0.0d0
+         deco2(3,i) = 0.0d0
       end do
       do i = 1, 3
-         virt(1,i) = vir(1,i)
-         virt(2,i) = vir(2,i)
-         virt(3,i) = vir(3,i)
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
       end do
 c
 c     set OpenMP directives for the major loop structure
@@ -903,8 +903,8 @@ c
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP& molcule,ebuffer) firstprivate(cscale)
-!$OMP& shared(ect,eintert,dect1,dect2,virt)
-!$OMP DO reduction(+:ect,eintert,dect1,dect2,virt)
+!$OMP& shared(eco,eintero,deco1,deco2,viro)
+!$OMP DO reduction(+:eco,eintero,deco1,deco2,viro)
 !$OMP& schedule(guided)
 c
 c     compute the charge interaction energy and first derivatives
@@ -1014,19 +1014,19 @@ c
 c
 c     increment the overall energy and derivative expressions
 c
-                  ect = ect + e
-                  dect1(1,i) = dect1(1,i) + dedx
-                  dect1(2,i) = dect1(2,i) + dedy
-                  dect1(3,i) = dect1(3,i) + dedz
-                  dect1(1,ic) = dect1(1,ic) + dedxc
-                  dect1(2,ic) = dect1(2,ic) + dedyc
-                  dect1(3,ic) = dect1(3,ic) + dedzc
-                  dect2(1,k) = dect2(1,k) - dedx
-                  dect2(2,k) = dect2(2,k) - dedy
-                  dect2(3,k) = dect2(3,k) - dedz
-                  dect2(1,kc) = dect2(1,kc) - dedxc
-                  dect2(2,kc) = dect2(2,kc) - dedyc
-                  dect2(3,kc) = dect2(3,kc) - dedzc
+                  eco = eco + e
+                  deco1(1,i) = deco1(1,i) + dedx
+                  deco1(2,i) = deco1(2,i) + dedy
+                  deco1(3,i) = deco1(3,i) + dedz
+                  deco1(1,ic) = deco1(1,ic) + dedxc
+                  deco1(2,ic) = deco1(2,ic) + dedyc
+                  deco1(3,ic) = deco1(3,ic) + dedzc
+                  deco2(1,k) = deco2(1,k) - dedx
+                  deco2(2,k) = deco2(2,k) - dedy
+                  deco2(3,k) = deco2(3,k) - dedz
+                  deco2(1,kc) = deco2(1,kc) - dedxc
+                  deco2(2,kc) = deco2(2,kc) - dedyc
+                  deco2(3,kc) = deco2(3,kc) - dedzc
 c
 c     increment the internal virial tensor components
 c
@@ -1036,20 +1036,20 @@ c
                   vyy = yr*dedy + yc*dedyc
                   vzy = zr*dedy + zc*dedyc
                   vzz = zr*dedz + zc*dedzc
-                  virt(1,1) = virt(1,1) + vxx
-                  virt(2,1) = virt(2,1) + vyx
-                  virt(3,1) = virt(3,1) + vzx
-                  virt(1,2) = virt(1,2) + vyx
-                  virt(2,2) = virt(2,2) + vyy
-                  virt(3,2) = virt(3,2) + vzy
-                  virt(1,3) = virt(1,3) + vzx
-                  virt(2,3) = virt(2,3) + vzy
-                  virt(3,3) = virt(3,3) + vzz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintert = eintert + e
+                     eintero = eintero + e
                   end if
                end if
             end if
@@ -1078,24 +1078,24 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      ec = ect
-      einter = eintert
+      ec = eco
+      einter = eintero
       do i = 1, n
-         dec(1,i) = dec(1,i) + dect1(1,i) + dect2(1,i)
-         dec(2,i) = dec(2,i) + dect1(2,i) + dect2(2,i)
-         dec(3,i) = dec(3,i) + dect1(3,i) + dect2(3,i)
+         dec(1,i) = dec(1,i) + deco1(1,i) + deco2(1,i)
+         dec(2,i) = dec(2,i) + deco1(2,i) + deco2(2,i)
+         dec(3,i) = dec(3,i) + deco1(3,i) + deco2(3,i)
       end do
       do i = 1, 3
-         vir(1,i) = virt(1,i)
-         vir(2,i) = virt(2,i)
-         vir(3,i) = virt(3,i)
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
-      deallocate (dect1)
-      deallocate (dect2)
+      deallocate (deco1)
+      deallocate (deco2)
       return
       end
 c
@@ -1867,11 +1867,11 @@ c
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 ect,eintrat
-      real*8 virt(3,3)
+      real*8 eco,eintrao
+      real*8 viro(3,3)
       real*8, allocatable :: cscale(:)
-      real*8, allocatable :: dect1(:,:)
-      real*8, allocatable :: dect2(:,:)
+      real*8, allocatable :: deco1(:,:)
+      real*8, allocatable :: deco2(:,:)
       logical proceed,usei
       character*6 mode
       external erfc
@@ -1890,8 +1890,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
-      allocate (dect1(3,n))
-      allocate (dect2(3,n))
+      allocate (deco1(3,n))
+      allocate (deco2(3,n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1950,20 +1950,20 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      ect = ec
-      eintrat = eintra
+      eco = ec
+      eintrao = eintra
       do i = 1, n
-         dect1(1,i) = 0.0d0
-         dect1(2,i) = 0.0d0
-         dect1(3,i) = 0.0d0
-         dect2(1,i) = 0.0d0
-         dect2(2,i) = 0.0d0
-         dect2(3,i) = 0.0d0
+         deco1(1,i) = 0.0d0
+         deco1(2,i) = 0.0d0
+         deco1(3,i) = 0.0d0
+         deco2(1,i) = 0.0d0
+         deco2(2,i) = 0.0d0
+         deco2(3,i) = 0.0d0
       end do
       do i = 1, 3
-         virt(1,i) = vir(1,i)
-         virt(2,i) = vir(2,i)
-         virt(3,i) = vir(3,i)
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
       end do
 c
 c     set OpenMP directives for the major loop structure
@@ -1972,8 +1972,8 @@ c
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer) firstprivate(cscale)
-!$OMP& shared(ect,eintrat,dect1,dect2,virt)
-!$OMP DO reduction(+:ect,eintrat,dect1,dect2,virt)
+!$OMP& shared(eco,eintrao,deco1,deco2,viro)
+!$OMP DO reduction(+:eco,eintrao,deco1,deco2,viro)
 !$OMP& schedule(guided)
 c
 c     compute the real space Ewald energy and first derivatives
@@ -2046,13 +2046,13 @@ c
 c
 c     increment the overall energy and derivative expressions
 c
-                 ect = ect + e
-                 dect1(1,i) = dect1(1,i) + dedx
-                 dect1(2,i) = dect1(2,i) + dedy
-                 dect1(3,i) = dect1(3,i) + dedz
-                 dect2(1,k) = dect2(1,k) - dedx
-                 dect2(2,k) = dect2(2,k) - dedy
-                 dect2(3,k) = dect2(3,k) - dedz
+                  eco = eco + e
+                  deco1(1,i) = deco1(1,i) + dedx
+                  deco1(2,i) = deco1(2,i) + dedy
+                  deco1(3,i) = deco1(3,i) + dedz
+                  deco2(1,k) = deco2(1,k) - dedx
+                  deco2(2,k) = deco2(2,k) - dedy
+                  deco2(3,k) = deco2(3,k) - dedz
 c
 c     increment the internal virial tensor components
 c
@@ -2062,21 +2062,21 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  virt(1,1) = virt(1,1) + vxx
-                  virt(2,1) = virt(2,1) + vyx
-                  virt(3,1) = virt(3,1) + vzx
-                  virt(1,2) = virt(1,2) + vyx
-                  virt(2,2) = virt(2,2) + vyy
-                  virt(3,2) = virt(3,2) + vzy
-                  virt(1,3) = virt(1,3) + vzx
-                  virt(2,3) = virt(2,3) + vzy
-                  virt(3,3) = virt(3,3) + vzz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
 c
 c     increment the total intramolecular energy
 c
                   if (molcule(i) .eq. molcule(k)) then
                      efix = (fik/rb) * scale
-                     eintrat = eintrat + efix
+                     eintrao = eintrao + efix
                   end if
                end if
             end if
@@ -2105,17 +2105,17 @@ c
 c
 c     add local copies to global variables for OpenMP calculation
 c
-      ec = ect
-      eintra = eintrat
+      ec = eco
+      eintra = eintrao
       do i = 1, n
-         dec(1,i) = dec(1,i) + dect1(1,i) + dect2(1,i)
-         dec(2,i) = dec(2,i) + dect1(2,i) + dect2(2,i)
-         dec(3,i) = dec(3,i) + dect1(3,i) + dect2(3,i)
+         dec(1,i) = dec(1,i) + deco1(1,i) + deco2(1,i)
+         dec(2,i) = dec(2,i) + deco1(2,i) + deco2(2,i)
+         dec(3,i) = dec(3,i) + deco1(3,i) + deco2(3,i)
       end do
       do i = 1, 3
-         vir(1,i) = virt(1,i)
-         vir(2,i) = virt(2,i)
-         vir(3,i) = virt(3,i)
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
       end do
 c
 c     intermolecular energy is total minus intramolecular part
@@ -2125,8 +2125,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
-      deallocate (dect1)
-      deallocate (dect2)
+      deallocate (deco1)
+      deallocate (deco2)
       return
       end
 c

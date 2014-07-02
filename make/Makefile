@@ -8,20 +8,20 @@
 ##  Invocation Options:
 ##
 ##   1. make all              Build all the TINKER executables
-##   2. make rename           Move the executables to BINDIR
+##   2. make install          Move the executables to BINDIR
 ##   3. make create_links     Create soft links in LINKDIR
 ##   4. make remove_links     Remove soft links from LINKDIR
 ##   6. make listing          Concatenate source to tinker.txt
 ##   5. make clean            Delete objects and executables
 ##
 ##  Original version of this file is due to Peter Happersberger
-##  and Jochen Buehler of the University of Konstanz, Jan. 1998,
+##  and Jochen Buehler of the University of Konstanz, January 1998,
 ##  Modifications by Reece Hart & Jay Ponder, Washington University
 ##
 ##  Note: Building TINKER requires libraries for the FFTW Fast
 ##  Fourier Transform package and (optionally) the APBS Poisson-
 ##  Boltzmann solver. These libraries are assumed to already be
-##  present, and are not built by this Makefile.
+##  present, and are not built by this Makefile
 ##
 ###################################################################
 
@@ -33,7 +33,7 @@
 ##  BINDIR       Hard Copies of TINKER Executables
 ##  LINKDIR      Linked Copies of TINKER Executables
 
-TINKERDIR = /Users/ponder/tinker
+TINKERDIR = $(HOME)/tinker
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
 
@@ -718,7 +718,11 @@ EXEFILES = alchemy.x \
 %.x: %.o libtinker.a
 	${F77} ${LINKFLAGS} -o $@ $^ ${LIBS}; strip $@
 
-all:	${EXEFILES}
+all:
+	${EXEFILES}
+
+install:
+	rename
 
 clean:
 	rm -f *.o *.mod *.a *.x

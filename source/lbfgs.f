@@ -53,8 +53,6 @@ c
       use output
       use scales
       implicit none
-      integer maxsav
-      parameter (maxsav=20)
       integer i,j,k,m
       integer nvar,next
       integer msav,muse
@@ -67,8 +65,8 @@ c
       real*8 angle,rms,beta
       real*8 ys,yy,gamma
       real*8 x0(*)
-      real*8 rho(maxsav)
-      real*8 alpha(maxsav)
+      real*8, allocatable :: rho(:)
+      real*8, allocatable :: alpha(:)
       real*8, allocatable :: x_old(:)
       real*8, allocatable :: g(:)
       real*8, allocatable :: g_old(:)
@@ -110,7 +108,7 @@ c
 c
 c     set default parameters for the optimization
 c
-      msav = min(nvar,maxsav)
+      msav = min(nvar,20)
       if (fctmin .eq. 0.0d0)  fctmin = -10000000.0d0
       if (maxiter .eq. 0)  maxiter = 1000000
       if (nextiter .eq. 0)  nextiter = 1
@@ -136,6 +134,7 @@ c
          string = record(next:120)
          if (keyword(1:14) .eq. 'LBFGS-VECTORS ') then
             read (string,*,err=10,end=10)  msav
+            msav = max(0,min(msav,nvar))
          else if (keyword(1:17) .eq. 'STEEPEST-DESCENT ') then
             msav = 0
          else if (keyword(1:7) .eq. 'FCTMIN ') then
@@ -158,36 +157,29 @@ c
    10    continue
       end do
 c
-c     check the number of saved correction vectors
-c
-      if (msav.lt.0 .or. msav.gt.min(nvar,maxsav)) then
-         msav = min(nvar,maxsav)
-         write (iout,20)  msav
-   20    format (/,' LBFGS  --  Number of Saved Vectors Set to',
-     &              ' the Maximum of',i5)
-      end if
-c
 c     print header information about the optimization method
 c
       if (iprint .gt. 0) then
          if (msav .eq. 0) then
+            write (iout,20)
+   20       format (/,' Steepest Descent Gradient Optimization :')
             write (iout,30)
-   30       format (/,' Steepest Descent Gradient Optimization :')
-            write (iout,40)
-   40       format (/,' SD Iter     F Value      G RMS     F Move',
+   30       format (/,' SD Iter     F Value      G RMS     F Move',
      &                 '    X Move   Angle  FG Call  Comment',/)
          else
-            write (iout,50)
-   50       format (/,' Limited Memory BFGS Quasi-Newton',
+            write (iout,40)
+   40       format (/,' Limited Memory BFGS Quasi-Newton',
      &                 ' Optimization :')
-            write (iout,60)
-   60       format (/,' QN Iter     F Value      G RMS     F Move',
+            write (iout,50)
+   50       format (/,' QN Iter     F Value      G RMS     F Move',
      &                 '    X Move   Angle  FG Call  Comment',/)
          end if
       end if
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (rho(msav))
+      allocate (alpha(msav))
       allocate (x_old(nvar))
       allocate (g(nvar))
       allocate (g_old(nvar))
@@ -195,8 +187,8 @@ c
       allocate (q(nvar))
       allocate (r(nvar))
       allocate (h0(nvar))
-      allocate (s(nvar,maxsav))
-      allocate (y(nvar,maxsav))
+      allocate (s(nvar,msav))
+      allocate (y(nvar,msav))
 c
 c     evaluate the function and get the initial gradient
 c
@@ -221,11 +213,11 @@ c     print initial information prior to first iteration
 c
       if (iprint .gt. 0) then
          if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and. g_rms.lt.1.0d5) then
-            write (iout,70)  niter,f,g_rms,ncalls
-   70       format (i6,f14.4,f11.4,29x,i7)
+            write (iout,60)  niter,f,g_rms,ncalls
+   60       format (i6,f14.4,f11.4,29x,i7)
          else
-            write (iout,80)  niter,f,g_rms,ncalls
-   80       format (i6,d14.4,d11.4,29x,i7)
+            write (iout,70)  niter,f,g_rms,ncalls
+   70       format (i6,d14.4,d11.4,29x,i7)
          end if
       end if
 c
@@ -371,13 +363,13 @@ c
             if (done .or. mod(niter,iprint).eq.0) then
                if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and.
      &             g_rms.lt.1.0d5 .and. f_move.lt.1.0d5) then
+                  write (iout,80)  niter,f,g_rms,f_move,x_move,
+     &                              angle,ncalls,status
+   80             format (i6,f14.4,f11.4,f11.4,f10.4,f8.2,i7,3x,a9)
+               else
                   write (iout,90)  niter,f,g_rms,f_move,x_move,
      &                              angle,ncalls,status
-   90             format (i6,f14.4,f11.4,f11.4,f10.4,f8.2,i7,3x,a9)
-               else
-                  write (iout,100)  niter,f,g_rms,f_move,x_move,
-     &                              angle,ncalls,status
-  100             format (i6,d14.4,d11.4,d11.4,f10.4,f8.2,i7,3x,a9)
+   90             format (i6,d14.4,d11.4,d11.4,f10.4,f8.2,i7,3x,a9)
                end if
             end if
          end if
@@ -393,6 +385,8 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (rho)
+      deallocate (alpha)
       deallocate (x_old)
       deallocate (g)
       deallocate (g_old)
@@ -408,11 +402,11 @@ c
       minimum = f
       if (iprint .gt. 0) then
          if (status.eq.'SmallGrad' .or. status.eq.'SmallFct ') then
-            write (iout,110)  status
-  110       format (/,' LBFGS  --  Normal Termination due to ',a9)
+            write (iout,100)  status
+  100       format (/,' LBFGS  --  Normal Termination due to ',a9)
          else
-            write (iout,120)  status
-  120       format (/,' LBFGS  --  Incomplete Convergence due to ',a9)
+            write (iout,110)  status
+  110       format (/,' LBFGS  --  Incomplete Convergence due to ',a9)
          end if
       end if
       return

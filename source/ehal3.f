@@ -850,7 +850,7 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer nevt
+      integer nevo
       integer, allocatable :: iv14(:)
       real*8 e,eps,rdn
       real*8 fgrp,rv,rv7
@@ -860,12 +860,12 @@ c
       real*8 scal,t1,t2
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
-      real*8 evt,eintert
+      real*8 evo,eintero
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
-      real*8, allocatable :: aevt(:)
+      real*8, allocatable :: aevo(:)
       logical proceed,usei
       logical muti,mutk
       logical header,huge
@@ -888,7 +888,7 @@ c
       allocate (yred(n))
       allocate (zred(n))
       allocate (vscale(n))
-      allocate (aevt(n))
+      allocate (aevo(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -915,11 +915,11 @@ c
 c
 c     transfer global to local copies for OpenMP calculation
 c
-      evt = ev
-      eintert = einter
-      nevt = nev
+      evo = ev
+      eintero = einter
+      nevo = nev
       do i = 1, n
-         aevt(i) = aev(i)
+         aevo(i) = aev(i)
       end do
 c
 c     set OpenMP directives for the major loop structure
@@ -930,8 +930,8 @@ c
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
 !$OMP& vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP& molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(vscale,iv14) shared(evt,eintert,nevt,aevt)
-!$OMP DO reduction(+:evt,eintert,nevt,aevt)
+!$OMP& firstprivate(vscale,iv14) shared(evo,eintero,nevo,aevo)
+!$OMP DO reduction(+:evo,eintero,nevo,aevo)
 !$OMP& schedule(guided)
 c
 c     find the van der Waals energy via neighbor list search
@@ -1031,16 +1031,16 @@ c
 c     increment the overall van der Waals energy components
 c
                   if (e .ne. 0.0d0) then
-                     nevt = nevt + 1
-                     evt = evt + e
-                     aevt(i) = aevt(i) + 0.5d0*e
-                     aevt(k) = aevt(k) + 0.5d0*e
+                     nevo = nevo + 1
+                     evo = evo + e
+                     aevo(i) = aevo(i) + 0.5d0*e
+                     aevo(k) = aevo(k) + 0.5d0*e
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintert = eintert + e
+                     eintero = eintero + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1089,11 +1089,11 @@ c
 c
 c     transfer local to global copies for OpenMP calculation
 c
-      ev = evt
-      einter = eintert
-      nev = nevt
+      ev = evo
+      einter = eintero
+      nev = nevo
       do i = 1, n
-         aev(i) = aevt(i)
+         aev(i) = aevo(i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -1103,6 +1103,6 @@ c
       deallocate (yred)
       deallocate (zred)
       deallocate (vscale)
-      deallocate (aevt)
+      deallocate (aevo)
       return
       end

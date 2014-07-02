@@ -33,11 +33,11 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine vlist  --  build van der Waals neighbor lists  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine vlist  --  get van der Waals neighbor lists  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "vlist" performs an update or a complete rebuild of the
@@ -279,11 +279,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine vlight  --  make vdw pair list for all sites  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine vlight  --  build vdw pair list via lights  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "vlight" performs a complete rebuild of the van der Waals
@@ -355,7 +355,7 @@ c
          zi = zred(i)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = kex(i)
          else
             repeat = .true.
@@ -391,7 +391,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = nvdw
             goto 10
          end if
@@ -411,11 +411,11 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine clist  --  build partial charge neighbor lists  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine clist  --  get partial charge neighbor lists  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "clist" performs an update or a complete rebuild of the
@@ -640,11 +640,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine clight  --  make charge pair list for all sites  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine clight  --  get partial charge list via lights  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "clight" performs a complete rebuild of the partial charge
@@ -716,7 +716,7 @@ c
          zi = z(ii)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = kex(i)
          else
             repeat = .true.
@@ -753,7 +753,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = nion
             goto 10
          end if
@@ -775,7 +775,7 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine mlist  --  build atom multipole neighbor lists  ##
+c     ##  subroutine mlist  --  get atomic multipole neighbor lists  ##
 c     ##                                                             ##
 c     #################################################################
 c
@@ -933,11 +933,11 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine mbuild  --  make mpole list for all sites  ##
-c     ##                                                        ##
-c     ############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine mbuild  --  build mpole list for all sites  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "mbuild" performs a complete rebuild of the atomic multipole
@@ -1004,7 +1004,7 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine mlight  --  make mpole pair list for all sites  ##
+c     ##  subroutine mlight  --  get multipole pair list via lights  ##
 c     ##                                                             ##
 c     #################################################################
 c
@@ -1078,7 +1078,7 @@ c
          zi = z(ii)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = kex(i)
          else
             repeat = .true.
@@ -1115,7 +1115,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = npole
             goto 10
          end if
@@ -1135,11 +1135,11 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine ulist  --  build preconditioner neighbor lists  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ulist  --  get preconditioner neighbor lists  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "ulist" performs an update or a complete rebuild of the
@@ -1364,11 +1364,11 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine ulight  --  preconditioner list for all sites  ##
-c     ##                                                            ##
-c     ################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ulight  --  get preconditioner list via lights  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "ulight" performs a complete rebuild of the polarization
@@ -1441,7 +1441,7 @@ c
          zi = z(ii)
          if (kbx(i) .le. kex(i)) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = kex(i)
          else
             repeat = .true.
@@ -1478,7 +1478,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i) + 1
+            start = kbx(i)
             stop = npole
             goto 10
          end if

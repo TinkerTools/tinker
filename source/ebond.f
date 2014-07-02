@@ -26,7 +26,8 @@ c
       use usage
       implicit none
       integer i,ia,ib
-      real*8 e,ideal,force
+      real*8 e,ebo
+      real*8 ideal,force
       real*8 expterm,bde
       real*8 dt,dt2,fgrp
       real*8 xab,yab,zab,rab
@@ -36,6 +37,17 @@ c
 c     zero out the bond stretching energy
 c
       eb = 0.0d0
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      ebo = eb
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
+!$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer)
+!$OMP& shared(ebo)
+!$OMP DO reduction(+:ebo) schedule(guided)
 c
 c     calculate the bond stretching energy term
 c
@@ -84,8 +96,17 @@ c
 c
 c     increment the total bond stretching energy
 c
-            eb = eb + e
+            ebo = ebo + e
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eb = ebo
       return
       end

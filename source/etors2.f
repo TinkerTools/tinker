@@ -34,11 +34,11 @@ c
       end
 c
 c
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine etors2a  --  standard torsional Hessian  ##
-c     ##                                                      ##
-c     ##########################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine etors2a  --  standard torsional angle Hessian  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "etors2a" calculates the second derivatives of the torsional
@@ -738,11 +738,11 @@ c
       end
 c
 c
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine etors2b  --  smoothed torsional Hessian  ##
-c     ##                                                      ##
-c     ##########################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine etors2b  --  smoothed torsional angle Hessian  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "etors2b" calculates the second derivatives of the torsional

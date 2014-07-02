@@ -888,13 +888,13 @@ c
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 evt,eintert
-      real*8 virt(3,3)
+      real*8 evo,eintero
+      real*8 viro(3,3)
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
-      real*8, allocatable :: devt(:,:)
+      real*8, allocatable :: devo(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -915,7 +915,7 @@ c
       allocate (yred(n))
       allocate (zred(n))
       allocate (vscale(n))
-      allocate (devt(3,n))
+      allocate (devo(3,n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -942,17 +942,17 @@ c
 c
 c     transfer global to local copies for OpenMP calculation
 c
-      evt = ev
-      eintert = einter
+      evo = ev
+      eintero = einter
       do i = 1, n
-         devt(1,i) = dev(1,i)
-         devt(2,i) = dev(2,i)
-         devt(3,i) = dev(3,i)
+         devo(1,i) = dev(1,i)
+         devo(2,i) = dev(2,i)
+         devo(3,i) = dev(3,i)
       end do
       do i = 1, 3
-         virt(1,i) = vir(1,i)
-         virt(2,i) = vir(2,i)
-         virt(3,i) = vir(3,i)
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
       end do
 c
 c     set OpenMP directives for the major loop structure
@@ -962,8 +962,8 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
 !$OMP& cut2,c0,c1,c2,c3,c4,c5,molcule) firstprivate(vscale,iv14)
-!$OMP& shared(evt,devt,virt,eintert)
-!$OMP DO reduction(+:evt,devt,virt,eintert) schedule(guided)
+!$OMP& shared(evo,devo,viro,eintero)
+!$OMP DO reduction(+:evo,devo,viro,eintero) schedule(guided)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1059,32 +1059,32 @@ c
 c
 c     increment the total van der Waals energy and derivatives
 c
-                  evt = evt + e
+                  evo = evo + e
                   if (i .eq. iv) then
-                     devt(1,i) = devt(1,i) + dedx
-                     devt(2,i) = devt(2,i) + dedy
-                     devt(3,i) = devt(3,i) + dedz
+                     devo(1,i) = devo(1,i) + dedx
+                     devo(2,i) = devo(2,i) + dedy
+                     devo(3,i) = devo(3,i) + dedz
                   else
-                     devt(1,i) = devt(1,i) + dedx*redi
-                     devt(2,i) = devt(2,i) + dedy*redi
-                     devt(3,i) = devt(3,i) + dedz*redi
-                     devt(1,iv) = devt(1,iv) + dedx*rediv
-                     devt(2,iv) = devt(2,iv) + dedy*rediv
-                     devt(3,iv) = devt(3,iv) + dedz*rediv
+                     devo(1,i) = devo(1,i) + dedx*redi
+                     devo(2,i) = devo(2,i) + dedy*redi
+                     devo(3,i) = devo(3,i) + dedz*redi
+                     devo(1,iv) = devo(1,iv) + dedx*rediv
+                     devo(2,iv) = devo(2,iv) + dedy*rediv
+                     devo(3,iv) = devo(3,iv) + dedz*rediv
                   end if
                   if (k .eq. kv) then
-                     devt(1,k) = devt(1,k) - dedx
-                     devt(2,k) = devt(2,k) - dedy
-                     devt(3,k) = devt(3,k) - dedz
+                     devo(1,k) = devo(1,k) - dedx
+                     devo(2,k) = devo(2,k) - dedy
+                     devo(3,k) = devo(3,k) - dedz
                   else
                      redk = kred(k)
                      redkv = 1.0d0 - redk
-                     devt(1,k) = devt(1,k) - dedx*redk
-                     devt(2,k) = devt(2,k) - dedy*redk
-                     devt(3,k) = devt(3,k) - dedz*redk
-                     devt(1,kv) = devt(1,kv) - dedx*redkv
-                     devt(2,kv) = devt(2,kv) - dedy*redkv
-                     devt(3,kv) = devt(3,kv) - dedz*redkv
+                     devo(1,k) = devo(1,k) - dedx*redk
+                     devo(2,k) = devo(2,k) - dedy*redk
+                     devo(3,k) = devo(3,k) - dedz*redk
+                     devo(1,kv) = devo(1,kv) - dedx*redkv
+                     devo(2,kv) = devo(2,kv) - dedy*redkv
+                     devo(3,kv) = devo(3,kv) - dedz*redkv
                   end if
 c
 c     increment the internal virial tensor components
@@ -1095,20 +1095,20 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  virt(1,1) = virt(1,1) + vxx
-                  virt(2,1) = virt(2,1) + vyx
-                  virt(3,1) = virt(3,1) + vzx
-                  virt(1,2) = virt(1,2) + vyx
-                  virt(2,2) = virt(2,2) + vyy
-                  virt(3,2) = virt(3,2) + vzy
-                  virt(1,3) = virt(1,3) + vzx
-                  virt(2,3) = virt(2,3) + vzy
-                  virt(3,3) = virt(3,3) + vzz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintert = eintert + e
+                     eintero = eintero + e
                   end if
                end if
             end if
@@ -1137,17 +1137,17 @@ c
 c
 c     transfer local to global copies for OpenMP calculation
 c
-      ev = evt
-      einter = eintert
+      ev = evo
+      einter = eintero
       do i = 1, n
-         dev(1,i) = devt(1,i)
-         dev(2,i) = devt(2,i)
-         dev(3,i) = devt(3,i)
+         dev(1,i) = devo(1,i)
+         dev(2,i) = devo(2,i)
+         dev(3,i) = devo(3,i)
       end do
       do i = 1, 3
-         vir(1,i) = virt(1,i)
-         vir(2,i) = virt(2,i)
-         vir(3,i) = virt(3,i)
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -1157,7 +1157,7 @@ c
       deallocate (yred)
       deallocate (zred)
       deallocate (vscale)
-      deallocate (devt)
+      deallocate (devo)
       return
       end
 c
