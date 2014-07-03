@@ -30,7 +30,8 @@ c
       implicit none
       integer i,j,k,istrbnd
       integer ia,ib,ic
-      real*8 e,dr1,dr2,dt
+      real*8 e,ebao
+      real*8 dr1,dr2,dt
       real*8 fgrp,angle
       real*8 force1,force2
       real*8 dot,cosine
@@ -47,6 +48,17 @@ c
 c     zero out the stretch-bend cross term energy
 c
       eba = 0.0d0
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      ebao = eba
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
+!$OMP& anat,bl,bk,use,x,y,z,stbnunit,use_group,use_polymer)
+!$OMP& shared(ebao)
+!$OMP DO reduction(+:ebao) schedule(guided)
 c
 c     calculate the stretch-bend energy term
 c
@@ -114,9 +126,18 @@ c
 c
 c     increment the total stretch-bend energy
 c
-               eba = eba + e
+               ebao = ebao + e
             end if
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eba = ebao
       return
       end

@@ -36,7 +36,9 @@ c
       implicit none
       integer i,j,k,istrbnd
       integer ia,ib,ic
-      real*8 e,dr1,dr2,dt
+      integer nebao
+      real*8 e,ebao
+      real*8 dr1,dr2,dt
       real*8 fgrp,angle
       real*8 force1,force2
       real*8 dot,cosine
@@ -47,6 +49,7 @@ c
       real*8 xcb,ycb,zcb
       real*8 rab,rab2
       real*8 rcb,rcb2
+      real*8, allocatable :: aebao(:)
       logical proceed
       logical header,huge
 c
@@ -59,6 +62,26 @@ c
          aeba(i) = 0.0d0
       end do
       header = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aebao(n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      ebao = eba
+      nebao = neba
+      do i = 1, n
+         aebao(i) = aeba(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
+!$OMP& anat,bl,bk,use,x,y,z,stbnunit,use_group,use_polymer,
+!$OMP& name,verbose,debug,header)
+!$OMP& shared(ebao,nebao,aebao)
+!$OMP DO reduction(+:ebao,nebao,aebao) schedule(guided)
 c
 c     calculate the stretch-bend energy term
 c
@@ -126,9 +149,9 @@ c
 c
 c     increment the total stretch-bend energy
 c
-               neba = neba + 1
-               eba = eba + e
-               aeba(ib) = aeba(ib) + e
+               nebao = nebao + 1
+               ebao = ebao + e
+               aebao(ib) = aebao(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -149,5 +172,22 @@ c
             end if
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eba = ebao
+      neba = nebao
+      do i = 1, n
+         aeba(i) = aebao(i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aebao)
       return
       end

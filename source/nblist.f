@@ -237,10 +237,13 @@ c
       real*8 zred(*)
 c
 c
-c     store coordinates to reflect update of the site
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
+c
+c     store coordinates to reflect update of the site
+c
       do i = 1, nvdw
          xi = xred(i)
          yi = yred(i)
@@ -273,6 +276,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -344,11 +350,14 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     loop over all atoms computing the neighbor lists
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
 !$OMP DO schedule(guided)
+c
+c     loop over all atoms computing the neighbor lists
+c
       do i = 1, nvdw
          xi = xred(i)
          yi = yred(i)
@@ -405,6 +414,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -596,10 +608,13 @@ c
       real*8 xr,yr,zr,r2
 c
 c
-c     store new coordinates to reflect update of the site
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
+c
+c     store new coordinates to reflect update of the site
+c
       do i = 1, nion
          ii = kion(i)
          xi = x(ii)
@@ -634,6 +649,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -704,11 +722,14 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     loop over all atoms computing the neighbor lists
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
 !$OMP DO schedule(guided)
+c
+c     loop over all atoms computing the neighbor lists
+c
       do i = 1, nion
          ii = kion(i)
          xi = x(ii)
@@ -767,6 +788,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -958,10 +982,13 @@ c
       real*8 xr,yr,zr,r2
 c
 c
-c     store new coordinates to reflect update of the site
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
+c
+c     store new coordinates to reflect update of the site
+c
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
@@ -996,6 +1023,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -1066,11 +1096,14 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     loop over all atoms computing the neighbor lists
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
 !$OMP DO schedule(guided)
+c
+c     loop over all atoms computing the neighbor lists
+c
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
@@ -1129,6 +1162,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -1320,10 +1356,13 @@ c
       real*8 xr,yr,zr,r2
 c
 c
-c     store new coordinates to reflect update of the site
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
+c
+c     store new coordinates to reflect update of the site
+c
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
@@ -1358,6 +1397,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return
@@ -1429,11 +1471,14 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     loop over all atoms computing the neighbor lists
+c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
 !$OMP DO schedule(guided)
+c
+c     loop over all atoms computing the neighbor lists
+c
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
@@ -1492,6 +1537,9 @@ c
             call fatal
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
 !$OMP END DO
 !$OMP END PARALLEL
       return

@@ -26,7 +26,8 @@ c
       use usage
       implicit none
       integer i,ia,ic
-      real*8 e,ideal,force
+      real*8 e,eubo
+      real*8 ideal,force
       real*8 dt,dt2,fgrp
       real*8 xac,yac,zac,rac
       logical proceed
@@ -35,6 +36,17 @@ c
 c     zero out the Urey-Bradley interaction energy
 c
       eub = 0.0d0
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      eubo = eub
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nurey,iury,ul,uk,
+!$OMP& use,x,y,z,cury,qury,ureyunit,use_group,use_polymer)
+!$OMP& shared(eubo)
+!$OMP DO reduction(+:eubo) schedule(guided)
 c
 c     calculate the Urey-Bradley 1-3 energy term
 c
@@ -71,8 +83,17 @@ c
 c
 c     increment the total Urey-Bradley energy
 c
-            eub = eub + e
+            eubo = eubo + e
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eub = eubo
       return
       end
