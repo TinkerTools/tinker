@@ -70,8 +70,8 @@ c     assign bond, angle and cross term potential parameters
 c
       if (use_bond .or. use_strbnd .or. use_strtor .or.
      &    (use_vdw .and. vdwtyp.eq.'MM3-HBOND'))  call kbond
-      if (use_angle .or. use_strbnd .or.
-     &    use_angang .or. use_angtor)  call kangle
+      if (use_angle .or. use_strbnd .or.use_angang .or. 
+     &    use_angtor .or. use_opbend .or. use_opdist)  call kangle
       if (use_strbnd)  call kstrbnd
       if (use_urey)  call kurey
       if (use_angang)  call kangang

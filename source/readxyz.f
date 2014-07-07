@@ -123,6 +123,7 @@ c
          y(i) = 0.0d0
          z(i) = 0.0d0
          type(i) = 0
+         n12(i) = 0
          do j = 1, maxval
             i12(j,i) = 0
          end do
@@ -177,7 +178,6 @@ c
 c     for each atom, count and sort its attached atoms
 c
       do i = 1, n
-         n12(i) = 0
          do j = maxval, 1, -1
             if (i12(j,i) .ne. 0) then
                n12(i) = j

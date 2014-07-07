@@ -178,8 +178,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(bk))  allocate (bk(nbond))
-      if (.not. allocated(bl))  allocate (bl(nbond))
+      if (allocated(bk))  deallocate (bk)
+      if (allocated(bl))  deallocate (bl)
+      allocate (bk(nbond))
+      allocate (bl(nbond))
 c
 c     use special bond parameter assignment method for MMFF
 c

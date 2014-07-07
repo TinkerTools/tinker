@@ -150,17 +150,26 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(bsmod1))  allocate (bsmod1(nfft1))
-      if (.not. allocated(bsmod2))  allocate (bsmod2(nfft2))
-      if (.not. allocated(bsmod3))  allocate (bsmod3(nfft3))
-      if (.not. allocated(bsbuild))
-     &   allocate (bsbuild(bsorder,bsorder))
-      if (.not. allocated(thetai1))  allocate (thetai1(4,bsorder,n))
-      if (.not. allocated(thetai2))  allocate (thetai2(4,bsorder,n))
-      if (.not. allocated(thetai3))  allocate (thetai3(4,bsorder,n))
-      if (.not. allocated(qgrid))  allocate (qgrid(2,nfft1,nfft2,nfft3))
-      if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
-      if (.not. allocated(pmetable))  allocate (pmetable(n,nchunk))
+      if (allocated(bsmod1))  deallocate (bsmod1)
+      if (allocated(bsmod2))  deallocate (bsmod2)
+      if (allocated(bsmod3))  deallocate (bsmod3)
+      if (allocated(bsbuild))  deallocate (bsbuild)
+      if (allocated(thetai1))  deallocate (thetai1)
+      if (allocated(thetai2))  deallocate (thetai2)
+      if (allocated(thetai3))  deallocate (thetai3)
+      if (allocated(qgrid))  deallocate (qgrid)
+      if (allocated(qfac))  deallocate (qfac)
+      if (allocated(pmetable))  deallocate (pmetable)
+      allocate (bsmod1(nfft1))
+      allocate (bsmod2(nfft2))
+      allocate (bsmod3(nfft3))
+      allocate (bsbuild(bsorder,bsorder))
+      allocate (thetai1(4,bsorder,n))
+      allocate (thetai2(4,bsorder,n))
+      allocate (thetai3(4,bsorder,n))
+      allocate (qgrid(2,nfft1,nfft2,nfft3))
+      allocate (qfac(nfft1,nfft2,nfft3))
+      allocate (pmetable(n,nchunk))
 c
 c     initialize the PME arrays that can be precomputed
 c

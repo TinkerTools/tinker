@@ -105,9 +105,12 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iury))  allocate (iury(3,nangle))
-      if (.not. allocated(uk))  allocate (uk(nangle))
-      if (.not. allocated(ul))  allocate (ul(nangle))
+      if (allocated(iury))  deallocate (iury)
+      if (allocated(uk))  deallocate (uk)
+      if (allocated(ul))  deallocate (ul)
+      allocate (iury(3,nangle))
+      allocate (uk(nangle))
+      allocate (ul(nangle))
 c
 c     assign the Urey-Bradley parameters for each angle
 c

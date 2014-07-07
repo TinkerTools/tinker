@@ -148,7 +148,8 @@ c
       real*8 eqmmin,emmmin
       real*8 rms,zrms,avedl
       real*8 minimum,grdmin
-      real*8 energy,geometry
+      real*8 energy,torfit1
+      real*8 geometry
       real*8 vxx(6*maxfit)
       real*8 vxxl(6*maxfit)
       real*8 eqm(maxconf)

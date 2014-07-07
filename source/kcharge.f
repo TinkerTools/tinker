@@ -80,11 +80,16 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iion))  allocate (iion(n))
-      if (.not. allocated(jion))  allocate (jion(n))
-      if (.not. allocated(kion))  allocate (kion(n))
-      if (.not. allocated(chglist))  allocate (chglist(n))
-      if (.not. allocated(pchg))  allocate (pchg(n))
+      if (allocated(iion))  deallocate (iion)
+      if (allocated(jion))  deallocate (jion)
+      if (allocated(kion))  deallocate (kion)
+      if (allocated(chglist))  deallocate (chglist)
+      if (allocated(pchg))  deallocate (pchg)
+      allocate (iion(n))
+      allocate (jion(n))
+      allocate (kion(n))
+      allocate (chglist(n))
+      allocate (pchg(n))
 c
 c     find and store all the atomic partial charges
 c

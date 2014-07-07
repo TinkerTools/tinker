@@ -33,41 +33,67 @@ c
       real*8 xterm,yterm,zterm
       real*8 derivs(*)
       real*8, allocatable :: g(:,:)
-      logical first
-      save first
-      data first  / .true. /
 c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (first) then
-         first = .false.
-         if (.not. allocated(tesum))  allocate (tesum(nomega))
-         if (.not. allocated(teb))  allocate (teb(nomega))
-         if (.not. allocated(tea))  allocate (tea(nomega))
-         if (.not. allocated(teba))  allocate (teba(nomega))
-         if (.not. allocated(teub))  allocate (teub(nomega))
-         if (.not. allocated(teaa))  allocate (teaa(nomega))
-         if (.not. allocated(teopb))  allocate (teopb(nomega))
-         if (.not. allocated(teopd))  allocate (teopd(nomega))
-         if (.not. allocated(teid))  allocate (teid(nomega))
-         if (.not. allocated(teit))  allocate (teit(nomega))
-         if (.not. allocated(tet))  allocate (tet(nomega))
-         if (.not. allocated(tept))  allocate (tept(nomega))
-         if (.not. allocated(tebt))  allocate (tebt(nomega))
-         if (.not. allocated(teat))  allocate (teat(nomega))
-         if (.not. allocated(tett))  allocate (tett(nomega))
-         if (.not. allocated(tev))  allocate (tev(nomega))
-         if (.not. allocated(tec))  allocate (tec(nomega))
-         if (.not. allocated(tecd))  allocate (tecd(nomega))
-         if (.not. allocated(ted))  allocate (ted(nomega))
-         if (.not. allocated(tem))  allocate (tem(nomega))
-         if (.not. allocated(tep))  allocate (tep(nomega))
-         if (.not. allocated(ter))  allocate (ter(nomega))
-         if (.not. allocated(tes))  allocate (tes(nomega))
-         if (.not. allocated(telf))  allocate (telf(nomega))
-         if (.not. allocated(teg))  allocate (teg(nomega))
-         if (.not. allocated(tex))  allocate (tex(nomega))
+      if (allocated(tesum)) then
+         if (size(tesum) .lt. nomega) then
+            deallocate (tesum)
+            deallocate (teb)
+            deallocate (tea)
+            deallocate (teba)
+            deallocate (teub)
+            deallocate (teaa)
+            deallocate (teopb)
+            deallocate (teopd)
+            deallocate (teid)
+            deallocate (teit)
+            deallocate (tet)
+            deallocate (tept)
+            deallocate (tebt)
+            deallocate (teat)
+            deallocate (tett)
+            deallocate (tev)
+            deallocate (tec)
+            deallocate (tecd)
+            deallocate (ted)
+            deallocate (tem)
+            deallocate (tep)
+            deallocate (ter)
+            deallocate (tes)
+            deallocate (telf)
+            deallocate (teg)
+            deallocate (tex)
+         end if
+      end if
+      if (.not. allocated(tesum)) then
+         allocate (tesum(nomega))
+         allocate (teb(nomega))
+         allocate (tea(nomega))
+         allocate (teba(nomega))
+         allocate (teub(nomega))
+         allocate (teaa(nomega))
+         allocate (teopb(nomega))
+         allocate (teopd(nomega))
+         allocate (teid(nomega))
+         allocate (teit(nomega))
+         allocate (tet(nomega))
+         allocate (tept(nomega))
+         allocate (tebt(nomega))
+         allocate (teat(nomega))
+         allocate (tett(nomega))
+         allocate (tev(nomega))
+         allocate (tec(nomega))
+         allocate (tecd(nomega))
+         allocate (ted(nomega))
+         allocate (tem(nomega))
+         allocate (tep(nomega))
+         allocate (ter(nomega))
+         allocate (tes(nomega))
+         allocate (telf(nomega))
+         allocate (teg(nomega))
+         allocate (tex(nomega))
       end if
 c
 c     zero out individual components of torsional derivatives

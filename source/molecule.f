@@ -30,10 +30,14 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(imol))  allocate (imol(2,n))
-      if (.not. allocated(kmol))  allocate (kmol(n))
-      if (.not. allocated(molcule))  allocate (molcule(n))
-      if (.not. allocated(molmass))  allocate (molmass(n))
+      if (allocated(imol))  deallocate (imol)
+      if (allocated(kmol))  deallocate (kmol)
+      if (allocated(molcule))  deallocate (molcule)
+      if (allocated(molmass))  deallocate (molmass)
+      allocate (imol(2,n))
+      allocate (kmol(n))
+      allocate (molcule(n))
+      allocate (molmass(n))
 c
 c     zero number of molecules and molecule membership list
 c

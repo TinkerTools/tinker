@@ -36,12 +36,18 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(imut))  allocate (imut(n))
-      if (.not. allocated(type0))  allocate (type0(n))
-      if (.not. allocated(class0))  allocate (class0(n))
-      if (.not. allocated(type1))  allocate (type1(n))
-      if (.not. allocated(class1))  allocate (class1(n))
-      if (.not. allocated(mut))  allocate (mut(n))
+      if (allocated(imut))  deallocate (imut)
+      if (allocated(type0))  deallocate (type0)
+      if (allocated(class0))  deallocate (class0)
+      if (allocated(type1))  deallocate (type1)
+      if (allocated(class1))  deallocate (class1)
+      if (allocated(mut))  deallocate (mut)
+      allocate (imut(n))
+      allocate (type0(n))
+      allocate (class0(n))
+      allocate (type1(n))
+      allocate (class1(n))
+      allocate (mut(n))
 c
 c     set defaults for lambda and soft core vdw parameters
 c

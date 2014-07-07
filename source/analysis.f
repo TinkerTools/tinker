@@ -33,9 +33,6 @@ c
       integer i
       real*8 energy
       real*8 cutoff
-      logical first
-      save first
-      data first  / .true. /
 c
 c
 c     zero out each of the potential energy components
@@ -68,34 +65,63 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (first) then
-         first = .false.
-         if (.not. allocated(aesum))  allocate (aesum(n))
-         if (.not. allocated(aeb))  allocate (aeb(n))
-         if (.not. allocated(aea))  allocate (aea(n))
-         if (.not. allocated(aeba))  allocate (aeba(n))
-         if (.not. allocated(aeub))  allocate (aeub(n))
-         if (.not. allocated(aeaa))  allocate (aeaa(n))
-         if (.not. allocated(aeopb))  allocate (aeopb(n))
-         if (.not. allocated(aeopd))  allocate (aeopd(n))
-         if (.not. allocated(aeid))  allocate (aeid(n))
-         if (.not. allocated(aeit))  allocate (aeit(n))
-         if (.not. allocated(aet))  allocate (aet(n))
-         if (.not. allocated(aept))  allocate (aept(n))
-         if (.not. allocated(aebt))  allocate (aebt(n))
-         if (.not. allocated(aeat))  allocate (aeat(n))
-         if (.not. allocated(aett))  allocate (aett(n))
-         if (.not. allocated(aev))  allocate (aev(n))
-         if (.not. allocated(aec))  allocate (aec(n))
-         if (.not. allocated(aecd))  allocate (aecd(n))
-         if (.not. allocated(aed))  allocate (aed(n))
-         if (.not. allocated(aem))  allocate (aem(n))
-         if (.not. allocated(aep))  allocate (aep(n))
-         if (.not. allocated(aer))  allocate (aer(n))
-         if (.not. allocated(aes))  allocate (aes(n))
-         if (.not. allocated(aelf))  allocate (aelf(n))
-         if (.not. allocated(aeg))  allocate (aeg(n))
-         if (.not. allocated(aex))  allocate (aex(n))
+      if (allocated(aesum)) then
+         if (size(aesum) .lt. n) then
+            deallocate (aesum)
+            deallocate (aeb)
+            deallocate (aea)
+            deallocate (aeba)
+            deallocate (aeub)
+            deallocate (aeaa)
+            deallocate (aeopb)
+            deallocate (aeopd)
+            deallocate (aeid)
+            deallocate (aeit)
+            deallocate (aet)
+            deallocate (aept)
+            deallocate (aebt)
+            deallocate (aeat)
+            deallocate (aett)
+            deallocate (aev)
+            deallocate (aec)
+            deallocate (aecd)
+            deallocate (aed)
+            deallocate (aem)
+            deallocate (aep)
+            deallocate (aer)
+            deallocate (aes)
+            deallocate (aelf)
+            deallocate (aeg)
+            deallocate (aex)
+         end if
+      end if
+      if (.not. allocated(aesum)) then
+         allocate (aesum(n))
+         allocate (aeb(n))
+         allocate (aea(n))
+         allocate (aeba(n))
+         allocate (aeub(n))
+         allocate (aeaa(n))
+         allocate (aeopb(n))
+         allocate (aeopd(n))
+         allocate (aeid(n))
+         allocate (aeit(n))
+         allocate (aet(n))
+         allocate (aept(n))
+         allocate (aebt(n))
+         allocate (aeat(n))
+         allocate (aett(n))
+         allocate (aev(n))
+         allocate (aec(n))
+         allocate (aecd(n))
+         allocate (aed(n))
+         allocate (aem(n))
+         allocate (aep(n))
+         allocate (aer(n))
+         allocate (aes(n))
+         allocate (aelf(n))
+         allocate (aeg(n))
+         allocate (aex(n))
       end if
 c
 c     zero out energy partitioning components for each atom

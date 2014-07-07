@@ -12,526 +12,526 @@
 #  to set static array dimensions in many of the other modules
 #
 #
-ifort -c -g -warn unused -check uninit -check bounds sizes.f
-ifort -c -g -warn unused -check uninit -check bounds action.f
-ifort -c -g -warn unused -check uninit -check bounds align.f
-ifort -c -g -warn unused -check uninit -check bounds analyz.f
-ifort -c -g -warn unused -check uninit -check bounds angang.f
-ifort -c -g -warn unused -check uninit -check bounds angbnd.f
-ifort -c -g -warn unused -check uninit -check bounds angpot.f
-ifort -c -g -warn unused -check uninit -check bounds angtor.f
-ifort -c -g -warn unused -check uninit -check bounds argue.f
-ifort -c -g -warn unused -check uninit -check bounds ascii.f
-ifort -c -g -warn unused -check uninit -check bounds atmlst.f
-ifort -c -g -warn unused -check uninit -check bounds atomid.f
-ifort -c -g -warn unused -check uninit -check bounds atoms.f
-ifort -c -g -warn unused -check uninit -check bounds bath.f
-ifort -c -g -warn unused -check uninit -check bounds bitor.f
-ifort -c -g -warn unused -check uninit -check bounds bndpot.f
-ifort -c -g -warn unused -check uninit -check bounds bndstr.f
-ifort -c -g -warn unused -check uninit -check bounds bound.f
-ifort -c -g -warn unused -check uninit -check bounds boxes.f
-ifort -c -g -warn unused -check uninit -check bounds cell.f
-ifort -c -g -warn unused -check uninit -check bounds charge.f
-ifort -c -g -warn unused -check uninit -check bounds chgpot.f
-ifort -c -g -warn unused -check uninit -check bounds chrono.f
-ifort -c -g -warn unused -check uninit -check bounds chunks.f
-ifort -c -g -warn unused -check uninit -check bounds couple.f
-ifort -c -g -warn unused -check uninit -check bounds deriv.f
-ifort -c -g -warn unused -check uninit -check bounds dipole.f
-ifort -c -g -warn unused -check uninit -check bounds disgeo.f
-ifort -c -g -warn unused -check uninit -check bounds dma.f
-ifort -c -g -warn unused -check uninit -check bounds domega.f
-ifort -c -g -warn unused -check uninit -check bounds energi.f
-ifort -c -g -warn unused -check uninit -check bounds ewald.f
-ifort -c -g -warn unused -check uninit -check bounds faces.f
-ifort -c -g -warn unused -check uninit -check bounds fft.f
-ifort -c -g -warn unused -check uninit -check bounds fields.f
-ifort -c -g -warn unused -check uninit -check bounds files.f
-ifort -c -g -warn unused -check uninit -check bounds fracs.f
-ifort -c -g -warn unused -check uninit -check bounds freeze.f
-ifort -c -g -warn unused -check uninit -check bounds gkstuf.f
-ifort -c -g -warn unused -check uninit -check bounds group.f
-ifort -c -g -warn unused -check uninit -check bounds hescut.f
-ifort -c -g -warn unused -check uninit -check bounds hessn.f
-ifort -c -g -warn unused -check uninit -check bounds hpmf.f
-ifort -c -g -warn unused -check uninit -check bounds improp.f
-ifort -c -g -warn unused -check uninit -check bounds imptor.f
-ifort -c -g -warn unused -check uninit -check bounds inform.f
-ifort -c -g -warn unused -check uninit -check bounds inter.f
-ifort -c -g -warn unused -check uninit -check bounds iounit.f
-ifort -c -g -warn unused -check uninit -check bounds kanang.f
-ifort -c -g -warn unused -check uninit -check bounds kangs.f
-ifort -c -g -warn unused -check uninit -check bounds kantor.f
-ifort -c -g -warn unused -check uninit -check bounds katoms.f
-ifort -c -g -warn unused -check uninit -check bounds kbonds.f
-ifort -c -g -warn unused -check uninit -check bounds kchrge.f
-ifort -c -g -warn unused -check uninit -check bounds kdipol.f
-ifort -c -g -warn unused -check uninit -check bounds keys.f
-ifort -c -g -warn unused -check uninit -check bounds khbond.f
-ifort -c -g -warn unused -check uninit -check bounds kiprop.f
-ifort -c -g -warn unused -check uninit -check bounds kitors.f
-ifort -c -g -warn unused -check uninit -check bounds kmulti.f
-ifort -c -g -warn unused -check uninit -check bounds kopbnd.f
-ifort -c -g -warn unused -check uninit -check bounds kopdst.f
-ifort -c -g -warn unused -check uninit -check bounds korbs.f
-ifort -c -g -warn unused -check uninit -check bounds kpitor.f
-ifort -c -g -warn unused -check uninit -check bounds kpolr.f
-ifort -c -g -warn unused -check uninit -check bounds kstbnd.f
-ifort -c -g -warn unused -check uninit -check bounds ksttor.f
-ifort -c -g -warn unused -check uninit -check bounds ktorsn.f
-ifort -c -g -warn unused -check uninit -check bounds ktrtor.f
-ifort -c -g -warn unused -check uninit -check bounds kurybr.f
-ifort -c -g -warn unused -check uninit -check bounds kvdwpr.f
-ifort -c -g -warn unused -check uninit -check bounds kvdws.f
-ifort -c -g -warn unused -check uninit -check bounds light.f
-ifort -c -g -warn unused -check uninit -check bounds limits.f
-ifort -c -g -warn unused -check uninit -check bounds linmin.f
-ifort -c -g -warn unused -check uninit -check bounds math.f
-ifort -c -g -warn unused -check uninit -check bounds mdstuf.f
-ifort -c -g -warn unused -check uninit -check bounds merck.f
-ifort -c -g -warn unused -check uninit -check bounds minima.f
-ifort -c -g -warn unused -check uninit -check bounds molcul.f
-ifort -c -g -warn unused -check uninit -check bounds moldyn.f
-ifort -c -g -warn unused -check uninit -check bounds moment.f
-ifort -c -g -warn unused -check uninit -check bounds mplpot.f
-ifort -c -g -warn unused -check uninit -check bounds mpole.f
-ifort -c -g -warn unused -check uninit -check bounds mutant.f
-ifort -c -g -warn unused -check uninit -check bounds neigh.f
-ifort -c -g -warn unused -check uninit -check bounds nonpol.f
-ifort -c -g -warn unused -check uninit -check bounds nucleo.f
-ifort -c -g -warn unused -check uninit -check bounds omega.f
-ifort -c -g -warn unused -check uninit -check bounds opbend.f
-ifort -c -g -warn unused -check uninit -check bounds opdist.f
-ifort -c -g -warn unused -check uninit -check bounds openmp.f
-ifort -c -g -warn unused -check uninit -check bounds orbits.f
-ifort -c -g -warn unused -check uninit -check bounds output.f
-ifort -c -g -warn unused -check uninit -check bounds params.f
-ifort -c -g -warn unused -check uninit -check bounds paths.f
-ifort -c -g -warn unused -check uninit -check bounds pbstuf.f
-ifort -c -g -warn unused -check uninit -check bounds pdb.f
-ifort -c -g -warn unused -check uninit -check bounds phipsi.f
-ifort -c -g -warn unused -check uninit -check bounds piorbs.f
-ifort -c -g -warn unused -check uninit -check bounds pistuf.f
-ifort -c -g -warn unused -check uninit -check bounds pitors.f
-ifort -c -g -warn unused -check uninit -check bounds pme.f
-ifort -c -g -warn unused -check uninit -check bounds polar.f
-ifort -c -g -warn unused -check uninit -check bounds polgrp.f
-ifort -c -g -warn unused -check uninit -check bounds polpot.f
-ifort -c -g -warn unused -check uninit -check bounds potent.f
-ifort -c -g -warn unused -check uninit -check bounds potfit.f
-ifort -c -g -warn unused -check uninit -check bounds precis.f
-ifort -c -g -warn unused -check uninit -check bounds ptable.f
-ifort -c -g -warn unused -check uninit -check bounds qmstuf.f
-ifort -c -g -warn unused -check uninit -check bounds refer.f
-ifort -c -g -warn unused -check uninit -check bounds resdue.f
-ifort -c -g -warn unused -check uninit -check bounds restrn.f
-ifort -c -g -warn unused -check uninit -check bounds rgddyn.f
-ifort -c -g -warn unused -check uninit -check bounds rigid.f
-ifort -c -g -warn unused -check uninit -check bounds ring.f
-ifort -c -g -warn unused -check uninit -check bounds rotbnd.f
-ifort -c -g -warn unused -check uninit -check bounds rxnfld.f
-ifort -c -g -warn unused -check uninit -check bounds rxnpot.f
-ifort -c -g -warn unused -check uninit -check bounds scales.f
-ifort -c -g -warn unused -check uninit -check bounds sequen.f
-ifort -c -g -warn unused -check uninit -check bounds shunt.f
-ifort -c -g -warn unused -check uninit -check bounds sizes.f
-ifort -c -g -warn unused -check uninit -check bounds socket.f
-ifort -c -g -warn unused -check uninit -check bounds solute.f
-ifort -c -g -warn unused -check uninit -check bounds stodyn.f
-ifort -c -g -warn unused -check uninit -check bounds strbnd.f
-ifort -c -g -warn unused -check uninit -check bounds strtor.f
-ifort -c -g -warn unused -check uninit -check bounds syntrn.f
-ifort -c -g -warn unused -check uninit -check bounds tarray.f
-ifort -c -g -warn unused -check uninit -check bounds titles.f
-ifort -c -g -warn unused -check uninit -check bounds torpot.f
-ifort -c -g -warn unused -check uninit -check bounds tors.f
-ifort -c -g -warn unused -check uninit -check bounds tortor.f
-ifort -c -g -warn unused -check uninit -check bounds tree.f
-ifort -c -g -warn unused -check uninit -check bounds units.f
-ifort -c -g -warn unused -check uninit -check bounds uprior.f
-ifort -c -g -warn unused -check uninit -check bounds urey.f
-ifort -c -g -warn unused -check uninit -check bounds urypot.f
-ifort -c -g -warn unused -check uninit -check bounds usage.f
-ifort -c -g -warn unused -check uninit -check bounds usolve.f
-ifort -c -g -warn unused -check uninit -check bounds valfit.f
-ifort -c -g -warn unused -check uninit -check bounds vdw.f
-ifort -c -g -warn unused -check uninit -check bounds vdwpot.f
-ifort -c -g -warn unused -check uninit -check bounds vibs.f
-ifort -c -g -warn unused -check uninit -check bounds virial.f
-ifort -c -g -warn unused -check uninit -check bounds warp.f
-ifort -c -g -warn unused -check uninit -check bounds xtals.f
-ifort -c -g -warn unused -check uninit -check bounds zclose.f
-ifort -c -g -warn unused -check uninit -check bounds zcoord.f
+ifort -c -g -warn all -check all sizes.f
+ifort -c -g -warn all -check all action.f
+ifort -c -g -warn all -check all align.f
+ifort -c -g -warn all -check all analyz.f
+ifort -c -g -warn all -check all angang.f
+ifort -c -g -warn all -check all angbnd.f
+ifort -c -g -warn all -check all angpot.f
+ifort -c -g -warn all -check all angtor.f
+ifort -c -g -warn all -check all argue.f
+ifort -c -g -warn all -check all ascii.f
+ifort -c -g -warn all -check all atmlst.f
+ifort -c -g -warn all -check all atomid.f
+ifort -c -g -warn all -check all atoms.f
+ifort -c -g -warn all -check all bath.f
+ifort -c -g -warn all -check all bitor.f
+ifort -c -g -warn all -check all bndpot.f
+ifort -c -g -warn all -check all bndstr.f
+ifort -c -g -warn all -check all bound.f
+ifort -c -g -warn all -check all boxes.f
+ifort -c -g -warn all -check all cell.f
+ifort -c -g -warn all -check all charge.f
+ifort -c -g -warn all -check all chgpot.f
+ifort -c -g -warn all -check all chrono.f
+ifort -c -g -warn all -check all chunks.f
+ifort -c -g -warn all -check all couple.f
+ifort -c -g -warn all -check all deriv.f
+ifort -c -g -warn all -check all dipole.f
+ifort -c -g -warn all -check all disgeo.f
+ifort -c -g -warn all -check all dma.f
+ifort -c -g -warn all -check all domega.f
+ifort -c -g -warn all -check all energi.f
+ifort -c -g -warn all -check all ewald.f
+ifort -c -g -warn all -check all faces.f
+ifort -c -g -warn all -check all fft.f
+ifort -c -g -warn all -check all fields.f
+ifort -c -g -warn all -check all files.f
+ifort -c -g -warn all -check all fracs.f
+ifort -c -g -warn all -check all freeze.f
+ifort -c -g -warn all -check all gkstuf.f
+ifort -c -g -warn all -check all group.f
+ifort -c -g -warn all -check all hescut.f
+ifort -c -g -warn all -check all hessn.f
+ifort -c -g -warn all -check all hpmf.f
+ifort -c -g -warn all -check all improp.f
+ifort -c -g -warn all -check all imptor.f
+ifort -c -g -warn all -check all inform.f
+ifort -c -g -warn all -check all inter.f
+ifort -c -g -warn all -check all iounit.f
+ifort -c -g -warn all -check all kanang.f
+ifort -c -g -warn all -check all kangs.f
+ifort -c -g -warn all -check all kantor.f
+ifort -c -g -warn all -check all katoms.f
+ifort -c -g -warn all -check all kbonds.f
+ifort -c -g -warn all -check all kchrge.f
+ifort -c -g -warn all -check all kdipol.f
+ifort -c -g -warn all -check all keys.f
+ifort -c -g -warn all -check all khbond.f
+ifort -c -g -warn all -check all kiprop.f
+ifort -c -g -warn all -check all kitors.f
+ifort -c -g -warn all -check all kmulti.f
+ifort -c -g -warn all -check all kopbnd.f
+ifort -c -g -warn all -check all kopdst.f
+ifort -c -g -warn all -check all korbs.f
+ifort -c -g -warn all -check all kpitor.f
+ifort -c -g -warn all -check all kpolr.f
+ifort -c -g -warn all -check all kstbnd.f
+ifort -c -g -warn all -check all ksttor.f
+ifort -c -g -warn all -check all ktorsn.f
+ifort -c -g -warn all -check all ktrtor.f
+ifort -c -g -warn all -check all kurybr.f
+ifort -c -g -warn all -check all kvdwpr.f
+ifort -c -g -warn all -check all kvdws.f
+ifort -c -g -warn all -check all light.f
+ifort -c -g -warn all -check all limits.f
+ifort -c -g -warn all -check all linmin.f
+ifort -c -g -warn all -check all math.f
+ifort -c -g -warn all -check all mdstuf.f
+ifort -c -g -warn all -check all merck.f
+ifort -c -g -warn all -check all minima.f
+ifort -c -g -warn all -check all molcul.f
+ifort -c -g -warn all -check all moldyn.f
+ifort -c -g -warn all -check all moment.f
+ifort -c -g -warn all -check all mplpot.f
+ifort -c -g -warn all -check all mpole.f
+ifort -c -g -warn all -check all mutant.f
+ifort -c -g -warn all -check all neigh.f
+ifort -c -g -warn all -check all nonpol.f
+ifort -c -g -warn all -check all nucleo.f
+ifort -c -g -warn all -check all omega.f
+ifort -c -g -warn all -check all opbend.f
+ifort -c -g -warn all -check all opdist.f
+ifort -c -g -warn all -check all openmp.f
+ifort -c -g -warn all -check all orbits.f
+ifort -c -g -warn all -check all output.f
+ifort -c -g -warn all -check all params.f
+ifort -c -g -warn all -check all paths.f
+ifort -c -g -warn all -check all pbstuf.f
+ifort -c -g -warn all -check all pdb.f
+ifort -c -g -warn all -check all phipsi.f
+ifort -c -g -warn all -check all piorbs.f
+ifort -c -g -warn all -check all pistuf.f
+ifort -c -g -warn all -check all pitors.f
+ifort -c -g -warn all -check all pme.f
+ifort -c -g -warn all -check all polar.f
+ifort -c -g -warn all -check all polgrp.f
+ifort -c -g -warn all -check all polpot.f
+ifort -c -g -warn all -check all potent.f
+ifort -c -g -warn all -check all potfit.f
+ifort -c -g -warn all -check all precis.f
+ifort -c -g -warn all -check all ptable.f
+ifort -c -g -warn all -check all qmstuf.f
+ifort -c -g -warn all -check all refer.f
+ifort -c -g -warn all -check all resdue.f
+ifort -c -g -warn all -check all restrn.f
+ifort -c -g -warn all -check all rgddyn.f
+ifort -c -g -warn all -check all rigid.f
+ifort -c -g -warn all -check all ring.f
+ifort -c -g -warn all -check all rotbnd.f
+ifort -c -g -warn all -check all rxnfld.f
+ifort -c -g -warn all -check all rxnpot.f
+ifort -c -g -warn all -check all scales.f
+ifort -c -g -warn all -check all sequen.f
+ifort -c -g -warn all -check all shunt.f
+ifort -c -g -warn all -check all sizes.f
+ifort -c -g -warn all -check all socket.f
+ifort -c -g -warn all -check all solute.f
+ifort -c -g -warn all -check all stodyn.f
+ifort -c -g -warn all -check all strbnd.f
+ifort -c -g -warn all -check all strtor.f
+ifort -c -g -warn all -check all syntrn.f
+ifort -c -g -warn all -check all tarray.f
+ifort -c -g -warn all -check all titles.f
+ifort -c -g -warn all -check all torpot.f
+ifort -c -g -warn all -check all tors.f
+ifort -c -g -warn all -check all tortor.f
+ifort -c -g -warn all -check all tree.f
+ifort -c -g -warn all -check all units.f
+ifort -c -g -warn all -check all uprior.f
+ifort -c -g -warn all -check all urey.f
+ifort -c -g -warn all -check all urypot.f
+ifort -c -g -warn all -check all usage.f
+ifort -c -g -warn all -check all usolve.f
+ifort -c -g -warn all -check all valfit.f
+ifort -c -g -warn all -check all vdw.f
+ifort -c -g -warn all -check all vdwpot.f
+ifort -c -g -warn all -check all vibs.f
+ifort -c -g -warn all -check all virial.f
+ifort -c -g -warn all -check all warp.f
+ifort -c -g -warn all -check all xtals.f
+ifort -c -g -warn all -check all zclose.f
+ifort -c -g -warn all -check all zcoord.f
 #
 #  now compile separately each of the Fortran source files
 #
-ifort -c -g -warn unused -check uninit -check bounds active.f
-ifort -c -g -warn unused -check uninit -check bounds alchemy.f
-ifort -c -g -warn unused -check uninit -check bounds analysis.f
-ifort -c -g -warn unused -check uninit -check bounds analyze.f
-ifort -c -g -warn unused -check uninit -check bounds angles.f
-ifort -c -g -warn unused -check uninit -check bounds anneal.f
-ifort -c -g -warn unused -check uninit -check bounds archive.f
-ifort -c -g -warn unused -check uninit -check bounds attach.f
-ifort -c -g -warn unused -check uninit -check bounds bar.f
-ifort -c -g -warn unused -check uninit -check bounds basefile.f
-ifort -c -g -warn unused -check uninit -check bounds beeman.f
-ifort -c -g -warn unused -check uninit -check bounds bicubic.f
-ifort -c -g -warn unused -check uninit -check bounds bitors.f
-ifort -c -g -warn unused -check uninit -check bounds bonds.f
-ifort -c -g -warn unused -check uninit -check bounds born.f
-ifort -c -g -warn unused -check uninit -check bounds bounds.f
-ifort -c -g -warn unused -check uninit -check bounds bussi.f
-ifort -c -g -warn unused -check uninit -check bounds calendar.f
-ifort -c -g -warn unused -check uninit -check bounds center.f
-ifort -c -g -warn unused -check uninit -check bounds chkpole.f
-ifort -c -g -warn unused -check uninit -check bounds chkring.f
-ifort -c -g -warn unused -check uninit -check bounds chkxyz.f
-ifort -c -g -warn unused -check uninit -check bounds cholesky.f
-ifort -c -g -warn unused -check uninit -check bounds clock.f
-ifort -c -g -warn unused -check uninit -check bounds cluster.f
-ifort -c -g -warn unused -check uninit -check bounds column.f
-ifort -c -g -warn unused -check uninit -check bounds command.f
-ifort -c -g -warn unused -check uninit -check bounds connect.f
-ifort -c -g -warn unused -check uninit -check bounds connolly.f
-ifort -c -g -warn unused -check uninit -check bounds control.f
-ifort -c -g -warn unused -check uninit -check bounds correlate.f
-ifort -c -g -warn unused -check uninit -check bounds crystal.f
-ifort -c -g -warn unused -check uninit -check bounds cspline.f
-ifort -c -g -warn unused -check uninit -check bounds cutoffs.f
-ifort -c -g -warn unused -check uninit -check bounds deflate.f
-ifort -c -g -warn unused -check uninit -check bounds delete.f
-ifort -c -g -warn unused -check uninit -check bounds diagq.f
-ifort -c -g -warn unused -check uninit -check bounds diffeq.f
-ifort -c -g -warn unused -check uninit -check bounds diffuse.f
-ifort -c -g -warn unused -check uninit -check bounds distgeom.f
-ifort -c -g -warn unused -check uninit -check bounds document.f
-ifort -c -g -warn unused -check uninit -check bounds dynamic.f
-ifort -c -g -warn unused -check uninit -check bounds eangang.f
-ifort -c -g -warn unused -check uninit -check bounds eangang1.f
-ifort -c -g -warn unused -check uninit -check bounds eangang2.f
-ifort -c -g -warn unused -check uninit -check bounds eangang3.f
-ifort -c -g -warn unused -check uninit -check bounds eangle.f
-ifort -c -g -warn unused -check uninit -check bounds eangle1.f
-ifort -c -g -warn unused -check uninit -check bounds eangle2.f
-ifort -c -g -warn unused -check uninit -check bounds eangle3.f
-ifort -c -g -warn unused -check uninit -check bounds eangtor.f
-ifort -c -g -warn unused -check uninit -check bounds eangtor1.f
-ifort -c -g -warn unused -check uninit -check bounds eangtor2.f
-ifort -c -g -warn unused -check uninit -check bounds eangtor3.f
-ifort -c -g -warn unused -check uninit -check bounds ebond.f
-ifort -c -g -warn unused -check uninit -check bounds ebond1.f
-ifort -c -g -warn unused -check uninit -check bounds ebond2.f
-ifort -c -g -warn unused -check uninit -check bounds ebond3.f
-ifort -c -g -warn unused -check uninit -check bounds ebuck.f
-ifort -c -g -warn unused -check uninit -check bounds ebuck1.f
-ifort -c -g -warn unused -check uninit -check bounds ebuck2.f
-ifort -c -g -warn unused -check uninit -check bounds ebuck3.f
-ifort -c -g -warn unused -check uninit -check bounds echarge.f
-ifort -c -g -warn unused -check uninit -check bounds echarge1.f
-ifort -c -g -warn unused -check uninit -check bounds echarge2.f
-ifort -c -g -warn unused -check uninit -check bounds echarge3.f
-ifort -c -g -warn unused -check uninit -check bounds echgdpl.f
-ifort -c -g -warn unused -check uninit -check bounds echgdpl1.f
-ifort -c -g -warn unused -check uninit -check bounds echgdpl2.f
-ifort -c -g -warn unused -check uninit -check bounds echgdpl3.f
-ifort -c -g -warn unused -check uninit -check bounds edipole.f
-ifort -c -g -warn unused -check uninit -check bounds edipole1.f
-ifort -c -g -warn unused -check uninit -check bounds edipole2.f
-ifort -c -g -warn unused -check uninit -check bounds edipole3.f
-ifort -c -g -warn unused -check uninit -check bounds egauss.f
-ifort -c -g -warn unused -check uninit -check bounds egauss1.f
-ifort -c -g -warn unused -check uninit -check bounds egauss2.f
-ifort -c -g -warn unused -check uninit -check bounds egauss3.f
-ifort -c -g -warn unused -check uninit -check bounds egeom.f
-ifort -c -g -warn unused -check uninit -check bounds egeom1.f
-ifort -c -g -warn unused -check uninit -check bounds egeom2.f
-ifort -c -g -warn unused -check uninit -check bounds egeom3.f
-ifort -c -g -warn unused -check uninit -check bounds ehal.f
-ifort -c -g -warn unused -check uninit -check bounds ehal1.f
-ifort -c -g -warn unused -check uninit -check bounds ehal2.f
-ifort -c -g -warn unused -check uninit -check bounds ehal3.f
-ifort -c -g -warn unused -check uninit -check bounds eimprop.f
-ifort -c -g -warn unused -check uninit -check bounds eimprop1.f
-ifort -c -g -warn unused -check uninit -check bounds eimprop2.f
-ifort -c -g -warn unused -check uninit -check bounds eimprop3.f
-ifort -c -g -warn unused -check uninit -check bounds eimptor.f
-ifort -c -g -warn unused -check uninit -check bounds eimptor1.f
-ifort -c -g -warn unused -check uninit -check bounds eimptor2.f
-ifort -c -g -warn unused -check uninit -check bounds eimptor3.f
-ifort -c -g -warn unused -check uninit -check bounds elj.f
-ifort -c -g -warn unused -check uninit -check bounds elj1.f
-ifort -c -g -warn unused -check uninit -check bounds elj2.f
-ifort -c -g -warn unused -check uninit -check bounds elj3.f
-ifort -c -g -warn unused -check uninit -check bounds embed.f
-ifort -c -g -warn unused -check uninit -check bounds emetal.f
-ifort -c -g -warn unused -check uninit -check bounds emetal1.f
-ifort -c -g -warn unused -check uninit -check bounds emetal2.f
-ifort -c -g -warn unused -check uninit -check bounds emetal3.f
-ifort -c -g -warn unused -check uninit -check bounds emm3hb.f
-ifort -c -g -warn unused -check uninit -check bounds emm3hb1.f
-ifort -c -g -warn unused -check uninit -check bounds emm3hb2.f
-ifort -c -g -warn unused -check uninit -check bounds emm3hb3.f
-ifort -c -g -warn unused -check uninit -check bounds empole.f
-ifort -c -g -warn unused -check uninit -check bounds empole1.f
-ifort -c -g -warn unused -check uninit -check bounds empole2.f
-ifort -c -g -warn unused -check uninit -check bounds empole3.f
-ifort -c -g -warn unused -check uninit -check bounds energy.f
-ifort -c -g -warn unused -check uninit -check bounds eopbend.f
-ifort -c -g -warn unused -check uninit -check bounds eopbend1.f
-ifort -c -g -warn unused -check uninit -check bounds eopbend2.f
-ifort -c -g -warn unused -check uninit -check bounds eopbend3.f
-ifort -c -g -warn unused -check uninit -check bounds eopdist.f
-ifort -c -g -warn unused -check uninit -check bounds eopdist1.f
-ifort -c -g -warn unused -check uninit -check bounds eopdist2.f
-ifort -c -g -warn unused -check uninit -check bounds eopdist3.f
-ifort -c -g -warn unused -check uninit -check bounds epitors.f
-ifort -c -g -warn unused -check uninit -check bounds epitors1.f
-ifort -c -g -warn unused -check uninit -check bounds epitors2.f
-ifort -c -g -warn unused -check uninit -check bounds epitors3.f
-ifort -c -g -warn unused -check uninit -check bounds erf.f
-ifort -c -g -warn unused -check uninit -check bounds erxnfld.f
-ifort -c -g -warn unused -check uninit -check bounds erxnfld1.f
-ifort -c -g -warn unused -check uninit -check bounds erxnfld2.f
-ifort -c -g -warn unused -check uninit -check bounds erxnfld3.f
-ifort -c -g -warn unused -check uninit -check bounds esolv.f
-ifort -c -g -warn unused -check uninit -check bounds esolv1.f
-ifort -c -g -warn unused -check uninit -check bounds esolv2.f
-ifort -c -g -warn unused -check uninit -check bounds esolv3.f
-ifort -c -g -warn unused -check uninit -check bounds estrbnd.f
-ifort -c -g -warn unused -check uninit -check bounds estrbnd1.f
-ifort -c -g -warn unused -check uninit -check bounds estrbnd2.f
-ifort -c -g -warn unused -check uninit -check bounds estrbnd3.f
-ifort -c -g -warn unused -check uninit -check bounds estrtor.f
-ifort -c -g -warn unused -check uninit -check bounds estrtor1.f
-ifort -c -g -warn unused -check uninit -check bounds estrtor2.f
-ifort -c -g -warn unused -check uninit -check bounds estrtor3.f
-ifort -c -g -warn unused -check uninit -check bounds etors.f
-ifort -c -g -warn unused -check uninit -check bounds etors1.f
-ifort -c -g -warn unused -check uninit -check bounds etors2.f
-ifort -c -g -warn unused -check uninit -check bounds etors3.f
-ifort -c -g -warn unused -check uninit -check bounds etortor.f
-ifort -c -g -warn unused -check uninit -check bounds etortor1.f
-ifort -c -g -warn unused -check uninit -check bounds etortor2.f
-ifort -c -g -warn unused -check uninit -check bounds etortor3.f
-ifort -c -g -warn unused -check uninit -check bounds eurey.f
-ifort -c -g -warn unused -check uninit -check bounds eurey1.f
-ifort -c -g -warn unused -check uninit -check bounds eurey2.f
-ifort -c -g -warn unused -check uninit -check bounds eurey3.f
-ifort -c -g -warn unused -check uninit -check bounds evcorr.f
-ifort -c -g -warn unused -check uninit -check bounds extra.f
-ifort -c -g -warn unused -check uninit -check bounds extra1.f
-ifort -c -g -warn unused -check uninit -check bounds extra2.f
-ifort -c -g -warn unused -check uninit -check bounds extra3.f
-ifort -c -g -warn unused -check uninit -check bounds fatal.f
-ifort -c -g -warn unused -check uninit -check bounds fft3d.f
-ifort -c -g -warn unused -check uninit -check bounds fftpack.f
-ifort -c -g -warn unused -check uninit -check bounds field.f
-ifort -c -g -warn unused -check uninit -check bounds final.f
-ifort -c -g -warn unused -check uninit -check bounds flatten.f
-ifort -c -g -warn unused -check uninit -check bounds freeunit.f
-ifort -c -g -warn unused -check uninit -check bounds gda.f
-ifort -c -g -warn unused -check uninit -check bounds geometry.f
-ifort -c -g -warn unused -check uninit -check bounds getint.f
-ifort -c -g -warn unused -check uninit -check bounds getkey.f
-ifort -c -g -warn unused -check uninit -check bounds getmol.f
-ifort -c -g -warn unused -check uninit -check bounds getmol2.f
-ifort -c -g -warn unused -check uninit -check bounds getnumb.f
-ifort -c -g -warn unused -check uninit -check bounds getpdb.f
-ifort -c -g -warn unused -check uninit -check bounds getprm.f
-ifort -c -g -warn unused -check uninit -check bounds getref.f
-ifort -c -g -warn unused -check uninit -check bounds getstring.f
-ifort -c -g -warn unused -check uninit -check bounds gettext.f
-ifort -c -g -warn unused -check uninit -check bounds getword.f
-ifort -c -g -warn unused -check uninit -check bounds getxyz.f
-ifort -c -g -warn unused -check uninit -check bounds ghmcstep.f
-ifort -c -g -warn unused -check uninit -check bounds gradient.f
-ifort -c -g -warn unused -check uninit -check bounds gradrgd.f
-ifort -c -g -warn unused -check uninit -check bounds gradrot.f
-ifort -c -g -warn unused -check uninit -check bounds groups.f
-ifort -c -g -warn unused -check uninit -check bounds grpline.f
-ifort -c -g -warn unused -check uninit -check bounds gyrate.f
-ifort -c -g -warn unused -check uninit -check bounds hessian.f
-ifort -c -g -warn unused -check uninit -check bounds hessrgd.f
-ifort -c -g -warn unused -check uninit -check bounds hessrot.f
-ifort -c -g -warn unused -check uninit -check bounds hybrid.f
-ifort -c -g -warn unused -check uninit -check bounds image.f
-ifort -c -g -warn unused -check uninit -check bounds impose.f
-ifort -c -g -warn unused -check uninit -check bounds induce.f
-ifort -c -g -warn unused -check uninit -check bounds inertia.f
-ifort -c -g -warn unused -check uninit -check bounds initatom.f
-ifort -c -g -warn unused -check uninit -check bounds initial.f
-ifort -c -g -warn unused -check uninit -check bounds initprm.f
-ifort -c -g -warn unused -check uninit -check bounds initres.f
-ifort -c -g -warn unused -check uninit -check bounds initrot.f
-ifort -c -g -warn unused -check uninit -check bounds insert.f
-ifort -c -g -warn unused -check uninit -check bounds intedit.f
-ifort -c -g -warn unused -check uninit -check bounds intxyz.f
-ifort -c -g -warn unused -check uninit -check bounds invbeta.f
-ifort -c -g -warn unused -check uninit -check bounds invert.f
-ifort -c -g -warn unused -check uninit -check bounds jacobi.f
-ifort -c -g -warn unused -check uninit -check bounds kangang.f
-ifort -c -g -warn unused -check uninit -check bounds kangle.f
-ifort -c -g -warn unused -check uninit -check bounds kangtor.f
-ifort -c -g -warn unused -check uninit -check bounds katom.f
-ifort -c -g -warn unused -check uninit -check bounds kbond.f
-ifort -c -g -warn unused -check uninit -check bounds kcharge.f
-ifort -c -g -warn unused -check uninit -check bounds kdipole.f
-ifort -c -g -warn unused -check uninit -check bounds kewald.f
-ifort -c -g -warn unused -check uninit -check bounds kextra.f
-ifort -c -g -warn unused -check uninit -check bounds kgeom.f
-ifort -c -g -warn unused -check uninit -check bounds kimprop.f
-ifort -c -g -warn unused -check uninit -check bounds kimptor.f
-ifort -c -g -warn unused -check uninit -check bounds kinetic.f
-ifort -c -g -warn unused -check uninit -check bounds kmetal.f
-ifort -c -g -warn unused -check uninit -check bounds kmpole.f
-ifort -c -g -warn unused -check uninit -check bounds kopbend.f
-ifort -c -g -warn unused -check uninit -check bounds kopdist.f
-ifort -c -g -warn unused -check uninit -check bounds korbit.f
-ifort -c -g -warn unused -check uninit -check bounds kpitors.f
-ifort -c -g -warn unused -check uninit -check bounds kpolar.f
-ifort -c -g -warn unused -check uninit -check bounds ksolv.f
-ifort -c -g -warn unused -check uninit -check bounds kstrbnd.f
-ifort -c -g -warn unused -check uninit -check bounds kstrtor.f
-ifort -c -g -warn unused -check uninit -check bounds ktors.f
-ifort -c -g -warn unused -check uninit -check bounds ktortor.f
-ifort -c -g -warn unused -check uninit -check bounds kurey.f
-ifort -c -g -warn unused -check uninit -check bounds kvdw.f
-ifort -c -g -warn unused -check uninit -check bounds lattice.f
-ifort -c -g -warn unused -check uninit -check bounds lbfgs.f
-ifort -c -g -warn unused -check uninit -check bounds lights.f
-ifort -c -g -warn unused -check uninit -check bounds makeint.f
-ifort -c -g -warn unused -check uninit -check bounds makeref.f
-ifort -c -g -warn unused -check uninit -check bounds makexyz.f
-ifort -c -g -warn unused -check uninit -check bounds maxwell.f
-ifort -c -g -warn unused -check uninit -check bounds mdinit.f
-ifort -c -g -warn unused -check uninit -check bounds mdrest.f
-ifort -c -g -warn unused -check uninit -check bounds mdsave.f
-ifort -c -g -warn unused -check uninit -check bounds mdstat.f
-ifort -c -g -warn unused -check uninit -check bounds mechanic.f
-ifort -c -g -warn unused -check uninit -check bounds merge.f
-ifort -c -g -warn unused -check uninit -check bounds minimize.f
-ifort -c -g -warn unused -check uninit -check bounds minirot.f
-ifort -c -g -warn unused -check uninit -check bounds minrigid.f
-ifort -c -g -warn unused -check uninit -check bounds molecule.f
-ifort -c -g -warn unused -check uninit -check bounds molxyz.f
-ifort -c -g -warn unused -check uninit -check bounds moments.f
-ifort -c -g -warn unused -check uninit -check bounds monte.f
-ifort -c -g -warn unused -check uninit -check bounds mutate.f
-ifort -c -g -warn unused -check uninit -check bounds nblist.f
-ifort -c -g -warn unused -check uninit -check bounds newton.f
-ifort -c -g -warn unused -check uninit -check bounds newtrot.f
-ifort -c -g -warn unused -check uninit -check bounds nextarg.f
-ifort -c -g -warn unused -check uninit -check bounds nexttext.f
-ifort -c -g -warn unused -check uninit -check bounds nose.f
-ifort -c -g -warn unused -check uninit -check bounds nspline.f
-ifort -c -g -warn unused -check uninit -check bounds nucleic.f
-ifort -c -g -warn unused -check uninit -check bounds number.f
-ifort -c -g -warn unused -check uninit -check bounds numeral.f
-ifort -c -g -warn unused -check uninit -check bounds numgrad.f
-ifort -c -g -warn unused -check uninit -check bounds ocvm.f
-ifort -c -g -warn unused -check uninit -check bounds openend.f
-ifort -c -g -warn unused -check uninit -check bounds optimize.f
-ifort -c -g -warn unused -check uninit -check bounds optirot.f
-ifort -c -g -warn unused -check uninit -check bounds optrigid.f
-ifort -c -g -warn unused -check uninit -check bounds optsave.f
-ifort -c -g -warn unused -check uninit -check bounds orbital.f
-ifort -c -g -warn unused -check uninit -check bounds orient.f
-ifort -c -g -warn unused -check uninit -check bounds orthog.f
-ifort -c -g -warn unused -check uninit -check bounds overlap.f
-ifort -c -g -warn unused -check uninit -check bounds path.f
-ifort -c -g -warn unused -check uninit -check bounds pdbxyz.f
-ifort -c -g -warn unused -check uninit -check bounds picalc.f
-ifort -c -g -warn unused -check uninit -check bounds pmestuff.f
-ifort -c -g -warn unused -check uninit -check bounds pmpb.f
-ifort -c -g -warn unused -check uninit -check bounds polarize.f
-ifort -c -g -warn unused -check uninit -check bounds poledit.f
-ifort -c -g -warn unused -check uninit -check bounds polymer.f
-ifort -c -g -warn unused -check uninit -check bounds potential.f
-ifort -c -g -warn unused -check uninit -check bounds precise.f
-ifort -c -g -warn unused -check uninit -check bounds pressure.f
-ifort -c -g -warn unused -check uninit -check bounds prmedit.f
-ifort -c -g -warn unused -check uninit -check bounds prmkey.f
-ifort -c -g -warn unused -check uninit -check bounds promo.f
-ifort -c -g -warn unused -check uninit -check bounds protein.f
-ifort -c -g -warn unused -check uninit -check bounds prtdyn.f
-ifort -c -g -warn unused -check uninit -check bounds prterr.f
-ifort -c -g -warn unused -check uninit -check bounds prtint.f
-ifort -c -g -warn unused -check uninit -check bounds prtmol2.f
-ifort -c -g -warn unused -check uninit -check bounds prtpdb.f
-ifort -c -g -warn unused -check uninit -check bounds prtprm.f
-ifort -c -g -warn unused -check uninit -check bounds prtseq.f
-ifort -c -g -warn unused -check uninit -check bounds prtxyz.f
-ifort -c -g -warn unused -check uninit -check bounds pss.f
-ifort -c -g -warn unused -check uninit -check bounds pssrigid.f
-ifort -c -g -warn unused -check uninit -check bounds pssrot.f
-ifort -c -g -warn unused -check uninit -check bounds quatfit.f
-ifort -c -g -warn unused -check uninit -check bounds radial.f
-ifort -c -g -warn unused -check uninit -check bounds random.f
-ifort -c -g -warn unused -check uninit -check bounds rattle.f
-ifort -c -g -warn unused -check uninit -check bounds readdyn.f
-ifort -c -g -warn unused -check uninit -check bounds readgau.f
-ifort -c -g -warn unused -check uninit -check bounds readint.f
-ifort -c -g -warn unused -check uninit -check bounds readmol.f
-ifort -c -g -warn unused -check uninit -check bounds readmol2.f
-ifort -c -g -warn unused -check uninit -check bounds readpdb.f
-ifort -c -g -warn unused -check uninit -check bounds readprm.f
-ifort -c -g -warn unused -check uninit -check bounds readseq.f
-ifort -c -g -warn unused -check uninit -check bounds readxyz.f
-ifort -c -g -warn unused -check uninit -check bounds replica.f
-ifort -c -g -warn unused -check uninit -check bounds respa.f
-ifort -c -g -warn unused -check uninit -check bounds rgdstep.f
-ifort -c -g -warn unused -check uninit -check bounds rings.f
-ifort -c -g -warn unused -check uninit -check bounds rmsfit.f
-ifort -c -g -warn unused -check uninit -check bounds rotlist.f
-ifort -c -g -warn unused -check uninit -check bounds rotpole.f
-ifort -c -g -warn unused -check uninit -check bounds saddle.f
-ifort -c -g -warn unused -check uninit -check bounds scan.f
-ifort -c -g -warn unused -check uninit -check bounds sdstep.f
-ifort -c -g -warn unused -check uninit -check bounds search.f
-ifort -c -g -warn unused -check uninit -check bounds server.f
-ifort -c -g -warn unused -check uninit -check bounds shakeup.f
-ifort -c -g -warn unused -check uninit -check bounds sigmoid.f
-ifort -c -g -warn unused -check uninit -check bounds sktstuff.f
-ifort -c -g -warn unused -check uninit -check bounds sniffer.f
-ifort -c -g -warn unused -check uninit -check bounds sort.f
-ifort -c -g -warn unused -check uninit -check bounds spacefill.f
-ifort -c -g -warn unused -check uninit -check bounds spectrum.f
-ifort -c -g -warn unused -check uninit -check bounds square.f
-ifort -c -g -warn unused -check uninit -check bounds suffix.f
-ifort -c -g -warn unused -check uninit -check bounds superpose.f
-ifort -c -g -warn unused -check uninit -check bounds surface.f
-ifort -c -g -warn unused -check uninit -check bounds surfatom.f
-ifort -c -g -warn unused -check uninit -check bounds switch.f
-ifort -c -g -warn unused -check uninit -check bounds sybylxyz.f
-ifort -c -g -warn unused -check uninit -check bounds temper.f
-ifort -c -g -warn unused -check uninit -check bounds testgrad.f
-ifort -c -g -warn unused -check uninit -check bounds testhess.f
-ifort -c -g -warn unused -check uninit -check bounds testpair.f
-ifort -c -g -warn unused -check uninit -check bounds testpol.f
-ifort -c -g -warn unused -check uninit -check bounds testrot.f
-ifort -c -g -warn unused -check uninit -check bounds timer.f
-ifort -c -g -warn unused -check uninit -check bounds timerot.f
-ifort -c -g -warn unused -check uninit -check bounds tncg.f
-ifort -c -g -warn unused -check uninit -check bounds torphase.f
-ifort -c -g -warn unused -check uninit -check bounds torque.f
-ifort -c -g -warn unused -check uninit -check bounds torsfit.f
-ifort -c -g -warn unused -check uninit -check bounds torsions.f
-ifort -c -g -warn unused -check uninit -check bounds trimtext.f
-ifort -c -g -warn unused -check uninit -check bounds unitcell.f
-ifort -c -g -warn unused -check uninit -check bounds valence.f
-ifort -c -g -warn unused -check uninit -check bounds verlet.f
-ifort -c -g -warn unused -check uninit -check bounds version.f
-ifort -c -g -warn unused -check uninit -check bounds vibbig.f
-ifort -c -g -warn unused -check uninit -check bounds vibrate.f
-ifort -c -g -warn unused -check uninit -check bounds vibrot.f
-ifort -c -g -warn unused -check uninit -check bounds volume.f
-ifort -c -g -warn unused -check uninit -check bounds xtalfit.f
-ifort -c -g -warn unused -check uninit -check bounds xtalmin.f
-ifort -c -g -warn unused -check uninit -check bounds xyzatm.f
-ifort -c -g -warn unused -check uninit -check bounds xyzedit.f
-ifort -c -g -warn unused -check uninit -check bounds xyzint.f
-ifort -c -g -warn unused -check uninit -check bounds xyzpdb.f
-ifort -c -g -warn unused -check uninit -check bounds xyzsybyl.f
-ifort -c -g -warn unused -check uninit -check bounds zatom.f
+ifort -c -g -warn all -check all active.f
+ifort -c -g -warn all -check all alchemy.f
+ifort -c -g -warn all -check all analysis.f
+ifort -c -g -warn all -check all analyze.f
+ifort -c -g -warn all -check all angles.f
+ifort -c -g -warn all -check all anneal.f
+ifort -c -g -warn all -check all archive.f
+ifort -c -g -warn all -check all attach.f
+ifort -c -g -warn all -check all bar.f
+ifort -c -g -warn all -check all basefile.f
+ifort -c -g -warn all -check all beeman.f
+ifort -c -g -warn all -check all bicubic.f
+ifort -c -g -warn all -check all bitors.f
+ifort -c -g -warn all -check all bonds.f
+ifort -c -g -warn all -check all born.f
+ifort -c -g -warn all -check all bounds.f
+ifort -c -g -warn all -check all bussi.f
+ifort -c -g -warn all -check all calendar.f
+ifort -c -g -warn all -check all center.f
+ifort -c -g -warn all -check all chkpole.f
+ifort -c -g -warn all -check all chkring.f
+ifort -c -g -warn all -check all chkxyz.f
+ifort -c -g -warn all -check all cholesky.f
+ifort -c -g -warn all -check all clock.f
+ifort -c -g -warn all -check all cluster.f
+ifort -c -g -warn all -check all column.f
+ifort -c -g -warn all -check all command.f
+ifort -c -g -warn all -check all connect.f
+ifort -c -g -warn all -check all connolly.f
+ifort -c -g -warn all -check all control.f
+ifort -c -g -warn all -check all correlate.f
+ifort -c -g -warn all -check all crystal.f
+ifort -c -g -warn all -check all cspline.f
+ifort -c -g -warn all -check all cutoffs.f
+ifort -c -g -warn all -check all deflate.f
+ifort -c -g -warn all -check all delete.f
+ifort -c -g -warn all -check all diagq.f
+ifort -c -g -warn all -check all diffeq.f
+ifort -c -g -warn all -check all diffuse.f
+ifort -c -g -warn all -check all distgeom.f
+ifort -c -g -warn all -check all document.f
+ifort -c -g -warn all -check all dynamic.f
+ifort -c -g -warn all -check all eangang.f
+ifort -c -g -warn all -check all eangang1.f
+ifort -c -g -warn all -check all eangang2.f
+ifort -c -g -warn all -check all eangang3.f
+ifort -c -g -warn all -check all eangle.f
+ifort -c -g -warn all -check all eangle1.f
+ifort -c -g -warn all -check all eangle2.f
+ifort -c -g -warn all -check all eangle3.f
+ifort -c -g -warn all -check all eangtor.f
+ifort -c -g -warn all -check all eangtor1.f
+ifort -c -g -warn all -check all eangtor2.f
+ifort -c -g -warn all -check all eangtor3.f
+ifort -c -g -warn all -check all ebond.f
+ifort -c -g -warn all -check all ebond1.f
+ifort -c -g -warn all -check all ebond2.f
+ifort -c -g -warn all -check all ebond3.f
+ifort -c -g -warn all -check all ebuck.f
+ifort -c -g -warn all -check all ebuck1.f
+ifort -c -g -warn all -check all ebuck2.f
+ifort -c -g -warn all -check all ebuck3.f
+ifort -c -g -warn all -check all echarge.f
+ifort -c -g -warn all -check all echarge1.f
+ifort -c -g -warn all -check all echarge2.f
+ifort -c -g -warn all -check all echarge3.f
+ifort -c -g -warn all -check all echgdpl.f
+ifort -c -g -warn all -check all echgdpl1.f
+ifort -c -g -warn all -check all echgdpl2.f
+ifort -c -g -warn all -check all echgdpl3.f
+ifort -c -g -warn all -check all edipole.f
+ifort -c -g -warn all -check all edipole1.f
+ifort -c -g -warn all -check all edipole2.f
+ifort -c -g -warn all -check all edipole3.f
+ifort -c -g -warn all -check all egauss.f
+ifort -c -g -warn all -check all egauss1.f
+ifort -c -g -warn all -check all egauss2.f
+ifort -c -g -warn all -check all egauss3.f
+ifort -c -g -warn all -check all egeom.f
+ifort -c -g -warn all -check all egeom1.f
+ifort -c -g -warn all -check all egeom2.f
+ifort -c -g -warn all -check all egeom3.f
+ifort -c -g -warn all -check all ehal.f
+ifort -c -g -warn all -check all ehal1.f
+ifort -c -g -warn all -check all ehal2.f
+ifort -c -g -warn all -check all ehal3.f
+ifort -c -g -warn all -check all eimprop.f
+ifort -c -g -warn all -check all eimprop1.f
+ifort -c -g -warn all -check all eimprop2.f
+ifort -c -g -warn all -check all eimprop3.f
+ifort -c -g -warn all -check all eimptor.f
+ifort -c -g -warn all -check all eimptor1.f
+ifort -c -g -warn all -check all eimptor2.f
+ifort -c -g -warn all -check all eimptor3.f
+ifort -c -g -warn all -check all elj.f
+ifort -c -g -warn all -check all elj1.f
+ifort -c -g -warn all -check all elj2.f
+ifort -c -g -warn all -check all elj3.f
+ifort -c -g -warn all -check all embed.f
+ifort -c -g -warn all -check all emetal.f
+ifort -c -g -warn all -check all emetal1.f
+ifort -c -g -warn all -check all emetal2.f
+ifort -c -g -warn all -check all emetal3.f
+ifort -c -g -warn all -check all emm3hb.f
+ifort -c -g -warn all -check all emm3hb1.f
+ifort -c -g -warn all -check all emm3hb2.f
+ifort -c -g -warn all -check all emm3hb3.f
+ifort -c -g -warn all -check all empole.f
+ifort -c -g -warn all -check all empole1.f
+ifort -c -g -warn all -check all empole2.f
+ifort -c -g -warn all -check all empole3.f
+ifort -c -g -warn all -check all energy.f
+ifort -c -g -warn all -check all eopbend.f
+ifort -c -g -warn all -check all eopbend1.f
+ifort -c -g -warn all -check all eopbend2.f
+ifort -c -g -warn all -check all eopbend3.f
+ifort -c -g -warn all -check all eopdist.f
+ifort -c -g -warn all -check all eopdist1.f
+ifort -c -g -warn all -check all eopdist2.f
+ifort -c -g -warn all -check all eopdist3.f
+ifort -c -g -warn all -check all epitors.f
+ifort -c -g -warn all -check all epitors1.f
+ifort -c -g -warn all -check all epitors2.f
+ifort -c -g -warn all -check all epitors3.f
+ifort -c -g -warn all -check all erf.f
+ifort -c -g -warn all -check all erxnfld.f
+ifort -c -g -warn all -check all erxnfld1.f
+ifort -c -g -warn all -check all erxnfld2.f
+ifort -c -g -warn all -check all erxnfld3.f
+ifort -c -g -warn all -check all esolv.f
+ifort -c -g -warn all -check all esolv1.f
+ifort -c -g -warn all -check all esolv2.f
+ifort -c -g -warn all -check all esolv3.f
+ifort -c -g -warn all -check all estrbnd.f
+ifort -c -g -warn all -check all estrbnd1.f
+ifort -c -g -warn all -check all estrbnd2.f
+ifort -c -g -warn all -check all estrbnd3.f
+ifort -c -g -warn all -check all estrtor.f
+ifort -c -g -warn all -check all estrtor1.f
+ifort -c -g -warn all -check all estrtor2.f
+ifort -c -g -warn all -check all estrtor3.f
+ifort -c -g -warn all -check all etors.f
+ifort -c -g -warn all -check all etors1.f
+ifort -c -g -warn all -check all etors2.f
+ifort -c -g -warn all -check all etors3.f
+ifort -c -g -warn all -check all etortor.f
+ifort -c -g -warn all -check all etortor1.f
+ifort -c -g -warn all -check all etortor2.f
+ifort -c -g -warn all -check all etortor3.f
+ifort -c -g -warn all -check all eurey.f
+ifort -c -g -warn all -check all eurey1.f
+ifort -c -g -warn all -check all eurey2.f
+ifort -c -g -warn all -check all eurey3.f
+ifort -c -g -warn all -check all evcorr.f
+ifort -c -g -warn all -check all extra.f
+ifort -c -g -warn all -check all extra1.f
+ifort -c -g -warn all -check all extra2.f
+ifort -c -g -warn all -check all extra3.f
+ifort -c -g -warn all -check all fatal.f
+ifort -c -g -warn all -check all fft3d.f
+ifort -c -g -warn all -check all fftpack.f
+ifort -c -g -warn all -check all field.f
+ifort -c -g -warn all -check all final.f
+ifort -c -g -warn all -check all flatten.f
+ifort -c -g -warn all -check all freeunit.f
+ifort -c -g -warn all -check all gda.f
+ifort -c -g -warn all -check all geometry.f
+ifort -c -g -warn all -check all getint.f
+ifort -c -g -warn all -check all getkey.f
+ifort -c -g -warn all -check all getmol.f
+ifort -c -g -warn all -check all getmol2.f
+ifort -c -g -warn all -check all getnumb.f
+ifort -c -g -warn all -check all getpdb.f
+ifort -c -g -warn all -check all getprm.f
+ifort -c -g -warn all -check all getref.f
+ifort -c -g -warn all -check all getstring.f
+ifort -c -g -warn all -check all gettext.f
+ifort -c -g -warn all -check all getword.f
+ifort -c -g -warn all -check all getxyz.f
+ifort -c -g -warn all -check all ghmcstep.f
+ifort -c -g -warn all -check all gradient.f
+ifort -c -g -warn all -check all gradrgd.f
+ifort -c -g -warn all -check all gradrot.f
+ifort -c -g -warn all -check all groups.f
+ifort -c -g -warn all -check all grpline.f
+ifort -c -g -warn all -check all gyrate.f
+ifort -c -g -warn all -check all hessian.f
+ifort -c -g -warn all -check all hessrgd.f
+ifort -c -g -warn all -check all hessrot.f
+ifort -c -g -warn all -check all hybrid.f
+ifort -c -g -warn all -check all image.f
+ifort -c -g -warn all -check all impose.f
+ifort -c -g -warn all -check all induce.f
+ifort -c -g -warn all -check all inertia.f
+ifort -c -g -warn all -check all initatom.f
+ifort -c -g -warn all -check all initial.f
+ifort -c -g -warn all -check all initprm.f
+ifort -c -g -warn all -check all initres.f
+ifort -c -g -warn all -check all initrot.f
+ifort -c -g -warn all -check all insert.f
+ifort -c -g -warn all -check all intedit.f
+ifort -c -g -warn all -check all intxyz.f
+ifort -c -g -warn all -check all invbeta.f
+ifort -c -g -warn all -check all invert.f
+ifort -c -g -warn all -check all jacobi.f
+ifort -c -g -warn all -check all kangang.f
+ifort -c -g -warn all -check all kangle.f
+ifort -c -g -warn all -check all kangtor.f
+ifort -c -g -warn all -check all katom.f
+ifort -c -g -warn all -check all kbond.f
+ifort -c -g -warn all -check all kcharge.f
+ifort -c -g -warn all -check all kdipole.f
+ifort -c -g -warn all -check all kewald.f
+ifort -c -g -warn all -check all kextra.f
+ifort -c -g -warn all -check all kgeom.f
+ifort -c -g -warn all -check all kimprop.f
+ifort -c -g -warn all -check all kimptor.f
+ifort -c -g -warn all -check all kinetic.f
+ifort -c -g -warn all -check all kmetal.f
+ifort -c -g -warn all -check all kmpole.f
+ifort -c -g -warn all -check all kopbend.f
+ifort -c -g -warn all -check all kopdist.f
+ifort -c -g -warn all -check all korbit.f
+ifort -c -g -warn all -check all kpitors.f
+ifort -c -g -warn all -check all kpolar.f
+ifort -c -g -warn all -check all ksolv.f
+ifort -c -g -warn all -check all kstrbnd.f
+ifort -c -g -warn all -check all kstrtor.f
+ifort -c -g -warn all -check all ktors.f
+ifort -c -g -warn all -check all ktortor.f
+ifort -c -g -warn all -check all kurey.f
+ifort -c -g -warn all -check all kvdw.f
+ifort -c -g -warn all -check all lattice.f
+ifort -c -g -warn all -check all lbfgs.f
+ifort -c -g -warn all -check all lights.f
+ifort -c -g -warn all -check all makeint.f
+ifort -c -g -warn all -check all makeref.f
+ifort -c -g -warn all -check all makexyz.f
+ifort -c -g -warn all -check all maxwell.f
+ifort -c -g -warn all -check all mdinit.f
+ifort -c -g -warn all -check all mdrest.f
+ifort -c -g -warn all -check all mdsave.f
+ifort -c -g -warn all -check all mdstat.f
+ifort -c -g -warn all -check all mechanic.f
+ifort -c -g -warn all -check all merge.f
+ifort -c -g -warn all -check all minimize.f
+ifort -c -g -warn all -check all minirot.f
+ifort -c -g -warn all -check all minrigid.f
+ifort -c -g -warn all -check all molecule.f
+ifort -c -g -warn all -check all molxyz.f
+ifort -c -g -warn all -check all moments.f
+ifort -c -g -warn all -check all monte.f
+ifort -c -g -warn all -check all mutate.f
+ifort -c -g -warn all -check all nblist.f
+ifort -c -g -warn all -check all newton.f
+ifort -c -g -warn all -check all newtrot.f
+ifort -c -g -warn all -check all nextarg.f
+ifort -c -g -warn all -check all nexttext.f
+ifort -c -g -warn all -check all nose.f
+ifort -c -g -warn all -check all nspline.f
+ifort -c -g -warn all -check all nucleic.f
+ifort -c -g -warn all -check all number.f
+ifort -c -g -warn all -check all numeral.f
+ifort -c -g -warn all -check all numgrad.f
+ifort -c -g -warn all -check all ocvm.f
+ifort -c -g -warn all -check all openend.f
+ifort -c -g -warn all -check all optimize.f
+ifort -c -g -warn all -check all optirot.f
+ifort -c -g -warn all -check all optrigid.f
+ifort -c -g -warn all -check all optsave.f
+ifort -c -g -warn all -check all orbital.f
+ifort -c -g -warn all -check all orient.f
+ifort -c -g -warn all -check all orthog.f
+ifort -c -g -warn all -check all overlap.f
+ifort -c -g -warn all -check all path.f
+ifort -c -g -warn all -check all pdbxyz.f
+ifort -c -g -warn all -check all picalc.f
+ifort -c -g -warn all -check all pmestuff.f
+ifort -c -g -warn all -check all pmpb.f
+ifort -c -g -warn all -check all polarize.f
+ifort -c -g -warn all -check all poledit.f
+ifort -c -g -warn all -check all polymer.f
+ifort -c -g -warn all -check all potential.f
+ifort -c -g -warn all -check all precise.f
+ifort -c -g -warn all -check all pressure.f
+ifort -c -g -warn all -check all prmedit.f
+ifort -c -g -warn all -check all prmkey.f
+ifort -c -g -warn all -check all promo.f
+ifort -c -g -warn all -check all protein.f
+ifort -c -g -warn all -check all prtdyn.f
+ifort -c -g -warn all -check all prterr.f
+ifort -c -g -warn all -check all prtint.f
+ifort -c -g -warn all -check all prtmol2.f
+ifort -c -g -warn all -check all prtpdb.f
+ifort -c -g -warn all -check all prtprm.f
+ifort -c -g -warn all -check all prtseq.f
+ifort -c -g -warn all -check all prtxyz.f
+ifort -c -g -warn all -check all pss.f
+ifort -c -g -warn all -check all pssrigid.f
+ifort -c -g -warn all -check all pssrot.f
+ifort -c -g -warn all -check all quatfit.f
+ifort -c -g -warn all -check all radial.f
+ifort -c -g -warn all -check all random.f
+ifort -c -g -warn all -check all rattle.f
+ifort -c -g -warn all -check all readdyn.f
+ifort -c -g -warn all -check all readgau.f
+ifort -c -g -warn all -check all readint.f
+ifort -c -g -warn all -check all readmol.f
+ifort -c -g -warn all -check all readmol2.f
+ifort -c -g -warn all -check all readpdb.f
+ifort -c -g -warn all -check all readprm.f
+ifort -c -g -warn all -check all readseq.f
+ifort -c -g -warn all -check all readxyz.f
+ifort -c -g -warn all -check all replica.f
+ifort -c -g -warn all -check all respa.f
+ifort -c -g -warn all -check all rgdstep.f
+ifort -c -g -warn all -check all rings.f
+ifort -c -g -warn all -check all rmsfit.f
+ifort -c -g -warn all -check all rotlist.f
+ifort -c -g -warn all -check all rotpole.f
+ifort -c -g -warn all -check all saddle.f
+ifort -c -g -warn all -check all scan.f
+ifort -c -g -warn all -check all sdstep.f
+ifort -c -g -warn all -check all search.f
+ifort -c -g -warn all -check all server.f
+ifort -c -g -warn all -check all shakeup.f
+ifort -c -g -warn all -check all sigmoid.f
+ifort -c -g -warn all -check all sktstuff.f
+ifort -c -g -warn all -check all sniffer.f
+ifort -c -g -warn all -check all sort.f
+ifort -c -g -warn all -check all spacefill.f
+ifort -c -g -warn all -check all spectrum.f
+ifort -c -g -warn all -check all square.f
+ifort -c -g -warn all -check all suffix.f
+ifort -c -g -warn all -check all superpose.f
+ifort -c -g -warn all -check all surface.f
+ifort -c -g -warn all -check all surfatom.f
+ifort -c -g -warn all -check all switch.f
+ifort -c -g -warn all -check all sybylxyz.f
+ifort -c -g -warn all -check all temper.f
+ifort -c -g -warn all -check all testgrad.f
+ifort -c -g -warn all -check all testhess.f
+ifort -c -g -warn all -check all testpair.f
+ifort -c -g -warn all -check all testpol.f
+ifort -c -g -warn all -check all testrot.f
+ifort -c -g -warn all -check all timer.f
+ifort -c -g -warn all -check all timerot.f
+ifort -c -g -warn all -check all tncg.f
+ifort -c -g -warn all -check all torphase.f
+ifort -c -g -warn all -check all torque.f
+ifort -c -g -warn all -check all torsfit.f
+ifort -c -g -warn all -check all torsions.f
+ifort -c -g -warn all -check all trimtext.f
+ifort -c -g -warn all -check all unitcell.f
+ifort -c -g -warn all -check all valence.f
+ifort -c -g -warn all -check all verlet.f
+ifort -c -g -warn all -check all version.f
+ifort -c -g -warn all -check all vibbig.f
+ifort -c -g -warn all -check all vibrate.f
+ifort -c -g -warn all -check all vibrot.f
+ifort -c -g -warn all -check all volume.f
+ifort -c -g -warn all -check all xtalfit.f
+ifort -c -g -warn all -check all xtalmin.f
+ifort -c -g -warn all -check all xyzatm.f
+ifort -c -g -warn all -check all xyzedit.f
+ifort -c -g -warn all -check all xyzint.f
+ifort -c -g -warn all -check all xyzpdb.f
+ifort -c -g -warn all -check all xyzsybyl.f
+ifort -c -g -warn all -check all zatom.f

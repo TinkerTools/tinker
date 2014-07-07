@@ -1603,7 +1603,7 @@ getword.o: ascii.o
 getxyz.o: inform.o iounit.o output.o
 ghmcstep.o: atomid.o atoms.o bath.o freeze.o iounit.o mdstuf.o moldyn.o sizes.o stodyn.o units.o usage.o virial.o
 gkstuf.o: sizes.o
-gradient.o: atoms.o bound.o deriv.o energi.o inter.o iounit.o limits.o potent.o rigid.o sizes.o vdwpot.o virial.o
+gradient.o: atoms.o bound.o couple.o deriv.o energi.o inter.o iounit.o limits.o potent.o rigid.o sizes.o vdwpot.o virial.o
 gradrgd.o: atoms.o group.o rigid.o sizes.o
 gradrot.o: atoms.o deriv.o domega.o omega.o potent.o rotbnd.o sizes.o
 group.o:

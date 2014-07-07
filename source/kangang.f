@@ -78,8 +78,10 @@ c
 c     perform dynamic allocation of some global arrays
 c
       maxaa = 15 * n
-      if (.not. allocated(iaa))  allocate (iaa(2,maxaa))
-      if (.not. allocated(kaa))  allocate (kaa(maxaa))
+      if (allocated(iaa))  deallocate (iaa)
+      if (allocated(kaa))  deallocate (kaa)
+      allocate (iaa(2,maxaa))
+      allocate (kaa(maxaa))
 c
 c     assign the angle-angle parameters for each angle pair
 c

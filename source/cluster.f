@@ -41,11 +41,13 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(kgrp))  allocate (kgrp(n))
-      if (.not. allocated(grplist))  allocate (grplist(n))
       if (.not. allocated(igrp))  allocate (igrp(2,0:maxgrp))
       if (.not. allocated(grpmass))  allocate (grpmass(0:maxgrp))
       if (.not. allocated(wgrp))  allocate (wgrp(0:maxgrp,0:maxgrp))
+      if (allocated(kgrp))  deallocate (kgrp)
+      if (allocated(grplist))  deallocate (grplist)
+      allocate (kgrp(n))
+      allocate (grplist(n))
 c
 c     set defaults for the group atom list and weight options
 c

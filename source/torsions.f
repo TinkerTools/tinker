@@ -32,7 +32,8 @@ c
 c     perform dynamic allocation of some global arrays
 c
       maxtors = 6 * n
-      if (.not. allocated(itors))  allocate (itors(4,maxtors))
+      if (allocated(itors))  deallocate (itors)
+      allocate (itors(4,maxtors))
 c
 c     loop over all bonds, storing the atoms in each torsion
 c

@@ -38,8 +38,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iuse))  allocate (iuse(n))
-      if (.not. allocated(use))  allocate (use(0:n))
+      if (allocated(iuse))  deallocate (iuse)
+      if (allocated(use))  deallocate (use)
+      allocate (iuse(n))
+      allocate (use(0:n))
 c
 c     perform dynamic allocation of some local arrays
 c

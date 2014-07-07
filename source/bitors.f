@@ -33,7 +33,8 @@ c
 c     perform dynamic allocation of some global arrays
 c
       maxbitor = 8 * n
-      if (.not. allocated(ibitor))  allocate (ibitor(5,maxbitor))
+      if (allocated(ibitor))  deallocate (ibitor)
+      allocate (ibitor(5,maxbitor))
 c
 c     loop over all angles, storing the atoms in each bitorsion
 c

@@ -253,10 +253,10 @@ c
       implicit none
       integer i
       integer flag
-      real*8, allocatable :: b1(:)
-      real*8, allocatable :: b2(:)
-      real*8, allocatable :: b3(:)
-      real*8, allocatable :: b4(:)
+      integer, allocatable :: b1(:)
+      integer, allocatable :: b2(:)
+      integer, allocatable :: b3(:)
+      integer, allocatable :: b4(:)
 c
 c
 c     set initialization flag and test for socket usage

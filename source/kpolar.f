@@ -95,13 +95,20 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(polarity))  allocate (polarity(n))
-      if (.not. allocated(thole))  allocate (thole(n))
-      if (.not. allocated(pdamp))  allocate (pdamp(n))
-      if (.not. allocated(uind))  allocate (uind(3,n))
-      if (.not. allocated(uinp))  allocate (uinp(3,n))
-      if (.not. allocated(uinds))  allocate (uinds(3,n))
-      if (.not. allocated(uinps))  allocate (uinps(3,n))
+      if (allocated(polarity))  deallocate (polarity)
+      if (allocated(thole))  deallocate (thole)
+      if (allocated(pdamp))  deallocate (pdamp)
+      if (allocated(uind))  deallocate (uind)
+      if (allocated(uinp))  deallocate (uinp)
+      if (allocated(uinds))  deallocate (uinds)
+      if (allocated(uinps))  deallocate (uinps)
+      allocate (polarity(n))
+      allocate (thole(n))
+      allocate (pdamp(n))
+      allocate (uind(3,n))
+      allocate (uinp(3,n))
+      allocate (uinds(3,n))
+      allocate (uinps(3,n))
 c
 c     find and store the atomic dipole polarizability parameters
 c
@@ -194,8 +201,10 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (use_polar) then
-         if (.not. allocated(mindex))  allocate (mindex(npole))
-         if (.not. allocated(minv))  allocate (minv(3*maxulst*npole))
+         if (allocated(mindex))  deallocate (mindex)
+         if (allocated(minv))  deallocate (minv)
+         allocate (mindex(npole))
+         allocate (minv(3*maxulst*npole))
       end if
       return
       end
@@ -245,14 +254,22 @@ c
       maxp12 = 50
       maxp13 = 50
       maxp14 = 50
-      if (.not. allocated(np11))  allocate (np11(n))
-      if (.not. allocated(np12))  allocate (np12(n))
-      if (.not. allocated(np13))  allocate (np13(n))
-      if (.not. allocated(np14))  allocate (np14(n))
-      if (.not. allocated(ip11))  allocate (ip11(maxp11,n))
-      if (.not. allocated(ip12))  allocate (ip12(maxp12,n))
-      if (.not. allocated(ip13))  allocate (ip13(maxp13,n))
-      if (.not. allocated(ip14))  allocate (ip14(maxp14,n))
+      if (allocated(np11))  deallocate (np11)
+      if (allocated(np12))  deallocate (np12)
+      if (allocated(np13))  deallocate (np13)
+      if (allocated(np14))  deallocate (np14)
+      if (allocated(ip11))  deallocate (ip11)
+      if (allocated(ip12))  deallocate (ip12)
+      if (allocated(ip13))  deallocate (ip13)
+      if (allocated(ip14))  deallocate (ip14)
+      allocate (np11(n))
+      allocate (np12(n))
+      allocate (np13(n))
+      allocate (np14(n))
+      allocate (ip11(maxp11,n))
+      allocate (ip12(maxp12,n))
+      allocate (ip13(maxp13,n))
+      allocate (ip14(maxp14,n))
 c
 c     find the directly connected group members for each atom
 c

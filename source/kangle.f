@@ -307,10 +307,14 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ak))  allocate (ak(nangle))
-      if (.not. allocated(anat))  allocate (anat(nangle))
-      if (.not. allocated(afld))  allocate (afld(nangle))
-      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
+      if (allocated(ak))  deallocate (ak)
+      if (allocated(anat))  deallocate (anat)
+      if (allocated(afld))  deallocate (afld)
+      if (allocated(angtyp))  deallocate (angtyp)
+      allocate (ak(nangle))
+      allocate (anat(nangle))
+      allocate (afld(nangle))
+      allocate (angtyp(nangle))
 c
 c     use special angle parameter assignment method for MMFF
 c

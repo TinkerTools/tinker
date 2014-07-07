@@ -216,37 +216,56 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (use_vlist) then
-         if (.not.allocated(nvlst))  allocate (nvlst(n))
-         if (.not.allocated(vlst))  allocate (vlst(maxvlst,n))
-         if (.not.allocated(xvold))  allocate (xvold(n))
-         if (.not.allocated(yvold))  allocate (yvold(n))
-         if (.not.allocated(zvold))  allocate (zvold(n))
+         if (allocated(nvlst))  deallocate (nvlst)
+         if (allocated(vlst))  deallocate (vlst)
+         if (allocated(xvold))  deallocate (xvold)
+         if (allocated(yvold))  deallocate (yvold)
+         if (allocated(zvold))  deallocate (zvold)
+         allocate (nvlst(n))
+         allocate (vlst(maxvlst,n))
+         allocate (xvold(n))
+         allocate (yvold(n))
+         allocate (zvold(n))
       end if
       if (use_clist .or. use_mlist) then
-         if (.not.allocated(nelst))  allocate (nelst(n))
-         if (.not.allocated(elst))  allocate (elst(maxelst,n))
+         if (allocated(nelst))  deallocate (nelst)
+         if (allocated(elst))  deallocate (elst)
+         allocate (nelst(n))
+         allocate (elst(maxelst,n))
       end if
       if (use_clist) then
-         if (.not.allocated(xcold))  allocate (xcold(n))
-         if (.not.allocated(ycold))  allocate (ycold(n))
-         if (.not.allocated(zcold))  allocate (zcold(n))
+         if (allocated(xcold))  deallocate (xcold)
+         if (allocated(ycold))  deallocate (ycold)
+         if (allocated(zcold))  deallocate (zcold)
+         allocate (xcold(n))
+         allocate (ycold(n))
+         allocate (zcold(n))
       end if
       if (use_mlist) then
-         if (.not.allocated(xmold))  allocate (xmold(n))
-         if (.not.allocated(ymold))  allocate (ymold(n))
-         if (.not.allocated(zmold))  allocate (zmold(n))
+         if (allocated(xmold))  deallocate (xmold)
+         if (allocated(ymold))  deallocate (ymold)
+         if (allocated(zmold))  deallocate (zmold)
+         allocate (xmold(n))
+         allocate (ymold(n))
+         allocate (zmold(n))
          if (poltyp .eq. 'MUTUAL') then
-            if (.not.allocated(tindex))  allocate (tindex(2,n*maxelst))
-            if (.not.allocated(tdipdip))
-     &         allocate (tdipdip(6,n*maxelst))
+            if (allocated(tindex))  deallocate (tindex)
+            if (allocated(tdipdip))  deallocate (tdipdip)
+            allocate (tindex(2,n*maxelst))
+            allocate (tdipdip(6,n*maxelst))
          end if
       end if
       if (use_ulist) then
-         if (.not.allocated(nulst))  allocate (nulst(n))
-         if (.not.allocated(ulst))  allocate (ulst(maxulst,n))
-         if (.not.allocated(xuold))  allocate (xuold(n))
-         if (.not.allocated(yuold))  allocate (yuold(n))
-         if (.not.allocated(zuold))  allocate (zuold(n))
+         if (allocated(nulst))  deallocate (nulst)
+         if (allocated(ulst))  deallocate (ulst)
+         if (allocated(xuold))  deallocate (xuold)
+         if (allocated(yuold))  deallocate (yuold)
+         if (allocated(zuold))  deallocate (zuold)
+         allocate (nulst(n))
+         allocate (ulst(maxulst,n))
+         allocate (xuold(n))
+         allocate (yuold(n))
+         allocate (zuold(n))
       end if
       return
       end

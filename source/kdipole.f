@@ -196,9 +196,12 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(idpl))  allocate (idpl(2,nbond))
-      if (.not. allocated(bdpl))  allocate (bdpl(nbond))
-      if (.not. allocated(sdpl))  allocate (sdpl(nbond))
+      if (allocated(idpl))  deallocate (idpl)
+      if (allocated(bdpl))  deallocate (bdpl)
+      if (allocated(sdpl))  deallocate (sdpl)
+      allocate (idpl(2,nbond))
+      allocate (bdpl(nbond))
+      allocate (sdpl(nbond))
 c
 c     find and store all the bond dipole moments
 c

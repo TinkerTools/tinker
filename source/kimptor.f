@@ -120,10 +120,14 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iitors))  allocate (iitors(4,ntors))
-      if (.not. allocated(itors1))  allocate (itors1(4,ntors))
-      if (.not. allocated(itors2))  allocate (itors2(4,ntors))
-      if (.not. allocated(itors3))  allocate (itors3(4,ntors))
+      if (allocated(iitors))  deallocate (iitors)
+      if (allocated(itors1))  deallocate (itors1)
+      if (allocated(itors2))  deallocate (itors2)
+      if (allocated(itors3))  deallocate (itors3)
+      allocate (iitors(4,ntors))
+      allocate (itors1(4,ntors))
+      allocate (itors2(4,ntors))
+      allocate (itors3(4,ntors))
 c
 c     assign improper torsional parameters for each improper torsion;
 c     multiple symmetrical parameters are given partial weights

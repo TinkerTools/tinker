@@ -31,8 +31,10 @@ c
 c     perform dynamic allocation of some global arrays
 c
       maxbnd = 4 * n
-      if (.not. allocated(ibnd))  allocate (ibnd(2,maxbnd))
-      if (.not. allocated(bndlist))  allocate (bndlist(maxval,n))
+      if (allocated(ibnd))  deallocate (ibnd)
+      if (allocated(bndlist))  deallocate (bndlist)
+      allocate (ibnd(2,maxbnd))
+      allocate (bndlist(maxval,n))
 c
 c     loop over all atoms, storing the atoms in each bond
 c

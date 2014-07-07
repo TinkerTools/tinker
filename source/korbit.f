@@ -199,9 +199,22 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(qorb))  allocate (qorb(n))
-      if (.not. allocated(worb))  allocate (worb(n))
-      if (.not. allocated(emorb))  allocate (emorb(n))
+      if (allocated(qorb))  deallocate (qorb)
+      if (allocated(worb))  deallocate (worb)
+      if (allocated(emorb))  deallocate (emorb)
+      if (allocated(bkpi))  deallocate (bkpi)
+      if (allocated(blpi))  deallocate (blpi)
+      if (allocated(kslope))  deallocate (kslope)
+      if (allocated(lslope))  deallocate (lslope)
+      if (allocated(torsp2))  deallocate (torsp2)
+      allocate (qorb(n))
+      allocate (worb(n))
+      allocate (emorb(n))
+      allocate (bkpi(nbond))
+      allocate (blpi(nbond))
+      allocate (kslope(nbond))
+      allocate (lslope(nbond))
+      allocate (torsp2(ntors))
 c
 c     assign the values characteristic of the piatom types
 c
@@ -212,14 +225,6 @@ c
          worb(j) = ionize(jt) / evolt
          emorb(j) = repulse(jt) / evolt
       end do
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(bkpi))  allocate (bkpi(nbond))
-      if (.not. allocated(blpi))  allocate (blpi(nbond))
-      if (.not. allocated(kslope))  allocate (kslope(nbond))
-      if (.not. allocated(lslope))  allocate (lslope(nbond))
-      if (.not. allocated(torsp2))  allocate (torsp2(ntors))
 c
 c     assign parameters for all bonds between piatoms;
 c     store the original bond lengths and force constants

@@ -217,8 +217,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(asolv))  allocate (asolv(n))
+      if (allocated(rsolv))  deallocate (rsolv)
+      if (allocated(asolv))  deallocate (asolv)
+      allocate (rsolv(n))
+      allocate (asolv(n))
 c
 c     assign the Eisenberg-McLachlan ASP solvation parameters;
 c     parameters only available for protein-peptide groups
@@ -375,20 +377,31 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(asolv))  allocate (asolv(n))
-      if (.not. allocated(rborn))  allocate (rborn(n))
-      if (.not. allocated(drb))  allocate (drb(n))
-      if (.not. allocated(drobc))  allocate (drobc(n))
-      if (.not. allocated(gpol))  allocate (gpol(n))
-      if (.not. allocated(shct))  allocate (shct(n))
-      if (.not. allocated(aobc))  allocate (aobc(n))
-      if (.not. allocated(bobc))  allocate (bobc(n))
-      if (.not. allocated(gobc))  allocate (gobc(n))
-      if (.not. allocated(vsolv))  allocate (vsolv(n))
       if (.not. allocated(wace))  allocate (wace(maxclass,maxclass)) 
       if (.not. allocated(s2ace))  allocate (s2ace(maxclass,maxclass)) 
       if (.not. allocated(uace))  allocate (uace(maxclass,maxclass)) 
+      if (allocated(rsolv))  deallocate (rsolv)
+      if (allocated(asolv))  deallocate (asolv)
+      if (allocated(rborn))  deallocate (rborn)
+      if (allocated(drb))  deallocate (drb)
+      if (allocated(drobc))  deallocate (drobc)
+      if (allocated(gpol))  deallocate (gpol)
+      if (allocated(shct))  deallocate (shct)
+      if (allocated(aobc))  deallocate (aobc)
+      if (allocated(bobc))  deallocate (bobc)
+      if (allocated(gobc))  deallocate (gobc)
+      if (allocated(vsolv))  deallocate (vsolv)
+      allocate (rsolv(n))
+      allocate (asolv(n))
+      allocate (rborn(n))
+      allocate (drb(n))
+      allocate (drobc(n))
+      allocate (gpol(n))
+      allocate (shct(n))
+      allocate (aobc(n))
+      allocate (bobc(n))
+      allocate (gobc(n))
+      allocate (vsolv(n))
 c
 c     set offset and scaling values for analytical Still method
 c
@@ -826,12 +839,18 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(rborn))  allocate (rborn(n))
-      if (.not. allocated(drb))  allocate (drb(n))
-      if (.not. allocated(drbp))  allocate (drbp(n))
-      if (.not. allocated(drobc))  allocate (drobc(n))
-      if (.not. allocated(shct))  allocate (shct(n))
+      if (allocated(rsolv))  deallocate (rsolv)
+      if (allocated(rborn))  deallocate (rborn)
+      if (allocated(drb))  deallocate (drb)
+      if (allocated(drbp))  deallocate (drbp)
+      if (allocated(drobc))  deallocate (drobc)
+      if (allocated(shct))  deallocate (shct)
+      allocate (rsolv(n))
+      allocate (rborn(n))
+      allocate (drb(n))
+      allocate (drbp(n))
+      allocate (drobc(n))
+      allocate (shct(n))
 c
 c     set default value for exponent in the GB/GK function
 c
@@ -1143,8 +1162,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(rsolv))  allocate (rsolv(n))
-      if (.not. allocated(shct))  allocate (shct(n))
+      if (allocated(rsolv))  deallocate (rsolv)
+      if (allocated(shct))  deallocate (shct)
+      allocate (rsolv(n))
+      allocate (shct(n))
 c
 c     assign some default APBS configuration parameters
 c
@@ -1690,10 +1711,14 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(asolv))  allocate (asolv(n))
-      if (.not. allocated(rcav))  allocate (rcav(n))
-      if (.not. allocated(rdisp))  allocate (rdisp(n))
-      if (.not. allocated(cdisp))  allocate (cdisp(n))
+      if (allocated(asolv))  deallocate (asolv)
+      if (allocated(rcav))  deallocate (rcav)
+      if (allocated(rdisp))  deallocate (rdisp)
+      if (allocated(cdisp))  deallocate (cdisp)
+      allocate (asolv(n))
+      allocate (rcav(n))
+      allocate (rdisp(n))
+      allocate (cdisp(n))
 c
 c     assign surface area factors for nonpolar solvation
 c
@@ -1781,9 +1806,12 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ipmf))  allocate (ipmf(n))
-      if (.not. allocated(rpmf))  allocate (rpmf(n))
-      if (.not. allocated(acsa))  allocate (acsa(n))
+      if (allocated(ipmf))  deallocate (ipmf)
+      if (allocated(rpmf))  deallocate (rpmf)
+      if (allocated(acsa))  deallocate (acsa)
+      allocate (ipmf(n))
+      allocate (rpmf(n))
+      allocate (acsa(n))
 c
 c     get carbons for PMF and set surface area screening values
 c

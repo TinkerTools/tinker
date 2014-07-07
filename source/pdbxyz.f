@@ -34,7 +34,7 @@ c
       integer ipdb,ixyz,iseq
       integer last,pdbleng
       integer freeunit
-      integer, allocatable :: size(:)
+      integer, allocatable :: row(:)
       real*8 xi,yi,zi,rij
       real*8 rcut,rmax(0:9)
       logical biopoly
@@ -147,9 +147,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-            allocate (size(n))
+            allocate (row(n))
 c
-c     assign the size classification for each atom
+c     set atom size classification from periodic table row
 c
             do i = 1, n
                it = type(i)
@@ -157,28 +157,28 @@ c
                   letter = name(i)(1:1)
                   call upcase (letter)
                   if (letter .eq. 'H') then
-                     size(i) = 1
+                     row(i) = 1
                   else if (letter .eq. 'C') then
-                     size(i) = 2
+                     row(i) = 2
                   else if (letter .eq. 'N') then
-                     size(i) = 2
+                     row(i) = 2
                   else if (letter .eq. 'O') then
-                     size(i) = 2
+                     row(i) = 2
                   else if (letter .eq. 'P') then
-                     size(i) = 3
+                     row(i) = 3
                   else if (letter .eq. 'S') then
-                     size(i) = 3
+                     row(i) = 3
                   else
-                     size(i) = 0
+                     row(i) = 0
                   end if
                else if (ligand(it) .eq. 0) then
-                  size(i) = 0
+                  row(i) = 0
                else if (atmnum(it) .le. 2) then
-                  size(i) = 1
+                  row(i) = 1
                else if (atmnum(it) .le. 10) then
-                  size(i) = 2
+                  row(i) = 2
                else
-                  size(i) = 3
+                  row(i) = 3
                end if
             end do
 c
@@ -199,7 +199,7 @@ c
                yi = y(i)
                zi = z(i)
                do j = i+1, n
-                  rcut = rmax(size(i)*size(j))**2
+                  rcut = rmax(row(i)*row(j))**2
                   rij = (xi-x(j))**2 + (yi-y(j))**2 + (zi-z(j))**2
                   if (rij .le. rcut) then
                      n12(i) = n12(i) + 1
@@ -212,7 +212,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-            deallocate (size)
+            deallocate (row)
          end if
 c
 c     sort the attached atom lists into ascending order

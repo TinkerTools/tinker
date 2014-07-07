@@ -143,7 +143,8 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(itt))  allocate (itt(3,nbitor))
+      if (allocated(itt))  deallocate (itt)
+      allocate (itt(3,nbitor))
 c
 c     check whether each torsion-torsion parameter is periodic;
 c     assumes the "tbf" array is sorted with both indices in

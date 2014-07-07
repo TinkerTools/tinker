@@ -104,6 +104,7 @@ c
 c     get atom restrained to a specified position range
 c
          if (keyword(1:18) .eq. 'RESTRAIN-POSITION ') then
+            ip = 0
             p1 = 0.0d0
             p2 = 0.0d0
             p3 = 0.0d0
@@ -112,7 +113,14 @@ c
             next = 1
             call getword (string,letter,next)
             if (letter .eq. ' ') then
-               read (string,*,err=10,end=10)  ip,p1,p2,p3,p4,p5
+               call getnumb (string,ip,next)
+               if (ip.ge.1 .and. ip.le.n) then
+                  p1 = x(ip)
+                  p2 = y(ip)
+                  p3 = z(ip)
+               end if
+               string = string(next:120)
+               read (string,*,err=10,end=10)  p1,p2,p3,p4,p5
    10          continue
                if (p4 .eq. 0.0d0)  p4 = 100.0d0
                npfix = npfix + 1
@@ -160,6 +168,8 @@ c
 c     get atoms restrained to a specified distance range
 c
          else if (keyword(1:18) .eq. 'RESTRAIN-DISTANCE ') then
+            ia = 0
+            ib = 0
             d1 = 100.0d0
             d2 = 0.0d0
             d3 = 0.0d0
@@ -194,6 +204,9 @@ c
 c     get atoms restrained to a specified angle range
 c
          else if (keyword(1:15) .eq. 'RESTRAIN-ANGLE ') then
+            ia = 0
+            ib = 0
+            ic = 0
             a1 = 10.0d0
             a2 = 0.0d0
             a3 = 0.0d0
@@ -222,6 +235,10 @@ c
 c     get atoms restrained to a specified torsion range
 c
          else if (keyword(1:17).eq.'RESTRAIN-TORSION ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
             t1 = 1.0d0
             t2 = 0.0d0
             t3 = 0.0d0
@@ -264,6 +281,8 @@ c
 c     get groups restrained to a specified distance range
 c
          else if (keyword(1:16) .eq. 'RESTRAIN-GROUPS ') then
+            ia = 0
+            ib = 0
             g1 = 100.0d0
             g2 = 0.0d0
             g3 = 0.0d0

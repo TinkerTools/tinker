@@ -20,6 +20,7 @@ c
       use sizes
       use atoms
       use bound
+      use couple
       use deriv
       use energi
       use inter
@@ -33,9 +34,6 @@ c
       integer i,j
       real*8 energy,cutoff
       real*8 derivs(3,*)
-      logical first
-      save first
-      data first  / .true. /
 c
 c
 c     zero out each of the potential energy components
@@ -68,34 +66,63 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (first) then
-         first = .false.
-         if (.not. allocated(desum))  allocate (desum(3,n))
-         if (.not. allocated(deb))  allocate (deb(3,n))
-         if (.not. allocated(dea))  allocate (dea(3,n))
-         if (.not. allocated(deba))  allocate (deba(3,n))
-         if (.not. allocated(deub))  allocate (deub(3,n))
-         if (.not. allocated(deaa))  allocate (deaa(3,n))
-         if (.not. allocated(deopb))  allocate (deopb(3,n))
-         if (.not. allocated(deopd))  allocate (deopd(3,n))
-         if (.not. allocated(deid))  allocate (deid(3,n))
-         if (.not. allocated(deit))  allocate (deit(3,n))
-         if (.not. allocated(det))  allocate (det(3,n))
-         if (.not. allocated(dept))  allocate (dept(3,n))
-         if (.not. allocated(debt))  allocate (debt(3,n))
-         if (.not. allocated(deat))  allocate (deat(3,n))
-         if (.not. allocated(dett))  allocate (dett(3,n))
-         if (.not. allocated(dev))  allocate (dev(3,n))
-         if (.not. allocated(dec))  allocate (dec(3,n))
-         if (.not. allocated(decd))  allocate (decd(3,n))
-         if (.not. allocated(ded))  allocate (ded(3,n))
-         if (.not. allocated(dem))  allocate (dem(3,n))
-         if (.not. allocated(dep))  allocate (dep(3,n))
-         if (.not. allocated(der))  allocate (der(3,n))
-         if (.not. allocated(des))  allocate (des(3,n))
-         if (.not. allocated(delf))  allocate (delf(3,n))
-         if (.not. allocated(deg))  allocate (deg(3,n))
-         if (.not. allocated(dex))  allocate (dex(3,n))
+      if (allocated(desum)) then
+         if (size(desum) .lt. 3*n) then
+            deallocate (desum)
+            deallocate (deb)
+            deallocate (dea)
+            deallocate (deba)
+            deallocate (deub)
+            deallocate (deaa)
+            deallocate (deopb)
+            deallocate (deopd)
+            deallocate (deid)
+            deallocate (deit)
+            deallocate (det)
+            deallocate (dept)
+            deallocate (debt)
+            deallocate (deat)
+            deallocate (dett)
+            deallocate (dev)
+            deallocate (dec)
+            deallocate (decd)
+            deallocate (ded)
+            deallocate (dem)
+            deallocate (dep)
+            deallocate (der)
+            deallocate (des)
+            deallocate (delf)
+            deallocate (deg)
+            deallocate (dex)
+         end if
+      end if
+      if (.not. allocated(desum)) then
+         allocate (desum(3,n))
+         allocate (deb(3,n))
+         allocate (dea(3,n))
+         allocate (deba(3,n))
+         allocate (deub(3,n))
+         allocate (deaa(3,n))
+         allocate (deopb(3,n))
+         allocate (deopd(3,n))
+         allocate (deid(3,n))
+         allocate (deit(3,n))
+         allocate (det(3,n))
+         allocate (dept(3,n))
+         allocate (debt(3,n))
+         allocate (deat(3,n))
+         allocate (dett(3,n))
+         allocate (dev(3,n))
+         allocate (dec(3,n))
+         allocate (decd(3,n))
+         allocate (ded(3,n))
+         allocate (dem(3,n))
+         allocate (dep(3,n))
+         allocate (der(3,n))
+         allocate (des(3,n))
+         allocate (delf(3,n))
+         allocate (deg(3,n))
+         allocate (dex(3,n))
       end if
 c
 c     zero out each of the first derivative components

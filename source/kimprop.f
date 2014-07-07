@@ -109,9 +109,12 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iiprop))  allocate (iiprop(4,ntors))
-      if (.not. allocated(kprop))  allocate (kprop(ntors))
-      if (.not. allocated(vprop))  allocate (vprop(ntors))
+      if (allocated(iiprop))  deallocate (iiprop)
+      if (allocated(kprop))  deallocate (kprop)
+      if (allocated(vprop))  deallocate (vprop)
+      allocate (iiprop(4,ntors))
+      allocate (kprop(ntors))
+      allocate (vprop(ntors))
 c
 c     assign improper dihedral parameters for each improper angle;
 c     multiple symmetrical parameters are given partial weights

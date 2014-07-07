@@ -112,8 +112,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(isb))  allocate (isb(3,nangle))
-      if (.not. allocated(sbk))  allocate (sbk(2,nangle))
+      if (allocated(isb))  deallocate (isb)
+      if (allocated(sbk))  deallocate (sbk)
+      allocate (isb(3,nangle))
+      allocate (sbk(2,nangle))
 c
 c     use special stretch-bend parameter assignment method for MMFF
 c

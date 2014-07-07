@@ -40,15 +40,24 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iorbit))  allocate (iorbit(n))
-      if (.not. allocated(iconj))  allocate (iconj(2,n))
-      if (.not. allocated(kconj))  allocate (kconj(n))
-      if (.not. allocated(piperp))  allocate (piperp(3,n))
-      if (.not. allocated(ibpi))  allocate (ibpi(3,nbond))
-      if (.not. allocated(itpi))  allocate (itpi(2,ntors))
-      if (.not. allocated(pbpl))  allocate (pbpl(nbond))
-      if (.not. allocated(pnpl))  allocate (pnpl(nbond))
-      if (.not. allocated(listpi))  allocate (listpi(n))
+      if (allocated(iorbit))  deallocate (iorbit)
+      if (allocated(iconj))  deallocate (iconj)
+      if (allocated(kconj))  deallocate (kconj)
+      if (allocated(piperp))  deallocate (piperp)
+      if (allocated(ibpi))  deallocate (ibpi)
+      if (allocated(itpi))  deallocate (itpi)
+      if (allocated(pbpl))  deallocate (pbpl)
+      if (allocated(pnpl))  deallocate (pnpl)
+      if (allocated(listpi))  deallocate (listpi)
+      allocate (iorbit(n))
+      allocate (iconj(2,n))
+      allocate (kconj(n))
+      allocate (piperp(3,n))
+      allocate (ibpi(3,nbond))
+      allocate (itpi(2,ntors))
+      allocate (pbpl(nbond))
+      allocate (pnpl(nbond))
+      allocate (listpi(n))
 c
 c     perform dynamic allocation of some local arrays
 c

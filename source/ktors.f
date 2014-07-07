@@ -198,12 +198,18 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(tors1))  allocate (tors1(4,ntors))
-      if (.not. allocated(tors2))  allocate (tors2(4,ntors))
-      if (.not. allocated(tors3))  allocate (tors3(4,ntors))
-      if (.not. allocated(tors4))  allocate (tors4(4,ntors))
-      if (.not. allocated(tors5))  allocate (tors5(4,ntors))
-      if (.not. allocated(tors6))  allocate (tors6(4,ntors))
+      if (allocated(tors1))  deallocate (tors1)
+      if (allocated(tors2))  deallocate (tors2)
+      if (allocated(tors3))  deallocate (tors3)
+      if (allocated(tors4))  deallocate (tors4)
+      if (allocated(tors5))  deallocate (tors5)
+      if (allocated(tors6))  deallocate (tors6)
+      allocate (tors1(4,ntors))
+      allocate (tors2(4,ntors))
+      allocate (tors3(4,ntors))
+      allocate (tors4(4,ntors))
+      allocate (tors5(4,ntors))
+      allocate (tors6(4,ntors))
 c
 c     use special torsional parameter assignment method for MMFF
 c

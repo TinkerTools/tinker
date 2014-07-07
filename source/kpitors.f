@@ -102,8 +102,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ipit))  allocate (ipit(6,ntors))
-      if (.not. allocated(kpit))  allocate (kpit(ntors))
+      if (allocated(ipit))  deallocate (ipit)
+      if (allocated(kpit))  deallocate (kpit)
+      allocate (ipit(6,ntors))
+      allocate (kpit(ntors))
 c
 c     assign pi-orbital torsion parameters as required
 c
