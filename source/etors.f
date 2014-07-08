@@ -85,7 +85,7 @@ c
 c
 c     transfer global to local copies for OpenMP calculation
 c
-      eto = eb
+      eto = et
 c
 c     set OpenMP directives for the major loop structure
 c

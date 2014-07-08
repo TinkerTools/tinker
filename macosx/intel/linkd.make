@@ -1,11 +1,11 @@
 #
 #
-#  #############################################################
-#  ##                                                         ##
-#  ##  link.make  --  link the TINKER programs for debugging  ##
-#  ##           (Intel Fortran for Mac OSX Version)           ##
-#  ##                                                         ##
-#  #############################################################
+#  ##############################################################
+#  ##                                                          ##
+#  ##  linkd.make  --  link the TINKER programs for debugging  ##
+#  ##            (Intel Fortran for Mac OSX Version)           ##
+#  ##                                                          ##
+#  ##############################################################
 #
 #
 ifort -g -Wl,-no_pie -o alchemy.x alchemy.o libtinker.a
