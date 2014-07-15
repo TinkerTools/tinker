@@ -783,7 +783,7 @@ c
          xnew = 0.0d0
          ynew = 0.0d0
          znew = 0.0d0
-         do while (xbox .eq. 0.0d0)
+         do while (xnew .eq. 0.0d0)
             write (iout,330)
   330       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
             read (input,340)  record

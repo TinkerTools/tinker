@@ -1120,6 +1120,13 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
+      if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
+      if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
+      if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
+c
 c     distance restraints for the base pair hydrogen bonds
 c
       do i = 1, nbase/2

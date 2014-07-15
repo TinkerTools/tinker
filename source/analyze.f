@@ -115,6 +115,10 @@ c
                read (string,*,err=50,end=50)  list(i)
             end do
    50       continue
+            if (list(1) .eq. 0) then
+               list(1) = -1
+               list(2) = n
+            end if
          else
             write (iout,60)
    60       format (/,' List Atoms for which Output is Desired',

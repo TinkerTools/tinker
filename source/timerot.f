@@ -69,18 +69,21 @@ c
 c
 c     decide whether to include timing of Hessian evaluations
 c
-      dohessian = .true.
-      call nextarg (answer,exist)
-      if (.not. exist) then
-         write (iout,40)
-   40    format (/,' Include Timing for Hessian Evaluations [Y] :  ',$)
-         read (input,50)  record
-   50    format (a120)
-         next = 1
-         call gettext (record,answer,next)
+      dohessian = .false.
+      if (nomega .le. 1000) then
+         call nextarg (answer,exist)
+         if (.not. exist) then
+            write (iout,40)
+   40       format (/,' Include Timing for Hessian Evaluations',
+     &                 ' [N] :  ',$)
+            read (input,50)  record
+   50       format (a120)
+            next = 1
+            call gettext (record,answer,next)
+         end if
+         call upcase (answer)
+         if (answer .eq. 'Y')  dohessian = .true.
       end if
-      call upcase (answer)
-      if (answer .eq. 'N')  dohessian = .false.
 c
 c     print the time required for the computation setup
 c
