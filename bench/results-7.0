@@ -12,7 +12,7 @@
  ---------------------------                  ---    ------  --------  -------
 
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66      30.4      50.7    143.4
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80      22.5      35.5    112.4
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80      19.7      31.7     96.1
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66      18.7      34.5    102.9
  Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66      13.5      34.1     99.7
  MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60       9.0      19.4     57.7
@@ -29,7 +29,7 @@
  ---------------------------                  ---    ------  --------  -------
 
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66      45.8      60.4    236.9
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80      39.4      51.9    206.8
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80      36.8      45.3    180.0
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66      34.2      47.5    185.5
  Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66      28.6      42.7    172.8
  MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60      21.2      27.7    110.5
@@ -46,7 +46,7 @@
  ---------------------------                  ---             -------
 
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66                4.09
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80                3.43
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80                3.02
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66                2.96
  Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66                3.90
  MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60                1.76
@@ -54,9 +54,9 @@
  Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40                2.79
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40                4.70
 
- Benchmark #4: TIP3P Water Box Molecular Dynamics (Serial)
+ Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
 
- MD run of 1000 MD Steps for 216 TIP3P Waters in 18.643 Ang Periodic Box,
+ MD run of 1000 Steps for 216 TIP3P Waters in 18.643 Ang Periodic Box,
  9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
  Step with Modified Beeman Integration
 
@@ -64,7 +64,7 @@
  ---------------------------                  ---             -------
 
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66                23.2
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80                17.3
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80                15.4
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66                16.9
  Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66                16.0         
  MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60                 8.8
@@ -72,9 +72,9 @@
  Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40                15.3
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40                15.8
 
- Benchmark #5: AMOEBA Water Box Molecular Dynamics (Serial)
+ Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
 
- MD run of 1000 MD Steps for 216 AMOEBA Waters in a 18.643 Ang Box,
+ MD run of 1000 Steps for 216 AMOEBA Waters in a 18.643 Ang Box,
  Neighbor Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
  and 0.00001 RMS Induced Dipole Convergence
@@ -83,7 +83,7 @@
  ---------------------------                  ---             -------
 
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66               137.8
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80               113.4
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80               104.2
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66                99.6
  Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66                99.3
  MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60                60.0
@@ -91,9 +91,9 @@
  Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40                99.3
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40               149.8
 
- Benchmark #6: CHARMM DHFR-Water Molecular Dynamics (Parallel, OpenMP)
+ Benchmark #6: MD on DHFR in Water using CHARMM (Parallel, OpenMP)
 
- MD run of 100 MD Steps for CHARMM DHFR-Water (23558 Atoms, 62.23 Ang Box),
+ MD run of 100 Steps for CHARMM DHFR in Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
  OpenMP timings reported as "wall clock" time for benchmark
@@ -104,11 +104,11 @@
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1     105.9 (1.00)
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/2      62.2 (1.70)
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4      40.0 (2.65)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1      87.7 (1.00)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/2      52.0 (1.69)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/4      33.5 (2.62)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/6      28.1 (3.12)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8      24.6 (3.57)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1      78.2 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/2      47.5 (1.65)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/4      31.6 (2.47)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/6      27.3 (2.86)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8      24.8 (3.15)
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1      82.4 (1.00)
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/2      47.4 (1.74)
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/4      29.3 (2.81)
@@ -144,9 +144,9 @@
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/6      32.6 (2.84)
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/8      27.4 (3.38)
 
- Benchmark #7: AMOEBA DHFR-Water Molecular Dynamics (Parallel, OpenMP)
+ Benchmark #7: MD on DHFR in Water using AMOEBA (Parallel, OpenMP)
 
- MD run of 100 MD Steps for AMOEBA DHFR-Water (23558 Atoms, 62.23 Ang Box),
+ MD run of 100 Steps for AMOEBA DHFR in Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
  and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
@@ -158,11 +158,11 @@
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1     661.9 (1.00)
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/2     375.2 (1.76)
  Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4     226.1 (2.93)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1     533.6 (1.00)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/2     303.4 (1.76)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/4     183.8 (2.90)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/6     145.6 (3.66)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8     128.1 (4.17)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1     484.9 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/2     274.2 (1.76)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/4     166.6 (2.90)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/6     134.2 (3.66)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8     118.0 (4.17)
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1     472.6 (1.00)
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/2     249.8 (1.89)
  Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/4     141.7 (3.34)
@@ -198,9 +198,61 @@
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/6     203.8 (3.17)
  Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/8     151.7 (4.26)
 
+ Benchmark #8: MD on COX-2 in Water using OPLS-AA (Parallel, OpenMP)
+
+ MD run of 100 Steps for OPLS-AA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
+ RATTLE for all X-H bonds and rigid TIP3P Water;  OpenMP timings reported as
+ "wall clock" time for benchmark
+
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
+
+ Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1     942.1 (1.00)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4     463.6 (2.03)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1     675.8 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8     314.6 (2.15)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1     608.4 (1.00)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/24    194.7 (3.12)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/1     368.0 (1.00)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/2     241.5 (1.53)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/4     162.6 (2.26)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/8     144.5 (2.55)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/1     404.1 (1.00)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/2     253.9 (1.59)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/4     187.5 (2.16)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8     163.4 (2.47)
+
+ Benchmark #9: MD on COX-2 in Water using AMOEBA (Parallel, OpenMP)
+
+ MD run of 100 Steps for AMOEBA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
+ and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
+ "wall clock" time for benchmark
+
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
+
+ Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1    6958.7 (1.00)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4    2329.3 (2.99)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1    5133.3 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8    1210.0 (4.24)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1    4700.8 (1.00)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/24    645.4 (7.28)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/1    2792.9 (1.00)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/2    1598.1 (1.75)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/4     910.0 (3.07)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/8     763.5 (3.66)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/1    3197.8 (1.00)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/2    1688.4 (1.89)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/4    1049.2 (3.05)
+ iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8     823.9 (3.88)
+
  ----------------------
- Times are reported in seconds and were measured with TINKER Version 7.0,
+ Times are reported in seconds and are measured with TINKER Version 7.0,
  dimensioned to MAXATM=1000000. Each benchmark ran twice in rapid succession
- on a quiet machine, and times shown were the best from the two runs. The
- first 5 benchmarks were run in serial with a single thread, while the last
- two benchmarks test OpenMP parallel performance.
+ on an unloaded machine, and times shown are the best from the two runs. The
+ first five benchmarks are run in serial with a single thread, while the last
+ four benchmarks test OpenMP parallel performance.

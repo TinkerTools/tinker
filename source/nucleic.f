@@ -370,39 +370,39 @@ c
          if (pucker(i) .ne. 0)  done = .true.
          if (.not. done) then
             if (hlxform .eq. 'A') then
-               bkbone(1,i) = -51.8d0
-               bkbone(2,i) = 174.8d0
-               bkbone(3,i) = 41.7d0
-               bkbone(4,i) = 79.1d0
+               bkbone(1,i) = -52.0d0
+               bkbone(2,i) = 175.0d0
+               bkbone(3,i) = 42.0d0
+               bkbone(4,i) = 79.0d0
                bkbone(5,i) = -148.0d0
                bkbone(6,i) = -75.0d0
-               glyco(i) = -157.2d0
+               glyco(i) = -157.0d0
                pucker(i) = 3
             else if (hlxform .eq. 'B') then
-               bkbone(1,i) = -46.1d0
-               bkbone(2,i) = -146.5d0
-               bkbone(3,i) = 36.4d0
-               bkbone(4,i) = 156.5d0
-               bkbone(5,i) = 154.7d0
-               bkbone(6,i) = -95.6d0
-               glyco(i) = -97.8d0
+               bkbone(1,i) = -30.0d0
+               bkbone(2,i) = 136.0d0
+               bkbone(3,i) = 31.0d0
+               bkbone(4,i) = 143.0d0
+               bkbone(5,i) = -141.0d0
+               bkbone(6,i) = -161.0d0
+               glyco(i) = -98.0d0
                pucker(i) = 2
             else if (hlxform .eq. 'Z') then
                if (purine(i)) then
-                  bkbone(1,i) = 48.0d0
+                  bkbone(1,i) = 47.0d0
                   bkbone(2,i) = 179.0d0
-                  bkbone(3,i) = -170.0d0
-                  bkbone(4,i) = 100.0d0
+                  bkbone(3,i) = -169.0d0
+                  bkbone(4,i) = 99.0d0
                   bkbone(5,i) = -104.0d0
                   bkbone(6,i) = -69.0d0
-                  glyco(i) = 67.0d0
+                  glyco(i) = 68.0d0
                   pucker(i) = 3
                else
                   bkbone(1,i) = -137.0d0
                   bkbone(2,i) = -139.0d0
-                  bkbone(3,i) = 55.0d0
+                  bkbone(3,i) = 56.0d0
                   bkbone(4,i) = 138.0d0
-                  bkbone(5,i) = -94.0d0
+                  bkbone(5,i) = -95.0d0
                   bkbone(6,i) = 80.0d0
                   glyco(i) = -159.0d0
                   pucker(i) = 1
@@ -1043,6 +1043,7 @@ c
       real*8, allocatable :: xx(:)
       character*3 resname
       external watson1,optsave
+      real*8 r
 c
 c
 c     perform dynamic allocation of some global arrays

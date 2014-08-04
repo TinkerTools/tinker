@@ -5288,11 +5288,10 @@ c
                erl = rr1*gl(0) + rr3*(gl(1)+gl(6))
      &                  + rr5*(gl(2)+gl(7)+gl(8))
      &                  + rr7*(gl(3)+gl(5)) + rr9*gl(4)
-               erl = erl * (1.0d0-mscale(kk))
                erli = 0.5d0*(rr3*(gli(1)+gli(6))*psc3
      &                   + rr5*(gli(2)+gli(7))*psc5
      &                   + rr7*gli(3)*psc7)
-               e = e - erl
+               e = e - erl * (1.0d0-mscale(kk))
                ei = ei - erli
                e = f * e
                ei = f * ei

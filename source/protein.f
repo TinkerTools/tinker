@@ -1421,6 +1421,17 @@ c
          grpmass(i) = dble(igrp(2,i)-igrp(1,i)+1)
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
+      if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
+      if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
+      if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
+      if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
+      if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
+      if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
+      if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
+c
 c     set pairwise restraints between the centers of chains
 c
       do i = 1, ngrp-1
