@@ -1879,7 +1879,7 @@ c
       integer i,j,k
       integer m,m1,m2
       integer ia,ib,ic,id
-      integer oldstep,olditer
+      integer olditer
       integer oldprt,oldwrt
       integer prtflg,ihess
       integer nvar,nfreq
@@ -1893,6 +1893,7 @@ c
       real*8 bond,gbond
       real*8 angle,gangle
       real*8 factor,grdmin
+      real*8 oldstep
       real*8 delta,cosine,sine
       real*8 rab2,rcb,rcb2,rabc
       real*8 xt,yt,zt,xu,yu,zu

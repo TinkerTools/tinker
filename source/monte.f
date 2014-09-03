@@ -184,7 +184,7 @@ c     get the gradient convergence for local minimizations
 c
       grdmin = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=110,end=110)  grdmin
+      if (exist)  read (string,*,err=150,end=150)  grdmin
   150 continue
       if (grdmin .lt. 0.0d0) then
          write (iout,160)

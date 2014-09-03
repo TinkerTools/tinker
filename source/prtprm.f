@@ -254,7 +254,7 @@ c
             if (kb4(i) .eq. blank8)  goto 290
             k1 = number(kb4(i)(1:4))
             k2 = number(kb4(i)(5:8))
-            write (itxt,310)  i,k1,k2,bcon4(i),blen4(i)
+            write (itxt,280)  i,k1,k2,bcon4(i),blen4(i)
   280       format (10x,i5,5x,i4,'-',i4,6x,f12.3,f12.4)
          end do
   290    continue

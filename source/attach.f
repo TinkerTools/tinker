@@ -72,7 +72,7 @@ c
      &                 ' Attached to Atom',i6)
             call fatal
          end if
-         call sort (n13(i),i13(1,i))
+         call sort8 (n13(i),i13(1,i))
       end do
 c
 c     loop over all atoms finding all the 1-4 relationships
@@ -101,7 +101,7 @@ c
      &                 ' Attached to Atom',i6)
             call fatal
          end if
-         call sort (n14(i),i14(1,i))
+         call sort8 (n14(i),i14(1,i))
       end do
 c
 c     loop over all atoms finding all the 1-5 relationships
@@ -133,7 +133,7 @@ c
      &                 ' Attached to Atom',i6)
             call fatal
          end if
-         call sort (n15(i),i15(1,i))
+         call sort8 (n15(i),i15(1,i))
       end do
       return
       end

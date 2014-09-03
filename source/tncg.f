@@ -161,7 +161,7 @@ c
       newhess = 1
       maxerr = 3
       done = .false.
-      status = '          '
+      status = '         '
       negtest = .true.
       automode = .false.
       automatic = .false.

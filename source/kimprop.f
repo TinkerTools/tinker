@@ -36,7 +36,8 @@ c
       real*8 tk,tv,symm
       logical header,done
       character*4 pa,pb,pc,pd
-      character*12 zeros
+      character*8 zero8
+      character*12 zero12
       character*16 blank,pti
       character*16 pt0,pt1
       character*16 pt2,pt3
@@ -49,7 +50,8 @@ c
 c     process keywords containing improper dihedral parameters
 c
       blank = '                '
-      zeros = '000000000000'
+      zero8 = '00000000'
+      zero12 = '000000000000'
       header = .true.
       do i = 1, nkey
          next = 1
@@ -142,10 +144,10 @@ c
                pt(4) = pa//pc//pd//pb
                pt(5) = pa//pd//pb//pc
                pt(6) = pa//pd//pc//pb
-               pt3 = pa//pb//zeros//zeros
-               pt2 = pa//pc//zeros//zeros
-               pt1 = pa//pd//zeros//zeros
-               pt0 = pa//zeros
+               pt3 = pa//pb//zero8
+               pt2 = pa//pc//zero8
+               pt1 = pa//pd//zero8
+               pt0 = pa//zero12
                symm = 1.0d0
                if (pb.eq.pc .or. pb.eq.pd .or. pc.eq.pd)  symm = 2.0d0
                if (pb.eq.pc .and. pb.eq.pd .and. pc.eq.pd)  symm = 6.0d0

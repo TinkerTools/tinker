@@ -18,7 +18,7 @@ c
 c
       module usolve
       implicit none
-      real*8, allocatable :: mindex(:)
+      integer, allocatable :: mindex(:)
       real*8, allocatable :: minv(:)
       save
       end

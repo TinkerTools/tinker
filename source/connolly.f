@@ -336,7 +336,7 @@ c     set up cube arrays; first the integer coordinate arrays
 c
       do i = 1, na
          do k = 1, 3
-            ico(k,i) = (axyz(k,i)-comin(k))/width + 1
+            ico(k,i) = int((axyz(k,i)-comin(k))/width) + 1
             if (ico(k,i) .lt. 1) then
                call cerror ('Cube Coordinate Too Small')
             else if (ico(k,i) .gt. maxcube) then
@@ -3696,15 +3696,15 @@ c
       real*8 dots(3,*)
 c
 c
-      nequat = sqrt(pi*dble(ndots))
-      nvert = 0.5d0 * nequat
+      nequat = int(sqrt(pi*dble(ndots)))
+      nvert = int(0.5d0*dble(nequat))
       if (nvert .lt. 1)  nvert = 1
       k = 0
       do i = 0, nvert
          fi = (pi * dble(i)) / dble(nvert)
          z = cos(fi)
          xy = sin(fi)
-         nhoriz = nequat * xy
+         nhoriz = int(dble(nequat)*xy)
          if (nhoriz .lt. 1)  nhoriz = 1
          do j = 0, nhoriz-1
             fj = (2.0d0 * pi * dble(j)) / dble(nhoriz)

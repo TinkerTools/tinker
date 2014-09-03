@@ -1043,7 +1043,6 @@ c
       real*8, allocatable :: xx(:)
       character*3 resname
       external watson1,optsave
-      real*8 r
 c
 c
 c     perform dynamic allocation of some global arrays

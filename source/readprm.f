@@ -1257,7 +1257,7 @@ c
             read (string,*,err=510,end=510)  ib
   510       continue
             if (ia .ge. maxbio) then
-               write (iout,40)
+               write (iout,520)
   520          format (/,' READPRM  --  Too many Biopolymer Types;',
      &                    ' Increase MAXBIO')
                call fatal

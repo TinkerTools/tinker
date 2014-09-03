@@ -23,6 +23,9 @@ c
       use atoms
       use bound
       use boxes
+ccccccccccccccccccccccccccc
+      use energi
+ccccccccccccccccccccccccccc
       use files
       use group
       use inform

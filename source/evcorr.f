@@ -112,8 +112,8 @@ c
             fkm = dble(mvt(k))
             fik = fi*fk - vlam1*(fim*fk+(fi-fim)*fkm)
             if (k .eq. i)  fik = 0.5d0 * fik
-	    rv = radmin(kt,it)
-	    eps = epsilon(kt,it)
+            rv = radmin(kt,it)
+            eps = epsilon(kt,it)
             rv2 = rv * rv
             rv6 = rv2 * rv2 * rv2
             rv7 = rv6 * rv
@@ -130,10 +130,10 @@ c
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)
                else if (vdwtyp .eq. 'BUFFERED-14-7') then
-	          rho = r7 + ghal*rv7
-	          tau = (dhal+1.0d0) / (r+dhal*rv)
+                  rho = r7 + ghal*rv7
+                  tau = (dhal+1.0d0) / (r+dhal*rv)
                   tau7 = tau**7
-	          e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
                else if (vdwtyp.eq.'BUCKINGHAM' .or.
      &                  vdwtyp.eq.'MM3-HBOND') then
                   p = sqrt(rv2/r2)
@@ -274,8 +274,8 @@ c
             fkm = dble(mvt(k))
             fik = fi*fk - vlam1*(fim*fk+(fi-fim)*fkm)
             if (k .eq. i)  fik = 0.5d0 * fik
-	    rv = radmin(kt,it)
-	    eps = epsilon(kt,it)
+            rv = radmin(kt,it)
+            eps = epsilon(kt,it)
             rv2 = rv * rv
             rv6 = rv2 * rv2 * rv2
             rv7 = rv6 * rv
@@ -295,12 +295,12 @@ c
                   e = eps * (p12 - 2.0d0*p6)
                   de = eps * (p12-p6) * (-12.0d0/r)
                else if (vdwtyp .eq. 'BUFFERED-14-7') then
-	          rho = r7 + ghal*rv7
-	          tau = (dhal+1.0d0) / (r+dhal*rv)
+                  rho = r7 + ghal*rv7
+                  tau = (dhal+1.0d0) / (r+dhal*rv)
                   tau7 = tau**7
                   dtau = tau / (dhal+1.0d0)
                   gtau = eps*tau7*r6*(ghal+1.0d0)*(rv7/rho)**2
-	          e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
                   de = -7.0d0 * (dtau*e+gtau)
                else if (vdwtyp.eq.'BUCKINGHAM' .or.
      &                  vdwtyp.eq.'MM3-HBOND') then

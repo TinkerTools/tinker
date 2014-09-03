@@ -234,35 +234,35 @@ sub STD2{
 }
 
 if ($count > -1) {
-   printf " Total MD Blocks     %20d\n", "$count";
+   printf " Total MD Blocks     %15d Frames\n", "$count";
 }
 if ($#tot > -1) {
-   printf " Total Energy        %20.4f  (+/-%9.4f)\n", "$avgtot","$stdtot";
+   printf " Total Energy        %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgtot","$stdtot";
 }
 if ($#pot > -1) {
-   printf " Potential Energy    %20.4f  (+/-%9.4f)\n", "$avgpot","$stdpot";
+   printf " Potential Energy    %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgpot","$stdpot";
 }
 if ($#kin > -1) {
-   printf " Kinetic Energy      %20.4f  (+/-%9.4f)\n", "$avgkin","$stdkin";
+   printf " Kinetic Energy      %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgkin","$stdkin";
 }
 if ($#inter > -1) {
-   printf " Intermolecular      %20.4f  (+/-%9.4f)\n", "$avgi","$stdi";
+   printf " Intermolecular      %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgi","$stdi";
 }
 if ($#ele > -1) {
-   printf " Electrostatic       %20.4f  (+/-%9.4f)\n", "$avge","$stde";
+   printf " Electrostatic       %15.4f Kcal/mole   (+/-%9.4f)\n", "$avge","$stde";
 }
 if ($#vdw > -1) {
-   printf " van der Waals       %20.4f  (+/-%9.4f)\n", "$avgv","$stdv";
+   printf " van der Waals       %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgv","$stdv";
 }
 if ($#pol > -1) {
-   printf " Polarization        %20.4f  (+/-%9.4f)\n", "$avgp","$stdp";
+   printf " Polarization        %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgp","$stdp";
 }
 if ($#temp > -1) {
-   printf " Temperature         %20.2f  (+/-%9.2f)\n", "$avgt","$stdt";
+   printf " Temperature         %15.2f Kelvin      (+/-%9.2f)\n", "$avgt","$stdt";
 }
 if ($#press > -1) {
-   printf " Pressure            %20.2f  (+/-%9.2f)\n", "$avgpr","$stdpr";
+   printf " Pressure            %15.2f Atomsphere  (+/-%9.2f)\n", "$avgpr","$stdpr";
 }
 if ($#den > -1) {
-   printf " Density             %20.4f  (+/-%9.4f)\n", "$avgd","$stdd";
+   printf " Density             %15.4f Grams/cc    (+/-%9.4f)\n", "$avgd","$stdd";
 }

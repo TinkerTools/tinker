@@ -81,6 +81,7 @@ c
                ionize(ia) = ioniz
                repulse(ia) = repuls
             else
+               write (iout,40)
    40          format (/,' KORBIT  --  Too many Atom Classes;',
      &                    ' Increase MAXCLASS')
                abort = .true.

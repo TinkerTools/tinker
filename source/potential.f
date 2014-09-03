@@ -988,8 +988,8 @@ c
       logical use_ring
       logical use_site
       character*4 pa,pb
-      character*8 blank8,pt
-      character*8 blank16
+      character*8 pt,blank8
+      character*16 blank16
 c
 c
 c     get the connectivity info for parameter assignment

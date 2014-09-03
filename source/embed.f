@@ -1069,8 +1069,10 @@ c
       use iounit
       use keys
       implicit none
-      integer i,j,k,m,index,next
-      integer npart,nmetrize,npair
+      integer i,j,k,m
+      integer index,next
+      integer npart,npair
+      integer nmetrize
       integer mik,mjk,nik,njk
       integer, allocatable :: list(:)
       real*8 random,fraction
@@ -1371,9 +1373,9 @@ c
             m = int(dble(n)*random()) + 1
             if (dbnd(k,m) .eq. dbnd(m,k))  goto 140
             if (k .gt. m) then
-               swap = k
+               j = k
                k = m
-               m = swap
+               m = j
             end if
             fraction = random ()
             fraction = invbeta (alpha,beta,fraction)
