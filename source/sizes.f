@@ -29,7 +29,6 @@ c     maxelst         neighbors in electrostatics pair list
 c     maxulst         neighbors in dipole preconditioner list
 c     maxfix          geometric constraints and restraints
 c     maxvib          vibrational frequencies
-c     maxcell         unit cells in replicated crystal
 c     maxres          residues in the macromolecule
 c
 c
@@ -40,8 +39,7 @@ c
       integer maxtyp,maxclass
       integer maxvlst,maxelst
       integer maxulst,maxfix
-      integer maxvib,maxcell
-      integer maxres
+      integer maxvib,maxres
       parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -53,7 +51,6 @@ c
       parameter (maxulst=100)
       parameter (maxfix=maxatm)
       parameter (maxvib=1000)
-      parameter (maxcell=10000)
       parameter (maxres=10000)
       save
       end
