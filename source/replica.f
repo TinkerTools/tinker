@@ -93,14 +93,18 @@ c
       ycell2 = 0.5d0 * ycell
       zcell2 = 0.5d0 * zcell
 c
-c     check the total number of replicated unit cells
+c     perform dynamic allocation of some global arrays
 c
       ncell = nx*ny*nz - 1
-      if (ncell .gt. maxcell) then
-         write (iout,20)
-   20    format (/,' REPLICA  --  Increase MAXCELL or Decrease',
-     &              ' the Interaction Cutoffs')
-         call fatal
+      if (ncell .ne. 0) then
+         if (allocated(icell)) then
+            if (size(icell) .lt. 3*ncell) then
+               deallocate (icell)
+               allocate (icell(3,ncell))
+            end if
+         else
+            allocate (icell(3,ncell))
+         end if
       end if
 c
 c     assign indices to the required cell replicates
@@ -122,9 +126,15 @@ c
 c     print a message indicating the number of replicates used
 c
       if (debug .and. ncell.ne.0) then
-         write (iout,30)  nx,ny,nz
-   30    format (/,' REPLICA  --  Period Boundary via',i3,' x',
-     &              i3,' x',i3,' Set of Cell Replicates')
+         if (max(nx,ny,nz) .lt. 100) then
+            write (iout,20)  nx,ny,nz
+   20       format (/,' REPLICA  --  Period Boundary via',i3,' x',
+     &                 i3,' x',i3,' Set of Cell Replicates')
+         else
+            write (iout,30)  nx,ny,nz
+   30       format (/,' REPLICA  --  Period Boundary via',i4,' x',
+     &                 i4,' x',i4,' Set of Cell Replicates')
+         end if
       end if
       return
       end

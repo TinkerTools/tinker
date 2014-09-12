@@ -27,6 +27,7 @@ c
       use atmlst
       use bitor
       use bndstr
+      use cell
       use charge
       use chunks
       use couple
@@ -156,6 +157,10 @@ c
       if (allocated(ibnd))  deallocate (ibnd)
       if (allocated(bk))  deallocate (bk)
       if (allocated(bl))  deallocate (bl)
+c
+c     deallocation of global arrays from module cell
+c
+      if (allocated(icell))  deallocate (icell)
 c
 c     deallocation of global arrays from module charge
 c

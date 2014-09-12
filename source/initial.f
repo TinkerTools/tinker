@@ -12,8 +12,11 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "initial" sets up original values for some parameters
-c     and variables that might not otherwise get initialized
+c     "initial" sets up original values for some parameters and
+c     variables that might not otherwise get initialized
+c
+c     note the calls below to "kmp_set" routines are only needed by
+c     the Intel compiler and must be commented for other compilers
 c
 c
       subroutine initial

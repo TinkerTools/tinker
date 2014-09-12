@@ -23,10 +23,9 @@ c     zcell2   half the length of the c-axis of the replicated cell
 c
 c
       module cell
-      use sizes
       implicit none
       integer ncell
-      integer icell(3,maxcell)
+      integer, allocatable :: icell(:,:)
       real*8 xcell
       real*8 ycell
       real*8 zcell

@@ -27,7 +27,7 @@ c
       use math
       implicit none
       integer maxspace
-      parameter (maxspace=56)
+      parameter (maxspace=60)
       integer i,ixyz,mode
       integer na,nb,nc
       integer next,freeunit
@@ -55,7 +55,8 @@ c
      &              'P43212    ', 'P4(-)21m  ', 'P4(-)21c  ',
      &              'P4(-)m2   ', 'R3(-)     ', 'R3c       ',
      &              'P63/m     ', 'P6(3)/mmc ', 'Pa3(-)    ',
-     &              'Fm3(-)m   ', 'Im3(-)m   '/
+     &              'P43m      ', 'I4(-)3m   ', 'P4(-)3n   ',
+     &              'Pm3m      ', 'Fm3(-)m   ', 'Im3(-)m   '/
 c
 c
 c     get and read the Cartesian coordinates file
@@ -131,7 +132,9 @@ c
      &           /,2x,'(49) ',a10,2x,'(50) ',a10,2x,'(51) ',a10,
      &              2x,'(52) ',a10,
      &           /,2x,'(53) ',a10,2x,'(54) ',a10,2x,'(55) ',a10,
-     &              2x,'(56) ',a10)
+     &              2x,'(56) ',a10,
+     &           /,2x,'(57) ',a10,2x,'(58) ',a10,2x,'(59) ',a10,
+     &              2x,'(60) ',a10)
          write (iout,80)
    80    format (/,' Enter the Number of the Desired Choice :  ',$)
          read (input,90)  i
@@ -667,11 +670,6 @@ c     P1 space group  (International Tables 1)
 c
       if (spacegrp .eq. 'P1        ') then
          nsym = 1
-         do i = 1, n
-            x(i) = x(i)
-            y(i) = y(i)
-            z(i) = z(i)
-         end do
 c
 c     P1(-) space group  (International Tables 2)
 c
@@ -2724,7 +2722,39 @@ c
             end do
          end do
 c
-c     Fm3m space group  (Intl. Tables 225, Face Centered Cubic)
+c     P4(-)3m space group  (Intl. Tables 215)
+c
+      else if (spacegrp .eq. 'P4(-)3m   ') then
+         nsym = 1
+c
+c     I4(-)3m space group  (Intl. Tables 217, Body Centered Cubic)
+c
+      else if (spacegrp .eq. 'I4(-)3m   ') then
+         nsym = 2
+         do i = 2, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 2) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = 0.5d0 + z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
+c     P4(-)3n space group  (Intl. Tables 218)
+c
+      else if (spacegrp .eq. 'P4(-)3n   ') then
+         nsym = 1
+c
+c     Pm3m space group  (Intl. Tables 221)
+c
+      else if (spacegrp .eq. 'Pm3m      ') then
+         nsym = 1
+c
+c     Fm3(-)m space group  (Intl. Tables 225, Face Centered Cubic)
 c
       else if (spacegrp .eq. 'Fm3(-)m   ') then
          nsym = 4
@@ -2749,7 +2779,7 @@ c
             end do
          end do
 c
-c     Im3m space group  (Intl. Tables 229, Body Centered Cubic)
+c     Im3(-)m space group  (Intl. Tables 229, Body Centered Cubic)
 c
       else if (spacegrp .eq. 'Im3(-)m   ') then
          nsym = 2
