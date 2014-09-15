@@ -21,7 +21,6 @@ c
       use sizes
       use angbnd
       use atoms
-      use deriv
       use group
       use hessn
       use opbend
@@ -30,6 +29,7 @@ c
       integer ia,ib,ic,id
       real*8 eps,fgrp
       real*8 old,term
+      real*8, allocatable :: de(:,:)
       real*8, allocatable :: d0(:,:)
       logical proceed
       logical twosided
@@ -42,12 +42,9 @@ c
       twosided = .false.
       if (n .le. 50)  twosided = .true.
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(deopb))  allocate (deopb(3,n))
-c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (de(3,n))
       allocate (d0(3,n))
 c
 c     compute numerical out-of-plane Hessian for current atom
@@ -71,12 +68,12 @@ c
 c     find first derivatives for the base structure
 c
             if (.not. twosided) then
-               call eopbend2a (iopbend)
+               call eopbend2a (iopbend,de)
                do j = 1, 3
-                  d0(j,ia) = deopb(j,ia)
-                  d0(j,ib) = deopb(j,ib)
-                  d0(j,ic) = deopb(j,ic)
-                  d0(j,id) = deopb(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
 c
@@ -87,20 +84,20 @@ c
                x(i) = x(i) - 0.5d0*eps
                call eopbend2a (iopbend)
                do j = 1, 3
-                  d0(j,ia) = deopb(j,ia)
-                  d0(j,ib) = deopb(j,ib)
-                  d0(j,ic) = deopb(j,ic)
-                  d0(j,id) = deopb(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
             x(i) = x(i) + eps
-            call eopbend2a (iopbend)
+            call eopbend2a (iopbend,de)
             x(i) = old
             do j = 1, 3
-               hessx(j,ia) = hessx(j,ia) + term*(deopb(j,ia)-d0(j,ia))
-               hessx(j,ib) = hessx(j,ib) + term*(deopb(j,ib)-d0(j,ib))
-               hessx(j,ic) = hessx(j,ic) + term*(deopb(j,ic)-d0(j,ic))
-               hessx(j,id) = hessx(j,id) + term*(deopb(j,id)-d0(j,id))
+               hessx(j,ia) = hessx(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessx(j,ib) = hessx(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessx(j,ic) = hessx(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessx(j,id) = hessx(j,id) + term*(de(j,id)-d0(j,id))
             end do
 c
 c     find numerical y-components via perturbed structures
@@ -110,20 +107,20 @@ c
                y(i) = y(i) - 0.5d0*eps
                call eopbend2a (iopbend)
                do j = 1, 3
-                  d0(j,ia) = deopb(j,ia)
-                  d0(j,ib) = deopb(j,ib)
-                  d0(j,ic) = deopb(j,ic)
-                  d0(j,id) = deopb(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
             y(i) = y(i) + eps
-            call eopbend2a (iopbend)
+            call eopbend2a (iopbend,de)
             y(i) = old
             do j = 1, 3
-               hessy(j,ia) = hessy(j,ia) + term*(deopb(j,ia)-d0(j,ia))
-               hessy(j,ib) = hessy(j,ib) + term*(deopb(j,ib)-d0(j,ib))
-               hessy(j,ic) = hessy(j,ic) + term*(deopb(j,ic)-d0(j,ic))
-               hessy(j,id) = hessy(j,id) + term*(deopb(j,id)-d0(j,id))
+               hessy(j,ia) = hessy(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessy(j,ib) = hessy(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessy(j,ic) = hessy(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessy(j,id) = hessy(j,id) + term*(de(j,id)-d0(j,id))
             end do
 c
 c     find numerical z-components via perturbed structures
@@ -133,26 +130,27 @@ c
                z(i) = z(i) - 0.5d0*eps
                call eopbend2a (iopbend)
                do j = 1, 3
-                  d0(j,ia) = deopb(j,ia)
-                  d0(j,ib) = deopb(j,ib)
-                  d0(j,ic) = deopb(j,ic)
-                  d0(j,id) = deopb(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
             z(i) = z(i) + eps
-            call eopbend2a (iopbend)
+            call eopbend2a (iopbend,de)
             z(i) = old
             do j = 1, 3
-               hessz(j,ia) = hessz(j,ia) + term*(deopb(j,ia)-d0(j,ia))
-               hessz(j,ib) = hessz(j,ib) + term*(deopb(j,ib)-d0(j,ib))
-               hessz(j,ic) = hessz(j,ic) + term*(deopb(j,ic)-d0(j,ic))
-               hessz(j,id) = hessz(j,id) + term*(deopb(j,id)-d0(j,id))
+               hessz(j,ia) = hessz(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessz(j,ib) = hessz(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessz(j,ic) = hessz(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessz(j,id) = hessz(j,id) + term*(de(j,id)-d0(j,id))
             end do
          end if
       end do
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (de)
       deallocate (d0)
       return
       end
@@ -170,13 +168,12 @@ c     a trigonal center via a Wilson-Decius-Cross or Allinger angle;
 c     used in computation of finite difference second derivatives
 c
 c
-      subroutine eopbend2a (i)
+      subroutine eopbend2a (i,de)
       use sizes
       use angbnd
       use angpot
       use atoms
       use bound
-      use deriv
       use math
       use opbend
       implicit none
@@ -208,6 +205,7 @@ c
       real*8 dedxib,dedyib,dedzib
       real*8 dedxic,dedyic,dedzic
       real*8 dedxid,dedyid,dedzid
+      real*8 de(3,*)
 c
 c
 c     set the atom numbers and parameters for this angle
@@ -236,18 +234,18 @@ c
 c
 c     zero out the first derivative components
 c
-      deopb(1,ia) = 0.0d0
-      deopb(2,ia) = 0.0d0
-      deopb(3,ia) = 0.0d0
-      deopb(1,ib) = 0.0d0
-      deopb(2,ib) = 0.0d0
-      deopb(3,ib) = 0.0d0
-      deopb(1,ic) = 0.0d0
-      deopb(2,ic) = 0.0d0
-      deopb(3,ic) = 0.0d0
-      deopb(1,id) = 0.0d0
-      deopb(2,id) = 0.0d0
-      deopb(3,id) = 0.0d0
+      de(1,ia) = 0.0d0
+      de(2,ia) = 0.0d0
+      de(3,ia) = 0.0d0
+      de(1,ib) = 0.0d0
+      de(2,ib) = 0.0d0
+      de(3,ib) = 0.0d0
+      de(1,ic) = 0.0d0
+      de(2,ic) = 0.0d0
+      de(3,ic) = 0.0d0
+      de(1,id) = 0.0d0
+      de(2,id) = 0.0d0
+      de(3,id) = 0.0d0
 c
 c     compute the out-of-plane bending angle
 c
@@ -363,18 +361,18 @@ c
 c
 c     set the out-of-plane bending derivatives
 c
-         deopb(1,ia) = dedxia
-         deopb(2,ia) = dedyia
-         deopb(3,ia) = dedzia
-         deopb(1,ib) = dedxib
-         deopb(2,ib) = dedyib
-         deopb(3,ib) = dedzib
-         deopb(1,ic) = dedxic
-         deopb(2,ic) = dedyic
-         deopb(3,ic) = dedzic
-         deopb(1,id) = dedxid
-         deopb(2,id) = dedyid
-         deopb(3,id) = dedzid
+         de(1,ia) = dedxia
+         de(2,ia) = dedyia
+         de(3,ia) = dedzia
+         de(1,ib) = dedxib
+         de(2,ib) = dedyib
+         de(3,ib) = dedzib
+         de(1,ic) = dedxic
+         de(2,ic) = dedyic
+         de(3,ic) = dedzic
+         de(1,id) = dedxid
+         de(2,id) = dedyid
+         de(3,id) = dedzid
       end if
       return
       end

@@ -24,7 +24,6 @@ c
       use angbnd
       use angpot
       use atoms
-      use deriv
       use group
       use hessn
       implicit none
@@ -32,6 +31,7 @@ c
       integer ia,ib,ic,id
       real*8 eps,fgrp
       real*8 old,term
+      real*8, allocatable :: de(:,:)
       real*8, allocatable :: d0(:,:)
       logical proceed
       logical twosided
@@ -48,12 +48,9 @@ c
       twosided = .false.
       if (n .le. 50)  twosided = .true.
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(dea))  allocate (dea(3,n))
-c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (de(3,n))
       allocate (d0(3,n))
 c
 c     compute numerical in-plane bend Hessian for current atom
@@ -75,12 +72,12 @@ c
 c     find first derivatives for the base structure
 c
             if (.not. twosided) then
-               call eangle2b (k)
+               call eangle2b (k,de)
                do j = 1, 3
-                  d0(j,ia) = dea(j,ia)
-                  d0(j,ib) = dea(j,ib)
-                  d0(j,ic) = dea(j,ic)
-                  d0(j,id) = dea(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
 c
@@ -91,20 +88,20 @@ c
                x(i) = x(i) - 0.5d0*eps
                call eangle2b (k)
                do j = 1, 3
-                  d0(j,ia) = dea(j,ia)
-                  d0(j,ib) = dea(j,ib)
-                  d0(j,ic) = dea(j,ic)
-                  d0(j,id) = dea(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
             x(i) = x(i) + eps
-            call eangle2b (k)
+            call eangle2b (k,de)
             x(i) = old
             do j = 1, 3
-               hessx(j,ia) = hessx(j,ia) + term*(dea(j,ia)-d0(j,ia))
-               hessx(j,ib) = hessx(j,ib) + term*(dea(j,ib)-d0(j,ib))
-               hessx(j,ic) = hessx(j,ic) + term*(dea(j,ic)-d0(j,ic))
-               hessx(j,id) = hessx(j,id) + term*(dea(j,id)-d0(j,id))
+               hessx(j,ia) = hessx(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessx(j,ib) = hessx(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessx(j,ic) = hessx(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessx(j,id) = hessx(j,id) + term*(de(j,id)-d0(j,id))
             end do
 c
 c     find numerical y-components via perturbed structures
@@ -112,22 +109,22 @@ c
             old = y(i)
             if (twosided) then
                y(i) = y(i) - 0.5d0*eps
-               call eangle2b (k)
+               call eangle2b (k,de)
                do j = 1, 3
-                  d0(j,ia) = dea(j,ia)
-                  d0(j,ib) = dea(j,ib)
-                  d0(j,ic) = dea(j,ic)
-                  d0(j,id) = dea(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
             y(i) = y(i) + eps
-            call eangle2b (k)
+            call eangle2b (k,de)
             y(i) = old
             do j = 1, 3
-               hessy(j,ia) = hessy(j,ia) + term*(dea(j,ia)-d0(j,ia))
-               hessy(j,ib) = hessy(j,ib) + term*(dea(j,ib)-d0(j,ib))
-               hessy(j,ic) = hessy(j,ic) + term*(dea(j,ic)-d0(j,ic))
-               hessy(j,id) = hessy(j,id) + term*(dea(j,id)-d0(j,id))
+               hessy(j,ia) = hessy(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessy(j,ib) = hessy(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessy(j,ic) = hessy(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessy(j,id) = hessy(j,id) + term*(de(j,id)-d0(j,id))
             end do
 c
 c     find numerical z-components via perturbed structures
@@ -135,28 +132,29 @@ c
             old = z(i)
             if (twosided) then
                z(i) = z(i) - 0.5d0*eps
-               call eangle2b (k)
+               call eangle2b (k,de)
                do j = 1, 3
-                  d0(j,ia) = dea(j,ia)
-                  d0(j,ib) = dea(j,ib)
-                  d0(j,ic) = dea(j,ic)
-                  d0(j,id) = dea(j,id)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
                end do
             end if
             z(i) = z(i) + eps
-            call eangle2b (k)
+            call eangle2b (k,de)
             z(i) = old
             do j = 1, 3
-               hessz(j,ia) = hessz(j,ia) + term*(dea(j,ia)-d0(j,ia))
-               hessz(j,ib) = hessz(j,ib) + term*(dea(j,ib)-d0(j,ib))
-               hessz(j,ic) = hessz(j,ic) + term*(dea(j,ic)-d0(j,ic))
-               hessz(j,id) = hessz(j,id) + term*(dea(j,id)-d0(j,id))
+               hessz(j,ia) = hessz(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessz(j,ib) = hessz(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessz(j,ic) = hessz(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessz(j,id) = hessz(j,id) + term*(de(j,id)-d0(j,id))
             end do
          end if
       end do
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (de)
       deallocate (d0)
       return
       end
@@ -621,7 +619,7 @@ c     for a single angle with respect to Cartesian coordinates;
 c     used in computation of finite difference second derivatives
 c
 c
-      subroutine eangle2b (i)
+      subroutine eangle2b (i,de)
       use sizes
       use angbnd
       use angpot
@@ -658,6 +656,7 @@ c
       real*8 dedxip,dedyip,dedzip
       real*8 dpdxia,dpdyia,dpdzia
       real*8 dpdxic,dpdyic,dpdzic
+      real*8 de(3,*)
 c
 c
 c     set the atom numbers and parameters for this angle
@@ -686,18 +685,18 @@ c
 c
 c     zero out the first derivative components
 c
-      dea(1,ia) = 0.0d0
-      dea(2,ia) = 0.0d0
-      dea(3,ia) = 0.0d0
-      dea(1,ib) = 0.0d0
-      dea(2,ib) = 0.0d0
-      dea(3,ib) = 0.0d0
-      dea(1,ic) = 0.0d0
-      dea(2,ic) = 0.0d0
-      dea(3,ic) = 0.0d0
-      dea(1,id) = 0.0d0
-      dea(2,id) = 0.0d0
-      dea(3,id) = 0.0d0
+      de(1,ia) = 0.0d0
+      de(2,ia) = 0.0d0
+      de(3,ia) = 0.0d0
+      de(1,ib) = 0.0d0
+      de(2,ib) = 0.0d0
+      de(3,ib) = 0.0d0
+      de(1,ic) = 0.0d0
+      de(2,ic) = 0.0d0
+      de(3,ic) = 0.0d0
+      de(1,id) = 0.0d0
+      de(2,id) = 0.0d0
+      de(3,id) = 0.0d0
 c
 c     compute the projected in-plane angle gradient
 c
@@ -804,18 +803,18 @@ c
 c
 c     set the in-plane angle bending first derivatives
 c
-         dea(1,ia) = dedxia
-         dea(2,ia) = dedyia
-         dea(3,ia) = dedzia
-         dea(1,ib) = dedxib
-         dea(2,ib) = dedyib
-         dea(3,ib) = dedzib
-         dea(1,ic) = dedxic
-         dea(2,ic) = dedyic
-         dea(3,ic) = dedzic
-         dea(1,id) = dedxid
-         dea(2,id) = dedyid
-         dea(3,id) = dedzid
+         de(1,ia) = dedxia
+         de(2,ia) = dedyia
+         de(3,ia) = dedzia
+         de(1,ib) = dedxib
+         de(2,ib) = dedyib
+         de(3,ib) = dedzib
+         de(1,ic) = dedxic
+         de(2,ic) = dedyic
+         de(3,ic) = dedzic
+         de(1,id) = dedxid
+         de(2,id) = dedyid
+         de(3,id) = dedzid
       end if
       return
       end

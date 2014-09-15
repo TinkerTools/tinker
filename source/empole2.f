@@ -38,7 +38,6 @@ c
       subroutine empole2 (i)
       use sizes
       use atoms
-      use deriv
       use hessn
       use mpole
       use potent
@@ -47,6 +46,8 @@ c
       integer nlist
       integer, allocatable :: list(:)
       real*8 eps,old
+      real*8, allocatable :: dm(:,:)
+      real*8, allocatable :: dp(:,:)
       real*8, allocatable :: d0(:,:)
       logical biglist
       logical reinduce
@@ -65,14 +66,11 @@ c
          twosided = .true.
       end if
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(dem))  allocate (dem(3,n))
-      if (.not. allocated(dep))  allocate (dep(3,n))
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (list(npole))
+      allocate (dm(3,n))
+      allocate (dp(3,n))
       allocate (d0(3,n))
 c
 c     find the multipole definitions involving the current atom;
@@ -90,10 +88,10 @@ c
 c     get multipole first derivatives for the base structure
 c
       if (.not. twosided) then
-         call empole2a (nlist,list,reinduce)
+         call empole2a (nlist,list,reinduce,dm,dp)
          do k = 1, n
             do j = 1, 3
-               d0(j,k) = dem(j,k) + dep(j,k)
+               d0(j,k) = dm(j,k) + dp(j,k)
             end do
          end do
       end if
@@ -103,19 +101,19 @@ c
       old = x(i)
       if (twosided) then
          x(i) = x(i) - 0.5d0*eps
-         call empole2a (nlist,list,reinduce)
+         call empole2a (nlist,list,reinduce,dm,dp)
          do k = 1, n
             do j = 1, 3
-               d0(j,k) = dem(j,k) + dep(j,k)
+               d0(j,k) = dm(j,k) + dp(j,k)
             end do
          end do
       end if
       x(i) = x(i) + eps
-      call empole2a (nlist,list,reinduce)
+      call empole2a (nlist,list,reinduce,dm,dp)
       x(i) = old
       do k = 1, n
          do j = 1, 3
-            hessx(j,k) = hessx(j,k) + (dem(j,k)+dep(j,k)-d0(j,k))/eps
+            hessx(j,k) = hessx(j,k) + (dm(j,k)+dp(j,k)-d0(j,k))/eps
          end do
       end do
 c
@@ -124,19 +122,19 @@ c
       old = y(i)
       if (twosided) then
          y(i) = y(i) - 0.5d0*eps
-         call empole2a (nlist,list,reinduce)
+         call empole2a (nlist,list,reinduce,dm,dp)
          do k = 1, n
             do j = 1, 3
-               d0(j,k) = dem(j,k) + dep(j,k)
+               d0(j,k) = dm(j,k) + dp(j,k)
             end do
          end do
       end if
       y(i) = y(i) + eps
-      call empole2a (nlist,list,reinduce)
+      call empole2a (nlist,list,reinduce,dm,dp)
       y(i) = old
       do k = 1, n
          do j = 1, 3
-            hessy(j,k) = hessy(j,k) + (dem(j,k)+dep(j,k)-d0(j,k))/eps
+            hessy(j,k) = hessy(j,k) + (dm(j,k)+dp(j,k)-d0(j,k))/eps
          end do
       end do
 c
@@ -145,25 +143,27 @@ c
       old = z(i)
       if (twosided) then
          z(i) = z(i) - 0.5d0*eps
-         call empole2a (nlist,list,reinduce)
+         call empole2a (nlist,list,reinduce,dm,dp)
          do k = 1, n
             do j = 1, 3
-               d0(j,k) = dem(j,k) + dep(j,k)
+               d0(j,k) = dm(j,k) + dp(j,k)
             end do
          end do
       end if
       z(i) = z(i) + eps
-      call empole2a (nlist,list,reinduce)
+      call empole2a (nlist,list,reinduce,dm,dp)
       z(i) = old
       do k = 1, n
          do j = 1, 3
-            hessz(j,k) = hessz(j,k) + (dem(j,k)+dep(j,k)-d0(j,k))/eps
+            hessz(j,k) = hessz(j,k) + (dm(j,k)+dp(j,k)-d0(j,k))/eps
          end do
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (list)
+      deallocate (dm)
+      deallocate (dp)
       deallocate (d0)
       return
       end
@@ -181,14 +181,13 @@ c     derivatives for a single atom with respect to Cartesian
 c     coordinates; used to get finite difference second derivatives
 c
 c
-      subroutine empole2a (nlist,list,reinduce)
+      subroutine empole2a (nlist,list,reinduce,dm,dp)
       use sizes
       use atoms
       use bound
       use boxes
       use chgpot
       use couple
-      use deriv
       use group
       use limits
       use molcul
@@ -254,6 +253,8 @@ c
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
+      real*8 dm(3,*)
+      real*8 dp(3,*)
       logical proceed
       logical usei,usek
       logical reinduce
@@ -264,8 +265,8 @@ c     zero out the multipole and polarization first derivatives
 c
       do i = 1, n
          do j = 1, 3
-            dem(j,i) = 0.0d0
-            dep(j,i) = 0.0d0
+            dm(j,i) = 0.0d0
+            dp(j,i) = 0.0d0
          end do
       end do
       if (nlist .eq. 0)  return
@@ -836,23 +837,23 @@ c
 c
 c     increment gradient due to force and torque on first site
 c
-               dem(1,ii) = dem(1,ii) + ftm2(1)
-               dem(2,ii) = dem(2,ii) + ftm2(2)
-               dem(3,ii) = dem(3,ii) + ftm2(3)
-               dep(1,ii) = dep(1,ii) + ftm2i(1)
-               dep(2,ii) = dep(2,ii) + ftm2i(2)
-               dep(3,ii) = dep(3,ii) + ftm2i(3)
-               call torque (i,ttm2,ttm2i,frcxi,frcyi,frczi)
+               dm(1,ii) = dm(1,ii) + ftm2(1)
+               dm(2,ii) = dm(2,ii) + ftm2(2)
+               dm(3,ii) = dm(3,ii) + ftm2(3)
+               dp(1,ii) = dp(1,ii) + ftm2i(1)
+               dp(2,ii) = dp(2,ii) + ftm2i(2)
+               dp(3,ii) = dp(3,ii) + ftm2i(3)
+               call torque (i,ttm2,ttm2i,frcxi,frcyi,frczi,dm,dp)
 c
 c     increment gradient due to force and torque on second site
 c
-               dem(1,kk) = dem(1,kk) - ftm2(1)
-               dem(2,kk) = dem(2,kk) - ftm2(2)
-               dem(3,kk) = dem(3,kk) - ftm2(3)
-               dep(1,kk) = dep(1,kk) - ftm2i(1)
-               dep(2,kk) = dep(2,kk) - ftm2i(2)
-               dep(3,kk) = dep(3,kk) - ftm2i(3)
-               call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk)
+               dm(1,kk) = dm(1,kk) - ftm2(1)
+               dm(2,kk) = dm(2,kk) - ftm2(2)
+               dm(3,kk) = dm(3,kk) - ftm2(3)
+               dp(1,kk) = dp(1,kk) - ftm2i(1)
+               dp(2,kk) = dp(2,kk) - ftm2i(2)
+               dp(3,kk) = dp(3,kk) - ftm2i(3)
+               call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk,dm,dp)
             end if
    10       continue
          end do
@@ -905,14 +906,14 @@ c
       if (.not. use_mpole) then
          do i = 1, n
             do j = 1, 3
-               dem(j,i) = 0.0d0
+               dm(j,i) = 0.0d0
             end do
          end do
       end if
       if (.not. use_polar) then
          do i = 1, n
             do j = 1, 3
-               dep(j,i) = 0.0d0
+               dp(j,i) = 0.0d0
             end do
          end do
       end if

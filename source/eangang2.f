@@ -22,7 +22,6 @@ c
       use angang
       use angbnd
       use atoms
-      use deriv
       use group
       use hessn
       implicit none
@@ -30,6 +29,7 @@ c
       integer ia,ib,ic,id,ie
       real*8 eps,fgrp
       real*8 old,term
+      real*8, allocatable :: de(:,:)
       real*8, allocatable :: d0(:,:)
       logical proceed
       logical twosided
@@ -42,12 +42,9 @@ c
       twosided = .false.
       if (n .le. 50)  twosided = .true.
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(deaa))  allocate (deaa(3,n))
-c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (de(3,n))
       allocate (d0(3,n))
 c
 c     compute numerical angle-angle Hessian for current atom
@@ -82,13 +79,13 @@ c
 c     find first derivatives for the base structure
 c
             if (.not. twosided) then
-               call eangang2a (iangang)
+               call eangang2a (iangang,de)
                do j = 1, 3
-                  d0(j,ia) = deaa(j,ia)
-                  d0(j,ib) = deaa(j,ib)
-                  d0(j,ic) = deaa(j,ic)
-                  d0(j,id) = deaa(j,id)
-                  if (ie .ne. 0)  d0(j,ie) = deaa(j,ie)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  if (ie .ne. 0)  d0(j,ie) = de(j,ie)
                end do
             end if
 c
@@ -97,25 +94,25 @@ c
             old = x(i)
             if (twosided) then
                x(i) = x(i) - 0.5d0*eps
-               call eangang2a (iangang)
+               call eangang2a (iangang,de)
                do j = 1, 3
-                  d0(j,ia) = deaa(j,ia)
-                  d0(j,ib) = deaa(j,ib)
-                  d0(j,ic) = deaa(j,ic)
-                  d0(j,id) = deaa(j,id)
-                  if (ie .ne. 0)  d0(j,ie) = deaa(j,ie)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  if (ie .ne. 0)  d0(j,ie) = de(j,ie)
                end do
             end if
             x(i) = x(i) + eps
-            call eangang2a (iangang)
+            call eangang2a (iangang,de)
             x(i) = old
             do j = 1, 3
-               hessx(j,ia) = hessx(j,ia) + term*(deaa(j,ia)-d0(j,ia))
-               hessx(j,ib) = hessx(j,ib) + term*(deaa(j,ib)-d0(j,ib))
-               hessx(j,ic) = hessx(j,ic) + term*(deaa(j,ic)-d0(j,ic))
-               hessx(j,id) = hessx(j,id) + term*(deaa(j,id)-d0(j,id))
+               hessx(j,ia) = hessx(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessx(j,ib) = hessx(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessx(j,ic) = hessx(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessx(j,id) = hessx(j,id) + term*(de(j,id)-d0(j,id))
                if (ie .ne. 0)
-     &            hessx(j,ie) = hessx(j,ie) + term*(deaa(j,ie)-d0(j,ie))
+     &            hessx(j,ie) = hessx(j,ie) + term*(de(j,ie)-d0(j,ie))
             end do
 c
 c     find numerical y-components via perturbed structures
@@ -123,25 +120,25 @@ c
             old = y(i)
             if (twosided) then
                y(i) = y(i) - 0.5d0*eps
-               call eangang2a (iangang)
+               call eangang2a (iangang,de)
                do j = 1, 3
-                  d0(j,ia) = deaa(j,ia)
-                  d0(j,ib) = deaa(j,ib)
-                  d0(j,ic) = deaa(j,ic)
-                  d0(j,id) = deaa(j,id)
-                  if (ie .ne. 0)  d0(j,ie) = deaa(j,ie)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  if (ie .ne. 0)  d0(j,ie) = de(j,ie)
                end do
             end if
             y(i) = y(i) + eps
-            call eangang2a (iangang)
+            call eangang2a (iangang,de)
             y(i) = old
             do j = 1, 3
-               hessy(j,ia) = hessy(j,ia) + term*(deaa(j,ia)-d0(j,ia))
-               hessy(j,ib) = hessy(j,ib) + term*(deaa(j,ib)-d0(j,ib))
-               hessy(j,ic) = hessy(j,ic) + term*(deaa(j,ic)-d0(j,ic))
-               hessy(j,id) = hessy(j,id) + term*(deaa(j,id)-d0(j,id))
+               hessy(j,ia) = hessy(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessy(j,ib) = hessy(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessy(j,ic) = hessy(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessy(j,id) = hessy(j,id) + term*(de(j,id)-d0(j,id))
                if (ie .ne. 0)
-     &            hessy(j,ie) = hessy(j,ie) + term*(deaa(j,ie)-d0(j,ie))
+     &            hessy(j,ie) = hessy(j,ie) + term*(de(j,ie)-d0(j,ie))
             end do
 c
 c     find numerical z-components via perturbed structures
@@ -149,31 +146,32 @@ c
             old = z(i)
             if (twosided) then
                z(i) = z(i) - 0.5d0*eps
-               call eangang2a (iangang)
+               call eangang2a (iangang,de)
                do j = 1, 3
-                  d0(j,ia) = deaa(j,ia)
-                  d0(j,ib) = deaa(j,ib)
-                  d0(j,ic) = deaa(j,ic)
-                  d0(j,id) = deaa(j,id)
-                  if (ie .ne. 0)  d0(j,ie) = deaa(j,ie)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  if (ie .ne. 0)  d0(j,ie) = de(j,ie)
                end do
             end if
             z(i) = z(i) + eps
-            call eangang2a (iangang)
+            call eangang2a (iangang,de)
             z(i) = old
             do j = 1, 3
-               hessz(j,ia) = hessz(j,ia) + term*(deaa(j,ia)-d0(j,ia))
-               hessz(j,ib) = hessz(j,ib) + term*(deaa(j,ib)-d0(j,ib))
-               hessz(j,ic) = hessz(j,ic) + term*(deaa(j,ic)-d0(j,ic))
-               hessz(j,id) = hessz(j,id) + term*(deaa(j,id)-d0(j,id))
+               hessz(j,ia) = hessz(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessz(j,ib) = hessz(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessz(j,ic) = hessz(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessz(j,id) = hessz(j,id) + term*(de(j,id)-d0(j,id))
                if (ie .ne. 0)
-     &            hessz(j,ie) = hessz(j,ie) + term*(deaa(j,ie)-d0(j,ie))
+     &            hessz(j,ie) = hessz(j,ie) + term*(de(j,ie)-d0(j,ie))
             end do
          end if
       end do
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (de)
       deallocate (d0)
       return
       end
@@ -191,14 +189,13 @@ c     a single interaction with respect to Cartesian coordinates;
 c     used in computation of finite difference second derivatives
 c
 c
-      subroutine eangang2a (i)
+      subroutine eangang2a (i,de)
       use sizes
       use angang
       use angbnd
       use angpot
       use atoms
       use bound
-      use deriv
       use math
       implicit none
       integer i,j,k
@@ -227,6 +224,7 @@ c
       real*8 dedxic,dedyic,dedzic
       real*8 dedxid,dedyid,dedzid
       real*8 dedxie,dedyie,dedzie
+      real*8 de(3,*)
 c
 c
 c     set the coordinates of the involved atoms
@@ -256,21 +254,21 @@ c
 c
 c     zero out the first derivative components
 c
-      deaa(1,ia) = 0.0d0
-      deaa(2,ia) = 0.0d0
-      deaa(3,ia) = 0.0d0
-      deaa(1,ib) = 0.0d0
-      deaa(2,ib) = 0.0d0
-      deaa(3,ib) = 0.0d0
-      deaa(1,ic) = 0.0d0
-      deaa(2,ic) = 0.0d0
-      deaa(3,ic) = 0.0d0
-      deaa(1,id) = 0.0d0
-      deaa(2,id) = 0.0d0
-      deaa(3,id) = 0.0d0
-      deaa(1,ie) = 0.0d0
-      deaa(2,ie) = 0.0d0
-      deaa(3,ie) = 0.0d0
+      de(1,ia) = 0.0d0
+      de(2,ia) = 0.0d0
+      de(3,ia) = 0.0d0
+      de(1,ib) = 0.0d0
+      de(2,ib) = 0.0d0
+      de(3,ib) = 0.0d0
+      de(1,ic) = 0.0d0
+      de(2,ic) = 0.0d0
+      de(3,ic) = 0.0d0
+      de(1,id) = 0.0d0
+      de(2,id) = 0.0d0
+      de(3,id) = 0.0d0
+      de(1,ie) = 0.0d0
+      de(2,ie) = 0.0d0
+      de(3,ie) = 0.0d0
 c
 c     compute the values of the two bond angles
 c
@@ -352,21 +350,21 @@ c
 c
 c     set the angle-angle interaction first derivatives
 c
-         deaa(1,ia) = deaa(1,ia) + dedxia
-         deaa(2,ia) = deaa(2,ia) + dedyia
-         deaa(3,ia) = deaa(3,ia) + dedzia
-         deaa(1,ib) = deaa(1,ib) + dedxib
-         deaa(2,ib) = deaa(2,ib) + dedyib
-         deaa(3,ib) = deaa(3,ib) + dedzib
-         deaa(1,ic) = deaa(1,ic) + dedxic
-         deaa(2,ic) = deaa(2,ic) + dedyic
-         deaa(3,ic) = deaa(3,ic) + dedzic
-         deaa(1,id) = deaa(1,id) + dedxid
-         deaa(2,id) = deaa(2,id) + dedyid
-         deaa(3,id) = deaa(3,id) + dedzid
-         deaa(1,ie) = deaa(1,ie) + dedxie
-         deaa(2,ie) = deaa(2,ie) + dedyie
-         deaa(3,ie) = deaa(3,ie) + dedzie
+         de(1,ia) = de(1,ia) + dedxia
+         de(2,ia) = de(2,ia) + dedyia
+         de(3,ia) = de(3,ia) + dedzia
+         de(1,ib) = de(1,ib) + dedxib
+         de(2,ib) = de(2,ib) + dedyib
+         de(3,ib) = de(3,ib) + dedzib
+         de(1,ic) = de(1,ic) + dedxic
+         de(2,ic) = de(2,ic) + dedyic
+         de(3,ic) = de(3,ic) + dedzic
+         de(1,id) = de(1,id) + dedxid
+         de(2,id) = de(2,id) + dedyid
+         de(3,id) = de(3,id) + dedzid
+         de(1,ie) = de(1,ie) + dedxie
+         de(2,ie) = de(2,ie) + dedyie
+         de(3,ie) = de(3,ie) + dedzie
       end if
       return
       end

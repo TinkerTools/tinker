@@ -705,7 +705,6 @@ c
       subroutine torque3 (i,trq1,trq2,frcx,frcy,frcz,demi,depi)
       use sizes
       use atoms
-      use deriv
       use mpole
       implicit none
       integer i,j

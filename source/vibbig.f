@@ -61,7 +61,8 @@ c
       integer, allocatable :: iblk(:)
       real*8 fmax,funit
       real*8 wtol,factor
-      real*8 size,space,sum
+      real*8 size,sizmax
+      real*8 space,sum
       real*8 dfreq,rnorm,rcomp
       real*8 ratio,shift
       real*8 uku_min,uku_max
@@ -107,8 +108,8 @@ c
       maxhess = nvar * (nvar-1) / 2
       maxiter = 100000
       wtol = 0.00001d0
+      sizmax = 500.0d0
       header = .true.
-      restart = .true.
 c
 c     search the keywords for normal mode parameters
 c
@@ -168,7 +169,6 @@ c
       funit = factor * efreq * emass
       ifactor = int(factor)
       irange = (nvar-np+1) * max((1-ifactor)/2,0)
-      nconv = nlock
       npair = 2 * nroot
       nbasis = 3 * nroot
 c
@@ -191,6 +191,7 @@ c
       call version (datafile,'old')
       inquire (file=datafile,exist=exist)
       if (exist) then
+         restart = .true.
          open (unit=ivb2,file=datafile,status='old',form='unformatted')
       else
          restart = .false.
@@ -253,7 +254,7 @@ c
    70 continue
       nblk = max(3,nblk)
       size = dble(n) / dble(nblk)
-      size = min(size,dble(maxvib)/3.0d0)
+      size = min(size,sizmax)
       do i = 1, nblk
          iblk(i) = nint(dble(i)*size)
       end do
@@ -293,28 +294,21 @@ c
       do i = 1, nblk
          k = k + 9*iblk(i)**2
       end do
-      if (k .lt. maxhess) then
-         write (iout,110)  k
-  110    format (/,' Storage for Preconditioning Array :',5x,i12)
-      else
-         write (iout,120)
-  120    format (/,' VIBBIG  --  Preconditioning Too Large;',
-     &              ' Increase MAXHESS')
-         call fatal
-      end if
+      write (iout,110)  k
+  110 format (/,' Storage for Preconditioning Array :',5x,i12)
 c
 c     determine number of prior modes available at restart
 c
       nlock = 0
       do while (.true.)
-         read (ivb1,err=130,end=130)  (p(k),k=1,nvar)
+         read (ivb1,err=120,end=120)  (p(k),k=1,nvar)
          nlock = nlock + 1
       end do
-  130 continue
+  120 continue
       rewind (unit=ivb1)
       if (nlock .ne. 0) then
-         write (iout,140)  nlock
-  140    format (/,' Prior Normal Modes Available at Restart :',i11)
+         write (iout,130)  nlock
+  130    format (/,' Prior Normal Modes Available at Restart :',i11)
       end if
       nconv = nlock
 c
@@ -370,7 +364,7 @@ c
             end do
             freqold(i) = sign(1.0d0,h(i,i)) * sqrt(abs(h(i,i)))
          end do
-         goto 150
+         goto 140
       end if
 c
 c     if not restarting, generate initial guess eigenvectors
@@ -599,7 +593,7 @@ c
 c
 c     residue of new solution (if restarting, begin here)
 c
-  150 continue
+  140 continue
       do i = 1, nroot
          freq(i) = funit * sign(1.0d0,h(i,i)) * sqrt(abs(h(i,i)))
          freq(i+nroot) = funit * sign(1.0d0,h(i+nroot,i+nroot))
@@ -656,7 +650,7 @@ c
 c     beginning of iterations
 c
       iconv = 0
-  160 continue
+  150 continue
       done = .false.
       iter = iter + 1
 c
@@ -687,13 +681,13 @@ c
       if (iconv.eq.0 .and. nconv.gt.0) then
          sum = sqrt(1.0d0-c(1,1)**2)
          if (sum .gt. 0.9d0) then
-            write (iout,170)  nconv-nlock
-  170       format (/,' Number of Converged Normal Modes :',6x,i12)
-            write (iout,180)
-  180       format (/,' VIBBIG  --  Loss of Root Identity; Please',
+            write (iout,160)  nconv-nlock
+  160       format (/,' Number of Converged Normal Modes :',6x,i12)
+            write (iout,170)
+  170       format (/,' VIBBIG  --  Loss of Root Identity; Please',
      &                 ' Try to Restart')
             close (unit=ivb2,status='delete')
-            goto 280
+            goto 270
          end if
       end if
 c
@@ -706,11 +700,11 @@ c
 c     check if first few have converged
 c
       iconv = 0
-  190 continue
+  180 continue
       dfreq = freqold(iconv+1) - freq(iconv+1)
       if (dfreq*factor.gt.0.0d0 .and. dfreq*factor.lt.wtol) then
          iconv = iconv + 1
-         goto 190
+         goto 180
       end if
 c
 c     shift levels of preconditioner matrix; since the Hessian
@@ -774,20 +768,20 @@ c
             ivib = irange + ifactor*(nconv+j)
             if ((header.or.verbose) .and. j.eq.1) then
                header = .false.
-               write (iout,200)
-  200          format (/,' Converged Normal Modes from Iterative',
+               write (iout,190)
+  190          format (/,' Converged Normal Modes from Iterative',
      &                    ' Vibrational Analysis :')
-               write (iout,210)
-  210          format (/,4x,'Mode',7x,'Frequency',8x,'Delta',10x,
+               write (iout,200)
+  200          format (/,4x,'Mode',7x,'Frequency',8x,'Delta',10x,
      &                    'R Norm',10x,'Orthog')
                if (.not. verbose) then
-                  write (iout,220)
-  220             format ()
+                  write (iout,210)
+  210             format ()
                end if
             end if
             dfreq = freqold(j) - freq(j)
-            write (iout,230)  ivib,freq(j),dfreq,rnorm,rcomp
-  230       format (i8,f15.3,3d16.4)
+            write (iout,220)  ivib,freq(j),dfreq,rnorm,rcomp
+  220       format (i8,f15.3,3d16.4)
             call prtvib (ivib,p)
             write (ivb1)  (p(k),k=1,nvar)
          end do
@@ -899,11 +893,11 @@ c
 c     print a header for the current iteration
 c
       if (verbose) then
-         write (iout,240)  iter,iconv,nconv
-  240    format (/,' Iteration',i7,11x,'New Modes',i6,10x,
+         write (iout,230)  iter,iconv,nconv
+  230    format (/,' Iteration',i7,11x,'New Modes',i6,10x,
      &              ' Total Modes',i6,/)
-         write (iout,250)
-  250    format (4x,'Mode',7x,'Frequency',8x,'Delta',10x,
+         write (iout,240)
+  240    format (4x,'Mode',7x,'Frequency',8x,'Delta',10x,
      &              'R Norm',10x,'Orthog')
       end if
 c
@@ -935,9 +929,9 @@ c
          rcomp = sqrt(rcomp)
          dfreq = freqold(i) - freq(i)
          if (verbose) then
-            write (iout,260)  irange+ifactor*(i+nconv),
+            write (iout,250)  irange+ifactor*(i+nconv),
      &                        freq(i),dfreq,rnorm,rcomp
-  260       format (i8,f15.3,3d16.4)
+  250       format (i8,f15.3,3d16.4)
          end if
       end do
 c
@@ -954,15 +948,15 @@ c
 c     prepare restart if finished or iterations exhausted
 c
       if (done .or. iter.eq.maxiter) then
-         write (iout,270)  nconv-nlock
-  270    format (/,' Number of Converged Normal Modes :',6x,i12)
+         write (iout,260)  nconv-nlock
+  260    format (/,' Number of Converged Normal Modes :',6x,i12)
          rewind (ivb2)
          do i = 1, npair
             write (ivb2)  (phi(k,i),k=1,nvar)
             write (ivb2)  (phik(k,i),k=1,nvar)
          end do
          close (unit=ivb2)
-         goto 280
+         goto 270
       end if
 c
 c     as above, make sure no prior roots are mixed in the basis
@@ -1043,8 +1037,8 @@ c
 c     project out locked roots from components of phik
 c
       call projectk (nvar,nconv,ivb1,nroot,npair)
-      goto 160
-  280 continue
+      goto 150
+  270 continue
 c
 c     perform deallocation of some local arrays
 c

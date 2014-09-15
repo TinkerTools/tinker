@@ -28,7 +28,6 @@ c     maxvlst         neighbors in van der Waals pair list
 c     maxelst         neighbors in electrostatics pair list
 c     maxulst         neighbors in dipole preconditioner list
 c     maxfix          geometric constraints and restraints
-c     maxvib          vibrational frequencies
 c     maxres          residues in the macromolecule
 c
 c
@@ -39,7 +38,7 @@ c
       integer maxtyp,maxclass
       integer maxvlst,maxelst
       integer maxulst,maxfix
-      integer maxvib,maxres
+      integer maxres
       parameter (maxatm=1000000)
       parameter (maxval=8)
       parameter (maxgrp=1000)
@@ -50,7 +49,6 @@ c
       parameter (maxelst=1200)
       parameter (maxulst=100)
       parameter (maxfix=maxatm)
-      parameter (maxvib=1000)
       parameter (maxres=10000)
       save
       end
