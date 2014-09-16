@@ -35,7 +35,7 @@ c
       integer maxfft
       parameter (maxpower=54)
       parameter (maxfft=576)
-      integer i,k,next
+      integer i,k,next,minfft
       integer ifft1,ifft2,ifft3
       integer multi(maxpower)
       real*8 delta,rmax,dens
@@ -129,6 +129,10 @@ c
             if (k .ge. ifft3)  nfft3 = k
          end if
       end do
+      minfft = 16
+      if (nfft1 .lt. minfft)  nfft1 = minfft
+      if (nfft2 .lt. minfft)  nfft2 = minfft
+      if (nfft3 .lt. minfft)  nfft3 = minfft
 c
 c     set the number of chunks and grid points per chunk
 c

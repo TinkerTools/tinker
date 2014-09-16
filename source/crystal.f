@@ -56,7 +56,7 @@ c
      &              'P4(-)m2   ', 'R3(-)     ', 'R3c       ',
      &              'P63/m     ', 'P6(3)/mmc ', 'Pa3(-)    ',
      &              'P43m      ', 'I4(-)3m   ', 'P4(-)3n   ',
-     &              'Pm3m      ', 'Fm3(-)m   ', 'Im3(-)m   '/
+     &              'Pm3(-)m   ', 'Fm3(-)m   ', 'Im3(-)m   '/
 c
 c
 c     get and read the Cartesian coordinates file
@@ -2749,9 +2749,9 @@ c
       else if (spacegrp .eq. 'P4(-)3n   ') then
          nsym = 1
 c
-c     Pm3m space group  (Intl. Tables 221)
+c     Pm3(-)m space group  (Intl. Tables 221)
 c
-      else if (spacegrp .eq. 'Pm3m      ') then
+      else if (spacegrp .eq. 'Pm3(-)m   ') then
          nsym = 1
 c
 c     Fm3(-)m space group  (Intl. Tables 225, Face Centered Cubic)

@@ -19,36 +19,36 @@ c
 c     parameter:      maximum allowed number of:
 c
 c     maxatm          atoms in the molecular system
-c     maxval          atoms directly bonded to an atom
-c     maxgrp          user-defined groups of atoms
-c     maxref          stored reference molecular systems
 c     maxtyp          force field atom type definitions
 c     maxclass        force field atom class definitions
 c     maxvlst         neighbors in van der Waals pair list
 c     maxelst         neighbors in electrostatics pair list
 c     maxulst         neighbors in dipole preconditioner list
-c     maxfix          geometric constraints and restraints
+c     maxval          atoms directly bonded to an atom
+c     maxref          stored reference molecular systems
+c     maxgrp          user-defined groups of atoms
 c     maxres          residues in the macromolecule
+c     maxfix          geometric constraints and restraints
 c
 c
       module sizes
       implicit none
-      integer maxatm,maxval
-      integer maxgrp,maxref
-      integer maxtyp,maxclass
-      integer maxvlst,maxelst
-      integer maxulst,maxfix
-      integer maxres
+      integer maxatm,maxtyp
+      integer maxclass,maxvlst
+      integer maxelst,maxulst
+      integer maxval,maxref
+      integer maxgrp,maxres
+      integer maxfix
       parameter (maxatm=1000000)
-      parameter (maxval=8)
-      parameter (maxgrp=1000)
-      parameter (maxref=10)
       parameter (maxtyp=5000)
       parameter (maxclass=1000)
       parameter (maxvlst=1800)
       parameter (maxelst=1200)
       parameter (maxulst=100)
-      parameter (maxfix=maxatm)
+      parameter (maxval=8)
+      parameter (maxref=10)
+      parameter (maxgrp=1000)
       parameter (maxres=10000)
+      parameter (maxfix=maxatm)
       save
       end
