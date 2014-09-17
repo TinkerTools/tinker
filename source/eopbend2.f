@@ -82,7 +82,7 @@ c
             old = x(i)
             if (twosided) then
                x(i) = x(i) - 0.5d0*eps
-               call eopbend2a (iopbend)
+               call eopbend2a (iopbend,de)
                do j = 1, 3
                   d0(j,ia) = de(j,ia)
                   d0(j,ib) = de(j,ib)
@@ -105,7 +105,7 @@ c
             old = y(i)
             if (twosided) then
                y(i) = y(i) - 0.5d0*eps
-               call eopbend2a (iopbend)
+               call eopbend2a (iopbend,de)
                do j = 1, 3
                   d0(j,ia) = de(j,ia)
                   d0(j,ib) = de(j,ib)
@@ -128,7 +128,7 @@ c
             old = z(i)
             if (twosided) then
                z(i) = z(i) - 0.5d0*eps
-               call eopbend2a (iopbend)
+               call eopbend2a (iopbend,de)
                do j = 1, 3
                   d0(j,ia) = de(j,ia)
                   d0(j,ib) = de(j,ib)

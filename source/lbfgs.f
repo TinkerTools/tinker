@@ -178,8 +178,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (rho(msav))
-      allocate (alpha(msav))
       allocate (x_old(nvar))
       allocate (g(nvar))
       allocate (g_old(nvar))
@@ -187,8 +185,12 @@ c
       allocate (q(nvar))
       allocate (r(nvar))
       allocate (h0(nvar))
-      allocate (s(nvar,msav))
-      allocate (y(nvar,msav))
+      if (msav .ne. 0) then
+         allocate (rho(msav))
+         allocate (alpha(msav))
+         allocate (s(nvar,msav))
+         allocate (y(nvar,msav))
+      end if
 c
 c     evaluate the function and get the initial gradient
 c
@@ -298,16 +300,18 @@ c
 c
 c     update variables based on results of this iteration
 c
-         ys = 0.0d0
-         yy = 0.0d0
-         do i = 1, nvar
-            s(i,m) = x0(i) - x_old(i)
-            y(i,m) = g(i) - g_old(i)
-            ys = ys + y(i,m)*s(i,m)
-            yy = yy + y(i,m)*y(i,m)
-         end do
-         gamma = abs(ys/yy)
-         rho(m) = 1.0d0 / ys
+         if (msav .ne. 0) then
+            ys = 0.0d0
+            yy = 0.0d0
+            do i = 1, nvar
+               s(i,m) = x0(i) - x_old(i)
+               y(i,m) = g(i) - g_old(i)
+               ys = ys + y(i,m)*s(i,m)
+               yy = yy + y(i,m)*y(i,m)
+            end do
+            gamma = abs(ys/yy)
+            rho(m) = 1.0d0 / ys
+         end if
 c
 c     get the sizes of the moves made during this iteration
 c
@@ -385,8 +389,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (rho)
-      deallocate (alpha)
       deallocate (x_old)
       deallocate (g)
       deallocate (g_old)
@@ -394,8 +396,12 @@ c
       deallocate (q)
       deallocate (r)
       deallocate (h0)
-      deallocate (s)
-      deallocate (y)
+      if (msav .ne. 0) then
+         deallocate (rho)
+         deallocate (alpha)
+         deallocate (s)
+         deallocate (y)
+      end if
 c
 c     set final value of the objective function
 c

@@ -86,7 +86,7 @@ c
             old = x(i)
             if (twosided) then
                x(i) = x(i) - 0.5d0*eps
-               call eangle2b (k)
+               call eangle2b (k,de)
                do j = 1, 3
                   d0(j,ia) = de(j,ia)
                   d0(j,ib) = de(j,ib)
@@ -625,7 +625,6 @@ c
       use angpot
       use atoms
       use bound
-      use deriv
       use math
       implicit none
       integer i,ia,ib,ic,id

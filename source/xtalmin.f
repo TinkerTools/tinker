@@ -202,31 +202,83 @@ c
 c
 c     write out the final energy and coordinate gradients
 c
-      if (grms.gt.1.0d-4 .and. glrms.gt.1.0d-4) then
-         write (iout,60)  minimum,grms,gnorm,glrms,glnorm
-   60    format (/,' Final Potential Function Value :',f16.4,
-     &           /,' Final RMS Coordinate Gradient : ',f16.4,
-     &           /,' Final Coordinate Gradient Norm :',f16.4,
-     &           /,' Final RMS Lattice Gradient :    ',f16.4,
-     &           /,' Final Lattice Gradient Norm :   ',f16.4)
+      if (digits .ge. 8) then
+         if (grms.gt.1.0d-8 .and. glrms.gt.1.0d-8) then
+            write (iout,60)  minimum,grms,gnorm,glrms,glnorm
+   60       format (/,' Final Potential Function Value :',f20.8,
+     &              /,' Final RMS Coordinate Gradient : ',f20.8,
+     &              /,' Final Coordinate Gradient Norm :',f20.8,
+     &              /,' Final RMS Lattice Gradient :    ',f20.8,
+     &              /,' Final Lattice Gradient Norm :   ',f20.8)
+         else
+            write (iout,70)  minimum,grms,gnorm,glrms,glnorm
+   70       format (/,' Final Potential Function Value :',f20.8,
+     &              /,' Final RMS Coordinate Gradient : ',d20.8,
+     &              /,' Final Coordinate Gradient Norm :',d20.8,
+     &              /,' Final RMS Lattice Gradient :    ',d20.8,
+     &              /,' Final Lattice Gradient Norm :   ',d20.8)
+         end if
+      else if (digits .ge. 6) then
+         if (grms.gt.1.0d-6 .and. glrms.gt.1.0d-6) then
+            write (iout,80)  minimum,grms,gnorm,glrms,glnorm
+   80       format (/,' Final Potential Function Value :',f18.6,
+     &              /,' Final RMS Coordinate Gradient : ',f18.6,
+     &              /,' Final Coordinate Gradient Norm :',f18.6,
+     &              /,' Final RMS Lattice Gradient :    ',f18.6,
+     &              /,' Final Lattice Gradient Norm :   ',f18.6)
+         else
+            write (iout,90)  minimum,grms,gnorm,glrms,glnorm
+   90       format (/,' Final Potential Function Value :',f18.6,
+     &              /,' Final RMS Coordinate Gradient : ',d18.6,
+     &              /,' Final Coordinate Gradient Norm :',d18.6,
+     &              /,' Final RMS Lattice Gradient :    ',d18.6,
+     &              /,' Final Lattice Gradient Norm :   ',d18.6)
+         end if
       else
-         write (iout,70)  minimum,grms,gnorm,glrms,glnorm
-   70    format (/,' Final Potential Function Value :',f16.4,
-     &           /,' Final RMS Coordinate Gradient : ',d16.4,
-     &           /,' Final Coordinate Gradient Norm :',d16.4,
-     &           /,' Final RMS Lattice Gradient :    ',d16.4,
-     &           /,' Final Lattice Gradient Norm :   ',d16.4)
+         if (grms.gt.1.0d-4 .and. glrms.gt.1.0d-4) then
+            write (iout,100)  minimum,grms,gnorm,glrms,glnorm
+  100       format (/,' Final Potential Function Value :',f16.4,
+     &              /,' Final RMS Coordinate Gradient : ',f16.4,
+     &              /,' Final Coordinate Gradient Norm :',f16.4,
+     &              /,' Final RMS Lattice Gradient :    ',f16.4,
+     &              /,' Final Lattice Gradient Norm :   ',f16.4)
+         else
+            write (iout,110)  minimum,grms,gnorm,glrms,glnorm
+  110       format (/,' Final Potential Function Value :',f16.4,
+     &              /,' Final RMS Coordinate Gradient : ',d16.4,
+     &              /,' Final Coordinate Gradient Norm :',d16.4,
+     &              /,' Final RMS Lattice Gradient :    ',d16.4,
+     &              /,' Final Lattice Gradient Norm :   ',d16.4)
+         end if
       end if
 c
 c     write out the final values of the lattice parameters
 c
-      write (iout,80)  xbox,ybox,zbox,alpha,beta,gamma
-   80 format (/,' Final Lattice Dimensions :      a   ',f12.4,
-     &        /,'                                 b   ',f12.4,
-     &        /,'                                 c   ',f12.4,
-     &        /,'                                Alpha',f12.4,
-     &        /,'                                Beta ',f12.4,
-     &        /,'                                Gamma',f12.4)
+      if (digits .ge. 8) then
+         write (iout,120)  xbox,ybox,zbox,alpha,beta,gamma
+  120    format (/,' Final Lattice Dimensions :      a   ',f16.8,
+     &           /,'                                 b   ',f16.8,
+     &           /,'                                 c   ',f16.8,
+     &           /,'                                Alpha',f16.8,
+     &           /,'                                Beta ',f16.8,
+     &           /,'                                Gamma',f16.8)
+      else if (digits .ge. 6) then
+         write (iout,130)  xbox,ybox,zbox,alpha,beta,gamma
+  130    format (/,' Final Lattice Dimensions :      a   ',f14.6,
+     &           /,'                                 b   ',f14.6,
+     &           /,'                                 c   ',f14.6,
+     &           /,'                                Alpha',f14.6,
+     &           /,'                                Beta ',f14.6,
+     &           /,'                                Gamma',f14.6)
+      else
+         write (iout,140)  xbox,ybox,zbox,alpha,beta,gamma
+  140    format (/,' Final Lattice Dimensions :      a   ',f12.4,
+     &           /,'                                 b   ',f12.4,
+     &           /,'                                 c   ',f12.4,
+     &           /,'                                Alpha',f12.4,
+     &           /,'                                Beta ',f12.4,
+     &           /,'                                Gamma',f12.4)
+      end if
 c
 c     write the final coordinates into a file
 c
