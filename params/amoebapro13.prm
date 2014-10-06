@@ -302,7 +302,7 @@ atom        162    9    H     "Glutamic Acid HG"             1     1.008    1
 atom        163   32    C     "Glutamic Acid CD"             6    12.011    3
 atom        164   33    O     "Glutamic Acid OE1"            8    15.999    1
 atom        165   34    O     "Glutamic Acid OE2"            8    15.999    2
-atom        166   35    H     "Glutamic Acid HE2"            8    15.999    1
+atom        166   35    H     "Glutamic Acid HE2"            8     1.008    1
 atom        167    8    C     "Glutamine CB"                 6    12.011    4
 atom        168    9    H     "Glutamine HB"                 1     1.008    1
 atom        169    8    C     "Glutamine CG"                 6    12.011    4

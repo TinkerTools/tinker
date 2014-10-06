@@ -829,10 +829,15 @@ c
    50 format (/,' Residual Error Function Values at Iteration',
      &           i4,' :',/)
       do i = 1, nresid
-         write (iout,60)  i,rsdtyp(i),iresid(i),f(i)
-   60    format (3x,'(',i2,')',2x,a16,4x,2x,'Crystal',i4,4x,f12.4)
+         if (i .lt. 100) then
+            write (iout,60)  i,rsdtyp(i),iresid(i),f(i)
+   60       format (3x,'(',i2,')',2x,a16,4x,2x,'Crystal',i4,4x,f12.4)
+         else
+            write (iout,70)  i,rsdtyp(i),iresid(i),f(i)
+   70       format (2x,'(',i3,')',2x,a16,4x,2x,'Crystal',i4,4x,f12.4)
+         end if
       end do
-      write (iout,70)
-   70 format ()
+      write (iout,80)
+   80 format ()
       return
       end

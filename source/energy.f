@@ -130,7 +130,8 @@ c
 c
 c     check for an illegal value for the total energy
 c
-      if (isnan(esum)) then
+c     if (isnan(esum)) then
+      if (esum .ne. esum) then
          write (iout,10)
    10    format (/,' ENERGY  --  Illegal Value for the Total',
      &              ' Potential Energy')

@@ -1619,7 +1619,7 @@ c
       reff4 = reff3 * reff
       reff5 = reff4 * reff
 c
-c     compute solvent excluded volume for needed for small solutes
+c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
          call volume (evol,rcav,exclude)
@@ -1724,7 +1724,8 @@ c
       use vdw
       implicit none
       integer i,k
-      real*8 edisp,e,idisp
+      real*8 edisp,edispo
+      real*8 e,idisp
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
@@ -1738,6 +1739,7 @@ c
       real*8 uik,uik2,uik3,uik4
       real*8 uik5,uik10,uik11,uik12
       real*8 aedisp(*)
+      real*8, allocatable :: aedispo(:)
 c
 c
 c     zero out the WCA dispersion energy and partitioning
@@ -1754,6 +1756,24 @@ c
       do i = 1, n
          rdisp(i) = rad(class(i)) + offset
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aedispo(n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      edispo = edisp
+      do i = 1, n
+         aedispo(i) = aedisp(i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(n,class,eps,
+!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& shared(edispo,aedispo)
+!$OMP DO reduction(+:edispo,aedispo) schedule(guided)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
@@ -1872,8 +1892,20 @@ c
 c     increment the overall dispersion energy component
 c
          e = cdisp(i) - slevy*awater*sum
-         aedisp(i) = e
-         edisp = edisp + e
+         aedispo(i) = e
+         edispo = edispo + e
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      edisp = edispo
+      do i = 1, n
+         aedisp(i) = aedispo(i)
       end do
 c
 c     print the total dispersion energy and energy for each atom
@@ -1919,7 +1951,8 @@ c
       implicit none
       integer i,j,k
       real*8 edisp,e
-      real*8 t,tinit,offset
+      real*8 t,tinit
+      real*8 delta,offset
       real*8 ratio,rinit
       real*8 rmult,rswitch
       real*8 rmax,shell
@@ -1972,10 +2005,11 @@ c
 c
 c     set parameters for atomic radii and probe radii
 c
-      offset = 0.55d0
+      delta = 0.55d0
+      offset = 0.27d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + 0.27d0
-         roff(i) = rdisp(i) + offset
+         rdisp(i) = rad(class(i)) + offset
+         roff(i) = rdisp(i) + delta
       end do
 c
 c     print header for output of the detailed energy components
@@ -2092,22 +2126,22 @@ c
 c
 c     reset the radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i) + offset
+         roff(i) = rdisp(i) + delta
          do j = 1, n12(i)
             k = i12(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
          do j = 1, n13(i)
             k = i13(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
          do j = 1, n14(i)
             k = i14(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
          do j = 1, n15(i)
             k = i15(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
       end do
 c

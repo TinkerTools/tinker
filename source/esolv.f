@@ -1420,7 +1420,7 @@ c
       reff4 = reff3 * reff
       reff5 = reff4 * reff
 c
-c     compute solvent excluded volume for needed for small solutes
+c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
          call volume (evol,rcav,exclude)
@@ -1507,7 +1507,8 @@ c
       use vdw
       implicit none
       integer i,k
-      real*8 edisp,e,idisp
+      real*8 edisp,edispo
+      real*8 e,idisp
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
@@ -1533,6 +1534,17 @@ c
       do i = 1, n
          rdisp(i) = rad(class(i)) + offset
       end do
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      edispo = edisp
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(n,class,eps,
+!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& shared(edispo)
+!$OMP DO reduction(+:edispo) schedule(guided)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
@@ -1653,6 +1665,15 @@ c
          e = cdisp(i) - slevy*awater*sum
          edisp = edisp + e
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      edisp = edispo
       return
       end
 c
@@ -1681,7 +1702,8 @@ c
       implicit none
       integer i,j,k
       real*8 edisp,e
-      real*8 t,tinit,offset
+      real*8 t,tinit
+      real*8 delta,offset
       real*8 ratio,rinit
       real*8 rmult,rswitch
       real*8 rmax,shell
@@ -1730,10 +1752,11 @@ c
 c
 c     set parameters for atomic radii and probe radii
 c
-      offset = 0.55d0
+      delta = 0.55d0
+      offset = 0.27d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + 0.27d0
-         roff(i) = rdisp(i) + offset
+         rdisp(i) = rad(class(i)) + offset
+         roff(i) = rdisp(i) + delta
       end do
 c
 c     compute the dispersion energy for each atom in the system
@@ -1834,22 +1857,22 @@ c
 c
 c     reset the radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i) + offset
+         roff(i) = rdisp(i) + delta
          do j = 1, n12(i)
             k = i12(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
          do j = 1, n13(i)
             k = i13(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
          do j = 1, n14(i)
             k = i14(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
          do j = 1, n15(i)
             k = i15(j,i)
-            roff(k) = rdisp(k) + offset
+            roff(k) = rdisp(k) + delta
          end do
       end do
 c

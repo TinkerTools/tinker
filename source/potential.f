@@ -658,10 +658,11 @@ c
       use atoms
       use katoms
       use potfit
+      use ptable
       implicit none
       integer i,j,k
       integer ipot,iconf
-      integer npoint,anum
+      integer npoint,atn
       real*8 xi,yi,zi
       real*8 big,small
       real*8 r2,dist
@@ -692,28 +693,12 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (rad(n))
 c
-c     set base atomic radii from traditional Bondi values
+c     set base atomic radii from consensus vdw values
 c
       do i = 1, n
-         rad(i) = 1.70d0
-         anum = atmnum(type(i))
-         if (anum .eq. 0)  rad(i) = 0.00d0
-         if (anum .eq. 1)  rad(i) = 1.20d0
-         if (anum .eq. 2)  rad(i) = 1.40d0
-         if (anum .eq. 6)  rad(i) = 1.70d0
-         if (anum .eq. 7)  rad(i) = 1.55d0
-         if (anum .eq. 8)  rad(i) = 1.52d0
-         if (anum .eq. 9)  rad(i) = 1.47d0
-         if (anum .eq. 10)  rad(i) = 1.54d0
-         if (anum .eq. 14)  rad(i) = 2.10d0
-         if (anum .eq. 15)  rad(i) = 1.80d0
-         if (anum .eq. 16)  rad(i) = 1.80d0
-         if (anum .eq. 17)  rad(i) = 1.75d0
-         if (anum .eq. 18)  rad(i) = 1.88d0
-         if (anum .eq. 35)  rad(i) = 1.85d0
-         if (anum .eq. 36)  rad(i) = 2.02d0
-         if (anum .eq. 53)  rad(i) = 1.98d0
-         if (anum .eq. 54)  rad(i) = 2.16d0
+         atn = atmnum(type(i))
+         rad(i) = vdwrad(atn)
+         if (rad(i) .eq. 0.0d0)  rad(i) = 1.7d0
       end do
 c
 c     assign each grid point to atom on molecular surface
@@ -765,7 +750,7 @@ c     ##############################################################
 c
 c
 c     "potgrid" generates electrostatic potential grid points in
-c     radially distributed shells outside the molecular surface
+c     radially distributed shells based on the molecular surface
 c
 c
       subroutine potgrid (iconf)
@@ -776,13 +761,15 @@ c
       use keys
       use math
       use potfit
+      use ptable
       implicit none
       integer i,j,k,m
       integer iconf,next
       integer npoint,nshell
       integer maxdot
-      integer ndot,anum
-      real*8 r2,roffset
+      integer ndot,atn
+      real*8 r2,rfactor
+      real*8 roffset
       real*8 spacing
       real*8 density
       real*8 round
@@ -804,6 +791,7 @@ c
       maxdot = 50000
       spacing = 0.35d0
       density = 4.0d0 * pi / spacing**2
+      rfactor = 1.0d0
       roffset = 1.0d0
       round = 0.000001d0
 c
@@ -820,6 +808,8 @@ c
          else if (keyword(1:18) .eq. 'POTENTIAL-SPACING ') then
             read (string,*,err=10,end=10)  spacing
             density = 4.0d0 * pi / spacing**2
+         else if (keyword(1:17) .eq. 'POTENTIAL-FACTOR ') then
+            read (string,*,err=10,end=10)  rfactor
          else if (keyword(1:17) .eq. 'POTENTIAL-OFFSET ') then
             read (string,*,err=10,end=10)  roffset
          end if
@@ -831,30 +821,14 @@ c
       allocate (rad(n))
       allocate (rad2(n))
 c
-c     set base atomic radii from traditional Bondi values
+c     get modified atomic radii from consensus vdw values
 c
       do i = 1, n
-         rad(i) = 1.70d0
-         anum = atmnum(type(i))
-         if (anum .eq. 0)  rad(i) = 0.00d0
-         if (anum .eq. 1)  rad(i) = 1.20d0
-         if (anum .eq. 2)  rad(i) = 1.40d0
-         if (anum .eq. 6)  rad(i) = 1.70d0
-         if (anum .eq. 7)  rad(i) = 1.55d0
-         if (anum .eq. 8)  rad(i) = 1.52d0
-         if (anum .eq. 9)  rad(i) = 1.47d0
-         if (anum .eq. 10)  rad(i) = 1.54d0
-         if (anum .eq. 14)  rad(i) = 2.10d0
-         if (anum .eq. 15)  rad(i) = 1.80d0
-         if (anum .eq. 16)  rad(i) = 1.80d0
-         if (anum .eq. 17)  rad(i) = 1.75d0
-         if (anum .eq. 18)  rad(i) = 1.88d0
-         if (anum .eq. 35)  rad(i) = 1.85d0
-         if (anum .eq. 36)  rad(i) = 2.02d0
-         if (anum .eq. 53)  rad(i) = 1.98d0
-         if (anum .eq. 54)  rad(i) = 2.16d0
-         rad(i) = rad(i) + roffset
-         rad2(i) = rad(i)**2
+         atn = atmnum(type(i))
+         rad(i) = vdwrad(atn)
+         if (rad(i) .eq. 0.0d0)  rad(i) = 1.7d0
+         rad(i) = rfactor*rad(i) + roffset
+         rad2(i) = rad(i) * rad(i)
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -867,7 +841,7 @@ c
          if (m .ne. 1) then
             do i = 1, n
                rad(i) = rad(i) + spacing
-               rad2(i) = rad(i)**2
+               rad2(i) = rad(i) * rad(i)
             end do
          end if
          do i = 1, n
@@ -1385,6 +1359,9 @@ c
       use mpole
       use polar
       use units
+ccccccccccccccccccccccccccccccccccccccccccccccccc
+      use atomid
+ccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
       integer k,kk,k1,k2
       real*8 e,ei,pot
@@ -1402,6 +1379,9 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qkx,qky,qkz
       real*8 scd,scq,scu
+ccccccccccccccccccccccccccccccccccccccccccccccccc
+      real*8 alphak,nuck
+ccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 c
 c     zero out charge, dipole and multipole potential terms
@@ -1482,13 +1462,36 @@ c     calculate scalar products for permanent and induced
 c
          scd = dkx*xr + dky*yr + dkz*zr
          scq = qkx*xr + qky*yr + qkz*zr
-         scu = ukx*xr + uky*yr + ukz*zr
+         scu = ukx*xr + uky*yr + ukz*zr                  
 c
 c     compute the potential contributions for this interaction
 c
          rr1 = 1.0d0 / r
          rr3 = rr1 / r2
          rr5 = 3.0d0 * rr3 / r2
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     apply Piquemal-1 penetration damping factor
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+         if (atomic(kk) .eq. 1)  alphak = 3.50d0    ! Pengyu
+         if (atomic(kk) .eq. 6)  alphak = 3.30d0    ! Pengyu
+         if (atomic(kk) .eq. 7)  alphak = 3.00d0    ! Pengyu
+         if (atomic(kk) .eq. 8)  alphak = 3.50d0    ! Pengyu
+         if (atomic(kk) .eq. 1)  alphak = 4.10d0    ! "best" fit ??
+         if (atomic(kk) .eq. 6)  alphak = 2.90d0    ! "best" fit ??
+         if (atomic(kk) .eq. 1)  alphak = 3.565d0   ! Piquemal '03
+         if (atomic(kk) .eq. 6)  alphak = 3.157d0   ! Piquemal '03
+         nuck = dble(atomic(kk))
+         if (atomic(kk) .gt. 2)  nuck = nuck - 2.0d0
+         if (atomic(kk) .gt. 10)  nuck = nuck - 8.0d0
+         ck = ck + nuck - (nuck-ck)*(1.0d0-exp(-alphak*r))
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     apply Gordon penetration damping factor
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c        if (atomic(kk) .eq. 1)  alphak = 1.65d0
+c        if (atomic(kk) .eq. 6)  alphak = 2.50d0
+c        nuck = dble(atomic(kk))
+c        ck = ck*(1.0d0-exp(-alphak*r)) - nuck + nuck
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          e = ck*rr1 - scd*rr3 + scq*rr5
          ei = -scu * rr3
 c

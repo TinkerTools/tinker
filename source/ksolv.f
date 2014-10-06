@@ -992,7 +992,7 @@ c
             end if
          end do
 c
-c     assign base atomic radii as traditional Bondi values
+c     assign base atomic radii as consensus Bondi values
 c
       else
          do i = 1, n
@@ -1442,7 +1442,7 @@ c
          end if
       end do
 c
-c     assign base atomic radii from the van der Waals values
+c     assign base atomic radii from consensus vdw values
 c
       if (radtyp .eq. 'VDW') then
          do i = 1, n
@@ -1514,7 +1514,7 @@ c
             end if
          end do
 c
-c     assign base atomic radii from traditional Bondi values
+c     assign base atomic radii from consensus vdw values
 c
       else
          do i = 1, n
@@ -1798,9 +1798,10 @@ c
       use atoms
       use couple
       use hpmf
+      use ptable
       implicit none
       integer i,j,k
-      integer nh,atmnum
+      integer nh,atn
       logical keep
 c
 c
@@ -1840,31 +1841,19 @@ c
          end if
       end do
 c
-c     assign HPMF atomic radii from traditional Bondi values
+c     assign HPMF atomic radii from consensus vdw values
 c
       do i = 1, n
-         rpmf(i) = 2.0d0
-         atmnum = atomic(i)
-         if (atmnum .eq. 0)  rpmf(i) = 0.00d0
-         if (atmnum .eq. 1)  rpmf(i) = 1.20d0
-         if (atmnum .eq. 2)  rpmf(i) = 1.40d0
-         if (atmnum .eq. 5)  rpmf(i) = 1.80d0
-         if (atmnum .eq. 6)  rpmf(i) = 1.70d0
-         if (atmnum .eq. 7)  rpmf(i) = 1.55d0
-c        if (atmnum .eq. 8)  rpmf(i) = 1.52d0
-         if (atmnum .eq. 8)  rpmf(i) = 1.50d0
-         if (atmnum .eq. 9)  rpmf(i) = 1.47d0
-         if (atmnum .eq. 10)  rpmf(i) = 1.54d0
-         if (atmnum .eq. 14)  rpmf(i) = 2.10d0
-         if (atmnum .eq. 15)  rpmf(i) = 1.80d0
-         if (atmnum .eq. 16)  rpmf(i) = 1.80d0
-         if (atmnum .eq. 17)  rpmf(i) = 1.75d0
-         if (atmnum .eq. 18)  rpmf(i) = 1.88d0
-         if (atmnum .eq. 34)  rpmf(i) = 1.90d0
-         if (atmnum .eq. 35)  rpmf(i) = 1.85d0
-         if (atmnum .eq. 36)  rpmf(i) = 2.02d0
-         if (atmnum .eq. 53)  rpmf(i) = 1.98d0
-         if (atmnum .eq. 54)  rpmf(i) = 2.16d0
+         rpmf(i) = 1.0d0
+         atn = atomic(i)
+         if (atn .eq. 0) then 
+            rpmf(i) = 0.00d0
+         else
+            rpmf(i) = vdwrad(atn)
+         end if
+         if (atn .eq. 5)  rpmf(i) = 1.80d0
+         if (atn .eq. 8)  rpmf(i) = 1.50d0
+         if (atn .eq. 35)  rpmf(i) = 1.85d0
       end do
       return
       end

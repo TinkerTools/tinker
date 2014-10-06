@@ -63,8 +63,8 @@ c
       use minima
       implicit none
       integer maxlsq,maxrsd
-      parameter (maxlsq=50)
-      parameter (maxrsd=100)
+      parameter (maxlsq=100)
+      parameter (maxrsd=200)
       integer i,j,k
       integer icode,next
       integer niter,ncalls

@@ -12,21 +12,25 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "virial2" computes the second virial coefficient; use trajectory
-c     frame as the first input file, and dimer structure as the second
-c     input file; current version is specific for water
+c     "virial2" computes the classical second virial coefficient with
+c     quantum corrections; provide an MD trajectory frame as the first
+c     input file, and any dimer structure as the second input file
+c
+c     note this version is specific for water, but caould be easily
+c     generalized to other molecules
 c
 c
       program virial2
+      use sizes
+      use atomid
+      use atoms
+      use boxes
+      use inter
+      use iounit
+      use math
+      use molcul
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'inter.i'
-      include 'iounit.i'
-      include 'math.i'
-      include 'molcul.i'
-      include 'units.i'
       integer maxbin
       parameter (maxbin=1000)
       integer i,j,k,m,ii
@@ -42,9 +46,8 @@ c
       real*8 xjcm,yjcm,zjcm
       real*8 rdist,rmax,rbin
       real*8 xdiff,ydiff,zdiff
-      real*8 energy,hbar,bolt
-      real*8 bterm,eterm1
-      real*8 fterm1,tterm1
+      real*8 e,hbar,bolt,bterm
+      real*8 etot,ftot,ttot
       real*8 trqx,trqy,trqz
       real*8 xx,xy,xz,yy,yz,zz
       real*8 xterm,yterm,zterm
@@ -53,7 +56,7 @@ c
       real*8 fcmi(3),fcmj(3)
       real*8 rcmx(3),rcmy(3),rcmz(3)
       real*8 vec(3,3),tensor(3,3)
-      real*8 a(3,3),fatm(3,6)
+      real*8 a(3,3),g(3,6)
       real*8 eterm(maxbin)
       real*8 fterm(maxbin)
       real*8 tterm(maxbin)
@@ -93,6 +96,18 @@ c
    60    continue
       end do
 c
+c     set needed constants and unit comversion factors
+c
+      nummol = nmol
+      molatm = n / nmol
+      molmas = molmass(1)
+      rmax = 20.0d0
+      kt = gasconst * temp
+      hbar = planck / (2.0d0*pi)
+      conver = avogadro * 1.0d-24
+      factor = hbar**2 * avogadro**2 * 1.0d23
+     &            / (24.0d0*(kt)**3) / 4182.0d0
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (xatm(n))
@@ -102,39 +117,19 @@ c
 c
 c     initialize quantities needed for the calculation
 c
-      rmax = 20.0d0
-      kt = gasconst * temp
-      hbar = planck / (2.0d0*pi)
-      conver = avogadro * 1.0d-27
-      do j = 1, 3
-         do i = 1, 6
-            fatm(j,i) = 0.0d0
-         end do
-         fcmi(j) = 0.0d0
-         fcmj(j) = 0.0d0
-      end do
-      do i = 1, maxbin
-         hist(i) = 0
-         eterm(i) = 0.0d0
-         fterm(i) = 0.0d0
-         tterm(i) = 0.0d0
-      end do
-      do i = 1, n
-         do j = 1, 3
-            pmi(j,i) = 0.0d0
-         end do
-      end do
       do i = 1, n
          xatm(i) = x(i)
          yatm(i) = y(i)
          zatm(i) = z(i)
       end do
-c
-c     initialize quantities needed for the calculation
-c
+      do i = 1, n
+         do j = 1, 3
+            pmi(j,i) = 0.0d0
+         end do
+      end do
       do j = 1, 3
          do i = 1, 6
-            fatm(j,i) = 0.0d0
+            g(j,i) = 0.0d0
          end do
          fcmi(j) = 0.0d0
          fcmj(j) = 0.0d0
@@ -145,36 +140,23 @@ c
          fterm(i) = 0.0d0
          tterm(i) = 0.0d0
       end do
-      do i = 1, nmol
-         do j = 1, 3
-            pmi(j,i) = 0.0d0
-         end do
-      end do
-      molatm = n / nmol
-      molmas = 0.0d0
-      do i = 1, molatm
-         molmas = molmas + mass(i)
-      end do
-      factor = hbar**2 * avogadro**2 * 1.0d23
-     &             / (24.0d0*(kt)**3*molmas) / 4182.0d0
 c
 c     compute and then diagonalize the inertial tensor
 c
-      do j = 1, nmol
+      do i = 1, nmol
          xcm = 0.0d0
          ycm = 0.0d0
          zcm = 0.0d0
-         ii = 1
-         do i = 3*j-2, j*3
-            weigh = mass(ii)
-            xcm = xcm + xatm(i)*weigh
-            ycm = ycm + yatm(i)*weigh
-            zcm = zcm + zatm(i)*weigh
-            ii = ii + 1
+         do j = imol(1,i), imol(2,i)
+            k = kmol(j)
+            weigh = mass(k)
+            xcm = xcm + xatm(k)*weigh
+            ycm = ycm + yatm(k)*weigh
+            zcm = zcm + zatm(k)*weigh
          end do
-         xcm = xcm / molmas
-         ycm = ycm / molmas
-         zcm = zcm / molmas
+         xcm = xcm / molmass(i)
+         ycm = ycm / molmass(i)
+         zcm = zcm / molmass(i)
          xx = 0.0d0
          xy = 0.0d0
          xz = 0.0d0
@@ -182,18 +164,18 @@ c
          yz = 0.0d0
          zz = 0.0d0
          ii = 1
-         do i = 3*j-2, 3*j
-            weigh = mass(ii)
-            xterm = xatm(i) - xcm
-            yterm = yatm(i) - ycm
-            zterm = zatm(i) - zcm
+         do j = imol(1,i), imol(2,i)
+            k = kmol(j)
+            weigh = mass(k)
+            xterm = xatm(k) - xcm
+            yterm = yatm(k) - ycm
+            zterm = zatm(k) - zcm
             xx = xx + xterm*xterm*weigh
             xy = xy + xterm*yterm*weigh
             xz = xz + xterm*zterm*weigh
             yy = yy + yterm*yterm*weigh
             yz = yz + yterm*zterm*weigh
             zz = zz + zterm*zterm*weigh
-            ii = ii + 1
          end do
          tensor(1,1) = yy + zz
          tensor(2,1) = -xy
@@ -205,26 +187,39 @@ c
          tensor(2,3) = -yz
          tensor(3,3) = xx + yy
          call jacobi (3,tensor,moment,vec)
-         do i = 1, 3
-            pmi(i,j) = moment(i)
+         do j = 1, 3
+            pmi(j,i) = moment(j)
          end do
       end do
 c
-c     read a dimer structure to setup the BT(2) calculation
+c     reset box size to disable periodic boundary conditions
 c
-      nummol = nmol
+      xbox = 0.0d0
+      ybox = 0.0d0
+      zbox = 0.0d0
+c
+c     read any dimer structure to reset mechanics calculation
+c
       call getxyz
       call mechanic
 c
-c     compute the BT(2) integrand over distance-based bins
+c     print initial information prior to numerical integration
 c
       write (iout,70)  nummol
-   70 format (/,5x,'Number of Molecules :  ',i8)
-      write (iout,80)  temp
-   80 format (5x,'Temperature (K) :  ',f12.2)
-      write (iout,90)
-   90 format (/,7x,'R',6x,'Eterm',6x,'Fterm',6x,'Tterm',
-     &          6x,'BT(2)',7x,'BTCf',7x,'BTCt')
+   70 format (/,' Number of Molecules :  ',i12)
+      write (iout,80)  nummol*(nummol-1)/2
+   80 format (' Dimer Orientations :  ',i13)
+      write (iout,90)  temp
+   90 format (' Temperature (K) :  ',f16.2)
+      write (iout,100)
+  100 format (/,' Cummulative Classical and Quantum Corrected',
+     &           ' B(T) Values :')
+      write (iout,110)
+  110 format (/,7x,'R',5x,'Bterm',5x,'Fterm',5x,'Tterm',4x,
+     &           'Bcl(T)',6x,'dBtr',5x,'dBrot',6x,'B(T)',/)
+c
+c     compute the B(T) integrands over distance-based bins
+c
       bt2 = 0.0d0
       btcf = 0.0d0
       btct = 0.0d0
@@ -257,13 +252,10 @@ c
                   yjcm = yjcm + y(m)*mass(m)/molmas
                   zjcm = zjcm + z(m)*mass(m)/molmas
                end do
-               xdiff = rdist + xicm - xjcm
-               ydiff = yicm - yjcm
-               zdiff = zicm - zjcm
-c              call ranvec (rvec)
-c              xdiff = rdist*rvec(1) + xicm - xjcm
-c              ydiff = rdist*rvec(2) + yicm - yjcm
-c              zdiff = rdist*rvec(3) + zicm - zjcm
+               call ranvec (rvec)
+               xdiff = rdist*rvec(1) + xicm - xjcm
+               ydiff = rdist*rvec(2) + yicm - yjcm
+               zdiff = rdist*rvec(3) + zicm - zjcm
                do m = 4, 6
                   x(m) = x(m) + xdiff
                   y(m) = y(m) + ydiff
@@ -274,11 +266,11 @@ c              zdiff = rdist*rvec(3) + zicm - zjcm
                   do m = 4, 6
                      dist2 = (x(k)-x(m))**2 + (y(k)-y(m))**2
      &                          + (z(k)-z(m))**2
-                     if (dist2 .lt. 0.25d0)  include = .false.
+                     if (dist2 .lt. 1.0d0)  include = .false.
                   end do
                end do
                if (include) then
-                  call gradient (energy,fatm)
+                  call gradient (e,g)
                   hist(rint) = hist(rint) + 1
                   bolt = exp(-einter/kt)
                   eterm(rint) = eterm(rint) + bolt
@@ -286,43 +278,45 @@ c              zdiff = rdist*rvec(3) + zicm - zjcm
                   trqy = 0.0d0
                   trqz = 0.0d0
                   do ii = 1, 3
-                     fcmi(ii) = fatm(ii,1) + fatm(ii,2) + fatm(ii,3)
-c                    fcmj(ii) = fatm(ii,4) + fatm(ii,5) + fatm(ii,6)
+                     fcmi(ii) = -g(ii,1) - g(ii,2) - g(ii,3)
+                     fcmj(ii) = -g(ii,4) - g(ii,5) - g(ii,6)
                      rcmx(ii) = x(ii) - xicm
                      rcmy(ii) = y(ii) - yicm
                      rcmz(ii) = z(ii) - zicm
-                     trqx = trqx+rcmy(ii)*fatm(3,ii)-rcmz(ii)*fatm(2,ii)
-                     trqy = trqy+rcmz(ii)*fatm(1,ii)-rcmx(ii)*fatm(3,ii)
-                     trqz = trqz+rcmx(ii)*fatm(2,ii)-rcmy(ii)*fatm(1,ii)
+                     trqx = trqx - rcmy(ii)*g(3,ii) + rcmz(ii)*g(2,ii)
+                     trqy = trqy - rcmz(ii)*g(1,ii) + rcmx(ii)*g(3,ii)
+                     trqz = trqz - rcmx(ii)*g(2,ii) + rcmy(ii)*g(1,ii)
                   end do
                   fsum = bolt * (fcmi(1)**2+fcmi(2)**2+fcmi(3)**2)
                   tsum = bolt * (trqx**2/pmi(1,i)+trqy**2/pmi(2,i)
-     &                                  +trqz**2/pmi(3,i))
+     &                                   +trqz**2/pmi(3,i))
                   fterm(rint) = fterm(rint) + fsum
                   tterm(rint) = tterm(rint) + tsum
                end if
             end do
          end do
          if (hist(rint) .gt. 0) then
-            eterm1 = eterm(rint)/dble(hist(rint)) - 1.0d0
-            fterm1 = fterm(rint)/dble(hist(rint)) * factor
-            tterm1 = tterm(rint)/dble(hist(rint)) * factor * molmas
+            etot = eterm(rint)/dble(hist(rint)) - 1.0d0
+            ftot = fterm(rint)/dble(hist(rint)) * factor / molmas
+            ttot = tterm(rint)/dble(hist(rint)) * factor
          else
-            eterm(i) = 0.0d0
+            etot = -1.0d0
+            ftot = 0.0d0
+            ttot = 0.0d0
          end if
-         bterm = 2.0d0 * pi * conver * rbin * rdist * rdist
-         bt2 = bt2 - bterm*eterm1
-         btcf = btcf + 2.0d0*bterm*fterm1
-         btct = btct + 2.0d0*bterm*tterm1
-         write (iout,100)  rdist,eterm1,fterm1,tterm1,
-     &                     bt2+btcf+btct,btcf,btct
-  100    format (f8.3,6f11.5)
+         bterm = 4.0d0 * pi * conver * rbin * rdist**2
+         bt2 = bt2 - 0.5d0*bterm*etot
+         btcf = btcf + bterm*ftot
+         btct = btct + bterm*ttot
+         write (iout,120)  rdist,etot,ftot,ttot,
+     &                     bt2,btcf,btct,bt2+btcf+btct
+  120    format (f8.3,3f10.4,4f10.1)
          rbin = width / (((rdist-2.8d0)**3+10.0d0)
      &                    * exp(-0.15d0*(rdist-2.8d0)**2)+3.0d0)
          rdist = rdist + rbin
-         if (rdist .ge. rmax)  goto 110
+         if (rdist .ge. rmax)  goto 130
       end do
-  110 continue
+  130 continue
 c
 c     perform deallocation of some local arrays
 c

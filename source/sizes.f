@@ -46,7 +46,7 @@ c
       parameter (maxelst=1200)
       parameter (maxulst=100)
       parameter (maxval=8)
-      parameter (maxref=10)
+      parameter (maxref=20)
       parameter (maxgrp=1000)
       parameter (maxres=10000)
       parameter (maxfix=maxatm)
