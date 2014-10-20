@@ -466,6 +466,7 @@ gfortran -c -g -Warray-bounds -Wmaybe-uninitialized prtxyz.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized pss.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized pssrigid.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized pssrot.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized qrfact.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized quatfit.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized radial.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized random.f

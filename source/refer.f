@@ -18,6 +18,12 @@ c     refleng     length in characters of each reference filename
 c     reftyp      atom types of the atoms in each reference system
 c     n12ref      number of atoms bonded to each reference atom
 c     i12ref      atom numbers of atoms 1-2 connected to each atom
+c     xboxref     reference a-axis length of periodic box
+c     yboxref     reference b-axis length of periodic box
+c     zboxref     reference c-axis length of periodic box
+c     alpharef    reference angle between b- and c-axes of box
+c     betaref     reference angle between a- and c-axes of box
+c     gammaref    reference angle between a- and b-axes of box
 c     xref        reference x-coordinates for atoms in each system
 c     yref        reference y-coordinates for atoms in each system
 c     zref        reference z-coordinates for atoms in each system
@@ -35,6 +41,12 @@ c
       integer, allocatable :: reftyp(:,:)
       integer, allocatable :: n12ref(:,:)
       integer, allocatable :: i12ref(:,:,:)
+      real*8 xboxref(maxref)
+      real*8 yboxref(maxref)
+      real*8 zboxref(maxref)
+      real*8 alpharef(maxref)
+      real*8 betaref(maxref)
+      real*8 gammaref(maxref)
       real*8, allocatable :: xref(:,:)
       real*8, allocatable :: yref(:,:)
       real*8, allocatable :: zref(:,:)

@@ -466,6 +466,7 @@ pathf90 -c -O -msse3 -openmp prtxyz.f
 pathf90 -c -O -msse3 -openmp pss.f
 pathf90 -c -O -msse3 -openmp pssrigid.f
 pathf90 -c -O -msse3 -openmp pssrot.f
+pathf90 -c -O -msse3 -openmp qrfact.f
 pathf90 -c -O -msse3 -openmp quatfit.f
 pathf90 -c -O -msse3 -openmp radial.f
 pathf90 -c -O -msse3 -openmp random.f

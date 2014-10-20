@@ -466,6 +466,7 @@ gfortran -c -O3 -ffast-math -fopenmp prtxyz.f
 gfortran -c -O3 -ffast-math -fopenmp pss.f
 gfortran -c -O3 -ffast-math -fopenmp pssrigid.f
 gfortran -c -O3 -ffast-math -fopenmp pssrot.f
+gfortran -c -O3 -ffast-math -fopenmp qrfact.f
 gfortran -c -O3 -ffast-math -fopenmp quatfit.f
 gfortran -c -O3 -ffast-math -fopenmp radial.f
 gfortran -c -O3 -ffast-math -fopenmp random.f

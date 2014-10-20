@@ -467,6 +467,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace prtxyz.f
 LF95 -c -o1 -tpp -nstchk -ntrace pss.f
 LF95 -c -o1 -tpp -nstchk -ntrace pssrigid.f
 LF95 -c -o1 -tpp -nstchk -ntrace pssrot.f
+LF95 -c -o1 -tpp -nstchk -ntrace qrfact.f
 LF95 -c -o1 -tpp -nstchk -ntrace quatfit.f
 LF95 -c -o1 -tpp -nstchk -ntrace radial.f
 LF95 -c -o1 -tpp -nstchk -ntrace random.f

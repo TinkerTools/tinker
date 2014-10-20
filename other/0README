@@ -1,0 +1,11 @@
+
+                     --------------------------------------
+                     OTHER Directory for the TINKER Package
+                     --------------------------------------
+
+       This directory contains extra, alternative and rarely used source
+       code for use with the TINKER package. Some of the code must be
+       converted from Fortran common blocks to modules before compiling
+       with the current TINKER. Other routines need partial rewriting to
+       use current data structures.
+

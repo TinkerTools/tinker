@@ -123,6 +123,7 @@ ifort -c -g -warn all -check all potfit.f
 ifort -c -g -warn all -check all precis.f
 ifort -c -g -warn all -check all ptable.f
 ifort -c -g -warn all -check all qmstuf.f
+ifort -c -g -warn all -check all qrfact.f
 ifort -c -g -warn all -check all refer.f
 ifort -c -g -warn all -check all resdue.f
 ifort -c -g -warn all -check all restrn.f

@@ -37,14 +37,15 @@ c
       integer freeunit,trimtext
       integer rint,nummol,molatm
       integer hist(maxbin)
-      real*8 width,weigh
+      real*8 kelvin,kt
+      real*8 weigh,molmas
       real*8 conver,factor
-      real*8 temp,kt,molmas
       real*8 bt2,btcf,btct
       real*8 xcm,ycm,zcm
       real*8 xicm,yicm,zicm
       real*8 xjcm,yjcm,zjcm
-      real*8 rdist,rmax,rbin
+      real*8 rdist,rbin
+      real*8 rinit,rmax
       real*8 xdiff,ydiff,zdiff
       real*8 e,hbar,bolt,bterm
       real*8 etot,ftot,ttot
@@ -73,36 +74,27 @@ c
       call getxyz
       call mechanic
 c
-c     get the temperature value and width of the first bin
+c     get temperature value to be used for the second virial
 c
-      temp = -1.0d0
-      do while (temp .lt. 0.0d0)
+      kelvin = -1.0d0
+      do while (kelvin .lt. 0.0d0)
          write (iout,10)
    10    format (/,' Enter the Desired Temperature in Degrees',
      &              ' K [298] :  ',$)
-         read (input,20,err=30)  temp
+         read (input,20,err=30)  kelvin
    20    format (f20.0)
-         if (temp .le. 0.0d0)  temp = 298.0d0
+         if (kelvin .le. 0.0d0)  kelvin = 298.0d0
    30    continue
       end do
-      width = -1.0d0
-      do while (width .lt. 0.0d0)
-         write (iout,40)
-   40    format (/,' Enter the Initial Distance Bin Width in Ang',
-     &              ' [1.0] :  ',$)
-         read (input,50,err=60)  width
-   50    format (f20.0)
-         if (width .le. 0.0d0)  width = 1.0d0
-   60    continue
-      end do
 c
-c     set needed constants and unit comversion factors
+c     set needed constants and unit conversion factors
 c
       nummol = nmol
       molatm = n / nmol
       molmas = molmass(1)
+      rinit = 1.0d0
       rmax = 20.0d0
-      kt = gasconst * temp
+      kt = gasconst * kelvin
       hbar = planck / (2.0d0*pi)
       conver = avogadro * 1.0d-24
       factor = hbar**2 * avogadro**2 * 1.0d23
@@ -205,17 +197,17 @@ c
 c
 c     print initial information prior to numerical integration
 c
-      write (iout,70)  nummol
-   70 format (/,' Number of Molecules :  ',i12)
-      write (iout,80)  nummol*(nummol-1)/2
-   80 format (' Dimer Orientations :  ',i13)
-      write (iout,90)  temp
-   90 format (' Temperature (K) :  ',f16.2)
-      write (iout,100)
-  100 format (/,' Cummulative Classical and Quantum Corrected',
+      write (iout,40)  nummol
+   40 format (/,' Number of Molecules :  ',i12)
+      write (iout,50)  nummol*(nummol-1)/2
+   50 format (' Dimer Orientations :  ',i13)
+      write (iout,60)  kelvin
+   60 format (' Temperature (K) :  ',f16.2)
+      write (iout,70)
+   70 format (/,' Cummulative Classical and Quantum Corrected',
      &           ' B(T) Values :')
-      write (iout,110)
-  110 format (/,7x,'R',5x,'Bterm',5x,'Fterm',5x,'Tterm',4x,
+      write (iout,80)
+   80 format (/,7x,'R',5x,'Bterm',5x,'Fterm',5x,'Tterm',4x,
      &           'Bcl(T)',6x,'dBtr',5x,'dBrot',6x,'B(T)',/)
 c
 c     compute the B(T) integrands over distance-based bins
@@ -223,8 +215,8 @@ c
       bt2 = 0.0d0
       btcf = 0.0d0
       btct = 0.0d0
-      rdist = width
-      rbin = width
+      rdist = rinit
+      rbin = rinit
       do rint = 1, maxbin
          do i = 1, nummol-1
             do j = i+1, nummol
@@ -308,15 +300,15 @@ c
          bt2 = bt2 - 0.5d0*bterm*etot
          btcf = btcf + bterm*ftot
          btct = btct + bterm*ttot
-         write (iout,120)  rdist,etot,ftot,ttot,
+         write (iout,90)  rdist,etot,ftot,ttot,
      &                     bt2,btcf,btct,bt2+btcf+btct
-  120    format (f8.3,3f10.4,4f10.1)
-         rbin = width / (((rdist-2.8d0)**3+10.0d0)
+   90    format (f8.3,3f10.4,4f10.1)
+         rbin = rinit / (((rdist-2.8d0)**3+10.0d0)
      &                    * exp(-0.15d0*(rdist-2.8d0)**2)+3.0d0)
          rdist = rdist + rbin
-         if (rdist .ge. rmax)  goto 130
+         if (rdist .ge. rmax)  goto 100
       end do
-  130 continue
+  100 continue
 c
 c     perform deallocation of some local arrays
 c

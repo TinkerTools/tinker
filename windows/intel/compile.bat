@@ -467,6 +467,7 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp prtxyz.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp pss.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp pssrigid.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp pssrot.f
+ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp qrfact.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp quatfit.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp radial.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp random.f

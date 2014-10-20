@@ -1359,9 +1359,6 @@ c
       use mpole
       use polar
       use units
-ccccccccccccccccccccccccccccccccccccccccccccccccc
-      use atomid
-ccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit none
       integer k,kk,k1,k2
       real*8 e,ei,pot
@@ -1379,9 +1376,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccc
       real*8 qkyy,qkyz,qkzz
       real*8 qkx,qky,qkz
       real*8 scd,scq,scu
-ccccccccccccccccccccccccccccccccccccccccccccccccc
-      real*8 alphak,nuck
-ccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 c
 c     zero out charge, dipole and multipole potential terms
@@ -1469,29 +1463,6 @@ c
          rr1 = 1.0d0 / r
          rr3 = rr1 / r2
          rr5 = 3.0d0 * rr3 / r2
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     apply Piquemal-1 penetration damping factor
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         if (atomic(kk) .eq. 1)  alphak = 3.50d0    ! Pengyu
-         if (atomic(kk) .eq. 6)  alphak = 3.30d0    ! Pengyu
-         if (atomic(kk) .eq. 7)  alphak = 3.00d0    ! Pengyu
-         if (atomic(kk) .eq. 8)  alphak = 3.50d0    ! Pengyu
-         if (atomic(kk) .eq. 1)  alphak = 4.10d0    ! "best" fit ??
-         if (atomic(kk) .eq. 6)  alphak = 2.90d0    ! "best" fit ??
-         if (atomic(kk) .eq. 1)  alphak = 3.565d0   ! Piquemal '03
-         if (atomic(kk) .eq. 6)  alphak = 3.157d0   ! Piquemal '03
-         nuck = dble(atomic(kk))
-         if (atomic(kk) .gt. 2)  nuck = nuck - 2.0d0
-         if (atomic(kk) .gt. 10)  nuck = nuck - 8.0d0
-         ck = ck + nuck - (nuck-ck)*(1.0d0-exp(-alphak*r))
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     apply Gordon penetration damping factor
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c        if (atomic(kk) .eq. 1)  alphak = 1.65d0
-c        if (atomic(kk) .eq. 6)  alphak = 2.50d0
-c        nuck = dble(atomic(kk))
-c        ck = ck*(1.0d0-exp(-alphak*r)) - nuck + nuck
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          e = ck*rr1 - scd*rr3 + scq*rr5
          ei = -scu * rr3
 c

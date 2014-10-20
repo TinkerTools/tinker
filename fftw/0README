@@ -1,7 +1,7 @@
 
-                 --------------------------------------------
-                 FFTW -- Fast, Parallel FFT for OpenMP TINKER
-                 --------------------------------------------
+                     -------------------------------------
+                     FFTW Directory for the TINKER Package
+                     -------------------------------------
 
       This directory contains FFTW-3.3.3 which is the preferred FFT
       method for use with the OpenMP version of TINKER. The FFTPACK

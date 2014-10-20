@@ -51,7 +51,24 @@ c
       implicit none
 !$    integer omp_get_num_procs
       real*8 precise
+      logical first
+      save first
+      data first  / .true. /
 c
+c
+c     default unit numbers for input and output
+c
+      input = 5
+      iout = 6
+c
+c     display program banner and copyright notice
+c
+      if (first)  call promo
+c
+c     command line arguments to the program
+c
+      if (first)  call command
+      if (first)  first = .false.
 c
 c     cores, thread count and options for OpenMP
 c
@@ -66,19 +83,6 @@ c     Intel compiler extensions to OpenMP standard
 c
 !$    call kmp_set_stacksize_s (2**28)
 !$    call kmp_set_blocktime (0)
-c
-c     default unit numbers for input and output
-c
-      input = 5
-      iout = 6
-c
-c     display program banner and copyright notice
-c
-      call promo
-c
-c     command line arguments to the program
-c
-      call command
 c
 c     values of machine precision constants
 c

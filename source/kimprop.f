@@ -114,9 +114,9 @@ c
       if (allocated(iiprop))  deallocate (iiprop)
       if (allocated(kprop))  deallocate (kprop)
       if (allocated(vprop))  deallocate (vprop)
-      allocate (iiprop(4,ntors))
-      allocate (kprop(ntors))
-      allocate (vprop(ntors))
+      allocate (iiprop(4,6*n))
+      allocate (kprop(6*n))
+      allocate (vprop(6*n))
 c
 c     assign improper dihedral parameters for each improper angle;
 c     multiple symmetrical parameters are given partial weights

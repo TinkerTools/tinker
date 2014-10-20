@@ -124,10 +124,10 @@ c
       if (allocated(itors1))  deallocate (itors1)
       if (allocated(itors2))  deallocate (itors2)
       if (allocated(itors3))  deallocate (itors3)
-      allocate (iitors(4,ntors))
-      allocate (itors1(4,ntors))
-      allocate (itors2(4,ntors))
-      allocate (itors3(4,ntors))
+      allocate (iitors(4,6*n))
+      allocate (itors1(4,6*n))
+      allocate (itors2(4,6*n))
+      allocate (itors3(4,6*n))
 c
 c     assign improper torsional parameters for each improper torsion;
 c     multiple symmetrical parameters are given partial weights

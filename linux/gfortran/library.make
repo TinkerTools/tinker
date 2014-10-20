@@ -384,6 +384,7 @@ prtseq.o \
 prtxyz.o \
 ptable.o \
 qmstuf.o \
+qrfact.o \
 quatfit.o \
 random.o \
 rattle.o \

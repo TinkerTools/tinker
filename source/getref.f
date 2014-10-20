@@ -20,6 +20,7 @@ c
       use sizes
       use atomid
       use atoms
+      use boxes
       use couple
       use files
       use refer
@@ -49,5 +50,14 @@ c
             i12(j,i) = i12ref(j,i,iref)
          end do
       end do
+c
+c     retrieve any unitcell parameters defining a periodic box
+c
+      xbox = xboxref(iref)
+      ybox = yboxref(iref)
+      zbox = zboxref(iref)
+      alpha = alpharef(iref)
+      beta = betaref(iref)
+      gamma = gammaref(iref)
       return
       end

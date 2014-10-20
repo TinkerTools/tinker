@@ -374,6 +374,7 @@ tinker
 +prtxyz.obj &
 +ptable.obj &
 +qmstuf.obj &
++qrfact.obj &
 +quatfit.obj &
 +random.obj &
 +rattle.obj &

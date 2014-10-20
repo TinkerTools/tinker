@@ -20,6 +20,7 @@ c
       use sizes
       use atomid
       use atoms
+      use boxes
       use couple
       use files
       use refer
@@ -66,5 +67,14 @@ c
             i12ref(j,i,iref) = i12(j,i)
          end do
       end do
+c
+c     copy any unitcell parameters from the coordinates file
+c
+      xboxref(iref) = xbox
+      yboxref(iref) = ybox
+      zboxref(iref) = zbox
+      alpharef(iref) = alpha
+      betaref(iref) = beta
+      gammaref(iref) = gamma
       return
       end

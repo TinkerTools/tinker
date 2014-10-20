@@ -92,7 +92,6 @@ c
                if (resname.eq.'HOH' .or. resname.eq.'NA ' .or.
      &             resname.eq.'K  ' .or. resname.eq.'MG ' .or.
      &             resname.eq.'CA ' .or. resname.eq.'CL ') then
-                  biopoly = .true.
                   pdbtyp(i) = 'HETATM'
                end if
             end if

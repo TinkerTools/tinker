@@ -466,6 +466,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pss.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrigid.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrot.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qrfact.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp quatfit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp radial.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp random.f
