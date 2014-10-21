@@ -19,19 +19,19 @@ c     be specified for the variables to be refined
 c
 c     arguments and variables :
 c
-c     n         number of variables to optimize
+c     n         number of least squares variables
 c     m         number of residual functions
 c     xlo       vector with the lower bounds for the variables
 c     xhi       vector with the upper bounds for the variables
 c     xscale    vector with the diagonal scaling matrix for variables
 c     xc        vector with variable values at the approximate solution
 c     fc        vector with the residuals at the approximate solution
-c     fp        vector containing the updated residual
+c     fp        vector containing the updated residuals
 c     xp        vector containing the updated point
 c     sc        vector containing the last step taken
 c     gc        vector with gradient estimate at approximate solution
 c     fjac      matrix with estimate of Jacobian at approximate solution
-c     iactive   vector indicating if variable moved to upper/lower bound
+c     iactive   vector showing if variable is at upper or lower bound
 c     ipvt      vector with permutation matrix used in QR factorization
 c                 of the Jacobian at the approximate solution
 c     stpmax    scalar containing maximum allowed step size
@@ -43,24 +43,21 @@ c     rsdvalue   subroutine to evaluate residual function values
 c     lsqwrite   subroutine to write out info about current status
 c
 c
-      subroutine square (m,n,xlo,xhi,xc,fc,gc,fjac,grdmin,
-     &                         rsdvalue,lsqwrite)
+      subroutine square (n,m,xlo,xhi,xc,fc,gc,fjac,grdmin,
+     &                          rsdvalue,lsqwrite)
       use sizes
       use inform
       use iounit
       use keys
       use minima
       implicit none
-      integer maxlsq,maxrsd
-      parameter (maxlsq=100)
-      parameter (maxrsd=200)
       integer i,j,k,m,n
       integer icode,next
       integer niter,ncalls
       integer nactive
       integer nbigstp,ndigit
-      integer iactive(maxlsq)
-      integer ipvt(maxlsq)
+      integer, allocatable :: iactive(:)
+      integer, allocatable :: ipvt(:)
       real*8 amu,delta,epsfcn
       real*8 fcnorm,fpnorm
       real*8 gcnorm,ganorm
@@ -75,17 +72,17 @@ c
       real*8 xhi(*)
       real*8 fc(*)
       real*8 gc(*)
-      real*8 xp(maxlsq)
-      real*8 fp(maxrsd)
-      real*8 ga(maxlsq)
-      real*8 gs(maxlsq)
-      real*8 sc(maxlsq)
-      real*8 sa(maxlsq)
-      real*8 ftemp(maxrsd)
-      real*8 xscale(maxlsq)
-      real*8 xsa(maxlsq)
-      real*8 rdiag(maxlsq)
-      real*8 qtf(maxlsq)
+      real*8, allocatable :: xp(:)
+      real*8, allocatable :: ga(:)
+      real*8, allocatable :: gs(:)
+      real*8, allocatable :: sc(:)
+      real*8, allocatable :: sa(:)
+      real*8, allocatable :: xsa(:)
+      real*8, allocatable :: xscale(:)
+      real*8, allocatable :: rdiag(:)
+      real*8, allocatable :: fp(:)
+      real*8, allocatable :: ftemp(:)
+      real*8, allocatable :: qtf(:)
       real*8 fjac(m,*)
       logical done,first
       logical gauss,bigstp
@@ -97,20 +94,6 @@ c
       external lsqwrite
       external precise
 c
-c
-c     check for too many variables or residuals
-c
-      if (n .gt. maxlsq) then
-         write (iout,10)
-   10    format (/,' SQUARE  --  Too many Parameters,',
-     &              ' Increase the Value of MAXLSQ')
-         return
-      else if (m .gt. maxrsd) then
-         write (iout,20)
-   20    format (/,' SQUARE  --  Too many Residuals,',
-     &              ' Increase the Value of MAXRSD')
-         return
-      end if
 c
 c     initialize various counters and status code
 c
@@ -145,16 +128,32 @@ c
          call upcase (keyword)
          string = record(next:120)
          if (keyword(1:7) .eq. 'FCTMIN ') then
-            read (string,*,err=30,end=30)  fctmin
+            read (string,*,err=10,end=10)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then
-            read (string,*,err=30,end=30)  maxiter
+            read (string,*,err=10,end=10)  maxiter
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
-            read (string,*,err=30,end=30)  iprint
+            read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
-            read (string,*,err=30,end=30)  iwrite
+            read (string,*,err=10,end=10)  iwrite
          end if
-   30    continue
+   10    continue
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iactive(n))
+      allocate (ipvt(n))
+      allocate (xp(n))
+      allocate (ga(n))
+      allocate (gs(n))
+      allocate (sc(n))
+      allocate (sa(n))
+      allocate (xsa(n))
+      allocate (xscale(n))
+      allocate (rdiag(n))
+      allocate (fp(m))
+      allocate (ftemp(m))
+      allocate (qtf(m))
 c
 c     check feasibility of variables and use bounds if needed
 c
@@ -175,7 +174,7 @@ c
 c     evaluate the function at the initial point
 c
       ncalls = ncalls + 1
-      call rsdvalue (m,n,xc,fc)
+      call rsdvalue (n,m,xc,fc)
       fcnorm = 0.0d0
       do i = 1, m
          fcnorm = fcnorm + fc(i)**2
@@ -192,7 +191,7 @@ c
          xtemp = xc(j)
          xc(j) = xtemp + stepsz
          ncalls = ncalls + 1
-         call rsdvalue (m,n,xc,ftemp)
+         call rsdvalue (n,m,xc,ftemp)
          xc(j) = xtemp
          do i = 1, m
             fjac(i,j) = (ftemp(i)-fc(i)) / stepsz
@@ -231,29 +230,29 @@ c
             ganorm = ganorm + gs(j)**2
          end if
       end do
-      gcnorm = sqrt(gcnorm/n)
-      if (nactive .ne. 0)  ganorm = sqrt(ganorm/nactive)
+      gcnorm = sqrt(gcnorm/dble(n))
+      if (nactive .ne. 0)  ganorm = sqrt(ganorm/dble(nactive))
 c
 c     print out information about initial conditions
 c
       if (iprint .gt. 0) then
-         write (iout,40)
-   40    format (/,' Levenberg-Marquardt Nonlinear Least Squares :')
-         write (iout,50)
-   50    format (/,' LS Iter     F Value      Total G     Active G',
+         write (iout,20)
+   20    format (/,' Levenberg-Marquardt Nonlinear Least Squares :')
+         write (iout,30)
+   30    format (/,' LS Iter     F Value      Total G     Active G',
      &              '    N Active   F Calls',/)
          if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
-            write (iout,60)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   60       format (i6,f14.4,2f13.4,2i10)
+            write (iout,40)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
+   40       format (i6,f14.4,2f13.4,2i10)
          else
-            write (iout,70)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   70       format (i6,f14.4,2d13.4,2i10)
+            write (iout,50)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
+   50       format (i6,f14.4,2d13.4,2i10)
          end if
       end if
 c
 c     write out the parameters, derivatives and residuals
 c
-      if (iwrite .ne. 0)  call lsqwrite (niter,xc,gs,m,fc)
+      if (iwrite .ne. 0)  call lsqwrite (niter,m,xc,gs,fc)
 c
 c     check stopping criteria at the initial point; test the
 c     absolute function value and gradient norm for termination
@@ -263,7 +262,7 @@ c
 c
 c     start of the main body of least squares iteration
 c
-   80 continue
+   60 continue
       niter = niter + 1
 c
 c     repack the Jacobian to include only active variables
@@ -298,7 +297,7 @@ c
 c     compute the QR factorization of the Jacobian
 c
       pivot = .true.
-      call qrfact (m,nactive,fjac,pivot,ipvt,rdiag)
+      call qrfact (nactive,m,fjac,pivot,ipvt,rdiag)
 c
 c     compute the vector Q(transpose) * residuals
 c
@@ -324,8 +323,8 @@ c
       icode = 6
       first = .true.
       do while (icode .ge. 4)
-         call lmstep (nactive,ga,fjac,m,ipvt,xsa,qtf,stpmax,
-     &                     delta,amu,first,sa,gauss)
+         call lmstep (nactive,m,ga,fjac,ipvt,xsa,qtf,stpmax,
+     &                      delta,amu,first,sa,gauss)
 c
 c     unpack the step vector to include all variables
 c
@@ -341,9 +340,9 @@ c
 c
 c     check new point and update the trust region
 c
-         call trust (rsdvalue,m,n,xc,fcnorm,gc,fjac,ipvt,sc,sa,
-     &               xscale,gauss,stpmax,delta,icode,xp,fc,fp,fpnorm,
-     &               bigstp,ncalls,xlo,xhi,nactive,stpmin,rftol,faketol)
+         call trust (n,m,xc,fcnorm,gc,fjac,ipvt,sc,sa,xscale,gauss,
+     &               stpmax,delta,icode,xp,fc,fp,fpnorm,bigstp,ncalls,
+     &               xlo,xhi,nactive,stpmin,rftol,faketol,rsdvalue)
       end do
       if (icode .eq. 1)  done = .true.
 c
@@ -366,15 +365,15 @@ c
             if (abs(xc(j)-xlo(j)) .le. eps) then
                nactive = nactive - 1
                iactive(j) = -1
-c              goto 90
+c              goto 99
             else if (abs(xc(j)-xhi(j)) .le. eps) then
                nactive = nactive - 1
                iactive(j) = 1
-c              goto 90
+c              goto 99
             end if
          end if
       end do
-c  90 continue
+c  99 continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
@@ -385,7 +384,7 @@ c
          xtemp = xc(j)
          xc(j) = xtemp + stepsz
          ncalls = ncalls + 1
-         call rsdvalue (m,n,xc,ftemp)
+         call rsdvalue (n,m,xc,ftemp)
          xc(j) = xtemp
          do i = 1, m
             fjac(i,j) = (ftemp(i)-fc(i)) / stepsz
@@ -423,18 +422,18 @@ c
             ganorm = ganorm + gs(j)**2
          end if
       end do
-      gcnorm = sqrt(gcnorm/n)
-      if (nactive .ne. 0)  ganorm = sqrt(ganorm/nactive)
+      gcnorm = sqrt(gcnorm/dble(n))
+      if (nactive .ne. 0)  ganorm = sqrt(ganorm/dble(nactive))
 c
 c     print out information about current iteration
 c
       if (iprint.ne.0 .and. mod(niter,iprint).eq.0) then
          if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
-            write (iout,100)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-  100       format (i6,f14.4,2f13.4,2i10)
+            write (iout,70)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
+   70       format (i6,f14.4,2f13.4,2i10)
          else
-            write (iout,110)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-  110       format (i6,f14.4,2d13.4,2i10)
+            write (iout,80)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
+   80       format (i6,f14.4,2d13.4,2i10)
          end if
       end if
 c
@@ -462,37 +461,37 @@ c     if (done) then
                nactive = nactive + 1
                iactive(j) = 0
                done = .false.
-c              goto 120
+c              goto 99
             else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
                nactive = nactive + 1
                iactive(j) = 0
                done = .false.
-c              goto 120
+c              goto 99
             end if
          end do
-c 120    continue
+c  99    continue
       end if
 c     end if
 c
 c     if still done, then normal termination has been achieved
 c
       if (done) then
-         write (iout,130)
-  130    format (/,' SQUARE  --  Normal Termination of Least Squares')
+         write (iout,90)
+   90    format (/,' SQUARE  --  Normal Termination of Least Squares')
 c
 c     check the limit on the number of iterations
 c
       else if (niter .ge. maxiter) then
          done = .true.
-         write (iout,140)
-  140    format (/,' SQUARE  --  Maximum Number of Allowed Iterations')
+         write (iout,100)
+  100    format (/,' SQUARE  --  Maximum Number of Allowed Iterations')
 c
 c     check for termination due to relative function convergence
 c
       else if (icode .eq. 2) then
          done = .true.
-         write (iout,150)
-  150    format (/,' SQUARE  --  Relative Function Convergence',
+         write (iout,110)
+  110    format (/,' SQUARE  --  Relative Function Convergence',
      &           //,' Both the scaled actual and predicted',
      &              ' reductions in the function',
      &           /,' are less than or equal to the relative',
@@ -502,8 +501,8 @@ c     check for termination due to false convergence
 c
       else if (icode .eq. 3) then
          done = .true.
-         write (iout,160)
-  160    format (/,' SQUARE  --  Possible False Convergence',
+         write (iout,120)
+  120    format (/,' SQUARE  --  Possible False Convergence',
      &           //,' The iterates appear to be converging to',
      &              ' a noncritical point due',
      &           /,' to bad gradient information, discontinuous',
@@ -516,8 +515,8 @@ c
          nbigstp = nbigstp + 1
          if (nbigstp .eq. 5) then
             done = .true.
-            write (iout,170)
-  170       format (/,' SQUARE  --  Five Consecutive Maximum',
+            write (iout,130)
+  130       format (/,' SQUARE  --  Five Consecutive Maximum',
      &                 ' Length Steps',
      &              //,' Either the function is unbounded below,',
      &                 ' or has a finite',
@@ -534,12 +533,28 @@ c
 c     write out the parameters, derivatives and residuals
 c
       if (iwrite.ne.0 .and. mod(niter,iwrite).eq.0) then
-         if (.not. done)  call lsqwrite (niter,xc,gs,m,fc)
+         if (.not. done)  call lsqwrite (niter,m,xc,gs,fc)
       end if
 c
 c     continue with the next iteration if not finished
 c
-      if (.not. done)  goto 80
+      if (.not. done)  goto 60
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iactive)
+      deallocate (ipvt)
+      deallocate (xp)
+      deallocate (ga)
+      deallocate (gs)
+      deallocate (sc)
+      deallocate (sa)
+      deallocate (xsa)
+      deallocate (xscale)
+      deallocate (rdiag)
+      deallocate (fp)
+      deallocate (ftemp)
+      deallocate (qtf)
       return
       end
 c
@@ -558,46 +573,35 @@ c     strategy of Dennis and Schnabel
 c
 c     arguments and variables :
 c
-c     n        dimension of the problem
-c     ga       real vector of length n containing the gradient
-c                of the residual vector
-c     a        real n by n array which on input contains in the full
-c                upper triangle the upper triangle of the matrix r
-c                resulting from the QR factorization of the Jacobian;
-c                on output the full upper triangle is unaltered, and
-c                the strict lower triangle contains the strict lower
-c                triangle of the lower triangular matrix l which is
-c                equal to the Cholesky factor of (j**t)*j + amu*xscale
-c     m        leading dimension of a exactly as specified in the
-c                dimension statement of the calling program
-c     ipvt     integer array of length n containing the pivoting
-c                infomation from the QR factorization routine
-c     xscale   real vector of length n containing the diagonal
-c                scaling matrix for the variables
-c     qtf      real vector containing the first n elements of
-c                Q(transpose) * (the scaled residual vector)
-c     amu      scalar containing an initial estimate of the
-c                Levenberg-Marquardt parameter on input; on
-c                output, amu contains the final estimate of
-c                the Levenberg-Marquardt parameter
-c     first    logical variable set true only if this is the first
+c     n        number of least squares variables
+c     m        number of residual functions
+c     ga       vector with the gradient of the residual vector
+c     a        array of size n by n which on input contains in the full
+c                upper triangle of the matrix r resulting from the QR
+c                factorization of the Jacobian; on output the full upper
+c                triangle is unaltered, and the strict lower triangle
+c                contains the strict lower triangle of the matrix l
+c                which is the Cholesky factor of (j**t)*j + amu*xscale
+c     ipvt     vector with pivoting information from QR factorization
+c     xscale   vector with the diagonal scaling matrix for variables
+c     qtf      vector with first n elements of Q(transpose)
+c                * (scaled residual)
+c     amu      scalar with initial estimate of the Levenberg-Marquardt
+c                parameter on input, and the final estimate of the
+c                parameter on output
+c     first    logical flag set true only if this is the first
 c                call to this routine in this iteration
-c     sa       real vector of length n containing the
-c                Levenberg-Marquardt step
-c     gnstep   real vector of length n containing the
-c                Gauss-Newton step
-c     gauss    logical variable which is true if the Gauss-Newton
-c                step is acceptable, and is false otherwise
-c     diag     vector of length n containing the diagonal elements
-c                of the Cholesky factor of (j**t)*j + amu*xscale
+c     sa       vector with the Levenberg-Marquardt step
+c     gnstep   vector with the Gauss-Newton step
+c     gauss    logical flag set true if the Gauss-Newton step
+c                is acceptable, and false otherwise
+c     diag     vector with the diagonal elements of the Cholesky
+c                factor of (j**t)*j + amu*xscale
 c
 c
-      subroutine lmstep (n,ga,a,m,ipvt,xscale,qtf,stpmax,
-     &                       delta,amu,first,sa,gauss)
+      subroutine lmstep (n,m,ga,a,ipvt,xscale,qtf,stpmax,
+     &                      delta,amu,first,sa,gauss)
       implicit none
-      integer maxlsq,maxrsd
-      parameter (maxlsq=100)
-      parameter (maxrsd=200)
       integer i,j,k
       integer m,n,nsing
       integer ipvt(*)
@@ -614,10 +618,10 @@ c
       real*8 xscale(*)
       real*8 qtf(*)
       real*8 sa(*)
-      real*8 gnstep(maxlsq)
-      real*8 diag(maxlsq)
-      real*8 work1(maxlsq)
-      real*8 work2(maxlsq)
+      real*8, allocatable :: gnstep(:)
+      real*8, allocatable :: diag(:)
+      real*8, allocatable :: work1(:)
+      real*8, allocatable :: work2(:)
       real*8 a(m,*)
       logical first,gauss
       logical done
@@ -630,6 +634,13 @@ c     set smallest floating point magnitude and spacing
 c
       tiny = precise (1)
       small = precise (2)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (gnstep(n))
+      allocate (diag(n))
+      allocate (work1(n))
+      allocate (work2(n))
 c
 c     if initial trust region is not provided by the user,
 c     compute and use the length of the Cauchy step given
@@ -784,7 +795,7 @@ c
 c     solve the damped least squares system for the value of the
 c     Levenberg-Marquardt step using More's Minpack technique
 c
-            call qrsolve (n,a,m,ipvt,work1,qtf,sa,diag,work2)
+            call qrsolve (n,m,a,ipvt,work1,qtf,sa,diag,work2)
             do j = 1, n
                sa(j) = -sa(j)
             end do
@@ -831,6 +842,13 @@ c
          end do
       end if
       deltap = delta
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (gnstep)
+      deallocate (diag)
+      deallocate (work1)
+      deallocate (work2)
       return
       end
 c
@@ -848,24 +866,23 @@ c     and in Dennis and Schnabel's book
 c
 c     arguments and variables :
 c
-c     m         number of functions (leading dimension of a)
-c     n         number of variables
-c     xc        vector of length n containing the current iterate
-c     fcnorm    real scalar containing the norm of f(xc)
-c     gc        vector of length n containing the gradient at xc
+c     n         number of least squares variables
+c     m         number of residual functions
+c     xc        vector with the current iterate
+c     fcnorm    scalar containing the norm of f(xc)
+c     gc        vector with the gradient at xc
 c     a         real m by n matrix containing the upper triangular
 c                 matrix r from the QR factorization of the current
 c                 Jacobian in the upper triangle
-c     ipvt      integer vector of length n containing the permutation
-c                 matrix from QR factorization of the Jacobian
-c     sc        vector of length n containing the Newton step
-c     sa        vector of length n containing current step
-c     xscale    vector of length n containing the diagonal
-c                 scaling matrix for x
+c     ipvt      vector of length n containing the permutation matrix
+c                 from QR factorization of the Jacobian
+c     sc        vector containing the Newton step
+c     sa        vector containing current step
+c     xscale    vector containing the diagonal scaling matrix for x
 c     gauss     flag set to true when the Gauss-Newton step is taken
 c     stpmax    maximum allowable step size
 c     delta     trust region radius with value retained between calls
-c     icode     return code set upon exit
+c     icode     return code values, set upon exit
 c                 0  means xp accepted as next iterate, delta
 c                      is trust region for next iteration
 c                 1  means the algorithm was unable to find a
@@ -879,8 +896,8 @@ c                 5  means fpnorm is sufficiently small, but the
 c                      chance of taking a longer successful step
 c                      seems good that the current iteration is to
 c                      be continued with a new, doubled trust region
-c     xpprev    vector of length n containing the value of xp at the
-c                 previous call within this iteration
+c     xpprev    vector with the value of xp at the  previous call
+c                 within this iteration
 c     fpprev    vector of length m containing f(xpprev)
 c     xp        vector of length n containing the new iterate
 c     fp        vector of length m containing the functions at xp
@@ -896,14 +913,14 @@ c
 c     rsdvalue   subroutine to evaluate residual function values
 c
 c
-      subroutine trust (rsdvalue,m,n,xc,fcnorm,gc,a,ipvt,sc,sa,
-     &                  xscale,gauss,stpmax,delta,icode,xp,fc,fp,
-     &                  fpnorm,bigstp,ncalls,xlo,xhi,nactive,stpmin,
-     &                  rftol,faketol)
+      subroutine trust (n,m,xc,fcnorm,gc,a,ipvt,sc,sa,xscale,gauss,
+     &                  stpmax,delta,icode,xp,fc,fp,fpnorm,bigstp,
+     &                  ncalls,xlo,xhi,nactive,stpmin,rftol,faketol,
+     &                  rsdvalue)
       implicit none
       integer maxlsq,maxrsd
-      parameter (maxlsq=100)
-      parameter (maxrsd=200)
+      parameter (maxlsq=1000)
+      parameter (maxrsd=1000)
       integer i,j,k
       integer m,n,icode
       integer ncalls,nactive
@@ -915,6 +932,8 @@ c
       real*8 stplen,stpmin
       real*8 rftol,faketol
       real*8 alpha,temp,precise
+      real*8 xpprev(maxlsq)
+      real*8 fpprev(maxrsd)
       real*8 xc(*)
       real*8 gc(*)
       real*8 sc(*)
@@ -925,8 +944,6 @@ c
       real*8 xlo(*)
       real*8 xhi(*)
       real*8 xscale(*)
-      real*8 xpprev(maxlsq)
-      real*8 fpprev(maxrsd)
       real*8 a(m,*)
       logical gauss,bigstp
       logical feas,ltemp
@@ -962,7 +979,7 @@ c
          end if
       end do
       ncalls = ncalls + 1
-      call rsdvalue (m,n,xp,fp)
+      call rsdvalue (n,m,xp,fp)
       fpnorm = 0.0d0
       do i = 1, m
          fpnorm = fpnorm + fp(i)**2

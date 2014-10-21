@@ -295,7 +295,7 @@ c     set default control parameters for induced dipoles
 c
       poltyp = 'MUTUAL'
       politer = 500
-      poleps = 0.00001d0
+      poleps = 0.000001d0
       udiag = 2.0d0
       d1scale = 0.0d0
       d2scale = 1.0d0

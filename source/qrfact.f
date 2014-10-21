@@ -18,7 +18,7 @@ c     the routine determines an orthogonal matrix q, a permutation
 c     matrix p, and an upper trapezoidal matrix r with diagonal
 c     elements of nonincreasing magnitude, such that a*p = q*r; the
 c     Householder transformation for column k, k = 1,2,...,min(m,n),
-c     is of the form
+c     is of the form:
 c
 c               i - (1/u(k))*u*u(transpose)
 c
@@ -26,8 +26,8 @@ c     where u has zeros in the first k-1 positions
 c
 c     arguments and variables :
 c
-c     m        number of rows in the "a" matrix
 c     n        number of columns in the "a" matrix
+c     m        number of rows in the "a" matrix
 c     a        on input contains the m by n matrix for which the QR
 c                factorization is to be computed; on output the
 c                strict upper trapezoidal part contains the strict
@@ -40,7 +40,7 @@ c                column ipvt(j) of the identity matrix
 c     rdiag    output vector of length n with diagonal elements of r
 c
 c
-      subroutine qrfact (m,n,a,pivot,ipvt,rdiag)
+      subroutine qrfact (n,m,a,pivot,ipvt,rdiag)
       implicit none
       integer i,j,k
       integer m,n,minmn
@@ -158,12 +158,11 @@ c
 c     arguments and variables :
 c
 c     n        number of rows and columns in the matrix r
+c     np       leading physical dimension of r in the calling program
 c     r        on input, an n by n array with the upper triangular
 c                matrix r; on output the full triangle is unaltered,
 c                and the strict lower triangle contains the transpose
 c                of the strict upper triangular matrix s
-c     np       leading physical dimension of r exactly as specified
-c                in the calling program
 c     ipvt     vector of length n which defines the permutation
 c                matrix p such that a*p = q*r; column j of p is
 c                column ipvt(j) of the identity matrix
@@ -179,7 +178,7 @@ c     xpvt     vector of length n containing permuted (pivoted)
 c                solution of the systems
 c
 c
-      subroutine qrsolve (n,r,np,ipvt,diag,qtb,x,sdiag,xpvt)
+      subroutine qrsolve (n,np,r,ipvt,diag,qtb,x,sdiag,xpvt)
       implicit none
       integer i,j,k,jj
       integer n,np,nsing

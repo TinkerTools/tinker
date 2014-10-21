@@ -40,7 +40,6 @@ c
       real*8, allocatable :: fjac(:,:)
       logical exist,query
       character*5 vindex
-      character*16 blank
       character*16 label(6)
       character*120 record
       character*120 string
@@ -52,13 +51,6 @@ c
       call initial
       nvary = 0
       nresid = 0
-      blank = '                '
-      do i = 1, maxlsq
-         vartyp(i) = blank
-      end do
-      do i = 1, maxrsd
-         rsdtyp(i) = blank
-      end do
 c
 c     print informational header about available parameters
 c
@@ -172,7 +164,7 @@ c
   130    continue
          if (query) then
             write (iout,140)
-  140       format (/,' Enter Target Elattice or Einter Value',
+  140       format (/,' Enter Target Elat/Einter Value and Weight',
      &                 ' [<CR> to omit] :  ',$)
             read (input,150)  e0_lattice
   150       format (f20.0)
@@ -298,7 +290,7 @@ c
 c
 c     use nonlinear least squares to refine the parameters
 c
-      call square (nresid,nvary,xlo,xhi,xx,resid,g,fjac,
+      call square (nvary,nresid,xlo,xhi,xx,resid,g,fjac,
      &                  grdmin,xtalerr,xtalwrt)
 c
 c     perform deallocation of some local arrays
@@ -315,13 +307,14 @@ c
       do i = 1, nvary
          if (ivary(i) .le. 3) then
             write (iout,230)  i,vartyp(i),vindex,vary(1,i),xx(i),g(i)
-  230       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,4x,2f12.4)
+  230       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,2x,2f14.4)
          else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,240)  i,vartyp(i),vary(1,i),xx(i),g(i)
-  240       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,2f12.4)
+  240       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,2x,2f14.4)
          else if (ivary(i) .eq. 6) then
             write (iout,250)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),g(i)
-  250       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,2f12.4)
+  250       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,
+     &                 f11.4,f14.4)
          end if
       end do
 c
@@ -580,7 +573,7 @@ c     lattice energies, dimer intermolecular energies and the
 c     gradient with respect to structural parameters
 c
 c
-      subroutine xtalerr (nresid,nvaried,xx,resid)
+      subroutine xtalerr (nvaried,nresid,xx,resid)
       use sizes
       use atoms
       use boxes
@@ -611,9 +604,10 @@ c
       real*8 resid(*)
 c
 c
-c     zero out the number of residual components
+c     zero out number of residuals and set numerical step size
 c
       nresid = 0
+      eps = 1.0d-4
 c
 c     set force field parameter values and find the base energy
 c
@@ -625,7 +619,6 @@ c
 c     perturb crystal lattice parameters and compute energies
 c
          if (use_bounds) then
-            eps = 0.00001d0
             temp = xbox
             xbox = xbox + eps
             call xtalmove
@@ -667,7 +660,6 @@ c
 c     translate dimer component molecules and compute energies
 c
          else
-            eps = 0.00001d0
             do i = imol(1,1), imol(2,1)
                k = kmol(i)
                x(k) = x(k) + eps
@@ -784,11 +776,13 @@ c
             e_lattice = e0
          end if
 c
-c     compute residual due to intermolecular or lattice energy
+c     compute residual due to intermolecular or lattice energy;
+c     weight energies more heavily, since there are fewer of them
 c
          if (e0_lattice .ne. 0.0d0) then
             nresid = nresid + 1
             resid(nresid) = e_lattice - e0_lattice
+            resid(nresid) = 10.0d0 * resid(nresid)
          end if
       end do
       return
@@ -899,7 +893,7 @@ c     "xtalwrt" prints intermediate results during fitting of
 c     force field parameters to structures and energies
 c
 c
-      subroutine xtalwrt (niter,xx,gs,nresid,resid)
+      subroutine xtalwrt (niter,nresid,xx,gs,resid)
       use iounit
       use vdwpot
       use xtals
@@ -922,13 +916,14 @@ c
       do i = 1, nvary
          if (ivary(i) .le. 3) then
             write (iout,20)  i,vartyp(i),vindex,vary(1,i),xx(i),gs(i)
-   20       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,4x,2f12.4)
+   20       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,2x,2f14.4)
          else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             write (iout,30)  i,vartyp(i),vary(1,i),xx(i),gs(i)
-   30       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,2f12.4)
+   30       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,2x,2f14.4)
          else if (ivary(i) .eq. 6) then
             write (iout,40)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),gs(i)
-   40       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,2f12.4)
+   40       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,
+     &                 f11.4,f14.4)
          end if
       end do
 c
