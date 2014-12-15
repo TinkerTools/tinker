@@ -32,7 +32,7 @@ c
       integer n1,n2,dt,trimtext
       integer first,last,step
       integer start,stop
-      integer nfile,nblock,maxgap
+      integer nframe,nblock,maxgap
       integer blksize,blkgap,blkdiff
       integer, allocatable :: t1(:)
       integer, allocatable :: t2(:)
@@ -126,13 +126,13 @@ c
       end if
       if (maxgap .eq. 0)  maxgap = last - first
 c
-c     get the number of file blocks from the total files
+c     get the number of frame blocks from the total frames
 c
-      nfile = 1 + (last-first)/step
-      nblock = 1 + (nfile-1)/maxblock
+      nframe = 1 + (last-first)/step
+      nblock = 1 + (nframe-1)/maxblock
       blksize = maxblock * step
       blkgap = 1 + (maxgap-1)/blksize
-      write (iout,110)  nblock,min(nfile,maxblock)
+      write (iout,110)  nblock,min(nframe,maxblock)
   110 format (/,' Correlation Function Computed using',i5,
      &           ' Blocks of',i6,' Frames')
 c

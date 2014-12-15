@@ -12,6 +12,15 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
+c     maxvlst     maximum size of van der Waals pair neighbor lists
+c     maxelst     maximum size of electrostatic pair neighbor lists
+c     maxulst     maximum size of dipole preconditioner pair lists
+c     nvlst       number of sites in list for each vdw site
+c     vlst        site numbers in neighbor list of each vdw site
+c     nelst       number of sites in list for each electrostatic site
+c     elst        site numbers in list of each electrostatic site
+c     nulst       number of sites in list for each preconditioner site
+c     ulst        site numbers in list of each preconditioner site
 c     lbuffer     width of the neighbor list buffer region
 c     pbuffer     width of the preconditioner list buffer region
 c     lbuf2       square of half the neighbor list buffer width
@@ -36,12 +45,6 @@ c     zmold       z-coordinate at last multipole neighbor list update
 c     xuold       x-coordinate at last preconditioner neighbor update
 c     yuold       y-coordinate at last preconditioner neighbor update
 c     zuold       z-coordinate at last preconditioner neighbor update
-c     nvlst       number of sites in list for each vdw site
-c     vlst        site numbers in neighbor list of each vdw site
-c     nelst       number of sites in list for each electrostatic site
-c     elst        site numbers in list of each electrostatic site
-c     nulst       number of sites in list for each preconditioner site
-c     ulst        site numbers in list of each preconditioner site
 c     dovlst      logical flag to rebuild vdw neighbor list
 c     doclst      logical flag to rebuild charge neighbor list
 c     domlst      logical flag to rebuild multipole neighbor list
@@ -50,6 +53,9 @@ c
 c
       module neigh
       implicit none
+      integer maxvlst
+      integer maxelst
+      integer maxulst
       integer, allocatable :: nvlst(:)
       integer, allocatable :: vlst(:,:)
       integer, allocatable :: nelst(:)

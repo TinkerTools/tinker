@@ -16,14 +16,14 @@
          throughout the package, and "openend.f" which is a system
          dependent routine to open a file at the end.
 
+         If you are building an OpenMP-capable version of TINKER with
+         a compiler other than the Intel Fortran compiler, then it is
+         necessary to comment or remove the calls to the Intel-specific
+         extensions "kmp_set_stacksize" and "kmp-set-blocksize" near
+         the top of the source file "initial.f".
+
          In addition, if your system does not support the iargc/getarg
          mechanism for command line arguments, then comment out the
          call to the subroutine "command" at the bottom of the source
          file "initial.f".
-
-         If you are building an OpenMP-capable version of TINKER with
-         a compiler other than the Intel Fortran compiler, then it is
-         necessary to remove the calls to the Intel-specific extensions
-         "kmp_set_stacksize" and "kmp-set-blocksize" near the top of
-         the file "initial.f".
 

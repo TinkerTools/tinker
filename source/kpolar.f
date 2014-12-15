@@ -24,6 +24,7 @@ c
       use keys
       use kpolr
       use mpole
+      use neigh
       use polar
       use polpot
       use potent

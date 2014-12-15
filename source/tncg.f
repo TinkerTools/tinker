@@ -899,7 +899,7 @@ c
             if (verbose) then
                write (iout,20)
    20          format (' PRECOND  --  Incomplete Cholesky is',
-     &                 ' Unstable, using Diagonal Method')
+     &                    ' Unstable, using Diagonal Method')
             end if
          else
             factor = 1.0d0 + alpha

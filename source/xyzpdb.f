@@ -64,6 +64,7 @@ c
 c
 c     perform any final tasks before program exit
 c
+      close (unit=ixyz)
       close (unit=ipdb)
       call final
       end

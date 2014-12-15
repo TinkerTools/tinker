@@ -22,17 +22,16 @@ c
       use math
       use units
       implicit none
-      integer maxvel,maxfreq
-      parameter (maxvel=100000)
-      parameter (maxfreq=5000)
       integer i,k,nsamp
       integer ivel,nvel
+      integer maxvel
+      integer maxfreq
       integer freeunit
       real*8 factor,aver
       real*8 norm,step
       real*8 freq,time
-      real*8 vel(0:maxvel)
-      real*8 intense(maxfreq)
+      real*8, allocatable :: vel(:)
+      real*8, allocatable :: intense(:)
       logical exist,done
       character*120 velfile
       character*120 record
@@ -100,6 +99,13 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      maxvel = 100000
+      maxfreq = 5000
+      allocate (vel(0:maxvel))
+      allocate (intense(maxfreq))
+c
 c     read the velocity autocorrelation as a function of time
 c
       do i = 1, maxvel
@@ -133,4 +139,13 @@ c
          write (iout,110)  dble(i),intense(i)
   110    format (3x,f12.2,8x,f16.6)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (vel)
+      deallocate (intense)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end

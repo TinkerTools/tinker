@@ -40,7 +40,7 @@ c
       real*8, allocatable :: fjac(:,:)
       logical exist,query
       character*5 vindex
-      character*16 label(6)
+      character*16 label(9)
       character*120 record
       character*120 string
       external xtalerr,xtalwrt
@@ -62,7 +62,10 @@ c
      &        /,4x,'(3) Hydrogen Atom Reduction Factor',
      &        /,4x,'(4) Atomic Partial Charge',
      &        /,4x,'(5) Bond Dipole Moment Magnitude',
-     &        /,4x,'(6) Bond Dipole Moment Position')
+     &        /,4x,'(6) Bond Dipole Moment Position',
+     &        /,4x,'(7) Atomic Polarizability',
+     &        /,4x,'(8) Penetration Alpha Value',
+     &        /,4x,'(9) Penetration Beta Value')
 c
 c     get types of potential parameters to be optimized
 c
@@ -94,9 +97,8 @@ c
             query = .true.
             nvary = nvary + 1
             ivary(nvary) = prmtyp
-            if (prmtyp .lt. 5) then
-               vary(1,nvary) = atom1
-            else
+            vary(1,nvary) = atom1
+            if (prmtyp.eq.5 .or. prmtyp.eq.6) then
                vary(1,nvary) = min(atom1,atom2)
                vary(2,nvary) = max(atom1,atom2)
             end if
@@ -233,6 +235,9 @@ c
       label(4) = 'Partial Charge'
       label(5) = 'Dipole Magnitude'
       label(6) = 'Dipole Position'
+      label(7) = 'Polarizability'
+      label(8) = 'Penetr Alpha'
+      label(9) = 'Penetr Beta'
       do i = 1, nvary
          vartyp(i) = label(ivary(i))
       end do
@@ -247,10 +252,10 @@ c
          if (ivary(i) .le. 3) then
             write (iout,190)  i,vartyp(i),vindex,vary(1,i),xx(i)
   190       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,4x,f12.4)
-         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
+         else if (ivary(i) .ne. 6) then
             write (iout,200)  i,vartyp(i),vary(1,i),xx(i)
   200       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,f12.4)
-         else if (ivary(i) .eq. 6) then
+         else
             write (iout,210)  i,vartyp(i),vary(1,i),vary(2,i),xx(i)
   210       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,f12.4)
          end if
@@ -267,22 +272,10 @@ c
 c     set upper and lower bounds based on the parameter type
 c
       do i = 1, nvary
-         if (ivary(i) .eq. 1) then
-            xlo(i) = 0.5d0 * xx(i)
-            xhi(i) = 1.5d0 * xx(i)
-         else if (ivary(i) .eq. 2) then
-            xlo(i) = 0.5d0 * xx(i)
-            xhi(i) = 1.5d0 * xx(i)
-         else if (ivary(i) .eq. 3) then
-            xlo(i) = 0.5d0 * xx(i)
-            xhi(i) = 1.5d0 * xx(i)
-         else if (ivary(i) .eq. 4) then
+         if (ivary(i).eq.4 .or. ivary(i).eq.5) then
             xlo(i) = xx(i) - 0.5d0
             xhi(i) = xx(i) + 0.5d0
-         else if (ivary(i) .eq. 5) then
-            xlo(i) = xx(i) - 0.5d0
-            xhi(i) = xx(i) + 0.5d0
-         else if (ivary(i) .eq. 6) then
+         else
             xlo(i) = 0.5d0 * xx(i)
             xhi(i) = 1.5d0 * xx(i)
          end if
@@ -308,10 +301,10 @@ c
          if (ivary(i) .le. 3) then
             write (iout,230)  i,vartyp(i),vindex,vary(1,i),xx(i),g(i)
   230       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,2x,2f14.4)
-         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
+         else if (ivary(i) .ne. 6) then
             write (iout,240)  i,vartyp(i),vary(1,i),xx(i),g(i)
   240       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,2x,2f14.4)
-         else if (ivary(i) .eq. 6) then
+         else
             write (iout,250)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),g(i)
   250       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,
      &                 f11.4,f14.4)
@@ -372,6 +365,8 @@ c
       use inform
       use kvdws
       use molcul
+      use mpole
+      use polar
       use vdw
       use vdwpot
       use xtals
@@ -379,7 +374,7 @@ c
       integer i,j,k
       integer ixtal,prmtyp
       integer atom1,atom2
-      real*8 rd,ep
+      real*8 rd,ep,sixth
       real*8 xmid,ymid,zmid
       real*8 e0_lattices(maxref)
       real*8 xx(*)
@@ -518,7 +513,7 @@ c
                   end if
                end do
             else if (mode .eq. 'RESET') then
-               do i = 1, n
+               do i = 1, nion
                   if (type(iion(i)) .eq. atom1)  pchg(i) = xx(j)
                end do
             end if
@@ -552,6 +547,23 @@ c
                do i = 1, ndipole
                   if (type(idpl(1,i)).eq.atom1 .and.
      &                type(idpl(2,i)).eq.atom2)  sdpl(i) = xx(j)
+               end do
+            end if
+         else if (prmtyp .eq. 7) then
+            if (mode .eq. 'STORE') then
+               do i = 1, npole
+                  if (type(ipole(i)) .eq. atom1) then
+                     xx(j) = polarity(i)
+                     goto 10
+                  end if
+               end do
+            else if (mode .eq. 'RESET') then
+               sixth = 1.0d0 / 6.0d0
+               do i = 1, npole
+                  if (type(ipole(i)) .eq. atom1) then
+                     polarity(i) = xx(j)
+                     if (thole(i) .ne. 0.0d0)  pdamp(i) = xx(j)**sixth
+                  end if
                end do
             end if
          end if
@@ -782,7 +794,11 @@ c
          if (e0_lattice .ne. 0.0d0) then
             nresid = nresid + 1
             resid(nresid) = e_lattice - e0_lattice
-            resid(nresid) = 10.0d0 * resid(nresid)
+            if (ixtal .le. 11) then
+               resid(nresid) = 3.0d0 * resid(nresid)
+            else
+               resid(nresid) = 10.0d0 * resid(nresid)
+            end if
          end if
       end do
       return
@@ -917,10 +933,10 @@ c
          if (ivary(i) .le. 3) then
             write (iout,20)  i,vartyp(i),vindex,vary(1,i),xx(i),gs(i)
    20       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,2x,2f14.4)
-         else if (ivary(i).eq.4 .or. ivary(i).eq.5) then
+         else if (ivary(i) .ne. 6) then
             write (iout,30)  i,vartyp(i),vary(1,i),xx(i),gs(i)
    30       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,2x,2f14.4)
-         else if (ivary(i) .eq. 6) then
+         else
             write (iout,40)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),gs(i)
    40       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,
      &                 f11.4,f14.4)

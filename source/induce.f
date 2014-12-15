@@ -2294,7 +2294,7 @@ c
       if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
       nlocal = 0
       toffset0 = 0
-      maxlocal = int((npole*maxelst)/nthread)
+      maxlocal = int(dble(npole)*dble(maxelst)/dble(nthread))
 c
 c     perform dynamic allocation of some local arrays
 c

@@ -5,16 +5,16 @@ c     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine cutoffs  --  set distance and Hessian cutoffs  ##
-c     ##                                                            ##
-c     ################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine cutoffs  --  distance cutoffs & neighbor lists  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "cutoffs" initializes and stores spherical energy cutoff
 c     distance windows, Hessian element and Ewald sum cutoffs,
-c     and the pairwise neighbor generation method
+c     and allocates pairwise neighbor lists
 c
 c
       subroutine cutoffs
@@ -29,6 +29,7 @@ c
       use tarray
       implicit none
       integer i,next
+      integer limit
       real*8 big,value
       logical truncate
       character*20 keyword
@@ -212,6 +213,18 @@ c
       cbufx = (chgcut+2.0d0*lbuffer)**2
       mbufx = (mpolecut+2.0d0*lbuffer)**2
       ubufx = (usolvcut+2.0d0*pbuffer)**2
+c
+c     specify maximum size for each of the neighbor lists
+c
+      maxvlst = 2500
+      limit = int(0.5d0*sqrt(vbuf2)**3) + 50
+      maxvlst = min(limit,maxvlst)
+      maxelst = 2500
+      limit = int(0.5d0*sqrt(max(cbuf2,mbuf2))**3) + 50
+      maxelst = min(limit,maxelst)
+      maxulst = 500
+      limit = int(0.5d0*sqrt(ubuf2)**3) + 50
+      maxulst = min(limit,maxulst)
 c
 c     perform dynamic allocation of some global arrays
 c
