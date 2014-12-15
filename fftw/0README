@@ -1,0 +1,62 @@
+
+                     -------------------------------------
+                     FFTW Directory for the TINKER Package
+                     -------------------------------------
+
+      This directory contains FFTW-3.3.4 which is the preferred FFT
+      method for use with the OpenMP version of TINKER. The FFTPACK
+      code provided by TINKER can be used instead (via modifications
+      to fft3d.f), but FFTPACK is serial only.
+
+      Building FFTW on Mac OSX and on Linux:
+
+      Under OSX and Linux, TINKER requires the two FFTW static object
+      libraries, libfftw3.a and libfftw3_threads.a. To build FFTW using
+      the GNU compilers, issue each of the commands indicated below.
+      Note that the 'setenv" syntax is for csh/tcsh shells, and should
+      be modified for other shells. Also, the --prefix in the "configure"
+      command should be changed to the correct path on the local machine
+      (ie, the current /fftw area under the TINKER tree).
+
+      setenv CC gcc          (or use "export CC=gcc" for bash)
+      setenv F77 gfortran    (or use "export F77=gfortran" for bash)
+      make distclean
+      configure --prefix=/Users/ponder/tinker/fftw --enable-threads
+      make
+      make install
+
+      The above "setenv" commands are for use of the GNU compilers. To
+      use the Intel or PGI compilers, substitute "icc" or "pgcc" for
+      "gcc", and "ifort" or "pgf95" for "gfortran".
+
+      After completion of the above commands, the library files needed
+      by TINKER will be in the /lib subdirectory.
+
+      Note modified versions of the configure script are used to enforce
+      processor-specific compiler flags. In particular, there are OSX
+      and Linux versions for the Intel compiler that use -axssse3 and
+      -axsse3, respectively, along with other optimization flags. The
+      original file is available as "configure-orig".
+
+      Note the configure option --enable-threads can be replaced with
+      --enable-openmp, creating a libfftw3_omp.a library. Under OSX with
+      recent versions of the Intel compilers, the threads library seems
+      to give better OpenMP performance on large numbers of cores.
+
+      Building FFTW on Windows:
+
+      It is possible to build FFTW under Cygwin on Windows using the
+      procedure outlined above for Linux and the GNU compilers. If this
+      is done, then TINKER must be built with the same compilers.
+
+      The Intel compilers can build FFTW on 64-bit Windows via Visual
+      Studio and using the add-on /fftw-3.3-libs subdirectory obtained
+      from the FFTW web site. This has been tested on 64-bit Windows 7
+      with Visual Studio 2010. In Visual Studio, open the project file
+      /fftw-3.3-libs/fftw-3.3-libs.sln. Then under the Project menu,
+      use the Configuration Manager to select x64 and build the Static-
+      Release version of only the libfftw library. The resulting .lib
+      file can be copied to the TINKER /source area for linking. Note
+      the config.h file in /fftw-3.3-libs/libfftw-3.3 has been modified
+      to enable use of threads and the calling interface with Fortran. 
+
