@@ -135,7 +135,6 @@ ifort -c -g -warn all -check all rxnpot.f
 ifort -c -g -warn all -check all scales.f
 ifort -c -g -warn all -check all sequen.f
 ifort -c -g -warn all -check all shunt.f
-ifort -c -g -warn all -check all sizes.f
 ifort -c -g -warn all -check all socket.f
 ifort -c -g -warn all -check all solute.f
 ifort -c -g -warn all -check all stodyn.f

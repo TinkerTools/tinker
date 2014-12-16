@@ -3,7 +3,7 @@
                   TINKER -- Software Tools for Molecular Design
                   ---------------------------------------------
 
-                             Version 7.0   June 2014
+                           Version 7.0   October 2014
                    Copyright (C) 1990-2014  Jay William Ponder
 
 TINKER is a modular program package for molecular mechanics-based potential

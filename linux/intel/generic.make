@@ -135,7 +135,6 @@ ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp rxnpot.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp scales.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp sequen.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp shunt.f
-ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp sizes.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp socket.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp solute.f
 ifort -c -O3 -axSSE3 -no-ipo -no-prec-div -openmp stodyn.f

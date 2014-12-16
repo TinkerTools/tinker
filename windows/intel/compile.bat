@@ -136,7 +136,6 @@ ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp rxnpot.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp scales.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp sequen.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp shunt.f
-ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp sizes.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp socket.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp solute.f
 ifort /c /O3 /QaxSSE3 /Qip- /Qprec-div- /w /Qopenmp stodyn.f

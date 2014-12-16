@@ -136,7 +136,6 @@ LF95 -c -o1 -tpp -nstchk -ntrace rxnpot.f
 LF95 -c -o1 -tpp -nstchk -ntrace scales.f
 LF95 -c -o1 -tpp -nstchk -ntrace sequen.f
 LF95 -c -o1 -tpp -nstchk -ntrace shunt.f
-LF95 -c -o1 -tpp -nstchk -ntrace sizes.f
 LF95 -c -o1 -tpp -nstchk -ntrace socket.f
 LF95 -c -o1 -tpp -nstchk -ntrace solute.f
 LF95 -c -o1 -tpp -nstchk -ntrace stodyn.f

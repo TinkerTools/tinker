@@ -135,7 +135,6 @@ pathf90 -c -O -msse3 -openmp rxnpot.f
 pathf90 -c -O -msse3 -openmp scales.f
 pathf90 -c -O -msse3 -openmp sequen.f
 pathf90 -c -O -msse3 -openmp shunt.f
-pathf90 -c -O -msse3 -openmp sizes.f
 pathf90 -c -O -msse3 -openmp socket.f
 pathf90 -c -O -msse3 -openmp solute.f
 pathf90 -c -O -msse3 -openmp stodyn.f

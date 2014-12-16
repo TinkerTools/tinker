@@ -135,7 +135,6 @@ gfortran -c -g -Warray-bounds -Wmaybe-uninitialized rxnpot.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized scales.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized sequen.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized shunt.f
-gfortran -c -g -Warray-bounds -Wmaybe-uninitialized sizes.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized socket.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized solute.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized stodyn.f

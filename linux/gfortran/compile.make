@@ -135,7 +135,6 @@ gfortran -c -O3 -ffast-math -fopenmp rxnpot.f
 gfortran -c -O3 -ffast-math -fopenmp scales.f
 gfortran -c -O3 -ffast-math -fopenmp sequen.f
 gfortran -c -O3 -ffast-math -fopenmp shunt.f
-gfortran -c -O3 -ffast-math -fopenmp sizes.f
 gfortran -c -O3 -ffast-math -fopenmp socket.f
 gfortran -c -O3 -ffast-math -fopenmp solute.f
 gfortran -c -O3 -ffast-math -fopenmp stodyn.f
