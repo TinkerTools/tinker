@@ -12,8 +12,8 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "torsions" finds the total number of dihedral angles and
-c     the numbers of the four atoms defining each dihedral angle
+c     "torsions" finds the total number of torsional angles and
+c     the numbers of the four atoms defining each torsional angle
 c
 c
       subroutine torsions
@@ -31,7 +31,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      maxtors = 6 * n
+      maxtors = 18 * n
       if (allocated(itors))  deallocate (itors)
       allocate (itors(4,maxtors))
 c

@@ -13,7 +13,7 @@ c     ##########################################################
 c
 c
 c     "bitors" finds the total number of bitorsions as pairs
-c     of adjacent dihedral angles, and the numbers of the five
+c     of adjacent torsional angles, and the numbers of the five
 c     atoms defining each bitorsion
 c
 c
@@ -32,7 +32,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      maxbitor = 8 * n
+      maxbitor = 54 * n
       if (allocated(ibitor))  deallocate (ibitor)
       allocate (ibitor(5,maxbitor))
 c
