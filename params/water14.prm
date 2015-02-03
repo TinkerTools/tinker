@@ -8,7 +8,7 @@
 
 forcefield              AMOEBA-WATER-2014
 
-bond-cubic              -2.55
+bond-cubic              -2.550
 bond-quartic            3.793125
 angle-cubic             -0.014
 angle-quartic           0.000056
