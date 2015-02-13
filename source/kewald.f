@@ -185,9 +185,9 @@ c
       if (verbose) then
          write (iout,50)  aewald,nfft1,nfft2,nfft3,bsorder
    50    format (/,' Smooth Particle Mesh Ewald Parameters :',
-     &           //,4x,'Ewald Coefficient',6x,'Charge Grid',
-     &              ' Dimensions',6x,'B-Spline Order',
-     &           //,8x,f8.4,11x,3i6,12x,i6)
+     &           //,4x,'Ewald Coefficient',7x,'PME Grid',
+     &              ' Dimensions',7x,'B-Spline Order',
+     &           //,8x,f8.4,11x,3i6,11x,i6)
       end if
       return
       end

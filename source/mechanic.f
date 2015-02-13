@@ -100,7 +100,8 @@ c
       if (use_dipole .or. use_chgdpl)  call kdipole
       if (use_mpole .or. use_polar .or.
      &    use_solv .or. use_rxnfld)  call kmpole
-      if (use_polar .or. use_solv)  call kpolar
+      if (use_mpole .or. use_polar .or.
+     &    use_solv)  call kpolar
       if (use_ewald)  call kewald
 c
 c     assign solvation, metal, pisystem and restraint parameters
