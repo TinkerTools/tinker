@@ -295,10 +295,15 @@ c
          if (vdwindex .eq. 'TYPE')  jvdw(i) = type(i)
          k = max(k,jvdw(i))
       end do
-      if (k .gt. maxclass) then
+      if (vdwindex.eq.'CLASS' .and. k.gt.maxclass) then
          write (iout,210)
   210    format (/,' KVDW  --  Unable to Index VDW Parameters;',
      &              ' Increase MAXCLASS')
+         abort = .true.
+      else if (vdwindex.eq.'TYPE' .and. k.gt.maxtyp) then
+         write (iout,220)
+  220    format (/,' KVDW  --  Unable to Index VDW Parameters;',
+     &              ' Increase MAXTYP')
          abort = .true.
       end if
 c
@@ -490,7 +495,7 @@ c
 c     radii and well depths for special atom class pairs
 c
       do i = 1, maxnvp
-         if (kvpr(i) .eq. blank)  goto 220
+         if (kvpr(i) .eq. blank)  goto 230
          ia = number(kvpr(i)(1:4))
          ib = number(kvpr(i)(5:8))
          if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
@@ -505,7 +510,7 @@ c
          epsilon4(ia,ib) = abs(epspr(i))
          epsilon4(ib,ia) = abs(epspr(i))
       end do
-  220 continue
+  230 continue
 c
 c     radii and well depths for hydrogen bonding pairs
 c
@@ -517,7 +522,7 @@ c
             end do
          end do
          do i = 1, maxnhb
-            if (khb(i) .eq. blank)  goto 230
+            if (khb(i) .eq. blank)  goto 240
             ia = number(khb(i)(1:4))
             ib = number(khb(i)(5:8))
             if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
@@ -528,7 +533,7 @@ c
             epshbnd(ia,ib) = abs(epshb(i))
             epshbnd(ib,ia) = abs(epshb(i))
          end do
-  230    continue
+  240    continue
       end if
 c
 c     set coefficients for Gaussian fit to eps=1 and radmin=1

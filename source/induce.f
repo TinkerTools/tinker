@@ -73,7 +73,7 @@ c
 c
 c     print out a list of the final induced dipole moments
 c
-      if (debug) then
+      if (debug .and. use_polar) then
          header = .true.
          do i = 1, npole
             if (polarity(i) .ne. 0.0d0) then

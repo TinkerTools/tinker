@@ -108,6 +108,14 @@ c
          end if
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
+      if (allocated(iopb))  deallocate (iopb)
+      if (allocated(opbk))  deallocate (opbk)
+      allocate (iopb(nangle))
+      allocate (opbk(nangle))
+c
 c     use special out-of-plane bend parameter assignment for MMFF
 c
       if (forcefield .eq. 'MMFF94') then
@@ -137,14 +145,6 @@ c
          jopb(it) = .true.
       end do
    60 continue
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
-      if (allocated(iopb))  deallocate (iopb)
-      if (allocated(opbk))  deallocate (opbk)
-      allocate (iopb(nangle))
-      allocate (opbk(nangle))
 c
 c     assign out-of-plane bending parameters for each angle
 c
@@ -289,40 +289,40 @@ c
             ib = iang(2,i)
             ic = iang(3,i)
             id = iang(4,i)
-            itta = type(ia)
-            ittb = type(ib)
-            ittc = type(ic)
-            ittd = type(id)
-            m = 0
-   10       continue
-            m = m + 1
-            if (m .eq. 1) then
-               ita = eqclass(itta,1)
-               itb = eqclass(ittb,1)
-               itc = eqclass(ittc,1)
-               itd = eqclass(ittd,1)
-            else if (m .eq. 2) then
-               ita = eqclass(itta,2)
-               itb = eqclass(ittb,2)
-               itc = eqclass(ittc,2)
-               itd = eqclass(ittd,2)
-            else if (m .eq. 3) then
-               ita = eqclass(itta,3)
-               itb = eqclass(ittb,2)
-               itc = eqclass(ittc,3)
-               itd = eqclass(ittd,3)
-            else if (m .eq. 4) then
-               ita = eqclass(itta,4)
-               itb = eqclass(ittb,2)
-               itc = eqclass(ittc,4)
-               itd = eqclass(ittd,4)
-            else if (m .eq. 5) then
-               ita = eqclass(itta,5)
-               itb = eqclass(ittb,2)
-               itc = eqclass(ittc,5)
-               itd = eqclass(ittd,5)
-            end if
-            if (ia.ne.0 .and. ib.ne.0 .and. ic.ne.0 .and. id.ne.0) then
+            if (min(ia,ib,ic,id) .gt. 0) then
+               itta = type(ia)
+               ittb = type(ib)
+               ittc = type(ic)
+               ittd = type(id)
+               m = 0
+   10          continue
+               m = m + 1
+               if (m .eq. 1) then
+                  ita = eqclass(itta,1)
+                  itb = eqclass(ittb,1)
+                  itc = eqclass(ittc,1)
+                  itd = eqclass(ittd,1)
+               else if (m .eq. 2) then
+                  ita = eqclass(itta,2)
+                  itb = eqclass(ittb,2)
+                  itc = eqclass(ittc,2)
+                  itd = eqclass(ittd,2)
+               else if (m .eq. 3) then
+                  ita = eqclass(itta,3)
+                  itb = eqclass(ittb,2)
+                  itc = eqclass(ittc,3)
+                  itd = eqclass(ittd,3)
+               else if (m .eq. 4) then
+                  ita = eqclass(itta,4)
+                  itb = eqclass(ittb,2)
+                  itc = eqclass(ittc,4)
+                  itd = eqclass(ittd,4)
+               else if (m .eq. 5) then
+                  ita = eqclass(itta,5)
+                  itb = eqclass(ittb,2)
+                  itc = eqclass(ittc,5)
+                  itd = eqclass(ittd,5)
+               end if
                if (m .gt. 5) then
                   nopbend = nopbend + 1
                   iopb(nopbend) = i
