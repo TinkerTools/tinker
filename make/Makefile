@@ -1,7 +1,7 @@
 ##
 ###################################################################
 ##                                                               ##
-##  Makefile for Building the Tinker Molecular Modeling Package  ##
+##  Makefile for Building the TINKER Molecular Modeling Package  ##
 ##                                                               ##
 ###################################################################
 ##
@@ -15,11 +15,11 @@
 ##   5. make clean            Delete objects and executables
 ##
 ##  Original version of this file is due to Peter Happersberger
-##  and Jochen Buehler of the University of Konstanz, January 1998,
+##  and Jochen Buehler of the University of Konstanz, January 1998.
 ##  Modifications by Reece Hart & Jay Ponder, Washington University
 ##
-##  Note: Building TINKER requires libraries for the FFTW Fast
-##  Fourier Transform package and (optionally) the APBS Poisson-
+##  Building TINKER from source requires libraries from the FFTW
+##  Fast Fourier Transform package and (optionally) APBS Poisson-
 ##  Boltzmann solver. These libraries are assumed to already be
 ##  present, and are not built by this Makefile
 ##

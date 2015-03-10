@@ -13,9 +13,9 @@ c     #################################################################
 c
 c
 c     nfree       total number of degrees of freedom for a system
-c     irest       steps between removal of COM inertia (0=no removal)
+c     irest       steps between removal of COM motion (0=no removal)
 c     bmnmix      mixing coefficient for use with Beeman integrator
-c     dorest      logical flag to remove center of mass inertia
+c     dorest      logical flag to remove center of mass motion
 c     velsave     logical flag to save velocity vector components
 c     frcsave     logical flag to save force vector components
 c     uindsave    logical flag to save induced atomic dipoles

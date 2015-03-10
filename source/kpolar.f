@@ -242,8 +242,6 @@ c
       integer jj,kk
       integer start,stop
       integer nlist,nkeep
-      integer maxp11,maxp12
-      integer maxp13,maxp14
       integer keep(maxkeep)
       integer list(maxlist)
       integer, allocatable :: mask(:)
@@ -252,10 +250,6 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      maxp11 = 150
-      maxp12 = 50
-      maxp13 = 50
-      maxp14 = 50
       if (allocated(np11))  deallocate (np11)
       if (allocated(np12))  deallocate (np12)
       if (allocated(np13))  deallocate (np13)

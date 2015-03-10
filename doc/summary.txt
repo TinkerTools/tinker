@@ -105,7 +105,7 @@ Selected References:
      J. Comput. Chem., 8, 1016-1024 (1987).
 
 Availability:   Executables and Source at http://dasher.wustl.edu/tinker/
-Version:        TINKER 7.0 and Force Field Explorer 7.0 of October 2014
+Version:        TINKER 7.1 and Force Field Explorer 7.1 of February 2015
 Language:       Fortran 95 with common extensions and some C;
                 FFE GUI in Java with Java 3D extensions
 Lines of Code:  210,000 in TINKER Package (Fortran 95 and some C)

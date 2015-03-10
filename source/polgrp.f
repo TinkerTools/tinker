@@ -12,6 +12,11 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
+c     maxp11   maximum number of atoms in a polarization group
+c     maxp12   maximum number of atoms in groups 1-2 to an atom
+c     maxp13   maximum number of atoms in groups 1-3 to an atom
+c     maxp14   maximum number of atoms in groups 1-4 to an atom
+c
 c     np11     number of atoms in polarization group of each atom
 c     np12     number of atoms in groups 1-2 to each atom
 c     np13     number of atoms in groups 1-3 to each atom
@@ -24,6 +29,12 @@ c
 c
       module polgrp
       implicit none
+      integer maxp11,maxp12
+      integer maxp13,maxp14
+      parameter (maxp11=150)
+      parameter (maxp12=50)
+      parameter (maxp13=50)
+      parameter (maxp14=50)
       integer, allocatable :: np11(:)
       integer, allocatable :: np12(:)
       integer, allocatable :: np13(:)
