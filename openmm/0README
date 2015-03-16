@@ -1,0 +1,14 @@
+
+                    ---------------------------------------
+                    Files for OpenMM-Enabled TINKER DYNAMIC
+                    ---------------------------------------
+
+          This directory contains the files needed to build a TINKER
+          DYNAMIC program using the GPU-capable OpenMM libraries. The
+          files should be copied into the /source directory of a clean
+          distribution of TINKER. The provided Makefile can then be
+          used, after minor editing, to build a dynamic_omm.x executable.
+          The Makefile assumes OpenMM 6.2.0 is present in its default
+          location, /usr/local/openmm. NVIDIA CUDA must be installed on
+          the target machine, as well as  a CUDA-capable graphics card.
+

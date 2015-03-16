@@ -843,7 +843,7 @@ c
                dp(1,ii) = dp(1,ii) + ftm2i(1)
                dp(2,ii) = dp(2,ii) + ftm2i(2)
                dp(3,ii) = dp(3,ii) + ftm2i(3)
-               call torque (i,ttm2,ttm2i,frcxi,frcyi,frczi,dm,dp)
+               call torque (i,ttm2,ttm2i,frcxi,frcyi,frczi)
 c
 c     increment gradient due to force and torque on second site
 c
@@ -853,7 +853,7 @@ c
                dp(1,kk) = dp(1,kk) - ftm2i(1)
                dp(2,kk) = dp(2,kk) - ftm2i(2)
                dp(3,kk) = dp(3,kk) - ftm2i(3)
-               call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk,dm,dp)
+               call torque (k,ttm3,ttm3i,frcxk,frcyk,frczk)
             end if
    10       continue
          end do

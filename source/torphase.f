@@ -19,9 +19,10 @@ c
       subroutine torphase (ft,vt,st)
       implicit none
       integer i,k
-      integer ft(6)
-      real*8 vt(6),st(6)
-      real*8 ampli(6),phase(6)
+      integer ft(*)
+      real*8 ampli(6)
+      real*8 phase(6)
+      real*8 vt(*),st(*)
 c
 c
 c     copy the input fold, amplitude and phase angles

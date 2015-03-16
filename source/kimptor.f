@@ -34,9 +34,9 @@ c
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
       integer size,next
-      integer ft(3)
+      integer ft(6)
       real*8 angle,symm
-      real*8 vt(3),st(3)
+      real*8 vt(6),st(6)
       logical header,done
       character*4 pa,pb,pc,pd
       character*4 zeros
@@ -64,7 +64,7 @@ c
             ib = 0
             ic = 0
             id = 0
-            do j = 1, 3
+            do j = 1, 6
                vt(j) = 0.0d0
                st(j) = 0.0d0
                ft(j) = 0

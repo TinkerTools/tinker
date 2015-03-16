@@ -78,8 +78,8 @@ c
       implicit none
       integer maxion
       parameter (maxion=10)
+      integer ionn
       integer dime(3)
-      integer ionn(maxion)
       integer ionq(maxion)
       real*8 pbe
       real*8 pdie,sdie
