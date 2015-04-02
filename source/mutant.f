@@ -19,8 +19,8 @@ c     class0     atom class of each atom in the initial state system
 c     type1      atom type of each atom in the final state system
 c     class1     atom class of each atom in the final state system
 c     lambda     generic weighting between initial and final states
-c     vlambda    state weighting value for electrostatic potentials
-c     elambda    state weighting value for van der Waals potentials
+c     vlambda    state weighting value for van der Waals potentials
+c     elambda    state weighting value for electrostatic potentials
 c     scexp      scale factor for soft core buffered 14-7 potential
 c     scalpha    scale factor for soft core buffered 14-7 potential
 c     mut        true if an atom is to be mutated, false otherwise

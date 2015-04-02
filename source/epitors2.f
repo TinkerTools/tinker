@@ -20,7 +20,6 @@ c
       use sizes
       use angbnd
       use atoms
-      use deriv
       use group
       use hessn
       use pitors
@@ -31,6 +30,7 @@ c
       integer id,ie,ig
       real*8 eps,fgrp
       real*8 old,term
+      real*8, allocatable :: de(:,:)
       real*8, allocatable :: d0(:,:)
       logical proceed
       logical twosided
@@ -45,6 +45,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (de(3,n))
       allocate (d0(3,n))
 c
 c     compute numerical out-of-plane Hessian for current atom
@@ -69,14 +70,14 @@ c
 c     find first derivatives for the base structure
 c
             if (.not. twosided) then
-               call epitors2a (ipitors)
+               call epitors2a (ipitors,de)
                do j = 1, 3
-                  d0(j,ia) = dept(j,ia)
-                  d0(j,ib) = dept(j,ib)
-                  d0(j,ic) = dept(j,ic)
-                  d0(j,id) = dept(j,id)
-                  d0(j,ie) = dept(j,ie)
-                  d0(j,ig) = dept(j,ig)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  d0(j,ie) = de(j,ie)
+                  d0(j,ig) = de(j,ig)
                end do
             end if
 c
@@ -85,26 +86,26 @@ c
             old = x(i)
             if (twosided) then
                x(i) = x(i) - 0.5d0*eps
-               call epitors2a (ipitors)
+               call epitors2a (ipitors,de)
                do j = 1, 3
-                  d0(j,ia) = dept(j,ia)
-                  d0(j,ib) = dept(j,ib)
-                  d0(j,ic) = dept(j,ic)
-                  d0(j,id) = dept(j,id)
-                  d0(j,ie) = dept(j,ie)
-                  d0(j,ig) = dept(j,ig)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  d0(j,ie) = de(j,ie)
+                  d0(j,ig) = de(j,ig)
                end do
             end if
             x(i) = x(i) + eps
-            call epitors2a (ipitors)
+            call epitors2a (ipitors,de)
             x(i) = old
             do j = 1, 3
-               hessx(j,ia) = hessx(j,ia) + term*(dept(j,ia)-d0(j,ia))
-               hessx(j,ib) = hessx(j,ib) + term*(dept(j,ib)-d0(j,ib))
-               hessx(j,ic) = hessx(j,ic) + term*(dept(j,ic)-d0(j,ic))
-               hessx(j,id) = hessx(j,id) + term*(dept(j,id)-d0(j,id))
-               hessx(j,ie) = hessx(j,ie) + term*(dept(j,ie)-d0(j,ie))
-               hessx(j,ig) = hessx(j,ig) + term*(dept(j,ig)-d0(j,ig))
+               hessx(j,ia) = hessx(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessx(j,ib) = hessx(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessx(j,ic) = hessx(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessx(j,id) = hessx(j,id) + term*(de(j,id)-d0(j,id))
+               hessx(j,ie) = hessx(j,ie) + term*(de(j,ie)-d0(j,ie))
+               hessx(j,ig) = hessx(j,ig) + term*(de(j,ig)-d0(j,ig))
             end do
 c
 c     find numerical y-components via perturbed structures
@@ -112,26 +113,26 @@ c
             old = y(i)
             if (twosided) then
                y(i) = y(i) - 0.5d0*eps
-               call epitors2a (ipitors)
+               call epitors2a (ipitors,de)
                do j = 1, 3
-                  d0(j,ia) = dept(j,ia)
-                  d0(j,ib) = dept(j,ib)
-                  d0(j,ic) = dept(j,ic)
-                  d0(j,id) = dept(j,id)
-                  d0(j,ie) = dept(j,ie)
-                  d0(j,ig) = dept(j,ig)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  d0(j,ie) = de(j,ie)
+                  d0(j,ig) = de(j,ig)
                end do
             end if
             y(i) = y(i) + eps
-            call epitors2a (ipitors)
+            call epitors2a (ipitors,de)
             y(i) = old
             do j = 1, 3
-               hessy(j,ia) = hessy(j,ia) + term*(dept(j,ia)-d0(j,ia))
-               hessy(j,ib) = hessy(j,ib) + term*(dept(j,ib)-d0(j,ib))
-               hessy(j,ic) = hessy(j,ic) + term*(dept(j,ic)-d0(j,ic))
-               hessy(j,id) = hessy(j,id) + term*(dept(j,id)-d0(j,id))
-               hessy(j,ie) = hessy(j,ie) + term*(dept(j,ie)-d0(j,ie))
-               hessy(j,ig) = hessy(j,ig) + term*(dept(j,ig)-d0(j,ig))
+               hessy(j,ia) = hessy(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessy(j,ib) = hessy(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessy(j,ic) = hessy(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessy(j,id) = hessy(j,id) + term*(de(j,id)-d0(j,id))
+               hessy(j,ie) = hessy(j,ie) + term*(de(j,ie)-d0(j,ie))
+               hessy(j,ig) = hessy(j,ig) + term*(de(j,ig)-d0(j,ig))
             end do
 c
 c     find numerical z-components via perturbed structures
@@ -139,26 +140,26 @@ c
             old = z(i)
             if (twosided) then
                z(i) = z(i) - 0.5d0*eps
-               call epitors2a (ipitors)
+               call epitors2a (ipitors,de)
                do j = 1, 3
-                  d0(j,ia) = dept(j,ia)
-                  d0(j,ib) = dept(j,ib)
-                  d0(j,ic) = dept(j,ic)
-                  d0(j,id) = dept(j,id)
-                  d0(j,ie) = dept(j,ie)
-                  d0(j,ig) = dept(j,ig)
+                  d0(j,ia) = de(j,ia)
+                  d0(j,ib) = de(j,ib)
+                  d0(j,ic) = de(j,ic)
+                  d0(j,id) = de(j,id)
+                  d0(j,ie) = de(j,ie)
+                  d0(j,ig) = de(j,ig)
                end do
             end if
             z(i) = z(i) + eps
-            call epitors2a (ipitors)
+            call epitors2a (ipitors,de)
             z(i) = old
             do j = 1, 3
-               hessz(j,ia) = hessz(j,ia) + term*(dept(j,ia)-d0(j,ia))
-               hessz(j,ib) = hessz(j,ib) + term*(dept(j,ib)-d0(j,ib))
-               hessz(j,ic) = hessz(j,ic) + term*(dept(j,ic)-d0(j,ic))
-               hessz(j,id) = hessz(j,id) + term*(dept(j,id)-d0(j,id))
-               hessz(j,ie) = hessz(j,ie) + term*(dept(j,ie)-d0(j,ie))
-               hessz(j,ig) = hessz(j,ig) + term*(dept(j,ig)-d0(j,ig))
+               hessz(j,ia) = hessz(j,ia) + term*(de(j,ia)-d0(j,ia))
+               hessz(j,ib) = hessz(j,ib) + term*(de(j,ib)-d0(j,ib))
+               hessz(j,ic) = hessz(j,ic) + term*(de(j,ic)-d0(j,ic))
+               hessz(j,id) = hessz(j,id) + term*(de(j,id)-d0(j,id))
+               hessz(j,ie) = hessz(j,ie) + term*(de(j,ie)-d0(j,ie))
+               hessz(j,ig) = hessz(j,ig) + term*(de(j,ig)-d0(j,ig))
             end do
          end if
       end do
@@ -181,7 +182,7 @@ c     "epitors2a" calculates the pi-orbital torsion first derivatives;
 c     used in computation of finite difference second derivatives
 c
 c
-      subroutine epitors2a (i)
+      subroutine epitors2a (i,de)
       use sizes
       use atoms
       use bound
@@ -226,6 +227,7 @@ c
       real*8 dedxig,dedyig,dedzig
       real*8 dedxip,dedyip,dedzip
       real*8 dedxiq,dedyiq,dedziq
+      real*8 de(3,*)
 c
 c
 c     set the atom numbers for this pi-orbital torsion
@@ -381,24 +383,24 @@ c
 c
 c     increment the total pi-orbital torsion energy and gradient
 c
-         dept(1,ia) = dedxia
-         dept(2,ia) = dedyia
-         dept(3,ia) = dedzia
-         dept(1,ib) = dedxib
-         dept(2,ib) = dedyib
-         dept(3,ib) = dedzib
-         dept(1,ic) = dedxic
-         dept(2,ic) = dedyic
-         dept(3,ic) = dedzic
-         dept(1,id) = dedxid
-         dept(2,id) = dedyid
-         dept(3,id) = dedzid
-         dept(1,ie) = dedxie
-         dept(2,ie) = dedyie
-         dept(3,ie) = dedzie
-         dept(1,ig) = dedxig
-         dept(2,ig) = dedyig
-         dept(3,ig) = dedzig
+         de(1,ia) = dedxia
+         de(2,ia) = dedyia
+         de(3,ia) = dedzia
+         de(1,ib) = dedxib
+         de(2,ib) = dedyib
+         de(3,ib) = dedzib
+         de(1,ic) = dedxic
+         de(2,ic) = dedyic
+         de(3,ic) = dedzic
+         de(1,id) = dedxid
+         de(2,id) = dedyid
+         de(3,id) = dedzid
+         de(1,ie) = dedxie
+         de(2,ie) = dedyie
+         de(3,ie) = dedzie
+         de(1,ig) = dedxig
+         de(2,ig) = dedyig
+         de(3,ig) = dedzig
       end if
       return
       end
