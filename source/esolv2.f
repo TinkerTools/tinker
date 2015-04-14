@@ -59,6 +59,12 @@ c
             call egb2a (i)
          end if
       end if
+c
+c     use full numerical Hessian values for GK solvation
+c
+      if (use_born .and. solvtyp(1:2).eq.'GK') then
+         call egk2 (i)
+      end if
       return
       end
 c
@@ -347,5 +353,192 @@ c
             end do
          end if
       end do
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine egk2  --  generalized Kirkwood Hessian matrix  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "egk2" calculates second derivatives of the generalized
+c     Kirkwood implicit solvation energy
+c
+c
+      subroutine egk2 (i)
+      use sizes
+      use atoms
+      use deriv
+      use hessn
+      use mpole
+      use potent
+      implicit none
+      integer i,j,k
+      integer nlist
+      integer, allocatable :: list(:)
+      real*8 eps,old
+      real*8, allocatable :: d0(:,:)
+      logical prior
+      logical biglist
+      logical reinduce
+      logical twosided
+c
+c
+c     set the default stepsize and flag for induced dipoles
+c
+      eps = 1.0d-5
+      biglist = .false.
+      reinduce = .false.
+      twosided = .false.
+      if (n .le. 300) then
+         biglist = .true.
+         reinduce = .true.
+         twosided = .true.
+      end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(npole))
+      allocate (d0(3,n))
+c
+c     perform dynamic allocation of some global arrays
+c
+      prior = .false.
+      if (allocated(des)) then
+         prior = .true.
+         if (size(des) .lt. 3*n) then
+            deallocate (des)
+         end if
+      end if
+      if (.not. allocated(des))  allocate (des(3,n))
+c
+c     find the multipole definitions involving the current atom;
+c     results in a faster but approximate Hessian calculation
+c
+      nlist = 0
+      do k = 1, npole
+         if (biglist .or. ipole(k).eq.i .or. zaxis(k).eq.i
+     &          .or. xaxis(k).eq.i .or. yaxis(k).eq.i) then
+            nlist = nlist + 1
+            list(nlist) = k
+         end if
+      end do
+c
+c     get multipole first derivatives for the base structure
+c
+      if (.not. twosided) then
+         call egk2a (nlist,list,reinduce)
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = des(j,k)
+            end do
+         end do
+      end if
+c
+c     find numerical x-components via perturbed structures
+c
+      old = x(i)
+      if (twosided) then
+         x(i) = x(i) - 0.5d0*eps
+         call egk2a (nlist,list,reinduce)
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = des(j,k)
+            end do
+         end do
+      end if
+      x(i) = x(i) + eps
+      call egk2a (nlist,list,reinduce)
+      x(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessx(j,k) = hessx(j,k) + (des(j,k)-d0(j,k))/eps
+         end do
+      end do
+c
+c     find numerical y-components via perturbed structures
+c
+      old = y(i)
+      if (twosided) then
+         y(i) = y(i) - 0.5d0*eps
+         call egk2a (nlist,list,reinduce)
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = des(j,k)
+            end do
+         end do
+      end if
+      y(i) = y(i) + eps
+      call egk2a (nlist,list,reinduce)
+      y(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessy(j,k) = hessy(j,k) + (des(j,k)-d0(j,k))/eps
+         end do
+      end do
+c
+c     find numerical z-components via perturbed structures
+c
+      old = z(i)
+      if (twosided) then
+         z(i) = z(i) - 0.5d0*eps
+         call egk2a (nlist,list,reinduce)
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = des(j,k)
+            end do
+         end do
+      end if
+      z(i) = z(i) + eps
+      call egk2a (nlist,list,reinduce)
+      z(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessz(j,k) = hessz(j,k) + (des(j,k)-d0(j,k))/eps
+         end do
+      end do
+c
+c     perform deallocation of some global arrays
+c
+      if (.not. prior) then
+         deallocate (des)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (d0)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine egk2a  --  generalized Kirkwood Hessian; numer  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "egk2a" uses finite differences to compute second derivatives
+c     of the generalized Kirkwood implicit solvation energy
+c
+c     note this version is very simple, and just makes full calls
+c     to the gradient; see the empole2 routine for a better method
+c     computing the multipole and polarization Hessian
+c
+c
+      subroutine egk2a (nlist,list,reinduce)
+      implicit none
+      integer nlist
+      integer list(*)
+      logical reinduce
+c
+c
+c     get the GK solvation gradient via a full gradient call
+c
+      call esolv1
       return
       end

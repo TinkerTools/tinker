@@ -29,10 +29,10 @@ c     minimizations, accuracy of vibrational frequencies, etc.
 c
 c     the "twosided" flag controls use of one-sided vs. two-sided
 c     numerical derivatives; setting the flag to "true" gives a more
-c     accurate Hessian at the expense of 50% additional computation
+c     accurate Hessian at the expense of doubling computation time
 c
 c     in the current version, all of the above accuracy improvements
-c     are turned on for systems containing 100 atoms or fewer
+c     are turned on for systems containing 300 atoms or fewer
 c
 c
       subroutine empole2 (i)
@@ -48,6 +48,7 @@ c
       integer, allocatable :: list(:)
       real*8 eps,old
       real*8, allocatable :: d0(:,:)
+      logical prior
       logical biglist
       logical reinduce
       logical twosided
@@ -59,15 +60,22 @@ c
       biglist = .false.
       reinduce = .false.
       twosided = .false.
-      if (n .le. 100) then
+      if (n .le. 300) then
          biglist = .true.
          reinduce = .true.
          twosided = .true.
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(npole))
+      allocate (d0(3,n))
+c
 c     perform dynamic allocation of some global arrays
 c
+      prior = .false.
       if (allocated(dem)) then
+         prior = .true.
          if (size(dem) .lt. 3*n) then
             deallocate (dem)
             deallocate (dep)
@@ -75,11 +83,6 @@ c
       end if
       if (.not. allocated(dem))  allocate (dem(3,n))
       if (.not. allocated(dep))  allocate (dep(3,n))
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (list(npole))
-      allocate (d0(3,n))
 c
 c     find the multipole definitions involving the current atom;
 c     results in a faster but approximate Hessian calculation
@@ -166,6 +169,13 @@ c
             hessz(j,k) = hessz(j,k) + (dem(j,k)+dep(j,k)-d0(j,k))/eps
          end do
       end do
+c
+c     perform deallocation of some global arrays
+c
+      if (.not. prior) then
+         deallocate (dem)
+         deallocate (dep)
+      end if
 c
 c     perform deallocation of some local arrays
 c

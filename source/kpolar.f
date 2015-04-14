@@ -196,7 +196,6 @@ c
 c
 c     turn off polarizable multipole potential if it is not used
 c
-      if (.not. use_polar)  npolar = 0
       if (npole .eq. 0)  use_mpole = .false.
       if (npolar .eq. 0)  use_polar = .false.
 c
