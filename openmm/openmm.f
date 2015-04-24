@@ -13,6 +13,9 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
+c     ommhandle   opaque handle pointing to OpenMM data structure
+c
+c
       module openmm
       implicit none
       integer*8 ommhandle

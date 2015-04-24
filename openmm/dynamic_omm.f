@@ -245,6 +245,12 @@ c
       call shakeup
       call mdinit
 c
+c     get TINKER energy/gradient values for initial structure
+c
+      allocate (derivs(3,n))
+      call gradient (e,derivs)
+      deallocate (derivs)
+c
 c     map TINKER data structures to OpenMM wrapper structures
 c
       call map_tinker_to_openmm ()
@@ -253,12 +259,9 @@ c     check required potentials forces are available in OpenMM
 c
       call openmm_init (ommHandle,dt)
 c
-c     get TINKER energy/gradient values and compare to OpenMM
+c     compare the TINKER and OpenMM energy/gradient values
 c
-      allocate (derivs(3,n))
-      call gradient (e,derivs)
       call openmm_test ()
-      deallocate (derivs)
 c
 c     print out a header line for the dynamics computation
 c

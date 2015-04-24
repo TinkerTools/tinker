@@ -53,6 +53,7 @@ c
       integer lext,freeunit
       real*8 e,ekt,qterm
       real*8 maxwell,speed
+      real*8 amass,gmass
       real*8 hmax,hmass
       real*8 sum,dmass
       real*8 vec(3)
@@ -399,7 +400,8 @@ c     set translational velocities for rigid body dynamics
 c
       else if (integrate .eq. 'RIGIDBODY') then
          do i = 1, ngrp
-            speed = maxwell (grpmass(i),kelvin)
+            gmass = grpmass(i)
+            speed = maxwell (gmass,kelvin)
             call ranvec (vec)
             do j = 1, 3
                vcm(j,i) = speed * vec(j)
@@ -415,8 +417,9 @@ c
          allocate (derivs(3,n))
          call gradslow (e,derivs)
          do i = 1, n
-            if (use(i) .and. mass(i).ne.0.0d0) then
-               speed = maxwell (mass(i),kelvin)
+            amass = mass(i)
+            if (use(i) .and. amass.ne.0.0d0) then
+               speed = maxwell (amass,kelvin)
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
@@ -431,9 +434,10 @@ c
          end do
          call gradfast (e,derivs)
          do i = 1, n
-            if (use(i) .and. mass(i).ne.0.0d0) then
+            amass = mass(i)
+            if (use(i) .and. amass.ne.0.0d0) then
                do j = 1, 3
-                  aalt(j,i) = -convert * derivs(j,i) / mass(i)
+                  aalt(j,i) = -convert * derivs(j,i) / amass
                end do
             else
                do j = 1, 3
@@ -450,12 +454,13 @@ c
          allocate (derivs(3,n))
          call gradient (e,derivs)
          do i = 1, n
-            if (use(i) .and. mass(i).ne.0.0d0) then
-               speed = maxwell (mass(i),kelvin)
+            amass = mass(i)
+            if (use(i) .and. amass.ne.0.0d0) then
+               speed = maxwell (amass,kelvin)
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
-                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  a(j,i) = -convert * derivs(j,i) / amass
                   aalt(j,i) = a(j,i)
                end do
             else

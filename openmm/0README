@@ -8,7 +8,9 @@
           files should be copied into the /source directory of a clean
           distribution of TINKER. The provided Makefile can then be
           used, after minor editing, to build a dynamic_omm.x executable.
-          The Makefile assumes OpenMM 6.2.0 is present in its default
-          location, /usr/local/openmm. NVIDIA CUDA must be installed on
-          the target machine, as well as  a CUDA-capable graphics card.
+          The Makefile assumes OpenMM is found in its default location,
+          /usr/local/openmm. NVIDIA CUDA must be installed on the target
+          machine, as well as a CUDA-capable graphics card. This code
+          has been tested with later releases of OpenMM 6.2, and should
+          also work with more recent versions of OpenMM.
 

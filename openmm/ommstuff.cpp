@@ -22,9 +22,7 @@
 #include <fstream>
 using namespace std;
 
-// #define AMOEBA_DEBUG
-
-// To convert from .c to .cpp, many things must be enclosed in extern "C" {}
+// to convert from .c to .cpp, many things must be enclosed in extern "C" {}
 
 extern "C" { 
     void kinetic_(double*, double(*)[3][3]); 
@@ -32,6 +30,7 @@ extern "C" {
     void mdsave_(int*, double*, double*, double*);
     void ewca1_(double*);
     void born_();
+    void bounds_();
     void empole1_();
     void egk1_();
     void enp1_(double*, double*);
@@ -1281,14 +1280,11 @@ struct ConstraintMap {
     int* constraintCount;   // number of constraints for atom i
     int* constraintList;    // list of constraints sorted by atom index
      
-/* 
-    For constraint involving atom i and j with i < j
-        constraintList[offset+kk] = j
-    where offset=constraintOffset[i], and 0 <= kk < constraintCount[i]
-    Note: one constraintOffset or constraintCount could be eliminated
-    since constraintCount[i] = constraintOffset[i+1] - constraintOffset[i]
-*/
-
+    // For constraint involving atom i and j with i < j,
+    //     constraintList[offset+kk] = j
+    // where offset=constraintOffset[i], and 0 <= kk < constraintCount[i]
+    // Note: one constraintOffset or constraintCount could be eliminated
+    // since constraintCount[i] = constraintOffset[i+1] - constraintOffset[i]
 };
 
 static void freeConstraintMap (struct ConstraintMap* map) {
@@ -2047,17 +2043,18 @@ static void setupAndersenThermostat (OpenMM_System* system, FILE* log) {
     andersenThermostat = OpenMM_AndersenThermostat_create (bath__.kelvin,
                                                            bath__.collide);
     OpenMM_System_addForce (system, (OpenMM_Force*) andersenThermostat);
+
     if (log) {
-        (void) fprintf( log, "\n Andersen Thermostat\n" );
-        (void) fprintf( log, "               Temperature: %15.7e K\n",
-           OpenMM_AndersenThermostat_getDefaultTemperature
-                          (andersenThermostat));
-        (void) fprintf( log, "       Collision Frequency: %15.7e ps^(-1)\n",
-           OpenMM_AndersenThermostat_getDefaultCollisionFrequency
-                          (andersenThermostat));
-        (void) fprintf( log, "        Random Number Seed: %d\n",
-           OpenMM_AndersenThermostat_getRandomNumberSeed
-                          (andersenThermostat));
+        (void) fprintf (log, "\n Andersen Thermostat:\n" );
+        (void) fprintf (log, "\n Temperature          %15.4f K",
+                        OpenMM_AndersenThermostat_getDefaultTemperature
+                        (andersenThermostat));
+        (void) fprintf (log, "\n Collision Frequency  %15.7e ps^(-1)",
+                        OpenMM_AndersenThermostat_getDefaultCollisionFrequency
+                        (andersenThermostat));
+        (void) fprintf (log, "\n Random Number Seed     %d\n",
+                        OpenMM_AndersenThermostat_getRandomNumberSeed
+                        (andersenThermostat));
     }
 }
 
@@ -2071,15 +2068,19 @@ static void setupMonteCarloBarostat (OpenMM_System* system, FILE* log) {
     OpenMM_System_addForce (system, (OpenMM_Force*) monteCarloBarostat);
 
     if (log) {
-        (void) fprintf (log, "\n MonteCarlo Barostat\n");
-        (void) fprintf (log, "               Temperature: %15.7e K\n",
-           OpenMM_MonteCarloBarostat_getTemperature (monteCarloBarostat));
-        (void) fprintf( log, "                  Pressure: %15.7e atm\n",
-           OpenMM_MonteCarloBarostat_getDefaultPressure (monteCarloBarostat));
-        (void) fprintf( log, "                 Frequency: %d\n",
-           OpenMM_MonteCarloBarostat_getFrequency (monteCarloBarostat));
-        (void) fprintf( log, "        Random Number Seed: %d\n",
-           OpenMM_MonteCarloBarostat_getRandomNumberSeed (monteCarloBarostat));
+        (void) fprintf (log, "\n MonteCarlo Barostat:\n");
+        (void) fprintf (log, "\n Temperature          %15.4f K",
+                        OpenMM_MonteCarloBarostat_getTemperature
+                        (monteCarloBarostat));
+        (void) fprintf (log, "\n Pressure             %15.4f atm",
+                        OpenMM_MonteCarloBarostat_getDefaultPressure
+                        (monteCarloBarostat));
+        (void) fprintf (log, "\n Frequency              %d",
+                        OpenMM_MonteCarloBarostat_getFrequency
+                        (monteCarloBarostat));
+        (void) fprintf (log, "\n Random Number Seed     %d\n",
+                        OpenMM_MonteCarloBarostat_getRandomNumberSeed
+                        (monteCarloBarostat));
     }
 }
 
@@ -2365,16 +2366,6 @@ static void setupAmoebaGeneralizedKirkwoodForce (OpenMM_System* system,
  *    ############################################################
  */
 
-static void setupConstraints (OpenMM_System* system, FILE* log) {
-
-    int ii;
-    for (ii = 0; ii < freeze__.nrat; ii++) {
-        OpenMM_System_addConstraint (system, *(freeze__.irat+2*ii) -1,
-                                     *(freeze__.irat + 2*ii +1)-1,
-                            (*(freeze__.krat +ii))*OpenMM_NmPerAngstrom);
-    }
-}
-
 static void setupPositions (OpenMM_Vec3Array* initialPosInNm, FILE* log) {
 
     int ii;
@@ -2393,14 +2384,21 @@ static void setupVelocities (OpenMM_Vec3Array* initialVelInNm, FILE* log) {
     for (ii = 0; ii < atoms__.n; ii++) {
         OpenMM_Vec3 velInNm;
         int offset;
-
         offset = 3*ii;
-
-        velInNm.x = moldyn__.v[offset  ]*OpenMM_NmPerAngstrom;
+        velInNm.x = moldyn__.v[offset]*OpenMM_NmPerAngstrom;
         velInNm.y = moldyn__.v[offset+1]*OpenMM_NmPerAngstrom;
         velInNm.z = moldyn__.v[offset+2]*OpenMM_NmPerAngstrom;
-
         OpenMM_Vec3Array_append (initialVelInNm, velInNm);
+    }
+}
+
+static void setupConstraints (OpenMM_System* system, FILE* log) {
+
+    int ii;
+    for (ii = 0; ii < freeze__.nrat; ii++) {
+        OpenMM_System_addConstraint (system, *(freeze__.irat+2*ii) -1,
+                                     *(freeze__.irat + 2*ii +1)-1,
+                            (*(freeze__.krat +ii))*OpenMM_NmPerAngstrom);
     }
 }
 
@@ -2578,11 +2576,9 @@ void openmm_init_ (void** ommHandle, double* dt) {
         setupAndersenThermostat (omm->system, log);
     }
 
-    // setup of constraints
+    // setup of constraints, positions and velocities
 
-    setupConstraints (omm->system, log);
-
-    // setup of positions
+    setupConstraints (omm->system, log) ;
 
     initialPosInNm = OpenMM_Vec3Array_create (0);
     setupPositions (initialPosInNm, log);
@@ -2592,8 +2588,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
     // Choose an Integrator, and a Context connecting the System with the
     // Integrator. Let the Context choose the best available Platform.
-    // Initialize the configuration from the default positions collected
-    // above. Initial velocities will be zero, but could have been set here.
+    // Initialize the configuration from default positions collected above.
 
     setNullTerminator (mdstuf__.integrate, 10, buffer);
     if (strncasecmp (buffer, "VERLET", 6) == 0) {
@@ -2607,12 +2602,12 @@ void openmm_init_ (void** ommHandle, double* dt) {
     } else if (strncasecmp (buffer, "STOCHASTIC", 10) == 0) {
 
         if (log) {
-            (void) fprintf (log, "StochasticInegrator\n");
-            (void) fprintf (log, "                       T: %12.4f K\n",
+            (void) fprintf (log, "\n Stochastic Integrator:\n");
+            (void) fprintf (log, "\n Temperature          %15.4f K",
                                 bath__.kelvin );
-            (void) fprintf (log, "                friction: %12.4f ps^(-1)\n",
+            (void) fprintf (log, "\n Friction             %15.4f ps^(-1)",
                                 stodyn__.friction );
-            (void) fprintf (log, "                timestep: %7.4f ps\n\n",
+            (void) fprintf (log, "\n TimeStep             %15.4f ps\n",
                                 *dt );
             (void) fflush (log);
         }
@@ -2630,45 +2625,44 @@ void openmm_init_ (void** ommHandle, double* dt) {
     if (platform == NULL) {
         exit (-1);
     }
+
     omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
                                             platform);
+    //(void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
+    //(void) fprintf (log, "\n Integrator:  %x\n", (void*)(omm->integrator));
+
     OpenMM_Context_setPositions (omm->context, initialPosInNm);
     OpenMM_Context_setVelocities (omm->context, initialVelInNm);
-
-#ifdef AMOEBA_DEBUG
     {
         int arraySz;
         int maxPrint;
         double x1, x2, x3;
         double v1, v2, v3;
-        (void) fprintf (stderr, "OpenMMDataHandle: %x\n", (void*)(omm));
-        (void) fprintf (stderr, "Integrator: %x\n", (void*)(omm->integrator));
         arraySz = OpenMM_Vec3Array_getSize (initialPosInNm);
-        maxPrint = 10;
-        (void) fprintf (stderr, "Sample Initial Positions and Velocities %d\n",
-                        arraySz); 
+        maxPrint = 5;
+        (void) fprintf (log, "\n Initial Positions and Velocities:\n\n"); 
         for (ii = 0; ii < arraySz; ii++)
         {
-            x1 = (*OpenMM_Vec3Array_get( initialPosInNm, ii)).x
+            x1 = (*OpenMM_Vec3Array_get(initialPosInNm, ii)).x
                       / OpenMM_NmPerAngstrom;
-            x2 = (*OpenMM_Vec3Array_get( initialPosInNm, ii)).y
+            x2 = (*OpenMM_Vec3Array_get(initialPosInNm, ii)).y
                       / OpenMM_NmPerAngstrom;
-            x3 = (*OpenMM_Vec3Array_get( initialPosInNm, ii)).z
+            x3 = (*OpenMM_Vec3Array_get(initialPosInNm, ii)).z
                       / OpenMM_NmPerAngstrom;
-            v1 = (*OpenMM_Vec3Array_get( initialVelInNm, ii)).x
+            v1 = (*OpenMM_Vec3Array_get(initialVelInNm, ii)).x
                       / OpenMM_NmPerAngstrom;
-            v2 = (*OpenMM_Vec3Array_get( initialVelInNm, ii)).y
+            v2 = (*OpenMM_Vec3Array_get(initialVelInNm, ii)).y
                       / OpenMM_NmPerAngstrom;
-            v3 = (*OpenMM_Vec3Array_get( initialVelInNm, ii)).z
+            v3 = (*OpenMM_Vec3Array_get(initialVelInNm, ii)).z
                      / OpenMM_NmPerAngstrom;
-            (void) fprintf( stderr,
-                       "%6d [%15.7e %15.7e %15.7e] [%15.7e %15.7e %15.7e]\n", 
-                       ii+1, x1, x2, x3, v1, v2, v3);
-            if (ii == maxPrint && ii < (arraySz-maxPrint))
-                ii = arraySz - maxPrint;
+            (void) fprintf (log, "%7d  POS    %16.7e %16.7e %16.7e\n",
+                            ii+1, x1, x2, x3);
+            (void) fprintf (log, "%7d  VEL    %16.7e %16.7e %16.7e\n",
+                            ii+1, v1, v2, v3);
+            if (ii == maxPrint-1 && ii < (arraySz-maxPrint-1))
+                ii = arraySz - maxPrint - 1;
         }
     }
-#endif
 
     *ommHandle = (void*) omm;
 }
@@ -2691,6 +2685,7 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
     OpenMM_State* state;
     const OpenMM_Vec3Array* positionArray;
     const OpenMM_Vec3Array* velocityArray;
+    const OpenMM_Vec3Array* forceArray;
     OpenMM_Vec3 aBox;
     OpenMM_Vec3 bBox;
     OpenMM_Vec3 cBox;
@@ -2698,15 +2693,17 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
     int ii;
     int offset;
     int debug = 0;
+    double amass;
+    double positionConvert;
+    double velocityConvert;
+    double forceConvert;
     OpenMMData* openMMDataHandle;
 
     openMMDataHandle = (OpenMMData*) (*omm);
 
     infoMask = OpenMM_State_Positions;
     infoMask += OpenMM_State_Velocities;
-    if (debug) {
-        infoMask += OpenMM_State_Forces;    
-    }
+    infoMask += OpenMM_State_Forces;    
     infoMask += OpenMM_State_Energy;
 
     // State object is created here and must be explicitly destroyed below
@@ -2724,40 +2721,56 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
     *(boxes__.ybox2) = 0.5 * (*(boxes__.ybox));
     *(boxes__.zbox2) = 0.5 * (*(boxes__.zbox));
 
-    // Positions and velocities are maintained as Vec3Arrays inside the
-    // State. This gives us access, but don't destroy them yourself
-    // as they will go away with the State
+    // Positions, velocities and forces are maintained as Vec3Arrays
+    // inside the State. This gives us access, but don't destroy them
+    // yourself as they will go away with the State
+
+    positionConvert = 1.0 / OpenMM_NmPerAngstrom;
+    velocityConvert = 1.0 / OpenMM_NmPerAngstrom;
+    forceConvert = 10.0;
 
     positionArray = OpenMM_State_getPositions (state);
+    velocityArray = OpenMM_State_getVelocities (state);
+    forceArray = OpenMM_State_getForces (state);
+
     for (ii = 0; ii < atoms__.n; ii++) {
         atoms__.x[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).x
-                             / OpenMM_NmPerAngstrom;
+                             * positionConvert;
         atoms__.y[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).y
-                             / OpenMM_NmPerAngstrom;
+                             * positionConvert;
         atoms__.z[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).z
-                             / OpenMM_NmPerAngstrom;
+                             * positionConvert;
     }
 
-    velocityArray = OpenMM_State_getVelocities (state);
     for (ii = 0; ii < atoms__.n; ii++) {
         offset = 3*ii;
         moldyn__.v[offset] = (*OpenMM_Vec3Array_get(velocityArray, ii)).x
-                                  / OpenMM_NmPerAngstrom;
+                                  * velocityConvert;
         moldyn__.v[offset+1] = (*OpenMM_Vec3Array_get(velocityArray, ii)).y
-                                    / OpenMM_NmPerAngstrom;
+                                    * velocityConvert;
         moldyn__.v[offset+2] = (*OpenMM_Vec3Array_get(velocityArray, ii)).z
-                                    / OpenMM_NmPerAngstrom;
+                                    * velocityConvert;
     }
 
-    if( debug ){
+    for (ii = 0; ii < atoms__.n; ii++) {
+        offset = 3*ii;
+        amass = 1.0 / atomid__.mass[ii];
+        moldyn__.a[offset] = (*OpenMM_Vec3Array_get(forceArray, ii)).x
+                                    * amass * forceConvert;
+        moldyn__.a[offset+1] = (*OpenMM_Vec3Array_get(forceArray, ii)).y
+                                    * amass * forceConvert;
+        moldyn__.a[offset+2] = (*OpenMM_Vec3Array_get(forceArray, ii)).z
+                                    * amass * forceConvert;
+    }
 
-        const OpenMM_Vec3Array* forceArray;
+    for (ii = 0; ii < atoms__.n; ii++) {
+        offset = 3*ii;
+        moldyn__.aalt[offset] = 0.0;
+        moldyn__.aalt[offset+1] = 0.0;
+        moldyn__.aalt[offset+2] = 0.0;
+    }
 
-        double positionConversion = 1.0 / OpenMM_NmPerAngstrom;
-        double velocityConversion = 1.0 / OpenMM_NmPerAngstrom;
-        double forceConversion = OpenMM_NmPerAngstrom / OpenMM_KcalPerKJ;
-
-        forceArray = OpenMM_State_getForces (state);
+    if (debug ) {
 
         (void) fprintf (stderr, "State: E=%15.7e [%15.7e %15.7e] t=%15.7e ps\n",
                             (*kineticEnergyInKcal + *potentialEnergyInKcal),
@@ -2765,16 +2778,18 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
                             *timeInPs);
 
         for (ii = 0; ii < atoms__.n; ii++) {
-            (void) fprintf (stderr, "%6d x[%15.7e %15.7e %15.7e] v[%15.7e %15.7e %15.7e] f[%15.7e %15.7e %15.7e]\n", ii,
-                (*OpenMM_Vec3Array_get(positionArray,ii)).x*positionConversion,
-                (*OpenMM_Vec3Array_get(positionArray,ii)).y*positionConversion,
-                (*OpenMM_Vec3Array_get(positionArray,ii)).z*positionConversion,
-                (*OpenMM_Vec3Array_get(velocityArray,ii)).x*velocityConversion,
-                (*OpenMM_Vec3Array_get(velocityArray,ii)).y*velocityConversion,
-                (*OpenMM_Vec3Array_get(velocityArray,ii)).z*velocityConversion,
-                (*OpenMM_Vec3Array_get(forceArray,ii)).x*forceConversion,
-                (*OpenMM_Vec3Array_get(forceArray,ii)).y*forceConversion,
-                (*OpenMM_Vec3Array_get(forceArray,ii)).z*forceConversion );
+            (void) fprintf (stderr, "%7d  POS    %16.7e %16.7e %16.7e\n", ii+1,
+                (*OpenMM_Vec3Array_get(positionArray,ii)).x*positionConvert,
+                (*OpenMM_Vec3Array_get(positionArray,ii)).y*positionConvert,
+                (*OpenMM_Vec3Array_get(positionArray,ii)).z*positionConvert);
+            (void) fprintf (stderr, "%7d  VEL    %16.7e %16.7e %16.7e\n", ii+1,
+                (*OpenMM_Vec3Array_get(velocityArray,ii)).x*velocityConvert,
+                (*OpenMM_Vec3Array_get(velocityArray,ii)).y*velocityConvert,
+                (*OpenMM_Vec3Array_get(velocityArray,ii)).z*velocityConvert);
+            (void) fprintf (stderr, "%7d  FRC    %16.7e %16.7e %16.7e\n", ii+1,
+                (*OpenMM_Vec3Array_get(forceArray,ii)).x*forceConvert,
+                (*OpenMM_Vec3Array_get(forceArray,ii)).y*forceConvert,
+                (*OpenMM_Vec3Array_get(forceArray,ii)).z*forceConvert);
         }
         (void) fflush (stderr);
     }
@@ -2807,11 +2822,16 @@ void openmm_update_ (void** omm, double* dt, int* istep,
     OpenMM_State* state;
     const OpenMM_Vec3Array* positionArray;
     const OpenMM_Vec3Array* velocityArray;
+    const OpenMM_Vec3Array* forceArray;
     OpenMM_Vec3 aBox;
     OpenMM_Vec3 bBox;
     OpenMM_Vec3 cBox;
     int infoMask;
     int ii;
+    double amass;
+    double positionConvert;
+    double velocityConvert;
+    double forceConvert;
 
     static const double gasconst = 1.98720415e-3;
     int debug = 0;
@@ -2824,9 +2844,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
 
     infoMask = OpenMM_State_Positions;
     infoMask += OpenMM_State_Velocities;
-    if (debug) {
-        infoMask += OpenMM_State_Forces;    
-    }
+    infoMask += OpenMM_State_Forces;    
     infoMask += OpenMM_State_Energy;
 
     // state object is created here and must be destroyed below
@@ -2842,32 +2860,55 @@ void openmm_update_ (void** omm, double* dt, int* istep,
     *(boxes__.ybox2) = 0.5 * (*(boxes__.ybox));
     *(boxes__.zbox2) = 0.5 * (*(boxes__.zbox));
 
-    // fprintf( stderr, "openmm_update_ %15.7e %15.7e %15.7e %15.7e %15.7e %15.7e \n",
+    // fprintf (stderr, "openmm_update_ %15.7e %15.7e %15.7e %15.7e %15.7e %15.7e \n",
     // *(boxes__.xbox), *(boxes__.ybox), *(boxes__.zbox),
     // aBox.x, bBox.y, cBox.z );
 
     // load positions/velocities and energies
 
+    positionConvert = 1.0 / OpenMM_NmPerAngstrom;
+    velocityConvert = 1.0 / OpenMM_NmPerAngstrom;
+    forceConvert = 10.0;
+
     positionArray = OpenMM_State_getPositions (state);
     velocityArray = OpenMM_State_getVelocities (state);
+    forceArray = OpenMM_State_getForces (state);
 
     for (ii = 0; ii < atoms__.n; ii++) {
         atoms__.x[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).x
-                            / OpenMM_NmPerAngstrom;
+                            * positionConvert;
         atoms__.y[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).y
-                            / OpenMM_NmPerAngstrom;
+                            * positionConvert;
         atoms__.z[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).z
-                            / OpenMM_NmPerAngstrom;
+                            * positionConvert;
     }
 
     for (ii = 0; ii < atoms__.n; ii++) {
         int offset = ii*3;
         moldyn__.v[offset] = (*OpenMM_Vec3Array_get(velocityArray, ii)).x
-                                 / OpenMM_NmPerAngstrom;
+                                  * velocityConvert;
         moldyn__.v[offset+1] = (*OpenMM_Vec3Array_get(velocityArray, ii)).y
-                                   / OpenMM_NmPerAngstrom;
+                                    * velocityConvert;
         moldyn__.v[offset+2] = (*OpenMM_Vec3Array_get(velocityArray, ii)).z
-                                   / OpenMM_NmPerAngstrom;
+                                    * velocityConvert;
+    }
+
+    for (ii = 0; ii < atoms__.n; ii++) {
+        int offset = ii*3;
+        amass = 1.0 / atomid__.mass[ii];
+        moldyn__.a[offset] = (*OpenMM_Vec3Array_get(forceArray, ii)).x
+                                  * amass * forceConvert;
+        moldyn__.a[offset+1] = (*OpenMM_Vec3Array_get(forceArray, ii)).y
+                                    * amass * forceConvert;
+        moldyn__.a[offset+2] = (*OpenMM_Vec3Array_get(forceArray, ii)).z
+                                    * amass * forceConvert;
+    }
+
+    for (ii = 0; ii < atoms__.n; ii++) {
+        int offset = ii*3;
+        moldyn__.aalt[offset] = 0.0;
+        moldyn__.aalt[offset+1] = 0.0;
+        moldyn__.aalt[offset+2] = 0.0;
     }
 
     potentialEnergy = (OpenMM_State_getPotentialEnergy(state))
@@ -2877,49 +2918,35 @@ void openmm_update_ (void** omm, double* dt, int* istep,
     totalEnergy = potentialEnergy + kineticEnergy;
  
     if (debug) {
-        const OpenMM_Vec3Array* forceArray;
 
-        double positionConversion = 1.0 / OpenMM_NmPerAngstrom;
-        double velocityConversion = 1.0 / OpenMM_NmPerAngstrom;
-        double forceConversion = OpenMM_NmPerAngstrom / OpenMM_KcalPerKJ;
         double eksum, temp, pres;
         double ekin[3][3];
 
         kinetic_ (&eksum, &ekin);
         temp = 2.0 * eksum / ((double)(mdstuf__.nfree)*gasconst);
 
-        forceArray = OpenMM_State_getForces (state);
-
         (void) fprintf (stderr, "State: E=%15.7e [%15.7e %15.7e] t=%15.7e ps T=%12.5e InitT=%12.3f\n",
                         totalEnergy, potentialEnergy, kineticEnergy,
                         (*dt)*(*istep), temp, bath__.kelvin );
-/*
+
         for (ii = 0; ii < atoms__.n; ii++) {
-            (void) fprintf (stderr, "%6d x[%15.7e %15.7e %15.7e] v[%15.7e %15.7e %15.7e] f[%15.7e %15.7e %15.7e]\n", ii,
-                                (*OpenMM_Vec3Array_get(positionArray, ii)).x
-                                     * positionConversion,
-                                (*OpenMM_Vec3Array_get(positionArray, ii)).y
-                                     * positionConversion,
-                                (*OpenMM_Vec3Array_get(positionArray, ii)).z
-                                     * positionConversion,
-                                (*OpenMM_Vec3Array_get(velocityArray, ii)).x
-                                     * velocityConversion,
-                                (*OpenMM_Vec3Array_get(velocityArray, ii)).y
-                                     * velocityConversion,
-                                (*OpenMM_Vec3Array_get(velocityArray, ii)).z
-                                     * velocityConversion,
-                                (*OpenMM_Vec3Array_get(forceArray, ii)).x
-                                     * forceConversion,
-                                (*OpenMM_Vec3Array_get(forceArray, ii)).y
-                                     * forceConversion,
-                                (*OpenMM_Vec3Array_get(forceArray, ii)).z
-                                     * forceConversion );
+            (void) fprintf (stderr, "%7d  POS    %16.7e %16.7e %16.7e\n", ii+1,
+                (*OpenMM_Vec3Array_get(positionArray,ii)).x*positionConvert,
+                (*OpenMM_Vec3Array_get(positionArray,ii)).y*positionConvert,
+                (*OpenMM_Vec3Array_get(positionArray,ii)).z*positionConvert);
+            (void) fprintf (stderr, "%7d  VEL    %16.7e %16.7e %16.7e\n", ii+1,
+                (*OpenMM_Vec3Array_get(velocityArray,ii)).x*velocityConvert,
+                (*OpenMM_Vec3Array_get(velocityArray,ii)).y*velocityConvert,
+                (*OpenMM_Vec3Array_get(velocityArray,ii)).z*velocityConvert);
+            (void) fprintf (stderr, "%7d  FRC    %16.7e %16.7e %16.7e\n", ii+1,
+                (*OpenMM_Vec3Array_get(forceArray,ii)).x*forceConvert,
+                (*OpenMM_Vec3Array_get(forceArray,ii)).y*forceConvert,
+                (*OpenMM_Vec3Array_get(forceArray,ii)).z*forceConvert);
         }
-*/
         (void) fflush (stderr);
     }
 
-    // call mdstat() or mdsave() if flags are set
+    // make calls to mdstat and/or mdsave if flags are set
 
     if (*callMdStat || *callMdSave) {
         double eksum, temp, pres;
@@ -2932,6 +2959,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
             mdstat_ (istep,dt,&totalEnergy,&potentialEnergy,&eksum,&temp,&pres);
         }
         if (*callMdSave) {
+            bounds_ ();
             mdsave_ (istep,dt,&potentialEnergy,&eksum);
         }
     }
@@ -2970,10 +2998,8 @@ void openmm_get_energies_ (void** omm, double* ke, double* pe ) {
 
     // load positions, velocities and energies
 
-/*
-    positionArray = OpenMM_State_getPositions (state);
-    velocityArray = OpenMM_State_getVelocities (state);
-*/
+    //positionArray = OpenMM_State_getPositions (state);
+    //velocityArray = OpenMM_State_getVelocities (state);
 
     potentialEnergy = (OpenMM_State_getPotentialEnergy (state))
                           * OpenMM_KcalPerKJ;
@@ -3159,7 +3185,7 @@ void openmm_validate_ (int* testingActive) {
 
     // check that requested bond potential type is supported
 
-    if (strncasecmp( bndpot__.bndtyp, "HARMONIC", 8) != 0) {
+    if (strncasecmp (bndpot__.bndtyp, "HARMONIC", 8) != 0) {
         invalid++;
         if (log) {
             (void) fprintf (log, "Only HARMONIC bond potential supported: %s not available\n",
@@ -3167,20 +3193,19 @@ void openmm_validate_ (int* testingActive) {
         }
     }
  
-/*
     // check that requested angle potential type is supported
 
-    for (ii = 0; ii < angle_.nangle; ii++) {
-        if (strncasecmp ("HARMONIC", angpot__.angtyp[ii], 8) != 0 &&
-            strncasecmp ("IN-PLANE", angpot__.angtyp[ii], 8) != 0 ) { 
+    for (ii = 0; ii < angbnd__.nangle; ii++) {
+        if (strncasecmp (angpot__.angtyp + 8*ii, "HARMONIC", 8) != 0 &&
+            strncasecmp (angpot__.angtyp + 8*ii, "IN-PLANE", 8) != 0 ) { 
             invalid++;
             if (log) {
-                 (void) fprintf (log, "Angle Potential=%s not 'HARMONIC' or 'IN-PLANE' at index=%d\n",
-                                 angpot__.angtyp, ii );
+                setNullTerminator (angpot__.angtyp + 8*ii, 8, buffer);
+                (void) fprintf (log, "Only HARMONIC or IN-PLANE angle potential supported: %s not available\n",
+                                buffer);
             }
         }
     }
-*/
 
     // check that scaling parameters agree with hardcoded values
 
@@ -3474,23 +3499,21 @@ int openmm_test_ (void) {
         (void) fprintf (log, "\n Testing TINKER vs OpenMM for AMOEBA:\n");
     }
 
-/*
-    if (log) {
-        (void) fprintf (log, "\n Default OpenMM Plugin Directory: %s\n\n",
-                        OpenMM_Platform_getDefaultPluginsDirectory());
-        (void) fflush (log);
-        pluginList = OpenMM_Platform_loadPluginsFromDirectory
-                         (OpenMM_Platform_getDefaultPluginsDirectory());
-        pluginList = OpenMM_Platform_loadPluginsFromDirectory
-                         (OpenMM_Platform_getDefaultPluginsDirectory());
-        for (ii = 0; ii < OpenMM_StringArray_getSize( pluginList ); ii++) {
-            (void) fprintf (log, " Plugin Library: %s\n",
-                            OpenMM_StringArray_get(pluginList, ii));
-        }
-        (void) fflush (log);
-    }
-    OpenMM_StringArray_destroy (pluginList);
-*/
+    //if (log) {
+    //    (void) fprintf (log, "\n Default OpenMM Plugin Directory: %s\n\n",
+    //                    OpenMM_Platform_getDefaultPluginsDirectory());
+    //    (void) fflush (log);
+    //    pluginList = OpenMM_Platform_loadPluginsFromDirectory
+    //                     (OpenMM_Platform_getDefaultPluginsDirectory());
+    //    pluginList = OpenMM_Platform_loadPluginsFromDirectory
+    //                     (OpenMM_Platform_getDefaultPluginsDirectory());
+    //    for (ii = 0; ii < OpenMM_StringArray_getSize( pluginList ); ii++) {
+    //        (void) fprintf (log, " Plugin Library: %s\n",
+    //                        OpenMM_StringArray_get(pluginList, ii));
+    //    }
+    //    (void) fflush (log);
+    //}
+    //OpenMM_StringArray_destroy (pluginList);
 
     implicitSolventActive = usingImplicitSolvent ();
 
@@ -3619,7 +3642,7 @@ int openmm_test_ (void) {
 
     } else if (potent__.use_angle) {
     
-        // TINKER angle = OpenMM (Angle + InPlaneAngle)
+        // note TINKER angle = OpenMM (Angle + InPlaneAngle)
 
         setupAmoebaAngleForce (system, removeConstrainedCovalentIxns, log);
         setupAmoebaInPlaneAngleForce (system, removeConstrainedCovalentIxns,
@@ -3715,7 +3738,7 @@ int openmm_test_ (void) {
     } else if (potent__.use_solv && implicitSolventActive > 0 &&
                !potent__.use_mpole) {
 
-        // To get TINKER WCA, zero deriv__.des, then call ewca1 
+        // to get TINKER WCA, zero deriv__.des, then call ewca1 
 
         zeroTinkerForce (deriv__.des);
         ewca1_ (&tinkerEnergy);
@@ -3725,7 +3748,7 @@ int openmm_test_ (void) {
 
     } else if (implicitSolventActive > 0 && potent__.use_mpole) {
 
-        // Kirkwood; OpenMM should have cavity term turned off
+        // generalized Kirkwood; OpenMM should have cavity term turned off
 
         double ecav, edisp;
         if (log) { 
@@ -3756,17 +3779,16 @@ int openmm_test_ (void) {
             (void) fprintf (log, "Energies total=%15.7e Gk=%15.7e (cavity=%15.7e dispersion=%15.7e) Multipole=%15.7e\n",
                             tinkerEnergy, *energi__.es, ecav, edisp,
                             *energi__.em + *energi__.ep );
-/*
-            for (ii = 0; ii < atoms__.n; ii++) {
-                fprintf (stderr, "Fs %5d [%15.7e %15.7e %15.7e] [%15.7e %15.7e%15.7e] [%15.7e %15.7e %15.7e]\n",
-                         ii, *(deriv__.des + 3*ii), *(deriv__.des + 3*ii+1),
-                         *(deriv__.des + 3*ii+2), *(deriv__.dem + 3*ii),
-                         *(deriv__.dem + 3*ii+1), *(deriv__.dem + 3*ii+2),
-                         *(deriv__.dep + 3*ii), *(deriv__.dep + 3*ii+1),
-                         *(deriv__.dep + 3*ii+2));
-                         
-            }
-*/
+
+            //for (ii = 0; ii < atoms__.n; ii++) {
+            //    fprintf (stderr, "Fs %5d [%15.7e %15.7e %15.7e] [%15.7e %15.7e%15.7e] [%15.7e %15.7e %15.7e]\n",
+            //             ii, *(deriv__.des + 3*ii), *(deriv__.des + 3*ii+1),
+            //             *(deriv__.des + 3*ii+2), *(deriv__.dem + 3*ii),
+            //             *(deriv__.dem + 3*ii+1), *(deriv__.dem + 3*ii+2),
+            //             *(deriv__.dep + 3*ii), *(deriv__.dep + 3*ii+1),
+            //             *(deriv__.dep + 3*ii+2));
+            //}
+
         }
         if( strncasecmp (polpot__.poltyp, "DIRECT", 6) == 0) {
             testName = "AmoebaKirkwoodDirectTest";
@@ -3808,17 +3830,17 @@ int openmm_test_ (void) {
                                 / OpenMM_KJPerKcal;
 
     conversion = OpenMM_KJPerKcal / OpenMM_NmPerAngstrom;
-/*
-    if (log) {
-        (void) fprintf (log, "\n Unit Conversion (kJ/nm->kcal/Ang):%15.5f\n",
-                        conversion );
-        printDefaultPeriodicBoxVectors (system, log);
-        (void) fflush (log);
-    }
-*/
+
+    //if (log) {
+    //    (void) fprintf (log, "\n Unit Conversion (kJ/nm->kcal/Ang):%15.5f\n",
+    //                    conversion );
+    //    printDefaultPeriodicBoxVectors (system, log);
+    //    (void) fflush (log);
+    //}
+
     conversion = -1.0 / conversion;
 
-    // differences between TINKER and OpenMM forces
+    // find any differences between TINKER and OpenMM forces
 
     maxFDelta = 0.0;
     maxFDeltaIndex = -1;
@@ -3829,9 +3851,9 @@ int openmm_test_ (void) {
     if (log) {
 
         (void) fprintf (log, "\n TINKER vs OpenMM Energy Values:\n");
-        (void) fprintf (log, "\n TINKER Potential Energy:  %18.4f",
+        (void) fprintf (log, "\n TINKER Potential Energy   %18.4f",
                         tinkerEnergy);
-        (void) fprintf (log, "\n OpenMM Potential Energy:  %18.4f\n",
+        (void) fprintf (log, "\n OpenMM Potential Energy   %18.4f\n",
                         openMMPotentialEnergy);
         maxEDelta = fabs(tinkerEnergy - openMMPotentialEnergy);
 

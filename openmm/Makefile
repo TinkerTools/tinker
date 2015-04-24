@@ -92,11 +92,11 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #CXX = icc
 #F77 = ifort
 #LIBS = -lstdc++
-#CFLAGS = -c -axSSE3
-#F77FLAGS = -c -axSSE3 -recursive
-#OPTFLAGS = -O3 -no-ipo -no-prec-div
+#CFLAGS = -c -xHost
+#F77FLAGS = -c -xHost
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
-#RANLIB = echo
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Generic Linux
@@ -105,16 +105,16 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 ##  Compiler: Intel Fortran for Linux 14.0
 ##  Parallel: OpenMP
 
-CC = icc
-CXX = icc
-F77 = ifort
-LIBS = -L. -lfftw3_threads -lfftw3
-CFLAGS = -c -axSSE3
-F77FLAGS = -c -axSSE3 -recursive
-OPTFLAGS = -O3 -no-ipo -no-prec-div -openmp
-LIBFLAGS = -crusv
-RANLIB = echo
-LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
+#CC = icc
+#CXX = icc
+#F77 = ifort
+#LIBS = -L. -lfftw3_threads -lfftw3
+#CFLAGS = -c -xHost
+#F77FLAGS = -c -xHost
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
@@ -139,17 +139,17 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 ##  Compiler: Intel Fortran for Mac 14.0
 ##  Parallel: OpenMP
 
-#CC = icc
-#CXX = icc
-#F77 = ifort
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
-#CFLAGS = -c -axSSSE3
-#F77FLAGS = -c -axSSSE3
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-#            -Wl,-stack_size,0x10000000
+CC = icc
+CXX = icc
+F77 = ifort
+LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+CFLAGS = -c -axSSSE3
+F77FLAGS = -c -axSSSE3
+OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
+LIBFLAGS = -crusv
+RANLIB = ranlib -c
+LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
+            -Wl,-stack_size,0x10000000
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
