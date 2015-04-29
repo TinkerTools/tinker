@@ -100,6 +100,11 @@ c
 c     get polarization energy term for the solvation methods
 c
       if (solvtyp(1:2) .eq. 'GK') then
+         if (.not.use_mpole .and. .not.use_polar) then
+            call chkpole
+            call rotpole
+            call induce
+         end if
          call egk
       else if (solvtyp(1:2) .eq. 'PB') then
          call epb
@@ -1564,7 +1569,7 @@ c
          zi = z(i)
          ri = rdisp(i)
 c
-c     remove  contribution due to solvent displaced by solute atoms
+c     remove contribution due to solvent displaced by solute atoms
 c
          sum = 0.0d0
          do k = 1, n

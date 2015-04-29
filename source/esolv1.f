@@ -113,6 +113,11 @@ c
 c     get polarization energy and derivatives for solvation methods
 c
       if (solvtyp(1:2) .eq. 'GK') then
+         if (.not.use_mpole .and. .not.use_polar) then
+            call chkpole
+            call rotpole
+            call induce
+         end if
          call egk1
       else if (solvtyp(1:2) .eq. 'PB') then
          call epb1
@@ -4827,7 +4832,7 @@ c
          ah = emixh * rmixh7
          ri = rdisp(i)
 c
-c     remove the contribution due to solvent displaced by solute atoms
+c     remove contribution due to solvent displaced by solute atoms
 c
          xi = x(i)
          yi = y(i)

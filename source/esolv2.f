@@ -47,6 +47,16 @@ c
 c     deallocate (aes)
 c     deallocate (des)
 c
+c     setup for generalized Kirkwood solvation only calculation
+c
+      if (solvtyp(1:2) .eq. 'GK') then
+         if (.not.use_mpole .and. .not.use_polar) then
+            call chkpole
+            call rotpole
+            call induce
+         end if
+      end if
+c
 c     get the electrostatic Hessian for GB/SA solvation
 c
       if (use_born .and. solvtyp(1:2).ne.'GK') then
@@ -108,8 +118,8 @@ c
       if (n .le. 300) then
          biglist = .true.
          if (use_born)  reborn = .true.
-         reinduce = .true.
-         twosided = .true.
+         if (use_mpole .or. use_polar)  reinduce = .true.
+         reborn = .true.
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -269,6 +279,11 @@ c
 c     get implicit solvation gradient for finite differences
 c
       if (reborn)  call born
+      if (reinduce) then
+         call chkpole
+         call rotpole
+         call induce
+      end if     
       call esolv1
       return
       end
