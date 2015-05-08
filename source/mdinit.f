@@ -297,6 +297,24 @@ c
          end if
       end if
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (integrate .eq. 'RIGIDBODY') then
+         if (.not. allocated(xcmo))  allocate (xcmo(n))
+         if (.not. allocated(ycmo))  allocate (ycmo(n))
+         if (.not. allocated(zcmo))  allocate (zcmo(n))
+         if (.not. allocated(vcm))  allocate (vcm(3,ngrp))
+         if (.not. allocated(wcm))  allocate (wcm(3,ngrp))
+         if (.not. allocated(lm))  allocate (lm(3,ngrp))
+         if (.not. allocated(vc))  allocate (vc(3,ngrp))
+         if (.not. allocated(wc))  allocate (wc(3,ngrp))
+         if (.not. allocated(linear))  allocate (linear(ngrp))
+      else
+         if (.not. allocated(v))  allocate (v(3,n))
+         if (.not. allocated(a))  allocate (a(3,n))
+         if (.not. allocated(aalt))  allocate (aalt(3,n))
+      end if
+c
 c     set the number of degrees of freedom for the system
 c
       if (nfree .eq. 0) then
@@ -365,24 +383,6 @@ c
       if (integrate .eq. 'STOCHASTIC')  dorest = .false.
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (integrate .eq. 'RIGIDBODY') then
-         if (.not. allocated(xcmo))  allocate (xcmo(n))
-         if (.not. allocated(ycmo))  allocate (ycmo(n))
-         if (.not. allocated(zcmo))  allocate (zcmo(n))
-         if (.not. allocated(vcm))  allocate (vcm(3,ngrp))
-         if (.not. allocated(wcm))  allocate (wcm(3,ngrp))
-         if (.not. allocated(lm))  allocate (lm(3,ngrp))
-         if (.not. allocated(vc))  allocate (vc(3,ngrp))
-         if (.not. allocated(wc))  allocate (wc(3,ngrp))
-         if (.not. allocated(linear))  allocate (linear(ngrp))
-      else
-         if (.not. allocated(v))  allocate (v(3,n))
-         if (.not. allocated(a))  allocate (a(3,n))
-         if (.not. allocated(aalt))  allocate (aalt(3,n))
-      end if
 c
 c     try to restart using prior velocities and accelerations
 c

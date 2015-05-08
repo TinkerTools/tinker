@@ -87,7 +87,7 @@ c
    60    format (/,' Enter the Number of Equilibration Steps [0] :  ',$)
          read (input,70,err=80)  nequil
    70    format (i10)
-         if (nequil .le. 0)  nequil = 0
+         if (nequil .lt. 0)  nequil = 0
    80    continue
       end do
 c
@@ -103,7 +103,7 @@ c
      &              ' [2000] :  ',$)
          read (input,110,err=120)  nstep
   110    format (i10)
-         if (nstep .le. 0)  nstep = 2000
+         if (nstep .lt. 0)  nstep = 2000
   120    continue
       end do
 c
