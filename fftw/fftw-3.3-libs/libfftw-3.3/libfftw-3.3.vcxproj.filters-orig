@@ -158,9 +158,6 @@
     <ClCompile Include="..\..\api\mkprinter-file.c">
       <Filter>Source Files\api</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\api\mkprinter-str.c">
-      <Filter>Source Files\api</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\api\mktensor-iodims.c">
       <Filter>Source Files\api</Filter>
     </ClCompile>

@@ -500,7 +500,7 @@ c
       deallocate (g)
       deallocate (g0)
       deallocate (hdiag)
-      if (n .le. maxnum)  deallocate (nhess)
+      if (allocated(nhess))  deallocate (nhess)
 c
 c     perform any final tasks before program exit
 c

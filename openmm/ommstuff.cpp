@@ -1900,7 +1900,8 @@ static void setupAmoebaWcaDispersionForce (OpenMM_System* system, FILE* log) {
     double rminh = 1.3275;
     double awater = 0.033428;
     double slevy = 1.0;
-    double dispoff = 0.26;
+//  double dispoff = 0.26;
+    double dispoff = 0.0;
     double shctd = 0.81;
 
     OpenMM_AmoebaWcaDispersionForce*  amoebaWcaDispersionForce;
@@ -3738,7 +3739,7 @@ int openmm_test_ (void) {
     } else if (potent__.use_solv && implicitSolventActive > 0 &&
                !potent__.use_mpole) {
 
-        // to get TINKER WCA, zero deriv__.des, then call ewca1 
+        // to get only TINKER WCA, zero deriv__.des, then call ewca1 
 
         zeroTinkerForce (deriv__.des);
         ewca1_ (&tinkerEnergy);
@@ -3754,9 +3755,9 @@ int openmm_test_ (void) {
         if (log) { 
             char buffer[128];
             setNullTerminator (solute__.borntyp, 8, buffer);
-            (void) fprintf (log, "Born radius type=%s ", buffer);
+            (void) fprintf (log, "Born Radius type=%s ", buffer);
             setNullTerminator (solute__.solvtyp, 8, buffer);
-            (void) fprintf (log, "Solvation type=%s\n", buffer);
+            (void) fprintf (log, "Solvation Type=%s\n", buffer);
         }
         setupAmoebaMultipoleForce (system, log);
         setupAmoebaGeneralizedKirkwoodForce (system, 1, log);
