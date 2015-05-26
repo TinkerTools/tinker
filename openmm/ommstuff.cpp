@@ -1971,10 +1971,13 @@ static void computePeriodicBoxVectors(OpenMM_Vec3 &a, OpenMM_Vec3 &b, OpenMM_Vec
 
   b.x -= a.x*round(b.x/a.x);
 
+#if 0
+  // DEBUG
   fprintf(stderr, "Box vectors:\n");
   fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", a.x, a.y, a.z);
   fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", b.x, b.y, b.z);
   fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", c.x, c.y, c.z);
+#endif /* 0 */
 }
 
 static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
