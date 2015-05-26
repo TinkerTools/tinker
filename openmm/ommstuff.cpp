@@ -1931,22 +1931,63 @@ static void setupAmoebaWcaDispersionForce (OpenMM_System* system, FILE* log) {
     OpenMM_AmoebaWcaDispersionForce_setShctd (amoebaWcaDispersionForce, shctd);
 }
 
+static void computePeriodicBoxVectors(OpenMM_Vec3 &a, OpenMM_Vec3 &b, OpenMM_Vec3 &c) {
+  /* a, b, and c are the output vectors, computed from the unit cell dimensions
+   * in boxes__. This should not be called when no box is defined
+   */
+  const double DEG_TO_RAD = M_PI / 180.0;
+
+  a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
+  a.y = a.z = 0.0;
+
+  b.x = OpenMM_NmPerAngstrom*(*boxes__.ybox)*cos(DEG_TO_RAD*boxes__.gamma);
+  b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox)*sin(DEG_TO_RAD*boxes__.gamma);
+  b.z = 0.0;
+
+  c.x = (*boxes__.zbox)*cos(DEG_TO_RAD*boxes__.beta);
+  c.y = *boxes__.zbox*(cos(DEG_TO_RAD*boxes__.alpha) -
+                cos(DEG_TO_RAD*boxes__.beta)*cos(DEG_TO_RAD*boxes__.gamma)) /
+                sin(DEG_TO_RAD*boxes__.gamma);
+  c.z = sqrt((*boxes__.zbox)*(*boxes__.zbox)-c.x*c.x-c.y*c.y);
+
+  c.x *= OpenMM_NmPerAngstrom;
+  c.y *= OpenMM_NmPerAngstrom;
+  c.z *= OpenMM_NmPerAngstrom;
+
+  // Make numbers that should be zero exactly zero
+  if (abs(a.x) < 1e-6) a.x = 0.0;
+  if (abs(a.y) < 1e-6) a.y = 0.0;
+  if (abs(a.z) < 1e-6) a.z = 0.0;
+  if (abs(b.x) < 1e-6) b.x = 0.0;
+  if (abs(b.y) < 1e-6) b.y = 0.0;
+  if (abs(b.z) < 1e-6) b.z = 0.0;
+  if (abs(c.x) < 1e-6) c.x = 0.0;
+  if (abs(c.y) < 1e-6) c.y = 0.0;
+  if (abs(c.z) < 1e-6) c.z = 0.0;
+
+  // Reduce the box vectors if necessary
+  c.x -= b.x*round(c.y/b.y) - a.x*round(c.x/a.x);;
+  c.y -= b.y*round(c.y/b.y);
+
+  b.x -= a.x*round(b.x/a.x);
+
+  fprintf(stderr, "Box vectors:\n");
+  fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", a.x, a.y, a.z);
+  fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", b.x, b.y, b.z);
+  fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", c.x, c.y, c.z);
+}
+
 static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
 
   OpenMM_Vec3 a;
   OpenMM_Vec3 b;
   OpenMM_Vec3 c;
 
-  if (*boxes__.xbox != 0) {
-      a.x = a.y = a.z = 0.0;
-      b.x = b.y = b.z = 0.0;
-      c.x = c.y = c.z = 0.0;
-      a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
-      b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox);
-      c.z = OpenMM_NmPerAngstrom*(*boxes__.zbox);
-    
-      OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
-  }
+  // Nothing to do if we have no box
+  if (*boxes__.xbox == 0) return;
+
+  computePeriodicBoxVectors(a, b, c);
+  OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
 }
 
 static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
@@ -2006,12 +2047,12 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
     OpenMM_AmoebaVdwForce_setUseDispersionCorrection (amoebaVdwForce,
                                                       useCorrection);
 
-    if (boxes__.orthogonal)
-        OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
-                                    OpenMM_AmoebaVdwForce_CutoffPeriodic);
-    else
+    if (*boxes__.xbox == 0)
         OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
                                     OpenMM_AmoebaVdwForce_NoCutoff);
+    else
+        OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
+                                    OpenMM_AmoebaVdwForce_CutoffPeriodic);
 
     setDefaultPeriodicBoxVectors (system, log);
 
@@ -3022,19 +3063,8 @@ void openmm_update_box_ (void** omm ) {
     OpenMMData* openMMDataHandle;
     openMMDataHandle = (OpenMMData*) (*omm);
 
-    aBox.x = 0.0;
-    aBox.y = 0.0;
-    aBox.z = 0.0;
-    bBox.x = 0.0;
-    bBox.y = 0.0;
-    bBox.z = 0.0;
-    cBox.x = 0.0;
-    cBox.y = 0.0;
-    cBox.z = 0.0;
+    computePeriodicBoxVectors(aBox, bBox, cBox);
 
-    aBox.x = *(boxes__.xbox) * OpenMM_NmPerAngstrom;
-    bBox.y = *(boxes__.ybox) * OpenMM_NmPerAngstrom;
-    cBox.z = *(boxes__.zbox) * OpenMM_NmPerAngstrom;
     OpenMM_Context_setPeriodicBoxVectors (openMMDataHandle->context,
                                           &aBox, &bBox, &cBox);
 }
