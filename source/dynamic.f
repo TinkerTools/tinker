@@ -280,7 +280,6 @@ c
      &              ' Modified Beeman Algorithm')
       end if
 
-      call settime
 c
 c     integrate equations of motion to take a time step
 c
@@ -308,8 +307,6 @@ c
          end if
       end do
 
-      call gettime(wall,cpu)
-        write(6,*)wall,cpu
 c
 c     perform any final tasks before program exit
 c
