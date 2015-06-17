@@ -456,7 +456,6 @@ c
       else if (integrate .eq. 'RESPA') then
          allocate (derivs(3,n))
          call gradslow (e,derivs)
-         tempstor = e
          do i = 1, n
             if (use(i) .and. mass(i).ne.0.0d0) then
                speed = maxwell (mass(i),kelvin)
@@ -472,9 +471,6 @@ c
                end do
             end if
          end do
-         call gradfast (e,derivs)
-         tempstor = tempstor + e
-         write(6,*) tempstor
          do i = 1, n
             if (use(i) .and. mass(i).ne.0.0d0) then
                do j = 1, 3
@@ -596,7 +592,6 @@ c
          allocate (temp(3,n))
 
         call grad1 (e,derivs)   
-        tempstor = e
         do i = 1,n
           do j= 1,3
               temp(j,i) = derivs(j,i)
@@ -604,7 +599,6 @@ c
         end do   
 
         call grad2 (e,derivs)
-        tempstor = tempstor + e
         do i = 1,n
           do j= 1,3
               temp(j,i) = temp(j,i) + derivs(j,i)
@@ -612,7 +606,6 @@ c
         end do
 
         call grad3 (e,derivs,0)
-        tempstor = tempstor + e
         do i = 1,n
           do j= 1,3
               temp(j,i) = temp(j,i) + derivs(j,i)
@@ -620,13 +613,11 @@ c
         end do
           
         call grad4 (e,derivs)
-        tempstor = tempstor + e
         do i = 1,n
           do j= 1,3
               temp(j,i) = temp(j,i) + derivs(j,i)
            end do
         end do    
-        write(6,*)tempstor
 
         do i = 1, n
                do j = 1, 3
@@ -670,145 +661,13 @@ c
          call prtdyn
          if (nuse .eq. n)  call mdrest (0)         
                   
-c
-c     set physical and extended velocities,
-c     physical accelerations, and extended
-c     masses for stochastic isokinetic dynamics
-c
-      else if (integrate .eq. 'NPT-ISOK') then
-           use_vdwSR = .true.
-           use_vdwLR = .true.
-           use_chgSR = .true.
-           use_chgLR = .true.
-           use_mpoleSR = .true.
-           use_mpoleLR = .true.
-         use_REvlist = .true.
-         kT = boltzmann*kelvin
-         LkT = len_nhc*kT
-         allocate (derivs(3,n)) 
-         allocate (temp(3,n))
-
-        call grad1 (e,derivs)   
-        do i = 1,n
-          do j= 1,3
-              temp(j,i) = derivs(j,i)
-           end do
-        end do   
-
-        call grad2 (e,derivs)
-        do i = 1,n
-          do j= 1,3
-              temp(j,i) = temp(j,i) + derivs(j,i)
-           end do
-        end do
-
-        call grad3 (e,derivs,0)
-        do i = 1,n
-          do j= 1,3
-              temp(j,i) = temp(j,i) + derivs(j,i)
-           end do
-        end do
-          
-        call grad4 (e,derivs)
-        do i = 1,n
-          do j= 1,3
-              temp(j,i) = temp(j,i) + derivs(j,i)
-           end do
-        end do    
-
-        do i = 1, n
-           do j = 1, 3
-              a(j,i) = -convert * temp(j,i) / mass(i)
-              do k = 1, len_nhc
-                 q_iso1(k,j,i) = kT*tautemp*tautemp
-                 q_iso2(k,j,i) = kT*tautemp*tautemp
-                 v_iso2(k,j,i) = sqrt(kT/q_iso2(k,j,i))*sqrt(-2.0d0
-     &                    *log(1.0d0-random()))
-     &                    *cos(2.0d0*pi*random())
-              end do                 
-              v(j,i) = random () 
-              do k = 1, len_nhc
-                 v_iso1(k,j,i) = random ()
-              end do
-              tempstor = v(j,i) * v(j,i)
-
-              do k = 1, len_nhc
-                 tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
-              end do
-              tempstor = sqrt(tempstor)
-              v(j,i) = v(j,i) / tempstor
-              do k = 1, len_nhc
-                 v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
-              end do
-              v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
-
-              do k = 1, len_nhc
-                 tempstor=(sqrt(q_iso1(k,j,i)/(kT*dble(len_nhc+1))))
-                 v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
-              end do
-              tempstor = mass(i)*v(j,i)*v(j,i)                  
-              do k = 1, len_nhc
-                 tempstor = tempstor + dble(len_nhc)*q_iso1(k,j,i)*
-     &           v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_nhc+1)
-              end do
-           end do
-         end do
-
-              do k = 1, len_nhc
-                 q_sinr1(k) = kT*tautemp*tautemp
-                 q_sinr2(k) = kT*tautemp*tautemp
-                 v_sinr2(k) = sqrt(kT/q_sinr2(k))*sqrt(-2.0d0
-     &                    *log(1.0d0-random()))
-     &                    *cos(2.0d0*pi*random())
-              end do                 
-              vbar = random () 
-              do k = 1, len_nhc
-                 v_sinr1(k) = random ()
-              end do
-              tempstor = vbar * vbar
-
-              do k = 1, len_nhc
-                 tempstor = tempstor + (v_sinr1(k)*v_sinr1(k))
-              end do
-              tempstor = sqrt(tempstor)
-              vbar = vbar / tempstor
-              do k = 1, len_nhc
-                 v_sinr1(k) = v_sinr1(k) / tempstor
-              end do
-              vbar = vbar / (sqrt(qbar/LkT))
-
-              do k = 1, len_nhc
-                 tempstor=(sqrt(q_sinr1(k)/(kT*dble(len_nhc+1))))
-                 v_sinr1(k) = v_sinr1(k)/tempstor
-              end do
-              tempstor = qbar * vbar * vbar                  
-              do k = 1, len_nhc
-                 tempstor = tempstor + dble(len_nhc)*q_sinr1(k)*
-     &           v_sinr1(k)*v_sinr1(k)/dble(len_nhc+1)
-              end do
-
-
-         deallocate (derivs)
-         deallocate (temp)
-         call prtdyn
-         if (nuse .eq. n)  call mdrest (0)    
-
-
 
 c
 c     set velocities and accelerations for Cartesian dynamics
 c
       else
-              use_vdwLR = .true.
-              use_vdwSR = .true.
-              use_chgLR = .true.
-              use_chgSR = .true.
-              use_mpoleSR = .true.
-              use_mpoleLR = .true.
-            use_REvlist = .true.
          allocate (derivs(3,n))
          call gradient (e,derivs)
-         write(6,*)
          do i = 1, n
             if (use(i) .and. mass(i).ne.0.0d0) then
                speed = maxwell (mass(i),kelvin)
