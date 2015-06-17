@@ -29,7 +29,7 @@ c
          call echarge1g
       else if (use_ewald) then
          if (use_clist) then
-            call echarge1f
+            call echarge1f3
          else if (use_lights) then
             call echarge1e
          else
@@ -1820,17 +1820,17 @@ c
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine echarge1f  --  Ewald charge derivs via list  ##
+c     ##  subroutine echarge1f3  --  Ewald charge derivs via list  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "echarge1f" calculates the charge-charge interaction energy
+c     "echarge1f3" calculates the charge-charge interaction energy
 c     and first derivatives with respect to Cartesian coordinates
 c     using a particle mesh Ewald summation and a neighbor list
 c
 c
-      subroutine echarge1f
+      subroutine echarge1f3
       use sizes
       use atoms
       use bound
@@ -2355,6 +2355,645 @@ c
       deallocate (cscale)
       return
       end
+
+
+
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine echargeSR  --  Ewald charge derivs via list  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "echargeSR" calculates the charge-charge interaction energy
+c     and first derivatives with respect to Cartesian coordinates
+c     using a particle mesh Ewald summation and a neighbor list
+c
+c
+      subroutine echargeSR
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use group
+      use inter
+      use limits
+      use math
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use virial
+      implicit none
+      integer i,j,k
+      integer ii,kk,kkk
+      integer in,kn
+      real*8 e,de,efix
+      real*8 eintra
+      real*8 f,fi,fik,fs
+      real*8 r,r2,rew
+      real*8 rb,rb2
+      real*8 fgrp,term
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 xd,yd,zd
+      real*8 erfc,erfterm
+      real*8 scale,scaleterm
+      real*8 dedx,dedy,dedz
+      real*8 vxx,vyy,vzz
+      real*8 vyx,vzx,vzy
+      real*8 eco,eintrao
+      real*8 viro(3,3)
+      real*8 res_lam,res_u,ru2,ru3,ru4,ru5,REchgcut2,taper2,q_switch
+      real*8, allocatable :: cscale(:)
+      real*8, allocatable :: deco1(:,:)
+      real*8, allocatable :: deco2(:,:)
+      logical proceed,usei
+      character*6 mode
+      external erfc
+c
+c
+c     zero out the Ewald summation energy and derivatives
+c
+      ecSR = 0.0d0
+      do i = 1, n
+         decSR(1,i) = 0.0d0
+         decSR(2,i) = 0.0d0
+         decSR(3,i) = 0.0d0
+      end do
+      if (nion .eq. 0)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+      allocate (deco1(3,n))
+      allocate (deco2(3,n))
+c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         cscale(i) = 1.0d0
+      end do
+c
+c     zero out the intramolecular portion of the Ewald energy
+c
+      eintra = 0.0d0
+c
+c     set conversion factor, cutoff and switching coefficients
+c
+      f = electric / dielec
+      mode = 'EWALD'
+      call switch (mode)
+      res_lam = REchgcut - REchgtaper
+      taper2 = REchgtaper * REchgtaper
+      REchgcut2 = REchgcut * REchgcut
+c
+c     compute the cell dipole boundary correction term
+c
+      if (boundary .eq. 'VACUUM') then
+         xd = 0.0d0
+         yd = 0.0d0
+         zd = 0.0d0
+         do ii = 1, nion
+            i = iion(ii)
+            xd = xd + pchg(ii)*x(i)
+            yd = yd + pchg(ii)*y(i)
+            zd = zd + pchg(ii)*z(i)
+         end do
+         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = term * (xd*xd+yd*yd+zd*zd)
+         ecSR = ecSR + e
+         do ii = 1, nion
+            i = iion(ii)
+            de = 2.0d0 * term * pchg(ii)
+            dedx = de * xd
+            dedy = de * yd
+            dedz = de * zd
+            decSR(1,i) = decSR(1,i) + dedx
+            decSR(2,i) = decSR(2,i) + dedy
+            decSR(3,i) = decSR(3,i) + dedz
+         end do
+      end if
+
+c
+c     initialize local variables for OpenMP calculation
+c
+      eco = ecSR
+      eintrao = eintra
+      do i = 1, n
+         deco1(1,i) = 0.0d0
+         deco1(2,i) = 0.0d0
+         deco1(3,i) = 0.0d0
+         deco2(1,i) = 0.0d0
+         deco2(2,i) = 0.0d0
+         deco2(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,
+!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
+!$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
+!$OMP& aewald,molcule,ebuffer) firstprivate(cscale)
+!$OMP& shared(eco,eintrao,deco1,deco2,viro)
+!$OMP DO reduction(+:eco,eintrao,deco1,deco2,viro)
+!$OMP& schedule(guided)
+c
+c     compute the real space Ewald energy and first derivatives
+c
+      do ii = 1, nion
+         i = iion(ii)
+         in = jion(ii)
+         usei = use(i)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         fi = f * pchg(ii)
+c
+c     set interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(in)
+            cscale(i12(j,in)) = c2scale
+         end do
+         do j = 1, n13(in)
+            cscale(i13(j,in)) = c3scale
+         end do
+         do j = 1, n14(in)
+            cscale(i14(j,in)) = c4scale
+         end do
+         do j = 1, n15(in)
+            cscale(i15(j,in)) = c5scale
+         end do
+c
+c     decide whether to compute the current interaction
+c
+         do kkk = 1, nelst(ii)
+            kk = elst(kkk,ii)
+            k = iion(kk)
+            kn = jion(kk)
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            proceed = .true.
+            if (proceed)  proceed = (usei .or. use(k))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               xr = xi - x(k)
+               yr = yi - y(k)
+               zr = zi - z(k)
+c
+c     find energy for interactions within real space cutoff
+c
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. REchgcut2) then
+                  r = sqrt(r2)
+                  rb = r + ebuffer
+                  rb2 = rb * rb
+                  fik = fi * pchg(kk)
+                  rew = aewald * r
+                  erfterm = erfc (rew)
+                  scale = cscale(kn)
+                  if (use_group)  scale = scale * fgrp
+                  scaleterm = scale - 1.0d0
+                  e = (fik/rb) * (1.0d0+scaleterm)
+                  de = -fik * (1.0d0+scaleterm)/rb2
+                  if (r2 .gt. taper2) then
+                     res_u = (r - REchgcut + res_lam)/res_lam                  
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                     de = de*(q_switch)
+                  end if  
+
+c                  
+c     form the chain rule terms for derivative expressions
+c
+                  de = de / r
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+c
+c     increment the overall energy and derivative expressions
+c
+                  eco = eco + e
+                  deco1(1,i) = deco1(1,i) + dedx
+                  deco1(2,i) = deco1(2,i) + dedy
+                  deco1(3,i) = deco1(3,i) + dedz
+                  deco2(1,k) = deco2(1,k) - dedx
+                  deco2(2,k) = deco2(2,k) - dedy
+                  deco2(3,k) = deco2(3,k) - dedz
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
+c
+c     increment the total intramolecular energy
+c
+                  if (molcule(i) .eq. molcule(k)) then
+                     efix = (fik/rb) * scale
+                     eintrao = eintrao + efix
+                  end if
+               end if
+            end if
+         end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(in)
+            cscale(i12(j,in)) = 1.0d0
+         end do
+         do j = 1, n13(in)
+            cscale(i13(j,in)) = 1.0d0
+         end do
+         do j = 1, n14(in)
+            cscale(i14(j,in)) = 1.0d0
+         end do
+         do j = 1, n15(in)
+            cscale(i15(j,in)) = 1.0d0
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ecSR = eco
+      eintra = eintrao
+      do i = 1, n
+         decSR(1,i) = decSR(1,i) + deco1(1,i) + deco2(1,i)
+         decSR(2,i) = decSR(2,i) + deco1(2,i) + deco2(2,i)
+         decSR(3,i) = decSR(3,i) + deco1(3,i) + deco2(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     intermolecular energy is total minus intramolecular part
+c
+      einter = einter + ecSR - eintra
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
+      deallocate (deco1)
+      deallocate (deco2)
+      return
+      end
+
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine echargeLR  --  Ewald charge derivs via list  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "echargeLR" calculates the charge-charge interaction energy
+c     and first derivatives with respect to Cartesian coordinates
+c     using a particle mesh Ewald summation and a neighbor list
+c
+c
+      subroutine echargeLR
+      use sizes
+      use atoms
+      use bound
+      use boxes
+      use charge
+      use chgpot
+      use couple
+      use deriv
+      use energi
+      use ewald
+      use group
+      use inter
+      use limits
+      use math
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use virial
+      implicit none
+      integer i,j,k
+      integer ii,kk,kkk
+      integer in,kn
+      real*8 e,de,efix
+      real*8 eintra
+      real*8 f,fi,fik,fs
+      real*8 r,r2,rew
+      real*8 rb,rb2
+      real*8 fgrp,term
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 xd,yd,zd
+      real*8 erf,erfterm
+      real*8 scale,scaleterm
+      real*8 dedx,dedy,dedz
+      real*8 vxx,vyy,vzz
+      real*8 vyx,vzx,vzy
+      real*8 eco,eintrao
+      real*8 viro(3,3)
+      real*8 res_lam,res_u,ru2,ru3,ru4,ru5,REchgcut2,taper2,q_switch
+      real*8, allocatable :: cscale(:)
+      real*8, allocatable :: deco1(:,:)
+      real*8, allocatable :: deco2(:,:)
+      logical proceed,usei
+      character*6 mode
+      external erf
+c
+c
+c     zero out the Ewald summation energy and derivatives
+c
+      ec = 0.0d0
+      ecLR = 0.0d0
+      do i = 1, n
+         dec(1,i) = 0.0d0
+         dec(2,i) = 0.0d0
+         dec(3,i) = 0.0d0         
+         decLR(1,i) = 0.0d0
+         decLR(2,i) = 0.0d0
+         decLR(3,i) = 0.0d0
+      end do
+      if (nion .eq. 0)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+      allocate (deco1(3,n))
+      allocate (deco2(3,n))
+c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         cscale(i) = 1.0d0
+      end do
+c
+c     zero out the intramolecular portion of the Ewald energy
+c
+      eintra = 0.0d0
+c
+c     set conversion factor, cutoff and switching coefficients
+c
+      f = electric / dielec
+      mode = 'EWALD'
+      call switch (mode)
+      res_lam = REchgcut - REchgtaper
+      taper2 = REchgtaper * REchgtaper
+      REchgcut2 = REchgcut * REchgcut
+c
+c     compute the Ewald self-energy term over all the atoms
+c
+      fs = -f * aewald / sqrtpi
+      do ii = 1, nion
+         e = fs * pchg(ii)**2
+         ecLR = ecLR + e
+      end do
+c
+c     compute reciprocal space Ewald energy and first derivatives
+c
+      call ecrecip1
+c
+c     initialize local variables for OpenMP calculation
+c
+      eco = ecLR
+      eintrao = eintra
+      do i = 1, n
+         deco1(1,i) = 0.0d0
+         deco1(2,i) = 0.0d0
+         deco1(3,i) = 0.0d0
+         deco2(1,i) = 0.0d0
+         deco2(2,i) = 0.0d0
+         deco2(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,
+!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
+!$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
+!$OMP& aewald,molcule,ebuffer) firstprivate(cscale)
+!$OMP& shared(eco,eintrao,deco1,deco2,viro)
+!$OMP DO reduction(+:eco,eintrao,deco1,deco2,viro)
+!$OMP& schedule(guided)
+c
+c     compute the real space Ewald energy and first derivatives
+c
+      do ii = 1, nion
+         i = iion(ii)
+         in = jion(ii)
+         usei = use(i)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         fi = f * pchg(ii)
+c
+c     set interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(in)
+            cscale(i12(j,in)) = c2scale
+         end do
+         do j = 1, n13(in)
+            cscale(i13(j,in)) = c3scale
+         end do
+         do j = 1, n14(in)
+            cscale(i14(j,in)) = c4scale
+         end do
+         do j = 1, n15(in)
+            cscale(i15(j,in)) = c5scale
+         end do
+c
+c     decide whether to compute the current interaction
+c
+         do kkk = 1, nelst(ii)
+            kk = elst(kkk,ii)
+            k = iion(kk)
+            kn = jion(kk)
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            proceed = .true.
+            if (proceed)  proceed = (usei .or. use(k))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               xr = xi - x(k)
+               yr = yi - y(k)
+               zr = zi - z(k)
+c
+c     find energy for interactions within real space cutoff
+c
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if ((r2 .le. off2) .and. (r2 .gt. taper2)) then
+                  r = sqrt(r2)
+                  rb = r + ebuffer
+                  rb2 = rb * rb
+                  fik = fi * pchg(kk)
+                  rew = aewald * r
+                  erfterm = erf (rew)
+                  scale = cscale(kn)
+                  if (use_group)  scale = scale * fgrp
+                  scaleterm = scale - 1.0d0
+                  de = fik*((erfterm/rb2)
+     &                   -(2.0*aewald*exp(-rew**2)/(r*sqrtpi)))
+                  if (r2.le.REchgcut2) then
+                     res_u = (r - REchgcut + res_lam)/res_lam                  
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                     de = de -(fik*(1.0d0-q_switch)*
+     &                         (1.0d0+scaleterm)/rb2)
+                  else 
+                     de = de -(fik*(1.0d0+scaleterm)/rb2)
+                  end if  
+
+c                  
+c     form the chain rule terms for derivative expressions
+c
+                  de = de / r
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+c
+c     increment the overall energy and derivative expressions
+c
+                  eco = eco + e
+                  deco1(1,i) = deco1(1,i) + dedx
+                  deco1(2,i) = deco1(2,i) + dedy
+                  deco1(3,i) = deco1(3,i) + dedz
+                  deco2(1,k) = deco2(1,k) - dedx
+                  deco2(2,k) = deco2(2,k) - dedy
+                  deco2(3,k) = deco2(3,k) - dedz
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
+c
+c     increment the total intramolecular energy
+c
+                  if (molcule(i) .eq. molcule(k)) then
+                     efix = (fik/rb) * scale
+                     eintrao = eintrao + efix
+                  end if
+               end if
+            end if
+         end do
+
+
+
+
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(in)
+            cscale(i12(j,in)) = 1.0d0
+         end do
+         do j = 1, n13(in)
+            cscale(i13(j,in)) = 1.0d0
+         end do
+         do j = 1, n14(in)
+            cscale(i14(j,in)) = 1.0d0
+         end do
+         do j = 1, n15(in)
+            cscale(i15(j,in)) = 1.0d0
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     add local copies to global variables for OpenMP calculation
+c
+      ec = eco
+      eintra = eintrao
+      do i = 1, n
+         decLR(1,i) = decLR(1,i) + deco1(1,i) + deco2(1,i)
+         decLR(2,i) = decLR(2,i) + deco1(2,i) + deco2(2,i)
+         decLR(3,i) = decLR(3,i) + deco1(3,i) + deco2(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     intermolecular energy is total minus intramolecular part
+c
+      einter = einter + ecLR - eintra
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
+      deallocate (deco1)
+      deallocate (deco2)
+
+      return
+      end      
+
+
+
+
+
 c
 c
 c     #################################################################

@@ -35,18 +35,36 @@ c     anisotrop   logical flag governing use of anisotropic pressure
 c     thermostat  choice of temperature control method to be used
 c     barostat    choice of pressure control method to be used
 c     volscale    choice of scaling method for Monte Carlo barostat
-c
+c     q_iso1/2    masses of isokinetic thermostats
+c     v_iso1/2    velocities of isokinetic thermostats
+c     f_iso1/2    forces acting on isokinetic thermostats
+c     len_nhc     In isokinetic dynamics, this is the Nose-Hoover chain length M. 
+c                 In stochastic isokinetic dynamics, this is the chain length L
+c     stoch_gamma Friction term for SIN(R)
 c
       module bath
       implicit none
       integer maxnose
       parameter (maxnose=4)
+      integer len_nhc,isok_L,isok_M
+      integer isok_chain      
+      parameter (isok_chain=6)      
       integer voltrial
+      real*8 stoch_gamma
       real*8 kelvin,atmsph
       real*8 tautemp,taupres
       real*8 compress,collide
       real*8 eta,volmove
       real*8 vbar,qbar,gbar
+      real*8 q_iso1(isok_chain,3,10000)
+      real*8 q_iso2(isok_chain,3,10000)
+      real*8 v_iso1(isok_chain,3,10000)
+      real*8 v_iso2(isok_chain,3,10000)
+      real*8 f_iso1(isok_chain,3,10000)
+      real*8 v_sinr1(isok_chain)
+      real*8 v_sinr2(isok_chain)
+      real*8 q_sinr1(isok_chain)
+      real*8 q_sinr2(isok_chain)
       real*8 vnh(maxnose)
       real*8 qnh(maxnose)
       real*8 gnh(maxnose)

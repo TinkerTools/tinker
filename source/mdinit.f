@@ -30,16 +30,20 @@ c
       use bath
       use bound
       use couple
+      use deriv
       use files
       use freeze
       use group
       use inform
       use iounit
       use keys
+      use limits
+      use math
       use mdstuf
       use molcul
       use moldyn
       use mpole
+      use potent
       use rgddyn
       use rigid
       use stodyn
@@ -50,14 +54,15 @@ c
       integer i,j,k
       integer idyn,nh
       integer size,next
-      integer lext,freeunit
-      real*8 e,ekt,qterm
+      integer lext,freeunit,len_isok
+      real*8 e,ekt,qterm,kt,lkt,len_fac,tempstor,random
       real*8 maxwell,speed
-      real*8 amass,gmass
       real*8 hmax,hmass
       real*8 sum,dmass
       real*8 vec(3)
       real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: temp(:,:)
+      real*8, allocatable :: temp2(:,:)      
       logical exist,heavy
       character*7 ext
       character*20 keyword
@@ -103,6 +108,16 @@ c
       voltrial = 20
       volmove = 100.0d0
       volscale = 'ATOMIC'
+
+      len_nhc = 4
+      nres_tors = 1
+      nres_short = 1
+      nres_bond = 1
+      stoch_gamma = 100.0d0
+      XO_RESPA = .false.
+      XI_RESPA = .true. 
+      use_mpole_switch = .true.    
+
 c
 c     check for keywords containing any altered parameters
 c
@@ -151,6 +166,8 @@ c
             anisotrop = .true.
          else if (keyword(1:13) .eq. 'TAU-PRESSURE ') then
             read (string,*,err=10,end=10)  taupres
+         else if (keyword(1:16) .eq. 'TAU-TEMPERATURE ') then
+            read (string,*,err=10,end=10)  tautemp            
          else if (keyword(1:9) .eq. 'COMPRESS ') then
             read (string,*,err=10,end=10)  compress
          else if (keyword(1:13) .eq. 'VOLUME-TRIAL ') then
@@ -162,9 +179,32 @@ c
             call upcase (volscale)
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
+         else if (keyword(1:11) .eq. 'NHC-LENGTH ') then
+            read (string,*,err=10,end=10)  len_nhc      
+         else if (keyword(1:10) .eq. 'NRES-TORS ') then
+            read (string,*,err=10,end=10)  nres_tors             
+         else if (keyword(1:12) .eq. 'NRES-SHORT ') then
+            read (string,*,err=10,end=10)  nres_short   
+         else if (keyword(1:11) .eq. 'NRES-BOND ') then
+            read (string,*,err=10,end=10)  nres_bond             
+         else if (keyword(1:12) .eq. 'STOCH-GAMMA ') then
+            read (string,*,err=10,end=10)  stoch_gamma    
+         else if (keyword(1:9) .eq. 'XO-RESPA ') then
+            XO_RESPA = .true.
+            XI_RESPA = .false.     
+         else if (keyword(1:16) .eq. 'NO-MPOLE-SWITCH ') then
+            use_mpole_switch = .false.
          end if
    10    continue
       end do
+
+c
+c     define some RESPA force multipliers 
+c
+      mult_bond = dble(nres_bond)
+      mult_tors = dble(nres_tors * nres_bond)  
+      mult_short = dble(nres_short * nres_tors * nres_bond)
+      
 c
 c     repartition hydrogen masses to allow long time steps
 c
@@ -285,6 +325,7 @@ c
      &         barostat.eq.'NOSE-HOOVER') then
          integrate = 'NOSE-HOOVER'
       end if
+
 c
 c     check for use of Monte Carlo barostat with constraints
 c
@@ -295,24 +336,6 @@ c
      &                 ' Barostat Incompatible with RATTLE')
             call fatal
          end if
-      end if
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (integrate .eq. 'RIGIDBODY') then
-         if (.not. allocated(xcmo))  allocate (xcmo(n))
-         if (.not. allocated(ycmo))  allocate (ycmo(n))
-         if (.not. allocated(zcmo))  allocate (zcmo(n))
-         if (.not. allocated(vcm))  allocate (vcm(3,ngrp))
-         if (.not. allocated(wcm))  allocate (wcm(3,ngrp))
-         if (.not. allocated(lm))  allocate (lm(3,ngrp))
-         if (.not. allocated(vc))  allocate (vc(3,ngrp))
-         if (.not. allocated(wc))  allocate (wc(3,ngrp))
-         if (.not. allocated(linear))  allocate (linear(ngrp))
-      else
-         if (.not. allocated(v))  allocate (v(3,n))
-         if (.not. allocated(a))  allocate (a(3,n))
-         if (.not. allocated(aalt))  allocate (aalt(3,n))
       end if
 c
 c     set the number of degrees of freedom for the system
@@ -384,6 +407,24 @@ c
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (integrate .eq. 'RIGIDBODY') then
+         if (.not. allocated(xcmo))  allocate (xcmo(n))
+         if (.not. allocated(ycmo))  allocate (ycmo(n))
+         if (.not. allocated(zcmo))  allocate (zcmo(n))
+         if (.not. allocated(vcm))  allocate (vcm(3,ngrp))
+         if (.not. allocated(wcm))  allocate (wcm(3,ngrp))
+         if (.not. allocated(lm))  allocate (lm(3,ngrp))
+         if (.not. allocated(vc))  allocate (vc(3,ngrp))
+         if (.not. allocated(wc))  allocate (wc(3,ngrp))
+         if (.not. allocated(linear))  allocate (linear(ngrp))
+      else
+         if (.not. allocated(v))  allocate (v(3,n))
+         if (.not. allocated(a))  allocate (a(3,n))
+         if (.not. allocated(aalt))  allocate (aalt(3,n))
+      end if
+c
 c     try to restart using prior velocities and accelerations
 c
       dynfile = filename(1:leng)//'.dyn'
@@ -400,8 +441,7 @@ c     set translational velocities for rigid body dynamics
 c
       else if (integrate .eq. 'RIGIDBODY') then
          do i = 1, ngrp
-            gmass = grpmass(i)
-            speed = maxwell (gmass,kelvin)
+            speed = maxwell (grpmass(i),kelvin)
             call ranvec (vec)
             do j = 1, 3
                vcm(j,i) = speed * vec(j)
@@ -416,10 +456,10 @@ c
       else if (integrate .eq. 'RESPA') then
          allocate (derivs(3,n))
          call gradslow (e,derivs)
+         tempstor = e
          do i = 1, n
-            amass = mass(i)
-            if (use(i) .and. amass.ne.0.0d0) then
-               speed = maxwell (amass,kelvin)
+            if (use(i) .and. mass(i).ne.0.0d0) then
+               speed = maxwell (mass(i),kelvin)
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
@@ -433,11 +473,12 @@ c
             end if
          end do
          call gradfast (e,derivs)
+         tempstor = tempstor + e
+         write(6,*) tempstor
          do i = 1, n
-            amass = mass(i)
-            if (use(i) .and. amass.ne.0.0d0) then
+            if (use(i) .and. mass(i).ne.0.0d0) then
                do j = 1, 3
-                  aalt(j,i) = -convert * derivs(j,i) / amass
+                  aalt(j,i) = -convert * derivs(j,i) / mass(i)
                end do
             else
                do j = 1, 3
@@ -448,19 +489,333 @@ c
          deallocate (derivs)
          if (nuse .eq. n)  call mdrest (0)
 c
+c     set physical and extended velocities,
+c     physical accelerations, and extended
+c     masses for isokinetic dynamics
+c
+      else if (integrate .eq. 'ISOK-RESPA') then
+           use_vdwSR = .true.
+           use_vdwLR = .true.
+           use_chgSR = .true.
+           use_chgLR = .true. 
+           use_mpoleSR = .true.
+           use_mpoleLR = .true.           
+         use_REvlist = .true.
+         kT = boltzmann*kelvin
+         len_isok=1
+         LkT = len_isok*kT
+         allocate (temp(3,n))
+         allocate (derivs(3,n))      
+        call grad1 (e,derivs)   
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = derivs(j,i)
+           end do
+        end do   
+        call grad2 (e,derivs)
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do
+        
+        call grad3 (e,derivs,0)
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do
+          
+        call grad4 (e,derivs)
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do 
+             do i = 1, n
+               do j = 1, 3
+                  a(j,i) = -convert * temp(j,i) / mass(i)
+                  do k = 1, len_nhc
+                     q_iso1(k,j,i) = kT*tautemp*tautemp
+                     q_iso2(k,j,i) = kT*tautemp*tautemp
+                     speed = maxwell (q_iso1(k,j,i),kelvin)
+                     call ranvec (vec)
+                     v_iso1(k,j,i) = speed * vec(1)
+                     v_iso2(k,j,i) = speed * vec(2)
+                  end do  
+
+                  v(j,i) = random () 
+                  do k = 1, len_isok
+                     v_iso1(k,j,i) = random ()
+                  end do
+                  tempstor = v(j,i) * v(j,i)
+                  do k = 1, len_isok
+                   tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
+                  end do
+                  tempstor = sqrt(tempstor)
+                  v(j,i) = v(j,i) / tempstor
+                  do k = 1, len_isok
+                     v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
+                  end do
+                  v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
+                  do k = 1, len_isok
+                     tempstor=(sqrt(q_iso1(k,j,i)
+     &                /(kT*dble(len_isok+1))))
+                     v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
+                  end do
+                  tempstor = mass(i)*v(j,i)*v(j,i)                      
+                  do k = 1, len_isok
+                   tempstor = tempstor + dble(len_isok)*q_iso1(k,j,i)*
+     &             v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_isok+1)
+                  end do
+                  do k = 1, len_nhc
+                  end do   
+
+               end do
+         end do
+         deallocate (derivs)
+         deallocate (temp)
+         call prtdyn
+         if (nuse .eq. n)  call mdrest (0)
+c
+c     set physical and extended velocities,
+c     physical accelerations, and extended
+c     masses for stochastic isokinetic dynamics
+c
+      else if (integrate .eq. 'STOCH-RESPA') then
+           use_vdwSR = .true.
+           use_vdwLR = .true.
+           use_chgSR = .true.
+           use_chgLR = .true.
+           use_mpoleSR = .true.
+           use_mpoleLR = .true.
+         use_REvlist = .true.
+         kT = boltzmann*kelvin
+         LkT = len_nhc*kT
+         allocate (derivs(3,n)) 
+         allocate (temp(3,n))
+
+        call grad1 (e,derivs)   
+        tempstor = e
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = derivs(j,i)
+           end do
+        end do   
+
+        call grad2 (e,derivs)
+        tempstor = tempstor + e
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do
+
+        call grad3 (e,derivs,0)
+        tempstor = tempstor + e
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do
+          
+        call grad4 (e,derivs)
+        tempstor = tempstor + e
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do    
+        write(6,*)tempstor
+
+        do i = 1, n
+               do j = 1, 3
+                  a(j,i) = -convert * temp(j,i) / mass(i)
+                  do k = 1, len_nhc
+                     q_iso1(k,j,i) = kT*tautemp*tautemp
+                     q_iso2(k,j,i) = kT*tautemp*tautemp
+                     v_iso2(k,j,i) = sqrt(kT/q_iso2(k,j,i))*sqrt(-2.0d0
+     &                        *log(1.0d0-random()))
+     &                        *cos(2.0d0*pi*random())
+                  end do                 
+                  v(j,i) = random () 
+                  do k = 1, len_nhc
+                     v_iso1(k,j,i) = random ()
+                  end do
+                  tempstor = v(j,i) * v(j,i)
+
+                  do k = 1, len_nhc
+                     tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
+                  end do
+                  tempstor = sqrt(tempstor)
+                  v(j,i) = v(j,i) / tempstor
+                  do k = 1, len_nhc
+                     v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
+                  end do
+                  v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
+
+                  do k = 1, len_nhc
+                     tempstor=(sqrt(q_iso1(k,j,i)/(kT*dble(len_nhc+1))))
+                     v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
+                  end do
+                  tempstor = mass(i)*v(j,i)*v(j,i)                  
+                  do k = 1, len_nhc
+                     tempstor = tempstor + dble(len_nhc)*q_iso1(k,j,i)*
+     &               v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_nhc+1)
+                  end do
+               end do
+         end do
+         deallocate (derivs)
+         deallocate (temp)
+         call prtdyn
+         if (nuse .eq. n)  call mdrest (0)         
+                  
+c
+c     set physical and extended velocities,
+c     physical accelerations, and extended
+c     masses for stochastic isokinetic dynamics
+c
+      else if (integrate .eq. 'NPT-ISOK') then
+           use_vdwSR = .true.
+           use_vdwLR = .true.
+           use_chgSR = .true.
+           use_chgLR = .true.
+           use_mpoleSR = .true.
+           use_mpoleLR = .true.
+         use_REvlist = .true.
+         kT = boltzmann*kelvin
+         LkT = len_nhc*kT
+         allocate (derivs(3,n)) 
+         allocate (temp(3,n))
+
+        call grad1 (e,derivs)   
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = derivs(j,i)
+           end do
+        end do   
+
+        call grad2 (e,derivs)
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do
+
+        call grad3 (e,derivs,0)
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do
+          
+        call grad4 (e,derivs)
+        do i = 1,n
+          do j= 1,3
+              temp(j,i) = temp(j,i) + derivs(j,i)
+           end do
+        end do    
+
+        do i = 1, n
+           do j = 1, 3
+              a(j,i) = -convert * temp(j,i) / mass(i)
+              do k = 1, len_nhc
+                 q_iso1(k,j,i) = kT*tautemp*tautemp
+                 q_iso2(k,j,i) = kT*tautemp*tautemp
+                 v_iso2(k,j,i) = sqrt(kT/q_iso2(k,j,i))*sqrt(-2.0d0
+     &                    *log(1.0d0-random()))
+     &                    *cos(2.0d0*pi*random())
+              end do                 
+              v(j,i) = random () 
+              do k = 1, len_nhc
+                 v_iso1(k,j,i) = random ()
+              end do
+              tempstor = v(j,i) * v(j,i)
+
+              do k = 1, len_nhc
+                 tempstor = tempstor + (v_iso1(k,j,i)*v_iso1(k,j,i))
+              end do
+              tempstor = sqrt(tempstor)
+              v(j,i) = v(j,i) / tempstor
+              do k = 1, len_nhc
+                 v_iso1(k,j,i) = v_iso1(k,j,i) / tempstor
+              end do
+              v(j,i) = v(j,i) / (sqrt(mass(i)/LkT))
+
+              do k = 1, len_nhc
+                 tempstor=(sqrt(q_iso1(k,j,i)/(kT*dble(len_nhc+1))))
+                 v_iso1(k,j,i) = v_iso1(k,j,i)/tempstor
+              end do
+              tempstor = mass(i)*v(j,i)*v(j,i)                  
+              do k = 1, len_nhc
+                 tempstor = tempstor + dble(len_nhc)*q_iso1(k,j,i)*
+     &           v_iso1(k,j,i)*v_iso1(k,j,i)/dble(len_nhc+1)
+              end do
+           end do
+         end do
+
+              do k = 1, len_nhc
+                 q_sinr1(k) = kT*tautemp*tautemp
+                 q_sinr2(k) = kT*tautemp*tautemp
+                 v_sinr2(k) = sqrt(kT/q_sinr2(k))*sqrt(-2.0d0
+     &                    *log(1.0d0-random()))
+     &                    *cos(2.0d0*pi*random())
+              end do                 
+              vbar = random () 
+              do k = 1, len_nhc
+                 v_sinr1(k) = random ()
+              end do
+              tempstor = vbar * vbar
+
+              do k = 1, len_nhc
+                 tempstor = tempstor + (v_sinr1(k)*v_sinr1(k))
+              end do
+              tempstor = sqrt(tempstor)
+              vbar = vbar / tempstor
+              do k = 1, len_nhc
+                 v_sinr1(k) = v_sinr1(k) / tempstor
+              end do
+              vbar = vbar / (sqrt(qbar/LkT))
+
+              do k = 1, len_nhc
+                 tempstor=(sqrt(q_sinr1(k)/(kT*dble(len_nhc+1))))
+                 v_sinr1(k) = v_sinr1(k)/tempstor
+              end do
+              tempstor = qbar * vbar * vbar                  
+              do k = 1, len_nhc
+                 tempstor = tempstor + dble(len_nhc)*q_sinr1(k)*
+     &           v_sinr1(k)*v_sinr1(k)/dble(len_nhc+1)
+              end do
+
+
+         deallocate (derivs)
+         deallocate (temp)
+         call prtdyn
+         if (nuse .eq. n)  call mdrest (0)    
+
+
+
+c
 c     set velocities and accelerations for Cartesian dynamics
 c
       else
+              use_vdwLR = .true.
+              use_vdwSR = .true.
+              use_chgLR = .true.
+              use_chgSR = .true.
+              use_mpoleSR = .true.
+              use_mpoleLR = .true.
+            use_REvlist = .true.
          allocate (derivs(3,n))
          call gradient (e,derivs)
+         write(6,*)
          do i = 1, n
-            amass = mass(i)
-            if (use(i) .and. amass.ne.0.0d0) then
-               speed = maxwell (amass,kelvin)
+            if (use(i) .and. mass(i).ne.0.0d0) then
+               speed = maxwell (mass(i),kelvin)
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
-                  a(j,i) = -convert * derivs(j,i) / amass
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
                   aalt(j,i) = a(j,i)
                end do
             else

@@ -38,9 +38,14 @@ c
       real*8 vdwtaper,chgtaper
       real*8 dpltaper,mpoletaper
       real*8 ewaldcut,usolvcut
+      real*8 REvdwcut,REvdwtaper
+      real*8 REchgcut,REchgtaper
+      real*8 REmpolecut,REmpoletaper
+      real*8 REdplcut,REdpltaper
       logical use_ewald,use_lights
       logical use_list,use_vlist
       logical use_clist,use_mlist
       logical use_ulist
+      logical use_REvlist,use_REclist
       save
       end
