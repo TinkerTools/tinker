@@ -1741,11 +1741,11 @@ c
 c
 c     zero out the van der Waals energy and first derivatives
 c
-      evSR = 0.0d0
+      evLR = 0.0d0
       do i = 1, n
-         devSR(1,i) = 0.0d0
-         devSR(2,i) = 0.0d0
-         devSR(3,i) = 0.0d0
+         devLR(1,i) = 0.0d0
+         devLR(2,i) = 0.0d0
+         devLR(3,i) = 0.0d0
       end do
 
       icount = 0

@@ -262,7 +262,7 @@ c
       use usage
       use virial
       implicit none
-      integer nc,ns,i,j,k,iatom,inhc,ixyz
+      integer ns,i,j,k,iatom,inhc,ixyz
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8 
       real*8 tempstor,kBT,LkT
@@ -274,9 +274,8 @@ c
       kBT = boltzmann*kelvin
       LkT = (dble(len_nhc))*kBT    
 
-      nc = 5
       ns = 3
-      dtc = dt / dble(nc)
+      dtc = dt / dble(respa_therm_nc)
       w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
       w(2) = 1.0d0 - 2.0d0*w(1)
       w(3) = w(1)
@@ -284,7 +283,7 @@ c
 c
 c     use multiple time steps and Suzuki-Yoshida decomposition
 c
-      do k = 1, nc
+      do k = 1, respa_therm_nc
          do j = 1, ns
 
             dts = w(j) * dtc

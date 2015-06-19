@@ -50,6 +50,7 @@ c
       integer isok_chain      
       parameter (isok_chain=6)      
       integer voltrial
+      integer respa_therm_nc
       real*8 stoch_gamma
       real*8 kelvin,atmsph
       real*8 tautemp,taupres

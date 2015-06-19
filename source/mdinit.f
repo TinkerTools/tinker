@@ -117,7 +117,7 @@ c
       XO_RESPA = .false.
       XI_RESPA = .true. 
       use_mpole_switch = .true.    
-
+      respa_therm_nc = 5
 c
 c     check for keywords containing any altered parameters
 c
@@ -194,6 +194,8 @@ c
             XI_RESPA = .false.     
          else if (keyword(1:16) .eq. 'NO-MPOLE-SWITCH ') then
             use_mpole_switch = .false.
+         else if (keyword(1:) .eq. 'RESPA-THERM-NC ') then
+            read (string,*,err=10,end=10) respa_therm_nc
          end if
    10    continue
       end do
