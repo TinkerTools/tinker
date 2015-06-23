@@ -248,8 +248,8 @@ c
       cbufx = (chgcut+2.0d0*lbuffer)**2
       mbufx = (mpolecut+2.0d0*lbuffer)**2
       ubufx = (usolvcut+2.0d0*pbuffer)**2
-      REvbufx = (REvdwcut)**2
-      REcbufx = (REchgcut)**2
+      REvbufx = (REvdwcut+lbuffer)**2
+      REcbufx = (REchgcut+lbuffer)**2
 
 c
 c     perform dynamic allocation of some global arrays
