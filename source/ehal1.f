@@ -974,7 +974,6 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer icount
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
       real*8 fgrp,rv,rv7
@@ -1014,7 +1013,6 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
-      icount = 1
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1106,7 +1104,6 @@ c
 c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(ii)
-            icount = icount + 1
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
             mutk = mut(k)
@@ -1336,7 +1333,6 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      integer icount
       real*8 e,de,eps,rdn
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -1377,8 +1373,6 @@ c
          devSR(2,i) = 0.0d0
          devSR(3,i) = 0.0d0
       end do
-
-      icount = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1473,7 +1467,6 @@ c
 c     decide whether to compute the current interaction
 c
          do kk = 1, REnvlst(ii)
-            icount = icount + 1
             k = ivdw(REvlst(kk,ii))
             kv = ired(k)
             mutk = mut(k)
@@ -1493,7 +1486,7 @@ c
 c
 c     check for an interaction distance less than the cutoff
 c
-               if (rik2 .le. off2) then
+               if (rik2 .le. REcut2) then
                   rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)
@@ -1546,6 +1539,19 @@ c
                      de = e*dtaper + de*taper
                      e = e * taper
                   end if
+c
+c     use RESPA quintic switching in switching domain
+c                  
+                  if (rik2.gt.REtaper2) then
+                     res_u = (rik - REvdwcut + res_lam) / res_lam
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                  de = de*q_switch
+                  end if    
 c
 c     scale the interaction based on its group membership
 c
@@ -1706,7 +1712,6 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      integer icount
       real*8 e,de,eps,rdn
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -1747,8 +1752,6 @@ c
          devLR(2,i) = 0.0d0
          devLR(3,i) = 0.0d0
       end do
-
-      icount = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1839,11 +1842,174 @@ c
          do j = 1, n15(i)
             vscale(i15(j,i)) = v5scale
          end do
+
+c
+c     decide whether to compute the current interaction
+c
+         do kk = 1, REnvlst(ii)
+            k = ivdw(REvlst(kk,ii))
+            kv = ired(k)
+            mutk = mut(k)
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               kt = jvdw(k)
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
+               call image (xr,yr,zr)
+               rik2 = xr*xr + yr*yr + zr*zr
+c
+c     check for an interaction distance less than the cutoff
+c
+               if (rik2 .le. REcut2) then
+                  rik = sqrt(rik2)
+                  rv = radmin(kt,it)
+                  eps = epsilon(kt,it)
+                  if (iv14(k) .eq. i) then
+                     rv = radmin4(kt,it)
+                     eps = epsilon4(kt,it)
+                  end if
+                  eps = eps * vscale(k)
+c
+c     get the energy and gradient, via soft core if necessary
+c
+                  if ((muti .and. .not.mutk) .or.
+     &                (mutk .and. .not.muti)) then
+                     rho = rik / rv
+                     rho6 = rho**6
+                     rho7 = rho6 * rho
+                     eps = eps * vlambda**scexp
+                     scal = scalpha * (1.0d0-vlambda)**2
+                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
+                     s2 = 1.0d0 / (scal+rho7+ghal)
+                     t1 = (1.0d0+dhal)**7 * s1
+                     t2 = (1.0d0+ghal) * s2
+                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
+                     dt2drho = -7.0d0*rho6 * t2 * s2
+                     e = 0.0d0
+                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                  else
+                     rv7 = rv**7
+                     rik6 = rik2**3
+                     rik7 = rik6 * rik
+                     rho = rik7 + ghal*rv7
+                     tau = (dhal+1.0d0) / (rik + dhal*rv)
+                     tau7 = tau**7
+                     dtau = tau / (dhal+1.0d0)
+                     gtau = eps*tau7*rik6*(ghal+1.0d0)*(rv7/rho)**2
+                     e = 0.0d0
+                     de = -7.0d0 * (dtau*e+gtau)
+                  end if
+c
+c     use energy switching if near the cutoff distance
+c
+                  if (rik2 .gt. cut2) then
+                     rik3 = rik2 * rik
+                     rik4 = rik2 * rik2
+                     rik5 = rik2 * rik3
+                     taper = c5*rik5 + c4*rik4 + c3*rik3
+     &                          + c2*rik2 + c1*rik + c0
+                     dtaper = 5.0d0*c5*rik4 + 4.0d0*c4*rik3
+     &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
+                     de = e*dtaper + de*taper
+                     e = e * taper
+                  end if
+c
+c     use RESPA quintic switching in switching domain
+c                  
+                  if (rik2.gt.REtaper2) then
+                     res_u = (rik - REvdwcut + res_lam) / res_lam
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                  de = de*(1.0d0-q_switch)
+                  else
+                     e = 0.0d0
+                     de = 0.0d0
+                  end if    
+c
+c     scale the interaction based on its group membership
+c
+                  if (use_group) then
+                     e = e * fgrp
+                     de = de * fgrp
+                  end if
+c
+c     find the chain rule terms for derivative components
+c
+                  de = de / rik
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+c
+c     increment the total van der Waals energy and derivatives
+c
+                  evo = evo + e
+                  if (i .eq. iv) then
+                     devo(1,i) = devo(1,i) + dedx
+                     devo(2,i) = devo(2,i) + dedy
+                     devo(3,i) = devo(3,i) + dedz
+                  else
+                     devo(1,i) = devo(1,i) + dedx*redi
+                     devo(2,i) = devo(2,i) + dedy*redi
+                     devo(3,i) = devo(3,i) + dedz*redi
+                     devo(1,iv) = devo(1,iv) + dedx*rediv
+                     devo(2,iv) = devo(2,iv) + dedy*rediv
+                     devo(3,iv) = devo(3,iv) + dedz*rediv
+                  end if
+                  if (k .eq. kv) then
+                     devo(1,k) = devo(1,k) - dedx
+                     devo(2,k) = devo(2,k) - dedy
+                     devo(3,k) = devo(3,k) - dedz
+                  else
+                     redk = kred(k)
+                     redkv = 1.0d0 - redk
+                     devo(1,k) = devo(1,k) - dedx*redk
+                     devo(2,k) = devo(2,k) - dedy*redk
+                     devo(3,k) = devo(3,k) - dedz*redk
+                     devo(1,kv) = devo(1,kv) - dedx*redkv
+                     devo(2,kv) = devo(2,kv) - dedy*redkv
+                     devo(3,kv) = devo(3,kv) - dedz*redkv
+                  end if
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
+c
+c     increment the total intermolecular energy
+c
+                  if (molcule(i) .ne. molcule(k)) then
+                     eintero = eintero + e
+                  end if
+               end if
+            end if
+         end do
 c
 c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(ii)
-            icount = icount + 1
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
             mutk = mut(k)
@@ -1916,6 +2082,19 @@ c
                      de = e*dtaper + de*taper
                      e = e * taper
                   end if
+c
+c     use RESPA quintic switching in switching domain
+c                  
+                  if ((rik2.le.REcut2).and.(rik2.gt.REtaper2)) then
+                     res_u = (rik - REvdwcut + res_lam) / res_lam
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                  de = de*(1.0d0-q_switch)
+                  end if                                     
 c
 c     scale the interaction based on its group membership
 c
