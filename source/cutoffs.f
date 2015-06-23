@@ -136,7 +136,6 @@ c
             chgcut = value
             dplcut = value
             mpolecut = value
-         ewaldcut
 c
 c     get buffer width for use with pairwise neighbor lists
 c
