@@ -115,9 +115,11 @@ c
       nres_bond = 1
       stoch_gamma = 100.0d0
       XO_RESPA = .false.
+      XM_RESPA = .false.
       XI_RESPA = .true. 
       use_mpole_switch = .true.    
       respa_therm_nc = 5
+      respa_therm_nsy = 3
 c
 c     check for keywords containing any altered parameters
 c
@@ -191,11 +193,22 @@ c
             read (string,*,err=10,end=10)  stoch_gamma    
          else if (keyword(1:9) .eq. 'XO-RESPA ') then
             XO_RESPA = .true.
-            XI_RESPA = .false.     
+            XI_RESPA = .false.   
+            XM_RESPA = .false. 
+         else if (keyword(1:9) .eq. 'XI-RESPA ') then
+            XO_RESPA = .false.
+            XI_RESPA = .true.   
+            XM_RESPA = .false.  
+         else if (keyword(1:9) .eq. 'XM-RESPA ') then
+            XO_RESPA = .false.
+            XI_RESPA = .false.   
+            XM_RESPA = .true.                           
          else if (keyword(1:16) .eq. 'NO-MPOLE-SWITCH ') then
             use_mpole_switch = .false.
-         else if (keyword(1:) .eq. 'RESPA-THERM-NC ') then
+         else if (keyword(1:15) .eq. 'RESPA-THERM-NC ') then
             read (string,*,err=10,end=10) respa_therm_nc
+         else if (keyword(1:16) .eq. 'RESPA-THERM-NSY ') then
+            read (string,*,err=10,end=10) respa_therm_nsy
          end if
    10    continue
       end do
