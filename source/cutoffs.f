@@ -5,16 +5,16 @@ c     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine cutoffs  --  distance cutoffs & neighbor lists  ##
-c     ##                                                             ##
-c     #################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine cutoffs  --  set distance and Hessian cutoffs  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "cutoffs" initializes and stores spherical energy cutoff
 c     distance windows, Hessian element and Ewald sum cutoffs,
-c     and allocates pairwise neighbor lists
+c     and the pairwise neighbor generation method
 c
 c
       subroutine cutoffs
@@ -29,7 +29,6 @@ c
       use tarray
       implicit none
       integer i,next
-      integer limit
       real*8 big,value
       logical truncate
       character*20 keyword
@@ -93,6 +92,7 @@ c
          if (keyword(1:6) .eq. 'EWALD ') then
             use_ewald = .true.
          else if (keyword(1:13) .eq. 'EWALD-CUTOFF ') then
+            use_ewald = .true.
             read (string,*,err=10,end=10)  ewaldcut
 c
 c     get cutoff for preconditioner of dipole solver
@@ -136,32 +136,6 @@ c
             chgcut = value
             dplcut = value
             mpolecut = value
-            ewaldcut = value
-         else if (keyword(1:11) .eq. 'VDW-CUTOFF ') then
-            read (string,*,err=10,end=10)  vdwcut
-         else if (keyword(1:11) .eq. 'CHG-CUTOFF ') then
-            read (string,*,err=10,end=10)  chgcut
-         else if (keyword(1:11) .eq. 'DPL-CUTOFF ') then
-            read (string,*,err=10,end=10)  dplcut
-         else if (keyword(1:13) .eq. 'MPOLE-CUTOFF ') then
-            read (string,*,err=10,end=10)  mpolecut
-c
-c     get distance for initialization of energy switching
-c
-         else if (keyword(1:6) .eq. 'TAPER ') then
-            read (string,*,err=10,end=10)  value
-            vdwtaper = value
-            chgtaper = value
-            dpltaper = value
-            mpoletaper = value
-         else if (keyword(1:10) .eq. 'VDW-TAPER ') then
-            read (string,*,err=10,end=10)  vdwtaper
-         else if (keyword(1:10) .eq. 'CHG-TAPER ') then
-            read (string,*,err=10,end=10)  chgtaper
-         else if (keyword(1:10) .eq. 'DPL-TAPER ') then
-            read (string,*,err=10,end=10)  dpltaper
-         else if (keyword(1:12) .eq. 'MPOLE-TAPER ') then
-            read (string,*,err=10,end=10)  mpoletaper
 c
 c     get buffer width for use with pairwise neighbor lists
 c
@@ -200,6 +174,8 @@ c
          dpltaper = big
          mpoletaper = big
       end if
+
+
 c
 c     set buffer region limits for pairwise neighbor lists
 c
@@ -213,29 +189,24 @@ c
       cbufx = (chgcut+2.0d0*lbuffer)**2
       mbufx = (mpolecut+2.0d0*lbuffer)**2
       ubufx = (usolvcut+2.0d0*pbuffer)**2
-c
-c     specify maximum size for each of the neighbor lists
-c
-      maxvlst = 2500
-      limit = int(0.5d0*sqrt(vbuf2)**3) + 50
-      maxvlst = min(limit,maxvlst)
-      maxelst = 2500
-      limit = int(0.5d0*sqrt(max(cbuf2,mbuf2))**3) + 50
-      maxelst = min(limit,maxelst)
-      maxulst = 500
-      limit = int(0.5d0*sqrt(ubuf2)**3) + 50
-      maxulst = min(limit,maxulst)
+      REvbufx = (REvdwcut+lbuffer)**2
+      REcbufx = (REchgcut+lbuffer)**2
+
 c
 c     perform dynamic allocation of some global arrays
 c
       if (use_vlist) then
          if (allocated(nvlst))  deallocate (nvlst)
          if (allocated(vlst))  deallocate (vlst)
+         if (allocated(REnvlst))  deallocate (REnvlst)
+         if (allocated(REvlst))  deallocate (REvlst)
          if (allocated(xvold))  deallocate (xvold)
          if (allocated(yvold))  deallocate (yvold)
          if (allocated(zvold))  deallocate (zvold)
          allocate (nvlst(n))
+         allocate (REnvlst(n))
          allocate (vlst(maxvlst,n))
+         allocate (REvlst(maxvlst,n))
          allocate (xvold(n))
          allocate (yvold(n))
          allocate (zvold(n))
@@ -243,8 +214,12 @@ c
       if (use_clist .or. use_mlist) then
          if (allocated(nelst))  deallocate (nelst)
          if (allocated(elst))  deallocate (elst)
+         if (allocated(REnelst))  deallocate (REnelst)
+         if (allocated(REelst))  deallocate (REelst)
          allocate (nelst(n))
          allocate (elst(maxelst,n))
+         allocate (REnelst(n))
+         allocate (REelst(maxelst,n))         
       end if
       if (use_clist) then
          if (allocated(xcold))  deallocate (xcold)

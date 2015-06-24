@@ -27,6 +27,12 @@ c     use_strtor  logical flag governing use of stretch-torsion term
 c     use_angtor  logical flag governing use of angle-torsion term
 c     use_tortor  logical flag governing use of torsion-torsion term
 c     use_vdw     logical flag governing use of vdw der Waals potential
+c     use_vdwLR
+c     use_vdwSR
+c     use_chgLR
+c     use_chgSR
+c     use_mpoleLR
+c     use_mpoleSR
 c     use_charge  logical flag governing use of charge-charge potential
 c     use_chgdpl  logical flag governing use of charge-dipole potential
 c     use_dipole  logical flag governing use of dipole-dipole potential
@@ -57,5 +63,8 @@ c
       logical use_metal,use_geom
       logical use_extra,use_born
       logical use_orbit
+      logical use_vdwLR,use_vdwSR
+      logical use_chgLR,use_chgSR
+      logical use_mpoleLR,use_mpoleSR
       save
       end

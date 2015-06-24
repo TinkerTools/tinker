@@ -68,5 +68,9 @@ c
       real*8, allocatable :: delf(:,:)
       real*8, allocatable :: deg(:,:)
       real*8, allocatable :: dex(:,:)
+      real*8, allocatable :: devSR(:,:)
+      real*8, allocatable :: devLR(:,:)
+      real*8, allocatable :: decSR(:,:)
+      real*8, allocatable :: decLR(:,:)
       save
       end
