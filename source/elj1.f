@@ -45,6 +45,7 @@ c     apply long range van der Waals correction if desired
 c
       if (use_vcorr) then
          call evcorr1 (elrc,vlrc)
+         write(6,*) "long range vdw correction"
          ev = ev + elrc
          vir(1,1) = vir(1,1) + vlrc
          vir(2,2) = vir(2,2) + vlrc
@@ -995,7 +996,7 @@ c
          end do
 c
 c     decide whether to compute the current interaction
-c
+c       
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
@@ -1455,3 +1456,812 @@ c
       deallocate (vscale)
       return
       end
+
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine eljSR  --  Lennard-Jones vdw derivs via list  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "eljSR" calculates the Lennard-Jones 12-6 van der Waals energy
+c     and its first derivatives using a pairwise neighbor list
+c
+c
+      subroutine eljSR
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use limits
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
+      implicit none
+      integer i,j,k
+      integer ii,iv,it
+      integer kk,kv,kt
+      integer, allocatable :: iv14(:)
+      real*8 e,de,p6,p12,eps
+      real*8 rv,rdn,fgrp
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 redi,rediv
+      real*8 redk,redkv
+      real*8 dedx,dedy,dedz
+      real*8 rik,rik2,rik3
+      real*8 res_u,ru2,ru3,ru4,ru5,res_lam,q_switch
+      real*8 REcut2,REtaper2
+      real*8 rik4,rik5
+      real*8 taper,dtaper
+      real*8 vxx,vyy,vzz
+      real*8 vyx,vzx,vzy
+      real*8 evo,eintero
+      real*8 viro(3,3)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
+      real*8, allocatable :: vscale(:)
+      real*8, allocatable :: devo(:,:)
+      logical proceed,usei
+      character*6 mode
+c
+c
+c     zero out the van der Waals energy and first derivatives
+c
+      evSR = 0.0d0
+      do i = 1, n
+         devSR(1,i) = 0.0d0
+         devSR(2,i) = 0.0d0
+         devSR(3,i) = 0.0d0
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
+      allocate (vscale(n))
+      allocate (devo(3,n))
+c
+c     set arrays needed to scale connected atom interactions
+c
+      do i = 1, n
+         vscale(i) = 1.0d0
+         iv14(i) = 0
+      end do
+c
+c     set the coefficients for the switching function
+c
+      mode = 'VDW'
+      call switch (mode)
+      REcut2 = REvdwcut**2
+      REtaper2 = REvdwtaper**2
+      res_lam = REvdwcut - REvdwtaper
+
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      evo = evSR
+      eintero = einter
+      do i = 1, n
+         devo(1,i) = devSR(1,i)
+         devo(2,i) = devSR(2,i)
+         devo(3,i) = devSR(3,i)
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
+!$OMP& jvdw,xred,yred,zred,use,REnvlst,REvlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
+!$OMP& cut2,c0,c1,c2,c3,c4,c5,molcule) firstprivate(vscale,iv14)
+!$OMP& shared(evo,devo,viro,eintero)
+!$OMP DO reduction(+:evo,devo,viro,eintero) schedule(guided)
+c
+c     find van der Waals energy and derivatives via neighbor list
+c
+      do ii = 1, nvdw
+         i = ivdw(ii)
+         iv = ired(i)
+         redi = kred(i)
+         rediv = 1.0d0 - redi
+         it = jvdw(i)
+         xi = xred(i)
+         yi = yred(i)
+         zi = zred(i)
+         usei = (use(i) .or. use(iv))
+c
+c     set interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            vscale(i12(j,i)) = v2scale
+         end do
+         do j = 1, n13(i)
+            vscale(i13(j,i)) = v3scale
+         end do
+         do j = 1, n14(i)
+            vscale(i14(j,i)) = v4scale
+            iv14(i14(j,i)) = i
+         end do
+         do j = 1, n15(i)
+            vscale(i15(j,i)) = v5scale
+         end do
+c
+c     decide whether to compute the current interaction
+c       
+         do kk = 1, REnvlst(ii)
+            k = ivdw(REvlst(kk,ii))
+            kv = ired(k)
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               kt = jvdw(k)
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
+               call image (xr,yr,zr)
+               rik2 = xr*xr + yr*yr + zr*zr
+c
+c     check for an interaction distance less than the cutoff
+c
+               if (rik2 .le. REcut2) then
+                  rv = radmin(kt,it)
+                  eps = epsilon(kt,it)
+                  if (iv14(k) .eq. i) then
+                     rv = radmin4(kt,it)
+                     eps = epsilon4(kt,it)
+                  end if
+                  eps = eps * vscale(k)
+                  rik = sqrt(rik2)
+                  p6 = rv**6 / rik2**3
+                  p12 = p6 * p6
+                  e = eps * (p12-2.0d0*p6)
+                  de = eps * (p12-p6) * (-12.0d0/rik)
+c
+c     use energy switching if near the cutoff distance
+c
+                  if (rik2 .gt. cut2) then
+                     rik3 = rik2 * rik
+                     rik4 = rik2 * rik2
+                     rik5 = rik2 * rik3
+                     taper = c5*rik5 + c4*rik4 + c3*rik3
+     &                          + c2*rik2 + c1*rik + c0
+                     dtaper = 5.0d0*c5*rik4 + 4.0d0*c4*rik3
+     &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
+                     de = e*dtaper + de*taper
+                     e = e * taper
+                  end if
+                  if ((rik2.le.REcut2).and.(rik2.gt.REtaper2)) then
+                     res_u = (rik - REvdwcut + res_lam) / res_lam
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                  de = de*q_switch
+                  end if                  
+c
+c     scale the interaction based on its group membership
+c
+                  if (use_group) then
+                     e = e * fgrp
+                     de = de * fgrp
+                  end if
+c
+c     find the chain rule terms for derivative components
+c
+                  de = de / rik
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+c
+c     increment the total van der Waals energy and derivatives
+c
+                  evo = evo + e
+                  if (i .eq. iv) then
+                     devo(1,i) = devo(1,i) + dedx
+                     devo(2,i) = devo(2,i) + dedy
+                     devo(3,i) = devo(3,i) + dedz
+                  else
+                     devo(1,i) = devo(1,i) + dedx*redi
+                     devo(2,i) = devo(2,i) + dedy*redi
+                     devo(3,i) = devo(3,i) + dedz*redi
+                     devo(1,iv) = devo(1,iv) + dedx*rediv
+                     devo(2,iv) = devo(2,iv) + dedy*rediv
+                     devo(3,iv) = devo(3,iv) + dedz*rediv
+                  end if
+                  if (k .eq. kv) then
+                     devo(1,k) = devo(1,k) - dedx
+                     devo(2,k) = devo(2,k) - dedy
+                     devo(3,k) = devo(3,k) - dedz
+                  else
+                     redk = kred(k)
+                     redkv = 1.0d0 - redk
+                     devo(1,k) = devo(1,k) - dedx*redk
+                     devo(2,k) = devo(2,k) - dedy*redk
+                     devo(3,k) = devo(3,k) - dedz*redk
+                     devo(1,kv) = devo(1,kv) - dedx*redkv
+                     devo(2,kv) = devo(2,kv) - dedy*redkv
+                     devo(3,kv) = devo(3,kv) - dedz*redkv
+                  end if
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
+c
+c     increment the total intermolecular energy
+c
+                  if (molcule(i) .ne. molcule(k)) then
+                     eintero = eintero + e
+                  end if
+               end if
+            end if
+         end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            vscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            vscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            vscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            vscale(i15(j,i)) = 1.0d0
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      evSR = evo
+      einter = eintero
+      do i = 1, n
+         devSR(1,i) = devo(1,i)
+         devSR(2,i) = devo(2,i)
+         devSR(3,i) = devo(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
+      deallocate (vscale)
+      deallocate (devo)
+      return
+      end
+
+
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine eljLR  --  Lennard-Jones vdw derivs via list  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "eljLR" calculates the Lennard-Jones 12-6 van der Waals energy
+c     and its first derivatives using a pairwise neighbor list
+c
+c
+      subroutine eljLR
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use couple
+      use deriv
+      use energi
+      use group
+      use inter
+      use limits
+      use molcul
+      use neigh
+      use shunt
+      use usage
+      use vdw
+      use vdwpot
+      use virial
+      implicit none
+      integer i,j,k
+      integer ii,iv,it
+      integer kk,kv,kt
+      integer, allocatable :: iv14(:)
+      real*8 e,de,p6,p12,eps
+      real*8 rv,rdn,fgrp
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 redi,rediv
+      real*8 redk,redkv
+      real*8 dedx,dedy,dedz
+      real*8 rik,rik2,rik3
+      real*8 res_u,ru2,ru3,ru4,ru5,res_lam,q_switch
+      real*8 REcut2,REtaper2      
+      real*8 rik4,rik5
+      real*8 taper,dtaper
+      real*8 vxx,vyy,vzz
+      real*8 vyx,vzx,vzy
+      real*8 evo,eintero
+      real*8 viro(3,3)
+      real*8, allocatable :: xred(:)
+      real*8, allocatable :: yred(:)
+      real*8, allocatable :: zred(:)
+      real*8, allocatable :: vscale(:)
+      real*8, allocatable :: devo(:,:)
+      logical proceed,usei
+      character*6 mode
+c
+c
+c     zero out the van der Waals energy and first derivatives
+c
+      evLR = 0.0d0
+      do i = 1, n
+         devLR(1,i) = 0.0d0
+         devLR(2,i) = 0.0d0
+         devLR(3,i) = 0.0d0
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (iv14(n))
+      allocate (xred(n))
+      allocate (yred(n))
+      allocate (zred(n))
+      allocate (vscale(n))
+      allocate (devo(3,n))
+c
+c     set arrays needed to scale connected atom interactions
+c
+      do i = 1, n
+         vscale(i) = 1.0d0
+         iv14(i) = 0
+      end do
+c
+c     set the coefficients for the switching function
+c
+      mode = 'VDW'
+      call switch (mode)
+      REcut2 = REvdwcut**2
+      REtaper2 = REvdwtaper**2
+      res_lam = REvdwcut - REvdwtaper
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      evo = evLR
+      eintero = einter
+      do i = 1, n
+         devo(1,i) = devLR(1,i)
+         devo(2,i) = devLR(2,i)
+         devo(3,i) = devLR(3,i)
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
+!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,REnvlst,REvlst,
+!$OMP& n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
+!$OMP& cut2,c0,c1,c2,c3,c4,c5,molcule) firstprivate(vscale,iv14)
+!$OMP& shared(evo,devo,viro,eintero)
+!$OMP DO reduction(+:evo,devo,viro,eintero) schedule(guided)
+c
+c     find van der Waals energy and derivatives via neighbor list
+c
+      do ii = 1, nvdw
+         i = ivdw(ii)
+         iv = ired(i)
+         redi = kred(i)
+         rediv = 1.0d0 - redi
+         it = jvdw(i)
+         xi = xred(i)
+         yi = yred(i)
+         zi = zred(i)
+         usei = (use(i) .or. use(iv))
+c
+c     set interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            vscale(i12(j,i)) = v2scale
+         end do
+         do j = 1, n13(i)
+            vscale(i13(j,i)) = v3scale
+         end do
+         do j = 1, n14(i)
+            vscale(i14(j,i)) = v4scale
+            iv14(i14(j,i)) = i
+         end do
+         do j = 1, n15(i)
+            vscale(i15(j,i)) = v5scale
+         end do
+c
+c     decide whether to compute the current interaction
+c       
+         do kk = 1, nvlst(ii)
+            k = ivdw(vlst(kk,ii))
+            kv = ired(k)
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               kt = jvdw(k)
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
+               call image (xr,yr,zr)
+               rik2 = xr*xr + yr*yr + zr*zr
+c
+c     check for an interaction distance less than the cutoff
+c
+               if (rik2 .le. off2) then
+                  rv = radmin(kt,it)
+                  eps = epsilon(kt,it)
+                  if (iv14(k) .eq. i) then
+                     rv = radmin4(kt,it)
+                     eps = epsilon4(kt,it)
+                  end if
+                  eps = eps * vscale(k)
+                  rik = sqrt(rik2)
+                  p6 = rv**6 / rik2**3
+                  p12 = p6 * p6
+                  e = eps * (p12-2.0d0*p6)
+                  de = eps * (p12-p6) * (-12.0d0/rik)
+c
+c     use energy switching if near the cutoff distance
+c
+                  if (rik2 .gt. cut2) then
+                     rik3 = rik2 * rik
+                     rik4 = rik2 * rik2
+                     rik5 = rik2 * rik3
+                     taper = c5*rik5 + c4*rik4 + c3*rik3
+     &                          + c2*rik2 + c1*rik + c0
+                     dtaper = 5.0d0*c5*rik4 + 4.0d0*c4*rik3
+     &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
+                     de = e*dtaper + de*taper
+                     e = e * taper
+                  end if
+                  if ((rik2.le.REcut2).and.(rik2.gt.REtaper2)) then
+                     res_u = (rik - REvdwcut + res_lam) / res_lam
+                     ru2 = res_u * res_u
+                     ru3 = ru2 * res_u
+                     ru4 = ru3 * res_u
+                     ru5 = ru4 * res_u
+                     q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                  de = de*(1.0d0-q_switch)
+                  end if                    
+c
+c     scale the interaction based on its group membership
+c
+                  if (use_group) then
+                     e = e * fgrp
+                     de = de * fgrp
+                  end if
+c
+c     find the chain rule terms for derivative components
+c
+                  de = de / rik
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+c
+c     increment the total van der Waals energy and derivatives
+c
+                  evo = evo + e
+                  if (i .eq. iv) then
+                     devo(1,i) = devo(1,i) + dedx
+                     devo(2,i) = devo(2,i) + dedy
+                     devo(3,i) = devo(3,i) + dedz
+                  else
+                     devo(1,i) = devo(1,i) + dedx*redi
+                     devo(2,i) = devo(2,i) + dedy*redi
+                     devo(3,i) = devo(3,i) + dedz*redi
+                     devo(1,iv) = devo(1,iv) + dedx*rediv
+                     devo(2,iv) = devo(2,iv) + dedy*rediv
+                     devo(3,iv) = devo(3,iv) + dedz*rediv
+                  end if
+                  if (k .eq. kv) then
+                     devo(1,k) = devo(1,k) - dedx
+                     devo(2,k) = devo(2,k) - dedy
+                     devo(3,k) = devo(3,k) - dedz
+                  else
+                     redk = kred(k)
+                     redkv = 1.0d0 - redk
+                     devo(1,k) = devo(1,k) - dedx*redk
+                     devo(2,k) = devo(2,k) - dedy*redk
+                     devo(3,k) = devo(3,k) - dedz*redk
+                     devo(1,kv) = devo(1,kv) - dedx*redkv
+                     devo(2,kv) = devo(2,kv) - dedy*redkv
+                     devo(3,kv) = devo(3,kv) - dedz*redkv
+                  end if
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
+c
+c     increment the total intermolecular energy
+c
+                  if (molcule(i) .ne. molcule(k)) then
+                     eintero = eintero + e
+                  end if
+               end if
+            end if
+         end do
+
+         do kk = 1, REnvlst(ii)
+            k = ivdw(REvlst(kk,ii))
+            kv = ired(k)
+            proceed = .true.
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+c
+c     compute the energy contribution for this interaction
+c
+            if (proceed) then
+               kt = jvdw(k)
+               xr = xi - xred(k)
+               yr = yi - yred(k)
+               zr = zi - zred(k)
+               call image (xr,yr,zr)
+               rik2 = xr*xr + yr*yr + zr*zr
+c
+c     check for an interaction distance less than the cutoff
+c
+               if ((rik2.le.REcut2).and.(rik2.gt.REtaper2)) then
+                  rv = radmin(kt,it)
+                  eps = epsilon(kt,it)
+                  if (iv14(k) .eq. i) then
+                     rv = radmin4(kt,it)
+                     eps = epsilon4(kt,it)
+                  end if
+                  eps = eps * vscale(k)
+                  rik = sqrt(rik2)
+                  p6 = rv**6 / rik2**3
+                  p12 = p6 * p6
+                  e = 0.0d0
+                  de = eps * (p12-p6) * (-12.0d0/rik)
+c
+c     use RESPA switching if near the cutoff distance
+c
+                  res_u = (rik - REvdwcut + res_lam) / res_lam
+                  ru2 = res_u * res_u
+                  ru3 = ru2 * res_u
+                  ru4 = ru3 * res_u
+                  ru5 = ru4 * res_u
+                  q_switch = 1.0d0 + (15.0d0*ru4) - (6.0d0*ru5)
+     &                          - (10.0d0*ru3)
+                  de = de*(1.0d0-q_switch)
+               else if (rik2.gt.REcut2) then
+                  rv = radmin(kt,it)
+                  eps = epsilon(kt,it)
+                  if (iv14(k) .eq. i) then
+                     rv = radmin4(kt,it)
+                     eps = epsilon4(kt,it)
+                  end if
+                  eps = eps * vscale(k)
+                  rik = sqrt(rik2)
+                  p6 = rv**6 / rik2**3
+                  p12 = p6 * p6
+                  e = 0.0d0
+                  de = eps * (p12-p6) * (-12.0d0/rik)               
+               else
+                  e = 0.0d0
+                  de = 0.0d0
+               end if                  
+c
+c     scale the interaction based on its group membership
+c
+                  if (use_group) then
+                     e = e * fgrp
+                     de = de * fgrp
+                  end if
+c
+c     find the chain rule terms for derivative components
+c
+                  de = de / rik
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+c
+c     increment the total van der Waals energy and derivatives
+c
+                  evo = evo + e
+                  if (i .eq. iv) then
+                     devo(1,i) = devo(1,i) + dedx
+                     devo(2,i) = devo(2,i) + dedy
+                     devo(3,i) = devo(3,i) + dedz
+                  else
+                     devo(1,i) = devo(1,i) + dedx*redi
+                     devo(2,i) = devo(2,i) + dedy*redi
+                     devo(3,i) = devo(3,i) + dedz*redi
+                     devo(1,iv) = devo(1,iv) + dedx*rediv
+                     devo(2,iv) = devo(2,iv) + dedy*rediv
+                     devo(3,iv) = devo(3,iv) + dedz*rediv
+                  end if
+                  if (k .eq. kv) then
+                     devo(1,k) = devo(1,k) - dedx
+                     devo(2,k) = devo(2,k) - dedy
+                     devo(3,k) = devo(3,k) - dedz
+                  else
+                     redk = kred(k)
+                     redkv = 1.0d0 - redk
+                     devo(1,k) = devo(1,k) - dedx*redk
+                     devo(2,k) = devo(2,k) - dedy*redk
+                     devo(3,k) = devo(3,k) - dedz*redk
+                     devo(1,kv) = devo(1,kv) - dedx*redkv
+                     devo(2,kv) = devo(2,kv) - dedy*redkv
+                     devo(3,kv) = devo(3,kv) - dedz*redkv
+                  end if
+c
+c     increment the internal virial tensor components
+c
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  viro(1,1) = viro(1,1) + vxx
+                  viro(2,1) = viro(2,1) + vyx
+                  viro(3,1) = viro(3,1) + vzx
+                  viro(1,2) = viro(1,2) + vyx
+                  viro(2,2) = viro(2,2) + vyy
+                  viro(3,2) = viro(3,2) + vzy
+                  viro(1,3) = viro(1,3) + vzx
+                  viro(2,3) = viro(2,3) + vzy
+                  viro(3,3) = viro(3,3) + vzz
+c
+c     increment the total intermolecular energy
+c
+                  if (molcule(i) .ne. molcule(k)) then
+                     eintero = eintero + e
+                  end if
+            end if
+         end do
+
+
+
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            vscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            vscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            vscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            vscale(i15(j,i)) = 1.0d0
+         end do
+      end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      evLR = evo
+      einter = eintero
+      do i = 1, n
+         devLR(1,i) = devo(1,i)
+         devLR(2,i) = devo(2,i)
+         devLR(3,i) = devo(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (iv14)
+      deallocate (xred)
+      deallocate (yred)
+      deallocate (zred)
+      deallocate (vscale)
+      deallocate (devo)
+      return
+      end      

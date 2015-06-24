@@ -51,5 +51,7 @@ c
       real*8 ed,em,ep
       real*8 er,es,elf
       real*8 eg,ex
+      real*8 evLR,evSR
+      real*8 ecLR,ecSR
       save
       end
