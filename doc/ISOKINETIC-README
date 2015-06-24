@@ -1,0 +1,16 @@
+If you would like to compile the code on the isokinetic branch of jayponder/tinker, follow he usual procedure of copying the following files into your local source/ directory:
+
+ - compile.make
+ - library.make
+ - link.make
+ - rename.make
+
+Then, edit compile.make and library.make so that the files stoch_respa2.f, grad_respa.f, and empoleSR.f are compiled.
+
+Finally:
+
+mkdir ../bin   ;
+./compile.make ;
+./library.make ;
+./link.make    ;
+./rename.make  
