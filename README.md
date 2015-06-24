@@ -1,6 +1,6 @@
 This code is capable of resonance-free multiple step (MTS) dynamics via the stochastic isokinetic integrator detailed in Leimkuhler, Margul, and Tuckerman Mol. Phys. 111, 22-23, 3579-3594 (2013).  This paper details the application to a fixed-charge model, but this code supports polarizable force fields.  It has been tested with the AMOEBA-WATER-2003 model, simulating a periodic cube of 512 H2O molecules.
 
-With properly chosen keywords, this code can generate canonical position distributions functions with well over an order of magnitude of computation time savings. Consider the Oxygen-Oxygen, Oxygen-Hydrogen, and Hydrogen-Hydrogen distribution functions of liquid water. Reference NVT data are shown in blue, and MTS data with a large time step of 105 fs are in red. Run the simulation yourself frmo xi-respa-test/:
+With properly chosen keywords, this code can generate canonical position distributions functions with well over an order of magnitude of computation time savings. Consider the Oxygen-Oxygen, Oxygen-Hydrogen, and Hydrogen-Hydrogen distribution functions of liquid water. Reference NVT data are shown in blue, and MTS data with a large time step of 105 fs are in red. Run the simulation yourself in xi-respa-test/:
 ![image](https://cloud.githubusercontent.com/assets/4325206/8332087/f47d509c-1a59-11e5-89be-9405b48b3039.png)
 
 The following keywords are required to run a stochastic isokinetic MTS simulation:
