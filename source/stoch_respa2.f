@@ -39,7 +39,7 @@ c
       integer istep
       real*8 eone,etwo,ethree,efour
       real*8 dt,dt_2
-      real*8 dta,dta_2
+      real*8 dti,dtm
       real*8 epot,etot
       real*8 eksum,eps
       real*8 temp,pres
@@ -63,8 +63,8 @@ c
 c     set some values for the dynamics integration
 c
       dt_2 = 0.5d0 * dt
-      dta = dt / (dble(nres_short*nres_tors*nres_bond))
-      dta_2 = 0.5d0 * dta
+      dtm = dt / (dble(nres_short))
+      dti = dtm / (dble(nres_tors*nres_bond))
 
       kBT = boltzmann*kelvin
       LkT = dble(len_nhc)*kBT
@@ -82,16 +82,6 @@ c
       allocate (yold(n))
       allocate (zold(n))
 
-c
-c
-c     initialize virial from fast-evolving potential energy terms
-c
-      do i = 1, 3
-         do j = 1, 3
-            viralt(j,i) = 0.0d0
-         end do
-      end do
-
       if (XO_RESPA) call applyisok (dt)
 
 c
@@ -100,26 +90,29 @@ c     begin inner RESPA loop
 c
 
       do ires_short = 1, nres_short
+
+         if (XM_RESPA) call applyisok (dtm)
+
          do ires_tors = 1, nres_tors
             do ires_bond = 1, nres_bond
 c
 c
 c     nose-like isokinetic operator
 
-               if (XI_RESPA) call applyisok (dta)
+               if (XI_RESPA) call applyisok (dti)
 
 c
 c
 c     stochastic noise operator
 c      
-               call v2random (dta)      
+               call v2random (dti)      
 
 
 c
 c     force-like isokinetic operator
 c
 
-               call applyisok2 (dta)
+               call applyisok2 (dti)
 
             
 c
@@ -130,12 +123,12 @@ c
                      xold(i) = x(i)
                      yold(i) = y(i)
                      zold(i) = z(i)
-                     x(i) = x(i) + v(1,i)*dta
-                     y(i) = y(i) + v(2,i)*dta
-                     z(i) = z(i) + v(3,i)*dta
+                     x(i) = x(i) + v(1,i)*dti
+                     y(i) = y(i) + v(2,i)*dti
+                     z(i) = z(i) + v(3,i)*dti
                   end if
                end do
-               if (use_rattle) call rattle (dta,xold,yold,zold)
+               if (use_rattle) call rattle (dti,xold,yold,zold)
 
 
 
@@ -152,7 +145,7 @@ c
                         end do
                      end do
                      if (ires_tors.eq.nres_tors) then
-                        call grad3 (ethree,derivs2,ires_short)                 
+                        call grad3 (ethree,derivs2)                 
                         do i = 1, n
                            do j = 1, 3
                               derivs(j,i) = derivs(j,i) 
@@ -177,21 +170,24 @@ c
                      end do
                   end do
 
-                  if (use_rattle) call rattle2 (dta)
+                  if (use_rattle) call rattle2 (dti)
 
 c
 c
 c     force-like isokinetic operator
 c
-               call applyisok2 (dta)
+               call applyisok2 (dti)
 c
 c
 c     nose-like isokinetic operator
 c
-               if (XI_RESPA) call applyisok (dta)
+               if (XI_RESPA) call applyisok (dti)
 
             end do
          end do
+
+         if (XM_RESPA) call applyisok (dtm)
+
       end do
 
       if (XO_RESPA) call applyisok (dt)
@@ -738,7 +734,7 @@ c
 c
 c
 c
-      subroutine grad3 (ethree,derivs,ires_short)
+      subroutine grad3 (ethree,derivs)
       use limits
       use mdstuf
       use potent
