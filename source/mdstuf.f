@@ -46,6 +46,7 @@ c     mult_short
       logical uindsave
       logical XO_RESPA
       logical XI_RESPA
+      logical XM_RESPA
       logical use_mpole_switch
       character*11 integrate
       save

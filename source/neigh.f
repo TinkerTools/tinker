@@ -72,7 +72,7 @@ c
       real*8 mbuf2,ubuf2
       real*8 vbufx,cbufx
       real*8 mbufx,ubufx
-      real*8 REvbufx,REcbufx
+      real*8 REvbufx,REcbufx,REmbufx
       real*8, allocatable :: xvold(:)
       real*8, allocatable :: yvold(:)
       real*8, allocatable :: zvold(:)
