@@ -37,7 +37,7 @@ RESPA-TAPER    [value, Å]
   - RESPA-CHG-TAPER [value, Å] for fixed-charge electrostatics 
   - RESPA-MPOLE-TAPER [value, Å] for polarizable electrostatics
 
-NHC-LENGTH <integer>
+NHC-LENGTH [integer, 1-6]
  - In Leimkuhler et al., this is L, the number of thermostat particles per degree of freedom. It has a default value of 4. For XI-RESPA (see below), the user may find that L = 1 is sufficient. 
 
 XO-RESPA
