@@ -37,11 +37,12 @@ RESPA-TAPER    [value, Å]
   - RESPA-CHG-TAPER [value, Å] for fixed-charge electrostatics 
   - RESPA-MPOLE-TAPER [value, Å] for polarizable electrostatics
 
-NHC-LENGTH [integer, 1-6]
- - In Leimkuhler et al., this is L, the number of thermostat particles per degree of freedom. It has a default value of 4. For XI-RESPA (see below), the user may find that L = 1 is sufficient. 
-
+ 
 XO-RESPA
- - By default, the integrator will follow an XI-RESPA scheme, where the Nose-like update to thermostat velocities occurs during the same time step level as the bonded interactions.  The user may enter the keyword XO-RESPA instead, so that this occurs during the time step level of the long-range nonbonded interactions.  This will speed up the code with some accuracy loss, and accuracy can be regained with larger values of 
+ - By default, the integrator will follow an XI-RESPA scheme, where the Nose-like update to thermostat velocities occurs during the same time step level as the bonded interactions.  The user may enter the keyword XO-RESPA instead, so that this occurs during the time step level of the long-range nonbonded interactions.  This will speed up the code with some accuracy loss, and accuracy can be regained with larger values of NHC-LENGTH, RESPA-THERM-NC, and/or RESPA-THERM-NSY (see below). 
+
+NHC-LENGTH [integer, 1-6]
+ - In Leimkuhler et al., this is L, the number of thermostat particles per degree of freedom. It has a default value of 4. For XI-RESPA, the user may find that NHC-LENGTH = 1 is sufficient.
 
 TAU-TEMPERATURE [value, ps]
  - This is a characteristic timescale of the physical system of interest, and it is used to assign "masses" to the extended phase space thermostat particles. This variable is native to TINKER for use in Nose-like thermostats and barostats, and has a default value of 0.2 ps.  For stochastic isokinetic dynamics of liquid water, TAU-TEMPERATURE of 0.01 ps is recommended. 
