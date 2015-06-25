@@ -4,11 +4,17 @@ With properly chosen keywords, this code can generate canonical position distrib
 
 ![image](https://cloud.githubusercontent.com/assets/4325206/8332087/f47d509c-1a59-11e5-89be-9405b48b3039.png)
 
+
 The following keywords are required to run a stochastic isokinetic MTS simulation:
-INTEGRATOR   STOCH-RESPA
-NRES-BOND [integer]
-NRES-TORS   [integer]
-NRES-SHORT [integer]
+
+ INTEGRATOR   STOCH-RESPA
+ 
+ NRES-BOND [integer]
+ 
+ NRES-TORS   [integer]
+ 
+ NRES-SHORT [integer]
+ 
 - For a single large outer time step such as 105 fs: 
   - The long-range non-bonded interactions are computed once. 
   - The short-range non-bonded interactions are computed NRES-SHORT times.  
