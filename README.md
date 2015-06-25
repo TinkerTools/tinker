@@ -23,8 +23,11 @@ The following keywords are required to run a stochastic isokinetic MTS simulatio
 - The default value for all three NRES- integers is 1.
 
 NEIGHBOR-LIST
+
 RESPA-CUTOFF  [value, Å]
+
 RESPA-TAPER    [value, Å]
+
  - RESPA-CUTOFF is the maximum distance between a pair of interacting particles which the user would classify as within "short-range."  This applies to the van der Waals interaction and either fixed charged PME or AMOEBA-like polarizable electrostatics.  For more control, the user may specify different short-range cutoffs for different interactions with the keywords:
   - RESPA-VDW-CUTOFF [value, Å] for van der Waals interactions 
   - RESPA-CHG-CUTOFF [value, Å] for fixed-charge electrostatics 
@@ -47,7 +50,9 @@ STOCH-GAMMA <value, ps^-1>
  - This is the Langevin friction coefficient $\gamma$ in Leimkuhler et al. It has a default value of 100 ps^-1.
 
 RESPA-THERM-NC   [integer]
+
 RESPA-THERM-NSY [integer]
+
  - The user may fine tune the Suzuki-Yoshida decomposition of the Nose-like thermostat velocity update. RESPA-THERM-NC is the number of factorizations per update, and RESPA-THERM-NSY is the number of Suzuki-Yoshida time steps per factorization. 
  - By default, RESPA-THERM-NC = 5. For XI-RESPA, RESPA-THERM-NC = 2 may be sufficient. 
  - RESPA-THERM-NSY has a default value of 3, and will accept 3, 5, 7, or 15.
