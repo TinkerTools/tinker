@@ -43,10 +43,10 @@ NHC-LENGTH <integer>
 XO-RESPA
  - By default, the integrator will follow an XI-RESPA scheme, where the Nose-like update to thermostat velocities occurs during the same time step level as the bonded interactions.  The user may enter the keyword XO-RESPA instead, so that this occurs during the time step level of the long-range nonbonded interactions.  This will speed up the code with some accuracy loss, and accuracy can be regained with larger values of 
 
-TAU-TEMPERATURE <value, ps>
+TAU-TEMPERATURE [value, ps]
  - This is a characteristic timescale of the physical system of interest, and it is used to assign "masses" to the extended phase space thermostat particles. This variable is native to TINKER for use in Nose-like thermostats and barostats, and has a default value of 0.2 ps.  For stochastic isokinetic dynamics of liquid water, TAU-TEMPERATURE of 0.01 ps is recommended. 
 
-STOCH-GAMMA <value, ps^-1>
+STOCH-GAMMA [value, ps^-1]
  - This is the Langevin friction coefficient $\gamma$ in Leimkuhler et al. It has a default value of 100 ps^-1.
 
 RESPA-THERM-NC   [integer]
