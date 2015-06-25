@@ -47,5 +47,6 @@ c
       logical use_clist,use_mlist
       logical use_ulist
       logical use_REvlist,use_REclist
+      logical use_REmlist
       save
       end

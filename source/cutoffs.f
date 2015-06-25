@@ -136,6 +136,64 @@ c
             chgcut = value
             dplcut = value
             mpolecut = value
+            ewaldcut = value
+         else if (keyword(1:11) .eq. 'VDW-CUTOFF ') then
+            read (string,*,err=10,end=10)  vdwcut
+         else if (keyword(1:11) .eq. 'CHG-CUTOFF ') then
+            read (string,*,err=10,end=10)  chgcut
+         else if (keyword(1:11) .eq. 'DPL-CUTOFF ') then
+            read (string,*,err=10,end=10)  dplcut
+         else if (keyword(1:13) .eq. 'MPOLE-CUTOFF ') then
+            read (string,*,err=10,end=10)  mpolecut
+         else if (keyword(1:13) .eq. 'RESPA-CUTOFF ') then
+            read (string,*,err=10,end=10)  value
+            REvdwcut = value
+            REchgcut = value
+            REdplcut = value
+            REmpolecut = value
+         else if (keyword(1:17) .eq. 'RESPA-VDW-CUTOFF ') then
+            read (string,*,err=10,end=10)  REvdwcut
+         else if (keyword(1:17) .eq. 'RESPA-CHG-CUTOFF ') then
+            read (string,*,err=10,end=10)  REchgcut
+         else if (keyword(1:17) .eq. 'RESPA-DPL-CUTOFF ') then
+            read (string,*,err=10,end=10)  REdplcut
+         else if (keyword(1:19) .eq. 'RESPA-MPOLE-CUTOFF ') then
+            read (string,*,err=10,end=10)  REmpolecut
+
+c
+c     get distance for initialization of energy switching
+c
+         else if (keyword(1:6) .eq. 'TAPER ') then
+            read (string,*,err=10,end=10)  value
+            vdwtaper = value
+            chgtaper = value
+            dpltaper = value
+            mpoletaper = value
+         else if (keyword(1:10) .eq. 'VDW-TAPER ') then
+            read (string,*,err=10,end=10)  vdwtaper
+         else if (keyword(1:10) .eq. 'CHG-TAPER ') then
+            read (string,*,err=10,end=10)  chgtaper
+         else if (keyword(1:10) .eq. 'DPL-TAPER ') then
+            read (string,*,err=10,end=10)  dpltaper
+         else if (keyword(1:12) .eq. 'MPOLE-TAPER ') then
+            read (string,*,err=10,end=10)  mpoletaper
+         else if (keyword(1:12) .eq. 'RESPA-TAPER ') then
+            read (string,*,err=10,end=10)  value
+            REvdwtaper = value  
+            REchgtaper = value
+            REdpltaper = value
+            REmpoletaper = value
+         else if (keyword(1:16) .eq. 'RESPA-VDW-TAPER ') then
+            read (string,*,err=10,end=10)  REvdwtaper
+         else if (keyword(1:16) .eq. 'RESPA-CHG-TAPER ') then
+            read (string,*,err=10,end=10)  REchgtaper
+         else if (keyword(1:16) .eq. 'RESPA-DPL-TAPER ') then
+            read (string,*,err=10,end=10)  REdpltaper
+         else if (keyword(1:18) .eq. 'RESPA-MPOLE-TAPER ') then
+            read (string,*,err=10,end=10)  REmpoletaper               
+         else if (keyword(1:13) .eq. 'EWALD-TAPER ') then
+            use_ewald = .true.
+            read (string,*,err=10,end=10)  ewaldcut
 c
 c     get buffer width for use with pairwise neighbor lists
 c
@@ -189,8 +247,9 @@ c
       cbufx = (chgcut+2.0d0*lbuffer)**2
       mbufx = (mpolecut+2.0d0*lbuffer)**2
       ubufx = (usolvcut+2.0d0*pbuffer)**2
-      REvbufx = (REvdwcut+lbuffer)**2
-      REcbufx = (REchgcut+lbuffer)**2
+      REvbufx = (REvdwcut)**2
+      REcbufx = (REchgcut)**2
+      REmbufx = (REmpolecut)**2
 
 c
 c     perform dynamic allocation of some global arrays
