@@ -27,7 +27,6 @@ c
       integer nfree
       integer irest
       integer bmnmix
-      integer i_step
       logical dorest
       logical velsave
       logical frcsave

@@ -117,7 +117,7 @@ c
 c
 c     get the fast-evolving potential energy and atomic forces
 c
-         call gradfast (ealt,derivs,istep)
+         call gradfast (ealt,derivs)
 c
 c     use Newton's second law to get fast-evolving accelerations;
 c     update fast-evolving velocities using the Verlet recursion
@@ -143,7 +143,7 @@ c
 c
 c     get the slow-evolving potential energy and atomic forces
 c
-      call gradslow (epot,derivs,istep)
+      call gradslow (epot,derivs)
 c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
@@ -206,13 +206,12 @@ c     "gradfast" calculates the potential energy and first derivatives
 c     for the fast-evolving local valence potential energy terms
 c
 c
-      subroutine gradfast (energy,derivs,istep)
+      subroutine gradfast (energy,derivs)
       use limits
       use potent
       implicit none
       real*8 energy
       real*8 derivs(3,*)
-      integer istep
       logical save_vdw,save_charge
       logical save_chgdpl,save_dipole
       logical save_mpole,save_polar
@@ -246,7 +245,7 @@ c
 c
 c     get energy and gradient for fast-evolving potential terms
 c
-      call gradient (energy,derivs,istep)
+      call gradient (energy,derivs)
 c
 c     restore the original state of slow-evolving potentials
 c
@@ -274,12 +273,11 @@ c     "gradslow" calculates the potential energy and first derivatives
 c     for the slow-evolving nonbonded potential energy terms
 c
 c
-      subroutine gradslow (energy,derivs,istep)
+      subroutine gradslow (energy,derivs)
       use potent
       implicit none
       real*8 energy
       real*8 derivs(3,*)
-      integer istep
       logical save_bond,save_angle
       logical save_strbnd,save_urey
       logical save_angang,save_opbend
@@ -330,7 +328,7 @@ c
 c
 c     get energy and gradient for slow-evolving potential terms
 c
-      call gradient (energy,derivs,istep)
+      call gradient (energy,derivs)
 c
 c     restore the original state of fast-evolving potentials
 c
