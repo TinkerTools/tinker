@@ -44,6 +44,7 @@ c     stoch_gamma Friction term for SIN(R)
 c
       module bath
       implicit none
+      use sizes
       integer maxnose
       parameter (maxnose=4)
       integer len_nhc,isok_L,isok_M
@@ -58,11 +59,11 @@ c
       real*8 compress,collide
       real*8 eta,volmove
       real*8 vbar,qbar,gbar
-      real*8 q_iso1(isok_chain,3,10000)
-      real*8 q_iso2(isok_chain,3,10000)
-      real*8 v_iso1(isok_chain,3,10000)
-      real*8 v_iso2(isok_chain,3,10000)
-      real*8 f_iso1(isok_chain,3,10000)
+      real*8 q_iso1(isok_chain,3,maxatm)
+      real*8 q_iso2(isok_chain,3,maxatm)
+      real*8 v_iso1(isok_chain,3,maxatm)
+      real*8 v_iso2(isok_chain,3,maxatm)
+      real*8 f_iso1(isok_chain,3,maxatm)
       real*8 v_sinr1(isok_chain)
       real*8 v_sinr2(isok_chain)
       real*8 q_sinr1(isok_chain)
