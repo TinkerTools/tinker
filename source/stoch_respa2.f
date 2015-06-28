@@ -262,7 +262,7 @@ c
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8 
       real*8 tempstor,kBT,LkT
-      real*8 w(3)
+      real*8 w(respa_therm_nsy)
       real*8 len_fac
 
       len_fac = dble(len_nhc)/dble(len_nhc+1)
@@ -270,17 +270,53 @@ c
       kBT = boltzmann*kelvin
       LkT = (dble(len_nhc))*kBT    
 
-      ns = 3
       dtc = dt / dble(respa_therm_nc)
-      w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
-      w(2) = 1.0d0 - 2.0d0*w(1)
-      w(3) = w(1)
+      if (respa_therm_nsy .eq. 3) then
+         w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
+         w(2) = 1.0d0 - 2.0d0*w(1)
+         w(3) = w(1)
+      else if (respa_therm_nsy .eq. 5) then
+         w(1) = 1.0d0 / (4.0d0-4.0d0**(1.0d0/3.0d0))
+         w(2) = w(1)
+         w(4) = w(1)
+         w(5) = w(1)
+         w(3) = 1 - (4.0d0 * w(1))
+      else if (respa_therm_nsy .eq. 7) then
+         w(1) = 0.784513610477560
+         w(2) = 0.235573213359357
+         w(3) = -1.17767998417887
+         w(5) = w(3)
+         w(6) = w(2)
+         w(7) = w(1)
+         w(4) = 1.0d0 - 2.0d0*(w(1)+w(2)+w(3))
+      else if (respa_therm_nsy.eq.15) then
+         w(1) =  0.102799849391985
+         w(2) = -1.96061023297549
+         w(3) =  1.93813913762276
+         w(4) = -0.158240635368243
+         w(5) = -1.44485223686048
+         w(6) =  0.253693336566229
+         w(7) =  0.914844246229740
+         w(8) = 1.0d0 - 2.0d0*(w(1)+w(2)+w(3)+w(4)+w(5)+w(6)+w(7))
+         w(9) = w(1)
+         w(10) = w(2)
+         w(11) = w(3)
+         w(12) = w(4)
+         w(13) = w(5)
+         w(14) = w(6)
+         w(15) = w(7)
+      else
+         write (iout,10)
+   10    format (/,' Suzuki-Yoshida decomposition of selected order
+     &          not supported. Try RESPA-THERM-SY = 3,5,7, or 15')
+         call fatal
+      end if
     
 c
 c     use multiple time steps and Suzuki-Yoshida decomposition
 c
       do k = 1, respa_therm_nc
-         do j = 1, ns
+         do j = 1, respa_therm_nsy
 
             dts = w(j) * dtc
             dt2 = 0.5d0 * dts
