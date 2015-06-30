@@ -64,15 +64,15 @@ c
       f = electric / dielec
 c
 c     check the sign of multipole components at chiral sites
-c     should not need to change this
+c   
       call chkpole
 c
 c     rotate the multipole components into the global frame
-c     should not need to change this
+c    
       call rotpole
 c
 c     compute the induced dipole moment at each atom
-c     induce0a copied below -- subroutine for explicit solvent
+c     
       call induce0aSR
 c
 c     compute the real space part of the Ewald summation
@@ -794,7 +794,7 @@ c
 c     calculate the real space error function terms
 c
                ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
+               bn(0) = 1.0d0 / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
                if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
@@ -2218,7 +2218,7 @@ c
 c     calculate the error function damping factors
 c
                ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
+               bn(0) = rr1
                exp2a = exp(-ralpha**2)
                aefac = aesq2n
                do j = 1, 3
