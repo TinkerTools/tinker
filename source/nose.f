@@ -184,6 +184,7 @@ c
       use atoms
       use bath
       use boxes
+      use iounit
       use mdstuf
       use moldyn
       use units
@@ -197,7 +198,7 @@ c
       real*8 df,odnf,gn1kt
       real*8 press,dpress
       real*8 expterm,scale
-      real*8 w(3),ekin(3,3)
+      real*8 w(respa_therm_nsy),ekin(3,3)
 c
 c
 c     find kinetic energy and set an initial scale factor

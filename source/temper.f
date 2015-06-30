@@ -31,6 +31,7 @@ c
       use atoms
       use bath
       use group
+      use iounit
       use mdstuf
       use moldyn
       use rgddyn
@@ -42,7 +43,7 @@ c
       real*8 dt2,dt4,dt8
       real*8 eksum,ekt
       real*8 scale,expterm
-      real*8 w(3)
+      real*8 w(respa_therm_nsy)
       real*8 ekin(3,3)
 c
 c
@@ -94,7 +95,7 @@ c
       end if
          scale = 1.0d0
          do i = 1, respa_therm_nc
-            do j = 1, resoa_therm_nsy
+            do j = 1, respa_therm_nsy
                dts = w(j) * dtc
                dt2 = 0.5d0 * dts
                dt4 = 0.25d0 * dts
@@ -179,6 +180,7 @@ c
       use atoms
       use bath
       use group
+      use iounit
       use mdstuf
       use molcul
       use moldyn
@@ -196,7 +198,7 @@ c
       real*8 random,normal
       real*8 kt,rate,trial
       real*8 temp,expterm
-      real*8 w(3)
+      real*8 w(respa_therm_nsy)
       real*8 ekin(3,3)
 c
 c
