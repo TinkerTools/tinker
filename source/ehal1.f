@@ -1493,7 +1493,7 @@ c
 c
 c     check for an interaction distance less than the cutoff
 c
-               if (rik2 .le. Rcut2) then
+               if (rik2 .le. REcut2) then
                   rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)

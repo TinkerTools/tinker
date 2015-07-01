@@ -253,6 +253,7 @@ c
       use atoms
       use bath
       use freeze
+      use iounit
       use moldyn
       use units
       use usage
