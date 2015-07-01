@@ -31,11 +31,12 @@ c
       use rigid
       use vdwpot
       use virial
-      include '../Plumed.h'
+      include '../Plumed.inc'
       implicit none
       integer i,j,istep
       real*8 energy,cutoff
       real*8 derivs(3,*)
+      external plumed
 c
 c
 c     zero out each of the potential energy components
@@ -253,13 +254,13 @@ c
       end do
 
 c      if (use_plumed) then
-         plumed_f_cmd(plumedmain,"setStep"//char(0),istep)
-         plumed_f_cmd(plumedmain,"setPositionX"//char(0),x(1))
-         plumed_f_cmd(plumedmain,"setPositionY"//char(0),y(1))
-         plumed_f_cmd(plumedmain,"setPositionZ"//char(0),z(1))
-         plumed_f_cmd(plumedmain,"setMasses"//char(0),m(1))
-         plumed_f_cmd(plumedmain,"setForces"//char(0),derivs(1,1))
-         plumed_f_cmd(plumedmain,"calc"//char(0),NULL)
+        call plumed_f_cmd(plumedmain,"setStep"//char(0),istep)
+        call plumed_f_cmd(plumedmain,"setPositionX"//char(0),x(1))
+        call plumed_f_cmd(plumedmain,"setPositionY"//char(0),y(1))
+        call plumed_f_cmd(plumedmain,"setPositionZ"//char(0),z(1))
+        call plumed_f_cmd(plumedmain,"setMasses"//char(0),m(1))
+        call plumed_f_cmd(plumedmain,"setForces"//char(0),derivs(1,1))
+        call plumed_f_cmd(plumedmain,"calc"//char(0),NULL)
 c      end if
 
 c

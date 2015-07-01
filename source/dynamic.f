@@ -38,8 +38,10 @@ c
       real*8 dt,dtdump
       logical exist
       character*20 keyword
+      character*32 plumedmain
       character*120 record
       character*120 string
+      external plumed
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -273,17 +275,17 @@ c
       fplog = "plumed.log"
       plumed plumedmain
       plumedmain = plumed_f_create()
-      plumed_f_cmd(plumedmain,"setRealPrecision"//char(0),8)
-      plumed_f_cmd(plumedmain,"setMDEnergyUnits"//char(0),4.184)
-      plumed_f_cmd(plumedmain,"setMDLengthUnits"//char(0),1.0d-1)
-      plumed_f_cmd(plumedmain,"setMDTimeUnits"//char(0),1.0d0)
-      plumed_f_cmd(plumedmain,"setPlumedDat"//char(0),plumedInput)
-      plumed_f_cmd(plumedmain,"setNatoms"//char(0),n) 
-      plumed_f_cmd(plumedmain,"setMDEngine"//char(0),"tinker7"//char(0))
-      plumed_f_cmd(plumedmain,"setLogFile"//char(0),fplog)
-      plumed_f_cmd(plumedmain,"setTimestep"//char(0),dt) 
-      plumed_f_cmd(plumedmain,"init"//char(0),NULL)
-      plumed_f_cmd(plumedmain,"read"//char(0),read)
+      call plumed_f_cmd(plumedmain,"setRealPrecision"//char(0),8)
+      call plumed_f_cmd(plumedmain,"setMDEnergyUnits"//char(0),4.184)
+      call plumed_f_cmd(plumedmain,"setMDLengthUnits"//char(0),1.0d-1)
+      call plumed_f_cmd(plumedmain,"setMDTimeUnits"//char(0),1.0d0)
+      call plumed_f_cmd(plumedmain,"setPlumedDat"//char(0),plumedInput)
+      call plumed_f_cmd(plumedmain,"setNatoms"//char(0),n) 
+      call plumed_f_cmd(plumedmain,"setMDEngine"//char(0),"tinker7"//char(0))
+      call plumed_f_cmd(plumedmain,"setLogFile"//char(0),fplog)
+      call plumed_f_cmd(plumedmain,"setTimestep"//char(0),dt) 
+      call plumed_f_cmd(plumedmain,"init"//char(0),NULL)
+      call plumed_f_cmd(plumedmain,"read"//char(0),read)
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
@@ -303,7 +305,7 @@ c
             call beeman (istep,dt)
          end if
       end do
-      plumed_f_finalize(plumedmain)    
+      call plumed_f_finalize(plumedmain)    
 
 c
 c     perform any final tasks before program exit
