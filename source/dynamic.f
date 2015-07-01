@@ -285,7 +285,7 @@ c
       call plumed_f_cmd(plumedmain,"setLogFile"//char(0),fplog)
       call plumed_f_cmd(plumedmain,"setTimestep"//char(0),dt) 
       call plumed_f_cmd(plumedmain,"init"//char(0),NULL)
-      call plumed_f_cmd(plumedmain,"read"//char(0),read)
+      call plumed_f_cmd(plumedmain,"read"//char(0),READ ())
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
