@@ -36,6 +36,7 @@ c
       integer i,j,istep
       real*8 energy,cutoff
       real*8 derivs(3,*)
+      character*32 plumedmain
       external plumed
 c
 c
@@ -258,9 +259,9 @@ c      if (use_plumed) then
         call plumed_f_cmd(plumedmain,"setPositionX"//char(0),x(1))
         call plumed_f_cmd(plumedmain,"setPositionY"//char(0),y(1))
         call plumed_f_cmd(plumedmain,"setPositionZ"//char(0),z(1))
-        call plumed_f_cmd(plumedmain,"setMasses"//char(0),m(1))
+        call plumed_f_cmd(plumedmain,"setMasses"//char(0),mass(1))
         call plumed_f_cmd(plumedmain,"setForces"//char(0),derivs(1,1))
-        call plumed_f_cmd(plumedmain,"calc"//char(0),NULL)
+        call plumed_f_cmd(plumedmain,"calc"//char(0),NULL())
 c      end if
 
 c
