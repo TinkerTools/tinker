@@ -32,7 +32,6 @@ c
       use rigid
       use vdwpot
       use virial
-      include '../Plumed.inc'
       implicit none
       integer i,j,istep
       real*8 energy,cutoff
@@ -255,7 +254,7 @@ c
          end do
       end do
 
-c      if (use_plumed) then
+      if (use_plumed) then
         call plumed_f_cmd(plumedmain,"setStep"//char(0),istep)
         call plumed_f_cmd(plumedmain,"setPositionX"//char(0),x(1))
         call plumed_f_cmd(plumedmain,"setPositionY"//char(0),y(1))
@@ -263,7 +262,7 @@ c      if (use_plumed) then
         call plumed_f_cmd(plumedmain,"setMasses"//char(0),mass(1))
         call plumed_f_cmd(plumedmain,"setForces"//char(0),derivs(1,1))
         call plumed_f_cmd(plumedmain,"calc"//char(0),0)
-c      end if
+      end if
 
 c
 c     check for an illegal value for the total energy

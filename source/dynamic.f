@@ -31,7 +31,6 @@ c
       use solute
       use stodyn
       use usage
-      include '../Plumed.inc'
       implicit none
       integer i,istep,nstep
       integer mode,next
@@ -271,21 +270,22 @@ c
 c
 c     integrate equations of motion to take a time step
 c
-      plumedInput = "plumed.dat"
-      fplog = "plumed.log"
-      plumed plumedmain
-      plumedmain = plumed_f_create()
+c      plumed plumedmain
+      call plumed_f_create()
       call plumed_f_cmd(plumedmain,"setRealPrecision"//char(0),8)
       call plumed_f_cmd(plumedmain,"setMDEnergyUnits"//char(0),4.184)
       call plumed_f_cmd(plumedmain,"setMDLengthUnits"//char(0),1.0d-1)
       call plumed_f_cmd(plumedmain,"setMDTimeUnits"//char(0),1.0d0)
-      call plumed_f_cmd(plumedmain,"setPlumedDat"//char(0),plumedInput)
+      call plumed_f_cmd(plumedmain,"setPlumedDat"//char(0),
+     &                  "plumed.dat"//char(0))
       call plumed_f_cmd(plumedmain,"setNatoms"//char(0),n) 
-      call plumed_f_cmd(plumedmain,"setMDEngine"//char(0),"tinker7"//char(0))
-      call plumed_f_cmd(plumedmain,"setLogFile"//char(0),fplog)
+      call plumed_f_cmd(plumedmain,"setMDEngine"//char(0),
+     &                  "tinker7"//char(0))
+      call plumed_f_cmd(plumedmain,"setLogFile"//char(0),
+     &                  "plumed.out"//char(0))
       call plumed_f_cmd(plumedmain,"setTimestep"//char(0),dt) 
-      call plumed_f_cmd(plumedmain,"init"//char(0),NULL)
-      call plumed_f_cmd(plumedmain,"read"//char(0),READ ())
+      call plumed_f_cmd(plumedmain,"init"//char(0),0)
+c      call plumed_f_cmd(plumedmain,"read"//char(0),READ ())
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
