@@ -18,6 +18,7 @@ c
 c
       subroutine gradient (energy,derivs,istep)
       use sizes
+      use atomid
       use atoms
       use bound
       use couple
