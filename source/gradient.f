@@ -261,7 +261,7 @@ c      if (use_plumed) then
         call plumed_f_cmd(plumedmain,"setPositionZ"//char(0),z(1))
         call plumed_f_cmd(plumedmain,"setMasses"//char(0),mass(1))
         call plumed_f_cmd(plumedmain,"setForces"//char(0),derivs(1,1))
-        call plumed_f_cmd(plumedmain,"calc"//char(0),NULL())
+        call plumed_f_cmd(plumedmain,"calc"//char(0),0)
 c      end if
 
 c
