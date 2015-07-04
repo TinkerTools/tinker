@@ -586,6 +586,7 @@ OBJS = action.o \
        spacefill.o \
        spectrum.o \
        square.o \
+       stoch_respa2.o \
        stodyn.o \
        strbnd.o \
        strtor.o \
@@ -1339,6 +1340,7 @@ libtinker.a: ${OBJS}
         solute.o \
         sort.o \
         square.o \
+	stoch_respa2.o \
         stodyn.o \
         strbnd.o \
         strtor.o \
@@ -1845,6 +1847,7 @@ sort.o:
 spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o sizes.o usage.o
 spectrum.o: files.o iounit.o math.o units.o
 square.o: inform.o iounit.o keys.o minima.o sizes.o
+stoch_respa2.o: sizes.o atomid.o freeze.o moldyn.o units.o virial.o atoms.o bath.o bound.o deriv.o inform.o iounit.o keys.o mdstuf.o potent.o solute.o stodyn.o usage.o limits.o 
 stodyn.o:
 strbnd.o:
 strtor.o:
