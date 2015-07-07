@@ -92,7 +92,7 @@ c
       dowhile (nstep .lt. 0)
          write (iout,20)
    20    format (/,' Enter the Number of Dynamics Steps to be',
-     &              ' Taken :  ',$)
+     &              ' Taken (or 0 to serialize) :  ',$)
          read (input,30,err=40)  nstep
    30    format (i10)
          if (nstep .lt. 0)  nstep = 0
@@ -345,18 +345,25 @@ c
       end if
       call gettime (elapsed,cpu)
 c
-c     print performance and timing information
+c     print performance and timing information if we took steps,
+c     otherwise dump a serialized XML file
 c
-      nsPerDay = 86.4d0 * nstep * dt / elapsed
-      write (iout,420)  nsPerDay,elapsed,nstep,updateCalls,
-     &                  1000.0d0*dt,n,nthread
-  420 format (/,' Performance:  ns/day',9x,f12.4,
-     &        /,15x,'Wall Time',6x,f12.4,
-     &        /,15x,'Steps',14x,i8,
-     &        /,15x,'Updates',12x,i8,
-     &        /,15x,'Time Step',6x,f12.4,
-     &        /,15x,'Atoms',14x,i8,
-     &        /,15x,'Threads',12x,i8)
+      if (nstep .gt. 0) then
+         nsPerDay = 86.4d0 * nstep * dt / elapsed
+         write (iout,420)  nsPerDay,elapsed,nstep,updateCalls,
+     &                     1000.0d0*dt,n,nthread
+  420    format (/,' Performance:  ns/day',9x,f12.4,
+     &           /,15x,'Wall Time',6x,f12.4,
+     &           /,15x,'Steps',14x,i8,
+     &           /,15x,'Updates',12x,i8,
+     &           /,15x,'Time Step',6x,f12.4,
+     &           /,15x,'Atoms',14x,i8,
+     &           /,15x,'Threads',12x,i8)
+      else
+         write(iout, '(a)')
+     &       'No dynamics requested, writing serialized system.xml file'
+         call openmm_serialize(ommHandle)
+      end if
 c
 c     perform any final tasks before program exit
 c

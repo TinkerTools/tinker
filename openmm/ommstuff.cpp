@@ -67,7 +67,7 @@ struct OpenMMData_s {
 
 int maxval__;
 
-struct {
+static struct {
     double* ak;
     double* anat;
     double* afld;
@@ -75,7 +75,7 @@ struct {
     int* iang;
 } angbnd__;
  
-struct {
+static struct {
     double angunit;
     double stbnunit;
     double aaunit;
@@ -97,7 +97,7 @@ struct {
     char opbtyp[9];
 } angpot__;
 
-struct { 
+static struct {
     double* mass;
     int* tag;
     int* classs;   // variable "class" not allowed in C++; add an extra "s"
@@ -107,7 +107,7 @@ struct {
     char* story;
 } atomid__;
 
-struct { 
+static struct {
     double* x;
     double* y;
     double* z;
@@ -115,7 +115,7 @@ struct {
     int* type;
 } atoms__;
 
-struct {
+static struct {
     double kelvin;
     double atmsph;
     double tautemp;
@@ -135,26 +135,26 @@ struct {
     char volscale[10];
 } bath__;
 
-struct {
+static struct {
     int* ibitor;
     int nbitor;
 } bitor__;
 
-struct {
+static struct {
     double cbnd;
     double qbnd;
     double bndunit;
     char bndtyp[9];
 } bndpot__;
 
-struct {
+static struct {
     double* bk;
     double* bl;
     int nbond;
     int* ibnd;
 } bndstr__;
 
-struct {
+static struct {
     double* xbox;
     double* ybox;
     double* zbox;
@@ -174,7 +174,7 @@ struct {
     char spacegrp[11];
 } boxes__;
 
-struct {
+static struct {
     double electric;
     double dielec,ebuffer;
     double c2scale,c3scale;
@@ -182,7 +182,7 @@ struct {
     int neutnbr,neutcut;
 } chgpot__;
 
-struct {
+static struct {
     int* n12;
     int* i12;
     int* n13;
@@ -194,7 +194,7 @@ struct {
     int maxval;
 } couple__;
 
-struct {
+static struct {
     double* desum;
     double* deb;
     double* dea;
@@ -223,7 +223,7 @@ struct {
     double* dex;
 } deriv__;
 
-struct {
+static struct {
     double* esum;
     double* eb;
     double* ea;
@@ -252,12 +252,12 @@ struct {
     double* ex;
 } energi__;
 
-struct {
+static struct {
     double aewald;
     char boundary[8];
 } ewald__;
 
-struct {
+static struct {
     double* krat; 
     int nrat;
     int nratx;
@@ -268,14 +268,14 @@ struct {
     int use_rattle;
 } freeze__;
 
-struct {
+static struct {
     int digits,iprint;
     int iwrite,isend;
     int verbose,debug;
     int holdup,abort;
 } inform__;
 
-struct {
+static struct {
     double* ttx;
     double* tty;
     double* tbf;
@@ -289,7 +289,7 @@ struct {
     int maxtgrd;
 } ktrtor__;
 
-struct {
+static struct {
     double* rad;
     double* eps;
     double* rad4;
@@ -297,7 +297,7 @@ struct {
     double* reduct;
 } kvdws__;
 
-struct {
+static struct {
     double vdwcut,chgcut;
     double dplcut,mpolecut;
     double vdwtaper,chgtaper;
@@ -308,7 +308,7 @@ struct {
     int use_clist,use_mlist;
 } limits__; 
 
-struct {
+static struct {
     int nfree;
     int irest;
     int velsave;
@@ -317,18 +317,18 @@ struct {
     char integrate[11];
 } mdstuf__;
 
-struct { 
+static struct {
     double* v;
     double* a;
     double* aalt;
 } moldyn__;
 
-struct {
+static struct {
     double m2scale,m3scale;
     double m4scale,m5scale;
 } mplpot__;
 
-struct {
+static struct {
     double* pole;
     double* rpole;
     int npole;
@@ -342,7 +342,7 @@ struct {
     int maxpole;
 } mpole__;
 
-struct {
+static struct {
     double solvprs,surften;
     double spcut,spoff;
     double stcut,stoff;
@@ -351,19 +351,19 @@ struct {
     double* cdisp;
 } nonpol__;
 
-struct {
+static struct {
     double* opbk; 
     int* iopb;
     int nopbend;
 } opbend__;
 
-struct {
+static struct {
     double* kpit;
     int* ipit;
     int npitors;
 } pitors__;
 
-struct {
+static struct {
     double* bsmod1;
     double* bsmod2;
     double* bsmod3;
@@ -377,7 +377,7 @@ struct {
     int* igrid;
 } pme__;
 
-struct {
+static struct {
     double* polarity;
     double* thole;
     double* pdamp;
@@ -388,7 +388,7 @@ struct {
     int npolar;
 } polar__;
 
-struct {
+static struct {
     int* np11;
     int* ip11;
     int* np12;
@@ -403,7 +403,7 @@ struct {
     int maxp14;
 } polgrp__;
 
-struct {
+static struct {
     double poleps,p2scale;
     double p3scale,p4scale;
     double p41scale,p5scale;
@@ -414,7 +414,7 @@ struct {
     char poltyp[7];
 } polpot__;
 
-struct {
+static struct {
     int use_bond,use_angle,use_strbnd;
     int use_urey,use_angang,use_opbend;
     int use_opdist,use_improp,use_imptor;
@@ -426,7 +426,7 @@ struct {
     int use_extra,use_born,use_orbit;
 } potent__;
 
-struct {
+static struct {
     double* rsolv;
     double* asolv;
     double* rborn;
@@ -448,25 +448,25 @@ struct {
     char borntyp[9];
 } solute__;
 
-struct {
+static struct {
     double friction;
     double* fgamma;
     int use_sdarea;
 } stodyn__;
 
-struct {
+static struct {
     double* sbk;
     int* isb;
     int nstrbnd;
 } strbnd__;
 
-struct {
+static struct {
     double idihunit,itorunit,torsunit;
     double ptorunit,storunit;
     double atorunit,ttorunit;
 } torpot__;
 
-struct {
+static struct {
     double* tors1;
     double* tors2;
     double* tors3;
@@ -477,31 +477,31 @@ struct {
     int* itors;
 } tors__;
 
-struct {
+static struct {
     int* itt;
     int ntortor;
 } tortor__;
 
-struct {
+static struct {
     double* uk;
     double* ul;
     int* iury;
     int nurey;
 } urey__;
 
-struct {
+static struct {
     double cury;
     double qury;
     double ureyunit;
 } urypot__;
 
-struct {
+static struct {
     int* nuse;
     int* iuse;
     int* use;
 } usage__;
 
-struct {
+static struct {
     double* radmin;
     double* epsilon;
     double* radmin4;
@@ -516,7 +516,7 @@ struct {
     int maxclass;
 } vdw__;
 
-struct {
+static struct {
     double abuck,bbuck,cbuck;
     double ghal,dhal;
     double v2scale,v3scale;
@@ -1931,22 +1931,66 @@ static void setupAmoebaWcaDispersionForce (OpenMM_System* system, FILE* log) {
     OpenMM_AmoebaWcaDispersionForce_setShctd (amoebaWcaDispersionForce, shctd);
 }
 
+static void computePeriodicBoxVectors(OpenMM_Vec3 &a, OpenMM_Vec3 &b, OpenMM_Vec3 &c) {
+  /* a, b, and c are the output vectors, computed from the unit cell dimensions
+   * in boxes__. This should not be called when no box is defined
+   */
+  const double DEG_TO_RAD = M_PI / 180.0;
+
+  a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
+  a.y = a.z = 0.0;
+
+  b.x = OpenMM_NmPerAngstrom*(*boxes__.ybox)*cos(DEG_TO_RAD*boxes__.gamma);
+  b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox)*sin(DEG_TO_RAD*boxes__.gamma);
+  b.z = 0.0;
+
+  c.x = (*boxes__.zbox)*cos(DEG_TO_RAD*boxes__.beta);
+  c.y = *boxes__.zbox*(cos(DEG_TO_RAD*boxes__.alpha) -
+                cos(DEG_TO_RAD*boxes__.beta)*cos(DEG_TO_RAD*boxes__.gamma)) /
+                sin(DEG_TO_RAD*boxes__.gamma);
+  c.z = sqrt((*boxes__.zbox)*(*boxes__.zbox)-c.x*c.x-c.y*c.y);
+
+  c.x *= OpenMM_NmPerAngstrom;
+  c.y *= OpenMM_NmPerAngstrom;
+  c.z *= OpenMM_NmPerAngstrom;
+
+  // Make numbers that should be zero exactly zero
+  if (abs(a.x) < 1e-6) a.x = 0.0;
+  if (abs(a.y) < 1e-6) a.y = 0.0;
+  if (abs(a.z) < 1e-6) a.z = 0.0;
+  if (abs(b.x) < 1e-6) b.x = 0.0;
+  if (abs(b.y) < 1e-6) b.y = 0.0;
+  if (abs(b.z) < 1e-6) b.z = 0.0;
+  if (abs(c.x) < 1e-6) c.x = 0.0;
+  if (abs(c.y) < 1e-6) c.y = 0.0;
+  if (abs(c.z) < 1e-6) c.z = 0.0;
+
+  // Reduce the box vectors if necessary
+  c.x -= b.x*round(c.y/b.y) - a.x*round(c.x/a.x);;
+  c.y -= b.y*round(c.y/b.y);
+
+  b.x -= a.x*round(b.x/a.x);
+
+#if 0
+  // DEBUG
+  fprintf(stderr, "Box vectors:\n");
+  fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", a.x, a.y, a.z);
+  fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", b.x, b.y, b.z);
+  fprintf(stderr, "[ %10.4f  %10.4f  %10.4f ]\n", c.x, c.y, c.z);
+#endif /* 0 */
+}
+
 static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
 
   OpenMM_Vec3 a;
   OpenMM_Vec3 b;
   OpenMM_Vec3 c;
 
-  if (*boxes__.xbox != 0) {
-      a.x = a.y = a.z = 0.0;
-      b.x = b.y = b.z = 0.0;
-      c.x = c.y = c.z = 0.0;
-      a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
-      b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox);
-      c.z = OpenMM_NmPerAngstrom*(*boxes__.zbox);
-    
-      OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
-  }
+  // Nothing to do if we have no box
+  if (*boxes__.xbox == 0) return;
+
+  computePeriodicBoxVectors(a, b, c);
+  OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
 }
 
 static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
@@ -2006,12 +2050,12 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
     OpenMM_AmoebaVdwForce_setUseDispersionCorrection (amoebaVdwForce,
                                                       useCorrection);
 
-    if (boxes__.orthogonal)
-        OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
-                                    OpenMM_AmoebaVdwForce_CutoffPeriodic);
-    else
+    if (*boxes__.xbox == 0)
         OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
                                     OpenMM_AmoebaVdwForce_NoCutoff);
+    else
+        OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
+                                    OpenMM_AmoebaVdwForce_CutoffPeriodic);
 
     setDefaultPeriodicBoxVectors (system, log);
 
@@ -2443,7 +2487,7 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
     }
 
     OpenMM_Platform_setPropertyDefaultValue (platform, "CudaPrecision",
-                                             "mixed" );
+                                             "double" );
 
     return platform;
 }
@@ -3022,19 +3066,8 @@ void openmm_update_box_ (void** omm ) {
     OpenMMData* openMMDataHandle;
     openMMDataHandle = (OpenMMData*) (*omm);
 
-    aBox.x = 0.0;
-    aBox.y = 0.0;
-    aBox.z = 0.0;
-    bBox.x = 0.0;
-    bBox.y = 0.0;
-    bBox.z = 0.0;
-    cBox.x = 0.0;
-    cBox.y = 0.0;
-    cBox.z = 0.0;
+    computePeriodicBoxVectors(aBox, bBox, cBox);
 
-    aBox.x = *(boxes__.xbox) * OpenMM_NmPerAngstrom;
-    bBox.y = *(boxes__.ybox) * OpenMM_NmPerAngstrom;
-    cBox.z = *(boxes__.zbox) * OpenMM_NmPerAngstrom;
     OpenMM_Context_setPeriodicBoxVectors (openMMDataHandle->context,
                                           &aBox, &bBox, &cBox);
 }
@@ -3177,7 +3210,7 @@ void openmm_validate_ (int* testingActive) {
     int invalidAxisType;
     int invalid = 0;
     int testing = *testingActive;
-    char* ixnString = "Interaction Not Currently Supported by OpenMM.\n";
+    const char* ixnString = "Interaction Not Currently Supported by OpenMM.\n";
     FILE* log = stderr;
 
     if (testing && log) {
@@ -3482,7 +3515,7 @@ int openmm_test_ (void) {
     int infoMask;
     int ii, jj;
     int countActiveForces;
-    char* testName;
+    string testName;
     double conversion, delta, dot;
     double tinkerNorm, openMMNorm;
     double openMMPotentialEnergy;
@@ -3524,7 +3557,7 @@ int openmm_test_ (void) {
     // to each force object so we can fill in the forces. Note: the OpenMM
     // System takes ownership of the force objects; don't delete them yourself.
 
-    testName = NULL;
+    testName = "";
     system = OpenMM_System_create ();
     setupSystemParticles (system, log);
 
@@ -3799,8 +3832,8 @@ int openmm_test_ (void) {
     }
 
     if (log) {
-        if (testName) {
-            (void) fprintf (log, "\n Test Option:  %s\n", testName);
+        if (!testName.empty()) {
+            (void) fprintf (log, "\n Test Option:  %s\n", testName.c_str());
             (void) fflush (NULL);
         } else {
             (void) fprintf (log, "\n Test Option not Recognized; Exiting\n");
@@ -3917,5 +3950,22 @@ int openmm_test_ (void) {
     OpenMM_Context_destroy (context);
     OpenMM_Integrator_destroy (integrator);
     OpenMM_System_destroy (system);
+}
+
+void openmm_serialize_(void** omm) {
+    OpenMMData* ommHandle = (OpenMMData*) (*omm);
+
+    char *stuff;
+
+    FILE *f = fopen("system.xml", "w");
+
+    stuff = OpenMM_XmlSerializer_serializeSystem(ommHandle->system);
+
+    fputs(stuff, f);
+    fputs("\n", f);
+
+    // We need to free the serialized content and close the file
+    free(stuff);
+    fclose(f);
 }
 }
