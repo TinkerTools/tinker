@@ -40,7 +40,6 @@ c
       character*32 plumedmain
       character*120 record
       character*120 string
-      external plumed
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -231,6 +230,7 @@ c     initialize any holonomic constraints and setup dynamics
 c
       call shakeup
       call mdinit
+
 c
 c     print out a header line for the dynamics computation
 c
@@ -267,25 +267,24 @@ c
   410    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
+
 c
 c     integrate equations of motion to take a time step
 c
-c      plumed plumedmain
-      call plumed_f_create()
-      call plumed_f_cmd(plumedmain,"setRealPrecision"//char(0),8)
-      call plumed_f_cmd(plumedmain,"setMDEnergyUnits"//char(0),4.184)
-      call plumed_f_cmd(plumedmain,"setMDLengthUnits"//char(0),1.0d-1)
-      call plumed_f_cmd(plumedmain,"setMDTimeUnits"//char(0),1.0d0)
-      call plumed_f_cmd(plumedmain,"setPlumedDat"//char(0),
+      call plumed_f_gcreate()
+      call plumed_f_gcmd("setRealPrecision"//char(0),8)
+      call plumed_f_gcmd("setMDEnergyUnits"//char(0),4.184)
+      call plumed_f_gcmd("setMDLengthUnits"//char(0),1.0d-1)
+      call plumed_f_gcmd("setMDTimeUnits"//char(0),1.0d0)
+      call plumed_f_gcmd("setPlumedDat"//char(0),
      &                  "plumed.dat"//char(0))
-      call plumed_f_cmd(plumedmain,"setNatoms"//char(0),n) 
-      call plumed_f_cmd(plumedmain,"setMDEngine"//char(0),
+      call plumed_f_gcmd("setNatoms"//char(0),n) 
+      call plumed_f_gcmd("setMDEngine"//char(0),
      &                  "tinker7"//char(0))
-      call plumed_f_cmd(plumedmain,"setLogFile"//char(0),
+      call plumed_f_gcmd("setLogFile"//char(0),
      &                  "plumed.out"//char(0))
-      call plumed_f_cmd(plumedmain,"setTimestep"//char(0),dt) 
-      call plumed_f_cmd(plumedmain,"init"//char(0),0)
-c      call plumed_f_cmd(plumedmain,"read"//char(0),READ ())
+      call plumed_f_gcmd("setTimestep"//char(0),dt) 
+      call plumed_f_gcmd("init"//char(0),0)
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
@@ -305,7 +304,7 @@ c      call plumed_f_cmd(plumedmain,"read"//char(0),READ ())
             call beeman (istep,dt)
          end if
       end do
-      call plumed_f_finalize(plumedmain)    
+      call plumed_f_gfinalize()    
 
 c
 c     perform any final tasks before program exit

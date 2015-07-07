@@ -16,7 +16,7 @@ c     "gradient" calls subroutines to calculate the potential energy
 c     and first derivatives with respect to Cartesian coordinates
 c
 c
-      subroutine gradient (energy,derivs,istep)
+      subroutine gradient (energy,derivs)
       use sizes
       use atomid
       use atoms
@@ -37,7 +37,6 @@ c
       real*8 energy,cutoff
       real*8 derivs(3,*)
       character*32 plumedmain
-      external plumed
 c
 c
 c     zero out each of the potential energy components
@@ -255,20 +254,19 @@ c
       end do
 
       if (use_plumed) then
-        call plumed_f_cmd(plumedmain,"setStep"//char(0),istep)
-        call plumed_f_cmd(plumedmain,"setPositionX"//char(0),x(1))
-        call plumed_f_cmd(plumedmain,"setPositionY"//char(0),y(1))
-        call plumed_f_cmd(plumedmain,"setPositionZ"//char(0),z(1))
-        call plumed_f_cmd(plumedmain,"setMasses"//char(0),mass(1))
-        call plumed_f_cmd(plumedmain,"setForces"//char(0),derivs(1,1))
-        call plumed_f_cmd(plumedmain,"calc"//char(0),0)
+        call plumed_f_gcmd("setStep"//char(0),istep)
+        call plumed_f_gcmd("setPositionsX"//char(0),x(1))
+        call plumed_f_gcmd("setPositionsY"//char(0),y(1))
+        call plumed_f_gcmd("setPositionsZ"//char(0),z(1))
+        call plumed_f_gcmd("setMasses"//char(0),mass(1))
+        call plumed_f_gcmd("setForces"//char(0),derivs(1,1))
+        call plumed_f_gcmd("calc"//char(0),0)
       end if
-
 c
 c     check for an illegal value for the total energy
 c
-c     if (isnan(esum)) then
-      if (esum .ne. esum) then
+      if (isnan(esum)) then
+c      if (esum .ne. esum) then
          write (iout,10)
    10    format (/,' GRADIENT  --  Illegal Value for the Total',
      &              ' Potential Energy')
