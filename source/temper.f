@@ -59,8 +59,13 @@ c
          w(2) = 1.0d0 - 2.0d0*w(1)
          w(3) = w(1)
          scale = 1.0d0
+<<<<<<< HEAD
          do i = 1, respa_therm_nc
             do j = 1, respa_therm_nsy
+=======
+         do i = 1, nc
+            do j = 1, ns
+>>>>>>> parent of 791b5fa... custom Suzuki-Yoshida decomposition expaned to NVT and NPT
                dts = w(j) * dtc
                dt2 = 0.5d0 * dts
                dt4 = 0.25d0 * dts
