@@ -974,7 +974,6 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer icount
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
       real*8 fgrp,rv,rv7
@@ -1014,7 +1013,6 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
-      icount = 1
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1106,7 +1104,6 @@ c
 c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(ii)
-            icount = icount + 1
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
             mutk = mut(k)
@@ -1336,7 +1333,6 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      integer icount
       real*8 e,de,eps,rdn
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -1378,7 +1374,6 @@ c
          devSR(3,i) = 0.0d0
       end do
 
-      icount = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1433,7 +1428,7 @@ c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
-!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& jvdw,xred,yred,zred,use,REnvlst,REvlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
 !$OMP& cut2,vlambda,scalpha,scexp,mut,c0,c1,c2,c3,c4,c5,molcule)
@@ -1473,7 +1468,6 @@ c
 c     decide whether to compute the current interaction
 c
          do kk = 1, REnvlst(ii)
-            icount = icount + 1
             k = ivdw(REvlst(kk,ii))
             kv = ired(k)
             mutk = mut(k)
@@ -1493,7 +1487,7 @@ c
 c
 c     check for an interaction distance less than the cutoff
 c
-               if (rik2 .le. Rcut2) then
+               if (rik2 .le. REcut2) then
                   rik = sqrt(rik2)
                   rv = radmin(kt,it)
                   eps = epsilon(kt,it)
@@ -1718,7 +1712,6 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      integer icount
       real*8 e,de,eps,rdn
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -1814,7 +1807,8 @@ c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
-!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,REnvlst,REvlst,
+!$OMP& n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
 !$OMP& cut2,vlambda,scalpha,scexp,mut,c0,c1,c2,c3,c4,c5,molcule)
@@ -2019,7 +2013,6 @@ c
          end do
 
          do kk = 1, nvlst(ii)
-            icount = icount + 1
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
             mutk = mut(k)

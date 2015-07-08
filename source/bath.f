@@ -43,8 +43,8 @@ c                 In stochastic isokinetic dynamics, this is the chain length L
 c     stoch_gamma Friction term for SIN(R)
 c
       module bath
-      implicit none
       use sizes
+      implicit none
       integer maxnose
       parameter (maxnose=4)
       integer len_nhc,isok_L,isok_M
