@@ -292,7 +292,7 @@ c
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8 
       real*8 tempstor,kBT,LkT,temp2,temp3
-      real*8 w(respa_therm_nsy)
+      real*8 w(3)
 
       len_m1=len_nhc-1
       len_p1=len_nhc+1
