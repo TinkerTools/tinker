@@ -33,9 +33,12 @@
 ##  BINDIR       Hard Copies of TINKER Executables
 ##  LINKDIR      Linked Copies of TINKER Executables
 
+
 TINKERDIR = $(HOME)/tinker
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
+FFT_PATH = 
+include Plumed.inc
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
@@ -59,13 +62,14 @@ LINKDIR = /usr/local/bin
 ##  Compiler: GNU gfortran
 ##  Parallel: OpenMP
 
+
 F77 = gfortran
-LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+LIBS = -L/$(FFT_PATH) -lfftw3_threads -lfftw3
 F77FLAGS = -c
-OPTFLAGS = -O3 -ffast-math -fopenmp
+OPTFLAGS =  -fopenmp -fbounds-check 
 LIBFLAGS = -crusv
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-libgcc
+RANLIB = ranlib 
+LINKFLAGS = $(PLUMED_LOAD) $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
@@ -78,7 +82,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
 #RANLIB = echo
-#LINKFLAGS = -static-libgcc -static-intel
+#LINKFLAGS = $(PLUMED_LOAD) -static-libgcc -static-intel
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
@@ -92,7 +96,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
 #LIBFLAGS = -crusv
 #RANLIB = echo
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
+#LINKFLAGS = $(PLUMED_LOAD) $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
@@ -105,7 +109,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
+#LINKFLAGS = $(PLUMED_LOAD) $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
              -Wl,-stack_size,0x10000000
 
 ##  Machine:  Macintosh
@@ -120,7 +124,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
+#LINKFLAGS = $(PLUMED_LOAD) $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
 #            -Wl,-stack_size,0x10000000
 
 #################################################################
