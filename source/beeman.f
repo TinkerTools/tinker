@@ -90,7 +90,8 @@ c
 c
 c     get the potential energy and atomic forces
 c
-      call gradient (epot,derivs)
+        call gradient (epot,derivs)
+
 c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Beeman recursion
@@ -115,6 +116,7 @@ c
 c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
+
 c
 c     make full-step temperature and pressure corrections
 c
@@ -124,6 +126,7 @@ c
 c     total energy is sum of kinetic and potential energies
 c
       etot = eksum + epot
+
 c
 c     compute statistics and save trajectory for this step
 c

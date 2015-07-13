@@ -39,6 +39,7 @@ c
       use mdstuf
       use molcul
       use moldyn
+      use potent
       use mpole
       use rgddyn
       use rigid
@@ -58,7 +59,7 @@ c
       real*8 sum,dmass
       real*8 vec(3)
       real*8, allocatable :: derivs(:,:)
-      logical exist,heavy
+      logical exist,heavy,plumed_onoff
       character*7 ext
       character*20 keyword
       character*120 dynfile
@@ -81,6 +82,7 @@ c
       use_pred = .false.
       polpred = 'LSQR'
       iprint = 100
+      plumed_onoff = .false.
 c
 c     set default values for temperature and pressure control
 c
@@ -162,6 +164,8 @@ c
             call upcase (volscale)
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
+         else if (keyword(1:7) .eq. 'PLUMED ' ) then
+            plumed_onoff = .true.
          end if
    10    continue
       end do
@@ -499,5 +503,8 @@ c
          end if
       end do
       nprior = i - 1
+
+      if (plumed_onoff) use_plumed = .true.
+
       return
       end

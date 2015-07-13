@@ -32,7 +32,7 @@ c
       use stodyn
       use usage
       implicit none
-      integer i,istep,nstep
+      integer i,nstep,istep
       integer mode,next
       real*8 dt,dtdump
       logical exist
@@ -278,7 +278,7 @@ c
       call plumed_f_gcmd("setMDTimeUnits"//char(0),1.0d0)
       call plumed_f_gcmd("setPlumedDat"//char(0),
      &                  "plumed.dat"//char(0))
-      call plumed_f_gcmd("setNatoms"//char(0),n) 
+      call plumed_f_gcmd("setNatoms"//char(0),n)
       call plumed_f_gcmd("setMDEngine"//char(0),
      &                  "tinker7"//char(0))
       call plumed_f_gcmd("setLogFile"//char(0),
@@ -286,6 +286,7 @@ c
       call plumed_f_gcmd("setTimestep"//char(0),dt) 
       call plumed_f_gcmd("init"//char(0),0)
       do istep = 1, nstep
+         i_step = istep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then

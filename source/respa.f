@@ -117,7 +117,7 @@ c
 c
 c     get the fast-evolving potential energy and atomic forces
 c
-         call gradfast (ealt,derivs,istep)
+         call gradfast (ealt,derivs)
 c
 c     use Newton's second law to get fast-evolving accelerations;
 c     update fast-evolving velocities using the Verlet recursion
@@ -143,7 +143,7 @@ c
 c
 c     get the slow-evolving potential energy and atomic forces
 c
-      call gradslow (epot,derivs,istep)
+      call gradslow (epot,derivs)
 c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
@@ -206,7 +206,7 @@ c     "gradfast" calculates the potential energy and first derivatives
 c     for the fast-evolving local valence potential energy terms
 c
 c
-      subroutine gradfast (energy,derivs,istep)
+      subroutine gradfast (energy,derivs)
       use limits
       use potent
       implicit none
@@ -217,7 +217,7 @@ c
       logical save_chgdpl,save_dipole
       logical save_mpole,save_polar
       logical save_rxnfld,save_solv
-      logical save_list
+      logical save_list,save_plumed
 c
 c
 c     save the original state of slow-evolving potentials
@@ -231,6 +231,7 @@ c
       save_rxnfld = use_rxnfld
       save_solv = use_solv
       save_list = use_list
+      save_plumed = use_plumed
 c
 c     turn off slow-evolving nonbonded potential energy terms
 c
@@ -243,10 +244,11 @@ c
       use_rxnfld = .false.
       use_solv = .false.
       use_list = .false.
+      use_plumed = .false.
 c
 c     get energy and gradient for fast-evolving potential terms
 c
-      call gradient (energy,derivs,istep)
+      call gradient (energy,derivs)
 c
 c     restore the original state of slow-evolving potentials
 c
@@ -259,6 +261,7 @@ c
       use_rxnfld = save_rxnfld
       use_solv = save_solv
       use_list = save_list
+      use_plumed = save_plumed
       return
       end
 c
@@ -274,7 +277,7 @@ c     "gradslow" calculates the potential energy and first derivatives
 c     for the slow-evolving nonbonded potential energy terms
 c
 c
-      subroutine gradslow (energy,derivs,istep)
+      subroutine gradslow (energy,derivs)
       use potent
       implicit none
       real*8 energy
@@ -330,7 +333,7 @@ c
 c
 c     get energy and gradient for slow-evolving potential terms
 c
-      call gradient (energy,derivs,istep)
+      call gradient (energy,derivs)
 c
 c     restore the original state of fast-evolving potentials
 c

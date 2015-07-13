@@ -21,6 +21,7 @@ c
       use atomid
       use atoms
       use bound
+      use boxes
       use couple
       use deriv
       use energi
@@ -36,7 +37,12 @@ c
       integer i,j,istep
       real*8 energy,cutoff
       real*8 derivs(3,*)
+      real*8 derivs_T(n,3)
+      real*8 derivsX(n)
+      real*8 derivsY(n)
+      real*8 derivsZ(n)
       character*32 plumedmain
+
 c
 c
 c     zero out each of the potential energy components
@@ -254,14 +260,34 @@ c
       end do
 
       if (use_plumed) then
-        call plumed_f_gcmd("setStep"//char(0),istep)
+        call plumed_f_gcmd("setStep"//char(0),i_step)
         call plumed_f_gcmd("setPositionsX"//char(0),x(1))
         call plumed_f_gcmd("setPositionsY"//char(0),y(1))
         call plumed_f_gcmd("setPositionsZ"//char(0),z(1))
         call plumed_f_gcmd("setMasses"//char(0),mass(1))
-        call plumed_f_gcmd("setForces"//char(0),derivs(1,1))
+       do i = 1, n
+                derivsX(i) = derivs(1,i)
+                derivsY(i) = derivs(2,i)
+                derivsZ(i) = derivs(3,i)
+       end do
+c        write (6,*) "I"
+        call plumed_f_gcmd("setBox"//char(0),lvec(1,1))
+        call plumed_f_gcmd("setForcesX"//char(0),derivsX(1))
+        call plumed_f_gcmd("setForcesY"//char(0),derivsY(1))
+        call plumed_f_gcmd("setForcesZ"//char(0),derivsZ(1))
+c        write (6,*) "II"
+        call plumed_f_gcmd("setVirial"//char(0),vir(1,1))
+c        write (6,*) "III"
         call plumed_f_gcmd("calc"//char(0),0)
+c        write (6,*) "IV"
       end if
+       
+       do i = 1, n
+                derivs(1,i) = derivsX(i)
+                derivs(2,i) = derivsY(i)
+                derivs(3,i) = derivsZ(i)
+       end do
+
 c
 c     check for an illegal value for the total energy
 c

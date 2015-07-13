@@ -108,9 +108,9 @@ c
       real*8 xcm,xmove
       real*8 ycm,ymove
       real*8 zcm,zmove
+      real*8 hbox(3,3)
       real*8 stress(3,3)
       real*8 temp(3,3)
-      real*8 hbox(3,3)
       real*8 ascale(3,3)
 c
 c
