@@ -217,7 +217,7 @@ c
       logical save_chgdpl,save_dipole
       logical save_mpole,save_polar
       logical save_rxnfld,save_solv
-      logical save_list,save_plumed
+      logical save_list
 c
 c
 c     save the original state of slow-evolving potentials
@@ -231,7 +231,6 @@ c
       save_rxnfld = use_rxnfld
       save_solv = use_solv
       save_list = use_list
-      save_plumed = use_plumed
 c
 c     turn off slow-evolving nonbonded potential energy terms
 c
@@ -244,7 +243,7 @@ c
       use_rxnfld = .false.
       use_solv = .false.
       use_list = .false.
-      use_plumed = .false.
+   
 c
 c     get energy and gradient for fast-evolving potential terms
 c
@@ -261,7 +260,7 @@ c
       use_rxnfld = save_rxnfld
       use_solv = save_solv
       use_list = save_list
-      use_plumed = save_plumed
+   
       return
       end
 c
@@ -291,6 +290,7 @@ c
       logical save_pitors,save_strtor
       logical save_tortor,save_geom
       logical save_metal,save_extra
+      logical save_plumed
 c
 c
 c     save the original state of fast-evolving potentials
@@ -311,6 +311,7 @@ c
       save_geom = use_geom
       save_metal = use_metal
       save_extra = use_extra
+      save_plumed = use_plumed
 c
 c     turn off fast-evolving valence potential energy terms
 c
@@ -330,6 +331,7 @@ c
       use_geom = .false.
       use_metal = .false.
       use_extra = .false.
+      use_plumed = .false.
 c
 c     get energy and gradient for slow-evolving potential terms
 c
@@ -353,5 +355,6 @@ c
       use_geom = save_geom
       use_metal = save_metal
       use_extra = save_extra
+      use_plumed = save_plumed
       return
       end
