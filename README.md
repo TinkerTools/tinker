@@ -11,7 +11,7 @@ INSTALLATION:
 2. The file Plumed.inc will be generated.  Copy it into the source/ directory of (this version of) TINKER.
 
 
-3. (Go back to TINKER directory) Make your machine-specific edits to the Makefile in make/, and copy Makefile into /source
+3. (Go back to TINKER directory) Make your machine-specific edits to the Makefile in make/, and copy Makefile into source/.
 
 
 4. From source/, enter 'make' in command line.
