@@ -1,1 +1,0 @@
-/home/d/daniel/plumed2//src/lib/Plumed.inc.static
