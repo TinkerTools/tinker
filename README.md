@@ -12,7 +12,7 @@ The use of iEL-SCF is invoked by using the 'iel-scf' keyword in a simulation key
 
 'aux-temp [REAL]' - Sets the auxiliary induced dipole 'temperature' at [REAL] in units of (e-Ang/ps)^2.  The default is 10^5 (e-Ang/ps)^2.
 
-'aux-tau-temp' - Sets the auxiliary 'thermostat' coupling timescale in units of ps.  Similar to 'tau-temperature' in default TINKER.  The default value is 0.1 ps.
+'aux-tau-temp [REAL]' - Sets the auxiliary 'thermostat' coupling timescale to [REAL] in units of ps.  Similar to 'tau-temperature' in default TINKER.  The default value is 0.1 ps.
 
 ---
 
