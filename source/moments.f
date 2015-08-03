@@ -33,6 +33,8 @@ c
       use solute
       use units
       use usage
+      use molcul
+      use iELSCF
       implicit none
       integer i,j,k
       real*8 weigh,qave
@@ -44,6 +46,7 @@ c
       real*8, allocatable :: ycm(:)
       real*8, allocatable :: zcm(:)
       real*8 a(3,3),b(3,3)
+      real*8 mu,mux,muy,muz
 c
 c
 c     zero out total charge, dipole and quadrupole components
@@ -159,7 +162,28 @@ c
       if (use_born)  call born
       call chkpole
       call rotpole
-      call induce
+      if(.not. use_iELSCF) call induce
+      
+      mu = 0.0d0
+      mux = 0.0d0
+      muy = 0.0d0
+      muz = 0.0d0
+      do i = 1, npole
+         mux = mux + x(i)*rpole(1,i) + rpole(2,i)
+         mux = mux + uind(1,i)
+         muy = muy + y(i)*rpole(1,i) + rpole(3,i)
+         muy = muy + uind(2,i)
+         muz = muz + z(i)*rpole(1,i) + rpole(4,i)
+         muz = muz + uind(3,i)
+         if (mod(i,3) .eq. 0) then
+            mu = mu + dsqrt(mux*mux + muy*muy + muz*muz)
+            mux = 0.0d0
+            muy = 0.0d0
+            muz = 0.0d0
+         end if
+      end do
+      write(125,*) mu * debye / dble(nmol)
+      
       if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
          do i = 1, npole
             rpole(2,i) = rpole(2,i) + uinds(1,i)

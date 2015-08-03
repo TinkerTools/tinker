@@ -37,6 +37,7 @@ c
       use socket
       use titles
       use units
+      use iELSCF
       implicit none
       integer i,j,k,istep
       integer ixyz,iind
@@ -150,6 +151,7 @@ c
 c     update the information needed to restart the trajectory
 c
       call prtdyn
+      if(use_iELSCF) call prtdynaux
 c
 c     save the velocity vector components at the current step
 c

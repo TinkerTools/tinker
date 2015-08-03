@@ -46,6 +46,7 @@ c
       use units
       use uprior
       use usage
+      use iELSCF
       implicit none
       integer i,j,k
       integer idyn,nh

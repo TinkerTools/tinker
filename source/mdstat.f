@@ -32,6 +32,7 @@ c
       use units
       use usage
       use warp
+      use iELSCF
       implicit none
       integer istep,modstep
       real*8 dt,temp,pres
@@ -57,6 +58,7 @@ c
       real*8 pres_ave,pres2_ave
       real*8 dens_sum,dens2_sum
       real*8 dens_ave,dens2_ave
+      real*8 ske, spe
       save etot_sum,etot2_sum
       save eint_sum,eint2_sum
       save epot_sum,epot2_sum
@@ -64,6 +66,13 @@ c
       save temp_sum,temp2_sum
       save pres_sum,pres2_sum
       save dens_sum,dens2_sum
+      
+      ske=0.5d0*(vnh(1)*vnh(1)*qnh(1)+vnh(2)*vnh(2)*qnh(2)+
+     &           vnh(3)*vnh(3)*qnh(3)+vnh(4)*vnh(4)*qnh(4))
+      spe=gasconst*temp*(dble(nfree)*pnh(1)+pnh(2)+pnh(3)+pnh(4))
+      write(120,*) ske+spe+ekin+epot
+      write(121,*) temp
+      call moments
 c
 c
 c     set number of steps for block averages of properties

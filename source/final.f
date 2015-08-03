@@ -89,6 +89,7 @@ c
       use vdw
       use vibs
       use warp
+      use iELSCF
       implicit none
 c
 c
@@ -742,6 +743,15 @@ c
       if (allocated(phi))  deallocate (phi)
       if (allocated(phik))  deallocate (phik)
       if (allocated(pwork))  deallocate (pwork)
+      
+c
+c     iEL-SCF stuff.  ALBAUGH.
+c 
+      if (allocated(a_aux)) deallocate (a_aux)
+      if (allocated(v_aux)) deallocate (v_aux)
+      if (allocated(uind_aux)) deallocate(uind_aux)
+      if (allocated(uinp_aux)) deallocate(uinp_aux)
+      
 c
 c     deallocation of global arrays from module warp
 c

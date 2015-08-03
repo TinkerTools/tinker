@@ -35,11 +35,11 @@ c
 c
 c
 c     set normalization factor for cumulative velocity distribution
-c
+c 
       beta = sqrt(mass / (2.0d0*boltzmann*temper))
 c
 c     pick a randomly distributed velocity along each of three axes
-c
+c 
       rho = random ()
       xspeed = erfinv(rho) / beta
       rho = random ()
@@ -48,7 +48,40 @@ c
       zspeed = erfinv(rho) / beta
 c
 c     set the final value of the particle speed in 3-dimensions
-c
+c 
       maxwell = sqrt(xspeed**2 + yspeed**2 + zspeed**2)
+      return
+      end
+      
+      
+      
+      function maxwell2 (temper)
+      use units
+      implicit none
+      real*8 maxwell2
+      real*8 mass,temper
+      real*8 rho,beta
+      real*8 random,erfinv
+      real*8 xspeed,yspeed
+      real*8 zspeed
+      external erfinv
+c
+c
+c     set normalization factor for cumulative velocity distribution
+c 
+      beta = sqrt(1.0d0 / (2.0d0*temper))
+c
+c     pick a randomly distributed velocity along each of three axes
+c 
+      rho = random ()
+      xspeed = erfinv(rho) / beta
+      rho = random ()
+      yspeed = erfinv(rho) / beta
+      rho = random ()
+      zspeed = erfinv(rho) / beta
+c
+c     set the final value of the particle speed in 3-dimensions
+c 
+      maxwell2 = sqrt(xspeed**2 + yspeed**2 + zspeed**2)
       return
       end

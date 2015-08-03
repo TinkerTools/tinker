@@ -184,6 +184,7 @@ c
       use potent
       use units
       use uprior
+      use iELSCF
       implicit none
       integer i,j,k,iter
       integer maxiter
@@ -208,6 +209,7 @@ c
       real*8, allocatable :: vecp(:,:)
       logical done
       character*6 mode
+      real*8 polepstemp
 c
 c
 c     zero out the induced dipoles at each site
@@ -274,6 +276,21 @@ c
                end do
             end do
          end if
+         
+         polepstemp = poleps
+         if(first) then
+            poleps = 0.000001d0
+         end if
+         
+         if((.not.first) .and. (use_iELSCF)) then
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uind_aux(j,i)
+                  uinp(j,i) = uinp_aux(j,i)
+               end do
+            end do
+         end if
+         
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -419,6 +436,8 @@ c
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. politer)  done = .true.
          end do
+         poleps = polepstemp
+         write(128,*) iter,eps
 c
 c     perform deallocation of some local arrays
 c

@@ -31,6 +31,7 @@ c
       use solute
       use stodyn
       use usage
+      use iELSCF
       implicit none
       integer i,istep,nstep
       integer mode,next
@@ -39,6 +40,8 @@ c
       character*20 keyword
       character*120 record
       character*120 string
+      real*8 start, finish
+      real*8 omp_get_wtime
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -53,6 +56,7 @@ c
       atmsph = 0.0d0
       isothermal = .false.
       isobaric = .false.
+      use_iELSCF = .false.
 c
 c     check for keywords containing any altered parameters
 c
@@ -66,6 +70,8 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
+         else if (keyword(1:20) .eq. 'IEL-SCF ') then
+            use_iELSCF = .true.
          end if
       end do
 c
@@ -227,8 +233,19 @@ c
 c
 c     initialize any holonomic constraints and setup dynamics
 c
+
+      open(unit=128,file="iter.txt")
+      open(unit=120,file="energy.txt")
+      open(unit=140,file="auxkin.txt")
+      open(unit=121,file="temp.txt")
+      open(unit=125,file="mu.txt")
+      open(unit=126,file="indtraj.txt")
+      open(unit=127,file="guesstraj.txt")
       call shakeup
+      if(use_iELSCF) first = .true.
       call mdinit
+      if(use_iELSCF) first = .false.
+      if(use_iELSCF) call iELSCF_init(dt)
 c
 c     print out a header line for the dynamics computation
 c
@@ -267,8 +284,10 @@ c
       end if
 c
 c     integrate equations of motion to take a time step
-c
+c 
+      start = omp_get_wtime()
       do istep = 1, nstep
+         print*,"Step: ",istep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
@@ -287,6 +306,16 @@ c
             call beeman (istep,dt)
          end if
       end do
+      finish = omp_get_wtime()
+      print*,"Dynamics finished in ",finish-start," seconds."
+      
+      close(120)
+      close(121)
+      close(125)
+      close(128)
+      close(140)
+      close(126)
+      close(127)
 c
 c     perform any final tasks before program exit
 c

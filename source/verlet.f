@@ -24,6 +24,8 @@ c
       use moldyn
       use units
       use usage
+      use iELSCF
+      use polar
       implicit none
       integer i,j,istep
       real*8 dt,dt_2
@@ -36,6 +38,9 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: derivs(:,:)
+      
+      write(126,*) uind(1,1),uind(2,1),uind(3,1)
+      write(127,*) uind_aux(1,1),uind_aux(2,1),uind_aux(3,1)
 c
 c
 c     set some time values for the dynamics integration
@@ -45,6 +50,7 @@ c
 c     make half-step temperature and pressure corrections
 c
       call temper (dt)
+      if(auxstat .ne. 'NONE') call auxtemper(dt)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -56,19 +62,38 @@ c
 c     store the current atom positions, then find half-step
 c     velocities and full-step positions via Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            x(i) = x(i) + v(1,i)*dt
-            y(i) = y(i) + v(2,i)*dt
-            z(i) = z(i) + v(3,i)*dt
-         end if
-      end do
+      if(use_iELSCF) then
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  v(j,i) = v(j,i) + a(j,i)*dt_2
+                  v_aux(j,i) = v_aux(j,i) + a_aux(j,i)*dt_2
+                  uind_aux(j,i) = uind_aux(j,i) + v_aux(j,i)*dt
+                  uinp_aux(j,i) = uind_aux(j,i)!water approx.
+               end do
+               xold(i) = x(i)
+               yold(i) = y(i)
+               zold(i) = z(i)
+               x(i) = x(i) + v(1,i)*dt
+               y(i) = y(i) + v(2,i)*dt
+               z(i) = z(i) + v(3,i)*dt
+            end if
+         end do
+      else
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  v(j,i) = v(j,i) + a(j,i)*dt_2
+               end do
+               xold(i) = x(i)
+               yold(i) = y(i)
+               zold(i) = z(i)
+               x(i) = x(i) + v(1,i)*dt
+               y(i) = y(i) + v(2,i)*dt
+               z(i) = z(i) + v(3,i)*dt
+            end if
+         end do
+      end if
 c
 c     get constraint-corrected positions and half-step velocities
 c
@@ -81,14 +106,27 @@ c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -convert * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
-      end do
+      if(use_iELSCF) then
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  a_aux(j,i) = omega*omega*(uind(j,i) - uind_aux(j,i))
+                  v(j,i) = v(j,i) + a(j,i)*dt_2
+                  v_aux(j,i) = v_aux(j,i) + a_aux(j,i)*dt_2
+               end do
+            end if
+         end do
+      else
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  v(j,i) = v(j,i) + a(j,i)*dt_2
+               end do
+            end if
+         end do
+      end if
 c
 c     perform deallocation of some local arrays
 c
@@ -104,6 +142,7 @@ c
 c     make full-step temperature and pressure corrections
 c
       call temper2 (dt,eksum,ekin,temp)
+      if(auxstat .ne. 'NONE') call auxtemper2(dt,istep)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies
@@ -115,5 +154,9 @@ c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)
+      
+      write(126,*) uind(1,1),uind(2,1),uind(3,1)
+      write(127,*) uind_aux(1,1),uind_aux(2,1),uind_aux(3,1)
+      
       return
       end
