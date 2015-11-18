@@ -22,16 +22,25 @@ c     total potential energy for all frames of each trajectory under
 c     control of both key files; finally the FEP and BAR algorithms
 c     are used to compute the free energy for state A --> state B
 c
-c     literature reference:
+c     modifications to handle NPT simulation data by Chengwen Liu,
+c     University of Texas at Austin during October 2015
+c
+c     literature references:
 c
 c     C. H. Bennett, "Efficient Estimation of Free Energy Differences
 c     from Monte Carlo Data", Journal of Computational Physics, 22,
 c     245-268 (1976)
+c       
+c     K. B. Daly, J. B. Benziger, P. G. Debenedetti and
+c     A. Z. Panagiotopoulos, "Massively Parallel Chemical Potential 
+c     Calculation on Graphics Processing Units", Computer Physics 
+c     Communications, 183, 2054-2062 (2012)  [modification for NPT]
 c
 c
       program bar
       use sizes
       use atoms
+      use boxes
       use energi
       use files
       use inform
@@ -59,7 +68,7 @@ c
       real*8 top,top2
       real*8 bot,bot2
       real*8 fterm,rfrm
-      real*8 sum,sum2
+      real*8 sum,sum2,vave
       real*8 mean,stdev
       real*8 random,ratio
       real*8 forward,backward
@@ -67,6 +76,8 @@ c
       real*8, allocatable :: ua1(:)
       real*8, allocatable :: ub0(:)
       real*8, allocatable :: ub1(:)
+      real*8, allocatable :: vola(:)
+      real*8, allocatable :: volb(:)
       logical exist,query,done
       character*120 record
       character*120 string
@@ -84,6 +95,8 @@ c
       allocate (ua1(maxframe))
       allocate (ub0(maxframe))
       allocate (ub1(maxframe))
+      allocate (vola(maxframe))
+      allocate (volb(maxframe))
 c
 c     get trajectory A archive and setup mechanics calculation
 c
@@ -215,6 +228,7 @@ c
          k = k + 1
          call cutoffs
          ua0(j) = energy ()
+         vola(j) = volbox
          do i = 1, step1-1
             call readxyz (ixyz)
          end do
@@ -299,6 +313,7 @@ c
          k = k + 1
          call cutoffs
          ub0(j) = energy ()
+         volb(j) = volbox
          do i = 1, step2-1
             call readxyz (ixyz)
          end do
@@ -360,6 +375,29 @@ c
       temp = 298.0d0
       rt = gasconst * temp
 c
+c     compute the volume corrections for trajectories A and B
+c
+      vave = 0.0d0
+      do i = 1, nfrm1
+         vave = vave + vola(i)
+      end do
+      if (vave .ne. 0.0d0) then
+         vave = vave / frm1
+         do i = 1, nfrm1
+            if (vola(i) .ne. 0.0d0)  vola(i) = -rt * log(vola(i)/vave)
+         end do
+      end if
+      vave = 0.0d0
+      do i = 1, nfrm2
+         vave = vave + volb(i)
+      end do
+      if (vave .ne. 0.0d0) then
+         vave = vave / frm2
+         do i = 1, nfrm2
+            if (volb(i) .ne. 0.0d0)  volb(i) = -rt * log(volb(i)/vave)
+         end do
+      end if
+c
 c     compute the free energy difference via Zwanzig equation
 c
       write (iout,190)
@@ -367,12 +405,12 @@ c
      &           ' via FEP Method :',/)
       sum = 0.0d0
       do i = 1, nfrm1
-         sum = sum + exp((ua0(i)-ua1(i))/rt)
+         sum = sum + exp((ua0(i)-ua1(i)+vola(i))/rt)
       end do
       forward = -rt * log(sum/frm1)
       sum = 0.0d0
       do i = 1, nfrm2
-         sum = sum + exp((ub1(i)-ub0(i))/rt)
+         sum = sum + exp((ub1(i)-ub0(i)+volb(i))/rt)
       end do
       backward = -rt * log(sum/frm2)
       write (iout,200)  forward
@@ -393,14 +431,14 @@ c
       top = 0.0d0
       top2 = 0.0d0
       do i = 1, nfrm2
-         fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+cold)/rt))
+         fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+volb(i)+cold)/rt))
          top = top + fterm
          top2 = top2 + fterm*fterm
       end do
       bot = 0.0d0
       bot2 = 0.0d0
       do i = 1, nfrm1
-         fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)-cold)/rt))
+         fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vola(i)-cold)/rt))
          bot = bot + fterm
          bot2 = bot2 + fterm*fterm
       end do
@@ -425,14 +463,16 @@ c
          top = 0.0d0
          top2 = 0.0d0
          do i = 1, nfrm2
-            fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+cold)/rt))
+            fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+volb(i)
+     &                                     +cold)/rt))
             top = top + fterm
             top2 = top2 + fterm*fterm
          end do
          bot = 0.0d0
          bot2 = 0.0d0
          do i = 1, nfrm1
-            fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)-cold)/rt))
+            fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vola(i)
+     &                                     -cold)/rt))
             bot = bot + fterm
             bot2 = bot2 + fterm*fterm
          end do
@@ -478,13 +518,15 @@ c
          do i = 1, nfrm2
             bst2(i) = int(frm2*random()) + 1
             j = bst2(i)
-            top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cold)/rt))
+            top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+volb(i)
+     &                                       +cold)/rt))
          end do
          bot = 0.0d0
          do i = 1, nfrm1
             bst1(i) = int(frm1*random()) + 1
             j = bst1(i)
-            bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cold)/rt))
+            bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)+vola(i)
+     &                                       -cold)/rt))
          end do
          cnew = rt*log(rfrm*top/bot) + cold
          delta = abs(cnew-cold)
@@ -494,12 +536,14 @@ c
             top = 0.0d0
             do i = 1, nfrm2
                j = bst2(i)
-               top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cold)/rt))
+               top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+volb(i)
+     &                                          +cold)/rt))
             end do
             bot = 0.0d0
             do i = 1, nfrm1
                j = bst1(i)
-               bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cold)/rt))
+               bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)+vola(i)
+     &                                          -cold)/rt))
             end do
             cnew = rt*log(rfrm*top/bot) + cold
             delta = abs(cnew-cold)
@@ -528,12 +572,14 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (bst1)
+      deallocate (bst2)
       deallocate (ua0)
       deallocate (ua1)
       deallocate (ub0)
       deallocate (ub1)
-      deallocate (bst1)
-      deallocate (bst2)
+      deallocate (vola)
+      deallocate (volb)
 c
 c     perform any final tasks before program exit
 c
