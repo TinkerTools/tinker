@@ -239,8 +239,6 @@ c
       open(unit=140,file="auxkin.txt")
       open(unit=121,file="temp.txt")
       open(unit=125,file="mu.txt")
-      open(unit=126,file="indtraj.txt")
-      open(unit=127,file="guesstraj.txt")
       call shakeup
       if(use_iELSCF) first = .true.
       call mdinit

@@ -38,9 +38,6 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: derivs(:,:)
-      
-      write(126,*) uind(1,1),uind(2,1),uind(3,1)
-      write(127,*) uind_aux(1,1),uind_aux(2,1),uind_aux(3,1)
 c
 c
 c     set some time values for the dynamics integration
@@ -68,8 +65,9 @@ c
                do j = 1, 3
                   v(j,i) = v(j,i) + a(j,i)*dt_2
                   v_aux(j,i) = v_aux(j,i) + a_aux(j,i)*dt_2
+                  vp_aux(j,i) = vp_aux(j,i) + ap_aux(j,i)*dt_2
                   uind_aux(j,i) = uind_aux(j,i) + v_aux(j,i)*dt
-                  uinp_aux(j,i) = uind_aux(j,i)!water approx.
+                  uinp_aux(j,i) = uinp_aux(j,i) + vp_aux(j,i)*dt!water approx.
                end do
                xold(i) = x(i)
                yold(i) = y(i)
@@ -112,8 +110,10 @@ c
                do j = 1, 3
                   a(j,i) = -convert * derivs(j,i) / mass(i)
                   a_aux(j,i) = omega*omega*(uind(j,i) - uind_aux(j,i))
+                  ap_aux(j,i) = omega*omega*(uinp(j,i) - uinp_aux(j,i))
                   v(j,i) = v(j,i) + a(j,i)*dt_2
                   v_aux(j,i) = v_aux(j,i) + a_aux(j,i)*dt_2
+                  vp_aux(j,i) = vp_aux(j,i) + ap_aux(j,i)*dt_2
                end do
             end if
          end do
@@ -154,9 +154,6 @@ c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)
-      
-      write(126,*) uind(1,1),uind(2,1),uind(3,1)
-      write(127,*) uind_aux(1,1),uind_aux(2,1),uind_aux(3,1)
       
       return
       end

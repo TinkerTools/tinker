@@ -7,8 +7,10 @@
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8
       real*8 scale,expterm
+      real*8 scale_p,expterm_p
       real*8 w(3)!w(5)
-      
+
+
       if(auxstat .eq. 'NOSE-HOOVER') then
 c
 c     make half-step velocity correction for Nose-Hoover auxiliary dipole system   
@@ -26,64 +28,114 @@ c
 !         w(4) = w(1)
 !         w(5) = w(1)
          scale = 1.0d0
+         scale_p = 1.0d0
          do i = 1, nc
-            do j = 1, ns
-             dts = w(j) * dtc
-             dt2 = 0.5d0 * dts
-             dt4 = 0.25d0 * dts
-             dt8 = 0.125d0 * dts
-            
-             gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
-     &                   /qnh_aux(4)
-             vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
-             gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
-     &                    /qnh_aux(3)
-             expterm=exp(-vnh_aux(4)*dt8)
-                
-             vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
-             gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
-     &                   /qnh_aux(2)
-             expterm=exp(-vnh_aux(3)*dt8)
-               
-             vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)!1/ps
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                   /qnh_aux(1)!1/ps**2
-             expterm=exp(-vnh_aux(2)*dt8)
-                
-             vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
-             scale=scale*exp(-vnh_aux(1)*dt2)
-             aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt2)*
-     &                           exp(-vnh_aux(1)*dt2)
-                
-             pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
-             pnh_aux(2) = pnh_aux(2) + vnh_aux(2)*dt2
-             pnh_aux(3) = pnh_aux(3) + vnh_aux(3)*dt2
-             pnh_aux(4) = pnh_aux(4) + vnh_aux(4)*dt2
-               
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                   /qnh_aux(1)
-             expterm = exp(-vnh_aux(2)*dt8)
-                
-             vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
-             gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
-     &                   /qnh_aux(2)
-             expterm=exp(-vnh_aux(3)*dt8)
-                
-             vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)
-             gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
-     &                   /qnh_aux(3)
-             expterm=exp(-vnh_aux(4)*dt8)
-                
-             vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
-             gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
-     &                    /qnh_aux(4)
-             vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
-            end do
+          do j = 1, ns
+           dts = w(j) * dtc
+           dt2 = 0.5d0 * dts
+           dt4 = 0.25d0 * dts
+           dt8 = 0.125d0 * dts
+          
+           gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
+     &                 /qnh_aux(4)
+           vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
+           gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
+     &                  /qnh_aux(3)
+           expterm=exp(-vnh_aux(4)*dt8)
+              
+           vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
+           gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
+     &                 /qnh_aux(2)
+           expterm=exp(-vnh_aux(3)*dt8)
+             
+           vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)!1/ps
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_aux(1)!1/ps**2
+           expterm=exp(-vnh_aux(2)*dt8)
+              
+           vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
+           scale=scale*exp(-vnh_aux(1)*dt2)
+           aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt2)*
+     &                         exp(-vnh_aux(1)*dt2)
+              
+           pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           pnh_aux(2) = pnh_aux(2) + vnh_aux(2)*dt2
+           pnh_aux(3) = pnh_aux(3) + vnh_aux(3)*dt2
+           pnh_aux(4) = pnh_aux(4) + vnh_aux(4)*dt2
+             
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_aux(1)
+           expterm = exp(-vnh_aux(2)*dt8)
+              
+           vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
+           gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
+     &                 /qnh_aux(2)
+           expterm=exp(-vnh_aux(3)*dt8)
+              
+           vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)
+           gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
+     &                 /qnh_aux(3)
+           expterm=exp(-vnh_aux(4)*dt8)
+              
+           vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
+           gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
+     &                  /qnh_aux(4)
+           vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
+           
+           
+           
+           gnh_auxp(4)=(qnh_auxp(3)*vnh_auxp(3)*vnh_auxp(3)-aux_kelvin)
+     &                 /qnh_auxp(4)
+           vnh_auxp(4)=vnh_auxp(4)+gnh_auxp(4)*dt4
+           gnh_auxp(3)=(qnh_auxp(2)*vnh_auxp(2)*vnh_auxp(2)-aux_kelvin)
+     &                  /qnh_auxp(3)
+           expterm_p=exp(-vnh_auxp(4)*dt8)
+              
+           vnh_auxp(3)=expterm_p*(vnh_auxp(3)*expterm_p+gnh_auxp(3)*dt4)
+           gnh_auxp(2)=(qnh_auxp(1)*vnh_auxp(1)*vnh_auxp(1)-aux_kelvin)
+     &                 /qnh_auxp(2)
+           expterm_p=exp(-vnh_auxp(3)*dt8)
+             
+           vnh_auxp(2)=expterm_p*(vnh_auxp(2)*expterm_p+gnh_auxp(2)*dt4)!1/ps
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_auxp(1)!1/ps**2
+           expterm_p=exp(-vnh_auxp(2)*dt8)
+              
+           vnh_auxp(1)=expterm_p*(vnh_auxp(1)*expterm_p+gnh_auxp(1)*dt4)
+           scale_p=scale_p*exp(-vnh_auxp(1)*dt2)
+           auxp_eksum=auxp_eksum*exp(-vnh_auxp(1)*dt2)*
+     &                         exp(-vnh_auxp(1)*dt2)
+              
+           pnh_auxp(1) = pnh_auxp(1) + vnh_auxp(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           pnh_auxp(2) = pnh_auxp(2) + vnh_auxp(2)*dt2
+           pnh_auxp(3) = pnh_auxp(3) + vnh_auxp(3)*dt2
+           pnh_auxp(4) = pnh_auxp(4) + vnh_auxp(4)*dt2
+             
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_auxp(1)
+           expterm_p = exp(-vnh_auxp(2)*dt8)
+              
+           vnh_auxp(1)=expterm_p*(vnh_auxp(1)*expterm_p+gnh_auxp(1)*dt4)
+           gnh_auxp(2)=(qnh_auxp(1)*vnh_auxp(1)*vnh_auxp(1)-aux_kelvin)
+     &                 /qnh_auxp(2)
+           expterm_p=exp(-vnh_auxp(3)*dt8)
+              
+           vnh_auxp(2)=expterm_p*(vnh_auxp(2)*expterm_p+gnh_auxp(2)*dt4)
+           gnh_auxp(3)=(qnh_auxp(2)*vnh_auxp(2)*vnh_auxp(2)-aux_kelvin)
+     &                 /qnh_auxp(3)
+           expterm_p=exp(-vnh_auxp(4)*dt8)
+              
+           vnh_auxp(3)=expterm_p*(vnh_auxp(3)*expterm_p+gnh_auxp(3)*dt4)
+           gnh_auxp(4)=(qnh_auxp(3)*vnh_auxp(3)*vnh_auxp(3)-aux_kelvin)
+     &                  /qnh_auxp(4)
+           vnh_auxp(4)=vnh_auxp(4)+gnh_auxp(4)*dt4
+          end do
          end do
          
          do i = 1, n
             do j = 1, 3
                v_aux(j,i) = v_aux(j,i)*scale
+               vp_aux(j,i) = vp_aux(j,i)*scale_p
             end do
          end do
       else if(auxstat .eq. 'NOSE-HOOVER1') then
@@ -100,32 +152,49 @@ c
 !         w(4) = w(1)
 !         w(5) = w(1)
          scale = 1.0d0
+         scale_p=1.0d0
          do i = 1, nc
-            do j = 1, ns
-             dts = w(j) * dtc
-             dt2 = 0.5d0 * dts
-             dt4 = 0.25d0 * dts
-             dt8 = 0.125d0 * dts
-             
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                    /qnh_aux(1)!1/ps**2
-                
-             vnh_aux(1)=vnh_aux(1)+gnh_aux(1)*dt4
-             scale=scale*exp(-vnh_aux(1)*dt2)
-             aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt)
-               
-             pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
-             
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                   /qnh_aux(1)
+          do j = 1, ns
+           dts = w(j) * dtc
+           dt2 = 0.5d0 * dts
+           dt4 = 0.25d0 * dts
+           dt8 = 0.125d0 * dts
+           
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                  /qnh_aux(1)!1/ps**2
               
-             vnh_aux(1)=(vnh_aux(1)+gnh_aux(1)*dt4)
-            end do
+           vnh_aux(1)=vnh_aux(1)+gnh_aux(1)*dt4
+           scale=scale*exp(-vnh_aux(1)*dt2)
+           aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt)
+             
+           pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_aux(1)
+            
+           vnh_aux(1)=(vnh_aux(1)+gnh_aux(1)*dt4)
+           
+           
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                  /qnh_auxp(1)!1/ps**2
+              
+           vnh_auxp(1)=vnh_auxp(1)+gnh_auxp(1)*dt4
+           scale_p=scale_p*exp(-vnh_auxp(1)*dt2)
+           auxp_eksum=auxp_eksum*exp(-vnh_auxp(1)*dt)
+             
+           pnh_auxp(1) = pnh_auxp(1) + vnh_auxp(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_auxp(1)
+            
+           vnh_auxp(1)=(vnh_auxp(1)+gnh_auxp(1)*dt4)
+          end do
          end do
          
          do i = 1, n
             do j = 1, 3
                v_aux(j,i) = v_aux(j,i)*scale
+               vp_aux(j,i) = vp_aux(j,i)*scale_p
             end do
          end do
       end if
@@ -162,10 +231,9 @@ c
       real*8 dtc,dts
       real*8 dt2,dt4,dt8
       real*8 expterm
+      real*8 expterm_p,scale_p
       real*8 w(3)!w(5)
-      
-      call auxkinetic(.false.)
-      
+
       if(auxstat .eq. 'NOSE-HOOVER') then
 c
 c     make full-step velocity correction for Nose-Hoover auxiliary dipole system   
@@ -182,64 +250,116 @@ c
 !         w(4) = w(1)
 !         w(5) = w(1)
          scale = 1.0d0
+         scale_p=1.0d0
          do i = 1, nc
-            do j = 1, ns
-             dts = w(j) * dtc
-             dt2 = 0.5d0 * dts
-             dt4 = 0.25d0 * dts
-             dt8 = 0.125d0 * dts
-            
-             gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
-     &                   /qnh_aux(4)
-             vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
-             gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
-     &                   /qnh_aux(3)
-             expterm=exp(-vnh_aux(4)*dt8)
-                
-             vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
-             gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
-     &                   /qnh_aux(2)
-             expterm=exp(-vnh_aux(3)*dt8)
-               
-             vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)!1/ps
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                   /qnh_aux(1)!1/ps**2
-             expterm=exp(-vnh_aux(2)*dt8)
-                
-             vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
-             scale=scale*exp(-vnh_aux(1)*dt2)
-             aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt2)*
-     &                           exp(-vnh_aux(1)*dt2)
-                
-             pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
-             pnh_aux(2) = pnh_aux(2) + vnh_aux(2)*dt2
-             pnh_aux(3) = pnh_aux(3) + vnh_aux(3)*dt2
-             pnh_aux(4) = pnh_aux(4) + vnh_aux(4)*dt2
-               
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                   /qnh_aux(1)
-             expterm = exp(-vnh_aux(2)*dt8)
-                
-             vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
-             gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
-     &                   /qnh_aux(2)
-             expterm=exp(-vnh_aux(3)*dt8)
-                
-             vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)
-             gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
-     &                   /qnh_aux(3)
-             expterm=exp(-vnh_aux(4)*dt8)
-                
-             vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
-             gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
-     &                    /qnh_aux(4)
-             vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
-            end do
+          do j = 1, ns
+           dts = w(j) * dtc
+           dt2 = 0.5d0 * dts
+           dt4 = 0.25d0 * dts
+           dt8 = 0.125d0 * dts
+          
+           gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
+     &                 /qnh_aux(4)
+           vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
+           gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
+     &                 /qnh_aux(3)
+           expterm=exp(-vnh_aux(4)*dt8)
+              
+           vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
+           gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
+     &                 /qnh_aux(2)
+           expterm=exp(-vnh_aux(3)*dt8)
+             
+           vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)!1/ps
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_aux(1)!1/ps**2
+           expterm=exp(-vnh_aux(2)*dt8)
+              
+           vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
+           scale=scale*exp(-vnh_aux(1)*dt2)
+           aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt2)*
+     &                         exp(-vnh_aux(1)*dt2)
+              
+           pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           pnh_aux(2) = pnh_aux(2) + vnh_aux(2)*dt2
+           pnh_aux(3) = pnh_aux(3) + vnh_aux(3)*dt2
+           pnh_aux(4) = pnh_aux(4) + vnh_aux(4)*dt2
+             
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_aux(1)
+           expterm = exp(-vnh_aux(2)*dt8)
+              
+           vnh_aux(1)=expterm*(vnh_aux(1)*expterm+gnh_aux(1)*dt4)
+           gnh_aux(2)=(qnh_aux(1)*vnh_aux(1)*vnh_aux(1)-aux_kelvin)
+     &                 /qnh_aux(2)
+           expterm=exp(-vnh_aux(3)*dt8)
+              
+           vnh_aux(2)=expterm*(vnh_aux(2)*expterm+gnh_aux(2)*dt4)
+           gnh_aux(3)=(qnh_aux(2)*vnh_aux(2)*vnh_aux(2)-aux_kelvin)
+     &                 /qnh_aux(3)
+           expterm=exp(-vnh_aux(4)*dt8)
+              
+           vnh_aux(3)=expterm*(vnh_aux(3)*expterm+gnh_aux(3)*dt4)
+           gnh_aux(4)=(qnh_aux(3)*vnh_aux(3)*vnh_aux(3)-aux_kelvin)
+     &                  /qnh_aux(4)
+           vnh_aux(4)=vnh_aux(4)+gnh_aux(4)*dt4
+           
+           
+           
+           
+           
+           gnh_auxp(4)=(qnh_auxp(3)*vnh_auxp(3)*vnh_auxp(3)-aux_kelvin)
+     &                /qnh_auxp(4)
+           vnh_auxp(4)=vnh_auxp(4)+gnh_auxp(4)*dt4
+           gnh_auxp(3)=(qnh_auxp(2)*vnh_auxp(2)*vnh_auxp(2)-aux_kelvin)
+     &                 /qnh_auxp(3)
+           expterm_p=exp(-vnh_auxp(4)*dt8)
+              
+           vnh_auxp(3)=expterm_p*(vnh_auxp(3)*expterm_p+gnh_auxp(3)*dt4)
+           gnh_auxp(2)=(qnh_auxp(1)*vnh_auxp(1)*vnh_auxp(1)-aux_kelvin)
+     &                 /qnh_auxp(2)
+           expterm_p=exp(-vnh_auxp(3)*dt8)
+             
+           vnh_auxp(2)=expterm_p*(vnh_auxp(2)*expterm_p+gnh_auxp(2)*dt4)!1/ps
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_auxp(1)!1/ps**2
+           expterm_p=exp(-vnh_auxp(2)*dt8)
+              
+           vnh_auxp(1)=expterm_p*(vnh_auxp(1)*expterm_p+gnh_auxp(1)*dt4)
+           scale_p=scale_p*exp(-vnh_auxp(1)*dt2)
+           auxp_eksum=auxp_eksum*exp(-vnh_auxp(1)*dt2)*
+     &                         exp(-vnh_auxp(1)*dt2)
+              
+           pnh_auxp(1) = pnh_auxp(1) + vnh_auxp(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           pnh_auxp(2) = pnh_auxp(2) + vnh_auxp(2)*dt2
+           pnh_auxp(3) = pnh_auxp(3) + vnh_auxp(3)*dt2
+           pnh_auxp(4) = pnh_auxp(4) + vnh_auxp(4)*dt2
+             
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_auxp(1)
+           expterm_p = exp(-vnh_auxp(2)*dt8)
+              
+           vnh_auxp(1)=expterm_p*(vnh_auxp(1)*expterm_p+gnh_auxp(1)*dt4)
+           gnh_auxp(2)=(qnh_auxp(1)*vnh_auxp(1)*vnh_auxp(1)-aux_kelvin)
+     &                 /qnh_auxp(2)
+           expterm_p=exp(-vnh_auxp(3)*dt8)
+              
+           vnh_auxp(2)=expterm_p*(vnh_auxp(2)*expterm_p+gnh_auxp(2)*dt4)
+           gnh_auxp(3)=(qnh_auxp(2)*vnh_auxp(2)*vnh_auxp(2)-aux_kelvin)
+     &                /qnh_auxp(3)
+           expterm_p=exp(-vnh_auxp(4)*dt8)
+              
+           vnh_auxp(3)=expterm_p*(vnh_auxp(3)*expterm_p+gnh_auxp(3)*dt4)
+           gnh_auxp(4)=(qnh_auxp(3)*vnh_auxp(3)*vnh_auxp(3)-aux_kelvin)
+     &                  /qnh_auxp(4)
+           vnh_auxp(4)=vnh_auxp(4)+gnh_auxp(4)*dt4
+          end do
          end do
          
          do i = 1, n
             do j = 1, 3
                v_aux(j,i) = v_aux(j,i)*scale
+               vp_aux(j,i) = vp_aux(j,i)*scale_p
             end do
          end do
       else if(auxstat .eq. 'NOSE-HOOVER1') then
@@ -258,48 +378,72 @@ c
 !         w(4) = w(1)
 !         w(5) = w(1)
          scale = 1.0d0
+         scale_p=1.0d0
          do i = 1, nc
-            do j = 1, ns
-             dts = w(j) * dtc
-             dt2 = 0.5d0 * dts
-             dt4 = 0.25d0 * dts
-             dt8 = 0.125d0 * dts
-             
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                    /qnh_aux(1)!1/ps**2
-                
-             vnh_aux(1)=vnh_aux(1)+gnh_aux(1)*dt4
-             scale=scale*exp(-vnh_aux(1)*dt2)
-             aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt)
-               
-             pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
-             
-             gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
-     &                   /qnh_aux(1)
+          do j = 1, ns
+           dts = w(j) * dtc
+           dt2 = 0.5d0 * dts
+           dt4 = 0.25d0 * dts
+           dt8 = 0.125d0 * dts
+           
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                  /qnh_aux(1)!1/ps**2
               
-             vnh_aux(1)=(vnh_aux(1)+gnh_aux(1)*dt4)
-            end do
+           vnh_aux(1)=vnh_aux(1)+gnh_aux(1)*dt4
+           scale=scale*exp(-vnh_aux(1)*dt2)
+           aux_eksum=aux_eksum*exp(-vnh_aux(1)*dt)
+             
+           pnh_aux(1) = pnh_aux(1) + vnh_aux(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           
+           gnh_aux(1)=(2.0d0*aux_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_aux(1)
+            
+           vnh_aux(1)=(vnh_aux(1)+gnh_aux(1)*dt4)
+           
+           
+          
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                  /qnh_auxp(1)!1/ps**2
+             
+           vnh_auxp(1)=vnh_auxp(1)+gnh_auxp(1)*dt4
+           scale_p=scale_p*exp(-vnh_auxp(1)*dt2)
+           auxp_eksum=auxp_eksum*exp(-vnh_auxp(1)*dt)
+             
+           pnh_auxp(1) = pnh_auxp(1) + vnh_auxp(1)*dt2!pnhEL dimensionless, vnhEL in 1/ps
+           
+           gnh_auxp(1)=(2.0d0*auxp_eksum-dble(auxDoF)*aux_kelvin)
+     &                 /qnh_auxp(1)
+            
+           vnh_auxp(1)=(vnh_auxp(1)+gnh_auxp(1)*dt4)
+          end do
          end do
          
          do i = 1, n
             do j = 1, 3
                v_aux(j,i) = v_aux(j,i)*scale
+               vp_aux(j,i) = vp_aux(j,i)*scale_p
             end do
          end do
       else if (auxstat .eq. 'BERENDSEN') then
          if (aux_temp .eq. 0.0d0)  aux_temp = 0.1d0
+         if (auxp_temp .eq. 0.0d0) auxp_temp = 0.1d0
          scale=dsqrt(1.0d0+(dt/aux_tautemp)*(aux_kelvin/aux_temp-1.0d0))
+         scale_p=dsqrt(1.0d0+(dt/aux_tautemp)*
+     &                  (aux_kelvin/auxp_temp-1.0d0))
          do i = 1, n
             do j = 1, 3
                v_aux(j,i) = scale * v_aux(j,i)
+               vp_aux(j,i) = scale_p * vp_aux(j,i)
             end do
          end do
       else if (auxstat .eq. 'RESCALE') then
          if(mod(istep,auxscale) .eq. 0) then
             scale = dsqrt(aux_kelvin/aux_temp)
+            scale_p = dsqrt(aux_kelvin/auxp_temp)
             do i = 1, n
                do j = 1, 3
                   v_aux(j,i) = scale * v_aux(j,i)
+                  vp_aux(j,i) = scale_p * vp_aux(j,i)
                end do
             end do
          end if

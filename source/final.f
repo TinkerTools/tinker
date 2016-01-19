@@ -751,6 +751,8 @@ c
       if (allocated(v_aux)) deallocate (v_aux)
       if (allocated(uind_aux)) deallocate(uind_aux)
       if (allocated(uinp_aux)) deallocate(uinp_aux)
+      if (allocated(ap_aux)) deallocate (ap_aux)
+      if (allocated(vp_aux)) deallocate (vp_aux)
       
 c
 c     deallocation of global arrays from module warp

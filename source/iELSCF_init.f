@@ -31,8 +31,9 @@ c
       use files
       use iELSCF
       use uprior
+      use math
       implicit none
-      integer i,j
+      integer i,j,k
       integer next
       real*8 dt
       real*8 ekt_aux
@@ -47,12 +48,18 @@ c
       logical exist
       character*120 dynfileaux
       integer freeunit
+      integer len_nhc
+      real*8 tempstor!,tempstor_p
+      real*8 kT,LkT
+      real*8 random,normal
 
 c
 c     Allocate arrays.
 c 
       allocate(a_aux(3,n))
       allocate(v_aux(3,n))
+      allocate(ap_aux(3,n))
+      allocate(vp_aux(3,n))
       allocate(uind_aux(3,n))
       allocate(uinp_aux(3,n))
       
@@ -77,7 +84,7 @@ c
          use_pred = .false.
          print*, "PCG predictor not available with iEL-SCF."
       end if
-      auxstat = 'NONE'!BERENDSEN RESCALE NOSE-HOOVER
+      auxstat = 'NONE'!BERENDSEN RESCALE NOSE-HOOVER NOSE-HOOVER1
       omega = dsqrt(2.0d0)
 c
 c     set default values for Drude temperature control
@@ -89,6 +96,10 @@ c
          qnh_aux(i) = 0.0d0
          gnh_aux(i) = 0.0d0
          pnh_aux(i) = 0.0d0
+         vnh_auxp(i) = 0.0d0
+         qnh_auxp(i) = 0.0d0
+         gnh_auxp(i) = 0.0d0
+         pnh_auxp(i) = 0.0d0
          
          pnh(i) = 0.0d0
       end do
@@ -133,8 +144,10 @@ c
       qterm_aux = ekt_aux * aux_tautemp * aux_tautemp !e**2 * Ang**2
       do j = 1, maxnose
          if (qnh_aux(j) .eq. 0.0d0) qnh_aux(j) = qterm_aux
+         if (qnh_auxp(j) .eq. 0.0d0) qnh_auxp(j) = qterm_aux
       end do
       qnh_aux(1) = dble(auxDoF) * qnh_aux(1)!e**2 * Ang**2
+      qnh_auxp(1) = dble(auxDoF) * qnh_auxp(1)!e**2 * Ang**2
 c
 c     set velocities and accelerations for auxiliary dipoles
 c 
@@ -151,7 +164,9 @@ c
          do i = 1, n
             do j = 1, 3
                uinp(j,i) = uind(j,i)
-               uinp_aux(j,i) = uind_aux(j,i)!Water approx.
+               uinp_aux(j,i) = uind(j,i)
+               vp_aux(j,i) = v_aux(j,i)
+               ap_aux(j,i) = a_aux(j,i)
             end do
          end do
       else
@@ -179,22 +194,49 @@ c
                end do
             end if
             
-            if(auxstat .ne. 'NONE') then
+            if((auxstat.eq.'NOSE-HOOVER')
+     &      .or.(auxstat.eq.'RESCALE')
+     &      .or.(auxstat.eq.'NOSE-HOOVER1')
+     &      .or.(auxstat.eq.'BERENDSEN')) then
                speed = maxwell2 (aux_kelvin)!ELmass in ps**2/Ang**3, factors convert to g/mol/electron**2
                call ranvec (vec)
                do j = 1, 3
                   v_aux(j,i) = speed*vec(j)
                   a_aux(j,i) = 0.0d0
+                  vp_aux(j,i) = v_aux(j,i)
+                  ap_aux(j,i) = 0.0d0
                end do
             else
                do j = 1, 3
                   v_aux(j,i) = 0.0d0
                   a_aux(j,i) = 0.0d0
+                  vp_aux(j,i) = 0.0d0
+                  ap_aux(j,i) = 0.0d0
                end do
             end if
          end do
          call auxkinetic(.true.)
       end if
-      
+c      print*,uind(1,1),uind(2,1),uind(3,1)
+c      print*,uinp(1,1),uinp(2,1),uinp(3,1)
+c      print*,uind_aux(1,1),uind_aux(2,1),uind_aux(3,1)
+c      print*,uinp_aux(1,1),uinp_aux(2,1),uinp_aux(3,1)
+c      print*,a_aux(1,1),a_aux(2,1),a_aux(3,1)
+c      print*,ap_aux(1,1),ap_aux(2,1),ap_aux(3,1)
+c      print*,v_aux(1,1),v_aux(2,1),v_aux(3,1)
+c      print*,vp_aux(1,1),vp_aux(2,1),vp_aux(3,1)
+c      print*,"----------------------------------"
+c      print*,v_aux(1,1)*v_aux(1,1)+(4.0d0/5.0d0)*q_iso1(1,1,1)*
+c     &        (v_iso1(1,1,1)*v_iso1(1,1,1)+v_iso1(2,1,1)*v_iso1(2,1,1)
+c     &        +v_iso1(3,1,1)*v_iso1(3,1,1)+v_iso1(4,1,1)*v_iso1(4,1,1))
+c      print*,4.0d0*kT
+c      print*,v_aux(1,1)*v_aux(1,1),v_aux(2,1)*v_aux(2,1),
+c     &       v_aux(3,1)*v_aux(3,1)
+c      do i = 1,n
+c         do j = 1,3
+c            write(150,*) v_aux(j,i)*v_aux(j,i),v_aux(j,i)
+c         end do
+c      end do
+c      stop
       return
       end
