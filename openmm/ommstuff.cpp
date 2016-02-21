@@ -16,10 +16,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <string.h>
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
 using namespace std;
 
 // to convert from .c to .cpp, many things must be enclosed in extern "C" {}
@@ -51,6 +53,7 @@ typedef struct {
 #include "OpenMMCWrapper.h"
 #include "AmoebaOpenMMCWrapper.h"
 #include "OpenMM.h"
+#include <typeinfo>
 using namespace OpenMM;
 
 struct OpenMMData_s {
@@ -314,6 +317,7 @@ static struct {
     int velsave;
     int frcsave;
     int uindsave;
+    bool useMTSgroups;
     char integrate[11];
 } mdstuf__;
 
@@ -340,6 +344,7 @@ static struct {
     int* xaxis;
     int* yaxis;
     int maxpole;
+    double elam;
 } mpole__;
 
 static struct {
@@ -447,7 +452,12 @@ static struct {
     char solvtyp[9];
     char borntyp[9];
 } solute__;
-
+static struct{
+int* igfix;
+double* gfix; 
+int ngfix;
+int* grplist;
+}restrain__;
 static struct {
     double friction;
     double* fgamma;
@@ -513,7 +523,8 @@ static struct {
     int nvdw;
     int* ivdw;
     int* jvdw;
-    int maxclass;
+    double VDWlam;
+    int* mut;
 } vdw__;
 
 static struct {
@@ -532,6 +543,18 @@ static struct {
     char epsrule[11];
     char gausstyp[9];
 } vdwpot__;
+
+static struct {
+    int nstrtor;
+    int* ist;
+    double* kst;
+} strtor__;
+
+static struct {
+    int nangtor;
+    int* iat;
+    double* kant;
+} angtor__;
 
 static void setNullTerminator (char* string, int maxLength, char* buffer) {
 
@@ -916,14 +939,20 @@ void set_limits_data_( double* vdwcut, double* chgcut, double* dplcut,
 
 void set_mdstuf_data_( int* nfree, int* irest, int* velsave,
                        int* frcsave, int* uindsave, char* integrate ) {
-
+   
    mdstuf__.nfree = *nfree;
    mdstuf__.irest = *irest;
    mdstuf__.velsave = *velsave;
    mdstuf__.frcsave = *frcsave;
    mdstuf__.uindsave = *uindsave;
-
+   char buffer[6];
+   mdstuf__.useMTSgroups=false;
+   setNullTerminator (integrate, 3, buffer);
+   if (strncasecmp (buffer, "MTS", 3) == 0) {
+  	 mdstuf__.useMTSgroups=true;
+   }	
    setNullTerminator( integrate, 10, mdstuf__.integrate );
+	
 }
 
 void set_moldyn_data_( double* v, double* a, double* aalt ) {
@@ -944,7 +973,7 @@ void set_mplpot_data_( double* m2scale, double* m3scale,
 
 void set_mpole_data_( double* pole, double* rpole, int* npole, 
                       int* ipole, int* polsiz, int* pollist, char* polaxe,
-                      int* zaxis, int* xaxis, int* yaxis, int* maxpole ) {
+                      int* zaxis, int* xaxis, int* yaxis, int* maxpole, double* elambda) {
 
    mpole__.pole = pole;
    mpole__.rpole = rpole;
@@ -957,6 +986,7 @@ void set_mpole_data_( double* pole, double* rpole, int* npole,
    mpole__.xaxis = xaxis;
    mpole__.yaxis = yaxis;
    mpole__.maxpole = *maxpole;
+   mpole__.elam= *elambda;
 }
 
 void set_nonpol_data_( double* solvprs, double* surften, double* spcut,
@@ -1101,6 +1131,12 @@ void set_potent_data_( int* use_bond, int* use_angle, int* use_strbnd,
    potent__.use_born = *use_born;
    potent__.use_orbit = *use_orbit;
 }
+void set_restraint_data_( int* igfix,double* gfix,int* ngfix, int* grplist){
+	restrain__.igfix= igfix;
+	restrain__.gfix=gfix;
+	restrain__.ngfix =*(ngfix);
+	restrain__.grplist= grplist;
+}
 
 void set_solute_data_( double* rsolv, double* asolv, double* rborn,
                        double* drb, double* drbp, double* drobc,
@@ -1206,7 +1242,7 @@ void set_usage_data_ (int* nuse, int* iuse, int* use) {
 
 void set_vdw_data_ (double* radmin, double* epsilon, double* radmin4,
                     double* epsilon4, double* radhbnd, double* epshbnd,
-                    double* kred, int* ired, int* nvdw, int* ivdw, int* jvdw) {
+                    double* kred, int* ired, int* nvdw, int* ivdw, int* jvdw, double* VDWlambda, int* mut ) {
 
    vdw__.radmin = radmin;
    vdw__.epsilon = epsilon;
@@ -1219,6 +1255,8 @@ void set_vdw_data_ (double* radmin, double* epsilon, double* radmin4,
    vdw__.nvdw = *nvdw;
    vdw__.ivdw = ivdw;
    vdw__.jvdw = jvdw;
+   vdw__.VDWlam= *VDWlambda;
+   vdw__.mut=mut;
 }
 
 void set_vdwpot_data_ (double* abuck, double* bbuck, double* cbuck,
@@ -1249,7 +1287,21 @@ void set_vdwpot_data_ (double* abuck, double* bbuck, double* cbuck,
    setNullTerminator (epsrule, 10, vdwpot__.epsrule);
    setNullTerminator (gausstyp, 8, vdwpot__.gausstyp);
 }
+
+void set_strtor_data_ (int* nstrtor, int* ist, double* kst) {
+	strtor__.nstrtor = *nstrtor;
+	strtor__.ist = ist;
+	strtor__.kst = kst;
 }
+
+void set_angtor_data_ (int* nangtor, int* iat, double* kant) {
+	angtor__.nangtor = *nangtor;
+	angtor__.iat = iat;
+	angtor__.kant = kant;
+}
+
+}
+
 
 /*
  *    ############################################################
@@ -1345,18 +1397,6 @@ static void mapConstraints (struct ConstraintMap* map, FILE* log) {
         constraintList[offset+count] = p2;
     }
 
-    if (log && 0) {
-        for (ii = 0; ii < numberOfParticles; ii++) {
-            offset = constraintOffset[ii];
-            count = constraintCount[ii];
-            (void) fprintf (stderr, "%5d Offset=%5d count=%5d: ",
-                            ii, offset, count);
-            for (jj = 0; jj < count; jj++) {
-                 (void) fprintf (stderr, "%5d ", constraintList[offset+jj] );
-            }
-            (void) fprintf (stderr, "\n ");
-        }
-    }
 
     map->constraintCount = constraintCount;
     map->constraintOffset = constraintOffset;
@@ -2037,7 +2077,45 @@ static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
   computePeriodicBoxVectors(a, b, c);
   OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
 }
+static void setupGroupRestraint ( OpenMM_System* system, FILE* log){
 
+    int* igfixdata = restrain__.igfix;
+    int* grplist =  restrain__.grplist;
+    int numRestraints= restrain__.ngfix;
+    double* gfixdata= restrain__.gfix;
+    for (int ii = 0; ii <numRestraints; ii++) {
+        int groupOneIndex= igfixdata[2*ii];
+        int groupTwoIndex= igfixdata[2*ii+1];
+        OpenMM_IntArray* groupOneArray;
+        groupOneArray = OpenMM_IntArray_create (0);
+        OpenMM_IntArray* groupTwoArray;
+        groupTwoArray = OpenMM_IntArray_create (0);
+        OpenMM_CustomCentroidBondForce* customCentroidBondForce;
+        char CentroidEquation[400];
+        double ForceConst = gfixdata[(3*ii)];
+        double target = gfixdata[(3*ii)+1]*0.1;
+        sprintf(CentroidEquation,"%f*(distance(g%d,g%d)-target)^2",(418.4*ForceConst),groupOneIndex,groupTwoIndex);
+        customCentroidBondForce=OpenMM_CustomCentroidBondForce_create (2,CentroidEquation);
+        for(int jj=0; jj< atoms__.n; jj++){
+ 		if(grplist[jj]==groupOneIndex){
+                        OpenMM_IntArray_append(groupOneArray,jj);
+                }else if(grplist[jj]==groupTwoIndex){
+                        OpenMM_IntArray_append(groupTwoArray,jj);
+                }
+        }
+        OpenMM_IntArray* bondGroups = OpenMM_IntArray_create (0);
+        OpenMM_DoubleArray* weights = OpenMM_DoubleArray_create (0);
+        OpenMM_IntArray_append(bondGroups,groupOneIndex-1);
+        OpenMM_IntArray_append(bondGroups, groupTwoIndex-1);
+        OpenMM_CustomCentroidBondForce_addGroup(customCentroidBondForce,groupOneArray,weights);
+        OpenMM_CustomCentroidBondForce_addGroup(customCentroidBondForce,groupTwoArray,weights);
+        OpenMM_CustomCentroidBondForce_addPerBondParameter(customCentroidBondForce,"target");
+        OpenMM_DoubleArray* bondParameters = OpenMM_DoubleArray_create(0);
+        OpenMM_DoubleArray_append(bondParameters,target);
+        OpenMM_CustomCentroidBondForce_addBond(customCentroidBondForce,bondGroups,bondParameters);
+        OpenMM_System_addForce (system, (OpenMM_Force*) customCentroidBondForce);
+      }
+}
 static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
 
     OpenMM_Vec3 a;
@@ -2065,28 +2143,38 @@ static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
 static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
 
     char buffer[128];
-    int ii,jj,i;
+    int ii,jj,kk,i;
     OpenMM_Boolean useCorrection;
     OpenMM_IntArray* exclusions;
-
     OpenMM_AmoebaVdwForce* amoebaVdwForce;
     amoebaVdwForce = OpenMM_AmoebaVdwForce_create ();
     OpenMM_System_addForce (system, (OpenMM_Force*) amoebaVdwForce);
-
-    for (ii = 0; ii < atoms__.n; ii++) {
-        i = vdw__.jvdw[ii];
-        OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce, vdw__.ired[ii]-1,
-                             OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
-                             OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
-                             vdw__.kred[ii]);
+    if(mdstuf__.useMTSgroups){
+    	OpenMM_Force_setForceGroup((OpenMM_Force*) amoebaVdwForce, 1);
     }
-
+    int curGroup = OpenMM_Force_getForceGroup ((OpenMM_Force*) amoebaVdwForce);
+    double VDWlam =  vdw__.VDWlam;
+    int* mut = vdw__.mut;
+    for (ii = 0; ii < atoms__.n; ii++) {
+	i = vdw__.jvdw[ii];
+	if(mut[ii]==-1){
+		OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce, vdw__.ired[ii]-1,
+        	                     OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
+                	             OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
+                        	     vdw__.kred[ii]);
+	}else{
+		OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce, vdw__.ired[ii]-1,
+                                     OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
+                                     OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
+                                     vdw__.kred[ii]);
+	}
+        int* particleIndex,parentIndex;
+    }
     setNullTerminator (vdwpot__.radrule, 10, buffer);
     OpenMM_AmoebaVdwForce_setSigmaCombiningRule (amoebaVdwForce, buffer);
 
     setNullTerminator (vdwpot__.epsrule, 10, buffer);
     OpenMM_AmoebaVdwForce_setEpsilonCombiningRule (amoebaVdwForce, buffer);
-
     OpenMM_AmoebaVdwForce_setCutoff (amoebaVdwForce,
                                      limits__.vdwcut*OpenMM_NmPerAngstrom);
 
@@ -2121,9 +2209,106 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
         }
         OpenMM_AmoebaVdwForce_setParticleExclusions (amoebaVdwForce,
                                                      ii, exclusions);
-        OpenMM_IntArray_resize (exclusions, 0);
+	OpenMM_IntArray_resize (exclusions, 0);
     }
     OpenMM_IntArray_destroy (exclusions);
+}
+
+static void setupAmoebaStretchTorsionForce (OpenMM_System* system,
+	FILE* log) {
+	int ii, jj, index, baIndex, cbIndex, dcIndex;
+	double bondLengthBA, bondLengthCB, bondLengthDC;
+	double* bondLengthPtr;
+	int* torsionIndexPtr;
+
+	OpenMM_AmoebaStretchTorsionForce* amoebaStretchTorsionForce;
+	amoebaStretchTorsionForce = OpenMM_AmoebaStretchTorsionForce_create ();
+	OpenMM_System_addForce (system, (OpenMM_Force*) amoebaStretchTorsionForce);
+
+	for (ii = 0; ii < strtor__.nstrtor; ii++) {
+		index = *(strtor__.ist + 4 * ii) - 1;
+		baIndex = *(strtor__.ist + 4 * ii + 1);
+		cbIndex = *(strtor__.ist + 4 * ii + 2);
+		dcIndex = *(strtor__.ist + 4 * ii + 3);
+		if (baIndex != 0) {
+			bondLengthPtr = bndstr__.bl + baIndex - 1;
+			bondLengthBA = (*bondLengthPtr) * OpenMM_NmPerAngstrom;
+		} else {
+			bondLengthBA = -1.0;
+		}
+
+		if (cbIndex != 0) {
+			bondLengthPtr = bndstr__.bl + cbIndex - 1;
+			bondLengthCB = (*bondLengthPtr) * OpenMM_NmPerAngstrom;
+		} else {
+			bondLengthCB = -1.0;
+		}
+
+		if (dcIndex != 0) {
+			bondLengthPtr = bndstr__.bl + dcIndex - 1;
+			bondLengthDC = (*bondLengthPtr) * OpenMM_NmPerAngstrom;
+		} else {
+			bondLengthDC = -1.0;
+		}
+
+		torsionIndexPtr = tors__.itors + 4 * index;
+		int result = OpenMM_AmoebaStretchTorsionForce_addStretchTorsion(amoebaStretchTorsionForce,
+			*(torsionIndexPtr) - 1, *(torsionIndexPtr + 1) - 1,
+			*(torsionIndexPtr + 2) - 1, *(torsionIndexPtr + 3) - 1,
+			bondLengthBA, bondLengthCB, bondLengthDC,
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 1)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 2)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 3)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 4)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 5)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 6)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 7)),
+			(OpenMM_KJPerKcal/OpenMM_NmPerAngstrom) * torpot__.storunit * (*(strtor__.kst + 9 * ii + 8)));
+	}
+}
+
+static void setupAmoebaAngleTorsionForce (OpenMM_System* system,
+	FILE* log) {
+	int ii, jj, index, cbaIndex, dcbIndex;
+	double angleCBA, angleDCB;
+	double* anglePtr;
+	int* torsionIndexPtr;
+
+	OpenMM_AmoebaAngleTorsionForce* amoebaAngleTorsionForce;
+	amoebaAngleTorsionForce = OpenMM_AmoebaAngleTorsionForce_create ();
+	OpenMM_System_addForce (system, (OpenMM_Force*) amoebaAngleTorsionForce);
+
+	for (ii = 0; ii < angtor__.nangtor; ii++) {
+		index = *(angtor__.iat + 3 * ii) -1;
+		cbaIndex = *(angtor__.iat + 3 * ii + 1);
+		dcbIndex = *(angtor__.iat + 3 * ii + 2);
+		if (cbaIndex !=0) {
+			anglePtr = angbnd__.anat + cbaIndex - 1;
+			angleCBA = *anglePtr;
+		} else {
+		        angleCBA = 0.0;
+		}
+
+		if (dcbIndex != 0) {
+			anglePtr = angbnd__.anat + dcbIndex - 1;
+			angleDCB = *anglePtr;
+		} else {
+			angleDCB = 0.0;
+		}
+
+		torsionIndexPtr = tors__.itors + 4 * index;
+		int result = OpenMM_AmoebaAngleTorsionForce_addAngleTorsion(amoebaAngleTorsionForce,
+			*(torsionIndexPtr) - 1, *(torsionIndexPtr + 1) - 1,
+			*(torsionIndexPtr + 2) - 1, *(torsionIndexPtr + 3) - 1,
+			angleCBA, angleDCB,
+			(OpenMM_KJPerKcal) * torpot__.atorunit * (*(angtor__.kant + 6 * ii)),
+			(OpenMM_KJPerKcal) * torpot__.atorunit * (*(angtor__.kant + 6 * ii + 1)),
+			(OpenMM_KJPerKcal) * torpot__.atorunit * (*(angtor__.kant + 6 * ii + 2)),
+			(OpenMM_KJPerKcal) * torpot__.atorunit * (*(angtor__.kant + 6 * ii + 3)),
+			(OpenMM_KJPerKcal) * torpot__.atorunit * (*(angtor__.kant + 6 * ii + 4)),
+			(OpenMM_KJPerKcal) * torpot__.atorunit * (*(angtor__.kant + 6 * ii + 5)));
+	}
 }
 
 static void setupAndersenThermostat (OpenMM_System* system, FILE* log) {
@@ -2133,7 +2318,6 @@ static void setupAndersenThermostat (OpenMM_System* system, FILE* log) {
     andersenThermostat = OpenMM_AndersenThermostat_create (bath__.kelvin,
                                                            bath__.collide);
     OpenMM_System_addForce (system, (OpenMM_Force*) andersenThermostat);
-
     if (log) {
         (void) fprintf (log, "\n Andersen Thermostat:\n" );
         (void) fprintf (log, "\n Temperature          %15.4f K",
@@ -2191,7 +2375,11 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
     int ii, jj, index;
     int invalidAxis, errorReport;
     double* polePtr;
-
+    int* mut;
+    double elam;
+    double curLambda;
+    elam = mpole__.elam;
+    mut = vdw__.mut;	
     OpenMM_AmoebaMultipoleForce_MultipoleAxisTypes axisType;
     OpenMM_DoubleArray* dipoles;
     OpenMM_DoubleArray* quadrupoles;
@@ -2208,12 +2396,19 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
     OpenMM_AmoebaMultipoleForce* amoebaMultipoleForce;
     amoebaMultipoleForce = OpenMM_AmoebaMultipoleForce_create();
     OpenMM_System_addForce(system, (OpenMM_Force*) amoebaMultipoleForce);
-
+    if(mdstuf__.useMTSgroups){
+        OpenMM_Force_setForceGroup((OpenMM_Force*) amoebaMultipoleForce, 1);
+    }
+    int curGroup = OpenMM_Force_getForceGroup ((OpenMM_Force*) amoebaMultipoleForce);
     dipoles = OpenMM_DoubleArray_create(3);
     quadrupoles = OpenMM_DoubleArray_create(9);
     errorReport = 0;
     for (ii = 0; ii < atoms__.n; ii++) {
-
+	if(mut[ii]==-1){
+		curLambda=elam;
+	}else{
+		curLambda=1.0;
+	}
         axisPtr = mpole__.polaxe + ii*8;
         if (strncasecmp (axisPtr, "Z-then-X", 8) == 0) {
             axisType = OpenMM_AmoebaMultipoleForce_ZThenX;
@@ -2243,24 +2438,25 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
         polePtr = mpole__.pole + ii*mpole__.maxpole + 1;
         for (jj = 0; jj < 3; jj++) {
             OpenMM_DoubleArray_set (dipoles, jj,
-                                      (*(polePtr))*dipoleConversion);
+                                      (*(polePtr))*dipoleConversion*curLambda);
             polePtr++;
         }
         for (jj = 0; jj < 9; jj++) {
             OpenMM_DoubleArray_set (quadrupoles, jj,
-                                      (*(polePtr))*quadrupoleConversion);
+                                      (*(polePtr))*quadrupoleConversion*curLambda);
             polePtr++;
         }
 
         polePtr = mpole__.pole + ii*mpole__.maxpole;
+
         OpenMM_AmoebaMultipoleForce_addMultipole (amoebaMultipoleForce,
-                                     *polePtr, dipoles, quadrupoles, axisType,
+                                     *(polePtr)*curLambda, dipoles, quadrupoles, axisType,
                                      *(mpole__.zaxis+ii)-1,
                                      *(mpole__.xaxis+ii)-1,
                                      *(mpole__.yaxis+ii)-1,
                                      polar__.thole[ii],
                                      polar__.pdamp[ii]*dampingFactorConversion,
-                                     polar__.polarity[ii]*polarityConversion);
+                                     polar__.polarity[ii]*polarityConversion*curLambda);
     }
 
     if (errorReport) {
@@ -2532,7 +2728,7 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
     }
 
     OpenMM_Platform_setPropertyDefaultValue (platform, "CudaPrecision",
-                                             "double" );
+                                             "mixed" );
 
     return platform;
 }
@@ -2655,11 +2851,18 @@ void openmm_init_ (void** ommHandle, double* dt) {
         setupAmoebaWcaDispersionForce (omm->system, log);
     }
 
+    if (potent__.use_strtor) {
+	setupAmoebaStretchTorsionForce (omm->system, log);
+    }
+
+    if (potent__.use_angtor) {
+	setupAmoebaAngleTorsionForce (omm->system, log);
+    }
+
     if (bath__.isobaric && bath__.atmsph > 0.0) {
         mdMode = 4;
         setupMonteCarloBarostat (omm->system, log);
     }
-
     setNullTerminator (bath__.thermostat, 11, buffer);
     if (strncasecmp( buffer, "ANDERSEN", 8 ) == 0) {
         isoThermal = 1;
@@ -2667,24 +2870,55 @@ void openmm_init_ (void** ommHandle, double* dt) {
     }
 
     // setup of constraints, positions and velocities
+    setupGroupRestraint (omm->system, log);
 
     setupConstraints (omm->system, log) ;
 
     initialPosInNm = OpenMM_Vec3Array_create (0);
     setupPositions (initialPosInNm, log);
-
     initialVelInNm = OpenMM_Vec3Array_create (0);
     setupVelocities (initialVelInNm, log);
-
+      
     // Choose an Integrator, and a Context connecting the System with the
     // Integrator. Let the Context choose the best available Platform.
     // Initialize the configuration from default positions collected above.
 
     setNullTerminator (mdstuf__.integrate, 10, buffer);
-    if (strncasecmp (buffer, "VERLET", 6) == 0) {
+    if (strncasecmp (buffer, "MTS", 3) == 0) {
+	double kBolt= 1.3806504e-23;
+	double NA= 6.02214179e23;
+	double kB= kBolt*NA;
+	double kT = kB*bath__.kelvin;
+	double colission_rate=1.0;
+	omm->integrator= (OpenMM_Integrator*) OpenMM_CustomIntegrator_create(*dt);
+        OpenMM_CustomIntegrator* integrator =    (OpenMM_CustomIntegrator*) omm->integrator;
+        OpenMM_CustomIntegrator_addGlobalVariable(integrator, "dt_fast", *(dt)/4.0);
+        OpenMM_CustomIntegrator_addGlobalVariable(integrator, "kT",kT);
+        OpenMM_CustomIntegrator_addGlobalVariable(integrator,"a", 1.0);
+        double beq= sqrt((2.0/(colission_rate*(*dt)))*tanh(colission_rate*(*dt)/2.0));
+    	OpenMM_CustomIntegrator_addGlobalVariable(integrator,"b",1.0);
+    	OpenMM_CustomIntegrator_addPerDofVariable(integrator, "sigma",0);
+        OpenMM_CustomIntegrator_addPerDofVariable(integrator, "x1",0);
+        OpenMM_CustomIntegrator_addComputePerDof(integrator,"sigma","sqrt(kT/m)");
+        OpenMM_CustomIntegrator_addComputePerDof(integrator,"v","sqrt(a)*v + sqrt(1-a)*sigma*gaussian");
+        OpenMM_CustomIntegrator_addConstrainVelocities(integrator);
+        OpenMM_CustomIntegrator_addUpdateContextState(integrator);
+        OpenMM_CustomIntegrator_addComputePerDof(integrator,"v", "v + 0.5*b*dt*f1/m");
+        for( int innerstep=0; innerstep<4; innerstep++){
+                OpenMM_CustomIntegrator_addComputePerDof(integrator,"v", "v + 0.5*b*dt_fast*f0/m");
+                OpenMM_CustomIntegrator_addComputePerDof(integrator,"x", "x + v*b*dt_fast");
+                OpenMM_CustomIntegrator_addComputePerDof(integrator,"x1", "x");
+                OpenMM_CustomIntegrator_addConstrainPositions(integrator);
+                OpenMM_CustomIntegrator_addComputePerDof(integrator,"v", "v + 0.5*b*dt_fast*f0/m + (x-x1)/dt_fast");
+        }
+        OpenMM_CustomIntegrator_addComputePerDof(integrator,"v","v + 0.5*b*dt*f1/m");
+        OpenMM_CustomIntegrator_addConstrainVelocities(integrator);
+        OpenMM_CustomIntegrator_addComputePerDof(integrator,"v","sqrt(a)*v + sqrt(1-a)*sigma*gaussian");
+        OpenMM_CustomIntegrator_addConstrainVelocities(integrator);
 
-        omm->integrator = (OpenMM_Integrator*)OpenMM_VerletIntegrator_create
-                               (*dt);
+    }
+    else if (strncasecmp (buffer, "VERLET", 6) == 0) {
+        omm->integrator = (OpenMM_Integrator*)OpenMM_VerletIntegrator_create(*dt);
         if (mdMode == 4 && isoThermal == 0) {
             setupAndersenThermostat (omm->system, log);
         }
@@ -2723,6 +2957,13 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
     OpenMM_Context_setPositions (omm->context, initialPosInNm);
     OpenMM_Context_setVelocities (omm->context, initialVelInNm);
+    int infoMask;
+    infoMask = OpenMM_State_Positions;
+    infoMask += OpenMM_State_Velocities;
+    infoMask += OpenMM_State_Forces;    
+    infoMask += OpenMM_State_Energy;
+    OpenMM_State* state = OpenMM_Context_getState (omm->context, infoMask, 0);
+    char *statestring = OpenMM_XmlSerializer_serializeState(state);
     {
         int arraySz;
         int maxPrint;
@@ -2753,7 +2994,6 @@ void openmm_init_ (void** ommHandle, double* dt) {
                 ii = arraySz - maxPrint - 1;
         }
     }
-
     *ommHandle = (void*) omm;
 }
 
@@ -3140,8 +3380,22 @@ void openmm_take_steps_ (void** omm, int* numSteps) {
 void openmm_cleanup_ (void** omm) {
 
     // clean up top-level heap allocated objects we are done with
-
+    int infoMask;
+    infoMask = OpenMM_State_Positions;
+    infoMask += OpenMM_State_Velocities;
+    infoMask += OpenMM_State_Forces;
+    infoMask += OpenMM_State_Energy;
     OpenMMData* openMMDataHandle = (OpenMMData*) (*omm);
+    OpenMM_State* state = OpenMM_Context_getState (openMMDataHandle->context, infoMask, 0);
+    char *statestring = OpenMM_XmlSerializer_serializeState(state);
+    FILE *f = fopen("state.xml", "w");
+    fputs(statestring, f);
+    OpenMMData* ommHandle = (OpenMMData*) (*omm);
+    char *stuff;
+    FILE *ftwo = fopen("system.xml", "w");
+    stuff = OpenMM_XmlSerializer_serializeSystem(ommHandle->system);
+    fputs(stuff, ftwo);
+    fputs("\n", ftwo);    
     OpenMM_Context_destroy (openMMDataHandle->context);
     OpenMM_Integrator_destroy (openMMDataHandle->integrator);
     OpenMM_System_destroy (openMMDataHandle->system);
@@ -3444,7 +3698,7 @@ void openmm_validate_ (int* testingActive) {
             (void) fprintf (log, "Improper Torsion %s", ixnString);
         }
     }
-    if (potent__.use_strtor) {
+    /*if (potent__.use_strtor) {
         invalid++;
         if (log) {
             (void) fprintf (log, "Stretch-Torsion %s", ixnString);
@@ -3455,7 +3709,7 @@ void openmm_validate_ (int* testingActive) {
         if (log) {
             (void) fprintf (log, "Angle-Torsion %s", ixnString);
         }
-    }
+    }*/
     if (potent__.use_charge) {
         invalid++;
         if (log) {
@@ -3560,7 +3814,7 @@ int openmm_test_ (void) {
     int infoMask;
     int ii, jj;
     int countActiveForces;
-    string testName;
+    char* testName;
     double conversion, delta, dot;
     double tinkerNorm, openMMNorm;
     double openMMPotentialEnergy;
@@ -3602,7 +3856,7 @@ int openmm_test_ (void) {
     // to each force object so we can fill in the forces. Note: the OpenMM
     // System takes ownership of the force objects; don't delete them yourself.
 
-    testName = "";
+    testName = NULL;
     system = OpenMM_System_create ();
     setupSystemParticles (system, log);
 
@@ -3661,7 +3915,7 @@ int openmm_test_ (void) {
     }
 
     if (countActiveForces > 1) {
-
+	setupGroupRestraint (system, log);
         setupAmoebaBondForce (system, removeConstrainedCovalentIxns, log);
         setupAmoebaAngleForce (system, removeConstrainedCovalentIxns, log);
         setupAmoebaInPlaneAngleForce (system, removeConstrainedCovalentIxns,
@@ -3684,6 +3938,14 @@ int openmm_test_ (void) {
             setupAmoebaUreyBradleyForce (system,
                                          removeConstrainedCovalentIxns, log);
         } 
+
+        if (potent__.use_strtor) {
+	                setupAmoebaStretchTorsionForce (system, log);
+		        }
+
+        if (potent__.use_angtor) {
+	                setupAmoebaAngleTorsionForce (system, log);
+		        }
 
         loadTinkerForce (deriv__.desum, 0, tinkerForce);
         tinkerEnergy = *energi__.esum;
@@ -3874,11 +4136,23 @@ int openmm_test_ (void) {
         } else {
             testName = "AmoebaKirkwoodMutualTest";
         }
-    }
+
+    }   else if (potent__.use_strtor) {
+	        setupAmoebaStretchTorsionForce(system, log);
+	            loadTinkerForce (deriv__.debt, 0, tinkerForce);
+	            tinkerEnergy = *energi__.ebt;
+	        testName = "AmoebaStretchTorsionTest";
+
+    } else if (potent__.use_angtor) {
+            setupAmoebaAngleTorsionForce(system, log);
+            loadTinkerForce (deriv__.deat, 0, tinkerForce);
+            tinkerEnergy = *energi__.eat;
+            testName = "AmoebaAngleTorsionTest";
+    }	    
 
     if (log) {
-        if (!testName.empty()) {
-            (void) fprintf (log, "\n Test Option:  %s\n", testName.c_str());
+        if (testName) {
+            (void) fprintf (log, "\n Test Option:  %s\n", testName);
             (void) fflush (NULL);
         } else {
             (void) fprintf (log, "\n Test Option not Recognized; Exiting\n");
@@ -4014,3 +4288,4 @@ void openmm_serialize_(void** omm) {
     fclose(f);
 }
 }
+
