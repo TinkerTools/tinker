@@ -1,9 +1,11 @@
-*.mod
-*.o
+*.swp
 bin
+build
 expt
 listing
 source/*.a
+source/*.mod
+source/*.o
 source/*.make
 source/*-orig
 source/*-old
