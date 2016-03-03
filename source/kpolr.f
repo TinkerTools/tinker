@@ -18,10 +18,9 @@ c     pgrp   connected types in polarization group of each atom type
 c
 c
       module kpolr
-      use sizes
       implicit none
-      integer pgrp(maxval,maxtyp)
-      real*8 polr(maxtyp)
-      real*8 athl(maxtyp)
+      integer, allocatable :: pgrp(:,:)
+      real*8, allocatable :: polr(:)
+      real*8, allocatable :: athl(:)
       save
       end

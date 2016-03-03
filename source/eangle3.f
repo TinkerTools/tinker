@@ -71,7 +71,17 @@ c
       do i = 1, n
          aea(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nangle.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Angle Bending Interactions :',
+     &           //,' Type',18x,'Atom Names',18x,
+     &              'Ideal',4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -181,8 +191,8 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Angle Bending',
+                        write (iout,20)
+   20                   format (/,' Individual Angle Bending',
      &                             ' Interactions :',
      &                          //,' Type',18x,'Atom Names',18x,
      &                             'Ideal',4x,'Actual',6x,'Energy',/)
@@ -196,9 +206,9 @@ c
                         if (angle-ideal .gt. 180.0d0/fold)
      &                     ideal = ideal + 360.0d0/fold
                      end if
-                     write (iout,20)  label,ia,name(ia),ib,name(ib),
+                     write (iout,30)  label,ia,name(ia),ib,name(ib),
      &                                ic,name(ic),ideal,angle,e
-   20                format (1x,a9,1x,i7,'-',a3,i7,'-',a3,i7,
+   30                format (1x,a9,1x,i7,'-',a3,i7,'-',a3,i7,
      &                          '-',a3,2x,2f10.4,f12.4)
                   end if
                end if
@@ -271,15 +281,15 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,30)
-   30                   format (/,' Individual Angle Bending',
+                        write (iout,40)
+   40                   format (/,' Individual Angle Bending',
      &                             ' Interactions :',
      &                          //,' Type',18x,'Atom Names',18x,
      &                             'Ideal',4x,'Actual',6x,'Energy',/)
                      end if
-                     write (iout,40)  ia,name(ia),ib,name(ib),ic,
+                     write (iout,50)  ia,name(ia),ib,name(ib),ic,
      &                                name(ic),ideal,angle,e
-   40                format (' Angle-IP',2x,i7,'-',a3,i7,'-',a3,i7,
+   50                format (' Angle-IP',2x,i7,'-',a3,i7,'-',a3,i7,
      &                          '-',a3,2x,2f10.4,f12.4)
                   end if
                end if

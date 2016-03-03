@@ -256,9 +256,11 @@ c
 c
 c     find potential energies for trajectory A in state B
 c
-      write (iout,120)
-  120 format (/,' Potential Energy Values for Trajectory A :',
-     &        //,7x,'Frame',9x,'State A',9x,'State B',12x,'Delta',/)
+      if (verbose) then
+         write (iout,120)
+  120    format (/,' Potential Energy Values for Trajectory A :',
+     &           //,7x,'Frame',9x,'State A',9x,'State B',12x,'Delta',/)
+      end if
       j = 0
       k = start1 - 1
       do while (.not. abort)
@@ -266,8 +268,10 @@ c
          k = k + 1
          call cutoffs
          ua1(j) = energy ()
-         write (iout,130)  k,ua0(j),ua1(j),ua1(j)-ua0(j)
-  130    format (i11,2x,3f16.4)
+         if (verbose) then
+            write (iout,130)  k,ua0(j),ua1(j),ua1(j)-ua0(j)
+  130       format (i11,2x,3f16.4)
+         end if
          do i = 1, step1-1
             call readxyz (ixyz)
          end do
@@ -341,9 +345,11 @@ c
 c
 c     find potential energies for trajectory B in state B
 c
-      write (iout,170)
-  170 format (/,' Potential Energy Values for Trajectory B :',
-     &        //,7x,'Frame',9x,'State A',9x,'State B',12x,'Delta',/)
+      if (verbose) then
+         write (iout,170)
+  170    format (/,' Potential Energy Values for Trajectory B :',
+     &           //,7x,'Frame',9x,'State A',9x,'State B',12x,'Delta',/)
+      end if
       j = 0
       k = start2 - 1
       do while (.not. abort)
@@ -351,8 +357,10 @@ c
          k = k + 1
          call cutoffs
          ub1(j) = energy ()
-         write (iout,180)  k,ub0(j),ub1(j),ub0(j)-ub1(j)
-  180    format (i11,2x,3f16.4)
+         if (verbose) then
+            write (iout,180)  k,ub0(j),ub1(j),ub0(j)-ub1(j)
+  180       format (i11,2x,3f16.4)
+         end if
          do i = 1, step2-1
             call readxyz (ixyz)
          end do
@@ -503,11 +511,15 @@ c
       allocate (bst1(nbst))
       allocate (bst2(nbst))
 c
-c     use bootstrapping analysis to estimate statistical error
+c     use bootstrap analysis to estimate statistical error
 c
       write (iout,280)
-  280 format (/,' Bootstrapping Error Analysis of BAR',
-     &           ' Free Energy :',/)
+  280 format (/,' Bootstrap Error Analysis for BAR',
+     &           ' Free Energy :')
+      if (debug) then
+         write (iout,290)
+  290    format ()
+      end if
       sum = 0.0d0
       sum2 = 0.0d0
       do k = 1, nbst
@@ -552,8 +564,8 @@ c
                sum = sum + cnew
                sum2 = sum2 + cnew*cnew
                if (debug) then
-                  write (iout,290)  k,cnew,iter
-  290             format (' Bootstrap Estimate',i7,2x,f12.4,
+                  write (iout,300)  k,cnew,iter
+  300             format (' Bootstrap Estimate',i7,2x,f12.4,
      &                       ' Kcal/mol at',i4,' Resamples')
                end if
             end if
@@ -562,12 +574,8 @@ c
       mean = sum / dble(nbst)
       ratio = dble(nbst/(nbst-1))
       stdev = sqrt(ratio*(sum2/dble(nbst)-mean*mean))
-      if (verbose) then
-         write (iout,300)
-  300    format ()
-      end if
       write (iout,310)  mean,stdev
-  310 format (' BAR Bootstrap Free Energy',2x,f12.4,
+  310 format (/,' BAR Bootstrap Free Energy',2x,f12.4,
      &           ' +/-',f8.4,' Kcal/mol')
 c
 c     perform deallocation of some local arrays

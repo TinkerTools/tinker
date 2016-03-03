@@ -51,6 +51,13 @@ c
       character*120 record
       character*120 string
 c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     QI spherical harmonics stuff
+c
+c     real*8, parameter :: sqrt13 = sqrt(1.0d0/3.0d0)
+c     real*8, parameter :: sqrt43 = sqrt(4.0d0/3.0d0)
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
 c
 c     count the number of existing multipole parameters
 c
@@ -232,6 +239,15 @@ c
       allocate (np12(n))
       allocate (np13(n))
       allocate (np14(n))
+c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     QI spherical harmonics stuff
+c
+c     if (allocated(spole)) deallocate (spole)
+c     if (allocated(srpole)) deallocate (srpole)
+c     allocate (spole(maxpole,n))
+c     allocate (srpole(maxpole,n))
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 c     zero out local axes, multipoles and polarization attachments
 c
@@ -510,6 +526,24 @@ c
          do k = 5, 13
             pole(k,i) = pole(k,i) * bohr**2 / 3.0d0
          end do
+c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     QI spherical harmonics stuff
+c
+c     1   2   3   4   5   6   7   8   9  10  11  12  13
+c     0   x   y   z  xx  xy  xz  yx  yy  yz  zx  zy  zz
+c
+c        spole(1,i) = pole(1,i)                            ! chg -> Q_00
+c        spole(2,i) = pole(4,i)                            ! z -> Q_10
+c        spole(3,i) = pole(2,i)                            ! x -> Q_11c
+c        spole(4,i) = pole(3,i)                            ! y -> Q_11s
+c        spole(5,i) = pole(13,i)*3.0d0                     ! zz -> Q_20
+c        spole(6,i) = sqrt43*pole(7,i)*3.0d0               ! xz -> Q_21c
+c        spole(7,i) = sqrt43*pole(10,i)*3.0d0              ! yz -> Q_21s
+c        spole(8,i) = sqrt3*(pole(5,i) - pole(9,i))*3.0d0  ! xx-yy -> Q_22c
+c        spole(9,i) = sqrt43*pole(6,i)*3.0d0               ! xy -> Q_22s
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
       end do
 c
 c     get the order of the multipole expansion at each site

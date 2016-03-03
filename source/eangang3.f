@@ -59,7 +59,18 @@ c
       do i = 1, n
          aeaa(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nangang.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Angle-Angle Interactions :',
+     &           //,' Type',10x,'Center',6x,'Angle1',
+     &              6x,'Angle2',4x,'dAngle1',
+     &              3x,'dAngle2',6x,'Energy',/)
+      end if
 c
 c     find the energy of each angle-angle interaction
 c
@@ -154,14 +165,14 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Angle-Angle Interactions :',
+                     write (iout,20)
+   20                format (/,' Individual Angle-Angle Interactions :',
      &                       //,' Type',10x,'Center',6x,'Angle1',
      &                          6x,'Angle2',4x,'dAngle1',
      &                          3x,'dAngle2',6x,'Energy',/)
                   end if
-                  write (iout,20)  ib,name(ib),ia,ic,id,ie,dt1,dt2,e
-   20             format (' AngAng',4x,i7,'-',a3,4i6,2f10.4,f12.4)
+                  write (iout,30)  ib,name(ib),ia,ic,id,ie,dt1,dt2,e
+   30             format (' AngAng',4x,i7,'-',a3,4i6,2f10.4,f12.4)
                end if
             end if
          end if

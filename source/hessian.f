@@ -166,10 +166,11 @@ c
 c
 c     call the electrostatic Hessian component routines
 c
-            if (use_charge) call echarge2 (i)
+            if (use_charge)  call echarge2 (i)
             if (use_chgdpl)  call echgdpl2 (i)
             if (use_dipole)  call edipole2 (i)
-            if (use_mpole .or. use_polar)   call empole2 (i)
+            if (use_mpole)   call empole2 (i)
+            if (use_polar)  call epolar2 (i)
             if (use_rxnfld)   call erxnfld2 (i)
 c
 c     call any miscellaneous Hessian component routines

@@ -49,7 +49,17 @@ c
       do i = 1, n
          aeub(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nurey.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Urey-Bradley Interactions :',
+     &           //,' Type',18x,'Atom Names',18x,'Ideal',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -118,14 +128,14 @@ c
             if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
-                  write (iout,10)
-   10             format (/,' Individual Urey-Bradley Interactions :',
+                  write (iout,20)
+   20             format (/,' Individual Urey-Bradley Interactions :',
      &                    //,' Type',18x,'Atom Names',18x,'Ideal',
      &                       4x,'Actual',6x,'Energy',/)
                end if
-               write (iout,20)  ia,name(ia),ib,name(ib),
+               write (iout,30)  ia,name(ia),ib,name(ib),
      &                          ic,name(ic),ideal,rac,e
-   20          format (' UreyBrad',2x,i7,'-',a3,i7,'-',a3,
+   30          format (' UreyBrad',2x,i7,'-',a3,i7,'-',a3,
      &                    i7,'-',a3,2x,2f10.4,f12.4)
             end if
          end if

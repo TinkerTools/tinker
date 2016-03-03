@@ -61,7 +61,17 @@ c
       do i = 1, n
          aeba(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nstrbnd.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Stretch-Bend Interactions :',
+     &           //,' Type',18x,'Atom Names',18x,'dSB 1',
+     &              5x,'dSB 2',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -159,15 +169,15 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Stretch-Bend',
+                     write (iout,20)
+   20                format (/,' Individual Stretch-Bend',
      &                          ' Interactions :',
      &                       //,' Type',18x,'Atom Names',18x,'dSB 1',
      &                          5x,'dSB 2',6x,'Energy',/)
                   end if
-                  write (iout,20)  ia,name(ia),ib,name(ib),
+                  write (iout,30)  ia,name(ia),ib,name(ib),
      &                             ic,name(ic),dr1*dt,dr2*dt,e
-   20             format (' StrBend',3x,3(i7,'-',a3),2x,2f10.4,f12.4)
+   30             format (' StrBend',3x,3(i7,'-',a3),2x,2f10.4,f12.4)
                end if
             end if
          end if

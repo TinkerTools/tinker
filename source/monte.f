@@ -34,6 +34,7 @@ c
       use inform
       use iounit
       use omega
+      use output
       use units
       use usage
       use zcoord
@@ -252,9 +253,20 @@ c
       lext = 3
       call numeral (nmap,ext,lext)
       ixyz = freeunit ()
-      xyzfile = filename(1:leng)//'.'//ext(1:lext)
-      call version (xyzfile,'new')
-      open (unit=ixyz,file=xyzfile,status='new')
+      if (archive) then
+         xyzfile = filename(1:leng)
+         call suffix (xyzfile,'arc','old')
+         inquire (file=xyzfile,exist=exist)
+         if (exist) then
+            call openend (ixyz,xyzfile)
+         else
+            open (unit=ixyz,file=xyzfile,status='new')
+         end if
+      else
+         xyzfile = filename(1:leng)//'.'//ext(1:lext)
+         call version (xyzfile,'new')
+         open (unit=ixyz,file=xyzfile,status='new')
+      end if
       call prtxyz (ixyz)
       close (unit=ixyz)
       write (iout,220)  nmap,global
@@ -380,9 +392,20 @@ c
             lext = 3
             call numeral (nmap,ext,lext)
             ixyz = freeunit ()
-            xyzfile = filename(1:leng)//'.'//ext(1:lext)
-            call version (xyzfile,'new')
-            open (unit=ixyz,file=xyzfile,status='new')
+            if (archive) then
+               xyzfile = filename(1:leng)
+               call suffix (xyzfile,'arc','old')
+               inquire (file=xyzfile,exist=exist)
+               if (exist) then
+                  call openend (ixyz,xyzfile)
+               else
+                  open (unit=ixyz,file=xyzfile,status='new')
+               end if
+            else
+               xyzfile = filename(1:leng)//'.'//ext(1:lext)
+               call version (xyzfile,'new')
+               open (unit=ixyz,file=xyzfile,status='new')
+            end if
             call prtxyz (ixyz)
             close (unit=ixyz)
             write (iout,230)  nmap,global

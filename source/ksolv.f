@@ -823,6 +823,7 @@ c
       use gkstuf
       use keys
       use kvdws
+      use polar
       use ptable
       use solute
       implicit none
@@ -845,12 +846,24 @@ c
       if (allocated(drbp))  deallocate (drbp)
       if (allocated(drobc))  deallocate (drobc)
       if (allocated(shct))  deallocate (shct)
+      if (allocated(udirs))  deallocate (udirs)
+      if (allocated(udirps))  deallocate (udirps)
+      if (allocated(uinds))  deallocate (uinds)
+      if (allocated(uinps))  deallocate (uinps)
+      if (allocated(uxtrs))  deallocate (uxtrs)
+      if (allocated(uxtrps))  deallocate (uxtrps)
       allocate (rsolv(n))
       allocate (rborn(n))
       allocate (drb(n))
       allocate (drbp(n))
       allocate (drobc(n))
       allocate (shct(n))
+      allocate (udirs(3,n))
+      allocate (udirps(3,n))
+      allocate (uinds(3,n))
+      allocate (uinps(3,n))
+      allocate (uxtrs(0:cxmax,3,n))
+      allocate (uxtrps(0:cxmax,3,n))
 c
 c     set default value for exponent in the GB/GK function
 c
@@ -1133,6 +1146,7 @@ c
       use math
       use nonpol
       use pbstuf
+      use polar
       use potent
       use ptable
       use solute
@@ -1164,8 +1178,20 @@ c     perform dynamic allocation of some global arrays
 c
       if (allocated(rsolv))  deallocate (rsolv)
       if (allocated(shct))  deallocate (shct)
+      if (allocated(udirs))  deallocate (udirs)
+      if (allocated(udirps))  deallocate (udirps)
+      if (allocated(uinds))  deallocate (uinds)
+      if (allocated(uinps))  deallocate (uinps)
+      if (allocated(uxtrs))  deallocate (uxtrs)
+      if (allocated(uxtrps))  deallocate (uxtrps)
       allocate (rsolv(n))
       allocate (shct(n))
+      allocate (udirs(3,n))
+      allocate (udirps(3,n))
+      allocate (uinds(3,n))
+      allocate (uinps(3,n))
+      allocate (uxtrs(0:3,3,n))
+      allocate (uxtrps(0:3,3,n))
 c
 c     assign some default APBS configuration parameters
 c

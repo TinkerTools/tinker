@@ -261,7 +261,7 @@ c
          allocate (xmold(n))
          allocate (ymold(n))
          allocate (zmold(n))
-         if (poltyp .eq. 'MUTUAL') then
+         if (poltyp .ne. 'DIRECT') then
             if (allocated(tindex))  deallocate (tindex)
             if (allocated(tdipdip))  deallocate (tdipdip)
             allocate (tindex(2,n*maxelst))

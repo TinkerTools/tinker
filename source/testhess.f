@@ -198,8 +198,6 @@ c
             end if
             hesscut = 0.0d0
             call hessian (h,hinit,hstop,hindex,hdiag)
-            call hessian (h,hinit,hstop,hindex,hdiag)
-            call hessian (h,hinit,hstop,hindex,hdiag)
          end if
 c
 c     get the two-sided numerical Hessian matrix elements

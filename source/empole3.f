@@ -5,27 +5,20 @@ c     ##  COPYRIGHT (C) 1999 by Pengyu Ren & Jay William Ponder  ##
 c     ##                   All Rights Reserved                   ##
 c     #############################################################
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine empole3  --  mpole/polar energy & analysis  ##
-c     ##                                                         ##
-c     #############################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine empole3  --  atomic multipole energy & analysis  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "empole3" calculates the electrostatic energy due to
-c     atomic multipole and dipole polarizability interactions,
-c     and partitions the energy among the atoms
+c     "empole3" calculates the electrostatic energy due to atomic
+c     multipole interactions, and partitions the energy among atoms
 c
 c
       subroutine empole3
-      use sizes
-      use analyz
-      use energi
       use limits
-      use mpole
-      use potent
       implicit none
-      integer i,ii
 c
 c
 c     choose the method for summing over multipole interactions
@@ -43,23 +36,6 @@ c
             call empole3a
          end if
       end if
-c
-c     zero out energy terms and analysis which are not in use
-c
-      if (.not. use_mpole) then
-         em = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            aem(ii) = 0.0d0
-         end do
-      end if
-      if (.not. use_polar) then
-         ep = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            aep(ii) = 0.0d0
-         end do
-      end if
       return
       end
 c
@@ -71,9 +47,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "empole3a" calculates the atomic multipole and dipole
-c     polarizability interaction energy using a double loop,
-c     and partitions the energy among the atoms
+c     "empole3a" calculates the atomic multipole interaction energy
+c     using a double loop, and partitions the energy among atoms
 c
 c
       subroutine empole3a
@@ -96,9 +71,6 @@ c
       use molcul
       use mplpot
       use mpole
-      use polar
-      use polgrp
-      use polpot
       use potent
       use shunt
       use usage
@@ -107,48 +79,46 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 e,ei,fgrp
-      real*8 f,fm,fp
+      real*8 e,f,fgrp
       real*8 r,r2,xr,yr,zr
-      real*8 damp,expdamp
-      real*8 pdi,pti,pgamma
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
-      real*8 ukx,uky,ukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
       real*8 qix,qiy,qiz
       real*8 qkx,qky,qkz
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 sc(10),sci(8)
-      real*8 gl(0:4),gli(3)
+      real*8 sc(10)
+      real*8 gl(0:4)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: pscale(:)
       logical proceed
       logical header,huge
       logical usei,usek
-      logical muse,puse
       character*6 mode
 c
 c
-c     zero out multipole and polarization energy and partitioning
+c     zero out total atomic multipole energy and partitioning
 c
       nem = 0
-      nep = 0
       em = 0.0d0
-      ep = 0.0d0
       do i = 1, n
          aem(i) = 0.0d0
-         aep(i) = 0.0d0
       end do
-      header = .true.
       if (npole .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -158,20 +128,14 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
-c     compute the induced dipoles at each polarizable atom
-c
-      call induce
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
-         pscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -187,8 +151,6 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
-         pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -199,32 +161,21 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
-            pscale(i12(j,ii)) = p2scale
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = m3scale
-            pscale(i13(j,ii)) = p3scale
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = m4scale
-            pscale(i14(j,ii)) = p4scale
-            do k = 1, np11(ii)
-                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = p4scale * p41scale
-            end do
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
-            pscale(i15(j,ii)) = p5scale
          end do
 c
 c     decide whether to compute the current interaction
@@ -260,9 +211,6 @@ c
                   qkyy = rpole(9,k)
                   qkyz = rpole(10,k)
                   qkzz = rpole(13,k)
-                  ukx = uind(1,k)
-                  uky = uind(2,k)
-                  ukz = uind(3,k)
 c
 c     construct some intermediate quadrupole values
 c
@@ -286,15 +234,6 @@ c
                   sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the scalar products for polarization components
-c
-                  sci(2) = uix*dkx + dix*ukx + uiy*dky
-     &                        + diy*uky + uiz*dkz + diz*ukz
-                  sci(3) = uix*xr + uiy*yr + uiz*zr
-                  sci(4) = ukx*xr + uky*yr + ukz*zr
-                  sci(7) = qix*ukx + qiy*uky + qiz*ukz
-                  sci(8) = qkx*uix + qky*uiy + qkz*uiz
-c
 c     calculate the gl functions for permanent multipoles
 c
                   gl(0) = ci*ck
@@ -304,92 +243,45 @@ c
                   gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
                   gl(4) = sc(5)*sc(6)
 c
-c     calculate the gl functions for polarization components
+c     get reciprocal distance terms with units and scaling
 c
-                  gli(1) = ck*sci(3) - ci*sci(4) + sci(2)
-                  gli(2) = 2.0d0*(sci(7)-sci(8)) - sci(3)*sc(4)
-     &                        - sc(3)*sci(4)
-                  gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
-c
-c     compute the energy contributions for this interaction
-c
-                  rr1 = 1.0d0 / r
+                  rr1 = f * mscale(kk) / r
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                          *expdamp
-                     end if
-                  end if
-                  e = gl(0)*rr1 + gl(1)*rr3 + gl(2)*rr5
-     &                   + gl(3)*rr7 + gl(4)*rr9
-                  ei = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                    + gli(3)*rr7*scale7
 c
-c     apply the energy adjustments for scaled interactions
+c     compute the energy contribution for this interaction
 c
-                  fm = f * mscale(kk)
-                  fp = f * pscale(kk)
-                  e = fm * e
-                  ei = 0.5d0 * fp * ei
-c
-c     scale the interaction based on its group membership;
-c     polarization cannot be group scaled as it is not pairwise
-c
-                  if (use_group) then
-                     e = e * fgrp
-c                    ei = ei * fgrp
-                  end if
-c
-c     increment the overall multipole and polarization energies
-c
-                  muse = (use_mpole .and. mscale(kk).ne.0.0d0)
-                  puse = (use_polar .and. pscale(kk).ne.0.0d0)
-                  if (muse)  nem = nem + 1
-                  if (puse)  nep = nep + 1
+                  e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                   + rr7*gl(3) + rr9*gl(4)
+                  if (use_group)  e = e * fgrp
+                  nem = nem + 1
                   em = em + e
-                  ep = ep + ei
                   aem(ii) = aem(ii) + 0.5d0*e
                   aem(kk) = aem(kk) + 0.5d0*e
-                  aep(ii) = aep(ii) + 0.5d0*ei
-                  aep(kk) = aep(kk) + 0.5d0*ei
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(ii) .ne. molcule(kk)) then
-                     einter = einter + e + ei
+                     einter = einter + e
                   end if
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (max(abs(e),abs(ei)) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
-                     if (muse .or. puse) then
-                        if (header) then
-                           header = .false.
-                           write (iout,10)
-   10                      format (/,' Individual Multipole and',
-     &                                ' Polarization Interactions :',
-     &                             //,' Type',14x,'Atom Names',
-     &                                15x,'Distance',6x,'Energies',
-     &                                ' (MPol,Polar)',/)
-                        end if
-                        write (iout,20)  ii,name(ii),kk,name(kk),r,e,ei
-   20                   format (' M-Pole',4x,2(i7,'-',a3),9x,
-     &                             f10.4,2x,2f12.4)
+                     if (header) then
+                        header = .false.
+                        write (iout,20)
+   20                   format (/,' Individual Atomic Multipole',
+     &                             ' Interactions :',
+     &                          //,' Type',14x,'Atom Names',
+     &                             15x,'Distance',8x,'Energy',/)
                      end if
+                     write (iout,30)  ii,name(ii),kk,name(kk),r,e
+   30                format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                          f10.4,2x,f12.4)
                   end if
                end if
             end if
@@ -399,19 +291,15 @@ c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
-            pscale(i12(j,ii)) = 1.0d0
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = 1.0d0
-            pscale(i13(j,ii)) = 1.0d0
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = 1.0d0
-            pscale(i14(j,ii)) = 1.0d0
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = 1.0d0
-            pscale(i15(j,ii)) = 1.0d0
          end do
       end do
 c
@@ -427,8 +315,6 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(k)
-         pdi = pdamp(i)
-         pti = thole(i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
          ci = rpole(1,i)
          dix = rpole(2,i)
@@ -440,27 +326,20 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
-            pscale(i12(j,ii)) = p2scale
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = m3scale
-            pscale(i13(j,ii)) = p3scale
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = m4scale
-            pscale(i14(j,ii)) = p4scale
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
-            pscale(i15(j,ii)) = p5scale
          end do
 c
 c     decide whether to compute the current interaction
@@ -496,9 +375,6 @@ c
                      qkyy = rpole(9,k)
                      qkyz = rpole(10,k)
                      qkzz = rpole(13,k)
-                     ukx = uind(1,k)
-                     uky = uind(2,k)
-                     ukz = uind(3,k)
 c
 c     construct some intermediate quadrupole values
 c
@@ -522,15 +398,6 @@ c
                      sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the scalar products for polarization components
-c
-                     sci(2) = uix*dkx + dix*ukx + uiy*dky
-     &                           + diy*uky + uiz*dkz + diz*ukz
-                     sci(3) = uix*xr + uiy*yr + uiz*zr
-                     sci(4) = ukx*xr + uky*yr + ukz*zr
-                     sci(7) = qix*ukx + qiy*uky + qiz*ukz
-                     sci(8) = qkx*uix + qky*uiy + qkz*uiz
-c
 c     calculate the gl functions for permanent multipoles
 c
                      gl(0) = ci*ck
@@ -540,96 +407,46 @@ c
                      gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
                      gl(4) = sc(5)*sc(6)
 c
-c     calculate the gl functions for polarization components
+c     get reciprocal distance terms with units and scaling
 c
-                     gli(1) = ck*sci(3) - ci*sci(4) + sci(2)
-                     gli(2) = 2.0d0*(sci(7)-sci(8)) - sci(3)*sc(4)
-     &                           - sc(3)*sci(4)
-                     gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
-c
-c     compute the energy contributions for this interaction
-c
-                     rr1 = 1.0d0 / r
+                     rr1 = f * mscale(kk) / r
                      rr3 = rr1 / r2
                      rr5 = 3.0d0 * rr3 / r2
                      rr7 = 5.0d0 * rr5 / r2
                      rr9 = 7.0d0 * rr7 / r2
-                     scale3 = 1.0d0
-                     scale5 = 1.0d0
-                     scale7 = 1.0d0
-                     damp = pdi * pdamp(k)
-                     if (damp .ne. 0.0d0) then
-                        pgamma = min(pti,thole(k))
-                        damp = -pgamma * (r/damp)**3
-                        if (damp .gt. -50.0d0) then
-                           expdamp = exp(damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                           scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                             *expdamp
-                        end if
-                     end if
-                     e = gl(0)*rr1 + gl(1)*rr3 + gl(2)*rr5
-     &                      + gl(3)*rr7 + gl(4)*rr9
-                     ei = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                       + gli(3)*rr7*scale7
 c
-c     apply the energy adjustments for scaled interactions
+c     compute the energy contribution for this interaction
 c
-                     fm = f
-                     fp = f
-                     if (use_polymer) then
-                        if (r2 .le. polycut2) then
-                           fm = fm * mscale(kk)
-                           fp = fp * pscale(kk)
-                        end if
-                     end if
-                     e = fm * e
-                     ei = 0.5d0 * fp * ei
-c
-c     scale the interaction based on its group membership;
-c     polarization cannot be group scaled as it is not pairwise
-c
-                     if (use_group) then
-                        e = e * fgrp
-c                       ei = ei * fgrp
-                     end if
-c
-c     increment the overall multipole and polarization energies
-c
-                     if (ii .eq. kk) then
-                        e = 0.5d0 * e
-                        ei = 0.5d0 * ei
-                     end if
+                     e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                      + rr7*gl(3) + rr9*gl(4)
+                     if (ii .eq. kk)  e = 0.5d0 * e
+                     if (use_polymer .and. r2.le.polycut2)
+     &                  e = e * mscale(kk)
+                     if (use_group)  e = e * fgrp
                      nem = nem + 1
-                     nep = nep + 1
                      em = em + e
-                     ep = ep + ei
                      aem(ii) = aem(ii) + 0.5d0*e
                      aem(kk) = aem(kk) + 0.5d0*e
-                     aep(ii) = aep(ii) + 0.5d0*ei
-                     aep(kk) = aep(kk) + 0.5d0*ei
 c
 c     increment the total intermolecular energy
 c
-                     einter = einter + e + ei
+                     einter = einter + e
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (max(abs(e),abs(ei)) .gt. 100.0d0)
+                     huge = (abs(e) .gt. 100.0d0)
                      if (debug .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
-                           write (iout,30)
-   30                      format (/,' Individual Multipole and',
-     &                                ' Polarization Interactions :',
+                           write (iout,40)
+   40                      format (/,' Individual Atomic Multipole',
+     &                                ' Interactions :',
      &                             //,' Type',14x,'Atom Names',
-     &                                15x,'Distance',6x,'Energies',
-     &                                ' (MPol,Polar)',/)
+     &                                15x,'Distance',8x,'Energy',/)
                         end if
-                        write (iout,40)  ii,name(ii),kk,name(kk),r,e,ei
-   40                   format (' M-Pole',4x,2(i7,'-',a3),1x,
-     &                             '(X)',5x,f10.4,2x,2f12.4)
+                        write (iout,50)  ii,name(ii),kk,name(kk),r,e
+   50                   format (' M-Pole',4x,2(i7,'-',a3),1x,
+     &                             '(X)',5x,f10.4,2x,f12.4)
                      end if
                   end if
                end do
@@ -640,26 +457,21 @@ c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
-            pscale(i12(j,ii)) = 1.0d0
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = 1.0d0
-            pscale(i13(j,ii)) = 1.0d0
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = 1.0d0
-            pscale(i14(j,ii)) = 1.0d0
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = 1.0d0
-            pscale(i15(j,ii)) = 1.0d0
          end do
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (pscale)
       return
       end
 c
@@ -671,9 +483,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "empole3b" calculates the atomic multipole and dipole
-c     polarizability interaction energy using a neighbor list,
-c     and partitions the energy among the atoms
+c     "empole3b" calculates the atomic multipole interaction energy
+c     using a neighbor list, and partitions the energy among the atoms
 c
 c
       subroutine empole3b
@@ -696,9 +507,6 @@ c
       use mplpot
       use mpole
       use neigh
-      use polar
-      use polgrp
-      use polpot
       use potent
       use shunt
       use usage
@@ -707,52 +515,48 @@ c
       integer ii,kk,kkk
       integer ix,iy,iz
       integer kx,ky,kz
-      integer nemo,nepo
-      real*8 e,ei,fgrp
-      real*8 f,fm,fp
+      integer nemo
+      real*8 e,f,fgrp
       real*8 r,r2,xr,yr,zr
-      real*8 damp,expdamp
-      real*8 pdi,pti,pgamma
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
-      real*8 ukx,uky,ukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
       real*8 qix,qiy,qiz
       real*8 qkx,qky,qkz
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 emo,epo
-      real*8 eintero
-      real*8 sc(10),sci(8)
-      real*8 gl(0:4),gli(3)
+      real*8 emo,eintero
+      real*8 sc(10)
+      real*8 gl(0:4)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: pscale(:)
       real*8, allocatable :: aemo(:)
-      real*8, allocatable :: aepo(:)
       logical proceed
       logical header,huge
       logical usei,usek
-      logical muse,puse
       character*6 mode
 c
 c
-c     zero out multipole and polarization energy and partitioning
+c     zero out total atomic multipole energy and partitioning
 c
       nem = 0
-      nep = 0
       em = 0.0d0
-      ep = 0.0d0
       do i = 1, n
          aem(i) = 0.0d0
-         aep(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -762,22 +566,15 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
-c     compute the induced dipoles at each polarizable atom
-c
-      call induce
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (pscale(n))
       allocate (aemo(n))
-      allocate (aepo(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
-         pscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -789,25 +586,21 @@ c
 c     initialize local variables for OpenMP calculation
 c
       emo = 0.0d0
-      epo = 0.0d0
       eintero = einter
       nemo = nem
-      nepo = nep
       do i = 1, n
          aemo(i) = aem(i)
-         aepo(i) = aep(i)
       end do
 c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) firstprivate(f)
-!$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,ei,
-!$OMP& damp,expdamp,pdi,pti,pgamma,scale3,scale5,scale7,xr,yr,zr,r,r2,
-!$OMP& rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,qix,qiy,qiz,qixx,qixy,qixz,
-!$OMP& qiyy,qiyz,qizz,uix,uiy,uiz,ck,dkx,dky,dkz,qkx,qky,qkz,qkxx,qkxy,
-!$OMP& qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,fgrp,fm,fp,sc,gl,sci,gli)
-!$OMP& firstprivate(mscale,pscale)
-!$OMP DO reduction(+:emo,epo,eintero,nemo,nepo,aemo,aepo)
+!$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,
+!$OMP& xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,qix,qiy,qiz,
+!$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,qkx,qky,qkz,
+!$OMP& qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,fgrp,sc,gl)
+!$OMP& firstprivate(mscale)
+!$OMP DO reduction(+:emo,eintero,nemo,aemo)
 !$OMP& schedule(guided)
 c
 c     calculate the multipole interaction energy term
@@ -817,8 +610,6 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
-         pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -829,32 +620,21 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
-            pscale(i12(j,ii)) = p2scale
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = m3scale
-            pscale(i13(j,ii)) = p3scale
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = m4scale
-            pscale(i14(j,ii)) = p4scale
-            do k = 1, np11(ii)
-                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = p4scale * p41scale
-            end do
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
-            pscale(i15(j,ii)) = p5scale
          end do
 c
 c     decide whether to compute the current interaction
@@ -891,9 +671,6 @@ c
                   qkyy = rpole(9,k)
                   qkyz = rpole(10,k)
                   qkzz = rpole(13,k)
-                  ukx = uind(1,k)
-                  uky = uind(2,k)
-                  ukz = uind(3,k)
 c
 c     construct some intermediate quadrupole values
 c
@@ -917,15 +694,6 @@ c
                   sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the scalar products for polarization components
-c
-                  sci(2) = uix*dkx + dix*ukx + uiy*dky
-     &                        + diy*uky + uiz*dkz + diz*ukz
-                  sci(3) = uix*xr + uiy*yr + uiz*zr
-                  sci(4) = ukx*xr + uky*yr + ukz*zr
-                  sci(7) = qix*ukx + qiy*uky + qiz*ukz
-                  sci(8) = qkx*uix + qky*uiy + qkz*uiz
-c
 c     calculate the gl functions for permanent multipoles
 c
                   gl(0) = ci*ck
@@ -935,92 +703,45 @@ c
                   gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
                   gl(4) = sc(5)*sc(6)
 c
-c     calculate the gl functions for polarization components
+c     get reciprocal distance terms with units and scaling
 c
-                  gli(1) = ck*sci(3) - ci*sci(4) + sci(2)
-                  gli(2) = 2.0d0*(sci(7)-sci(8)) - sci(3)*sc(4)
-     &                        - sc(3)*sci(4)
-                  gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
-c
-c     compute the energy contributions for this interaction
-c
-                  rr1 = 1.0d0 / r
+                  rr1 = f * mscale(kk) / r
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                          *expdamp
-                     end if
-                  end if
-                  e = gl(0)*rr1 + gl(1)*rr3 + gl(2)*rr5
-     &                   + gl(3)*rr7 + gl(4)*rr9
-                  ei = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                    + gli(3)*rr7*scale7
 c
-c     apply the energy adjustments for scaled interactions
+c     compute the energy contribution for this interaction
 c
-                  fm = f * mscale(kk)
-                  fp = f * pscale(kk)
-                  e = fm * e
-                  ei = 0.5d0 * fp * ei
-c
-c     scale the interaction based on its group membership;
-c     polarization cannot be group scaled as it is not pairwise
-c
-                  if (use_group) then
-                     e = e * fgrp
-c                    ei = ei * fgrp
-                  end if
-c
-c     increment the overall multipole and polarization energies
-c
-                  muse = (use_mpole .and. mscale(kk).ne.0.0d0)
-                  puse = (use_polar .and. pscale(kk).ne.0.0d0)
-                  if (muse)  nemo = nemo + 1
-                  if (puse)  nepo = nepo + 1
+                  e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                   + rr7*gl(3) + rr9*gl(4)
+                  if (use_group)  e = e * fgrp
+                  nemo = nemo + 1
                   emo = emo + e
-                  epo = epo + ei
                   aemo(ii) = aemo(ii) + 0.5d0*e
                   aemo(kk) = aemo(kk) + 0.5d0*e
-                  aepo(ii) = aepo(ii) + 0.5d0*ei
-                  aepo(kk) = aepo(kk) + 0.5d0*ei
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(ii) .ne. molcule(kk)) then
-                     eintero = eintero + e + ei
+                     eintero = eintero + e
                   end if
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (max(abs(e),abs(ei)) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
-                     if (muse .or. puse) then
-                        if (header) then
-                           header = .false.
-                           write (iout,10)
-   10                      format (/,' Individual Multipole and',
-     &                                ' Polarization Interactions :',
-     &                             //,' Type',14x,'Atom Names',
-     &                                15x,'Distance',6x,'Energies',
-     &                                ' (MPol,Polar)',/)
-                        end if
-                        write (iout,20)  ii,name(ii),kk,name(kk),r,e,ei
-   20                   format (' M-Pole',4x,2(i7,'-',a3),9x,
-     &                             f10.4,2x,2f12.4)
+                     if (header) then
+                        header = .false.
+                        write (iout,20)
+   20                   format (/,' Individual Atomic Multipole',
+     &                             ' Interactions :',
+     &                          //,' Type',14x,'Atom Names',
+     &                             15x,'Distance',8x,'Energy',/)
                      end if
+                     write (iout,30)  ii,name(ii),kk,name(kk),r,e
+   30                format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                          f10.4,2x,f12.4)
                   end if
                end if
             end if
@@ -1030,19 +751,15 @@ c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
-            pscale(i12(j,ii)) = 1.0d0
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = 1.0d0
-            pscale(i13(j,ii)) = 1.0d0
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = 1.0d0
-            pscale(i14(j,ii)) = 1.0d0
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = 1.0d0
-            pscale(i15(j,ii)) = 1.0d0
          end do
       end do
 c
@@ -1054,21 +771,16 @@ c
 c     add local copies to global variables for OpenMP calculation
 c
       em = em + emo
-      ep = ep + epo
       einter = eintero
       nem = nemo
-      nep = nepo
       do i = 1, n
          aem(i) = aemo(i)
-         aep(i) = aepo(i)
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (pscale)
       deallocate (aemo)
-      deallocate (aepo)
       return
       end
 c
@@ -1080,10 +792,9 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "empole3c" calculates the atomic multipole and dipole
-c     polarizability interaction energy using a particle mesh
-c     Ewald summation and double loop, and partitions the energy
-c     among the atoms
+c     "empole3c" calculates the atomic multipole interaction energy
+c     using a particle mesh Ewald summation and double loop, and
+c     partitions the energy among the atoms
 c
 c
       subroutine empole3c
@@ -1098,16 +809,13 @@ c
       use inter
       use math
       use mpole
-      use polar
       implicit none
       integer i,ii
-      real*8 e,ei,eintra
+      real*8 e,eintra
       real*8 f,term,fterm
-      real*8 cii,dii,qii,uii
+      real*8 cii,dii,qii
       real*8 xd,yd,zd
-      real*8 xu,yu,zu
       real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
 c
@@ -1115,12 +823,9 @@ c
 c     zero out the multipole and polarization energies
 c
       nem = 0
-      nep = 0
       em = 0.0d0
-      ep = 0.0d0
       do i = 1, n
          aem(i) = 0.0d0
-         aep(i) = 0.0d0
       end do
       if (npole .eq. 0)  return
 c
@@ -1136,13 +841,9 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
-c     compute the induced dipoles at each polarizable atom
-c
-      call induce
-c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call emrecip
+      call emrecip3
 c
 c     compute the real space part of the Ewald summation
 c
@@ -1163,22 +864,14 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = qixx*qixx + qiyy*qiyy + qizz*qizz
      &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
-         uii = dix*uix + diy*uiy + diz*uiz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
-         ei = fterm * term * uii / 3.0d0
          nem = nem + 1
-         nep = nep + 1
          em = em + e
-         ep = ep + ei
          aem(i) = aem(i) + e
-         aep(i) = aep(i) + ei
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -1187,34 +880,27 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
-         xu = 0.0d0
-         yu = 0.0d0
-         zu = 0.0d0
          do i = 1, npole
             ii = ipole(i)
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            uix = uind(1,i)
-            uiy = uind(2,i)
-            uiz = uind(3,i)
             xd = xd + dix + rpole(1,i)*x(ii)
             yd = yd + diy + rpole(1,i)*y(ii)
             zd = zd + diz + rpole(1,i)*z(ii)
-            xu = xu + uix
-            yu = yu + uiy
-            zu = zu + uiz
          end do
-         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          nem = nem + 1
-         nep = nep + 1
-         em = em + term*(xd*xd+yd*yd+zd*zd)
-         ep = ep + term*(xd*xu+yd*yu+zd*zu)
+         em = em + e
+         do i = 1, npole
+            ii = ipole(i)
+            aem(ii) = aem(ii) + e/dble(npole)
+         end do
       end if
 c
 c     intermolecular energy is total minus intramolecular part
 c
-      einter = einter + em + ep - eintra
+      einter = einter + em - eintra
       return
       end
 c
@@ -1227,8 +913,8 @@ c     ##################################################################
 c
 c
 c     "ereal3c" evaluates the real space portion of the Ewald sum
-c     energy due to atomic multipole interactions and dipole
-c     polarizability and partitions the energy among the atoms
+c     energy due to atomic multipole interactions and partitions
+c     the energy among the atoms
 c
 c     literature reference:
 c
@@ -1255,44 +941,33 @@ c
       use molcul
       use mplpot
       use mpole
-      use polar
-      use polgrp
-      use polpot
       use potent
       use shunt
       implicit none
       integer i,j,k,m
       integer ii,kk
-      real*8 e,ei,eintra
+      real*8 e,eintra
+      real*8 efull
       real*8 f,erfc
       real*8 r,r2,xr,yr,zr
       real*8 bfac,exp2a
-      real*8 efix,eifix
-      real*8 ralpha
-      real*8 damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 ralpha,scalekk
       real*8 alsq2,alsq2n
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
-      real*8 ukx,uky,ukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
       real*8 qix,qiy,qiz
       real*8 qkx,qky,qkz
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 sc(10),sci(8)
-      real*8 gl(0:4),gli(3)
+      real*8 sc(10)
+      real*8 gl(0:4)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: pscale(:)
       logical header,huge
-      logical muse,puse
       character*6 mode
       external erfc
 c
@@ -1300,18 +975,26 @@ c
 c     zero out the intramolecular portion of the Ewald energy
 c
       eintra = 0.0d0
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (pscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
-         pscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -1324,8 +1007,6 @@ c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole-1
          ii = ipole(i)
-         pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1336,31 +1017,20 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
-            pscale(i12(j,ii)) = p2scale
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = m3scale
-            pscale(i13(j,ii)) = p3scale
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = m4scale
-            pscale(i14(j,ii)) = p4scale
-            do k = 1, np11(ii)
-                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = p4scale * p41scale
-            end do
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
-            pscale(i15(j,ii)) = p5scale
          end do
          do k = i+1, npole
             kk = ipole(k)
@@ -1381,9 +1051,6 @@ c
                qkyy = rpole(9,k)
                qkyz = rpole(10,k)
                qkzz = rpole(13,k)
-               ukx = uind(1,k)
-               uky = uind(2,k)
-               ukz = uind(3,k)
 c
 c     calculate the error function damping terms
 c
@@ -1422,15 +1089,6 @@ c
                sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the scalar products for polarization components
-c
-               sci(2) = uix*dkx + dix*ukx + uiy*dky
-     &                     + diy*uky + uiz*dkz + diz*ukz
-               sci(3) = uix*xr + uiy*yr + uiz*zr
-               sci(4) = ukx*xr + uky*yr + ukz*zr
-               sci(7) = qix*ukx + qiy*uky + qiz*ukz
-               sci(8) = qkx*uix + qky*uiy + qkz*uiz
-c
 c     calculate the gl functions for permanent multipoles
 c
                gl(0) = ci*ck
@@ -1440,96 +1098,59 @@ c
                gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
                gl(4) = sc(5)*sc(6)
 c
-c     calculate the gl functions for polarization components
-c
-               gli(1) = ck*sci(3) - ci*sci(4) + sci(2)
-               gli(2) = 2.0d0*(sci(7)-sci(8)) - sci(3)*sc(4)
-     &                     - sc(3)*sci(4)
-               gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
-c
-c     compute the energy contributions for this interaction
-c
-               e = gl(0)*bn(0) + gl(1)*bn(1) + gl(2)*bn(2)
-     &                + gl(3)*bn(3) + gl(4)*bn(4)
-               ei = gli(1)*bn(1) + gli(2)*bn(2) + gli(3)*bn(3)
-c
-c     full real space energies needed for scaled interactions
+c     get reciprocal distance terms as unscaled values
 c
                rr1 = 1.0d0 / r
                rr3 = rr1 / r2
                rr5 = 3.0d0 * rr3 / r2
                rr7 = 5.0d0 * rr5 / r2
                rr9 = 7.0d0 * rr7 / r2
-               scale3 = pscale(kk)
-               scale5 = pscale(kk)
-               scale7 = pscale(kk)
-               damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     expdamp = exp(damp)
-                     scale3 = scale3 * (1.0d0-expdamp)
-                     scale5 = scale5 * (1.0d0-(1.0d0-damp)*expdamp)
-                     scale7 = scale7 * (1.0d0-(1.0d0-damp
-     &                                    +0.6d0*damp**2)*expdamp)
-                  end if
-               end if
-               efix = gl(0)*rr1 + gl(1)*rr3 + gl(2)*rr5
-     &                   + gl(3)*rr7 + gl(4)*rr9
-               eifix = gli(1)*rr3*(1.0d0-scale3)
-     &                    + gli(2)*rr5*(1.0d0-scale5)
-     &                    + gli(3)*rr7*(1.0d0-scale7)
 c
-c     apply the energy adjustments for scaled interactions
+c     compute the full undamped permanent multipole energy
 c
-               e = e - efix*(1.0d0-mscale(kk))
-               ei = ei - eifix
-               e = f * e
-               ei = 0.5d0 * f * ei
+               efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                    + rr7*gl(3) + rr9*gl(4)
+               efull = f * mscale(kk) * efull
 c
-c     increment the overall multipole and polarization energies
+c     modify error function terms by scaled true distance
 c
-               muse = use_mpole
-               puse = use_polar
-               if (muse)  nem = nem + 1
-               if (puse)  nep = nep + 1
+               scalekk = 1.0d0 - mscale(kk)
+               rr1 = f * (bn(0)-scalekk*rr1)
+               rr3 = f * (bn(1)-scalekk*rr3)
+               rr5 = f * (bn(2)-scalekk*rr5)
+               rr7 = f * (bn(3)-scalekk*rr7)
+               rr9 = f * (bn(4)-scalekk*rr9)
+c
+c     compute the energy contribution for this interaction
+c
+               e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                + rr7*gl(3) + rr9*gl(4)
+               nem = nem + 1
                em = em + e
-               ep = ep + ei
                aem(ii) = aem(ii) + 0.5d0*e
                aem(kk) = aem(kk) + 0.5d0*e
-               aep(ii) = aep(ii) + 0.5d0*ei
-               aep(kk) = aep(kk) + 0.5d0*ei
 c
 c     increment the total intramolecular energy
 c
-               efix = f * efix * mscale(kk)
-               eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                    + gli(3)*rr7*scale7
-               eifix = 0.5d0 * f * eifix
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintra = eintra + efix + eifix
+                  eintra = eintra + efull
                end if
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (max(abs(efix),abs(eifix)) .gt. 100.0d0)
+               huge = (abs(efull) .gt. 100.0d0)
                if (debug .or. (verbose.and.huge)) then
-                  if (muse .or. puse) then
-                     if (header) then
-                        header = .false.
-                        write (iout,10)
-   10                   format (/,' Real Space Multipole and',
-     &                             ' Polarization Interactions :',
-     &                          //,' Type',14x,'Atom Names',
-     &                             15x,'Distance',6x,'Energies',
-     &                             ' (MPol,Polar)',/)
-                     end if
-                     write (iout,20)  ii,name(ii),kk,name(kk),r,
-     &                                efix,eifix
-   20                format (' M-Pole',4x,2(i7,'-',a3),9x,
-     &                          f10.4,2x,2f12.4)
+                  if (header) then
+                     header = .false.
+                     write (iout,20)
+   20                format (/,' Real Space Multipole and',
+     &                          ' Polarization Interactions :',
+     &                       //,' Type',14x,'Atom Names',
+     &                          15x,'Distance',8x,'Energy',/)
                   end if
+                  write (iout,30)  ii,name(ii),kk,name(kk),r,efull
+   30             format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                       f10.4,2x,f12.4)
                end if
             end if
          end do
@@ -1538,19 +1159,15 @@ c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
-            pscale(i12(j,ii)) = 1.0d0
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = 1.0d0
-            pscale(i13(j,ii)) = 1.0d0
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = 1.0d0
-            pscale(i14(j,ii)) = 1.0d0
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = 1.0d0
-            pscale(i15(j,ii)) = 1.0d0
          end do
       end do
 c
@@ -1563,8 +1180,6 @@ c     calculate interaction energy with other unit cells
 c
       do i = 1, npole
          ii = ipole(i)
-         pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1575,27 +1190,20 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
-            pscale(i12(j,ii)) = p2scale
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = m3scale
-            pscale(i13(j,ii)) = p3scale
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = m4scale
-            pscale(i14(j,ii)) = p4scale
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
-            pscale(i15(j,ii)) = p5scale
          end do
          do k = i, npole
             kk = ipole(k)
@@ -1617,9 +1225,6 @@ c
                   qkyy = rpole(9,k)
                   qkyz = rpole(10,k)
                   qkzz = rpole(13,k)
-                  ukx = uind(1,k)
-                  uky = uind(2,k)
-                  ukz = uind(3,k)
 c
 c     calculate the error function damping terms
 c
@@ -1658,15 +1263,6 @@ c
                   sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the scalar products for polarization components
-c
-                  sci(2) = uix*dkx + dix*ukx + uiy*dky
-     &                        + diy*uky + uiz*dkz + diz*ukz
-                  sci(3) = uix*xr + uiy*yr + uiz*zr
-                  sci(4) = ukx*xr + uky*yr + ukz*zr
-                  sci(7) = qix*ukx + qiy*uky + qiz*ukz
-                  sci(8) = qkx*uix + qky*uiy + qkz*uiz
-c
 c     calculate the gl functions for permanent multipoles
 c
                   gl(0) = ci*ck
@@ -1676,96 +1272,57 @@ c
                   gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
                   gl(4) = sc(5)*sc(6)
 c
-c     calculate the gl functions for polarization components
-c
-                  gli(1) = ck*sci(3) - ci*sci(4) + sci(2)
-                  gli(2) = 2.0d0*(sci(7)-sci(8)) - sci(3)*sc(4)
-     &                        - sc(3)*sci(4)
-                  gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
-c
-c     compute the energy contributions for this interaction
-c
-                  e = gl(0)*bn(0) + gl(1)*bn(1) + gl(2)*bn(2)
-     &                   + gl(3)*bn(3) + gl(4)*bn(4)
-                  ei = gli(1)*bn(1) + gli(2)*bn(2) + gli(3)*bn(3)
-c
-c     full real space energies needed for scaled interactions
+c     get reciprocal distance terms as unscaled values
 c
                   rr1 = 1.0d0 / r
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                          *expdamp
-                        if (use_polymer .and. r2.le.polycut2) then
-                           scale3 = scale3 * pscale(kk)
-                           scale5 = scale5 * pscale(kk)
-                           scale7 = scale7 * pscale(kk)
-                        end if
-                     end if
-                  end if
-                  efix = gl(0)*rr1 + gl(1)*rr3 + gl(2)*rr5
-     &                      + gl(3)*rr7 + gl(4)*rr9
-                  eifix = gli(1)*rr3*(1.0d0-scale3)
-     &                       + gli(2)*rr5*(1.0d0-scale5)
-     &                       + gli(3)*rr7*(1.0d0-scale7)
 c
-c     apply the energy adjustments for scaled interactions
+c     compute the full undamped permanent multipole energy
 c
+                  efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                       + rr7*gl(3) + rr9*gl(4)
+                  efull = f * efull
+c
+c     modify error function terms by scaled true distance
+c
+                  scalekk = 1.0d0 - mscale(kk)
+                  rr1 = f * (bn(0)-scalekk*rr1)
+                  rr3 = f * (bn(1)-scalekk*rr3)
+                  rr5 = f * (bn(2)-scalekk*rr5)
+                  rr7 = f * (bn(3)-scalekk*rr7)
+                  rr9 = f * (bn(4)-scalekk*rr9)
+c
+c     compute the energy contribution for this interaction
+c
+                  e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                   + rr7*gl(3) + rr9*gl(4)
                   if (use_polymer .and. r2.le.polycut2)
-     &               e = e - efix*(1.0d0-mscale(kk))
-                  ei = ei - eifix
-c
-c     increment the overall multipole and polarization energies
-c
-                  e = f * e
-                  ei = 0.5d0 * f * ei
-                  if (ii .eq. kk) then
-                     e = 0.5d0 * e
-                     ei = 0.5d0 * ei
-                  end if
+     &               e = e - efull*(1.0d0-mscale(kk))
+                  if (ii .eq. kk)  e = 0.5d0 * e
                   nem = nem + 1
-                  nep = nep + 1
                   em = em + e
-                  ep = ep + ei
                   aem(ii) = aem(ii) + 0.5d0*e
                   aem(kk) = aem(kk) + 0.5d0*e
-                  aep(ii) = aep(ii) + 0.5d0*ei
-                  aep(kk) = aep(kk) + 0.5d0*ei
 c
 c     print a message if the energy of this interaction is large
 c
-                  efix = f * efix * mscale(kk)
-                  eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                       + gli(3)*rr7*scale7
-                  eifix = 0.5d0 * f * eifix
-                  huge = (max(abs(efix),abs(eifix)) .gt. 100.0d0)
+                  efull = efull * mscale(kk)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,30)
-   30                   format (/,' Real Space Multipole and',
+                        write (iout,40)
+   40                   format (/,' Real Space Multipole and',
      &                             ' Polarization Interactions :',
      &                          //,' Type',14x,'Atom Names',
-     &                             15x,'Distance',6x,'Energies',
-     &                             ' (MPol,Polar)',/)
+     &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,40)  ii,name(ii),kk,name(kk),r,
-     &                                efix,eifix
-   40                format (' M-Pole',4x,2(i7,'-',a3),1x,
-     &                          '(X)',5x,f10.4,2x,2f12.4)
+                     write (iout,50)  ii,name(ii),kk,name(kk),r,efull
+   50                format (' M-Pole',4x,2(i7,'-',a3),1x,
+     &                          '(X)',5x,f10.4,2x,f12.4)
                   end if
                end if
             end do
@@ -1775,26 +1332,21 @@ c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
-            pscale(i12(j,ii)) = 1.0d0
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = 1.0d0
-            pscale(i13(j,ii)) = 1.0d0
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = 1.0d0
-            pscale(i14(j,ii)) = 1.0d0
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = 1.0d0
-            pscale(i15(j,ii)) = 1.0d0
          end do
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (pscale)
       return
       end
 c
@@ -1806,10 +1358,9 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "empole3d" calculates the atomic multipole and dipole
-c     polarizability interaction energy using a particle mesh
-c     Ewald summation and a neighbor list, and partitions the
-c     energy among the atoms
+c     "empole3d" calculates the atomic multipole interaction energy
+c     using particle mesh Ewald summation and a neighbor list, and
+c     partitions the energy among the atoms
 c
 c
       subroutine empole3d
@@ -1824,16 +1375,13 @@ c
       use inter
       use math
       use mpole
-      use polar
       implicit none
       integer i,ii
-      real*8 e,ei,eintra
+      real*8 e,eintra
       real*8 f,term,fterm
-      real*8 cii,dii,qii,uii
+      real*8 cii,dii,qii
       real*8 xd,yd,zd
-      real*8 xu,yu,zu
       real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
 c
@@ -1841,12 +1389,9 @@ c
 c     zero out the multipole and polarization energies
 c
       nem = 0
-      nep = 0
       em = 0.0d0
-      ep = 0.0d0
       do i = 1, n
          aem(i) = 0.0d0
-         aep(i) = 0.0d0
       end do
       if (npole .eq. 0)  return
 c
@@ -1862,13 +1407,9 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
-c     compute the induced dipoles at each polarizable atom
-c
-      call induce
-c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call emrecip
+      call emrecip3
 c
 c     compute the real space part of the Ewald summation
 c
@@ -1889,22 +1430,14 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = qixx*qixx + qiyy*qiyy + qizz*qizz
      &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
-         uii = dix*uix + diy*uiy + diz*uiz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
-         ei = fterm * term * uii / 3.0d0
          nem = nem + 1
-         nep = nep + 1
          em = em + e
-         ep = ep + ei
          aem(i) = aem(i) + e
-         aep(i) = aep(i) + ei
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -1913,34 +1446,27 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
-         xu = 0.0d0
-         yu = 0.0d0
-         zu = 0.0d0
          do i = 1, npole
             ii = ipole(i)
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            uix = uind(1,i)
-            uiy = uind(2,i)
-            uiz = uind(3,i)
             xd = xd + dix + rpole(1,i)*x(ii)
             yd = yd + diy + rpole(1,i)*y(ii)
             zd = zd + diz + rpole(1,i)*z(ii)
-            xu = xu + uix
-            yu = yu + uiy
-            zu = zu + uiz
          end do
-         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          nem = nem + 1
-         nep = nep + 1
-         em = em + term*(xd*xd+yd*yd+zd*zd)
-         ep = ep + term*(xd*xu+yd*yu+zd*zu)
+         em = em + e
+         do i = 1, npole
+            ii = ipole(i)
+            aem(ii) = aem(ii) + e/dble(npole)
+         end do
       end if
 c
 c     intermolecular energy is total minus intramolecular part
 c
-      einter = einter + em + ep - eintra
+      einter = einter + em - eintra
       return
       end
 c
@@ -1953,9 +1479,8 @@ c     ##################################################################
 c
 c
 c     "ereal3d" evaluates the real space portion of the Ewald sum
-c     energy due to atomic multipole interactions and dipole
-c     polarizability and partitions the energy among the atoms
-c     using a pairwise neighbor list
+c     energy due to atomic multipole interactions, and partitions
+c     the energy among the atoms using a pairwise neighbor list
 c
 c     literature reference:
 c
@@ -1982,49 +1507,36 @@ c
       use mplpot
       use mpole
       use neigh
-      use polar
-      use polgrp
-      use polpot
       use potent
       use shunt
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
-      integer nemo,nepo
-      real*8 e,ei,eintra
+      integer nemo
+      real*8 e,eintra
+      real*8 efull
       real*8 f,erfc,r,r2
       real*8 xr,yr,zr
       real*8 bfac,exp2a
-      real*8 efix,eifix
-      real*8 ralpha
-      real*8 damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 ralpha,scalekk
       real*8 alsq2,alsq2n
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
-      real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
-      real*8 ukx,uky,ukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
       real*8 qix,qiy,qiz
       real*8 qkx,qky,qkz
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 emo,epo
-      real*8 eintrao
-      real*8 sc(10),sci(8)
-      real*8 gl(0:4),gli(3)
+      real*8 emo,eintrao
+      real*8 sc(10)
+      real*8 gl(0:4)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: pscale(:)
       real*8, allocatable :: aemo(:)
-      real*8, allocatable :: aepo(:)
       logical header,huge
-      logical muse,puse
       character*6 mode
       external erfc
 c
@@ -2032,20 +1544,27 @@ c
 c     zero out the intramolecular portion of the Ewald energy
 c
       eintra = 0.0d0
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (pscale(n))
       allocate (aemo(n))
-      allocate (aepo(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
-         pscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2057,34 +1576,27 @@ c
 c     initialize local variables for OpenMP calculation
 c
       emo = 0.0d0
-      epo = 0.0d0
       eintrao = eintra
       nemo = nem
-      nepo = nep
       do i = 1, n
          aemo(i) = aem(i)
-         aepo(i) = aep(i)
       end do
 c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) firstprivate(f)
-!$OMP& private(i,j,k,ii,kk,kkk,e,ei,efix,eifix,bfac,damp,expdamp,
-!$OMP& pdi,pti,pgamma,scale3,scale5,scale7,alsq2,alsq2n,
-!$OMP& exp2a,ralpha,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,
-!$OMP& ci,dix,diy,diz,qixx,qixy,qixz,qiyy,qiyz,qizz,uix,uiy,uiz,
-!$OMP& ck,dkx,dky,dkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,ukx,uky,ukz,
-!$OMP& bn,sc,gl,sci,gli)
-!$OMP& firstprivate(mscale,pscale)
-!$OMP DO reduction(+:emo,epo,eintrao,nemo,nepo,aemo,aepo)
+!$OMP& private(i,j,k,ii,kk,kkk,e,efull,bfac,alsq2,alsq2n,exp2a,ralpha,
+!$OMP& scalekk,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,
+!$OMP& qix,qiy,qiz,qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,
+!$OMP& qkx,qky,qkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,bn,sc,gl)
+!$OMP& firstprivate(mscale)
+!$OMP DO reduction(+:emo,eintrao,nemo,aemo)
 !$OMP& schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole
          ii = ipole(i)
-         pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -2095,31 +1607,20 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
-            pscale(i12(j,ii)) = p2scale
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = m3scale
-            pscale(i13(j,ii)) = p3scale
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = m4scale
-            pscale(i14(j,ii)) = p4scale
-            do k = 1, np11(ii)
-                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = p4scale * p41scale
-            end do
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
-            pscale(i15(j,ii)) = p5scale
          end do
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
@@ -2141,9 +1642,15 @@ c
                qkyy = rpole(9,k)
                qkyz = rpole(10,k)
                qkzz = rpole(13,k)
-               ukx = uind(1,k)
-               uky = uind(2,k)
-               ukz = uind(3,k)
+c
+c     construct some intermediate quadrupole values
+c
+               qix = qixx*xr + qixy*yr + qixz*zr
+               qiy = qixy*xr + qiyy*yr + qiyz*zr
+               qiz = qixz*xr + qiyz*yr + qizz*zr
+               qkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qky = qkxy*xr + qkyy*yr + qkyz*zr
+               qkz = qkxz*xr + qkyz*yr + qkzz*zr
 c
 c     calculate the error function damping terms
 c
@@ -2160,15 +1667,6 @@ c
                   bn(m) = (bfac*bn(m-1)+alsq2n*exp2a) / r2
                end do
 c
-c     construct some intermediate quadrupole values
-c
-               qix = qixx*xr + qixy*yr + qixz*zr
-               qiy = qixy*xr + qiyy*yr + qiyz*zr
-               qiz = qixz*xr + qiyz*yr + qizz*zr
-               qkx = qkxx*xr + qkxy*yr + qkxz*zr
-               qky = qkxy*xr + qkyy*yr + qkyz*zr
-               qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
 c     calculate the scalar products for permanent multipoles
 c
                sc(2) = dix*dkx + diy*dky + diz*dkz
@@ -2182,15 +1680,6 @@ c
                sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the scalar products for polarization components
-c
-               sci(2) = uix*dkx + dix*ukx + uiy*dky
-     &                     + diy*uky + uiz*dkz + diz*ukz
-               sci(3) = uix*xr + uiy*yr + uiz*zr
-               sci(4) = ukx*xr + uky*yr + ukz*zr
-               sci(7) = qix*ukx + qiy*uky + qiz*ukz
-               sci(8) = qkx*uix + qky*uiy + qkz*uiz
-c
 c     calculate the gl functions for permanent multipoles
 c
                gl(0) = ci*ck
@@ -2200,96 +1689,59 @@ c
                gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
                gl(4) = sc(5)*sc(6)
 c
-c     calculate the gl functions for polarization components
-c
-               gli(1) = ck*sci(3) - ci*sci(4) + sci(2)
-               gli(2) = 2.0d0*(sci(7)-sci(8)) - sci(3)*sc(4)
-     &                     - sc(3)*sci(4)
-               gli(3) = sci(3)*sc(6) - sci(4)*sc(5)
-c
-c     compute the energy contributions for this interaction
-c
-               e = gl(0)*bn(0) + gl(1)*bn(1) + gl(2)*bn(2)
-     &                + gl(3)*bn(3) + gl(4)*bn(4)
-               ei = gli(1)*bn(1) + gli(2)*bn(2) + gli(3)*bn(3)
-c
-c     full real space energies needed for scaled interactions
+c     get reciprocal distance terms as unscaled values
 c
                rr1 = 1.0d0 / r
                rr3 = rr1 / r2
                rr5 = 3.0d0 * rr3 / r2
                rr7 = 5.0d0 * rr5 / r2
                rr9 = 7.0d0 * rr7 / r2
-               scale3 = pscale(kk)
-               scale5 = pscale(kk)
-               scale7 = pscale(kk)
-               damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     expdamp = exp(damp)
-                     scale3 = scale3 * (1.0d0-expdamp)
-                     scale5 = scale5 * (1.0d0-(1.0d0-damp)*expdamp)
-                     scale7 = scale7 * (1.0d0-(1.0d0-damp+0.6d0*damp**2)
-     &                                               *expdamp)
-                  end if
-               end if
-               efix = gl(0)*rr1 + gl(1)*rr3 + gl(2)*rr5
-     &                   + gl(3)*rr7 + gl(4)*rr9
-               eifix = gli(1)*rr3*(1.0d0-scale3)
-     &                    + gli(2)*rr5*(1.0d0-scale5)
-     &                    + gli(3)*rr7*(1.0d0-scale7)
 c
-c     apply the energy adjustments for scaled interactions
+c     compute the full undamped permanent multipole energy
 c
-               e = e - efix*(1.0d0-mscale(kk))
-               ei = ei - eifix
+               efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                    + rr7*gl(3) + rr9*gl(4)
+               efull = f * mscale(kk) * efull
 c
-c     increment the overall multipole and polarization energies
+c     modify error function terms by scaled true distance
 c
-               e = f * e
-               ei = 0.5d0 * f * ei
-               muse = use_mpole
-               puse = use_polar
-               if (muse)  nemo = nemo + 1
-               if (puse)  nepo = nepo + 1
+               scalekk = 1.0d0 - mscale(kk)
+               rr1 = f * (bn(0)-scalekk*rr1)
+               rr3 = f * (bn(1)-scalekk*rr3)
+               rr5 = f * (bn(2)-scalekk*rr5)
+               rr7 = f * (bn(3)-scalekk*rr7)
+               rr9 = f * (bn(4)-scalekk*rr9)
+c
+c     compute the energy contributions for this interaction
+c
+               e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                + rr7*gl(3) + rr9*gl(4)
+               nemo = nemo + 1
                emo = emo + e
-               epo = epo + ei
                aemo(ii) = aemo(ii) + 0.5d0*e
                aemo(kk) = aemo(kk) + 0.5d0*e
-               aepo(ii) = aepo(ii) + 0.5d0*ei
-               aepo(kk) = aepo(kk) + 0.5d0*ei
 c
 c     increment the total intramolecular energy
 c
-               efix = f * efix * mscale(kk)
-               eifix = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                    + gli(3)*rr7*scale7
-               eifix = 0.5d0 * f * eifix
                if (molcule(ii) .eq. molcule(kk)) then
-                  eintrao = eintrao + efix + eifix
+                  eintrao = eintrao + efull
                end if
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (max(abs(efix),abs(eifix)) .gt. 100.0d0)
+               huge = (abs(efull) .gt. 100.0d0)
                if (debug .or. (verbose.and.huge)) then
-                  if (muse .or. puse) then
-                     if (header) then
-                        header = .false.
-                        write (iout,10)
-   10                   format (/,' Real Space Multipole and',
-     &                             ' Polarization Interactions :',
-     &                          //,' Type',14x,'Atom Names',
-     &                             15x,'Distance',6x,'Energies',
-     &                             ' (MPol,Polar)',/)
-                     end if
-                     write (iout,20)  ii,name(ii),kk,name(kk),r,
-     &                                efix,eifix
-   20                format (' M-Pole',4x,2(i7,'-',a3),9x,
-     &                          f10.4,2x,2f12.4)
+                  if (header) then
+                     header = .false.
+                     write (iout,20)
+   20                format (/,' Real Space Multipole and',
+     &                          ' Polarization Interactions :',
+     &                       //,' Type',14x,'Atom Names',
+     &                          15x,'Distance',8x,'Energy',/)
                   end if
+                  write (iout,30)  ii,name(ii),kk,name(kk),r,efull
+   30             format (' M-Pole',4x,2(i7,'-',a3),9x,
+     &                       f10.4,2x,f12.4)
                end if
             end if
          end do
@@ -2298,19 +1750,15 @@ c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
-            pscale(i12(j,ii)) = 1.0d0
          end do
          do j = 1, n13(ii)
             mscale(i13(j,ii)) = 1.0d0
-            pscale(i13(j,ii)) = 1.0d0
          end do
          do j = 1, n14(ii)
             mscale(i14(j,ii)) = 1.0d0
-            pscale(i14(j,ii)) = 1.0d0
          end do
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = 1.0d0
-            pscale(i15(j,ii)) = 1.0d0
          end do
       end do
 c
@@ -2322,20 +1770,190 @@ c
 c     add local copies to global variables for OpenMP calculation
 c
       em = em + emo
-      ep = ep + epo
       eintra = eintrao
       nem = nemo
-      nep = nepo
       do i = 1, n
          aem(i) = aemo(i)
-         aep(i) = aepo(i)
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (pscale)
       deallocate (aemo)
-      deallocate (aepo)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine emrecip3  --  PME recip space mpole analysis  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "emrecip3" evaluates the reciprocal space portion of the particle
+c     mesh Ewald energy due to atomic multipole interactions, also
+c     partitions the energy among the atoms
+c
+c     literature reference:
+c
+c     C. Sagui, L. G. Pedersen and T. A. Darden, "Towards an Accurate
+c     Representation of Electrostatics in Classical Force Fields:
+c     Efficient Implementation of Multipolar Interactions in
+c     Biomolecular Simulations", Journal of Chemical Physics, 120,
+c     73-87 (2004)
+c
+c     modifications for nonperiodic systems suggested by Tom Darden
+c     during May 2007
+c
+c
+      subroutine emrecip3
+      use sizes
+      use bound
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use math
+      use mpole
+      use mrecip
+      use pme
+      use potent
+      implicit none
+      integer i,j,k,ntot
+      integer k1,k2,k3
+      integer m1,m2,m3
+      integer nff,nf1,nf2,nf3
+      real*8 e,r1,r2,r3
+      real*8 h1,h2,h3
+      real*8 volterm,denom
+      real*8 hsq,expterm
+      real*8 term,pterm
+c
+c
+c     return if the Ewald coefficient is zero
+c
+      if (aewald .lt. 1.0d-6)  return
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(cmp)) then
+         if (size(cmp) .lt. 10*npole) then
+            deallocate (cmp)
+            deallocate (fmp)
+            deallocate (fphi)
+         end if
+      end if
+      if (.not. allocated(cmp)) then
+         allocate (cmp(10,npole))
+         allocate (fmp(10,npole))
+         allocate (fphi(20,npole))
+      end if
+c
+c     copy the multipole moments into local storage areas
+c
+      do i = 1, npole
+         cmp(1,i) = rpole(1,i)
+         cmp(2,i) = rpole(2,i)
+         cmp(3,i) = rpole(3,i)
+         cmp(4,i) = rpole(4,i)
+         cmp(5,i) = rpole(5,i)
+         cmp(6,i) = rpole(9,i)
+         cmp(7,i) = rpole(13,i)
+         cmp(8,i) = 2.0d0 * rpole(6,i)
+         cmp(9,i) = 2.0d0 * rpole(7,i)
+         cmp(10,i) = 2.0d0 * rpole(10,i)
+      end do
+c
+c     compute B-spline coefficients and spatial decomposition
+c
+      call bspline_fill
+      call table_fill
+c
+c     convert Cartesian multipoles to fractional coordinates
+c
+      call cmp_to_fmp (cmp,fmp)
+c
+c     assign PME grid and perform 3-D FFT forward transform
+c
+      call grid_mpole (fmp)
+      call fftfront
+c
+c     make the scalar summation over reciprocal lattice
+c
+      ntot = nfft1 * nfft2 * nfft3
+      pterm = (pi/aewald)**2
+      volterm = pi * volbox
+      nff = nfft1 * nfft2
+      nf1 = (nfft1+1) / 2
+      nf2 = (nfft2+1) / 2
+      nf3 = (nfft3+1) / 2
+      do i = 1, ntot-1
+         k3 = i/nff + 1
+         j = i - (k3-1)*nff
+         k2 = j/nfft1 + 1
+         k1 = j - (k2-1)*nfft1 + 1
+         m1 = k1 - 1
+         m2 = k2 - 1
+         m3 = k3 - 1
+         if (k1 .gt. nf1)  m1 = m1 - nfft1
+         if (k2 .gt. nf2)  m2 = m2 - nfft2
+         if (k3 .gt. nf3)  m3 = m3 - nfft3
+         r1 = dble(m1)
+         r2 = dble(m2)
+         r3 = dble(m3)
+         h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+         h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+         h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+         hsq = h1*h1 + h2*h2 + h3*h3
+         term = -pterm * hsq
+         expterm = 0.0d0
+         if (term .gt. -50.0d0) then
+            denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+            expterm = exp(term) / denom
+            if (.not. use_bounds) then
+               expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+            else if (octahedron) then
+               if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+            end if
+         end if
+         qfac(k1,k2,k3) = expterm
+      end do
+c
+c     account for the zeroth grid point for a finite system
+c
+      qfac(1,1,1) = 0.0d0
+      if (.not. use_bounds) then
+         expterm = 0.5d0 * pi / xbox
+         qfac(1,1,1) = expterm
+      end if
+c
+c     complete the transformation of the charge grid
+c
+      do k = 1, nfft3
+         do j = 1, nfft2
+            do i = 1, nfft1
+               term = qfac(i,j,k)
+               qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+               qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+            end do
+         end do
+      end do
+c
+c     perform 3-D FFT backward transform and get potential
+c
+      call fftback
+      call fphi_mpole (fphi)
+c
+c     sum over multipoles and increment total multipole energy
+c
+      e = 0.0d0
+      do i = 1, npole
+         do k = 1, 10
+            e = e + fmp(k,i)*fphi(k,i)
+         end do
+      end do
+      e = 0.5d0 * electric * e
+      em = em + e
       return
       end

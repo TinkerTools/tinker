@@ -40,7 +40,7 @@ c
       real*8, allocatable :: fjac(:,:)
       logical exist,query
       character*5 vindex
-      character*16 label(9)
+      character*16 label(7)
       character*120 record
       character*120 string
       external xtalerr,xtalwrt
@@ -63,9 +63,7 @@ c
      &        /,4x,'(4) Atomic Partial Charge',
      &        /,4x,'(5) Bond Dipole Moment Magnitude',
      &        /,4x,'(6) Bond Dipole Moment Position',
-     &        /,4x,'(7) Atomic Polarizability',
-     &        /,4x,'(8) Penetration Alpha Value',
-     &        /,4x,'(9) Penetration Beta Value')
+     &        /,4x,'(7) Atomic Polarizability')
 c
 c     get types of potential parameters to be optimized
 c
@@ -236,8 +234,6 @@ c
       label(5) = 'Dipole Magnitude'
       label(6) = 'Dipole Position'
       label(7) = 'Polarizability'
-      label(8) = 'Penetr Alpha'
-      label(9) = 'Penetr Beta'
       do i = 1, nvary
          vartyp(i) = label(ivary(i))
       end do

@@ -27,7 +27,7 @@ c
       use iounit
       implicit none
       integer i,j,ixyz
-      integer frame
+      integer frame,nold
       integer freeunit
       integer trimtext
       integer list(20)
@@ -199,6 +199,7 @@ c
          if (frame .gt. 1) then
             write (iout,90)  frame
    90       format (/,' Analysis for Archive Structure :',8x,i8)
+            if (nold .ne. n)  call mechanic
          end if
 c
 c     make the call to compute the potential energy
@@ -207,9 +208,7 @@ c
 c
 c     energy partitioning by potential energy components
 c
-         if (doenergy) then
-            call partyze
-         end if
+         if (doenergy)  call partyze
 c
 c     get the various electrostatic and inertial moments
 c
@@ -233,6 +232,7 @@ c
 c
 c     attempt to read next structure from the coordinate file
 c
+         nold = n
          call readxyz (ixyz)
       end do
 c
@@ -1188,7 +1188,7 @@ c
                end if
                write (iout,750)  i,ia,polarity(i),thole(i),
      &                           (ip11(j,ia),j=1,np11(ia))
-  750          format (i6,3x,i6,6x,f10.4,f9.3,3x,20i6)
+  750          format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)
             end if
          end do
       end if
@@ -1275,6 +1275,7 @@ c
       use iounit
       use limits
       use molcul
+      use potent
       implicit none
       real*8 energy
       character*120 fstr
@@ -1298,7 +1299,8 @@ c
       if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
       if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
       if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
-      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald)
+      if (nmol.gt.1 .and. nmol.lt.n .and.
+     &      .not.use_ewald .and. .not.use_polar)
      &   write (iout,fstr)  einter
       return
       end
