@@ -1,0 +1,8 @@
+*.mod
+*.o
+bin
+source/*.a
+source/*.make
+source/*-orig
+source/*-new
+source/*-old
