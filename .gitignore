@@ -1,8 +1,12 @@
 *.mod
 *.o
 bin
+expt
+listing
 source/*.a
 source/*.make
 source/*-orig
-source/*-new
 source/*-old
+source/*-new
+source/*-newer
+source/*-newest
