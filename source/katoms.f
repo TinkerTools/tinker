@@ -21,13 +21,12 @@ c     describe   string identifying each of the atom types
 c
 c
       module katoms
-      use sizes
       implicit none
-      integer atmcls(maxtyp)
-      integer atmnum(maxtyp)
-      integer ligand(maxtyp)
-      real*8 weight(maxtyp)
-      character*3 symbol(maxtyp)
-      character*24 describe(maxtyp)
+      integer, allocatable :: atmcls(:)
+      integer, allocatable :: atmnum(:)
+      integer, allocatable :: ligand(:)
+      real*8, allocatable :: weight(:)
+      character*3, allocatable :: symbol(:)
+      character*24, allocatable :: describe(:)
       save
       end

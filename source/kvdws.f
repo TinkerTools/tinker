@@ -20,12 +20,11 @@ c     reduct   van der Waals reduction factor for each atom type
 c
 c
       module kvdws
-      use sizes
       implicit none
-      real*8 rad(maxtyp)
-      real*8 eps(maxtyp)
-      real*8 rad4(maxtyp)
-      real*8 eps4(maxtyp)
-      real*8 reduct(maxtyp)
+      real*8, allocatable :: rad(:)
+      real*8, allocatable :: eps(:)
+      real*8, allocatable :: rad4(:)
+      real*8, allocatable :: eps4(:)
+      real*8, allocatable :: reduct(:)
       save
       end

@@ -43,7 +43,7 @@ c
       integer next,freeunit
       integer igeo,ngeo,nhydro
       integer r1,r2,r3,r4,b1,b2
-      real*8 angle,weigh
+      real*8 cosine,weigh
       real*8 hbond1,hbond2
       real*8 bndfac,angfac
       real*8 radi,rmsvalue
@@ -425,9 +425,9 @@ c     angfac = 0.01d0
      &                    + (z(ib)-z(ic))**2)
          rac = sqrt((x(ia)-x(ic))**2 + (y(ia)-y(ic))**2
      &                    + (z(ia)-z(ic))**2)
-         angle = acos((rab**2+rbc**2-rac**2) / (2.0d0*rab*rbc))
-         cosmin = cos(angle*(1.0d0-angfac))
-         cosmax = cos(min(pi,angle*(1.0d0+angfac)))
+         cosine = (rab**2+rbc**2-rac**2) / (2.0d0*rab*rbc)
+         cosmin = min(1.0d0,cosine+angfac)
+         cosmax = max(-1.0d0,cosine-angfac)
          qab = min(dbnd(ia,ib),dbnd(ib,ia))
          qbc = min(dbnd(ic,ib),dbnd(ib,ic))
          bndmin = qab**2 + qbc**2 - 2.0d0*qab*qbc*cosmin

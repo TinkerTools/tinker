@@ -902,7 +902,7 @@ c     create random box full of the current coordinates file
 c
       if (mode .eq. 19) then
          write (iout,360)
-  360    format (/,' Enter Number of Copies to put in Box :  ',$)
+  360    format (/,' Enter Number of Copies to Put in Box :  ',$)
          read (input,370)  ncopy
   370    format (i10)
          xbox = 0.0d0
@@ -984,6 +984,7 @@ c
          deallocate (x0)
          deallocate (y0)
          deallocate (z0)
+         offset = 0
          n = ncopy * n
          call lattice
          call molecule
@@ -1005,7 +1006,7 @@ c
       if (opened) then
          close (unit=imod)
          write (iout,410)  modfile
-  410    format (/,' New Coordinates written to File :  ',a)
+  410    format (/,' New Coordinates Written to File :  ',a)
       end if
       close (unit=ixyz)
       call final

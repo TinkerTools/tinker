@@ -62,7 +62,17 @@ c
       do i = 1, n
          aeopb(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nopbend.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Out-of-Plane Bend Interactions :',
+     &           //,' Type',25x,'Atom Names',21x,'Angle',
+     &              6x,'Energy',/)
+      end if
 c
 c     calculate the out-of-plane bending energy term
 c
@@ -170,15 +180,15 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Out-of-Plane Bend',
+                     write (iout,20)
+   20                format (/,' Individual Out-of-Plane Bend',
      &                          ' Interactions :',
      &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
-                  write (iout,20)  id,name(id),ib,name(ib),ia,
+                  write (iout,30)  id,name(id),ib,name(ib),ia,
      &                             name(ia),ic,name(ic),angle,e
-   20             format (' O-P-Bend',2x,4(i7,'-',a3),f11.4,f12.4)
+   30             format (' O-P-Bend',2x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if

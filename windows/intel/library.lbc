@@ -141,6 +141,10 @@ epitors.obj
 epitors1.obj
 epitors2.obj
 epitors3.obj
+epolar.obj
+epolar1.obj
+epolar2.obj
+epolar3.obj
 erf.obj
 erxnfld.obj
 erxnfld1.obj
@@ -314,6 +318,7 @@ moment.obj
 moments.obj
 mplpot.obj
 mpole.obj
+mrecip.obj
 mutant.obj
 mutate.obj
 nblist.obj
@@ -410,6 +415,7 @@ server.obj
 shakeup.obj
 shunt.obj
 sigmoid.obj
+simplex.obj
 sizes.obj
 sktstuff.obj
 socket.obj

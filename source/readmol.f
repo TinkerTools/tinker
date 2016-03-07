@@ -51,6 +51,11 @@ c
          end if
       end if
 c
+c     zero out the total number of atoms and of bonds
+c
+      n = 0
+      nbond = 0
+c
 c     get title line and get the number of atoms and bonds
 c
       read (imdl,20)  title
@@ -94,7 +99,7 @@ c
          i12(n12(ib),ib) = ia
       end do
 c
-c     assign basic atom types to each of the atoms
+c     assign atom types from atomic number and connectivity
 c
       do i = 1, n
          type(i) = 0

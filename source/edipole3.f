@@ -61,7 +61,17 @@ c
          aed(i) = 0.0d0
       end do
       if (ndipole .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. ndipole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Dipole-Dipole Interactions :',
+     &           //,' Type',15x,'Dipole 1',14x,'Dipole 2',
+     &              8x,'Distance',6x,'Energy',/)
+      end if
 c
 c     set conversion factor and switching function coefficients
 c
@@ -154,17 +164,17 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Dipole-Dipole',
+                        write (iout,20)
+   20                   format (/,' Individual Dipole-Dipole',
      &                             ' Interactions :',
      &                          //,' Type',15x,'Dipole 1',14x,
      &                             'Dipole 2',8x,'Distance',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i1,name(i1),i2,name(i2),
+                     write (iout,30)  i1,name(i1),i2,name(i2),
      &                                k1,name(k1),k2,name(k2),
      &                                sqrt(r2),e
-   20                format (' Dipole',4x,4(i7,'-',a3),f11.4,f12.4)
+   30                format (' Dipole',4x,4(i7,'-',a3),f11.4,f12.4)
                   end if
                end if
             end if
@@ -271,17 +281,17 @@ c
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
-                           write (iout,30)
-   30                      format (/,' Individual Dipole-Dipole',
+                           write (iout,40)
+   40                      format (/,' Individual Dipole-Dipole',
      &                                ' Interactions :',
      &                             //,' Type',15x,'Dipole 1',14x,
      &                                'Dipole 2',8x,'Distance',
      &                                6x,'Energy',/)
                         end if
-                        write (iout,40)  i1,name(i1),i2,name(i2),
+                        write (iout,50)  i1,name(i1),i2,name(i2),
      &                                   k1,name(k1),k2,name(k2),
      &                                   sqrt(r2),e
-   40                format (' Dipole',4x,4(i7,'-',a3),f11.4,f12.4)
+   50                format (' Dipole',4x,4(i7,'-',a3),f11.4,f12.4)
                      end if
                   end if
                end do

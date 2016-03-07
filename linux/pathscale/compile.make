@@ -96,6 +96,7 @@ pathf90 -c -O -msse3 -openmp moldyn.f
 pathf90 -c -O -msse3 -openmp moment.f
 pathf90 -c -O -msse3 -openmp mplpot.f
 pathf90 -c -O -msse3 -openmp mpole.f
+pathf90 -c -O -msse3 -openmp mrecip.f
 pathf90 -c -O -msse3 -openmp mutant.f
 pathf90 -c -O -msse3 -openmp neigh.f
 pathf90 -c -O -msse3 -openmp nonpol.f
@@ -289,6 +290,10 @@ pathf90 -c -O -msse3 -openmp epitors.f
 pathf90 -c -O -msse3 -openmp epitors1.f
 pathf90 -c -O -msse3 -openmp epitors2.f
 pathf90 -c -O -msse3 -openmp epitors3.f
+pathf90 -c -O -msse3 -openmp epolar.f
+pathf90 -c -O -msse3 -openmp epolar1.f
+pathf90 -c -O -msse3 -openmp epolar2.f
+pathf90 -c -O -msse3 -openmp epolar3.f
 pathf90 -c -O -msse3 -openmp erf.f
 pathf90 -c -O -msse3 -openmp erxnfld.f
 pathf90 -c -O -msse3 -openmp erxnfld1.f
@@ -493,6 +498,7 @@ pathf90 -c -O -msse3 -openmp search.f
 pathf90 -c -O -msse3 -openmp server.f
 pathf90 -c -O -msse3 -openmp shakeup.f
 pathf90 -c -O -msse3 -openmp sigmoid.f
+pathf90 -c -O -msse3 -openmp simplex.f
 pathf90 -c -O -msse3 -openmp sktstuff.f
 pathf90 -c -O -msse3 -openmp sniffer.f
 pathf90 -c -O -msse3 -openmp sort.f

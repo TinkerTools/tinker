@@ -50,7 +50,17 @@ c
       do i = 1, n
          aeb(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nbond.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Bond Stretching Interactions :',
+     &           //,' Type',14x,'Atom Names',22x,'Ideal',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -130,14 +140,14 @@ c
             if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
-                  write (iout,10)
-   10             format (/,' Individual Bond Stretching',
+                  write (iout,20)
+   20             format (/,' Individual Bond Stretching',
      &                       ' Interactions :',
      &                    //,' Type',14x,'Atom Names',22x,'Ideal',
      &                       4x,'Actual',6x,'Energy',/)
                end if
-               write (iout,20)  ia,name(ia),ib,name(ib),ideal,rab,e
-   20          format (' Bond',6x,2(i7,'-',a3),13x,2f10.4,f12.4)
+               write (iout,30)  ia,name(ia),ib,name(ib),ideal,rab,e
+   30          format (' Bond',6x,2(i7,'-',a3),13x,2f10.4,f12.4)
             end if
          end if
       end do

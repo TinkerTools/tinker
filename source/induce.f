@@ -196,8 +196,6 @@ c
       real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: rsdp(:,:)
       real*8, allocatable :: zrsd(:,:)
@@ -206,6 +204,8 @@ c
       real*8, allocatable :: conjp(:,:)
       real*8, allocatable :: vec(:,:)
       real*8, allocatable :: vecp(:,:)
+      real*8, allocatable :: usum(:,:)
+      real*8, allocatable :: usump(:,:)
       logical done
       character*6 mode
 c
@@ -224,8 +224,6 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (field(3,npole))
       allocate (fieldp(3,npole))
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
 c
 c     get the electrostatic field due to permanent multipoles
 c
@@ -240,13 +238,67 @@ c
 c     set induced dipoles to polarizability times direct field
 c
       do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-         end do
+         if (douind(ipole(i))) then
+            do j = 1, 3
+               udir(j,i) = polarity(i) * field(j,i)
+               udirp(j,i) = polarity(i) * fieldp(j,i)
+               uind(j,i) = udir(j,i)
+               uinp(j,i) = udirp(j,i)
+            end do
+         end if
       end do
+c
+c     get induced dipoles via the ExPT extrapolation method
+c
+      if (poltyp .eq. 'EXTRAP') then
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uxtr(0,j,i) = udir(j,i)
+                  uxtrp(0,j,i) = udirp(j,i)
+               end do
+            end if
+         end do
+         do k = 1, cxmax
+            if (use_ewald) then
+               call ufield0c (field,fieldp)
+            else if (use_mlist) then
+               call ufield0b (field,fieldp)
+            else
+               call ufield0a (field,fieldp)
+            end if
+            do i = 1, npole
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uxtr(k,j,i) = polarity(i) * field(j,i)
+                     uxtrp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uind(j,i) = uxtr(k,j,i)
+                     uinp(j,i) = uxtrp(k,j,i)
+                  end do
+               end if
+            end do
+         end do
+         allocate (usum(3,n))
+         allocate (usump(3,n))
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uind(j,i) = 0.0d0
+                  uinp(j,i) = 0.0d0
+                  usum(j,i) = 0.0d0
+                  usump(j,i) = 0.0d0
+                  do k = 0, cxmax
+                     usum(j,i) = usum(j,i) + uxtr(k,j,i)
+                     usump(j,i) = usump(j,i) + uxtrp(k,j,i)
+                     uind(j,i) = uind(j,i) + cxtr(k)*usum(j,i)
+                     uinp(j,i) = uinp(j,i) + cxtr(k)*usump(j,i)
+                  end do
+               end do
+            end if
+         end do
+         deallocate (usum)
+         deallocate (usump)
+      end if
 c
 c     set tolerances for computation of mutual induced dipoles
 c
@@ -300,13 +352,20 @@ c
 c     set initial conjugate gradient residual and conjugate vector
 c
          do i = 1, npole
-            poli(i) = max(polmin,polarity(i))
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                       + fieldp(j,i)
-            end do
+            if (douind(ipole(i))) then
+               poli(i) = max(polmin,polarity(i))
+               do j = 1, 3
+                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                          + field(j,i)
+                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                          + fieldp(j,i)
+               end do
+            else
+               do j = 1, 3
+                  rsd(j,i) = 0.0d0
+                  rsdp(j,i) = 0.0d0
+               end do
+            end if
          end do
          mode = 'BUILD'
          if (use_mlist) then
@@ -319,10 +378,12 @@ c
             call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
          end if
          do i = 1, npole
-            do j = 1, 3
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-            end do
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  conj(j,i) = zrsd(j,i)
+                  conjp(j,i) = zrsdp(j,i)
+               end do
+            end if
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -330,12 +391,14 @@ c
          do while (.not. done)
             iter = iter + 1
             do i = 1, npole
-               do j = 1, 3
-                  vec(j,i) = uind(j,i)
-                  vecp(j,i) = uinp(j,i)
-                  uind(j,i) = conj(j,i)
-                  uinp(j,i) = conjp(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     vec(j,i) = uind(j,i)
+                     vecp(j,i) = uinp(j,i)
+                     uind(j,i) = conj(j,i)
+                     uinp(j,i) = conjp(j,i)
+                  end do
+               end if
             end do
             if (use_ewald) then
                call ufield0c (field,fieldp)
@@ -345,34 +408,40 @@ c
                call ufield0a (field,fieldp)
             end if
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  uinp(j,i) = vecp(j,i)
-                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = vec(j,i)
+                     uinp(j,i) = vecp(j,i)
+                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                  end do
+               end if
             end do
             a = 0.0d0
             ap = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  a = a + conj(j,i)*vec(j,i)
-                  ap = ap + conjp(j,i)*vecp(j,i)
-                  sum = sum + rsd(j,i)*zrsd(j,i)
-                  sump = sump + rsdp(j,i)*zrsdp(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     a = a + conj(j,i)*vec(j,i)
+                     ap = ap + conjp(j,i)*vecp(j,i)
+                     sum = sum + rsd(j,i)*zrsd(j,i)
+                     sump = sump + rsdp(j,i)*zrsdp(j,i)
+                  end do
+               end if
             end do
             if (a .ne. 0.0d0)  a = sum / a
             if (ap .ne. 0.0d0)  ap = sump / ap
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = uind(j,i) + a*conj(j,i)
-                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = uind(j,i) + a*conj(j,i)
+                     uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                     rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                     rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                  end do
+               end if
             end do
             if (use_mlist) then
                call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
@@ -382,22 +451,26 @@ c
             b = 0.0d0
             bp = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  b = b + rsd(j,i)*zrsd(j,i)
-                  bp = bp + rsdp(j,i)*zrsdp(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     b = b + rsd(j,i)*zrsd(j,i)
+                     bp = bp + rsdp(j,i)*zrsdp(j,i)
+                  end do
+               end if
             end do
             if (sum .ne. 0.0d0)  b = b / sum
             if (sump .ne. 0.0d0)  bp = bp / sump
             epsd = 0.0d0
             epsp = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                     conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                     epsd = epsd + rsd(j,i)*rsd(j,i)
+                     epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                  end do
+               end if
             end do
 c
 c     check the convergence of the mutual induced dipoles
@@ -455,8 +528,6 @@ c     perform deallocation of some local arrays
 c
       deallocate (field)
       deallocate (fieldp)
-      deallocate (udir)
-      deallocate (udirp)
       return
       end
 c
@@ -532,6 +603,13 @@ c
       allocate (dscale(n))
       allocate (pscale(n))
 c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         dscale(i) = 1.0d0
+         pscale(i) = 1.0d0
+      end do
+c
 c     find the electrostatic field due to permanent multipoles
 c
       do i = 1, npole-1
@@ -548,10 +626,6 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         do j = i+1, npole
-            dscale(ipole(j)) = 1.0d0
-            pscale(ipole(j)) = 1.0d0
-         end do
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -651,6 +725,33 @@ c
                end if
             end if
          end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(ii)
+            pscale(i12(j,ii)) = 1.0d0
+         end do
+         do j = 1, n13(ii)
+            pscale(i13(j,ii)) = 1.0d0
+         end do
+         do j = 1, n14(ii)
+            pscale(i14(j,ii)) = 1.0d0
+         end do
+         do j = 1, n15(ii)
+            pscale(i15(j,ii)) = 1.0d0
+         end do
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = 1.0d0
+         end do
       end do
 c
 c     periodic boundary for large cutoffs via replicates method
@@ -670,10 +771,6 @@ c
             qiyy = rpole(9,i)
             qiyz = rpole(10,i)
             qizz = rpole(13,i)
-            do j = i, npole
-               dscale(ipole(j)) = 1.0d0
-               pscale(ipole(j)) = 1.0d0
-            end do
             do j = 1, n12(ii)
                pscale(i12(j,ii)) = p2scale
             end do
@@ -762,7 +859,7 @@ c
                         fip(j) = fid(j)
                         fkp(j) = fkd(j)
                      end do
-                     if (use_polymer .and. r2 .le. polycut2) then
+                     if (use_polymer .and. r2.le.polycut2) then
                         do j = 1, 3
                            fid(j) = fid(j) * dscale(kk)
                            fip(j) = fip(j) * pscale(kk)
@@ -780,6 +877,33 @@ c
                      end do
                   end if
                end do
+            end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+            do j = 1, n12(ii)
+               pscale(i12(j,ii)) = 1.0d0
+            end do
+            do j = 1, n13(ii)
+               pscale(i13(j,ii)) = 1.0d0
+            end do
+            do j = 1, n14(ii)
+               pscale(i14(j,ii)) = 1.0d0
+            end do
+            do j = 1, n15(ii)
+               pscale(i15(j,ii)) = 1.0d0
+            end do
+            do j = 1, np11(ii)
+               dscale(ip11(j,ii)) = 1.0d0
+            end do
+            do j = 1, np12(ii)
+               dscale(ip12(j,ii)) = 1.0d0
+            end do
+            do j = 1, np13(ii)
+               dscale(ip13(j,ii)) = 1.0d0
+            end do
+            do j = 1, np14(ii)
+               dscale(ip14(j,ii)) = 1.0d0
             end do
          end do
       end if
@@ -831,7 +955,7 @@ c
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical proceed
@@ -854,7 +978,13 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dscale(n))
+      allocate (uscale(n))
+c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         uscale(i) = 1.0d0
+      end do
 c
 c     find the electrostatic field due to mutual induced dipoles
 c
@@ -868,20 +998,17 @@ c
          puix = uinp(1,i)
          puiy = uinp(2,i)
          puiz = uinp(3,i)
-         do j = i+1, npole
-            dscale(ipole(j)) = 1.0d0
-         end do
          do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = u1scale
+            uscale(ip11(j,ii)) = u1scale
          end do
          do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = u2scale
+            uscale(ip12(j,ii)) = u2scale
          end do
          do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = u3scale
+            uscale(ip13(j,ii)) = u3scale
          end do
          do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = u4scale
+            uscale(ip14(j,ii)) = u4scale
          end do
          do k = i+1, npole
             kk = ipole(k)
@@ -901,8 +1028,8 @@ c
                   pukx = uinp(1,k)
                   puky = uinp(2,k)
                   pukz = uinp(3,k)
-                  scale3 = dscale(kk)
-                  scale5 = dscale(kk)
+                  scale3 = uscale(kk)
+                  scale5 = uscale(kk)
                   damp = pdi * pdamp(k)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(k))
@@ -913,24 +1040,24 @@ c
                         scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
                      end if
                   end if
-                  rr3 = scale3 / (r*r2)
+                  rr3 = -scale3 / (r*r2)
                   rr5 = 3.0d0 * scale5 / (r*r2*r2)
                   duir = xr*duix + yr*duiy + zr*duiz
                   dukr = xr*dukx + yr*duky + zr*dukz
                   puir = xr*puix + yr*puiy + zr*puiz
                   pukr = xr*pukx + yr*puky + zr*pukz
-                  fid(1) = -rr3*dukx + rr5*dukr*xr
-                  fid(2) = -rr3*duky + rr5*dukr*yr
-                  fid(3) = -rr3*dukz + rr5*dukr*zr
-                  fkd(1) = -rr3*duix + rr5*duir*xr
-                  fkd(2) = -rr3*duiy + rr5*duir*yr
-                  fkd(3) = -rr3*duiz + rr5*duir*zr
-                  fip(1) = -rr3*pukx + rr5*pukr*xr
-                  fip(2) = -rr3*puky + rr5*pukr*yr
-                  fip(3) = -rr3*pukz + rr5*pukr*zr
-                  fkp(1) = -rr3*puix + rr5*puir*xr
-                  fkp(2) = -rr3*puiy + rr5*puir*yr
-                  fkp(3) = -rr3*puiz + rr5*puir*zr
+                  fid(1) = rr3*dukx + rr5*dukr*xr
+                  fid(2) = rr3*duky + rr5*dukr*yr
+                  fid(3) = rr3*dukz + rr5*dukr*zr
+                  fkd(1) = rr3*duix + rr5*duir*xr
+                  fkd(2) = rr3*duiy + rr5*duir*yr
+                  fkd(3) = rr3*duiz + rr5*duir*zr
+                  fip(1) = rr3*pukx + rr5*pukr*xr
+                  fip(2) = rr3*puky + rr5*pukr*yr
+                  fip(3) = rr3*pukz + rr5*pukr*zr
+                  fkp(1) = rr3*puix + rr5*puir*xr
+                  fkp(2) = rr3*puiy + rr5*puir*yr
+                  fkp(3) = rr3*puiz + rr5*puir*zr
                   do j = 1, 3
                      field(j,i) = field(j,i) + fid(j)
                      field(j,k) = field(j,k) + fkd(j)
@@ -939,6 +1066,21 @@ c
                   end do
                end if
             end if
+         end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, np11(ii)
+            uscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            uscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            uscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
 c
@@ -956,19 +1098,19 @@ c
             puiy = uinp(2,i)
             puiz = uinp(3,i)
             do j = i, npole
-               dscale(ipole(j)) = 1.0d0
+               uscale(ipole(j)) = 1.0d0
             end do
             do j = 1, np11(ii)
-               dscale(ip11(j,ii)) = u1scale
+               uscale(ip11(j,ii)) = u1scale
             end do
             do j = 1, np12(ii)
-               dscale(ip12(j,ii)) = u2scale
+               uscale(ip12(j,ii)) = u2scale
             end do
             do j = 1, np13(ii)
-               dscale(ip13(j,ii)) = u3scale
+               uscale(ip13(j,ii)) = u3scale
             end do
             do j = 1, np14(ii)
-               dscale(ip14(j,ii)) = u4scale
+               uscale(ip14(j,ii)) = u4scale
             end do
             do k = i, npole
                kk = ipole(k)
@@ -999,31 +1141,31 @@ c
                            scale5 = 1.0d0 - expdamp*(1.0d0-damp)
                         end if
                      end if
-                     rr3 = scale3 / (r*r2)
+                     rr3 = -scale3 / (r*r2)
                      rr5 = 3.0d0 * scale5 / (r*r2*r2)
                      duir = xr*duix + yr*duiy + zr*duiz
                      dukr = xr*dukx + yr*duky + zr*dukz
                      puir = xr*puix + yr*puiy + zr*puiz
                      pukr = xr*pukx + yr*puky + zr*pukz
-                     fid(1) = -rr3*dukx + rr5*dukr*xr
-                     fid(2) = -rr3*duky + rr5*dukr*yr
-                     fid(3) = -rr3*dukz + rr5*dukr*zr
-                     fkd(1) = -rr3*duix + rr5*duir*xr
-                     fkd(2) = -rr3*duiy + rr5*duir*yr
-                     fkd(3) = -rr3*duiz + rr5*duir*zr
-                     fip(1) = -rr3*pukx + rr5*pukr*xr
-                     fip(2) = -rr3*puky + rr5*pukr*yr
-                     fip(3) = -rr3*pukz + rr5*pukr*zr
-                     fkp(1) = -rr3*puix + rr5*puir*xr
-                     fkp(2) = -rr3*puiy + rr5*puir*yr
-                     fkp(3) = -rr3*puiz + rr5*puir*zr
+                     fid(1) = rr3*dukx + rr5*dukr*xr
+                     fid(2) = rr3*duky + rr5*dukr*yr
+                     fid(3) = rr3*dukz + rr5*dukr*zr
+                     fkd(1) = rr3*duix + rr5*duir*xr
+                     fkd(2) = rr3*duiy + rr5*duir*yr
+                     fkd(3) = rr3*duiz + rr5*duir*zr
+                     fip(1) = rr3*pukx + rr5*pukr*xr
+                     fip(2) = rr3*puky + rr5*pukr*yr
+                     fip(3) = rr3*pukz + rr5*pukr*zr
+                     fkp(1) = rr3*puix + rr5*puir*xr
+                     fkp(2) = rr3*puiy + rr5*puir*yr
+                     fkp(3) = rr3*puiz + rr5*puir*zr
                      if (use_polymer) then
                         if (r2 .le. polycut2) then
                            do j = 1, 3
-                              fid(j) = fid(j) * dscale(kk)
-                              fkd(j) = fkd(j) * dscale(kk)
-                              fip(j) = fip(j) * dscale(kk)
-                              fkp(j) = fkp(j) * dscale(kk)
+                              fid(j) = fid(j) * uscale(kk)
+                              fkd(j) = fkd(j) * uscale(kk)
+                              fip(j) = fip(j) * uscale(kk)
+                              fkp(j) = fkp(j) * uscale(kk)
                            end do
                         end if
                      end if
@@ -1038,12 +1180,27 @@ c
                   end if
                end do
             end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+            do j = 1, np11(ii)
+               uscale(ip11(j,ii)) = 1.0d0
+            end do
+            do j = 1, np12(ii)
+               uscale(ip12(j,ii)) = 1.0d0
+            end do
+            do j = 1, np13(ii)
+               uscale(ip13(j,ii)) = 1.0d0
+            end do
+            do j = 1, np14(ii)
+               uscale(ip14(j,ii)) = 1.0d0
+            end do
          end do
       end if
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
+      deallocate (uscale)
       return
       end
 c
@@ -1118,6 +1275,13 @@ c
       allocate (dscale(n))
       allocate (pscale(n))
 c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         dscale(i) = 1.0d0
+         pscale(i) = 1.0d0
+      end do
+c
 c     find the electrostatic field due to permanent multipoles
 c
       do i = 1, npole
@@ -1134,10 +1298,6 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         do j = 1, nelst(i)
-            dscale(ipole(elst(j,i))) = 1.0d0
-            pscale(ipole(elst(j,i))) = 1.0d0
-         end do
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -1238,6 +1398,33 @@ c
                end if
             end if
          end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, n12(ii)
+            pscale(i12(j,ii)) = 1.0d0
+         end do
+         do j = 1, n13(ii)
+            pscale(i13(j,ii)) = 1.0d0
+         end do
+         do j = 1, n14(ii)
+            pscale(i14(j,ii)) = 1.0d0
+         end do
+         do j = 1, n15(ii)
+            pscale(i15(j,ii)) = 1.0d0
+         end do
+         do j = 1, np11(ii)
+            dscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            dscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            dscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            dscale(ip14(j,ii)) = 1.0d0
+         end do
       end do
 c
 c     perform deallocation of some local arrays
@@ -1287,7 +1474,7 @@ c
       real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical proceed
@@ -1310,7 +1497,13 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dscale(n))
+      allocate (uscale(n))
+c
+c     set array needed to scale connected atom interactions
+c
+      do i = 1, n
+         uscale(i) = 1.0d0
+      end do
 c
 c     find the electrostatic field due to mutual induced dipoles
 c
@@ -1324,20 +1517,17 @@ c
          puix = uinp(1,i)
          puiy = uinp(2,i)
          puiz = uinp(3,i)
-         do j = 1, nelst(i)
-            dscale(ipole(elst(j,i))) = 1.0d0
-         end do
          do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = u1scale
+            uscale(ip11(j,ii)) = u1scale
          end do
          do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = u2scale
+            uscale(ip12(j,ii)) = u2scale
          end do
          do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = u3scale
+            uscale(ip13(j,ii)) = u3scale
          end do
          do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = u4scale
+            uscale(ip14(j,ii)) = u4scale
          end do
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
@@ -1358,8 +1548,8 @@ c
                   pukx = uinp(1,k)
                   puky = uinp(2,k)
                   pukz = uinp(3,k)
-                  scale3 = dscale(kk)
-                  scale5 = dscale(kk)
+                  scale3 = uscale(kk)
+                  scale5 = uscale(kk)
                   damp = pdi * pdamp(k)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(k))
@@ -1370,24 +1560,24 @@ c
                         scale5 = scale5 * (1.0d0-(1.0d0-damp)*expdamp)
                      end if
                   end if
-                  rr3 = scale3 / (r*r2)
+                  rr3 = -scale3 / (r*r2)
                   rr5 = 3.0d0 * scale5 / (r*r2*r2)
                   duir = xr*duix + yr*duiy + zr*duiz
                   dukr = xr*dukx + yr*duky + zr*dukz
                   puir = xr*puix + yr*puiy + zr*puiz
                   pukr = xr*pukx + yr*puky + zr*pukz
-                  fid(1) = -rr3*dukx + rr5*dukr*xr
-                  fid(2) = -rr3*duky + rr5*dukr*yr
-                  fid(3) = -rr3*dukz + rr5*dukr*zr
-                  fkd(1) = -rr3*duix + rr5*duir*xr
-                  fkd(2) = -rr3*duiy + rr5*duir*yr
-                  fkd(3) = -rr3*duiz + rr5*duir*zr
-                  fip(1) = -rr3*pukx + rr5*pukr*xr
-                  fip(2) = -rr3*puky + rr5*pukr*yr
-                  fip(3) = -rr3*pukz + rr5*pukr*zr
-                  fkp(1) = -rr3*puix + rr5*puir*xr
-                  fkp(2) = -rr3*puiy + rr5*puir*yr
-                  fkp(3) = -rr3*puiz + rr5*puir*zr
+                  fid(1) = rr3*dukx + rr5*dukr*xr
+                  fid(2) = rr3*duky + rr5*dukr*yr
+                  fid(3) = rr3*dukz + rr5*dukr*zr
+                  fkd(1) = rr3*duix + rr5*duir*xr
+                  fkd(2) = rr3*duiy + rr5*duir*yr
+                  fkd(3) = rr3*duiz + rr5*duir*zr
+                  fip(1) = rr3*pukx + rr5*pukr*xr
+                  fip(2) = rr3*puky + rr5*pukr*yr
+                  fip(3) = rr3*pukz + rr5*pukr*zr
+                  fkp(1) = rr3*puix + rr5*puir*xr
+                  fkp(2) = rr3*puiy + rr5*puir*yr
+                  fkp(3) = rr3*puiz + rr5*puir*zr
                   do j = 1, 3
                      field(j,i) = field(j,i) + fid(j)
                      field(j,k) = field(j,k) + fkd(j)
@@ -1397,11 +1587,26 @@ c
                end if
             end if
          end do
+c
+c     reset interaction scaling coefficients for connected atoms
+c
+         do j = 1, np11(ii)
+            uscale(ip11(j,ii)) = 1.0d0
+         end do
+         do j = 1, np12(ii)
+            uscale(ip12(j,ii)) = 1.0d0
+         end do
+         do j = 1, np13(ii)
+            uscale(ip13(j,ii)) = 1.0d0
+         end do
+         do j = 1, np14(ii)
+            uscale(ip14(j,ii)) = 1.0d0
+         end do
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
+      deallocate (uscale)
       return
       end
 c
@@ -2325,7 +2530,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      if (poltyp .eq. 'MUTUAL') then
+      if (poltyp .ne. 'DIRECT') then
          allocate (ilocal(2,maxlocal))
          allocate (dlocal(6,maxlocal))
       end if
@@ -2491,7 +2696,7 @@ c
 c
 c     find terms needed later to compute mutual polarization
 c
-               if (poltyp .eq. 'MUTUAL') then
+               if (poltyp .ne. 'DIRECT') then
                   bcn(1) = bn(1) - (1.0d0-scale3*uscale(kk))*rr3
                   bcn(2) = bn(2) - 3.0d0*(1.0d0-scale5*uscale(kk))*rr5
                   nlocal = nlocal + 1
@@ -2569,7 +2774,7 @@ c
       toffset0 = toffset0 + nlocal
       ntpair = toffset0
 !$OMP END CRITICAL
-      if (poltyp .eq. 'MUTUAL') then
+      if (poltyp .ne. 'DIRECT') then
          k = toffset(tid)
          do i = 1, nlocal
             m = k + i
@@ -3204,10 +3409,6 @@ c
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
       real*8, allocatable :: fieldps(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: udirs(:,:)
-      real*8, allocatable :: udirps(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: rsdp(:,:)
       real*8, allocatable :: rsds(:,:)
@@ -3224,6 +3425,10 @@ c
       real*8, allocatable :: vecp(:,:)
       real*8, allocatable :: vecs(:,:)
       real*8, allocatable :: vecps(:,:)
+      real*8, allocatable :: usum(:,:)
+      real*8, allocatable :: usump(:,:)
+      real*8, allocatable :: usums(:,:)
+      real*8, allocatable :: usumps(:,:)
       logical done
       character*6 mode
 c
@@ -3252,10 +3457,6 @@ c
       allocate (fieldp(3,npole))
       allocate (fields(3,npole))
       allocate (fieldps(3,npole))
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-      allocate (udirs(3,npole))
-      allocate (udirps(3,npole))
 c
 c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
@@ -3267,17 +3468,83 @@ c     set SCRF induced dipoles to polarizability times direct field
 c     plus the GK reaction field due to permanent multipoles
 c
       do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            udirs(j,i) = polarity(i) * fields(j,i)
-            udirps(j,i) = polarity(i) * fieldps(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-            uinds(j,i) = udirs(j,i)
-            uinps(j,i) = udirps(j,i)
-         end do
+         if (douind(ipole(i))) then
+            do j = 1, 3
+               udir(j,i) = polarity(i) * field(j,i)
+               udirp(j,i) = polarity(i) * fieldp(j,i)
+               udirs(j,i) = polarity(i) * fields(j,i)
+               udirps(j,i) = polarity(i) * fieldps(j,i)
+               uind(j,i) = udir(j,i)
+               uinp(j,i) = udirp(j,i)
+               uinds(j,i) = udirs(j,i)
+               uinps(j,i) = udirps(j,i)
+            end do
+         end if
       end do
+c
+c     get induced dipoles via the ExPT extrapolation method
+c
+      if (poltyp .eq. 'EXTRAP') then
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uxtr(0,j,i) = udir(j,i)
+                  uxtrp(0,j,i) = udirp(j,i)
+                  uxtrs(0,j,i) = udirs(j,i)
+                  uxtrps(0,j,i) = udirps(j,i)
+               end do
+            end if
+         end do
+         do k = 1, cxmax
+            call ufield0d (field,fieldp,fields,fieldps)
+            do i = 1, npole
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uxtr(k,j,i) = polarity(i) * field(j,i)
+                     uxtrp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uxtrs(k,j,i) = polarity(i) * fields(j,i)
+                     uxtrps(k,j,i) = polarity(i) * fieldps(j,i)
+                     uind(j,i) = uxtr(k,j,i)
+                     uinp(j,i) = uxtrp(k,j,i)
+                     uinds(j,i) = uxtrs(k,j,i)
+                     uinps(j,i) = uxtrps(k,j,i)
+                  end do
+               end if
+            end do
+         end do
+         allocate (usum(3,n))
+         allocate (usump(3,n))
+         allocate (usums(3,n))
+         allocate (usumps(3,n))
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uind(j,i) = 0.0d0
+                  uinp(j,i) = 0.0d0
+                  uinds(j,i) = 0.0d0
+                  uinps(j,i) = 0.0d0
+                  usum(j,i) = 0.0d0
+                  usump(j,i) = 0.0d0
+                  usums(j,i) = 0.0d0
+                  usumps(j,i) = 0.0d0
+                  do k = 0, cxmax
+                     usum(j,i) = usum(j,i) + uxtr(k,j,i)
+                     usump(j,i) = usump(j,i) + uxtrp(k,j,i)
+                     usums(j,i) = usums(j,i) + uxtrs(k,j,i)
+                     usumps(j,i) = usumps(j,i) + uxtrps(k,j,i)
+                     uind(j,i) = uind(j,i) + cxtr(k)*usum(j,i)
+                     uinp(j,i) = uinp(j,i) + cxtr(k)*usump(j,i)
+                     uinds(j,i) = uinds(j,i) + cxtr(k)*usums(j,i)
+                     uinps(j,i) = uinps(j,i) + cxtr(k)*usumps(j,i)
+                  end do
+               end do
+            end if
+         end do
+         deallocate (usum)
+         deallocate (usump)
+         deallocate (usums)
+         deallocate (usumps)
+      end if
 c
 c     set tolerances for computation of mutual induced dipoles
 c
@@ -3335,25 +3602,27 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0d (field,fieldp,fields,fieldps)
          do i = 1, npole
-            poli(i) = max(polmin,polarity(i))
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                        + fieldp(j,i)
-               rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
-     &                        + fields(j,i)
-               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
-     &                         + fieldps(j,i)
-               zrsd(j,i) = rsd(j,i) * poli(i)
-               zrsdp(j,i) = rsdp(j,i) * poli(i)
-               zrsds(j,i) = rsds(j,i) * poli(i)
-               zrsdps(j,i) = rsdps(j,i) * poli(i)
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-               conjs(j,i) = zrsds(j,i)
-               conjps(j,i) = zrsdps(j,i)
-            end do
+            if (douind(ipole(i))) then
+               poli(i) = max(polmin,polarity(i))
+               do j = 1, 3
+                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                          + field(j,i)
+                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                           + fieldp(j,i)
+                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
+     &                           + fields(j,i)
+                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
+     &                            + fieldps(j,i)
+                  zrsd(j,i) = rsd(j,i) * poli(i)
+                  zrsdp(j,i) = rsdp(j,i) * poli(i)
+                  zrsds(j,i) = rsds(j,i) * poli(i)
+                  zrsdps(j,i) = rsdps(j,i) * poli(i)
+                  conj(j,i) = zrsd(j,i)
+                  conjp(j,i) = zrsdp(j,i)
+                  conjs(j,i) = zrsds(j,i)
+                  conjps(j,i) = zrsdps(j,i)
+               end do
+            end if
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -3361,29 +3630,33 @@ c
          do while (.not. done)
             iter = iter + 1
             do i = 1, npole
-               do j = 1, 3
-                  vec(j,i) = uind(j,i)
-                  vecp(j,i) = uinp(j,i)
-                  vecs(j,i) = uinds(j,i)
-                  vecps(j,i) = uinps(j,i)
-                  uind(j,i) = conj(j,i)
-                  uinp(j,i) = conjp(j,i)
-                  uinds(j,i) = conjs(j,i)
-                  uinps(j,i) = conjps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     vec(j,i) = uind(j,i)
+                     vecp(j,i) = uinp(j,i)
+                     vecs(j,i) = uinds(j,i)
+                     vecps(j,i) = uinps(j,i)
+                     uind(j,i) = conj(j,i)
+                     uinp(j,i) = conjp(j,i)
+                     uinds(j,i) = conjs(j,i)
+                     uinps(j,i) = conjps(j,i)
+                  end do
+               end if
             end do
             call ufield0d (field,fieldp,fields,fieldps)
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  uinp(j,i) = vecp(j,i)
-                  uinds(j,i) = vecs(j,i)
-                  uinps(j,i) = vecps(j,i)
-                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
-                  vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
-                  vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = vec(j,i)
+                     uinp(j,i) = vecp(j,i)
+                     uinds(j,i) = vecs(j,i)
+                     uinps(j,i) = vecps(j,i)
+                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                     vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
+                     vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
+                  end do
+               end if
             end do
             a = 0.0d0
             ap = 0.0d0
@@ -3394,48 +3667,54 @@ c
             sums = 0.0d0
             sumps = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  a = a + conj(j,i)*vec(j,i)
-                  ap = ap + conjp(j,i)*vecp(j,i)
-                  as = as + conjs(j,i)*vecs(j,i)
-                  aps = aps + conjps(j,i)*vecps(j,i)
-                  sum = sum + rsd(j,i)*zrsd(j,i)
-                  sump = sump + rsdp(j,i)*zrsdp(j,i)
-                  sums = sums + rsds(j,i)*zrsds(j,i)
-                  sumps = sumps + rsdps(j,i)*zrsdps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     a = a + conj(j,i)*vec(j,i)
+                     ap = ap + conjp(j,i)*vecp(j,i)
+                     as = as + conjs(j,i)*vecs(j,i)
+                     aps = aps + conjps(j,i)*vecps(j,i)
+                     sum = sum + rsd(j,i)*zrsd(j,i)
+                     sump = sump + rsdp(j,i)*zrsdp(j,i)
+                     sums = sums + rsds(j,i)*zrsds(j,i)
+                     sumps = sumps + rsdps(j,i)*zrsdps(j,i)
+                  end do
+               end if
             end do
             if (a .ne. 0.0d0)  a = sum / a
             if (ap .ne. 0.0d0)  ap = sump / ap
             if (as .ne. 0.0d0)  as = sums / as
             if (aps .ne. 0.0d0)  aps = sumps / aps
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = uind(j,i) + a*conj(j,i)
-                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  uinds(j,i) = uinds(j,i) + as*conjs(j,i)
-                  uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
-                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = uind(j,i) + a*conj(j,i)
+                     uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                     uinds(j,i) = uinds(j,i) + as*conjs(j,i)
+                     uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
+                     rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                     rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                     rsds(j,i) = rsds(j,i) - as*vecs(j,i)
+                     rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
+                  end do
+               end if
             end do
             b = 0.0d0
             bp = 0.0d0
             bs = 0.0d0
             bps = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * poli(i)
-                  zrsdp(j,i) = rsdp(j,i) * poli(i)
-                  zrsds(j,i) = rsds(j,i) * poli(i)
-                  zrsdps(j,i) = rsdps(j,i) * poli(i)
-                  b = b + rsd(j,i)*zrsd(j,i)
-                  bp = bp + rsdp(j,i)*zrsdp(j,i)
-                  bs = bs + rsds(j,i)*zrsds(j,i)
-                  bps = bps + rsdps(j,i)*zrsdps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     zrsd(j,i) = rsd(j,i) * poli(i)
+                     zrsdp(j,i) = rsdp(j,i) * poli(i)
+                     zrsds(j,i) = rsds(j,i) * poli(i)
+                     zrsdps(j,i) = rsdps(j,i) * poli(i)
+                     b = b + rsd(j,i)*zrsd(j,i)
+                     bp = bp + rsdp(j,i)*zrsdp(j,i)
+                     bs = bs + rsds(j,i)*zrsds(j,i)
+                     bps = bps + rsdps(j,i)*zrsdps(j,i)
+                  end do
+               end if
             end do
             if (sum .ne. 0.0d0)  b = b / sum
             if (sump .ne. 0.0d0)  bp = bp / sump
@@ -3446,16 +3725,18 @@ c
             epsds = 0.0d0
             epsps = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
-                  conjs(j,i) = zrsds(j,i) + bs*conjs(j,i)
-                  conjps(j,i) = zrsdps(j,i) + bps*conjps(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-                  epsds = epsds + rsds(j,i)*rsds(j,i)
-                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                     conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                     conjs(j,i) = zrsds(j,i) + bs*conjs(j,i)
+                     conjps(j,i) = zrsdps(j,i) + bps*conjps(j,i)
+                     epsd = epsd + rsd(j,i)*rsd(j,i)
+                     epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                     epsds = epsds + rsds(j,i)*rsds(j,i)
+                     epsps = epsps + rsdps(j,i)*rsdps(j,i)
+                  end do
+               end if
             end do
 c
 c     check the convergence of the mutual induced dipoles
@@ -3523,10 +3804,6 @@ c
       deallocate (fieldp)
       deallocate (fields)
       deallocate (fieldps)
-      deallocate (udir)
-      deallocate (udirp)
-      deallocate (udirs)
-      deallocate (udirps)
       return
       end
 c
@@ -4081,7 +4358,7 @@ c
       real*8 fip(3),fkp(3)
       real*8 fids(3),fkds(3)
       real*8 fips(3),fkps(3)
-      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       real*8 fields(3,*)
@@ -4111,12 +4388,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dscale(n))
+      allocate (uscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
       do i = 1, n
-         dscale(i) = 1.0d0
+         uscale(i) = 1.0d0
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -4132,7 +4409,7 @@ c
 !$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
 !$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
 !$OMP& field,fieldp,fields,fieldps)
-!$OMP& firstprivate(dscale) shared(fieldt,fieldtp,fieldts,fieldtps)
+!$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
 c
 c     initialize local variables for OpenMP calculation
 c
@@ -4173,16 +4450,16 @@ c
          puiys = uinps(2,i)
          puizs = uinps(3,i)
          do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = u1scale
+            uscale(ip11(j,ii)) = u1scale
          end do
          do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = u2scale
+            uscale(ip12(j,ii)) = u2scale
          end do
          do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = u3scale
+            uscale(ip13(j,ii)) = u3scale
          end do
          do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = u4scale
+            uscale(ip14(j,ii)) = u4scale
          end do
          do k = i, npole
             kk = ipole(k)
@@ -4212,8 +4489,8 @@ c
                   pukys = uinps(2,k)
                   pukzs = uinps(3,k)
                   if (i .ne. k) then
-                     scale3 = dscale(kk)
-                     scale5 = dscale(kk)
+                     scale3 = uscale(kk)
+                     scale5 = uscale(kk)
                      damp = pdi * pdamp(k)
                      if (damp .ne. 0.0d0) then
                         pgamma = min(pti,thole(k))
@@ -4225,7 +4502,7 @@ c
      &                                           *expdamp)
                         end if
                      end if
-                     rr3 = scale3 / (r*r2)
+                     rr3 = -scale3 / (r*r2)
                      rr5 = 3.0d0 * scale5 / (r*r2*r2)
                      duir = xr*duix + yr*duiy + zr*duiz
                      dukr = xr*dukx + yr*duky + zr*dukz
@@ -4235,30 +4512,30 @@ c
                      dukrs = xr*dukxs + yr*dukys + zr*dukzs
                      puirs = xr*puixs + yr*puiys + zr*puizs
                      pukrs = xr*pukxs + yr*pukys + zr*pukzs
-                     fid(1) = -rr3*dukx + rr5*dukr*xr
-                     fid(2) = -rr3*duky + rr5*dukr*yr
-                     fid(3) = -rr3*dukz + rr5*dukr*zr
-                     fkd(1) = -rr3*duix + rr5*duir*xr
-                     fkd(2) = -rr3*duiy + rr5*duir*yr
-                     fkd(3) = -rr3*duiz + rr5*duir*zr
-                     fip(1) = -rr3*pukx + rr5*pukr*xr
-                     fip(2) = -rr3*puky + rr5*pukr*yr
-                     fip(3) = -rr3*pukz + rr5*pukr*zr
-                     fkp(1) = -rr3*puix + rr5*puir*xr
-                     fkp(2) = -rr3*puiy + rr5*puir*yr
-                     fkp(3) = -rr3*puiz + rr5*puir*zr
-                     fids(1) = -rr3*dukxs + rr5*dukrs*xr
-                     fids(2) = -rr3*dukys + rr5*dukrs*yr
-                     fids(3) = -rr3*dukzs + rr5*dukrs*zr
-                     fkds(1) = -rr3*duixs + rr5*duirs*xr
-                     fkds(2) = -rr3*duiys + rr5*duirs*yr
-                     fkds(3) = -rr3*duizs + rr5*duirs*zr
-                     fips(1) = -rr3*pukxs + rr5*pukrs*xr
-                     fips(2) = -rr3*pukys + rr5*pukrs*yr
-                     fips(3) = -rr3*pukzs + rr5*pukrs*zr
-                     fkps(1) = -rr3*puixs + rr5*puirs*xr
-                     fkps(2) = -rr3*puiys + rr5*puirs*yr
-                     fkps(3) = -rr3*puizs + rr5*puirs*zr
+                     fid(1) = rr3*dukx + rr5*dukr*xr
+                     fid(2) = rr3*duky + rr5*dukr*yr
+                     fid(3) = rr3*dukz + rr5*dukr*zr
+                     fkd(1) = rr3*duix + rr5*duir*xr
+                     fkd(2) = rr3*duiy + rr5*duir*yr
+                     fkd(3) = rr3*duiz + rr5*duir*zr
+                     fip(1) = rr3*pukx + rr5*pukr*xr
+                     fip(2) = rr3*puky + rr5*pukr*yr
+                     fip(3) = rr3*pukz + rr5*pukr*zr
+                     fkp(1) = rr3*puix + rr5*puir*xr
+                     fkp(2) = rr3*puiy + rr5*puir*yr
+                     fkp(3) = rr3*puiz + rr5*puir*zr
+                     fids(1) = rr3*dukxs + rr5*dukrs*xr
+                     fids(2) = rr3*dukys + rr5*dukrs*yr
+                     fids(3) = rr3*dukzs + rr5*dukrs*zr
+                     fkds(1) = rr3*duixs + rr5*duirs*xr
+                     fkds(2) = rr3*duiys + rr5*duirs*yr
+                     fkds(3) = rr3*duizs + rr5*duirs*zr
+                     fips(1) = rr3*pukxs + rr5*pukrs*xr
+                     fips(2) = rr3*pukys + rr5*pukrs*yr
+                     fips(3) = rr3*pukzs + rr5*pukrs*zr
+                     fkps(1) = rr3*puixs + rr5*puirs*xr
+                     fkps(2) = rr3*puiys + rr5*puirs*yr
+                     fkps(3) = rr3*puizs + rr5*puirs*zr
                      do j = 1, 3
                         fieldt(j,i) = fieldt(j,i) + fid(j)
                         fieldt(j,k) = fieldt(j,k) + fkd(j)
@@ -4327,16 +4604,16 @@ c
 c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = 1.0d0
+            uscale(ip11(j,ii)) = 1.0d0
          end do
          do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = 1.0d0
+            uscale(ip12(j,ii)) = 1.0d0
          end do
          do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = 1.0d0
+            uscale(ip13(j,ii)) = 1.0d0
          end do
          do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = 1.0d0
+            uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
 !$OMP END DO
@@ -4357,7 +4634,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
+      deallocate (uscale)
       deallocate (fieldt)
       deallocate (fieldtp)
       deallocate (fieldts)
@@ -4406,10 +4683,6 @@ c
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
       real*8, allocatable :: fieldps(:,:)
-      real*8, allocatable :: udir(:,:)
-      real*8, allocatable :: udirp(:,:)
-      real*8, allocatable :: udirs(:,:)
-      real*8, allocatable :: udirps(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: rsdp(:,:)
       real*8, allocatable :: rsds(:,:)
@@ -4426,6 +4699,10 @@ c
       real*8, allocatable :: vecp(:,:)
       real*8, allocatable :: vecs(:,:)
       real*8, allocatable :: vecps(:,:)
+      real*8, allocatable :: usum(:,:)
+      real*8, allocatable :: usump(:,:)
+      real*8, allocatable :: usums(:,:)
+      real*8, allocatable :: usumps(:,:)
       logical done
       character*6 mode
 c
@@ -4454,10 +4731,6 @@ c
       allocate (fieldp(3,npole))
       allocate (fields(3,npole))
       allocate (fieldps(3,npole))
-      allocate (udir(3,npole))
-      allocate (udirp(3,npole))
-      allocate (udirs(3,npole))
-      allocate (udirps(3,npole))
 c
 c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
@@ -4469,17 +4742,83 @@ c     SCRF induced dipoles are polarizability times direct field
 c     plus the reaction field due to permanent multipoles
 c
       do i = 1, npole
-         do j = 1, 3
-            udir(j,i) = polarity(i) * field(j,i)
-            udirp(j,i) = polarity(i) * fieldp(j,i)
-            udirs(j,i) = polarity(i) * fields(j,i)
-            udirps(j,i) = polarity(i) * fieldps(j,i)
-            uind(j,i) = udir(j,i)
-            uinp(j,i) = udirp(j,i)
-            uinds(j,i) = udirs(j,i)
-            uinps(j,i) = udirps(j,i)
-         end do
+         if (douind(ipole(i))) then
+            do j = 1, 3
+               udir(j,i) = polarity(i) * field(j,i)
+               udirp(j,i) = polarity(i) * fieldp(j,i)
+               udirs(j,i) = polarity(i) * fields(j,i)
+               udirps(j,i) = polarity(i) * fieldps(j,i)
+               uind(j,i) = udir(j,i)
+               uinp(j,i) = udirp(j,i)
+               uinds(j,i) = udirs(j,i)
+               uinps(j,i) = udirps(j,i)
+            end do
+         end if
       end do
+c
+c     get induced dipoles via the ExPT extrapolation method
+c
+      if (poltyp .eq. 'EXTRAP') then
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uxtr(0,j,i) = udir(j,i)
+                  uxtrp(0,j,i) = udirp(j,i)
+                  uxtrs(0,j,i) = udirs(j,i)
+                  uxtrps(0,j,i) = udirps(j,i)
+               end do
+            end if
+         end do
+         do k = 1, cxmax
+            call ufield0e (field,fieldp,fields,fieldps)
+            do i = 1, npole
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uxtr(k,j,i) = polarity(i) * field(j,i)
+                     uxtrp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uxtrs(k,j,i) = polarity(i) * fields(j,i)
+                     uxtrps(k,j,i) = polarity(i) * fieldps(j,i)
+                     uind(j,i) = uxtr(k,j,i)
+                     uinp(j,i) = uxtrp(k,j,i)
+                     uinds(j,i) = uxtrs(k,j,i)
+                     uinps(j,i) = uxtrps(k,j,i)
+                  end do
+               end if
+            end do
+         end do
+         allocate (usum(3,n))
+         allocate (usump(3,n))
+         allocate (usums(3,n))
+         allocate (usumps(3,n))
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uind(j,i) = 0.0d0
+                  uinp(j,i) = 0.0d0
+                  uinds(j,i) = 0.0d0
+                  uinps(j,i) = 0.0d0
+                  usum(j,i) = 0.0d0
+                  usump(j,i) = 0.0d0
+                  usums(j,i) = 0.0d0
+                  usumps(j,i) = 0.0d0
+                  do k = 0, cxmax
+                     usum(j,i) = usum(j,i) + uxtr(k,j,i)
+                     usump(j,i) = usump(j,i) + uxtrp(k,j,i)
+                     usums(j,i) = usums(j,i) + uxtrs(k,j,i)
+                     usumps(j,i) = usumps(j,i) + uxtrps(k,j,i)
+                     uind(j,i) = uind(j,i) + cxtr(k)*usum(j,i)
+                     uinp(j,i) = uinp(j,i) + cxtr(k)*usump(j,i)
+                     uinds(j,i) = uinds(j,i) + cxtr(k)*usums(j,i)
+                     uinps(j,i) = uinps(j,i) + cxtr(k)*usumps(j,i)
+                  end do
+               end do
+            end if
+         end do
+         deallocate (usum)
+         deallocate (usump)
+         deallocate (usums)
+         deallocate (usumps)
+      end if
 c
 c     set tolerances for computation of mutual induced dipoles
 c
@@ -4537,25 +4876,27 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0e (field,fieldp,fields,fieldps)
          do i = 1, npole
-            poli(i) = max(polmin,polarity(i))
-            do j = 1, 3
-               rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                       + field(j,i)
-               rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                        + fieldp(j,i)
-               rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
-     &                        + fields(j,i)
-               rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
-     &                         + fieldps(j,i)
-               zrsd(j,i) = rsd(j,i) * poli(i)
-               zrsdp(j,i) = rsdp(j,i) * poli(i)
-               zrsds(j,i) = rsds(j,i) * poli(i)
-               zrsdps(j,i) = rsdps(j,i) * poli(i)
-               conj(j,i) = zrsd(j,i)
-               conjp(j,i) = zrsdp(j,i)
-               conjs(j,i) = zrsds(j,i)
-               conjps(j,i) = zrsdps(j,i)
-            end do
+            if (douind(ipole(i))) then
+               poli(i) = max(polmin,polarity(i))
+               do j = 1, 3
+                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                          + field(j,i)
+                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                           + fieldp(j,i)
+                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
+     &                           + fields(j,i)
+                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
+     &                            + fieldps(j,i)
+                  zrsd(j,i) = rsd(j,i) * poli(i)
+                  zrsdp(j,i) = rsdp(j,i) * poli(i)
+                  zrsds(j,i) = rsds(j,i) * poli(i)
+                  zrsdps(j,i) = rsdps(j,i) * poli(i)
+                  conj(j,i) = zrsd(j,i)
+                  conjp(j,i) = zrsdp(j,i)
+                  conjs(j,i) = zrsds(j,i)
+                  conjps(j,i) = zrsdps(j,i)
+               end do
+            end if
          end do
 c
 c     conjugate gradient iteration of the mutual induced dipoles
@@ -4563,29 +4904,33 @@ c
          do while (.not. done)
             iter = iter + 1
             do i = 1, npole
-               do j = 1, 3
-                  vec(j,i) = uind(j,i)
-                  vecp(j,i) = uinp(j,i)
-                  vecs(j,i) = uinds(j,i)
-                  vecps(j,i) = uinps(j,i)
-                  uind(j,i) = conj(j,i)
-                  uinp(j,i) = conjp(j,i)
-                  uinds(j,i) = conjs(j,i)
-                  uinps(j,i) = conjps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     vec(j,i) = uind(j,i)
+                     vecp(j,i) = uinp(j,i)
+                     vecs(j,i) = uinds(j,i)
+                     vecps(j,i) = uinps(j,i)
+                     uind(j,i) = conj(j,i)
+                     uinp(j,i) = conjp(j,i)
+                     uinds(j,i) = conjs(j,i)
+                     uinps(j,i) = conjps(j,i)
+                  end do
+               end if
             end do
             call ufield0e (field,fieldp,fields,fieldps)
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = vec(j,i)
-                  uinp(j,i) = vecp(j,i)
-                  uinds(j,i) = vecs(j,i)
-                  uinps(j,i) = vecps(j,i)
-                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                  vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
-                  vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
-                  vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = vec(j,i)
+                     uinp(j,i) = vecp(j,i)
+                     uinds(j,i) = vecs(j,i)
+                     uinps(j,i) = vecps(j,i)
+                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                     vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
+                     vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
+                  end do
+               end if
             end do
             a = 0.0d0
             ap = 0.0d0
@@ -4596,48 +4941,54 @@ c
             sums = 0.0d0
             sumps = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  a = a + conj(j,i)*vec(j,i)
-                  ap = ap + conjp(j,i)*vecp(j,i)
-                  as = as + conjs(j,i)*vecs(j,i)
-                  aps = aps + conjps(j,i)*vecps(j,i)
-                  sum = sum + rsd(j,i)*zrsd(j,i)
-                  sump = sump + rsdp(j,i)*zrsdp(j,i)
-                  sums = sums + rsds(j,i)*zrsds(j,i)
-                  sumps = sumps + rsdps(j,i)*zrsdps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     a = a + conj(j,i)*vec(j,i)
+                     ap = ap + conjp(j,i)*vecp(j,i)
+                     as = as + conjs(j,i)*vecs(j,i)
+                     aps = aps + conjps(j,i)*vecps(j,i)
+                     sum = sum + rsd(j,i)*zrsd(j,i)
+                     sump = sump + rsdp(j,i)*zrsdp(j,i)
+                     sums = sums + rsds(j,i)*zrsds(j,i)
+                     sumps = sumps + rsdps(j,i)*zrsdps(j,i)
+                  end do
+               end if
             end do
             if (a .ne. 0.0d0)  a = sum / a
             if (ap .ne. 0.0d0)  ap = sump / ap
             if (as .ne. 0.0d0)  as = sums / as
             if (aps .ne. 0.0d0)  aps = sumps / aps
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = uind(j,i) + a*conj(j,i)
-                  uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
-                  uinds(j,i) = uinds(j,i) + as*conjs(j,i)
-                  uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
-                  rsd(j,i) = rsd(j,i) - a*vec(j,i)
-                  rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
-                  rsds(j,i) = rsds(j,i) - as*vecs(j,i)
-                  rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = uind(j,i) + a*conj(j,i)
+                     uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
+                     uinds(j,i) = uinds(j,i) + as*conjs(j,i)
+                     uinps(j,i) = uinps(j,i) + aps*conjps(j,i)
+                     rsd(j,i) = rsd(j,i) - a*vec(j,i)
+                     rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                     rsds(j,i) = rsds(j,i) - as*vecs(j,i)
+                     rsdps(j,i) = rsdps(j,i) - aps*vecps(j,i)
+                  end do
+               end if
             end do
             b = 0.0d0
             bp = 0.0d0
             bs = 0.0d0
             bps = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * poli(i)
-                  zrsdp(j,i) = rsdp(j,i) * poli(i)
-                  zrsds(j,i) = rsds(j,i) * poli(i)
-                  zrsdps(j,i) = rsdps(j,i) * poli(i)
-                  b = b + rsd(j,i)*zrsd(j,i)
-                  bp = bp + rsdp(j,i)*zrsdp(j,i)
-                  bs = bs + rsds(j,i)*zrsds(j,i)
-                  bps = bps + rsdps(j,i)*zrsdps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     zrsd(j,i) = rsd(j,i) * poli(i)
+                     zrsdp(j,i) = rsdp(j,i) * poli(i)
+                     zrsds(j,i) = rsds(j,i) * poli(i)
+                     zrsdps(j,i) = rsdps(j,i) * poli(i)
+                     b = b + rsd(j,i)*zrsd(j,i)
+                     bp = bp + rsdp(j,i)*zrsdp(j,i)
+                     bs = bs + rsds(j,i)*zrsds(j,i)
+                     bps = bps + rsdps(j,i)*zrsdps(j,i)
+                  end do
+               end if
             end do
             if (sum .ne. 0.0d0)  b = b / sum
             if (sump .ne. 0.0d0)  bp = bp / sump
@@ -4648,16 +4999,18 @@ c
             epsds = 0.0d0
             epsps = 0.0d0
             do i = 1, npole
-               do j = 1, 3
-                  conj(j,i) = zrsd(j,i) + b*conj(j,i)
-                  conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
-                  conjs(j,i) = zrsds(j,i) + bs*conjs(j,i)
-                  conjps(j,i) = zrsdps(j,i) + bps*conjps(j,i)
-                  epsd = epsd + rsd(j,i)*rsd(j,i)
-                  epsp = epsp + rsdp(j,i)*rsdp(j,i)
-                  epsds = epsds + rsds(j,i)*rsds(j,i)
-                  epsps = epsps + rsdps(j,i)*rsdps(j,i)
-               end do
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     conj(j,i) = zrsd(j,i) + b*conj(j,i)
+                     conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
+                     conjs(j,i) = zrsds(j,i) + bs*conjs(j,i)
+                     conjps(j,i) = zrsdps(j,i) + bps*conjps(j,i)
+                     epsd = epsd + rsd(j,i)*rsd(j,i)
+                     epsp = epsp + rsdp(j,i)*rsdp(j,i)
+                     epsds = epsds + rsds(j,i)*rsds(j,i)
+                     epsps = epsps + rsdps(j,i)*rsdps(j,i)
+                  end do
+               end if
             end do
 c
 c     check the convergence of the mutual induced dipoles
@@ -4725,10 +5078,6 @@ c
       deallocate (fieldp)
       deallocate (fields)
       deallocate (fieldps)
-      deallocate (udir)
-      deallocate (udirp)
-      deallocate (udirs)
-      deallocate (udirps)
       return
       end
 c
@@ -5027,7 +5376,7 @@ c
       real*8 fieldp(3,*)
       real*8 fields(3,*)
       real*8 fieldps(3,*)
-      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8, allocatable :: indpole(:,:)
       real*8, allocatable :: inppole(:,:)
       logical proceed
@@ -5046,12 +5395,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dscale(n))
+      allocate (uscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
       do i = 1, n
-         dscale(i) = 1.0d0
+         uscale(i) = 1.0d0
       end do
 c
 c     compute the mutual electrostatic field at each atom,
@@ -5074,16 +5423,16 @@ c
          puiys = uinps(2,i)
          puizs = uinps(3,i)
          do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = u1scale
+            uscale(ip11(j,ii)) = u1scale
          end do
          do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = u2scale
+            uscale(ip12(j,ii)) = u2scale
          end do
          do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = u3scale
+            uscale(ip13(j,ii)) = u3scale
          end do
          do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = u4scale
+            uscale(ip14(j,ii)) = u4scale
          end do
          do k = i+1, npole
             kk = ipole(k)
@@ -5111,8 +5460,8 @@ c
                   pukxs = uinps(1,k)
                   pukys = uinps(2,k)
                   pukzs = uinps(3,k)
-                  scale3 = dscale(kk)
-                  scale5 = dscale(kk)
+                  scale3 = uscale(kk)
+                  scale5 = uscale(kk)
                   damp = pdi * pdamp(k)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(k))
@@ -5123,7 +5472,7 @@ c
                         scale5 = scale5 * (1.0d0-(1.0d0-damp)*expdamp)
                      end if
                   end if
-                  rr3 = scale3 / (r*r2)
+                  rr3 = -scale3 / (r*r2)
                   rr5 = 3.0d0 * scale5 / (r*r2*r2)
                   duir = xr*duix + yr*duiy + zr*duiz
                   dukr = xr*dukx + yr*duky + zr*dukz
@@ -5133,30 +5482,30 @@ c
                   dukrs = xr*dukxs + yr*dukys + zr*dukzs
                   puirs = xr*puixs + yr*puiys + zr*puizs
                   pukrs = xr*pukxs + yr*pukys + zr*pukzs
-                  fid(1) = -rr3*dukx + rr5*dukr*xr
-                  fid(2) = -rr3*duky + rr5*dukr*yr
-                  fid(3) = -rr3*dukz + rr5*dukr*zr
-                  fkd(1) = -rr3*duix + rr5*duir*xr
-                  fkd(2) = -rr3*duiy + rr5*duir*yr
-                  fkd(3) = -rr3*duiz + rr5*duir*zr
-                  fip(1) = -rr3*pukx + rr5*pukr*xr
-                  fip(2) = -rr3*puky + rr5*pukr*yr
-                  fip(3) = -rr3*pukz + rr5*pukr*zr
-                  fkp(1) = -rr3*puix + rr5*puir*xr
-                  fkp(2) = -rr3*puiy + rr5*puir*yr
-                  fkp(3) = -rr3*puiz + rr5*puir*zr
-                  fids(1) = -rr3*dukxs + rr5*dukrs*xr
-                  fids(2) = -rr3*dukys + rr5*dukrs*yr
-                  fids(3) = -rr3*dukzs + rr5*dukrs*zr
-                  fkds(1) = -rr3*duixs + rr5*duirs*xr
-                  fkds(2) = -rr3*duiys + rr5*duirs*yr
-                  fkds(3) = -rr3*duizs + rr5*duirs*zr
-                  fips(1) = -rr3*pukxs + rr5*pukrs*xr
-                  fips(2) = -rr3*pukys + rr5*pukrs*yr
-                  fips(3) = -rr3*pukzs + rr5*pukrs*zr
-                  fkps(1) = -rr3*puixs + rr5*puirs*xr
-                  fkps(2) = -rr3*puiys + rr5*puirs*yr
-                  fkps(3) = -rr3*puizs + rr5*puirs*zr
+                  fid(1) = rr3*dukx + rr5*dukr*xr
+                  fid(2) = rr3*duky + rr5*dukr*yr
+                  fid(3) = rr3*dukz + rr5*dukr*zr
+                  fkd(1) = rr3*duix + rr5*duir*xr
+                  fkd(2) = rr3*duiy + rr5*duir*yr
+                  fkd(3) = rr3*duiz + rr5*duir*zr
+                  fip(1) = rr3*pukx + rr5*pukr*xr
+                  fip(2) = rr3*puky + rr5*pukr*yr
+                  fip(3) = rr3*pukz + rr5*pukr*zr
+                  fkp(1) = rr3*puix + rr5*puir*xr
+                  fkp(2) = rr3*puiy + rr5*puir*yr
+                  fkp(3) = rr3*puiz + rr5*puir*zr
+                  fids(1) = rr3*dukxs + rr5*dukrs*xr
+                  fids(2) = rr3*dukys + rr5*dukrs*yr
+                  fids(3) = rr3*dukzs + rr5*dukrs*zr
+                  fkds(1) = rr3*duixs + rr5*duirs*xr
+                  fkds(2) = rr3*duiys + rr5*duirs*yr
+                  fkds(3) = rr3*duizs + rr5*duirs*zr
+                  fips(1) = rr3*pukxs + rr5*pukrs*xr
+                  fips(2) = rr3*pukys + rr5*pukrs*yr
+                  fips(3) = rr3*pukzs + rr5*pukrs*zr
+                  fkps(1) = rr3*puixs + rr5*puirs*xr
+                  fkps(2) = rr3*puiys + rr5*puirs*yr
+                  fkps(3) = rr3*puizs + rr5*puirs*zr
                   do j = 1, 3
                      field(j,i) = field(j,i) + fid(j)
                      field(j,k) = field(j,k) + fkd(j)
@@ -5174,22 +5523,22 @@ c
 c     reset interaction scaling coefficients for connected atoms
 c
          do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = 1.0d0
+            uscale(ip11(j,ii)) = 1.0d0
          end do
          do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = 1.0d0
+            uscale(ip12(j,ii)) = 1.0d0
          end do
          do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = 1.0d0
+            uscale(ip13(j,ii)) = 1.0d0
          end do
          do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = 1.0d0
+            uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
+      deallocate (uscale)
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -5397,7 +5746,7 @@ c
       real*8 scale3,scale5
       real*8 m1,m2,m3
       real*8 m4,m5,m6
-      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8 rsd(3,*)
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
@@ -5475,12 +5824,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (dscale(n))
+         allocate (uscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
          do i = 1, n
-            dscale(i) = 1.0d0
+            uscale(i) = 1.0d0
          end do
 c
 c     determine the off-diagonal elements of the preconditioner
@@ -5496,19 +5845,19 @@ c
             pti = thole(i)
             poli = polarity(i)
             do j = i+1, npole
-               dscale(ipole(j)) = 1.0d0
+               uscale(ipole(j)) = 1.0d0
             end do
             do j = 1, np11(ii)
-               dscale(ip11(j,ii)) = u1scale
+               uscale(ip11(j,ii)) = u1scale
             end do
             do j = 1, np12(ii)
-               dscale(ip12(j,ii)) = u2scale
+               uscale(ip12(j,ii)) = u2scale
             end do
             do j = 1, np13(ii)
-               dscale(ip13(j,ii)) = u3scale
+               uscale(ip13(j,ii)) = u3scale
             end do
             do j = 1, np14(ii)
-               dscale(ip14(j,ii)) = u4scale
+               uscale(ip14(j,ii)) = u4scale
             end do
             do k = i+1, npole
                kk = ipole(k)
@@ -5519,8 +5868,8 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  scale3 = dscale(kk)
-                  scale5 = dscale(kk)
+                  scale3 = uscale(kk)
+                  scale5 = uscale(kk)
                   damp = pdi * pdamp(k)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(k))
@@ -5547,22 +5896,22 @@ c
 c     reset interaction scaling coefficients for connected atoms
 c
             do j = 1, np11(ii)
-               dscale(ip11(j,ii)) = 1.0d0
+               uscale(ip11(j,ii)) = 1.0d0
             end do
             do j = 1, np12(ii)
-               dscale(ip12(j,ii)) = 1.0d0
+               uscale(ip12(j,ii)) = 1.0d0
             end do
             do j = 1, np13(ii)
-               dscale(ip13(j,ii)) = 1.0d0
+               uscale(ip13(j,ii)) = 1.0d0
             end do
             do j = 1, np14(ii)
-               dscale(ip14(j,ii)) = 1.0d0
+               uscale(ip14(j,ii)) = 1.0d0
             end do
          end do
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (dscale)
+         deallocate (uscale)
       end if
       return
       end
@@ -5602,7 +5951,7 @@ c
       real*8 scale3,scale5
       real*8 m1,m2,m3
       real*8 m4,m5,m6
-      real*8, allocatable :: dscale(:)
+      real*8, allocatable :: uscale(:)
       real*8 rsd(3,*)
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
@@ -5706,12 +6055,12 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (dscale(n))
+         allocate (uscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
          do i = 1, n
-            dscale(i) = 1.0d0
+            uscale(i) = 1.0d0
          end do
 c
 c     set OpenMP directives for the major loop structure
@@ -5719,7 +6068,7 @@ c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,
 !$OMP& thole,polarity,u1scale,u2scale,u3scale,u4scale,np11,ip11,
 !$OMP& np12,ip12,np13,ip13,np14,ip14,nulst,ulst,mindex,minv)
-!$OMP& firstprivate (dscale)
+!$OMP& firstprivate (uscale)
 c
 c     determine the off-diagonal elements of the preconditioner
 c
@@ -5733,16 +6082,16 @@ c
             pti = thole(i)
             poli = polarity(i)
             do j = 1, np11(ii)
-               dscale(ip11(j,ii)) = u1scale
+               uscale(ip11(j,ii)) = u1scale
             end do
             do j = 1, np12(ii)
-               dscale(ip12(j,ii)) = u2scale
+               uscale(ip12(j,ii)) = u2scale
             end do
             do j = 1, np13(ii)
-               dscale(ip13(j,ii)) = u3scale
+               uscale(ip13(j,ii)) = u3scale
             end do
             do j = 1, np14(ii)
-               dscale(ip14(j,ii)) = u4scale
+               uscale(ip14(j,ii)) = u4scale
             end do
             m = mindex(i)
             do kkk = 1, nulst(i)
@@ -5754,8 +6103,8 @@ c
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                r = sqrt(r2)
-               scale3 = dscale(kk)
-               scale5 = dscale(kk)
+               scale3 = uscale(kk)
+               scale5 = uscale(kk)
                damp = pdi * pdamp(k)
                if (damp .ne. 0.0d0) then
                   pgamma = min(pti,thole(k))
@@ -5781,16 +6130,16 @@ c
 c     reset interaction scaling coefficients for connected atoms
 c
             do j = 1, np11(ii)
-               dscale(ip11(j,ii)) = 1.0d0
+               uscale(ip11(j,ii)) = 1.0d0
             end do
             do j = 1, np12(ii)
-               dscale(ip12(j,ii)) = 1.0d0
+               uscale(ip12(j,ii)) = 1.0d0
             end do
             do j = 1, np13(ii)
-               dscale(ip13(j,ii)) = 1.0d0
+               uscale(ip13(j,ii)) = 1.0d0
             end do
             do j = 1, np14(ii)
-               dscale(ip14(j,ii)) = 1.0d0
+               uscale(ip14(j,ii)) = 1.0d0
             end do
          end do
 !$OMP END DO
@@ -5798,7 +6147,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (dscale)
+         deallocate (uscale)
       end if
       return
       end

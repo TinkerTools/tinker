@@ -96,6 +96,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp moldyn.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp moment.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp mplpot.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp mpole.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp mrecip.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp mutant.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp neigh.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp nonpol.f
@@ -289,6 +290,10 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epitors.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epitors1.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epitors2.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epitors3.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epolar.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epolar1.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epolar2.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp epolar3.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp erf.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp erxnfld.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp erxnfld1.f
@@ -493,6 +498,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp search.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp server.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp shakeup.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sigmoid.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp simplex.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sktstuff.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sniffer.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sort.f

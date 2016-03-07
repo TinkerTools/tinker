@@ -16,8 +16,7 @@ c     chg   partial charge parameters for each atom type
 c
 c
       module kchrge
-      use sizes
       implicit none
-      real*8 chg(maxtyp)
+      real*8, allocatable :: chg(:)
       save
       end

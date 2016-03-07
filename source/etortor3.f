@@ -71,7 +71,17 @@ c
       do i = 1, n
          aett(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. ntortor.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Torsion-Torsion Interactions :',
+     &           //,' Type',17x,'Atom Numbers',16x,'Angle1',
+     &              4x,'Angle2',6x,'Energy',/)
+      end if
 c
 c     calculate the torsion-torsion interaction energy term
 c
@@ -243,14 +253,14 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Torsion-Torsion',
+                     write (iout,20)
+   20                format (/,' Individual Torsion-Torsion',
      &                          ' Interactions :',
      &                       //,' Type',17x,'Atom Numbers',16x,'Angle1',
      &                          4x,'Angle2',6x,'Energy',/)
                   end if
-                  write (iout,20)  ia,ib,ic,id,ie,angle1,angle2,e
-   20             format (' TorTor',2x,5i7,2x,2f10.4,f12.4)
+                  write (iout,30)  ia,ib,ic,id,ie,angle1,angle2,e
+   30             format (' TorTor',2x,5i7,2x,2f10.4,f12.4)
                end if
             end if
          end if

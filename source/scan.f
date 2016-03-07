@@ -13,7 +13,15 @@ c     #################################################################
 c
 c
 c     "scan" attempts to find all the local minima on a potential
-c     energy surface via an iterative series of local searches
+c     energy surface via an iterative series of local searches along
+c     normal mode directions
+c
+c     literature reference:
+c
+c     I. Kolossvary and W. C. Guida, "Low-Mode Conformational Search
+c     Elucidated: Application to C39H80 and Flexible Docking of
+c     9-Deazaguanine Inhibitors into PNP, Journal of Computational
+c     Chemistry, 20, 1671-1684 (1999)
 c
 c
       program scan
@@ -34,6 +42,7 @@ c
       character*7 ext
       character*120 xyzfile
       character*120 string
+c
 c
 c     set up the structure and mechanics calculation
 c

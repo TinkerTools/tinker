@@ -106,7 +106,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -224,16 +234,16 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Charge-Charge',
+                        write (iout,20)
+   20                   format (/,' Individual Charge-Charge',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             17x,'Charges',5x,'Distance',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i,name(i),k,name(k),
+                     write (iout,30)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,e
-   20                format (' Charge',4x,2(i7,'-',a3),8x,
+   30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
                end if
@@ -364,16 +374,16 @@ c
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
-                           write (iout,30)
-   30                      format (/,' Individual Charge-Charge',
+                           write (iout,40)
+   40                      format (/,' Individual Charge-Charge',
      &                                ' Interactions :',
      &                             //,' Type',14x,'Atom Names',
      &                                17x,'Charges',5x,'Distance',
      &                                6x,'Energy',/)
                         end if
-                        write (iout,40)  i,name(i),k,name(k),
+                        write (iout,50)  i,name(i),k,name(k),
      &                                   pchg(ii),pchg(kk),r,e
-   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+   50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
@@ -471,7 +481,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -546,20 +566,20 @@ c
             start = 1
             stop = kex(ii)
          end if
-   10    continue
+   20    continue
          do j = start, stop
             kk = locx(j)
             kgy = rgy(kk)
             if (kby(ii) .le. key(ii)) then
-               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 50
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 60
             else
-               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 50
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 60
             end if
             kgz = rgz(kk)
             if (kbz(ii) .le. kez(ii)) then
-               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 50
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 60
             else
-               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 50
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
@@ -649,8 +669,8 @@ c
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,20)
-   20                   format (/,' Individual Charge-Charge',
+                        write (iout,30)
+   30                   format (/,' Individual Charge-Charge',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             17x,'Charges',5x,'Distance',
@@ -659,28 +679,28 @@ c
                      ikmin = min(i,k)
                      ikmax = max(i,k)
                      if (prime) then
-                        write (iout,30)  ikmin,name(ikmin),ikmax,
-     &                                   name(ikmax),pchg(ii),
-     &                                   pchg(kmap),r,e
-   30                   format (' Charge',4x,2(i7,'-',a3),8x,
-     &                             2f7.2,f11.4,f12.4)
-                     else
                         write (iout,40)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),pchg(ii),
      &                                   pchg(kmap),r,e
-   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+   40                   format (' Charge',4x,2(i7,'-',a3),8x,
+     &                             2f7.2,f11.4,f12.4)
+                     else
+                        write (iout,50)  ikmin,name(ikmin),ikmax,
+     &                                   name(ikmax),pchg(ii),
+     &                                   pchg(kmap),r,e
+   50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
                end if
             end if
-   50       continue
+   60       continue
          end do
          if (repeat) then
             repeat = .false.
             start = kbx(ii) + 1
             stop = nlight
-            goto 10
+            goto 20
          end if
 c
 c     reset interaction scaling coefficients for connected atoms
@@ -771,7 +791,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -911,16 +941,16 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Charge-Charge',
+                        write (iout,20)
+   20                   format (/,' Individual Charge-Charge',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             17x,'Charges',5x,'Distance',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i,name(i),k,name(k),
+                     write (iout,30)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,e
-   20                format (' Charge',4x,2(i7,'-',a3),8x,
+   30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
                end if
@@ -1028,7 +1058,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1155,16 +1195,16 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Real Space Ewald',
+                        write (iout,20)
+   20                   format (/,' Individual Real Space Ewald',
      &                             ' Charge-Charge Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             17x,'Charges',5x,'Distance',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i,name(i),k,name(k),
+                     write (iout,30)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,efix
-   20                format (' Charge',4x,2(i7,'-',a3),8x,
+   30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
                end if
@@ -1272,16 +1312,16 @@ c
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
-                           write (iout,30)
-   30                      format (/,' Individual Real Space Ewald',
+                           write (iout,40)
+   40                      format (/,' Individual Real Space Ewald',
      &                                ' Charge-Charge Interactions :',
      &                             //,' Type',14x,'Atom Names',
      &                                17x,'Charges',5x,'Distance',
      &                                6x,'Energy',/)
                         end if
-                        write (iout,40)  i,name(i),k,name(k),
+                        write (iout,50)  i,name(i),k,name(k),
      &                                   pchg(ii),pchg(kk),r,efix
-   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+   50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
@@ -1381,7 +1421,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1485,20 +1535,20 @@ c
             start = 1
             stop = kex(ii)
          end if
-   10    continue
+   20    continue
          do j = start, stop
             kk = locx(j)
             kgy = rgy(kk)
             if (kby(ii) .le. key(ii)) then
-               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 50
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 60
             else
-               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 50
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 60
             end if
             kgz = rgz(kk)
             if (kbz(ii) .le. kez(ii)) then
-               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 50
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 60
             else
-               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 50
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
@@ -1569,34 +1619,34 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,20)
-   20                   format (/,' Individual Real Space Ewald',
+                        write (iout,30)
+   30                   format (/,' Individual Real Space Ewald',
      &                             ' Charge-Charge Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             17x,'Charges',5x,'Distance',
      &                             6x,'Energy',/)
                      end if
                      if (prime) then
-                        write (iout,30)  i,name(i),k,name(k),pchg(ii),
-     &                                   pchg(kmap),r,efix
-   30                   format (' Charge',4x,2(i7,'-',a3),8x,
-     &                             2f7.2,f11.4,f12.4)
-                     else
                         write (iout,40)  i,name(i),k,name(k),pchg(ii),
      &                                   pchg(kmap),r,efix
-   40                   format (' Charge',4x,2(i7,'-',a3),1x,
+   40                   format (' Charge',4x,2(i7,'-',a3),8x,
+     &                             2f7.2,f11.4,f12.4)
+                     else
+                        write (iout,50)  i,name(i),k,name(k),pchg(ii),
+     &                                   pchg(kmap),r,efix
+   50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
                   end if
                end if
             end if
-   50       continue
+   60       continue
          end do
          if (repeat) then
             repeat = .false.
             start = kbx(ii) + 1
             stop = nlight
-            goto 10
+            goto 20
          end if
 c
 c     reset interaction scaling coefficients for connected atoms
@@ -1695,7 +1745,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1843,16 +1903,16 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Real Space Ewald',
+                        write (iout,20)
+   20                   format (/,' Individual Real Space Ewald',
      &                             ' Charge-Charge Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             17x,'Charges',5x,'Distance',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i,name(i),k,name(k),
+                     write (iout,30)  i,name(i),k,name(k),
      &                                pchg(ii),pchg(kk),r,efix
-   20                format (' Charge',4x,2(i7,'-',a3),8x,
+   30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
                end if
@@ -1955,7 +2015,17 @@ c
          aec(i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2074,16 +2144,16 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Charge-Charge',
+                     write (iout,20)
+   20                format (/,' Individual Charge-Charge',
      &                          ' Interactions :',
      &                       //,' Type',14x,'Atom Names',
      &                          17x,'Charges',5x,'Distance',
      &                          6x,'Energy',/)
                   end if
-                  write (iout,20)  i,name(i),k,name(k),pchg(ii),
+                  write (iout,30)  i,name(i),k,name(k),pchg(ii),
      &                             pchg(kk),r,e
-   20             format (' Charge',4x,2(i7,'-',a3),8x,
+   30             format (' Charge',4x,2(i7,'-',a3),8x,
      &                       2f7.2,f11.4,f12.4)
                end if
             end if

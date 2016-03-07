@@ -17,6 +17,7 @@ c     parameters to zero and using defaults for control values
 c
 c
       subroutine initprm
+      use sizes
       use angpot
       use bndpot
       use chgpot
@@ -173,6 +174,24 @@ c
       do i = 1, maxnpi4
          kpi4(i) = blank8
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(atmcls))  allocate (atmcls(maxtyp))
+      if (.not. allocated(atmnum))  allocate (atmnum(maxtyp))
+      if (.not. allocated(ligand))  allocate (ligand(maxtyp))
+      if (.not. allocated(weight))  allocate (weight(maxtyp))
+      if (.not. allocated(symbol))  allocate (symbol(maxtyp))
+      if (.not. allocated(describe))  allocate (describe(maxtyp))
+      if (.not. allocated(rad))  allocate (rad(maxtyp))
+      if (.not. allocated(eps))  allocate (eps(maxtyp))
+      if (.not. allocated(rad4))  allocate (rad4(maxtyp))
+      if (.not. allocated(eps4))  allocate (eps4(maxtyp))
+      if (.not. allocated(reduct))  allocate (reduct(maxtyp))
+      if (.not. allocated(chg))  allocate (chg(maxtyp))
+      if (.not. allocated(polr))  allocate (polr(maxtyp))
+      if (.not. allocated(athl))  allocate (athl(maxtyp))
+      if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
 c
 c     initialize values of some force field parameters
 c

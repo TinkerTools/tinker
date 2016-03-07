@@ -97,6 +97,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp moldyn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp moment.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp mplpot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp mpole.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp mrecip.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp mutant.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp neigh.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp nonpol.f
@@ -290,6 +291,10 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epitors.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epitors1.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epitors2.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epitors3.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epolar.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epolar1.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epolar2.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp epolar3.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp erf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp erxnfld.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp erxnfld1.f
@@ -494,6 +499,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp search.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp server.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp shakeup.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sigmoid.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp simplex.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sktstuff.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sniffer.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sort.f

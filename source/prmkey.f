@@ -111,7 +111,7 @@ c
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
          use_angtor = .true.
-         if (value .eq. 'NONE')  use_strtor = .false.
+         if (value .eq. 'NONE')  use_angtor = .false.
       else if (keyword(1:11) .eq. 'TORTORTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff

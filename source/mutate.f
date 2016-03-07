@@ -184,7 +184,7 @@ c
             k = ipole(i)
             if (mut(k)) then
                do j = 1, 13
-                  pole (j,i) = pole(j,i) * elambda
+                  pole(j,i) = pole(j,i) * elambda
                end do
             end if
          end do

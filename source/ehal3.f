@@ -120,7 +120,17 @@ c
       do i = 1, n
          aev(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -270,16 +280,16 @@ c
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual van der Waals',
+                        write (iout,20)
+   20                   format (/,' Individual van der Waals',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             20x,'Minimum',4x,'Actual',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i,name(i),k,name(k),
+                     write (iout,30)  i,name(i),k,name(k),
      &                                rv,sqrt(rik2),e
-   20                format (' VDW-Hal',3x,2(i7,'-',a3),
+   30                format (' VDW-Hal',3x,2(i7,'-',a3),
      &                          13x,2f10.4,f12.4)
                   end if
                end if
@@ -432,16 +442,16 @@ c
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
-                           write (iout,30)
-   30                      format (/,' Individual van der Waals',
+                           write (iout,40)
+   40                      format (/,' Individual van der Waals',
      &                                ' Interactions :',
      &                             //,' Type',14x,'Atom Names',
      &                                20x,'Minimum',4x,'Actual',
      &                                6x,'Energy',/)
                         end if
-                        write (iout,40)  i,name(i),k,name(k),
+                        write (iout,50)  i,name(i),k,name(k),
      &                                   rv,sqrt(rik2),e
-   40                   format (' VDW-Hal',3x,2(i7,'-',a3),3x,
+   50                   format (' VDW-Hal',3x,2(i7,'-',a3),3x,
      &                             '(XTAL)',4x,2f10.4,f12.4)
                      end if
                   end if
@@ -547,7 +557,17 @@ c
       do i = 1, n
          aev(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -634,20 +654,20 @@ c
             start = 1
             stop = kex(ii)
          end if
-   10    continue
+   20    continue
          do j = start, stop
             kk = locx(j)
             kgy = rgy(kk)
             if (kby(ii) .le. key(ii)) then
-               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 50
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 60
             else
-               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 50
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 60
             end if
             kgz = rgz(kk)
             if (kbz(ii) .le. kez(ii)) then
-               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 50
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 60
             else
-               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 50
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kv = ired(k)
@@ -752,8 +772,8 @@ c
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,20)
-   20                   format (/,' Individual van der Waals',
+                        write (iout,30)
+   30                   format (/,' Individual van der Waals',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             20x,'Minimum',4x,'Actual',
@@ -762,26 +782,26 @@ c
                      ikmin = min(i,k)
                      ikmax = max(i,k)
                      if (prime) then
-                        write (iout,30)  ikmin,name(ikmin),ikmax,
+                        write (iout,40)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),rv,sqrt(rik2),e
-   30                   format (' VDW-Hal',3x,2(i7,'-',a3),
+   40                   format (' VDW-Hal',3x,2(i7,'-',a3),
      &                             13x,2f10.4,f12.4)
                      else
-                        write (iout,40)  ikmax,name(ikmin),ikmax,
+                        write (iout,50)  ikmax,name(ikmin),ikmax,
      &                                   name(ikmax),rv,sqrt(rik2),e
-   40                   format (' VDW-Hal',3x,2(i7,'-',a3),3x,
+   50                   format (' VDW-Hal',3x,2(i7,'-',a3),3x,
      &                             '(XTAL)',4x,2f10.4,f12.4)
                      end if
                   end if
                end if
             end if
-   50       continue
+   60       continue
          end do
          if (repeat) then
             repeat = .false.
             start = kbx(ii) + 1
             stop = nlight
-            goto 10
+            goto 20
          end if
 c
 c     reset interaction scaling coefficients for connected atoms
@@ -879,7 +899,17 @@ c
       do i = 1, n
          aev(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1050,16 +1080,16 @@ c
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual van der Waals',
+                        write (iout,20)
+   20                   format (/,' Individual van der Waals',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             20x,'Minimum',4x,'Actual',
      &                             6x,'Energy',/)
                      end if
-                     write (iout,20)  i,name(i),k,name(k),
+                     write (iout,30)  i,name(i),k,name(k),
      &                                rv,sqrt(rik2),e
-   20                format (' VDW-Hal',3x,2(i7,'-',a3),
+   30                format (' VDW-Hal',3x,2(i7,'-',a3),
      &                          13x,2f10.4,f12.4)
                   end if
                end if

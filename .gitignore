@@ -1,0 +1,16 @@
+*.swp
+apbs
+bin
+build
+expt
+lib
+listing
+mscale
+osrw
+source/*.a
+source/*.mod
+source/*.o
+source/*.x
+source/*.make
+source/*-*
+usage

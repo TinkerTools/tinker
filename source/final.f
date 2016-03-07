@@ -45,11 +45,16 @@ c
       use imptor
       use inform
       use iounit
+      use katoms
+      use kchrge
+      use kpolr
+      use kvdws
       use light
       use merck
       use molcul
       use moldyn
       use mpole
+      use mrecip
       use mutant
       use neigh
       use nonpol
@@ -66,6 +71,7 @@ c
       use pme
       use polar
       use polgrp
+      use potfit
       use qmstuf
       use refer
       use restrn
@@ -346,6 +352,33 @@ c
       if (allocated(itors2))  deallocate (itors2)
       if (allocated(itors3))  deallocate (itors3)
 c
+c     deallocation of global arrays from module katoms
+c
+      if (allocated(atmcls))  deallocate (atmcls)
+      if (allocated(atmnum))  deallocate (atmnum)
+      if (allocated(ligand))  deallocate (ligand)
+      if (allocated(weight))  deallocate (weight)
+      if (allocated(symbol))  deallocate (symbol)
+      if (allocated(describe))  deallocate (describe)
+c
+c     deallocation of global arrays from module kchrge
+c
+      if (allocated(chg))  deallocate (chg)
+c
+c     deallocation of global arrays from module kpolr
+c
+      if (allocated(polr))  deallocate (polr)
+      if (allocated(athl))  deallocate (athl)
+      if (allocated(pgrp))  deallocate (pgrp)
+c
+c     deallocation of global arrays from module kvdws
+c
+      if (allocated(rad))  deallocate (rad)
+      if (allocated(eps))  deallocate (eps)
+      if (allocated(rad4))  deallocate (rad4)
+      if (allocated(eps4))  deallocate (eps4)
+      if (allocated(reduct))  deallocate (reduct)
+c
 c     deallocation of global arrays from module light
 c
       if (allocated(kbx))  deallocate (kbx)
@@ -430,6 +463,12 @@ c
       if (allocated(pole))  deallocate (pole)
       if (allocated(rpole))  deallocate (rpole)
       if (allocated(polaxe))  deallocate (polaxe)
+c
+c     deallocation of global arrays from module mrecip
+c
+      if (allocated(cmp))  deallocate (cmp)
+      if (allocated(fmp))  deallocate (fmp)
+      if (allocated(fphi))  deallocate (fphi)
 c
 c     deallocation of global arrays from module mutant
 c
@@ -558,10 +597,20 @@ c
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
+      if (allocated(udir))  deallocate (udir)
+      if (allocated(udirp))  deallocate (udirp)
+      if (allocated(udirs))  deallocate (udirs)
+      if (allocated(udirps))  deallocate (udirps)
       if (allocated(uind))  deallocate (uind)
       if (allocated(uinp))  deallocate (uinp)
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
+      if (allocated(uxtr))  deallocate (uxtr)
+      if (allocated(uxtrp))  deallocate (uxtrp)
+      if (allocated(uxtrs))  deallocate (uxtrs)
+      if (allocated(uxtrps))  deallocate (uxtrps)
+      if (allocated(uexact))  deallocate (uexact)
+      if (allocated(douind))  deallocate (douind)
 c
 c     deallocation of global arrays from module polgrp
 c
@@ -569,6 +618,18 @@ c
       if (allocated(ip12))  deallocate (ip12)
       if (allocated(ip13))  deallocate (ip13)
       if (allocated(ip14))  deallocate (ip14)
+c
+c     deallocation of global arrays from module potfit
+c
+      if (allocated(ipgrid))  deallocate (ipgrid)
+      if (allocated(fchg))  deallocate (fchg)
+      if (allocated(fpol))  deallocate (fpol)
+      if (allocated(pgrid))  deallocate (pgrid)
+      if (allocated(epot))  deallocate (epot)
+      if (allocated(fitchg))  deallocate (fitchg)
+      if (allocated(fitpol))  deallocate (fitpol)
+      if (allocated(gatm))  deallocate (gatm)
+      if (allocated(fatm))  deallocate (fatm)
 c
 c     deallocation of global arrays from module qmstuf
 c

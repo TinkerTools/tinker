@@ -97,7 +97,17 @@ c
       do i = 1, n
          aet(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. ntors.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Torsional Angle Interactions :',
+     &           //,' Type',25x,'Atom Names',21x,'Angle',
+     &              6x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -245,15 +255,15 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Torsional Angle',
+                     write (iout,20)
+   20                format (/,' Individual Torsional Angle',
      &                          ' Interactions :',
      &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
-                  write (iout,20)  ia,name(ia),ib,name(ib),ic,
+                  write (iout,30)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),angle,e
-   20             format (' Torsion',3x,4(i7,'-',a3),f11.4,f12.4)
+   30             format (' Torsion',3x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if
@@ -342,7 +352,17 @@ c
       do i = 1, n
          aet(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. ntors.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Torsional Angle Interactions :',
+     &           //,' Type',25x,'Atom Names',21x,'Angle',
+     &              6x,'Energy',/)
+      end if
 c
 c     set the extent of smoothing to be performed
 c
@@ -522,15 +542,15 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Torsional Angle',
+                     write (iout,20)
+   20                format (/,' Individual Torsional Angle',
      &                          ' Interactions :',
      &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
-                  write (iout,20)  ia,name(ia),ib,name(ib),ic,
+                  write (iout,30)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),angle,e
-   20             format (' Torsion',3x,4(i7,'-',a3),f11.4,f12.4)
+   30             format (' Torsion',3x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if

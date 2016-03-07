@@ -96,6 +96,7 @@ gfortran -c -g -Warray-bounds -Wmaybe-uninitialized moldyn.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized moment.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized mplpot.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized mpole.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized mrecip.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized mutant.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized neigh.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized nonpol.f
@@ -289,6 +290,10 @@ gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epitors.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epitors1.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epitors2.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epitors3.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epolar.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epolar1.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epolar2.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized epolar3.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized erf.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized erxnfld.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized erxnfld1.f
@@ -493,6 +498,7 @@ gfortran -c -g -Warray-bounds -Wmaybe-uninitialized search.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized server.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized shakeup.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized sigmoid.f
+gfortran -c -g -Warray-bounds -Wmaybe-uninitialized simplex.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized sktstuff.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized sniffer.f
 gfortran -c -g -Warray-bounds -Wmaybe-uninitialized sort.f

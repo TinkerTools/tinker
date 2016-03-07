@@ -70,7 +70,17 @@ c
       do i = 1, n
          aeat(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. nangtor.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Angle-Torsion Interactions :',
+     &           //,' Type',25x,'Atom Names',21x,'Angle',
+     &              6x,'Energy',/)
+      end if
 c
 c     calculate the stretch-torsion interaction energy term
 c
@@ -202,15 +212,15 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,10)
-   10                format (/,' Individual Angle-Torsion',
+                     write (iout,20)
+   20                format (/,' Individual Angle-Torsion',
      &                          ' Interactions :',
      &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
-                  write (iout,20)  ia,name(ia),ib,name(ib),ic,
+                  write (iout,30)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),tangle,e
-   20             format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
+   30             format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if

@@ -75,8 +75,9 @@ c
                gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
                expterm = exp(-vnh(2)*dt8)
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
-               scale = scale * exp(-vnh(1)*dt2)
-               eksum = eksum * scale * scale
+               expterm = exp(-vnh(1)*dt2)
+               scale = scale * expterm
+               eksum = eksum * expterm * expterm
                gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
                expterm = exp(-vnh(2)*dt8)
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
@@ -165,7 +166,7 @@ c
       real*8 ekin(3,3)
 c
 c
-c     get instantaneous temperature from the kinetic energy
+c     get initial kinetic energy and instantaneous temperature
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
@@ -174,8 +175,6 @@ c
 c     couple to external temperature bath via Berendsen scaling
 c
       if (thermostat .eq. 'BERENDSEN') then
-         call kinetic (eksum,ekin)
-         temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
          if (temp .eq. 0.0d0)  temp = 0.1d0
          scale = sqrt(1.0d0 + (dt/tautemp)*(kelvin/temp-1.0d0))
          if (integrate .eq. 'RIGIDBODY') then
@@ -198,8 +197,6 @@ c
 c     couple to external temperature bath via Bussi scaling
 c
       else if (thermostat .eq. 'BUSSI') then
-         call kinetic (eksum,ekin)
-         temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
          if (temp .eq. 0.0d0)  temp = 0.1d0
          c = exp(-dt/tautemp)
          d = (1.0d0-c) * (kelvin/temp) / dble(nfree)
@@ -304,8 +301,9 @@ c
                gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
                expterm = exp(-vnh(2)*dt8)
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)
-               scale = scale * exp(-vnh(1)*dt2)
-               eksum = eksum * scale * scale
+               expterm = exp(-vnh(1)*dt2)
+               scale = scale * expterm
+               eksum = eksum * expterm * expterm
                gnh(1) = (2.0d0*eksum-dble(nfree)*ekt) / qnh(1)
                expterm = exp(-vnh(2)*dt8)
                vnh(1) = expterm * (vnh(1)*expterm+gnh(1)*dt4)

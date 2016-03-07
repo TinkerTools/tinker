@@ -96,6 +96,7 @@ gfortran -c -O3 -ffast-math -fopenmp moldyn.f
 gfortran -c -O3 -ffast-math -fopenmp moment.f
 gfortran -c -O3 -ffast-math -fopenmp mplpot.f
 gfortran -c -O3 -ffast-math -fopenmp mpole.f
+gfortran -c -O3 -ffast-math -fopenmp mrecip.f
 gfortran -c -O3 -ffast-math -fopenmp mutant.f
 gfortran -c -O3 -ffast-math -fopenmp neigh.f
 gfortran -c -O3 -ffast-math -fopenmp nonpol.f
@@ -289,6 +290,10 @@ gfortran -c -O3 -ffast-math -fopenmp epitors.f
 gfortran -c -O3 -ffast-math -fopenmp epitors1.f
 gfortran -c -O3 -ffast-math -fopenmp epitors2.f
 gfortran -c -O3 -ffast-math -fopenmp epitors3.f
+gfortran -c -O3 -ffast-math -fopenmp epolar.f
+gfortran -c -O3 -ffast-math -fopenmp epolar1.f
+gfortran -c -O3 -ffast-math -fopenmp epolar2.f
+gfortran -c -O3 -ffast-math -fopenmp epolar3.f
 gfortran -c -O3 -ffast-math -fopenmp erf.f
 gfortran -c -O3 -ffast-math -fopenmp erxnfld.f
 gfortran -c -O3 -ffast-math -fopenmp erxnfld1.f
@@ -493,6 +498,7 @@ gfortran -c -O3 -ffast-math -fopenmp search.f
 gfortran -c -O3 -ffast-math -fopenmp server.f
 gfortran -c -O3 -ffast-math -fopenmp shakeup.f
 gfortran -c -O3 -ffast-math -fopenmp sigmoid.f
+gfortran -c -O3 -ffast-math -fopenmp simplex.f
 gfortran -c -O3 -ffast-math -fopenmp sktstuff.f
 gfortran -c -O3 -ffast-math -fopenmp sniffer.f
 gfortran -c -O3 -ffast-math -fopenmp sort.f

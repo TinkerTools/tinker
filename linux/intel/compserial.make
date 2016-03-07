@@ -96,6 +96,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 moldyn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 moment.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 mplpot.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 mpole.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 mrecip.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 mutant.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 neigh.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 nonpol.f
@@ -289,6 +290,10 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epitors.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epitors1.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epitors2.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epitors3.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epolar.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epolar1.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epolar2.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 epolar3.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 erf.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 erxnfld.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 erxnfld1.f
@@ -493,6 +498,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 search.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 server.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 shakeup.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sigmoid.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 simplex.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sktstuff.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sniffer.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sort.f

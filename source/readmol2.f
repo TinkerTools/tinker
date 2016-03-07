@@ -23,6 +23,7 @@ c
       use couple
       use files
       use iounit
+      use ptable
       use titles
       implicit none
       integer i,j,k,m,ia,ib,isyb
@@ -53,10 +54,15 @@ c
          end if
       end if
 c
+c     zero out the total number of atoms and of bonds
+c
+      n = 0
+      nbond = 0
+c
 c     get title line and get the number of atoms and bonds
 c
-      do i = 1, 1000000
-         read (isyb,20)  record
+      dowhile (.true.)
+         read (isyb,20,err=50,end=50)  record
    20    format (a120)
          next = 1
          call gettext (record,string,next)
@@ -89,8 +95,8 @@ c
 c
 c     read the atom names and coordinates
 c
-      do i = 1, 1000000
-         read (isyb,80)  record
+      dowhile (.true.)
+         read (isyb,80,err=100,end=100)  record
    80    format (a120)
          next = 1
          call gettext (record,string,next)
@@ -113,7 +119,6 @@ c
                      end do
                   end if
                end do
-               type(j) = 0
             end do
             goto 100
          end if
@@ -122,8 +127,8 @@ c
 c
 c     read the bond list to get attached atom lists
 c
-      do i = 1, 1000000
-         read (isyb,110)  record
+      dowhile (.true.)
+         read (isyb,110,err=130,end=130)  record
   110    format (a120)
          next = 1
          call gettext (record,string,next)
@@ -142,6 +147,19 @@ c
          end if
       end do
   130 continue
+c
+c     assign atom types from atomic number and connectivity
+c
+      do i = 1, n
+         type(i) = 0
+         do j = 1, maxele
+            if (name(i) .eq. elemnt(j)) then
+               type(i) = 10*j + n12(i)
+               goto 140
+            end if
+         end do
+  140    continue
+      end do
 c
 c     for each atom, sort its list of attached atoms
 c

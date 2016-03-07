@@ -219,7 +219,8 @@ c
       if (use_charge)  call echarge1
       if (use_chgdpl)  call echgdpl1
       if (use_dipole)  call edipole1
-      if (use_mpole .or. use_polar)  call empole1
+      if (use_mpole)  call empole1
+      if (use_polar)  call epolar1
       if (use_rxnfld)  call erxnfld1
 c
 c     call any miscellaneous energy and gradient routines

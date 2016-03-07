@@ -30,9 +30,10 @@ c
       use potent
       use usolve
       implicit none
-      integer i,j,k
-      integer npg,next
+      integer i,j,k,next
+      integer nlist,npg
       integer pg(maxval)
+      integer, allocatable :: list(:)
       real*8 pol,thl
       real*8 sixth
       logical header
@@ -40,6 +41,114 @@ c
       character*120 record
       character*120 string
 c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(cxtr))  deallocate (cxtr)
+      allocate (cxtr(0:maxxtr))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
+c     set defaults for numbers and lists of polarizable atoms
+c
+      nlist = 0
+      do i = 1, n
+         list(i) = 0
+      end do
+c
+c     set defaults for ExPT induced dipole coefficients
+c
+      do i = 0, maxxtr
+         cxtr(i) = 0.0d0
+      end do
+      cxtr(0) = -0.16d0
+      cxtr(1) = 0.11d0
+      cxtr(2) = 0.68d0
+      cxtr(3) = 0.37d0
+c
+c     get keywords containing polarization-related options
+c
+      do j = 1, nkey
+         next = 1
+         record = keyline(j)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:120)
+         if (keyword(1:12) .eq. 'POLARIZABLE ') then
+            read (string,*,err=10,end=10)  (list(i),i=nlist+1,n)
+   10       continue
+            do while (list(nlist+1) .ne. 0)
+               nlist = nlist + 1
+            end do
+         else if (keyword(1:13) .eq. 'POLAR-EXTRAP ') then
+            read (string,*,err=20,end=20)  (cxtr(i),i=0,maxxtr)
+         end if
+   20    continue
+      end do
+c
+c     get maximum coefficient order for ExPT induced dipoles
+c
+      cxmax = 0
+      do i = 1, maxxtr
+         if (cxtr(i) .ne. 0.0d0)  cxmax = i
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(polarity))  deallocate (polarity)
+      if (allocated(thole))  deallocate (thole)
+      if (allocated(pdamp))  deallocate (pdamp)
+      if (allocated(udir))  deallocate (udir)
+      if (allocated(udirp))  deallocate (udirp)
+      if (allocated(uind))  deallocate (uind)
+      if (allocated(uinp))  deallocate (uinp)
+      if (allocated(uxtr))  deallocate (uxtr)
+      if (allocated(uxtrp))  deallocate (uxtrp)
+      if (allocated(douind))  deallocate (douind)
+      allocate (polarity(n))
+      allocate (thole(n))
+      allocate (pdamp(n))
+      allocate (udir(3,n))
+      allocate (udirp(3,n))
+      allocate (uind(3,n))
+      allocate (uinp(3,n))
+      allocate (uxtr(0:cxmax,3,n))
+      allocate (uxtrp(0:cxmax,3,n))
+      allocate (douind(n))
+c
+c     set the atoms allowed to have nonzero induced dipoles
+c
+      do i = 1, n
+         douind(i) = .true.
+      end do
+      i = 1
+      do while (list(i) .ne. 0)
+         if (i .eq. 1) then
+            do j = 1, n
+               douind(j) = .false.
+            end do
+         end if
+         if (list(i).gt.0 .and. list(i).le.n) then
+            j = list(i)
+            if (.not. douind(j)) then
+               douind(j) = .true.
+            end if
+         else if (list(i).lt.0 .and. list(i).ge.-n) then
+            do j = abs(list(i)), abs(list(i+1))
+               if (.not. douind(j)) then
+                  douind(j) = .true.
+               end if
+            end do
+            i = i + 1
+         end if
+         i = i + 1
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      deallocate (list)
 c
 c     process keywords containing polarizability parameters
 c
@@ -58,13 +167,13 @@ c
             end do
             call getnumb (record,k,next)
             string = record(next:120)
-            read (string,*,err=10,end=10)  pol,thl,(pg(j),j=1,maxval)
-   10       continue
+            read (string,*,err=30,end=30)  pol,thl,(pg(j),j=1,maxval)
+   30       continue
             if (k .gt. 0) then
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,20)
-   20             format (/,' Additional Atomic Dipole',
+                  write (iout,40)
+   40             format (/,' Additional Atomic Dipole',
      &                       ' Polarizability Parameters :',
      &                    //,5x,'Atom Type',11x,'Alpha',8x,
      &                       'Damp',5x,'Group Atom Types'/)
@@ -76,40 +185,23 @@ c
                      pgrp(j,k) = pg(j)
                      if (pg(j) .eq. 0) then
                         npg = j - 1
-                        goto 30
+                        goto 50
                      end if
                   end do
-   30             continue
+   50             continue
                   if (.not. silent) then
-                     write (iout,40)  k,pol,thl,(pg(j),j=1,npg)
-   40                format (4x,i6,10x,f10.3,2x,f10.3,7x,20i5)
+                     write (iout,60)  k,pol,thl,(pg(j),j=1,npg)
+   60                format (4x,i6,10x,f10.3,2x,f10.3,7x,20i5)
                   end if
                else
-                  write (iout,50)
-   50             format (/,' KPOLAR  --  Too many Dipole',
+                  write (iout,70)
+   70             format (/,' KPOLAR  --  Too many Dipole',
      &                       ' Polarizability Parameters')
                   abort = .true.
                end if
             end if
          end if
       end do
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (allocated(polarity))  deallocate (polarity)
-      if (allocated(thole))  deallocate (thole)
-      if (allocated(pdamp))  deallocate (pdamp)
-      if (allocated(uind))  deallocate (uind)
-      if (allocated(uinp))  deallocate (uinp)
-      if (allocated(uinds))  deallocate (uinds)
-      if (allocated(uinps))  deallocate (uinps)
-      allocate (polarity(n))
-      allocate (thole(n))
-      allocate (pdamp(n))
-      allocate (uind(3,n))
-      allocate (uinp(3,n))
-      allocate (uinds(3,n))
-      allocate (uinps(3,n))
 c
 c     find and store the atomic dipole polarizability parameters
 c
@@ -134,18 +226,18 @@ c
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
                string = record(next:120)
-               read (string,*,err=60,end=60)  pol,thl
-   60          continue
+               read (string,*,err=80,end=80)  pol,thl
+   80          continue
                if (header) then
                   header = .false.
-                  write (iout,70)
-   70             format (/,' Additional Dipole Polarizabilities',
+                  write (iout,90)
+   90             format (/,' Additional Dipole Polarizabilities',
      &                       ' for Specific Atoms :',
      &                    //,6x,'Atom',15x,'Alpha',8x,'Damp',/)
                end if
                if (.not. silent) then
-                  write (iout,80)  k,pol,thl
-   80             format (4x,i6,10x,f10.3,2x,f10.3)
+                  write (iout,100)  k,pol,thl
+  100             format (4x,i6,10x,f10.3,2x,f10.3)
                end if
                polarity(k) = pol
                thole(k) = thl

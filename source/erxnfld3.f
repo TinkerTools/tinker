@@ -56,7 +56,17 @@ c
       do i = 1, n
          aer(i) = 0.0d0
       end do
+c
+c     print header information if debug output was requested
+c
       header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Reaction Field Interactions :',
+     &           //,' Type',14x,'Atom Names',11x,'Dist from Origin',
+     &              4x,'R(1-2)',6x,'Energy',/)
+      end if
 c
 c     set the switching function coefficients
 c
@@ -113,8 +123,8 @@ c
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
-                        write (iout,10)
-   10                   format (/,' Individual Reaction Field',
+                        write (iout,20)
+   20                   format (/,' Individual Reaction Field',
      &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             11x,'Dist from Origin',4x,'R(1-2)',
@@ -123,8 +133,8 @@ c
                      r = sqrt(r2)
                      di = sqrt(x(i)**2 + y(i)**2 + z(i)**2)
                      dk = sqrt(x(k)**2 + y(k)**2 + z(k)**2)
-                     write (iout,20)  i,name(i),k,name(k),di,dk,r,eik
-   20                format (' RxnFld',4x,2(i7,'-',a3),3x,3f10.4,f12.4)
+                     write (iout,30)  i,name(i),k,name(k),di,dk,r,eik
+   30                format (' RxnFld',4x,2(i7,'-',a3),3x,3f10.4,f12.4)
                   end if
                end if
             end if

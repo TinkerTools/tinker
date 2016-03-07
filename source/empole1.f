@@ -699,6 +699,308 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Andy's original ExPT method stuff below here
+c
+c              if (poltyp .eq. 'EXTRAP') then
+c
+c     +1/2 (uind)T (dT/dr) (uind)
+c
+c                 gfd = 0.5d0 * (rr5*scip(2)*scale3i
+c    &                  - rr7*(scip(3)*sci(4)+sci(3)*scip(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                         * (sci(4)*uinp(1,i)+scip(4)*uind(1,i)
+c    &                           +sci(3)*uinp(1,k)+scip(3)*uind(1,k))
+c                 fdir(2) = gfd*yr + temp5
+c    &                         * (sci(4)*uinp(2,i)+scip(4)*uind(2,i)
+c    &                           +sci(3)*uinp(2,k)+scip(3)*uind(2,k))
+c                 fdir(3) = gfd*zr + temp5
+c    &                         * (sci(4)*uinp(3,i)+scip(4)*uind(3,i)
+c    &                           +sci(3)*uinp(3,k)+scip(3)*uind(3,k))
+c                 ftm2i(1) = ftm2i(1) - fdir(1) + findmp(1)
+c                 ftm2i(2) = ftm2i(2) - fdir(2) + findmp(2)
+c                 ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
+c
+c     -1/2 (cc1+cc2+cc3) (u0)T (dT/dr) (u0)
+c
+c                 scia(3) = uxtr(0,1,i)*xr + uxtr(0,2,i)*yr
+c    &                         + uxtr(0,3,i)*zr
+c                 scia(4) = uxtr(0,1,k)*xr + uxtr(0,2,k)*yr
+c    &                         + uxtr(0,3,k)*zr
+c                 sciap(2) = uxtr(0,1,i)*uxtrp(0,1,k)
+c    &                          + uxtr(0,2,i)*uxtrp(0,2,k)
+c    &                          + uxtr(0,3,i)*uxtrp(0,3,k)
+c    &                          + uxtrp(0,1,i)*uxtr(0,1,k)
+c    &                          + uxtrp(0,2,i)*uxtr(0,2,k)
+c    &                          + uxtrp(0,3,i)*uxtr(0,3,k)
+c                 sciap(3) = uxtrp(0,1,i)*xr + uxtrp(0,2,i)*yr
+c    &                          + uxtrp(0,3,i)*zr
+c                 sciap(4) = uxtrp(0,1,k)*xr + uxtrp(0,2,k)*yr
+c    &                          + uxtrp(0,3,k)*zr
+c                 gfd = 0.5d0 * (rr5*sciap(2)*scale3i
+c    &                  - rr7*(sciap(3)*scia(4)
+c    &                        +scia(3)*sciap(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                  * (scia(4)*uxtrp(0,1,i)+sciap(4)*uxtr(0,1,i)
+c    &                    +scia(3)*uxtrp(0,1,k)+sciap(3)*uxtr(0,1,k))
+c                 fdir(2) = gfd*yr + temp5
+c    &                  * (scia(4)*uxtrp(0,2,i)+sciap(4)*uxtr(0,2,i)
+c    &                    +scia(3)*uxtrp(0,2,k)+sciap(3)*uxtr(0,2,k))
+c                 fdir(3) = gfd*zr + temp5
+c    &                  * (scia(4)*uxtrp(0,3,i)+sciap(4)*uxtr(0,3,i)
+c    &                    +scia(3)*uxtrp(0,3,k)+sciap(3)*uxtr(0,3,k))
+c                 temp3 = 0.5d0 * rr3 * uscale(kk) * sciap(2)
+c                 temp5 = -0.5d0 * rr5 * uscale(kk)
+c    &                       * (scia(3)*sciap(4)+sciap(3)*scia(4))
+c                 findmp(1) = temp3*ddsc3(1) + temp5*ddsc5(1)
+c                 findmp(2) = temp3*ddsc3(2) + temp5*ddsc5(2)
+c                 findmp(3) = temp3*ddsc3(3) + temp5*ddsc5(3)
+c                 ftm2i(1) = ftm2i(1) + (cc1+cc2+cc3)
+c    &                                     *(fdir(1)-findmp(1))
+c                 ftm2i(2) = ftm2i(2) + (cc1+cc2+cc3)
+c    &                                     *(fdir(2)-findmp(2))
+c                 ftm2i(3) = ftm2i(3) + (cc1+cc2+cc3)
+c    &                                     *(fdir(3)-findmp(3))
+c
+c     -1/2 (cc2+cc3) (u0)T (dT/dr) (u(1))
+c
+c                 usumi(1) = uxtr(0,1,i)
+c                 usumi(2) = uxtr(0,2,i)
+c                 usumi(3) = uxtr(0,3,i)
+c                 usumk(1) = uxtr(1,1,k)
+c                 usumk(2) = uxtr(1,2,k)
+c                 usumk(3) = uxtr(1,3,k)
+c                 usumip(1) = uxtrp(0,1,i)
+c                 usumip(2) = uxtrp(0,2,i)
+c                 usumip(3) = uxtrp(0,3,i)
+c                 usumkp(1) = uxtrp(1,1,k)
+c                 usumkp(2) = uxtrp(1,2,k)
+c                 usumkp(3) = uxtrp(1,3,k)
+c                 scia(3) = usumi(1)*xr + usumi(2)*yr + usumi(3)*zr
+c                 scia(4) = usumk(1)*xr + usumk(2)*yr + usumk(3)*zr
+c                 sciap(2) = usumi(1)*usumkp(1)
+c    &                          + usumi(2)*usumkp(2)
+c    &                          + usumi(3)*usumkp(3)
+c    &                          + usumip(1)*usumk(1)
+c    &                          + usumip(2)*usumk(2)
+c    &                          + usumip(3)*usumk(3)
+c                 sciap(3) = usumip(1)*xr + usumip(2)*yr + usumip(3)*zr
+c                 sciap(4) = usumkp(1)*xr + usumkp(2)*yr + usumkp(3)*zr
+c                 gfd = 0.5d0 * (rr5*sciap(2)*scale3i
+c    &                  - rr7*(sciap(3)*scia(4)
+c    &                        +scia(3)*sciap(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                  * (scia(4)*usumip(1)+sciap(4)*usumi(1)
+c    &                    +scia(3)*usumkp(1)+sciap(3)*usumk(1))
+c                 fdir(2) = gfd*yr + temp5
+c    &                  * (scia(4)*usumip(2)+sciap(4)*usumi(2)
+c    &                    +scia(3)*usumkp(2)+sciap(3)*usumk(2))
+c                 fdir(3) = gfd*zr + temp5
+c    &                  * (scia(4)*usumip(3)+sciap(4)*usumi(3)
+c    &                    +scia(3)*usumkp(3)+sciap(3)*usumk(3))
+c                 temp3 = 0.5d0 * rr3 * uscale(kk) * sciap(2)
+c                 temp5 = -0.5d0 * rr5 * uscale(kk)
+c    &                       * (scia(3)*sciap(4)+sciap(3)*scia(4))
+c                 findmp(1) = temp3*ddsc3(1) + temp5*ddsc5(1)
+c                 findmp(2) = temp3*ddsc3(2) + temp5*ddsc5(2)
+c                 findmp(3) = temp3*ddsc3(3) + temp5*ddsc5(3)
+c                 ftm2i(1) = ftm2i(1) + (cc2+cc3)*(fdir(1)-findmp(1))
+c                 ftm2i(2) = ftm2i(2) + (cc2+cc3)*(fdir(2)-findmp(2))
+c                 ftm2i(3) = ftm2i(3) + (cc2+cc3)*(fdir(3)-findmp(3))
+c
+c     -1/2 (cc2+cc3) (u(1))T (dT/dr) (u0)
+c
+c                 usumi(1) = uxtr(1,1,i)
+c                 usumi(2) = uxtr(1,2,i)
+c                 usumi(3) = uxtr(1,3,i)
+c                 usumk(1) = uxtr(0,1,k)
+c                 usumk(2) = uxtr(0,2,k)
+c                 usumk(3) = uxtr(0,3,k)
+c                 usumip(1) = uxtrp(1,1,i)
+c                 usumip(2) = uxtrp(1,2,i)
+c                 usumip(3) = uxtrp(1,3,i)
+c                 usumkp(1) = uxtrp(0,1,k)
+c                 usumkp(2) = uxtrp(0,2,k)
+c                 usumkp(3) = uxtrp(0,3,k)
+c                 scia(3) = usumi(1)*xr + usumi(2)*yr + usumi(3)*zr
+c                 scia(4) = usumk(1)*xr + usumk(2)*yr + usumk(3)*zr
+c                 sciap(2) = usumi(1)*usumkp(1)
+c    &                          + usumi(2)*usumkp(2)
+c    &                          + usumi(3)*usumkp(3)
+c    &                          + usumip(1)*usumk(1)
+c    &                          + usumip(2)*usumk(2)
+c    &                          + usumip(3)*usumk(3)
+c                 sciap(3) = usumip(1)*xr + usumip(2)*yr + usumip(3)*zr
+c                 sciap(4) = usumkp(1)*xr + usumkp(2)*yr + usumkp(3)*zr
+c                 gfd = 0.5d0 * (rr5*sciap(2)*scale3i
+c    &                  - rr7*(sciap(3)*scia(4)
+c    &                        +scia(3)*sciap(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                  * (scia(4)*usumip(1)+sciap(4)*usumi(1)
+c    &                    +scia(3)*usumkp(1)+sciap(3)*usumk(1))
+c                 fdir(2) = gfd*yr + temp5
+c    &                  * (scia(4)*usumip(2)+sciap(4)*usumi(2)
+c    &                    +scia(3)*usumkp(2)+sciap(3)*usumk(2))
+c                 fdir(3) = gfd*zr + temp5
+c    &                  * (scia(4)*usumip(3)+sciap(4)*usumi(3)
+c    &                    +scia(3)*usumkp(3)+sciap(3)*usumk(3))
+c                 temp3 = 0.5d0 * rr3 * uscale(kk) * sciap(2)
+c                 temp5 = -0.5d0 * rr5 * uscale(kk)
+c    &                       * (scia(3)*sciap(4)+sciap(3)*scia(4))
+c                 findmp(1) = temp3*ddsc3(1) + temp5*ddsc5(1)
+c                 findmp(2) = temp3*ddsc3(2) + temp5*ddsc5(2)
+c                 findmp(3) = temp3*ddsc3(3) + temp5*ddsc5(3)
+c                 ftm2i(1) = ftm2i(1) + (cc2+cc3)*(fdir(1)-findmp(1))
+c                 ftm2i(2) = ftm2i(2) + (cc2+cc3)*(fdir(2)-findmp(2))
+c                 ftm2i(3) = ftm2i(3) + (cc2+cc3)*(fdir(3)-findmp(3))
+c
+c     -1/2 cc3 (u1)T (dT/dr) (u1)
+c
+c                 usumi(1) = uxtr(1,1,i)
+c                 usumi(2) = uxtr(1,2,i)
+c                 usumi(3) = uxtr(1,3,i)
+c                 usumk(1) = uxtr(1,1,k)
+c                 usumk(2) = uxtr(1,2,k)
+c                 usumk(3) = uxtr(1,3,k)
+c                 usumip(1) = uxtrp(1,1,i)
+c                 usumip(2) = uxtrp(1,2,i)
+c                 usumip(3) = uxtrp(1,3,i)
+c                 usumkp(1) = uxtrp(1,1,k)
+c                 usumkp(2) = uxtrp(1,2,k)
+c                 usumkp(3) = uxtrp(1,3,k)
+c                 scia(3) = usumi(1)*xr + usumi(2)*yr + usumi(3)*zr
+c                 scia(4) = usumk(1)*xr + usumk(2)*yr + usumk(3)*zr
+c                 sciap(2) = usumi(1)*usumkp(1)
+c    &                          + usumi(2)*usumkp(2)
+c    &                          + usumi(3)*usumkp(3)
+c    &                          + usumip(1)*usumk(1)
+c    &                          + usumip(2)*usumk(2)
+c    &                          + usumip(3)*usumk(3)
+c                 sciap(3) = usumip(1)*xr + usumip(2)*yr + usumip(3)*zr
+c                 sciap(4) = usumkp(1)*xr + usumkp(2)*yr + usumkp(3)*zr
+c                 gfd = 0.5d0 * (rr5*sciap(2)*scale3i
+c    &                  - rr7*(sciap(3)*scia(4)
+c    &                        +scia(3)*sciap(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                  * (scia(4)*usumip(1)+sciap(4)*usumi(1)
+c    &                    +scia(3)*usumkp(1)+sciap(3)*usumk(1))
+c                 fdir(2) = gfd*yr + temp5
+c    &                  * (scia(4)*usumip(2)+sciap(4)*usumi(2)
+c    &                    +scia(3)*usumkp(2)+sciap(3)*usumk(2))
+c                 fdir(3) = gfd*zr + temp5
+c    &                  * (scia(4)*usumip(3)+sciap(4)*usumi(3)
+c    &                    +scia(3)*usumkp(3)+sciap(3)*usumk(3))
+c                 temp3 = 0.5d0 * rr3 * uscale(kk) * sciap(2)
+c                 temp5 = -0.5d0 * rr5 * uscale(kk)
+c    &                       * (scia(3)*sciap(4)+sciap(3)*scia(4))
+c                 findmp(1) = temp3*ddsc3(1) + temp5*ddsc5(1)
+c                 findmp(2) = temp3*ddsc3(2) + temp5*ddsc5(2)
+c                 findmp(3) = temp3*ddsc3(3) + temp5*ddsc5(3)
+c                 ftm2i(1) = ftm2i(1) + cc3*(fdir(1)-findmp(1))
+c                 ftm2i(2) = ftm2i(2) + cc3*(fdir(2)-findmp(2))
+c                 ftm2i(3) = ftm2i(3) + cc3*(fdir(3)-findmp(3))
+c
+c     -1/2 cc3 (u0)T (dT/dr) (u(2))
+c
+c                 usumi(1) = uxtr(0,1,i)
+c                 usumi(2) = uxtr(0,2,i)
+c                 usumi(3) = uxtr(0,3,i)
+c                 usumk(1) = uxtr(2,1,k)
+c                 usumk(2) = uxtr(2,2,k)
+c                 usumk(3) = uxtr(2,3,k)
+c                 usumip(1) = uxtrp(0,1,i)
+c                 usumip(2) = uxtrp(0,2,i)
+c                 usumip(3) = uxtrp(0,3,i)
+c                 usumkp(1) = uxtrp(2,1,k)
+c                 usumkp(2) = uxtrp(2,2,k)
+c                 usumkp(3) = uxtrp(2,3,k)
+c                 scia(3) = usumi(1)*xr + usumi(2)*yr + usumi(3)*zr
+c                 scia(4) = usumk(1)*xr + usumk(2)*yr + usumk(3)*zr
+c                 sciap(2) = usumi(1)*usumkp(1)
+c    &                          + usumi(2)*usumkp(2)
+c    &                          + usumi(3)*usumkp(3)
+c    &                          + usumip(1)*usumk(1)
+c    &                          + usumip(2)*usumk(2)
+c    &                          + usumip(3)*usumk(3)
+c                 sciap(3) = usumip(1)*xr + usumip(2)*yr + usumip(3)*zr
+c                 sciap(4) = usumkp(1)*xr + usumkp(2)*yr + usumkp(3)*zr
+c                 gfd = 0.5d0 * (rr5*sciap(2)*scale3i
+c    &                  - rr7*(sciap(3)*scia(4)
+c    &                        +scia(3)*sciap(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                  * (scia(4)*usumip(1)+sciap(4)*usumi(1)
+c    &                    +scia(3)*usumkp(1)+sciap(3)*usumk(1))
+c                 fdir(2) = gfd*yr + temp5
+c    &                  * (scia(4)*usumip(2)+sciap(4)*usumi(2)
+c    &                    +scia(3)*usumkp(2)+sciap(3)*usumk(2))
+c                 fdir(3) = gfd*zr + temp5
+c    &                  * (scia(4)*usumip(3)+sciap(4)*usumi(3)
+c    &                    +scia(3)*usumkp(3)+sciap(3)*usumk(3))
+c                 temp3 = 0.5d0 * rr3 * uscale(kk) * sciap(2)
+c                 temp5 = -0.5d0 * rr5 * uscale(kk)
+c    &                       * (scia(3)*sciap(4)+sciap(3)*scia(4))
+c                 findmp(1) = temp3*ddsc3(1) + temp5*ddsc5(1)
+c                 findmp(2) = temp3*ddsc3(2) + temp5*ddsc5(2)
+c                 findmp(3) = temp3*ddsc3(3) + temp5*ddsc5(3)
+c                 ftm2i(1) = ftm2i(1) + cc3*(fdir(1)-findmp(1))
+c                 ftm2i(2) = ftm2i(2) + cc3*(fdir(2)-findmp(2))
+c                 ftm2i(3) = ftm2i(3) + cc3*(fdir(3)-findmp(3))
+c
+c     -1/2 cc3 (u(2))T (dT/dr) (u0)
+c
+c                 usumi(1) = uxtr(2,1,i)
+c                 usumi(2) = uxtr(2,2,i)
+c                 usumi(3) = uxtr(2,3,i)
+c                 usumk(1) = uxtr(0,1,k)
+c                 usumk(2) = uxtr(0,2,k)
+c                 usumk(3) = uxtr(0,3,k)
+c                 usumip(1) = uxtrp(2,1,i)
+c                 usumip(2) = uxtrp(2,2,i)
+c                 usumip(3) = uxtrp(2,3,i)
+c                 usumkp(1) = uxtrp(0,1,k)
+c                 usumkp(2) = uxtrp(0,2,k)
+c                 usumkp(3) = uxtrp(0,3,k)
+c                 scia(3) = usumi(1)*xr + usumi(2)*yr + usumi(3)*zr
+c                 scia(4) = usumk(1)*xr + usumk(2)*yr + usumk(3)*zr
+c                 sciap(2) = usumi(1)*usumkp(1)
+c    &                          + usumi(2)*usumkp(2)
+c    &                          + usumi(3)*usumkp(3)
+c    &                          + usumip(1)*usumk(1)
+c    &                          + usumip(2)*usumk(2)
+c    &                          + usumip(3)*usumk(3)
+c                 sciap(3) = usumip(1)*xr + usumip(2)*yr + usumip(3)*zr
+c                 sciap(4) = usumkp(1)*xr + usumkp(2)*yr + usumkp(3)*zr
+c                 gfd = 0.5d0 * (rr5*sciap(2)*scale3i
+c    &                  - rr7*(sciap(3)*scia(4)
+c    &                        +scia(3)*sciap(4))*scale5i)
+c                 temp5 = 0.5d0 * rr5 * scale5i
+c                 fdir(1) = gfd*xr + temp5
+c    &                  * (scia(4)*usumip(1)+sciap(4)*usumi(1)
+c    &                    +scia(3)*usumkp(1)+sciap(3)*usumk(1))
+c                 fdir(2) = gfd*yr + temp5
+c    &                  * (scia(4)*usumip(2)+sciap(4)*usumi(2)
+c    &                    +scia(3)*usumkp(2)+sciap(3)*usumk(2))
+c                 fdir(3) = gfd*zr + temp5
+c    &                  * (scia(4)*usumip(3)+sciap(4)*usumi(3)
+c    &                    +scia(3)*usumkp(3)+sciap(3)*usumk(3))
+c                 temp3 = 0.5d0 * rr3 * uscale(kk) * sciap(2)
+c                 temp5 = -0.5d0 * rr5 * uscale(kk)
+c    &                       * (scia(3)*sciap(4)+sciap(3)*scia(4))
+c                 findmp(1) = temp3*ddsc3(1) + temp5*ddsc5(1)
+c                 findmp(2) = temp3*ddsc3(2) + temp5*ddsc5(2)
+c                 findmp(3) = temp3*ddsc3(3) + temp5*ddsc5(3)
+c                 ftm2i(1) = ftm2i(1) + cc3*(fdir(1)-findmp(1))
+c                 ftm2i(2) = ftm2i(2) + cc3*(fdir(2)-findmp(2))
+c                 ftm2i(3) = ftm2i(3) + cc3*(fdir(3)-findmp(3))
+c              end if
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c
 c     intermediate terms for induced torque on multipoles
 c
                gti(2) = 0.5d0 * rr5 * (sci(4)*psc5+scip(4)*dsc5)
@@ -878,6 +1180,18 @@ c
             uscale(ip14(j,ii)) = 1.0d0
          end do
       end do
+c
+c     get polarization energy via the ExPT extrapolation method
+c
+      if (poltyp .eq. 'EXTRAP') then
+         ep = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               e = -0.5d0 * f * uind(j,i)*uxtr(0,j,i)/polarity(i)
+               ep = ep + e
+            end do
+         end do
+      end if
 c
 c     for periodic boundary conditions with large cutoffs
 c     neighbors must be found by the replicates method
