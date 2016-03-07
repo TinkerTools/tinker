@@ -26,10 +26,8 @@ c
       use bound
       use inform
       use iounit
-      use group
       use keys
       use mdstuf
-      use mutant
       use openmm
       use openmp
       use potent
@@ -38,28 +36,21 @@ c
       use usage
       implicit none
       integer i,istep,nstep
-      integer mode,next, ligstart, ligend
-      real*8 e,dt,dtdump
-      real*8, allocatable :: derivs(:,:)
-      logical exist
-      character*20 keyword
-      character*120 record
-      character*120 string
-c
-c     additional variables used by the OpenMM interface
-c
+      integer mode,next
       integer nextStep
       integer nextUpdate
       integer updateCalls
       integer callMdStat
       integer callMdSave
+      real*8 e,dt,dtdump
       real*8 elapsed,nsPerDay,cpu
-      logical oneTimeStepPerUpdate
-      real*8 vdwLam
-      character*120 ligandstring
-      integer curVal,isRange   
-      character*109 partialstring2
-      character*10 lambdaString
+      real*8, allocatable :: derivs(:,:)
+      logical exist
+      logical updateEachStep
+      character*1 answer
+      character*20 keyword
+      character*120 record
+      character*120 string
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -78,7 +69,6 @@ c
 c     check for keywords containing any altered parameters
 c
       integrate = 'BEEMAN'
-      isRange=0
       do i = 1, nkey
          next = 1
          record = keyline(i)
@@ -100,7 +90,7 @@ c
       dowhile (nstep .lt. 0)
          write (iout,20)
    20    format (/,' Enter the Number of Dynamics Steps to be',
-     &              ' Taken (or 0 to serialize) :  ',$)
+     &              ' Taken :  ',$)
          read (input,30,err=40)  nstep
    30    format (i10)
          if (nstep .lt. 0)  nstep = 0
@@ -247,6 +237,29 @@ c
          end if
       end if
 c
+c     set the frequency with which data is returned from the GPU
+c
+c     if updateEachStep is true, take single steps on the GPU
+c     and retrieve data (positions/velocities/energies) each step;
+c     if updateEachStep is false, then take multiple time steps
+c     on the GPU before sending data updates to the CPU with the
+c     number of steps per update set by the value of "iwrite"
+c
+      updateEachStep = .false.
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=340,end=340)  answer
+  340 continue
+      if (.not. exist) then
+         write (iout,350)
+  350    format (/,' Return Data from the GPU at Every Time Step',
+     &              ' [N] :  ',$)
+         read (input,360)  record
+  360    format (a120)
+         next = 1
+      end if
+      call upcase (answer)
+      if (answer .eq. 'Y')  updateEachStep = .true.
+c
 c     initialize any holonomic constraints and setup dynamics
 c
       call shakeup
@@ -260,7 +273,7 @@ c
 c
 c     map TINKER data structures to OpenMM wrapper structures
 c
-      call map_tinker_to_openmm ()
+      call openmm_data ()
 c
 c     check required potentials forces are available in OpenMM
 c
@@ -273,36 +286,36 @@ c
 c     print out a header line for the dynamics computation
 c
       if (integrate .eq. 'VERLET') then
-         write (iout,340)
-  340    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'STOCHASTIC') then
-         write (iout,350)
-  350    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'BUSSI') then
-         write (iout,360)
-  360    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Bussi-Parrinello NPT Algorithm')
-      else if (integrate .eq. 'NOSE-HOOVER') then
          write (iout,370)
   370    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Nose-Hoover NPT Algorithm')
-      else if (integrate .eq. 'GHMC') then
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'STOCHASTIC') then
          write (iout,380)
   380    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' Generalized Hybrid Monte Carlo')
-      else if (integrate .eq. 'RIGIDBODY') then
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'BUSSI') then
          write (iout,390)
   390    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
+     &              ' Bussi-Parrinello NPT Algorithm')
+      else if (integrate .eq. 'NOSE-HOOVER') then
          write (iout,400)
   400    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Nose-Hoover NPT Algorithm')
+      else if (integrate .eq. 'GHMC') then
+         write (iout,410)
+  410    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' Generalized Hybrid Monte Carlo')
+      else if (integrate .eq. 'RIGIDBODY') then
+         write (iout,420)
+  420    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'RESPA') then
+         write (iout,430)
+  430    format (/,' Molecular Dynamics Trajectory via',
      &              ' r-RESPA MTS Algorithm')
       else
-         write (iout,410)
-  410    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,440)
+  440    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -312,19 +325,10 @@ c
       nextStep = 1
       updateCalls = 0
 c
-c     if oneTimeStepPerUpdate=true, then take one step on the GPU
-c     and retrieve data (position/velocities/energies) from GPU;
-c     if oneTimeStepPerUpdate=false, then take multiple time steps
-c     on the GPU before retrieving data to the CPU; the number of
-c     steps taken per iteration is determined by "iwrite"
-c
-c     oneTimestepPerUpdate = .true.
-      oneTimestepPerUpdate = .false.
-c
 c     integrate equations of motion to take the MD time steps
 c
       call settime
-      if (oneTimeStepPerUpdate) then
+      if (updateEachStep) then
          callMdStat = 1
          callMdSave = 1
          do while (istep .lt. nstep)
@@ -353,25 +357,18 @@ c
       end if
       call gettime (elapsed,cpu)
 c
-c     print performance and timing information if we took steps,
-c     otherwise dump a serialized XML file
+c     print performance and timing information
 c
-      if (nstep .gt. 0) then
-         nsPerDay = 86.4d0 * nstep * dt / elapsed
-         write (iout,420)  nsPerDay,elapsed,nstep,updateCalls,
-     &                     1000.0d0*dt,n,nthread
-  420    format (/,' Performance:  ns/day',9x,f12.4,
-     &           /,15x,'Wall Time',6x,f12.4,
-     &           /,15x,'Steps',14x,i8,
-     &           /,15x,'Updates',12x,i8,
-     &           /,15x,'Time Step',6x,f12.4,
-     &           /,15x,'Atoms',14x,i8,
-     &           /,15x,'Threads',12x,i8)
-      else
-         write(iout, '(a)')
-     &       'No dynamics requested, writing serialized system.xml file'
-         call openmm_serialize(ommHandle)
-      end if
+      nsPerDay = 86.4d0 * nstep * dt / elapsed
+      write (iout,450)  nsPerDay,elapsed,nstep,updateCalls,
+     &                  1000.0d0*dt,n,nthread
+  450 format (/,' Performance:  ns/day',9x,f12.4,
+     &        /,15x,'Wall Time',6x,f12.4,
+     &        /,15x,'Steps',14x,i8,
+     &        /,15x,'Updates',12x,i8,
+     &        /,15x,'Time Step',6x,f12.4,
+     &        /,15x,'Atoms',14x,i8,
+     &        /,15x,'Threads',12x,i8)
 c
 c     perform any final tasks before program exit
 c
@@ -380,21 +377,22 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine map_tinker_to_openmm  --  transfer structures  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine openmm_data  --  copy TINKER data to OpenMM  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "map_tinker_to_openmm" uses calls to the OpenMM C++ interface
-c     to transfer TINKER data to the corresponding OpenMM structures
+c     "openmm_data" uses calls to the OpenMM interface to copy data
+c     from TINKER modules to the corresponding OpenMM structures
 c
 c
-      subroutine map_tinker_to_openmm ()
+      subroutine openmm_data ()
       use sizes
       use angbnd
       use angpot
+      use angtor
       use atomid
       use atoms
       use bath
@@ -410,7 +408,6 @@ c
       use freeze
       use group
       use inform
-      use keys
       use ktrtor
       use kvdws
       use limits
@@ -431,49 +428,43 @@ c
       use solute
       use stodyn
       use strbnd
+      use strtor
       use torpot
       use tors
       use tortor
+      use units
       use urey
       use urypot
       use usage
       use vdw
       use vdwpot
-      use strtor
-      use angtor
       implicit none
-      integer igrpdata(ngrp*2)
-      integer igfixdata(ngfix*2)
-      Real*8 gfixdata(ngfix*3)
-      integer i,j,k
-      integer temp
-      Real*8 tempD
 c
 c
 c     use C++ interface calls to map TINKER variables to OpenMM
 c
-      call set_parameters (maxval)
-      call set_angbnd_data (ak,anat,afld,nangle,iang)
+      call set_angbnd_data (nangle,iang,ak,anat,afld)
       call set_angpot_data (angunit,stbnunit,aaunit,opbunit,opdunit,
      &                      cang,qang,pang,sang,copb,qopb,popb,sopb,
-     &                      copd,qopd,popd,sopd,angtyp,opbtyp)
-      call set_atomid_data (mass,tag,class,atomic,valence,name,story)
-      call set_atoms_data (x,y,z,n,type)
-      call set_bath_data (kelvin,atmsph,tautemp,taupres,compress,
-     &                    collide,vnh,qnh,gnh,volmove,voltrial,
-     &                    isothermal,isobaric,anisotrop,thermostat,
-     &                    barostat,volscale)
-      call set_bitor_data (ibitor,nbitor)
+     &                      copd,qopd,popd,sopd,opbtyp,angtyp)
+      call set_angtor_data (nangtor,iat,kant)
+      call set_atomid_data (tag,class,atomic,valence,mass,name,story)
+      call set_atoms_data (n,type,x,y,z)
+      call set_bath_data (maxnose,voltrial,kelvin,atmsph,tautemp,
+     &                    taupres,compress,collide,eta,volmove,vbar,
+     &                    qbar,gbar,vnh,qnh,gnh,isothermal,isobaric,
+     &                    anisotrop,volscale,barostat,thermostat)
+      call set_bitor_data (nbitor,ibitor)
       call set_bndpot_data (cbnd,qbnd,bndunit,bndtyp)
-      call set_bndstr_data (bk,bl,nbond,ibnd)
-      call set_boxes_data (xbox,ybox,zbox,alpha,beta,gamma,xbox2,ybox2,
-     &                     zbox2,box34,lvec,recip,volbox,beta_sin,
-     &                     beta_cos,gamma_sin,gamma_cos,beta_term,
-     &                     gamma_term,orthogonal,monoclinic,triclinic,
+      call set_bndstr_data (nbond,ibnd,bk,bl)
+      call set_boxes_data (xbox,ybox,zbox,alpha,beta,gamma,xbox2,
+     &                     ybox2,zbox2,box34,volbox,beta_sin,beta_cos,
+     &                     gamma_sin,gamma_cos,beta_term,gamma_term,
+     &                     lvec,recip,orthogonal,monoclinic,triclinic,
      &                     octahedron,spacegrp)
       call set_chgpot_data (electric,dielec,ebuffer,c2scale,c3scale,
      &                      c4scale,c5scale,neutnbr,neutcut)
-      call set_couple_data (n12,i12,n13,i13,n14,i14,n15,i15,maxval)
+      call set_couple_data (n12,i12,n13,i13,n14,i14,n15,i15)
       call set_deriv_data (desum,deb,dea,deba,deub,deaa,deopb,deopd,
      &                     deid,deit,det,dept,debt,deat,dett,dev,dec,
      &                     decd,ded,dem,dep,der,des,delf,deg,dex)
@@ -481,36 +472,45 @@ c
      &                      et,ept,ebt,eat,ett,ev,ec,ecd,ed,em,ep,er,
      &                      es,elf,eg,ex)
       call set_ewald_data (aewald,boundary)
-      call set_freeze_data (krat,nrat,nratx,irat,iratx,kratx,
-     &                      ratimage,use_rattle)
-      call set_inform_data (digits,iprint,iwrite,isend,verbose,debug,
-     &                      holdup,abort)
-      call set_ktrtor_data (ttx,tty,tbf,tbx,tby,tbxy,tnx,tny,
-     &                      ktt,maxntt,maxtgrd)
+      call set_freeze_data (nrat,nratx,iratx,kratx,irat,rateps,
+     &                      krat,use_rattle,ratimage)
+      call set_group_data (ngrp,kgrp,grplist,igrp,grpmass,wgrp,
+     &                     use_group,use_intra,use_inter)
+      call set_inform_data (digits,iprint,iwrite,isend,silent,
+     &                      verbose,debug,holdup,abort)
+      call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
+     &                      ttx,tty,tbf,tbx,tby,tbxy,ktt)
       call set_kvdws_data (rad,eps,rad4,eps4,reduct)
       call set_limits_data (vdwcut,chgcut,dplcut,mpolecut,vdwtaper,
      &                      chgtaper,dpltaper,mpoletaper,ewaldcut,
-     &                      use_ewald,use_lights,use_list,use_vlist,
-     &                      use_clist,use_mlist)
-      call set_mdstuf_data (nfree,irest,velsave,frcsave,uindsave,
-     &                      integrate)
+     &                      usolvcut,use_ewald,use_lights,use_list,
+     &                      use_vlist,use_clist,use_mlist,use_ulist)
+      call set_mdstuf_data (nfree,irest,bmnmix,dorest,velsave,
+     &                      frcsave,uindsave,integrate)
       call set_moldyn_data (v,a,aalt)
       call set_mplpot_data (m2scale,m3scale,m4scale,m5scale)
-      call set_mpole_data (pole,rpole,npole,ipole,polsiz,pollist,
-     &                     polaxe,zaxis,xaxis,yaxis,maxpole,elambda)
-      call set_nonpol_data (solvprs,surften,spcut,spoff,stcut,stoff,
-     &                      rcav,rdisp,cdisp)
-      call set_opbend_data (opbk,iopb,nopbend)
-      call set_pitors_data (kpit,ipit,npitors)
-      call set_pme_data (bsmod1,bsmod2,bsmod3,thetai1,thetai2,thetai3,
-     &                   qgrid,qfac,nfft1,nfft2,nfft3,bsorder,igrid)
-      call set_polar_data (polarity,thole,pdamp,uind,uinp,
-     &                     uinds,uinps,npolar)
-      call set_polgrp_data (np11,ip11,np12,ip12,np13,ip13,np14,ip14,
-     &                      maxp11,maxp12,maxp13,maxp14)
-      call set_polpot_data (poleps,p2scale,p3scale,p4scale,p41scale,
-     &                      p5scale,d1scale,d2scale,d3scale,d4scale,
-     &                      u1scale,u2scale,u3scale,u4scale,poltyp)
+      call set_mpole_data (maxpole,npole,ipole,polsiz,pollist,
+     &                     zaxis,xaxis,yaxis,pole,rpole,polaxe)
+      call set_mutant_data (nmut,imut,type0,class0,type1,class1,lambda,
+     &                      vlambda,elambda,scexp,scalpha,mut)
+      call set_nonpol_data (epso,epsh,rmino,rminh,awater,slevy,
+     &                      solvprs,surften,spcut,spoff,stcut,
+     &                      stoff,rcav,rdisp,cdisp)
+      call set_opbend_data (nopbend,iopb,opbk)
+      call set_pitors_data (npitors,ipit,kpit)
+      call set_pme_data (nfft1,nfft2,nfft3,bsorder,igrid,bsmod1,
+     &                   bsmod2,bsmod3,bsbuild,thetai1,thetai2,
+     &                   thetai3,qgrid,qfac)
+      call set_polar_data (maxxtr,npolar,cxmax,cxtr,polarity,thole,
+     &                     pdamp,udir,udirp,udirs,udirps,uind,uinp,
+     &                     uinds,uinps,uxtr,uxtrp,uxtrs,uxtrps,
+     &                     uexact,douind)
+      call set_polgrp_data (maxp11,maxp12,maxp13,maxp14,np11,
+     &                      np12,np13,np14,ip11,ip12,ip13,ip14)
+      call set_polpot_data (politer,poleps,p2scale,p3scale,p4scale,
+     &                      p5scale,p41scale,d1scale,d2scale,d3scale,
+     &                      d4scale,u1scale,u2scale,u3scale,u4scale,
+     &                      udiag,poltyp)
       call set_potent_data (use_bond,use_angle,use_strbnd,use_urey,
      &                      use_angang,use_opbend,use_opdist,use_improp,
      &                      use_imptor,use_tors,use_pitors,use_strtor,
@@ -518,29 +518,34 @@ c
      &                      use_chgdpl,use_dipole,use_mpole,use_polar,
      &                      use_rxnfld,use_solv,use_metal,use_geom,
      &                      use_extra,use_born,use_orbit)
-      call set_solute_data (rsolv,asolv,rborn,drb,drbp,drobc,doffset,
-     &                      p1,p2,p3,p4,p5,gpol,shct,aobc,bobc,gobc,
+      call set_restrn_data (npfix,ndfix,nafix,ntfix,ngfix,nchir,ipfix,
+     &                      kpfix,idfix,iafix,itfix,igfix,ichir,depth,
+     &                      width,rwall,xpfix,ypfix,zpfix,pfix,dfix,
+     &                      afix,tfix,gfix,chir,use_basin,use_wall)
+      call set_sizes_data (maxatm,maxtyp,maxclass,maxval,maxref,
+     &                     maxgrp,maxres,maxfix)
+      call set_solute_data (doffset,p1,p2,p3,p4,p5,rsolv,asolv,rborn,
+     &                      drb,drbp,drobc,gpol,shct,aobc,bobc,gobc,
      &                      vsolv,wace,s2ace,uace,solvtyp,borntyp)
       call set_stodyn_data (friction,fgamma,use_sdarea)
-      call set_strbnd_data (sbk,isb,nstrbnd)
+      call set_strbnd_data (nstrbnd,isb,sbk)
+      call set_strtor_data (nstrtor,ist,kst)
       call set_torpot_data (idihunit,itorunit,torsunit,ptorunit,
      &                      storunit,atorunit,ttorunit)
-      call set_tors_data (tors1,tors2,tors3,tors4,tors5,tors6,
-     &                    ntors,itors)
-      call set_tortor_data (itt,ntortor)
-      call set_urey_data (uk,ul,iury,nurey)
+      call set_tors_data (ntors,itors,tors1,tors2,tors3,
+     &                    tors4,tors5,tors6)
+      call set_tortor_data (ntortor,itt)
+      call set_units_data (avogadro,lightspd,boltzmann,gasconst,emass,
+     &                     planck,joule,convert,bohr,hartree,evolt,
+     &                     efreq,coulomb,debye,prescon)
+      call set_urey_data (nurey,iury,uk,ul)
       call set_urypot_data (cury,qury,ureyunit)
       call set_usage_data (nuse,iuse,use)
-      call set_vdw_data (radmin,epsilon,radmin4,epsilon4,radhbnd,
-     &                   epshbnd,kred,ired,nvdw,ivdw,jvdw,vlambda,
-     &		         mut)
-      call set_vdwpot_data (abuck,bbuck,cbuck,ghal,dhal,v2scale,
-     &                      v3scale,v4scale,v5scale,igauss,ngauss,
-     &                      use_vcorr,vdwindex,vdwtyp,radtyp,radsiz,
-     &                      radrule,epsrule,gausstyp)
-      call set_restraint_data(igfix,gfix, ngfix, grplist)
-      call set_strtor_data (nstrtor,ist,kst)
-      call set_angtor_data (nangtor,iat,kant)
+      call set_vdw_data (nvdw,ivdw,jvdw,ired,kred,radmin,epsilon,
+     &                   radmin4,epsilon4,radhbnd,epshbnd)
+      call set_vdwpot_data (maxgauss,ngauss,igauss,abuck,bbuck,cbuck,
+     &                      ghal,dhal,v2scale,v3scale,v4scale,v5scale,
+     &                      use_vcorr,vdwindex,radtyp,radsiz,gausstyp,
+     &                      radrule,epsrule,vdwtyp)
       return
       end
-
