@@ -301,7 +301,8 @@ c
       do i = start, stop, step
          nt = nt + 1
          call numeral (i,ext,lext)
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
+c        xyzfile = filename(1:leng)//'.'//ext(1:lext)
+         xyzfile = filename(1:leng)//'.'//ext(1:lext)//'v'
          inquire (file=xyzfile,exist=exist)
 c
 c     add file to the current block and get number of atoms
@@ -413,13 +414,13 @@ c
 c
 c     sample code to find the velocity autocorrelation function
 c
-c     do j = 1, n
-c        value = value + x1(j)*x2(j) + y1(j)*y2(j) + z1(j)*z2(j)
-c     end do
+      do j = 1, n
+         value = value + x1(j)*x2(j) + y1(j)*y2(j) + z1(j)*z2(j)
+      end do
 c
 c     sample code to find the rms deviation upon superposition
 c
-      call impose (n,x1,y1,z1,n,x2,y2,z2,value)
+c     call impose (n,x1,y1,z1,n,x2,y2,z2,value)
 c
 c     perform deallocation of some local arrays
 c

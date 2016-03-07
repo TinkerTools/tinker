@@ -102,7 +102,7 @@ c
       eta = 0.0d0
       voltrial = 20
       volmove = 100.0d0
-      volscale = 'ATOMIC'
+      volscale = 'MOLECULAR'
 c
 c     check for keywords containing any altered parameters
 c
