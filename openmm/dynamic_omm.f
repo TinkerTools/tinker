@@ -26,8 +26,10 @@ c
       use bound
       use inform
       use iounit
+      use group
       use keys
       use mdstuf
+      use mutant
       use openmm
       use openmp
       use potent
@@ -36,7 +38,7 @@ c
       use usage
       implicit none
       integer i,istep,nstep
-      integer mode,next
+      integer mode,next, ligstart, ligend
       real*8 e,dt,dtdump
       real*8, allocatable :: derivs(:,:)
       logical exist
@@ -53,6 +55,11 @@ c
       integer callMdSave
       real*8 elapsed,nsPerDay,cpu
       logical oneTimeStepPerUpdate
+      real*8 vdwLam
+      character*120 ligandstring
+      integer curVal,isRange   
+      character*109 partialstring2
+      character*10 lambdaString
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -71,6 +78,7 @@ c
 c     check for keywords containing any altered parameters
 c
       integrate = 'BEEMAN'
+      isRange=0
       do i = 1, nkey
          next = 1
          record = keyline(i)
@@ -400,7 +408,9 @@ c
       use energi
       use ewald
       use freeze
+      use group
       use inform
+      use keys
       use ktrtor
       use kvdws
       use limits
@@ -408,6 +418,7 @@ c
       use moldyn
       use mplpot
       use mpole
+      use mutant
       use nonpol
       use opbend
       use pitors
@@ -416,6 +427,7 @@ c
       use polgrp
       use polpot
       use potent
+      use restrn
       use solute
       use stodyn
       use strbnd
@@ -427,7 +439,15 @@ c
       use usage
       use vdw
       use vdwpot
+      use strtor
+      use angtor
       implicit none
+      integer igrpdata(ngrp*2)
+      integer igfixdata(ngfix*2)
+      Real*8 gfixdata(ngfix*3)
+      integer i,j,k
+      integer temp
+      Real*8 tempD
 c
 c
 c     use C++ interface calls to map TINKER variables to OpenMM
@@ -477,7 +497,7 @@ c
       call set_moldyn_data (v,a,aalt)
       call set_mplpot_data (m2scale,m3scale,m4scale,m5scale)
       call set_mpole_data (pole,rpole,npole,ipole,polsiz,pollist,
-     &                     polaxe,zaxis,xaxis,yaxis,maxpole)
+     &                     polaxe,zaxis,xaxis,yaxis,maxpole,elambda)
       call set_nonpol_data (solvprs,surften,spcut,spoff,stcut,stoff,
      &                      rcav,rdisp,cdisp)
       call set_opbend_data (opbk,iopb,nopbend)
@@ -512,10 +532,15 @@ c
       call set_urypot_data (cury,qury,ureyunit)
       call set_usage_data (nuse,iuse,use)
       call set_vdw_data (radmin,epsilon,radmin4,epsilon4,radhbnd,
-     &                   epshbnd,kred,ired,nvdw,ivdw,jvdw)
+     &                   epshbnd,kred,ired,nvdw,ivdw,jvdw,vlambda,
+     &		         mut)
       call set_vdwpot_data (abuck,bbuck,cbuck,ghal,dhal,v2scale,
      &                      v3scale,v4scale,v5scale,igauss,ngauss,
      &                      use_vcorr,vdwindex,vdwtyp,radtyp,radsiz,
      &                      radrule,epsrule,gausstyp)
+      call set_restraint_data(igfix,gfix, ngfix, grplist)
+      call set_strtor_data (nstrtor,ist,kst)
+      call set_angtor_data (nangtor,iat,kant)
       return
       end
+
