@@ -97,6 +97,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace moldyn.f
 LF95 -c -o1 -tpp -nstchk -ntrace moment.f
 LF95 -c -o1 -tpp -nstchk -ntrace mplpot.f
 LF95 -c -o1 -tpp -nstchk -ntrace mpole.f
+LF95 -c -o1 -tpp -nstchk -ntrace mrecip.f
 LF95 -c -o1 -tpp -nstchk -ntrace mutant.f
 LF95 -c -o1 -tpp -nstchk -ntrace neigh.f
 LF95 -c -o1 -tpp -nstchk -ntrace nonpol.f
@@ -290,6 +291,10 @@ LF95 -c -o1 -tpp -nstchk -ntrace epitors.f
 LF95 -c -o1 -tpp -nstchk -ntrace epitors1.f
 LF95 -c -o1 -tpp -nstchk -ntrace epitors2.f
 LF95 -c -o1 -tpp -nstchk -ntrace epitors3.f
+LF95 -c -o1 -tpp -nstchk -ntrace epolar.f
+LF95 -c -o1 -tpp -nstchk -ntrace epolar1.f
+LF95 -c -o1 -tpp -nstchk -ntrace epolar2.f
+LF95 -c -o1 -tpp -nstchk -ntrace epolar3.f
 LF95 -c -o1 -tpp -nstchk -ntrace erf.f
 LF95 -c -o1 -tpp -nstchk -ntrace erxnfld.f
 LF95 -c -o1 -tpp -nstchk -ntrace erxnfld1.f
@@ -494,6 +499,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace search.f
 LF95 -c -o1 -tpp -nstchk -ntrace server.f
 LF95 -c -o1 -tpp -nstchk -ntrace shakeup.f
 LF95 -c -o1 -tpp -nstchk -ntrace sigmoid.f
+LF95 -c -o1 -tpp -nstchk -ntrace simplex.f
 LF95 -c -o1 -tpp -nstchk -ntrace sktstuff.f
 LF95 -c -o1 -tpp -nstchk -ntrace sniffer.f
 LF95 -c -o1 -tpp -nstchk -ntrace sort.f

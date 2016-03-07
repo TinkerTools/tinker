@@ -215,6 +215,7 @@ OBJS = action.o \
        disgeo.o \
        dma.o \
        domega.o \
+       dynamic.o \
        dynamic_omm.o \
        eangang.o \
        eangang1.o \
@@ -1200,7 +1201,7 @@ dma.o:
 document.o: iounit.o
 domega.o:
 dynamic.o: atoms.o bath.o bndstr.o bound.o inform.o iounit.o keys.o mdstuf.o potent.o sizes.o solute.o stodyn.o usage.o
-dynamic_omm.o: angbnd.o angpot.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o boxes.o bound.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o inform.o iounit.o keys.o ktrtor.o kvdws.o limits.o mdstuf.o moldyn.o mplpot.o mpole.o nonpol.o opbend.o openmm.o openmp.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o sizes.o solute.o stodyn.o strbnd.o torpot.o tors.o tortor.o urey.o urypot.o usage.o vdw.o vdwpot.o
+dynamic_omm.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o inform.o iounit.o keys.o ktrtor.o kvdws.o limits.o mdstuf.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o openmp.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o restrn.o sizes.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
 eangang.o: angang.o angbnd.o angpot.o atoms.o bound.o energi.o group.o math.o sizes.o usage.o
 eangang1.o: angang.o angbnd.o angpot.o atoms.o bound.o deriv.o energi.o group.o math.o sizes.o usage.o virial.o
 eangang2.o: angang.o angbnd.o angpot.o atoms.o bound.o group.o hessn.o math.o sizes.o
@@ -1491,7 +1492,6 @@ omega.o:
 opbend.o:
 opdist.o:
 openend.o:
-openmm.o:
 openmp.o:
 optimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 optirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o

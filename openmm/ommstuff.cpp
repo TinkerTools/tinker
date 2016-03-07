@@ -1,7 +1,7 @@
 /*
  *    ############################################################
  *    ##                  COPYRIGHT (C) 2015                    ##
- *    ##     by Mark Friedrichs, Lee-Ping Wang, Kailong Mao     ##
+ *    ##     by Mark Friedrichs, Lee-Ping Wang, Kailong Mao,    ##
  *    ##        Chao Lu, Zhi Wang and Jay William Ponder        ##
  *    ##                  All Rights Reserved                   ##
  *    ############################################################
@@ -337,6 +337,13 @@ struct {
    double* tbxy;
    char20* ktt;
 } ktrtor__;
+
+struct {
+   int maxnvp;
+   double* radpr;
+   double* epspr;
+   char* kvpr;
+} kvdwpr__;
 
 struct {
    double* rad;
@@ -1678,7 +1685,7 @@ static void mapConstraints (struct ConstraintMap* map, FILE* log) {
    memset (constraintOffset, 0, sizeof(int)*numberOfParticles);
 
    // count number of constraints for each particle where that particle
-   // has the smaller index of the two constrainted particles
+   // has the smaller index of the two constrained particles
 
    for (ii = 0; ii < freeze__.nrat; ii++) {
       p1 = *(freeze__.irat+2*ii) - 1;
@@ -1789,6 +1796,7 @@ static void setupAmoebaBondForce (OpenMM_System* system,
       }
       bondPtr += 2;
    }
+
    OpenMM_AmoebaBondForce_setAmoebaGlobalBondCubic (amoebaBondForce,
                      bndpot__.cbnd/OpenMM_NmPerAngstrom);
    OpenMM_AmoebaBondForce_setAmoebaGlobalBondQuartic (amoebaBondForce,
@@ -1811,6 +1819,8 @@ static void setupAmoebaAngleForce (OpenMM_System* system,
    int match;
    char* angleTypPtr;
 
+   // TINKER harmonic and in-plane angles are separate terms in OpenMM
+
    struct ConstraintMap map;
    if (removeConstrainedAngles) {
       mapConstraints (&map, log);
@@ -1819,9 +1829,6 @@ static void setupAmoebaAngleForce (OpenMM_System* system,
    OpenMM_AmoebaAngleForce* amoebaAngleForce;
    amoebaAngleForce = OpenMM_AmoebaAngleForce_create ();
    OpenMM_System_addForce (system, (OpenMM_Force*) amoebaAngleForce);
-
-   // TINKER includes both harmonic and in-plane angles in these
-   // data structs; they are separate in the OpenMM implementation
 
    angleIndexPtr = angbnd__.iang;
    angleTypPtr = angpot__.angtyp;
@@ -1839,6 +1846,7 @@ static void setupAmoebaAngleForce (OpenMM_System* system,
       angleIndexPtr += 4;
       angleTypPtr += 8;
    }
+
    OpenMM_AmoebaAngleForce_setAmoebaGlobalAngleCubic (amoebaAngleForce,
                                                       angpot__.cang);
    OpenMM_AmoebaAngleForce_setAmoebaGlobalAngleQuartic (amoebaAngleForce,
@@ -1862,6 +1870,8 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
    int match;
    double kParameterConversion;
 
+   // TINKER harmonic and in-plane angles are separate terms in OpenMM
+
    struct ConstraintMap map;
    if (removeConstrainedBonds) {
       mapConstraints (&map, log);
@@ -1870,9 +1880,6 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
    OpenMM_AmoebaInPlaneAngleForce* amoebaInPlaneAngleForce;
    amoebaInPlaneAngleForce = OpenMM_AmoebaInPlaneAngleForce_create ();
    OpenMM_System_addForce (system, (OpenMM_Force*) amoebaInPlaneAngleForce);
-
-   // TINKER has both harmonic and in-plane angles in these structures;
-   // they are separate in the OpenMM implementation
 
    angleIndexPtr = angbnd__.iang;
    angleTypPtr = angpot__.angtyp;
@@ -1891,6 +1898,7 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
       angleIndexPtr += 4;
       angleTypPtr += 8;
    }
+
    OpenMM_AmoebaInPlaneAngleForce_setAmoebaGlobalInPlaneAngleCubic 
                        (amoebaInPlaneAngleForce, angpot__.cang);
    OpenMM_AmoebaInPlaneAngleForce_setAmoebaGlobalInPlaneAngleQuartic
@@ -1998,6 +2006,7 @@ static void setupAmoebaUreyBradleyForce (OpenMM_System* system,
       }
       angleIndexPtr += 3;
    }
+
    // OpenMM_AmoebaBondForce_setAmoebaGlobalBondCubic (amoebaBondForce,
    //                                                  urypot__.cury);
    // OpenMM_AmoebaBondForce_setAmoebaGlobalBondQuartic (amoebaBondForce,
@@ -2099,7 +2108,7 @@ static void setupAmoebaTorsionForce (OpenMM_System* system, FILE* log) {
    OpenMM_DoubleArray_destroy (torsion3);
 }
 
-static void setupAmoebaPiTorsionForce( OpenMM_System* system, FILE* log ) {
+static void setupAmoebaPiTorsionForce (OpenMM_System* system, FILE* log) {
 
    int ii;
    int* piTorsIndexPtr;
@@ -2235,7 +2244,7 @@ static void setupAmoebaAngleTorsionForce (OpenMM_System* system, FILE* log) {
    }
 }
 
-static int getChiralIndex( int atomB, int atomC, int atomD ){
+static int getChiralIndex (int atomB, int atomC, int atomD) {
  
    int ii, j, m, k;
    int chiralAtom;
@@ -2378,13 +2387,23 @@ static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    OpenMM_Vec3 c;
 
    if (*boxes__.xbox != 0) {
-      a.x = a.y = a.z = 0.0;
-      b.x = b.y = b.z = 0.0;
-      c.x = c.y = c.z = 0.0;
-      a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
-      b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox);
-      c.z = OpenMM_NmPerAngstrom*(*boxes__.zbox);
-    
+
+      // a.x = a.y = a.z = 0.0;
+      // b.x = b.y = b.z = 0.0;
+      // c.x = c.y = c.z = 0.0;
+      // a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
+      // b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox);
+      // c.z = OpenMM_NmPerAngstrom*(*boxes__.zbox);
+
+      a.x = boxes__.lvec[0][0] * OpenMM_NmPerAngstrom;
+      a.y = boxes__.lvec[1][0] * OpenMM_NmPerAngstrom;
+      a.z = boxes__.lvec[2][0] * OpenMM_NmPerAngstrom;
+      b.x = boxes__.lvec[0][1] * OpenMM_NmPerAngstrom;
+      b.y = boxes__.lvec[1][1] * OpenMM_NmPerAngstrom;
+      b.z = boxes__.lvec[2][1] * OpenMM_NmPerAngstrom;
+      c.x = boxes__.lvec[0][2] * OpenMM_NmPerAngstrom;
+      c.y = boxes__.lvec[1][2] * OpenMM_NmPerAngstrom;
+      c.z = boxes__.lvec[2][2] * OpenMM_NmPerAngstrom;
       OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
    }
 }
@@ -2405,9 +2424,13 @@ static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    c.x = c.x / OpenMM_NmPerAngstrom;
    c.y = c.y / OpenMM_NmPerAngstrom;
    c.z = c.z / OpenMM_NmPerAngstrom;
-   (void) fprintf (log, "\n Box Size:  %12.4f %12.4f %12.4f", a.x, a.y, a.z);
-   (void) fprintf (log, "\n  (Ang)     %12.4f %12.4f %12.4f", b.x, b.y, b.z);
-   (void) fprintf (log, "\n            %12.4f %12.4f %12.4f\n", c.x, c.y, c.z);
+
+   (void) fprintf (log, "\n Box Vectors:  %12.4f %12.4f %12.4f",
+                      a.x, a.y, a.z);
+   (void) fprintf (log, "\n    (Ang)      %12.4f %12.4f %12.4f",
+                      b.x, b.y, b.z);
+   (void) fprintf (log, "\n               %12.4f %12.4f %12.4f\n",
+                      c.x, c.y, c.z);
 }
 
 static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
@@ -2425,27 +2448,17 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
    for (ii = 0; ii < atoms__.n; ii++) {
       i = vdw__.jvdw[ii];
       if (mutant__.mut[ii] == -1) {
-         /* OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
-                              vdw__.ired[ii]-1,
-                              OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
-                              OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
-                              vdw__.kred[ii], mutant__.vlambda); */
          OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
-                              vdw__.ired[ii]-1,
+                              vdw__.ired[ii]-1, atomid__.classs[ii],
                               OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
                               OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
-                              vdw__.kred[ii]);
+                              vdw__.kred[ii], mutant__.vlambda);
       } else {
-         /* OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
-                              vdw__.ired[ii]-1,
-                              OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
-                              OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
-                              vdw__.kred[ii], 1.0); */
          OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
-                              vdw__.ired[ii]-1,
+                              vdw__.ired[ii]-1, atomid__.classs[ii],
                               OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
                               OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
-                              vdw__.kred[ii]);
+                              vdw__.kred[ii], 1.0);
       }
    }
 
@@ -2478,13 +2491,13 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
       if (fabs( vdwpot__.v2scale ) <= 0.0) {
          for (jj = 0; jj < *(couple__.n12 + ii); jj++) {
             OpenMM_IntArray_append (exclusions,
-                    *(couple__.i12 + sizes__.maxval*ii + jj)-1 );
+                    *(couple__.i12 + sizes__.maxval*ii + jj) - 1 );
          }
       }
       if (fabs(vdwpot__.v3scale) <= 0.0) {
          for (jj = 0; jj < *(couple__.n13 + ii); jj++) {
             OpenMM_IntArray_append (exclusions,
-                    *(couple__.i13 + 3*sizes__.maxval*ii + jj)-1 );
+                    *(couple__.i13 + 3*sizes__.maxval*ii + jj) - 1 );
          }
       }
       OpenMM_AmoebaVdwForce_setParticleExclusions (amoebaVdwForce,
@@ -2492,6 +2505,45 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
       OpenMM_IntArray_resize (exclusions, 0);
    }
    OpenMM_IntArray_destroy (exclusions);
+
+   OpenMM_AmoebaVdwForce_computeCombinedSigmaEpsilon (amoebaVdwForce);
+
+   int* avcs = new int[sizes__.maxclass];
+   for (int ii = 0; ii < sizes__.maxclass; ++ii) {
+      avcs[ii] = 0;
+   }
+   for (int ii = 0; ii < atoms__.n; ++ii) {
+      int tpi = atomid__.classs[ii];
+      if (avcs[tpi-1] == 0) {
+         avcs[tpi-1] == 1;
+      }
+   }
+   int nvdwpr = 0;
+   for (int ii = 0; ii < sizes__.maxclass; ++ii) {
+      nvdwpr += avcs[ii];
+   }
+   int* avcv = new int[nvdwpr];
+   int iter_tag = 0;
+   for (int ii = 0; ii < sizes__.maxclass; ++ii) {
+      if (avcs[ii] == 1) {
+         avcv[iter_tag] = ii+1;
+         ++iter_tag;
+      }
+   }
+   for (int ii = 0; ii < nvdwpr; ++ii) {
+      for (int jj = ii; jj < nvdwpr; ++jj) {
+         int tpi = avcv[ii];
+         int tpj = avcv[jj];
+         int kk = (tpi-1) * sizes__.maxclass + (tpj-1);
+         double combinedSigma = vdw__.radmin[kk];
+         double combinedEpsilon = vdw__.epsilon[kk];
+         OpenMM_AmoebaVdwForce_addVdwprByOldTypes (amoebaVdwForce, tpi, tpj,
+                        combinedSigma*OpenMM_NmPerAngstrom,
+                        combinedEpsilon*OpenMM_KJPerKcal);
+      }
+   }
+   delete[] avcs;
+   delete[] avcv;
 }
 
 static void loadCovalentArray (int numberToLoad, int* valuesToLoad,
@@ -2518,6 +2570,8 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
 
    OpenMM_IntArray* covalentMap;
    OpenMM_IntArray* gridDimensions;
+
+   OpenMM_DoubleArray* exptCoefficients;
 
    double dipoleConversion = OpenMM_NmPerAngstrom;
    double quadrupoleConversion = OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom;
@@ -2600,8 +2654,6 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
       // OpenMM_AmoebaMultipoleForce_setPmeBSplineOrder (amoebaMultipoleForce,
       //                           pme__.bsorder);
     
-      // grid dimensions
-    
       gridDimensions = OpenMM_IntArray_create (3);
     
       OpenMM_IntArray_set (gridDimensions, 0, pme__.nfft1);
@@ -2623,6 +2675,16 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
    if (strncasecmp (polpot__.poltyp, "DIRECT", 6) == 0) { 
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Direct);
+   } else if (strncasecmp (polpot__.poltyp, "EXTRAP", 6) == 0) {
+      exptCoefficients = OpenMM_DoubleArray_create (4);
+      OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.cxtr[0]);
+      OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.cxtr[1]);
+      OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.cxtr[2]);
+      OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.cxtr[3]);
+      OpenMM_AmoebaMultipoleForce_setExtrapolationCoefficients
+                                  (amoebaMultipoleForce,exptCoefficients);
+      OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
+                                   OpenMM_AmoebaMultipoleForce_Extrapolated);
    } else {
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Mutual);
@@ -2758,16 +2820,15 @@ static void setupAmoebaGeneralizedKirkwoodForce (OpenMM_System* system,
    double shct;
    char buffer[80];
 
-   // check that Born radius type is recognized -- if not exit
-   // after printing messaage; force Born type='Grycuk' for now
+   // check Born radius type; force use of "Grycuk" for now
 
    setNullTerminator (solute__.borntyp, 8, buffer);
    useGrycuk = 1;
    if (strncasecmp (buffer, "GRYCUK", 6 ) != 0) {
       if (log) {
-         (void) fprintf (log, "setupAmoebaGeneralizedKirkwoodForce: Born type=%s -- forcing Born type to 'Grycuk'.\n", buffer);
+         (void) fprintf (log, "setupAmoebaGeneralizedKirkwoodForce: Born type=%s, forcing Born type to 'Grycuk'.\n", buffer);
       } else {
-         (void) fprintf (stderr, "setupAmoebaGeneralizedKirkwoodForce: Born type=%s -- forcing Born type to 'Grycuk'.\n", buffer);
+         (void) fprintf (stderr, "setupAmoebaGeneralizedKirkwoodForce: Born type=%s, forcing Born type to 'Grycuk'.\n", buffer);
       }
    }
 
@@ -2783,9 +2844,6 @@ static void setupAmoebaGeneralizedKirkwoodForce (OpenMM_System* system,
                           (amoebaGeneralizedKirkwoodForce, chgpot__.dielec);
    OpenMM_AmoebaGeneralizedKirkwoodForce_setIncludeCavityTerm
                           (amoebaGeneralizedKirkwoodForce, includeCavityTerm);
-
-   // use default values for following fields
-
    // OpenMM_AmoebaGeneralizedGeneralizedKirkwoodForce_setDielectricOffset
    //                     (amoebaGeneralizedGeneralizedKirkwoodForce,
    //                      solute__.doffset*OpenMM_NmPerAngstrom);
@@ -2795,8 +2853,6 @@ static void setupAmoebaGeneralizedKirkwoodForce (OpenMM_System* system,
    // OpenMM_AmoebaGeneralizedGeneralizedKirkwoodForce_setSurfaceAreaFactor
    //                     (amoebaGeneralizedGeneralizedKirkwoodForce,
    //                      surfaceAreaFactor);
-
-   // set parameters for GeneralizedKirkwood
 
    for (ii = 0; ii < atoms__.n; ii++) {
       polePtr = mpole__.pole + ii*mpole__.maxpole;
@@ -2821,7 +2877,7 @@ static void setupAndersenThermostat (OpenMM_System* system, FILE* log) {
 
    if (log) {
       (void) fprintf (log, "\n Andersen Thermostat:\n" );
-      (void) fprintf (log, "\n Temperature          %15.2f K",
+      (void) fprintf (log, "\n Target Temperature   %15.2f K",
                       OpenMM_AndersenThermostat_getDefaultTemperature
                       (andersenThermostat));
       (void) fprintf (log, "\n Collision Frequency  %15.7e ps^(-1)",
@@ -2839,18 +2895,18 @@ static void setupMonteCarloBarostat (OpenMM_System* system, FILE* log) {
 
    int frequency = bath__.voltrial;
    monteCarloBarostat = OpenMM_MonteCarloBarostat_create
-                            (bath__.atmsph*1.01295, bath__.kelvin, frequency);
+                            (bath__.atmsph*1.01325, bath__.kelvin, frequency);
    OpenMM_System_addForce (system, (OpenMM_Force*) monteCarloBarostat);
 
    if (log) {
       (void) fprintf (log, "\n MonteCarlo Barostat:\n");
-      (void) fprintf (log, "\n Temperature          %15.2f K",
+      (void) fprintf (log, "\n Target Temperature   %15.2f K",
                       OpenMM_MonteCarloBarostat_getTemperature
                       (monteCarloBarostat));
-      (void) fprintf (log, "\n Pressure             %15.4f atm",
+      (void) fprintf (log, "\n Target Pressure      %15.4f atm",
                       OpenMM_MonteCarloBarostat_getDefaultPressure
-                      (monteCarloBarostat));
-      (void) fprintf (log, "\n Frequency                         %d",
+                      (monteCarloBarostat) / 1.01325);
+      (void) fprintf (log, "\n Trial Frequency                   %d",
                       OpenMM_MonteCarloBarostat_getFrequency
                       (monteCarloBarostat));
       (void) fprintf (log, "\n Random Number Seed                 %d\n",
@@ -2934,7 +2990,7 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       OpenMM_Platform_setPropertyDefaultValue (platform, "CUDADevice",
                                                deviceId);
       if (log) {
-         (void) fprintf (log, "\n Platform CUDA: Setting Device ID to %s from Env Variable CUDA_DEVICE\n", deviceId);
+         (void) fprintf (log, "\n Platform CUDA: Setting Device ID to %s from CUDA_DEVICE\n", deviceId);
       }
    } else if (log) {
       (void) fprintf (log, "\n Platform CUDA: Using Default Value for CUDA Device ID\n");
@@ -2973,7 +3029,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
    char buffer2[128];
    FILE* log = stderr;
 
-   // Allocate space for opaque handle to hold OpenMM objects
+   // allocate space for opaque handle to hold OpenMM objects
    // such as system, integrator, context, etc.
 
    OpenMMData* omm = (OpenMMData*) malloc(sizeof(struct OpenMMData_s));
@@ -3002,9 +3058,9 @@ void openmm_init_ (void** ommHandle, double* dt) {
    OpenMM_StringArray_destroy (pluginList);
    (void) fflush (NULL);
 
-   // Create a System and Force objects within the System. Retain a reference
-   // to each force object so we can fill in the forces. Note: the OpenMM
-   // System takes ownership of the force objects; don't delete them yourself
+   // create System and Force objects within the System; retain a reference
+   // to each force object so we can fill in the forces; mote the OpenMM
+   // System takes ownership of the force objects, don't delete them yourself
 
    omm->system = OpenMM_System_create ();
    setupSystemParticles (omm->system, log);
@@ -3086,9 +3142,9 @@ void openmm_init_ (void** ommHandle, double* dt) {
    initialVelInNm = OpenMM_Vec3Array_create (0);
    setupVelocities (initialVelInNm, log);
 
-   // Choose an Integrator, and a Context connecting the System with the
-   // Integrator. Let the Context choose the best available Platform.
-   // Initialize the configuration from default positions collected above.
+   // choose an Integrator, and a Context connecting the System with the
+   // Integrator; let the Context choose the best available Platform;
+   // initialize the configuration from default positions collected above
 
    setNullTerminator (mdstuf__.integrate, 11, buffer);
    setNullTerminator (bath__.thermostat, 11, buffer2);
@@ -3121,7 +3177,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
       }
       OpenMM_CustomIntegrator_addComputePerDof (integrator, "v", "v+0.5*dt*f1/m");
 
-      // setup for the Bussi-Parrinello thermostat
+      // setup and computation for the Bussi-Parrinello thermostat
 
       int n_constraints = OpenMM_System_getNumConstraints (omm->system) + 3;
       char adjustment [200] = {0};
@@ -3134,8 +3190,6 @@ void openmm_init_ (void** ommHandle, double* dt) {
       strcat (e3, "s-(");
       strcat (e3, adjustment);
       strcat (e3, ")");
-
-      // variables and computation for Bussi-Parrinello thermostat
 
       if (strncasecmp (buffer2, "BUSSI", 5) == 0) {
          OpenMM_CustomIntegrator_addGlobalVariable (integrator, "df", mdstuf__.nfree);
@@ -3210,8 +3264,8 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
    omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
                                            platform);
-   //(void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
-   //(void) fprintf (log, "\n Integrator:  %x\n", (void*)(omm->integrator));
+   // (void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
+   // (void) fprintf (log, "\n Integrator:  %x\n", (void*)(omm->integrator));
 
    OpenMM_Context_setPositions (omm->context, initialPosInNm);
    OpenMM_Context_setVelocities (omm->context, initialVelInNm);
@@ -3300,8 +3354,8 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
    *(boxes__.ybox2) = 0.5 * (*(boxes__.ybox));
    *(boxes__.zbox2) = 0.5 * (*(boxes__.zbox));
 
-   // Positions, velocities and forces are maintained as Vec3Arrays
-   // inside the State. This gives us access, but don't destroy them
+   // positions, velocities and forces are maintained as Vec3Arrays
+   // inside the State; this provides access, but don't destroy them
    // yourself as they will go away with the State
 
    positionConvert = 1.0 / OpenMM_NmPerAngstrom;
@@ -3373,8 +3427,6 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
       (void) fflush (stderr);
    }
 
-   // convert energies from kJ/mol to kcal/mol
-
    *kineticEnergyInKcal = OpenMM_State_getKineticEnergy (state)
                               * OpenMM_KcalPerKJ;
    *potentialEnergyInKcal = OpenMM_State_getPotentialEnergy (state)
@@ -3396,7 +3448,7 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
  */
 
 void openmm_update_ (void** omm, double* dt, int* istep,
-                     int* callMdStat, int* callMdSave ) {
+                     int* callMdStat, int* callMdSave) {
 
    OpenMM_State* state;
    const OpenMM_Vec3Array* positionArray;
@@ -3547,7 +3599,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
    OpenMM_State_destroy (state);
 }
 
-void openmm_get_energies_ (void** omm, double* ke, double* pe ) {
+void openmm_get_energies_ (void** omm, double* ke, double* pe) {
 
    OpenMM_State* state;
    const OpenMM_Vec3Array* positionArray;
@@ -3592,7 +3644,7 @@ void openmm_get_energies_ (void** omm, double* ke, double* pe ) {
    OpenMM_State_destroy (state);
 }
 
-void openmm_update_box_ (void** omm ) {
+void openmm_update_box_ (void** omm) {
 
    OpenMM_Vec3 aBox;
    OpenMM_Vec3 bBox;
@@ -3618,7 +3670,7 @@ void openmm_update_box_ (void** omm ) {
                                          &aBox, &bBox, &cBox);
 }
 
-void openmm_update_positions_ (void** omm ) {
+void openmm_update_positions_ (void** omm) {
 
    OpenMMData* openMMDataHandle;
    OpenMM_Vec3Array* initialPosInNm;
@@ -4474,13 +4526,13 @@ int openmm_test_ (void) {
       }
 
       (void) fprintf (log, "\n Summary of TINKER vs OpenMM Comparison:\n");
-      (void) fprintf (log, "\n EnergyDelta                  %17.8e\n",
+      (void) fprintf (log, "\n EnergyDelta                    %19.8e\n",
                       maxEDelta);
-      (void) fprintf (log, " MaxForceDelta at   %7d   %17.8e\n",
+      (void) fprintf (log, " MaxForceDelta at   %11d %19.8e\n",
                       maxFDeltaIndex, maxFDelta);
-      (void) fprintf (log, " MinDotProduct at   %7d   %17.8e\n",
+      (void) fprintf (log, " MinDotProduct at   %11d %19.8e\n",
                       minDotIndex, minDot);
-      (void) fprintf (log, " AvgDotProduct                %17.8e\n",
+      (void) fprintf (log, " AvgDotProduct                  %19.8e\n",
                       avgDot);
    }
 

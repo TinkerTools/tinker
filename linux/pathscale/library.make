@@ -152,6 +152,10 @@ epitors.o \
 epitors1.o \
 epitors2.o \
 epitors3.o \
+epolar.o \
+epolar1.o \
+epolar2.o \
+epolar3.o \
 erf.o \
 erxnfld.o \
 erxnfld1.o \
@@ -325,6 +329,7 @@ moment.o \
 moments.o \
 mplpot.o \
 mpole.o \
+mrecip.o \
 mutant.o \
 mutate.o \
 nblist.o \
@@ -421,6 +426,7 @@ server.o \
 shakeup.o \
 shunt.o \
 sigmoid.o \
+simplex.o \
 sizes.o \
 sktstuff.o \
 socket.o \
