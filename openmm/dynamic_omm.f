@@ -359,7 +359,8 @@ c
 c
 c     print performance and timing information
 c
-      nsPerDay = 86.4d0 * nstep * dt / elapsed
+      nsPerDay = 0.0d0
+      if (elapsed .ne. 0.0d0)  nsPerDay = 86.4d0 * nstep * dt / elapsed
       write (iout,450)  nsPerDay,elapsed,nstep,updateCalls,
      &                  1000.0d0*dt,n,nthread
   450 format (/,' Performance:  ns/day',9x,f12.4,
