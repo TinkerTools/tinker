@@ -86,7 +86,7 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 14.0
+##  Compiler: Intel Fortran for Linux
 
 #CC = icc
 #CXX = icc
@@ -102,7 +102,7 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 14.0
+##  Compiler: Intel Fortran for Linux
 ##  Parallel: OpenMP
 
 #CC = icc
@@ -118,8 +118,8 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.10 (Yosemite)
-##  Compiler: Intel Fortran for Mac 14.0
+##  Oper Sys: OS X 10.11 (El Capitan)
+##  Compiler: Intel Fortran for Mac OSX
 
 #CC = icc
 #CXX = icc
@@ -135,8 +135,8 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.10 (Yosemite)
-##  Compiler: Intel Fortran for Mac 14.0
+##  Oper Sys: OS X 10.11 (El Capitan)
+##  Compiler: Intel Fortran for Mac OSX
 ##  Parallel: OpenMP
 
 CC = icc
@@ -1492,6 +1492,7 @@ omega.o:
 opbend.o:
 opdist.o:
 openend.o:
+openmm.o:
 openmp.o:
 optimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 optirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
@@ -1586,6 +1587,7 @@ server.o:
 shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o sizes.o usage.o
 shunt.o:
 sigmoid.o:
+simplex.o: iounit.o keys.o minima.o
 sizes.o:
 sktstuff.o: atomid.o atoms.o charge.o couple.o deriv.o fields.o files.o inform.o iounit.o keys.o moldyn.o mpole.o polar.o potent.o sizes.o socket.o
 sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o scales.o sizes.o usage.o
