@@ -81,8 +81,11 @@ c
 c
 c     Intel compiler extensions to OpenMP standard
 c
+#if __GFORTRAN__
+#elif
 !$    call kmp_set_stacksize_s (2**28)
 !$    call kmp_set_blocktime (0)
+#endif
 c
 c     values of machine precision constants
 c
