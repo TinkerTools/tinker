@@ -2387,14 +2387,6 @@ static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    OpenMM_Vec3 c;
 
    if (*boxes__.xbox != 0) {
-
-      // a.x = a.y = a.z = 0.0;
-      // b.x = b.y = b.z = 0.0;
-      // c.x = c.y = c.z = 0.0;
-      // a.x = OpenMM_NmPerAngstrom*(*boxes__.xbox);
-      // b.y = OpenMM_NmPerAngstrom*(*boxes__.ybox);
-      // c.z = OpenMM_NmPerAngstrom*(*boxes__.zbox);
-
       a.x = boxes__.lvec[0][0] * OpenMM_NmPerAngstrom;
       a.y = boxes__.lvec[1][0] * OpenMM_NmPerAngstrom;
       a.z = boxes__.lvec[2][0] * OpenMM_NmPerAngstrom;
@@ -2476,7 +2468,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
    OpenMM_AmoebaVdwForce_setUseDispersionCorrection (amoebaVdwForce,
                                                      useCorrection);
 
-   if (boxes__.orthogonal)
+   if (boxes__.orthogonal || boxes__.monoclinic || boxes__.triclinic)
       OpenMM_AmoebaVdwForce_setNonbondedMethod (amoebaVdwForce,
                                   OpenMM_AmoebaVdwForce_CutoffPeriodic);
    else
