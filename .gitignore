@@ -13,4 +13,5 @@ source/*.o
 source/*.x
 source/*.make
 source/*-*
+source/Makefile
 usage
