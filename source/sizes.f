@@ -41,6 +41,6 @@ c
       parameter (maxref=30)
       parameter (maxgrp=1000)
       parameter (maxres=10000)
-      parameter (maxfix=100000)
+      parameter (maxfix=1000000)
       save
       end

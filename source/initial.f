@@ -79,6 +79,11 @@ c
 !$    call omp_set_num_threads (nthread)
 !$    call omp_set_nested (.true.)
 c
+c     Intel compiler extensions to OpenMP standard
+c
+!$    call kmp_set_stacksize_s (2**28)
+!$    call kmp_set_blocktime (0)
+c
 c     values of machine precision constants
 c
       tiny = precise (1)
