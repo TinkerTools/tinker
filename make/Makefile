@@ -47,11 +47,11 @@ LINKDIR = /usr/local/bin
 ##  Compiler: GNU gfortran
 
 #F77 = gfortran
-#LIBS =
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux or Macintosh
@@ -60,11 +60,11 @@ LINKDIR = /usr/local/bin
 ##  Parallel: OpenMP
 
 F77 = gfortran
-LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 F77FLAGS = -c
 OPTFLAGS = -O3 -ffast-math -fopenmp
 LIBFLAGS = -crusv
-RANLIB = ranlib -c
+RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
@@ -73,7 +73,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 ##  Compiler: Intel Fortran for Linux 14.0
 
 #F77 = ifort
-#LIBS =
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
@@ -100,7 +100,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 ##  Compiler: Intel Fortran for Mac OSX
 
 #F77 = ifort
-#LIBS =
+#LIBS = -L. -lfftw3_threads -lfftw3
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
 #LIBFLAGS = -crusv
@@ -115,7 +115,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 ##  Parallel: OpenMP
 
 #F77 = ifort
-#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+#LIBS = -L. -lfftw3_threads -lfftw3
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
 #LIBFLAGS = -crusv

@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 7.0   October 2014                        ##
+ ##                        Version 7.2  February 2016                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2014               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2016               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -197,7 +197,7 @@
  Minimizing Structure    9  with New Parameters
  Minimizing Structure   10  with New Parameters
 
- Relative Conformational Energy (MM)       1      1.7134 Kcal/mole
+ Relative Conformational Energy (MM)       1      1.7135 Kcal/mole
  Relative Conformational Energy (MM)       2      1.3086 Kcal/mole
  Relative Conformational Energy (MM)       3      0.4738 Kcal/mole
  Relative Conformational Energy (MM)       4      0.0000 Kcal/mole

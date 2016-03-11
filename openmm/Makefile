@@ -59,12 +59,12 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #CC = gcc
 #CXX = g++
 #F77 = gfortran
-#LIBS = -lstdc++
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 #CFLAGS = -c
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux or Macintosh
@@ -80,7 +80,7 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math -fopenmp
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
@@ -91,12 +91,12 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #CC = icc
 #CXX = icc
 #F77 = ifort
-#LIBS = -lstdc++
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 #CFLAGS = -c -xHost
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Generic Linux
@@ -108,12 +108,12 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #CC = icc
 #CXX = icc
 #F77 = ifort
-#LIBS = -L. -lfftw3_threads -lfftw3
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 #CFLAGS = -c -xHost
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Macintosh
@@ -124,7 +124,7 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #CC = icc
 #CXX = icc
 #F77 = ifort
-#LIBS = -lstdc++
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
 #CFLAGS = -c -axSSSE3
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
