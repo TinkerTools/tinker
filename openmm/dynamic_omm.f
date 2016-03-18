@@ -24,6 +24,7 @@ c
       use bath
       use bndstr
       use bound
+      use boxes
       use inform
       use iounit
       use keys
@@ -58,6 +59,17 @@ c
       call initial
       call getxyz
       call mechanic
+c
+c     multipole and polarization are computed together in OpenMM
+c
+      if (use_mpole .and. .not.use_polar .or.
+     &       .not.use_mpole .and. use_polar) then
+         use_mpole = .true.
+         use_polar = .true.
+         call kmpole
+         call kpolar
+         call mutate
+      end if
 c
 c     initialize the temperature, pressure and coupling baths
 c
@@ -275,11 +287,11 @@ c     map TINKER data structures to OpenMM wrapper structures
 c
       call openmm_data ()
 c
-c     check required potentials forces are available in OpenMM
+c     setup the required potential energy terms within OpenMM
 c
       call openmm_init (ommHandle,dt)
 c
-c     compare the TINKER and OpenMM energy/gradient values
+c     compare the energy and gradient between TINKER and OpenMM
 c
       call openmm_test ()
 c
@@ -400,6 +412,7 @@ c
       use bitor
       use bndpot
       use bndstr
+      use bound
       use boxes
       use chgpot
       use couple
@@ -458,6 +471,8 @@ c
       call set_bitor_data (nbitor,ibitor)
       call set_bndpot_data (cbnd,qbnd,bndunit,bndtyp)
       call set_bndstr_data (nbond,ibnd,bk,bl)
+      call set_bound_data (polycut,polycut2,use_bounds,use_replica,
+     &                     use_polymer)
       call set_boxes_data (xbox,ybox,zbox,alpha,beta,gamma,xbox2,
      &                     ybox2,zbox2,box34,volbox,beta_sin,beta_cos,
      &                     gamma_sin,gamma_cos,beta_term,gamma_term,

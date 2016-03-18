@@ -59,12 +59,12 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #CC = gcc
 #CXX = g++
 #F77 = gfortran
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+#LIBS = -lstdc++
 #CFLAGS = -c
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math
 #LIBFLAGS = -crusv
-#RANLIB = ranlib
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux or Macintosh
@@ -80,51 +80,51 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -ffast-math -fopenmp
 #LIBFLAGS = -crusv
-#RANLIB = ranlib
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux
+##  Compiler: Intel Fortran for Linux 14.0
 
 #CC = icc
 #CXX = icc
 #F77 = ifort
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+#LIBS = -lstdc++
 #CFLAGS = -c -xHost
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
-#RANLIB = ranlib
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux
+##  Compiler: Intel Fortran for Linux 14.0
 ##  Parallel: OpenMP
 
 #CC = icc
 #CXX = icc
 #F77 = ifort
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+#LIBS = -L. -lfftw3_threads -lfftw3
 #CFLAGS = -c -xHost
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
 #LIBFLAGS = -crusv
-#RANLIB = ranlib
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac OSX
+##  Oper Sys: OS X 10.10 (Yosemite)
+##  Compiler: Intel Fortran for Mac 14.0
 
 #CC = icc
 #CXX = icc
 #F77 = ifort
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+#LIBS = -lstdc++
 #CFLAGS = -c -axSSSE3
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
@@ -135,8 +135,8 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac OSX
+##  Oper Sys: OS X 10.10 (Yosemite)
+##  Compiler: Intel Fortran for Mac 14.0
 ##  Parallel: OpenMP
 
 CC = icc
@@ -649,13 +649,13 @@ dynamic_omm.x: dynamic_omm.o ommstuff.o libtinker.a
 	${F77} ${LINKFLAGS} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${OPENMM_LIBS}
 
 rename:
-	mv  dynamic_omm.x   $(BINDIR)/dynamic_omm
+	mv dynamic_omm.x $(BINDIR)/dynamic_omm
 
 remove_links:
 	rm -f $(LINKDIR)/dynamic_omm
 
 create_links:
-	ln -s $(BINDIR)/dynamic_omm   $(LINKDIR)/dynamic_omm
+	ln -s $(BINDIR)/dynamic_omm $(LINKDIR)/dynamic_omm
 
 libtinker.a: ${OBJS} 
 	ar ${LIBFLAGS} libtinker.a \
@@ -1492,7 +1492,6 @@ omega.o:
 opbend.o:
 opdist.o:
 openend.o:
-openmm.o:
 openmp.o:
 optimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 optirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
@@ -1587,7 +1586,6 @@ server.o:
 shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o sizes.o usage.o
 shunt.o:
 sigmoid.o:
-simplex.o: iounit.o keys.o minima.o
 sizes.o:
 sktstuff.o: atomid.o atoms.o charge.o couple.o deriv.o fields.o files.o inform.o iounit.o keys.o moldyn.o mpole.o polar.o potent.o sizes.o socket.o
 sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o scales.o sizes.o usage.o

@@ -175,6 +175,14 @@ struct {
 } bndstr__;
 
 struct {
+   double polycut;
+   double polycut2;
+   int use_bounds;
+   int use_replica;
+   int use_polymer;
+} bound__;
+
+struct {
    double* xbox;
    double* ybox;
    double* zbox;
@@ -892,6 +900,16 @@ void set_bndstr_data_ (int* nbond, int* ibnd, double* bk, double* bl) {
    bndstr__.ibnd = ibnd;
    bndstr__.bk = bk;
    bndstr__.bl = bl;
+}
+
+void set_bound_data_ (double* polycut, double* polycut2, int* use_bounds,
+                       int* use_replica, int* use_polymer) {
+
+   bound__.polycut = *polycut;
+   bound__.polycut2 = *polycut2;
+   bound__.use_bounds = *use_bounds;
+   bound__.use_replica = *use_replica;
+   bound__.use_polymer = *use_polymer;
 }
 
 void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
@@ -2386,7 +2404,7 @@ static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    OpenMM_Vec3 b;
    OpenMM_Vec3 c;
 
-   if (*boxes__.xbox != 0) {
+   if (bound__.use_bounds) {
       a.x = boxes__.lvec[0][0] * OpenMM_NmPerAngstrom;
       a.y = boxes__.lvec[1][0] * OpenMM_NmPerAngstrom;
       a.z = boxes__.lvec[2][0] * OpenMM_NmPerAngstrom;
@@ -2417,12 +2435,14 @@ static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    c.y = c.y / OpenMM_NmPerAngstrom;
    c.z = c.z / OpenMM_NmPerAngstrom;
 
-   (void) fprintf (log, "\n Box Vectors:  %12.4f %12.4f %12.4f",
-                      a.x, a.y, a.z);
-   (void) fprintf (log, "\n    (Ang)      %12.4f %12.4f %12.4f",
-                      b.x, b.y, b.z);
-   (void) fprintf (log, "\n               %12.4f %12.4f %12.4f\n",
-                      c.x, c.y, c.z);
+   if (bound__.use_bounds) {
+      (void) fprintf (log, "\n Box Vectors:  %12.4f %12.4f %12.4f",
+                         a.x, a.y, a.z);
+      (void) fprintf (log, "\n    (Ang)      %12.4f %12.4f %12.4f",
+                         b.x, b.y, b.z);
+      (void) fprintf (log, "\n               %12.4f %12.4f %12.4f\n",
+                         c.x, c.y, c.z);
+   }
 }
 
 static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
@@ -2507,7 +2527,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
    for (int ii = 0; ii < atoms__.n; ++ii) {
       int tpi = atomid__.classs[ii];
       if (avcs[tpi-1] == 0) {
-         avcs[tpi-1] == 1;
+         avcs[tpi-1] = 1;
       }
    }
    int nvdwpr = 0;
@@ -2949,6 +2969,69 @@ static void setupConstraints (OpenMM_System* system, FILE* log) {
    }
 }
 
+static OpenMM_IntArray* getGroup (int* kgrp, int* igrp, int idx) {
+
+   int start = igrp[2 * idx] - 1;
+   int end = igrp[2 * idx + 1] - 1;
+   OpenMM_IntArray* group = OpenMM_IntArray_create (0);
+   for (int i = start; i < end + 1; i++) {
+      OpenMM_IntArray_append (group, kgrp[i] - 1);
+   }
+   return group;
+}
+
+static OpenMM_DoubleArray* getWeights (int* kgrp, int* igrp, int idx,
+                                       OpenMM_System* system) {
+
+   int start = igrp[2 * idx] - 1;
+   int end = igrp[2 * idx + 1] - 1;
+   OpenMM_DoubleArray* weights = OpenMM_DoubleArray_create (0);
+   for (int i = start; i < end + 1; i++){
+      OpenMM_DoubleArray_append (weights, OpenMM_System_getParticleMass(system,
+                                 kgrp[i] - 1));
+   }
+   return weights;
+}
+
+static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
+
+   double convert;
+   convert = OpenMM_KJPerKcal / (OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom);
+
+   // In the expression below, u and l are the upper and lower threshold
+
+   OpenMM_CustomCentroidBondForce* force =
+      OpenMM_CustomCentroidBondForce_create (2,
+              "step(distance(g1,g2)-u)*k*(distance(g1,g2)-u)^2+step(l-distance(g1,g2))*k*(distance(g1,g2)-l)^2");
+   OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "k");
+   OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "l");
+   OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "u");
+
+   for (int i = 1; i < group__.ngrp + 1; i++) {
+      OpenMM_CustomCentroidBondForce_addGroup (force, 
+                      getGroup(group__.kgrp, group__.igrp, i),
+                      getWeights(group__.kgrp, group__.igrp, i, system));
+   }
+
+   for (int i = 0; i < restrn__.ngfix; i++) {
+      OpenMM_IntArray* bondGroups = OpenMM_IntArray_create (0);
+      OpenMM_IntArray_append (bondGroups, restrn__.igfix[2*i] - 1);
+      OpenMM_IntArray_append (bondGroups, restrn__.igfix[2*i + 1] - 1);
+
+      OpenMM_DoubleArray* bondParameters = OpenMM_DoubleArray_create (0);
+      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[2*i]
+                                    *convert);
+      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[2*i + 1]
+                                    *OpenMM_NmPerAngstrom);
+      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[2*i + 2]
+                                    *OpenMM_NmPerAngstrom);
+
+      OpenMM_CustomCentroidBondForce_addBond (force, bondGroups,
+                                              bondParameters);
+   }
+   OpenMM_System_addForce (system, (OpenMM_Force *) force);
+}
+
 /*
  *    ############################################################
  *            Platform for Calculation: Reference or CUDA
@@ -3124,9 +3207,11 @@ void openmm_init_ (void** ommHandle, double* dt) {
       setupMonteCarloBarostat (omm->system, log);
    }
 
-   // setup of constraints, positions and velocities
+   // setup of constraints, restraints, positions and velocities
 
    setupConstraints (omm->system, log);
+
+   setupCentroidRestraints (omm->system, log);
 
    initialPosInNm = OpenMM_Vec3Array_create (0);
    setupPositions (initialPosInNm, log);
@@ -3248,7 +3333,9 @@ void openmm_init_ (void** ommHandle, double* dt) {
       exit (-1);
    }
 
-   //platform = getReferencePlatform (log);
+   // choose either the reference or the CUDA platform
+
+   // platform = getReferencePlatform (log);
    platform = getCUDAPlatform (log);
    if (platform == NULL) {
       exit (-1);
@@ -4179,34 +4266,57 @@ int openmm_test_ (void) {
 
    if (countActiveForces > 1) {
 
-      setupAmoebaBondForce (system, removeConstrainedCovalentIxns, log);
-      setupAmoebaAngleForce (system, removeConstrainedCovalentIxns, log);
-      setupAmoebaInPlaneAngleForce (system, removeConstrainedCovalentIxns,
-                                    log);
-      setupAmoebaStretchBendForce (system, removeConstrainedCovalentIxns,
-                                   log);
-      setupAmoebaOutOfPlaneBendForce (system, log);
-      setupAmoebaTorsionForce (system, log);
-      setupAmoebaStretchTorsionForce (system, log);
-      setupAmoebaAngleTorsionForce (system, log);
-      setupAmoebaPiTorsionForce (system, log);
-      setupAmoebaTorsionTorsionForce (system, log);
-      setupAmoebaVdwForce (system, log);
-      setupAmoebaMultipoleForce (system, log);
-
+      if (potent__.use_bond) {
+         setupAmoebaBondForce (system, removeConstrainedCovalentIxns, log);
+      }
+      if (potent__.use_angle) {
+         setupAmoebaAngleForce (system, removeConstrainedCovalentIxns, log);
+         setupAmoebaInPlaneAngleForce (system, removeConstrainedCovalentIxns,
+                                       log);
+      }
+      if (potent__.use_strbnd) {
+         setupAmoebaStretchBendForce (system, removeConstrainedCovalentIxns,
+                                      log);
+      }
+      if (potent__.use_urey) {
+         setupAmoebaUreyBradleyForce (system, removeConstrainedCovalentIxns,
+                                      log);
+      }
+      if (potent__.use_opbend) {
+         setupAmoebaOutOfPlaneBendForce (system, log);
+      }
+      if (potent__.use_tors) {
+         setupAmoebaTorsionForce (system, log);
+      }
+      if (potent__.use_pitors) {
+         setupAmoebaPiTorsionForce (system, log);
+      }
+      if (potent__.use_strtor) {
+         setupAmoebaStretchTorsionForce (system, log);
+      }
+      if (potent__.use_angtor) {
+         setupAmoebaAngleTorsionForce (system, log);
+      }
+      if (potent__.use_tortor) {
+         setupAmoebaTorsionTorsionForce (system, log);
+      }
+      if (potent__.use_vdw) {
+         setupAmoebaVdwForce (system, log);
+      }
+      if (potent__.use_mpole) {
+         setupAmoebaMultipoleForce (system, log);
+      }
       if (potent__.use_solv) {
          setupAmoebaWcaDispersionForce (system, log);
          setupAmoebaGeneralizedKirkwoodForce (system, 1, log);
       }
-
-      if (potent__.use_urey) {
-         setupAmoebaUreyBradleyForce (system,
-                                      removeConstrainedCovalentIxns, log);
-      } 
+      if (potent__.use_geom) {
+         setupCentroidRestraints (system, log);
+      }
 
       loadTinkerForce (deriv__.desum, 0, tinkerForce);
       tinkerEnergy = *energi__.esum;
-      testName = "AmoebaAllTest";
+      testName = "AmoebaPotentialsTest";
 
       if (log) {
          (void) fprintf (log,
@@ -4231,7 +4341,8 @@ int openmm_test_ (void) {
                     *energi__.ex );
          (void) fflush (log);
       }
-   } else if (potent__.use_bond && !potent__.use_mpole) {
+
+   } else if (potent__.use_bond) {
 
       setupAmoebaBondForce (system, removeConstrainedCovalentIxns, log);
       loadTinkerForce (deriv__.deb, 0, tinkerForce);
@@ -4322,10 +4433,17 @@ int openmm_test_ (void) {
                          limits__.use_vlist, limits__.vdwcut);
       }
 
+   } else if (potent__.use_geom) {
+
+      setupCentroidRestraints (system, log);
+      loadTinkerForce (deriv__.deg, 0, tinkerForce);
+      tinkerEnergy = *energi__.eg;
+      testName = "AmoebaRestraintTest";
+
    } else if (potent__.use_mpole && !potent__.use_solv) {
 
       if (log) {
-         (void) fprintf (log, "implicitSolventActive=%d\n",
+         (void) fprintf (log, "ImplicitSolventActive=%d\n",
                          implicitSolventActive);
       }
       if (implicitSolventActive == 0) {
@@ -4426,8 +4544,14 @@ int openmm_test_ (void) {
 
    integrator = (OpenMM_Integrator*) OpenMM_VerletIntegrator_create (0.001);
 
-   //platform = getReferencePlatform (log);
+   // choose either the reference or the CUDA platform
+
+   // platform = getReferencePlatform (log);
    platform = getCUDAPlatform (log);
+   if (platform == NULL) {
+      exit (-1);
+   }
+
    context = OpenMM_Context_create_2 (system, integrator, platform);
 
    OpenMM_Context_setPositions (context, initialPosInNm);
@@ -4444,6 +4568,7 @@ int openmm_test_ (void) {
 
    conversion = -OpenMM_NmPerAngstrom / OpenMM_KJPerKcal;
 
+   setDefaultPeriodicBoxVectors (system, log);
    if (log) {
       printDefaultPeriodicBoxVectors (system, log);
       (void) fflush (log);
