@@ -66,6 +66,9 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 force,dedphiprime
+      real*8 dedxtp,dedytp,dedztp
+      real*8 dedxup,dedyup,dedzup
       logical proceed
 c
 c
@@ -178,9 +181,18 @@ c
                v3 = kst(3,istrtor)
                k = ist(2,istrtor)
                dr = rba - bl(k)
-               e1 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
-               dedphi = storunit * dr * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               ddr = storunit * (v1*phi1 + v2*phi2 + v3*phi3) / rba
+               force = bk(k)
+               e1 = storunit * 2.0d0 * force * dr 
+     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
+     &              + force * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               dedphi = storunit * 2.0d0 * force * dr 
+     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               ddr = storunit * 2.0d0 * force 
+     &                  * (v1*phi1 + v2*phi2 + v3*phi3) / rba
+               dedphiprime = storunit * 2.0d0 * force 
+     &                          * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
 c
 c     scale the interaction based on its group membership
 c
@@ -188,6 +200,7 @@ c
                   e1 = e1 * fgrp
                   dedphi = dedphi * fgrp
                   ddr = ddr * fgrp
+                  dedphiprime = dedphiprime * fgrp
                end if
 c
 c     compute derivative components for this interaction
@@ -201,27 +214,52 @@ c
                dedxu = -dedphi * (yu*zcb - ycb*zu) / (ru2*rcb)
                dedyu = -dedphi * (zu*xcb - zcb*xu) / (ru2*rcb)
                dedzu = -dedphi * (xu*ycb - xcb*yu) / (ru2*rcb)
+
+               dedxtp = dedphiprime * (yt*zcb - ycb*zt) / (rt2*rcb)
+               dedytp = dedphiprime * (zt*xcb - zcb*xt) / (rt2*rcb)
+               dedztp = dedphiprime * (xt*ycb - xcb*yt) / (rt2*rcb)
+               dedxup = -dedphiprime * (yu*zcb - ycb*zu) / (ru2*rcb)
+               dedyup = -dedphiprime * (zu*xcb - zcb*xu) / (ru2*rcb)
+               dedzup = -dedphiprime * (xu*ycb - xcb*yu) / (ru2*rcb)
 c
 c     determine chain rule components for the first bond
 c
                dedxia = zcb*dedyt - ycb*dedzt - ddrdx
+     &                     + zcb*dedytp - ycb*dedztp
                dedyia = xcb*dedzt - zcb*dedxt - ddrdy
+     &                     + xcb*dedztp - zcb*dedxtp
                dedzia = ycb*dedxt - xcb*dedyt - ddrdz
+     &                     + ycb*dedxtp - xcb*dedytp
                dedxib = yca*dedzt - zca*dedyt + zdc*dedyu
      &                     - ydc*dedzu + ddrdx
+     &                     + yca*dedztp - zca*dedytp
+     &                     + zdc*dedyup - ydc*dedzup
                dedyib = zca*dedxt - xca*dedzt + xdc*dedzu
      &                     - zdc*dedxu + ddrdy
+     &                     + zca*dedxtp - xca*dedztp
+     &                     + xdc*dedzup - zdc*dedxup
                dedzib = xca*dedyt - yca*dedxt + ydc*dedxu
      &                     - xdc*dedyu + ddrdz
+     &                     + xca*dedytp - yca*dedxtp 
+     &                     + ydc*dedxup - xdc*dedyup
                dedxic = zba*dedyt - yba*dedzt + ydb*dedzu
      &                     - zdb*dedyu
+     &                     + zba*dedytp - yba*dedztp
+     &                     + ydb*dedzup - zdb*dedyup
                dedyic = xba*dedzt - zba*dedxt + zdb*dedxu
      &                     - xdb*dedzu
+     &                     + xba*dedztp - zba*dedxtp
+     &                     + zdb*dedxup - xdb*dedzup
                dedzic = yba*dedxt - xba*dedyt + xdb*dedyu
      &                     - ydb*dedxu
+     &                     + yba*dedxtp - xba*dedytp
+     &                     + xdb*dedyup - ydb*dedxup
                dedxid = zcb*dedyu - ycb*dedzu
+     &                     + zcb*dedyup - ycb*dedzup
                dedyid = xcb*dedzu - zcb*dedxu
+     &                     + xcb*dedzup - zcb*dedxup
                dedzid = ycb*dedxu - xcb*dedyu
+     &                     + ycb*dedxup - xcb*dedyup
 c
 c     get the stretch-torsion values for the second bond
 c
@@ -230,9 +268,18 @@ c
                v3 = kst(6,istrtor)
                k = ist(3,istrtor)
                dr = rcb - bl(k)
-               e2 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
-               dedphi = storunit * dr * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               ddr = storunit * (v1*phi1 + v2*phi2 + v3*phi3) / rcb
+               force = bk(k)
+               e2 = storunit * 2.0d0 * force * dr 
+     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
+     &              + force * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               dedphi = storunit * 2.0d0 * force * dr 
+     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               ddr = storunit * 2.0d0 * force 
+     &                  * (v1*phi1 + v2*phi2 + v3*phi3) / rcb
+               dedphiprime = storunit * 2.0d0 * force
+     &                          * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
 c
 c     scale the interaction based on its group membership
 c
@@ -240,6 +287,7 @@ c
                   e2 = e2 * fgrp
                   dedphi = dedphi * fgrp
                   ddr = ddr * fgrp
+                  dedphiprime = dedphiprime * fgrp
                end if
 c
 c     compute derivative components for this interaction
@@ -253,27 +301,52 @@ c
                dedxu = -dedphi * (yu*zcb - ycb*zu) / (ru2*rcb)
                dedyu = -dedphi * (zu*xcb - zcb*xu) / (ru2*rcb)
                dedzu = -dedphi * (xu*ycb - xcb*yu) / (ru2*rcb)
+
+               dedxtp = dedphiprime * (yt*zcb - ycb*zt) / (rt2*rcb)
+               dedytp = dedphiprime * (zt*xcb - zcb*xt) / (rt2*rcb)
+               dedztp = dedphiprime * (xt*ycb - xcb*yt) / (rt2*rcb)
+               dedxup = -dedphiprime * (yu*zcb - ycb*zu) / (ru2*rcb)
+               dedyup = -dedphiprime * (zu*xcb - zcb*xu) / (ru2*rcb)
+               dedzup = -dedphiprime * (xu*ycb - xcb*yu) / (ru2*rcb)
 c
 c     increment chain rule components for the second bond
 c
                dedxia = dedxia + zcb*dedyt - ycb*dedzt
+     &                     + zcb*dedytp - ycb* dedztp
                dedyia = dedyia + xcb*dedzt - zcb*dedxt
+     &                     + xcb*dedztp - zcb*dedxtp
                dedzia = dedzia + ycb*dedxt - xcb*dedyt
+     &                     + ycb*dedxtp - xcb*dedytp
                dedxib = dedxib + yca*dedzt - zca*dedyt + zdc*dedyu
      &                     - ydc*dedzu - ddrdx
+     &                     + yca*dedztp - zca*dedytp
+     &                     + zdc*dedyup - ydc*dedzup
                dedyib = dedyib + zca*dedxt - xca*dedzt + xdc*dedzu
      &                     - zdc*dedxu - ddrdy
+     &                     + zca*dedxtp - xca*dedztp
+     &                     + xdc*dedzup - zdc*dedxup
                dedzib = dedzib + xca*dedyt - yca*dedxt + ydc*dedxu
      &                     - xdc*dedyu - ddrdz
+     &                     + xca*dedytp - yca*dedxtp 
+     &                     + ydc*dedxup - xdc*dedyup
                dedxic = dedxic + zba*dedyt - yba*dedzt + ydb*dedzu
      &                     - zdb*dedyu + ddrdx
+     &                     + zba*dedytp - yba*dedztp 
+     &                     + ydb*dedzup - zdb*dedyup
                dedyic = dedyic + xba*dedzt - zba*dedxt + zdb*dedxu
      &                     - xdb*dedzu + ddrdy
+     &                     + xba*dedztp - zba*dedxtp
+     &                     + zdb*dedxup - xdb*dedzup
                dedzic = dedzic + yba*dedxt - xba*dedyt + xdb*dedyu
      &                     - ydb*dedxu + ddrdz
+     &                     + yba*dedxtp - xba*dedytp 
+     &                     + xdb*dedyup - ydb*dedxup
                dedxid = dedxid + zcb*dedyu - ycb*dedzu
+     &                     + zcb*dedyup - ycb*dedzup
                dedyid = dedyid + xcb*dedzu - zcb*dedxu
+     &                     + xcb*dedzup - zcb*dedxup
                dedzid = dedzid + ycb*dedxu - xcb*dedyu
+     &                     + ycb*dedxup - xcb*dedyup
 c
 c     get the stretch-torsion values for the third bond
 c
@@ -282,9 +355,18 @@ c
                v3 = kst(9,istrtor)
                k = ist(4,istrtor)
                dr = rdc - bl(k)
-               e3 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
-               dedphi = storunit * dr * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               ddr = storunit * (v1*phi1 + v2*phi2 + v3*phi3) / rdc
+               force = bk(k)
+               e3 = storunit * 2.0d0 * force * dr 
+     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
+     &              + force * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               dedphi = storunit * 2.0d0 * force * dr 
+     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               ddr = storunit * 2.0d0 * force 
+     &                  * (v1*phi1 + v2*phi2 + v3*phi3) / rdc
+               dedphiprime = storunit * 2.0d0 * force
+     &                          * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
 c
 c     scale the interaction based on its group membership
 c
@@ -292,6 +374,7 @@ c
                   e3 = e3 * fgrp
                   dedphi = dedphi * fgrp
                   ddr = ddr * fgrp
+                  dedphiprime = dedphiprime * fgrp
                end if
 c
 c     compute derivative components for this interaction
@@ -305,27 +388,52 @@ c
                dedxu = -dedphi * (yu*zcb - ycb*zu) / (ru2*rcb)
                dedyu = -dedphi * (zu*xcb - zcb*xu) / (ru2*rcb)
                dedzu = -dedphi * (xu*ycb - xcb*yu) / (ru2*rcb)
+
+               dedxtp = dedphiprime * (yt*zcb - ycb*zt) / (rt2*rcb)
+               dedytp = dedphiprime * (zt*xcb - zcb*xt) / (rt2*rcb)
+               dedztp = dedphiprime * (xt*ycb - xcb*yt) / (rt2*rcb)
+               dedxup = -dedphiprime * (yu*zcb - ycb*zu) / (ru2*rcb)
+               dedyup = -dedphiprime * (zu*xcb - zcb*xu) / (ru2*rcb)
+               dedzup = -dedphiprime * (xu*ycb - xcb*yu) / (ru2*rcb)
 c
 c     increment chain rule components for the third bond
 c
                dedxia = dedxia + zcb*dedyt - ycb*dedzt
+     &                     + zcb*dedytp - ycb*dedztp
                dedyia = dedyia + xcb*dedzt - zcb*dedxt
+     &                     + xcb*dedztp - zcb*dedxtp
                dedzia = dedzia + ycb*dedxt - xcb*dedyt
+     &                     + ycb*dedxtp - xcb*dedytp
                dedxib = dedxib + yca*dedzt - zca*dedyt + zdc*dedyu
      &                     - ydc*dedzu
+     &                     + yca*dedztp - zca*dedytp
+     &                     + zdc*dedyup - ydc*dedzup
                dedyib = dedyib + zca*dedxt - xca*dedzt + xdc*dedzu
      &                     - zdc*dedxu
+     &                     + zca*dedxtp - xca*dedztp
+     &                     + xdc*dedzup - zdc*dedxup
                dedzib = dedzib + xca*dedyt - yca*dedxt + ydc*dedxu
      &                     - xdc*dedyu
+     &                     + xca*dedytp - yca*dedxtp
+     &                     + ydc*dedxup - xdc*dedyup
                dedxic = dedxic + zba*dedyt - yba*dedzt + ydb*dedzu
      &                     - zdb*dedyu - ddrdx
+     &                     + zba*dedytp - yba*dedztp
+     &                     + ydb*dedzup - zdb*dedyup
                dedyic = dedyic + xba*dedzt - zba*dedxt + zdb*dedxu
      &                     - xdb*dedzu - ddrdy
+     &                     + xba*dedztp - zba*dedxtp 
+     &                     + zdb*dedxup - xdb*dedzup
                dedzic = dedzic + yba*dedxt - xba*dedyt + xdb*dedyu
      &                     - ydb*dedxu - ddrdz
+     &                     + yba*dedxtp - xba*dedytp
+     &                     + xdb*dedyup - ydb*dedxup
                dedxid = dedxid + zcb*dedyu - ycb*dedzu + ddrdx
+     &                     + zcb*dedyup - ycb*dedzup
                dedyid = dedyid + xcb*dedzu - zcb*dedxu + ddrdy
+     &                     + xcb*dedzup - zcb*dedxup
                dedzid = dedzid + ycb*dedxu - xcb*dedyu + ddrdz
+     &                     + ycb*dedxup - xcb*dedyup
 c
 c     increment the stretch-torsion energy and gradient
 c

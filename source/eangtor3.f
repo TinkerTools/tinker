@@ -1,7 +1,7 @@
 c
 c
 c     ##########################################################
-c     ##  COPYRIGHT (C) 2014 by Chao Lv & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
 c     ##                  All Rights Reserved                 ##
 c     ##########################################################
 c
@@ -59,6 +59,7 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
+      real*8 force
       logical proceed
       logical header,huge
 c
@@ -70,17 +71,7 @@ c
       do i = 1, n
          aeat(i) = 0.0d0
       end do
-c
-c     print header information if debug output was requested
-c
       header = .true.
-      if (debug .and. nangtor.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Angle-Torsion Interactions :',
-     &           //,' Type',25x,'Atom Names',21x,'Angle',
-     &              6x,'Energy',/)
-      end if
 c
 c     calculate the stretch-torsion interaction energy term
 c
@@ -175,7 +166,12 @@ c
                cosang = -dot / sqrt(rba2*rcb2)
                angle = radian * acos(cosang)
                dt = angle - anat(k)
-               e1 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
+               force = ak(k)
+               e1 = atorunit * 2.0d0 * force * dt
+     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
+     &              + atorunit * force
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the angle-torsion values for the second angle
 c
@@ -187,7 +183,12 @@ c
                cosang = -dot / sqrt(rcb2*rdc2)
                angle = radian * acos(cosang)
                dt = angle - anat(k)
-               e2 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
+               force = ak(k)
+               e2 = atorunit * 2.0d0 * force * dt
+     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
+     &              + atorunit * force
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
@@ -212,15 +213,15 @@ c
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
-                     write (iout,20)
-   20                format (/,' Individual Angle-Torsion',
+                     write (iout,10)
+   10                format (/,' Individual Angle-Torsion',
      &                          ' Interactions :',
      &                       //,' Type',25x,'Atom Names',21x,'Angle',
      &                          6x,'Energy',/)
                   end if
-                  write (iout,30)  ia,name(ia),ib,name(ib),ic,
+                  write (iout,20)  ia,name(ia),ib,name(ib),ic,
      &                             name(ic),id,name(id),tangle,e
-   30             format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
+   20             format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
                end if
             end if
          end if
