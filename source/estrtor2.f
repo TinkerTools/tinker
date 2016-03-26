@@ -101,9 +101,6 @@ c
       real*8 dxicxid,dxicyid,dxiczid
       real*8 dyicxid,dyicyid,dyiczid
       real*8 dzicxid,dzicyid,dziczid
-      real*8 force,d2drprime
-      real*8 dedphiprime
-      real*8 d2edphi2prime
       logical proceed
 c
 c
@@ -392,23 +389,11 @@ c
                v3 = kst(3,istrtor)
                k = ist(2,istrtor)
                dr = rba - bl(k)
-               force = bk(k)
-               dedphi = storunit * 2.0d0 * force 
-     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2 = storunit * 2.0d0 * force * dr
+               dedphi = storunit * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2edphi2 = storunit * dr
      &                       * (v1*d2phi1 + v2*d2phi2 + v3*d2phi3)
                ddr = 1.0d0 / rba
-               d2dr = -storunit * 2.0d0 * force 
-     &                    * (v1*phi1 + v2*phi2 + v3*phi3) / rba**3
-               dedphiprime = storunit * 2.0d0 * force
-     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2prime = storunit * 2.0d0 * force 
-     &                            * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                            * (v1*d2phi1 + v2*d2phi2 + v3*d2phi3)
-               d2drprime = storunit * 2.0d0 * force
-     &                        * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                        * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2dr = -storunit * (v1*phi1 + v2*phi2 + v3*phi3) / rba**3
 c
 c     scale the interaction based on its group membership
 c
@@ -416,9 +401,6 @@ c
                   dedphi = dedphi * fgrp
                   d2edphi2 = d2edphi2 * fgrp
                   d2dr = d2dr * fgrp
-                  dedphiprime = dedphiprime * fgrp
-                  d2edphi2prime = d2edphi2prime * fgrp
-                  d2drprime = d2drprime * fgrp
                end if
 c
 c     compute derivative components for this interaction
@@ -454,763 +436,430 @@ c
                if (i .eq. ia) then
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxia
      &                             + d2edphi2*dphidxia*dphidxia
-     &                             - 2.0d0*dxia*ddrdx
-     &                             + dedphiprime*dphidxia*dphidxia
-     &                             + d2edphi2prime*dphidxia*dphidxia
-     &                             + d2drprime*dxiaxia + d2drdxx
+     &                             - 2.0d0 * dxia * ddrdx
+     &                             + d2drdxx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
      &                             - dxia*ddrdy - dyia*ddrdx
-     &                             + dedphiprime*dphidxia*dphidyia
-     &                             + d2edphi2prime*dphidxia*dphidyia
-     &                             + d2drprime*dxiayia + d2drdxy
+     &                             + d2drdxy
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazia
      &                             + d2edphi2*dphidxia*dphidzia
      &                             - dxia*ddrdz - dzia*ddrdx
-     &                             + dedphiprime*dphidxia*dphidzia
-     &                             + d2edphi2prime*dphidxia*dphidzia
-     &                             + d2drprime*dxiazia + d2drdxz
+     &                             + d2drdxz
                   hessx(2,ia) = hessx(2,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
      &                             - dyia*ddrdx - dxia*ddrdy
-     &                             + dedphiprime*dphidxia*dphidyia
-     &                             + d2edphi2prime*dphidxia*dphidyia
-     &                             + d2drprime*dxiayia + d2drdxy
+     &                             + d2drdxy
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayia
      &                             + d2edphi2*dphidyia*dphidyia
-     &                             - 2.0d0*dyia*ddrdy
-     &                             + dedphiprime*dphidyia*dphidyia
-     &                             + d2edphi2prime*dphidyia*dphidyia
-     &                             + d2drprime*dyiayia + d2drdyy
+     &                             - 2.0d0 * dyia * ddrdy
+     &                             + d2drdyy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazia
      &                             + d2edphi2*dphidyia*dphidzia
      &                             - dyia*ddrdz - dzia*ddrdy
-     &                             + dedphiprime*dphidyia*dphidzia
-     &                             + d2edphi2prime*dphidyia*dphidzia
-     &                             + d2drprime*dyiazia + d2drdyz
+     &                             + d2drdyz
                   hessx(3,ia) = hessx(3,ia) + dedphi*dxiazia
      &                             + d2edphi2*dphidxia*dphidzia
      &                             - dxia*ddrdz - dzia*ddrdx
-     &                             + dedphiprime*dphidxia*dphidzia
-     &                             + d2edphi2prime*dphidxia*dphidzia
-     &                             + d2drprime*dxiazia + d2drdxz
+     &                             + d2drdxz
                   hessy(3,ia) = hessy(3,ia) + dedphi*dyiazia
      &                             + d2edphi2*dphidyia*dphidzia
      &                             - dyia*ddrdz - dzia*ddrdy
-     &                             + dedphiprime*dphidyia*dphidzia
-     &                             + d2edphi2prime*dphidyia*dphidzia
-     &                             + d2drprime*dyiazia + d2drdyz
+     &                             + d2drdyz
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazia
      &                             + d2edphi2*dphidzia*dphidzia
-     &                             - 2.0d0*dzia*ddrdz
-     &                             + dedphiprime*dphidzia*dphidzia
-     &                             + d2edphi2prime*dphidzia*dphidzia
-     &                             + d2drprime*dziazia + d2drdzz
+     &                             - 2.0d0 * dzia * ddrdz
+     &                             + d2drdzz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxiaxib
      &                             + d2edphi2*dphidxia*dphidxib
      &                             + dxia*ddrdx - dxib*ddrdx
-     &                             + dedphiprime*dphidxia*dphidxib
-     &                             + d2edphi2prime*dphidxia*dphidxib
-     &                             + d2drprime*dxiaxib - d2drdxx
+     &                             - d2drdxx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dyiaxib
      &                             + d2edphi2*dphidyia*dphidxib
      &                             + dyia*ddrdx - dxib*ddrdy
-     &                             + dedphiprime*dphidyia*dphidxib
-     &                             + d2edphi2prime*dphidyia*dphidxib
-     &                             + d2drprime*dyiaxib - d2drdxy
+     &                             - d2drdxy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dziaxib
      &                             + d2edphi2*dphidzia*dphidxib
      &                             + dzia*ddrdx - dxib*ddrdz
-     &                             + dedphiprime*dphidzia*dphidxib
-     &                             + d2edphi2prime*dphidzia*dphidxib
-     &                             + d2drprime*dziaxib - d2drdxz
+     &                             - d2drdxz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dxiayib
      &                             + d2edphi2*dphidxia*dphidyib
      &                             + dxia*ddrdy - dyib*ddrdx
-     &                             + dedphiprime*dphidxia*dphidyib
-     &                             + d2edphi2prime*dphidxia*dphidyib
-     &                             + d2drprime*dxiayib - d2drdxy
+     &                             - d2drdxy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyiayib
      &                             + d2edphi2*dphidyia*dphidyib
      &                             + dyia*ddrdy - dyib*ddrdy
-     &                             + dedphiprime*dphidyia*dphidyib
-     &                             + d2edphi2prime*dphidyia*dphidyib
-     &                             + d2drprime*dyiayib - d2drdyy
+     &                             - d2drdyy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dziayib
      &                             + d2edphi2*dphidzia*dphidyib
      &                             + dzia*ddrdy - dyib*ddrdz
-     &                             + dedphiprime*dphidzia*dphidyib
-     &                             + d2edphi2prime*dphidzia*dphidyib
-     &                             + d2drprime*dziayib - d2drdyz
+     &                             - d2drdyz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dxiazib
      &                             + d2edphi2*dphidxia*dphidzib
      &                             + dxia*ddrdz - dzib*ddrdx
-     &                             + dedphiprime*dphidxia*dphidzib
-     &                             + d2edphi2prime*dphidxia*dphidzib
-     &                             + d2drprime*dxiazib - d2drdxz
+     &                             - d2drdxz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dyiazib
      &                             + d2edphi2*dphidyia*dphidzib
      &                             + dyia*ddrdz - dzib*ddrdy
-     &                             + dedphiprime*dphidyia*dphidzib
-     &                             + d2edphi2prime*dphidyia*dphidzib
-     &                             + d2drprime*dyiazib - d2drdyz
+     &                             - d2drdyz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dziazib
      &                             + d2edphi2*dphidzia*dphidzib
      &                             + dzia*ddrdz - dzib*ddrdz
-     &                             + dedphiprime*dphidzia*dphidzib
-     &                             + d2edphi2prime*dphidzia*dphidzib
-     &                             + d2drprime*dziazib - d2drdzz
+     &                             - d2drdzz
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxiaxic
      &                             + d2edphi2*dphidxia*dphidxic
-     &                             + dedphiprime*dphidxia*dphidxic
-     &                             + d2edphi2prime*dphidxia*dphidxic
-     &                             + d2drprime*dxiaxic - dxic*ddrdx
+     &                             - dxic*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyiaxic
      &                             + d2edphi2*dphidyia*dphidxic
-     &                             + dedphiprime*dphidyia*dphidxic
-     &                             + d2edphi2prime*dphidyia*dphidxic
-     &                             + d2drprime*dyiaxic - dxic*ddrdy
+     &                             - dxic*ddrdy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dziaxic
      &                             + d2edphi2*dphidzia*dphidxic
-     &                             + dedphiprime*dphidzia*dphidxic
-     &                             + d2edphi2prime*dphidzia*dphidxic
-     &                             + d2drprime*dziaxic - dxic*ddrdz
+     &                             - dxic*ddrdz
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxiayic
      &                             + d2edphi2*dphidxia*dphidyic
-     &                             + dedphiprime*dphidxia*dphidyic
-     &                             + d2edphi2prime*dphidxia*dphidyic
-     &                             + d2drprime*dxiayic - dyic*ddrdx
+     &                             - dyic*ddrdx
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyiayic
      &                             + d2edphi2*dphidyia*dphidyic
-     &                             + dedphiprime*dphidyia*dphidyic
-     &                             + d2edphi2prime*dphidyia*dphidyic
-     &                             + d2drprime*dyiayic - dyic*ddrdy
+     &                             - dyic*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dziayic
      &                             + d2edphi2*dphidzia*dphidyic
-     &                             + dedphiprime*dphidzia*dphidyic
-     &                             + d2edphi2prime*dphidzia*dphidyic
-     &                             + d2drprime*dziayic - dyic*ddrdz
+     &                             - dyic*ddrdz
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiazic
      &                             + d2edphi2*dphidxia*dphidzic
-     &                             + dedphiprime*dphidxia*dphidzic
-     &                             + d2edphi2prime*dphidxia*dphidzic
-     &                             + d2drprime*dxiazic - dzic*ddrdx
+     &                             - dzic*ddrdx
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiazic
      &                             + d2edphi2*dphidyia*dphidzic
-     &                             + dedphiprime*dphidyia*dphidzic
-     &                             + d2edphi2prime*dphidyia*dphidzic
-     &                             + d2drprime*dyiazic - dzic*ddrdy
+     &                             - dzic*ddrdy
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziazic
      &                             + d2edphi2*dphidzia*dphidzic
-     &                             + dedphiprime*dphidzia*dphidzic
-     &                             + d2edphi2prime*dphidzia*dphidzic
-     &                             + d2drprime*dziazic - dzic*ddrdz
+     &                             - dzic*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxiaxid
      &                             + d2edphi2*dphidxia*dphidxid
-     &                             + dedphiprime*dphidxia*dphidxid
-     &                             + d2edphi2prime*dphidxia*dphidxid
-     &                             + d2drprime*dxiaxid - dxid*ddrdx
+     &                             - dxid*ddrdx
                   hessy(1,id) = hessy(1,id) + dedphi*dyiaxid
      &                             + d2edphi2*dphidyia*dphidxid
-     &                             + dedphiprime*dphidyia*dphidxid
-     &                             + d2edphi2prime*dphidyia*dphidxid
-     &                             + d2drprime*dyiaxid - dxid*ddrdy
+     &                             - dxid*ddrdy
                   hessz(1,id) = hessz(1,id) + dedphi*dziaxid
      &                             + d2edphi2*dphidzia*dphidxid
-     &                             + dedphiprime*dphidzia*dphidxid
-     &                             + d2edphi2prime*dphidzia*dphidxid
-     &                             + d2drprime*dziaxid - dxid*ddrdz
+     &                             - dxid*ddrdz
                   hessx(2,id) = hessx(2,id) + dedphi*dxiayid
      &                             + d2edphi2*dphidxia*dphidyid
-     &                             + dedphiprime*dphidxia*dphidyid
-     &                             + d2edphi2prime*dphidxia*dphidyid
-     &                             + d2drprime*dxiayid - dyid*ddrdx
+     &                             - dyid*ddrdx
                   hessy(2,id) = hessy(2,id) + dedphi*dyiayid
      &                             + d2edphi2*dphidyia*dphidyid
-     &                             + dedphiprime*dphidyia*dphidyid
-     &                             + d2edphi2prime*dphidyia*dphidyid
-     &                             + d2drprime*dyiayid - dyid*ddrdy
+     &                             - dyid*ddrdy
                   hessz(2,id) = hessz(2,id) + dedphi*dziayid
      &                             + d2edphi2*dphidzia*dphidyid
-     &                             + dedphiprime*dphidzia*dphidyid
-     &                             + d2edphi2prime*dphidzia*dphidyid
-     &                             + d2drprime*dziayid - dyid*ddrdz
+     &                             - dyid*ddrdz
                   hessx(3,id) = hessx(3,id) + dedphi*dxiazid
      &                             + d2edphi2*dphidxia*dphidzid
-     &                             + dedphiprime*dphidxia*dphidzid
-     &                             + d2edphi2prime*dphidxia*dphidzid
-     &                             + d2drprime*dxiazid - dzid*ddrdx
+     &                             - dzid*ddrdx
                   hessy(3,id) = hessy(3,id) + dedphi*dyiazid
      &                             + d2edphi2*dphidyia*dphidzid
-     &                             + dedphiprime*dphidyia*dphidzid
-     &                             + d2edphi2prime*dphidyia*dphidzid
-     &                             + d2drprime*dyiazid - dzid*ddrdy
+     &                             - dzid*ddrdy
                   hessz(3,id) = hessz(3,id) + dedphi*dziazid
      &                             + d2edphi2*dphidzia*dphidzid
-     &                             + dedphiprime*dphidzia*dphidzid
-     &                             + d2edphi2prime*dphidzia*dphidzid
-     &                             + d2drprime*dziazid - dzid*ddrdz
+     &                             - dzid*ddrdz
                else if (i .eq. ib) then
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxib
      &                             + d2edphi2*dphidxib*dphidxib
      &                             + 2.0d0*dxib*ddrdx + d2drdxx
-     &                             + dedphiprime*dphidxib*dphidxib
-     &                             + d2edphi2prime*dphidxib*dphidxib
-     &                             + d2drprime*dxibxib
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyib
      &                             + d2edphi2*dphidxib*dphidyib
-     &                             + dyib*ddrdx + dxib*ddrdy
-     &                             + dedphiprime*dphidxib*dphidyib
-     &                             + d2edphi2prime*dphidxib*dphidyib
-     &                             + d2drprime*dxibyib + d2drdxy
+     &                             + dyib*ddrdx + dxib*ddrdy + d2drdxy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzib
      &                             + d2edphi2*dphidxib*dphidzib
-     &                             + dzib*ddrdx + dxib*ddrdz
-     &                             + dedphiprime*dphidxib*dphidzib
-     &                             + d2edphi2prime*dphidxib*dphidzib
-     &                             + d2drprime*dxibzib + d2drdxz
+     &                             + dzib*ddrdx + dxib*ddrdz + d2drdxz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dxibyib
      &                             + d2edphi2*dphidxib*dphidyib
-     &                             + dxib*ddrdy + dyib*ddrdx
-     &                             + dedphiprime*dphidxib*dphidyib
-     &                             + d2edphi2prime*dphidxib*dphidyib
-     &                             + d2drprime*dxibyib + d2drdxy
+     &                             + dxib*ddrdy + dyib*ddrdx + d2drdxy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyib
      &                             + d2edphi2*dphidyib*dphidyib
      &                             + 2.0d0*dyib*ddrdy + d2drdyy
-     &                             + dedphiprime*dphidyib*dphidyib
-     &                             + d2edphi2prime*dphidyib*dphidyib
-     &                             + d2drprime*dyibyib
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzib
      &                             + d2edphi2*dphidyib*dphidzib
-     &                             + dzib*ddrdy + dyib*ddrdz
-     &                             + dedphiprime*dphidyib*dphidzib
-     &                             + d2edphi2prime*dphidyib*dphidzib
-     &                             + d2drprime*dyibzib + d2drdyz
+     &                             + dzib*ddrdy + dyib*ddrdz + d2drdyz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dxibzib
      &                             + d2edphi2*dphidxib*dphidzib
-     &                             + dxib*ddrdz + dzib*ddrdx
-     &                             + dedphiprime*dphidxib*dphidzib
-     &                             + d2edphi2prime*dphidxib*dphidzib
-     &                             + d2drprime*dxibzib + d2drdxz
+     &                             + dxib*ddrdz + dzib*ddrdx + d2drdxz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dyibzib
      &                             + d2edphi2*dphidyib*dphidzib
-     &                             + dyib*ddrdz + dzib*ddrdy
-     &                             + dedphiprime*dphidyib*dphidzib
-     &                             + d2edphi2prime*dphidyib*dphidzib
-     &                             + d2drprime*dyibzib + d2drdyz
+     &                             + dyib*ddrdz + dzib*ddrdy + d2drdyz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzib
      &                             + d2edphi2*dphidzib*dphidzib
      &                             + 2.0d0*dzib*ddrdz + d2drdzz
-     &                             + dedphiprime*dphidzib*dphidzib
-     &                             + d2edphi2prime*dphidzib*dphidzib
-     &                             + d2drprime*dzibzib
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxib
      &                             + d2edphi2*dphidxib*dphidxia
      &                             + dxia*ddrdx - dxib*ddrdx
-     &                             + dedphiprime*dphidxib*dphidxia
-     &                             + d2edphi2prime*dphidxib*dphidxia
-     &                             + d2drprime*dxiaxib - d2drdxx
+     &                             - d2drdxx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayib
      &                             + d2edphi2*dphidyib*dphidxia
      &                             + dxia*ddrdy - dyib*ddrdx
-     &                             + dedphiprime*dphidyib*dphidxia
-     &                             + d2edphi2prime*dphidyib*dphidxia
-     &                             + d2drprime*dxiayib - d2drdxy
+     &                             - d2drdxy
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazib
      &                             + d2edphi2*dphidzib*dphidxia
      &                             + dxia*ddrdz - dzib*ddrdx
-     &                             + dedphiprime*dphidzib*dphidxia
-     &                             + d2edphi2prime*dphidzib*dphidxia
-     &                             + d2drprime*dxiazib - d2drdxz
+     &                             - d2drdxz
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxib
      &                             + d2edphi2*dphidxib*dphidyia
      &                             + dyia*ddrdx - dxib*ddrdy
-     &                             + dedphiprime*dphidxib*dphidyia
-     &                             + d2edphi2prime*dphidxib*dphidyia
-     &                             + d2drprime*dyiaxib - d2drdxy
+     &                             - d2drdxy
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayib
      &                             + d2edphi2*dphidyib*dphidyia
      &                             + dyia*ddrdy - dyib*ddrdy
-     &                             + dedphiprime*dphidyib*dphidyia
-     &                             + d2edphi2prime*dphidyib*dphidyia
-     &                             + d2drprime*dyiayib - d2drdyy
+     &                             - d2drdyy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazib
      &                             + d2edphi2*dphidzib*dphidyia
      &                             + dyia*ddrdz - dzib*ddrdy
-     &                             + dedphiprime*dphidzib*dphidyia
-     &                             + d2edphi2prime*dphidzib*dphidyia
-     &                             + d2drprime*dyiazib - d2drdyz
+     &                             - d2drdyz
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxib
      &                             + d2edphi2*dphidxib*dphidzia
      &                             + dzia*ddrdx - dxib*ddrdz
-     &                             + dedphiprime*dphidxib*dphidzia
-     &                             + d2edphi2prime*dphidxib*dphidzia
-     &                             + d2drprime*dziaxib - d2drdxz
+     &                             - d2drdxz
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayib
      &                             + d2edphi2*dphidyib*dphidzia
      &                             + dzia*ddrdy - dyib*ddrdz
-     &                             + dedphiprime*dphidyib*dphidzia
-     &                             + d2edphi2prime*dphidyib*dphidzia
-     &                             + d2drprime*dziayib - d2drdyz
+     &                             - d2drdyz
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazib
      &                             + d2edphi2*dphidzib*dphidzia
      &                             + dzia*ddrdz - dzib*ddrdz
-     &                             + dedphiprime*dphidzib*dphidzia
-     &                             + d2edphi2prime*dphidzib*dphidzia
-     &                             + d2drprime*dziazib - d2drdzz
+     &                             - d2drdzz
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxibxic
      &                             + d2edphi2*dphidxib*dphidxic
-     &                             + dedphiprime*dphidxib*dphidxic
-     &                             + d2edphi2prime*dphidxib*dphidxic
-     &                             + d2drprime*dxibxic + dxic*ddrdx
+     &                             + dxic*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyibxic
      &                             + d2edphi2*dphidyib*dphidxic
-     &                             + dedphiprime*dphidyib*dphidxic
-     &                             + d2edphi2prime*dphidyib*dphidxic
-     &                             + d2drprime*dyibxic + dxic*ddrdy
+     &                             + dxic*ddrdy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
      &                             + d2edphi2*dphidzib*dphidxic
-     &                             + dedphiprime*dphidzib*dphidxic
-     &                             + d2edphi2prime*dphidzib*dphidxic
-     &                             + d2drprime*dzibxic + dxic*ddrdz
+     &                             + dxic*ddrdz
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxibyic
      &                             + d2edphi2*dphidxib*dphidyic
-     &                             + dedphiprime*dphidxib*dphidyic
-     &                             + d2edphi2prime*dphidxib*dphidyic
-     &                             + d2drprime*dxibyic + dyic*ddrdx
+     &                             + dyic*ddrdx
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyibyic
      &                             + d2edphi2*dphidyib*dphidyic
-     &                             + dedphiprime*dphidyib*dphidyic
-     &                             + d2edphi2prime*dphidyib*dphidyic
-     &                             + d2drprime*dyibyic + dyic*ddrdy
+     &                             + dyic*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dzibyic
      &                             + d2edphi2*dphidzib*dphidyic
-     &                             + dedphiprime*dphidzib*dphidyic
-     &                             + d2edphi2prime*dphidzib*dphidyic
-     &                             + d2drprime*dzibyic + dyic*ddrdz
+     &                             + dyic*ddrdz
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxibzic
      &                             + d2edphi2*dphidxib*dphidzic
-     &                             + dedphiprime*dphidxib*dphidzic
-     &                             + d2edphi2prime*dphidxib*dphidzic
-     &                             + d2drprime*dxibzic + dzic*ddrdx
+     &                             + dzic*ddrdx
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyibzic
      &                             + d2edphi2*dphidyib*dphidzic
-     &                             + dedphiprime*dphidyib*dphidzic
-     &                             + d2edphi2prime*dphidyib*dphidzic
-     &                             + d2drprime*dyibzic + dzic*ddrdy
+     &                             + dzic*ddrdy
                   hessz(3,ic) = hessz(3,ic) + dedphi*dzibzic
      &                             + d2edphi2*dphidzib*dphidzic
-     &                             + dedphiprime*dphidzib*dphidzic
-     &                             + d2edphi2prime*dphidzib*dphidzic
-     &                             + d2drprime*dzibzic + dzic*ddrdz
+     &                             + dzic*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxibxid
      &                             + d2edphi2*dphidxib*dphidxid
-     &                             + dedphiprime*dphidxib*dphidxid
-     &                             + d2edphi2prime*dphidxib*dphidxid
-     &                             + d2drprime*dxibxid + dxid*ddrdx
+     &                             + dxid*ddrdx
                   hessy(1,id) = hessy(1,id) + dedphi*dyibxid
      &                             + d2edphi2*dphidyib*dphidxid
-     &                             + dedphiprime*dphidyib*dphidxid
-     &                             + d2edphi2prime*dphidyib*dphidxid
-     &                             + d2drprime*dyibxid + dxid*ddrdy
+     &                             + dxid*ddrdy
                   hessz(1,id) = hessz(1,id) + dedphi*dzibxid
      &                             + d2edphi2*dphidzib*dphidxid
-     &                             + dedphiprime*dphidzib*dphidxid
-     &                             + d2edphi2prime*dphidzib*dphidxid
-     &                             + d2drprime*dzibxid + dxid*ddrdz
+     &                             + dxid*ddrdz
                   hessx(2,id) = hessx(2,id) + dedphi*dxibyid
      &                             + d2edphi2*dphidxib*dphidyid
-     &                             + dedphiprime*dphidxib*dphidyid
-     &                             + d2edphi2prime*dphidxib*dphidyid
-     &                             + d2drprime*dxibyid + dyid*ddrdx
+     &                             + dyid*ddrdx
                   hessy(2,id) = hessy(2,id) + dedphi*dyibyid
      &                             + d2edphi2*dphidyib*dphidyid
-     &                             + dedphiprime*dphidyib*dphidyid
-     &                             + d2edphi2prime*dphidyib*dphidyid
-     &                             + d2drprime*dyibyid + dyid*ddrdy
+     &                             + dyid*ddrdy
                   hessz(2,id) = hessz(2,id) + dedphi*dzibyid
      &                             + d2edphi2*dphidzib*dphidyid
-     &                             + dedphiprime*dphidzib*dphidyid
-     &                             + d2edphi2prime*dphidzib*dphidyid
-     &                             + d2drprime*dzibyid + dyid*ddrdz
+     &                             + dyid*ddrdz
                   hessx(3,id) = hessx(3,id) + dedphi*dxibzid
      &                             + d2edphi2*dphidxib*dphidzid
-     &                             + dedphiprime*dphidxib*dphidzid
-     &                             + d2edphi2prime*dphidxib*dphidzid
-     &                             + d2drprime*dxibzid + dzid*ddrdx
+     &                             + dzid*ddrdx
                   hessy(3,id) = hessy(3,id) + dedphi*dyibzid
      &                             + d2edphi2*dphidyib*dphidzid
-     &                             + dedphiprime*dphidyib*dphidzid
-     &                             + d2edphi2prime*dphidyib*dphidzid
-     &                             + d2drprime*dyibzid + dzid*ddrdy
+     &                             + dzid*ddrdy
                   hessz(3,id) = hessz(3,id) + dedphi*dzibzid
      &                             + d2edphi2*dphidzib*dphidzid
-     &                             + dedphiprime*dphidzib*dphidzid
-     &                             + d2edphi2prime*dphidzib*dphidzid
-     &                             + d2drprime*dzibzid + dzid*ddrdz
+     &                             + dzid*ddrdz
                else if (i .eq. ic) then
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxicxic
      &                             + d2edphi2*dphidxic*dphidxic
-     &                             + dedphiprime*dphidxic*dphidxic
-     &                             + d2edphi2prime*dphidxic*dphidxic
-     &                             + d2drprime*dxicxic
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyic
      &                             + d2edphi2*dphidxic*dphidyic
-     &                             + dedphiprime*dphidxic*dphidyic
-     &                             + d2edphi2prime*dphidxic*dphidyic
-     &                             + d2drprime*dxicyic
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczic
      &                             + d2edphi2*dphidxic*dphidzic
-     &                             + dedphiprime*dphidxic*dphidzic
-     &                             + d2edphi2prime*dphidxic*dphidzic
-     &                             + d2drprime*dxiczic
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxicyic
      &                             + d2edphi2*dphidxic*dphidyic
-     &                             + dedphiprime*dphidxic*dphidyic
-     &                             + d2edphi2prime*dphidxic*dphidyic
-     &                             + d2drprime*dxicyic
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyicyic
      &                             + d2edphi2*dphidyic*dphidyic
-     &                             + dedphiprime*dphidyic*dphidyic
-     &                             + d2edphi2prime*dphidyic*dphidyic
-     &                             + d2drprime*dyicyic
                   hessz(2,ic) = hessz(2,ic) + dedphi*dyiczic
      &                             + d2edphi2*dphidyic*dphidzic
-     &                             + dedphiprime*dphidyic*dphidzic
-     &                             + d2edphi2prime*dphidyic*dphidzic
-     &                             + d2drprime*dyiczic
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiczic
      &                             + d2edphi2*dphidxic*dphidzic
-     &                             + dedphiprime*dphidxic*dphidzic
-     &                             + d2edphi2prime*dphidxic*dphidzic
-     &                             + d2drprime*dxiczic
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiczic
      &                             + d2edphi2*dphidyic*dphidzic
-     &                             + dedphiprime*dphidyic*dphidzic
-     &                             + d2edphi2prime*dphidyic*dphidzic
-     &                             + d2drprime*dyiczic
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziczic
      &                             + d2edphi2*dphidzic*dphidzic
-     &                             + dedphiprime*dphidzic*dphidzic
-     &                             + d2edphi2prime*dphidzic*dphidzic
-     &                             + d2drprime*dziczic
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxic
      &                             + d2edphi2*dphidxic*dphidxia
-     &                             + dedphiprime*dphidxic*dphidxia
-     &                             + d2edphi2prime*dphidxic*dphidxia
-     &                             + d2drprime*dxiaxic - dxic*ddrdx
+     &                             - dxic*ddrdx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayic
      &                             + d2edphi2*dphidyic*dphidxia
-     &                             + dedphiprime*dphidyic*dphidxia
-     &                             + d2edphi2prime*dphidyic*dphidxia
-     &                             + d2drprime*dxiayic - dyic*ddrdx
+     &                             - dyic*ddrdx
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazic
      &                             + d2edphi2*dphidzic*dphidxia
-     &                             + dedphiprime*dphidzic*dphidxia
-     &                             + d2edphi2prime*dphidzic*dphidxia
-     &                             + d2drprime*dxiazic - dzic*ddrdx
+     &                             - dzic*ddrdx
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxic
      &                             + d2edphi2*dphidxic*dphidyia
-     &                             + dedphiprime*dphidxic*dphidyia
-     &                             + d2edphi2prime*dphidxic*dphidyia
-     &                             + d2drprime*dyiaxic - dxic*ddrdy
+     &                             - dxic*ddrdy
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayic
      &                             + d2edphi2*dphidyic*dphidyia
-     &                             + dedphiprime*dphidyic*dphidyia
-     &                             + d2edphi2prime*dphidyic*dphidyia
-     &                             + d2drprime*dyiayic - dyic*ddrdy
+     &                             - dyic*ddrdy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazic
      &                             + d2edphi2*dphidzic*dphidyia
-     &                             + dedphiprime*dphidzic*dphidyia
-     &                             + d2edphi2prime*dphidzic*dphidyia
-     &                             + d2drprime*dyiazic - dzic*ddrdy
+     &                             - dzic*ddrdy
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxic
      &                             + d2edphi2*dphidxic*dphidzia
-     &                             + dedphiprime*dphidxic*dphidzia
-     &                             + d2edphi2prime*dphidxic*dphidzia
-     &                             + d2drprime*dziaxic - dxic*ddrdz
+     &                             - dxic*ddrdz
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayic
      &                             + d2edphi2*dphidyic*dphidzia
-     &                             + dedphiprime*dphidyic*dphidzia
-     &                             + d2edphi2prime*dphidyic*dphidzia
-     &                             + d2drprime*dziayic - dyic*ddrdz
+     &                             - dyic*ddrdz
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazic
      &                             + d2edphi2*dphidzic*dphidzia
-     &                             + dedphiprime*dphidzic*dphidzia
-     &                             + d2edphi2prime*dphidzic*dphidzia
-     &                             + d2drprime*dziazic - dzic*ddrdz
+     &                             - dzic*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
      &                             + d2edphi2*dphidxic*dphidxib
-     &                             + dedphiprime*dphidxic*dphidxib
-     &                             + d2edphi2prime*dphidxic*dphidxib
-     &                             + d2drprime*dxibxic + dxic*ddrdx
+     &                             + dxic*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
      &                             + d2edphi2*dphidyic*dphidxib
-     &                             + dedphiprime*dphidyic*dphidxib
-     &                             + d2edphi2prime*dphidyic*dphidxib
-     &                             + d2drprime*dxibyic + dyic*ddrdx
+     &                             + dyic*ddrdx
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
      &                             + d2edphi2*dphidzic*dphidxib
-     &                             + dedphiprime*dphidzic*dphidxib
-     &                             + d2edphi2prime*dphidzic*dphidxib
-     &                             + d2drprime*dxibzic + dzic*ddrdx
+     &                             + dzic*ddrdx
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
      &                             + d2edphi2*dphidxic*dphidyib
-     &                             + dedphiprime*dphidxic*dphidyib
-     &                             + d2edphi2prime*dphidxic*dphidyib
-     &                             + d2drprime*dyibxic + dxic*ddrdy
+     &                             + dxic*ddrdy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
      &                             + d2edphi2*dphidyic*dphidyib
-     &                             + dedphiprime*dphidyic*dphidyib
-     &                             + d2edphi2prime*dphidyic*dphidyib
-     &                             + d2drprime*dyibyic + dyic*ddrdy
+     &                             + dyic*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
      &                             + d2edphi2*dphidzic*dphidyib
-     &                             + dedphiprime*dphidzic*dphidyib
-     &                             + d2edphi2prime*dphidzic*dphidyib
-     &                             + d2drprime*dyibzic + dzic*ddrdy
+     &                             + dzic*ddrdy
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
      &                             + d2edphi2*dphidxic*dphidzib
-     &                             + dedphiprime*dphidxic*dphidzib
-     &                             + d2edphi2prime*dphidxic*dphidzib
-     &                             + d2drprime*dzibxic + dxic*ddrdz
+     &                             + dxic*ddrdz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
      &                             + d2edphi2*dphidyic*dphidzib
-     &                             + dedphiprime*dphidyic*dphidzib
-     &                             + d2edphi2prime*dphidyic*dphidzib
-     &                             + d2drprime*dzibyic + dyic*ddrdz
+     &                             + dyic*ddrdz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
      &                             + d2edphi2*dphidzic*dphidzib
-     &                             + dedphiprime*dphidzic*dphidzib
-     &                             + d2edphi2prime*dphidzic*dphidzib
-     &                             + d2drprime*dzibzic + dzic*ddrdz
+     &                             + dzic*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxicxid
      &                             + d2edphi2*dphidxic*dphidxid
-     &                             + dedphiprime*dphidxic*dphidxid
-     &                             + d2edphi2prime*dphidxic*dphidxid
-     &                             + d2drprime*dxicxid
                   hessy(1,id) = hessy(1,id) + dedphi*dyicxid
      &                             + d2edphi2*dphidyic*dphidxid
-     &                             + dedphiprime*dphidyic*dphidxid
-     &                             + d2edphi2prime*dphidyic*dphidxid
-     &                             + d2drprime*dyicxid
                   hessz(1,id) = hessz(1,id) + dedphi*dzicxid
      &                             + d2edphi2*dphidzic*dphidxid
-     &                             + dedphiprime*dphidzic*dphidxid
-     &                             + d2edphi2prime*dphidzic*dphidxid
-     &                             + d2drprime*dzicxid
                   hessx(2,id) = hessx(2,id) + dedphi*dxicyid
      &                             + d2edphi2*dphidxic*dphidyid
-     &                             + dedphiprime*dphidxic*dphidyid
-     &                             + d2edphi2prime*dphidxic*dphidyid
-     &                             + d2drprime*dxicyid
                   hessy(2,id) = hessy(2,id) + dedphi*dyicyid
      &                             + d2edphi2*dphidyic*dphidyid
-     &                             + dedphiprime*dphidyic*dphidyid
-     &                             + d2edphi2prime*dphidyic*dphidyid
-     &                             + d2drprime*dyicyid
                   hessz(2,id) = hessz(2,id) + dedphi*dzicyid
      &                             + d2edphi2*dphidzic*dphidyid
-     &                             + dedphiprime*dphidzic*dphidyid
-     &                             + d2edphi2prime*dphidzic*dphidyid
-     &                             + d2drprime*dzicyid
                   hessx(3,id) = hessx(3,id) + dedphi*dxiczid
      &                             + d2edphi2*dphidxic*dphidzid
-     &                             + dedphiprime*dphidxic*dphidzid
-     &                             + d2edphi2prime*dphidxic*dphidzid
-     &                             + d2drprime*dxiczid
                   hessy(3,id) = hessy(3,id) + dedphi*dyiczid
      &                             + d2edphi2*dphidyic*dphidzid
-     &                             + dedphiprime*dphidyic*dphidzid
-     &                             + d2edphi2prime*dphidyic*dphidzid
-     &                             + d2drprime*dyiczid
                   hessz(3,id) = hessz(3,id) + dedphi*dziczid
      &                             + d2edphi2*dphidzic*dphidzid
-     &                             + dedphiprime*dphidzic*dphidzid
-     &                             + d2edphi2prime*dphidzic*dphidzid
-     &                             + d2drprime*dziczid
                else if (i .eq. id) then
                   hessx(1,id) = hessx(1,id) + dedphi*dxidxid
      &                             + d2edphi2*dphidxid*dphidxid
-     &                             + dedphiprime*dphidxid*dphidxid
-     &                             + d2edphi2prime*dphidxid*dphidxid
-     &                             + d2drprime*dxidxid
                   hessy(1,id) = hessy(1,id) + dedphi*dxidyid
      &                             + d2edphi2*dphidxid*dphidyid
-     &                             + dedphiprime*dphidxid*dphidyid
-     &                             + d2edphi2prime*dphidxid*dphidyid
-     &                             + d2drprime*dxidyid
                   hessz(1,id) = hessz(1,id) + dedphi*dxidzid
      &                             + d2edphi2*dphidxid*dphidzid
-     &                             + dedphiprime*dphidxid*dphidzid
-     &                             + d2edphi2prime*dphidxid*dphidzid
-     &                             + d2drprime*dxidzid
                   hessx(2,id) = hessx(2,id) + dedphi*dxidyid
      &                             + d2edphi2*dphidxid*dphidyid
-     &                             + dedphiprime*dphidxid*dphidyid
-     &                             + d2edphi2prime*dphidxid*dphidyid
-     &                             + d2drprime*dxidyid
                   hessy(2,id) = hessy(2,id) + dedphi*dyidyid
      &                             + d2edphi2*dphidyid*dphidyid
-     &                             + dedphiprime*dphidyid*dphidyid
-     &                             + d2edphi2prime*dphidyid*dphidyid
-     &                             + d2drprime*dyidyid
                   hessz(2,id) = hessz(2,id) + dedphi*dyidzid
      &                             + d2edphi2*dphidyid*dphidzid
-     &                             + dedphiprime*dphidyid*dphidzid
-     &                             + d2edphi2prime*dphidyid*dphidzid
-     &                             + d2drprime*dyidzid
                   hessx(3,id) = hessx(3,id) + dedphi*dxidzid
      &                             + d2edphi2*dphidxid*dphidzid
-     &                             + dedphiprime*dphidxid*dphidzid
-     &                             + d2edphi2prime*dphidxid*dphidzid
-     &                             + d2drprime*dxidzid
                   hessy(3,id) = hessy(3,id) + dedphi*dyidzid
      &                             + d2edphi2*dphidyid*dphidzid
-     &                             + dedphiprime*dphidyid*dphidzid
-     &                             + d2edphi2prime*dphidyid*dphidzid
-     &                             + d2drprime*dyidzid
                   hessz(3,id) = hessz(3,id) + dedphi*dzidzid
      &                             + d2edphi2*dphidzid*dphidzid
-     &                             + dedphiprime*dphidzid*dphidzid
-     &                             + d2edphi2prime*dphidzid*dphidzid
-     &                             + d2drprime*dzidzid
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxid
      &                             + d2edphi2*dphidxid*dphidxia
-     &                             + dedphiprime*dphidxid*dphidxia
-     &                             + d2edphi2prime*dphidxid*dphidxia
-     &                             + d2drprime*dxiaxid - dxid*ddrdx
+     &                             - dxid*ddrdx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayid
      &                             + d2edphi2*dphidyid*dphidxia
-     &                             + dedphiprime*dphidyid*dphidxia
-     &                             + d2edphi2prime*dphidyid*dphidxia
-     &                             + d2drprime*dxiayid - dyid*ddrdx
+     &                             - dyid*ddrdx
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazid
      &                             + d2edphi2*dphidzid*dphidxia
-     &                             + dedphiprime*dphidzid*dphidxia
-     &                             + d2edphi2prime*dphidzid*dphidxia
-     &                             + d2drprime*dxiazid - dzid*ddrdx
+     &                             - dzid*ddrdx
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxid
      &                             + d2edphi2*dphidxid*dphidyia
-     &                             + dedphiprime*dphidxid*dphidyia
-     &                             + d2edphi2prime*dphidxid*dphidyia
-     &                             + d2drprime*dyiaxid - dxid*ddrdy
+     &                             - dxid*ddrdy
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayid
      &                             + d2edphi2*dphidyid*dphidyia
-     &                             + dedphiprime*dphidyid*dphidyia
-     &                             + d2edphi2prime*dphidyid*dphidyia
-     &                             + d2drprime*dyiayid - dyid*ddrdy
+     &                             - dyid*ddrdy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazid
      &                             + d2edphi2*dphidzid*dphidyia
-     &                             + dedphiprime*dphidzid*dphidyia
-     &                             + d2edphi2prime*dphidzid*dphidyia
-     &                             + d2drprime*dyiazid - dzid*ddrdy
+     &                             - dzid*ddrdy
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxid
      &                             + d2edphi2*dphidxid*dphidzia
-     &                             + dedphiprime*dphidxid*dphidzia
-     &                             + d2edphi2prime*dphidxid*dphidzia
-     &                             + d2drprime*dziaxid - dxid*ddrdz
+     &                             - dxid*ddrdz
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayid
      &                             + d2edphi2*dphidyid*dphidzia
-     &                             + dedphiprime*dphidyid*dphidzia
-     &                             + d2edphi2prime*dphidyid*dphidzia
-     &                             + d2drprime*dziayid - dyid*ddrdz
+     &                             - dyid*ddrdz
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazid
      &                             + d2edphi2*dphidzid*dphidzia
-     &                             + dedphiprime*dphidzid*dphidzia
-     &                             + d2edphi2prime*dphidzid*dphidzia
-     &                             + d2drprime*dziazid - dzid*ddrdz
+     &                             - dzid*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxid
      &                             + d2edphi2*dphidxid*dphidxib
-     &                             + dedphiprime*dphidxid*dphidxib
-     &                             + d2edphi2prime*dphidxid*dphidxib
-     &                             + d2drprime*dxibxid + dxid*ddrdx
+     &                             + dxid*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyid
      &                             + d2edphi2*dphidyid*dphidxib
-     &                             + dedphiprime*dphidyid*dphidxib
-     &                             + d2edphi2prime*dphidyid*dphidxib
-     &                             + d2drprime*dxibyid + dyid*ddrdx
+     &                             + dyid*ddrdx
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzid
      &                             + d2edphi2*dphidzid*dphidxib
-     &                             + dedphiprime*dphidzid*dphidxib
-     &                             + d2edphi2prime*dphidzid*dphidxib
-     &                             + d2drprime*dxibzid + dzid*ddrdx
+     &                             + dzid*ddrdx
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxid
      &                             + d2edphi2*dphidxid*dphidyib
-     &                             + dedphiprime*dphidxid*dphidyib
-     &                             + d2edphi2prime*dphidxid*dphidyib
-     &                             + d2drprime*dyibxid + dxid*ddrdy
+     &                             + dxid*ddrdy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyid
      &                             + d2edphi2*dphidyid*dphidyib
-     &                             + dedphiprime*dphidyid*dphidyib
-     &                             + d2edphi2prime*dphidyid*dphidyib
-     &                             + d2drprime*dyibyid + dyid*ddrdy
+     &                             + dyid*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzid
      &                             + d2edphi2*dphidzid*dphidyib
-     &                             + dedphiprime*dphidzid*dphidyib
-     &                             + d2edphi2prime*dphidzid*dphidyib
-     &                             + d2drprime*dyibzid + dzid*ddrdy
+     &                             + dzid*ddrdy
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxid
      &                             + d2edphi2*dphidxid*dphidzib
-     &                             + dedphiprime*dphidxid*dphidzib
-     &                             + d2edphi2prime*dphidxid*dphidzib
-     &                             + d2drprime*dzibxid + dxid*ddrdz
+     &                             + dxid*ddrdz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyid
      &                             + d2edphi2*dphidyid*dphidzib
-     &                             + dedphiprime*dphidyid*dphidzib
-     &                             + d2edphi2prime*dphidyid*dphidzib
-     &                             + d2drprime*dzibyid + dyid*ddrdz
+     &                             + dyid*ddrdz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzid
      &                             + d2edphi2*dphidzid*dphidzib
-     &                             + dedphiprime*dphidzid*dphidzib
-     &                             + d2edphi2prime*dphidzid*dphidzib
-     &                             + d2drprime*dzibzid + dzid*ddrdz
+     &                             + dzid*ddrdz
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxicxid
      &                             + d2edphi2*dphidxid*dphidxic
-     &                             + dedphiprime*dphidxid*dphidxic
-     &                             + d2edphi2prime*dphidxid*dphidxic
-     &                             + d2drprime*dxicxid
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyid
      &                             + d2edphi2*dphidyid*dphidxic
-     &                             + dedphiprime*dphidyid*dphidxic
-     &                             + d2edphi2prime*dphidyid*dphidxic
-     &                             + d2drprime*dxicyid
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczid
      &                             + d2edphi2*dphidzid*dphidxic
-     &                             + dedphiprime*dphidzid*dphidxic
-     &                             + d2edphi2prime*dphidzid*dphidxic
-     &                             + d2drprime*dxiczid
                   hessx(2,ic) = hessx(2,ic) + dedphi*dyicxid
      &                             + d2edphi2*dphidxid*dphidyic
-     &                             + dedphiprime*dphidxid*dphidyic
-     &                             + d2edphi2prime*dphidxid*dphidyic
-     &                             + d2drprime*dyicxid
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyicyid
      &                             + d2edphi2*dphidyid*dphidyic
-     &                             + dedphiprime*dphidyid*dphidyic
-     &                             + d2edphi2prime*dphidyid*dphidyic
-     &                             + d2drprime*dyicyid
                   hessz(2,ic) = hessz(2,ic) + dedphi*dyiczid
      &                             + d2edphi2*dphidzid*dphidyic
-     &                             + dedphiprime*dphidzid*dphidyic
-     &                             + d2edphi2prime*dphidzid*dphidyic
-     &                             + d2drprime*dyiczid
                   hessx(3,ic) = hessx(3,ic) + dedphi*dzicxid
      &                             + d2edphi2*dphidxid*dphidzic
-     &                             + dedphiprime*dphidxid*dphidzic
-     &                             + d2edphi2prime*dphidxid*dphidzic
-     &                             + d2drprime*dzicxid
                   hessy(3,ic) = hessy(3,ic) + dedphi*dzicyid
      &                             + d2edphi2*dphidyid*dphidzic
-     &                             + dedphiprime*dphidyid*dphidzic
-     &                             + d2edphi2prime*dphidyid*dphidzic
-     &                             + d2drprime*dzicyid
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziczid
      &                             + d2edphi2*dphidzid*dphidzic
-     &                             + dedphiprime*dphidzid*dphidzic
-     &                             + d2edphi2prime*dphidzid*dphidzic
-     &                             + d2drprime*dziczid
                end if
 c
 c     get the stretch-torsion values for the second bond
@@ -1220,23 +869,11 @@ c
                v3 = kst(6,istrtor)
                k = ist(3,istrtor)
                dr = rcb - bl(k)
-               force = bk(k)
-               dedphi = storunit * 2.0d0 * force 
-     &                       * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2 = storunit * 2.0d0 * force * dr
+               dedphi = storunit * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2edphi2 = storunit * dr
      &                       * (v1*d2phi1 + v2*d2phi2 + v3*d2phi3)
                ddr = 1.0d0 / rcb
-               d2dr = -storunit * 2.0d0 * force 
-     &                    * (v1*phi1 + v2*phi2 + v3*phi3) / rcb**3
-               dedphiprime = storunit * 2.0d0 * force
-     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2prime = storunit * 2.0d0 * force
-     &                            * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                            * (v1*d2phi1 + v2*d2phi2 + v3*d2phi3)
-               d2drprime = storunit * 2.0d0 * force
-     &                        * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                        * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2dr = -storunit * (v1*phi1 + v2*phi2 + v3*phi3) / rcb**3
 c
 c     scale the interaction based on its group membership
 c
@@ -1244,9 +881,6 @@ c
                   dedphi = dedphi * fgrp
                   d2edphi2 = d2edphi2 * fgrp
                   d2dr = d2dr * fgrp
-                  dedphiprime = dedphiprime * fgrp
-                  d2edphi2prime = d2edphi2prime * fgrp
-                  d2drprime = d2drprime * fgrp
                end if
 c
 c     compute derivative components for this interaction
@@ -1282,766 +916,403 @@ c
                if (i .eq. ia) then
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxia
      &                             + d2edphi2*dphidxia*dphidxia
-     &                             + dedphiprime*dphidxia*dphidxia
-     &                             + d2edphi2prime*dphidxia*dphidxia
-     &                             + d2drprime*dxiaxia
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
-     &                             + dedphiprime*dphidxia*dphidyia
-     &                             + d2edphi2prime*dphidxia*dphidyia
-     &                             + d2drprime*dxiayia
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazia
      &                             + d2edphi2*dphidxia*dphidzia
-     &                             + dedphiprime*dphidxia*dphidzia
-     &                             + d2edphi2prime*dphidxia*dphidzia
-     &                             + d2drprime*dxiazia
                   hessx(2,ia) = hessx(2,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
-     &                             + dedphiprime*dphidxia*dphidyia
-     &                             + d2edphi2prime*dphidxia*dphidyia
-     &                             + d2drprime*dxiayia
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayia
      &                             + d2edphi2*dphidyia*dphidyia
-     &                             + dedphiprime*dphidyia*dphidyia
-     &                             + d2edphi2prime*dphidyia*dphidyia
-     &                             + d2drprime*dyiayia
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazia
      &                             + d2edphi2*dphidyia*dphidzia
-     &                             + dedphiprime*dphidyia*dphidzia
-     &                             + d2edphi2prime*dphidyia*dphidzia
-     &                             + d2drprime*dyiazia
                   hessx(3,ia) = hessx(3,ia) + dedphi*dxiazia
      &                             + d2edphi2*dphidxia*dphidzia
-     &                             + dedphiprime*dphidxia*dphidzia
-     &                             + d2edphi2prime*dphidxia*dphidzia
-     &                             + d2drprime*dxiazia
                   hessy(3,ia) = hessy(3,ia) + dedphi*dyiazia
      &                             + d2edphi2*dphidyia*dphidzia
-     &                             + dedphiprime*dphidyia*dphidzia
-     &                             + d2edphi2prime*dphidyia*dphidzia
-     &                             + d2drprime*dyiazia
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazia
      &                             + d2edphi2*dphidzia*dphidzia
-     &                             + dedphiprime*dphidzia*dphidzia
-     &                             + d2edphi2prime*dphidzia*dphidzia
-     &                             + d2drprime*dziazia
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxiaxib
      &                             + d2edphi2*dphidxia*dphidxib
-     &                             + dedphiprime*dphidxia*dphidxib
-     &                             + d2edphi2prime*dphidxia*dphidxib
-     &                             + d2drprime*dxiaxib - dxia*ddrdx
+     &                             - dxia*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dyiaxib
      &                             + d2edphi2*dphidyia*dphidxib
-     &                             + dedphiprime*dphidyia*dphidxib
-     &                             + d2edphi2prime*dphidyia*dphidxib
-     &                             + d2drprime*dyiaxib - dyia*ddrdx
+     &                             - dyia*ddrdx
                   hessz(1,ib) = hessz(1,ib) + dedphi*dziaxib
      &                             + d2edphi2*dphidzia*dphidxib
-     &                             + dedphiprime*dphidzia*dphidxib
-     &                             + d2edphi2prime*dphidzia*dphidxib
-     &                             + d2drprime*dziaxib - dzia*ddrdx
+     &                             - dzia*ddrdx
                   hessx(2,ib) = hessx(2,ib) + dedphi*dxiayib
      &                             + d2edphi2*dphidxia*dphidyib
-     &                             + dedphiprime*dphidxia*dphidyib
-     &                             + d2edphi2prime*dphidxia*dphidyib
-     &                             + d2drprime*dxiayib - dxia*ddrdy
+     &                             - dxia*ddrdy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyiayib
      &                             + d2edphi2*dphidyia*dphidyib
-     &                             + dedphiprime*dphidyia*dphidyib
-     &                             + d2edphi2prime*dphidyia*dphidyib
-     &                             + d2drprime*dyiayib - dyia*ddrdy
+     &                             - dyia*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dziayib
      &                             + d2edphi2*dphidzia*dphidyib
-     &                             + dedphiprime*dphidzia*dphidyib
-     &                             + d2edphi2prime*dphidzia*dphidyib
-     &                             + d2drprime*dziayib - dzia*ddrdy
+     &                             - dzia*ddrdy
                   hessx(3,ib) = hessx(3,ib) + dedphi*dxiazib
      &                             + d2edphi2*dphidxia*dphidzib
-     &                             + dedphiprime*dphidxia*dphidzib
-     &                             + d2edphi2prime*dphidxia*dphidzib
-     &                             + d2drprime*dxiazib - dxia*ddrdz
+     &                             - dxia*ddrdz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dyiazib
      &                             + d2edphi2*dphidyia*dphidzib
-     &                             + dedphiprime*dphidyia*dphidzib
-     &                             + d2edphi2prime*dphidyia*dphidzib
-     &                             + d2drprime*dyiazib - dyia*ddrdz
+     &                             - dyia*ddrdz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dziazib
      &                             + d2edphi2*dphidzia*dphidzib
-     &                             + dedphiprime*dphidzia*dphidzib
-     &                             + d2edphi2prime*dphidzia*dphidzib
-     &                             + d2drprime*dziazib - dzia*ddrdz
+     &                             - dzia*ddrdz
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxiaxic
      &                             + d2edphi2*dphidxia*dphidxic
-     &                             + dedphiprime*dphidxia*dphidxic
-     &                             + d2edphi2prime*dphidxia*dphidxic
-     &                             + d2drprime*dxiaxic + dxia*ddrdx
+     &                             + dxia*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyiaxic
      &                             + d2edphi2*dphidyia*dphidxic
-     &                             + dedphiprime*dphidyia*dphidxic
-     &                             + d2edphi2prime*dphidyia*dphidxic
-     &                             + d2drprime*dyiaxic + dyia*ddrdx
+     &                             + dyia*ddrdx
                   hessz(1,ic) = hessz(1,ic) + dedphi*dziaxic
      &                             + d2edphi2*dphidzia*dphidxic
-     &                             + dedphiprime*dphidzia*dphidxic
-     &                             + d2edphi2prime*dphidzia*dphidxic
-     &                             + d2drprime*dziaxic + dzia*ddrdx
+     &                             + dzia*ddrdx
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxiayic
      &                             + d2edphi2*dphidxia*dphidyic
-     &                             + dedphiprime*dphidxia*dphidyic
-     &                             + d2edphi2prime*dphidxia*dphidyic
-     &                             + d2drprime*dxiayic + dxia*ddrdy
+     &                             + dxia*ddrdy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyiayic
      &                             + d2edphi2*dphidyia*dphidyic
-     &                             + dedphiprime*dphidyia*dphidyic
-     &                             + d2edphi2prime*dphidyia*dphidyic
-     &                             + d2drprime*dyiayic + dyia*ddrdy
+     &                             + dyia*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dziayic
      &                             + d2edphi2*dphidzia*dphidyic
-     &                             + dedphiprime*dphidzia*dphidyic
-     &                             + d2edphi2prime*dphidzia*dphidyic
-     &                             + d2drprime*dziayic + dzia*ddrdy
+     &                             + dzia*ddrdy
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiazic
      &                             + d2edphi2*dphidxia*dphidzic
-     &                             + dedphiprime*dphidxia*dphidzic
-     &                             + d2edphi2prime*dphidxia*dphidzic
-     &                             + d2drprime*dxiazic + dxia*ddrdz
+     &                             + dxia*ddrdz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiazic
      &                             + d2edphi2*dphidyia*dphidzic
-     &                             + dedphiprime*dphidyia*dphidzic
-     &                             + d2edphi2prime*dphidyia*dphidzic
-     &                             + d2drprime*dyiazic + dyia*ddrdz
+     &                             + dyia*ddrdz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziazic
      &                             + d2edphi2*dphidzia*dphidzic
-     &                             + dedphiprime*dphidzia*dphidzic
-     &                             + d2edphi2prime*dphidzia*dphidzic
-     &                             + d2drprime*dziazic + dzia*ddrdz
+     &                             + dzia*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxiaxid
      &                             + d2edphi2*dphidxia*dphidxid
-     &                             + dedphiprime*dphidxia*dphidxid
-     &                             + d2edphi2prime*dphidxia*dphidxid
-     &                             + d2drprime*dxiaxid
                   hessy(1,id) = hessy(1,id) + dedphi*dyiaxid
      &                             + d2edphi2*dphidyia*dphidxid
-     &                             + dedphiprime*dphidyia*dphidxid
-     &                             + d2edphi2prime*dphidyia*dphidxid
-     &                             + d2drprime*dyiaxid
                   hessz(1,id) = hessz(1,id) + dedphi*dziaxid
      &                             + d2edphi2*dphidzia*dphidxid
-     &                             + dedphiprime*dphidzia*dphidxid
-     &                             + d2edphi2prime*dphidzia*dphidxid
-     &                             + d2drprime*dziaxid
                   hessx(2,id) = hessx(2,id) + dedphi*dxiayid
      &                             + d2edphi2*dphidxia*dphidyid
-     &                             + dedphiprime*dphidxia*dphidyid
-     &                             + d2edphi2prime*dphidxia*dphidyid
-     &                             + d2drprime*dxiayid
                   hessy(2,id) = hessy(2,id) + dedphi*dyiayid
      &                             + d2edphi2*dphidyia*dphidyid
-     &                             + dedphiprime*dphidyia*dphidyid
-     &                             + d2edphi2prime*dphidyia*dphidyid
-     &                             + d2drprime*dyiayid
                   hessz(2,id) = hessz(2,id) + dedphi*dziayid
      &                             + d2edphi2*dphidzia*dphidyid
-     &                             + dedphiprime*dphidzia*dphidyid
-     &                             + d2edphi2prime*dphidzia*dphidyid
-     &                             + d2drprime*dziayid
                   hessx(3,id) = hessx(3,id) + dedphi*dxiazid
      &                             + d2edphi2*dphidxia*dphidzid
-     &                             + dedphiprime*dphidxia*dphidzid
-     &                             + d2edphi2prime*dphidxia*dphidzid
-     &                             + d2drprime*dxiazid
                   hessy(3,id) = hessy(3,id) + dedphi*dyiazid
      &                             + d2edphi2*dphidyia*dphidzid
-     &                             + dedphiprime*dphidyia*dphidzid
-     &                             + d2edphi2prime*dphidyia*dphidzid
-     &                             + d2drprime*dyiazid
                   hessz(3,id) = hessz(3,id) + dedphi*dziazid
      &                             + d2edphi2*dphidzia*dphidzid
-     &                             + dedphiprime*dphidzia*dphidzid
-     &                             + d2edphi2prime*dphidzia*dphidzid
-     &                             + d2drprime*dziazid
                else if (i .eq. ib) then
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxib
      &                             + d2edphi2*dphidxib*dphidxib
      &                             - 2.0d0*dxib*ddrdx + d2drdxx
-     &                             + dedphiprime*dphidxib*dphidxib
-     &                             + d2edphi2prime*dphidxib*dphidxib
-     &                             + d2drprime*dxibxib
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyib
      &                             + d2edphi2*dphidxib*dphidyib
-     &                             - dyib*ddrdx - dxib*ddrdy
-     &                             + dedphiprime*dphidxib*dphidyib
-     &                             + d2edphi2prime*dphidxib*dphidyib
-     &                             + d2drprime*dxibyib + d2drdxy
+     &                             - dyib*ddrdx - dxib*ddrdy + d2drdxy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzib
      &                             + d2edphi2*dphidxib*dphidzib
-     &                             - dzib*ddrdx - dxib*ddrdz
-     &                             + dedphiprime*dphidxib*dphidzib
-     &                             + d2edphi2prime*dphidxib*dphidzib
-     &                             + d2drprime*dxibzib + d2drdxz
+     &                             - dzib*ddrdx - dxib*ddrdz + d2drdxz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dxibyib
      &                             + d2edphi2*dphidxib*dphidyib
-     &                             - dxib*ddrdy - dyib*ddrdx
-     &                             + dedphiprime*dphidxib*dphidyib
-     &                             + d2edphi2prime*dphidxib*dphidyib
-     &                             + d2drprime*dxibyib + d2drdxy
+     &                             - dxib*ddrdy - dyib*ddrdx + d2drdxy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyib
      &                             + d2edphi2*dphidyib*dphidyib
      &                             - 2.0d0*dyib*ddrdy + d2drdyy
-     &                             + dedphiprime*dphidyib*dphidyib
-     &                             + d2edphi2prime*dphidyib*dphidyib
-     &                             + d2drprime*dyibyib
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzib
      &                             + d2edphi2*dphidyib*dphidzib
-     &                             - dzib*ddrdy - dyib*ddrdz
-     &                             + dedphiprime*dphidyib*dphidzib
-     &                             + d2edphi2prime*dphidyib*dphidzib
-     &                             + d2drprime*dyibzib + d2drdyz
+     &                             - dzib*ddrdy - dyib*ddrdz + d2drdyz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dxibzib
      &                             + d2edphi2*dphidxib*dphidzib
-     &                             - dxib*ddrdz - dzib*ddrdx
-     &                             + dedphiprime*dphidxib*dphidzib
-     &                             + d2edphi2prime*dphidxib*dphidzib
-     &                             + d2drprime*dxibzib + d2drdxz
+     &                             - dxib*ddrdz - dzib*ddrdx + d2drdxz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dyibzib
      &                             + d2edphi2*dphidyib*dphidzib
-     &                             - dyib*ddrdz - dzib*ddrdy
-     &                             + dedphiprime*dphidyib*dphidzib
-     &                             + d2edphi2prime*dphidyib*dphidzib
-     &                             + d2drprime*dyibzib + d2drdyz
+     &                             - dyib*ddrdz - dzib*ddrdy + d2drdyz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzib
      &                             + d2edphi2*dphidzib*dphidzib
      &                             - 2.0d0*dzib*ddrdz + d2drdzz
-     &                             + dedphiprime*dphidzib*dphidzib
-     &                             + d2edphi2prime*dphidzib*dphidzib
-     &                             + d2drprime*dzibzib
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxib
      &                             + d2edphi2*dphidxib*dphidxia
-     &                             + dedphiprime*dphidxib*dphidxia
-     &                             + d2edphi2prime*dphidxib*dphidxia
-     &                             + d2drprime*dxiaxib - dxia*ddrdx
+     &                             - dxia*ddrdx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayib
      &                             + d2edphi2*dphidyib*dphidxia
-     &                             + dedphiprime*dphidyib*dphidxia
-     &                             + d2edphi2prime*dphidyib*dphidxia
-     &                             + d2drprime*dxiayib - dxia*ddrdy
+     &                             - dxia*ddrdy
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazib
      &                             + d2edphi2*dphidzib*dphidxia
-     &                             + dedphiprime*dphidzib*dphidxia
-     &                             + d2edphi2prime*dphidzib*dphidxia
-     &                             + d2drprime*dxiazib - dxia*ddrdz
+     &                             - dxia*ddrdz
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxib
      &                             + d2edphi2*dphidxib*dphidyia
-     &                             + dedphiprime*dphidxib*dphidyia
-     &                             + d2edphi2prime*dphidxib*dphidyia
-     &                             + d2drprime*dyiaxib - dyia*ddrdx
+     &                             - dyia*ddrdx
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayib
      &                             + d2edphi2*dphidyib*dphidyia
-     &                             + dedphiprime*dphidyib*dphidyia
-     &                             + d2edphi2prime*dphidyib*dphidyia
-     &                             + d2drprime*dyiayib - dyia*ddrdy
+     &                             - dyia*ddrdy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazib
      &                             + d2edphi2*dphidzib*dphidyia
-     &                             + dedphiprime*dphidzib*dphidyia
-     &                             + d2edphi2prime*dphidzib*dphidyia
-     &                             + d2drprime*dyiazib - dyia*ddrdz
+     &                             - dyia*ddrdz
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxib
      &                             + d2edphi2*dphidxib*dphidzia
      &                             - dzia*ddrdx
-     &                             + dedphiprime*dphidxib*dphidzia
-     &                             + d2edphi2prime*dphidxib*dphidzia
-     &                             + d2drprime*dziaxib
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayib
      &                             + d2edphi2*dphidyib*dphidzia
      &                             - dzia*ddrdy
-     &                             + dedphiprime*dphidyib*dphidzia
-     &                             + d2edphi2prime*dphidyib*dphidzia
-     &                             + d2drprime*dziayib
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazib
      &                             + d2edphi2*dphidzib*dphidzia
      &                             - dzia*ddrdz
-     &                             + dedphiprime*dphidzib*dphidzia
-     &                             + d2edphi2prime*dphidzib*dphidzia
-     &                             + d2drprime*dziazib
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxibxic
      &                             + d2edphi2*dphidxib*dphidxic
      &                             + (dxib-dxic)*ddrdx - d2drdxx
-     &                             + dedphiprime*dphidxib*dphidxic
-     &                             + d2edphi2prime*dphidxib*dphidxic
-     &                             + d2drprime*dxibxic
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyibxic
      &                             + d2edphi2*dphidyib*dphidxic
-     &                             + dyib*ddrdx - dxic*ddrdy
-     &                             + dedphiprime*dphidyib*dphidxic
-     &                             + d2edphi2prime*dphidyib*dphidxic
-     &                             + d2drprime*dyibxic - d2drdxy
+     &                             + dyib*ddrdx - dxic*ddrdy - d2drdxy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
      &                             + d2edphi2*dphidzib*dphidxic
-     &                             + dzib*ddrdx - dxic*ddrdz
-     &                             + dedphiprime*dphidzib*dphidxic
-     &                             + d2edphi2prime*dphidzib*dphidxic
-     &                             + d2drprime*dzibxic - d2drdxz
+     &                             + dzib*ddrdx - dxic*ddrdz - d2drdxz
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxibyic
      &                             + d2edphi2*dphidxib*dphidyic
-     &                             + dxib*ddrdy - dyic*ddrdx
-     &                             + dedphiprime*dphidxib*dphidyic
-     &                             + d2edphi2prime*dphidxib*dphidyic
-     &                             + d2drprime*dxibyic - d2drdxy
+     &                             + dxib*ddrdy - dyic*ddrdx - d2drdxy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyibyic
      &                             + d2edphi2*dphidyib*dphidyic
      &                             + (dyib-dyic)*ddrdy - d2drdyy
-     &                             + dedphiprime*dphidyib*dphidyic
-     &                             + d2edphi2prime*dphidyib*dphidyic
-     &                             + d2drprime*dyibyic
                   hessz(2,ic) = hessz(2,ic) + dedphi*dzibyic
      &                             + d2edphi2*dphidzib*dphidyic
-     &                             + dzib*ddrdy - dyic*ddrdz
-     &                             + dedphiprime*dphidzib*dphidyic
-     &                             + d2edphi2prime*dphidzib*dphidyic
-     &                             + d2drprime*dzibyic - d2drdyz
+     &                             + dzib*ddrdy - dyic*ddrdz - d2drdyz
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxibzic
      &                             + d2edphi2*dphidxib*dphidzic
-     &                             + dxib*ddrdz - dzic*ddrdx
-     &                             + dedphiprime*dphidxib*dphidzic
-     &                             + d2edphi2prime*dphidxib*dphidzic
-     &                             + d2drprime*dxibzic - d2drdxz
+     &                             + dxib*ddrdz - dzic*ddrdx - d2drdxz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyibzic
      &                             + d2edphi2*dphidyib*dphidzic
-     &                             + dyib*ddrdz - dzic*ddrdy
-     &                             + dedphiprime*dphidyib*dphidzic
-     &                             + d2edphi2prime*dphidyib*dphidzic
-     &                             + d2drprime*dyibzic - d2drdyz
+     &                             + dyib*ddrdz - dzic*ddrdy - d2drdyz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dzibzic
      &                             + d2edphi2*dphidzib*dphidzic
      &                             + (dzib-dzic)*ddrdz - d2drdzz
-     &                             + dedphiprime*dphidzib*dphidzic
-     &                             + d2edphi2prime*dphidzib*dphidzic
-     &                             + d2drprime*dzibzic
                   hessx(1,id) = hessx(1,id) + dedphi*dxibxid
      &                             + d2edphi2*dphidxib*dphidxid
-     &                             + dedphiprime*dphidxib*dphidxid
-     &                             + d2edphi2prime*dphidxib*dphidxid
-     &                             + d2drprime*dxibxid - dxid*ddrdx
+     &                             - dxid*ddrdx
                   hessy(1,id) = hessy(1,id) + dedphi*dyibxid
      &                             + d2edphi2*dphidyib*dphidxid
-     &                             + dedphiprime*dphidyib*dphidxid
-     &                             + d2edphi2prime*dphidyib*dphidxid
-     &                             + d2drprime*dyibxid - dxid*ddrdy
+     &                             - dxid*ddrdy
                   hessz(1,id) = hessz(1,id) + dedphi*dzibxid
      &                             + d2edphi2*dphidzib*dphidxid
-     &                             + dedphiprime*dphidzib*dphidxid
-     &                             + d2edphi2prime*dphidzib*dphidxid
-     &                             + d2drprime*dzibxid - dxid*ddrdz
+     &                             - dxid*ddrdz
                   hessx(2,id) = hessx(2,id) + dedphi*dxibyid
      &                             + d2edphi2*dphidxib*dphidyid
-     &                             + dedphiprime*dphidxib*dphidyid
-     &                             + d2edphi2prime*dphidxib*dphidyid
-     &                             + d2drprime*dxibyid - dyid*ddrdx
+     &                             - dyid*ddrdx
                   hessy(2,id) = hessy(2,id) + dedphi*dyibyid
      &                             + d2edphi2*dphidyib*dphidyid
-     &                             + dedphiprime*dphidyib*dphidyid
-     &                             + d2edphi2prime*dphidyib*dphidyid
-     &                             + d2drprime*dyibyid - dyid*ddrdy
+     &                             - dyid*ddrdy
                   hessz(2,id) = hessz(2,id) + dedphi*dzibyid
      &                             + d2edphi2*dphidzib*dphidyid
-     &                             + dedphiprime*dphidzib*dphidyid
-     &                             + d2edphi2prime*dphidzib*dphidyid
-     &                             + d2drprime*dzibyid - dyid*ddrdz
+     &                             - dyid*ddrdz
                   hessx(3,id) = hessx(3,id) + dedphi*dxibzid
      &                             + d2edphi2*dphidxib*dphidzid
-     &                             + dedphiprime*dphidxib*dphidzid
-     &                             + d2edphi2prime*dphidxib*dphidzid
-     &                             + d2drprime*dxibzid - dzid*ddrdx
+     &                             - dzid*ddrdx
                   hessy(3,id) = hessy(3,id) + dedphi*dyibzid
      &                             + d2edphi2*dphidyib*dphidzid
-     &                             + dedphiprime*dphidyib*dphidzid
-     &                             + d2edphi2prime*dphidyib*dphidzid
-     &                             + d2drprime*dyibzid - dzid*ddrdy
+     &                             - dzid*ddrdy
                   hessz(3,id) = hessz(3,id) + dedphi*dzibzid
      &                             + d2edphi2*dphidzib*dphidzid
-     &                             + dedphiprime*dphidzib*dphidzid
-     &                             + d2edphi2prime*dphidzib*dphidzid
-     &                             + d2drprime*dzibzid - dzid*ddrdz
+     &                             - dzid*ddrdz
                else if (i .eq. ic) then
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxicxic
      &                             + d2edphi2*dphidxic*dphidxic
      &                             + 2.0d0*dxic*ddrdx + d2drdxx
-     &                             + dedphiprime*dphidxic*dphidxic
-     &                             + d2edphi2prime*dphidxic*dphidxic
-     &                             + d2drprime*dxicxic
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyic
      &                             + d2edphi2*dphidxic*dphidyic
-     &                             + dyic*ddrdx + dxic*ddrdy
-     &                             + dedphiprime*dphidxic*dphidyic
-     &                             + d2edphi2prime*dphidxic*dphidyic
-     &                             + d2drprime*dxicyic + d2drdxy
+     &                             + dyic*ddrdx + dxic*ddrdy + d2drdxy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczic
      &                             + d2edphi2*dphidxic*dphidzic
-     &                             + dzic*ddrdx + dxic*ddrdz
-     &                             + dedphiprime*dphidxic*dphidzic
-     &                             + d2edphi2prime*dphidxic*dphidzic
-     &                             + d2drprime*dxiczic + d2drdxz
+     &                             + dzic*ddrdx + dxic*ddrdz + d2drdxz
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxicyic
      &                             + d2edphi2*dphidxic*dphidyic
-     &                             + dxic*ddrdy + dyic*ddrdx
-     &                             + dedphiprime*dphidxic*dphidyic
-     &                             + d2edphi2prime*dphidxic*dphidyic
-     &                             + d2drprime*dxicyic + d2drdxy
+     &                             + dxic*ddrdy + dyic*ddrdx + d2drdxy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyicyic
      &                             + d2edphi2*dphidyic*dphidyic
      &                             + 2.0d0*dyic*ddrdy + d2drdyy
-     &                             + dedphiprime*dphidyic*dphidyic
-     &                             + d2edphi2prime*dphidyic*dphidyic
-     &                             + d2drprime*dyicyic
                   hessz(2,ic) = hessz(2,ic) + dedphi*dyiczic
      &                             + d2edphi2*dphidyic*dphidzic
-     &                             + dzic*ddrdy + dyic*ddrdz
-     &                             + dedphiprime*dphidyic*dphidzic
-     &                             + d2edphi2prime*dphidyic*dphidzic
-     &                             + d2drprime*dyiczic + d2drdyz
+     &                             + dzic*ddrdy + dyic*ddrdz + d2drdyz
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiczic
      &                             + d2edphi2*dphidxic*dphidzic
-     &                             + dxic*ddrdz + dzic*ddrdx
-     &                             + dedphiprime*dphidxic*dphidzic
-     &                             + d2edphi2prime*dphidxic*dphidzic
-     &                             + d2drprime*dxiczic + d2drdxz
+     &                             + dxic*ddrdz + dzic*ddrdx + d2drdxz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiczic
      &                             + d2edphi2*dphidyic*dphidzic
-     &                             + dyic*ddrdz + dzic*ddrdy
-     &                             + dedphiprime*dphidyic*dphidzic
-     &                             + d2edphi2prime*dphidyic*dphidzic
-     &                             + d2drprime*dyiczic + d2drdyz
+     &                             + dyic*ddrdz + dzic*ddrdy + d2drdyz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziczic
      &                             + d2edphi2*dphidzic*dphidzic
      &                             + 2.0d0*dzic*ddrdz + d2drdzz
-     &                             + dedphiprime*dphidzic*dphidzic
-     &                             + d2edphi2prime*dphidzic*dphidzic
-     &                             + d2drprime*dziczic
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxic
      &                             + d2edphi2*dphidxic*dphidxia
-     &                             + dedphiprime*dphidxic*dphidxia
-     &                             + d2edphi2prime*dphidxic*dphidxia
-     &                             + d2drprime*dxiaxic + dxia*ddrdx
+     &                             + dxia*ddrdx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayic
      &                             + d2edphi2*dphidyic*dphidxia
-     &                             + dedphiprime*dphidyic*dphidxia
-     &                             + d2edphi2prime*dphidyic*dphidxia
-     &                             + d2drprime*dxiayic + dxia*ddrdy
+     &                             + dxia*ddrdy
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazic
      &                             + d2edphi2*dphidzic*dphidxia
-     &                             + dedphiprime*dphidzic*dphidxia
-     &                             + d2edphi2prime*dphidzic*dphidxia
-     &                             + d2drprime*dxiazic + dxia*ddrdz
+     &                             + dxia*ddrdz
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxic
      &                             + d2edphi2*dphidxic*dphidyia
-     &                             + dedphiprime*dphidxic*dphidyia
-     &                             + d2edphi2prime*dphidxic*dphidyia
-     &                             + d2drprime*dyiaxic + dyia*ddrdx
+     &                             + dyia*ddrdx
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayic
      &                             + d2edphi2*dphidyic*dphidyia
-     &                             + dedphiprime*dphidyic*dphidyia
-     &                             + d2edphi2prime*dphidyic*dphidyia
-     &                             + d2drprime*dyiayic + dyia*ddrdy
+     &                             + dyia*ddrdy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazic
      &                             + d2edphi2*dphidzic*dphidyia
-     &                             + dedphiprime*dphidzic*dphidyia
-     &                             + d2edphi2prime*dphidzic*dphidyia
-     &                             + d2drprime*dyiazic + dyia*ddrdz
+     &                             + dyia*ddrdz
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxic
      &                             + d2edphi2*dphidxic*dphidzia
-     &                             + dedphiprime*dphidxic*dphidzia
-     &                             + d2edphi2prime*dphidxic*dphidzia
-     &                             + d2drprime*dziaxic + dzia*ddrdx
+     &                             + dzia*ddrdx
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayic
      &                             + d2edphi2*dphidyic*dphidzia
-     &                             + dedphiprime*dphidyic*dphidzia
-     &                             + d2edphi2prime*dphidyic*dphidzia
-     &                             + d2drprime*dziayic + dzia*ddrdy
+     &                             + dzia*ddrdy
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazic
      &                             + d2edphi2*dphidzic*dphidzia
-     &                             + dedphiprime*dphidzic*dphidzia
-     &                             + d2edphi2prime*dphidzic*dphidzia
-     &                             + d2drprime*dziazic + dzia*ddrdz
+     &                             + dzia*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
      &                             + d2edphi2*dphidxic*dphidxib
      &                             - (dxic-dxib)*ddrdx - d2drdxx
-     &                             + dedphiprime*dphidxic*dphidxib
-     &                             + d2edphi2prime*dphidxic*dphidxib
-     &                             + d2drprime*dxibxic
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
      &                             + d2edphi2*dphidyic*dphidxib
-     &                             - dyic*ddrdx + dxib*ddrdy
-     &                             + dedphiprime*dphidyic*dphidxib
-     &                             + d2edphi2prime*dphidyic*dphidxib
-     &                             + d2drprime*dxibyic - d2drdxy
+     &                             - dyic*ddrdx + dxib*ddrdy - d2drdxy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
      &                             + d2edphi2*dphidzic*dphidxib
-     &                             - dzic*ddrdx + dxib*ddrdz
-     &                             + dedphiprime*dphidzic*dphidxib
-     &                             + d2edphi2prime*dphidzic*dphidxib
-     &                             + d2drprime*dxibzic - d2drdxz
+     &                             - dzic*ddrdx + dxib*ddrdz - d2drdxz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
      &                             + d2edphi2*dphidxic*dphidyib
-     &                             - dxic*ddrdy + dyib*ddrdx
-     &                             + dedphiprime*dphidxic*dphidyib
-     &                             + d2edphi2prime*dphidxic*dphidyib
-     &                             + d2drprime*dyibxic - d2drdxy
+     &                             - dxic*ddrdy + dyib*ddrdx - d2drdxy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
      &                             + d2edphi2*dphidyic*dphidyib
      &                             - (dyic-dyib)*ddrdy - d2drdyy
-     &                             + dedphiprime*dphidyic*dphidyib
-     &                             + d2edphi2prime*dphidyic*dphidyib
-     &                             + d2drprime*dyibyic
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
      &                             + d2edphi2*dphidzic*dphidyib
-     &                             - dzic*ddrdy + dyib*ddrdz
-     &                             + dedphiprime*dphidzic*dphidyib
-     &                             + d2edphi2prime*dphidzic*dphidyib
-     &                             + d2drprime*dyibzic - d2drdyz
+     &                             - dzic*ddrdy + dyib*ddrdz - d2drdyz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
      &                             + d2edphi2*dphidxic*dphidzib
-     &                             - dxic*ddrdz + dzib*ddrdx
-     &                             + dedphiprime*dphidxic*dphidzib
-     &                             + d2edphi2prime*dphidxic*dphidzib
-     &                             + d2drprime*dzibxic - d2drdxz
+     &                             - dxic*ddrdz + dzib*ddrdx - d2drdxz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
      &                             + d2edphi2*dphidyic*dphidzib
-     &                             - dyic*ddrdz + dzib*ddrdy
-     &                             + dedphiprime*dphidyic*dphidzib
-     &                             + d2edphi2prime*dphidyic*dphidzib
-     &                             + d2drprime*dzibyic - d2drdyz
+     &                             - dyic*ddrdz + dzib*ddrdy - d2drdyz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
      &                             + d2edphi2*dphidzic*dphidzib
      &                             - (dzic-dzib)*ddrdz - d2drdzz
-     &                             + dedphiprime*dphidzic*dphidzib
-     &                             + d2edphi2prime*dphidzic*dphidzib 
-     &                             + d2drprime*dzibzic
                   hessx(1,id) = hessx(1,id) + dedphi*dxicxid
      &                             + d2edphi2*dphidxic*dphidxid
-     &                             + dedphiprime*dphidxic*dphidxid
-     &                             + d2edphi2prime*dphidxic*dphidxid
-     &                             + d2drprime*dxicxid + dxid*ddrdx
+     &                             + dxid*ddrdx
                   hessy(1,id) = hessy(1,id) + dedphi*dyicxid
      &                             + d2edphi2*dphidyic*dphidxid
-     &                             + dedphiprime*dphidyic*dphidxid
-     &                             + d2edphi2prime*dphidyic*dphidxid
-     &                             + d2drprime*dyicxid + dxid*ddrdy
+     &                             + dxid*ddrdy
                   hessz(1,id) = hessz(1,id) + dedphi*dzicxid
      &                             + d2edphi2*dphidzic*dphidxid
-     &                             + dedphiprime*dphidzic*dphidxid
-     &                             + d2edphi2prime*dphidzic*dphidxid
-     &                             + d2drprime*dzicxid + dxid*ddrdz
+     &                             + dxid*ddrdz
                   hessx(2,id) = hessx(2,id) + dedphi*dxicyid
      &                             + d2edphi2*dphidxic*dphidyid
-     &                             + dedphiprime*dphidxic*dphidyid
-     &                             + d2edphi2prime*dphidxic*dphidyid
-     &                             + d2drprime*dxicyid + dyid*ddrdx
+     &                             + dyid*ddrdx
                   hessy(2,id) = hessy(2,id) + dedphi*dyicyid
      &                             + d2edphi2*dphidyic*dphidyid
-     &                             + dedphiprime*dphidyic*dphidyid
-     &                             + d2edphi2prime*dphidyic*dphidyid
-     &                             + d2drprime*dyicyid + dyid*ddrdy
+     &                             + dyid*ddrdy
                   hessz(2,id) = hessz(2,id) + dedphi*dzicyid
      &                             + d2edphi2*dphidzic*dphidyid
-     &                             + dedphiprime*dphidzic*dphidyid
-     &                             + d2edphi2prime*dphidzic*dphidyid
-     &                             + d2drprime*dzicyid + dyid*ddrdz
+     &                             + dyid*ddrdz
                   hessx(3,id) = hessx(3,id) + dedphi*dxiczid
      &                             + d2edphi2*dphidxic*dphidzid
-     &                             + dedphiprime*dphidxic*dphidzid
-     &                             + d2edphi2prime*dphidxic*dphidzid
-     &                             + d2drprime*dxiczid + dzid*ddrdx
+     &                             + dzid*ddrdx
                   hessy(3,id) = hessy(3,id) + dedphi*dyiczid
      &                             + d2edphi2*dphidyic*dphidzid
-     &                             + dedphiprime*dphidyic*dphidzid
-     &                             + d2edphi2prime*dphidyic*dphidzid
-     &                             + d2drprime*dyiczid + dzid*ddrdy
+     &                             + dzid*ddrdy
                   hessz(3,id) = hessz(3,id) + dedphi*dziczid
      &                             + d2edphi2*dphidzic*dphidzid
-     &                             + dedphiprime*dphidzic*dphidzid
-     &                             + d2edphi2prime*dphidzic*dphidzid
-     &                             + d2drprime*dziczid + dzid*ddrdz
+     &                             + dzid*ddrdz
                else if (i .eq. id) then
                   hessx(1,id) = hessx(1,id) + dedphi*dxidxid
      &                             + d2edphi2*dphidxid*dphidxid
-     &                             + dedphiprime*dphidxid*dphidxid
-     &                             + d2edphi2prime*dphidxid*dphidxid
-     &                             + d2drprime*dxidxid
                   hessy(1,id) = hessy(1,id) + dedphi*dxidyid
      &                             + d2edphi2*dphidxid*dphidyid
-     &                             + dedphiprime*dphidxid*dphidyid
-     &                             + d2edphi2prime*dphidxid*dphidyid
-     &                             + d2drprime*dxidyid
                   hessz(1,id) = hessz(1,id) + dedphi*dxidzid
      &                             + d2edphi2*dphidxid*dphidzid
-     &                             + dedphiprime*dphidxid*dphidzid
-     &                             + d2edphi2prime*dphidxid*dphidzid
-     &                             + d2drprime*dxidzid
                   hessx(2,id) = hessx(2,id) + dedphi*dxidyid
      &                             + d2edphi2*dphidxid*dphidyid
-     &                             + dedphiprime*dphidxid*dphidyid
-     &                             + d2edphi2prime*dphidxid*dphidyid
-     &                             + d2drprime*dxidyid
                   hessy(2,id) = hessy(2,id) + dedphi*dyidyid
      &                             + d2edphi2*dphidyid*dphidyid
-     &                             + dedphiprime*dphidyid*dphidyid
-     &                             + d2edphi2prime*dphidyid*dphidyid
-     &                             + d2drprime*dyidyid
                   hessz(2,id) = hessz(2,id) + dedphi*dyidzid
      &                             + d2edphi2*dphidyid*dphidzid
-     &                             + dedphiprime*dphidyid*dphidzid
-     &                             + d2edphi2prime*dphidyid*dphidzid
-     &                             + d2drprime*dyidzid
                   hessx(3,id) = hessx(3,id) + dedphi*dxidzid
      &                             + d2edphi2*dphidxid*dphidzid
-     &                             + dedphiprime*dphidxid*dphidzid
-     &                             + d2edphi2prime*dphidxid*dphidzid
-     &                             + d2drprime*dxidzid
                   hessy(3,id) = hessy(3,id) + dedphi*dyidzid
      &                             + d2edphi2*dphidyid*dphidzid
-     &                             + dedphiprime*dphidyid*dphidzid
-     &                             + d2edphi2prime*dphidyid*dphidzid
-     &                             + d2drprime*dyidzid
                   hessz(3,id) = hessz(3,id) + dedphi*dzidzid
      &                             + d2edphi2*dphidzid*dphidzid
-     &                             + dedphiprime*dphidzid*dphidzid
-     &                             + d2edphi2prime*dphidzid*dphidzid
-     &                             + d2drprime*dzidzid
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxid
      &                             + d2edphi2*dphidxid*dphidxia
-     &                             + dedphiprime*dphidxid*dphidxia
-     &                             + d2edphi2prime*dphidxid*dphidxia
-     &                             + d2drprime*dxiaxid
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayid
      &                             + d2edphi2*dphidyid*dphidxia
-     &                             + dedphiprime*dphidyid*dphidxia
-     &                             + d2edphi2prime*dphidyid*dphidxia
-     &                             + d2drprime*dxiayid
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazid
      &                             + d2edphi2*dphidzid*dphidxia
-     &                             + dedphiprime*dphidzid*dphidxia
-     &                             + d2edphi2prime*dphidzid*dphidxia
-     &                             + d2drprime*dxiazid
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxid
      &                             + d2edphi2*dphidxid*dphidyia
-     &                             + dedphiprime*dphidxid*dphidyia
-     &                             + d2edphi2prime*dphidxid*dphidyia
-     &                             + d2drprime*dyiaxid
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayid
      &                             + d2edphi2*dphidyid*dphidyia
-     &                             + dedphiprime*dphidyid*dphidyia
-     &                             + d2edphi2prime*dphidyid*dphidyia
-     &                             + d2drprime*dyiayid
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazid
      &                             + d2edphi2*dphidzid*dphidyia
-     &                             + dedphiprime*dphidzid*dphidyia
-     &                             + d2edphi2prime*dphidzid*dphidyia
-     &                             + d2drprime*dyiazid
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxid
      &                             + d2edphi2*dphidxid*dphidzia
-     &                             + dedphiprime*dphidxid*dphidzia
-     &                             + d2edphi2prime*dphidxid*dphidzia
-     &                             + d2drprime*dziaxid
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayid
      &                             + d2edphi2*dphidyid*dphidzia
-     &                             + dedphiprime*dphidyid*dphidzia
-     &                             + d2edphi2prime*dphidyid*dphidzia
-     &                             + d2drprime*dziayid
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazid
      &                             + d2edphi2*dphidzid*dphidzia
-     &                             + dedphiprime*dphidzid*dphidzia
-     &                             + d2edphi2prime*dphidzid*dphidzia
-     &                             + d2drprime*dziazid
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxid
      &                             + d2edphi2*dphidxid*dphidxib
-     &                             + dedphiprime*dphidxid*dphidxib
-     &                             + d2edphi2prime*dphidxid*dphidxib
-     &                             + d2drprime*dxibxid - dxid*ddrdx
+     &                             - dxid*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyid
      &                             + d2edphi2*dphidyid*dphidxib
-     &                             + dedphiprime*dphidyid*dphidxib
-     &                             + d2edphi2prime*dphidyid*dphidxib
-     &                             + d2drprime*dxibyid - dyid*ddrdx
+     &                             - dyid*ddrdx
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzid
      &                             + d2edphi2*dphidzid*dphidxib
-     &                             + dedphiprime*dphidzid*dphidxib
-     &                             + d2edphi2prime*dphidzid*dphidxib
-     &                             + d2drprime*dxibzid - dzid*ddrdx
+     &                             - dzid*ddrdx
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxid
      &                             + d2edphi2*dphidxid*dphidyib
-     &                             + dedphiprime*dphidxid*dphidyib
-     &                             + d2edphi2prime*dphidxid*dphidyib
-     &                             + d2drprime*dyibxid - dxid*ddrdy
+     &                             - dxid*ddrdy
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyid
      &                             + d2edphi2*dphidyid*dphidyib
-     &                             + dedphiprime*dphidyid*dphidyib
-     &                             + d2edphi2prime*dphidyid*dphidyib
-     &                             + d2drprime*dyibyid - dyid*ddrdy
+     &                             - dyid*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzid
      &                             + d2edphi2*dphidzid*dphidyib
-     &                             + dedphiprime*dphidzid*dphidyib
-     &                             + d2edphi2prime*dphidzid*dphidyib 
-     &                             + d2drprime*dyibzid - dzid*ddrdy
+     &                             - dzid*ddrdy
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxid
      &                             + d2edphi2*dphidxid*dphidzib
-     &                             + dedphiprime*dphidxid*dphidzib
-     &                             + d2edphi2prime*dphidxid*dphidzib
-     &                             + d2drprime*dzibxid - dxid*ddrdz
+     &                             - dxid*ddrdz
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyid
      &                             + d2edphi2*dphidyid*dphidzib
-     &                             + dedphiprime*dphidyid*dphidzib
-     &                             + d2edphi2prime*dphidyid*dphidzib
-     &                             + d2drprime*dzibyid - dyid*ddrdz
+     &                             - dyid*ddrdz
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzid
      &                             + d2edphi2*dphidzid*dphidzib
-     &                             + dedphiprime*dphidzid*dphidzib
-     &                             + d2edphi2prime*dphidzid*dphidzib
-     &                             + d2drprime*dzibzid - dzid*ddrdz
+     &                             - dzid*ddrdz
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxicxid
      &                             + d2edphi2*dphidxid*dphidxic
-     &                             + dedphiprime*dphidxid*dphidxic
-     &                             + d2edphi2prime*dphidxid*dphidxic
-     &                             + d2drprime*dxicxid + dxid*ddrdx
+     &                             + dxid*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyid
      &                             + d2edphi2*dphidyid*dphidxic
-     &                             + dedphiprime*dphidyid*dphidxic
-     &                             + d2edphi2prime*dphidyid*dphidxic
-     &                             + d2drprime*dxicyid + dyid*ddrdx
+     &                             + dyid*ddrdx
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczid
      &                             + d2edphi2*dphidzid*dphidxic
-     &                             + dedphiprime*dphidzid*dphidxic
-     &                             + d2edphi2prime*dphidzid*dphidxic
-     &                             + d2drprime*dxiczid + dzid*ddrdx
+     &                             + dzid*ddrdx
                   hessx(2,ic) = hessx(2,ic) + dedphi*dyicxid
      &                             + d2edphi2*dphidxid*dphidyic
-     &                             + dedphiprime*dphidxid*dphidyic
-     &                             + d2edphi2prime*dphidxid*dphidyic
-     &                             + d2drprime*dyicxid + dxid*ddrdy
+     &                             + dxid*ddrdy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyicyid
      &                             + d2edphi2*dphidyid*dphidyic
-     &                             + dedphiprime*dphidyid*dphidyic
-     &                             + d2edphi2prime*dphidyid*dphidyic
-     &                             + d2drprime*dyicyid + dyid*ddrdy
+     &                             + dyid*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dyiczid
      &                             + d2edphi2*dphidzid*dphidyic
-     &                             + dedphiprime*dphidzid*dphidyic
-     &                             + d2edphi2prime*dphidzid*dphidyic
-     &                             + d2drprime*dyiczid + dzid*ddrdy
+     &                             + dzid*ddrdy
                   hessx(3,ic) = hessx(3,ic) + dedphi*dzicxid
      &                             + d2edphi2*dphidxid*dphidzic
-     &                             + dedphiprime*dphidxid*dphidzic
-     &                             + d2edphi2prime*dphidxid*dphidzic
-     &                             + d2drprime*dzicxid + dxid*ddrdz
+     &                             + dxid*ddrdz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dzicyid
      &                             + d2edphi2*dphidyid*dphidzic
-     &                             + dedphiprime*dphidyid*dphidzic
-     &                             + d2edphi2prime*dphidyid*dphidzic
-     &                             + d2drprime*dzicyid + dyid*ddrdz
+     &                             + dyid*ddrdz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziczid
      &                             + d2edphi2*dphidzid*dphidzic
-     &                             + dedphiprime*dphidzid*dphidzic
-     &                             + d2edphi2prime*dphidzid*dphidzic
-     &                             + d2drprime*dziczid + dzid*ddrdz
+     &                             + dzid*ddrdz
                end if
 c
 c     get the stretch-torsion values for the third bond
@@ -2051,23 +1322,11 @@ c
                v3 = kst(9,istrtor)
                k = ist(4,istrtor)
                dr = rdc - bl(k)
-               force = bk(k)
-               dedphi = storunit * 2.0d0 * force 
-     &                     * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2 = storunit * 2.0d0 * force * dr
+               dedphi = storunit * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2edphi2 = storunit * dr
      &                       * (v1*d2phi1 + v2*d2phi2 + v3*d2phi3)
                ddr = 1.0d0 / rdc
-               d2dr = -storunit * 2.0d0 * force 
-     &                    * (v1*phi1 + v2*phi2 + v3*phi3) / rdc**3
-               dedphiprime = storunit * 2.0d0 * force
-     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-     &                          * (v1*dphi1 + v2*dphi2 + v3*dphi3)
-               d2edphi2prime = storunit * 2.0d0 * force
-     &                            * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                            * (v1*d2phi1 + v2*d2phi2 + v3*d2phi3)
-               d2drprime = storunit * 2.0d0 * force
-     &                        * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                        * (v1*dphi1 + v2*dphi2 + v3*dphi3)
+               d2dr = -storunit * (v1*phi1 + v2*phi2 + v3*phi3) / rdc**3
 c
 c     scale the interaction based on its group membership
 c
@@ -2110,763 +1369,430 @@ c
                if (i .eq. ia) then
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxia
      &                             + d2edphi2*dphidxia*dphidxia
-     &                             + dedphiprime*dphidxia*dphidxia
-     &                             + d2edphi2prime*dphidxia*dphidxia
-     &                             + d2drprime*dxiaxia
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
-     &                             + dedphiprime*dphidxia*dphidyia
-     &                             + d2edphi2prime*dphidxia*dphidyia
-     &                             + d2drprime*dxiayia
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazia
      &                             + d2edphi2*dphidxia*dphidzia
-     &                             + dedphiprime*dphidxia*dphidzia
-     &                             + d2edphi2prime*dphidxia*dphidzia
-     &                             + d2drprime*dxiazia
                   hessx(2,ia) = hessx(2,ia) + dedphi*dxiayia
      &                             + d2edphi2*dphidxia*dphidyia
-     &                             + dedphiprime*dphidxia*dphidyia
-     &                             + d2edphi2prime*dphidxia*dphidyia
-     &                             + d2drprime*dxiayia
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayia
      &                             + d2edphi2*dphidyia*dphidyia
-     &                             + dedphiprime*dphidyia*dphidyia
-     &                             + d2edphi2prime*dphidyia*dphidyia 
-     &                             + d2drprime*dyiayia
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazia
      &                             + d2edphi2*dphidyia*dphidzia
-     &                             + dedphiprime*dphidyia*dphidzia
-     &                             + d2edphi2prime*dphidyia*dphidzia
-     &                             + d2drprime*dyiazia
                   hessx(3,ia) = hessx(3,ia) + dedphi*dxiazia
      &                             + d2edphi2*dphidxia*dphidzia
-     &                             + dedphiprime*dphidxia*dphidzia
-     &                             + d2edphi2prime*dphidxia*dphidzia
-     &                             + d2drprime*dxiazia
                   hessy(3,ia) = hessy(3,ia) + dedphi*dyiazia
      &                             + d2edphi2*dphidyia*dphidzia
-     &                             + dedphiprime*dphidyia*dphidzia
-     &                             + d2edphi2prime*dphidyia*dphidzia
-     &                             + d2drprime*dyiazia
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazia
      &                             + d2edphi2*dphidzia*dphidzia
-     &                             + dedphiprime*dphidzia*dphidzia
-     &                             + d2edphi2prime*dphidzia*dphidzia
-     &                             + d2drprime*dziazia
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxiaxib
      &                             + d2edphi2*dphidxia*dphidxib
-     &                             + dedphiprime*dphidxia*dphidxib
-     &                             + d2edphi2prime*dphidxia*dphidxib
-     &                             + d2drprime*dxiaxib
                   hessy(1,ib) = hessy(1,ib) + dedphi*dyiaxib
      &                             + d2edphi2*dphidyia*dphidxib
-     &                             + dedphiprime*dphidyia*dphidxib
-     &                             + d2edphi2prime*dphidyia*dphidxib
-     &                             + d2drprime*dyiaxib
                   hessz(1,ib) = hessz(1,ib) + dedphi*dziaxib
      &                             + d2edphi2*dphidzia*dphidxib
-     &                             + dedphiprime*dphidzia*dphidxib
-     &                             + d2edphi2prime*dphidzia*dphidxib
-     &                             + d2drprime*dziaxib
                   hessx(2,ib) = hessx(2,ib) + dedphi*dxiayib
      &                             + d2edphi2*dphidxia*dphidyib
-     &                             + dedphiprime*dphidxia*dphidyib
-     &                             + d2edphi2prime*dphidxia*dphidyib
-     &                             + d2drprime*dxiayib
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyiayib
      &                             + d2edphi2*dphidyia*dphidyib
-     &                             + dedphiprime*dphidyia*dphidyib
-     &                             + d2edphi2prime*dphidyia*dphidyib
-     &                             + d2drprime*dyiayib
                   hessz(2,ib) = hessz(2,ib) + dedphi*dziayib
      &                             + d2edphi2*dphidzia*dphidyib
-     &                             + dedphiprime*dphidzia*dphidyib
-     &                             + d2edphi2prime*dphidzia*dphidyib
-     &                             + d2drprime*dziayib
                   hessx(3,ib) = hessx(3,ib) + dedphi*dxiazib
      &                             + d2edphi2*dphidxia*dphidzib
-     &                             + dedphiprime*dphidxia*dphidzib
-     &                             + d2edphi2prime*dphidxia*dphidzib
-     &                             + d2drprime*dxiazib
                   hessy(3,ib) = hessy(3,ib) + dedphi*dyiazib
      &                             + d2edphi2*dphidyia*dphidzib
-     &                             + dedphiprime*dphidyia*dphidzib
-     &                             + d2edphi2prime*dphidyia*dphidzib
-     &                             + d2drprime*dyiazib
                   hessz(3,ib) = hessz(3,ib) + dedphi*dziazib
      &                             + d2edphi2*dphidzia*dphidzib
-     &                             + dedphiprime*dphidzia*dphidzib
-     &                             + d2edphi2prime*dphidzia*dphidzib
-     &                             + d2drprime*dziazib
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxiaxic
      &                             + d2edphi2*dphidxia*dphidxic
-     &                             + dedphiprime*dphidxia*dphidxic
-     &                             + d2edphi2prime*dphidxia*dphidxic
-     &                             + d2drprime*dxiaxic - dxia*ddrdx
+     &                             - dxia*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyiaxic
      &                             + d2edphi2*dphidyia*dphidxic
-     &                             + dedphiprime*dphidyia*dphidxic
-     &                             + d2edphi2prime*dphidyia*dphidxic
-     &                             + d2drprime*dyiaxic - dyia*ddrdx
+     &                             - dyia*ddrdx
                   hessz(1,ic) = hessz(1,ic) + dedphi*dziaxic
      &                             + d2edphi2*dphidzia*dphidxic
-     &                             + dedphiprime*dphidzia*dphidxic
-     &                             + d2edphi2prime*dphidzia*dphidxic
-     &                             + d2drprime*dziaxic - dzia*ddrdx
+     &                             - dzia*ddrdx
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxiayic
      &                             + d2edphi2*dphidxia*dphidyic
-     &                             + dedphiprime*dphidxia*dphidyic
-     &                             + d2edphi2prime*dphidxia*dphidyic
-     &                             + d2drprime*dxiayic - dxia*ddrdy
+     &                             - dxia*ddrdy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyiayic
      &                             + d2edphi2*dphidyia*dphidyic
-     &                             + dedphiprime*dphidyia*dphidyic
-     &                             + d2edphi2prime*dphidyia*dphidyic
-     &                             + d2drprime*dyiayic - dyia*ddrdy
+     &                             - dyia*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dziayic
      &                             + d2edphi2*dphidzia*dphidyic
-     &                             + dedphiprime*dphidzia*dphidyic
-     &                             + d2edphi2prime*dphidzia*dphidyic
-     &                             + d2drprime*dziayic - dzia*ddrdy
+     &                             - dzia*ddrdy
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiazic
      &                             + d2edphi2*dphidxia*dphidzic
-     &                             + dedphiprime*dphidxia*dphidzic
-     &                             + d2edphi2prime*dphidxia*dphidzic
-     &                             + d2drprime*dxiazic - dxia*ddrdz
+     &                             - dxia*ddrdz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiazic
      &                             + d2edphi2*dphidyia*dphidzic
-     &                             + dedphiprime*dphidyia*dphidzic
-     &                             + d2edphi2prime*dphidyia*dphidzic
-     &                             + d2drprime*dyiazic - dyia*ddrdz
+     &                             - dyia*ddrdz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziazic
      &                             + d2edphi2*dphidzia*dphidzic
-     &                             + dedphiprime*dphidzia*dphidzic
-     &                             + d2edphi2prime*dphidzia*dphidzic
-     &                             + d2drprime*dziazic - dzia*ddrdz
+     &                             - dzia*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxiaxid
      &                             + d2edphi2*dphidxia*dphidxid
-     &                             + dedphiprime*dphidxia*dphidxid
-     &                             + d2edphi2prime*dphidxia*dphidxid
-     &                             + d2drprime*dxiaxid + dxia*ddrdx
+     &                             + dxia*ddrdx
                   hessy(1,id) = hessy(1,id) + dedphi*dyiaxid
      &                             + d2edphi2*dphidyia*dphidxid
-     &                             + dedphiprime*dphidyia*dphidxid
-     &                             + d2edphi2prime*dphidyia*dphidxid
-     &                             + d2drprime*dyiaxid + dyia*ddrdx
+     &                             + dyia*ddrdx
                   hessz(1,id) = hessz(1,id) + dedphi*dziaxid
      &                             + d2edphi2*dphidzia*dphidxid
-     &                             + dedphiprime*dphidzia*dphidxid
-     &                             + d2edphi2prime*dphidzia*dphidxid
-     &                             + d2drprime*dziaxid + dzia*ddrdx
+     &                             + dzia*ddrdx
                   hessx(2,id) = hessx(2,id) + dedphi*dxiayid
      &                             + d2edphi2*dphidxia*dphidyid
-     &                             + dedphiprime*dphidxia*dphidyid
-     &                             + d2edphi2prime*dphidxia*dphidyid
-     &                             + d2drprime*dxiayid + dxia*ddrdy
+     &                             + dxia*ddrdy
                   hessy(2,id) = hessy(2,id) + dedphi*dyiayid
      &                             + d2edphi2*dphidyia*dphidyid
-     &                             + dedphiprime*dphidyia*dphidyid
-     &                             + d2edphi2prime*dphidyia*dphidyid
-     &                             + d2drprime*dyiayid + dyia*ddrdy
+     &                             + dyia*ddrdy
                   hessz(2,id) = hessz(2,id) + dedphi*dziayid
      &                             + d2edphi2*dphidzia*dphidyid
-     &                             + dedphiprime*dphidzia*dphidyid
-     &                             + d2edphi2prime*dphidzia*dphidyid
-     &                             + d2drprime*dziayid + dzia*ddrdy
+     &                             + dzia*ddrdy
                   hessx(3,id) = hessx(3,id) + dedphi*dxiazid
      &                             + d2edphi2*dphidxia*dphidzid
-     &                             + dedphiprime*dphidxia*dphidzid
-     &                             + d2edphi2prime*dphidxia*dphidzid
-     &                             + d2drprime*dxiazid + dxia*ddrdz
+     &                             + dxia*ddrdz
                   hessy(3,id) = hessy(3,id) + dedphi*dyiazid
      &                             + d2edphi2*dphidyia*dphidzid
-     &                             + dedphiprime*dphidyia*dphidzid
-     &                             + d2edphi2prime*dphidyia*dphidzid
-     &                             + d2drprime*dyiazid + dyia*ddrdz
+     &                             + dyia*ddrdz
                   hessz(3,id) = hessz(3,id) + dedphi*dziazid
      &                             + d2edphi2*dphidzia*dphidzid
-     &                             + dedphiprime*dphidzia*dphidzid
-     &                             + d2edphi2prime*dphidzia*dphidzid
-     &                             + d2drprime*dziazid + dzia*ddrdz
+     &                             + dzia*ddrdz
                else if (i .eq. ib) then
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxib
      &                             + d2edphi2*dphidxib*dphidxib
-     &                             + dedphiprime*dphidxib*dphidxib
-     &                             + d2edphi2prime*dphidxib*dphidxib
-     &                             + d2drprime*dxibxib
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyib
      &                             + d2edphi2*dphidxib*dphidyib
-     &                             + dedphiprime*dphidxib*dphidyib
-     &                             + d2edphi2prime*dphidxib*dphidyib
-     &                             + d2drprime*dxibyib
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzib
      &                             + d2edphi2*dphidxib*dphidzib
-     &                             + dedphiprime*dphidxib*dphidzib
-     &                             + d2edphi2prime*dphidxib*dphidzib
-     &                             + d2drprime*dxibzib
                   hessx(2,ib) = hessx(2,ib) + dedphi*dxibyib
      &                             + d2edphi2*dphidxib*dphidyib
-     &                             + dedphiprime*dphidxib*dphidyib
-     &                             + d2edphi2prime*dphidxib*dphidyib
-     &                             + d2drprime*dxibyib
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyib
      &                             + d2edphi2*dphidyib*dphidyib
-     &                             + dedphiprime*dphidyib*dphidyib
-     &                             + d2edphi2prime*dphidyib*dphidyib
-     &                             + d2drprime*dyibyib
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzib
      &                             + d2edphi2*dphidyib*dphidzib
-     &                             + dedphiprime*dphidyib*dphidzib
-     &                             + d2edphi2prime*dphidyib*dphidzib
-     &                             + d2drprime*dyibzib
                   hessx(3,ib) = hessx(3,ib) + dedphi*dxibzib
      &                             + d2edphi2*dphidxib*dphidzib
-     &                             + dedphiprime*dphidxib*dphidzib
-     &                             + d2edphi2prime*dphidxib*dphidzib
-     &                             + d2drprime*dxibzib
                   hessy(3,ib) = hessy(3,ib) + dedphi*dyibzib
      &                             + d2edphi2*dphidyib*dphidzib
-     &                             + dedphiprime*dphidyib*dphidzib
-     &                             + d2edphi2prime*dphidyib*dphidzib
-     &                             + d2drprime*dyibzib
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzib
      &                             + d2edphi2*dphidzib*dphidzib
-     &                             + dedphiprime*dphidzib*dphidzib
-     &                             + d2edphi2prime*dphidzib*dphidzib
-     &                             + d2drprime*dzibzib
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxib
      &                             + d2edphi2*dphidxib*dphidxia
-     &                             + dedphiprime*dphidxib*dphidxia
-     &                             + d2edphi2prime*dphidxib*dphidxia
-     &                             + d2drprime*dxiaxib
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayib
      &                             + d2edphi2*dphidyib*dphidxia
-     &                             + dedphiprime*dphidyib*dphidxia
-     &                             + d2edphi2prime*dphidyib*dphidxia
-     &                             + d2drprime*dxiayib
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazib
      &                             + d2edphi2*dphidzib*dphidxia
-     &                             + dedphiprime*dphidzib*dphidxia
-     &                             + d2edphi2prime*dphidzib*dphidxia
-     &                             + d2drprime*dxiazib
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxib
      &                             + d2edphi2*dphidxib*dphidyia
-     &                             + dedphiprime*dphidxib*dphidyia
-     &                             + d2edphi2prime*dphidxib*dphidyia
-     &                             + d2drprime*dyiaxib
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayib
      &                             + d2edphi2*dphidyib*dphidyia
-     &                             + dedphiprime*dphidyib*dphidyia
-     &                             + d2edphi2prime*dphidyib*dphidyia
-     &                             + d2drprime*dyiayib
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazib
      &                             + d2edphi2*dphidzib*dphidyia
-     &                             + dedphiprime*dphidzib*dphidyia
-     &                             + d2edphi2prime*dphidzib*dphidyia
-     &                             + d2drprime*dyiazib
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxib
      &                             + d2edphi2*dphidxib*dphidzia
-     &                             + dedphiprime*dphidxib*dphidzia
-     &                             + d2edphi2prime*dphidxib*dphidzia
-     &                             + d2drprime*dziaxib
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayib
      &                             + d2edphi2*dphidyib*dphidzia
-     &                             + dedphiprime*dphidyib*dphidzia
-     &                             + d2edphi2prime*dphidyib*dphidzia
-     &                             + d2drprime*dziayib
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazib
      &                             + d2edphi2*dphidzib*dphidzia
-     &                             + dedphiprime*dphidzib*dphidzia
-     &                             + d2edphi2prime*dphidzib*dphidzia
-     &                             + d2drprime*dziazib
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxibxic
      &                             + d2edphi2*dphidxib*dphidxic
-     &                             + dedphiprime*dphidxib*dphidxic
-     &                             + d2edphi2prime*dphidxib*dphidxic
-     &                             + d2drprime*dxibxic - dxib*ddrdx
+     &                             - dxib*ddrdx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dyibxic
      &                             + d2edphi2*dphidyib*dphidxic
-     &                             + dedphiprime*dphidyib*dphidxic
-     &                             + d2edphi2prime*dphidyib*dphidxic
-     &                             + d2drprime*dyibxic - dyib*ddrdx
+     &                             - dyib*ddrdx
                   hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
      &                             + d2edphi2*dphidzib*dphidxic
-     &                             + dedphiprime*dphidzib*dphidxic
-     &                             + d2edphi2prime*dphidzib*dphidxic
-     &                             + d2drprime*dzibxic - dzib*ddrdx
+     &                             - dzib*ddrdx
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxibyic
      &                             + d2edphi2*dphidxib*dphidyic
-     &                             + dedphiprime*dphidxib*dphidyic
-     &                             + d2edphi2prime*dphidxib*dphidyic
-     &                             + d2drprime*dxibyic - dxib*ddrdy
+     &                             - dxib*ddrdy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyibyic
      &                             + d2edphi2*dphidyib*dphidyic
-     &                             + dedphiprime*dphidyib*dphidyic
-     &                             + d2edphi2prime*dphidyib*dphidyic
-     &                             + d2drprime*dyibyic - dyib*ddrdy
+     &                             - dyib*ddrdy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dzibyic
      &                             + d2edphi2*dphidzib*dphidyic
-     &                             + dedphiprime*dphidzib*dphidyic
-     &                             + d2edphi2prime*dphidzib*dphidyic
-     &                             + d2drprime*dzibyic - dzib*ddrdy
+     &                             - dzib*ddrdy
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxibzic
      &                             + d2edphi2*dphidxib*dphidzic
-     &                             + dedphiprime*dphidxib*dphidzic
-     &                             + d2edphi2prime*dphidxib*dphidzic
-     &                             + d2drprime*dxibzic - dxib*ddrdz
+     &                             - dxib*ddrdz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyibzic
      &                             + d2edphi2*dphidyib*dphidzic
-     &                             + dedphiprime*dphidyib*dphidzic
-     &                             + d2edphi2prime*dphidyib*dphidzic
-     &                             + d2drprime*dyibzic - dyib*ddrdz
+     &                             - dyib*ddrdz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dzibzic
      &                             + d2edphi2*dphidzib*dphidzic
-     &                             + dedphiprime*dphidzib*dphidzic
-     &                             + d2edphi2prime*dphidzib*dphidzic
-     &                             + d2drprime*dzibzic - dzib*ddrdz
+     &                             - dzib*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxibxid
      &                             + d2edphi2*dphidxib*dphidxid
-     &                             + dedphiprime*dphidxib*dphidxid
-     &                             + d2edphi2prime*dphidxib*dphidxid
-     &                             + d2drprime*dxibxid + dxib*ddrdx
+     &                             + dxib*ddrdx
                   hessy(1,id) = hessy(1,id) + dedphi*dyibxid
      &                             + d2edphi2*dphidyib*dphidxid
-     &                             + dedphiprime*dphidyib*dphidxid
-     &                             + d2edphi2prime*dphidyib*dphidxid
-     &                             + d2drprime*dyibxid + dyib*ddrdx
+     &                             + dyib*ddrdx
                   hessz(1,id) = hessz(1,id) + dedphi*dzibxid
      &                             + d2edphi2*dphidzib*dphidxid
-     &                             + dedphiprime*dphidzib*dphidxid
-     &                             + d2edphi2prime*dphidzib*dphidxid
-     &                             + d2drprime*dzibxid + dzib*ddrdx
+     &                             + dzib*ddrdx
                   hessx(2,id) = hessx(2,id) + dedphi*dxibyid
      &                             + d2edphi2*dphidxib*dphidyid
-     &                             + dedphiprime*dphidxib*dphidyid
-     &                             + d2edphi2prime*dphidxib*dphidyid
-     &                             + d2drprime*dxibyid + dxib*ddrdy
+     &                             + dxib*ddrdy
                   hessy(2,id) = hessy(2,id) + dedphi*dyibyid
      &                             + d2edphi2*dphidyib*dphidyid
-     &                             + dedphiprime*dphidyib*dphidyid
-     &                             + d2edphi2prime*dphidyib*dphidyid
-     &                             + d2drprime*dyibyid + dyib*ddrdy
+     &                             + dyib*ddrdy
                   hessz(2,id) = hessz(2,id) + dedphi*dzibyid
      &                             + d2edphi2*dphidzib*dphidyid
-     &                             + dedphiprime*dphidzib*dphidyid
-     &                             + d2edphi2prime*dphidzib*dphidyid
-     &                             + d2drprime*dzibyid + dzib*ddrdy
+     &                             + dzib*ddrdy
                   hessx(3,id) = hessx(3,id) + dedphi*dxibzid
      &                             + d2edphi2*dphidxib*dphidzid
-     &                             + dedphiprime*dphidxib*dphidzid
-     &                             + d2edphi2prime*dphidxib*dphidzid
-     &                             + d2drprime*dxibzid + dxib*ddrdz
+     &                             + dxib*ddrdz
                   hessy(3,id) = hessy(3,id) + dedphi*dyibzid
      &                             + d2edphi2*dphidyib*dphidzid
-     &                             + dedphiprime*dphidyib*dphidzid
-     &                             + d2edphi2prime*dphidyib*dphidzid
-     &                             + d2drprime*dyibzid + dyib*ddrdz
+     &                             + dyib*ddrdz
                   hessz(3,id) = hessz(3,id) + dedphi*dzibzid
      &                             + d2edphi2*dphidzib*dphidzid
-     &                             + dedphiprime*dphidzib*dphidzid
-     &                             + d2edphi2prime*dphidzib*dphidzid
-     &                             + d2drprime*dzibzid + dzib*ddrdz
+     &                             + dzib*ddrdz
                else if (i .eq. ic) then
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxicxic
      &                             + d2edphi2*dphidxic*dphidxic
      &                             - 2.0d0*dxic*ddrdx + d2drdxx
-     &                             + dedphiprime*dphidxic*dphidxic
-     &                             + d2edphi2prime*dphidxic*dphidxic
-     &                             + d2drprime*dxicxic
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyic
      &                             + d2edphi2*dphidxic*dphidyic
-     &                             - dyic*ddrdx - dxic*ddrdy
-     &                             + dedphiprime*dphidxic*dphidyic
-     &                             + d2edphi2prime*dphidxic*dphidyic
-     &                             + d2drprime*dxicyic + d2drdxy
+     &                             - dyic*ddrdx - dxic*ddrdy + d2drdxy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczic
      &                             + d2edphi2*dphidxic*dphidzic
-     &                             - dzic*ddrdx - dxic*ddrdz
-     &                             + dedphiprime*dphidxic*dphidzic
-     &                             + d2edphi2prime*dphidxic*dphidzic
-     &                             + d2drprime*dxiczic + d2drdxz
+     &                             - dzic*ddrdx - dxic*ddrdz + d2drdxz
                   hessx(2,ic) = hessx(2,ic) + dedphi*dxicyic
      &                             + d2edphi2*dphidxic*dphidyic
-     &                             - dxic*ddrdy - dyic*ddrdx
-     &                             + dedphiprime*dphidxic*dphidyic
-     &                             + d2edphi2prime*dphidxic*dphidyic
-     &                             + d2drprime*dxicyic + d2drdxy
+     &                             - dxic*ddrdy - dyic*ddrdx + d2drdxy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyicyic
      &                             + d2edphi2*dphidyic*dphidyic
      &                             - 2.0d0*dyic*ddrdy + d2drdyy
-     &                             + dedphiprime*dphidyic*dphidyic
-     &                             + d2edphi2prime*dphidyic*dphidyic
-     &                             + d2drprime*dyicyic
                   hessz(2,ic) = hessz(2,ic) + dedphi*dyiczic
      &                             + d2edphi2*dphidyic*dphidzic
-     &                             - dzic*ddrdy - dyic*ddrdz
-     &                             + dedphiprime*dphidyic*dphidzic
-     &                             + d2edphi2prime*dphidyic*dphidzic
-     &                             + d2drprime*dyiczic + d2drdyz
+     &                             - dzic*ddrdy - dyic*ddrdz + d2drdyz
                   hessx(3,ic) = hessx(3,ic) + dedphi*dxiczic
      &                             + d2edphi2*dphidxic*dphidzic
-     &                             - dxic*ddrdz - dzic*ddrdx
-     &                             + dedphiprime*dphidxic*dphidzic
-     &                             + d2edphi2prime*dphidxic*dphidzic
-     &                             + d2drprime*dxiczic + d2drdxz
+     &                             - dxic*ddrdz - dzic*ddrdx + d2drdxz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dyiczic
      &                             + d2edphi2*dphidyic*dphidzic
-     &                             - dyic*ddrdz - dzic*ddrdy
-     &                             + dedphiprime*dphidyic*dphidzic
-     &                             + d2edphi2prime*dphidyic*dphidzic
-     &                             + d2drprime*dyiczic + d2drdyz
+     &                             - dyic*ddrdz - dzic*ddrdy + d2drdyz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziczic
      &                             + d2edphi2*dphidzic*dphidzic
      &                             - 2.0d0*dzic*ddrdz + d2drdzz
-     &                             + dedphiprime*dphidzic*dphidzic
-     &                             + d2edphi2prime*dphidzic*dphidzic
-     &                             + d2drprime*dziczic
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxic
      &                             + d2edphi2*dphidxic*dphidxia
-     &                             + dedphiprime*dphidxic*dphidxia
-     &                             + d2edphi2prime*dphidxic*dphidxia
-     &                             + d2drprime*dxiaxic - dxia*ddrdx
+     &                             - dxia*ddrdx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayic
      &                             + d2edphi2*dphidyic*dphidxia
-     &                             + dedphiprime*dphidyic*dphidxia
-     &                             + d2edphi2prime*dphidyic*dphidxia
-     &                             + d2drprime*dxiayic - dxia*ddrdy
+     &                             - dxia*ddrdy
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazic
      &                             + d2edphi2*dphidzic*dphidxia
-     &                             + dedphiprime*dphidzic*dphidxia
-     &                             + d2edphi2prime*dphidzic*dphidxia
-     &                             + d2drprime*dxiazic - dxia*ddrdz
+     &                             - dxia*ddrdz
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxic
      &                             + d2edphi2*dphidxic*dphidyia
-     &                             + dedphiprime*dphidxic*dphidyia
-     &                             + d2edphi2prime*dphidxic*dphidyia
-     &                             + d2drprime*dyiaxic - dyia*ddrdx
+     &                             - dyia*ddrdx
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayic
      &                             + d2edphi2*dphidyic*dphidyia
-     &                             + dedphiprime*dphidyic*dphidyia
-     &                             + d2edphi2prime*dphidyic*dphidyia
-     &                             + d2drprime*dyiayic - dyia*ddrdy
+     &                             - dyia*ddrdy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazic
      &                             + d2edphi2*dphidzic*dphidyia
-     &                             + dedphiprime*dphidzic*dphidyia
-     &                             + d2edphi2prime*dphidzic*dphidyia
-     &                             + d2drprime*dyiazic - dyia*ddrdz
+     &                             - dyia*ddrdz
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxic
      &                             + d2edphi2*dphidxic*dphidzia
-     &                             + dedphiprime*dphidxic*dphidzia
-     &                             + d2edphi2prime*dphidxic*dphidzia
-     &                             + d2drprime*dziaxic - dzia*ddrdx
+     &                             - dzia*ddrdx
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayic
      &                             + d2edphi2*dphidyic*dphidzia
-     &                             + dedphiprime*dphidyic*dphidzia
-     &                             + d2edphi2prime*dphidyic*dphidzia
-     &                             + d2drprime*dziayic - dzia*ddrdy
+     &                             - dzia*ddrdy
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazic
      &                             + d2edphi2*dphidzic*dphidzia
-     &                             + dedphiprime*dphidzic*dphidzia
-     &                             + d2edphi2prime*dphidzic*dphidzia
-     &                             + d2drprime*dziazic - dzia*ddrdz
+     &                             - dzia*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
      &                             + d2edphi2*dphidxic*dphidxib
-     &                             + dedphiprime*dphidxic*dphidxib
-     &                             + d2edphi2prime*dphidxic*dphidxib
-     &                             + d2drprime*dxibxic - dxib*ddrdx
+     &                             - dxib*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
      &                             + d2edphi2*dphidyic*dphidxib
-     &                             + dedphiprime*dphidyic*dphidxib
-     &                             + d2edphi2prime*dphidyic*dphidxib 
-     &                             + d2drprime*dxibyic - dxib*ddrdy
+     &                             - dxib*ddrdy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
      &                             + d2edphi2*dphidzic*dphidxib
-     &                             + dedphiprime*dphidzic*dphidxib
-     &                             + d2edphi2prime*dphidzic*dphidxib
-     &                             + d2drprime*dxibzic - dxib*ddrdz
+     &                             - dxib*ddrdz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
      &                             + d2edphi2*dphidxic*dphidyib
-     &                             + dedphiprime*dphidxic*dphidyib
-     &                             + d2edphi2prime*dphidxic*dphidyib
-     &                             + d2drprime*dyibxic - dyib*ddrdx
+     &                             - dyib*ddrdx
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
      &                             + d2edphi2*dphidyic*dphidyib
-     &                             + dedphiprime*dphidyic*dphidyib
-     &                             + d2edphi2prime*dphidyic*dphidyib
-     &                             + d2drprime*dyibyic - dyib*ddrdy
+     &                             - dyib*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
      &                             + d2edphi2*dphidzic*dphidyib
-     &                             + dedphiprime*dphidzic*dphidyib
-     &                             + d2edphi2prime*dphidzic*dphidyib
-     &                             + d2drprime*dyibzic - dyib*ddrdz
+     &                             - dyib*ddrdz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
      &                             + d2edphi2*dphidxic*dphidzib
-     &                             + dedphiprime*dphidxic*dphidzib
-     &                             + d2edphi2prime*dphidxic*dphidzib
-     &                             + d2drprime*dzibxic - dzib*ddrdx
+     &                             - dzib*ddrdx
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
      &                             + d2edphi2*dphidyic*dphidzib
-     &                             + dedphiprime*dphidyic*dphidzib
-     &                             + d2edphi2prime*dphidyic*dphidzib
-     &                             + d2drprime*dzibyic - dzib*ddrdy
+     &                             - dzib*ddrdy
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
      &                             + d2edphi2*dphidzic*dphidzib
-     &                             + dedphiprime*dphidzic*dphidzib
-     &                             + d2edphi2prime*dphidzic*dphidzib
-     &                             + d2drprime*dzibzic - dzib*ddrdz
+     &                             - dzib*ddrdz
                   hessx(1,id) = hessx(1,id) + dedphi*dxicxid
      &                             + d2edphi2*dphidxic*dphidxid
      &                             - dxid*ddrdx + dxic*ddrdx
-     &                             + dedphiprime*dphidxic*dphidxid
-     &                             + d2edphi2prime*dphidxic*dphidxid
-     &                             + d2drprime*dxicxid - d2drdxx
+     &                             - d2drdxx
                   hessy(1,id) = hessy(1,id) + dedphi*dyicxid
      &                             + d2edphi2*dphidyic*dphidxid
      &                             - dxid*ddrdy + dyic*ddrdx
-     &                             + dedphiprime*dphidyic*dphidxid
-     &                             + d2edphi2prime*dphidyic*dphidxid
-     &                             + d2drprime*dyicxid - d2drdxy
+     &                             - d2drdxy
                   hessz(1,id) = hessz(1,id) + dedphi*dzicxid
      &                             + d2edphi2*dphidzic*dphidxid
      &                             - dxid*ddrdz + dzic*ddrdx
-     &                             + dedphiprime*dphidzic*dphidxid
-     &                             + d2edphi2prime*dphidzic*dphidxid
-     &                             + d2drprime*dzicxid - d2drdxz
+     &                             - d2drdxz
                   hessx(2,id) = hessx(2,id) + dedphi*dxicyid
      &                             + d2edphi2*dphidxic*dphidyid
      &                             - dyid*ddrdx + dxic*ddrdy
-     &                             + dedphiprime*dphidxic*dphidyid
-     &                             + d2edphi2prime*dphidxic*dphidyid
-     &                             + d2drprime*dxicyid - d2drdxy
+     &                             - d2drdxy
                   hessy(2,id) = hessy(2,id) + dedphi*dyicyid
      &                             + d2edphi2*dphidyic*dphidyid
      &                             - dyid*ddrdy + dyic*ddrdy
-     &                             + dedphiprime*dphidyic*dphidyid
-     &                             + d2edphi2prime*dphidyic*dphidyid
-     &                             + d2drprime*dyicyid - d2drdyy
+     &                             - d2drdyy
                   hessz(2,id) = hessz(2,id) + dedphi*dzicyid
      &                             + d2edphi2*dphidzic*dphidyid
      &                             - dyid*ddrdz + dzic*ddrdy
-     &                             + dedphiprime*dphidzic*dphidyid
-     &                             + d2edphi2prime*dphidzic*dphidyid
-     &                             + d2drprime*dzicyid - d2drdyz
+     &                             - d2drdyz
                   hessx(3,id) = hessx(3,id) + dedphi*dxiczid
      &                             + d2edphi2*dphidxic*dphidzid
      &                             - dzid*ddrdx + dxic*ddrdz
-     &                             + dedphiprime*dphidxic*dphidzid
-     &                             + d2edphi2prime*dphidxic*dphidzid
-     &                             + d2drprime*dxiczid - d2drdxz
+     &                             - d2drdxz
                   hessy(3,id) = hessy(3,id) + dedphi*dyiczid
      &                             + d2edphi2*dphidyic*dphidzid
      &                             - dzid*ddrdy + dyic*ddrdz
-     &                             + dedphiprime*dphidyic*dphidzid
-     &                             + d2edphi2prime*dphidyic*dphidzid
-     &                             + d2drprime*dyiczid - d2drdyz
+     &                             - d2drdyz
                   hessz(3,id) = hessz(3,id) + dedphi*dziczid
      &                             + d2edphi2*dphidzic*dphidzid
      &                             - dzid*ddrdz + dzic*ddrdz
-     &                             + dedphiprime*dphidzic*dphidzid
-     &                             + d2edphi2prime*dphidzic*dphidzid
-     &                             + d2drprime*dziczid - d2drdzz
+     &                             - d2drdzz
                else if (i .eq. id) then
                   hessx(1,id) = hessx(1,id) + dedphi*dxidxid
      &                             + d2edphi2*dphidxid*dphidxid
-     &                             + 2.0d0*dxid*ddrdx
-     &                             + dedphiprime*dphidxid*dphidxid
-     &                             + d2edphi2prime*dphidxid*dphidxid
-     &                             + d2drprime*dxidxid + d2drdxx
+     &                             + 2.0d0 * dxid * ddrdx
+     &                             + d2drdxx
                   hessy(1,id) = hessy(1,id) + dedphi*dxidyid
      &                             + d2edphi2*dphidxid*dphidyid
      &                             + dxid*ddrdy + dyid*ddrdx
-     &                             + dedphiprime*dphidxid*dphidyid
-     &                             + d2edphi2prime*dphidxid*dphidyid
-     &                             + d2drprime*dxidyid + d2drdxy
+     &                             + d2drdxy
                   hessz(1,id) = hessz(1,id) + dedphi*dxidzid
      &                             + d2edphi2*dphidxid*dphidzid
      &                             + dxid*ddrdz + dzid*ddrdx
-     &                             + dedphiprime*dphidxid*dphidzid
-     &                             + d2edphi2prime*dphidxid*dphidzid
-     &                             + d2drprime*dxidzid + d2drdxz
+     &                             + d2drdxz
                   hessx(2,id) = hessx(2,id) + dedphi*dxidyid
      &                             + d2edphi2*dphidxid*dphidyid
      &                             + dxid*ddrdy + dyid*ddrdx
-     &                             + dedphiprime*dphidxid*dphidyid
-     &                             + d2edphi2prime*dphidxid*dphidyid
-     &                             + d2drprime*dxidyid + d2drdxy
+     &                             + d2drdxy
                   hessy(2,id) = hessy(2,id) + dedphi*dyidyid
      &                             + d2edphi2*dphidyid*dphidyid
-     &                             + 2.0d0*dyid*ddrdy
-     &                             + dedphiprime*dphidyid*dphidyid
-     &                             + d2edphi2prime*dphidyid*dphidyid
-     &                             + d2drprime*dyidyid + d2drdyy
+     &                             + 2.0d0 * dyid * ddrdy
+     &                             + d2drdyy
                   hessz(2,id) = hessz(2,id) + dedphi*dyidzid
      &                             + d2edphi2*dphidyid*dphidzid
      &                             + dyid*ddrdz + dzid*ddrdy
-     &                             + dedphiprime*dphidyid*dphidzid
-     &                             + d2edphi2prime*dphidyid*dphidzid
-     &                             + d2drprime*dyidzid + d2drdyz
+     &                             + d2drdyz
                   hessx(3,id) = hessx(3,id) + dedphi*dxidzid
      &                             + d2edphi2*dphidxid*dphidzid
      &                             + dxid*ddrdz + dzid*ddrdx
-     &                             + dedphiprime*dphidxid*dphidzid
-     &                             + d2edphi2prime*dphidxid*dphidzid
-     &                             + d2drprime*dxidzid + d2drdxz
+     &                             + d2drdxz
                   hessy(3,id) = hessy(3,id) + dedphi*dyidzid
      &                             + d2edphi2*dphidyid*dphidzid
      &                             + dyid*ddrdz + dzid*ddrdy
-     &                             + dedphiprime*dphidyid*dphidzid
-     &                             + d2edphi2prime*dphidyid*dphidzid
-     &                             + d2drprime*dyidzid + d2drdyz
+     &                             + d2drdyz
                   hessz(3,id) = hessz(3,id) + dedphi*dzidzid
      &                             + d2edphi2*dphidzid*dphidzid
-     &                             + 2.0d0*dzid*ddrdz
-     &                             + dedphiprime*dphidzid*dphidzid
-     &                             + d2edphi2prime*dphidzid*dphidzid
-     &                             + d2drprime*dzidzid + d2drdzz
+     &                             + 2.0d0 * dzid * ddrdz
+     &                             + d2drdzz
                   hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxid
      &                             + d2edphi2*dphidxid*dphidxia
-     &                             + dedphiprime*dphidxid*dphidxia
-     &                             + d2edphi2prime*dphidxid*dphidxia
-     &                             + d2drprime*dxiaxid + dxia*ddrdx
+     &                             + dxia*ddrdx
                   hessy(1,ia) = hessy(1,ia) + dedphi*dxiayid
      &                             + d2edphi2*dphidyid*dphidxia
-     &                             + dedphiprime*dphidyid*dphidxia
-     &                             + d2edphi2prime*dphidyid*dphidxia
-     &                             + d2drprime*dxiayid + dxia*ddrdy
+     &                             + dxia*ddrdy
                   hessz(1,ia) = hessz(1,ia) + dedphi*dxiazid
      &                             + d2edphi2*dphidzid*dphidxia
-     &                             + dedphiprime*dphidzid*dphidxia
-     &                             + d2edphi2prime*dphidzid*dphidxia
-     &                             + d2drprime*dxiazid + dxia*ddrdz
+     &                             + dxia*ddrdz
                   hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxid
      &                             + d2edphi2*dphidxid*dphidyia
-     &                             + dedphiprime*dphidxid*dphidyia
-     &                             + d2edphi2prime*dphidxid*dphidyia
-     &                             + d2drprime*dyiaxid + dyia*ddrdx
+     &                             + dyia*ddrdx
                   hessy(2,ia) = hessy(2,ia) + dedphi*dyiayid
      &                             + d2edphi2*dphidyid*dphidyia
-     &                             + dedphiprime*dphidyid*dphidyia
-     &                             + d2edphi2prime*dphidyid*dphidyia
-     &                             + d2drprime*dyiayid + dyia*ddrdy
+     &                             + dyia*ddrdy
                   hessz(2,ia) = hessz(2,ia) + dedphi*dyiazid
      &                             + d2edphi2*dphidzid*dphidyia
-     &                             + dedphiprime*dphidzid*dphidyia
-     &                             + d2edphi2prime*dphidzid*dphidyia
-     &                             + d2drprime*dyiazid + dyia*ddrdz
+     &                             + dyia*ddrdz
                   hessx(3,ia) = hessx(3,ia) + dedphi*dziaxid
      &                             + d2edphi2*dphidxid*dphidzia
-     &                             + dedphiprime*dphidxid*dphidzia
-     &                             + d2edphi2prime*dphidxid*dphidzia
-     &                             + d2drprime*dziaxid + dzia*ddrdx
+     &                             + dzia*ddrdx
                   hessy(3,ia) = hessy(3,ia) + dedphi*dziayid
      &                             + d2edphi2*dphidyid*dphidzia
-     &                             + dedphiprime*dphidyid*dphidzia
-     &                             + d2edphi2prime*dphidyid*dphidzia
-     &                             + d2drprime*dziayid + dzia*ddrdy
+     &                             + dzia*ddrdy
                   hessz(3,ia) = hessz(3,ia) + dedphi*dziazid
      &                             + d2edphi2*dphidzid*dphidzia
-     &                             + dedphiprime*dphidzid*dphidzia
-     &                             + d2edphi2prime*dphidzid*dphidzia
-     &                             + d2drprime*dziazid + dzia*ddrdz
+     &                             + dzia*ddrdz
                   hessx(1,ib) = hessx(1,ib) + dedphi*dxibxid
      &                             + d2edphi2*dphidxid*dphidxib
-     &                             + dedphiprime*dphidxid*dphidxib
-     &                             + d2edphi2prime*dphidxid*dphidxib
-     &                             + d2drprime*dxibxid + dxib*ddrdx
+     &                             + dxib*ddrdx
                   hessy(1,ib) = hessy(1,ib) + dedphi*dxibyid
      &                             + d2edphi2*dphidyid*dphidxib
-     &                             + dedphiprime*dphidyid*dphidxib
-     &                             + d2edphi2prime*dphidyid*dphidxib
-     &                             + d2drprime*dxibyid + dxib*ddrdy
+     &                             + dxib*ddrdy
                   hessz(1,ib) = hessz(1,ib) + dedphi*dxibzid
      &                             + d2edphi2*dphidzid*dphidxib
-     &                             + dedphiprime*dphidzid*dphidxib
-     &                             + d2edphi2prime*dphidzid*dphidxib
-     &                             + d2drprime*dxibzid + dxib*ddrdz
+     &                             + dxib*ddrdz
                   hessx(2,ib) = hessx(2,ib) + dedphi*dyibxid
      &                             + d2edphi2*dphidxid*dphidyib
-     &                             + dedphiprime*dphidxid*dphidyib
-     &                             + d2edphi2prime*dphidxid*dphidyib
-     &                             + d2drprime*dyibxid + dyib*ddrdx
+     &                             + dyib*ddrdx
                   hessy(2,ib) = hessy(2,ib) + dedphi*dyibyid
      &                             + d2edphi2*dphidyid*dphidyib
-     &                             + dedphiprime*dphidyid*dphidyib
-     &                             + d2edphi2prime*dphidyid*dphidyib
-     &                             + d2drprime*dyibyid + dyib*ddrdy
+     &                             + dyib*ddrdy
                   hessz(2,ib) = hessz(2,ib) + dedphi*dyibzid
      &                             + d2edphi2*dphidzid*dphidyib
-     &                             + dedphiprime*dphidzid*dphidyib
-     &                             + d2edphi2prime*dphidzid*dphidyib
-     &                             + d2drprime*dyibzid + dyib*ddrdz
+     &                             + dyib*ddrdz
                   hessx(3,ib) = hessx(3,ib) + dedphi*dzibxid
      &                             + d2edphi2*dphidxid*dphidzib
-     &                             + dedphiprime*dphidxid*dphidzib
-     &                             + d2edphi2prime*dphidxid*dphidzib
-     &                             + d2drprime*dzibxid + dzib*ddrdx
+     &                             + dzib*ddrdx
                   hessy(3,ib) = hessy(3,ib) + dedphi*dzibyid
      &                             + d2edphi2*dphidyid*dphidzib
-     &                             + dedphiprime*dphidyid*dphidzib
-     &                             + d2edphi2prime*dphidyid*dphidzib
-     &                             + d2drprime*dzibyid + dzib*ddrdy
+     &                             + dzib*ddrdy
                   hessz(3,ib) = hessz(3,ib) + dedphi*dzibzid
      &                             + d2edphi2*dphidzid*dphidzib
-     &                             + dedphiprime*dphidzid*dphidzib
-     &                             + d2edphi2prime*dphidzid*dphidzib
-     &                             + d2drprime*dzibzid + dzib*ddrdz
+     &                             + dzib*ddrdz
                   hessx(1,ic) = hessx(1,ic) + dedphi*dxicxid
      &                             + d2edphi2*dphidxid*dphidxic
      &                             + dxic*ddrdx - dxid*ddrdx
-     &                             + dedphiprime*dphidxid*dphidxic
-     &                             + d2edphi2prime*dphidxid*dphidxic
-     &                             + d2drprime*dxicxid - d2drdxx
+     &                             - d2drdxx
                   hessy(1,ic) = hessy(1,ic) + dedphi*dxicyid
      &                             + d2edphi2*dphidyid*dphidxic
      &                             + dxic*ddrdy - dyid*ddrdx
-     &                             + dedphiprime*dphidyid*dphidxic
-     &                             + d2edphi2prime*dphidyid*dphidxic
-     &                             + d2drprime*dxicyid - d2drdxy
+     &                             - d2drdxy
                   hessz(1,ic) = hessz(1,ic) + dedphi*dxiczid
      &                             + d2edphi2*dphidzid*dphidxic
      &                             + dxic*ddrdz - dzid*ddrdx
-     &                             + dedphiprime*dphidzid*dphidxic
-     &                             + d2edphi2prime*dphidzid*dphidxic
-     &                             + d2drprime*dxiczid - d2drdxz
+     &                             - d2drdxz
                   hessx(2,ic) = hessx(2,ic) + dedphi*dyicxid
      &                             + d2edphi2*dphidxid*dphidyic
      &                             + dyic*ddrdx - dxid*ddrdy
-     &                             + dedphiprime*dphidxid*dphidyic
-     &                             + d2edphi2prime*dphidxid*dphidyic
-     &                             + d2drprime*dyicxid - d2drdxy
+     &                             - d2drdxy
                   hessy(2,ic) = hessy(2,ic) + dedphi*dyicyid
      &                             + d2edphi2*dphidyid*dphidyic
      &                             + dyic*ddrdy - dyid*ddrdy
-     &                             + dedphiprime*dphidyid*dphidyic
-     &                             + d2edphi2prime*dphidyid*dphidyic
-     &                             + d2drprime*dyicyid - d2drdyy
+     &                             - d2drdyy
                   hessz(2,ic) = hessz(2,ic) + dedphi*dyiczid
      &                             + d2edphi2*dphidzid*dphidyic
      &                             + dyic*ddrdz - dzid*ddrdy
-     &                             + dedphiprime*dphidzid*dphidyic
-     &                             + d2edphi2prime*dphidzid*dphidyic
-     &                             + d2drprime*dyiczid - d2drdyz
+     &                             - d2drdyz
                   hessx(3,ic) = hessx(3,ic) + dedphi*dzicxid
      &                             + d2edphi2*dphidxid*dphidzic
      &                             + dzic*ddrdx - dxid*ddrdz
-     &                             + dedphiprime*dphidxid*dphidzic
-     &                             + d2edphi2prime*dphidxid*dphidzic
-     &                             + d2drprime*dzicxid - d2drdxz
+     &                             - d2drdxz
                   hessy(3,ic) = hessy(3,ic) + dedphi*dzicyid
      &                             + d2edphi2*dphidyid*dphidzic
      &                             + dzic*ddrdy - dyid*ddrdz
-     &                             + dedphiprime*dphidyid*dphidzic
-     &                             + d2edphi2prime*dphidyid*dphidzic
-     &                             + d2drprime*dzicyid - d2drdyz
+     &                             - d2drdyz
                   hessz(3,ic) = hessz(3,ic) + dedphi*dziczid
      &                             + d2edphi2*dphidzid*dphidzic
      &                             + dzic*ddrdz - dzid*ddrdz
-     &                             + dedphiprime*dphidzid*dphidzic
-     &                             + d2edphi2prime*dphidzid*dphidzic
-     &                             + d2drprime*dziczid - d2drdzz
+     &                             - d2drdzz
                end if
             end if
          end if

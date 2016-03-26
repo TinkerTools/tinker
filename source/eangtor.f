@@ -1,7 +1,7 @@
 c
 c
 c     ##########################################################
-c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2014 by Chao Lv & Jay William Ponder  ##
 c     ##                  All Rights Reserved                 ##
 c     ##########################################################
 c
@@ -53,7 +53,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8 force
       logical proceed
 c
 c
@@ -152,12 +151,7 @@ c
                cosang = -dot / sqrt(rba2*rcb2)
                angle = radian * acos(cosang)
                dt = angle - anat(k)
-               force = ak(k)
-               e1 = atorunit * 2.0d0 * force * dt
-     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
-     &              + atorunit * force
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               e1 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the angle-torsion values for the second angle
 c
@@ -169,12 +163,7 @@ c
                cosang = -dot / sqrt(rcb2*rdc2)
                angle = radian * acos(cosang)
                dt = angle - anat(k)
-               force = ak(k)
-               e2 = atorunit * 2.0d0 * force * dt
-     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
-     &              + atorunit * force
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               e2 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c

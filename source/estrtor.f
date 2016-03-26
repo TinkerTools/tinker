@@ -50,7 +50,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8 force
       logical proceed
 c
 c
@@ -145,11 +144,7 @@ c
                v3 = kst(3,istrtor)
                k = ist(2,istrtor)
                dr = rba - bl(k)
-               force = bk(k)
-               e1 = storunit * 2.0d0 * force * dr 
-     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
-     &              + force * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               e1 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the stretch-torsion values for the second bond
 c
@@ -158,11 +153,7 @@ c
                v3 = kst(6,istrtor)
                k = ist(3,istrtor)
                dr = rcb - bl(k)
-               force = bk(k)
-               e2 = storunit * 2.0d0 * force * dr 
-     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
-     &              + force * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               e2 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the stretch-torsion values for the third bond
 c
@@ -171,11 +162,7 @@ c
                v3 = kst(9,istrtor)
                k = ist(4,istrtor)
                dr = rdc - bl(k)
-               force = bk(k)
-               e3 = storunit * 2.0d0 * force * dr 
-     &                 * (v1*phi1 + v2*phi2 + v3*phi3)
-     &              + force * (v1*phi1 + v2*phi2 + v3*phi3)
-     &                   * (v1*phi1 + v2*phi2 + v3*phi3)
+               e3 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
