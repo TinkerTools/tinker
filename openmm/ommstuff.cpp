@@ -3067,7 +3067,7 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       if (log) {
          (void) fprintf (log, "\n Platform CUDA: Setting Device ID to %s from CUDA_DEVICE\n", deviceId);
       }
-   } else if (log) {
+   } else if (log && inform__.verbose) {
       (void) fprintf (log, "\n Platform CUDA: Using Default Value for CUDA Device ID\n");
    }
 
@@ -3124,12 +3124,16 @@ void openmm_init_ (void** ommHandle, double* dt) {
                     (OpenMM_Platform_getDefaultPluginsDirectory());
    pluginList = OpenMM_Platform_loadPluginsFromDirectory
                     (OpenMM_Platform_getDefaultPluginsDirectory());
-   (void) fprintf (stderr, "\n Default OpenMM Plugin Directory: %s\n\n",
-                       OpenMM_Platform_getDefaultPluginsDirectory());
-   for (ii = 0; ii < OpenMM_StringArray_getSize(pluginList); ii++) {
-      (void) fprintf (stderr, " Plugin Library: %s\n",
-                          OpenMM_StringArray_get(pluginList, ii));
+
+   if (inform__.verbose) {
+      (void) fprintf (stderr, "\n Default OpenMM Plugin Directory: %s\n\n",
+                          OpenMM_Platform_getDefaultPluginsDirectory());
+      for (ii = 0; ii < OpenMM_StringArray_getSize(pluginList); ii++) {
+         (void) fprintf (stderr, " Plugin Library: %s\n",
+                             OpenMM_StringArray_get(pluginList, ii));
+      }
    }
+
    OpenMM_StringArray_destroy (pluginList);
    (void) fflush (NULL);
 
@@ -3343,19 +3347,23 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
    omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
                                            platform);
-   // (void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
-   // (void) fprintf (log, "\n Integrator:  %x\n", (void*)(omm->integrator));
+
+   if (inform__.debug) {
+      (void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
+      (void) fprintf (log, "\n Integrator:  %x\n", (void*)(omm->integrator));
+   }
 
    OpenMM_Context_setPositions (omm->context, initialPosInNm);
    OpenMM_Context_setVelocities (omm->context, initialVelInNm);
-   {
+
+   if (inform__.verbose) {
       int arraySz;
       int maxPrint;
       double x1, x2, x3;
       double v1, v2, v3;
       arraySz = OpenMM_Vec3Array_getSize (initialPosInNm);
       maxPrint = 5;
-      (void) fprintf (log, "\n Initial Positions and Velocities:\n\n"); 
+      (void) fprintf (log, "\n Initial Positions and Velocities:\n\n");
       for (ii = 0; ii < arraySz; ii++) {
          x1 = (*OpenMM_Vec3Array_get(initialPosInNm, ii)).x
                    / OpenMM_NmPerAngstrom;
@@ -3932,11 +3940,11 @@ void openmm_validate_ (int* testingActive) {
       }
    }
 
-   if (fabs( 0.0 - polpot__.p2scale) > 0.0 ||
-      fabs( 0.0 - polpot__.p3scale) > 0.0 ||
-      fabs( 1.0 - polpot__.p4scale) > 0.0 ||
-      fabs( 0.5 - polpot__.p41scale) > 0.0 ||
-      fabs( 1.0 - polpot__.p5scale) > 0.0) {
+   if (fabs(0.0 - polpot__.p2scale) > 0.0 ||
+      fabs(0.0 - polpot__.p3scale) > 0.0 ||
+      fabs(1.0 - polpot__.p4scale) > 0.0 ||
+      fabs(0.5 - polpot__.p41scale) > 0.0 ||
+      fabs(1.0 - polpot__.p5scale) > 0.0) {
       invalid++;
       if (log) {
          (void) fprintf (log, "P-Scale Parameters [%8.1f %8.1f %8.1f %8.1f %8.1f] are not [0.0, 0.0, 1.0, 0.5, 1.0]\n",

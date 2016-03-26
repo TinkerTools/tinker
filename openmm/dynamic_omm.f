@@ -279,9 +279,11 @@ c
 c
 c     get TINKER energy/gradient values for initial structure
 c
-      allocate (derivs(3,n))
-      call gradient (e,derivs)
-      deallocate (derivs)
+      if (verbose) then
+         allocate (derivs(3,n))
+         call gradient (e,derivs)
+         deallocate (derivs)
+      end if
 c
 c     map TINKER data structures to OpenMM wrapper structures
 c
@@ -293,7 +295,7 @@ c
 c
 c     compare the energy and gradient between TINKER and OpenMM
 c
-      call openmm_test ()
+      if (verbose)  call openmm_test ()
 c
 c     print out a header line for the dynamics computation
 c
