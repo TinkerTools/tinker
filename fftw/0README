@@ -21,7 +21,8 @@
       setenv CC gcc          (or use "export CC=gcc" for bash)
       setenv F77 gfortran    (or use "export F77=gfortran" for bash)
       make distclean
-      ./configure --prefix=/Users/ponder/tinker/fftw --enable-threads
+      ./configure --prefix=/Users/ponder/tinker/fftw --enable-threads \
+                     --enable-mpi
       make
       make install
 
@@ -32,16 +33,19 @@
       After completion of the above commands, the library files needed
       by TINKER will be in the /lib subdirectory.
 
-      Note modified versions of the configure script are used to enforce
+      Modified versions of the configure script are used to enforce
       processor-specific compiler flags. In particular, there are OSX
       and Linux versions for the Intel compiler that use -axssse3 and
       -msse3, respectively, along with other optimization flags. The
       original file is available as "configure-orig".
 
-      Note the configure option --enable-threads can be replaced with
+      The configure script option --enable-threads can be replaced with
       --enable-openmp, creating a libfftw3_omp.a library. Under OSX with
       recent versions of the Intel compilers, the threads library seems
       to give better OpenMP performance on large numbers of cores.
+
+      The configure script option --enable-mpi causes the libfftw3_mpi.a
+      library to be built. This library is needed by TINKER-HP.
 
       Building FFTW on Windows:
 
