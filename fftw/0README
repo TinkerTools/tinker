@@ -22,7 +22,7 @@
       setenv F77 gfortran    (or use "export F77=gfortran" for bash)
       make distclean
       ./configure --prefix=/Users/ponder/tinker/fftw --enable-threads \
-                     --enable-mpi
+                     --enable-openmp --enable-mpi
       make
       make install
 
@@ -39,8 +39,9 @@
       -msse3, respectively, along with other optimization flags. The
       original file is available as "configure-orig".
 
-      The configure script option --enable-threads can be replaced with
-      --enable-openmp, creating a libfftw3_omp.a library. Under OSX with
+      The configure script options --enable-threads and --enable-openmp
+      create libfftw3_threads.a and libfftw3_omp.a, respectively. One or
+      the other is required for OpenMP versions of TINKER. Under OSX with
       recent versions of the Intel compilers, the threads library seems
       to give better OpenMP performance on large numbers of cores.
 

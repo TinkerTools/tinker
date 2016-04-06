@@ -2074,12 +2074,18 @@ static void setupAmoebaTorsionForce (OpenMM_System* system, FILE* log) {
    OpenMM_DoubleArray* torsion1;
    OpenMM_DoubleArray* torsion2;
    OpenMM_DoubleArray* torsion3;
+   OpenMM_DoubleArray* torsion4;
+   OpenMM_DoubleArray* torsion5;
+   OpenMM_DoubleArray* torsion6;
 
    OpenMM_PeriodicTorsionForce* amoebaTorsionForce;
 
    torsion1 = OpenMM_DoubleArray_create(2);
    torsion2 = OpenMM_DoubleArray_create(2);
    torsion3 = OpenMM_DoubleArray_create(2);
+   torsion4 = OpenMM_DoubleArray_create(2);
+   torsion5 = OpenMM_DoubleArray_create(2);
+   torsion6 = OpenMM_DoubleArray_create(2);
 
    amoebaTorsionForce = OpenMM_PeriodicTorsionForce_create ();
    OpenMM_System_addForce (system, (OpenMM_Force*) amoebaTorsionForce);
@@ -2100,6 +2106,18 @@ static void setupAmoebaTorsionForce (OpenMM_System* system, FILE* log) {
       OpenMM_DoubleArray_set (torsion3, 0, torsunit*(*torsPtr));
       OpenMM_DoubleArray_set (torsion3, 1, acos((*(torsPtr+2))));
 
+      torsPtr = tors__.tors4 + ii*4;
+      OpenMM_DoubleArray_set (torsion4, 0, torsunit*(*torsPtr));
+      OpenMM_DoubleArray_set (torsion4, 1, acos((*(torsPtr+2))));
+
+      torsPtr = tors__.tors5 + ii*4;
+      OpenMM_DoubleArray_set (torsion5, 0, torsunit*(*torsPtr));
+      OpenMM_DoubleArray_set (torsion5, 1, acos((*(torsPtr+2))));
+
+      torsPtr = tors__.tors6 + ii*4;
+      OpenMM_DoubleArray_set (torsion6, 0, torsunit*(*torsPtr));
+      OpenMM_DoubleArray_set (torsion6, 1, acos((*(torsPtr+2))));
+
       OpenMM_PeriodicTorsionForce_addTorsion (amoebaTorsionForce,
                 (*torsIndexPtr) - 1, (*(torsIndexPtr+1)) - 1,
                 (*(torsIndexPtr+2)) - 1, (*(torsIndexPtr+3)) - 1, 1,
@@ -2117,6 +2135,24 @@ static void setupAmoebaTorsionForce (OpenMM_System* system, FILE* log) {
                 (*(torsIndexPtr+2)) - 1, (*(torsIndexPtr+3)) - 1, 3,
                 OpenMM_DoubleArray_get(torsion3,1),
                 OpenMM_DoubleArray_get(torsion3,0)); 
+      
+      OpenMM_PeriodicTorsionForce_addTorsion (amoebaTorsionForce,
+                (*torsIndexPtr) - 1, (*(torsIndexPtr+1)) - 1,
+                (*(torsIndexPtr+2)) - 1, (*(torsIndexPtr+3)) - 1, 4,
+                OpenMM_DoubleArray_get(torsion4,1),
+                OpenMM_DoubleArray_get(torsion4,0));
+
+      OpenMM_PeriodicTorsionForce_addTorsion (amoebaTorsionForce,
+                (*torsIndexPtr) - 1, (*(torsIndexPtr+1)) - 1,
+                (*(torsIndexPtr+2)) - 1, (*(torsIndexPtr+3)) - 1, 5,
+                OpenMM_DoubleArray_get(torsion5,1),
+                OpenMM_DoubleArray_get(torsion5,0));
+
+      OpenMM_PeriodicTorsionForce_addTorsion (amoebaTorsionForce,
+                (*torsIndexPtr) - 1, (*(torsIndexPtr+1)) - 1,
+                (*(torsIndexPtr+2)) - 1, (*(torsIndexPtr+3)) - 1, 6,
+                OpenMM_DoubleArray_get(torsion6,1),
+                OpenMM_DoubleArray_get(torsion6,0));
 
       torsIndexPtr += 4;
    }

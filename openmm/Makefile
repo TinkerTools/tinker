@@ -37,12 +37,18 @@
 ##  TINKERDIR    TINKER Distribution Directory
 ##  BINDIR       Hard Copies of TINKER Executables
 ##  LINKDIR      Linked Copies of TINKER Executables
+##  FFTWDIR      FFTW Distribution Directory
+##  OPENMMDIR    OpenMM Distribution Directory
 
 TINKERDIR = $(HOME)/tinker
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
-OPENMMDIR = /usr/local/openmm
 
+FFTWDIR = $(TINKERDIR)/fftw
+FFTW_LIB_DIR = -L$(FFTWDIR)/lib
+FFTW_LIBS = -lfftw3_threads -lfftw3
+
+OPENMMDIR = /usr/local/openmm
 OPENMM_LIB_DIR = -L$(OPENMMDIR)/lib
 OPENMM_INCLUDE_DIR = $(OPENMMDIR)/include
 OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
@@ -142,7 +148,7 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 CC = icc
 CXX = icc
 F77 = ifort
-LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+LIBS = -lstdc++
 CFLAGS = -c -axSSSE3
 F77FLAGS = -c -axSSSE3
 OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
@@ -646,7 +652,7 @@ ommstuff.o: ommstuff.cpp
 	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuff.cpp
 
 dynamic_omm.x: dynamic_omm.o ommstuff.o libtinker.a
-	${F77} ${LINKFLAGS} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${OPENMM_LIBS}
+	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}
 
 rename:
 	mv dynamic_omm.x $(BINDIR)/dynamic_omm
