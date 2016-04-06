@@ -15,12 +15,12 @@ c
 c     literature references:
 c
 c     P. J. Mohr, B. N. Taylor and D. B. Newell, "CODATA Recommended
-c     Values of the Fundamental Physical Constants: 2010", Reviews of
-c     Modern Physics, 84, 1527-1605 (2012)
+c     Values of the Fundamental Physical Constants: 2014", available
+c     from http://arxiv.org/pdf/1507.07956/
 c
-c     Most values below are taken from 2010 CODATA reference values;
+c     Most values below are taken from 2014 CODATA reference values;
 c     available on the web from the National Institute of Standards
-c     and Technology at http://physics.nist.gov/constants/
+c     and Technology at http://physics.nist.gov/cuu/index.html/
 c
 c     The conversion from calorie to Joule is the definition of the
 c     thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
@@ -67,19 +67,19 @@ c
       real*8 evolt,efreq
       real*8 coulomb,debye
       real*8 prescon
-      parameter (avogadro=6.02214129d+23)
+      parameter (avogadro=6.022140857d+23)
       parameter (lightspd=2.99792458d-2)
-      parameter (boltzmann=0.831446215d0)
-      parameter (gasconst=1.98720415d-3)
-      parameter (emass=5.485799095d-4)
-      parameter (planck=6.62606957d-34)
+      parameter (boltzmann=0.83144598d0)
+      parameter (gasconst=1.987203585d-3)
+      parameter (emass=5.48579909070d-4)
+      parameter (planck=6.626070040d-34)
       parameter (joule=4.1840d0)
       parameter (convert=4.1840d+2)
-      parameter (bohr=0.52917721092d0)
-      parameter (hartree=627.5094743d0)
-      parameter (evolt=27.21138503d0)
-      parameter (efreq=2.194746313708d+5)
-      parameter (coulomb=332.063714d0)
+      parameter (bohr=0.52917721067d0)
+      parameter (hartree=627.5094736d0)
+      parameter (evolt=27.21138602d0)
+      parameter (efreq=2.194746314d+5)
+      parameter (coulomb=332.0637128d0)
       parameter (debye=4.80321d0)
       parameter (prescon=6.85684112d+4)
       save
