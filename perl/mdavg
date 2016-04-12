@@ -234,7 +234,7 @@ sub STD2{
 }
 
 if ($count > -1) {
-   printf " Total MD Blocks     %15d Frames\n", "$count";
+   printf " Total MD Blocks     %15d Blocks\n", "$count";
 }
 if ($#tot > -1) {
    printf " Total Energy        %15.4f Kcal/mole   (+/-%9.4f)\n", "$avgtot","$stdtot";
