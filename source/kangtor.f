@@ -36,7 +36,7 @@ c
       integer size,next
       real*8 at1,at2,at3
       real*8 at4,at5,at6
-      logical header,sane
+      logical header,swap
       character*4 pa,pb,pc,pd
       character*4 zeros
       character*16 blank
@@ -91,34 +91,34 @@ c
             call numeral (id,pd,size)
             if (ib .lt. ic) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (ic .lt. ib) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             else if (ia .le. id) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (id .lt. ia) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             end if
             do j = 1, maxnat
                if (kat(j).eq.blank .or. kat(j).eq.pt) then
                   kat(j) = pt
-                  if (sane) then
-                     atcon(1,j) = at1
-                     atcon(2,j) = at2
-                     atcon(3,j) = at3
-                     atcon(4,j) = at4
-                     atcon(5,j) = at5
-                     atcon(6,j) = at6
-                  else
+                  if (swap) then
                      atcon(1,j) = at4
                      atcon(2,j) = at5
                      atcon(3,j) = at6
                      atcon(4,j) = at1
                      atcon(5,j) = at2
                      atcon(6,j) = at3
+                  else
+                     atcon(1,j) = at1
+                     atcon(2,j) = at2
+                     atcon(3,j) = at3
+                     atcon(4,j) = at4
+                     atcon(5,j) = at5
+                     atcon(6,j) = at6
                   end if
                   goto 50
                end if
@@ -165,34 +165,34 @@ c
             call numeral (itd,pd,size)
             if (itb .lt. itc) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (itc .lt. itb) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             else if (ita .le. itd) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (itd .lt. ita) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             end if
             do j = 1, nat
                if (kat(j) .eq. pt) then
                   nangtor = nangtor + 1
-                  if (sane) then
-                     kant(1,nangtor) = atcon(1,j)
-                     kant(2,nangtor) = atcon(2,j)
-                     kant(3,nangtor) = atcon(3,j)
-                     kant(4,nangtor) = atcon(4,j)
-                     kant(5,nangtor) = atcon(5,j)
-                     kant(6,nangtor) = atcon(6,j)
-                  else
+                  if (swap) then
                      kant(1,nangtor) = atcon(4,j)
                      kant(2,nangtor) = atcon(5,j)
                      kant(3,nangtor) = atcon(6,j)
                      kant(4,nangtor) = atcon(1,j)
                      kant(5,nangtor) = atcon(2,j)
                      kant(6,nangtor) = atcon(3,j)
+                  else
+                     kant(1,nangtor) = atcon(1,j)
+                     kant(2,nangtor) = atcon(2,j)
+                     kant(3,nangtor) = atcon(3,j)
+                     kant(4,nangtor) = atcon(4,j)
+                     kant(5,nangtor) = atcon(5,j)
+                     kant(6,nangtor) = atcon(6,j)
                   end if
                   iat(1,nangtor) = i
                   m = 0

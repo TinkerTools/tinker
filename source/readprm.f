@@ -84,7 +84,7 @@ c
       real*8 tx(maxtgrd2)
       real*8 ty(maxtgrd2)
       real*8 tf(maxtgrd2)
-      logical header,sane
+      logical header,swap
       character*1 da1
       character*4 pa,pb,pc
       character*4 pd,pe
@@ -846,34 +846,34 @@ c
             nbt = nbt + 1
             if (ib .lt. ic) then
                kbt(nbt) = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (ic .lt. ib) then
                kbt(nbt) = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             else if (ia .le. id) then
                kbt(nbt) = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (id .lt. ia) then
                kbt(nbt) = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             end if
             btcon(4,nbt) = bt4
             btcon(5,nbt) = bt5
             btcon(6,nbt) = bt6
-            if (sane) then
-               btcon(1,nbt) = bt1
-               btcon(2,nbt) = bt2
-               btcon(3,nbt) = bt3
-               btcon(7,nbt) = bt7
-               btcon(8,nbt) = bt8
-               btcon(9,nbt) = bt9
-            else
+            if (swap) then
                btcon(1,nbt) = bt7
                btcon(2,nbt) = bt8
                btcon(3,nbt) = bt9
                btcon(7,nbt) = bt1
                btcon(8,nbt) = bt2
                btcon(9,nbt) = bt3
+            else
+               btcon(1,nbt) = bt1
+               btcon(2,nbt) = bt2
+               btcon(3,nbt) = bt3
+               btcon(7,nbt) = bt7
+               btcon(8,nbt) = bt8
+               btcon(9,nbt) = bt9
             end if
 c
 c     angle-torsion parameters
@@ -899,32 +899,32 @@ c
             call numeral (id,pd,size)
             nat = nat + 1
             if (ib .lt. ic) then
-               kbt(nat) = pa//pb//pc//pd
-               sane = .true.
+               kat(nat) = pa//pb//pc//pd
+               swap = .false.
             else if (ic .lt. ib) then
-               kbt(nat) = pd//pc//pb//pa
-               sane = .false.
+               kat(nat) = pd//pc//pb//pa
+               swap = .true.
             else if (ia .le. id) then
-               kbt(nat) = pa//pb//pc//pd
-               sane = .true.
+               kat(nat) = pa//pb//pc//pd
+               swap = .false.
             else if (id .lt. ia) then
-               kbt(nat) = pd//pc//pb//pa
-               sane = .false.
+               kat(nat) = pd//pc//pb//pa
+               swap = .true.
             end if
-            if (sane) then
-               atcon(1,nat) = at1
-               atcon(2,nat) = at2
-               atcon(3,nat) = at3
-               atcon(4,nat) = at4
-               atcon(5,nat) = at5
-               atcon(6,nat) = at6
-            else
+            if (swap) then
                atcon(1,nat) = at4
                atcon(2,nat) = at5
                atcon(3,nat) = at6
                atcon(4,nat) = at1
                atcon(5,nat) = at2
                atcon(6,nat) = at3
+            else
+               atcon(1,nat) = at1
+               atcon(2,nat) = at2
+               atcon(3,nat) = at3
+               atcon(4,nat) = at4
+               atcon(5,nat) = at5
+               atcon(6,nat) = at6
             end if
 c
 c     torsion-torsion parameters

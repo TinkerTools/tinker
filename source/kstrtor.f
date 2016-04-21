@@ -37,7 +37,7 @@ c
       real*8 bt1,bt2,bt3
       real*8 bt4,bt5,bt6
       real*8 bt7,bt8,bt9
-      logical header,sane
+      logical header,swap
       character*4 pa,pb,pc,pd
       character*4 zeros
       character*16 blank
@@ -82,16 +82,16 @@ c
             call numeral (id,pd,size)
             if (ib .lt. ic) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (ic .lt. ib) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             else if (ia .le. id) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (id .lt. ia) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             end if
             if (.not. silent) then
                if (header) then
@@ -113,20 +113,20 @@ c
                   btcon(4,j) = bt4
                   btcon(5,j) = bt5
                   btcon(6,j) = bt6
-                  if (sane) then
-                     btcon(1,j) = bt1
-                     btcon(2,j) = bt2
-                     btcon(3,j) = bt3
-                     btcon(7,j) = bt7
-                     btcon(8,j) = bt8
-                     btcon(9,j) = bt9
-                  else
+                  if (swap) then
                      btcon(1,j) = bt7
                      btcon(2,j) = bt8
                      btcon(3,j) = bt9
                      btcon(7,j) = bt1
                      btcon(8,j) = bt2
                      btcon(9,j) = bt3
+                  else
+                     btcon(1,j) = bt1
+                     btcon(2,j) = bt2
+                     btcon(3,j) = bt3
+                     btcon(7,j) = bt7
+                     btcon(8,j) = bt8
+                     btcon(9,j) = bt9
                   end if
                   goto 50
                end if
@@ -173,16 +173,16 @@ c
             call numeral (itd,pd,size)
             if (itb .lt. itc) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (itc .lt. itb) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             else if (ita .le. itd) then
                pt = pa//pb//pc//pd
-               sane = .true.
+               swap = .false.
             else if (itd .lt. ita) then
                pt = pd//pc//pb//pa
-               sane = .false.
+               swap = .true.
             end if
             pt0 = zeros//pt(5:12)//zeros
             do j = 1, nbt
@@ -191,20 +191,20 @@ c
                   kst(4,nstrtor) = btcon(4,j)
                   kst(5,nstrtor) = btcon(5,j)
                   kst(6,nstrtor) = btcon(6,j)
-                  if (sane) then
-                     kst(1,nstrtor) = btcon(1,j)
-                     kst(2,nstrtor) = btcon(2,j)
-                     kst(3,nstrtor) = btcon(3,j)
-                     kst(7,nstrtor) = btcon(7,j)
-                     kst(8,nstrtor) = btcon(8,j)
-                     kst(9,nstrtor) = btcon(9,j)
-                  else
+                  if (swap) then
                      kst(1,nstrtor) = btcon(7,j)
                      kst(2,nstrtor) = btcon(8,j)
                      kst(3,nstrtor) = btcon(9,j)
                      kst(7,nstrtor) = btcon(1,j)
                      kst(8,nstrtor) = btcon(2,j)
                      kst(9,nstrtor) = btcon(3,j)
+                  else
+                     kst(1,nstrtor) = btcon(1,j)
+                     kst(2,nstrtor) = btcon(2,j)
+                     kst(3,nstrtor) = btcon(3,j)
+                     kst(7,nstrtor) = btcon(7,j)
+                     kst(8,nstrtor) = btcon(8,j)
+                     kst(9,nstrtor) = btcon(9,j)
                   end if
                   ist(1,nstrtor) = i
                   do k = 1, n12(ia)
@@ -235,20 +235,20 @@ c
                   kst(4,nstrtor) = btcon(4,j)
                   kst(5,nstrtor) = btcon(5,j)
                   kst(6,nstrtor) = btcon(6,j)
-                  if (sane) then
-                     kst(1,nstrtor) = btcon(1,j)
-                     kst(2,nstrtor) = btcon(2,j)
-                     kst(3,nstrtor) = btcon(3,j)
-                     kst(7,nstrtor) = btcon(7,j)
-                     kst(8,nstrtor) = btcon(8,j)
-                     kst(9,nstrtor) = btcon(9,j)
-                  else
+                  if (swap) then
                      kst(1,nstrtor) = btcon(7,j)
                      kst(2,nstrtor) = btcon(8,j)
                      kst(3,nstrtor) = btcon(9,j)
                      kst(7,nstrtor) = btcon(1,j)
                      kst(8,nstrtor) = btcon(2,j)
                      kst(9,nstrtor) = btcon(3,j)
+                  else
+                     kst(1,nstrtor) = btcon(1,j)
+                     kst(2,nstrtor) = btcon(2,j)
+                     kst(3,nstrtor) = btcon(3,j)
+                     kst(7,nstrtor) = btcon(7,j)
+                     kst(8,nstrtor) = btcon(8,j)
+                     kst(9,nstrtor) = btcon(9,j)
                   end if
                   ist(1,nstrtor) = i
                   do k = 1, n12(ia)
