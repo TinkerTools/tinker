@@ -12,9 +12,12 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "groups" tests a set of atoms to see if all are members
-c     of a single atom group or a pair of atom groups; if so,
-c     then the correct intra- or intergroup weight is assigned
+c     "groups" tests a set of atoms to see if all are members of a
+c     single atom group or a pair of atom groups; if so, then the
+c     correct intra- or intergroup weight is assigned
+c
+c     note the default group-based interaction weight is 1.0; only
+c     interactions involving two or fewer groups can be scaled
 c
 c
       subroutine groups (proceed,weigh,ia,ib,ic,id,ie,ig)
@@ -33,7 +36,7 @@ c
 c     determine the number of atoms in the set to be compared
 c
       nset = 0
-      weigh = 0.0d0
+      weigh = 1.0d0
       if (ig .ne. 0) then
          nset = 6
       else if (ie .ne. 0) then
