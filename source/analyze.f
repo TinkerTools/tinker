@@ -288,7 +288,7 @@ c
    10    format (/,' Overall System Contents :',
      &           //,' Number of Atoms',25x,i8,
      &           /,' Number of Molecules',21x,i8,
-     &           /,' Total System Mass',19x,f12.4)
+     &           /,' Total System Mass',15x,f16.4)
          if (use_bounds) then
             dens = (1.0d24/volbox) * (totmass/avogadro)
             write (iout,20)  dens
@@ -312,7 +312,7 @@ c
      &           /,' Alpha Angle',25x,f12.4,
      &           /,' Beta Angle',26x,f12.4,
      &           /,' Gamma Angle',25x,f12.4,
-     &           /,' Cell Volume',25x,f12.4,
+     &           /,' Cell Volume',21x,f16.4,
      &           /,' Lattice Type',16x,a20)
          if (spacegrp .ne. '          ') then
             value = spacegrp
@@ -1332,12 +1332,12 @@ c
 c
 c     write out each energy component to the desired precision
 c
-      form1 = '5x,f16.4,i15'
-      if (digits .ge. 6)  form1 = '3x,f18.6,i15'
-      if (digits .ge. 8)  form1 = '1x,f20.8,i15'
+      form1 = '5x,f16.4,i17'
+      if (digits .ge. 6)  form1 = '3x,f18.6,i17'
+      if (digits .ge. 8)  form1 = '1x,f20.8,i17'
       form2 = form1(1:3)//'d'//form1(5:12)
       fstr = '(/,'' Energy Component Breakdown :'',
-     &          11x,''Kcal/mole'',6x,''Interactions''/)'
+     &          11x,''Kcal/mole'',8x,''Interactions''/)'
       write (iout,fstr)
       if (use_bond .and. (neb.ne.0.or.eb.ne.0.0d0)) then
          fstr = '('' Bond Stretching'',12x,'//form1//')'
@@ -1491,31 +1491,31 @@ c     get the total charge, dipole and quadrupole moments
 c
       call moments
       write (iout,10)  netchg
-   10 format (/,' Total Electric Charge :',13x,f12.5,' Electrons')
+   10 format (/,' Total Electric Charge :',12x,f13.5,' Electrons')
       write (iout,20)  netdpl,xdpl,ydpl,zdpl
-   20 format (/,' Dipole Moment Magnitude :',11x,f12.3,' Debyes',
-     &        //,' Dipole X,Y,Z-Components :',11x,3f12.3)
+   20 format (/,' Dipole Moment Magnitude :',10x,f13.3,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',10x,3f13.3)
       write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
      &                 yzqdp,zxqdp,zyqdp,zzqdp
-   30 format (/,' Quadrupole Moment Tensor :',10x,3f12.3,
-     &        /,6x,'(Buckinghams)',18x,3f12.3,
-     &        /,37x,3f12.3)
+   30 format (/,' Quadrupole Moment Tensor :',9x,3f13.3,
+     &        /,6x,'(Buckinghams)',17x,3f13.3,
+     &        /,36x,3f13.3)
       write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
-   40 format (/,' Principal Axes Quadrupole :',9x,3f12.3)
+   40 format (/,' Principal Axes Quadrupole :',8x,3f13.3)
       if (dielec .ne. 1.0d0) then
          write (iout,50)  dielec
-   50    format (/,' Dielectric Constant :',15x,f12.3)
+   50    format (/,' Dielectric Constant :',14x,f13.3)
          write (iout,60)  netchg/sqrt(dielec)
-   60    format (' Effective Total Charge :',12x,f12.5,' Electrons')
+   60    format (' Effective Total Charge :',11x,f13.5,' Electrons')
          write (iout,70)  netdpl/sqrt(dielec)
-   70    format (' Effective Dipole Moment :',11x,f12.3,' Debyes')
+   70    format (' Effective Dipole Moment :',10x,f13.3,' Debyes')
       end if
 c
 c     get the radius of gyration and moments of inertia
 c
       call gyrate (rg)
       write (iout,80)  rg
-   80 format (/,' Radius of Gyration :',16x,f12.3,' Angstroms')
+   80 format (/,' Radius of Gyration :',15x,f13.3,' Angstroms')
       call inertia (1)
       return
       end

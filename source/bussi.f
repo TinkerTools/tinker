@@ -69,7 +69,7 @@ c
 c
 c     make half-step temperature correction and get pressure
 c
-      call temper2 (dt_2,eksum,ekin,temp)
+      call temper (dt_2,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     get half-step Beeman velocities and update barostat velocity
@@ -167,7 +167,7 @@ c
 c
 c     make full-step temperature correction and get pressure
 c
-      call temper2 (dt_2,eksum,ekin,temp)
+      call temper (dt_2,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

@@ -42,10 +42,6 @@ c     set some time values for the dynamics integration
 c
       dt_2 = 0.5d0 * dt
 c
-c     make half-step temperature and pressure corrections
-c
-      call temper (dt)
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (xold(n))
@@ -78,6 +74,11 @@ c     get the potential energy and atomic forces
 c
       call gradient (epot,derivs)
 c
+c     make half-step temperature and pressure corrections
+c
+      call temper2 (dt,temp)
+      call pressure2 (epot,temp)
+c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
@@ -103,7 +104,7 @@ c
 c
 c     make full-step temperature and pressure corrections
 c
-      call temper2 (dt,eksum,ekin,temp)
+      call temper (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

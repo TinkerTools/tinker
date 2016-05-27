@@ -95,21 +95,22 @@ c
          if (modstep .eq. 1) then
             if (use_bounds .and. integrate.ne.'STOCHASTIC') then
                write (iout,10)
-   10          format (/,4x,'MD Step',6x,'E Total',3x,'E Potential',
-     &                    5x,'E Kinetic',7x,'Temp',7x,'Pres',/)
+   10          format (/,4x,'MD Step',7x,'E Total',4x,'E Potential',
+     &                    6x,'E Kinetic',7x,'Temp',7x,'Pres',/)
             else
                write (iout,20)
-   20          format (/,4x,'MD Step',6x,'E Total',3x,'E Potential',
-     &                    5x,'E Kinetic',7x,'Temp',/)
+   20          format (/,4x,'MD Step',7x,'E Total',4x,'E Potential',
+     &                    6x,'E Kinetic',7x,'Temp',/)
             end if
          end if
          if (use_bounds .and. integrate.ne.'STOCHASTIC') then
             write (iout,30)  istep,etot,epot,ekin,temp,pres
-   30       format (i10,3f14.4,2f11.2)
+   30       format (i10,3f15.4,2f11.2)
          else
             write (iout,40)  istep,etot,epot,ekin,temp
-   40       format (i10,3f14.4,f11.2)
+   40       format (i10,3f15.4,f11.2)
          end if
+         flush (iout)
       end if
 c
 c     print header for the averages over a group of recent steps
@@ -348,5 +349,9 @@ c
             end if
          end if
       end if
+c
+c     ensure any output is written to the storage device
+c
+      if (modstep .eq. 0)  flush (iout)
       return
       end

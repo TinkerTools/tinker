@@ -60,7 +60,7 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 ##  Machine:  Generic Linux or Macintosh
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran
+##  Compiler: GNU gfortran 6.1
 
 #CC = gcc
 #CXX = g++
@@ -75,27 +75,27 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 ##  Machine:  Generic Linux or Macintosh
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran
+##  Compiler: GNU gfortran 6.1
 ##  Parallel: OpenMP
 
-#CC = gcc
-#CXX = g++
-#F77 = gfortran
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
-#CFLAGS = -c
-#F77FLAGS = -c
-#OPTFLAGS = -O3 -ffast-math -fopenmp
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+CC = gcc
+CXX = g++
+F77 = gfortran
+LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+CFLAGS = -c
+F77FLAGS = -c
+OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -fopenmp
+LIBFLAGS = -crusv
+RANLIB = ranlib -c
+LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 14.0
+##  Compiler: Intel Fortran for Linux 15.0
 
 #CC = icc
-#CXX = icc
+#CXX = icpc
 #F77 = ifort
 #LIBS = -lstdc++
 #CFLAGS = -c -xHost
@@ -108,16 +108,16 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 14.0
+##  Compiler: Intel Fortran for Linux 15.0
 ##  Parallel: OpenMP
 
 #CC = icc
-#CXX = icc
+#CXX = icpc
 #F77 = ifort
 #LIBS = -L. -lfftw3_threads -lfftw3
 #CFLAGS = -c -xHost
 #F77FLAGS = -c -xHost
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -qopenmp
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
@@ -125,10 +125,10 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.10 (Yosemite)
-##  Compiler: Intel Fortran for Mac 14.0
+##  Compiler: Intel Fortran for Mac 15.0
 
 #CC = icc
-#CXX = icc
+#CXX = icpc
 #F77 = ifort
 #LIBS = -lstdc++
 #CFLAGS = -c -axSSSE3
@@ -136,26 +136,24 @@ OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-#            -Wl,-stack_size,0x10000000
+#LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.10 (Yosemite)
-##  Compiler: Intel Fortran for Mac 14.0
+##  Compiler: Intel Fortran for Mac 15.0
 ##  Parallel: OpenMP
 
-CC = icc
-CXX = icc
-F77 = ifort
-LIBS = -lstdc++
-CFLAGS = -c -axSSSE3
-F77FLAGS = -c -axSSSE3
-OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
-LIBFLAGS = -crusv
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-            -Wl,-stack_size,0x10000000
+#CC = icc
+#CXX = icpc
+#F77 = ifort
+#LIBS = -lstdc++
+#CFLAGS = -c -axSSSE3
+#F77FLAGS = -c -axSSSE3
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
@@ -652,7 +650,7 @@ ommstuff.o: ommstuff.cpp
 	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuff.cpp
 
 dynamic_omm.x: dynamic_omm.o ommstuff.o libtinker.a
-	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}
+	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
 
 rename:
 	mv dynamic_omm.x $(BINDIR)/dynamic_omm
@@ -1292,7 +1290,7 @@ epitors1.o: atoms.o bound.o deriv.o energi.o group.o pitors.o sizes.o torpot.o u
 epitors2.o: angbnd.o atoms.o bound.o deriv.o group.o hessn.o pitors.o sizes.o torpot.o usage.o
 epitors3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o iounit.o math.o pitors.o sizes.o torpot.o usage.o
 epolar.o: atoms.o boxes.o chgpot.o energi.o ewald.o limits.o math.o mpole.o polar.o potent.o sizes.o units.o
-epolar1.o:
+epolar1.o: atoms.o chgpot.o couple.o deriv.o energi.o limits.o mpole.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o virial.o
 epolar2.o:
 epolar3.o: action.o analyz.o atomid.o atoms.o boxes.o chgpot.o energi.o ewald.o inform.o iounit.o limits.o math.o mpole.o polar.o potent.o sizes.o units.o
 erf.o: iounit.o math.o
@@ -1498,6 +1496,7 @@ omega.o:
 opbend.o:
 opdist.o:
 openend.o:
+openmm.o:
 openmp.o:
 optimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 optirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
@@ -1534,7 +1533,7 @@ potential.o: atomid.o atoms.o charge.o chgpot.o dipole.o files.o inform.o iounit
 potfit.o: sizes.o
 precis.o:
 precise.o:
-pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o iounit.o math.o mdstuf.o molcul.o sizes.o units.o usage.o virial.o
+pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o iounit.o math.o mdstuf.o molcul.o moldyn.o sizes.o units.o usage.o virial.o
 prmedit.o: angpot.o bndpot.o iounit.o math.o params.o sizes.o urypot.o vdwpot.o
 prmkey.o: angpot.o bndpot.o chgpot.o fields.o mplpot.o polpot.o potent.o rxnpot.o torpot.o urypot.o vdwpot.o
 promo.o: iounit.o
@@ -1592,6 +1591,7 @@ server.o:
 shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o sizes.o usage.o
 shunt.o:
 sigmoid.o:
+simplex.o: iounit.o keys.o minima.o
 sizes.o:
 sktstuff.o: atomid.o atoms.o charge.o couple.o deriv.o fields.o files.o inform.o iounit.o keys.o moldyn.o mpole.o polar.o potent.o sizes.o socket.o
 sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o scales.o sizes.o usage.o

@@ -123,7 +123,7 @@ c
       logical proceed
 c
 c
-c     calculate the torsional angle energy term
+c     calculate the torsional angle interaction Hessian elements
 c
       do ktors = 1, ntors
          ia = itors(1,ktors)

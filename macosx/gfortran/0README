@@ -15,7 +15,7 @@
          use of static versions of most system libraries. An exception
          is libquadmath. There is a static version of this library,
          libquadmath.a, and its use can be enforced by renaming the
-         shared versions libquadmath.dylib and libquadmath.0.dylib in
+         shared versions, libquadmath.dylib and libquadmath.0.dylib, in
          the /usr/local/lib directory.
 
          If some or all of the executables fail via a segmentation

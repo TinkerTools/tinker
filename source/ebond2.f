@@ -39,7 +39,7 @@ c
       logical proceed
 c
 c
-c     compute the Hessian elements of the bond stretch energy
+c     calculate the bond stretch interaction Hessian elements
 c
       ia = i
       do k = 1, n12(ia)

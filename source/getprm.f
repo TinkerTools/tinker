@@ -24,10 +24,12 @@ c
       implicit none
       integer i,iprm,next
       integer freeunit
+      integer trimtext
       logical exist,useprm
       character*4 none
       character*20 keyword
       character*120 prmfile
+      character*120 prefix
       character*120 record
       character*120 string
 c
@@ -51,6 +53,14 @@ c
             if (next .eq. 1)  call gettext (string,prmfile,next)
          end if
       end do
+c
+c     account for home directory abbreviation in filename
+c
+      if (prmfile(1:2) .eq. '~/') then
+         call getenv ('HOME',prefix)
+         prmfile = prefix(1:trimtext(prefix))//
+     &               prmfile(2:trimtext(prmfile))
+      end if
 c
 c     check existence of default or specified parameter file
 c

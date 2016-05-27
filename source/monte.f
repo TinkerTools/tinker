@@ -204,6 +204,7 @@ c
       write (iout,200)
   200 format (/,' MCM Iter       Current         Global       Temper',
      &           '      Ratio      Status',/)
+      flush (iout)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -271,6 +272,7 @@ c
       close (unit=ixyz)
       write (iout,220)  nmap,global
   220 format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
+      call flush (iout)
 c
 c     optionally reset coordinates to before the minimization
 c
@@ -410,6 +412,7 @@ c
             close (unit=ixyz)
             write (iout,230)  nmap,global
   230       format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
+            flush (iout)
          end if
 c
 c     update the overall Monte Carlo acceptance ratio
@@ -428,6 +431,7 @@ c
             write (iout,250)  istep,global,temper,ratio,status
   250       format (i8,9x,'------',3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
          end if
+         flush (iout)
 c
 c     restore global minimum after repeated bad iterations
 c

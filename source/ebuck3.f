@@ -533,8 +533,8 @@ c
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
-      logical proceed,usei
-      logical prime,repeat
+      logical proceed,usei,prime
+      logical unique,repeat
       logical header,huge
       character*6 mode
 c
@@ -609,7 +609,8 @@ c
 c
 c     use the method of lights to generate neighbors
 c
-      call lights (off,nvdw,xsort,ysort,zsort)
+      unique = .true.
+      call lights (off,nvdw,xsort,ysort,zsort,unique)
 c
 c     now, loop over all atoms computing the interactions
 c

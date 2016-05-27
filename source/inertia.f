@@ -155,23 +155,23 @@ c     print the center of mass and Euler angle values
 c
       if (print) then
          write (iout,20)  xcm,ycm,zcm
-   20    format (/,' Center of Mass Coordinates :',8x,3f12.6)
+   20    format (/,' Center of Mass Coordinates :',7x,3f13.6)
          call invert (3,vec)
          call roteuler (vec,phi,theta,psi)
          phi = radian * phi
          theta = radian * theta
          psi = radian * psi
          write (iout,30)  phi,theta,psi
-   30    format (' Euler Angles (Phi/Theta/Psi) : ',5x,3f12.3)
+   30    format (' Euler Angles (Phi/Theta/Psi) : ',4x,3f13.3)
 c
 c     print the moments of inertia and the principal axes
 c
          write (iout,40)
    40    format (/,' Moments of Inertia and Principal Axes :',
      &           //,13x,'Moments (amu Ang^2)',
-     &              10x,'X-, Y- and Z-Components of Axes')
+     &              12x,'X-, Y- and Z-Components of Axes')
          write (iout,50)  (moment(i),vec(1,i),vec(2,i),vec(3,i),i=1,3)
-   50    format (3(/,11x,f16.3,10x,3f12.6))
+   50    format (3(/,11x,f16.3,9x,3f13.6))
       end if
       return
       end

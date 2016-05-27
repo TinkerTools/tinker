@@ -75,7 +75,7 @@ c
          call fatal
       else if (n .gt. maxatm) then
          write (iout,60)  maxatm
-   60    format (/,' READMOL  --  The Maximum of',i8,' Atoms',
+   60    format (/,' READMOL  --  The Maximum of',i9,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if

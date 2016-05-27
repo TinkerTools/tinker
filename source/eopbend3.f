@@ -176,7 +176,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (e .gt. 2.0d0)
+               huge = (e .gt. 5.0d0)
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.

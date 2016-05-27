@@ -34,13 +34,13 @@ c
       integer maxclass,maxval
       integer maxref,maxgrp
       integer maxres,maxfix
-      parameter (maxatm=1000000)
+      parameter (maxatm=10000000)
       parameter (maxtyp=5000)
       parameter (maxclass=1000)
       parameter (maxval=8)
       parameter (maxref=30)
       parameter (maxgrp=1000)
       parameter (maxres=10000)
-      parameter (maxfix=1000000)
+      parameter (maxfix=100000)
       save
       end

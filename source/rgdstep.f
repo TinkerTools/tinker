@@ -282,9 +282,14 @@ c
       deallocate (zp)
       deallocate (derivs)
 c
+c     make half-step temperature and pressure corrections
+c
+      call temper2 (dt,temp)
+      call pressure2 (epot,temp)
+c
 c     make full-step temperature and pressure corrections
 c
-      call temper2 (dt,eksum,ekin,temp)
+      call temper (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C) 2003 by Alan Grossfield & Jay W. Ponder  ##
 c     ##                   All Rights Reserved                   ##
 c     #############################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine temper  --  thermostat applied at half step  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine temper2  --  thermostat applied at half step  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "temper" applies a velocity correction at the half time step
+c     "temper2" applies a velocity correction at the half time step
 c     as needed for the Nose-Hoover extended system thermostat
 c
 c     literature references:
@@ -26,7 +26,7 @@ c     "Explicit Reversible Integrators for Extended Systems Dynamics",
 c     Molecular Physics, 87, 1117-1157 (1996)
 c
 c
-      subroutine temper (dt)
+      subroutine temper2 (dt,temp)
       use sizes
       use atoms
       use bath
@@ -41,15 +41,20 @@ c
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8
       real*8 eksum,ekt
-      real*8 scale,expterm
+      real*8 scale,temp
+      real*8 expterm
       real*8 w(3)
       real*8 ekin(3,3)
 c
 c
+c     get the kinetic energy and instantaneous temperature
+c
+      call kinetic (eksum,ekin)
+      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+c
 c     make half-step velocity correction for Nose-Hoover system
 c
       if (thermostat .eq. 'NOSE-HOOVER') then
-         call kinetic (eksum,ekin)
          ekt = gasconst * kelvin
          nc = 5
          ns = 3
@@ -112,14 +117,14 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine temper2  --  thermostat applied at full step  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine temper  --  thermostat applied at full step  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "temper2" computes the instantaneous temperature and applies a
+c     "temper" computes the instantaneous temperature and applies a
 c     thermostat via Berendsen or Bussi-Parrinello velocity scaling,
 c     Andersen stochastic collisions or Nose-Hoover extended system
 c
@@ -139,7 +144,7 @@ c     Pressure and/or Temperature", Journal of Chemical Physics,
 c     72, 2384-2393 (1980)
 c
 c
-      subroutine temper2 (dt,eksum,ekin,temp)
+      subroutine temper (dt,eksum,ekin,temp)
       use sizes
       use atomid
       use atoms
@@ -166,11 +171,10 @@ c
       real*8 ekin(3,3)
 c
 c
-c     get initial kinetic energy and instantaneous temperature
+c     get the kinetic energy and instantaneous temperature
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-      if (.not. isothermal)  return
 c
 c     couple to external temperature bath via Berendsen scaling
 c
@@ -337,7 +341,9 @@ c
 c
 c     recompute kinetic energy and instantaneous temperature
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      if (isothermal) then
+         call kinetic (eksum,ekin)
+         temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      end if
       return
       end

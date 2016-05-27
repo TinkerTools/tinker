@@ -32,10 +32,15 @@
 ##  TINKERDIR    TINKER Distribution Directory
 ##  BINDIR       Hard Copies of TINKER Executables
 ##  LINKDIR      Linked Copies of TINKER Executables
+##  FFTWDIR      FFTW Distribution Directory
 
 TINKERDIR = $(HOME)/tinker
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
+
+FFTWDIR = $(TINKERDIR)/fftw
+FFTW_LIB_DIR = -L$(FFTWDIR)/lib
+FFTW_LIBS = -lfftw3_threads -lfftw3
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
@@ -44,52 +49,52 @@ LINKDIR = /usr/local/bin
 
 ##  Machine:  Generic Linux or Macintosh
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran
+##  Compiler: GNU gfortran 6.1
 
 #F77 = gfortran
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+#LIBS = -lstdc++
 #F77FLAGS = -c
-#OPTFLAGS = -O3 -ffast-math
+#OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops
 #LIBFLAGS = -crusv
-#RANLIB = ranlib
+#RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux or Macintosh
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran
+##  Compiler: GNU gfortran 6.1
 ##  Parallel: OpenMP
 
 F77 = gfortran
-LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+LIBS = -lstdc++
 F77FLAGS = -c
-OPTFLAGS = -O3 -ffast-math -fopenmp
+OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -fopenmp
 LIBFLAGS = -crusv
-RANLIB = ranlib
+RANLIB = ranlib -c
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 14.0
+##  Compiler: Intel Fortran for Linux 15.0
 
 #F77 = ifort
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3
+#LIBS = 
 #F77FLAGS = -c -xHost
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive
 #LIBFLAGS = -crusv
 #RANLIB = echo
-#LINKFLAGS = -static-libgcc -static-intel
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 14.0
+##  Compiler: Intel Fortran for Linux 15.0
 ##  Parallel: OpenMP
 
 #F77 = ifort
-#LIBS = -L$(TINKERDIR)/fftw/lib -lfftw3_threads -lfftw3
+#LIBS = 
 #F77FLAGS = -c -xHost
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -qopenmp
 #LIBFLAGS = -crusv
 #RANLIB = echo
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
@@ -97,10 +102,10 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac OSX
+##  Compiler: Intel Fortran for Mac OSX 15.0
 
 #F77 = ifort
-#LIBS = -L. -lfftw3_threads -lfftw3
+#LIBS = 
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic
 #LIBFLAGS = -crusv
@@ -111,13 +116,13 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
 ##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac OSX
+##  Compiler: Intel Fortran for Mac OSX 15.0
 ##  Parallel: OpenMP
 
 #F77 = ifort
-#LIBS = -L. -lfftw3_threads -lfftw3
+#LIBS = 
 #F77FLAGS = -c -axSSSE3
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -openmp
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
@@ -723,7 +728,7 @@ EXEFILES = alchemy.x \
 	${CC} ${CFLAGS} ${INCLUDEDIR} ${OPTFLAGS} $<
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ $^ ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS}; strip $@
 
 all:	${EXEFILES}
 
@@ -1553,7 +1558,7 @@ epitors1.o: atoms.o bound.o deriv.o energi.o group.o pitors.o sizes.o torpot.o u
 epitors2.o: angbnd.o atoms.o bound.o deriv.o group.o hessn.o pitors.o sizes.o torpot.o usage.o
 epitors3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o iounit.o math.o pitors.o sizes.o torpot.o usage.o
 epolar.o: atoms.o boxes.o chgpot.o energi.o ewald.o limits.o math.o mpole.o polar.o potent.o sizes.o units.o
-epolar1.o:
+epolar1.o: atoms.o chgpot.o couple.o deriv.o energi.o limits.o mpole.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o virial.o
 epolar2.o:
 epolar3.o: action.o analyz.o atomid.o atoms.o boxes.o chgpot.o energi.o ewald.o inform.o iounit.o limits.o math.o mpole.o polar.o potent.o sizes.o units.o
 erf.o: iounit.o math.o
@@ -1795,7 +1800,7 @@ potential.o: atomid.o atoms.o charge.o chgpot.o dipole.o files.o inform.o iounit
 potfit.o: sizes.o
 precis.o:
 precise.o:
-pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o iounit.o math.o mdstuf.o molcul.o sizes.o units.o usage.o virial.o
+pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o iounit.o math.o mdstuf.o molcul.o moldyn.o sizes.o units.o usage.o virial.o
 prmedit.o: angpot.o bndpot.o iounit.o math.o params.o sizes.o urypot.o vdwpot.o
 prmkey.o: angpot.o bndpot.o chgpot.o fields.o mplpot.o polpot.o potent.o rxnpot.o torpot.o urypot.o vdwpot.o
 promo.o: iounit.o

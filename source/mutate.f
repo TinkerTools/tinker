@@ -112,7 +112,7 @@ c
                else
                   do j = abs(list(k)), abs(list(k+1))
                      nmut = nmut + 1
-                     imut(nmut) = i
+                     imut(nmut) = j
                      mut(j) = .true.
                      type0(nmut) = 0
                      type1(nmut) = type(i)
@@ -152,7 +152,7 @@ c     ################################################################
 c
 c
 c     "altelec" constructs the mutated electrostatic parameters
-c     based on the lambda mutation parameter "elmd"
+c     based on the lambda mutation parameter "elambda"
 c
 c
       subroutine altelec

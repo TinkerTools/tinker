@@ -828,6 +828,10 @@ c
      &              ' of the Program',/)
       end if
 c
+c     ensure any output is written to the storage device
+c
+      flush (iout)
+c
 c     may need a pause to avoid closing the execution window
 c
       if (holdup) then

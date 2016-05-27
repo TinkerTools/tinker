@@ -47,8 +47,9 @@ c
       use params
       implicit none
       integer i,j,iprm
-      integer ia,ib,ic,id,ie
-      integer if,ig,ih,ii
+      integer ia,ib,ic,id
+      integer ie,if,ig,ih
+      integer ii,imin
       integer size,next
       integer length,trimtext
       integer nb,nb5,nb4,nb3,nel
@@ -595,7 +596,11 @@ c
             call numeral (ic,pc,size)
             call numeral (id,pd,size)
             nopb = nopb + 1
-            kopb(nopb) = pa//pb//pc//pd
+            if (ic .le. id) then
+               kopb(nopb) = pa//pb//pc//pd
+            else
+               kopb(nopb) = pa//pb//pd//pc
+            end if
             opbn(nopb) = fc
 c
 c     out-of-plane distance parameters
@@ -614,7 +619,26 @@ c
             call numeral (ic,pc,size)
             call numeral (id,pd,size)
             nopd = nopd + 1
-            kopd(nopd) = pa//pb//pc//pd
+            imin = min(ib,ic,id)
+            if (ib .eq. imin) then
+               if (ic .le. id) then
+                  kopd(nopd) = pa//pb//pc//pd
+               else
+                  kopd(nopd) = pa//pb//pd//pc
+               end if
+            else if (ic .eq. imin) then
+               if (ib .le. id) then
+                  kopd(nopd) = pa//pc//pb//pd
+               else
+                  kopd(nopd) = pa//pc//pd//pb
+               end if
+            else if (id .eq. imin) then
+               if (ib .le. ic) then
+                  kopd(nopd) = pa//pd//pb//pc
+               else
+                  kopd(nopd) = pa//pd//pc//pb
+               end if
+            end if
             opds(nopd) = fc
 c
 c     improper dihedral parameters

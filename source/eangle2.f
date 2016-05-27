@@ -53,7 +53,7 @@ c
       allocate (de(3,n))
       allocate (d0(3,n))
 c
-c     compute numerical in-plane bend Hessian for current atom
+c     calculate numerical in-plane bend Hessian for current atom
 c
       do k = 1, nangle
          proceed = .false.
@@ -313,7 +313,7 @@ c
 c     construct an orthogonal direction for linear angles
 c
                   linear = .false.
-                  if (rp .lt. 0.000001d0) then
+                  if (rp .lt. 0.0001d0) then
                      linear = .true.
                      if (xab.ne.0.0d0 .and. yab.ne.0.0d0) then
                         xp = -yab
@@ -738,7 +738,7 @@ c
          ym = zcp*xap - xcp*zap
          zm = xcp*yap - ycp*xap
          rm = sqrt(xm*xm + ym*ym + zm*zm)
-         rm = max(rm,0.000001d0)
+         rm = max(rm,0.0001d0)
          dot = xap*xcp + yap*ycp + zap*zcp
          cosine = dot / sqrt(rap2*rcp2)
          cosine = min(1.0d0,max(-1.0d0,cosine))

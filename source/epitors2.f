@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine epitors2  --  out-of-plane bend Hessian; numer  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epitors2  --  pi-orbital torsion Hessian; numer  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "epitors2" calculates the second derivatives of the pi-orbital
@@ -48,7 +48,7 @@ c
       allocate (de(3,n))
       allocate (d0(3,n))
 c
-c     compute numerical out-of-plane Hessian for current atom
+c     calculate numerical pi-orbital torsion Hessian for current atom
 c
       do ipitors = 1, npitors
          ia = ipit(1,ipitors)

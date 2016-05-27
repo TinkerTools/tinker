@@ -1,7 +1,7 @@
 c
 c
 c     ##########################################################
-c     ##  COPYRIGHT (C) 2014 by Chao Lv & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
 c     ##                 All Rights Reserved                  ##
 c     ##########################################################
 c

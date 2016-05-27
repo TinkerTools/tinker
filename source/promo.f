@@ -30,7 +30,7 @@ c
      &        /,1x,'###',12x,'TINKER  ---  Software Tools for',
      &           ' Molecular Design',12x,'###',
      &        /,1x,'##',74x,'##',
-     &        /,1x,'##',24x,'Version 7.2  February 2016',24x,'##',
+     &        /,1x,'##',26x,'Version 7.2  June 2016',26x,'##',
      &        /,1x,'##',74x,'##',
      &        /,1x,'##',15x,'Copyright (c)  Jay William Ponder',
      &           '  1990-2016',15x,'##',
@@ -38,5 +38,6 @@ c
      &        /,2x,'###',70x,'###',
      &        /,3x,74('#'),
      &        /,5x,70('#'),/)
+      flush (iout)
       return
       end

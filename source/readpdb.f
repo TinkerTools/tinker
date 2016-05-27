@@ -105,8 +105,8 @@ c
       do while (.true.)
          read (ipdb,20,err=230,end=230)  record
    20    format (a120)
-         call upcase (record)
          remark = record(1:6)
+         call upcase (remark)
          if (remark .eq. 'HEADER') then
             title = record(11:70)
             ltitle = trimtext (title)
@@ -121,12 +121,14 @@ c
             string = record(next+1:next+4)
             read (string,30)  atmname
    30       format (a4)
+            call upcase (atmname)
             string = record(next+5:next+5)
             read (string,40)  altloc
    40       format (a1)
             string = record(next+6:next+8)
             read (string,50)  resname
    50       format (a3)
+            call upcase (resname)
             string = record(next+10:next+10)
             read (string,60)  chain
    60       format (a1)
@@ -153,8 +155,6 @@ c
             string = record(47:54)
             read (string,*)  zz
   100       continue
-            if (resname(1:2) .eq. '  ')  resname = resname(3:3)
-            if (resname(1:1) .eq. ' ')  resname = resname(2:3)
             if (chain.ne.' ' .and. index(chnsym,chain).eq.0)  goto 120
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 120
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 120
@@ -194,12 +194,14 @@ c
             string = record(next+1:next+4)
             read (string,130)  atmname
   130       format (a4)
+            call upcase (atmname)
             string = record(next+5:next+5)
             read (string,140)  altloc
   140       format (a1)
             string = record(next+6:next+8)
             read (string,150)  resname
   150       format (a3)
+            call upcase (resname)
             string = record(next+10:next+10)
             read (string,160)  chain
   160       format (a1)
@@ -225,8 +227,6 @@ c
             string = record(47:54)
             read (string,*)  zz
   200       continue
-            if (resname(1:2) .eq. '  ')  resname = resname(3:3)
-            if (resname(1:1) .eq. ' ')  resname = resname(2:3)
             if (chain.ne.' ' .and. index(chnsym,chain).eq.0)  goto 210
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 210
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 210
@@ -416,8 +416,8 @@ c
       do while (.not. done)
          read (ipdb,10,err=60,end=60)  record
    10    format (a120)
-         call upcase (record)
          remark = record(1:6)
+         call upcase (remark)
          if (remark.eq.'ATOM  ' .or. remark.eq.'HETATM') then
             next = 7
             call getnumb (record,dummy,next)
@@ -604,14 +604,40 @@ c
 c
 c     convert traditional 3-letter base names to PDB names
 c
-      if (resname .eq. 'ADE')  resname = 'A  '
-      if (resname .eq. 'GUA')  resname = 'G  '
-      if (resname .eq. 'CYT')  resname = 'C  '
-      if (resname .eq. 'URA')  resname = 'U  '
-      if (resname .eq. 'DAD')  resname = 'DA '
-      if (resname .eq. 'DGU')  resname = 'DG '
-      if (resname .eq. 'DCY')  resname = 'DC '
-      if (resname .eq. 'THY')  resname = 'DT '
+      if (resname .eq. 'ADE')  resname = '  A'
+      if (resname .eq. 'GUA')  resname = '  G'
+      if (resname .eq. 'CYT')  resname = '  C'
+      if (resname .eq. 'URA')  resname = '  U'
+      if (resname .eq. 'DAD')  resname = ' DA'
+      if (resname .eq. 'DGU')  resname = ' DG'
+      if (resname .eq. 'DCY')  resname = ' DC'
+      if (resname .eq. 'THY')  resname = ' DT'
+c
+c     convert shifted standard base names to PDB names
+c
+      if (resname .eq. 'A  ')  resname = '  A'
+      if (resname .eq. 'G  ')  resname = '  G'
+      if (resname .eq. 'C  ')  resname = '  C'
+      if (resname .eq. 'U  ')  resname = '  U'
+      if (resname .eq. ' A ')  resname = '  A'
+      if (resname .eq. ' G ')  resname = '  G'
+      if (resname .eq. ' C ')  resname = '  C'
+      if (resname .eq. ' U ')  resname = '  U'
+      if (resname .eq. 'DA ')  resname = ' DA'
+      if (resname .eq. 'DG ')  resname = ' DG'
+      if (resname .eq. 'DC ')  resname = ' DC'
+      if (resname .eq. 'DT ')  resname = ' DT'
+c
+c     convert terminal 3-letter base names to PDB names
+c
+      if (resname .eq. 'DA5')  resname = ' DA'
+      if (resname .eq. 'DG5')  resname = ' DG'
+      if (resname .eq. 'DC5')  resname = ' DC'
+      if (resname .eq. 'DT5')  resname = ' DT'
+      if (resname .eq. 'DA3')  resname = ' DA'
+      if (resname .eq. 'DG3')  resname = ' DG'
+      if (resname .eq. 'DC3')  resname = ' DC'
+      if (resname .eq. 'DT3')  resname = ' DT'
 c
 c     convert unusual names for protonated histidine residues
 c
@@ -1060,43 +1086,43 @@ c
 c
 c     adenosine residue  (A)
 c
-      else if (resname .eq. 'A  ') then
+      else if (resname .eq. '  A') then
          if (atmname .eq. '1H6 ')  atmname = ' H61'
          if (atmname .eq. '2H6 ')  atmname = ' H62'
 c
 c     guanosine residue  (G)
 c
-      else if (resname .eq. 'G  ') then
+      else if (resname .eq. '  G') then
          if (atmname .eq. '1H2 ')  atmname = ' H21'
          if (atmname .eq. '2H2 ')  atmname = ' H22'
 c
 c     cytidine residue  (C)
 c
-      else if (resname .eq. 'C  ') then
+      else if (resname .eq. '  C') then
          if (atmname .eq. '1H4 ')  atmname = ' H41'
          if (atmname .eq. '2H4 ')  atmname = ' H42'
 c
 c     deoxyadenosine residue  (DA)
 c
-      else if (resname .eq. 'DA ') then
+      else if (resname .eq. ' DA') then
          if (atmname .eq. '1H6 ')  atmname = ' H61'
          if (atmname .eq. '2H6 ')  atmname = ' H62'
 c
 c     deoxyguanosine residue  (DG)
 c
-      else if (resname .eq. 'DG ') then
+      else if (resname .eq. ' DG') then
          if (atmname .eq. '1H2 ')  atmname = ' H21'
          if (atmname .eq. '2H2 ')  atmname = ' H22'
 c
 c     deoxycytidine residue  (DC)
 c
-      else if (resname .eq. 'DC ') then
+      else if (resname .eq. ' DC') then
          if (atmname .eq. '1H4 ')  atmname = ' H41'
          if (atmname .eq. '2H4 ')  atmname = ' H42'
 c
 c     deoxythymidine residue  (DT)
 c
-      else if (resname .eq. 'DT ') then
+      else if (resname .eq. ' DT') then
          if (atmname .eq. ' C5M')  atmname = ' C7 '
          if (atmname .eq. '1H5M')  atmname = ' H71'
          if (atmname .eq. '2H5M')  atmname = ' H72'

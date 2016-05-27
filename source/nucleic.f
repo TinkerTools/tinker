@@ -275,16 +275,16 @@ c
          start = 1
          stop = nseq
          resname = nuclz(seqtyp(1))
-         if (resname.eq.'MP ' .or. resname.eq.'DP '
-     &          .or. resname.eq.'TP ') then
+         if (resname.eq.' MP' .or. resname.eq.' DP'
+     &          .or. resname.eq.' TP') then
             k = nseq + 1
             seq(k) = seq(1)
             seqtyp(k) = seqtyp(1)
             start = 2
          end if
          resname = nuclz(seqtyp(nseq))
-         if (resname.eq.'MP ' .or. resname.eq.'DP '
-     &          .or. resname.eq.'TP ') then
+         if (resname.eq.' MP' .or. resname.eq.' DP'
+     &          .or. resname.eq.' TP') then
             k = 2 * nseq
             seq(k) = seq(nseq)
             seqtyp(k) = seqtyp(nseq)
@@ -292,22 +292,22 @@ c
          end if
          do i = start, stop
             resname = nuclz(seqtyp(i))
-            if (resname .eq. 'A  ') then
-               resname = 'U  '
-            else if (resname .eq. 'G  ') then
-               resname = 'C  '
-            else if (resname .eq. 'C  ') then
-               resname = 'G  '
-            else if (resname .eq. 'U  ') then
-               resname = 'A  '
-            else if (resname .eq. 'DA ') then
-               resname = 'DT '
-            else if (resname .eq. 'DG ') then
-               resname = 'DC '
-            else if (resname .eq. 'DC ') then
-               resname = 'DG '
-            else if (resname .eq. 'DT ') then
-               resname = 'DA '
+            if (resname .eq. '  A') then
+               resname = '  U'
+            else if (resname .eq. '  G') then
+               resname = '  C'
+            else if (resname .eq. '  C') then
+               resname = '  G'
+            else if (resname .eq. '  U') then
+               resname = '  A'
+            else if (resname .eq. ' DA') then
+               resname = ' DT'
+            else if (resname .eq. ' DG') then
+               resname = ' DC'
+            else if (resname .eq. ' DC') then
+               resname = ' DG'
+            else if (resname .eq. ' DT') then
+               resname = ' DA'
             end if
             k = nseq + stop + start - i
             do j = 1, maxnuc
@@ -348,15 +348,15 @@ c
       do i = 1, nseq
          resname = nuclz(seqtyp(i))
          purine(i) = .false.
-         if (resname .eq. 'A  ')  purine(i) = .true.
-         if (resname .eq. 'G  ')  purine(i) = .true.
-         if (resname .eq. 'DA ')  purine(i) = .true.
-         if (resname .eq. 'DG ')  purine(i) = .true.
+         if (resname .eq. '  A')  purine(i) = .true.
+         if (resname .eq. '  G')  purine(i) = .true.
+         if (resname .eq. ' DA')  purine(i) = .true.
+         if (resname .eq. ' DG')  purine(i) = .true.
          deoxy(i) = .false.
-         if (resname .eq. 'DA ')  deoxy(i) = .true.
-         if (resname .eq. 'DG ')  deoxy(i) = .true.
-         if (resname .eq. 'DC ')  deoxy(i) = .true.
-         if (resname .eq. 'DT ')  deoxy(i) = .true.
+         if (resname .eq. ' DA')  deoxy(i) = .true.
+         if (resname .eq. ' DG')  deoxy(i) = .true.
+         if (resname .eq. ' DC')  deoxy(i) = .true.
+         if (resname .eq. ' DT')  deoxy(i) = .true.
       end do
 c
 c     set the backbone and glycosidic torsions and sugar pucker
@@ -461,20 +461,20 @@ c
          i = ichain(1,m)
          k = seqtyp(i)
          resname = nuclz(k)
-         if (resname.eq.'MP ' .or. resname.eq.'DP '
-     &          .or. resname.eq.'TP ')  cap5 = .true.
+         if (resname.eq.' MP' .or. resname.eq.' DP'
+     &          .or. resname.eq.' TP')  cap5 = .true.
          i = ichain(2,m)
          k = seqtyp(i)
          resname = nuclz(k)
-         if (resname.eq.'MP ' .or. resname.eq.'DP '
-     &          .or. resname.eq.'TP ')  cap3 = .true.
+         if (resname.eq.' MP' .or. resname.eq.' DP'
+     &          .or. resname.eq.' TP')  cap3 = .true.
 c
 c     build the first residue or a phosphate capping group
 c
          i = ichain(1,m)
          k = seqtyp(i)
          resname = nuclz(k)
-         if (resname .eq. 'MP ') then
+         if (resname .eq. ' MP') then
             if (deoxy(i+1)) then
                ostyp = 1246
                phtyp = 1247
@@ -501,9 +501,9 @@ c
             call zatom (ophtyp,1.52d0,113.0d0,113.0d0,poi,o3i,n-1,1)
             o5i = n
             call zatom (ostyp,1.63d0,106.0d0,106.0d0,poi,o3i,n-2,-1)
-         else if (resname .eq. 'DP ') then
+         else if (resname .eq. ' DP') then
             continue
-         else if (resname .eq. 'TP ') then
+         else if (resname .eq. ' TP') then
             continue
          else
             if (deoxy(i)) then
@@ -701,7 +701,7 @@ c
          resname = nuclz(k)
          if (single) then
             continue
-         else if (resname .eq. 'MP ') then
+         else if (resname .eq. ' MP') then
             poi = n
             if (deoxy(i-1)) then
                call zatom (1252,1.63d0,119.0d0,bkbone(5,i-1),
@@ -716,9 +716,9 @@ c
                call zatom (1241,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
                call zatom (1241,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
             end if
-         else if (resname .eq. 'DP ') then
+         else if (resname .eq. ' DP') then
             continue
-         else if (resname .eq. 'TP ') then
+         else if (resname .eq. ' TP') then
             continue
          else
             if (cap5) then
@@ -845,7 +845,7 @@ c
 c
 c     adenine in adenosine residue  (A)
 c
-      if (resname .eq. 'A  ') then
+      if (resname .eq. '  A') then
          call zatom (1017,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1021,1.37d0,128.4d0,glyco(i)+180.0d0,
      &                  n-1,c1i,o4i,0)
@@ -866,7 +866,7 @@ c
 c
 c     guanine in guanosine residue  (G)
 c
-      else if (resname .eq. 'G  ') then
+      else if (resname .eq. '  G') then
          call zatom (1047,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1051,1.38d0,128.4d0,glyco(i)+180.0d0,
      &                  n-1,c1i,o4i,0)
@@ -888,7 +888,7 @@ c
 c
 c     cytosine in cytidine residue  (C)
 c
-      else if (resname .eq. 'C ') then
+      else if (resname .eq. '  C') then
          call zatom (1078,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1079,1.37d0,117.8d0,glyco(i),n-1,c1i,o4i,0)
          call zatom (1084,1.24d0,118.9d0,0.0d0,n-1,n-2,c1i,0)
@@ -905,7 +905,7 @@ c
 c
 c     uracil in uridine residue  (U)
 c
-      else if (resname .eq. 'U  ') then
+      else if (resname .eq. '  U') then
          call zatom (1106,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1107,1.38d0,117.1d0,glyco(i),n-1,c1i,o4i,0)
          call zatom (1112,1.22d0,123.2d0,0.0d0,n-1,n-2,c1i,0)
@@ -921,7 +921,7 @@ c
 c
 c     adenine in deoxyadenosine residue  (DA)
 c
-      else if (resname .eq. 'DA ') then
+      else if (resname .eq. ' DA') then
          call zatom (1132,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1136,1.37d0,128.4d0,glyco(i)+180.0d0,
      &                  n-1,c1i,o4i,0)
@@ -942,7 +942,7 @@ c
 c
 c     guanine in deoxyguanosine residue  (DG)
 c
-      else if (resname .eq. 'DG ') then
+      else if (resname .eq. ' DG') then
          call zatom (1161,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1165,1.38d0,128.4d0,glyco(i)+180.0d0,
      &                  n-1,c1i,o4i,0)
@@ -964,7 +964,7 @@ c
 c
 c     cytosine in deoxycytidine residue  (DC)
 c
-      else if (resname .eq. 'DC ') then
+      else if (resname .eq. ' DC') then
          call zatom (1191,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1192,1.37d0,117.8d0,glyco(i),n-1,c1i,o4i,0)
          call zatom (1197,1.24d0,118.9d0,0.0d0,n-1,n-2,c1i,0)
@@ -981,7 +981,7 @@ c
 c
 c     thymine in deoxythymidine residue  (DT)
 c
-      else if (resname .eq. 'DT ') then
+      else if (resname .eq. ' DT') then
          call zatom (1218,1.48d0,108.1d0,113.7d0,c1i,o4i,c2i,1)
          call zatom (1219,1.37d0,117.1d0,glyco(i),n-1,c1i,o4i,0)
          call zatom (1224,1.22d0,122.9d0,0.0d0,n-1,n-2,c1i,0)
@@ -1095,24 +1095,24 @@ c
                root(nbase) = j
                kseq = kseq + 1
                resname = nuclz(seqtyp(kseq))
-               do while (resname.eq.'MP ' .or. resname.eq.'DP '
-     &                         .or. resname.eq.'TP ')
+               do while (resname.eq.' MP' .or. resname.eq.' DP'
+     &                         .or. resname.eq.' TP')
                   kseq = kseq + 1
                   resname = nuclz(seqtyp(kseq))
                end do
-               if (resname.eq.'A  ' .or. resname.eq.'DA ') then
+               if (resname.eq.'  A' .or. resname.eq.' DA') then
                   list(1,nbase) = j + 6
                   list(2,nbase) = j + 11
-               else if (resname.eq.'G  ' .or. resname.eq.'DG ') then
+               else if (resname.eq.'  G' .or. resname.eq.' DG') then
                   list(1,nbase) = j + 12
                   list(2,nbase) = j + 5
-               else if (resname.eq.'C  ' .or. resname.eq.'DC ') then
+               else if (resname.eq.'  C' .or. resname.eq.' DC') then
                   list(1,nbase) = j + 3
                   list(2,nbase) = j + 8
-               else if (resname .eq. 'U  ') then
+               else if (resname .eq. '  U') then
                   list(1,nbase) = j + 8
                   list(2,nbase) = j + 5
-               else if (resname .eq. 'DT ') then
+               else if (resname .eq. ' DT') then
                   list(1,nbase) = j + 9
                   list(2,nbase) = j + 5
                end if
@@ -1195,13 +1195,13 @@ c
       start = 1
       stop = nphos / 2
       resname = nuclz(seqtyp(1))
-      if (resname .eq. 'MP ')  start = start + 1
-      if (resname .eq. 'DP ')  start = start + 2
-      if (resname .eq. 'TP ')  start = start + 3
+      if (resname .eq. ' MP')  start = start + 1
+      if (resname .eq. ' DP')  start = start + 2
+      if (resname .eq. ' TP')  start = start + 3
       resname = nuclz(seqtyp(nseq))
-      if (resname .eq. 'MP ')  stop = stop - 1
-      if (resname .eq. 'DP ')  stop = stop - 2
-      if (resname .eq. 'TP ')  stop = stop - 3
+      if (resname .eq. ' MP')  stop = stop - 1
+      if (resname .eq. ' DP')  stop = stop - 2
+      if (resname .eq. ' TP')  stop = stop - 3
       offset = stop + nphos/2 + 1
       if (hlxform .eq. 'A')  dist = 17.78d0
       if (hlxform .eq. 'B')  dist = 17.46d0

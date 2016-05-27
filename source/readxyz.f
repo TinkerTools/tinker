@@ -109,7 +109,7 @@ c
          call fatal
       else if (n .gt. maxatm) then
          write (iout,40)  maxatm
-   40    format (/,' READXYZ  --  The Maximum of',i8,' Atoms',
+   40    format (/,' READXYZ  --  The Maximum of',i9,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if
@@ -171,7 +171,7 @@ c     an error occurred in reading the coordinate file
 c
       if (quit) then
          write (iout,90)  i
-   90    format (/,' READXYZ  --  Error in Coordinate File at Atom',i6)
+   90    format (/,' READXYZ  --  Error in Coordinate File at Atom',i9)
          call fatal
       end if
 c
@@ -237,8 +237,8 @@ c
                if (i12(m,k) .eq. i)  goto 130
             end do
             write (iout,120)  k,i
-  120       format (/,' READXYZ  --  Check Connection of Atom',
-     &                 i6,' to Atom',i6)
+  120       format (/,' READXYZ  --  Check Connection of Atoms',
+     &                 i9,' and',i9)
             call fatal
   130       continue
          end do

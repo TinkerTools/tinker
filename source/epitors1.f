@@ -81,7 +81,7 @@ c
          dept(3,i) = 0.0d0
       end do
 c
-c     calculate the pi-orbital torsion angle energy term
+c     calculate the pi-orbital torsion angle energy and derivatives
 c
       do i = 1, npitors
          ia = ipit(1,i)

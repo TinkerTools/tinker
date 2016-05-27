@@ -15,8 +15,8 @@ c
 c     "initial" sets up original values for some parameters and
 c     variables that might not otherwise get initialized
 c
-c     note the calls below to "kmp_set" routines are only needed by
-c     the Intel compiler and must be commented for other compilers
+c     note the calls below to "kmp_set" routines are required with
+c     the Intel compiler, but must be commented for other compilers
 c
 c
       subroutine initial
@@ -81,8 +81,8 @@ c
 c
 c     Intel compiler extensions to OpenMP standard
 c
-!$    call kmp_set_stacksize_s (2**28)
-!$    call kmp_set_blocktime (0)
+c!$   call kmp_set_stacksize_s (2**28)
+c!$   call kmp_set_blocktime (0)
 c
 c     values of machine precision constants
 c

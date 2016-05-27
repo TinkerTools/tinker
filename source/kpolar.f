@@ -63,10 +63,10 @@ c
       do i = 0, maxxtr
          cxtr(i) = 0.0d0
       end do
-      cxtr(0) = -0.16d0
-      cxtr(1) = 0.11d0
-      cxtr(2) = 0.68d0
-      cxtr(3) = 0.37d0
+      cxtr(0) = -0.154d0
+      cxtr(1) = 0.017d0
+      cxtr(2) = 0.658d0
+      cxtr(3) = 0.474d0
 c
 c     get keywords containing polarization-related options
 c

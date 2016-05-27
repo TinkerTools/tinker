@@ -1,10 +1,10 @@
 /*
- *    ############################################################
- *    ##                  COPYRIGHT (C) 2015                    ##
- *    ##     by Mark Friedrichs, Lee-Ping Wang, Kailong Mao,    ##
- *    ##        Chao Lu, Zhi Wang and Jay William Ponder        ##
- *    ##                  All Rights Reserved                   ##
- *    ############################################################
+ *    ################################################################
+ *    ##                    COPYRIGHT (C) 2015                      ##
+ *    ##       by Mark Friedrichs, Lee-Ping Wang, Kailong Mao,      ##
+ *    ##  Chao Lu, Zhi Wang, Matthew Harger and Jay William Ponder  ##
+ *    ##                  All Rights Reserved                       ##
+ *    ################################################################
  *
  *    ############################################################
  *    ##                                                        ##
@@ -1886,7 +1886,6 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
    int* angleIndexPtr;
    char* angleTypPtr;
    int match;
-   double kParameterConversion;
 
    // TINKER harmonic and in-plane angles are separate terms in OpenMM
 
@@ -2277,24 +2276,24 @@ static void setupAmoebaAngleTorsionForce (OpenMM_System* system, FILE* log) {
          angleDCB = 0.0;
       }
 
-      torsionIndexPtr = tors__.itors + 4 * index;
+      torsionIndexPtr = tors__.itors + 4*index;
       int result = OpenMM_AmoebaAngleTorsionForce_addAngleTorsion
                       (amoebaAngleTorsionForce,
                        *(torsionIndexPtr)-1, *(torsionIndexPtr+1) - 1,
                        *(torsionIndexPtr+2) - 1, *(torsionIndexPtr+3) - 1,
                        angleCBA, angleDCB,
                        (OpenMM_KJPerKcal) * torpot__.atorunit
-                          * (*(angtor__.kant + 6 * ii)),
+                          * (*(angtor__.kant + 6*ii)),
                        (OpenMM_KJPerKcal) * torpot__.atorunit
-                          * (*(angtor__.kant + 6 * ii + 1)),
+                          * (*(angtor__.kant + 6*ii + 1)),
                        (OpenMM_KJPerKcal) * torpot__.atorunit
-                          * (*(angtor__.kant + 6 * ii + 2)),
+                          * (*(angtor__.kant + 6*ii + 2)),
                        (OpenMM_KJPerKcal) * torpot__.atorunit
-                          * (*(angtor__.kant + 6 * ii + 3)),
+                          * (*(angtor__.kant + 6*ii + 3)),
                        (OpenMM_KJPerKcal) * torpot__.atorunit
-                          * (*(angtor__.kant + 6 * ii + 4)),
+                          * (*(angtor__.kant + 6*ii + 4)),
                        (OpenMM_KJPerKcal) * torpot__.atorunit
-                          * (*(angtor__.kant + 6 * ii + 5)));
+                          * (*(angtor__.kant + 6*ii + 5)));
    }
 }
 
@@ -2495,18 +2494,18 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
 
    for (ii = 0; ii < atoms__.n; ii++) {
       i = vdw__.jvdw[ii];
-      if (mutant__.mut[ii] == -1) {
-         OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
-                              vdw__.ired[ii]-1, atomid__.classs[ii],
-                              OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
-                              OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
-                              vdw__.kred[ii], mutant__.vlambda);
-      } else {
+      if (mutant__.mut[ii] == 0) {
          OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
                               vdw__.ired[ii]-1, atomid__.classs[ii],
                               OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
                               OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
                               vdw__.kred[ii], 1.0);
+      } else {
+         OpenMM_AmoebaVdwForce_addParticle (amoebaVdwForce,
+                              vdw__.ired[ii]-1, atomid__.classs[ii],
+                              OpenMM_NmPerAngstrom*(kvdws__.rad[i-1]),
+                              OpenMM_KJPerKcal*(kvdws__.eps[i-1]),
+                              vdw__.kred[ii], mutant__.vlambda);
       }
    }
 
@@ -3016,6 +3015,28 @@ static OpenMM_IntArray* getGroup (int* kgrp, int* igrp, int idx) {
    return group;
 }
 
+static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
+
+   double convert;
+   convert = OpenMM_KJPerKcal / 0.0174532925 / 0.0174532925;
+
+   OpenMM_CustomTorsionForce* force = OpenMM_CustomTorsionForce_create ("k*(min(min(abs(theta-theta0),abs(theta-theta0-6.28318530718)),abs(theta-theta0+6.28318530718)))^2");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "k");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "theta0");
+
+   for (int i = 0; i < restrn__.ntfix; i++) {
+      OpenMM_DoubleArray* torsionParameters = OpenMM_DoubleArray_create (0);
+      OpenMM_DoubleArray_append (torsionParameters, restrn__.tfix[i*3]*convert);
+      OpenMM_DoubleArray_append (torsionParameters, restrn__.tfix[i*3+1]*0.0174532925);
+      OpenMM_CustomTorsionForce_addTorsion (force, restrn__.itfix[i*4]-1,
+                                            restrn__.itfix[i*4+1]-1,
+                                            restrn__.itfix[i*4+2]-1,
+                                            restrn__.itfix[i*4+3]-1,
+                                            torsionParameters);
+   }
+   OpenMM_System_addForce (system, (OpenMM_Force *) force);
+}
+
 static OpenMM_DoubleArray* getWeights (int* kgrp, int* igrp, int idx,
                                        OpenMM_System* system) {
 
@@ -3251,6 +3272,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
    setupConstraints (omm->system, log);
 
+   setupTorsionRestraints (omm->system, log);
    setupCentroidRestraints (omm->system, log);
 
    initialPosInNm = OpenMM_Vec3Array_create (0);
@@ -3931,7 +3953,7 @@ void openmm_validate_ (int* testingActive) {
    int invalidAxisType;
    int invalid = 0;
    int testing = *testingActive;
-   char* ixnString = "Interaction Not Currently Supported by OpenMM.\n";
+   char const* ixnString = "Interaction Not Currently Supported by OpenMM.\n";
    FILE* log = stderr;
 
    if (testing && log) {
@@ -4223,7 +4245,7 @@ int openmm_test_ (void) {
    int infoMask;
    int ii, jj;
    int countActiveForces;
-   char* testName;
+   char const* testName;
    double conversion, delta, dot;
    double tinkerNorm, openMMNorm;
    double openMMPotentialEnergy;
@@ -4355,6 +4377,7 @@ int openmm_test_ (void) {
          setupAmoebaGeneralizedKirkwoodForce (system, 1, log);
       }
       if (potent__.use_geom) {
+         setupTorsionRestraints (system, log);
          setupCentroidRestraints (system, log);
       }
 
@@ -4479,6 +4502,7 @@ int openmm_test_ (void) {
 
    } else if (potent__.use_geom) {
 
+      setupTorsionRestraints (system, log);
       setupCentroidRestraints (system, log);
       loadTinkerForce (deriv__.deg, 0, tinkerForce);
       tinkerEnergy = *energi__.eg;

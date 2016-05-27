@@ -15,8 +15,10 @@ c
 c     "lights" computes the set of nearest neighbor interactions
 c     using the method of lights algorithm
 c
-c     note this version generates each pair only once via setting
-c     of the negative x-coordinate boundaries
+c     note this routine can include each pair only once via setting
+c     of the negative x-coordinate boundaries, or it can optionally
+c     include each pair in both directions, ie, both (A,B) and (B,A);
+c     inclusion of one vs both directions is controlled by "unique"
 c
 c     literature reference:
 c
@@ -25,7 +27,7 @@ c     Dynamics on Vector Computers", Journal of Computational
 c     Physics, 61, 138-153 (1985)
 c
 c
-      subroutine lights (cutoff,nsite,xsort,ysort,zsort)
+      subroutine lights (cutoff,nsite,xsort,ysort,zsort,unique)
       use sizes
       use bound
       use boxes
@@ -45,6 +47,7 @@ c
       real*8, allocatable :: xfrac(:)
       real*8, allocatable :: yfrac(:)
       real*8, allocatable :: zfrac(:)
+      logical unique
 c
 c
 c     check that maximum number of replicates is not exceeded
@@ -232,12 +235,37 @@ c
 c
 c     find the negative x-coordinate boundary for each atom
 c
-      do i = nlight, 1, -1
-         k = locx(i)
-         if (k .le. nsite) then
-            kbx(k) = i
-         end if
-      end do
+      if (unique) then
+         do i = nlight, 1, -1
+            k = locx(i)
+            if (k .le. nsite) then
+               kbx(k) = i
+            end if
+         end do
+      else
+         j = nlight
+         box = 0.0d0
+         do i = nlight, 1, -1
+            k = locx(i)
+            do while (xsort(i)-xsort(j)+box .le. xcut)
+               if (j .eq. 1) then
+                  if (use_bounds) then
+                     j = nlight + 1
+                     box = xcell
+                  end if
+               end if
+               j = j - 1
+               if (j .lt. 1)  goto 30
+            end do
+   30       continue
+            j = j + 1
+            if (j .gt. nlight) then
+               j = 1
+               box = 0.0d0
+            end if
+            kbx(k) = j
+         end do
+      end if
 c
 c     find the positive x-coordinate boundary for each atom
 c
@@ -254,9 +282,9 @@ c
                   end if
                end if
                j = j + 1
-               if (j .gt. nlight)  goto 30
+               if (j .gt. nlight)  goto 40
             end do
-   30       continue
+   40       continue
             j = j - 1
             if (j .lt. 1) then
                j = nlight
@@ -281,9 +309,9 @@ c
                   end if
                end if
                j = j - 1
-               if (j .lt. 1)  goto 40
+               if (j .lt. 1)  goto 50
             end do
-   40       continue
+   50       continue
             j = j + 1
             if (j .gt. nlight) then
                j = 1
@@ -308,9 +336,9 @@ c
                   end if
                end if
                j = j + 1
-               if (j .gt. nlight)  goto 50
+               if (j .gt. nlight)  goto 60
             end do
-   50       continue
+   60       continue
             j = j - 1
             if (j .lt. 1) then
                j = nlight
@@ -335,9 +363,9 @@ c
                   end if
                end if
                j = j - 1
-               if (j .lt. 1)  goto 60
+               if (j .lt. 1)  goto 70
             end do
-   60       continue
+   70       continue
             j = j + 1
             if (j .gt. nlight) then
                j = 1
@@ -362,9 +390,9 @@ c
                   end if
                end if
                j = j + 1
-               if (j .gt. nlight)  goto 70
+               if (j .gt. nlight)  goto 80
             end do
-   70       continue
+   80       continue
             j = j - 1
             if (j .lt. 1) then
                j = nlight

@@ -1,9 +1,9 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ##########################################################
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
+c     ##                  All Rights Reserved                 ##
+c     ##########################################################
 c
 c     #################################################################
 c     ##                                                             ##
@@ -104,7 +104,7 @@ c
       logical proceed
 c
 c
-c     compute the Hessian elements of the stretch-torsions
+c     calculate the stretch-torsion interaction Hessian elements
 c
       do istrtor = 1, nstrtor
          j = ist(1,istrtor)
@@ -148,19 +148,24 @@ c
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
-            xt = yba*zcb - ycb*zba
-            yt = zba*xcb - zcb*xba
-            zt = xba*ycb - xcb*yba
-            xu = ycb*zdc - ydc*zcb
-            yu = zcb*xdc - zdc*xcb
-            zu = xcb*ydc - xdc*ycb
-            xtu = yt*zu - yu*zt
-            ytu = zt*xu - zu*xt
-            ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
-            rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
+            rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
+            rba = sqrt(xba*xba + yba*yba + zba*zba)
+            rdc = sqrt(xdc*xdc + ydc*ydc + zdc*zdc)
+            if (min(rba,rcb,rdc) .ne. 0.0d0) then
+               xt = yba*zcb - ycb*zba
+               yt = zba*xcb - zcb*xba
+               zt = xba*ycb - xcb*yba
+               xu = ycb*zdc - ydc*zcb
+               yu = zcb*xdc - zdc*xcb
+               zu = xcb*ydc - xdc*ycb
+               xtu = yt*zu - yu*zt
+               ytu = zt*xu - zu*xt
+               ztu = xt*yu - xu*yt
+               rt2 = xt*xt + yt*yt + zt*zt
+               rt2 = max(rt2,0.000001d0)
+               ru2 = xu*xu + yu*yu + zu*zu
+               ru2 = max(ru2,0.000001d0)
+               rtru = sqrt(rt2*ru2)
                xca = xic - xia
                yca = yic - yia
                zca = zic - zia
@@ -171,9 +176,6 @@ c
                   call image (xca,yca,zca)
                   call image (xdb,ydb,zdb)
                end if
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               rba = sqrt(xba*xba + yba*yba + zba*zba)
-               rdc = sqrt(xdc*xdc + ydc*ydc + zdc*zdc)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c

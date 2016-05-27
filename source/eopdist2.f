@@ -74,7 +74,7 @@ c
       logical proceed
 c
 c
-c     compute Hessian elements for the out-of-plane distances
+c     compute the out-of-plane distance term Hessian elements
 c
       do kopdist = 1, nopdist
          ia = iopd(1,kopdist)

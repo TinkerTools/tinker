@@ -105,7 +105,7 @@ c
          call fatal
       else if (n .gt. maxatm) then
          write (iout,40)  maxatm
-   40    format (' READINT  --  The Maximum of',i8,' Atoms',
+   40    format (' READINT  --  The Maximum of',i9,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if
@@ -150,7 +150,7 @@ c     an error occurred in reading the Z-matrix coordinates
 c
       if (quit) then
          write (iout,80)  i
-   80    format (' READZ  --  Error in Z-Matrix File at Atom',i6)
+   80    format (' READZ  --  Error in Z-Matrix File at Atom',i9)
          call fatal
       end if
 c

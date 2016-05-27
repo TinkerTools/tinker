@@ -265,6 +265,7 @@ c
   410    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
+      flush (iout)
 c
 c     integrate equations of motion to take a time step
 c

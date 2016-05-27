@@ -61,11 +61,13 @@ c
       real*8, allocatable :: y0(:)
       real*8, allocatable :: z0(:)
       real*8 a(3,3)
-      logical exist,opened
-      logical multi,append
+      logical exist,query
+      logical opened,multi
+      logical append
       character*120 xyzfile
       character*120 modfile
       character*120 record
+      character*120 string
       external merge
 c
 c
@@ -140,14 +142,23 @@ c
    40 continue
       abort = .false.
       mode = -1
-      do while (mode.lt.0 .or. mode.gt.nmode)
-         mode = 0
-         write (iout,50)
-   50    format (/,' Number of the Desired Choice [<CR>=Exit] :  ',$)
-         read (input,60,err=40,end=70)  mode
-   60    format (i10)
-   70    continue
-      end do
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=50,end=50)  mode
+         if (mode.ge.0 .and. mode.le.nmode)  query = .false.
+      end if
+   50 continue
+      if (query) then
+         do while (mode.lt.0 .or. mode.gt.nmode)
+            mode = 0
+            write (iout,60)
+   60       format (/,' Number of the Desired Choice [<CR>=Exit] :  ',$)
+            read (input,70,err=40,end=80)  mode
+   70       format (i10)
+   80       continue
+         end do
+      end if
 c
 c     open the file to be used for the output coordinates
 c
@@ -162,12 +173,12 @@ c
 c     get the offset value to be used in atom renumbering
 c
       if (mode .eq. 1) then
-   80    continue
+   90    continue
          offset = 0
-         write (iout,90)
-   90    format (/,' Offset used to Renumber the Atoms [0] :  ',$)
-         read (input,100,err=80)  offset
-  100    format (i10)
+         write (iout,100)
+  100    format (/,' Offset used to Renumber the Atoms [0] :  ',$)
+         read (input,110,err=90)  offset
+  110    format (i10)
          dowhile (.not. abort)
             call makeref (1)
             call readxyz (ixyz)
@@ -193,12 +204,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,110)
-  110    format (/,' Numbers of the Atoms to be Removed :  ',$)
-         read (input,120)  record
-  120    format (a120)
-         read (record,*,err=130,end=130)  (list(i),i=1,n)
-  130    continue
+         write (iout,120)
+  120    format (/,' Numbers of the Atoms to be Removed :  ',$)
+         read (input,130)  record
+  130    format (a120)
+         read (record,*,err=140,end=140)  (list(i),i=1,n)
+  140    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -246,12 +257,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,140)
-  140    format (/,' Atom Types to be Removed :  ',$)
-         read (input,150)  record
-  150    format (a120)
-         read (record,*,err=160,end=160)  (list(i),i=1,n)
-  160    continue
+         write (iout,150)
+  150    format (/,' Atom Types to be Removed :  ',$)
+         read (input,160)  record
+  160    format (a120)
+         read (record,*,err=170,end=170)  (list(i),i=1,n)
+  170    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -262,10 +273,10 @@ c
                do j = 1, nlist
                   if (list(j) .eq. it) then
                      call delete (i)
-                     goto 170
+                     goto 180
                   end if
                end do
-  170          continue
+  180          continue
             end do
             call makeref (1)
             call readxyz (ixyz)
@@ -318,14 +329,14 @@ c
                   zi = z(i)
                   do j = 1, n
                      if (use(j)) then
-                        if (keep(j) .eq. i)  goto 180
+                        if (keep(j) .eq. i)  goto 190
                         dist2 = (x(j)-xi)**2+(y(j)-yi)**2+(z(j)-zi)**2
-                        if (dist2 .le. cut2)  goto 180
+                        if (dist2 .le. cut2)  goto 190
                      end if
                   end do
                   nlist = nlist + 1
                   list(nlist) = i
-  180             continue
+  190             continue
                end if
             end do
             do i = nlist, 1, -1
@@ -357,12 +368,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,190)
-  190    format (/,' Numbers of the Atoms to be Inserted :  ',$)
-         read (input,200)  record
-  200    format (a120)
-         read (record,*,err=210,end=210)  (list(i),i=1,n)
-  210    continue
+         write (iout,200)
+  200    format (/,' Numbers of the Atoms to be Inserted :  ',$)
+         read (input,210)  record
+  210    format (a120)
+         read (record,*,err=220,end=220)  (list(i),i=1,n)
+  220    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -401,19 +412,21 @@ c
 c     get an old atom type and new atom type for replacement
 c
       if (mode .eq. 6) then
-  220    continue
+  230    continue
          oldtype = 0
          newtype = 0
-         write (iout,230)
-  230    format (/,' Numbers of the Old and New Atom Types :  ',$)
-         read (input,240)  record
-  240    format (a120)
-         read (record,*,err=220,end=220)  oldtype,newtype
+         write (iout,240)
+  240    format (/,' Numbers of the Old and New Atom Types :  ',$)
+         read (input,250)  record
+  250    format (a120)
+         read (record,*,err=230,end=230)  oldtype,newtype
          dowhile (.not. abort)
             do i = 1, n
-               if (type(i) .eq. oldtype)  type(i) = newtype
+               if (type(i) .eq. oldtype) then
+                  type(i) = newtype
+               end if
             end do
-            if (verbose)  call katom
+            call katom
             call makeref (1)
             call readxyz (ixyz)
             if (.not. abort)  multi = .true.
@@ -572,12 +585,12 @@ c
          xr = 0.0d0
          yr = 0.0d0
          zr = 0.0d0
-         write (iout,250)
-  250    format (/,' Enter Translation Vector Components :  ',$)
-         read (input,260)  record
-  260    format (a120)
-         read (record,*,err=270,end=270)  xr,yr,zr
-  270    continue
+         write (iout,260)
+  260    format (/,' Enter Translation Vector Components :  ',$)
+         read (input,270)  record
+  270    format (a120)
+         read (record,*,err=280,end=280)  xr,yr,zr
+  280    continue
          dowhile (.not. abort)
             do i = 1, n
                x(i) = x(i) + xr
@@ -642,10 +655,10 @@ c
 c     translate to place a specified atom at the origin
 c
       if (mode .eq. 13) then
-         write (iout,280)
-  280    format (/,' Number of the Atom to Move to the Origin :  ',$)
-         read (input,290)  origin
-  290    format (i10)
+         write (iout,290)
+  290    format (/,' Number of the Atom to Move to the Origin :  ',$)
+         read (input,300)  origin
+  300    format (i10)
          dowhile (.not. abort)
             xorig = x(origin)
             yorig = y(origin)
@@ -701,12 +714,12 @@ c
          phi = 0.0d0
          theta = 0.0d0
          psi = 0.0d0
-         write (iout,300)
-  300    format (/,' Enter Rigid Body Coordinates :  ',$)
-         read (input,310)  record
-  310    format (a120)
-         read (record,*,err=320,end=320)  xcm,ycm,zcm,phi,theta,psi
-  320    continue
+         write (iout,310)
+  310    format (/,' Enter Rigid Body Coordinates :  ',$)
+         read (input,320)  record
+  320    format (a120)
+         read (record,*,err=330,end=330)  xcm,ycm,zcm,phi,theta,psi
+  330    continue
          call inertia (2)
          phi = phi / radian
          theta = theta / radian
@@ -784,12 +797,12 @@ c
          ynew = 0.0d0
          znew = 0.0d0
          do while (xnew .eq. 0.0d0)
-            write (iout,330)
-  330       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,340)  record
-  340       format (a120)
-            read (record,*,err=350,end=350)  xnew,ynew,znew
-  350       continue
+            write (iout,340)
+  340       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,350)  record
+  350       format (a120)
+            read (record,*,err=360,end=360)  xnew,ynew,znew
+  360       continue
             if (ynew .eq. 0.0d0)  ynew = xnew
             if (znew .eq. 0.0d0)  znew = xnew
          end do
@@ -901,20 +914,20 @@ c
 c     create random box full of the current coordinates file
 c
       if (mode .eq. 19) then
-         write (iout,360)
-  360    format (/,' Enter Number of Copies to Put in Box :  ',$)
-         read (input,370)  ncopy
-  370    format (i10)
+         write (iout,370)
+  370    format (/,' Enter Number of Copies to Put in Box :  ',$)
+         read (input,380)  ncopy
+  380    format (i10)
          xbox = 0.0d0
          ybox = 0.0d0
          zbox = 0.0d0
          do while (xbox .eq. 0.0d0)
-            write (iout,380)
-  380       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,390)  record
-  390       format (a120)
-            read (record,*,err=400,end=400)  xbox,ybox,zbox
-  400       continue
+            write (iout,390)
+  390       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,400)  record
+  400       format (a120)
+            read (record,*,err=410,end=410)  xbox,ybox,zbox
+  410       continue
             if (ybox .eq. 0.0d0)  ybox = xbox
             if (zbox .eq. 0.0d0)  zbox = xbox
          end do
@@ -999,14 +1012,16 @@ c
 c
 c     output final coordinates for single frame input file
 c
-      if (.not. multi)  call prtmod (imod,offset)
+      if (opened .and. .not.multi) then
+         call prtmod (imod,offset)
+      end if
 c
 c     perform any final tasks before program exit
 c
       if (opened) then
          close (unit=imod)
-         write (iout,410)  modfile
-  410    format (/,' New Coordinates Written to File :  ',a)
+         write (iout,420)  modfile
+  420    format (/,' New Coordinates Written to File :  ',a)
       end if
       close (unit=ixyz)
       call final
@@ -1114,17 +1129,24 @@ c
 c
       subroutine soak
       use sizes
+      use atomid
       use atoms
       use bound
+      use boxes
+      use couple
       use iounit
       use molcul
       use refer
       implicit none
-      integer i,k,isolv
+      integer i,j,k
+      integer ii,jj
+      integer isolv,icount
       integer ntot,freeunit
+      integer, allocatable :: map(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr,rik2
       real*8 close,close2
+      logical exist,header
       logical, allocatable :: remove(:)
       character*120 solvfile
       external merge
@@ -1134,16 +1156,28 @@ c     make a copy of the solute coordinates and connectivities
 c
       call makeref (1)
 c
-c     read the coordinates for the solvent box
+c     get the filename for the solvent box coordinates
 c
-   10 continue
-      write (iout,20)
-   20 format (/,' Enter Name of Solvent Box Coordinates :  ',$)
-      read (input,30)  solvfile
-   30 format (a120)
-      call suffix (solvfile,'xyz','old')
+      call nextarg (solvfile,exist)
+      if (exist) then
+         call basefile (solvfile)
+         call suffix (solvfile,'xyz','old')
+         inquire (file=solvfile,exist=exist)
+      end if
+      do while (.not. exist)
+         write (iout,10)
+   10    format (/,' Enter Name of Solvent Box Coordinates :  ',$)
+         read (input,20)  solvfile
+   20    format (a120)
+         call basefile (solvfile)
+         call suffix (solvfile,'xyz','old')
+         inquire (file=solvfile,exist=exist)
+      end do
+c
+c     read the coordinate file containing the solvent atoms
+c
       isolv = freeunit ()
-      open (unit=isolv,file=solvfile,status='old',err=10)
+      open (unit=isolv,file=solvfile,status='old')
       rewind (unit=isolv)
       call readxyz (isolv)
       close (unit=isolv)
@@ -1151,6 +1185,17 @@ c
 c     combine solute and solvent into a single coordinate set
 c
       call merge (1)
+      call basefile (solvfile)
+      call getkey
+c
+c     reset the default values for unitcell dimensions
+c
+      xbox = 0.0d0
+      ybox = 0.0d0
+      zbox = 0.0d0
+      alpha = 0.0d0
+      beta = 0.0d0
+      gamma = 0.0d0
 c
 c     count number of molecules and set lattice parameters
 c
@@ -1158,8 +1203,14 @@ c
       call unitcell
       call lattice
 c
+c     set distance cutoff for solute-solvent close contacts
+c
+      close = 1.5d0
+      close2 = close * close
+c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (map(n))
       allocate (remove(nmol))
 c
 c     initialize the list of solvent molecules to be deleted
@@ -1168,33 +1219,102 @@ c
          remove(i) = .false.
       end do
 c
+c     print header information when processing large systems
+c
+      icount = 0
+      header = .true.
+      if (n-nref(1) .ge. 10000) then
+         write (iout,30)
+   30    format (/,' Scan for Solvent Molecules to be Removed')
+      end if
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(nref,n,x,y,z,molcule,close2,remove,header,icount)
+!$OMP DO schedule(guided)
+c
 c     search for close contacts between solute and solvent
 c
-      close = 1.5d0
-      close2 = close * close
-      do i = 1, nref(1)
-         xi = x(i)
-         yi = y(i)
-         zi = z(i)
-         do k = nref(1)+1, n
-            xr = x(k) - xi
-            yr = y(k) - yi
-            zr = z(k) - zi
-            call image (xr,yr,zr)
-            rik2 = xr*xr + yr*yr + zr*zr
-            if (rik2 .lt. close2)  remove(molcule(k)) = .true.
-         end do
+      do i = nref(1)+1, n
+         if (.not. remove(molcule(i))) then
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            do k = 1, nref(1)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               call imagen (xr,yr,zr)
+               rik2 = xr*xr + yr*yr + zr*zr
+               if (rik2 .lt. close2) then
+                  remove(molcule(i)) = .true.
+                  goto 40
+               end if
+            end do
+   40       continue
+         end if
+         icount = icount + 1
+         if (mod(icount,10000) .eq. 0) then
+            if (header) then
+               header = .false.
+               write (iout,50)
+   50          format ()
+            end if
+            write (iout,60)  10000*(icount/10000)
+   60       format (' Solvent Atoms Processed',i15)
+         end if
       end do
 c
-c     remove solvent molecules that are too close to the solute
+c     end OpenMP directives for the major loop structure
 c
-      ntot = n
-      do i = ntot, nref(1)+1, -1
-         if (remove(molcule(i)))  call delete (i)
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     print final status when processing large systems
+c
+      icount = n - nref(1)
+      if (mod(icount,10000).ne.0 .and. icount.gt.10000) then
+         write (iout,70)  icount
+   70    format (' Solvent Atoms Processed',i15)
+      end if
+c
+c     delete solvent molecules that are too close to the solute
+c
+      k = nref(1)
+      ntot = k
+      do i = nref(1)+1, n
+         map(i) = 0
+         if (.not. remove(molcule(i))) then
+            k = k + 1
+            map(i) = k
+            ntot = k
+         end if
       end do
+      do i = nref(1)+1, n
+         ii = map(i)
+         if (ii .ne. 0) then
+            x(ii) = x(i)
+            y(ii) = y(i)
+            z(ii) = z(i)
+            name(ii) = name(i)
+            type(ii) = type(i)
+            k = 0
+            do j = 1, n12(i)
+               jj = map(i12(j,i))
+               if (jj .ne. 0) then
+                  k = k + 1
+                  i12(k,ii) = jj
+               end if
+            end do
+            n12(ii) = k
+         end if
+      end do
+      n = ntot
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (map)
       deallocate (remove)
       return
       end

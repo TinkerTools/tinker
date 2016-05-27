@@ -407,7 +407,7 @@ c     find the phosphates and sugar C1 nucleotide backbone atoms
 c
          else if (restyp(m) .eq. 'NUCLEIC') then
             resname = nuclz(seqtyp(m))
-            if (resname .eq. 'MP ') then
+            if (resname .eq. ' MP') then
                if (atomic(i) .eq. 15) then
                   poi(m) = i
                   m = m + 1
@@ -491,9 +491,9 @@ c
                end if
                if (i .gt. 1) then
                   resname = nuclz(seqtyp(i-1))
-                  if (resname .eq. 'MP ')  poi(i) = 0
-                  if (resname .eq. 'DP ')  poi(i) = 0
-                  if (resname .eq. 'TP ')  poi(i) = 0
+                  if (resname .eq. ' MP')  poi(i) = 0
+                  if (resname .eq. ' DP')  poi(i) = 0
+                  if (resname .eq. ' TP')  poi(i) = 0
                end if
                m = poi(i)
                if (m .ne. 0) then
@@ -568,13 +568,13 @@ c
          else if (chntyp(m) .eq. 'NUCLEIC') then
             do i = start, stop
                resname = nuclz(seqtyp(i))
-               if (resname .eq. 'MP ') then
+               if (resname .eq. ' MP') then
                   call pdbatom (' P  ',resname,i,poi(i))
                   call pdbatom (' OP1',resname,i,op1(i))
                   call pdbatom (' OP2',resname,i,op2(i))
                   call pdbatom (' OP3',resname,i,op3(i))
-               else if (resname .eq. 'DP ') then
-               else if (resname .eq. 'TP ') then
+               else if (resname .eq. ' DP') then
+               else if (resname .eq. ' TP') then
                else
                   call pdbatom (' P  ',resname,i,poi(i))
                   call pdbatom (' OP1',resname,i,op1(i))
@@ -1667,7 +1667,7 @@ c
 c
 c     adenine in adenosine residue  (A)
 c
-      if (resname .eq. 'A  ') then
+      if (resname .eq. '  A') then
          call pdbatom (' N9 ',resname,ires,ni)
          call pdbatom (' C8 ',resname,ires,ni+1)
          call pdbatom (' N7 ',resname,ires,ni+2)
@@ -1681,7 +1681,7 @@ c
 c
 c     guanine in guanosine residue  (G)
 c
-      else if (resname .eq. 'G  ') then
+      else if (resname .eq. '  G') then
          call pdbatom (' N9 ',resname,ires,ni)
          call pdbatom (' C8 ',resname,ires,ni+1)
          call pdbatom (' N7 ',resname,ires,ni+2)
@@ -1696,7 +1696,7 @@ c
 c
 c     cytosine in cytidine residue  (C)
 c
-      else if (resname .eq. 'C  ') then
+      else if (resname .eq. '  C') then
          call pdbatom (' N1 ',resname,ires,ni)
          call pdbatom (' C2 ',resname,ires,ni+1)
          call pdbatom (' O2 ',resname,ires,ni+2)
@@ -1708,7 +1708,7 @@ c
 c
 c     uracil in uridine residue  (U)
 c
-      else if (resname .eq. 'U  ') then
+      else if (resname .eq. '  U') then
          call pdbatom (' N1 ',resname,ires,ni)
          call pdbatom (' C2 ',resname,ires,ni+1)
          call pdbatom (' O2 ',resname,ires,ni+2)
@@ -1720,7 +1720,7 @@ c
 c
 c     adenine in deoxyadenosine residue  (DA)
 c
-      else if (resname .eq. 'DA ') then
+      else if (resname .eq. ' DA') then
          call pdbatom (' N9 ',resname,ires,ni)
          call pdbatom (' C8 ',resname,ires,ni+1)
          call pdbatom (' N7 ',resname,ires,ni+2)
@@ -1734,7 +1734,7 @@ c
 c
 c     guanine in deoxyguanosine residue  (DG)
 c
-      else if (resname .eq. 'DG ') then
+      else if (resname .eq. ' DG') then
          call pdbatom (' N9 ',resname,ires,ni)
          call pdbatom (' C8 ',resname,ires,ni+1)
          call pdbatom (' N7 ',resname,ires,ni+2)
@@ -1749,7 +1749,7 @@ c
 c
 c     cytosine in deoxycytidine residue  (DC)
 c
-      else if (resname .eq. 'DC ') then
+      else if (resname .eq. ' DC') then
          call pdbatom (' N1 ',resname,ires,ni)
          call pdbatom (' C2 ',resname,ires,ni+1)
          call pdbatom (' O2 ',resname,ires,ni+2)
@@ -1761,7 +1761,7 @@ c
 c
 c     thymine in deoxythymidine residue  (DT)
 c
-      else if (resname .eq. 'DT ') then
+      else if (resname .eq. ' DT') then
          call pdbatom (' N1 ',resname,ires,ni)
          call pdbatom (' C2 ',resname,ires,ni+1)
          call pdbatom (' O2 ',resname,ires,ni+2)
@@ -1856,7 +1856,7 @@ c
 c
 c     adenine in adenosine residue  (A)
 c
-      if (resname .eq. 'A  ') then
+      if (resname .eq. '  A') then
          if (allatom) then
             call pdbatom (' H8 ',resname,ires,ni+10)
             call pdbatom (' H61',resname,ires,ni+11)
@@ -1869,7 +1869,7 @@ c
 c
 c     guanine in guanosine residue  (G)
 c
-      else if (resname .eq. 'G  ') then
+      else if (resname .eq. '  G') then
          if (allatom) then
             call pdbatom (' H8 ',resname,ires,ni+11)
             call pdbatom (' H1 ',resname,ires,ni+12)
@@ -1883,7 +1883,7 @@ c
 c
 c     cytosine in cytidine residue  (C)
 c
-      else if (resname .eq. 'C  ') then
+      else if (resname .eq. '  C') then
          if (allatom) then
             call pdbatom (' H41',resname,ires,ni+8)
             call pdbatom (' H42',resname,ires,ni+9)
@@ -1896,7 +1896,7 @@ c
 c
 c     uracil in uridine residue  (U)
 c
-      else if (resname .eq. 'U  ') then
+      else if (resname .eq. '  U') then
          if (allatom) then
             call pdbatom (' H3 ',resname,ires,ni+8)
             call pdbatom (' H5 ',resname,ires,ni+9)
@@ -1907,7 +1907,7 @@ c
 c
 c     adenine in deoxyadenosine residue  (DA)
 c
-      else if (resname .eq. 'DA ') then
+      else if (resname .eq. ' DA') then
          if (allatom) then
             call pdbatom (' H8 ',resname,ires,ni+10)
             call pdbatom (' H61',resname,ires,ni+11)
@@ -1920,7 +1920,7 @@ c
 c
 c     guanine in deoxyguanosine residue  (DG)
 c
-      else if (resname .eq. 'DG ') then
+      else if (resname .eq. ' DG') then
          if (allatom) then
             call pdbatom (' H8 ',resname,ires,ni+11)
             call pdbatom (' H1 ',resname,ires,ni+12)
@@ -1934,7 +1934,7 @@ c
 c
 c     cytosine in deoxycytidine residue  (DC)
 c
-      else if (resname .eq. 'DC ') then
+      else if (resname .eq. ' DC') then
          if (allatom) then
             call pdbatom (' H41',resname,ires,ni+8)
             call pdbatom (' H42',resname,ires,ni+9)
@@ -1947,7 +1947,7 @@ c
 c
 c     thymine in deoxythymidine residue  (DT)
 c
-      else if (resname .eq. 'DT ') then
+      else if (resname .eq. ' DT') then
          if (allatom) then
             call pdbatom (' H3 ',resname,ires,ni+9)
             call pdbatom (' H71',resname,ires,ni+10)

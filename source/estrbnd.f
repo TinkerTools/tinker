@@ -60,7 +60,7 @@ c
 !$OMP& shared(ebao)
 !$OMP DO reduction(+:ebao) schedule(guided)
 c
-c     calculate the stretch-bend energy term
+c     calculate the stretch-bend interaction energy term
 c
       do istrbnd = 1, nstrbnd
          i = isb(1,istrbnd)
@@ -103,7 +103,7 @@ c
             end if
             rab2 = xab*xab + yab*yab + zab*zab
             rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
+            if (min(rab2,rcb2) .ne. 0.0d0) then
                rab = sqrt(rab2)
                rcb = sqrt(rcb2)
                dot = xab*xcb + yab*ycb + zab*zcb

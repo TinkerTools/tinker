@@ -478,7 +478,7 @@ c
      &                       8x,'Separated',10x,'in Fit'/)
                end if
                write (iout,290)  i1,name1(i1),i2,name2(i2),dist,wfit(i)
-  290          format (5x,i5,'-',a3,11x,i5,'-',a3,7x,f13.6,4x,f12.4)
+  290          format (3x,i7,'-',a3,9x,i7,'-',a3,7x,f13.6,4x,f12.4)
             end if
          end do
          if (.not. header) then

@@ -62,8 +62,8 @@ c     supported nucleotide 1-letter and 3-letter codes
 c
       data base1  / 'A', 'G', 'C', 'U', 'D', 'B', 'I', 'T', '1', '2',
      &              '3', 'X' /
-      data base3  / 'A  ', 'G  ', 'C  ', 'U  ', 'DA ', 'DG ', 'DC ',
-     &              'DT ', 'MP ', 'DP ', 'TP ', 'UNK' /
+      data base3  / '  A', '  G', '  C', '  U', ' DA', ' DG', ' DC',
+     &              ' DT', ' MP', ' DP', ' TP', 'UNK' /
 c
 c     biopolymer types for mid-chain peptide backbone atoms
 c

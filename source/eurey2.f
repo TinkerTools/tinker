@@ -37,7 +37,7 @@ c
       logical proceed
 c
 c
-c     compute the Hessian elements of the Urey-Bradley energy
+c     calculate the Urey-Bradley interaction Hessian elements
 c
       do iurey = 1, nurey
          ia = iury(1,iurey)

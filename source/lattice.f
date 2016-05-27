@@ -29,7 +29,7 @@ c
       real*8 cr1,cr2,cr3
 c
 c
-c     compute and store the half box length values
+c     compute and store half and three-quarter box lengths
 c
       xbox2 = 0.5d0 * xbox
       ybox2 = 0.5d0 * ybox

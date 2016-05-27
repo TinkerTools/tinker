@@ -100,7 +100,7 @@ c
       qbar = 0.0d0
       gbar = 0.0d0
       eta = 0.0d0
-      voltrial = 20
+      voltrial = 25
       volmove = 100.0d0
       volscale = 'MOLECULAR'
 c

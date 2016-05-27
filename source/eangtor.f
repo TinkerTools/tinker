@@ -1,7 +1,7 @@
 c
 c
 c     ##########################################################
-c     ##  COPYRIGHT (C) 2014 by Chao Lv & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
 c     ##                  All Rights Reserved                 ##
 c     ##########################################################
 c
@@ -30,7 +30,7 @@ c
       implicit none
       integer i,k,iangtor
       integer ia,ib,ic,id
-      real*8 e,e1,e2
+      real*8 e,e1,e2,eato
       real*8 rcb,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba2,rcb2,rdc2
@@ -60,7 +60,18 @@ c     zero out the energy due to extra potential terms
 c
       eat = 0.0d0
 c
-c     calculate the stretch-torsion interaction energy term
+c     transfer global to local copies for OpenMP calculation
+c
+      eato = eat
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
+!$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,use_group,use_polymer)
+!$OMP& shared(eato)
+!$OMP DO reduction(+:eato) schedule(guided)
+c
+c     calculate the angle-torsion interaction energy term
 c
       do iangtor = 1, nangtor
          i = iat(1,iangtor)
@@ -100,27 +111,29 @@ c
             xdc = xid - xic
             ydc = yid - yic
             zdc = zid - zic
-            rba2 = xba*xba + yba*yba + zba*zba
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
             if (use_polymer) then
                call image (xba,yba,zba)
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
-            xt = yba*zcb - ycb*zba
-            yt = zba*xcb - zcb*xba
-            zt = xba*ycb - xcb*yba
-            xu = ycb*zdc - ydc*zcb
-            yu = zcb*xdc - zdc*xcb
-            zu = xcb*ydc - xdc*ycb
-            xtu = yt*zu - yu*zt
-            ytu = zt*xu - zu*xt
-            ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
-            rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
+            rba2 = xba*xba + yba*yba + zba*zba
+            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
+            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
+            if (min(rba2,rcb2,rdc2) .ne. 0.0d0) then
+               xt = yba*zcb - ycb*zba
+               yt = zba*xcb - zcb*xba
+               zt = xba*ycb - xcb*yba
+               xu = ycb*zdc - ydc*zcb
+               yu = zcb*xdc - zdc*xcb
+               zu = xcb*ydc - xdc*ycb
+               xtu = yt*zu - yu*zt
+               ytu = zt*xu - zu*xt
+               ztu = xt*yu - xu*yt
+               rt2 = xt*xt + yt*yt + zt*zt
+               rt2 = max(rt2,0.000001d0)
+               ru2 = xu*xu + yu*yu + zu*zu
+               ru2 = max(ru2,0.000001d0)
+               rtru = sqrt(rt2*ru2)
                rcb = sqrt(rcb2)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
@@ -172,12 +185,21 @@ c
                   e2 = e2 * fgrp
                end if
 c
-c     increment the total bend-torsion energy
+c     increment the total angle-torsion energy
 c
                e = e1 + e2
-               eat = eat + e
+               eato = eato + e
             end if
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eat = eato
       return
       end

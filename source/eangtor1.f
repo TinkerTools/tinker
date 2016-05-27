@@ -1,7 +1,7 @@
 c
 c
 c     ##########################################################
-c     ##  COPYRIGHT (C) 2014 by Chao Lv & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
 c     ##                  All Rights Reserved                 ##
 c     ##########################################################
 c
@@ -33,7 +33,7 @@ c
       implicit none
       integer i,k,iangtor
       integer ia,ib,ic,id
-      real*8 e,e1,e2
+      real*8 e,e1,e2,eato
       real*8 rcb,fgrp
       real*8 ddt,dedphi
       real*8 rt2,ru2,rtru
@@ -70,6 +70,8 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 viro(3,3)
+      real*8, allocatable :: deato(:,:)
       logical proceed
 c
 c
@@ -82,7 +84,32 @@ c
          deat(3,i) = 0.0d0
       end do
 c
-c     calculate the angle-torsion interaction energy term
+c     perform dynamic allocation of some local arrays
+c
+      allocate (deato(3,n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      eato = eat
+      do i = 1, n
+         deato(1,i) = deat(1,i)
+         deato(2,i) = deat(2,i)
+         deato(3,i) = deat(3,i)
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
+!$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,use_group,use_polymer)
+!$OMP& shared(eato,deato,viro)
+!$OMP DO reduction(+:eato,deato,viro) schedule(guided)
+c
+c     calculate the angle-torsion energy and first derviatives
 c
       do iangtor = 1, nangtor
          i = iat(1,iangtor)
@@ -122,27 +149,29 @@ c
             xdc = xid - xic
             ydc = yid - yic
             zdc = zid - zic
-            rba2 = xba*xba + yba*yba + zba*zba
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
             if (use_polymer) then
                call image (xba,yba,zba)
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
-            xt = yba*zcb - ycb*zba
-            yt = zba*xcb - zcb*xba
-            zt = xba*ycb - xcb*yba
-            xu = ycb*zdc - ydc*zcb
-            yu = zcb*xdc - zdc*xcb
-            zu = xcb*ydc - xdc*ycb
-            xtu = yt*zu - yu*zt
-            ytu = zt*xu - zu*xt
-            ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
-            rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
+            rba2 = xba*xba + yba*yba + zba*zba
+            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
+            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
+            if (min(rba2,rcb2,rdc2) .ne. 0.0d0) then
+               xt = yba*zcb - ycb*zba
+               yt = zba*xcb - zcb*xba
+               zt = xba*ycb - xcb*yba
+               xu = ycb*zdc - ydc*zcb
+               yu = zcb*xdc - zdc*xcb
+               zu = xcb*ydc - xdc*ycb
+               xtu = yt*zu - yu*zt
+               ytu = zt*xu - zu*xt
+               ztu = xt*yu - xu*yt
+               rt2 = xt*xt + yt*yt + zt*zt
+               rt2 = max(rt2,0.000001d0)
+               ru2 = xu*xu + yu*yu + zu*zu
+               ru2 = max(ru2,0.000001d0)
+               rtru = sqrt(rt2*ru2)
                xca = xic - xia
                yca = yic - yia
                zca = zic - zia
@@ -296,19 +325,19 @@ c
 c     increment the angle-torsion energy and gradient
 c
                e = e1 + e2
-               eat = eat + e
-               deat(1,ia) = deat(1,ia) + dedxia
-               deat(2,ia) = deat(2,ia) + dedyia
-               deat(3,ia) = deat(3,ia) + dedzia
-               deat(1,ib) = deat(1,ib) + dedxib
-               deat(2,ib) = deat(2,ib) + dedyib
-               deat(3,ib) = deat(3,ib) + dedzib
-               deat(1,ic) = deat(1,ic) + dedxic
-               deat(2,ic) = deat(2,ic) + dedyic
-               deat(3,ic) = deat(3,ic) + dedzic
-               deat(1,id) = deat(1,id) + dedxid
-               deat(2,id) = deat(2,id) + dedyid
-               deat(3,id) = deat(3,id) + dedzid
+               eato = eato + e
+               deato(1,ia) = deato(1,ia) + dedxia
+               deato(2,ia) = deato(2,ia) + dedyia
+               deato(3,ia) = deato(3,ia) + dedzia
+               deato(1,ib) = deato(1,ib) + dedxib
+               deato(2,ib) = deato(2,ib) + dedyib
+               deato(3,ib) = deato(3,ib) + dedzib
+               deato(1,ic) = deato(1,ic) + dedxic
+               deato(2,ic) = deato(2,ic) + dedyic
+               deato(3,ic) = deato(3,ic) + dedzic
+               deato(1,id) = deato(1,id) + dedxid
+               deato(2,id) = deato(2,id) + dedyid
+               deato(3,id) = deato(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -318,17 +347,40 @@ c
                vyy = ycb*(dedyic+dedyid) - yba*dedyia + ydc*dedyid
                vzy = zcb*(dedyic+dedyid) - zba*dedyia + zdc*dedyid
                vzz = zcb*(dedzic+dedzid) - zba*dedzia + zdc*dedzid
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
+               viro(1,1) = viro(1,1) + vxx
+               viro(2,1) = viro(2,1) + vyx
+               viro(3,1) = viro(3,1) + vzx
+               viro(1,2) = viro(1,2) + vyx
+               viro(2,2) = viro(2,2) + vyy
+               viro(3,2) = viro(3,2) + vzy
+               viro(1,3) = viro(1,3) + vzx
+               viro(2,3) = viro(2,3) + vzy
+               viro(3,3) = viro(3,3) + vzz
             end if
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eat = eato
+      do i = 1, n
+         deat(1,i) = deato(1,i)
+         deat(2,i) = deato(2,i)
+         deat(3,i) = deato(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (deato)
       return
       end

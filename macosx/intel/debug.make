@@ -96,6 +96,7 @@ ifort -c -g -warn all -check all moldyn.f
 ifort -c -g -warn all -check all moment.f
 ifort -c -g -warn all -check all mplpot.f
 ifort -c -g -warn all -check all mpole.f
+ifort -c -g -warn all -check all mrecip.f
 ifort -c -g -warn all -check all mutant.f
 ifort -c -g -warn all -check all neigh.f
 ifort -c -g -warn all -check all nonpol.f
@@ -290,6 +291,10 @@ ifort -c -g -warn all -check all epitors.f
 ifort -c -g -warn all -check all epitors1.f
 ifort -c -g -warn all -check all epitors2.f
 ifort -c -g -warn all -check all epitors3.f
+ifort -c -g -warn all -check all epolar.f
+ifort -c -g -warn all -check all epolar1.f
+ifort -c -g -warn all -check all epolar2.f
+ifort -c -g -warn all -check all epolar3.f
 ifort -c -g -warn all -check all erf.f
 ifort -c -g -warn all -check all erxnfld.f
 ifort -c -g -warn all -check all erxnfld1.f
@@ -493,6 +498,7 @@ ifort -c -g -warn all -check all search.f
 ifort -c -g -warn all -check all server.f
 ifort -c -g -warn all -check all shakeup.f
 ifort -c -g -warn all -check all sigmoid.f
+ifort -c -g -warn all -check all simplex.f
 ifort -c -g -warn all -check all sktstuff.f
 ifort -c -g -warn all -check all sniffer.f
 ifort -c -g -warn all -check all sort.f

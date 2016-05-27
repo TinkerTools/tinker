@@ -109,7 +109,7 @@ c
 c     set default parameters for the optimization
 c
       msav = min(nvar,20)
-      if (fctmin .eq. 0.0d0)  fctmin = -10000000.0d0
+      if (fctmin .eq. 0.0d0)  fctmin = -100000000.0d0
       if (maxiter .eq. 0)  maxiter = 1000000
       if (nextiter .eq. 0)  nextiter = 1
       if (iprint .lt. 0)  iprint = 1
@@ -164,16 +164,17 @@ c
             write (iout,20)
    20       format (/,' Steepest Descent Gradient Optimization :')
             write (iout,30)
-   30       format (/,' SD Iter     F Value      G RMS     F Move',
-     &                 '    X Move   Angle  FG Call  Comment',/)
+   30       format (/,' SD Iter     F Value      G RMS      F Move',
+     &                 '   X Move   Angle  FG Call  Comment',/)
          else
             write (iout,40)
    40       format (/,' Limited Memory BFGS Quasi-Newton',
      &                 ' Optimization :')
             write (iout,50)
-   50       format (/,' QN Iter     F Value      G RMS     F Move',
-     &                 '    X Move   Angle  FG Call  Comment',/)
+   50       format (/,' QN Iter     F Value      G RMS      F Move',
+     &                 '   X Move   Angle  FG Call  Comment',/)
          end if
+         flush (iout)
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -221,6 +222,7 @@ c
             write (iout,70)  niter,f,g_rms,ncalls
    70       format (i6,d14.4,d11.4,29x,i7)
          end if
+         flush (iout)
       end if
 c
 c     write initial intermediate prior to first iteration
@@ -366,16 +368,18 @@ c
          if (iprint .gt. 0) then
             if (done .or. mod(niter,iprint).eq.0) then
                if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and.
-     &             g_rms.lt.1.0d5 .and. f_move.lt.1.0d5) then
+     &             g_rms.lt.1.0d5 .and. f_move.lt.1.0d6 .and.
+     &             f_move.gt.-1.0d5) then
                   write (iout,80)  niter,f,g_rms,f_move,x_move,
-     &                              angle,ncalls,status
-   80             format (i6,f14.4,f11.4,f11.4,f10.4,f8.2,i7,3x,a9)
+     &                             angle,ncalls,status
+   80             format (i6,f14.4,f11.4,f12.4,f9.4,f8.2,i7,3x,a9)
                else
                   write (iout,90)  niter,f,g_rms,f_move,x_move,
-     &                              angle,ncalls,status
-   90             format (i6,d14.4,d11.4,d11.4,f10.4,f8.2,i7,3x,a9)
+     &                             angle,ncalls,status
+   90             format (i6,d14.4,d11.4,d12.4,f9.4,f8.2,i7,3x,a9)
                end if
             end if
+            flush (iout)
          end if
 c
 c     write intermediate results for the current iteration
@@ -414,6 +418,7 @@ c
             write (iout,110)  status
   110       format (/,' LBFGS  --  Incomplete Convergence due to ',a9)
          end if
+         flush (iout)
       end if
       return
       end

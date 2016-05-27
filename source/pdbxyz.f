@@ -1547,11 +1547,11 @@ c
          if (k .eq. 0) then
             deoxy(i) = .true.
             do j = start, stop
-               if (resname .eq. 'A  ')  pdbres(j) = 'DA '
-               if (resname .eq. 'G  ')  pdbres(j) = 'DG '
-               if (resname .eq. 'C  ')  pdbres(j) = 'DC '
-               if (resname .eq. 'U  ')  pdbres(j) = 'DU '
-               if (resname .eq. 'T  ')  pdbres(j) = 'DT '
+               if (resname .eq. '  A')  pdbres(j) = ' DA'
+               if (resname .eq. '  G')  pdbres(j) = ' DG'
+               if (resname .eq. '  C')  pdbres(j) = ' DC'
+               if (resname .eq. '  U')  pdbres(j) = ' DU'
+               if (resname .eq. '  T')  pdbres(j) = ' DT'
             end do
          end if
       end do
@@ -1588,11 +1588,11 @@ c
 c
 c     build the phosphate atoms of the current residue
 c
-         if (resname .eq. 'TP ') then
+         if (resname .eq. ' TP') then
 
-         else if (resname .eq. 'DP ') then
+         else if (resname .eq. ' DP') then
 
-         else if (resname .eq. 'MP ') then
+         else if (resname .eq. ' MP') then
 
          else if (.not. newchain) then
             call findatm (' P  ',start,stop,k)
@@ -1747,7 +1747,7 @@ c
 c
 c     adenine in adenosine residue  (A)
 c
-      if (resname .eq. 'A ') then
+      if (resname .eq. '  A') then
          call findatm (' N9 ',start,stop,i)
          call oldatm (i,1017,c1i,ires)
          call findatm (' C8 ',start,stop,i)
@@ -1781,7 +1781,7 @@ c
 c
 c     guanine in guanosine residue  (G)
 c
-      else if (resname .eq. 'G  ') then
+      else if (resname .eq. '  G') then
          call findatm (' N9 ',start,stop,i)
          call oldatm (i,1047,c1i,ires)
          call findatm (' C8 ',start,stop,i)
@@ -1817,7 +1817,7 @@ c
 c
 c     cytosine in cytidine residue  (C)
 c
-      else if (resname .eq. 'C  ') then
+      else if (resname .eq. '  C') then
          call findatm (' N1 ',start,stop,i)
          call oldatm (i,1078,c1i,ires)
          call findatm (' C2 ',start,stop,i)
@@ -1846,7 +1846,7 @@ c
 c
 c     uracil in uridine residue  (U)
 c
-      else if (resname .eq. 'U  ') then
+      else if (resname .eq. '  U') then
          call findatm (' N1 ',start,stop,i)
          call oldatm (i,1106,c1i,ires)
          call findatm (' C2 ',start,stop,i)
@@ -1873,7 +1873,7 @@ c
 c
 c     adenine in deoxyadenosine residue  (DA)
 c
-      else if (resname .eq. 'DA ') then
+      else if (resname .eq. ' DA') then
          call findatm (' N9 ',start,stop,i)
          call oldatm (i,1132,c1i,ires)
          call findatm (' C8 ',start,stop,i)
@@ -1907,7 +1907,7 @@ c
 c
 c     guanine in deoxyguanosine residue  (DG)
 c
-      else if (resname .eq. 'DG ') then
+      else if (resname .eq. ' DG') then
          call findatm (' N9 ',start,stop,i)
          call oldatm (i,1161,c1i,ires)
          call findatm (' C8 ',start,stop,i)
@@ -1943,7 +1943,7 @@ c
 c
 c     cytosine in deoxycytidine residue  (DC)
 c
-      else if (resname .eq. 'DC ') then
+      else if (resname .eq. ' DC') then
          call findatm (' N1 ',start,stop,i)
          call oldatm (i,1191,c1i,ires)
          call findatm (' C2 ',start,stop,i)
@@ -1972,7 +1972,7 @@ c
 c
 c     thymine in deoxythymidine residue  (DT)
 c
-      else if (resname .eq. 'DT ') then
+      else if (resname .eq. ' DT') then
          call findatm (' N1 ',start,stop,i)
          call oldatm (i,1218,c1i,ires)
          call findatm (' C2 ',start,stop,i)

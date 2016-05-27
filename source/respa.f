@@ -67,10 +67,6 @@ c
       dta = dt / dalt
       dta_2 = 0.5d0 * dta
 c
-c     make half-step temperature and pressure corrections
-c
-      call temper (dt)
-c
 c     store the current atom positions, then find half-step
 c     velocities via velocity Verlet recursion
 c
@@ -132,7 +128,7 @@ c
          end do
          if (use_rattle)  call rattle2 (dta)
 c
-c     increment average virial from fast-evolving potential terms
+c     find average virial from fast-evolving potential terms
 c
          do i = 1, 3
             do j = 1, 3
@@ -144,6 +140,12 @@ c
 c     get the slow-evolving potential energy and atomic forces
 c
       call gradslow (epot,derivs)
+      epot = epot + ealt
+c
+c     make half-step temperature and pressure corrections
+c
+      call temper2 (dt,temp)
+c     call pressure2 (epot,temp)
 c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
@@ -168,9 +170,8 @@ c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     total potential and virial from sum of fast and slow parts
+c     increment total virial from sum of fast and slow parts
 c
-      epot = epot + ealt
       do i = 1, 3
          do j = 1, 3
             vir(j,i) = vir(j,i) + viralt(j,i)
@@ -179,7 +180,7 @@ c
 c
 c     make full-step temperature and pressure corrections
 c
-      call temper2 (dt,eksum,ekin,temp)
+      call temper (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

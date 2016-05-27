@@ -93,7 +93,7 @@ c
 !$OMP& shared(ebao,nebao,aebao)
 !$OMP DO reduction(+:ebao,nebao,aebao) schedule(guided)
 c
-c     calculate the stretch-bend energy term
+c     calculate the stretch-bend interaction energy term
 c
       do istrbnd = 1, nstrbnd
          i = isb(1,istrbnd)
@@ -136,7 +136,7 @@ c
             end if
             rab2 = xab*xab + yab*yab + zab*zab
             rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
+            if (min(rab2,rcb2) .ne. 0.0d0) then
                rab = sqrt(rab2)
                rcb = sqrt(rcb2)
                dot = xab*xcb + yab*ycb + zab*zcb
@@ -165,7 +165,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(e) .gt. 2.0d0)
+               huge = (abs(e) .gt. 5.0d0)
                if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.

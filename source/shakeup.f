@@ -53,11 +53,11 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      allocate (iratx(maxfix))
-      allocate (kratx(maxfix))
-      allocate (irat(2,maxfix))
-      allocate (krat(maxfix))
-      allocate (ratimage(maxfix))
+      allocate (iratx(maxatm))
+      allocate (kratx(maxatm))
+      allocate (irat(2,maxatm))
+      allocate (krat(maxatm))
+      allocate (ratimage(maxatm))
 c
 c     process keywords containing holonomic constraint options
 c

@@ -162,7 +162,7 @@ c
                   yp = zcb*xab - xcb*zab
                   zp = xcb*yab - ycb*xab
                   rp = sqrt(xp*xp + yp*yp + zp*zp)
-                  rp = max(rp,0.000001d0)
+                  rp = max(rp,0.0001d0)
                   dot = xab*xcb + yab*ycb + zab*zcb
                   cosine = dot / sqrt(rab2*rcb2)
                   cosine = min(1.0d0,max(-1.0d0,cosine))
@@ -292,7 +292,7 @@ c
                   ym = zcp*xap - xcp*zap
                   zm = xcp*yap - ycp*xap
                   rm = sqrt(xm*xm + ym*ym + zm*zm)
-                  rm = max(rm,0.000001d0)
+                  rm = max(rm,0.0001d0)
                   dot = xap*xcp + yap*ycp + zap*zcp
                   cosine = dot / sqrt(rap2*rcp2)
                   cosine = min(1.0d0,max(-1.0d0,cosine))

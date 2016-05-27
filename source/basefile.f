@@ -13,7 +13,8 @@ c     ################################################################
 c
 c
 c     "basefile" extracts from an input filename the portion
-c     consisting of any directory name and the base filename
+c     consisting of any directory name and the base filename;
+c     also reads any keyfile and sets information level values
 c
 c
       subroutine basefile (string)
@@ -23,7 +24,16 @@ c
       integer i,k,trimtext
       character*1 letter
       character*120 string
+      character*120 prefix
 c
+c
+c     account for home directory abbreviation in filename
+c
+      if (string(1:2) .eq. '~/') then
+         call getenv ('HOME',prefix)
+         string = prefix(1:trimtext(prefix))//
+     &               string(2:trimtext(string))
+      end if
 c
 c     store the input filename and find its full length
 c

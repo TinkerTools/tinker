@@ -76,7 +76,7 @@ c
       logical proceed
 c
 c
-c     compute the Hessian elements of the stretch-bends
+c     calculate the stretch-bend interaction Hessian elements
 c
       do istrbnd = 1, nstrbnd
          i = isb(1,istrbnd)
@@ -119,14 +119,14 @@ c
             end if
             rab2 = xab*xab + yab*yab + zab*zab
             rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
+            if (min(rab2,rcb2) .ne. 0.0d0) then
                rab = sqrt(rab2)
                rcb = sqrt(rcb2)
                xp = ycb*zab - zcb*yab
                yp = zcb*xab - xcb*zab
                zp = xcb*yab - ycb*xab
                rp = sqrt(xp*xp + yp*yp + zp*zp)
-               rp = max(rp,0.001d0)
+               rp = max(rp,0.0001d0)
                dot = xab*xcb + yab*ycb + zab*zcb
                cosine = dot / (rab*rcb)
                cosine = min(1.0d0,max(-1.0d0,cosine))

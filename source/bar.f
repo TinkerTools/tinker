@@ -90,7 +90,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      maxframe = 100000
+      maxframe = 1000000
       allocate (ua0(maxframe))
       allocate (ua1(maxframe))
       allocate (ub0(maxframe))
@@ -238,6 +238,7 @@ c
          if (mod(j,100).eq.0 .or. abort) then
             write (iout,110)  j
   110       format (7x,'Completed',i8,' Coordinate Frames')
+            flush (iout)
          end if
       end do
 c
@@ -327,6 +328,7 @@ c
          if (mod(j,100).eq.0 .or. abort) then
             write (iout,160)  j
   160       format (7x,'Completed',i8,' Coordinate Frames')
+            flush (iout)
          end if
       end do
 c

@@ -1143,8 +1143,8 @@ c
                   if (header) then
                      header = .false.
                      write (iout,20)
-   20                format (/,' Real Space Multipole and',
-     &                          ' Polarization Interactions :',
+   20                format (/,' Individual Real Space Multipole',
+     &                          ' Interactions :',
      &                       //,' Type',14x,'Atom Names',
      &                          15x,'Distance',8x,'Energy',/)
                   end if
@@ -1315,8 +1315,8 @@ c
                      if (header) then
                         header = .false.
                         write (iout,40)
-   40                   format (/,' Real Space Multipole and',
-     &                             ' Polarization Interactions :',
+   40                   format (/,' Individual Real Space Multipole',
+     &                             ' Interactions :',
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
@@ -1734,8 +1734,8 @@ c
                   if (header) then
                      header = .false.
                      write (iout,20)
-   20                format (/,' Real Space Multipole and',
-     &                          ' Polarization Interactions :',
+   20                format (/,' Individual Real Space Multipole',
+     &                          ' Interactions :',
      &                       //,' Type',14x,'Atom Names',
      &                          15x,'Distance',8x,'Energy',/)
                   end if

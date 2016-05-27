@@ -299,37 +299,37 @@ c
          if (nring3 .gt. 0) then
             write (iout,90)
    90       format (/,' Three-Membered Rings in the Structure :',
-     &              //,11x,'Ring',14x,'Atoms in Ring',/)
+     &              //,11x,'Ring',17x,'Atoms in Ring',/)
             do i = 1, nring3
                write (iout,100)  i,(iring3(j,i),j=1,3)
-  100          format (9x,i5,10x,3i6)
+  100          format (9x,i5,10x,3i8)
             end do
          end if
          if (nring4 .gt. 0) then
             write (iout,110)
   110       format (/,' Four-Membered Rings in the Structure :',
-     &              //,11x,'Ring',17x,'Atoms in Ring',/)
+     &              //,11x,'Ring',21x,'Atoms in Ring',/)
             do i = 1, nring4
                write (iout,120)  i,(iring4(j,i),j=1,4)
-  120          format (9x,i5,10x,4i6)
+  120          format (9x,i5,10x,4i8)
             end do
          end if
          if (nring5 .gt. 0) then
             write (iout,130)
   130       format (/,' Five-Membered Rings in the Structure :',
-     &              //,11x,'Ring',20x,'Atoms in Ring',/)
+     &              //,11x,'Ring',25x,'Atoms in Ring',/)
             do i = 1, nring5
                write (iout,140)  i,(iring5(j,i),j=1,5)
-  140          format (9x,i5,10x,5i6)
+  140          format (9x,i5,10x,5i8)
             end do
          end if
          if (nring6 .gt. 0) then
             write (iout,150)
   150       format (/,' Six-Membered Rings in the Structure :',
-     &              //,11x,'Ring',23x,'Atoms in Ring',/)
+     &              //,11x,'Ring',29x,'Atoms in Ring',/)
             do i = 1, nring6
                write (iout,160)  i,(iring6(j,i),j=1,6)
-  160          format (9x,i5,10x,6i6)
+  160          format (9x,i5,10x,6i8)
             end do
          end if
       end if

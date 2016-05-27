@@ -71,7 +71,7 @@ c
       call nextarg (string,exist)
       if (exist) then
          read (string,*,err=10,end=10)  mode
-         query = .false.
+         if (mode.ge.1 .and. mode.le.5)  query = .false.
       end if
    10 continue
       if (query) then

@@ -190,7 +190,7 @@ c
      &                    'Expected',4x,'Found',/)
             end if
             write (iout,110)  i,name(i),type(i),valence(i),n12(i)
-  110       format (' Valence',7x,i5,'-',a3,8x,i5,10x,i5,5x,i5)
+  110       format (' Valence',5x,i7,'-',a3,8x,i5,10x,i5,5x,i5)
          end if
       end do
       return

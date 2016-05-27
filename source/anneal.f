@@ -222,6 +222,7 @@ c
          write (iout,320)  nequil,dt,logmass,hot,hot
   320    format (/,' Steps:',i6,3x,'Time/Step:',f6.3,' ps',3x,
      &              'LogMass:',f5.2,3x,'Temp:',f7.1,' to',f7.1)
+         flush (iout)
       end if
 c
 c     take the dynamics steps for the equilibration phase
@@ -257,6 +258,7 @@ c
       write (iout,340)  nstep,dt,logmass,hot,cold
   340 format (/,' Steps:',i6,3x,'Time/Step:',f6.3,' ps',3x,
      &           'LogMass:',f5.2,3x,'Temp:',f7.1,' to',f7.1)
+      flush (iout)
 c
 c     set target temperature using the desired cooling protocol
 c

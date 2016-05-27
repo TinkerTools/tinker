@@ -48,7 +48,7 @@ c
       real*8, allocatable :: dlist(:,:)
       logical exist,query
       logical header,match
-      logical repeat
+      logical unique,repeat
       character*1 axis(3)
       character*6 mode
       character*120 string
@@ -93,7 +93,8 @@ c
       if (use_charge)  nterm = nterm + 1
       if (use_chgdpl)  nterm = nterm + 1
       if (use_dipole)  nterm = nterm + 1
-      if (use_mpole .or. use_polar)  nterm = nterm + 1
+      if (use_mpole)  nterm = nterm + 1
+      if (use_polar)  nterm = nterm + 1
       nterm = nterm * ncalls
       off = 5.0d0
       off2 = off * off
@@ -142,13 +143,14 @@ c
       mode = 'LIGHTS'
       call setpair (mode)
       call settime
+      unique = .true.
       do m = 1, nterm
          do i = 1, n
             xsort(i) = x(i)
             ysort(i) = y(i)
             zsort(i) = z(i)
          end do
-         call lights (off,n,xsort,ysort,zsort)
+         call lights (off,n,xsort,ysort,zsort,unique)
          do i = 1, n
             xi = xsort(rgx(i))
             yi = ysort(rgy(i))
@@ -239,7 +241,8 @@ c
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
          if (use_dipole)  call edipole
-         if (use_mpole .or. use_polar)  call empole
+         if (use_mpole)  call empole
+         if (use_polar)  call epolar
       end do
       call gettime (wall,cpu)
       write (iout,110)
@@ -273,7 +276,8 @@ c
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
          if (use_dipole)  call edipole
-         if (use_mpole .or. use_polar)  call empole
+         if (use_mpole)  call empole
+         if (use_polar)  call epolar
       end do
       call gettime (wall,cpu)
       elight = ev + ec + ecd + ed + em + ep
@@ -304,7 +308,8 @@ c
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
          if (use_dipole)  call edipole
-         if (use_mpole .or. use_polar)  call empole
+         if (use_mpole)  call empole
+         if (use_polar)  call epolar
       end do
       call gettime (wall,cpu)
       elist = ev + ec + ecd + ed + em + ep
@@ -346,7 +351,8 @@ c
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
          if (use_dipole)  call edipole1
-         if (use_mpole .or. use_polar)  call empole1
+         if (use_mpole)  call empole1
+         if (use_polar)  call epolar1
       end do
       call gettime (wall,cpu)
 c
@@ -395,7 +401,8 @@ c
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
          if (use_dipole)  call edipole1
-         if (use_mpole .or. use_polar)  call empole1
+         if (use_mpole)  call empole1
+         if (use_polar)  call epolar1
       end do
       call gettime (wall,cpu)
 c
@@ -441,7 +448,8 @@ c
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
          if (use_dipole)  call edipole1
-         if (use_mpole .or. use_polar)  call empole1
+         if (use_mpole)  call empole1
+         if (use_polar)  call epolar1
       end do
       call gettime (wall,cpu)
 c

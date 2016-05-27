@@ -18,9 +18,9 @@ c     P. J. Mohr, B. N. Taylor and D. B. Newell, "CODATA Recommended
 c     Values of the Fundamental Physical Constants: 2014", available
 c     from http://arxiv.org/pdf/1507.07956/
 c
-c     Most values below are taken from 2014 CODATA reference values;
-c     available on the web from the National Institute of Standards
-c     and Technology at http://physics.nist.gov/cuu/index.html/
+c     Most values below are from the 2014 CODATA reference constants;
+c     available online from the National Institute of Standards and
+c     Technology at http://physics.nist.gov/cuu/Constants/index.html/
 c
 c     The conversion from calorie to Joule is the definition of the
 c     thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)

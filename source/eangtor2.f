@@ -1,7 +1,7 @@
 c
 c
 c     ##########################################################
-c     ##  COPYRIGHT (C) 2014 by Chao Lv & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
 c     ##                  All Rights Reserved                 ##
 c     ##########################################################
 c
@@ -144,7 +144,7 @@ c
       logical proceed
 c
 c
-c     compute the Hessian elements of the stretch-torsions
+c     calculate the angle-torsion interaction Hessian elements
 c
       do iangtor = 1, nangtor
          j = iat(1,iangtor)
@@ -189,9 +189,6 @@ c
             xbc = -xcb
             ybc = -ycb
             zbc = -zcb
-            rba2 = xba*xba + yba*yba + zba*zba
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
             if (use_polymer) then
                call image (xba,yba,zba)
                call image (xcb,ycb,zcb)
@@ -199,19 +196,24 @@ c
                call image (xab,yab,zab)
                call image (xbc,ybc,zbc)
             end if
-            xt = yba*zcb - ycb*zba
-            yt = zba*xcb - zcb*xba
-            zt = xba*ycb - xcb*yba
-            xu = ycb*zdc - ydc*zcb
-            yu = zcb*xdc - zdc*xcb
-            zu = xcb*ydc - xdc*ycb
-            xtu = yt*zu - yu*zt
-            ytu = zt*xu - zu*xt
-            ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
-            rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
+            rba2 = xba*xba + yba*yba + zba*zba
+            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
+            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
+            if (min(rba2,rcb2,rdc2) .ne. 0.0d0) then
+               xt = yba*zcb - ycb*zba
+               yt = zba*xcb - zcb*xba
+               zt = xba*ycb - xcb*yba
+               xu = ycb*zdc - ydc*zcb
+               yu = zcb*xdc - zdc*xcb
+               zu = xcb*ydc - xdc*ycb
+               xtu = yt*zu - yu*zt
+               ytu = zt*xu - zu*xt
+               ztu = xt*yu - xu*yt
+               rt2 = xt*xt + yt*yt + zt*zt
+               rt2 = max(rt2,0.000001d0)
+               ru2 = xu*xu + yu*yu + zu*zu
+               ru2 = max(ru2,0.000001d0)
+               rtru = sqrt(rt2*ru2)
                xca = xic - xia
                yca = yic - yia
                zca = zic - zia

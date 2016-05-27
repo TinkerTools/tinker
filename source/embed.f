@@ -2961,6 +2961,7 @@ c
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
       real*8 derivs(3,*)
+      logical unique
 c
 c
 c     zero out the distance van der Waals error function
@@ -2986,7 +2987,8 @@ c
 c
 c     use the method of lights to generate neighbors
 c
-      call lights (vdwmax,n,xsort,ysort,zsort)
+      unique = .true.
+      call lights (vdwmax,n,xsort,ysort,zsort,unique)
 c
 c     now, loop over all atoms computing the interactions
 c

@@ -1,9 +1,9 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ##########################################################
+c     ##  COPYRIGHT (C) 2014 by Chao Lu & Jay William Ponder  ##
+c     ##                  All Rights Reserved                 ##
+c     ##########################################################
 c
 c     #################################################################
 c     ##                                                             ##
@@ -29,7 +29,8 @@ c
       implicit none
       integer i,k,istrtor
       integer ia,ib,ic,id
-      real*8 e,dr,fgrp
+      real*8 e,ebto
+      real*8 dr,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba,rcb,rdc
       real*8 e1,e2,e3
@@ -56,6 +57,17 @@ c
 c     zero out the stretch-torsion energy
 c
       ebt = 0.0d0
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      ebto = ebt
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
+!$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer)
+!$OMP& shared(ebto)
+!$OMP DO reduction(+:ebto) schedule(guided)
 c
 c     calculate the stretch-torsion interaction energy term
 c
@@ -102,22 +114,24 @@ c
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
-            xt = yba*zcb - ycb*zba
-            yt = zba*xcb - zcb*xba
-            zt = xba*ycb - xcb*yba
-            xu = ycb*zdc - ydc*zcb
-            yu = zcb*xdc - zdc*xcb
-            zu = xcb*ydc - xdc*ycb
-            xtu = yt*zu - yu*zt
-            ytu = zt*xu - zu*xt
-            ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
-            rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rba = sqrt(xba*xba + yba*yba + zba*zba)
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               rdc = sqrt(xdc*xdc + ydc*ydc + zdc*zdc)
+            rba = sqrt(xba*xba + yba*yba + zba*zba)
+            rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
+            rdc = sqrt(xdc*xdc + ydc*ydc + zdc*zdc)
+            if (min(rba,rcb,rdc) .ne. 0.0d0) then
+               xt = yba*zcb - ycb*zba
+               yt = zba*xcb - zcb*xba
+               zt = xba*ycb - xcb*yba
+               xu = ycb*zdc - ydc*zcb
+               yu = zcb*xdc - zdc*xcb
+               zu = xcb*ydc - xdc*ycb
+               xtu = yt*zu - yu*zt
+               ytu = zt*xu - zu*xt
+               ztu = xt*yu - xu*yt
+               rt2 = xt*xt + yt*yt + zt*zt
+               rt2 = max(rt2,0.000001d0)
+               ru2 = xu*xu + yu*yu + zu*zu
+               ru2 = max(ru2,0.000001d0)
+               rtru = sqrt(rt2*ru2)
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
@@ -175,9 +189,18 @@ c
 c     increment the total stretch-torsion energy
 c
                e = e1 + e2 + e3
-               ebt = ebt + e
+               ebto = ebto + e
             end if
          end if
       end do
+c
+c     end OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ebt = ebto
       return
       end
