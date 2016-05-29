@@ -521,11 +521,11 @@ c
          if (grdmin .le. 0.0d0) then
             write (iout,360)
   360       format (/,' Enter RMS Gradient Termination Criterion',
-     &                 ' [0.5] :  ',$)
+     &                 ' [0.1] :  ',$)
             read (input,370)  grdmin
   370       format (f20.0)
          end if
-         if (grdmin .le. 0.0d0)  grdmin = 0.5d0
+         if (grdmin .le. 0.0d0)  grdmin = 0.1d0
       end if
 c
 c     setup the potential computation for alternative models

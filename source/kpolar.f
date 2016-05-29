@@ -328,7 +328,7 @@ c
       integer maxlist,maxkeep
       parameter (maxkeep=100)
       parameter (maxlist=1000)
-      integer i,j,k
+      integer i,j,k,m
       integer it,jt
       integer jj,kk
       integer start,stop
@@ -388,6 +388,23 @@ c
       end do
    30 continue
 c
+c     make sure all connected group members are bidirectional
+c
+      do i = 1, n
+         do j = 1, np11(i)
+            k = ip11(j,i)
+            do m = 1, np11(k)
+               if (ip11(m,k) .eq. i)  goto 50
+            end do
+            write (iout,40)  min(i,k),max(i,k)
+   40       format (/,' POLARGRP  --  Check Polarization Groups for',
+     &                 ' Atoms',i9,' and',i9)
+            abort = .true.
+   50       continue
+         end do
+      end do
+      if (abort)  call fatal
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mask(n))
@@ -424,11 +441,11 @@ c
                      if (np11(i) .le. maxp11) then
                         ip11(np11(i),i) = kk
                      else
-                        write (iout,40)
-   40                   format (/,' POLARGRP  --  Too many Atoms',
+                        write (iout,60)
+   60                   format (/,' POLARGRP  --  Too many Atoms',
      &                             ' in Polarization Group')
                         abort = .true.
-                        goto 50
+                        goto 70
                      end if
                      mask(kk) = i
                   end if
@@ -442,7 +459,7 @@ c
          end do
          call sort (np11(i),ip11(1,i))
       end do
-   50 continue
+   70 continue
 c
 c     loop over atoms finding all the 1-2 group relationships
 c
@@ -481,14 +498,14 @@ c
                ip12(j,i) = list(j)
             end do
          else
-            write (iout,60)
-   60       format (/,' POLARGRP  --  Too many Atoms',
+            write (iout,80)
+   80       format (/,' POLARGRP  --  Too many Atoms',
      &                 ' in 1-2 Polarization Group')
             abort = .true.
-            goto 70
+            goto 90
          end if
       end do
-   70 continue
+   90 continue
 c
 c     loop over atoms finding all the 1-3 group relationships
 c
@@ -522,14 +539,14 @@ c
                ip13(j,i) = list(j)
             end do
          else
-            write (iout,80)
-   80       format (/,' POLARGRP  --  Too many Atoms',
+            write (iout,100)
+  100       format (/,' POLARGRP  --  Too many Atoms',
      &                 ' in 1-3 Polarization Group')
             abort = .true.
-            goto 90
+            goto 110
          end if
       end do
-   90 continue
+  110 continue
 c
 c     loop over atoms finding all the 1-4 group relationships
 c
@@ -567,14 +584,14 @@ c
                ip14(j,i) = list(j)
             end do
          else
-            write (iout,100)
-  100       format (/,' POLARGRP  --  Too many Atoms',
+            write (iout,120)
+  120       format (/,' POLARGRP  --  Too many Atoms',
      &                 ' in 1-4 Polarization Group')
             abort = .true.
-            goto 110
+            goto 130
          end if
       end do
-  110 continue
+  130 continue
 c
 c     perform deallocation of some local arrays
 c

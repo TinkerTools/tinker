@@ -228,7 +228,7 @@ c
       clash = .false.
       if (n .le. 10000)  call chkxyz (clash)
 c
-c     make sure that all connectivities are bidirectional
+c     make sure all atom connectivities are bidirectional
 c
       do i = 1, n
          do j = 1, n12(i)
