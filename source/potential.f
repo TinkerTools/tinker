@@ -1820,6 +1820,7 @@ c
       integer, allocatable :: natm(:)
       real*8 xi,yi,zi
       real*8 pave1,pave2
+      real*8 mave1,mave2
       real*8 tave,uave,rmsd
       real*8, allocatable :: patm1(:)
       real*8, allocatable :: patm2(:)
@@ -1958,14 +1959,18 @@ c
       npoint = 0
       pave1 = 0.0d0
       pave2 = 0.0d0
+      mave1 = 0.0d0
+      mave2 = 0.0d0
       tave = 0.0d0
       uave = 0.0d0
       rmsd = 0.0d0
       do j = 1, nconf
          npoint = npoint + npgrid(j)
          do i = 1, npgrid(j)
-            pave1 = pave1 + abs(epot(1,i,j))
-            pave2 = pave2 + abs(epot(2,i,j))
+            pave1 = pave1 + epot(1,i,j)
+            pave2 = pave2 + epot(2,i,j)
+            mave1 = mave1 + abs(epot(1,i,j))
+            mave2 = mave2 + abs(epot(2,i,j))
             tave = tave + epot(1,i,j) - epot(2,i,j)
             uave = uave + abs(epot(1,i,j)-epot(2,i,j))
             rmsd = rmsd + (epot(1,i,j)-epot(2,i,j))**2
@@ -1973,30 +1978,37 @@ c
       end do
       pave1 = pave1 / dble(npoint)
       pave2 = pave2 / dble(npoint)
+      mave1 = mave1 / dble(npoint)
+      mave2 = mave2 / dble(npoint)
       tave = tave / dble(npoint)
       uave = uave / dble(npoint)
       rmsd = sqrt(rmsd/dble(npoint))
       if (dopair) then
-         write (iout,170)  pave1
+         write (iout,170)  pave1,mave1
   170    format (/,' Electrostatic Potential over all Grid Points :',
-     &           //,' Average Magnitude for Potential 1 :',6x,f12.4)
+     &           //,' Average Potential Value for Model 1 :',10x,f12.4,
+     &           /,' Average Potential Magnitude for Model 1 :',
+     &              6x,f12.4)
       else
-         write (iout,180)  pave1
+         write (iout,180)  pave1,mave1
   180    format (/,' Electrostatic Potential over all Grid Points :',
-     &           //,' Average Magnitude for Potential :',8x,f12.4)
+     &           //,' Average Potential Value for Model :',12x,f12.4,
+     &           /,' Average Potential Magnitude for Model :',8x,f12.4)
       end if
       if (dotarget) then
-         write (iout,190)  pave2,tave,uave,rmsd
-  190    format (' Average Magnitude for Target :',11x,f12.4,
-     &           /,' Average Signed Potential Difference :',4x,f12.4,
-     &           /,' Average Unsigned Potential Difference :',2x,f12.4,
-     &           /,' Root Mean Square Potential Difference :',2x,f12.4)
+         write (iout,190)  pave2,mave2,tave,uave,rmsd
+  190    format (' Average Potential Value for Target :',11x,f12.4,
+     &           /,' Average Potential Magnitude for Target :',7x,f12.4,
+     &           /,' Average Signed Potential Difference :',10x,f12.4,
+     &           /,' Average Unsigned Potential Difference :',8x,f12.4,
+     &           /,' Root Mean Square Potential Difference :',8x,f12.4)
       else if (dopair) then
-         write (iout,200)  pave2,tave,uave,rmsd
-  200    format (' Average Magnitude for Potential 2 :',6x,f12.4,
-     &           /,' Average Signed Potential Difference :',4x,f12.4,
-     &           /,' Average Unsigned Potential Difference :',2x,f12.4,
-     &           /,' Root Mean Square Potential Difference :',2x,f12.4)
+         write (iout,200)  pave2,mave2,tave,uave,rmsd
+  200    format (' Average Potential Value for Model 2 :',10x,f12.4,
+     &           /,' Average Potential Magnitude for Model 2 :',6x,f12.4,
+     &           /,' Average Signed Potential Difference :',10x,f12.4,
+     &           /,' Average Unsigned Potential Difference :',8x,f12.4,
+     &           /,' Root Mean Square Potential Difference :',8x,f12.4)
       end if
       return
       end

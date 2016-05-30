@@ -48,6 +48,7 @@ c
 c
 c     zero out the total polarization energy and partitioning
 c
+      nep = 0
       ep = 0.0d0
       do i = 1, n
          aep(i) = 0.0d0
