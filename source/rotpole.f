@@ -91,10 +91,15 @@ c
          a(1,3) = dx / r
          a(2,3) = dy / r
          a(3,3) = dz / r
-         dx = random ()
-         dy = random ()
-         dz = random ()
-         dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
+         dx = 1.0d0
+         dy = 0.0d0
+         dz = 0.0d0
+         dot = a(1,3)
+         if (abs(dot) .gt. 0.866d0) then
+            dx = 0.0d0
+            dy = 1.0d0
+            dot = a(2,3)
+         end if
          dx = dx - dot*a(1,3)
          dy = dy - dot*a(2,3)
          dz = dz - dot*a(3,3)

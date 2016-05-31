@@ -31,7 +31,7 @@ c
       implicit none
       integer i,j
       integer ia,ib,ic,id
-      real*8 du,dv,dw,cosine
+      real*8 du,dv,dw,dot
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -92,8 +92,8 @@ c
          v(2) = 0.0d0
          v(3) = 0.0d0
          vsiz = 1.0d0
-         cosine = (u(1)*v(1) + u(2)*v(2) + u(3)*v(3)) / usiz
-         if (abs(cosine) .gt. 0.866d0) then
+         dot = u(1) / usiz
+         if (abs(dot) .gt. 0.866d0) then
             v(1) = 0.0d0
             v(2) = 1.0d0
          end if
@@ -431,7 +431,7 @@ c
       implicit none
       integer i,j
       integer ia,ib,ic,id
-      real*8 du,dv,dw,cosine
+      real*8 du,dv,dw,dot
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -485,8 +485,8 @@ c
             v(2) = 0.0d0
             v(3) = 0.0d0
             vsiz = 1.0d0
-            cosine = (u(1)*v(1) + u(2)*v(2) + u(3)*v(3)) / usiz
-            if (abs(cosine) .gt. 0.866d0) then
+            dot = u(1) / usiz
+            if (abs(dot) .gt. 0.866d0) then
                v(1) = 0.0d0
                v(2) = 1.0d0
             end if
@@ -721,7 +721,7 @@ c
       implicit none
       integer i,j
       integer ia,ib,ic,id
-      real*8 du,dv,dw,cosine
+      real*8 du,dv,dw,dot
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -784,8 +784,8 @@ c
          v(2) = 0.0d0
          v(3) = 0.0d0
          vsiz = 1.0d0
-         cosine = (u(1)*v(1) + u(2)*v(2) + u(3)*v(3)) / usiz
-         if (abs(cosine) .gt. 0.866d0) then
+         dot = u(1) / usiz
+         if (abs(dot) .gt. 0.866d0) then
             v(1) = 0.0d0
             v(2) = 1.0d0
          end if
@@ -1124,7 +1124,7 @@ c
       implicit none
       integer i,j
       integer ia,ib,ic,id
-      real*8 du,dv,dw,cosine
+      real*8 du,dv,dw,dot
       real*8 usiz,vsiz,wsiz
       real*8 rsiz,ssiz
       real*8 t1siz,t2siz
@@ -1186,8 +1186,8 @@ c
          v(2) = 0.0d0
          v(3) = 0.0d0
          vsiz = 1.0d0
-         cosine = (u(1)*v(1) + u(2)*v(2) + u(3)*v(3)) / usiz
-         if (abs(cosine) .gt. 0.866d0) then
+         dot = u(1) / usiz
+         if (abs(dot) .gt. 0.866d0) then
             v(1) = 0.0d0
             v(2) = 1.0d0
          end if
