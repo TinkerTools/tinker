@@ -590,7 +590,7 @@ c
       if (allocated(thetai2))  deallocate (thetai2)
       if (allocated(thetai3))  deallocate (thetai3)
       if (allocated(qgrid))  deallocate (qgrid)
-c     if (allocated(qfac))  deallocate (qfac)
+      if (allocated(qfac))  deallocate (qfac)
 c
 c     deallocation of global arrays from module polar
 c

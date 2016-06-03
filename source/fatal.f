@@ -26,6 +26,6 @@ c
       write (iout,10)
    10 format (/,' TINKER is Unable to Continue; Terminating',
      &           ' the Current Calculation',/)
-      call final
+c     call final
       stop
       end
