@@ -269,6 +269,9 @@ c
          allocate (xvold(n))
          allocate (yvold(n))
          allocate (zvold(n))
+         do i = 1, n
+            REnvlst(i) = 0
+         end do
       end if
       if (use_clist .or. use_mlist) then
          if (allocated(nelst))  deallocate (nelst)
