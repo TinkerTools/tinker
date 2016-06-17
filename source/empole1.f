@@ -7218,8 +7218,7 @@ c
 !$OMP& qidk,qkdi,qir,qkr,qiqkr,qkqir,qixqk,rxqir,dixr,dkxr,
 !$OMP& dixqkr,dkxqir,rxqkr,qkrxqir,rxqikr,rxqkir,rxqidk,rxqkdi,
 !$OMP& ddsc3,ddsc5,ddsc7,bn,sc,gl,sci,scip,gli,glip,gf,gfi,
-!$OMP& gfr,gfri,gti,gtri,dorl,dorli,REnvlst,REvlst,REmpolecut2,
-!$OMP& REmpoletaper2,use_mpole_switch)
+!$OMP& gfr,gfri,gti,gtri,dorl,dorli,use_mpole_switch)
 !$OMP& firstprivate(mscale,pscale,dscale,uscale)
 !$OMP DO reduction(+:emo,epo,eintrao,demo1,demo2,depo1,depo2,viro)
 !$OMP& schedule(guided)

@@ -1431,7 +1431,8 @@ c
 !$OMP& jvdw,xred,yred,zred,use,REnvlst,REvlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
-!$OMP& cut2,vlambda,scalpha,scexp,mut,c0,c1,c2,c3,c4,c5,molcule)
+!$OMP& cut2,vlambda,scalpha,scexp,mut,c0,c1,c2,c3,c4,c5,molcule,
+!$OMP& REtaper2,REvdwcut,REcut2,res_lam)
 !$OMP& firstprivate(vscale,iv14) shared(evo,devo,viro,eintero)
 !$OMP DO reduction(+:evo,devo,viro,eintero) schedule(guided)
 c
