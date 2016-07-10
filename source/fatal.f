@@ -21,11 +21,15 @@ c
       implicit none
 c
 c
-c     print a final warning message, then quit
+c     print a final warning message, then do final cleanup
 c
       write (iout,10)
    10 format (/,' TINKER is Unable to Continue; Terminating',
      &           ' the Current Calculation',/)
-c     call final
-      stop
+      call final
+c
+c     exit is not standard Fortran, but stop can give errors
+c
+      call exit
+c     stop
       end

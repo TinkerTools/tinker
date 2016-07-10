@@ -338,7 +338,7 @@ c
       write (iout,210)
   210 format (/,' Extrapolation Coefficient Refinement :',
      &        //,4x,'Iter',5x,'C0',5x,'C1',5x,'C2',5x,'C3',5x,
-     &           'C4',5x,'C5',5x,'C6',5x,'C7',3x,'RMS vs Exact'/)
+     &           'C4',5x,'C5',5x,'C6',5x,'C7',5x,'Residual',/)
 c
 c     count number of variables and define the initial simplex
 c
@@ -474,7 +474,8 @@ c
       rexpt = 0.0d0
       do i = 1, n
          do j = 1, 3
-            rexpt = rexpt + (uexpt(j,i)-uexact(j,i))**2
+c           rexpt = rexpt + (uexpt(j,i)-uexact(j,i))**2
+            rexpt = rexpt + (uexpt(j,i)-uexact(j,i))**6
          end do
       end do
       rexpt = sqrt(rexpt/dble(n))
