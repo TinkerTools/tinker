@@ -3015,24 +3015,140 @@ static OpenMM_IntArray* getGroup (int* kgrp, int* igrp, int idx) {
    return group;
 }
 
-static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
+static void setupPositionalRestraints (OpenMM_System* system, FILE* log) {
+   
+   double convert;
+   convert = OpenMM_KJPerKcal / (OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom);
+   double NmPerAng = OpenMM_NmPerAngstrom;
+
+   OpenMM_CustomExternalForce* force =
+      OpenMM_CustomExternalForce_create("k*(max(0.0,sqrt((x-x0)^2+(y-y0)^2+(z-z0)^2)-range))^2");
+
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "k");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "range");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "x0");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "y0");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "z0");
+   
+   for (int i = 0; i < restrn__.npfix; ++i) {
+      OpenMM_DoubleArray* positionalParameters = OpenMM_DoubleArray_create(0);
+      OpenMM_DoubleArray_append (positionalParameters, restrn__.pfix[i*2]
+                                    *convert);
+      OpenMM_DoubleArray_append (positionalParameters, restrn__.pfix[i*2+1]
+                                    *NmPerAng);
+      OpenMM_DoubleArray_append (positionalParameters, restrn__.xpfix[i]
+                                    *NmPerAng);
+      OpenMM_DoubleArray_append (positionalParameters, restrn__.ypfix[i]
+                                    *NmPerAng);
+      OpenMM_DoubleArray_append (positionalParameters, restrn__.zpfix[i]
+                                    *NmPerAng);
+      OpenMM_CustomExternalForce_addParticle (force, restrn__.ipfix[i]-1,
+                                              positionalParameters);
+   }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+}
+
+static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
 
    double convert;
-   convert = OpenMM_KJPerKcal / 0.0174532925 / 0.0174532925;
+   convert = OpenMM_KJPerKcal / (OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom);
+   double NmPerAng = OpenMM_NmPerAngstrom;
 
-   OpenMM_CustomTorsionForce* force = OpenMM_CustomTorsionForce_create ("k*(min(min(abs(theta-theta0),abs(theta-theta0-6.28318530718)),abs(theta-theta0+6.28318530718)))^2");
+   OpenMM_CustomBondForce* force =
+      OpenMM_CustomBondForce_create("k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2");
+
+   OpenMM_CustomBondForce_addPerBondParameter (force, "k");
+   OpenMM_CustomBondForce_addPerBondParameter (force, "distMin");
+   OpenMM_CustomBondForce_addPerBondParameter (force, "distMax");
+
+   for (int i = 0; i < restrn__.ndfix; ++i) {
+      OpenMM_DoubleArray* distanceParameters = OpenMM_DoubleArray_create (0);
+      OpenMM_DoubleArray_append (distanceParameters, restrn__.dfix[i*3]
+                                    *convert);
+      OpenMM_DoubleArray_append (distanceParameters, restrn__.dfix[i*3+1]
+                                    *NmPerAng);
+      OpenMM_DoubleArray_append (distanceParameters, restrn__.dfix[i*3+2]
+                                    *NmPerAng);
+      OpenMM_CustomBondForce_addBond (force, restrn__.idfix[i*2]-1,
+                                      restrn__.idfix[i*2+1]-1,
+                                      distanceParameters);
+   }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+}
+
+static void setupAngleRestraints (OpenMM_System* system, FILE* log) {
+
+   double Radians_Per_Degree;
+   Radians_Per_Degree = 0.0174532925;
+   double convert;
+   convert = OpenMM_KJPerKcal / Radians_Per_Degree / Radians_Per_Degree;
+
+   OpenMM_CustomAngleForce* force =
+      OpenMM_CustomAngleForce_create ("k*(max(max(0.0,thetaMin-theta), max(0.0,theta-thetaMax)))^2");
+
+   OpenMM_CustomAngleForce_addPerAngleParameter (force, "k");
+   OpenMM_CustomAngleForce_addPerAngleParameter (force, "thetaMin");
+   OpenMM_CustomAngleForce_addPerAngleParameter (force, "thetaMax");
+
+   for (int i = 0; i < restrn__.nafix; ++i) {
+      OpenMM_DoubleArray* AngleParameters = OpenMM_DoubleArray_create (0);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2]
+                                    *convert);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2+1]
+                                    *Radians_Per_Degree);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2+2]
+                                    *Radians_Per_Degree);
+      OpenMM_CustomAngleForce_addAngle (force, restrn__.iafix[i*3]-1,
+                                        restrn__.iafix[i*3+1]-1,
+                                        restrn__.iafix[i*3+2]-1,
+                                        AngleParameters);
+   }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+}
+
+static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
+
+   double Radians_Per_Degree;
+   Radians_Per_Degree = 0.0174532925;
+   double convert;
+   convert = OpenMM_KJPerKcal / Radians_Per_Degree / Radians_Per_Degree;
+
+   OpenMM_CustomTorsionForce* force =
+      OpenMM_CustomTorsionForce_create("k*max(\
+      (step(thetaMin-theta)*(min(min(abs(theta-thetaMin),abs(theta-thetaMin-6.28318530718)), abs(theta-thetaMin+6.28318530718)))),\
+      (step(theta-thetaMax)*(min(min(abs(theta-thetaMax),abs(theta-thetaMax-6.28318530718)), abs(theta-thetaMax+6.28318530718))))\
+      )^2");
+
+   // OpenMM_CustomTorsionForce* force = OpenMM_CustomTorsionForce_create ("k*(min(min(abs(theta-theta0),abs(theta-theta0-6.28318530718)),abs(theta-theta0+6.28318530718)))^2");
+
    OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "k");
-   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "theta0");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "thetaMin");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "thetaMax");
 
    for (int i = 0; i < restrn__.ntfix; i++) {
-      OpenMM_DoubleArray* torsionParameters = OpenMM_DoubleArray_create (0);
-      OpenMM_DoubleArray_append (torsionParameters, restrn__.tfix[i*3]*convert);
-      OpenMM_DoubleArray_append (torsionParameters, restrn__.tfix[i*3+1]*0.0174532925);
+      float thetaMin = restrn__.tfix[i*3+1];
+      float thetaMax = restrn__.tfix[i*3+2];
+      if (thetaMin > 180.0f)
+         thetaMin -= 360.0f;
+      else if (thetaMin < -180.0f)
+         thetaMin += 360.0f;
+      if (thetaMax > 180.0f)
+         thetaMax -= 360.0f;
+      else if (thetaMax < -180.0f)
+         thetaMax += 360.0f;
+
+      OpenMM_DoubleArray* lowerTorsionParameters = OpenMM_DoubleArray_create (0);
+      OpenMM_DoubleArray_append (lowerTorsionParameters, restrn__.tfix[i*3]
+                                    *convert);
+      OpenMM_DoubleArray_append (lowerTorsionParameters, thetaMin
+                                    *Radians_Per_Degree);
+      OpenMM_DoubleArray_append (lowerTorsionParameters, thetaMax
+                                    *Radians_Per_Degree);
       OpenMM_CustomTorsionForce_addTorsion (force, restrn__.itfix[i*4]-1,
                                             restrn__.itfix[i*4+1]-1,
                                             restrn__.itfix[i*4+2]-1,
                                             restrn__.itfix[i*4+3]-1,
-                                            torsionParameters);
+                                            lowerTorsionParameters);
    }
    OpenMM_System_addForce (system, (OpenMM_Force *) force);
 }
@@ -3272,6 +3388,9 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
    setupConstraints (omm->system, log);
 
+   setupPositionalRestraints (omm->system, log);
+   setupDistanceRestraints (omm->system, log);
+   setupAngleRestraints (omm->system, log);
    setupTorsionRestraints (omm->system, log);
    setupCentroidRestraints (omm->system, log);
 
@@ -4377,6 +4496,9 @@ int openmm_test_ (void) {
          setupAmoebaGeneralizedKirkwoodForce (system, 1, log);
       }
       if (potent__.use_geom) {
+         setupPositionalRestraints (system, log);
+         setupDistanceRestraints (system, log);
+         setupAngleRestraints (system, log);
          setupTorsionRestraints (system, log);
          setupCentroidRestraints (system, log);
       }
@@ -4502,6 +4624,9 @@ int openmm_test_ (void) {
 
    } else if (potent__.use_geom) {
 
+      setupPositionalRestraints (system, log);
+      setupDistanceRestraints (system, log);
+      setupAngleRestraints (system, log);
       setupTorsionRestraints (system, log);
       setupCentroidRestraints (system, log);
       loadTinkerForce (deriv__.deg, 0, tinkerForce);
