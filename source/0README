@@ -18,8 +18,8 @@
 
          If you are building an OpenMP-capable version of TINKER with
          the Intel Fortran compiler, then it is necessary to uncomment
-         the calls to the Intel-specific extensions "kmp_set_stacksize"
-         and "kmp-set-blocksize" near the top of the file "initial.f".
+         the calls to Intel-specific extensions "kmp_set_stacksize_s"
+         and "kmp_set_blocksize" near the top of the file "initial.f".
 
          In addition, if your system does not support the iargc/getarg
          mechanism for command line arguments, then comment out the
