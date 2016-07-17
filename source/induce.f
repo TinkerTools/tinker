@@ -248,7 +248,7 @@ c
          end if
       end do
 c
-c     get induced dipoles via the ExPT extrapolation method
+c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'EXTRAP') then
          do i = 1, npole
@@ -2450,8 +2450,8 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
-      integer nlocal,maxlocal
-      integer tid,toffset0
+      integer tid,nlocal
+      integer maxlocal
 !$    integer omp_get_thread_num
       integer, allocatable :: toffset(:)
       integer, allocatable :: ilocal(:,:)
@@ -2497,8 +2497,8 @@ c
       aesq2 = 2.0 * aewald * aewald
       aesq2n = 0.0d0
       if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
+      ntpair = 0
       nlocal = 0
-      toffset0 = 0
       maxlocal = int(dble(npole)*dble(maxelst)/dble(nthread))
 c
 c     perform dynamic allocation of some local arrays
@@ -2518,6 +2518,15 @@ c
          uscale(i) = 1.0d0
       end do
 c
+c     initialize local variables for OpenMP calculation
+c
+      do i = 1, npole
+         do j = 1, 3
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+         end do
+      end do
+c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,thole,
@@ -2525,7 +2534,7 @@ c
 !$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,nelst,
 !$OMP& elst,cut2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,tdipdip,
-!$OMP& toffset,toffset0,field,fieldp,fieldt,fieldtp,maxlocal)
+!$OMP& toffset,maxlocal,field,fieldp,fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,nlocal)
 c
 c     perform dynamic allocation of some local arrays
@@ -2534,17 +2543,6 @@ c
          allocate (ilocal(2,maxlocal))
          allocate (dlocal(6,maxlocal))
       end if
-c
-c     initialize local variables for OpenMP calculation
-c
-!$OMP DO collapse(2)
-      do i = 1, npole
-         do j = 1, 3
-            fieldt(j,i) = 0.0d0
-            fieldtp(j,i) = 0.0d0
-         end do
-      end do
-!$OMP END DO
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -2754,26 +2752,17 @@ c
       end do
 !$OMP END DO
 c
-c     transfer the results from local to global arrays
-c
-!$OMP DO
-      do i = 1, npole
-         do j = 1, 3
-            field(j,i) = fieldt(j,i) + field(j,i)
-            fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
-         end do
-      end do
-!$OMP END DO
-c
-c     store terms needed later to compute mutual polarization
+c     find offset into global arrays for the current thread
 c
 !$OMP CRITICAL
       tid = 0
 !$    tid = omp_get_thread_num ()
-      toffset(tid) = toffset0
-      toffset0 = toffset0 + nlocal
-      ntpair = toffset0
+      toffset(tid) = ntpair
+      ntpair = ntpair + nlocal
 !$OMP END CRITICAL
+c
+c     store terms used later to compute mutual polarization
+c
       if (poltyp .ne. 'DIRECT') then
          k = toffset(tid)
          do i = 1, nlocal
@@ -2787,6 +2776,17 @@ c
          deallocate (ilocal)
          deallocate (dlocal)
       end if
+c
+c     add local to global variables for OpenMP calculation
+c
+!$OMP DO
+      do i = 1, npole
+         do j = 1, 3
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
+         end do
+      end do
+!$OMP END DO
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
@@ -3291,25 +3291,23 @@ c
       allocate (fieldt(3,npole))
       allocate (fieldtp(3,npole))
 c
-c     set OpenMP directives for the major loop structure
-c
-!$OMP PARALLEL default(private) shared(npole,uind,uinp,ntpair,tindex,
-!$OMP& tdipdip,field,fieldp,fieldt,fieldtp)
-c
 c     initialize local variables for OpenMP calculation
 c
-!$OMP DO collapse(2)
       do i = 1, npole
          do j = 1, 3
             fieldt(j,i) = 0.0d0
             fieldtp(j,i) = 0.0d0
          end do
       end do
-!$OMP END DO
+c
+c     set OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,uind,uinp,ntpair,tindex,
+!$OMP& tdipdip,field,fieldp,fieldt,fieldtp)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
 c
 c     find the field terms for each pairwise interaction
 c
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
       do m = 1, ntpair
          i = tindex(1,m)
          k = tindex(2,m)
@@ -3349,13 +3347,13 @@ c
       end do
 !$OMP END DO
 c
-c     end OpenMP directives for the major loop structure
+c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do i = 1, npole
          do j = 1, 3
-            field(j,i) = fieldt(j,i) + field(j,i)
-            fieldp(j,i) = fieldtp(j,i) + fieldp(j,i)
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
          end do
       end do
 !$OMP END DO
@@ -3482,7 +3480,7 @@ c
          end if
       end do
 c
-c     get induced dipoles via the ExPT extrapolation method
+c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'EXTRAP') then
          do i = 1, npole
@@ -3913,6 +3911,17 @@ c
       allocate (fieldts(3,npole))
       allocate (fieldtps(3,npole))
 c
+c     initialize local variables for OpenMP calculation
+c
+      do i = 1, npole
+         do j = 1, 3
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+            fieldts(j,i) = 0.0d0
+            fieldtps(j,i) = 0.0d0
+         end do
+      end do
+c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
@@ -3922,27 +3931,10 @@ c
 !$OMP& gkc,field,fieldp,fields,fieldps)
 !$OMP& firstprivate(dscale,pscale)
 !$OMP% shared(fieldt,fieldtp,fieldts,fieldtps)
-c
-c     initialize local variables for OpenMP calculation
-c
-!$OMP DO collapse(2)
-      do i = 1, npole
-         do j = 1, 3
-            fieldt(j,i) = 0.0d0
-            fieldtp(j,i) = 0.0d0
-            fieldts(j,i) = 0.0d0
-            fieldtps(j,i) = 0.0d0
-         end do
-      end do
-!$OMP END DO
-c
-c     find the field terms for each pairwise interaction
-c
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
 !$OMP& schedule(guided)
 c
-c     compute the direct induced dipole moment at each atom, and
-c     another set that also includes RF due to permanent multipoles
+c     find the field terms for each pairwise interaction
 c
       do i = 1, npole
          ii = ipole(i)
@@ -4265,7 +4257,7 @@ c
       end do
 !$OMP END DO
 c
-c     add local copies to global variables for OpenMP calculation
+c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do i = 1, npole
@@ -4403,17 +4395,8 @@ c
       allocate (fieldts(3,npole))
       allocate (fieldtps(3,npole))
 c
-c     set OpenMP directives for the major loop structure
-c
-!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
-!$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
-!$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
-!$OMP& field,fieldp,fields,fieldps)
-!$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
-c
 c     initialize local variables for OpenMP calculation
 c
-!$OMP DO collapse(2)
       do i = 1, npole
          do j = 1, 3
             fieldt(j,i) = 0.0d0
@@ -4422,15 +4405,18 @@ c
             fieldtps(j,i) = 0.0d0
          end do
       end do
-!$OMP END DO
 c
-c     find the field terms for each pairwise interaction
+c     set OpenMP directives for the major loop structure
 c
+!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
+!$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
+!$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
+!$OMP& field,fieldp,fields,fieldps)
+!$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
 !$OMP& schedule(guided)
 c
-c     compute the mutual electrostatic field at each atom,
-c     and another field including RF due to induced dipoles
+c     find the field terms for each pairwise interaction
 c
       do i = 1, npole
          ii = ipole(i)
@@ -4618,7 +4604,7 @@ c
       end do
 !$OMP END DO
 c
-c     add local copies to global variables for OpenMP calculation
+c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do i = 1, npole
@@ -4756,7 +4742,7 @@ c
          end if
       end do
 c
-c     get induced dipoles via the ExPT extrapolation method
+c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'EXTRAP') then
          do i = 1, npole

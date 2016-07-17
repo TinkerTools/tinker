@@ -58,7 +58,7 @@ c
          list(i) = 0
       end do
 c
-c     set defaults for ExPT induced dipole coefficients
+c     set defaults for OPT induced dipole coefficients
 c
       do i = 0, maxxtr
          cxtr(i) = 0.0d0
@@ -88,7 +88,7 @@ c
    20    continue
       end do
 c
-c     get maximum coefficient order for ExPT induced dipoles
+c     get maximum coefficient order for OPT induced dipoles
 c
       cxmax = 0
       do i = 1, maxxtr

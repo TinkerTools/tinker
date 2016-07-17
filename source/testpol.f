@@ -33,13 +33,13 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer next,kpart
+      integer next,kpcg
       integer nvar,iter
       integer miny
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
       real*8 rdirect
-      real*8 rexpt,rpart
+      real*8 ropt,rpcg
       real*8 eps,delta
       real*8 extrap0
       real*8, allocatable :: var(:)
@@ -48,14 +48,14 @@ c
       real*8, allocatable :: rms(:)
       real*8, allocatable :: drms(:)
       real*8, allocatable :: tdirect(:)
-      real*8, allocatable :: texpt(:)
-      real*8, allocatable :: tpart(:)
+      real*8, allocatable :: topt(:)
+      real*8, allocatable :: tpcg(:)
       real*8, allocatable :: ddirect(:,:)
-      real*8, allocatable :: dexpt(:,:)
-      real*8, allocatable :: dpart(:,:)
+      real*8, allocatable :: dopt(:,:)
+      real*8, allocatable :: dpcg(:,:)
       real*8, allocatable :: udirect(:,:)
-      real*8, allocatable :: uexpt(:,:)
-      real*8, allocatable :: upart(:,:)
+      real*8, allocatable :: uopt(:,:)
+      real*8, allocatable :: upcg(:,:)
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull
       character*1 answer
@@ -121,14 +121,14 @@ c
       allocate (rms(0:maxiter))
       allocate (drms(maxiter))
       allocate (tdirect(n))
-      allocate (texpt(n))
-      allocate (tpart(n))
+      allocate (topt(n))
+      allocate (tpcg(n))
       allocate (ddirect(3,n))
-      allocate (dexpt(3,n))
-      allocate (dpart(3,n))
+      allocate (dopt(3,n))
+      allocate (dpcg(3,n))
       allocate (udirect(3,n))
-      allocate (uexpt(3,n))
-      allocate (upart(3,n))
+      allocate (uopt(3,n))
+      allocate (upcg(3,n))
       allocate (ustore(3,n,0:maxiter))
 c
 c     perform dynamic allocation of some global arrays
@@ -164,28 +164,27 @@ c
          end do
       end if
 c
-c     get induced dipoles from ExPT extrapolation method
+c     get induced dipoles from OPT extrapolation method
 c
       poltyp = 'EXTRAP'
       call induce
       do i = 1, n
          do j = 1, 3
-            uexpt(j,i) = debye * uind(j,i)
+            uopt(j,i) = debye * uind(j,i)
          end do
       end do
 c
-c     print the ExPT extrapolation induced dipole moments
+c     print the OPT3 extrapolation induced dipole moments
 c
       if (dofull) then
-         write (iout,60)  cxtr(0),cxtr(1),cxtr(2),cxtr(3)
-   60    format (/,' Extrapolated Induced Dipole Moments :',
-     &              4x,'(',4f7.3,')',
+         write (iout,60)  cxmax
+   60    format (/,' Extrapolated OPT',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i)) then
-               ux = uexpt(1,i)
-               uy = uexpt(2,i)
-               uz = uexpt(3,i)
+               ux = uopt(1,i)
+               uy = uopt(2,i)
+               uz = uopt(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
                write (iout,70)  i,ux,uy,uz,u2
    70          format (i8,4x,4f14.6)
@@ -212,11 +211,11 @@ c
          end do
          drms(k) = sqrt(sum/dble(npolar))
          if (drms(k) .lt. epscut) then
-            kpart = k
+            kpcg = k
             epscut = -epscut
             do i = 1, n
                do j = 1, 3
-                  upart(j,i) = ustore(j,i,k)
+                  upcg(j,i) = ustore(j,i,k)
                end do
             end do
          end if
@@ -231,18 +230,18 @@ c
          end do
       end do
 c
-c     print the partially converged and exact induced dipoles
+c     print the iterative PCG and exact SCF induced dipoles
 c
       if (dofull) then
-         write (iout,90)  epscut,kpart
-   90    format (/,' Partially Converged SCF Induced Dipoles :',
+         write (iout,90)  epscut,kpcg
+   90    format (/,' Iterative PCG Induced Dipole Moments :',
      &              4x,'(',d9.2,' at',i3,' Iter)',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i)) then
-               ux = upart(1,i)
-               uy = upart(2,i)
-               uz = upart(3,i)
+               ux = upcg(1,i)
+               uy = upcg(2,i)
+               uz = upcg(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
                write (iout,100)  i,ux,uy,uz,u2
   100          format (i8,4x,4f14.6)
@@ -266,42 +265,42 @@ c
 c     find differences between approximate and exact dipoles
 c
       rdirect = 0.0d0
-      rexpt = 0.0d0
-      rpart = 0.0d0
+      ropt = 0.0d0
+      rpcg = 0.0d0
       do i = 1, n
          do j = 1, 3
             ddirect(j,i) = udirect(j,i) - uexact(j,i)
-            dexpt(j,i) = uexpt(j,i) - uexact(j,i)
-            dpart(j,i) = upart(j,i) - uexact(j,i)
+            dopt(j,i) = uopt(j,i) - uexact(j,i)
+            dpcg(j,i) = upcg(j,i) - uexact(j,i)
          end do
          tdirect(i) = sqrt(ddirect(1,i)**2+ddirect(2,i)**2
      &                           +ddirect(3,i)**2)
-         texpt(i) = sqrt(dexpt(1,i)**2+dexpt(2,i)**2+dexpt(3,i)**2)
-         tpart(i) = sqrt(dpart(1,i)**2+dpart(2,i)**2+dpart(3,i)**2)
+         topt(i) = sqrt(dopt(1,i)**2+dopt(2,i)**2+dopt(3,i)**2)
+         tpcg(i) = sqrt(dpcg(1,i)**2+dpcg(2,i)**2+dpcg(3,i)**2)
          rdirect = rdirect + tdirect(i)**2
-         rexpt = rexpt + texpt(i)**2
-         rpart = rpart + tpart(i)**2
+         ropt = ropt + topt(i)**2
+         rpcg = rpcg + tpcg(i)**2
       end do
       rdirect = sqrt(rdirect/dble(n))
-      rexpt = sqrt(rexpt/dble(n))
-      rpart = sqrt(rpart/dble(n))
+      ropt = sqrt(ropt/dble(n))
+      rpcg = sqrt(rpcg/dble(n))
 c
 c     print the RMS between approximate and exact dipoles
 c
-      write (iout,130)
+      write (iout,130)  cxmax
   130 format (/,' Approximate vs. Exact Induced Dipoles :',
-     &        //,4x,'Atom',14x,'Direct',13x,'ExPT',10x,'Partial SCF')
+     &        //,4x,'Atom',14x,'Direct',13x,'OPT',i1,15x,'PCG')
       if (dofull) then
          write (iout,140)
   140    format ()
          do i = 1, n
             if (use(i)) then
-               write (iout,150)  i,tdirect(i),texpt(i),tpart(i)
+               write (iout,150)  i,tdirect(i),topt(i),tpcg(i)
   150          format (i8,4x,3f18.10)
             end if
          end do
       end if
-      write (iout,160)  rdirect,rexpt,rpart
+      write (iout,160)  rdirect,ropt,rpcg
   160 format (/,5x,'RMS',4x,3f18.10)
 c
 c     find the RMS of each iteration from the exact dipoles
@@ -319,7 +318,7 @@ c
 c     print the RMS between iterations and versus exact dipoles
 c
       write (iout,170)
-  170 format (/,' Iterative Induced Dipole Convergence :',
+  170 format (/,' Iterative PCG Induced Dipole Convergence :',
      &        //,4x,'Iter',12x,'RMS Change',11x,'RMS vs Exact')
       write (iout,180)  0,rms(0)
   180 format (/,i8,15x,'----',6x,f20.10)
@@ -335,10 +334,10 @@ c
       maxiter = 10000
       eps = 0.033d0
       delta = 0.0001d0
-      write (iout,210)
-  210 format (/,' Extrapolation Coefficient Refinement :',
+      write (iout,210)  cxmax
+  210 format (/,' Extrapolated OPT',i1,' Coefficient Refinement :',
      &        //,4x,'Iter',5x,'C0',5x,'C1',5x,'C2',5x,'C3',5x,
-     &           'C4',5x,'C5',5x,'C6',5x,'C7',5x,'Residual',/)
+     &           'C4',5x,'C5',5x,'C6',5x,'C7',3x,'RMS vs Exact',/)
 c
 c     count number of variables and define the initial simplex
 c
@@ -373,11 +372,11 @@ c     optimize coefficients, then find and print refined values
 c
       call simplex (nvar,p,yval,delta,extrap0,iter)
       iter = iter + nvar + 1
-      rexpt = 1000000.0d0
+      ropt = 1000000.0d0
       do i = 1, nvar+1
-         if (yval(i) .lt. rexpt) then
+         if (yval(i) .lt. ropt) then
             miny = i
-            rexpt = yval(i)
+            ropt = yval(i)
          end if
       end do
       nvar = 0
@@ -387,7 +386,7 @@ c
             cxtr(i) = p(miny,nvar)
          end if
       end do
-      write (iout,220)  iter,(cxtr(i),i=0,maxxtr),rexpt
+      write (iout,220)  iter,(cxtr(i),i=0,maxxtr),ropt
   220 format (i8,1x,8f7.3,f14.10)
 c
 c     perform deallocation of some local arrays
@@ -398,14 +397,14 @@ c
       deallocate (rms)
       deallocate (drms)
       deallocate (tdirect)
-      deallocate (texpt)
-      deallocate (tpart)
+      deallocate (topt)
+      deallocate (tpcg)
       deallocate (ddirect)
-      deallocate (dexpt)
-      deallocate (dpart)
+      deallocate (dopt)
+      deallocate (dpcg)
       deallocate (udirect)
-      deallocate (uexpt)
-      deallocate (upart)
+      deallocate (uopt)
+      deallocate (upcg)
       deallocate (ustore)
 c
 c     perform any final tasks before program exit
@@ -432,9 +431,9 @@ c
       integer i,j
       integer iter,nvar
       real*8 extrap0
-      real*8 rexpt
+      real*8 ropt
       real*8 var(*)
-      real*8, allocatable :: uexpt(:,:)
+      real*8, allocatable :: uopt(:,:)
       logical first
       save first,iter
       data first  / .true. /
@@ -460,36 +459,36 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (uexpt(3,n))
+      allocate (uopt(3,n))
 c
-c     compute RMS error between ExPT and exact dipoles
+c     compute RMS error between OPT and exact SCF dipoles
 c
       poltyp = 'EXTRAP'
       call induce
       do i = 1, n
          do j = 1, 3
-            uexpt(j,i) = debye * uind(j,i)
+            uopt(j,i) = debye * uind(j,i)
          end do
       end do
-      rexpt = 0.0d0
+      ropt = 0.0d0
       do i = 1, n
          do j = 1, 3
-c           rexpt = rexpt + (uexpt(j,i)-uexact(j,i))**2
-            rexpt = rexpt + (uexpt(j,i)-uexact(j,i))**6
+            ropt = ropt + (uopt(j,i)-uexact(j,i))**2
+c           ropt = ropt + (uopt(j,i)-uexact(j,i))**6
          end do
       end do
-      rexpt = sqrt(rexpt/dble(n))
+      ropt = sqrt(ropt/dble(n))
       if (mod(iter,10) .eq. 0) then
-         write (iout,10)  iter,(cxtr(i),i=0,maxxtr),rexpt
+         write (iout,10)  iter,(cxtr(i),i=0,maxxtr),ropt
    10    format (i8,1x,8f7.3,f14.10)
       end if
 c
 c     set the return value equal to the RMS error
 c
-      extrap0 = rexpt
+      extrap0 = ropt
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (uexpt)
+      deallocate (uopt)
       return
       end

@@ -113,22 +113,6 @@ c
       call getxyz
       call mechanic
 c
-c     find temperature at which trajectory was originally run
-c
-      temp1 = -1.0d0
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=10,end=10)  temp1
-   10 continue
-      do while (temp1 .lt. 0.0d0)
-         write (iout,20)
-   20    format (/,' Enter the Trajectory Temperature in Degrees',
-     &              ' K [298] :  ',$)
-         read (input,30,err=40)  temp1
-   30    format (f20.0)
-         if (temp1 .le. 0.0d0)  temp1 = 298.0d0
-   40    continue
-      end do
-c
 c     set beginning and ending frame and the step increment
 c
       start1 = 0
@@ -137,26 +121,42 @@ c
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=50,end=50)  start1
+         read (string,*,err=10,end=10)  start1
          query = .false.
       end if
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=50,end=50)  stop1
+      if (exist)  read (string,*,err=10,end=10)  stop1
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=50,end=50)  step1
-   50 continue
+      if (exist)  read (string,*,err=10,end=10)  step1
+   10 continue
       if (query) then
-         write (iout,60)
-   60    format (/,' Numbers of First & Last File and Step',
+         write (iout,20)
+   20    format (/,' Numbers of First & Last File and Step',
      &              ' Increment :  ',$)
-         read (input,70)  record
-   70    format (a120)
-         read (record,*,err=80,end=80)  start1,stop1,step1
-   80    continue
+         read (input,30)  record
+   30    format (a120)
+         read (record,*,err=40,end=40)  start1,stop1,step1
+   40    continue
       end if
       if (start1 .eq. 0)  start1 = 1
       if (stop1 .eq. 0)  stop1 = maxframe
       if (step1 .eq. 0)  step1 = 1
+c
+c     find temperature at which trajectory A was originally run
+c
+      temp1 = -1.0d0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=50,end=50)  temp1
+   50 continue
+      do while (temp1 .lt. 0.0d0)
+         write (iout,60)
+   60    format (/,' Enter the Trajectory Temperature in Degrees',
+     &              ' K [298] :  ',$)
+         read (input,70,err=80)  temp1
+   70    format (f20.0)
+         if (temp1 .le. 0.0d0)  temp1 = 298.0d0
+   80    continue
+      end do
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -180,22 +180,6 @@ c
       call mechanic
       silent = .true.
 c
-c     find temperature at which trajectory was originally run
-c
-      temp2 = -1.0d0
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=90,end=90)  temp2
-   90 continue
-      do while (temp2 .lt. 0.0d0)
-         write (iout,100)
-  100    format (/,' Enter the Trajectory Temperature in Degrees',
-     &              ' K [298] :  ',$)
-         read (input,110,err=120)  temp2
-  110    format (f20.0)
-         if (temp2 .le. 0.0d0)  temp2 = 298.0d0
-  120    continue
-      end do
-c
 c     set beginning and ending frame and the step increment
 c
       start2 = 0
@@ -204,26 +188,42 @@ c
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=130,end=130)  start2
+         read (string,*,err=90,end=90)  start2
          query = .false.
       end if
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=130,end=130)  stop2
+      if (exist)  read (string,*,err=90,end=90)  stop2
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=130,end=130)  step2
-  130 continue
+      if (exist)  read (string,*,err=90,end=90)  step2
+   90 continue
       if (query) then
-         write (iout,140)
-  140    format (/,' Numbers of First & Last File and Step',
+         write (iout,100)
+  100    format (/,' Numbers of First & Last File and Step',
      &              ' Increment :  ',$)
-         read (input,150)  record
-  150    format (a120)
-         read (record,*,err=160,end=160)  start2,stop2,step2
-  160    continue
+         read (input,110)  record
+  110    format (a120)
+         read (record,*,err=120,end=120)  start2,stop2,step2
+  120    continue
       end if
       if (start2 .eq. 0)  start2 = 1
       if (stop2 .eq. 0)  stop2 = maxframe
       if (step2 .eq. 0)  step2 = 1
+c
+c     find temperature at which trajectory B was originally run
+c
+      temp2 = -1.0d0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=130,end=130)  temp2
+  130 continue
+      do while (temp2 .lt. 0.0d0)
+         write (iout,140)
+  140    format (/,' Enter the Trajectory Temperature in Degrees',
+     &              ' K [298] :  ',$)
+         read (input,150,err=160)  temp2
+  150    format (f20.0)
+         if (temp2 .le. 0.0d0)  temp2 = 298.0d0
+  160    continue
+      end do
 c
 c     perform dynamic allocation of some local arrays
 c

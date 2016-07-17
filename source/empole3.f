@@ -594,7 +594,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f)
+!$OMP PARALLEL default(shared)
 !$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,
 !$OMP& xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,qix,qiy,qiz,
 !$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,qkx,qky,qkz,
@@ -1584,7 +1584,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f)
+!$OMP PARALLEL default(shared)
 !$OMP& private(i,j,k,ii,kk,kkk,e,efull,bfac,alsq2,alsq2n,exp2a,ralpha,
 !$OMP& scalekk,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,
 !$OMP& qix,qiy,qiz,qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,

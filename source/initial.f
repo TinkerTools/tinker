@@ -84,8 +84,8 @@ c
 c     Intel compiler extensions to OpenMP standard, note that
 c     268435456 bytes is 2**28 bytes, or 256 MB
 c
-c!$   call kmp_set_stacksize_s (268435456)
-c!$   call kmp_set_blocktime (0)
+!$    call kmp_set_stacksize_s (268435456)
+!$    call kmp_set_blocktime (0)
 c
 c     values of machine precision constants
 c

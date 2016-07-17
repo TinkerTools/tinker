@@ -65,7 +65,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f) private(i,j,e,fi)
+!$OMP PARALLEL default(shared) private(i,j,e,fi)
 !$OMP DO reduction(+:epo)
 !$OMP& schedule(guided)
 c

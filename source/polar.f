@@ -12,11 +12,11 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     maxxtr    maximum perturbation order for ExPT induced dipoles
+c     maxxtr    maximum perturbation order for OPT induced dipoles
 c
 c     npolar    total number of polarizable sites in the system
-c     cxmax     maximum coefficient order for ExPT dipole extrapolation
-c     cxtr      coefficients for ExPT induced dipole extrapolation
+c     cxmax     maximum coefficient order for OPT dipole extrapolation
+c     cxtr      coefficients for OPT induced dipole extrapolation
 c     polarity  dipole polarizability for each multipole site (Ang**3)
 c     thole     Thole polarizability damping value for each site
 c     pdamp     value of polarizability scale factor for each site
@@ -28,10 +28,10 @@ c     uind      mutual induced dipole components at each multipole site
 c     uinp      mutual induced dipoles in field used for energy terms
 c     uinds     mutual GK or PB induced dipoles at each multipole site
 c     uinps     mutual induced dipoles in field used for GK or PB energy
-c     uxtr      ExPT induced dipole components at each multipole site
-c     uxtrp     ExPT induced dipoles in field used for energy terms
-c     uxtrs     ExPT GK or PB induced dipoles at each multipole site
-c     uxtrps    ExPT induced dipoles in field used for GK or PB energy
+c     uxtr      OPT induced dipole components at each multipole site
+c     uxtrp     OPT induced dipoles in field used for energy terms
+c     uxtrs     OPT GK or PB induced dipoles at each multipole site
+c     uxtrps    OPT induced dipoles in field used for GK or PB energy
 c     uexact    exact SCF induced dipoles to full numerical precision
 c     douind    flag to allow induced dipoles at each atomic site
 c

@@ -702,7 +702,7 @@ c
                end if
 c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     Andy's original ExPT method stuff below here
+c     Andy's original OPT method stuff below here
 c
 c              if (poltyp .eq. 'EXTRAP') then
 c
@@ -1183,7 +1183,7 @@ c
          end do
       end do
 c
-c     get polarization energy via the ExPT extrapolation method
+c     get polarization energy via the OPT extrapolation method
 c
       if (poltyp .eq. 'EXTRAP') then
          ep = 0.0d0
@@ -2934,7 +2934,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f)
+!$OMP PARALLEL default(shared)
 !$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,ei,
 !$OMP& damp,expdamp,pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,
 !$OMP& temp7,dsc3,dsc5,dsc7,psc3,psc5,psc7,gfd,xr,yr,zr,xix,yix,zix,
@@ -3622,7 +3622,7 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
+c     add local to global variables for OpenMP calculation
 c
       em = em + emo
       ep = ep + epo
@@ -3787,7 +3787,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f)
+!$OMP PARALLEL default(shared)
 !$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,
 !$OMP& e,xr,yr,zr,xix,yix,zix,xiy,yiy,ziy,xiz,yiz,ziz,xkx,ykx,zkx,
 !$OMP& xky,yky,zky,xkz,ykz,zkz,r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
@@ -6569,7 +6569,7 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) firstprivate(f)
+!$OMP PARALLEL default(shared)
 !$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,damp,expdamp,
 !$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
 !$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,usc3,usc5,alsq2,alsq2n,
