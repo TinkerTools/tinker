@@ -2534,7 +2534,7 @@ c
 !$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,nelst,
 !$OMP& elst,cut2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,tdipdip,
-!$OMP& toffset,maxlocal,field,fieldp,fieldt,fieldtp)
+!$OMP& toffset,maxlocal,field,fieldp,fieldt,fieldtp,maxelst,nthread)
 !$OMP& firstprivate(pscale,dscale,uscale,nlocal)
 c
 c     perform dynamic allocation of some local arrays
@@ -2546,7 +2546,7 @@ c
 c
 c     compute the real space portion of the Ewald summation
 c
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(static, 10)
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)

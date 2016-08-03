@@ -256,10 +256,15 @@ c
                   e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
      &                   + rr7*gl(3) + rr9*gl(4)
                   if (use_group)  e = e * fgrp
-                  nem = nem + 1
-                  em = em + e
-                  aem(ii) = aem(ii) + 0.5d0*e
-                  aem(kk) = aem(kk) + 0.5d0*e
+c
+c     increment the overall van der Waals energy components
+c
+                  if (e .ne. 0.0d0) then
+                     nem = nem + 1
+                     em = em + e
+                     aem(ii) = aem(ii) + 0.5d0*e
+                     aem(kk) = aem(kk) + 0.5d0*e
+                  end if
 c
 c     increment the total intermolecular energy
 c
@@ -270,7 +275,8 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.e.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -423,10 +429,15 @@ c
                      if (use_polymer .and. r2.le.polycut2)
      &                  e = e * mscale(kk)
                      if (use_group)  e = e * fgrp
-                     nem = nem + 1
-                     em = em + e
-                     aem(ii) = aem(ii) + 0.5d0*e
-                     aem(kk) = aem(kk) + 0.5d0*e
+c
+c     increment the overall van der Waals energy components
+c
+                     if (e .ne. 0.0d0) then
+                        nem = nem + 1
+                        em = em + e
+                        aem(ii) = aem(ii) + 0.5d0*e
+                        aem(kk) = aem(kk) + 0.5d0*e
+                     end if
 c
 c     increment the total intermolecular energy
 c
@@ -435,7 +446,8 @@ c
 c     print a message if the energy of this interaction is large
 c
                      huge = (abs(e) .gt. 100.0d0)
-                     if (debug .or. (verbose.and.huge)) then
+                     if ((debug.and.e.ne.0.0d0)
+     &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
                            write (iout,40)
@@ -716,10 +728,15 @@ c
                   e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
      &                   + rr7*gl(3) + rr9*gl(4)
                   if (use_group)  e = e * fgrp
-                  nemo = nemo + 1
-                  emo = emo + e
-                  aemo(ii) = aemo(ii) + 0.5d0*e
-                  aemo(kk) = aemo(kk) + 0.5d0*e
+c
+c     increment the overall van der Waals energy components
+c
+                  if (e .ne. 0.0d0) then
+                     nemo = nemo + 1
+                     emo = emo + e
+                     aemo(ii) = aemo(ii) + 0.5d0*e
+                     aemo(kk) = aemo(kk) + 0.5d0*e
+                  end if
 c
 c     increment the total intermolecular energy
 c
@@ -1125,10 +1142,15 @@ c     compute the energy contribution for this interaction
 c
                e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
      &                + rr7*gl(3) + rr9*gl(4)
-               nem = nem + 1
-               em = em + e
-               aem(ii) = aem(ii) + 0.5d0*e
-               aem(kk) = aem(kk) + 0.5d0*e
+c
+c     increment the overall van der Waals energy components
+c
+               if (e .ne. 0.0d0) then
+                  nem = nem + 1
+                  em = em + e
+                  aem(ii) = aem(ii) + 0.5d0*e
+                  aem(kk) = aem(kk) + 0.5d0*e
+               end if
 c
 c     increment the total intramolecular energy
 c
@@ -1139,7 +1161,8 @@ c
 c     print a message if the energy of this interaction is large
 c
                huge = (abs(efull) .gt. 100.0d0)
-               if (debug .or. (verbose.and.huge)) then
+               if ((debug.and.e.ne.0.0d0)
+     &               .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,20)
@@ -1302,16 +1325,22 @@ c
                   if (use_polymer .and. r2.le.polycut2)
      &               e = e - efull*(1.0d0-mscale(kk))
                   if (ii .eq. kk)  e = 0.5d0 * e
-                  nem = nem + 1
-                  em = em + e
-                  aem(ii) = aem(ii) + 0.5d0*e
-                  aem(kk) = aem(kk) + 0.5d0*e
+c
+c     increment the overall van der Waals energy components
+c
+                  if (e .ne. 0.0d0) then
+                     nem = nem + 1
+                     em = em + e
+                     aem(ii) = aem(ii) + 0.5d0*e
+                     aem(kk) = aem(kk) + 0.5d0*e
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
                   efull = efull * mscale(kk)
                   huge = (abs(efull) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.e.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,40)
@@ -1716,10 +1745,15 @@ c     compute the energy contributions for this interaction
 c
                e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
      &                + rr7*gl(3) + rr9*gl(4)
-               nemo = nemo + 1
-               emo = emo + e
-               aemo(ii) = aemo(ii) + 0.5d0*e
-               aemo(kk) = aemo(kk) + 0.5d0*e
+c
+c     increment the overall van der Waals energy components
+c
+               if (e .ne. 0.0d0) then
+                  nemo = nemo + 1
+                  emo = emo + e
+                  aemo(ii) = aemo(ii) + 0.5d0*e
+                  aemo(kk) = aemo(kk) + 0.5d0*e
+               end if
 c
 c     increment the total intramolecular energy
 c

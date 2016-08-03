@@ -5,40 +5,6 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine pressure2  --  barostat applied at half step  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "pressure2" applies a box size and velocity correction at
-c     the half time step as needed for the Monte Carlo barostat
-c
-c
-      subroutine pressure2 (epot,temp)
-      use sizes
-      use bath
-      use bound
-      implicit none
-      real*8 epot,temp
-c
-c
-c     only necessary if periodic boundaries are in use
-c
-      if (.not. use_bounds)  return
-c
-c     use the Monte Carlo barostat method to change box size
-c
-      if (isobaric) then
-         if (barostat .eq. 'MONTECARLO') then
-            call pmonte (epot,temp)
-         end if
-      end if
-      return
-      end
-c
-c
 c     ##############################################################
 c     ##                                                          ##
 c     ##  subroutine pressure  --  barostat applied at full step  ##
@@ -84,12 +50,44 @@ c     set isotropic pressure to the average of tensor diagonal
 c
       pres = (stress(1,1)+stress(2,2)+stress(3,3)) / 3.0d0
 c
-c     use the Berendsen box size scaling barostat method
+c     use the desired barostat to maintain constant pressure
 c
       if (isobaric) then
-         if (barostat .eq. 'BERENDSEN') then
-            call pscale (dt,pres,stress)
-         end if
+         if (barostat .eq. 'BERENDSEN')  call pscale (dt,pres,stress)
+c        if (barostat .eq. 'MONTECARLO')  call pmonte (epot,temp)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine pressure2  --  barostat applied at half step  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "pressure2" applies a box size and velocity correction at
+c     the half time step as needed for the Monte Carlo barostat
+c
+c
+      subroutine pressure2 (epot,temp)
+      use sizes
+      use bath
+      use bound
+      implicit none
+      real*8 epot,temp
+c
+c
+c     only necessary if periodic boundaries are in use
+c
+      if (.not. use_bounds)  return
+c
+c     use the desired barostat to maintain constant pressure
+c
+      if (isobaric) then
+c        if (barostat .eq. 'BERENDSEN')  call pscale (dt,pres,stress)
+         if (barostat .eq. 'MONTECARLO')  call pmonte (epot,temp)
       end if
       return
       end
@@ -108,7 +106,7 @@ c
 c     literature references:
 c
 c     D. Frenkel and B. Smit, "Understanding Molecular Simulation,
-c     2nd Edition", Academic Press, San Diego, CA, 2002; Section 5.4
+c     2nd Edition", Academic Press, San Diego, CA, 2002; Section 5.4.2
 c
 c     original version written by Alan Grossfield, January 2004;
 c     anisotropic modification implemented by Lee-Ping Wang, Stanford
@@ -133,15 +131,14 @@ c
       integer start,stop
       real*8 epot,temp,term
       real*8 energy,random
+      real*8 kt,expterm
       real*8 third,weigh
       real*8 step,scale
       real*8 eold,rnd6
       real*8 xcm,ycm,zcm
       real*8 vxcm,vycm,vzcm
-      real*8 volold,vfrac
-      real*8 cosine,diff
+      real*8 volold,cosine
       real*8 dpot,dpv,dkin
-      real*8 kt,expterm
       real*8 xmove,ymove,zmove
       real*8 vxmove,vymove,vzmove
       real*8 xboxold,yboxold,zboxold
@@ -153,18 +150,33 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: vold(:,:)
+      logical dotrial
+      logical isotropic
 c
+c
+c     decide whether to attempt a box size change at this step
+c
+      dotrial = .false.
+      if (random() .lt. 1.0d0/dble(voltrial))  dotrial = .true.
+c
+c     set constants and decide on type of trial box size change
+c
+      if (dotrial) then
+         third = 1.0d0 / 3.0d0
+         kt = gasconst * temp
+         if (isothermal)  kt = gasconst * kelvin
+         isotropic = .true.
+         if (anisotrop .and. random().gt.0.5d0)  isotropic = .false.
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (xold(n))
-      allocate (yold(n))
-      allocate (zold(n))
-      allocate (vold(3,n))
+         allocate (xold(n))
+         allocate (yold(n))
+         allocate (zold(n))
+         allocate (vold(3,n))
 c
 c     save the system state prior to trial box size change
 c
-      if (random() .lt. 1.0d0/dble(voltrial)) then
          xboxold = xbox
          yboxold = ybox
          zboxold = zbox
@@ -173,19 +185,26 @@ c
          gammaold = gamma
          volold = volbox
          eold = epot
-         do i = 1, n
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            vold(1,i) = v(1,i)
-            vold(2,i) = v(2,i)
-            vold(3,i) = v(3,i)
-         end do
-         third = 1.0d0 / 3.0d0
+         if (integrate .eq. 'RIGIDBODY') then
+            do i = 1, n
+               xold(i) = x(i)
+               yold(i) = y(i)
+               zold(i) = z(i)
+            end do
+         else
+            do i = 1, n
+               xold(i) = x(i)
+               yold(i) = y(i)
+               zold(i) = z(i)
+               vold(1,i) = v(1,i)
+               vold(2,i) = v(2,i)
+               vold(3,i) = v(3,i)
+            end do
+         end if
 c
 c     for the isotropic case, change the lattice lengths uniformly
 c
-         if (.not.anisotrop .or. random().lt.0.5d0) then
+         if (isotropic) then
             step = volmove * (2.0d0*random()-1.0d0)
             volbox = volbox + step
             scale = (volbox/volold)**third
@@ -194,14 +213,11 @@ c
             zbox = zbox * scale
             call lattice
             if (integrate .eq. 'RIGIDBODY') then
-               diff = scale - 1.0d0
+               scale = scale - 1.0d0
                do i = 1, ngrp
                   xcm = 0.0d0
                   ycm = 0.0d0
                   zcm = 0.0d0
-                  vxcm = 0.0d0
-                  vycm = 0.0d0
-                  vzcm = 0.0d0
                   start = igrp(1,i)
                   stop = igrp(2,i)
                   do j = start, stop
@@ -210,28 +226,19 @@ c
                      xcm = xcm + x(k)*weigh
                      ycm = ycm + y(k)*weigh
                      zcm = zcm + z(k)*weigh
-                     vxcm = vxcm + v(1,k)*weigh
-                     vycm = vycm + v(2,k)*weigh
-                     vzcm = vzcm + v(3,k)*weigh
                   end do
-                  xmove = diff * xcm/grpmass(i)
-                  ymove = diff * ycm/grpmass(i)
-                  zmove = diff * zcm/grpmass(i)
-                  vxmove = diff * vxcm/grpmass(i)
-                  vymove = diff * vycm/grpmass(i)
-                  vzmove = diff * vzcm/grpmass(i)
+                  xmove = scale * xcm/grpmass(i)
+                  ymove = scale * ycm/grpmass(i)
+                  zmove = scale * zcm/grpmass(i)
                   do j = start, stop
                      k = kgrp(j)
                      x(k) = x(k) + xmove
                      y(k) = y(k) + ymove
                      z(k) = z(k) + zmove
-                     v(1,k) = v(1,k) - vxmove
-                     v(2,k) = v(2,k) - vymove
-                     v(3,k) = v(3,k) - vzmove
                   end do
                end do
             else if (volscale .eq. 'MOLECULAR') then
-               diff = scale - 1.0d0
+               scale = scale - 1.0d0
                do i = 1, nmol
                   xcm = 0.0d0
                   ycm = 0.0d0
@@ -251,12 +258,12 @@ c
                      vycm = vycm + v(2,k)*weigh
                      vzcm = vzcm + v(3,k)*weigh
                   end do
-                  xmove = diff * xcm/molmass(i)
-                  ymove = diff * ycm/molmass(i)
-                  zmove = diff * zcm/molmass(i)
-                  vxmove = diff * vxcm/molmass(i)
-                  vymove = diff * vycm/molmass(i)
-                  vzmove = diff * vzcm/molmass(i)
+                  xmove = scale * xcm/molmass(i)
+                  ymove = scale * ycm/molmass(i)
+                  zmove = scale * zcm/molmass(i)
+                  vxmove = scale * vxcm/molmass(i)
+                  vymove = scale * vycm/molmass(i)
+                  vzmove = scale * vzcm/molmass(i)
                   do j = start, stop
                      k = kmol(j)
                      if (use(k)) then
@@ -359,8 +366,7 @@ c
 c     find the new box dimensions and other lattice values
 c
             call lattice
-            vfrac = volold / volbox
-            scale = vfrac**third
+            scale = (volbox/volold)**third
             xbox = xbox * scale
             ybox = ybox * scale
             zbox = zbox * scale
@@ -376,9 +382,6 @@ c
                   xcm = 0.0d0
                   ycm = 0.0d0
                   zcm = 0.0d0
-                  vxcm = 0.0d0
-                  vycm = 0.0d0
-                  vzcm = 0.0d0
                   start = igrp(1,i)
                   stop = igrp(2,i)
                   do j = start, stop
@@ -387,36 +390,21 @@ c
                      xcm = xcm + x(k)*weigh
                      ycm = ycm + y(k)*weigh
                      zcm = zcm + z(k)*weigh
-                     vxcm = vxcm + v(1,k)*weigh
-                     vycm = vycm + v(2,k)*weigh
-                     vzcm = vzcm + v(3,k)*weigh
                   end do
                   xcm = xcm / grpmass(i)
                   ycm = ycm / grpmass(i)
                   zcm = zcm / grpmass(i)
-                  vxcm = vxcm / grpmass(i)
-                  vycm = vycm / grpmass(i)
-                  vzcm = vzcm / grpmass(i)
                   xmove = xcm*ascale(1,1) + ycm*ascale(1,2)
      &                       + zcm*ascale(1,3)
                   ymove = xcm*ascale(2,1) + ycm*ascale(2,2)
      &                       + zcm*ascale(2,3)
                   zmove = xcm*ascale(3,1) + ycm*ascale(3,2)
      &                       + zcm*ascale(3,3)
-                  vxmove = vxcm*ascale(1,1) + vycm*ascale(1,2)
-     &                        + vzcm*ascale(1,3)
-                  vymove = vxcm*ascale(2,1) + vycm*ascale(2,2)
-     &                        + vzcm*ascale(2,3)
-                  vzmove = vxcm*ascale(3,1) + vycm*ascale(3,2)
-     &                        + vzcm*ascale(3,3)
                   do j = start, stop
                      k = kgrp(j)
                      x(k) = x(k) + xmove
                      y(k) = y(k) + ymove
                      z(k) = z(k) + zmove
-                     v(1,k) = v(1,k) - vxmove
-                     v(2,k) = v(2,k) - vymove
-                     v(3,k) = v(3,k) - vzmove
                   end do
                end do
             else if (volscale .eq. 'MOLECULAR') then
@@ -492,7 +480,7 @@ c
             end if
          end if
 c
-c     find the potential and PV work changes for the trial move
+c     get the potential energy and PV work changes for trial move
 c
          epot = energy ()
          dpot = epot - eold
@@ -500,11 +488,6 @@ c
 c
 c     estimate the kinetic energy change as an ideal gas term
 c
-         if (isothermal) then
-            kt = gasconst * kelvin
-         else
-            kt = gasconst * temp
-         end if
          if (integrate .eq. 'RIGIDBODY') then
             dkin = dble(ngrp) * kt * log(volold/volbox)
          else if (volscale .eq. 'MOLECULAR') then
@@ -513,57 +496,58 @@ c
             dkin = dble(nuse) * kt * log(volold/volbox)
          end if
 c
-c     set the actual kinetic energy change based on velocities
+c     compute the kinetic energy change from the actual velocities;
+c     scale the kinetic energy change to match virial pressure
 c
-         dkin = 0.0d0
-         do i = 1, n
-            if (use(i)) then
-               term = 0.5d0 * mass(i) / convert
-               do j = 1, 3
-                  dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
-               end do
-            end if
-         end do
-c
-c     apply empirical scaling for small boxes and reset velocities
-c
-c        dkin = 0.95d0 * dkin
+c        dkin = 0.0d0
 c        do i = 1, n
-c           v(1,i) = vold(1,i)
-c           v(2,i) = vold(2,i)
-c           v(3,i) = vold(3,i)
+c           if (use(i)) then
+c              term = 0.5d0 * mass(i) / convert
+c              do j = 1, 3
+c                 dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
+c              end do
+c           end if
 c        end do
+c        dkin = 0.907d0 * dkin
 c
-c     acceptance ratio from energy change, PV and ideal gas terms
+c     acceptance ratio from Epot change, Ekin change and PV work
 c
          term = -(dpot+dpv+dkin) / kt
          expterm = exp(term)
 c
-c     reject the step, and restore values prior to box size step
+c     reject the step, and restore values prior to trial change
 c
          if (random() .gt. expterm) then
+            epot = eold
             xbox = xboxold
             ybox = yboxold
             zbox = zboxold
             call lattice
-            epot = eold
-            do i = 1, n
-               x(i) = xold(i)
-               y(i) = yold(i)
-               z(i) = zold(i)
-               v(1,i) = vold(1,i)
-               v(2,i) = vold(2,i)
-               v(3,i) = vold(3,i)
-            end do
+            if (integrate .eq. 'RIGIDBODY') then
+               do i = 1, n
+                  x(i) = xold(i)
+                  y(i) = yold(i)
+                  z(i) = zold(i)
+               end do
+            else
+               do i = 1, n
+                  x(i) = xold(i)
+                  y(i) = yold(i)
+                  z(i) = zold(i)
+                  v(1,i) = vold(1,i)
+                  v(2,i) = vold(2,i)
+                  v(3,i) = vold(3,i)
+               end do
+            end if
          end if
-      end if
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xold)
-      deallocate (yold)
-      deallocate (zold)
-      deallocate (vold)
+         deallocate (xold)
+         deallocate (yold)
+         deallocate (zold)
+         deallocate (vold)
+      end if
       return
       end
 c
@@ -622,7 +606,6 @@ c
 c     find the isotropic scale factor for constant pressure
 c
       if (.not. anisotrop) then
-         scale = 1.0d0
          third = 1.0d0 / 3.0d0
          scale = (1.0d0 + (dt*compress/taupres)*(pres-atmsph))**third
 c
@@ -815,7 +798,7 @@ c
       integer i
       real*8 energy,third
       real*8 delta,step,scale
-      real*8 vold,xboxold
+      real*8 volold,xboxold
       real*8 yboxold,zboxold
       real*8 epos,eneg
       real*8 dedv_vir,dedv_fd
@@ -842,7 +825,7 @@ c
       xboxold = xbox
       yboxold = ybox
       zboxold = zbox
-      vold = volbox
+      volold = volbox
       do i = 1, n
          xold(i) = x(i)
          yold(i) = y(i)
@@ -851,9 +834,9 @@ c
 c
 c     get scale factor to reflect a negative volume change
 c
-      volbox = vold - step
+      volbox = volold - step
       third = 1.0d0 / 3.0d0
-      scale = (volbox/vold)**third
+      scale = (volbox/volold)**third
 c
 c     set new box dimensions and coordinate values
 c
@@ -873,9 +856,9 @@ c
 c
 c     get scale factor to reflect a positive volume change
 c
-      volbox = vold + step
+      volbox = volold + step
       third = 1.0d0 / 3.0d0
-      scale = (volbox/vold)**third
+      scale = (volbox/volold)**third
 c
 c     set new box dimensions and coordinate values
 c
@@ -911,7 +894,7 @@ c
       deallocate (yold)
       deallocate (zold)
 c
-c     get virial and finite difference values of dE/dV
+c     get virial-based and finite difference values of dE/dV
 c
       dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
       dedv_fd = (epos-eneg) / (2.0d0*delta*volbox)
