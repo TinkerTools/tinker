@@ -39,7 +39,7 @@ c
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
       real*8 rdirect
-      real*8 ropt,rpcg
+      real*8 rpcg,ropt
       real*8 eps,delta
       real*8 extrap0
       real*8, allocatable :: var(:)
@@ -48,14 +48,14 @@ c
       real*8, allocatable :: rms(:)
       real*8, allocatable :: drms(:)
       real*8, allocatable :: tdirect(:)
-      real*8, allocatable :: topt(:)
       real*8, allocatable :: tpcg(:)
+      real*8, allocatable :: topt(:)
       real*8, allocatable :: ddirect(:,:)
-      real*8, allocatable :: dopt(:,:)
       real*8, allocatable :: dpcg(:,:)
+      real*8, allocatable :: dopt(:,:)
       real*8, allocatable :: udirect(:,:)
-      real*8, allocatable :: uopt(:,:)
       real*8, allocatable :: upcg(:,:)
+      real*8, allocatable :: uopt(:,:)
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull
       character*1 answer
@@ -121,14 +121,14 @@ c
       allocate (rms(0:maxiter))
       allocate (drms(maxiter))
       allocate (tdirect(n))
-      allocate (topt(n))
       allocate (tpcg(n))
+      allocate (topt(n))
       allocate (ddirect(3,n))
-      allocate (dopt(3,n))
       allocate (dpcg(3,n))
+      allocate (dopt(3,n))
       allocate (udirect(3,n))
-      allocate (uopt(3,n))
       allocate (upcg(3,n))
+      allocate (uopt(3,n))
       allocate (ustore(3,n,0:maxiter))
 c
 c     perform dynamic allocation of some global arrays
@@ -164,35 +164,7 @@ c
          end do
       end if
 c
-c     get induced dipoles from OPT extrapolation method
-c
-      poltyp = 'EXTRAP'
-      call induce
-      do i = 1, n
-         do j = 1, 3
-            uopt(j,i) = debye * uind(j,i)
-         end do
-      end do
-c
-c     print the OPT3 extrapolation induced dipole moments
-c
-      if (dofull) then
-         write (iout,60)  cxmax
-   60    format (/,' Extrapolated OPT',i1,' Induced Dipole Moments :',
-     &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
-         do i = 1, n
-            if (use(i)) then
-               ux = uopt(1,i)
-               uy = uopt(2,i)
-               uz = uopt(3,i)
-               u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,70)  i,ux,uy,uz,u2
-   70          format (i8,4x,4f14.6)
-            end if
-         end do
-      end if
-c
-c     compute induced dipoles for increasing iteration counts
+c     find PCG induced dipoles for increasing iteration counts
 c
       poltyp = 'MUTUAL'
       do k = 1, maxiter
@@ -219,9 +191,9 @@ c
                end do
             end do
          end if
-         if (drms(k) .lt. 0.5d0*poleps)  goto 80
+         if (drms(k) .lt. 0.5d0*poleps)  goto 60
       end do
-   80 continue
+   60 continue
       maxiter = politer
       epscut = -epscut
       do i = 1, n
@@ -233,8 +205,8 @@ c
 c     print the iterative PCG and exact SCF induced dipoles
 c
       if (dofull) then
-         write (iout,90)  epscut,kpcg
-   90    format (/,' Iterative PCG Induced Dipole Moments :',
+         write (iout,70)  epscut,kpcg
+   70    format (/,' Iterative PCG Induced Dipole Moments :',
      &              4x,'(',d9.2,' at',i3,' Iter)',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
@@ -243,18 +215,46 @@ c
                uy = upcg(2,i)
                uz = upcg(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,100)  i,ux,uy,uz,u2
-  100          format (i8,4x,4f14.6)
+               write (iout,80)  i,ux,uy,uz,u2
+   80          format (i8,4x,4f14.6)
             end if
          end do
-         write (iout,110)
-  110    format (/,' Exact SCF Induced Dipole Moments :',
+         write (iout,90)
+   90    format (/,' Exact SCF Induced Dipole Moments :',
      &           //,4x,'Atom',14x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i)) then
                ux = uexact(1,i)
                uy = uexact(2,i)
                uz = uexact(3,i)
+               u2 = sqrt(ux*ux+uy*uy+uz*uz)
+               write (iout,100)  i,ux,uy,uz,u2
+  100          format (i8,4x,4f14.6)
+            end if
+         end do
+      end if
+c
+c     get induced dipoles from OPT extrapolation method
+c
+      poltyp = 'EXTRAP'
+      call induce
+      do i = 1, n
+         do j = 1, 3
+            uopt(j,i) = debye * uind(j,i)
+         end do
+      end do
+c
+c     print the OPT extrapolation induced dipole moments
+c
+      if (dofull) then
+         write (iout,110)  cxmax
+  110    format (/,' Extrapolated OPT',i1,' Induced Dipole Moments :',
+     &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
+         do i = 1, n
+            if (use(i)) then
+               ux = uopt(1,i)
+               uy = uopt(2,i)
+               uz = uopt(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
                write (iout,120)  i,ux,uy,uz,u2
   120          format (i8,4x,4f14.6)
@@ -265,42 +265,42 @@ c
 c     find differences between approximate and exact dipoles
 c
       rdirect = 0.0d0
-      ropt = 0.0d0
       rpcg = 0.0d0
+      ropt = 0.0d0
       do i = 1, n
          do j = 1, 3
             ddirect(j,i) = udirect(j,i) - uexact(j,i)
-            dopt(j,i) = uopt(j,i) - uexact(j,i)
             dpcg(j,i) = upcg(j,i) - uexact(j,i)
+            dopt(j,i) = uopt(j,i) - uexact(j,i)
          end do
          tdirect(i) = sqrt(ddirect(1,i)**2+ddirect(2,i)**2
      &                           +ddirect(3,i)**2)
-         topt(i) = sqrt(dopt(1,i)**2+dopt(2,i)**2+dopt(3,i)**2)
          tpcg(i) = sqrt(dpcg(1,i)**2+dpcg(2,i)**2+dpcg(3,i)**2)
+         topt(i) = sqrt(dopt(1,i)**2+dopt(2,i)**2+dopt(3,i)**2)
          rdirect = rdirect + tdirect(i)**2
-         ropt = ropt + topt(i)**2
          rpcg = rpcg + tpcg(i)**2
+         ropt = ropt + topt(i)**2
       end do
       rdirect = sqrt(rdirect/dble(n))
-      ropt = sqrt(ropt/dble(n))
       rpcg = sqrt(rpcg/dble(n))
+      ropt = sqrt(ropt/dble(n))
 c
 c     print the RMS between approximate and exact dipoles
 c
       write (iout,130)  cxmax
   130 format (/,' Approximate vs. Exact Induced Dipoles :',
-     &        //,4x,'Atom',14x,'Direct',13x,'OPT',i1,15x,'PCG')
+     &        //,4x,'Atom',14x,'Direct',14x,'PCG',14x,'OPT',i1)
       if (dofull) then
          write (iout,140)
   140    format ()
          do i = 1, n
             if (use(i)) then
-               write (iout,150)  i,tdirect(i),topt(i),tpcg(i)
+               write (iout,150)  i,tdirect(i),tpcg(i),topt(i)
   150          format (i8,4x,3f18.10)
             end if
          end do
       end if
-      write (iout,160)  rdirect,ropt,rpcg
+      write (iout,160)  rdirect,rpcg,ropt
   160 format (/,5x,'RMS',4x,3f18.10)
 c
 c     find the RMS of each iteration from the exact dipoles
@@ -329,7 +329,7 @@ c
       end do
   200 continue
 c
-c     refine the extrapolation coefficients via optimization
+c     refine the extrapolated OPT coefficients via optimization
 c
       maxiter = 10000
       eps = 0.033d0

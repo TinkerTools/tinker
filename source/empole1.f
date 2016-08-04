@@ -3797,8 +3797,7 @@ c
 !$OMP& rxqkuip,qidk,qkdi,qir,qkr,qiqkr,qkqir,qixqk,rxqir,dixr,dkxr,
 !$OMP& dixqkr,dkxqir,rxqkr,qkrxqir,rxqikr,rxqkir,rxqidk,rxqkdi,sc,gl,gf)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintero,demo,viro)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:emo,eintero,demo,viro) schedule(guided)
 c
 c     set scale factors for permanent multipole and induced terms
 c

@@ -2450,8 +2450,8 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
-      integer tid,nlocal
-      integer maxlocal
+      integer nlocal,nchunk
+      integer tid,maxlocal
 !$    integer omp_get_thread_num
       integer, allocatable :: toffset(:)
       integer, allocatable :: ilocal(:,:)
@@ -2497,9 +2497,13 @@ c
       aesq2 = 2.0 * aewald * aewald
       aesq2n = 0.0d0
       if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
-      ntpair = 0
-      nlocal = 0
+c
+c     values for storage of mutual polarization intermediates
+c
+      nchunk = int(0.5d0*dble(npole)/dble(nthread)) + 1
       maxlocal = int(dble(npole)*dble(maxelst)/dble(nthread))
+      nlocal = 0
+      ntpair = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2531,10 +2535,11 @@ c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,thole,
 !$OMP& rpole,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
-!$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,i13,
-!$OMP& n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,nelst,
-!$OMP& elst,cut2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,tdipdip,
-!$OMP& toffset,maxlocal,field,fieldp,fieldt,fieldtp,maxelst,nthread)
+!$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,
+!$OMP& i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP& nelst,elst,cut2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,
+!$OMP& tdipdip,toffset,maxlocal,field,fieldp,fieldt,fieldtp,maxelst,
+!$OMP& nthread,nchunk)
 !$OMP& firstprivate(pscale,dscale,uscale,nlocal)
 c
 c     perform dynamic allocation of some local arrays
@@ -2546,7 +2551,7 @@ c
 c
 c     compute the real space portion of the Ewald summation
 c
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(static, 10)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nchunk)
       do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
@@ -3931,8 +3936,7 @@ c
 !$OMP& gkc,field,fieldp,fields,fieldps)
 !$OMP& firstprivate(dscale,pscale)
 !$OMP% shared(fieldt,fieldtp,fieldts,fieldtps)
-!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
 c
 c     find the field terms for each pairwise interaction
 c
@@ -4413,8 +4417,7 @@ c
 !$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
 !$OMP& field,fieldp,fields,fieldps)
 !$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
-!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
 c
 c     find the field terms for each pairwise interaction
 c

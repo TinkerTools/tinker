@@ -66,8 +66,7 @@ c
 c     set OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,e,fi)
-!$OMP DO reduction(+:epo)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:epo) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c

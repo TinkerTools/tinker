@@ -612,8 +612,7 @@ c
 !$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,qkx,qky,qkz,
 !$OMP& qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,fgrp,sc,gl)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintero,nemo,aemo)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:emo,eintero,nemo,aemo) schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1619,8 +1618,7 @@ c
 !$OMP& qix,qiy,qiz,qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,
 !$OMP& qkx,qky,qkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,bn,sc,gl)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintrao,nemo,aemo)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:emo,eintrao,nemo,aemo) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c

@@ -278,8 +278,7 @@ c
 !$OMP& f,pchg,rborn,use_group,off,off2,cut,cut2,molcule,
 !$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(est,eintert,nest,aest)
-!$OMP DO reduction(+:est,eintert,nest,aest)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:est,eintert,nest,aest) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -455,8 +454,7 @@ c
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
 !$OMP& molcule,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(est,eintert,nest,aest)
-!$OMP DO reduction(+:est,eintert,nest,aest)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:est,eintert,nest,aest) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -1316,8 +1314,7 @@ c
 !$OMP% i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p41scale,p5scale,
 !$OMP% use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale) shared(est,nest,aest)
-!$OMP DO reduction(+:est,nest,aest)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:est,nest,aest) schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
