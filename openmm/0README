@@ -1,16 +1,25 @@
 
-                    ---------------------------------------
+                    #######################################
                     Files for OpenMM-Enabled TINKER DYNAMIC
-                    ---------------------------------------
+                    #######################################
 
-          This directory contains the files needed to build a TINKER
-          DYNAMIC program using the GPU-capable OpenMM libraries. The
-          files should be copied into the /source directory of a clean
-          distribution of TINKER. The provided Makefile can then be
-          used, after minor editing, to build a dynamic_omm.x executable.
-          The Makefile assumes OpenMM is found in its default location,
-          /usr/local/openmm. NVIDIA CUDA must be installed on the target
-          machine, as well as a CUDA-capable graphics card. This code
-          has been tested with later releases of OpenMM 6.2, and should
-          also work with more recent versions of OpenMM.
+         This directory contains the files needed to build a TINKER
+         DYNAMIC program using the GPU-capable OpenMM libraries. The
+         files in this directory should be copied into the /source
+         directory of a clean distribution of TINKER, and the program
+         can be compiled and linked in that modified /source directory.
+
+         Building an OpenMM-enabled DYNAMIC requires a special version
+         of OpenMM, call OpenMM-TINKER that is available in a separate
+         GitHub branch, currently https://github.com/pren/tinker-openmm
+         This version contains changes to the canonical Stanford OpenMM
+         that are needed for the TINKER interface, beyond implementation
+         of the basic AMOEBA force field.
+
+         The provided Makefile can then be used, after minor editing, to
+         build a dynamic_omm.x executable. Either the GNU compilers or
+         the Intel compilers can be used. The Makefile assumes OpenMM
+         is found in its default location, /usr/local/openmm. NVIDIA
+         CUDA V7.5 or later must be installed on the target machine, as
+         well as a CUDA-capable graphics card.
 

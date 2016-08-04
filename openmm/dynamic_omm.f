@@ -44,7 +44,7 @@ c
       integer callMdStat
       integer callMdSave
       real*8 e,dt,dtdump
-      real*8 elapsed,nsPerDay,cpu
+      real*8 elapsed,cpu,speed
       real*8, allocatable :: derivs(:,:)
       logical exist
       logical updateEachStep
@@ -90,6 +90,9 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
+         else if (keyword(1:12) .eq. 'CUDA_DEVICE ') then
+            call gettext (record,cudaDevice,next)
+            call upcase (cudaDevice)
          end if
       end do
 c
@@ -285,6 +288,10 @@ c
          deallocate (derivs)
       end if
 c
+c     get a list of the available CUDA-capable GPU cards
+c
+      call set_cuda_devices (cudaDevice)
+c
 c     map TINKER data structures to OpenMM wrapper structures
 c
       call openmm_data ()
@@ -373,9 +380,9 @@ c
 c
 c     print performance and timing information
 c
-      nsPerDay = 0.0d0
-      if (elapsed .ne. 0.0d0)  nsPerDay = 86.4d0 * nstep * dt / elapsed
-      write (iout,450)  nsPerDay,elapsed,nstep,updateCalls,
+      speed = 0.0d0
+      if (elapsed .ne. 0.0d0)  speed = 86.4d0 * nstep * dt / elapsed
+      write (iout,450)  speed,elapsed,nstep,updateCalls,
      &                  1000.0d0*dt,n,nthread
   450 format (/,' Performance:  ns/day',9x,f12.4,
      &        /,15x,'Wall Time',6x,f12.4,
@@ -416,6 +423,7 @@ c
       use bndstr
       use bound
       use boxes
+      use cell
       use chgpot
       use couple
       use deriv
@@ -430,6 +438,7 @@ c
       use mdstuf
       use moldyn
       use mplpot
+      use molcul
       use mpole
       use mutant
       use nonpol
@@ -480,6 +489,8 @@ c
      &                     gamma_sin,gamma_cos,beta_term,gamma_term,
      &                     lvec,recip,orthogonal,monoclinic,triclinic,
      &                     octahedron,spacegrp)
+      call set_cell_data (ncell,icell,xcell,ycell,zcell,
+     &                    xcell2,ycell2,zcell2)
       call set_chgpot_data (electric,dielec,ebuffer,c2scale,c3scale,
      &                      c4scale,c5scale,neutnbr,neutcut)
       call set_couple_data (n12,i12,n13,i13,n14,i14,n15,i15)
@@ -505,6 +516,7 @@ c
      &                      use_vlist,use_clist,use_mlist,use_ulist)
       call set_mdstuf_data (nfree,irest,bmnmix,dorest,velsave,
      &                      frcsave,uindsave,integrate)
+      call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)
       call set_mplpot_data (m2scale,m3scale,m4scale,m5scale)
       call set_mpole_data (maxpole,npole,ipole,polsiz,pollist,
