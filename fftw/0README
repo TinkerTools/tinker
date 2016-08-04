@@ -1,7 +1,7 @@
 
-                     -------------------------------------
+                     #####################################
                      FFTW Directory for the TINKER Package
-                     -------------------------------------
+                     #####################################
 
       This directory contains FFTW-3.3.4 which is the preferred FFT
       method for use with the OpenMP version of TINKER. The FFTPACK
