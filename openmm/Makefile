@@ -1136,7 +1136,7 @@ libtinker.a: ${OBJS}
 ###############################################################
 
 dynamic_omm.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o inform.o iounit.o keys.o ktrtor.o kvdws.o limits.o mdstuf.o molcul.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o openmp.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o restrn.o sizes.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
-gpu_cards.o: gpu_usage.o
+gpu_cards.o: $(GPU_USAGE_OBJS)
 
 action.o:
 active.o: atoms.o inform.o iounit.o keys.o sizes.o usage.o
