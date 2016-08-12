@@ -506,7 +506,7 @@ c
       use mpole
       use polar
       implicit none
-      integer i,j,ixyz
+      integer i,j,k,m,ixyz
       integer atmnum,size
       integer freeunit
       real*8 xi,yi,zi
@@ -624,6 +624,7 @@ c
             polarity(i) = 0.837d0
          else if (atmnum .eq. 9) then
             mass(i) = 18.998d0
+            polarity(i) = 0.507d0
          else if (atmnum .eq. 14) then
             mass(i) = 28.086d0
          else if (atmnum .eq. 15) then
@@ -634,13 +635,41 @@ c
             polarity(i) = 3.300d0
          else if (atmnum .eq. 17) then
             mass(i) = 35.453d0
-            polarity(i) = 4.000d0
+            polarity(i) = 2.500d0
          else if (atmnum .eq. 35) then
             mass(i) = 79.904d0
-            polarity(i) = 5.650d0
+            polarity(i) = 3.595d0
          else if (atmnum .eq. 53) then
             mass(i) = 126.904d0
-            polarity(i) = 7.250d0
+            polarity(i) = 5.705d0
+         end if
+      end do
+c
+c     alter polarizabilities for aromatic carbon and hydrogen
+c
+      do i = 1, n
+         atmnum = atomic(i)
+         if (atmnum .eq. 1) then
+            j = i12(1,i)
+            if (atomic(j).eq.6 .and. n12(j).eq.3) then
+               polarity(i) = 0.696d0
+               do k = 1, n12(j)
+                  m = i12(k,j)
+                  if (atomic(m).eq.8 .and. n12(m).eq.1) then
+                     polarity(i) = 0.494d0
+                  end if
+               end do
+            end if
+         else if (atmnum .eq. 6) then
+            if (n12(i) .eq. 3) then
+               polarity(i) = 1.75d0
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (atomic(k).eq.8 .and. n12(k).eq.1) then
+                     polarity(i) = 1.334d0
+                  end if
+               end do
+            end if
          end if
       end do
 c
