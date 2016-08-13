@@ -23,7 +23,7 @@ c
       implicit none
       integer nprior
       integer ldir,leng
-      character*120 filename
-      character*120 outfile
+      character*240 filename
+      character*240 outfile
       save
       end

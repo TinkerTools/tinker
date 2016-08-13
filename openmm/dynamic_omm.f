@@ -50,8 +50,8 @@ c
       logical updateEachStep
       character*1 answer
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -86,7 +86,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
@@ -269,7 +269,7 @@ c
   350    format (/,' Return Data from the GPU at Every Time Step',
      &              ' [N] :  ',$)
          read (input,360)  record
-  360    format (a120)
+  360    format (a240)
          next = 1
       end if
       call upcase (answer)

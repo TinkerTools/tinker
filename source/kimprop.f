@@ -43,8 +43,8 @@ c
       character*16 pt2,pt3
       character*16 pt(6)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing improper dihedral parameters
@@ -65,7 +65,7 @@ c
             id = 0
             tk = 0.0d0
             tv = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,tk,tv
    10       continue
             size = 4

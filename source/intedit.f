@@ -34,8 +34,8 @@ c
       real*8 value,geometry
       logical changed,error
       character*4 word
-      character*120 zmtfile
-      character*120 record
+      character*240 zmtfile
+      character*240 record
 c
 c
 c     read coordinate file and force field definition
@@ -59,7 +59,7 @@ c
       write (iout,30)
    30 format (/,' INTEDIT>  ',$)
       read (input,40)  record
-   40 format (a120)
+   40 format (a240)
 c
 c     interpret any user entered text command
 c
@@ -364,7 +364,7 @@ c
       integer trimtext
       real*8 x,xnew
       logical changed
-      character*120 record
+      character*240 record
       character*(*) text
 c
 c
@@ -374,7 +374,7 @@ c
       write (iout,10)  text
    10 format (/,' Enter the New ',a,' :  ',$)
       read (input,20)  record
-   20 format (a120)
+   20 format (a240)
       length = trimtext (record)
       if (length .ne. 0) then
          read (record,*,end=30,err=30)  xnew

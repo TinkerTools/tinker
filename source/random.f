@@ -55,8 +55,8 @@ c
       real*8 random
       logical first
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       save first
       save seed,seed2
       save iy,ishuffle
@@ -83,7 +83,7 @@ c
             call gettext (record,keyword,next)
             call upcase (keyword)
             if (keyword(1:11) .eq. 'RANDOMSEED ') then
-               string = record(next:120)
+               string = record(next:240)
                read (string,*,err=10)  seed
                seed = max(1,seed)
             end if

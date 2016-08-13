@@ -58,10 +58,10 @@ c
       character*1 answer
       character*3, allocatable :: name1(:)
       character*3, allocatable :: name2(:)
-      character*120 file1,file2
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 file1,file2
+      character*240 xyzfile
+      character*240 record
+      character*240 string
 c
 c
 c     get atom names and masses for the first structure
@@ -164,7 +164,7 @@ c
    30    format (/,' Enter an Option (either 1,M,N or 2',
      &              ' [<CR>=1,0,0]) :  ',$)
          read (input,40)  record
-   40    format (a120)
+   40    format (a240)
          read (record,*,err=50,end=50)  option,start,stop
    50    continue
          if (option.lt.1 .or. option.gt.2) then
@@ -203,7 +203,7 @@ c
    70       format (/,' Include Hydrogen Atoms in the Fitting',
      &                 ' [Y] :  ',$)
             read (input,80)  record
-   80       format (a120)
+   80       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -255,7 +255,7 @@ c
             write (iout,100)
   100       format (/,' Enter a Pair of Atoms or Ranges :  ',$)
             read (input,110)  record
-  110       format (a120)
+  110       format (a240)
             read (record,*,err=120,end=120)  (range(i),i=1,4)
   120       continue
             if (range(1) .eq. 0) then
@@ -290,7 +290,7 @@ c
   140       format (/,' Apply Periodic Boundary Conditions',
      &                 ' [N] :  ',$)
             read (input,150)  record
-  150       format (a120)
+  150       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -306,7 +306,7 @@ c
   160    format (/,' Use Mass- or Unit-Weighted Coordinates',
      &              ' (M or [U]) :  ',$)
          read (input,170)  record
-  170    format (a120)
+  170    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -330,7 +330,7 @@ c
   180    format (/,' Write Best-Fit Coordinates of 2nd Molecule',
      &              ' [N] :  ',$)
          read (input,190)  record
-  190    format (a120)
+  190    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

@@ -35,9 +35,9 @@ c
       real*8, allocatable :: derivs(:)
       logical exist
       character*20 keyword
-      character*120 minfile
-      character*120 record
-      character*120 string
+      character*240 minfile
+      character*240 record
+      character*240 string
       external optirot1
       external optsave
 c
@@ -56,7 +56,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then

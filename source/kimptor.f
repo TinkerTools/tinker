@@ -45,8 +45,8 @@ c
       character*16 pt2,pt3
       character*16 pt(6)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing improper torsion parameters
@@ -69,7 +69,7 @@ c
                st(j) = 0.0d0
                ft(j) = 0
             end do
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,3)
    10       continue

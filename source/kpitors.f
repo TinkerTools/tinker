@@ -39,8 +39,8 @@ c
       character*4 pa,pb
       character*8 blank,pt
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing pi-orbital torsion parameters
@@ -56,7 +56,7 @@ c
             ia = 0
             ib = 0
             tp = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,tp
    10       continue
             if (.not. silent) then

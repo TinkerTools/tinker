@@ -23,7 +23,7 @@ c
       integer imdl
       integer freeunit
       logical exist
-      character*120 mdlfile
+      character*240 mdlfile
 c
 c
 c     try to get a filename from the command line arguments
@@ -41,7 +41,7 @@ c
          write (iout,10)
    10    format (/,' Enter a MDL MOL File Name :  ',$)
          read (input,20)  mdlfile
-   20    format (a120)
+   20    format (a240)
          call basefile (mdlfile)
          call suffix (mdlfile,'mol','old')
          inquire (file=mdlfile,exist=exist)

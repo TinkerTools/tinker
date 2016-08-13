@@ -21,7 +21,7 @@ c
       use potent
       implicit none
       integer i
-      character*120 record
+      character*240 record
 c
 c
 c     set the default values for the active potentials

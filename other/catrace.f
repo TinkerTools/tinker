@@ -29,8 +29,8 @@ c
       integer ixyz,icat
       integer freeunit
       logical nfind,cfind
-      character*120 xyzfile
-      character*120 catfile
+      character*240 xyzfile
+      character*240 catfile
 c
 c
 c     get the initial coordinates file to be converted

@@ -56,9 +56,9 @@ c
       logical exist,query
       character*1 letter
       character*7 ext
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 record
+      character*240 string
 c
 c
 c     set up the structure and mechanics calculation
@@ -232,7 +232,7 @@ c
    60    format (/,' Enter Vibrations to Output [List, A=All',
      &              ' or <CR>=Exit] :  ',$)
          read (input,70)  record
-   70    format (a120)
+   70    format (a240)
          letter = ' '
          next = 1
          call gettext (record,letter,next)

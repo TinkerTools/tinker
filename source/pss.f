@@ -48,8 +48,8 @@ c
       logical use_tors
       character*1 answer
       character*1 formtyp
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set up the structure, mechanics calculation and smoothing
@@ -85,7 +85,7 @@ c
    40    format (/,' Perform Forward Smoothing from Input Structure',
      &              ' [Y] :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -101,7 +101,7 @@ c
    60    format (/,' Use Quadratic, Cubic or Sigmoidal Schedule',
      &              ' (Q [C] or S) :  ',$)
          read (input,70)  record
-   70    format (a120)
+   70    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -119,7 +119,7 @@ c
    80    format (/,' Local Search Type - Cartesian, Torsional or None',
      &              ' (C T or [N]) :  ',$)
          read (input,90)  record
-   90    format (a120)
+   90    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -150,7 +150,7 @@ c
   110       format (/,' Enter the Range of Local Search Directions',
      &                 ' (1=Highest Freq) :  ',$)
             read (input,120)  record
-  120       format (a120)
+  120       format (a240)
             read (record,*)  start,stop
             range = abs(stop-start)
             start = min(start,stop)
@@ -187,7 +187,7 @@ c
   160       format (/,' Restrict Local Search to Children of Input',
      &                 ' Structure [N] :  ',$)
             read (input,170)  record
-  170       format (a120)
+  170       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -1099,7 +1099,7 @@ c
       integer i,ixyz
       integer lext,freeunit
       character*7 ext
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     write the coordinates of the current minimum to a file

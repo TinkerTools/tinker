@@ -24,7 +24,7 @@ c
       subroutine openend (iunit,name)
       implicit none
       integer iunit
-      character*120 name
+      character*240 name
 c
 c
 c     standard Fortran 90, unavailable in some Fortran 77 compilers

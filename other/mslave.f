@@ -45,7 +45,7 @@ c
       real*8 hdiag(3,maxatm)
       real*8, allocatable :: ddx2(:)
       logical exist,qsecd
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     set up the structure and mechanics calculation

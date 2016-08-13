@@ -37,7 +37,7 @@ c
       character*3 resname
       character*6 crdc
       character*38 fstr
-      character*120 pdbfile
+      character*240 pdbfile
 c
 c
 c     set flags for residue naming and large value formatting

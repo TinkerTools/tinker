@@ -22,7 +22,7 @@ c
       implicit none
       integer mode
       logical exist,query
-      character*120 string
+      character*240 string
 c
 c
 c     get the desired type of coordinate file modification
@@ -120,8 +120,8 @@ c
       logical exist,done
       logical use_bohr
       character*3 atmnam
-      character*120 record
-      character*120 dmafile
+      character*240 record
+      character*240 dmafile
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -168,7 +168,7 @@ c
          write (iout,10)
    10    format (/,' Enter GDMA Output File Name :  ',$)
          read (input,20)  dmafile
-   20    format (a120)
+   20    format (a240)
          call basefile (dmafile)
          call suffix (dmafile,'dma','old')
          inquire (file=dmafile,exist=exist)
@@ -185,7 +185,7 @@ c
       rewind (unit=idma)
       do while (.true.)
          read (idma,30,err=50,end=50)  record
-   30    format (a120)
+   30    format (a240)
          if (i .ne. 0)  call match1 (i,record)
          if (record(12:14) .eq. 'x =') then
             i = i + 1
@@ -232,7 +232,7 @@ c
       rewind (unit=idma)
       do while (.true.)
          read (idma,60,err=70,end=70)  record
-   60    format (a120)
+   60    format (a240)
          if (record(1:27) .eq. 'Positions and radii in bohr') then
             use_bohr = .true.
             goto 70
@@ -256,15 +256,15 @@ c
       rewind (unit=idma)
       do while (.true.)
          read (idma,80,err=100,end=100)  record
-   80    format (a120)
+   80    format (a240)
          if (record(1:16) .eq. 'Nuclear charges:') then
             k = min(n,20)
-            read (record(17:120),*,err=100,end=100)  (atomic(i),i=1,k)
+            read (record(17:240),*,err=100,end=100)  (atomic(i),i=1,k)
             do while (k .ne. n)
                j = k + 1
                k = min(n,k+20)
                read (idma,90,err=100,end=100)  record
-   90          format (a120)
+   90          format (a240)
                read (record,*,err=100,end=100)  (atomic(i),i=j,k)
             end do
             done = .true.
@@ -363,7 +363,7 @@ c
       use dma
       implicit none
       integer i
-      character*120 record
+      character*240 record
 c
 c
 c     store first multipole components on a line of GDMA output
@@ -418,7 +418,7 @@ c
       use dma
       implicit none
       integer i
-      character*120 record
+      character*240 record
 c
 c
 c     store second multipole component on a line of GDMA output
@@ -465,7 +465,7 @@ c
       use dma
       implicit none
       integer i
-      character*120 record
+      character*240 record
 c
 c
 c     store third multipole component on a line of GDMA output
@@ -717,7 +717,7 @@ c
       integer kbc,kbd,kcd
       integer priority
       logical query,change
-      character*120 record
+      character*240 record
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -972,7 +972,7 @@ c
    40    format (/,' Enter Altered Local Frame Definition',
      &              ' [<CR>=Exit] :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          read (record,*,err=60,end=60)  i,ia,ib,ic
    60    continue
          if (i .eq. 0) then
@@ -1233,7 +1233,7 @@ c
       real*8 big,sum
       real*8 a(3,3)
       logical query,change
-      character*120 record
+      character*240 record
 c
 c
 c     rotate the multipole components into the global frame
@@ -1276,7 +1276,7 @@ c
    50    format (/,' Enter Altered Local Frame Definition',
      &              ' [<CR>=Exit] :  ',$)
          read (input,60)  record
-   60    format (a120)
+   60    format (a240)
          read (record,*,err=70,end=70)  ii,ia,ib,ic
    70    continue
          if (ii .eq. 0) then
@@ -1468,7 +1468,7 @@ c
       integer ia,ib
       real*8 pol,thl
       logical query,change
-      character*120 record
+      character*240 record
 c
 c
 c     list the polariability values for each multipole site
@@ -1501,7 +1501,7 @@ c
    50    format (/,' Enter Atom Number & Polarizability Values',
      &              ' [<CR>=Exit] :  ',$)
          read (input,60)  record
-   60    format (a120)
+   60    format (a240)
          read (record,*,err=70,end=70)  ii,pol,thl
    70    continue
          if (ii .eq. 0) then
@@ -1560,7 +1560,7 @@ c
   130    format (/,' Enter a Bond between Polarization Groups',
      &              ' [<CR>=Exit] :  ',$)
          read (input,140)  record
-  140    format (a120)
+  140    format (a240)
          read (record,*,err=150,end=150)  ia,ib
   150    continue
          if (ia.eq.0 .or. ib.eq.0) then
@@ -2196,7 +2196,7 @@ c
       real*8 pave(13)
       logical yzero
       character*1 answer
-      character*120 record
+      character*240 record
 c
 c
 c     optionally average multipoles for equivalent atoms
@@ -2205,7 +2205,7 @@ c
    10 format (/,' Average the Multipole Moments of Equivalent',
      &           ' Atoms [N] :  ',$)
       read (input,20)  record
-   20 format (a120)
+   20 format (a240)
       next = 1
       call gettext (record,answer,next)
       call upcase (answer)
@@ -2268,7 +2268,7 @@ c
    40 format (/,' Remove Multipole Components Zeroed by',
      &           ' Symmetry [N] :  ',$)
       read (input,50)  record
-   50 format (a120)
+   50 format (a240)
       next = 1
       call gettext (record,answer,next)
       call upcase (answer)
@@ -2424,8 +2424,8 @@ c
       integer freeunit
       integer trimtext
       logical dofull
-      character*120 keyfile
-      character*120 record
+      character*240 keyfile
+      character*240 record
 c
 c
 c     output some definitions and parameters to a keyfile

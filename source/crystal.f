@@ -34,9 +34,9 @@ c
       logical exist,query
       character*1 answer
       character*10 sgroup(maxspace)
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 record
+      character*240 string
       data sgroup / 'P1        ', 'P2        ', 'P1(-)     ',
      &              'P21       ', 'C2        ', 'Pm        ',
      &              'Pc        ', 'Cm        ', 'Cc        ',
@@ -150,7 +150,7 @@ c
          write (iout,110)
   110    format (/,' Enter Unit Cell Axis Lengths :  ',$)
          read (input,120)  record
-  120    format (a120)
+  120    format (a240)
          read (record,*,err=130,end=130)  xbox,ybox,zbox
   130    continue
          if (ybox .eq. 0.0d0)  ybox = xbox
@@ -164,7 +164,7 @@ c
          write (iout,140)
   140    format (/,' Enter Unit Cell Axis Angles :   ',$)
          read (input,150)  record
-  150    format (a120)
+  150    format (a240)
          read (record,*,err=160,end=160)  alpha,beta,gamma
   160    continue
          if (alpha .eq. 0.0d0)  alpha = 90.0d0
@@ -222,7 +222,7 @@ c
   190    format (/,' Enter Number of Replicates along a-, b- and',
      &              ' c-Axes [1 1 1] :   ',$)
          read (input,200)  record
-  200    format (a120)
+  200    format (a240)
          read (record,*,err=210,end=210)  na,nb,nc
   210    continue
          if (na .eq. 0)  na = 1
@@ -263,7 +263,7 @@ c
   240       format (/,' Attempt to Merge Fragments to Form Full',
      &                 ' Molecules [N] :   ',$)
             read (input,250)  record
-  250       format (a120)
+  250       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -286,7 +286,7 @@ c
   260       format (/,' Move Any Stray Molecules into Unit Cell',
      &                 ' [N] :   ',$)
             read (input,270)  record
-  270       format (a120)
+  270       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -309,7 +309,7 @@ c
   280       format (/,' Locate Center of Unit Cell at Coordinate',
      &                 ' Origin [N] :   ',$)
             read (input,290)  record
-  290       format (a120)
+  290       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if

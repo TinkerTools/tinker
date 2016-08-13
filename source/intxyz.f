@@ -22,7 +22,7 @@ c
       use titles
       implicit none
       integer ixyz,freeunit
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     get and read the internal coordinates file;

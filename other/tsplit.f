@@ -20,7 +20,7 @@ c
       program tsplit
       implicit none
       integer maxline
-      parameter (maxline=300000)
+      parameter (maxline=500000)
       integer i,j,k,m
       integer input,iout
       integer itxt,leng
@@ -28,7 +28,7 @@ c
       integer nline,module
       character*80 record
       character*80 code(maxline)
-      character*120 filename
+      character*240 filename
 c
 c
 c     get the name of the source file to split into modules
@@ -38,7 +38,7 @@ c
       write (iout,10)
    10 format (/,' Enter TINKER Source Listing File Name :  ',$)
       read (input,20)  filename
-   20 format (a120)
+   20 format (a240)
 c
 c     read and store a concatenated listing of TINKER source
 c

@@ -31,7 +31,7 @@ c
       character*2 atmc
       character*5 bndc,angc
       character*43 fstr
-      character*120 zmtfile
+      character*240 zmtfile
 c
 c
 c     open the output unit if not already done

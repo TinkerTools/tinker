@@ -43,9 +43,9 @@ c
       character*3 namelast
       character*4 atmname
       character*6 remark
-      character*120 pdbfile
-      character*120 record
-      character*120 string
+      character*240 pdbfile
+      character*240 record
+      character*240 string
       save first
       data first  / .true. /
 c
@@ -104,7 +104,7 @@ c     process individual atoms from the Protein Data Bank file
 c
       do while (.true.)
          read (ipdb,20,err=230,end=230)  record
-   20    format (a120)
+   20    format (a240)
          remark = record(1:6)
          call upcase (remark)
          if (remark .eq. 'HEADER') then
@@ -144,7 +144,7 @@ c
             string = record(next:next)
             read (string,80)  insert
    80       format (a1)
-            string = record(next+1:120)
+            string = record(next+1:240)
             read (string,*,err=90,end=90)  xx,yy,zz
             goto 100
    90       continue
@@ -216,7 +216,7 @@ c
             string = record(next:next)
             read (string,180)  insert
   180       format (a1)
-            string = record(next+1:120)
+            string = record(next+1:240)
             read (string,*,err=190,end=190)  xx,yy,zz
             goto 200
   190       continue
@@ -392,8 +392,8 @@ c
       character*20 chntemp
       character*20 alttyp
       character*20 instemp
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     initialize chain, alternate site and insertion lists
@@ -415,7 +415,7 @@ c
       done = .false.
       do while (.not. done)
          read (ipdb,10,err=60,end=60)  record
-   10    format (a120)
+   10    format (a240)
          remark = record(1:6)
          call upcase (remark)
          if (remark.eq.'ATOM  ' .or. remark.eq.'HETATM') then
@@ -539,7 +539,7 @@ c
    90       format (/,' Enter a Set of Alternate Atom Locations',
      &                 ' from (',a,') :  ',$)
             read (input,100)  record
-  100       format (a120)
+  100       format (a240)
             next = 1
             call gettext (record,altsym,next)
          end if

@@ -44,8 +44,8 @@ c
       character*6 label
       character*8 blank,pt
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing pisystem atom parameters
@@ -62,7 +62,7 @@ c
             elect = 0.0d0
             ioniz = 0.0d0
             repuls = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10)  ia,elect,ioniz,repuls
    10       continue
             if (.not. silent) then
@@ -106,7 +106,7 @@ c
             ib = 0
             sslop = 0.0d0
             tslop = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=50)  ia,ib,sslop,tslop
    50       continue
             if (.not. silent) then

@@ -64,8 +64,8 @@ c
       real*8, allocatable :: derivs(:,:)
       logical exist,done
       character*9 status
-      character*120 minfile
-      character*120 string
+      character*240 minfile
+      character*240 string
 c
 c
 c     set up the structure and mechanics calculation

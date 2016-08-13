@@ -24,8 +24,8 @@ c
       integer freeunit
       real*8 xpot,ypot,zpot
       logical exist
-      character*120 record
-      character*120 potfile
+      character*240 record
+      character*240 potfile
 c
 c
 c     find and open the electrostatic potential grid file
@@ -41,7 +41,7 @@ c
          write (iout,10)
    10    format (/,' Enter Electrostatic Potential File Name :  ',$)
          read (input,20)  potfile
-   20    format (a120)
+   20    format (a240)
          call basefile (potfile)
          call suffix (potfile,'pot','old')
          inquire (file=potfile,exist=exist)
@@ -54,14 +54,14 @@ c     get the grid points and output them as atom coordinates
 c
       npot = 0
       read (ipot,30,err=50,end=50)  record
-   30 format (a120)
+   30 format (a240)
       read (record,*,err=50,end=50)  npot
       write (iout,40)  npot
    40 format (i6,2x,'Epot Grid converted to Atoms for Display')
    50 continue
       do i = 1, npot
          read (ipot,60,err=80,end=80)  record
-   60    format (a120)
+   60    format (a240)
          read (record,*,err=80,end=80)  k,xpot,ypot,zpot
          write (iout,70)  k,xpot,ypot,zpot
    70    format (i6,2x,'He ',3f12.4,4x,'20')

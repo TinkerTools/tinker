@@ -52,9 +52,9 @@ c
       logical use_local
       character*1 answer
       character*7 ext
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 record
+      character*240 string
       external pssrgd1
       external optsave
 c
@@ -102,7 +102,7 @@ c
    40    format (/,' Use Local Search to Explore Each Smoothing Level',
      &              ' [N] :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

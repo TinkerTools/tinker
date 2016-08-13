@@ -13,10 +13,10 @@ c     #############################################################
 c
 c
       program extent
+      use sizes
+      use atoms
+      use iounit
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
       integer i,k
       real*8 xi,yi,zi
       real*8 xk,yk,zk

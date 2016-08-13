@@ -94,8 +94,8 @@ c
       logical dogeom
       character*1 answer
       character*7 ext
-      character*120 xyzfile
-      character*120 record
+      character*240 xyzfile
+      character*240 record
 c
 c
 c     set up the structure and mechanics calculation
@@ -111,7 +111,7 @@ c
       write (iout,10)
    10 format (/,' Numbers of First and Last File to Analyze :  ',$)
       read (input,20)  record
-   20 format (a120)
+   20 format (a240)
       read (record,*,err=30,end=30)  start,stop
    30 continue
       if (start .eq. 0)  start = 1
@@ -157,7 +157,7 @@ c
   100 format (/,' Consider only Intermolecular Perturbation',
      &           ' Energy [N] :  ',$)
       read (input,110)  record
-  110 format (a120)
+  110 format (a240)
       next = 1
       call gettext (record,answer,next)
       call upcase (answer)

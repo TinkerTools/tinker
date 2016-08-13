@@ -36,8 +36,8 @@ c
       real*8 cg
       logical header
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing partial charge parameters
@@ -51,7 +51,7 @@ c
          if (keyword(1:7) .eq. 'CHARGE ') then
             ia = 0
             cg = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=40,end=40)  ia,cg
             if (ia .gt. 0) then
                if (header .and. .not.silent) then
@@ -112,7 +112,7 @@ c
          if (keyword(1:7) .eq. 'CHARGE ') then
             ia = 0
             cg = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=70,end=70)  ia,cg
             if (ia.lt.0 .and. ia.ge.-n) then
                ia = -ia

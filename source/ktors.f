@@ -52,8 +52,8 @@ c
       character*16 pt1,pt2
       character*16, allocatable :: klist(:)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing torsional angle parameters
@@ -80,7 +80,7 @@ c
                st(j) = 0.0d0
                ft(j) = 0
             end do
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,6)
    10       continue

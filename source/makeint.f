@@ -41,7 +41,7 @@ c
       character*1 answer
       character*1 default
       character*8 phrase
-      character*120 record
+      character*240 record
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -158,7 +158,7 @@ c
    70          format (/,' Specify with Dihedral Angle or Second',
      &                    ' Bond Angle (',a8,') :  ',$)
                read (input,80)  record
-   80          format (a120)
+   80          format (a240)
                next = 1
                call gettext (record,answer,next)
                call upcase (answer)

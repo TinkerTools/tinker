@@ -45,8 +45,8 @@ c
       logical exist,query
       logical rotate,rotcheck
       logical use_partial
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     initialize the number of rotatable torsional angles
@@ -103,7 +103,7 @@ c
             write (iout,40)  nomega
    40       format (/,' Enter Atoms in Rotatable Bond',i5,' :  ',$)
             read (input,50)  record
-   50       format (a120)
+   50       format (a240)
             read (record,*,err=80,end=80)  j1,j2
             if (j1.eq.0 .and. j2.eq.0)  goto 80
             do i = 4, n
@@ -150,7 +150,7 @@ c
             write (iout,90)  i
    90       format (/,' Enter Atoms in Frozen Bond',i5,' :  ',$)
             read (input,100)  record
-  100       format (a120)
+  100       format (a240)
             read (record,*,err=110,end=110)  ifixed(1,i),ifixed(2,i)
             if (ifixed(1,i).eq.0 .or. ifixed(2,i).eq.0)  goto 110
             nfixed = nfixed + 1

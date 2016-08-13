@@ -31,8 +31,8 @@ c
       logical exist,opened,done
       character*1 letter
       character*3 word
-      character*120 seqfile
-      character*120 record
+      character*240 seqfile
+      character*240 record
 c
 c
 c     open the input file if it has not already been done
@@ -65,7 +65,7 @@ c     read in the biopolymer sequence file
 c
       do while (.true.)
          read (iseq,20,err=30,end=30)  record
-   20    format (a120)
+   20    format (a240)
          length = trimtext (record)
          next = 1
          call gettext (record,letter,next)

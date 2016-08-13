@@ -34,9 +34,9 @@ c
       integer trimtext
       logical exist,opened
       logical quit
-      character*120 intfile
-      character*120 record
-      character*120 string
+      character*240 intfile
+      character*240 record
+      character*240 string
 c
 c
 c     initialize the total number of atoms in the system
@@ -70,7 +70,7 @@ c
       size = 0
       do while (size .eq. 0)
          read (izmt,20,err=70,end=70)  record
-   20    format (a120)
+   20    format (a240)
          size = trimtext (record)
       end do
       abort = .false.
@@ -85,7 +85,7 @@ c
 c
 c     extract the title and determine its length
 c
-      string = record(next:120)
+      string = record(next:240)
       first = nexttext (string)
       last = trimtext (string)
       if (last .eq. 0) then
@@ -131,12 +131,12 @@ c
          size = 0
          do while (size .eq. 0)
             read (izmt,50,err=70,end=70)  record
-   50       format (a120)
+   50       format (a240)
             size = trimtext (record)
          end do
          read (record,*,err=70,end=70)  tag(i)
          call getword (record,name(i),next)
-         string = record(next:120)
+         string = record(next:240)
          read (string,*,err=60,end=60)  type(i),iz(1,i),zbond(i),
      &                                  iz(2,i),zang(i),iz(3,i),
      &                                  ztors(i),iz(4,i)
@@ -162,14 +162,14 @@ c
    90 format ()
       do i = 1, maxatm
          read (izmt,100,err=130,end=130)  record
-  100    format (a120)
+  100    format (a240)
          read (record,*,err=110,end=110)  (iadd(j,i),j=1,2)
          nadd = i
       end do
   110 continue
       do i = 1, maxatm
          read (izmt,120,err=130,end=130)  record
-  120    format (a120)
+  120    format (a240)
          read (record,*,err=130,end=130)  (idel(j,i),j=1,2)
          ndel = i
       end do

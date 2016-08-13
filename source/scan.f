@@ -40,8 +40,8 @@ c
       real*8 emap(maxmap)
       logical exist
       character*7 ext
-      character*120 xyzfile
-      character*120 string
+      character*240 xyzfile
+      character*240 string
 c
 c
 c     set up the structure and mechanics calculation
@@ -177,7 +177,7 @@ c
       real*8 emap(*)
       logical unique,exist
       character*7 ext
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     check to see if the current minimum was previously found

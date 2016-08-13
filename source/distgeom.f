@@ -61,10 +61,10 @@ c
       character*1 answer
       character*1 letter
       character*7 ext
-      character*120 geofile
-      character*120 title
-      character*120 record
-      character*120 string
+      character*240 geofile
+      character*240 title
+      character*240 record
+      character*240 string
 c
 c
 c     get the input structure file for the embedding
@@ -170,7 +170,7 @@ c
    40    format (/,' Impose Chirality Constraints on Tetrahedral',
      &              ' Atoms [Y] :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -182,7 +182,7 @@ c
    60       format (/,' Use "Floating" Chirality for -XH2- and -XH3',
      &                 ' Groups [N] :  ',$)
             read (input,70)  record
-   70       format (a120)
+   70       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -214,7 +214,7 @@ c
    80    format (/,' Impose Planarity and/or Chirality of Trigonal',
      &              ' Atoms [Y] :  ',$)
          read (input,90)  record
-   90    format (a120)
+   90    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -239,7 +239,7 @@ c
   100    format (/,' Impose Torsional Planarity on Adjacent Trigonal',
      &              ' Atoms [Y] :  ',$)
          read (input,110)  record
-  110    format (a120)
+  110    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -275,7 +275,7 @@ c
   120    format (/,' Do You Wish to Examine or Alter the Bounds',
      &              ' Matrix [N] :  ',$)
          read (input,130)  record
-  130    format (a120)
+  130    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -291,7 +291,7 @@ c
   140    format (/,' Select the Enantiomer Closest to the Input',
      &              ' Structure [N] :  ',$)
          read (input,150)  record
-  150    format (a120)
+  150    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -307,7 +307,7 @@ c
   160    format (/,' Refinement via Minimization or Annealing',
      &              ' [M or A, <CR>=A] :  ',$)
          read (input,170)  record
-  170    format (a120)
+  170    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -592,7 +592,7 @@ c
   260    format (/,' Enter an Atom Pair to Display Bounds',
      &              ' [<CR> When Done] :  ',$)
          read (input,270)  record
-  270    format (a120)
+  270    format (a240)
          read (record,*,err=320,end=320)  b1,b2
          done = .false.
          if (b1.lt.1 .or. b2.gt.n .or. b1.eq.b2)  goto 320
@@ -607,7 +607,7 @@ c
          write (iout,300)
   300    format (/,' Enter New Bounds or <CR> to Leave Unchanged :  ',$)
          read (input,310)  record
-  310    format (a120)
+  310    format (a240)
          read (record,*,err=320,end=320)  bndmin,bndmax
          if (bndmin .gt. bndmax)  goto 290
          dbnd(b2,b1) = bndmin

@@ -40,8 +40,8 @@ c
       logical done
       character*9 rattyp
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set defaults for constraints and convergence tolerance
@@ -66,7 +66,7 @@ c
          record = keyline(k)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:11) .eq. 'RATTLE-EPS ') then
             read (string,*,err=10,end=10)  rateps
          end if
@@ -273,7 +273,7 @@ c
             call getnumb (record,ia,next)
             call getnumb (record,ib,next)
             rab = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=20,end=20)  rab
    20       continue
             if (rab .eq. 0.0d0) then

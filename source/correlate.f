@@ -47,7 +47,7 @@ c
       real*8, allocatable :: z2(:,:)
       logical exist,query,normal
       character*1 letter
-      character*120 string
+      character*240 string
 c
 c
 c     get the base name of user specified input structures
@@ -58,7 +58,7 @@ c
          write (iout,10)
    10    format (/,' Enter Base Name of Coordinate Cycle Files :  ',$)
          read (input,20)  filename
-   20    format (a120)
+   20    format (a240)
       end if
 c
 c     remove any extension from the filename
@@ -98,7 +98,7 @@ c
    40    format (/,' Numbers of First & Last File and Step',
      &              ' Increment :  ',$)
          read (input,50)  string
-   50    format (a120)
+   50    format (a240)
          read (string,*,err=60,end=60)  first,last,step
    60    continue
       end if
@@ -120,7 +120,7 @@ c
    80    format (/,' Maximum Frame Separation to be Used in',
      &              ' Correlation [ALL] :  ',$)
          read (input,90)  string
-   90    format (a120)
+   90    format (a240)
          read (string,*,err=100,end=100)  maxgap
   100    continue
       end if
@@ -285,9 +285,9 @@ c
       real*8 zb(maxsite,*)
       logical exist
       character*7 ext
-      character*120 record
-      character*120 string
-      character*120 xyzfile
+      character*240 record
+      character*240 string
+      character*240 xyzfile
 c
 c
 c     initialize the number of files and the numeral size
@@ -313,7 +313,7 @@ c
             ixyz = freeunit ()
             open (unit=ixyz,file=xyzfile,status='old')
             read (ixyz,10)  record
-   10       format (a120)
+   10       format (a240)
             read (record,*)  n
 c
 c     check for too many correlation sites in the frame
@@ -339,10 +339,10 @@ c
             do k = 1, n
                next = 1
                read (ixyz,40)  record
-   40          format (a120)
+   40          format (a240)
                read (record,*)  label
                call getword (record,name(k),next)
-               string = record(next:120)
+               string = record(next:240)
                read (string,*)  xb(k,nb),yb(k,nb),zb(k,nb)
             end do
             close (unit=ixyz)

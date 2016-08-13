@@ -35,7 +35,7 @@ c
       character*2 crdc
       character*2 digc
       character*25 fstr
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     open the output unit if not already done

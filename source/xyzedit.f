@@ -64,10 +64,10 @@ c
       logical exist,query
       logical opened,multi
       logical append
-      character*120 xyzfile
-      character*120 modfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 modfile
+      character*240 record
+      character*240 string
       external merge
 c
 c
@@ -94,7 +94,7 @@ c
          write (iout,10)
    10    format (/,' Enter Cartesian Coordinate File Name :  ',$)
          read (input,20)  xyzfile
-   20    format (a120)
+   20    format (a240)
          call basefile (xyzfile)
          call suffix (xyzfile,'xyz','old')
          inquire (file=xyzfile,exist=exist)
@@ -207,7 +207,7 @@ c
          write (iout,120)
   120    format (/,' Numbers of the Atoms to be Removed :  ',$)
          read (input,130)  record
-  130    format (a120)
+  130    format (a240)
          read (record,*,err=140,end=140)  (list(i),i=1,n)
   140    continue
          do while (list(nlist+1) .ne. 0)
@@ -260,7 +260,7 @@ c
          write (iout,150)
   150    format (/,' Atom Types to be Removed :  ',$)
          read (input,160)  record
-  160    format (a120)
+  160    format (a240)
          read (record,*,err=170,end=170)  (list(i),i=1,n)
   170    continue
          do while (list(nlist+1) .ne. 0)
@@ -371,7 +371,7 @@ c
          write (iout,200)
   200    format (/,' Numbers of the Atoms to be Inserted :  ',$)
          read (input,210)  record
-  210    format (a120)
+  210    format (a240)
          read (record,*,err=220,end=220)  (list(i),i=1,n)
   220    continue
          do while (list(nlist+1) .ne. 0)
@@ -418,7 +418,7 @@ c
          write (iout,240)
   240    format (/,' Numbers of the Old and New Atom Types :  ',$)
          read (input,250)  record
-  250    format (a120)
+  250    format (a240)
          read (record,*,err=230,end=230)  oldtype,newtype
          dowhile (.not. abort)
             do i = 1, n
@@ -588,7 +588,7 @@ c
          write (iout,260)
   260    format (/,' Enter Translation Vector Components :  ',$)
          read (input,270)  record
-  270    format (a120)
+  270    format (a240)
          read (record,*,err=280,end=280)  xr,yr,zr
   280    continue
          dowhile (.not. abort)
@@ -717,7 +717,7 @@ c
          write (iout,310)
   310    format (/,' Enter Rigid Body Coordinates :  ',$)
          read (input,320)  record
-  320    format (a120)
+  320    format (a240)
          read (record,*,err=330,end=330)  xcm,ycm,zcm,phi,theta,psi
   330    continue
          call inertia (2)
@@ -800,7 +800,7 @@ c
             write (iout,340)
   340       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
             read (input,350)  record
-  350       format (a120)
+  350       format (a240)
             read (record,*,err=360,end=360)  xnew,ynew,znew
   360       continue
             if (ynew .eq. 0.0d0)  ynew = xnew
@@ -925,7 +925,7 @@ c
             write (iout,390)
   390       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
             read (input,400)  record
-  400       format (a120)
+  400       format (a240)
             read (record,*,err=410,end=410)  xbox,ybox,zbox
   410       continue
             if (ybox .eq. 0.0d0)  ybox = xbox
@@ -1148,7 +1148,7 @@ c
       real*8 close,close2
       logical exist,header
       logical, allocatable :: remove(:)
-      character*120 solvfile
+      character*240 solvfile
       external merge
 c
 c
@@ -1168,7 +1168,7 @@ c
          write (iout,10)
    10    format (/,' Enter Name of Solvent Box Coordinates :  ',$)
          read (input,20)  solvfile
-   20    format (a120)
+   20    format (a240)
          call basefile (solvfile)
          call suffix (solvfile,'xyz','old')
          inquire (file=solvfile,exist=exist)

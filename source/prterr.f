@@ -21,7 +21,7 @@ c
       use output
       implicit none
       integer ierr,freeunit
-      character*120 errorfile
+      character*240 errorfile
 c
 c
 c     write the current coordinates to a file after an error

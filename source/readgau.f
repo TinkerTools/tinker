@@ -37,10 +37,10 @@ c
       real*8 frcunit,hessunit
       character*4 arcstart
       character*6 gname
-      character*120 gaufile
-      character*120 record
-      character*120 string
-      character*120 word
+      character*240 gaufile
+      character*240 record
+      character*240 string
+      character*240 word
 c
 c
 c     initialize some values prior to opening the log file
@@ -70,7 +70,7 @@ c
          write (iout,10)
    10    format (/,' Enter the Name of the Gaussian Output File :  ',$)
          read (input,20)  gaufile
-   20    format (a120)
+   20    format (a240)
          igau = freeunit ()
          call basefile (gaufile)
          call suffix (gaufile,'log','old')
@@ -89,7 +89,7 @@ c
 c     do while (.true. .and. .not.eof(igau))
       do while (.true.)
          read (igau,30,err=70,end=70)  record
-   30    format (a120)
+   30    format (a240)
          next = 1
          string = record
          call trimhead (string)
@@ -98,12 +98,12 @@ c     do while (.true. .and. .not.eof(igau))
          if (string(1:20) .eq. 'STANDARD ORIENTATION') then
             do i = 1, 4
                read (igau,40,err=70,end=70)  record
-   40          format (a120)
+   40          format (a240)
             end do
             i = 1
             do while (.true.)
                read (igau,50,err=70,end=70)  record
-   50          format (a120)
+   50          format (a240)
                read (record,*,err=60,end=60)  itmp,jtmp,ktmp,
      &                                        xtmp,ytmp,ztmp
                if (jtmp .le. 0)  goto 60
@@ -131,7 +131,7 @@ c
 c     do while (.true. .and. .not.eof(igau))
       do while (.true.)
          read (igau,80,err=220,end=220)  record
-   80    format (a120)
+   80    format (a240)
          next = 1
          string = record
          call trimhead (string)
@@ -140,12 +140,12 @@ c     do while (.true. .and. .not.eof(igau))
          if (string(1:20) .eq. 'STANDARD ORIENTATION') then
             do i = 1, 4
                read (igau,90,err=220,end=220)  record
-   90          format (a120)
+   90          format (a240)
             end do
             i = 1
             do while (.true.)
                read (igau,100,err=220,end=220)  record
-  100          format (a120)
+  100          format (a240)
                read (record,*,err=110,end=110)  itmp,jtmp,ktmp,
      &                                          gx(i),gy(i),gz(i)
                if (jtmp .le. 0)  goto 110
@@ -155,16 +155,16 @@ c     do while (.true. .and. .not.eof(igau))
             ngatom = i - 1
          else if (string(37:58) .eq. 'FORCES (HARTREES/BOHR)') then
             read (igau,120,err=220,end=220)  record
-  120       format (a120)
+  120       format (a240)
             read (igau,130,err=220,end=220)  record
-  130       format (a120)
+  130       format (a240)
             frcunit = hartree / bohr
             do i = 1, ngatom
                gforce(1,i) = 0.0d0
                gforce(2,i) = 0.0d0
                gforce(3,i) = 0.0d0
                read (igau,140,err=220,end=220)  record
-  140          format (a120)
+  140          format (a240)
                read (record,*,err=150,end=150)  itmp,jtmp,gforce(1,i),
      &                                          gforce(2,i),gforce(3,i)
                do j = 1, 3
@@ -176,7 +176,7 @@ c     do while (.true. .and. .not.eof(igau))
             gfreq(ngfreq+1) = 0.0d0
             gfreq(ngfreq+2) = 0.0d0
             gfreq(ngfreq+3) = 0.0d0
-            read (string(15:120),*,err=160,end=160)  gfreq(ngfreq+1),
+            read (string(15:240),*,err=160,end=160)  gfreq(ngfreq+1),
      &                                               gfreq(ngfreq+2),
      &                                               gfreq(ngfreq+3)
   160       continue
@@ -190,7 +190,7 @@ c           do while (.true. .and. .not.eof(igau))
             do while (.true.)
                if (next .gt. 73) then
                   read (igau,170,err=220,end=220)  record
-  170             format (a120)
+  170             format (a240)
                   next = 1
                end if
                call readgarc (igau,record,word,length,next)
@@ -200,7 +200,7 @@ c           do while (.true. .and. .not.eof(igau))
                      do j = 1, 5
                         if (next .gt. 73) then
                            read (igau,180,err=220,end=220)  record
-  180                      format (a120)
+  180                      format (a240)
                            next = 1
                         end if
                         call readgarc (igau,record,word,length,next)
@@ -215,7 +215,7 @@ c           do while (.true. .and. .not.eof(igau))
                   do i = 1, 2
                      if (next .gt. 73) then
                         read (igau,190,err=220,end=220)  record
-  190                   format (a120)
+  190                   format (a240)
                         next = 1
                      end if
                      call readgarc (igau,record,word,length,next)
@@ -227,7 +227,7 @@ c           do while (.true. .and. .not.eof(igau))
                   do i = 1, 2
                      if (next .gt. 73) then
                         read (igau,200,err=220,end=220)  record
-  200                   format (a120)
+  200                   format (a240)
                         next = 1
                      end if
                      call readgarc (igau,record,word,length,next)
@@ -283,15 +283,15 @@ c
       integer i,igau,code
       integer next,length
       character*1 letter
-      character*120 word
-      character*120 string
+      character*240 word
+      character*240 string
 c
 c
 c     initialize some values prior to parsing the test string
 c
       length = 1
       letter = ' '
-      do i = 1, 120
+      do i = 1, 240
          word(i:i) = ' '
       end do
 c
@@ -312,7 +312,7 @@ c
      &          .or. code.eq.space)  return
          if (next .gt. 70) then
             read (igau,20,err=30,end=30)  string
-   20       format (a120)
+   20       format (a240)
             next = 1
             goto 10
          end if

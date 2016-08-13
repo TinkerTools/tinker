@@ -69,9 +69,9 @@ c
       character*1 answer
       character*6 status
       character*7 ext
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 record
+      character*240 string
 c
 c
 c     set up the structure and mechanics calculation
@@ -111,7 +111,7 @@ c
          write (iout,40)
    40    format (/,' Use [C]artesian or [T]orsional Moves [C] : ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -150,7 +150,7 @@ c
    80       format (/,' Enter Maximum Step in Angstroms [3.0] : ', $)
          end if
          read (input,90)  string
-   90    format (a120)
+   90    format (a240)
          read (string,*,err=100,end=100)  size
   100    continue
          if (size .lt. 0.0d0) then
@@ -174,7 +174,7 @@ c
   120    format (/,' Enter the Desired Temperature in Degrees',
      &              ' K [500] : ', $)
          read (input,130)  string
-  130    format (a120)
+  130    format (a240)
          read (string,*,err=140,end=140)  temper
   140    continue
          if (temper .lt. 0.0d0)  temper = 500.0d0
@@ -191,7 +191,7 @@ c
          write (iout,160)
   160    format (/,' Enter RMS Gradient Criterion [0.01] : ', $)
          read (input,170)  string
-  170    format (a120)
+  170    format (a240)
          read (string,*,err=180,end=180)  grdmin
   180    continue
          if (grdmin .lt. 0.0d0)  grdmin = 0.01

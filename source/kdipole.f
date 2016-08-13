@@ -40,8 +40,8 @@ c
       character*6 label
       character*8 blank,pt
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing bond dipole parameters
@@ -63,7 +63,7 @@ c
             ib = 0
             dp = 0.0d0
             ps = 0.5d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,dp,ps
    10       continue
             if (ia.gt.0 .and. ib.gt.0) then
@@ -310,7 +310,7 @@ c
             ib = 0
             dp = 0.0d0
             ps = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=110,end=110)  ia,ib,dp,ps
   110       continue
             if (ia.lt.0 .and. ib.lt.0) then

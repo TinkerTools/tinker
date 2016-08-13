@@ -40,8 +40,8 @@ c
       integer multi(maxpower)
       real*8 delta,rmax,dens
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c     PME grid size must be even with factors of only 2, 3 and 5
 c
@@ -96,7 +96,7 @@ c
          next = 1
          call upcase (record)
          call gettext (record,keyword,next)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:12) .eq. 'FFT-PACKAGE ') then
             call getword (record,ffttyp,next)
          else if (keyword(1:12) .eq. 'EWALD-ALPHA ') then

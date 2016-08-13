@@ -71,9 +71,9 @@ c
       logical doanalyt,donumer,dofull
       character*1 answer
       character*1 axis(3)
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 record
+      character*240 string
       data axis  / 'X','Y','Z' /
 c
 c
@@ -91,7 +91,7 @@ c
          write (iout,10)
    10    format (/,' Compute the Analytical Gradient Vector [Y] :  ',$)
          read (input,20)  record
-   20    format (a120)
+   20    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -106,7 +106,7 @@ c
          write (iout,30)
    30    format (/,' Compute the Numerical Gradient Vector [Y] :   ',$)
          read (input,40)  record
-   40    format (a120)
+   40    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -146,7 +146,7 @@ c
    80       format (/,' Output Breakdown by Gradient Component',
      &                 ' [N] :  ',$)
             read (input,90)  record
-   90       format (a120)
+   90       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if

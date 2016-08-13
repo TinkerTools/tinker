@@ -35,9 +35,9 @@ c
       character*1 answer
       character*6 mode,method
       character*20 keyword
-      character*120 minfile
-      character*120 record
-      character*120 string
+      character*240 minfile
+      character*240 record
+      character*240 string
       external newton1
       external newton2
       external optsave
@@ -56,7 +56,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
@@ -75,7 +75,7 @@ c
    20    format (/,' Choose Automatic, Newton, TNCG or DTNCG',
      &              ' Method [',a1,'] :  ',$)
          read (input,30)  record
-   30    format (a120)
+   30    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -95,7 +95,7 @@ c
    40    format (/,' Precondition via Auto/None/Diag/Block/',
      &              'SSOR/ICCG [',a1,'] :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

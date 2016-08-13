@@ -52,7 +52,7 @@ c
       real*8, allocatable :: ztmp(:)
       real*8, allocatable :: temp(:,:)
       logical exist
-      character*120 string
+      character*240 string
       external path1
       external optsave
 c

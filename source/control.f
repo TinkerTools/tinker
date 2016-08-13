@@ -25,8 +25,8 @@ c
       integer i,next
       logical exist
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set default values for information and output variables
@@ -63,7 +63,7 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:7) .eq. 'DIGITS ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10)  digits
          else if (keyword(1:8) .eq. 'VERBOSE ') then
             verbose = .true.

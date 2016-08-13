@@ -43,8 +43,8 @@ c
       character*16 blank
       character*16 pt,pt0
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing stretch-torsion parameters
@@ -71,7 +71,7 @@ c
             bt7 = 0.0d0
             bt8 = 0.0d0
             bt9 = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,bt1,bt2,bt3,
      &                                     bt4,bt5,bt6,bt7,bt8,bt9
    10       continue

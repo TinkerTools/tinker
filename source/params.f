@@ -23,6 +23,6 @@ c
       integer maxprm
       parameter (maxprm=25000)
       integer nprm
-      character*120 prmline(maxprm)
+      character*240 prmline(maxprm)
       save
       end

@@ -31,9 +31,9 @@ c
       integer izmt,ixyz,iseq
       integer freeunit,trimtext
       logical exist
-      character*120 seqfile
-      character*120 intfile
-      character*120 xyzfile
+      character*240 seqfile
+      character*240 intfile
+      character*240 xyzfile
 c
 c
 c     get the name to use for the output structure files
@@ -44,7 +44,7 @@ c
          write (iout,10)
    10    format (/,' Enter Name to be Used for Output Files :  ',$)
          read (input,20)  filename
-   20    format (a120)
+   20    format (a240)
       end if
       call basefile (filename)
 c
@@ -53,7 +53,7 @@ c
       write (iout,30)
    30 format (/,' Enter Title :  ',$)
       read (input,40)  title
-   40 format (a120)
+   40 format (a240)
       ltitle = trimtext (title)
 c
 c     read the keyfile and force field parameter file
@@ -144,8 +144,8 @@ c
       character*1 answer
       character*1 ucase(26)
       character*3 name,resname
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       data ucase  / 'A','B','C','D','E','F','G','H','I','J','K','L',
      &              'M','N','O','P','Q','R','S','T','U','V','W','X',
      &              'Y','Z' /
@@ -157,7 +157,7 @@ c
    10 format (/,' Enter A-, B- or Z-Form Helix for the Structure',
      &           ' [B] :  ',$)
       read (input,20)  record
-   20 format (a120)
+   20 format (a240)
       call upcase (record)
       next = 1
       call getword (record,answer,next)
@@ -195,12 +195,12 @@ c
          write (iout,40)  i
    40    format (/,' Enter Residue',i4,' :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          call upcase (record)
          next = 1
          call gettext (record,name,next)
          length = trimtext (name)
-         string = record(next:120)
+         string = record(next:240)
          read (string,*,err=60,end=60)  (bkbone(j,i),j=1,6),glyco(i)
    60    continue
 c
@@ -252,7 +252,7 @@ c
    80    format (/,' Build a Double Helix using Complimentary Bases',
      &              ' [N] :  ',$)
          read (input,90)  record
-   90    format (a120)
+   90    format (a240)
          next = 1
          call gettext (record,answer,next)
          call upcase (answer)
@@ -262,7 +262,7 @@ c
   100    format (/,' Combine the Two Single Strands into Double Helix',
      &              ' [Y] :  ',$)
          read (input,110)  record
-  110    format (a120)
+  110    format (a240)
          next = 1
          call gettext (record,answer,next)
          call upcase (answer)

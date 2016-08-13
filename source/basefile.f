@@ -23,8 +23,8 @@ c
       implicit none
       integer i,k,trimtext
       character*1 letter
-      character*120 string
-      character*120 prefix
+      character*240 string
+      character*240 prefix
 c
 c
 c     account for home directory abbreviation in filename

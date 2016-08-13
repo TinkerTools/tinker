@@ -43,8 +43,8 @@ c
       character*6 label
       character*8 blank,pt
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing bond stretch parameters
@@ -66,7 +66,7 @@ c
             ib = 0
             fc = 0.0d0
             bd = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,fc,bd
    10       continue
             if (.not. silent) then
@@ -341,8 +341,8 @@ c
       character*12 blank
       character*12 pt,pt1,pt2
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing electronegativity parameters
@@ -359,7 +359,7 @@ c
             ib = 0
             ic = 0
             dl = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,dl
    10       continue
             if (.not. silent) then
@@ -531,8 +531,8 @@ c
       real*8 rad0a,rad0b
       logical header,done
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     get single bonds that could be double (MMFF bond type=1)
@@ -547,7 +547,7 @@ c
             do j = 1, 20
                list(j) = 0
             end do
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  (list(j),j=1,20)
    10       continue
             do j = 1, 20, 2

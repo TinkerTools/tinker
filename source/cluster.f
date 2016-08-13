@@ -35,8 +35,8 @@ c
       real*8 wg
       logical header
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -94,7 +94,7 @@ c
      &                    ' Increase MAXGRP')
                call fatal
             end if
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=20,end=20)  (list(i),i=1,20)
    20       continue
             i = 1
@@ -134,7 +134,7 @@ c
             ga = 0
             gb = 0
             wg = -1.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=40,end=40)  ga,gb,wg
    40       continue
             if (wg .lt. 0.0d0)  wg = 1.0d0

@@ -31,8 +31,8 @@ c
       logical header
       character*20 keyword
       character*20 value
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     defaults for implicit solvation term and parameters
@@ -51,7 +51,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:8) .eq. 'SOLVATE ') then
             use_solv = .true.
             use_born = .false.
@@ -834,8 +834,8 @@ c
       character*10 radtyp
       character*20 keyword
       character*20 value
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -877,7 +877,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:4) .eq. 'GKC ') then
             read (string,*,err=10,end=10)  gkc
          else if (keyword(1:10) .eq. 'GK-RADIUS ') then
@@ -1170,8 +1170,8 @@ c
       character*10 radtyp
       character*20 keyword
       character*20 value
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -1268,7 +1268,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:8) .eq. 'MG-AUTO ') then
             pbsoln = 'MG-AUTO'
          else if (keyword(1:10) .eq. 'MG-MANUAL ') then
@@ -1417,7 +1417,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:5) .eq. 'DIME ') then
             read (string,*,err=90,end=90)  nx,ny,nz
             dime(1) = nx
@@ -1697,8 +1697,8 @@ c
       real*8 rmixo7,emixo
       real*8 ri,ri3,ri7,ri11
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set default values for solvent pressure and surface tension
@@ -1718,7 +1718,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
             read (string,*,err=10,end=10)  solvprs
          else if (keyword(1:16) .eq. 'SURFACE-TENSION ') then

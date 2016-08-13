@@ -32,7 +32,7 @@ c
       logical exist
       character*2 atmc
       character*39 fstr
-      character*120 dynfile
+      character*240 dynfile
 c
 c
 c     update an existing restart file or open a new one

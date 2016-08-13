@@ -32,7 +32,7 @@ c
       real*8, allocatable :: yave(:)
       real*8, allocatable :: zave(:)
       logical exist
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     try to get a filename from the command line arguments
@@ -51,7 +51,7 @@ c
          write (iout,10)
    10    format (/,' Enter Coordinate Archive File Name :  ',$)
          read (input,20)  xyzfile
-   20    format (a120)
+   20    format (a240)
          call basefile (xyzfile)
          call suffix (xyzfile,'xyz','old')
          inquire (file=xyzfile,exist=exist)

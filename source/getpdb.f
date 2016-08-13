@@ -22,7 +22,7 @@ c
       integer ipdb
       integer freeunit
       logical exist
-      character*120 pdbfile
+      character*240 pdbfile
 c
 c
 c     try to get a filename from the command line arguments
@@ -40,7 +40,7 @@ c
          write (iout,10)
    10    format (/,' Enter Protein Data Bank File Name :  ',$)
          read (input,20)  pdbfile
-   20    format (a120)
+   20    format (a240)
          call basefile (pdbfile)
          call suffix (pdbfile,'pdb','old')
          inquire (file=pdbfile,exist=exist)

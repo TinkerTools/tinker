@@ -71,9 +71,9 @@ c
       character*1 answer
       character*9 status
       character*20 keyword
-      character*120 tsfile
-      character*120 record
-      character*120 string
+      character*240 tsfile
+      character*240 record
+      character*240 string
       external saddle1
 c
 c
@@ -153,7 +153,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:8) .eq. 'DIVERGE ') then
             read (string,*,err=10,end=10)  diverge
          else if (keyword(1:7) .eq. 'REDUCE ') then
@@ -187,7 +187,7 @@ c
    50    format (/,' Perform Synchronous Transit Pathway Scans',
      &              ' [N] :  ',$)
          read (input,60)  record
-   60    format (a120)
+   60    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

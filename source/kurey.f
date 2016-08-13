@@ -38,8 +38,8 @@ c
       character*4 pa,pb,pc
       character*12 blank,pt
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing Urey-Bradley parameters
@@ -57,7 +57,7 @@ c
             ic = 0
             bb = 0.0d0
             tt = 0.0d0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,bb,tt
    10       continue
             if (.not. silent) then

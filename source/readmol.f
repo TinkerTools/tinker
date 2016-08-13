@@ -30,7 +30,7 @@ c
       integer nbond
       integer trimtext
       logical exist,opened
-      character*120 mdlfile
+      character*240 mdlfile
 c
 c
 c     open the input file if it has not already been done
@@ -59,7 +59,7 @@ c
 c     get title line and get the number of atoms and bonds
 c
       read (imdl,20)  title
-   20 format (a120)
+   20 format (a240)
       ltitle = trimtext (title)
       read (imdl,30)
    30 format (/)

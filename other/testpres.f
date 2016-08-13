@@ -34,7 +34,7 @@ c
       real*8 stress(3,3)
       real*8 derivs(3,maxatm)
       logical exist,query
-      character*120 string
+      character*240 string
 c
 c
 c     set up the structure and molecular mechanics calculation

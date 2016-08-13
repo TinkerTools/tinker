@@ -42,11 +42,11 @@ c
       logical exist,query
       character*1 answer
       character*7 ext,modtyp
-      character*120 arcfile
-      character*120 basename
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 arcfile
+      character*240 basename
+      character*240 xyzfile
+      character*240 record
+      character*240 string
 c
 c
 c     get the name to use for the coordinate archive file
@@ -57,7 +57,7 @@ c
          write (iout,10)
    10    format (/,' Enter Name of the Coordinate Archive File :  ',$)
          read (input,20)  arcfile
-   20    format (a120)
+   20    format (a240)
       end if
 c
 c     present a list of possible archive modifications
@@ -109,7 +109,7 @@ c
    80       format (/,' Enter Name of the Coordinate Archive',
      &                 ' File :  ',$)
             read (input,90)  arcfile
-   90       format (a120)
+   90       format (a240)
             call basefile (arcfile)
             basename = arcfile
             lengb = leng
@@ -146,7 +146,7 @@ c
   110       format (/,' Numbers of First & Last File and Step',
      &                 ' Increment :  ',$)
             read (input,120)  record
-  120       format (a120)
+  120       format (a240)
             read (record,*,err=130,end=130)  start,stop,step
   130       continue
          end if
@@ -204,7 +204,7 @@ c
             write (iout,140)
   140       format (/,' Numbers of the Atoms to be Removed :  ',$)
             read (input,150)  record
-  150       format (a120)
+  150       format (a240)
             read (record,*,err=160,end=160)  (list(i),i=1,20)
   160       continue
             i = 1
@@ -283,7 +283,7 @@ c
   180       format (/,' Numbers of First & Last File and Step',
      &                 ' [<CR>=Exit] :  ',$)
             read (input,190)  record
-  190       format (a120)
+  190       format (a240)
             read (record,*,err=200,end=200)  start,stop,step
   200       continue
          end if
@@ -386,7 +386,7 @@ c
   230          format (/,' Numbers of First & Last File and Step',
      &                    ' [<CR>=Exit] :  ',$)
                read (input,240)  record
-  240          format (a120)
+  240          format (a240)
                read (record,*,err=250,end=250)  start,stop,step
   250          continue
             end if
@@ -439,7 +439,7 @@ c
       character*2 crdc
       character*2 digc
       character*25 fstr
-      character*120 arcfile
+      character*240 arcfile
 c
 c
 c     open output unit if not already done

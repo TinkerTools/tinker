@@ -28,7 +28,7 @@ c
       logical opened
       character*1 letter
       character*23 fstr
-      character*120 seqfile
+      character*240 seqfile
 c
 c
 c     open the output unit if not already done

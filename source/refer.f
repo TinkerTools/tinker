@@ -51,7 +51,7 @@ c
       real*8, allocatable :: yref(:,:)
       real*8, allocatable :: zref(:,:)
       character*3, allocatable :: refnam(:,:)
-      character*120 reffile(maxref)
-      character*120 reftitle(maxref)
+      character*240 reffile(maxref)
+      character*240 reftitle(maxref)
       save
       end

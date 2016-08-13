@@ -68,8 +68,8 @@ c
       logical done,valid
       logical exist,info
       character*7 errtyp,ext
-      character*120 title
-      character*120 geofile
+      character*240 title
+      character*240 geofile
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -938,7 +938,7 @@ c
       character*1 ta,tb,tc,td,te
       character*1 digit(0:9)
       character*1 symbol(130)
-      character*120 title
+      character*240 title
       data dash   / '-' /
       data ta,tb,tc,td,te  / ' ','.','+','X','#' /
       data digit  / '0','1','2','3','4','5','6','7','8','9' /
@@ -1087,8 +1087,8 @@ c
       logical update
       character*8 method
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       save first,method,update
       save npart,percent
       save mean,stdev
@@ -1127,7 +1127,7 @@ c
                else if (method .eq. 'PARTIAL') then
                   call getnumb (record,npart,next)
                else if (method .eq. 'PAIRWISE') then
-                  string = record(next:120)
+                  string = record(next:240)
                   read (string,*,err=10,end=10)  percent
    10             continue
                end if
@@ -1135,7 +1135,7 @@ c
 c     get a choice of initial mean for the trial distribution
 c
             else if (keyword(1:19) .eq. 'TRIAL-DISTRIBUTION ') then
-               string = record(next:120)
+               string = record(next:240)
                read (string,*,err=20,end=20)  mean
    20          continue
                update = .false.
@@ -1667,7 +1667,7 @@ c
       real*8 rg
       real*8 evl(*)
       real*8 evc(n,*)
-      character*120 title
+      character*240 title
 c
 c
 c     compute coordinates from the largest eigenvalues and vectors
@@ -1832,7 +1832,7 @@ c
       real*8, allocatable :: yy(:)
       real*8, allocatable :: zz(:)
       real*8 dmx(n,*)
-      character*120 title
+      character*240 title
 c
 c
 c     set number of iterations and some other needed values
@@ -2336,7 +2336,7 @@ c
       real*8 dist,range,fraction
       real*8 fdist(start:stop)
       real*8 fdist2(start:stop)
-      character*120 title
+      character*240 title
 c
 c
 c     set the bin size and zero out the individual bins
@@ -2421,7 +2421,7 @@ c
       integer leng,trimtext
       real*8 rms,himax,lomax
       real*8 dist,hierr,loerr
-      character*120 title
+      character*240 title
 c
 c
 c     search all atom pairs for maximal bounds deviations
@@ -2553,7 +2553,7 @@ c
       real*8 sum,rgsq
       real*8 dist,dist2
       real*8 dmd(n,*)
-      character*120 title
+      character*240 title
 c
 c
 c     store the final distance matrix and bound violations

@@ -30,9 +30,9 @@ c
       integer natom,mode
       integer freeunit,trimtext
       logical exist,clash
-      character*120 seqfile
-      character*120 intfile
-      character*120 xyzfile
+      character*240 seqfile
+      character*240 intfile
+      character*240 xyzfile
 c
 c
 c     get the name to use for the output structure files
@@ -43,7 +43,7 @@ c
          write (iout,10)
    10    format (/,' Enter Name to be Used for Output Files :  ',$)
          read (input,20)  filename
-   20    format (a120)
+   20    format (a240)
       end if
       call basefile (filename)
 c
@@ -52,7 +52,7 @@ c
       write (iout,30)
    30 format (/,' Enter Title :  ',$)
       read (input,40)  title
-   40 format (a120)
+   40 format (a240)
       ltitle = trimtext (title)
 c
 c     read the keyfile and force field parameter file
@@ -151,8 +151,8 @@ c
       character*1 chir
       character*1 ucase(26)
       character*3 name
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       data ucase  / 'A','B','C','D','E','F','G','H','I','J','K','L',
      &              'M','N','O','P','Q','R','S','T','U','V','W','X',
      &              'Y','Z' /
@@ -208,12 +208,12 @@ c
          write (iout,20)  i
    20    format (/,' Enter Residue',i4,' :  ',$)
          read (input,30)  record
-   30    format (a120)
+   30    format (a240)
          call upcase (record)
          next = 1
          call gettext (record,name,next)
          length = trimtext (name)
-         string = record(next:120)
+         string = record(next:240)
          read (string,*,err=40,end=40)  phi(i),psi(i),omega(i),
      &                                  (chi(j,i),j=1,4),disulf(i)
    40    continue
@@ -357,7 +357,7 @@ c
       logical single,cyclic
       character*1 answer
       character*3 resname
-      character*120 record
+      character*240 record
 c
 c
 c     determine whether the peptide chain is cyclic
@@ -366,7 +366,7 @@ c
       write (iout,10)
    10 format (/,' Cyclize the Polypeptide Chain [N] :  ',$)
       read (input,20)  record
-   20 format (a120)
+   20 format (a240)
       next = 1
       call gettext (record,answer,next)
       call upcase (answer)

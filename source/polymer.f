@@ -35,8 +35,8 @@ c
       real*8 zlimit
       real*8 maximage
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set defaults of infinite polymer usage and cutoff distance
@@ -52,7 +52,7 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:15) .eq. 'POLYMER-CUTOFF ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  polycut
    10       continue
          end if

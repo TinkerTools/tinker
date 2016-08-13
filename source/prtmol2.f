@@ -33,7 +33,7 @@ c
       character*1 digit(0:9)
       character*4 atmtyp,number
       character*7 atmnam
-      character*120 sybylfile
+      character*240 sybylfile
       data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
 c

@@ -31,9 +31,9 @@ c
       integer next,trimtext
       logical exist,opened
       character*10 atmnam
-      character*120 sybylfile
-      character*120 record
-      character*120 string
+      character*240 sybylfile
+      character*240 record
+      character*240 string
 c
 c
 c     open the input file if it has not already been done
@@ -63,16 +63,16 @@ c     get title line and get the number of atoms and bonds
 c
       dowhile (.true.)
          read (isyb,20,err=50,end=50)  record
-   20    format (a120)
+   20    format (a240)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>MOLECULE') then
             read (isyb,30)  title
-   30       format (a120)
+   30       format (a240)
             ltitle = trimtext (title)
             read (isyb,40)  record
-   40       format (a120)
+   40       format (a240)
             read (record,*)  n,nbond
             goto 50
          end if
@@ -97,18 +97,18 @@ c     read the atom names and coordinates
 c
       dowhile (.true.)
          read (isyb,80,err=100,end=100)  record
-   80    format (a120)
+   80    format (a240)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>ATOM') then
             do j = 1, n
                read (isyb,90)  record
-   90          format (a120)
+   90          format (a240)
                read (record,*)  number
                next = 1
                call getword (record,atmnam,next)
-               string = record(next:120)
+               string = record(next:240)
                read (string,*)  x(j),y(j),z(j)
                call getword (record,atmnam,next)
                name(j) = atmnam(1:3)
@@ -129,14 +129,14 @@ c     read the bond list to get attached atom lists
 c
       dowhile (.true.)
          read (isyb,110,err=130,end=130)  record
-  110    format (a120)
+  110    format (a240)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>BOND') then
             do j = 1, nbond
                read (isyb,120)  record
-  120          format (a120)
+  120          format (a240)
                read (record,*)  number,ia,ib
                n12(ia) = n12(ia) + 1
                i12(n12(ia),ia) = ib

@@ -134,8 +134,8 @@ c
       character*9 info_solve
       character*9 info_search
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       save h_index,h
       external fgvalue
       external hmatrix
@@ -184,7 +184,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:7) .eq. 'FCTMIN ') then
             read (string,*,err=10,end=10)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then

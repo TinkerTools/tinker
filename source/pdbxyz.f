@@ -42,10 +42,10 @@ c
       character*1 letter
       character*3 resname
       character*3 reslast
-      character*120 pdbfile
-      character*120 xyzfile
-      character*120 seqfile
-      character*120 pdbtitle
+      character*240 pdbfile
+      character*240 xyzfile
+      character*240 seqfile
+      character*240 pdbtitle
 c
 c
 c     get the Protein Data Bank file and a parameter set

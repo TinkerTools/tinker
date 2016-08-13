@@ -37,9 +37,9 @@ c
       real*8, allocatable :: radius(:)
       logical exist,query
       character*1 answer
-      character*120 xyzfile
-      character*120 record
-      character*120 string
+      character*240 xyzfile
+      character*240 record
+      character*240 string
 c
 c
 c     get the Cartesian coordinates for the system
@@ -116,7 +116,7 @@ c
    80    format (/,' Include the Hydrogen Atoms in Computation',
      &              ' [N] :  ',$)
          read (input,90)  record
-   90    format (a120)
+   90    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

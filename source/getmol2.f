@@ -23,7 +23,7 @@ c
       integer isyb
       integer freeunit
       logical exist
-      character*120 sybylfile
+      character*240 sybylfile
 c
 c
 c     try to get a filename from the command line arguments
@@ -41,7 +41,7 @@ c
          write (iout,10)
    10    format (/,' Enter a Sybyl MOL2 File Name :  ',$)
          read (input,20)  sybylfile
-   20    format (a120)
+   20    format (a240)
          call basefile (sybylfile)
          call suffix (sybylfile,'mol2','old')
          inquire (file=sybylfile,exist=exist)

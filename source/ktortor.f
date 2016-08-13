@@ -52,8 +52,8 @@ c
       character*20 blank,pt
       character*20 pt1,pt2
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing torsion-torsion parameters
@@ -79,7 +79,7 @@ c
                ty(j) = 0.0d0
                tf(j) = 0.0d0
             end do
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,ie,nx,ny
             nxy = nx * ny
             do j = 1, nxy

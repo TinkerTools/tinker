@@ -84,10 +84,10 @@ c
       real*8, allocatable :: c(:,:)
       character*1 answer
       character*20 keyword
-      character*120 record
-      character*120 string
-      character*120 datafile
-      character*120 blockfile
+      character*240 record
+      character*240 string
+      character*240 datafile
+      character*240 blockfile
       logical exist,restart
       logical header,done
 c
@@ -118,7 +118,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:8) .eq. 'MAXITER ') then
             read (string,*,err=10,end=10)  maxiter
          else if (keyword(1:6) .eq. 'IDUMP ') then
@@ -142,7 +142,7 @@ c
    20    format (/,' Start at Lowest or Highest Frequency',
      &              ' Normal Mode [',a1,'] :  ',$)
          read (input,30)  record
-   30    format (a120)
+   30    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -1917,7 +1917,7 @@ c
       real*8, allocatable :: yref(:)
       real*8, allocatable :: zref(:)
       character*7 ext
-      character*120 xyzfile
+      character*240 xyzfile
 c
 c
 c     create a name for the vibrational displacement file

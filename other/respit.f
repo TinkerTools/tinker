@@ -35,12 +35,12 @@ c
       real*8 za(maxatm),zg(maxgrid)
       real*8 pot(maxgrid)
       logical exist
-      character*80 record
-      character*80 string
-      character*80 title
-      character*120 logfile
-      character*120 espfile
-      character*120 datfile
+      character*240 record
+      character*240 string
+      character*240 title
+      character*240 logfile
+      character*240 espfile
+      character*240 datfile
 c
 c
 c     try to get a filename from the command line arguments
@@ -60,7 +60,7 @@ c
          write (iout,10)
    10    format (/,' Enter Gaussian 03 Log File Name :  ',$)
          read (input,20)  logfile
-   20    format (a120)
+   20    format (a240)
          call basefile (logfile)
          call suffix (logfile,'log')
          call version (logfile,'old')

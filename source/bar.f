@@ -85,16 +85,16 @@ c
       real*8, allocatable :: vola(:)
       real*8, allocatable :: volb(:)
       logical exist,query,done
-      character*120 record
-      character*120 string
-      character*120 fname1
-      character*120 fname2
-      character*120 title1
-      character*120 title2
-      character*120 xyzfile
-      character*120 barfile
-      character*120, allocatable :: keys1(:)
-      character*120, allocatable :: keys2(:)
+      character*240 record
+      character*240 string
+      character*240 fname1
+      character*240 fname2
+      character*240 title1
+      character*240 title2
+      character*240 xyzfile
+      character*240 barfile
+      character*240, allocatable :: keys1(:)
+      character*240, allocatable :: keys2(:)
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -134,7 +134,7 @@ c
    20    format (/,' Numbers of First & Last File and Step',
      &              ' Increment :  ',$)
          read (input,30)  record
-   30    format (a120)
+   30    format (a240)
          read (record,*,err=40,end=40)  start1,stop1,step1
    40    continue
       end if
@@ -201,7 +201,7 @@ c
   100    format (/,' Numbers of First & Last File and Step',
      &              ' Increment :  ',$)
          read (input,110)  record
-  110    format (a120)
+  110    format (a240)
          read (record,*,err=120,end=120)  start2,stop2,step2
   120    continue
       end if

@@ -91,8 +91,8 @@ c
       logical restart,done
       character*9 status
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       external fgvalue,optsave
 c
 c
@@ -137,7 +137,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:7) .eq. 'FCTMIN ') then
             read (string,*,err=10,end=10)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then

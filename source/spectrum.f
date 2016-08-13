@@ -33,9 +33,9 @@ c
       real*8, allocatable :: vel(:)
       real*8, allocatable :: intense(:)
       logical exist,done
-      character*120 velfile
-      character*120 record
-      character*120 string
+      character*240 velfile
+      character*240 record
+      character*240 string
 c
 c
 c     perform the standard initialization functions
@@ -58,7 +58,7 @@ c
    10    format (/,' Enter Name of Velocity Autocorrelation',
      &              ' File :  ',$)
          read (input,20)  velfile
-   20    format (a120)
+   20    format (a240)
          call basefile (velfile)
          call suffix (velfile,'vel','old')
          inquire (file=velfile,exist=exist)
@@ -91,7 +91,7 @@ c
       done = .false.
       do while (.not. done)
          read (ivel,60)  record
-   60    format (a120)
+   60    format (a240)
          if (record(4:13) .eq. 'Separation') then
             done = .true.
             read (ivel,70)
@@ -110,7 +110,7 @@ c     read the velocity autocorrelation as a function of time
 c
       do i = 1, maxvel
          read (ivel,80,err=90,end=90)  record
-   80    format (a120)
+   80    format (a240)
          read (record,*)  k,nsamp,aver,norm
          nvel = k
          vel(k) = norm

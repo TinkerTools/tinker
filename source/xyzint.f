@@ -25,8 +25,8 @@ c
       integer next,freeunit
       logical exist
       character*1 answer
-      character*120 intfile
-      character*120 record
+      character*240 intfile
+      character*240 record
 c
 c
 c     get and read the Cartesian coordinates file
@@ -44,7 +44,7 @@ c
    20    format (/,' Template (T), Dihedrals (D), Manual (M)',
      &              ' or Automatic [A] :  ',$)
          read (input,30)  record
-   30    format (a120)
+   30    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

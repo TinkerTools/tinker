@@ -79,8 +79,8 @@ c
       logical done
       character*9 blank,status
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       external fgvalue,optsave
 c
 c
@@ -131,7 +131,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:14) .eq. 'LBFGS-VECTORS ') then
             read (string,*,err=10,end=10)  msav
             msav = max(0,min(msav,nvar))

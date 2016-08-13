@@ -23,7 +23,7 @@ c
       use titles
       implicit none
       integer isyb,freeunit
-      character*120 sybylfile
+      character*240 sybylfile
 c
 c
 c     get and read the Cartesian coordinates file

@@ -54,9 +54,9 @@ c
       character*1 answer
       character*3 namej,namek
       character*6 labelj,labelk
-      character*120 arcfile
-      character*120 record
-      character*120 string
+      character*240 arcfile
+      character*240 record
+      character*240 string
 c
 c
 c     perform the standard initialization functions
@@ -78,7 +78,7 @@ c
          write (iout,10)
    10    format (/,' Enter Coordinate Archive File Name :  ',$)
          read (input,20)  arcfile
-   20    format (a120)
+   20    format (a240)
          call basefile (arcfile)
          call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
@@ -126,7 +126,7 @@ c
    40    format (/,' Numbers of First & Last Frame and Step',
      &              ' Increment :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          read (record,*,err=60,end=60)  start,stop,step
    60    continue
       end if
@@ -139,7 +139,7 @@ c
          write (iout,70)
    70    format (/,' Enter 1st & 2nd Atom Names or Type Numbers :  ',$)
          read (input,80)  record
-   80    format (a120)
+   80    format (a240)
          next = 1
          call gettext (record,labelj,next)
          call gettext (record,labelk,next)
@@ -219,7 +219,7 @@ c
   170    format (/,' Include Intramolecular Pairs in Distribution',
      &              ' [N] :  ',$)
          read (input,180)  record
-  180    format (a120)
+  180    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

@@ -49,8 +49,8 @@ c
       logical first
       character*1 letter
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       save first
       data first  / .true. /
 c
@@ -98,7 +98,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
 c
 c     get atom restrained to a specified position range
 c
@@ -118,7 +118,7 @@ c
                   p1 = x(ia)
                   p2 = y(ia)
                   p3 = z(ia)
-                  string = string(next:120)
+                  string = string(next:240)
                   read (string,*,err=10,end=10)  p1,p2,p3,p4,p5
    10             continue
                   if (p4 .eq. 0.0d0)  p4 = 100.0d0
@@ -136,7 +136,7 @@ c
                   ia = abs(ia)
                   call getnumb (string,ib,next)
                   ib = min(abs(ib),n)
-                  string = string(next:120)
+                  string = string(next:240)
                   read (string,*,err=20,end=20)  p1,p2
    20             continue
                   if (p1 .eq. 0.0d0)  p1 = 100.0d0
@@ -156,7 +156,7 @@ c
             else
                call upcase (letter)
                read (string,*,err=30,end=30)  ia
-               string = string(next:120)
+               string = string(next:240)
                read (string,*,err=30,end=30)  p1,p2,p3
    30          continue
                if (p2 .eq. 0.0d0)  p2 = 100.0d0

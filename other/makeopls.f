@@ -53,9 +53,9 @@ c
       character*3 cls3(maxprm)
       character*3 cls4(maxprm)
       character*3 clsnam(maxclass)
-      character*120 bossfile
-      character*120 record
-      character*120 string
+      character*240 bossfile
+      character*240 record
+      character*240 string
 c
 c
 c     setup for calculation and initialize types and classes
@@ -75,7 +75,7 @@ c
          write (iout,10)
    10    format (/,' Enter the BOSS Atom Definition File Name :  ',$)
          read (input,20)  bossfile
-   20    format (a120)
+   20    format (a240)
          call basefile (bossfile)
          call suffix (bossfile,'atom')
          call version (bossfile,'old')
@@ -94,12 +94,12 @@ c
       rewind (unit=iboss)
       dowhile (.true.)
          read (iboss,30,err=80,end=80)  record
-   30    format (a120)
+   30    format (a240)
          next = 1
          call getnumb (record,it,next)
          call getnumb (record,ie,next)
          call getword (record,id,next)
-         string = record(next:120)
+         string = record(next:240)
          read (string,*)  cg,rd,ep
          ntyp = ntyp + 1
          typnum(ntyp) = it
@@ -276,7 +276,7 @@ c
          write (iout,200)
   200    format (/,' Enter the BOSS Bond Parameter File Name :  ',$)
          read (input,210)  bossfile
-  210    format (a120)
+  210    format (a240)
          call basefile (bossfile)
          call suffix (bossfile,'bond')
          call version (bossfile,'old')
@@ -296,10 +296,10 @@ c
          fc = 0.0d0
          bd = 0.0d0
          read (iboss,220,err=270,end=270)  record
-  220    format (a120)
+  220    format (a240)
          sm1 = record(1:2)
          sm2 = record(4:5)
-         string = record(6:120)
+         string = record(6:240)
          read (string,*,err=230,end=230)  fc,bd
   230    continue
          nprm = nprm + 1
@@ -357,7 +357,7 @@ c
          write (iout,320)
   320    format (/,' Enter the BOSS Angle Parameter File Name :  ',$)
          read (input,330)  bossfile
-  330    format (a120)
+  330    format (a240)
          call basefile (bossfile)
          call suffix (bossfile,'angle')
          call version (bossfile,'old')
@@ -378,11 +378,11 @@ c
          fc = 0.0d0
          an = 0.0d0
          read (iboss,340,err=390,end=390)  record
-  340    format (a120)
+  340    format (a240)
          sm1 = record(1:2)
          sm2 = record(4:5)
          sm3 = record(7:8)
-         string = record(9:120)
+         string = record(9:240)
          read (string,*,err=350,end=350)  fc,an
   350    continue
          nprm = nprm + 1
@@ -448,7 +448,7 @@ c
          write (iout,450)
   450    format (/,' Enter the BOSS Torsion Parameter File Name :  ',$)
          read (input,460)  bossfile
-  460    format (a120)
+  460    format (a240)
          call basefile (bossfile)
          call suffix (bossfile,'tors')
          call version (bossfile,'old')
@@ -472,7 +472,7 @@ c
          vt3 = 0.0d0
          vt4 = 0.0d0
          read (iboss,470,err=520,end=520)  record
-  470    format (a120)
+  470    format (a240)
          sm1 = record(48:49)
          sm2 = record(51:52)
          sm3 = record(54:55)

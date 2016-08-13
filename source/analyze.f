@@ -39,9 +39,9 @@ c
       logical exist
       logical, allocatable :: active(:)
       character*1 letter
-      character*120 record
-      character*120 string
-      character*120 xyzfile
+      character*240 record
+      character*240 string
+      character*240 xyzfile
 c
 c
 c     set up the structure and mechanics calculation
@@ -70,7 +70,7 @@ c
    30    format (/,' Enter the Desired Analysis Types',
      &              ' [G,P,E,A,L,D,M,V,C] :  ',$)
          read (input,40,err=20)  string
-   40    format (a120)
+   40    format (a240)
       end if
 c
 c     set option control flags based desired analysis types
@@ -124,7 +124,7 @@ c
    60       format (/,' List Atoms for which Output is Desired',
      &                 ' [ALL] :  '/,'    >  ',$)
             read (input,70)  record
-   70       format (a120)
+   70       format (a240)
             read (record,*,err=80,end=80)  (list(i),i=1,20)
    80       continue
          end if
@@ -1278,7 +1278,7 @@ c
       use potent
       implicit none
       real*8 energy
-      character*120 fstr
+      character*240 fstr
 c
 c
 c     perform the energy analysis by atom and component
@@ -1327,7 +1327,7 @@ c
       implicit none
       character*12 form1
       character*12 form2
-      character*120 fstr
+      character*240 fstr
 c
 c
 c     write out each energy component to the desired precision
@@ -1582,7 +1582,7 @@ c
       implicit none
       integer i
       logical active(*)
-      character*120 fstr
+      character*240 fstr
 c
 c
 c     energy partitioning over the individual atoms

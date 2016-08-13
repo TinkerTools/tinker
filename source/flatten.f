@@ -29,8 +29,8 @@ c
       logical query,exist
       character*7 stype
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set defaults for deformation and diffusion coefficients
@@ -48,7 +48,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:10) .eq. 'SMOOTHING ') then
             use_smooth = .true.
             use_dem = .false.
@@ -106,7 +106,7 @@ c
      &                    ' Parameter [0.0] :  ',$)
             end if
             read (input,60)  record
-   60       format (a120)
+   60       format (a240)
             read (record,*,err=70,end=70)  deform
    70       continue
          end if

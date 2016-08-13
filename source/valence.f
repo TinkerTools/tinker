@@ -40,9 +40,9 @@ c
       logical dotarget
       logical dofit
       character*20 keyword
-      character*120 record
-      character*120 string
-      character*120 xyzfile
+      character*240 record
+      character*240 string
+      character*240 xyzfile
       external valfit1
       external optsave
 c
@@ -136,7 +136,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:9) .eq. 'FIT-BOND ') then
             fit_bond = .true.
          else if (keyword(1:9) .eq. 'FIX-BOND ') then
@@ -3497,8 +3497,8 @@ c
       character*8 pitb,pktb
       character*12 pita,pkta
       character*16 pitt,pktt
-      character*120 keyfile
-      character*120 record
+      character*240 keyfile
+      character*240 record
 c
 c
 c     output some definitions and parameters to a keyfile

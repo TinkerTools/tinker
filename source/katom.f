@@ -33,8 +33,8 @@ c
       character*3 symb
       character*20 keyword
       character*24 notice
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     process keywords containing atom type parameters
@@ -59,7 +59,7 @@ c
             atmcls(k) = cls
             call gettext (record,symb,next)
             call getstring (record,notice,next)
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=40,end=40)  atn,wght,lig
             if (k.ge.1 .and. k.le.maxtyp) then
                if (header .and. .not.silent) then
@@ -127,7 +127,7 @@ c
             call getnumb (record,cls,next)
             call gettext (record,symb,next)
             call getstring (record,notice,next)
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=70,end=70)  atn,wght,lig
             if (k.lt.0 .and. k.ge.-n) then
                if (header .and. .not.silent) then

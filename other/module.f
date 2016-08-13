@@ -27,9 +27,9 @@ c
       integer freeunit
       integer start,stop
       logical exist
-      character*120 srcfile
-      character*120 record
-      character*120, allocatable :: line(:)
+      character*240 srcfile
+      character*240 record
+      character*240, allocatable :: line(:)
 c
 c
 c     setup the use of the TINKER subroutine library
@@ -51,7 +51,7 @@ c
          write (*,10)
    10    format (/,' Enter Fortran Source File Name :  ',$)
          read (*,20)  srcfile
-   20    format (a120)
+   20    format (a240)
          call basefile (srcfile)
          call suffix (srcfile,'f','old')
          inquire (file=srcfile,exist=exist)
@@ -70,7 +70,7 @@ c
       nline = 0
       dowhile (.true.)
          read (isrc,30,err=40,end=40)  record
-   30    format (a120)
+   30    format (a240)
          nline = nline + 1
          line(nline) = record
       end do

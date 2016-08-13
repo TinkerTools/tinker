@@ -26,9 +26,9 @@ c
       integer i,length
       integer torbnd(10)
       logical exist,query
-      character*120 record
-      character*120 string
-      character*120 xyzfile
+      character*240 record
+      character*240 string
+      character*240 xyzfile
 c
 c
 c     get the Cartesian coordinates and connectivity info
@@ -78,7 +78,7 @@ c
    50    format (/,' Enter Central Atoms of the 2nd Torsion',
      &              ' [Optional, <CR>=None] : ',$)
          read (input,60,err=70,end=70)  record
-   60    format (a120)
+   60    format (a240)
          read (record,*,err=70,end=70)  torbnd(3),torbnd(4)
    70    continue
       end if
@@ -172,10 +172,10 @@ c
       character*4 pa,pb,pc,pd
       character*16 kft(maxfit)
       character*16 kct(9*maxfit)
-      character*120 record
-      character*120 keyfile
-      character*120 oldfilename
-      character*120, allocatable :: oldkeyline(:)
+      character*240 record
+      character*240 keyfile
+      character*240 oldfilename
+      character*240, allocatable :: oldkeyline(:)
       external torfit1
       external optsave
 c
@@ -272,7 +272,7 @@ c
       write (iout,30)
    30 format (/,' Choose Torsions for Fitting from Above List :  ',$)
       read (input,40,err=50,end=50)  record
-   40 format (a120)
+   40 format (a240)
    50 continue
       read (record,*,err=60,end=60)  (ftorid(i),i=1,ntorcrs)
    60 continue

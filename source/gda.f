@@ -46,9 +46,9 @@ c
       character*1 answer
       character*6 mode,method
       character*7 ext,status
-      character*120 gdafile
-      character*120 record
-      character*120 string
+      character*240 gdafile
+      character*240 record
+      character*240 string
       external gda1,gda2,gda3
       external optsave
 c
@@ -85,7 +85,7 @@ c
             write (iout,40)
    40       format (/,' Use Randomized Initial Coordinates [N] :  ',$)
             read (input,50)  record
-   50       format (a120)
+   50       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -107,7 +107,7 @@ c
          write (iout,70)
    70    format (/,' Enter Initial and Final Beta [0.01, 10**10] :  ',$)
          read (input,80)  record
-   80    format (a120)
+   80    format (a240)
          read (record,*,err=90,end=90)  bstart,bstop
    90    continue
       end if

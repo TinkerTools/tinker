@@ -70,8 +70,8 @@ c
       real*8 delta,eps
       logical use_pme
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       data multi  /   2,   3,   4,   5,   6,   8,   9,  10,  12,  15,
      &               16,  18,  20,  24,  25,  27,  30,  32,  36,  40,
      &               45,  48,  50,  54,  60,  64,  72,  75,  80,  81,
@@ -123,7 +123,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:12) .eq. 'EWALD-ALPHA ') then
             read (string,*,err=20,end=20)  aewald
          else if (keyword(1:15) .eq. 'EWALD-FRACTION ') then

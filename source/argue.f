@@ -25,6 +25,6 @@ c
       parameter (maxarg=20)
       integer narg
       logical listarg(0:maxarg)
-      character*120 arg(0:maxarg)
+      character*240 arg(0:maxarg)
       save
       end

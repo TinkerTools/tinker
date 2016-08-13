@@ -41,8 +41,8 @@ c
       logical exist,query
       character*5 vindex
       character*16 label(7)
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       external xtalerr,xtalwrt
 c
 c
@@ -85,7 +85,7 @@ c
    30       format (/,' Enter Parameter Type then Atom Class',
      &                 ' or Type(s) :  ',$)
             read (input,40)  record
-   40       format (a120)
+   40       format (a240)
             read (record,*,err=50,end=50)  prmtyp,atom1,atom2
    50       continue
          end if

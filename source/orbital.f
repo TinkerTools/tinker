@@ -34,8 +34,8 @@ c
       integer nlist,next
       integer, allocatable :: list(:)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -79,7 +79,7 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:9) .eq. 'PISYSTEM ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  (list(k),k=nlist+1,n)
    10       continue
             do while (list(nlist+1) .ne. 0)

@@ -51,12 +51,12 @@ c
       character*20 fname1,fname2
       character*20 key(maxword)
       character*20 fname(maxfunc)
-      character*120 docfile
-      character*120 srcfile
-      character*120 record
-      character*120 string
-      character*120 routine(maxunit)
-      character*120 info(maxline,maxunit)
+      character*240 docfile
+      character*240 srcfile
+      character*240 record
+      character*240 string
+      character*240 routine(maxunit)
+      character*240 info(maxline,maxunit)
       character*2048 field
 c
 c     list of the Fortran functions in the TINKER package
@@ -121,7 +121,7 @@ c
             write (iout,50)
    50       format (/,' Enter Name of Source Code Listing File :  ',$)
             read (input,60)  srcfile
-   60       format (a120)
+   60       format (a240)
             call suffix (srcfile,'txt','old')
             inquire (file=srcfile,exist=exist)
          end do
@@ -134,7 +134,7 @@ c
          nunit = 0
          do while (.true.)
             read (isrc,70,err=100,end=100)  record
-   70       format (a120)
+   70       format (a240)
             if (record(1:9) .eq. 'c     ## ') then
                next = 10
                call getword (record,module,next)
@@ -153,7 +153,7 @@ c
                   done = .false.
                   do while (.not. done)
                      read (isrc,90,err=100,end=100)  record
-   90                format (a120)
+   90                format (a240)
                      leng = trimtext (record)
                      if (leng .lt. 7) then
                         done = .true.
@@ -228,7 +228,7 @@ c
          nunit = 0
          do while (.true.)
             read (isrc,170,err=180,end=180)  record
-  170       format (a120)
+  170       format (a240)
             call upcase (record)
             if (record(1:1) .ne. 'C') then
                next = 1
@@ -304,7 +304,7 @@ c
          nunit = 0
          do while (.true.)
             read (isrc,230,err=260,end=260)  record
-  230       format (a120)
+  230       format (a240)
             if (record(1:9) .eq. 'c     ## ') then
                next = index (record,'.i  --')
                if (next .ne. 0) then
@@ -314,7 +314,7 @@ c
                   string = record(11:next-1)
                   start = 20
                   if (wiki)  start = trimtext(string) + 5
-                  string(start:120) = record(next+8:leng-4)
+                  string(start:240) = record(next+8:leng-4)
                   routine(nunit) = string
                   read (isrc,240,err=260,end=260)
   240             format (///)
@@ -322,7 +322,7 @@ c
                   done = .false.
                   do while (.not. done)
                      read (isrc,250,err=260,end=260)  record
-  250                format (a120)
+  250                format (a240)
                      leng = trimtext (record)
                      if (record(1:1) .eq. ' ') then
                         done = .true.
@@ -335,7 +335,7 @@ c
                         leng = trimtext (record)
                         start = 20
                         if (wiki)  start = trimtext(string) + 5
-                        string(start:120) = record(next:leng)
+                        string(start:240) = record(next:leng)
                         info(k,nunit) = string
                      end if
                   end do
@@ -392,7 +392,7 @@ c
          nkey = 0
          do while (.true.)
             read (isrc,330,err=340,end=340)  record
-  330       format (a120)
+  330       format (a240)
             next = index (record,'if (keyword(')
             if (next .ne. 0) then
                next = index (record,'.eq.')
@@ -436,7 +436,7 @@ c
          nkey = 0
          do while (.true.)
             read (isrc,370,err=380,end=380)  record
-  370       format (a120)
+  370       format (a240)
             next = 1
             call getword (record,keyword,next)
             if (keyword .eq. 'use') then

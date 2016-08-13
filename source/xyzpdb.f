@@ -22,8 +22,8 @@ c
       implicit none
       integer ipdb,ixyz
       integer freeunit
-      character*120 pdbfile
-      character*120 xyzfile
+      character*240 pdbfile
+      character*240 xyzfile
 c
 c
 c     get the Cartesian coordinates file for the system
@@ -125,7 +125,7 @@ c
       character*3 resname
       character*4 atmname
       character*7, allocatable :: restyp(:)
-      character*120 seqfile
+      character*240 seqfile
       save first
       data first  / .true. /
 c

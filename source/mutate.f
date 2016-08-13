@@ -30,8 +30,8 @@ c
       integer it0,it1,next
       integer list(20)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -75,16 +75,16 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:7) .eq. 'LAMBDA ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=20)  lambda
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=20)  vlambda
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=20)  elambda
          else if (keyword(1:7) .eq. 'MUTATE ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=20)  ihyb,it0,it1
             nmut = nmut + 1
             imut(nmut) = ihyb
@@ -94,7 +94,7 @@ c
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
          else if (keyword(1:7) .eq. 'LIGAND ') then
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  (list(k),k=1,20)
    10       continue
             k = 1

@@ -70,25 +70,25 @@ c
       subroutine trimhead (string)
       implicit none
       integer i,j,k
-      character*120 string
-      character*120 temp
+      character*240 string
+      character*240 temp
 c
 c
 c     loop over characters, removing blank beginning spaces
 c
-      do i = 1, 120
+      do i = 1, 240
          temp(i:i) = ' '
       end do
       j = 0
       k = 0
-      do i = 1, 120
+      do i = 1, 240
          if (string(i:i) .ne. ' ')  j = 1
          if (j .eq. 1) then
             k = k + 1
             temp(k:k) = string(i:i)
          end if
       end do
-      do i = 1, 120
+      do i = 1, 240
          string(i:i) = temp(i:i)
       end do
       return

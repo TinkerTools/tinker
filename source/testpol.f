@@ -59,7 +59,7 @@ c
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull
       character*1 answer
-      character*120 record
+      character*240 record
       external extrap0
 c
 c
@@ -89,7 +89,7 @@ c
    20       format (/,' Output Induced Dipole Components by Atom',
      &                 ' [N] :  ',$)
             read (input,30)  record
-   30       format (a120)
+   30       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if

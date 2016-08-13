@@ -33,8 +33,8 @@ c
       real*8 psum(nvar)
       real*8 p(nvar+1,*)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
       external fvalue
 c
 c
@@ -49,7 +49,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:8) .eq. 'MAXITER ') then
             read (string,*,err=10,end=10)  maxiter
          end if

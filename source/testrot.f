@@ -40,7 +40,7 @@ c
       real*8, allocatable :: derivs(:)
       real*8, allocatable :: nderiv(:)
       logical exist,query
-      character*120 string
+      character*240 string
 c
 c
 c     set up the molecular mechanics calculation

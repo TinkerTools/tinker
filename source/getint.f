@@ -27,7 +27,7 @@ c
       integer freeunit
       logical exist
       logical clash
-      character*120 intfile
+      character*240 intfile
 c
 c
 c     try to get a filename from the command line arguments
@@ -45,7 +45,7 @@ c
          write (iout,10)
    10    format (/,' Enter Internal Coordinate File Name :  ',$)
          read (input,20)  intfile
-   20    format (a120)
+   20    format (a240)
          call basefile (intfile)
          call suffix (intfile,'int','old')
          inquire (file=intfile,exist=exist)

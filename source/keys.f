@@ -23,6 +23,6 @@ c
       integer maxkey
       parameter (maxkey=25000)
       integer nkey
-      character*120 keyline(maxkey)
+      character*240 keyline(maxkey)
       save
       end

@@ -51,7 +51,7 @@ c
       logical unique,repeat
       character*1 axis(3)
       character*6 mode
-      character*120 string
+      character*240 string
       data axis  / 'X','Y','Z' /
 c
 c

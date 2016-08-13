@@ -38,8 +38,8 @@ c
       real*8 sixth
       logical header
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -75,7 +75,7 @@ c
          record = keyline(j)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:12) .eq. 'POLARIZABLE ') then
             read (string,*,err=10,end=10)  (list(i),i=nlist+1,n)
    10       continue
@@ -166,7 +166,7 @@ c
                pg(j) = 0
             end do
             call getnumb (record,k,next)
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=30,end=30)  pol,thl,(pg(j),j=1,maxval)
    30       continue
             if (k .gt. 0) then
@@ -225,7 +225,7 @@ c
             call getnumb (record,k,next)
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
-               string = record(next:120)
+               string = record(next:240)
                read (string,*,err=80,end=80)  pol,thl
    80          continue
                if (header) then

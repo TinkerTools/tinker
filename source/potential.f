@@ -61,13 +61,13 @@ c
       logical, allocatable :: tmppol(:)
       character*1 answer
       character*20 keyword
-      character*120 record
-      character*120 string
-      character*120 xyzfile
-      character*120 xyz2file
-      character*120 potfile
-      character*120 gridfile
-      character*120 cubefile
+      character*240 record
+      character*240 string
+      character*240 xyzfile
+      character*240 xyz2file
+      character*240 potfile
+      character*240 gridfile
+      character*240 cubefile
       external potfit1
       external optsave
 c
@@ -168,7 +168,7 @@ c
             write (iout,60)
    60       format (/,' Enter the Gaussian CUBE File Name :  ',$)
             read (input,70)  cubefile
-   70       format (a120)
+   70       format (a240)
             call basefile (cubefile)
             call suffix (cubefile,'cube','old')
             inquire (file=cubefile,exist=exist)
@@ -177,7 +177,7 @@ c
          open (unit=icub,file=cubefile,status ='old')
          rewind (unit=icub)
          read (icub,80)  title
-   80    format (1x,a120)
+   80    format (1x,a240)
          ltitle = trimtext (title)
          read (icub,90)
    90    format ()
@@ -191,7 +191,7 @@ c
          end do
          do i = 1, npgrid(1)
             read (icub,130)  record
-  130       format (a120)
+  130       format (a240)
             read (record,*)  xi,yi,zi,pot
             pgrid(1,i,1) = xi
             pgrid(2,i,1) = yi
@@ -275,7 +275,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:16) .eq. 'POTENTIAL-ATOMS ') then
             read (string,*,err=180,end=180)  (glist(k),k=nglist+1,namax)
   180       continue
@@ -401,7 +401,7 @@ c
             write (iout,220)
   220       format (/,' Enter Name of Second Coordinate File :  ',$)
             read (input,230)  xyz2file
-  230       format (a120)
+  230       format (a240)
             call basefile (xyz2file)
             call suffix (xyz2file,'xyz','old')
             inquire (file=xyz2file,exist=exist)
@@ -421,7 +421,7 @@ c
             write (iout,240)
   240       format (/,' Enter Target Grid/Potential File Name :  ',$)
             read (input,250)  potfile
-  250       format (a120)
+  250       format (a240)
             call basefile (potfile)
             call suffix (potfile,'pot','old')
             inquire (file=potfile,exist=exist)
@@ -438,7 +438,7 @@ c
   260       format (/,' Output Potential Value at Each Grid Point',
      &                 ' [N] :  ',$)
             read (input,270)  record
-  270       format (a120)
+  270       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -697,14 +697,14 @@ c
       real*8 big,small
       real*8 r2,dist
       real*8, allocatable :: rad(:)
-      character*120 record
+      character*240 record
 c
 c
 c     read the grid points and target potential from a file
 c
       npoint = 0
       read (ipot,10,err=20,end=20)  record
-   10 format (a120)
+   10 format (a240)
       read (record,*,err=20,end=20)  npoint
    20 continue
       do i = 1, npoint
@@ -713,7 +713,7 @@ c
          pgrid(3,i,iconf) = 0.0d0
          epot(2,i,iconf) = 0.0d0
          read (ipot,30,err=40,end=40)  record
-   30    format (a120)
+   30    format (a240)
          read (record,*,err=40,end=40)  k,(pgrid(j,i,iconf),j=1,3),
      &                                  epot(2,i,iconf)
    40    continue
@@ -810,8 +810,8 @@ c
       real*8, allocatable :: rad2(:)
       real*8, allocatable :: dot(:,:)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set default values for grid point generation parameters
@@ -832,7 +832,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:17) .eq. 'POTENTIAL-SHELLS ') then
             read (string,*,err=10,end=10)  nshell
          else if (keyword(1:18) .eq. 'POTENTIAL-SPACING ') then
@@ -1827,7 +1827,7 @@ c
       real*8, allocatable :: rmsa(:)
       logical dofull,domodel
       logical dopair,dotarget
-      character*120 potfile
+      character*240 potfile
 c
 c
 c     output potential values for each model at each point
@@ -2043,8 +2043,8 @@ c
       integer trimtext
       real*8 dterm,qterm
       logical done,header
-      character*120 keyfile
-      character*120 record
+      character*240 keyfile
+      character*240 record
 c
 c
 c     open a new keyfile to contain the optimized parameters

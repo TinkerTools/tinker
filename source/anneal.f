@@ -43,8 +43,8 @@ c
       logical exist
       character*1 answer
       character*8 cooltyp
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     set up the structure and mechanics calculation
@@ -69,7 +69,7 @@ c
    20    format (/,' Enter the Initial and Final Temperatures in',
      &              ' Degrees K [1000,0] :  ',$)
          read (input,30)  record
-   30    format (a120)
+   30    format (a240)
          read (record,*,err=40,end=40)  hot,cold
    40    continue
          if (hot .le. 0.0d0)  hot = 1000.0d0
@@ -116,7 +116,7 @@ c
   130    format (/,' Use Linear, Sigmoidal or Exponential Cooling',
      &              ' Protocol ([L], S or E) :  ',$)
          read (input,140)  record
-  140    format (a120)
+  140    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

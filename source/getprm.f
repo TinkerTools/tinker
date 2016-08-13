@@ -28,10 +28,10 @@ c
       logical exist,useprm
       character*4 none
       character*20 keyword
-      character*120 prmfile
-      character*120 prefix
-      character*120 record
-      character*120 string
+      character*240 prmfile
+      character*240 prefix
+      character*240 record
+      character*240 string
 c
 c
 c     set the default name for the parameter file
@@ -47,7 +47,7 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:11) .eq. 'PARAMETERS ') then
-            string = record(next:120)
+            string = record(next:240)
             next = 1
             call getstring (string,prmfile,next)
             if (next .eq. 1)  call gettext (string,prmfile,next)
@@ -94,7 +94,7 @@ c
          write (iout,10)
    10    format (/,' Enter Potential Parameter File Name :  ',$)
          read (input,20)  prmfile
-   20    format (a120)
+   20    format (a240)
          next = 1
          call getword (prmfile,none,next)
          call upcase (none)
@@ -120,7 +120,7 @@ c
          rewind (unit=iprm)
          do while (.true.)
             read (iprm,30,err=50,end=50)  record
-   30       format (a120)
+   30       format (a240)
             nprm = nprm + 1
             prmline(nprm) = record
             if (nprm .ge. maxprm) then

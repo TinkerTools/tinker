@@ -55,9 +55,9 @@ c
       real*8, allocatable :: ycm(:,:)
       real*8, allocatable :: zcm(:,:)
       logical exist,query
-      character*120 arcfile
-      character*120 record
-      character*120 string
+      character*240 arcfile
+      character*240 record
+      character*240 string
 c
 c
 c     perform the standard initialization functions
@@ -79,7 +79,7 @@ c
          write (iout,10)
    10    format (/,' Enter Coordinate Archive File Name :  ',$)
          read (input,20)  arcfile
-   20    format (a120)
+   20    format (a240)
          call basefile (arcfile)
          call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
@@ -112,7 +112,7 @@ c
    40    format (/,' Numbers of First & Last Frame and Step',
      &              ' Increment :  ',$)
          read (input,50)  record
-   50    format (a120)
+   50    format (a240)
          read (record,*,err=60,end=60)  start,stop,step
    60    continue
       end if
@@ -160,7 +160,7 @@ c
             write (iout,110)
   110       format (/,' Numbers of any Atoms to be Removed :  ',$)
             read (input,120)  record
-  120       format (a120)
+  120       format (a240)
             read (record,*,err=130,end=130)  (list(i),i=1,20)
   130       continue
          end if

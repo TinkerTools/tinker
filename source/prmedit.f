@@ -24,8 +24,8 @@ c
       integer trimtext
       logical dotype,doclass
       logical exist,query
-      character*120 prmfile
-      character*120 string
+      character*240 prmfile
+      character*240 string
 c
 c
 c     read and store the original force field parameter file
@@ -182,8 +182,8 @@ c
       character*20 keyword
       character*24 note
       character*30 blank
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     reformat and print the various parameters
@@ -197,7 +197,7 @@ c
          next = 1
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:120)
+         string = record(next:240)
          if (keyword(1:5) .eq. 'ATOM ') then
             ia = -1
             ib = -1
@@ -210,7 +210,7 @@ c
             call getnumb (record,ib,next)
             call gettext (record,sym,next)
             call getstring (record,note,next)
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=10,end=10)  atn,wght,lig
    10       continue
             length = trimtext(note)
@@ -872,7 +872,7 @@ c
             read (string,*,err=1250,end=1250)  ia
             call getword (record,sym,next)
             call getstring (record,note,next)
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=1250,end=1250)  ib
  1250       continue
             length = trimtext(note)
@@ -922,8 +922,8 @@ c
       logical prtclass
       character*20 keyword
       character*30 blank
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     zero out the storage for atom types and classes
@@ -1457,7 +1457,7 @@ c
             do j = 1, 20
                ig(j) = 0
             end do
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=420,end=420)  ia,pol,thl,
      &                                       (ig(j),j=1,20)
   420       continue
@@ -1516,11 +1516,11 @@ c
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=490,end=490)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
-            string = record(next:120)
+            string = record(next:240)
             read (string,*,err=490,end=490)  ib
   490       continue
             if (ib .gt. 0)  ib = itype(ib)
@@ -1617,8 +1617,8 @@ c
       character*4 pa,pb,pc,pd
       character*16, allocatable :: list(:)
       character*20 keyword
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -1674,7 +1674,7 @@ c
          ib = 0
          ic = 0
          id = 0
-         string = record(next:120)
+         string = record(next:240)
          read (string,*,err=20,end=20)  ia,ib,ic,id,v1
          write (iprm,10)  ia,ib,ic,id,v1
    10    format ('multipole ',4i5,6x,f11.5)
@@ -1739,8 +1739,8 @@ c
       character*3 sym
       character*20 keyword
       character*30 blank
-      character*120 record
-      character*120 string
+      character*240 record
+      character*240 string
 c
 c
 c     find, renumber and format the biotype parameters
