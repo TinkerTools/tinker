@@ -138,7 +138,6 @@ empole.o \
 empole1.o \
 empole2.o \
 empole3.o \
-empoleSR.o \
 energi.o \
 energy.o \
 eopbend.o \
@@ -216,7 +215,6 @@ getword.o \
 getxyz.o \
 ghmcstep.o \
 gkstuf.o \
-grad_respa.o \
 gradient.o \
 gradrgd.o \
 gradrot.o \
@@ -248,7 +246,6 @@ inter.o \
 invbeta.o \
 invert.o \
 iounit.o \
-isok_respa2.o \
 jacobi.o \
 kanang.o \
 kangang.o \
