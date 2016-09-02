@@ -1856,7 +1856,7 @@ static int checkForConstraint (struct ConstraintMap* map,
 
 /*
  *    ############################################################
- *               Setup Individual Potential Energy Terms
+ *            Setup Standard AMOEBA Potential Energy Terms
  *    ############################################################
  */
 
@@ -2989,97 +2989,13 @@ static void setupAmoebaGeneralizedKirkwoodForce (OpenMM_System* system,
    }
 }
 
-static void setupAndersenThermostat (OpenMM_System* system, FILE* log) {
-
-   OpenMM_AndersenThermostat* andersenThermostat;
-    
-   andersenThermostat = OpenMM_AndersenThermostat_create (bath__.kelvin,
-                                                          bath__.collide);
-   OpenMM_System_addForce (system, (OpenMM_Force*) andersenThermostat);
-
-   if (log) {
-      (void) fprintf (log, "\n Andersen Thermostat:\n" );
-      (void) fprintf (log, "\n Target Temperature   %15.2f K",
-                      OpenMM_AndersenThermostat_getDefaultTemperature
-                      (andersenThermostat));
-      (void) fprintf (log, "\n Collision Frequency  %15.7e ps^(-1)",
-                      OpenMM_AndersenThermostat_getDefaultCollisionFrequency
-                      (andersenThermostat));
-      (void) fprintf (log, "\n Random Number Seed                 %d\n",
-                      OpenMM_AndersenThermostat_getRandomNumberSeed
-                      (andersenThermostat));
-   }
-}
-
-static void setupMonteCarloBarostat (OpenMM_System* system, FILE* log) {
-
-   OpenMM_MonteCarloBarostat* monteCarloBarostat;
-
-   int frequency = bath__.voltrial;
-   monteCarloBarostat = OpenMM_MonteCarloBarostat_create
-                            (bath__.atmsph*1.01325, bath__.kelvin, frequency);
-   OpenMM_System_addForce (system, (OpenMM_Force*) monteCarloBarostat);
-
-   if (log) {
-      (void) fprintf (log, "\n MonteCarlo Barostat:\n");
-      (void) fprintf (log, "\n Target Temperature   %15.2f K",
-                      OpenMM_MonteCarloBarostat_getTemperature
-                      (monteCarloBarostat));
-      (void) fprintf (log, "\n Target Pressure      %15.4f atm",
-                      OpenMM_MonteCarloBarostat_getDefaultPressure
-                      (monteCarloBarostat) / 1.01325);
-      (void) fprintf (log, "\n Trial Frequency                   %d",
-                      OpenMM_MonteCarloBarostat_getFrequency
-                      (monteCarloBarostat));
-      (void) fprintf (log, "\n Random Number Seed                 %d\n",
-                      OpenMM_MonteCarloBarostat_getRandomNumberSeed
-                      (monteCarloBarostat));
-   }
-}
-
 /*
  *    ############################################################
- *            Setup Positions, Velocities and Constraints
+ *          Setup Geometric Restraint Potential Energy Terms
  *    ############################################################
  */
 
 #define RADIANS_PER_DEGREE 0.0174532925
-
-static void setupPositions (OpenMM_Vec3Array* initialPosInNm, FILE* log) {
-
-   int ii;
-   for (ii = 0; ii < atoms__.n; ii++) {
-      OpenMM_Vec3 posInNm;
-      posInNm.x = atoms__.x[ii]*OpenMM_NmPerAngstrom;
-      posInNm.y = atoms__.y[ii]*OpenMM_NmPerAngstrom;
-      posInNm.z = atoms__.z[ii]*OpenMM_NmPerAngstrom;
-      OpenMM_Vec3Array_append (initialPosInNm, posInNm);
-   }
-}
-
-static void setupVelocities (OpenMM_Vec3Array* initialVelInNm, FILE* log) {
-
-   int ii;
-   for (ii = 0; ii < atoms__.n; ii++) {
-      OpenMM_Vec3 velInNm;
-      int offset;
-      offset = 3*ii;
-      velInNm.x = moldyn__.v[offset]*OpenMM_NmPerAngstrom;
-      velInNm.y = moldyn__.v[offset+1]*OpenMM_NmPerAngstrom;
-      velInNm.z = moldyn__.v[offset+2]*OpenMM_NmPerAngstrom;
-      OpenMM_Vec3Array_append (initialVelInNm, velInNm);
-   }
-}
-
-static void setupConstraints (OpenMM_System* system, FILE* log) {
-
-   int ii;
-   for (ii = 0; ii < freeze__.nrat; ii++) {
-      OpenMM_System_addConstraint (system, *(freeze__.irat+2*ii) -1,
-                                   *(freeze__.irat + 2*ii +1)-1,
-                          (*(freeze__.krat +ii))*OpenMM_NmPerAngstrom);
-   }
-}
 
 static void setupPositionalRestraints (OpenMM_System* system, FILE* log) {
    
@@ -3434,7 +3350,103 @@ static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
 
 /*
  *    ############################################################
- *            Platform for Calculation: Reference or CUDA
+ *          Create Standalone Thermotat and Barostat Methods
+ *    ############################################################
+ */
+
+static void setupAndersenThermostat (OpenMM_System* system, FILE* log) {
+
+   OpenMM_AndersenThermostat* andersenThermostat;
+    
+   andersenThermostat = OpenMM_AndersenThermostat_create (bath__.kelvin,
+                                                          bath__.collide);
+   OpenMM_System_addForce (system, (OpenMM_Force*) andersenThermostat);
+
+   if (log) {
+      (void) fprintf (log, "\n Andersen Thermostat:\n" );
+      (void) fprintf (log, "\n Target Temperature   %15.2f K",
+                      OpenMM_AndersenThermostat_getDefaultTemperature
+                      (andersenThermostat));
+      (void) fprintf (log, "\n Collision Frequency  %15.7e ps^(-1)",
+                      OpenMM_AndersenThermostat_getDefaultCollisionFrequency
+                      (andersenThermostat));
+      (void) fprintf (log, "\n Random Number Seed                 %d\n",
+                      OpenMM_AndersenThermostat_getRandomNumberSeed
+                      (andersenThermostat));
+   }
+}
+
+static void setupMonteCarloBarostat (OpenMM_System* system, FILE* log) {
+
+   OpenMM_MonteCarloBarostat* monteCarloBarostat;
+
+   int frequency = bath__.voltrial;
+   monteCarloBarostat = OpenMM_MonteCarloBarostat_create
+                            (bath__.atmsph*1.01325, bath__.kelvin, frequency);
+   OpenMM_System_addForce (system, (OpenMM_Force*) monteCarloBarostat);
+
+   if (log) {
+      (void) fprintf (log, "\n MonteCarlo Barostat:\n");
+      (void) fprintf (log, "\n Target Temperature   %15.2f K",
+                      OpenMM_MonteCarloBarostat_getTemperature
+                      (monteCarloBarostat));
+      (void) fprintf (log, "\n Target Pressure      %15.4f atm",
+                      OpenMM_MonteCarloBarostat_getDefaultPressure
+                      (monteCarloBarostat) / 1.01325);
+      (void) fprintf (log, "\n Trial Frequency                   %d",
+                      OpenMM_MonteCarloBarostat_getFrequency
+                      (monteCarloBarostat));
+      (void) fprintf (log, "\n Random Number Seed                 %d\n",
+                      OpenMM_MonteCarloBarostat_getRandomNumberSeed
+                      (monteCarloBarostat));
+   }
+}
+
+/*
+ *    ############################################################
+ *         Setup Positions, Velocities and Rattle Constraints
+ *    ############################################################
+ */
+
+static void setupPositions (OpenMM_Vec3Array* initialPosInNm, FILE* log) {
+
+   int ii;
+   for (ii = 0; ii < atoms__.n; ii++) {
+      OpenMM_Vec3 posInNm;
+      posInNm.x = atoms__.x[ii]*OpenMM_NmPerAngstrom;
+      posInNm.y = atoms__.y[ii]*OpenMM_NmPerAngstrom;
+      posInNm.z = atoms__.z[ii]*OpenMM_NmPerAngstrom;
+      OpenMM_Vec3Array_append (initialPosInNm, posInNm);
+   }
+}
+
+static void setupVelocities (OpenMM_Vec3Array* initialVelInNm, FILE* log) {
+
+   int ii;
+   for (ii = 0; ii < atoms__.n; ii++) {
+      OpenMM_Vec3 velInNm;
+      int offset;
+      offset = 3*ii;
+      velInNm.x = moldyn__.v[offset]*OpenMM_NmPerAngstrom;
+      velInNm.y = moldyn__.v[offset+1]*OpenMM_NmPerAngstrom;
+      velInNm.z = moldyn__.v[offset+2]*OpenMM_NmPerAngstrom;
+      OpenMM_Vec3Array_append (initialVelInNm, velInNm);
+   }
+}
+
+static void setupConstraints (OpenMM_System* system, FILE* log) {
+
+   int ii;
+   for (ii = 0; ii < freeze__.nrat; ii++) {
+      OpenMM_System_addConstraint (system, *(freeze__.irat+2*ii) -1,
+                                   *(freeze__.irat + 2*ii +1)-1,
+                          (*(freeze__.krat +ii))*OpenMM_NmPerAngstrom);
+   }
+}
+
+/*
+ *    ############################################################
+ *           Set Calculation Platform to Reference or CUDA
  *    ############################################################
  */
 
@@ -3503,7 +3515,7 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
 
 /*
  *    ############################################################
- *                 Initialize OpenMM Data Structures
+ *               Initialize the OpenMM Data Structures
  *    ############################################################
  *
  *    Following actions are performed here:
@@ -3517,7 +3529,6 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
  *    (5) Select the OpenMM platform to be used.
  *    (6) Return an opaque pointer to the OpenMMData struct
  */
-
 
 extern "C" {
 
