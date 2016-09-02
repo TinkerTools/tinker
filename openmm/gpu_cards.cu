@@ -46,7 +46,7 @@ int findBestCUDACard() {
    int device_used_mem[nDevices];
 
 
-   printf ("\n Number of CUDA cards detected: %d\n", nDevices);
+   printf ("\n Number of CUDA cards detected :  %d\n", nDevices);
 
    // Loop through all the CUDA devices and pick the best one
 
@@ -150,16 +150,16 @@ int findBestCUDACard() {
       // is already running a job
 
       if (verbose) {
-         printf("\n Device Number: %d\n", i);
-         printf("\tDevice name:             %s\n", prop.name);
+         printf("\n Device Number :  %d\n", i);
+         printf("\tDevice Name              %s\n", prop.name);
          if (coresPerMP != 0) {
-            printf("\tCUDA Cores:              %d\n", MPCount * coresPerMP);
-            printf("\tTFLOPS:                  %.2f\n", GFLOPS/1000);
+            printf("\tCUDA Cores               %d\n", MPCount * coresPerMP);
+            printf("\tTFLOPS                   %.2f\n", GFLOPS/1000);
          }
-         printf("\tClockspeed (Ghz):        %.3f\n", ((float)prop.clockRate) / 1000000.0f);
-         printf("\tTotal Memory (GB):       %.2f\n", round(10.0f * ((float)totalMemory/GIGABYTE) / 10.0f));
-         printf("\tFree Memory (GB):        %.2f\n", round(1000.0f * (float)freeMemory/GIGABYTE) / 1024.0f);
-         printf("\tGPU load:                %.2f%%\n", gpu_load);
+         printf("\tClockspeed (GHz)         %.3f\n", ((float)prop.clockRate) / 1000000.0f);
+         printf("\tTotal Memory (GB)        %.2f\n", round(10.0f * ((float)totalMemory/GIGABYTE) / 10.0f));
+         printf("\tFree Memory (GB)         %.2f\n", round(1000.0f * (float)freeMemory/GIGABYTE) / 1024.0f);
+         printf("\tGPU load                 %.2f%%\n", gpu_load);
       }
    }
 
