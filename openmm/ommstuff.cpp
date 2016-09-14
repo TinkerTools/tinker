@@ -3002,89 +3002,87 @@ static void setupPositionalRestraints (OpenMM_System* system, FILE* log) {
    double convert = OpenMM_KJPerKcal / (OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom);
    double nmPerAng = OpenMM_NmPerAngstrom;
 
+   OpenMM_CustomExternalForce* force;
+
+   if (boxes__.orthogonal) {
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
+         yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
+         zr = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
+         xr_pre=x-x0;\
+         yr_pre=y-y0;\
+         zr_pre=z-z0");
+   } else if (boxes__.monoclinic) {
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_converted + zr_converted*beta_cos;\
+         zr = zr_converted*beta_sin;\
+         xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
+         yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
+         zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
+         xr_pre = x-x0 - zr_pre*beta_cos;\
+         yr_pre = y-y0;\
+         zr_pre = (z-z0)/beta_sin");
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
+   } else if (boxes__.triclinic) {
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_converted + yr_converted*gamma_cos + zr_converted*beta_cos;\
+         yr = yr_converted*gamma_sin + zr_converted*beta_term;\
+         zr = zr_converted*gamma_term;\
+         xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
+         yr_converted = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
+         zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
+         xr_pre = x-x0 - yr_pre*gamma_cos - zr_pre*beta_cos;\
+         yr_pre = (y-y0 - zr_pre*beta_term)/gamma_sin;\
+         zr_pre = (z-z0)/gamma_term");
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_term", boxes__.gamma_term);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_term", boxes__.beta_term);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_sin", boxes__.gamma_sin);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_cos", boxes__.gamma_cos);
+   } else if (boxes__.octahedron) {
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_converted - absDist*xbox2 * (step(xr_converted)*2-1);\
+         yr = yr_converted - absDist*ybox2 * (step(yr_converted)*2-1);\
+         zr = zr_converted - absDist*zbox2 * (step(zr_converted)*2-1);\
+         absDist = step(abs(xr_converted) + abs(yr_converted) + abs(zr_converted) - box34);\
+         xr_converted = xr_pre-use_bounds*(xbox*ceil(max(0,(abs(xr_pre)-xbox2))/xbox)*(step(xr_pre)*2-1));\
+         yr_converted = yr_pre-use_bounds*(ybox*ceil(max(0,(abs(yr_pre)-ybox2))/ybox)*(step(yr_pre)*2-1));\
+         zr_converted = zr_pre-use_bounds*(zbox*ceil(max(0,(abs(zr_pre)-zbox2))/zbox)*(step(zr_pre)*2-1));\
+         xr_pre = x-x0;\
+         yr_pre = y-y0;\
+         zr_pre = z-z0");
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "box34", boxes__.box34*nmPerAng);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "xbox", *boxes__.xbox*nmPerAng);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "xbox2", *boxes__.xbox2*nmPerAng);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "ybox", *boxes__.ybox*nmPerAng);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "ybox2", *boxes__.ybox2*nmPerAng);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "zbox", *boxes__.zbox*nmPerAng);
+      OpenMM_CustomExternalForce_addGlobalParameter (force, "zbox2", *boxes__.zbox2*nmPerAng);
+   }
+
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "k");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "range");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "x0");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "y0");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "z0");
+   OpenMM_CustomExternalForce_addPerParticleParameter (force, "use_bounds");
+   OpenMM_CustomExternalForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
+   OpenMM_CustomExternalForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
+   OpenMM_CustomExternalForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
+   OpenMM_CustomExternalForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
+   OpenMM_CustomExternalForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
+   OpenMM_CustomExternalForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
+
    for (int i = 0; i < restrn__.npfix; ++i) {
-
-      OpenMM_CustomExternalForce* force;
-
-      if (boxes__.orthogonal) {
-         force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-            yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-            zr = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-            xr_pre=x-x0;\
-            yr_pre=y-y0;\
-            zr_pre=z-z0");
-      } else if (boxes__.monoclinic) {
-         force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_converted + zr_converted*beta_cos;\
-            zr = zr_converted*beta_sin;\
-            xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-            yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-            zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-            xr_pre = x-x0 - zr_pre*beta_cos;\
-            yr_pre = y-y0;\
-            zr_pre = (z-z0)/beta_sin");
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
-      } else if (boxes__.triclinic) {
-         force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_converted + yr_converted*gamma_cos + zr_converted*beta_cos;\
-            yr = yr_converted*gamma_sin + zr_converted*beta_term;\
-            zr = zr_converted*gamma_term;\
-            xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-            yr_converted = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-            zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-            xr_pre = x-x0 - yr_pre*gamma_cos - zr_pre*beta_cos;\
-            yr_pre = (y-y0 - zr_pre*beta_term)/gamma_sin;\
-            zr_pre = (z-z0)/gamma_term");
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_term", boxes__.gamma_term);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_term", boxes__.beta_term);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_sin", boxes__.gamma_sin);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_cos", boxes__.gamma_cos);
-      } else if (boxes__.octahedron) {
-         force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_converted - absDist*xbox2 * (step(xr_converted)*2-1);\
-            yr = yr_converted - absDist*ybox2 * (step(yr_converted)*2-1);\
-            zr = zr_converted - absDist*zbox2 * (step(zr_converted)*2-1);\
-            absDist = step(abs(xr_converted) + abs(yr_converted) + abs(zr_converted) - box34);\
-            xr_converted = xr_pre-use_bounds*(xbox*ceil(max(0,(abs(xr_pre)-xbox2))/xbox)*(step(xr_pre)*2-1));\
-            yr_converted = yr_pre-use_bounds*(ybox*ceil(max(0,(abs(yr_pre)-ybox2))/ybox)*(step(yr_pre)*2-1));\
-            zr_converted = zr_pre-use_bounds*(zbox*ceil(max(0,(abs(zr_pre)-zbox2))/zbox)*(step(zr_pre)*2-1));\
-            xr_pre = x-x0;\
-            yr_pre = y-y0;\
-            zr_pre = z-z0");
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "box34", boxes__.box34*nmPerAng);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "xbox", *boxes__.xbox*nmPerAng);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "xbox2", *boxes__.xbox2*nmPerAng);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "ybox", *boxes__.ybox*nmPerAng);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "ybox2", *boxes__.ybox2*nmPerAng);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "zbox", *boxes__.zbox*nmPerAng);
-         OpenMM_CustomExternalForce_addGlobalParameter (force, "zbox2", *boxes__.zbox2*nmPerAng);
-      }
-
-      OpenMM_CustomExternalForce_addPerParticleParameter (force, "k");
-      OpenMM_CustomExternalForce_addPerParticleParameter (force, "range");
-      OpenMM_CustomExternalForce_addPerParticleParameter (force, "x0");
-      OpenMM_CustomExternalForce_addPerParticleParameter (force, "y0");
-      OpenMM_CustomExternalForce_addPerParticleParameter (force, "z0");
-      OpenMM_CustomExternalForce_addPerParticleParameter (force, "use_bounds");
-      OpenMM_CustomExternalForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
-      OpenMM_CustomExternalForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
-      OpenMM_CustomExternalForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
-      OpenMM_CustomExternalForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
-      OpenMM_CustomExternalForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
-      OpenMM_CustomExternalForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
-
       double use_bounds = 0.0;
       if (bound__.use_bounds)
          use_bounds = 1.0;
-
       OpenMM_DoubleArray* positionalParameters = OpenMM_DoubleArray_create(0);
       OpenMM_DoubleArray_append(positionalParameters, restrn__.pfix[i*2]*convert);
       OpenMM_DoubleArray_append(positionalParameters, restrn__.pfix[i*2 + 1] * nmPerAng);
@@ -3093,10 +3091,8 @@ static void setupPositionalRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_DoubleArray_append(positionalParameters, restrn__.zpfix[i] * nmPerAng);
       OpenMM_DoubleArray_append(positionalParameters, use_bounds);
       OpenMM_CustomExternalForce_addParticle(force, restrn__.ipfix[i]-1, positionalParameters);
-
-      OpenMM_System_addForce(system, (OpenMM_Force*) force);
-      OpenMM_CustomExternalForce_destroy (force);
    }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
 }
 
 static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
@@ -3104,101 +3100,99 @@ static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
    const double convert = OpenMM_KJPerKcal / (OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom);
    const double nmPerAng = OpenMM_NmPerAngstrom;
 
+   OpenMM_CustomCompoundBondForce* force;
+
+   if (boxes__.orthogonal) {
+      force = OpenMM_CustomCompoundBondForce_create(2,"k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_pre-use_bounds*(xcell*ceil(max(0.0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
+         yr = yr_pre-use_bounds*(ycell*ceil(max(0.0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
+         zr = zr_pre-use_bounds*(zcell*ceil(max(0.0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
+         xr_pre=x1-x2;\
+         yr_pre=y1-y2;\
+         zr_pre=z1-z2");
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
+   } else if (boxes__.monoclinic) {
+      force = OpenMM_CustomCompoundBondForce_create(2, "k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_converted + zr_converted*beta_cos;\
+         zr = zr_converted*beta_sin;\
+         yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
+         xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
+         zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
+         xr_pre = x1-x2 - zr_pre*beta_cos;\
+         yr_pre = y1-y2;\
+         zr_pre = (z1-z2)/beta_sin");
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
+   } else if (boxes__.triclinic) {
+      force = OpenMM_CustomCompoundBondForce_create(2, "k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_converted + yr_converted*gamma_cos + zr_converted*beta_cos;\
+         yr = yr_converted*gamma_sin + zr_converted*beta_term;\
+         zr = zr_converted*gamma_term;\
+         xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
+         yr_converted = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
+         zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
+         xr_pre = x1-x2 - yr_pre*gamma_cos - zr_pre*beta_cos;\
+         yr_pre = (y1-y2 - zr_pre*beta_term)/gamma_sin;\
+         zr_pre = (z1-z2)/gamma_term");
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "gamma_term", boxes__.gamma_term);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_term", boxes__.beta_term);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "gamma_sin", boxes__.gamma_sin);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "gamma_cos", boxes__.gamma_cos);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
+   } else if (boxes__.octahedron) {
+      force = OpenMM_CustomCompoundBondForce_create(2, "k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
+         r = sqrt(xr^2+yr^2+zr^2);\
+         xr = xr_converted - absDist*xbox2 * (step(xr_converted)*2-1);\
+         yr = yr_converted - absDist*ybox2 * (step(yr_converted)*2-1);\
+         zr = zr_converted - absDist*zbox2 * (step(zr_converted)*2-1);\
+         absDist = step(abs(xr_converted)+abs(yr_converted)+abs(zr_converted)-box34);\
+         xr_converted = xr_pre-use_bounds*(xbox*ceil(max(0,(abs(xr_pre)-xbox2))/xbox)*(step(xr_pre)*2-1));\
+         yr_converted = yr_pre-use_bounds*(ybox*ceil(max(0,(abs(yr_pre)-ybox2))/ybox)*(step(yr_pre)*2-1));\
+         zr_converted = zr_pre-use_bounds*(zbox*ceil(max(0,(abs(zr_pre)-zbox2))/zbox)*(step(zr_pre)*2-1));\
+         xr_pre = x1-x2;\
+         yr_pre = y1-y2;\
+         zr_pre = z1-z2");
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "box34", boxes__.box34*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xbox", *boxes__.xbox*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xbox2", *boxes__.xbox2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ybox", *boxes__.ybox*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ybox2", *boxes__.ybox2*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zbox", *boxes__.zbox*nmPerAng);
+      OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zbox2", *boxes__.zbox2*nmPerAng);
+   }
+
+   OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "k");
+   OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "distMin");
+   OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "distMax");
+   OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "use_bounds");
+
    for (int i = 0; i < restrn__.ndfix; ++i) {
-
-      OpenMM_CustomCompoundBondForce* force;
-
-      if (boxes__.orthogonal) {
-         force = OpenMM_CustomCompoundBondForce_create(2,"k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_pre-use_bounds*(xcell*ceil(max(0.0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-            yr = yr_pre-use_bounds*(ycell*ceil(max(0.0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-            zr = zr_pre-use_bounds*(zcell*ceil(max(0.0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-            xr_pre=x1-x2;\
-            yr_pre=y1-y2;\
-            zr_pre=z1-z2");
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
-      } else if (boxes__.monoclinic) {
-         force = OpenMM_CustomCompoundBondForce_create(2, "k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_converted + zr_converted*beta_cos;\
-            zr = zr_converted*beta_sin;\
-            yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-            xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-            zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-            xr_pre = x1-x2 - zr_pre*beta_cos;\
-            yr_pre = y1-y2;\
-            zr_pre = (z1-z2)/beta_sin");
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
-      } else if (boxes__.triclinic) {
-         force = OpenMM_CustomCompoundBondForce_create(2, "k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_converted + yr_converted*gamma_cos + zr_converted*beta_cos;\
-            yr = yr_converted*gamma_sin + zr_converted*beta_term;\
-            zr = zr_converted*gamma_term;\
-            xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-            yr_converted = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-            zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-            xr_pre = x1-x2 - yr_pre*gamma_cos - zr_pre*beta_cos;\
-            yr_pre = (y1-y2 - zr_pre*beta_term)/gamma_sin;\
-            zr_pre = (z1-z2)/gamma_term");
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "gamma_term", boxes__.gamma_term);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "beta_term", boxes__.beta_term);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "gamma_sin", boxes__.gamma_sin);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "gamma_cos", boxes__.gamma_cos);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell", cell__.xcell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xcell2", cell__.xcell2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell", cell__.ycell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ycell2", cell__.ycell2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell", cell__.zcell*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zcell2", cell__.zcell2*nmPerAng);
-      } else if (boxes__.octahedron) {
-         force = OpenMM_CustomCompoundBondForce_create(2, "k*(max(max(0.0,distMin-r),max(0.0,r-distMax)))^2;\
-            r = sqrt(xr^2+yr^2+zr^2);\
-            xr = xr_converted - absDist*xbox2 * (step(xr_converted)*2-1);\
-            yr = yr_converted - absDist*ybox2 * (step(yr_converted)*2-1);\
-            zr = zr_converted - absDist*zbox2 * (step(zr_converted)*2-1);\
-            absDist = step(abs(xr_converted)+abs(yr_converted)+abs(zr_converted)-box34);\
-            xr_converted = xr_pre-use_bounds*(xbox*ceil(max(0,(abs(xr_pre)-xbox2))/xbox)*(step(xr_pre)*2-1));\
-            yr_converted = yr_pre-use_bounds*(ybox*ceil(max(0,(abs(yr_pre)-ybox2))/ybox)*(step(yr_pre)*2-1));\
-            zr_converted = zr_pre-use_bounds*(zbox*ceil(max(0,(abs(zr_pre)-zbox2))/zbox)*(step(zr_pre)*2-1));\
-            xr_pre = x1-x2;\
-            yr_pre = y1-y2;\
-            zr_pre = z1-z2");
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "box34", boxes__.box34*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xbox", *boxes__.xbox*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "xbox2", *boxes__.xbox2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ybox", *boxes__.ybox*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "ybox2", *boxes__.ybox2*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zbox", *boxes__.zbox*nmPerAng);
-         OpenMM_CustomCompoundBondForce_addGlobalParameter (force, "zbox2", *boxes__.zbox2*nmPerAng);
-      }
-
-      OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "k");
-      OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "distMin");
-      OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "distMax");
-      OpenMM_CustomCompoundBondForce_addPerBondParameter (force, "use_bounds");
-
       double use_bounds = 0.0;
       if (bound__.use_bounds && molcul__.molcule[restrn__.idfix[i*2]-1]
                                != molcul__.molcule[restrn__.idfix[i*2+1]-1]) {
          use_bounds = 1.0;
       }
-
       OpenMM_IntArray* particles = OpenMM_IntArray_create(0);
       OpenMM_IntArray_append(particles, restrn__.idfix[i*2]-1);
       OpenMM_IntArray_append(particles, restrn__.idfix[i*2+1]-1);
@@ -3208,54 +3202,48 @@ static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_DoubleArray_append(distanceParameters, restrn__.dfix[i*3 + 2]*nmPerAng);
       OpenMM_DoubleArray_append(distanceParameters, use_bounds);
       OpenMM_CustomCompoundBondForce_addBond(force, particles, distanceParameters);
-
-      OpenMM_System_addForce(system, (OpenMM_Force*) force);
-      OpenMM_CustomCompoundBondForce_destroy (force);
    }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
 }
 
 static void setupAngleRestraints (OpenMM_System* system, FILE* log) {
 
    double convert = OpenMM_KJPerKcal / RADIANS_PER_DEGREE / RADIANS_PER_DEGREE;
 
+   OpenMM_CustomAngleForce* force =
+      OpenMM_CustomAngleForce_create("k*(max(max(0.0,thetaMin-theta),max(0.0,theta-thetaMax)))^2");
+
+   OpenMM_CustomAngleForce_addPerAngleParameter (force, "k");
+   OpenMM_CustomAngleForce_addPerAngleParameter (force, "thetaMin");
+   OpenMM_CustomAngleForce_addPerAngleParameter (force, "thetaMax");
+
    for (int i = 0; i < restrn__.nafix; ++i) {
-
-      OpenMM_CustomAngleForce* force =
-         OpenMM_CustomAngleForce_create("k*(max(max(0.0,thetaMin-theta),max(0.0,theta-thetaMax)))^2");
-
-      OpenMM_CustomAngleForce_addPerAngleParameter (force, "k");
-      OpenMM_CustomAngleForce_addPerAngleParameter (force, "thetaMin");
-      OpenMM_CustomAngleForce_addPerAngleParameter (force, "thetaMax");
-
       OpenMM_DoubleArray* AngleParameters = OpenMM_DoubleArray_create(0);
       OpenMM_DoubleArray_append(AngleParameters, restrn__.afix[i*2]*convert);
       OpenMM_DoubleArray_append(AngleParameters, restrn__.afix[i*2 + 1]*RADIANS_PER_DEGREE);
       OpenMM_DoubleArray_append(AngleParameters, restrn__.afix[i*2 + 2]*RADIANS_PER_DEGREE);
       OpenMM_CustomAngleForce_addAngle(force, restrn__.iafix[i*3]-1, restrn__.iafix[i*3+1]-1,
                                        restrn__.iafix[i*3+2]-1, AngleParameters);
-
-      OpenMM_System_addForce(system, (OpenMM_Force*) force);
-      OpenMM_CustomAngleForce_destroy (force);
    }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
 }
 
 static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
 
    double convert;
    convert = OpenMM_KJPerKcal / RADIANS_PER_DEGREE / RADIANS_PER_DEGREE;
-
-   for (int i = 0; i < restrn__.ntfix; i++) {
  
-      OpenMM_CustomTorsionForce* force =
+   OpenMM_CustomTorsionForce* force =
          OpenMM_CustomTorsionForce_create("k*max(\
             (step(thetaMin-theta)*(min(min(abs(theta-thetaMin),abs(theta-thetaMin-6.28318530718)), abs(theta-thetaMin+6.28318530718)))),\
             (step(theta-thetaMax)*(min(min(abs(theta-thetaMax),abs(theta-thetaMax-6.28318530718)), abs(theta-thetaMax+6.28318530718))))\
                )^2");
 
-      OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "k");
-      OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "thetaMin");
-      OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "thetaMax");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "k");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "thetaMin");
+   OpenMM_CustomTorsionForce_addPerTorsionParameter (force, "thetaMax");
 
+   for (int i = 0; i < restrn__.ntfix; i++) {
       float thetaMin = restrn__.tfix[i*3+1];
       float thetaMax = restrn__.tfix[i*3+2];
       if (thetaMin > 180.0f)
@@ -3276,10 +3264,8 @@ static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
                                             restrn__.itfix[i*4+2]-1,
                                             restrn__.itfix[i*4+3]-1,
                                             lowerTorsionParameters);
-
-      OpenMM_System_addForce(system, (OpenMM_Force*) force);
-      OpenMM_CustomTorsionForce_destroy (force);
    }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
 }
 
 static OpenMM_IntArray* getGroup (int* kgrp, int* igrp, int idx) {
@@ -3311,23 +3297,22 @@ static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
    double convert;
    convert = OpenMM_KJPerKcal / (OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom);
 
-   for (int i = 0; i < restrn__.ngfix; i++) {
+   // In the expression below, u and l are the upper and lower threshold
 
-      // In the expression below, u and l are the upper and lower threshold
-
-      OpenMM_CustomCentroidBondForce* force =
-         OpenMM_CustomCentroidBondForce_create (2,
+   OpenMM_CustomCentroidBondForce* force =
+      OpenMM_CustomCentroidBondForce_create (2,
                  "step(distance(g1,g2)-u)*k*(distance(g1,g2)-u)^2+step(l-distance(g1,g2))*k*(distance(g1,g2)-l)^2");
-      OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "k");
-      OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "l");
-      OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "u");
+   OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "k");
+   OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "l");
+   OpenMM_CustomCentroidBondForce_addPerBondParameter (force, "u");
 
-      for (int j = 1; j < group__.ngrp + 1; j++) {
-         OpenMM_CustomCentroidBondForce_addGroup (force, 
-                         getGroup(group__.kgrp, group__.igrp, j),
-                         getWeights(group__.kgrp, group__.igrp, j, system));
-      }
+   for (int j = 1; j < group__.ngrp + 1; j++) {
+      OpenMM_CustomCentroidBondForce_addGroup (force, 
+                      getGroup(group__.kgrp, group__.igrp, j),
+                      getWeights(group__.kgrp, group__.igrp, j, system));
+   }
 
+   for (int i = 0; i < restrn__.ngfix; i++) {
       OpenMM_IntArray* bondGroups = OpenMM_IntArray_create (0);
       OpenMM_IntArray_append (bondGroups, restrn__.igfix[2*i] - 1);
       OpenMM_IntArray_append (bondGroups, restrn__.igfix[2*i + 1] - 1);
@@ -3342,10 +3327,8 @@ static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
 
       OpenMM_CustomCentroidBondForce_addBond (force, bondGroups,
                                               bondParameters);
-
-      OpenMM_System_addForce(system, (OpenMM_Force*) force);
-      OpenMM_CustomCentroidBondForce_destroy (force);
    }
+   OpenMM_System_addForce(system, (OpenMM_Force*) force);
 }
 
 /*
