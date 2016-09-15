@@ -6568,23 +6568,13 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared)
-!$OMP& private(i,j,k,ii,kk,kkk,e,ei,bfac,damp,expdamp,
-!$OMP& pdi,pti,pgamma,scale3,scale5,scale7,temp3,temp5,temp7,
-!$OMP& dsc3,dsc5,dsc7,psc3,psc5,psc7,usc3,usc5,alsq2,alsq2n,
-!$OMP& exp2a,ralpha,gfd,gfdr,xr,yr,zr,xix,yix,zix,
-!$OMP& xiy,yiy,ziy,xiz,yiz,ziz,xkx,ykx,zkx,xky,yky,zky,
-!$OMP& xkz,ykz,zkz,r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
-!$OMP& erl,erli,iax,iay,iaz,kax,kay,kaz,vxx,vyy,vzz,vyx,vzx,vzy,
-!$OMP& frcxi,frcyi,frczi,frcxk,frcyk,frczk,ci,di,qi,ck,dk,qk,
-!$OMP& fridmp,findmp,ftm2,ftm2i,ftm2r,ftm2ri,ttm2,ttm3,
-!$OMP& ttm2i,ttm3i,ttm2r,ttm3r,ttm2ri,ttm3ri,fdir,dixdk,
-!$OMP& dkxui,dixuk,dixukp,dkxuip,uixqkr,ukxqir,uixqkrp,ukxqirp,
-!$OMP& qiuk,qkui,qiukp,qkuip,rxqiuk,rxqkui,rxqiukp,rxqkuip,
-!$OMP& qidk,qkdi,qir,qkr,qiqkr,qkqir,qixqk,rxqir,dixr,dkxr,
-!$OMP& dixqkr,dkxqir,rxqkr,qkrxqir,rxqikr,rxqkir,rxqidk,rxqkdi,
-!$OMP& ddsc3,ddsc5,ddsc7,bn,sc,gl,sci,scip,gli,glip,gf,gfi,
-!$OMP& gfr,gfri,gti,gtri,dorl,dorli)
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,ipole,pdamp,thole,rpole,m2scale,m3scale,m4scale,
+!$OMP& m5scale,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
+!$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,i13,
+!$OMP& n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,nelst,
+!$OMP& elst,f,x,y,z,off2,aewald,uind,uinp,molcule,xaxis,yaxis,zaxis,
+!$OMP& emo,epo,eintrao,demo1,demo2,depo1,depo2,viro)
 !$OMP& firstprivate(mscale,pscale,dscale,uscale)
 !$OMP DO reduction(+:emo,epo,eintrao,demo1,demo2,depo1,depo2,viro)
 !$OMP& schedule(guided)

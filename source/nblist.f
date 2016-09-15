@@ -216,7 +216,7 @@ c     ###########################################################
 c
 c
 c     "vbuild" performs a complete rebuild of the van der Waals
-c     pair neighbor for each site
+c     pair neighbor list for all sites
 c
 c
       subroutine vbuild (xred,yred,zred)

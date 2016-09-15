@@ -108,7 +108,7 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Generic Linux
-# NOT IMPLEMENTED YET
+##  (Warning! NOT IMPLEMENTED YET)
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
 ##  Compiler: Intel Fortran for Linux 15.0

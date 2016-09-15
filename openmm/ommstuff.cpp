@@ -3005,39 +3005,13 @@ static void setupPositionalRestraints (OpenMM_System* system, FILE* log) {
    OpenMM_CustomExternalForce* force;
 
    if (boxes__.orthogonal) {
-      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-         r = sqrt(xr^2+yr^2+zr^2);\
-         xr = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-         yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-         zr = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-         xr_pre=x-x0;\
-         yr_pre=y-y0;\
-         zr_pre=z-z0");
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,periodicdistance(x, y, z, x0, y0, z0)-range))^2");
    } else if (boxes__.monoclinic) {
-      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-         r = sqrt(xr^2+yr^2+zr^2);\
-         xr = xr_converted + zr_converted*beta_cos;\
-         zr = zr_converted*beta_sin;\
-         xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-         yr = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-         zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-         xr_pre = x-x0 - zr_pre*beta_cos;\
-         yr_pre = y-y0;\
-         zr_pre = (z-z0)/beta_sin");
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,periodicdistance(x, y, z, x0, y0, z0)-range))^2");
       OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
       OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
    } else if (boxes__.triclinic) {
-      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-         r = sqrt(xr^2+yr^2+zr^2);\
-         xr = xr_converted + yr_converted*gamma_cos + zr_converted*beta_cos;\
-         yr = yr_converted*gamma_sin + zr_converted*beta_term;\
-         zr = zr_converted*gamma_term;\
-         xr_converted = xr_pre-use_bounds*(xcell*ceil(max(0,(abs(xr_pre)-xcell2))/xcell)*(step(xr_pre)*2-1));\
-         yr_converted = yr_pre-use_bounds*(ycell*ceil(max(0,(abs(yr_pre)-ycell2))/ycell)*(step(yr_pre)*2-1));\
-         zr_converted = zr_pre-use_bounds*(zcell*ceil(max(0,(abs(zr_pre)-zcell2))/zcell)*(step(zr_pre)*2-1));\
-         xr_pre = x-x0 - yr_pre*gamma_cos - zr_pre*beta_cos;\
-         yr_pre = (y-y0 - zr_pre*beta_term)/gamma_sin;\
-         zr_pre = (z-z0)/gamma_term");
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,periodicdistance(x, y, z, x0, y0, z0)-range))^2");
       OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_sin", boxes__.beta_sin);
       OpenMM_CustomExternalForce_addGlobalParameter (force, "beta_cos", boxes__.beta_cos);
       OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_term", boxes__.gamma_term);
@@ -3045,18 +3019,7 @@ static void setupPositionalRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_sin", boxes__.gamma_sin);
       OpenMM_CustomExternalForce_addGlobalParameter (force, "gamma_cos", boxes__.gamma_cos);
    } else if (boxes__.octahedron) {
-      force = OpenMM_CustomExternalForce_create("k*(max(0.0,r-range))^2;\
-         r = sqrt(xr^2+yr^2+zr^2);\
-         xr = xr_converted - absDist*xbox2 * (step(xr_converted)*2-1);\
-         yr = yr_converted - absDist*ybox2 * (step(yr_converted)*2-1);\
-         zr = zr_converted - absDist*zbox2 * (step(zr_converted)*2-1);\
-         absDist = step(abs(xr_converted) + abs(yr_converted) + abs(zr_converted) - box34);\
-         xr_converted = xr_pre-use_bounds*(xbox*ceil(max(0,(abs(xr_pre)-xbox2))/xbox)*(step(xr_pre)*2-1));\
-         yr_converted = yr_pre-use_bounds*(ybox*ceil(max(0,(abs(yr_pre)-ybox2))/ybox)*(step(yr_pre)*2-1));\
-         zr_converted = zr_pre-use_bounds*(zbox*ceil(max(0,(abs(zr_pre)-zbox2))/zbox)*(step(zr_pre)*2-1));\
-         xr_pre = x-x0;\
-         yr_pre = y-y0;\
-         zr_pre = z-z0");
+      force = OpenMM_CustomExternalForce_create("k*(max(0.0,periodicdistance(x, y, z, x0, y0, z0)-range))^2");
       OpenMM_CustomExternalForce_addGlobalParameter (force, "box34", boxes__.box34*nmPerAng);
       OpenMM_CustomExternalForce_addGlobalParameter (force, "xbox", *boxes__.xbox*nmPerAng);
       OpenMM_CustomExternalForce_addGlobalParameter (force, "xbox2", *boxes__.xbox2*nmPerAng);
