@@ -72,7 +72,9 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,f,fgrp
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
@@ -126,6 +128,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -169,9 +174,9 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -264,6 +269,9 @@ c
             iz = zaxis(i)
             ix = xaxis(i)
             iy = yaxis(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             ci = rpole(1,i)
             dix = rpole(2,i)
             diy = rpole(3,i)
@@ -307,9 +315,9 @@ c     compute the energy contribution for this interaction
 c
                if (proceed) then
                   do j = 1, ncell
-                     xr = x(kk) - x(ii)
-                     yr = y(kk) - y(ii)
-                     zr = z(kk) - z(ii)
+                     xr = x(kk) - xi
+                     yr = y(kk) - yi
+                     zr = z(kk) - zi
                      call imager (xr,yr,zr,j)
                      r2 = xr*xr + yr* yr + zr*zr
                      if (r2 .le. off2) then
@@ -434,7 +442,9 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,f,fgrp
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
@@ -488,11 +498,10 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared)
-!$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,
-!$OMP& xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,qix,qiy,qiz,
-!$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,qkx,qky,qkz,
-!$OMP& qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,fgrp,sc,gl)
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f,emo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo) schedule(guided)
 c
@@ -503,6 +512,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -547,9 +559,9 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -781,7 +793,9 @@ c
       integer i,j,k,m
       integer ii,kk
       real*8 e,f,erfc
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 bfac,exp2a
       real*8 efull,ralpha
       real*8 scalekk
@@ -824,6 +838,9 @@ c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole-1
          ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -851,9 +868,9 @@ c
          end do
          do k = i+1, npole
             kk = ipole(k)
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
@@ -964,6 +981,9 @@ c     calculate interaction energy with other unit cells
 c
          do i = 1, npole
             ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
             ci = rpole(1,i)
             dix = rpole(2,i)
             diy = rpole(3,i)
@@ -992,9 +1012,9 @@ c
             do k = i, npole
                kk = ipole(k)
                do j = 1, ncell
-                  xr = x(kk) - x(ii)
-                  yr = y(kk) - y(ii)
-                  zr = z(kk) - z(ii)
+                  xr = x(kk) - xi
+                  yr = y(kk) - yi
+                  zr = z(kk) - zi
                   call imager (xr,yr,zr,j)
                   r2 = xr*xr + yr* yr + zr*zr
                   if (r2 .le. off2) then
@@ -1250,7 +1270,9 @@ c
       integer i,j,k,m
       integer ii,kk,kkk
       real*8 e,f,erfc,bfac
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 exp2a,ralpha
       real*8 alsq2,alsq2n
       real*8 rr1,rr3,rr5
@@ -1294,11 +1316,10 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared)
-!$OMP& private(i,j,k,ii,kk,kkk,e,bfac,alsq2,alsq2n,exp2a,
-!$OMP& ralpha,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,
-!$OMP& qix,qiy,qiz,qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,
-!$OMP& qkx,qky,qkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,bn,sc,gl)
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,n13,
+!$OMP& i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,
+!$OMP& off2,aewald,f,emo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo) schedule(guided)
 c
@@ -1306,6 +1327,9 @@ c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole
          ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1334,9 +1358,9 @@ c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
             kk = ipole(k)
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then

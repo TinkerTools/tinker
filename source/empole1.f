@@ -37,11 +37,11 @@ c
          end if
       else
          if (use_mlist) then
-            call empole1b
-c           call empole1bx
+c           call empole1b
+            call empole1bx
          else
-            call empole1a
-c           call empole1ax
+c           call empole1a
+            call empole1ax
          end if
       end if
 c
@@ -1966,6 +1966,7 @@ c
       integer iax,iay,iaz
       integer kax,kay,kaz
       real*8 e,f,fgrp
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -2047,6 +2048,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          di(1) = rpole(2,i)
          di(2) = rpole(3,i)
@@ -2087,9 +2091,9 @@ c
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 10
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -2381,6 +2385,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          di(1) = rpole(2,i)
          di(2) = rpole(3,i)
@@ -2421,9 +2428,9 @@ c
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 20
             do jcell = 1, ncell
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             call imager (xr,yr,zr,jcell)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -3691,6 +3698,7 @@ c
       integer iax,iay,iaz
       integer kax,kay,kaz
       real*8 e,f,fgrp
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -3787,15 +3795,11 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared)
-!$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,
-!$OMP& e,xr,yr,zr,xix,yix,zix,xiy,yiy,ziy,xiz,yiz,ziz,xkx,ykx,zkx,
-!$OMP& xky,yky,zky,xkz,ykz,zkz,r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
-!$OMP& iax,iay,iaz,kax,kay,kaz,vxx,vyy,vzz,vyx,vzx,vzy,
-!$OMP& frcxi,frcyi,frczi,frcxk,frcyk,frczk,ci,di,qi,ck,dk,qk,
-!$OMP& ftm2,ttm2,ttm3,dixdk,qiuk,qkui,qiukp,qkuip,rxqiuk,rxqkui,rxqiukp,
-!$OMP& rxqkuip,qidk,qkdi,qir,qkr,qiqkr,qkqir,qixqk,rxqir,dixr,dkxr,
-!$OMP& dixqkr,dkxqir,rxqkr,qkrxqir,rxqikr,rxqkir,rxqidk,rxqkdi,sc,gl,gf)
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,emo,eintero,
+!$OMP& demo,viro)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo,eintero,demo,viro) schedule(guided)
 c
@@ -3806,6 +3810,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          di(1) = rpole(2,i)
          di(2) = rpole(3,i)
@@ -3847,9 +3854,9 @@ c
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 10
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -4041,14 +4048,14 @@ c
                demo(1,ii) = demo(1,ii) + ftm2(1)
                demo(2,ii) = demo(2,ii) + ftm2(2)
                demo(3,ii) = demo(3,ii) + ftm2(3)
-               call torque (i,ttm2,frcxi,frcyi,frczi,demo)
+               call torque4 (i,ttm2,frcxi,frcyi,frczi,demo)
 c
 c     increment gradient due to force and torque on second site
 c
                demo(1,kk) = demo(1,kk) - ftm2(1)
                demo(2,kk) = demo(2,kk) - ftm2(2)
                demo(3,kk) = demo(3,kk) - ftm2(3)
-               call torque (k,ttm3,frcxk,frcyk,frczk,demo)
+               call torque4 (k,ttm3,frcxk,frcyk,frczk,demo)
 c
 c     increment the internal virial tensor components
 c

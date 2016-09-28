@@ -80,7 +80,9 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,f,fgrp
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
@@ -151,6 +153,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -194,9 +199,9 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -312,174 +317,178 @@ c
 c     for periodic boundary conditions with large cutoffs
 c     neighbors must be found by the replicates method
 c
-      if (.not. use_replica)  return
+      if (use_replica) then
 c
 c     calculate interaction energy with other unit cells
 c
-      do i = 1, npole
-         ii = ipole(i)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = yaxis(k)
-         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
+         do i = 1, npole
+            ii = ipole(i)
+            iz = zaxis(i)
+            ix = xaxis(i)
+            iy = yaxis(k)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
+            usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set interaction scaling coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = m2scale
-         end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = m3scale
-         end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = m4scale
-         end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = m5scale
-         end do
+            do j = 1, n12(ii)
+               mscale(i12(j,ii)) = m2scale
+            end do
+            do j = 1, n13(ii)
+               mscale(i13(j,ii)) = m3scale
+            end do
+            do j = 1, n14(ii)
+               mscale(i14(j,ii)) = m4scale
+            end do
+            do j = 1, n15(ii)
+               mscale(i15(j,ii)) = m5scale
+            end do
 c
 c     decide whether to compute the current interaction
 c
-         do k = i, npole
-            kk = ipole(k)
-            kz = zaxis(k)
-            kx = xaxis(k)
-            ky = yaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
-            proceed = .true.
-            if (proceed)  proceed = (usei .or. usek)
+            do k = i, npole
+               kk = ipole(k)
+               kz = zaxis(k)
+               kx = xaxis(k)
+               ky = yaxis(k)
+               usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
+               if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+               proceed = .true.
+               if (proceed)  proceed = (usei .or. usek)
 c
 c     compute the energy contribution for this interaction
 c
-            if (proceed) then
-               do j = 1, ncell
-                  xr = x(kk) - x(ii)
-                  yr = y(kk) - y(ii)
-                  zr = z(kk) - z(ii)
-                  call imager (xr,yr,zr,j)
-                  r2 = xr*xr + yr* yr + zr*zr
-                  if (r2 .le. off2) then
-                     r = sqrt(r2)
-                     ck = rpole(1,k)
-                     dkx = rpole(2,k)
-                     dky = rpole(3,k)
-                     dkz = rpole(4,k)
-                     qkxx = rpole(5,k)
-                     qkxy = rpole(6,k)
-                     qkxz = rpole(7,k)
-                     qkyy = rpole(9,k)
-                     qkyz = rpole(10,k)
-                     qkzz = rpole(13,k)
+               if (proceed) then
+                  do j = 1, ncell
+                     xr = x(kk) - xi
+                     yr = y(kk) - yi
+                     zr = z(kk) - zi
+                     call imager (xr,yr,zr,j)
+                     r2 = xr*xr + yr* yr + zr*zr
+                     if (r2 .le. off2) then
+                        r = sqrt(r2)
+                        ck = rpole(1,k)
+                        dkx = rpole(2,k)
+                        dky = rpole(3,k)
+                        dkz = rpole(4,k)
+                        qkxx = rpole(5,k)
+                        qkxy = rpole(6,k)
+                        qkxz = rpole(7,k)
+                        qkyy = rpole(9,k)
+                        qkyz = rpole(10,k)
+                        qkzz = rpole(13,k)
 c
 c     construct some intermediate quadrupole values
 c
-                     qix = qixx*xr + qixy*yr + qixz*zr
-                     qiy = qixy*xr + qiyy*yr + qiyz*zr
-                     qiz = qixz*xr + qiyz*yr + qizz*zr
-                     qkx = qkxx*xr + qkxy*yr + qkxz*zr
-                     qky = qkxy*xr + qkyy*yr + qkyz*zr
-                     qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                        qix = qixx*xr + qixy*yr + qixz*zr
+                        qiy = qixy*xr + qiyy*yr + qiyz*zr
+                        qiz = qixz*xr + qiyz*yr + qizz*zr
+                        qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                        qky = qkxy*xr + qkyy*yr + qkyz*zr
+                        qkz = qkxz*xr + qkyz*yr + qkzz*zr
 c
 c     calculate the scalar products for permanent multipoles
 c
-                     sc(2) = dix*dkx + diy*dky + diz*dkz
-                     sc(3) = dix*xr + diy*yr + diz*zr
-                     sc(4) = dkx*xr + dky*yr + dkz*zr
-                     sc(5) = qix*xr + qiy*yr + qiz*zr
-                     sc(6) = qkx*xr + qky*yr + qkz*zr
-                     sc(7) = qix*dkx + qiy*dky + qiz*dkz
-                     sc(8) = qkx*dix + qky*diy + qkz*diz
-                     sc(9) = qix*qkx + qiy*qky + qiz*qkz
-                     sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                        sc(2) = dix*dkx + diy*dky + diz*dkz
+                        sc(3) = dix*xr + diy*yr + diz*zr
+                        sc(4) = dkx*xr + dky*yr + dkz*zr
+                        sc(5) = qix*xr + qiy*yr + qiz*zr
+                        sc(6) = qkx*xr + qky*yr + qkz*zr
+                        sc(7) = qix*dkx + qiy*dky + qiz*dkz
+                        sc(8) = qkx*dix + qky*diy + qkz*diz
+                        sc(9) = qix*qkx + qiy*qky + qiz*qkz
+                        sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                              + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     calculate the gl functions for permanent multipoles
 c
-                     gl(0) = ci*ck
-                     gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-                     gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                          + 2.0d0*(sc(7)-sc(8)+sc(10))
-                     gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-                     gl(4) = sc(5)*sc(6)
+                        gl(0) = ci*ck
+                        gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
+                        gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
+     &                             + 2.0d0*(sc(7)-sc(8)+sc(10))
+                        gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
+                        gl(4) = sc(5)*sc(6)
 c
 c     get reciprocal distance terms with units and scaling
 c
-                     rr1 = f * mscale(kk) / r
-                     rr3 = rr1 / r2
-                     rr5 = 3.0d0 * rr3 / r2
-                     rr7 = 5.0d0 * rr5 / r2
-                     rr9 = 7.0d0 * rr7 / r2
+                        rr1 = f * mscale(kk) / r
+                        rr3 = rr1 / r2
+                        rr5 = 3.0d0 * rr3 / r2
+                        rr7 = 5.0d0 * rr5 / r2
+                        rr9 = 7.0d0 * rr7 / r2
 c
 c     compute the energy contribution for this interaction
 c
-                     e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                      + rr7*gl(3) + rr9*gl(4)
-                     if (ii .eq. kk)  e = 0.5d0 * e
-                     if (use_polymer .and. r2.le.polycut2)
-     &                  e = e * mscale(kk)
-                     if (use_group)  e = e * fgrp
+                        e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                         + rr7*gl(3) + rr9*gl(4)
+                        if (ii .eq. kk)  e = 0.5d0 * e
+                        if (use_polymer .and. r2.le.polycut2)
+     &                     e = e * mscale(kk)
+                        if (use_group)  e = e * fgrp
 c
 c     increment the overall van der Waals energy components
 c
-                     if (e .ne. 0.0d0) then
-                        nem = nem + 1
-                        em = em + e
-                        aem(ii) = aem(ii) + 0.5d0*e
-                        aem(kk) = aem(kk) + 0.5d0*e
-                     end if
+                        if (e .ne. 0.0d0) then
+                           nem = nem + 1
+                           em = em + e
+                           aem(ii) = aem(ii) + 0.5d0*e
+                           aem(kk) = aem(kk) + 0.5d0*e
+                        end if
 c
 c     increment the total intermolecular energy
 c
-                     einter = einter + e
+                        einter = einter + e
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(e) .gt. 100.0d0)
-                     if ((debug.and.e.ne.0.0d0)
-     &                     .or. (verbose.and.huge)) then
-                        if (header) then
-                           header = .false.
-                           write (iout,40)
-   40                      format (/,' Individual Atomic Multipole',
-     &                                ' Interactions :',
-     &                             //,' Type',14x,'Atom Names',
-     &                                15x,'Distance',8x,'Energy',/)
+                        huge = (abs(e) .gt. 100.0d0)
+                        if ((debug.and.e.ne.0.0d0)
+     &                        .or. (verbose.and.huge)) then
+                           if (header) then
+                              header = .false.
+                              write (iout,40)
+   40                         format (/,' Individual Atomic Multipole',
+     &                                   ' Interactions :',
+     &                                //,' Type',14x,'Atom Names',
+     &                                   15x,'Distance',8x,'Energy',/)
+                           end if
+                           write (iout,50)  ii,name(ii),kk,name(kk),r,e
+   50                      format (' M-Pole',4x,2(i7,'-',a3),1x,
+     &                                '(X)',5x,f10.4,2x,f12.4)
                         end if
-                        write (iout,50)  ii,name(ii),kk,name(kk),r,e
-   50                   format (' M-Pole',4x,2(i7,'-',a3),1x,
-     &                             '(X)',5x,f10.4,2x,f12.4)
                      end if
-                  end if
-               end do
-            end if
-         end do
+                  end do
+               end if
+            end do
 c
 c     reset interaction scaling coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = 1.0d0
+            do j = 1, n12(ii)
+               mscale(i12(j,ii)) = 1.0d0
+            end do
+            do j = 1, n13(ii)
+               mscale(i13(j,ii)) = 1.0d0
+            end do
+            do j = 1, n14(ii)
+               mscale(i14(j,ii)) = 1.0d0
+            end do
+            do j = 1, n15(ii)
+               mscale(i15(j,ii)) = 1.0d0
+            end do
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = 1.0d0
-         end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = 1.0d0
-         end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = 1.0d0
-         end do
-      end do
+      end if
 c
 c     perform deallocation of some local arrays
 c
@@ -529,7 +538,9 @@ c
       integer kx,ky,kz
       integer nemo
       real*8 e,f,fgrp
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9
       real*8 ci,dix,diy,diz
@@ -606,11 +617,11 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared)
-!$OMP& private(i,j,k,ii,ix,iy,iz,usei,kk,kx,ky,kz,usek,kkk,proceed,e,
-!$OMP& xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,qix,qiy,qiz,
-!$OMP& qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,qkx,qky,qkz,
-!$OMP& qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,fgrp,sc,gl)
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,header,
+!$OMP& verbose,debug,emo,eintero,nemo,aemo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo,eintero,nemo,aemo) schedule(guided)
 c
@@ -621,6 +632,9 @@ c
          iz = zaxis(i)
          ix = xaxis(i)
          iy = yaxis(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -665,9 +679,9 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -965,7 +979,9 @@ c
       real*8 e,eintra
       real*8 efull
       real*8 f,erfc
-      real*8 r,r2,xr,yr,zr
+      real*8 r,r2
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
       real*8 bfac,exp2a
       real*8 ralpha,scalekk
       real*8 alsq2,alsq2n
@@ -1023,6 +1039,9 @@ c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole-1
          ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1050,9 +1069,9 @@ c
          end do
          do k = i+1, npole
             kk = ipole(k)
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
@@ -1196,181 +1215,185 @@ c
 c     for periodic boundary conditions with large cutoffs
 c     neighbors must be found by the replicates method
 c
-      if (.not. use_replica)  return
+      if (use_replica) then
 c
 c     calculate interaction energy with other unit cells
 c
-      do i = 1, npole
-         ii = ipole(i)
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
+         do i = 1, npole
+            ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
 c
 c     set interaction scaling coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = m2scale
-         end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = m3scale
-         end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = m4scale
-         end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = m5scale
-         end do
-         do k = i, npole
-            kk = ipole(k)
-            do j = 1, ncell
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
-               call imager (xr,yr,zr,j)
-               r2 = xr*xr + yr* yr + zr*zr
-               if (r2 .le. off2) then
-                  r = sqrt(r2)
-                  ck = rpole(1,k)
-                  dkx = rpole(2,k)
-                  dky = rpole(3,k)
-                  dkz = rpole(4,k)
-                  qkxx = rpole(5,k)
-                  qkxy = rpole(6,k)
-                  qkxz = rpole(7,k)
-                  qkyy = rpole(9,k)
-                  qkyz = rpole(10,k)
-                  qkzz = rpole(13,k)
+            do j = 1, n12(ii)
+               mscale(i12(j,ii)) = m2scale
+            end do
+            do j = 1, n13(ii)
+               mscale(i13(j,ii)) = m3scale
+            end do
+            do j = 1, n14(ii)
+               mscale(i14(j,ii)) = m4scale
+            end do
+            do j = 1, n15(ii)
+               mscale(i15(j,ii)) = m5scale
+            end do
+            do k = i, npole
+               kk = ipole(k)
+               do j = 1, ncell
+                  xr = x(kk) - xi
+                  yr = y(kk) - yi
+                  zr = z(kk) - zi
+                  call imager (xr,yr,zr,j)
+                  r2 = xr*xr + yr* yr + zr*zr
+                  if (r2 .le. off2) then
+                     r = sqrt(r2)
+                     ck = rpole(1,k)
+                     dkx = rpole(2,k)
+                     dky = rpole(3,k)
+                     dkz = rpole(4,k)
+                     qkxx = rpole(5,k)
+                     qkxy = rpole(6,k)
+                     qkxz = rpole(7,k)
+                     qkyy = rpole(9,k)
+                     qkyz = rpole(10,k)
+                     qkzz = rpole(13,k)
 c
 c     calculate the error function damping terms
 c
-                  ralpha = aewald * r
-                  bn(0) = erfc(ralpha) / r
-                  alsq2 = 2.0d0 * aewald**2
-                  alsq2n = 0.0d0
-                  if (aewald .gt. 0.0d0)
-     &               alsq2n = 1.0d0 / (sqrtpi*aewald)
-                  exp2a = exp(-ralpha**2)
-                  do m = 1, 4
-                     bfac = dble(m+m-1)
-                     alsq2n = alsq2 * alsq2n
-                     bn(m) = (bfac*bn(m-1)+alsq2n*exp2a) / r2
-                  end do
+                     ralpha = aewald * r
+                     bn(0) = erfc(ralpha) / r
+                     alsq2 = 2.0d0 * aewald**2
+                     alsq2n = 0.0d0
+                     if (aewald .gt. 0.0d0)
+     &                  alsq2n = 1.0d0 / (sqrtpi*aewald)
+                     exp2a = exp(-ralpha**2)
+                     do m = 1, 4
+                        bfac = dble(m+m-1)
+                        alsq2n = alsq2 * alsq2n
+                        bn(m) = (bfac*bn(m-1)+alsq2n*exp2a) / r2
+                     end do
 c
 c     construct some intermediate quadrupole values
 c
-                  qix = qixx*xr + qixy*yr + qixz*zr
-                  qiy = qixy*xr + qiyy*yr + qiyz*zr
-                  qiz = qixz*xr + qiyz*yr + qizz*zr
-                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qky = qkxy*xr + qkyy*yr + qkyz*zr
-                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                     qix = qixx*xr + qixy*yr + qixz*zr
+                     qiy = qixy*xr + qiyy*yr + qiyz*zr
+                     qiz = qixz*xr + qiyz*yr + qizz*zr
+                     qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                     qky = qkxy*xr + qkyy*yr + qkyz*zr
+                     qkz = qkxz*xr + qkyz*yr + qkzz*zr
 c
 c     calculate the scalar products for permanent multipoles
 c
-                  sc(2) = dix*dkx + diy*dky + diz*dkz
-                  sc(3) = dix*xr + diy*yr + diz*zr
-                  sc(4) = dkx*xr + dky*yr + dkz*zr
-                  sc(5) = qix*xr + qiy*yr + qiz*zr
-                  sc(6) = qkx*xr + qky*yr + qkz*zr
-                  sc(7) = qix*dkx + qiy*dky + qiz*dkz
-                  sc(8) = qkx*dix + qky*diy + qkz*diz
-                  sc(9) = qix*qkx + qiy*qky + qiz*qkz
-                  sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                     sc(2) = dix*dkx + diy*dky + diz*dkz
+                     sc(3) = dix*xr + diy*yr + diz*zr
+                     sc(4) = dkx*xr + dky*yr + dkz*zr
+                     sc(5) = qix*xr + qiy*yr + qiz*zr
+                     sc(6) = qkx*xr + qky*yr + qkz*zr
+                     sc(7) = qix*dkx + qiy*dky + qiz*dkz
+                     sc(8) = qkx*dix + qky*diy + qkz*diz
+                     sc(9) = qix*qkx + qiy*qky + qiz*qkz
+                     sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     calculate the gl functions for permanent multipoles
 c
-                  gl(0) = ci*ck
-                  gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-                  gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                       + 2.0d0*(sc(7)-sc(8)+sc(10))
-                  gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-                  gl(4) = sc(5)*sc(6)
+                     gl(0) = ci*ck
+                     gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
+                     gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
+     &                          + 2.0d0*(sc(7)-sc(8)+sc(10))
+                     gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
+                     gl(4) = sc(5)*sc(6)
 c
 c     get reciprocal distance terms as unscaled values
 c
-                  rr1 = 1.0d0 / r
-                  rr3 = rr1 / r2
-                  rr5 = 3.0d0 * rr3 / r2
-                  rr7 = 5.0d0 * rr5 / r2
-                  rr9 = 7.0d0 * rr7 / r2
+                     rr1 = 1.0d0 / r
+                     rr3 = rr1 / r2
+                     rr5 = 3.0d0 * rr3 / r2
+                     rr7 = 5.0d0 * rr5 / r2
+                     rr9 = 7.0d0 * rr7 / r2
 c
 c     compute the full undamped permanent multipole energy
 c
-                  efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                       + rr7*gl(3) + rr9*gl(4)
-                  efull = f * efull
+                     efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                          + rr7*gl(3) + rr9*gl(4)
+                     efull = f * efull
 c
 c     modify error function terms by scaled true distance
 c
-                  scalekk = 1.0d0 - mscale(kk)
-                  rr1 = f * (bn(0)-scalekk*rr1)
-                  rr3 = f * (bn(1)-scalekk*rr3)
-                  rr5 = f * (bn(2)-scalekk*rr5)
-                  rr7 = f * (bn(3)-scalekk*rr7)
-                  rr9 = f * (bn(4)-scalekk*rr9)
+                     scalekk = 1.0d0 - mscale(kk)
+                     rr1 = f * (bn(0)-scalekk*rr1)
+                     rr3 = f * (bn(1)-scalekk*rr3)
+                     rr5 = f * (bn(2)-scalekk*rr5)
+                     rr7 = f * (bn(3)-scalekk*rr7)
+                     rr9 = f * (bn(4)-scalekk*rr9)
 c
 c     compute the energy contribution for this interaction
 c
-                  e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                   + rr7*gl(3) + rr9*gl(4)
-                  if (use_polymer .and. r2.le.polycut2)
-     &               e = e - efull*(1.0d0-mscale(kk))
-                  if (ii .eq. kk)  e = 0.5d0 * e
+                     e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
+     &                      + rr7*gl(3) + rr9*gl(4)
+                     if (use_polymer .and. r2.le.polycut2)
+     &                  e = e - efull*(1.0d0-mscale(kk))
+                     if (ii .eq. kk)  e = 0.5d0 * e
 c
 c     increment the overall van der Waals energy components
 c
-                  if (e .ne. 0.0d0) then
-                     nem = nem + 1
-                     em = em + e
-                     aem(ii) = aem(ii) + 0.5d0*e
-                     aem(kk) = aem(kk) + 0.5d0*e
-                  end if
+                     if (e .ne. 0.0d0) then
+                        nem = nem + 1
+                        em = em + e
+                        aem(ii) = aem(ii) + 0.5d0*e
+                        aem(kk) = aem(kk) + 0.5d0*e
+                     end if
 c
 c     print a message if the energy of this interaction is large
 c
-                  efull = efull * mscale(kk)
-                  huge = (abs(efull) .gt. 100.0d0)
-                  if ((debug.and.e.ne.0.0d0)
-     &                  .or. (verbose.and.huge)) then
-                     if (header) then
-                        header = .false.
-                        write (iout,40)
-   40                   format (/,' Individual Real Space Multipole',
-     &                             ' Interactions :',
-     &                          //,' Type',14x,'Atom Names',
-     &                             15x,'Distance',8x,'Energy',/)
+                     efull = efull * mscale(kk)
+                     huge = (abs(efull) .gt. 100.0d0)
+                     if ((debug.and.e.ne.0.0d0)
+     &                     .or. (verbose.and.huge)) then
+                        if (header) then
+                           header = .false.
+                           write (iout,40)
+   40                      format (/,' Individual Real Space Multipole',
+     &                                ' Interactions :',
+     &                             //,' Type',14x,'Atom Names',
+     &                                15x,'Distance',8x,'Energy',/)
+                        end if
+                        write (iout,50)  ii,name(ii),kk,name(kk),r,efull
+   50                   format (' M-Pole',4x,2(i7,'-',a3),1x,
+     &                             '(X)',5x,f10.4,2x,f12.4)
                      end if
-                     write (iout,50)  ii,name(ii),kk,name(kk),r,efull
-   50                format (' M-Pole',4x,2(i7,'-',a3),1x,
-     &                          '(X)',5x,f10.4,2x,f12.4)
                   end if
-               end if
+               end do
             end do
-         end do
 c
 c     reset interaction scaling coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = 1.0d0
+            do j = 1, n12(ii)
+               mscale(i12(j,ii)) = 1.0d0
+            end do
+            do j = 1, n13(ii)
+               mscale(i13(j,ii)) = 1.0d0
+            end do
+            do j = 1, n14(ii)
+               mscale(i14(j,ii)) = 1.0d0
+            end do
+            do j = 1, n15(ii)
+               mscale(i15(j,ii)) = 1.0d0
+            end do
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = 1.0d0
-         end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = 1.0d0
-         end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = 1.0d0
-         end do
-      end do
+      end if
 c
 c     perform deallocation of some local arrays
 c
@@ -1544,6 +1567,7 @@ c
       real*8 e,eintra
       real*8 efull
       real*8 f,erfc,r,r2
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 bfac,exp2a
       real*8 ralpha,scalekk
@@ -1612,11 +1636,11 @@ c
 c
 c     set OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared)
-!$OMP& private(i,j,k,ii,kk,kkk,e,efull,bfac,alsq2,alsq2n,exp2a,ralpha,
-!$OMP& scalekk,xr,yr,zr,r,r2,rr1,rr3,rr5,rr7,rr9,ci,dix,diy,diz,
-!$OMP& qix,qiy,qiz,qixx,qixy,qixz,qiyy,qiyz,qizz,ck,dkx,dky,dkz,
-!$OMP& qkx,qky,qkz,qkxx,qkxy,qkxz,qkyy,qkyz,qkzz,bn,sc,gl)
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,n13,
+!$OMP& i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,
+!$OMP& off2,aewald,f,molcule,header,verbose,debug,name,emo,eintrao,
+!$OMP& nemo,aemo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo,eintrao,nemo,aemo) schedule(guided)
 c
@@ -1624,6 +1648,9 @@ c     compute the real space portion of the Ewald summation
 c
       do i = 1, npole
          ii = ipole(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1652,9 +1679,9 @@ c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
             kk = ipole(k)
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+            xr = x(kk) - xi
+            yr = y(kk) - yi
+            zr = z(kk) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
