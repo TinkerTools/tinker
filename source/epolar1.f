@@ -157,7 +157,7 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
 c
-c     set arrays needed to scale connected atom interactions
+c     set arrays needed to scale interactions and store fields
 c
       do i = 1, n
          pscale(i) = 1.0d0
@@ -882,7 +882,7 @@ c
       allocate (dufld(6,n))
       allocate (depo(3,n))
 c
-c     set arrays needed to scale connected atom interactions
+c     set arrays needed to scale interactions and store fields
 c
       do i = 1, n
          pscale(i) = 1.0d0
@@ -943,7 +943,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:depo,viro) schedule(guided)
+!$OMP DO reduction(+:depo,viro,ufld,dufld) schedule(guided)
 c
 c     set the permanent multipole and induced dipole values
 c
