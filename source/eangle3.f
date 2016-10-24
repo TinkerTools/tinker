@@ -95,7 +95,7 @@ c
          aeao(i) = aea(i)
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
 !$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer,
@@ -297,7 +297,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

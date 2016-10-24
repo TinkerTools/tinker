@@ -652,7 +652,7 @@ c     initialize local variables for OpenMP calculation
 c
       eco = ec
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
@@ -765,7 +765,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1402,7 +1402,7 @@ c     initialize local variables for OpenMP calculation
 c
       eco = ec
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
 !$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c2scale,
@@ -1488,7 +1488,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

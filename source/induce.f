@@ -2531,7 +2531,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,thole,
 !$OMP& rpole,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
@@ -3305,7 +3305,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,uind,uinp,ntpair,tindex,
 !$OMP& tdipdip,field,fieldp,fieldt,fieldtp)
@@ -3927,7 +3927,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
 !$OMP& rpole,n12,n13,n14,n15,np11,np12,np13,np14,i12,i13,i14,i15,
@@ -4410,7 +4410,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
 !$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
@@ -6052,7 +6052,7 @@ c
             uscale(i) = 1.0d0
          end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,
 !$OMP& thole,polarity,u1scale,u2scale,u3scale,u4scale,np11,ip11,

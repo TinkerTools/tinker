@@ -1228,7 +1228,7 @@ c
    30    format (/,' Scan for Solvent Molecules to be Removed')
       end if
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(nref,n,x,y,z,molcule,close2,remove,header,icount)
@@ -1266,7 +1266,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

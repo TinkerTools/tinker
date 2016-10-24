@@ -399,7 +399,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
 !$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
@@ -460,7 +460,7 @@ c
          end do
       end do
 c
-c     end OpenMP directive for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -513,7 +513,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
 !$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
@@ -586,7 +586,7 @@ c
          end do
       end do
 c
-c     end OpenMP directive for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -640,7 +640,7 @@ c
          end do
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
 !$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
@@ -712,7 +712,7 @@ c
          end do
       end do
 c
-c     end OpenMP directive for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -801,7 +801,7 @@ c
       real*8 fphi(20,*)
 c
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
 !$OMP& nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,fphi)
@@ -928,7 +928,7 @@ c
          fphi(20,isite) = tuv111
       end do
 c
-c     end OpenMP directive for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -984,7 +984,7 @@ c
       real*8 fdip_sum_phi(20,*)
 c
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,
 !$OMP& igrid,bsorder,nfft3,thetai3,nfft2,thetai2,nfft1,
@@ -1200,7 +1200,7 @@ c
          fdip_sum_phi(20,isite) = tuv111
       end do
 c
-c     end OpenMP directive for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

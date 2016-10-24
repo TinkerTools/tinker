@@ -247,25 +247,27 @@ c
 c
 c     remove zero and undefined polarizable sites from the list
 c
-      npole = 0
       npolar = 0
-      do i = 1, n
-         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do k = 1, maxpole
-               pole(k,npole) = pole(k,i)
-            end do
-            if (polarity(i) .ne. 0.0d0)  npolar = npolar + 1
-            polarity(npole) = polarity(i)
-            thole(npole) = thole(i)
-         end if
-      end do
+      if (use_polar) then
+         npole = 0
+         do i = 1, n
+            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do k = 1, maxpole
+                  pole(k,npole) = pole(k,i)
+               end do
+               if (polarity(i) .ne. 0.0d0)  npolar = npolar + 1
+               polarity(npole) = polarity(i)
+               thole(npole) = thole(i)
+            end if
+         end do
+      end if
 c
 c     set the values used in the scaling of the polarizability
 c

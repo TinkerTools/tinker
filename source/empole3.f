@@ -58,7 +58,6 @@ c
       use atomid
       use atoms
       use bound
-      use boxes
       use cell
       use chgpot
       use couple
@@ -80,21 +79,19 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,f,fgrp
-      real*8 r,r2
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 rr1,rr3,rr5
-      real*8 rr7,rr9
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qix,qiy,qiz
-      real*8 qkx,qky,qkz
-      real*8 sc(10)
-      real*8 gl(0:4)
+      real*8 qirx,qiry,qirz
+      real*8 qkrx,qkry,qkrz
+      real*8 sc(9),ge(5)
       real*8, allocatable :: mscale(:)
       logical proceed
       logical header,huge
@@ -134,7 +131,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set arrays needed to scale connected atom interactions
+c     set array needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -167,9 +164,6 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-c
-c     set interaction scaling coefficients for connected atoms
-c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
          end do
@@ -183,7 +177,7 @@ c
             mscale(i15(j,ii)) = m5scale
          end do
 c
-c     decide whether to compute the current interaction
+c     evaluate all sites within the cutoff distance
 c
          do k = i+1, npole
             kk = ipole(k)
@@ -195,9 +189,6 @@ c
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
-c
-c     compute the energy contribution for this interaction
-c
             if (proceed) then
                xr = x(kk) - xi
                yr = y(kk) - yi
@@ -217,38 +208,7 @@ c
                   qkyz = rpole(10,k)
                   qkzz = rpole(13,k)
 c
-c     construct some intermediate quadrupole values
-c
-                  qix = qixx*xr + qixy*yr + qixz*zr
-                  qiy = qixy*xr + qiyy*yr + qiyz*zr
-                  qiz = qixz*xr + qiyz*yr + qizz*zr
-                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qky = qkxy*xr + qkyy*yr + qkyz*zr
-                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
-c     calculate the scalar products for permanent multipoles
-c
-                  sc(2) = dix*dkx + diy*dky + diz*dkz
-                  sc(3) = dix*xr + diy*yr + diz*zr
-                  sc(4) = dkx*xr + dky*yr + dkz*zr
-                  sc(5) = qix*xr + qiy*yr + qiz*zr
-                  sc(6) = qkx*xr + qky*yr + qkz*zr
-                  sc(7) = qix*dkx + qiy*dky + qiz*dkz
-                  sc(8) = qkx*dix + qky*diy + qkz*diz
-                  sc(9) = qix*qkx + qiy*qky + qiz*qkz
-                  sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     calculate the gl functions for permanent multipoles
-c
-                  gl(0) = ci*ck
-                  gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-                  gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                       + 2.0d0*(sc(7)-sc(8)+sc(10))
-                  gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-                  gl(4) = sc(5)*sc(6)
-c
-c     get reciprocal distance terms with units and scaling
+c     get reciprocal distance terms for this interaction
 c
                   rr1 = f * mscale(kk) / r
                   rr3 = rr1 / r2
@@ -256,13 +216,44 @@ c
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
 c
+c     construct several necessary additional variables
+c
+                  qirx = qixx*xr + qixy*yr + qixz*zr
+                  qiry = qixy*xr + qiyy*yr + qiyz*zr
+                  qirz = qixz*xr + qiyz*yr + qizz*zr
+                  qkrx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qkry = qkxy*xr + qkyy*yr + qkyz*zr
+                  qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+c
+c     calculate scalar products for multipole interactions
+c
+                  sc(1) = dix*dkx + diy*dky + diz*dkz
+                  sc(2) = dix*xr + diy*yr + diz*zr
+                  sc(3) = dkx*xr + dky*yr + dkz*zr
+                  sc(4) = qirx*xr + qiry*yr + qirz*zr
+                  sc(5) = qkrx*xr + qkry*yr + qkrz*zr
+                  sc(6) = dkx*qirx + dky*qiry + dkz*qirz
+                  sc(7) = dix*qkrx + diy*qkry + diz*qkrz
+                  sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
+                  sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                       + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+c
+c     construct auxiliary variables for multipole energy
+c
+                  ge(1) = ci*ck
+                  ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
+                  ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
+     &                       + 2.0d0*(sc(6)-sc(7)+sc(9))
+                  ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
+                  ge(5) = sc(4)*sc(5)
+c
 c     compute the energy contribution for this interaction
 c
-                  e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                   + rr7*gl(3) + rr9*gl(4)
+                  e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                   + rr7*ge(4) + rr9*ge(5)
                   if (use_group)  e = e * fgrp
 c
-c     increment the overall van der Waals energy components
+c     increment the overall multipole energy components
 c
                   if (e .ne. 0.0d0) then
                      nem = nem + 1
@@ -273,11 +264,10 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(ii) .ne. molcule(kk)) then
-                     einter = einter + e
-                  end if
+                  if (molcule(ii) .ne. molcule(kk))
+     &               einter = einter + e
 c
-c     print a message if the energy of this interaction is large
+c     print message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
                   if ((debug.and.e.ne.0.0d0)
@@ -298,7 +288,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
@@ -340,9 +330,6 @@ c
             qiyz = rpole(10,i)
             qizz = rpole(13,i)
             usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-c
-c     set interaction scaling coefficients for connected atoms
-c
             do j = 1, n12(ii)
                mscale(i12(j,ii)) = m2scale
             end do
@@ -356,7 +343,7 @@ c
                mscale(i15(j,ii)) = m5scale
             end do
 c
-c     decide whether to compute the current interaction
+c     evaluate all sites within the cutoff distance
 c
             do k = i, npole
                kk = ipole(k)
@@ -367,9 +354,6 @@ c
                if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
                proceed = .true.
                if (proceed)  proceed = (usei .or. usek)
-c
-c     compute the energy contribution for this interaction
-c
                if (proceed) then
                   do j = 1, ncell
                      xr = x(kk) - xi
@@ -390,55 +374,55 @@ c
                         qkyz = rpole(10,k)
                         qkzz = rpole(13,k)
 c
-c     construct some intermediate quadrupole values
+c     get reciprocal distance terms for this interaction
 c
-                        qix = qixx*xr + qixy*yr + qixz*zr
-                        qiy = qixy*xr + qiyy*yr + qiyz*zr
-                        qiz = qixz*xr + qiyz*yr + qizz*zr
-                        qkx = qkxx*xr + qkxy*yr + qkxz*zr
-                        qky = qkxy*xr + qkyy*yr + qkyz*zr
-                        qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
-c     calculate the scalar products for permanent multipoles
-c
-                        sc(2) = dix*dkx + diy*dky + diz*dkz
-                        sc(3) = dix*xr + diy*yr + diz*zr
-                        sc(4) = dkx*xr + dky*yr + dkz*zr
-                        sc(5) = qix*xr + qiy*yr + qiz*zr
-                        sc(6) = qkx*xr + qky*yr + qkz*zr
-                        sc(7) = qix*dkx + qiy*dky + qiz*dkz
-                        sc(8) = qkx*dix + qky*diy + qkz*diz
-                        sc(9) = qix*qkx + qiy*qky + qiz*qkz
-                        sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                              + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     calculate the gl functions for permanent multipoles
-c
-                        gl(0) = ci*ck
-                        gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-                        gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                             + 2.0d0*(sc(7)-sc(8)+sc(10))
-                        gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-                        gl(4) = sc(5)*sc(6)
-c
-c     get reciprocal distance terms with units and scaling
-c
-                        rr1 = f * mscale(kk) / r
+                        rr1 = f / r
                         rr3 = rr1 / r2
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
                         rr9 = 7.0d0 * rr7 / r2
 c
+c     construct several necessary additional variables
+c
+                        qirx = qixx*xr + qixy*yr + qixz*zr
+                        qiry = qixy*xr + qiyy*yr + qiyz*zr
+                        qirz = qixz*xr + qiyz*yr + qizz*zr
+                        qkrx = qkxx*xr + qkxy*yr + qkxz*zr
+                        qkry = qkxy*xr + qkyy*yr + qkyz*zr
+                        qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+c
+c     calculate scalar products for multipole interactions
+c
+                        sc(1) = dix*dkx + diy*dky + diz*dkz
+                        sc(2) = dix*xr + diy*yr + diz*zr
+                        sc(3) = dkx*xr + dky*yr + dkz*zr
+                        sc(4) = qirx*xr + qiry*yr + qirz*zr
+                        sc(5) = qkrx*xr + qkry*yr + qkrz*zr
+                        sc(6) = dkx*qirx + dky*qiry + dkz*qirz
+                        sc(7) = dix*qkrx + diy*qkry + diz*qkrz
+                        sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
+                        sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                             + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+c
+c     construct auxiliary variables for multipole energy
+c
+                        ge(1) = ci*ck
+                        ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
+                        ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
+     &                             + 2.0d0*(sc(6)-sc(7)+sc(9))
+                        ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
+                        ge(5) = sc(4)*sc(5)
+c
 c     compute the energy contribution for this interaction
 c
-                        e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                         + rr7*gl(3) + rr9*gl(4)
-                        if (ii .eq. kk)  e = 0.5d0 * e
+                        e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                         + rr7*ge(4) + rr9*ge(5)
                         if (use_polymer .and. r2.le.polycut2)
      &                     e = e * mscale(kk)
                         if (use_group)  e = e * fgrp
+                        if (ii .eq. kk)  e = 0.5d0 * e
 c
-c     increment the overall van der Waals energy components
+c     increment the overall multipole energy components
 c
                         if (e .ne. 0.0d0) then
                            nem = nem + 1
@@ -451,7 +435,7 @@ c     increment the total intermolecular energy
 c
                         einter = einter + e
 c
-c     print a message if the energy of this interaction is large
+c     print message if the energy of this interaction is large
 c
                         huge = (abs(e) .gt. 100.0d0)
                         if ((debug.and.e.ne.0.0d0)
@@ -473,7 +457,7 @@ c
                end if
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, n12(ii)
                mscale(i12(j,ii)) = 1.0d0
@@ -515,7 +499,6 @@ c
       use atomid
       use atoms
       use bound
-      use boxes
       use chgpot
       use couple
       use energi
@@ -538,22 +521,20 @@ c
       integer kx,ky,kz
       integer nemo
       real*8 e,f,fgrp
-      real*8 r,r2
+      real*8 emo,eintero
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 rr1,rr3,rr5
-      real*8 rr7,rr9
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qix,qiy,qiz
-      real*8 qkx,qky,qkz
-      real*8 emo,eintero
-      real*8 sc(10)
-      real*8 gl(0:4)
+      real*8 qirx,qiry,qirz
+      real*8 qkrx,qkry,qkrz
+      real*8 sc(9),ge(5)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: aemo(:)
       logical proceed
@@ -594,7 +575,7 @@ c
       allocate (mscale(n))
       allocate (aemo(n))
 c
-c     set arrays needed to scale connected atom interactions
+c     set array needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -615,7 +596,7 @@ c
          aemo(i) = aem(i)
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
@@ -627,7 +608,7 @@ c
 c
 c     calculate the multipole interaction energy term
 c
-      do i = 1, npole-1
+      do i = 1, npole
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
@@ -646,9 +627,6 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-c
-c     set interaction scaling coefficients for connected atoms
-c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
          end do
@@ -662,7 +640,7 @@ c
             mscale(i15(j,ii)) = m5scale
          end do
 c
-c     decide whether to compute the current interaction
+c     evaluate all sites within the cutoff distance
 c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
@@ -675,9 +653,6 @@ c
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
-c
-c     compute the energy contribution for this interaction
-c
             if (proceed) then
                xr = x(kk) - xi
                yr = y(kk) - yi
@@ -697,38 +672,7 @@ c
                   qkyz = rpole(10,k)
                   qkzz = rpole(13,k)
 c
-c     construct some intermediate quadrupole values
-c
-                  qix = qixx*xr + qixy*yr + qixz*zr
-                  qiy = qixy*xr + qiyy*yr + qiyz*zr
-                  qiz = qixz*xr + qiyz*yr + qizz*zr
-                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qky = qkxy*xr + qkyy*yr + qkyz*zr
-                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
-c     calculate the scalar products for permanent multipoles
-c
-                  sc(2) = dix*dkx + diy*dky + diz*dkz
-                  sc(3) = dix*xr + diy*yr + diz*zr
-                  sc(4) = dkx*xr + dky*yr + dkz*zr
-                  sc(5) = qix*xr + qiy*yr + qiz*zr
-                  sc(6) = qkx*xr + qky*yr + qkz*zr
-                  sc(7) = qix*dkx + qiy*dky + qiz*dkz
-                  sc(8) = qkx*dix + qky*diy + qkz*diz
-                  sc(9) = qix*qkx + qiy*qky + qiz*qkz
-                  sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     calculate the gl functions for permanent multipoles
-c
-                  gl(0) = ci*ck
-                  gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-                  gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                       + 2.0d0*(sc(7)-sc(8)+sc(10))
-                  gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-                  gl(4) = sc(5)*sc(6)
-c
-c     get reciprocal distance terms with units and scaling
+c     get reciprocal distance terms for this interaction
 c
                   rr1 = f * mscale(kk) / r
                   rr3 = rr1 / r2
@@ -736,13 +680,44 @@ c
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
 c
+c     construct several necessary additional variables
+c
+                  qirx = qixx*xr + qixy*yr + qixz*zr
+                  qiry = qixy*xr + qiyy*yr + qiyz*zr
+                  qirz = qixz*xr + qiyz*yr + qizz*zr
+                  qkrx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qkry = qkxy*xr + qkyy*yr + qkyz*zr
+                  qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+c
+c     calculate scalar products for multipole interactions
+c
+                  sc(1) = dix*dkx + diy*dky + diz*dkz
+                  sc(2) = dix*xr + diy*yr + diz*zr
+                  sc(3) = dkx*xr + dky*yr + dkz*zr
+                  sc(4) = qirx*xr + qiry*yr + qirz*zr
+                  sc(5) = qkrx*xr + qkry*yr + qkrz*zr
+                  sc(6) = dkx*qirx + dky*qiry + dkz*qirz
+                  sc(7) = dix*qkrx + diy*qkry + diz*qkrz
+                  sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
+                  sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                       + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+c
+c     construct auxiliary variables for multipole energy
+c
+                  ge(1) = ci*ck
+                  ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
+                  ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
+     &                       + 2.0d0*(sc(6)-sc(7)+sc(9))
+                  ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
+                  ge(5) = sc(4)*sc(5)
+c
 c     compute the energy contribution for this interaction
 c
-                  e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                   + rr7*gl(3) + rr9*gl(4)
+                  e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                   + rr7*ge(4) + rr9*ge(5)
                   if (use_group)  e = e * fgrp
 c
-c     increment the overall van der Waals energy components
+c     increment the overall multipole energy components
 c
                   if (e .ne. 0.0d0) then
                      nemo = nemo + 1
@@ -753,14 +728,14 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(ii) .ne. molcule(kk)) then
-                     eintero = eintero + e
-                  end if
+                  if (molcule(ii) .ne. molcule(kk))
+     &               eintero = eintero + e
 c
-c     print a message if the energy of this interaction is large
+c     print message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.e.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -777,7 +752,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
@@ -793,12 +768,12 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
+c     add local to global variables for OpenMP calculation
 c
       em = em + emo
       einter = eintero
@@ -871,13 +846,13 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
+c     compute the real space part of the Ewald summation
+c
+      call emreal3c (eintra)
+c
 c     compute the reciprocal space part of the Ewald summation
 c
       call emrecip3
-c
-c     compute the real space part of the Ewald summation
-c
-      call ereal3c (eintra)
 c
 c     compute the self-energy part of the Ewald summation
 c
@@ -935,14 +910,14 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ereal3c  --  real space mpole analysis via loop  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine emreal3c  --  real space mpole analysis via loop  ##
+c     ##                                                               ##
+c     ###################################################################
 c
 c
-c     "ereal3c" evaluates the real space portion of the Ewald sum
+c     "emreal3c" evaluates the real space portion of the Ewald sum
 c     energy due to atomic multipole interactions and partitions
 c     the energy among the atoms
 c
@@ -952,14 +927,13 @@ c     W. Smith, "Point Multipoles in the Ewald Summation (Revisited)",
 c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
-      subroutine ereal3c (eintra)
+      subroutine emreal3c (eintra)
       use sizes
       use action
       use analyz
       use atomid
       use atoms
       use bound
-      use boxes
       use cell
       use chgpot
       use couple
@@ -974,29 +948,27 @@ c
       use potent
       use shunt
       implicit none
-      integer i,j,k,m
+      integer i,j,k
       integer ii,kk
-      real*8 e,eintra
-      real*8 efull
-      real*8 f,erfc
-      real*8 r,r2
+      integer jcell
+      real*8 e,f,bfac,erfc
+      real*8 eintra,efull
+      real*8 alsq2,alsq2n
+      real*8 exp2a,ralpha
+      real*8 scalekk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 bfac,exp2a
-      real*8 ralpha,scalekk
-      real*8 alsq2,alsq2n
-      real*8 rr1,rr3,rr5
-      real*8 rr7,rr9
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qix,qiy,qiz
-      real*8 qkx,qky,qkz
-      real*8 sc(10)
-      real*8 gl(0:4)
+      real*8 qirx,qiry,qirz
+      real*8 qkrx,qkry,qkrz
+      real*8 sc(9),ge(5)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       logical header,huge
@@ -1023,7 +995,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set arrays needed to scale connected atom interactions
+c     set array needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1052,9 +1024,6 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-c
-c     set interaction scaling coefficients for connected atoms
-c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
          end do
@@ -1067,12 +1036,15 @@ c
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
          end do
+c
+c     evaluate all sites within the cutoff distance
+c
          do k = i+1, npole
             kk = ipole(k)
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi
-            call image (xr,yr,zr)
+            if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
@@ -1087,81 +1059,83 @@ c
                qkyz = rpole(10,k)
                qkzz = rpole(13,k)
 c
-c     calculate the error function damping terms
+c     get reciprocal distance terms for this interaction
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
-               alsq2 = 2.0d0 * aewald**2
-               alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)
-     &            alsq2n = 1.0d0 / (sqrtpi*aewald)
-               exp2a = exp(-ralpha**2)
-               do m = 1, 4
-                  bfac = dble(m+m-1)
-                  alsq2n = alsq2 * alsq2n
-                  bn(m) = (bfac*bn(m-1)+alsq2n*exp2a) / r2
-               end do
-c
-c     construct some intermediate quadrupole values
-c
-               qix = qixx*xr + qixy*yr + qixz*zr
-               qiy = qixy*xr + qiyy*yr + qiyz*zr
-               qiz = qixz*xr + qiyz*yr + qizz*zr
-               qkx = qkxx*xr + qkxy*yr + qkxz*zr
-               qky = qkxy*xr + qkyy*yr + qkyz*zr
-               qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
-c     calculate the scalar products for permanent multipoles
-c
-               sc(2) = dix*dkx + diy*dky + diz*dkz
-               sc(3) = dix*xr + diy*yr + diz*zr
-               sc(4) = dkx*xr + dky*yr + dkz*zr
-               sc(5) = qix*xr + qiy*yr + qiz*zr
-               sc(6) = qkx*xr + qky*yr + qkz*zr
-               sc(7) = qix*dkx + qiy*dky + qiz*dkz
-               sc(8) = qkx*dix + qky*diy + qkz*diz
-               sc(9) = qix*qkx + qiy*qky + qiz*qkz
-               sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     calculate the gl functions for permanent multipoles
-c
-               gl(0) = ci*ck
-               gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-               gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                    + 2.0d0*(sc(7)-sc(8)+sc(10))
-               gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-               gl(4) = sc(5)*sc(6)
-c
-c     get reciprocal distance terms as unscaled values
-c
-               rr1 = 1.0d0 / r
+               rr1 = f / r
                rr3 = rr1 / r2
                rr5 = 3.0d0 * rr3 / r2
                rr7 = 5.0d0 * rr5 / r2
                rr9 = 7.0d0 * rr7 / r2
 c
+c     calculate the real space Ewald error function terms
+c
+               ralpha = aewald * r
+               bn(0) = erfc(ralpha) / r
+               alsq2 = 2.0d0 * aewald**2
+               alsq2n = 0.0d0
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               exp2a = exp(-ralpha**2)
+               do j = 1, 4
+                  bfac = dble(j+j-1)
+                  alsq2n = alsq2 * alsq2n
+                  bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
+               end do
+               do j = 0, 4
+                  bn(j) = f * bn(j)
+               end do
+c
+c     construct several necessary additional variables
+c
+               qirx = qixx*xr + qixy*yr + qixz*zr
+               qiry = qixy*xr + qiyy*yr + qiyz*zr
+               qirz = qixz*xr + qiyz*yr + qizz*zr
+               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
+               qkry = qkxy*xr + qkyy*yr + qkyz*zr
+               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+c
+c     calculate scalar products for multipole interactions
+c
+               sc(1) = dix*dkx + diy*dky + diz*dkz
+               sc(2) = dix*xr + diy*yr + diz*zr
+               sc(3) = dkx*xr + dky*yr + dkz*zr
+               sc(4) = qirx*xr + qiry*yr + qirz*zr
+               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
+               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
+               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
+               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
+               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+c
+c     construct auxiliary variables for multipole energy
+c
+               ge(1) = ci*ck
+               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
+               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
+     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
+               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
+               ge(5) = sc(4)*sc(5)
+c
 c     compute the full undamped permanent multipole energy
 c
-               efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                    + rr7*gl(3) + rr9*gl(4)
-               efull = f * mscale(kk) * efull
+               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = mscale(kk) * efull
 c
-c     modify error function terms by scaled true distance
+c     modify error function terms to account for scaling
 c
                scalekk = 1.0d0 - mscale(kk)
-               rr1 = f * (bn(0)-scalekk*rr1)
-               rr3 = f * (bn(1)-scalekk*rr3)
-               rr5 = f * (bn(2)-scalekk*rr5)
-               rr7 = f * (bn(3)-scalekk*rr7)
-               rr9 = f * (bn(4)-scalekk*rr9)
+               rr1 = bn(0) - scalekk*rr1
+               rr3 = bn(1) - scalekk*rr3
+               rr5 = bn(2) - scalekk*rr5
+               rr7 = bn(3) - scalekk*rr7
+               rr9 = bn(4) - scalekk*rr9
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                + rr7*gl(3) + rr9*gl(4)
+               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                + rr7*ge(4) + rr9*ge(5)
 c
-c     increment the overall van der Waals energy components
+c     increment the overall multipole energy components
 c
                if (e .ne. 0.0d0) then
                   nem = nem + 1
@@ -1172,19 +1146,18 @@ c
 c
 c     increment the total intramolecular energy
 c
-               if (molcule(ii) .eq. molcule(kk)) then
-                  eintra = eintra + efull
-               end if
+               if (molcule(ii) .eq. molcule(kk))
+     &            eintra = eintra + efull
 c
 c     print a message if the energy of this interaction is large
 c
                huge = (abs(efull) .gt. 100.0d0)
-               if ((debug.and.e.ne.0.0d0)
+               if ((debug.and.efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,20)
-   20                format (/,' Individual Real Space Multipole',
+   20                format (/,' Individual Atomic Multipole',
      &                          ' Interactions :',
      &                       //,' Type',14x,'Atom Names',
      &                          15x,'Distance',8x,'Energy',/)
@@ -1196,7 +1169,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
@@ -1234,9 +1207,6 @@ c
             qiyy = rpole(9,i)
             qiyz = rpole(10,i)
             qizz = rpole(13,i)
-c
-c     set interaction scaling coefficients for connected atoms
-c
             do j = 1, n12(ii)
                mscale(i12(j,ii)) = m2scale
             end do
@@ -1249,13 +1219,16 @@ c
             do j = 1, n15(ii)
                mscale(i15(j,ii)) = m5scale
             end do
+c
+c     evaluate all sites within the cutoff distance
+c
             do k = i, npole
                kk = ipole(k)
-               do j = 1, ncell
+               do jcell = 1, ncell
                   xr = x(kk) - xi
                   yr = y(kk) - yi
                   zr = z(kk) - zi
-                  call imager (xr,yr,zr,j)
+                  call imager (xr,yr,zr,jcell)
                   r2 = xr*xr + yr* yr + zr*zr
                   if (r2 .le. off2) then
                      r = sqrt(r2)
@@ -1270,7 +1243,15 @@ c
                      qkyz = rpole(10,k)
                      qkzz = rpole(13,k)
 c
-c     calculate the error function damping terms
+c     get reciprocal distance terms for this interaction
+c
+                     rr1 = f / r
+                     rr3 = rr1 / r2
+                     rr5 = 3.0d0 * rr3 / r2
+                     rr7 = 5.0d0 * rr5 / r2
+                     rr9 = 7.0d0 * rr7 / r2
+c
+c     calculate the real space Ewald error function terms
 c
                      ralpha = aewald * r
                      bn(0) = erfc(ralpha) / r
@@ -1279,75 +1260,70 @@ c
                      if (aewald .gt. 0.0d0)
      &                  alsq2n = 1.0d0 / (sqrtpi*aewald)
                      exp2a = exp(-ralpha**2)
-                     do m = 1, 4
-                        bfac = dble(m+m-1)
+                     do j = 1, 4
+                        bfac = dble(j+j-1)
                         alsq2n = alsq2 * alsq2n
-                        bn(m) = (bfac*bn(m-1)+alsq2n*exp2a) / r2
+                        bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
+                     end do
+                     do j = 0, 4
+                        bn(j) = f * bn(j)
                      end do
 c
-c     construct some intermediate quadrupole values
+c     construct several necessary additional variables
 c
-                     qix = qixx*xr + qixy*yr + qixz*zr
-                     qiy = qixy*xr + qiyy*yr + qiyz*zr
-                     qiz = qixz*xr + qiyz*yr + qizz*zr
-                     qkx = qkxx*xr + qkxy*yr + qkxz*zr
-                     qky = qkxy*xr + qkyy*yr + qkyz*zr
-                     qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                     qirx = qixx*xr + qixy*yr + qixz*zr
+                     qiry = qixy*xr + qiyy*yr + qiyz*zr
+                     qirz = qixz*xr + qiyz*yr + qizz*zr
+                     qkrx = qkxx*xr + qkxy*yr + qkxz*zr
+                     qkry = qkxy*xr + qkyy*yr + qkyz*zr
+                     qkrz = qkxz*xr + qkyz*yr + qkzz*zr
 c
-c     calculate the scalar products for permanent multipoles
+c     calculate scalar products for multipole interactions
 c
-                     sc(2) = dix*dkx + diy*dky + diz*dkz
-                     sc(3) = dix*xr + diy*yr + diz*zr
-                     sc(4) = dkx*xr + dky*yr + dkz*zr
-                     sc(5) = qix*xr + qiy*yr + qiz*zr
-                     sc(6) = qkx*xr + qky*yr + qkz*zr
-                     sc(7) = qix*dkx + qiy*dky + qiz*dkz
-                     sc(8) = qkx*dix + qky*diy + qkz*diz
-                     sc(9) = qix*qkx + qiy*qky + qiz*qkz
-                     sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                     sc(1) = dix*dkx + diy*dky + diz*dkz
+                     sc(2) = dix*xr + diy*yr + diz*zr
+                     sc(3) = dkx*xr + dky*yr + dkz*zr
+                     sc(4) = qirx*xr + qiry*yr + qirz*zr
+                     sc(5) = qkrx*xr + qkry*yr + qkrz*zr
+                     sc(6) = dkx*qirx + dky*qiry + dkz*qirz
+                     sc(7) = dix*qkrx + diy*qkry + diz*qkrz
+                     sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
+                     sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                          + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate the gl functions for permanent multipoles
+c     construct auxiliary variables for multipole energy
 c
-                     gl(0) = ci*ck
-                     gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-                     gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                          + 2.0d0*(sc(7)-sc(8)+sc(10))
-                     gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-                     gl(4) = sc(5)*sc(6)
-c
-c     get reciprocal distance terms as unscaled values
-c
-                     rr1 = 1.0d0 / r
-                     rr3 = rr1 / r2
-                     rr5 = 3.0d0 * rr3 / r2
-                     rr7 = 5.0d0 * rr5 / r2
-                     rr9 = 7.0d0 * rr7 / r2
+                     ge(1) = ci*ck
+                     ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
+                     ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
+     &                          + 2.0d0*(sc(6)-sc(7)+sc(9))
+                     ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
+                     ge(5) = sc(4)*sc(5)
 c
 c     compute the full undamped permanent multipole energy
 c
-                     efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                          + rr7*gl(3) + rr9*gl(4)
-                     efull = f * efull
+                     efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                          + rr7*ge(4) + rr9*ge(5)
+                     if (.not. (use_polymer .and. r2.le.polycut2))
+     &                  mscale(kk) = 1.0d0
+                     efull = mscale(kk) * efull
 c
-c     modify error function terms by scaled true distance
+c     modify distances to account for Ewald and exclusions
 c
                      scalekk = 1.0d0 - mscale(kk)
-                     rr1 = f * (bn(0)-scalekk*rr1)
-                     rr3 = f * (bn(1)-scalekk*rr3)
-                     rr5 = f * (bn(2)-scalekk*rr5)
-                     rr7 = f * (bn(3)-scalekk*rr7)
-                     rr9 = f * (bn(4)-scalekk*rr9)
+                     rr1 = bn(0) - scalekk*rr1
+                     rr3 = bn(1) - scalekk*rr3
+                     rr5 = bn(2) - scalekk*rr5
+                     rr7 = bn(3) - scalekk*rr7
+                     rr9 = bn(4) - scalekk*rr9
 c
 c     compute the energy contribution for this interaction
 c
-                     e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                      + rr7*gl(3) + rr9*gl(4)
-                     if (use_polymer .and. r2.le.polycut2)
-     &                  e = e - efull*(1.0d0-mscale(kk))
+                     e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                      + rr7*ge(4) + rr9*ge(5)
                      if (ii .eq. kk)  e = 0.5d0 * e
 c
-c     increment the overall van der Waals energy components
+c     increment the overall multipole energy components
 c
                      if (e .ne. 0.0d0) then
                         nem = nem + 1
@@ -1356,16 +1332,16 @@ c
                         aem(kk) = aem(kk) + 0.5d0*e
                      end if
 c
-c     print a message if the energy of this interaction is large
+c     print message if the energy of this interaction is large
 c
                      efull = efull * mscale(kk)
                      huge = (abs(efull) .gt. 100.0d0)
-                     if ((debug.and.e.ne.0.0d0)
+                     if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
                            write (iout,40)
-   40                      format (/,' Individual Real Space Multipole',
+   40                      format (/,' Individual Atomic Multipole',
      &                                ' Interactions :',
      &                             //,' Type',14x,'Atom Names',
      &                                15x,'Distance',8x,'Energy',/)
@@ -1378,7 +1354,7 @@ c
                end do
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, n12(ii)
                mscale(i12(j,ii)) = 1.0d0
@@ -1458,13 +1434,13 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
+c     compute the real space part of the Ewald summation
+c
+      call emreal3d (eintra)
+c
 c     compute the reciprocal space part of the Ewald summation
 c
       call emrecip3
-c
-c     compute the real space part of the Ewald summation
-c
-      call ereal3d (eintra)
 c
 c     compute the self-energy part of the Ewald summation
 c
@@ -1522,14 +1498,14 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ereal3d  --  real space mpole analysis via list  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine emreal3d  --  real space mpole analysis via list  ##
+c     ##                                                               ##
+c     ###################################################################
 c
 c
-c     "ereal3d" evaluates the real space portion of the Ewald sum
+c     "emreal3d" evaluates the real space portion of the Ewald sum
 c     energy due to atomic multipole interactions, and partitions
 c     the energy among the atoms using a pairwise neighbor list
 c
@@ -1539,14 +1515,13 @@ c     W. Smith, "Point Multipoles in the Ewald Summation (Revisited)",
 c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
-      subroutine ereal3d (eintra)
+      subroutine emreal3d (eintra)
       use sizes
       use action
       use analyz
       use atomid
       use atoms
       use bound
-      use boxes
       use chgpot
       use couple
       use energi
@@ -1561,30 +1536,28 @@ c
       use potent
       use shunt
       implicit none
-      integer i,j,k,m
+      integer i,j,k
       integer ii,kk,kkk
       integer nemo
-      real*8 e,eintra
-      real*8 efull
-      real*8 f,erfc,r,r2
+      real*8 e,f,bfac,erfc
+      real*8 eintra,eintrao
+      real*8 emo,efull
+      real*8 alsq2,alsq2n
+      real*8 exp2a,ralpha
+      real*8 scalekk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 bfac,exp2a
-      real*8 ralpha,scalekk
-      real*8 alsq2,alsq2n
-      real*8 rr1,rr3,rr5
-      real*8 rr7,rr9
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qix,qiy,qiz
-      real*8 qkx,qky,qkz
-      real*8 emo,eintrao
-      real*8 sc(10)
-      real*8 gl(0:4)
+      real*8 qirx,qiry,qirz
+      real*8 qkrx,qkry,qkrz
+      real*8 sc(9),ge(5)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: aemo(:)
@@ -1613,7 +1586,7 @@ c
       allocate (mscale(n))
       allocate (aemo(n))
 c
-c     set arrays needed to scale connected atom interactions
+c     set array needed to scale connected atom interactions
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1634,13 +1607,12 @@ c
          aemo(i) = aem(i)
       end do
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,n13,
-!$OMP& i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,
-!$OMP& off2,aewald,f,molcule,header,verbose,debug,name,emo,eintrao,
-!$OMP& nemo,aemo)
+!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
+!$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
+!$OMP& aewald,molcule,header,verbose,debug,name,emo,eintrao,nemo,aemo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo,eintrao,nemo,aemo) schedule(guided)
 c
@@ -1661,9 +1633,6 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-c
-c     set interaction scaling coefficients for connected atoms
-c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = m2scale
          end do
@@ -1676,13 +1645,16 @@ c
          do j = 1, n15(ii)
             mscale(i15(j,ii)) = m5scale
          end do
+c
+c     evaluate all sites within the cutoff distance
+c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
             kk = ipole(k)
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi
-            call image (xr,yr,zr)
+            if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
@@ -1697,103 +1669,105 @@ c
                qkyz = rpole(10,k)
                qkzz = rpole(13,k)
 c
-c     construct some intermediate quadrupole values
+c     get reciprocal distance terms for this interaction
 c
-               qix = qixx*xr + qixy*yr + qixz*zr
-               qiy = qixy*xr + qiyy*yr + qiyz*zr
-               qiz = qixz*xr + qiyz*yr + qizz*zr
-               qkx = qkxx*xr + qkxy*yr + qkxz*zr
-               qky = qkxy*xr + qkyy*yr + qkyz*zr
-               qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
-c     calculate the error function damping terms
-c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
-               alsq2 = 2.0d0 * aewald**2
-               alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)
-     &            alsq2n = 1.0d0 / (sqrtpi*aewald)
-               exp2a = exp(-ralpha**2)
-               do m = 1, 4
-                  bfac = dble(m+m-1)
-                  alsq2n = alsq2 * alsq2n
-                  bn(m) = (bfac*bn(m-1)+alsq2n*exp2a) / r2
-               end do
-c
-c     calculate the scalar products for permanent multipoles
-c
-               sc(2) = dix*dkx + diy*dky + diz*dkz
-               sc(3) = dix*xr + diy*yr + diz*zr
-               sc(4) = dkx*xr + dky*yr + dkz*zr
-               sc(5) = qix*xr + qiy*yr + qiz*zr
-               sc(6) = qkx*xr + qky*yr + qkz*zr
-               sc(7) = qix*dkx + qiy*dky + qiz*dkz
-               sc(8) = qkx*dix + qky*diy + qkz*diz
-               sc(9) = qix*qkx + qiy*qky + qiz*qkz
-               sc(10) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     calculate the gl functions for permanent multipoles
-c
-               gl(0) = ci*ck
-               gl(1) = ck*sc(3) - ci*sc(4) + sc(2)
-               gl(2) = ci*sc(6) + ck*sc(5) - sc(3)*sc(4)
-     &                    + 2.0d0*(sc(7)-sc(8)+sc(10))
-               gl(3) = sc(3)*sc(6) - sc(4)*sc(5) - 4.0d0*sc(9)
-               gl(4) = sc(5)*sc(6)
-c
-c     get reciprocal distance terms as unscaled values
-c
-               rr1 = 1.0d0 / r
+               rr1 = f / r
                rr3 = rr1 / r2
                rr5 = 3.0d0 * rr3 / r2
                rr7 = 5.0d0 * rr5 / r2
                rr9 = 7.0d0 * rr7 / r2
 c
+c     calculate the real space Ewald error function terms
+c
+               ralpha = aewald * r
+               bn(0) = erfc(ralpha) / r
+               alsq2 = 2.0d0 * aewald**2
+               alsq2n = 0.0d0
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               exp2a = exp(-ralpha**2)
+               do j = 1, 4
+                  bfac = dble(j+j-1)
+                  alsq2n = alsq2 * alsq2n
+                  bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
+               end do
+               do j = 0, 4
+                  bn(j) = f * bn(j)
+               end do
+c
+c     construct several necessary additional variables
+c
+               qirx = qixx*xr + qixy*yr + qixz*zr
+               qiry = qixy*xr + qiyy*yr + qiyz*zr
+               qirz = qixz*xr + qiyz*yr + qizz*zr
+               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
+               qkry = qkxy*xr + qkyy*yr + qkyz*zr
+               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+c
+c     calculate scalar products for multipole interactions
+c
+               sc(1) = dix*dkx + diy*dky + diz*dkz
+               sc(2) = dix*xr + diy*yr + diz*zr
+               sc(3) = dkx*xr + dky*yr + dkz*zr
+               sc(4) = qirx*xr + qiry*yr + qirz*zr
+               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
+               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
+               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
+               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
+               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+c
+c     construct auxiliary variables for multipole energy
+c
+               ge(1) = ci*ck
+               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
+               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
+     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
+               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
+               ge(5) = sc(4)*sc(5)
+c
 c     compute the full undamped permanent multipole energy
 c
-               efull = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                    + rr7*gl(3) + rr9*gl(4)
-               efull = f * mscale(kk) * efull
+               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = mscale(kk) * efull
 c
-c     modify error function terms by scaled true distance
+c     modify error function terms to account for scaling
 c
                scalekk = 1.0d0 - mscale(kk)
-               rr1 = f * (bn(0)-scalekk*rr1)
-               rr3 = f * (bn(1)-scalekk*rr3)
-               rr5 = f * (bn(2)-scalekk*rr5)
-               rr7 = f * (bn(3)-scalekk*rr7)
-               rr9 = f * (bn(4)-scalekk*rr9)
+               rr1 = bn(0) - scalekk*rr1
+               rr3 = bn(1) - scalekk*rr3
+               rr5 = bn(2) - scalekk*rr5
+               rr7 = bn(3) - scalekk*rr7
+               rr9 = bn(4) - scalekk*rr9
 c
 c     compute the energy contributions for this interaction
 c
-               e = rr1*gl(0) + rr3*gl(1) + rr5*gl(2)
-     &                + rr7*gl(3) + rr9*gl(4)
+               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
+     &                + rr7*ge(4) + rr9*ge(5)
 c
 c     increment the overall van der Waals energy components
 c
-               if (e .ne. 0.0d0) then
+               emo = emo + e
+               if (efull .ne. 0.0d0) then
                   nemo = nemo + 1
-                  emo = emo + e
-                  aemo(ii) = aemo(ii) + 0.5d0*e
-                  aemo(kk) = aemo(kk) + 0.5d0*e
+                  aemo(ii) = aemo(ii) + 0.5d0*efull
+                  aemo(kk) = aemo(kk) + 0.5d0*efull
                end if
 c
 c     increment the total intramolecular energy
 c
-               if (molcule(ii) .eq. molcule(kk)) then
-                  eintrao = eintrao + efull
-               end if
+               if (molcule(ii) .eq. molcule(kk))
+     &            eintrao = eintrao + efull
 c
 c     print a message if the energy of this interaction is large
 c
                huge = (abs(efull) .gt. 100.0d0)
-               if (debug .or. (verbose.and.huge)) then
+               if ((debug.and.efull.ne.0.0d0)
+     &               .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,20)
-   20                format (/,' Individual Real Space Multipole',
+   20                format (/,' Individual Atomic Multipole',
      &                          ' Interactions :',
      &                       //,' Type',14x,'Atom Names',
      &                          15x,'Distance',8x,'Energy',/)
@@ -1805,7 +1779,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             mscale(i12(j,ii)) = 1.0d0
@@ -1821,7 +1795,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

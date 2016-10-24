@@ -87,7 +87,7 @@ c     transfer global to local copies for OpenMP calculation
 c
       eto = et
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,use_group,use_polymer)
@@ -211,7 +211,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

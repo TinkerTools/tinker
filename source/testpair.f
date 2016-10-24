@@ -492,7 +492,7 @@ c
                   header = .false.
                   write (iout,320)
   320             format (/,' Comparison of Nonbond Gradients from',
-     &                       ' the Neighbor Methods :',
+     &                       ' Different Methods :',
      &                    //,11x,'Component',14x,'Loop',12x,'Lights',
      &                       14x,'List',/)
                end if
@@ -514,8 +514,7 @@ c
       end do
       if (match) then
          write (iout,360)
-  360    format (/,' Gradients Computed via all Neighbor Methods',
-     &              ' are Identical')
+  360    format (/,' Gradients Computed via all Methods are Identical')
       end if
 c
 c     perform deallocation of some local arrays

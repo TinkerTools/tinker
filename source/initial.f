@@ -48,6 +48,7 @@ c
       use scales
       use sequen
       use socket
+      use virial
       use warp
       use zclose
       implicit none
@@ -150,11 +151,15 @@ c     flag for use of atom groups
 c
       use_group = .false.
 c
-c     flags for periodic boundaries
+c     flags for use of periodic boundaries
 c
       use_bounds = .false.
       use_replica = .false.
       use_polymer = .false.
+c
+c     flag for use of internal virial
+c
+      use_virial = .true.
 c
 c     default values for unitcell dimensions
 c

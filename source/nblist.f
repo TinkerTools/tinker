@@ -234,7 +234,7 @@ c
       real*8 zred(*)
 c
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -274,7 +274,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -348,7 +348,7 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
@@ -413,7 +413,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -603,7 +603,7 @@ c
       real*8 xr,yr,zr,r2
 c
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -645,7 +645,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -718,7 +718,7 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
@@ -785,7 +785,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -975,7 +975,7 @@ c
       real*8 xr,yr,zr,r2
 c
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -1017,7 +1017,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1090,11 +1090,11 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
-!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-!$OMP DO schedule(guided)
+c!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
+c!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+c!$OMP DO schedule(guided)
 c
 c     loop over all atoms computing the neighbor lists
 c
@@ -1157,10 +1157,10 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
-!$OMP END DO
-!$OMP END PARALLEL
+c!$OMP END DO
+c!$OMP END PARALLEL
       return
       end
 c
@@ -1347,7 +1347,7 @@ c
       real*8 xr,yr,zr,r2
 c
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -1389,7 +1389,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1463,7 +1463,7 @@ c
       deallocate (ysort)
       deallocate (zsort)
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
@@ -1530,7 +1530,7 @@ c
          end if
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

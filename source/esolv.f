@@ -172,7 +172,7 @@ c     initialize local variables for OpenMP calculation
 c
       est = 0.0d0
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
@@ -244,7 +244,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -310,7 +310,7 @@ c     initialize local variables for OpenMP calculation
 c
       est = 0.0d0
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
@@ -394,7 +394,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -615,7 +615,7 @@ c     initialize local variables for OpenMP calculation
 c
       est = 0.0d0
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
 !$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
@@ -964,7 +964,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1054,7 +1054,7 @@ c     initialize local variables for OpenMP calculation
 c
       est = 0.0d0
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
 !$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
@@ -1233,7 +1233,7 @@ c
          end do
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1540,7 +1540,7 @@ c     transfer global to local copies for OpenMP calculation
 c
       edispo = edisp
 c
-c     set OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
 !$OMP& rad,rdisp,x,y,z,shctd,cdisp)
@@ -1667,7 +1667,7 @@ c
          edisp = edisp + e
       end do
 c
-c     end OpenMP directives for the major loop structure
+c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL

@@ -237,6 +237,7 @@ c     zero out local axes, multipoles and polarization attachments
 c
       npole = n
       do i = 1, n
+         ipole(i) = 0
          polsiz(i) = 0
          pollist(i) = 0
          zaxis(i) = 0
@@ -553,7 +554,7 @@ c
 c
 c     remove any zero or undefined atomic multipoles
 c
-      if (.not.use_polar .and. .not.use_solv) then
+      if (.not. use_polar) then
          npole = 0
          do i = 1, n
             if (polsiz(i) .ne. 0) then
