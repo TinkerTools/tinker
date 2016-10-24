@@ -61,7 +61,6 @@ c
       use couple
       use deriv
       use energi
-      use limits
       use mpole
       use polar
       use polgrp
@@ -1121,7 +1120,6 @@ c
       use couple
       use deriv
       use energi
-      use limits
       use mpole
       use neigh
       use polar
@@ -2001,7 +1999,6 @@ c
       use deriv
       use energi
       use ewald
-      use limits
       use math
       use mpole
       use polar
@@ -2070,11 +2067,9 @@ c
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 bn(0:4)
-      real*8 viro(3,3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: depo(:,:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       character*6 mode
@@ -3437,7 +3432,6 @@ c
       use deriv
       use energi
       use ewald
-      use limits
       use math
       use mpole
       use neigh
