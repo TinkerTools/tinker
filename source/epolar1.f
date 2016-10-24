@@ -4525,8 +4525,7 @@ c
             else if (octahedron) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
-            struc2 = qgrid(1,k1,k2,k3)*qgrid(1,k1,k2,k3)
-     &                  + qgrid(2,k1,k2,k3)*qgrid(2,k1,k2,k3)
+            struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
             eterm = 0.5d0 * electric * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx - h1*h1*vterm + eterm

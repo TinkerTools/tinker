@@ -2906,7 +2906,6 @@ c
       real*8, allocatable :: fmp(:,:)
       real*8, allocatable :: fphi(:,:)
       real*8, allocatable :: cphi(:,:)
-      real*8, allocatable :: qgrip(:,:,:,:)
 c
 c     derivative indices into the fphi and fphidp arrays
 c
@@ -2955,24 +2954,12 @@ c
       call bspline_fill
       call table_fill
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (qgrip(2,nfft1,nfft2,nfft3))
-c
 c     assign permanent multipoles to PME grid and perform
 c     the 3-D FFT forward transformation
 c
       call cmp_to_fmp (cmp,fmp)
       call grid_mpole (fmp)
       call fftfront
-      do k = 1, nfft3
-         do j = 1, nfft2
-            do i = 1, nfft1
-               qgrip(1,i,j,k) = qgrid(1,i,j,k)
-               qgrip(2,i,j,k) = qgrid(2,i,j,k)
-            end do
-         end do
-      end do
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -3011,8 +2998,7 @@ c
             else if (octahedron) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
-            struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
-     &                  + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
+            struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
             eterm = 0.5d0 * electric * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx + h1*h1*vterm - eterm
@@ -3024,10 +3010,6 @@ c
          end if
          qfac(k1,k2,k3) = expterm
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (qgrip)
 c
 c     account for the zeroth grid point for a finite system
 c
