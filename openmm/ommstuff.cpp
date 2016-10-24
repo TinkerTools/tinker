@@ -3281,11 +3281,11 @@ static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_IntArray_append (bondGroups, restrn__.igfix[2*i + 1] - 1);
 
       OpenMM_DoubleArray* bondParameters = OpenMM_DoubleArray_create (0);
-      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[2*i]
+      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[3*i]
                                     *convert);
-      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[2*i + 1]
+      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[3*i + 1]
                                     *OpenMM_NmPerAngstrom);
-      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[2*i + 2]
+      OpenMM_DoubleArray_append (bondParameters, restrn__.gfix[3*i + 2]
                                     *OpenMM_NmPerAngstrom);
 
       OpenMM_CustomCentroidBondForce_addBond (force, bondGroups,

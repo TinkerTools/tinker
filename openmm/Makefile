@@ -72,22 +72,22 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 ##  Compiler: GNU gfortran 6.1, clang, nvcc
 ##  Parallel: OpenMP, OpenMM
 
-#CC = clang
-#CXX = g++
-#NVCC = nvcc
-#OBJECTIVE_CC = clang
-#OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
-#F77 = gfortran
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
-#CFLAGS = -c
-#F77FLAGS = -c
-#OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -fopenmp
-#CUDAFLAGS = -O3 -I /usr/local/cuda/include
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#OBJS = gpu_usage.o
-#GPU_USAGE_OBJS = gpu_usage.o
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
+CC = clang
+CXX = g++
+NVCC = nvcc
+OBJECTIVE_CC = clang
+OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
+F77 = gfortran
+LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
+CFLAGS = -c
+F77FLAGS = -c
+OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -fopenmp
+CUDAFLAGS = -O3 -I /usr/local/cuda/include
+LIBFLAGS = -crusv
+RANLIB = ranlib -c
+OBJS = gpu_usage.o
+GPU_USAGE_OBJS = gpu_usage.o
+LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible, Nvidia GPU
@@ -127,25 +127,25 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 ##  Machine:  Macintosh
 ##  CPU Type: Intel x86-64, Nvidia GPU
 ##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac 15.0
+##  Compiler: Intel Fortran for Mac 15.0, clang, nvcc
 ##  Parallel: OpenMP, OpenMM
 
-CC = icc
-CXX = icpc -stdlib=libstdc++
-NVCC = nvcc
-OBJECTIVE_CC = clang
-OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
-F77 = ifort
-LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
-CFLAGS = -c
-F77FLAGS = -c
-OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
-CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
-LIBFLAGS = -crusv
-RANLIB = ranlib -c
-OBJS = gpu_usage.o
-GPU_USAGE_OBJS = gpu_usage.o
-LINKFLAGS = $(OPTFLAGS) -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
+#CC = icc
+#CXX = icpc -stdlib=libstdc++
+#NVCC = nvcc
+#OBJECTIVE_CC = clang
+#OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
+#F77 = ifort
+#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
+#CFLAGS = -c
+#F77FLAGS = -c
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
+#CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#OBJS = gpu_usage.o
+#GPU_USAGE_OBJS = gpu_usage.o
+#LINKFLAGS = $(OPTFLAGS) -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
