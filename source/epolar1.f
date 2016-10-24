@@ -2630,7 +2630,7 @@ c
 c
 c     calculate interaction with other unit cells
 c
-      do i = 1, npole-1
+      do i = 1, npole
          ii = ipole(i)
          pdi = pdamp(i)
          pti = thole(i)

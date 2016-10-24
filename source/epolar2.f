@@ -240,8 +240,8 @@ c
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 sr3,sr5,sr7
-      real*8 dsr3,dsr5,dsr7
       real*8 psr3,psr5,psr7
+      real*8 dsr3,dsr5,dsr7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
@@ -455,12 +455,12 @@ c
                sr3 = rr3 * sc3
                sr5 = rr5 * sc5
                sr7 = rr7 * sc7
-               dsr3 = sr3 * dscale(kk)
-               dsr5 = sr5 * dscale(kk)
-               dsr7 = sr7 * dscale(kk)
                psr3 = sr3 * pscale(kk)
                psr5 = sr5 * pscale(kk)
                psr7 = sr7 * pscale(kk)
+               dsr3 = sr3 * dscale(kk)
+               dsr5 = sr5 * dscale(kk)
+               dsr7 = sr7 * dscale(kk)
 c
 c     intermediates involving moments and distance separation
 c
@@ -478,10 +478,10 @@ c
                qrrk = (qkxx*xr+2.0d0*qkxy*yr)*xr
      &                   + (qkyy*yr+2.0d0*qkyz*zr)*yr
      &                   + (qkzz*zr+2.0d0*qkxz*xr)*zr
-               duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
-               durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
                puri = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
                purk = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
+               duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
+               durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
 c
 c     get the dE/dR field gradient for direct polarization force
 c
@@ -654,8 +654,8 @@ c
                txk3 = psr3*uind(1,i) + dsr3*uinp(1,i)
                tyk3 = psr3*uind(2,i) + dsr3*uinp(2,i)
                tzk3 = psr3*uind(3,i) + dsr3*uinp(3,i)
-               turi = -dsr5*purk - psr5*durk
-               turk = -dsr5*puri - psr5*duri
+               turi = -psr5*durk - dsr5*purk
+               turk = -psr5*duri - dsr5*puri
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -671,8 +671,8 @@ c
                txk5 = 2.0d0 * (psr5*uind(1,i)+dsr5*uinp(1,i))
                tyk5 = 2.0d0 * (psr5*uind(2,i)+dsr5*uinp(2,i))
                tzk5 = 2.0d0 * (psr5*uind(3,i)+dsr5*uinp(3,i))
-               turi = -dsr7*purk - psr7*durk
-               turk = -dsr7*puri - psr7*duri
+               turi = -psr7*durk - dsr7*purk
+               turk = -psr7*duri - dsr7*puri
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -860,12 +860,12 @@ c
                sr3 = rr3 * sc3
                sr5 = rr5 * sc5
                sr7 = rr7 * sc7
-               dsr3 = sr3 * dscale(kk)
-               dsr5 = sr5 * dscale(kk)
-               dsr7 = sr7 * dscale(kk)
                psr3 = sr3 * pscale(kk)
                psr5 = sr5 * pscale(kk)
                psr7 = sr7 * pscale(kk)
+               dsr3 = sr3 * dscale(kk)
+               dsr5 = sr5 * dscale(kk)
+               dsr7 = sr7 * dscale(kk)
 c
 c     intermediates involving moments and distance separation
 c
@@ -883,10 +883,10 @@ c
                qrrk = (qkxx*xr+2.0d0*qkxy*yr)*xr
      &                   + (qkyy*yr+2.0d0*qkyz*zr)*yr
      &                   + (qkzz*zr+2.0d0*qkxz*xr)*zr
-               duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
-               durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
                puri = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
                purk = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
+               duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
+               durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
 c
 c     get the dE/dR field gradient for direct polarization force
 c
@@ -1048,12 +1048,12 @@ c
                   frcx = 0.5d0 * frcx
                   frcy = 0.5d0 * frcy
                   frcz = 0.5d0 * frcz
-                  dsr3 = 0.5d0 * dsr3
-                  dsr5 = 0.5d0 * dsr5
-                  dsr7 = 0.5d0 * dsr7
                   psr3 = 0.5d0 * psr3
                   psr5 = 0.5d0 * psr5
                   psr7 = 0.5d0 * psr7
+                  dsr3 = 0.5d0 * dsr3
+                  dsr5 = 0.5d0 * dsr5
+                  dsr7 = 0.5d0 * dsr7
                end if
 c
 c     increment gradient components due to Cartesian forces
@@ -1073,8 +1073,8 @@ c
                txk3 = psr3*uind(1,i) + dsr3*uinp(1,i)
                tyk3 = psr3*uind(2,i) + dsr3*uinp(2,i)
                tzk3 = psr3*uind(3,i) + dsr3*uinp(3,i)
-               turi = -dsr5*purk - psr5*durk
-               turk = -dsr5*puri - psr5*duri
+               turi = -psr5*durk - dsr5*purk
+               turk = -psr5*duri - dsr5*puri
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -1090,8 +1090,8 @@ c
                txk5 = 2.0d0 * (psr5*uind(1,i)+dsr5*uinp(1,i))
                tyk5 = 2.0d0 * (psr5*uind(2,i)+dsr5*uinp(2,i))
                tzk5 = 2.0d0 * (psr5*uind(3,i)+dsr5*uinp(3,i))
-               turi = -dsr7*purk - psr7*durk
-               turk = -dsr7*puri - psr7*duri
+               turi = -psr7*durk - dsr7*purk
+               turk = -psr7*duri - dsr7*puri
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -1224,8 +1224,8 @@ c
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 sr3,sr5,sr7
-      real*8 dsr3,dsr5,dsr7
       real*8 psr3,psr5,psr7
+      real*8 dsr3,dsr5,dsr7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
@@ -1461,12 +1461,12 @@ c
                sr3 = rr3 * sc3
                sr5 = rr5 * sc5
                sr7 = rr7 * sc7
-               dsr3 = sr3 * dscale(kk)
-               dsr5 = sr5 * dscale(kk)
-               dsr7 = sr7 * dscale(kk)
                psr3 = sr3 * pscale(kk)
                psr5 = sr5 * pscale(kk)
                psr7 = sr7 * pscale(kk)
+               dsr3 = sr3 * dscale(kk)
+               dsr5 = sr5 * dscale(kk)
+               dsr7 = sr7 * dscale(kk)
 c
 c     intermediates involving moments and distance separation
 c
@@ -1484,10 +1484,10 @@ c
                qrrk = (qkxx*xr+2.0d0*qkxy*yr)*xr
      &                   + (qkyy*yr+2.0d0*qkyz*zr)*yr
      &                   + (qkzz*zr+2.0d0*qkxz*xr)*zr
-               duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
-               durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
                puri = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
                purk = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
+               duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
+               durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
 c
 c     get the dE/dR field gradient for direct polarization force
 c
@@ -1660,8 +1660,8 @@ c
                txk3 = psr3*uind(1,i) + dsr3*uinp(1,i)
                tyk3 = psr3*uind(2,i) + dsr3*uinp(2,i)
                tzk3 = psr3*uind(3,i) + dsr3*uinp(3,i)
-               turi = -dsr5*purk - psr5*durk
-               turk = -dsr5*puri - psr5*duri
+               turi = -psr5*durk - dsr5*purk
+               turk = -psr5*duri - dsr5*puri
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -1677,8 +1677,8 @@ c
                txk5 = 2.0d0 * (psr5*uind(1,i)+dsr5*uinp(1,i))
                tyk5 = 2.0d0 * (psr5*uind(2,i)+dsr5*uinp(2,i))
                tzk5 = 2.0d0 * (psr5*uind(3,i)+dsr5*uinp(3,i))
-               turi = -dsr7*purk - psr7*durk
-               turk = -dsr7*puri - psr7*duri
+               turi = -psr7*durk - dsr7*purk
+               turk = -psr7*duri - dsr7*puri
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
