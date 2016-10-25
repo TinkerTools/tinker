@@ -1,1 +1,1 @@
-time ../bin/dynamic bench4 1000 1.0 10.0 2 298.0
+time ../bin/dynamic bench4 10000 1.0 100.0 2 298.0

@@ -4233,8 +4233,8 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
-      real*8 vxx,vyx,vzx
-      real*8 vyy,vzy,vzz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -4281,10 +4281,10 @@ c
 c     zero out the temporary virial accumulation variables
 c
       vxx = 0.0d0
-      vyx = 0.0d0
-      vzx = 0.0d0
+      vxy = 0.0d0
+      vxz = 0.0d0
       vyy = 0.0d0
-      vzy = 0.0d0
+      vyz = 0.0d0
       vzz = 0.0d0
 c
 c     copy multipole moments and coordinates to local storage
@@ -4387,10 +4387,10 @@ c
             eterm = 0.5d0 * electric * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx + h1*h1*vterm - eterm
-            vyx = vyx + h2*h1*vterm
-            vzx = vzx + h3*h1*vterm
+            vxy = vxy + h1*h2*vterm
+            vxz = vxz + h1*h3*vterm
             vyy = vyy + h2*h2*vterm - eterm
-            vzy = vzy + h3*h2*vterm
+            vyz = vyz + h2*h3*vterm
             vzz = vzz + h3*h3*vterm - eterm
          end if
          qfac(k1,k2,k3) = expterm
@@ -4463,10 +4463,10 @@ c
                eterm = 0.5d0 * electric * expterm * struc2
                vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
                vxx = vxx - h1*h1*vterm + eterm
-               vyx = vyx - h2*h1*vterm
-               vzx = vzx - h3*h1*vterm
+               vxy = vxy - h1*h2*vterm
+               vxz = vxz - h1*h3*vterm
                vyy = vyy - h2*h2*vterm + eterm
-               vzy = vzy - h3*h2*vterm
+               vyz = vyz - h2*h3*vterm
                vzz = vzz - h3*h3*vterm + eterm
             end if
          end do
@@ -4529,10 +4529,10 @@ c
             eterm = 0.5d0 * electric * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx - h1*h1*vterm + eterm
-            vyx = vyx - h2*h1*vterm
-            vzx = vzx - h3*h1*vterm
+            vxy = vxy - h1*h2*vterm
+            vxz = vxz - h1*h3*vterm
             vyy = vyy - h2*h2*vterm + eterm
-            vzy = vzy - h3*h2*vterm
+            vyz = vyz - h2*h3*vterm
             vzz = vzz - h3*h3*vterm + eterm
          end if
       end do
@@ -4717,12 +4717,12 @@ c
          vxx = vxx - cphi(2,i)*cmp(2,i)
      &             - 0.5d0*(cphim(2)*(uind(1,i)+uinp(1,i))
      &                     +cphid(2)*uinp(1,i)+cphip(2)*uind(1,i))
-         vyx = vyx - 0.5d0*(cphi(2,i)*cmp(3,i)+cphi(3,i)*cmp(2,i))
+         vxy = vxy - 0.5d0*(cphi(2,i)*cmp(3,i)+cphi(3,i)*cmp(2,i))
      &             - 0.25d0*(cphim(2)*(uind(2,i)+uinp(2,i))
      &                      +cphim(3)*(uind(1,i)+uinp(1,i))
      &                      +cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
      &                      +cphid(3)*uinp(1,i)+cphip(3)*uind(1,i))
-         vzx = vzx - 0.5d0*(cphi(2,i)*cmp(4,i)+cphi(4,i)*cmp(2,i))
+         vxz = vxz - 0.5d0*(cphi(2,i)*cmp(4,i)+cphi(4,i)*cmp(2,i))
      &             - 0.25d0*(cphim(2)*(uind(3,i)+uinp(3,i))
      &                      +cphim(4)*(uind(1,i)+uinp(1,i))
      &                      +cphid(2)*uinp(3,i)+cphip(2)*uind(3,i)
@@ -4730,7 +4730,7 @@ c
          vyy = vyy - cphi(3,i)*cmp(3,i)
      &             - 0.5d0*(cphim(3)*(uind(2,i)+uinp(2,i))
      &                     +cphid(3)*uinp(2,i)+cphip(3)*uind(2,i))
-         vzy = vzy - 0.5d0*(cphi(3,i)*cmp(4,i)+cphi(4,i)*cmp(3,i))
+         vyz = vyz - 0.5d0*(cphi(3,i)*cmp(4,i)+cphi(4,i)*cmp(3,i))
      &             - 0.25d0*(cphim(3)*(uind(3,i)+uinp(3,i))
      &                      +cphim(4)*(uind(2,i)+uinp(2,i))
      &                      +cphid(3)*uinp(3,i)+cphip(3)*uind(3,i)
@@ -4740,27 +4740,27 @@ c
      &                     +cphid(4)*uinp(3,i)+cphip(4)*uind(3,i))
          vxx = vxx - 2.0d0*cmp(5,i)*cphi(5,i) - cmp(8,i)*cphi(8,i)
      &             - cmp(9,i)*cphi(9,i)
-         vyx = vyx - (cmp(5,i)+cmp(6,i))*cphi(8,i)
+         vxy = vxy - (cmp(5,i)+cmp(6,i))*cphi(8,i)
      &             - 0.5d0*(cmp(8,i)*(cphi(6,i)+cphi(5,i))
      &                  +cmp(9,i)*cphi(10,i)+cmp(10,i)*cphi(9,i))
-         vzx = vzx - (cmp(5,i)+cmp(7,i))*cphi(9,i)
+         vxz = vxz - (cmp(5,i)+cmp(7,i))*cphi(9,i)
      &             - 0.5d0*(cmp(9,i)*(cphi(5,i)+cphi(7,i))
      &                  +cmp(8,i)*cphi(10,i)+cmp(10,i)*cphi(8,i))
          vyy = vyy - 2.0d0*cmp(6,i)*cphi(6,i) - cmp(8,i)*cphi(8,i)
      &             - cmp(10,i)*cphi(10,i)
-         vzy = vzy - (cmp(6,i)+cmp(7,i))*cphi(10,i)
+         vyz = vyz - (cmp(6,i)+cmp(7,i))*cphi(10,i)
      &             - 0.5d0*(cmp(10,i)*(cphi(6,i)+cphi(7,i))
      &                  +cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
          vzz = vzz - 2.0d0*cmp(7,i)*cphi(7,i) - cmp(9,i)*cphi(9,i)
      &             - cmp(10,i)*cphi(10,i)
          if (poltyp .eq. 'DIRECT') then
             vxx = vxx + 0.5d0*(cphid(2)*uinp(1,i)+cphip(2)*uind(1,i))
-            vyx = vyx + 0.25d0*(cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
+            vxy = vxy + 0.25d0*(cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
      &                        +cphid(3)*uinp(1,i)+cphip(3)*uind(1,i))
-            vzx = vzx + 0.25d0*(cphid(2)*uinp(3,i)+cphip(2)*uind(3,i)
+            vxz = vxz + 0.25d0*(cphid(2)*uinp(3,i)+cphip(2)*uind(3,i)
      &                        +cphid(4)*uinp(1,i)+cphip(4)*uind(1,i))
             vyy = vyy + 0.5d0*(cphid(3)*uinp(2,i)+cphip(3)*uind(2,i))
-            vzy = vzy + 0.25d0*(cphid(3)*uinp(3,i)+cphip(3)*uind(3,i)
+            vyz = vyz + 0.25d0*(cphid(3)*uinp(3,i)+cphip(3)*uind(3,i)
      &                        +cphid(4)*uinp(2,i)+cphip(4)*uind(2,i))
             vzz = vzz + 0.5d0*(cphid(4)*uinp(3,i)+cphip(4)*uind(3,i))
          end if
@@ -4769,13 +4769,13 @@ c
 c     increment the internal virial tensor components
 c
       vir(1,1) = vir(1,1) + vxx
-      vir(2,1) = vir(2,1) + vyx
-      vir(3,1) = vir(3,1) + vzx
-      vir(1,2) = vir(1,2) + vyx
+      vir(2,1) = vir(2,1) + vxy
+      vir(3,1) = vir(3,1) + vxz
+      vir(1,2) = vir(1,2) + vxy
       vir(2,2) = vir(2,2) + vyy
-      vir(3,2) = vir(3,2) + vzy
-      vir(1,3) = vir(1,3) + vzx
-      vir(2,3) = vir(2,3) + vzy
+      vir(3,2) = vir(3,2) + vyz
+      vir(1,3) = vir(1,3) + vxz
+      vir(2,3) = vir(2,3) + vyz
       vir(3,3) = vir(3,3) + vzz
 c
 c     perform deallocation of some local arrays

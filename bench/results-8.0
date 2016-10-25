@@ -1,0 +1,127 @@
+
+                #################################################
+                Benchmark Results for TINKER 8.0   (October 2016)            
+                #################################################
+
+ Benchmark #1: Calmodulin Energy Evaluation (Serial)
+
+ Gas-Phase Calmodulin Molecule, 2264 Atoms, Amber ff94 Force Field,
+ No Nonbonded Cutoffs, 100 Evaluations
+
+ MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
+ ---------------------------                  ---    ------  --------  -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60       6.9      19.3     54.5
+
+ Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
+
+ Crambin Unit Cell, 1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
+ with PME Electrostatics, 9.0 Ang vdw Cutoff, 1000 Evaluations
+
+ MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
+ ---------------------------                  ---    ------  --------  -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60      18.1      26.7     93.9
+
+ Benchmark #3: Crambin Normal Mode Calculation (Serial)
+
+ Hessian Eigenvalues, Normal Modes and Vibrational Freqencies for the
+ 42-Amino Acid, 642-Atom Protein Crambin, CHARMM-22 Force Field with Cutoffs
+
+ MACHINE TYPE (OS, Compiler)                  GHz             Seconds
+ ---------------------------                  ---             -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60                14.6
+
+ Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
+
+ MD run of 10000 Steps for 216 TIP3P Waters in 18.643 Ang Periodic Box,
+ 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
+ Step with Modified Beeman Integration
+
+ MACHINE TYPE (OS, Compiler)                  GHz             Seconds
+ ---------------------------                  ---             -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60                93.9
+
+ Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
+
+ MD run of 1000 Steps for 216 AMOEBA Waters in a 18.643 Ang Box,
+ Neighbor Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
+ and 0.00001 RMS Induced Dipole Convergence
+
+ MACHINE TYPE (OS, Compiler)                  GHz             Seconds
+ ---------------------------                  ---             -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60                56.2
+
+ Benchmark #6: MD on DHFR in Water using CHARMM (Parallel, OpenMP)
+
+ MD run of 100 Steps for CHARMM DHFR in Water (23558 Atoms, 62.23 Ang Box),
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
+ OpenMP timings reported as "wall clock" time for benchmark
+
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1      47.8 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2      35.4 (1.35)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4      26.6 (1.80)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8      22.0 (2.17)
+
+ Benchmark #7: MD on DHFR in Water using AMOEBA (Parallel, OpenMP)
+
+ MD run of 100 Steps for AMOEBA DHFR in Water (23558 Atoms, 62.23 Ang Box),
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
+ and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
+ "wall clock" time for benchmark
+
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1     308.4 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2     207.6 (1.49)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4     127.0 (2.43)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8      97.9 (3.15)
+
+ Benchmark #8: MD on COX-2 in Water using OPLS-AA (Parallel, OpenMP)
+
+ MD run of 100 Steps for OPLS-AA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
+ RATTLE for all X-H bonds and rigid TIP3P Water; OpenMP timings reported as
+ "wall clock" time for benchmark
+
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1     355.1 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2     285.9 (1.24)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4     189.5 (1.87)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8     166.3 (2.14)
+
+ Benchmark #9: MD on COX-2 in Water using AMOEBA (Parallel, OpenMP)
+
+ MD run of 100 Steps for AMOEBA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
+ and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
+ "wall clock" time for benchmark
+
+ MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
+ ---------------------------                  ---    -------------     -------
+
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1    2888.6 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2    2004.2 (1.44)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4    1192.1 (2.42)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8     961.8 (3.00)
+
+ ----------------------
+ Times are reported in seconds and are measured with TINKER Version 8.0,
+ dimensioned to MAXATM=10000000. Each benchmark ran twice in rapid succession
+ on an unloaded machine, and times shown are the best from the two runs. The
+ first five benchmarks are run in serial with a single thread, while the last
+ four benchmarks test OpenMP parallel performance.
