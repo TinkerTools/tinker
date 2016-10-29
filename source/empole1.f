@@ -2879,6 +2879,7 @@ c
       use ewald
       use math
       use mpole
+      use mrecip
       use pme
       use virial
       implicit none
@@ -2902,10 +2903,6 @@ c
       real*8 vterm,struc2
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
-      real*8, allocatable :: cmp(:,:)
-      real*8, allocatable :: fmp(:,:)
-      real*8, allocatable :: fphi(:,:)
-      real*8, allocatable :: cphi(:,:)
 c
 c     derivative indices into the fphi and fphidp arrays
 c
@@ -2918,12 +2915,22 @@ c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
 c
-c     perform dynamic allocation of some local arrays
+c     perform dynamic allocation of some global arrays
 c
-      allocate (cmp(10,npole))
-      allocate (fmp(10,npole))
-      allocate (fphi(20,npole))
-      allocate (cphi(10,npole))
+      if (allocated(cmp)) then
+         if (size(cmp) .lt. 10*npole) then
+            deallocate (cmp)
+            deallocate (fmp)
+            deallocate (cphi)
+            deallocate (fphi)
+         end if
+      end if
+      if (.not. allocated(cmp)) then
+         allocate (cmp(10,npole))
+         allocate (fmp(10,npole))
+         allocate (cphi(10,npole))
+         allocate (fphi(20,npole))
+      end if
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -3010,6 +3017,15 @@ c
          end if
          qfac(k1,k2,k3) = expterm
       end do
+c
+c     save the virial for use in polarization computation
+c
+      vmxx = vxx
+      vmxy = vxy
+      vmxz = vxz
+      vmyy = vyy
+      vmyz = vyz
+      vmzz = vzz
 c
 c     account for the zeroth grid point for a finite system
 c
@@ -3123,12 +3139,5 @@ c
       vir(1,3) = vir(1,3) + vxz
       vir(2,3) = vir(2,3) + vyz
       vir(3,3) = vir(3,3) + vzz
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (cmp)
-      deallocate (fmp)
-      deallocate (fphi)
-      deallocate (cphi)
       return
       end

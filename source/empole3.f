@@ -1874,12 +1874,14 @@ c
          if (size(cmp) .lt. 10*npole) then
             deallocate (cmp)
             deallocate (fmp)
+            deallocate (cphi)
             deallocate (fphi)
          end if
       end if
       if (.not. allocated(cmp)) then
          allocate (cmp(10,npole))
          allocate (fmp(10,npole))
+         allocate (cphi(10,npole))
          allocate (fphi(20,npole))
       end if
 c

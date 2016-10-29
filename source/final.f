@@ -468,6 +468,7 @@ c     deallocation of global arrays from module mrecip
 c
       if (allocated(cmp))  deallocate (cmp)
       if (allocated(fmp))  deallocate (fmp)
+      if (allocated(cphi))  deallocate (cphi)
       if (allocated(fphi))  deallocate (fphi)
 c
 c     deallocation of global arrays from module mutant

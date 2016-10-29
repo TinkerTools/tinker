@@ -46,15 +46,15 @@
 
  Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
 
- MD run of 1000 Steps for 216 AMOEBA Waters in a 18.643 Ang Box,
- Neighbor Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff,
- 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
+ MD run of 1000 Steps for 216 AMOEBA Waters in a 18.643 Ang Box, Neighbor
+ Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff, 9.0 Ang vdW
+ Cutoff with Correction, 1.0 fs Time Step with Modified Beeman Integration,
  and 0.00001 RMS Induced Dipole Convergence
 
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60                56.2
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60                54.0
 
  Benchmark #6: MD on DHFR in Water using CHARMM (Parallel, OpenMP)
 
@@ -75,17 +75,17 @@
 
  MD run of 100 Steps for AMOEBA DHFR in Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
- 12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
- and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
- "wall clock" time for benchmark
+ 9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
+ Integration, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
+ reported as "wall clock" time for benchmark
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1     308.4 (1.00)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2     207.6 (1.49)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4     127.0 (2.43)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8      97.9 (3.15)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1     230.2 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2     171.2 (1.34)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4     103.8 (2.22)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8      83.2 (2.77)
 
  Benchmark #8: MD on COX-2 in Water using OPLS-AA (Parallel, OpenMP)
 
@@ -107,17 +107,17 @@
 
  MD run of 100 Steps for AMOEBA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
  Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
- 12.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
- and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
- "wall clock" time for benchmark
+ 9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
+ Integration, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
+ reported as "wall clock" time for benchmark
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1    2888.6 (1.00)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2    2004.2 (1.44)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4    1192.1 (2.42)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8     961.8 (3.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/1    2384.7 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/2    1642.4 (1.45)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/4     967.6 (2.46)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.1)       2.60         4/8     779.8 (3.06)
 
  ----------------------
  Times are reported in seconds and are measured with TINKER Version 8.0,
