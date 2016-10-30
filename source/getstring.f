@@ -7,15 +7,15 @@ c     ###################################################
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine getstring  --  extract single quoted string  ##
+c     ##  subroutine getstring  --  extract double quoted string  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
 c     "getstring" searches for a quoted text string within an input
 c     character string; the region between the first and second
-c     quotes is returned as the "text"; if the actual text is too
-c     long, only the first part is returned
+c     double quote is returned as the "text"; if the actual text is
+c     too long, only the first part is returned
 c
 c     variables and parameters:
 c
@@ -28,12 +28,13 @@ c
       subroutine getstring (string,text,next)
       use ascii
       implicit none
-      integer i,j
+      integer i,j,k,m
       integer len,length
       integer size,next
       integer code,extent
-      integer first,last
       integer initial,final
+      integer first,last
+      integer maxascii
       character*(*) string
       character*(*) text
 c
@@ -43,13 +44,42 @@ c
       length = len(string(next:))
       size = len(text)
 c
-c     move through the string one character at a time,
-c     searching for the quoted text string characters
+c     convert first two non-ascii regions to delimiting quotes
+c
+      maxascii = 126
+      initial = next
+      final = next + length - 1
+      do i = initial, final
+         code = ichar(string(i:i))
+         if (code .gt. maxascii) then
+            string(i:i) = ' '
+            do j = i+1, final
+               code = ichar(string(j:j))
+               if (code .le. maxascii) then
+                  string(j-1:j-1) = '"'
+                  do k = j+1, final
+                     code = ichar(string(k:k))
+                     if (code .gt. maxascii) then
+                        string(k:k) = '"'
+                        do m = k+1, final
+                           code = ichar(string(m:m))
+                           if (code .gt. maxascii) then
+                              string(m:m) = ' '
+                           end if
+                        end do
+                        goto 10
+                     end if
+                  end do
+               end if
+            end do
+         end if
+      end do
+   10 continue
+c
+c     search the string for quoted region of text characters
 c
       first = next
       last = 0
-      initial = next
-      final = next + length - 1
       do i = initial, final
          code = ichar(string(i:i))
          if (code .eq. quote) then
@@ -59,12 +89,12 @@ c
                if (code .eq. quote) then
                   last = j - 1
                   next = j + 1
-                  goto 10
+                  goto 20
                end if
             end do
          end if
       end do
-   10 continue
+   20 continue
 c
 c     trim the actual word if it is too long to return
 c

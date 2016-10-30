@@ -43,8 +43,7 @@ c
       length = len(string(next:))
       size = len(text)
 c
-c     move through the string one character at a time,
-c     searching for the first non-blank character
+c     search the string for the first non-blank character
 c
       first = next
       last = 0

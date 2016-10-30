@@ -47,8 +47,7 @@ c
       numeral = .false.
       length = trimtext(string(next:))
 c
-c     move through the string one character at a time,
-c     searching for the first run of numeric characters
+c     search the string for the first run of numeric characters
 c
       first = next
       last = 0

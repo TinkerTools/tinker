@@ -44,8 +44,7 @@ c
       length = len(string(next:))
       size = len(word)
 c
-c     move through the string one character at a time,
-c     searching for the first alphabetic character
+c     search the string for the first alphabetic character
 c
       first = next
       last = 0

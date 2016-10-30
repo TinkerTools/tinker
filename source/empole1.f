@@ -2904,7 +2904,7 @@ c
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
 c
-c     derivative indices into the fphi and fphidp arrays
+c     indices into the electrostatic field array
 c
       data deriv1  / 2, 5,  8,  9, 11, 16, 18, 14, 15, 20 /
       data deriv2  / 3, 8,  6, 10, 14, 12, 19, 16, 20, 17 /
