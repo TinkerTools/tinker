@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 7.2  February 2016                        ##
+ ##                        Version 8.0   October 2016                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2016               ##
  ###                           All Rights Reserved                          ###
@@ -18,7 +18,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 7.2  February 2016                        ##
+ ##                        Version 8.0   October 2016                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2016               ##
  ###                           All Rights Reserved                          ###
@@ -258,25 +258,25 @@
 
  Total Potential Energy :                462.1803 Kcal/mole
 
- Energy Component Breakdown :           Kcal/mole      Interactions
+ Energy Component Breakdown :           Kcal/mole        Interactions
 
- Bond Stretching                         114.6345            652
- Angle Bending                           143.3128           1183
- Stretch-Bend                             -6.6196           1044
- Out-of-Plane Bend                         2.7302            375
- Torsional Angle                         160.1355           1747
- Stretch-Torsion                          -2.6381           1116
- Van der Waals                           222.7280         203626
- Charge-Charge                           -48.0258             33
- Charge-Dipole                           -29.5684           2758
- Dipole-Dipole                           -94.5087          47824
+ Bond Stretching                         114.6345              652
+ Angle Bending                           143.3128             1183
+ Stretch-Bend                             -6.6196             1044
+ Out-of-Plane Bend                         2.7302              375
+ Torsional Angle                         160.1355             1747
+ Stretch-Torsion                          -2.6381             1116
+ Van der Waals                           222.7280           203626
+ Charge-Charge                           -48.0258               33
+ Charge-Dipole                           -29.5684             2758
+ Dipole-Dipole                           -94.5087            47824
 
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 7.2  February 2016                        ##
+ ##                        Version 8.0   October 2016                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2016               ##
  ###                           All Rights Reserved                          ###

@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 7.2  February 2016                        ##
+ ##                        Version 8.0   October 2016                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2016               ##
  ###                           All Rights Reserved                          ###
@@ -202,7 +202,7 @@
  Relative Conformational Energy (MM)       3      0.4738 Kcal/mole
  Relative Conformational Energy (MM)       4      0.0000 Kcal/mole
  Relative Conformational Energy (MM)       5      0.3323 Kcal/mole
- Relative Conformational Energy (MM)       6      1.1255 Kcal/mole
+ Relative Conformational Energy (MM)       6      1.1254 Kcal/mole
  Relative Conformational Energy (MM)       7      1.5894 Kcal/mole
  Relative Conformational Energy (MM)       8      1.2940 Kcal/mole
  Relative Conformational Energy (MM)       9      0.6017 Kcal/mole
