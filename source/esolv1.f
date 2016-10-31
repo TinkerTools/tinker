@@ -1904,12 +1904,12 @@ c
      &                +2.0d0*(qxyi*guz(6)+qxzi*guz(7)+qyzi*guz(9))
      &                +ci*gc(4)+qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
      &                +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
-                     trq(1,i) = trq(1,i) + uyi*fid(3) - uzi*fid(2)
-                     trq(2,i) = trq(2,i) + uzi*fid(1) - uxi*fid(3)
-                     trq(3,i) = trq(3,i) + uxi*fid(2) - uyi*fid(1)
-                     trq(1,k) = trq(1,k) + uyk*fkd(3) - uzk*fkd(2)
-                     trq(2,k) = trq(2,k) + uzk*fkd(1) - uxk*fkd(3)
-                     trq(3,k) = trq(3,k) + uxk*fkd(2) - uyk*fkd(1)
+                     trq(1,ii) = trq(1,ii) + uyi*fid(3) - uzi*fid(2)
+                     trq(2,ii) = trq(2,ii) + uzi*fid(1) - uxi*fid(3)
+                     trq(3,ii) = trq(3,ii) + uxi*fid(2) - uyi*fid(1)
+                     trq(1,kk) = trq(1,kk) + uyk*fkd(3) - uzk*fkd(2)
+                     trq(2,kk) = trq(2,kk) + uzk*fkd(1) - uxk*fkd(3)
+                     trq(3,kk) = trq(3,kk) + uxk*fkd(2) - uyk*fkd(1)
 c
 c     torque on quadrupoles due to permanent reaction field gradient
 c
@@ -2003,22 +2003,22 @@ c
                      fkdg(2,1) = fkdg(1,2)
                      fkdg(3,1) = fkdg(1,3)
                      fkdg(3,2) = fkdg(2,3)
-                     trq(1,i) = trq(1,i) + 2.0d0*
+                     trq(1,ii) = trq(1,ii) + 2.0d0*
      &                    (qxyi*fidg(1,3)+qyyi*fidg(2,3)+qyzi*fidg(3,3)
      &                    -qxzi*fidg(1,2)-qyzi*fidg(2,2)-qzzi*fidg(3,2))
-                     trq(2,i) = trq(2,i) + 2.0d0*
+                     trq(2,ii) = trq(2,ii) + 2.0d0*
      &                    (qxzi*fidg(1,1)+qyzi*fidg(2,1)+qzzi*fidg(3,1)
      &                    -qxxi*fidg(1,3)-qxyi*fidg(2,3)-qxzi*fidg(3,3))
-                     trq(3,i) = trq(3,i) + 2.0d0*
+                     trq(3,ii) = trq(3,ii) + 2.0d0*
      &                    (qxxi*fidg(1,2)+qxyi*fidg(2,2)+qxzi*fidg(3,2)
      &                    -qxyi*fidg(1,1)-qyyi*fidg(2,1)-qyzi*fidg(3,1))
-                     trq(1,k) = trq(1,k) + 2.0d0*
+                     trq(1,kk) = trq(1,kk) + 2.0d0*
      &                    (qxyk*fkdg(1,3)+qyyk*fkdg(2,3)+qyzk*fkdg(3,3)
      &                    -qxzk*fkdg(1,2)-qyzk*fkdg(2,2)-qzzk*fkdg(3,2))
-                     trq(2,k) = trq(2,k) + 2.0d0*
+                     trq(2,kk) = trq(2,kk) + 2.0d0*
      &                    (qxzk*fkdg(1,1)+qyzk*fkdg(2,1)+qzzk*fkdg(3,1)
      &                    -qxxk*fkdg(1,3)-qxyk*fkdg(2,3)-qxzk*fkdg(3,3))
-                     trq(3,k) = trq(3,k) + 2.0d0*
+                     trq(3,kk) = trq(3,kk) + 2.0d0*
      &                    (qxxk*fkdg(1,2)+qxyk*fkdg(2,2)+qxzk*fkdg(3,2)
      &                    -qxyk*fkdg(1,1)-qyyk*fkdg(2,1)-qyzk*fkdg(3,1))
                   end if
@@ -2262,12 +2262,12 @@ c
                      fkd(2) = 0.5d0 * fkd(2)
                      fkd(3) = 0.5d0 * fkd(3)
                   end if
-                  trqi(1,i) = trqi(1,i) + uyi*fid(3) - uzi*fid(2)
-                  trqi(2,i) = trqi(2,i) + uzi*fid(1) - uxi*fid(3)
-                  trqi(3,i) = trqi(3,i) + uxi*fid(2) - uyi*fid(1)
-                  trqi(1,k) = trqi(1,k) + uyk*fkd(3) - uzk*fkd(2)
-                  trqi(2,k) = trqi(2,k) + uzk*fkd(1) - uxk*fkd(3)
-                  trqi(3,k) = trqi(3,k) + uxk*fkd(2) - uyk*fkd(1)
+                  trqi(1,ii) = trqi(1,ii) + uyi*fid(3) - uzi*fid(2)
+                  trqi(2,ii) = trqi(2,ii) + uzi*fid(1) - uxi*fid(3)
+                  trqi(3,ii) = trqi(3,ii) + uxi*fid(2) - uyi*fid(1)
+                  trqi(1,kk) = trqi(1,kk) + uyk*fkd(3) - uzk*fkd(2)
+                  trqi(2,kk) = trqi(2,kk) + uzk*fkd(1) - uxk*fkd(3)
+                  trqi(3,kk) = trqi(3,kk) + uxk*fkd(2) - uyk*fkd(1)
 c
 c     torque due to induced reaction field gradient on quadrupoles
 c
@@ -2333,22 +2333,22 @@ c
                      fkdg(3,2) = 0.5d0 * fkdg(3,2)
                      fkdg(3,3) = 0.5d0 * fkdg(3,3)
                   end if
-                  trqi(1,i) = trqi(1,i) + 2.0d0*
+                  trqi(1,ii) = trqi(1,ii) + 2.0d0*
      &                  (qxyi*fidg(1,3)+qyyi*fidg(2,3)+qyzi*fidg(3,3)
      &                  -qxzi*fidg(1,2)-qyzi*fidg(2,2)-qzzi*fidg(3,2))
-                  trqi(2,i) = trqi(2,i) + 2.0d0*
+                  trqi(2,ii) = trqi(2,ii) + 2.0d0*
      &                  (qxzi*fidg(1,1)+qyzi*fidg(2,1)+qzzi*fidg(3,1)
      &                  -qxxi*fidg(1,3)-qxyi*fidg(2,3)-qxzi*fidg(3,3))
-                  trqi(3,i) = trqi(3,i) + 2.0d0*
+                  trqi(3,ii) = trqi(3,ii) + 2.0d0*
      &                  (qxxi*fidg(1,2)+qxyi*fidg(2,2)+qxzi*fidg(3,2)
      &                  -qxyi*fidg(1,1)-qyyi*fidg(2,1)-qyzi*fidg(3,1))
-                  trqi(1,k) = trqi(1,k) + 2.0d0*
+                  trqi(1,kk) = trqi(1,kk) + 2.0d0*
      &                  (qxyk*fkdg(1,3)+qyyk*fkdg(2,3)+qyzk*fkdg(3,3)
      &                  -qxzk*fkdg(1,2)-qyzk*fkdg(2,2)-qzzk*fkdg(3,2))
-                  trqi(2,k) = trqi(2,k) + 2.0d0*
+                  trqi(2,kk) = trqi(2,kk) + 2.0d0*
      &                  (qxzk*fkdg(1,1)+qyzk*fkdg(2,1)+qzzk*fkdg(3,1)
      &                  -qxxk*fkdg(1,3)-qxyk*fkdg(2,3)-qxzk*fkdg(3,3))
-                  trqi(3,k) = trqi(3,k) + 2.0d0*
+                  trqi(3,kk) = trqi(3,kk) + 2.0d0*
      &                  (qxxk*fkdg(1,2)+qxyk*fkdg(2,2)+qxzk*fkdg(3,2)
      &                  -qxyk*fkdg(1,1)-qyyk*fkdg(2,1)-qyzk*fkdg(3,1))
 c
