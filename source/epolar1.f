@@ -4293,9 +4293,19 @@ c     get the fractional to Cartesian transformation matrix
 c
       call frac_to_cart (ftc)
 c
+c     remove scalar sum virial from prior multipole 3-D FFT
+c
+      if (use_mpole) then
+         vxx = -vmxx
+         vxy = -vmxy
+         vxz = -vmxz
+         vyy = -vmyy
+         vyz = -vmyz
+         vzz = -vmzz
+c
 c     compute the arrays of B-spline coefficients
 c
-      if (.not. use_mpole) then
+      else
          call bspline_fill
          call table_fill
 c
@@ -4392,16 +4402,6 @@ c
             end do
          end do
          call fphi_to_cphi (fphi,cphi)
-c
-c     remove scalar sum virial from prior multipole 3-D FFT
-c
-      else
-         vxx = -vmxx
-         vxy = -vmxy
-         vxz = -vmxz
-         vyy = -vmyy
-         vyz = -vmyz
-         vzz = -vmzz
       end if
 c
 c     perform dynamic allocation of some local arrays

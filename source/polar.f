@@ -12,7 +12,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     maxxtr    maximum perturbation order for OPT induced dipoles
+c     maxxtr    maximum order for OPT induced dipole extrapolation
 c
 c     npolar    total number of polarizable sites in the system
 c     cxmax     maximum coefficient order for OPT dipole extrapolation
@@ -39,7 +39,7 @@ c
       module polar
       implicit none
       integer maxxtr
-      parameter (maxxtr=7)
+      parameter (maxxtr=4)
       integer npolar,cxmax
       real*8, allocatable :: cxtr(:)
       real*8, allocatable :: polarity(:)

@@ -65,8 +65,8 @@ c
       end do
       cxtr(0) = -0.154d0
       cxtr(1) = 0.017d0
-      cxtr(2) = 0.658d0
-      cxtr(3) = 0.474d0
+      cxtr(2) = 0.657d0
+      cxtr(3) = 0.475d0
 c
 c     get keywords containing polarization-related options
 c
