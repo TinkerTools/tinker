@@ -1487,10 +1487,11 @@ c
       use pme
       use potent
       implicit none
-      integer i,j,k,ntot
+      integer i,j,k
       integer k1,k2,k3
       integer m1,m2,m3
-      integer nff,nf1,nf2,nf3
+      integer ntot,nff
+      integer nf1,nf2,nf3
       real*8 e,r1,r2,r3
       real*8 h1,h2,h3
       real*8 volterm,denom
