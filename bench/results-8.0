@@ -13,6 +13,7 @@
 
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93      11.1      31.3     85.2
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60       6.8      19.2     54.6
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60       8.9      19.3     57.8
 
  Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
 
@@ -24,6 +25,7 @@
 
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93      25.8      39.9    146.0
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60      17.9      26.3     94.9
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60      21.3      27.8    110.9
 
  Benchmark #3: Crambin Normal Mode Calculation (Serial)
 
@@ -35,6 +37,7 @@
 
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93                25.7
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                14.5
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                10.9
 
  Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
 
@@ -47,6 +50,7 @@
 
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93               144.2
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                93.6
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                88.0
 
  Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
 
@@ -60,13 +64,14 @@
 
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93                76.3
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                54.2
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                58.8
 
  Benchmark #6: MD on DHFR in Water using CHARMM (Parallel, OpenMP)
 
  MD run of 100 Steps for CHARMM DHFR in Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
- OpenMP timings reported as "wall clock" time for benchmark
+ OpenMP timings as "wall clock" time, with parallel speedup in parentheses
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
@@ -80,6 +85,10 @@
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2      35.3 (1.34)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4      26.6 (1.77)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8      22.1 (2.14)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/1      49.9 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/2      30.0 (1.66)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4      18.7 (2.67)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8      16.0 (3.12)
 
  Benchmark #7: MD on DHFR in Water using AMOEBA (Parallel, OpenMP)
 
@@ -87,7 +96,7 @@
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
  Integration, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
- reported as "wall clock" time for benchmark
+ reported as "wall clock" time, with parallel speedup in parentheses
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
@@ -101,6 +110,10 @@
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2     170.3 (1.36)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4     102.9 (2.26)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8      81.2 (2.86)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/1     263.5 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/2     151.8 (1.74)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4      98.8 (2.67)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8      88.2 (2.99)
 
  Benchmark #8: MD on COX-2 in Water using OPLS-AA (Parallel, OpenMP)
 
@@ -108,7 +121,7 @@
  Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
  RATTLE for all X-H bonds and rigid TIP3P Water; OpenMP timings reported as
- "wall clock" time for benchmark
+ "wall clock" time, with parallel speedup in parentheses
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
@@ -122,6 +135,10 @@
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2     281.9 (1.25)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4     190.6 (1.85)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8     160.9 (2.19)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/1     390.4 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/2     248.0 (1.57)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4     169.8 (2.30)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8     153.2 (2.55)
 
  Benchmark #9: MD on COX-2 in Water using AMOEBA (Parallel, OpenMP)
 
@@ -129,7 +146,7 @@
  Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
  9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
  Integration, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
- reported as "wall clock" time for benchmark
+ reported as "wall clock" time, with parallel speedup in parentheses
 
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
@@ -143,6 +160,10 @@
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2    1654.4 (1.45)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4     957.3 (2.51)
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8     779.9 (3.08)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/1    2496.9 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/2    1440.0 (1.73)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4     861.6 (2.90)
+ MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8     758.7 (3.29)
 
  ----------------------
  Times are reported in seconds and are measured with TINKER Version 8.0,
