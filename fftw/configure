@@ -13495,7 +13495,7 @@ fi
     gnu)
      # Default optimization flags for gcc on all systems.
      # Somehow -O3 does not imply -fomit-frame-pointer on ia32
-     CFLAGS="-O3 -fomit-frame-pointer"
+     CFLAGS="-O3 -mssse3 -funroll-loops -fomit-frame-pointer"
 
      # tune for the host by default
       { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C compiler accepts -mtune=native" >&5
