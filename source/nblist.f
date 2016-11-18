@@ -1092,9 +1092,9 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-c!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
-c!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-c!$OMP DO schedule(guided)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
+!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP DO schedule(guided)
 c
 c     loop over all atoms computing the neighbor lists
 c
@@ -1159,8 +1159,8 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-c!$OMP END DO
-c!$OMP END PARALLEL
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
