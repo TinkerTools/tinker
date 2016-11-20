@@ -11,6 +11,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
  ---------------------------                  ---    ------  --------  -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40      12.2      35.6    116.3
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93      11.1      31.3     85.2
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66      12.0      33.9     91.8
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60       6.8      19.2     54.6
@@ -24,6 +25,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
  ---------------------------                  ---    ------  --------  -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40      33.0      49.8    205.9
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93      25.8      39.9    146.0
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66      27.7      42.9    156.9
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60      17.9      26.3     94.9
@@ -37,6 +39,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40                27.6
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93                25.7
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66                24.2
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                14.5
@@ -51,6 +54,7 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40               154.0
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93               144.2
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66               155.0
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                93.6
@@ -66,12 +70,13 @@
  MACHINE TYPE (OS, Compiler)                  GHz             Seconds
  ---------------------------                  ---             -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40               100.7
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93                76.3
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66                80.9
  MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                54.2
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                58.8
 
- Benchmark #6: MD on DHFR in Water using CHARMM (Parallel, OpenMP)
+ Benchmark #6: MD on DHFR in Water using CHARMM (OpenMP Parallel)
 
  MD run of 100 Steps for CHARMM DHFR in Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
@@ -81,6 +86,10 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/1      91.1 (1.00)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/2      70.2 (1.30)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/4      41.1 (2.22)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/8      28.6 (3.19)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/1      74.1 (1.00)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/2      56.2 (1.32)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/4      44.6 (1.66)
@@ -101,7 +110,7 @@
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4      18.7 (2.67)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8      16.0 (3.12)
 
- Benchmark #7: MD on DHFR in Water using AMOEBA (Parallel, OpenMP)
+ Benchmark #7: MD on DHFR in Water using AMOEBA (OpenMP Parallel)
 
  MD run of 100 Steps for AMOEBA DHFR in Water (23558 Atoms, 62.23 Ang Box),
  Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
@@ -112,6 +121,10 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/1     399.1 (1.00)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/2     302.5 (1.32)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/4     172.8 (2.31)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/8     105.9 (3.77)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/1     342.7 (1.00)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/2     239.5 (1.43)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/4     155.1 (2.21)
@@ -132,7 +145,7 @@
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4      98.8 (2.67)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8      88.2 (2.99)
 
- Benchmark #8: MD on COX-2 in Water using OPLS-AA (Parallel, OpenMP)
+ Benchmark #8: MD on COX-2 in Water using OPLS-AA (OpenMP Parallel)
 
  MD run of 100 Steps for OPLS-AA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
  Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
@@ -143,6 +156,10 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/1     615.7 (1.00)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/2     495.3 (1.24)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/4     339.0 (1.82)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/8     271.8 (2.27)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/1     572.2 (1.00)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/2     415.1 (1.38)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/4     303.2 (1.89)
@@ -163,7 +180,7 @@
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4     169.8 (2.30)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/8     153.2 (2.55)
 
- Benchmark #9: MD on COX-2 in Water using AMOEBA (Parallel, OpenMP)
+ Benchmark #9: MD on COX-2 in Water using AMOEBA (OpenMP Parallel)
 
  MD run of 100 Steps for AMOEBA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
  Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
@@ -174,6 +191,10 @@
  MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
  ---------------------------                  ---    -------------     -------
 
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/1    3906.4 (1.00)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/2    2628.9 (1.49)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/4    1600.0 (2.44)
+ Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40         8/8    1014.2 (3.85)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/1    3518.5 (1.00)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/2    2434.3 (1.45)
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93         8/4    1353.4 (2.60)
@@ -199,4 +220,4 @@
  dimensioned to MAXATM=10000000. Each benchmark ran twice in rapid succession
  on an unloaded machine, and times shown are the best from the two runs. The
  first five benchmarks are run in serial with a single thread, while the last
- four benchmarks test OpenMP parallel performance.
+ four benchmarks reflect OpenMP parallel performance.
