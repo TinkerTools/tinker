@@ -7,6 +7,12 @@
          used to build the TINKER program package on a Linux system
          using the GNU gfortran Fortran compiler.
 
+         Building reasonably portable executables requires linking with
+         static gcc libraries. This can be done via use of versions of 
+         gfortran that enforce the -static-libgcc flag, or by copying 
+         the static libraries from the gcc directories into the TINKER 
+         build directory, as noted in "link.make".
+
          Please note that by default most Linux distributions limit
          stacksize and datasize for processes, as can be checked via
          the csh limit command or similar. Large TINKER executables

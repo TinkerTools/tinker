@@ -11,12 +11,15 @@
          those before 4.7, do not work correctly due to lack of support
          for some features of the OpenMP standard.
 
-         Note including the -static-libgcc flag at link time causes
-         use of static versions of most system libraries. An exception
-         is libquadmath. There is a static version of this library,
-         libquadmath.a. Its use can be enforced by moving or renaming
-         the shared versions, libquadmath.dylib and libquadmath.0.dylib,
-         from within the directory containing the compiler libraries.
+         Building reasonably portable executables requires linking with
+         static gcc libraries. This can be done via use of versions of
+         gfortran that enforce the -static-libgcc flag, or by copying
+         the static libraries from the gcc directories into the TINKER
+         build directory, as noted in "link.make".
+
+         Alternatively, on Mac OS the shared versions, libquadmath.dylib
+         and libquadmath.0.dylib, can be moved or renamed from within
+         the directory containing the compiler libraries.
 
          If some or all of the executables fail via a segmentation
          fault, check the limits for your processes by issuing the
