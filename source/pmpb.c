@@ -16,7 +16,7 @@
  * Note: Use the -Qlowercase flag to deal with Intel
  * Fortran Compiler name mangling on Windows.
  *
- * Underscores are used by default on Linux and MacOSX,
+ * Underscores are used by default on Linux and MacOS,
  * but not on Windows.
  *
  * We define aliases below to allow TINKER's Fortran code to

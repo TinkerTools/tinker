@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  library.make  --  create object library of TINKER routines  ##
-#  ##              (GNU gfortran for Mac OSX Version)              ##
+#  ##               (GNU gfortran for MacOS Version)               ##
 #  ##                                                              ##
 #  ##################################################################
 #

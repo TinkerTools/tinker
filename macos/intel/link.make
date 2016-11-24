@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##            (Intel Fortran for Mac OSX Version)            ##
+#  ##             (Intel Fortran for MacOS Version)             ##
 #  ##                                                           ##
 #  ###############################################################
 #

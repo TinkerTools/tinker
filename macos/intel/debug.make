@@ -3,7 +3,7 @@
 #  #################################################################
 #  ##                                                             ##
 #  ##  debug.make  --  compile the TINKER routines for debugging  ##
-#  ##             (Intel Fortran for Mac OSX Version)             ##
+#  ##              (Intel Fortran for MacOS Version)              ##
 #  ##                                                             ##
 #  #################################################################
 #

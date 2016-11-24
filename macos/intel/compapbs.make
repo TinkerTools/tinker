@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  compapbs.make  --  compile TINKER routines needed for APBS  ##
-#  ##              (Intel Fortran for Mac OSX Version)             ##
+#  ##               (Intel Fortran for MacOS Version)              ##
 #  ##                                                              ##
 #  ##################################################################
 #

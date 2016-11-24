@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  library.make  --  create object library of TINKER routines  ##
-#  ##              (Intel Fortran for Mac OSX Version)             ##
+#  ##               (Intel Fortran for MacOS Version)              ##
 #  ##                                                              ##
 #  ##################################################################
 #

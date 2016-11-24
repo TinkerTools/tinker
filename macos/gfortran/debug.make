@@ -3,7 +3,7 @@
 #  #################################################################
 #  ##                                                             ##
 #  ##  debug.make  --  compile the TINKER routines for debugging  ##
-#  ##              (GNU gfortran for Mac OSX Version)             ##
+#  ##               (GNU gfortran for MacOS Version)              ##
 #  ##                                                             ##
 #  #################################################################
 #

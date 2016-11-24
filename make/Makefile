@@ -101,8 +101,8 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac OSX 15.0
+##  Oper Sys: MacOS 10.11 (El Capitan)
+##  Compiler: Intel Fortran for MacOS 15.0
 
 #F77 = ifort
 #LIBS = 
@@ -115,8 +115,8 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  Macintosh
 ##  CPU Type: Intel Xeon
-##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac OSX 15.0
+##  Oper Sys: MacOS 10.11 (El Capitan)
+##  Compiler: Intel Fortran for MacOS 15.0
 ##  Parallel: OpenMP
 
 #F77 = ifort

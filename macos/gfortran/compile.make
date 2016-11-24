@@ -3,7 +3,7 @@
 #  #############################################################
 #  ##                                                         ##
 #  ##  compile.make  --  compile each of the TINKER routines  ##
-#  ##            (GNU gfortran for Mac OSX Version)           ##
+#  ##             (GNU gfortran for MacOS Version)            ##
 #  ##                                                         ##
 #  #############################################################
 #

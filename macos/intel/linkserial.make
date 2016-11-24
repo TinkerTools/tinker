@@ -3,7 +3,7 @@
 #  ################################################################
 #  ##                                                            ##
 #  ##  linkserial.make  --  link the TINKER programs for serial  ##
-#  ##             (Intel Fortran for Mac OSX Version)            ##
+#  ##              (Intel Fortran for MacOS Version)             ##
 #  ##                                                            ##
 #  ################################################################
 #

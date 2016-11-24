@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  compserial.make  --  compile TINKER routines for serial  ##
-#  ##            (Intel Fortran for Mac OSX Version)            ##
+#  ##             (Intel Fortran for MacOS Version)             ##
 #  ##                                                           ##
 #  ###############################################################
 #

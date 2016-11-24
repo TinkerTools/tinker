@@ -1,15 +1,15 @@
 
-                ###############################################
-                TINKER Notes for GNU gfortran on Macintosh OS X
-                ###############################################
+                    ######################################
+                    TINKER Notes for GNU gfortran on MacOS
+                    ######################################
 
          This subdirectory contains a set of script files that can be
-         used to build the TINKER program package on a Macintosh OS X
-         system using the GNU gcc/gfortran compiler suite under OpenMP
-         parallelization. These scripts have been tested with compiler
-         version 6.2. Earlier versions of the compiler, in particular
-         those before 4.7, do not work correctly due to lack of support
-         for some features of the OpenMP standard.
+         used to build the TINKER program package on a MacOS system
+         using GNU gcc/gfortran compilers under OpenMP parallelization.
+         These scripts have been tested with compiler version 6.2. Earlier
+         versions of the compiler, in particular those before 4.7, do not
+         work correctly due to lack of support for some features of the
+         OpenMP standard.
 
          Building reasonably portable executables requires linking with
          static gcc libraries. This can be done via use of versions of
@@ -17,7 +17,7 @@
          the static libraries from the gcc directories into the TINKER
          build directory, as noted in "link.make".
 
-         Alternatively, on Mac OS the shared versions, libquadmath.dylib
+         Alternatively, on MacOS the shared versions, libquadmath.dylib
          and libquadmath.0.dylib, can be moved or renamed from within
          the directory containing the compiler libraries.
 

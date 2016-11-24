@@ -3507,7 +3507,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
    OpenMM_Platform*        platform;
 
    // Load all OpenMM plugin libraries from their default location;
-   // Call the plugin loading routine twice to fix an issue with OSX
+   // Call the plugin loading routine twice to fix an issue with MacOS
    // where the first library in the alphabetical list gets skipped
 
    pluginList = OpenMM_Platform_loadPluginsFromDirectory

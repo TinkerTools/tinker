@@ -3,7 +3,7 @@
 #  ###############################################################
 #  ##                                                           ##
 #  ##  link.make  --  link each of the TINKER package programs  ##
-#  ##             (GNU gfortran for Mac OSX Version)            ##
+#  ##              (GNU gfortran for MacOS Version)             ##
 #  ##                                                           ##
 #  ###############################################################
 #
@@ -12,7 +12,7 @@
 #  versions of the main gcc libraries (libgcc.a, libgfortran.a,
 #  libgomp.a and libquadmath.a) into the present build directory;
 #  with Linux, all four libraries must usually be present locally,
-#  while for Mac OS, libquadmath.a is the only one required
+#  while for MacOS, libquadmath.a is the only one required
 #
 #
 gfortran -O3 -ffast-math -fopenmp -static-libgcc -o alchemy.x alchemy.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip alchemy.x

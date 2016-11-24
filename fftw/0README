@@ -8,9 +8,9 @@
       code provided by TINKER can be used instead (via modifications
       to fft3d.f), but FFTPACK is serial only.
 
-      Building FFTW on Mac OSX and on Linux:
+      Building FFTW on MacOS and on Linux:
 
-      Under OSX and Linux, TINKER requires the two FFTW static object
+      Under MacOS and Linux, TINKER requires the two FFTW static object
       libraries, libfftw3.a and libfftw3_threads.a. To build FFTW using
       the GNU compilers, issue each of the commands indicated below.
       Note that the 'setenv" syntax is for csh/tcsh shells, and should
@@ -34,14 +34,14 @@
       by TINKER will be in the /lib subdirectory.
 
       Modified versions of the configure script are used to enforce
-      processor-specific compiler flags. In particular, there are OSX
+      processor-specific compiler flags. In particular, there are MacOS
       and Linux versions for the Intel compiler that use -axssse3 and
       -msse3, respectively, along with other optimization flags. The
       original file is available as "configure-orig".
 
       The configure script options --enable-threads and --enable-openmp
       create libfftw3_threads.a and libfftw3_omp.a, respectively. One or
-      the other is required for OpenMP versions of TINKER. Under OSX with
+      the other is needed for OpenMP versions of TINKER. Under MacOS with
       recent versions of the Intel compilers, the threads library seems
       to give better OpenMP performance on large numbers of cores.
 

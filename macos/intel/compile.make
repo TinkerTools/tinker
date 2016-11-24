@@ -3,7 +3,7 @@
 #  #############################################################
 #  ##                                                         ##
 #  ##  compile.make  --  compile each of the TINKER routines  ##
-#  ##           (Intel Fortran for Mac OSX Version)           ##
+#  ##            (Intel Fortran for MacOS Version)            ##
 #  ##                                                         ##
 #  #############################################################
 #

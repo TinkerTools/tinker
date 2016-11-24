@@ -3,7 +3,7 @@
 #  ##############################################################
 #  ##                                                          ##
 #  ##  linkd.make  --  link the TINKER programs for debugging  ##
-#  ##            (GNU gfortran for Mac OSX Version)            ##
+#  ##             (GNU gfortran for MacOS Version)             ##
 #  ##                                                          ##
 #  ##############################################################
 #
