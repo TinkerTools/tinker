@@ -29,72 +29,86 @@
 ##  Master Directory Locations; Change as Needed for Local Site  ##
 ###################################################################
 
-##  TINKERDIR       TINKER Distribution Directory
+##  BUILDDIR        Top-Level Directory for Building
+##  TINKERDIR       TINKER Top-Level Directory
 ##  TINKER_LIBDIR   Libraries needed to build TINKER
 ##  BINDIR          Directory with TINKER Executables
 ##  LINKDIR         Linked Copies of TINKER Executables
 ##  FFTWDIR         FFTW Top-Level Directory
-##  FFTW_LIB_DIR    Directory with FFTW Libraries
+##  FFTW_LIBDIR     Directory with FFTW Libraries
 ##  FFTW_LIBS       FFTW Libraries needed to build TINKER
 ##  APBSDIR         APBS Top-Level Directory
-##  APBS_INC_DIR    Directory with APBS Include Files
-##  APBS_LIB_DIR    Directory with APBS Libraries
+##  APBS_INCDIR     Directory with APBS Include Files
+##  APBS_LIBDIR     Directory with APBS Libraries
 ##  APBS_LIBS       APBS Libraries needed to build TINKER
+##  FFEDIR          FFE Top-Level Directory
+##  JAVA_INCDIR     Java Include File Directories Bundled JRE
 
-TINKERDIR = $(HOME)/tinker
+BUILDDIR = /Users/ponder/ffe/build
+
+TINKERDIR = $(BUILDDIR)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
 
-FFTWDIR = $(TINKERDIR)/fftw
+FFTWDIR = $(BUILDDIR)/fftw
 FFTW_LIBDIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
 
-APBSDIR = $(TINKERDIR)/apbs
+APBSDIR = $(BUILDDIR)/apbs
 APBS_INCDIR = -I$(APBSDIR)/include
 APBS_LIBDIR = -L$(APBSDIR)/lib
 APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
+
+FFEDIR = $(BUILDDIR)/ffe
+JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:     TINKER (no APBS or FFE Support)
-##  OS Type:   Generic Linux
-##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 6.2
-##  Parallel:  OpenMP
+##  Build:    TINKER (with APBS and FFE Support)
+##  OS Type:  Generic Linux
+##  CPU Type: Intel x86 Compatible (also AMD)
+##  Compiler: GNU gfortran 6.2
+##  Parallel: OpenMP
 
+#CC = gcc
 #F77 = gfortran
+#CCFLAGS = -c
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
-#LIBS = 
+#LIBS = -lstdc++
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
-##  Build:     TINKER (no APBS or FFE Support)
-##  OS Type:   Apple MacOS
-##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 6.2
-##  Parallel:  OpenMP
+##  Build:    TINKER (with APBS and FFE Support)
+##  OS Type:  Apple MacOS
+##  CPU Type: Intel x86 Compatible
+##  Compiler: GNU gfortran 6.2
+##  Parallel: OpenMP
 
+CC = gcc
 F77 = gfortran
+CCFLAGS = -c
 F77FLAGS = -c
 OPTFLAGS = -Ofast -mavx -fopenmp
 LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-LIBS = 
+LIBS = -lstdc++
 LIBFLAGS = -crusv
 RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-libgcc
+LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework JavaVM -framework \
+            CoreFoundation
 
-##  Build:     TINKER (no APBS or FFE Support)
-##  OS Type:   Generic Linux
-##  CPU Type:  Intel x86 Compatible (also AMD)
-##  Compiler:  Intel Fortran for Linux 15.0
-##  Parallel:  OpenMP
+##  Build:    TINKER (Standalone)
+##  OS Type:  Generic Linux
+##  CPU Type: Intel x86 Compatible (also AMD)
+##  Oper Sys: Fedora Core
+##  Compiler: Intel Fortran for Linux 15.0
+##  Parallel: OpenMP
 
 #F77 = ifort
 #F77FLAGS = -c -xHost
@@ -105,11 +119,12 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RANLIB = echo
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
-##  Build:     TINKER (no APBS or FFE Support)
-##  OS Type:   Apple MacOS
-##  CPU Type:  Intel Xeon
-##  Compiler:  Intel Fortran for MacOS 15.0
-##  Parallel:  OpenMP
+##  Build:    TINKER (Standalone)
+##  OS Type:  Macintosh
+##  CPU Type: Intel x86 Compatible
+##  Oper Sys: MacOS 10.11 (El Capitan)
+##  Compiler: Intel Fortran for MacOS 15.0
+##  Parallel: OpenMP
 
 #F77 = ifort
 #F77FLAGS = -c -axSSSE3
@@ -714,11 +729,14 @@ EXEFILES = alchemy.x \
            xyzpdb.x \
            xyzsybyl.x
 
+%.o: %.c
+	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${APBS_INCDIR} ${OPTFLAGS} $<
+
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} ${LIBDIR} ${FFTW_LIBDIR} -o $@ $^ ${LIBS} ${FFTW_LIBS}; strip $@
+	${F77} ${LINKFLAGS} ${LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
 
 all:	${EXEFILES}
 
@@ -1412,7 +1430,7 @@ atmlst.o:
 atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o sizes.o
-bar.o: atoms.o boxes.o energi.o files.o inform.o iounit.o keys.o sizes.o titles.o units.o
+bar.o: atoms.o boxes.o energi.o files.o inform.o iounit.o keys.o sizes.o units.o
 basefile.o: ascii.o files.o
 bath.o:
 beeman.o: atomid.o atoms.o freeze.o mdstuf.o moldyn.o sizes.o units.o usage.o
@@ -1529,8 +1547,8 @@ emm3hb1.o: atmlst.o atomid.o atoms.o bndstr.o bound.o boxes.o cell.o chgpot.o co
 emm3hb2.o: atmlst.o atomid.o atoms.o bndstr.o bound.o cell.o chgpot.o couple.o group.o hessn.o shunt.o sizes.o vdw.o vdwpot.o
 emm3hb3.o: action.o analyz.o atmlst.o atomid.o atoms.o bndstr.o bound.o boxes.o cell.o chgpot.o couple.o energi.o group.o inform.o inter.o iounit.o light.o limits.o molcul.o neigh.o shunt.o sizes.o usage.o vdw.o vdwpot.o
 empole.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o group.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o sizes.o usage.o
-empole1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o group.o inter.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o sizes.o usage.o virial.o
-empole2.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o group.o hessn.o limits.o molcul.o mplpot.o mpole.o neigh.o potent.o shunt.o sizes.o usage.o
+empole1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o group.o inter.o limits.o math.o molcul.o mplpot.o mpole.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o usage.o virial.o
+empole2.o: atoms.o bound.o boxes.o chgpot.o couple.o deriv.o group.o hessn.o limits.o molcul.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o usage.o
 empole3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o sizes.o usage.o
 energi.o:
 energy.o: bound.o energi.o iounit.o limits.o potent.o rigid.o sizes.o vdwpot.o
@@ -1547,8 +1565,8 @@ epitors1.o: atoms.o bound.o deriv.o energi.o group.o pitors.o sizes.o torpot.o u
 epitors2.o: angbnd.o atoms.o bound.o deriv.o group.o hessn.o pitors.o sizes.o torpot.o usage.o
 epitors3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o iounit.o math.o pitors.o sizes.o torpot.o usage.o
 epolar.o: atoms.o boxes.o chgpot.o energi.o ewald.o limits.o math.o mpole.o polar.o potent.o sizes.o units.o
-epolar1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o limits.o math.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o virial.o
-epolar2.o: atoms.o bound.o cell.o chgpot.o couple.o deriv.o hessn.o limits.o mpole.o neigh.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o
+epolar1.o: atoms.o chgpot.o couple.o deriv.o energi.o limits.o mpole.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o virial.o
+epolar2.o:
 epolar3.o: action.o analyz.o atomid.o atoms.o boxes.o chgpot.o energi.o ewald.o inform.o iounit.o limits.o math.o mpole.o polar.o potent.o sizes.o units.o
 erf.o: iounit.o math.o
 erxnfld.o: atoms.o chgpot.o energi.o mpole.o rxnfld.o rxnpot.o shunt.o sizes.o usage.o
@@ -1636,7 +1654,7 @@ induce.o: atoms.o bound.o boxes.o cell.o couple.o ewald.o gkstuf.o group.o infor
 inertia.o: atomid.o atoms.o iounit.o math.o sizes.o
 inform.o:
 initatom.o: ptable.o
-initial.o: align.o atoms.o bath.o bound.o boxes.o cell.o files.o group.o inform.o iounit.o keys.o linmin.o minima.o molcul.o mutant.o neigh.o openmp.o output.o params.o pdb.o precis.o rigid.o scales.o sequen.o sizes.o socket.o virial.o warp.o zclose.o
+initial.o: align.o atoms.o bath.o bound.o boxes.o cell.o files.o group.o inform.o iounit.o keys.o linmin.o minima.o molcul.o mutant.o neigh.o openmp.o output.o params.o pdb.o precis.o rigid.o scales.o sequen.o sizes.o socket.o warp.o zclose.o
 initprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kdipol.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o rxnpot.o sizes.o solute.o torpot.o units.o urypot.o vdwpot.o
 initres.o: resdue.o
 initrot.o: atoms.o couple.o group.o inform.o iounit.o math.o omega.o potent.o restrn.o rotbnd.o sizes.o usage.o zcoord.o

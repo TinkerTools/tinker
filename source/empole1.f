@@ -2968,7 +2968,7 @@ c
       call grid_mpole (fmp)
       call fftfront
 c
-c     make the scalar summation over reciprocal lattice
+c     initialize variables required for the scalar summation
 c
       ntot = nfft1 * nfft2 * nfft3
       pterm = (pi/aewald)**2
@@ -2977,6 +2977,9 @@ c
       nf1 = (nfft1+1) / 2
       nf2 = (nfft2+1) / 2
       nf3 = (nfft3+1) / 2
+c
+c     make the scalar summation over reciprocal lattice
+c
       do i = 1, ntot-1
          k3 = i/nff + 1
          j = i - (k3-1)*nff

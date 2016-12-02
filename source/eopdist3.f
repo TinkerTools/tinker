@@ -152,7 +152,7 @@ c
                end if
                write (iout,30)  ia,name(ia),ib,name(ib),ic,
      &                          name(ic),id,name(id),sqrt(dt2),e
-   30          format (' O-P-Dist',2x,(i7,'-',a3),f11.4,f12.4)
+   30          format (' O-P-Dist',2x,4(i7,'-',a3),f11.4,f12.4)
             end if
          end if
       end do

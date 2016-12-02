@@ -4293,6 +4293,16 @@ c     get the fractional to Cartesian transformation matrix
 c
       call frac_to_cart (ftc)
 c
+c     initialize variables required for the scalar summation
+c
+      ntot = nfft1 * nfft2 * nfft3
+      pterm = (pi/aewald)**2
+      volterm = pi * volbox
+      nff = nfft1 * nfft2
+      nf1 = (nfft1+1) / 2
+      nf2 = (nfft2+1) / 2
+      nf3 = (nfft3+1) / 2
+c
 c     remove scalar sum virial from prior multipole 3-D FFT
 c
       if (use_mpole) then
@@ -4642,13 +4652,6 @@ c
 c
 c     make the scalar summation over reciprocal lattice
 c
-      ntot = nfft1 * nfft2 * nfft3
-      pterm = (pi/aewald)**2
-      volterm = pi * volbox
-      nff = nfft1 * nfft2
-      nf1 = (nfft1+1) / 2
-      nf2 = (nfft2+1) / 2
-      nf3 = (nfft3+1) / 2
       do i = 1, ntot-1
          k3 = i/nff + 1
          j = i - (k3-1)*nff
