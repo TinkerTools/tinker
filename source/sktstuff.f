@@ -5,226 +5,6 @@ c     ##  COPYRIGHT (C) 2002 by Michael Schnieders & Jay W. Ponder  ##
 c     ##                     All Rights Reserved                    ##
 c     ################################################################
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine sktopt  --  send current optimization info  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "sktopt" sends the current optimization info via a socket
-c
-c
-      subroutine sktopt (ncycle,eopt)
-      use sizes
-      use atoms
-      use deriv
-      use mpole
-      use polar
-      use potent
-      use socket
-      implicit none
-      integer i,k,ncycle
-      integer flag
-      real*8 eopt
-      real*8, allocatable :: px(:)
-      real*8, allocatable :: py(:)
-      real*8, allocatable :: pz(:)
-c
-c
-c     check to see if the Server has been created
-c
-      runtyp = 2
-      if (.not. skt_init)  call sktinit ()
-      if (.not. use_socket)  return
-c
-c     save the current step number and energy
-c
-      cstep = ncycle
-      cenergy = eopt
-c
-c     check to see if an update is needed
-c
-      flag = 1
-      if (.not. skt_close)  call needupdate (flag)
-      if (flag .eq. 0)  return
-c
-c     get the monitor for the update structure
-c
-      call getmonitor ()
-c
-c     load the coordinates and energy information
-c
-      call setcoordinates (n,x,y,z)
-      call setstep (ncycle)
-      call setenergy (eopt)
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not. allocated(cdx))  allocate (cdx(n))
-      if (.not. allocated(cdy))  allocate (cdy(n))
-      if (.not. allocated(cdz))  allocate (cdz(n))
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (px(n))
-      allocate (py(n))
-      allocate (pz(n))
-c
-c     load the gradient and induced dipole information
-c
-      do i = 1, n
-         cdx(i) = desum(1,i)
-         cdy(i) = desum(2,i)
-         cdz(i) = desum(3,i)
-         px(i) = 0.0d0
-         py(i) = 0.0d0
-         pz(i) = 0.0d0
-      end do
-      call setgradients (n,cdx,cdy,cdz)
-      if (use_polar) then
-          do i = 1, npole
-             k = ipole(i)
-             px(k) = uind(1,i)
-             py(k) = uind(2,i)
-             pz(k) = uind(3,i)
-          end do
-          call setinduced (n,px,py,pz)
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (px)
-      deallocate (py)
-      deallocate (pz)
-c
-c     release the monitor for the system stucture
-c
-      call setupdated ()
-      call releasemonitor ()
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine sktdyn  --   send the current dynamics info  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "sktdyn" sends the current dynamics info via a socket
-c
-c
-      subroutine sktdyn (istep,dt,epot)
-      use sizes
-      use atoms
-      use moldyn
-      use mpole
-      use polar
-      use potent
-      use socket
-      implicit none
-      integer i,k,istep
-      integer flag
-      real*8 dt,time,epot
-      real*8, allocatable :: vx(:)
-      real*8, allocatable :: vy(:)
-      real*8, allocatable :: vz(:)
-      real*8, allocatable :: ax(:)
-      real*8, allocatable :: ay(:)
-      real*8, allocatable :: az(:)
-      real*8, allocatable :: px(:)
-      real*8, allocatable :: py(:)
-      real*8, allocatable :: pz(:)
-c
-c
-c     check to see if the Java objects have been created
-c
-      runtyp = 1
-      if (.not. skt_init)  call sktinit ()
-      if (.not. use_socket)  return
-c
-c     save the current step number, time and energy
-c
-      cstep = istep
-      cdt = dt
-      cenergy = epot
-c
-c     check to see if we need to update the system info
-c
-      flag = 1
-      if (.not. skt_close)  call needupdate (flag)
-      if (flag .eq. 0)  return
-c
-c     get the monitor for the update structure
-c
-      call getmonitor ()
-c
-c     load the coordinated, time and energy information
-c
-      call setcoordinates (n,x,y,z)
-      time = dble(istep) * dt
-      call setmdtime (time)
-      call setenergy (epot)
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (vx(n))
-      allocate (vy(n))
-      allocate (vz(n))
-      allocate (ax(n))
-      allocate (ay(n))
-      allocate (az(n))
-      allocate (px(n))
-      allocate (py(n))
-      allocate (pz(n))
-c
-c     load the velocity and acceleration information
-c
-      do i = 1, n
-         vx(i) = v(1,i)
-         vy(i) = v(2,i)
-         vz(i) = v(3,i)
-         ax(i) = a(1,i)
-         ay(i) = a(2,i)
-         az(i) = a(3,i)
-         px(i) = 0.0d0
-         py(i) = 0.0d0
-         pz(i) = 0.0d0
-      end do
-      call setvelocity (n,vx,vy,vz)
-      call setacceleration (n,ax,ay,az)
-      if (use_polar) then
-          do i = 1, npole
-             k = ipole(i)
-             px(k) = uind(1,i)
-             py(k) = uind(2,i)
-             pz(k) = uind(3,i)
-          end do
-          call setinduced (n,px,py,pz)
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (vx)
-      deallocate (vy)
-      deallocate (vz)
-      deallocate (ax)
-      deallocate (ay)
-      deallocate (az)
-      deallocate (px)
-      deallocate (py)
-      deallocate (pz)
-c
-c     release the monitor for the update stucture
-c
-      call setupdated ()
-      call releasemonitor ()
-      return
-      end
-c
-c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine sktinit  --  initialize socket communication  ##
@@ -355,6 +135,226 @@ c
       end
 c
 c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine sktdyn  --   send the current dynamics info  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "sktdyn" sends the current dynamics info via a socket
+c
+c
+      subroutine sktdyn (istep,dt,epot)
+      use sizes
+      use atoms
+      use moldyn
+      use mpole
+      use polar
+      use potent
+      use socket
+      implicit none
+      integer i,k,istep
+      integer flag
+      real*8 dt,time,epot
+      real*8, allocatable :: vx(:)
+      real*8, allocatable :: vy(:)
+      real*8, allocatable :: vz(:)
+      real*8, allocatable :: ax(:)
+      real*8, allocatable :: ay(:)
+      real*8, allocatable :: az(:)
+      real*8, allocatable :: px(:)
+      real*8, allocatable :: py(:)
+      real*8, allocatable :: pz(:)
+c
+c
+c     check to see if the Java objects have been created
+c
+      runtyp = 1
+      if (.not. skt_init)  call sktinit ()
+      if (.not. use_socket)  return
+c
+c     save the current step number, time and energy
+c
+      cstep = istep
+      cdt = dt
+      cenergy = epot
+c
+c     check to see if we need to update the system info
+c
+      flag = 1
+      if (.not. skt_close)  call needupdate (flag)
+      if (flag .eq. 0)  return
+c
+c     get the monitor for the update structure
+c
+      call getmonitor ()
+c
+c     load the coordinated, time and energy information
+c
+      call setcoordinates (n,x,y,z)
+      time = dble(istep) * dt
+      call setmdtime (time)
+      call setenergy (epot)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (vx(n))
+      allocate (vy(n))
+      allocate (vz(n))
+      allocate (ax(n))
+      allocate (ay(n))
+      allocate (az(n))
+      allocate (px(n))
+      allocate (py(n))
+      allocate (pz(n))
+c
+c     load the velocity and acceleration information
+c
+      do i = 1, n
+         vx(i) = v(1,i)
+         vy(i) = v(2,i)
+         vz(i) = v(3,i)
+         ax(i) = a(1,i)
+         ay(i) = a(2,i)
+         az(i) = a(3,i)
+         px(i) = 0.0d0
+         py(i) = 0.0d0
+         pz(i) = 0.0d0
+      end do
+      call setvelocity (n,vx,vy,vz)
+      call setacceleration (n,ax,ay,az)
+      if (use_polar) then
+          do i = 1, npole
+             k = ipole(i)
+             px(k) = uind(1,i)
+             py(k) = uind(2,i)
+             pz(k) = uind(3,i)
+          end do
+          call setinduced (n,px,py,pz)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (vx)
+      deallocate (vy)
+      deallocate (vz)
+      deallocate (ax)
+      deallocate (ay)
+      deallocate (az)
+      deallocate (px)
+      deallocate (py)
+      deallocate (pz)
+c
+c     release the monitor for the update stucture
+c
+      call setupdated ()
+      call releasemonitor ()
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine sktopt  --  send current optimization info  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "sktopt" sends the current optimization info via a socket
+c
+c
+      subroutine sktopt (ncycle,eopt)
+      use sizes
+      use atoms
+      use deriv
+      use mpole
+      use polar
+      use potent
+      use socket
+      implicit none
+      integer i,k,ncycle
+      integer flag
+      real*8 eopt
+      real*8, allocatable :: px(:)
+      real*8, allocatable :: py(:)
+      real*8, allocatable :: pz(:)
+c
+c
+c     check to see if the Server has been created
+c
+      runtyp = 2
+      if (.not. skt_init)  call sktinit ()
+      if (.not. use_socket)  return
+c
+c     save the current step number and energy
+c
+      cstep = ncycle
+      cenergy = eopt
+c
+c     check to see if an update is needed
+c
+      flag = 1
+      if (.not. skt_close)  call needupdate (flag)
+      if (flag .eq. 0)  return
+c
+c     get the monitor for the update structure
+c
+      call getmonitor ()
+c
+c     load the coordinates and energy information
+c
+      call setcoordinates (n,x,y,z)
+      call setstep (ncycle)
+      call setenergy (eopt)
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(cdx))  allocate (cdx(n))
+      if (.not. allocated(cdy))  allocate (cdy(n))
+      if (.not. allocated(cdz))  allocate (cdz(n))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (px(n))
+      allocate (py(n))
+      allocate (pz(n))
+c
+c     load the gradient and induced dipole information
+c
+      do i = 1, n
+         cdx(i) = desum(1,i)
+         cdy(i) = desum(2,i)
+         cdz(i) = desum(3,i)
+         px(i) = 0.0d0
+         py(i) = 0.0d0
+         pz(i) = 0.0d0
+      end do
+      call setgradients (n,cdx,cdy,cdz)
+      if (use_polar) then
+          do i = 1, npole
+             k = ipole(i)
+             px(k) = uind(1,i)
+             py(k) = uind(2,i)
+             pz(k) = uind(3,i)
+          end do
+          call setinduced (n,px,py,pz)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (px)
+      deallocate (py)
+      deallocate (pz)
+c
+c     release the monitor for the system stucture
+c
+      call setupdated ()
+      call releasemonitor ()
+      return
+      end
+c
+c
 c     ###########################################################
 c     ##                                                       ##
 c     ##  subroutine sktkill  --  shutdown the server and JVM  ##
@@ -387,6 +387,6 @@ c
 c
 c     shutdown the Java virtual machine
 c
-      call destroyjvm ()
+c     call destroyjvm ()
       return
       end
