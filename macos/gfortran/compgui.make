@@ -8,4 +8,4 @@
 #  ################################################################
 #
 #
-gcc -c -O3 server.c -I /Library/Java/Home/include
+gcc -c -O2 server.c -I /Library/Java/Home/include
