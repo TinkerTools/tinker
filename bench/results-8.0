@@ -14,7 +14,7 @@
  Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40      12.2      35.6    116.3
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93      11.1      31.3     85.2
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66      12.0      33.9     91.8
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60       6.8      19.2     54.6
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60       7.5      20.2     54.1
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60       8.9      19.3     57.8
 
  Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
@@ -28,7 +28,7 @@
  Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40      33.0      49.8    205.9
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93      25.8      39.9    146.0
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66      27.7      42.9    156.9
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60      17.9      26.3     94.9
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60      18.6      26.4     95.3
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60      21.3      27.8    110.9
 
  Benchmark #3: Crambin Normal Mode Calculation (Serial)
@@ -42,7 +42,7 @@
  Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40                27.6
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93                25.7
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66                24.2
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                14.5
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                13.7
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                10.9
 
  Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
@@ -57,7 +57,7 @@
  Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40               154.0
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93               144.2
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66               155.0
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                93.6
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                87.9
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                88.0
 
  Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
@@ -73,7 +73,7 @@
  Dell PowerEdge R720 (CentOS 5, GNU 4.9)     2.40               100.7
  Apple Xserve 3.1 (MacOS 10.12, GNU 6.2)     2.93                76.3
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66                80.9
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                54.2
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60                54.4
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60                58.8
 
  Benchmark #6: MD on DHFR in Water using CHARMM (OpenMP Parallel)
@@ -101,10 +101,10 @@
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66        12/8      34.2 (2.27)
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66        12/12     32.5 (2.39)
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66        12/24     34.8 (2.24)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/1      47.2 (1.00)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2      35.3 (1.34)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4      26.6 (1.77)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8      22.1 (2.14)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/1      45.9 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2      34.3 (1.34)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4      26.1 (1.76)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8      21.6 (2.13)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/1      49.9 (1.00)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/2      30.0 (1.66)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4      18.7 (2.67)
@@ -136,10 +136,10 @@
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66        12/8      99.3 (3.42)
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66        12/12     91.4 (3.71)
  Mac Pro 5.1 (OSX 10.11, GNU 6.2)            2.66        12/24    106.8 (3.18)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/1     232.1 (1.00)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2     170.3 (1.36)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4     102.9 (2.26)
- MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8      81.2 (2.86)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/1     222.3 (1.00)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/2     166.4 (1.34)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/4      99.3 (2.24)
+ MacBook Pro 11.3 (OSX 10.11, GNU 6.2)       2.60         4/8      78.3 (2.84)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/1     263.5 (1.00)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/2     151.8 (1.74)
  MacBook Pro 11.3 (OSX 10.11, Intel 15.0)    2.60         4/4      98.8 (2.67)

@@ -718,7 +718,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} ${LIBDIR} ${FFTW_LIBDIR} -o $@ $^ ${LIBS} ${FFTW_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${LIBS} ${FFTW_LIBS}; strip $@
 
 all:	${EXEFILES}
 
@@ -728,7 +728,7 @@ clean:
 	rm -f *.o *.mod *.a *.x
 
 listing:
-	cat *.i *.f *.c > tinker.txt
+	cat *.f *.c > tinker.txt
 
 rename:
 	mv  alchemy.x    $(BINDIR)/alchemy
