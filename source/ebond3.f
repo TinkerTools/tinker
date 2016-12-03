@@ -78,7 +78,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer,
-!$OMP& name,verbose,debug,header)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ebo,nebo,aebo)
 !$OMP DO reduction(+:ebo,nebo,aebo) schedule(guided)
 c

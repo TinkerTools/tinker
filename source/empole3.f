@@ -601,8 +601,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,header,
-!$OMP& verbose,debug,name,emo,eintero,nemo,aemo)
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,name,
+!$OMP& verbose,debug,header,iout,emo,eintero,nemo,aemo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo,eintero,nemo,aemo) schedule(guided)
 c
@@ -1612,7 +1612,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,molcule,header,verbose,debug,name,emo,eintrao,nemo,aemo)
+!$OMP& aewald,molcule,name,verbose,debug,header,iout,emo,eintrao,
+!$OMP& nemo,aemo)
 !$OMP& firstprivate(mscale)
 !$OMP DO reduction(+:emo,eintrao,nemo,aemo) schedule(guided)
 c

@@ -98,7 +98,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer,
-!$OMP& name,verbose,debug,header)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ebto,nebto,aebto)
 !$OMP DO reduction(+:ebto,nebto,aebto) schedule(guided)
 c
