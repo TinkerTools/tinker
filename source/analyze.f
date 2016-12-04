@@ -929,7 +929,7 @@ c
          end do
       end if
 c
-c     parameters used for pi-orbital torsion interactions
+c     parameters used for pi-system torsion interactions
 c
       if (use_pitors) then
          header = .true.
@@ -2161,7 +2161,7 @@ c
          end do
       end if
 c
-c     parameters used for pi-orbital torsion interactions
+c     parameters used for pi-system torsion interactions
 c
       if (use_pitors) then
          header = .true.

@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine kpitors  --  find pi-orbital torsion parameters  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine kpitors  --  find pi-system torsion parameters  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "kpitors" assigns pi-orbital torsion parameters to torsions
+c     "kpitors" assigns pi-system torsion parameters to torsions
 c     needing them, and processes any new or changed values
 c
 c
@@ -43,7 +43,7 @@ c
       character*240 string
 c
 c
-c     process keywords containing pi-orbital torsion parameters
+c     process keywords containing pi-system torsion parameters
 c
       blank = '        '
       header = .true.
@@ -107,7 +107,7 @@ c
       allocate (ipit(6,ntors))
       allocate (kpit(ntors))
 c
-c     assign pi-orbital torsion parameters as required
+c     assign pi-system torsion parameters as required
 c
       npitors = 0
       if (npt .ne. 0) then
@@ -151,7 +151,7 @@ c
          end do
       end if
 c
-c     turn off the pi-orbital torsion potential if it is not used
+c     turn off the pi-system torsion potential if it is not used
 c
 c     if (npitors .eq. 0)  use_pitors = .false.
       return

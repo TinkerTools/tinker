@@ -5,136 +5,6 @@ c     ##  COPYRIGHT (C) 2002 by Michael Schnieders & Jay W. Ponder  ##
 c     ##                     All Rights Reserved                    ##
 c     ################################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine sktinit  --  initialize socket communication  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "sktinit" sets up socket communication with the graphical
-c     user interface by starting a Java virtual machine, initiating
-c     a server, and loading an object with system information
-c
-c
-      subroutine sktinit
-      use sizes
-      use atomid
-      use atoms
-      use charge
-      use couple
-      use files
-      use fields
-      use iounit
-      use inform
-      use keys
-      use polar
-      use socket
-      implicit none
-      integer i
-      integer flag
-      integer, allocatable :: b1(:)
-      integer, allocatable :: b2(:)
-      integer, allocatable :: b3(:)
-      integer, allocatable :: b4(:)
-c
-c
-c     set initialization flag and test for socket usage
-c
-      skt_init = .true.
-      use_socket = .true.
-      call chksocket (flag)
-      if (flag .eq. 0) then
-         use_socket = .false.
-         return
-      end if
-c
-c     create the Java Virtual Machine
-c
-      call createjvm (flag)
-      if (flag .eq. 0) then
-         use_socket = .false.
-         if (debug) then
-            write (iout,10)
-   10       format (/,' SKTINIT  --  Unable to Start Server for',
-     &                 ' Java GUI Communication',
-     &              /,' Check the LD_LIBRARY_PATH and CLASSPATH',
-     &                 ' Environment Variables',/)
-         end if
-         return
-      end if
-c
-c     create the TINKER system object
-c
-      call createsystem (n,nkey,flag)
-      if (flag .eq. 0) then
-         use_socket = .false.
-         return
-      end if
-c
-c     load the keyfile and coordinates information
-c
-      call setfile (filename)
-      call setforcefield (forcefield)
-      do i = 1, nkey
-         call setkeyword (i,keyline(i))
-      end do
-      call setcoordinates (n,x,y,z)
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (b1(n))
-      allocate (b2(n))
-      allocate (b3(n))
-      allocate (b4(n))
-c
-c     load the atom connectivity information
-c
-      do i = 1, n
-         b1(i) = i12(1,i)
-         b2(i) = i12(2,i)
-         b3(i) = i12(3,i)
-         b4(i) = i12(4,i)
-      end do
-      call setconnectivity (n,b1,b2,b3,b4)
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (b1)
-      deallocate (b2)
-      deallocate (b3)
-      deallocate (b4)
-c
-c     load atom type information for the parameter set
-c
-      call setatomtypes (n,type)
-      do i = 1, n
-         call setname (i,name(i))
-         call setstory (i,story(i))
-      end do
-      call setatomic (n,atomic)
-      call setmass (n,mass)
-      call setcharge (n,pchg)
-c
-c     create the TINKER server
-c
-      call createserver (flag)
-      if (flag .eq. 0) then
-         use_socket = .false.
-         return
-      end if
-c
-c     create the update object
-c
-      call createupdate (n,runtyp,npolar,flag)
-      if (flag .eq. 0) then
-         use_socket = .false.
-         return
-      end if
-      return
-      end
-c
-c
 c     ##############################################################
 c     ##                                                          ##
 c     ##  subroutine sktdyn  --   send the current dynamics info  ##
@@ -351,6 +221,136 @@ c     release the monitor for the system stucture
 c
       call setupdated ()
       call releasemonitor ()
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine sktinit  --  initialize socket communication  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "sktinit" sets up socket communication with the graphical
+c     user interface by starting a Java virtual machine, initiating
+c     a server, and loading an object with system information
+c
+c
+      subroutine sktinit
+      use sizes
+      use atomid
+      use atoms
+      use charge
+      use couple
+      use files
+      use fields
+      use iounit
+      use inform
+      use keys
+      use polar
+      use socket
+      implicit none
+      integer i
+      integer flag
+      integer, allocatable :: b1(:)
+      integer, allocatable :: b2(:)
+      integer, allocatable :: b3(:)
+      integer, allocatable :: b4(:)
+c
+c
+c     set initialization flag and test for socket usage
+c
+      skt_init = .true.
+      use_socket = .true.
+      call chksocket (flag)
+      if (flag .eq. 0) then
+         use_socket = .false.
+         return
+      end if
+c
+c     create the Java Virtual Machine
+c
+      call createjvm (flag)
+      if (flag .eq. 0) then
+         use_socket = .false.
+         if (debug) then
+            write (iout,10)
+   10       format (/,' SKTINIT  --  Unable to Start Server for',
+     &                 ' Java GUI Communication',
+     &              /,' Check the LD_LIBRARY_PATH and CLASSPATH',
+     &                 ' Environment Variables',/)
+         end if
+         return
+      end if
+c
+c     create the TINKER system object
+c
+      call createsystem (n,nkey,flag)
+      if (flag .eq. 0) then
+         use_socket = .false.
+         return
+      end if
+c
+c     load the keyfile and coordinates information
+c
+      call setfile (filename)
+      call setforcefield (forcefield)
+      do i = 1, nkey
+         call setkeyword (i,keyline(i))
+      end do
+      call setcoordinates (n,x,y,z)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (b1(n))
+      allocate (b2(n))
+      allocate (b3(n))
+      allocate (b4(n))
+c
+c     load the atom connectivity information
+c
+      do i = 1, n
+         b1(i) = i12(1,i)
+         b2(i) = i12(2,i)
+         b3(i) = i12(3,i)
+         b4(i) = i12(4,i)
+      end do
+      call setconnectivity (n,b1,b2,b3,b4)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (b1)
+      deallocate (b2)
+      deallocate (b3)
+      deallocate (b4)
+c
+c     load atom type information for the parameter set
+c
+      call setatomtypes (n,type)
+      do i = 1, n
+         call setname (i,name(i))
+         call setstory (i,story(i))
+      end do
+      call setatomic (n,atomic)
+      call setmass (n,mass)
+      call setcharge (n,pchg)
+c
+c     create the TINKER server
+c
+      call createserver (flag)
+      if (flag .eq. 0) then
+         use_socket = .false.
+         return
+      end if
+c
+c     create the update object
+c
+      call createupdate (n,runtyp,npolar,flag)
+      if (flag .eq. 0) then
+         use_socket = .false.
+         return
+      end if
       return
       end
 c

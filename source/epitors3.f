@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine epitors3  --  pi-orbit torsion potential energy  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine epitors3  --  pi-system torsion potential energy  ##
+c     ##                                                               ##
+c     ###################################################################
 c
 c
-c     "epitors3" calculates the pi-orbital torsion potential energy;
+c     "epitors3" calculates the pi-system torsion potential energy;
 c     also partitions the energy terms among the atoms
 c
 c
@@ -34,7 +34,9 @@ c
       implicit none
       integer i,ia,ib,ic
       integer id,ie,ig
-      real*8 e,rdc,angle,fgrp
+      integer nepto
+      real*8 e,epto
+      real*8 rdc,angle,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -56,11 +58,12 @@ c
       real*8 xcp,ycp,zcp
       real*8 xdc,ydc,zdc
       real*8 xqd,yqd,zqd
+      real*8, allocatable :: aepto(:)
       logical proceed
       logical header,huge
 c
 c
-c     zero out the pi-orbital torsion energy and partitioning terms
+c     zero out the pi-system torsion energy and partitioning terms
 c
       nept = 0
       ept = 0.0d0
@@ -74,12 +77,32 @@ c
       if (debug .and. npitors.ne.0) then
          header = .false.
          write (iout,10)
-   10    format (/,' Individual Pi-Orbital Torsion Interactions :',
+   10    format (/,' Individual Pi-System Torsion Interactions :',
      &           //,' Type',14x,'Atom Names',32x,'Angle',
      &              6x,'Energy',/)
       end if
 c
-c     calculate the pi-orbital torsion angle energy term
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aepto(n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      epto = ept
+      nepto = nept
+      do i = 1, n
+         aepto(i) = aept(i)
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npitors,ipit,
+!$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer,
+!$OMP& name,verbose,debug,header,iout)
+!$OMP& shared(epto,nepto,aepto)
+!$OMP DO reduction(+:epto,nepto,aepto) schedule(guided)
+c
+c     calculate the pi-system torsion angle energy term
 c
       do i = 1, npitors
          ia = ipit(1,i)
@@ -96,7 +119,7 @@ c
          if (proceed)  proceed = (use(ia) .or. use(ib) .or. use(ic) .or.
      &                              use(id) .or. use(ie) .or. use(ig))
 c
-c     compute the value of the pi-orbital torsion angle
+c     compute the value of the pi-system torsion angle
 c
          if (proceed) then
             xia = x(ia)
@@ -177,7 +200,7 @@ c
                if (angle .gt. 90.0d0)  angle = angle - 180.0d0
                if (angle .lt. -90.0d0)  angle = angle + 180.0d0
 c
-c     set the pi-orbital torsion parameters for this angle
+c     set the pi-system torsion parameters for this angle
 c
                v2 = kpit(i)
                c2 = -1.0d0
@@ -189,7 +212,7 @@ c
                sine2 = 2.0d0 * cosine * sine
                phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
 c
-c     calculate the pi-orbital torsion energy for this angle
+c     calculate the pi-system torsion energy for this angle
 c
                e = ptorunit * v2 * phi2
 c
@@ -197,12 +220,12 @@ c     scale the interaction based on its group membership
 c
                if (use_group)  e = e * fgrp
 c
-c     increment the total pi-orbital torsion angle energy
+c     increment the total pi-system torsion angle energy
 c
-               nept = nept + 1
-               ept = ept + e
-               aept(ic) = aept(ic) + 0.5d0*e
-               aept(id) = aept(id) + 0.5d0*e
+               nepto = nepto + 1
+               epto = epto + e
+               aepto(ic) = aepto(ic) + 0.5d0*e
+               aepto(id) = aepto(id) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -211,7 +234,7 @@ c
                   if (header) then
                      header = .false.
                      write (iout,20)
-   20                format (/,' Individual Pi-Orbital Torsion',
+   20                format (/,' Individual Pi-System Torsion',
      &                          ' Interactions :',
      &                       //,' Type',14x,'Atom Names',32x,'Angle',
      &                          6x,'Energy',/)
@@ -222,5 +245,22 @@ c
             end if
          end if
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ept = epto
+      nept = nepto
+      do i = 1, n
+         aept(i) = aepto(i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aepto)
       return
       end

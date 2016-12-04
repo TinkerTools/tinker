@@ -22,7 +22,7 @@ c     use_opdist  logical flag governing use of out-of-plane distance
 c     use_improp  logical flag governing use of improper dihedral term
 c     use_imptor  logical flag governing use of improper torsion term
 c     use_tors    logical flag governing use of torsional potential
-c     use_pitors  logical flag governing use of pi-orbital torsion term
+c     use_pitors  logical flag governing use of pi-system torsion term
 c     use_strtor  logical flag governing use of stretch-torsion term
 c     use_angtor  logical flag governing use of angle-torsion term
 c     use_tortor  logical flag governing use of torsion-torsion term

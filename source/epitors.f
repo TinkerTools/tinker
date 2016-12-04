@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine epitors  --  pi-orbit torsion potential energy  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epitors  --  pi-system torsion potential energy  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "epitors" calculates the pi-orbital torsion potential energy
+c     "epitors" calculates the pi-system torsion potential energy
 c
 c
       subroutine epitors
@@ -27,7 +27,8 @@ c
       implicit none
       integer i,ia,ib,ic
       integer id,ie,ig
-      real*8 e,rdc,fgrp
+      real*8 e,epto
+      real*8 rdc,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -52,11 +53,22 @@ c
       logical proceed
 c
 c
-c     zero out the pi-orbital torsion potential energy
+c     zero out the pi-system torsion potential energy
 c
       ept = 0.0d0
 c
-c     calculate the pi-orbital torsion angle energy term
+c     transfer global to local copies for OpenMP calculation
+c
+      epto = ept
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npitors,ipit,
+!$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer)
+!$OMP& shared(epto)
+!$OMP DO reduction(+:epto) schedule(guided)
+c
+c     calculate the pi-system torsion angle energy term
 c
       do i = 1, npitors
          ia = ipit(1,i)
@@ -73,7 +85,7 @@ c
          if (proceed)  proceed = (use(ia) .or. use(ib) .or. use(ic) .or.
      &                              use(id) .or. use(ie) .or. use(ig))
 c
-c     compute the value of the pi-orbital torsion angle
+c     compute the value of the pi-system torsion angle
 c
          if (proceed) then
             xia = x(ia)
@@ -149,7 +161,7 @@ c
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xdc*xtu + ydc*ytu + zdc*ztu) / (rdc*rtru)
 c
-c     set the pi-orbital torsion parameters for this angle
+c     set the pi-system torsion parameters for this angle
 c
                v2 = kpit(i)
                c2 = -1.0d0
@@ -161,7 +173,7 @@ c
                sine2 = 2.0d0 * cosine * sine
                phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
 c
-c     calculate the pi-orbital torsion energy for this angle
+c     calculate the pi-system torsion energy for this angle
 c
                e = ptorunit * v2 * phi2
 c
@@ -169,11 +181,20 @@ c     scale the interaction based on its group membership
 c
                if (use_group)  e = e * fgrp
 c
-c     increment the total pi-orbital torsion angle energy
+c     increment the total pi-system torsion angle energy
 c
-               ept = ept + e
+               epto = epto + e
             end if
          end if
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ept = epto
       return
       end

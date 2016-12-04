@@ -15,7 +15,7 @@ c
 c     idihunit  convert improper dihedral energy to kcal/mole
 c     itorunit  convert improper torsion amplitudes to kcal/mole
 c     torsunit  convert torsional parameter amplitudes to kcal/mole
-c     ptorunit  convert pi-orbital torsion energy to kcal/mole
+c     ptorunit  convert pi-system torsion energy to kcal/mole
 c     storunit  convert stretch-torsion energy to kcal/mole
 c     atorunit  convert angle-torsion energy to kcal/mole
 c     ttorunit  convert torsion-torsion energy to kcal/mole

@@ -23,7 +23,7 @@ c     eopd   out-of-plane distance potential energy of the system
 c     eid    improper dihedral potential energy of the system
 c     eit    improper torsion potential energy of the system
 c     et     torsional potential energy of the system
-c     ept    pi-orbital torsion potential energy of the system
+c     ept    pi-system torsion potential energy of the system
 c     ebt    stretch-torsion potential energy of the system
 c     eat    angle-torsion potential energy of the system
 c     ett    torsion-torsion potential energy of the system

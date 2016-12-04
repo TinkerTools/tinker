@@ -5,17 +5,17 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  module kpitor  --  pi-orbit torsion forcefield parameters  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  module kpitor  --  pi-system torsion forcefield parameters  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     maxnpt   maximum number of pi-orbital torsion parameter entries
+c     maxnpt   maximum number of pi-system torsion parameter entries
 c
-c     ptcon    force constant parameters for pi-orbital torsions
-c     kpt      string of atom classes for pi-orbital torsion terms
+c     ptcon    force constant parameters for pi-system torsions
+c     kpt      string of atom classes for pi-system torsion terms
 c
 c
       module kpitor

@@ -22,7 +22,7 @@ c     neopd   number of out-of-plane distance energy terms computed
 c     neid    number of improper dihedral energy terms computed
 c     neit    number of improper torsion energy terms computed
 c     net     number of torsional energy terms computed
-c     nept    number of pi-orbital torsion energy terms computed
+c     nept    number of pi-system torsion energy terms computed
 c     nebt    number of stretch-torsion energy terms computed
 c     neat    number of angle-torsion energy terms computed
 c     nett    number of torsion-torsion energy terms computed

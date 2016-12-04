@@ -12,9 +12,9 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     npitors   total number of pi-orbital torsional interactions
-c     ipit      numbers of the atoms in each pi-orbital torsion
-c     kpit      2-fold pi-orbital torsional force constants
+c     npitors   total number of pi-system torsional interactions
+c     ipit      numbers of the atoms in each pi-system torsion
+c     kpit      2-fold pi-system torsional force constants
 c
 c
       module pitors

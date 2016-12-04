@@ -33,9 +33,9 @@ c
       real*8 de,ideal,force
       real*8 dt,dt2,deddt,fgrp
       real*8 dedx,dedy,dedz
+      real*8 xac,yac,zac,rac
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 xac,yac,zac,rac
       real*8 viro(3,3)
       real*8, allocatable :: deubo(:,:)
       logical proceed

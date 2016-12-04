@@ -824,7 +824,7 @@ c
             t64(1,nt4) = vt(6)
             t64(2,nt4) = st(6)
 c
-c     pi-orbital torsion parameters
+c     pi-system torsion parameters
 c
          else if (keyword(1:7) .eq. 'PITORS ') then
             ia = 0

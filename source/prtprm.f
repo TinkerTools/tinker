@@ -768,7 +768,7 @@ c
   950    continue
       end if
 c
-c     pi-orbital torsion parameters
+c     pi-system torsion parameters
 c
       if (kpt(1) .ne. blank8) then
          write (itxt,960)  formfeed,forcefield

@@ -23,7 +23,7 @@ c     teopd   out-of-plane distance derivatives over torsions
 c     teid    improper dihedral derivatives over torsions
 c     teit    improper torsion derivatives over torsions
 c     tet     torsional derivatives over torsions
-c     tept    pi-orbital torsion derivatives over torsions
+c     tept    pi-system torsion derivatives over torsions
 c     tebt    stretch-torsion derivatives over torsions
 c     teat    angle-torsion derivatives over torsions
 c     tett    torsion-torsion derivatives over torsions

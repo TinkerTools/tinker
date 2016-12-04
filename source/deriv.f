@@ -23,7 +23,7 @@ c     deopd   out-of-plane distance Cartesian coordinate derivatives
 c     deid    improper dihedral Cartesian coordinate derivatives
 c     deit    improper torsion Cartesian coordinate derivatives
 c     det     torsional Cartesian coordinate derivatives
-c     dept    pi-orbital torsion Cartesian coordinate derivatives
+c     dept    pi-system torsion Cartesian coordinate derivatives
 c     debt    stretch-torsion Cartesian coordinate derivatives
 c     deat    angle-torsion Cartesian coordinate derivatives
 c     dett    torsion-torsion Cartesian coordinate derivatives

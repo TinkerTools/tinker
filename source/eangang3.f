@@ -35,7 +35,9 @@ c
       implicit none
       integer i,k,iangang
       integer ia,ib,ic,id,ie
-      real*8 e,dt1,dt2,fgrp
+      integer neaao
+      real*8 e,eaao
+      real*8 dt1,dt2,fgrp
       real*8 angle,dot,cosine
       real*8 xia,yia,zia
       real*8 xib,yib,zib
@@ -48,6 +50,7 @@ c
       real*8 xeb,yeb,zeb
       real*8 rab2,rcb2
       real*8 rdb2,reb2
+      real*8, allocatable :: aeaao(:)
       logical proceed
       logical header,huge
 c
@@ -71,6 +74,26 @@ c
      &              6x,'Angle2',4x,'dAngle1',
      &              3x,'dAngle2',6x,'Energy',/)
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aeaao(n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      eaao = eaa
+      neaao = neaa
+      do i = 1, n
+         aeaao(i) = aeaa(i)
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nangang,iaa,iang,
+!$OMP& use,x,y,z,anat,kaa,aaunit,use_group,use_polymer,
+!$OMP& name,verbose,debug,header,iout)
+!$OMP& shared(eaao,neaao,aeaao)
+!$OMP DO reduction(+:eaao,neaao,aeaao) schedule(guided)
 c
 c     find the energy of each angle-angle interaction
 c
@@ -155,9 +178,9 @@ c
 c
 c     increment the total angle-angle energy
 c
-               neaa = neaa + 1
-               eaa = eaa + e
-               aeaa(ib) = aeaa(ib) + e
+               neaao = neaao + 1
+               eaao = eaao + e
+               aeaao(ib) = aeaao(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -177,5 +200,22 @@ c
             end if
          end if
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      eaa = eaao
+      neaa = neaao
+      do i = 1, n
+         aeaa(i) = aeaao(i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aeaao)
       return
       end

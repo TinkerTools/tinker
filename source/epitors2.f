@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine epitors2  --  pi-orbital torsion Hessian; numer  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epitors2  --  pi-system torsion Hessian; numer  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "epitors2" calculates the second derivatives of the pi-orbital
+c     "epitors2" calculates the second derivatives of the pi-system
 c     torsion energy for a single atom using finite difference methods
 c
 c
@@ -48,7 +48,7 @@ c
       allocate (de(3,n))
       allocate (d0(3,n))
 c
-c     calculate numerical pi-orbital torsion Hessian for current atom
+c     calculate numerical pi-system torsion Hessian for current atom
 c
       do ipitors = 1, npitors
          ia = ipit(1,ipitors)
@@ -171,14 +171,14 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine epitors2a  --  pi-orbital torsion derivatives  ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine epitors2a  --  pi-system torsion derivatives  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "epitors2a" calculates the pi-orbital torsion first derivatives;
+c     "epitors2a" calculates the pi-system torsion first derivatives;
 c     used in computation of finite difference second derivatives
 c
 c
@@ -230,7 +230,7 @@ c
       real*8 de(3,*)
 c
 c
-c     set the atom numbers for this pi-orbital torsion
+c     set the atom numbers for this pi-system torsion
 c
       ia = ipit(1,i)
       ib = ipit(2,i)
@@ -239,7 +239,7 @@ c
       ie = ipit(5,i)
       ig = ipit(6,i)
 c
-c     compute the value of the pi-orbital torsion angle
+c     compute the value of the pi-system torsion angle
 c
       xia = x(ia)
       yia = y(ia)
@@ -314,7 +314,7 @@ c
          cosine = (xt*xu + yt*yu + zt*zu) / rtru
          sine = (xdc*xtu + ydc*ytu + zdc*ztu) / (rdc*rtru)
 c
-c     set the pi-orbital torsion parameters for this angle
+c     set the pi-system torsion parameters for this angle
 c
          v2 = kpit(i)
          c2 = -1.0d0
@@ -326,7 +326,7 @@ c
          sine2 = 2.0d0 * cosine * sine
          dphi2 = 2.0d0 * (cosine2*s2 - sine2*c2)
 c
-c     calculate pi-orbital torsion energy and master chain rule term
+c     calculate pi-system torsion energy and master chain rule term
 c
          dedphi = ptorunit * v2 * dphi2
 c
@@ -345,7 +345,7 @@ c
          dedyu = -dedphi * (zu*xdc - zdc*xu) / (ru2*rdc)
          dedzu = -dedphi * (xu*ydc - xdc*yu) / (ru2*rdc)
 c
-c     compute first derivative components for pi-orbital angle
+c     compute first derivative components for pi-system angle
 c
          dedxip = zdc*dedyt - ydc*dedzt
          dedyip = xdc*dedzt - zdc*dedxt
@@ -381,7 +381,7 @@ c
          dedyid = dedyid + dedyiq - dedyia - dedyib
          dedzid = dedzid + dedziq - dedzia - dedzib
 c
-c     increment the total pi-orbital torsion energy and gradient
+c     increment the total pi-system torsion energy and gradient
 c
          de(1,ia) = dedxia
          de(2,ia) = dedyia

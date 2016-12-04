@@ -23,7 +23,7 @@ c     aeopd   out-of-plane distance energy partitioned over atoms
 c     aeid    improper dihedral energy partitioned over atoms
 c     aeit    improper torsion energy partitioned over atoms
 c     aet     torsional energy partitioned over atoms
-c     aept    pi-orbital torsion energy partitioned over atoms
+c     aept    pi-system torsion energy partitioned over atoms
 c     aebt    stretch-torsion energy partitioned over atoms
 c     aeat    angle-torsion energy partitioned over atoms
 c     aett    torsion-torsion energy partitioned over atoms

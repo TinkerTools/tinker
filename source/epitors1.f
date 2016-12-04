@@ -5,14 +5,14 @@ c     ##  COPYRIGHT (C)  2003  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine epitors1  --  pi-orbit torsion energy & derivs  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epitors1  --  pi-system torsion energy & derivs  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "epitors1" calculates the pi-orbital torsion potential energy
+c     "epitors1" calculates the pi-system torsion potential energy
 c     and first derivatives with respect to Cartesian coordinates
 c
 c
@@ -30,7 +30,8 @@ c
       implicit none
       integer i,ia,ib,ic
       integer id,ie,ig
-      real*8 e,dedphi,fgrp
+      real*8 e,epto
+      real*8 dedphi,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu
@@ -69,10 +70,12 @@ c
       real*8 vxterm,vyterm,vzterm
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 viro(3,3)
+      real*8, allocatable :: depto(:,:)
       logical proceed
 c
 c
-c     zero out the pi-orbital torsion energy and first derivatives
+c     zero out the pi-system torsion energy and first derivatives
 c
       ept = 0.0d0
       do i = 1, n
@@ -81,7 +84,32 @@ c
          dept(3,i) = 0.0d0
       end do
 c
-c     calculate the pi-orbital torsion angle energy and derivatives
+c     perform dynamic allocation of some local arrays
+c
+      allocate (depto(3,n))
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      epto = ept
+      do i = 1, n
+         depto(1,i) = dept(1,i)
+         depto(2,i) = dept(2,i)
+         depto(3,i) = dept(3,i)
+      end do
+      do i = 1, 3
+         viro(1,i) = vir(1,i)
+         viro(2,i) = vir(2,i)
+         viro(3,i) = vir(3,i)
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npitors,ipit,
+!$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer)
+!$OMP& shared(epto,depto,viro)
+!$OMP DO reduction(+:epto,depto,viro) schedule(guided)
+c
+c     calculate the pi-system torsion angle energy and derivatives
 c
       do i = 1, npitors
          ia = ipit(1,i)
@@ -98,7 +126,7 @@ c
          if (proceed)  proceed = (use(ia) .or. use(ib) .or. use(ic) .or.
      &                              use(id) .or. use(ie) .or. use(ig))
 c
-c     compute the value of the pi-orbital torsion angle
+c     compute the value of the pi-system torsion angle
 c
          if (proceed) then
             xia = x(ia)
@@ -174,7 +202,7 @@ c
                cosine = (xt*xu + yt*yu + zt*zu) / rtru
                sine = (xdc*xtu + ydc*ytu + zdc*ztu) / (rdc*rtru)
 c
-c     set the pi-orbital torsion parameters for this angle
+c     set the pi-system torsion parameters for this angle
 c
                v2 = kpit(i)
                c2 = -1.0d0
@@ -187,7 +215,7 @@ c
                phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
                dphi2 = 2.0d0 * (cosine2*s2 - sine2*c2)
 c
-c     calculate pi-orbital torsion energy and master chain rule term
+c     calculate pi-system torsion energy and master chain rule term
 c
                e = ptorunit * v2 * phi2
                dedphi = ptorunit * v2 * dphi2
@@ -214,7 +242,7 @@ c
                dedyu = -dedphi * (zu*xdc - zdc*xu) / (ru2*rdc)
                dedzu = -dedphi * (xu*ydc - xdc*yu) / (ru2*rdc)
 c
-c     compute first derivative components for pi-orbital angle
+c     compute first derivative components for pi-system angle
 c
                dedxip = zdc*dedyt - ydc*dedzt
                dedyip = xdc*dedzt - zdc*dedxt
@@ -250,27 +278,27 @@ c
                dedyid = dedyid + dedyiq - dedyia - dedyib
                dedzid = dedzid + dedziq - dedzia - dedzib
 c
-c     increment the total pi-orbital torsion energy and gradient
+c     increment the total pi-system torsion energy and gradient
 c
-               ept = ept + e
-               dept(1,ia) = dept(1,ia) + dedxia
-               dept(2,ia) = dept(2,ia) + dedyia
-               dept(3,ia) = dept(3,ia) + dedzia
-               dept(1,ib) = dept(1,ib) + dedxib
-               dept(2,ib) = dept(2,ib) + dedyib
-               dept(3,ib) = dept(3,ib) + dedzib
-               dept(1,ic) = dept(1,ic) + dedxic
-               dept(2,ic) = dept(2,ic) + dedyic
-               dept(3,ic) = dept(3,ic) + dedzic
-               dept(1,id) = dept(1,id) + dedxid
-               dept(2,id) = dept(2,id) + dedyid
-               dept(3,id) = dept(3,id) + dedzid
-               dept(1,ie) = dept(1,ie) + dedxie
-               dept(2,ie) = dept(2,ie) + dedyie
-               dept(3,ie) = dept(3,ie) + dedzie
-               dept(1,ig) = dept(1,ig) + dedxig
-               dept(2,ig) = dept(2,ig) + dedyig
-               dept(3,ig) = dept(3,ig) + dedzig
+               epto = epto + e
+               depto(1,ia) = depto(1,ia) + dedxia
+               depto(2,ia) = depto(2,ia) + dedyia
+               depto(3,ia) = depto(3,ia) + dedzia
+               depto(1,ib) = depto(1,ib) + dedxib
+               depto(2,ib) = depto(2,ib) + dedyib
+               depto(3,ib) = depto(3,ib) + dedzib
+               depto(1,ic) = depto(1,ic) + dedxic
+               depto(2,ic) = depto(2,ic) + dedyic
+               depto(3,ic) = depto(3,ic) + dedzic
+               depto(1,id) = depto(1,id) + dedxid
+               depto(2,id) = depto(2,id) + dedyid
+               depto(3,id) = depto(3,id) + dedzid
+               depto(1,ie) = depto(1,ie) + dedxie
+               depto(2,ie) = depto(2,ie) + dedyie
+               depto(3,ie) = depto(3,ie) + dedzie
+               depto(1,ig) = depto(1,ig) + dedxig
+               depto(2,ig) = depto(2,ig) + dedyig
+               depto(3,ig) = depto(3,ig) + dedzig
 c
 c     increment the internal virial tensor components
 c
@@ -283,17 +311,40 @@ c
                vyy = ydc*vyterm + ycp*dedyip - yqd*dedyiq
                vzy = zdc*vyterm + zcp*dedyip - zqd*dedyiq
                vzz = zdc*vzterm + zcp*dedzip - zqd*dedziq
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
+               viro(1,1) = viro(1,1) + vxx
+               viro(2,1) = viro(2,1) + vyx
+               viro(3,1) = viro(3,1) + vzx
+               viro(1,2) = viro(1,2) + vyx
+               viro(2,2) = viro(2,2) + vyy
+               viro(3,2) = viro(3,2) + vzy
+               viro(1,3) = viro(1,3) + vzx
+               viro(2,3) = viro(2,3) + vzy
+               viro(3,3) = viro(3,3) + vzz
             end if
          end if
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ept = epto
+      do i = 1, n
+         dept(1,i) = depto(1,i)
+         dept(2,i) = depto(2,i)
+         dept(3,i) = depto(3,i)
+      end do
+      do i = 1, 3
+         vir(1,i) = viro(1,i)
+         vir(2,i) = viro(2,i)
+         vir(3,i) = viro(3,i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (depto)
       return
       end
