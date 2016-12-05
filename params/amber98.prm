@@ -3476,8 +3476,8 @@ biotype     779    CH3     "N-MeAmide C-Terminus"            348
 biotype     780    H       "N-MeAmide C-Terminus"            349
 biotype    1001    O5*     "Adenosine"                      1001
 biotype    1002    C5*     "Adenosine"                      1002
-biotype    1003    H5*     "Adenosine"                      1003
-biotype    1004    H5*     "Adenosine"                      1004
+biotype    1003    H5*1    "Adenosine"                      1003
+biotype    1004    H5*2    "Adenosine"                      1004
 biotype    1005    C4*     "Adenosine"                      1005
 biotype    1006    H4*     "Adenosine"                      1006
 biotype    1007    O4*     "Adenosine"                      1007
@@ -3506,8 +3506,8 @@ biotype    1029    H62     "Adenosine"                      1029
 biotype    1030    H8      "Adenosine"                      1030
 biotype    1031    O5*     "Guanosine"                      1031
 biotype    1032    C5*     "Guanosine"                      1032
-biotype    1033    H5*     "Guanosine"                      1033
-biotype    1034    H5*     "Guanosine"                      1034
+biotype    1033    H5*1    "Guanosine"                      1033
+biotype    1034    H5*2    "Guanosine"                      1034
 biotype    1035    C4*     "Guanosine"                      1035
 biotype    1036    H4*     "Guanosine"                      1036
 biotype    1037    O4*     "Guanosine"                      1037
@@ -3537,8 +3537,8 @@ biotype    1060    O6      "Guanosine"                      1060
 biotype    1061    H8      "Guanosine"                      1061
 biotype    1062    O5*     "Cytidine"                       1062
 biotype    1063    C5*     "Cytidine"                       1063
-biotype    1064    H5*     "Cytidine"                       1064
-biotype    1065    H5*     "Cytidine"                       1065
+biotype    1064    H5*1    "Cytidine"                       1064
+biotype    1065    H5*2    "Cytidine"                       1065
 biotype    1066    C4*     "Cytidine"                       1066
 biotype    1067    H4*     "Cytidine"                       1067
 biotype    1068    O4*     "Cytidine"                       1068
@@ -3565,8 +3565,8 @@ biotype    1088    H5      "Cytidine"                       1088
 biotype    1089    H6      "Cytidine"                       1089
 biotype    1090    O5*     "Uridine"                        1090
 biotype    1091    C5*     "Uridine"                        1091
-biotype    1092    H5*     "Uridine"                        1092
-biotype    1093    H5*     "Uridine"                        1093
+biotype    1092    H5*1    "Uridine"                        1092
+biotype    1093    H5*2    "Uridine"                        1093
 biotype    1094    C4*     "Uridine"                        1094
 biotype    1095    H4*     "Uridine"                        1095
 biotype    1096    O4*     "Uridine"                        1096
@@ -3592,8 +3592,8 @@ biotype    1115    H5      "Uridine"                        1115
 biotype    1116    H6      "Uridine"                        1116
 biotype    1117    O5*     "Deoxyadenosine"                 1117
 biotype    1118    C5*     "Deoxyadenosine"                 1118
-biotype    1119    H5*     "Deoxyadenosine"                 1119
-biotype    1120    H5*     "Deoxyadenosine"                 1120
+biotype    1119    H5*1    "Deoxyadenosine"                 1119
+biotype    1120    H5*2    "Deoxyadenosine"                 1120
 biotype    1121    C4*     "Deoxyadenosine"                 1121
 biotype    1122    H4*     "Deoxyadenosine"                 1122
 biotype    1123    O4*     "Deoxyadenosine"                 1123
@@ -3602,8 +3602,8 @@ biotype    1125    H1*     "Deoxyadenosine"                 1125
 biotype    1126    C3*     "Deoxyadenosine"                 1126
 biotype    1127    H3*     "Deoxyadenosine"                 1127
 biotype    1128    C2*     "Deoxyadenosine"                 1128
-biotype    1129    H2*     "Deoxyadenosine"                 1129
-biotype    1130    H2*     "Deoxyadenosine"                 1130
+biotype    1129    H2*1    "Deoxyadenosine"                 1129
+biotype    1130    H2*2    "Deoxyadenosine"                 1130
 biotype    1131    O3*     "Deoxyadenosine"                 1131
 biotype    1132    N9      "Deoxyadenosine"                 1132
 biotype    1133    C4      "Deoxyadenosine"                 1133
@@ -3621,8 +3621,8 @@ biotype    1144    H62     "Deoxyadenosine"                 1144
 biotype    1145    H8      "Deoxyadenosine"                 1145
 biotype    1146    O5*     "Deoxyguanosine"                 1146
 biotype    1147    C5*     "Deoxyguanosine"                 1147
-biotype    1148    H5*     "Deoxyguanosine"                 1148
-biotype    1149    H5*     "Deoxyguanosine"                 1149
+biotype    1148    H5*1    "Deoxyguanosine"                 1148
+biotype    1149    H5*2    "Deoxyguanosine"                 1149
 biotype    1150    C4*     "Deoxyguanosine"                 1150
 biotype    1151    H4*     "Deoxyguanosine"                 1151
 biotype    1152    O4*     "Deoxyguanosine"                 1152
@@ -3631,8 +3631,8 @@ biotype    1154    H1*     "Deoxyguanosine"                 1154
 biotype    1155    C3*     "Deoxyguanosine"                 1155
 biotype    1156    H3*     "Deoxyguanosine"                 1156
 biotype    1157    C2*     "Deoxyguanosine"                 1157
-biotype    1158    H2*     "Deoxyguanosine"                 1158
-biotype    1159    H2*     "Deoxyguanosine"                 1159
+biotype    1158    H2*1    "Deoxyguanosine"                 1158
+biotype    1159    H2*2    "Deoxyguanosine"                 1159
 biotype    1160    O3*     "Deoxyguanosine"                 1160
 biotype    1161    N9      "Deoxyguanosine"                 1161
 biotype    1162    C4      "Deoxyguanosine"                 1162
@@ -3651,8 +3651,8 @@ biotype    1174    O6      "Deoxyguanosine"                 1174
 biotype    1175    H8      "Deoxyguanosine"                 1175
 biotype    1176    O5*     "Deoxycytidine"                  1176
 biotype    1177    C5*     "Deoxycytidine"                  1177
-biotype    1178    H5*     "Deoxycytidine"                  1178
-biotype    1179    H5*     "Deoxycytidine"                  1179
+biotype    1178    H5*1    "Deoxycytidine"                  1178
+biotype    1179    H5*2    "Deoxycytidine"                  1179
 biotype    1180    C4*     "Deoxycytidine"                  1180
 biotype    1181    H4*     "Deoxycytidine"                  1181
 biotype    1182    O4*     "Deoxycytidine"                  1182
@@ -3661,8 +3661,8 @@ biotype    1184    H1*     "Deoxycytidine"                  1184
 biotype    1185    C3*     "Deoxycytidine"                  1185
 biotype    1186    H3*     "Deoxycytidine"                  1186
 biotype    1187    C2*     "Deoxycytidine"                  1187
-biotype    1188    H2*     "Deoxycytidine"                  1188
-biotype    1189    H2*     "Deoxycytidine"                  1189
+biotype    1188    H2*1    "Deoxycytidine"                  1188
+biotype    1189    H2*2    "Deoxycytidine"                  1189
 biotype    1190    O3*     "Deoxycytidine"                  1190
 biotype    1191    N1      "Deoxycytidine"                  1191
 biotype    1192    C2      "Deoxycytidine"                  1192
@@ -3678,8 +3678,8 @@ biotype    1201    H5      "Deoxycytidine"                  1201
 biotype    1202    H6      "Deoxycytidine"                  1202
 biotype    1203    O5*     "Deoxythymidine"                 1203
 biotype    1204    C5*     "Deoxythymidine"                 1204
-biotype    1205    H5*     "Deoxythymidine"                 1205
-biotype    1206    H5*     "Deoxythymidine"                 1206
+biotype    1205    H5*1    "Deoxythymidine"                 1205
+biotype    1206    H5*2    "Deoxythymidine"                 1206
 biotype    1207    C4*     "Deoxythymidine"                 1207
 biotype    1208    H4*     "Deoxythymidine"                 1208
 biotype    1209    O4*     "Deoxythymidine"                 1209
@@ -3688,8 +3688,8 @@ biotype    1211    H1*     "Deoxythymidine"                 1211
 biotype    1212    C3*     "Deoxythymidine"                 1212
 biotype    1213    H3*     "Deoxythymidine"                 1213
 biotype    1214    C2*     "Deoxythymidine"                 1214
-biotype    1215    H2*     "Deoxythymidine"                 1215
-biotype    1216    H2*     "Deoxythymidine"                 1216
+biotype    1215    H2*1    "Deoxythymidine"                 1215
+biotype    1216    H2*2    "Deoxythymidine"                 1216
 biotype    1217    O3*     "Deoxythymidine"                 1217
 biotype    1218    N1      "Deoxythymidine"                 1218
 biotype    1219    C2      "Deoxythymidine"                 1219

@@ -825,8 +825,7 @@ c     print a final status message before exiting TINKER
 c
       if (debug) then
          write (iout,10)
-   10    format (/,' TINKER is Exiting following Normal Termination',
-     &              ' of the Program',/)
+   10    format (/,' TINKER is Exiting following Normal Termination',/)
       end if
 c
 c     ensure any output is written to the storage device
