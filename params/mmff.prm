@@ -288,6 +288,403 @@ atom        214   99    MG+2  "MAGNESIUM(+2) CATION"        12    24.305    0
 
       ################################
       ##                            ##
+      ##  Atom Class Equivalencies  ##
+      ##                            ##
+      ################################
+
+
+   ######################################################################
+   ##                                                                  ##
+   ##  For angle bends, out-of-plane bends and torsions, if required   ##
+   ##  parameters are not found, atom class equivalency allows use of  ##
+   ##  parameters from another set of atom classes based on step-down  ##
+   ##  procedures [see Ref 1, pg 513-514]. The fifth and last stage    ##
+   ##  provides wild-card defaults for all but the central atom(s).    ##
+   ##                                                                  ##
+   ######################################################################
+
+
+#               class | default classes | type                  
+mmffequiv         1    1    1    1    0   1 # CR           
+mmffequiv         2    2    2    1    0   2 # C=C                
+mmffequiv         2    2    2    1    0   3 # CSP2           
+mmffequiv         3    3    3    1    0   4 # C=O     
+mmffequiv         3    3    3    1    0   5 # C=N                    
+mmffequiv         3    3    3    1    0   6 # CGD
+mmffequiv         3    3    3    1    0   7 # C=OR  
+mmffequiv         3    3    3    1    0   8 # C=ON        
+mmffequiv         3    3    3    1    0   10 # CONN 
+mmffequiv         3    3    3    1    0   11 # COO 
+mmffequiv         3    3    3    3    0   12 # COON     
+mmffequiv         3    3    3    1    0   13 # COOO 
+mmffequiv         3    3    3    1    0   14 # C=OS         
+mmffequiv         3    3    3    1    0   15 # C=S         
+mmffequiv         3    3    3    1    0   16 # C=SN             
+mmffequiv         3    3    3    1    0   17 # CSO2
+mmffequiv         3    3    3    3    0   18 # CS=O
+mmffequiv         3    3    3    3    0   19 # CSS
+mmffequiv         3    3    3    3    0   20 # C=P       
+mmffequiv         4    4    4    1    0   21 # CSP           
+mmffequiv         4    4    4    1    0   22 # =C=              
+mmffequiv         5    5    5    5    0   23 # HC                    
+mmffequiv         5    5    5    5    0   24 # HSI                  
+mmffequiv         6    6    6    6    0   25 # OR
+mmffequiv         6    6    6    6    0   26 # OC=O      
+mmffequiv         6    6    6    6    0   27 # OC=C     
+mmffequiv         6    6    6    6    0   28 # OC=N
+mmffequiv         6    6    6    6    0   29 # OC=S
+mmffequiv         6    6    6    6    0   30 # ONO2
+mmffequiv         6    6    6    6    0   31 # ON=O
+mmffequiv         6    6    6    6    0   32 # OSO3
+mmffequiv         6    6    6    6    0   33 # OSO2
+mmffequiv         6    6    6    6    0   34 # OSO
+mmffequiv         6    6    6    6    0   35 # OS=O
+mmffequiv         6    6    6    6    0   36 # -OS
+mmffequiv         6    6    6    6    0   37 # OPO3
+mmffequiv         6    6    6    6    0   38 # OPO2
+mmffequiv         6    6    6    6    0   39 # OPO
+mmffequiv         6    6    6    6    0   40 # -OP
+mmffequiv         6    6    6    6    0   41 # -O-    
+mmffequiv         7    7    7    6    0   42 # O=C           
+mmffequiv         7    7    7    6    0   43 # O=CN          
+mmffequiv         7    7    7    6    0   44 # O=CR        
+mmffequiv         7    7    7    6    0   45 # O=CO   
+mmffequiv         7    7    7    6    0   46 # O=N 
+mmffequiv         7    7    7    6    0   47 # O=S
+mmffequiv         7    7    7    7    0   48 # O=S=  
+mmffequiv         8    8    8    8    0   49 # NR                
+mmffequiv         9    9    9    8    0   50 # N=C            
+mmffequiv         9    9    9    8    0   51 # N=N     
+mmffequiv        10   10   10    8    0   52 # NC=O          
+mmffequiv        10   10   10    8    0   53 # NC=S       
+mmffequiv        10   10   10    8    0   54 # NN=C       
+mmffequiv        10   10   10    8    0   55 # NN=N       
+mmffequiv        11   11   11   11    0   56 # F               
+mmffequiv        12   12   12   12    0   57 # CL               
+mmffequiv        13   13   13   13    0   58 # BR                
+mmffequiv        14   14   14   14    0   59 # I                 
+mmffequiv        15   15   15   15    0   60 # S         
+mmffequiv        16   16   16   15    0   61 # S=C   
+mmffequiv        17   17   17   15    0   62 # S=O
+mmffequiv        17   17   17   17    0   63 # >S=N            
+mmffequiv        18   18   18   15    0   64 # SO2              
+mmffequiv        18   18   18   15    0   65 # SO2N          
+mmffequiv        18   18   18   15    0   66 # SO3 
+mmffequiv        18   18   18   18    0   68 # SO4
+mmffequiv        18   18   18   15    0   69 # =SO2   
+mmffequiv        18   18   18   15    0   70 # SNO 
+mmffequiv        19   19   19   19    0   71 # SI                
+mmffequiv        20   20    1    1    0   72 # CR4R        
+mmffequiv        21   21   21    5    0   73 # HOR          
+mmffequiv        21   21   21    5    0   74 # HO         
+mmffequiv        21   21   21   21    0   75 # HOM
+mmffequiv        22   22   22    1    0   76 # CR3R       
+mmffequiv        23   23   23    5    0   77 # HNR            
+mmffequiv        23   23   23    5    0   78 # H3N             
+mmffequiv        23   23   23    5    0   79 # HPYL         
+mmffequiv        23   23   23   23    0   80 # HNOX
+mmffequiv        23   23   23   23    0   81 # HNM
+mmffequiv        23   23   23    5    0   82 # HN            
+mmffequiv        24   24   24    5    0   83 # HOCO             
+mmffequiv        24   21   21    5    0   84 # HOP      
+mmffequiv        25   25   25   25    0   85 # PO4         
+mmffequiv        25   25   25   25    0   86 # PO3  
+mmffequiv        25   25   25   25    0   87 # PO2  
+mmffequiv        25   25   25   25    0   88 # PO  
+mmffequiv        25   25   25   25    0   89 # PTET     
+mmffequiv        26   26   26   25    0   90 # P   
+mmffequiv        27   27   28    5    0   91 # HN=N     
+mmffequiv        27   27   28    5    0   92 # HN=C             
+mmffequiv        28   28   28    5    0   93 # HNCO
+mmffequiv        28   28   28    5    0   94 # HNCS            
+mmffequiv        28   28   28    5    0   95 # HNCC
+mmffequiv        28   28   28    5    0   96 # HNCN          
+mmffequiv        28   28   28    5    0   97 # HNNC            
+mmffequiv        28   28   28    5    0   98 # HNNN           
+mmffequiv        28   28   28   28    0   99 # HNSO
+mmffequiv        28   28   28   28    0   100 # HNPO
+mmffequiv        28   28   28   28    0   101 # HNC% 
+mmffequiv        28   28   28    5    0   102 # HSP2     
+mmffequiv        29   29   29    5    0   103 # HOCC    
+mmffequiv        29   29   29    5    0   104 # HOCN          
+mmffequiv        30   30    2    1    0   105 # CE4R          
+mmffequiv        31   31   31   31    0   106 # HOH                   
+mmffequiv        32   32    7    6    0   107 # O2CM   
+mmffequiv        32   32    7    6    0   108 # OXN     
+mmffequiv        32   32    7    6    0   109 # O2N     
+mmffequiv        32   32    7    6    0   110 # O2NO 
+mmffequiv        32   32    7    6    0   111 # O3N   
+mmffequiv        32   32    7    6    0   112 # O-S 
+mmffequiv        32   32    7    6    0   113 # O2S 
+mmffequiv        32   32    7    6    0   114 # O3S    
+mmffequiv        32   32    7    6    0   115 # O4S                
+mmffequiv        32   32    7    6    0   116 # OSMS 
+mmffequiv        32   32    7    6    0   117 # OP        
+mmffequiv        32   32    7    6    0   118 # O2P  
+mmffequiv        32   32    7    6    0   119 # O3P  
+mmffequiv        32   32    7    6    0   120 # O4P    
+mmffequiv        32   32    7    6    0   121 # O4CL  
+mmffequiv        33   33   21    5    0   122 # HOS      
+mmffequiv        34   34    8    8    0   123 # NR+       
+mmffequiv        35   35    6    6    0   124 # OM  
+mmffequiv        35   35    6    6    0   125 # OM2  
+mmffequiv        36   36   36    5    0   126 # HNR+
+mmffequiv        36   36   36   36    0   127 # HIM+
+mmffequiv        36   36   36   36    0   128 # HPD+                   
+mmffequiv        36   36   36    5    0   129 # HNN+     
+mmffequiv        36   36   36    5    0   130 # HNC+ 
+mmffequiv        36   36   36    5    0   131 # HGD+
+mmffequiv        36   36   36   36    0   132 # HN5+     
+mmffequiv        37   37    2    1    0   133 # CB             
+mmffequiv        38   38    9    8    0   134 # NPYD   
+mmffequiv        39   39   10    8    0   135 # NPYL    
+mmffequiv        40   40   10    8    0   136 # NC=C       
+mmffequiv        40   40   10    8    0   137 # NC=N
+mmffequiv        40   40   40   40    0   138 # NC=P
+mmffequiv        40   40   40   40    0   139 # NC%C       
+mmffequiv        41   41    3    1    0   140 # CO2M        
+mmffequiv        41   41    3    1    0   141 # CS2M      
+mmffequiv        42   42   42    8    0   142 # NSP        
+mmffequiv        43   43   10    8    0   143 # NSO2        
+mmffequiv        43   43   43   43    0   144 # NSO3
+mmffequiv        43   43   43   43    0   145 # NPO2
+mmffequiv        43   43   43   43    0   146 # NPO3
+mmffequiv        43   43   43   43    0   147 # NC%N
+mmffequiv        44   44   16   15    0   148 # STHI         
+mmffequiv        45   45   10    8    0   149 # NO2          
+mmffequiv        45   45   10    8    0   150 # NO3        
+mmffequiv        46   46    9    8    0   151 # N=O        
+mmffequiv        47   47   42    8    0   152 # NAZT      
+mmffequiv        48   48    9    8    0   153 # NSO 
+mmffequiv        49   49    6    6    0   154 # O+   
+mmffequiv        50   50   21    5    0   155 # HO+    
+mmffequiv        51   51    7    6    0   156 # O=+        
+mmffequiv        52   52   21    5    0   157 # HO=+        
+mmffequiv        53   53   42    8    0   158 # =N=  
+mmffequiv        54   54    9    8    0   159 # N+=C       
+mmffequiv        54   54    9    8    0   160 # N+=N       
+mmffequiv        55   55   10    8    0   161 # NCN+   
+mmffequiv        56   56   10    8    0   162 # NGD+   
+mmffequiv        57   57    2    1    0   163 # CGD+     
+mmffequiv        57   57    2    1    0   164 # CNN+  
+mmffequiv        58   58   10    8    0   165 # NPD+       
+mmffequiv        59   59    6    6    0   166 # OFUR      
+mmffequiv        60   60    4    1    0   167 # C%      
+mmffequiv        61   61   42    8    0   168 # NR%           
+mmffequiv        62   62   10    8    0   169 # NM         
+mmffequiv        63   63    2    1    0   170 # C5A   
+mmffequiv        64   64    2    1    0   171 # C5B    
+mmffequiv        65   65    9    8    0   172 # N5A    
+mmffequiv        66   66    9    8    0   173 # N5B    
+mmffequiv        67   67    9    8    0   174 # N2OX    
+mmffequiv        68   68    8    8    0   175 # N3OX    
+mmffequiv        69   69    9    8    0   176 # NPOX    
+mmffequiv        70   70   70   70   70   177 # OH2        
+mmffequiv        71   71    5    5    0   178 # HS                    
+mmffequiv        71   71   71   71    0   179 # HS=N
+mmffequiv        71   71    5    5    0   180 # HP
+mmffequiv        72   72   16   15    0   181 # S-P
+mmffequiv        72   72   16   15    0   182 # S2CM      
+mmffequiv        72   72   16   15    0   183 # SM   
+mmffequiv        72   72   16   15    0   184 # SSOM  
+mmffequiv        73   73   18   15    0   185 # SO2M    
+mmffequiv        73   73   18   15    0   186 # SSOM  
+mmffequiv        74   74   17   15    0   187 # =S=O 
+mmffequiv        75   75   26   25    0   188 # -P=C
+mmffequiv        76   76    9    8    0   189 # N5M  
+mmffequiv        77   77   12   12    0   190 # CLO4     
+mmffequiv        78   78    2    1    0   191 # C5  
+mmffequiv        79   79    9    8    0   192 # N5  
+mmffequiv        80   80    2    1    0   193 # CIM+    
+mmffequiv        81   81   10    8    0   194 # NIM+   
+mmffequiv        81   81   81   81    0   195 # N5A+
+mmffequiv        81   81   81   81    0   196 # N5B+
+mmffequiv        81   81   81   81    0   197 # N5+
+mmffequiv        82   82    9    8    0   198 # N5AX 
+mmffequiv        82   82    9    8    0   199 # N5BX 
+mmffequiv        82   82    9    8    0   200 # N5OX 
+mmffequiv        87   87   87   87   87   201 # FE+2
+mmffequiv        88   88   88   88   88   202 # FE+3
+mmffequiv        89   89   89   89   89   203 # F-
+mmffequiv        90   90   90   90   90   204 # CL-
+mmffequiv        91   91   91   91   91   205 # BR-
+mmffequiv        92   92   92   92   92   206 # LI+         
+mmffequiv        93   93   93   93   93   207 # NA+          
+mmffequiv        94   94   94   94   94   208 # K+       
+mmffequiv        95   95   95   95   95   209 # ZINC
+mmffequiv        95   95   95   95   95   210 # ZN+2 
+mmffequiv        96   96   96   96   96   211 # CA+2
+mmffequiv        97   97   97   97   97   212 # CU+1
+mmffequiv        98   98   98   98   98   213 # CU+2
+mmffequiv        99   99   99   99   99   214 # MG+2
+
+
+      ################################################
+      ##                                            ##
+      ##  Atom Class Radii and Electronegativities  ##
+      ##                                            ##
+      ################################################
+
+
+#                 at    coval    Pauling
+#                 num   radius   electroneg
+mmffcovrad         1     0.33     2.20
+mmffcovrad         3     1.34     0.97
+mmffcovrad         4     0.90     1.47
+mmffcovrad         5     0.81     2.01
+mmffcovrad         6     0.77     2.50
+mmffcovrad         7     0.73     3.07
+mmffcovrad         8     0.72     3.50
+mmffcovrad         9     0.74     4.10
+mmffcovrad        11     1.54     1.01
+mmffcovrad        12     1.30     1.23
+mmffcovrad        13     1.22     1.47
+mmffcovrad        14     1.15     1.74
+mmffcovrad        15     1.09     2.06
+mmffcovrad        16     1.03     2.44
+mmffcovrad        17     1.01     2.83
+mmffcovrad        19     1.96     0.91
+mmffcovrad        20     1.74     1.04
+mmffcovrad        21     1.44     1.30
+mmffcovrad        22     1.36     1.50
+mmffcovrad        29     1.38     1.90
+mmffcovrad        30     1.31     1.60
+mmffcovrad        31     1.19     1.82
+mmffcovrad        32     1.20     2.02
+mmffcovrad        33     1.20     2.20
+mmffcovrad        34     1.16     2.48
+mmffcovrad        35     1.15     2.74
+mmffcovrad        37     2.11     0.89
+mmffcovrad        38     1.92     0.99
+mmffcovrad        39     1.62     1.30
+mmffcovrad        40     1.48     1.40
+mmffcovrad        47     1.53     1.90
+mmffcovrad        48     1.48     1.70
+mmffcovrad        49     1.46     1.49
+mmffcovrad        50     1.40     1.72
+mmffcovrad        51     1.41     1.82
+mmffcovrad        52     1.35     2.01
+mmffcovrad        53     1.33     2.21
+mmffcovrad        81     1.51
+mmffcovrad        82     1.53
+mmffcovrad        83     1.55
+
+
+      ############################################
+      ##                                        ##
+      ##  Atom Class Torsional Rule Properties  ##
+      ##                                        ##
+      ############################################
+
+
+   ##################################################################
+   ##                                                              ##
+   ##  Properties of the atom classes; used by an empirical rule   ##
+   ##  to generate default torsion parameters [see Ref V, pg 619]  ##
+   ##                                                              ##
+   ##################################################################
+
+
+#           class   aspec  crd   val   pilp  mltb  arom  lin   sbmb
+mmffprop        1     6     4     4     0     0     0     0     0
+mmffprop        2     6     3     4     0     2     0     0     1
+mmffprop        3     6     3     4     0     2     0     0     1
+mmffprop        4     6     2     4     0     3     0     1     1
+mmffprop        5     1     1     1     0     0     0     0     0
+mmffprop        6     8     2     2     1     0     0     0     0
+mmffprop        7     8     1     2     0     2     0     0     0
+mmffprop        8     7     3     3     1     0     0     0     0
+mmffprop        9     7     2     3     0     2     0     0     1
+mmffprop       10     7     3     3     1     1     0     0     0
+mmffprop       11     9     1     1     1     0     0     0     0
+mmffprop       12    17     1     1     1     0     0     0     0
+mmffprop       13    35     1     1     1     0     0     0     0
+mmffprop       14    53     1     1     1     0     0     0     0
+mmffprop       15    16     2     2     1     0     0     0     0
+mmffprop       16    16     1     2     0     2     0     0     0
+mmffprop       17    16     3     4     0     2     0     0     0
+mmffprop       18    16     4     4     0     0     0     0     0
+mmffprop       19    14     4     4     0     0     0     0     0
+mmffprop       20     6     4     4     0     0     0     0     0
+mmffprop       21     1     1     1     0     0     0     0     0
+mmffprop       22     6     4     4     0     0     0     0     0
+mmffprop       23     1     1     1     0     0     0     0     0
+mmffprop       24     1     1     1     0     0     0     0     0
+mmffprop       25    15     4     4     0     0     0     0     0
+mmffprop       26    15     3     3     1     0     0     0     0
+mmffprop       27     1     1     1     0     0     0     0     0
+mmffprop       28     1     1     1     0     0     0     0     0
+mmffprop       29     1     1     1     0     0     0     0     0
+mmffprop       30     6     3     4     0     2     0     0     1
+mmffprop       31     1     1     1     0     0     0     0     0
+mmffprop       32     8     1    12     1     1     0     0     0
+mmffprop       33     1     1     1     0     0     0     0     0
+mmffprop       34     7     4     4     0     0     0     0     0
+mmffprop       35     8     1     1     1     1     0     0     0
+mmffprop       36     1     1     1     0     0     0     0     0
+mmffprop       37     6     3     4     0     2     1     0     1
+mmffprop       38     7     2     3     0     2     1     0     0
+mmffprop       39     7     3     3     1     1     1     0     1
+mmffprop       40     7     3     3     1     0     0     0     0
+mmffprop       41     6     3     4     0     1     0     0     0
+mmffprop       42     7     1     3     0     3     0     0     0
+mmffprop       43     7     3     3     1     0     0     0     0
+mmffprop       44    16     2     2     1     1     1     0     0
+mmffprop       45     7     3     4     0     2     0     0     0
+mmffprop       46     7     2     3     0     2     0     0     0
+mmffprop       47     7     1     2     0     2     0     0     0
+mmffprop       48     7     2     2     0     0     0     0     0
+mmffprop       49     8     3     3     0     0     0     0     0
+mmffprop       50     1     1     1     0     0     0     0     0
+mmffprop       51     8     2     3     0     2     0     0     0
+mmffprop       52     1     1     1     0     0     0     0     0
+mmffprop       53     7     2     4     0     2     0     1     0
+mmffprop       54     7     3     4     0     2     0     0     1
+mmffprop       55     7     3    34     0     1     0     0     0
+mmffprop       56     7     3    34     0     1     0     0     0
+mmffprop       57     6     3     4     0     2     0     0     1
+mmffprop       58     7     3     4     0     1     1     0     1
+mmffprop       59     8     2     2     1     1     1     0     0
+mmffprop       60     6     1     3     0     3     0     0     0
+mmffprop       61     7     2     4     0     3     0     1     0
+mmffprop       62     7     2     2     1     0     0     0     0
+mmffprop       63     6     3     4     0     2     1     0     1
+mmffprop       64     6     3     4     0     2     1     0     1
+mmffprop       65     7     2     3     0     2     1     0     0
+mmffprop       66     7     2     3     0     2     1     0     0
+mmffprop       67     7     3     4     0     2     0     0     1
+mmffprop       68     7     4     4     0     0     0     0     0
+mmffprop       69     7     3     4     0     1     1     0     0
+mmffprop       70     8     2     2     1     0     0     0     0
+mmffprop       71     1     1     1     0     0     0     0     0
+mmffprop       72    16     1     1     1     1     0     0     0
+mmffprop       73    16     3     3     0     0     0     0     0
+mmffprop       74    16     2     4     0     2     0     0     0
+mmffprop       75    15     2     3     0     2     0     0     1
+mmffprop       76     7     2     2     1     0     0     0     0
+mmffprop       77    17     4     4     0     0     0     0     0
+mmffprop       78     6     3     4     0     2     1     0     1
+mmffprop       79     7     2     3     0     2     1     0     0
+mmffprop       80     6     3     4     0     2     0     0     1
+mmffprop       81     7     3     4     0     1     1     0     1
+mmffprop       82     7     3     4     0     1     1     0     0
+mmffprop       87    26     0     0     0     0     0     0     0
+mmffprop       88    26     0     0     0     0     0     0     0
+mmffprop       89     9     0     0     0     0     0     0     0
+mmffprop       90    17     0     0     0     0     0     0     0
+mmffprop       91    35     0     0     0     0     0     0     0
+mmffprop       92     3     0     0     0     0     0     0     0
+mmffprop       93    11     0     0     0     0     0     0     0
+mmffprop       94    19     0     0     0     0     0     0     0
+mmffprop       95    30     0     0     0     0     0     0     0
+mmffprop       96    20     0     0     0     0     0     0     0
+mmffprop       97    29     0     0     0     0     0     0     0
+mmffprop       98    29     0     0     0     0     0     0     0
+mmffprop       99    12     0     0     0     0     0     0     0
+
+
+      ################################
+      ##                            ##
       ##  Van der Waals Parameters  ##
       ##                            ##
       ################################
@@ -903,12 +1300,19 @@ mmffbond       79     81     4.305          1.356     0
 mmffbond       80     81     8.237          1.335     0
 
 
-      #####################################################
-      ##                                                 ##
-      ##  Use of Bond stretching empirical rule allows   ##
-      ##  generation of missing bond stretch parameters  ##
-      ##                                                 ##
-      #####################################################
+      #################################################
+      ##                                             ##
+      ##  Bond Stretching Empirical Rule Parameters  ##
+      ##                                             ##
+      #################################################
+
+
+   ##############################################################
+   ##                                                          ##
+   ##  Values for empirical rule used to generate any missing  ##
+   ##  bond stretch parameters                                 ##
+   ##                                                          ##
+   ##############################################################
 
 
 #                              r0-ref   kb-ref
@@ -970,49 +1374,6 @@ mmffbonder        16     53     2.400     1.70
 mmffbonder        17     17     1.990     3.50
 mmffbonder        35     35     2.280     2.40
 mmffbonder        53     53     2.670     1.60
-
-#                       coval    Pauling
-#                  A   radius   electroneg
-mmffcovrad         1     0.33     2.20
-mmffcovrad         3     1.34     0.97
-mmffcovrad         4     0.90     1.47
-mmffcovrad         5     0.81     2.01
-mmffcovrad         6     0.77     2.50
-mmffcovrad         7     0.73     3.07
-mmffcovrad         8     0.72     3.50
-mmffcovrad         9     0.74     4.10
-mmffcovrad        11     1.54     1.01
-mmffcovrad        12     1.30     1.23
-mmffcovrad        13     1.22     1.47
-mmffcovrad        14     1.15     1.74
-mmffcovrad        15     1.09     2.06
-mmffcovrad        16     1.03     2.44
-mmffcovrad        17     1.01     2.83
-mmffcovrad        19     1.96     0.91
-mmffcovrad        20     1.74     1.04
-mmffcovrad        21     1.44     1.30
-mmffcovrad        22     1.36     1.50
-mmffcovrad        29     1.38     1.90
-mmffcovrad        30     1.31     1.60
-mmffcovrad        31     1.19     1.82
-mmffcovrad        32     1.20     2.02
-mmffcovrad        33     1.20     2.20
-mmffcovrad        34     1.16     2.48
-mmffcovrad        35     1.15     2.74
-mmffcovrad        37     2.11     0.89
-mmffcovrad        38     1.92     0.99
-mmffcovrad        39     1.62     1.30
-mmffcovrad        40     1.48     1.40
-mmffcovrad        47     1.53     1.90
-mmffcovrad        48     1.48     1.70
-mmffcovrad        49     1.46     1.49
-mmffcovrad        50     1.40     1.72
-mmffcovrad        51     1.41     1.82
-mmffcovrad        52     1.35     2.01
-mmffcovrad        53     1.33     2.21
-mmffcovrad        81     1.51
-mmffcovrad        82     1.53
-mmffcovrad        83     1.55
 
 
       ################################
@@ -3660,6 +4021,55 @@ mmffstrbnd      36    81    80     0.018     0.422     0
 mmffstrbnd      78    81    80     0.366     0.419     0
 
 
+      #######################################
+      ##                                   ##
+      ##  Stretch-Bend Default Parameters  ##
+      ##                                   ##
+      #######################################
+
+
+   ################################################################
+   ##                                                            ##
+   ##  For angle I-J-K, IR, JR and KR are the rows of the atoms  ##
+   ##  I, J and K in the periodic table; hydrogen's row is zero  ##
+   ##                                                            ##
+   ################################################################
+
+
+#              Per  Table Row         
+#               IR   JR   KR     kbaIJK    kbaKJI 
+mmffdefstbn      0    1    0      0.15      0.15
+mmffdefstbn      0    1    1      0.10      0.30
+mmffdefstbn      0    1    2      0.05      0.35
+mmffdefstbn      0    1    3      0.05      0.35
+mmffdefstbn      0    1    4      0.05      0.35
+mmffdefstbn      0    2    0      0.00      0.00
+mmffdefstbn      0    2    1      0.00      0.15
+mmffdefstbn      0    2    2      0.00      0.15
+mmffdefstbn      0    2    3      0.00      0.15
+mmffdefstbn      0    2    4      0.00      0.15
+mmffdefstbn      1    1    1      0.30      0.30
+mmffdefstbn      1    1    2      0.30      0.50
+mmffdefstbn      1    1    3      0.30      0.50
+mmffdefstbn      1    1    4      0.30      0.50
+mmffdefstbn      2    1    2      0.50      0.50
+mmffdefstbn      2    1    3      0.50      0.50
+mmffdefstbn      2    1    4      0.50      0.50
+mmffdefstbn      3    1    3      0.50      0.50
+mmffdefstbn      3    1    4      0.50      0.50
+mmffdefstbn      4    1    4      0.50      0.50
+mmffdefstbn      1    2    1      0.30      0.30
+mmffdefstbn      1    2    2      0.25      0.25
+mmffdefstbn      1    2    3      0.25      0.25
+mmffdefstbn      1    2    4      0.25      0.25
+mmffdefstbn      2    2    2      0.25      0.25
+mmffdefstbn      2    2    3      0.25      0.25
+mmffdefstbn      2    2    4      0.25      0.25
+mmffdefstbn      3    2    3      0.25      0.25
+mmffdefstbn      3    2    4      0.25      0.25
+mmffdefstbn      4    2    4      0.25      0.25
+
+
       ####################################
       ##                                ##
       ##  Out-of-Plane Bend Parameters  ##
@@ -4725,18 +5135,17 @@ mmfftorsion       0  80  81   0     0.000 0 1   4.000 180 2   0.000 0 3    0
 
       ########################################
       ##                                    ##
-      ##  Atomic Partial Charge Parameters  ##
+      ##  Bond Charge Increment Parameters  ##
       ##                                    ##  
       ########################################
 
 
-   ###########################################################
-   ##                                                       ##
-   ##  Bond Charge Increment (BCI) Method:  The charge on   ##
-   ##  each atom is built by summation of the BCI's of the  ##
-   ##  neighbor atoms. Note that bci(i-j) = -bci(j-i)       ##
-   ##                                                       ##
-   ###########################################################
+   ####################################################################
+   ##                                                                ##
+   ##  The atomic charge on each atom is built by summing the BCI's  ##
+   ##  of all the neighboring atoms. Note bci(i-j) = -bci(j-i).      ##
+   ##                                                                ##
+   ####################################################################
 
 
 #              i      j       bci      bt
@@ -5237,12 +5646,19 @@ mmffbci       79     81     -0.0430     0
 mmffbci       80     81     -0.4000     0
 
 
-      #################################################
-      ##                                             ##
-      ##  Empirical rule for bond charge increments  ##
-      ##  Parameters for building any missing BCI's  ##
-      ##                                             ##
-      #################################################
+      #####################################
+      ##                                 ##
+      ##  BCI Empirical Rule Parameters  ##
+      ##                                 ##  
+      #####################################
+
+
+   ############################################################
+   ##                                                        ##
+   ##  Values for the bond charge increment empirical rule;  ##
+   ##  needed to build missing BCI parameters                ##
+   ##                                                        ##
+   ############################################################
 
 
 #            class      pbci   fcadj
@@ -5347,405 +5763,25 @@ mmffpbci       98      2         0
 mmffpbci       99      2         0
 
 
-      ################################
-      ##                            ##
-      ##  Atom Class Equivalencies  ##
-      ##                            ##
-      ################################
+      ######################################
+      ##                                  ##
+      ##  Ionic Aromatic Ring Parameters  ##
+      ##                                  ##  
+      ######################################
 
 
-   ##################################################################
-   ##                                                              ##
-   ##  For the angle bending, out-of-plane bending and torsional   ##
-   ##  parameters, if the required parameter is not available,     ##
-   ##  the atom class equivalencies table allows using parameters  ##
-   ##  from another set of atom classes according to a staged      ##
-   ##  step-down procedure [see Reference 1, pages 513-514].       ##
-   ##  The 5th, and last, stage provides wild-card defaults for    ##
-   ##  all except the central atom(s).                             ##
-   ##                                                              ##
-   ##################################################################
-
-
-#               class | DEFAULT classes | type                  
-mmffequiv         1    1    1    1    0   1 # CR           
-mmffequiv         2    2    2    1    0   2 # C=C                
-mmffequiv         2    2    2    1    0   3 # CSP2           
-mmffequiv         3    3    3    1    0   4 # C=O     
-mmffequiv         3    3    3    1    0   5 # C=N                    
-mmffequiv         3    3    3    1    0   6 # CGD
-mmffequiv         3    3    3    1    0   7 # C=OR  
-mmffequiv         3    3    3    1    0   8 # C=ON        
-mmffequiv         3    3    3    1    0   10 # CONN 
-mmffequiv         3    3    3    1    0   11 # COO 
-mmffequiv         3    3    3    3    0   12 # COON     
-mmffequiv         3    3    3    1    0   13 # COOO 
-mmffequiv         3    3    3    1    0   14 # C=OS         
-mmffequiv         3    3    3    1    0   15 # C=S         
-mmffequiv         3    3    3    1    0   16 # C=SN             
-mmffequiv         3    3    3    1    0   17 # CSO2
-mmffequiv         3    3    3    3    0   18 # CS=O
-mmffequiv         3    3    3    3    0   19 # CSS
-mmffequiv         3    3    3    3    0   20 # C=P       
-mmffequiv         4    4    4    1    0   21 # CSP           
-mmffequiv         4    4    4    1    0   22 # =C=              
-mmffequiv         5    5    5    5    0   23 # HC                    
-mmffequiv         5    5    5    5    0   24 # HSI                  
-mmffequiv         6    6    6    6    0   25 # OR
-mmffequiv         6    6    6    6    0   26 # OC=O      
-mmffequiv         6    6    6    6    0   27 # OC=C     
-mmffequiv         6    6    6    6    0   28 # OC=N
-mmffequiv         6    6    6    6    0   29 # OC=S
-mmffequiv         6    6    6    6    0   30 # ONO2
-mmffequiv         6    6    6    6    0   31 # ON=O
-mmffequiv         6    6    6    6    0   32 # OSO3
-mmffequiv         6    6    6    6    0   33 # OSO2
-mmffequiv         6    6    6    6    0   34 # OSO
-mmffequiv         6    6    6    6    0   35 # OS=O
-mmffequiv         6    6    6    6    0   36 # -OS
-mmffequiv         6    6    6    6    0   37 # OPO3
-mmffequiv         6    6    6    6    0   38 # OPO2
-mmffequiv         6    6    6    6    0   39 # OPO
-mmffequiv         6    6    6    6    0   40 # -OP
-mmffequiv         6    6    6    6    0   41 # -O-    
-mmffequiv         7    7    7    6    0   42 # O=C           
-mmffequiv         7    7    7    6    0   43 # O=CN          
-mmffequiv         7    7    7    6    0   44 # O=CR        
-mmffequiv         7    7    7    6    0   45 # O=CO   
-mmffequiv         7    7    7    6    0   46 # O=N 
-mmffequiv         7    7    7    6    0   47 # O=S
-mmffequiv         7    7    7    7    0   48 # O=S=  
-mmffequiv         8    8    8    8    0   49 # NR                
-mmffequiv         9    9    9    8    0   50 # N=C            
-mmffequiv         9    9    9    8    0   51 # N=N     
-mmffequiv        10   10   10    8    0   52 # NC=O          
-mmffequiv        10   10   10    8    0   53 # NC=S       
-mmffequiv        10   10   10    8    0   54 # NN=C       
-mmffequiv        10   10   10    8    0   55 # NN=N       
-mmffequiv        11   11   11   11    0   56 # F               
-mmffequiv        12   12   12   12    0   57 # CL               
-mmffequiv        13   13   13   13    0   58 # BR                
-mmffequiv        14   14   14   14    0   59 # I                 
-mmffequiv        15   15   15   15    0   60 # S         
-mmffequiv        16   16   16   15    0   61 # S=C   
-mmffequiv        17   17   17   15    0   62 # S=O
-mmffequiv        17   17   17   17    0   63 # >S=N            
-mmffequiv        18   18   18   15    0   64 # SO2              
-mmffequiv        18   18   18   15    0   65 # SO2N          
-mmffequiv        18   18   18   15    0   66 # SO3 
-mmffequiv        18   18   18   18    0   68 # SO4
-mmffequiv        18   18   18   15    0   69 # =SO2   
-mmffequiv        18   18   18   15    0   70 # SNO 
-mmffequiv        19   19   19   19    0   71 # SI                
-mmffequiv        20   20    1    1    0   72 # CR4R        
-mmffequiv        21   21   21    5    0   73 # HOR          
-mmffequiv        21   21   21    5    0   74 # HO         
-mmffequiv        21   21   21   21    0   75 # HOM
-mmffequiv        22   22   22    1    0   76 # CR3R       
-mmffequiv        23   23   23    5    0   77 # HNR            
-mmffequiv        23   23   23    5    0   78 # H3N             
-mmffequiv        23   23   23    5    0   79 # HPYL         
-mmffequiv        23   23   23   23    0   80 # HNOX
-mmffequiv        23   23   23   23    0   81 # HNM
-mmffequiv        23   23   23    5    0   82 # HN            
-mmffequiv        24   24   24    5    0   83 # HOCO             
-mmffequiv        24   21   21    5    0   84 # HOP      
-mmffequiv        25   25   25   25    0   85 # PO4         
-mmffequiv        25   25   25   25    0   86 # PO3  
-mmffequiv        25   25   25   25    0   87 # PO2  
-mmffequiv        25   25   25   25    0   88 # PO  
-mmffequiv        25   25   25   25    0   89 # PTET     
-mmffequiv        26   26   26   25    0   90 # P   
-mmffequiv        27   27   28    5    0   91 # HN=N     
-mmffequiv        27   27   28    5    0   92 # HN=C             
-mmffequiv        28   28   28    5    0   93 # HNCO
-mmffequiv        28   28   28    5    0   94 # HNCS            
-mmffequiv        28   28   28    5    0   95 # HNCC
-mmffequiv        28   28   28    5    0   96 # HNCN          
-mmffequiv        28   28   28    5    0   97 # HNNC            
-mmffequiv        28   28   28    5    0   98 # HNNN           
-mmffequiv        28   28   28   28    0   99 # HNSO
-mmffequiv        28   28   28   28    0   100 # HNPO
-mmffequiv        28   28   28   28    0   101 # HNC% 
-mmffequiv        28   28   28    5    0   102 # HSP2     
-mmffequiv        29   29   29    5    0   103 # HOCC    
-mmffequiv        29   29   29    5    0   104 # HOCN          
-mmffequiv        30   30    2    1    0   105 # CE4R          
-mmffequiv        31   31   31   31    0   106 # HOH                   
-mmffequiv        32   32    7    6    0   107 # O2CM   
-mmffequiv        32   32    7    6    0   108 # OXN     
-mmffequiv        32   32    7    6    0   109 # O2N     
-mmffequiv        32   32    7    6    0   110 # O2NO 
-mmffequiv        32   32    7    6    0   111 # O3N   
-mmffequiv        32   32    7    6    0   112 # O-S 
-mmffequiv        32   32    7    6    0   113 # O2S 
-mmffequiv        32   32    7    6    0   114 # O3S    
-mmffequiv        32   32    7    6    0   115 # O4S                
-mmffequiv        32   32    7    6    0   116 # OSMS 
-mmffequiv        32   32    7    6    0   117 # OP        
-mmffequiv        32   32    7    6    0   118 # O2P  
-mmffequiv        32   32    7    6    0   119 # O3P  
-mmffequiv        32   32    7    6    0   120 # O4P    
-mmffequiv        32   32    7    6    0   121 # O4CL  
-mmffequiv        33   33   21    5    0   122 # HOS      
-mmffequiv        34   34    8    8    0   123 # NR+       
-mmffequiv        35   35    6    6    0   124 # OM  
-mmffequiv        35   35    6    6    0   125 # OM2  
-mmffequiv        36   36   36    5    0   126 # HNR+
-mmffequiv        36   36   36   36    0   127 # HIM+
-mmffequiv        36   36   36   36    0   128 # HPD+                   
-mmffequiv        36   36   36    5    0   129 # HNN+     
-mmffequiv        36   36   36    5    0   130 # HNC+ 
-mmffequiv        36   36   36    5    0   131 # HGD+
-mmffequiv        36   36   36   36    0   132 # HN5+     
-mmffequiv        37   37    2    1    0   133 # CB             
-mmffequiv        38   38    9    8    0   134 # NPYD   
-mmffequiv        39   39   10    8    0   135 # NPYL    
-mmffequiv        40   40   10    8    0   136 # NC=C       
-mmffequiv        40   40   10    8    0   137 # NC=N
-mmffequiv        40   40   40   40    0   138 # NC=P
-mmffequiv        40   40   40   40    0   139 # NC%C       
-mmffequiv        41   41    3    1    0   140 # CO2M        
-mmffequiv        41   41    3    1    0   141 # CS2M      
-mmffequiv        42   42   42    8    0   142 # NSP        
-mmffequiv        43   43   10    8    0   143 # NSO2        
-mmffequiv        43   43   43   43    0   144 # NSO3
-mmffequiv        43   43   43   43    0   145 # NPO2
-mmffequiv        43   43   43   43    0   146 # NPO3
-mmffequiv        43   43   43   43    0   147 # NC%N
-mmffequiv        44   44   16   15    0   148 # STHI         
-mmffequiv        45   45   10    8    0   149 # NO2          
-mmffequiv        45   45   10    8    0   150 # NO3        
-mmffequiv        46   46    9    8    0   151 # N=O        
-mmffequiv        47   47   42    8    0   152 # NAZT      
-mmffequiv        48   48    9    8    0   153 # NSO 
-mmffequiv        49   49    6    6    0   154 # O+   
-mmffequiv        50   50   21    5    0   155 # HO+    
-mmffequiv        51   51    7    6    0   156 # O=+        
-mmffequiv        52   52   21    5    0   157 # HO=+        
-mmffequiv        53   53   42    8    0   158 # =N=  
-mmffequiv        54   54    9    8    0   159 # N+=C       
-mmffequiv        54   54    9    8    0   160 # N+=N       
-mmffequiv        55   55   10    8    0   161 # NCN+   
-mmffequiv        56   56   10    8    0   162 # NGD+   
-mmffequiv        57   57    2    1    0   163 # CGD+     
-mmffequiv        57   57    2    1    0   164 # CNN+  
-mmffequiv        58   58   10    8    0   165 # NPD+       
-mmffequiv        59   59    6    6    0   166 # OFUR      
-mmffequiv        60   60    4    1    0   167 # C%      
-mmffequiv        61   61   42    8    0   168 # NR%           
-mmffequiv        62   62   10    8    0   169 # NM         
-mmffequiv        63   63    2    1    0   170 # C5A   
-mmffequiv        64   64    2    1    0   171 # C5B    
-mmffequiv        65   65    9    8    0   172 # N5A    
-mmffequiv        66   66    9    8    0   173 # N5B    
-mmffequiv        67   67    9    8    0   174 # N2OX    
-mmffequiv        68   68    8    8    0   175 # N3OX    
-mmffequiv        69   69    9    8    0   176 # NPOX    
-mmffequiv        70   70   70   70   70   177 # OH2        
-mmffequiv        71   71    5    5    0   178 # HS                    
-mmffequiv        71   71   71   71    0   179 # HS=N
-mmffequiv        71   71    5    5    0   180 # HP
-mmffequiv        72   72   16   15    0   181 # S-P
-mmffequiv        72   72   16   15    0   182 # S2CM      
-mmffequiv        72   72   16   15    0   183 # SM   
-mmffequiv        72   72   16   15    0   184 # SSOM  
-mmffequiv        73   73   18   15    0   185 # SO2M    
-mmffequiv        73   73   18   15    0   186 # SSOM  
-mmffequiv        74   74   17   15    0   187 # =S=O 
-mmffequiv        75   75   26   25    0   188 # -P=C
-mmffequiv        76   76    9    8    0   189 # N5M  
-mmffequiv        77   77   12   12    0   190 # CLO4     
-mmffequiv        78   78    2    1    0   191 # C5  
-mmffequiv        79   79    9    8    0   192 # N5  
-mmffequiv        80   80    2    1    0   193 # CIM+    
-mmffequiv        81   81   10    8    0   194 # NIM+   
-mmffequiv        81   81   81   81    0   195 # N5A+
-mmffequiv        81   81   81   81    0   196 # N5B+
-mmffequiv        81   81   81   81    0   197 # N5+
-mmffequiv        82   82    9    8    0   198 # N5AX 
-mmffequiv        82   82    9    8    0   199 # N5BX 
-mmffequiv        82   82    9    8    0   200 # N5OX 
-mmffequiv        87   87   87   87   87   201 # FE+2
-mmffequiv        88   88   88   88   88   202 # FE+3
-mmffequiv        89   89   89   89   89   203 # F-
-mmffequiv        90   90   90   90   90   204 # CL-
-mmffequiv        91   91   91   91   91   205 # BR-
-mmffequiv        92   92   92   92   92   206 # LI+         
-mmffequiv        93   93   93   93   93   207 # NA+          
-mmffequiv        94   94   94   94   94   208 # K+       
-mmffequiv        95   95   95   95   95   209 # ZINC
-mmffequiv        95   95   95   95   95   210 # ZN+2 
-mmffequiv        96   96   96   96   96   211 # CA+2
-mmffequiv        97   97   97   97   97   212 # CU+1
-mmffequiv        98   98   98   98   98   213 # CU+2
-mmffequiv        99   99   99   99   99   214 # MG+2
-
-
-      ##############################################################
-      ##                                                          ##
-      ##  Stretch-bend default parameters:  IR, JR and KR are     ##
-      ##  the rows of the atoms I, J and K in the periodic table  ##
-      ##  for angle I-J-K; Note that hydrogen is set to row = 0   ##
-      ##                                                          ##
-      ##############################################################
-
-
-#              Per  Table Row         
-#               IR   JR   KR     kbaIJK    kbaKJI 
-mmffdefstbn      0    1    0      0.15      0.15
-mmffdefstbn      0    1    1      0.10      0.30
-mmffdefstbn      0    1    2      0.05      0.35
-mmffdefstbn      0    1    3      0.05      0.35
-mmffdefstbn      0    1    4      0.05      0.35
-mmffdefstbn      0    2    0      0.00      0.00
-mmffdefstbn      0    2    1      0.00      0.15
-mmffdefstbn      0    2    2      0.00      0.15
-mmffdefstbn      0    2    3      0.00      0.15
-mmffdefstbn      0    2    4      0.00      0.15
-mmffdefstbn      1    1    1      0.30      0.30
-mmffdefstbn      1    1    2      0.30      0.50
-mmffdefstbn      1    1    3      0.30      0.50
-mmffdefstbn      1    1    4      0.30      0.50
-mmffdefstbn      2    1    2      0.50      0.50
-mmffdefstbn      2    1    3      0.50      0.50
-mmffdefstbn      2    1    4      0.50      0.50
-mmffdefstbn      3    1    3      0.50      0.50
-mmffdefstbn      3    1    4      0.50      0.50
-mmffdefstbn      4    1    4      0.50      0.50
-mmffdefstbn      1    2    1      0.30      0.30
-mmffdefstbn      1    2    2      0.25      0.25
-mmffdefstbn      1    2    3      0.25      0.25
-mmffdefstbn      1    2    4      0.25      0.25
-mmffdefstbn      2    2    2      0.25      0.25
-mmffdefstbn      2    2    3      0.25      0.25
-mmffdefstbn      2    2    4      0.25      0.25
-mmffdefstbn      3    2    3      0.25      0.25
-mmffdefstbn      3    2    4      0.25      0.25
-mmffdefstbn      4    2    4      0.25      0.25
-
-
-      #################################################################
-      ##                                                             ##
-      ##  MMFF94 Properties:  Properties of the atom classes; used   ##
-      ##  in the empirical rule for the defaults torsion parameters  ##
-      ##  [see Reference V, page 619]                                ##
-      ##                                                             ##
-      #################################################################
-
-
-#           class   aspec  crd   val   pilp  mltb  arom  lin   sbmb
-mmffprop        1     6     4     4     0     0     0     0     0
-mmffprop        2     6     3     4     0     2     0     0     1
-mmffprop        3     6     3     4     0     2     0     0     1
-mmffprop        4     6     2     4     0     3     0     1     1
-mmffprop        5     1     1     1     0     0     0     0     0
-mmffprop        6     8     2     2     1     0     0     0     0
-mmffprop        7     8     1     2     0     2     0     0     0
-mmffprop        8     7     3     3     1     0     0     0     0
-mmffprop        9     7     2     3     0     2     0     0     1
-mmffprop       10     7     3     3     1     1     0     0     0
-mmffprop       11     9     1     1     1     0     0     0     0
-mmffprop       12    17     1     1     1     0     0     0     0
-mmffprop       13    35     1     1     1     0     0     0     0
-mmffprop       14    53     1     1     1     0     0     0     0
-mmffprop       15    16     2     2     1     0     0     0     0
-mmffprop       16    16     1     2     0     2     0     0     0
-mmffprop       17    16     3     4     0     2     0     0     0
-mmffprop       18    16     4     4     0     0     0     0     0
-mmffprop       19    14     4     4     0     0     0     0     0
-mmffprop       20     6     4     4     0     0     0     0     0
-mmffprop       21     1     1     1     0     0     0     0     0
-mmffprop       22     6     4     4     0     0     0     0     0
-mmffprop       23     1     1     1     0     0     0     0     0
-mmffprop       24     1     1     1     0     0     0     0     0
-mmffprop       25    15     4     4     0     0     0     0     0
-mmffprop       26    15     3     3     1     0     0     0     0
-mmffprop       27     1     1     1     0     0     0     0     0
-mmffprop       28     1     1     1     0     0     0     0     0
-mmffprop       29     1     1     1     0     0     0     0     0
-mmffprop       30     6     3     4     0     2     0     0     1
-mmffprop       31     1     1     1     0     0     0     0     0
-mmffprop       32     8     1    12     1     1     0     0     0
-mmffprop       33     1     1     1     0     0     0     0     0
-mmffprop       34     7     4     4     0     0     0     0     0
-mmffprop       35     8     1     1     1     1     0     0     0
-mmffprop       36     1     1     1     0     0     0     0     0
-mmffprop       37     6     3     4     0     2     1     0     1
-mmffprop       38     7     2     3     0     2     1     0     0
-mmffprop       39     7     3     3     1     1     1     0     1
-mmffprop       40     7     3     3     1     0     0     0     0
-mmffprop       41     6     3     4     0     1     0     0     0
-mmffprop       42     7     1     3     0     3     0     0     0
-mmffprop       43     7     3     3     1     0     0     0     0
-mmffprop       44    16     2     2     1     1     1     0     0
-mmffprop       45     7     3     4     0     2     0     0     0
-mmffprop       46     7     2     3     0     2     0     0     0
-mmffprop       47     7     1     2     0     2     0     0     0
-mmffprop       48     7     2     2     0     0     0     0     0
-mmffprop       49     8     3     3     0     0     0     0     0
-mmffprop       50     1     1     1     0     0     0     0     0
-mmffprop       51     8     2     3     0     2     0     0     0
-mmffprop       52     1     1     1     0     0     0     0     0
-mmffprop       53     7     2     4     0     2     0     1     0
-mmffprop       54     7     3     4     0     2     0     0     1
-mmffprop       55     7     3    34     0     1     0     0     0
-mmffprop       56     7     3    34     0     1     0     0     0
-mmffprop       57     6     3     4     0     2     0     0     1
-mmffprop       58     7     3     4     0     1     1     0     1
-mmffprop       59     8     2     2     1     1     1     0     0
-mmffprop       60     6     1     3     0     3     0     0     0
-mmffprop       61     7     2     4     0     3     0     1     0
-mmffprop       62     7     2     2     1     0     0     0     0
-mmffprop       63     6     3     4     0     2     1     0     1
-mmffprop       64     6     3     4     0     2     1     0     1
-mmffprop       65     7     2     3     0     2     1     0     0
-mmffprop       66     7     2     3     0     2     1     0     0
-mmffprop       67     7     3     4     0     2     0     0     1
-mmffprop       68     7     4     4     0     0     0     0     0
-mmffprop       69     7     3     4     0     1     1     0     0
-mmffprop       70     8     2     2     1     0     0     0     0
-mmffprop       71     1     1     1     0     0     0     0     0
-mmffprop       72    16     1     1     1     1     0     0     0
-mmffprop       73    16     3     3     0     0     0     0     0
-mmffprop       74    16     2     4     0     2     0     0     0
-mmffprop       75    15     2     3     0     2     0     0     1
-mmffprop       76     7     2     2     1     0     0     0     0
-mmffprop       77    17     4     4     0     0     0     0     0
-mmffprop       78     6     3     4     0     2     1     0     1
-mmffprop       79     7     2     3     0     2     1     0     0
-mmffprop       80     6     3     4     0     2     0     0     1
-mmffprop       81     7     3     4     0     1     1     0     1
-mmffprop       82     7     3     4     0     1     1     0     0
-mmffprop       87    26     0     0     0     0     0     0     0
-mmffprop       88    26     0     0     0     0     0     0     0
-mmffprop       89     9     0     0     0     0     0     0     0
-mmffprop       90    17     0     0     0     0     0     0     0
-mmffprop       91    35     0     0     0     0     0     0     0
-mmffprop       92     3     0     0     0     0     0     0     0
-mmffprop       93    11     0     0     0     0     0     0     0
-mmffprop       94    19     0     0     0     0     0     0     0
-mmffprop       95    30     0     0     0     0     0     0     0
-mmffprop       96    20     0     0     0     0     0     0     0
-mmffprop       97    29     0     0     0     0     0     0     0
-mmffprop       98    29     0     0     0     0     0     0     0
-mmffprop       99    12     0     0     0     0     0     0     0
-
-
-      #####################################################################
-      ##                                                                 ##
-      ##  MMFF94 for Ionic Aromatic Rings:                               ##
-      ##                                                                 ##
-      ##  im cation: 1 if the ring charge is +1, it is distributed to    ##
-      ##             the atoms of corresponding atom type according      ##
-      ##             to 1/L5 (depending on the number of those atoms     ##
-      ##             in the ring).                                       ##
-      ##                                                                 ##
-      ##  n5 anion:  idem for 5-membered rings with global charge -1     ##
-      ##             is distributed onto the corresponding N types       ##
-      ##             according to the same 1/L5 rule.                    ##
-      ##                                                                 ##
-      #####################################################################
+   #####################################################################
+   ##                                                                 ##
+   ##  im cation: 1 if the ring charge is +1, it is distributed to    ##
+   ##             the atoms of corresponding atom type according      ##
+   ##             to 1/L5 (depending on the number of those atoms     ##
+   ##             in the ring).                                       ##
+   ##                                                                 ##
+   ##  n5 anion:  idem for 5-membered rings with global charge -1     ##
+   ##             is distributed onto the corresponding N types       ##
+   ##             according to the same 1/L5 rule.                    ##
+   ##                                                                 ##
+   #####################################################################
 
 
 #              arom   ring         Iim    n5

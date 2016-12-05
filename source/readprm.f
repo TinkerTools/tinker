@@ -1288,6 +1288,60 @@ c
             end if
             if (ia .ne. 0)  biotyp(ia) = ib
 c
+c     MMFF atom class equivalency parameters
+c
+         else if (keyword(1:10) .eq. 'MMFFEQUIV ') then
+            string = record(next:240)
+            ia = 1000
+            ib = 1000
+            ic = 1000
+            id = 1000
+            ie = 1000
+            if = 0
+            read (string,*,err=530,end=530)  ia,ib,ic,id,ie,if
+  530       continue
+            eqclass(if,1) = ia
+            eqclass(if,2) = ib
+            eqclass(if,3) = ic
+            eqclass(if,4) = id
+            eqclass(if,5) = ie
+c
+c     MMFF covalent radius and electronegativity parameters
+c
+         else if (keyword(1:11) .eq. 'MMFFCOVRAD ') then
+            ia = 0
+            fc = 0.0d0
+            bd = 0.0d0
+            string = record(next:240)
+            read (string,*,err=540,end=540)  ia,fc,bd
+  540       continue
+            rad0(ia) = fc
+            paulel(ia) = bd
+c
+c     MMFF atom class property parameters
+c
+         else if (keyword(1:9) .eq. 'MMFFPROP ') then
+            string = record(next:240)
+            ia = 1000
+            ib = 1000
+            ic = 1000
+            id = 1000
+            ie = 1000
+            if = 1000
+            ig = 1000
+            ih = 1000
+            ii = 1000
+            read (string,*,err=550,end=550)  ia,ib,ic,id,ie,
+     &                                       if,ig,ih,ii
+  550       continue
+            crd(ia) = ic
+            val(ia) = id
+            pilp(ia) = ie
+            mltb(ia) = if
+            arom(ia) = ig
+            lin(ia) = ih
+            sbmb(ia) = ii
+c
 c     MMFF van der Waals parameters
 c
          else if (keyword(1:8) .eq. 'MMFFVDW ') then
@@ -1297,8 +1351,8 @@ c
             rdn = 0.0d0
             da1 = 'C'
             string = record(next:240)
-            read (string,*,err=530,end=530)  ia,rd,alphi,nni,gi,da1
-  530       continue
+            read (string,*,err=560,end=560)  ia,rd,alphi,nni,gi,da1
+  560       continue
             if (ia .ne. 0) then
                rad(ia) = rd
                g(ia) = gi
@@ -1316,8 +1370,8 @@ c
             bd = 0.0d0
             bt = 2
             string = record(next:240)
-            read (string,*,err=540,end=540)  ia,ib,fc,bd,bt
-  540       continue
+            read (string,*,err=570,end=570)  ia,ib,fc,bd,bt
+  570       continue
             nb = nb + 1
             if (bt .eq. 0) then
                mmff_kb(ia,ib) = fc
@@ -1339,8 +1393,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=550,end=550)  ia,ib,fc,bd
-  550       continue
+            read (string,*,err=580,end=580)  ia,ib,fc,bd
+  580       continue
             r0ref(ia,ib) = fc
             r0ref(ib,ia) = fc
             kbref(ia,ib) = bd
@@ -1356,8 +1410,8 @@ c
             an1 = 0.0d0
             at = 3
             string = record(next:240)
-            read (string,*,err=560,end=560)  ia,ib,ic,fc,an1,at
-  560       continue
+            read (string,*,err=590,end=590)  ia,ib,ic,fc,an1,at
+  590       continue
             na = na + 1
             if (an1 .ne. 0.0d0) then
                if (at .eq. 0) then
@@ -1418,8 +1472,8 @@ c
             cba = 0.0d0
             sbt = 4
             string = record(next:240)
-            read (string,*,err=570,end=570)  ia,ib,ic,abc,cba,sbt
-  570       continue
+            read (string,*,err=600,end=600)  ia,ib,ic,abc,cba,sbt
+  600       continue
             if (ia .ne. 0) then
                if (sbt .eq. 0) then
                   stbn_abc(ia,ib,ic) = abc
@@ -1484,6 +1538,22 @@ c
                end if
             end if
 c
+c     MMFF default stretch-bend parameters
+c
+         else if (keyword(1:12) .eq. 'MMFFDEFSTBN ') then
+            string = record(next:240)
+            ia = 1000
+            ib = 1000
+            ic = 1000
+            abc = 0.0d0
+            cba = 0.0d0
+            read (string,*,err=610,end=610)  ia,ib,ic,abc,cba
+  610       continue
+            defstbn_abc(ia,ib,ic) = abc
+            defstbn_cba(ia,ib,ic) = cba
+            defstbn_abc(ic,ib,ia) = cba
+            defstbn_cba(ic,ib,ia) = abc
+c
 c     MMFF out-of-plane bend parameters
 c
          else if (keyword(1:11) .eq. 'MMFFOPBEND ') then
@@ -1493,8 +1563,8 @@ c
             id = 0
             fc = 0.0d0
             string = record(next:240)
-            read (string,*,err=580,end=580)  ia,ib,ic,id,fc
-  580       continue
+            read (string,*,err=620,end=620)  ia,ib,ic,id,fc
+  620       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1537,9 +1607,9 @@ c
             end do
             tt = 3
             string = record(next:240)
-            read (string,*,err=590,end=590)  ia,ib,ic,id,(vt(j),
+            read (string,*,err=630,end=630)  ia,ib,ic,id,(vt(j),
      &                                       st(j),ft(j),j=1,3),tt
-  590       continue
+  630       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1642,8 +1712,8 @@ c
             cg = 1000.0d0
             bt = 2
             string = record(next:240)
-            read (string,*,err=600,end=600)  ia,ib,cg,bt
-  600       continue
+            read (string,*,err=640,end=640)  ia,ib,cg,bt
+  640       continue
             if (ia .ne. 0) then
                if (bt .eq. 0) then
                   bci(ia,ib) = cg
@@ -1659,82 +1729,12 @@ c
          else if (keyword(1:9) .eq. 'MMFFPBCI ') then
             ia = 0
             string = record(next:240)
-            read (string,*,err=610,end=610)  ia,cg,factor
-  610       continue
+            read (string,*,err=650,end=650)  ia,cg,factor
+  650       continue
             if (ia .ne. 0) then
                pbci(ia) = cg
                fcadj(ia) = factor
             end if
-c
-c     MMFF atom class equivalency parameters
-c
-         else if (keyword(1:10) .eq. 'MMFFEQUIV ') then
-            string = record(next:240)
-            ia = 1000
-            ib = 1000
-            ic = 1000
-            id = 1000
-            ie = 1000
-            if = 0
-            read (string,*,err=620,end=620)  ia,ib,ic,id,ie,if
-  620       continue
-            eqclass(if,1) = ia
-            eqclass(if,2) = ib
-            eqclass(if,3) = ic
-            eqclass(if,4) = id
-            eqclass(if,5) = ie
-c
-c     MMFF default stretch-bend parameters
-c
-         else if (keyword(1:12) .eq. 'MMFFDEFSTBN ') then
-            string = record(next:240)
-            ia = 1000
-            ib = 1000
-            ic = 1000
-            abc = 0.0d0
-            cba = 0.0d0
-            read (string,*,err=630,end=630)  ia,ib,ic,abc,cba
-  630       continue
-            defstbn_abc(ia,ib,ic) = abc
-            defstbn_cba(ia,ib,ic) = cba
-            defstbn_abc(ic,ib,ia) = cba
-            defstbn_cba(ic,ib,ia) = abc
-c
-c     MMFF covalent radius and electronegativity parameters
-c
-         else if (keyword(1:11) .eq. 'MMFFCOVRAD ') then
-            ia = 0
-            fc = 0.0d0
-            bd = 0.0d0
-            string = record(next:240)
-            read (string,*,err=640,end=640)  ia,fc,bd
-  640       continue
-            rad0(ia) = fc
-            paulel(ia) = bd
-c
-c     MMFF property parameters
-c
-         else if (keyword(1:9) .eq. 'MMFFPROP ') then
-            string = record(next:240)
-            ia = 1000
-            ib = 1000
-            ic = 1000
-            id = 1000
-            ie = 1000
-            if = 1000
-            ig = 1000
-            ih = 1000
-            ii = 1000
-            read (string,*,err=650,end=650)  ia,ib,ic,id,ie,
-     &                                       if,ig,ih,ii
-  650       continue
-            crd(ia) = ic
-            val(ia) = id
-            pilp(ia) = ie
-            mltb(ia) = if
-            arom(ia) = ig
-            lin(ia) = ih
-            sbmb(ia) = ii
 c
 c     MMFF aromatic ion parameters
 c
