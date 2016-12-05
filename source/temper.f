@@ -63,6 +63,7 @@ c     get the kinetic energy and instantaneous temperature
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      if (.not. isothermal) return
 c
 c     couple to external temperature bath via Berendsen scaling
 c
