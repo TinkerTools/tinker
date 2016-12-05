@@ -98,6 +98,29 @@ c
       implicit none
 c
 c
+c     free memory used by the APBS Poisson-Boltzmann solver
+c
+      if (solvtyp .eq. 'PB') then
+         call apbsfinal
+      end if
+c
+c     close any open socket used for external communication
+c
+      if (use_socket) then
+         call sktkill
+      end if
+c
+c     print a final status message before exiting TINKER
+c
+      if (debug) then
+         write (iout,10)
+   10    format (/,' TINKER is Exiting following Normal Termination',/)
+      end if
+c
+c     ensure any output is written to the storage device
+c
+      flush (iout)
+c
 c     deallocation of global arrays from module align
 c
       if (allocated(ifit))  deallocate (ifit)
@@ -808,29 +831,6 @@ c
 c     deallocation of global arrays from module warp
 c
       if (allocated(m2))  deallocate (m2)
-c
-c     free memory used by the APBS Poisson-Boltzmann solver
-c
-      if (solvtyp .eq. 'PB') then
-         call apbsfinal
-      end if
-c
-c     close any open socket used for external communication
-c
-      if (use_socket) then
-         call sktkill
-      end if
-c
-c     print a final status message before exiting TINKER
-c
-      if (debug) then
-         write (iout,10)
-   10    format (/,' TINKER is Exiting following Normal Termination',/)
-      end if
-c
-c     ensure any output is written to the storage device
-c
-      flush (iout)
 c
 c     may need a pause to avoid closing the execution window
 c

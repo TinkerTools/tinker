@@ -33,7 +33,8 @@ c
       integer ia,ib,ic,id,ie
       integer nlo,nhi,nt
       integer xlo,ylo
-      real*8 e,fgrp,sign
+      real*8 e,etto
+      real*8 fgrp,sign
       real*8 angle1,angle2
       real*8 value1,value2
       real*8 cosine1,cosine2
@@ -61,6 +62,18 @@ c
 c     zero out the torsion-torsion energy
 c
       ett = 0.0d0
+c
+c     transfer global to local copies for OpenMP calculation
+c
+      etto = ett
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(ntortor,itt,ibitor,
+!$OMP& use,x,y,z,tnx,ttx,tny,tty,tbf,tbx,tby,tbxy,ttorunit,
+!$OMP& use_group,use_polymer)
+!$OMP& shared(etto)
+!$OMP DO reduction(+:etto) schedule(guided)
 c
 c     calculate the torsion-torsion interaction energy term
 c
@@ -220,10 +233,19 @@ c
 c
 c     increment the total torsion-torsion energy
 c
-               ett = ett + e
+               etto = etto + e
             end if
          end if
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     transfer local to global copies for OpenMP calculation
+c
+      ett = etto
       return
       end
 c

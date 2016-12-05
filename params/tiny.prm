@@ -24,9 +24,9 @@ dielectric              1.5
 
 
 This is a generic parameter file intended to enable simple geometry
-optimization of crude structures to avoid steric clashes. The bond,
-angle and torsion parameters are set to ideal values. The vdw values
-model sterics and hydrogen bonds. Electrostatics is via bond dipoles.
+optimization of crude structures to avoid steric clashes. The valence
+parameters are set to idealized values. The vdw values model sterics
+and hydrogen bonds. Electrostatics are treated via bond dipoles.
 
 
       #############################
