@@ -63,6 +63,7 @@ c     get the kinetic energy and instantaneous temperature
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      if (.not. isothermal)  return
 c
 c     couple to external temperature bath via Berendsen scaling
 c
@@ -229,10 +230,8 @@ c
 c
 c     recompute kinetic energy and instantaneous temperature
 c
-      if (isothermal) then
-         call kinetic (eksum,ekin)
-         temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-      end if
+      call kinetic (eksum,ekin)
+      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
       return
       end
 c
@@ -283,6 +282,7 @@ c     get the kinetic energy and instantaneous temperature
 c
       call kinetic (eksum,ekin)
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      if (.not. isothermal)  return
 c
 c     make half-step velocity correction for Nose-Hoover system
 c
