@@ -34,21 +34,27 @@ c
       external erfinv
 c
 c
+c     initialize the speed magnitude of the particle to zero
+c
+      maxwell = 0.0d0
+c
 c     set normalization factor for cumulative velocity distribution
 c
-      beta = sqrt(mass / (2.0d0*boltzmann*temper))
+      if (mass.gt.0.0d0 .and. temper.gt.0.0d0) then
+         beta = sqrt(mass / (2.0d0*boltzmann*temper))
 c
 c     pick a randomly distributed velocity along each of three axes
 c
-      rho = random ()
-      xspeed = erfinv(rho) / beta
-      rho = random ()
-      yspeed = erfinv(rho) / beta
-      rho = random ()
-      zspeed = erfinv(rho) / beta
+         rho = random ()
+         xspeed = erfinv(rho) / beta
+         rho = random ()
+         yspeed = erfinv(rho) / beta
+         rho = random ()
+         zspeed = erfinv(rho) / beta
 c
 c     set the final value of the particle speed in 3-dimensions
 c
-      maxwell = sqrt(xspeed**2 + yspeed**2 + zspeed**2)
+         maxwell = sqrt(xspeed**2 + yspeed**2 + zspeed**2)
+      end if
       return
       end

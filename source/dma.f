@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  2005  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  module dma  --  distributed multipole analysis components  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  module dma  --  QM spherical harmonic multipole moments  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     mp        atomic monopole charge values from DMA

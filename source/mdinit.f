@@ -401,7 +401,7 @@ c
       else if (integrate .eq. 'RIGIDBODY') then
          do i = 1, ngrp
             gmass = grpmass(i)
-            speed = maxwell (gmass,max(kelvin,1.0d-6))
+            speed = maxwell (gmass,kelvin)
             call ranvec (vec)
             do j = 1, 3
                vcm(j,i) = speed * vec(j)
@@ -419,7 +419,7 @@ c
          do i = 1, n
             amass = mass(i)
             if (use(i) .and. amass.ne.0.0d0) then
-               speed = maxwell (amass,max(kelvin,1.0d-6))
+               speed = maxwell (amass,kelvin)
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
@@ -456,7 +456,7 @@ c
          do i = 1, n
             amass = mass(i)
             if (use(i) .and. amass.ne.0.0d0) then
-               speed = maxwell (amass,max(kelvin,1.0d-6))
+               speed = maxwell (amass,kelvin)
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
