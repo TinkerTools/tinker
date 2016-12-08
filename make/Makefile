@@ -83,7 +83,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 F77 = gfortran
 F77FLAGS = -c
-OPTFLAGS = -Ofast -mavx -fopenmp
+OPTFLAGS = -Ofast -mssse3 -fopenmp
 LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 LIBS = 
 LIBFLAGS = -crusv
@@ -1417,7 +1417,7 @@ attach.o: atoms.o couple.o iounit.o sizes.o
 bar.o: atoms.o boxes.o energi.o files.o inform.o iounit.o keys.o sizes.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:
-beeman.o: atomid.o atoms.o freeze.o mdstuf.o moldyn.o sizes.o units.o usage.o
+beeman.o: atomid.o atoms.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o sizes.o units.o usage.o
 bicubic.o:
 bitor.o:
 bitors.o: angbnd.o atoms.o bitor.o couple.o iounit.o sizes.o
@@ -1713,7 +1713,7 @@ makeref.o: atomid.o atoms.o boxes.o couple.o files.o refer.o sizes.o titles.o
 makexyz.o: atoms.o sizes.o zcoord.o
 math.o:
 maxwell.o: units.o
-mdinit.o: atomid.o atoms.o bath.o bound.o couple.o files.o freeze.o group.o ielscf.o inform.o iounit.o keys.o mdstuf.o molcul.o moldyn.o mpole.o rgddyn.o rigid.o sizes.o stodyn.o units.o uprior.o usage.o
+mdinit.o: atomid.o atoms.o bath.o bound.o couple.o files.o freeze.o group.o ielscf.o inform.o iounit.o keys.o mdstuf.o molcul.o moldyn.o mpole.o polar.o rgddyn.o rigid.o sizes.o stodyn.o units.o uprior.o usage.o
 mdrest.o: atomid.o atoms.o bound.o group.o inform.o iounit.o mdstuf.o moldyn.o rgddyn.o sizes.o units.o
 mdsave.o: atomid.o atoms.o bound.o boxes.o files.o group.o inform.o iounit.o mdstuf.o moldyn.o mpole.o output.o polar.o potent.o rgddyn.o sizes.o socket.o titles.o units.o
 mdstat.o: atoms.o bath.o bound.o boxes.o inform.o inter.o iounit.o limits.o mdstuf.o molcul.o sizes.o units.o usage.o warp.o
@@ -1901,7 +1901,7 @@ valence.o: angbnd.o angpot.o atomid.o atoms.o bndpot.o bndstr.o couple.o files.o
 valfit.o:
 vdw.o:
 vdwpot.o:
-verlet.o: atomid.o atoms.o freeze.o ielscf.o moldyn.o sizes.o units.o usage.o
+verlet.o: atomid.o atoms.o freeze.o ielscf.o moldyn.o polar.o sizes.o units.o usage.o
 version.o: iounit.o output.o
 vibbig.o: atomid.o atoms.o bound.o couple.o files.o hescut.o hessn.o inform.o iounit.o keys.o limits.o mpole.o potent.o rigid.o sizes.o units.o usage.o vdw.o vdwpot.o vibs.o
 vibrate.o: atomid.o atoms.o files.o hescut.o iounit.o math.o sizes.o units.o usage.o

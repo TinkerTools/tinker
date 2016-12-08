@@ -83,6 +83,9 @@ c
                nlist = nlist + 1
             end do
          else if (keyword(1:13) .eq. 'POLAR-EXTRAP ') then
+            do i = 0, maxxtr
+               cxtr(i) = 0.0d0
+            end do
             read (string,*,err=20,end=20)  (cxtr(i),i=0,maxxtr)
          end if
    20    continue
