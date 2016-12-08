@@ -69,7 +69,7 @@ c
          end if
       end do
 c
-c     apply half-step updates for auxiliary induced dipoles
+c     apply Verlet half-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
          do i = 1, n
@@ -109,7 +109,7 @@ c
          end if
       end do
 c
-c     apply full-step updates for auxiliary induced dipoles
+c     apply Verlet full-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
          term = 2.0d0 / (dt*dt)

@@ -513,11 +513,6 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##  COPYRIGHT (C) 2014 by Alex Albaugh & Jay William Ponder  ##
-c     ##                    All Rights Reserved                    ##
-c     ###############################################################
-c
 c     ##################################################################
 c     ##                                                              ##
 c     ##  subroutine auxinit  --  initialize auxiliary dipole values  ##
