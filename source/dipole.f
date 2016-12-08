@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1992  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  module dipole  --  atom/bond dipoles in current structure  ##
-c     ##                                                             ##
-c     #################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  module dipole  --  bond dipoles in current structure  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     ndipole   total number of dipoles in the system

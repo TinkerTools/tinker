@@ -14,7 +14,8 @@ c
 c
 c     "temper" computes the instantaneous temperature and applies a
 c     thermostat via Berendsen or Bussi-Parrinello velocity scaling,
-c     Andersen stochastic collisions or Nose-Hoover extended system
+c     Andersen stochastic collisions or Nose-Hoover chains; also uses
+c     Berendsen scaling for any iEL induced dipole variables
 c
 c     literature references:
 c
@@ -244,7 +245,7 @@ c     ###############################################################
 c
 c
 c     "temper2" applies a velocity correction at the half time step
-c     as needed for the Nose-Hoover extended system thermostat
+c     as needed for the Nose-Hoover thermostat
 c
 c     literature references:
 c
@@ -262,6 +263,7 @@ c
       use atoms
       use bath
       use group
+      use ielscf
       use mdstuf
       use moldyn
       use rgddyn
@@ -274,6 +276,7 @@ c
       real*8 eksum,ekt
       real*8 scale,temp
       real*8 expterm
+      real*8 scalep
       real*8 w(3)
       real*8 ekin(3,3)
 c
@@ -344,6 +347,24 @@ c
                end if
             end do
          end if
+      end if
+c
+c     use Berendsen scaling for any auxiliary dipole velocities
+c
+      if (use_ielscf) then
+         if (temp_aux .eq. 0.0d0)  temp_aux = 0.1d0
+         if (temp_auxp .eq. 0.0d0)  temp_auxp = 0.1d0
+         scale = sqrt(1.0d0+(dt/tautemp_aux)
+     &                          *(kelvin_aux/temp_aux-1.0d0))
+         scalep = sqrt(1.0d0+(dt/tautemp_aux)
+     &                           *(kelvin_aux/temp_auxp-1.0d0))
+         do i = 1, n
+            do j = 1, 3
+               vaux(j,i) = scale * vaux(j,i)
+               vpaux(j,i) = scalep * vpaux(j,i)
+            end do
+         end do
+         call kinaux
       end if
       return
       end

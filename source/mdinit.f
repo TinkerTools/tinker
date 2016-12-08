@@ -33,6 +33,7 @@ c
       use files
       use freeze
       use group
+      use ielscf
       use inform
       use iounit
       use keys
@@ -80,6 +81,7 @@ c
       use_sdarea = .false.
       use_pred = .false.
       polpred = 'LSQR'
+      use_ielscf = .false.
       iprint = 100
 c
 c     set default values for temperature and pressure control
@@ -134,9 +136,13 @@ c
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
          else if (keyword(1:14) .eq. 'POLAR-PREDICT ') then
-            use_pred = .true.
             call getword (record,polpred,next)
             call upcase (polpred)
+            if (polpred .eq. 'IEL') then
+               use_ielscf = .true.
+            else
+               use_pred = .true.
+            end if
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)
@@ -260,6 +266,10 @@ c
             end do
          end do
       end if
+c
+c     initialize inertial extended Lagrangian method
+c
+      if (use_ielscf)  call auxinit
 c
 c     enforce use of velocity Verlet with Andersen thermostat
 c
@@ -499,5 +509,107 @@ c
          end if
       end do
       nprior = i - 1
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##  COPYRIGHT (C) 2014 by Alex Albaugh & Jay William Ponder  ##
+c     ##                    All Rights Reserved                    ##
+c     ###############################################################
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine auxinit  --  initialize auxiliary dipole values  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "auxinit" initializes auxiliary variables and settings for
+c     inertial extended Lagrangian induced dipole prediction
+c
+c     literature reference:
+c
+c     A. Albaugh, O. Demerdash, and T. Head-Gordon, "An Efficient and
+c     Stable Hybrid Extended Lagrangian/Self-Consistent Field Scheme
+c     for Solving Classical Mutual Induction", Journal of Chemical
+c     Physics, 143, 174104 (2015)
+c
+c
+      subroutine auxinit
+      use atomid
+      use atoms
+      use ielscf
+      use keys
+      use polar
+      use units
+      implicit none
+      integer i,j,next
+      real*8 speed
+      real*8 weight
+      real*8 maxwell
+      real*8 vec(3)
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set defaults for auxiliary thermostat control variables
+c
+      nfree_aux = 3 * npolar
+      kelvin_aux = 100000.0d0
+      tautemp_aux = 0.1d0
+c
+c     check for keywords containing auxiliary thermostat values
+c 
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:13) .eq. 'AUX-TAUTEMP ') then
+            read (string,*,err=10,end=10)  tautemp_aux
+         else if (keyword(1:9) .eq. 'AUX-TEMP ') then
+            read (string,*,err=10,end=10)  kelvin_aux
+         end if
+   10    continue
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c 
+      allocate (uaux(3,n))
+      allocate (vaux(3,n))
+      allocate (aaux(3,n))
+      allocate (upaux(3,n))
+      allocate (vpaux(3,n))
+      allocate (apaux(3,n))
+c
+c     set auxiliary dipole values equal to induced dipoles
+c
+      use_ielscf = .false.
+      call induce
+      use_ielscf = .true.
+      do i = 1, n
+         do j = 1, 3
+            uaux(j,i) = uind(j,i)
+            upaux(j,i) = uinp(j,i)
+         end do
+      end do
+c
+c     set velocities and accelerations for auxiliary dipoles
+c
+      do i = 1, n
+         weight = boltzmann / mass(i)
+         speed = maxwell (weight,kelvin_aux)
+         call ranvec (vec)
+         do j = 1, 3
+            vaux(j,i) = speed * vec(j)
+            aaux(j,i) = 0.0d0
+            vpaux(j,i) = vaux(j,i)
+            apaux(j,i) = 0.0d0
+         end do
+      end do
+      call kinaux
       return
       end

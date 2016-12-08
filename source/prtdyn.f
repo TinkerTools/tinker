@@ -122,9 +122,15 @@ c
          fstr =  '('' Alternate Atomic Accelerations :'')'
          write (idyn,fstr(1:38))
          fstr = '(3d26.16)'
-         do i = 1, n
-            write (idyn,fstr(1:9))  aalt(1,i),aalt(2,i),aalt(3,i)
-         end do
+         if (integrate .eq. 'VERLET') then
+            do i = 1, n
+               write (idyn,fstr(1:9))  a(1,i),a(2,i),a(3,i)
+            end do
+         else
+            do i = 1, n
+               write (idyn,fstr(1:9))  aalt(1,i),aalt(2,i),aalt(3,i)
+            end do
+         end if
       end if
 c
 c     close the dynamics trajectory restart file

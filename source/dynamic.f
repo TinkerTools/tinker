@@ -37,8 +37,8 @@ c
       real*8 dt,dtdump
       logical exist
       character*20 keyword
-      character*240 record
-      character*240 string
+      character*120 record
+      character*120 string
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -47,63 +47,58 @@ c
       call getxyz
       call mechanic
 c
-c     initialize integrator and temperature/pressure coupling
+c     initialize the temperature, pressure and coupling baths
 c
-      integrate = 'BEEMAN'
-      kelvin = -1.0d0
-      atmsph = -1.0d0
+      kelvin = 0.0d0
+      atmsph = 0.0d0
       isothermal = .false.
       isobaric = .false.
 c
 c     check for keywords containing any altered parameters
 c
+      integrate = 'BEEMAN'
       do i = 1, nkey
          next = 1
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         string = record(next:240)
+         string = record(next:120)
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
-         else if (keyword(1:12) .eq. 'TEMPERATURE ') then
-            read (string,*,err=10,end=10)  kelvin
-         else if (keyword(1:9) .eq. 'PRESSURE ') then
-            read (string,*,err=10,end=10)  atmsph
          end if
-   10    continue
       end do
 c
 c     initialize the simulation length as number of time steps
 c
       nstep = -1
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=20,end=20)  nstep
-   20 continue
+      if (exist)  read (string,*,err=10,end=10)  nstep
+   10 continue
       dowhile (nstep .lt. 0)
-         write (iout,30)
-   30    format (/,' Enter the Number of Dynamics Steps to be',
+         write (iout,20)
+   20    format (/,' Enter the Number of Dynamics Steps to be',
      &              ' Taken :  ',$)
-         read (input,40,err=50)  nstep
-   40    format (i10)
+         read (input,30,err=40)  nstep
+   30    format (i10)
          if (nstep .lt. 0)  nstep = 0
-   50    continue
+   40    continue
       end do
 c
 c     get the length of the dynamics time step in picoseconds
 c
       dt = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=60,end=60)  dt
-   60 continue
+      if (exist)  read (string,*,err=50,end=50)  dt
+   50 continue
       do while (dt .lt. 0.0d0)
-         write (iout,70)
-   70    format (/,' Enter the Time Step Length in Femtoseconds',
+         write (iout,60)
+   60    format (/,' Enter the Time Step Length in Femtoseconds',
      &              ' [1.0] :  ',$)
-         read (input,80,err=90)  dt
-   80    format (f20.0)
+         read (input,70,err=80)  dt
+   70    format (f20.0)
          if (dt .le. 0.0d0)  dt = 1.0d0
-   90    continue
+   80    continue
       end do
       dt = 0.001d0 * dt
 c
@@ -116,16 +111,16 @@ c     set the time between trajectory snapshot coordinate dumps
 c
       dtdump = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=100,end=100)  dtdump
-  100 continue
+      if (exist)  read (string,*,err=90,end=90)  dtdump
+   90 continue
       do while (dtdump .lt. 0.0d0)
-         write (iout,110)
-  110    format (/,' Enter Time between Dumps in Picoseconds',
+         write (iout,100)
+  100    format (/,' Enter Time between Dumps in Picoseconds',
      &              ' [0.1] :  ',$)
-         read (input,120,err=130)  dtdump
-  120    format (f20.0)
+         read (input,110,err=120)  dtdump
+  110    format (f20.0)
          if (dtdump .le. 0.0d0)  dtdump = 0.1d0
-  130    continue
+  120    continue
       end do
       iwrite = nint(dtdump/dt)
 c
@@ -134,64 +129,62 @@ c
       if (use_bounds) then
          mode = -1
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=140,end=140)  mode
-  140    continue
+         if (exist)  read (string,*,err=130,end=130)  mode
+  130    continue
          do while (mode.lt.1 .or. mode.gt.4)
-            write (iout,150)
-  150       format (/,' Available Statistical Mechanical Ensembles :',
+            write (iout,140)
+  140       format (/,' Available Statistical Mechanical Ensembles :',
      &              //,4x,'(1) Microcanonical (NVE)',
      &              /,4x,'(2) Canonical (NVT)',
      &              /,4x,'(3) Isoenthalpic-Isobaric (NPH)',
      &              /,4x,'(4) Isothermal-Isobaric (NPT)',
      &              //,' Enter the Number of the Desired Choice',
      &                 ' [1] :  ',$)
-            read (input,160,err=170)  mode
-  160       format (i10)
+            read (input,150,err=160)  mode
+  150       format (i10)
             if (mode .le. 0)  mode = 1
-  170       continue
+  160       continue
          end do
          if (integrate.eq.'BUSSI' .or. integrate.eq.'NOSE-HOOVER'
      &                .or. integrate.eq.'GHMC') then
             if (mode .ne. 4) then
                mode = 4
-               write (iout,180)
-  180          format (/,' Switching to NPT Ensemble as Required',
+               write (iout,170)
+  170          format (/,' Switching to NPT Ensemble as Required',
      &                    ' by Chosen Integrator')
             end if
          end if
          if (mode.eq.2 .or. mode.eq.4) then
             isothermal = .true.
-            if (kelvin .lt. 0.0d0) then
-               call nextarg (string,exist)
-               if (exist)  read (string,*,err=190,end=190)  kelvin
-  190          continue
-               do while (kelvin .lt. 0.0d0)
-                  write (iout,200)
-  200             format (/,' Enter the Desired Temperature in Degrees',
-     &                       ' K [298] :  ',$)
-                  read (input,210,err=220)  kelvin
-  210             format (f20.0)
-                  if (kelvin .le. 0.0d0)  kelvin = 298.0d0
-  220             continue
-               end do
-            end if
+            kelvin = -1.0d0
+            call nextarg (string,exist)
+            if (exist)  read (string,*,err=180,end=180)  kelvin
+  180       continue
+            do while (kelvin .lt. 0.0d0)
+               write (iout,190)
+  190          format (/,' Enter the Desired Temperature in Degrees',
+     &                    ' K [298] :  ',$)
+               read (input,200,err=210)  kelvin
+  200          format (f20.0)
+               if (kelvin .le. 0.0d0)  kelvin = 298.0d0
+  210          continue
+            end do
          end if
          if (mode.eq.3 .or. mode.eq.4) then
             isobaric = .true.
-            if (atmsph .lt. 0.0d0) then
-               call nextarg (string,exist)
-               if (exist)  read (string,*,err=230,end=230)  atmsph
-  230          continue
-               do while (atmsph .lt. 0.0d0)
-                  write (iout,240)
-  240             format (/,' Enter the Desired Pressure in Atmospheres'
-     &                       ' [1.0] :  ',$)
-                  read (input,250,err=260)  atmsph
-  250             format (f20.0)
-                  if (atmsph .le. 0.0d0)  atmsph = 1.0d0
-  260             continue
-               end do
-            end if
+            atmsph = -1.0d0
+            call nextarg (string,exist)
+            if (exist)  read (string,*,err=220,end=220)  atmsph
+  220       continue
+            do while (atmsph .lt. 0.0d0)
+               write (iout,230)
+  230          format (/,' Enter the Desired Pressure in Atm',
+     &                    ' [1.0] :  ',$)
+               read (input,240,err=250)  atmsph
+  240          format (f20.0)
+               if (atmsph .le. 0.0d0)  atmsph = 1.0d0
+  250          continue
+            end do
          end if
       end if
 c
@@ -200,36 +193,35 @@ c
       if (.not. use_bounds) then
          mode = -1
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=270,end=270)  mode
-  270    continue
+         if (exist)  read (string,*,err=260,end=260)  mode
+  260    continue
          do while (mode.lt.1 .or. mode.gt.2)
-            write (iout,280)
-  280       format (/,' Available Simulation Control Modes :',
+            write (iout,270)
+  270       format (/,' Available Simulation Control Modes :',
      &              //,4x,'(1) Constant Total Energy Value (E)',
      &              /,4x,'(2) Constant Temperature via Thermostat (T)',
      &              //,' Enter the Number of the Desired Choice',
      &                 ' [1] :  ',$)
-            read (input,290,err=300)  mode
-  290       format (i10)
+            read (input,280,err=290)  mode
+  280       format (i10)
             if (mode .le. 0)  mode = 1
-  300       continue
+  290       continue
          end do
          if (mode .eq. 2) then
             isothermal = .true.
-            if (kelvin .lt. 0.0d0) then
-               call nextarg (string,exist)
-               if (exist)  read (string,*,err=310,end=310)  kelvin
-  310          continue
-               do while (kelvin .lt. 0.0d0)
-                  write (iout,320)
-  320             format (/,' Enter the Desired Temperature in Degrees',
-     &                       ' K [298] :  ',$)
-                  read (input,330,err=340)  kelvin
-  330             format (f20.0)
-                  if (kelvin .le. 0.0d0)  kelvin = 298.0d0
-  340             continue
-               end do
-            end if
+            kelvin = -1.0d0
+            call nextarg (string,exist)
+            if (exist)  read (string,*,err=300,end=300)  kelvin
+  300       continue
+            do while (kelvin .lt. 0.0d0)
+               write (iout,310)
+  310          format (/,' Enter the Desired Temperature in Degrees',
+     &                    ' K [298] :  ',$)
+               read (input,320,err=330)  kelvin
+  320          format (f20.0)
+               if (kelvin .le. 0.0d0)  kelvin = 298.0d0
+  330          continue
+            end do
          end if
       end if
 c
@@ -241,36 +233,36 @@ c
 c     print out a header line for the dynamics computation
 c
       if (integrate .eq. 'VERLET') then
-         write (iout,350)
-  350    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,340)
+  340    format (/,' Molecular Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
       else if (integrate .eq. 'STOCHASTIC') then
-         write (iout,360)
-  360    format (/,' Stochastic Dynamics Trajectory via',
+         write (iout,350)
+  350    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
       else if (integrate .eq. 'BUSSI') then
-         write (iout,370)
-  370    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,360)
+  360    format (/,' Molecular Dynamics Trajectory via',
      &              ' Bussi-Parrinello NPT Algorithm')
       else if (integrate .eq. 'NOSE-HOOVER') then
-         write (iout,380)
-  380    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,370)
+  370    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
       else if (integrate .eq. 'GHMC') then
-         write (iout,390)
-  390    format (/,' Stochastic Dynamics Trajectory via',
+         write (iout,380)
+  380    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,400)
-  400    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,390)
+  390    format (/,' Molecular Dynamics Trajectory via',
      &              ' Rigid Body Algorithm')
       else if (integrate .eq. 'RESPA') then
-         write (iout,410)
-  410    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,400)
+  400    format (/,' Molecular Dynamics Trajectory via',
      &              ' r-RESPA MTS Algorithm')
       else
-         write (iout,420)
-  420    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,410)
+  410    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)

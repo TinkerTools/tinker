@@ -41,6 +41,7 @@ c
       use group
       use hessn
       use hpmf
+      use ielscf
       use improp
       use imptor
       use inform
@@ -361,6 +362,15 @@ c
       if (allocated(ipmf))  deallocate (ipmf)
       if (allocated(rpmf))  deallocate (rpmf)
       if (allocated(acsa))  deallocate (acsa)
+c
+c     deallocation of global arrays from module ielscf
+c
+      if (allocated(uaux))  deallocate (uaux)
+      if (allocated(upaux))  deallocate (upaux)
+      if (allocated(vaux))  deallocate (vaux)
+      if (allocated(vpaux))  deallocate (vpaux)
+      if (allocated(aaux))  deallocate (aaux)
+      if (allocated(apaux))  deallocate (apaux)
 c
 c     deallocation of global arrays from module improp
 c

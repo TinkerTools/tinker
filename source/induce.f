@@ -175,6 +175,7 @@ c
       subroutine induce0a
       use sizes
       use atoms
+      use ielscf
       use inform
       use iounit
       use limits
@@ -309,7 +310,7 @@ c
          polmin = 0.00000001d0
          eps = 100.0d0
 c
-c     estimated induced dipoles from polynomial predictor
+c     estimate induced dipoles using a polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
             call ulspred
@@ -323,6 +324,17 @@ c
                   end do
                   uind(j,i) = udsum
                   uinp(j,i) = upsum
+               end do
+            end do
+         end if
+c
+c     estimate induced dipoles via inertial extended Lagrangian
+c
+         if (use_ielscf) then
+            do i = 1, npole
+               do j = 1, 3
+                  uind(j,i) = uaux(j,i)
+                  uinp(j,i) = upaux(j,i)
                end do
             end do
          end if

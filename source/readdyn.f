@@ -62,7 +62,7 @@ c
    20 format ()
       read (idyn,30)  record
    30 format (a240)
-      read (record,*,err=230,end=230)  ndyn
+      read (record,*,err=240,end=240)  ndyn
       if (ndyn .ne. n) then
          write (iout,40)
    40    format (/,' READDYN  --  Restart File has Incorrect',
@@ -76,12 +76,10 @@ c
    50 format ()
       read (idyn,60)  record
    60 format (a240)
-      read (record,*,err=230,end=230)  xbox,ybox,zbox
+      read (record,*,err=240,end=240)  xbox,ybox,zbox
       read (idyn,70)  record
    70 format (a240)
-      read (record,*,err=230,end=230)  alpha,beta,gamma
-      read (idyn,80)
-   80 format ()
+      read (record,*,err=240,end=240)  alpha,beta,gamma
 c
 c     set the box volume and additional periodic box values
 c
@@ -89,75 +87,78 @@ c
 c
 c     get rigid body positions, translational and angular velocities
 c
-      quit = .true.
       if (integrate .eq. 'RIGIDBODY') then
+         read (idyn,80)
+   80    format ()
          do i = 1, n
             read (idyn,90)  record
    90       format (a240)
-            read (record,*,err=230,end=230)  x(i),y(i),z(i)
+            read (record,*,err=240,end=240)  x(i),y(i),z(i)
          end do
          read (idyn,100)
   100    format ()
          do i = 1, ngrp
             read (idyn,110)  record
   110       format (a240)
-            read (record,*,err=230,end=230)  vcm(1,i),vcm(2,i),vcm(3,i)
+            read (record,*,err=240,end=240)  vcm(1,i),vcm(2,i),vcm(3,i)
          end do
          read (idyn,120)
   120    format ()
          do i = 1, ngrp
             read (idyn,130)  record
   130       format (a240)
-            read (record,*,err=230,end=230)  wcm(1,i),wcm(2,i),wcm(3,i)
+            read (record,*,err=240,end=240)  wcm(1,i),wcm(2,i),wcm(3,i)
          end do
          read (idyn,140)
   140    format ()
          do i = 1, ngrp
             read (idyn,150)  record
   150       format (a240)
-            read (record,*,err=230,end=230)  lm(1,i),lm(2,i),lm(3,i)
+            read (record,*,err=240,end=240)  lm(1,i),lm(2,i),lm(3,i)
          end do
 c
 c     get the atomic positions, velocities and accelerations
 c
       else
+         read (idyn,160)
+  160    format ()
          do i = 1, n
-            read (idyn,160)  record
-  160       format (a240)
-            read (record,*,err=230,end=230)  x(i),y(i),z(i)
+            read (idyn,170)  record
+  170       format (a240)
+            read (record,*,err=240,end=240)  x(i),y(i),z(i)
          end do
-         read (idyn,170)
-  170    format ()
+         read (idyn,180)
+  180    format ()
          do i = 1, n
-            read (idyn,180)  record
-  180       format (a240)
-            read (record,*,err=230,end=230)  v(1,i),v(2,i),v(3,i)
+            read (idyn,190)  record
+  190       format (a240)
+            read (record,*,err=240,end=240)  v(1,i),v(2,i),v(3,i)
          end do
-         read (idyn,190)
-  190    format ()
+         read (idyn,200)
+  200    format ()
          do i = 1, n
-            read (idyn,200)  record
-  200       format (a240)
-            read (record,*,err=230,end=230)  a(1,i),a(2,i),a(3,i)
+            read (idyn,210)  record
+  210       format (a240)
+            read (record,*,err=240,end=240)  a(1,i),a(2,i),a(3,i)
          end do
-         read (idyn,210)
-  210    format ()
+         read (idyn,220)
+  220    format ()
          do i = 1, n
-            read (idyn,220)  record
-  220       format (a240)
-            read (record,*,err=230,end=230)  aalt(1,i),aalt(2,i),
+            read (idyn,230)  record
+  230       format (a240)
+            read (record,*,err=240,end=240)  aalt(1,i),aalt(2,i),
      &                                       aalt(3,i)
          end do
       end if
       quit = .false.
-  230 continue
+  240 continue
       if (.not. opened)  close (unit=idyn)
 c
 c     report any error in reading the dynamics restart file
 c
       if (quit) then
-         write (iout,240)  i
-  240    format (/,' READDYN  --  Error in Dynamics Restart',
+         write (iout,250)  i
+  250    format (/,' READDYN  --  Error in Dynamics Restart',
      &              ' File at Atom',i6)
          call fatal
       end if

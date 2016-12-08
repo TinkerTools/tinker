@@ -716,8 +716,10 @@ c
       integer kab,kac,kad
       integer kbc,kbd,kcd
       integer priority
-      logical query,change
+      logical exist,query
+      logical change
       character*240 record
+      character*240 string
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -951,8 +953,8 @@ c
       write (iout,10)
    10 format (/,' Local Frame Definition for Multipole Sites :')
       write (iout,20)
-   20 format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
-     &          'X Axis',2x,'Y Axis',/)
+   20 format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',
+     &           2x,'X Axis',2x,'Y Axis',/)
       do i = 1, npole
          write (iout,30)  i,name(i),polaxe(i),zaxis(i),
      &                    xaxis(i),yaxis(i)
@@ -961,20 +963,27 @@ c
 c
 c     allow the user to manually alter local coordinate frames
 c
-      query = .true.
       change = .false.
+      query = .true.
+      i = -1
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=40,end=40)  i
+         if (i .eq. 0)  query = .false.
+      end if
+   40 continue
       do while (query)
          i = 0
          ia = 0
          ib = 0
          ic = 0
-         write (iout,40)
-   40    format (/,' Enter Altered Local Frame Definition',
+         write (iout,50)
+   50    format (/,' Enter Altered Local Frame Definition',
      &              ' [<CR>=Exit] :  ',$)
-         read (input,50)  record
-   50    format (a240)
-         read (record,*,err=60,end=60)  i,ia,ib,ic
-   60    continue
+         read (input,60)  record
+   60    format (a240)
+         read (record,*,err=70,end=70)  i,ia,ib,ic
+   70    continue
          if (i .eq. 0) then
             query = .false.
          else
@@ -994,15 +1003,15 @@ c
 c     repeat local frame list if definitions were altered
 c
       if (change) then
-         write (iout,70)
-   70    format (/,' Local Frame Definition for Multipole Sites :')
          write (iout,80)
-   80    format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
-     &             'X Axis',2x,'Y Axis',/)
+   80    format (/,' Local Frame Definition for Multipole Sites :')
+         write (iout,90)
+   90    format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',
+     &              2x,'X Axis',2x,'Y Axis',/)
          do i = 1, npole
-            write (iout,90)  i,name(i),polaxe(i),zaxis(i),
-     &                       xaxis(i),yaxis(i)
-   90       format (i8,6x,a3,7x,a8,2x,3i8)
+            write (iout,100)  i,name(i),polaxe(i),zaxis(i),
+     &                        xaxis(i),yaxis(i)
+  100       format (i8,6x,a3,7x,a8,2x,3i8)
          end do
       end if
       return
@@ -1467,8 +1476,10 @@ c
       integer i,j,k,ii
       integer ia,ib
       real*8 pol,thl
-      logical query,change
+      logical exist,query
+      logical change
       character*240 record
+      character*240 string
 c
 c
 c     list the polariability values for each multipole site
@@ -1490,20 +1501,27 @@ c
 c
 c     allow the user to manually alter polarizability values
 c
-      query = .true.
       change = .false.
+      query = .true.
+      i = -1
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=50,end=50)  i
+         if (i .eq. 0)  query = .false.
+      end if
+   50 continue
       do while (query)
          i = 0
          ii = 0
          pol = 0.0d0
          thl = 0.39d0
-         write (iout,50)
-   50    format (/,' Enter Atom Number & Polarizability Values',
+         write (iout,60)
+   60    format (/,' Enter Atom Number & Polarizability Values',
      &              ' [<CR>=Exit] :  ',$)
-         read (input,60)  record
-   60    format (a240)
-         read (record,*,err=70,end=70)  ii,pol,thl
-   70    continue
+         read (input,70)  record
+   70    format (a240)
+         read (record,*,err=80,end=80)  ii,pol,thl
+   80    continue
          if (ii .eq. 0) then
             query = .false.
          else
@@ -1519,26 +1537,26 @@ c
 c     repeat polarizability values if parameters were altered
 c
       if (change) then
-         write (iout,80)
-   80    format (/,' Atomic Polarizabilities for Multipole Sites :')
          write (iout,90)
-   90    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+   90    format (/,' Atomic Polarizabilities for Multipole Sites :')
+         write (iout,100)
+  100    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
          do ii = 1, n
             i = pollist(ii)
             if (i .eq. 0) then
-               write (iout,100)  ii,name(ii)
-  100          format (i8,6x,a3,12x,'--',13x,'--')
+               write (iout,110)  ii,name(ii)
+  110          format (i8,6x,a3,12x,'--',13x,'--')
             else
-               write (iout,110)  ii,name(ii),polarity(i),thole(i)
-  110          format (i8,6x,a3,4x,f12.4,3x,f12.4)
+               write (iout,120)  ii,name(ii),polarity(i),thole(i)
+  120          format (i8,6x,a3,4x,f12.4,3x,f12.4)
             end if
          end do
       end if
 c
 c     use bonded atoms as initial guess at polarization groups
 c
-      write (iout,120)
-  120 format (/,' The default is to place all Atoms into one',
+      write (iout,130)
+  130 format (/,' The default is to place all Atoms into one',
      &           ' Polarization Group;',
      &        /,' This can be altered by entering a series of',
      &           ' Bonded Atom Pairs',
@@ -1553,16 +1571,23 @@ c
 c     get the bonds that separate the polarization groups
 c
       query = .true.
+      i = -1
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=140,end=140)  i
+         if (i .eq. 0)  query = .false.
+      end if
+  140 continue
       do while (query)
          ia = 0
          ib = 0
-         write (iout,130)
-  130    format (/,' Enter a Bond between Polarization Groups',
+         write (iout,150)
+  150    format (/,' Enter a Bond between Polarization Groups',
      &              ' [<CR>=Exit] :  ',$)
-         read (input,140)  record
-  140    format (a240)
-         read (record,*,err=150,end=150)  ia,ib
-  150    continue
+         read (input,160)  record
+  160    format (a240)
+         read (record,*,err=170,end=170)  ia,ib
+  170    continue
          if (ia.eq.0 .or. ib.eq.0) then
             query = .false.
          else
@@ -1588,18 +1613,18 @@ c
 c
 c     list the polarization group for each multipole site
 c
-      write (iout,160)
-  160 format (/,' Polarization Groups for Multipole Sites :')
-      write (iout,170)
-  170 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
+      write (iout,180)
+  180 format (/,' Polarization Groups for Multipole Sites :')
+      write (iout,190)
+  190 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
      &           ' Definition',/)
       do i = 1, n
          k = 0
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0)  k = j
          end do
-         write (iout,180)  i,name(i),(pgrp(j,i),j=1,k)
-  180    format (i8,6x,a3,8x,20i6)
+         write (iout,200)  i,name(i),(pgrp(j,i),j=1,k)
+  200    format (i8,6x,a3,8x,20i6)
       end do
       return
       end
@@ -2194,21 +2219,34 @@ c
       real*8 eps,ci,cj
       real*8 big,sum
       real*8 pave(13)
+      logical exist,query
       logical yzero
       character*1 answer
       character*240 record
+      character*240 string
 c
 c
 c     optionally average multipoles for equivalent atoms
 c
-      write (iout,10)
-   10 format (/,' Average the Multipole Moments of Equivalent',
-     &           ' Atoms [N] :  ',$)
-      read (input,20)  record
-   20 format (a240)
-      next = 1
-      call gettext (record,answer,next)
-      call upcase (answer)
+      query = .true.
+      answer = ' '
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=10,end=10)  answer
+         call upcase (answer)
+         if (answer.eq.'N' .or. answer.eq.'Y')  query = .false.
+      end if
+   10 continue
+      if (query) then
+         write (iout,20)
+   20    format (/,' Average the Multipole Moments of Equivalent',
+     &              ' Atoms [N] :  ',$)
+         read (input,30)  record
+   30    format (a240)
+         next = 1
+         call gettext (record,answer,next)
+         call upcase (answer)
+      end if
 c
 c     perform averaging for equivalent monovalent atoms
 c
@@ -2219,11 +2257,11 @@ c
                k = i12(j,i)
                if (n12(k) .eq. 1) then
                   do m = 1, nlist
-                     if (list(m) .eq. atomic(k))  goto 30
+                     if (list(m) .eq. atomic(k))  goto 40
                   end do
                   nlist = nlist + 1
                   list(nlist) = atomic(k)
-   30             continue
+   40             continue
                end if
             end do
             do ii = 1, nlist
@@ -2264,14 +2302,25 @@ c
 c
 c     optionally set symmetric multipole components to zero
 c
-      write (iout,40)
-   40 format (/,' Remove Multipole Components Zeroed by',
-     &           ' Symmetry [N] :  ',$)
-      read (input,50)  record
-   50 format (a240)
-      next = 1
-      call gettext (record,answer,next)
-      call upcase (answer)
+      query = .true.
+      answer = ' '
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=50,end=50)  answer
+         call upcase (answer)
+         if (answer.eq.'N' .or. answer.eq.'Y')  query = .false.
+      end if
+   50 continue
+      if (query) then
+         write (iout,60)
+   60    format (/,' Remove Multipole Components Zeroed by',
+     &              ' Symmetry [N] :  ',$)
+         read (input,70)  record
+   70    format (a240)
+         next = 1
+         call gettext (record,answer,next)
+         call upcase (answer)
+      end if
 c
 c     remove multipole components that are zero by symmetry
 c
@@ -2333,11 +2382,11 @@ c
          if (ci .gt. big) then
             do j = 1, n
                cj = abs(pole(1,j))
-               if (i.ne.j .and. ci.eq.cj)  goto 60
+               if (i.ne.j .and. ci.eq.cj)  goto 80
             end do
             k = i
             big = ci
-   60       continue
+   80       continue
          end if
       end do
       sum = sum - dble(nint(sum))
@@ -2357,37 +2406,37 @@ c
 c
 c     print the final post-processed multipoles for AMOEBA
 c
-      write (iout,70)
-   70 format (/,' Final Multipole Moments for the AMOEBA Force',
+      write (iout,90)
+   90 format (/,' Final Multipole Moments for the AMOEBA Force',
      &           ' Field :')
       do ii = 1, n
          i = pollist(ii)
          if (i .eq. 0) then
-            write (iout,80)  ii,name(ii),atomic(ii)
-   80       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,100)  ii,name(ii),atomic(ii)
+  100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,90)
-   90       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,110)
+  110       format (/,' No Atomic Multipole Moments for this Site')
          else
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,100)  ii,name(ii),atomic(ii)
-  100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,120)  ii,name(ii),atomic(ii)
+  120       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,110)  polaxe(i),izaxe,ixaxe,iyaxe
-  110       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,120)  pole(1,i)
-  120       format (/,' Charge:',10x,f15.5)
-            write (iout,130)  pole(2,i),pole(3,i),pole(4,i)
-  130       format (' Dipole:',10x,3f15.5)
-            write (iout,140)  pole(5,i)
-  140       format (' Quadrupole:',6x,f15.5)
-            write (iout,150)  pole(8,i),pole(9,i)
-  150       format (18x,2f15.5)
-            write (iout,160)  pole(11,i),pole(12,i),pole(13,i)
-  160       format (18x,3f15.5)
+            write (iout,130)  polaxe(i),izaxe,ixaxe,iyaxe
+  130       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,140)  pole(1,i)
+  140       format (/,' Charge:',10x,f15.5)
+            write (iout,150)  pole(2,i),pole(3,i),pole(4,i)
+  150       format (' Dipole:',10x,3f15.5)
+            write (iout,160)  pole(5,i)
+  160       format (' Quadrupole:',6x,f15.5)
+            write (iout,170)  pole(8,i),pole(9,i)
+  170       format (18x,2f15.5)
+            write (iout,180)  pole(11,i),pole(12,i),pole(13,i)
+  180       format (18x,3f15.5)
          end if
       end do
       return

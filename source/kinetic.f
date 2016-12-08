@@ -1,9 +1,9 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  2001  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ###############################################################
+c     ##  COPYRIGHT (C) 2014 by Alex Albaugh & Jay William Ponder  ##
+c     ##                    All Rights Reserved                    ##
+c     ###############################################################
 c
 c     #################################################################
 c     ##                                                             ##
@@ -144,5 +144,67 @@ c
          end do
          eksum = eksum + value
       end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine kinaux -- compute iEL dipole kinetic energy  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "kinaux" computes the total kinetic energy and temperature
+c     for auxiliary dipole variables used in iEL polarization
+c
+c
+      subroutine kinaux
+      use atoms
+      use ielscf
+      implicit none
+      integer i,j,k
+      real*8 term
+      real*8 vj,vjp
+      real*8 vk,vkp
+      real*8 eksum_aux
+      real*8 eksum_auxp
+      real*8 ekaux(3,3)
+      real*8 ekauxp(3,3)
+c
+c
+c     zero out the total kinetic energy and its outer product
+c  
+      eksum_aux = 0.0d0
+      eksum_auxp = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            ekaux(j,i) = 0.0d0
+            ekauxp(j,i) = 0.0d0
+         end do
+      end do
+c
+c     get the kinetic energy tensor for auxiliary variables
+c 
+      do i = 1, n
+         term = 0.5d0
+         do j = 1, 3
+            vj = vaux(j,i)
+            vjp = vpaux(j,i)
+            do k = 1, 3
+               vk = vaux(k,i)
+               vkp = vpaux(k,i)
+               ekaux(k,j) = ekaux(k,j) + term*vj*vk
+               ekauxp(k,j) = ekauxp(k,j) + term*vjp*vkp
+            end do
+         end do
+      end do
+c
+c     find the total kinetic energy and temperature values
+c
+      eksum_aux = ekaux(1,1) + ekaux(2,2) + ekaux(3,3)
+      eksum_auxp = ekauxp(1,1) + ekauxp(2,2) + ekauxp(3,3)
+      temp_aux = 2.0d0 * eksum_aux / dble(nfree_aux)
+      temp_auxp = 2.0d0 * eksum_auxp / dble(nfree_aux)
       return
       end
