@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine pressure  --  barostat applied at full step  ##
+c     ##  subroutine pressure  --  barostat applied at full-step  ##
 c     ##                                                          ##
 c     ##############################################################
 c
@@ -62,7 +62,7 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine pressure2  --  barostat applied at half step  ##
+c     ##  subroutine pressure2  --  barostat applied at half-step  ##
 c     ##                                                           ##
 c     ###############################################################
 c

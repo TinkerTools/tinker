@@ -31,8 +31,10 @@ c
       use bath
       use boxes
       use freeze
+      use ielscf
       use mdstuf
       use moldyn
+      use polar
       use units
       use usage
       implicit none
@@ -121,6 +123,22 @@ c
       zbox = zbox * expterm
       call lattice
 c
+c     apply Verlet half-step updates for any auxiliary dipoles
+c
+      if (use_ielscf) then
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
+                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
+                  uaux(j,i) = uaux(j,i) + vaux(j,i)*dt
+                  upaux(j,i) = upaux(j,i) + vpaux(j,i)*dt
+               end do
+            end if
+         end do
+         call temper2 (dt,temp)
+      end if
+c
 c     get constraint-corrected positions and half-step velocities
 c
       if (use_rattle)  call rattle (dt,xold,yold,zold)
@@ -160,6 +178,22 @@ c
             end do
         end if
       end do
+c
+c     apply Verlet full-step updates for any auxiliary dipoles
+c
+      if (use_ielscf) then
+         term = 2.0d0 / (dt*dt)
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  aaux(j,i) = term * (uind(j,i)-uaux(j,i))
+                  apaux(j,i) = term * (uinp(j,i)-upaux(j,i))
+                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
+                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
+               end do
+            end if
+         end do
+      end if
 c
 c     find the constraint-corrected full-step velocities
 c

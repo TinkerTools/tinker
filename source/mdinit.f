@@ -143,6 +143,8 @@ c
             else
                use_pred = .true.
             end if
+         else if (keyword(1:8) .eq. 'IEL-SCF ') then
+            use_ielscf = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)

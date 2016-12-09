@@ -7,7 +7,7 @@ c     #############################################################
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine temper  --  thermostat applied at full step  ##
+c     ##  subroutine temper  --  thermostat applied at full-step  ##
 c     ##                                                          ##
 c     ##############################################################
 c
@@ -239,7 +239,7 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine temper2  --  thermostat applied at half step  ##
+c     ##  subroutine temper2  --  thermostat applied at half-step  ##
 c     ##                                                           ##
 c     ###############################################################
 c
