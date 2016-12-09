@@ -1428,7 +1428,7 @@ born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math
 bound.o:
 bounds.o: atomid.o atoms.o boxes.o molcul.o sizes.o
 boxes.o:
-bussi.o: atomid.o atoms.o bath.o boxes.o freeze.o mdstuf.o moldyn.o sizes.o units.o usage.o
+bussi.o: atomid.o atoms.o bath.o boxes.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o sizes.o units.o usage.o
 calendar.o:
 cell.o:
 center.o: align.o
@@ -1827,7 +1827,7 @@ readxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o s
 refer.o: sizes.o
 replica.o: bound.o boxes.o cell.o inform.o iounit.o
 resdue.o:
-respa.o: atomid.o atoms.o freeze.o limits.o moldyn.o potent.o sizes.o units.o usage.o virial.o
+respa.o: atomid.o atoms.o freeze.o ielscf.o limits.o moldyn.o polar.o potent.o sizes.o units.o usage.o virial.o
 restrn.o:
 rgddyn.o:
 rgdstep.o: atomid.o atoms.o bound.o group.o iounit.o rgddyn.o sizes.o units.o virial.o

@@ -1635,7 +1635,7 @@ c
                txk5 = 2.0d0 * (psr5*uind(1,i)+dsr5*uinp(1,i))
                tyk5 = 2.0d0 * (psr5*uind(2,i)+dsr5*uinp(2,i))
                tzk5 = 2.0d0 * (psr5*uind(3,i)+dsr5*uinp(3,i))
-               turi = -psr7*duri - dsr7*purk
+               turi = -psr7*durk - dsr7*purk
                turk = -psr7*duri - dsr7*puri
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
