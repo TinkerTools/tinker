@@ -33,8 +33,8 @@ c
       implicit none
       integer i,j,k,istrbnd
       integer ia,ib,ic
-      real*8 e,ebao
-      real*8 dr1,dr2,dt
+      real*8 e,dt
+      real*8 dr1,dr2
       real*8 fgrp,angle
       real*8 force1,force2
       real*8 dot,cosine
@@ -57,8 +57,6 @@ c
       real*8 dedxic,dedyic,dedzic
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: debao(:,:)
       logical proceed
 c
 c
@@ -71,30 +69,12 @@ c
          deba(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (debao(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      ebao = eba
-      do i = 1, n
-         debao(1,i) = deba(1,i)
-         debao(2,i) = deba(2,i)
-         debao(3,i) = deba(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
 !$OMP& anat,bl,bk,use,x,y,z,stbnunit,use_group,use_polymer)
-!$OMP& shared(ebao,debao,viro)
-!$OMP DO reduction(+:ebao,debao,viro) schedule(guided)
+!$OMP& shared(eba,deba,vir)
+!$OMP DO reduction(+:eba,deba,vir) schedule(guided)
 c
 c     calculate the stretch-bend energy and first derivatives
 c
@@ -210,16 +190,16 @@ c
 c
 c     increment the total stretch-bend energy and derivatives
 c
-               ebao = ebao + e
-               debao(1,ia) = debao(1,ia) + dedxia
-               debao(2,ia) = debao(2,ia) + dedyia
-               debao(3,ia) = debao(3,ia) + dedzia
-               debao(1,ib) = debao(1,ib) + dedxib
-               debao(2,ib) = debao(2,ib) + dedyib
-               debao(3,ib) = debao(3,ib) + dedzib
-               debao(1,ic) = debao(1,ic) + dedxic
-               debao(2,ic) = debao(2,ic) + dedyic
-               debao(3,ic) = debao(3,ic) + dedzic
+               eba = eba + e
+               deba(1,ia) = deba(1,ia) + dedxia
+               deba(2,ia) = deba(2,ia) + dedyia
+               deba(3,ia) = deba(3,ia) + dedzia
+               deba(1,ib) = deba(1,ib) + dedxib
+               deba(2,ib) = deba(2,ib) + dedyib
+               deba(3,ib) = deba(3,ib) + dedzib
+               deba(1,ic) = deba(1,ic) + dedxic
+               deba(2,ic) = deba(2,ic) + dedyic
+               deba(3,ic) = deba(3,ic) + dedzic
 c
 c     increment the internal virial tensor components
 c
@@ -229,15 +209,15 @@ c
                vyy = yab*dedyia + ycb*dedyic
                vzy = zab*dedyia + zcb*dedyic
                vzz = zab*dedzia + zcb*dedzic
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vyx
-               viro(3,1) = viro(3,1) + vzx
-               viro(1,2) = viro(1,2) + vyx
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vzy
-               viro(1,3) = viro(1,3) + vzx
-               viro(2,3) = viro(2,3) + vzy
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
             end if
          end if
       end do
@@ -246,23 +226,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eba = ebao
-      do i = 1, n
-         deba(1,i) = debao(1,i)
-         deba(2,i) = debao(2,i)
-         deba(3,i) = debao(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (debao)
       return
       end

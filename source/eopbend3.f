@@ -36,9 +36,7 @@ c
       implicit none
       integer i,iopbend
       integer ia,ib,ic,id
-      integer neopbo
-      real*8 e,eopbo
-      real*8 angle,force
+      real*8 e,angle,force
       real*8 cosine,fgrp
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
@@ -53,7 +51,6 @@ c
       real*8 rdb2,rad2,rcd2
       real*8 rab2,rcb2
       real*8 cc,ee,bkk2
-      real*8, allocatable :: aeopbo(:)
       logical proceed
       logical header,huge
 c
@@ -77,25 +74,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeopbo(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eopbo = eopb
-      neopbo = neopb
-      do i = 1, n
-         aeopbo(i) = aeopb(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopbend,iopb,iang,opbk,use,
 !$OMP& x,y,z,opbtyp,copb,qopb,popb,sopb,opbunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eopbo,neopbo,aeopbo)
-!$OMP DO reduction(+:eopbo,neopbo,aeopbo) schedule(guided)
+!$OMP& shared(eopb,neopb,aeopb)
+!$OMP DO reduction(+:eopb,neopb,aeopb) schedule(guided)
 c
 c     calculate the out-of-plane bending energy term
 c
@@ -193,9 +178,9 @@ c
 c
 c     increment the total out-of-plane bending energy
 c
-               neopbo = neopbo + 1
-               eopbo = eopbo + e
-               aeopbo(ib) = aeopbo(ib) + e
+               neopb = neopb + 1
+               eopb = eopb + e
+               aeopb(ib) = aeopb(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -221,17 +206,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eopb = eopbo
-      neopb = neopbo
-      do i = 1, n
-         aeopb(i) = aeopbo(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeopbo)
       return
       end

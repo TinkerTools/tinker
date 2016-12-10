@@ -27,8 +27,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eopdo
-      real*8 force,fgrp
+      real*8 e,force,fgrp
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
       real*8 xib,yib,zib
@@ -45,16 +44,12 @@ c     zero out the out-of-plane distance energy component
 c
       eopd = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eopdo = eopd
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer)
-!$OMP& shared(eopdo)
-!$OMP DO reduction(+:eopdo) schedule(guided)
+!$OMP& shared(eopd)
+!$OMP DO reduction(+:eopd) schedule(guided)
 c
 c     calculate the out-of-plane distance energy term
 c
@@ -124,7 +119,7 @@ c
 c
 c     increment the total out-of-plane distance energy
 c
-            eopdo = eopdo + e
+            eopd = eopd + e
          end if
       end do
 c
@@ -132,9 +127,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eopd = eopdo
       return
       end

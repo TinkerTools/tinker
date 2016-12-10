@@ -33,9 +33,8 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      integer neito
-      real*8 e,eito
-      real*8 rcb,angle,fgrp
+      real*8 e,rcb
+      real*8 angle,fgrp
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
@@ -78,25 +77,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeito(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eito = eit
-      neito = neit
-      do i = 1, n
-         aeito(i) = aeit(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nitors,iitors,use,x,y,z,
 !$OMP& itors1,itors2,itors3,itorunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eito,neito,aeito)
-!$OMP DO reduction(+:eito,neito,aeito) schedule(guided)
+!$OMP& shared(eit,neit,aeit)
+!$OMP DO reduction(+:eit,neit,aeit) schedule(guided)
 c
 c     calculate the improper torsional angle energy term
 c
@@ -194,10 +181,10 @@ c
 c
 c     increment the total torsional angle energy
 c
-               neito = neito + 1
-               eito = eito + e
-               aeito(ib) = aeito(ib) + 0.5d0*e
-               aeito(ic) = aeito(ic) + 0.5d0*e
+               neit = neit + 1
+               eit = eit + e
+               aeit(ib) = aeit(ib) + 0.5d0*e
+               aeit(ic) = aeit(ic) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -223,17 +210,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eit = eito
-      neit = neito
-      do i = 1, n
-         aeit(i) = aeito(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeito)
       return
       end

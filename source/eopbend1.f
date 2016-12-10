@@ -33,8 +33,7 @@ c
       implicit none
       integer i,iopbend
       integer ia,ib,ic,id
-      real*8 e,eopbo
-      real*8 angle,force
+      real*8 e,angle,force
       real*8 dot,cosine,fgrp
       real*8 cc,ee,bkk2,term
       real*8 deddt,dedcos
@@ -62,8 +61,6 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: deopbo(:,:)
       logical proceed
 c
 c
@@ -76,30 +73,12 @@ c
          deopb(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (deopbo(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eopbo = eopb
-      do i = 1, n
-         deopbo(1,i) = deopb(1,i)
-         deopbo(2,i) = deopb(2,i)
-         deopbo(3,i) = deopb(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopbend,iopb,iang,opbk,use,
 !$OMP& x,y,z,opbtyp,copb,qopb,popb,sopb,opbunit,use_group,use_polymer)
-!$OMP& shared(eopbo,deopbo,viro)
-!$OMP DO reduction(+:eopbo,deopbo,viro) schedule(guided)
+!$OMP& shared(eopb,deopb,vir)
+!$OMP DO reduction(+:eopb,deopb,vir) schedule(guided)
 c
 c     calculate the out-of-plane bending energy and derivatives
 c
@@ -257,19 +236,19 @@ c
 c
 c     increment the out-of-plane bending energy and gradient
 c
-               eopbo = eopbo + e
-               deopbo(1,ia) = deopbo(1,ia) + dedxia
-               deopbo(2,ia) = deopbo(2,ia) + dedyia
-               deopbo(3,ia) = deopbo(3,ia) + dedzia
-               deopbo(1,ib) = deopbo(1,ib) + dedxib
-               deopbo(2,ib) = deopbo(2,ib) + dedyib
-               deopbo(3,ib) = deopbo(3,ib) + dedzib
-               deopbo(1,ic) = deopbo(1,ic) + dedxic
-               deopbo(2,ic) = deopbo(2,ic) + dedyic
-               deopbo(3,ic) = deopbo(3,ic) + dedzic
-               deopbo(1,id) = deopbo(1,id) + dedxid
-               deopbo(2,id) = deopbo(2,id) + dedyid
-               deopbo(3,id) = deopbo(3,id) + dedzid
+               eopb = eopb + e
+               deopb(1,ia) = deopb(1,ia) + dedxia
+               deopb(2,ia) = deopb(2,ia) + dedyia
+               deopb(3,ia) = deopb(3,ia) + dedzia
+               deopb(1,ib) = deopb(1,ib) + dedxib
+               deopb(2,ib) = deopb(2,ib) + dedyib
+               deopb(3,ib) = deopb(3,ib) + dedzib
+               deopb(1,ic) = deopb(1,ic) + dedxic
+               deopb(2,ic) = deopb(2,ic) + dedyic
+               deopb(3,ic) = deopb(3,ic) + dedzic
+               deopb(1,id) = deopb(1,id) + dedxid
+               deopb(2,id) = deopb(2,id) + dedyid
+               deopb(3,id) = deopb(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -279,15 +258,15 @@ c
                vyy = yab*dedyia + ycb*dedyic + ydb*dedyid
                vzy = zab*dedyia + zcb*dedyic + zdb*dedyid
                vzz = zab*dedzia + zcb*dedzic + zdb*dedzid
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vyx
-               viro(3,1) = viro(3,1) + vzx
-               viro(1,2) = viro(1,2) + vyx
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vzy
-               viro(1,3) = viro(1,3) + vzx
-               viro(2,3) = viro(2,3) + vzy
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
             end if
          end if
       end do
@@ -296,23 +275,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eopb = eopbo
-      do i = 1, n
-         deopb(1,i) = deopbo(1,i)
-         deopb(2,i) = deopbo(2,i)
-         deopb(3,i) = deopbo(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (deopbo)
       return
       end

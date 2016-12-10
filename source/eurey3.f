@@ -32,12 +32,9 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic
-      integer neubo
-      real*8 e,eubo
-      real*8 ideal,force
+      real*8 e,ideal,force
       real*8 dt,dt2,fgrp
       real*8 xac,yac,zac,rac
-      real*8, allocatable :: aeubo(:)
       logical proceed
       logical header,huge
 c
@@ -61,25 +58,13 @@ c
      &              4x,'Actual',6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeubo(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eubo = eub
-      neubo = neub
-      do i = 1, n
-         aeubo(i) = aeub(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nurey,iury,ul,uk,
 !$OMP& use,x,y,z,cury,qury,ureyunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eubo,neubo,aeubo)
-!$OMP DO reduction(+:eubo,neubo,aeubo) schedule(guided)
+!$OMP& shared(eub,neub,aeub)
+!$OMP DO reduction(+:eub,neub,aeub) schedule(guided)
 c
 c     calculate the Urey-Bradley 1-3 energy term
 c
@@ -117,10 +102,10 @@ c
 c
 c     increment the total Urey-Bradley energy
 c
-            neubo = neubo + 1
-            eubo = eubo + e
-            aeubo(ia) = aeubo(ia) + 0.5d0*e
-            aeubo(ic) = aeubo(ic) + 0.5d0*e
+            neub = neub + 1
+            eub = eub + e
+            aeub(ia) = aeub(ia) + 0.5d0*e
+            aeub(ic) = aeub(ic) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -145,17 +130,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eub = eubo
-      neub = neubo
-      do i = 1, n
-         aeub(i) = aeubo(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeubo)
       return
       end

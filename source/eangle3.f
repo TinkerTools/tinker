@@ -35,9 +35,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      integer neao
-      real*8 e,eao
-      real*8 ideal,force
+      real*8 e,ideal,force
       real*8 fold,factor
       real*8 dot,cosine
       real*8 angle,fgrp
@@ -58,7 +56,6 @@ c
       real*8 rap2,rcp2
       real*8 xt,yt,zt
       real*8 rt2,delta
-      real*8, allocatable :: aeao(:)
       logical proceed
       logical header,huge
       character*9 label
@@ -83,25 +80,13 @@ c
      &              'Ideal',4x,'Actual',6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeao(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eao = ea
-      neao = nea
-      do i = 1, n
-         aeao(i) = aea(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
 !$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eao,neao,aeao)
-!$OMP DO reduction(+:eao,neao,aeao) schedule(guided)
+!$OMP& shared(ea,nea,aea)
+!$OMP DO reduction(+:ea,nea,aea) schedule(guided)
 c
 c     calculate the bond angle bending energy term
 c
@@ -181,9 +166,9 @@ c
 c
 c     increment the total bond angle bending energy
 c
-                  neao = neao + 1
-                  eao = eao + e
-                  aeao(ib) = aeao(ib) + e
+                  nea = nea + 1
+                  ea = ea + e
+                  aea(ib) = aea(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -271,9 +256,9 @@ c
 c
 c     increment the total bond angle bending energy
 c
-                  neao = neao + 1
-                  eao = eao + e
-                  aeao(ib) = aeao(ib) + e
+                  nea = nea + 1
+                  ea = ea + e
+                  aea(ib) = aea(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -301,17 +286,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ea = eao
-      nea = neao
-      do i = 1, n
-         aea(i) = aeao(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeao)
       return
       end

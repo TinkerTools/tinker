@@ -31,7 +31,7 @@ c
       use units
       implicit none
       integer i,j,ii
-      real*8 e,epo,f,fi
+      real*8 e,f,fi
       real*8 xd,yd,zd
       real*8 xu,yu,zu
       real*8 dix,diy,diz
@@ -59,15 +59,11 @@ c     set the energy conversion factor
 c
       f = -0.5d0 * electric / dielec
 c
-c     initialize local variables for OpenMP calculation
-c
-      epo = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,polarity,f,uind,udirp,epo)
-!$OMP DO reduction(+:epo) schedule(guided)
+!$OMP& shared(npole,polarity,f,uind,udirp,ep)
+!$OMP DO reduction(+:ep) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c
@@ -77,7 +73,7 @@ c
             e = 0.0d0
             do j = 1, 3
                e = fi * uind(j,i) * udirp(j,i)
-               epo = epo + e
+               ep = ep + e
             end do
          end if
       end do
@@ -86,10 +82,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      ep = ep + epo
 c
 c     compute the cell dipole boundary correction term
 c

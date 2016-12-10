@@ -1132,7 +1132,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer iax,iay,iaz
-      real*8 e,epo,f,fi
+      real*8 e,f,fi
       real*8 damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
@@ -1177,11 +1177,9 @@ c
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
-      real*8 viro(3,3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: depo(:,:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       character*6 mode
@@ -1216,7 +1214,6 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
-      allocate (depo(3,n))
 c
 c     set arrays needed to scale interactions and store fields
 c
@@ -1238,30 +1235,16 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      epo = 0.0d0
-      do i = 1, n
-         do j = 1, 3
-            depo(j,i) = 0.0d0
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            viro(j,i) = 0.0d0
-         end do
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp,epo)
+!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp,ep)
 !$OMP& shared(ipole,pdamp,thole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,uinp,poltyp,depo,viro,ufld,dufld)
+!$OMP& off2,uinp,poltyp,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP DO reduction(+:epo) schedule(guided)
+!$OMP DO reduction(+:ep) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c
@@ -1271,7 +1254,7 @@ c
             e = 0.0d0
             do j = 1, 3
                e = fi * uind(j,i) * udirp(j,i)
-               epo = epo + e
+               ep = ep + e
             end do
          end if
       end do
@@ -1279,7 +1262,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:depo,viro,ufld,dufld) schedule(guided)
+!$OMP DO reduction(+:dep,vir,ufld,dufld) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -1588,27 +1571,27 @@ c
 c
 c     increment gradient and virial due to Cartesian forces
 c
-               depo(1,ii) = depo(1,ii) + frcx
-               depo(2,ii) = depo(2,ii) + frcy
-               depo(3,ii) = depo(3,ii) + frcz
-               depo(1,kk) = depo(1,kk) - frcx
-               depo(2,kk) = depo(2,kk) - frcy
-               depo(3,kk) = depo(3,kk) - frcz
+               dep(1,ii) = dep(1,ii) + frcx
+               dep(2,ii) = dep(2,ii) + frcy
+               dep(3,ii) = dep(3,ii) + frcz
+               dep(1,kk) = dep(1,kk) - frcx
+               dep(2,kk) = dep(2,kk) - frcy
+               dep(3,kk) = dep(3,kk) - frcz
                vxx = -xr * frcx
                vxy = -yr * frcx
                vxz = -zr * frcx
                vyy = -yr * frcy
                vyz = -zr * frcy
                vzz = -zr * frcz
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vxy
-               viro(3,1) = viro(3,1) + vxz
-               viro(1,2) = viro(1,2) + vxy
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vyz
-               viro(1,3) = viro(1,3) + vxz
-               viro(2,3) = viro(2,3) + vyz
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vxy
+               vir(3,1) = vir(3,1) + vxz
+               vir(1,2) = vir(1,2) + vxy
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vyz
+               vir(1,3) = vir(1,3) + vxz
+               vir(2,3) = vir(2,3) + vyz
+               vir(3,3) = vir(3,3) + vzz
 c
 c     get the induced dipole field used for dipole torques
 c
@@ -1693,7 +1676,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:depo,viro) schedule(guided)
+!$OMP DO reduction(+:dep,vir) schedule(guided)
 c
 c     torque is induced field and gradient cross permanent moments
 c
@@ -1719,7 +1702,7 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,depo)
+         call torque (i,trq,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -1742,15 +1725,15 @@ c
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         viro(1,1) = viro(1,1) + vxx
-         viro(2,1) = viro(2,1) + vxy
-         viro(3,1) = viro(3,1) + vxz
-         viro(1,2) = viro(1,2) + vxy
-         viro(2,2) = viro(2,2) + vyy
-         viro(3,2) = viro(3,2) + vyz
-         viro(1,3) = viro(1,3) + vxz
-         viro(2,3) = viro(2,3) + vyz
-         viro(3,3) = viro(3,3) + vzz
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1758,26 +1741,11 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      ep = ep + epo
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = dep(j,i) + depo(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = vir(j,i) + viro(j,i)
-         end do
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
-      deallocate (depo)
       deallocate (ufld)
       deallocate (dufld)
       return
@@ -2011,7 +1979,7 @@ c
       integer i,j,k
       integer ii,kk,jcell
       integer iax,iay,iaz
-      real*8 e,epo,f,fi
+      real*8 e,f,fi
       real*8 erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
@@ -3445,7 +3413,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer iax,iay,iaz
-      real*8 e,epo,f,fi
+      real*8 e,f,fi
       real*8 erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
@@ -3501,11 +3469,9 @@ c
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 bn(0:4)
-      real*8 viro(3,3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: depo(:,:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       character*6 mode
@@ -3516,7 +3482,6 @@ c
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
-      allocate (depo(3,n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
 c
@@ -3540,30 +3505,16 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      epo = 0.0d0
-      do i = 1, n
-         do j = 1, 3
-            depo(j,i) = 0.0d0
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            viro(j,i) = 0.0d0
-         end do
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp,epo)
+!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp,ep)
 !$OMP& shared(ipole,pdamp,thole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,aewald,uinp,poltyp,depo,viro,ufld,dufld)
+!$OMP& off2,aewald,uinp,poltyp,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP DO reduction(+:epo) schedule(guided)
+!$OMP DO reduction(+:ep) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c
@@ -3573,7 +3524,7 @@ c
             e = 0.0d0
             do j = 1, 3
                e = fi * uind(j,i) * udirp(j,i)
-               epo = epo + e
+               ep = ep + e
             end do
          end if
       end do
@@ -3581,7 +3532,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:depo,viro,ufld,dufld) schedule(guided)
+!$OMP DO reduction(+:dep,vir,ufld,dufld) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -3984,27 +3935,27 @@ c
 c
 c     increment gradient and virial due to Cartesian forces
 c
-               depo(1,ii) = depo(1,ii) - frcx
-               depo(2,ii) = depo(2,ii) - frcy
-               depo(3,ii) = depo(3,ii) - frcz
-               depo(1,kk) = depo(1,kk) + frcx
-               depo(2,kk) = depo(2,kk) + frcy
-               depo(3,kk) = depo(3,kk) + frcz
+               dep(1,ii) = dep(1,ii) - frcx
+               dep(2,ii) = dep(2,ii) - frcy
+               dep(3,ii) = dep(3,ii) - frcz
+               dep(1,kk) = dep(1,kk) + frcx
+               dep(2,kk) = dep(2,kk) + frcy
+               dep(3,kk) = dep(3,kk) + frcz
                vxx = xr * frcx
                vxy = yr * frcx
                vxz = zr * frcx
                vyy = yr * frcy
                vyz = zr * frcy
                vzz = zr * frcz
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vxy
-               viro(3,1) = viro(3,1) + vxz
-               viro(1,2) = viro(1,2) + vxy
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vyz
-               viro(1,3) = viro(1,3) + vxz
-               viro(2,3) = viro(2,3) + vyz
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vxy
+               vir(3,1) = vir(3,1) + vxz
+               vir(1,2) = vir(1,2) + vxy
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vyz
+               vir(1,3) = vir(1,3) + vxz
+               vir(2,3) = vir(2,3) + vyz
+               vir(3,3) = vir(3,3) + vzz
 c
 c     get the induced dipole field used for dipole torques
 c
@@ -4089,7 +4040,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:depo,viro) schedule(guided)
+!$OMP DO reduction(+:dep,vir) schedule(guided)
 c
 c     torque is induced field and gradient cross permanent moments
 c
@@ -4115,7 +4066,7 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,depo)
+         call torque (i,trq,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -4138,15 +4089,15 @@ c
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         viro(1,1) = viro(1,1) + vxx
-         viro(2,1) = viro(2,1) + vxy
-         viro(3,1) = viro(3,1) + vxz
-         viro(1,2) = viro(1,2) + vxy
-         viro(2,2) = viro(2,2) + vyy
-         viro(3,2) = viro(3,2) + vyz
-         viro(1,3) = viro(1,3) + vxz
-         viro(2,3) = viro(2,3) + vyz
-         viro(3,3) = viro(3,3) + vzz
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -4154,26 +4105,11 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      ep = ep + epo
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = dep(j,i) + depo(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = vir(j,i) + viro(j,i)
-         end do
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
-      deallocate (depo)
       deallocate (ufld)
       deallocate (dufld)
       return

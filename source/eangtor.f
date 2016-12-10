@@ -30,7 +30,7 @@ c
       implicit none
       integer i,k,iangtor
       integer ia,ib,ic,id
-      real*8 e,e1,e2,eato
+      real*8 e,e1,e2
       real*8 rcb,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba2,rcb2,rdc2
@@ -60,16 +60,12 @@ c     zero out the energy due to extra potential terms
 c
       eat = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eato = eat
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
 !$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,use_group,use_polymer)
-!$OMP& shared(eato)
-!$OMP DO reduction(+:eato) schedule(guided)
+!$OMP& shared(eat)
+!$OMP DO reduction(+:eat) schedule(guided)
 c
 c     calculate the angle-torsion interaction energy term
 c
@@ -188,7 +184,7 @@ c
 c     increment the total angle-torsion energy
 c
                e = e1 + e2
-               eato = eato + e
+               eat = eat + e
             end if
          end if
       end do
@@ -197,9 +193,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eat = eato
       return
       end

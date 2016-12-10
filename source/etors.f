@@ -54,8 +54,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eto
-      real*8 rcb,fgrp
+      real*8 e,rcb,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -83,16 +82,12 @@ c     zero out the torsional potential energy
 c
       et = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eto = et
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,use_group,use_polymer)
-!$OMP& shared(eto)
-!$OMP DO reduction(+:eto) schedule(guided)
+!$OMP& shared(et)
+!$OMP DO reduction(+:et) schedule(guided)
 c
 c     calculate the torsional angle energy term
 c
@@ -206,7 +201,7 @@ c
 c
 c     increment the total torsional angle energy
 c
-               eto = eto + e
+               et = et + e
             end if
          end if
       end do
@@ -215,10 +210,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      et = eto
       return
       end
 c

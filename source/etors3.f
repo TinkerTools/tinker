@@ -62,9 +62,8 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      integer neto
-      real*8 e,eto
-      real*8 rcb,angle,fgrp
+      real*8 e,rcb
+      real*8 angle,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -85,7 +84,6 @@ c
       real*8 xba,yba,zba
       real*8 xdc,ydc,zdc
       real*8 xcb,ycb,zcb
-      real*8, allocatable :: aeto(:)
       logical proceed
       logical header,huge
 c
@@ -109,25 +107,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeto(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eto = et
-      neto = net
-      do i = 1, n
-         aeto(i) = aet(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eto,neto,aeto)
-!$OMP DO reduction(+:eto,neto,aeto) schedule(guided)
+!$OMP& shared(et,net,aet)
+!$OMP DO reduction(+:et,net,aet) schedule(guided)
 c
 c     calculate the torsional angle energy term
 c
@@ -244,10 +230,10 @@ c
 c
 c     increment the total torsional angle energy
 c
-               neto = neto + 1
-               eto = eto + e
-               aeto(ib) = aeto(ib) + 0.5d0*e
-               aeto(ic) = aeto(ic) + 0.5d0*e
+               net = net + 1
+               et = et + e
+               aet(ib) = aet(ib) + 0.5d0*e
+               aet(ic) = aet(ic) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -273,18 +259,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      et = eto
-      net = neto
-      do i = 1, n
-         aet(i) = aeto(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeto)
       return
       end
 c

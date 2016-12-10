@@ -119,7 +119,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-#            -Wl,-stack_size,0x10000000
+#		-Wl,-stack_size,0x10000000
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##

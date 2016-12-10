@@ -34,9 +34,8 @@ c
       implicit none
       integer i,ia,ib,ic
       integer id,ie,ig
-      integer nepto
-      real*8 e,epto
-      real*8 rdc,angle,fgrp
+      real*8 e,rdc
+      real*8 angle,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -58,7 +57,6 @@ c
       real*8 xcp,ycp,zcp
       real*8 xdc,ydc,zdc
       real*8 xqd,yqd,zqd
-      real*8, allocatable :: aepto(:)
       logical proceed
       logical header,huge
 c
@@ -82,25 +80,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aepto(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      epto = ept
-      nepto = nept
-      do i = 1, n
-         aepto(i) = aept(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npitors,ipit,
 !$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(epto,nepto,aepto)
-!$OMP DO reduction(+:epto,nepto,aepto) schedule(guided)
+!$OMP& shared(ept,nept,aept)
+!$OMP DO reduction(+:ept,nept,aept) schedule(guided)
 c
 c     calculate the pi-system torsion angle energy term
 c
@@ -222,10 +208,10 @@ c
 c
 c     increment the total pi-system torsion angle energy
 c
-               nepto = nepto + 1
-               epto = epto + e
-               aepto(ic) = aepto(ic) + 0.5d0*e
-               aepto(id) = aepto(id) + 0.5d0*e
+               nept = nept + 1
+               ept = ept + e
+               aept(ic) = aept(ic) + 0.5d0*e
+               aept(id) = aept(id) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -250,17 +236,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ept = epto
-      nept = nepto
-      do i = 1, n
-         aept(i) = aepto(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aepto)
       return
       end

@@ -26,8 +26,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eito
-      real*8 rcb,fgrp
+      real*8 e,rcb,fgrp
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
@@ -53,16 +52,12 @@ c     zero out improper torsional energy
 c
       eit = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eito = eit
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nitors,iitors,use,x,y,z,
 !$OMP& itors1,itors2,itors3,itorunit,use_group,use_polymer)
-!$OMP& shared(eito)
-!$OMP DO reduction(+:eito) schedule(guided)
+!$OMP& shared(eit)
+!$OMP DO reduction(+:eit) schedule(guided)
 c
 c     calculate the improper torsional angle energy term
 c
@@ -157,7 +152,7 @@ c
 c
 c     increment the total torsional angle energy
 c
-               eito = eito + e
+               eit = eit + e
             end if
          end if
       end do
@@ -166,9 +161,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eit = eito
       return
       end

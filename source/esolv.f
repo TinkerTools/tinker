@@ -144,8 +144,7 @@ c
       use usage
       implicit none
       integer i,k,ii,kk
-      real*8 e,est
-      real*8 f,fi,fik
+      real*8 e,f,fi,fik
       real*8 dwater,fgrp
       real*8 rb2,rm2,fgb,fgm
       real*8 xi,yi,zi
@@ -168,17 +167,13 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      est = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP% f0,f1,f2,f3,f4,f5,f6,f7)
-!$OMP& shared(est)
-!$OMP DO reduction(+:est) schedule(guided)
+!$OMP& shared(es)
+!$OMP DO reduction(+:es) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -238,7 +233,7 @@ c
 c     increment the overall GB solvation energy component
 c
                   if (i .eq. k)  e = 0.5d0 * e
-                  est = est + e
+                  es = es + e
                end if
             end if
          end do
@@ -248,10 +243,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + est
       return
       end
 c
@@ -281,8 +272,7 @@ c
       implicit none
       integer i,k
       integer ii,kk,kkk
-      real*8 e,est
-      real*8 f,fi,fik
+      real*8 e,f,fi,fik
       real*8 dwater,fgrp
       real*8 rbi,rb2,rm2
       real*8 fgb,fgm
@@ -306,17 +296,13 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      est = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
 !$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
-!$OMP& shared(est)
-!$OMP DO reduction(+:est) schedule(guided)
+!$OMP& shared(es)
+!$OMP DO reduction(+:es) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -338,7 +324,7 @@ c
          fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
          shift = fik / fgm
          e = e - shift
-         est = est + 0.5d0*e
+         es = es + 0.5d0*e
 c
 c     decide whether to compute the current interaction
 c
@@ -388,7 +374,7 @@ c
 c
 c     increment the overall GB solvation energy component
 c
-                  est = est + e
+                  es = es + e
                end if
             end if
          end do
@@ -398,10 +384,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + est
       return
       end
 c
@@ -564,7 +546,7 @@ c
       use usage
       implicit none
       integer i,k,ii,kk
-      real*8 e,ei,est
+      real*8 e,ei
       real*8 fc,fd,fq
       real*8 dwater,fgrp
       real*8 r2,rb2
@@ -611,16 +593,12 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      est = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
 !$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
-!$OMP& shared(est)
-!$OMP DO reduction(+:est) schedule(guided)
+!$OMP& shared(es)
+!$OMP DO reduction(+:es) schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -958,7 +936,7 @@ c
                      e = 0.5d0 * e
                      ei = 0.5d0 * ei
                   end if
-                  est = est + e + ei
+                  es = es + e + ei
                end if
             end if
          end do
@@ -968,10 +946,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + est
       return
       end
 c
@@ -1006,8 +980,8 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,est
-      real*8 f,fikp,fgrp
+      real*8 ei,f
+      real*8 fikp,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,damp
@@ -1050,18 +1024,14 @@ c
          pscale(i) = 1.0d0
       end do
 c
-c     initialize local variables for OpenMP calculation
-c
-      est = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
 !$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
 !$OMP% i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p41scale,p5scale,
 !$OMP% use_group,use_intra,off2,f)
-!$OMP& firstprivate(pscale) shared(est)
-!$OMP DO reduction(+:est) schedule(guided)
+!$OMP& firstprivate(pscale) shared(es)
+!$OMP DO reduction(+:es) schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1212,7 +1182,7 @@ c
 c
 c     increment the total GK electrostatic solvation energy
 c
-                  est = est + ei
+                  es = es + ei
                end if
             end if
          end do
@@ -1237,10 +1207,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + est
 c
 c     perform deallocation of some local arrays
 c
@@ -1508,7 +1474,7 @@ c
       use vdw
       implicit none
       integer i,k
-      real*8 edisp,edispo
+      real*8 edisp
       real*8 e,idisp
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
@@ -1536,16 +1502,12 @@ c
          rdisp(i) = rad(class(i)) + offset
       end do
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      edispo = edisp
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
 !$OMP& rad,rdisp,x,y,z,shctd,cdisp)
-!$OMP& shared(edispo)
-!$OMP DO reduction(+:edispo) schedule(guided)
+!$OMP& shared(edisp)
+!$OMP DO reduction(+:edisp) schedule(guided)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
@@ -1671,10 +1633,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      edisp = edispo
       return
       end
 c

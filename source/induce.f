@@ -5977,10 +5977,10 @@ c
          do i = 1, npole
             poli = udiag * max(polmin,polarity(i))
             do j = 1, 3
-               zrsd(j,i) = 0.0d0
-               zrsdp(j,i) = 0.0d0
-               zrsdt(j,i) = poli * rsd(j,i)
-               zrsdtp(j,i) = poli * rsdp(j,i)
+               zrsd(j,i) = poli * rsd(j,i)
+               zrsdp(j,i) = poli * rsdp(j,i)
+               zrsdt(j,i) = 0.0d0
+               zrsdtp(j,i) = 0.0d0
             end do
          end do
 c
@@ -6033,8 +6033,8 @@ c
 !$OMP DO
          do i = 1, npole
             do j = 1, 3
-               zrsd(j,i) = zrsdt(j,i) + zrsd(j,i)
-               zrsdp(j,i) = zrsdtp(j,i) + zrsdp(j,i)
+               zrsd(j,i) = zrsd(j,i) + zrsdt(j,i)
+               zrsdp(j,i) = zrsdp(j,i) + zrsdtp(j,i)
             end do
          end do
 !$OMP END DO

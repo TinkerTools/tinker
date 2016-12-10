@@ -871,7 +871,6 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer nevo
       integer, allocatable :: iv14(:)
       real*8 e,eps,rdn
       real*8 fgrp,rv,rv7
@@ -881,7 +880,6 @@ c
       real*8 scal,t1,t2
       real*8 rik,rik2,rik3
       real*8 rik4,rik5,rik7
-      real*8 evo,eintero
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
@@ -919,7 +917,6 @@ c
       allocate (yred(n))
       allocate (zred(n))
       allocate (vscale(n))
-      allocate (aevo(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
@@ -944,15 +941,6 @@ c
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      evo = ev
-      eintero = einter
-      nevo = nev
-      do i = 1, n
-         aevo(i) = aev(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
@@ -961,8 +949,8 @@ c
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
 !$OMP& vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP& molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(vscale,iv14) shared(evo,eintero,nevo,aevo)
-!$OMP DO reduction(+:evo,eintero,nevo,aevo) schedule(guided)
+!$OMP& firstprivate(vscale,iv14) shared(ev,einter,nev,aev)
+!$OMP DO reduction(+:ev,einter,nev,aev) schedule(guided)
 c
 c     find the van der Waals energy via neighbor list search
 c
@@ -1061,16 +1049,16 @@ c
 c     increment the overall van der Waals energy components
 c
                   if (e .ne. 0.0d0) then
-                     nevo = nevo + 1
-                     evo = evo + e
-                     aevo(i) = aevo(i) + 0.5d0*e
-                     aevo(k) = aevo(k) + 0.5d0*e
+                     nev = nev + 1
+                     ev = ev + e
+                     aev(i) = aev(i) + 0.5d0*e
+                     aev(k) = aev(k) + 0.5d0*e
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintero = eintero + e
+                     einter = einter + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1117,15 +1105,6 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     transfer local to global copies for OpenMP calculation
-c
-      ev = evo
-      einter = eintero
-      nev = nevo
-      do i = 1, n
-         aev(i) = aevo(i)
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
@@ -1133,6 +1112,5 @@ c
       deallocate (yred)
       deallocate (zred)
       deallocate (vscale)
-      deallocate (aevo)
       return
       end

@@ -36,8 +36,7 @@ c
       integer ia,ib,ic,id,ie
       integer nlo,nhi,nt
       integer xlo,ylo
-      real*8 e,etto
-      real*8 fgrp,sign
+      real*8 e,fgrp,sign
       real*8 angle1,angle2
       real*8 value1,value2
       real*8 cosine1,cosine2
@@ -80,8 +79,6 @@ c
       real*8 vyx2,vzx2,vzy2
       real*8 ftt(4),ft12(4)
       real*8 ft1(4),ft2(4)
-      real*8 viro(3,3)
-      real*8, allocatable :: detto(:,:)
       logical proceed
 c
 c
@@ -94,31 +91,13 @@ c
          dett(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (detto(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      etto = ett
-      do i = 1, n
-         detto(1,i) = dett(1,i)
-         detto(2,i) = dett(2,i)
-         detto(3,i) = dett(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntortor,itt,ibitor,
 !$OMP& use,x,y,z,tnx,ttx,tny,tty,tbf,tbx,tby,tbxy,ttorunit,
 !$OMP& use_group,use_polymer)
-!$OMP& shared(etto,detto,viro)
-!$OMP DO reduction(+:etto,detto,viro) schedule(guided)
+!$OMP& shared(ett,dett,vir)
+!$OMP DO reduction(+:ett,dett,vir) schedule(guided)
 c
 c     calculate the torsion-torsion interaction energy term
 c
@@ -357,22 +336,22 @@ c
 c
 c     increment the torsion-torsion energy and gradient
 c
-               etto = etto + e
-               detto(1,ia) = detto(1,ia) + dedxia
-               detto(2,ia) = detto(2,ia) + dedyia
-               detto(3,ia) = detto(3,ia) + dedzia
-               detto(1,ib) = detto(1,ib) + dedxib + dedxib2
-               detto(2,ib) = detto(2,ib) + dedyib + dedyib2
-               detto(3,ib) = detto(3,ib) + dedzib + dedzib2
-               detto(1,ic) = detto(1,ic) + dedxic + dedxic2
-               detto(2,ic) = detto(2,ic) + dedyic + dedyic2
-               detto(3,ic) = detto(3,ic) + dedzic + dedzic2
-               detto(1,id) = detto(1,id) + dedxid + dedxid2
-               detto(2,id) = detto(2,id) + dedyid + dedyid2
-               detto(3,id) = detto(3,id) + dedzid + dedzid2
-               detto(1,ie) = detto(1,ie) + dedxie2
-               detto(2,ie) = detto(2,ie) + dedyie2
-               detto(3,ie) = detto(3,ie) + dedzie2
+               ett = ett + e
+               dett(1,ia) = dett(1,ia) + dedxia
+               dett(2,ia) = dett(2,ia) + dedyia
+               dett(3,ia) = dett(3,ia) + dedzia
+               dett(1,ib) = dett(1,ib) + dedxib + dedxib2
+               dett(2,ib) = dett(2,ib) + dedyib + dedyib2
+               dett(3,ib) = dett(3,ib) + dedzib + dedzib2
+               dett(1,ic) = dett(1,ic) + dedxic + dedxic2
+               dett(2,ic) = dett(2,ic) + dedyic + dedyic2
+               dett(3,ic) = dett(3,ic) + dedzic + dedzic2
+               dett(1,id) = dett(1,id) + dedxid + dedxid2
+               dett(2,id) = dett(2,id) + dedyid + dedyid2
+               dett(3,id) = dett(3,id) + dedzid + dedzid2
+               dett(1,ie) = dett(1,ie) + dedxie2
+               dett(2,ie) = dett(2,ie) + dedyie2
+               dett(3,ie) = dett(3,ie) + dedzie2
 c
 c     increment the internal virial tensor components
 c
@@ -388,15 +367,15 @@ c
                vyy2 = ydc*(dedyid2+dedyie2) - ycb*dedyib2 + yed*dedyie2
                vzy2 = zdc*(dedyid2+dedyie2) - zcb*dedyib2 + zed*dedyie2
                vzz2 = zdc*(dedzid2+dedzie2) - zcb*dedzib2 + zed*dedzie2
-               viro(1,1) = viro(1,1) + vxx + vxx2
-               viro(2,1) = viro(2,1) + vyx + vyx2
-               viro(3,1) = viro(3,1) + vzx + vzx2
-               viro(1,2) = viro(1,2) + vyx + vyx2
-               viro(2,2) = viro(2,2) + vyy + vyy2
-               viro(3,2) = viro(3,2) + vzy + vzy2
-               viro(1,3) = viro(1,3) + vzx + vzx2
-               viro(2,3) = viro(2,3) + vzy + vzy2
-               viro(3,3) = viro(3,3) + vzz + vzz2
+               vir(1,1) = vir(1,1) + vxx + vxx2
+               vir(2,1) = vir(2,1) + vyx + vyx2
+               vir(3,1) = vir(3,1) + vzx + vzx2
+               vir(1,2) = vir(1,2) + vyx + vyx2
+               vir(2,2) = vir(2,2) + vyy + vyy2
+               vir(3,2) = vir(3,2) + vzy + vzy2
+               vir(1,3) = vir(1,3) + vzx + vzx2
+               vir(2,3) = vir(2,3) + vzy + vzy2
+               vir(3,3) = vir(3,3) + vzz + vzz2
             end if
          end if
       end do
@@ -405,23 +384,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ett = etto
-      do i = 1, n
-         dett(1,i) = detto(1,i)
-         dett(2,i) = detto(2,i)
-         dett(3,i) = detto(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (detto)
       return
       end

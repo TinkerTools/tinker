@@ -27,8 +27,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eido
-      real*8 dt,fgrp
+      real*8 e,dt,fgrp
       real*8 ideal,force
       real*8 cosine,sine
       real*8 rcb,angle
@@ -50,16 +49,12 @@ c     zero out improper dihedral energy
 c
       eid = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eido = eid
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
 !$OMP& x,y,z,kprop,vprop,idihunit,use_group,use_polymer)
-!$OMP& shared(eido)
-!$OMP DO reduction(+:eido) schedule(guided)
+!$OMP& shared(eid)
+!$OMP DO reduction(+:eid) schedule(guided)
 c
 c     calculate the improper dihedral angle energy term
 c
@@ -150,7 +145,7 @@ c
 c
 c     increment the total improper dihedral energy
 c
-               eido = eido + e
+               eid = eid + e
             end if
          end if
       end do
@@ -159,9 +154,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eid = eido
       return
       end

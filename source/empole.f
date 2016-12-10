@@ -106,7 +106,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set arrays needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -426,11 +426,10 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,f,fgrp
-      real*8 emo,r,r2
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 rr1,rr3,rr5
-      real*8 rr7,rr9
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -462,7 +461,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -474,18 +473,14 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      emo = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f,emo)
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f,em)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo) schedule(guided)
+!$OMP DO reduction(+:em) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -597,7 +592,7 @@ c
                   e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
      &                   + rr7*ge(4) + rr9*ge(5)
                   if (use_group)  e = e * fgrp
-                  emo = emo + e
+                  em = em + e
                end if
             end if
          end do
@@ -622,10 +617,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local to global variables for OpenMP calculation
-c
-      em = em + emo
 c
 c     perform deallocation of some local arrays
 c
@@ -795,7 +786,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set array needed for scaling connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1245,11 +1236,10 @@ c
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
-      real*8 emo,r,r2
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 rr1,rr3,rr5
-      real*8 rr7,rr9
+      real*8 r,r2,rr1,rr3
+      real*8 rr5,rr7,rr9
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -1269,7 +1259,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set arrays needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1281,18 +1271,14 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      emo = 0.0d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,emo)
+!$OMP& aewald,em)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo) schedule(guided)
+!$OMP DO reduction(+:em) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1416,7 +1402,7 @@ c     compute the energy contribution for this interaction
 c
                e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
      &                + rr7*ge(4) + rr9*ge(5)
-               emo = emo + e
+               em = em + e
             end if
          end do
 c
@@ -1440,10 +1426,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local to global variables for OpenMP calculation
-c
-      em = em + emo
 c
 c     perform deallocation of some local arrays
 c

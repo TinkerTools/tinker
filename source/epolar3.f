@@ -36,13 +36,11 @@ c
       use units
       implicit none
       integer i,j,ii
-      integer nepo
-      real*8 e,epo,f,fi
+      real*8 e,f,fi
       real*8 xd,yd,zd
       real*8 xu,yu,zu
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz
-      real*8, allocatable :: aepo(:)
       logical header,huge
 c
 c
@@ -67,10 +65,6 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aepo(n))
-c
 c     set the energy conversion factor
 c
       f = -0.5d0 * electric / dielec
@@ -85,20 +79,12 @@ c
      &           //,' Type',9x,'Atom Name',24x,'Alpha',8x,'Energy',/)
       end if
 c
-c     initialize local variables for OpenMP calculation
-c
-      epo = 0.0d0
-      nepo = nep
-      do i = 1, n
-         aepo(i) = aep(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,polarity,f,uind,udirp,name,verbose,
-!$OMP& debug,header,iout,epo,nepo,aepo)
-!$OMP DO reduction(+:epo,nepo,aepo) schedule(guided)
+!$OMP& debug,header,iout,ep,nep,aep)
+!$OMP DO reduction(+:ep,nep,aep) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c
@@ -110,9 +96,9 @@ c
             do j = 1, 3
                e = e + fi*uind(j,i)*udirp(j,i)
             end do
-            nepo = nepo + 1
-            epo = epo + e
-            aepo(ii) = aepo(ii) + e
+            nep = nep + 1
+            ep = ep + e
+            aep(ii) = aep(ii) + e
 c
 c     print a message if the energy for this site is large
 c
@@ -136,14 +122,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      ep = ep + epo
-      nep = nepo
-      do i = 1, n
-         aep(i) = aepo(i)
-      end do
 c
 c     compute the cell dipole boundary correction term
 c
@@ -180,9 +158,5 @@ c
             end do
          end if
       end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aepo)
       return
       end

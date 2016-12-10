@@ -31,8 +31,7 @@ c
       implicit none
       integer i,iopbend
       integer ia,ib,ic,id
-      real*8 e,eopbo
-      real*8 force,angle
+      real*8 e,force,angle
       real*8 cosine,fgrp
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
@@ -54,16 +53,12 @@ c     zero out the out-of-plane bending energy component
 c
       eopb = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eopbo = eopb
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopbend,iopb,iang,opbk,use,
 !$OMP& x,y,z,opbtyp,copb,qopb,popb,sopb,opbunit,use_group,use_polymer)
-!$OMP& shared(eopbo)
-!$OMP DO reduction(+:eopbo) schedule(guided)
+!$OMP& shared(eopb)
+!$OMP DO reduction(+:eopb) schedule(guided)
 c
 c     calculate the out-of-plane bending energy term
 c
@@ -161,7 +156,7 @@ c
 c
 c     increment the total out-of-plane bending energy
 c
-               eopbo = eopbo + e
+               eopb = eopb + e
             end if
          end if
       end do
@@ -170,9 +165,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eopb = eopbo
       return
       end

@@ -32,8 +32,7 @@ c
       implicit none
       integer i,k,istrtor
       integer ia,ib,ic,id
-      real*8 e,ebto
-      real*8 dr,fgrp
+      real*8 e,dr,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba,rcb,rdc
       real*8 e1,e2,e3
@@ -67,8 +66,6 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: debto(:,:)
       logical proceed
 c
 c
@@ -81,30 +78,12 @@ c
          debt(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (debto(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      ebto = ebt
-      do i = 1, n
-         debto(1,i) = debt(1,i)
-         debto(2,i) = debt(2,i)
-         debto(3,i) = debt(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer)
-!$OMP& shared(ebto,debto,viro)
-!$OMP DO reduction(+:ebto,debto,viro) schedule(guided)
+!$OMP& shared(ebt,debt,vir)
+!$OMP DO reduction(+:ebt,debt,vir) schedule(guided)
 c
 c     calculate the stretch-torsion energy and first derivatives
 c
@@ -360,19 +339,19 @@ c
 c     increment the stretch-torsion energy and gradient
 c
                e = e1 + e2 + e3
-               ebto = ebto + e
-               debto(1,ia) = debto(1,ia) + dedxia
-               debto(2,ia) = debto(2,ia) + dedyia
-               debto(3,ia) = debto(3,ia) + dedzia
-               debto(1,ib) = debto(1,ib) + dedxib
-               debto(2,ib) = debto(2,ib) + dedyib
-               debto(3,ib) = debto(3,ib) + dedzib
-               debto(1,ic) = debto(1,ic) + dedxic
-               debto(2,ic) = debto(2,ic) + dedyic
-               debto(3,ic) = debto(3,ic) + dedzic
-               debto(1,id) = debto(1,id) + dedxid
-               debto(2,id) = debto(2,id) + dedyid
-               debto(3,id) = debto(3,id) + dedzid
+               ebt = ebt + e
+               debt(1,ia) = debt(1,ia) + dedxia
+               debt(2,ia) = debt(2,ia) + dedyia
+               debt(3,ia) = debt(3,ia) + dedzia
+               debt(1,ib) = debt(1,ib) + dedxib
+               debt(2,ib) = debt(2,ib) + dedyib
+               debt(3,ib) = debt(3,ib) + dedzib
+               debt(1,ic) = debt(1,ic) + dedxic
+               debt(2,ic) = debt(2,ic) + dedyic
+               debt(3,ic) = debt(3,ic) + dedzic
+               debt(1,id) = debt(1,id) + dedxid
+               debt(2,id) = debt(2,id) + dedyid
+               debt(3,id) = debt(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -382,15 +361,15 @@ c
                vyy = ycb*(dedyic+dedyid) - yba*dedyia + ydc*dedyid
                vzy = zcb*(dedyic+dedyid) - zba*dedyia + zdc*dedyid
                vzz = zcb*(dedzic+dedzid) - zba*dedzia + zdc*dedzid
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vyx
-               viro(3,1) = viro(3,1) + vzx
-               viro(1,2) = viro(1,2) + vyx
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vzy
-               viro(1,3) = viro(1,3) + vzx
-               viro(2,3) = viro(2,3) + vzy
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
             end if
          end if
       end do
@@ -399,23 +378,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ebt = ebto
-      do i = 1, n
-         debt(1,i) = debto(1,i)
-         debt(2,i) = debto(2,i)
-         debt(3,i) = debto(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (debto)
       return
       end

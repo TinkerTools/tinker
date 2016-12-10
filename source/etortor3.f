@@ -38,9 +38,7 @@ c
       integer ia,ib,ic,id,ie
       integer nlo,nhi,nt
       integer xlo,ylo
-      integer netto
-      real*8 e,etto
-      real*8 fgrp,sign
+      real*8 e,fgrp,sign
       real*8 angle1,angle2
       real*8 value1,value2
       real*8 cosine1,cosine2
@@ -62,7 +60,6 @@ c
       real*8 xed,yed,zed
       real*8 ftt(4),ft12(4)
       real*8 ft1(4),ft2(4)
-      real*8, allocatable :: aetto(:)
       logical proceed
       logical header,huge
 c
@@ -86,25 +83,13 @@ c
      &              4x,'Angle2',6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aetto(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      etto = ett
-      netto = nett
-      do i = 1, n
-         aetto(i) = aett(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntortor,itt,ibitor,
 !$OMP& use,x,y,z,tnx,ttx,tny,tty,tbf,tbx,tby,tbxy,ttorunit,
 !$OMP& use_group,use_polymer,verbose,debug,header,iout)
-!$OMP& shared(etto,netto,aetto)
-!$OMP DO reduction(+:etto,netto,aetto) schedule(guided)
+!$OMP& shared(ett,nett,aett)
+!$OMP DO reduction(+:ett,nett,aett) schedule(guided)
 c
 c     calculate the torsion-torsion interaction energy term
 c
@@ -264,11 +249,11 @@ c
 c
 c     increment the total torsion-torsion energy
 c
-               netto = netto + 1
-               etto = etto + e
-               aetto(ib) = aetto(ib) + e/3.0d0
-               aetto(ic) = aetto(ic) + e/3.0d0
-               aetto(id) = aetto(id) + e/3.0d0
+               nett = nett + 1
+               ett = ett + e
+               aett(ib) = aett(ib) + e/3.0d0
+               aett(ic) = aett(ic) + e/3.0d0
+               aett(id) = aett(id) + e/3.0d0
 c
 c     print a message if the energy of this interaction is large
 c
@@ -293,17 +278,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ett = etto
-      nett = netto
-      do i = 1, n
-         aett(i) = aetto(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aetto)
       return
       end

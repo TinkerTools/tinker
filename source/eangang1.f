@@ -32,8 +32,7 @@ c
       implicit none
       integer i,k,iangang
       integer ia,ib,ic,id,ie
-      real*8 e,eaao
-      real*8 angle,fgrp
+      real*8 e,angle,fgrp
       real*8 dot,cosine
       real*8 dt1,deddt1
       real*8 dt2,deddt2
@@ -59,8 +58,6 @@ c
       real*8 dedxie,dedyie,dedzie
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: deaao(:,:)
       logical proceed
 c
 c
@@ -73,30 +70,12 @@ c
          deaa(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (deaao(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eaao = eaa
-      do i = 1, n
-         deaao(1,i) = deaa(1,i)
-         deaao(2,i) = deaa(2,i)
-         deaao(3,i) = deaa(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangang,iaa,iang,
 !$OMP& use,x,y,z,anat,kaa,aaunit,use_group,use_polymer)
-!$OMP& shared(eaao,deaao,viro)
-!$OMP DO reduction(+:eaao,deaao,viro) schedule(guided)
+!$OMP& shared(eaa,deaa,vir)
+!$OMP DO reduction(+:eaa,deaa,vir) schedule(guided)
 c
 c     find the energy of each angle-angle interaction
 c
@@ -223,22 +202,22 @@ c
 c
 c     increment the total angle-angle energy and derivatives
 c
-               eaao = eaao + e
-               deaao(1,ia) = deaao(1,ia) + dedxia
-               deaao(2,ia) = deaao(2,ia) + dedyia
-               deaao(3,ia) = deaao(3,ia) + dedzia
-               deaao(1,ib) = deaao(1,ib) + dedxib
-               deaao(2,ib) = deaao(2,ib) + dedyib
-               deaao(3,ib) = deaao(3,ib) + dedzib
-               deaao(1,ic) = deaao(1,ic) + dedxic
-               deaao(2,ic) = deaao(2,ic) + dedyic
-               deaao(3,ic) = deaao(3,ic) + dedzic
-               deaao(1,id) = deaao(1,id) + dedxid
-               deaao(2,id) = deaao(2,id) + dedyid
-               deaao(3,id) = deaao(3,id) + dedzid
-               deaao(1,ie) = deaao(1,ie) + dedxie
-               deaao(2,ie) = deaao(2,ie) + dedyie
-               deaao(3,ie) = deaao(3,ie) + dedzie
+               eaa = eaa + e
+               deaa(1,ia) = deaa(1,ia) + dedxia
+               deaa(2,ia) = deaa(2,ia) + dedyia
+               deaa(3,ia) = deaa(3,ia) + dedzia
+               deaa(1,ib) = deaa(1,ib) + dedxib
+               deaa(2,ib) = deaa(2,ib) + dedyib
+               deaa(3,ib) = deaa(3,ib) + dedzib
+               deaa(1,ic) = deaa(1,ic) + dedxic
+               deaa(2,ic) = deaa(2,ic) + dedyic
+               deaa(3,ic) = deaa(3,ic) + dedzic
+               deaa(1,id) = deaa(1,id) + dedxid
+               deaa(2,id) = deaa(2,id) + dedyid
+               deaa(3,id) = deaa(3,id) + dedzid
+               deaa(1,ie) = deaa(1,ie) + dedxie
+               deaa(2,ie) = deaa(2,ie) + dedyie
+               deaa(3,ie) = deaa(3,ie) + dedzie
 c
 c     increment the internal virial tensor components
 c
@@ -248,15 +227,15 @@ c
                vyy = yab*dedyia + ycb*dedyic + ydb*dedyid + yeb*dedyie
                vzy = zab*dedyia + zcb*dedyic + zdb*dedyid + zeb*dedyie
                vzz = zab*dedzia + zcb*dedzic + zdb*dedzid + zeb*dedzie
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vyx
-               viro(3,1) = viro(3,1) + vzx
-               viro(1,2) = viro(1,2) + vyx
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vzy
-               viro(1,3) = viro(1,3) + vzx
-               viro(2,3) = viro(2,3) + vzy
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
             end if
          end if
       end do
@@ -265,23 +244,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eaa = eaao
-      do i = 1, n
-         deaa(1,i) = deaao(1,i)
-         deaa(2,i) = deaao(2,i)
-         deaa(3,i) = deaao(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (deaao)
       return
       end

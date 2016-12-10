@@ -182,10 +182,6 @@ c
       real*8 trans,dtrans
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 eso,eintero
-      real*8 viro(3,3)
-      real*8, allocatable :: drbo(:)
-      real*8, allocatable :: deso(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -201,34 +197,13 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (drbo(n))
-      allocate (deso(3,n))
-c
-c     initialize local variables for OpenMP calculation
-c
-      eso = 0.0d0
-      eintero = 0.0d0
-      do i = 1, n
-         drbo(i) = 0.0d0
-         deso(1,i) = 0.0d0
-         deso(2,i) = 0.0d0
-         deso(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         viro(1,i) = 0.0d0
-         viro(2,i) = 0.0d0
-         viro(3,i) = 0.0d0
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP% f0,f1,f2,f3,f4,f5,f6,f7,molcule)
-!$OMP& shared(eso,eintero,deso,drbo,viro)
-!$OMP DO reduction(+:eso,eintero,deso,drbo,viro) schedule(guided)
+!$OMP& shared(es,einter,des,drb,vir)
+!$OMP DO reduction(+:es,einter,des,drb,vir) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -306,25 +281,25 @@ c     increment the overall energy and derivative expressions
 c
                   if (i .eq. k) then
                      e = 0.5d0 * e
-                     eso = eso + e
+                     es = es + e
                      drbi = derb * rbk
-                     drbo(i) = drbo(i) + drbi
+                     drb(i) = drb(i) + drbi
                   else
-                     eso = eso + e
+                     es = es + e
                      de = de / r
                      dedx = de * xr
                      dedy = de * yr
                      dedz = de * zr
-                     deso(1,i) = deso(1,i) + dedx
-                     deso(2,i) = deso(2,i) + dedy
-                     deso(3,i) = deso(3,i) + dedz
-                     deso(1,k) = deso(1,k) - dedx
-                     deso(2,k) = deso(2,k) - dedy
-                     deso(3,k) = deso(3,k) - dedz
+                     des(1,i) = des(1,i) + dedx
+                     des(2,i) = des(2,i) + dedy
+                     des(3,i) = des(3,i) + dedz
+                     des(1,k) = des(1,k) - dedx
+                     des(2,k) = des(2,k) - dedy
+                     des(3,k) = des(3,k) - dedz
                      drbi = derb * rbk
                      drbk = derb * rbi
-                     drbo(i) = drbo(i) + drbi
-                     drbo(k) = drbo(k) + drbk
+                     drb(i) = drb(i) + drbi
+                     drb(k) = drb(k) + drbk
 c
 c     increment the internal virial tensor components
 c
@@ -334,21 +309,21 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     viro(1,1) = viro(1,1) + vxx
-                     viro(2,1) = viro(2,1) + vyx
-                     viro(3,1) = viro(3,1) + vzx
-                     viro(1,2) = viro(1,2) + vyx
-                     viro(2,2) = viro(2,2) + vyy
-                     viro(3,2) = viro(3,2) + vzy
-                     viro(1,3) = viro(1,3) + vzx
-                     viro(2,3) = viro(2,3) + vzy
-                     viro(3,3) = viro(3,3) + vzz
+                     vir(1,1) = vir(1,1) + vxx
+                     vir(2,1) = vir(2,1) + vyx
+                     vir(3,1) = vir(3,1) + vzx
+                     vir(1,2) = vir(1,2) + vyx
+                     vir(2,2) = vir(2,2) + vyy
+                     vir(3,2) = vir(3,2) + vzy
+                     vir(1,3) = vir(1,3) + vzx
+                     vir(2,3) = vir(2,3) + vzy
+                     vir(3,3) = vir(3,3) + vzz
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintero = eintero + e
+                     einter = einter + e
                   end if
                end if
             end if
@@ -359,27 +334,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + eso
-      einter = einter + eintero
-      do i = 1, n
-         des(1,i) = des(1,i) + deso(1,i)
-         des(2,i) = des(2,i) + deso(2,i)
-         des(3,i) = des(3,i) + deso(3,i)
-         drb(i) = drb(i) + drbo(i)
-      end do
-      do i = 1, 3
-         vir(1,i) = vir(1,i) + viro(1,i)
-         vir(2,i) = vir(2,i) + viro(2,i)
-         vir(3,i) = vir(3,i) + viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (drbo)
-      deallocate (deso)
       return
       end
 c
@@ -433,10 +387,6 @@ c
       real*8 trans,dtrans
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 eso,eintero
-      real*8 viro(3,3)
-      real*8, allocatable :: drbo(:)
-      real*8, allocatable :: deso(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -452,34 +402,13 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (drbo(n))
-      allocate (deso(3,n))
-c
-c     initialize local variables for OpenMP calculation
-c
-      eso = 0.0d0
-      eintero = 0.0d0
-      do i = 1, n
-         drbo(i) = 0.0d0
-         deso(1,i) = 0.0d0
-         deso(2,i) = 0.0d0
-         deso(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         viro(1,i) = 0.0d0
-         viro(2,i) = 0.0d0
-         viro(3,i) = 0.0d0
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
 !$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,molcule)
-!$OMP& shared(eso,eintero,deso,drbo,viro)
-!$OMP DO reduction(+:eso,eintero,deso,drbo,viro) schedule(guided)
+!$OMP& shared(es,einter,des,drb,vir)
+!$OMP DO reduction(+:es,einter,des,drb,vir) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -502,9 +431,9 @@ c
          fgm = sqrt(rm2 + rb2*exp(-0.25d0*rm2/rb2))
          shift = fik / fgm
          e = e - shift
-         eso = eso + 0.5d0*e
+         es = es + 0.5d0*e
          drbi = derb * rbi
-         drbo(i) = drbo(i) + drbi
+         drb(i) = drb(i) + drbi
 c
 c     decide whether to compute the current interaction
 c
@@ -570,21 +499,21 @@ c
 c
 c     increment the overall energy and derivative expressions
 c
-                  eso = eso + e
+                  es = es + e
                   de = de / r
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
-                  deso(1,i) = deso(1,i) + dedx
-                  deso(2,i) = deso(2,i) + dedy
-                  deso(3,i) = deso(3,i) + dedz
-                  deso(1,k) = deso(1,k) - dedx
-                  deso(2,k) = deso(2,k) - dedy
-                  deso(3,k) = deso(3,k) - dedz
+                  des(1,i) = des(1,i) + dedx
+                  des(2,i) = des(2,i) + dedy
+                  des(3,i) = des(3,i) + dedz
+                  des(1,k) = des(1,k) - dedx
+                  des(2,k) = des(2,k) - dedy
+                  des(3,k) = des(3,k) - dedz
                   drbi = derb * rbk
                   drbk = derb * rbi
-                  drbo(i) = drbo(i) + drbi
-                  drbo(k) = drbo(k) + drbk
+                  drb(i) = drb(i) + drbi
+                  drb(k) = drb(k) + drbk
 c
 c     increment the internal virial tensor components
 c
@@ -594,20 +523,20 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  viro(1,1) = viro(1,1) + vxx
-                  viro(2,1) = viro(2,1) + vyx
-                  viro(3,1) = viro(3,1) + vzx
-                  viro(1,2) = viro(1,2) + vyx
-                  viro(2,2) = viro(2,2) + vyy
-                  viro(3,2) = viro(3,2) + vzy
-                  viro(1,3) = viro(1,3) + vzx
-                  viro(2,3) = viro(2,3) + vzy
-                  viro(3,3) = viro(3,3) + vzz
+                  vir(1,1) = vir(1,1) + vxx
+                  vir(2,1) = vir(2,1) + vyx
+                  vir(3,1) = vir(3,1) + vzx
+                  vir(1,2) = vir(1,2) + vyx
+                  vir(2,2) = vir(2,2) + vyy
+                  vir(3,2) = vir(3,2) + vzy
+                  vir(1,3) = vir(1,3) + vzx
+                  vir(2,3) = vir(2,3) + vzy
+                  vir(3,3) = vir(3,3) + vzz
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintero = eintero + e
+                     einter = einter + e
                   end if
                end if
             end if
@@ -618,27 +547,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + eso
-      einter = einter + eintero
-      do i = 1, n
-         des(1,i) = des(1,i) + deso(1,i)
-         des(2,i) = des(2,i) + deso(2,i)
-         des(3,i) = des(3,i) + deso(3,i)
-         drb(i) = drb(i) + drbo(i)
-      end do
-      do i = 1, 3
-         vir(1,i) = vir(1,i) + viro(1,i)
-         vir(2,i) = vir(2,i) + viro(2,i)
-         vir(3,i) = vir(3,i) + viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (drbo)
-      deallocate (deso)
       return
       end
 c
@@ -973,37 +881,24 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (drbo(n))
-      allocate (drbpo(n))
-      allocate (deso(3,n))
       allocate (trq(3,n))
       allocate (trqi(3,n))
 c
 c     initialize local variables for OpenMP calculation
 c
-      eso = 0.0d0
-      eintero = 0.0d0
       do i = 1, n
-         drbo(i) = 0.0d0
-         drbpo(i) = 0.0d0
          do j = 1, 3
-            deso(j,i) = 0.0d0
             trq(j,i) = 0.0d0
             trqi(j,i) = 0.0d0
          end do
-      end do
-      do i = 1, 3
-         viro(1,i) = 0.0d0
-         viro(2,i) = 0.0d0
-         viro(3,i) = 0.0d0
       end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,rborn,
 !$OMP& rpole,uinds,uinps,use_group,off2,gkc,fc,fd,fq,poltyp,molcule)
-!$OMP& shared(eso,eintero,deso,drbo,drbpo,trq,trqi,viro)
-!$OMP DO reduction(+:eso,eintero,deso,drbo,drbpo,trq,trqi,viro)
+!$OMP& shared(es,einter,des,drb,drbp,trq,trqi,vir)
+!$OMP DO reduction(+:es,einter,des,drb,drbp,trq,trqi,vir)
 !$OMP& schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
@@ -2379,21 +2274,21 @@ c
                   if (i .eq. k) then
                      e = 0.5d0 * e
                      ei = 0.5d0 * ei
-                     eso = eso + e + ei
-                     drbo(i) = drbo(i) + drbi
-                     drbpo(i) = drbpo(i) + dpbi
+                     es = es + e + ei
+                     drb(i) = drb(i) + drbi
+                     drbp(i) = drbp(i) + dpbi
                   else
-                     eso = eso + e + ei
-                     deso(1,i) = deso(1,i) - dedx - dpdx
-                     deso(2,i) = deso(2,i) - dedy - dpdy
-                     deso(3,i) = deso(3,i) - dedz - dpdz
-                     deso(1,k) = deso(1,k) + dedx + dpdx
-                     deso(2,k) = deso(2,k) + dedy + dpdy
-                     deso(3,k) = deso(3,k) + dedz + dpdz
-                     drbo(i) = drbo(i) + drbi
-                     drbo(k) = drbo(k) + drbk
-                     drbpo(i) = drbpo(i) + dpbi
-                     drbpo(k) = drbpo(k) + dpbk
+                     es = es + e + ei
+                     des(1,i) = des(1,i) - dedx - dpdx
+                     des(2,i) = des(2,i) - dedy - dpdy
+                     des(3,i) = des(3,i) - dedz - dpdz
+                     des(1,k) = des(1,k) + dedx + dpdx
+                     des(2,k) = des(2,k) + dedy + dpdy
+                     des(3,k) = des(3,k) + dedz + dpdz
+                     drb(i) = drb(i) + drbi
+                     drb(k) = drb(k) + drbk
+                     drbp(i) = drbp(i) + dpbi
+                     drbp(k) = drbp(k) + dpbk
 c
 c     increment the internal virial tensor components
 c
@@ -2403,21 +2298,21 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     viro(1,1) = viro(1,1) + vxx
-                     viro(2,1) = viro(2,1) + vyx
-                     viro(3,1) = viro(3,1) + vzx
-                     viro(1,2) = viro(1,2) + vyx
-                     viro(2,2) = viro(2,2) + vyy
-                     viro(3,2) = viro(3,2) + vzy
-                     viro(1,3) = viro(1,3) + vzx
-                     viro(2,3) = viro(2,3) + vzy
-                     viro(3,3) = viro(3,3) + vzz
+                     vir(1,1) = vir(1,1) + vxx
+                     vir(2,1) = vir(2,1) + vyx
+                     vir(3,1) = vir(3,1) + vzx
+                     vir(1,2) = vir(1,2) + vyx
+                     vir(2,2) = vir(2,2) + vyy
+                     vir(3,2) = vir(3,2) + vzy
+                     vir(1,3) = vir(1,3) + vzx
+                     vir(2,3) = vir(2,3) + vzy
+                     vir(3,3) = vir(3,3) + vzz
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintero = eintero + e + ei
+                     einter = einter + e + ei
                   end if
                end if
             end if
@@ -2429,23 +2324,6 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      es = es + eso
-      einter = einter + eintero
-      do i = 1, n
-         des(1,i) = des(1,i) + deso(1,i)
-         des(2,i) = des(2,i) + deso(2,i)
-         des(3,i) = des(3,i) + deso(3,i)
-         drb(i) = drb(i) + drbo(i)
-         drbp(i) = drbp(i) + drbpo(i)
-      end do
-      do i = 1, 3
-         vir(1,i) = vir(1,i) + viro(1,i)
-         vir(2,i) = vir(2,i) + viro(2,i)
-         vir(3,i) = vir(3,i) + viro(3,i)
-      end do
-c
 c     convert torque derivative components to Cartesian form
 c
       call torque2 (trq,des)
@@ -2453,9 +2331,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (drbo)
-      deallocate (drbpo)
-      deallocate (deso)
       deallocate (trq)
       deallocate (trqi)
       return
@@ -2500,8 +2375,7 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,eso
-      real*8 f,fgrp
+      real*8 ei,f,fgrp
       real*8 damp,gfd
       real*8 scale3,scale5
       real*8 scale7,scale9
@@ -2546,7 +2420,6 @@ c
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: deso(:,:)
       real*8, allocatable :: trqi(:,:)
       logical proceed,usei,usek
       character*6 mode
@@ -2564,7 +2437,6 @@ c
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
-      allocate (deso(3,n))
       allocate (trqi(3,n))
 c
 c     set arrays needed to scale connected atom interactions
@@ -2577,10 +2449,8 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      eso = 0.0d0
       do i = 1, n
          do j = 1, 3
-            deso(j,i) = 0.0d0
             trqi(j,i) = 0.0d0
          end do
       end do
@@ -2594,8 +2464,8 @@ c
 !$OMP% d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,use_group,
 !$OMP% use_intra,off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP% shared(eso,deso,trqi)
-!$OMP DO reduction(+:eso,deso,trqi) schedule(guided)
+!$OMP% shared(es,des,trqi)
+!$OMP DO reduction(+:es,des,trqi) schedule(guided)
 c
 c     calculate the multipole interaction energy and gradient
 c
@@ -2915,7 +2785,7 @@ c
      &                          + rr5*(gli(2)+gli(7))*psc5
      &                          + rr7*gli(3)*psc7)
                ei = f * ei
-               eso = eso + ei
+               es = es + ei
 c
 c     intermediate variables for the induced-permanent terms
 c
@@ -3060,12 +2930,12 @@ c
 c
 c     update the force components on sites i and k
 c
-               deso(1,ii) = deso(1,ii) + f*ftm2i(1)
-               deso(2,ii) = deso(2,ii) + f*ftm2i(2)
-               deso(3,ii) = deso(3,ii) + f*ftm2i(3)
-               deso(1,kk) = deso(1,kk) - f*ftm2i(1)
-               deso(2,kk) = deso(2,kk) - f*ftm2i(2)
-               deso(3,kk) = deso(3,kk) - f*ftm2i(3)
+               des(1,ii) = des(1,ii) + f*ftm2i(1)
+               des(2,ii) = des(2,ii) + f*ftm2i(2)
+               des(3,ii) = des(3,ii) + f*ftm2i(3)
+               des(1,kk) = des(1,kk) - f*ftm2i(1)
+               des(2,kk) = des(2,kk) - f*ftm2i(2)
+               des(3,kk) = des(3,kk) - f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
@@ -3184,7 +3054,7 @@ c
      &                           + rr5*(gli(2)+gli(7))*psc5
      &                           + rr7*gli(3)*psc7)
                ei = f * ei
-               eso = eso + ei
+               es = es + ei
 c
 c     intermediate variables for the induced-permanent terms
 c
@@ -3329,12 +3199,12 @@ c
 c
 c     update the force components on sites i and k
 c
-               deso(1,ii) = deso(1,ii) - f*ftm2i(1)
-               deso(2,ii) = deso(2,ii) - f*ftm2i(2)
-               deso(3,ii) = deso(3,ii) - f*ftm2i(3)
-               deso(1,kk) = deso(1,kk) + f*ftm2i(1)
-               deso(2,kk) = deso(2,kk) + f*ftm2i(2)
-               deso(3,kk) = deso(3,kk) + f*ftm2i(3)
+               des(1,ii) = des(1,ii) - f*ftm2i(1)
+               des(2,ii) = des(2,ii) - f*ftm2i(2)
+               des(3,ii) = des(3,ii) - f*ftm2i(3)
+               des(1,kk) = des(1,kk) + f*ftm2i(1)
+               des(2,kk) = des(2,kk) + f*ftm2i(2)
+               des(3,kk) = des(3,kk) + f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
@@ -3385,14 +3255,8 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
+c     convert torque values into Cartesian forces
 c
-      es = es + eso
-      do i = 1, n
-         des(1,i) = des(1,i) + deso(1,i)
-         des(2,i) = des(2,i) + deso(2,i)
-         des(3,i) = des(3,i) + deso(3,i)
-      end do
       call torque2 (trqi,des)
 c
 c     perform deallocation of some local arrays
@@ -3400,7 +3264,6 @@ c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
-      deallocate (deso)
       deallocate (trqi)
       return
       end
@@ -3445,8 +3308,7 @@ c
       integer ii,kk,kkk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,eso
-      real*8 f,fgrp
+      real*8 ei,f,fgrp
       real*8 damp,gfd
       real*8 scale3,scale5
       real*8 scale7,scale9
@@ -3491,7 +3353,6 @@ c
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: deso(:,:)
       real*8, allocatable :: trqi(:,:)
       logical proceed,usei,usek
       character*6 mode
@@ -3509,7 +3370,6 @@ c
       allocate (pscale(n))
       allocate (dscale(n))
       allocate (uscale(n))
-      allocate (deso(3,n))
       allocate (trqi(3,n))
 c
 c     set arrays needed to scale connected atom interactions
@@ -3522,10 +3382,8 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      eso = 0.0d0
       do i = 1, n
          do j = 1, 3
-            deso(j,i) = 0.0d0
             trqi(j,i) = 0.0d0
          end do
       end do
@@ -3539,8 +3397,8 @@ c
 !$OMP% d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP% use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP% shared(eso,deso,trqi)
-!$OMP DO reduction(+:eso,deso,trqi) schedule(guided)
+!$OMP% shared(es,des,trqi)
+!$OMP DO reduction(+:es,des,trqi) schedule(guided)
 c
 c     calculate the multipole interaction energy and gradient
 c
@@ -3861,7 +3719,7 @@ c
      &                          + rr5*(gli(2)+gli(7))*psc5
      &                          + rr7*gli(3)*psc7)
                ei = f * ei
-               eso = eso + ei
+               es = es + ei
 c
 c     intermediate variables for the induced-permanent terms
 c
@@ -4006,12 +3864,12 @@ c
 c
 c     update the force components on sites i and k
 c
-               deso(1,ii) = deso(1,ii) + f*ftm2i(1)
-               deso(2,ii) = deso(2,ii) + f*ftm2i(2)
-               deso(3,ii) = deso(3,ii) + f*ftm2i(3)
-               deso(1,kk) = deso(1,kk) - f*ftm2i(1)
-               deso(2,kk) = deso(2,kk) - f*ftm2i(2)
-               deso(3,kk) = deso(3,kk) - f*ftm2i(3)
+               des(1,ii) = des(1,ii) + f*ftm2i(1)
+               des(2,ii) = des(2,ii) + f*ftm2i(2)
+               des(3,ii) = des(3,ii) + f*ftm2i(3)
+               des(1,kk) = des(1,kk) - f*ftm2i(1)
+               des(2,kk) = des(2,kk) - f*ftm2i(2)
+               des(3,kk) = des(3,kk) - f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
@@ -4130,7 +3988,7 @@ c
      &                           + rr5*(gli(2)+gli(7))*psc5
      &                           + rr7*gli(3)*psc7)
                ei = f * ei
-               eso = eso + ei
+               es = es + ei
 c
 c     intermediate variables for the induced-permanent terms
 c
@@ -4275,12 +4133,12 @@ c
 c
 c     update the force components on sites i and k
 c
-               deso(1,ii) = deso(1,ii) - f*ftm2i(1)
-               deso(2,ii) = deso(2,ii) - f*ftm2i(2)
-               deso(3,ii) = deso(3,ii) - f*ftm2i(3)
-               deso(1,kk) = deso(1,kk) + f*ftm2i(1)
-               deso(2,kk) = deso(2,kk) + f*ftm2i(2)
-               deso(3,kk) = deso(3,kk) + f*ftm2i(3)
+               des(1,ii) = des(1,ii) - f*ftm2i(1)
+               des(2,ii) = des(2,ii) - f*ftm2i(2)
+               des(3,ii) = des(3,ii) - f*ftm2i(3)
+               des(1,kk) = des(1,kk) + f*ftm2i(1)
+               des(2,kk) = des(2,kk) + f*ftm2i(2)
+               des(3,kk) = des(3,kk) + f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
@@ -4331,14 +4189,8 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
+c     convert torques into Cartesian forces
 c
-      es = es + eso
-      do i = 1, n
-         des(1,i) = des(1,i) + deso(1,i)
-         des(2,i) = des(2,i) + deso(2,i)
-         des(3,i) = des(3,i) + deso(3,i)
-      end do
       call torque2 (trqi,des)
 c
 c     perform deallocation of some local arrays
@@ -4346,7 +4198,6 @@ c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
-      deallocate (deso)
       deallocate (trqi)
       return
       end
@@ -4777,8 +4628,6 @@ c
       real*8 uik11,uik12,uik13
       real*8 de,dl,du
       real*8 dedx,dedy,dedz
-      real*8 edispo
-      real*8, allocatable :: deso(:,:)
 c
 c
 c     zero out the Weeks-Chandler-Andersen dispersion energy
@@ -4793,25 +4642,12 @@ c
          rdisp(i) = rad(class(i)) + offset
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (deso(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      edispo = edisp
-      do i = 1, n
-         deso(1,i) = des(1,i)
-         deso(2,i) = des(2,i)
-         deso(3,i) = des(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
 !$OMP& rad,rdisp,x,y,z,shctd,cdisp)
-!$OMP& shared(edispo,deso)
-!$OMP DO reduction(+:edispo,deso) schedule(guided)
+!$OMP& shared(edisp,des)
+!$OMP DO reduction(+:edisp,des) schedule(guided)
 c
 c     find the WCA dispersion energy and gradient components
 c
@@ -5020,12 +4856,12 @@ c
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
-                  deso(1,i) = deso(1,i) + dedx
-                  deso(2,i) = deso(2,i) + dedy
-                  deso(3,i) = deso(3,i) + dedz
-                  deso(1,k) = deso(1,k) - dedx
-                  deso(2,k) = deso(2,k) - dedy
-                  deso(3,k) = deso(3,k) - dedz
+                  des(1,i) = des(1,i) + dedx
+                  des(2,i) = des(2,i) + dedy
+                  des(3,i) = des(3,i) + dedz
+                  des(1,k) = des(1,k) - dedx
+                  des(2,k) = des(2,k) - dedy
+                  des(3,k) = des(3,k) - dedz
                end if
             end if
          end do
@@ -5033,26 +4869,13 @@ c
 c     increment the overall dispersion energy component
 c
          e = cdisp(i) - slevy*awater*sum
-         edispo = edispo + e
+         edisp = edisp + e
       end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      edisp = edispo
-      do i = 1, n
-         des(1,i) = deso(1,i)
-         des(2,i) = deso(2,i)
-         des(3,i) = deso(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (deso)
       return
       end
 c

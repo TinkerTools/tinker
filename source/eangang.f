@@ -28,8 +28,8 @@ c
       implicit none
       integer i,k,iangang
       integer ia,ib,ic,id,ie
-      real*8 e,eaao
-      real*8 dt1,dt2,fgrp
+      real*8 e,fgrp
+      real*8 dt1,dt2
       real*8 angle,dot,cosine
       real*8 xia,yia,zia
       real*8 xib,yib,zib
@@ -49,16 +49,12 @@ c     zero out the angle-angle cross term energy
 c
       eaa = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eaao = eaa
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangang,iaa,iang,
 !$OMP& use,x,y,z,anat,kaa,aaunit,use_group,use_polymer)
-!$OMP& shared(eaao)
-!$OMP DO reduction(+:eaao) schedule(guided)
+!$OMP& shared(eaa)
+!$OMP DO reduction(+:eaa) schedule(guided)
 c
 c     calculate the angle-angle interaction energy term
 c
@@ -143,7 +139,7 @@ c
 c
 c     increment the total angle-angle energy
 c
-               eaao = eaao + e
+               eaa = eaa + e
             end if
          end if
       end do
@@ -152,9 +148,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eaa = eaao
       return
       end

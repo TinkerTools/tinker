@@ -30,8 +30,7 @@ c
       use virial
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eido
-      real*8 dedphi
+      real*8 e,dedphi
       real*8 dt,fgrp
       real*8 ideal,force
       real*8 cosine,sine
@@ -57,8 +56,6 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: deido(:,:)
       logical proceed
 c
 c
@@ -71,30 +68,12 @@ c
          deid(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (deido(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eido = eid
-      do i = 1, n
-         deido(1,i) = deid(1,i)
-         deido(2,i) = deid(2,i)
-         deido(3,i) = deid(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
 !$OMP& x,y,z,kprop,vprop,idihunit,use_group,use_polymer)
-!$OMP& shared(eido,deido,viro)
-!$OMP DO reduction(+:eido,deido,viro) schedule(guided)
+!$OMP& shared(eid,deid,vir)
+!$OMP DO reduction(+:eid,deid,vir) schedule(guided)
 c
 c     calculate the improper dihedral angle energy term
 c
@@ -223,19 +202,19 @@ c
 c
 c     calculate improper dihedral energy and derivatives
 c
-               eido = eido + e
-               deido(1,ia) = deido(1,ia) + dedxia
-               deido(2,ia) = deido(2,ia) + dedyia
-               deido(3,ia) = deido(3,ia) + dedzia
-               deido(1,ib) = deido(1,ib) + dedxib
-               deido(2,ib) = deido(2,ib) + dedyib
-               deido(3,ib) = deido(3,ib) + dedzib
-               deido(1,ic) = deido(1,ic) + dedxic
-               deido(2,ic) = deido(2,ic) + dedyic
-               deido(3,ic) = deido(3,ic) + dedzic
-               deido(1,id) = deido(1,id) + dedxid
-               deido(2,id) = deido(2,id) + dedyid
-               deido(3,id) = deido(3,id) + dedzid
+               eid = eid + e
+               deid(1,ia) = deid(1,ia) + dedxia
+               deid(2,ia) = deid(2,ia) + dedyia
+               deid(3,ia) = deid(3,ia) + dedzia
+               deid(1,ib) = deid(1,ib) + dedxib
+               deid(2,ib) = deid(2,ib) + dedyib
+               deid(3,ib) = deid(3,ib) + dedzib
+               deid(1,ic) = deid(1,ic) + dedxic
+               deid(2,ic) = deid(2,ic) + dedyic
+               deid(3,ic) = deid(3,ic) + dedzic
+               deid(1,id) = deid(1,id) + dedxid
+               deid(2,id) = deid(2,id) + dedyid
+               deid(3,id) = deid(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -245,15 +224,15 @@ c
                vyy = ycb*(dedyic+dedyid) - yba*dedyia + ydc*dedyid
                vzy = zcb*(dedyic+dedyid) - zba*dedyia + zdc*dedyid
                vzz = zcb*(dedzic+dedzid) - zba*dedzia + zdc*dedzid
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vyx
-               viro(3,1) = viro(3,1) + vzx
-               viro(1,2) = viro(1,2) + vyx
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vzy
-               viro(1,3) = viro(1,3) + vzx
-               viro(2,3) = viro(2,3) + vzy
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
             end if
          end if
       end do
@@ -262,23 +241,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eid = eido
-      do i = 1, n
-         deid(1,i) = deido(1,i)
-         deid(2,i) = deido(2,i)
-         deid(3,i) = deido(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (deido)
       return
       end

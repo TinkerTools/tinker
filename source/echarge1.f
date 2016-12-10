@@ -113,7 +113,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -545,7 +545,7 @@ c
       allocate (ysort(8*n))
       allocate (zsort(8*n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -842,11 +842,7 @@ c
       real*8 rc5,rc6,rc7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 eco,eintero
-      real*8 viro(3,3)
       real*8, allocatable :: cscale(:)
-      real*8, allocatable :: deco1(:,:)
-      real*8, allocatable :: deco2(:,:)
       logical proceed,usei
       character*6 mode
 c
@@ -864,10 +860,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
-      allocate (deco1(3,n))
-      allocate (deco2(3,n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -879,33 +873,15 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      eco = ec
-      eintero = einter
-      do i = 1, n
-         deco1(1,i) = 0.0d0
-         deco1(2,i) = 0.0d0
-         deco1(3,i) = 0.0d0
-         deco2(1,i) = 0.0d0
-         deco2(2,i) = 0.0d0
-         deco2(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
-!$OMP& molcule,ebuffer) firstprivate(cscale)
-!$OMP& shared(eco,eintero,deco1,deco2,viro)
-!$OMP DO reduction(+:eco,eintero,deco1,deco2,viro) schedule(guided)
+!$OMP& molcule,ebuffer)
+!$OMP& firstprivate(cscale) shared (ec,einter,dec,vir)
+!$OMP DO reduction(+:ec,einter,dec,vir) schedule(guided)
 c
 c     compute the charge interaction energy and first derivatives
 c
@@ -1014,19 +990,19 @@ c
 c
 c     increment the overall energy and derivative expressions
 c
-                  eco = eco + e
-                  deco1(1,i) = deco1(1,i) + dedx
-                  deco1(2,i) = deco1(2,i) + dedy
-                  deco1(3,i) = deco1(3,i) + dedz
-                  deco1(1,ic) = deco1(1,ic) + dedxc
-                  deco1(2,ic) = deco1(2,ic) + dedyc
-                  deco1(3,ic) = deco1(3,ic) + dedzc
-                  deco2(1,k) = deco2(1,k) - dedx
-                  deco2(2,k) = deco2(2,k) - dedy
-                  deco2(3,k) = deco2(3,k) - dedz
-                  deco2(1,kc) = deco2(1,kc) - dedxc
-                  deco2(2,kc) = deco2(2,kc) - dedyc
-                  deco2(3,kc) = deco2(3,kc) - dedzc
+                  ec = ec + e
+                  dec(1,i) = dec(1,i) + dedx
+                  dec(2,i) = dec(2,i) + dedy
+                  dec(3,i) = dec(3,i) + dedz
+                  dec(1,ic) = dec(1,ic) + dedxc
+                  dec(2,ic) = dec(2,ic) + dedyc
+                  dec(3,ic) = dec(3,ic) + dedzc
+                  dec(1,k) = dec(1,k) - dedx
+                  dec(2,k) = dec(2,k) - dedy
+                  dec(3,k) = dec(3,k) - dedz
+                  dec(1,kc) = dec(1,kc) - dedxc
+                  dec(2,kc) = dec(2,kc) - dedyc
+                  dec(3,kc) = dec(3,kc) - dedzc
 c
 c     increment the internal virial tensor components
 c
@@ -1036,20 +1012,20 @@ c
                   vyy = yr*dedy + yc*dedyc
                   vzy = zr*dedy + zc*dedyc
                   vzz = zr*dedz + zc*dedzc
-                  viro(1,1) = viro(1,1) + vxx
-                  viro(2,1) = viro(2,1) + vyx
-                  viro(3,1) = viro(3,1) + vzx
-                  viro(1,2) = viro(1,2) + vyx
-                  viro(2,2) = viro(2,2) + vyy
-                  viro(3,2) = viro(3,2) + vzy
-                  viro(1,3) = viro(1,3) + vzx
-                  viro(2,3) = viro(2,3) + vzy
-                  viro(3,3) = viro(3,3) + vzz
+                  vir(1,1) = vir(1,1) + vxx
+                  vir(2,1) = vir(2,1) + vyx
+                  vir(3,1) = vir(3,1) + vzx
+                  vir(1,2) = vir(1,2) + vyx
+                  vir(2,2) = vir(2,2) + vyy
+                  vir(3,2) = vir(3,2) + vzy
+                  vir(1,3) = vir(1,3) + vzx
+                  vir(2,3) = vir(2,3) + vzy
+                  vir(3,3) = vir(3,3) + vzz
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintero = eintero + e
+                     einter = einter + e
                   end if
                end if
             end if
@@ -1076,26 +1052,9 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      ec = eco
-      einter = eintero
-      do i = 1, n
-         dec(1,i) = dec(1,i) + deco1(1,i) + deco2(1,i)
-         dec(2,i) = dec(2,i) + deco1(2,i) + deco2(2,i)
-         dec(3,i) = dec(3,i) + deco1(3,i) + deco2(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
-      deallocate (deco1)
-      deallocate (deco2)
       return
       end
 c
@@ -1169,7 +1128,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1563,7 +1522,7 @@ c
       allocate (ysort(8*n))
       allocate (zsort(8*n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1868,11 +1827,7 @@ c
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 eco,eintrao
-      real*8 viro(3,3)
       real*8, allocatable :: cscale(:)
-      real*8, allocatable :: deco1(:,:)
-      real*8, allocatable :: deco2(:,:)
       logical proceed,usei
       character*6 mode
       external erfc
@@ -1891,10 +1846,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
-      allocate (deco1(3,n))
-      allocate (deco2(3,n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1949,32 +1902,13 @@ c     compute reciprocal space Ewald energy and first derivatives
 c
       call ecrecip1
 c
-c     initialize local variables for OpenMP calculation
-c
-      eco = ec
-      eintrao = eintra
-      do i = 1, n
-         deco1(1,i) = 0.0d0
-         deco1(2,i) = 0.0d0
-         deco1(3,i) = 0.0d0
-         deco2(1,i) = 0.0d0
-         deco2(2,i) = 0.0d0
-         deco2(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nion,iion,jion,use,
-!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
-!$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
-!$OMP& aewald,molcule,ebuffer) firstprivate(cscale)
-!$OMP& shared(eco,eintrao,deco1,deco2,viro)
-!$OMP DO reduction(+:eco,eintrao,deco1,deco2,viro) schedule(guided)
+!$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
+!$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c2scale,
+!$OMP& c3scale,c4scale,c5scale,use_group,off2,aewald,molcule,ebuffer)
+!$OMP& firstprivate(cscale) shared (ec,eintra,dec,vir)
+!$OMP DO reduction(+:ec,eintra,dec,vir) schedule(guided)
 c
 c     compute the real space Ewald energy and first derivatives
 c
@@ -2046,13 +1980,13 @@ c
 c
 c     increment the overall energy and derivative expressions
 c
-                  eco = eco + e
-                  deco1(1,i) = deco1(1,i) + dedx
-                  deco1(2,i) = deco1(2,i) + dedy
-                  deco1(3,i) = deco1(3,i) + dedz
-                  deco2(1,k) = deco2(1,k) - dedx
-                  deco2(2,k) = deco2(2,k) - dedy
-                  deco2(3,k) = deco2(3,k) - dedz
+                  ec = ec + e
+                  dec(1,i) = dec(1,i) + dedx
+                  dec(2,i) = dec(2,i) + dedy
+                  dec(3,i) = dec(3,i) + dedz
+                  dec(1,k) = dec(1,k) - dedx
+                  dec(2,k) = dec(2,k) - dedy
+                  dec(3,k) = dec(3,k) - dedz
 c
 c     increment the internal virial tensor components
 c
@@ -2062,21 +1996,21 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  viro(1,1) = viro(1,1) + vxx
-                  viro(2,1) = viro(2,1) + vyx
-                  viro(3,1) = viro(3,1) + vzx
-                  viro(1,2) = viro(1,2) + vyx
-                  viro(2,2) = viro(2,2) + vyy
-                  viro(3,2) = viro(3,2) + vzy
-                  viro(1,3) = viro(1,3) + vzx
-                  viro(2,3) = viro(2,3) + vzy
-                  viro(3,3) = viro(3,3) + vzz
+                  vir(1,1) = vir(1,1) + vxx
+                  vir(2,1) = vir(2,1) + vyx
+                  vir(3,1) = vir(3,1) + vzx
+                  vir(1,2) = vir(1,2) + vyx
+                  vir(2,2) = vir(2,2) + vyy
+                  vir(3,2) = vir(3,2) + vzy
+                  vir(1,3) = vir(1,3) + vzx
+                  vir(2,3) = vir(2,3) + vzy
+                  vir(3,3) = vir(3,3) + vzz
 c
 c     increment the total intramolecular energy
 c
                   if (molcule(i) .eq. molcule(k)) then
                      efix = (fik/rb) * scale
-                     eintrao = eintrao + efix
+                     eintra = eintra + efix
                   end if
                end if
             end if
@@ -2103,21 +2037,6 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      ec = eco
-      eintra = eintrao
-      do i = 1, n
-         dec(1,i) = dec(1,i) + deco1(1,i) + deco2(1,i)
-         dec(2,i) = dec(2,i) + deco1(2,i) + deco2(2,i)
-         dec(3,i) = dec(3,i) + deco1(3,i) + deco2(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
 c     intermolecular energy is total minus intramolecular part
 c
       einter = einter + ec - eintra
@@ -2125,8 +2044,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
-      deallocate (deco1)
-      deallocate (deco2)
       return
       end
 c
@@ -2190,7 +2107,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0

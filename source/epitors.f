@@ -27,8 +27,7 @@ c
       implicit none
       integer i,ia,ib,ic
       integer id,ie,ig
-      real*8 e,epto
-      real*8 rdc,fgrp
+      real*8 e,rdc,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -57,16 +56,12 @@ c     zero out the pi-system torsion potential energy
 c
       ept = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      epto = ept
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npitors,ipit,
 !$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer)
-!$OMP& shared(epto)
-!$OMP DO reduction(+:epto) schedule(guided)
+!$OMP& shared(ept)
+!$OMP DO reduction(+:ept) schedule(guided)
 c
 c     calculate the pi-system torsion angle energy term
 c
@@ -183,7 +178,7 @@ c
 c
 c     increment the total pi-system torsion angle energy
 c
-               epto = epto + e
+               ept = ept + e
             end if
          end if
       end do
@@ -192,9 +187,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ept = epto
       return
       end

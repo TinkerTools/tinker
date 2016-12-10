@@ -29,8 +29,7 @@ c
       implicit none
       integer i,k,istrtor
       integer ia,ib,ic,id
-      real*8 e,ebto
-      real*8 dr,fgrp
+      real*8 e,dr,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba,rcb,rdc
       real*8 e1,e2,e3
@@ -58,16 +57,12 @@ c     zero out the stretch-torsion energy
 c
       ebt = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      ebto = ebt
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer)
-!$OMP& shared(ebto)
-!$OMP DO reduction(+:ebto) schedule(guided)
+!$OMP& shared(ebt)
+!$OMP DO reduction(+:ebt) schedule(guided)
 c
 c     calculate the stretch-torsion interaction energy term
 c
@@ -189,7 +184,7 @@ c
 c     increment the total stretch-torsion energy
 c
                e = e1 + e2 + e3
-               ebto = ebto + e
+               ebt = ebt + e
             end if
          end if
       end do
@@ -198,9 +193,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ebt = ebto
       return
       end

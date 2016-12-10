@@ -101,7 +101,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
@@ -399,7 +399,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
@@ -634,7 +634,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0

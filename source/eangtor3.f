@@ -36,8 +36,7 @@ c
       implicit none
       integer i,k,iangtor
       integer ia,ib,ic,id
-      integer neato
-      real*8 e,e1,e2,eato
+      real*8 e,e1,e2
       real*8 rcb,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba2,rcb2,rdc2
@@ -60,7 +59,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8, allocatable :: aeato(:)
       logical proceed
       logical header,huge
 c
@@ -84,25 +82,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeato(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eato = eat
-      neato = neat
-      do i = 1, n
-         aeato(i) = aeat(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
 !$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eato,neato,aeato)
-!$OMP DO reduction(+:eato,neato,aeato) schedule(guided)
+!$OMP& shared(eat,neat,aeat)
+!$OMP DO reduction(+:eat,neat,aeat) schedule(guided)
 c
 c     calculate the angle-torsion interaction energy term
 c
@@ -222,13 +208,13 @@ c
 c
 c     increment the total angle-torsion energy
 c
-               neato = neato + 1
+               neat = neat + 1
                e = e1 + e2
-               eato = eato + e
-               aeato(ia) = aeato(ia) + e1/3.0d0
-               aeato(ib) = aeato(ib) + e/3.0d0
-               aeato(ic) = aeato(ic) + e/3.0d0
-               aeato(id) = aeato(id) + e2/3.0d0
+               eat = eat + e
+               aeat(ia) = aeat(ia) + e1/3.0d0
+               aeat(ib) = aeat(ib) + e/3.0d0
+               aeat(ic) = aeat(ic) + e/3.0d0
+               aeat(id) = aeat(id) + e2/3.0d0
 c
 c     print a message if the energy of this interaction is large
 c
@@ -254,17 +240,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eat = eato
-      neat = neato
-      do i = 1, n
-         aeat(i) = aeato(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeato)
       return
       end

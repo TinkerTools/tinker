@@ -122,7 +122,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -500,7 +500,7 @@ c
       allocate (ysort(8*n))
       allocate (zsort(8*n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -762,7 +762,7 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k,neco
+      integer i,j,k
       integer ii,kk,kkk
       integer in,kn
       integer ic,kc
@@ -776,9 +776,7 @@ c
       real*8 shift,taper,trans
       real*8 rc,rc2,rc3,rc4
       real*8 rc5,rc6,rc7
-      real*8 eco,eintero
       real*8, allocatable :: cscale(:)
-      real*8, allocatable :: aeco(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -807,9 +805,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
-      allocate (aeco(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -821,15 +818,6 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      eco = ec
-      eintero = einter
-      neco = nec
-      do i = 1, n
-         aeco(i) = aec(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
@@ -837,8 +825,8 @@ c
 !$OMP& c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,off,
 !$OMP& off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
-!$OMP& firstprivate(cscale) shared(eco,eintero,neco,aeco)
-!$OMP DO reduction(+:eco,eintero,neco,aeco) schedule(guided)
+!$OMP& firstprivate(cscale) shared (ec,einter,nec,aec)
+!$OMP DO reduction(+:ec,einter,nec,aec) schedule(guided)
 c
 c     compute and partition the charge interaction energy
 c
@@ -924,15 +912,15 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-                  neco = neco + 1
-                  eco = eco + e
-                  aeco(i) = aeco(i) + 0.5d0*e
-                  aeco(k) = aeco(k) + 0.5d0*e
+                  nec = nec + 1
+                  ec = ec + e
+                  aec(i) = aec(i) + 0.5d0*e
+                  aec(k) = aec(k) + 0.5d0*e
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(i) .ne. molcule(k)) then
-                     eintero = eintero + e
+                     einter = einter + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -978,19 +966,9 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      ec = eco
-      einter = eintero
-      nec = neco
-      do i = 1, n
-         aec(i) = aeco(i)
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
-      deallocate (aeco)
       return
       end
 c
@@ -1074,7 +1052,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1440,7 +1418,7 @@ c
       allocate (ysort(8*n))
       allocate (zsort(8*n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1718,7 +1696,6 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
-      integer neco
       real*8 e,efix
       real*8 eintra
       real*8 f,fi,fik
@@ -1729,9 +1706,7 @@ c
       real*8 xd,yd,zd
       real*8 erfc,erfterm
       real*8 scale,scaleterm
-      real*8 eco,eintrao
       real*8, allocatable :: cscale(:)
-      real*8, allocatable :: aeco(:)
       logical proceed,usei
       logical header,huge
       character*6 mode
@@ -1761,9 +1736,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
-      allocate (aeco(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1807,23 +1781,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call ecrecip
 c
-c     initialize local variables for OpenMP calculation
-c
-      eco = ec
-      eintrao = eintra
-      neco = nec
-      do i = 1, n
-         aeco(i) = aec(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
-!$OMP& firstprivate(cscale) shared(eco,eintrao,neco,aeco)
-!$OMP DO reduction(+:eco,eintrao,neco,aeco) schedule(guided)
+!$OMP& firstprivate(cscale) shared (ec,eintra,nec,aec)
+!$OMP DO reduction(+:ec,eintra,nec,aec) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1885,16 +1850,16 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-                  neco = neco + 1
-                  eco = eco + e
-                  aeco(i) = aeco(i) + 0.5d0*e
-                  aeco(k) = aeco(k) + 0.5d0*e
+                  nec = nec + 1
+                  ec = ec + e
+                  aec(i) = aec(i) + 0.5d0*e
+                  aec(k) = aec(k) + 0.5d0*e
 c
 c     increment the total intramolecular energy
 c
                   efix = (fik/rb) * scale
                   if (molcule(i) .eq. molcule(k)) then
-                     eintrao = eintrao + efix
+                     eintra = eintra + efix
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1940,15 +1905,6 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      ec = eco
-      eintra = eintrao
-      nec = neco
-      do i = 1, n
-         aec(i) = aeco(i)
-      end do
-c
 c     intermolecular energy is total minus intramolecular part
 c
       einter = einter + ec - eintra
@@ -1956,7 +1912,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
-      deallocate (aeco)
       return
       end
 c
@@ -2031,7 +1986,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          cscale(i) = 1.0d0

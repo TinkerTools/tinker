@@ -30,8 +30,7 @@ c
       use virial
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eopdo
-      real*8 force,fgrp
+      real*8 e,force,fgrp
       real*8 dot,deddt
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
@@ -50,8 +49,6 @@ c
       real*8 dedxid,dedyid,dedzid
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: deopdo(:,:)
       logical proceed
 c
 c
@@ -64,30 +61,12 @@ c
          deopd(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (deopdo(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eopdo = eopd
-      do i = 1, n
-         deopdo(1,i) = deopd(1,i)
-         deopdo(2,i) = deopd(2,i)
-         deopdo(3,i) = deopd(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer)
-!$OMP& shared(eopdo,deopdo,viro)
-!$OMP DO reduction(+:eopdo,deopdo,viro) schedule(guided)
+!$OMP& shared(eopd,deopd,vir)
+!$OMP DO reduction(+:eopd,deopd,vir) schedule(guided)
 c
 c     calculate the out-of-plane distance energy and derivatives
 c
@@ -189,19 +168,19 @@ c
 c
 c     increment the out-of-plane distance energy and gradient
 c
-            eopdo = eopdo + e
-            deopdo(1,ia) = deopdo(1,ia) + dedxia
-            deopdo(2,ia) = deopdo(2,ia) + dedyia
-            deopdo(3,ia) = deopdo(3,ia) + dedzia
-            deopdo(1,ib) = deopdo(1,ib) + dedxib
-            deopdo(2,ib) = deopdo(2,ib) + dedyib
-            deopdo(3,ib) = deopdo(3,ib) + dedzib
-            deopdo(1,ic) = deopdo(1,ic) + dedxic
-            deopdo(2,ic) = deopdo(2,ic) + dedyic
-            deopdo(3,ic) = deopdo(3,ic) + dedzic
-            deopdo(1,id) = deopdo(1,id) + dedxid
-            deopdo(2,id) = deopdo(2,id) + dedyid
-            deopdo(3,id) = deopdo(3,id) + dedzid
+            eopd = eopd + e
+            deopd(1,ia) = deopd(1,ia) + dedxia
+            deopd(2,ia) = deopd(2,ia) + dedyia
+            deopd(3,ia) = deopd(3,ia) + dedzia
+            deopd(1,ib) = deopd(1,ib) + dedxib
+            deopd(2,ib) = deopd(2,ib) + dedyib
+            deopd(3,ib) = deopd(3,ib) + dedzib
+            deopd(1,ic) = deopd(1,ic) + dedxic
+            deopd(2,ic) = deopd(2,ic) + dedyic
+            deopd(3,ic) = deopd(3,ic) + dedzic
+            deopd(1,id) = deopd(1,id) + dedxid
+            deopd(2,id) = deopd(2,id) + dedyid
+            deopd(3,id) = deopd(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -211,15 +190,15 @@ c
             vyy = yad*dedyia + ybd*dedyib + ycd*dedyic
             vzy = zad*dedyia + zbd*dedyib + zcd*dedyic
             vzz = zad*dedzia + zbd*dedzib + zcd*dedzic
-            viro(1,1) = viro(1,1) + vxx
-            viro(2,1) = viro(2,1) + vyx
-            viro(3,1) = viro(3,1) + vzx
-            viro(1,2) = viro(1,2) + vyx
-            viro(2,2) = viro(2,2) + vyy
-            viro(3,2) = viro(3,2) + vzy
-            viro(1,3) = viro(1,3) + vzx
-            viro(2,3) = viro(2,3) + vzy
-            viro(3,3) = viro(3,3) + vzz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vyx
+            vir(3,1) = vir(3,1) + vzx
+            vir(1,2) = vir(1,2) + vyx
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vzy
+            vir(1,3) = vir(1,3) + vzx
+            vir(2,3) = vir(2,3) + vzy
+            vir(3,3) = vir(3,3) + vzz
          end if
       end do
 c
@@ -227,23 +206,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eopd = eopdo
-      do i = 1, n
-         deopd(1,i) = deopdo(1,i)
-         deopd(2,i) = deopdo(2,i)
-         deopd(3,i) = deopdo(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (deopdo)
       return
       end

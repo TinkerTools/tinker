@@ -33,9 +33,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      integer neido
-      real*8 e,eido
-      real*8 dt,fgrp
+      real*8 e,dt,fgrp
       real*8 ideal,force
       real*8 cosine,sine
       real*8 rcb,angle
@@ -50,7 +48,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8, allocatable :: aeido(:)
       logical proceed
       logical header,huge
 c
@@ -74,25 +71,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeido(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eido = eid
-      neido = neid
-      do i = 1, n
-         aeido(i) = aeid(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
 !$OMP& x,y,z,kprop,vprop,idihunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eido,neido,aeido)
-!$OMP DO reduction(+:eido,neido,aeido) schedule(guided)
+!$OMP& shared(eid,neid,aeid)
+!$OMP DO reduction(+:eid,neid,aeid) schedule(guided)
 c
 c     calculate the improper dihedral angle energy term
 c
@@ -183,10 +168,10 @@ c
 c
 c     increment the total improper dihedral energy
 c
-               neido = neido + 1
-               eido = eido + e
-               aeido(ib) = aeido(ib) + 0.5d0*e
-               aeido(ic) = aeido(ic) + 0.5d0*e
+               neid = neid + 1
+               eid = eid + e
+               aeid(ib) = aeid(ib) + 0.5d0*e
+               aeid(ic) = aeid(ic) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -212,17 +197,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eid = eido
-      neid = neido
-      do i = 1, n
-         aeid(i) = aeido(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeido)
       return
       end

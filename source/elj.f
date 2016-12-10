@@ -641,8 +641,7 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      real*8 e,evo
-      real*8 p6,p12,eps
+      real*8 e,p6,p12,eps
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -691,10 +690,6 @@ c
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      evo = ev
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
@@ -702,8 +697,8 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
 !$OMP& cut2,c0,c1,c2,c3,c4,c5) firstprivate(vscale,iv14)
-!$OMP& shared(evo)
-!$OMP DO reduction(+:evo) schedule(guided)
+!$OMP& shared(ev)
+!$OMP DO reduction(+:ev) schedule(guided)
 c
 c     find the van der Waals energy via neighbor list search
 c
@@ -783,7 +778,7 @@ c
 c
 c     increment the overall van der Waals energy components
 c
-                  evo = evo + e
+                  ev = ev + e
                end if
             end if
          end do
@@ -808,10 +803,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ev = evo
 c
 c     perform deallocation of some local arrays
 c

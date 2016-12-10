@@ -131,7 +131,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -519,9 +519,7 @@ c
       integer ii,kk,kkk
       integer ix,iy,iz
       integer kx,ky,kz
-      integer nemo
       real*8 e,f,fgrp
-      real*8 emo,eintero
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
@@ -536,7 +534,6 @@ c
       real*8 qkrx,qkry,qkrz
       real*8 sc(9),ge(5)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: aemo(:)
       logical proceed
       logical header,huge
       logical usei,usek
@@ -573,9 +570,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (aemo(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -587,24 +583,15 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      emo = 0.0d0
-      eintero = einter
-      nemo = nem
-      do i = 1, n
-         aemo(i) = aem(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
 !$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,name,
-!$OMP& verbose,debug,header,iout,emo,eintero,nemo,aemo)
+!$OMP& verbose,debug,header,iout,em,einter,nem,aem)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintero,nemo,aemo) schedule(guided)
+!$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -720,16 +707,16 @@ c
 c     increment the overall multipole energy components
 c
                   if (e .ne. 0.0d0) then
-                     nemo = nemo + 1
-                     emo = emo + e
-                     aemo(ii) = aemo(ii) + 0.5d0*e
-                     aemo(kk) = aemo(kk) + 0.5d0*e
+                     nem = nem + 1
+                     em = em + e
+                     aem(ii) = aem(ii) + 0.5d0*e
+                     aem(kk) = aem(kk) + 0.5d0*e
                   end if
 c
 c     increment the total intermolecular energy
 c
                   if (molcule(ii) .ne. molcule(kk))
-     &               eintero = eintero + e
+     &               einter = einter + e
 c
 c     print message if the energy of this interaction is large
 c
@@ -773,19 +760,9 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local to global variables for OpenMP calculation
-c
-      em = em + emo
-      einter = eintero
-      nem = nemo
-      do i = 1, n
-         aem(i) = aemo(i)
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (aemo)
       return
       end
 c
@@ -995,7 +972,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1538,10 +1515,8 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      integer nemo
       real*8 e,f,bfac,erfc
-      real*8 eintra,eintrao
-      real*8 emo,efull
+      real*8 eintra,efull
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
@@ -1560,7 +1535,6 @@ c
       real*8 sc(9),ge(5)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: aemo(:)
       logical header,huge
       character*6 mode
       external erfc
@@ -1584,9 +1558,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (aemo(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom interaction scaling array
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1598,24 +1571,14 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      emo = 0.0d0
-      eintrao = eintra
-      nemo = nem
-      do i = 1, n
-         aemo(i) = aem(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,molcule,name,verbose,debug,header,iout,emo,eintrao,
-!$OMP& nemo,aemo)
+!$OMP& aewald,molcule,name,verbose,debug,header,iout,em,eintra,nem,aem)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintrao,nemo,aemo) schedule(guided)
+!$OMP DO reduction(+:em,eintra,nem,aem) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1748,17 +1711,17 @@ c
 c
 c     increment the overall van der Waals energy components
 c
-               emo = emo + e
+               em = em + e
                if (efull .ne. 0.0d0) then
-                  nemo = nemo + 1
-                  aemo(ii) = aemo(ii) + 0.5d0*efull
-                  aemo(kk) = aemo(kk) + 0.5d0*efull
+                  nem = nem + 1
+                  aem(ii) = aem(ii) + 0.5d0*efull
+                  aem(kk) = aem(kk) + 0.5d0*efull
                end if
 c
 c     increment the total intramolecular energy
 c
                if (molcule(ii) .eq. molcule(kk))
-     &            eintrao = eintrao + efull
+     &            eintra = eintra + efull
 c
 c     print a message if the energy of this interaction is large
 c
@@ -1801,19 +1764,9 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      em = em + emo
-      eintra = eintrao
-      nem = nemo
-      do i = 1, n
-         aem(i) = aemo(i)
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (aemo)
       return
       end
 c

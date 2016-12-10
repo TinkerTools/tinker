@@ -1261,7 +1261,6 @@ c
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
-      real*8, allocatable :: depo(:,:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       logical reinduce
@@ -1296,7 +1295,6 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
-      allocate (depo(3,n))
 c
 c     set arrays needed to scale interactions and store fields
 c
@@ -1318,14 +1316,6 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      do i = 1, n
-         do j = 1, 3
-            depo(j,i) = 0.0d0
-         end do
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
@@ -1333,9 +1323,9 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,f,
-!$OMP& off2,uind,uinp,poltyp,depo,ufld,dufld)
+!$OMP& off2,uind,uinp,poltyp,dep,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP DO reduction(+:depo,ufld,dufld) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -1645,12 +1635,12 @@ c
 c
 c     increment gradient components due to Cartesian forces
 c
-               depo(1,ii) = depo(1,ii) + frcx
-               depo(2,ii) = depo(2,ii) + frcy
-               depo(3,ii) = depo(3,ii) + frcz
-               depo(1,kk) = depo(1,kk) - frcx
-               depo(2,kk) = depo(2,kk) - frcy
-               depo(3,kk) = depo(3,kk) - frcz
+               dep(1,ii) = dep(1,ii) + frcx
+               dep(2,ii) = dep(2,ii) + frcy
+               dep(3,ii) = dep(3,ii) + frcz
+               dep(1,kk) = dep(1,kk) - frcx
+               dep(2,kk) = dep(2,kk) - frcy
+               dep(3,kk) = dep(3,kk) - frcz
 c
 c     get the induced dipole field used for dipole torques
 c
@@ -1735,7 +1725,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:depo) schedule(guided)
+!$OMP DO reduction(+:dep) schedule(guided)
 c
 c     torque is induced field and gradient cross permanent moments
 c
@@ -1761,7 +1751,7 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,depo)
+         call torque (i,trq,fix,fiy,fiz,dep)
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1769,20 +1759,11 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local copies to global variables for OpenMP calculation
-c
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = dep(j,i) + depo(j,i)
-         end do
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
-      deallocate (depo)
       deallocate (ufld)
       deallocate (dufld)
       return

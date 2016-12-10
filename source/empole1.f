@@ -167,7 +167,7 @@ c
       allocate (mscale(n))
       allocate (tem(3,n))
 c
-c     set arrays needed for connected atom scaling and torque
+c     initialize connected atom scaling and torque arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -838,7 +838,6 @@ c
       integer kx,ky,kz
       integer iax,iay,iaz
       real*8 e,f,fgrp
-      real*8 emo,eintero
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xix,yix,zix
@@ -875,10 +874,8 @@ c
       real*8 sc(9),ge(5),gf(7)
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
-      real*8 viro(3,3)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: demo(:,:)
-      real*8, allocatable :: temo(:,:)
+      real*8, allocatable :: tem(:,:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -904,14 +901,15 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (demo(3,n))
-      allocate (temo(3,n))
+      allocate (tem(3,n))
 c
-c     set arrays needed to scale connected atom interactions
+c     initialize connected atom scaling and torque arrays
 c
-      if (npole .eq. 0)  return
       do i = 1, n
          mscale(i) = 1.0d0
+         do j = 1, 3
+            tem(j,i) = 0.0d0
+         end do
       end do
 c
 c     set conversion factor, cutoff and scaling coefficients
@@ -920,31 +918,15 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      emo = 0.0d0
-      eintero = einter
-      do i = 1, n
-         do j = 1, 3
-            demo(j,i) = 0.0d0
-            temo(j,i) = 0.0d0
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            viro(j,i) = 0.0d0
-         end do
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,emo,eintero,
-!$OMP& demo,temo,viro)
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,em,einter,
+!$OMP& dem,tem,vir)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintero,demo,temo,viro) schedule(guided)
+!$OMP DO reduction(+:em,einter,dem,tem,vir) schedule(guided)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1108,12 +1090,12 @@ c
                e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
      &                + rr7*ge(4) + rr9*ge(5)
                if (use_group)  e = e * fgrp
-               emo = emo + e
+               em = em + e
 c
 c     increment the total intermolecular energy
 c
                if (molcule(ii) .ne. molcule(kk))
-     &            eintero = eintero + e
+     &            einter = einter + e
 c
 c     intermediate variables for the permanent multipoles
 c
@@ -1161,21 +1143,21 @@ c
 c
 c     increment force-based gradient and torque on first site
 c
-               demo(1,ii) = demo(1,ii) + frcx
-               demo(2,ii) = demo(2,ii) + frcy
-               demo(3,ii) = demo(3,ii) + frcz
-               temo(1,i) = temo(1,i) + ttmi(1)
-               temo(2,i) = temo(2,i) + ttmi(2)
-               temo(3,i) = temo(3,i) + ttmi(3)
+               dem(1,ii) = dem(1,ii) + frcx
+               dem(2,ii) = dem(2,ii) + frcy
+               dem(3,ii) = dem(3,ii) + frcz
+               tem(1,i) = tem(1,i) + ttmi(1)
+               tem(2,i) = tem(2,i) + ttmi(2)
+               tem(3,i) = tem(3,i) + ttmi(3)
 c
 c     increment force-based gradient and torque on second site
 c
-               demo(1,kk) = demo(1,kk) - frcx
-               demo(2,kk) = demo(2,kk) - frcy
-               demo(3,kk) = demo(3,kk) - frcz
-               temo(1,k) = temo(1,k) + ttmk(1)
-               temo(2,k) = temo(2,k) + ttmk(2)
-               temo(3,k) = temo(3,k) + ttmk(3)
+               dem(1,kk) = dem(1,kk) - frcx
+               dem(2,kk) = dem(2,kk) - frcy
+               dem(3,kk) = dem(3,kk) - frcz
+               tem(1,k) = tem(1,k) + ttmk(1)
+               tem(2,k) = tem(2,k) + ttmk(2)
+               tem(3,k) = tem(3,k) + ttmk(3)
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -1185,15 +1167,15 @@ c
                vyy = -yr * frcy
                vyz = -zr * frcy
                vzz = -zr * frcz
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vxy
-               viro(3,1) = viro(3,1) + vxz
-               viro(1,2) = viro(1,2) + vxy
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vyz
-               viro(1,3) = viro(1,3) + vxz
-               viro(2,3) = viro(2,3) + vyz
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vxy
+               vir(3,1) = vir(3,1) + vxz
+               vir(1,2) = vir(1,2) + vxy
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vyz
+               vir(1,3) = vir(1,3) + vxz
+               vir(2,3) = vir(2,3) + vyz
+               vir(3,3) = vir(3,3) + vzz
             end if
    10       continue
          end do
@@ -1217,12 +1199,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:demo,viro) schedule(guided)
+!$OMP DO reduction(+:dem,vir) schedule(guided)
 c
 c     resolve site torques then increment forces and virial
 c
       do i = 1, npole
-         call torque (i,temo(1,i),fix,fiy,fiz,demo)
+         call torque (i,tem(1,i),fix,fiy,fiz,dem)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -1245,15 +1227,15 @@ c
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         viro(1,1) = viro(1,1) + vxx
-         viro(2,1) = viro(2,1) + vxy
-         viro(3,1) = viro(3,1) + vxz
-         viro(1,2) = viro(1,2) + vxy
-         viro(2,2) = viro(2,2) + vyy
-         viro(3,2) = viro(3,2) + vyz
-         viro(1,3) = viro(1,3) + vxz
-         viro(2,3) = viro(2,3) + vyz
-         viro(3,3) = viro(3,3) + vzz
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1261,26 +1243,10 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local to global variables for OpenMP calculation
-c
-      em = em + emo
-      einter = eintero
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = dem(j,i) + demo(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = vir(j,i) + viro(j,i)
-         end do
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (demo)
-      deallocate (temo)
+      deallocate (tem)
       return
       end
 c
@@ -1538,7 +1504,7 @@ c
       allocate (mscale(n))
       allocate (tem(3,n))
 c
-c     set arrays needed for connected atom scaling and torque
+c     initialize connected atom scaling and torque arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -2390,8 +2356,7 @@ c
       integer ii,kk,kkk
       integer iax,iay,iaz
       real*8 e,f,bfac,erfc
-      real*8 eintra,eintrao
-      real*8 emo,efull
+      real*8 eintra,efull
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
@@ -2432,10 +2397,8 @@ c
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 bn(0:5)
-      real*8 viro(3,3)
       real*8, allocatable :: mscale(:)
-      real*8, allocatable :: demo(:,:)
-      real*8, allocatable :: temo(:,:)
+      real*8, allocatable :: tem(:,:)
       character*6 mode
       external erfc
 c
@@ -2447,13 +2410,15 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
-      allocate (demo(3,n))
-      allocate (temo(3,n))
+      allocate (tem(3,n))
 c
-c     set array needed for scaling connected atom interactions
+c     initialize connected atom scaling and torque arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
+         do j = 1, 3
+            tem(j,i) = 0.0d0
+         end do
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2462,32 +2427,14 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
-c     initialize local variables for OpenMP calculation
-c
-      emo = 0.0d0
-      eintrao = eintra
-      do i = 1, n
-         do j = 1, 3
-            demo(j,i) = 0.0d0
-         end do
-         temo(1,i) = 0.0d0
-         temo(2,i) = 0.0d0
-         temo(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            viro(j,i) = 0.0d0
-         end do
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,molcule,xaxis,yaxis,zaxis,emo,eintrao,demo,temo,viro)
+!$OMP& aewald,molcule,xaxis,yaxis,zaxis,em,eintra,dem,tem,vir)
 !$OMP& firstprivate(mscale)
-!$OMP DO reduction(+:emo,eintrao,demo,temo,viro) schedule(guided)
+!$OMP DO reduction(+:em,eintra,dem,tem,vir) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -2670,12 +2617,12 @@ c     compute the energy contributions for this interaction
 c
                e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
      &                + rr7*ge(4) + rr9*ge(5)
-               emo = emo + e
+               em = em + e
 c
 c     increment the total intramolecular energy
 c
                if (molcule(ii) .eq. molcule(kk))
-     &            eintrao = eintrao + efull
+     &            eintra = eintra + efull
 c
 c     construct auxiliary variables for force and torque
 c
@@ -2723,21 +2670,21 @@ c
 c
 c     increment force-based gradient and torque on first site
 c
-               demo(1,ii) = demo(1,ii) + frcx
-               demo(2,ii) = demo(2,ii) + frcy
-               demo(3,ii) = demo(3,ii) + frcz
-               temo(1,i) = temo(1,i) + ttmi(1)
-               temo(2,i) = temo(2,i) + ttmi(2)
-               temo(3,i) = temo(3,i) + ttmi(3)
+               dem(1,ii) = dem(1,ii) + frcx
+               dem(2,ii) = dem(2,ii) + frcy
+               dem(3,ii) = dem(3,ii) + frcz
+               tem(1,i) = tem(1,i) + ttmi(1)
+               tem(2,i) = tem(2,i) + ttmi(2)
+               tem(3,i) = tem(3,i) + ttmi(3)
 c
 c     increment force-based gradient and torque on second site
 c
-               demo(1,kk) = demo(1,kk) - frcx
-               demo(2,kk) = demo(2,kk) - frcy
-               demo(3,kk) = demo(3,kk) - frcz
-               temo(1,k) = temo(1,k) + ttmk(1)
-               temo(2,k) = temo(2,k) + ttmk(2)
-               temo(3,k) = temo(3,k) + ttmk(3)
+               dem(1,kk) = dem(1,kk) - frcx
+               dem(2,kk) = dem(2,kk) - frcy
+               dem(3,kk) = dem(3,kk) - frcz
+               tem(1,k) = tem(1,k) + ttmk(1)
+               tem(2,k) = tem(2,k) + ttmk(2)
+               tem(3,k) = tem(3,k) + ttmk(3)
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -2747,15 +2694,15 @@ c
                vyy = -yr * frcy
                vyz = -zr * frcy
                vzz = -zr * frcz
-               viro(1,1) = viro(1,1) + vxx
-               viro(2,1) = viro(2,1) + vxy
-               viro(3,1) = viro(3,1) + vxz
-               viro(1,2) = viro(1,2) + vxy
-               viro(2,2) = viro(2,2) + vyy
-               viro(3,2) = viro(3,2) + vyz
-               viro(1,3) = viro(1,3) + vxz
-               viro(2,3) = viro(2,3) + vyz
-               viro(3,3) = viro(3,3) + vzz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vxy
+               vir(3,1) = vir(3,1) + vxz
+               vir(1,2) = vir(1,2) + vxy
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vyz
+               vir(1,3) = vir(1,3) + vxz
+               vir(2,3) = vir(2,3) + vyz
+               vir(3,3) = vir(3,3) + vzz
             end if
          end do
 c
@@ -2778,12 +2725,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:demo,viro) schedule(guided)
+!$OMP DO reduction(+:dem,vir) schedule(guided)
 c
 c     resolve site torques then increment forces and virial
 c
       do i = 1, npole
-         call torque (i,temo(1,i),fix,fiy,fiz,demo)
+         call torque (i,tem(1,i),fix,fiy,fiz,dem)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -2806,15 +2753,15 @@ c
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         viro(1,1) = viro(1,1) + vxx
-         viro(2,1) = viro(2,1) + vxy
-         viro(3,1) = viro(3,1) + vxz
-         viro(1,2) = viro(1,2) + vxy
-         viro(2,2) = viro(2,2) + vyy
-         viro(3,2) = viro(3,2) + vyz
-         viro(1,3) = viro(1,3) + vxz
-         viro(2,3) = viro(2,3) + vyz
-         viro(3,3) = viro(3,3) + vzz
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -2822,26 +2769,10 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     add local to global variables for OpenMP calculation
-c
-      em = em + emo
-      eintra = eintrao
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = dem(j,i) + demo(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = vir(j,i) + viro(j,i)
-         end do
-      end do
-c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
-      deallocate (demo)
-      deallocate (temo)
+      deallocate (tem)
       return
       end
 c

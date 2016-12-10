@@ -36,9 +36,8 @@ c
       implicit none
       integer i,k,istrtor
       integer ia,ib,ic,id
-      integer nebto
-      real*8 e,ebto
-      real*8 dr,fgrp,angle
+      real*8 e,dr
+      real*8 fgrp,angle
       real*8 rt2,ru2,rtru
       real*8 rba,rcb,rdc
       real*8 e1,e2,e3
@@ -59,7 +58,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8, allocatable :: aebto(:)
       logical proceed
       logical header,huge
 c
@@ -82,25 +80,13 @@ c
      &           //,' Type',25x,'Atom Names',21x,'Angle',6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aebto(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      ebto = ebt
-      nebto = nebt
-      do i = 1, n
-         aebto(i) = aebt(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(ebto,nebto,aebto)
-!$OMP DO reduction(+:ebto,nebto,aebto) schedule(guided)
+!$OMP& shared(ebt,nebt,aebt)
+!$OMP DO reduction(+:ebt,nebt,aebt) schedule(guided)
 c
 c     calculate the stretch-torsion interaction energy term
 c
@@ -224,13 +210,13 @@ c
 
 c     increment the total stretch-torsion energy
 c
-               nebto = nebto + 1
+               nebt = nebt + 1
                e = e1 + e2 + e3
-               ebto = ebto + e
-               aebto(ia) = aebto(ia) + 0.5d0*e1
-               aebto(ib) = aebto(ib) + 0.5d0*(e1+e2)
-               aebto(ic) = aebto(ic) + 0.5d0*(e2+e3)
-               aebto(id) = aebto(id) + 0.5d0*e3
+               ebt = ebt + e
+               aebt(ia) = aebt(ia) + 0.5d0*e1
+               aebt(ib) = aebt(ib) + 0.5d0*(e1+e2)
+               aebt(ic) = aebt(ic) + 0.5d0*(e2+e3)
+               aebt(id) = aebt(id) + 0.5d0*e3
 c
 c     print a message if the energy of this interaction is large
 c
@@ -256,17 +242,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ebt = ebto
-      nebt = nebto
-      do i = 1, n
-         aebt(i) = aebto(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aebto)
       return
       end

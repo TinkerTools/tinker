@@ -29,8 +29,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eao
-      real*8 ideal,force
+      real*8 e,ideal,force
       real*8 fold,factor
       real*8 dot,cosine
       real*8 angle,fgrp
@@ -58,16 +57,12 @@ c     zero out the angle bending energy component
 c
       ea = 0.0d0
 c
-c     transfer global to local copies for OpenMP calculation
-c
-      eao = ea
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
 !$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer)
-!$OMP& shared(eao)
-!$OMP DO reduction(+:eao) schedule(guided)
+!$OMP& shared(ea)
+!$OMP DO reduction(+:ea) schedule(guided)
 c
 c     calculate the bond angle bending energy term
 c
@@ -147,7 +142,7 @@ c
 c
 c     increment the total bond angle bending energy
 c
-                  eao = eao + e
+                  ea = ea + e
                end if
 c
 c     compute the projected in-plane angle bend energy
@@ -208,7 +203,7 @@ c
 c
 c     increment the total bond angle bending energy
 c
-                  eao = eao + e
+                  ea = ea + e
                end if
             end if
          end if
@@ -218,9 +213,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ea = eao
       return
       end

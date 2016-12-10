@@ -32,13 +32,10 @@ c
       use usage
       implicit none
       integer i,ia,ib
-      integer nebo
-      real*8 e,ebo
-      real*8 ideal,force
+      real*8 e,ideal,force
       real*8 expterm,bde
       real*8 dt,dt2,fgrp
       real*8 xab,yab,zab,rab
-      real*8, allocatable :: aebo(:)
       logical proceed
       logical header,huge
 c
@@ -62,25 +59,13 @@ c
      &              4x,'Actual',6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aebo(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      ebo = eb
-      nebo = neb
-      do i = 1, n
-         aebo(i) = aeb(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(ebo,nebo,aebo)
-!$OMP DO reduction(+:ebo,nebo,aebo) schedule(guided)
+!$OMP& shared(eb,neb,aeb)
+!$OMP DO reduction(+:eb,neb,aeb) schedule(guided)
 c
 c     calculate the bond stretching energy term
 c
@@ -129,10 +114,10 @@ c
 c
 c     increment the total bond energy and partition between atoms
 c
-            nebo = nebo + 1
-            ebo = ebo + e
-            aebo(ia) = aebo(ia) + 0.5d0*e
-            aebo(ib) = aebo(ib) + 0.5d0*e
+            neb = neb + 1
+            eb = eb + e
+            aeb(ia) = aeb(ia) + 0.5d0*e
+            aeb(ib) = aeb(ib) + 0.5d0*e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -156,17 +141,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eb = ebo
-      neb = nebo
-      do i = 1, n
-         aeb(i) = aebo(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aebo)
       return
       end

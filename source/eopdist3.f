@@ -33,9 +33,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      integer neopdo
-      real*8 e,eopdo
-      real*8 force,fgrp
+      real*8 e,force,fgrp
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
       real*8 xib,yib,zib
@@ -69,25 +67,13 @@ c
      &              6x,'Energy',/)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aeopdo(n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eopdo = eopd
-      neopdo = neopd
-      do i = 1, n
-         aeopdo(i) = aeopd(i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
-!$OMP& shared(eopdo,neopdo,aeopdo)
-!$OMP DO reduction(+:eopdo,neopdo,aeopdo) schedule(guided)
+!$OMP& shared(eopd,neopd,aeopd)
+!$OMP DO reduction(+:eopd,neopd,aeopd) schedule(guided)
 c
 c     calculate the out-of-plane distance energy term
 c
@@ -157,9 +143,9 @@ c
 c
 c     increment the total out-of-plane distance energy
 c
-            neopdo = neopdo + 1
-            eopdo = eopdo + e
-            aeopdo(ia) = aeopdo(ia) + e
+            neopd = neopd + 1
+            eopd = eopd + e
+            aeopd(ia) = aeopd(ia) + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -184,17 +170,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      eopd = eopdo
-      neopd = neopdo
-      do i = 1, n
-         aeopd(i) = aeopdo(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aeopdo)
       return
       end

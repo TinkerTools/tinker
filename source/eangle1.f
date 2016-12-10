@@ -32,8 +32,7 @@ c
       use virial
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,eao
-      real*8 ideal,force
+      real*8 e,ideal,force
       real*8 fold,factor,dot
       real*8 cosine,sine
       real*8 angle,fgrp
@@ -68,8 +67,6 @@ c
       real*8 dpdxic,dpdyic,dpdzic
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 viro(3,3)
-      real*8, allocatable :: deao(:,:)
       logical proceed
 c
 c
@@ -82,30 +79,12 @@ c
          dea(3,i) = 0.0d0
       end do
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (deao(3,n))
-c
-c     transfer global to local copies for OpenMP calculation
-c
-      eao = ea
-      do i = 1, n
-         deao(1,i) = dea(1,i)
-         deao(2,i) = dea(2,i)
-         deao(3,i) = dea(3,i)
-      end do
-      do i = 1, 3
-         viro(1,i) = vir(1,i)
-         viro(2,i) = vir(2,i)
-         viro(3,i) = vir(3,i)
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
 !$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer)
-!$OMP& shared(eao,deao,viro)
-!$OMP DO reduction(+:eao,deao,viro) schedule(guided)
+!$OMP& shared(ea,dea,vir)
+!$OMP DO reduction(+:ea,dea,vir) schedule(guided)
 c
 c     calculate the bond angle bending energy term
 c
@@ -217,16 +196,16 @@ c
 c
 c     increment the total bond angle energy and derivatives
 c
-                  eao = eao + e
-                  deao(1,ia) = deao(1,ia) + dedxia
-                  deao(2,ia) = deao(2,ia) + dedyia
-                  deao(3,ia) = deao(3,ia) + dedzia
-                  deao(1,ib) = deao(1,ib) + dedxib
-                  deao(2,ib) = deao(2,ib) + dedyib
-                  deao(3,ib) = deao(3,ib) + dedzib
-                  deao(1,ic) = deao(1,ic) + dedxic
-                  deao(2,ic) = deao(2,ic) + dedyic
-                  deao(3,ic) = deao(3,ic) + dedzic
+                  ea = ea + e
+                  dea(1,ia) = dea(1,ia) + dedxia
+                  dea(2,ia) = dea(2,ia) + dedyia
+                  dea(3,ia) = dea(3,ia) + dedzia
+                  dea(1,ib) = dea(1,ib) + dedxib
+                  dea(2,ib) = dea(2,ib) + dedyib
+                  dea(3,ib) = dea(3,ib) + dedzib
+                  dea(1,ic) = dea(1,ic) + dedxic
+                  dea(2,ic) = dea(2,ic) + dedyic
+                  dea(3,ic) = dea(3,ic) + dedzic
 c
 c     increment the internal virial tensor components
 c
@@ -236,15 +215,15 @@ c
                   vyy = yab*dedyia + ycb*dedyic
                   vzy = zab*dedyia + zcb*dedyic
                   vzz = zab*dedzia + zcb*dedzic
-                  viro(1,1) = viro(1,1) + vxx
-                  viro(2,1) = viro(2,1) + vyx
-                  viro(3,1) = viro(3,1) + vzx
-                  viro(1,2) = viro(1,2) + vyx
-                  viro(2,2) = viro(2,2) + vyy
-                  viro(3,2) = viro(3,2) + vzy
-                  viro(1,3) = viro(1,3) + vzx
-                  viro(2,3) = viro(2,3) + vzy
-                  viro(3,3) = viro(3,3) + vzz
+                  vir(1,1) = vir(1,1) + vxx
+                  vir(2,1) = vir(2,1) + vyx
+                  vir(3,1) = vir(3,1) + vzx
+                  vir(1,2) = vir(1,2) + vyx
+                  vir(2,2) = vir(2,2) + vyy
+                  vir(3,2) = vir(3,2) + vzy
+                  vir(1,3) = vir(1,3) + vzx
+                  vir(2,3) = vir(2,3) + vzy
+                  vir(3,3) = vir(3,3) + vzz
                end if
 c
 c     compute the projected in-plane angle energy and gradient
@@ -365,19 +344,19 @@ c
 c
 c     increment the total bond angle energy and derivatives
 c
-                  eao = eao + e
-                  deao(1,ia) = deao(1,ia) + dedxia
-                  deao(2,ia) = deao(2,ia) + dedyia
-                  deao(3,ia) = deao(3,ia) + dedzia
-                  deao(1,ib) = deao(1,ib) + dedxib
-                  deao(2,ib) = deao(2,ib) + dedyib
-                  deao(3,ib) = deao(3,ib) + dedzib
-                  deao(1,ic) = deao(1,ic) + dedxic
-                  deao(2,ic) = deao(2,ic) + dedyic
-                  deao(3,ic) = deao(3,ic) + dedzic
-                  deao(1,id) = deao(1,id) + dedxid
-                  deao(2,id) = deao(2,id) + dedyid
-                  deao(3,id) = deao(3,id) + dedzid
+                  ea = ea + e
+                  dea(1,ia) = dea(1,ia) + dedxia
+                  dea(2,ia) = dea(2,ia) + dedyia
+                  dea(3,ia) = dea(3,ia) + dedzia
+                  dea(1,ib) = dea(1,ib) + dedxib
+                  dea(2,ib) = dea(2,ib) + dedyib
+                  dea(3,ib) = dea(3,ib) + dedzib
+                  dea(1,ic) = dea(1,ic) + dedxic
+                  dea(2,ic) = dea(2,ic) + dedyic
+                  dea(3,ic) = dea(3,ic) + dedzic
+                  dea(1,id) = dea(1,id) + dedxid
+                  dea(2,id) = dea(2,id) + dedyid
+                  dea(3,id) = dea(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
@@ -387,15 +366,15 @@ c
                   vyy = yad*dedyia + ybd*dedyib + ycd*dedyic
                   vzy = zad*dedyia + zbd*dedyib + zcd*dedyic
                   vzz = zad*dedzia + zbd*dedzib + zcd*dedzic
-                  viro(1,1) = viro(1,1) + vxx
-                  viro(2,1) = viro(2,1) + vyx
-                  viro(3,1) = viro(3,1) + vzx
-                  viro(1,2) = viro(1,2) + vyx
-                  viro(2,2) = viro(2,2) + vyy
-                  viro(3,2) = viro(3,2) + vzy
-                  viro(1,3) = viro(1,3) + vzx
-                  viro(2,3) = viro(2,3) + vzy
-                  viro(3,3) = viro(3,3) + vzz
+                  vir(1,1) = vir(1,1) + vxx
+                  vir(2,1) = vir(2,1) + vyx
+                  vir(3,1) = vir(3,1) + vzx
+                  vir(1,2) = vir(1,2) + vyx
+                  vir(2,2) = vir(2,2) + vyy
+                  vir(3,2) = vir(3,2) + vzy
+                  vir(1,3) = vir(1,3) + vzx
+                  vir(2,3) = vir(2,3) + vzy
+                  vir(3,3) = vir(3,3) + vzz
                end if
             end if
          end if
@@ -405,23 +384,5 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     transfer local to global copies for OpenMP calculation
-c
-      ea = eao
-      do i = 1, n
-         dea(1,i) = deao(1,i)
-         dea(2,i) = deao(2,i)
-         dea(3,i) = deao(3,i)
-      end do
-      do i = 1, 3
-         vir(1,i) = viro(1,i)
-         vir(2,i) = viro(2,i)
-         vir(3,i) = viro(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (deao)
       return
       end
