@@ -55,6 +55,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp group.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp hescut.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp hessn.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp hpmf.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp ielscf.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp improp.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp imptor.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp inform.f

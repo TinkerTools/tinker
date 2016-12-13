@@ -55,6 +55,7 @@ gfortran -c -Ofast -msse3 -fopenmp group.f
 gfortran -c -Ofast -msse3 -fopenmp hescut.f
 gfortran -c -Ofast -msse3 -fopenmp hessn.f
 gfortran -c -Ofast -msse3 -fopenmp hpmf.f
+gfortran -c -Ofast -msse3 -fopenmp ielscf.f
 gfortran -c -Ofast -msse3 -fopenmp improp.f
 gfortran -c -Ofast -msse3 -fopenmp imptor.f
 gfortran -c -Ofast -msse3 -fopenmp inform.f

@@ -55,6 +55,7 @@ ifort -c -g -warn all -check all group.f
 ifort -c -g -warn all -check all hescut.f
 ifort -c -g -warn all -check all hessn.f
 ifort -c -g -warn all -check all hpmf.f
+ifort -c -g -warn all -check all ielscf.f
 ifort -c -g -warn all -check all improp.f
 ifort -c -g -warn all -check all imptor.f
 ifort -c -g -warn all -check all inform.f

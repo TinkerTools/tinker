@@ -223,6 +223,7 @@ tinker
 +hessrot.obj &
 +hpmf.obj &
 +hybrid.obj &
++ielscf.obj &
 +image.obj &
 +impose.obj &
 +improp.obj &

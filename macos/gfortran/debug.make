@@ -55,6 +55,7 @@ gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized group.f
 gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized hescut.f
 gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized hessn.f
 gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized hpmf.f
+gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized ielscf.f
 gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized improp.f
 gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized imptor.f
 gfortran -c -Og -g -fbacktrace -Warray-bounds -Wmaybe-uninitialized inform.f

@@ -56,6 +56,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace group.f
 LF95 -c -o1 -tpp -nstchk -ntrace hescut.f
 LF95 -c -o1 -tpp -nstchk -ntrace hessn.f
 LF95 -c -o1 -tpp -nstchk -ntrace hpmf.f
+LF95 -c -o1 -tpp -nstchk -ntrace ielscf.f
 LF95 -c -o1 -tpp -nstchk -ntrace improp.f
 LF95 -c -o1 -tpp -nstchk -ntrace imptor.f
 LF95 -c -o1 -tpp -nstchk -ntrace inform.f

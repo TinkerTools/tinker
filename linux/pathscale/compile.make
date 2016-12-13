@@ -55,6 +55,7 @@ pathf90 -c -O -msse3 -openmp group.f
 pathf90 -c -O -msse3 -openmp hescut.f
 pathf90 -c -O -msse3 -openmp hessn.f
 pathf90 -c -O -msse3 -openmp hpmf.f
+pathf90 -c -O -msse3 -openmp ielscf.f
 pathf90 -c -O -msse3 -openmp improp.f
 pathf90 -c -O -msse3 -openmp imptor.f
 pathf90 -c -O -msse3 -openmp inform.f

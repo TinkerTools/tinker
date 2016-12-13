@@ -55,6 +55,7 @@ gfortran -c -O3 -ffast-math -fopenmp group.f
 gfortran -c -O3 -ffast-math -fopenmp hescut.f
 gfortran -c -O3 -ffast-math -fopenmp hessn.f
 gfortran -c -O3 -ffast-math -fopenmp hpmf.f
+gfortran -c -O3 -ffast-math -fopenmp ielscf.f
 gfortran -c -O3 -ffast-math -fopenmp improp.f
 gfortran -c -O3 -ffast-math -fopenmp imptor.f
 gfortran -c -O3 -ffast-math -fopenmp inform.f

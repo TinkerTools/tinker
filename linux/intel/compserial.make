@@ -55,6 +55,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 group.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 hescut.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 hessn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 hpmf.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 ielscf.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 improp.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 imptor.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 inform.f

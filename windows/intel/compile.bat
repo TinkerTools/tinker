@@ -56,6 +56,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp group.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp hescut.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp hessn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp hpmf.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ielscf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp improp.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp imptor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp inform.f

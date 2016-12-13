@@ -233,6 +233,7 @@ hessrgd.o \
 hessrot.o \
 hpmf.o \
 hybrid.o \
+ielscf.o \
 image.o \
 impose.o \
 improp.o \
