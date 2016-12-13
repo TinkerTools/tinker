@@ -153,6 +153,6 @@ c
 c
 c     turn off the pi-system torsion potential if it is not used
 c
-c     if (npitors .eq. 0)  use_pitors = .false.
+      if (npitors .eq. 0)  use_pitors = .false.
       return
       end

@@ -1237,12 +1237,13 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp,ep)
+!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp)
 !$OMP& shared(ipole,pdamp,thole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,uinp,poltyp,dep,vir,ufld,dufld)
+!$OMP& off2,uinp,poltyp)
+!$OMP& shared (ep,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
@@ -3507,12 +3508,13 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp,ep)
+!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp)
 !$OMP& shared(ipole,pdamp,thole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,aewald,uinp,poltyp,dep,vir,ufld,dufld)
+!$OMP& off2,aewald,uinp,poltyp)
+!$OMP& shared (ep,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep) schedule(guided)
 c

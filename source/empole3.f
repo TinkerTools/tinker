@@ -589,8 +589,8 @@ c
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
 !$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,name,
-!$OMP& verbose,debug,header,iout,em,einter,nem,aem)
-!$OMP& firstprivate(mscale)
+!$OMP& verbose,debug,header,iout)
+!$OMP& firstprivate(mscale) shared (em,einter,nem,aem)
 !$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
 c
 c     calculate the multipole interaction energy term
@@ -1576,8 +1576,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,molcule,name,verbose,debug,header,iout,em,eintra,nem,aem)
-!$OMP& firstprivate(mscale)
+!$OMP& aewald,molcule,name,verbose,debug,header,iout)
+!$OMP& firstprivate(mscale) shared (em,eintra,nem,aem)
 !$OMP DO reduction(+:em,eintra,nem,aem) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation

@@ -478,8 +478,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f,em)
-!$OMP& firstprivate(mscale)
+!$OMP& elst,use_group,use_intra,use_bounds,off2,f)
+!$OMP& firstprivate(mscale) shared (em)
 !$OMP DO reduction(+:em) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
@@ -1274,10 +1274,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
-!$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,em)
-!$OMP& firstprivate(mscale)
+!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,
+!$OMP& n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,
+!$OMP& use_bounds,f,off2,aewald)
+!$OMP& firstprivate(mscale) shared (em)
 !$OMP DO reduction(+:em) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
