@@ -13,8 +13,8 @@ c     #################################################################
 c
 c
 c     "testpol" computes the induced dipole moments for direct
-c     polarization, perturbation theory extrapolation, and for
-c     SCF iterations in order to monitor convergence
+c     polarization, perturbation theory extrapolation (OPT), and
+c     for SCF iterations in order to monitor convergence
 c
 c
       program testpol
@@ -236,7 +236,8 @@ c
 c
 c     get induced dipoles from OPT extrapolation method
 c
-      poltyp = 'EXTRAP'
+      poltyp = 'OPT4'
+      call kpolar
       call induce
       do i = 1, n
          do j = 1, 3
@@ -336,8 +337,8 @@ c
       delta = 0.0001d0
       write (iout,210)  cxmax
   210 format (/,' Extrapolated OPT',i1,' Coefficient Refinement :',
-     &        //,4x,'Iter',5x,'C0',5x,'C1',5x,'C2',5x,'C3',5x,
-     &           'C4',5x,'C5',5x,'C6',5x,'C7',3x,'RMS vs Exact',/)
+     &        //,4x,'Iter',8x,'C0',8x,'C1',8x,'C2',8x,'C3',
+     &           8x,'C4',6x,'RMS vs Exact',/)
 c
 c     count number of variables and define the initial simplex
 c
@@ -387,7 +388,7 @@ c
          end if
       end do
       write (iout,220)  iter,(cxtr(i),i=0,maxxtr),ropt
-  220 format (i8,1x,8f7.3,f14.10)
+  220 format (i8,1x,5f10.3,f17.10)
 c
 c     perform deallocation of some local arrays
 c
@@ -480,7 +481,7 @@ c           ropt = ropt + (uopt(j,i)-uexact(j,i))**6
       ropt = sqrt(ropt/dble(n))
       if (mod(iter,10) .eq. 0) then
          write (iout,10)  iter,(cxtr(i),i=0,maxxtr),ropt
-   10    format (i8,1x,8f7.3,f14.10)
+   10    format (i8,1x,5f10.3,f17.10)
       end if
 c
 c     set the return value equal to the RMS error
