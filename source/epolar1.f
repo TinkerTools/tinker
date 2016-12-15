@@ -494,58 +494,58 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'EXTRAP') then
-                  do j = 0, cxmax-1
-                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
-     &                          + uxtr(j,3,i)*zr
-                     do m = 0, cxmax-1
-                        if (j+m+1 .le. cxmax) then
-                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
-     &                                + uxtr(m,3,k)*zr
+               else if (poltyp .eq. 'OPT') then
+                  do j = 0, coptmax-1
+                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
+                     do m = 0, coptmax-1
+                        if (j+m+1 .le. coptmax) then
+                           durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                                + uopt(m,3,k)*zr
                            term1 = (sc3+sc5) * rr5
                            term2 = term1*xr - rc3(1)
                            term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                           txxi = uxtr(j,1,i)*term2 + durim*term3
-                           txxk = uxtr(m,1,k)*term2 + durkm*term3
+                           txxi = uopt(j,1,i)*term2 + durim*term3
+                           txxk = uopt(m,1,k)*term2 + durkm*term3
                            term2 = term1*yr - rc3(2)
                            term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                           tyyi = uxtr(j,2,i)*term2 + durim*term3
-                           tyyk = uxtr(m,2,k)*term2 + durkm*term3
+                           tyyi = uopt(j,2,i)*term2 + durim*term3
+                           tyyk = uopt(m,2,k)*term2 + durkm*term3
                            term2 = term1*zr - rc3(3)
                            term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                           tzzi = uxtr(j,3,i)*term2 + durim*term3
-                           tzzk = uxtr(m,3,k)*term2 + durkm*term3
+                           tzzi = uopt(j,3,i)*term2 + durim*term3
+                           tzzk = uopt(m,3,k)*term2 + durkm*term3
                            term1 = sc5 * rr5 * yr
                            term2 = sc3*rr5*xr - rc3(1)
                            term3 = yr * (sc5*rr7*xr-rc5(1))
-                           txyi = uxtr(j,1,i)*term1 + uxtr(j,2,i)*term2
+                           txyi = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
      &                               - durim*term3
-                           txyk = uxtr(m,1,k)*term1 + uxtr(m,2,k)*term2
+                           txyk = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
      &                               - durkm*term3
                            term1 = sc5 * rr5 * zr
                            term3 = zr * (sc5*rr7*xr-rc5(1))
-                           txzi = uxtr(j,1,i)*term1 + uxtr(j,3,i)*term2
+                           txzi = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
      &                               - durim*term3
-                           txzk = uxtr(m,1,k)*term1 + uxtr(m,3,k)*term2
+                           txzk = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
      &                               - durkm*term3
                            term2 = sc3*rr5*yr - rc3(2)
                            term3 = zr * (sc5*rr7*yr-rc5(2))
-                           tyzi = uxtr(j,2,i)*term1 + uxtr(j,3,i)*term2
+                           tyzi = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
      &                               - durim*term3
-                           tyzk = uxtr(m,2,k)*term1 + uxtr(m,3,k)*term2
+                           tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                               - durkm*term3
-                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
-     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
-     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
-                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
-     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
-     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
-                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
-     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
-     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
-                           frcx = frcx + cxtm(j+m+1)*uscale(kk)*depx
-                           frcy = frcy + cxtm(j+m+1)*uscale(kk)*depy
-                           frcz = frcz + cxtm(j+m+1)*uscale(kk)*depz
+                           depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+     &                          + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
+     &                          + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
+                           depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+     &                          + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
+     &                          + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
+                           depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+     &                          + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
+     &                          + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
+                           frcx = frcx + copm(j+m+1)*uscale(kk)*depx
+                           frcy = frcy + copm(j+m+1)*uscale(kk)*depy
+                           frcz = frcz + copm(j+m+1)*uscale(kk)*depz
                         end if
                      end do
                   end do
@@ -971,58 +971,58 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'EXTRAP') then
-                  do j = 0, cxmax-1
-                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
-     &                          + uxtr(j,3,i)*zr
-                     do m = 0, cxmax-1
-                        if (j+m+1 .le. cxmax) then
-                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
-     &                                + uxtr(m,3,k)*zr
+               else if (poltyp .eq. 'OPT') then
+                  do j = 0, coptmax-1
+                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
+                     do m = 0, coptmax-1
+                        if (j+m+1 .le. coptmax) then
+                           durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                                + uopt(m,3,k)*zr
                            term1 = (sc3+sc5) * rr5
                            term2 = term1*xr - rc3(1)
                            term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                           txxi = uxtr(j,1,i)*term2 + durim*term3
-                           txxk = uxtr(m,1,k)*term2 + durkm*term3
+                           txxi = uopt(j,1,i)*term2 + durim*term3
+                           txxk = uopt(m,1,k)*term2 + durkm*term3
                            term2 = term1*yr - rc3(2)
                            term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                           tyyi = uxtr(j,2,i)*term2 + durim*term3
-                           tyyk = uxtr(m,2,k)*term2 + durkm*term3
+                           tyyi = uopt(j,2,i)*term2 + durim*term3
+                           tyyk = uopt(m,2,k)*term2 + durkm*term3
                            term2 = term1*zr - rc3(3)
                            term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                           tzzi = uxtr(j,3,i)*term2 + durim*term3
-                           tzzk = uxtr(m,3,k)*term2 + durkm*term3
+                           tzzi = uopt(j,3,i)*term2 + durim*term3
+                           tzzk = uopt(m,3,k)*term2 + durkm*term3
                            term1 = sc5 * rr5 * yr
                            term2 = sc3*rr5*xr - rc3(1)
                            term3 = yr * (sc5*rr7*xr-rc5(1))
-                           txyi = uxtr(j,1,i)*term1 + uxtr(j,2,i)*term2
+                           txyi = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
      &                               - durim*term3
-                           txyk = uxtr(m,1,k)*term1 + uxtr(m,2,k)*term2
+                           txyk = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
      &                               - durkm*term3
                            term1 = sc5 * rr5 * zr
                            term3 = zr * (sc5*rr7*xr-rc5(1))
-                           txzi = uxtr(j,1,i)*term1 + uxtr(j,3,i)*term2
+                           txzi = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
      &                               - durim*term3
-                           txzk = uxtr(m,1,k)*term1 + uxtr(m,3,k)*term2
+                           txzk = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
      &                               - durkm*term3
                            term2 = sc3*rr5*yr - rc3(2)
                            term3 = zr * (sc5*rr7*yr-rc5(2))
-                           tyzi = uxtr(j,2,i)*term1 + uxtr(j,3,i)*term2
+                           tyzi = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
      &                               - durim*term3
-                           tyzk = uxtr(m,2,k)*term1 + uxtr(m,3,k)*term2
+                           tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                               - durkm*term3
-                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
-     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
-     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
-                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
-     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
-     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
-                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
-     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
-     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
-                           frcx = frcx + cxtm(j+m+1)*uscale(kk)*depx
-                           frcy = frcy + cxtm(j+m+1)*uscale(kk)*depy
-                           frcz = frcz + cxtm(j+m+1)*uscale(kk)*depz
+                           depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+     &                          + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
+     &                          + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
+                           depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+     &                          + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
+     &                          + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
+                           depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+     &                          + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
+     &                          + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
+                           frcx = frcx + copm(j+m+1)*uscale(kk)*depx
+                           frcy = frcy + copm(j+m+1)*uscale(kk)*depy
+                           frcz = frcz + copm(j+m+1)*uscale(kk)*depz
                         end if
                      end do
                   end do
@@ -1360,7 +1360,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,uinp,cxmax,cxtm,uxtr,uxtrp,poltyp)
+!$OMP& off2,uinp,coptmax,copm,uopt,uoptp,poltyp)
 !$OMP& shared (ep,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep) schedule(guided)
@@ -1689,58 +1689,58 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'EXTRAP') then
-                  do j = 0, cxmax-1
-                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
-     &                          + uxtr(j,3,i)*zr
-                     do m = 0, cxmax-1
-                        if (j+m+1 .le. cxmax) then
-                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
-     &                                + uxtr(m,3,k)*zr
+               else if (poltyp .eq. 'OPT') then
+                  do j = 0, coptmax-1
+                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
+                     do m = 0, coptmax-1
+                        if (j+m+1 .le. coptmax) then
+                           durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                                + uopt(m,3,k)*zr
                            term1 = (sc3+sc5) * rr5
                            term2 = term1*xr - rc3(1)
                            term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                           txxi = uxtr(j,1,i)*term2 + durim*term3
-                           txxk = uxtr(m,1,k)*term2 + durkm*term3
+                           txxi = uopt(j,1,i)*term2 + durim*term3
+                           txxk = uopt(m,1,k)*term2 + durkm*term3
                            term2 = term1*yr - rc3(2)
                            term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                           tyyi = uxtr(j,2,i)*term2 + durim*term3
-                           tyyk = uxtr(m,2,k)*term2 + durkm*term3
+                           tyyi = uopt(j,2,i)*term2 + durim*term3
+                           tyyk = uopt(m,2,k)*term2 + durkm*term3
                            term2 = term1*zr - rc3(3)
                            term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                           tzzi = uxtr(j,3,i)*term2 + durim*term3
-                           tzzk = uxtr(m,3,k)*term2 + durkm*term3
+                           tzzi = uopt(j,3,i)*term2 + durim*term3
+                           tzzk = uopt(m,3,k)*term2 + durkm*term3
                            term1 = sc5 * rr5 * yr
                            term2 = sc3*rr5*xr - rc3(1)
                            term3 = yr * (sc5*rr7*xr-rc5(1))
-                           txyi = uxtr(j,1,i)*term1 + uxtr(j,2,i)*term2
+                           txyi = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
      &                               - durim*term3
-                           txyk = uxtr(m,1,k)*term1 + uxtr(m,2,k)*term2
+                           txyk = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
      &                               - durkm*term3
                            term1 = sc5 * rr5 * zr
                            term3 = zr * (sc5*rr7*xr-rc5(1))
-                           txzi = uxtr(j,1,i)*term1 + uxtr(j,3,i)*term2
+                           txzi = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
      &                               - durim*term3
-                           txzk = uxtr(m,1,k)*term1 + uxtr(m,3,k)*term2
+                           txzk = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
      &                               - durkm*term3
                            term2 = sc3*rr5*yr - rc3(2)
                            term3 = zr * (sc5*rr7*yr-rc5(2))
-                           tyzi = uxtr(j,2,i)*term1 + uxtr(j,3,i)*term2
+                           tyzi = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
      &                               - durim*term3
-                           tyzk = uxtr(m,2,k)*term1 + uxtr(m,3,k)*term2
+                           tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                               - durkm*term3
-                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
-     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
-     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
-                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
-     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
-     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
-                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
-     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
-     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
-                           frcx = frcx + cxtm(j+m+1)*uscale(kk)*depx
-                           frcy = frcy + cxtm(j+m+1)*uscale(kk)*depy
-                           frcz = frcz + cxtm(j+m+1)*uscale(kk)*depz
+                           depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+     &                          + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
+     &                          + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
+                           depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+     &                          + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
+     &                          + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
+                           depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+     &                          + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
+     &                          + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
+                           frcx = frcx + copm(j+m+1)*uscale(kk)*depx
+                           frcy = frcy + copm(j+m+1)*uscale(kk)*depy
+                           frcz = frcz + copm(j+m+1)*uscale(kk)*depz
                         end if
                      end do
                   end do
@@ -2661,61 +2661,61 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'EXTRAP') then
-                  do j = 0, cxmax-1
-                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
-     &                          + uxtr(j,3,i)*zr
-                     do m = 0, cxmax-1
-                        if (j+m+1 .le. cxmax) then
-                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
-     &                                + uxtr(m,3,k)*zr
+               else if (poltyp .eq. 'OPT') then
+                  do j = 0, coptmax-1
+                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
+                     do m = 0, coptmax-1
+                        if (j+m+1 .le. coptmax) then
+                           durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                                + uopt(m,3,k)*zr
                            term1 = bn(2) - usc3*rr5
                            term2 = bn(3) - usc5*rr7
                            term3 = usr5 + term1
                            term4 = rr3 * uscale(kk)
                            term5 = -xr*term3 + rc3(1)*term4
                            term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
-                           txxi = uxtr(j,1,i)*term5 + durim*term6
-                           txxk = uxtr(m,1,k)*term5 + durkm *term6
+                           txxi = uopt(j,1,i)*term5 + durim*term6
+                           txxk = uopt(m,1,k)*term5 + durkm *term6
                            term5 = -yr*term3 + rc3(2)*term4
                            term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
-                           tyyi = uxtr(j,2,i)*term5 + durim*term6
-                           tyyk = uxtr(m,2,k)*term5 + durkm*term6
+                           tyyi = uopt(j,2,i)*term5 + durim*term6
+                           tyyk = uopt(m,2,k)*term5 + durkm*term6
                            term5 = -zr*term3 + rc3(3)*term4
                            term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
-                           tzzi = uxtr(j,3,i)*term5 + durim*term6
-                           tzzk = uxtr(m,3,k)*term5 + durkm*term6
+                           tzzi = uopt(j,3,i)*term5 + durim*term6
+                           tzzk = uopt(m,3,k)*term5 + durkm*term6
                            term4 = -usr5 * yr
                            term5 = -xr*term1 + rr3*urc3(1)
                            term6 = xr*yr*term2 - rr5*yr*urc5(1)
-                           txyi = uxtr(j,1,i)*term4 + uxtr(j,2,i)*term5
+                           txyi = uopt(j,1,i)*term4 + uopt(j,2,i)*term5
      &                               + durim*term6
-                           txyk = uxtr(m,1,k)*term4 + uxtr(m,2,k)*term5
+                           txyk = uopt(m,1,k)*term4 + uopt(m,2,k)*term5
      &                               + durkm*term6
                            term4 = -usr5 * zr
                            term6 = xr*zr*term2 - rr5*zr*urc5(1)
-                           txzi = uxtr(j,1,i)*term4 + uxtr(j,3,i)*term5
+                           txzi = uopt(j,1,i)*term4 + uopt(j,3,i)*term5
      &                               + durim*term6
-                           txzk = uxtr(m,1,k)*term4 + uxtr(m,3,k)*term5
+                           txzk = uopt(m,1,k)*term4 + uopt(m,3,k)*term5
      &                               + durkm*term6
                            term5 = -yr*term1 + rr3*urc3(2)
                            term6 = yr*zr*term2 - rr5*zr*urc5(2)
-                           tyzi = uxtr(j,2,i)*term4 + uxtr(j,3,i)*term5
+                           tyzi = uopt(j,2,i)*term4 + uopt(j,3,i)*term5
      &                               + durim*term6
-                           tyzk = uxtr(m,2,k)*term4 + uxtr(m,3,k)*term5
+                           tyzk = uopt(m,2,k)*term4 + uopt(m,3,k)*term5
      &                               + durkm*term6
-                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
-     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
-     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
-                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
-     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
-     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
-                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
-     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
-     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
-                           frcx = frcx + cxtm(j+m+1)*depx
-                           frcy = frcy + cxtm(j+m+1)*depy
-                           frcz = frcz + cxtm(j+m+1)*depz
+                           depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+     &                          + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
+     &                          + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
+                           depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+     &                          + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
+     &                          + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
+                           depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+     &                          + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
+     &                          + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
+                           frcx = frcx + copm(j+m+1)*depx
+                           frcy = frcy + copm(j+m+1)*depy
+                           frcz = frcz + copm(j+m+1)*depz
                         end if
                      end do
                   end do
@@ -3235,61 +3235,61 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'EXTRAP') then
-                  do j = 0, cxmax-1
-                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
-     &                          + uxtr(j,3,i)*zr
-                     do m = 0, cxmax-1
-                        if (j+m+1 .le. cxmax) then
-                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
-     &                                + uxtr(m,3,k)*zr
+               else if (poltyp .eq. 'OPT') then
+                  do j = 0, coptmax-1
+                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
+                     do m = 0, coptmax-1
+                        if (j+m+1 .le. coptmax) then
+                           durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                                + uopt(m,3,k)*zr
                            term1 = bn(2) - usc3*rr5
                            term2 = bn(3) - usc5*rr7
                            term3 = usr5 + term1
                            term4 = rr3 * uscale(kk)
                            term5 = -xr*term3 + rc3(1)*term4
                            term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
-                           txxi = uxtr(j,1,i)*term5 + durim*term6
-                           txxk = uxtr(m,1,k)*term5 + durkm*term6
+                           txxi = uopt(j,1,i)*term5 + durim*term6
+                           txxk = uopt(m,1,k)*term5 + durkm*term6
                            term5 = -yr*term3 + rc3(2)*term4
                            term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
-                           tyyi = uxtr(j,2,i)*term5 + durim*term6
-                           tyyk = uxtr(m,2,k)*term5 + durkm*term6
+                           tyyi = uopt(j,2,i)*term5 + durim*term6
+                           tyyk = uopt(m,2,k)*term5 + durkm*term6
                            term5 = -zr*term3 + rc3(3)*term4
                            term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
-                           tzzi = uxtr(j,3,i)*term5 + durim*term6
-                           tzzk = uxtr(m,3,k)*term5 + durkm*term6
+                           tzzi = uopt(j,3,i)*term5 + durim*term6
+                           tzzk = uopt(m,3,k)*term5 + durkm*term6
                            term4 = -usr5 * yr
                            term5 = -xr*term1 + rr3*urc3(1)
                            term6 = xr*yr*term2 - rr5*yr*urc5(1)
-                           txyi = uxtr(j,1,i)*term4 + uxtr(j,2,i)*term5
+                           txyi = uopt(j,1,i)*term4 + uopt(j,2,i)*term5
      &                               + durim*term6
-                           txyk = uxtr(m,1,k)*term4 + uxtr(m,2,k)*term5
+                           txyk = uopt(m,1,k)*term4 + uopt(m,2,k)*term5
      &                               + durkm*term6
                            term4 = -usr5 * zr
                            term6 = xr*zr*term2 - rr5*zr*urc5(1)
-                           txzi = uxtr(j,1,i)*term4 + uxtr(j,3,i)*term5
+                           txzi = uopt(j,1,i)*term4 + uopt(j,3,i)*term5
      &                               + durim*term6
-                           txzk = uxtr(m,1,k)*term4 + uxtr(m,3,k)*term5
+                           txzk = uopt(m,1,k)*term4 + uopt(m,3,k)*term5
      &                               + durkm*term6
                            term5 = -yr*term1 + rr3*urc3(2)
                            term6 = yr*zr*term2 - rr5*zr*urc5(2)
-                           tyzi = uxtr(j,2,i)*term4 + uxtr(j,3,i)*term5
+                           tyzi = uopt(j,2,i)*term4 + uopt(j,3,i)*term5
      &                               + durim*term6
-                           tyzk = uxtr(m,2,k)*term4 + uxtr(m,3,k)*term5
+                           tyzk = uopt(m,2,k)*term4 + uopt(m,3,k)*term5
      &                               + durkm*term6
-                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
-     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
-     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
-                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
-     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
-     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
-                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
-     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
-     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
-                           frcx = frcx + cxtm(j+m+1)*depx
-                           frcy = frcy + cxtm(j+m+1)*depy
-                           frcz = frcz + cxtm(j+m+1)*depz
+                           depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+     &                          + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
+     &                          + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
+                           depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+     &                          + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
+     &                          + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
+                           depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+     &                          + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
+     &                          + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
+                           frcx = frcx + copm(j+m+1)*depx
+                           frcy = frcy + copm(j+m+1)*depy
+                           frcz = frcz + copm(j+m+1)*depz
                         end if
                      end do
                   end do
@@ -3813,7 +3813,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,aewald,uinp,cxmax,cxtm,uxtr,uxtrp,poltyp)
+!$OMP& off2,aewald,uinp,coptmax,copm,uopt,uoptp,poltyp)
 !$OMP& shared (ep,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep) schedule(guided)
@@ -4236,61 +4236,61 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'EXTRAP') then
-                  do j = 0, cxmax
-                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
-     &                          + uxtr(j,3,i)*zr
-                     do m = 0, cxmax
-                        if (j+m+1 .le. cxmax) then
-                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
-     &                                + uxtr(m,3,k)*zr
+               else if (poltyp .eq. 'OPT') then
+                  do j = 0, coptmax
+                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
+                     do m = 0, coptmax
+                        if (j+m+1 .le. coptmax) then
+                           durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                                + uopt(m,3,k)*zr
                            term1 = bn(2) - usc3*rr5
                            term2 = bn(3) - usc5*rr7
                            term3 = usr5 + term1
                            term4 = rr3 * uscale(kk)
                            term5 = -xr*term3 + rc3(1)*term4
                            term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
-                           txxi = uxtr(j,1,i)*term5 + durim*term6
-                           txxk = uxtr(m,1,k)*term5 + durkm*term6
+                           txxi = uopt(j,1,i)*term5 + durim*term6
+                           txxk = uopt(m,1,k)*term5 + durkm*term6
                            term5 = -yr*term3 + rc3(2)*term4
                            term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
-                           tyyi = uxtr(j,2,i)*term5 + durim*term6
-                           tyyk = uxtr(m,2,k)*term5 + durkm*term6
+                           tyyi = uopt(j,2,i)*term5 + durim*term6
+                           tyyk = uopt(m,2,k)*term5 + durkm*term6
                            term5 = -zr*term3 + rc3(3)*term4
                            term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
-                           tzzi = uxtr(j,3,i)*term5 + durim*term6
-                           tzzk = uxtr(m,3,k)*term5 + durkm*term6
+                           tzzi = uopt(j,3,i)*term5 + durim*term6
+                           tzzk = uopt(m,3,k)*term5 + durkm*term6
                            term4 = -usr5 * yr
                            term5 = -xr*term1 + rr3*urc3(1)
                            term6 = xr*yr*term2 - rr5*yr*urc5(1)
-                           txyi = uxtr(j,1,i)*term4 + uxtr(j,2,i)*term5
+                           txyi = uopt(j,1,i)*term4 + uopt(j,2,i)*term5
      &                               + durim*term6
-                           txyk = uxtr(m,1,k)*term4 + uxtr(m,2,k)*term5
+                           txyk = uopt(m,1,k)*term4 + uopt(m,2,k)*term5
      &                               + durkm*term6
                            term4 = -usr5 * zr
                            term6 = xr*zr*term2 - rr5*zr*urc5(1)
-                           txzi = uxtr(j,1,i)*term4 + uxtr(j,3,i)*term5
+                           txzi = uopt(j,1,i)*term4 + uopt(j,3,i)*term5
      &                               + durim*term6
-                           txzk = uxtr(m,1,k)*term4 + uxtr(m,3,k)*term5
+                           txzk = uopt(m,1,k)*term4 + uopt(m,3,k)*term5
      &                               + durkm*term6
                            term5 = -yr*term1 + rr3*urc3(2)
                            term6 = yr*zr*term2 - rr5*zr*urc5(2)
-                           tyzi = uxtr(j,2,i)*term4 + uxtr(j,3,i)*term5
+                           tyzi = uopt(j,2,i)*term4 + uopt(j,3,i)*term5
      &                               + durim*term6
-                           tyzk = uxtr(m,2,k)*term4 + uxtr(m,3,k)*term5
+                           tyzk = uopt(m,2,k)*term4 + uopt(m,3,k)*term5
      &                               + durkm*term6
-                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
-     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
-     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
-                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
-     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
-     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
-                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
-     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
-     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
-                           frcx = frcx + cxtm(j+m+1)*depx
-                           frcy = frcy + cxtm(j+m+1)*depy
-                           frcz = frcz + cxtm(j+m+1)*depz
+                           depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+     &                          + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
+     &                          + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
+                           depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+     &                          + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
+     &                          + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
+                           depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+     &                          + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
+     &                          + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
+                           frcx = frcx + copm(j+m+1)*depx
+                           frcy = frcy + copm(j+m+1)*depy
+                           frcz = frcz + copm(j+m+1)*depz
                         end if
                      end do
                   end do

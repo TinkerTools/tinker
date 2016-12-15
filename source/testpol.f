@@ -39,9 +39,9 @@ c
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
       real*8 rdirect
-      real*8 rpcg,ropt
+      real*8 rpcg,rxpt
       real*8 eps,delta
-      real*8 extrap0
+      real*8 optfit
       real*8, allocatable :: var(:)
       real*8, allocatable :: yval(:)
       real*8, allocatable :: p(:,:)
@@ -49,18 +49,18 @@ c
       real*8, allocatable :: drms(:)
       real*8, allocatable :: tdirect(:)
       real*8, allocatable :: tpcg(:)
-      real*8, allocatable :: topt(:)
+      real*8, allocatable :: txpt(:)
       real*8, allocatable :: ddirect(:,:)
       real*8, allocatable :: dpcg(:,:)
-      real*8, allocatable :: dopt(:,:)
+      real*8, allocatable :: dxpt(:,:)
       real*8, allocatable :: udirect(:,:)
       real*8, allocatable :: upcg(:,:)
-      real*8, allocatable :: uopt(:,:)
+      real*8, allocatable :: uxpt(:,:)
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull
       character*1 answer
       character*240 record
-      external extrap0
+      external optfit
 c
 c
 c     get the coordinates and required force field parameters
@@ -122,13 +122,13 @@ c
       allocate (drms(maxiter))
       allocate (tdirect(n))
       allocate (tpcg(n))
-      allocate (topt(n))
+      allocate (txpt(n))
       allocate (ddirect(3,n))
       allocate (dpcg(3,n))
-      allocate (dopt(3,n))
+      allocate (dxpt(3,n))
       allocate (udirect(3,n))
       allocate (upcg(3,n))
-      allocate (uopt(3,n))
+      allocate (uxpt(3,n))
       allocate (ustore(3,n,0:maxiter))
 c
 c     perform dynamic allocation of some global arrays
@@ -241,21 +241,21 @@ c
       call induce
       do i = 1, n
          do j = 1, 3
-            uopt(j,i) = debye * uind(j,i)
+            uxpt(j,i) = debye * uind(j,i)
          end do
       end do
 c
 c     print the OPT extrapolation induced dipole moments
 c
       if (dofull) then
-         write (iout,110)  cxmax
+         write (iout,110)  coptmax
   110    format (/,' Extrapolated OPT',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i)) then
-               ux = uopt(1,i)
-               uy = uopt(2,i)
-               uz = uopt(3,i)
+               ux = uxpt(1,i)
+               uy = uxpt(2,i)
+               uz = uxpt(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
                write (iout,120)  i,ux,uy,uz,u2
   120          format (i8,4x,4f14.6)
@@ -267,28 +267,28 @@ c     find differences between approximate and exact dipoles
 c
       rdirect = 0.0d0
       rpcg = 0.0d0
-      ropt = 0.0d0
+      rxpt = 0.0d0
       do i = 1, n
          do j = 1, 3
             ddirect(j,i) = udirect(j,i) - uexact(j,i)
             dpcg(j,i) = upcg(j,i) - uexact(j,i)
-            dopt(j,i) = uopt(j,i) - uexact(j,i)
+            dxpt(j,i) = uxpt(j,i) - uexact(j,i)
          end do
          tdirect(i) = sqrt(ddirect(1,i)**2+ddirect(2,i)**2
      &                           +ddirect(3,i)**2)
          tpcg(i) = sqrt(dpcg(1,i)**2+dpcg(2,i)**2+dpcg(3,i)**2)
-         topt(i) = sqrt(dopt(1,i)**2+dopt(2,i)**2+dopt(3,i)**2)
+         txpt(i) = sqrt(dxpt(1,i)**2+dxpt(2,i)**2+dxpt(3,i)**2)
          rdirect = rdirect + tdirect(i)**2
          rpcg = rpcg + tpcg(i)**2
-         ropt = ropt + topt(i)**2
+         rxpt = rxpt + txpt(i)**2
       end do
       rdirect = sqrt(rdirect/dble(n))
       rpcg = sqrt(rpcg/dble(n))
-      ropt = sqrt(ropt/dble(n))
+      rxpt = sqrt(rxpt/dble(n))
 c
 c     print the RMS between approximate and exact dipoles
 c
-      write (iout,130)  cxmax
+      write (iout,130)  coptmax
   130 format (/,' Approximate vs. Exact Induced Dipoles :',
      &        //,4x,'Atom',14x,'Direct',14x,'PCG',14x,'OPT',i1)
       if (dofull) then
@@ -296,12 +296,12 @@ c
   140    format ()
          do i = 1, n
             if (use(i)) then
-               write (iout,150)  i,tdirect(i),tpcg(i),topt(i)
+               write (iout,150)  i,tdirect(i),tpcg(i),txpt(i)
   150          format (i8,4x,3f18.10)
             end if
          end do
       end if
-      write (iout,160)  rdirect,rpcg,ropt
+      write (iout,160)  rdirect,rpcg,rxpt
   160 format (/,5x,'RMS',4x,3f18.10)
 c
 c     find the RMS of each iteration from the exact dipoles
@@ -335,7 +335,7 @@ c
       maxiter = 10000
       eps = 0.033d0
       delta = 0.0001d0
-      write (iout,210)  cxmax
+      write (iout,210)  coptmax
   210 format (/,' Extrapolated OPT',i1,' Coefficient Refinement :',
      &        //,4x,'Iter',8x,'C0',8x,'C1',8x,'C2',8x,'C3',
      &           8x,'C4',6x,'RMS vs Exact',/)
@@ -343,51 +343,51 @@ c
 c     count number of variables and define the initial simplex
 c
       nvar = 0
-      do i = 0, cxmax
-         if (cxtr(i) .ne. 0.0d0)  nvar = nvar + 1
+      do i = 0, coptmax
+         if (copt(i) .ne. 0.0d0)  nvar = nvar + 1
       end do
       allocate (var(nvar))
       allocate (yval(nvar+1))
       allocate (p(nvar+1,nvar))
       nvar = 0
-      do i = 0, cxmax
-         if (cxtr(i) .ne. 0.0d0) then
+      do i = 0, coptmax
+         if (copt(i) .ne. 0.0d0) then
             nvar = nvar + 1
-            var(nvar) = cxtr(i)
+            var(nvar) = copt(i)
          end if
       end do
       do i = 1, nvar
          p(1,i) = var(i)
       end do
-      yval(1) = extrap0 (var)
+      yval(1) = optfit (var)
       do k = 1, nvar
          var(k) = var(k) + eps
          do i = 1, nvar
             p(k+1,i) = var(i)
          end do
-         yval(k+1) = extrap0 (var)
+         yval(k+1) = optfit (var)
          var(k) = var(k) - eps
       end do
 c
 c     optimize coefficients, then find and print refined values
 c
-      call simplex (nvar,p,yval,delta,extrap0,iter)
+      call simplex (nvar,p,yval,delta,optfit,iter)
       iter = iter + nvar + 1
-      ropt = 1000000.0d0
+      rxpt = 1000000.0d0
       do i = 1, nvar+1
-         if (yval(i) .lt. ropt) then
+         if (yval(i) .lt. rxpt) then
             miny = i
-            ropt = yval(i)
+            rxpt = yval(i)
          end if
       end do
       nvar = 0
-      do i = 0, cxmax
-         if (cxtr(i) .ne. 0.0d0) then
+      do i = 0, coptmax
+         if (copt(i) .ne. 0.0d0) then
             nvar = nvar + 1
-            cxtr(i) = p(miny,nvar)
+            copt(i) = p(miny,nvar)
          end if
       end do
-      write (iout,220)  iter,(cxtr(i),i=0,maxxtr),ropt
+      write (iout,220)  iter,(copt(i),i=0,maxopt),rxpt
   220 format (i8,1x,5f10.3,f17.10)
 c
 c     perform deallocation of some local arrays
@@ -398,14 +398,14 @@ c
       deallocate (rms)
       deallocate (drms)
       deallocate (tdirect)
-      deallocate (topt)
+      deallocate (txpt)
       deallocate (tpcg)
       deallocate (ddirect)
-      deallocate (dopt)
+      deallocate (dxpt)
       deallocate (dpcg)
       deallocate (udirect)
-      deallocate (uopt)
       deallocate (upcg)
+      deallocate (uxpt)
       deallocate (ustore)
 c
 c     perform any final tasks before program exit
@@ -414,14 +414,14 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  function extrap0  --  extrapolation coefficient refinement  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function optfit  --  OPT dipole coefficient refinement  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-      function extrap0 (var)
+      function optfit (var)
       use sizes
       use atoms
       use iounit
@@ -431,10 +431,10 @@ c
       implicit none
       integer i,j
       integer iter,nvar
-      real*8 extrap0
-      real*8 ropt
+      real*8 optfit
+      real*8 rxpt
       real*8 var(*)
-      real*8, allocatable :: uopt(:,:)
+      real*8, allocatable :: uxpt(:,:)
       logical first
       save first,iter
       data first  / .true. /
@@ -451,45 +451,45 @@ c
 c     copy optimization variables into extrapolation coefficients
 c
       nvar = 0
-      do i = 0, maxxtr
-         if (cxtr(i) .ne. 0.0d0) then
+      do i = 0, maxopt
+         if (copt(i) .ne. 0.0d0) then
             nvar = nvar + 1
-            cxtr(i) = var(nvar)
+            copt(i) = var(nvar)
          end if
       end do
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (uopt(3,n))
+      allocate (uxpt(3,n))
 c
 c     compute RMS error between OPT and exact SCF dipoles
 c
-      poltyp = 'EXTRAP'
+      poltyp = 'OPT'
       call induce
       do i = 1, n
          do j = 1, 3
-            uopt(j,i) = debye * uind(j,i)
+            uxpt(j,i) = debye * uind(j,i)
          end do
       end do
-      ropt = 0.0d0
+      rxpt = 0.0d0
       do i = 1, n
          do j = 1, 3
-            ropt = ropt + (uopt(j,i)-uexact(j,i))**2
-c           ropt = ropt + (uopt(j,i)-uexact(j,i))**6
+            rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**2
+c           rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**6
          end do
       end do
-      ropt = sqrt(ropt/dble(n))
+      rxpt = sqrt(rxpt/dble(n))
       if (mod(iter,10) .eq. 0) then
-         write (iout,10)  iter,(cxtr(i),i=0,maxxtr),ropt
+         write (iout,10)  iter,(copt(i),i=0,maxopt),rxpt
    10    format (i8,1x,5f10.3,f17.10)
       end if
 c
 c     set the return value equal to the RMS error
 c
-      extrap0 = ropt
+      optfit = rxpt
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (uopt)
+      deallocate (uxpt)
       return
       end

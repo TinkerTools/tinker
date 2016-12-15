@@ -51,10 +51,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(cxtr))  deallocate (cxtr)
-      if (allocated(cxtm))  deallocate (cxtm)
-      allocate (cxtr(0:maxxtr))
-      allocate (cxtm(0:maxxtr))
+      if (allocated(copt))  deallocate (copt)
+      if (allocated(copm))  deallocate (copm)
+      allocate (copt(0:maxopt))
+      allocate (copm(0:maxopt))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -69,31 +69,31 @@ c
 c
 c     set defaults for OPT induced dipole coefficients
 c
-      if (poltyp .eq. 'EXTRAP')  poltyp = 'OPT3'
       if (poltyp .eq. 'OPT')  poltyp = 'OPT3'
-      do i = 0, maxxtr
-         cxtr(i) = 0.0d0
-         cxtm(i) = 0.0d0
+      do i = 0, maxopt
+         copt(i) = 0.0d0
+         copm(i) = 0.0d0
       end do
       if (poltyp .eq. 'OPT1') then
-         cxtr(0) = 0.412d0
-         cxtr(1) = 0.784d0
+         copt(0) = 0.412d0
+         copt(1) = 0.784d0
       else if (poltyp .eq. 'OPT2') then
-         cxtr(0) = -0.115d0
-         cxtr(1) = 0.568d0
-         cxtr(2) = 0.608d0
+         copt(0) = -0.115d0
+         copt(1) = 0.568d0
+         copt(2) = 0.608d0
       else if (poltyp .eq. 'OPT3') then
-         cxtr(0) = -0.154d0
-         cxtr(1) = 0.017d0
-         cxtr(2) = 0.657d0
-         cxtr(3) = 0.475d0
+         copt(0) = -0.154d0
+         copt(1) = 0.017d0
+         copt(2) = 0.657d0
+         copt(3) = 0.475d0
       else if (poltyp .eq. 'OPT4') then
-         cxtr(0) = -0.041d0
-         cxtr(1) = -0.176d0
-         cxtr(2) = 0.169d0
-         cxtr(3) = 0.663d0
-         cxtr(4) = 0.374d0
+         copt(0) = -0.041d0
+         copt(1) = -0.176d0
+         copt(2) = 0.169d0
+         copt(3) = 0.663d0
+         copt(4) = 0.374d0
       end if
+      if (poltyp(1:3) .eq. 'OPT')  poltyp = 'OPT   '
 c
 c     get keywords containing polarization-related options
 c
@@ -109,25 +109,24 @@ c
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
-         else if (keyword(1:13) .eq. 'POLAR-EXTRAP ') then
-            do i = 0, maxxtr
-               cxtr(i) = 0.0d0
+         else if (keyword(1:10) .eq. 'POLAR-OPT ') then
+            do i = 0, maxopt
+               copt(i) = 0.0d0
             end do
-            read (string,*,err=20,end=20)  (cxtr(i),i=0,maxxtr)
+            read (string,*,err=20,end=20)  (copt(i),i=0,maxopt)
          end if
    20    continue
       end do
 c
 c     get maximum coefficient order for OPT induced dipoles
 c
-      if (poltyp(1:3) .eq. 'OPT')  poltyp = 'EXTRAP'
-      cxmax = 0
-      do i = 1, maxxtr
-         if (cxtr(i) .ne. 0.0d0)  cxmax = max(i,cxmax)
+      coptmax = 0
+      do i = 1, maxopt
+         if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
       end do
-      do i = 0, cxmax
-         do j = cxmax, i, -1
-            cxtm(i) = cxtm(i) + cxtr(j)
+      do i = 0, coptmax
+         do j = coptmax, i, -1
+            copm(i) = copm(i) + copt(j)
          end do
       end do
 c
@@ -140,8 +139,8 @@ c
       if (allocated(udirp))  deallocate (udirp)
       if (allocated(uind))  deallocate (uind)
       if (allocated(uinp))  deallocate (uinp)
-      if (allocated(uxtr))  deallocate (uxtr)
-      if (allocated(uxtrp))  deallocate (uxtrp)
+      if (allocated(uopt))  deallocate (uopt)
+      if (allocated(uoptp))  deallocate (uoptp)
       if (allocated(douind))  deallocate (douind)
       allocate (polarity(n))
       allocate (thole(n))
@@ -150,8 +149,8 @@ c
       allocate (udirp(3,n))
       allocate (uind(3,n))
       allocate (uinp(3,n))
-      allocate (uxtr(0:cxmax,3,n))
-      allocate (uxtrp(0:cxmax,3,n))
+      allocate (uopt(0:coptmax,3,n))
+      allocate (uoptp(0:coptmax,3,n))
       allocate (douind(n))
 c
 c     set the atoms allowed to have nonzero induced dipoles

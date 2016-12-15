@@ -850,8 +850,8 @@ c
       if (allocated(udirps))  deallocate (udirps)
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
-      if (allocated(uxtrs))  deallocate (uxtrs)
-      if (allocated(uxtrps))  deallocate (uxtrps)
+      if (allocated(uopts))  deallocate (uopts)
+      if (allocated(uoptps))  deallocate (uoptps)
       allocate (rsolv(n))
       allocate (rborn(n))
       allocate (drb(n))
@@ -862,8 +862,8 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      allocate (uxtrs(0:cxmax,3,n))
-      allocate (uxtrps(0:cxmax,3,n))
+      allocate (uopts(0:coptmax,3,n))
+      allocate (uoptps(0:coptmax,3,n))
 c
 c     set default value for exponent in the GB/GK function
 c
@@ -1182,16 +1182,16 @@ c
       if (allocated(udirps))  deallocate (udirps)
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
-      if (allocated(uxtrs))  deallocate (uxtrs)
-      if (allocated(uxtrps))  deallocate (uxtrps)
+      if (allocated(uopts))  deallocate (uopts)
+      if (allocated(uoptps))  deallocate (uoptps)
       allocate (rsolv(n))
       allocate (shct(n))
       allocate (udirs(3,n))
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      allocate (uxtrs(0:3,3,n))
-      allocate (uxtrps(0:3,3,n))
+      allocate (uopts(0:3,3,n))
+      allocate (uoptps(0:3,3,n))
 c
 c     assign some default APBS configuration parameters
 c

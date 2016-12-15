@@ -628,8 +628,8 @@ c
 c
 c     deallocation of global arrays from module polar
 c
-      if (allocated(cxtr))  deallocate (cxtr)
-      if (allocated(cxtm))  deallocate (cxtm)
+      if (allocated(copt))  deallocate (copt)
+      if (allocated(copm))  deallocate (copm)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
@@ -641,10 +641,10 @@ c
       if (allocated(uinp))  deallocate (uinp)
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
-      if (allocated(uxtr))  deallocate (uxtr)
-      if (allocated(uxtrp))  deallocate (uxtrp)
-      if (allocated(uxtrs))  deallocate (uxtrs)
-      if (allocated(uxtrps))  deallocate (uxtrps)
+      if (allocated(uopt))  deallocate (uopt)
+      if (allocated(uoptp))  deallocate (uoptp)
+      if (allocated(uopts))  deallocate (uopts)
+      if (allocated(uoptps))  deallocate (uoptps)
       if (allocated(uexact))  deallocate (uexact)
       if (allocated(douind))  deallocate (douind)
 c

@@ -251,16 +251,16 @@ c
 c
 c     get induced dipoles via the OPT extrapolation method
 c
-      if (poltyp .eq. 'EXTRAP') then
+      if (poltyp .eq. 'OPT') then
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3
-                  uxtr(0,j,i) = udir(j,i)
-                  uxtrp(0,j,i) = udirp(j,i)
+                  uopt(0,j,i) = udir(j,i)
+                  uoptp(0,j,i) = udirp(j,i)
                end do
             end if
          end do
-         do k = 1, cxmax
+         do k = 1, coptmax
             if (use_ewald) then
                call ufield0c (field,fieldp)
             else if (use_mlist) then
@@ -271,10 +271,10 @@ c
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     uxtr(k,j,i) = polarity(i) * field(j,i)
-                     uxtrp(k,j,i) = polarity(i) * fieldp(j,i)
-                     uind(j,i) = uxtr(k,j,i)
-                     uinp(j,i) = uxtrp(k,j,i)
+                     uopt(k,j,i) = polarity(i) * field(j,i)
+                     uoptp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uind(j,i) = uopt(k,j,i)
+                     uinp(j,i) = uoptp(k,j,i)
                   end do
                end if
             end do
@@ -288,11 +288,11 @@ c
                   uinp(j,i) = 0.0d0
                   usum(j,i) = 0.0d0
                   usump(j,i) = 0.0d0
-                  do k = 0, cxmax
-                     usum(j,i) = usum(j,i) + uxtr(k,j,i)
-                     usump(j,i) = usump(j,i) + uxtrp(k,j,i)
-                     uind(j,i) = uind(j,i) + cxtr(k)*usum(j,i)
-                     uinp(j,i) = uinp(j,i) + cxtr(k)*usump(j,i)
+                  do k = 0, coptmax
+                     usum(j,i) = usum(j,i) + uopt(k,j,i)
+                     usump(j,i) = usump(j,i) + uoptp(k,j,i)
+                     uind(j,i) = uind(j,i) + copt(k)*usum(j,i)
+                     uinp(j,i) = uinp(j,i) + copt(k)*usump(j,i)
                   end do
                end do
             end if
@@ -3499,30 +3499,30 @@ c
 c
 c     get induced dipoles via the OPT extrapolation method
 c
-      if (poltyp .eq. 'EXTRAP') then
+      if (poltyp .eq. 'OPT') then
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3
-                  uxtr(0,j,i) = udir(j,i)
-                  uxtrp(0,j,i) = udirp(j,i)
-                  uxtrs(0,j,i) = udirs(j,i)
-                  uxtrps(0,j,i) = udirps(j,i)
+                  uopt(0,j,i) = udir(j,i)
+                  uoptp(0,j,i) = udirp(j,i)
+                  uopts(0,j,i) = udirs(j,i)
+                  uoptps(0,j,i) = udirps(j,i)
                end do
             end if
          end do
-         do k = 1, cxmax
+         do k = 1, coptmax
             call ufield0d (field,fieldp,fields,fieldps)
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     uxtr(k,j,i) = polarity(i) * field(j,i)
-                     uxtrp(k,j,i) = polarity(i) * fieldp(j,i)
-                     uxtrs(k,j,i) = polarity(i) * fields(j,i)
-                     uxtrps(k,j,i) = polarity(i) * fieldps(j,i)
-                     uind(j,i) = uxtr(k,j,i)
-                     uinp(j,i) = uxtrp(k,j,i)
-                     uinds(j,i) = uxtrs(k,j,i)
-                     uinps(j,i) = uxtrps(k,j,i)
+                     uopt(k,j,i) = polarity(i) * field(j,i)
+                     uoptp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uopts(k,j,i) = polarity(i) * fields(j,i)
+                     uoptps(k,j,i) = polarity(i) * fieldps(j,i)
+                     uind(j,i) = uopt(k,j,i)
+                     uinp(j,i) = uoptp(k,j,i)
+                     uinds(j,i) = uopts(k,j,i)
+                     uinps(j,i) = uoptps(k,j,i)
                   end do
                end if
             end do
@@ -3542,15 +3542,15 @@ c
                   usump(j,i) = 0.0d0
                   usums(j,i) = 0.0d0
                   usumps(j,i) = 0.0d0
-                  do k = 0, cxmax
-                     usum(j,i) = usum(j,i) + uxtr(k,j,i)
-                     usump(j,i) = usump(j,i) + uxtrp(k,j,i)
-                     usums(j,i) = usums(j,i) + uxtrs(k,j,i)
-                     usumps(j,i) = usumps(j,i) + uxtrps(k,j,i)
-                     uind(j,i) = uind(j,i) + cxtr(k)*usum(j,i)
-                     uinp(j,i) = uinp(j,i) + cxtr(k)*usump(j,i)
-                     uinds(j,i) = uinds(j,i) + cxtr(k)*usums(j,i)
-                     uinps(j,i) = uinps(j,i) + cxtr(k)*usumps(j,i)
+                  do k = 0, coptmax
+                     usum(j,i) = usum(j,i) + uopt(k,j,i)
+                     usump(j,i) = usump(j,i) + uoptp(k,j,i)
+                     usums(j,i) = usums(j,i) + uopts(k,j,i)
+                     usumps(j,i) = usumps(j,i) + uoptps(k,j,i)
+                     uind(j,i) = uind(j,i) + copt(k)*usum(j,i)
+                     uinp(j,i) = uinp(j,i) + copt(k)*usump(j,i)
+                     uinds(j,i) = uinds(j,i) + copt(k)*usums(j,i)
+                     uinps(j,i) = uinps(j,i) + copt(k)*usumps(j,i)
                   end do
                end do
             end if
@@ -4759,30 +4759,30 @@ c
 c
 c     get induced dipoles via the OPT extrapolation method
 c
-      if (poltyp .eq. 'EXTRAP') then
+      if (poltyp .eq. 'OPT') then
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3
-                  uxtr(0,j,i) = udir(j,i)
-                  uxtrp(0,j,i) = udirp(j,i)
-                  uxtrs(0,j,i) = udirs(j,i)
-                  uxtrps(0,j,i) = udirps(j,i)
+                  uopt(0,j,i) = udir(j,i)
+                  uoptp(0,j,i) = udirp(j,i)
+                  uopts(0,j,i) = udirs(j,i)
+                  uoptps(0,j,i) = udirps(j,i)
                end do
             end if
          end do
-         do k = 1, cxmax
+         do k = 1, coptmax
             call ufield0e (field,fieldp,fields,fieldps)
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     uxtr(k,j,i) = polarity(i) * field(j,i)
-                     uxtrp(k,j,i) = polarity(i) * fieldp(j,i)
-                     uxtrs(k,j,i) = polarity(i) * fields(j,i)
-                     uxtrps(k,j,i) = polarity(i) * fieldps(j,i)
-                     uind(j,i) = uxtr(k,j,i)
-                     uinp(j,i) = uxtrp(k,j,i)
-                     uinds(j,i) = uxtrs(k,j,i)
-                     uinps(j,i) = uxtrps(k,j,i)
+                     uopt(k,j,i) = polarity(i) * field(j,i)
+                     uoptp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uopts(k,j,i) = polarity(i) * fields(j,i)
+                     uoptps(k,j,i) = polarity(i) * fieldps(j,i)
+                     uind(j,i) = uopt(k,j,i)
+                     uinp(j,i) = uoptp(k,j,i)
+                     uinds(j,i) = uopts(k,j,i)
+                     uinps(j,i) = uoptps(k,j,i)
                   end do
                end if
             end do
@@ -4802,15 +4802,15 @@ c
                   usump(j,i) = 0.0d0
                   usums(j,i) = 0.0d0
                   usumps(j,i) = 0.0d0
-                  do k = 0, cxmax
-                     usum(j,i) = usum(j,i) + uxtr(k,j,i)
-                     usump(j,i) = usump(j,i) + uxtrp(k,j,i)
-                     usums(j,i) = usums(j,i) + uxtrs(k,j,i)
-                     usumps(j,i) = usumps(j,i) + uxtrps(k,j,i)
-                     uind(j,i) = uind(j,i) + cxtr(k)*usum(j,i)
-                     uinp(j,i) = uinp(j,i) + cxtr(k)*usump(j,i)
-                     uinds(j,i) = uinds(j,i) + cxtr(k)*usums(j,i)
-                     uinps(j,i) = uinps(j,i) + cxtr(k)*usumps(j,i)
+                  do k = 0, coptmax
+                     usum(j,i) = usum(j,i) + uopt(k,j,i)
+                     usump(j,i) = usump(j,i) + uoptp(k,j,i)
+                     usums(j,i) = usums(j,i) + uopts(k,j,i)
+                     usumps(j,i) = usumps(j,i) + uoptps(k,j,i)
+                     uind(j,i) = uind(j,i) + copt(k)*usum(j,i)
+                     uinp(j,i) = uinp(j,i) + copt(k)*usump(j,i)
+                     uinds(j,i) = uinds(j,i) + copt(k)*usums(j,i)
+                     uinps(j,i) = uinps(j,i) + copt(k)*usumps(j,i)
                   end do
                end do
             end if
