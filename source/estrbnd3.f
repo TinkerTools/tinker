@@ -59,6 +59,7 @@ c
       do i = 1, n
          aeba(i) = 0.0d0
       end do
+      if (nstrbnd .eq. 0)  return
 c
 c     print header information if debug output was requested
 c

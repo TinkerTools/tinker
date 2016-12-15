@@ -60,6 +60,7 @@ c
       do i = 1, n
          aeaa(i) = 0.0d0
       end do
+      if (nangang .eq. 0)  return
 c
 c     print header information if debug output was requested
 c

@@ -43,6 +43,7 @@ c
 c     zero out the out-of-plane distance energy component
 c
       eopd = 0.0d0
+      if (nopdist .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

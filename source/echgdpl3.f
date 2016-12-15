@@ -61,12 +61,12 @@ c
       do i = 1, n
          aecd(i) = 0.0d0
       end do
-      if (ndipole.eq.0 .or. nion.eq.0)  return
+      if (nion.eq.0 .or. ndipole.eq.0)  return
 c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. ndipole.ne.0 .and. nion.ne.0) then
+      if (debug .and. nion.ne.0 .and. ndipole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Charge-Dipole Interactions :',

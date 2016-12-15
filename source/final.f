@@ -628,6 +628,8 @@ c
 c
 c     deallocation of global arrays from module polar
 c
+      if (allocated(cxtr))  deallocate (cxtr)
+      if (allocated(cxtm))  deallocate (cxtm)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)

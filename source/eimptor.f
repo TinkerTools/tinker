@@ -51,6 +51,7 @@ c
 c     zero out improper torsional energy
 c
       eit = 0.0d0
+      if (nitors .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

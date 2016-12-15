@@ -52,6 +52,7 @@ c
 c     zero out the out-of-plane bending energy component
 c
       eopb = 0.0d0
+      if (nopbend .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

@@ -59,6 +59,7 @@ c
 c     zero out the energy due to extra potential terms
 c
       eat = 0.0d0
+      if (nangtor .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

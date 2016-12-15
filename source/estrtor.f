@@ -56,6 +56,7 @@ c
 c     zero out the stretch-torsion energy
 c
       ebt = 0.0d0
+      if (nstrtor .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

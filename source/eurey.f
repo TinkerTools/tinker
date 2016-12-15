@@ -35,6 +35,7 @@ c
 c     zero out the Urey-Bradley interaction energy
 c
       eub = 0.0d0
+      if (nurey .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

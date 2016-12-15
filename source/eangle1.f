@@ -78,6 +78,7 @@ c
          dea(2,i) = 0.0d0
          dea(3,i) = 0.0d0
       end do
+      if (nangle .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

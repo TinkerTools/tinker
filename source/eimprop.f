@@ -48,6 +48,7 @@ c
 c     zero out improper dihedral energy
 c
       eid = 0.0d0
+      if (niprop .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

@@ -67,6 +67,7 @@ c
          deid(2,i) = 0.0d0
          deid(3,i) = 0.0d0
       end do
+      if (niprop .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

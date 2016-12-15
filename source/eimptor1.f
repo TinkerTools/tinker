@@ -71,6 +71,7 @@ c
          deit(2,i) = 0.0d0
          deit(3,i) = 0.0d0
       end do
+      if (nitors .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

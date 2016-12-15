@@ -47,7 +47,7 @@ c
 c     zero out the overall charge-dipole interaction energy
 c
       ecd = 0.0d0
-      if (ndipole.eq.0 .or. nion.eq.0)  return
+      if (nion.eq.0 .or. ndipole.eq.0)  return
 c
 c     perform dynamic allocation of some local arrays
 c

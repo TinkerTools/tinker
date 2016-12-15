@@ -15,6 +15,13 @@ c
 c     "kpolar" assigns atomic dipole polarizabilities to the atoms
 c     within the structure and processes any new or changed values
 c
+c     literature reference:
+c
+c     A. C. Simmonett, F. C. Pickard IV, J. W. Ponder and B. R. Brooks,
+c     "An Empirical Extrapolation Scheme for Efficient Treatment of
+c     Induced Dipoles", Journal of Chemical Physics, 145, 164101 (2016)
+c     [OPT coefficients]
+c
 c
       subroutine kpolar
       use sizes
@@ -45,7 +52,9 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(cxtr))  deallocate (cxtr)
+      if (allocated(cxtm))  deallocate (cxtm)
       allocate (cxtr(0:maxxtr))
+      allocate (cxtm(0:maxxtr))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -60,13 +69,31 @@ c
 c
 c     set defaults for OPT induced dipole coefficients
 c
+      if (poltyp .eq. 'EXTRAP')  poltyp = 'OPT3'
+      if (poltyp .eq. 'OPT')  poltyp = 'OPT3'
       do i = 0, maxxtr
          cxtr(i) = 0.0d0
+         cxtm(i) = 0.0d0
       end do
-      cxtr(0) = -0.154d0
-      cxtr(1) = 0.017d0
-      cxtr(2) = 0.657d0
-      cxtr(3) = 0.475d0
+      if (poltyp .eq. 'OPT1') then
+         cxtr(0) = 0.412d0
+         cxtr(1) = 0.784d0
+      else if (poltyp .eq. 'OPT2') then
+         cxtr(0) = -0.115d0
+         cxtr(1) = 0.568d0
+         cxtr(2) = 0.608d0
+      else if (poltyp .eq. 'OPT3') then
+         cxtr(0) = -0.154d0
+         cxtr(1) = 0.017d0
+         cxtr(2) = 0.657d0
+         cxtr(3) = 0.475d0
+      else if (poltyp .eq. 'OPT4') then
+         cxtr(0) = -0.041d0
+         cxtr(1) = -0.176d0
+         cxtr(2) = 0.169d0
+         cxtr(3) = 0.663d0
+         cxtr(4) = 0.374d0
+      end if
 c
 c     get keywords containing polarization-related options
 c
@@ -93,9 +120,15 @@ c
 c
 c     get maximum coefficient order for OPT induced dipoles
 c
+      if (poltyp(1:3) .eq. 'OPT')  poltyp = 'EXTRAP'
       cxmax = 0
       do i = 1, maxxtr
-         if (cxtr(i) .ne. 0.0d0)  cxmax = i
+         if (cxtr(i) .ne. 0.0d0)  cxmax = max(i,cxmax)
+      end do
+      do i = 0, cxmax
+         do j = cxmax, i, -1
+            cxtm(i) = cxtm(i) + cxtr(j)
+         end do
       end do
 c
 c     perform dynamic allocation of some global arrays

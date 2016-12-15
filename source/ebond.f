@@ -36,6 +36,7 @@ c
 c     zero out the bond stretching energy
 c
       eb = 0.0d0
+      if (nbond .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

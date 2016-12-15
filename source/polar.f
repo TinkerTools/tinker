@@ -16,7 +16,8 @@ c     maxxtr    maximum order for OPT induced dipole extrapolation
 c
 c     npolar    total number of polarizable sites in the system
 c     cxmax     maximum coefficient order for OPT dipole extrapolation
-c     cxtr      coefficients for OPT induced dipole extrapolation
+c     cxtr      coefficients for OPT total induced dipole moments
+c     cxtm      coefficients for OPT incremental induced dipole moments
 c     polarity  dipole polarizability for each multipole site (Ang**3)
 c     thole     Thole polarizability damping value for each site
 c     pdamp     value of polarizability scale factor for each site
@@ -42,6 +43,7 @@ c
       parameter (maxxtr=4)
       integer npolar,cxmax
       real*8, allocatable :: cxtr(:)
+      real*8, allocatable :: cxtm(:)
       real*8, allocatable :: polarity(:)
       real*8, allocatable :: thole(:)
       real*8, allocatable :: pdamp(:)

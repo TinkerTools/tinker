@@ -55,6 +55,7 @@ c
       do i = 1, n
          aeopd(i) = 0.0d0
       end do
+      if (nopdist .eq. 0)  return
 c
 c     print header information if debug output was requested
 c

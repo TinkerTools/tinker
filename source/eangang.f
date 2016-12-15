@@ -48,6 +48,7 @@ c
 c     zero out the angle-angle cross term energy
 c
       eaa = 0.0d0
+      if (nangang .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

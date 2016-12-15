@@ -69,7 +69,7 @@ c
       use shunt
       use virial
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer ii,kk,jcell
       integer iax,iay,iaz
       real*8 e,f,fi
@@ -100,6 +100,7 @@ c
       real*8 txyk,txzk,tyzk
       real*8 turi,duri,puri
       real*8 turk,durk,purk
+      real*8 durim,durkm
       real*8 txi3,tyi3,tzi3
       real*8 txi5,tyi5,tzi5
       real*8 txk3,tyk3,tzk3
@@ -490,6 +491,64 @@ c
                   frcx = frcx + uscale(kk)*depx
                   frcy = frcy + uscale(kk)*depy
                   frcz = frcz + uscale(kk)*depz
+c
+c     get the dtau/dr terms used for OPT polarization force
+c
+               else if (poltyp .eq. 'EXTRAP') then
+                  do j = 0, cxmax-1
+                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
+     &                          + uxtr(j,3,i)*zr
+                     do m = 0, cxmax-1
+                        if (j+m+1 .le. cxmax) then
+                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
+     &                                + uxtr(m,3,k)*zr
+                           term1 = (sc3+sc5) * rr5
+                           term2 = term1*xr - rc3(1)
+                           term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                           txxi = uxtr(j,1,i)*term2 + durim*term3
+                           txxk = uxtr(m,1,k)*term2 + durkm*term3
+                           term2 = term1*yr - rc3(2)
+                           term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                           tyyi = uxtr(j,2,i)*term2 + durim*term3
+                           tyyk = uxtr(m,2,k)*term2 + durkm*term3
+                           term2 = term1*zr - rc3(3)
+                           term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                           tzzi = uxtr(j,3,i)*term2 + durim*term3
+                           tzzk = uxtr(m,3,k)*term2 + durkm*term3
+                           term1 = sc5 * rr5 * yr
+                           term2 = sc3*rr5*xr - rc3(1)
+                           term3 = yr * (sc5*rr7*xr-rc5(1))
+                           txyi = uxtr(j,1,i)*term1 + uxtr(j,2,i)*term2
+     &                               - durim*term3
+                           txyk = uxtr(m,1,k)*term1 + uxtr(m,2,k)*term2
+     &                               - durkm*term3
+                           term1 = sc5 * rr5 * zr
+                           term3 = zr * (sc5*rr7*xr-rc5(1))
+                           txzi = uxtr(j,1,i)*term1 + uxtr(j,3,i)*term2
+     &                               - durim*term3
+                           txzk = uxtr(m,1,k)*term1 + uxtr(m,3,k)*term2
+     &                               - durkm*term3
+                           term2 = sc3*rr5*yr - rc3(2)
+                           term3 = zr * (sc5*rr7*yr-rc5(2))
+                           tyzi = uxtr(j,2,i)*term1 + uxtr(j,3,i)*term2
+     &                               - durim*term3
+                           tyzk = uxtr(m,2,k)*term1 + uxtr(m,3,k)*term2
+     &                               - durkm*term3
+                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
+     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
+     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
+                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
+     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
+     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
+                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
+     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
+     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
+                           frcx = frcx + cxtm(j+m+1)*uscale(kk)*depx
+                           frcy = frcy + cxtm(j+m+1)*uscale(kk)*depy
+                           frcz = frcz + cxtm(j+m+1)*uscale(kk)*depz
+                        end if
+                     end do
+                  end do
                end if
 c
 c     increment gradient and virial due to Cartesian forces
@@ -909,6 +968,64 @@ c
                   frcx = frcx + uscale(kk)*depx
                   frcy = frcy + uscale(kk)*depy
                   frcz = frcz + uscale(kk)*depz
+c
+c     get the dtau/dr terms used for OPT polarization force
+c
+               else if (poltyp .eq. 'EXTRAP') then
+                  do j = 0, cxmax-1
+                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
+     &                          + uxtr(j,3,i)*zr
+                     do m = 0, cxmax-1
+                        if (j+m+1 .le. cxmax) then
+                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
+     &                                + uxtr(m,3,k)*zr
+                           term1 = (sc3+sc5) * rr5
+                           term2 = term1*xr - rc3(1)
+                           term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                           txxi = uxtr(j,1,i)*term2 + durim*term3
+                           txxk = uxtr(m,1,k)*term2 + durkm*term3
+                           term2 = term1*yr - rc3(2)
+                           term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                           tyyi = uxtr(j,2,i)*term2 + durim*term3
+                           tyyk = uxtr(m,2,k)*term2 + durkm*term3
+                           term2 = term1*zr - rc3(3)
+                           term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                           tzzi = uxtr(j,3,i)*term2 + durim*term3
+                           tzzk = uxtr(m,3,k)*term2 + durkm*term3
+                           term1 = sc5 * rr5 * yr
+                           term2 = sc3*rr5*xr - rc3(1)
+                           term3 = yr * (sc5*rr7*xr-rc5(1))
+                           txyi = uxtr(j,1,i)*term1 + uxtr(j,2,i)*term2
+     &                               - durim*term3
+                           txyk = uxtr(m,1,k)*term1 + uxtr(m,2,k)*term2
+     &                               - durkm*term3
+                           term1 = sc5 * rr5 * zr
+                           term3 = zr * (sc5*rr7*xr-rc5(1))
+                           txzi = uxtr(j,1,i)*term1 + uxtr(j,3,i)*term2
+     &                               - durim*term3
+                           txzk = uxtr(m,1,k)*term1 + uxtr(m,3,k)*term2
+     &                               - durkm*term3
+                           term2 = sc3*rr5*yr - rc3(2)
+                           term3 = zr * (sc5*rr7*yr-rc5(2))
+                           tyzi = uxtr(j,2,i)*term1 + uxtr(j,3,i)*term2
+     &                               - durim*term3
+                           tyzk = uxtr(m,2,k)*term1 + uxtr(m,3,k)*term2
+     &                               - durkm*term3
+                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
+     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
+     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
+                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
+     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
+     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
+                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
+     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
+     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
+                           frcx = frcx + cxtm(j+m+1)*uscale(kk)*depx
+                           frcy = frcy + cxtm(j+m+1)*uscale(kk)*depy
+                           frcz = frcz + cxtm(j+m+1)*uscale(kk)*depz
+                        end if
+                     end do
+                  end do
                end if
 c
 c     force and torque components scaled for self-interactions
@@ -1129,7 +1246,7 @@ c
       use shunt
       use virial
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer ii,kk,kkk
       integer iax,iay,iaz
       real*8 e,f,fi
@@ -1160,6 +1277,7 @@ c
       real*8 txyk,txzk,tyzk
       real*8 turi,duri,puri
       real*8 turk,durk,purk
+      real*8 durim,durkm
       real*8 txi3,tyi3,tzi3
       real*8 txi5,tyi5,tzi5
       real*8 txk3,tyk3,tzk3
@@ -1242,7 +1360,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,uinp,poltyp)
+!$OMP& off2,uinp,cxmax,cxtm,uxtr,uxtrp,poltyp)
 !$OMP& shared (ep,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep) schedule(guided)
@@ -1557,17 +1675,75 @@ c
                   tyzi = uind(2,i)*term1 + uind(3,i)*term2 - duri*term3
                   tyzk = uind(2,k)*term1 + uind(3,k)*term2 - durk*term3
                   depx = txxi*uinp(1,k) + txxk*uinp(1,i)
-     &                      + txyi*uinp(2,k) + txyk*uinp(2,i)
-     &                      + txzi*uinp(3,k) + txzk*uinp(3,i)
+     &                   + txyi*uinp(2,k) + txyk*uinp(2,i)
+     &                   + txzi*uinp(3,k) + txzk*uinp(3,i)
                   depy = txyi*uinp(1,k) + txyk*uinp(1,i)
-     &                      + tyyi*uinp(2,k) + tyyk*uinp(2,i)
-     &                      + tyzi*uinp(3,k) + tyzk*uinp(3,i)
+     &                   + tyyi*uinp(2,k) + tyyk*uinp(2,i)
+     &                   + tyzi*uinp(3,k) + tyzk*uinp(3,i)
                   depz = txzi*uinp(1,k) + txzk*uinp(1,i)
-     &                      + tyzi*uinp(2,k) + tyzk*uinp(2,i)
-     &                      + tzzi*uinp(3,k) + tzzk*uinp(3,i)
+     &                   + tyzi*uinp(2,k) + tyzk*uinp(2,i)
+     &                   + tzzi*uinp(3,k) + tzzk*uinp(3,i)
                   frcx = frcx + uscale(kk)*depx
                   frcy = frcy + uscale(kk)*depy
                   frcz = frcz + uscale(kk)*depz
+c
+c     get the dtau/dr terms used for OPT polarization force
+c
+               else if (poltyp .eq. 'EXTRAP') then
+                  do j = 0, cxmax-1
+                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
+     &                          + uxtr(j,3,i)*zr
+                     do m = 0, cxmax-1
+                        if (j+m+1 .le. cxmax) then
+                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
+     &                                + uxtr(m,3,k)*zr
+                           term1 = (sc3+sc5) * rr5
+                           term2 = term1*xr - rc3(1)
+                           term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                           txxi = uxtr(j,1,i)*term2 + durim*term3
+                           txxk = uxtr(m,1,k)*term2 + durkm*term3
+                           term2 = term1*yr - rc3(2)
+                           term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                           tyyi = uxtr(j,2,i)*term2 + durim*term3
+                           tyyk = uxtr(m,2,k)*term2 + durkm*term3
+                           term2 = term1*zr - rc3(3)
+                           term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                           tzzi = uxtr(j,3,i)*term2 + durim*term3
+                           tzzk = uxtr(m,3,k)*term2 + durkm*term3
+                           term1 = sc5 * rr5 * yr
+                           term2 = sc3*rr5*xr - rc3(1)
+                           term3 = yr * (sc5*rr7*xr-rc5(1))
+                           txyi = uxtr(j,1,i)*term1 + uxtr(j,2,i)*term2
+     &                               - durim*term3
+                           txyk = uxtr(m,1,k)*term1 + uxtr(m,2,k)*term2
+     &                               - durkm*term3
+                           term1 = sc5 * rr5 * zr
+                           term3 = zr * (sc5*rr7*xr-rc5(1))
+                           txzi = uxtr(j,1,i)*term1 + uxtr(j,3,i)*term2
+     &                               - durim*term3
+                           txzk = uxtr(m,1,k)*term1 + uxtr(m,3,k)*term2
+     &                               - durkm*term3
+                           term2 = sc3*rr5*yr - rc3(2)
+                           term3 = zr * (sc5*rr7*yr-rc5(2))
+                           tyzi = uxtr(j,2,i)*term1 + uxtr(j,3,i)*term2
+     &                               - durim*term3
+                           tyzk = uxtr(m,2,k)*term1 + uxtr(m,3,k)*term2
+     &                               - durkm*term3
+                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
+     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
+     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
+                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
+     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
+     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
+                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
+     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
+     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
+                           frcx = frcx + cxtm(j+m+1)*uscale(kk)*depx
+                           frcy = frcy + cxtm(j+m+1)*uscale(kk)*depy
+                           frcz = frcz + cxtm(j+m+1)*uscale(kk)*depz
+                        end if
+                     end do
+                  end do
                end if
 c
 c     increment gradient and virial due to Cartesian forces
@@ -1977,7 +2153,7 @@ c
       use shunt
       use virial
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer ii,kk,jcell
       integer iax,iay,iaz
       real*8 e,f,fi
@@ -2015,6 +2191,7 @@ c
       real*8 txyk,txzk,tyzk
       real*8 turi,duri,puri
       real*8 turk,durk,purk
+      real*8 durim,durkm
       real*8 txi3,tyi3,tzi3
       real*8 txi5,tyi5,tzi5
       real*8 txk3,tyk3,tzk3
@@ -2481,6 +2658,67 @@ c
                   frcx = frcx + depx
                   frcy = frcy + depy
                   frcz = frcz + depz
+c
+c     get the dtau/dr terms used for OPT polarization force
+c
+               else if (poltyp .eq. 'EXTRAP') then
+                  do j = 0, cxmax-1
+                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
+     &                          + uxtr(j,3,i)*zr
+                     do m = 0, cxmax-1
+                        if (j+m+1 .le. cxmax) then
+                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
+     &                                + uxtr(m,3,k)*zr
+                           term1 = bn(2) - usc3*rr5
+                           term2 = bn(3) - usc5*rr7
+                           term3 = usr5 + term1
+                           term4 = rr3 * uscale(kk)
+                           term5 = -xr*term3 + rc3(1)*term4
+                           term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                           txxi = uxtr(j,1,i)*term5 + durim*term6
+                           txxk = uxtr(m,1,k)*term5 + durkm *term6
+                           term5 = -yr*term3 + rc3(2)*term4
+                           term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                           tyyi = uxtr(j,2,i)*term5 + durim*term6
+                           tyyk = uxtr(m,2,k)*term5 + durkm*term6
+                           term5 = -zr*term3 + rc3(3)*term4
+                           term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                           tzzi = uxtr(j,3,i)*term5 + durim*term6
+                           tzzk = uxtr(m,3,k)*term5 + durkm*term6
+                           term4 = -usr5 * yr
+                           term5 = -xr*term1 + rr3*urc3(1)
+                           term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                           txyi = uxtr(j,1,i)*term4 + uxtr(j,2,i)*term5
+     &                               + durim*term6
+                           txyk = uxtr(m,1,k)*term4 + uxtr(m,2,k)*term5
+     &                               + durkm*term6
+                           term4 = -usr5 * zr
+                           term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                           txzi = uxtr(j,1,i)*term4 + uxtr(j,3,i)*term5
+     &                               + durim*term6
+                           txzk = uxtr(m,1,k)*term4 + uxtr(m,3,k)*term5
+     &                               + durkm*term6
+                           term5 = -yr*term1 + rr3*urc3(2)
+                           term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                           tyzi = uxtr(j,2,i)*term4 + uxtr(j,3,i)*term5
+     &                               + durim*term6
+                           tyzk = uxtr(m,2,k)*term4 + uxtr(m,3,k)*term5
+     &                               + durkm*term6
+                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
+     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
+     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
+                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
+     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
+     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
+                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
+     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
+     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
+                           frcx = frcx + cxtm(j+m+1)*depx
+                           frcy = frcy + cxtm(j+m+1)*depy
+                           frcz = frcz + cxtm(j+m+1)*depz
+                        end if
+                     end do
+                  end do
                end if
 c
 c     increment gradient and virial due to Cartesian forces
@@ -2994,6 +3232,67 @@ c
                   frcx = frcx + depx
                   frcy = frcy + depy
                   frcz = frcz + depz
+c
+c     get the dtau/dr terms used for OPT polarization force
+c
+               else if (poltyp .eq. 'EXTRAP') then
+                  do j = 0, cxmax-1
+                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
+     &                          + uxtr(j,3,i)*zr
+                     do m = 0, cxmax-1
+                        if (j+m+1 .le. cxmax) then
+                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
+     &                                + uxtr(m,3,k)*zr
+                           term1 = bn(2) - usc3*rr5
+                           term2 = bn(3) - usc5*rr7
+                           term3 = usr5 + term1
+                           term4 = rr3 * uscale(kk)
+                           term5 = -xr*term3 + rc3(1)*term4
+                           term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                           txxi = uxtr(j,1,i)*term5 + durim*term6
+                           txxk = uxtr(m,1,k)*term5 + durkm*term6
+                           term5 = -yr*term3 + rc3(2)*term4
+                           term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                           tyyi = uxtr(j,2,i)*term5 + durim*term6
+                           tyyk = uxtr(m,2,k)*term5 + durkm*term6
+                           term5 = -zr*term3 + rc3(3)*term4
+                           term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                           tzzi = uxtr(j,3,i)*term5 + durim*term6
+                           tzzk = uxtr(m,3,k)*term5 + durkm*term6
+                           term4 = -usr5 * yr
+                           term5 = -xr*term1 + rr3*urc3(1)
+                           term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                           txyi = uxtr(j,1,i)*term4 + uxtr(j,2,i)*term5
+     &                               + durim*term6
+                           txyk = uxtr(m,1,k)*term4 + uxtr(m,2,k)*term5
+     &                               + durkm*term6
+                           term4 = -usr5 * zr
+                           term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                           txzi = uxtr(j,1,i)*term4 + uxtr(j,3,i)*term5
+     &                               + durim*term6
+                           txzk = uxtr(m,1,k)*term4 + uxtr(m,3,k)*term5
+     &                               + durkm*term6
+                           term5 = -yr*term1 + rr3*urc3(2)
+                           term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                           tyzi = uxtr(j,2,i)*term4 + uxtr(j,3,i)*term5
+     &                               + durim*term6
+                           tyzk = uxtr(m,2,k)*term4 + uxtr(m,3,k)*term5
+     &                               + durkm*term6
+                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
+     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
+     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
+                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
+     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
+     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
+                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
+     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
+     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
+                           frcx = frcx + cxtm(j+m+1)*depx
+                           frcy = frcy + cxtm(j+m+1)*depy
+                           frcz = frcz + cxtm(j+m+1)*depz
+                        end if
+                     end do
+                  end do
                end if
 c
 c     force and torque components scaled for self-interactions
@@ -3411,7 +3710,7 @@ c
       use shunt
       use virial
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer ii,kk,kkk
       integer iax,iay,iaz
       real*8 e,f,fi
@@ -3449,6 +3748,7 @@ c
       real*8 txyk,txzk,tyzk
       real*8 turi,duri,puri
       real*8 turk,durk,purk
+      real*8 durim,durkm
       real*8 txi3,tyi3,tzi3
       real*8 txi5,tyi5,tzi5
       real*8 txk3,tyk3,tzk3
@@ -3513,7 +3813,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,aewald,uinp,poltyp)
+!$OMP& off2,aewald,uinp,cxmax,cxtm,uxtr,uxtrp,poltyp)
 !$OMP& shared (ep,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep) schedule(guided)
@@ -3933,6 +4233,67 @@ c
                   frcx = frcx + depx
                   frcy = frcy + depy
                   frcz = frcz + depz
+c
+c     get the dtau/dr terms used for OPT polarization force
+c
+               else if (poltyp .eq. 'EXTRAP') then
+                  do j = 0, cxmax
+                     durim = uxtr(j,1,i)*xr + uxtr(j,2,i)*yr
+     &                          + uxtr(j,3,i)*zr
+                     do m = 0, cxmax
+                        if (j+m+1 .le. cxmax) then
+                           durkm = uxtr(m,1,k)*xr + uxtr(m,2,k)*yr
+     &                                + uxtr(m,3,k)*zr
+                           term1 = bn(2) - usc3*rr5
+                           term2 = bn(3) - usc5*rr7
+                           term3 = usr5 + term1
+                           term4 = rr3 * uscale(kk)
+                           term5 = -xr*term3 + rc3(1)*term4
+                           term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                           txxi = uxtr(j,1,i)*term5 + durim*term6
+                           txxk = uxtr(m,1,k)*term5 + durkm*term6
+                           term5 = -yr*term3 + rc3(2)*term4
+                           term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                           tyyi = uxtr(j,2,i)*term5 + durim*term6
+                           tyyk = uxtr(m,2,k)*term5 + durkm*term6
+                           term5 = -zr*term3 + rc3(3)*term4
+                           term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                           tzzi = uxtr(j,3,i)*term5 + durim*term6
+                           tzzk = uxtr(m,3,k)*term5 + durkm*term6
+                           term4 = -usr5 * yr
+                           term5 = -xr*term1 + rr3*urc3(1)
+                           term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                           txyi = uxtr(j,1,i)*term4 + uxtr(j,2,i)*term5
+     &                               + durim*term6
+                           txyk = uxtr(m,1,k)*term4 + uxtr(m,2,k)*term5
+     &                               + durkm*term6
+                           term4 = -usr5 * zr
+                           term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                           txzi = uxtr(j,1,i)*term4 + uxtr(j,3,i)*term5
+     &                               + durim*term6
+                           txzk = uxtr(m,1,k)*term4 + uxtr(m,3,k)*term5
+     &                               + durkm*term6
+                           term5 = -yr*term1 + rr3*urc3(2)
+                           term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                           tyzi = uxtr(j,2,i)*term4 + uxtr(j,3,i)*term5
+     &                               + durim*term6
+                           tyzk = uxtr(m,2,k)*term4 + uxtr(m,3,k)*term5
+     &                               + durkm*term6
+                           depx = txxi*uxtrp(m,1,k) + txxk*uxtrp(j,1,i)
+     &                          + txyi*uxtrp(m,2,k) + txyk*uxtrp(j,2,i)
+     &                          + txzi*uxtrp(m,3,k) + txzk*uxtrp(j,3,i)
+                           depy = txyi*uxtrp(m,1,k) + txyk*uxtrp(j,1,i)
+     &                          + tyyi*uxtrp(m,2,k) + tyyk*uxtrp(j,2,i)
+     &                          + tyzi*uxtrp(m,3,k) + tyzk*uxtrp(j,3,i)
+                           depz = txzi*uxtrp(m,1,k) + txzk*uxtrp(j,1,i)
+     &                          + tyzi*uxtrp(m,2,k) + tyzk*uxtrp(j,2,i)
+     &                          + tzzi*uxtrp(m,3,k) + tzzk*uxtrp(j,3,i)
+                           frcx = frcx + cxtm(j+m+1)*depx
+                           frcy = frcy + cxtm(j+m+1)*depy
+                           frcz = frcz + cxtm(j+m+1)*depz
+                        end if
+                     end do
+                  end do
                end if
 c
 c     increment gradient and virial due to Cartesian forces

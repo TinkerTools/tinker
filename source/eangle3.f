@@ -68,6 +68,7 @@ c
       do i = 1, n
          aea(i) = 0.0d0
       end do
+      if (nangle .eq. 0)  return
 c
 c     print header information if debug output was requested
 c

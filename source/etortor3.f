@@ -71,6 +71,7 @@ c
       do i = 1, n
          aett(i) = 0.0d0
       end do
+      if (ntortor .eq. 0)  return
 c
 c     print header information if debug output was requested
 c

@@ -56,6 +56,7 @@ c
 c     zero out the angle bending energy component
 c
       ea = 0.0d0
+      if (nangle .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

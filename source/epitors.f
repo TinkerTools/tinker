@@ -55,6 +55,7 @@ c
 c     zero out the pi-system torsion potential energy
 c
       ept = 0.0d0
+      if (npitors .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

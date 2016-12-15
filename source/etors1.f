@@ -103,6 +103,7 @@ c
          det(2,i) = 0.0d0
          det(3,i) = 0.0d0
       end do
+      if (ntors .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c
@@ -384,6 +385,7 @@ c
          det(2,i) = 0.0d0
          det(3,i) = 0.0d0
       end do
+      if (ntors .eq. 0)  return
 c
 c     set the extent of smoothing to be performed
 c

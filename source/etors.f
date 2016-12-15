@@ -81,6 +81,7 @@ c
 c     zero out the torsional potential energy
 c
       et = 0.0d0
+      if (ntors .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c
@@ -266,6 +267,7 @@ c
 c     zero out the torsional potential energy
 c
       et = 0.0d0
+      if (ntors .eq. 0)  return
 c
 c     set the extent of smoothing to be performed
 c

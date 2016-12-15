@@ -61,6 +61,7 @@ c
 c     zero out the torsion-torsion energy
 c
       ett = 0.0d0
+      if (ntortor .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

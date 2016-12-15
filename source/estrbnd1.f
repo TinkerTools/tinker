@@ -68,6 +68,7 @@ c
          deba(2,i) = 0.0d0
          deba(3,i) = 0.0d0
       end do
+      if (nstrbnd .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c

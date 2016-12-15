@@ -69,7 +69,7 @@ c
          decd(2,i) = 0.0d0
          decd(3,i) = 0.0d0
       end do
-      if (ndipole.eq.0 .or. nion.eq.0)  return
+      if (nion.eq.0 .or. ndipole.eq.0)  return
 c
 c     perform dynamic allocation of some local arrays
 c

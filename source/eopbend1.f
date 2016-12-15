@@ -72,6 +72,7 @@ c
          deopb(2,i) = 0.0d0
          deopb(3,i) = 0.0d0
       end do
+      if (nopbend .eq. 0)  return
 c
 c     OpenMP directives for the major loop structure
 c
