@@ -104,6 +104,7 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -584,6 +585,7 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -935,6 +937,7 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1219,6 +1222,7 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c

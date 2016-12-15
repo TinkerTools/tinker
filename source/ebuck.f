@@ -101,6 +101,7 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -433,6 +434,7 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -705,6 +707,7 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c

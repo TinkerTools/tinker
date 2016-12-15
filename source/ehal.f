@@ -93,6 +93,7 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -108,6 +109,7 @@ c
          vscale(i) = 1.0d0
          iv14(i) = 0
       end do
+      if (nvdw .eq. 0)  return
 c
 c     set the coefficients for the switching function
 c
@@ -440,6 +442,7 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -717,6 +720,7 @@ c
 c     zero out the van der Waals energy contribution
 c
       ev = 0.0d0
+      if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
