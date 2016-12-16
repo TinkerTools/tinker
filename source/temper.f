@@ -62,15 +62,15 @@ c
 c
 c     get the kinetic energy and instantaneous temperature
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      call kinetic (eksum,ekin,temp)
       if (.not. isothermal)  return
 c
 c     couple to external temperature bath via Berendsen scaling
 c
       if (thermostat .eq. 'BERENDSEN') then
-         if (temp .eq. 0.0d0)  temp = 0.1d0
-         scale = sqrt(1.0d0 + (dt/tautemp)*(kelvin/temp-1.0d0))
+         scale = 1.0d0
+         if (temp .ne. 0.0d0)
+     &      scale = sqrt(1.0d0 + (dt/tautemp)*(kelvin/temp-1.0d0))
          if (integrate .eq. 'RIGIDBODY') then
             do i = 1, ngrp
                do j = 1, 3
@@ -231,8 +231,7 @@ c
 c
 c     recompute kinetic energy and instantaneous temperature
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      call kinetic (eksum,ekin,temp)
       return
       end
 c
@@ -277,19 +276,19 @@ c
       real*8 scale,temp
       real*8 expterm
       real*8 scalep
+      real*8 temp_aux
+      real*8 temp_auxp
       real*8 w(3)
       real*8 ekin(3,3)
 c
 c
 c     get the kinetic energy and instantaneous temperature
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-      if (.not. isothermal)  return
+      call kinetic (eksum,ekin,temp)
 c
 c     make half-step velocity correction for Nose-Hoover system
 c
-      if (thermostat .eq. 'NOSE-HOOVER') then
+      if (isothermal .and. thermostat.eq.'NOSE-HOOVER') then
          ekt = gasconst * kelvin
          nc = 5
          ns = 3
@@ -347,24 +346,29 @@ c
                end if
             end do
          end if
+         call kinetic (eksum,ekin,temp)
       end if
 c
-c     use Berendsen scaling for any auxiliary dipole velocities
+c     use Berendsen scaling for iEL auxiliary dipole velocities
 c
       if (use_ielscf) then
-         if (temp_aux .eq. 0.0d0)  temp_aux = 0.1d0
-         if (temp_auxp .eq. 0.0d0)  temp_auxp = 0.1d0
-         scale = sqrt(1.0d0+(dt/tautemp_aux)
-     &                          *(kelvin_aux/temp_aux-1.0d0))
-         scalep = sqrt(1.0d0+(dt/tautemp_aux)
-     &                           *(kelvin_aux/temp_auxp-1.0d0))
+         call kinaux (temp_aux,temp_auxp)
+         scale = 1.0d0
+         scalep = 1.0d0
+         if (temp_aux .ne. 0.0d0) then
+            scale = sqrt(1.0d0+(dt/tautemp_aux)
+     &                             *(kelvin_aux/temp_aux-1.0d0))
+         end if
+         if (temp_auxp .ne. 0.0d0) then
+            scalep = sqrt(1.0d0+(dt/tautemp_aux)
+     &                              *(kelvin_aux/temp_auxp-1.0d0))
+         end if
          do i = 1, n
             do j = 1, 3
                vaux(j,i) = scale * vaux(j,i)
                vpaux(j,i) = scalep * vpaux(j,i)
             end do
          end do
-         call kinaux
       end if
       return
       end

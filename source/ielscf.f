@@ -13,24 +13,20 @@ c     ##############################################################
 c
 c
 c     nfree_aux    total degrees of freedom for auxiliary dipoles
-c     temp_aux     temperature of auxiliary induced dipoles
-c     temp_auxp    temperature of auxiliary shadow induced dipoles
 c     tautemp_aux  time constant for auliliary Berendsen thermostat
 c     kelvin_aux   target system temperature for auxiliary dipoles
 c     uaux         auxiliary induced dipole value at each site
-c     uauxp        auxiliary shadow induced dipoles at each site
+c     upaux        auxiliary shadow induced dipoles at each site
 c     vaux         auxiliary induced dipole velocity at each site
-c     vauxp        auxiliary shadow dipole velocity at each site
+c     vpaux        auxiliary shadow dipole velocity at each site
 c     aaux         auxiliary induced dipole acceleration at each site
-c     aauxp        auxiliary shadow dipole acceleration at each site
+c     apaux        auxiliary shadow dipole acceleration at each site
 c     use_ielscf   flag to use inertial extended Lagrangian method
 c
 c
       module ielscf
       implicit none
       integer nfree_aux
-      real*8 temp_aux
-      real*8 temp_auxp
       real*8 tautemp_aux
       real*8 kelvin_aux
       real*8, allocatable :: uaux(:,:)

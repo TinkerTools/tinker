@@ -150,8 +150,7 @@ c
 c
 c     compute and control the temperature and pressure
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

@@ -29,13 +29,13 @@ c     and Applications, 25, 507-518 (1978)
 c
 c     variables and parameters:
 c
-c     nvar      number of parameters in the objective function
-c     x0        contains starting point upon input, upon return
-c                 contains the best point found
-c     f0        during optimization contains best current function
-c                 value; returns final best function value
-c     grdmin    normal exit if rms gradient gets below this value
-c     ncalls    total number of function/gradient evaluations
+c     nvar       number of parameters in the objective function
+c     x0         contains starting point upon input, upon return
+c                  contains the best point found
+c     f0         during optimization contains best current function
+c                  value; returns final best function value
+c     grdmin     normal exit if rms gradient gets below this value
+c     ncalls     total number of function/gradient evaluations
 c
 c     required external routines:
 c

@@ -16,7 +16,7 @@ c     "kinetic" computes the total kinetic energy and kinetic energy
 c     contributions to the pressure tensor by summing over velocities
 c
 c
-      subroutine kinetic (eksum,ekin)
+      subroutine kinetic (eksum,ekin,temp)
       use sizes
       use atomid
       use atoms
@@ -30,7 +30,8 @@ c
       implicit none
       integer i,j,k
       integer start,stop
-      real*8 eksum,weigh
+      real*8 eksum,temp
+      real*8 weigh
       real*8 term,value
       real*8 xr,yr,zr
       real*8 x2,y2,z2
@@ -39,8 +40,9 @@ c
       real*8 inert(3,3)
 c
 c
-c     zero out the total kinetic energy and its outer product
+c     zero out the temperature and kinetic energy components
 c
+      temp = 0.0d0
       eksum = 0.0d0
       do i = 1, 3
          do j = 1, 3
@@ -134,6 +136,10 @@ c
          end do
       end if
 c
+c     set the instantaneous temperature from total kinetic energy
+c
+      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+c
 c     get the kinetic energy for Bussi-Parrinello barostat
 c
       if (isobaric .and. barostat.eq.'BUSSI') then
@@ -159,7 +165,7 @@ c     "kinaux" computes the total kinetic energy and temperature
 c     for auxiliary dipole variables used in iEL polarization
 c
 c
-      subroutine kinaux
+      subroutine kinaux (temp_aux,temp_auxp)
       use atoms
       use ielscf
       implicit none
@@ -167,16 +173,18 @@ c
       real*8 term
       real*8 vj,vjp
       real*8 vk,vkp
+      real*8 temp_aux
+      real*8 temp_auxp
       real*8 eksum_aux
       real*8 eksum_auxp
       real*8 ekaux(3,3)
       real*8 ekauxp(3,3)
 c
 c
-c     zero out the total kinetic energy and its outer product
-c  
-      eksum_aux = 0.0d0
-      eksum_auxp = 0.0d0
+c     zero out the temperature and kinetic energy components
+c
+      temp_aux = 0.0d0
+      temp_auxp = 0.0d0
       do i = 1, 3
          do j = 1, 3
             ekaux(j,i) = 0.0d0
@@ -185,7 +193,7 @@ c
       end do
 c
 c     get the kinetic energy tensor for auxiliary variables
-c 
+c
       do i = 1, n
          term = 0.5d0
          do j = 1, 3
@@ -200,11 +208,13 @@ c
          end do
       end do
 c
-c     find the total kinetic energy and temperature values
+c     find the total kinetic energy and auxiliary temperatures
 c
       eksum_aux = ekaux(1,1) + ekaux(2,2) + ekaux(3,3)
       eksum_auxp = ekauxp(1,1) + ekauxp(2,2) + ekauxp(3,3)
-      temp_aux = 2.0d0 * eksum_aux / dble(nfree_aux)
-      temp_auxp = 2.0d0 * eksum_auxp / dble(nfree_aux)
+      if (nfree_aux .ne. 0) then
+         temp_aux = 2.0d0 * eksum_aux / dble(nfree_aux)
+         temp_auxp = 2.0d0 * eksum_auxp / dble(nfree_aux)
+      end if
       return
       end

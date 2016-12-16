@@ -146,7 +146,7 @@ c
 c
 c     accumulate the kinetic energy and its outer product
 c
-      call kinetic (eksum,ekin)
+      call kinetic (eksum,ekin,temp)
 c
 c     calculate the stress tensor for anisotropic systems
 c
@@ -159,7 +159,6 @@ c
 c
 c     get the instantaneous temperature from the kinetic energy
 c
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
       etot = epot + eksum
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
@@ -193,7 +192,7 @@ c
       integer nc,ns
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8
-      real*8 ekt,eksum
+      real*8 ekt,eksum,temp
       real*8 df,odnf,gn1kt
       real*8 press,dpress
       real*8 expterm,scale
@@ -202,7 +201,7 @@ c
 c
 c     find kinetic energy and set an initial scale factor
 c
-      call kinetic (eksum,ekin)
+      call kinetic (eksum,ekin,temp)
       ekt = gasconst * kelvin
       nc = 5
       ns = 3

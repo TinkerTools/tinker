@@ -85,7 +85,7 @@ c
 c
 c     accumulate the kinetic energy and store the energy values
 c
-      call kinetic (eksum,ekin)
+      call kinetic (eksum,ekin,temp)
       epold = epot
       etold = eksum + epot
 c
@@ -150,8 +150,7 @@ c
 c
 c     determine the kinetic energy, temperature and total energy
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      call kinetic (eksum,ekin,temp)
       etot = eksum + epot
 c
 c     accept or reject according to Metropolis scheme;
@@ -204,8 +203,7 @@ c
 c
 c     compute and control the temperature and pressure
 c
-      call kinetic (eksum,ekin)
-      temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
+      call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

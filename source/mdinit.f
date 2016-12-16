@@ -539,7 +539,6 @@ c
       use ielscf
       use keys
       use polar
-      use units
       implicit none
       integer i,j,next
       real*8 speed
@@ -597,7 +596,7 @@ c
 c     set velocities and accelerations for auxiliary dipoles
 c
       do i = 1, n
-         weight = boltzmann / mass(i)
+         weight = 1.0d0
          speed = maxwell (weight,kelvin_aux)
          call ranvec (vec)
          do j = 1, 3
@@ -607,6 +606,5 @@ c
             apaux(j,i) = 0.0d0
          end do
       end do
-      call kinaux
       return
       end
