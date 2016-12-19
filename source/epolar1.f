@@ -4686,6 +4686,7 @@ c
             expterm = 0.5d0 * pi / xbox
             struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
 c           e = 0.5d0 * expterm * struc2
+c           em = em + e
             qfac(1,1,1) = expterm
          end if
 c
@@ -4748,6 +4749,7 @@ c
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
 c        e = 0.5d0 * expterm * struc2
+c        ep = ep + e
       end if
 c
 c     complete the transformation of the PME grid
@@ -4917,6 +4919,14 @@ c
          end if
       end do
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (fuind)
+      deallocate (fuinp)
+      deallocate (fphid)
+      deallocate (fphip)
+      deallocate (fphidp)
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (qgrip(2,nfft1,nfft2,nfft3))
@@ -5083,11 +5093,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (fuind)
-      deallocate (fuinp)
-      deallocate (fphid)
-      deallocate (fphip)
-      deallocate (fphidp)
       deallocate (qgrip)
       return
       end

@@ -1817,6 +1817,7 @@ c
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
+      real*8 struc2
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1915,6 +1916,9 @@ c
       qfac(1,1,1) = 0.0d0
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
+         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
+         e = 0.5d0 * expterm * struc2
+         em = em + e
          qfac(1,1,1) = expterm
       end if
 c
