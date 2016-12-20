@@ -72,7 +72,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
 #LIBS = 
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Build:     TINKER (no APBS or FFE Support)

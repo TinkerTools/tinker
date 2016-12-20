@@ -42,9 +42,11 @@
 ##  APBS_LIBDIR     Directory with APBS Libraries
 ##  APBS_LIBS       APBS Libraries needed to build TINKER
 ##  FFEDIR          FFE Top-Level Directory
-##  JAVA_INCDIR     Java Include File Directories Bundled JRE
+##  JAVA_INCDIR     Directories with Java Include Files
+##  JAVA_LIBDIR     Directory with Java Libraries
+##  JAVA_LIBS       Java Libraries needed to build FFE
 
-BUILDDIR = /Users/ponder/ffe/build
+BUILDDIR = $(HOME)/ffe/build
 
 TINKERDIR = $(BUILDDIR)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib
@@ -61,7 +63,12 @@ APBS_LIBDIR = -L$(APBSDIR)/lib
 APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 FFEDIR = $(BUILDDIR)/ffe
-JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
+JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+		-I/usr/lib/jvm/java-8-oracle/include \
+		-I/usr/lib/jvm/java-8-oracle/include/linux \
+		-I/usr/lib/jvm/java-8-oracle/lib/amd64/server
+JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
+JAVA_LIBS = -ljvm
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
@@ -82,7 +89,7 @@ OPTFLAGS = -Ofast -msse3 -fopenmp
 LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
 LIBS = -lstdc++
 LIBFLAGS = -crusv
-RANLIB = ranlib -c
+RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Build:    TINKER (with APBS and FFE Support)
@@ -737,7 +744,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
 
 all:	${EXEFILES}
 

@@ -42,9 +42,9 @@
 ##  APBS_LIBDIR     Directory with APBS Libraries
 ##  APBS_LIBS       APBS Libraries needed to build TINKER
 ##  FFEDIR          FFE Top-Level Directory
-##  JAVA_INCDIR     Java Include File Directories Bundled JRE
+##  JAVA_INCDIR     Directories with Java Include Files
 
-BUILDDIR = /Users/ponder/ffe/build
+BUILDDIR = $(HOME)/ffe/build
 
 TINKERDIR = $(BUILDDIR)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib
@@ -82,7 +82,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
 #LIBS = -lstdc++
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Build:    TINKER (with APBS and FFE Support)
