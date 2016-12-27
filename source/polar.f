@@ -16,6 +16,7 @@ c     maxopt    maximum order for OPT induced dipole extrapolation
 c
 c     npolar    total number of polarizable sites in the system
 c     coptmax   maximum coefficient order for OPT dipole extrapolation
+c     optlevel  current OPT order for reciprocal potential and field
 c     copt      coefficients for OPT total induced dipole moments
 c     copm      coefficients for OPT incremental induced dipole moments
 c     polarity  dipole polarizability for each multipole site (Ang**3)
@@ -33,6 +34,8 @@ c     uopt      OPT induced dipole components at each multipole site
 c     uoptp     OPT induced dipoles in field used for energy terms
 c     uopts     OPT GK or PB induced dipoles at each multipole site
 c     uoptps    OPT induced dipoles in field used for GK or PB energy
+c     fopt      OPT fractional reciprocal potentials at multipole sites
+c     foptp     OPT fractional reciprocal potentials for energy terms
 c     uexact    exact SCF induced dipoles to full numerical precision
 c     douind    flag to allow induced dipoles at each atomic site
 c
@@ -41,7 +44,9 @@ c
       implicit none
       integer maxopt
       parameter (maxopt=4)
-      integer npolar,coptmax
+      integer npolar
+      integer coptmax
+      integer optlevel
       real*8, allocatable :: copt(:)
       real*8, allocatable :: copm(:)
       real*8, allocatable :: polarity(:)
@@ -59,6 +64,8 @@ c
       real*8, allocatable :: uoptp(:,:,:)
       real*8, allocatable :: uopts(:,:,:)
       real*8, allocatable :: uoptps(:,:,:)
+      real*8, allocatable :: fopt(:,:,:)
+      real*8, allocatable :: foptp(:,:,:)
       real*8, allocatable :: uexact(:,:)
       logical, allocatable :: douind(:)
       save

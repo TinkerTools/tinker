@@ -49,13 +49,6 @@ c
       character*240 string
 c
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (allocated(copt))  deallocate (copt)
-      if (allocated(copm))  deallocate (copm)
-      allocate (copt(0:maxopt))
-      allocate (copm(0:maxopt))
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (list(n))
@@ -66,6 +59,15 @@ c
       do i = 1, n
          list(i) = 0
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(copt))  deallocate (copt)
+      if (allocated(copm))  deallocate (copm)
+      if (poltyp(1:3) .eq. 'OPT') then
+         allocate (copt(0:maxopt))
+         allocate (copm(0:maxopt))
+      end if
 c
 c     set defaults for OPT induced dipole coefficients
 c
@@ -139,8 +141,6 @@ c
       if (allocated(udirp))  deallocate (udirp)
       if (allocated(uind))  deallocate (uind)
       if (allocated(uinp))  deallocate (uinp)
-      if (allocated(uopt))  deallocate (uopt)
-      if (allocated(uoptp))  deallocate (uoptp)
       if (allocated(douind))  deallocate (douind)
       allocate (polarity(n))
       allocate (thole(n))
@@ -149,9 +149,17 @@ c
       allocate (udirp(3,n))
       allocate (uind(3,n))
       allocate (uinp(3,n))
-      allocate (uopt(0:coptmax,3,n))
-      allocate (uoptp(0:coptmax,3,n))
       allocate (douind(n))
+      if (allocated(uopt))  deallocate (uopt)
+      if (allocated(uoptp))  deallocate (uoptp)
+      if (allocated(fopt))  deallocate (fopt)
+      if (allocated(foptp))  deallocate (foptp)
+      if (poltyp .eq. 'OPT') then
+         allocate (uopt(0:coptmax,3,n))
+         allocate (uoptp(0:coptmax,3,n))
+         allocate (fopt(0:coptmax,10,n))
+         allocate (foptp(0:coptmax,10,n))
+      end if
 c
 c     set the atoms allowed to have nonzero induced dipoles
 c

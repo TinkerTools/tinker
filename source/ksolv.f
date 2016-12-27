@@ -1190,8 +1190,8 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      allocate (uopts(0:3,3,n))
-      allocate (uoptps(0:3,3,n))
+      allocate (uopts(0:coptmax,3,n))
+      allocate (uoptps(0:coptmax,3,n))
 c
 c     assign some default APBS configuration parameters
 c

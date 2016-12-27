@@ -261,6 +261,7 @@ c
             end if
          end do
          do k = 1, coptmax
+            optlevel = k - 1
             if (use_ewald) then
                call ufield0c (field,fieldp)
             else if (use_mlist) then
@@ -2837,6 +2838,7 @@ c
       use mpole
       use pme
       use polar
+      use polpot
       implicit none
       integer i,j,k
       real*8 term
@@ -2903,6 +2905,17 @@ c     perform 3-D FFT backward transform and get field
 c
       call fftback
       call fphi_uind (fdip_phi1,fdip_phi2,fdip_sum_phi)
+c
+c     store fractional reciprocal potentials for OPT method
+c
+      if (poltyp .eq. 'OPT') then
+         do i = 1, npole
+            do k = 1, 10
+               fopt(optlevel,k,i) = fdip_phi1(k,i)
+               foptp(optlevel,k,i) = fdip_phi2(k,i)
+            end do
+         end do
+      end if
 c
 c     convert the dipole fields from fractional to Cartesian
 c
