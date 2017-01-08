@@ -4508,7 +4508,7 @@ c
       use potent
       use virial
       implicit none
-      integer i,j,k,ii
+      integer i,j,k,m,ii
       integer j1,j2,j3
       integer k1,k2,k3
       integer m1,m2,m3
@@ -4538,9 +4538,6 @@ c
       real*8, allocatable :: fphip(:,:)
       real*8, allocatable :: fphidp(:,:)
       real*8, allocatable :: qgrip(:,:,:,:)
-c
-      integer l,m
-      real*8 c
 c
 c     indices into the electrostatic field array
 c
@@ -4960,25 +4957,24 @@ c
                         cphip(j) = cphip(j) + ftc(j,j1)*fphip(j1,i)
                      end do
                   end do
-                  c = copm(k+m+1)
-                  vxx = vxx - 0.5d0 * c * (cphid(2)*uoptp(m,1,i)
-     &                                    +cphip(2)*uopt(m,1,i))
-                  vxy = vxy - 0.25d0 * c * (cphid(2)*uoptp(m,2,i)
-     &                                     +cphip(2)*uopt(m,2,i)
-     &                                     +cphid(3)*uoptp(m,1,i)
-     &                                     +cphip(3)*uopt(m,1,i))
-                  vxz = vxz - 0.25d0 * c * (cphid(2)*uoptp(m,3,i)
-     &                                     +cphip(2)*uopt(m,3,i)
-     &                                     +cphid(4)*uoptp(m,1,i)
-     &                                     +cphip(4)*uopt(m,1,i))
-                  vyy = vyy - 0.5d0 * c * (cphid(3)*uoptp(m,2,i)
-     &                                    +cphip(3)*uopt(m,2,i))
-                  vyz = vyz - 0.25d0 * c * (cphid(3)*uoptp(m,3,i)
-     &                                     +cphip(3)*uopt(m,3,i)
-     &                                     +cphid(4)*uoptp(m,2,i)
-     &                                     +cphip(4)*uopt(m,2,i))
-                  vzz = vzz - 0.5d0 * c * (cphid(4)*uoptp(m,3,i)
-     &                                    +cphip(4)*uopt(m,3,i))
+                  vxx = vxx - 0.5d0*copm(k+m+1)*(cphid(2)*uoptp(m,1,i)
+     &                                          +cphip(2)*uopt(m,1,i))
+                  vxy = vxy - 0.25d0*copm(k+m+1)*(cphid(2)*uoptp(m,2,i)
+     &                                           +cphip(2)*uopt(m,2,i)
+     &                                           +cphid(3)*uoptp(m,1,i)
+     &                                           +cphip(3)*uopt(m,1,i))
+                  vxz = vxz - 0.25d0*copm(k+m+1)*(cphid(2)*uoptp(m,3,i)
+     &                                           +cphip(2)*uopt(m,3,i)
+     &                                           +cphid(4)*uoptp(m,1,i)
+     &                                           +cphip(4)*uopt(m,1,i))
+                  vyy = vyy - 0.5d0*copm(k+m+1)*(cphid(3)*uoptp(m,2,i)
+     &                                          +cphip(3)*uopt(m,2,i))
+                  vyz = vyz - 0.25d0*copm(k+m+1)*(cphid(3)*uoptp(m,3,i)
+     &                                           +cphip(3)*uopt(m,3,i)
+     &                                           +cphid(4)*uoptp(m,2,i)
+     &                                           +cphip(4)*uopt(m,2,i))
+                  vzz = vzz - 0.5d0*copm(k+m+1)*(cphid(4)*uoptp(m,3,i)
+     &                                          +cphip(4)*uopt(m,3,i))
                end do
             end do
          end do
