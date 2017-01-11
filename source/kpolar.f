@@ -64,10 +64,8 @@ c     perform dynamic allocation of some global arrays
 c
       if (allocated(copt))  deallocate (copt)
       if (allocated(copm))  deallocate (copm)
-      if (poltyp(1:3) .eq. 'OPT') then
-         allocate (copt(0:maxopt))
-         allocate (copm(0:maxopt))
-      end if
+      allocate (copt(0:maxopt))
+      allocate (copm(0:maxopt))
 c
 c     set defaults for OPT induced dipole coefficients
 c

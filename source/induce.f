@@ -494,7 +494,7 @@ c
             if (debug) then
                if (iter .eq. 1) then
                   write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
+   10             format (/,' Determination of SCF Induced Dipole',
      &                       ' Moments :',
      &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
                end if

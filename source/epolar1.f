@@ -339,7 +339,7 @@ c
                puri = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
                purk = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
 c
-c     get the dE/dR field gradient for direct polarization force
+c     get the field gradient for direct polarization force
 c
                term1 = sc3*(rr3-rr5*xr*xr) + rc3(1)*xr
                term2 = (sc3+sc5)*rr5*xr - rc3(1)
@@ -420,7 +420,7 @@ c
      &                + drk*term4 - qkyz*term5 + qrk3*term6
      &                + qrk2*term7 - qrrk*term8
 c
-c     get the dEd/dR field gradient for direct polarization force
+c     get the dEd/dR terms used for direct polarization force
 c
                depx = txxi*uinp(1,k) - txxk*uinp(1,i)
      &                   + txyi*uinp(2,k) - txyk*uinp(2,i)
@@ -435,7 +435,7 @@ c
                frcy = dscale(kk) * depy
                frcz = dscale(kk) * depz
 c
-c     get the dEp/dR field gradient for direct polarization force
+c     get the dEp/dR terms used for direct polarization force
 c
                depx = txxi*uind(1,k) - txxk*uind(1,i)
      &                   + txyi*uind(2,k) - txyk*uind(2,i)
@@ -814,7 +814,7 @@ c
                puri = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
                purk = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
 c
-c     get the dE/dR field gradient for direct polarization force
+c     get the field gradient for direct polarization force
 c
                term1 = sc3*(rr3-rr5*xr*xr) + rc3(1)*xr
                term2 = (sc3+sc5)*rr5*xr - rc3(1)
@@ -895,7 +895,7 @@ c
      &                + drk*term4 - qkyz*term5 + qrk3*term6
      &                + qrk2*term7 - qrrk*term8
 c
-c     get the dEd/dR field gradient for direct polarization force
+c     get the dEd/dR terms used for direct polarization force
 c
                depx = txxi*uinp(1,k) - txxk*uinp(1,i)
      &                   + txyi*uinp(2,k) - txyk*uinp(2,i)
@@ -910,7 +910,7 @@ c
                frcy = dscale(kk) * depy
                frcz = dscale(kk) * depz
 c
-c     get the dEp/dR field gradient for direct polarization force
+c     get the dEp/dR terms used for direct polarization force
 c
                depx = txxi*uind(1,k) - txxk*uind(1,i)
      &                   + txyi*uind(2,k) - txyk*uind(2,i)
@@ -1530,7 +1530,7 @@ c
                puri = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
                purk = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
 c
-c     get the dE/dR field gradient for direct polarization force
+c     get the field gradient for direct polarization force
 c
                term1 = sc3*(rr3-rr5*xr*xr) + rc3(1)*xr
                term2 = (sc3+sc5)*rr5*xr - rc3(1)
@@ -1611,7 +1611,7 @@ c
      &                + drk*term4 - qkyz*term5 + qrk3*term6
      &                + qrk2*term7 - qrrk*term8
 c
-c     get the dEd/dR field gradient for direct polarization force
+c     get the dEd/dR terms used for direct polarization force
 c
                depx = txxi*uinp(1,k) - txxk*uinp(1,i)
      &                   + txyi*uinp(2,k) - txyk*uinp(2,i)
@@ -1626,7 +1626,7 @@ c
                frcy = dscale(kk) * depy
                frcz = dscale(kk) * depz
 c
-c     get the dEp/dR field gradient for direct polarization force
+c     get the dEp/dR terms used for direct polarization force
 c
                depx = txxi*uind(1,k) - txxk*uind(1,i)
      &                   + txyi*uind(2,k) - txyk*uind(2,i)
@@ -2440,7 +2440,7 @@ c
                duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
                durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
 c
-c     get the dEd/dR field gradient for direct polarization force
+c     get the dEd/dR terms used for direct polarization force
 c
                term1 = bn(2) - dsc3*rr5
                term2 = bn(3) - dsc5*rr7
@@ -2524,7 +2524,7 @@ c
                frcy = depy
                frcz = depz
 c
-c     get the dEp/dR field gradient for direct polarization force
+c     get the dEp/dR terms used for direct polarization force
 c
                term1 = bn(2) - psc3*rr5
                term2 = bn(3) - psc5*rr7
@@ -3012,7 +3012,7 @@ c
                duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
                durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
 c
-c     get the dEd/dR field gradient for direct polarization force
+c     get the dEd/dR terms used for direct polarization force
 c
                term1 = bn(2) - dsc3*rr5
                term2 = bn(3) - dsc5*rr7
@@ -3096,7 +3096,7 @@ c
                frcy = depy
                frcz = depz
 c
-c     get the dEp/dR field gradient for direct polarization force
+c     get the dEp/dR terms used for direct polarization force
 c
                term1 = bn(2) - psc3*rr5
                term2 = bn(3) - psc5*rr7
@@ -4011,7 +4011,7 @@ c
                duri = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
                durk = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
 c
-c     get the dEd/dR field gradient for direct polarization force
+c     get the dEd/dR terms used for direct polarization force
 c
                term1 = bn(2) - dsc3*rr5
                term2 = bn(3) - dsc5*rr7
@@ -4095,7 +4095,7 @@ c
                frcy = depy
                frcz = depz
 c
-c     get the dEp/dR field gradient for direct polarization force
+c     get the dEp/dR terms used for direct polarization force
 c
                term1 = bn(2) - psc3*rr5
                term2 = bn(3) - psc5*rr7
