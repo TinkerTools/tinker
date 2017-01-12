@@ -1,9 +1,9 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  2015  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ##################################################
+c     ##  COPYRIGHT (C) 2015  by  Jay William Ponder  ##
+c     ##              All Rights Reserved             ##
+c     ##################################################
 c
 c     #################################################################
 c     ##                                                             ##
@@ -12,11 +12,140 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "epolar" calculates the dipole polarizability interaction
-c     from the induced dipoles times the electric field
+c     "epolar" calculates the polarization energy due to induced
+c     dipole interactions
 c
 c
       subroutine epolar
+      use limits
+      implicit none
+      logical pairwise
+c
+c
+c     choose the method for summing over polarization interactions
+c
+      pairwise = .true.
+      if (pairwise) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar0d
+            else
+               call epolar0c
+            end if
+         else
+            if (use_mlist) then
+               call epolar0b
+            else
+               call epolar0a
+            end if
+         end if
+      else
+         call epolar0x
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar0a  --  Ewald polarization analysis; loop  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar0a" calculates the induced dipole polarization energy
+c     using a double loop, and partitions the energy among atoms
+c
+c
+      subroutine epolar0a
+      implicit none
+c
+c
+c     get the polarization energy from the field-based routine
+c
+      call epolar0x
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar0b  --  Ewald polarization analysis; list  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar0b" calculates the induced dipole polarization energy
+c     using a neighbor list
+c
+c
+      subroutine epolar0b
+      implicit none
+c
+c
+c     get the polarization energy from the field-based routine
+c
+      call epolar0x
+      return
+      end
+c
+c
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine epolar0c  --  Ewald polarization energy via loop  ##
+c     ##                                                               ##
+c     ###################################################################
+c
+c
+c     "epolar0c" calculates the induced dipole polarization energy
+c     using particle mesh Ewald summation and a double loop
+c
+c
+      subroutine epolar0c
+      implicit none
+c
+c
+c     get the polarization energy from the field-based routine
+c
+      call epolar0x
+      return
+      end
+c
+c
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine epolar0d  --  Ewald polarization energy via list  ##
+c     ##                                                               ##
+c     ###################################################################
+c
+c
+c     "epolar0d" calculates the induced dipole polarization energy
+c     using particle mesh Ewald summation and a neighbor list
+c
+c
+      subroutine epolar0d
+      implicit none
+c
+c
+c     get the polarization energy from the field-based routine
+c
+      call epolar0x
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine epolar0x  --  single-loop polarization energy  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "epolar0x" calculates the dipole polarizability interaction
+c     from the induced dipoles times the electric field
+c
+c
+      subroutine epolar0x
       use sizes
       use atoms
       use boxes
