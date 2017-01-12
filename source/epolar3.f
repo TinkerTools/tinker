@@ -97,8 +97,8 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 ukx,uky,ukz
       real*8 dri,drk,uri,urk
-      real*8 qri1,qri2,qri3
-      real*8 qrk1,qrk2,qrk3
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
       real*8 qrri,qrrk
       real*8 duik,quik
       real*8 term1,term2,term3
@@ -256,18 +256,18 @@ c
                drk = dkx*xr + dky*yr + dkz*zr
                uri = uix*xr + uiy*yr + uiz*zr
                urk = ukx*xr + uky*yr + ukz*zr
-               qri1 = qixx*xr + qixy*yr + qixz*zr
-               qri2 = qixy*xr + qiyy*yr + qiyz*zr
-               qri3 = qixz*xr + qiyz*yr + qizz*zr
-               qrk1 = qkxx*xr + qkxy*yr + qkxz*zr
-               qrk2 = qkxy*xr + qkyy*yr + qkyz*zr
-               qrk3 = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = qri1*xr + qri2*yr + qri3*zr
-               qrrk = qrk1*xr + qrk2*yr + qrk3*zr
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
                duik = uix*dkx + dix*ukx + uiy*dky
      &                   + diy*uky + uiz*dkz + diz*ukz
-               quik = qri1*ukx + qri2*uky + qri3*ukz
-     &                   - qrk1*uix - qrk2*uiy - qrk3*uiz
+               quik = qrix*ukx + qriy*uky + qriz*ukz
+     &                   - qrkx*uix - qrky*uiy - qrkz*uiz
 c
 c     calculate intermediate terms for polarization interaction
 c
@@ -434,18 +434,18 @@ c
                      drk = dkx*xr + dky*yr + dkz*zr
                      uri = uix*xr + uiy*yr + uiz*zr
                      urk = ukx*xr + uky*yr + ukz*zr
-                     qri1 = qixx*xr + qixy*yr + qixz*zr
-                     qri2 = qixy*xr + qiyy*yr + qiyz*zr
-                     qri3 = qixz*xr + qiyz*yr + qizz*zr
-                     qrk1 = qkxx*xr + qkxy*yr + qkxz*zr
-                     qrk2 = qkxy*xr + qkyy*yr + qkyz*zr
-                     qrk3 = qkxz*xr + qkyz*yr + qkzz*zr
-                     qrri = qri1*xr + qri2*yr + qri3*zr
-                     qrrk = qrk1*xr + qrk2*yr + qrk3*zr
+                     qrix = qixx*xr + qixy*yr + qixz*zr
+                     qriy = qixy*xr + qiyy*yr + qiyz*zr
+                     qriz = qixz*xr + qiyz*yr + qizz*zr
+                     qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+                     qrky = qkxy*xr + qkyy*yr + qkyz*zr
+                     qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+                     qrri = qrix*xr + qriy*yr + qriz*zr
+                     qrrk = qrkx*xr + qrky*yr + qrkz*zr
                      duik = uix*dkx + dix*ukx + uiy*dky
      &                         + diy*uky + uiz*dkz + diz*ukz
-                     quik = qri1*ukx + qri2*uky + qri3*ukz
-     &                         - qrk1*uix - qrk2*uiy - qrk3*uiz
+                     quik = qrix*ukx + qriy*uky + qriz*ukz
+     &                         - qrkx*uix - qrky*uiy - qrkz*uiz
 c
 c     calculate intermediate terms for polarization interaction
 c
@@ -562,8 +562,8 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 ukx,uky,ukz
       real*8 dri,drk,uri,urk
-      real*8 qri1,qri2,qri3
-      real*8 qrk1,qrk2,qrk3
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
       real*8 qrri,qrrk
       real*8 duik,quik
       real*8 term1,term2,term3
@@ -732,18 +732,18 @@ c
                drk = dkx*xr + dky*yr + dkz*zr
                uri = uix*xr + uiy*yr + uiz*zr
                urk = ukx*xr + uky*yr + ukz*zr
-               qri1 = qixx*xr + qixy*yr + qixz*zr
-               qri2 = qixy*xr + qiyy*yr + qiyz*zr
-               qri3 = qixz*xr + qiyz*yr + qizz*zr
-               qrk1 = qkxx*xr + qkxy*yr + qkxz*zr
-               qrk2 = qkxy*xr + qkyy*yr + qkyz*zr
-               qrk3 = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = qri1*xr + qri2*yr + qri3*zr
-               qrrk = qrk1*xr + qrk2*yr + qrk3*zr
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
                duik = uix*dkx + dix*ukx + uiy*dky
      &                   + diy*uky + uiz*dkz + diz*ukz
-               quik = qri1*ukx + qri2*uky + qri3*ukz
-     &                   - qrk1*uix - qrk2*uiy - qrk3*uiz
+               quik = qrix*ukx + qriy*uky + qriz*ukz
+     &                   - qrkx*uix - qrky*uiy - qrkz*uiz
 c
 c     calculate intermediate terms for polarization interaction
 c
