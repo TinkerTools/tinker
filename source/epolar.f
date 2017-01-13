@@ -245,8 +245,8 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duik = uix*dkx + dix*ukx + uiy*dky
-     &                   + diy*uky + uiz*dkz + diz*ukz
+               duik = dix*ukx + diy*uky + diz*ukz
+     &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
      &                   - qrkx*uix - qrky*uiy - qrkz*uiz
 c
@@ -400,8 +400,8 @@ c
                      qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                      qrri = qrix*xr + qriy*yr + qriz*zr
                      qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                     duik = uix*dkx + dix*ukx + uiy*dky
-     &                         + diy*uky + uiz*dkz + diz*ukz
+                     duik = dix*ukx + diy*uky + diz*ukz
+     &                         + dkx*uix + dky*uiy + dkz*uiz
                      quik = qrix*ukx + qriy*uky + qriz*ukz
      &                         - qrkx*uix - qrky*uiy - qrkz*uiz
 c
@@ -655,8 +655,8 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duik = uix*dkx + dix*ukx + uiy*dky
-     &                   + diy*uky + uiz*dkz + diz*ukz
+               duik = dix*ukx + diy*uky + diz*ukz
+     &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
      &                   - qrkx*uix - qrky*uiy - qrkz*uiz
 c

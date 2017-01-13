@@ -108,6 +108,14 @@ c
       end do
       if (npole .eq. 0)  return
 c
+c     check the sign of multipole components at chiral sites
+c
+      call chkpole
+c
+c     rotate the multipole components into the global frame
+c
+      call rotpole
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -118,14 +126,6 @@ c
      &           //,' Type',14x,'Atom Names',15x,'Distance',
      &              8x,'Energy',/)
       end if
-c
-c     check the sign of multipole components at chiral sites
-c
-      call chkpole
-c
-c     rotate the multipole components into the global frame
-c
-      call rotpole
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -548,6 +548,14 @@ c
          aem(i) = 0.0d0
       end do
 c
+c     check the sign of multipole components at chiral sites
+c
+      call chkpole
+c
+c     rotate the multipole components into the global frame
+c
+      call rotpole
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -558,14 +566,6 @@ c
      &           //,' Type',14x,'Atom Names',15x,'Distance',
      &              8x,'Energy',/)
       end if
-c
-c     check the sign of multipole components at chiral sites
-c
-      call chkpole
-c
-c     rotate the multipole components into the global frame
-c
-      call rotpole
 c
 c     perform dynamic allocation of some local arrays
 c

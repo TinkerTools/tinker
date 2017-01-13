@@ -116,17 +116,6 @@ c
       end do
       if (npole .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. npole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Dipole Polarization Interactions :',
-     &           //,' Type',14x,'Atom Names',15x,'Distance',
-     &              8x,'Energy',/)
-      end if
-c
 c     check the sign of multipole components at chiral sites
 c
       if (.not. use_mpole)  call chkpole
@@ -138,6 +127,17 @@ c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Dipole Polarization Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -264,8 +264,8 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duik = uix*dkx + dix*ukx + uiy*dky
-     &                   + diy*uky + uiz*dkz + diz*ukz
+               duik = dix*ukx + diy*uky + diz*ukz
+     &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
      &                   - qrkx*uix - qrky*uiy - qrkz*uiz
 c
@@ -442,8 +442,8 @@ c
                      qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                      qrri = qrix*xr + qriy*yr + qriz*zr
                      qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                     duik = uix*dkx + dix*ukx + uiy*dky
-     &                         + diy*uky + uiz*dkz + diz*ukz
+                     duik = dix*ukx + diy*uky + diz*ukz
+     &                         + dkx*uix + dky*uiy + dkz*uiz
                      quik = qrix*ukx + qriy*uky + qriz*ukz
      &                         - qrkx*uix - qrky*uiy - qrkz*uiz
 c
@@ -581,17 +581,6 @@ c
       end do
       if (npole .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. npole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Dipole Polarization Interactions :',
-     &           //,' Type',14x,'Atom Names',15x,'Distance',
-     &              8x,'Energy',/)
-      end if
-c
 c     check the sign of multipole components at chiral sites
 c
       if (.not. use_mpole)  call chkpole
@@ -603,6 +592,17 @@ c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Dipole Polarization Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -740,8 +740,8 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duik = uix*dkx + dix*ukx + uiy*dky
-     &                   + diy*uky + uiz*dkz + diz*ukz
+               duik = dix*ukx + diy*uky + diz*ukz
+     &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
      &                   - qrkx*uix - qrky*uiy - qrkz*uiz
 c
@@ -918,10 +918,6 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
-c     set the energy conversion factor
-c
-      f = -0.5d0 * electric / dielec
-c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -931,6 +927,10 @@ c
    10    format (/,' Individual Dipole Polarization Interactions :',
      &           //,' Type',9x,'Atom Name',24x,'Alpha',8x,'Energy',/)
       end if
+c
+c     set the energy conversion factor
+c
+      f = -0.5d0 * electric / dielec
 c
 c     OpenMP directives for the major loop structure
 c
