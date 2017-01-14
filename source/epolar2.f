@@ -489,12 +489,8 @@ c
                qrkx = qkxx*xr + qkxy*yr + qkxz*zr
                qrky = qkxy*xr + qkyy*yr + qkyz*zr
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = (qixx*xr+2.0d0*qixy*yr)*xr
-     &                   + (qiyy*yr+2.0d0*qiyz*zr)*yr
-     &                   + (qizz*zr+2.0d0*qixz*xr)*zr
-               qrrk = (qkxx*xr+2.0d0*qkxy*yr)*xr
-     &                   + (qkyy*yr+2.0d0*qkyz*zr)*yr
-     &                   + (qkzz*zr+2.0d0*qkxz*xr)*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
                duri = uix*xr + uiy*yr + uiz*zr
                durk = ukx*xr + uky*yr + ukz*zr
                puri = uixp*xr + uiyp*yr + uizp*zr
@@ -953,12 +949,8 @@ c
                qrkx = qkxx*xr + qkxy*yr + qkxz*zr
                qrky = qkxy*xr + qkyy*yr + qkyz*zr
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = (qixx*xr+2.0d0*qixy*yr)*xr
-     &                   + (qiyy*yr+2.0d0*qiyz*zr)*yr
-     &                   + (qizz*zr+2.0d0*qixz*xr)*zr
-               qrrk = (qkxx*xr+2.0d0*qkxy*yr)*xr
-     &                   + (qkyy*yr+2.0d0*qkyz*zr)*yr
-     &                   + (qkzz*zr+2.0d0*qkxz*xr)*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
                duri = uix*xr + uiy*yr + uiz*zr
                durk = ukx*xr + uky*yr + ukz*zr
                puri = uixp*xr + uiyp*yr + uizp*zr
@@ -1609,12 +1601,8 @@ c
                qrkx = qkxx*xr + qkxy*yr + qkxz*zr
                qrky = qkxy*xr + qkyy*yr + qkyz*zr
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = (qixx*xr+2.0d0*qixy*yr)*xr
-     &                   + (qiyy*yr+2.0d0*qiyz*zr)*yr
-     &                   + (qizz*zr+2.0d0*qixz*xr)*zr
-               qrrk = (qkxx*xr+2.0d0*qkxy*yr)*xr
-     &                   + (qkyy*yr+2.0d0*qkyz*zr)*yr
-     &                   + (qkzz*zr+2.0d0*qkxz*xr)*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
                duri = uix*xr + uiy*yr + uiz*zr
                durk = ukx*xr + uky*yr + ukz*zr
                puri = uixp*xr + uiyp*yr + uizp*zr

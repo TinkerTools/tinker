@@ -504,6 +504,19 @@ c
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. politer)  done = .true.
+c
+c     apply a "peek" iteration to the mutual induced dipoles
+c
+            if (done) then
+               do i = 1, npole
+                  if (douind(ipole(i))) then
+                     do j = 1, 3
+                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
+                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
+                     end do
+                  end if
+               end do
+            end if
          end do
 c
 c     perform deallocation of some local arrays
@@ -3785,6 +3798,21 @@ c
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. politer)  done = .true.
+c
+c     apply a "peek" iteration to the mutual induced dipoles
+c
+            if (done) then
+               do i = 1, npole
+                  if (douind(ipole(i))) then
+                     do j = 1, 3
+                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
+                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
+                        uinds(j,i) = uinds(j,i) + poli(i)*rsds(j,i)
+                        uinps(j,i) = uinps(j,i) + poli(i)*rsdps(j,i)
+                     end do
+                  end if
+               end do
+            end if
          end do
 c
 c     perform deallocation of some local arrays
@@ -5045,6 +5073,21 @@ c
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
             if (iter .ge. politer)  done = .true.
+c
+c     apply a "peek" iteration to the mutual induced dipoles
+c
+            if (done) then
+               do i = 1, npole
+                  if (douind(ipole(i))) then
+                     do j = 1, 3
+                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
+                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
+                        uinds(j,i) = uinds(j,i) + poli(i)*rsds(j,i)
+                        uinps(j,i) = uinps(j,i) + poli(i)*rsdps(j,i)
+                     end do
+                  end if
+               end do
+            end if
          end do
 c
 c     perform deallocation of some local arrays
