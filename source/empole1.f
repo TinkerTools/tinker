@@ -17,14 +17,8 @@ c     energy and derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
-      use sizes
-      use deriv
-      use energi
       use limits
-      use mpole
-      use potent
       implicit none
-      integer i,j,ii
 c
 c
 c     choose the method for summing over multipole interactions
@@ -41,27 +35,6 @@ c
          else
             call empole1a
          end if
-      end if
-c
-c     zero out energy and derivative terms which are not in use
-c
-      if (.not. use_mpole) then
-         em = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            do j = 1, 3
-               dem(j,ii) = 0.0d0
-            end do
-         end do
-      end if
-      if (.not. use_polar) then
-         ep = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            do j = 1, 3
-               dep(j,ii) = 0.0d0
-            end do
-         end do
       end if
       return
       end
@@ -101,7 +74,7 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       integer iax,iay,iaz
-      real*8 e,f,fgrp
+      real*8 e,de,f,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xix,yix,zix
@@ -118,10 +91,10 @@ c
       real*8 dikx,diky,dikz
       real*8 dirx,diry,dirz
       real*8 dkrx,dkry,dkrz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 qirxr,qiryr,qirzr
-      real*8 qkrxr,qkryr,qkrzr
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 qrixr,qriyr,qrizr
+      real*8 qrkxr,qrkyr,qrkzr
       real*8 qrrx,qrry,qrrz
       real*8 qikrx,qikry,qikrz
       real*8 qkirx,qkiry,qkirz
@@ -132,10 +105,14 @@ c
       real*8 diqkxr,diqkyr,diqkzr
       real*8 dkqixr,dkqiyr,dkqizr
       real*8 dqiqkx,dqiqky,dqiqkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5,term6
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
-      real*8 sc(9),ge(5),gf(7)
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8, allocatable :: mscale(:)
@@ -256,7 +233,7 @@ c
                rr9 = 7.0d0 * rr7 / r2
                rr11 = 9.0d0 * rr9 / r2
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
                dikx = diy*dkz - diz*dky
                diky = diz*dkx - dix*dkz
@@ -267,27 +244,35 @@ c
                dkrx = dky*zr - dkz*yr
                dkry = dkz*xr - dkx*zr
                dkrz = dkx*yr - dky*xr
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
-               qirxr = qirz*yr - qiry*zr
-               qiryr = qirx*zr - qirz*xr
-               qirzr = qiry*xr - qirx*yr
-               qkrxr = qkrz*yr - qkry*zr
-               qkryr = qkrx*zr - qkrz*xr
-               qkrzr = qkry*xr - qkrx*yr
-               qrrx = qkry*qirz - qkrz*qiry
-               qrry = qkrz*qirx - qkrx*qirz
-               qrrz = qkrx*qiry - qkry*qirx
-               qikrx = qixx*qkrx + qixy*qkry + qixz*qkrz
-               qikry = qixy*qkrx + qiyy*qkry + qiyz*qkrz
-               qikrz = qixz*qkrx + qiyz*qkry + qizz*qkrz
-               qkirx = qkxx*qirx + qkxy*qiry + qkxz*qirz
-               qkiry = qkxy*qirx + qkyy*qiry + qkyz*qirz
-               qkirz = qkxz*qirx + qkyz*qiry + qkzz*qirz
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               qrixr = qriz*yr - qriy*zr
+               qriyr = qrix*zr - qriz*xr
+               qrizr = qriy*xr - qrix*yr
+               qrkxr = qrkz*yr - qrky*zr
+               qrkyr = qrkx*zr - qrkz*xr
+               qrkzr = qrky*xr - qrkx*yr
+               qrrx = qrky*qriz - qrkz*qriy
+               qrry = qrkz*qrix - qrkx*qriz
+               qrrz = qrkx*qriy - qrky*qrix
+               qikrx = qixx*qrkx + qixy*qrky + qixz*qrkz
+               qikry = qixy*qrkx + qiyy*qrky + qiyz*qrkz
+               qikrz = qixz*qrkx + qiyz*qrky + qizz*qrkz
+               qkirx = qkxx*qrix + qkxy*qriy + qkxz*qriz
+               qkiry = qkxy*qrix + qkyy*qriy + qkyz*qriz
+               qkirz = qkxz*qrix + qkyz*qriy + qkzz*qriz
                qikrxr = qikrz*yr - qikry*zr
                qikryr = qikrx*zr - qikrz*xr
                qikrzr = qikry*xr - qikrx*yr
@@ -300,99 +285,78 @@ c
                dkqix = dkx*qixx + dky*qixy + dkz*qixz
                dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
                dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                diqkxr = diqkz*yr - diqky*zr
                diqkyr = diqkx*zr - diqkz*xr
                diqkzr = diqky*xr - diqkx*yr
                dkqixr = dkqiz*yr - dkqiy*zr
                dkqiyr = dkqix*zr - dkqiz*xr
                dkqizr = dkqiy*xr - dkqix*yr
-               dqiqkx = diy*qkrz - diz*qkry + dky*qirz - dkz*qiry
+               dqiqkx = diy*qrkz - diz*qrky + dky*qriz - dkz*qriy
      &                     - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
      &                             -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
-               dqiqky = diz*qkrx - dix*qkrz + dkz*qirx - dkx*qirz
+               dqiqky = diz*qrkx - dix*qrkz + dkz*qrix - dkx*qriz
      &                     - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
      &                             -qixx*qkxz-qixy*qkyz-qixz*qkzz)
-               dqiqkz = dix*qkry - diy*qkrx + dkx*qiry - dky*qirx
+               dqiqkz = dix*qrky - diy*qrkx + dkx*qriy - dky*qrix
      &                     - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                             -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole energy
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
-               if (ii .eq. kk)  e = 0.5d0 * e
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
                em = em + e
-c
-c     increment the total intramolecular energy
-c
                if (molcule(ii) .ne. molcule(kk))
      &            einter = einter + e
 c
-c     construct auxiliary variables for force and torque
+c     calculate intermediate terms for force and torque
 c
-               gf(1) = rr3*ge(1) + rr5*ge(2) + rr7*ge(3)
-     &                    + rr9*ge(4) + rr11*ge(5)
-               gf(2) = -ck*rr3 + sc(3)*rr5 - sc(5)*rr7
-               gf(3) = ci*rr3 + sc(2)*rr5 + sc(4)*rr7
-               gf(4) = 2.0d0 * rr5
-               gf(5) = 2.0d0 * (-ck*rr5+sc(3)*rr7-sc(5)*rr9)
-               gf(6) = 2.0d0 * (-ci*rr5-sc(2)*rr7-sc(4)*rr9)
-               gf(7) = 4.0d0 * rr7
+               de = term1*rr3 + term2*rr5 + term3*rr7
+     &                 + term4*rr9 + term5*rr11
+               term1 = -ck*rr3 + drk*rr5 - qrrk*rr7
+               term2 = ci*rr3 + dri*rr5 + qrri*rr7
+               term3 = 2.0d0 * rr5
+               term4 = 2.0d0 * (-ck*rr5+drk*rr7-qrrk*rr9)
+               term5 = 2.0d0 * (-ci*rr5-dri*rr7-qrri*rr9)
+               term6 = 4.0d0 * rr7
 c
-c     compute the force components for both sites
+c     compute the force components for this interaction
 c
-               frcx = gf(1)*xr + gf(2)*dix + gf(3)*dkx
-     &                   + gf(4)*(diqkx-dkqix) + gf(5)*qirx
-     &                   + gf(6)*qkrx + gf(7)*(qikrx+qkirx)
-               frcy = gf(1)*yr + gf(2)*diy + gf(3)*dky
-     &                   + gf(4)*(diqky-dkqiy) + gf(5)*qiry
-     &                   + gf(6)*qkry + gf(7)*(qikry+qkiry)
-               frcz = gf(1)*zr + gf(2)*diz + gf(3)*dkz
-     &                   + gf(4)*(diqkz-dkqiz) + gf(5)*qirz
-     &                   + gf(6)*qkrz + gf(7)*(qikrz+qkirz)
+               frcx = de*xr + term1*dix + term2*dkx
+     &                   + term3*(diqkx-dkqix) + term4*qrix
+     &                   + term5*qrkx + term6*(qikrx+qkirx)
+               frcy = de*yr + term1*diy + term2*dky
+     &                   + term3*(diqky-dkqiy) + term4*qriy
+     &                   + term5*qrky + term6*(qikry+qkiry)
+               frcz = de*zr + term1*diz + term2*dkz
+     &                   + term3*(diqkz-dkqiz) + term4*qriz
+     &                   + term5*qrkz + term6*(qikrz+qkirz)
 c
-c     compute the torque components for both sites
+c     compute the torque components for this interaction
 c
-               ttmi(1) = -rr3*dikx + gf(2)*dirx
-     &                      + gf(4)*(dqiqkx+dkqixr)
-     &                      - gf(5)*qirxr - gf(7)*(qikrxr+qrrx)
-               ttmi(2) = -rr3*diky + gf(2)*diry
-     &                      + gf(4)*(dqiqky+dkqiyr)
-     &                      - gf(5)*qiryr - gf(7)*(qikryr+qrry)
-               ttmi(3) = -rr3*dikz + gf(2)*dirz
-     &                      + gf(4)*(dqiqkz+dkqizr)
-     &                      - gf(5)*qirzr - gf(7)*(qikrzr+qrrz)
-               ttmk(1) = rr3*dikx + gf(3)*dkrx
-     &                      - gf(4)*(dqiqkx+diqkxr)
-     &                      - gf(6)*qkrxr - gf(7)*(qkirxr-qrrx)
-               ttmk(2) = rr3*diky + gf(3)*dkry
-     &                      - gf(4)*(dqiqky+diqkyr)
-     &                      - gf(6)*qkryr - gf(7)*(qkiryr-qrry)
-               ttmk(3) = rr3*dikz + gf(3)*dkrz
-     &                      - gf(4)*(dqiqkz+diqkzr)
-     &                      - gf(6)*qkrzr - gf(7)*(qkirzr-qrrz)
+               ttmi(1) = -rr3*dikx + term1*dirx + term3*(dqiqkx+dkqixr)
+     &                      - term4*qrixr - term6*(qikrxr+qrrx)
+               ttmi(2) = -rr3*diky + term1*diry + term3*(dqiqky+dkqiyr)
+     &                      - term4*qriyr - term6*(qikryr+qrry)
+               ttmi(3) = -rr3*dikz + term1*dirz + term3*(dqiqkz+dkqizr)
+     &                      - term4*qrizr - term6*(qikrzr+qrrz)
+               ttmk(1) = rr3*dikx + term2*dkrx - term3*(dqiqkx+diqkxr)
+     &                      - term5*qrkxr - term6*(qkirxr-qrrx)
+               ttmk(2) = rr3*diky + term2*dkry - term3*(dqiqky+diqkyr)
+     &                      - term5*qrkyr - term6*(qkiryr-qrry)
+               ttmk(3) = rr3*dikz + term2*dkrz - term3*(dqiqkz+diqkzr)
+     &                      - term5*qrkzr - term6*(qkirzr-qrrz)
 c
 c     force and torque components scaled by group membership
 c
@@ -543,7 +507,7 @@ c
                rr9 = 7.0d0 * rr7 / r2
                rr11 = 9.0d0 * rr9 / r2
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
                dikx = diy*dkz - diz*dky
                diky = diz*dkx - dix*dkz
@@ -554,27 +518,35 @@ c
                dkrx = dky*zr - dkz*yr
                dkry = dkz*xr - dkx*zr
                dkrz = dkx*yr - dky*xr
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
-               qirxr = qirz*yr - qiry*zr
-               qiryr = qirx*zr - qirz*xr
-               qirzr = qiry*xr - qirx*yr
-               qkrxr = qkrz*yr - qkry*zr
-               qkryr = qkrx*zr - qkrz*xr
-               qkrzr = qkry*xr - qkrx*yr
-               qrrx = qkry*qirz - qkrz*qiry
-               qrry = qkrz*qirx - qkrx*qirz
-               qrrz = qkrx*qiry - qkry*qirx
-               qikrx = qixx*qkrx + qixy*qkry + qixz*qkrz
-               qikry = qixy*qkrx + qiyy*qkry + qiyz*qkrz
-               qikrz = qixz*qkrx + qiyz*qkry + qizz*qkrz
-               qkirx = qkxx*qirx + qkxy*qiry + qkxz*qirz
-               qkiry = qkxy*qirx + qkyy*qiry + qkyz*qirz
-               qkirz = qkxz*qirx + qkyz*qiry + qkzz*qirz
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               qrixr = qriz*yr - qriy*zr
+               qriyr = qrix*zr - qriz*xr
+               qrizr = qriy*xr - qrix*yr
+               qrkxr = qrkz*yr - qrky*zr
+               qrkyr = qrkx*zr - qrkz*xr
+               qrkzr = qrky*xr - qrkx*yr
+               qrrx = qrky*qriz - qrkz*qriy
+               qrry = qrkz*qrix - qrkx*qriz
+               qrrz = qrkx*qriy - qrky*qrix
+               qikrx = qixx*qrkx + qixy*qrky + qixz*qrkz
+               qikry = qixy*qrkx + qiyy*qrky + qiyz*qrkz
+               qikrz = qixz*qrkx + qiyz*qrky + qizz*qrkz
+               qkirx = qkxx*qrix + qkxy*qriy + qkxz*qriz
+               qkiry = qkxy*qrix + qkyy*qriy + qkyz*qriz
+               qkirz = qkxz*qrix + qkyz*qriy + qkzz*qriz
                qikrxr = qikrz*yr - qikry*zr
                qikryr = qikrx*zr - qikrz*xr
                qikrzr = qikry*xr - qikrx*yr
@@ -587,98 +559,78 @@ c
                dkqix = dkx*qixx + dky*qixy + dkz*qixz
                dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
                dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                diqkxr = diqkz*yr - diqky*zr
                diqkyr = diqkx*zr - diqkz*xr
                diqkzr = diqky*xr - diqkx*yr
                dkqixr = dkqiz*yr - dkqiy*zr
                dkqiyr = dkqix*zr - dkqiz*xr
                dkqizr = dkqiy*xr - dkqix*yr
-               dqiqkx = diy*qkrz - diz*qkry + dky*qirz - dkz*qiry
+               dqiqkx = diy*qrkz - diz*qrky + dky*qriz - dkz*qriy
      &                     - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
      &                             -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
-               dqiqky = diz*qkrx - dix*qkrz + dkz*qirx - dkx*qirz
+               dqiqky = diz*qrkx - dix*qrkz + dkz*qrix - dkx*qriz
      &                     - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
      &                             -qixx*qkxz-qixy*qkyz-qixz*qkzz)
-               dqiqkz = dix*qkry - diy*qkrx + dkx*qiry - dky*qirx
+               dqiqkz = dix*qrky - diy*qrkx + dkx*qriy - dky*qrix
      &                     - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                             -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole energy
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
                if (ii .eq. kk)  e = 0.5d0 * e
                em = em + e
-c
-c     increment the total intramolecular energy
-c
                einter = einter + e
 c
-c     construct auxiliary variables for force and torque
+c     calculate intermediate terms for force and torque
 c
-               gf(1) = rr3*ge(1) + rr5*ge(2) + rr7*ge(3)
-     &                    + rr9*ge(4) + rr11*ge(5)
-               gf(2) = -ck*rr3 + sc(3)*rr5 - sc(5)*rr7
-               gf(3) = ci*rr3 + sc(2)*rr5 + sc(4)*rr7
-               gf(4) = 2.0d0 * rr5
-               gf(5) = 2.0d0 * (-ck*rr5+sc(3)*rr7-sc(5)*rr9)
-               gf(6) = 2.0d0 * (-ci*rr5-sc(2)*rr7-sc(4)*rr9)
-               gf(7) = 4.0d0 * rr7
+               de = term1*rr3 + term2*rr5 + term3*rr7
+     &                 + term4*rr9 + term5*rr11
+               term1 = -ck*rr3 + drk*rr5 - qrrk*rr7
+               term2 = ci*rr3 + dri*rr5 + qrri*rr7
+               term3 = 2.0d0 * rr5
+               term4 = 2.0d0 * (-ck*rr5+drk*rr7-qrrk*rr9)
+               term5 = 2.0d0 * (-ci*rr5-dri*rr7-qrri*rr9)
+               term6 = 4.0d0 * rr7
 c
-c     compute the force components for both sites
+c     compute the force components for this interaction
 c
-               frcx = gf(1)*xr + gf(2)*dix + gf(3)*dkx
-     &                   + gf(4)*(diqkx-dkqix) + gf(5)*qirx
-     &                   + gf(6)*qkrx + gf(7)*(qikrx+qkirx)
-               frcy = gf(1)*yr + gf(2)*diy + gf(3)*dky
-     &                   + gf(4)*(diqky-dkqiy) + gf(5)*qiry
-     &                   + gf(6)*qkry + gf(7)*(qikry+qkiry)
-               frcz = gf(1)*zr + gf(2)*diz + gf(3)*dkz
-     &                   + gf(4)*(diqkz-dkqiz) + gf(5)*qirz
-     &                   + gf(6)*qkrz + gf(7)*(qikrz+qkirz)
+               frcx = de*xr + term1*dix + term2*dkx
+     &                   + term3*(diqkx-dkqix) + term4*qrix
+     &                   + term5*qrkx + term6*(qikrx+qkirx)
+               frcy = de*yr + term1*diy + term2*dky
+     &                   + term3*(diqky-dkqiy) + term4*qriy
+     &                   + term5*qrky + term6*(qikry+qkiry)
+               frcz = de*zr + term1*diz + term2*dkz
+     &                   + term3*(diqkz-dkqiz) + term4*qriz
+     &                   + term5*qrkz + term6*(qikrz+qkirz)
 c
-c     compute the torque components for both sites
+c     compute the torque components for this interaction
 c
-               ttmi(1) = -rr3*dikx + gf(2)*dirx
-     &                      + gf(4)*(dqiqkx+dkqixr)
-     &                      - gf(5)*qirxr - gf(7)*(qikrxr+qrrx)
-               ttmi(2) = -rr3*diky + gf(2)*diry
-     &                      + gf(4)*(dqiqky+dkqiyr)
-     &                      - gf(5)*qiryr - gf(7)*(qikryr+qrry)
-               ttmi(3) = -rr3*dikz + gf(2)*dirz
-     &                      + gf(4)*(dqiqkz+dkqizr)
-     &                      - gf(5)*qirzr - gf(7)*(qikrzr+qrrz)
-               ttmk(1) = rr3*dikx + gf(3)*dkrx
-     &                      - gf(4)*(dqiqkx+diqkxr)
-     &                      - gf(6)*qkrxr - gf(7)*(qkirxr-qrrx)
-               ttmk(2) = rr3*diky + gf(3)*dkry
-     &                      - gf(4)*(dqiqky+diqkyr)
-     &                      - gf(6)*qkryr - gf(7)*(qkiryr-qrry)
-               ttmk(3) = rr3*dikz + gf(3)*dkrz
-     &                      - gf(4)*(dqiqkz+diqkzr)
-     &                      - gf(6)*qkrzr - gf(7)*(qkirzr-qrrz)
+               ttmi(1) = -rr3*dikx + term1*dirx + term3*(dqiqkx+dkqixr)
+     &                      - term4*qrixr - term6*(qikrxr+qrrx)
+               ttmi(2) = -rr3*diky + term1*diry + term3*(dqiqky+dkqiyr)
+     &                      - term4*qriyr - term6*(qikryr+qrry)
+               ttmi(3) = -rr3*dikz + term1*dirz + term3*(dqiqkz+dkqizr)
+     &                      - term4*qrizr - term6*(qikrzr+qrrz)
+               ttmk(1) = rr3*dikx + term2*dkrx - term3*(dqiqkx+diqkxr)
+     &                      - term5*qrkxr - term6*(qkirxr-qrrx)
+               ttmk(2) = rr3*diky + term2*dkry - term3*(dqiqky+diqkyr)
+     &                      - term5*qrkyr - term6*(qkiryr-qrry)
+               ttmk(3) = rr3*dikz + term2*dkrz - term3*(dqiqkz+diqkzr)
+     &                      - term5*qrkzr - term6*(qkirzr-qrrz)
 c
 c     force and torque scaled for self-interactions and groups
 c
@@ -837,7 +789,7 @@ c
       integer ix,iy,iz
       integer kx,ky,kz
       integer iax,iay,iaz
-      real*8 e,f,fgrp
+      real*8 e,de,f,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xix,yix,zix
@@ -854,10 +806,10 @@ c
       real*8 dikx,diky,dikz
       real*8 dirx,diry,dirz
       real*8 dkrx,dkry,dkrz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 qirxr,qiryr,qirzr
-      real*8 qkrxr,qkryr,qkrzr
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 qrixr,qriyr,qrizr
+      real*8 qrkxr,qrkyr,qrkzr
       real*8 qrrx,qrry,qrrz
       real*8 qikrx,qikry,qikrz
       real*8 qkirx,qkiry,qkirz
@@ -868,10 +820,14 @@ c
       real*8 diqkxr,diqkyr,diqkzr
       real*8 dkqixr,dkqiyr,dkqizr
       real*8 dqiqkx,dqiqky,dqiqkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5,term6
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
-      real*8 sc(9),ge(5),gf(7)
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8, allocatable :: mscale(:)
@@ -1002,7 +958,7 @@ c
                rr9 = 7.0d0 * rr7 / r2
                rr11 = 9.0d0 * rr9 / r2
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
                dikx = diy*dkz - diz*dky
                diky = diz*dkx - dix*dkz
@@ -1013,27 +969,35 @@ c
                dkrx = dky*zr - dkz*yr
                dkry = dkz*xr - dkx*zr
                dkrz = dkx*yr - dky*xr
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
-               qirxr = qirz*yr - qiry*zr
-               qiryr = qirx*zr - qirz*xr
-               qirzr = qiry*xr - qirx*yr
-               qkrxr = qkrz*yr - qkry*zr
-               qkryr = qkrx*zr - qkrz*xr
-               qkrzr = qkry*xr - qkrx*yr
-               qrrx = qkry*qirz - qkrz*qiry
-               qrry = qkrz*qirx - qkrx*qirz
-               qrrz = qkrx*qiry - qkry*qirx
-               qikrx = qixx*qkrx + qixy*qkry + qixz*qkrz
-               qikry = qixy*qkrx + qiyy*qkry + qiyz*qkrz
-               qikrz = qixz*qkrx + qiyz*qkry + qizz*qkrz
-               qkirx = qkxx*qirx + qkxy*qiry + qkxz*qirz
-               qkiry = qkxy*qirx + qkyy*qiry + qkyz*qirz
-               qkirz = qkxz*qirx + qkyz*qiry + qkzz*qirz
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               qrixr = qriz*yr - qriy*zr
+               qriyr = qrix*zr - qriz*xr
+               qrizr = qriy*xr - qrix*yr
+               qrkxr = qrkz*yr - qrky*zr
+               qrkyr = qrkx*zr - qrkz*xr
+               qrkzr = qrky*xr - qrkx*yr
+               qrrx = qrky*qriz - qrkz*qriy
+               qrry = qrkz*qrix - qrkx*qriz
+               qrrz = qrkx*qriy - qrky*qrix
+               qikrx = qixx*qrkx + qixy*qrky + qixz*qrkz
+               qikry = qixy*qrkx + qiyy*qrky + qiyz*qrkz
+               qikrz = qixz*qrkx + qiyz*qrky + qizz*qrkz
+               qkirx = qkxx*qrix + qkxy*qriy + qkxz*qriz
+               qkiry = qkxy*qrix + qkyy*qriy + qkyz*qriz
+               qkirz = qkxz*qrix + qkyz*qriy + qkzz*qriz
                qikrxr = qikrz*yr - qikry*zr
                qikryr = qikrx*zr - qikrz*xr
                qikrzr = qikry*xr - qikrx*yr
@@ -1046,99 +1010,79 @@ c
                dkqix = dkx*qixx + dky*qixy + dkz*qixz
                dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
                dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                diqkxr = diqkz*yr - diqky*zr
                diqkyr = diqkx*zr - diqkz*xr
                diqkzr = diqky*xr - diqkx*yr
                dkqixr = dkqiz*yr - dkqiy*zr
                dkqiyr = dkqix*zr - dkqiz*xr
                dkqizr = dkqiy*xr - dkqix*yr
-               dqiqkx = diy*qkrz - diz*qkry + dky*qirz - dkz*qiry
+               dqiqkx = diy*qrkz - diz*qrky + dky*qriz - dkz*qriy
      &                     - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
      &                             -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
-               dqiqky = diz*qkrx - dix*qkrz + dkz*qirx - dkx*qirz
+               dqiqky = diz*qrkx - dix*qrkz + dkz*qrix - dkx*qriz
      &                     - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
      &                             -qixx*qkxz-qixy*qkyz-qixz*qkzz)
-               dqiqkz = dix*qkry - diy*qkrx + dkx*qiry - dky*qirx
+               dqiqkz = dix*qrky - diy*qrkx + dkx*qriy - dky*qrix
      &                     - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                             -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole energy
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
                if (use_group)  e = e * fgrp
                em = em + e
-c
-c     increment the total intermolecular energy
-c
                if (molcule(ii) .ne. molcule(kk))
      &            einter = einter + e
 c
-c     intermediate variables for the permanent multipoles
+c     calculate intermediate terms for force and torque
 c
-               gf(1) = rr3*ge(1) + rr5*ge(2) + rr7*ge(3)
-     &                    + rr9*ge(4) + rr11*ge(5)
-               gf(2) = -ck*rr3 + sc(3)*rr5 - sc(5)*rr7
-               gf(3) = ci*rr3 + sc(2)*rr5 + sc(4)*rr7
-               gf(4) = 2.0d0 * rr5
-               gf(5) = 2.0d0 * (-ck*rr5+sc(3)*rr7-sc(5)*rr9)
-               gf(6) = 2.0d0 * (-ci*rr5-sc(2)*rr7-sc(4)*rr9)
-               gf(7) = 4.0d0 * rr7
+               de = term1*rr3 + term2*rr5 + term3*rr7
+     &                 + term4*rr9 + term5*rr11
+               term1 = -ck*rr3 + drk*rr5 - qrrk*rr7
+               term2 = ci*rr3 + dri*rr5 + qrri*rr7
+               term3 = 2.0d0 * rr5
+               term4 = 2.0d0 * (-ck*rr5+drk*rr7-qrrk*rr9)
+               term5 = 2.0d0 * (-ci*rr5-dri*rr7-qrri*rr9)
+               term6 = 4.0d0 * rr7
 c
-c     get the permanent multipole force components
+c     compute the force components for this interaction
 c
-               frcx = gf(1)*xr + gf(2)*dix + gf(3)*dkx
-     &                   + gf(4)*(diqkx-dkqix) + gf(5)*qirx
-     &                   + gf(6)*qkrx + gf(7)*(qikrx+qkirx)
-               frcy = gf(1)*yr + gf(2)*diy + gf(3)*dky
-     &                   + gf(4)*(diqky-dkqiy) + gf(5)*qiry
-     &                   + gf(6)*qkry + gf(7)*(qikry+qkiry)
-               frcz = gf(1)*zr + gf(2)*diz + gf(3)*dkz
-     &                   + gf(4)*(diqkz-dkqiz) + gf(5)*qirz
-     &                   + gf(6)*qkrz + gf(7)*(qikrz+qkirz)
+               frcx = de*xr + term1*dix + term2*dkx
+     &                   + term3*(diqkx-dkqix) + term4*qrix
+     &                   + term5*qrkx + term6*(qikrx+qkirx)
+               frcy = de*yr + term1*diy + term2*dky
+     &                   + term3*(diqky-dkqiy) + term4*qriy
+     &                   + term5*qrky + term6*(qikry+qkiry)
+               frcz = de*zr + term1*diz + term2*dkz
+     &                   + term3*(diqkz-dkqiz) + term4*qriz
+     &                   + term5*qrkz + term6*(qikrz+qkirz)
 c
-c     get the permanent multipole torque components
+c     compute the torque components for this interaction
 c
-               ttmi(1) = -rr3*dikx + gf(2)*dirx - gf(5)*qirxr
-     &                      + gf(4)*(dqiqkx+dkqixr)
-     &                      - gf(7)*(qikrxr+qrrx)
-               ttmi(2) = -rr3*diky + gf(2)*diry - gf(5)*qiryr
-     &                      + gf(4)*(dqiqky+dkqiyr)
-     &                      - gf(7)*(qikryr+qrry)
-               ttmi(3) = -rr3*dikz + gf(2)*dirz - gf(5)*qirzr
-     &                      + gf(4)*(dqiqkz+dkqizr)
-     &                      - gf(7)*(qikrzr+qrrz)
-               ttmk(1) = rr3*dikx + gf(3)*dkrx - gf(6)*qkrxr
-     &                      - gf(4)*(dqiqkx+diqkxr)
-     &                      - gf(7)*(qkirxr-qrrx)
-               ttmk(2) = rr3*diky + gf(3)*dkry - gf(6)*qkryr
-     &                      - gf(4)*(dqiqky+diqkyr)
-     &                      - gf(7)*(qkiryr-qrry)
-               ttmk(3) = rr3*dikz + gf(3)*dkrz - gf(6)*qkrzr
-     &                      - gf(4)*(dqiqkz+diqkzr)
-     &                      - gf(7)*(qkirzr-qrrz)
+               ttmi(1) = -rr3*dikx + term1*dirx + term3*(dqiqkx+dkqixr)
+     &                      - term4*qrixr - term6*(qikrxr+qrrx)
+               ttmi(2) = -rr3*diky + term1*diry + term3*(dqiqky+dkqiyr)
+     &                      - term4*qriyr - term6*(qikryr+qrry)
+               ttmi(3) = -rr3*dikz + term1*dirz + term3*(dqiqkz+dkqizr)
+     &                      - term4*qrizr - term6*(qikrzr+qrrz)
+               ttmk(1) = rr3*dikx + term2*dkrx - term3*(dqiqkx+diqkxr)
+     &                      - term5*qrkxr - term6*(qkirxr-qrrx)
+               ttmk(2) = rr3*diky + term2*dkry - term3*(dqiqky+diqkyr)
+     &                      - term5*qrkyr - term6*(qkiryr-qrry)
+               ttmk(3) = rr3*dikz + term2*dkrz - term3*(dqiqkz+diqkzr)
+     &                      - term5*qrkzr - term6*(qkirzr-qrrz)
 c
 c     increment force-based gradient and torque on first site
 c
@@ -1446,7 +1390,8 @@ c
       integer i,j,k
       integer ii,kk,jcell
       integer iax,iay,iaz
-      real*8 e,f,bfac,erfc
+      real*8 e,de,f
+      real*8 bfac,erfc
       real*8 eintra,efull
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
@@ -1467,10 +1412,10 @@ c
       real*8 dikx,diky,dikz
       real*8 dirx,diry,dirz
       real*8 dkrx,dkry,dkrz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 qirxr,qiryr,qirzr
-      real*8 qkrxr,qkryr,qkrzr
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 qrixr,qriyr,qrizr
+      real*8 qrkxr,qrkyr,qrkzr
       real*8 qrrx,qrry,qrrz
       real*8 qikrx,qikry,qikrz
       real*8 qkirx,qkiry,qkirz
@@ -1481,10 +1426,14 @@ c
       real*8 diqkxr,diqkyr,diqkzr
       real*8 dkqixr,dkqiyr,dkqizr
       real*8 dqiqkx,dqiqky,dqiqkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5,term6
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
-      real*8 sc(9),ge(5),gf(7)
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 bn(0:5)
@@ -1596,7 +1545,7 @@ c
                   bn(j) = f * bn(j)
                end do
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
                dikx = diy*dkz - diz*dky
                diky = diz*dkx - dix*dkz
@@ -1607,27 +1556,35 @@ c
                dkrx = dky*zr - dkz*yr
                dkry = dkz*xr - dkx*zr
                dkrz = dkx*yr - dky*xr
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
-               qirxr = qirz*yr - qiry*zr
-               qiryr = qirx*zr - qirz*xr
-               qirzr = qiry*xr - qirx*yr
-               qkrxr = qkrz*yr - qkry*zr
-               qkryr = qkrx*zr - qkrz*xr
-               qkrzr = qkry*xr - qkrx*yr
-               qrrx = qkry*qirz - qkrz*qiry
-               qrry = qkrz*qirx - qkrx*qirz
-               qrrz = qkrx*qiry - qkry*qirx
-               qikrx = qixx*qkrx + qixy*qkry + qixz*qkrz
-               qikry = qixy*qkrx + qiyy*qkry + qiyz*qkrz
-               qikrz = qixz*qkrx + qiyz*qkry + qizz*qkrz
-               qkirx = qkxx*qirx + qkxy*qiry + qkxz*qirz
-               qkiry = qkxy*qirx + qkyy*qiry + qkyz*qirz
-               qkirz = qkxz*qirx + qkyz*qiry + qkzz*qirz
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               qrixr = qriz*yr - qriy*zr
+               qriyr = qrix*zr - qriz*xr
+               qrizr = qriy*xr - qrix*yr
+               qrkxr = qrkz*yr - qrky*zr
+               qrkyr = qrkx*zr - qrkz*xr
+               qrkzr = qrky*xr - qrkx*yr
+               qrrx = qrky*qriz - qrkz*qriy
+               qrry = qrkz*qrix - qrkx*qriz
+               qrrz = qrkx*qriy - qrky*qrix
+               qikrx = qixx*qrkx + qixy*qrky + qixz*qrkz
+               qikry = qixy*qrkx + qiyy*qrky + qiyz*qrkz
+               qikrz = qixz*qrkx + qiyz*qrky + qizz*qrkz
+               qkirx = qkxx*qrix + qkxy*qriy + qkxz*qriz
+               qkiry = qkxy*qrix + qkyy*qriy + qkyz*qriz
+               qkirz = qkxz*qrix + qkyz*qriy + qkzz*qriz
                qikrxr = qikrz*yr - qikry*zr
                qikryr = qikrx*zr - qikrz*xr
                qikrzr = qikry*xr - qikrx*yr
@@ -1640,48 +1597,37 @@ c
                dkqix = dkx*qixx + dky*qixy + dkz*qixz
                dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
                dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                diqkxr = diqkz*yr - diqky*zr
                diqkyr = diqkx*zr - diqkz*xr
                diqkzr = diqky*xr - diqkx*yr
                dkqixr = dkqiz*yr - dkqiy*zr
                dkqiyr = dkqix*zr - dkqiz*xr
                dkqizr = dkqiy*xr - dkqix*yr
-               dqiqkx = diy*qkrz - diz*qkry + dky*qirz - dkz*qiry
+               dqiqkx = diy*qrkz - diz*qrky + dky*qriz - dkz*qriy
      &                     - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
      &                             -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
-               dqiqky = diz*qkrx - dix*qkrz + dkz*qirx - dkx*qirz
+               dqiqky = diz*qrkx - dix*qrkz + dkz*qrix - dkx*qriz
      &                     - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
      &                             -qixx*qkxz-qixy*qkyz-qixz*qkzz)
-               dqiqkz = dix*qkry - diy*qkrx + dkx*qiry - dky*qirx
+               dqiqkz = dix*qrky - diy*qrkx + dkx*qriy - dky*qrix
      &                     - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                             -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole energy
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
 c     compute the full energy without any Ewald scaling
 c
-               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = term1*rr1 + term2*rr3 + term3*rr5
+     &                    + term4*rr7 + term5*rr9
                efull = efull * mscale(kk)
 c
 c     modify distances to account for Ewald and exclusions
@@ -1696,58 +1642,49 @@ c
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
                em = em + e
-c
-c     increment the total intramolecular energy
-c
                if (molcule(ii) .eq. molcule(kk))
      &            eintra = eintra + efull
 c
-c     construct auxiliary variables for force and torque
+c     calculate intermediate terms for force and torque
 c
-               gf(1) = rr3*ge(1) + rr5*ge(2) + rr7*ge(3)
-     &                    + rr9*ge(4) + rr11*ge(5)
-               gf(2) = -ck*rr3 + sc(3)*rr5 - sc(5)*rr7
-               gf(3) = ci*rr3 + sc(2)*rr5 + sc(4)*rr7
-               gf(4) = 2.0d0 * rr5
-               gf(5) = 2.0d0 * (-ck*rr5+sc(3)*rr7-sc(5)*rr9)
-               gf(6) = 2.0d0 * (-ci*rr5-sc(2)*rr7-sc(4)*rr9)
-               gf(7) = 4.0d0 * rr7
+               de = term1*rr3 + term2*rr5 + term3*rr7
+     &                 + term4*rr9 + term5*rr11
+               term1 = -ck*rr3 + drk*rr5 - qrrk*rr7
+               term2 = ci*rr3 + dri*rr5 + qrri*rr7
+               term3 = 2.0d0 * rr5
+               term4 = 2.0d0 * (-ck*rr5+drk*rr7-qrrk*rr9)
+               term5 = 2.0d0 * (-ci*rr5-dri*rr7-qrri*rr9)
+               term6 = 4.0d0 * rr7
 c
-c     compute the force components for both sites
+c     compute the force components for this interaction
 c
-               frcx = gf(1)*xr + gf(2)*dix + gf(3)*dkx
-     &                   + gf(4)*(diqkx-dkqix) + gf(5)*qirx
-     &                   + gf(6)*qkrx + gf(7)*(qikrx+qkirx)
-               frcy = gf(1)*yr + gf(2)*diy + gf(3)*dky
-     &                   + gf(4)*(diqky-dkqiy) + gf(5)*qiry
-     &                   + gf(6)*qkry + gf(7)*(qikry+qkiry)
-               frcz = gf(1)*zr + gf(2)*diz + gf(3)*dkz
-     &                   + gf(4)*(diqkz-dkqiz) + gf(5)*qirz
-     &                   + gf(6)*qkrz + gf(7)*(qikrz+qkirz)
+               frcx = de*xr + term1*dix + term2*dkx
+     &                   + term3*(diqkx-dkqix) + term4*qrix
+     &                   + term5*qrkx + term6*(qikrx+qkirx)
+               frcy = de*yr + term1*diy + term2*dky
+     &                   + term3*(diqky-dkqiy) + term4*qriy
+     &                   + term5*qrky + term6*(qikry+qkiry)
+               frcz = de*zr + term1*diz + term2*dkz
+     &                   + term3*(diqkz-dkqiz) + term4*qriz
+     &                   + term5*qrkz + term6*(qikrz+qkirz)
 c
-c     compute the torque components for both sites
+c     compute the torque components for this interaction
 c
-               ttmi(1) = -rr3*dikx + gf(2)*dirx
-     &                      + gf(4)*(dqiqkx+dkqixr)
-     &                      - gf(5)*qirxr - gf(7)*(qikrxr+qrrx)
-               ttmi(2) = -rr3*diky + gf(2)*diry
-     &                      + gf(4)*(dqiqky+dkqiyr)
-     &                      - gf(5)*qiryr - gf(7)*(qikryr+qrry)
-               ttmi(3) = -rr3*dikz + gf(2)*dirz
-     &                      + gf(4)*(dqiqkz+dkqizr)
-     &                      - gf(5)*qirzr - gf(7)*(qikrzr+qrrz)
-               ttmk(1) = rr3*dikx + gf(3)*dkrx
-     &                      - gf(4)*(dqiqkx+diqkxr)
-     &                      - gf(6)*qkrxr - gf(7)*(qkirxr-qrrx)
-               ttmk(2) = rr3*diky + gf(3)*dkry
-     &                      - gf(4)*(dqiqky+diqkyr)
-     &                      - gf(6)*qkryr - gf(7)*(qkiryr-qrry)
-               ttmk(3) = rr3*dikz + gf(3)*dkrz
-     &                      - gf(4)*(dqiqkz+diqkzr)
-     &                      - gf(6)*qkrzr - gf(7)*(qkirzr-qrrz)
+               ttmi(1) = -rr3*dikx + term1*dirx + term3*(dqiqkx+dkqixr)
+     &                      - term4*qrixr - term6*(qikrxr+qrrx)
+               ttmi(2) = -rr3*diky + term1*diry + term3*(dqiqky+dkqiyr)
+     &                      - term4*qriyr - term6*(qikryr+qrry)
+               ttmi(3) = -rr3*dikz + term1*dirz + term3*(dqiqkz+dkqizr)
+     &                      - term4*qrizr - term6*(qikrzr+qrrz)
+               ttmk(1) = rr3*dikx + term2*dkrx - term3*(dqiqkx+diqkxr)
+     &                      - term5*qrkxr - term6*(qkirxr-qrrx)
+               ttmk(2) = rr3*diky + term2*dkry - term3*(dqiqky+diqkyr)
+     &                      - term5*qrkyr - term6*(qkiryr-qrry)
+               ttmk(3) = rr3*dikz + term2*dkrz - term3*(dqiqkz+diqkzr)
+     &                      - term5*qrkzr - term6*(qkirzr-qrrz)
 c
 c     increment force-based gradient and torque on first site
 c
@@ -1890,7 +1827,7 @@ c
                   bn(j) = f * bn(j)
                end do
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
                dikx = diy*dkz - diz*dky
                diky = diz*dkx - dix*dkz
@@ -1901,27 +1838,35 @@ c
                dkrx = dky*zr - dkz*yr
                dkry = dkz*xr - dkx*zr
                dkrz = dkx*yr - dky*xr
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
-               qirxr = qirz*yr - qiry*zr
-               qiryr = qirx*zr - qirz*xr
-               qirzr = qiry*xr - qirx*yr
-               qkrxr = qkrz*yr - qkry*zr
-               qkryr = qkrx*zr - qkrz*xr
-               qkrzr = qkry*xr - qkrx*yr
-               qrrx = qkry*qirz - qkrz*qiry
-               qrry = qkrz*qirx - qkrx*qirz
-               qrrz = qkrx*qiry - qkry*qirx
-               qikrx = qixx*qkrx + qixy*qkry + qixz*qkrz
-               qikry = qixy*qkrx + qiyy*qkry + qiyz*qkrz
-               qikrz = qixz*qkrx + qiyz*qkry + qizz*qkrz
-               qkirx = qkxx*qirx + qkxy*qiry + qkxz*qirz
-               qkiry = qkxy*qirx + qkyy*qiry + qkyz*qirz
-               qkirz = qkxz*qirx + qkyz*qiry + qkzz*qirz
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               qrixr = qriz*yr - qriy*zr
+               qriyr = qrix*zr - qriz*xr
+               qrizr = qriy*xr - qrix*yr
+               qrkxr = qrkz*yr - qrky*zr
+               qrkyr = qrkx*zr - qrkz*xr
+               qrkzr = qrky*xr - qrkx*yr
+               qrrx = qrky*qriz - qrkz*qriy
+               qrry = qrkz*qrix - qrkx*qriz
+               qrrz = qrkx*qriy - qrky*qrix
+               qikrx = qixx*qrkx + qixy*qrky + qixz*qrkz
+               qikry = qixy*qrkx + qiyy*qrky + qiyz*qrkz
+               qikrz = qixz*qrkx + qiyz*qrky + qizz*qrkz
+               qkirx = qkxx*qrix + qkxy*qriy + qkxz*qriz
+               qkiry = qkxy*qrix + qkyy*qriy + qkyz*qriz
+               qkirz = qkxz*qrix + qkyz*qriy + qkzz*qriz
                qikrxr = qikrz*yr - qikry*zr
                qikryr = qikrx*zr - qikrz*xr
                qikrzr = qikry*xr - qikrx*yr
@@ -1934,48 +1879,37 @@ c
                dkqix = dkx*qixx + dky*qixy + dkz*qixz
                dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
                dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                diqkxr = diqkz*yr - diqky*zr
                diqkyr = diqkx*zr - diqkz*xr
                diqkzr = diqky*xr - diqkx*yr
                dkqixr = dkqiz*yr - dkqiy*zr
                dkqiyr = dkqix*zr - dkqiz*xr
                dkqizr = dkqiy*xr - dkqix*yr
-               dqiqkx = diy*qkrz - diz*qkry + dky*qirz - dkz*qiry
+               dqiqkx = diy*qrkz - diz*qrky + dky*qriz - dkz*qriy
      &                     - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
      &                             -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
-               dqiqky = diz*qkrx - dix*qkrz + dkz*qirx - dkx*qirz
+               dqiqky = diz*qrkx - dix*qrkz + dkz*qrix - dkx*qriz
      &                     - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
      &                             -qixx*qkxz-qixy*qkyz-qixz*qkzz)
-               dqiqkz = dix*qkry - diy*qkrx + dkx*qiry - dky*qirx
+               dqiqkz = dix*qrky - diy*qrkx + dkx*qriy - dky*qrix
      &                     - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                             -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole energy
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
 c     compute the full energy without any Ewald scaling
 c
-               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = term1*rr1 + term2*rr3 + term3*rr5
+     &                    + term4*rr7 + term5*rr9
                efull = efull * mscale(kk)
                if (ii .eq. kk)  efull = 0.5d0 * e
 c
@@ -1991,59 +1925,50 @@ c
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
                if (ii .eq. kk)  e = 0.5d0 * e
                em = em + e
-c
-c     increment the total intramolecular energy
-c
                if (molcule(ii) .eq. molcule(kk))
      &            eintra = eintra + efull
 c
-c     construct auxiliary variables for force and torque
+c     calculate intermediate terms for force and torque
 c
-               gf(1) = rr3*ge(1) + rr5*ge(2) + rr7*ge(3)
-     &                    + rr9*ge(4) + rr11*ge(5)
-               gf(2) = -ck*rr3 + sc(3)*rr5 - sc(5)*rr7
-               gf(3) = ci*rr3 + sc(2)*rr5 + sc(4)*rr7
-               gf(4) = 2.0d0 * rr5
-               gf(5) = 2.0d0 * (-ck*rr5+sc(3)*rr7-sc(5)*rr9)
-               gf(6) = 2.0d0 * (-ci*rr5-sc(2)*rr7-sc(4)*rr9)
-               gf(7) = 4.0d0 * rr7
+               de = term1*rr3 + term2*rr5 + term3*rr7
+     &                 + term4*rr9 + term5*rr11
+               term1 = -ck*rr3 + drk*rr5 - qrrk*rr7
+               term2 = ci*rr3 + dri*rr5 + qrri*rr7
+               term3 = 2.0d0 * rr5
+               term4 = 2.0d0 * (-ck*rr5+drk*rr7-qrrk*rr9)
+               term5 = 2.0d0 * (-ci*rr5-dri*rr7-qrri*rr9)
+               term6 = 4.0d0 * rr7
 c
-c     compute the force components for both sites
+c     compute the force components for this interaction
 c
-               frcx = gf(1)*xr + gf(2)*dix + gf(3)*dkx
-     &                   + gf(4)*(diqkx-dkqix) + gf(5)*qirx
-     &                   + gf(6)*qkrx + gf(7)*(qikrx+qkirx)
-               frcy = gf(1)*yr + gf(2)*diy + gf(3)*dky
-     &                   + gf(4)*(diqky-dkqiy) + gf(5)*qiry
-     &                   + gf(6)*qkry + gf(7)*(qikry+qkiry)
-               frcz = gf(1)*zr + gf(2)*diz + gf(3)*dkz
-     &                   + gf(4)*(diqkz-dkqiz) + gf(5)*qirz
-     &                   + gf(6)*qkrz + gf(7)*(qikrz+qkirz)
+               frcx = de*xr + term1*dix + term2*dkx
+     &                   + term3*(diqkx-dkqix) + term4*qrix
+     &                   + term5*qrkx + term6*(qikrx+qkirx)
+               frcy = de*yr + term1*diy + term2*dky
+     &                   + term3*(diqky-dkqiy) + term4*qriy
+     &                   + term5*qrky + term6*(qikry+qkiry)
+               frcz = de*zr + term1*diz + term2*dkz
+     &                   + term3*(diqkz-dkqiz) + term4*qriz
+     &                   + term5*qrkz + term6*(qikrz+qkirz)
 c
-c     compute the torque components for both sites
+c     compute the torque components for this interaction
 c
-               ttmi(1) = -rr3*dikx + gf(2)*dirx
-     &                      + gf(4)*(dqiqkx+dkqixr)
-     &                      - gf(5)*qirxr - gf(7)*(qikrxr+qrrx)
-               ttmi(2) = -rr3*diky + gf(2)*diry
-     &                      + gf(4)*(dqiqky+dkqiyr)
-     &                      - gf(5)*qiryr - gf(7)*(qikryr+qrry)
-               ttmi(3) = -rr3*dikz + gf(2)*dirz
-     &                      + gf(4)*(dqiqkz+dkqizr)
-     &                      - gf(5)*qirzr - gf(7)*(qikrzr+qrrz)
-               ttmk(1) = rr3*dikx + gf(3)*dkrx
-     &                      - gf(4)*(dqiqkx+diqkxr)
-     &                      - gf(6)*qkrxr - gf(7)*(qkirxr-qrrx)
-               ttmk(2) = rr3*diky + gf(3)*dkry
-     &                      - gf(4)*(dqiqky+diqkyr)
-     &                      - gf(6)*qkryr - gf(7)*(qkiryr-qrry)
-               ttmk(3) = rr3*dikz + gf(3)*dkrz
-     &                      - gf(4)*(dqiqkz+diqkzr)
-     &                      - gf(6)*qkrzr - gf(7)*(qkirzr-qrrz)
+               ttmi(1) = -rr3*dikx + term1*dirx + term3*(dqiqkx+dkqixr)
+     &                      - term4*qrixr - term6*(qikrxr+qrrx)
+               ttmi(2) = -rr3*diky + term1*diry + term3*(dqiqky+dkqiyr)
+     &                      - term4*qriyr - term6*(qikryr+qrry)
+               ttmi(3) = -rr3*dikz + term1*dirz + term3*(dqiqkz+dkqizr)
+     &                      - term4*qrizr - term6*(qikrzr+qrrz)
+               ttmk(1) = rr3*dikx + term2*dkrx - term3*(dqiqkx+diqkxr)
+     &                      - term5*qrkxr - term6*(qkirxr-qrrx)
+               ttmk(2) = rr3*diky + term2*dkry - term3*(dqiqky+diqkyr)
+     &                      - term5*qrkyr - term6*(qkiryr-qrry)
+               ttmk(3) = rr3*dikz + term2*dkrz - term3*(dqiqkz+diqkzr)
+     &                      - term5*qrkzr - term6*(qkirzr-qrrz)
 c
 c     force and torque components scaled for self-interactions
 c
@@ -2354,7 +2279,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer iax,iay,iaz
-      real*8 e,f,bfac,erfc
+      real*8 e,de,f
+      real*8 bfac,erfc
       real*8 eintra,efull
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
@@ -2375,10 +2301,10 @@ c
       real*8 dikx,diky,dikz
       real*8 dirx,diry,dirz
       real*8 dkrx,dkry,dkrz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 qirxr,qiryr,qirzr
-      real*8 qkrxr,qkryr,qkrzr
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 qrixr,qriyr,qrizr
+      real*8 qrkxr,qrkyr,qrkzr
       real*8 qrrx,qrry,qrrz
       real*8 qikrx,qikry,qikrz
       real*8 qkirx,qkiry,qkirz
@@ -2389,10 +2315,14 @@ c
       real*8 diqkxr,diqkyr,diqkzr
       real*8 dkqixr,dkqiyr,dkqizr
       real*8 dqiqkx,dqiqky,dqiqkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5,term6
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
-      real*8 sc(9),ge(5),gf(7)
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 bn(0:5)
@@ -2514,7 +2444,7 @@ c
                   bn(j) = f * bn(j)
                end do
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
                dikx = diy*dkz - diz*dky
                diky = diz*dkx - dix*dkz
@@ -2525,27 +2455,35 @@ c
                dkrx = dky*zr - dkz*yr
                dkry = dkz*xr - dkx*zr
                dkrz = dkx*yr - dky*xr
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
-               qirxr = qirz*yr - qiry*zr
-               qiryr = qirx*zr - qirz*xr
-               qirzr = qiry*xr - qirx*yr
-               qkrxr = qkrz*yr - qkry*zr
-               qkryr = qkrx*zr - qkrz*xr
-               qkrzr = qkry*xr - qkrx*yr
-               qrrx = qkry*qirz - qkrz*qiry
-               qrry = qkrz*qirx - qkrx*qirz
-               qrrz = qkrx*qiry - qkry*qirx
-               qikrx = qixx*qkrx + qixy*qkry + qixz*qkrz
-               qikry = qixy*qkrx + qiyy*qkry + qiyz*qkrz
-               qikrz = qixz*qkrx + qiyz*qkry + qizz*qkrz
-               qkirx = qkxx*qirx + qkxy*qiry + qkxz*qirz
-               qkiry = qkxy*qirx + qkyy*qiry + qkyz*qirz
-               qkirz = qkxz*qirx + qkyz*qiry + qkzz*qirz
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               qrixr = qriz*yr - qriy*zr
+               qriyr = qrix*zr - qriz*xr
+               qrizr = qriy*xr - qrix*yr
+               qrkxr = qrkz*yr - qrky*zr
+               qrkyr = qrkx*zr - qrkz*xr
+               qrkzr = qrky*xr - qrkx*yr
+               qrrx = qrky*qriz - qrkz*qriy
+               qrry = qrkz*qrix - qrkx*qriz
+               qrrz = qrkx*qriy - qrky*qrix
+               qikrx = qixx*qrkx + qixy*qrky + qixz*qrkz
+               qikry = qixy*qrkx + qiyy*qrky + qiyz*qrkz
+               qikrz = qixz*qrkx + qiyz*qrky + qizz*qrkz
+               qkirx = qkxx*qrix + qkxy*qriy + qkxz*qriz
+               qkiry = qkxy*qrix + qkyy*qriy + qkyz*qriz
+               qkirz = qkxz*qrix + qkyz*qriy + qkzz*qriz
                qikrxr = qikrz*yr - qikry*zr
                qikryr = qikrx*zr - qikrz*xr
                qikrzr = qikry*xr - qikrx*yr
@@ -2558,48 +2496,37 @@ c
                dkqix = dkx*qixx + dky*qixy + dkz*qixz
                dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
                dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                diqkxr = diqkz*yr - diqky*zr
                diqkyr = diqkx*zr - diqkz*xr
                diqkzr = diqky*xr - diqkx*yr
                dkqixr = dkqiz*yr - dkqiy*zr
                dkqiyr = dkqix*zr - dkqiz*xr
                dkqizr = dkqiy*xr - dkqix*yr
-               dqiqkx = diy*qkrz - diz*qkry + dky*qirz - dkz*qiry
+               dqiqkx = diy*qrkz - diz*qrky + dky*qriz - dkz*qriy
      &                     - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
      &                             -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
-               dqiqky = diz*qkrx - dix*qkrz + dkz*qirx - dkx*qirz
+               dqiqky = diz*qrkx - dix*qrkz + dkz*qrix - dkx*qriz
      &                     - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
      &                             -qixx*qkxz-qixy*qkyz-qixz*qkzz)
-               dqiqkz = dix*qkry - diy*qkrx + dkx*qiry - dky*qirx
+               dqiqkz = dix*qrky - diy*qrkx + dkx*qriy - dky*qrix
      &                     - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                             -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole energy
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
 c     compute the full energy without any Ewald scaling
 c
-               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = term1*rr1 + term2*rr3 + term3*rr5
+     &                    + term4*rr7 + term5*rr9
                efull = efull * mscale(kk)
 c
 c     modify distances to account for Ewald and exclusions
@@ -2614,58 +2541,49 @@ c
 c
 c     compute the energy contributions for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
                em = em + e
-c
-c     increment the total intramolecular energy
-c
                if (molcule(ii) .eq. molcule(kk))
      &            eintra = eintra + efull
 c
-c     construct auxiliary variables for force and torque
+c     calculate intermediate terms for force and torque
 c
-               gf(1) = rr3*ge(1) + rr5*ge(2) + rr7*ge(3)
-     &                    + rr9*ge(4) + rr11*ge(5)
-               gf(2) = -ck*rr3 + sc(3)*rr5 - sc(5)*rr7
-               gf(3) = ci*rr3 + sc(2)*rr5 + sc(4)*rr7
-               gf(4) = 2.0d0 * rr5
-               gf(5) = 2.0d0 * (-ck*rr5+sc(3)*rr7-sc(5)*rr9)
-               gf(6) = 2.0d0 * (-ci*rr5-sc(2)*rr7-sc(4)*rr9)
-               gf(7) = 4.0d0 * rr7
+               de = term1*rr3 + term2*rr5 + term3*rr7
+     &                 + term4*rr9 + term5*rr11
+               term1 = -ck*rr3 + drk*rr5 - qrrk*rr7
+               term2 = ci*rr3 + dri*rr5 + qrri*rr7
+               term3 = 2.0d0 * rr5
+               term4 = 2.0d0 * (-ck*rr5+drk*rr7-qrrk*rr9)
+               term5 = 2.0d0 * (-ci*rr5-dri*rr7-qrri*rr9)
+               term6 = 4.0d0 * rr7
 c
-c     compute the force components for both sites
+c     compute the force components for this interaction
 c
-               frcx = gf(1)*xr + gf(2)*dix + gf(3)*dkx
-     &                   + gf(4)*(diqkx-dkqix) + gf(5)*qirx
-     &                   + gf(6)*qkrx + gf(7)*(qikrx+qkirx)
-               frcy = gf(1)*yr + gf(2)*diy + gf(3)*dky
-     &                   + gf(4)*(diqky-dkqiy) + gf(5)*qiry
-     &                   + gf(6)*qkry + gf(7)*(qikry+qkiry)
-               frcz = gf(1)*zr + gf(2)*diz + gf(3)*dkz
-     &                   + gf(4)*(diqkz-dkqiz) + gf(5)*qirz
-     &                   + gf(6)*qkrz + gf(7)*(qikrz+qkirz)
+               frcx = de*xr + term1*dix + term2*dkx
+     &                   + term3*(diqkx-dkqix) + term4*qrix
+     &                   + term5*qrkx + term6*(qikrx+qkirx)
+               frcy = de*yr + term1*diy + term2*dky
+     &                   + term3*(diqky-dkqiy) + term4*qriy
+     &                   + term5*qrky + term6*(qikry+qkiry)
+               frcz = de*zr + term1*diz + term2*dkz
+     &                   + term3*(diqkz-dkqiz) + term4*qriz
+     &                   + term5*qrkz + term6*(qikrz+qkirz)
 c
-c     compute the torque components for both sites
+c     compute the torque components for this interaction
 c
-               ttmi(1) = -rr3*dikx + gf(2)*dirx
-     &                      + gf(4)*(dqiqkx+dkqixr)
-     &                      - gf(5)*qirxr - gf(7)*(qikrxr+qrrx)
-               ttmi(2) = -rr3*diky + gf(2)*diry
-     &                      + gf(4)*(dqiqky+dkqiyr)
-     &                      - gf(5)*qiryr - gf(7)*(qikryr+qrry)
-               ttmi(3) = -rr3*dikz + gf(2)*dirz
-     &                      + gf(4)*(dqiqkz+dkqizr)
-     &                      - gf(5)*qirzr - gf(7)*(qikrzr+qrrz)
-               ttmk(1) = rr3*dikx + gf(3)*dkrx
-     &                      - gf(4)*(dqiqkx+diqkxr)
-     &                      - gf(6)*qkrxr - gf(7)*(qkirxr-qrrx)
-               ttmk(2) = rr3*diky + gf(3)*dkry
-     &                      - gf(4)*(dqiqky+diqkyr)
-     &                      - gf(6)*qkryr - gf(7)*(qkiryr-qrry)
-               ttmk(3) = rr3*dikz + gf(3)*dkrz
-     &                      - gf(4)*(dqiqkz+diqkzr)
-     &                      - gf(6)*qkrzr - gf(7)*(qkirzr-qrrz)
+               ttmi(1) = -rr3*dikx + term1*dirx + term3*(dqiqkx+dkqixr)
+     &                      - term4*qrixr - term6*(qikrxr+qrrx)
+               ttmi(2) = -rr3*diky + term1*diry + term3*(dqiqky+dkqiyr)
+     &                      - term4*qriyr - term6*(qikryr+qrry)
+               ttmi(3) = -rr3*dikz + term1*dirz + term3*(dqiqkz+dkqizr)
+     &                      - term4*qrizr - term6*(qikrzr+qrrz)
+               ttmk(1) = rr3*dikx + term2*dkrx - term3*(dqiqkx+diqkxr)
+     &                      - term5*qrkxr - term6*(qkirxr-qrrx)
+               ttmk(2) = rr3*diky + term2*dkry - term3*(dqiqky+diqkyr)
+     &                      - term5*qrkyr - term6*(qkiryr-qrry)
+               ttmk(3) = rr3*dikz + term2*dkrz - term3*(dqiqkz+diqkzr)
+     &                      - term5*qrkzr - term6*(qkirzr-qrrz)
 c
 c     increment force-based gradient and torque on first site
 c

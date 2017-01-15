@@ -89,9 +89,13 @@ c
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 sc(9),ge(5)
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5
       real*8, allocatable :: mscale(:)
       logical proceed
       logical header,huge
@@ -216,41 +220,38 @@ c
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
-                  qirx = qixx*xr + qixy*yr + qixz*zr
-                  qiry = qixy*xr + qiyy*yr + qiyz*zr
-                  qirz = qixz*xr + qiyz*yr + qizz*zr
-                  qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qkry = qkxy*xr + qkyy*yr + qkyz*zr
-                  qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+                  dri = dix*xr + diy*yr + diz*zr
+                  drk = dkx*xr + dky*yr + dkz*zr
+                  qrix = qixx*xr + qixy*yr + qixz*zr
+                  qriy = qixy*xr + qiyy*yr + qiyz*zr
+                  qriz = qixz*xr + qiyz*yr + qizz*zr
+                  qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qrky = qkxy*xr + qkyy*yr + qkyz*zr
+                  qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+                  qrri = qrix*xr + qriy*yr + qriz*zr
+                  qrrk = qrkx*xr + qrky*yr + qrkz*zr
+                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                  qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+                  dik = dix*dkx + diy*dky + diz*dkz
+                  qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole interaction
 c
-                  sc(1) = dix*dkx + diy*dky + diz*dkz
-                  sc(2) = dix*xr + diy*yr + diz*zr
-                  sc(3) = dkx*xr + dky*yr + dkz*zr
-                  sc(4) = qirx*xr + qiry*yr + qirz*zr
-                  sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-                  sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-                  sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-                  sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-                  sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                       + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-                  ge(1) = ci*ck
-                  ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-                  ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                       + 2.0d0*(sc(6)-sc(7)+sc(9))
-                  ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-                  ge(5) = sc(4)*sc(5)
+                  term1 = ci*ck
+                  term2 = ck*dri - ci*drk + dik
+                  term3 = ci*qrrk + ck*qrri - dri*drk
+     &                       + 2.0d0*(dkqri-diqrk+qik)
+                  term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+                  term5 = qrri*qrrk
 c
 c     compute the energy contribution for this interaction
 c
-                  e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                   + rr7*ge(4) + rr9*ge(5)
+                  e = term1*rr1 + term2*rr3 + term3*rr5
+     &                   + term4*rr7 + term5*rr9
                   if (use_group)  e = e * fgrp
 c
 c     increment the overall multipole energy components
@@ -382,41 +383,38 @@ c
                         rr7 = 5.0d0 * rr5 / r2
                         rr9 = 7.0d0 * rr7 / r2
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
-                        qirx = qixx*xr + qixy*yr + qixz*zr
-                        qiry = qixy*xr + qiyy*yr + qiyz*zr
-                        qirz = qixz*xr + qiyz*yr + qizz*zr
-                        qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-                        qkry = qkxy*xr + qkyy*yr + qkyz*zr
-                        qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+                        dri = dix*xr + diy*yr + diz*zr
+                        drk = dkx*xr + dky*yr + dkz*zr
+                        qrix = qixx*xr + qixy*yr + qixz*zr
+                        qriy = qixy*xr + qiyy*yr + qiyz*zr
+                        qriz = qixz*xr + qiyz*yr + qizz*zr
+                        qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+                        qrky = qkxy*xr + qkyy*yr + qkyz*zr
+                        qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+                        qrri = qrix*xr + qriy*yr + qriz*zr
+                        qrrk = qrkx*xr + qrky*yr + qrkz*zr
+                        diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                        dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                        qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+                        dik = dix*dkx + diy*dky + diz*dkz
+                        qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole interaction
 c
-                        sc(1) = dix*dkx + diy*dky + diz*dkz
-                        sc(2) = dix*xr + diy*yr + diz*zr
-                        sc(3) = dkx*xr + dky*yr + dkz*zr
-                        sc(4) = qirx*xr + qiry*yr + qirz*zr
-                        sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-                        sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-                        sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-                        sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-                        sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                             + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-                        ge(1) = ci*ck
-                        ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-                        ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                             + 2.0d0*(sc(6)-sc(7)+sc(9))
-                        ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-                        ge(5) = sc(4)*sc(5)
+                        term1 = ci*ck
+                        term2 = ck*dri - ci*drk + dik
+                        term3 = ci*qrrk + ck*qrri - dri*drk
+     &                             + 2.0d0*(dkqri-diqrk+qik)
+                        term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+                        term5 = qrri*qrrk
 c
 c     compute the energy contribution for this interaction
 c
-                        e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                         + rr7*ge(4) + rr9*ge(5)
+                        e = term1*rr1 + term2*rr3 + term3*rr5
+     &                         + term4*rr7 + term5*rr9
                         if (use_polymer .and. r2.le.polycut2)
      &                     e = e * mscale(kk)
                         if (use_group)  e = e * fgrp
@@ -530,9 +528,13 @@ c
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 sc(9),ge(5)
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5
       real*8, allocatable :: mscale(:)
       logical proceed
       logical header,huge
@@ -667,41 +669,38 @@ c
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
-                  qirx = qixx*xr + qixy*yr + qixz*zr
-                  qiry = qixy*xr + qiyy*yr + qiyz*zr
-                  qirz = qixz*xr + qiyz*yr + qizz*zr
-                  qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qkry = qkxy*xr + qkyy*yr + qkyz*zr
-                  qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+                  dri = dix*xr + diy*yr + diz*zr
+                  drk = dkx*xr + dky*yr + dkz*zr
+                  qrix = qixx*xr + qixy*yr + qixz*zr
+                  qriy = qixy*xr + qiyy*yr + qiyz*zr
+                  qriz = qixz*xr + qiyz*yr + qizz*zr
+                  qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qrky = qkxy*xr + qkyy*yr + qkyz*zr
+                  qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+                  qrri = qrix*xr + qriy*yr + qriz*zr
+                  qrrk = qrkx*xr + qrky*yr + qrkz*zr
+                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                  qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+                  dik = dix*dkx + diy*dky + diz*dkz
+                  qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole interaction
 c
-                  sc(1) = dix*dkx + diy*dky + diz*dkz
-                  sc(2) = dix*xr + diy*yr + diz*zr
-                  sc(3) = dkx*xr + dky*yr + dkz*zr
-                  sc(4) = qirx*xr + qiry*yr + qirz*zr
-                  sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-                  sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-                  sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-                  sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-                  sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                       + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-c
-c     construct auxiliary variables for multipole energy
-c
-                  ge(1) = ci*ck
-                  ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-                  ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                       + 2.0d0*(sc(6)-sc(7)+sc(9))
-                  ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-                  ge(5) = sc(4)*sc(5)
+                  term1 = ci*ck
+                  term2 = ck*dri - ci*drk + dik
+                  term3 = ci*qrrk + ck*qrri - dri*drk
+     &                       + 2.0d0*(dkqri-diqrk+qik)
+                  term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+                  term5 = qrri*qrrk
 c
 c     compute the energy contribution for this interaction
 c
-                  e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                   + rr7*ge(4) + rr9*ge(5)
+                  e = term1*rr1 + term2*rr3 + term3*rr5
+     &                   + term4*rr7 + term5*rr9
                   if (use_group)  e = e * fgrp
 c
 c     increment the overall multipole energy components
@@ -943,9 +942,13 @@ c
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 sc(9),ge(5)
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       logical header,huge
@@ -1061,41 +1064,38 @@ c
                   bn(j) = f * bn(j)
                end do
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               dik = dix*dkx + diy*dky + diz*dkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole interaction
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
-c     construct auxiliary variables for multipole energy
+c     compute the full undamped energy for this interaction
 c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
-c
-c     compute the full undamped permanent multipole energy
-c
-               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = term1*rr1 + term2*rr3 + term3*rr5
+     &                    + term4*rr7 + term5*rr9
                efull = mscale(kk) * efull
 c
 c     modify error function terms to account for scaling
@@ -1109,8 +1109,8 @@ c
 c
 c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
 c
 c     increment the overall multipole energy components
 c
@@ -1246,41 +1246,38 @@ c
                         bn(j) = f * bn(j)
                      end do
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
-                     qirx = qixx*xr + qixy*yr + qixz*zr
-                     qiry = qixy*xr + qiyy*yr + qiyz*zr
-                     qirz = qixz*xr + qiyz*yr + qizz*zr
-                     qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-                     qkry = qkxy*xr + qkyy*yr + qkyz*zr
-                     qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+                     dri = dix*xr + diy*yr + diz*zr
+                     drk = dkx*xr + dky*yr + dkz*zr
+                     qrix = qixx*xr + qixy*yr + qixz*zr
+                     qriy = qixy*xr + qiyy*yr + qiyz*zr
+                     qriz = qixz*xr + qiyz*yr + qizz*zr
+                     qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+                     qrky = qkxy*xr + qkyy*yr + qkyz*zr
+                     qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+                     qrri = qrix*xr + qriy*yr + qriz*zr
+                     qrrk = qrkx*xr + qrky*yr + qrkz*zr
+                     diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                     dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                     qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+                     dik = dix*dkx + diy*dky + diz*dkz
+                     qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole interaction
 c
-                     sc(1) = dix*dkx + diy*dky + diz*dkz
-                     sc(2) = dix*xr + diy*yr + diz*zr
-                     sc(3) = dkx*xr + dky*yr + dkz*zr
-                     sc(4) = qirx*xr + qiry*yr + qirz*zr
-                     sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-                     sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-                     sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-                     sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-                     sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                          + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                     term1 = ci*ck
+                     term2 = ck*dri - ci*drk + dik
+                     term3 = ci*qrrk + ck*qrri - dri*drk
+     &                          + 2.0d0*(dkqri-diqrk+qik)
+                     term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+                     term5 = qrri*qrrk
 c
-c     construct auxiliary variables for multipole energy
+c     compute the full undamped energy for this interaction
 c
-                     ge(1) = ci*ck
-                     ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-                     ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                          + 2.0d0*(sc(6)-sc(7)+sc(9))
-                     ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-                     ge(5) = sc(4)*sc(5)
-c
-c     compute the full undamped permanent multipole energy
-c
-                     efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                          + rr7*ge(4) + rr9*ge(5)
+                     efull = term1*rr1 + term2*rr3 + term3*rr5
+     &                          + term4*rr7 + term5*rr9
                      if (.not. (use_polymer .and. r2.le.polycut2))
      &                  mscale(kk) = 1.0d0
                      efull = mscale(kk) * efull
@@ -1296,8 +1293,8 @@ c
 c
 c     compute the energy contribution for this interaction
 c
-                     e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                      + rr7*ge(4) + rr9*ge(5)
+                     e = term1*rr1 + term2*rr3 + term3*rr5
+     &                      + term4*rr7 + term5*rr9
                      if (ii .eq. kk)  e = 0.5d0 * e
 c
 c     increment the overall multipole energy components
@@ -1530,9 +1527,13 @@ c
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qirx,qiry,qirz
-      real*8 qkrx,qkry,qkrz
-      real*8 sc(9),ge(5)
+      real*8 qrix,qriy,qriz
+      real*8 qrkx,qrky,qrkz
+      real*8 dri,drk,qrri,qrrk
+      real*8 diqrk,dkqri
+      real*8 dik,qik,qrrik
+      real*8 term1,term2,term3
+      real*8 term4,term5
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       logical header,huge
@@ -1658,41 +1659,38 @@ c
                   bn(j) = f * bn(j)
                end do
 c
-c     construct several necessary additional variables
+c     intermediates involving moments and distance separation
 c
-               qirx = qixx*xr + qixy*yr + qixz*zr
-               qiry = qixy*xr + qiyy*yr + qiyz*zr
-               qirz = qixz*xr + qiyz*yr + qizz*zr
-               qkrx = qkxx*xr + qkxy*yr + qkxz*zr
-               qkry = qkxy*xr + qkyy*yr + qkyz*zr
-               qkrz = qkxz*xr + qkyz*yr + qkzz*zr
+               dri = dix*xr + diy*yr + diz*zr
+               drk = dkx*xr + dky*yr + dkz*zr
+               qrix = qixx*xr + qixy*yr + qixz*zr
+               qriy = qixy*xr + qiyy*yr + qiyz*zr
+               qriz = qixz*xr + qiyz*yr + qizz*zr
+               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qrky = qkxy*xr + qkyy*yr + qkyz*zr
+               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qrri = qrix*xr + qriy*yr + qriz*zr
+               qrrk = qrkx*xr + qrky*yr + qrkz*zr
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
+               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
+               dik = dix*dkx + diy*dky + diz*dkz
+               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
-c     calculate scalar products for multipole interactions
+c     calculate intermediate terms for multipole interaction
 c
-               sc(1) = dix*dkx + diy*dky + diz*dkz
-               sc(2) = dix*xr + diy*yr + diz*zr
-               sc(3) = dkx*xr + dky*yr + dkz*zr
-               sc(4) = qirx*xr + qiry*yr + qirz*zr
-               sc(5) = qkrx*xr + qkry*yr + qkrz*zr
-               sc(6) = dkx*qirx + dky*qiry + dkz*qirz
-               sc(7) = dix*qkrx + diy*qkry + diz*qkrz
-               sc(8) = qirx*qkrx + qiry*qkry + qirz*qkrz
-               sc(9) = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                    + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               term1 = ci*ck
+               term2 = ck*dri - ci*drk + dik
+               term3 = ci*qrrk + ck*qrri - dri*drk
+     &                    + 2.0d0*(dkqri-diqrk+qik)
+               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
+               term5 = qrri*qrrk
 c
-c     construct auxiliary variables for multipole energy
+c     compute the full undamped energy for this interaction
 c
-               ge(1) = ci*ck
-               ge(2) = ck*sc(2) - ci*sc(3) + sc(1)
-               ge(3) = ci*sc(5) + ck*sc(4) - sc(2)*sc(3)
-     &                    + 2.0d0*(sc(6)-sc(7)+sc(9))
-               ge(4) = sc(2)*sc(5) - sc(3)*sc(4) - 4.0d0*sc(8)
-               ge(5) = sc(4)*sc(5)
-c
-c     compute the full undamped permanent multipole energy
-c
-               efull = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                    + rr7*ge(4) + rr9*ge(5)
+               efull = term1*rr1 + term2*rr3 + term3*rr5
+     &                    + term4*rr7 + term5*rr9
                efull = mscale(kk) * efull
 c
 c     modify error function terms to account for scaling
@@ -1704,10 +1702,10 @@ c
                rr7 = bn(3) - scalekk*rr7
                rr9 = bn(4) - scalekk*rr9
 c
-c     compute the energy contributions for this interaction
+c     compute the energy contribution for this interaction
 c
-               e = rr1*ge(1) + rr3*ge(2) + rr5*ge(3)
-     &                + rr7*ge(4) + rr9*ge(5)
+               e = term1*rr1 + term2*rr3 + term3*rr5
+     &                + term4*rr7 + term5*rr9
 c
 c     increment the overall van der Waals energy components
 c
