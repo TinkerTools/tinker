@@ -224,6 +224,7 @@ c     intermediates involving moments and distance separation
 c
                   dri = dix*xr + diy*yr + diz*zr
                   drk = dkx*xr + dky*yr + dkz*zr
+                  dik = dix*dkx + diy*dky + diz*dkz
                   qrix = qixx*xr + qixy*yr + qixz*zr
                   qriy = qixy*xr + qiyy*yr + qiyz*zr
                   qriz = qixz*xr + qiyz*yr + qizz*zr
@@ -232,12 +233,11 @@ c
                   qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                   qrri = qrix*xr + qriy*yr + qriz*zr
                   qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
                   qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                  dik = dix*dkx + diy*dky + diz*dkz
                   qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
 c
 c     calculate intermediate terms for multipole interaction
 c
@@ -387,6 +387,7 @@ c     intermediates involving moments and distance separation
 c
                         dri = dix*xr + diy*yr + diz*zr
                         drk = dkx*xr + dky*yr + dkz*zr
+                        dik = dix*dkx + diy*dky + diz*dkz
                         qrix = qixx*xr + qixy*yr + qixz*zr
                         qriy = qixy*xr + qiyy*yr + qiyz*zr
                         qriz = qixz*xr + qiyz*yr + qizz*zr
@@ -395,12 +396,11 @@ c
                         qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                         qrri = qrix*xr + qriy*yr + qriz*zr
                         qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                        diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                        dkqri = dkx*qrix + dky*qriy + dkz*qriz
                         qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                        dik = dix*dkx + diy*dky + diz*dkz
                         qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                        diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                        dkqri = dkx*qrix + dky*qriy + dkz*qriz
 c
 c     calculate intermediate terms for multipole interaction
 c
@@ -673,6 +673,7 @@ c     intermediates involving moments and distance separation
 c
                   dri = dix*xr + diy*yr + diz*zr
                   drk = dkx*xr + dky*yr + dkz*zr
+                  dik = dix*dkx + diy*dky + diz*dkz
                   qrix = qixx*xr + qixy*yr + qixz*zr
                   qriy = qixy*xr + qiyy*yr + qiyz*zr
                   qriz = qixz*xr + qiyz*yr + qizz*zr
@@ -681,12 +682,11 @@ c
                   qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                   qrri = qrix*xr + qriy*yr + qriz*zr
                   qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
                   qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                  dik = dix*dkx + diy*dky + diz*dkz
                   qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
 c
 c     calculate intermediate terms for multipole interaction
 c
@@ -1068,6 +1068,7 @@ c     intermediates involving moments and distance separation
 c
                dri = dix*xr + diy*yr + diz*zr
                drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
                qrix = qixx*xr + qixy*yr + qixz*zr
                qriy = qixy*xr + qiyy*yr + qiyz*zr
                qriz = qixz*xr + qiyz*yr + qizz*zr
@@ -1076,12 +1077,11 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               diqrk = dix*qrkx + diy*qrky + diz*qrkz
-               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-               dik = dix*dkx + diy*dky + diz*dkz
                qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
 c
 c     calculate intermediate terms for multipole interaction
 c
@@ -1250,6 +1250,7 @@ c     intermediates involving moments and distance separation
 c
                      dri = dix*xr + diy*yr + diz*zr
                      drk = dkx*xr + dky*yr + dkz*zr
+                     dik = dix*dkx + diy*dky + diz*dkz
                      qrix = qixx*xr + qixy*yr + qixz*zr
                      qriy = qixy*xr + qiyy*yr + qiyz*zr
                      qriz = qixz*xr + qiyz*yr + qizz*zr
@@ -1258,12 +1259,11 @@ c
                      qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                      qrri = qrix*xr + qriy*yr + qriz*zr
                      qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                     diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                     dkqri = dkx*qrix + dky*qriy + dkz*qriz
                      qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                     dik = dix*dkx + diy*dky + diz*dkz
                      qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+                     diqrk = dix*qrkx + diy*qrky + diz*qrkz
+                     dkqri = dkx*qrix + dky*qriy + dkz*qriz
 c
 c     calculate intermediate terms for multipole interaction
 c
@@ -1663,6 +1663,7 @@ c     intermediates involving moments and distance separation
 c
                dri = dix*xr + diy*yr + diz*zr
                drk = dkx*xr + dky*yr + dkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
                qrix = qixx*xr + qixy*yr + qixz*zr
                qriy = qixy*xr + qiyy*yr + qiyz*zr
                qriz = qixz*xr + qiyz*yr + qizz*zr
@@ -1671,12 +1672,11 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               diqrk = dix*qrkx + diy*qrky + diz*qrkz
-               dkqri = dkx*qrix + dky*qriy + dkz*qriz
                qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-               dik = dix*dkx + diy*dky + diz*dkz
                qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+               diqrk = dix*qrkx + diy*qrky + diz*qrkz
+               dkqri = dkx*qrix + dky*qriy + dkz*qriz
 c
 c     calculate intermediate terms for multipole interaction
 c
