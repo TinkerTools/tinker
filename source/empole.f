@@ -83,9 +83,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8, allocatable :: mscale(:)
@@ -306,6 +307,8 @@ c
                      zr = z(kk) - zi
                      call imager (xr,yr,zr,j)
                      r2 = xr*xr + yr* yr + zr*zr
+                     if (.not. (use_polymer .and. r2.le.polycut2))
+     &                  mscale(kk) = 1.0d0
                      if (r2 .le. off2) then
                         r = sqrt(r2)
                         ck = rpole(1,k)
@@ -359,8 +362,7 @@ c     compute the energy contribution for this interaction
 c
                         e = term1*rr1 + term2*rr3 + term3*rr5
      &                         + term4*rr7 + term5*rr9
-                        if (use_polymer .and. r2.le.polycut2)
-     &                     e = e * mscale(kk)
+                        e = e * mscale(kk)
                         if (use_group)  e = e * fgrp
                         if (ii .eq. kk)  e = 0.5d0 * e
                         em = em + e
@@ -436,9 +438,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8, allocatable :: mscale(:)
@@ -697,8 +700,8 @@ c
          qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
-         qii = qixx*qixx + qiyy*qiyy + qizz*qizz
-     &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+         qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+     &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
       end do
@@ -774,9 +777,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 bn(0:4)
@@ -918,7 +922,7 @@ c
 c     compute the energy contribution for this interaction
 c
                e = term1*rr1 + term2*rr3 + term3*rr5
-     &                + term4*rr7 + term4*rr9
+     &                + term4*rr7 + term5*rr9
                em = em + e
             end if
          end do
@@ -984,6 +988,8 @@ c
                   zr = z(kk) - zi
                   call imager (xr,yr,zr,jcell)
                   r2 = xr*xr + yr* yr + zr*zr
+                  if (.not. (use_polymer .and. r2.le.polycut2))
+     &               mscale(kk) = 1.0d0
                   if (r2 .le. off2) then
                      r = sqrt(r2)
                      ck = rpole(1,k)
@@ -1053,8 +1059,6 @@ c
 c
 c     modify distances to account for Ewald and exclusions
 c
-                     if (.not. (use_polymer .and. r2.le.polycut2))
-     &                  mscale(kk) = 1.0d0
                      scalekk = 1.0d0 - mscale(kk)
                      rr1 = bn(0) - scalekk*rr1
                      rr3 = bn(1) - scalekk*rr3
@@ -1169,8 +1173,8 @@ c
          qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
-         qii = qixx*qixx + qiyy*qiyy + qizz*qizz
-     &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+         qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+     &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
       end do
@@ -1245,9 +1249,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 bn(0:4)

@@ -234,8 +234,7 @@ c
       integer iax,iay,iaz
       integer nlist,jcell
       integer list(*)
-      real*8 f,fi,damp
-      real*8 expdamp
+      real*8 f,damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -264,9 +263,9 @@ c
       real*8 txyi,txzi,tyzi
       real*8 txxk,tyyk,tzzk
       real*8 txyk,txzk,tyzk
-      real*8 turi,duri,puri
-      real*8 turk,durk,purk
-      real*8 durim,durkm
+      real*8 uri,urip,turi
+      real*8 urk,urkp,turk
+      real*8 urim,urkm
       real*8 txi3,tyi3,tzi3
       real*8 txi5,tyi5,tzi5
       real*8 txk3,tyk3,tzk3
@@ -491,10 +490,10 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duri = uix*xr + uiy*yr + uiz*zr
-               durk = ukx*xr + uky*yr + ukz*zr
-               puri = uixp*xr + uiyp*yr + uizp*zr
-               purk = ukxp*xr + ukyp*yr + ukzp*zr
+               uri = uix*xr + uiy*yr + uiz*zr
+               urk = ukx*xr + uky*yr + ukz*zr
+               urip = uixp*xr + uiyp*yr + uizp*zr
+               urkp = ukxp*xr + ukyp*yr + ukzp*zr
 c
 c     get the field gradient for direct polarization force
 c
@@ -607,29 +606,29 @@ c
                   term1 = (sc3+sc5) * rr5
                   term2 = term1*xr - rc3(1)
                   term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                  txxi = uix*term2 + duri*term3
-                  txxk = ukx*term2 + durk*term3
+                  txxi = uix*term2 + uri*term3
+                  txxk = ukx*term2 + urk*term3
                   term2 = term1*yr - rc3(2)
                   term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                  tyyi = uiy*term2 + duri*term3
-                  tyyk = uky*term2 + durk*term3
+                  tyyi = uiy*term2 + uri*term3
+                  tyyk = uky*term2 + urk*term3
                   term2 = term1*zr - rc3(3)
                   term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                  tzzi = uiz*term2 + duri*term3
-                  tzzk = ukz*term2 + durk*term3
+                  tzzi = uiz*term2 + uri*term3
+                  tzzk = ukz*term2 + urk*term3
                   term1 = sc5 * rr5 * yr
                   term2 = sc3*rr5*xr - rc3(1)
                   term3 = yr * (sc5*rr7*xr-rc5(1))
-                  txyi = uix*term1 + uiy*term2 - duri*term3
-                  txyk = ukx*term1 + uky*term2 - durk*term3
+                  txyi = uix*term1 + uiy*term2 - uri*term3
+                  txyk = ukx*term1 + uky*term2 - urk*term3
                   term1 = sc5 * rr5 * zr
                   term3 = zr * (sc5*rr7*xr-rc5(1))
-                  txzi = uix*term1 + uiz*term2 - duri*term3
-                  txzk = ukx*term1 + ukz*term2 - durk*term3
+                  txzi = uix*term1 + uiz*term2 - uri*term3
+                  txzk = ukx*term1 + ukz*term2 - urk*term3
                   term2 = sc3*rr5*yr - rc3(2)
                   term3 = zr * (sc5*rr7*yr-rc5(2))
-                  tyzi = uiy*term1 + uiz*term2 - duri*term3
-                  tyzk = uky*term1 + ukz*term2 - durk*term3
+                  tyzi = uiy*term1 + uiz*term2 - uri*term3
+                  tyzk = uky*term1 + ukz*term2 - urk*term3
                   depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
                   depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
@@ -644,43 +643,43 @@ c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp .eq. 'OPT') then
                   do j = 0, coptmax-1
-                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+                     urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
                      do m = 0, coptmax-j-1
-                        durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+                        urkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = (sc3+sc5) * rr5
                         term2 = term1*xr - rc3(1)
                         term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                        txxi = uopt(j,1,i)*term2 + durim*term3
-                        txxk = uopt(m,1,k)*term2 + durkm*term3
+                        txxi = uopt(j,1,i)*term2 + urim*term3
+                        txxk = uopt(m,1,k)*term2 + urkm*term3
                         term2 = term1*yr - rc3(2)
                         term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                        tyyi = uopt(j,2,i)*term2 + durim*term3
-                        tyyk = uopt(m,2,k)*term2 + durkm*term3
+                        tyyi = uopt(j,2,i)*term2 + urim*term3
+                        tyyk = uopt(m,2,k)*term2 + urkm*term3
                         term2 = term1*zr - rc3(3)
                         term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                        tzzi = uopt(j,3,i)*term2 + durim*term3
-                        tzzk = uopt(m,3,k)*term2 + durkm*term3
+                        tzzi = uopt(j,3,i)*term2 + urim*term3
+                        tzzk = uopt(m,3,k)*term2 + urkm*term3
                         term1 = sc5 * rr5 * yr
                         term2 = sc3*rr5*xr - rc3(1)
                         term3 = yr * (sc5*rr7*xr-rc5(1))
                         txyi = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         txyk = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         term1 = sc5 * rr5 * zr
                         term3 = zr * (sc5*rr7*xr-rc5(1))
                         txzi = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         txzk = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         term2 = sc3*rr5*yr - rc3(2)
                         term3 = zr * (sc5*rr7*yr-rc5(2))
                         tyzi = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
@@ -714,8 +713,8 @@ c
                txk3 = psr3*uix + dsr3*uixp
                tyk3 = psr3*uiy + dsr3*uiyp
                tzk3 = psr3*uiz + dsr3*uizp
-               turi = -psr5*durk - dsr5*purk
-               turk = -psr5*duri - dsr5*puri
+               turi = -psr5*urk - dsr5*urkp
+               turk = -psr5*uri - dsr5*urip
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -731,8 +730,8 @@ c
                txk5 = 2.0d0 * (psr5*uix+dsr5*uixp)
                tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
-               turi = -psr7*durk - dsr7*purk
-               turk = -psr7*duri - dsr7*puri
+               turi = -psr7*urk - dsr7*urkp
+               turk = -psr7*uri - dsr7*urip
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -951,10 +950,10 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duri = uix*xr + uiy*yr + uiz*zr
-               durk = ukx*xr + uky*yr + ukz*zr
-               puri = uixp*xr + uiyp*yr + uizp*zr
-               purk = ukxp*xr + ukyp*yr + ukzp*zr
+               uri = uix*xr + uiy*yr + uiz*zr
+               urk = ukx*xr + uky*yr + ukz*zr
+               urip = uixp*xr + uiyp*yr + uizp*zr
+               urkp = ukxp*xr + ukyp*yr + ukzp*zr
 c
 c     get the field gradient for direct polarization force
 c
@@ -1067,29 +1066,29 @@ c
                   term1 = (sc3+sc5) * rr5
                   term2 = term1*xr - rc3(1)
                   term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                  txxi = uix*term2 + duri*term3
-                  txxk = ukx*term2 + durk*term3
+                  txxi = uix*term2 + uri*term3
+                  txxk = ukx*term2 + urk*term3
                   term2 = term1*yr - rc3(2)
                   term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                  tyyi = uiy*term2 + duri*term3
-                  tyyk = uky*term2 + durk*term3
+                  tyyi = uiy*term2 + uri*term3
+                  tyyk = uky*term2 + urk*term3
                   term2 = term1*zr - rc3(3)
                   term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                  tzzi = uiz*term2 + duri*term3
-                  tzzk = ukz*term2 + durk*term3
+                  tzzi = uiz*term2 + uri*term3
+                  tzzk = ukz*term2 + urk*term3
                   term1 = sc5 * rr5 * yr
                   term2 = sc3*rr5*xr - rc3(1)
                   term3 = yr * (sc5*rr7*xr-rc5(1))
-                  txyi = uix*term1 + uiy*term2 - duri*term3
-                  txyk = ukx*term1 + uky*term2 - durk*term3
+                  txyi = uix*term1 + uiy*term2 - uri*term3
+                  txyk = ukx*term1 + uky*term2 - urk*term3
                   term1 = sc5 * rr5 * zr
                   term3 = zr * (sc5*rr7*xr-rc5(1))
-                  txzi = uix*term1 + uiz*term2 - duri*term3
-                  txzk = ukx*term1 + ukz*term2 - durk*term3
+                  txzi = uix*term1 + uiz*term2 - uri*term3
+                  txzk = ukx*term1 + ukz*term2 - urk*term3
                   term2 = sc3*rr5*yr - rc3(2)
                   term3 = zr * (sc5*rr7*yr-rc5(2))
-                  tyzi = uiy*term1 + uiz*term2 - duri*term3
-                  tyzk = uky*term1 + ukz*term2 - durk*term3
+                  tyzi = uiy*term1 + uiz*term2 - uri*term3
+                  tyzk = uky*term1 + ukz*term2 - urk*term3
                   depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
                   depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
@@ -1104,43 +1103,43 @@ c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp .eq. 'OPT') then
                   do j = 0, coptmax-1
-                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+                     urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
                      do m = 0, coptmax-j-1
-                        durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+                        urkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = (sc3+sc5) * rr5
                         term2 = term1*xr - rc3(1)
                         term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                        txxi = uopt(j,1,i)*term2 + durim*term3
-                        txxk = uopt(m,1,k)*term2 + durkm*term3
+                        txxi = uopt(j,1,i)*term2 + urim*term3
+                        txxk = uopt(m,1,k)*term2 + urkm*term3
                         term2 = term1*yr - rc3(2)
                         term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                        tyyi = uopt(j,2,i)*term2 + durim*term3
-                        tyyk = uopt(m,2,k)*term2 + durkm*term3
+                        tyyi = uopt(j,2,i)*term2 + urim*term3
+                        tyyk = uopt(m,2,k)*term2 + urkm*term3
                         term2 = term1*zr - rc3(3)
                         term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                        tzzi = uopt(j,3,i)*term2 + durim*term3
-                        tzzk = uopt(m,3,k)*term2 + durkm*term3
+                        tzzi = uopt(j,3,i)*term2 + urim*term3
+                        tzzk = uopt(m,3,k)*term2 + urkm*term3
                         term1 = sc5 * rr5 * yr
                         term2 = sc3*rr5*xr - rc3(1)
                         term3 = yr * (sc5*rr7*xr-rc5(1))
                         txyi = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         txyk = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         term1 = sc5 * rr5 * zr
                         term3 = zr * (sc5*rr7*xr-rc5(1))
                         txzi = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         txzk = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         term2 = sc3*rr5*yr - rc3(2)
                         term3 = zr * (sc5*rr7*yr-rc5(2))
                         tyzi = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
@@ -1188,8 +1187,8 @@ c
                txk3 = psr3*uix + dsr3*uixp
                tyk3 = psr3*uiy + dsr3*uiyp
                tzk3 = psr3*uiz + dsr3*uizp
-               turi = -psr5*durk - dsr5*purk
-               turk = -psr5*duri - dsr5*puri
+               turi = -psr5*urk - dsr5*urkp
+               turk = -psr5*uri - dsr5*urip
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -1205,8 +1204,8 @@ c
                txk5 = 2.0d0 * (psr5*uix+dsr5*uixp)
                tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
-               turi = -psr7*durk - dsr7*purk
-               turk = -psr7*duri - dsr7*puri
+               turi = -psr7*urk - dsr7*urkp
+               turk = -psr7*uri - dsr7*urip
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -1333,8 +1332,7 @@ c
       integer iii,kkk
       integer nlist
       integer list(*)
-      real*8 f,fi,damp
-      real*8 expdamp
+      real*8 f,damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -1363,9 +1361,9 @@ c
       real*8 txyi,txzi,tyzi
       real*8 txxk,tyyk,tzzk
       real*8 txyk,txzk,tyzk
-      real*8 turi,duri,puri
-      real*8 turk,durk,purk
-      real*8 durim,durkm
+      real*8 uri,urip,turi
+      real*8 urk,urkp,turk
+      real*8 urim,urkm
       real*8 txi3,tyi3,tzi3
       real*8 txi5,tyi5,tzi5
       real*8 txk3,tyk3,tzk3
@@ -1603,10 +1601,10 @@ c
                qrkz = qkxz*xr + qkyz*yr + qkzz*zr
                qrri = qrix*xr + qriy*yr + qriz*zr
                qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               duri = uix*xr + uiy*yr + uiz*zr
-               durk = ukx*xr + uky*yr + ukz*zr
-               puri = uixp*xr + uiyp*yr + uizp*zr
-               purk = ukxp*xr + ukyp*yr + ukzp*zr
+               uri = uix*xr + uiy*yr + uiz*zr
+               urk = ukx*xr + uky*yr + ukz*zr
+               urip = uixp*xr + uiyp*yr + uizp*zr
+               urkp = ukxp*xr + ukyp*yr + ukzp*zr
 c
 c     get the field gradient for direct polarization force
 c
@@ -1719,29 +1717,29 @@ c
                   term1 = (sc3+sc5) * rr5
                   term2 = term1*xr - rc3(1)
                   term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                  txxi = uix*term2 + duri*term3
-                  txxk = ukx*term2 + durk*term3
+                  txxi = uix*term2 + uri*term3
+                  txxk = ukx*term2 + urk*term3
                   term2 = term1*yr - rc3(2)
                   term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                  tyyi = uiy*term2 + duri*term3
-                  tyyk = uky*term2 + durk*term3
+                  tyyi = uiy*term2 + uri*term3
+                  tyyk = uky*term2 + urk*term3
                   term2 = term1*zr - rc3(3)
                   term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                  tzzi = uiz*term2 + duri*term3
-                  tzzk = ukz*term2 + durk*term3
+                  tzzi = uiz*term2 + uri*term3
+                  tzzk = ukz*term2 + urk*term3
                   term1 = sc5 * rr5 * yr
                   term2 = sc3*rr5*xr - rc3(1)
                   term3 = yr * (sc5*rr7*xr-rc5(1))
-                  txyi = uix*term1 + uiy*term2 - duri*term3
-                  txyk = ukx*term1 + uky*term2 - durk*term3
+                  txyi = uix*term1 + uiy*term2 - uri*term3
+                  txyk = ukx*term1 + uky*term2 - urk*term3
                   term1 = sc5 * rr5 * zr
                   term3 = zr * (sc5*rr7*xr-rc5(1))
-                  txzi = uix*term1 + uiz*term2 - duri*term3
-                  txzk = ukx*term1 + ukz*term2 - durk*term3
+                  txzi = uix*term1 + uiz*term2 - uri*term3
+                  txzk = ukx*term1 + ukz*term2 - urk*term3
                   term2 = sc3*rr5*yr - rc3(2)
                   term3 = zr * (sc5*rr7*yr-rc5(2))
-                  tyzi = uiy*term1 + uiz*term2 - duri*term3
-                  tyzk = uky*term1 + ukz*term2 - durk*term3
+                  tyzi = uiy*term1 + uiz*term2 - uri*term3
+                  tyzk = uky*term1 + ukz*term2 - urk*term3
                   depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
                   depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
@@ -1756,43 +1754,43 @@ c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp .eq. 'OPT') then
                   do j = 0, coptmax-1
-                     durim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+                     urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
                      do m = 0, coptmax-j-1
-                        durkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+                        urkm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = (sc3+sc5) * rr5
                         term2 = term1*xr - rc3(1)
                         term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
-                        txxi = uopt(j,1,i)*term2 + durim*term3
-                        txxk = uopt(m,1,k)*term2 + durkm*term3
+                        txxi = uopt(j,1,i)*term2 + urim*term3
+                        txxk = uopt(m,1,k)*term2 + urkm*term3
                         term2 = term1*yr - rc3(2)
                         term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
-                        tyyi = uopt(j,2,i)*term2 + durim*term3
-                        tyyk = uopt(m,2,k)*term2 + durkm*term3
+                        tyyi = uopt(j,2,i)*term2 + urim*term3
+                        tyyk = uopt(m,2,k)*term2 + urkm*term3
                         term2 = term1*zr - rc3(3)
                         term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
-                        tzzi = uopt(j,3,i)*term2 + durim*term3
-                        tzzk = uopt(m,3,k)*term2 + durkm*term3
+                        tzzi = uopt(j,3,i)*term2 + urim*term3
+                        tzzk = uopt(m,3,k)*term2 + urkm*term3
                         term1 = sc5 * rr5 * yr
                         term2 = sc3*rr5*xr - rc3(1)
                         term3 = yr * (sc5*rr7*xr-rc5(1))
                         txyi = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         txyk = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         term1 = sc5 * rr5 * zr
                         term3 = zr * (sc5*rr7*xr-rc5(1))
                         txzi = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         txzk = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         term2 = sc3*rr5*yr - rc3(2)
                         term3 = zr * (sc5*rr7*yr-rc5(2))
                         tyzi = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
-     &                            - durim*term3
+     &                            - urim*term3
                         tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
-     &                            - durkm*term3
+     &                            - urkm*term3
                         depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
@@ -1826,8 +1824,8 @@ c
                txk3 = psr3*uix + dsr3*uixp
                tyk3 = psr3*uiy + dsr3*uiyp
                tzk3 = psr3*uiz + dsr3*uizp
-               turi = -psr5*durk - dsr5*purk
-               turk = -psr5*duri - dsr5*puri
+               turi = -psr5*urk - dsr5*urkp
+               turk = -psr5*uri - dsr5*urip
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -1843,8 +1841,8 @@ c
                txk5 = 2.0d0 * (psr5*uix+dsr5*uixp)
                tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
-               turi = -psr7*durk - dsr7*purk
-               turk = -psr7*duri - dsr7*puri
+               turi = -psr7*urk - dsr7*urkp
+               turk = -psr7*uri - dsr7*urip
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi

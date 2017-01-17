@@ -1214,14 +1214,13 @@ c
       use deriv
       use energi
       use ewald
-      use inter
       use math
       use mpole
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,eintra
-      real*8 f,term,fterm
+      real*8 e,f
+      real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xd,yd,zd
       real*8 xq,yq,zq
@@ -1259,7 +1258,7 @@ c
 c
 c     compute the real space part of the Ewald summation
 c
-      call emreal1c (eintra)
+      call emreal1c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
@@ -1282,8 +1281,8 @@ c
          qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
-         qii = qixx*qixx + qiyy*qiyy + qizz*qizz
-     &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+         qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+     &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
       end do
@@ -1350,10 +1349,6 @@ c
          vir(2,3) = vir(2,3) + 2.0d0*term*(zq*yq+zv)
          vir(3,3) = vir(3,3) + 2.0d0*term*(zq*zq+zv) + vterm
       end if
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + em - eintra
       return
       end
 c
@@ -1370,7 +1365,7 @@ c     summation energy and gradient due to multipole interactions
 c     via a double loop
 c
 c
-      subroutine emreal1c (eintra)
+      subroutine emreal1c
       use sizes
       use atoms
       use bound
@@ -1380,6 +1375,7 @@ c
       use deriv
       use energi
       use ewald
+      use inter
       use math
       use molcul
       use mplpot
@@ -1390,9 +1386,8 @@ c
       integer i,j,k
       integer ii,kk,jcell
       integer iax,iay,iaz
-      real*8 e,de,f
+      real*8 e,efull,de,f
       real*8 bfac,erfc
-      real*8 eintra,efull
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
@@ -1442,10 +1437,6 @@ c
       character*6 mode
       external erfc
 c
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1629,6 +1620,8 @@ c
                efull = term1*rr1 + term2*rr3 + term3*rr5
      &                    + term4*rr7 + term5*rr9
                efull = efull * mscale(kk)
+               if (molcule(ii) .ne. molcule(kk))
+     &            einter = einter + efull
 c
 c     modify distances to account for Ewald and exclusions
 c
@@ -1645,8 +1638,6 @@ c
                e = term1*rr1 + term2*rr3 + term3*rr5
      &                + term4*rr7 + term5*rr9
                em = em + e
-               if (molcule(ii) .eq. molcule(kk))
-     &            eintra = eintra + efull
 c
 c     calculate intermediate terms for force and torque
 c
@@ -1912,6 +1903,7 @@ c
      &                    + term4*rr7 + term5*rr9
                efull = efull * mscale(kk)
                if (ii .eq. kk)  efull = 0.5d0 * e
+               einter = einter + efull
 c
 c     modify distances to account for Ewald and exclusions
 c
@@ -1929,8 +1921,6 @@ c
      &                + term4*rr7 + term5*rr9
                if (ii .eq. kk)  e = 0.5d0 * e
                em = em + e
-               if (molcule(ii) .eq. molcule(kk))
-     &            eintra = eintra + efull
 c
 c     calculate intermediate terms for force and torque
 c
@@ -2103,14 +2093,13 @@ c
       use deriv
       use energi
       use ewald
-      use inter
       use math
       use mpole
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,eintra
-      real*8 f,term,fterm
+      real*8 e,f
+      real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xd,yd,zd
       real*8 xq,yq,zq
@@ -2148,7 +2137,7 @@ c
 c
 c     compute the real space part of the Ewald summation
 c
-      call emreal1d (eintra)
+      call emreal1d
 c
 c     compute the reciprocal space part of the Ewald summation
 c
@@ -2171,8 +2160,8 @@ c
          qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
-         qii = qixx*qixx + qiyy*qiyy + qizz*qizz
-     &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+         qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+     &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
       end do
@@ -2239,10 +2228,6 @@ c
          vir(2,3) = vir(2,3) + 2.0d0*term*(zq*yq+zv)
          vir(3,3) = vir(3,3) + 2.0d0*term*(zq*zq+zv) + vterm
       end if
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + em - eintra
       return
       end
 c
@@ -2259,7 +2244,7 @@ c     summation energy and gradient due to multipole interactions
 c     via a neighbor list
 c
 c
-      subroutine emreal1d (eintra)
+      subroutine emreal1d
       use sizes
       use atoms
       use bound
@@ -2268,6 +2253,7 @@ c
       use deriv
       use energi
       use ewald
+      use inter
       use math
       use molcul
       use mplpot
@@ -2279,9 +2265,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer iax,iay,iaz
-      real*8 e,de,f
+      real*8 e,efull,de,f
       real*8 bfac,erfc
-      real*8 eintra,efull
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
@@ -2332,10 +2317,6 @@ c
       external erfc
 c
 c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
@@ -2362,8 +2343,8 @@ c
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
 !$OMP& aewald,molcule,xaxis,yaxis,zaxis)
-!$OMP& firstprivate(mscale) shared (em,eintra,dem,tem,vir)
-!$OMP DO reduction(+:em,eintra,dem,tem,vir) schedule(guided)
+!$OMP& firstprivate(mscale) shared (em,einter,dem,tem,vir)
+!$OMP DO reduction(+:em,einter,dem,tem,vir) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -2528,6 +2509,8 @@ c
                efull = term1*rr1 + term2*rr3 + term3*rr5
      &                    + term4*rr7 + term5*rr9
                efull = efull * mscale(kk)
+               if (molcule(ii) .ne. molcule(kk))
+     &            einter = einter + efull
 c
 c     modify distances to account for Ewald and exclusions
 c
@@ -2544,8 +2527,6 @@ c
                e = term1*rr1 + term2*rr3 + term3*rr5
      &                + term4*rr7 + term5*rr9
                em = em + e
-               if (molcule(ii) .eq. molcule(kk))
-     &            eintra = eintra + efull
 c
 c     calculate intermediate terms for force and torque
 c

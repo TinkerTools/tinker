@@ -91,9 +91,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8, allocatable :: mscale(:)
@@ -261,12 +262,9 @@ c
                      em = em + e
                      aem(ii) = aem(ii) + 0.5d0*e
                      aem(kk) = aem(kk) + 0.5d0*e
+                     if (molcule(ii) .ne. molcule(kk))
+     &                  einter = einter + e
                   end if
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(ii) .ne. molcule(kk))
-     &               einter = einter + e
 c
 c     print message if the energy of this interaction is large
 c
@@ -362,6 +360,8 @@ c
                      zr = z(kk) - zi
                      call imager (xr,yr,zr,j)
                      r2 = xr*xr + yr* yr + zr*zr
+                     if (.not. (use_polymer .and. r2.le.polycut2))
+     &                  mscale(kk) = 1.0d0
                      if (r2 .le. off2) then
                         r = sqrt(r2)
                         ck = rpole(1,k)
@@ -415,8 +415,7 @@ c     compute the energy contribution for this interaction
 c
                         e = term1*rr1 + term2*rr3 + term3*rr5
      &                         + term4*rr7 + term5*rr9
-                        if (use_polymer .and. r2.le.polycut2)
-     &                     e = e * mscale(kk)
+                        e = e * mscale(kk)
                         if (use_group)  e = e * fgrp
                         if (ii .eq. kk)  e = 0.5d0 * e
 c
@@ -427,11 +426,8 @@ c
                            em = em + e
                            aem(ii) = aem(ii) + 0.5d0*e
                            aem(kk) = aem(kk) + 0.5d0*e
+                           einter = einter + e
                         end if
-c
-c     increment the total intermolecular energy
-c
-                        einter = einter + e
 c
 c     print message if the energy of this interaction is large
 c
@@ -530,9 +526,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8, allocatable :: mscale(:)
@@ -710,12 +707,9 @@ c
                      em = em + e
                      aem(ii) = aem(ii) + 0.5d0*e
                      aem(kk) = aem(kk) + 0.5d0*e
+                     if (molcule(ii) .ne. molcule(kk))
+     &                  einter = einter + e
                   end if
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(ii) .ne. molcule(kk))
-     &               einter = einter + e
 c
 c     print message if the energy of this interaction is large
 c
@@ -787,13 +781,12 @@ c
       use chgpot
       use energi
       use ewald
-      use inter
       use math
       use mpole
       implicit none
       integer i,ii
-      real*8 e,eintra
-      real*8 f,term,fterm
+      real*8 e,f
+      real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xd,yd,zd
       real*8 ci,dix,diy,diz
@@ -824,7 +817,7 @@ c
 c
 c     compute the real space part of the Ewald summation
 c
-      call emreal3c (eintra)
+      call emreal3c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
@@ -847,8 +840,8 @@ c
          qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
-         qii = qixx*qixx + qiyy*qiyy + qizz*qizz
-     &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+         qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+     &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          nem = nem + 1
          em = em + e
@@ -878,10 +871,6 @@ c
             aem(ii) = aem(ii) + e/dble(npole)
          end do
       end if
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + em - eintra
       return
       end
 c
@@ -903,7 +892,7 @@ c     W. Smith, "Point Multipoles in the Ewald Summation (Revisited)",
 c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
-      subroutine emreal3c (eintra)
+      subroutine emreal3c
       use sizes
       use action
       use analyz
@@ -916,6 +905,7 @@ c
       use energi
       use ewald
       use inform
+      use inter
       use iounit
       use math
       use molcul
@@ -927,8 +917,8 @@ c
       integer i,j,k
       integer ii,kk
       integer jcell
-      real*8 e,f,bfac,erfc
-      real*8 eintra,efull
+      real*8 e,efull,f
+      real*8 bfac,erfc
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
@@ -944,9 +934,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 bn(0:4)
@@ -955,10 +946,6 @@ c
       character*6 mode
       external erfc
 c
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     print header information if debug output was requested
 c
@@ -1097,6 +1084,13 @@ c
                efull = term1*rr1 + term2*rr3 + term3*rr5
      &                    + term4*rr7 + term5*rr9
                efull = mscale(kk) * efull
+               if (efull .ne. 0.0d0) then
+                  nem = nem + 1
+                  aem(ii) = aem(ii) + 0.5d0*efull
+                  aem(kk) = aem(kk) + 0.5d0*efull
+                  if (molcule(ii) .ne. molcule(kk))
+     &               einter = einter + efull
+               end if
 c
 c     modify error function terms to account for scaling
 c
@@ -1111,20 +1105,7 @@ c     compute the energy contribution for this interaction
 c
                e = term1*rr1 + term2*rr3 + term3*rr5
      &                + term4*rr7 + term5*rr9
-c
-c     increment the overall multipole energy components
-c
-               if (e .ne. 0.0d0) then
-                  nem = nem + 1
-                  em = em + e
-                  aem(ii) = aem(ii) + 0.5d0*e
-                  aem(kk) = aem(kk) + 0.5d0*e
-               end if
-c
-c     increment the total intramolecular energy
-c
-               if (molcule(ii) .eq. molcule(kk))
-     &            eintra = eintra + efull
+               em = em + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -1207,6 +1188,8 @@ c
                   zr = z(kk) - zi
                   call imager (xr,yr,zr,jcell)
                   r2 = xr*xr + yr* yr + zr*zr
+                  if (.not. (use_polymer .and. r2.le.polycut2))
+     &               mscale(kk) = 1.0d0
                   if (r2 .le. off2) then
                      r = sqrt(r2)
                      ck = rpole(1,k)
@@ -1278,9 +1261,14 @@ c     compute the full undamped energy for this interaction
 c
                      efull = term1*rr1 + term2*rr3 + term3*rr5
      &                          + term4*rr7 + term5*rr9
-                     if (.not. (use_polymer .and. r2.le.polycut2))
-     &                  mscale(kk) = 1.0d0
                      efull = mscale(kk) * efull
+                     if (ii .eq. kk)  efull = 0.5d0 * efull
+                     if (e .ne. 0.0d0) then
+                        nem = nem + 1
+                        aem(ii) = aem(ii) + 0.5d0*efull
+                        aem(kk) = aem(kk) + 0.5d0*efull
+                        einter = einter + efull
+                     end if
 c
 c     modify distances to account for Ewald and exclusions
 c
@@ -1296,19 +1284,10 @@ c
                      e = term1*rr1 + term2*rr3 + term3*rr5
      &                      + term4*rr7 + term5*rr9
                      if (ii .eq. kk)  e = 0.5d0 * e
-c
-c     increment the overall multipole energy components
-c
-                     if (e .ne. 0.0d0) then
-                        nem = nem + 1
-                        em = em + e
-                        aem(ii) = aem(ii) + 0.5d0*e
-                        aem(kk) = aem(kk) + 0.5d0*e
-                     end if
+                     em = em + e
 c
 c     print message if the energy of this interaction is large
 c
-                     efull = efull * mscale(kk)
                      huge = (abs(efull) .gt. 100.0d0)
                      if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
@@ -1373,13 +1352,12 @@ c
       use chgpot
       use energi
       use ewald
-      use inter
       use math
       use mpole
       implicit none
       integer i,ii
-      real*8 e,eintra
-      real*8 f,term,fterm
+      real*8 e,f
+      real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xd,yd,zd
       real*8 ci,dix,diy,diz
@@ -1410,7 +1388,7 @@ c
 c
 c     compute the real space part of the Ewald summation
 c
-      call emreal3d (eintra)
+      call emreal3d
 c
 c     compute the reciprocal space part of the Ewald summation
 c
@@ -1433,8 +1411,8 @@ c
          qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
-         qii = qixx*qixx + qiyy*qiyy + qizz*qizz
-     &            + 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+         qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
+     &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          nem = nem + 1
          em = em + e
@@ -1464,10 +1442,6 @@ c
             aem(ii) = aem(ii) + e/dble(npole)
          end do
       end if
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + em - eintra
       return
       end
 c
@@ -1489,7 +1463,7 @@ c     W. Smith, "Point Multipoles in the Ewald Summation (Revisited)",
 c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
-      subroutine emreal3d (eintra)
+      subroutine emreal3d
       use sizes
       use action
       use analyz
@@ -1501,6 +1475,7 @@ c
       use energi
       use ewald
       use inform
+      use inter
       use iounit
       use math
       use molcul
@@ -1512,8 +1487,8 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      real*8 e,f,bfac,erfc
-      real*8 eintra,efull
+      real*8 e,efull,f
+      real*8 bfac,erfc
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 scalekk
@@ -1529,9 +1504,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,qrri,qrrk
+      real*8 dri,drk,dik
+      real*8 qrri,qrrk
+      real*8 qrrik,qik
       real*8 diqrk,dkqri
-      real*8 dik,qik,qrrik
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 bn(0:4)
@@ -1540,10 +1516,6 @@ c
       character*6 mode
       external erfc
 c
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     print header information if debug output was requested
 c
@@ -1578,8 +1550,8 @@ c
 !$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
 !$OMP& aewald,molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(mscale) shared (em,eintra,nem,aem)
-!$OMP DO reduction(+:em,eintra,nem,aem) schedule(guided)
+!$OMP& firstprivate(mscale) shared (em,einter,nem,aem)
+!$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1692,6 +1664,13 @@ c
                efull = term1*rr1 + term2*rr3 + term3*rr5
      &                    + term4*rr7 + term5*rr9
                efull = mscale(kk) * efull
+               if (efull .ne. 0.0d0) then
+                  nem = nem + 1
+                  aem(ii) = aem(ii) + 0.5d0*efull
+                  aem(kk) = aem(kk) + 0.5d0*efull
+                  if (molcule(ii) .ne. molcule(kk))
+     &               einter = einter + efull
+               end if
 c
 c     modify error function terms to account for scaling
 c
@@ -1706,20 +1685,7 @@ c     compute the energy contribution for this interaction
 c
                e = term1*rr1 + term2*rr3 + term3*rr5
      &                + term4*rr7 + term5*rr9
-c
-c     increment the overall van der Waals energy components
-c
                em = em + e
-               if (efull .ne. 0.0d0) then
-                  nem = nem + 1
-                  aem(ii) = aem(ii) + 0.5d0*efull
-                  aem(kk) = aem(kk) + 0.5d0*efull
-               end if
-c
-c     increment the total intramolecular energy
-c
-               if (molcule(ii) .eq. molcule(kk))
-     &            eintra = eintra + efull
 c
 c     print a message if the energy of this interaction is large
 c

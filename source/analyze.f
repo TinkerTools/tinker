@@ -1275,7 +1275,6 @@ c
       use iounit
       use limits
       use molcul
-      use potent
       implicit none
       real*8 energy
       character*240 fstr
@@ -1285,6 +1284,15 @@ c     perform the energy analysis by atom and component
 c
       call analysis (energy)
 c
+c     intermolecular energy for systems with multiple molecules
+c
+      fstr = '(/,'' Intermolecular Energy :'',9x,f16.4,'' Kcal/mole'')'
+      if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
+      if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
+      if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
+      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald)
+     &   write (iout,fstr)  einter
+c
 c     print out the total potential energy of the system
 c
       fstr = '(/,'' Total Potential Energy :'',8x,f16.4,'' Kcal/mole'')'
@@ -1292,16 +1300,6 @@ c
       if (digits .ge. 8)  fstr(32:39) = '4x,f20.8'
       if (abs(energy) .ge. 1.0d10)  fstr(35:35) = 'd'
       write (iout,fstr)  energy
-c
-c     intermolecular energy for systems with multiple molecules
-c
-      fstr = '(/,'' Intermolecular Energy :'',9x,f16.4,'' Kcal/mole'')'
-      if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
-      if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
-      if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
-      if (nmol.gt.1 .and. nmol.lt.n .and.
-     &      .not.use_ewald .and. .not.use_polar)
-     &   write (iout,fstr)  einter
       return
       end
 c

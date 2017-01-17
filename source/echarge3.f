@@ -224,9 +224,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -659,9 +658,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (.not.prime .or. molcule(i).ne.molcule(k)) then
-                     einter = einter + e
-                  end if
+                  if (.not.prime .or. molcule(i).ne.molcule(k))
+     &               einter = einter + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -919,9 +917,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + e
 c
 c     print a message if the energy of this interaction is large
 c
@@ -1011,8 +1008,7 @@ c
       integer i,j,k
       integer ii,kk
       integer in,kn
-      real*8 e,efix
-      real*8 eintra
+      real*8 e,efull
       real*8 f,fi,fik
       real*8 fs,fgrp
       real*8 r,r2,rb,rew
@@ -1057,10 +1053,6 @@ c
       do i = 1, n
          cscale(i) = 1.0d0
       end do
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -1162,14 +1154,13 @@ c
 c
 c     increment the total intramolecular energy
 c
-                  efix = (fik/rb) * scale
-                  if (molcule(i) .eq. molcule(k)) then
-                     eintra = eintra + efix
-                  end if
+                  efull = (fik/rb) * scale
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + efull
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efix) .gt. 100.0d0)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1181,7 +1172,7 @@ c
      &                             6x,'Energy',/)
                      end if
                      write (iout,30)  i,name(i),k,name(k),
-     &                                pchg(ii),pchg(kk),r,efix
+     &                                pchg(ii),pchg(kk),r,efull
    30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
@@ -1204,10 +1195,6 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     for periodic boundary conditions with large cutoffs
 c     neighbors must be found by the replicates method
@@ -1282,10 +1269,14 @@ c
                      aec(i) = aec(i) + 0.5d0*e
                      aec(k) = aec(k) + 0.5d0*e
 c
+c     increment the total intramolecular energy
+c
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
+c
 c     print a message if the energy of this interaction is large
 c
-                     efix = (fik/rb) * scale
-                     huge = (abs(efix) .gt. 100.0d0)
+                     huge = (abs(efull) .gt. 100.0d0)
                      if ((debug.and.e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -1298,7 +1289,7 @@ c
      &                                6x,'Energy',/)
                         end if
                         write (iout,50)  i,name(i),k,name(k),
-     &                                   pchg(ii),pchg(kk),r,efix
+     &                                   pchg(ii),pchg(kk),r,efull
    50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
@@ -1370,8 +1361,7 @@ c
       integer ii,kk,in,kn
       integer kgy,kgz,kmap
       integer start,stop
-      real*8 e,efix
-      real*8 eintra
+      real*8 e,efull
       real*8 f,fi,fik
       real*8 fs,fgrp
       real*8 r,r2,rb,rew
@@ -1423,10 +1413,6 @@ c
       do i = 1, n
          cscale(i) = 1.0d0
       end do
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -1587,14 +1573,13 @@ c
 c
 c     increment the total intramolecular energy
 c
-                  efix = (fik/rb) * scale
-                  if (prime .and. molcule(i).eq.molcule(k)) then
-                     eintra = eintra + efix
-                  end if
+                  efull = (fik/rb) * scale
+                  if (.not.prime .or. molcule(i).ne.molcule(k))
+     &               einter = einter + efull
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efix) .gt. 100.0d0)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1607,12 +1592,12 @@ c
                      end if
                      if (prime) then
                         write (iout,40)  i,name(i),k,name(k),pchg(ii),
-     &                                   pchg(kmap),r,efix
+     &                                   pchg(kmap),r,efull
    40                   format (' Charge',4x,2(i7,'-',a3),8x,
      &                             2f7.2,f11.4,f12.4)
                      else
                         write (iout,50)  i,name(i),k,name(k),pchg(ii),
-     &                                   pchg(kmap),r,efix
+     &                                   pchg(kmap),r,efull
    50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
@@ -1643,10 +1628,6 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     perform deallocation of some local arrays
 c
@@ -1696,8 +1677,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
-      real*8 e,efix
-      real*8 eintra
+      real*8 e,efull
       real*8 f,fi,fik
       real*8 fs,fgrp
       real*8 r,r2,rb,rew
@@ -1743,10 +1723,6 @@ c
          cscale(i) = 1.0d0
       end do
 c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
-c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = electric / dielec
@@ -1787,8 +1763,8 @@ c
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
-!$OMP& firstprivate(cscale) shared (ec,eintra,nec,aec)
-!$OMP DO reduction(+:ec,eintra,nec,aec) schedule(guided)
+!$OMP& firstprivate(cscale) shared (ec,einter,nec,aec)
+!$OMP DO reduction(+:ec,einter,nec,aec) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1857,14 +1833,13 @@ c
 c
 c     increment the total intramolecular energy
 c
-                  efix = (fik/rb) * scale
-                  if (molcule(i) .eq. molcule(k)) then
-                     eintra = eintra + efix
-                  end if
+                  efull = (fik/rb) * scale
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + efull
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efix) .gt. 100.0d0)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1876,7 +1851,7 @@ c
      &                             6x,'Energy',/)
                      end if
                      write (iout,30)  i,name(i),k,name(k),
-     &                                pchg(ii),pchg(kk),r,efix
+     &                                pchg(ii),pchg(kk),r,efull
    30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
@@ -1904,10 +1879,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     perform deallocation of some local arrays
 c
@@ -2089,9 +2060,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-               if (molcule(i) .ne. molcule(k)) then
-                  einter = einter + e
-               end if
+               if (molcule(i) .ne. molcule(k))
+     &            einter = einter + e
 c
 c     print a message if the energy of this interaction is large
 c

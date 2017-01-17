@@ -265,9 +265,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + e
                end if
             end if
          end do
@@ -755,9 +754,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (.not.prime .or. molcule(i).ne.molcule(k)) then
-                     einter = einter + e
-                  end if
+                  if (.not.prime .or. molcule(i).ne.molcule(k))
+     &               einter = einter + e
                end if
             end if
    20       continue
@@ -1024,9 +1022,8 @@ c
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + e
                end if
             end if
          end do
@@ -1094,8 +1091,7 @@ c
       integer i,j,k
       integer ii,kk
       integer in,kn
-      real*8 e,de,efix
-      real*8 eintra
+      real*8 e,de,efull
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
@@ -1133,10 +1129,6 @@ c
       do i = 1, n
          cscale(i) = 1.0d0
       end do
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -1280,9 +1272,9 @@ c
 c
 c     increment the total intramolecular energy
 c
-                  if (molcule(i) .eq. molcule(k)) then
-                     efix = (fik/rb) * scale
-                     eintra = eintra + efix
+                  if (molcule(i) .ne. molcule(k)) then
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
                   end if
                end if
             end if
@@ -1412,6 +1404,11 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
+c
+c     increment the total intramolecular energy
+c
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
                   end if
                end do
             end if
@@ -1432,10 +1429,6 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     perform deallocation of some local arrays
 c
@@ -1481,8 +1474,7 @@ c
       integer ii,kk,in,kn
       integer kgy,kgz,kmap
       integer start,stop
-      real*8 e,de,efix
-      real*8 eintra
+      real*8 e,de,efull
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
@@ -1527,10 +1519,6 @@ c
       do i = 1, n
          cscale(i) = 1.0d0
       end do
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -1733,9 +1721,9 @@ c
 c
 c     increment the total intramolecular energy
 c
-                  if (prime .and. molcule(i).eq.molcule(k)) then
-                     efix = (fik/rb) * scale
-                     eintra = eintra + efix
+                  if (.not.prime .or. molcule(i).ne.molcule(k)) then
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
                   end if
                end if
             end if
@@ -1763,10 +1751,6 @@ c
             cscale(i15(j,in)) = 1.0d0
          end do
       end do
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     perform deallocation of some local arrays
 c
@@ -1813,8 +1797,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,kn
-      real*8 e,de,efix
-      real*8 eintra
+      real*8 e,de,efull
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
@@ -1852,10 +1835,6 @@ c
       do i = 1, n
          cscale(i) = 1.0d0
       end do
-c
-c     zero out the intramolecular portion of the Ewald energy
-c
-      eintra = 0.0d0
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -1907,8 +1886,8 @@ c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
 !$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c2scale,
 !$OMP& c3scale,c4scale,c5scale,use_group,off2,aewald,molcule,ebuffer)
-!$OMP& firstprivate(cscale) shared (ec,eintra,dec,vir)
-!$OMP DO reduction(+:ec,eintra,dec,vir) schedule(guided)
+!$OMP& firstprivate(cscale) shared (ec,einter,dec,vir)
+!$OMP DO reduction(+:ec,einter,dec,vir) schedule(guided)
 c
 c     compute the real space Ewald energy and first derivatives
 c
@@ -2008,9 +1987,9 @@ c
 c
 c     increment the total intramolecular energy
 c
-                  if (molcule(i) .eq. molcule(k)) then
-                     efix = (fik/rb) * scale
-                     eintra = eintra + efix
+                  if (molcule(i) .ne. molcule(k)) then
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
                   end if
                end if
             end if
@@ -2036,10 +2015,6 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
-c
-c     intermolecular energy is total minus intramolecular part
-c
-      einter = einter + ec - eintra
 c
 c     perform deallocation of some local arrays
 c
