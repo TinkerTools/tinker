@@ -505,10 +505,10 @@ struct {
 } pme__;
 
 struct {
-   int maxxtr;
+   int maxopt;
    int npolar;
    int cxmax;
-   double* cxtr;
+   double* copt;
    double* polarity;
    double* thole;
    double* pdamp;
@@ -520,10 +520,10 @@ struct {
    double* uinp;
    double* uinds;
    double* uinps;
-   double* uxtr;
-   double* uxtrp;
-   double* uxtrs;
-   double* uxtrps;
+   double* uopt;
+   double* uoptp;
+   double* uopts;
+   double* uoptps;
    double* uexact;
    int* douind;
 } polar__;
@@ -1351,18 +1351,18 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* bsorder,
    pme__.qfac = qfac;
 }
 
-void set_polar_data_ (int* maxxtr, int* npolar, int* cxmax,
-                      double* cxtr, double* polarity, double* thole,
+void set_polar_data_ (int* maxopt, int* npolar, int* cxmax,
+                      double* copt, double* polarity, double* thole,
                       double* pdamp, double* udir, double* udirp,
                       double* udirs, double* udirps, double* uind,
                       double* uinp, double* uinds, double* uinps,
-                      double* uxtr, double* uxtrp, double* uxtrs,
-                      double* uxtrps, double* uexact, int* douind) {
+                      double* uopt, double* uoptp, double* uopts,
+                      double* uoptps, double* uexact, int* douind) {
 
-   polar__.maxxtr = *maxxtr;
+   polar__.maxopt = *maxopt;
    polar__.npolar = *npolar;
    polar__.cxmax = *cxmax;
-   polar__.cxtr = cxtr;
+   polar__.copt = copt;
    polar__.polarity = polarity;
    polar__.thole = thole;
    polar__.pdamp = pdamp;
@@ -1374,10 +1374,10 @@ void set_polar_data_ (int* maxxtr, int* npolar, int* cxmax,
    polar__.uinp = uinp;
    polar__.uinds = uinds;
    polar__.uinps = uinps;
-   polar__.uxtr = uxtr;
-   polar__.uxtrp = uxtrp;
-   polar__.uxtrs = uxtrs;
-   polar__.uxtrps = uxtrps;
+   polar__.uopt = uopt;
+   polar__.uoptp = uoptp;
+   polar__.uopts = uopts;
+   polar__.uoptps = uoptps;
    polar__.uexact = uexact;
    polar__.douind = douind;
 }
@@ -2693,7 +2693,7 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
    OpenMM_IntArray* covalentMap;
    OpenMM_IntArray* gridDimensions;
 
-   OpenMM_DoubleArray* exptCoefficients;
+   OpenMM_DoubleArray* optCoefficients;
 
    double dipoleConversion = OpenMM_NmPerAngstrom;
    double quadrupoleConversion = OpenMM_NmPerAngstrom*OpenMM_NmPerAngstrom;
@@ -2797,14 +2797,15 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
    if (strncasecmp (polpot__.poltyp, "DIRECT", 6) == 0) { 
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Direct);
-   } else if (strncasecmp (polpot__.poltyp, "EXTRAP", 6) == 0) {
-      exptCoefficients = OpenMM_DoubleArray_create (4);
-      OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.cxtr[0]);
-      OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.cxtr[1]);
-      OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.cxtr[2]);
-      OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.cxtr[3]);
+   } else if (strncasecmp (polpot__.poltyp, "OPT", 3) == 0) {
+      optCoefficients = OpenMM_DoubleArray_create (5);
+      OpenMM_DoubleArray_set (optCoefficients, 0, polar__.copt[0]);
+      OpenMM_DoubleArray_set (optCoefficients, 1, polar__.copt[1]);
+      OpenMM_DoubleArray_set (optCoefficients, 2, polar__.copt[2]);
+      OpenMM_DoubleArray_set (optCoefficients, 3, polar__.copt[3]);
+      OpenMM_DoubleArray_set (optCoefficients, 4, polar__.copt[5]);
       OpenMM_AmoebaMultipoleForce_setExtrapolationCoefficients
-                                  (amoebaMultipoleForce,exptCoefficients);
+                                  (amoebaMultipoleForce,optCoefficients);
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Extrapolated);
    } else {
