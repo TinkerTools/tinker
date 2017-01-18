@@ -1756,8 +1756,7 @@ c
       integer m1,m2,m3
       integer ntot,nff
       integer nf1,nf2,nf3
-      real*8 e,eterm
-      real*8 r1,r2,r3
+      real*8 e,r1,r2,r3
       real*8 h1,h2,h3
       real*8 volterm,denom
       real*8 hsq,expterm
@@ -1766,9 +1765,6 @@ c
       real*8 a(3,3),ftc(10,10)
       real*8, allocatable :: fuind(:,:)
       real*8, allocatable :: fuinp(:,:)
-      real*8, allocatable :: fphid(:,:)
-      real*8, allocatable :: fphip(:,:)
-      real*8, allocatable :: fphidp(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1936,7 +1932,7 @@ c
 c
 c     increment the induced dipole polarization energy
 c
-c     e = 0.0d0
+      e = 0.0d0
       do i = 1, npole
          ii = ipole(i)
          do k = 1, 3
