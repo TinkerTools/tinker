@@ -44,7 +44,7 @@ extern "C" {
    void empole1_ ();
    void enp1_ (double*, double*);
    void ewca1_ (double*);
-   void kinetic_ (double*, double(*)[3][3]); 
+   void kinetic_ (double*, double(*)[3][3], double*); 
    void lattice_ ();
    void mdsave_ (int*, double*, double*, double*);
    void mdstat_ (int*, double*, double*, double*, double*, double*, double*);
@@ -3953,7 +3953,6 @@ void openmm_update_ (void** omm, double* dt, int* istep,
    OpenMMData* openMMDataHandle;
 
    openMMDataHandle = (OpenMMData*) (*omm);
-
    infoMask = OpenMM_State_Positions;
    infoMask += OpenMM_State_Velocities;
    infoMask += OpenMM_State_Forces;    
@@ -4027,14 +4026,12 @@ void openmm_update_ (void** omm, double* dt, int* istep,
    kineticEnergy = (OpenMM_State_getKineticEnergy(state))
                        * OpenMM_KcalPerKJ;
    totalEnergy = potentialEnergy + kineticEnergy;
- 
    if (inform__.debug) {
 
       double eksum, temp, pres;
       double ekin[3][3];
 
-      kinetic_ (&eksum, &ekin);
-      temp = 2.0 * eksum / ((double)(mdstuf__.nfree)*gasconst);
+      kinetic_ (&eksum, &ekin, &temp);
 
       (void) fprintf (stderr, "\n State: E=%15.7e [%15.7e %15.7e]\n",
                       totalEnergy, potentialEnergy, kineticEnergy);
@@ -4060,13 +4057,13 @@ void openmm_update_ (void** omm, double* dt, int* istep,
 
    // make calls to mdstat and/or mdsave if flags are set
 
+
    if (*callMdStat || *callMdSave) {
       double eksum, temp, pres;
       double ekin[3][3];
-      kinetic_ (&eksum, &ekin);
+      kinetic_ (&eksum, &ekin, &temp);
 
       if (*callMdStat) {
-         temp = 2.0 * eksum / ((double)(mdstuf__.nfree)*gasconst);
          pres = 0.0;
          if (bath__.isobaric) {
             lattice_ ();
