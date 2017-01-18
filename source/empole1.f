@@ -877,9 +877,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,
+!$OMP& i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
+!$OMP& nelst,elst,use_group,use_intra,use_bounds,off2,f,molcule)
 !$OMP& firstprivate(mscale) shared (em,einter,dem,tem,vir)
 !$OMP DO reduction(+:em,einter,dem,tem,vir) schedule(guided)
 c
@@ -2340,9 +2340,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
-!$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,molcule,xaxis,yaxis,zaxis)
+!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,
+!$OMP& n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,
+!$OMP& use_bounds,f,off2,aewald,molcule,xaxis,yaxis,zaxis)
 !$OMP& firstprivate(mscale) shared (em,einter,dem,tem,vir)
 !$OMP DO reduction(+:em,einter,dem,tem,vir) schedule(guided)
 c

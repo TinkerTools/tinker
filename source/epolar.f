@@ -535,9 +535,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,pdamp,thole,x,y,z,rpole,uind,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,p2scale,p3scale,p4scale,
-!$OMP& p5scale,p41scale,nelst,elst,use_bounds,off2,f)
+!$OMP& shared(npole,ipole,pdamp,thole,x,y,z,rpole,uind,n12,
+!$OMP& i12,n13,i13,n14,i14,n15,i15,np11,ip11,p2scale,p3scale,
+!$OMP& p4scale,p5scale,p41scale,nelst,elst,use_bounds,off2,f)
 !$OMP& firstprivate(pscale) shared (ep)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
@@ -1627,7 +1627,7 @@ c
       use units
       implicit none
       integer i,j,ii
-      real*8 e,f,fi
+      real*8 e,f,fi,term
       real*8 xd,yd,zd
       real*8 xu,yu,zu
       real*8 dix,diy,diz
@@ -1705,7 +1705,8 @@ c
                yu = yu + uiy
                zu = zu + uiz
             end do
-            e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xu+yd*yu+zd*zu)
+            term = (2.0d0/3.0d0) * f * (pi/volbox)
+            e = term * (xd*xu+yd*yu+zd*zu)
             ep = ep + e
          end if
       end if

@@ -938,10 +938,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(nlist,list,npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,
-!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
-!$OMP& nelst,elst,use_group,use_intra,use_bounds,off2,f,dem,tem)
-!$OMP& firstprivate(mscale)
+!$OMP& shared(nlist,list,npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,
+!$OMP& use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,
+!$OMP& m5scale,nelst,elst,use_group,use_intra,use_bounds,off2,f)
+!$OMP& firstprivate(mscale) shared(dem,tem)
 !$OMP DO reduction(+:dem,tem) schedule(guided)
 c
 c     compute the multipole interaction energy and gradient

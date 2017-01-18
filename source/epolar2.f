@@ -1437,13 +1437,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(nlist,list,npole,ipole,pdamp,thole,x,y,z,rpole,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
-!$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
-!$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,f,
-!$OMP& off2,uind,uinp,coptmax,copm,uopt,uoptp,poltyp)
-!$OMP& shared(dep,ufld,dufld)
-!$OMP& firstprivate(pscale,dscale,uscale)
+!$OMP& shared(nlist,list,npole,ipole,pdamp,thole,x,y,z,rpole,n12,
+!$OMP& i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
+!$OMP& np14,ip14,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,
+!$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,nelst,
+!$OMP& elst,use_bounds,f,off2,uind,uinp,coptmax,copm,uopt,uoptp,poltyp)
+!$OMP& firstprivate(pscale,dscale,uscale) shared(dep,ufld,dufld)
 !$OMP DO reduction(+:dep,ufld,dufld) schedule(guided)
 c
 c     compute the dipole polarization gradient components

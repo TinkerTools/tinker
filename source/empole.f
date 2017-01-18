@@ -481,9 +481,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,
+!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,
+!$OMP& m5scale,nelst,elst,use_group,use_intra,use_bounds,off2,f)
 !$OMP& firstprivate(mscale) shared (em)
 !$OMP DO reduction(+:em) schedule(guided)
 c
@@ -721,7 +721,8 @@ c
             yd = yd + diy + rpole(1,i)*y(ii)
             zd = zd + diz + rpole(1,i)*z(ii)
          end do
-         e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
+         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
       end if
       return
@@ -1194,7 +1195,8 @@ c
             yd = yd + diy + rpole(1,i)*y(ii)
             zd = zd + diz + rpole(1,i)*z(ii)
          end do
-         e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
+         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
       end if
       return
@@ -1280,9 +1282,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,
-!$OMP& n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,
-!$OMP& use_bounds,f,off2,aewald)
+!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,
+!$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
+!$OMP& nelst,elst,use_bounds,f,off2,aewald)
 !$OMP& firstprivate(mscale) shared (em)
 !$OMP DO reduction(+:em) schedule(guided)
 c

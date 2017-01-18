@@ -585,10 +585,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_group,use_intra,use_bounds,off2,f,molcule,name,
-!$OMP& verbose,debug,header,iout)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,
+!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,
+!$OMP& m5scale,nelst,elst,use_group,use_intra,use_bounds,off2,
+!$OMP& f,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(mscale) shared (em,einter,nem,aem)
 !$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
 c
@@ -843,8 +843,8 @@ c
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
-         nem = nem + 1
          em = em + e
+         nem = nem + 1
          aem(i) = aem(i) + e
       end do
 c
@@ -863,9 +863,10 @@ c
             yd = yd + diy + rpole(1,i)*y(ii)
             zd = zd + diz + rpole(1,i)*z(ii)
          end do
-         e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
-         nem = nem + 1
+         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
+         nem = nem + 1
          do i = 1, npole
             ii = ipole(i)
             aem(ii) = aem(ii) + e/dble(npole)
@@ -1414,8 +1415,8 @@ c
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
-         nem = nem + 1
          em = em + e
+         nem = nem + 1
          aem(i) = aem(i) + e
       end do
 c
@@ -1434,9 +1435,10 @@ c
             yd = yd + diy + rpole(1,i)*y(ii)
             zd = zd + diz + rpole(1,i)*z(ii)
          end do
-         e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
-         nem = nem + 1
+         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
+         nem = nem + 1
          do i = 1, npole
             ii = ipole(i)
             aem(ii) = aem(ii) + e/dble(npole)
@@ -1547,9 +1549,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,i15,
-!$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,f,off2,
-!$OMP& aewald,molcule,name,verbose,debug,header,iout)
+!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,
+!$OMP& i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,
+!$OMP& f,off2,aewald,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(mscale) shared (em,einter,nem,aem)
 !$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
 c

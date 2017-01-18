@@ -904,6 +904,8 @@ c
          uii = dix*uix + diy*uiy + diz*uiz
          e = fterm * term * uii / 3.0d0
          ep = ep + e
+         nep = nep + 1
+         aep(i) = aep(i) + e
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -926,6 +928,11 @@ c
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
+         nep = nep + 1
+         do i = 1, npole
+            ii = ipole(i)
+            aep(ii) = aep(ii) + e/dble(npole)
+         end do
       end if
       return
       end
@@ -1533,6 +1540,8 @@ c
          uii = dix*uix + diy*uiy + diz*uiz
          e = fterm * term * uii / 3.0d0
          ep = ep + e
+         nep = nep + 1
+         aep(i) = aep(i) + e
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -1555,6 +1564,11 @@ c
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
+         nep = nep + 1
+         do i = 1, npole
+            ii = ipole(i)
+            aep(ii) = aep(ii) + e/dble(npole)
+         end do
       end if
       return
       end
@@ -1663,8 +1677,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,pdamp,thole,x,y,z,rpole,uind,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,p2scale,p3scale,p4scale,
-!$OMP& p5scale,p41scale,nelst,elst,use_bounds,off2,f,aewald,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& p5scale,p41scale,nelst,elst,use_bounds,off2,f,aewald,
+!$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale) shared (ep,einter,nep,aep)
 !$OMP DO reduction(+:ep,einter,nep,aep) schedule(guided)
 c
@@ -1910,7 +1924,7 @@ c
       use units
       implicit none
       integer i,j,ii
-      real*8 e,f,fi
+      real*8 e,f,fi,term
       real*8 xd,yd,zd
       real*8 xu,yu,zu
       real*8 dix,diy,diz
@@ -2023,7 +2037,8 @@ c
                yu = yu + uiy
                zu = zu + uiz
             end do
-            e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xu+yd*yu+zd*zu)
+            term = (2.0d0/3.0d0) * f * (pi/volbox)
+            e = term * (xd*xu+yd*yu+zd*zu)
             nep = nep + 1
             ep = ep + e
             do i = 1, npole
