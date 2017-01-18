@@ -531,9 +531,9 @@ c
       call set_pme_data (nfft1,nfft2,nfft3,bsorder,igrid,bsmod1,
      &                   bsmod2,bsmod3,bsbuild,thetai1,thetai2,
      &                   thetai3,qgrid,qfac)
-      call set_polar_data (maxxtr,npolar,cxmax,cxtr,polarity,thole,
+      call set_polar_data (maxopt,npolar,coptmax,copt,polarity,thole,
      &                     pdamp,udir,udirp,udirs,udirps,uind,uinp,
-     &                     uinds,uinps,uxtr,uxtrp,uxtrs,uxtrps,
+     &                     uinds,uinps,uopt,uoptp,uopts,uoptps,
      &                     uexact,douind)
       call set_polgrp_data (maxp11,maxp12,maxp13,maxp14,np11,
      &                      np12,np13,np14,ip11,ip12,ip13,ip14)
