@@ -2798,12 +2798,10 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Direct);
    } else if (strncasecmp (polpot__.poltyp, "OPT", 3) == 0) {
-      optCoefficients = OpenMM_DoubleArray_create (5);
-      OpenMM_DoubleArray_set (optCoefficients, 0, polar__.copt[0]);
-      OpenMM_DoubleArray_set (optCoefficients, 1, polar__.copt[1]);
-      OpenMM_DoubleArray_set (optCoefficients, 2, polar__.copt[2]);
-      OpenMM_DoubleArray_set (optCoefficients, 3, polar__.copt[3]);
-      OpenMM_DoubleArray_set (optCoefficients, 4, polar__.copt[5]);
+      optCoefficients = OpenMM_DoubleArray_create (polar__.cxmax+1);
+      for (int n = 0; n <= polar__.cxmax; n++) {
+        OpenMM_DoubleArray_set (optCoefficients, n, polar__.copt[n]);
+      }
       OpenMM_AmoebaMultipoleForce_setExtrapolationCoefficients
                                   (amoebaMultipoleForce,optCoefficients);
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
