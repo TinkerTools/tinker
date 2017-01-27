@@ -60,7 +60,7 @@ c     get the monitor for the update structure
 c
       call getmonitor ()
 c
-c     load the coordinated, time and energy information
+c     load the coordinates, time and energy information
 c
       call setcoordinates (n,x,y,z)
       time = dble(istep) * dt

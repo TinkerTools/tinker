@@ -126,6 +126,9 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework JavaVM -framework \
 ##  Compiler: Intel Fortran for MacOS 15.0
 ##  Parallel: OpenMP
 
+#CC = icc
+#F77 = ifort
+#CCFLAGS = -c
 #F77 = ifort
 #F77FLAGS = -c -axSSSE3
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
@@ -134,7 +137,8 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework JavaVM -framework \
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-#		-Wl,-stack_size,0x10000000
+#		-Wl,-stack_size,0x10000000 -framework JavaVM -framework \
+#		CoreFoundation
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
