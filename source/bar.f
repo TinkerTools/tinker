@@ -88,6 +88,7 @@ c
       real*8 random,ratio
       real*8 cfore,cback
       real*8 uave0,uave1
+      real*8 stdev0,stdev1
       real*8 hfore,hback
       real*8 fore,back
       real*8 hdir,hbar
@@ -151,7 +152,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' Numbers of First & Last File and Step',
+   20    format (/,' Numbers of First & Last Frame and Step',
      &              ' Increment :  ',$)
          read (input,30)  record
    30    format (a120)
@@ -218,7 +219,7 @@ c
    90 continue
       if (query) then
          write (iout,100)
-  100    format (/,' Numbers of First & Last File and Step',
+  100    format (/,' Numbers of First & Last Frame and Step',
      &              ' Increment :  ',$)
          read (input,110)  record
   110    format (a120)
@@ -655,24 +656,40 @@ c
 c
 c     find the enthalpy directly from average potential energies
 c
+      write (iout,400)
+  400 format (/,' Direct Estimation of Enthalpy from Potential',
+     &           ' Energies :',/)
       sum = 0.0d0
+      sum2 = 0.0d0
       do i = 1, nfrma
          sum = sum + ua0(i)
+         sum2 = sum2 + ua0(i)*ua0(i)
       end do
       uave0 = sum / frma
+      stdev0 = sqrt(sum2/frma-uave0*uave0)
       sum = 0.0d0
       do i = 1, nfrmb
          sum = sum + ub1(i)
+         sum2 = sum2 + ua0(i)*ua0(i)
       end do
       uave1 = sum / frmb
+      stdev1 = sqrt(sum2/frmb-uave1*uave1)
       hdir = uave1 - uave0
-      write (iout,400)  hdir
-  400 format (/,' Direct Enthalpy Estimate',3x,f12.4,' Kcal/mol')
+      stdev = stdev0 + stdev1
+      write (iout,410)  uave0,stdev0
+  410 format (' Average Energy for State 0',1x,f12.4,
+     &           ' +/-',f8.4,' Kcal/mol')
+      write (iout,420)  uave1,stdev1
+  420 format (' Average Energy for State 1',1x,f12.4,
+     &           ' +/-',f8.4,' Kcal/mol')
+      write (iout,430)  hdir,stdev
+  430 format (' Direct Enthalpy Estimate',3x,f12.4,
+     &           ' +/-',f8.4,' Kcal/mol')
 c
 c     get the enthalpy and entropy via thermodynamic perturbation
 c
-      write (iout,410)
-  410 format (/,' Estimation of Enthalpy and Entropy',
+      write (iout,440)
+  440 format (/,' Estimation of Enthalpy and Entropy',
      &           ' via FEP Method :',/)
       numer = 0.0d0
       denom = 0.0d0
@@ -690,15 +707,15 @@ c
          denom = denom + term
       end do
       hback = -(numer/denom) + uave1
-      write (iout,420)  hfore
-  420 format (' FEP Forward Enthalpy',7x,f12.4,' Kcal/mol')
-      write (iout,430)  hback
-  430 format (' FEP Backward Enthalpy',6x,f12.4,' Kcal/mol')
+      write (iout,450)  hfore
+  450 format (' FEP Forward Enthalpy',7x,f12.4,' Kcal/mol')
+      write (iout,460)  hback
+  460 format (' FEP Backward Enthalpy',6x,f12.4,' Kcal/mol')
 c
 c     determine the enthalpy and entropy via the BAR method
 c
-      write (iout,440)
-  440 format (/,' Estimation of Enthalpy and Entropy',
+      write (iout,470)
+  470 format (/,' Estimation of Enthalpy and Entropy',
      &           ' via BAR Method :',/)
       fsum = 0.0d0
       fvsum = 0.0d0
@@ -707,7 +724,7 @@ c
       fbsum0 = 0.0d0
       do i = 1, nfrma
          fore = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vola(i)-cnew)/rta))
-         back = 1.0d0 / (1.0d0+exp((ua0(i)-ua1(i)-vola(i)+cnew)/rta))
+         back = 1.0d0 / (1.0d0+exp((ua0(i)-ua1(i)+vola(i)+cnew)/rta))
          fsum = fsum + fore
          fvsum = fvsum + fore*ua0(i)
          fbvsum = fbvsum + fore*back*(ua1(i)-ua0(i)+vola(i))
@@ -722,7 +739,7 @@ c
       fbsum1 = 0.0d0
       do i = 1, nfrmb
          fore = 1.0d0 / (1.0d0+exp((ub1(i)-ub0(i)+volb(i)-cnew)/rtb))
-         back = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)-volb(i)+cnew)/rtb))
+         back = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+volb(i)+cnew)/rtb))
          bsum = bsum + back
          bvsum = bvsum + back*ub1(i)
          fbvsum = fbvsum + fore*back*(ub1(i)-ub0(i)+volb(i))
@@ -733,12 +750,12 @@ c
       hbar = (alpha0-alpha1) / (fbsum0+fbsum1)
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
-      write (iout,450)  hbar
-  450 format (' BAR Enthalpy Estimate',6x,f12.4)
-      write (iout,460)  sbar
-  460 format (' BAR Entropy Estimate',7x,f12.6)
-      write (iout,470)  tsbar
-  470 format (' BAR T*dS Estimate',10x,f12.4)
+      write (iout,480)  hbar
+  480 format (' BAR Enthalpy Estimate',6x,f12.4)
+      write (iout,490)  sbar
+  490 format (' BAR Entropy Estimate',7x,f12.6)
+      write (iout,500)  tsbar
+  500 format (' BAR T*dS Estimate',10x,f12.4)
 c
 c     save the energies and volume corrections to a file
 c
@@ -747,17 +764,17 @@ c
       barfile = filename(1:leng1)//'.bar'
       call version (barfile,'new')
       open (unit=ibar,file=barfile,status ='new')
-      write (ibar,480)  nfrma,title0(1:ltitle0)
-  480 format (i6,2x,a)
+      write (ibar,510)  nfrma,title0(1:ltitle0)
+  510 format (i6,2x,a)
       do i = 1, nfrma
-         write (ibar,490)  i,ua0(i),ua1(i),vola(i)
-  490    format (i6,2x,3f16.4)
+         write (ibar,520)  i,ua0(i),ua1(i),vola(i)
+  520    format (i6,2x,3f16.4)
       end do
-      write (ibar,500)  nfrmb,title1(1:ltitle1)
-  500 format (i6,2x,a)
+      write (ibar,530)  nfrmb,title1(1:ltitle1)
+  530 format (i6,2x,a)
       do i = 1, nfrmb
-         write (ibar,510)  i,ub0(i),ub1(i),volb(i)
-  510    format (i6,2x,3f16.4)
+         write (ibar,540)  i,ub0(i),ub1(i),volb(i)
+  540    format (i6,2x,3f16.4)
       end do
       close (unit=ibar)
 c
