@@ -1443,7 +1443,7 @@ atmlst.o:
 atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o sizes.o
-bar.o: atoms.o boxes.o energi.o files.o inform.o iounit.o keys.o sizes.o titles.o units.o
+bar.o: atoms.o boxes.o files.o inform.o iounit.o keys.o sizes.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:
 beeman.o: atomid.o atoms.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o sizes.o units.o usage.o
@@ -1562,7 +1562,7 @@ emm3hb3.o: action.o analyz.o atmlst.o atomid.o atoms.o bndstr.o bound.o boxes.o 
 empole.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o group.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o sizes.o usage.o
 empole1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o group.o inter.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o shunt.o sizes.o usage.o virial.o
 empole2.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o group.o hessn.o limits.o molcul.o mplpot.o mpole.o neigh.o potent.o shunt.o sizes.o usage.o
-empole3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o sizes.o usage.o
+empole3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o neigh.o potent.o shunt.o sizes.o usage.o
 energi.o:
 energy.o: bound.o energi.o iounit.o limits.o potent.o rigid.o sizes.o vdwpot.o
 eopbend.o: angbnd.o angpot.o atoms.o bound.o energi.o fields.o group.o math.o opbend.o sizes.o usage.o
@@ -1580,7 +1580,7 @@ epitors3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o
 epolar.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o limits.o math.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o units.o
 epolar1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o inter.o limits.o math.o molcul.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o virial.o
 epolar2.o: atoms.o bound.o cell.o chgpot.o couple.o deriv.o hessn.o limits.o mpole.o neigh.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o
-epolar3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o inform.o inter.o iounit.o limits.o math.o molcul.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o units.o
+epolar3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o couple.o energi.o ewald.o inform.o inter.o iounit.o limits.o math.o molcul.o mpole.o neigh.o polar.o polgrp.o polpot.o potent.o shunt.o sizes.o units.o
 erf.o: iounit.o math.o
 erxnfld.o: atoms.o chgpot.o energi.o mpole.o rxnfld.o rxnpot.o shunt.o sizes.o usage.o
 erxnfld1.o: atoms.o deriv.o energi.o sizes.o

@@ -50,7 +50,6 @@ c
       use sizes
       use atoms
       use boxes
-      use energi
       use files
       use inform
       use iounit
@@ -108,8 +107,8 @@ c
       real*8, allocatable :: ub1(:)
       real*8, allocatable :: vola(:)
       real*8, allocatable :: volb(:)
-      real*8, allocatable :: vterma(:)
-      real*8, allocatable :: vtermb(:)
+      real*8, allocatable :: vloga(:)
+      real*8, allocatable :: vlogb(:)
       logical exist,query,done
       character*240 record
       character*240 string
@@ -132,8 +131,8 @@ c
       allocate (ub1(maxframe))
       allocate (vola(maxframe))
       allocate (volb(maxframe))
-      allocate (vterma(maxframe))
-      allocate (vtermb(maxframe))
+      allocate (vloga(maxframe))
+      allocate (vlogb(maxframe))
 c
 c     get trajectory A archive and setup mechanics calculation
 c
@@ -474,7 +473,7 @@ c
       if (vavea .ne. 0.0d0) then
          do i = 1, nfrma
             if (vola(i) .ne. 0.0d0)
-     &         vterma(i) = -rta * log(vola(i)/vavea)
+     &         vloga(i) = -rta * log(vola(i)/vavea)
          end do
       end if
       sum = 0.0d0
@@ -488,7 +487,7 @@ c
       if (vaveb .ne. 0.0d0) then
          do i = 1, nfrmb
             if (volb(i) .ne. 0.0d0)
-     &         vtermb(i) = -rtb * log(volb(i)/vaveb)
+     &         vlogb(i) = -rtb * log(volb(i)/vaveb)
          end do
       end if
 c
@@ -499,12 +498,12 @@ c
      &           ' via FEP Method :',/)
       sum = 0.0d0
       do i = 1, nfrma
-         sum = sum + exp((ua0(i)-ua1(i)+vterma(i))/rta)
+         sum = sum + exp((ua0(i)-ua1(i)+vloga(i))/rta)
       end do
       cfore = -rta * log(sum/frma)
       sum = 0.0d0
       do i = 1, nfrmb
-         sum = sum + exp((ub1(i)-ub0(i)+vtermb(i))/rtb)
+         sum = sum + exp((ub1(i)-ub0(i)+vlogb(i))/rtb)
       end do
       cback = -rtb * log(sum/frmb)
       write (iout,280)  cfore
@@ -525,14 +524,14 @@ c
       top = 0.0d0
       top2 = 0.0d0
       do i = 1, nfrmb
-         fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vtermb(i)+cold)/rtb))
+         fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vlogb(i)+cold)/rtb))
          top = top + fterm
          top2 = top2 + fterm*fterm
       end do
       bot = 0.0d0
       bot2 = 0.0d0
       do i = 1, nfrma
-         fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vterma(i)-cold)/rta))
+         fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vloga(i)-cold)/rta))
          bot = bot + fterm
          bot2 = bot2 + fterm*fterm
       end do
@@ -557,7 +556,7 @@ c
          top = 0.0d0
          top2 = 0.0d0
          do i = 1, nfrmb
-            fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vtermb(i)
+            fterm = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vlogb(i)
      &                                     +cold)/rtb))
             top = top + fterm
             top2 = top2 + fterm*fterm
@@ -565,7 +564,7 @@ c
          bot = 0.0d0
          bot2 = 0.0d0
          do i = 1, nfrma
-            fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vterma(i)
+            fterm = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vloga(i)
      &                                     -cold)/rta))
             bot = bot + fterm
             bot2 = bot2 + fterm*fterm
@@ -617,14 +616,14 @@ c
             bstb(i) = int(frmb*random()) + 1
             j = bstb(i)
             top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)
-     &                                   +vtermb(i)+cold)/rtb))
+     &                                   +vlogb(i)+cold)/rtb))
          end do
          bot = 0.0d0
          do i = 1, nfrma
             bsta(i) = int(frma*random()) + 1
             j = bsta(i)
             bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)
-     &                                   +vterma(i)-cold)/rta))
+     &                                   +vloga(i)-cold)/rta))
          end do
          cnew = rt*log(rfrm*top/bot) + cold
          delta = abs(cnew-cold)
@@ -635,13 +634,13 @@ c
             do i = 1, nfrmb
                j = bstb(i)
                top = top + 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)
-     &                                      +vtermb(i)+cold)/rtb))
+     &                                      +vlogb(i)+cold)/rtb))
             end do
             bot = 0.0d0
             do i = 1, nfrma
                j = bsta(i)
                bot = bot + 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)
-     &                                      +vterma(i)-cold)/rta))
+     &                                      +vloga(i)-cold)/rta))
             end do
             cnew = rt*log(rfrm*top/bot) + cold
             delta = abs(cnew-cold)
@@ -719,7 +718,7 @@ c
       top = 0.0d0
       bot = 0.0d0
       do i = 1, nfrma
-         term = exp((ua0(i)-ua1(i)+vterma(i))/rta)
+         term = exp((ua0(i)-ua1(i)+vloga(i))/rta)
          top = top + ua1(i)*term
          bot = bot + term
       end do
@@ -727,7 +726,7 @@ c
       top = 0.0d0
       bot = 0.0d0
       do i = 1, nfrmb
-         term = exp((ub1(i)-ub0(i)+vtermb(i))/rtb)
+         term = exp((ub1(i)-ub0(i)+vlogb(i))/rtb)
          top = top + ub0(i)*term
          bot = bot + term
       end do
@@ -748,11 +747,11 @@ c
       vsum = 0.0d0
       fbsum0 = 0.0d0
       do i = 1, nfrma
-         fore = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vterma(i)-cnew)/rta))
-         back = 1.0d0 / (1.0d0+exp((ua0(i)-ua1(i)+vterma(i)+cnew)/rta))
+         fore = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vloga(i)-cnew)/rta))
+         back = 1.0d0 / (1.0d0+exp((ua0(i)-ua1(i)+vloga(i)+cnew)/rta))
          fsum = fsum + fore
          fvsum = fvsum + fore*ua0(i)
-         fbvsum = fbvsum + fore*back*(ua1(i)-ua0(i)+vterma(i))
+         fbvsum = fbvsum + fore*back*(ua1(i)-ua0(i)+vloga(i))
          vsum = vsum + ua0(i)
          fbsum0 = fbsum0 + fore*back
       end do
@@ -763,11 +762,11 @@ c
       vsum = 0.0d0
       fbsum1 = 0.0d0
       do i = 1, nfrmb
-         fore = 1.0d0 / (1.0d0+exp((ub1(i)-ub0(i)+vtermb(i)-cnew)/rtb))
-         back = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vtermb(i)+cnew)/rtb))
+         fore = 1.0d0 / (1.0d0+exp((ub1(i)-ub0(i)+vlogb(i)-cnew)/rtb))
+         back = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vlogb(i)+cnew)/rtb))
          bsum = bsum + back
          bvsum = bvsum + back*ub1(i)
-         fbvsum = fbvsum + fore*back*(ub1(i)-ub0(i)+vtermb(i))
+         fbvsum = fbvsum + fore*back*(ub1(i)-ub0(i)+vlogb(i))
          vsum = vsum + ub1(i)
          fbsum1 = fbsum1 + fore*back
       end do
@@ -812,8 +811,8 @@ c
       deallocate (ub1)
       deallocate (vola)
       deallocate (volb)
-      deallocate (vterma)
-      deallocate (vtermb)
+      deallocate (vloga)
+      deallocate (vlogb)
 c
 c     perform any final tasks before program exit
 c
