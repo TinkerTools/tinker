@@ -63,7 +63,7 @@ c
 c     present a list of possible archive modifications
 c
       write (iout,30)
-   30 format (/,' The TINKER Archive Facility can Provide :',
+   30 format (/,' The TINKER Archive File Utility Can :',
      &        //,4x,'(1) Create an Archive from Individual Frames',
      &        /,4x,'(2) Extract Individual Frames from an Archive',
      &        /,4x,'(3) Trim an Archive to Remove Atoms or Frames',

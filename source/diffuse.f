@@ -148,7 +148,7 @@ c
             list(i) = 0
          end do
          i = 0
-         dowhile (exist)
+         do while (exist)
             call nextarg (string,exist)
             if (exist) then
                read (string,*,err=100,end=100)  list(i+1)

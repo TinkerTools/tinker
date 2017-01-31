@@ -115,7 +115,7 @@ c
 c     present a list of possible coordinate modifications
 c
       write (iout,30)
-   30 format (/,' The TINKER XYZ Editing Facility can Provide :',
+   30 format (/,' The TINKER XYZ File Editing Utility Can :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
      &        /,4x,'(2) Deletion of Individual Specified Atoms',
      &        /,4x,'(3) Deletion of Specified Types of Atoms',
@@ -179,7 +179,7 @@ c
   100    format (/,' Offset used to Renumber the Atoms [0] :  ',$)
          read (input,110,err=90)  offset
   110    format (i10)
-         dowhile (.not. abort)
+         do while (.not. abort)
             call makeref (1)
             call readxyz (ixyz)
             if (.not. abort)  multi = .true.
@@ -218,7 +218,7 @@ c
             if (list(i) .lt. -n)  list(i) = -n
          end do
          call sort4 (nlist,list)
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = nlist, 1, -1
                if (i .gt. 1) then
                   if (list(i-1) .lt. 0) then
@@ -267,7 +267,7 @@ c
             nlist = nlist + 1
          end do
          natom = n
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = natom, 1, -1
                it = type(i)
                do j = 1, nlist
@@ -308,7 +308,7 @@ c
          if (cut2 .eq. 0.0d0)  cut2 = 1.0d16
          allocate (list(n))
          allocate (keep(n))
-         dowhile (.not. abort)
+         do while (.not. abort)
             nlist = 0
             do i = 1, n
                keep(i) = 0
@@ -378,7 +378,7 @@ c
             nlist = nlist + 1
          end do
          call sort4 (nlist,list)
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = nlist, 1, -1
                if (i .gt. 1) then
                   if (list(i-1) .lt. 0) then
@@ -420,7 +420,7 @@ c
          read (input,250)  record
   250    format (a240)
          read (record,*,err=230,end=230)  oldtype,newtype
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = 1, n
                if (type(i) .eq. oldtype) then
                   type(i) = newtype
@@ -446,7 +446,7 @@ c
 c     assign atom connectivities to produce a linear chain
 c
       if (mode .eq. 7) then
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = 1, n
                n12(i) = 0
                if (i .ne. 1) then
@@ -478,7 +478,7 @@ c     assign atom connectivities based on interatomic distances
 c
       if (mode .eq. 8) then
          allocate (rad(n))
-         dowhile (.not. abort)
+         do while (.not. abort)
             call unitcell
             call lattice
             do i = 1, n
@@ -532,7 +532,7 @@ c
 c     convert the coordinate units from Bohrs to Angstroms
 c
       if (mode .eq. 9) then
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = 1, n
                x(i) = x(i) * bohr
                y(i) = y(i) * bohr
@@ -557,7 +557,7 @@ c
 c     get mirror image by inverting coordinates through origin
 c
       if (mode .eq. 10) then
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = 1, n
                x(i) = -x(i)
                y(i) = -y(i)
@@ -591,7 +591,7 @@ c
   270    format (a240)
          read (record,*,err=280,end=280)  xr,yr,zr
   280    continue
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = 1, n
                x(i) = x(i) + xr
                y(i) = y(i) + yr
@@ -616,7 +616,7 @@ c
 c     translate the center of mass to the coordinate origin
 c
       if (mode .eq. 12) then
-         dowhile (.not. abort)
+         do while (.not. abort)
             xcm = 0.0d0
             ycm = 0.0d0
             zcm = 0.0d0
@@ -659,7 +659,7 @@ c
   290    format (/,' Number of the Atom to Move to the Origin :  ',$)
          read (input,300)  origin
   300    format (i10)
-         dowhile (.not. abort)
+         do while (.not. abort)
             xorig = x(origin)
             yorig = y(origin)
             zorig = z(origin)
@@ -687,7 +687,7 @@ c
 c     translate and rotate into standard orientation
 c
       if (mode .eq. 14) then
-         dowhile (.not. abort)
+         do while (.not. abort)
             call inertia (2)
             call makeref (1)
             call readxyz (ixyz)
@@ -739,7 +739,7 @@ c
          a(1,3) = -stheta
          a(2,3) = ctheta * spsi
          a(3,3) = ctheta * cpsi
-         dowhile (.not. abort)
+         do while (.not. abort)
             do i = 1, n
                xorig = x(i)
                yorig = y(i)
@@ -767,7 +767,7 @@ c
 c     move stray molecules back into original periodic box
 c
       if (mode .eq. 16) then
-         dowhile (.not. abort)
+         do while (.not. abort)
             call unitcell
             if (use_bounds) then
                call lattice
@@ -808,7 +808,7 @@ c
          end do
          allocate (list(n))
          allocate (keep(n))
-         dowhile (.not. abort)
+         do while (.not. abort)
             xbox = xnew
             ybox = ynew
             zbox = znew
@@ -885,7 +885,7 @@ c     append a second file to the current coordinates file
 c
       if (mode .eq. 18) then
          append = .false.
-         dowhile (.not. abort)
+         do while (.not. abort)
             call makeref (1)
             if (append) then
                call getref (3)
@@ -1021,7 +1021,7 @@ c
       if (opened) then
          close (unit=imod)
          write (iout,420)  modfile
-  420    format (/,' New Coordinates Written to File :  ',a)
+  420    format (/,' New Coordinates File Written To :  ',a)
       end if
       close (unit=ixyz)
       call final

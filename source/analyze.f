@@ -55,7 +55,7 @@ c
       call nextarg (string,exist)
       if (.not. exist) then
          write (iout,10)
-   10    format (/,' The TINKER Analysis Facility can Provide :',
+   10    format (/,' The TINKER Energy Analysis Utility Can :',
      &           //,' General System and Force Field Information [G]',
      &           /,' Force Field Parameters for Interactions [P]',
      &           /,' Total Potential Energy and its Components [E]',

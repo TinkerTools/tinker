@@ -66,7 +66,7 @@ c
          end do
          psum(i) = sum
       end do
-      dowhile (.true.)
+      do while (.true.)
          ilo = 1
          if (y(1) .gt. y(2)) then
             ihi = 1

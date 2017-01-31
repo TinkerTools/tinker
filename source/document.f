@@ -90,7 +90,7 @@ c     find out what documentation the user wants to generate
 c
       call initial
       write (iout,10)
-   10 format (/,' The TINKER Document Facility can Provide :',
+   10 format (/,' The TINKER Documentation Utility Can :',
      &        //,4x,'(1) List of Routines from a Source File',
      &        /,4x,'(2) List of Calls made by each Routine',
      &        /,4x,'(3) List of Common Blocks from Source',

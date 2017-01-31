@@ -111,7 +111,7 @@ c
          zzqdp0(i) = 0.0d0
       end do
 c
-c     find electrostatic potential manipulation to be performed
+c     find electrostatic potential manipulation to perform
 c
       mode = 0
       query = .true.
@@ -155,7 +155,7 @@ c
          dofit = .true.
       end if
 c
-c     read the electrostatic potential from a Gaussian CUBE file
+c     read electrostatic potential from a Gaussian CUBE file
 c
       if (docube) then
          call nextarg (cubefile,exist)
@@ -200,7 +200,7 @@ c
          end do
          close (unit=icub)
 c
-c     write the electrostatic potential to a TINKER pot file
+c     write the electrostatic potential to a TINKER POT file
 c
          potfile = filename(1:leng)
          call suffix (potfile,'pot','new')
@@ -218,11 +218,11 @@ c
          end do
          close (unit=ipot)
          write (iout,160)  potfile(1:trimtext(potfile))
-  160    format (/,' Electrostatic Potential Written to File :  ',a)
+  160    format (/,' Electrostatic Potential Written To :  ',a)
          goto 380
       end if
 c
-c     read the first structure and get electrostatic parameters
+c     read first structure and get electrostatic parameters
 c
       call getxyz
       call field
@@ -446,7 +446,7 @@ c
          if (answer .eq. 'Y')  dofull = .true.
       end if
 c
-c     read the grid points where potential will be computed
+c     read grid points where potential will be computed
 c
       if (dotarget) then
          ipot = freeunit ()
@@ -499,7 +499,7 @@ c
          end do
          close (unit=igrd)
          write (iout,330)  gridfile(1:trimtext(gridfile))
-  330    format (/,' Gaussian CUBEGEN Input Written to File :   ',a)
+  330    format (/,' Gaussian CUBEGEN Input Written To :   ',a)
          write (iout,340)
   340    format (/,' Next, run the Gaussian CUBEGEN program; for',
      &              ' example:',
@@ -1884,7 +1884,7 @@ c
          if (domodel) then
             close (unit=ipot)
             write (iout,100)  potfile(1:trimtext(potfile))
-  100       format (/,' Electrostatic Potential Written to File :  ',a)
+  100       format (/,' Electrostatic Potential Written To :  ',a)
          end if
       end if
 c

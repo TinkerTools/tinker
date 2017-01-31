@@ -75,7 +75,7 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=10,end=10)  nstep
    10 continue
-      dowhile (nstep .lt. 0)
+      do while (nstep .lt. 0)
          write (iout,20)
    20    format (/,' Enter the Number of Dynamics Steps to be',
      &              ' Taken :  ',$)

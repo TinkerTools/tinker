@@ -61,7 +61,7 @@ c
 c
 c     get title line and get the number of atoms and bonds
 c
-      dowhile (.true.)
+      do while (.true.)
          read (isyb,20,err=50,end=50)  record
    20    format (a240)
          next = 1
@@ -95,7 +95,7 @@ c
 c
 c     read the atom names and coordinates
 c
-      dowhile (.true.)
+      do while (.true.)
          read (isyb,80,err=100,end=100)  record
    80    format (a240)
          next = 1
@@ -127,7 +127,7 @@ c
 c
 c     read the bond list to get attached atom lists
 c
-      dowhile (.true.)
+      do while (.true.)
          read (isyb,110,err=130,end=130)  record
   110    format (a240)
          next = 1
