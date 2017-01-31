@@ -456,6 +456,7 @@ c
       real*8 u0sum2,u1sum2
       real*8 stdev0,stdev1
       real*8 hfore,hback
+      real*8 sfore,sback
       real*8 fore,back
       real*8 epv,stdpv
       real*8 hdir,hbar
@@ -972,15 +973,25 @@ c
          bot = bot + term
       end do
       hback = -(top/bot) + uave1
+      sfore = (hfore-cfore) / tempa
+      sback = (hback-cback) / tempb
       write (iout,480)  hfore
   480 format (' Enthalpy via Forward FEP',12x,f12.4,' Kcal/mol')
-      write (iout,490)  hback
-  490 format (' Enthalpy via Backward FEP',11x,f12.4,' Kcal/mol')
+      write (iout,490)  sfore
+  490 format (' Entropy via Forward FEP',13x,f12.6,' Kcal/mol/K')
+      write (iout,500)  -tempa*sfore
+  500 format (' Forward FEP -T*dS Value',13x,f12.4,' Kcal/mol')
+      write (iout,510)  hback
+  510 format (/,' Enthalpy via Backward FEP',11x,f12.4,' Kcal/mol')
+      write (iout,520)  sback
+  520 format (' Entropy via Backward FEP',12x,f12.6,' Kcal/mol/K')
+      write (iout,530)  -tempb*sback
+  530 format (' Backward FEP -T*dS Value',12x,f12.4,' Kcal/mol')
 c
 c     determine the enthalpy and entropy via the BAR method
 c
-      write (iout,500)
-  500 format (/,' Enthalpy and Entropy via BAR Method :',/)
+      write (iout,540)
+  540 format (/,' Enthalpy and Entropy via BAR Method :',/)
       fsum = 0.0d0
       fvsum = 0.0d0
       fbvsum = 0.0d0
@@ -1014,12 +1025,12 @@ c
       hbar = (alpha0-alpha1) / (fbsum0+fbsum1)
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
-      write (iout,510)  hbar
-  510 format (' Enthalpy via BAR Estimate',11x,f12.4,' Kcal/mol')
-      write (iout,520)  sbar
-  520 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
-      write (iout,530)  -tsbar
-  530 format (' BAR Estimate of -T*dS',15x,f12.4,' Kcal/mol')
+      write (iout,550)  hbar
+  550 format (' Enthalpy via BAR Estimate',11x,f12.4,' Kcal/mol')
+      write (iout,560)  sbar
+  560 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
+      write (iout,570)  -tsbar
+  570 format (' BAR Estimate of -T*dS',15x,f12.4,' Kcal/mol')
 c
 c     perform deallocation of some local arrays
 c
