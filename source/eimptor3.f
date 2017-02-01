@@ -53,7 +53,6 @@ c
       real*8 xba,yba,zba
       real*8 xcb,ycb,zcb
       real*8 xdc,ydc,zdc
-      real*8, allocatable :: aeito(:)
       logical proceed
       logical header,huge
 c

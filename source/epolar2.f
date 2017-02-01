@@ -231,7 +231,6 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,iii
-      integer iax,iay,iaz
       integer nlist,jcell
       integer list(*)
       real*8 f,damp,expdamp

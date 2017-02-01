@@ -53,7 +53,6 @@ c
       integer i,ii
       integer ix,iy,iz
       real*8 r,dot
-      real*8 random
       real*8 xi,yi,zi
       real*8 dx,dy,dz
       real*8 dx1,dy1,dz1

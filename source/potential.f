@@ -2035,7 +2035,7 @@ c
       use potfit
       use units
       implicit none
-      integer i,j,k,m
+      integer i,j,k
       integer ii,it
       integer ix,iy,iz
       integer ikey,size
@@ -2069,8 +2069,8 @@ c
       do i = 1, maxtyp
          fitchg(i) = .false.
       end do
-      do m = 1, nconf
-         call getref (m)
+      do k = 1, nconf
+         call getref (k)
          call setelect
          do i = 1, nion
             done = .true.
@@ -2103,8 +2103,8 @@ c
       do i = 1, maxtyp
          fitpol(i) = .false.
       end do
-      do m = 1, nconf
-         call getref (m)
+      do k = 1, nconf
+         call getref (k)
          call setelect
          do i = 1, npole
             done = .true.

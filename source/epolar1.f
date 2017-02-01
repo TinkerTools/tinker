@@ -2187,7 +2187,6 @@ c
       real*8 damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
-      real*8 scalekk
       real*8 sc3,sc5,sc7
       real*8 psc3,psc5,psc7
       real*8 dsc3,dsc5,dsc7
@@ -3785,7 +3784,6 @@ c
       real*8 damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
-      real*8 scalekk
       real*8 sc3,sc5,sc7
       real*8 psc3,psc5,psc7
       real*8 dsc3,dsc5,dsc7

@@ -122,7 +122,6 @@ c
       real*8, allocatable :: vola(:)
       real*8, allocatable :: volb(:)
       logical exist
-      character*240 record
       character*240 string
       character*240 fnamea
       character*240 fnameb
@@ -415,7 +414,6 @@ c     ################################################################
 c
 c
       subroutine barcalc
-      use boxes
       use files
       use inform
       use iounit
@@ -503,7 +501,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      maxframe = 500000
+      maxframe = 1000000
       allocate (ua0(maxframe))
       allocate (ua1(maxframe))
       allocate (ub0(maxframe))
@@ -830,10 +828,6 @@ c
 c
 c     use bootstrap analysis to estimate statistical error
 c
-      if (debug) then
-         write (iout,390)
-  390    format ()
-      end if
       sum = 0.0d0
       sum2 = 0.0d0
       do k = 1, nbst
@@ -877,19 +871,14 @@ c
                done = .true.
                sum = sum + cnew
                sum2 = sum2 + cnew*cnew
-               if (debug) then
-                  write (iout,400)  k,cnew,iter
-  400             format (' Bootstrap Estimate',i7,7x,f12.4,
-     &                       ' Kcal/mol at',i4,' Resamples')
-               end if
             end if
          end do
       end do
       cnew = sum / bst
       ratio = bst / (bst-1.0d0)
       stdev = sqrt(ratio*(sum2/bst-cnew*cnew))
-      write (iout,410)  cnew,stdev
-  410 format (' Free Energy via BAR Bootstrap',7x,f12.4,
+      write (iout,390)  cnew,stdev
+  390 format (' Free Energy via BAR Bootstrap',7x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
 c
 c     perform deallocation of some local arrays
@@ -899,8 +888,8 @@ c
 c
 c     find the enthalpy directly via average potential energy
 c
-      write (iout,420)
-  420 format (/,' Enthalpy from Potential Energy Averages :',/)
+      write (iout,400)
+  400 format (/,' Enthalpy from Potential Energy Averages :',/)
       patm = 1.0d0
       epv = (vaveb-vavea) * patm / prescon
       stdpv = (vstda+vstdb) * patm / prescon
@@ -938,25 +927,25 @@ c
       stdev1 = sqrt(ratio*(u1sum2/bst-uave1*uave1))
       hdir = hsum / bst
       stdev = sqrt(ratio*(hsum2/bst-hdir*hdir))
-      write (iout,430)  uave0,stdev0
-  430 format (' Average Energy for State 0',10x,f12.4,
+      write (iout,410)  uave0,stdev0
+  410 format (' Average Energy for State 0',10x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
-      write (iout,440)  uave1,stdev1
-  440 format (' Average Energy for State 1',10x,f12.4,
+      write (iout,420)  uave1,stdev1
+  420 format (' Average Energy for State 1',10x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
       if (epv .ne. 0.0d0) then
-         write (iout,450)  epv,stdpv
-  450    format (' PdV Work Term for 1 Atm',13x,f12.4,
+         write (iout,430)  epv,stdpv
+  430    format (' PdV Work Term for 1 Atm',13x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
       end if
-      write (iout,460)  hdir,stdev
-  460 format (' Enthalpy via Direct Estimate',8x,f12.4,
+      write (iout,440)  hdir,stdev
+  440 format (' Enthalpy via Direct Estimate',8x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
 c
 c     calculate the enthalpy via thermodynamic perturbation
 c
-      write (iout,470)
-  470 format (/,' Enthalpy and Entropy via FEP Method :',/)
+      write (iout,450)
+  450 format (/,' Enthalpy and Entropy via FEP Method :',/)
       top = 0.0d0
       bot = 0.0d0
       do i = 1, nfrma
@@ -975,23 +964,23 @@ c
       hback = -(top/bot) + uave1
       sfore = (hfore-cfore) / tempa
       sback = (hback-cback) / tempb
-      write (iout,480)  hfore
-  480 format (' Enthalpy via Forward FEP',12x,f12.4,' Kcal/mol')
-      write (iout,490)  sfore
-  490 format (' Entropy via Forward FEP',13x,f12.6,' Kcal/mol/K')
-      write (iout,500)  -tempa*sfore
-  500 format (' Forward FEP -T*dS Value',13x,f12.4,' Kcal/mol')
-      write (iout,510)  hback
-  510 format (/,' Enthalpy via Backward FEP',11x,f12.4,' Kcal/mol')
-      write (iout,520)  sback
-  520 format (' Entropy via Backward FEP',12x,f12.6,' Kcal/mol/K')
-      write (iout,530)  -tempb*sback
-  530 format (' Backward FEP -T*dS Value',12x,f12.4,' Kcal/mol')
+      write (iout,460)  hfore
+  460 format (' Enthalpy via Forward FEP',12x,f12.4,' Kcal/mol')
+      write (iout,470)  sfore
+  470 format (' Entropy via Forward FEP',13x,f12.6,' Kcal/mol/K')
+      write (iout,480)  -tempa*sfore
+  480 format (' Forward FEP -T*dS Value',13x,f12.4,' Kcal/mol')
+      write (iout,490)  hback
+  490 format (/,' Enthalpy via Backward FEP',11x,f12.4,' Kcal/mol')
+      write (iout,500)  sback
+  500 format (' Entropy via Backward FEP',12x,f12.6,' Kcal/mol/K')
+      write (iout,510)  -tempb*sback
+  510 format (' Backward FEP -T*dS Value',12x,f12.4,' Kcal/mol')
 c
 c     determine the enthalpy and entropy via the BAR method
 c
-      write (iout,540)
-  540 format (/,' Enthalpy and Entropy via BAR Method :',/)
+      write (iout,520)
+  520 format (/,' Enthalpy and Entropy via BAR Method :',/)
       fsum = 0.0d0
       fvsum = 0.0d0
       fbvsum = 0.0d0
@@ -1025,12 +1014,12 @@ c
       hbar = (alpha0-alpha1) / (fbsum0+fbsum1)
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
-      write (iout,550)  hbar
-  550 format (' Enthalpy via BAR Estimate',11x,f12.4,' Kcal/mol')
-      write (iout,560)  sbar
-  560 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
-      write (iout,570)  -tsbar
-  570 format (' BAR Estimate of -T*dS',15x,f12.4,' Kcal/mol')
+      write (iout,530)  hbar
+  530 format (' Enthalpy via BAR Estimate',11x,f12.4,' Kcal/mol')
+      write (iout,540)  sbar
+  540 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
+      write (iout,550)  -tsbar
+  550 format (' BAR Estimate of -T*dS',15x,f12.4,' Kcal/mol')
 c
 c     perform deallocation of some local arrays
 c

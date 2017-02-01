@@ -886,7 +886,6 @@ c
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
-      real*8, allocatable :: aevo(:)
       logical proceed,usei
       logical muti,mutk
       logical header,huge

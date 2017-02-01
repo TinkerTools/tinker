@@ -43,7 +43,6 @@ c
       real*8 xbd,ybd,zbd
       real*8 xcd,ycd,zcd
       real*8 xt,yt,zt,rt2
-      real*8, allocatable :: aeopdo(:)
       logical proceed
       logical header,huge
 c

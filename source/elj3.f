@@ -813,7 +813,6 @@ c
       integer i,j,k
       integer ii,iv,it
       integer kk,kv,kt
-      integer nevo
       integer, allocatable :: iv14(:)
       real*8 e,p6,p12,eps
       real*8 rv,rdn,fgrp

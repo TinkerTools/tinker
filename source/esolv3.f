@@ -378,7 +378,7 @@ c
       use solute
       use usage
       implicit none
-      integer i,k,nest
+      integer i,k
       integer ii,kk,kkk
       real*8 e,f,fi,fik
       real*8 dwater,fgrp
@@ -535,7 +535,8 @@ c
       use usage
       use warp
       implicit none
-      integer i,k,ii,kk
+      integer i,k
+      integer ii,kk
       real*8 e,fgrp
       real*8 f,fi,fik
       real*8 xi,yi,zi
@@ -694,7 +695,7 @@ c
       use solute
       use usage
       implicit none
-      integer i,k,nest
+      integer i,k
       integer ii,kk
       real*8 e,ei
       real*8 fc,fd,fq
@@ -1179,7 +1180,6 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      integer nest
       real*8 ei,f,fikp
       real*8 fgrp,damp
       real*8 r,r2,xr,yr,zr

@@ -801,7 +801,6 @@ c
       implicit none
       integer i,j,k,ii,kk
       real*8 e,ei,fgrp
-      real*8 eso,eintero
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xr2,yr2,zr2
@@ -851,15 +850,11 @@ c
       real*8 b(0:4,0:2)
       real*8 fid(3),fkd(3)
       real*8 fidg(3,3),fkdg(3,3)
-      real*8 viro(3,3)
       real*8 gc(30),gux(30)
       real*8 guy(30),guz(30)
       real*8 gqxx(30),gqxy(30)
       real*8 gqxz(30),gqyy(30)
       real*8 gqyz(30),gqzz(30)
-      real*8, allocatable :: drbo(:)
-      real*8, allocatable :: drbpo(:)
-      real*8, allocatable :: deso(:,:)
       real*8, allocatable :: trq(:,:)
       real*8, allocatable :: trqi(:,:)
       logical proceed,usei

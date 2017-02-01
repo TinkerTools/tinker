@@ -725,7 +725,7 @@ c
       use polpot
       use potent
       implicit none
-      integer i,j,ii
+      integer i,ii
       real*8 e,f,term,fterm
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz,uii
@@ -1257,7 +1257,7 @@ c
       use polpot
       use potent
       implicit none
-      integer i,j,ii
+      integer i,ii
       real*8 e,f,term,fterm
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz,uii
