@@ -446,6 +446,8 @@ c
       real*8 sum,sum2,bst
       real*8 vavea,vaveb
       real*8 vstda,vstdb
+      real*8 vasum,vbsum
+      real*8 vasum2,vbsum2
       real*8 stdev,patm
       real*8 random,ratio
       real*8 cfore,cback
@@ -702,28 +704,38 @@ c
 c
 c     find average volumes and corrections for both trajectories
 c
-      sum = 0.0d0
-      sum2 = 0.0d0
-      do i = 1, nfrma
-         sum = sum + vola(i)
-         sum2 = sum2 + vola(i)*vola(i)
+      vasum = 0.0d0
+      vasum2 = 0.0d0
+      vbsum = 0.0d0
+      vbsum2 = 0.0d0
+      do k = 1, nbst
+         sum = 0.0d0
+         do i = 1, nfrma
+            j = int(frma*random()) + 1
+            sum = sum + vola(j)
+         end do
+         vavea = sum / frma
+         vasum = vasum + vavea
+         vasum2 = vasum2 + vavea*vavea
+         sum = 0.0d0
+         do i = 1, nfrmb
+            j = int(frmb*random()) + 1
+            sum = sum + volb(j)
+         end do
+         vaveb = sum / frmb
+         vbsum = vbsum + vaveb
+         vbsum2 = vbsum2 + vaveb*vaveb
       end do
-      vavea = sum / frma
-      vstda = sqrt(sum2/frma-vavea*vavea)
+      vavea = vasum / bst
+      vstda = sqrt(ratio*(vasum2/bst-vavea*vavea))
+      vaveb = vbsum / bst
+      vstdb = sqrt(ratio*(vbsum2/bst-vaveb*vaveb))
       if (vavea .ne. 0.0d0) then
          do i = 1, nfrma
             if (vola(i) .ne. 0.0d0)
      &         vloga(i) = -rta * log(vola(i)/vavea)
          end do
       end if
-      sum = 0.0d0
-      sum2 = 0.0d0
-      do i = 1, nfrmb
-         sum = sum + volb(i)
-         sum2 = sum2 + volb(i)*volb(i)
-      end do
-      vaveb = sum / frmb
-      vstdb = sqrt(sum2/frmb-vaveb*vaveb)
       if (vaveb .ne. 0.0d0) then
          do i = 1, nfrmb
             if (volb(i) .ne. 0.0d0)
@@ -1034,12 +1046,13 @@ c
          vsum = 0.0d0
          fbsum0 = 0.0d0
          do i = 1, nfrma
-            fore = 1.0d0/(1.0d0+exp((ua1(i)-ua0(i)+vloga(i)-cnew)/rta))
-            back = 1.0d0/(1.0d0+exp((ua0(i)-ua1(i)+vloga(i)+cnew)/rta))
+            j = int(frma*random()) + 1
+            fore = 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)+vloga(j)-cnew)/rta))
+            back = 1.0d0/(1.0d0+exp((ua0(j)-ua1(j)+vloga(j)+cnew)/rta))
             fsum = fsum + fore
-            fvsum = fvsum + fore*ua0(i)
-            fbvsum = fbvsum + fore*back*(ua1(i)-ua0(i)+vloga(i))
-            vsum = vsum + ua0(i)
+            fvsum = fvsum + fore*ua0(j)
+            fbvsum = fbvsum + fore*back*(ua1(j)-ua0(j)+vloga(j))
+            vsum = vsum + ua0(j)
             fbsum0 = fbsum0 + fore*back
          end do
          alpha0 = fvsum - fsum*(vsum/frma) + fbvsum
@@ -1049,12 +1062,13 @@ c
          vsum = 0.0d0
          fbsum1 = 0.0d0
          do i = 1, nfrmb
-            fore = 1.0d0/(1.0d0+exp((ub1(i)-ub0(i)+vlogb(i)-cnew)/rtb))
-            back = 1.0d0/(1.0d0+exp((ub0(i)-ub1(i)+vlogb(i)+cnew)/rtb))
+            j = int(frmb*random()) + 1
+            fore = 1.0d0/(1.0d0+exp((ub1(j)-ub0(j)+vlogb(j)-cnew)/rtb))
+            back = 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+vlogb(j)+cnew)/rtb))
             bsum = bsum + back
-            bvsum = bvsum + back*ub1(i)
-            fbvsum = fbvsum + fore*back*(ub1(i)-ub0(i)+vlogb(i))
-            vsum = vsum + ub1(i)
+            bvsum = bvsum + back*ub1(j)
+            fbvsum = fbvsum + fore*back*(ub1(j)-ub0(j)+vlogb(j))
+            vsum = vsum + ub1(j)
             fbsum1 = fbsum1 + fore*back
          end do
          alpha1 = bvsum - bsum*(vsum/frmb) - fbvsum
@@ -1063,7 +1077,7 @@ c
          hsum2 = hsum2 + hbar*hbar
       end do
       hbar = hsum / bst
-      stdev = sqrt(ratio*(hsum2/bst-hdir*hdir))
+      stdev = sqrt(ratio*(hsum2/bst-hbar*hbar))
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
       write (iout,530)  hbar,stdev
