@@ -133,16 +133,6 @@ c
       character*240, allocatable :: keys1(:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      maxframe = 1000000
-      allocate (ua0(maxframe))
-      allocate (ua1(maxframe))
-      allocate (ub0(maxframe))
-      allocate (ub1(maxframe))
-      allocate (vola(maxframe))
-      allocate (volb(maxframe))
-c
 c     get trajectory A archive and setup mechanics calculation
 c
       call initial
@@ -213,6 +203,16 @@ c
       do i = 1, nkey1
          keys1(i) = keyline(i)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      maxframe = 1000000
+      allocate (ua0(maxframe))
+      allocate (ua1(maxframe))
+      allocate (ub0(maxframe))
+      allocate (ub1(maxframe))
+      allocate (vola(maxframe))
+      allocate (volb(maxframe))
 c
 c     reopen trajectory A using the parameters for state 0
 c
@@ -449,12 +449,18 @@ c
       real*8 stdev,patm
       real*8 random,ratio
       real*8 cfore,cback
+      real*8 cfsum,cbsum
+      real*8 cfsum2,cbsum2
+      real*8 stdcf,stdcb
       real*8 uave0,uave1
       real*8 u0sum,u1sum
       real*8 u0sum2,u1sum2
       real*8 stdev0,stdev1
       real*8 hfore,hback
       real*8 sfore,sback
+      real*8 hfsum,hbsum
+      real*8 hfsum2,hbsum2
+      real*8 stdhf,stdhb
       real*8 fore,back
       real*8 epv,stdpv
       real*8 hdir,hbar
@@ -687,6 +693,13 @@ c
       rtb = gasconst * tempb
       rt = 0.5d0 * (rta+rtb)
 c
+c     set the number of bootstrap trials to be generated
+c
+      nfrm = max(nfrma,nfrmb)
+      nbst = min(100000,nint(1.0d8/dble(nfrm)))
+      bst = dble(nbst)
+      ratio = bst / (bst-1.0d0)
+c
 c     find average volumes and corrections for both trajectories
 c
       sum = 0.0d0
@@ -722,20 +735,38 @@ c     get the free energy change via thermodynamic perturbation
 c
       write (iout,300)
   300 format (/,' Free Energy Difference via FEP Method :',/)
-      sum = 0.0d0
-      do i = 1, nfrma
-         sum = sum + exp((ua0(i)-ua1(i)+vloga(i))/rta)
+      cfsum = 0.0d0
+      cfsum2 = 0.0d0
+      cbsum = 0.0d0
+      cbsum2 = 0.0d0
+      do k = 1, nbst
+         sum = 0.0d0
+         do i = 1, nfrma
+            j = int(frma*random()) + 1
+            sum = sum + exp((ua0(j)-ua1(j)+vloga(j))/rta)
+         end do
+         cfore = -rta * log(sum/frma)
+         cfsum = cfsum + cfore
+         cfsum2 = cfsum2 + cfore*cfore
+         sum = 0.0d0
+         do i = 1, nfrmb
+            j = int(frmb*random()) + 1
+            sum = sum + exp((ub1(j)-ub0(j)+vlogb(j))/rtb)
+         end do
+         cback = rtb * log(sum/frmb)
+         cbsum = cbsum + cback
+         cbsum2 = cbsum2 + cback*cback
       end do
-      cfore = -rta * log(sum/frma)
-      sum = 0.0d0
-      do i = 1, nfrmb
-         sum = sum + exp((ub1(i)-ub0(i)+vlogb(i))/rtb)
-      end do
-      cback = rtb * log(sum/frmb)
-      write (iout,310)  cfore
-  310 format (' Free Energy via Forward FEP',9x,f12.4,' Kcal/mol')
-      write (iout,320)  cback
-  320 format (' Free Energy via Backward FEP',8x,f12.4,' Kcal/mol')
+      cfore = cfsum / bst
+      stdcf = sqrt(ratio*(cfsum2/bst-cfore*cfore))
+      cback = cbsum / bst
+      stdcb = sqrt(ratio*(cbsum2/bst-cback*cback))
+      write (iout,310)  cfore,stdcf
+  310 format (' Free Energy via Forward FEP',9x,f12.4,
+     &           ' +/-',f9.4,' Kcal/mol')
+      write (iout,320)  cback,stdcb
+  320 format (' Free Energy via Backward FEP',8x,f12.4,
+     &           ' +/-',f9.4,' Kcal/mol')
 c
 c     determine the initial free energy via the BAR method
 c
@@ -803,7 +834,7 @@ c
          if (delta .lt. eps) then
             done = .true.
             write (iout,370)  cnew,stdev
-  370       format (/,' Free Energy via BAR Estimate',8x,f12.4,
+  370       format (/,' Free Energy via BAR Iteration',7x,f12.4,
      &                 ' +/-',f9.4,' Kcal/mol')
          end if
          if (iter.ge.maxiter .and. .not.done) then
@@ -814,12 +845,6 @@ c
             call fatal
          end if
       end do
-c
-c     set the number of bootstrap trials to be generated
-c
-      nfrm = max(nfrma,nfrmb)
-      nbst = min(100000,nint(1.0d8/dble(nfrm)))
-      bst = dble(nbst)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -893,7 +918,6 @@ c
       patm = 1.0d0
       epv = (vaveb-vavea) * patm / prescon
       stdpv = (vstda+vstdb) * patm / prescon
-      ratio = dble(nbst/(nbst-1))
       u0sum = 0.0d0
       u0sum2 = 0.0d0
       u1sum = 0.0d0
@@ -946,32 +970,52 @@ c     calculate the enthalpy via thermodynamic perturbation
 c
       write (iout,450)
   450 format (/,' Enthalpy and Entropy via FEP Method :',/)
-      top = 0.0d0
-      bot = 0.0d0
-      do i = 1, nfrma
-         term = exp((ua0(i)-ua1(i)+vloga(i))/rta)
-         top = top + ua1(i)*term
-         bot = bot + term
+      hfsum = 0.0d0
+      hfsum2 = 0.0d0
+      hbsum = 0.0d0
+      hbsum2 = 0.0d0
+      do k = 1, nbst
+         top = 0.0d0
+         bot = 0.0d0
+         do i = 1, nfrma
+            j = int(frma*random()) + 1
+            term = exp((ua0(j)-ua1(j)+vloga(j))/rta)
+            top = top + ua1(j)*term
+            bot = bot + term
+         end do
+         hfore = (top/bot) - uave0
+         hfsum = hfsum + hfore
+         hfsum2 = hfsum2 + hfore*hfore
+         top = 0.0d0
+         bot = 0.0d0
+         do i = 1, nfrmb
+            j = int(frmb*random()) + 1
+            term = exp((ub1(j)-ub0(j)+vlogb(j))/rtb)
+            top = top + ub0(j)*term
+            bot = bot + term
+         end do
+         hback = -(top/bot) + uave1
+         hbsum = hbsum + hback
+         hbsum2 = hbsum2 + hback*hback
       end do
-      hfore = (top/bot) - uave0
-      top = 0.0d0
-      bot = 0.0d0
-      do i = 1, nfrmb
-         term = exp((ub1(i)-ub0(i)+vlogb(i))/rtb)
-         top = top + ub0(i)*term
-         bot = bot + term
-      end do
-      hback = -(top/bot) + uave1
+      hfore = hfsum / bst
+      stdhf = sqrt(ratio*(hfsum2/bst-hfore*hfore))
+      stdhf = stdhf + stdev0
       sfore = (hfore-cfore) / tempa
+      hback = hbsum / bst
+      stdhb = sqrt(ratio*(hbsum2/bst-hback*hback))
+      stdhb = stdhb + stdev1
       sback = (hback-cback) / tempb
-      write (iout,460)  hfore
-  460 format (' Enthalpy via Forward FEP',12x,f12.4,' Kcal/mol')
+      write (iout,460)  hfore,stdhf
+  460 format (' Enthalpy via Forward FEP',12x,f12.4,
+     &              ' +/-',f9.4,' Kcal/mol')
       write (iout,470)  sfore
   470 format (' Entropy via Forward FEP',13x,f12.6,' Kcal/mol/K')
       write (iout,480)  -tempa*sfore
   480 format (' Forward FEP -T*dS Value',13x,f12.4,' Kcal/mol')
-      write (iout,490)  hback
-  490 format (/,' Enthalpy via Backward FEP',11x,f12.4,' Kcal/mol')
+      write (iout,490)  hback,stdhb
+  490 format (/,' Enthalpy via Backward FEP',11x,f12.4,
+     &              ' +/-',f9.4,' Kcal/mol')
       write (iout,500)  sback
   500 format (' Entropy via Backward FEP',12x,f12.6,' Kcal/mol/K')
       write (iout,510)  -tempb*sback
@@ -981,41 +1025,50 @@ c     determine the enthalpy and entropy via the BAR method
 c
       write (iout,520)
   520 format (/,' Enthalpy and Entropy via BAR Method :',/)
-      fsum = 0.0d0
-      fvsum = 0.0d0
-      fbvsum = 0.0d0
-      vsum = 0.0d0
-      fbsum0 = 0.0d0
-      do i = 1, nfrma
-         fore = 1.0d0 / (1.0d0+exp((ua1(i)-ua0(i)+vloga(i)-cnew)/rta))
-         back = 1.0d0 / (1.0d0+exp((ua0(i)-ua1(i)+vloga(i)+cnew)/rta))
-         fsum = fsum + fore
-         fvsum = fvsum + fore*ua0(i)
-         fbvsum = fbvsum + fore*back*(ua1(i)-ua0(i)+vloga(i))
-         vsum = vsum + ua0(i)
-         fbsum0 = fbsum0 + fore*back
+      hsum = 0.0d0
+      hsum2 = 0.0d0
+      do k = 1, nbst
+         fsum = 0.0d0
+         fvsum = 0.0d0
+         fbvsum = 0.0d0
+         vsum = 0.0d0
+         fbsum0 = 0.0d0
+         do i = 1, nfrma
+            fore = 1.0d0/(1.0d0+exp((ua1(i)-ua0(i)+vloga(i)-cnew)/rta))
+            back = 1.0d0/(1.0d0+exp((ua0(i)-ua1(i)+vloga(i)+cnew)/rta))
+            fsum = fsum + fore
+            fvsum = fvsum + fore*ua0(i)
+            fbvsum = fbvsum + fore*back*(ua1(i)-ua0(i)+vloga(i))
+            vsum = vsum + ua0(i)
+            fbsum0 = fbsum0 + fore*back
+         end do
+         alpha0 = fvsum - fsum*(vsum/frma) + fbvsum
+         bsum = 0.0d0
+         bvsum = 0.0d0
+         fbvsum = 0.0d0
+         vsum = 0.0d0
+         fbsum1 = 0.0d0
+         do i = 1, nfrmb
+            fore = 1.0d0/(1.0d0+exp((ub1(i)-ub0(i)+vlogb(i)-cnew)/rtb))
+            back = 1.0d0/(1.0d0+exp((ub0(i)-ub1(i)+vlogb(i)+cnew)/rtb))
+            bsum = bsum + back
+            bvsum = bvsum + back*ub1(i)
+            fbvsum = fbvsum + fore*back*(ub1(i)-ub0(i)+vlogb(i))
+            vsum = vsum + ub1(i)
+            fbsum1 = fbsum1 + fore*back
+         end do
+         alpha1 = bvsum - bsum*(vsum/frmb) - fbvsum
+         hbar = (alpha0-alpha1) / (fbsum0+fbsum1)
+         hsum = hsum + hbar
+         hsum2 = hsum2 + hbar*hbar
       end do
-      alpha0 = fvsum - fsum*(vsum/frma) + fbvsum
-      bsum = 0.0d0
-      bvsum = 0.0d0
-      fbvsum = 0.0d0
-      vsum = 0.0d0
-      fbsum1 = 0.0d0
-      do i = 1, nfrmb
-         fore = 1.0d0 / (1.0d0+exp((ub1(i)-ub0(i)+vlogb(i)-cnew)/rtb))
-         back = 1.0d0 / (1.0d0+exp((ub0(i)-ub1(i)+vlogb(i)+cnew)/rtb))
-         bsum = bsum + back
-         bvsum = bvsum + back*ub1(i)
-         fbvsum = fbvsum + fore*back*(ub1(i)-ub0(i)+vlogb(i))
-         vsum = vsum + ub1(i)
-         fbsum1 = fbsum1 + fore*back
-      end do
-      alpha1 = bvsum - bsum*(vsum/frmb) - fbvsum
-      hbar = (alpha0-alpha1) / (fbsum0+fbsum1)
+      hbar = hsum / bst
+      stdev = sqrt(ratio*(hsum2/bst-hdir*hdir))
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
-      write (iout,530)  hbar
-  530 format (' Enthalpy via BAR Estimate',11x,f12.4,' Kcal/mol')
+      write (iout,530)  hbar,stdev
+  530 format (' Enthalpy via BAR Estimate',11x,f12.4
+     &           ' +/-',f9.4,' Kcal/mol')
       write (iout,540)  sbar
   540 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
       write (iout,550)  -tsbar
