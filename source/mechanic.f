@@ -95,13 +95,11 @@ c
 c     assign van der Waals and electrostatic potential parameters
 c
       if (use_vdw .or. use_solv)  call kvdw
-      if (use_charge .or. use_chgdpl .or.
-     &    use_solv)  call kcharge
+      if (use_charge .or. use_chgdpl .or. use_solv)  call kcharge
       if (use_dipole .or. use_chgdpl)  call kdipole
       if (use_mpole .or. use_polar .or.
      &    use_solv .or. use_rxnfld)  call kmpole
-      if (use_mpole .or. use_polar .or.
-     &    use_solv)  call kpolar
+      if (use_mpole .or. use_polar .or. use_solv)  call kpolar
       if (use_ewald)  call kewald
 c
 c     assign solvation, metal, pisystem and restraint parameters

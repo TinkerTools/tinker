@@ -43,6 +43,7 @@ c
       integer offset,origin
       integer oldtype,newtype
       integer freeunit
+      integer trimtext
       integer, allocatable :: list(:)
       integer, allocatable :: keep(:)
       real*8 xi,yi,zi
@@ -54,7 +55,7 @@ c
       real*8 phi,theta,psi
       real*8 cphi,ctheta,cpsi
       real*8 sphi,stheta,spsi
-      real*8 dist2,cut2
+      real*8 dist2,cut2,reduce
       real*8 random,norm,weigh
       real*8, allocatable :: rad(:)
       real*8, allocatable :: x0(:)
@@ -63,7 +64,8 @@ c
       real*8 a(3,3)
       logical exist,query
       logical opened,multi
-      logical append
+      logical append,refine
+      character*1 answer
       character*240 xyzfile
       character*240 modfile
       character*240 record
@@ -119,20 +121,20 @@ c
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
      &        /,4x,'(2) Deletion of Individual Specified Atoms',
      &        /,4x,'(3) Deletion of Specified Types of Atoms',
-     &        /,4x,'(4) Deletion of Atoms outside Cutoff Range',
+     &        /,4x,'(4) Deletion of Atoms Outside Cutoff Range',
      &        /,4x,'(5) Insertion of Individual Specified Atoms',
      &        /,4x,'(6) Replace Old Atom Type with a New Type',
      &        /,4x,'(7) Assign Connectivities for Linear Chain',
-     &        /,4x,'(8) Assign Connectivities based on Distance',
+     &        /,4x,'(8) Assign Connectivities Based on Distance',
      &        /,4x,'(9) Convert Units from Bohrs to Angstroms',
-     &        /,3x,'(10) Invert thru Origin to give Mirror Image',
+     &        /,3x,'(10) Invert thru Origin to Give Mirror Image',
      &        /,3x,'(11) Translate All Atoms by an X,Y,Z-Vector',
      &        /,3x,'(12) Translate Center of Mass to the Origin',
      &        /,3x,'(13) Translate a Specified Atom to the Origin',
      &        /,3x,'(14) Translate and Rotate to Inertial Frame',
      &        /,3x,'(15) Move to Specified Rigid Body Coordinates',
      &        /,3x,'(16) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(17) Delete Molecules outside of Periodic Box',
+     &        /,3x,'(17) Delete Molecules Outside of Periodic Box',
      &        /,3x,'(18) Append a Second XYZ File to Current One',
      &        /,3x,'(19) Create and Fill a Periodic Boundary Box',
      &        /,3x,'(20) Soak Current Molecule in Box of Solvent')
@@ -931,6 +933,13 @@ c
             if (ybox .eq. 0.0d0)  ybox = xbox
             if (zbox .eq. 0.0d0)  zbox = xbox
          end do
+         refine = .false.
+         write (iout,420)
+  420    format (/,' Refine the Periodic Box Configuration [N] :  ',$)
+         read (input,430)  answer
+  430    format (a1)
+         call upcase (answer)
+         if (answer .eq. 'Y')  refine = .true.
          orthogonal = .true.
          xcm = 0.0d0
          ycm = 0.0d0
@@ -949,10 +958,16 @@ c
          allocate (x0(n))
          allocate (y0(n))
          allocate (z0(n))
+         reduce = 0.001d0
          do i = 1, n
             x(i) = x(i) - xcm
             y(i) = y(i) - ycm
             z(i) = z(i) - zcm
+            if (refine) then
+               x(i) = reduce * x(i)
+               y(i) = reduce * y(i)
+               z(i) = reduce * z(i)
+            end if
             x0(i) = x(i)
             y0(i) = y(i)
             z0(i) = z(i)
@@ -999,9 +1014,13 @@ c
          deallocate (z0)
          offset = 0
          n = ncopy * n
-         call lattice
-         call molecule
-         call bounds
+         if (.not. refine) then
+            call lattice
+            call molecule
+            call bounds
+         else
+            call boxmin
+         end if
       end if
 c
 c     solvate the current system by insertion into a solvent box
@@ -1020,8 +1039,8 @@ c     perform any final tasks before program exit
 c
       if (opened) then
          close (unit=imod)
-         write (iout,420)  modfile
-  420    format (/,' New Coordinates File Written To :  ',a)
+         write (iout,440)  modfile(1:trimtext(modfile))
+  440    format (/,' New Coordinates File Written To :  ',a)
       end if
       close (unit=ixyz)
       call final
@@ -1111,6 +1130,167 @@ c
          write (imod,fstr)  i+offset,name(i),x(i),y(i),z(i),type(i),
      &                      (i12(k,i)+offset,k=1,n12(i))
       end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine boxmin  --  expand molecules into periodic box  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "boxmin" uses minimization of valence and vdw potential energy
+c     to expand and refine a collection of solvent molecules in a
+c     periodic box
+c
+c
+      subroutine boxmin
+      use sizes
+      use atoms
+      use inform
+      use linmin
+      use minima
+      use output
+      use potent
+      use scales
+      implicit none
+      integer i,j,nvar
+      real*8 minimum
+      real*8 boxmin1
+      real*8 grdmin
+      real*8, allocatable :: xx(:)
+      external boxmin1
+      external optsave
+c
+c
+c     setup for minimization with only valence and vdw terms
+c
+      call mechanic
+      call potoff
+      use_bond = .true.
+      use_angle = .true.
+      use_opbend = .true.
+      use_opdist = .true.
+      use_improp = .true.
+      use_imptor = .true.
+      use_tors = .true.
+      use_vdw = .true.
+c
+c     mark for use of all atoms, and set scale factors
+c
+      nvar = 0
+      do i = 1, n
+         do j = 1, 3
+            nvar = nvar + 1
+            scale(nvar) = 12.0d0
+         end do
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xx(nvar))
+c
+c     scale the coordinates of each active atom
+c
+      nvar = 0
+      do i = 1, n
+         nvar = nvar + 1
+         xx(nvar) = x(i) * scale(nvar)
+         nvar = nvar + 1
+         xx(nvar) = y(i) * scale(nvar)
+         nvar = nvar + 1
+         xx(nvar) = z(i) * scale(nvar)
+      end do
+c
+c     make the call to the optimization routine
+c
+      iprint = 100
+      maxiter = 10000
+      stpmax = 10.0
+      grdmin = 1.0d0
+      coordtype = 'NONE'
+      call lbfgs (nvar,xx,minimum,grdmin,boxmin1,optsave)
+c
+c     unscale the final coordinates for active atoms
+c
+      nvar = 0
+      do i = 1, n
+         nvar = nvar + 1
+         x(i) = xx(nvar) / scale(nvar)
+         nvar = nvar + 1
+         y(i) = xx(nvar) / scale(nvar)
+         nvar = nvar + 1
+         z(i) = xx(nvar) / scale(nvar)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xx)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  function boxmin1  --  energy and gradient for boxmin  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "boxmin1" is a service routine that computes the energy and
+c     gradient during refinement of a periodic box
+c
+c
+      function boxmin1 (xx,g)
+      use sizes
+      use atoms
+      use scales
+      implicit none
+      integer i,nvar
+      real*8 e,boxmin1
+      real*8 xx(*)
+      real*8 g(*)
+      real*8, allocatable :: derivs(:,:)
+c
+c
+c     translate optimization parameters to atomic coordinates
+c
+      nvar = 0
+      do i = 1, n
+         nvar = nvar + 1
+         x(i) = xx(nvar) / scale(nvar)
+         nvar = nvar + 1
+         y(i) = xx(nvar) / scale(nvar)
+         nvar = nvar + 1
+         z(i) = xx(nvar) / scale(nvar)
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
+c     compute and store the energy and gradient
+c
+      call gradient (e,derivs)
+      boxmin1 = e
+c
+c     store Cartesian gradient as optimization gradient
+c
+      nvar = 0
+      do i = 1, n
+         nvar = nvar + 1
+         g(nvar) = derivs(1,i) / scale(nvar)
+         nvar = nvar + 1
+         g(nvar) = derivs(2,i) / scale(nvar)
+         nvar = nvar + 1
+         g(nvar) = derivs(3,i) / scale(nvar)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
       return
       end
 c
