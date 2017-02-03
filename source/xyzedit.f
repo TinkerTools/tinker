@@ -958,7 +958,7 @@ c
          allocate (x0(n))
          allocate (y0(n))
          allocate (z0(n))
-         reduce = 0.001d0
+         reduce = 0.01d0
          do i = 1, n
             x(i) = x(i) - xcm
             y(i) = y(i) - ycm
@@ -1014,12 +1014,12 @@ c
          deallocate (z0)
          offset = 0
          n = ncopy * n
-         if (.not. refine) then
+         if (refine) then
+            call boxmin
+         else
             call lattice
             call molecule
             call bounds
-         else
-            call boxmin
          end if
       end if
 c
@@ -1029,20 +1029,20 @@ c
          call soak
       end if
 c
-c     output final coordinates for single frame input file
+c     output final coordinates for single frame and print info
 c
       if (opened .and. .not.multi) then
          call prtmod (imod,offset)
       end if
-c
-c     perform any final tasks before program exit
-c
       if (opened) then
          close (unit=imod)
          write (iout,440)  modfile(1:trimtext(modfile))
   440    format (/,' New Coordinates File Written To :  ',a)
       end if
       close (unit=ixyz)
+c
+c     perform any final tasks before program exit
+c
       call final
       end
 c
@@ -1150,8 +1150,10 @@ c
       use sizes
       use atoms
       use inform
+      use limits
       use linmin
       use minima
+      use neigh
       use output
       use potent
       use scales
@@ -1177,6 +1179,32 @@ c
       use_imptor = .true.
       use_tors = .true.
       use_vdw = .true.
+c
+c     cutoff values and neighbor lists for vdw interactions
+c
+      vdwcut = 6.0d0
+      vdwtaper = 5.4d0
+      use_list = .true.
+      use_vlist = .true.
+      dovlst = .true.
+      lbuffer = 2.0d0
+      lbuf2 = (0.5d0*lbuffer)**2
+      vbuf2 = (vdwcut+lbuffer)**2
+      vbufx = (vdwcut+2.0d0*lbuffer)**2
+      maxvlst = int(sqrt(vbuf2)**3) + 100
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(nvlst))  deallocate (nvlst)
+      if (allocated(vlst))  deallocate (vlst)
+      if (allocated(xvold))  deallocate (xvold)
+      if (allocated(yvold))  deallocate (yvold)
+      if (allocated(zvold))  deallocate (zvold)
+      allocate (nvlst(n))
+      allocate (vlst(maxvlst,n))
+      allocate (xvold(n))
+      allocate (yvold(n))
+      allocate (zvold(n))
 c
 c     mark for use of all atoms, and set scale factors
 c
