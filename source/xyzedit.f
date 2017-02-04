@@ -933,13 +933,13 @@ c
             if (ybox .eq. 0.0d0)  ybox = xbox
             if (zbox .eq. 0.0d0)  zbox = xbox
          end do
-         refine = .false.
+         refine = .true.
          write (iout,420)
-  420    format (/,' Refine the Periodic Box Configuration [N] :  ',$)
+  420    format (/,' Refine the Periodic Box Configuration [Y] :  ',$)
          read (input,430)  answer
   430    format (a1)
          call upcase (answer)
-         if (answer .eq. 'Y')  refine = .true.
+         if (answer .eq. 'N')  refine = .false.
          orthogonal = .true.
          xcm = 0.0d0
          ycm = 0.0d0
@@ -1149,6 +1149,7 @@ c
       subroutine boxmin
       use sizes
       use atoms
+      use boxes
       use inform
       use limits
       use linmin
@@ -1162,6 +1163,7 @@ c
       real*8 minimum
       real*8 boxmin1
       real*8 grdmin
+      real*8 boxmax
       real*8, allocatable :: xx(:)
       external boxmin1
       external optsave
@@ -1182,29 +1184,36 @@ c
 c
 c     cutoff values and neighbor lists for vdw interactions
 c
+      use_list = .false.
+      use_vlist = .false.
       vdwcut = 6.0d0
       vdwtaper = 5.4d0
-      use_list = .true.
-      use_vlist = .true.
-      dovlst = .true.
       lbuffer = 2.0d0
-      lbuf2 = (0.5d0*lbuffer)**2
-      vbuf2 = (vdwcut+lbuffer)**2
-      vbufx = (vdwcut+2.0d0*lbuffer)**2
-      maxvlst = int(sqrt(vbuf2)**3) + 100
+      boxmax = min(xbox,ybox,zbox)
+      if (boxmax .gt. vdwcut+lbuffer) then
+         use_list = .true.
+         use_vlist = .true.
+         dovlst = .true.
+         lbuf2 = (0.5d0*lbuffer)**2
+         vbuf2 = (vdwcut+lbuffer)**2
+         vbufx = (vdwcut+2.0d0*lbuffer)**2
+         maxvlst = int(sqrt(vbuf2)**3)
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(nvlst))  deallocate (nvlst)
-      if (allocated(vlst))  deallocate (vlst)
-      if (allocated(xvold))  deallocate (xvold)
-      if (allocated(yvold))  deallocate (yvold)
-      if (allocated(zvold))  deallocate (zvold)
-      allocate (nvlst(n))
-      allocate (vlst(maxvlst,n))
-      allocate (xvold(n))
-      allocate (yvold(n))
-      allocate (zvold(n))
+      if (use_vlist) then
+         if (allocated(nvlst))  deallocate (nvlst)
+         if (allocated(vlst))  deallocate (vlst)
+         if (allocated(xvold))  deallocate (xvold)
+         if (allocated(yvold))  deallocate (yvold)
+         if (allocated(zvold))  deallocate (zvold)
+         allocate (nvlst(n))
+         allocate (vlst(maxvlst,n))
+         allocate (xvold(n))
+         allocate (yvold(n))
+         allocate (zvold(n))
+      end if
 c
 c     mark for use of all atoms, and set scale factors
 c
@@ -1236,7 +1245,7 @@ c     make the call to the optimization routine
 c
       iprint = 100
       maxiter = 10000
-      stpmax = 10.0
+      stpmax = 10.0d0
       grdmin = 1.0d0
       coordtype = 'NONE'
       call lbfgs (nvar,xx,minimum,grdmin,boxmin1,optsave)
