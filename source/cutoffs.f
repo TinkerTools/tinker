@@ -218,20 +218,20 @@ c     specify maximum size for each of the neighbor lists
 c
       maxvlst = 2500
       if (vdwcut .ne. big) then
-         limit = int(0.5d0*sqrt(vbuf2)**3) + 50
+         limit = int(sqrt(vbuf2)**3)
          maxvlst = min(limit,maxvlst)
       end if
       maxelst = 2500
       if (chgcut .ne. big) then
-         limit = int(0.5d0*sqrt(cbuf2)**3) + 50
+         limit = int(sqrt(cbuf2)**3)
          maxelst = min(limit,maxelst)
       end if
       if (mpolecut .ne. big) then
-         limit = int(0.5d0*sqrt(mbuf2)**3) + 50
+         limit = int(sqrt(mbuf2)**3)
          maxelst = min(limit,maxelst)
       end if
       maxulst = 500
-      limit = int(0.5d0*sqrt(ubuf2)**3) + 50
+      limit = int(sqrt(ubuf2)**3)
       maxulst = min(limit,maxulst)
 c
 c     perform dynamic allocation of some global arrays
