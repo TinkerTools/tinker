@@ -1190,7 +1190,7 @@ c
       vdwtaper = 5.4d0
       lbuffer = 2.0d0
       boxmax = min(xbox,ybox,zbox)
-      if (boxmax .gt. vdwcut+lbuffer) then
+      if (boxmax .gt. 2.0d0*(vdwcut+lbuffer)) then
          use_list = .true.
          use_vlist = .true.
          dovlst = .true.
