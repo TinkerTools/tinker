@@ -496,7 +496,7 @@ c
                   write (iout,10)
    10             format (/,' Determination of SCF Induced Dipole',
      &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
+     &                    //,4x,'Iter',7x,'RMS Residual (Debyes)',/)
                end if
                write (iout,20)  iter,eps
    20          format (i8,7x,f16.10)
@@ -535,8 +535,8 @@ c     print the results from the conjugate gradient iteration
 c
          if (debug) then
             write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
-     &                 6x,'RMS Change',f15.10)
+   30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
+     &                 6x,'RMS Residual',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge

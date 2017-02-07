@@ -177,10 +177,19 @@ c
       if (mode .eq. 1) then
    90    continue
          offset = 0
-         write (iout,100)
-  100    format (/,' Offset used to Renumber the Atoms [0] :  ',$)
-         read (input,110,err=90)  offset
-  110    format (i10)
+         query = .true.
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=100,end=100)  offset
+            query = .false.
+         end if
+  100    continue
+         if (query) then
+            write (iout,110)
+  110       format (/,' Offset used to Renumber the Atoms [0] :  ',$)
+            read (input,120,err=90)  offset
+  120       format (i10)
+         end if
          do while (.not. abort)
             call makeref (1)
             call readxyz (ixyz)
@@ -206,12 +215,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,120)
-  120    format (/,' Numbers of the Atoms to be Removed :  ',$)
-         read (input,130)  record
-  130    format (a240)
-         read (record,*,err=140,end=140)  (list(i),i=1,n)
-  140    continue
+         write (iout,130)
+  130    format (/,' Numbers of the Atoms to be Removed :  ',$)
+         read (input,140)  record
+  140    format (a240)
+         read (record,*,err=150,end=150)  (list(i),i=1,n)
+  150    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -259,12 +268,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,150)
-  150    format (/,' Atom Types to be Removed :  ',$)
-         read (input,160)  record
-  160    format (a240)
-         read (record,*,err=170,end=170)  (list(i),i=1,n)
-  170    continue
+         write (iout,160)
+  160    format (/,' Atom Types to be Removed :  ',$)
+         read (input,170)  record
+  170    format (a240)
+         read (record,*,err=180,end=180)  (list(i),i=1,n)
+  180    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -275,10 +284,10 @@ c
                do j = 1, nlist
                   if (list(j) .eq. it) then
                      call delete (i)
-                     goto 180
+                     goto 190
                   end if
                end do
-  180          continue
+  190          continue
             end do
             call makeref (1)
             call readxyz (ixyz)
@@ -331,14 +340,14 @@ c
                   zi = z(i)
                   do j = 1, n
                      if (use(j)) then
-                        if (keep(j) .eq. i)  goto 190
+                        if (keep(j) .eq. i)  goto 200
                         dist2 = (x(j)-xi)**2+(y(j)-yi)**2+(z(j)-zi)**2
-                        if (dist2 .le. cut2)  goto 190
+                        if (dist2 .le. cut2)  goto 200
                      end if
                   end do
                   nlist = nlist + 1
                   list(nlist) = i
-  190             continue
+  200             continue
                end if
             end do
             do i = nlist, 1, -1
@@ -370,12 +379,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,200)
-  200    format (/,' Numbers of the Atoms to be Inserted :  ',$)
-         read (input,210)  record
-  210    format (a240)
-         read (record,*,err=220,end=220)  (list(i),i=1,n)
-  220    continue
+         write (iout,210)
+  210    format (/,' Numbers of the Atoms to be Inserted :  ',$)
+         read (input,220)  record
+  220    format (a240)
+         read (record,*,err=230,end=230)  (list(i),i=1,n)
+  230    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -414,14 +423,21 @@ c
 c     get an old atom type and new atom type for replacement
 c
       if (mode .eq. 6) then
-  230    continue
+  240    continue
          oldtype = 0
          newtype = 0
-         write (iout,240)
-  240    format (/,' Numbers of the Old and New Atom Types :  ',$)
-         read (input,250)  record
-  250    format (a240)
-         read (record,*,err=230,end=230)  oldtype,newtype
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=250,end=250)  oldtype
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=250,end=250)  newtype
+  250    continue
+         if (oldtype.eq.0 .or. newtype.eq.0) then
+            write (iout,260)
+  260       format (/,' Numbers of the Old and New Atom Types :  ',$)
+            read (input,270)  record
+  270       format (a240)
+         end if
+         read (record,*,err=240,end=240)  oldtype,newtype
          do while (.not. abort)
             do i = 1, n
                if (type(i) .eq. oldtype) then
@@ -587,12 +603,21 @@ c
          xr = 0.0d0
          yr = 0.0d0
          zr = 0.0d0
-         write (iout,260)
-  260    format (/,' Enter Translation Vector Components :  ',$)
-         read (input,270)  record
-  270    format (a240)
-         read (record,*,err=280,end=280)  xr,yr,zr
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=280,end=280)  xr
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=280,end=280)  yr
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=280,end=280)  zr
   280    continue
+         if (xr.eq.0.0d0 .and. yr.eq.0.0d0 .and. zr.eq.0.0d0) then
+            write (iout,290)
+  290       format (/,' Enter Translation Vector Components :  ',$)
+            read (input,300)  record
+  300       format (a240)
+            read (record,*,err=310,end=310)  xr,yr,zr
+  310       continue
+         end if
          do while (.not. abort)
             do i = 1, n
                x(i) = x(i) + xr
@@ -657,10 +682,17 @@ c
 c     translate to place a specified atom at the origin
 c
       if (mode .eq. 13) then
-         write (iout,290)
-  290    format (/,' Number of the Atom to Move to the Origin :  ',$)
-         read (input,300)  origin
-  300    format (i10)
+         origin = 0
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=320,end=320)  origin
+  320    continue
+         if (origin .eq. 0) then
+            write (iout,330)
+  330       format (/,' Number of the Atom to Move to the Origin',
+     &                 ' :  ',$)
+            read (input,340)  origin
+  340       format (i10)
+         end if
          do while (.not. abort)
             xorig = x(origin)
             yorig = y(origin)
@@ -716,12 +748,28 @@ c
          phi = 0.0d0
          theta = 0.0d0
          psi = 0.0d0
-         write (iout,310)
-  310    format (/,' Enter Rigid Body Coordinates :  ',$)
-         read (input,320)  record
-  320    format (a240)
-         read (record,*,err=330,end=330)  xcm,ycm,zcm,phi,theta,psi
-  330    continue
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=350,end=350)  xcm
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=350,end=350)  ycm
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=350,end=350)  zcm
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=350,end=350)  phi
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=350,end=350)  theta
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=350,end=350)  psi
+  350    continue
+         if (min(xcm,ycm,zcm,phi,theta,psi).eq.0.0d0 .and.
+     &       max(xcm,ycm,zcm,phi,theta,psi).eq.0.0d0) then
+            write (iout,360)
+  360       format (/,' Enter Rigid Body Coordinates :  ',$)
+            read (input,370)  record
+  370       format (a240)
+            read (record,*,err=380,end=380)  xcm,ycm,zcm,phi,theta,psi
+  380       continue
+         end if
          call inertia (2)
          phi = phi / radian
          theta = theta / radian
@@ -798,16 +846,23 @@ c
          xnew = 0.0d0
          ynew = 0.0d0
          znew = 0.0d0
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=390,end=390)  xbox
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=390,end=390)  ybox
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=390,end=390)  zbox
+  390    continue
          do while (xnew .eq. 0.0d0)
-            write (iout,340)
-  340       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,350)  record
-  350       format (a240)
-            read (record,*,err=360,end=360)  xnew,ynew,znew
-  360       continue
-            if (ynew .eq. 0.0d0)  ynew = xnew
-            if (znew .eq. 0.0d0)  znew = xnew
+            write (iout,400)
+  400       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,410)  record
+  410       format (a240)
+            read (record,*,err=420,end=420)  xnew,ynew,znew
+  420       continue
          end do
+         if (ynew .eq. 0.0d0)  ynew = xnew
+         if (znew .eq. 0.0d0)  znew = xnew
          allocate (list(n))
          allocate (keep(n))
          do while (.not. abort)
@@ -916,28 +971,52 @@ c
 c     create random box full of the current coordinates file
 c
       if (mode .eq. 19) then
-         write (iout,370)
-  370    format (/,' Enter Number of Copies to Put in Box :  ',$)
-         read (input,380)  ncopy
-  380    format (i10)
+         ncopy = 0
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=430,end=430)  ncopy
+  430    continue
+         if (ncopy .eq. 0)  then
+            write (iout,440)
+  440       format (/,' Enter Number of Copies to Put in Box :  ',$)
+            read (input,450)  ncopy
+  450       format (i10)
+         end if
          xbox = 0.0d0
          ybox = 0.0d0
          zbox = 0.0d0
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=460,end=460)  xbox
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=460,end=460)  ybox
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=460,end=460)  zbox
+  460    continue
          do while (xbox .eq. 0.0d0)
-            write (iout,390)
-  390       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,400)  record
-  400       format (a240)
-            read (record,*,err=410,end=410)  xbox,ybox,zbox
-  410       continue
-            if (ybox .eq. 0.0d0)  ybox = xbox
-            if (zbox .eq. 0.0d0)  zbox = xbox
+            write (iout,470)
+  470       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,480)  record
+  480       format (a240)
+            read (record,*,err=490,end=490)  xbox,ybox,zbox
+  490       continue
          end do
+         if (ybox .eq. 0.0d0)  ybox = xbox
+         if (zbox .eq. 0.0d0)  zbox = xbox
          refine = .true.
-         write (iout,420)
-  420    format (/,' Refine the Periodic Box Configuration [Y] :  ',$)
-         read (input,430)  answer
-  430    format (a1)
+         answer = 'Y'
+         query = .true.
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=500,end=500)  answer
+            query = .false.
+         end if
+  500    continue
+         if (query) then
+            write (iout,510)
+  510       format (/,' Refine the Periodic Box Configuration',
+     &                 ' [Y] :  ',$)
+            read (input,520)  answer
+  520       format (a1)
+         end if
          call upcase (answer)
          if (answer .eq. 'N')  refine = .false.
          orthogonal = .true.
@@ -958,7 +1037,7 @@ c
          allocate (x0(n))
          allocate (y0(n))
          allocate (z0(n))
-         reduce = 0.01d0
+         reduce = 0.001d0
          do i = 1, n
             x(i) = x(i) - xcm
             y(i) = y(i) - ycm
@@ -1036,8 +1115,8 @@ c
       end if
       if (opened) then
          close (unit=imod)
-         write (iout,440)  modfile(1:trimtext(modfile))
-  440    format (/,' New Coordinates File Written To :  ',a)
+         write (iout,530)  modfile(1:trimtext(modfile))
+  530    format (/,' New Coordinates File Written To :  ',a)
       end if
       close (unit=ixyz)
 c
