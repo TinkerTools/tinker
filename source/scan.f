@@ -111,6 +111,16 @@ c
       if (grdmin .le. 0.000001d0)  digits = 6
       if (grdmin .le. 0.00000001d0)  digits = 8
 c
+c     create and open an output file if using archive mode
+c
+      if (archive) then
+         ixyz = freeunit ()
+         xyzfile = filename(1:leng)
+         call suffix (xyzfile,'arc','new')
+         open (unit=ixyz,file=xyzfile,status='new')
+         close (unit=ixyz)
+      end if
+c
 c     find the first map point from the input structure
 c
       write (iout,100)

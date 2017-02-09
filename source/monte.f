@@ -97,7 +97,7 @@ c
    10 continue
       if (nstep .le. 0) then
          write (iout,20)
-   20    format (/,' Number of Monte Carlo Steps [1000] : ', $)
+   20    format (/,' Number of Monte Carlo Steps [1000] :  ', $)
          read (input,30)  nstep
    30    format (i15)
          if (nstep .le. 0)  nstep = 1000
@@ -109,7 +109,7 @@ c
       call nextarg (answer, exist)
       if (.not. exist) then
          write (iout,40)
-   40    format (/,' Use [C]artesian or [T]orsional Moves [C] : ',$)
+   40    format (/,' Use [C]artesian or [T]orsional Moves [C] :  ',$)
          read (input,50)  record
    50    format (a240)
          next = 1
@@ -144,10 +144,10 @@ c
       if (size .lt. 0.0d0) then
          if (torsmove) then
             write (iout,70)
-   70       format (/,' Enter Maximum Step in Degrees [180] : ', $)
+   70       format (/,' Enter Maximum Step in Degrees [180] :  ', $)
          else
             write (iout,80)
-   80       format (/,' Enter Maximum Step in Angstroms [3.0] : ', $)
+   80       format (/,' Enter Maximum Step in Angstroms [3.0] :  ', $)
          end if
          read (input,90)  string
    90    format (a240)
@@ -172,7 +172,7 @@ c
       if (temper .lt. 0.0d0) then
          write (iout,120)
   120    format (/,' Enter the Desired Temperature in Degrees',
-     &              ' K [500] : ', $)
+     &              ' K [500] :  ', $)
          read (input,130)  string
   130    format (a240)
          read (string,*,err=140,end=140)  temper
@@ -189,7 +189,7 @@ c
   150 continue
       if (grdmin .lt. 0.0d0) then
          write (iout,160)
-  160    format (/,' Enter RMS Gradient Criterion [0.01] : ', $)
+  160    format (/,' Enter RMS Gradient Criterion [0.01] :  ', $)
          read (input,170)  string
   170    format (a240)
          read (string,*,err=180,end=180)  grdmin
@@ -217,6 +217,16 @@ c
       allocate (xp(n))
       allocate (yp(n))
       allocate (zp(n))
+c
+c     create and open an output file if using archive mode
+c
+      if (archive) then
+         ixyz = freeunit ()
+         xyzfile = filename(1:leng)
+         call suffix (xyzfile,'arc','new')
+         open (unit=ixyz,file=xyzfile,status='new')
+         close (unit=ixyz)
+      end if
 c
 c     store the coordinates, then perform a minimization
 c
