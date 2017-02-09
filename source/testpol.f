@@ -35,6 +35,7 @@ c
       integer i,j,k
       integer next,kpcg
       integer nvar,iter
+      integer itercut
       integer miny
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
@@ -57,7 +58,7 @@ c
       real*8, allocatable :: upcg(:,:)
       real*8, allocatable :: uxpt(:,:)
       real*8, allocatable :: ustore(:,:,:)
-      logical exist,dofull
+      logical exist,dofull,done
       character*1 answer
       character*240 record
       external optfit
@@ -107,9 +108,10 @@ c
       call cutoffs
       if (use_list)  call nblist
 c
-c     set tolerance and rotate multipoles to global frame
+c     set tolerances and rotate multipoles to global frame
 c
-      maxiter = 500
+      maxiter = 100
+      itercut = politer
       epscut = poleps
       poleps = 0.0000000001d0
       debug = .false.
@@ -167,6 +169,7 @@ c
 c     find PCG induced dipoles for increasing iteration counts
 c
       poltyp = 'MUTUAL'
+      done = .false.
       do k = 1, maxiter
          politer = k
          call induce
@@ -182,20 +185,21 @@ c
             end do
          end do
          drms(k) = sqrt(sum/dble(npolar))
-         if (drms(k) .lt. epscut) then
-            kpcg = k
-            epscut = -epscut
-            do i = 1, n
-               do j = 1, 3
-                  upcg(j,i) = ustore(j,i,k)
+         if (.not. done) then
+            if (k.eq.itercut .or. drms(k).lt.epscut) then
+               done = .true.
+               kpcg = k
+               do i = 1, n
+                  do j = 1, 3
+                     upcg(j,i) = ustore(j,i,k)
+                  end do
                end do
-            end do
+            end if
          end if
          if (drms(k) .lt. 0.5d0*poleps)  goto 60
       end do
    60 continue
       maxiter = politer
-      epscut = -epscut
       do i = 1, n
          do j = 1, 3
             uexact(j,i) = ustore(j,i,maxiter)
@@ -479,7 +483,7 @@ c           rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**6
          end do
       end do
       rxpt = sqrt(rxpt/dble(n))
-      if (mod(iter,10) .eq. 0) then
+      if (mod(iter,100) .eq. 0) then
          write (iout,10)  iter,(copt(i),i=0,maxopt),rxpt
    10    format (i8,1x,5f10.3,f17.10)
       end if
