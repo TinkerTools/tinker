@@ -44,7 +44,7 @@ extern "C" {
    void empole1_ ();
    void enp1_ (double*, double*);
    void ewca1_ (double*);
-   void kinetic_ (double*, double(*)[3][3]); 
+   void kinetic_ (double*, double(*)[3][3], double*); 
    void lattice_ ();
    void mdsave_ (int*, double*, double*, double*);
    void mdstat_ (int*, double*, double*, double*, double*, double*, double*);
@@ -4042,8 +4042,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
       double eksum, temp, pres;
       double ekin[3][3];
 
-      kinetic_ (&eksum, &ekin);
-      temp = 2.0 * eksum / ((double)(mdstuf__.nfree)*gasconst);
+      kinetic_ (&eksum, &ekin, &temp);
 
       (void) fprintf (stderr, "\n State: E=%15.7e [%15.7e %15.7e]\n",
                       totalEnergy, potentialEnergy, kineticEnergy);
@@ -4072,10 +4071,9 @@ void openmm_update_ (void** omm, double* dt, int* istep,
    if (*callMdStat || *callMdSave) {
       double eksum, temp, pres;
       double ekin[3][3];
-      kinetic_ (&eksum, &ekin);
+      kinetic_ (&eksum, &ekin, &temp);
 
       if (*callMdStat) {
-         temp = 2.0 * eksum / ((double)(mdstuf__.nfree)*gasconst);
          pres = 0.0;
          if (bath__.isobaric) {
             lattice_ ();

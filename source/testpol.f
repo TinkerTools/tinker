@@ -60,6 +60,7 @@ c
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull,done
       character*1 answer
+      character*6 savetyp
       character*240 record
       external optfit
 c
@@ -104,6 +105,7 @@ c
 c
 c     generate neighbor lists for iterative SCF solver
 c
+      savetyp = poltyp
       poltyp = 'MUTUAL'
       call cutoffs
       if (use_list)  call nblist
@@ -209,9 +211,9 @@ c
 c     print the iterative PCG and exact SCF induced dipoles
 c
       if (dofull) then
-         write (iout,70)  epscut,kpcg
+         write (iout,70)  kpcg
    70    format (/,' Iterative PCG Induced Dipole Moments :',
-     &              4x,'(',d9.2,' at',i3,' Iter)',
+     &              4x,'(',i3,' Iterations)',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i)) then
@@ -240,7 +242,8 @@ c
 c
 c     get induced dipoles from OPT extrapolation method
 c
-      poltyp = 'OPT4'
+      poltyp = savetyp
+      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT4'
       call kpolar
       call induce
       do i = 1, n

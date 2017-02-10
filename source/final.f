@@ -197,7 +197,6 @@ c
       if (allocated(iion))  deallocate (iion)
       if (allocated(jion))  deallocate (jion)
       if (allocated(kion))  deallocate (kion)
-      if (allocated(chglist))  deallocate (chglist)
       if (allocated(pchg))  deallocate (pchg)
 c
 c     deallocation of global arrays from module chunks
