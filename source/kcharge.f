@@ -32,7 +32,7 @@ c
       implicit none
       integer i,j,k,m
       integer ia,next
-      integer, allocatable :: chgmap(:)
+      integer, allocatable :: list(:)
       integer, allocatable :: nc12(:)
       real*8 cg
       logical header
@@ -134,21 +134,21 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (chgmap(n))
+      allocate (list(n))
       allocate (nc12(n))
 c
 c     remove zero partial charges from the list of charges
 c
       nion = 0
       do i = 1, n
-         chgmap(i) = 0
+         list(i) = 0
          if (pchg(i) .ne. 0.0d0) then
             nion = nion + 1
             iion(nion) = i
             jion(nion) = i
             kion(nion) = i
             pchg(nion) = pchg(i)
-            chgmap(i) = nion
+            list(i) = nion
          end if
       end do
 c
@@ -158,7 +158,7 @@ c
          do i = 1, n
             nc12(i) = 0
             do j = 1, n12(i)
-               k = chgmap(i12(j,i))
+               k = list(i12(j,i))
                if (k .ne. 0)  nc12(i) = nc12(i) + 1
             end do
          end do
@@ -178,7 +178,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (chgmap)
+      deallocate (list)
       deallocate (nc12)
 c
 c     turn off charge-charge and charge-dipole terms if not used
