@@ -1076,7 +1076,7 @@ c
                if (m .gt. kb1) then
                   kb2 = kb1
                   kb1 = m
-               else
+               else if (m .gt. kb2) then
                   kb2 = m
                end if
             end if
