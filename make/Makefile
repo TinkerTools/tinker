@@ -74,6 +74,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 #LIBFLAGS = -crusv
 #RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
+#RENAME = rename_bin
 
 ##  Build:     TINKER (no APBS or FFE Support)
 ##  OS Type:   Apple MacOS
@@ -89,6 +90,23 @@ LIBS =
 LIBFLAGS = -crusv
 RANLIB = ranlib -c
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
+RENAME = rename_bin
+
+##  Build:     TINKER (no APBS or FFE Support)
+##  OS Type:   Microsoft Windows 10
+##  CPU Type:  Intel x86 Compatible
+##  Compiler:  MinGW GNU gfortran 5.4
+##  Parallel:  OpenMP
+
+#F77 = gfortran
+#F77FLAGS = -c
+#OPTFLAGS = -Ofast -msse3 -fopenmp
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
+#LIBS = 
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static
+#RENAME = rename_exe
 
 ##  Build:     TINKER (no APBS or FFE Support)
 ##  OS Type:   Generic Linux
@@ -104,6 +122,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #LIBFLAGS = -crusv
 #RANLIB = echo
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
+#RENAME = rename_bin
 
 ##  Build:     TINKER (no APBS or FFE Support)
 ##  OS Type:   Apple MacOS
@@ -120,6 +139,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
 #		-Wl,-stack_size,0x10000000
+#RENAME = rename_bin
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
@@ -721,9 +741,9 @@ EXEFILES = alchemy.x \
 %.x: %.o libtinker.a
 	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${LIBS} ${FFTW_LIBS}; strip $@
 
-all:	${EXEFILES}
+all: ${EXEFILES}
 
-install: rename
+install: ${RENAME}
 
 clean:
 	rm -f *.o *.mod *.a *.x
@@ -731,7 +751,7 @@ clean:
 listing:
 	cat *.f *.c > tinker.txt
 
-rename:
+rename_bin:
 	mv  alchemy.x    $(BINDIR)/alchemy
 	mv  analyze.x    $(BINDIR)/analyze
 	mv  anneal.x     $(BINDIR)/anneal
@@ -793,6 +813,69 @@ rename:
 	mv  xyzint.x     $(BINDIR)/xyzint
 	mv  xyzpdb.x     $(BINDIR)/xyzpdb
 	mv  xyzsybyl.x   $(BINDIR)/xyzsybyl
+
+rename_exe:
+	mv  alchemy.x    $(BINDIR)/alchemy.exe
+	mv  analyze.x    $(BINDIR)/analyze.exe
+	mv  anneal.x     $(BINDIR)/anneal.exe
+	mv  archive.x    $(BINDIR)/archive.exe
+	mv  bar.x        $(BINDIR)/bar.exe
+	mv  correlate.x  $(BINDIR)/correlate.exe
+	mv  crystal.x    $(BINDIR)/crystal.exe
+	mv  diffuse.x    $(BINDIR)/diffuse.exe
+	mv  distgeom.x   $(BINDIR)/distgeom.exe
+	mv  document.x   $(BINDIR)/document.exe
+	mv  dynamic.x    $(BINDIR)/dynamic.exe
+	mv  gda.x        $(BINDIR)/gda.exe
+	mv  intedit.x    $(BINDIR)/intedit.exe
+	mv  intxyz.x     $(BINDIR)/intxyz.exe
+	mv  minimize.x   $(BINDIR)/minimize.exe
+	mv  minirot.x    $(BINDIR)/minirot.exe
+	mv  minrigid.x   $(BINDIR)/minrigid.exe
+	mv  molxyz.x     $(BINDIR)/molxyz.exe
+	mv  monte.x      $(BINDIR)/monte.exe
+	mv  newton.x     $(BINDIR)/newton.exe
+	mv  newtrot.x    $(BINDIR)/newtrot.exe
+	mv  nucleic.x    $(BINDIR)/nucleic.exe
+	mv  optimize.x   $(BINDIR)/optimize.exe
+	mv  optirot.x    $(BINDIR)/optirot.exe
+	mv  optrigid.x   $(BINDIR)/optrigid.exe
+	mv  path.x       $(BINDIR)/path.exe
+	mv  pdbxyz.x     $(BINDIR)/pdbxyz.exe
+	mv  polarize.x   $(BINDIR)/polarize.exe
+	mv  poledit.x    $(BINDIR)/poledit.exe
+	mv  potential.x  $(BINDIR)/potential.exe
+	mv  prmedit.x    $(BINDIR)/prmedit.exe
+	mv  protein.x    $(BINDIR)/protein.exe
+	mv  pss.x        $(BINDIR)/pss.exe
+	mv  pssrigid.x   $(BINDIR)/pssrigid.exe
+	mv  pssrot.x     $(BINDIR)/pssrot.exe
+	mv  radial.x     $(BINDIR)/radial.exe
+	mv  saddle.x     $(BINDIR)/saddle.exe
+	mv  scan.x       $(BINDIR)/scan.exe
+	mv  sniffer.x    $(BINDIR)/sniffer.exe
+	mv  spacefill.x  $(BINDIR)/spacefill.exe
+	mv  spectrum.x   $(BINDIR)/spectrum.exe
+	mv  superpose.x  $(BINDIR)/superpose.exe
+	mv  sybylxyz.x   $(BINDIR)/sybylxyz.exe
+	mv  testgrad.x   $(BINDIR)/testgrad.exe
+	mv  testhess.x   $(BINDIR)/testhess.exe
+	mv  testpair.x   $(BINDIR)/testpair.exe
+	mv  testpol.x    $(BINDIR)/testpol.exe
+	mv  testrot.x    $(BINDIR)/testrot.exe
+	mv  timer.x      $(BINDIR)/timer.exe
+	mv  timerot.x    $(BINDIR)/timerot.exe
+	mv  torsfit.x    $(BINDIR)/torsfit.exe
+	mv  valence.x    $(BINDIR)/valence.exe
+	mv  vibbig.x     $(BINDIR)/vibbig.exe
+	mv  vibrate.x    $(BINDIR)/vibrate.exe
+	mv  vibrot.x     $(BINDIR)/vibrot.exe
+	mv  xtalfit.x    $(BINDIR)/xtalfit.exe
+	mv  xtalmin.x    $(BINDIR)/xtalmin.exe
+	mv  xyzedit.x    $(BINDIR)/xyzedit.exe
+	mv  xyzint.x     $(BINDIR)/xyzint.exe
+	mv  xyzpdb.x     $(BINDIR)/xyzpdb.exe
+	mv  xyzsybyl.x   $(BINDIR)/xyzsybyl.exe
 
 remove_links:
 	rm -f $(LINKDIR)/alchemy
