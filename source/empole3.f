@@ -444,7 +444,7 @@ c
                            end if
                            write (iout,50)  ii,name(ii),kk,name(kk),r,e
    50                      format (' M-Pole',4x,2(i7,'-',a3),1x,
-     &                                '(X)',5x,f10.4,2x,f12.4)
+     &                                '(XTAL)',2x,f10.4,2x,f12.4)
                         end if
                      end if
                   end do
@@ -1264,7 +1264,7 @@ c
      &                          + term4*rr7 + term5*rr9
                      efull = mscale(kk) * efull
                      if (ii .eq. kk)  efull = 0.5d0 * efull
-                     if (e .ne. 0.0d0) then
+                     if (efull .ne. 0.0d0) then
                         nem = nem + 1
                         aem(ii) = aem(ii) + 0.5d0*efull
                         aem(kk) = aem(kk) + 0.5d0*efull
@@ -1302,7 +1302,7 @@ c
                         end if
                         write (iout,50)  ii,name(ii),kk,name(kk),r,efull
    50                   format (' M-Pole',4x,2(i7,'-',a3),1x,
-     &                             '(X)',5x,f10.4,2x,f12.4)
+     &                             '(XTAL)',2x,f10.4,2x,f12.4)
                      end if
                   end if
                end do

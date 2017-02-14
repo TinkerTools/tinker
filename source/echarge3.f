@@ -215,22 +215,22 @@ c     scale the interaction based on its group membership
 c
                   if (use_group)  e = e * fgrp
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
-                  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + e
+                  if (e .ne. 0.0d0) then
+                     nec = nec + 1
+                     ec = ec + e
+                     aec(i) = aec(i) + 0.5d0*e
+                     aec(k) = aec(k) + 0.5d0*e
+                     if (molcule(i) .ne. molcule(k))
+     &                  einter = einter + e
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.e.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -354,17 +354,16 @@ c     scale the interaction based on its group membership
 c
                      if (use_group)  e = e * fgrp
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
-                     if (i .eq. k)  e = 0.5d0 * e
-                     if (e .ne. 0.0d0)  nec = nec + 1
-                     ec = ec + e
-                     aec(i) = aec(i) + 0.5d0*e
-                     aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intermolecular energy
-c
-                     einter = einter + e
+                     if (e .ne. 0.0d0) then
+                        if (i .eq. k)  e = 0.5d0 * e
+                        nec = nec + 1
+                        ec = ec + e
+                        aec(i) = aec(i) + 0.5d0*e
+                        aec(k) = aec(k) + 0.5d0*e
+                        einter = einter + e
+                     end if
 c
 c     print a message if the energy of this interaction is large
 c
@@ -649,17 +648,16 @@ c     scale the interaction based on its group membership
 c
                   if (use_group)  e = e * fgrp
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
-                  if (e .ne. 0.0d0)  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intermolecular energy
-c
-                  if (.not.prime .or. molcule(i).ne.molcule(k))
-     &               einter = einter + e
+                  if (e .ne. 0.0d0) then
+                     nec = nec + 1
+                     ec = ec + e
+                     aec(i) = aec(i) + 0.5d0*e
+                     aec(k) = aec(k) + 0.5d0*e
+                     if (.not.prime .or. molcule(i).ne.molcule(k))
+     &                  einter = einter + e
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
@@ -908,22 +906,22 @@ c     scale the interaction based on its group membership
 c
                   if (use_group)  e = e * fgrp
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
-                  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + e
+                  if (e .ne. 0.0d0) then
+                     nec = nec + 1
+                     ec = ec + e
+                     aec(i) = aec(i) + 0.5d0*e
+                     aec(k) = aec(k) + 0.5d0*e
+                     if (molcule(i) .ne. molcule(k))
+     &                  einter = einter + e
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.e.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -1064,8 +1062,11 @@ c     compute the Ewald self-energy term over all the atoms
 c
       fs = -f * aewald / sqrtpi
       do ii = 1, nion
+         i = iion(ii)
          e = fs * pchg(ii)**2
          ec = ec + e
+         nec = nec + 1
+         aec(i) = aec(i) + e
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -1082,6 +1083,11 @@ c
          end do
          e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
       end if
 c
 c     compute the reciprocal space part of the Ewald summation
@@ -1144,24 +1150,24 @@ c
                   if (use_group)  scale = scale * fgrp
                   scaleterm = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scaleterm)
-c
-c     increment the overall charge-charge energy component
-c
-                  nec = nec + 1
                   ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
 c
-c     increment the total intramolecular energy
+c     increment the overall charge-charge energy components
 c
                   efull = (fik/rb) * scale
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + efull
+                  if (efull .ne. 0.0d0) then
+                     nec = nec + 1
+                     aec(i) = aec(i) + 0.5d0*efull
+                     aec(k) = aec(k) + 0.5d0*efull
+                     if (molcule(i) .ne. molcule(k))
+     &                  einter = einter + efull
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(efull) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.efull.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -1260,24 +1266,24 @@ c
                      end if
                      scaleterm = scale - 1.0d0
                      e = (fik/rb) * (erfterm+scaleterm)
+                     if (i .eq. k)  e = 0.5d0 * e
+                     ec = ec + e
 c
 c     increment the overall charge-charge energy component
 c
-                     if (i .eq. k)  e = 0.5d0 * e
-                     if (e .ne. 0.0d0)  nec = nec + 1
-                     ec = ec + e
-                     aec(i) = aec(i) + 0.5d0*e
-                     aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intramolecular energy
-c
                      efull = (fik/rb) * scale
-                     einter = einter + efull
+                     if (i .eq. k)  efull = 0.5d0 * efull
+                     if (efull .ne. 0.0d0) then
+                        nec = nec + 1
+                        aec(i) = aec(i) + 0.5d0*efull
+                        aec(k) = aec(k) + 0.5d0*efull
+                        einter = einter + efull
+                     end if
 c
 c     print a message if the energy of this interaction is large
 c
                      huge = (abs(efull) .gt. 100.0d0)
-                     if ((debug.and.e.ne.0.0d0)
+                     if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -1424,8 +1430,11 @@ c     compute the Ewald self-energy term over all the atoms
 c
       fs = -f * aewald / sqrtpi
       do ii = 1, nion
+         i = iion(ii)
          e = fs * pchg(ii)**2
          ec = ec + e
+         nec = nec + 1
+         aec(i) = aec(i) + e
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -1442,6 +1451,11 @@ c
          end do
          e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
       end if
 c
 c     compute the reciprocal space part of the Ewald summation
@@ -1563,24 +1577,24 @@ c
                   end if
                   scaleterm = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scaleterm)
+                  ec = ec + e
 c
 c     increment the overall charge-charge energy component
 c
-                  if (e .ne. 0.0d0)  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intramolecular energy
-c
                   efull = (fik/rb) * scale
-                  if (.not.prime .or. molcule(i).ne.molcule(k))
-     &               einter = einter + efull
+                  if (efull .ne. 0.0d0) then
+                     nec = nec + 1
+                     aec(i) = aec(i) + 0.5d0*efull
+                     aec(k) = aec(k) + 0.5d0*efull
+                     if (.not.prime .or. molcule(i).ne.molcule(k))
+     &                  einter = einter + efull
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(efull) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.efull.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,30)
@@ -1733,8 +1747,11 @@ c     compute the Ewald self-energy term over all the atoms
 c
       fs = -f * aewald / sqrtpi
       do ii = 1, nion
+         i = iion(ii)
          e = fs * pchg(ii)**2
          ec = ec + e
+         nec = nec + 1
+         aec(i) = aec(i) + e
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -1751,6 +1768,11 @@ c
          end do
          e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
       end if
 c
 c     compute the reciprocal space part of the Ewald summation
@@ -1823,24 +1845,24 @@ c
                   if (use_group)  scale = scale * fgrp
                   scaleterm = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scaleterm)
+                  ec = ec + e
 c
 c     increment the overall charge-charge energy component
 c
-                  nec = nec + 1
-                  ec = ec + e
-                  aec(i) = aec(i) + 0.5d0*e
-                  aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intramolecular energy
-c
                   efull = (fik/rb) * scale
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + efull
+                  if (efull .ne. 0.0d0) then
+                     nec = nec + 1
+                     aec(i) = aec(i) + 0.5d0*efull
+                     aec(k) = aec(k) + 0.5d0*efull
+                     if (molcule(i) .ne. molcule(k))
+     &                  einter = einter + efull
+                  end if
 c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(efull) .gt. 100.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if ((debug.and.efull.ne.0.0d0)
+     &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -2053,20 +2075,20 @@ c
 c
 c     increment the overall charge-charge energy component
 c
-               nec = nec + 1
-               ec = ec + e
-               aec(i) = aec(i) + 0.5d0*e
-               aec(k) = aec(k) + 0.5d0*e
-c
-c     increment the total intermolecular energy
-c
-               if (molcule(i) .ne. molcule(k))
-     &            einter = einter + e
+               if (e .ne. 0.0d0) then
+                  nec = nec + 1
+                  ec = ec + e
+                  aec(i) = aec(i) + 0.5d0*e
+                  aec(k) = aec(k) + 0.5d0*e
+                  if (molcule(i) .ne. molcule(k))
+     &               einter = einter + e
+               end if
 c
 c     print a message if the energy of this interaction is large
 c
                huge = (abs(e) .gt. 100.0d0)
-               if (debug .or. (verbose.and.huge)) then
+               if ((debug.and.e.ne.0.0d0)
+     &               .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,20)
