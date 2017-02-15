@@ -122,7 +122,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
 c
-c     set arrays needed to scale interactions and store fields
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
@@ -520,7 +520,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
 c
-c     set arrays needed to scale interactions and store fields
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
@@ -869,7 +869,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
 c
-c     set arrays needed to scale interactions and store fields
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
@@ -1401,7 +1401,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
 c
-c     set arrays needed to scale interactions and store fields
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0

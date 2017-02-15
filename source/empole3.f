@@ -136,7 +136,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -570,7 +570,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -963,7 +963,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          mscale(i) = 1.0d0
@@ -1534,7 +1534,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          mscale(i) = 1.0d0

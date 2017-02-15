@@ -1187,7 +1187,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0

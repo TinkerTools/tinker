@@ -113,7 +113,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -140,7 +140,7 @@ c
          fi = f * pchg(ii)
          usei = (use(i) .or. use(ic))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -271,7 +271,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -307,7 +307,7 @@ c
          zi = z(i) - zic
          fi = f * pchg(ii)
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -445,7 +445,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -544,7 +544,7 @@ c
       allocate (ysort(8*n))
       allocate (zsort(8*n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -585,7 +585,7 @@ c
          fi = f * pchg(ii)
          usei = (use(i) .or. use(ic))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -767,7 +767,7 @@ c
             goto 10
          end if
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -859,7 +859,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -896,7 +896,7 @@ c
          fi = f * pchg(ii)
          usei = (use(i) .or. use(ic))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -1028,7 +1028,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -1124,7 +1124,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1186,7 +1186,7 @@ c
          zi = z(i)
          fi = f * pchg(ii)
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -1280,7 +1280,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -1312,7 +1312,7 @@ c
          zi = z(i)
          fi = f * pchg(ii)
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -1414,7 +1414,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -1514,7 +1514,7 @@ c
       allocate (ysort(8*n))
       allocate (zsort(8*n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1591,7 +1591,7 @@ c
          fi = f * pchg(ii)
          usei = (use(i))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -1736,7 +1736,7 @@ c
             goto 10
          end if
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -1830,7 +1830,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -1900,7 +1900,7 @@ c
          zi = z(i)
          fi = f * pchg(ii)
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -1995,7 +1995,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
@@ -2082,7 +2082,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
 c
-c     initialize connected atom interaction scaling array
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          cscale(i) = 1.0d0
@@ -2115,7 +2115,7 @@ c
          zi = z(i)
          fi = f * pchg(ii)
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
@@ -2226,7 +2226,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0

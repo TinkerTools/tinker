@@ -752,7 +752,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0
@@ -905,7 +905,7 @@ c
                end do
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, n12(ii)
                pscale(i12(j,ii)) = 1.0d0
@@ -1094,7 +1094,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, np11(ii)
             uscale(ip11(j,ii)) = 1.0d0
@@ -1207,7 +1207,7 @@ c
                end do
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, np11(ii)
                uscale(ip11(j,ii)) = 1.0d0
@@ -1425,7 +1425,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0
@@ -1614,7 +1614,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, np11(ii)
             uscale(ip11(j,ii)) = 1.0d0
@@ -2210,7 +2210,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0
@@ -2408,7 +2408,7 @@ c
                end do
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, n12(ii)
                pscale(i12(j,ii)) = 1.0d0
@@ -2750,7 +2750,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0
@@ -3145,7 +3145,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, np11(ii)
             uscale(ip11(j,ii)) = 1.0d0
@@ -3275,7 +3275,7 @@ c
                end do
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, np11(ii)
                uscale(ip11(j,ii)) = 1.0d0
@@ -4285,7 +4285,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0
@@ -4643,7 +4643,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, np11(ii)
             uscale(ip11(j,ii)) = 1.0d0
@@ -5332,7 +5332,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = 1.0d0
@@ -5577,7 +5577,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, np11(ii)
             uscale(ip11(j,ii)) = 1.0d0
@@ -5950,7 +5950,7 @@ c
                end if
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, np11(ii)
                uscale(ip11(j,ii)) = 1.0d0
@@ -6184,7 +6184,7 @@ c
                m = m + 6
             end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
             do j = 1, np11(ii)
                uscale(ip11(j,ii)) = 1.0d0

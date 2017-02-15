@@ -189,7 +189,7 @@ c
          zi = zred(i)
          usei = (use(i) .or. use(iv))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = v2scale
@@ -299,7 +299,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = 1.0d0
@@ -331,7 +331,7 @@ c
          zi = zred(i)
          usei = (use(i) .or. use(iv))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = v2scale
@@ -450,7 +450,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = 1.0d0
@@ -625,7 +625,7 @@ c
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = v2scale
@@ -792,7 +792,7 @@ c
             goto 20
          end if
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = 1.0d0
@@ -945,7 +945,7 @@ c
          zi = zred(i)
          usei = (use(i) .or. use(iv))
 c
-c     set interaction scaling coefficients for connected atoms
+c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = v2scale
@@ -1055,7 +1055,7 @@ c
             end if
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             vscale(i12(j,i)) = 1.0d0

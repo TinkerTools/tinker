@@ -378,7 +378,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (dscale(n))
 c
-c     set array needed to scale connected atom interactions
+c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          dscale(i) = 1.0d0
@@ -449,7 +449,7 @@ c
             end do
          end do
 c
-c     reset interaction scaling coefficients for connected atoms
+c     reset exclusion coefficients for connected atoms
 c
          do j = 1, np11(ii)
             dscale(ip11(j,ii)) = 1.0d0

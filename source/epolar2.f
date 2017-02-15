@@ -315,7 +315,7 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
 c
-c     set arrays needed to scale interactions and store fields
+c     set exclusion coefficients and arrays to store fields
 c
       do i = 1, n
          pscale(i) = 1.0d0
@@ -1413,7 +1413,7 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
 c
-c     set arrays needed to scale interactions and store fields
+c     set exclusion coefficients and arrays to store fields
 c
       do i = 1, n
          pscale(i) = 1.0d0
