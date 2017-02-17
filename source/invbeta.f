@@ -33,6 +33,7 @@ c
       real*8 betai,gammln
       real*8 slope,error
       logical done
+      external betai
 c
 c
 c     use limiting values when input argument is out of range
@@ -114,7 +115,9 @@ c
       function betai (a,b,x)
       implicit none
       real*8 betai,a,b,x
-      real*8 bt,betacf,gammln
+      real*8 bt,gammln
+      real*8 betacf
+      external betacf
 c
 c
 c     get cumulative distribution directly or via reflection

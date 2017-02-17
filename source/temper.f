@@ -58,6 +58,7 @@ c
       real*8 temp,expterm
       real*8 w(3)
       real*8 ekin(3,3)
+      external random,normal
 c
 c
 c     get the kinetic energy and instantaneous temperature

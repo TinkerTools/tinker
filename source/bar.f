@@ -487,6 +487,7 @@ c
       character*240 titlea
       character*240 titleb
       character*240 barfile
+      external random
 c
 c
 c     ask the user for file with potential energies and volumes

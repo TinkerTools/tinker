@@ -152,6 +152,7 @@ c
       real*8, allocatable :: vold(:,:)
       logical dotrial
       logical isotropic
+      external random
 c
 c
 c     decide whether to attempt a box size change at this step

@@ -60,6 +60,7 @@ c
       real*8, allocatable :: derivs(:,:)
       real*8, allocatable :: alpha(:,:)
       real*8, allocatable :: beta(:,:)
+      external random
       save epot,nrej
 c
 c
@@ -240,10 +241,12 @@ c
       implicit none
       integer i,j,istep
       real*8 dt,dt_2,dt_4
-      real*8 normal,gamma,sigma
+      real*8 gamma,sigma
+      real*8 normal
       real*8 alpha(3,*)
       real*8 beta(3,*)
       logical first
+      external normal
       save first
       data first  / .true. /
 c

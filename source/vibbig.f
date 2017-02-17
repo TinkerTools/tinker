@@ -1092,6 +1092,7 @@ c
       real*8 uu(*)
       real*8 u(nvar,*)
       real*8, allocatable :: tmp(:)
+      external random
 c
 c
 c     set the number of random guesses

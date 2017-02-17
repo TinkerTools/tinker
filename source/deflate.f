@@ -35,6 +35,7 @@ c
       real*8, allocatable :: work(:)
       real*8 a(n,*)
       real*8 vec(n,*)
+      external random
 c
 c
 c     initialize number of iterations and convergence criteria

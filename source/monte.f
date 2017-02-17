@@ -72,6 +72,7 @@ c
       character*240 xyzfile
       character*240 record
       character*240 string
+      external random
 c
 c
 c     set up the structure and mechanics calculation

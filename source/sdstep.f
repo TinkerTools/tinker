@@ -203,6 +203,7 @@ c
       real*8 prand(3,*)
       real*8 vrand(3,*)
       logical first
+      external normal
       save first
       data first  / .true. /
 c

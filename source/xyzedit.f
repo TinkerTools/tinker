@@ -70,7 +70,7 @@ c
       character*240 modfile
       character*240 record
       character*240 string
-      external merge
+      external random,merge
 c
 c
 c     initialize various constants and the output flags

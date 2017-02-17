@@ -50,7 +50,7 @@ c
       character*240 record
       character*240 string
       external gda1,gda2,gda3
-      external optsave
+      external random,optsave
 c
 c
 c     set up the structure, mechanics calculation and smoothing

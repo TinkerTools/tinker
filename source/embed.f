@@ -1089,6 +1089,7 @@ c
       character*20 keyword
       character*240 record
       character*240 string
+      external random,invbeta
       save first,method,update
       save npart,percent
       save mean,stdev

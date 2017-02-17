@@ -149,9 +149,11 @@ c
       use inform
       use iounit
       implicit none
-      real*8 random,v1,v2,rsq
-      real*8 factor,store,normal
+      real*8 v1,v2,rsq
+      real*8 factor,store
+      real*8 normal,random
       logical compute
+      external random
       save compute,store
       data compute  / .true. /
 c
@@ -160,8 +162,8 @@ c     get a pair of random values from the distribution
 c
       if (compute) then
    10    continue
-         v1 = 2.0d0 * random () - 1.0d0
-         v2 = 2.0d0 * random () - 1.0d0
+         v1 = 2.0d0*random() - 1.0d0
+         v2 = 2.0d0*random() - 1.0d0
          rsq = v1**2 + v2**2
          if (rsq .ge. 1.0d0)  goto 10
          factor = sqrt(-2.0d0*log(rsq)/rsq)
@@ -211,14 +213,15 @@ c
       real*8 x,y,s
       real*8 random
       real*8 vector(3)
+      external random
 c
 c
 c     get a pair of appropriate components in the plane
 c
       s = 2.0d0
       do while (s .ge. 1.0d0)
-         x = 2.0d0 * random () - 1.0d0
-         y = 2.0d0 * random () - 1.0d0
+         x = 2.0d0*random() - 1.0d0
+         y = 2.0d0*random() - 1.0d0
          s = x**2 + y**2
       end do
 c

@@ -31,7 +31,7 @@ c
       real*8 random,erfinv
       real*8 xspeed,yspeed
       real*8 zspeed
-      external erfinv
+      external random,erfinv
 c
 c
 c     initialize the speed magnitude of the particle to zero
