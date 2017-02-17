@@ -66,10 +66,27 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
+##  Machine:  Generic Linux
+##  CPU Type: Intel x86 Compatible, Nvidia GPU
+##  Compiler: GNU gfortran 6.2, g++, nvcc
+##  Parallel: OpenMP, OpenMM
+
+#CC = gcc
+#CXX = g++
+#NVCC = nvcc
+#F77 = gfortran
+#LIBS = -lstdc++ -L. -L$(NVML_LIB) -lnvidia-ml -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
+#CFLAGS = -c
+#F77FLAGS = -c
+#OPTFLAGS = -Ofast -msse3 -fopenmp
+#CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
-##  Compiler: GNU gfortran 6.1, clang, nvcc
+##  Compiler: GNU gfortran 6.2, clang, nvcc
 ##  Parallel: OpenMP, OpenMM
 
 CC = clang
@@ -81,7 +98,7 @@ F77 = gfortran
 LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
 CFLAGS = -c
 F77FLAGS = -c
-OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -fopenmp
+OPTFLAGS = -Ofast -mssse3 -fopenmp
 CUDAFLAGS = -O3 -I /usr/local/cuda/include
 LIBFLAGS = -crusv
 RANLIB = ranlib -c
@@ -90,25 +107,7 @@ GPU_USAGE_OBJS = gpu_usage.o
 LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
 ##  Machine:  Generic Linux
-##  CPU Type: Intel x86 Compatible, Nvidia GPU
-##  Compiler: GNU gfortran 6.1, g++, nvcc
-##  Parallel: OpenMP, OpenMM
-
-#CC = gcc
-#CXX = g++
-#NVCC = nvcc
-#F77 = gfortran
-#LIBS = -lstdc++ -L. -L$(NVML_LIB) -lnvidia-ml -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
-#CFLAGS = -c
-#F77FLAGS = -c
-#OPTFLAGS = -O3 -march=native -ffast-math -funroll-loops -fopenmp
-#CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
-
-##  Machine:  Generic Linux
-##  (Warning! NOT IMPLEMENTED YET)
+##  (Warning! NOT YET IMPLEMENTED/TESTED)
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
 ##  Compiler: Intel Fortran for Linux 15.0
@@ -124,7 +123,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoun
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
-##  Machine:  Macintosh
+##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
 ##  Oper Sys: OS X 10.11 (El Capitan)
 ##  Compiler: Intel Fortran for Mac 15.0, clang, nvcc
@@ -1137,7 +1136,7 @@ libtinker.a: ${OBJS}
 ##  Next Section has Explicit Dependencies on Include Files  ##
 ###############################################################
 
-dynamic_omm.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o inform.o iounit.o keys.o ktrtor.o kvdws.o limits.o mdstuf.o molcul.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o openmp.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o restrn.o sizes.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
+dynamic_omm.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o imptor.o inform.o iounit.o keys.o ktrtor.o kvdws.o limits.o mdstuf.o molcul.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o openmp.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o restrn.o sizes.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
 gpu_cards.o: $(GPU_USAGE_OBJS)
 openmm.o:
 

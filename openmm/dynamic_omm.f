@@ -43,8 +43,9 @@ c
       integer updateCalls
       integer callMdStat
       integer callMdSave
-      real*8 e,dt,dtdump
-      real*8 elapsed,cpu,speed
+      real*8 e,dt
+      real*8 dtdump,speed
+      real*8 elapsed,cpu
       real*8, allocatable :: derivs(:,:)
       logical exist
       logical updateEachStep
@@ -424,6 +425,7 @@ c
       use bound
       use boxes
       use cell
+      use charge
       use chgpot
       use couple
       use deriv
@@ -431,6 +433,7 @@ c
       use ewald
       use freeze
       use group
+      use imptor
       use inform
       use ktrtor
       use kvdws
@@ -491,6 +494,7 @@ c
      &                     octahedron,spacegrp)
       call set_cell_data (ncell,icell,xcell,ycell,zcell,
      &                    xcell2,ycell2,zcell2)
+      call set_charge_data (nion,iion,jion,kion,pchg)
       call set_chgpot_data (electric,dielec,ebuffer,c2scale,c3scale,
      &                      c4scale,c5scale,neutnbr,neutcut)
       call set_couple_data (n12,i12,n13,i13,n14,i14,n15,i15)
@@ -505,6 +509,7 @@ c
      &                      krat,use_rattle,ratimage)
       call set_group_data (ngrp,kgrp,grplist,igrp,grpmass,wgrp,
      &                     use_group,use_intra,use_inter)
+      call set_imptor_data (nitors,iitors,itors,itors2,itors3)
       call set_inform_data (digits,iprint,iwrite,isend,silent,
      &                      verbose,debug,holdup,abort)
       call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
@@ -533,7 +538,7 @@ c
      &                   thetai3,qgrid,qfac)
       call set_polar_data (maxopt,npolar,coptmax,optlevel,copt,copm,
      &                     polarity,thole,pdamp,udir,udirp,udirs,
-     &                     udirps,uind,uinp,uinds,uinps,uopt,uoptp,       
+     &                     udirps,uind,uinp,uinds,uinps,uopt,uoptp,
      &                     uopts,uoptps,fopt,foptp,uexact,douind)
       call set_polgrp_data (maxp11,maxp12,maxp13,maxp14,np11,
      &                      np12,np13,np14,ip11,ip12,ip13,ip14)

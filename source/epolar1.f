@@ -1381,12 +1381,12 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,f,pdamp,thole,
-!$OMP& x,y,z,xaxis,yaxis,zaxis,rpole,uind,udirp,n12,i12,n13,i13,
-!$OMP& n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
-!$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
-!$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,
-!$OMP& use_bounds,off2,molcule,uinp,coptmax,copm,uopt,uoptp,poltyp)
+!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,
+!$OMP& x,y,z,xaxis,yaxis,zaxis,rpole,uind,uinp,n12,i12,n13,i13,n14,
+!$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
+!$OMP& p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
+!$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
+!$OMP& off2,f,molcule,coptmax,copm,uopt,uoptp,poltyp)
 !$OMP& shared (ep,einter,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(guided)
@@ -3752,6 +3752,9 @@ c     "epreal1d" evaluates the real space portion of the Ewald
 c     summation energy and gradient due to dipole polarization
 c     via a neighbor list
 c
+c     note: the main OpenMP loop uses a "static" schedule; use of
+c     "guided" gives incorrect results with gfortran 6.2 on MacOS
+c
 c
       subroutine epreal1d
       use sizes
@@ -3876,15 +3879,15 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,polarity,f,uind,udirp)
-!$OMP& shared(ipole,pdamp,thole,x,y,z,xaxis,yaxis,zaxis,rpole,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
-!$OMP& p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
+!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,
+!$OMP& x,y,z,xaxis,yaxis,zaxis,rpole,uind,uinp,n12,i12,n13,i13,n14,
+!$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
+!$OMP& p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,aewald,molcule,uinp,coptmax,copm,uopt,uoptp,poltyp)
+!$OMP& off2,f,aewald,molcule,coptmax,copm,uopt,uoptp,poltyp)
 !$OMP& shared (ep,einter,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(guided)
+!$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(static)
 c
 c     compute the dipole polarization gradient components
 c
