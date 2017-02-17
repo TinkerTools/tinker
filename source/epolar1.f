@@ -2247,6 +2247,7 @@ c
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       character*6 mode
+      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -3752,9 +3753,6 @@ c     "epreal1d" evaluates the real space portion of the Ewald
 c     summation energy and gradient due to dipole polarization
 c     via a neighbor list
 c
-c     note: the main OpenMP loop uses a "static" schedule; use of
-c     "guided" gives incorrect results with gfortran 6.2 on MacOS
-c
 c
       subroutine epreal1d
       use sizes
@@ -3847,6 +3845,7 @@ c
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       character*6 mode
+      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -3887,7 +3886,7 @@ c
 !$OMP& off2,f,aewald,molcule,coptmax,copm,uopt,uoptp,poltyp)
 !$OMP& shared (ep,einter,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(static)
+!$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c

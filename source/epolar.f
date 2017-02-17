@@ -863,6 +863,7 @@ c
       real*8 bn(0:3)
       real*8, allocatable :: pscale(:)
       character*6 mode
+      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -1395,6 +1396,7 @@ c
       real*8 bn(0:3)
       real*8, allocatable :: pscale(:)
       character*6 mode
+      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
