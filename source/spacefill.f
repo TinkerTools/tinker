@@ -58,8 +58,8 @@ c
 c
 c     initialize random numbers and turn on extra printing
 c
+      verbose = .false.
       value = random ()
-      verbose = .true.
       debug = .true.
 c
 c     select either vdw, excluded or molecular volume and area
@@ -128,6 +128,24 @@ c
          end do
       end if
 c
+c     decide whether to provide full output for large systems
+c
+      if (n .gt. 100) then
+         debug = .false.
+         call nextarg (answer,exist)
+         if (.not. exist) then
+            write (iout,100)
+  100       format (/,' Output the Surface Area of Individual Atoms',
+     &                 ' [N] :  ',$)
+            read (input,110)  record
+  110       format (a240)
+            next = 1
+            call gettext (record,answer,next)
+         end if
+         call upcase (answer)
+         if (answer .eq. 'Y')  debug = .true.
+      end if
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (radius(n))
@@ -157,8 +175,8 @@ c
       do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
-            write (iout,100)  frame
-  100       format (/,' Area and Volume for Archive Structure :',5x,i8)
+            write (iout,120)  frame
+  120       format (/,' Area and Volume for Archive Structure :',5x,i8)
          end if
 c
 c     use the Connolly routines to find the area and volume
@@ -168,19 +186,19 @@ c
 c     print out the values of the total surface area and volume
 c
          if (mode .eq. 1) then
-            write (iout,110)
-  110       format (/,' Van der Waals Surface Area and Volume :')
-         else if (mode .eq. 2) then
-            write (iout,120)
-  120       format (/,' Accessible Surface Area and Excluded Volume :')
-         else if (mode .eq. 3) then
             write (iout,130)
-  130       format (/,' Contact-Reentrant Surface Area and Volume :')
+  130       format (/,' Van der Waals Surface Area and Volume :')
+         else if (mode .eq. 2) then
+            write (iout,140)
+  140       format (/,' Accessible Surface Area and Excluded Volume :')
+         else if (mode .eq. 3) then
+            write (iout,150)
+  150       format (/,' Contact-Reentrant Surface Area and Volume :')
          end if
-         write (iout,140)  area
-  140    format (/,' Total Area :',f20.3,' Square Angstroms')
-         write (iout,150)  volume
-  150    format (' Total Volume :',f18.3,' Cubic Angstroms')
+         write (iout,160)  area
+  160    format (/,' Total Area :',f20.3,' Square Angstroms')
+         write (iout,170)  volume
+  170    format (' Total Volume :',f18.3,' Cubic Angstroms')
 c
 c     attempt to read next structure from the coordinate file
 c
