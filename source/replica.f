@@ -126,14 +126,18 @@ c
 c     print a message indicating the number of replicates used
 c
       if (debug .and. ncell.ne.0) then
-         if (max(nx,ny,nz) .lt. 100) then
+         if (max(nx,ny,nz) .lt. 10) then
             write (iout,20)  nx,ny,nz
-   20       format (/,' REPLICA  --  Period Boundary via',i3,' x',
-     &                 i3,' x',i3,' Set of Cell Replicates')
-         else
+   20       format (/,' REPLICA  --  Period Boundaries via',i2,' x',
+     &                 i2,' x',i2,' Cell Replicate Set')
+         else if (max(nx,ny,nz) .lt. 100) then
             write (iout,30)  nx,ny,nz
-   30       format (/,' REPLICA  --  Period Boundary via',i4,' x',
-     &                 i4,' x',i4,' Set of Cell Replicates')
+   30       format (/,' REPLICA  --  Period Boundaries via',i3,' x',
+     &                 i3,' x',i3,' Cell Replicate Set')
+         else
+            write (iout,40)  nx,ny,nz
+   40       format (/,' REPLICA  --  Period Boundaries via',i4,' x',
+     &                 i4,' x',i4,' Cell Replicate Set')
          end if
       end if
       return

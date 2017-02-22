@@ -38,7 +38,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The Multipole Editing Facility can Provide :',
+   20    format (/,' The TINKER Multipole Editing Utility Can :',
      &           //,4x,'(1) Multipole Parameters from GDMA Output',
      &           /,4x,'(2) Alter Local Coordinate Frame Definitions',
      &           /,4x,'(3) Removal of Intramolecular Polarization')

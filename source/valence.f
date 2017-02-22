@@ -74,7 +74,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Valence Parameter Facility Can :',
+   20    format (/,' The TINKER Valence Parameter Utility Can :',
      &           //,4x,'(1) Set Initial Values for Valence Parameters',
      &           /,4x,'(2) Compare QM and MM Vibrational Frequencies',
      &           /,4x,'(3) Force Fit of Parameters to QM Results',

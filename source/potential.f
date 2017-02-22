@@ -123,7 +123,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Electrostatic Potential Facility Can :',
+   20    format (/,' The TINKER Electrostatic Potential Utility Can :',
      &           //,4x,'(1) Create an Input File for Gaussian CUBEGEN',
      &           /,4x,'(2) Get QM Potential from a Gaussian CUBE File',
      &           /,4x,'(3) Calculate the Model Potential for a System',
