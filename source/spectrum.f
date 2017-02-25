@@ -22,7 +22,8 @@ c
       use math
       use units
       implicit none
-      integer i,k,nsamp
+      integer i,k
+      integer next,nsamp
       integer ivel,nvel
       integer maxvel
       integer maxfreq
@@ -92,7 +93,9 @@ c
       do while (.not. done)
          read (ivel,60)  record
    60    format (a240)
-         if (record(4:13) .eq. 'Separation') then
+         next = 1
+         call getword (record,string,next)
+         if (string(1:10) .eq. 'Separation') then
             done = .true.
             read (ivel,70)
    70       format ()

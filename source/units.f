@@ -14,11 +14,11 @@ c
 c
 c     literature references:
 c
-c     P. J. Mohr, B. N. Taylor and D. B. Newell, "CODATA Recommended
-c     Values of the Fundamental Physical Constants: 2014", available
-c     from http://arxiv.org/pdf/1507.07956/
+c     P. J. Mohr, D. B. Newell and B. N. Taylor, "CODATA Recommended
+c     Values of the Fundamental Physical Constants: 2014", Journal of
+c     Physical and Chemical Reference Data, 45, 043102 (2016)
 c
-c     Most values below are from the 2014 CODATA reference constants;
+c     Most values are from the 2014 CODATA reference constants; also
 c     available online from the National Institute of Standards and
 c     Technology at http://physics.nist.gov/cuu/Constants/index.html/
 c

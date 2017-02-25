@@ -20,7 +20,7 @@ c
 c     K. A. Feenstra, B. Hess and H. J. C. Berendsen, "Improving
 c     Efficiency of Large Time-Scale Molecular Dynamics Simulations
 c     of Hydrogen-Rich Systems", Journal of Computational Chemistry,
-c     8, 786-798 (1999)
+c     8, 786-798 (1999)  [heavy hydrogen reweighting]
 c
 c
       subroutine mdinit
