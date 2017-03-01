@@ -4876,7 +4876,7 @@ c     e = 0.0d0
             f3 = f3 + (fuind(k,i)+fuinp(k,i))*fphi(j3,i)
      &              + fuind(k,i)*fphip(j3,i)
      &              + fuinp(k,i)*fphid(j3,i)
-            if (poltyp .eq. 'DIRECT') then
+            if (poltyp.eq.'DIRECT' .or. poltyp.eq.'OPT') then
                f1 = f1 - fuind(k,i)*fphip(j1,i)
      &                 - fuinp(k,i)*fphid(j1,i)
                f2 = f2 - fuind(k,i)*fphip(j2,i)
@@ -4982,7 +4982,7 @@ c
      &                  +cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
          vzz = vzz - 2.0d0*cmp(7,i)*cphi(7,i) - cmp(9,i)*cphi(9,i)
      &             - cmp(10,i)*cphi(10,i)
-         if (poltyp .eq. 'DIRECT') then
+         if (poltyp.eq.'DIRECT' .or. poltyp.eq.'OPT') then
             vxx = vxx + 0.5d0*(cphid(2)*uinp(1,i)+cphip(2)*uind(1,i))
             vxy = vxy + 0.25d0*(cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
      &                        +cphid(3)*uinp(1,i)+cphip(3)*uind(1,i))
