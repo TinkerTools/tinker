@@ -3055,12 +3055,30 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
    if (strncasecmp (polpot__.poltyp, "DIRECT", 6) == 0) {
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Direct);
-   } else if (strncasecmp (polpot__.poltyp, "EXTRAP", 6) == 0) {
-      exptCoefficients = OpenMM_DoubleArray_create (4);
-      OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
-      OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
-      OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
-      OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.copt[3]);
+   } else if (strncasecmp (polpot__.poltyp, "OPT", 3) == 0) {
+      if (polar__.copt[4] != 0.0) {
+         exptCoefficients = OpenMM_DoubleArray_create (5);
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
+         OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.copt[3]);
+         OpenMM_DoubleArray_set (exptCoefficients, 4, polar__.copt[4]);
+      } else if (polar__.copt[3] != 0.0) {
+         exptCoefficients = OpenMM_DoubleArray_create (4);
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
+         OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.copt[3]);
+      } else if (polar__.copt[2] != 0.0) {
+         exptCoefficients = OpenMM_DoubleArray_create (3);
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
+      } else if (polar__.copt[1] != 0.0) {
+         exptCoefficients = OpenMM_DoubleArray_create (2);
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
+      }
       OpenMM_AmoebaMultipoleForce_setExtrapolationCoefficients
                                   (amoebaMultipoleForce,exptCoefficients);
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
