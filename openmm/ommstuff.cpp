@@ -3617,7 +3617,7 @@ static void setupMonteCarloBarostat (OpenMM_System* system, FILE* log) {
    OpenMM_System_addForce (system, (OpenMM_Force*) monteCarloBarostat);
 
    if (log) {
-      (void) fprintf (log, "\n MonteCarlo Barostat:\n");
+      (void) fprintf (log, "\n MonteCarlo Barostat :\n");
       (void) fprintf (log, "\n Target Temperature   %15.2f K",
                       OpenMM_MonteCarloBarostat_getDefaultTemperature
                       (monteCarloBarostat));
@@ -4912,7 +4912,7 @@ int openmm_test_ (void) {
    FILE* log = stderr;
 
    if (log) {
-      (void) fprintf (log, "\n Testing TINKER vs OpenMM for AMOEBA :\n");
+      (void) fprintf (log, "\n Testing TINKER vs OpenMM Energy & Force :\n");
    }
 
    implicitSolventActive = usingImplicitSolvent ();
@@ -4954,7 +4954,7 @@ int openmm_test_ (void) {
    if (potent__.use_geom)  countActiveForces++;
 
    if (log) {
-      (void) fprintf (log, "\n Potential Terms Used in TINKER:\n" );
+      (void) fprintf (log, "\n Potential Terms Used in TINKER :\n" );
       (void) fprintf (log, "\n    Bond=    %d", abs(potent__.use_bond));
       (void) fprintf (log, "    Angle=   %d", abs(potent__.use_angle));
       (void) fprintf (log, "    StrBnd=  %d", abs(potent__.use_strbnd));
@@ -5044,7 +5044,7 @@ int openmm_test_ (void) {
 
       loadTinkerForce (deriv__.desum, 0, tinkerForce);
       tinkerEnergy = *energi__.esum;
-      testName = "AmoebaPotentialsTest";
+      testName = "PotentialsTest";
 
       if (log) {
          (void) fprintf (log,

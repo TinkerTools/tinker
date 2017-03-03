@@ -46,7 +46,7 @@ int findBestCUDACard() {
    int device_used_mem[nDevices];
 
 
-   printf ("\n Number of CUDA cards detected :  %d\n", nDevices);
+   printf ("\n Number of CUDA Dards Detected :    %d\n", nDevices);
 
    // Loop through all the CUDA devices and pick the best one
 
