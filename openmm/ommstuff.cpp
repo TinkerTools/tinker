@@ -2794,11 +2794,8 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
    setNullTerminator (vdwpot__.epsrule, 10, buffer);
    OpenMM_AmoebaVdwForce_setEpsilonCombiningRule (amoebaVdwForce, buffer);
 
-   //
-   // Choose L-J or Buffered 14-7 to enable Amber MD (Z. Wang)
-   //
-   // setNullTerminator (vdwpot__.vdwtyp, 13, buffer);
-   // OpenMM_AmoebaVdwForce_setFunctionalForm (amoebaVdwForce, buffer);
+   setNullTerminator (vdwpot__.vdwtyp, 13, buffer);
+   OpenMM_AmoebaVdwForce_setFunctionalForm (amoebaVdwForce, buffer);
 
    OpenMM_AmoebaVdwForce_setCutoffDistance (amoebaVdwForce,
                                     limits__.vdwcut*OpenMM_NmPerAngstrom);
