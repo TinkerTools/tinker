@@ -102,6 +102,11 @@ c
             exist = .true.
             useprm = .false.
          else
+            if (prmfile(1:2) .eq. '~/') then
+               call getenv ('HOME',prefix)
+               prmfile = prefix(1:trimtext(prefix))//
+     &                     prmfile(2:trimtext(prmfile))
+            end if
             call suffix (prmfile,'prm','old')
             inquire (file=prmfile,exist=exist)
          end if
