@@ -59,7 +59,7 @@ c
       if (prmfile(1:2) .eq. '~/') then
          call getenv ('HOME',prefix)
          prmfile = prefix(1:trimtext(prefix))//
-     &               prmfile(2:trimtext(prmfile))
+     &                prmfile(2:trimtext(prmfile))
       end if
 c
 c     check existence of default or specified parameter file
@@ -105,7 +105,7 @@ c
             if (prmfile(1:2) .eq. '~/') then
                call getenv ('HOME',prefix)
                prmfile = prefix(1:trimtext(prefix))//
-     &                     prmfile(2:trimtext(prmfile))
+     &                      prmfile(2:trimtext(prmfile))
             end if
             call suffix (prmfile,'prm','old')
             inquire (file=prmfile,exist=exist)

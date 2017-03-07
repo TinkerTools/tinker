@@ -344,19 +344,21 @@ c
       if (exist)  read (string,*,err=200,end=200)  cutoff
   200 continue
       if (cutoff .lt. 0.0d0) then
+         cutoff = 0.0d0
          write (iout,210)
   210    format (/,' Cutoff Value for Listing RMS Deviations',
      &              ' [0.0] :  ',$)
-         read (input,220)  cutoff
+         read (input,220,err=230,end=230)  cutoff
   220    format (f20.0)
+  230    continue
       end if
 c
 c     information about structures to be superimposed
 c
-      write (iout,230)  file1(1:leng1)
-  230 format (/,' Structure File 1 :  ',a)
-      write (iout,240)  file2(1:leng2)
-  240 format (/,' Structure File 2 :  ',a)
+      write (iout,240)  file1(1:leng1)
+  240 format (/,' Structure File 1 :  ',a)
+      write (iout,250)  file2(1:leng2)
+  250 format (/,' Structure File 2 :  ',a)
 c
 c     reopen the coordinate files with structures to superimpose
 c
@@ -417,10 +419,10 @@ c
 c     perform the superposition of a structure pair
 c
       do while (.not. abort)
-         write (iout,250)  frame1,frame2
-  250    format (/,' File 1 Frame :',i6,13x,'File 2 Frame :',i6)
-         write (iout,260)
-  260    format (/,' Summary of Results from Structural',
+         write (iout,260)  frame1,frame2
+  260    format (/,' File 1 Frame :',i6,13x,'File 2 Frame :',i6)
+         write (iout,270)
+  270    format (/,' Summary of Results from Structural',
      &              ' Superposition :')
          if (dopbc) then
             twin = .true.
@@ -455,8 +457,8 @@ c
          end if
          verbose = .true.
          call impose (n1,x1,y1,z1,n2,x2,y2,z2,rmsvalue)
-         write (iout,270)  rmsvalue,frame1,frame2
-  270    format (/,' Root Mean Square Distance :',11x,f15.6,2x,2i7)
+         write (iout,280)  rmsvalue,frame1,frame2
+  280    format (/,' Root Mean Square Distance :',11x,f15.6,2x,2i7)
 c
 c     write out the results of the superposition
 c
@@ -471,19 +473,19 @@ c
             if (dist .ge. cutoff) then
                if (header) then
                   header = .false.
-                  write (iout,280)
-  280             format (/,'   Atom in the',9x,'Atom in the',12x,
+                  write (iout,290)
+  290             format (/,'   Atom in the',9x,'Atom in the',12x,
      &                       'Distance',10x,'Weight'
      &                    /,' First Structure',5x,'Second Structure',
      &                       8x,'Separated',10x,'in Fit'/)
                end if
-               write (iout,290)  i1,name1(i1),i2,name2(i2),dist,wfit(i)
-  290          format (3x,i7,'-',a3,9x,i7,'-',a3,7x,f13.6,4x,f12.4)
+               write (iout,300)  i1,name1(i1),i2,name2(i2),dist,wfit(i)
+  300          format (3x,i7,'-',a3,9x,i7,'-',a3,7x,f13.6,4x,f12.4)
             end if
          end do
          if (.not. header) then
-            write (iout,300)  rmsvalue
-  300       format (/,' Root Mean Square Distance :',11x,f15.6)
+            write (iout,310)  rmsvalue
+  310       format (/,' Root Mean Square Distance :',11x,f15.6)
          end if
 c
 c     create output file for superimposed second structure
