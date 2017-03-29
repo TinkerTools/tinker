@@ -1869,9 +1869,6 @@ c
          qfac(1,1,1) = 0.0d0
          if (.not. use_bounds) then
             expterm = 0.5d0 * pi / xbox
-            struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-            e = 0.5d0 * electric * expterm * struc2
-            em = em + e
             qfac(1,1,1) = expterm
          end if
 c
@@ -1942,7 +1939,7 @@ c
             e = e + fuind(k,i)*fphi(k+1,i)
          end do
       end do
-      e = 0.5d0 * electric * e
+      e = 0.5d0 * e
       ep = ep + e
 c
 c     perform deallocation of some local arrays

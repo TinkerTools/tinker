@@ -225,6 +225,25 @@ c
       allocate (dem(3,n))
       allocate (dep(3,n))
 c
+c     zero out each of the energy and gradient components
+c
+      ev = 0.0d0
+      ec = 0.0d0
+      ecd = 0.0d0
+      ed = 0.0d0
+      em = 0.0d0
+      ep = 0.0d0
+      do i = 1, n
+         do j = 1, 3
+            dev(j,i) = 0.0d0
+            dec(j,i) = 0.0d0
+            decd(j,i) = 0.0d0
+            ded(j,i) = 0.0d0
+            dem(j,i) = 0.0d0
+            dep(j,i) = 0.0d0
+         end do
+      end do
+c
 c     get the timing for energy terms via double nested loop
 c
       mode = 'LOOP'
