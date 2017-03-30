@@ -76,9 +76,6 @@ c
       a(1,1) = 1.0d0
       a(2,1) = 0.0d0
       a(3,1) = 0.0d0
-      a(1,2) = 0.0d0
-      a(2,2) = 1.0d0
-      a(3,2) = 0.0d0
       a(1,3) = 0.0d0
       a(2,3) = 0.0d0
       a(3,3) = 1.0d0
@@ -274,8 +271,8 @@ c
       integer i,j,k,m
       integer isite
       real*8 a(3,3)
-      real*8 m2(3,3)
-      real*8 r2(3,3)
+      real*8 mp(3,3)
+      real*8 rp(3,3)
 c
 c
 c     monopoles have the same value in any coordinate frame
@@ -296,19 +293,19 @@ c
       k = 5
       do i = 1, 3
          do j = 1, 3
-            m2(i,j) = pole(k,isite)
-            r2(i,j) = 0.0d0
+            mp(i,j) = pole(k,isite)
+            rp(i,j) = 0.0d0
             k = k + 1
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             if (j .lt. i) then
-               r2(i,j) = r2(j,i)
+               rp(i,j) = rp(j,i)
             else
                do k = 1, 3
                   do m = 1, 3
-                     r2(i,j) = r2(i,j) + a(i,k)*a(j,m)*m2(k,m)
+                     rp(i,j) = rp(i,j) + a(i,k)*a(j,m)*mp(k,m)
                   end do
                end do
             end if
@@ -317,7 +314,7 @@ c
       k = 5
       do i = 1, 3
          do j = 1, 3
-            rpole(k,isite) = r2(i,j)
+            rpole(k,isite) = rp(i,j)
             k = k + 1
          end do
       end do

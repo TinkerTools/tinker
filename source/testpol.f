@@ -243,8 +243,10 @@ c
 c     get induced dipoles from OPT extrapolation method
 c
       poltyp = savetyp
-      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT4'
-      call kpolar
+      if (poltyp(1:3) .ne. 'OPT') then
+         poltyp = 'OPT4'
+         call kpolar
+      end if
       call induce
       do i = 1, n
          do j = 1, 3
