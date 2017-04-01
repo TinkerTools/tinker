@@ -57,12 +57,13 @@ c
      &        //,4x,'(1) Create an Archive from Individual Frames',
      &        /,4x,'(2) Extract Individual Frames from an Archive',
      &        /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
-     &        /,4x,'(4) Unfold Periodic Boundaries for a Trajectory')
+     &        /,4x,'(4) Unfold Periodic Boundaries for a Trajectory',
+     &        /,4x,'(5) Remove Periodic Box Size from a Trajectory')
 c
 c     get the desired type of archive file modification
 c
       next = 1
-      nmode = 4
+      nmode = 5
       mode = 0
       call nextarg (answer,exist)
       call getnumb (answer,mode,next)
@@ -81,6 +82,7 @@ c
       if (mode .eq. 2)  modtyp = 'EXTRACT'
       if (mode .eq. 3)  modtyp = 'TRIM'
       if (mode .eq. 4)  modtyp = 'UNFOLD'
+      if (mode .eq. 5)  modtyp = 'UNBOUND'
 c
 c     get the name to use for the coordinate archive file
 c
@@ -363,6 +365,8 @@ c
                         yold(j) = y(j)
                         zold(j) = z(j)
                      end do
+                  else if (modtyp .eq. 'UNBOUND') then
+                     use_bounds = .false.
                   end if
                   call prtarc (ixyz)
                   i = i + step

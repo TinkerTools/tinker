@@ -398,6 +398,7 @@ c     read initial structure set from the second coordinate file
 c
       frame2 = 1
       if (same)  frame2 = 2
+      use_bounds = .false.
       call readxyz (ifile2)
       n2 = n
       do i = 1, n2
@@ -514,6 +515,7 @@ c
 c     attempt to get next structure pair from coordinate files
 c
          frame2 = frame2 + 1
+         use_bounds = .false.
          call readxyz (ifile2)
          n2 = n
          do i = 1, n2
@@ -543,6 +545,7 @@ c
                   frame2 = 1
                   rewind (unit=ifile2)
                end if
+               use_bounds = .false.
                call readxyz (ifile2)
                n2 = n
                do i = 1, n2
