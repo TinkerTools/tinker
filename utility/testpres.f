@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  2009  by Chuanjie Wu & Jay William Ponder  ##
 c     ##                    All Rights Reserved                     ##
 c     ################################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  program  testpres  --  compare virial to dU/dV pressure  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  program testpres  --  compare virial to dU/dV pressure  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "testpres" computes the internal virial for a periodic system
@@ -113,6 +113,7 @@ c
       write (iout,90)  eps,virial,dudv,dudv-virial
    90 format (/,6x,'Volume Change',8x,'Virial',10x,'dU/dV',11x,'Delta',
      &        /,1x,f15.4,3x,3f15.4)
+      call final
       end
 c
 c

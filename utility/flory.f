@@ -63,8 +63,8 @@ c
       logical alkane,peptide
       character*1 answer
       character*7 ext
-      character*60 xyzfile,datafile
-      character*80 record,string
+      character*240 xyzfile,datafile
+      character*240 record,string
 c
 c
 c     get the name to use for the input coordinate files
@@ -75,7 +75,7 @@ c
          write (iout,10)
    10    format (/,' Enter Cartesian Coordinate File Name :  ',$)
          read (input,20)  filename
-   20    format (a60)
+   20    format (a240)
       end if
       call basefile (filename)
 c
@@ -94,7 +94,7 @@ c
          write (iout,40)
    40    format (/,' Number of the First File to Use [<CR>=1] :  ',$)
          read (input,50)  record
-   50    format (a80)
+   50    format (a240)
          read (record,*,err=60,end=60)  start
    60    continue
       end if
@@ -106,7 +106,7 @@ c
          write (iout,70)
    70    format (/,' PolyPeptide or PolyEthylene (P or E) [P] :  ',$)
          read (input,80)  record
-   80    format (a80)
+   80    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if

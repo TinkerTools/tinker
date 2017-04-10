@@ -25,7 +25,8 @@ c
       parameter (maxline=100000)
       integer i,k,isrc,itop,nline
       integer length,trimtext,freeunit
-      character*80 string,record(maxline)
+      character*240 string
+      character*240 record(maxline)
 c
 c
 c     get a filename supplied as a command line argument
@@ -41,7 +42,7 @@ c
          write (iout,20)
    20    format (' Enter the Name of the Source File :  ',$)
          read (input,30)  filename
-   30    format (a60)
+   30    format (a240)
       end if
       isrc = freeunit ()
       open (unit=isrc,file=filename,status='old',err=10)
@@ -52,7 +53,7 @@ c
       nline = 0
       do i = 1, maxline
          read (isrc,40,err=50,end=50)  record(i)
-   40    format (a80)
+   40    format (a240)
          nline = nline + 1
       end do
 c

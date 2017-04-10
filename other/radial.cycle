@@ -57,9 +57,9 @@ c
       character*3 namej
       character*3 namek
       character*7 ext
-      character*60 coordfile
-      character*60 rdffile
-      character*80 record
+      character*240 coordfile
+      character*240 rdffile
+      character*240 record
 c
 c
 c     get the structure, unitcell parameters and molecules
@@ -88,7 +88,7 @@ c
    10 format (/,' Numbers of First & Last File and Step',
      &              ' Increment :  ',$)
       read (input,20)  record
-   20 format (a80)
+   20 format (a240)
       read (record,*,err=30,end=30)  start,stop,step
    30 continue
       if (stop .eq. 0)  stop = start
@@ -99,7 +99,7 @@ c
       write (iout,40)
    40 format (/,' Enter Names of First & Second Atoms :  ',$)
       read (input,50)  record
-   50 format (a80)
+   50 format (a240)
       next = 1
       call getword (record,namej,next)
       call getword (record,namek,next)

@@ -37,10 +37,10 @@ c
       character*3 oldname,newname
       character*7 ext
       character*9 emin(maxmin)
-      character*60 listfile
-      character*60 oldfile
-      character*60 newfile
-      character*80 record
+      character*240 listfile
+      character*240 oldfile
+      character*240 newfile
+      character*240 record
 c
 c
 c     get the filename for the energy ordered list of minima
@@ -49,7 +49,7 @@ c
       write (iout,10)
    10 format (/,' Enter Name of File Listing Sorted Minima :  ',$)
       read (input,20)  listfile
-   20 format (a60)
+   20 format (a240)
       call basefile (listfile)
       call suffix (listfile,'list')
       call version (listfile,'old')
@@ -62,7 +62,7 @@ c
       nmin = 0
       dowhile (.true.)
          read (ilist,30,err=40,end=40)  record
-   30    format (a80)
+   30    format (a240)
          nmin = nmin + 1
          next = 1
          call getnumb (record,imin(nmin),next)

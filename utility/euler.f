@@ -28,7 +28,7 @@ c
       real*8 sphi,stheta,spsi
       real*8 a(3,3),b(3,3)
       logical err(3)
-      character*80 record
+      character*240 record
 c
 c
 c     get initial values of the Euler angles
@@ -36,7 +36,7 @@ c
       write (*,10)
    10 format (/,' Enter Euler Angle Values :  ',$)
       read (*,20)  record
-   20 format (a80)
+   20 format (a240)
       read (record,*,err=30,end=30)  phi,theta,psi
    30 continue
 c

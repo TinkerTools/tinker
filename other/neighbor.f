@@ -584,8 +584,8 @@ c
       integer molsite
       logical exist,header,use_molcut
       character*20 keyword
-      character*60 keyfile
-      character*80 record,string
+      character*240 keyfile
+      character*240 record,string
 c
 c
 c     open the keyword file for the current computation
@@ -617,12 +617,12 @@ c
          rewind (unit=ikey)
          dowhile (.true.)
             read (ikey,10,err=20,end=20)  record
-   10       format (a80)
+   10       format (a240)
             next = 1
             call gettext (record,keyword,next)
             call upcase (keyword)
 c
-c     use MOLCUT to specify molecular cutoff ( keep old keyword WATER)
+c     use MOLCUT to specify molecular cutoff (keep old keyword WATER)
 c
             if ( (keyword(1:6) .eq. 'WATER ') .or.
      &           (keyword(1:7) .eq. 'MOLCUT ' ) ) then
@@ -630,13 +630,13 @@ c
             end if
             if (keyword(1:10) .eq. 'MCUT_TYPE ') then
                nmctype = nmctype + 1
-               string = record(next:80)
+               string = record(next:240)
                read (string,*,err=20,end=20)  soltyp
                mcut_typ(nmctype) = soltyp
             end if
             if (keyword(1:10) .eq. 'MCUT_SITE ') then
                nmcsite = nmcsite + 1
-               string = record(next:80)
+               string = record(next:240)
                read (string,*,err=20,end=20)  soltyp
                mcut_site(nmcsite) = soltyp
             end if
@@ -690,6 +690,7 @@ c     residue based switching. To implement this need to do something
 c     with CELLS code.
 c       2)  the reduce stuff may or may not work correctly with
 c     residue based switching.
+c
 c
       subroutine enlj1
       implicit none

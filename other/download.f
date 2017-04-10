@@ -39,7 +39,7 @@ c
       character*5 time(maxhit)
       character*6 numeral,tag(0:maxtag)
       character*6 date(maxhit)
-      character*60 logfile
+      character*240 logfile
       character*256 record
       character*256 string(0:maxtag)
       character*256 site(maxhit)
@@ -64,7 +64,7 @@ c
          write (*,10)
    10    format (/,' Enter the ftp Log File Name :  ',$)
          read (*,20)  logfile
-   20    format (a60)
+   20    format (a240)
          inquire (file=logfile,exist=exist)
       end do
 c

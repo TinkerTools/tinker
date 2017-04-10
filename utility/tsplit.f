@@ -26,9 +26,9 @@ c
       integer itxt,leng
       integer start,stop
       integer nline,module
-      character*80 record
-      character*80 code(maxline)
       character*240 filename
+      character*240 record
+      character*240 code(maxline)
 c
 c
 c     get the name of the source file to split into modules
@@ -47,7 +47,7 @@ c     itxt = freeunit ()
       open (unit=itxt,file=filename,status='old')
       do i = 1, maxline
          read (itxt,30,err=40,end=40)  code(i)
-   30    format (a80)
+   30    format (a240)
          nline = i
       end do
    40 continue

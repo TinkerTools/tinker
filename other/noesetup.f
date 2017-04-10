@@ -39,8 +39,8 @@ c
       character*3 resnam1,resnam2
       character*3 amino(maxres)
       character*4 atom1,atom2
-      character*60 noefile,keyfile
-      character*80 record,string
+      character*240 noefile,keyfile
+      character*240 record,string
 c
 c
 c     read the PDB and TINKER files for the structure
@@ -116,7 +116,7 @@ c     get the first atom involved in the NOE constraint
 c
       dowhile (.true.)
          read (inoe,60,err=190,end=190)  record
-   60    format (a80)
+   60    format (a240)
          next = index(record,':') + 1
          if (next .eq. 0)  goto 180
          call getnumb (record,res1,next)
@@ -191,7 +191,7 @@ c
 c     locate the values of the NOE distance bounds
 c
          next = next + 8
-         string = record(next:80)
+         string = record(next:240)
          read (string,*)  dummy,upper,lower
 c        upper = 10.0d0
 c        lower = 2.0d0
