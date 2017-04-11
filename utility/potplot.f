@@ -68,5 +68,8 @@ c
    80    continue
       end do
       close (unit=ipot)
+c
+c     perform any final tasks before program exit
+c
       call final
       end

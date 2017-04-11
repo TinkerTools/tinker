@@ -213,6 +213,12 @@ c
       logical midx,midy,midz
 c
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,k,cid,nearpt,abound,
+!$OMP& cbound,negx,negy,negz,posx,posy,posz,midx,midy,midz)
+!$OMP DO
+c
 c     zero out the PME table marking chunks per site
 c
       do k = 1, nchunk
@@ -220,6 +226,11 @@ c
             pmetable(i,k) = 0
          end do
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP DO
 c
 c     loop over sites to find the spatial chunks for each
 c
@@ -315,6 +326,11 @@ c
          if (posx .and. posy .and. posz)  call setchunk (i,cid,1,1,1)
    10    continue
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end
 c
@@ -388,6 +404,13 @@ c
       real*8 term
 c
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,u0,term,t0)
+!$OMP DO
+c
 c     zero out the particle mesh Ewald charge grid
 c
       do k = 1, nfft3
@@ -401,9 +424,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,u0,term,t0)
+!$OMP END DO
 !$OMP DO
 c
 c     put the permanent multipole moments onto the grid
@@ -502,6 +523,13 @@ c
       real*8 fmp(10,*)
 c
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,v1,v2,u0,u1,u2,term0,term1,term2,t0,t1,t2)
+!$OMP DO
+c
 c     zero out the particle mesh Ewald charge grid
 c
       do k = 1, nfft3
@@ -515,9 +543,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,v1,v2,u0,u1,u2,term0,term1,term2,t0,t1,t2)
+!$OMP END DO
 !$OMP DO
 c
 c     put the permanent multipole moments onto the grid
@@ -629,6 +655,13 @@ c
       real*8 fuinp(3,*)
 c
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,v1,u0,u1,term01,term11,term02,term12,t0,t1)
+!$OMP DO
+c
 c     zero out the particle mesh Ewald charge grid
 c
       do k = 1, nfft3
@@ -642,9 +675,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,v1,u0,u1,term01,term11,term02,term12,t0,t1)
+!$OMP END DO
 !$OMP DO
 c
 c     put the induced dipole moments onto the grid
