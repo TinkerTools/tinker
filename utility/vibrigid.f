@@ -18,10 +18,10 @@ c
 c
       program vibrigid
       implicit none
-      include 'sizes.i'
-      include 'group.i'
-      include 'iounit.i'
-      include 'rigid.i'
+      use sizes
+      use group
+      use iounit
+      use rigid
       integer maxrgd
       parameter (maxrgd=6*maxgrp)
       integer i,j,ihess,nvar

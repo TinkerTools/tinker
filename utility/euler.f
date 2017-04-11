@@ -18,10 +18,9 @@ c     method used by the "roteuler" routine in the main TINKER code
 c
 c
       program euler
+      use iounit
+      use math
       implicit none
-      real*8 radian,pi
-      parameter (radian=57.29577951308232088d0)
-      parameter (pi=3.141592653589793238d0)
       integer i,k
       real*8 phi,theta,psi,eps
       real*8 cphi,ctheta,cpsi
@@ -33,16 +32,17 @@ c
 c
 c     get initial values of the Euler angles
 c
-      write (*,10)
+      call initial
+      write (iout,10)
    10 format (/,' Enter Euler Angle Values :  ',$)
-      read (*,20)  record
+      read (input,20)  record
    20 format (a240)
       read (record,*,err=30,end=30)  phi,theta,psi
    30 continue
 c
 c     write out the initial Euler angles
 c
-      write (*,40)  phi,theta,psi
+      write (iout,40)  phi,theta,psi
    40 format (/,' Input Angles :',5x,3f12.4)
 c
 c     convert Euler angles from degrees to radians
@@ -71,10 +71,10 @@ c
 c
 c     write out the initial rotation matrix
 c
-      write (*,50)
+      write (iout,50)
    50 format (/,' Initial Rotation Matrix :',/)
       do i = 1, 3
-         write (*,60)  (a(i,k),k=1,3)
+         write (iout,60)  (a(i,k),k=1,3)
    60    format (20x,3f12.4)
       end do
 c
@@ -165,15 +165,19 @@ c
 c
 c     write out the final Euler angles
 c
-      write (*,70)  phi*radian,theta*radian,psi*radian
+      write (iout,70)  phi*radian,theta*radian,psi*radian
    70 format (/,' Final Angles :',5x,3f12.4)
 c
 c     write out the final rotation matrix
 c
-      write (*,80)
+      write (iout,80)
    80 format (/,' Final Rotation Matrix :',/)
       do i = 1, 3
-         write (*,90)  (b(i,k),k=1,3)
+         write (iout,90)  (b(i,k),k=1,3)
    90    format (20x,3f12.4)
       end do
+c
+c     perform any final tasks before program exit
+c
+      call final
       end

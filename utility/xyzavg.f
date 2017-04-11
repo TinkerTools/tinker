@@ -105,5 +105,8 @@ c
       open (unit=ixyz,file=xyzfile,status='new')
       call prtxyz (ixyz)
       close (unit=ixyz)
+c
+c     perform any final tasks before program exit
+c
       call final
       end

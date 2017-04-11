@@ -49,4 +49,8 @@ c     print out the maximum distance in the system
 c
       write (iout,10)  rmax
    10 format (/,' Maximum Distance :  ',f12.4)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end

@@ -13,11 +13,11 @@ c     #############################################################
 c
 c
       program fakenoe
+      use sizes
+      use atoms
+      use iounit
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'pdb.i'
       integer i,j,k
       integer map(maxatm)
       real*8 dist2,xi,yi,zi

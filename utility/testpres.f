@@ -17,22 +17,22 @@ c     and compares it to a numerical evaluation of dU/dV
 c
 c
       program testpres
+      use sizes
+      use atoms
+      use boxes
+      use bound
+      use iounit
+      use potent
+      use units
+      use usage
+      use virial
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'bound.i'
-      include 'iounit.i'
-      include 'potent.i'
-      include 'units.i'
-      include 'usage.i'
-      include 'virial.i'
       integer i,j,mode
       real*8 epot,epot1,epot2
       real*8 eps,factor
       real*8 dudv,virial
       real*8 stress(3,3)
-      real*8 derivs(3,maxatm)
+      real*8, allocatable :: derivs(:,:)
       logical exist,query
       character*240 string
 c
@@ -84,9 +84,17 @@ c
       end if
       if (eps .le. 0.0d0)  eps = 0.1d0
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     get the potential energy, forces and internal virial
 c
       call gradient (epot,derivs)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     calculate the full stress tensor for the periodic system
 c
@@ -113,6 +121,9 @@ c
       write (iout,90)  eps,virial,dudv,dudv-virial
    90 format (/,6x,'Volume Change',8x,'Virial',10x,'dU/dV',11x,'Delta',
      &        /,1x,f15.4,3x,3f15.4)
+c
+c     perform any final tasks before program exit
+c
       call final
       end
 c
@@ -129,14 +140,14 @@ c     of the periodic box volume
 c
 c
       subroutine vscale (epot,mode,eps)
+      use sizes
+      use atomid
+      use atoms
+      use boxes
+      use group
+      use molcul
+      use usage
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'boxes.i'
-      include 'group.i'
-      include 'molcul.i'
-      include 'usage.i'
       integer i,j,k,mode
       integer start,stop
       real*8 epot,eps,vold
@@ -147,10 +158,16 @@ c
       real*8 xmove,xboxold
       real*8 ymove,yboxold
       real*8 zmove,zboxold
-      real*8 xold(maxatm)
-      real*8 yold(maxatm)
-      real*8 zold(maxatm)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
 c
 c     save the original box size and atomic coordinates
 c
@@ -267,5 +284,11 @@ c
          y(i) = yold(i)
          z(i) = zold(i)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
       return
       end

@@ -18,11 +18,11 @@ c     version of the standard fsplit routine
 c
 c
       program tsplit
+      use iounit
       implicit none
       integer maxline
       parameter (maxline=500000)
       integer i,j,k,m
-      integer input,iout
       integer itxt,leng
       integer start,stop
       integer nline,module
@@ -33,8 +33,7 @@ c
 c
 c     get the name of the source file to split into modules
 c
-      input = 5
-      iout = 6
+      call initial
       write (iout,10)
    10 format (/,' Enter TINKER Source Listing File Name :  ',$)
       read (input,20)  filename
@@ -128,4 +127,8 @@ c
    90    format (a)
       end do
       close (unit=itxt)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end

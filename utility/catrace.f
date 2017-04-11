@@ -106,4 +106,8 @@ c
       end do
       close (unit=ixyz)
       close (unit=icat)
+c
+c     perform any final tasks before program exit
+c
+      call final
       end

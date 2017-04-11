@@ -12,22 +12,22 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "moveaxes" converts atomic multipoles from the original local
-c     axis definitions to the bisector method; in the original mode,
+c     "moveaxes" converts atomic multipoles from the Z-then-X local
+c     axis definition to the Bisector method; in the original mode,
 c     the "zaxis" atom defines the z-direction and the "xaxis" atom
 c     lies in the positive-x half of the z,x-plane; in the alternate
-c     "bisector" the z-direction is taken as the bisector of the
+c     Bisector form the z-direction is taken as the bisector of the
 c     angle (zaxis atom-central atom-xaxis atom), the x-direction is
 c     then perpendicular to the z-axis and in the plane
 c
 c
       program moveaxes
+      use sizes
+      use atoms
+      use iounit
+      use mpole
+      use units
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'iounit.i'
-      include 'mpole.i'
-      include 'units.i'
       integer i,k,ia
       real*8 a(3,3)
 c
@@ -85,14 +85,14 @@ c
 c
 c     "rotmatx" find the rotation matrix that converts from the local
 c     coordinate system at each multipole site from the "Z-then-X"
-c     system to the "bisector" system
+c     system to the "Bisector" system
 c
 c
       subroutine rotmatx (i,a)
+      use sizes
+      use atoms
+      use mpole
       implicit none
-      include 'sizes.i'
-      include 'atoms.i'
-      include 'mpole.i'
       integer i
       real*8 dx,dy,dz,r
       real*8 dxz1,dyz1,dzz1
