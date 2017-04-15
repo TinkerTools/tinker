@@ -72,16 +72,17 @@ c
          call mutate
       end if
 c
-c     initialize the temperature, pressure and coupling baths
+c     initialize the temperature, pressure, integrator and GPU ID
 c
       kelvin = 0.0d0
       atmsph = 0.0d0
       isothermal = .false.
       isobaric = .false.
+      integrate = 'VERLET'
+      cudaDevice = '0               '
 c
 c     check for keywords containing any altered parameters
 c
-      integrate = 'BEEMAN'
       do i = 1, nkey
          next = 1
          record = keyline(i)
@@ -91,7 +92,7 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
-         else if (keyword(1:12) .eq. 'CUDA_DEVICE ') then
+         else if (keyword(1:12) .eq. 'CUDA-DEVICE ') then
             call gettext (record,cudaDevice,next)
             call upcase (cudaDevice)
          end if

@@ -57,19 +57,19 @@ c
          yi = y(i)
          zi = z(i)
          w = xi*recip(1,1) + yi*recip(2,1) + zi*recip(3,1)
-         fr = dble(nfft1) * (w-anint(w)+0.5d0)
+         fr = dble(nfft1) * (w-dble(anint(w))+0.5d0)
          ifr = int(fr-eps)
          w = fr - dble(ifr)
          igrid(1,i) = ifr - bsorder
          call bsplgen (w,thetai1(1,1,i))
          w = xi*recip(1,2) + yi*recip(2,2) + zi*recip(3,2)
-         fr = dble(nfft2) * (w-anint(w)+0.5d0)
+         fr = dble(nfft2) * (w-dble(anint(w))+0.5d0)
          ifr = int(fr-eps)
          w = fr - dble(ifr)
          igrid(2,i) = ifr - bsorder
          call bsplgen (w,thetai2(1,1,i))
          w = xi*recip(1,3) + yi*recip(2,3) + zi*recip(3,3)
-         fr = dble(nfft3) * (w-anint(w)+0.5d0)
+         fr = dble(nfft3) * (w-dble(anint(w))+0.5d0)
          ifr = int(fr-eps)
          w = fr - dble(ifr)
          igrid(3,i) = ifr - bsorder

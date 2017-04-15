@@ -3719,7 +3719,6 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       device_key = true;
    } else {
       device_number = findBestCUDACard();
-      device_number = 0;
       if (device_number < 0) {
          deviceId = NULL;
       } else {
@@ -3728,10 +3727,8 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       }
    }
 
-
-   //fprintf (log, "\n Value is %s \n", deviceId);
    //deviceId = "0,1";
-   //fprintf (log, "\n Value is %s \n", deviceId);
+   fprintf (log, "\n Value is %s \n", deviceId);
 
    if (device_key) {
       OpenMM_Platform_setPropertyDefaultValue (platform, "CudaDeviceIndex",
