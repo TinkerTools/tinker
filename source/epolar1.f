@@ -157,13 +157,11 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      !if (.not. use_mpole)  call chkpole !ALBAUGHTEST
-      call chkpole
+      if (.not. use_mpole)  call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      !if (.not. use_mpole)  call rotpole !ALBAUGHTEST
-      call rotpole
+      if (.not. use_mpole)  call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1727,13 +1725,11 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      !if (.not. use_mpole)  call chkpole ALBAUGHTEST
-      call chkpole
+      if (.not. use_mpole)  call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      !if (.not. use_mpole)  call rotpole ALBAUGHTEST
-      call rotpole
+      if (.not. use_mpole)  call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2586,13 +2582,11 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      !if (.not. use_mpole)  call chkpole ALBAUGHTEST
-      call chkpole
+      if (.not. use_mpole)  call chkpole 
 c
 c     rotate the multipole components into the global frame
 c
-      !if (.not. use_mpole)  call rotpole ALBAUGHTEST
-      call rotpole
+      if (.not. use_mpole)  call rotpole 
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -4578,12 +4572,10 @@ c
 c     check the sign of multipole components at chiral sites
 c
       if (.not. use_mpole)  call chkpole
-      call chkpole!ALBAUGHTEST
 c
 c     rotate the multipole components into the global frame
 c
       if (.not. use_mpole)  call rotpole
-      call rotpole!ALBAUGHTEST
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -4634,7 +4626,7 @@ c
          trq(1) = term * (diy*uiz-diz*uiy)
          trq(2) = term * (diz*uix-dix*uiz)
          trq(3) = term * (dix*uiy-diy*uix)
-         call torque (i,trq,fix,fiy,fiz,dep)!ALBAUGHTEST
+         call torque (i,trq,fix,fiy,fiz,dep)
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -5893,17 +5885,17 @@ c
 c
 c     remove scalar sum virial from prior multipole 3-D FFT
 c
-      !if (use_mpole) then ALBAUGHTEST
-      !   vxx = -vmxx
-      !   vxy = -vmxy
-      !   vxz = -vmxz
-      !   vyy = -vmyy
-      !   vyz = -vmyz
-      !   vzz = -vmzz
+      if (use_mpole) then 
+         vxx = -vmxx
+         vxy = -vmxy
+         vxz = -vmxz
+         vyy = -vmyy
+         vyz = -vmyz
+         vzz = -vmzz
 c
 c     compute the arrays of B-spline coefficients
 c
-      !else ALBAUGHTEST
+      else
          call bspline_fill
          call table_fill
 c
@@ -6001,7 +5993,7 @@ c
             end do
          end do
          call fphi_to_cphi (fphi,cphi)
-      !end if ALBAUGHTEST
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -6348,7 +6340,7 @@ c
      &                  +cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
          vzz = vzz - 2.0d0*cmp(7,i)*cphi(7,i) - cmp(9,i)*cphi(9,i)
      &             - cmp(10,i)*cphi(10,i)
-         if (use_iel0scf) then!ALBAUGH
+         if (use_iel0scf) then!ALBAUGH - PRETTY SURE THIS BLOCK IS OKAY
             vxx = vxx + cphi(2,i)*cmp(2,i)
      &                - cphiaux(2,i)*cmp(2,i)
      &             - 0.5d0*(cphim(2)*(auxtmp1(1,i)+auxtmp2(1,i)
@@ -6638,262 +6630,262 @@ c
          end do
       end do
       
-      if (use_iel0scf) then!ALBAUGH
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) - uinp(j-1,i) + uaux(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriad(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriad(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) - uaux(j-1,i) + upaux(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriap(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriap(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) - upaux(j-1,i)
-     &                     + auxptmp1(j-1,i) + auxptmp2(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriauxp(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriauxp(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) - auxptmp1(j-1,i) - auxptmp2(j-1,i)
-     &                     + auxtmp1(j-1,i) + auxtmp2(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriauxd(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriauxd(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) - uind(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgrialtd(1,i,j,k) = qgrid(1,i,j,k)
-                  qgrialtd(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + uind(j-1,i) - auxtmp1(j-1,i)
-     &                     - auxtmp2(j-1,i) - uinp(j-1,i) 
-     &                     + auxptmp1(j-1,i) + auxptmp2(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgrialtp(1,i,j,k) = qgrid(1,i,j,k)
-                  qgrialtp(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + uinp(j-1,i) - auxptmp1(j-1,i)
-     &                     - auxptmp2(j-1,i) - uind(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgridn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgridn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + uind(j-1,i) - uinp(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgripn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgripn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + uinp(j-1,i) - uaux(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriadn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriadn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + uaux(j-1,i) - upaux(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriapn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriapn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + upaux(j-1,i) - auxtmp1(j-1,i) 
-     &                     - auxtmp2(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriauxdn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriauxdn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + auxtmp1(j-1,i) + auxtmp2(j-1,i) 
-     &                     - auxptmp1(j-1,i) - auxptmp2(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgriauxpn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgriauxpn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + auxptmp1(j-1,i) + auxptmp2(j-1,i)
-     &                     - auxtmp1(j-1,i) - auxtmp2(j-1,i)
-     &                     + uind(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgrialtdn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgrialtdn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + auxtmp1(j-1,i) + auxtmp2(j-1,i)
-     &                     - uind(j-1,i) - auxptmp1(j-1,i)
-     &                     - auxptmp2(j-1,i) + uinp(j-1,i)
-            end do
-         end do
-         call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
-         do k = 1, nfft3
-            do j = 1, nfft2
-               do i = 1, nfft1
-                  qgrialtpn(1,i,j,k) = qgrid(1,i,j,k)
-                  qgrialtpn(2,i,j,k) = qgrid(2,i,j,k)
-               end do
-            end do
-         end do
-         
-         do i = 1, npole
-            do j = 2, 4
-               cmp(j,i) = cmp(j,i) + auxptmp1(j-1,i) + auxptmp2(j-1,i)
-            end do
-         end do
-      end if
+!!      if (use_iel0scf) then!ALBAUGH - UNSURE OF THIS SECTION
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) - uinp(j-1,i) + uaux(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriad(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriad(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) - uaux(j-1,i) + upaux(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriap(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriap(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) - upaux(j-1,i)
+!!     &                     + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriauxp(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriauxp(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) - auxptmp1(j-1,i) - auxptmp2(j-1,i)
+!!     &                     + auxtmp1(j-1,i) + auxtmp2(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriauxd(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriauxd(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) - uind(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgrialtd(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgrialtd(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + uind(j-1,i) - auxtmp1(j-1,i)
+!!     &                     - auxtmp2(j-1,i) - uinp(j-1,i) 
+!!     &                     + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgrialtp(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgrialtp(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + uinp(j-1,i) - auxptmp1(j-1,i)
+!!     &                     - auxptmp2(j-1,i) - uind(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgridn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgridn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + uind(j-1,i) - uinp(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgripn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgripn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + uinp(j-1,i) - uaux(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriadn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriadn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + uaux(j-1,i) - upaux(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriapn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriapn(2,i,j,k) = qgrid(2,i,j,k)
+!1               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + upaux(j-1,i) - auxtmp1(j-1,i) 
+!!     &                     - auxtmp2(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriauxdn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriauxdn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + auxtmp1(j-1,i) + auxtmp2(j-1,i) 
+!!     &                     - auxptmp1(j-1,i) - auxptmp2(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgriauxpn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgriauxpn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+!!     &                     - auxtmp1(j-1,i) - auxtmp2(j-1,i)
+!!     &                     + uind(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgrialtdn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgrialtdn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + auxtmp1(j-1,i) + auxtmp2(j-1,i)
+!!     &                     - uind(j-1,i) - auxptmp1(j-1,i)
+!!     &                     - auxptmp2(j-1,i) + uinp(j-1,i)
+!!            end do
+!!         end do
+!!         call cmp_to_fmp (cmp,fmp)
+!!         call grid_mpole (fmp)
+!!         call fftfront
+!!         do k = 1, nfft3
+!!            do j = 1, nfft2
+!!               do i = 1, nfft1
+!!                  qgrialtpn(1,i,j,k) = qgrid(1,i,j,k)
+!!                  qgrialtpn(2,i,j,k) = qgrid(2,i,j,k)
+!!               end do
+!!            end do
+!!         end do
+!!         
+!!         do i = 1, npole
+!!            do j = 2, 4
+!!               cmp(j,i) = cmp(j,i) + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+!!            end do
+!!         end do
+!!      end if
       
       do i = 1, npole
          do j = 2, 4
@@ -6936,23 +6928,23 @@ c
             end if
             struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
      &                  + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
-            if (use_iel0scf) then!ALBAUGH
-               struc2 = 0.5d0*struc2!0.5f(x,y)
-     &             +0.5d0*(qgridn(1,k1,k2,k3)*qgripn(1,k1,k2,k3)
-     &                    +qgridn(2,k1,k2,k3)*qgripn(2,k1,k2,k3))!0.5f(-x,-y)
-     &             +0.5d0*(qgrialtp(1,k1,k2,k3)*qgriad(1,k1,k2,k3)
-     &                    +qgrialtp(2,k1,k2,k3)*qgriad(2,k1,k2,k3))!0.5*f(a-x,h)
-     &             +0.5d0*(qgrialtpn(1,k1,k2,k3)*qgriadn(1,k1,k2,k3)
-     &                    +qgrialtpn(2,k1,k2,k3)*qgriadn(2,k1,k2,k3))!0.5f(-a+x,-h)
-     &             +0.5d0*(qgrialtd(1,k1,k2,k3)*qgriap(1,k1,k2,k3)
-     &                    +qgrialtd(2,k1,k2,k3)*qgriap(2,k1,k2,k3))!0.5f(b-y,g)
-     &             +0.5d0*(qgrialtdn(1,k1,k2,k3)*qgriapn(1,k1,k2,k3)
-     &                    +qgrialtdn(2,k1,k2,k3)*qgriapn(2,k1,k2,k3))!0.5f(-b+y,-g)
-     &             +0.5d0*(qgriauxd(1,k1,k2,k3)*qgriauxp(1,k1,k2,k3)
-     &                    +qgriauxd(2,k1,k2,k3)*qgriauxp(2,k1,k2,k3))!0.5f(a,b)
-     &             -0.5d0*(qgriauxdn(1,k1,k2,k3)*qgriauxpn(1,k1,k2,k3)
-     &                    +qgriauxdn(2,k1,k2,k3)*qgriauxpn(2,k1,k2,k3))!0.5f(-a,-b)
-            end if
+!!            if (use_iel0scf) then!ALBAUGH - UNSURE OF THIS SECTION
+!!               struc2 = 0.5d0*struc2!0.5f(x,y)
+!!     &             +0.5d0*(qgridn(1,k1,k2,k3)*qgripn(1,k1,k2,k3)
+!!     &                    +qgridn(2,k1,k2,k3)*qgripn(2,k1,k2,k3))!0.5f(-x,-y)
+!!     &             +0.5d0*(qgrialtp(1,k1,k2,k3)*qgriad(1,k1,k2,k3)
+!!     &                    +qgrialtp(2,k1,k2,k3)*qgriad(2,k1,k2,k3))!0.5*f(a-x,h)
+!!     &             +0.5d0*(qgrialtpn(1,k1,k2,k3)*qgriadn(1,k1,k2,k3)
+!!     &                    +qgrialtpn(2,k1,k2,k3)*qgriadn(2,k1,k2,k3))!0.5f(-a+x,-h)
+!!     &             +0.5d0*(qgrialtd(1,k1,k2,k3)*qgriap(1,k1,k2,k3)
+!!     &                    +qgrialtd(2,k1,k2,k3)*qgriap(2,k1,k2,k3))!0.5f(b-y,g)
+!!     &             +0.5d0*(qgrialtdn(1,k1,k2,k3)*qgriapn(1,k1,k2,k3)
+!!     &                    +qgrialtdn(2,k1,k2,k3)*qgriapn(2,k1,k2,k3))!0.5f(-b+y,-g)
+!!     &             +0.5d0*(qgriauxd(1,k1,k2,k3)*qgriauxp(1,k1,k2,k3)
+!!     &                    +qgriauxd(2,k1,k2,k3)*qgriauxp(2,k1,k2,k3))!0.5f(a,b)
+!!     &             -0.5d0*(qgriauxdn(1,k1,k2,k3)*qgriauxpn(1,k1,k2,k3)
+!!     &                    +qgriauxdn(2,k1,k2,k3)*qgriauxpn(2,k1,k2,k3))!0.5f(-a,-b)
+!!            end if
             eterm = 0.5d0 * electric * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx + h1*h1*vterm - eterm

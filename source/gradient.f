@@ -189,46 +189,46 @@ c
 c
 c     call the local geometry energy and gradient routines
 c
-      !if (use_bond)  call ebond1
-      !if (use_angle)  call eangle1
-      !if (use_strbnd)  call estrbnd1
-      !if (use_urey)  call eurey1
-      !if (use_angang)  call eangang1
-      !if (use_opbend)  call eopbend1
-      !if (use_opdist)  call eopdist1
-      !if (use_improp)  call eimprop1
-      !if (use_imptor)  call eimptor1
-      !if (use_tors)  call etors1
-      !if (use_pitors)  call epitors1
-      !if (use_strtor)  call estrtor1
-      !if (use_angtor)  call eangtor1
-      !if (use_tortor)  call etortor1
+      if (use_bond)  call ebond1
+      if (use_angle)  call eangle1
+      if (use_strbnd)  call estrbnd1
+      if (use_urey)  call eurey1
+      if (use_angang)  call eangang1
+      if (use_opbend)  call eopbend1
+      if (use_opdist)  call eopdist1
+      if (use_improp)  call eimprop1
+      if (use_imptor)  call eimptor1
+      if (use_tors)  call etors1
+      if (use_pitors)  call epitors1
+      if (use_strtor)  call estrtor1
+      if (use_angtor)  call eangtor1
+      if (use_tortor)  call etortor1
 c
 c     call the van der Waals energy and gradient routines
 c
       if (use_vdw) then
-         !if (vdwtyp .eq. 'LENNARD-JONES')  call elj1
-         !if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck1
-         !if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb1
-         !if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
-         !if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
+         if (vdwtyp .eq. 'LENNARD-JONES')  call elj1
+         if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck1
+         if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb1
+         if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
+         if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
       end if
 c
 c     call the electrostatic energy and gradient routines
 c
-      !if (use_charge)  call echarge1
-      !if (use_chgdpl)  call echgdpl1
-      !if (use_dipole)  call edipole1
-      !if (use_mpole)  call empole1 !ALBAUGHTEST
+      if (use_charge)  call echarge1
+      if (use_chgdpl)  call echgdpl1
+      if (use_dipole)  call edipole1
+      if (use_mpole)  call empole1
       if (use_polar)  call epolar1
-      !if (use_rxnfld)  call erxnfld1
+      if (use_rxnfld)  call erxnfld1
 c
 c     call any miscellaneous energy and gradient routines
 c
-      !if (use_solv)  call esolv1
-      !if (use_metal)  call emetal1
-      !if (use_geom)  call egeom1
-      !if (use_extra)  call extra1
+      if (use_solv)  call esolv1
+      if (use_metal)  call emetal1
+      if (use_geom)  call egeom1
+      if (use_extra)  call extra1
 c
 c     sum up to get the total energy and first derivatives
 c

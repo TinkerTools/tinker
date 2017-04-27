@@ -532,15 +532,6 @@ c
          end if
       end do
       nprior = i - 1
-      
-      do i = 1, n!ALBAUGHTEST
-         do j = 1, 3
-            v(j,i) = 0.0d0
-            vaux(j,i) = 0.0d0
-            vpaux(j,i) = 0.0d0
-         end do
-      end do
-      
       return
       end
 c
