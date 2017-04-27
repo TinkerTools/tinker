@@ -45,6 +45,7 @@ c
       use rgddyn
       use units
       use usage
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer nc,ns
@@ -56,9 +57,136 @@ c
       real*8 random,normal
       real*8 kt,rate,trial
       real*8 temp,expterm
+      real*8 temp_aux!ALBAUGH
+      real*8 temp_auxp!ALBAUGH
+      real*8 scalep
       real*8 w(3)
       real*8 ekin(3,3)
       external random,normal
+c
+c     control auxiliary pseudo-temperatures
+c
+      if (use_ielscf .or. use_iel0scf) then!ALBAUGH
+         if (stat_aux .eq. 'BERENDSEN') then
+            call kinaux (temp_aux,temp_auxp)
+            scale = 1.0d0
+            scalep = 1.0d0
+            if (temp_aux .ne. 0.0d0) then
+               scale = sqrt(1.0d0+(dt/tautemp_aux)
+     &                             *(kelvin_aux/temp_aux-1.0d0))
+            end if
+            if (temp_auxp .ne. 0.0d0) then
+               scalep = sqrt(1.0d0+(dt/tautemp_aux)
+     &                              *(kelvin_aux/temp_auxp-1.0d0))
+            end if
+            do i = 1, n
+               do j = 1, 3
+                  vaux(j,i) = scale * vaux(j,i)
+                  vpaux(j,i) = scalep * vpaux(j,i)
+               end do
+            end do
+         else if (stat_aux .eq. 'NOSE-HOOVER') then
+            call kinaux (temp_aux,temp_auxp)
+            nc = 5
+            ns = 3
+            dtc = dt / dble(nc)
+            w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
+            w(2) = 1.0d0 - 2.0d0*w(1)
+            w(3) = w(1)
+            scale = 1.0d0
+            scalep = 1.0d0
+            do i = 1, nc
+               do j = 1, ns
+                  dts = w(j) * dtc
+                  dt2 = 0.5d0 * dts
+                  dt4 = 0.25d0 * dts
+                  dt8 = 0.125d0 * dts
+            
+                  gnhaux(4)=(qnhaux(3)*vnhaux(3)*vnhaux(3)-kelvin_aux)
+     &                        /qnhaux(4)
+                  vnhaux(4)=vnhaux(4)+gnhaux(4)*dt4
+                  gnhaux(3)=(qnhaux(2)*vnhaux(2)*vnhaux(2)-kelvin_aux)
+     &                        /qnhaux(3)
+                  expterm=exp(-vnhaux(4)*dt8)
+                  vnhaux(3)=expterm*(vnhaux(3)*expterm+gnhaux(3)*dt4)
+                  gnhaux(2)=(qnhaux(1)*vnhaux(1)*vnhaux(1)-kelvin_aux)
+     &                        /qnhaux(2)
+                  expterm=exp(-vnhaux(3)*dt8)
+                  vnhaux(2)=expterm*(vnhaux(2)*expterm+gnhaux(2)*dt4)
+                  gnhaux(1)=(dble(nfree_aux)*temp_aux-dble(nfree_aux)
+     &                          *kelvin_aux)/qnhaux(1)
+                  expterm=exp(-vnhaux(2)*dt8)
+                  vnhaux(1)=expterm*(vnhaux(1)*expterm+gnhaux(1)*dt4)
+                  scale=scale*exp(-vnhaux(1)*dt2)
+                  temp_aux=temp_aux*exp(-vnhaux(1)*dt2)*exp(-vnhaux(1)
+     &                               *dt2)
+                  gnhaux(1)=(dble(nfree_aux)*temp_aux-dble(nfree_aux)
+     &                         *kelvin_aux)/qnhaux(1)
+                  expterm=exp(-vnhaux(2)*dt8)
+                  vnhaux(1)=expterm*(vnhaux(1)*expterm+gnhaux(1)*dt4)
+                  gnhaux(2)=(qnhaux(1)*vnhaux(1)*vnhaux(1)-kelvin_aux)
+     &                        /qnhaux(2)
+                  expterm=exp(-vnhaux(3)*dt8)
+                  vnhaux(2)=expterm*(vnhaux(2)*expterm+gnhaux(2)*dt4)
+                  gnhaux(3)=(qnhaux(2)*vnhaux(2)*vnhaux(2)-kelvin_aux)
+     &                         /qnhaux(3)
+                  expterm=exp(-vnhaux(4)*dt8)
+                  vnhaux(3)=expterm*(vnhaux(3)*expterm+gnhaux(3)*dt4)
+                  gnhaux(4)=(qnhaux(3)*vnhaux(3)*vnhaux(3)-kelvin_aux)
+     &                         /qnhaux(4)
+                  vnhaux(4)=vnhaux(4)+gnhaux(4)*dt4
+           
+                  
+                  gnhauxp(4)=(qnhauxp(3)*vnhauxp(3)*vnhauxp(3)
+     &                          -kelvin_aux)/qnhauxp(4)
+                  vnhauxp(4)=vnhauxp(4)+gnhauxp(4)*dt4
+                  gnhauxp(3)=(qnhauxp(2)*vnhauxp(2)*vnhauxp(2)
+     &                          -kelvin_aux)/qnhauxp(3)
+                  expterm=exp(-vnhauxp(4)*dt8)
+                  vnhauxp(3)=expterm*(vnhauxp(3)*expterm+gnhauxp(3)
+     &                           *dt4)
+                  gnhauxp(2)=(qnhauxp(1)*vnhauxp(1)*vnhauxp(1)
+     &                         -kelvin_aux)/qnhauxp(2)
+                  expterm=exp(-vnhauxp(3)*dt8)
+                  vnhauxp(2)=expterm*(vnhauxp(2)*expterm+gnhauxp(2)
+     &                        *dt4)
+                  gnhauxp(1)=(dble(nfree_aux)*temp_auxp-dble(nfree_aux)
+     &                          *kelvin_aux)/qnhauxp(1)
+                  expterm=exp(-vnhauxp(2)*dt8)
+                  vnhauxp(1)=expterm*(vnhauxp(1)*expterm+gnhauxp(1)
+     &                           *dt4)
+                  scalep=scalep*exp(-vnhauxp(1)*dt2)
+                  temp_auxp=temp_auxp*exp(-vnhauxp(1)*dt2)
+     &                         *exp(-vnhauxp(1)*dt2)
+                  gnhauxp(1)=(dble(nfree_aux)*temp_auxp-dble(nfree_aux)
+     &                         *kelvin_aux)/qnhauxp(1)
+                  expterm=exp(-vnhauxp(2)*dt8)
+                  vnhauxp(1)=expterm*(vnhauxp(1)*expterm+gnhauxp(1)
+     &                           *dt4)
+                  gnhauxp(2)=(qnhauxp(1)*vnhauxp(1)*vnhauxp(1)
+     &                           -kelvin_aux)/qnhauxp(2)
+                  expterm=exp(-vnhauxp(3)*dt8)
+                  vnhauxp(2)=expterm*(vnhauxp(2)*expterm+gnhauxp(2)
+     &                           *dt4)
+                  gnhauxp(3)=(qnhauxp(2)*vnhauxp(2)*vnhauxp(2)
+     &                             -kelvin_aux)/qnhauxp(3)
+                  expterm=exp(-vnhauxp(4)*dt8)
+                  vnhauxp(3)=expterm*(vnhauxp(3)*expterm+gnhauxp(3)
+     &                            *dt4)
+                  gnhauxp(4)=(qnhauxp(3)*vnhauxp(3)*vnhauxp(3)
+     &                           -kelvin_aux)/qnhauxp(4) 
+                  vnhauxp(4)=vnhauxp(4)+gnhauxp(4)*dt4
+               end do
+            end do
+         
+            do i = 1, n
+               do j = 1, 3
+                  vaux(j,i)=vaux(j,i)*scale
+                  vpaux(j,i)=vpaux(j,i)*scalep
+               end do
+            end do
+         end if
+      end if
 c
 c
 c     get the kinetic energy and instantaneous temperature
@@ -269,6 +397,7 @@ c
       use rgddyn
       use units
       use usage
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,nc,ns
       real*8 dt,dtc,dts
@@ -277,8 +406,8 @@ c
       real*8 scale,temp
       real*8 expterm
       real*8 scalep
-      real*8 temp_aux
-      real*8 temp_auxp
+      real*8 temp_aux!ALBAUGH
+      real*8 temp_auxp!ALBAUGH
       real*8 w(3)
       real*8 ekin(3,3)
 c
@@ -349,27 +478,115 @@ c
          end if
          call kinetic (eksum,ekin,temp)
       end if
+      
 c
-c     use Berendsen scaling for iEL auxiliary dipole velocities
+c     control auxiliary pseudo-temperatures
 c
-      if (use_ielscf) then
-         call kinaux (temp_aux,temp_auxp)
-         scale = 1.0d0
-         scalep = 1.0d0
-         if (temp_aux .ne. 0.0d0) then
-            scale = sqrt(1.0d0+(dt/tautemp_aux)
-     &                             *(kelvin_aux/temp_aux-1.0d0))
-         end if
-         if (temp_auxp .ne. 0.0d0) then
-            scalep = sqrt(1.0d0+(dt/tautemp_aux)
-     &                              *(kelvin_aux/temp_auxp-1.0d0))
-         end if
-         do i = 1, n
-            do j = 1, 3
-               vaux(j,i) = scale * vaux(j,i)
-               vpaux(j,i) = scalep * vpaux(j,i)
+      if (use_ielscf .or. use_iel0scf) then!ALBAUGH
+         if (stat_aux .eq. 'NOSE-HOOVER') then
+            call kinaux (temp_aux,temp_auxp)
+            nc = 5
+            ns = 3
+            dtc = dt / dble(nc)
+            w(1) = 1.0d0 / (2.0d0-2.0d0**(1.0d0/3.0d0))
+            w(2) = 1.0d0 - 2.0d0*w(1)
+            w(3) = w(1)
+            scale = 1.0d0
+            scalep = 1.0d0
+            do i = 1, nc
+               do j = 1, ns
+                  dts = w(j) * dtc
+                  dt2 = 0.5d0 * dts
+                  dt4 = 0.25d0 * dts
+                  dt8 = 0.125d0 * dts
+            
+                  gnhaux(4)=(qnhaux(3)*vnhaux(3)*vnhaux(3)-kelvin_aux)
+     &                        /qnhaux(4)
+                  vnhaux(4)=vnhaux(4)+gnhaux(4)*dt4
+                  gnhaux(3)=(qnhaux(2)*vnhaux(2)*vnhaux(2)-kelvin_aux)
+     &                        /qnhaux(3)
+                  expterm=exp(-vnhaux(4)*dt8)
+                  vnhaux(3)=expterm*(vnhaux(3)*expterm+gnhaux(3)*dt4)
+                  gnhaux(2)=(qnhaux(1)*vnhaux(1)*vnhaux(1)-kelvin_aux)
+     &                        /qnhaux(2)
+                  expterm=exp(-vnhaux(3)*dt8)
+                  vnhaux(2)=expterm*(vnhaux(2)*expterm+gnhaux(2)*dt4)
+                  gnhaux(1)=(dble(nfree_aux)*temp_aux-dble(nfree_aux)
+     &                          *kelvin_aux)/qnhaux(1)
+                  expterm=exp(-vnhaux(2)*dt8)
+                  vnhaux(1)=expterm*(vnhaux(1)*expterm+gnhaux(1)*dt4)
+                  scale=scale*exp(-vnhaux(1)*dt2)
+                  temp_aux=temp_aux*exp(-vnhaux(1)*dt2)*exp(-vnhaux(1)
+     &                               *dt2)
+                  gnhaux(1)=(dble(nfree_aux)*temp_aux-dble(nfree_aux)
+     &                         *kelvin_aux)/qnhaux(1)
+                  expterm=exp(-vnhaux(2)*dt8)
+                  vnhaux(1)=expterm*(vnhaux(1)*expterm+gnhaux(1)*dt4)
+                  gnhaux(2)=(qnhaux(1)*vnhaux(1)*vnhaux(1)-kelvin_aux)
+     &                        /qnhaux(2)
+                  expterm=exp(-vnhaux(3)*dt8)
+                  vnhaux(2)=expterm*(vnhaux(2)*expterm+gnhaux(2)*dt4)
+                  gnhaux(3)=(qnhaux(2)*vnhaux(2)*vnhaux(2)-kelvin_aux)
+     &                         /qnhaux(3)
+                  expterm=exp(-vnhaux(4)*dt8)
+                  vnhaux(3)=expterm*(vnhaux(3)*expterm+gnhaux(3)*dt4)
+                  gnhaux(4)=(qnhaux(3)*vnhaux(3)*vnhaux(3)-kelvin_aux)
+     &                         /qnhaux(4)
+                  vnhaux(4)=vnhaux(4)+gnhaux(4)*dt4
+           
+                  
+                  gnhauxp(4)=(qnhauxp(3)*vnhauxp(3)*vnhauxp(3)
+     &                          -kelvin_aux)/qnhauxp(4)
+                  vnhauxp(4)=vnhauxp(4)+gnhauxp(4)*dt4
+                  gnhauxp(3)=(qnhauxp(2)*vnhauxp(2)*vnhauxp(2)
+     &                          -kelvin_aux)/qnhauxp(3)
+                  expterm=exp(-vnhauxp(4)*dt8)
+                  vnhauxp(3)=expterm*(vnhauxp(3)*expterm+gnhauxp(3)
+     &                           *dt4)
+                  gnhauxp(2)=(qnhauxp(1)*vnhauxp(1)*vnhauxp(1)
+     &                         -kelvin_aux)/qnhauxp(2)
+                  expterm=exp(-vnhauxp(3)*dt8)
+                  vnhauxp(2)=expterm*(vnhauxp(2)*expterm+gnhauxp(2)
+     &                        *dt4)
+                  gnhauxp(1)=(dble(nfree_aux)*temp_auxp-dble(nfree_aux)
+     &                          *kelvin_aux)/qnhauxp(1)
+                  expterm=exp(-vnhauxp(2)*dt8)
+                  vnhauxp(1)=expterm*(vnhauxp(1)*expterm+gnhauxp(1)
+     &                           *dt4)
+                  scalep=scalep*exp(-vnhauxp(1)*dt2)
+                  temp_auxp=temp_auxp*exp(-vnhauxp(1)*dt2)
+     &                         *exp(-vnhauxp(1)*dt2)
+                  gnhauxp(1)=(dble(nfree_aux)*temp_auxp-dble(nfree_aux)
+     &                         *kelvin_aux)/qnhauxp(1)
+                  expterm=exp(-vnhauxp(2)*dt8)
+                  vnhauxp(1)=expterm*(vnhauxp(1)*expterm+gnhauxp(1)
+     &                           *dt4)
+                  gnhauxp(2)=(qnhauxp(1)*vnhauxp(1)*vnhauxp(1)
+     &                           -kelvin_aux)/qnhauxp(2)
+                  expterm=exp(-vnhauxp(3)*dt8)
+                  vnhauxp(2)=expterm*(vnhauxp(2)*expterm+gnhauxp(2)
+     &                           *dt4)
+                  gnhauxp(3)=(qnhauxp(2)*vnhauxp(2)*vnhauxp(2)
+     &                             -kelvin_aux)/qnhauxp(3)
+                  expterm=exp(-vnhauxp(4)*dt8)
+                  vnhauxp(3)=expterm*(vnhauxp(3)*expterm+gnhauxp(3)
+     &                            *dt4)
+                  gnhauxp(4)=(qnhauxp(3)*vnhauxp(3)*vnhauxp(3)
+     &                           -kelvin_aux)/qnhauxp(4) 
+                  vnhauxp(4)=vnhauxp(4)+gnhauxp(4)*dt4
+               end do
             end do
-         end do
-      end if
+         
+            do i = 1, n
+               do j = 1, 3
+                  vaux(j,i)=vaux(j,i)*scale
+                  vpaux(j,i)=vpaux(j,i)*scalep
+               end do
+            end do
+         end if
+      end if      
+      
+      
+      
       return
       end

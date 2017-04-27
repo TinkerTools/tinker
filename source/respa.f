@@ -40,6 +40,7 @@ c
       use units
       use usage
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k
       integer istep
@@ -58,6 +59,12 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: derivs(:,:)
+      
+      if (use_ielscf .or. use_iel0scf) then
+         call auxrespa(istep,dt)
+         return
+      end if
+      
 c
 c
 c     set some time values for the dynamics integration
@@ -140,20 +147,7 @@ c
          end do
       end do
 c
-c     apply Verlet half-step updates for any auxiliary dipoles
-c
-      if (use_ielscf) then
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-                  uaux(j,i) = uaux(j,i) + vaux(j,i)*dt
-                  upaux(j,i) = upaux(j,i) + vpaux(j,i)*dt
-               end do
-            end if
-         end do
-      end if
+c     apply Verlet half-step updates for any auxiliary dipoles - REMOVED ALBAUGH
 c
 c     get the slow-evolving potential energy and atomic forces
 c
@@ -177,21 +171,7 @@ c
          end if
       end do
 c
-c     apply Verlet full-step updates for any auxiliary dipoles
-c
-      if (use_ielscf) then
-         term = 2.0d0 / (dt*dt)
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  aaux(j,i) = term * (uind(j,i)-uaux(j,i))
-                  apaux(j,i) = term * (uinp(j,i)-upaux(j,i))
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-               end do
-            end if
-         end do
-      end if
+c     apply Verlet full-step updates for any auxiliary dipoles - REMOVED ALBAUGH
 c
 c     perform deallocation of some local arrays
 c

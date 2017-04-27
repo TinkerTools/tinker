@@ -50,6 +50,7 @@ c
       implicit none
       integer i,j,k
       integer idyn,nh
+      integer idynaux,idynauxp!ALBAUGH
       integer size,next
       integer lext,freeunit
       real*8 e,ekt,qterm
@@ -63,6 +64,7 @@ c
       character*7 ext
       character*20 keyword
       character*240 dynfile
+      character*240 dynfileaux,dynfileauxp!ALBAUGH
       character*240 record
       character*240 string
 c
@@ -82,6 +84,7 @@ c
       use_pred = .false.
       polpred = 'LSQR'
       use_ielscf = .false.
+      use_iel0scf = .false.!ALBAUGH
       iprint = 100
 c
 c     set default values for temperature and pressure control
@@ -140,11 +143,15 @@ c
             call upcase (polpred)
             if (polpred .eq. 'IEL') then
                use_ielscf = .true.
+            else if (polpred .eq. 'IEL0') then!ALBAUGH
+               use_iel0scf = .true.
             else
                use_pred = .true.
             end if
          else if (keyword(1:8) .eq. 'IEL-SCF ') then
             use_ielscf = .true.
+         else if (keyword(1:9) .eq. 'IEL-0SCF ') then!ALBAUGH
+            use_iel0scf = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
             call getword (record,thermostat,next)
             call upcase (thermostat)
@@ -271,7 +278,7 @@ c
 c
 c     initialize inertial extended Lagrangian method
 c
-      if (use_ielscf)  call auxinit
+      if (use_ielscf .or. use_iel0scf)  call auxinit
 c
 c     enforce use of velocity Verlet with Andersen thermostat
 c
@@ -405,8 +412,22 @@ c
          idyn = freeunit ()
          open (unit=idyn,file=dynfile,status='old')
          rewind (unit=idyn)
-         call readdyn (idyn)
+         idynaux = 0!ALBAUGH
+         idynauxp = 0
+         if (use_ielscf .or. use_iel0scf) then
+            idynaux = freeunit ()
+            open (unit=idynaux,file=dynfileaux,status='old')
+            rewind (unit=idynaux)
+            idynauxp = freeunit ()
+            open (unit=idynauxp,file=dynfileauxp,status='old')
+            rewind (unit=idynauxp)
+         end if
+         call readdyn (idyn,idynaux,idynauxp)!ALBAUGH
          close (unit=idyn)
+         if (use_ielscf .or. use_iel0scf) then
+            close (unit=idynaux)
+            close (unit=idynauxp)
+         end if
 c
 c     set translational velocities for rigid body dynamics
 c
@@ -511,6 +532,15 @@ c
          end if
       end do
       nprior = i - 1
+      
+      do i = 1, n!ALBAUGHTEST
+         do j = 1, 3
+            v(j,i) = 0.0d0
+            vaux(j,i) = 0.0d0
+            vpaux(j,i) = 0.0d0
+         end do
+      end do
+      
       return
       end
 c
@@ -539,12 +569,23 @@ c
       use ielscf
       use keys
       use polar
+      use polpot!ALBAUGH
+      use mpole!ALBAUGH
+      use potent!ALBAUGH
+      use bound!ALBAUGH
+      use limits!ALBAUGH
+      use rigid!ALBAUGH
       implicit none
       integer i,j,next
       real*8 speed
       real*8 weight
       real*8 maxwell
+      real*8 polepstmp
+      real*8 ekt_aux,qterm_aux
+      real*8 cutoff!ALBAUGH
       real*8 vec(3)
+      logical save_ielscf!ALBAUGH
+      logical save_iel0scf!ALBAUGH
       character*20 keyword
       character*240 record
       character*240 string
@@ -553,8 +594,30 @@ c
 c     set defaults for auxiliary thermostat control variables
 c
       nfree_aux = 3 * npolar
-      kelvin_aux = 100000.0d0
+      if (use_ielscf) then!ALBAUGH
+         kelvin_aux = 100000.0d0
+      else
+         kelvin_aux = 5.3d0
+         allocate(auxtmp1(3,npole))
+         allocate(auxtmp2(3,npole))
+!         allocate(auxtmp(3,npole))
+         allocate(auxptmp1(3,npole))
+         allocate(auxptmp2(3,npole))
+!         allocate(auxptmp(3,npole))
+         do i = 1, npole
+            do j = 1, 3
+               auxtmp1(j,i) = 0.0d0
+               auxtmp2(j,i) = 0.0d0
+!               auxtmp(j,i) = 0.0d0
+               auxptmp1(j,i) = 0.0d0
+               auxptmp2(j,i) = 0.0d0
+!               auxptmp(j,i) = 0.0d0
+            end do
+         end do
+      end if
       tautemp_aux = 0.1d0
+      gamma_aux = 0.9d0!ALBAUGH
+      stat_aux = 'NONE'
 c
 c     check for keywords containing auxiliary thermostat values
 c 
@@ -568,6 +631,10 @@ c
             read (string,*,err=10,end=10)  tautemp_aux
          else if (keyword(1:9) .eq. 'AUX-TEMP ') then
             read (string,*,err=10,end=10)  kelvin_aux
+         else if (keyword(1:10) .eq. 'AUX-GAMMA ') then!ALBAUGH
+            read (string,*,err=10,end=10)  gamma_aux
+         else if (keyword(1:9) .eq. 'AUX-STAT ') then!ALBAUGH
+            read (string,*,err=10,end=10)  stat_aux
          end if
    10    continue
       end do
@@ -583,15 +650,44 @@ c
 c
 c     set auxiliary dipole values equal to induced dipoles
 c
+      save_ielscf = use_ielscf!ALBAUGH
+      save_iel0scf = use_iel0scf
       use_ielscf = .false.
+      use_iel0scf = .false.
+      polepstmp = poleps
+      poleps = 0.000000001d0
+      if (use_bounds .and. .not.use_rigid)  call bounds
+      if (use_list)  call nblist
+      cutoff = 0.0d0
+      call replica (cutoff)
+      call chkpole
+      call rotpole
       call induce
-      use_ielscf = .true.
-      do i = 1, n
+      use_ielscf = save_ielscf
+      use_iel0scf = save_iel0scf
+      poleps = polepstmp
+      do i = 1, npole
          do j = 1, 3
             uaux(j,i) = uind(j,i)
             upaux(j,i) = uinp(j,i)
          end do
       end do
+      
+      if (stat_aux .eq. 'NOSE-HOOVER') then!ALBAUGH
+         ekt_aux = kelvin_aux
+         qterm_aux = ekt_aux * tautemp_aux * tautemp_aux
+         do j = 1, maxnose_aux
+            vnhaux(j) = 0.0d0
+            qnhaux(j) = 0.0d0
+            if (qnhaux(j) .eq. 0.0d0)  qnhaux(j) = qterm_aux
+            vnhauxp(j) = 0.0d0
+            qnhauxp(j) = 0.0d0
+            if (qnhauxp(j) .eq. 0.0d0)  qnhauxp(j) = qterm_aux
+         end do
+         qnhaux(1) = dble(nfree_aux) * qnhaux(1)
+         qnhauxp(1) = dble(nfree_aux) * qnhauxp(1)
+      end if
+      
 c
 c     set velocities and accelerations for auxiliary dipoles
 c

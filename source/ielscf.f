@@ -27,14 +27,31 @@ c
       module ielscf
       implicit none
       integer nfree_aux
+      integer maxnose_aux
+      parameter (maxnose_aux=4)
       real*8 tautemp_aux
       real*8 kelvin_aux
+      real*8 gamma_aux!ALBAUGH
+      real*8 vnhaux(maxnose_aux)!ALBAUGH
+      real*8 gnhaux(maxnose_aux)!ALBAUGH
+      real*8 qnhaux(maxnose_aux)!ALBAUGH
+      real*8 vnhauxp(maxnose_aux)!ALBAUGH
+      real*8 gnhauxp(maxnose_aux)!ALBAUGH
+      real*8 qnhauxp(maxnose_aux)!ALBAUGH
       real*8, allocatable :: uaux(:,:)
       real*8, allocatable :: upaux(:,:)
       real*8, allocatable :: vaux(:,:)
       real*8, allocatable :: vpaux(:,:)
       real*8, allocatable :: aaux(:,:)
       real*8, allocatable :: apaux(:,:)
+      real*8, allocatable :: auxtmp1(:,:)!ALBAUGH
+      real*8, allocatable :: auxtmp2(:,:)!ALBAUGH
+!      real*8, allocatable :: auxtmp(:,:)!ALBAUGH
+      real*8, allocatable :: auxptmp1(:,:)!ALBAUGH
+      real*8, allocatable :: auxptmp2(:,:)!ALBAUGH
+!      real*8, allocatable :: auxptmp(:,:)!ALBAUGH
       logical use_ielscf
+      logical use_iel0scf!ALBAUGH
+      character*11 stat_aux!ALBAUGH
       save
       end

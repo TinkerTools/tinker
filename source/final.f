@@ -370,6 +370,12 @@ c
       if (allocated(vpaux))  deallocate (vpaux)
       if (allocated(aaux))  deallocate (aaux)
       if (allocated(apaux))  deallocate (apaux)
+      if (allocated(auxtmp1)) deallocate (auxtmp1)
+      if (allocated(auxtmp2)) deallocate (auxtmp2)
+!      if (allocated(auxtmp)) deallocate (auxtmp)
+      if (allocated(auxptmp1)) deallocate (auxptmp1)
+      if (allocated(auxptmp2)) deallocate (auxptmp2)
+!      if (allocated(auxptmp)) deallocate (auxptmp)
 c
 c     deallocation of global arrays from module improp
 c

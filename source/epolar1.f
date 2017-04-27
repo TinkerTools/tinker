@@ -70,6 +70,7 @@ c
       use potent
       use shunt
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer ii,kk,jcell
@@ -121,6 +122,18 @@ c
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 auxdix,auxdiy,auxdiz!ALBAUGH
+      real*8 auxdkx,auxdky,auxdkz!ALBAUGH
+      real*8 auxpix,auxpiy,auxpiz!ALBAUGH
+      real*8 auxpkx,auxpky,auxpkz!ALBAUGH
+      real*8 aix,aiy,aiz!ALBAUGH
+      real*8 apix,apiy,apiz!ALBAUGH
+      real*8 akx,aky,akz!ALBAUGH
+      real*8 apkx,apky,apkz!ALBAUGH
+      real*8 ari,ark!ALBAUGH
+      real*8 arip,arkp!ALBAUGH
+      real*8 auxdri,auxdrk!ALBAUGH
+      real*8 auxpri,auxprk!ALBAUGH
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
@@ -144,11 +157,13 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole
+      !if (.not. use_mpole)  call chkpole !ALBAUGHTEST
+      call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      !if (.not. use_mpole)  call rotpole !ALBAUGHTEST
+      call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -207,6 +222,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         if (use_iel0scf) then!ALBAUGH
+            auxdix = auxtmp1(1,i)+auxtmp2(1,i)
+            auxdiy = auxtmp1(2,i)+auxtmp2(2,i)
+            auxdiz = auxtmp1(3,i)+auxtmp2(3,i)
+            auxpix = auxptmp1(1,i)+auxptmp2(1,i)
+            auxpiy = auxptmp1(2,i)+auxptmp2(2,i)
+            auxpiz = auxptmp1(3,i)+auxptmp2(3,i)
+            aix = uaux(1,i)
+            aiy = uaux(2,i)
+            aiz = uaux(3,i)
+            apix = upaux(1,i)
+            apiy = upaux(2,i)
+            apiz = upaux(3,i)
+         end if
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -267,6 +296,20 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               if (use_iel0scf) then!ALBAUGH
+                  auxdkx = auxtmp1(1,k)+auxtmp2(1,k)
+                  auxdky = auxtmp1(2,k)+auxtmp2(2,k)
+                  auxdkz = auxtmp1(3,k)+auxtmp2(3,k)
+                  auxpkx = auxptmp1(1,k)+auxptmp2(1,k)
+                  auxpky = auxptmp1(2,k)+auxptmp2(2,k)
+                  auxpkz = auxptmp1(3,k)+auxptmp2(3,k)
+                  akx = uaux(1,k)
+                  aky = uaux(2,k)
+                  akz = uaux(3,k)
+                  apkx = upaux(1,k)
+                  apky = upaux(2,k)
+                  apkz = upaux(3,k)
+               end if
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -339,6 +382,16 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
+               if (use_iel0scf) then!ALBAUGH
+                  ari = aix*xr + aiy*yr + aiz*zr
+                  ark = akx*xr + aky*yr + akz*zr
+                  arip = apix*xr + apiy*yr + apiz*zr
+                  arkp = apkx*xr + apky*yr + apkz*zr
+                  auxdri = auxdix*xr + auxdiy*yr + auxdiz*zr
+                  auxdrk = auxdkx*xr + auxdky*yr + auxdkz*zr
+                  auxpri = auxpix*xr + auxpiy*yr + auxpiz*zr
+                  auxprk = auxpkx*xr + auxpky*yr + auxpkz*zr
+               end if
                duik = dix*ukx + diy*uky + diz*ukz
      &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
@@ -446,6 +499,14 @@ c
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
                depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxpkx + txyi*auxpky + txzi*auxpkz
+     &                   -txxk*auxpix - txyk*auxpiy - txzk*auxpiz
+                  depy =  txyi*auxpkx + tyyi*auxpky + tyzi*auxpkz
+     &                   -txyk*auxpix - tyyk*auxpiy - tyzk*auxpiz
+                  depz =  txzi*auxpkx + tyzi*auxpky + tzzi*auxpkz
+     &                   -txzk*auxpix - tyzk*auxpiy - tzzk*auxpiz
+               end if
                frcx = dscale(kk) * depx
                frcy = dscale(kk) * depy
                frcz = dscale(kk) * depz
@@ -458,6 +519,14 @@ c
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
                depz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxdkx + txyi*auxdky + txzi*auxdkz
+     &                   -txxk*auxdix - txyk*auxdiy - txzk*auxdiz
+                  depy =  txyi*auxdkx + tyyi*auxdky + tyzi*auxdkz
+     &                   -txyk*auxdix - tyyk*auxdiy - tyzk*auxdiz
+                  depz =  txzi*auxdkx + tyzi*auxdky + tzzi*auxdkz
+     &                   -txzk*auxdix - tyzk*auxdiy - tzzk*auxdiz
+               end if
                frcx = frcx + pscale(kk)*depx
                frcy = frcy + pscale(kk)*depy
                frcz = frcz + pscale(kk)*depz
@@ -500,6 +569,104 @@ c
                   frcx = frcx + uscale(kk)*depx
                   frcy = frcy + uscale(kk)*depy
                   frcz = frcz + uscale(kk)*depz
+                  if (use_iel0scf) then
+                     term1 = (sc3+sc5) * rr5
+                     term2 = term1*xr - rc3(1)
+                     term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                     txxi = aix*term2 + ari*term3
+                     txxk = akx*term2 + ark*term3
+                     term2 = term1*yr - rc3(2)
+                     term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                     tyyi = aiy*term2 + ari*term3
+                     tyyk = aky*term2 + ark*term3
+                     term2 = term1*zr - rc3(3)
+                     term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                     tzzi = aiz*term2 + ari*term3
+                     tzzk = akz*term2 + ark*term3
+                     term1 = sc5 * rr5 * yr
+                     term2 = sc3*rr5*xr - rc3(1)
+                     term3 = yr * (sc5*rr7*xr-rc5(1))
+                     txyi = aix*term1 + aiy*term2 - ari*term3
+                     txyk = akx*term1 + aky*term2 - ark*term3
+                     term1 = sc5 * rr5 * zr
+                     term3 = zr * (sc5*rr7*xr-rc5(1))
+                     txzi = aix*term1 + aiz*term2 - ari*term3
+                     txzk = akx*term1 + akz*term2 - ark*term3
+                     term2 = sc3*rr5*yr - rc3(2)
+                     term3 = zr * (sc5*rr7*yr-rc5(2))
+                     tyzi = aiy*term1 + aiz*term2 - ari*term3
+                     tyzk = aky*term1 + akz*term2 - ark*term3
+                     depx =        txxi*(-ukxp+auxpkx)
+     &                           + txyi*(-ukyp+auxpky)
+     &                           + txzi*(-ukzp+auxpkz)
+     &                           + txxk*(-uixp+auxpix) 
+     &                           + txyk*(-uiyp+auxpiy)
+     &                           + txzk*(-uizp+auxpiz)
+                     depy =        txyi*(-ukxp+auxpkx)
+     &                           + tyyi*(-ukyp+auxpky)
+     &                           + tyzi*(-ukzp+auxpkz)
+     &                           + txyk*(-uixp+auxpix)
+     &                           + tyyk*(-uiyp+auxpiy)
+     &                           + tyzk*(-uizp+auxpiz)
+                     depz =        txzi*(-ukxp+auxpkx) 
+     &                           + tyzi*(-ukyp+auxpky) 
+     &                           + tzzi*(-ukzp+auxpkz)
+     &                           + txzk*(-uixp+auxpix) 
+     &                           + tyzk*(-uiyp+auxpiy) 
+     &                           + tzzk*(-uizp+auxpiz)
+                     frcx = frcx + uscale(kk)*depx
+                     frcy = frcy + uscale(kk)*depy
+                     frcz = frcz + uscale(kk)*depz
+                     
+                     
+                     term1 = (sc3+sc5) * rr5
+                     term2 = term1*xr - rc3(1)
+                     term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                     txxi = apix*term2 + arip*term3
+                     txxk = apkx*term2 + arkp*term3
+                     term2 = term1*yr - rc3(2)
+                     term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                     tyyi = apiy*term2 + arip*term3
+                     tyyk = apky*term2 + arkp*term3
+                     term2 = term1*zr - rc3(3)
+                     term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                     tzzi = apiz*term2 + arip*term3
+                     tzzk = apkz*term2 + arkp*term3
+                     term1 = sc5 * rr5 * yr
+                     term2 = sc3*rr5*xr - rc3(1)
+                     term3 = yr * (sc5*rr7*xr-rc5(1))
+                     txyi = apix*term1 + apiy*term2 - arip*term3
+                     txyk = apkx*term1 + apky*term2 - arkp*term3
+                     term1 = sc5 * rr5 * zr
+                     term3 = zr * (sc5*rr7*xr-rc5(1))
+                     txzi = apix*term1 + apiz*term2 - arip*term3
+                     txzk = apkx*term1 + apkz*term2 - arkp*term3
+                     term2 = sc3*rr5*yr - rc3(2)
+                     term3 = zr * (sc5*rr7*yr-rc5(2))
+                     tyzi = apiy*term1 + apiz*term2 - arip*term3
+                     tyzk = apky*term1 + apkz*term2 - arkp*term3
+                     depx =        txxi*(-ukx+auxdkx) 
+     &                           + txyi*(-uky+auxdky) 
+     &                           + txzi*(-ukz+auxdkz)
+     &                           + txxk*(-uix+auxdix) 
+     &                           + txyk*(-uiy+auxdiy) 
+     &                           + txzk*(-uiz+auxdiz)
+                     depy =        txyi*(-ukx+auxdkx) 
+     &                           + tyyi*(-uky+auxdky) 
+     &                           + tyzi*(-ukz+auxdkz)
+     &                           + txyk*(-uix+auxdix) 
+     &                           + tyyk*(-uiy+auxdiy) 
+     &                           + tyzk*(-uiz+auxdiz)
+                     depz =        txzi*(-ukx+auxdkx) 
+     &                           + tyzi*(-uky+auxdky) 
+     &                           + tzzi*(-ukz+auxdkz)
+     &                           + txzk*(-uix+auxdix) 
+     &                           + tyzk*(-uiy+auxdiy) 
+     &                           + tzzk*(-uiz+auxdiz)
+                     frcx = frcx + uscale(kk)*depx
+                     frcy = frcy + uscale(kk)*depy
+                     frcz = frcz + uscale(kk)*depz
+                  end if
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -592,6 +759,16 @@ c
                tzk3 = psr3*uiz + dsr3*uizp
                turi = -psr5*urk - dsr5*urkp
                turk = -psr5*uri - dsr5*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi3 = psr3*auxdkx + dsr3*auxpkx
+                  tyi3 = psr3*auxdky + dsr3*auxpky
+                  tzi3 = psr3*auxdkz + dsr3*auxpkz
+                  txk3 = psr3*auxdix + dsr3*auxpix
+                  tyk3 = psr3*auxdiy + dsr3*auxpiy
+                  tzk3 = psr3*auxdiz + dsr3*auxpiz
+                  turi = -psr5*auxdrk - dsr5*auxprk
+                  turk = -psr5*auxdri - dsr5*auxpri
+               end if
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -609,6 +786,16 @@ c
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
                turi = -psr7*urk - dsr7*urkp
                turk = -psr7*uri - dsr7*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi5 = 2.0d0 * (psr5*auxdkx+dsr5*auxpkx)
+                  tyi5 = 2.0d0 * (psr5*auxdky+dsr5*auxpky)
+                  tzi5 = 2.0d0 * (psr5*auxdkz+dsr5*auxpkz)
+                  txk5 = 2.0d0 * (psr5*auxdix+dsr5*auxpix)
+                  tyk5 = 2.0d0 * (psr5*auxdiy+dsr5*auxpiy)
+                  tzk5 = 2.0d0 * (psr5*auxdiz+dsr5*auxpiz)
+                  turi = -psr7*auxdrk - dsr7*auxprk
+                  turk = -psr7*auxdri - dsr7*auxdri
+               end if
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -692,6 +879,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         if (use_iel0scf) then!ALBAUGH
+            auxdix = auxtmp1(1,i)+auxtmp2(1,i)
+            auxdiy = auxtmp1(2,i)+auxtmp2(2,i)
+            auxdiz = auxtmp1(3,i)+auxtmp2(3,i)
+            auxpix = auxptmp1(1,i)+auxptmp2(1,i)
+            auxpiy = auxptmp1(2,i)+auxptmp2(2,i)
+            auxpiz = auxptmp1(3,i)+auxptmp2(3,i)
+            aix = uaux(1,i)
+            aiy = uaux(2,i)
+            aiz = uaux(3,i)
+            apix = upaux(1,i)
+            apiy = upaux(2,i)
+            apiz = upaux(3,i)
+         end if
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -758,6 +959,20 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               if (use_iel0scf) then!ALBAUGH
+                  auxdkx = auxtmp1(1,k)+auxtmp2(1,k)
+                  auxdky = auxtmp1(2,k)+auxtmp2(2,k)
+                  auxdkz = auxtmp1(3,k)+auxtmp2(3,k)
+                  auxpkx = auxptmp1(1,k)+auxptmp2(1,k)
+                  auxpky = auxptmp1(2,k)+auxptmp2(2,k)
+                  auxpkz = auxptmp1(3,k)+auxptmp2(3,k)
+                  akx = uaux(1,k)
+                  aky = uaux(2,k)
+                  akz = uaux(3,k)
+                  apkx = upaux(1,k)
+                  apky = upaux(2,k)
+                  apkz = upaux(3,k)
+               end if
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -830,6 +1045,16 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
+               if (use_iel0scf) then!ALBAUGH
+                  ari = aix*xr + aiy*yr + aiz*zr
+                  ark = akx*xr + aky*yr + akz*zr
+                  arip = apix*xr + apiy*yr + apiz*zr
+                  arkp = apkx*xr + apky*yr + apkz*zr
+                  auxdri = auxdix*xr + auxdiy*yr + auxdiz*zr
+                  auxdrk = auxdkx*xr + auxdky*yr + auxdkz*zr
+                  auxpri = auxpix*xr + auxpiy*yr + auxpiz*zr
+                  auxprk = auxpkx*xr + auxpky*yr + auxpkz*zr
+               end if
                duik = dix*ukx + diy*uky + diz*ukz
      &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
@@ -936,6 +1161,14 @@ c
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
                depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxpkx + txyi*auxpky + txzi*auxpkz
+     &                   -txxk*auxpix - txyk*auxpiy - txzk*auxpiz
+                  depy =  txyi*auxpkx + tyyi*auxpky + tyzi*auxpkz
+     &                   -txyk*auxpix - tyyk*auxpiy - tyzk*auxpiz
+                  depz =  txzi*auxpkx + tyzi*auxpky + tzzi*auxpkz
+     &                   -txzk*auxpix - tyzk*auxpiy - tzzk*auxpiz
+               end if
                frcx = dscale(kk) * depx
                frcy = dscale(kk) * depy
                frcz = dscale(kk) * depz
@@ -948,6 +1181,14 @@ c
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
                depz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxdkx + txyi*auxdky + txzi*auxdkz
+     &                   -txxk*auxdix - txyk*auxdiy - txzk*auxdiz
+                  depy =  txyi*auxdkx + tyyi*auxdky + tyzi*auxdkz
+     &                   -txyk*auxdix - tyyk*auxdiy - tyzk*auxdiz
+                  depz =  txzi*auxdkx + tyzi*auxdky + tzzi*auxdkz
+     &                   -txzk*auxdix - tyzk*auxdiy - tzzk*auxdiz
+               end if
                frcx = frcx + pscale(kk)*depx
                frcy = frcy + pscale(kk)*depy
                frcz = frcz + pscale(kk)*depz
@@ -990,6 +1231,104 @@ c
                   frcx = frcx + uscale(kk)*depx
                   frcy = frcy + uscale(kk)*depy
                   frcz = frcz + uscale(kk)*depz
+                  if (use_iel0scf) then
+                     term1 = (sc3+sc5) * rr5
+                     term2 = term1*xr - rc3(1)
+                     term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                     txxi = aix*term2 + ari*term3
+                     txxk = akx*term2 + ark*term3
+                     term2 = term1*yr - rc3(2)
+                     term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                     tyyi = aiy*term2 + ari*term3
+                     tyyk = aky*term2 + ark*term3
+                     term2 = term1*zr - rc3(3)
+                     term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                     tzzi = aiz*term2 + ari*term3
+                     tzzk = akz*term2 + ark*term3
+                     term1 = sc5 * rr5 * yr
+                     term2 = sc3*rr5*xr - rc3(1)
+                     term3 = yr * (sc5*rr7*xr-rc5(1))
+                     txyi = aix*term1 + aiy*term2 - ari*term3
+                     txyk = akx*term1 + aky*term2 - ark*term3
+                     term1 = sc5 * rr5 * zr
+                     term3 = zr * (sc5*rr7*xr-rc5(1))
+                     txzi = aix*term1 + aiz*term2 - ari*term3
+                     txzk = akx*term1 + akz*term2 - ark*term3
+                     term2 = sc3*rr5*yr - rc3(2)
+                     term3 = zr * (sc5*rr7*yr-rc5(2))
+                     tyzi = aiy*term1 + aiz*term2 - ari*term3
+                     tyzk = aky*term1 + akz*term2 - ark*term3
+                     depx =        txxi*(-ukxp+auxpkx)
+     &                           + txyi*(-ukyp+auxpky)
+     &                           + txzi*(-ukzp+auxpkz)
+     &                           + txxk*(-uixp+auxpix) 
+     &                           + txyk*(-uiyp+auxpiy)
+     &                           + txzk*(-uizp+auxpiz)
+                     depy =        txyi*(-ukxp+auxpkx)
+     &                           + tyyi*(-ukyp+auxpky)
+     &                           + tyzi*(-ukzp+auxpkz)
+     &                           + txyk*(-uixp+auxpix)
+     &                           + tyyk*(-uiyp+auxpiy)
+     &                           + tyzk*(-uizp+auxpiz)
+                     depz =        txzi*(-ukxp+auxpkx) 
+     &                           + tyzi*(-ukyp+auxpky) 
+     &                           + tzzi*(-ukzp+auxpkz)
+     &                           + txzk*(-uixp+auxpix) 
+     &                           + tyzk*(-uiyp+auxpiy) 
+     &                           + tzzk*(-uizp+auxpiz)
+                     frcx = frcx + uscale(kk)*depx
+                     frcy = frcy + uscale(kk)*depy
+                     frcz = frcz + uscale(kk)*depz
+                     
+                     
+                     term1 = (sc3+sc5) * rr5
+                     term2 = term1*xr - rc3(1)
+                     term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                     txxi = apix*term2 + arip*term3
+                     txxk = apkx*term2 + arkp*term3
+                     term2 = term1*yr - rc3(2)
+                     term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                     tyyi = apiy*term2 + arip*term3
+                     tyyk = apky*term2 + arkp*term3
+                     term2 = term1*zr - rc3(3)
+                     term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                     tzzi = apiz*term2 + arip*term3
+                     tzzk = apkz*term2 + arkp*term3
+                     term1 = sc5 * rr5 * yr
+                     term2 = sc3*rr5*xr - rc3(1)
+                     term3 = yr * (sc5*rr7*xr-rc5(1))
+                     txyi = apix*term1 + apiy*term2 - arip*term3
+                     txyk = apkx*term1 + apky*term2 - arkp*term3
+                     term1 = sc5 * rr5 * zr
+                     term3 = zr * (sc5*rr7*xr-rc5(1))
+                     txzi = apix*term1 + apiz*term2 - arip*term3
+                     txzk = apkx*term1 + apkz*term2 - arkp*term3
+                     term2 = sc3*rr5*yr - rc3(2)
+                     term3 = zr * (sc5*rr7*yr-rc5(2))
+                     tyzi = apiy*term1 + apiz*term2 - arip*term3
+                     tyzk = apky*term1 + apkz*term2 - arkp*term3
+                     depx =        txxi*(-ukx+auxdkx) 
+     &                           + txyi*(-uky+auxdky) 
+     &                           + txzi*(-ukz+auxdkz)
+     &                           + txxk*(-uix+auxdix) 
+     &                           + txyk*(-uiy+auxdiy) 
+     &                           + txzk*(-uiz+auxdiz)
+                     depy =        txyi*(-ukx+auxdkx) 
+     &                           + tyyi*(-uky+auxdky) 
+     &                           + tyzi*(-ukz+auxdkz)
+     &                           + txyk*(-uix+auxdix) 
+     &                           + tyyk*(-uiy+auxdiy) 
+     &                           + tyzk*(-uiz+auxdiz)
+                     depz =        txzi*(-ukx+auxdkx) 
+     &                           + tyzi*(-uky+auxdky) 
+     &                           + tzzi*(-ukz+auxdkz)
+     &                           + txzk*(-uix+auxdix) 
+     &                           + tyzk*(-uiy+auxdiy) 
+     &                           + tzzk*(-uiz+auxdiz)
+                     frcx = frcx + uscale(kk)*depx
+                     frcy = frcy + uscale(kk)*depy
+                     frcz = frcz + uscale(kk)*depz
+                  end if
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -1096,6 +1435,16 @@ c
                tzk3 = psr3*uiz + dsr3*uizp
                turi = -psr5*urk - dsr5*urkp
                turk = -psr5*uri - dsr5*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi3 = psr3*auxdkx + dsr3*auxpkx
+                  tyi3 = psr3*auxdky + dsr3*auxpky
+                  tzi3 = psr3*auxdkz + dsr3*auxpkz
+                  txk3 = psr3*auxdix + dsr3*auxpix
+                  tyk3 = psr3*auxdiy + dsr3*auxpiy
+                  tzk3 = psr3*auxdiz + dsr3*auxpiz
+                  turi = -psr5*auxdrk - dsr5*auxprk
+                  turk = -psr5*auxdri - dsr5*auxpri
+               end if
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -1113,6 +1462,16 @@ c
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
                turi = -psr7*urk - dsr7*urkp
                turk = -psr7*uri - dsr7*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi5 = 2.0d0 * (psr5*auxdkx+dsr5*auxpkx)
+                  tyi5 = 2.0d0 * (psr5*auxdky+dsr5*auxpky)
+                  tzi5 = 2.0d0 * (psr5*auxdkz+dsr5*auxpkz)
+                  txk5 = 2.0d0 * (psr5*auxdix+dsr5*auxpix)
+                  tyk5 = 2.0d0 * (psr5*auxdiy+dsr5*auxpiy)
+                  tzk5 = 2.0d0 * (psr5*auxdiz+dsr5*auxpiz)
+                  turi = -psr7*auxdrk - dsr7*auxprk
+                  turk = -psr7*auxdri - dsr7*auxdri
+               end if
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -1228,6 +1587,20 @@ c
 c
 c     perform deallocation of some local arrays
 c
+
+      if (use_iel0scf) then!ALBAUGH
+         ep = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               ep = ep + (uind(j,i)*uinp(j,i)
+     &                 - uinp(j,i)*auxtmp1(j,i) 
+     &                 - uind(j,i)*auxptmp2(j,i)
+     &                 - uinp(j,i)*auxtmp2(j,i))/polarity(i)
+            end do
+         end do
+         ep = f*ep
+      end if 
+
       deallocate (pscale)
       deallocate (dscale)
       deallocate (uscale)
@@ -1267,6 +1640,7 @@ c
       use potent
       use shunt
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
@@ -1318,6 +1692,18 @@ c
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 auxdix,auxdiy,auxdiz!ALBAUGH
+      real*8 auxdkx,auxdky,auxdkz!ALBAUGH
+      real*8 auxpix,auxpiy,auxpiz!ALBAUGH
+      real*8 auxpkx,auxpky,auxpkz!ALBAUGH
+      real*8 aix,aiy,aiz!ALBAUGH
+      real*8 apix,apiy,apiz!ALBAUGH
+      real*8 akx,aky,akz!ALBAUGH
+      real*8 apkx,apky,apkz!ALBAUGH
+      real*8 ari,ark!ALBAUGH
+      real*8 arip,arkp!ALBAUGH
+      real*8 auxdri,auxdrk!ALBAUGH
+      real*8 auxpri,auxprk!ALBAUGH
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
@@ -1341,11 +1727,13 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole
+      !if (.not. use_mpole)  call chkpole ALBAUGHTEST
+      call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      !if (.not. use_mpole)  call rotpole ALBAUGHTEST
+      call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1386,7 +1774,8 @@ c
 !$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
 !$OMP& p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,f,molcule,coptmax,copm,uopt,uoptp,poltyp)
+!$OMP& off2,f,molcule,coptmax,copm,uopt,uoptp,poltyp,
+!$OMP& use_iel0scf,uaux,upaux,auxtmp1,auxtmp2,auxptmp1,auxptmp2)!ALBAUGH
 !$OMP& shared (ep,einter,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(guided)
@@ -1416,6 +1805,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         if (use_iel0scf) then!ALBAUGH
+            auxdix = auxtmp1(1,i)+auxtmp2(1,i)
+            auxdiy = auxtmp1(2,i)+auxtmp2(2,i)
+            auxdiz = auxtmp1(3,i)+auxtmp2(3,i)
+            auxpix = auxptmp1(1,i)+auxptmp2(1,i)
+            auxpiy = auxptmp1(2,i)+auxptmp2(2,i)
+            auxpiz = auxptmp1(3,i)+auxptmp2(3,i)
+            aix = uaux(1,i)
+            aiy = uaux(2,i)
+            aiz = uaux(3,i)
+            apix = upaux(1,i)
+            apiy = upaux(2,i)
+            apiz = upaux(3,i)
+         end if
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -1477,6 +1880,20 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               if (use_iel0scf) then!ALBAUGH
+                  auxdkx = auxtmp1(1,k)+auxtmp2(1,k)
+                  auxdky = auxtmp1(2,k)+auxtmp2(2,k)
+                  auxdkz = auxtmp1(3,k)+auxtmp2(3,k)
+                  auxpkx = auxptmp1(1,k)+auxptmp2(1,k)
+                  auxpky = auxptmp1(2,k)+auxptmp2(2,k)
+                  auxpkz = auxptmp1(3,k)+auxptmp2(3,k)
+                  akx = uaux(1,k)
+                  aky = uaux(2,k)
+                  akz = uaux(3,k)
+                  apkx = upaux(1,k)
+                  apky = upaux(2,k)
+                  apkz = upaux(3,k)
+               end if
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -1549,6 +1966,16 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
+               if (use_iel0scf) then!ALBAUGH
+                  ari = aix*xr + aiy*yr + aiz*zr
+                  ark = akx*xr + aky*yr + akz*zr
+                  arip = apix*xr + apiy*yr + apiz*zr
+                  arkp = apkx*xr + apky*yr + apkz*zr
+                  auxdri = auxdix*xr + auxdiy*yr + auxdiz*zr
+                  auxdrk = auxdkx*xr + auxdky*yr + auxdkz*zr
+                  auxpri = auxpix*xr + auxpiy*yr + auxpiz*zr
+                  auxprk = auxpkx*xr + auxpky*yr + auxpkz*zr
+               end if
                duik = dix*ukx + diy*uky + diz*ukz
      &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
@@ -1656,6 +2083,14 @@ c
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
                depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxpkx + txyi*auxpky + txzi*auxpkz
+     &                   -txxk*auxpix - txyk*auxpiy - txzk*auxpiz
+                  depy =  txyi*auxpkx + tyyi*auxpky + tyzi*auxpkz
+     &                   -txyk*auxpix - tyyk*auxpiy - tyzk*auxpiz
+                  depz =  txzi*auxpkx + tyzi*auxpky + tzzi*auxpkz
+     &                   -txzk*auxpix - tyzk*auxpiy - tzzk*auxpiz
+               end if
                frcx = dscale(kk) * depx
                frcy = dscale(kk) * depy
                frcz = dscale(kk) * depz
@@ -1668,6 +2103,14 @@ c
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
                depz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxdkx + txyi*auxdky + txzi*auxdkz
+     &                   -txxk*auxdix - txyk*auxdiy - txzk*auxdiz
+                  depy =  txyi*auxdkx + tyyi*auxdky + tyzi*auxdkz
+     &                   -txyk*auxdix - tyyk*auxdiy - tyzk*auxdiz
+                  depz =  txzi*auxdkx + tyzi*auxdky + tzzi*auxdkz
+     &                   -txzk*auxdix - tyzk*auxdiy - tzzk*auxdiz
+               end if
                frcx = frcx + pscale(kk)*depx
                frcy = frcy + pscale(kk)*depy
                frcz = frcz + pscale(kk)*depz
@@ -1710,6 +2153,105 @@ c
                   frcx = frcx + uscale(kk)*depx
                   frcy = frcy + uscale(kk)*depy
                   frcz = frcz + uscale(kk)*depz
+                  if (use_iel0scf) then
+                     term1 = (sc3+sc5) * rr5
+                     term2 = term1*xr - rc3(1)
+                     term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                     txxi = aix*term2 + ari*term3
+                     txxk = akx*term2 + ark*term3
+                     term2 = term1*yr - rc3(2)
+                     term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                     tyyi = aiy*term2 + ari*term3
+                     tyyk = aky*term2 + ark*term3
+                     term2 = term1*zr - rc3(3)
+                     term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                     tzzi = aiz*term2 + ari*term3
+                     tzzk = akz*term2 + ark*term3
+                     term1 = sc5 * rr5 * yr
+                     term2 = sc3*rr5*xr - rc3(1)
+                     term3 = yr * (sc5*rr7*xr-rc5(1))
+                     txyi = aix*term1 + aiy*term2 - ari*term3
+                     txyk = akx*term1 + aky*term2 - ark*term3
+                     term1 = sc5 * rr5 * zr
+                     term3 = zr * (sc5*rr7*xr-rc5(1))
+                     txzi = aix*term1 + aiz*term2 - ari*term3
+                     txzk = akx*term1 + akz*term2 - ark*term3
+                     term2 = sc3*rr5*yr - rc3(2)
+                     term3 = zr * (sc5*rr7*yr-rc5(2))
+                     tyzi = aiy*term1 + aiz*term2 - ari*term3
+                     tyzk = aky*term1 + akz*term2 - ark*term3
+                     depx =        txxi*(-ukxp+auxpkx)
+     &                           + txyi*(-ukyp+auxpky)
+     &                           + txzi*(-ukzp+auxpkz)
+     &                           + txxk*(-uixp+auxpix) 
+     &                           + txyk*(-uiyp+auxpiy)
+     &                           + txzk*(-uizp+auxpiz)
+                     depy =        txyi*(-ukxp+auxpkx)
+     &                           + tyyi*(-ukyp+auxpky)
+     &                           + tyzi*(-ukzp+auxpkz)
+     &                           + txyk*(-uixp+auxpix)
+     &                           + tyyk*(-uiyp+auxpiy)
+     &                           + tyzk*(-uizp+auxpiz)
+                     depz =        txzi*(-ukxp+auxpkx) 
+     &                           + tyzi*(-ukyp+auxpky) 
+     &                           + tzzi*(-ukzp+auxpkz)
+     &                           + txzk*(-uixp+auxpix) 
+     &                           + tyzk*(-uiyp+auxpiy) 
+     &                           + tzzk*(-uizp+auxpiz)
+                     frcx = frcx + uscale(kk)*depx
+                     frcy = frcy + uscale(kk)*depy
+                     frcz = frcz + uscale(kk)*depz
+                     
+                     
+                     term1 = (sc3+sc5) * rr5
+                     term2 = term1*xr - rc3(1)
+                     term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
+                     txxi = apix*term2 + arip*term3
+                     txxk = apkx*term2 + arkp*term3
+                     term2 = term1*yr - rc3(2)
+                     term3 = sc5*(rr5-rr7*yr*yr) + rc5(2)*yr
+                     tyyi = apiy*term2 + arip*term3
+                     tyyk = apky*term2 + arkp*term3
+                     term2 = term1*zr - rc3(3)
+                     term3 = sc5*(rr5-rr7*zr*zr) + rc5(3)*zr
+                     tzzi = apiz*term2 + arip*term3
+                     tzzk = apkz*term2 + arkp*term3
+                     term1 = sc5 * rr5 * yr
+                     term2 = sc3*rr5*xr - rc3(1)
+                     term3 = yr * (sc5*rr7*xr-rc5(1))
+                     txyi = apix*term1 + apiy*term2 - arip*term3
+                     txyk = apkx*term1 + apky*term2 - arkp*term3
+                     term1 = sc5 * rr5 * zr
+                     term3 = zr * (sc5*rr7*xr-rc5(1))
+                     txzi = apix*term1 + apiz*term2 - arip*term3
+                     txzk = apkx*term1 + apkz*term2 - arkp*term3
+                     term2 = sc3*rr5*yr - rc3(2)
+                     term3 = zr * (sc5*rr7*yr-rc5(2))
+                     tyzi = apiy*term1 + apiz*term2 - arip*term3
+                     tyzk = apky*term1 + apkz*term2 - arkp*term3
+                     depx =        txxi*(-ukx+auxdkx) 
+     &                           + txyi*(-uky+auxdky) 
+     &                           + txzi*(-ukz+auxdkz)
+     &                           + txxk*(-uix+auxdix) 
+     &                           + txyk*(-uiy+auxdiy) 
+     &                           + txzk*(-uiz+auxdiz)
+                     depy =        txyi*(-ukx+auxdkx) 
+     &                           + tyyi*(-uky+auxdky) 
+     &                           + tyzi*(-ukz+auxdkz)
+     &                           + txyk*(-uix+auxdix) 
+     &                           + tyyk*(-uiy+auxdiy) 
+     &                           + tyzk*(-uiz+auxdiz)
+                     depz =        txzi*(-ukx+auxdkx) 
+     &                           + tyzi*(-uky+auxdky) 
+     &                           + tzzi*(-ukz+auxdkz)
+     &                           + txzk*(-uix+auxdix) 
+     &                           + tyzk*(-uiy+auxdiy) 
+     &                           + tzzk*(-uiz+auxdiz)
+                     frcx = frcx + uscale(kk)*depx
+                     frcy = frcy + uscale(kk)*depy
+                     frcz = frcz + uscale(kk)*depz
+                  end if
+                     
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -1802,6 +2344,16 @@ c
                tzk3 = psr3*uiz + dsr3*uizp
                turi = -psr5*urk - dsr5*urkp
                turk = -psr5*uri - dsr5*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi3 = psr3*auxdkx + dsr3*auxpkx
+                  tyi3 = psr3*auxdky + dsr3*auxpky
+                  tzi3 = psr3*auxdkz + dsr3*auxpkz
+                  txk3 = psr3*auxdix + dsr3*auxpix
+                  tyk3 = psr3*auxdiy + dsr3*auxpiy
+                  tzk3 = psr3*auxdiz + dsr3*auxpiz
+                  turi = -psr5*auxdrk - dsr5*auxprk
+                  turk = -psr5*auxdri - dsr5*auxpri
+               end if
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -1819,6 +2371,16 @@ c
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
                turi = -psr7*urk - dsr7*urkp
                turk = -psr7*uri - dsr7*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi5 = 2.0d0 * (psr5*auxdkx+dsr5*auxpkx)
+                  tyi5 = 2.0d0 * (psr5*auxdky+dsr5*auxpky)
+                  tzi5 = 2.0d0 * (psr5*auxdkz+dsr5*auxpkz)
+                  txk5 = 2.0d0 * (psr5*auxdix+dsr5*auxpix)
+                  tyk5 = 2.0d0 * (psr5*auxdiy+dsr5*auxpiy)
+                  tzk5 = 2.0d0 * (psr5*auxdiz+dsr5*auxpiz)
+                  turi = -psr7*auxdrk - dsr7*auxprk
+                  turk = -psr7*auxdri - dsr7*auxdri
+               end if
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -1939,6 +2501,20 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
+
+      if (use_iel0scf) then!ALBAUGH
+         ep = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               ep = ep + (uind(j,i)*uinp(j,i)
+     &                 - uinp(j,i)*auxtmp1(j,i) 
+     &                 - uind(j,i)*auxptmp2(j,i)
+     &                 - uinp(j,i)*auxtmp2(j,i))/polarity(i)
+            end do
+         end do
+         ep = f*ep
+      end if 
+
 c
 c     perform deallocation of some local arrays
 c
@@ -1977,6 +2553,7 @@ c
       use polpot
       use potent
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,ii
       real*8 e,f,term,fterm
@@ -2009,11 +2586,13 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole
+      !if (.not. use_mpole)  call chkpole ALBAUGHTEST
+      call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      !if (.not. use_mpole)  call rotpole ALBAUGHTEST
+      call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2053,6 +2632,14 @@ c
          uix = 0.5d0 * (uind(1,i)+uinp(1,i))
          uiy = 0.5d0 * (uind(2,i)+uinp(2,i))
          uiz = 0.5d0 * (uind(3,i)+uinp(3,i))
+         if (use_iel0scf) then!ALBAUGH
+            uix = 0.5d0 * ( auxtmp1(1,i) + auxtmp2(1,i)
+     &                     +auxptmp1(1,i) + auxtmp2(1,i) )
+            uiy = 0.5d0 * ( auxtmp1(2,i) + auxtmp2(2,i)
+     &                     +auxptmp1(2,i) + auxtmp2(2,i) )
+            uiz = 0.5d0 * ( auxtmp1(3,i) + auxtmp2(3,i) 
+     &                     +auxptmp1(3,i) + auxtmp2(3,i) )
+         end if
          trq(1) = term * (diy*uiz-diz*uiy)
          trq(2) = term * (diz*uix-dix*uiz)
          trq(3) = term * (dix*uiy-diy*uix)
@@ -2140,6 +2727,21 @@ c
             vir(3,3) = vir(3,3) + vterm
          end if
       end if
+c         
+c     with iEL/0-SCF polarization energy can be calculated from stored vectors
+c
+      if (use_iel0scf) then!ALBAUGH
+         ep = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               ep = ep + (uind(j,i)*uinp(j,i)
+     &                 - uinp(j,i)*auxtmp1(j,i) 
+     &                 - uind(j,i)*auxptmp2(j,i)
+     &                 - uinp(j,i)*auxtmp2(j,i))/polarity(i)
+            end do
+         end do
+         ep = 0.5d0*f*ep
+      end if 
       return
       end
 c
@@ -2176,6 +2778,7 @@ c
       use potent
       use shunt
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer ii,kk,jcell
@@ -2234,6 +2837,18 @@ c
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 auxdix,auxdiy,auxdiz!ALBAUGH
+      real*8 auxdkx,auxdky,auxdkz!ALBAUGH
+      real*8 auxpix,auxpiy,auxpiz!ALBAUGH
+      real*8 auxpkx,auxpky,auxpkz!ALBAUGH
+      real*8 aix,aiy,aiz!ALBAUGH
+      real*8 apix,apiy,apiz!ALBAUGH
+      real*8 akx,aky,akz!ALBAUGH
+      real*8 apkx,apky,apkz!ALBAUGH
+      real*8 ari,ark!ALBAUGH
+      real*8 arip,arkp!ALBAUGH
+      real*8 auxdri,auxdrk!ALBAUGH
+      real*8 auxpri,auxprk!ALBAUGH
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 prc3(3),prc5(3),prc7(3)
       real*8 drc3(3),drc5(3),drc7(3)
@@ -2303,6 +2918,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         if (use_iel0scf) then!ALBAUGH
+            auxdix = auxtmp1(1,i)+auxtmp2(1,i)
+            auxdiy = auxtmp1(2,i)+auxtmp2(2,i)
+            auxdiz = auxtmp1(3,i)+auxtmp2(3,i)
+            auxpix = auxptmp1(1,i)+auxptmp2(1,i)
+            auxpiy = auxptmp1(2,i)+auxptmp2(2,i)
+            auxpiz = auxptmp1(3,i)+auxptmp2(3,i)
+            aix = uaux(1,i)
+            aiy = uaux(2,i)
+            aiz = uaux(3,i)
+            apix = upaux(1,i)
+            apiy = upaux(2,i)
+            apiz = upaux(3,i)
+         end if
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -2363,6 +2992,20 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               if (use_iel0scf) then!ALBAUGH
+                  auxdkx = auxtmp1(1,k)+auxtmp2(1,k)
+                  auxdky = auxtmp1(2,k)+auxtmp2(2,k)
+                  auxdkz = auxtmp1(3,k)+auxtmp2(3,k)
+                  auxpkx = auxptmp1(1,k)+auxptmp2(1,k)
+                  auxpky = auxptmp1(2,k)+auxptmp2(2,k)
+                  auxpkz = auxptmp1(3,k)+auxptmp2(3,k)
+                  akx = uaux(1,k)
+                  aky = uaux(2,k)
+                  akz = uaux(3,k)
+                  apkx = upaux(1,k)
+                  apky = upaux(2,k)
+                  apkz = upaux(3,k)
+               end if
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -2440,6 +3083,16 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
+               if (use_iel0scf) then!ALBAUGH
+                  ari = aix*xr + aiy*yr + aiz*zr
+                  ark = akx*xr + aky*yr + akz*zr
+                  arip = apix*xr + apiy*yr + apiz*zr
+                  arkp = apkx*xr + apky*yr + apkz*zr
+                  auxdri = auxdix*xr + auxdiy*yr + auxdiz*zr
+                  auxdrk = auxdkx*xr + auxdky*yr + auxdkz*zr
+                  auxpri = auxpix*xr + auxpiy*yr + auxpiz*zr
+                  auxprk = auxpkx*xr + auxpky*yr + auxpkz*zr
+               end if
                duik = dix*ukx + diy*uky + diz*ukz
      &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
@@ -2574,6 +3227,14 @@ c
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
                depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxpkx + txyi*auxpky + txzi*auxpkz
+     &                   -txxk*auxpix - txyk*auxpiy - txzk*auxpiz
+                  depy =  txyi*auxpkx + tyyi*auxpky + tyzi*auxpkz
+     &                   -txyk*auxpix - tyyk*auxpiy - tyzk*auxpiz
+                  depz =  txzi*auxpkx + tyzi*auxpky + tzzi*auxpkz
+     &                   -txzk*auxpix - tyzk*auxpiy - tzzk*auxpiz
+               end if
                frcx = depx
                frcy = depy
                frcz = depz
@@ -2655,6 +3316,14 @@ c
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
                depz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxdkx + txyi*auxdky + txzi*auxdkz
+     &                   -txxk*auxdix - txyk*auxdiy - txzk*auxdiz
+                  depy =  txyi*auxdkx + tyyi*auxdky + tyzi*auxdkz
+     &                   -txyk*auxdix - tyyk*auxdiy - tyzk*auxdiz
+                  depz =  txzi*auxdkx + tyzi*auxdky + tzzi*auxdkz
+     &                   -txzk*auxdix - tyzk*auxdiy - tzzk*auxdiz
+               end if
                frcx = frcx + depx
                frcy = frcy + depy
                frcz = frcz + depz
@@ -2700,6 +3369,109 @@ c
                   frcx = frcx + depx
                   frcy = frcy + depy
                   frcz = frcz + depz
+                  if (use_iel0scf) then!ALBAUGH
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = aix*term5 + ari*term6
+                     txxk = akx*term5 + ark*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = aiy*term5 + ari*term6
+                     tyyk = aky*term5 + ark*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = aiz*term5 + ari*term6
+                     tzzk = akz*term5 + ark*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = aix*term4 + aiy*term5 + ari*term6
+                     txyk = akx*term4 + aky*term5 + ark*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = aix*term4 + aiz*term5 + ari*term6
+                     txzk = akx*term4 + akz*term5 + ark*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = aiy*term4 + aiz*term5 + ari*term6
+                     tyzk = aky*term4 + akz*term5 + ark*term6
+                     depx =        txxi*(-ukxp+auxpkx)
+     &                           + txyi*(-ukyp+auxpky)
+     &                           + txzi*(-ukzp+auxpkz)
+     &                           + txxk*(-uixp+auxpix) 
+     &                           + txyk*(-uiyp+auxpiy)
+     &                           + txzk*(-uizp+auxpiz)
+                     depy =        txyi*(-ukxp+auxpkx)
+     &                           + tyyi*(-ukyp+auxpky)
+     &                           + tyzi*(-ukzp+auxpkz)
+     &                           + txyk*(-uixp+auxpix)
+     &                           + tyyk*(-uiyp+auxpiy)
+     &                           + tyzk*(-uizp+auxpiz)
+                     depz =        txzi*(-ukxp+auxpkx) 
+     &                           + tyzi*(-ukyp+auxpky) 
+     &                           + tzzi*(-ukzp+auxpkz)
+     &                           + txzk*(-uixp+auxpix) 
+     &                           + tyzk*(-uiyp+auxpiy) 
+     &                           + tzzk*(-uizp+auxpiz)
+                     frcx = frcx + depx
+                     frcy = frcy + depy
+                     frcz = frcz + depz
+                     
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = apix*term5 + arip*term6
+                     txxk = apkx*term5 + arkp*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = apiy*term5 + arip*term6
+                     tyyk = apky*term5 + arkp*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = apiz*term5 + arip*term6
+                     tzzk = apkz*term5 + arkp*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = apix*term4 + apiy*term5 + arip*term6
+                     txyk = apkx*term4 + apky*term5 + arkp*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = apix*term4 + apiz*term5 + arip*term6
+                     txzk = apkx*term4 + apkz*term5 + arkp*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = apiy*term4 + apiz*term5 + arip*term6
+                     tyzk = apky*term4 + apkz*term5 + arkp*term6
+                     depx =        txxi*(-ukx+auxdkx) 
+     &                           + txyi*(-uky+auxdky) 
+     &                           + txzi*(-ukz+auxdkz)
+     &                           + txxk*(-uix+auxdix) 
+     &                           + txyk*(-uiy+auxdiy) 
+     &                           + txzk*(-uiz+auxdiz)
+                     depy =        txyi*(-ukx+auxdkx) 
+     &                           + tyyi*(-uky+auxdky) 
+     &                           + tyzi*(-ukz+auxdkz)
+     &                           + txyk*(-uix+auxdix) 
+     &                           + tyyk*(-uiy+auxdiy) 
+     &                           + tyzk*(-uiz+auxdiz)
+                     depz =        txzi*(-ukx+auxdkx) 
+     &                           + tyzi*(-uky+auxdky) 
+     &                           + tzzi*(-ukz+auxdkz)
+     &                           + txzk*(-uix+auxdix) 
+     &                           + tyzk*(-uiy+auxdiy) 
+     &                           + tzzk*(-uiz+auxdiz)
+                     frcx = frcx + depx
+                     frcy = frcy + depy
+                     frcz = frcz + depz
+                  end if
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -2795,6 +3567,16 @@ c
                tzk3 = psr3*uiz + dsr3*uizp
                turi = -psr5*urk - dsr5*urkp
                turk = -psr5*uri - dsr5*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi3 = psr3*auxdkx + dsr3*auxpkx
+                  tyi3 = psr3*auxdky + dsr3*auxpky
+                  tzi3 = psr3*auxdkz + dsr3*auxpkz
+                  txk3 = psr3*auxdix + dsr3*auxpix
+                  tyk3 = psr3*auxdiy + dsr3*auxpiy
+                  tzk3 = psr3*auxdiz + dsr3*auxpiz
+                  turi = -psr5*auxdrk - dsr5*auxprk
+                  turk = -psr5*auxdri - dsr5*auxpri
+               end if
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -2811,7 +3593,17 @@ c
                tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
                turi = -psr7*urk - dsr7*urkp 
-               turk = -psr7*uri - dsr7*urip 
+               turk = -psr7*uri - dsr7*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi5 = 2.0d0 * (psr5*auxdkx+dsr5*auxpkx)
+                  tyi5 = 2.0d0 * (psr5*auxdky+dsr5*auxpky)
+                  tzi5 = 2.0d0 * (psr5*auxdkz+dsr5*auxpkz)
+                  txk5 = 2.0d0 * (psr5*auxdix+dsr5*auxpix)
+                  tyk5 = 2.0d0 * (psr5*auxdiy+dsr5*auxpiy)
+                  tzk5 = 2.0d0 * (psr5*auxdiz+dsr5*auxpiz)
+                  turi = -psr7*auxdrk - dsr7*auxprk
+                  turk = -psr7*auxdri - dsr7*auxdri
+               end if
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -2895,6 +3687,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         if (use_iel0scf) then!ALBAUGH
+            auxdix = auxtmp1(1,i)+auxtmp2(1,i)
+            auxdiy = auxtmp1(2,i)+auxtmp2(2,i)
+            auxdiz = auxtmp1(3,i)+auxtmp2(3,i)
+            auxpix = auxptmp1(1,i)+auxptmp2(1,i)
+            auxpiy = auxptmp1(2,i)+auxptmp2(2,i)
+            auxpiz = auxptmp1(3,i)+auxptmp2(3,i)
+            aix = uaux(1,i)
+            aiy = uaux(2,i)
+            aiz = uaux(3,i)
+            apix = upaux(1,i)
+            apiy = upaux(2,i)
+            apiz = upaux(3,i)
+         end if
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -2961,6 +3767,20 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               if (use_iel0scf) then!ALBAUGH
+                  auxdkx = auxtmp1(1,k)+auxtmp2(1,k)
+                  auxdky = auxtmp1(2,k)+auxtmp2(2,k)
+                  auxdkz = auxtmp1(3,k)+auxtmp2(3,k)
+                  auxpkx = auxptmp1(1,k)+auxptmp2(1,k)
+                  auxpky = auxptmp1(2,k)+auxptmp2(2,k)
+                  auxpkz = auxptmp1(3,k)+auxptmp2(3,k)
+                  akx = uaux(1,k)
+                  aky = uaux(2,k)
+                  akz = uaux(3,k)
+                  apkx = upaux(1,k)
+                  apky = upaux(2,k)
+                  apkz = upaux(3,k)
+               end if
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -3038,6 +3858,16 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
+               if (use_iel0scf) then!ALBAUGH
+                  ari = aix*xr + aiy*yr + aiz*zr
+                  ark = akx*xr + aky*yr + akz*zr
+                  arip = apix*xr + apiy*yr + apiz*zr
+                  arkp = apkx*xr + apky*yr + apkz*zr
+                  auxdri = auxdix*xr + auxdiy*yr + auxdiz*zr
+                  auxdrk = auxdkx*xr + auxdky*yr + auxdkz*zr
+                  auxpri = auxpix*xr + auxpiy*yr + auxpiz*zr
+                  auxprk = auxpkx*xr + auxpky*yr + auxpkz*zr
+               end if
                duik = dix*ukx + diy*uky + diz*ukz
      &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
@@ -3171,6 +4001,14 @@ c
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
                depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxpkx + txyi*auxpky + txzi*auxpkz
+     &                   -txxk*auxpix - txyk*auxpiy - txzk*auxpiz
+                  depy =  txyi*auxpkx + tyyi*auxpky + tyzi*auxpkz
+     &                   -txyk*auxpix - tyyk*auxpiy - tyzk*auxpiz
+                  depz =  txzi*auxpkx + tyzi*auxpky + tzzi*auxpkz
+     &                   -txzk*auxpix - tyzk*auxpiy - tzzk*auxpiz
+               end if
                frcx = depx
                frcy = depy
                frcz = depz
@@ -3252,6 +4090,14 @@ c
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
                depz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxdkx + txyi*auxdky + txzi*auxdkz
+     &                   -txxk*auxdix - txyk*auxdiy - txzk*auxdiz
+                  depy =  txyi*auxdkx + tyyi*auxdky + tyzi*auxdkz
+     &                   -txyk*auxdix - tyyk*auxdiy - tyzk*auxdiz
+                  depz =  txzi*auxdkx + tyzi*auxdky + tzzi*auxdkz
+     &                   -txzk*auxdix - tyzk*auxdiy - tzzk*auxdiz
+               end if
                frcx = frcx + depx
                frcy = frcy + depy
                frcz = frcz + depz
@@ -3297,6 +4143,109 @@ c
                   frcx = frcx + depx
                   frcy = frcy + depy
                   frcz = frcz + depz
+                  if (use_iel0scf) then!ALBAUGH
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = aix*term5 + ari*term6
+                     txxk = akx*term5 + ark*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = aiy*term5 + ari*term6
+                     tyyk = aky*term5 + ark*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = aiz*term5 + ari*term6
+                     tzzk = akz*term5 + ark*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = aix*term4 + aiy*term5 + ari*term6
+                     txyk = akx*term4 + aky*term5 + ark*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = aix*term4 + aiz*term5 + ari*term6
+                     txzk = akx*term4 + akz*term5 + ark*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = aiy*term4 + aiz*term5 + ari*term6
+                     tyzk = aky*term4 + akz*term5 + ark*term6
+                     depx =        txxi*(-ukxp+auxpkx)
+     &                           + txyi*(-ukyp+auxpky)
+     &                           + txzi*(-ukzp+auxpkz)
+     &                           + txxk*(-uixp+auxpix) 
+     &                           + txyk*(-uiyp+auxpiy)
+     &                           + txzk*(-uizp+auxpiz)
+                     depy =        txyi*(-ukxp+auxpkx)
+     &                           + tyyi*(-ukyp+auxpky)
+     &                           + tyzi*(-ukzp+auxpkz)
+     &                           + txyk*(-uixp+auxpix)
+     &                           + tyyk*(-uiyp+auxpiy)
+     &                           + tyzk*(-uizp+auxpiz)
+                     depz =        txzi*(-ukxp+auxpkx) 
+     &                           + tyzi*(-ukyp+auxpky) 
+     &                           + tzzi*(-ukzp+auxpkz)
+     &                           + txzk*(-uixp+auxpix) 
+     &                           + tyzk*(-uiyp+auxpiy) 
+     &                           + tzzk*(-uizp+auxpiz)
+                     frcx = frcx + depx
+                     frcy = frcy + depy
+                     frcz = frcz + depz
+                     
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = apix*term5 + arip*term6
+                     txxk = apkx*term5 + arkp*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = apiy*term5 + arip*term6
+                     tyyk = apky*term5 + arkp*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = apiz*term5 + arip*term6
+                     tzzk = apkz*term5 + arkp*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = apix*term4 + apiy*term5 + arip*term6
+                     txyk = apkx*term4 + apky*term5 + arkp*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = apix*term4 + apiz*term5 + arip*term6
+                     txzk = apkx*term4 + apkz*term5 + arkp*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = apiy*term4 + apiz*term5 + arip*term6
+                     tyzk = apky*term4 + apkz*term5 + arkp*term6
+                     depx =        txxi*(-ukx+auxdkx) 
+     &                           + txyi*(-uky+auxdky) 
+     &                           + txzi*(-ukz+auxdkz)
+     &                           + txxk*(-uix+auxdix) 
+     &                           + txyk*(-uiy+auxdiy) 
+     &                           + txzk*(-uiz+auxdiz)
+                     depy =        txyi*(-ukx+auxdkx) 
+     &                           + tyyi*(-uky+auxdky) 
+     &                           + tyzi*(-ukz+auxdkz)
+     &                           + txyk*(-uix+auxdix) 
+     &                           + tyyk*(-uiy+auxdiy) 
+     &                           + tyzk*(-uiz+auxdiz)
+                     depz =        txzi*(-ukx+auxdkx) 
+     &                           + tyzi*(-uky+auxdky) 
+     &                           + tzzi*(-ukz+auxdkz)
+     &                           + txzk*(-uix+auxdix) 
+     &                           + tyzk*(-uiy+auxdiy) 
+     &                           + tzzk*(-uiz+auxdiz)
+                     frcx = frcx + depx
+                     frcy = frcy + depy
+                     frcz = frcz + depz
+                  end if
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -3408,6 +4357,16 @@ c
                tzk3 = psr3*uiz + dsr3*uizp
                turi = -psr5*urk - dsr5*urkp
                turk = -psr5*uri - dsr5*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi3 = psr3*auxdkx + dsr3*auxpkx
+                  tyi3 = psr3*auxdky + dsr3*auxpky
+                  tzi3 = psr3*auxdkz + dsr3*auxpkz
+                  txk3 = psr3*auxdix + dsr3*auxpix
+                  tyk3 = psr3*auxdiy + dsr3*auxpiy
+                  tzk3 = psr3*auxdiz + dsr3*auxpiz
+                  turi = -psr5*auxdrk - dsr5*auxprk
+                  turk = -psr5*auxdri - dsr5*auxpri
+               end if
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -3425,6 +4384,16 @@ c
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
                turi = -psr7*urk - dsr7*urkp
                turk = -psr7*uri - dsr7*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi5 = 2.0d0 * (psr5*auxdkx+dsr5*auxpkx)
+                  tyi5 = 2.0d0 * (psr5*auxdky+dsr5*auxpky)
+                  tzi5 = 2.0d0 * (psr5*auxdkz+dsr5*auxpkz)
+                  txk5 = 2.0d0 * (psr5*auxdix+dsr5*auxpix)
+                  tyk5 = 2.0d0 * (psr5*auxdiy+dsr5*auxpiy)
+                  tzk5 = 2.0d0 * (psr5*auxdiz+dsr5*auxpiz)
+                  turi = -psr7*auxdrk - dsr7*auxprk
+                  turk = -psr7*auxdri - dsr7*auxdri
+               end if
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -3575,6 +4544,7 @@ c
       use polpot
       use potent
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,ii
       real*8 e,f,term,fterm
@@ -3608,10 +4578,12 @@ c
 c     check the sign of multipole components at chiral sites
 c
       if (.not. use_mpole)  call chkpole
+      call chkpole!ALBAUGHTEST
 c
 c     rotate the multipole components into the global frame
 c
       if (.not. use_mpole)  call rotpole
+      call rotpole!ALBAUGHTEST
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -3651,10 +4623,18 @@ c
          uix = 0.5d0 * (uind(1,i)+uinp(1,i))
          uiy = 0.5d0 * (uind(2,i)+uinp(2,i))
          uiz = 0.5d0 * (uind(3,i)+uinp(3,i))
+         if (use_iel0scf) then!ALBAUGH
+            uix = 0.5d0 * ( auxtmp1(1,i) + auxtmp2(1,i)
+     &                     +auxptmp1(1,i) + auxtmp2(1,i) )
+            uiy = 0.5d0 * ( auxtmp1(2,i) + auxtmp2(2,i)
+     &                     +auxptmp1(2,i) + auxtmp2(2,i) )
+            uiz = 0.5d0 * ( auxtmp1(3,i) + auxtmp2(3,i) 
+     &                     +auxptmp1(3,i) + auxtmp2(3,i) )
+         end if
          trq(1) = term * (diy*uiz-diz*uiy)
          trq(2) = term * (diz*uix-dix*uiz)
          trq(3) = term * (dix*uiy-diy*uix)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,trq,fix,fiy,fiz,dep)!ALBAUGHTEST
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -3697,7 +4677,7 @@ c
             trq(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
             trq(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
             call torque (i,trq,fix,fiy,fiz,dep)
-         end do
+         end do     
 c
 c     boundary correction to virial due to overall cell dipole
 c
@@ -3737,7 +4717,22 @@ c
             vir(2,2) = vir(2,2) + vterm
             vir(3,3) = vir(3,3) + vterm
          end if
-      end if
+      end if      
+c         
+c     with iEL/0-SCF polarization energy can be calculated from stored vectors
+c
+      if (use_iel0scf) then!ALBAUGH
+         ep = 0.0d0
+         do i = 1, npole
+            do j = 1, 3
+               ep = ep + (uind(j,i)*uinp(j,i)
+     &                 - uinp(j,i)*auxtmp1(j,i) 
+     &                 - uind(j,i)*auxptmp2(j,i)
+     &                 - uinp(j,i)*auxtmp2(j,i))/polarity(i)
+            end do
+         end do
+         ep = 0.5d0*f*ep
+      end if 
       return
       end
 c
@@ -3774,6 +4769,7 @@ c
       use potent
       use shunt
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
@@ -3832,6 +4828,18 @@ c
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 auxdix,auxdiy,auxdiz!ALBAUGH
+      real*8 auxdkx,auxdky,auxdkz!ALBAUGH
+      real*8 auxpix,auxpiy,auxpiz!ALBAUGH
+      real*8 auxpkx,auxpky,auxpkz!ALBAUGH
+      real*8 aix,aiy,aiz!ALBAUGH
+      real*8 apix,apiy,apiz!ALBAUGH
+      real*8 akx,aky,akz!ALBAUGH
+      real*8 apkx,apky,apkz!ALBAUGH
+      real*8 ari,ark!ALBAUGH
+      real*8 arip,arkp!ALBAUGH
+      real*8 auxdri,auxdrk!ALBAUGH
+      real*8 auxpri,auxprk!ALBAUGH
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 prc3(3),prc5(3),prc7(3)
       real*8 drc3(3),drc5(3),drc7(3)
@@ -3883,7 +4891,8 @@ c
 !$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
 !$OMP& p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
 !$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,f,aewald,molcule,coptmax,copm,uopt,uoptp,poltyp)
+!$OMP& off2,f,aewald,molcule,coptmax,copm,uopt,uoptp,poltyp,
+!$OMP& use_iel0scf,uaux,upaux,auxtmp1,auxtmp2,auxptmp1,auxptmp2)!ALBAUGH
 !$OMP& shared (ep,einter,dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(guided)
@@ -3913,6 +4922,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         if (use_iel0scf) then!ALBAUGH
+            auxdix = auxtmp1(1,i)+auxtmp2(1,i)
+            auxdiy = auxtmp1(2,i)+auxtmp2(2,i)
+            auxdiz = auxtmp1(3,i)+auxtmp2(3,i)
+            auxpix = auxptmp1(1,i)+auxptmp2(1,i)
+            auxpiy = auxptmp1(2,i)+auxptmp2(2,i)
+            auxpiz = auxptmp1(3,i)+auxptmp2(3,i)
+            aix = uaux(1,i)
+            aiy = uaux(2,i)
+            aiz = uaux(3,i)
+            apix = upaux(1,i)
+            apiy = upaux(2,i)
+            apiz = upaux(3,i)
+         end if
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -3974,6 +4997,20 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               if (use_iel0scf) then!ALBAUGH
+                  auxdkx = auxtmp1(1,k)+auxtmp2(1,k)
+                  auxdky = auxtmp1(2,k)+auxtmp2(2,k)
+                  auxdkz = auxtmp1(3,k)+auxtmp2(3,k)
+                  auxpkx = auxptmp1(1,k)+auxptmp2(1,k)
+                  auxpky = auxptmp1(2,k)+auxptmp2(2,k)
+                  auxpkz = auxptmp1(3,k)+auxptmp2(3,k)
+                  akx = uaux(1,k)
+                  aky = uaux(2,k)
+                  akz = uaux(3,k)
+                  apkx = upaux(1,k)
+                  apky = upaux(2,k)
+                  apkz = upaux(3,k)
+               end if
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -4051,6 +5088,16 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
+               if (use_iel0scf) then!ALBAUGH
+                  ari = aix*xr + aiy*yr + aiz*zr
+                  ark = akx*xr + aky*yr + akz*zr
+                  arip = apix*xr + apiy*yr + apiz*zr
+                  arkp = apkx*xr + apky*yr + apkz*zr
+                  auxdri = auxdix*xr + auxdiy*yr + auxdiz*zr
+                  auxdrk = auxdkx*xr + auxdky*yr + auxdkz*zr
+                  auxpri = auxpix*xr + auxpiy*yr + auxpiz*zr
+                  auxprk = auxpkx*xr + auxpky*yr + auxpkz*zr
+               end if
                duik = dix*ukx + diy*uky + diz*ukz
      &                   + dkx*uix + dky*uiy + dkz*uiz
                quik = qrix*ukx + qriy*uky + qriz*ukz
@@ -4185,6 +5232,14 @@ c
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
                depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxpkx + txyi*auxpky + txzi*auxpkz
+     &                   -txxk*auxpix - txyk*auxpiy - txzk*auxpiz
+                  depy =  txyi*auxpkx + tyyi*auxpky + tyzi*auxpkz
+     &                   -txyk*auxpix - tyyk*auxpiy - tyzk*auxpiz
+                  depz =  txzi*auxpkx + tyzi*auxpky + tzzi*auxpkz
+     &                   -txzk*auxpix - tyzk*auxpiy - tzzk*auxpiz
+               end if
                frcx = depx
                frcy = depy
                frcz = depz
@@ -4266,6 +5321,14 @@ c
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
                depz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
+               if (use_iel0scf) then!ALBAUGH
+                  depx =  txxi*auxdkx + txyi*auxdky + txzi*auxdkz
+     &                   -txxk*auxdix - txyk*auxdiy - txzk*auxdiz
+                  depy =  txyi*auxdkx + tyyi*auxdky + tyzi*auxdkz
+     &                   -txyk*auxdix - tyyk*auxdiy - tyzk*auxdiz
+                  depz =  txzi*auxdkx + tyzi*auxdky + tzzi*auxdkz
+     &                   -txzk*auxdix - tyzk*auxdiy - tzzk*auxdiz
+               end if
                frcx = frcx + depx
                frcy = frcy + depy
                frcz = frcz + depz
@@ -4308,6 +5371,105 @@ c
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
                   depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
+                  if (use_iel0scf) then!ALBAUGH
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = aix*term5 + ari*term6
+                     txxk = akx*term5 + ark*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = aiy*term5 + ari*term6
+                     tyyk = aky*term5 + ark*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = aiz*term5 + ari*term6
+                     tzzk = akz*term5 + ark*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = aix*term4 + aiy*term5 + ari*term6
+                     txyk = akx*term4 + aky*term5 + ark*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = aix*term4 + aiz*term5 + ari*term6
+                     txzk = akx*term4 + akz*term5 + ark*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = aiy*term4 + aiz*term5 + ari*term6
+                     tyzk = aky*term4 + akz*term5 + ark*term6
+                     
+                     depx = depx + txxi*(-ukxp+auxpkx)
+     &                           + txyi*(-ukyp+auxpky)
+     &                           + txzi*(-ukzp+auxpkz)
+     &                           + txxk*(-uixp+auxpix) 
+     &                           + txyk*(-uiyp+auxpiy)
+     &                           + txzk*(-uizp+auxpiz)
+                     depy = depy + txyi*(-ukxp+auxpkx)
+     &                           + tyyi*(-ukyp+auxpky)
+     &                           + tyzi*(-ukzp+auxpkz)
+     &                           + txyk*(-uixp+auxpix)
+     &                           + tyyk*(-uiyp+auxpiy)
+     &                           + tyzk*(-uizp+auxpiz)
+                     depz = depz + txzi*(-ukxp+auxpkx) 
+     &                           + tyzi*(-ukyp+auxpky) 
+     &                           + tzzi*(-ukzp+auxpkz)
+     &                           + txzk*(-uixp+auxpix) 
+     &                           + tyzk*(-uiyp+auxpiy) 
+     &                           + tzzk*(-uizp+auxpiz)
+                     
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = apix*term5 + arip*term6
+                     txxk = apkx*term5 + arkp*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = apiy*term5 + arip*term6
+                     tyyk = apky*term5 + arkp*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = apiz*term5 + arip*term6
+                     tzzk = apkz*term5 + arkp*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = apix*term4 + apiy*term5 + arip*term6
+                     txyk = apkx*term4 + apky*term5 + arkp*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = apix*term4 + apiz*term5 + arip*term6
+                     txzk = apkx*term4 + apkz*term5 + arkp*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = apiy*term4 + apiz*term5 + arip*term6
+                     tyzk = apky*term4 + apkz*term5 + arkp*term6
+                     
+                     depx = depx + txxi*(-ukx+auxdkx) 
+     &                           + txyi*(-uky+auxdky) 
+     &                           + txzi*(-ukz+auxdkz)
+     &                           + txxk*(-uix+auxdix) 
+     &                           + txyk*(-uiy+auxdiy) 
+     &                           + txzk*(-uiz+auxdiz)
+                     depy = depy + txyi*(-ukx+auxdkx) 
+     &                           + tyyi*(-uky+auxdky) 
+     &                           + tyzi*(-ukz+auxdkz)
+     &                           + txyk*(-uix+auxdix) 
+     &                           + tyyk*(-uiy+auxdiy) 
+     &                           + tyzk*(-uiz+auxdiz)
+                     depz = depz + txzi*(-ukx+auxdkx) 
+     &                           + tyzi*(-uky+auxdky) 
+     &                           + tzzi*(-ukz+auxdkz)
+     &                           + txzk*(-uix+auxdix) 
+     &                           + tyzk*(-uiy+auxdiy) 
+     &                           + tzzk*(-uiz+auxdiz)
+                  end if
                   frcx = frcx + depx
                   frcy = frcy + depy
                   frcz = frcz + depz
@@ -4406,6 +5568,16 @@ c
                tzk3 = psr3*uiz + dsr3*uizp
                turi = -psr5*urk - dsr5*urkp
                turk = -psr5*uri - dsr5*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi3 = psr3*auxdkx + dsr3*auxpkx
+                  tyi3 = psr3*auxdky + dsr3*auxpky
+                  tzi3 = psr3*auxdkz + dsr3*auxpkz
+                  txk3 = psr3*auxdix + dsr3*auxpix
+                  tyk3 = psr3*auxdiy + dsr3*auxpiy
+                  tzk3 = psr3*auxdiz + dsr3*auxpiz
+                  turi = -psr5*auxdrk - dsr5*auxprk
+                  turk = -psr5*auxdri - dsr5*auxpri
+               end if
                ufld(1,i) = ufld(1,i) + txi3 + xr*turi
                ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
                ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
@@ -4423,6 +5595,16 @@ c
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
                turi = -psr7*urk - dsr7*urkp
                turk = -psr7*uri - dsr7*urip
+               if (use_iel0scf) then!ALBAUGH
+                  txi5 = 2.0d0 * (psr5*auxdkx+dsr5*auxpkx)
+                  tyi5 = 2.0d0 * (psr5*auxdky+dsr5*auxpky)
+                  tzi5 = 2.0d0 * (psr5*auxdkz+dsr5*auxpkz)
+                  txk5 = 2.0d0 * (psr5*auxdix+dsr5*auxpix)
+                  tyk5 = 2.0d0 * (psr5*auxdiy+dsr5*auxpiy)
+                  tzk5 = 2.0d0 * (psr5*auxdiz+dsr5*auxpiz)
+                  turi = -psr7*auxdrk - dsr7*auxprk
+                  turk = -psr7*auxdri - dsr7*auxdri
+               end if
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -4595,6 +5777,7 @@ c
       use polpot
       use potent
       use virial
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k,m,ii
       integer j1,j2,j3
@@ -4619,13 +5802,40 @@ c
       real*8 fiy(3),fiz(3)
       real*8 cphim(4),cphid(4)
       real*8 cphip(4)
+      real*8 cphiad(4),cphiap(4)!ALBAUGH
+      real*8 cphiauxd(4),cphiauxp(4)!ALBAUGH
       real*8 a(3,3),ftc(10,10)
       real*8, allocatable :: fuind(:,:)
       real*8, allocatable :: fuinp(:,:)
       real*8, allocatable :: fphid(:,:)
       real*8, allocatable :: fphip(:,:)
       real*8, allocatable :: fphidp(:,:)
+      real*8, allocatable :: fad(:,:)
+      real*8, allocatable :: fap(:,:)
+      real*8, allocatable :: fphiad(:,:)!ALBAUGH
+      real*8, allocatable :: fphiap(:,:)!ALBAUGH
+      real*8, allocatable :: fphiadp(:,:)!ALBAUGH
+      real*8, allocatable :: fauxd(:,:)!ALBAUGH
+      real*8, allocatable :: fauxp(:,:)!ALBAUGH
+      real*8, allocatable :: fphiauxd(:,:)!ALBAUGH
+      real*8, allocatable :: fphiauxp(:,:)!ALBAUGH
+      real*8, allocatable :: fphiauxdp(:,:)!ALBAUGH
+      real*8, allocatable :: cphiaux(:,:)!ALBAUGH
       real*8, allocatable :: qgrip(:,:,:,:)
+      real*8, allocatable :: qgripn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgridn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriad(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriadn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriap(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriapn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriauxd(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriauxdn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriauxp(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgriauxpn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgrialtd(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgrialtdn(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgrialtp(:,:,:,:)!ALBAUGH
+      real*8, allocatable :: qgrialtpn(:,:,:,:)!ALBAUGH
 c
 c     indices into the electrostatic field array
 c
@@ -4654,6 +5864,9 @@ c
          allocate (cphi(10,npole))
          allocate (fphi(20,npole))
       end if
+      if (use_iel0scf) then
+         allocate (cphiaux(10,npole))
+      end if
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -4680,17 +5893,17 @@ c
 c
 c     remove scalar sum virial from prior multipole 3-D FFT
 c
-      if (use_mpole) then
-         vxx = -vmxx
-         vxy = -vmxy
-         vxz = -vmxz
-         vyy = -vmyy
-         vyz = -vmyz
-         vzz = -vmzz
+      !if (use_mpole) then ALBAUGHTEST
+      !   vxx = -vmxx
+      !   vxy = -vmxy
+      !   vxz = -vmxz
+      !   vyy = -vmyy
+      !   vyz = -vmyz
+      !   vzz = -vmzz
 c
 c     compute the arrays of B-spline coefficients
 c
-      else
+      !else ALBAUGHTEST
          call bspline_fill
          call table_fill
 c
@@ -4758,7 +5971,7 @@ c
 c     account for the zeroth grid point for a finite system
 c
          qfac(1,1,1) = 0.0d0
-         if (.not. use_bounds) then
+         if (.not. use_bounds) then!ALBAUGH
             expterm = 0.5d0 * pi / xbox
             struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
             e = 0.5d0 * expterm * struc2
@@ -4788,7 +6001,7 @@ c
             end do
          end do
          call fphi_to_cphi (fphi,cphi)
-      end if
+      !end if ALBAUGHTEST
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -4797,6 +6010,18 @@ c
       allocate (fphid(10,npole))
       allocate (fphip(10,npole))
       allocate (fphidp(20,npole))
+      if (use_iel0scf) then!ALBAUGH
+         allocate (fauxd(3,npole))
+         allocate (fauxp(3,npole))
+         allocate (fphiauxd(10,npole))
+         allocate (fphiauxp(10,npole))
+         allocate (fphiauxdp(20,npole))
+         allocate (fad(3,npole))
+         allocate (fap(3,npole))
+         allocate (fphiad(10,npole))
+         allocate (fphiap(10,npole))
+         allocate (fphiadp(20,npole))
+      end if
 c
 c     convert Cartesian induced dipoles to fractional coordinates
 c
@@ -4813,6 +6038,23 @@ c
      &                      + a(j,3)*uinp(3,i)
          end do
       end do
+      
+      if (use_iel0scf) then!ALBAUGH
+         do i = 1, npole
+            do j = 1, 3
+               fauxd(j,i) = a(j,1)*(auxtmp1(1,i) + auxtmp2(1,i)) 
+     &                    + a(j,2)*(auxtmp1(2,i) + auxtmp2(2,i))
+     &                    + a(j,3)*(auxtmp1(3,i) + auxtmp2(3,i))
+               fauxp(j,i) = a(j,1)*(auxptmp1(1,i) + auxptmp2(1,i)) 
+     &                    + a(j,2)*(auxptmp1(2,i) + auxptmp2(2,i))
+     &                    + a(j,3)*(auxptmp1(3,i) + auxptmp2(3,i))
+               fad(j,i) = a(j,1)*uaux(1,i) + a(j,2)*uaux(2,i)
+     &                  + a(j,3)*uaux(3,i)
+               fap(j,i) = a(j,1)*upaux(1,i) + a(j,2)*upaux(2,i)
+     &                  + a(j,3)*upaux(3,i)
+            end do
+         end do
+      end if
 c
 c     assign PME grid and perform 3-D FFT forward transform
 c
@@ -4853,6 +6095,54 @@ c
             fphidp(j,i) = electric * fphidp(j,i)
          end do
       end do
+      
+      if (use_iel0scf) then!ALBAUGH
+         call grid_uind (fad,fap)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  term = qfac(i,j,k)
+                  qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+                  qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         call fftback
+         call fphi_uind (fphiad,fphiap,fphiadp)
+         do i = 1, npole
+            do j = 1, 10
+               fphiad(j,i) = electric * fphiad(j,i)
+               fphiap(j,i) = electric * fphiap(j,i)
+            end do
+            do j = 1, 20
+               fphiadp(j,i) = electric * fphiadp(j,i)
+            end do
+         end do
+         
+         call grid_uind (fauxd,fauxp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  term = qfac(i,j,k)
+                  qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+                  qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         call fftback
+         call fphi_uind (fphiauxd,fphiauxp,fphiauxdp)
+         do i = 1, npole
+            do j = 1, 10
+               fphiauxd(j,i) = electric * fphiauxd(j,i)
+               fphiauxp(j,i) = electric * fphiauxp(j,i)
+            end do
+            do j = 1, 20
+               fphiauxdp(j,i) = electric * fphiauxdp(j,i)
+            end do
+         end do       
+      end if
 c
 c     increment the induced dipole energy and gradient
 c
@@ -4876,6 +6166,38 @@ c     e = 0.0d0
             f3 = f3 + (fuind(k,i)+fuinp(k,i))*fphi(j3,i)
      &              + fuind(k,i)*fphip(j3,i)
      &              + fuinp(k,i)*fphid(j3,i)
+            if (use_iel0scf) then!ALBAUGH
+               f1 = f1 - (fuind(k,i)+fuinp(k,i))*fphi(j1,i)
+     &                 + (fauxd(k,i)+fauxp(k,i))*fphi(j1,i)
+     &                 - fad(k,i)*fphip(j1,i)
+     &                 - fap(k,i)*fphid(j1,i)
+     &                 - fuind(k,i)*fphiap(j1,i)
+     &                 - fuinp(k,i)*fphiad(j1,i)
+     &                 + fad(k,i)*fphiauxp(j1,i)
+     &                 + fap(k,i)*fphiauxd(j1,i)
+     &                 + fauxd(k,i)*fphiap(j1,i)
+     &                 + fauxp(k,i)*fphiad(j1,i)
+               f2 = f2 - (fuind(k,i)+fuinp(k,i))*fphi(j2,i)
+     &                 + (fauxd(k,i)+fauxp(k,i))*fphi(j2,i)
+     &                 - fad(k,i)*fphip(j2,i)
+     &                 - fap(k,i)*fphid(j2,i)
+     &                 - fuind(k,i)*fphiap(j2,i)
+     &                 - fuinp(k,i)*fphiad(j2,i)
+     &                 + fad(k,i)*fphiauxp(j2,i)
+     &                 + fap(k,i)*fphiauxd(j2,i)
+     &                 + fauxd(k,i)*fphiap(j2,i)
+     &                 + fauxp(k,i)*fphiad(j2,i)
+               f3 = f3 - (fuind(k,i)+fuinp(k,i))*fphi(j3,i)
+     &                 + (fauxd(k,i)+fauxp(k,i))*fphi(j3,i)
+     &                 - fad(k,i)*fphip(j3,i)
+     &                 - fap(k,i)*fphid(j3,i)
+     &                 - fuind(k,i)*fphiap(j3,i)
+     &                 - fuinp(k,i)*fphiad(j3,i)
+     &                 + fad(k,i)*fphiauxp(j3,i)
+     &                 + fap(k,i)*fphiauxd(j3,i)
+     &                 + fauxd(k,i)*fphiap(j3,i)
+     &                 + fauxp(k,i)*fphiad(j3,i)
+            end if
             if (poltyp.eq.'DIRECT' .or. poltyp.eq.'OPT') then
                f1 = f1 - fuind(k,i)*fphip(j1,i)
      &                 - fuinp(k,i)*fphid(j1,i)
@@ -4889,6 +6211,14 @@ c     e = 0.0d0
             f1 = f1 + fmp(k,i)*fphidp(deriv1(k),i)
             f2 = f2 + fmp(k,i)*fphidp(deriv2(k),i)
             f3 = f3 + fmp(k,i)*fphidp(deriv3(k),i)
+            if (use_iel0scf) then
+               f1 = f1 + fmp(k,i)*fphiauxdp(deriv1(k),i)
+     &                 - fmp(k,i)*fphidp(deriv1(k),i)
+               f2 = f2 + fmp(k,i)*fphiauxdp(deriv2(k),i)
+     &                 - fmp(k,i)*fphidp(deriv2(k),i)
+               f3 = f3 + fmp(k,i)*fphiauxdp(deriv3(k),i)
+     &                 - fmp(k,i)*fphidp(deriv3(k),i)
+            end if
          end do
          f1 = 0.5d0 * dble(nfft1) * f1
          f2 = 0.5d0 * dble(nfft2) * f2
@@ -4911,6 +6241,14 @@ c
          end do
       end do
       call fphi_to_cphi (fphidp,cphi)
+      if (use_iel0scf) then!ALBAUGH
+         do i = 1, npole
+            do k = 1, 10
+               fphiauxdp(k,i) = 0.5d0 * fphiauxdp(k,i)
+            end do
+         end do
+         call fphi_to_cphi (fphiauxdp,cphiaux)
+      end if
 c
 c     distribute torques into the induced dipole gradient
 c
@@ -4927,6 +6265,20 @@ c
      &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphi(8,i)
      &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
      &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
+         if (use_iel0scf) then!ALBAUGH
+            trq(1) = cmp(4,i)*cphiaux(3,i) - cmp(3,i)*cphiaux(4,i)
+     &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphiaux(10,i)
+     &               + cmp(9,i)*cphiaux(8,i) + cmp(10,i)*cphiaux(6,i)
+     &               - cmp(8,i)*cphiaux(9,i) - cmp(10,i)*cphiaux(7,i)
+            trq(2) = cmp(2,i)*cphiaux(4,i) - cmp(4,i)*cphiaux(2,i)
+     &               + 2.0d0*(cmp(5,i)-cmp(7,i))*cphiaux(9,i)
+     &               + cmp(8,i)*cphiaux(10,i) + cmp(9,i)*cphiaux(7,i)
+     &               - cmp(9,i)*cphiaux(5,i) - cmp(10,i)*cphiaux(8,i)
+            trq(3) = cmp(3,i)*cphiaux(2,i) - cmp(2,i)*cphiaux(3,i)
+     &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphiaux(8,i)
+     &               + cmp(8,i)*cphiaux(5,i) + cmp(10,i)*cphiaux(9,i)
+     &               - cmp(8,i)*cphiaux(6,i) - cmp(9,i)*cphiaux(10,i)
+         end if
          call torque (i,trq,fix,fiy,fiz,dep)
       end do
 c
@@ -4943,6 +6295,20 @@ c
                cphip(j) = cphip(j) + ftc(j,k)*fphip(k,i)
             end do
          end do
+         if (use_iel0scf) then!ALBAUGH
+            do j = 2, 4
+               cphiad(j) = 0.0d0
+               cphiap(j) = 0.0d0
+               cphiauxd(j) = 0.0d0
+               cphiauxp(j) = 0.0d0
+               do k = 2, 4
+                  cphiad(j) = cphiad(j) + ftc(j,k)*fphiad(k,i)
+                  cphiap(j) = cphiap(j) + ftc(j,k)*fphiap(k,i)
+                  cphiauxd(j) = cphiauxd(j) + ftc(j,k)*fphiauxd(k,i)
+                  cphiauxp(j) = cphiauxp(j) + ftc(j,k)*fphiauxp(k,i)
+               end do
+            end do
+         end if
          vxx = vxx - cphi(2,i)*cmp(2,i)
      &             - 0.5d0*(cphim(2)*(uind(1,i)+uinp(1,i))
      &                     +cphid(2)*uinp(1,i)+cphip(2)*uind(1,i))
@@ -4982,6 +6348,149 @@ c
      &                  +cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
          vzz = vzz - 2.0d0*cmp(7,i)*cphi(7,i) - cmp(9,i)*cphi(9,i)
      &             - cmp(10,i)*cphi(10,i)
+         if (use_iel0scf) then!ALBAUGH
+            vxx = vxx + cphi(2,i)*cmp(2,i)
+     &                - cphiaux(2,i)*cmp(2,i)
+     &             - 0.5d0*(cphim(2)*(auxtmp1(1,i)+auxtmp2(1,i)
+     &                               +auxptmp1(1,i)+auxptmp2(1,i))
+     &                     -cphim(2)*(uind(1,i)+uinp(1,i))
+!     &                     +cphid(2)*uinp(1,i)+cphip(2)*uind(1,i)
+     &                     -cphiad(2)*uinp(1,i)-cphip(2)*uaux(1,i)
+     &                     -cphiap(2)*uind(1,i)-cphid(2)*upaux(1,i)
+     &                     +cphiap(2)*(auxtmp1(1,i)+auxtmp2(1,i))
+     &                     +cphiauxd(2)*upaux(1,i)
+     &                     +cphiad(2)*(auxptmp1(1,i)+auxptmp2(1,i))
+     &                     +cphiauxp(2)*uaux(1,i))
+     
+            vxy = vxy + 0.5d0*(cphi(2,i)*cmp(3,i)+cphi(3,i)*cmp(2,i))
+     &                - 0.5d0*(cphiaux(2,i)*cmp(3,i)
+     &                        +cphiaux(3,i)*cmp(2,i))     
+     &                - 0.25d0*(cphim(2)*(auxtmp1(2,i)+auxtmp2(2,i)
+     &                                   +auxptmp1(2,i)+auxptmp2(2,i))
+     &                      +cphim(3)*(auxtmp1(1,i)+auxtmp2(1,i)
+     &                                +auxptmp1(1,i)+auxptmp2(1,i))
+     &                      -cphim(2)*(uind(2,i)+uinp(2,i))
+     &                      -cphim(3)*(uind(1,i)+uinp(1,i))
+!     &                      +cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
+!     &                      +cphid(3)*uinp(1,i)+cphip(3)*uind(1,i)
+     &                      -cphiad(2)*uinp(2,i)-cphip(2)*uaux(2,i)
+     &                      -cphiad(3)*uinp(1,i)-cphip(3)*uaux(1,i)
+     &                      -cphiap(2)*uind(2,i)-cphid(2)*upaux(2,i)
+     &                      -cphiap(3)*uind(1,i)-cphid(3)*upaux(1,i)
+     &                      +cphiap(2)*(auxtmp1(2,i)+auxtmp2(2,i))
+     &                      +cphiauxd(2)*upaux(2,i)
+     &                      +cphiap(3)*(auxtmp1(1,i)+auxtmp2(1,i))
+     &                      +cphiauxd(3)*upaux(1,i)
+     &                      +cphiad(2)*(auxptmp1(2,i)+auxptmp2(2,i))
+     &                      +cphiauxp(2)*uaux(2,i)
+     &                      +cphiad(3)*(auxptmp1(1,i)+auxptmp2(1,i))
+     &                      +cphiauxp(3)*uaux(1,i))
+     
+            vxz = vxz + 0.5d0*(cphi(2,i)*cmp(4,i)+cphi(4,i)*cmp(2,i))
+     &                - 0.5d0*(cphiaux(2,i)*cmp(4,i)
+     &                        +cphiaux(4,i)*cmp(2,i))
+     &                - 0.25d0*(cphim(2)*(auxtmp1(3,i)+auxtmp2(3,i)
+     &                                   +auxptmp1(3,i)+auxptmp2(3,i))
+     &                      +cphim(4)*(auxtmp1(1,i)+auxtmp2(1,i)
+     &                                +auxptmp1(1,i)+auxptmp2(1,i))
+     &                      -cphim(2)*(uind(3,i)+uinp(3,i))
+     &                      -cphim(4)*(uind(1,i)+uinp(1,i))
+!     &                      +cphid(2)*uinp(3,i)+cphip(2)*uind(3,i)
+!     &                      +cphid(4)*uinp(1,i)+cphip(4)*uind(1,i)
+     &                      -cphiad(2)*uinp(3,i)-cphip(2)*uaux(3,i)
+     &                      -cphiad(4)*uinp(1,i)-cphip(4)*uaux(1,i)
+     &                      -cphiap(2)*uind(3,i)-cphid(2)*upaux(3,i)
+     &                      -cphiap(4)*uind(1,i)-cphid(4)*upaux(1,i)
+     &                      +cphiap(2)*(auxtmp1(3,i)+auxtmp2(3,i))
+     &                      +cphiauxd(2)*upaux(3,i)
+     &                      +cphiap(4)*(auxtmp1(1,i)+auxtmp2(1,i))
+     &                      +cphiauxd(4)*upaux(1,i)
+     &                      +cphiad(2)*(auxptmp1(3,i)+auxptmp2(3,i))
+     &                      +cphiauxp(2)*uaux(3,i)
+     &                      +cphiad(4)*(auxptmp1(1,i)+auxptmp2(1,i))
+     &                      +cphiauxp(4)*uaux(1,i))
+     
+            vyy = vyy + cphi(3,i)*cmp(3,i)
+     &                - cphiaux(3,i)*cmp(3,i)
+     &                - 0.5d0*(cphim(3)*(auxtmp1(2,i)+auxtmp2(2,i)
+     &                                  +auxptmp1(2,i)+auxptmp2(2,i))
+     &                     -cphim(3)*(uind(2,i)+uinp(2,i))
+!     &                     +cphid(3)*uinp(2,i)+cphip(3)*uind(2,i)
+     &                     -cphiad(3)*uinp(2,i)-cphip(3)*uaux(2,i)
+     &                     -cphiap(3)*uind(2,i)-cphid(3)*upaux(2,i)
+     &                     +cphiap(3)*(auxtmp1(2,i)+auxtmp2(2,i))
+     &                     +cphiauxd(3)*upaux(2,i)
+     &                     +cphiad(3)*(auxptmp1(2,i)+auxptmp2(2,i))
+     &                     +cphiauxp(3)*uaux(2,i))
+     
+            vyz = vyz + 0.5d0*(cphi(3,i)*cmp(4,i)+cphi(4,i)*cmp(3,i))
+     &                - 0.5d0*(cphiaux(3,i)*cmp(4,i)
+     &                        +cphiaux(4,i)*cmp(3,i))  
+     &                - 0.25d0*(cphim(3)*(auxtmp1(3,i)+auxtmp2(3,i)
+     &                                   +auxptmp1(3,i)+auxptmp2(3,i))
+     &                      +cphim(4)*(auxtmp1(2,i)+auxtmp2(2,i)
+     &                                +auxptmp1(2,i)+auxptmp2(2,i))
+     &                      -cphim(3)*(uind(3,i)+uinp(3,i))
+     &                      -cphim(4)*(uind(2,i)+uinp(2,i))
+!     &                      +cphid(3)*uinp(3,i)+cphip(3)*uind(3,i)
+!     &                      +cphid(4)*uinp(2,i)+cphip(4)*uind(2,i)
+     &                      -cphiad(3)*uinp(3,i)-cphip(3)*uaux(3,i)
+     &                      -cphiad(4)*uinp(2,i)-cphip(4)*uaux(2,i)
+     &                      -cphiap(3)*uind(3,i)-cphid(3)*upaux(3,i)
+     &                      -cphiap(4)*uind(2,i)-cphid(4)*upaux(2,i)
+     &                      +cphiap(3)*(auxtmp1(3,i)+auxtmp2(3,i))
+     &                      +cphiauxd(3)*upaux(3,i)
+     &                      +cphiap(4)*(auxtmp1(2,i)+auxtmp2(2,i))
+     &                      +cphiauxd(4)*upaux(2,i)
+     &                      +cphiad(3)*(auxptmp1(3,i)+auxptmp2(3,i))
+     &                      +cphiauxp(3)*uaux(3,i)
+     &                      +cphiad(4)*(auxptmp1(2,i)+auxptmp2(2,i))
+     &                      +cphiauxp(4)*uaux(2,i))
+     
+            vzz = vzz + cphi(4,i)*cmp(4,i)
+     &                - cphiaux(4,i)*cmp(4,i)
+     &                - 0.5d0*(cphim(4)*(auxtmp1(3,i)+auxtmp2(3,i)
+     &                                  +auxptmp1(3,i)+auxptmp2(3,i))
+     &                     -cphim(4)*(uind(3,i)+uinp(3,i))
+!     &                     +cphid(4)*uinp(3,i)+cphip(4)*uind(3,i)
+     &                     -cphiad(4)*uinp(3,i)-cphip(4)*uaux(3,i)
+     &                     -cphiap(4)*uind(3,i)-cphid(4)*upaux(3,i)
+     &                     +cphiap(4)*(auxtmp1(3,i)+auxtmp2(3,i))
+     &                     +cphiauxd(4)*upaux(3,i)
+     &                     +cphiad(4)*(auxptmp1(3,i)+auxptmp2(3,i))
+     &                     +cphiauxp(4)*uaux(3,i))
+     
+            vxx = vxx-2.0d0*cmp(5,i)*cphiaux(5,i)-cmp(8,i)*cphiaux(8,i)
+     &                - cmp(9,i)*cphiaux(9,i)
+     &                + 2.0d0*cmp(5,i)*cphi(5,i) + cmp(8,i)*cphi(8,i)
+     &                + cmp(9,i)*cphi(9,i)
+            vxy = vxy - (cmp(5,i)+cmp(6,i))*cphiaux(8,i)
+     &                - 0.5d0*(cmp(8,i)*(cphiaux(6,i)+cphiaux(5,i))
+     &                  +cmp(9,i)*cphiaux(10,i)+cmp(10,i)*cphiaux(9,i))
+     &                + (cmp(5,i)+cmp(6,i))*cphi(8,i)
+     &                + 0.5d0*(cmp(8,i)*(cphi(6,i)+cphi(5,i))
+     &                  +cmp(9,i)*cphi(10,i)+cmp(10,i)*cphi(9,i))
+            vxz = vxz - (cmp(5,i)+cmp(7,i))*cphiaux(9,i)
+     &                - 0.5d0*(cmp(9,i)*(cphiaux(5,i)+cphiaux(7,i))
+     &                  +cmp(8,i)*cphiaux(10,i)+cmp(10,i)*cphiaux(8,i))
+     &                + (cmp(5,i)+cmp(7,i))*cphi(9,i)
+     &                + 0.5d0*(cmp(9,i)*(cphi(5,i)+cphi(7,i))
+     &                  +cmp(8,i)*cphi(10,i)+cmp(10,i)*cphi(8,i))
+            vyy = vyy-2.0d0*cmp(6,i)*cphiaux(6,i)-cmp(8,i)*cphiaux(8,i)
+     &                - cmp(10,i)*cphiaux(10,i)
+     &                + 2.0d0*cmp(6,i)*cphi(6,i) + cmp(8,i)*cphi(8,i)
+     &                + cmp(10,i)*cphi(10,i)
+            vyz = vyz - (cmp(6,i)+cmp(7,i))*cphiaux(10,i)
+     &                - 0.5d0*(cmp(10,i)*(cphiaux(6,i)+cphiaux(7,i))
+     &                  +cmp(8,i)*cphiaux(9,i)+cmp(9,i)*cphiaux(8,i))
+     &                + (cmp(6,i)+cmp(7,i))*cphi(10,i)
+     &                + 0.5d0*(cmp(10,i)*(cphi(6,i)+cphi(7,i))
+     &                  +cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
+            vzz = vzz-2.0d0*cmp(7,i)*cphiaux(7,i)-cmp(9,i)*cphiaux(9,i)
+     &                - cmp(10,i)*cphiaux(10,i)
+     &                + 2.0d0*cmp(7,i)*cphi(7,i) + cmp(9,i)*cphi(9,i)
+     &                + cmp(10,i)*cphi(10,i)
+         end if
          if (poltyp.eq.'DIRECT' .or. poltyp.eq.'OPT') then
             vxx = vxx + 0.5d0*(cphid(2)*uinp(1,i)+cphip(2)*uind(1,i))
             vxy = vxy + 0.25d0*(cphid(2)*uinp(2,i)+cphip(2)*uind(2,i)
@@ -5075,15 +6584,44 @@ c
       deallocate (fphid)
       deallocate (fphip)
       deallocate (fphidp)
+      if (use_iel0scf) then!ALBAUGH
+         deallocate (fauxd)
+         deallocate (fauxp)
+         deallocate (fphiauxd)
+         deallocate (fphiauxp)
+         deallocate (fphiauxdp)
+         deallocate (fad)
+         deallocate (fap)
+         deallocate (fphiad)
+         deallocate (fphiap)
+         deallocate (fphiadp)
+         deallocate (cphiaux)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (qgrip(2,nfft1,nfft2,nfft3))
+      if (use_iel0scf) then!ALBAUGH
+         allocate (qgridn(2,nfft1,nfft2,nfft3))
+         allocate (qgripn(2,nfft1,nfft2,nfft3))
+         allocate (qgriad(2,nfft1,nfft2,nfft3))
+         allocate (qgriadn(2,nfft1,nfft2,nfft3))
+         allocate (qgriap(2,nfft1,nfft2,nfft3))
+         allocate (qgriapn(2,nfft1,nfft2,nfft3))
+         allocate (qgriauxd(2,nfft1,nfft2,nfft3))
+         allocate (qgriauxdn(2,nfft1,nfft2,nfft3))
+         allocate (qgriauxp(2,nfft1,nfft2,nfft3))
+         allocate (qgriauxpn(2,nfft1,nfft2,nfft3))
+         allocate (qgrialtd(2,nfft1,nfft2,nfft3))
+         allocate (qgrialtdn(2,nfft1,nfft2,nfft3))
+         allocate (qgrialtp(2,nfft1,nfft2,nfft3))
+         allocate (qgrialtpn(2,nfft1,nfft2,nfft3))
+      end if
 c
 c     assign permanent and induced multipoles to the PME grid
 c     and perform the 3-D FFT forward transformation
 c
-      do i = 1, npole
+      do i = 1, npole !ALBAUGH - pick up here
          do j = 2, 4
             cmp(j,i) = cmp(j,i) + uinp(j-1,i)
          end do
@@ -5099,6 +6637,264 @@ c
             end do
          end do
       end do
+      
+      if (use_iel0scf) then!ALBAUGH
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) - uinp(j-1,i) + uaux(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriad(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriad(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) - uaux(j-1,i) + upaux(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriap(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriap(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) - upaux(j-1,i)
+     &                     + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriauxp(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriauxp(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) - auxptmp1(j-1,i) - auxptmp2(j-1,i)
+     &                     + auxtmp1(j-1,i) + auxtmp2(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriauxd(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriauxd(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) - uind(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgrialtd(1,i,j,k) = qgrid(1,i,j,k)
+                  qgrialtd(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + uind(j-1,i) - auxtmp1(j-1,i)
+     &                     - auxtmp2(j-1,i) - uinp(j-1,i) 
+     &                     + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgrialtp(1,i,j,k) = qgrid(1,i,j,k)
+                  qgrialtp(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + uinp(j-1,i) - auxptmp1(j-1,i)
+     &                     - auxptmp2(j-1,i) - uind(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgridn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgridn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + uind(j-1,i) - uinp(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgripn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgripn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + uinp(j-1,i) - uaux(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriadn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriadn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + uaux(j-1,i) - upaux(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriapn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriapn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + upaux(j-1,i) - auxtmp1(j-1,i) 
+     &                     - auxtmp2(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriauxdn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriauxdn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + auxtmp1(j-1,i) + auxtmp2(j-1,i) 
+     &                     - auxptmp1(j-1,i) - auxptmp2(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgriauxpn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgriauxpn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+     &                     - auxtmp1(j-1,i) - auxtmp2(j-1,i)
+     &                     + uind(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgrialtdn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgrialtdn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + auxtmp1(j-1,i) + auxtmp2(j-1,i)
+     &                     - uind(j-1,i) - auxptmp1(j-1,i)
+     &                     - auxptmp2(j-1,i) + uinp(j-1,i)
+            end do
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  qgrialtpn(1,i,j,k) = qgrid(1,i,j,k)
+                  qgrialtpn(2,i,j,k) = qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+         
+         do i = 1, npole
+            do j = 2, 4
+               cmp(j,i) = cmp(j,i) + auxptmp1(j-1,i) + auxptmp2(j-1,i)
+            end do
+         end do
+      end if
+      
       do i = 1, npole
          do j = 2, 4
             cmp(j,i) = cmp(j,i) + uind(j-1,i) - uinp(j-1,i)
@@ -5140,6 +6936,23 @@ c
             end if
             struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
      &                  + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
+            if (use_iel0scf) then!ALBAUGH
+               struc2 = 0.5d0*struc2!0.5f(x,y)
+     &             +0.5d0*(qgridn(1,k1,k2,k3)*qgripn(1,k1,k2,k3)
+     &                    +qgridn(2,k1,k2,k3)*qgripn(2,k1,k2,k3))!0.5f(-x,-y)
+     &             +0.5d0*(qgrialtp(1,k1,k2,k3)*qgriad(1,k1,k2,k3)
+     &                    +qgrialtp(2,k1,k2,k3)*qgriad(2,k1,k2,k3))!0.5*f(a-x,h)
+     &             +0.5d0*(qgrialtpn(1,k1,k2,k3)*qgriadn(1,k1,k2,k3)
+     &                    +qgrialtpn(2,k1,k2,k3)*qgriadn(2,k1,k2,k3))!0.5f(-a+x,-h)
+     &             +0.5d0*(qgrialtd(1,k1,k2,k3)*qgriap(1,k1,k2,k3)
+     &                    +qgrialtd(2,k1,k2,k3)*qgriap(2,k1,k2,k3))!0.5f(b-y,g)
+     &             +0.5d0*(qgrialtdn(1,k1,k2,k3)*qgriapn(1,k1,k2,k3)
+     &                    +qgrialtdn(2,k1,k2,k3)*qgriapn(2,k1,k2,k3))!0.5f(-b+y,-g)
+     &             +0.5d0*(qgriauxd(1,k1,k2,k3)*qgriauxp(1,k1,k2,k3)
+     &                    +qgriauxd(2,k1,k2,k3)*qgriauxp(2,k1,k2,k3))!0.5f(a,b)
+     &             -0.5d0*(qgriauxdn(1,k1,k2,k3)*qgriauxpn(1,k1,k2,k3)
+     &                    +qgriauxdn(2,k1,k2,k3)*qgriauxpn(2,k1,k2,k3))!0.5f(-a,-b)
+            end if
             eterm = 0.5d0 * electric * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx + h1*h1*vterm - eterm
@@ -5243,5 +7056,21 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (qgrip)
+      if (use_iel0scf) then!ALBAUGH
+         deallocate (qgridn)
+         deallocate (qgripn)
+         deallocate (qgriad)
+         deallocate (qgriap)
+         deallocate (qgriadn)
+         deallocate (qgriapn)
+         deallocate (qgriauxd)
+         deallocate (qgriauxp)
+         deallocate (qgriauxdn)
+         deallocate (qgriauxpn)
+         deallocate (qgrialtd)
+         deallocate (qgrialtp)
+         deallocate (qgrialtdn)
+         deallocate (qgrialtpn)
+      end if
       return
       end

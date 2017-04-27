@@ -807,6 +807,8 @@ c
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
+      real*8, allocatable :: derivs(:,:)
+      allocate(derivs(3,n))!ALBAUGHTEST
 c
 c
 c     set relative volume change for finite-differences
@@ -853,7 +855,8 @@ c
 c
 c     compute potential energy for negative volume change
 c
-      eneg = energy ()
+      call gradient (eneg,derivs)!ALBAUGHTEST
+      !eneg = energy ()
 c
 c     get scale factor to reflect a positive volume change
 c
@@ -875,7 +878,8 @@ c
 c
 c     compute potential energy for positive volume change
 c
-      epos = energy ()
+      call gradient (epos,derivs)!ALBAUGHTEST
+      !epos = energy ()
 c
 c     restore original box dimensions and coordinate values
 c
@@ -923,5 +927,6 @@ c
    60    format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
      &              ' Atmospheres')
       end if
+      deallocate(derivs)!ALBAUGHTEST
       return
       end

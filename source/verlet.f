@@ -39,6 +39,12 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: derivs(:,:)
+      logical isayso!ALBAUGHTEST
+      integer chosen,direction
+      integer kk,ll
+      real*8 diff
+      real*8 xt,yt,zt
+      real*8 fc(3),en(3)
 c
 c
 c     set some time values for the dynamics integration
@@ -51,6 +57,68 @@ c
       allocate (yold(n))
       allocate (zold(n))
       allocate (derivs(3,n))
+      
+      
+      
+      
+      print*,x(1),y(1),z(1),uind(1,1),uind(2,1),uind(3,1),
+     &       uaux(1,1),uaux(2,1),uaux(3,1)
+      isayso = .true.!ALBAUGHTEST
+      if(isayso)then
+         call ptest
+         chosen = 1
+         direction = 1
+         diff = 0.000001d0
+         
+         if(direction.eq.1)then
+            xt = x(chosen)
+         elseif(direction.eq.2)then
+            yt = y(chosen)
+         elseif(direction.eq.3)then
+            zt = z(chosen)
+         end if 
+
+         do ll = 1,3
+            do kk = 1, 3
+               fc(kk) = 0.0d0
+               en(kk) = 0.0d0
+            end do
+            
+            do kk = 1, 3
+               call gradient (epot,derivs)
+               fc(kk) = -derivs(direction,chosen)
+               en(kk) = epot
+               if(direction.eq.1)then
+                  x(chosen) = x(chosen) + diff
+               elseif(direction.eq.2)then
+                  y(chosen) = y(chosen) + diff
+               elseif(direction.eq.3)then
+                  z(chosen) = z(chosen) + diff
+               end if
+            end do
+            
+            print*,"Analytical:",ll,fc(2)
+            print*,"Numerical: ",ll,-(en(3)-en(1))/(2.0d0*diff)
+            print*,fc(2)/(-(en(3)-en(1))/(2.0d0*diff)),
+     &             fc(2)-(-(en(3)-en(1))/(2.0d0*diff))!,
+         end do
+         if(direction.eq.1)then
+            x(chosen) = xt
+         elseif(direction.eq.2)then
+            y(chosen) = yt
+         elseif(direction.eq.3)then
+            z(chosen) = zt
+         end if
+         !stop
+      end if      
+      
+      
+      
+      
+      
+      
+      
+      
 c
 c     store the current atom positions, then find half-step
 c     velocities and full-step positions via Verlet recursion
@@ -71,7 +139,7 @@ c
 c
 c     apply Verlet half-step updates for any auxiliary dipoles
 c
-      if (use_ielscf) then
+      if (use_ielscf .or. use_iel0scf) then
          do i = 1, n
             if (use(i)) then
                do j = 1, 3
@@ -94,7 +162,7 @@ c
 c
 c     make half-step temperature and pressure corrections
 c
-      call temper2 (dt,temp)
+      !call temper2 (dt,temp) ALBAUGHTEST
       call pressure2 (epot,temp)
 c
 c     use Newton's second law to get the next accelerations;
@@ -123,6 +191,18 @@ c
                end do
             end if
          end do
+      else if (use_iel0scf) then
+         term = 2.0d0 / (dt*dt)
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  aaux(j,i) = gamma_aux * term * (uind(j,i)-uaux(j,i))
+                  apaux(j,i) = gamma_aux * term * (uinp(j,i)-upaux(j,i))
+                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
+                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
+               end do
+            end if
+         end do
       end if
 c
 c     perform deallocation of some local arrays
@@ -138,7 +218,7 @@ c
 c
 c     make full-step temperature and pressure corrections
 c
-      call temper (dt,eksum,ekin,temp)
+      !call temper (dt,eksum,ekin,temp) ALBAUGHTEST
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies

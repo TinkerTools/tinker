@@ -236,6 +236,27 @@ c
          call dfield0a (field,fieldp)
       end if
 c
+c     save intermediate vectors for iEL/0-SCF      
+c
+      if(use_iel0scf) then!ALBAUGH
+         do i = 1, npole
+            do j = 1, 3
+               !auxtmp(j,i) = 0.0d0
+               auxtmp1(j,i) = 0.0d0
+               auxtmp2(j,i) = 0.0d0
+               !auxptmp(j,i) = 0.0d0
+               auxptmp1(j,i) = 0.0d0
+               auxptmp2(j,i) = 0.0d0
+            end do
+            if(douind(ipole(i)))then
+               do j = 1, 3
+                  auxtmp2(j,i) = polarity(i)*field(j,i)
+                  auxptmp2(j,i) = polarity(i)*fieldp(j,i)
+               end do
+            end if
+         end do
+      end if
+c
 c     set induced dipoles to polarizability times direct field
 c
       do i = 1, npole
@@ -331,12 +352,14 @@ c
 c
 c     estimate induced dipoles via inertial extended Lagrangian
 c
-         if (use_ielscf) then
+         if (use_ielscf .or. use_iel0scf) then!ALBAUGH
             do i = 1, npole
-               do j = 1, 3
-                  uind(j,i) = uaux(j,i)
-                  uinp(j,i) = upaux(j,i)
-               end do
+               if (douind(ipole(i))) then!ALBAUGH
+                  do j = 1, 3
+                     uind(j,i) = uaux(j,i)
+                     uinp(j,i) = upaux(j,i)
+                  end do
+               end if
             end do
          end if
 c
@@ -361,6 +384,63 @@ c
          else
             call ufield0a (field,fieldp)
          end if
+
+c
+c     For the iEL/0-SCF method set the dipoles to the direct + mutual based on a first guess from the auxiliaries         
+c
+         if( use_iel0scf ) then!ALBAUGH
+            do i = 1, npole
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uind(j,i) = udir(j,i) + polarity(i)*field(j,i)
+                     uinp(j,i) = udirp(j,i) + polarity(i)*fieldp(j,i)
+                     !auxtmp(j,i) = -field(j,i)
+                     !auxptmp(j,i) = -fieldp(j,i)
+                  end do
+               end if
+            end do
+            
+            !do i = 1, npole
+            !   do j = 1, 3
+            !      utemp(j,i) = uind(j,i)
+            !      uptemp(j,i)= uinp(j,i)
+            !   end do
+            !end do
+            
+            if (use_ewald) then
+               call ufield0c (field,fieldp)
+             else if (use_mlist) then
+               call ufield0b (field,fieldp)
+            else
+               call ufield0a (field,fieldp)
+            end if
+            
+            do i = 1, npole
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     !uind(j,i) = utemp(j,i)
+                     !uinp(j,i) = uptemp(j,i)
+                     auxtmp1(j,i) = polarity(i)*field(j,i)
+                     auxptmp1(j,i)= polarity(i)*fieldp(j,i)
+                  end do
+               end if
+            end do
+            
+            deallocate (poli)
+            deallocate (rsd)
+            deallocate (rsdp)
+            deallocate (zrsd)
+            deallocate (zrsdp)
+            deallocate (conj)
+            deallocate (conjp)
+            deallocate (vec)
+            deallocate (vecp)
+            deallocate (field)
+            deallocate (fieldp)
+            return
+         end if
+         
+         
 c
 c     set initial conjugate gradient residual and conjugate vector
 c

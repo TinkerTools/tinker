@@ -125,7 +125,7 @@ c
 c
 c     apply Verlet half-step updates for any auxiliary dipoles
 c
-      if (use_ielscf) then
+      if (use_ielscf .or. use_iel0scf) then
          do i = 1, n
             if (use(i)) then
                do j = 1, 3
@@ -193,6 +193,20 @@ c
                end do
             end if
          end do
+         call temper(dt,eksum,ekin,temp)
+      else if (use_iel0scf) then
+         term = 2.0d0 *gamma_aux / (dt*dt)
+         do i = 1, n
+            if (use(i)) then
+               do j = 1, 3
+                  aaux(j,i) = term * (uind(j,i)-uaux(j,i))
+                  apaux(j,i) = term * (uinp(j,i)-upaux(j,i))
+                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
+                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
+               end do
+            end if
+         end do
+         call temper(dt,eksum,ekin,temp)
       end if
 c
 c     find the constraint-corrected full-step velocities

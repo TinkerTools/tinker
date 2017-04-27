@@ -16,7 +16,7 @@ c     "readdyn" get the positions, velocities and accelerations
 c     for a molecular dynamics restart from an external disk file
 c
 c
-      subroutine readdyn (idyn)
+      subroutine readdyn (idyn,idynaux,idynauxp)!ALBAUGH
       use sizes
       use atoms
       use boxes
@@ -26,8 +26,12 @@ c
       use mdstuf
       use moldyn
       use rgddyn
+      use ielscf!ALBAUGH
+      use mpole!ALBAUGH
+      use polar!ALBAUGH
       implicit none
       integer i,idyn,ndyn
+      integer idynaux,idynauxp!ALBAUGH
       logical exist,opened,quit
       character*240 dynfile
       character*240 record
@@ -162,5 +166,200 @@ c
      &              ' File at Atom',i6)
          call fatal
       end if
+      
+      if (use_ielscf .or. use_iel0scf) then
+c
+c
+c     open the input file if it has not already been done
+c
+         inquire (unit=idynaux,opened=opened)
+         if (.not. opened) then
+             dynfile = filename(1:leng)//'.auxdyn'
+           call version (dynfile,'old')
+            inquire (file=dynfile,exist=exist)
+            if (exist) then
+               open (unit=idynaux,file=dynfile,status='old')
+               rewind (unit=idynaux)
+            else
+               write (iout,260)
+  260          format (/,' READDYN  --  Unable to Find the Auxiliary',
+     &                 ' Restart File')
+               call fatal
+            end if
+         end if
+c
+c     initialize error handling during reading of the file
+c
+         i = 0
+         quit = .true.
+c
+c     get the number of atoms and check for consistency
+c
+         read (idynaux,270)
+  270    format ()
+         read (idynaux,280)  record
+  280    format (a240)
+         read (record,*,err=410,end=410)  ndyn
+         if (ndyn .ne. npole) then
+            write (iout,290)
+  290       format (/,' READDYN  --  Restart File has Incorrect',
+     &              ' Number of Auxiliaries')
+             call fatal
+         end if
+c
+c     get the periodic box edge lengths and angles
+c
+         read (idynaux,300)
+  300    format ()
+         read (idynaux,310)  record
+  310    format (a240)
+         read (record,*,err=410,end=410)
+         read (idynaux,320)  record
+  320    format (a240)
+         read (record,*,err=410,end=410)
+
+         read (idynaux,330)
+  330    format ()
+         do i = 1, npole
+            read (idynaux,340)  record
+  340       format (a240)
+            read (record,*,err=410,end=410)  uaux(1,i),uaux(2,i),
+     &                                        uaux(3,i)
+         end do
+         read (idynaux,350)
+  350    format ()
+         do i = 1, npole
+            read (idynaux,360)  record
+  360       format (a240)
+            read (record,*,err=410,end=410)  vaux(1,i),vaux(2,i),
+     &                                        vaux(3,i)
+         end do
+         read (idynaux,370)
+  370    format ()
+         do i = 1, n
+            read (idynaux,380)  record
+  380       format (a240)
+            read (record,*,err=410,end=410)  aaux(1,i),aaux(2,i),
+     &                                        aaux(3,i)
+         end do
+         read (idynaux,390)
+  390    format ()
+         do i = 1, n
+            read (idynaux,400)  record
+  400       format (a240)
+            read (record,*,err=410,end=410)  uind(1,i),uind(2,i),
+     &                                         uind(3,i)
+         end do
+         
+         quit = .false.
+  410    continue
+         if (.not. opened)  close (unit=idynaux)
+c
+c     report any error in reading the dynamics restart file
+c
+         if (quit) then
+            write (iout,420)  i
+  420       format (/,' READDYN  --  Error in Auxiliary Restart',
+     &              ' File at Atom',i6)
+            call fatal
+         end if
+
+c
+c
+c     open the input file if it has not already been done
+c
+         inquire (unit=idynauxp,opened=opened)
+         if (.not. opened) then
+             dynfile = filename(1:leng)//'.auxpdyn'
+           call version (dynfile,'old')
+            inquire (file=dynfile,exist=exist)
+            if (exist) then
+               open (unit=idynauxp,file=dynfile,status='old')
+               rewind (unit=idynauxp)
+            else
+               write (iout,430)
+  430          format (/,' READDYN  --  Unable to Find the P-Auxiliary',
+     &                 ' Restart File')
+               call fatal
+            end if
+         end if
+c
+c     initialize error handling during reading of the file
+c
+         i = 0
+         quit = .true.
+c
+c     get the number of atoms and check for consistency
+c
+         read (idynauxp,440)
+  440    format ()
+         read (idynauxp,450)  record
+  450    format (a240)
+         read (record,*,err=580,end=580)  ndyn
+         if (ndyn .ne. npole) then
+            write (iout,460)
+  460       format (/,' READDYN  --  Restart File has Incorrect',
+     &              ' Number of P-Auxiliaries')
+             call fatal
+         end if
+c
+c     get the periodic box edge lengths and angles
+c
+         read (idynauxp,470)
+  470    format ()
+         read (idynauxp,480)  record
+  480    format (a240)
+         read (record,*,err=580,end=580)
+         read (idynauxp,490)  record
+  490    format (a240)
+         read (record,*,err=580,end=580)
+
+         read (idynauxp,500)
+  500    format ()
+         do i = 1, npole
+            read (idynauxp,510)  record
+  510       format (a240)
+            read (record,*,err=580,end=580)  upaux(1,i),upaux(2,i),
+     &                                        upaux(3,i)
+         end do
+         read (idynauxp,520)
+  520    format ()
+         do i = 1, npole
+            read (idynauxp,530)  record
+  530       format (a240)
+            read (record,*,err=580,end=580)  vpaux(1,i),vpaux(2,i),
+     &                                        vpaux(3,i)
+         end do
+         read (idynauxp,540)
+  540    format ()
+         do i = 1, n
+            read (idynauxp,550)  record
+  550       format (a240)
+            read (record,*,err=580,end=580)  apaux(1,i),apaux(2,i),
+     &                                        apaux(3,i)
+         end do
+         read (idynauxp,560)
+  560    format ()
+         do i = 1, n
+            read (idynauxp,570)  record
+  570       format (a240)
+            read (record,*,err=580,end=580)  uinp(1,i),uinp(2,i),
+     &                                         uinp(3,i)
+         end do
+         
+         quit = .false.
+  580    continue
+         if (.not. opened)  close (unit=idynauxp)
+c
+c     report any error in reading the dynamics restart file
+c
+         if (quit) then
+            write (iout,590)  i
+  590       format (/,' READDYN  --  Error in P-Auxiliary Restart',
+     &              ' File at Atom',i6)
+            call fatal
+         end if  
+      end if
+      
       return
       end
