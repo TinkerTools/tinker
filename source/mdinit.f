@@ -415,9 +415,13 @@ c
          idynaux = 0!ALBAUGH
          idynauxp = 0
          if (use_ielscf .or. use_iel0scf) then
+            dynfileaux = filename(1:leng)//'.auxdyn'
+            call version (dynfileaux,'old')
             idynaux = freeunit ()
             open (unit=idynaux,file=dynfileaux,status='old')
             rewind (unit=idynaux)
+            dynfileauxp = filename(1:leng)//'.auxpdyn'
+            call version (dynfileauxp,'old')
             idynauxp = freeunit ()
             open (unit=idynauxp,file=dynfileauxp,status='old')
             rewind (unit=idynauxp)
