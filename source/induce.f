@@ -2108,7 +2108,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                rr1 = 1.0d0 / r
                rr2 = rr1 * rr1
@@ -2300,7 +2300,7 @@ c
 c
 c     calculate the error function damping factors
 c
-                  if (r2 .le. cut2) then
+                  if (r2 .le. off2) then
                      r = sqrt(r2)
                      rr1 = 1.0d0 / r
                      rr2 = rr1 * rr1
@@ -2563,7 +2563,7 @@ c
 !$OMP& rpole,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,
 !$OMP& d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,n13,
 !$OMP& i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
-!$OMP& nelst,elst,cut2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,
+!$OMP& nelst,elst,off2,aewald,aesq2,aesq2n,poltyp,ntpair,tindex,
 !$OMP& tdipdip,toffset,maxlocal,field,fieldp,fieldt,fieldtp,maxelst,
 !$OMP& nthread,nchunk)
 !$OMP& firstprivate(pscale,dscale,uscale,nlocal)
@@ -2632,7 +2632,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                rr1 = 1.0d0 / r
                rr2 = rr1 * rr1
@@ -3073,7 +3073,7 @@ c
             zr = z(kk) - z(ii)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                rr1 = 1.0d0 / r
                rr2 = rr1 * rr1
@@ -3203,7 +3203,7 @@ c
 c
 c     calculate the error function damping factors
 c
-                  if (r2 .le. cut2) then
+                  if (r2 .le. off2) then
                      r = sqrt(r2)
                      rr1 = 1.0d0 / r
                      rr2 = rr1 * rr1

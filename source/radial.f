@@ -245,7 +245,7 @@ c
 c     set the number of distance bins to be accumulated
 c
       nbin = int(rmax/width)
-      write (*,200)  nbin
+      write (iout,200)  nbin
   200 format (' Number of Distance Bins :',i18)
 c
 c     perform dynamic allocation of some local arrays

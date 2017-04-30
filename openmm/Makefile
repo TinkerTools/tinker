@@ -81,7 +81,7 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 
 ##  Machine:  MacOS
