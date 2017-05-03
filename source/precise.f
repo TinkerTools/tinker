@@ -5,17 +5,17 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #########################################################
-c     ##                                                     ##
-c     ##  function precise  --  determine machine precision  ##
-c     ##                                                     ##
-c     #########################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  function precise  --  determine machine precision values  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "precise" finds a machine precision value as selected by
-c     the input argument: (1) the smallest positive floating
-c     point value, (2) the smallest relative floating point
-c     spacing, (3) the largest relative floating point spacing
+c     "precise" finds a machine precision value as selected by the
+c     input argument: (1) the smallest positive floating point value,
+c     (2) the smallest relative floating point spacing, or (3) the
+c     largest relative floating point spacing
 c
 c
       function precise (i)
@@ -33,12 +33,12 @@ c
       precise = one
 c
 c     find the smallest positive floating point value;
-c     minimum of 0.24x10-307 is a patch for some SGI's,
-c     for Sparc cpu's under Linux, etc.
+c     hard coded minimum of 0.24x10-307 is a patch needed for
+c     some machines (SGI's, Sparc CPU's under Linux, etc.)
 c
       if (i .eq. 1) then
-c        do while (precise .ne. zero)
-         do while (precise .ge. 0.24d-307)
+         do while (precise .ne. zero)
+c        do while (precise .ge. 0.24d-307)
             value = precise
             precise = precise / delta
          end do

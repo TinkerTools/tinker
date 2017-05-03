@@ -204,8 +204,8 @@ c     ###############################################################
 c
 c
 c     "empole2a" computes multipole first derivatives for a single
-c     atom with respect to Cartesian coordinates; used to get finite
-c     difference second derivatives
+c     atom via a double loop; used to get finite difference second
+c     derivatives
 c
 c
       subroutine empole2a (nlist,list)
@@ -830,8 +830,9 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "empole2b" calculates the multipole energy and derivatives
-c     with respect to Cartesian coordinates using a neighbor list
+c     "empole2b" calculates multipole first derivatives for a single
+c     atom via a neighbor list; used to get finite difference second
+c     derivatives
 c
 c
       subroutine empole2b (nlist,list)

@@ -37,6 +37,7 @@ c
       use hessn
       use limits
       use mpole
+      use potent
       implicit none
       integer i,j,k
       integer nlist
@@ -47,6 +48,7 @@ c
       logical biglist
       logical twosided
       logical reinduce
+      logical save_mpole
 c
 c
 c     set the default stepsize and accuracy control flags
@@ -86,13 +88,26 @@ c
          end if
       end do
 c
+c     turn off multipole term as needed for Ewald gradient calls
+c
+      save_mpole = use_mpole
+      use_mpole = .false.
+c
 c     get multipole first derivatives for the base structure
 c
       if (.not. twosided) then
-         if (use_mlist) then
-            call epolar2b (nlist,list,reinduce)
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar1d
+            else
+               call epolar1c
+            end if
          else
-            call epolar2a (nlist,list,reinduce)
+            if (use_mlist) then
+               call epolar2b (nlist,list,reinduce)
+            else
+               call epolar2a (nlist,list,reinduce)
+            end if
          end if
          do k = 1, n
             do j = 1, 3
@@ -106,10 +121,18 @@ c
       old = x(i)
       if (twosided) then
          x(i) = x(i) - 0.5d0*eps
-         if (use_mlist) then
-            call epolar2b (nlist,list,reinduce)
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar1d
+            else
+               call epolar1c
+            end if
          else
-            call epolar2a (nlist,list,reinduce)
+            if (use_mlist) then
+               call epolar2b (nlist,list,reinduce)
+            else
+               call epolar2a (nlist,list,reinduce)
+            end if
          end if
          do k = 1, n
             do j = 1, 3
@@ -118,10 +141,18 @@ c
          end do
       end if
       x(i) = x(i) + eps
-      if (use_mlist) then
-         call epolar2b (nlist,list,reinduce)
+      if (use_ewald) then
+         if (use_mlist) then
+            call epolar1d
+         else
+            call epolar1c
+         end if
       else
-         call epolar2a (nlist,list,reinduce)
+         if (use_mlist) then
+            call epolar2b (nlist,list,reinduce)
+         else
+            call epolar2a (nlist,list,reinduce)
+         end if
       end if
       x(i) = old
       do k = 1, n
@@ -135,10 +166,18 @@ c
       old = y(i)
       if (twosided) then
          y(i) = y(i) - 0.5d0*eps
-         if (use_mlist) then
-            call epolar2b (nlist,list,reinduce)
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar1d
+            else
+               call epolar1c
+            end if
          else
-            call epolar2a (nlist,list,reinduce)
+            if (use_mlist) then
+               call epolar2b (nlist,list,reinduce)
+            else
+               call epolar2a (nlist,list,reinduce)
+            end if
          end if
          do k = 1, n
             do j = 1, 3
@@ -147,10 +186,18 @@ c
          end do
       end if
       y(i) = y(i) + eps
-      if (use_mlist) then
-         call epolar2b (nlist,list,reinduce)
+      if (use_ewald) then
+         if (use_mlist) then
+            call epolar1d
+         else
+            call epolar1c
+         end if
       else
-         call epolar2a (nlist,list,reinduce)
+         if (use_mlist) then
+            call epolar2b (nlist,list,reinduce)
+         else
+            call epolar2a (nlist,list,reinduce)
+         end if
       end if
       y(i) = old
       do k = 1, n
@@ -164,10 +211,18 @@ c
       old = z(i)
       if (twosided) then
          z(i) = z(i) - 0.5d0*eps
-         if (use_mlist) then
-            call epolar2b (nlist,list,reinduce)
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar1d
+            else
+               call epolar1c
+            end if
          else
-            call epolar2a (nlist,list,reinduce)
+            if (use_mlist) then
+               call epolar2b (nlist,list,reinduce)
+            else
+               call epolar2a (nlist,list,reinduce)
+            end if
          end if
          do k = 1, n
             do j = 1, 3
@@ -176,10 +231,18 @@ c
          end do
       end if
       z(i) = z(i) + eps
-      if (use_mlist) then
-         call epolar2b (nlist,list,reinduce)
+      if (use_ewald) then
+         if (use_mlist) then
+            call epolar1d
+         else
+            call epolar1c
+         end if
       else
-         call epolar2a (nlist,list,reinduce)
+         if (use_mlist) then
+            call epolar2b (nlist,list,reinduce)
+         else
+            call epolar2a (nlist,list,reinduce)
+         end if
       end if
       z(i) = old
       do k = 1, n
@@ -187,6 +250,10 @@ c
             hessz(j,k) = hessz(j,k) + (dep(j,k)-d0(j,k))/eps
          end do
       end do
+c
+c     restore permanent multipole term to its original status
+c
+      use_mpole = save_mpole
 c
 c     perform deallocation of some global arrays
 c

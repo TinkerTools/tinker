@@ -28,7 +28,7 @@ c     ta,tb,y   local vectors containing temporary work space
 c
 c     literature reference:
 c
-c     adapted from an original program written by Bernie Brooks,
+c     adapted from an original routine written by Bernie Brooks,
 c     National Institutes of Health, Bethesda, MD
 c
 c
