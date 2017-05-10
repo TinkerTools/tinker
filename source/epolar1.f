@@ -71,6 +71,7 @@ c
       use shunt
       use virial
       use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer ii,kk,jcell
@@ -157,15 +158,19 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
+         if (.not. use_mpole)  call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+         if (.not. use_mpole)  call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
-      call induce
+         call induce
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1639,6 +1644,7 @@ c
       use shunt
       use virial
       use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
@@ -1725,15 +1731,19 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
+         if (.not. use_mpole)  call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+         if (.not. use_mpole)  call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
-      call induce
+         call induce
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2550,6 +2560,7 @@ c
       use potent
       use virial
       use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,ii
       real*8 e,f,term,fterm
@@ -2582,15 +2593,19 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole 
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
+         if (.not. use_mpole)  call chkpole 
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole 
+         if (.not. use_mpole)  call rotpole 
 c
 c     compute the induced dipoles at each polarizable atom
 c
-      call induce
+         call induce
+      end if
 c
 c     compute the real space part of the Ewald summation
 c
@@ -4539,6 +4554,7 @@ c
       use potent
       use virial
       use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,ii
       real*8 e,f,term,fterm
@@ -4571,15 +4587,19 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      if (.not. use_mpole)  call chkpole
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
+         if (.not. use_mpole)  call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+         if (.not. use_mpole)  call rotpole
 c
 c     compute the induced dipoles at each polarizable atom
 c
-      call induce
+         call induce
+      end if
 c
 c     compute the real space part of the Ewald summation
 c

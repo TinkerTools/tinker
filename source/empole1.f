@@ -68,6 +68,8 @@ c
       use shunt
       use usage
       use virial
+      use mdstuf!ALBAUGH
+      use ielscf!ALBAUGH
       implicit none
       integer i,j,k
       integer ii,kk,jcell
@@ -130,14 +132,19 @@ c
          end do
       end do
       if (npole .eq. 0)  return
+      
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
 c
 c     check the sign of multipole components at chiral sites
 c
-      call chkpole
+         call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+         call rotpole
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -783,6 +790,8 @@ c
       use shunt
       use usage
       use virial
+      use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,k
       integer ii,kk,kkk
@@ -848,11 +857,15 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      call chkpole
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
+         call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+         call rotpole
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1217,6 +1230,8 @@ c
       use math
       use mpole
       use virial
+      use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,ii
       real*8 e,f
@@ -1250,11 +1265,15 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      call chkpole
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+      
+      else
+         call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+         call rotpole
+      end if
 c
 c     compute the real space part of the Ewald summation
 c
@@ -2096,6 +2115,8 @@ c
       use math
       use mpole
       use virial
+      use ielscf!ALBAUGH
+      use mdstuf!ALBAUGH
       implicit none
       integer i,j,ii
       real*8 e,f
@@ -2129,11 +2150,15 @@ c
 c
 c     check the sign of multipole components at chiral sites
 c
-      call chkpole
+      if((integrate .eq.'RESPA').and.(use_ielscf.or.use_iel0scf))then!ALBAUGH
+     
+      else
+         call chkpole
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+         call rotpole
+      end if
 c
 c     compute the real space part of the Ewald summation
 c

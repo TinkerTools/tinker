@@ -28,14 +28,13 @@
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 viralt(3,3)
-      real*8 ep,e1,e2,e3
+      real*8 ep,es,ef
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: derivs(:,:)
-      real*8, allocatable :: derivs1(:,:)
-      real*8, allocatable :: derivs2(:,:)
-      real*8, allocatable :: derivs3(:,:)
+      real*8, allocatable :: derivsf(:,:)
+      real*8, allocatable :: derivss(:,:)
 c
 c
 c     set some time values for the dynamics integration
@@ -54,9 +53,8 @@ c
       dta_2 = 0.5d0 * dta
       
       allocate(derivs(3,n))
-      allocate(derivs1(3,n))
-      allocate(derivs2(3,n))
-      allocate(derivs3(3,n))
+      allocate(derivsf(3,n))
+      allocate(derivss(3,n))
       allocate (xold(n))
       allocate (yold(n))
       allocate (zold(n))
@@ -64,7 +62,6 @@ c
 c     store the current atom positions, then find half-step
 c     velocities via velocity Verlet recursion
 c
-      
       call temper2 (dt,temp)
       
       do l = 1, nmed
@@ -87,11 +84,11 @@ c
                end if
             end do
             if (use_rattle)  call rattle (dta,xold,yold,zold)
-            call gradfastaux(e1,derivs1)
+            call gradfast(ef,derivsf)
             do i = 1, n
                if (use(i)) then
                   do j = 1, 3
-                     derivs(j,i) = derivs1(j,i)
+                     derivs(j,i) = derivsf(j,i)
                      aaux(j,i) = 0.0d0
                      apaux(j,i) = 0.0d0
                   end do
@@ -106,7 +103,7 @@ c
             end do
             
             if (k .eq. nalt) then
-               call gradintaux(e2,derivs2)
+               call gradint
                term = 2.0d0 / (dtm*dtm)
                if (use_ielscf) then
                   do i = 1, n
@@ -116,8 +113,6 @@ c
      &                                   -uaux(j,i))*dble(nalt)
                            apaux(j,i)=term*(uinp(j,i)
      &                                   -upaux(j,i))*dble(nalt)
-                           derivs(j,i)=derivs(j,i)
-     &                                   +dble(nalt)*derivs2(j,i)
                         end do
                      end if
                   end do
@@ -129,24 +124,17 @@ c
      &                                   -uaux(j,i))*dble(nalt)
                            apaux(j,i)=gamma_aux*term*(uinp(j,i)
      &                                   -upaux(j,i))*dble(nalt)
-                           derivs(j,i)=derivs(j,i)
-     &                                   +dble(nalt)*derivs2(j,i)
                         end do
                      end if
                   end do
                end if
-               do i = 1, 3
-                  do j = 1, 3
-                     viralt(j,i) = viralt(j,i) + vir(j,i)/dble(nmed)
-                  end do
-               end do
                if(l .eq. nmed) then
-                  call gradslowaux(e3,derivs3)
+                  call gradslow(es,derivss)
                   do i = 1, n
                      if (use(i)) then
                         do j = 1, 3
                            derivs(j,i)=derivs(j,i)
-     &                        +derivs3(j,i)*dble(nalt)*dble(nmed)
+     &                        +derivss(j,i)*dble(nalt)*dble(nmed)
                         end do
                      end if
                   end do
@@ -179,16 +167,15 @@ c
       
       call temper (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
-      epot = e1 + e3 + e2
+      epot = ef + es
       etot = eksum + epot
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)
       
       deallocate (derivs)
-      deallocate (derivs1)
-      deallocate (derivs2)
-      deallocate (derivs3)
+      deallocate (derivsf)
+      deallocate (derivss)
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
@@ -196,264 +183,12 @@ c
       end
       
       
-
-
-      subroutine gradfastaux (energy,derivs)
-      use limits
-      use potent
+      
+      subroutine gradint
       implicit none
-      real*8 energy
-      real*8 derivs(3,*)
-      logical save_vdw,save_charge
-      logical save_chgdpl,save_dipole
-      logical save_mpole,save_polar
-      logical save_rxnfld,save_solv
-      logical save_list
-c
-c
-c     save the original state of slow-evolving potentials
-c
-      save_vdw = use_vdw
-      save_charge = use_charge
-      save_chgdpl = use_chgdpl
-      save_dipole = use_dipole
-      save_mpole = use_mpole
-      save_polar = use_polar
-      save_rxnfld = use_rxnfld
-      save_solv = use_solv
-      save_list = use_list
-c
-c     turn off slow-evolving nonbonded potential energy terms
-c
-      use_vdw = .false.
-      use_charge = .false.
-      use_chgdpl = .false.
-      use_dipole = .false.
-      use_mpole = .false.
-      use_polar = .false.
-      use_rxnfld = .false.
-      use_solv = .false.
-      use_list = .false.
-c
-c     get energy and gradient for fast-evolving potential terms
-c
-      call gradient (energy,derivs)
-c
-c     restore the original state of slow-evolving potentials
-c
-      use_vdw = save_vdw
-      use_charge = save_charge
-      use_chgdpl = save_chgdpl
-      use_dipole = save_dipole
-      use_mpole = save_mpole
-      use_polar = save_polar
-      use_rxnfld = save_rxnfld
-      use_solv = save_solv
-      use_list = save_list
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine gradslow  --  slow energy & gradient components  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "gradslow" calculates the potential energy and first derivatives
-c     for the slow-evolving nonbonded potential energy terms
-c
-c
-      subroutine gradslowaux (energy,derivs)
-      use potent
-      implicit none
-      real*8 energy
-      real*8 derivs(3,*)
-      logical save_bond,save_angle
-      logical save_strbnd,save_urey
-      logical save_angang,save_opbend
-      logical save_opdist,save_improp
-      logical save_imptor,save_tors
-      logical save_pitors,save_strtor
-      logical save_tortor,save_geom
-      logical save_metal,save_extra
-      logical save_polar
-c
-c
-c     save the original state of fast-evolving potentials
-c
-      save_bond = use_bond
-      save_angle = use_angle
-      save_strbnd = use_strbnd
-      save_urey = use_urey
-      save_angang = use_angang
-      save_opbend = use_opbend
-      save_opdist = use_opdist
-      save_improp = use_improp
-      save_imptor = use_imptor
-      save_tors = use_tors
-      save_pitors = use_pitors
-      save_strtor = use_strtor
-      save_tortor = use_tortor
-      save_geom = use_geom
-      save_metal = use_metal
-      save_extra = use_extra
-      save_polar = use_polar
-c
-c     turn off fast-evolving valence potential energy terms
-c
-      use_bond = .false.
-      use_angle = .false.
-      use_strbnd = .false.
-      use_urey = .false.
-      use_angang = .false.
-      use_opbend = .false.
-      use_opdist = .false.
-      use_improp = .false.
-      use_imptor = .false.
-      use_tors = .false.
-      use_pitors = .false.
-      use_strtor = .false.
-      use_tortor = .false.
-      use_geom = .false.
-      use_metal = .false.
-      use_extra = .false.
-      use_polar = .false.
-c
-c     get energy and gradient for slow-evolving potential terms
-c
-      call gradient (energy,derivs)
-c
-c     restore the original state of fast-evolving potentials
-c
-      use_bond = save_bond
-      use_angle = save_angle
-      use_strbnd = save_strbnd
-      use_urey = save_urey
-      use_angang = save_angang
-      use_opbend = save_opbend
-      use_opdist = save_opdist
-      use_improp = save_improp
-      use_imptor = save_imptor
-      use_tors = save_tors
-      use_pitors = save_pitors
-      use_strtor = save_strtor
-      use_tortor = save_tortor
-      use_geom = save_geom
-      use_metal = save_metal
-      use_extra = save_extra
-      use_polar = save_polar
-      return
-      end
-      
-      
-      
-      
-      
-      
-      
-
-      subroutine gradintaux (energy,derivs)
-      use limits
-      use potent
-      implicit none
-      real*8 energy
-      real*8 derivs(3,*)
-      logical save_vdw,save_charge
-      logical save_chgdpl,save_dipole
-      logical save_mpole,save_polar
-      logical save_rxnfld,save_solv
-      logical save_bond,save_angle
-      logical save_strbnd,save_urey
-      logical save_angang,save_opbend
-      logical save_opdist,save_improp
-      logical save_imptor,save_tors
-      logical save_pitors,save_strtor
-      logical save_tortor,save_geom
-      logical save_metal,save_extra
-c
-c
-c     save the original state of slow-evolving potentials
-c
-      save_vdw = use_vdw
-      save_charge = use_charge
-      save_chgdpl = use_chgdpl
-      save_dipole = use_dipole
-      save_mpole = use_mpole
-      save_rxnfld = use_rxnfld
-      save_solv = use_solv
-      save_bond = use_bond
-      save_angle = use_angle
-      save_strbnd = use_strbnd
-      save_urey = use_urey
-      save_angang = use_angang
-      save_opbend = use_opbend
-      save_opdist = use_opdist
-      save_improp = use_improp
-      save_imptor = use_imptor
-      save_tors = use_tors
-      save_pitors = use_pitors
-      save_strtor = use_strtor
-      save_tortor = use_tortor
-      save_geom = use_geom
-      save_metal = use_metal
-      save_extra = use_extra
-c
-c     turn off slow-evolving nonbonded potential energy terms
-c
-      use_vdw = .false.
-      use_charge = .false.
-      use_chgdpl = .false.
-      use_dipole = .false.
-      use_mpole = .false.
-      use_rxnfld = .false.
-      use_solv = .false.
-      use_bond = .false.
-      use_angle = .false.
-      use_strbnd = .false.
-      use_urey = .false.
-      use_angang = .false.
-      use_opbend = .false.
-      use_opdist = .false.
-      use_improp = .false.
-      use_imptor = .false.
-      use_tors = .false.
-      use_pitors = .false.
-      use_strtor = .false.
-      use_tortor = .false.
-      use_geom = .false.
-      use_metal = .false.
-      use_extra = .false.
-c
-c     get energy and gradient for fast-evolving potential terms
-c
-      call gradient (energy,derivs)
-c
-c     restore the original state of slow-evolving potentials
-c
-      use_vdw = save_vdw
-      use_charge = save_charge
-      use_chgdpl = save_chgdpl
-      use_dipole = save_dipole
-      use_mpole = save_mpole
-      use_rxnfld = save_rxnfld
-      use_solv = save_solv
-      use_bond = save_bond
-      use_angle = save_angle
-      use_strbnd = save_strbnd
-      use_urey = save_urey
-      use_angang = save_angang
-      use_opbend = save_opbend
-      use_opdist = save_opdist
-      use_improp = save_improp
-      use_imptor = save_imptor
-      use_tors = save_tors
-      use_pitors = save_pitors
-      use_strtor = save_strtor
-      use_tortor = save_tortor
-      use_geom = save_geom
-      use_metal = save_metal
-      use_extra = save_extra
+       
+      call chkpole
+      call rotpole
+      call induce
       return
       end

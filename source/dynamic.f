@@ -39,6 +39,8 @@ c
       character*20 keyword
       character*240 record
       character*240 string
+      real*8 start,finish
+      real*8 omp_get_wtime
 c
 c
 c     set up the structure and molecular mechanics calculation
@@ -269,6 +271,7 @@ c
 c
 c     integrate equations of motion to take a time step
 c
+      start = omp_get_wtime()
       do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
@@ -288,6 +291,8 @@ c
             call beeman (istep,dt)
          end if
       end do
+      finish = omp_get_wtime()
+      print*,"Dynamics completed in ", finish-start, " seconds."
 c
 c     perform any final tasks before program exit
 c

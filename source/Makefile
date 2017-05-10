@@ -66,15 +66,15 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Compiler:  GNU gfortran 6.2
 ##  Parallel:  OpenMP
 
-F77 = gfortran
-F77FLAGS = -c
-OPTFLAGS = -Ofast -msse3 -fopenmp
-LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
-LIBS = 
-LIBFLAGS = -crusv
-RANLIB = ranlib
-LINKFLAGS = $(OPTFLAGS) -static-libgcc
-RENAME = rename_bin
+#F77 = gfortran
+#F77FLAGS = -c
+#OPTFLAGS = -Ofast -msse3 -fopenmp
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
+#LIBS = 
+#LIBFLAGS = -crusv
+#RANLIB = ranlib
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+#RENAME = rename_bin
 
 ##  Build:     TINKER (no APBS or FFE Support)
 ##  OS Type:   Apple MacOS
@@ -114,15 +114,15 @@ RENAME = rename_bin
 ##  Compiler:  Intel Fortran for Linux 15.0
 ##  Parallel:  OpenMP
 
-#F77 = ifort
-#F77FLAGS = -c -xHost
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -qopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = echo
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
-#RENAME = rename_bin
+F77 = ifort
+F77FLAGS = -c -xHost -no-wrap-margin
+OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -openmp
+LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
+LIBS = 
+LIBFLAGS = -crusv
+RANLIB = echo
+LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
+RENAME = rename_bin
 
 ##  Build:     TINKER (no APBS or FFE Support)
 ##  OS Type:   Apple MacOS
