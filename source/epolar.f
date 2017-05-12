@@ -1759,7 +1759,7 @@ c
       integer m1,m2,m3
       integer ntot,nff
       integer nf1,nf2,nf3
-      real*8 e,r1,r2,r3
+      real*8 e,r1,r2,r3,f
       real*8 h1,h2,h3
       real*8 volterm,denom
       real*8 hsq,expterm
@@ -1769,6 +1769,7 @@ c
       real*8, allocatable :: fuind(:,:)
       real*8, allocatable :: fuinp(:,:)
 c
+      f = electric / dielec
 c
 c     return if the Ewald coefficient is zero
 c
@@ -1890,7 +1891,7 @@ c
          call fphi_mpole (fphi)
          do i = 1, npole
             do j = 1, 20
-               fphi(j,i) = electric * fphi(j,i)
+               fphi(j,i) = f * fphi(j,i)
             end do
          end do
       end if
@@ -1926,7 +1927,7 @@ c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = 0.5d0 * electric * expterm * struc2
+         e = 0.5d0 * f * expterm * struc2
          ep = ep + e
       end if
 c
@@ -1939,7 +1940,7 @@ c
             e = e + fuind(k,i)*fphi(k+1,i)
          end do
       end do
-      e = 0.5d0 * e
+      e = 0.5d0 * f * e
       ep = ep + e
 c
 c     perform deallocation of some local arrays
