@@ -1628,7 +1628,7 @@ c
       use potent
       use units
       implicit none
-      integer i,j,ii
+      integer i,j,ii,m
       real*8 e,f,fi,term
       real*8 xd,yd,zd
       real*8 xu,yu,zu
@@ -1660,20 +1660,17 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,polarity,f,uind,udirp,ep)
+!$OMP& shared(npole,rpolarityinv,f,uind,udirp,ep)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c
       do i = 1, npole
-         if (polarity(i) .ne. 0.0d0) then
-            fi = f / polarity(i)
-            e = 0.0d0
-            do j = 1, 3
-               e = fi * uind(j,i) * udirp(j,i)
-               ep = ep + e
+         do j = 1, 3
+            do m = 1, 3
+              ep = ep + f * uind(j,i) * udirp(m,i) * rpolarityinv(m,j,i)
             end do
-         end if
+         end do
       end do
 c
 c     OpenMP directives for the major loop structure

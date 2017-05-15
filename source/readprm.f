@@ -75,7 +75,7 @@ c
       real*8 an,pr,ds,dk
       real*8 vd,cg,dp,ps
       real*8 fc,bd,dl,el
-      real*8 pt,pol,thl
+      real*8 pt,pol,thl,apol(3)
       real*8 iz,rp,ss,ts
       real*8 abc,cba
       real*8 gi,alphi
@@ -1175,7 +1175,35 @@ c
      &                                       (pg(i),i=1,maxval)
   450       continue
             if (ia .ne. 0) then
-               polr(ia) = pol
+               do j = 1, 3
+                  polr(j,ia) = pol
+               end do
+               athl(ia) = thl
+               do i = 1, maxval
+                  pgrp(i,ia) = pg(i)
+               end do
+            end if
+
+c
+c     anisotropic atomic dipole polarizability parameters
+c
+         else if (keyword(1:9) .eq. 'APOLARIZE') then
+            ia = 0
+            do i = 1, 3
+                apol(i) = 0.0d0
+            end do
+            thl = 0.0d0
+            do i = 1, maxval
+               pg(i) = 0
+            end do
+            string = record(next:240)
+            read (string,*,err=455,end=455)  ia,apol(1),apol(2),apol(3),
+     &                                       thl,(pg(i),i=1,maxval)
+  455       continue
+            if (ia .ne. 0) then
+               do j = 1, 3
+                  polr(j,ia) = apol(j)
+               end do
                athl(ia) = thl
                do i = 1, maxval
                   pgrp(i,ia) = pg(i)

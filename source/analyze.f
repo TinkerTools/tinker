@@ -1183,12 +1183,14 @@ c
                   header = .false.
                   write (iout,740)
   740             format (/,' Dipole Polarizability Parameters :',
-     &                    //,10x,'Atom Number',5x,'Alpha',5x,'Damp',
+     &                    //,9x,'Atom Number',4x,'Alpha xx',2x,
+     &                       'Alpha yy',2x,'Alpha zz',3x,'Damp',
      &                       6x,'Polarization Group',/)
                end if
-               write (iout,750)  i,ia,polarity(i),thole(i),
+               write (iout,750)  i,ia,polarity(1,i),polarity(2,i),
+     &                            polarity(3,i), thole(i),
      &                           (ip11(j,ia),j=1,np11(ia))
-  750          format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)
+  750          format (i6,3x,i6,6x,3f10.4,f9.3,3x,20i6)
             end if
          end do
       end if
@@ -2403,10 +2405,12 @@ c
                   header = .false.
                   write (iout,730)
   730             format (/,' Dipole Polarizability Parameters :',
-     &                    //,10x,'Atom Number',9x,'Alpha',8x,
+     &                    //,10x,'Atom Number',9x,'Alpha xx',8x,
+     &                       'Alpha yy',4x, 'Alpha zz',4x,
      &                       'Polarization Group',/)
                end if
-               write (iout,740)  i,ia,polarity(i),
+               write (iout,740)  i,ia,polarity(1,i),polarity(2,i),
+     &                                polarity(3,i),
      &                           (ip11(j,ia),j=1,np11(ia))
   740          format (i6,3x,i6,10x,f10.4,5x,20i6)
             end if

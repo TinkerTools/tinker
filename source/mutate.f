@@ -190,7 +190,9 @@ c
          end do
          do i = 1, npolar
             if (mut(i)) then
-               polarity(i) = polarity(i) * elambda
+               do j = 1, 3
+                  polarity(j,i) = polarity(j,i) * elambda
+               end do
             end if
          end do
       end if

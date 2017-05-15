@@ -189,7 +189,7 @@ c
       if (.not. allocated(eps4))  allocate (eps4(maxtyp))
       if (.not. allocated(reduct))  allocate (reduct(maxtyp))
       if (.not. allocated(chg))  allocate (chg(maxtyp))
-      if (.not. allocated(polr))  allocate (polr(maxtyp))
+      if (.not. allocated(polr))  allocate (polr(3,maxtyp))
       if (.not. allocated(athl))  allocate (athl(maxtyp))
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
 c
@@ -209,7 +209,9 @@ c
          eps4(i) = 0.0d0
          reduct(i) = 0.0d0
          chg(i) = 0.0d0
-         polr(i) = 0.0d0
+         do j = 1, 3
+            polr(j,i) = 0.0d0
+         enddo
          athl(i) = 0.0d0
          do j = 1, maxval
             pgrp(j,i) = 0

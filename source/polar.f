@@ -19,7 +19,10 @@ c     coptmax   maximum coefficient order for OPT dipole extrapolation
 c     optlevel  current OPT order for reciprocal potential and field
 c     copt      coefficients for OPT total induced dipole moments
 c     copm      coefficients for OPT incremental induced dipole moments
-c     polarity  dipole polarizability for each multipole site (Ang**3)
+c     polarity  anisotropic dipole polarizability for each multipole site (body frame, Ang**3)
+c     rpolarity anisotropic dipole polarizability for each multipole site (lab frame, Ang**3)
+c     rpolarityinv inverted anisotropic dipole polarizability for each multipole site (lab frame, Ang**3)
+c     is_aniso   whether each polarizabile site is anisotropic or not
 c     thole     Thole polarizability damping value for each site
 c     pdamp     value of polarizability scale factor for each site
 c     udir      direct induced dipole components at each multipole site
@@ -49,7 +52,10 @@ c
       integer optlevel
       real*8, allocatable :: copt(:)
       real*8, allocatable :: copm(:)
-      real*8, allocatable :: polarity(:)
+      real*8, allocatable :: rpolarity(:,:,:)
+      real*8, allocatable :: rpolarityinv(:,:,:)
+      real*8, allocatable :: polarity(:,:)
+      logical, allocatable :: is_aniso(:)
       real*8, allocatable :: thole(:)
       real*8, allocatable :: pdamp(:)
       real*8, allocatable :: udir(:,:)

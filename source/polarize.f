@@ -60,7 +60,7 @@ c
       end if
       addu = 0.0d0
       do i = 1, npole
-         addu = polarity(i) + addu
+         addu = (polarity(1,i)+polarity(2,i)+polarity(3,i))/3.0d0 + addu
       end do
       fstr = ' Additive Total Polarizability :    '
       if (nmol .eq. 1)  fstr = ' Additive Molecular Polarizability :'
@@ -190,7 +190,7 @@ c
       real*8 a,b,sum
       real*8 umol(3)
       real*8 exfield(3)
-      real*8, allocatable :: poli(:)
+      real*8, allocatable :: poli(:,:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: zrsd(:,:)
@@ -203,13 +203,13 @@ c     set induced dipoles to polarizability times external field
 c
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = polarity(i) * exfield(j)
+            uind(j,i) = polarity(j,i) * exfield(j)
          end do
       end do
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (poli(npole))
+      allocate (poli(3,npole))
       allocate (field(3,npole))
       allocate (rsd(3,npole))
       allocate (zrsd(3,npole))
@@ -226,10 +226,10 @@ c
          polmin = 0.00000001d0
          call ufield (field)
          do i = 1, npole
-            poli(i) = max(polmin,polarity(i))
             do j = 1, 3
+               poli(j,i) = max(polmin,polarity(j,i))
                rsd(j,i) = field(j,i)
-               zrsd(j,i) = rsd(j,i) * poli(i)
+               zrsd(j,i) = rsd(j,i) * poli(j,i)
                conj(j,i) = zrsd(j,i)
             end do
          end do
@@ -248,7 +248,7 @@ c
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = vec(j,i)
-                  vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                  vec(j,i) = conj(j,i)/poli(j,i) - field(j,i)
                end do
             end do
             a = 0.0d0
@@ -269,7 +269,7 @@ c
             b = 0.0d0
             do i = 1, npole
                do j = 1, 3
-                  zrsd(j,i) = rsd(j,i) * poli(i)
+                  zrsd(j,i) = rsd(j,i) * poli(j,i)
                   b = b + rsd(j,i)*zrsd(j,i)
                end do
             end do

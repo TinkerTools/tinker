@@ -506,7 +506,7 @@ c
       use mpole
       use polar
       implicit none
-      integer i,j,k,m,ixyz
+      integer i,j,jj,k,m,ixyz
       integer atmnum,size
       integer freeunit
       real*8 xi,yi,zi
@@ -593,7 +593,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(polarity))  allocate (polarity(n))
+      if (.not. allocated(polarity))  allocate (polarity(3,n))
       if (.not. allocated(thole))  allocate (thole(n))
       if (.not. allocated(pdamp))  allocate (pdamp(n))
       if (.not. allocated(ipole))  allocate (ipole(n))
@@ -605,43 +605,67 @@ c
       do i = 1, n
          atmnum = atomic(i)
          mass(i) = 1.0d0
-         polarity(i) = 0.0d0
+         do j = 1, 3
+            polarity(j,i) = 0.0d0
+         end do
          thole(i) = 0.39d0
          if (atmnum .eq. 1) then
             mass(i) = 1.008d0
-            polarity(i) = 0.496d0
+            do j = 1, 3
+               polarity(j,i) = 0.496d0
+            end do
          else if (atmnum .eq. 5) then
             mass(i) = 10.810d0
-            polarity(i) = 1.600d0
+            do j = 1, 3
+               polarity(j,i) = 1.600d0
+            end do
          else if (atmnum .eq. 6) then
             mass(i) = 12.011d0
-            polarity(i) = 1.334d0
+            do j = 1, 3
+               polarity(j,i) = 1.334d0
+            end do
          else if (atmnum .eq. 7) then
             mass(i) = 14.007d0
-            polarity(i) = 1.073d0
+            do j = 1, 3
+               polarity(j,i) = 1.073d0
+            end do
          else if (atmnum .eq. 8) then
             mass(i) = 15.999d0
-            polarity(i) = 0.837d0
+            do j = 1, 3
+               polarity(j,i) = 0.837d0
+            end do
          else if (atmnum .eq. 9) then
             mass(i) = 18.998d0
-            polarity(i) = 0.507d0
+            do j = 1, 3
+               polarity(j,i) = 0.507d0
+            end do
          else if (atmnum .eq. 14) then
             mass(i) = 28.086d0
          else if (atmnum .eq. 15) then
             mass(i) = 30.974d0
-            polarity(i) = 1.828d0
+            do j = 1, 3
+               polarity(j,i) = 1.828d0
+            end do
          else if (atmnum .eq. 16) then
             mass(i) = 32.066d0
-            polarity(i) = 3.300d0
+            do j = 1, 3
+               polarity(j,i) = 3.300d0
+            end do
          else if (atmnum .eq. 17) then
             mass(i) = 35.453d0
-            polarity(i) = 2.500d0
+            do j = 1, 3
+               polarity(j,i) = 2.500d0
+            end do
          else if (atmnum .eq. 35) then
             mass(i) = 79.904d0
-            polarity(i) = 3.595d0
+            do j = 1, 3
+               polarity(j,i) = 3.595d0
+            end do
          else if (atmnum .eq. 53) then
             mass(i) = 126.904d0
-            polarity(i) = 5.705d0
+            do j = 1, 3
+               polarity(j,i) = 5.705d0
+            end do
          end if
       end do
 c
@@ -652,21 +676,29 @@ c
          if (atmnum .eq. 1) then
             j = i12(1,i)
             if (atomic(j).eq.6 .and. n12(j).eq.3) then
-               polarity(i) = 0.696d0
+               do jj = 1, 3
+                  polarity(jj,i) = 0.696d0
+               end do
                do k = 1, n12(j)
                   m = i12(k,j)
                   if (atomic(m).eq.8 .and. n12(m).eq.1) then
-                     polarity(i) = 0.494d0
+                     do jj = 1, 3
+                        polarity(jj,i) = 0.494d0
+                     end do
                   end if
                end do
             end if
          else if (atmnum .eq. 6) then
             if (n12(i) .eq. 3) then
-               polarity(i) = 1.75d0
+               do jj = 1, 3
+                  polarity(jj,i) = 1.75d0
+               end do
                do j = 1, n12(i)
                   k = i12(j,i)
                   if (atomic(k).eq.8 .and. n12(k).eq.1) then
-                     polarity(i) = 1.334d0
+                     do jj = 1, 3
+                        polarity(jj,i) = 1.334d0
+                     end do
                   end if
                end do
             end if
@@ -685,7 +717,8 @@ c
          if (thole(i) .eq. 0.0d0) then
             pdamp(i) = 0.0d0
          else
-            pdamp(i) = polarity(i)**sixth
+            pdamp(i) = ((polarity(1,i)+polarity(2,i)+polarity(3,i))
+     &                  /3.0d0)**sixth
          end if
       end do
       return
@@ -1487,15 +1520,17 @@ c
       write (iout,10)
    10 format (/,' Atomic Polarizabilities for Multipole Sites :')
       write (iout,20)
-   20 format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+   20 format (/,5x,'Atom',5x,'Name',7x,'Polarize xx',7x,
+     &         'Polarize yy',7x,'Polarize zz',7x,'Thole',/)
       do ii = 1, n
          i = pollist(ii)
          if (i .eq. 0) then
             write (iout,30)  ii,name(ii)
    30       format (i8,6x,a3,12x,'--',13x,'--')
          else
-            write (iout,40)  ii,name(ii),polarity(i),thole(i)
-   40       format (i8,6x,a3,4x,f12.4,3x,f12.4)
+            write (iout,40)  ii,name(ii),polarity(1,i),
+     &            polarity(2,i),polarity(3,i),thole(i)
+   40       format (i8,6x,a3,4x,f12.4,3x,f12.4,3x,f12.4,3x,f12.4)
          end if
       end do
 c
@@ -1529,7 +1564,9 @@ c
          end if
          if (i .ne. 0) then
             change = .true.
-            polarity(i) = pol
+            do j = 1, 3
+               polarity(j,i) = pol
+            enddo
             thole(i) = thl
          end if
       end do
@@ -1540,15 +1577,17 @@ c
          write (iout,90)
    90    format (/,' Atomic Polarizabilities for Multipole Sites :')
          write (iout,100)
-  100    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+  100    format (/,5x,'Atom',5x,'Name',7x,'Polarize xx',7x,
+     &              'Polarize yy',7x,'Polarize zz',7x,'Thole',/)
          do ii = 1, n
             i = pollist(ii)
             if (i .eq. 0) then
                write (iout,110)  ii,name(ii)
   110          format (i8,6x,a3,12x,'--',13x,'--')
             else
-               write (iout,120)  ii,name(ii),polarity(i),thole(i)
-  120          format (i8,6x,a3,4x,f12.4,3x,f12.4)
+               write (iout,120)  ii,name(ii),polarity(1,i),
+     &                         polarity(2,i),polarity(3,i),thole(i)
+  120          format (i8,6x,a3,4x,f12.4,3x,f12.4,3x,f12.4,3x,f12.4)
             end if
          end do
       end if
@@ -1779,7 +1818,7 @@ c
       real*8 polmin,norm
       real*8 a,b,sum
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: poli(:)
+      real*8, allocatable :: poli(:,:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: zrsd(:,:)
@@ -1795,7 +1834,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
-      allocate (poli(npole))
+      allocate (poli(3,npole))
       allocate (field(3,npole))
       allocate (rsd(3,npole))
       allocate (zrsd(3,npole))
@@ -1807,7 +1846,7 @@ c
       call dfieldi (field,pscale)
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = polarity(i) * field(j,i)
+            uind(j,i) = polarity(j,i) * field(j,i)
          end do
       end do
 c
@@ -1829,10 +1868,10 @@ c
       polmin = 0.00000001d0
       call ufieldi (field,pscale)
       do i = 1, npole
-         poli(i) = max(polmin,polarity(i))
          do j = 1, 3
+            poli(j,i) = max(polmin,polarity(j,i))
             rsd(j,i) = field(j,i)
-            zrsd(j,i) = rsd(j,i) * poli(i)
+            zrsd(j,i) = rsd(j,i) * poli(j,i)
             conj(j,i) = zrsd(j,i)
          end do
       end do
@@ -1851,7 +1890,7 @@ c
          do i = 1, npole
             do j = 1, 3
                uind(j,i) = vec(j,i)
-               vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+               vec(j,i) = conj(j,i)/poli(j,i) - field(j,i)
             end do
          end do
          a = 0.0d0
@@ -1872,7 +1911,7 @@ c
          b = 0.0d0
          do i = 1, npole
             do j = 1, 3
-               zrsd(j,i) = rsd(j,i) * poli(i)
+               zrsd(j,i) = rsd(j,i) * poli(j,i)
                b = b + rsd(j,i)*zrsd(j,i)
             end do
          end do
@@ -2575,7 +2614,7 @@ c
             do j = 1, maxval
                if (pgrp(j,i) .ne. 0)  k = j
             end do
-            write (ikey,180)  ipole(i),polarity(i),thole(i),
+            write (ikey,180)  ipole(i),polarity(1,i),thole(i),
      &                        (pgrp(j,i),j=1,k)
   180       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
          end do

@@ -1923,7 +1923,7 @@ c
       use potent
       use units
       implicit none
-      integer i,j,ii
+      integer i,j,ii,m
       real*8 e,f,fi,term
       real*8 xd,yd,zd
       real*8 xu,yu,zu
@@ -1977,12 +1977,15 @@ c
 c     get polarization energy via induced dipoles times field
 c
       do i = 1, npole
-         if (polarity(i) .ne. 0.0d0) then
-            ii = ipole(i)
-            fi = f / polarity(i)
+         ii = ipole(i)
+         if (polarity(1,i) .ne. 0.0d0 .or.
+     &       polarity(2,i) .ne. 0.0d0 .or.
+     &       polarity(3,i) .ne. 0.0d0) then
             e = 0.0d0
             do j = 1, 3
-               e = e + fi*uind(j,i)*udirp(j,i)
+               do m = 1, 3
+                 e = e + f * uind(j,i) * udirp(m,i)*rpolarityinv(m,j,i)
+               end do
             end do
             nep = nep + 1
             ep = ep + e
@@ -1997,11 +2000,13 @@ c
                   write (iout,20)
    20             format (/,' Individual Dipole Polarization',
      &                       ' Interactions :',
-     &                    //,' Type',9x,'Atom Name',24x,'Alpha',
+     &                    //,' Type',9x,'Atom Name',24x,'Alpha xx',
+     &                       'Alpha yy', 8x, 'Alpha zz',
      &                       8x,'Energy',/)
                end if
-               write (iout,30)  ii,name(ii),polarity(i),e
-   30          format (' Polar',5x,i7,'-',a3,16x,2f14.4)
+               write (iout,30)  ii,name(ii),polarity(1,i),polarity(2,i),
+     &                              polarity(3,i), e
+   30          format (' Polar',5x,i7,'-',a3,16x,4f14.4)
             end if
          end if
       end do
