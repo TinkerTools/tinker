@@ -29,6 +29,7 @@ c
       do i = 1, npole
          call rotmat (i,a)
          call rotsite (i,a)
+         call rotalpha (i,a)
       end do
       return
       end
@@ -248,6 +249,50 @@ c
       a(1,2) = a(3,1)*a(2,3) - a(2,1)*a(3,3)
       a(2,2) = a(1,1)*a(3,3) - a(3,1)*a(1,3)
       a(3,2) = a(2,1)*a(1,3) - a(1,1)*a(2,3)
+      return
+      end
+c
+c
+c     #######################################################################
+c     ##                                                                   ##
+c     ##  subroutine rotalpha  --  rotate polarizabilities at single site  ##
+c     ##                                                                   ##
+c     #######################################################################
+c
+c
+c     "rotalpha" computes the atomic polarizabilities at a specified site
+c     in the global coordinate frame by applying a rotation matrix
+c
+c
+      subroutine rotalpha (isite,a)
+      use sizes
+      use atoms
+      use mpole
+      use polar
+      implicit none
+      integer i,j,k
+      integer isite
+      real*8 a(3,3),val,valinv,kpol
+      real*8 polmin
+
+      polmin = 0.00000001d0
+c
+c     rotate the polarizability to the global coordinate frame
+c
+
+      do i = 1, 3
+         do j = 1, 3
+            val = 0.0d0
+            valinv = 0.0d0
+            do k = 1, 3
+               kpol = max(polmin,polarity(k,isite))
+               val = val + a(i,k)*a(j,k)*kpol
+               valinv = valinv + a(i,k)*a(j,k)/kpol
+            end do
+            rpolarity(i,j,isite) = val
+            rpolarityinv(i,j,isite) = valinv
+         end do
+      end do
       return
       end
 c

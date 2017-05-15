@@ -20,7 +20,7 @@ c
       module kpolr
       implicit none
       integer, allocatable :: pgrp(:,:)
-      real*8, allocatable :: polr(:)
+      real*8, allocatable :: polr(:,:)
       real*8, allocatable :: athl(:)
       save
       end

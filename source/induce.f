@@ -76,7 +76,9 @@ c
       if (debug .and. use_polar) then
          header = .true.
          do i = 1, npole
-            if (polarity(i) .ne. 0.0d0) then
+            if (polarity(1,i) .ne. 0.0d0 .or.
+     &          polarity(2,i) .ne. 0.0d0 .or.       
+     &          polarity(3,i) .ne. 0.0d0) then
                if (header) then
                   header = .false.
                   if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
@@ -104,13 +106,13 @@ c
                k = ipole(i)
                norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
                if (digits .ge. 8) then
-                  write (iout,60)  k,(debye*uind(j,i),j=1,3),debye*norm
+                  write (iout,60)  k,(uind(j,i),j=1,3),debye*norm
    60             format (i8,3x,4f16.8)
                else if (digits .ge. 6) then
-                  write (iout,70)  k,(debye*uind(j,i),j=1,3),debye*norm
+                  write (iout,70)  k,(uind(j,i),j=1,3),debye*norm
    70             format (i8,4x,4f14.6)
                else
-                  write (iout,80)  k,(debye*uind(j,i),j=1,3),debye*norm
+                  write (iout,80)  k,(uind(j,i),j=1,3),debye*norm
    80             format (i8,5x,4f12.4)
                end if
             end if
@@ -118,7 +120,9 @@ c
          header = .true.
          if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
             do i = 1, npole
-               if (polarity(i) .ne. 0.0d0) then
+               if (polarity(1,i) .ne. 0.0d0 .or.
+     &             polarity(2,i) .ne. 0.0d0 .or.
+     &             polarity(3,i) .ne. 0.0d0) then
                   if (header) then
                      header = .false.
                      write (iout,90)
@@ -186,15 +190,13 @@ c
       use units
       use uprior
       implicit none
-      integer i,j,k,iter
+      integer i,j,k,m,iter
       integer maxiter
-      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 udsum,upsum
       real*8 a,ap,b,bp
       real*8 sum,sump
-      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: rsd(:,:)
@@ -238,11 +240,16 @@ c
 c
 c     set induced dipoles to polarizability times direct field
 c
+     
       do i = 1, npole
          if (douind(ipole(i))) then
             do j = 1, 3
-               udir(j,i) = polarity(i) * field(j,i)
-               udirp(j,i) = polarity(i) * fieldp(j,i)
+               udir(j,i) = 0.0d0
+               udirp(j,i) = 0.0d0
+               do m = 1, 3
+                  udir(j,i) = udir(j,i) + rpolarity(m,j,i)*field(m,i)
+                  udirp(j,i) = udirp(j,i) + rpolarity(m,j,i)*fieldp(m,i)
+               end do
                uind(j,i) = udir(j,i)
                uinp(j,i) = udirp(j,i)
             end do
@@ -272,8 +279,14 @@ c
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     uopt(k,j,i) = polarity(i) * field(j,i)
-                     uoptp(k,j,i) = polarity(i) * fieldp(j,i)
+                     uopt(k,j,i) = 0.0d0
+                     uoptp(k,j,i) = 0.0d0
+                     do m = 1, 3
+                        uopt(k,j,i) = uopt(k,j,i) +
+     &                             rpolarity(m,j,i) * field(m,i)
+                        uoptp(k,j,i) = uoptp(k,j,i) +
+     &                             rpolarity(m,j,i) * fieldp(m,i)
+                     end do
                      uind(j,i) = uopt(k,j,i)
                      uinp(j,i) = uoptp(k,j,i)
                   end do
@@ -308,7 +321,6 @@ c
          done = .false.
          maxiter = 100
          iter = 0
-         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimate induced dipoles using a polynomial predictor
@@ -342,7 +354,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (poli(npole))
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
          allocate (zrsd(3,npole))
@@ -366,12 +377,15 @@ c     set initial conjugate gradient residual and conjugate vector
 c
          do i = 1, npole
             if (douind(ipole(i))) then
-               poli(i) = max(polmin,polarity(i))
                do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                          + fieldp(j,i)
+                  rsd(j,i) = field(j,i)
+                  rsdp(j,i) = fieldp(j,i)
+                  do m = 1, 3
+                     rsd(j,i) = rsd(j,i) + (udir(m,i)-uind(m,i)) 
+     &                           * rpolarityinv(m,j,i)
+                     rsdp(j,i) = rsdp(j,i) + (udirp(m,i)-uinp(m,i))
+     &                           * rpolarityinv(m,j,i)
+                  enddo
                end do
             else
                do j = 1, 3
@@ -425,8 +439,14 @@ c
                   do j = 1, 3
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
-                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                     vec(j,i) =  -field(j,i)
+                     vecp(j,i) =  -fieldp(j,i)
+                     do m = 1, 3
+                        vec(j,i) = vec(j,i) +
+     &                                 conj(m,i)*rpolarityinv(m,j,i)
+                        vecp(j,i) = vecp(j,i) +
+     &                                 conjp(m,i)*rpolarityinv(m,j,i)
+                     end do
                   end do
                end if
             end do
@@ -511,8 +531,12 @@ c
                do i = 1, npole
                   if (douind(ipole(i))) then
                      do j = 1, 3
-                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
-                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
+                        do m = 1, 3
+                           uind(j,i) = uind(j,i) +
+     &                                  rpolarity(m,j,i)*rsd(m,i)
+                           uinp(j,i) = uinp(j,i) +
+     &                                  rpolarity(m,j,i)*rsdp(m,i)
+                        end do
                      end do
                   end if
                end do
@@ -521,7 +545,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (poli)
          deallocate (rsd)
          deallocate (rsdp)
          deallocate (zrsd)
@@ -3433,9 +3456,8 @@ c
       use units
       use uprior
       implicit none
-      integer i,j,k,iter
+      integer i,j,k,m,iter
       integer maxiter
-      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 epsds,epsps
@@ -3445,7 +3467,6 @@ c
       real*8 b,bp,bs,bps
       real*8 sum,sump
       real*8 sums,sumps
-      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
@@ -3511,10 +3532,20 @@ c
       do i = 1, npole
          if (douind(ipole(i))) then
             do j = 1, 3
-               udir(j,i) = polarity(i) * field(j,i)
-               udirp(j,i) = polarity(i) * fieldp(j,i)
-               udirs(j,i) = polarity(i) * fields(j,i)
-               udirps(j,i) = polarity(i) * fieldps(j,i)
+               udir(j,i) = 0.0d0
+               udirp(j,i) = 0.0d0
+               udirs(j,i) = 0.0d0
+               udirps(j,i) = 0.0d0
+               do m = 1, 3
+                  udir(j,i) = udir(j,i) + rpolarity(m,j,i)
+     &                                       * field(m,i)
+                  udirp(j,i) = udirp(j,i) + rpolarity(m,j,i)
+     &                                       * fieldp(m,i)
+                  udirs(j,i) = udirs(j,i) + rpolarity(m,j,i)
+     &                                       * fields(m,i)
+                  udirps(j,i) = udirps(j,i) + rpolarity(m,j,i)
+     &                                       * fieldps(m,i)
+               end do
                uind(j,i) = udir(j,i)
                uinp(j,i) = udirp(j,i)
                uinds(j,i) = udirs(j,i)
@@ -3541,10 +3572,20 @@ c
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     uopt(k,j,i) = polarity(i) * field(j,i)
-                     uoptp(k,j,i) = polarity(i) * fieldp(j,i)
-                     uopts(k,j,i) = polarity(i) * fields(j,i)
-                     uoptps(k,j,i) = polarity(i) * fieldps(j,i)
+                     uopt(k,j,i) = 0.0d0
+                     uoptp(k,j,i) = 0.0d0
+                     uopts(k,j,i) = 0.0d0
+                     uoptps(k,j,i) = 0.0d0
+                     do m = 1, 3
+                        uopt(k,j,i) = uopt(k,j,i) + 
+     &                                   rpolarity(m,j,i) * field(m,i)
+                        uoptp(k,j,i) = uoptp(k,j,i) +
+     &                                   rpolarity(m,j,i) * fieldp(m,i)
+                        uopts(k,j,i) = uopts(k,j,i) +
+     &                                   rpolarity(m,j,i) * fields(m,i)
+                        uoptps(k,j,i) = uoptps(k,j,i) +
+     &                                   rpolarity(m,j,i) * fieldps(m,i)
+                     end do
                      uind(j,i) = uopt(k,j,i)
                      uinp(j,i) = uoptp(k,j,i)
                      uinds(j,i) = uopts(k,j,i)
@@ -3593,7 +3634,6 @@ c
          done = .false.
          maxiter = 100
          iter = 0
-         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -3621,7 +3661,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (poli(npole))
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
          allocate (rsds(3,npole))
@@ -3644,20 +3683,33 @@ c
          call ufield0d (field,fieldp,fields,fieldps)
          do i = 1, npole
             if (douind(ipole(i))) then
-               poli(i) = max(polmin,polarity(i))
                do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                           + fieldp(j,i)
-                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
-     &                           + fields(j,i)
-                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
-     &                            + fieldps(j,i)
-                  zrsd(j,i) = rsd(j,i) * poli(i)
-                  zrsdp(j,i) = rsdp(j,i) * poli(i)
-                  zrsds(j,i) = rsds(j,i) * poli(i)
-                  zrsdps(j,i) = rsdps(j,i) * poli(i)
+                  rsd(j,i) = field(j,i)
+                  rsdp(j,i) = fieldp(j,i)
+                  rsds(j,i) = fields(j,i)
+                  rsdps(j,i) = fieldps(j,i)
+                  zrsd(j,i) = 0.0d0
+                  zrsdp(j,i) = 0.0d0
+                  zrsds(j,i) = 0.0d0
+                  zrsdps(j,i) = 0.0d0
+                  do m = 1, 3
+                     rsd(j,i) = rsd(j,i) +
+     &                      (udir(m,i)-uind(m,i))*rpolarityinv(m,j,i)
+                     rsdp(j,i) = rsdp(j,i) +
+     &                      (udirp(m,i)-uinp(m,i))*rpolarityinv(m,j,i)
+                     rsds(j,i) = rsds(j,i) +
+     &                      (udirs(m,i)-uinds(m,i))*rpolarityinv(m,j,i)
+                     rsdps(j,i) = rsdps(j,i) +
+     &                      (udirps(m,i)-uinps(m,i))*rpolarityinv(m,j,i)
+                     zrsd(j,i) = zrsd(j,i) +
+     &                      rsd(m,i)*rpolarity(m,j,i)
+                     zrsdp(j,i) = zrsdp(j,i) +
+     &                      rsdp(m,i)*rpolarity(m,j,i)
+                     zrsds(j,i) = zrsds(j,i) +
+     &                      rsds(m,i)*rpolarity(m,j,i)
+                     zrsdps(j,i) = zrsdps(j,i) +
+     &                      rsdps(m,i)*rpolarity(m,j,i)
+                  end do
                   conj(j,i) = zrsd(j,i)
                   conjp(j,i) = zrsdp(j,i)
                   conjs(j,i) = zrsds(j,i)
@@ -3692,10 +3744,20 @@ c
                      uinp(j,i) = vecp(j,i)
                      uinds(j,i) = vecs(j,i)
                      uinps(j,i) = vecps(j,i)
-                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
-                     vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
-                     vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
+                     vec(j,i) = -field(j,i)
+                     vecp(j,i) = -fieldp(j,i)
+                     vecs(j,i) = -fields(j,i)
+                     vecps(j,i) =  -fieldps(j,i)
+                     do m = 1, 3
+                        vec(j,i) = vec(j,i) +
+     &                             conj(m,i)*rpolarityinv(m,j,i)
+                        vecp(j,i) = vecp(j,i) +
+     &                             conjp(m,i)*rpolarityinv(m,j,i)
+                        vecs(j,i) = vecs(j,i) +
+     &                             conjs(m,i)*rpolarityinv(m,j,i)
+                        vecps(j,i) = vecps(j,i) +
+     &                             conjps(m,i)*rpolarityinv(m,j,i)
+                     enddo
                   end do
                end if
             end do
@@ -3746,10 +3808,20 @@ c
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     zrsd(j,i) = rsd(j,i) * poli(i)
-                     zrsdp(j,i) = rsdp(j,i) * poli(i)
-                     zrsds(j,i) = rsds(j,i) * poli(i)
-                     zrsdps(j,i) = rsdps(j,i) * poli(i)
+                     zrsd(j,i) = 0.0d0
+                     zrsdp(j,i) = 0.0d0
+                     zrsds(j,i) = 0.0d0
+                     zrsdps(j,i) = 0.0d0
+                     do m = 1, 3
+                        zrsd(j,i) = zrsd(j,i) +
+     &                         rsd(m,i)*rpolarity(m,j,i)
+                        zrsdp(j,i) = zrsdp(j,i) +
+     &                         rsdp(m,i)*rpolarity(m,j,i)
+                        zrsds(j,i) = zrsds(j,i) +
+     &                         rsds(m,i)*rpolarity(m,j,i)
+                        zrsdps(j,i) = zrsdps(j,i) +
+     &                         rsdps(m,i)*rpolarity(m,j,i)
+                     end do
                      b = b + rsd(j,i)*zrsd(j,i)
                      bp = bp + rsdp(j,i)*zrsdp(j,i)
                      bs = bs + rsds(j,i)*zrsds(j,i)
@@ -3805,10 +3877,16 @@ c
                do i = 1, npole
                   if (douind(ipole(i))) then
                      do j = 1, 3
-                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
-                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
-                        uinds(j,i) = uinds(j,i) + poli(i)*rsds(j,i)
-                        uinps(j,i) = uinps(j,i) + poli(i)*rsdps(j,i)
+                        do m = 1, 3
+                           uind(j,i) = uind(j,i) +
+     &                          rpolarity(m,j,i)*rsd(m,i)
+                           uinp(j,i) = uinp(j,i) +
+     &                          rpolarity(m,j,i)*rsdp(m,i)
+                           uinds(j,i) = uinds(j,i) +
+     &                          rpolarity(m,j,i)*rsds(m,i)
+                           uinps(j,i) = uinps(j,i) +
+     &                          rpolarity(m,j,i)*rsdps(m,i)
+                        end do
                      end do
                   end if
                end do
@@ -3817,7 +3895,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (poli)
          deallocate (rsd)
          deallocate (rsdp)
          deallocate (rsds)
@@ -4708,9 +4785,8 @@ c
       use units
       use uprior
       implicit none
-      integer i,j,k,iter
+      integer i,j,k,m,iter
       integer maxiter
-      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 epsds,epsps
@@ -4720,7 +4796,6 @@ c
       real*8 b,bp,bs,bps
       real*8 sum,sump
       real*8 sums,sumps
-      real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: fields(:,:)
@@ -4786,10 +4861,20 @@ c
       do i = 1, npole
          if (douind(ipole(i))) then
             do j = 1, 3
-               udir(j,i) = polarity(i) * field(j,i)
-               udirp(j,i) = polarity(i) * fieldp(j,i)
-               udirs(j,i) = polarity(i) * fields(j,i)
-               udirps(j,i) = polarity(i) * fieldps(j,i)
+               udir(j,i) = 0.0d0
+               udirp(j,i) = 0.0d0
+               udirs(j,i) = 0.0d0
+               udirps(j,i) = 0.0d0
+               do m = 1, 3
+                  udir(j,i) = udir(j,i) + 
+     &                        rpolarity(m,j,i) * field(m,i)
+                  udirp(j,i) = udirp(j,i) +
+     &                        rpolarity(m,j,i) * fieldp(m,i)
+                  udirs(j,i) = udirs(j,i) +
+     &                        rpolarity(m,j,i) * fields(m,i)
+                  udirps(j,i) = udirps(j,i) +
+     &                        rpolarity(m,j,i) * fieldps(m,i)
+               end do
                uind(j,i) = udir(j,i)
                uinp(j,i) = udirp(j,i)
                uinds(j,i) = udirs(j,i)
@@ -4816,10 +4901,20 @@ c
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     uopt(k,j,i) = polarity(i) * field(j,i)
-                     uoptp(k,j,i) = polarity(i) * fieldp(j,i)
-                     uopts(k,j,i) = polarity(i) * fields(j,i)
-                     uoptps(k,j,i) = polarity(i) * fieldps(j,i)
+                     uopt(k,j,i) = 0.0d0
+                     uoptp(k,j,i) = 0.0d0
+                     uopts(k,j,i) = 0.0d0
+                     uoptps(k,j,i) = 0.0d0
+                     do m = 1, 3
+                        uopt(k,j,i) = uopt(k,j,i) +
+     &                                   rpolarity(m,j,i) * field(m,i)
+                        uoptp(k,j,i) = uoptp(k,j,i) +
+     &                                   rpolarity(m,j,i) * fieldp(m,i)
+                        uopts(k,j,i) = uopts(k,j,i) +
+     &                                   rpolarity(m,j,i) * fields(m,i)
+                        uoptps(k,j,i) = uoptps(k,j,i) +
+     &                                   rpolarity(m,j,i) * fieldps(m,i)
+                     end do
                      uind(j,i) = uopt(k,j,i)
                      uinp(j,i) = uoptp(k,j,i)
                      uinds(j,i) = uopts(k,j,i)
@@ -4868,7 +4963,6 @@ c
          done = .false.
          maxiter = 100
          iter = 0
-         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -4896,7 +4990,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (poli(npole))
          allocate (rsd(3,npole))
          allocate (rsdp(3,npole))
          allocate (rsds(3,npole))
@@ -4919,20 +5012,33 @@ c
          call ufield0e (field,fieldp,fields,fieldps)
          do i = 1, npole
             if (douind(ipole(i))) then
-               poli(i) = max(polmin,polarity(i))
                do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                           + fieldp(j,i)
-                  rsds(j,i) = (udirs(j,i)-uinds(j,i))/poli(i)
-     &                           + fields(j,i)
-                  rsdps(j,i) = (udirps(j,i)-uinps(j,i))/poli(i)
-     &                            + fieldps(j,i)
-                  zrsd(j,i) = rsd(j,i) * poli(i)
-                  zrsdp(j,i) = rsdp(j,i) * poli(i)
-                  zrsds(j,i) = rsds(j,i) * poli(i)
-                  zrsdps(j,i) = rsdps(j,i) * poli(i)
+                  rsd(j,i) =  field(j,i)
+                  rsdp(j,i) = fieldp(j,i)
+                  rsds(j,i) = fields(j,i)
+                  rsdps(j,i) = fieldps(j,i)
+                  zrsd(j,i) = 0.0d0
+                  zrsdp(j,i) = 0.0d0
+                  zrsds(j,i) = 0.0d0
+                  zrsdps(j,i) = 0.0d0
+                  do m = 1, 3
+                     rsd(j,i) = rsd(j,i) + 
+     &                      (udir(m,i)-uind(m,i))*rpolarityinv(m,j,i)
+                     rsdp(j,i) = rsdp(j,i) +
+     &                      (udirp(m,i)-uinp(m,i))*rpolarityinv(m,j,i)
+                     rsds(j,i) = rsds(j,i) +
+     &                      (udirs(m,i)-uinds(m,i))*rpolarityinv(m,j,i)
+                     rsdps(j,i) = rsdps(j,i) +
+     &                      (udirps(m,i)-uinps(m,i))*rpolarityinv(m,j,i)
+                     zrsd(j,i) = zrsd(j,i) +
+     &                      rsd(m,i) * rpolarity(m,j,i)
+                     zrsdp(j,i) = zrsdp(j,i) +
+     &                      rsdp(m,i) * rpolarity(m,j,i)
+                     zrsds(j,i) = zrsds(j,i) +
+     &                      rsds(m,i) * rpolarity(m,j,i)
+                     zrsdps(j,i) = zrsdps(j,i) +
+     &                      rsdps(m,i) * rpolarity(m,j,i)
+                  end do
                   conj(j,i) = zrsd(j,i)
                   conjp(j,i) = zrsdp(j,i)
                   conjs(j,i) = zrsds(j,i)
@@ -4967,10 +5073,20 @@ c
                      uinp(j,i) = vecp(j,i)
                      uinds(j,i) = vecs(j,i)
                      uinps(j,i) = vecps(j,i)
-                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
-                     vecs(j,i) = conjs(j,i)/poli(i) - fields(j,i)
-                     vecps(j,i) = conjps(j,i)/poli(i) - fieldps(j,i)
+                     vec(j,i) =  -field(j,i)
+                     vecp(j,i) =  -fieldp(j,i)
+                     vecs(j,i) =  -fields(j,i)
+                     vecps(j,i) =  -fieldps(j,i)
+                     do m = 1, 3
+                        vec(j,i) = vec(j,i) +
+     &                      conj(m,i)*rpolarityinv(m,j,i)
+                        vecp(j,i) = vecp(j,i) +
+     &                      conjp(m,i)*rpolarityinv(m,j,i)
+                        vecs(j,i) = vecs(j,i) +
+     &                      conjs(m,i)*rpolarityinv(m,j,i)
+                        vecps(j,i) = vecps(j,i) +
+     &                      conjps(m,i)*rpolarityinv(m,j,i)
+                     end do
                   end do
                end if
             end do
@@ -5021,10 +5137,20 @@ c
             do i = 1, npole
                if (douind(ipole(i))) then
                   do j = 1, 3
-                     zrsd(j,i) = rsd(j,i) * poli(i)
-                     zrsdp(j,i) = rsdp(j,i) * poli(i)
-                     zrsds(j,i) = rsds(j,i) * poli(i)
-                     zrsdps(j,i) = rsdps(j,i) * poli(i)
+                     zrsd(j,i) = 0.0d0
+                     zrsdp(j,i) = 0.0d0
+                     zrsds(j,i) = 0.0d0
+                     zrsdps(j,i) = 0.0d0
+                     do m = 1, 3
+                        zrsd(j,i) = zrsd(j,i) +
+     &                       rsd(m,i) * rpolarity(m,j,i)
+                        zrsdp(j,i) = zrsdp(j,i) +
+     &                       rsdp(m,i) * rpolarity(m,j,i)
+                        zrsds(j,i) = zrsds(j,i) + 
+     &                       rsds(m,i) * rpolarity(m,j,i)
+                        zrsdps(j,i) = zrsdps(j,i) +
+     &                       rsdps(m,i) * rpolarity(m,j,i)
+                     end do
                      b = b + rsd(j,i)*zrsd(j,i)
                      bp = bp + rsdp(j,i)*zrsdp(j,i)
                      bs = bs + rsds(j,i)*zrsds(j,i)
@@ -5080,10 +5206,16 @@ c
                do i = 1, npole
                   if (douind(ipole(i))) then
                      do j = 1, 3
-                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
-                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
-                        uinds(j,i) = uinds(j,i) + poli(i)*rsds(j,i)
-                        uinps(j,i) = uinps(j,i) + poli(i)*rsdps(j,i)
+                        do m = 1, 3
+                           uind(j,i) = uind(j,i) +
+     &                        rpolarity(m,j,i)*rsd(m,i)
+                           uinp(j,i) = uinp(j,i) +
+     &                        rpolarity(m,j,i)*rsdp(m,i)
+                           uinds(j,i) = uinds(j,i) +
+     &                        rpolarity(m,j,i)*rsds(m,i)
+                           uinps(j,i) = uinps(j,i) +
+     &                        rpolarity(m,j,i)*rsdps(m,i)
+                        end do
                      end do
                   end if
                end do
@@ -5092,7 +5224,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (poli)
          deallocate (rsd)
          deallocate (rsdp)
          deallocate (rsds)
@@ -5796,7 +5927,6 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
       real*8 pdi,pti
-      real*8 polmin
       real*8 poli,polik
       real*8 damp,expdamp
       real*8 pgamma,off2
@@ -5817,12 +5947,16 @@ c
 c
 c     use diagonal preconditioner elements as first approximation
 c
-         polmin = 0.00000001d0
          do i = 1, npole
-            poli = udiag * max(polmin,polarity(i))
             do j = 1, 3
-               zrsd(j,i) = poli * rsd(j,i)
-               zrsdp(j,i) = poli * rsdp(j,i)
+               zrsd(j,i) = 0.0d0
+               zrsdp(j,i) = 0.0d0
+               do m = 1, 3
+                 zrsd(j,i) = zrsd(j,i) +
+     &                      rpolarity(m,j,i)*rsd(m,i) * udiag
+                 zrsdp(j,i) = zrsdp(j,i) +
+     &                      rpolarity(m,j,i)*rsdp(m,i) * udiag
+               enddo
             end do
          end do
 c
@@ -5900,7 +6034,7 @@ c
             zi = z(ii)
             pdi = pdamp(i)
             pti = thole(i)
-            poli = polarity(i)
+            poli = (polarity(1,i)+polarity(2,i)+polarity(3,i))/3.0d0
             do j = i+1, npole
                uscale(ipole(j)) = 1.0d0
             end do
@@ -5937,7 +6071,9 @@ c
                         scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
                      end if
                   end if
-                  polik = poli * polarity(k)
+                  polik = poli*(polarity(1,k)+
+     &                          polarity(2,k)+
+     &                          polarity(3,k))/3.0d0
                   rr3 = scale3 * polik / (r*r2)
                   rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
                   minv(m+1) = rr5*xr*xr - rr3
@@ -6001,7 +6137,6 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
       real*8 pdi,pti
-      real*8 polmin
       real*8 poli,polik
       real*8 damp,expdamp
       real*8 pgamma
@@ -6029,12 +6164,16 @@ c
 c
 c     use diagonal preconditioner elements as first approximation
 c
-         polmin = 0.00000001d0
          do i = 1, npole
-            poli = udiag * max(polmin,polarity(i))
             do j = 1, 3
-               zrsd(j,i) = poli * rsd(j,i)
-               zrsdp(j,i) = poli * rsdp(j,i)
+               zrsd(j,i) = 0.0d0
+               zrsdp(j,i) = 0.0d0
+               do m = 1, 3
+                 zrsd(j,i) = zrsd(j,i) +
+     &                      rpolarity(m,j,i)*rsd(m,i) * udiag
+                 zrsdp(j,i) = zrsdp(j,i) +
+     &                      rpolarity(m,j,i)*rsdp(m,i) * udiag
+               enddo
                zrsdt(j,i) = 0.0d0
                zrsdtp(j,i) = 0.0d0
             end do
@@ -6137,7 +6276,7 @@ c
             zi = z(ii)
             pdi = pdamp(i)
             pti = thole(i)
-            poli = polarity(i)
+            poli = (polarity(1,i)+polarity(2,i)+polarity(3,i))/3.0d0
             do j = 1, np11(ii)
                uscale(ip11(j,ii)) = u1scale
             end do
@@ -6172,7 +6311,9 @@ c
                      scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
                   end if
                end if
-               polik = poli * polarity(k)
+               !ACS NOTE TO JWP: the polarizability is taken as the mean here
+               polik = poli*(polarity(1,k)+polarity(2,k)+polarity(3,k))
+     &                        / 3.0d0
                rr3 = scale3 * polik / (r*r2)
                rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
                minv(m+1) = rr5*xr*xr - rr3

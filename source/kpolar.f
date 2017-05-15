@@ -37,13 +37,16 @@ c
       use potent
       use usolve
       implicit none
-      integer i,j,k,next
+      integer i,j,k,kx,ky,kz,next
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
-      real*8 pol,thl
+      real*8 pol,apol(3),thl
       real*8 sixth
       logical header
+      character*8 axt
+      character*4 pa,pb,pc,pd
+      character*16 pt
       character*20 keyword
       character*240 record
       character*240 string
@@ -133,6 +136,9 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(polarity))  deallocate (polarity)
+      if (allocated(rpolarity))  deallocate (rpolarity)
+      if (allocated(rpolarityinv))  deallocate (rpolarityinv)
+      if (allocated(is_aniso))  deallocate (is_aniso)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
       if (allocated(udir))  deallocate (udir)
@@ -140,7 +146,10 @@ c
       if (allocated(uind))  deallocate (uind)
       if (allocated(uinp))  deallocate (uinp)
       if (allocated(douind))  deallocate (douind)
-      allocate (polarity(n))
+      allocate (polarity(3,n))
+      allocate (rpolarity(3,3,n))
+      allocate (rpolarityinv(3,3,n))
+      allocate (is_aniso(n))
       allocate (thole(n))
       allocate (pdamp(n))
       allocate (udir(3,n))
@@ -199,6 +208,9 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
+c
+c        Look for isotropic polarizabilities
+c
          if (keyword(1:9) .eq. 'POLARIZE ') then
             k = 0
             pol = 0.0d0
@@ -220,7 +232,9 @@ c
      &                       'Damp',5x,'Group Atom Types'/)
                end if
                if (k .le. maxtyp) then
-                  polr(k) = pol
+                  do j = 1, 3
+                    polr(j,k) = pol
+                  enddo
                   athl(k) = thl
                   do j = 1, maxval
                      pgrp(j,k) = pg(j)
@@ -242,12 +256,70 @@ c
                end if
             end if
          end if
+c
+c        Look for anisotropic polarizabilities
+c
+         if (keyword(1:9) .eq. 'APOLARIZE') then
+            k = 0
+            do j = 1, 3
+                apol(j) = 0.0d0
+            enddo
+            thl = -1.0d0
+            do j = 1, maxval
+               pg(j) = 0
+            end do
+            call getnumb (record,k,next)
+            string = record(next:240)
+            read (string,*,err=80,end=80) apol(1),apol(2),apol(3),
+     &                                      thl,(pg(j),j=1,maxval)
+  80        continue
+            if (k .gt. 0) then
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,90)
+  90              format (/,' Additional Anisotropic Atomic Dipole',
+     &                       ' Polarizability Parameters :',
+     &                    //,5x,'Atom Type',9x,'Alpha xx',2x,
+     &                      'Alpha yy',2x, 'Alpha zz',6x,
+     &                       'Damp',4x,'Group Atom Types'/)
+               end if
+               if (k .le. maxtyp) then
+                  do j = 1, 3
+                     polr(j,k) = apol(j)
+                  enddo
+                  athl(k) = thl
+                  do j = 1, maxval
+                     pgrp(j,k) = pg(j)
+                     if (pg(j) .eq. 0) then
+                        npg = j - 1
+                        goto 100
+                     end if
+                  end do
+ 100              continue
+                  if (.not. silent) then
+                     write (iout,110) k,apol(1:3),thl,(pg(j),j=1,npg)
+ 110                 format (4x,i6,10x,3f10.3,2x,f10.3,7x,20i5)
+                  end if
+               else
+                  write (iout,79)
+  79              format (/,' KPOLAR  --  Too many Dipole',
+     &                       ' Polarizability Parameters')
+                  abort = .true.
+               end if
+            end if
+         end if
       end do
 c
 c     find and store the atomic dipole polarizability parameters
 c
       do i = 1, n
-         polarity(i) = polr(type(i))
+         is_aniso(i) = .false.
+         do j = 1, 3
+            polarity(j,i) = polr(j, type(i))
+         enddo
+         if((polarity(1,i) .ne. polarity(2,i)) .or.
+     &      (polarity(1,i) .ne. polarity(3,i)) .or.
+     &      (polarity(2,i) .ne. polarity(3,i))) is_aniso(i) = .true.
          thole(i) = athl(type(i))
       end do
 c
@@ -259,6 +331,9 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
+c
+c        Look for isotropic polarizabilities
+c
          if (keyword(1:9) .eq. 'POLARIZE ') then
             k = 0
             pol = 0.0d0
@@ -267,24 +342,61 @@ c
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
                string = record(next:240)
-               read (string,*,err=80,end=80)  pol,thl
-   80          continue
+               read (string,*,err=120,end=120)  pol,thl
+  120          continue
                if (header) then
                   header = .false.
-                  write (iout,90)
-   90             format (/,' Additional Dipole Polarizabilities',
+                  write (iout,130)
+  130             format (/,' Additional Dipole Polarizabilities',
      &                       ' for Specific Atoms :',
      &                    //,6x,'Atom',15x,'Alpha',8x,'Damp',/)
                end if
                if (.not. silent) then
-                  write (iout,100)  k,pol,thl
-  100             format (4x,i6,10x,f10.3,2x,f10.3)
+                  write (iout,140)  k,pol,thl
+  140             format (4x,i6,10x,f10.3,2x,f10.3)
                end if
-               polarity(k) = pol
+               do j = 1, 3
+                  polarity(j,k) = pol
+               end do
+               thole(k) = thl
+            end if
+         end if
+c
+c        Look for anisotropic polarizabilities
+c
+         if (keyword(1:9) .eq. 'APOLARIZE') then
+            k = 0
+            do j = 1, 3
+                apol(j) = 0.0d0
+            enddo
+            thl = -1.0d0
+            call getnumb (record,k,next)
+            if (k.lt.0 .and. k.ge.-n) then
+               k = -k
+               string = record(next:240)
+               read (string,*,err=150,end=150) apol(1),apol(2),apol(3),
+     &                                         thl
+  150          continue
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,160)
+  160             format (/,' Additional Anisotropic Atomic Dipole',
+     &                 ' Polarizability Parameters for Specific Atoms:',
+     &                    //,5x,'Atom Type',9x,'Alpha xx',2x,
+     &                      'Alpha yy',2x,'Alpha zz',6x,'Damp'/)
+               end if
+               if (.not. silent) then
+                  write (iout,170)  k,apol(1:3),thl
+  170             format (4x,i6,10x,3f10.3,2x,f10.3)
+               end if
+               do j = 1, 3
+                  polarity(j,k) = apol(j)
+               end do
                thole(k) = thl
             end if
          end if
       end do
+
 c
 c     remove zero and undefined polarizable sites from the list
 c
@@ -292,7 +404,10 @@ c
       if (use_polar) then
          npole = 0
          do i = 1, n
-            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
+            if (polsiz(i) .ne. 0 .or.
+     &          polarity(1,i) .ne. 0.0d0 .or.
+     &          polarity(2,i) .ne. 0.0d0 .or.
+     &          polarity(3,i) .ne. 0.0d0) then
                npole = npole + 1
                ipole(npole) = i
                pollist(i) = npole
@@ -303,8 +418,12 @@ c
                do k = 1, maxpole
                   pole(k,npole) = pole(k,i)
                end do
-               if (polarity(i) .ne. 0.0d0)  npolar = npolar + 1
-               polarity(npole) = polarity(i)
+               if (polarity(1,i).ne.0.0d0 .or.
+     &             polarity(2,i).ne.0.0d0 .or.
+     &             polarity(3,i).ne.0.0d0) npolar = npolar + 1
+               do j = 1, 3
+                  polarity(j,npole) = polarity(j,i)
+               enddo
                thole(npole) = thole(i)
             end if
          end do
@@ -317,7 +436,8 @@ c
          if (thole(i) .eq. 0.0d0) then
             pdamp(i) = 0.0d0
          else
-            pdamp(i) = polarity(i)**sixth
+            pdamp(i) = ((polarity(1,i)+polarity(2,i)+
+     &                  polarity(3,i))/3.0d0)**sixth
          end if
       end do
 c

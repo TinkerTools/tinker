@@ -629,7 +629,10 @@ c     deallocation of global arrays from module polar
 c
       if (allocated(copt))  deallocate (copt)
       if (allocated(copm))  deallocate (copm)
+      if (allocated(is_aniso))  deallocate (is_aniso)
       if (allocated(polarity))  deallocate (polarity)
+      if (allocated(rpolarity))  deallocate (rpolarity)
+      if (allocated(rpolarityinv))  deallocate (rpolarityinv)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
       if (allocated(udir))  deallocate (udir)

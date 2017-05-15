@@ -986,7 +986,9 @@ c     atomic dipole polarizability parameters
 c
       exist = .false.
       do i = 1, maxtyp
-         if (polr(i) .ne. 0.0d0)  exist = .true.
+         do j = 1, 3
+            if (polr(j,i) .ne. 0.0d0)  exist = .true.
+         end do
       end do
       if (exist) then
          write (itxt,1350)  formfeed,forcefield
@@ -997,17 +999,19 @@ c
      &              6x,'Group Atom Types',/)
          k = 0
          do i = 1, maxtyp
-            if (polr(i) .ne. 0.0d0) then
+            if (polr(1,i) .ne. 0.0d0 .or.
+     &          polr(2,i) .ne. 0.0d0 .or.
+     &          polr(3,i) .ne. 0.0d0) then
                k = k + 1
                npg = 0
                do j = 1, maxval
                   if (pgrp(j,i) .ne. 0)  npg = npg + 1
                end do
                if (npg .eq. 0) then
-                  write (itxt,1370)  k,i,polr(i),athl(i)
+                  write (itxt,1370)  k,i,polr(1,i),athl(i)
  1370             format (10x,i5,7x,i4,3x,2f10.3)
                else
-                  write (itxt,1380)  k,i,polr(i),athl(i),
+                  write (itxt,1380)  k,i,polr(1,i),athl(i),
      &                               (pgrp(j,i),j=1,npg)
  1380             format (10x,i5,7x,i4,3x,2f10.3,4x,6i5)
                end if

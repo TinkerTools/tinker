@@ -72,6 +72,8 @@ c
       use virial
       implicit none
       integer i,j,k,m
+      integer ix,iy,iz
+      integer kx,ky,kz
       integer ii,kk,jcell
       integer iax,iay,iaz
       real*8 e,f,damp,expdamp
@@ -124,6 +126,9 @@ c
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
+      real*8 uikx,uiky,uikz
+      real*8 ttmi(3),ttmk(3)
+      real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
@@ -161,6 +166,7 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (tem(3,n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -173,6 +179,9 @@ c
          end do
          do j = 1, 6
             dufld(j,i) = 0.0d0
+         end do
+         do j = 1, 3
+            tem(j,i) = 0.0d0
          end do
       end do
 c
@@ -557,6 +566,90 @@ c
                      end do
                   end do
                end if
+c
+c      add anisotropic dipole torques
+c
+
+               ! Note: this "if" check is not needed; the extra terms computed will
+               ! be zero in the isotropic case.  Right now the go-to is isotropic dipoles
+               ! so I added it in, even though these few terms will not be a bottleneck
+               if(is_aniso(i) .or. is_aniso(k)) then
+                  uikx = uky*uizp + ukyp*uiz - ukz*uiyp - ukzp*uiy
+                  uiky = ukz*uixp + ukzp*uix - ukx*uizp - ukxp*uiz
+                  uikz = ukx*uiyp + ukxp*uiy - uky*uixp - ukyp*uix
+                  ! Site i
+                  term1 = -ck*dsr3 + drk*dsr5 - qrrk*dsr7
+                  term2 = -ck*psr3 + drk*psr5 - qrrk*psr7
+                  term3 = 2.0d0 * dsr5
+                  term4 = 2.0d0 * psr5
+                  tem(1,i) = tem(1,i) + psr3*(dky*uiz - dkz*uiy)
+                  tem(2,i) = tem(2,i) + psr3*(dkz*uix - dkx*uiz)
+                  tem(3,i) = tem(3,i) + psr3*(dkx*uiy - dky*uix)
+                  tem(1,i) = tem(1,i) + dsr3*(dky*uizp - dkz*uiyp)
+                  tem(2,i) = tem(2,i) + dsr3*(dkz*uixp - dkx*uizp)
+                  tem(3,i) = tem(3,i) + dsr3*(dkx*uiyp - dky*uixp)
+                  tem(1,i) = tem(1,i) + term1*(uiyp*zr - uizp*yr)
+                  tem(2,i) = tem(2,i) + term1*(uizp*xr - uixp*zr)
+                  tem(3,i) = tem(3,i) + term1*(uixp*yr - uiyp*xr)
+                  tem(1,i) = tem(1,i) + term2*(uiy*zr - uiz*yr)
+                  tem(2,i) = tem(2,i) + term2*(uiz*xr - uix*zr)
+                  tem(3,i) = tem(3,i) + term2*(uix*yr - uiy*xr)
+                  tem(1,i) = tem(1,i) + term3*(uiyp*qrkz - uizp*qrky)
+                  tem(2,i) = tem(2,i) + term3*(uizp*qrkx - uixp*qrkz)
+                  tem(3,i) = tem(3,i) + term3*(uixp*qrky - uiyp*qrkx)
+                  tem(1,i) = tem(1,i) + term4*(uiy*qrkz - uiz*qrky)
+                  tem(2,i) = tem(2,i) + term4*(uiz*qrkx - uix*qrkz)
+                  tem(3,i) = tem(3,i) + term4*(uix*qrky - uiy*qrkx)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = uscale(kk)*urk*sr5
+                     term2 = uscale(kk)*urkp*sr5
+                     tem(1,i) = tem(1,i) + uscale(kk)*sr3*uikx
+                     tem(2,i) = tem(2,i) + uscale(kk)*sr3*uiky
+                     tem(3,i) = tem(3,i) + uscale(kk)*sr3*uikz
+                     tem(1,i) = tem(1,i) + term1*(uiyp*zr-uizp*yr)
+                     tem(2,i) = tem(2,i) + term1*(uizp*xr-uixp*zr)
+                     tem(3,i) = tem(3,i) + term1*(uixp*yr-uiyp*xr)
+                     tem(1,i) = tem(1,i) + term2*(uiy*zr-uiz*yr)
+                     tem(2,i) = tem(2,i) + term2*(uiz*xr-uix*zr)
+                     tem(3,i) = tem(3,i) + term2*(uix*yr-uiy*xr)
+                  endif
+                  ! Site k
+                  term1 = ci*dsr3 + dri*dsr5 + qrri*dsr7
+                  term2 = ci*psr3 + dri*psr5 + qrri*psr7
+                  term3 = -2.0d0 * dsr5
+                  term4 = -2.0d0 * psr5
+                  tem(1,k) = tem(1,k) + dsr3*(diy*ukzp - diz*ukyp)
+                  tem(2,k) = tem(2,k) + dsr3*(diz*ukxp - dix*ukzp)
+                  tem(3,k) = tem(3,k) + dsr3*(dix*ukyp - diy*ukxp)
+                  tem(1,k) = tem(1,k) + psr3*(diy*ukz - diz*uky)
+                  tem(2,k) = tem(2,k) + psr3*(diz*ukx - dix*ukz)
+                  tem(3,k) = tem(3,k) + psr3*(dix*uky - diy*ukx)
+                  tem(1,k) = tem(1,k) + term1*(ukyp*zr - ukzp*yr)
+                  tem(2,k) = tem(2,k) + term1*(ukzp*xr - ukxp*zr)
+                  tem(3,k) = tem(3,k) + term1*(ukxp*yr - ukyp*xr)
+                  tem(1,k) = tem(1,k) + term2*(uky*zr - ukz*yr)
+                  tem(2,k) = tem(2,k) + term2*(ukz*xr - ukx*zr)
+                  tem(3,k) = tem(3,k) + term2*(ukx*yr - uky*xr)
+                  tem(1,k) = tem(1,k) + term3*(ukyp*qriz - ukzp*qriy)
+                  tem(2,k) = tem(2,k) + term3*(ukzp*qrix - ukxp*qriz)
+                  tem(3,k) = tem(3,k) + term3*(ukxp*qriy - ukyp*qrix)
+                  tem(1,k) = tem(1,k) + term4*(uky*qriz - ukz*qriy)
+                  tem(2,k) = tem(2,k) + term4*(ukz*qrix - ukx*qriz)
+                  tem(3,k) = tem(3,k) + term4*(ukx*qriy - uky*qrix)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = uscale(kk)*uri*sr5
+                     term2 = uscale(kk)*urip*sr5
+                     tem(1,k) = tem(1,k) - uscale(kk)*sr3*uikx
+                     tem(2,k) = tem(2,k) - uscale(kk)*sr3*uiky
+                     tem(3,k) = tem(3,k) - uscale(kk)*sr3*uikz
+                     tem(1,k) = tem(1,k) + term1*(ukyp*zr-ukzp*yr)
+                     tem(2,k) = tem(2,k) + term1*(ukzp*xr-ukxp*zr)
+                     tem(3,k) = tem(3,k) + term1*(ukxp*yr-ukyp*xr)
+                     tem(1,k) = tem(1,k) + term2*(uky*zr-ukz*yr)
+                     tem(2,k) = tem(2,k) + term2*(ukz*xr-ukx*zr)
+                     tem(3,k) = tem(3,k) + term2*(ukx*yr-uky*xr)
+                  endif
+               endif
 c
 c     increment gradient and virial due to Cartesian forces
 c
@@ -1062,6 +1155,86 @@ c
                   dsr7 = 0.5d0 * dsr7
                end if
 c
+c      add anisotropic dipole torques
+c
+               if(is_aniso(i) .or. is_aniso(k)) then
+                  uikx = uky*uizp + ukyp*uiz - ukz*uiyp - ukzp*uiy
+                  uiky = ukz*uixp + ukzp*uix - ukx*uizp - ukxp*uiz
+                  uikz = ukx*uiyp + ukxp*uiy - uky*uixp - ukyp*uix
+                  ! Site i
+                  term1 = -ck*dsr3 + drk*dsr5 - qrrk*dsr7
+                  term2 = -ck*psr3 + drk*psr5 - qrrk*psr7
+                  term3 = 2.0d0 * dsr5
+                  term4 = 2.0d0 * psr5
+                  tem(1,i) = tem(1,i) + psr3*(dky*uiz - dkz*uiy)
+                  tem(2,i) = tem(2,i) + psr3*(dkz*uix - dkx*uiz)
+                  tem(3,i) = tem(3,i) + psr3*(dkx*uiy - dky*uix)
+                  tem(1,i) = tem(1,i) + dsr3*(dky*uizp - dkz*uiyp)
+                  tem(2,i) = tem(2,i) + dsr3*(dkz*uixp - dkx*uizp)
+                  tem(3,i) = tem(3,i) + dsr3*(dkx*uiyp - dky*uixp)
+                  tem(1,i) = tem(1,i) + term1*(uiyp*zr - uizp*yr)
+                  tem(2,i) = tem(2,i) + term1*(uizp*xr - uixp*zr)
+                  tem(3,i) = tem(3,i) + term1*(uixp*yr - uiyp*xr)
+                  tem(1,i) = tem(1,i) + term2*(uiy*zr - uiz*yr)
+                  tem(2,i) = tem(2,i) + term2*(uiz*xr - uix*zr)
+                  tem(3,i) = tem(3,i) + term2*(uix*yr - uiy*xr)
+                  tem(1,i) = tem(1,i) + term3*(uiyp*qrkz - uizp*qrky)
+                  tem(2,i) = tem(2,i) + term3*(uizp*qrkx - uixp*qrkz)
+                  tem(3,i) = tem(3,i) + term3*(uixp*qrky - uiyp*qrkx)
+                  tem(1,i) = tem(1,i) + term4*(uiy*qrkz - uiz*qrky)
+                  tem(2,i) = tem(2,i) + term4*(uiz*qrkx - uix*qrkz)
+                  tem(3,i) = tem(3,i) + term4*(uix*qrky - uiy*qrkx)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = uscale(kk)*urk*sr5
+                     term2 = uscale(kk)*urkp*sr5
+                     tem(1,i) = tem(1,i) + uscale(kk)*sr3*uikx
+                     tem(2,i) = tem(2,i) + uscale(kk)*sr3*uiky
+                     tem(3,i) = tem(3,i) + uscale(kk)*sr3*uikz
+                     tem(1,i) = tem(1,i) + term1*(uiyp*zr-uizp*yr)
+                     tem(2,i) = tem(2,i) + term1*(uizp*xr-uixp*zr)
+                     tem(3,i) = tem(3,i) + term1*(uixp*yr-uiyp*xr)
+                     tem(1,i) = tem(1,i) + term2*(uiy*zr-uiz*yr)
+                     tem(2,i) = tem(2,i) + term2*(uiz*xr-uix*zr)
+                     tem(3,i) = tem(3,i) + term2*(uix*yr-uiy*xr)
+                  endif
+                  ! Site k
+                  term1 = ci*dsr3 + dri*dsr5 + qrri*dsr7
+                  term2 = ci*psr3 + dri*psr5 + qrri*psr7
+                  term3 = -2.0d0 * dsr5
+                  term4 = -2.0d0 * psr5
+                  tem(1,k) = tem(1,k) + dsr3*(diy*ukzp - diz*ukyp)
+                  tem(2,k) = tem(2,k) + dsr3*(diz*ukxp - dix*ukzp)
+                  tem(3,k) = tem(3,k) + dsr3*(dix*ukyp - diy*ukxp)
+                  tem(1,k) = tem(1,k) + psr3*(diy*ukz - diz*uky)
+                  tem(2,k) = tem(2,k) + psr3*(diz*ukx - dix*ukz)
+                  tem(3,k) = tem(3,k) + psr3*(dix*uky - diy*ukx)
+                  tem(1,k) = tem(1,k) + term1*(ukyp*zr - ukzp*yr)
+                  tem(2,k) = tem(2,k) + term1*(ukzp*xr - ukxp*zr)
+                  tem(3,k) = tem(3,k) + term1*(ukxp*yr - ukyp*xr)
+                  tem(1,k) = tem(1,k) + term2*(uky*zr - ukz*yr)
+                  tem(2,k) = tem(2,k) + term2*(ukz*xr - ukx*zr)
+                  tem(3,k) = tem(3,k) + term2*(ukx*yr - uky*xr)
+                  tem(1,k) = tem(1,k) + term3*(ukyp*qriz - ukzp*qriy)
+                  tem(2,k) = tem(2,k) + term3*(ukzp*qrix - ukxp*qriz)
+                  tem(3,k) = tem(3,k) + term3*(ukxp*qriy - ukyp*qrix)
+                  tem(1,k) = tem(1,k) + term4*(uky*qriz - ukz*qriy)
+                  tem(2,k) = tem(2,k) + term4*(ukz*qrix - ukx*qriz)
+                  tem(3,k) = tem(3,k) + term4*(ukx*qriy - uky*qrix)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = uscale(kk)*uri*sr5
+                     term2 = uscale(kk)*urip*sr5
+                     tem(1,k) = tem(1,k) - uscale(kk)*sr3*uikx
+                     tem(2,k) = tem(2,k) - uscale(kk)*sr3*uiky
+                     tem(3,k) = tem(3,k) - uscale(kk)*sr3*uikz
+                     tem(1,k) = tem(1,k) + term1*(ukyp*zr-ukzp*yr)
+                     tem(2,k) = tem(2,k) + term1*(ukzp*xr-ukxp*zr)
+                     tem(3,k) = tem(3,k) + term1*(ukxp*yr-ukyp*xr)
+                     tem(1,k) = tem(1,k) + term2*(uky*zr-ukz*yr)
+                     tem(2,k) = tem(2,k) + term2*(ukz*xr-ukx*zr)
+                     tem(3,k) = tem(3,k) + term2*(ukx*yr-uky*xr)
+                  endif
+               endif
+c
 c     increment gradient and virial due to Cartesian forces
 c
                dep(1,ii) = dep(1,ii) + frcx
@@ -1192,6 +1365,10 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
+         ! Anisotropic dipole terms
+         trq(1) = trq(1) + tem(1,i)
+         trq(2) = trq(2) + tem(2,i)
+         trq(3) = trq(3) + tem(3,i)
          call torque (i,trq,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
@@ -1233,6 +1410,7 @@ c
       deallocate (uscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (tem)
       return
       end
 c
@@ -1321,6 +1499,9 @@ c
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
+      real*8 uikx,uiky,uikz
+      real*8 ttmi(3),ttmk(3)
+      real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
@@ -1358,6 +1539,7 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (tem(3,n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -1370,6 +1552,9 @@ c
          end do
          do j = 1, 6
             dufld(j,i) = 0.0d0
+         end do
+         do j = 1, 3
+            tem(j,i) = 0.0d0
          end do
       end do
 c
@@ -1768,6 +1953,86 @@ c
                   end do
                end if
 c
+c      add anisotropic dipole torques
+c
+               if(is_aniso(i) .or. is_aniso(k)) then
+                  uikx = uky*uizp + ukyp*uiz - ukz*uiyp - ukzp*uiy
+                  uiky = ukz*uixp + ukzp*uix - ukx*uizp - ukxp*uiz
+                  uikz = ukx*uiyp + ukxp*uiy - uky*uixp - ukyp*uix
+                  ! Site i
+                  term1 = -ck*dsr3 + drk*dsr5 - qrrk*dsr7
+                  term2 = -ck*psr3 + drk*psr5 - qrrk*psr7
+                  term3 = 2.0d0 * dsr5
+                  term4 = 2.0d0 * psr5
+                  tem(1,i) = tem(1,i) + psr3*(dky*uiz - dkz*uiy)
+                  tem(2,i) = tem(2,i) + psr3*(dkz*uix - dkx*uiz)
+                  tem(3,i) = tem(3,i) + psr3*(dkx*uiy - dky*uix)
+                  tem(1,i) = tem(1,i) + dsr3*(dky*uizp - dkz*uiyp)
+                  tem(2,i) = tem(2,i) + dsr3*(dkz*uixp - dkx*uizp)
+                  tem(3,i) = tem(3,i) + dsr3*(dkx*uiyp - dky*uixp)
+                  tem(1,i) = tem(1,i) + term1*(uiyp*zr - uizp*yr)
+                  tem(2,i) = tem(2,i) + term1*(uizp*xr - uixp*zr)
+                  tem(3,i) = tem(3,i) + term1*(uixp*yr - uiyp*xr)
+                  tem(1,i) = tem(1,i) + term2*(uiy*zr - uiz*yr)
+                  tem(2,i) = tem(2,i) + term2*(uiz*xr - uix*zr)
+                  tem(3,i) = tem(3,i) + term2*(uix*yr - uiy*xr)
+                  tem(1,i) = tem(1,i) + term3*(uiyp*qrkz - uizp*qrky)
+                  tem(2,i) = tem(2,i) + term3*(uizp*qrkx - uixp*qrkz)
+                  tem(3,i) = tem(3,i) + term3*(uixp*qrky - uiyp*qrkx)
+                  tem(1,i) = tem(1,i) + term4*(uiy*qrkz - uiz*qrky)
+                  tem(2,i) = tem(2,i) + term4*(uiz*qrkx - uix*qrkz)
+                  tem(3,i) = tem(3,i) + term4*(uix*qrky - uiy*qrkx)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = uscale(kk)*urk*sr5
+                     term2 = uscale(kk)*urkp*sr5
+                     tem(1,i) = tem(1,i) + uscale(kk)*sr3*uikx
+                     tem(2,i) = tem(2,i) + uscale(kk)*sr3*uiky
+                     tem(3,i) = tem(3,i) + uscale(kk)*sr3*uikz
+                     tem(1,i) = tem(1,i) + term1*(uiyp*zr-uizp*yr)
+                     tem(2,i) = tem(2,i) + term1*(uizp*xr-uixp*zr)
+                     tem(3,i) = tem(3,i) + term1*(uixp*yr-uiyp*xr)
+                     tem(1,i) = tem(1,i) + term2*(uiy*zr-uiz*yr)
+                     tem(2,i) = tem(2,i) + term2*(uiz*xr-uix*zr)
+                     tem(3,i) = tem(3,i) + term2*(uix*yr-uiy*xr)
+                  endif
+                  ! Site k
+                  term1 = ci*dsr3 + dri*dsr5 + qrri*dsr7
+                  term2 = ci*psr3 + dri*psr5 + qrri*psr7
+                  term3 = -2.0d0 * dsr5
+                  term4 = -2.0d0 * psr5
+                  tem(1,k) = tem(1,k) + dsr3*(diy*ukzp - diz*ukyp)
+                  tem(2,k) = tem(2,k) + dsr3*(diz*ukxp - dix*ukzp)
+                  tem(3,k) = tem(3,k) + dsr3*(dix*ukyp - diy*ukxp)
+                  tem(1,k) = tem(1,k) + psr3*(diy*ukz - diz*uky)
+                  tem(2,k) = tem(2,k) + psr3*(diz*ukx - dix*ukz)
+                  tem(3,k) = tem(3,k) + psr3*(dix*uky - diy*ukx)
+                  tem(1,k) = tem(1,k) + term1*(ukyp*zr - ukzp*yr)
+                  tem(2,k) = tem(2,k) + term1*(ukzp*xr - ukxp*zr)
+                  tem(3,k) = tem(3,k) + term1*(ukxp*yr - ukyp*xr)
+                  tem(1,k) = tem(1,k) + term2*(uky*zr - ukz*yr)
+                  tem(2,k) = tem(2,k) + term2*(ukz*xr - ukx*zr)
+                  tem(3,k) = tem(3,k) + term2*(ukx*yr - uky*xr)
+                  tem(1,k) = tem(1,k) + term3*(ukyp*qriz - ukzp*qriy)
+                  tem(2,k) = tem(2,k) + term3*(ukzp*qrix - ukxp*qriz)
+                  tem(3,k) = tem(3,k) + term3*(ukxp*qriy - ukyp*qrix)
+                  tem(1,k) = tem(1,k) + term4*(uky*qriz - ukz*qriy)
+                  tem(2,k) = tem(2,k) + term4*(ukz*qrix - ukx*qriz)
+                  tem(3,k) = tem(3,k) + term4*(ukx*qriy - uky*qrix)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = uscale(kk)*uri*sr5
+                     term2 = uscale(kk)*urip*sr5
+                     tem(1,k) = tem(1,k) - uscale(kk)*sr3*uikx
+                     tem(2,k) = tem(2,k) - uscale(kk)*sr3*uiky
+                     tem(3,k) = tem(3,k) - uscale(kk)*sr3*uikz
+                     tem(1,k) = tem(1,k) + term1*(ukyp*zr-ukzp*yr)
+                     tem(2,k) = tem(2,k) + term1*(ukzp*xr-ukxp*zr)
+                     tem(3,k) = tem(3,k) + term1*(ukxp*yr-ukyp*xr)
+                     tem(1,k) = tem(1,k) + term2*(uky*zr-ukz*yr)
+                     tem(2,k) = tem(2,k) + term2*(ukz*xr-ukx*zr)
+                     tem(3,k) = tem(3,k) + term2*(ukx*yr-uky*xr)
+                  endif
+               endif
+c
 c     increment gradient and virial due to Cartesian forces
 c
                dep(1,ii) = dep(1,ii) + frcx
@@ -1901,6 +2166,10 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
+         ! Anisotropic dipole terms
+         trq(1) = trq(1) + tem(1,i)
+         trq(2) = trq(2) + tem(2,i)
+         trq(3) = trq(3) + tem(3,i)
          call torque (i,trq,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
@@ -1947,6 +2216,7 @@ c
       deallocate (uscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (tem)
       return
       end
 c
@@ -2047,6 +2317,9 @@ c     compute the self-energy torque term due to induced dipole
 c
       term = (4.0d0/3.0d0) * f * aewald**3 / sqrtpi
       do i = 1, npole
+         ! anisotropic induced dipole torques are equal and opposite to
+         ! permanent dipole torques and, thus, they cancel each other
+         if(is_aniso(i)) cycle
          dix = rpole(2,i)
          diy = rpole(3,i)
          diz = rpole(4,i)
@@ -2241,6 +2514,9 @@ c
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 bn(0:4)
+      real*8 uikx,uiky,uikz
+      real*8 ttmi(3),ttmk(3)
+      real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
@@ -2257,6 +2533,7 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (tem(3,n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -2269,6 +2546,9 @@ c
          end do
          do j = 1, 6
             dufld(j,i) = 0.0d0
+         end do
+         do j = 1, 3
+            tem(j,i) = 0.0d0
          end do
       end do
 c
@@ -2760,6 +3040,86 @@ c
                      end do
                   end do
                end if
+c
+c      add anisotropic dipole torques
+c
+               if(is_aniso(i) .or. is_aniso(k)) then
+                  uikx = uky*uizp + ukyp*uiz - ukz*uiyp - ukzp*uiy
+                  uiky = ukz*uixp + ukzp*uix - ukx*uizp - ukxp*uiz
+                  uikz = ukx*uiyp + ukxp*uiy - uky*uixp - ukyp*uix
+                  ! Site i
+                  term1 = -ck*dsr3 + drk*dsr5 - qrrk*dsr7
+                  term2 = -ck*psr3 + drk*psr5 - qrrk*psr7
+                  term3 = 2.0d0 * dsr5
+                  term4 = 2.0d0 * psr5
+                  tem(1,i) = tem(1,i) + psr3*(dky*uiz - dkz*uiy)
+                  tem(2,i) = tem(2,i) + psr3*(dkz*uix - dkx*uiz)
+                  tem(3,i) = tem(3,i) + psr3*(dkx*uiy - dky*uix)
+                  tem(1,i) = tem(1,i) + dsr3*(dky*uizp - dkz*uiyp)
+                  tem(2,i) = tem(2,i) + dsr3*(dkz*uixp - dkx*uizp)
+                  tem(3,i) = tem(3,i) + dsr3*(dkx*uiyp - dky*uixp)
+                  tem(1,i) = tem(1,i) + term1*(uiyp*zr - uizp*yr)
+                  tem(2,i) = tem(2,i) + term1*(uizp*xr - uixp*zr)
+                  tem(3,i) = tem(3,i) + term1*(uixp*yr - uiyp*xr)
+                  tem(1,i) = tem(1,i) + term2*(uiy*zr - uiz*yr)
+                  tem(2,i) = tem(2,i) + term2*(uiz*xr - uix*zr)
+                  tem(3,i) = tem(3,i) + term2*(uix*yr - uiy*xr)
+                  tem(1,i) = tem(1,i) + term3*(uiyp*qrkz - uizp*qrky)
+                  tem(2,i) = tem(2,i) + term3*(uizp*qrkx - uixp*qrkz)
+                  tem(3,i) = tem(3,i) + term3*(uixp*qrky - uiyp*qrkx)
+                  tem(1,i) = tem(1,i) + term4*(uiy*qrkz - uiz*qrky)
+                  tem(2,i) = tem(2,i) + term4*(uiz*qrkx - uix*qrkz)
+                  tem(3,i) = tem(3,i) + term4*(uix*qrky - uiy*qrkx)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = usr5*urk
+                     term2 = usr5*urkp
+                     tem(1,i) = tem(1,i) + usr3*uikx
+                     tem(2,i) = tem(2,i) + usr3*uiky
+                     tem(3,i) = tem(3,i) + usr3*uikz
+                     tem(1,i) = tem(1,i) + term1*(uiyp*zr-uizp*yr)
+                     tem(2,i) = tem(2,i) + term1*(uizp*xr-uixp*zr)
+                     tem(3,i) = tem(3,i) + term1*(uixp*yr-uiyp*xr)
+                     tem(1,i) = tem(1,i) + term2*(uiy*zr-uiz*yr)
+                     tem(2,i) = tem(2,i) + term2*(uiz*xr-uix*zr)
+                     tem(3,i) = tem(3,i) + term2*(uix*yr-uiy*xr)
+                  endif
+                  ! Site k
+                  term1 = ci*dsr3 + dri*dsr5 + qrri*dsr7
+                  term2 = ci*psr3 + dri*psr5 + qrri*psr7
+                  term3 = -2.0d0 * dsr5
+                  term4 = -2.0d0 * psr5
+                  tem(1,k) = tem(1,k) + dsr3*(diy*ukzp - diz*ukyp)
+                  tem(2,k) = tem(2,k) + dsr3*(diz*ukxp - dix*ukzp)
+                  tem(3,k) = tem(3,k) + dsr3*(dix*ukyp - diy*ukxp)
+                  tem(1,k) = tem(1,k) + psr3*(diy*ukz - diz*uky)
+                  tem(2,k) = tem(2,k) + psr3*(diz*ukx - dix*ukz)
+                  tem(3,k) = tem(3,k) + psr3*(dix*uky - diy*ukx)
+                  tem(1,k) = tem(1,k) + term1*(ukyp*zr - ukzp*yr)
+                  tem(2,k) = tem(2,k) + term1*(ukzp*xr - ukxp*zr)
+                  tem(3,k) = tem(3,k) + term1*(ukxp*yr - ukyp*xr)
+                  tem(1,k) = tem(1,k) + term2*(uky*zr - ukz*yr)
+                  tem(2,k) = tem(2,k) + term2*(ukz*xr - ukx*zr)
+                  tem(3,k) = tem(3,k) + term2*(ukx*yr - uky*xr)
+                  tem(1,k) = tem(1,k) + term3*(ukyp*qriz - ukzp*qriy)
+                  tem(2,k) = tem(2,k) + term3*(ukzp*qrix - ukxp*qriz)
+                  tem(3,k) = tem(3,k) + term3*(ukxp*qriy - ukyp*qrix)
+                  tem(1,k) = tem(1,k) + term4*(uky*qriz - ukz*qriy)
+                  tem(2,k) = tem(2,k) + term4*(ukz*qrix - ukx*qriz)
+                  tem(3,k) = tem(3,k) + term4*(ukx*qriy - uky*qrix)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = usr5*uri
+                     term2 = usr5*urip
+                     tem(1,k) = tem(1,k) - usr3*uikx
+                     tem(2,k) = tem(2,k) - usr3*uiky
+                     tem(3,k) = tem(3,k) - usr3*uikz
+                     tem(1,k) = tem(1,k) + term1*(ukyp*zr-ukzp*yr)
+                     tem(2,k) = tem(2,k) + term1*(ukzp*xr-ukxp*zr)
+                     tem(3,k) = tem(3,k) + term1*(ukxp*yr-ukyp*xr)
+                     tem(1,k) = tem(1,k) + term2*(uky*zr-ukz*yr)
+                     tem(2,k) = tem(2,k) + term2*(ukz*xr-ukx*zr)
+                     tem(3,k) = tem(3,k) + term2*(ukx*yr-uky*xr)
+                  endif
+               endif
 c
 c     increment gradient and virial due to Cartesian forces
 c
@@ -3504,6 +3864,10 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
+         ! Anisotropic dipole terms
+         trq(1) = trq(1) + tem(1,i)
+         trq(2) = trq(2) + tem(2,i)
+         trq(3) = trq(3) + tem(3,i)
          call torque (i,trq,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
@@ -3545,6 +3909,7 @@ c
       deallocate (uscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (tem)
       return
       end
 c
@@ -3645,6 +4010,9 @@ c     compute the self-energy torque term due to induced dipole
 c
       term = (4.0d0/3.0d0) * f * aewald**3 / sqrtpi
       do i = 1, npole
+         ! anisotropic induced dipole torques are equal and opposite to
+         ! permanent dipole torques and, thus, they cancel each other
+         if(is_aniso(i)) cycle
          dix = rpole(2,i)
          diy = rpole(3,i)
          diz = rpole(4,i)
@@ -3839,6 +4207,9 @@ c
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 bn(0:4)
+      real*8 uikx,uiky,uikz
+      real*8 ttmi(3),ttmk(3)
+      real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
@@ -3855,6 +4226,7 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (tem(3,n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -3867,6 +4239,9 @@ c
          end do
          do j = 1, 6
             dufld(j,i) = 0.0d0
+         end do
+         do j = 1, 3
+            tem(j,i) = 0.0d0
          end do
       end do
 c
@@ -4372,6 +4747,86 @@ c
                   end do
                end if
 c
+c      add anisotropic dipole torques
+c
+               if(is_aniso(i) .or. is_aniso(k)) then
+                  uikx = uky*uizp + ukyp*uiz - ukz*uiyp - ukzp*uiy
+                  uiky = ukz*uixp + ukzp*uix - ukx*uizp - ukxp*uiz
+                  uikz = ukx*uiyp + ukxp*uiy - uky*uixp - ukyp*uix
+                  ! Site i
+                  term1 = -ck*dsr3 + drk*dsr5 - qrrk*dsr7
+                  term2 = -ck*psr3 + drk*psr5 - qrrk*psr7
+                  term3 = 2.0d0 * dsr5
+                  term4 = 2.0d0 * psr5
+                  tem(1,i) = tem(1,i) + psr3*(dky*uiz - dkz*uiy)
+                  tem(2,i) = tem(2,i) + psr3*(dkz*uix - dkx*uiz)
+                  tem(3,i) = tem(3,i) + psr3*(dkx*uiy - dky*uix)
+                  tem(1,i) = tem(1,i) + dsr3*(dky*uizp - dkz*uiyp)
+                  tem(2,i) = tem(2,i) + dsr3*(dkz*uixp - dkx*uizp)
+                  tem(3,i) = tem(3,i) + dsr3*(dkx*uiyp - dky*uixp)
+                  tem(1,i) = tem(1,i) + term1*(uiyp*zr - uizp*yr)
+                  tem(2,i) = tem(2,i) + term1*(uizp*xr - uixp*zr)
+                  tem(3,i) = tem(3,i) + term1*(uixp*yr - uiyp*xr)
+                  tem(1,i) = tem(1,i) + term2*(uiy*zr - uiz*yr)
+                  tem(2,i) = tem(2,i) + term2*(uiz*xr - uix*zr)
+                  tem(3,i) = tem(3,i) + term2*(uix*yr - uiy*xr)
+                  tem(1,i) = tem(1,i) + term3*(uiyp*qrkz - uizp*qrky)
+                  tem(2,i) = tem(2,i) + term3*(uizp*qrkx - uixp*qrkz)
+                  tem(3,i) = tem(3,i) + term3*(uixp*qrky - uiyp*qrkx)
+                  tem(1,i) = tem(1,i) + term4*(uiy*qrkz - uiz*qrky)
+                  tem(2,i) = tem(2,i) + term4*(uiz*qrkx - uix*qrkz)
+                  tem(3,i) = tem(3,i) + term4*(uix*qrky - uiy*qrkx)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = usr5*urk
+                     term2 = usr5*urkp
+                     tem(1,i) = tem(1,i) + usr3*uikx
+                     tem(2,i) = tem(2,i) + usr3*uiky
+                     tem(3,i) = tem(3,i) + usr3*uikz
+                     tem(1,i) = tem(1,i) + term1*(uiyp*zr-uizp*yr)
+                     tem(2,i) = tem(2,i) + term1*(uizp*xr-uixp*zr)
+                     tem(3,i) = tem(3,i) + term1*(uixp*yr-uiyp*xr)
+                     tem(1,i) = tem(1,i) + term2*(uiy*zr-uiz*yr)
+                     tem(2,i) = tem(2,i) + term2*(uiz*xr-uix*zr)
+                     tem(3,i) = tem(3,i) + term2*(uix*yr-uiy*xr)
+                  endif
+                  ! Site k
+                  term1 = ci*dsr3 + dri*dsr5 + qrri*dsr7
+                  term2 = ci*psr3 + dri*psr5 + qrri*psr7
+                  term3 = -2.0d0 * dsr5
+                  term4 = -2.0d0 * psr5
+                  tem(1,k) = tem(1,k) + dsr3*(diy*ukzp - diz*ukyp)
+                  tem(2,k) = tem(2,k) + dsr3*(diz*ukxp - dix*ukzp)
+                  tem(3,k) = tem(3,k) + dsr3*(dix*ukyp - diy*ukxp)
+                  tem(1,k) = tem(1,k) + psr3*(diy*ukz - diz*uky)
+                  tem(2,k) = tem(2,k) + psr3*(diz*ukx - dix*ukz)
+                  tem(3,k) = tem(3,k) + psr3*(dix*uky - diy*ukx)
+                  tem(1,k) = tem(1,k) + term1*(ukyp*zr - ukzp*yr)
+                  tem(2,k) = tem(2,k) + term1*(ukzp*xr - ukxp*zr)
+                  tem(3,k) = tem(3,k) + term1*(ukxp*yr - ukyp*xr)
+                  tem(1,k) = tem(1,k) + term2*(uky*zr - ukz*yr)
+                  tem(2,k) = tem(2,k) + term2*(ukz*xr - ukx*zr)
+                  tem(3,k) = tem(3,k) + term2*(ukx*yr - uky*xr)
+                  tem(1,k) = tem(1,k) + term3*(ukyp*qriz - ukzp*qriy)
+                  tem(2,k) = tem(2,k) + term3*(ukzp*qrix - ukxp*qriz)
+                  tem(3,k) = tem(3,k) + term3*(ukxp*qriy - ukyp*qrix)
+                  tem(1,k) = tem(1,k) + term4*(uky*qriz - ukz*qriy)
+                  tem(2,k) = tem(2,k) + term4*(ukz*qrix - ukx*qriz)
+                  tem(3,k) = tem(3,k) + term4*(ukx*qriy - uky*qrix)
+                  if (poltyp .eq. 'MUTUAL') then
+                     term1 = usr5*uri
+                     term2 = usr5*urip
+                     tem(1,k) = tem(1,k) - usr3*uikx
+                     tem(2,k) = tem(2,k) - usr3*uiky
+                     tem(3,k) = tem(3,k) - usr3*uikz
+                     tem(1,k) = tem(1,k) + term1*(ukyp*zr-ukzp*yr)
+                     tem(2,k) = tem(2,k) + term1*(ukzp*xr-ukxp*zr)
+                     tem(3,k) = tem(3,k) + term1*(ukxp*yr-ukyp*xr)
+                     tem(1,k) = tem(1,k) + term2*(uky*zr-ukz*yr)
+                     tem(2,k) = tem(2,k) + term2*(ukz*xr-ukx*zr)
+                     tem(3,k) = tem(3,k) + term2*(ukx*yr-uky*xr)
+                  endif
+               endif
+c
 c     increment gradient and virial due to Cartesian forces
 c
                dep(1,ii) = dep(1,ii) - frcx
@@ -4505,6 +4960,10 @@ c
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
+         ! Anisotropic dipole terms
+         trq(1) = trq(1) + tem(1,i)
+         trq(2) = trq(2) + tem(2,i)
+         trq(3) = trq(3) + tem(3,i)
          call torque (i,trq,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
@@ -4615,6 +5074,7 @@ c
       real*8 hsq,expterm
       real*8 term,pterm
       real*8 vterm,struc2
+      real*8 idip(3)
       real*8 trq(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 cphim(4),cphid(4)
@@ -4790,6 +5250,20 @@ c
          call fphi_to_cphi (fphi,cphi)
       end if
 c
+c     handle anisotropic induced dipoles
+c
+      do i = 1, npole
+         if(is_aniso(i)) then
+            idip(1) = 0.5d0*(uind(1,i) + uinp(1,i))
+            idip(2) = 0.5d0*(uind(2,i) + uinp(2,i))
+            idip(3) = 0.5d0*(uind(3,i) + uinp(3,i))
+            trq(1) = idip(3)*cphi(3,i) - idip(2)*cphi(4,i)
+            trq(2) = idip(1)*cphi(4,i) - idip(3)*cphi(2,i)
+            trq(3) = idip(2)*cphi(2,i) - idip(1)*cphi(3,i)
+            call torque (i,trq,fix,fiy,fiz,dep)
+         endif
+      end do
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (fuind(3,npole))
@@ -4927,6 +5401,15 @@ c
      &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphi(8,i)
      &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
      &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
+         if(is_aniso(i) .and. poltyp .eq. "MUTUAL") then
+            ! add mutual induced torques
+            idip(1) = 0.5d0*(uind(1,i) + uinp(1,i))
+            idip(2) = 0.5d0*(uind(2,i) + uinp(2,i))
+            idip(3) = 0.5d0*(uind(3,i) + uinp(3,i))
+            trq(1) = trq(1) + idip(3)*cphi(3,i) - idip(2)*cphi(4,i)
+            trq(2) = trq(2) + idip(1)*cphi(4,i) - idip(3)*cphi(2,i)
+            trq(3) = trq(3) + idip(2)*cphi(2,i) - idip(1)*cphi(3,i)
+         endif
          call torque (i,trq,fix,fiy,fiz,dep)
       end do
 c

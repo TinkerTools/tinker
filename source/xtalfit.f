@@ -549,7 +549,7 @@ c
             if (mode .eq. 'STORE') then
                do i = 1, npole
                   if (type(ipole(i)) .eq. atom1) then
-                     xx(j) = polarity(i)
+                     xx(j) = polarity(1,i)
                      goto 10
                   end if
                end do
@@ -557,7 +557,7 @@ c
                sixth = 1.0d0 / 6.0d0
                do i = 1, npole
                   if (type(ipole(i)) .eq. atom1) then
-                     polarity(i) = xx(j)
+                     polarity(1,i) = xx(j)
                      if (thole(i) .ne. 0.0d0)  pdamp(i) = xx(j)**sixth
                   end if
                end do

@@ -242,7 +242,9 @@ c
          write (iind,280)  n,title(1:ltitle)
   280    format (i6,2x,a)
          do i = 1, npole
-            if (polarity(i) .ne. 0.0d0) then
+            if (polarity(1,i) .ne. 0.0d0 .or.
+     &          polarity(2,i) .ne. 0.0d0 .or.
+     &          polarity(3,i) .ne. 0.0d0) then
                k = ipole(i)
                write (iind,290)  k,name(k),(debye*uind(j,i),j=1,3)
   290          format (i6,2x,a3,3f12.6)
