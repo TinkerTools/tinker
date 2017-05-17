@@ -654,7 +654,7 @@ c
   210    format ()
       end do
       j = 0
-      stopa = (min(stopb,nfrmb)-startb+1)/stepb
+      stopb = (min(stopb,nfrmb)-startb+1)/stepb
       do i = 1, stopb
          read (ibar,220,err=250,end=250)  record
   220    format (a240)
