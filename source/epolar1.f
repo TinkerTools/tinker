@@ -4605,7 +4605,7 @@ c
       integer deriv1(10)
       integer deriv2(10)
       integer deriv3(10)
-      real*8 e,eterm
+      real*8 e,eterm,f
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
@@ -4637,6 +4637,7 @@ c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+      f = electric / dielec
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -4744,7 +4745,7 @@ c
                   if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                end if
                struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-               eterm = 0.5d0 * electric * expterm * struc2
+               eterm = 0.5d0 * f * expterm * struc2
                vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
                vxx = vxx - h1*h1*vterm + eterm
                vxy = vxy - h1*h2*vterm
@@ -4761,7 +4762,7 @@ c
          if (.not. use_bounds) then
             expterm = 0.5d0 * pi / xbox
             struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-            e = 0.5d0 * expterm * struc2
+            e = 0.5d0 * f * expterm * struc2
             em = em + e
             qfac(1,1,1) = expterm
          end if
@@ -4784,7 +4785,7 @@ c
          call fphi_mpole (fphi)
          do i = 1, npole
             do j = 1, 20
-               fphi(j,i) = electric * fphi(j,i)
+               fphi(j,i) = f * fphi(j,i)
             end do
          end do
          call fphi_to_cphi (fphi,cphi)
@@ -4824,7 +4825,7 @@ c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = 0.5d0 * expterm * struc2
+         e = 0.5d0 * f * expterm * struc2
          ep = ep + e
       end if
 c
@@ -4846,11 +4847,11 @@ c
       call fphi_uind (fphid,fphip,fphidp)
       do i = 1, npole
          do j = 1, 10
-            fphid(j,i) = electric * fphid(j,i)
-            fphip(j,i) = electric * fphip(j,i)
+            fphid(j,i) = f * fphid(j,i)
+            fphip(j,i) = f * fphip(j,i)
          end do
          do j = 1, 20
-            fphidp(j,i) = electric * fphidp(j,i)
+            fphidp(j,i) = f * fphidp(j,i)
          end do
       end do
 c
@@ -5002,8 +5003,8 @@ c
             ii = ipole(i)
             do k = 0, coptmax-1
                do j = 1, 10
-                  fphid(j,i) = electric * fopt(k,j,i)
-                  fphip(j,i) = electric * foptp(k,j,i)
+                  fphid(j,i) = f * fopt(k,j,i)
+                  fphip(j,i) = f * foptp(k,j,i)
                end do
                do m = 0, coptmax-k-1
                   do j = 1, 3
@@ -5140,7 +5141,7 @@ c
             end if
             struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
      &                  + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
-            eterm = 0.5d0 * electric * expterm * struc2
+            eterm = 0.5d0 * f * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx + h1*h1*vterm - eterm
             vxy = vxy + h1*h2*vterm
@@ -5216,7 +5217,7 @@ c
                end if
                struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
      &                     + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
-               eterm = 0.5d0 * electric * expterm * struc2
+               eterm = 0.5d0 * f * expterm * struc2
                vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
                vxx = vxx - h1*h1*vterm + eterm
                vxy = vxy - h1*h2*vterm

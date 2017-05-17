@@ -1760,7 +1760,7 @@ c
       integer ntot,nff
       integer nf1,nf2,nf3
       real*8 e,r1,r2,r3
-      real*8 h1,h2,h3
+      real*8 f,h1,h2,h3
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -1773,6 +1773,7 @@ c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+      f = electric / dielec
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1888,11 +1889,6 @@ c     perform 3-D FFT backward transform and get potential
 c
          call fftback
          call fphi_mpole (fphi)
-         do i = 1, npole
-            do j = 1, 20
-               fphi(j,i) = electric * fphi(j,i)
-            end do
-         end do
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -1926,7 +1922,7 @@ c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = 0.5d0 * electric * expterm * struc2
+         e = 0.5d0 * f * expterm * struc2
          ep = ep + e
       end if
 c
@@ -1939,7 +1935,7 @@ c
             e = e + fuind(k,i)*fphi(k+1,i)
          end do
       end do
-      e = 0.5d0 * e
+      e = 0.5d0 * f * e
       ep = ep + e
 c
 c     perform deallocation of some local arrays

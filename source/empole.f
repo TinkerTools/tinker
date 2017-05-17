@@ -1480,7 +1480,7 @@ c
       integer ntot,nff
       integer nf1,nf2,nf3
       real*8 e,r1,r2,r3
-      real*8 h1,h2,h3
+      real*8 f,h1,h2,h3
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -1490,6 +1490,7 @@ c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
+      f = electric / dielec
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1584,7 +1585,7 @@ c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = 0.5d0 * expterm * struc2
+         e = 0.5d0 * f * expterm * struc2
          em = em + e
          qfac(1,1,1) = expterm
       end if
@@ -1614,7 +1615,7 @@ c
             e = e + fmp(k,i)*fphi(k,i)
          end do
       end do
-      e = 0.5d0 * electric * e
+      e = 0.5d0 * f * e
       em = em + e
       return
       end
