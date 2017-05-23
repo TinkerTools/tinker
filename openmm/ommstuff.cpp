@@ -26,7 +26,7 @@
 #include <iostream>
 #include <fstream>
 
-#define MAX_CUDA_DEVICES 16
+#define MAX_CUDA_DEVICES 17
 
 using namespace std;
 
