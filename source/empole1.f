@@ -2675,11 +2675,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine emrecip1  --  mpole Ewald recip energy & derivs  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ####################################################################
+c     ##                                                                ##
+c     ##  subroutine emrecip1  --  PME recip multipole energy & derivs  ##
+c     ##                                                                ##
+c     ####################################################################
 c
 c
 c     "emrecip1" evaluates the reciprocal space portion of the particle

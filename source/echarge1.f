@@ -2251,7 +2251,7 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine ecrecip1  --  PME recip energy and derivatives  ##
+c     ##  subroutine ecrecip1  --  PME recip charge energy & derivs  ##
 c     ##                                                             ##
 c     #################################################################
 c

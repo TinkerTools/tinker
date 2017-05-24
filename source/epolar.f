@@ -1716,11 +1716,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine eprecip  --  polarization Ewald recip energy  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine eprecip  --  PME recip space polarization energy  ##
+c     ##                                                               ##
+c     ###################################################################
 c
 c
 c     "eprecip" evaluates the reciprocal space portion of particle

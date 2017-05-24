@@ -4555,16 +4555,15 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine eprecip1  --  polar Ewald recip energy & derivs  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###################################################################
+c     ##                                                               ##
+c     ##  subroutine eprecip1  --  PME recip polarize energy & derivs  ##
+c     ##                                                               ##
+c     ###################################################################
 c
 c
-c     "eprecip1" evaluates the reciprocal space portion of the
-c     particle mesh Ewald summation energy and gradient due to
-c     dipole polarization
+c     "eprecip1" evaluates the reciprocal space portion of the particle
+c     mesh Ewald summation energy and gradient due to dipole polarization
 c
 c     literature reference:
 c
