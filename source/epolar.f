@@ -1922,7 +1922,7 @@ c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = 0.5d0 * f * expterm * struc2
+         e = f * expterm * struc2
          ep = ep + e
       end if
 c
@@ -1930,7 +1930,6 @@ c     increment the induced dipole polarization energy
 c
       e = 0.0d0
       do i = 1, npole
-         ii = ipole(i)
          do k = 1, 3
             e = e + fuind(k,i)*fphi(k+1,i)
          end do
