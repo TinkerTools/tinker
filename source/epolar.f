@@ -1754,7 +1754,7 @@ c
       use polpot
       use potent
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
       integer k1,k2,k3
       integer m1,m2,m3
       integer ntot,nff
@@ -1865,7 +1865,7 @@ c
             qfac(k1,k2,k3) = expterm
          end do
 c
-c     account for the zeroth grid point for a finite system
+c     account for zeroth grid point for nonperiodic system
 c
          qfac(1,1,1) = 0.0d0
          if (.not. use_bounds) then
@@ -1917,7 +1917,7 @@ c
       call grid_uind (fuind,fuinp)
       call fftfront
 c
-c     account for the zeroth grid point for a finite system
+c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox

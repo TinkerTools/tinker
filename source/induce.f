@@ -1928,7 +1928,7 @@ c
          qfac(k1,k2,k3) = expterm
       end do
 c
-c     account for the zeroth grid point for a finite system
+c     account for zeroth grid point for nonperiodic system
 c
       qfac(1,1,1) = 0.0d0
       if (.not. use_bounds) then

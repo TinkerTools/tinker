@@ -4755,7 +4755,7 @@ c
             end if
          end do
 c
-c     account for the zeroth grid point for a finite system
+c     account for zeroth grid point for nonperiodic system
 c
          qfac(1,1,1) = 0.0d0
          if (.not. use_bounds) then
@@ -4818,7 +4818,7 @@ c
       call grid_uind (fuind,fuinp)
       call fftfront
 c
-c     account for the zeroth grid point for a finite system
+c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox

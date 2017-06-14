@@ -2860,7 +2860,7 @@ c
       vmyz = vyz
       vmzz = vzz
 c
-c     account for the zeroth grid point for a finite system
+c     account for zeroth grid point for nonperiodic system
 c
       qfac(1,1,1) = 0.0d0
       if (.not. use_bounds) then

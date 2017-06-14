@@ -30,8 +30,7 @@ c
       parameter (maxblock=1000)
       integer i,j,k,m
       integer n1,n2,dt
-      integer first,last
-      integer mode,trimtext
+      integer first,last,mode
       integer start,stop,step
       integer nframe,nblock,maxgap
       integer blksize,blkgap,blkdiff
