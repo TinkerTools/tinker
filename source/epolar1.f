@@ -4855,7 +4855,7 @@ c
 c
 c     increment the induced dipole energy and gradient
 c
-c     e = 0.0d0
+      e = 0.0d0
       do i = 1, npole
          ii = ipole(i)
          f1 = 0.0d0
