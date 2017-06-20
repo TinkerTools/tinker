@@ -15,13 +15,6 @@ c
 c     "mdinit" initializes the velocities and accelerations
 c     for a molecular dynamics trajectory, including restarts
 c
-c     literature reference:
-c
-c     K. A. Feenstra, B. Hess and H. J. C. Berendsen, "Improving
-c     Efficiency of Large Time-Scale Molecular Dynamics Simulations
-c     of Hydrogen-Rich Systems", Journal of Computational Chemistry,
-c     8, 786-798 (1999)  [heavy hydrogen reweighting]
-c
 c
       subroutine mdinit
       use sizes
@@ -49,17 +42,15 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer idyn,nh
+      integer idyn,lext
       integer size,next
-      integer lext,freeunit
+      integer freeunit
       real*8 e,ekt,qterm
       real*8 maxwell,speed
       real*8 amass,gmass
-      real*8 hmax,hmass
-      real*8 sum,dmass
       real*8 vec(3)
       real*8, allocatable :: derivs(:,:)
-      logical exist,heavy
+      logical exist
       character*7 ext
       character*20 keyword
       character*240 dynfile
@@ -73,7 +64,6 @@ c
       bmnmix = 8
       nfree = 0
       irest = 1
-      heavy = .false.
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
@@ -123,8 +113,6 @@ c
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
             read (string,*,err=10,end=10)  irest
-         else if (keyword(1:15) .eq. 'HEAVY-HYDROGEN ') then
-            heavy = .true.
          else if (keyword(1:14) .eq. 'SAVE-VELOCITY ') then
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
@@ -173,32 +161,6 @@ c
          end if
    10    continue
       end do
-c
-c     repartition hydrogen masses to allow long time steps
-c
-      if (heavy) then
-         hmax = 4.0d0
-         do i = 1, n
-            nh = 0
-            sum = mass(i)
-            do j = 1, n12(i)
-               k = i12(j,i)
-               if (atomic(k) .eq. 1) then
-                  nh = nh + 1
-                  sum = sum + mass(k)
-               end if
-            end do
-            hmass = max(hmax,sum/dble(nh+1))
-            do j = 1, n12(i)
-               k = i12(j,i)
-               if (atomic(k) .eq. 1) then
-                  dmass = hmass - mass(k)
-                  mass(k) = mass(k) + dmass
-                  mass(i) = mass(i) - dmass
-               end if
-            end do
-         end do
-      end if
 c
 c     make sure all atoms or groups have a nonzero mass
 c

@@ -15,6 +15,13 @@ c
 c     "katom" assigns an atom type definitions to each atom in
 c     the structure and processes any new or changed values
 c
+c     literature reference:
+c
+c     K. A. Feenstra, B. Hess and H. J. C. Berendsen, "Improving
+c     Efficiency of Large Time-Scale Molecular Dynamics Simulations
+c     of Hydrogen-Rich Systems", Journal of Computational Chemistry,
+c     8, 786-798 (1999)  [heavy hydrogen reweighting]
+c
 c
       subroutine katom
       use sizes
@@ -26,10 +33,13 @@ c
       use katoms
       use keys
       implicit none
-      integer i,k,next
+      integer i,j,k
+      integer next,nh
       integer cls,atn,lig
       real*8 wght
-      logical header
+      real*8 hmax,hmass
+      real*8 sum,dmass
+      logical header,heavy
       character*3 symb
       character*20 keyword
       character*24 notice
@@ -107,6 +117,42 @@ c
             story(i) = describe(k)
          end if
       end do
+c
+c     repartition hydrogen masses to use "heavy" hydrogens
+c
+      heavy = .false.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:15) .eq. 'HEAVY-HYDROGEN ') then
+            heavy = .true.
+         end if
+      end do
+      if (heavy) then
+         hmax = 4.0d0
+         do i = 1, n
+            nh = 0
+            sum = mass(i)
+            do j = 1, n12(i)
+               k = i12(j,i)
+               if (atomic(k) .eq. 1) then
+                  nh = nh + 1
+                  sum = sum + mass(k)
+               end if
+            end do
+            hmass = max(hmax,sum/dble(nh+1))
+            do j = 1, n12(i)
+               k = i12(j,i)
+               if (atomic(k) .eq. 1) then
+                  dmass = hmass - mass(k)
+                  mass(k) = mass(k) + dmass
+                  mass(i) = mass(i) - dmass
+               end if
+            end do
+         end do
+      end if
 c
 c     process keywords containing atom types for specific atoms
 c
