@@ -61,7 +61,25 @@ APBS_LIBDIR = -L$(APBSDIR)/lib
 APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 FFEDIR = $(BUILDDIR)/ffe
+
+##  For MacOS Only
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
+
+##  For Linux Only
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+#		-I/usr/lib/jvm/java-8-oracle/include \
+#		-I/usr/lib/jvm/java-8-oracle/include/linux \
+#		-I/usr/lib/jvm/java-8-oracle/lib/amd64/server
+#JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
+#JAVA_LIBS = -ljvm
+
+##  For Windows Only
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+#		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
+#		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
+#		-I"C:\Program Files\Java\jdk1.8.0_112\lib"
+#JAVA_LIBDIR = -L"C:\Program Files\Java\jdk1.8.0_112\lib"
+#JAVA_LIBS = -ljvm
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##

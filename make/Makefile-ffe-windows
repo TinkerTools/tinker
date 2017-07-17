@@ -43,6 +43,8 @@
 ##  APBS_LIBS       APBS Libraries needed to build TINKER
 ##  FFEDIR          FFE Top-Level Directory
 ##  JAVA_INCDIR     Directories with Java Include Files
+##  JAVA_LIBDIR     Directory with Java Libraries
+##  JAVA_LIBS       Java Libraries needed to build FFE
 
 BUILDDIR = $(HOME)/ffe/build
 
@@ -63,7 +65,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 FFEDIR = $(BUILDDIR)/ffe
 
 ##  For MacOS Only
-JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 
 ##  For Linux Only
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
@@ -74,12 +76,12 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 #JAVA_LIBS = -ljvm
 
 ##  For Windows Only
-#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-#		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
-#		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
-#		-I"C:\Program Files\Java\jdk1.8.0_112\lib"
-#JAVA_LIBDIR = -L"C:\Program Files\Java\jdk1.8.0_112\lib"
-#JAVA_LIBS = -ljvm
+JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
+		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
+		-I"C:\Program Files\Java\jdk1.8.0_112\lib"
+JAVA_LIBDIR = -L"C:\Program Files\Java\jdk1.8.0_112\lib"
+JAVA_LIBS = -ljvm
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
@@ -89,7 +91,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 ##  Build:    TINKER (with APBS and FFE Support)
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
-##  Compiler: GNU gfortran 6.2
+##  Compiler: GNU gfortran 6.3
 ##  Parallel: OpenMP
 
 #CC = gcc
@@ -107,7 +109,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 ##  Build:    TINKER (with APBS and FFE Support)
 ##  OS Type:  Apple MacOS
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 6.2
+##  Compiler: GNU gfortran 7.1
 ##  Parallel: OpenMP
 
 #CC = gcc
@@ -123,23 +125,23 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 #		CoreFoundation
 #RENAME = rename_bin
 
-##  Build:     TINKER (no APBS or FFE Support)
+##  Build:     TINKER (with APBS and FFE Support)
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  MinGW GNU gfortran 5.4
 ##  Parallel:  OpenMP
 
-#CC = gcc
-#F77 = gfortran
-#CCFLAGS = -c
-#F77FLAGS = -c
-#OPTFLAGS = -Ofast -msse3 -fopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
-#LIBS = -lstdc++
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static
-#RENAME = rename_exe
+CC = gcc
+F77 = gfortran
+CCFLAGS = -c
+F77FLAGS = -c
+OPTFLAGS = -Ofast -msse3 -fopenmp
+LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
+LIBS = -lstdc++
+LIBFLAGS = -crusv
+RANLIB = ranlib -c
+LINKFLAGS = $(OPTFLAGS) -static
+RENAME = rename_exe
 
 ##  Build:    TINKER (Standalone)
 ##  OS Type:  Generic Linux
@@ -165,20 +167,20 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 ##  Compiler: Intel Fortran for MacOS 15.0
 ##  Parallel: OpenMP
 
-CC = icc
-F77 = ifort
-CCFLAGS = -c
-F77 = ifort
-F77FLAGS = -c -axSSSE3
-OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-LIBS = 
-LIBFLAGS = -crusv
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
-                -Wl,-stack_size,0x10000000 -framework JavaVM -framework \
-                CoreFoundation
-RENAME = rename_bin
+#CC = icc
+#F77 = ifort
+#CCFLAGS = -c
+#F77 = ifort
+#F77FLAGS = -c -axSSSE3
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+#LIBS = 
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-intel -mmacosx-version-min=10.6 \
+#		-Wl,-stack_size,0x10000000 -framework JavaVM -framework \
+#		CoreFoundation
+#RENAME = rename_bin
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
@@ -781,7 +783,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
 
 all: ${EXEFILES}
 
