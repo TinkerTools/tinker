@@ -60,7 +60,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:     TINKER (no APBS or FFE Support)
+##  Build:     TINKER
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  GNU gfortran 6.3
@@ -76,7 +76,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RENAME = rename_bin
 
-##  Build:     TINKER (no APBS or FFE Support)
+##  Build:     TINKER
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  GNU gfortran 7.1
@@ -92,7 +92,7 @@ RANLIB = ranlib -c
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 RENAME = rename_bin
 
-##  Build:     TINKER (no APBS or FFE Support)
+##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  MinGW GNU gfortran 5.4
@@ -108,7 +108,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static
 #RENAME = rename_exe
 
-##  Build:     TINKER (no APBS or FFE Support)
+##  Build:     TINKER
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible (also AMD)
 ##  Compiler:  Intel Fortran for Linux 15.0
@@ -124,7 +124,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 #RENAME = rename_bin
 
-##  Build:     TINKER (no APBS or FFE Support)
+##  Build:     TINKER
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel Xeon
 ##  Compiler:  Intel Fortran for MacOS 15.0

@@ -88,7 +88,7 @@ JAVA_LIBS = -ljvm
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:    TINKER (with APBS and FFE Support)
+##  Build:    TINKER
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Compiler: GNU gfortran 6.3
@@ -106,7 +106,7 @@ JAVA_LIBS = -ljvm
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RENAME = rename_bin
 
-##  Build:    TINKER (with APBS and FFE Support)
+##  Build:    TINKER
 ##  OS Type:  Apple MacOS
 ##  CPU Type: Intel x86 Compatible
 ##  Compiler: GNU gfortran 7.1
@@ -125,7 +125,7 @@ JAVA_LIBS = -ljvm
 #		CoreFoundation
 #RENAME = rename_bin
 
-##  Build:     TINKER (with APBS and FFE Support)
+##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  MinGW GNU gfortran 5.4
@@ -143,7 +143,7 @@ RANLIB = ranlib -c
 LINKFLAGS = $(OPTFLAGS) -static
 RENAME = rename_exe
 
-##  Build:    TINKER (Standalone)
+##  Build:    TINKER
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
@@ -160,7 +160,7 @@ RENAME = rename_exe
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 #RENAME = rename_bin
 
-##  Build:    TINKER (Standalone)
+##  Build:    TINKER
 ##  OS Type:  Macintosh
 ##  CPU Type: Intel x86 Compatible
 ##  Oper Sys: MacOS 10.11 (El Capitan)
@@ -777,13 +777,13 @@ EXEFILES = alchemy.x \
 	    xyzsybyl.x
 
 %.o: %.c
-	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${APBS_INCDIR} ${OPTFLAGS} $<
+	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${OPTFLAGS} $<
 
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} $^ ${LIBS} ${JAVA_LIBS} ${FFTW_LIBS}; strip $@
 
 all: ${EXEFILES}
 

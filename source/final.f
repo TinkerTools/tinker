@@ -734,12 +734,6 @@ c     deallocation of global arrays from module rotbnd
 c
       if (allocated(rot))  deallocate (rot)
 c
-c     deallocation of global arrays from module socket
-c
-      if (allocated(cdx))  deallocate (cdx)
-      if (allocated(cdy))  deallocate (cdy)
-      if (allocated(cdz))  deallocate (cdz)
-c
 c     deallocation of global arrays from module solute
 c
       if (allocated(rsolv))  deallocate (rsolv)
