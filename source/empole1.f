@@ -2715,6 +2715,7 @@ c
       integer i,j,k,ii
       integer k1,k2,k3
       integer m1,m2,m3
+      integer iax,iay,iaz
       integer ntot,nff
       integer nf1,nf2,nf3
       integer deriv1(10)
@@ -2724,6 +2725,9 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
+      real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 volterm,denom
@@ -2921,25 +2925,7 @@ c
       e = 0.5d0 * e
       em = em + e
 c
-c     distribute torques into the permanent multipole gradient
-c
-      do i = 1, npole
-         trq(1) = cmp(4,i)*cphi(3,i) - cmp(3,i)*cphi(4,i)
-     &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphi(10,i)
-     &               + cmp(9,i)*cphi(8,i) + cmp(10,i)*cphi(6,i)
-     &               - cmp(8,i)*cphi(9,i) - cmp(10,i)*cphi(7,i)
-         trq(2) = cmp(2,i)*cphi(4,i) - cmp(4,i)*cphi(2,i)
-     &               + 2.0d0*(cmp(5,i)-cmp(7,i))*cphi(9,i)
-     &               + cmp(8,i)*cphi(10,i) + cmp(9,i)*cphi(7,i)
-     &               - cmp(9,i)*cphi(5,i) - cmp(10,i)*cphi(8,i)
-         trq(3) = cmp(3,i)*cphi(2,i) - cmp(2,i)*cphi(3,i)
-     &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphi(8,i)
-     &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
-     &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
-         call torque (i,trq,fix,fiy,fiz,dem)
-      end do
-c
-c     permanent multipole contribution to the internal virial
+c     increment the permanent multipole virial contributions
 c
       do i = 1, npole
          vxx = vxx - cmp(2,i)*cphi(2,i) - 2.0d0*cmp(5,i)*cphi(5,i)
@@ -2962,7 +2948,47 @@ c
      &            - cmp(9,i)*cphi(9,i) - cmp(10,i)*cphi(10,i)
       end do
 c
-c     increment the internal virial tensor components
+c     resolve site torques then increment forces and virial
+c
+      do i = 1, npole
+         trq(1) = cmp(4,i)*cphi(3,i) - cmp(3,i)*cphi(4,i)
+     &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphi(10,i)
+     &               + cmp(9,i)*cphi(8,i) + cmp(10,i)*cphi(6,i)
+     &               - cmp(8,i)*cphi(9,i) - cmp(10,i)*cphi(7,i)
+         trq(2) = cmp(2,i)*cphi(4,i) - cmp(4,i)*cphi(2,i)
+     &               + 2.0d0*(cmp(5,i)-cmp(7,i))*cphi(9,i)
+     &               + cmp(8,i)*cphi(10,i) + cmp(9,i)*cphi(7,i)
+     &               - cmp(9,i)*cphi(5,i) - cmp(10,i)*cphi(8,i)
+         trq(3) = cmp(3,i)*cphi(2,i) - cmp(2,i)*cphi(3,i)
+     &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphi(8,i)
+     &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
+     &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
+         call torque (i,trq,fix,fiy,fiz,dem)
+         ii = ipole(i)
+         iaz = zaxis(i)
+         iax = xaxis(i)
+         iay = yaxis(i)
+         if (iaz .eq. 0)  iaz = ii
+         if (iax .eq. 0)  iax = ii
+         if (iay .eq. 0)  iay = ii
+         xiz = x(iaz) - x(ii)
+         yiz = y(iaz) - y(ii)
+         ziz = z(iaz) - z(ii)
+         xix = x(iax) - x(ii)
+         yix = y(iax) - y(ii)
+         zix = z(iax) - z(ii)
+         xiy = x(iay) - x(ii)
+         yiy = y(iay) - y(ii)
+         ziy = z(iay) - z(ii)
+         vxx = vxx + xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = vxy + yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+         vxz = vxz + zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+         vyy = vyy + yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = vyz + zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+         vzz = vzz + zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+      end do
+c
+c     increment the total internal virial tensor components
 c
       vir(1,1) = vir(1,1) + vxx
       vir(2,1) = vir(2,1) + vxy

@@ -192,7 +192,7 @@ c
 c
 c     flags for external Java socket communication
 c
-      skt_init = .false.
+      sktstart = .false.
       use_socket = .false.
 c
 c     flags for potential energy smoothing

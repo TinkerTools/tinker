@@ -120,7 +120,7 @@ c
 c
 c     send data via external socket communication if desired
 c
-      if (.not.skt_init .or. use_socket) then
+      if (.not.sktstart .or. use_socket) then
          if (coordtype .eq. 'INTERNAL')  call makexyz
          call sktopt (ncycle,f)
       end if

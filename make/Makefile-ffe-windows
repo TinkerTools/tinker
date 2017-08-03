@@ -139,7 +139,7 @@ OPTFLAGS = -Ofast -msse3 -fopenmp
 LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 LIBS = -lstdc++
 LIBFLAGS = -crusv
-RANLIB = ranlib -c
+RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static
 RENAME = rename_exe
 
@@ -775,6 +775,12 @@ EXEFILES = alchemy.x \
 	    xyzint.x \
 	    xyzpdb.x \
 	    xyzsybyl.x
+
+lbfgs.o:
+	${F77} ${F77FLAGS} -O1 -msse3 -fopenmp lbfgs.f -o lbfgs.o
+
+ocvm.o:
+	${F77} ${F77FLAGS} -O1 -msse3 -fopenmp ocvm.f -o ocvm.o
 
 %.o: %.c
 	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${OPTFLAGS} $<

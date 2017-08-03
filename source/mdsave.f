@@ -57,7 +57,7 @@ c
 c
 c     send data via external socket communication if desired
 c
-      if (.not.skt_init .or. use_socket)  call sktdyn (istep,dt,epot)
+      if (.not.sktstart .or. use_socket)  call sktdyn (istep,dt,epot)
 c
 c     check number of steps between trajectory file dumps
 c

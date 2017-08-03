@@ -38,7 +38,7 @@ c
       real*8, allocatable :: pz(:)
 c
 c
-c     check to see if the Java objects have been created
+c     check to see if the server has been created
 c
       skttyp = 1
       if (.not. sktstart)  call sktinit ()
@@ -146,15 +146,15 @@ c
       integer i,k,ncycle
       integer flag
       real*8 eopt
-      real*8, allocatable :: cdx(:)
-      real*8, allocatable :: cdy(:)
-      real*8, allocatable :: cdz(:)
+      real*8, allocatable :: gx(:)
+      real*8, allocatable :: gy(:)
+      real*8, allocatable :: gz(:)
       real*8, allocatable :: px(:)
       real*8, allocatable :: py(:)
       real*8, allocatable :: pz(:)
 c
 c
-c     check to see if the Server has been created
+c     check to see if the server has been created
 c
       skttyp = 2
       if (.not. sktstart)  call sktinit ()
@@ -183,9 +183,9 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (cdx(n))
-      allocate (cdy(n))
-      allocate (cdz(n))
+      allocate (gx(n))
+      allocate (gy(n))
+      allocate (gz(n))
       allocate (px(n))
       allocate (py(n))
       allocate (pz(n))
@@ -193,14 +193,14 @@ c
 c     load the gradient and induced dipole information
 c
       do i = 1, n
-         cdx(i) = desum(1,i)
-         cdy(i) = desum(2,i)
-         cdz(i) = desum(3,i)
+         gx(i) = desum(1,i)
+         gy(i) = desum(2,i)
+         gz(i) = desum(3,i)
          px(i) = 0.0d0
          py(i) = 0.0d0
          pz(i) = 0.0d0
       end do
-      call setgradients (n,cdx,cdy,cdz)
+      call setgradients (n,gx,gy,gz)
       if (use_polar) then
           do i = 1, npole
              k = ipole(i)
@@ -213,9 +213,9 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (cdx)
-      deallocate (cdy)
-      deallocate (cdz)
+      deallocate (gx)
+      deallocate (gy)
+      deallocate (gz)
       deallocate (px)
       deallocate (py)
       deallocate (pz)

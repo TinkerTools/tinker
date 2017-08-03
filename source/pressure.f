@@ -802,8 +802,9 @@ c
       real*8 volold,xboxold
       real*8 yboxold,zboxold
       real*8 epos,eneg
-      real*8 dedv_vir,dedv_fd
-      real*8 pres_vir,pres_fd
+      real*8 vnxx,vnyy,vnzz
+      real*8 dedv_vir,dedv_num
+      real*8 pres_vir,pres_num
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
@@ -812,6 +813,7 @@ c
 c     set relative volume change for finite-differences
 c
       if (.not. use_bounds)  return
+      third = 1.0d0 / 3.0d0
       delta = 0.000001d0
       step = volbox * delta
 c
@@ -833,36 +835,90 @@ c
          zold(i) = z(i)
       end do
 c
-c     get scale factor to reflect a negative volume change
+c     get the XX-component of the virial by finite differences
 c
       volbox = volold - step
-      third = 1.0d0 / 3.0d0
       scale = (volbox/volold)**third
-c
-c     set new box dimensions and coordinate values
-c
       xbox = xboxold * scale
-      ybox = yboxold * scale
-      zbox = zboxold * scale
       call lattice
       do i = 1, n
          x(i) = xold(i) * scale
-         y(i) = yold(i) * scale
-         z(i) = zold(i) * scale
       end do
-c
-c     compute potential energy for negative volume change
-c
       eneg = energy ()
-c
-c     get scale factor to reflect a positive volume change
-c
       volbox = volold + step
-      third = 1.0d0 / 3.0d0
       scale = (volbox/volold)**third
+      xbox = xboxold * scale
+      call lattice
+      do i = 1, n
+         x(i) = xold(i) * scale
+      end do
+      epos = energy ()
+      xbox = xboxold
+      call lattice
+      do i = 1, n
+         x(i) = xold(i)
+      end do
+      vnxx = 1.5d0 * (epos-eneg) / delta
 c
-c     set new box dimensions and coordinate values
+c     get the YY-component of the virial by finite differences
 c
+      volbox = volold - step
+      scale = (volbox/volold)**third
+      ybox = yboxold * scale
+      call lattice
+      do i = 1, n
+         y(i) = yold(i) * scale
+      end do
+      eneg = energy ()
+      volbox = volold + step
+      scale = (volbox/volold)**third
+      ybox = yboxold * scale
+      call lattice
+      do i = 1, n
+         y(i) = yold(i) * scale
+      end do
+      epos = energy ()
+      ybox = yboxold
+      call lattice
+      do i = 1, n
+         y(i) = yold(i)
+      end do
+      vnyy = 1.5d0 * (epos-eneg) / delta
+c
+c     get the ZZ-component of the virial by finite differences
+c
+      volbox = volold - step
+      scale = (volbox/volold)**third
+      zbox = zboxold * scale
+      call lattice
+      do i = 1, n
+         z(i) = zold(i) * scale
+      end do
+      eneg = energy ()
+      volbox = volold + step
+      scale = (volbox/volold)**third
+      zbox = zboxold * scale
+      call lattice
+      do i = 1, n
+         z(i) = zold(i) * scale
+      end do
+      epos = energy ()
+      zbox = zboxold
+      call lattice
+      do i = 1, n
+         z(i) = zold(i)
+      end do
+      vnzz = 1.5d0 * (epos-eneg) / delta
+c
+c     print numerical values for the virial diagonal elements
+c
+      write (iout,10)  vnxx,vnyy,vnzz
+   10 format (/,' Numerical Virial Diagonal :',9x,3f12.3)
+c
+c     compute the numerical change in energy with box volume
+c
+      volbox = volold - step
+      scale = (volbox/volold)**third
       xbox = xboxold * scale
       ybox = yboxold * scale
       zbox = zboxold * scale
@@ -872,9 +928,18 @@ c
          y(i) = yold(i) * scale
          z(i) = zold(i) * scale
       end do
-c
-c     compute potential energy for positive volume change
-c
+      eneg = energy ()
+      volbox = volold + step
+      scale = (volbox/volold)**third
+      xbox = xboxold * scale
+      ybox = yboxold * scale
+      zbox = zboxold * scale
+      call lattice
+      do i = 1, n
+         x(i) = xold(i) * scale
+         y(i) = yold(i) * scale
+         z(i) = zold(i) * scale
+      end do
       epos = energy ()
 c
 c     restore original box dimensions and coordinate values
@@ -898,29 +963,26 @@ c
 c     get virial-based and finite difference values of dE/dV
 c
       dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
-      dedv_fd = (epos-eneg) / (2.0d0*delta*volbox)
-      write (iout,10)  dedv_vir
-   10 format (/,' dE/dV (Virial-based) :',11x,f15.6,' Kcal/mole/A**3')
-      write (iout,20)  dedv_fd
-   20 format (' dE/dV (Finite Diff) :',12x,f15.6,' Kcal/mole/A**3')
+      dedv_num = (epos-eneg) / (2.0d0*delta*volbox)
 c
 c     compute analytical and finite-difference isotropic pressure
 c
+      kelvin = 298.0d0
       pres_vir = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_vir)
-      pres_fd = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_fd)
+      pres_num = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_num)
       if (kelvin .eq. 0.0d0) then
-         write (iout,30)  pres_vir
-         write (iout,40)  pres_fd
-   30    format (/,' Pressure (Analytical, 0 K) :',5x,f15.3,
+         write (iout,20)  pres_vir
+   20    format (/,' Pressure (Analytical, 0 K) :',5x,f15.3,
      &              ' Atmospheres')
-   40    format (' Pressure (Numerical, 0 K) :',6x,f15.3,
+         write (iout,30)  pres_num
+   30    format (' Pressure (Numerical, 0 K) :',6x,f15.3,
      &              ' Atmospheres')
       else
-         write (iout,50)  nint(kelvin),pres_vir
-         write (iout,60)  nint(kelvin),pres_fd
-   50    format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
+         write (iout,40)  nint(kelvin),pres_vir
+   40    format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
      &              ' Atmospheres')
-   60    format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
+         write (iout,50)  nint(kelvin),pres_num
+   50    format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
      &              ' Atmospheres')
       end if
       return

@@ -104,7 +104,7 @@ RENAME = rename_bin
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 #LIBS = 
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static
 #RENAME = rename_exe
 
