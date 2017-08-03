@@ -771,16 +771,15 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine ptest  --  find pressure via finite-difference  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ptest  --  find pressure via finite differences  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "ptest" compares the virial-based value of dE/dV to an estimate
-c     from finite-difference volume changes; also finds the isotropic
-c     pressure via finite-differences
+c     "ptest" determines the numerical virial tensor, and compares
+c     analytical to numerical values for dE/dV and isotropic pressure
 c
 c     original version written by John D. Chodera, University of
 c     California, Berkeley, December 2010
@@ -801,7 +800,7 @@ c
       real*8 delta,step,scale
       real*8 volold,xboxold
       real*8 yboxold,zboxold
-      real*8 epos,eneg
+      real*8 epos,eneg,temp
       real*8 vnxx,vnyy,vnzz
       real*8 dedv_vir,dedv_num
       real*8 pres_vir,pres_num
@@ -815,7 +814,7 @@ c
       if (.not. use_bounds)  return
       third = 1.0d0 / 3.0d0
       delta = 0.000001d0
-      step = volbox * delta
+      step = 0.5d0 * delta * volbox
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -835,7 +834,7 @@ c
          zold(i) = z(i)
       end do
 c
-c     get the XX-component of the virial by finite differences
+c     get the xx-component of the numerical virial tensor
 c
       volbox = volold - step
       scale = (volbox/volold)**third
@@ -858,9 +857,9 @@ c
       do i = 1, n
          x(i) = xold(i)
       end do
-      vnxx = 1.5d0 * (epos-eneg) / delta
+      vnxx = 3.0d0 * (epos-eneg) / delta
 c
-c     get the YY-component of the virial by finite differences
+c     get the yy-component of the numerical virial tensor
 c
       volbox = volold - step
       scale = (volbox/volold)**third
@@ -883,9 +882,9 @@ c
       do i = 1, n
          y(i) = yold(i)
       end do
-      vnyy = 1.5d0 * (epos-eneg) / delta
+      vnyy = 3.0d0 * (epos-eneg) / delta
 c
-c     get the ZZ-component of the virial by finite differences
+c     get the zz-component of the numerical virial tensor
 c
       volbox = volold - step
       scale = (volbox/volold)**third
@@ -908,7 +907,7 @@ c
       do i = 1, n
          z(i) = zold(i)
       end do
-      vnzz = 1.5d0 * (epos-eneg) / delta
+      vnzz = 3.0d0 * (epos-eneg) / delta
 c
 c     print numerical values for the virial diagonal elements
 c
@@ -941,9 +940,6 @@ c
          z(i) = zold(i) * scale
       end do
       epos = energy ()
-c
-c     restore original box dimensions and coordinate values
-c
       xbox = xboxold
       ybox = yboxold
       zbox = zboxold
@@ -960,30 +956,22 @@ c
       deallocate (yold)
       deallocate (zold)
 c
-c     get virial-based and finite difference values of dE/dV
+c     find virial-based and finite difference values of dE/dV
 c
       dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
-      dedv_num = (epos-eneg) / (2.0d0*delta*volbox)
+      dedv_num = (epos-eneg) / (delta*volbox)
 c
-c     compute analytical and finite-difference isotropic pressure
+c     get virial-based and finite difference isotropic pressure
 c
-      kelvin = 298.0d0
-      pres_vir = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_vir)
-      pres_num = prescon * (dble(n)*gasconst*kelvin/volbox-dedv_num)
-      if (kelvin .eq. 0.0d0) then
-         write (iout,20)  pres_vir
-   20    format (/,' Pressure (Analytical, 0 K) :',5x,f15.3,
-     &              ' Atmospheres')
-         write (iout,30)  pres_num
-   30    format (' Pressure (Numerical, 0 K) :',6x,f15.3,
-     &              ' Atmospheres')
-      else
-         write (iout,40)  nint(kelvin),pres_vir
-   40    format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
-     &              ' Atmospheres')
-         write (iout,50)  nint(kelvin),pres_num
-   50    format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
-     &              ' Atmospheres')
-      end if
+      temp = kelvin
+      if (temp .eq. 0.0d0)  temp = 298.0d0
+      pres_vir = prescon * (dble(n)*gasconst*temp/volbox-dedv_vir)
+      pres_num = prescon * (dble(n)*gasconst*temp/volbox-dedv_num)
+      write (iout,20)  nint(temp),pres_vir
+   20 format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
+     &           ' Atmospheres')
+      write (iout,30)  nint(temp),pres_num
+   30 format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
+     &           ' Atmospheres')
       return
       end
