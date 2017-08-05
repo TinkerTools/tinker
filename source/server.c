@@ -72,9 +72,9 @@ jboolean InitializeJVM() {
    sprintf(def, "-Djava.class.path=%s", classpath);
    options[0].optionString = def;
 
-   args.version  = JNI_VERSION_1_4;
+   args.version = JNI_VERSION_1_6;
    args.nOptions = numOptions;
-   args.options  = options;
+   args.options = options;
    args.ignoreUnrecognized = JNI_TRUE;
 
    r = JNI_CreateJavaVM(&vm, (void **) &env, &args);
