@@ -99,7 +99,7 @@ LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
 CFLAGS = -c
 F77FLAGS = -c
 OPTFLAGS = -Ofast -mssse3 -fopenmp
-CUDAFLAGS = -O3 -I /usr/local/cuda/include
+CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
 LIBFLAGS = -crusv
 RANLIB = ranlib -c
 OBJS = gpu_usage.o
@@ -629,7 +629,7 @@ EXEFILES = dynamic_omm.x
 	${CC} ${CFLAGS} ${OPTFLAGS} ${INCLUDEDIR} -O3 $<
 
 %.o: %.cu
-	${NVCC} ${CFLAGS} ${INCLUDEDIR} ${CUDAFLAGS} $<
+	${NVCC} ${CFLAGS} ${INCLUDEDIR} ${CUDAFLAGS} -Wno-deprecated-gpu-targets $<
 
 %.o: %.m
 	${OBJECTIVE_CC} ${OBJECTIVE_CFLAGS} ${INCLUDEDIR} ${CUDAFLAGS} $< -o $@

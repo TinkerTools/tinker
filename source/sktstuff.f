@@ -269,8 +269,6 @@ c
       call chksocket (flag)
       if (flag .eq. 0) then
          use_socket = .false.
-         write (iout,10)
-   10    format (/,' SKTINIT  --  Unable to Use Socket Mechanism',/)
          return
       end if
 c
@@ -279,8 +277,8 @@ c
       call createjvm (flag)
       if (flag .eq. 0) then
          use_socket = .false.
-         write (iout,20)
-   20    format (/,' SKTINIT  --  Unable to Create the JVM Server',
+         write (iout,10)
+   10    format (/,' SKTINIT  --  Unable to Create the JVM Server',
      &           /,' Check LD_LIBRARY_PATH and CLASSPATH Variables',/)
          return
       end if
@@ -290,8 +288,8 @@ c
       call createsystem (n,nkey,flag)
       if (flag .eq. 0) then
          use_socket = .false.
-         write (iout,30)
-   30    format (/,' SKTINIT  --  Unable to Create TINKER System',/)        
+         write (iout,20)
+   20    format (/,' SKTINIT  --  Unable to Create TINKER System',/)        
          return
       end if
 c
@@ -344,8 +342,8 @@ c
       call createserver (flag)
       if (flag .eq. 0) then
          use_socket = .false.
-         write (iout,40)
-   40    format (/,' SKTINIT  --  Unable to Create TINKER Server',/)
+         write (iout,30)
+   30    format (/,' SKTINIT  --  Unable to Create TINKER Server',/)
          return
       end if
 c
@@ -354,8 +352,8 @@ c
       call createupdate (n,skttyp,npolar,flag)
       if (flag .eq. 0) then
          use_socket = .false.
-         write (iout,50)
-   50    format (/,' SKTINIT  --  Unable to Create Update Object',/)
+         write (iout,40)
+   40    format (/,' SKTINIT  --  Unable to Create Update Object',/)
          return
       end if
       return
