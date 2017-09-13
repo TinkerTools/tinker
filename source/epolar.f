@@ -1937,7 +1937,8 @@ c
             e = e + fuind(k,i)*fphi(k+1,i)
          end do
       end do
-      e = 0.5d0 * f * e
+c      e = 0.5d0 * f * e
+      e = 0.5d0 * e
       ep = ep + e
 c
 c     perform deallocation of some local arrays

@@ -15,12 +15,6 @@ c
 c     "initial" sets up original values for some parameters and
 c     variables that might not otherwise get initialized
 c
-c     note calls below to the "kmp_set" routines are for use with
-c     the Intel compiler, but must be commented for other compilers;
-c     alternatively, these values can be set via the KMP_STACKSIZE
-c     and KMP_BLOCKTIME environment variables
-c
-c
       subroutine initial
       use sizes
       use align
@@ -48,7 +42,6 @@ c
       use scales
       use sequen
       use socket
-      use virial
       use warp
       use zclose
       implicit none
@@ -82,11 +75,13 @@ c
 !$    call omp_set_num_threads (nthread)
 !$    call omp_set_nested (.true.)
 c
-c     Intel compiler extensions to OpenMP standard, 268435456 bytes is
-c     2**28 bytes, or 256 MB; comment these lines for other compilers
+c     Intel compiler extensions to OpenMP standard
 c
-c!$   call kmp_set_stacksize_s (268435456)
-c!$   call kmp_set_blocktime (0)
+c     commented out for gfortran compiler
+c#ifdef __INTEL_COMPILER
+c!$    call kmp_set_stacksize_s (2**28)
+c!$    call kmp_set_blocktime (0)
+c#endif
 c
 c     values of machine precision constants
 c
@@ -151,15 +146,11 @@ c     flag for use of atom groups
 c
       use_group = .false.
 c
-c     flags for use of periodic boundaries
+c     flags for periodic boundaries
 c
       use_bounds = .false.
       use_replica = .false.
       use_polymer = .false.
-c
-c     flag for use of internal virial
-c
-      use_virial = .true.
 c
 c     default values for unitcell dimensions
 c
