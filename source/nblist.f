@@ -106,8 +106,7 @@ c
          return
       end if
 c
-c     test sites for displacement exceeding half the buffer, and
-c     rebuild the higher numbered neighbors of updated sites
+c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -126,11 +125,23 @@ c
             xvold(i) = xi
             yvold(i) = yi
             zvold(i) = zi
+         end if
+      end do
+!$OMP END DO
+c
+c     rebuild the higher numbered neighbors of updated sites
+c
+!$OMP DO schedule(guided)
+      do i = 1, nvdw
+         xi = xvold(i)
+         yi = yvold(i)
+         zi = zvold(i)
+         if (update(i)) then
             nvlst(i) = 0
             do k = i+1, nvdw
-               xr = xi - xred(k)
-               yr = yi - yred(k)
-               zr = zi - zred(k)
+               xr = xi - xvold(k)
+               yr = yi - yvold(k)
+               zr = zi - zvold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. vbuf2) then
@@ -476,8 +487,7 @@ c
          return
       end if
 c
-c     test sites for displacement exceeding half the buffer, and
-c     rebuild the higher numbered neighbors of updated sites
+c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -497,12 +507,23 @@ c
             xcold(i) = xi
             ycold(i) = yi
             zcold(i) = zi
+         end if
+      end do
+!$OMP END DO
+c
+c     rebuild the higher numbered neighbors of updated sites
+c
+!$OMP DO schedule(guided)
+      do i = 1, nion
+         xi = xcold(i)
+         yi = ycold(i)
+         zi = zcold(i)
+         if (update(i)) then
             nelst(i) = 0
             do k = i+1, nion
-               kk = kion(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xcold(k)
+               yr = yi - ycold(k)
+               zr = zi - zcold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -848,8 +869,7 @@ c
          return
       end if
 c
-c     test sites for displacement exceeding half the buffer, and
-c     rebuild the higher numbered neighbors of updated sites
+c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -869,12 +889,23 @@ c
             xmold(i) = xi
             ymold(i) = yi
             zmold(i) = zi
+         end if
+      end do
+!$OMP END DO
+c
+c     rebuild the higher numbered neighbors of updated sites
+c
+!$OMP DO schedule (guided)
+      do i = 1, npole
+         xi = xmold(i)
+         yi = ymold(i)
+         zi = zmold(i)
+         if (update(i)) then
             nelst(i) = 0
             do k = i+1, npole
-               kk = ipole(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xmold(k)
+               yr = yi - ymold(k)
+               zr = zi - zmold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -1220,8 +1251,7 @@ c
          return
       end if
 c
-c     test sites for displacement exceeding half the buffer, and
-c     rebuild the higher numbered neighbors of updated sites
+c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
@@ -1241,12 +1271,23 @@ c
             xuold(i) = xi
             yuold(i) = yi
             zuold(i) = zi
+         end if
+      end do
+!$OMP END DO
+c
+c     rebuild the higher numbered neighbors of updated sites
+c
+!$OMP DO schedule(guided)
+      do i = 1, npole
+         xi = xuold(i)
+         yi = yuold(i)
+         zi = zuold(i)
+         if (update(i)) then
             nulst(i) = 0
             do k = i+1, npole
-               kk = ipole(k)
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - xuold(k)
+               yr = yi - yuold(k)
+               zr = zi - zuold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. ubuf2) then
