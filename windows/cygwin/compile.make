@@ -478,6 +478,7 @@ gfortran -c -O3 -ffast-math -fopenmp random.f
 gfortran -c -O3 -ffast-math -fopenmp rattle.f
 gfortran -c -O3 -ffast-math -fopenmp readdyn.f
 gfortran -c -O3 -ffast-math -fopenmp readgau.f
+gfortran -c -O3 -ffast-math -fopenmp readgdma.f
 gfortran -c -O3 -ffast-math -fopenmp readint.f
 gfortran -c -O3 -ffast-math -fopenmp readmol.f
 gfortran -c -O3 -ffast-math -fopenmp readmol2.f

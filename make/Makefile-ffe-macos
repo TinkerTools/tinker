@@ -607,6 +607,7 @@ OBJS =	action.o \
 	rattle.o \
 	readdyn.o \
 	readgau.o \
+	readgdma.o \
 	readint.o \
 	readmol.o \
 	readmol2.o \
@@ -1434,6 +1435,7 @@ libtinker.a: ${OBJS}
 	rattle.o \
 	readdyn.o \
 	readgau.o \
+	readgdma.o \
 	readint.o \
 	readmol.o \
 	readmol2.o \
@@ -1539,7 +1541,7 @@ atmlst.o:
 atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o sizes.o
-bar.o: atoms.o boxes.o files.o inform.o iounit.o keys.o sizes.o titles.o units.o
+bar.o: boxes.o files.o inform.o iounit.o keys.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:
 beeman.o: atomid.o atoms.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o sizes.o units.o usage.o
@@ -1908,7 +1910,7 @@ pmestuff.o: atoms.o boxes.o charge.o chunks.o mpole.o pme.o potent.o sizes.o
 pmpb.o: iounit.o
 polar.o:
 polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o units.o
-poledit.o: atomid.o atoms.o couple.o dma.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o units.o
+poledit.o: atomid.o atoms.o couple.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o units.o
 polgrp.o:
 polpot.o:
 polymer.o: atoms.o bndstr.o bound.o boxes.o iounit.o keys.o sizes.o
@@ -1942,6 +1944,7 @@ random.o: inform.o iounit.o keys.o math.o
 rattle.o: atomid.o atoms.o freeze.o group.o inform.o iounit.o moldyn.o sizes.o units.o usage.o virial.o
 readdyn.o: atoms.o boxes.o files.o group.o iounit.o mdstuf.o moldyn.o rgddyn.o sizes.o
 readgau.o: ascii.o iounit.o qmstuf.o sizes.o units.o
+readgdma.o: atomid.o atoms.o dma.o files.o iounit.o mpole.o sizes.o units.o
 readint.o: atomid.o atoms.o files.o inform.o iounit.o sizes.o titles.o zclose.o zcoord.o
 readmol.o: atomid.o atoms.o couple.o files.o iounit.o ptable.o sizes.o titles.o
 readmol2.o: atomid.o atoms.o couple.o files.o iounit.o ptable.o sizes.o titles.o
@@ -2039,7 +2042,7 @@ xtalfit.o: atomid.o atoms.o bound.o boxes.o charge.o dipole.o energi.o files.o f
 xtalmin.o: atoms.o boxes.o files.o inform.o iounit.o keys.o math.o scales.o sizes.o
 xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o sizes.o
-xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o math.o molcul.o ptable.o refer.o sizes.o titles.o units.o usage.o
+xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o linmin.o math.o minima.o molcul.o neigh.o output.o potent.o ptable.o refer.o scales.o sizes.o titles.o units.o usage.o
 xyzint.o: files.o iounit.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o sizes.o
 xyzsybyl.o: files.o iounit.o sizes.o titles.o

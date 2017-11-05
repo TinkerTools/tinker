@@ -133,10 +133,10 @@ c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nvdw
-         xi = xvold(i)
-         yi = yvold(i)
-         zi = zvold(i)
          if (update(i)) then
+            xi = xvold(i)
+            yi = yvold(i)
+            zi = zvold(i)
             nvlst(i) = 0
             do k = i+1, nvdw
                xr = xi - xvold(k)
@@ -515,10 +515,10 @@ c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nion
-         xi = xcold(i)
-         yi = ycold(i)
-         zi = zcold(i)
          if (update(i)) then
+            xi = xcold(i)
+            yi = ycold(i)
+            zi = zcold(i)
             nelst(i) = 0
             do k = i+1, nion
                xr = xi - xcold(k)
@@ -896,10 +896,10 @@ c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule (guided)
       do i = 1, npole
-         xi = xmold(i)
-         yi = ymold(i)
-         zi = zmold(i)
          if (update(i)) then
+            xi = xmold(i)
+            yi = ymold(i)
+            zi = zmold(i)
             nelst(i) = 0
             do k = i+1, npole
                xr = xi - xmold(k)
@@ -1277,10 +1277,10 @@ c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, npole
-         xi = xuold(i)
-         yi = yuold(i)
-         zi = zuold(i)
          if (update(i)) then
+            xi = xuold(i)
+            yi = yuold(i)
+            zi = zuold(i)
             nulst(i) = 0
             do k = i+1, npole
                xr = xi - xuold(k)

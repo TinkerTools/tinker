@@ -386,6 +386,7 @@ tinker
 +rattle.obj &
 +readdyn.obj &
 +readgau.obj &
++readgdma.obj &
 +readint.obj &
 +readmol.obj &
 +readmol2.obj &

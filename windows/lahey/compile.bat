@@ -479,6 +479,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace random.f
 LF95 -c -o1 -tpp -nstchk -ntrace rattle.f
 LF95 -c -o1 -tpp -nstchk -ntrace readdyn.f
 LF95 -c -o1 -tpp -nstchk -ntrace readgau.f
+LF95 -c -o1 -tpp -nstchk -ntrace readgdma.f
 LF95 -c -o1 -tpp -nstchk -ntrace readint.f
 LF95 -c -o1 -tpp -nstchk -ntrace readmol.f
 LF95 -c -o1 -tpp -nstchk -ntrace readmol2.f

@@ -478,6 +478,7 @@ gfortran -c -Wall random.f
 gfortran -c -Wall rattle.f
 gfortran -c -Wall readdyn.f
 gfortran -c -Wall readgau.f
+gfortran -c -Wall readgdma.f
 gfortran -c -Wall readint.f
 gfortran -c -Wall readmol.f
 gfortran -c -Wall readmol2.f

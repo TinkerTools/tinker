@@ -368,16 +368,14 @@ c
       use mpole
       use polgrp
       implicit none
-      integer maxlist,maxkeep
-      parameter (maxkeep=100)
-      parameter (maxlist=1000)
       integer i,j,k,m
       integer it,jt
       integer jj,kk
       integer start,stop
-      integer nlist,nkeep
-      integer keep(maxkeep)
-      integer list(maxlist)
+      integer nkeep,nlist
+      integer maxkeep,maxlist
+      integer, allocatable :: keep(:)
+      integer, allocatable :: list(:)
       integer, allocatable :: mask(:)
       logical done
 c
@@ -450,6 +448,10 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      maxkeep = 100
+      maxlist = 10000
+      allocate (keep(maxkeep))
+      allocate (list(maxlist))
       allocate (mask(n))
 c
 c     find any other group members for each atom in turn
@@ -638,6 +640,8 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (keep)
+      deallocate (list)
       deallocate (mask)
       return
       end

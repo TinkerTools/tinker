@@ -396,6 +396,7 @@ random.o \
 rattle.o \
 readdyn.o \
 readgau.o \
+readgdma.o \
 readint.o \
 readmol.o \
 readmol2.o \

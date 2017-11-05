@@ -478,6 +478,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp random.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp rattle.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp readdyn.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp readgau.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp readgdma.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp readint.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp readmol.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp readmol2.f

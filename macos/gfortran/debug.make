@@ -478,6 +478,7 @@ gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized ran
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized rattle.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized readdyn.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized readgau.f
+gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized readgdma.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized readint.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized readmol.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized readmol2.f

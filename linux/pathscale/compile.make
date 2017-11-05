@@ -478,6 +478,7 @@ pathf90 -c -O -msse3 -openmp random.f
 pathf90 -c -O -msse3 -openmp rattle.f
 pathf90 -c -O -msse3 -openmp readdyn.f
 pathf90 -c -O -msse3 -openmp readgau.f
+pathf90 -c -O -msse3 -openmp readgdma.f
 pathf90 -c -O -msse3 -openmp readint.f
 pathf90 -c -O -msse3 -openmp readmol.f
 pathf90 -c -O -msse3 -openmp readmol2.f

@@ -478,6 +478,7 @@ ifort -c -g -warn all -check all random.f
 ifort -c -g -warn all -check all rattle.f
 ifort -c -g -warn all -check all readdyn.f
 ifort -c -g -warn all -check all readgau.f
+ifort -c -g -warn all -check all readgdma.f
 ifort -c -g -warn all -check all readint.f
 ifort -c -g -warn all -check all readmol.f
 ifort -c -g -warn all -check all readmol2.f
