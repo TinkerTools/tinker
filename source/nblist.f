@@ -158,9 +158,9 @@ c
 !$OMP DO schedule(guided)
       do i = 1, nvdw
          if (update(i)) then
-            xi = xred(i)
-            yi = yred(i)
-            zi = zred(i)
+            xi = xvold(i)
+            yi = yvold(i)
+            zi = zvold(i)
             do k = 1, i-1
                if (.not. update(k)) then
                   xr = xi - xvold(k)
@@ -540,10 +540,9 @@ c
 !$OMP DO schedule(guided)
       do i = 1, nion
          if (update(i)) then
-            ii = kion(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
+            xi = xcold(i)
+            yi = ycold(i)
+            zi = zcold(i)
             do k = 1, i-1
                if (.not. update(k)) then
                   xr = xi - xcold(k)
@@ -922,10 +921,9 @@ c
 !$OMP DO schedule (guided)
       do i = 1, npole
          if (update(i)) then
-            ii = ipole(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
+            xi = xmold(i)
+            yi = ymold(i)
+            zi = zmold(i)
             do k = 1, i-1
                if (.not. update(k)) then
                   xr = xi - xmold(k)
@@ -1304,10 +1302,9 @@ c
 !$OMP DO schedule(guided)
       do i = 1, npole
          if (update(i)) then
-            ii = ipole(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
+            xi = xuold(i)
+            yi = yuold(i)
+            zi = zuold(i)
             do k = 1, i-1
                if (.not. update(k)) then
                   xr = xi - xuold(k)
