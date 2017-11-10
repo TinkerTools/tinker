@@ -150,7 +150,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoun
 ##  Should not be Necessary to Change Things Below this Point  ##
 #################################################################
 
-OBJS += action.o \
+OBJS =	action.o \
 	active.o \
 	alchemy.o \
 	align.o \
@@ -373,6 +373,7 @@ OBJS += action.o \
 	getxyz.o \
 	ghmcstep.o \
 	gkstuf.o \
+	gpu_cards.o \
 	gradient.o \
 	gradrgd.o \
 	gradrot.o \
@@ -513,6 +514,7 @@ OBJS += action.o \
 	opbend.o \
 	opdist.o \
 	openend.o \
+	openmm.o \
 	openmp.o \
 	optimize.o \
 	optirot.o \
@@ -933,7 +935,7 @@ libtinker.a: ${OBJS}
 	ghmcstep.o \
 	gkstuf.o \
 	gpu_cards.o \
-	$(GPU_USAGE_OBJS)\
+	$(GPU_USAGE_OBJS) \
 	gradient.o \
 	gradrgd.o \
 	gradrot.o \
@@ -1064,6 +1066,7 @@ libtinker.a: ${OBJS}
 	opbend.o \
 	opdist.o \
 	openend.o \
+	openmm.o \
 	openmp.o \
 	optsave.o \
 	orbital.o \
