@@ -129,7 +129,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors of updated sites
+c     rebuild the higher numbered neighbors for updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nvdw
@@ -511,7 +511,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors of updated sites
+c     rebuild the higher numbered neighbors for updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nion
@@ -892,7 +892,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors of updated sites
+c     rebuild the higher numbered neighbors for updated sites
 c
 !$OMP DO schedule (guided)
       do i = 1, npole
@@ -1273,7 +1273,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors of updated sites
+c     rebuild the higher numbered neighbors for updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, npole

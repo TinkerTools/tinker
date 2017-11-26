@@ -199,7 +199,9 @@ c
          call upcase (record)
          next = 1
          call gettext (record,name,next)
-         length = trimtext (name)
+         call justify (name)
+         length = 3
+c        length = trimtext (name)
          string = record(next:240)
          read (string,*,err=60,end=60)  (bkbone(j,i),j=1,6),glyco(i)
    60    continue
