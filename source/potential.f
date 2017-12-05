@@ -589,6 +589,10 @@ c
          allocate (tmpchg(maxtyp))
          allocate (tmppol(maxtyp))
 c
+c     zero the keyfile length to avoid parameter reprocessing
+c
+         nkey = 0
+c
 c     set parameters, run optimization, get final parameters
 c
          nvar = 0
@@ -2047,6 +2051,10 @@ c
       character*240 record
 c
 c
+c     reread the contents of any previously existing keyfile
+c
+      call getkey
+c
 c     open a new keyfile to contain the optimized parameters
 c
       ikey = freeunit ()
@@ -2062,6 +2070,10 @@ c
          write (ikey,10)  record(1:size)
    10    format (a)
       end do
+c
+c     zero the keyfile length to avoid parameter reprocessing
+c
+      nkey = 0
 c
 c     output the optimized partial charge values to the keyfile
 c
