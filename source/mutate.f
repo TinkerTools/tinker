@@ -52,6 +52,7 @@ c
 c     set defaults for lambda and soft core vdw parameters
 c
       lambda = 1.0d0
+      tlambda = 1.0d0
       vlambda = 1.0d0
       elambda = 1.0d0
       scexp = 5.0d0
@@ -77,6 +78,9 @@ c
          if (keyword(1:7) .eq. 'LAMBDA ') then
             string = record(next:240)
             read (string,*,err=20)  lambda
+         else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=20)  tlambda
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=20)  vlambda
@@ -126,6 +130,10 @@ c
    20    continue
       end do
 c
+c     scale torsional parameter values based on lambda
+c
+      if (tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0)  call alttors
+c
 c     scale electrostatic parameter values based on lambda
 c
       if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0)  call altelec
@@ -133,12 +141,57 @@ c
 c     write the status of the current free energy perturbation step
 c
       if (nmut.ne.0 .and. .not.silent) then
-         write (iout,30)  vlambda
+         write (iout,30)  tlambda
    30    format (/,' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for van der Waals')
-         write (iout,40)  elambda
+     &              ' Lambda for Torsional Angles')
+         write (iout,40)  vlambda
    40    format (' Free Energy Perturbation :',f15.3,
+     &              ' Lambda for van der Waals')
+         write (iout,50)  elambda
+   50    format (' Free Energy Perturbation :',f15.3,
      &              ' Lambda for Electrostatics')
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine alttors  --  mutated torsional parameters  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "alttors" constructs mutated torsional parameters based
+c     on the lambda mutation parameter "tlambda"
+c
+c
+      subroutine alttors
+      use sizes
+      use mutant
+      use potent
+      use tors
+      implicit none
+      integer i,ia,ib,ic,id
+c
+c
+c     set torsional parameters within a mutated group of atoms
+c
+      if (use_tors) then
+         do i = 1, ntors
+            ia = itors(1,i)
+            ib = itors(2,i)
+            ic = itors(3,i)
+            id = itors(4,i)
+            if (mut(ia) .and. mut(ib) .and. mut(ic) .and. mut(id)) then
+               tors1(1,i) = tlambda * tors1(1,i)
+               tors2(1,i) = tlambda * tors2(1,i)
+               tors3(1,i) = tlambda * tors3(1,i)
+               tors4(1,i) = tlambda * tors4(1,i)
+               tors5(1,i) = tlambda * tors5(1,i)
+               tors6(1,i) = tlambda * tors6(1,i)
+            end if
+         end do
       end if
       return
       end
@@ -151,8 +204,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "altelec" constructs the mutated electrostatic parameters
-c     based on the lambda mutation parameter "elambda"
+c     "altelec" constructs mutated electrostatic parameters based
+c     on the lambda mutation parameter "elambda"
 c
 c
       subroutine altelec

@@ -111,6 +111,7 @@ c
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
             fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+c           fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)  ! omit intraligand v$
             if (k .eq. i)  fik = 0.5d0 * fik
             rv = radmin(kt,it)
             eps = epsilon(kt,it)
@@ -273,6 +274,7 @@ c
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
             fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+c           fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)  ! omit intraligand vdw
             if (k .eq. i)  fik = 0.5d0 * fik
             rv = radmin(kt,it)
             eps = epsilon(kt,it)

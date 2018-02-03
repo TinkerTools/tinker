@@ -297,6 +297,10 @@ c
   210       continue
          end if
          if (stop .eq. 0)  stop = start
+         if (stop .eq. 0) then
+            start = 1
+            stop = 1000000
+         end if
          if (step .eq. 0)  step = 1
 c
 c     loop over the individual coordinate files to be extracted
@@ -402,6 +406,10 @@ c
   260          continue
             end if
             if (stop .eq. 0)  stop = start
+            if (stop .eq. 0) then
+               start = 1
+               stop = 1000000
+            end if
             if (step .eq. 0)  step = 1
          end do
       end if
