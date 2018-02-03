@@ -1316,7 +1316,7 @@ void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
 
 void set_mutant_data_ (int* nmut, int* imut, int* type0, int* class0,
                        int* type1, int* class1, double* lambda,
-                       double* vlambda, double* vlambda, double* elambda,
+                       double* tlambda, double* vlambda, double* elambda,
                        double* scexp, double* scalpha, int* mut) {
 
    mutant__.nmut = *nmut;
