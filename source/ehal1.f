@@ -215,8 +215,9 @@ c
 c
 c     get the energy and gradient, via soft core if necessary
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+c                 if ((muti .and. .not.mutk) .or.
+c    &                (mutk .and. .not.muti)) then
+                  if (muti .or. mutk) then
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -418,8 +419,9 @@ c
 c
 c     get the energy and gradient, via soft core if necessary
 c
-                     if ((muti .and. .not.mutk) .or.
-     &                   (mutk .and. .not.muti)) then
+c                    if ((muti .and. .not.mutk) .or.
+c    &                   (mutk .and. .not.muti)) then
+                     if (muti .or. mutk) then
                         rho = rik / rv
                         rho6 = rho**6
                         rho7 = rho6 * rho
@@ -793,8 +795,9 @@ c
 c
 c     get the energy and gradient, via soft core if necessary
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+c                 if ((muti .and. .not.mutk) .or.
+c    &                (mutk .and. .not.muti)) then
+                  if (muti .or. mutk) then
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -1120,8 +1123,9 @@ c
 c
 c     get the energy and gradient, via soft core if necessary
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+c                 if ((muti .and. .not.mutk) .or.
+c    &                (mutk .and. .not.muti)) then
+                  if (muti .or. mutk) then
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho

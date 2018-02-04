@@ -20,6 +20,7 @@ c
       use sizes
       use atomid
       use atoms
+      use bndstr
       use inform
       use iounit
       use katoms
@@ -27,8 +28,10 @@ c
       use mutant
       implicit none
       integer i,j,k,ihyb
-      integer it0,it1,next
+      integer it0,it1
+      integer ntbnd,next
       integer list(20)
+      integer, allocatable :: itbnd(:,:)
       character*20 keyword
       character*240 record
       character*240 string
@@ -49,23 +52,32 @@ c
       allocate (class1(n))
       allocate (mut(n))
 c
-c     set defaults for lambda and soft core vdw parameters
+c     perform dynamic allocation of some local arrays
+c
+      allocate (itbnd(2,nbond))
+c
+c     set defaults for lambda perturbation scaling values
 c
       lambda = 1.0d0
       tlambda = 1.0d0
       vlambda = 1.0d0
       elambda = 1.0d0
+c
+c     set defaults for soft core vdw and rotatable torsions
+c
       scexp = 5.0d0
       scalpha = 0.7d0
 c
-c     zero number of hybrid atoms and hybrid atom list
+c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
       do i = 1, n
          mut(i) = .false.
       end do
-      do i = 1, 20
-         list(i) = 0
+      ntbnd = 0
+      do i = 1, nbond
+         itbnd(1,i) = 0
+         itbnd(2,i) = 0
       end do
 c
 c     search keywords for free energy perturbation options
@@ -77,19 +89,19 @@ c
          call upcase (keyword)
          if (keyword(1:7) .eq. 'LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=20)  lambda
+            read (string,*,err=30)  lambda
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=20)  tlambda
+            read (string,*,err=30)  tlambda
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=20)  vlambda
+            read (string,*,err=30)  vlambda
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=20)  elambda
+            read (string,*,err=30)  elambda
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
-            read (string,*,err=20)  ihyb,it0,it1
+            read (string,*,err=30)  ihyb,it0,it1
             nmut = nmut + 1
             imut(nmut) = ihyb
             mut(ihyb) = .true.
@@ -98,6 +110,9 @@ c
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
          else if (keyword(1:7) .eq. 'LIGAND ') then
+            do k = 1, 20
+               list(k) = 0
+            end do
             string = record(next:240)
             read (string,*,err=10,end=10)  (list(k),k=1,20)
    10       continue
@@ -126,31 +141,53 @@ c
                   k = k + 2
                end if
             end do
+         else if (keyword(1:15) .eq. 'ROTATABLE-BOND ') then
+            do k = 1, 20
+               list(k) = 0
+            end do
+            string = record(next:240)
+            read (string,*,err=20,end=20)  (list(k),k=1,20)
+   20       continue
+            k = 1
+            do while (list(k) .ne. 0)
+               ntbnd = ntbnd + 1
+               itbnd(1,ntbnd) = list(k)
+               itbnd(2,ntbnd) = list(k+1)
+               k = k + 2
+            end do
          end if
-   20    continue
+   30    continue
       end do
 c
 c     scale torsional parameter values based on lambda
 c
-      if (tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0)  call alttors
+      if (tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
+         if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
+      end if
 c
 c     scale electrostatic parameter values based on lambda
 c
-      if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0)  call altelec
+      if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
+         call altelec
+      end if
 c
 c     write the status of the current free energy perturbation step
 c
       if (nmut.ne.0 .and. .not.silent) then
-         write (iout,30)  tlambda
-   30    format (/,' Free Energy Perturbation :',f15.3,
+         write (iout,40)  tlambda
+   40    format (/,' Free Energy Perturbation :',f15.3,
      &              ' Lambda for Torsional Angles')
-         write (iout,40)  vlambda
-   40    format (' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for van der Waals')
-         write (iout,50)  elambda
+         write (iout,50)  vlambda
    50    format (' Free Energy Perturbation :',f15.3,
+     &              ' Lambda for van der Waals')
+         write (iout,60)  elambda
+   60    format (' Free Energy Perturbation :',f15.3,
      &              ' Lambda for Electrostatics')
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (itbnd)
       return
       end
 c
@@ -166,16 +203,20 @@ c     "alttors" constructs mutated torsional parameters based
 c     on the lambda mutation parameter "tlambda"
 c
 c
-      subroutine alttors
+      subroutine alttors (ntbnd,itbnd)
       use sizes
       use mutant
       use potent
       use tors
       implicit none
-      integer i,ia,ib,ic,id
+      integer i,j
+      integer ia,ib,ic,id
+      integer kb,kc
+      integer ntbnd
+      integer itbnd(2,*)
 c
 c
-c     set torsional parameters within a mutated group of atoms
+c     set torsional parameters across freely rotatable bonds
 c
       if (use_tors) then
          do i = 1, ntors
@@ -184,12 +225,19 @@ c
             ic = itors(3,i)
             id = itors(4,i)
             if (mut(ia) .and. mut(ib) .and. mut(ic) .and. mut(id)) then
-               tors1(1,i) = tlambda * tors1(1,i)
-               tors2(1,i) = tlambda * tors2(1,i)
-               tors3(1,i) = tlambda * tors3(1,i)
-               tors4(1,i) = tlambda * tors4(1,i)
-               tors5(1,i) = tlambda * tors5(1,i)
-               tors6(1,i) = tlambda * tors6(1,i)
+               do j = 1, ntbnd
+                  kb = itbnd(1,j)
+                  kc = itbnd(2,j)
+                  if ((kb.eq.ib .and. kc.eq.ic) .or.
+     &                (kb.eq.ic .and. kc.eq.ib)) then
+                     tors1(1,i) = tors1(1,i) * tlambda
+                     tors2(1,i) = tors2(1,i) * tlambda
+                     tors3(1,i) = tors3(1,i) * tlambda
+                     tors4(1,i) = tors4(1,i) * tlambda
+                     tors5(1,i) = tors5(1,i) * tlambda
+                     tors6(1,i) = tors6(1,i) * tlambda
+                  end if
+               end do
             end if
          end do
       end if

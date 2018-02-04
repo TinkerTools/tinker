@@ -189,8 +189,9 @@ c
 c
 c     get the interaction energy, via soft core if necessary
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+c                 if ((muti .and. .not.mutk) .or.
+c    &                (mutk .and. .not.muti)) then
+                  if (muti .or. mutk) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
                      scal = scalpha * (1.0d0-vlambda)**2
@@ -315,8 +316,9 @@ c
 c
 c     get the interaction energy, via soft core if necessary
 c
-                     if ((muti .and. .not.mutk) .or.
-     &                   (mutk .and. .not.muti)) then
+c                    if ((muti .and. .not.mutk) .or.
+c    &                   (mutk .and. .not.muti)) then
+                     if (muti .or. mutk) then
                         rho = rik / rv
                         eps = eps * vlambda**scexp
                         scal = scalpha * (1.0d0-vlambda)**2
@@ -594,8 +596,9 @@ c
 c
 c     get the interaction energy, via soft core if necessary
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+c                 if ((muti .and. .not.mutk) .or.
+c    &                (mutk .and. .not.muti)) then
+                  if (muti .or. mutk) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
                      scal = scalpha * (1.0d0-vlambda)**2
@@ -825,8 +828,9 @@ c
 c
 c     get the interaction energy, via soft core if necessary
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+c                 if ((muti .and. .not.mutk) .or.
+c    &                (mutk .and. .not.muti)) then
+                  if (muti .or. mutk) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
                      scal = scalpha * (1.0d0-vlambda)**2
