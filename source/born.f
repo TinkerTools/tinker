@@ -295,6 +295,9 @@ c
                      r2 = xr**2 + yr**2 + zr**2
                      r = sqrt(r2)
                      sk = rk * shct(k)
+                     
+                     if (ri .lt. r+sk) then
+                     
                      sk2 = sk * sk
                      if (ri+r .lt. sk) then
                         lik = ri
@@ -320,6 +323,8 @@ c
                      term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
      &                         - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
                      sum = sum - pi*term/12.0d0
+                     
+                     end if
                   end if
                end do
                rborn(i) = (sum/pi43)**third
@@ -732,6 +737,9 @@ c
                      yr = y(k) - yi
                      zr = z(k) - zi
                      sk = rk * shct(k)
+                     
+                     if (ri .lt. r+sk) then
+                     
                      sk2 = sk * sk
                      r2 = xr**2 + yr**2 + zr**2
                      r = sqrt(r2)
@@ -790,6 +798,7 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
+                  end if
                   end if
                end do
             end if
