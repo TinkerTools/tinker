@@ -285,16 +285,19 @@ c
       end if
       minimiz1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     store coordinates and gradient as optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
+            xx(nvar) = x(i) * scale(nvar)
             g(nvar) = derivs(1,i) / scale(nvar)
             nvar = nvar + 1
+            xx(nvar) = y(i) * scale(nvar)
             g(nvar) = derivs(2,i) / scale(nvar)
             nvar = nvar + 1
+            xx(nvar) = z(i) * scale(nvar)
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do

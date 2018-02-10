@@ -638,16 +638,19 @@ c
       call gradient (e,derivs)
       mcm1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     store coordinates and gradient as optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
+            xx(nvar) = x(i)
             g(nvar) = derivs(1,i)
             nvar = nvar + 1
+            xx(nvar) = y(i)
             g(nvar) = derivs(2,i)
             nvar = nvar + 1
+            xx(nvar) = z(i)
             g(nvar) = derivs(3,i)
          end if
       end do
@@ -740,6 +743,20 @@ c
             end do
          end do
       end if
+c
+c     store atomic coordinates as optimization parameters
+c
+      nvar = 0
+      do i = 1, n
+         if (use(i)) then
+            nvar = nvar + 1
+            xx(nvar) = x(i)
+            nvar = nvar + 1
+            xx(nvar) = y(i)
+            nvar = nvar + 1
+            xx(nvar) = z(i)
+         end if
+      end do
 c
 c     perform deallocation of some local arrays
 c
