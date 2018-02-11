@@ -609,7 +609,7 @@ OBJS =	action.o \
 	rattle.o \
 	readdyn.o \
 	readgau.o \
-	readgmda.o \
+	readgdma.o \
 	readint.o \
 	readmol.o \
 	readmol2.o \
