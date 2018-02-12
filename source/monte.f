@@ -526,6 +526,7 @@ c
       subroutine mcmstep (minimum,grdmin)
       use sizes
       use atoms
+      use bound
       use files
       use inform
       use output
@@ -551,7 +552,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(3*n))
 c
-c     translate the coordinates of each active atom
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n
@@ -570,7 +571,7 @@ c
       call tncg (mode,method,nvar,xx,minimum,grdmin,
      &                  mcm1,mcm2,optsave)
 c
-c     untranslate the final coordinates for active atoms
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -583,6 +584,10 @@ c
             z(i) = xx(nvar)
          end if
       end do
+c
+c     maintain any periodic boundary conditions
+c
+      if (use_bounds)  call bounds
 c
 c     perform deallocation of some local arrays
 c
@@ -615,7 +620,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -638,19 +643,16 @@ c
       call gradient (e,derivs)
       mcm1 = e
 c
-c     store coordinates and gradient as optimization parameters
+c     store gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
-            xx(nvar) = x(i)
             g(nvar) = derivs(1,i)
             nvar = nvar + 1
-            xx(nvar) = y(i)
             g(nvar) = derivs(2,i)
             nvar = nvar + 1
-            xx(nvar) = z(i)
             g(nvar) = derivs(3,i)
          end if
       end do
@@ -691,7 +693,7 @@ c
       character*4 mode
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       if (mode .eq. 'NONE')  return
       nvar = 0
@@ -744,7 +746,7 @@ c
          end do
       end if
 c
-c     store atomic coordinates as optimization parameters
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n

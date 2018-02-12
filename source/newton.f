@@ -137,7 +137,7 @@ c
       allocate (xx(3*n))
       allocate (derivs(3,n))
 c
-c     translate the coordinates of each active atom
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n
@@ -156,7 +156,7 @@ c
       call tncg (mode,method,nvar,xx,minimum,grdmin,
      &               newton1,newton2,optsave)
 c
-c     untranslate the final coordinates for active atoms
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -267,7 +267,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -290,19 +290,16 @@ c
       call gradient (e,derivs)
       newton1 = e
 c
-c     store coordinates and gradient as optimization parameters
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
-            xx(nvar) = x(i)
             g(nvar) = derivs(1,i)
             nvar = nvar + 1
-            xx(nvar) = y(i)
             g(nvar) = derivs(2,i)
             nvar = nvar + 1
-            xx(nvar) = z(i)
             g(nvar) = derivs(3,i)
          end if
       end do
@@ -343,7 +340,7 @@ c
       character*4 mode
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       if (mode .eq. 'NONE')  return
       nvar = 0
@@ -396,7 +393,7 @@ c
          end do
       end if
 c
-c     store atomic coordinates as optimization parameters
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n

@@ -268,7 +268,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -289,18 +289,15 @@ c
       call gradient (e,derivs)
       scan1 = e
 c
-c     store coordinates and gradient as optimization parameters
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          nvar = nvar + 1
-         xx(nvar) = x(i)
          g(nvar) = derivs(1,i)
          nvar = nvar + 1
-         xx(nvar) = y(i)
          g(nvar) = derivs(2,i)
          nvar = nvar + 1
-         xx(nvar) = z(i)
          g(nvar) = derivs(3,i)
       end do
 c
@@ -353,18 +350,6 @@ c
 c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
-c
-c     store atomic coordinates as optimization parameters
-c
-      nvar = 0
-      do i = 1, n
-         nvar = nvar + 1
-         xx(nvar) = x(i)
-         nvar = nvar + 1
-         xx(nvar) = y(i)
-         nvar = nvar + 1
-         xx(nvar) = z(i)
-      end do
       return
       end
 c
@@ -635,7 +620,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(3*n))
 c
-c     translate the coordinates of each atom
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n
@@ -656,7 +641,7 @@ c
 c     call lbfgs (nvar,xx,minimum,grdmin,scan1,optsave)
       verbose = oldverb
 c
-c     untranslate the final coordinates for each atom
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n

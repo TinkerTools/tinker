@@ -292,7 +292,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -313,18 +313,15 @@ c
       call gradient (e,derivs)
       pss1 = e
 c
-c     store coordinates and gradient as optimization parameters
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          nvar = nvar + 1
-         xx(nvar) = x(i)
          g(nvar) = derivs(1,i)
          nvar = nvar + 1
-         xx(nvar) = y(i)
          g(nvar) = derivs(2,i)
          nvar = nvar + 1
-         xx(nvar) = z(i)
          g(nvar) = derivs(3,i)
       end do
 c
@@ -361,7 +358,7 @@ c
       character*4 mode
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       if (mode .eq. 'NONE')  return
       nvar = 0
@@ -377,18 +374,6 @@ c
 c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
-c
-c     store atomic coordinates as optimization parameters
-c
-      nvar = 0
-      do i = 1, n
-         nvar = nvar + 1
-         xx(nvar) = x(i)
-         nvar = nvar + 1
-         xx(nvar) = y(i)
-         nvar = nvar + 1
-         xx(nvar) = z(i)
-      end do
       return
       end
 c

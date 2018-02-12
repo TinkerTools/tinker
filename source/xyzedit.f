@@ -1371,7 +1371,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -1392,7 +1392,7 @@ c
       call gradient (e,derivs)
       boxmin1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n

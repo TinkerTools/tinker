@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -128,9 +128,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -152,16 +152,16 @@
 
  Final Function Value :           19.0495
  Final RMS Gradient :          0.1910D-05
- Final Gradient Norm :         0.8104D-05
+ Final Gradient Norm :         0.8103D-05
 
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -201,9 +201,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -218,55 +218,55 @@
  Path Point :           1
  Initial Point :                 20.8909
  Optimized Point :                9.0744
- Target-Energy Difference :    0.000D+00
+ Target-Energy Difference :   -0.107D-13
  Gradient along Path :            4.7031
 
  Path Point :           2
  Initial Point :                 19.3285
  Optimized Point :               11.5767
- Target-Energy Difference :   -0.711D-14
+ Target-Energy Difference :    0.266D-13
  Gradient along Path :            6.8891
 
  Path Point :           3
  Initial Point :                 18.4983
  Optimized Point :               14.5074
- Target-Energy Difference :    0.409D-13
+ Target-Energy Difference :    0.284D-13
  Gradient along Path :            6.8476
 
  Path Point :           4
  Initial Point :                 18.5139
  Optimized Point :               17.0524
- Target-Energy Difference :   -0.320D-13
+ Target-Energy Difference :    0.131D-12
  Gradient along Path :            5.1392
 
  Path Point :           5
  Initial Point :                 18.8618
  Optimized Point :               18.6497
- Target-Energy Difference :   -0.107D-13
+ Target-Energy Difference :    0.711D-13
  Gradient along Path :            2.4147
 
  Path Point :           6
  Initial Point :                 19.1801
  Optimized Point :               14.0649
- Target-Energy Difference :    0.344D-10
- Gradient along Path :           -0.8628
+ Target-Energy Difference :    0.401D-12
+ Gradient along Path :           -0.8630
 
  Path Point :           7
- Initial Point :                 21.2036
+ Initial Point :                 21.2035
  Optimized Point :               13.9129
- Target-Energy Difference :   -0.974D-11
+ Target-Energy Difference :    0.320D-12
  Gradient along Path :            0.2537
 
  Path Point :           8
- Initial Point :                 22.1128
+ Initial Point :                 22.1129
  Optimized Point :               14.2890
- Target-Energy Difference :   -0.516D-10
- Gradient along Path :            1.4140
+ Target-Energy Difference :    0.356D-11
+ Gradient along Path :            1.4141
 
  Path Point :           9
- Initial Point :                 23.8318
+ Initial Point :                 23.8319
  Optimized Point :               14.6987
- Target-Energy Difference :    0.409D-10
+ Target-Energy Difference :   -0.165D-11
  Gradient along Path :           -1.1969
 
      ######################################################################
@@ -274,9 +274,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -295,7 +295,7 @@
      3       19.0495     0.0103      0.0015   0.0028       6   TruncNewt     10
      4       19.0495     0.0200      0.0001   0.0089      15   TruncNewt     21
      5       19.0495     0.0007      0.0000   0.0016      24   TruncNewt     31
-     6       19.0495     0.0000      0.0000   0.0003      36   TruncNewt     44
+     6       19.0495     0.0000      0.0000   0.0003      35   TruncNewt     43
 
  TNCG  --  Normal Termination due to SmallGrad
 
@@ -308,9 +308,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################

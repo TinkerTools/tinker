@@ -1261,7 +1261,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(6*ngrp))
 c
-c     transfer rigid body coordinates to optimization parameters
+c     convert rigid body coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, ngrp
@@ -1279,7 +1279,7 @@ c
       coordtype = 'NONE'
       call ocvm (nvar,xx,minimum,grdmin,watson1,optsave)
 c
-c     transfer optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
       nvar = 0
       do i = 1, ngrp
@@ -1325,7 +1325,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
       nvar = 0
       do i = 1, ngrp
@@ -1345,7 +1345,7 @@ c
       call gradrgd (e,derivs)
       watson1 = e
 c
-c     translate rigid body gradient to optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, ngrp

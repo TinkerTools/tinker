@@ -2386,7 +2386,7 @@ c
       analytic = .true.
       eps = 0.00001d0
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -2414,7 +2414,7 @@ c
       end if
       minimiz1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n

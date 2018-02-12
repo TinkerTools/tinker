@@ -433,7 +433,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -456,19 +456,16 @@ c
       call gradient (e,derivs)
       sniffer1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
-            xx(nvar) = x(i) * scale(nvar)
             g(nvar) = derivs(1,i) / scale(nvar)
             nvar = nvar + 1
-            xx(nvar) = y(i) * scale(nvar)
             g(nvar) = derivs(2,i) / scale(nvar)
             nvar = nvar + 1
-            xx(nvar) = z(i) * scale(nvar)
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do

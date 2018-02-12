@@ -114,7 +114,7 @@ c
       allocate (xx(nvar))
       allocate (derivs(3,n))
 c
-c     scale the coordinates of each active atom
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n
@@ -132,7 +132,7 @@ c     make the call to the optimization routine
 c
       call ocvm (nvar,xx,minimum,grdmin,optimiz1,optsave)
 c
-c     unscale the final coordinates for active atoms
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -257,7 +257,7 @@ c
       analytic = .true.
       eps = 0.00001d0
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -285,19 +285,16 @@ c
       end if
       optimiz1 = e
 c
-c     store coordinates and gradient as optimization parameters
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
-            xx(nvar) = x(i) * scale(nvar)
             g(nvar) = derivs(1,i) / scale(nvar)
             nvar = nvar + 1
-            xx(nvar) = y(i) * scale(nvar)
             g(nvar) = derivs(2,i) / scale(nvar)
             nvar = nvar + 1
-            xx(nvar) = z(i) * scale(nvar)
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do

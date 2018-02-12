@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -61,6 +61,7 @@
          4             -1.0000
          5             -1.0000
 
+ Free Energy Perturbation :          1.000 Lambda for Torsional Angles
  Free Energy Perturbation :          1.000 Lambda for van der Waals
  Free Energy Perturbation :          1.000 Lambda for Electrostatics
 
@@ -1423,9 +1424,9 @@
   ###                                                                      ###
  ###            TINKER  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.3   October 2017                        ##
+ ##                        Version 8.4  February 2018                        ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2017               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -1481,6 +1482,7 @@
          4             -1.0000
          5             -1.0000
 
+ Free Energy Perturbation :          1.000 Lambda for Torsional Angles
  Free Energy Perturbation :          1.000 Lambda for van der Waals
  Free Energy Perturbation :          1.000 Lambda for Electrostatics
 

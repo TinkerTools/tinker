@@ -59,7 +59,7 @@ c
          end if
       end if
 c
-c     transform optimization parameters back to coordinates
+c     convert optimization parameters to atomic coordinates
 c
       if (coordtype .eq. 'CARTESIAN') then
          nvar = 0

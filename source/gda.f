@@ -148,7 +148,7 @@ c
             end do
          end if
 c
-c     translate coordinates and M2's to optimization parameters
+c     convert coordinates and M2's to optimization parameters
 c
          nvar = 0
          do i = 1, n
@@ -204,7 +204,7 @@ c        call lbfgs (nvar,xx,minimum,grdmin,gda2,optsave)
          write (iout,110)  itrial,minimum
   110    format (/,' Global Energy Minimum for Trial',i4,' :',f15.4)
 c
-c     translate optimization parameters into atomic coordinates
+c     convert optimization parameters into atomic coordinates
 c
          nvar = 0
          do i = 1, n
@@ -280,7 +280,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to coordinates and M2's
+c     convert optimization parameters to coordinates and M2's
 c
       nvar = 0
       do i = 1, n
@@ -310,7 +310,7 @@ c     compute and store the Cartesian energy gradient vector
 c
       call gradient (e,derivs)
 c
-c     translate the energy gradient into a dr/dbeta vector
+c     convert the gradient components into a dr/dbeta vector
 c
       nvar = 0
       do i = 1, n
@@ -338,7 +338,7 @@ c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
 c
-c     translate the Hessian diagonal into a dM2/dbeta vector
+c     convert the Hessian diagonal into a dM2/dbeta vector
 c
       do i = 1, n
          nvar = nvar + 1
@@ -375,7 +375,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -396,18 +396,15 @@ c
       call gradient (e,derivs)
       gda2 = e
 c
-c     store coordinates and gradient as optimization parameters
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n
          nvar = nvar + 1
-         xx(nvar) = x(i)
          g(nvar) = derivs(1,i)
          nvar = nvar + 1
-         xx(nvar) = y(i)
          g(nvar) = derivs(2,i)
          nvar = nvar + 1
-         xx(nvar) = z(i)
          g(nvar) = derivs(3,i)
       end do
 c
@@ -439,7 +436,7 @@ c
       character*4 mode
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       if (mode .eq. 'NONE')  return
       nvar = 0
@@ -455,17 +452,5 @@ c
 c     compute and store the Hessian elements
 c
       call hessian (h,hinit,hstop,hindex,hdiag)
-c
-c     store atomic coordinates as optimization parameters
-c
-      nvar = 0
-      do i = 1, n
-         nvar = nvar + 1
-         xx(nvar) = x(i)
-         nvar = nvar + 1
-         xx(nvar) = y(i)
-         nvar = nvar + 1
-         xx(nvar) = z(i)
-      end do
       return
       end

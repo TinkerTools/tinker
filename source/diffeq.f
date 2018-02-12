@@ -484,7 +484,7 @@ c
       character*7 status
 c
 c
-c     translate optimization parameters to coordinates and M2's
+c     convert optimization parameters to coordinates and M2's
 c
       nvar = 0
       do i = 1, n
