@@ -94,7 +94,7 @@ c
 c
 c     get the center and radius of the sphere of active atoms
 c
-         else if (keyword(1:7) .eq. 'SPHERE ') then
+         else if (keyword(1:14) .eq. 'ACTIVE-SPHERE ') then
             center = 0
             xcenter = 0.0d0
             ycenter = 0.0d0
@@ -117,10 +117,9 @@ c
                end do
                if (verbose) then
                   write (iout,40)
-   40             format (/,' Active Site Spheres used to',
-     &                        ' Select Active Atoms :',
-     &                     //,3x,'Atom Center',11x,'Coordinates',
-     &                        12x,'Radius',6x,'# Active Atoms')
+   40             format (/,' Spheres used to Select Active Atoms :',
+     &                    //,3x,'Atom Center',11x,'Coordinates',
+     &                       12x,'Radius',6x,'# Active Atoms')
                end if
             end if
             radius2 = radius * radius

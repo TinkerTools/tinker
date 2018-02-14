@@ -192,7 +192,7 @@ c
       if (sg_b*sg_a.lt.0.0d0 .or. f_b.gt.f_a)  goto 30
 c
 c     if the finite difference curvature is negative double the step;
-c     or if  step < parabolic estimate < 4*step  use this estimate,
+c     or if (step < parabolic estimate < 4*step) use this estimate,
 c     otherwise truncate to step or 4*step, respectively
 c
       step = 2.0d0 * step
@@ -275,7 +275,7 @@ c
 c     if current brackets have slope of same sign, then replace
 c     the far bracket if the interpolated point has a slope of
 c     the opposite sign or a lower function value than the near
-c     bracket, otherwise replace the far bracket point
+c     bracket, otherwise replace the near bracket point
 c
             else
                if (sg_a*sg_c.lt.0.0d0 .or. f_a.le.f_c) then
