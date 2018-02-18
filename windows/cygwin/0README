@@ -5,5 +5,5 @@
 
          This subdirectory contains a set of script files that can be
          used to build the TINKER program package on a Windows system
-         using the GNU 4.9.0 gfortran compiler under Cygwin.
+         using the MinGW GNU 5.4 gfortran compiler under Cygwin.
 

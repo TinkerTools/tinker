@@ -338,6 +338,7 @@ gfortran -c -Wall flatten.f
 gfortran -c -Wall freeunit.f
 gfortran -c -Wall gda.f
 gfortran -c -Wall geometry.f
+gfortran -c -Wall getarc.f
 gfortran -c -Wall getint.f
 gfortran -c -Wall getkey.f
 gfortran -c -Wall getmol.f

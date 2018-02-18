@@ -10,6 +10,10 @@
          compiler to SSE3-compatible instructions, and the resulting
          executables should run on most AMD-based machines.
 
+         Building OpenMP parallel executables requires uncommenting
+         the two Intel-specific routine calls kmp_set_stacksize_s and
+         kmp_set_blocksize in the source file initial.f.
+
          Please note that by default most Linux distributions limit
          stacksize and datasize for processes, as can be checked via
          the csh limit command or similar. Calculations on big systems

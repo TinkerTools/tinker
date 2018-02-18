@@ -195,6 +195,7 @@ tinker
 +freeunit.obj &
 +freeze.obj &
 +geometry.obj &
++getarc.obj &
 +getint.obj &
 +getkey.obj &
 +getmol.obj &

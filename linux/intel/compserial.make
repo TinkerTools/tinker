@@ -338,6 +338,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 flatten.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 freeunit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 gda.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 geometry.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getarc.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getint.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getkey.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 getmol.f

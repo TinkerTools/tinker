@@ -339,6 +339,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp flatten.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp freeunit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp gda.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp geometry.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getarc.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getkey.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getmol.f

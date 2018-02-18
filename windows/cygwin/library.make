@@ -205,6 +205,7 @@ fracs.o \
 freeunit.o \
 freeze.o \
 geometry.o \
+getarc.o \
 getint.o \
 getkey.o \
 getmol.o \

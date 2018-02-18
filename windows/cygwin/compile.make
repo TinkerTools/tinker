@@ -338,6 +338,7 @@ gfortran -c -O3 -ffast-math -fopenmp flatten.f
 gfortran -c -O3 -ffast-math -fopenmp freeunit.f
 gfortran -c -O3 -ffast-math -fopenmp gda.f
 gfortran -c -O3 -ffast-math -fopenmp geometry.f
+gfortran -c -O3 -ffast-math -fopenmp getarc.f
 gfortran -c -O3 -ffast-math -fopenmp getint.f
 gfortran -c -O3 -ffast-math -fopenmp getkey.f
 gfortran -c -O3 -ffast-math -fopenmp getmol.f

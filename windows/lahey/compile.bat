@@ -339,6 +339,7 @@ LF95 -c -o1 -tpp -nstchk -ntrace flatten.f
 LF95 -c -o1 -tpp -nstchk -ntrace freeunit.f
 LF95 -c -o1 -tpp -nstchk -ntrace gda.f
 LF95 -c -o1 -tpp -nstchk -ntrace geometry.f
+LF95 -c -o1 -tpp -nstchk -ntrace getarc.f
 LF95 -c -o1 -tpp -nstchk -ntrace getint.f
 LF95 -c -o1 -tpp -nstchk -ntrace getkey.f
 LF95 -c -o1 -tpp -nstchk -ntrace getmol.f

@@ -338,6 +338,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp flatten.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp freeunit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gda.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp geometry.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getarc.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getkey.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getmol.f

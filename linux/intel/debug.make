@@ -338,6 +338,7 @@ ifort -c -g -warn all -check all flatten.f
 ifort -c -g -warn all -check all freeunit.f
 ifort -c -g -warn all -check all gda.f
 ifort -c -g -warn all -check all geometry.f
+ifort -c -g -warn all -check all getarc.f
 ifort -c -g -warn all -check all getint.f
 ifort -c -g -warn all -check all getkey.f
 ifort -c -g -warn all -check all getmol.f

@@ -7,6 +7,10 @@
          used to build the TINKER program package on an Intel-based
          Macintosh system using the Intel Fortran Compiler for MacOS.
 
+         Building OpenMP parallel executables requires uncommenting
+         the two Intel-specific routine calls kmp_set_stacksize_s and
+         kmp_set_blocksize in the source file initial.f.
+
          Please note that by default the MacOS distributions limit
          stacksize and datasize for processes as can be checked via
          the csh limit command or similar. Large TINKER executables
