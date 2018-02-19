@@ -105,7 +105,8 @@ c
       use keys
       use titles
       implicit none
-      integer i,iarc,ibar
+      integer i,ibar
+      integer iarc,ilog
       integer lenga,lengb
       integer ltitlea,ltitleb
       integer nkey0,nkey1
@@ -122,22 +123,45 @@ c
       real*8, allocatable :: vola(:)
       real*8, allocatable :: volb(:)
       logical exist
-      character*240 string
-      character*240 fnamea
-      character*240 fnameb
+      logical use_log
+      character*240 filea
+      character*240 fileb
       character*240 titlea
       character*240 titleb
-      character*240 arcfile
       character*240 barfile
+      character*240 arcfile
+      character*240 logfile
+      character*240 record
+      character*240 string
       character*240, allocatable :: keys0(:)
       character*240, allocatable :: keys1(:)
 c
 c
-c     get trajectory A archive and setup mechanics calculation
+c     get trajectory A and setup mechanics calculation
 c
       call initial
-      call getxyz
+      call getarc (iarc)
+      close (unit=iarc)
       call mechanic
+c
+c     store the filename for trajectory A
+c
+      filea = filename
+      lenga = leng
+      titlea = title
+      ltitlea = ltitle
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (keys0(nkey))
+      allocate (keys1(nkey))
+c
+c     store the keyword vqlues for state 0
+c
+      nkey0 = nkey
+      do i = 1, nkey0
+         keys0(i) = keyline(i)
+      end do
 c
 c     find the original temperature value for trajectory A
 c
@@ -155,27 +179,26 @@ c
    40    continue
       end do
 c
-c     perform dynamic allocation of some local arrays
+c     get trajectory B and setup mechanics calculation
 c
-      allocate (keys0(nkey))
-      allocate (keys1(nkey))
-c
-c     store filename and keywords for trajectory A and state 0
-c
-      fnamea = filename
-      lenga = leng
-      titlea = title
-      ltitlea = ltitle
-      nkey0 = nkey
-      do i = 1, nkey0
-         keys0(i) = keyline(i)
-      end do
-c
-c     get trajectory B archive and setup mechanics calculation
-c
-      call getxyz
+      call getarc (iarc)
+      close (unit=iarc)
       call mechanic
       silent = .true.
+c
+c     store the filename for trajectory B
+c
+      fileb = filename
+      lengb = leng
+      titleb = title
+      ltitleb = ltitle
+c
+c     store the keyword values for state 1
+c
+      nkey1 = nkey
+      do i = 1, nkey1
+         keys1(i) = keyline(i)
+      end do
 c
 c     find the original temperature value for trajectory B
 c
@@ -193,17 +216,6 @@ c
    80    continue
       end do
 c
-c     store filename and keywords for trajectory B and state 1
-c
-      fnameb = filename
-      lengb = leng
-      titleb = title
-      ltitleb = ltitle
-      nkey1 = nkey
-      do i = 1, nkey1
-         keys1(i) = keyline(i)
-      end do
-c
 c     perform dynamic allocation of some local arrays
 c
       maxframe = 1000000
@@ -214,41 +226,67 @@ c
       allocate (vola(maxframe))
       allocate (volb(maxframe))
 c
-c     reopen trajectory A using the parameters for state 0
+c     reopen the file corresponding to trajectory A
 c
       iarc = freeunit ()
-      arcfile = fnamea
+      arcfile = filea
       call suffix (arcfile,'arc','old')
       open (unit=iarc,file=arcfile,status ='old')
-      rewind (unit=iarc)
-      call readxyz (iarc)
-      nkey = nkey0
-      do i = 1, nkey
-         keyline(i) = keys0(i)
-      end do
-      if (abort) then
-         write (iout,90)
-   90    format (/,' BAR  --  No Coordinate Frames Available',
-     &              ' from First Input File')
-         call fatal
+c
+c     check for log with energies of trajectory A in state 0
+c
+      use_log = .false.
+      logfile = filea(1:lenga)
+      call suffix (logfile,'log','old')
+      inquire (file=logfile,exist=exist)
+      if (exist) then
+         use_log = .true.
+         ilog = freeunit ()
+         open (unit=ilog,file=logfile,status='old')
       end if
-      call mechanic
+c
+c     reset trajectory A using the parameters for state 0
+c
+      if (.not. use_log) then
+         rewind (unit=iarc)
+         call readxyz (iarc)
+         nkey = nkey0
+         do i = 1, nkey
+            keyline(i) = keys0(i)
+         end do
+         call mechanic
+      end if
 c
 c     find potential energies for trajectory A in state 0
 c
-      write (iout,100)
-  100 format (/,' Initial Processing for Trajectory A :',/)
+      write (iout,90)
+   90 format (/,' Initial Processing for Trajectory A :',/)
       i = 0
       do while (.not. abort)
          i = i + 1
-         call cutoffs
-         ua0(i) = energy ()
-         vola(i) = volbox
-         call readxyz (iarc)
+         if (use_log) then
+            abort = .true.
+            dowhile (abort)
+               read (ilog,100,err=120,end=120)  record
+  100          format (a240)
+               if (record(1:18) .eq. ' Current Potential') then
+                  string = record(19:240)
+                  read (string,*,err=110,end=110)  ua0(i)
+                  abort = .false.
+               end if
+  110          continue
+            end do
+  120       continue
+            if (abort)  i = i - 1
+         else
+            call cutoffs
+            ua0(i) = energy ()
+            call readxyz (iarc)
+         end if
          if (i .ge. maxframe)  abort = .true.
          if (mod(i,100).eq.0 .or. abort) then
-            write (iout,110)  i
-  110       format (7x,'Completed',i8,' Coordinate Frames')
+            write (iout,130)  i
+  130       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
          end if
       end do
@@ -266,8 +304,8 @@ c
 c     find potential energies for trajectory A in state 1
 c
       if (verbose) then
-         write (iout,120)
-  120    format (/,' Potential Energy Values for Trajectory A :',
+         write (iout,140)
+  140    format (/,' Potential Energy Values for Trajectory A :',
      &           //,7x,'Frame',9x,'State 0',9x,'State 1',12x,'Delta',/)
       end if
       i = 0
@@ -275,9 +313,10 @@ c
          i = i + 1
          call cutoffs
          ua1(i) = energy ()
+         vola(i) = volbox
          if (verbose) then
-            write (iout,130)  i,ua0(i),ua1(i),ua1(i)-ua0(i)
-  130       format (i11,2x,3f16.4)
+            write (iout,150)  i,ua0(i),ua1(i),ua1(i)-ua0(i)
+  150       format (i11,2x,3f16.4)
          end if
          call readxyz (iarc)
          if (i .ge. maxframe)  abort = .true.
@@ -285,44 +324,43 @@ c
       nfrma = i
       close (unit=iarc)
 c
-c     reopen trajectory B using the parameters for state 0
+c     save potential energies and volumes for trajectory A
 c
-      iarc = freeunit ()
-      arcfile = fnameb
-      call suffix (arcfile,'arc','old')
-      open (unit=iarc,file=arcfile,status ='old')
-      rewind (unit=iarc)
-      call readxyz (iarc)
-      nkey = nkey0
-      do i = 1, nkey
-         keyline(i) = keys0(i)
-      end do
-      if (abort) then
-         write (iout,140)
-  140    format (/,' BAR  --  No Coordinate Frames Available',
-     &              ' from Second Input File')
-         call fatal
-      end if
-      call mechanic
-c
-c     find potential energies for trajectory B in state 0
-c
-      write (iout,150)
-  150 format (/,' Initial Processing for Trajectory B :',/)
-      i = 0
-      do while (.not. abort)
-         i = i + 1
-         call cutoffs
-         ub0(i) = energy ()
-         volb(i) = volbox
-         call readxyz (iarc)
-         if (i .ge. maxframe)  abort = .true.
-         if (mod(i,100).eq.0 .or. abort) then
-            write (iout,160)  i
-  160       format (7x,'Completed',i8,' Coordinate Frames')
-            flush (iout)
+      ibar = freeunit ()
+      barfile = filea(1:lenga)//'.bar'
+      call version (barfile,'new')
+      open (unit=ibar,file=barfile,status ='new')
+      write (ibar,160)  nfrma,tempa,titlea(1:ltitlea)
+  160 format (i8,f10.2,2x,a)
+      do i = 1, nfrma
+         if (vola(i) .eq. 0.0d0) then
+            write (ibar,170)  i,ua0(i),ua1(i)
+  170       format (i8,2x,2f18.4)
+         else
+            write (ibar,180)  i,ua0(i),ua1(i),vola(i)
+  180       format (i8,2x,3f18.4)
          end if
       end do
+      flush (ibar)
+c
+c     reopen the file corresponding to trajectory B
+c
+      iarc = freeunit ()
+      arcfile = fileb
+      call suffix (arcfile,'arc','old')
+      open (unit=iarc,file=arcfile,status ='old')
+c
+c     check for log with energies of trajectory B in state 1
+c
+      use_log = .false.
+      logfile = fileb(1:lengb)
+      call suffix (logfile,'log','old')
+      inquire (file=logfile,exist=exist)
+      if (exist) then
+         use_log = .true.
+         ilog = freeunit ()
+         open (unit=ilog,file=logfile,status='old')
+      end if
 c
 c     reset trajectory B using the parameters for state 1
 c
@@ -336,19 +374,64 @@ c
 c
 c     find potential energies for trajectory B in state 1
 c
+      write (iout,190)
+  190 format (/,' Initial Processing for Trajectory B :',/)
+      i = 0
+      do while (.not. abort)
+         i = i + 1
+         if (use_log) then
+            abort = .true.
+            dowhile (abort)
+               read (ilog,200,err=220,end=220)  record
+  200          format (a240)
+               if (record(1:18) .eq. ' Current Potential') then
+                  string = record(19:240)
+                  read (string,*,err=210,end=210)  ub1(i)
+                  abort = .false.
+               end if
+  210          continue
+            end do
+  220       continue
+            if (abort)  i = i - 1
+         else
+            call cutoffs
+            ub1(i) = energy ()
+            call readxyz (iarc)
+         end if
+         if (i .ge. maxframe)  abort = .true.
+         if (mod(i,100).eq.0 .or. abort) then
+            write (iout,230)  i
+  230       format (7x,'Completed',i8,' Coordinate Frames')
+            flush (iout)
+         end if
+      end do
+c
+c     reset trajectory B using the parameters for state 0
+c
+      rewind (unit=iarc)
+      call readxyz (iarc)
+      nkey = nkey0
+      do i = 1, nkey
+         keyline(i) = keys0(i)
+      end do
+      call mechanic
+c
+c     find potential energies for trajectory B in state 0
+c
       if (verbose) then
-         write (iout,170)
-  170    format (/,' Potential Energy Values for Trajectory B :',
+         write (iout,240)
+  240    format (/,' Potential Energy Values for Trajectory B :',
      &           //,7x,'Frame',9x,'State 0',9x,'State 1',12x,'Delta',/)
       end if
       i = 0
       do while (.not. abort)
          i = i + 1
          call cutoffs
-         ub1(i) = energy ()
+         ub0(i) = energy ()
+         volb(i) = volbox
          if (verbose) then
-            write (iout,180)  i,ub0(i),ub1(i),ub0(i)-ub1(i)
-  180       format (i11,2x,3f16.4)
+            write (iout,250)  i,ub0(i),ub1(i),ub0(i)-ub1(i)
+  250       format (i11,2x,3f16.4)
          end if
          call readxyz (iarc)
          if (i .ge. maxframe)  abort = .true.
@@ -356,43 +439,27 @@ c
       nfrmb = i
       close (unit=iarc)
 c
+c     save potential energies and volumes for trajectory B
+c
+      write (ibar,260)  nfrmb,tempb,titleb(1:ltitleb)
+  260 format (i8,f10.2,2x,a)
+      do i = 1, nfrmb
+         if (volb(i) .eq. 0.0d0) then
+            write (ibar,270)  i,ub0(i),ub1(i)
+  270       format (i8,2x,2f18.4)
+         else
+            write (ibar,280)  i,ub0(i),ub1(i),volb(i)
+  280       format (i8,2x,3f18.4)
+         end if
+      end do
+      close (unit=ibar)
+      write (iout,290)  barfile(1:trimtext(barfile))
+  290 format (/,' Potential Energy Values Written To :  ',a)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (keys0)
       deallocate (keys1)
-c
-c     save potential energies and system volumes to a file
-c
-      ibar = freeunit ()
-      barfile = fnamea(1:lenga)//'.bar'
-      call version (barfile,'new')
-      open (unit=ibar,file=barfile,status ='new')
-      write (ibar,190)  nfrma,tempa,titlea(1:ltitlea)
-  190 format (i8,f10.2,2x,a)
-      do i = 1, nfrma
-         if (vola(i) .eq. 0.0d0) then
-            write (ibar,200)  i,ua0(i),ua1(i)
-  200       format (i8,2x,2f18.4)
-         else
-            write (ibar,210)  i,ua0(i),ua1(i),vola(i)
-  210       format (i8,2x,3f18.4)
-         end if
-      end do
-      write (ibar,220)  nfrmb,tempb,titleb(1:ltitleb)
-  220 format (i8,f10.2,2x,a)
-      do i = 1, nfrmb
-         if (volb(i) .eq. 0.0d0) then
-            write (ibar,230)  i,ub0(i),ub1(i)
-  230       format (i8,2x,2f18.4)
-         else
-            write (ibar,240)  i,ub0(i),ub1(i),volb(i)
-  240       format (i8,2x,3f18.4)
-         end if
-      end do
-      write (iout,250)  barfile(1:trimtext(barfile))
-  250 format (/,' Potential Energy Values Written To :  ',a)
-      flush (iout)
-      close (unit=ibar)
 c
 c     perform deallocation of some local arrays
 c

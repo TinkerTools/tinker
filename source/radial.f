@@ -31,9 +31,9 @@ c
       use molcul
       use potent
       implicit none
-      integer i,j,k,iarc
+      integer i,j,k
       integer nframe,iframe
-      integer freeunit,next
+      integer iarc,next
       integer molj,molk
       integer numj,numk
       integer typej,typek
@@ -54,7 +54,6 @@ c
       character*1 answer
       character*3 namej,namek
       character*6 labelj,labelk
-      character*240 arcfile
       character*240 record
       character*240 string
 c
@@ -63,32 +62,9 @@ c     perform the standard initialization functions
 c
       call initial
 c
-c     try to get a filename from the command line arguments
+c     open the trajectory archive and read the initial frame
 c
-      call nextarg (arcfile,exist)
-      if (exist) then
-         call basefile (arcfile)
-         call suffix (arcfile,'arc','old')
-         inquire (file=arcfile,exist=exist)
-      end if
-c
-c     ask for the user specified input structure filename
-c
-      do while (.not. exist)
-         write (iout,10)
-   10    format (/,' Enter Coordinate Archive File Name :  ',$)
-         read (input,20)  arcfile
-   20    format (a240)
-         call basefile (arcfile)
-         call suffix (arcfile,'arc','old')
-         inquire (file=arcfile,exist=exist)
-      end do
-c
-c     read the first coordinate set in the archive
-c
-      iarc = freeunit ()
-      open (unit=iarc,file=arcfile,status='old')
-      call readxyz (iarc)
+      call getarc (iarc)
 c
 c     get the unitcell parameters and number of molecules
 c
@@ -113,22 +89,22 @@ c
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=30,end=30)  start
+         read (string,*,err=10,end=10)  start
          query = .false.
       end if
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  stop
+      if (exist)  read (string,*,err=10,end=10)  stop
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  step
-   30 continue
+      if (exist)  read (string,*,err=10,end=10)  step
+   10 continue
       if (query) then
-         write (iout,40)
-   40    format (/,' Numbers of First & Last Frame and Step',
+         write (iout,20)
+   20    format (/,' Numbers of First & Last Frame and Step',
      &              ' Increment :  ',$)
-         read (input,50)  record
-   50    format (a240)
-         read (record,*,err=60,end=60)  start,stop,step
-   60    continue
+         read (input,30)  record
+   30    format (a240)
+         read (record,*,err=40,end=40)  start,stop,step
+   40    continue
       end if
 c
 c     get the names of the atoms to be used in rdf computation
@@ -136,10 +112,10 @@ c
       call nextarg (labelj,exist)
       call nextarg (labelk,exist)
       if (.not. exist) then
-         write (iout,70)
-   70    format (/,' Enter 1st & 2nd Atom Names or Type Numbers :  ',$)
-         read (input,80)  record
-   80    format (a240)
+         write (iout,50)
+   50    format (/,' Enter 1st & 2nd Atom Names or Type Numbers :  ',$)
+         read (input,60)  record
+   60    format (a240)
          next = 1
          call gettext (record,labelj,next)
          call gettext (record,labelk,next)
@@ -149,16 +125,16 @@ c     convert the labels to either atom names or type numbers
 c
       namej = '   '
       typej = -1
-      read (labelj,*,err=90,end=90)  typej
-   90 continue
+      read (labelj,*,err=70,end=70)  typej
+   70 continue
       if (typej .le. 0) then
          next = 1
          call gettext (labelj,namej,next)
       end if
       namek = '   '
       typek = -1
-      read (labelk,*,err=100,end=100)  typek
-  100 continue
+      read (labelk,*,err=80,end=80)  typek
+   80 continue
       if (typek .le. 0) then
          next = 1
          call gettext (labelk,namek,next)
@@ -171,16 +147,16 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=110,end=110)  rmax
+            read (string,*,err=90,end=90)  rmax
             query = .false.
          end if
-  110    continue
+   90    continue
          if (query) then
-            write (iout,120)
-  120       format (/,' Enter Maximum Distance to Accumulate',
+            write (iout,100)
+  100       format (/,' Enter Maximum Distance to Accumulate',
      &                 ' [10.0 Ang] :  ',$)
-            read (input,130)  rmax
-  130       format (f20.0)
+            read (input,110)  rmax
+  110       format (f20.0)
          end if
          if (rmax .le. 0.0d0)  rmax = 10.0d0
       else if (octahedron) then
@@ -198,15 +174,15 @@ c
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=140,end=140)  width
+         read (string,*,err=120,end=120)  width
          query = .false.
       end if
-  140 continue
+  120 continue
       if (query) then
-         write (iout,150)
-  150    format (/,' Enter Width of Distance Bins [0.01 Ang] :  ',$)
-         read (input,160)  width
-  160    format (f20.0)
+         write (iout,130)
+  130    format (/,' Enter Width of Distance Bins [0.01 Ang] :  ',$)
+         read (input,140)  width
+  140    format (f20.0)
       end if
       if (width .le. 0.0d0)  width = 0.01d0
 c
@@ -215,11 +191,11 @@ c
       intramol = .false.
       call nextarg (answer,exist)
       if (.not. exist) then
-         write (iout,170)
-  170    format (/,' Include Intramolecular Pairs in Distribution',
+         write (iout,150)
+  150    format (/,' Include Intramolecular Pairs in Distribution',
      &              ' [N] :  ',$)
-         read (input,180)  record
-  180    format (a240)
+         read (input,160)  record
+  160    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -239,14 +215,14 @@ c
       rewind (unit=iarc)
       stop = min(nframe,stop)
       nframe = (stop-start)/step + 1
-      write (iout,190)  nframe
-  190 format (/,' Number of Coordinate Frames :',i14)
+      write (iout,170)  nframe
+  170 format (/,' Number of Coordinate Frames :',i14)
 c
 c     set the number of distance bins to be accumulated
 c
       nbin = int(rmax/width)
-      write (iout,200)  nbin
-  200 format (' Number of Distance Bins :',i18)
+      write (iout,180)  nbin
+  180 format (' Number of Distance Bins :',i18)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -264,8 +240,8 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,210)
-  210 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,190)
+  190 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
@@ -279,8 +255,8 @@ c
          if (.not. abort) then
             nframe = nframe + 1
             if (mod(nframe,100) .eq. 0) then
-               write (iout,220)  nframe
-  220          format (4x,'Processing Coordinate Frame',i13)
+               write (iout,200)  nframe
+  200          format (4x,'Processing Coordinate Frame',i13)
             end if
             do j = 1, n
                if (name(j).eq.namej .or. type(j).eq.typej) then
@@ -318,8 +294,8 @@ c
       end if
       close (unit=iarc)
       if (mod(nframe,100) .ne. 0) then
-         write (iout,230)  nframe
-  230    format (4x,'Processing Coordinate Frame',i13)
+         write (iout,210)  nframe
+  210    format (4x,'Processing Coordinate Frame',i13)
       end if
 c
 c     count the number of occurrences of each atom type
@@ -372,16 +348,16 @@ c
 c
 c     output the final radial distribution function results
 c
-      write (iout,240)  labelj,labelk
-  240 format (/,' Pairwise Radial Distribution Function :'
+      write (iout,220)  labelj,labelk
+  220 format (/,' Pairwise Radial Distribution Function :'
      &        //,7x,'First Name or Type :  ',a6,
      &           5x,'Second Name or Type :  ',a6)
-      write (iout,250)
-  250 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
+      write (iout,230)
+  230 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
      &           4x,'Smooth g(r)',/)
       do i = 1, nbin
-         write (iout,260)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
-  260    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
+         write (iout,240)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
+  240    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
       end do
 c
 c     perform deallocation of some local arrays

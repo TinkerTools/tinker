@@ -90,12 +90,10 @@ c
       if (.not. exist) then
          if (mode .eq. 1) then
             write (iout,60)
-   60       format (/,' Enter Base Name of the Individual',
-     &                 ' Frames :  ',$)
+   60       format (/,' Enter Base Name of the Individual Frames :  ',$)
          else
             write (iout,70)
-   70       format (/,' Enter Name of the Coordinate Archive',
-     &                 ' File :  ',$)
+   70       format (/,' Enter the Coordinate Archive File Name :  ',$)
          end if
          read (input,80)  arcfile
    80    format (a240)
@@ -115,8 +113,7 @@ c
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
             write (iout,90)
-   90       format (/,' Enter Name of the Coordinate Archive',
-     &                 ' File :  ',$)
+   90       format (/,' Enter the Coordinate Archive File Name :  ',$)
             read (input,100)  arcfile
   100       format (a240)
             call basefile (arcfile)

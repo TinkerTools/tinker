@@ -36,8 +36,7 @@ c
       implicit none
       integer i,j,k,m
       integer nframe,iframe
-      integer iarc,freeunit
-      integer start,stop
+      integer iarc,start,stop
       integer step,skip
       integer list(20)
       integer, allocatable :: ntime(:)
@@ -55,7 +54,6 @@ c
       real*8, allocatable :: ycm(:,:)
       real*8, allocatable :: zcm(:,:)
       logical exist,query
-      character*240 arcfile
       character*240 record
       character*240 string
 c
@@ -64,32 +62,9 @@ c     perform the standard initialization functions
 c
       call initial
 c
-c     try to get a filename from the command line arguments
+c     open the trajectory archive and read the initial frame
 c
-      call nextarg (arcfile,exist)
-      if (exist) then
-         call basefile (arcfile)
-         call suffix (arcfile,'arc','old')
-         inquire (file=arcfile,exist=exist)
-      end if
-c
-c     ask for the user specified input structure filename
-c
-      do while (.not. exist)
-         write (iout,10)
-   10    format (/,' Enter Coordinate Archive File Name :  ',$)
-         read (input,20)  arcfile
-   20    format (a240)
-         call basefile (arcfile)
-         call suffix (arcfile,'arc','old')
-         inquire (file=arcfile,exist=exist)
-      end do
-c
-c     read the first coordinate set in the archive
-c
-      iarc = freeunit ()
-      open (unit=iarc,file=arcfile,status='old')
-      call readxyz (iarc)
+      call getarc (iarc)
 c
 c     get numbers of the coordinate frames to be processed
 c
@@ -99,36 +74,36 @@ c
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=30,end=30)  start
+         read (string,*,err=10,end=10)  start
          query = .false.
       end if
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  stop
+      if (exist)  read (string,*,err=10,end=10)  stop
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  step
-   30 continue
+      if (exist)  read (string,*,err=10,end=10)  step
+   10 continue
       if (query) then
-         write (iout,40)
-   40    format (/,' Numbers of First & Last Frame and Step',
+         write (iout,20)
+   20    format (/,' Numbers of First & Last Frame and Step',
      &              ' Increment :  ',$)
-         read (input,50)  record
-   50    format (a240)
-         read (record,*,err=60,end=60)  start,stop,step
-   60    continue
+         read (input,30)  record
+   30    format (a240)
+         read (record,*,err=40,end=40)  start,stop,step
+   40    continue
       end if
 c
 c     get the time increment between frames in picoseconds
 c
       tstep = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=70,end=70)  tstep
-   70 continue
+      if (exist)  read (string,*,err=50,end=50)  tstep
+   50 continue
       if (tstep .le. 0.0d0) then
-         write (iout,80)
-   80    format (/,' Enter the Time Increment in Picoseconds',
+         write (iout,60)
+   60    format (/,' Enter the Time Increment in Picoseconds',
      &              ' [1.0] :  ',$)
-         read (input,90)  tstep
-   90    format (f20.0)
+         read (input,70)  tstep
+   70    format (f20.0)
       end if
       if (tstep .le. 0.0d0)  tstep = 1.0d0
 c
@@ -151,18 +126,18 @@ c
          do while (exist)
             call nextarg (string,exist)
             if (exist) then
-               read (string,*,err=100,end=100)  list(i+1)
+               read (string,*,err=80,end=80)  list(i+1)
                i = i + 1
             end if
          end do
-  100    continue
+   80    continue
          if (i .eq. 0) then
-            write (iout,110)
-  110       format (/,' Numbers of any Atoms to be Removed :  ',$)
-            read (input,120)  record
-  120       format (a240)
-            read (record,*,err=130,end=130)  (list(i),i=1,20)
-  130       continue
+            write (iout,90)
+   90       format (/,' Numbers of any Atoms to be Excluded :  ',$)
+            read (input,100)  record
+  100       format (a240)
+            read (record,*,err=110,end=110)  (list(i),i=1,20)
+  110       continue
          end if
          i = 1
          do while (list(i) .ne. 0)
@@ -205,8 +180,8 @@ c
          end if
       end do
       nmol = k
-      write (iout,140)  nmol
-  140 format (/,' Total Number of Molecules :',i16)
+      write (iout,120)  nmol
+  120 format (/,' Total Number of Molecules :',i16)
 c
 c     count the number of coordinate frames in the archive file
 c
@@ -221,8 +196,8 @@ c
       rewind (unit=iarc)
       stop = min(nframe,stop)
       nframe = (stop-start)/step + 1
-      write (iout,150)  nframe
-  150 format (/,' Number of Coordinate Frames :',i14)
+      write (iout,130)  nframe
+  130 format (/,' Number of Coordinate Frames :',i14)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -236,8 +211,8 @@ c
 c
 c     get the archived coordinates for each frame in turn
 c
-      write (iout,160)
-  160 format (/,' Reading the Coordinates Archive File :',/)
+      write (iout,140)
+  140 format (/,' Reading the Coordinates Archive File :',/)
       nframe = 0
       iframe = start
       skip = start
@@ -248,11 +223,11 @@ c
          iframe = iframe + step
          skip = step
          call readxyz (iarc)
-         if (n .eq. 0)  goto 180
+         if (n .eq. 0)  goto 160
          nframe = nframe + 1
          if (mod(nframe,100) .eq. 0) then
-            write (iout,170)  nframe
-  170       format (4x,'Processing Coordinate Frame',i13)
+            write (iout,150)  nframe
+  150       format (4x,'Processing Coordinate Frame',i13)
          end if
 c
 c     unfold each molecule to get its corrected center of mass
@@ -290,11 +265,11 @@ c
             zcm(i,nframe) = zold + zr
          end do
       end do
-  180 continue
+  160 continue
       close (unit=iarc)
       if (mod(nframe,100) .ne. 0) then
-         write (iout,190)  nframe
-  190    format (4x,'Processing Coordinate Frame',i13)
+         write (iout,170)  nframe
+  170    format (4x,'Processing Coordinate Frame',i13)
       end if
 c
 c     increment the squared displacements for each frame pair
@@ -339,8 +314,8 @@ c
 c
 c     estimate the diffusion constant via the Einstein relation
 c
-      write (iout,200)
-  200 format (/,' Mean Squared Displacements and Self-Diffusion',
+      write (iout,180)
+  180 format (/,' Mean Squared Displacements and Self-Diffusion',
      &           ' Constant :',
      &        //,5x,'Time Gap',6x,'X MSD',7x,'Y MSD',7x,'Z MSD',
      &           7x,'R MSD',4x,'Diff Const',
@@ -353,8 +328,8 @@ c
          zvalue = zmsd(i) / 2.0d0
          rvalue = (xmsd(i) + ymsd(i) + zmsd(i)) / 6.0d0
          dvalue = rvalue / delta
-         write (iout,210)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
-  210    format (f12.2,4f12.2,f12.4)
+         write (iout,190)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
+  190    format (f12.2,4f12.2,f12.4)
       end do
 c
 c     perform deallocation of some local arrays
