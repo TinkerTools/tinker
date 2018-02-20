@@ -353,6 +353,7 @@ OBJS =	action.o \
 	freeze.o \
 	gda.o \
 	geometry.o \
+	getarc.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -1202,6 +1203,7 @@ libtinker.a: ${OBJS}
 	freeunit.o \
 	freeze.o \
 	geometry.o \
+	getarc.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -1687,6 +1689,7 @@ freeunit.o: iounit.o
 freeze.o:
 gda.o: atoms.o files.o iounit.o minima.o potent.o sizes.o vdwpot.o warp.o
 geometry.o: atoms.o math.o sizes.o
+getarc.o: inform.o iounit.o output.o
 getint.o: atoms.o inform.o iounit.o output.o sizes.o
 getkey.o: argue.o files.o iounit.o keys.o openmp.o
 getmol.o: files.o iounit.o

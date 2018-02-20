@@ -67,12 +67,20 @@ FFEDIR = $(BUILDDIR)/ffe
 ##  For MacOS Only
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 
-##  For Linux Only
+##  For Linux Only (Ubuntu, Java 8)
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+#		-I/usr/lib/jvm/java-8-oracle/include \
+#		-I/usr/lib/jvm/java-8-oracle/include/linux \
+#		-I/usr/lib/jvm/java-8-oracle/lib/amd64/server
+#JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
+#JAVA_LIBS = -ljvm
+
+##  For Linux Only (CentOS, JDK 1.8.0_112)
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-		-I/usr/lib/jvm/java-8-oracle/include \
-		-I/usr/lib/jvm/java-8-oracle/include/linux \
-		-I/usr/lib/jvm/java-8-oracle/lib/amd64/server
-JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
+		-I/usr/java/jdk1.8.0_112/include \
+		-I/usr/java/jdk1.8.0_112/include/linux \
+		-I/usr/java/jdk1.8.0_112/lib/amd64/server
+JAVA_LIBDIR = -L/usr/java/jdk1.8.0_112/jre/lib/amd64/server
 JAVA_LIBS = -ljvm
 
 ##  For Windows Only
@@ -394,6 +402,7 @@ OBJS =	action.o \
 	freeze.o \
 	gda.o \
 	geometry.o \
+	getarc.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -1246,6 +1255,7 @@ libtinker.a: ${OBJS}
 	freeunit.o \
 	freeze.o \
 	geometry.o \
+	getarc.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -1731,6 +1741,7 @@ freeunit.o: iounit.o
 freeze.o:
 gda.o: atoms.o files.o iounit.o minima.o potent.o sizes.o vdwpot.o warp.o
 geometry.o: atoms.o math.o sizes.o
+getarc.o: inform.o iounit.o output.o
 getint.o: atoms.o inform.o iounit.o output.o sizes.o
 getkey.o: argue.o files.o iounit.o keys.o openmp.o
 getmol.o: files.o iounit.o
