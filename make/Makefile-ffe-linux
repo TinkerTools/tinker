@@ -75,15 +75,15 @@ FFEDIR = $(BUILDDIR)/ffe
 #JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
 #JAVA_LIBS = -ljvm
 
-##  For Linux Only (CentOS, JDK 1.8.0_112)
+##  For Linux Only (RHEL & CentOS)
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-		-I/usr/java/jdk1.8.0_112/include \
-		-I/usr/java/jdk1.8.0_112/include/linux \
-		-I/usr/java/jdk1.8.0_112/lib/amd64/server
-JAVA_LIBDIR = -L/usr/java/jdk1.8.0_112/jre/lib/amd64/server
+		-I/usr/java/default/include \
+		-I/usr/java/default/include/linux \
+		-I/usr/java/default/lib/amd64/server
+JAVA_LIBDIR = -L/usr/java/default/jre/lib/amd64/server
 JAVA_LIBS = -ljvm
 
-##  For Windows Only
+##  For Windows Only (Windows 10, JDK 1.8.0_112)
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
 #		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
