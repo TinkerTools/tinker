@@ -133,7 +133,7 @@ c    &                .and. epstyp(i).eq.ep) then
    80 continue
       close (unit=iboss)
 c
-c     find TINKER classes associated with each OPLS class
+c     find Tinker classes associated with each OPLS class
 c
       ncls = 0
       header = .true.
@@ -157,7 +157,7 @@ c
                      nlst(ncls) = nlst(ncls) + 1
                      if (nlst(ncls) .gt. 20) then
                         write (iout,90)
-   90                   format (/,' MAKEOPLS  --  Too many TINKER',
+   90                   format (/,' MAKEOPLS  --  Too many Tinker',
      &                             ' Atom Classes in List')
                         call fatal
                      end if
@@ -168,7 +168,7 @@ c
             if (header) then
                header = .false.
                write (iout,100)
-  100          format (/,' TINKER Classes for Each OPLS Class :',/)
+  100          format (/,' Tinker Classes for Each OPLS Class :',/)
             end if
             write (iout,110)  ncls,clsnam(ncls),
      &                        (clslst(j,ncls),j=1,nlst(ncls))
@@ -176,7 +176,7 @@ c
          end if
       end do
 c
-c     print the atom type definitions in TINKER format
+c     print the atom type definitions in Tinker format
 c
       write (iout,120)
   120 format (/,' Atom Type Definitions :',/)
@@ -221,7 +221,7 @@ c
   130    format ('atom',6x,2i5,4x,a3,4x,'"',16x,'"',6x,i5,f11.3,i5)
       end do
 c
-c     print the van der Waals parameters in TINKER format;
+c     print the van der Waals parameters in Tinker format;
 c     the "if" test on "clsnum" is needed if atom classes,
 c     instead of types, are used in index the vdw parameters
 c
@@ -254,7 +254,7 @@ c        if (clsnum(i) .gt. ncls) then
 c        end if
       end do
 c
-c     print the partial charge parameters in TINKER format
+c     print the partial charge parameters in Tinker format
 c
       write (iout,180)
   180 format (/,' Partial Charge Parameters :',/)
@@ -320,7 +320,7 @@ c
   270 continue
       close (unit=iboss)
 c
-c     print the bond stretch parameters in TINKER format
+c     print the bond stretch parameters in Tinker format
 c
       write (iout,280)
   280 format (/,' Bond Stretching Parameters :',/)
@@ -404,7 +404,7 @@ c
   390 continue
       close (unit=iboss)
 c
-c     print the angle bend parameters in TINKER format
+c     print the angle bend parameters in Tinker format
 c
       write (iout,400)
   400 format (/,' Angle Bending Parameters :',/)
@@ -502,7 +502,7 @@ c
   520 continue
       close (unit=iboss)
 c
-c     print the torsion parameters in TINKER format
+c     print the torsion parameters in Tinker format
 c
       write (iout,530)
   530 format (/,' Torsional Parameters :',/)

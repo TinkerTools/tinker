@@ -14,7 +14,7 @@ c
 c
 c     "euler" tests an Euler angle --> rotation matrix --> Euler angle
 c     sequence of conversions for consistency; this is a check on the
-c     method used by the "roteuler" routine in the main TINKER code
+c     method used by the "roteuler" routine in the main Tinker code
 c
 c
       program euler

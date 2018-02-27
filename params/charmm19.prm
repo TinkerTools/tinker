@@ -47,7 +47,7 @@ Energies in Molecular Systems", J. Chem. Phys., 105, 1902-1921 (1996)
 
    ######################################################
    ##                                                  ##
-   ##  TINKER Atom Class Numbers to CHARMM Atom Names  ##
+   ##  Tinker Atom Class Numbers to CHARMM Atom Names  ##
    ##                                                  ##
    ##    1  H        7  CH3     13  NH3     19  OH1    ##
    ##    2  HC       8  CM      14  NC2     20  OM     ##
@@ -457,10 +457,10 @@ improper      4   11    4    9            90.00       0.00
    ##  All torsional parameters have been reduced as needed  ##
    ##  to account for degeneracy; authentic CHARMM19 uses    ##
    ##  at most one torsion across each pair of bonded atoms  ##
-   ##  while TINKER has a torsion for each four atom set     ##
+   ##  while Tinker has a torsion for each four atom set     ##
    ##  across a bond; for example, the generic CHARMM19      ##
    ##  parameter between two trigonal atoms is reduced by a  ##
-   ##  factor of (3-1)x(3-1)=4 for use with the TINKER code  ##
+   ##  factor of (3-1)x(3-1)=4 for use with the Tinker code  ##
    ##                                                        ##
    ############################################################
 
@@ -655,7 +655,7 @@ torsion       6   22   22    6            4.000    0.0  2
    ##  parameter set, but set to large 2-fold barriers here   ##
    ##  to replace improper dihedrals that do not involve      ##
    ##  the three atoms bonded to a trigonal center and thus   ##
-   ##  cannot be handled by the TINKER improper formulation   ##
+   ##  cannot be handled by the Tinker improper formulation   ##
    ##                                                         ##
    #############################################################
 

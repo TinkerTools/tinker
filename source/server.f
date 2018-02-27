@@ -9,7 +9,7 @@ c     #############################################################
 c     ##                                                         ##
 c     ##  routines below implement dummy versions of the socket  ##
 c     ##  communication calls required for the transmission of   ##
-c     ##  information between TINKER and Force Field Explorer;   ##
+c     ##  information between Tinker and Force Field Explorer;   ##
 c     ##  functional C code is in "server.c", while the dummy    ##
 c     ##  calls in this file are written in standard Fortran     ##
 c     ##                                                         ##

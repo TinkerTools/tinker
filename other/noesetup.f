@@ -12,9 +12,9 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "noesetup" takes PDB and TINKER coordinate files and a QUANTA
+c     "noesetup" takes PDB and Tinker coordinate files and a QUANTA
 c     NOE file, and generates a list of distance restraints suitable
-c     for input to the TINKER distgeom program; modified to handle
+c     for input to the Tinker distgeom program; modified to handle
 c     the special characters "+" and "*" in PDB atom names
 c
 c
@@ -43,7 +43,7 @@ c
       character*240 record,string
 c
 c
-c     read the PDB and TINKER files for the structure
+c     read the PDB and Tinker files for the structure
 c
       call initial
       call getpdb
@@ -68,7 +68,7 @@ c
          end if
       end do
 c
-c     open the TINKER keyfile to which output will be written
+c     open the Tinker keyfile to which output will be written
 c
       ikey = freeunit ()
       keyfile = filename(1:leng)
@@ -217,7 +217,7 @@ c
   110       continue
          end do
 c
-c     search for the first atom types in the TINKER file
+c     search for the first atom types in the Tinker file
 c
          do j = 1, nlist1
             xx = xpdb(list1(j))
@@ -250,7 +250,7 @@ c
   130       continue
          end do
 c
-c     search for the second atom types in the TINKER file
+c     search for the second atom types in the Tinker file
 c
          do j = 1, nlist2
             xx = xpdb(list2(j))

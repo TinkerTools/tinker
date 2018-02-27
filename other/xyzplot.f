@@ -12,7 +12,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "xyzplot" makes a plot of a TINKER Cartesian coordinates file
+c     "xyzplot" makes a plot of a Tinker Cartesian coordinates file
 c     on a display terminal, Imagen LaserPrinter or HP 7475 plotter
 c
 c     this version is written to link against the ancient Unified

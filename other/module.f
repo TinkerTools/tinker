@@ -32,7 +32,7 @@ c
       character*240, allocatable :: line(:)
 c
 c
-c     setup the use of the TINKER subroutine library
+c     setup the use of the Tinker subroutine library
 c
       call initial
 c

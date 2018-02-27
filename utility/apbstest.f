@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "apbstest" computes the APBS Poisson-Boltzmann solvation energy
-c     for a structure; requires an APBS-enabled TINKER version
+c     for a structure; requires an APBS-enabled Tinker version
 c
 c
       program apbstest

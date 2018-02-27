@@ -29,7 +29,7 @@ dielectric              1.0
       #############################
 
 
-The parameters supplied with TINKER are from "OPLS All-Atom Parameters
+The parameters supplied with Tinker are from "OPLS All-Atom Parameters
 for Organic Molecules, Ions, Peptides & Nucleic Acids, July 2008" as
 provided by W. L. Jorgensen, Yale University during June 2009. These
 parameters are taken from those distributed with BOSS Version 4.8.

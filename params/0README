@@ -1,19 +1,19 @@
 
                     #######################################
-                    PARAMS Directory for the TINKER Package
+                    PARAMS Directory for the Tinker Package
                     #######################################
 
       This directory contains the force field parameter sets distributed
-      with the TINKER package, implementing a selection of widely-used
+      with the Tinker package, implementing a selection of widely-used
       literature force fields as well as the AMOEBA force field now
       under development in the Ponder lab. We try to exactly reproduce
       the intent of the original authors of our distributed, third-party
       force fields. In all cases the parameter sets have been validated
       against literature reports, results as provided by the original
       developers, or calculations made with the authentic programs. With
-      the few exceptions noted below, TINKER calculations can be treated
+      the few exceptions noted below, Tinker calculations can be treated
       as authentic results from the genuine force fields. Please inform
-      the TINKER developers of any discrepancies. A brief description of
+      the Tinker developers of any discrepancies. A brief description of
       each parameter set is provided below:
 
       amber94    Amber ff94 parameters for proteins and nucleic acids.
@@ -56,10 +56,10 @@
 
       charmm19   CHARMM19 parameters for proteins and water. The nucleic
                  acid values are not yet implemented. There are some
-                 differences between authentic CHARMM19 and the TINKER
+                 differences between authentic CHARMM19 and the Tinker
                  version due to replacement of CHARMM impropers by
                  torsions for cases that involve atoms not bonded to
-                 the trigonal atom and TINKER's use of all possible
+                 the trigonal atom and Tinker's use of all possible
                  torsions across a bond instead of a single torsion
                  per bond. 
 
@@ -67,7 +67,7 @@
                  Most of the nucleic acid and small model compound values
                  are not yet implemented. The file almost exactly
                  reproduces authentic CHARMM energies; there are small
-                 differences are related to TINKER symmetrization of some
+                 differences are related to Tinker symmetrization of some
                  improper torsions.
 
       charmm22   CHARMM22 parameters for proteins, plus heme and lipids.
@@ -75,7 +75,7 @@
                  Most of the nucleic acid and small model compound values
                  are not yet implemented. The file almost exactly
                  reproduces authentic CHARMM energies; there are small
-                 differences are related to TINKER symmetrization of some
+                 differences are related to Tinker symmetrization of some
                  improper torsions, as well as in the CMAP correction.
 
       dang       Polarizable force field parameters from Liem Dang at
@@ -130,7 +130,7 @@
                  and many classes of organic molecules. Explicit hydrogens
                  on polar atoms and aromatic carbons.
 
-      smoothaa   Parameters for use with the TINKER potential energy
+      smoothaa   Parameters for use with the Tinker potential energy
                  smoothing methods. Based on the OPLS-AA parameters, but
                  with modifications to vdw and improper torsion terms.
 

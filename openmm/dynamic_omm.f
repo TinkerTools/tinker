@@ -282,7 +282,7 @@ c
       call shakeup
       call mdinit
 c
-c     get TINKER energy/gradient values for initial structure
+c     get Tinker energy/gradient values for initial structure
 c
       if (verbose) then
          allocate (derivs(3,n))
@@ -294,7 +294,7 @@ c     get a list of the available CUDA-capable GPU cards
 c
       call set_cuda_devices (cudaDevice)
 c
-c     map TINKER data structures to OpenMM wrapper structures
+c     map Tinker data structures to OpenMM wrapper structures
 c
       call openmm_data ()
 c
@@ -302,7 +302,7 @@ c     setup the required potential energy terms within OpenMM
 c
       call openmm_init (ommHandle,dt)
 c
-c     compare the energy and gradient between TINKER and OpenMM
+c     compare the energy and gradient between Tinker and OpenMM
 c
       if (verbose)  call openmm_test ()
 c
@@ -403,13 +403,13 @@ c
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine openmm_data  --  copy TINKER data to OpenMM  ##
+c     ##  subroutine openmm_data  --  copy Tinker data to OpenMM  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
 c     "openmm_data" uses calls to the OpenMM interface to copy data
-c     from TINKER modules to the corresponding OpenMM structures
+c     from Tinker modules to the corresponding OpenMM structures
 c
 c
       subroutine openmm_data ()
@@ -470,7 +470,7 @@ c
       implicit none
 c
 c
-c     use C++ interface calls to map TINKER variables to OpenMM
+c     use C++ interface calls to map Tinker variables to OpenMM
 c
       call set_angbnd_data (nangle,iang,ak,anat,afld)
       call set_angpot_data (angunit,stbnunit,aaunit,opbunit,opdunit,

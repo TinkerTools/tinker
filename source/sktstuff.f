@@ -283,13 +283,13 @@ c
          return
       end if
 c
-c     create the TINKER system object
+c     create the Tinker system object
 c
       call createsystem (n,nkey,flag)
       if (flag .eq. 0) then
          use_socket = .false.
          write (iout,20)
-   20    format (/,' SKTINIT  --  Unable to Create TINKER System',/)        
+   20    format (/,' SKTINIT  --  Unable to Create Tinker System',/)        
          return
       end if
 c
@@ -337,13 +337,13 @@ c
       call setmass (n,mass)
       call setcharge (n,pchg)
 c
-c     create the TINKER server
+c     create the Tinker server
 c
       call createserver (flag)
       if (flag .eq. 0) then
          use_socket = .false.
          write (iout,30)
-   30    format (/,' SKTINIT  --  Unable to Create TINKER Server',/)
+   30    format (/,' SKTINIT  --  Unable to Create Tinker Server',/)
          return
       end if
 c
@@ -386,7 +386,7 @@ c
       if (skttyp .eq. 1)  call sktdyn (cstep,cdt,cenergy)
       if (skttyp .eq. 2)  call sktopt (cstep,cenergy)
 c
-c     shutdown the TINKER server
+c     shutdown the Tinker server
 c
       call destroyserver ()
 c

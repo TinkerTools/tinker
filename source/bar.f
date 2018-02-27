@@ -66,11 +66,11 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Thermodynamic Perturbation Utility',
+   20    format (/,' The Tinker Thermodynamic Perturbation Utility',
      &              ' Can :',
      &           //,4x,'(1) Create BAR File with Perturbed Potential',
      &              ' Energies',
-     &           /,4x,'(2) Compute Thermodynamic Values from TINKER',
+     &           /,4x,'(2) Compute Thermodynamic Values from Tinker',
      &              ' BAR File')
          do while (mode.lt.1 .or. mode.gt.2)
             mode = 0
@@ -82,7 +82,7 @@ c
          end do
       end if
 c
-c     create TINKER BAR file or compute thermodynamic values
+c     create Tinker BAR file or compute thermodynamic values
 c
       if (mode .eq. 1)  call makebar
       if (mode .eq. 2)  call barcalc

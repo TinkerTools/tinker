@@ -1,6 +1,5 @@
-
 /*
- * Note: This version of pmpb.c is compatible with APBS Version 1.3
+ * This version of pmpb.c is compatible with APBS Version 1.3
  *
  * Note: The "routines.h" header file includes apbscfg.h, which
  * defines ENABLE_TINKER. ENABLE_TINKER turns on function prototypes
@@ -19,7 +18,7 @@
  * Underscores are used by default on Linux and MacOS,
  * but not on Windows.
  *
- * We define aliases below to allow TINKER's Fortran code to
+ * We define aliases below to allow Tinker's Fortran code to
  * call the C routines in this file when linking on Windows.
  */
 
@@ -36,13 +35,13 @@
 /***********************************************************************
   Below are some global variables that are saved between APBS calls.
   There may be a better way to do this, although passing pointers
-  into FORTRAN should be avoided.
+  into Fortran should be avoided.
 ***********************************************************************/
 
-// TINKER MAXATM parameter; must match "sizes.i"
-#define maxatm 25000
+// Tinker MAXATM parameter; must match "sizes.f"
+#define maxatm 1000000
 
-// TINKER MAXION parameter; must match "pbstuf.i"
+// Tinker MAXION parameter; must match "pbstuf.f"
 #define maxion 10
 
 // APBS configuration objects
@@ -69,7 +68,7 @@ Vgrid *chargeMap[NOSH_MAXMOL];
 double realCenter[3];
 
 /***********************************************************************
-  apbsinitial is called from TINKER to:
+  apbsinitial is called from Tinker to:
 
   (1) Initialize APBS Vcom, Vmem and NOsh objects
   (2) Create a "virtual" APBS input file and parse it
@@ -94,11 +93,11 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
                   int fortranAppendedChgmLen,
                   int fortranAppendedSrfmLen) {
 
-    /* All character strings passed from FORTRAN result in an integer
+    /* All character strings passed from Fortran result in an integer
        appended to the list of arguments, each equal to the static
-       length specified in the TINKER common block 'pb.i' (20).
+       length specified in the Tinker common block 'pb.i' (20).
 
-       Further below the FORTRAN strings will be converted into
+       Further below the Fortran strings will be converted into
        null terminated C-strings.
     */
     char pbtype[21]; // lpbe
@@ -107,7 +106,7 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
     char chgm[21];   // spl4
     char srfm[21];   // mol, smol, spl2
 
-    /* Bogus argc and argv variables used for Vcom constructor. */
+    /* Bogus argc and argv variables used for Vcom constructor */
     int argc = 0;
     char **argv;
 
@@ -121,11 +120,10 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
     /* Loop index */
     int i;
 
-    /* Start the timer - although keep in mind it is not stopped until
-       apbsfinal is called.  */
+    /* Start the timer; it is not stopped until apbsfinal is called */
     Vnm_tstart(APBS_TIMER_WALL_CLOCK, "APBS WALL CLOCK");
 
-    /* Convert FORTRAN strings to null-terminated C-String */
+    /* Convert Fortran strings to null-terminated C-String */
     strncpy(pbtype, pbtypef, *pbtypelen);
     strncpy(pbsoln, pbsolnf, *pbsolnlen);
     strncpy(bcfl, bcflf, *bcfllen);
@@ -145,7 +143,7 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
 
        Many options for partial charge systems are not yet supported
        for AMOEBA (or are not appropriate). The subset of ELEC options
-       that can be modified are configured using TINKER keywords.
+       that can be modified are configured using Tinker keywords.
 
        Initialization of the "nosh" input data structure then proceeds
        using the buffer data. If the syntax of the ELEC statement changes,
@@ -275,7 +273,7 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
        nlIndU[i] = VNULL;
     }
 
-    /* Initialization of Vcom, Vmem, and Nosh (via Vio). */
+    /* Initialization of Vcom, Vmem, and Nosh (via Vio) */
     VASSERT(Vcom_init(&argc, &argv));
     com = Vcom_ctor(1);
     rank = Vcom_rank(com);
@@ -285,7 +283,7 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
     mem = Vmem_ctor("MAIN");
 
     /* Print (to io.mc) and then parse the input buffer. */
-    Vnm_tprint(0, "\n********* TINKER generated input buffer *********\n\n");
+    Vnm_tprint(0, "\n********* Tinker generated input buffer *********\n\n");
     Vnm_tprint(0, "%s", buff);
     Vnm_tprint(0, "\n*************************************************\n\n");
     nosh = NOsh_ctor(rank, size);
@@ -301,7 +299,7 @@ void apbsinitial_(int dime[3], double grid[3], double gcent[3],
 }
 
 /***********************************************************************
-  apbsempole is called from TINKER to:
+  apbsempole is called from Tinker to:
 
   (1) Solve the PBE using permanent multipoles as the source term
   (2) Save the solution potential for polarization force calculation
@@ -362,7 +360,7 @@ void apbsempole_(int *natom, double x[maxatm][3],
        alist[0]->number = *natom;
     }
 
-    /* Read TINKER input data into Vatom instances. */
+    /* Read Tinker input data into Vatom instances */
     for (i=0; i < alist[0]->number; i++){
        atom = Valist_getAtom(alist[0],i);
        Vatom_setAtomID(atom, i);
@@ -465,7 +463,8 @@ void apbsempole_(int *natom, double x[maxatm][3],
         * data structure to think it read these maps in from a file.
         * The goal is to save setup time during convergence of the
         * induced dipoles. This is under consideration...
-        * */
+        */
+
        /*
        // X (shifted)
        data = Vmem_malloc(mem, nx*ny*nz, sizeof(double));
@@ -497,7 +496,6 @@ void apbsempole_(int *natom, double x[maxatm][3],
        pbeparm->dielMapID = i + 1;
        pbeparm->useKappaMap = 1;
        pbeparm->kappaMapID = i + 1;
-
        */
 
        data = Vmem_malloc(mem, nx*ny*nz, sizeof(double));
@@ -589,11 +587,11 @@ void apbsempole_(int *natom, double x[maxatm][3],
 }
 
 /***********************************************************************
-  apbsinduce is called from TINKER during SCRF convergence to:
+  apbsinduce is called from Tinker during SCRF convergence to:
 
   (1) Solve the PBE given induced dipoles as the source term
   (2) Save the solution potential for later polarization force calc
-  (3) Return the induced reaction field to TINKER
+  (3) Return the induced reaction field to Tinker
 ***********************************************************************/
 
 void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
@@ -623,7 +621,7 @@ void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
        pbe[i] = VNULL;
     }
 
-    /* Read TINKER input data into Vatom instances. */
+    /* Read Tinker input data into Vatom instances */
     for (i=0; i < alist[0]->number; i++){
        atom = Valist_getAtom(alist[0],i);
        Vatom_setInducedDipole(atom, uind[i]);
@@ -632,7 +630,7 @@ void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
        }
     }
 
-    /* Solve the LPBE for the homogeneous system, then solvated. */
+    /* Solve the LPBE for the homogeneous system, then solvated */
     for (i=0; i<2; i++) {
 
        pmg[i] = VNULL;
@@ -716,7 +714,7 @@ void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
     electric = 332.05382;
     for (i=0; i<alist[0]->number; i++){
        // starting with the field in KT/e/Ang^2 multiply by Kcal/mol/KT
-       // (conversion to e/Ang^2, which are TINKER field units)
+       // (conversion to e/Ang^2, which are Tinker field units)
        fld[i][0] *= kT / electric;
        fld[i][1] *= kT / electric;
        fld[i][2] *= kT / electric;
@@ -726,11 +724,11 @@ void apbsinduce_(double uind[maxatm][3], double fld[maxatm][3]){
 }
 
 /***********************************************************************
-  apbsnlinduce is called from TINKER during SCRF convergence to:
+  apbsnlinduce is called from Tinker during SCRF convergence to:
 
   (1) Solve the PBE given non-local induced dipoles as the source term
   (2) Save the solution potential for later polarization force calc
-  (3) Return the nonlocal induced dipole reaction field to TINKER
+  (3) Return the nonlocal induced dipole reaction field to Tinker
 ************************************************************************/
 
 void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
@@ -759,7 +757,7 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
        pbe[i] = VNULL;
     }
 
-    /* Read TINKER induce input data into Vatom instances. */
+    /* Read Tinker induce input data into Vatom instances */
     for (i=0; i < alist[0]->number; i++){
        atom = Valist_getAtom(alist[0],i);
        Vatom_setNLInducedDipole(atom, uinp[i]);
@@ -768,7 +766,7 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
        }
     }
 
-    /* Solve the LPBE for the homogeneous system, then solvated. */
+    /* Solve the LPBE for the homogeneous system, then solvated */
     for (i=0; i<2; i++) {
 
        pmg[i] = VNULL;
@@ -859,7 +857,7 @@ void apbsnlinduce_(double uinp[maxatm][3], double fld[maxatm][3]){
 }
 
 /***********************************************************************
-  pbdirectpolforce is called from TINKER to:
+  pbdirectpolforce is called from Tinker to:
 
   (1) compute direct polarization forces and torques using
       saved potentials
@@ -884,7 +882,7 @@ void pbdirectpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
        pbe[i] = VNULL;
     }
 
-    // Read the converged induced dipole data into APBS Vatom structures.
+    // Read the converged induced dipole data into APBS Vatom structures
     for (i=0; i < alist[0]->number; i++){
        atom = Valist_getAtom(alist[0],i);
        Vatom_setInducedDipole(atom, uind[i]);
@@ -993,7 +991,7 @@ void pbdirectpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
 }
 
 /***********************************************************************
-  pbmutualpolforce is called from TINKER to:
+  pbmutualpolforce is called from Tinker to:
 
   (1) compute mutual polarization forces using saved potentials
 ***********************************************************************/
@@ -1017,7 +1015,7 @@ void pbmutualpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
        pbe[i] = VNULL;
     }
 
-    // Read the converged dipole data into APBS Vatom structures.
+    // Read the converged dipole data into APBS Vatom structures
     for (i=0; i < alist[0]->number; i++){
        atom = Valist_getAtom(alist[0],i);
        Vatom_setInducedDipole(atom, uind[i]);
@@ -1081,7 +1079,7 @@ void pbmutualpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
        }
     }
 
-    // kT in kcal/mol.
+    // kT in kcal/mol
     kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 / 4.184;
     for (i=0; i<alist[0]->number; i++){
        rff[i][0] *= kT;
@@ -1093,7 +1091,7 @@ void pbmutualpolforce_(double uind[maxatm][3], double uinp[maxatm][3],
 }
 
 /***********************************************************************
-  apbsfinal is called from TINKER to:
+  apbsfinal is called from Tinker to:
 
   (1) clean up at the end of an APBS calculation
 ***********************************************************************/
@@ -1112,7 +1110,7 @@ void apbsfinal_() {
     }
 
     Valist_dtor(&alist[0]);
-    /* Saving the kappa and dielectric maps is under consideration.
+    /* Saving the kappa and dielectric maps is under consideration
     killKappaMaps(nosh, kappaMap);
     killDielMaps(nosh, dielXMap, dielYMap, dielZMap);
     */

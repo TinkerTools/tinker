@@ -7,17 +7,17 @@ c     ###################################################
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  program download  --  parse ftplog for TINKER downloads  ##
+c     ##  program download  --  parse ftplog for Tinker downloads  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
 c     "download" parses an ftp logfile produced under Digital Unix
 c     and extracts the number and name of machines downloading the
-c     complete TINKER molecular modeling package; duplicates are
+c     complete Tinker molecular modeling package; duplicates are
 c     removed so each machine/site is listed only once
 c
-c     if downloads of TINKER are not matched with a site, then the
+c     if downloads of Tinker are not matched with a site, then the
 c     logfile contains an unexpected format or the maxtag parameter
 c     needs to be set to a larger value 
 c
@@ -77,7 +77,7 @@ c
 c     write a header prior to analyzing the logfile
 c
       write (*,30)
-   30 format (/,' Downloads of the TINKER Molecular',
+   30 format (/,' Downloads of the Tinker Molecular',
      &           ' Modeling Package',/)
 c
 c     read each line looking for connects and downloads
@@ -115,7 +115,7 @@ c
             ihit = ihit + 1
             next = 1
             call getnumb (numeral,process(ihit),next)
-            site(ihit) = '*** TINKER Download Not Matched ***'
+            site(ihit) = '*** Tinker Download Not Matched ***'
             day(ihit) = '   '
             date(ihit) = '      '
             time(ihit) = '     '
@@ -144,7 +144,7 @@ c     scan the list of hits, skipping over duplicate sites
 c
       ilist = 0
       do i = 1, ihit
-         if (site(i) .ne. '*** TINKER Download Not Matched ***') then
+         if (site(i) .ne. '*** Tinker Download Not Matched ***') then
             do k = 1, i-1
                if (site(i) .eq. site(k))  goto 80
             end do

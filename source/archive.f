@@ -53,7 +53,7 @@ c     present a list of possible archive modifications
 c
       call initial
       write (iout,10)
-   10 format (/,' The TINKER Archive File Utility Can :',
+   10 format (/,' The Tinker Archive File Utility Can :',
      &        //,4x,'(1) Create an Archive from Individual Frames',
      &        /,4x,'(2) Extract Individual Frames from an Archive',
      &        /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
@@ -418,13 +418,13 @@ c
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine prtarc  --  output of a TINKER archive file  ##
+c     ##  subroutine prtarc  --  output of a Tinker archive file  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
 c     "prtarc" writes out a set of Cartesian coordinates for
-c     all active atoms in the TINKER XYZ archive format
+c     all active atoms in the Tinker XYZ archive format
 c
 c
       subroutine prtarc (iarc)

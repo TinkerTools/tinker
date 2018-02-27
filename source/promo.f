@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "promo" writes a short message containing information
-c     about the TINKER version number and the copyright notice
+c     about the Tinker version number and the copyright notice
 c
 c
       subroutine promo

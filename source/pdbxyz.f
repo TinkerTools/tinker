@@ -99,7 +99,7 @@ c
       end do
    20 continue
 c
-c     open the TINKER coordinates file to be used for output
+c     open the Tinker coordinates file to be used for output
 c
       ixyz = freeunit ()
       xyzfile = filename(1:leng)//'.xyz'
@@ -225,7 +225,7 @@ c
          clash = .false.
          call chkxyz (clash)
 c
-c     write the TINKER coordinates and reset the connectivities
+c     write the Tinker coordinates and reset the connectivities
 c
          ltitle = pdbleng
          title = pdbtitle(1:ltitle)

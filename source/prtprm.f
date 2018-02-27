@@ -86,7 +86,7 @@ c
       end do
       if (exist) then
          write (itxt,10)  forcefield
-   10    format (//,15x,'TINKER Force Field Parameters for ',a20)
+   10    format (//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,20)
    20    format (//,15x,'Force Field Atom Definitions',
      &           //,54x,'Atomic',4x,'Atomic',
@@ -109,7 +109,7 @@ c
       end do
       if (exist) then
          write (itxt,40)  formfeed,forcefield
-   40    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+   40    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          if (vdwindex .eq. 'CLASS') then
             write (itxt,50)
    50       format (//,15x,'Van der Waals Parameters',
@@ -214,7 +214,7 @@ c     bond stretching parameters
 c
       if (kb(1) .ne. blank8) then
          write (itxt,200)  formfeed,forcefield
-  200    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  200    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,210)
   210    format (//,15x,'Bond Stretching Parameters',
      &           ///,22x,'Classes',15x,'KS',7x,'Length',/)
@@ -305,7 +305,7 @@ c     bond angle bending parameters
 c
       if (ka(1) .ne. blank12) then
          write (itxt,370)  formfeed,forcefield
-  370    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  370    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,380)
   380    format (//,15x,'Angle Bending Parameters',
      &           ///,18x,'Classes',11x,'KB',6x,'Value 1',
@@ -430,7 +430,7 @@ c     stretch-bend parameters
 c
       if (ksb(1) .ne. blank12) then
          write (itxt,580)  formfeed,forcefield
-  580    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  580    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,590)
   590    format (//,15x,'Stretch-Bend Parameters',
      &           ///,18x,'Classes',10x,'KSB1',8x,'KSB2',/)
@@ -449,7 +449,7 @@ c     Urey-Bradley parameters
 c
       if (ku(1) .ne. blank12) then
          write (itxt,620)  formfeed,forcefield
-  620    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  620    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,630)
   630    format (//,15x,'Urey-Bradley Parameters',
      &           ///,18x,'Classes',11x,'KB',6x,'Distance',/)
@@ -482,7 +482,7 @@ c
       end do
       if (exist) then
          write (itxt,670)  formfeed,forcefield
-  670    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  670    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,680)
   680    format (//,15x,'Angle-Angle Parameters',
      &           ///,20x,'Class',9x,'KAA 1',7x,'KAA 2',7x,'KAA 3',
@@ -502,7 +502,7 @@ c     out-of-plane bending parameters
 c
       if (kopb(1) .ne. blank16) then
          write (itxt,700)  formfeed,forcefield
-  700    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  700    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,710)
   710    format (//,15x,'Out-of-Plane Bend Parameters',
      &           ///,26x,'Classes',11x,'KOPB',/)
@@ -522,7 +522,7 @@ c     out-of-plane distance parameters
 c
       if (kopd(1) .ne. blank16) then
          write (itxt,740)  formfeed,forcefield
-  740    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  740    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,750)
   750    format (//,15x,'Out-of-Plane Distance Parameters',
      &           ///,26x,'Classes',11x,'KOPD',/)
@@ -542,7 +542,7 @@ c     improper dihedral parameters
 c
       if (kdi(1) .ne. blank16) then
          write (itxt,780)  formfeed,forcefield
-  780    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  780    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,790)
   790    format (//,15x,'Improper Dihedral Parameters',
      &           ///,20x,'Classes',12x,'KID',7x,'Target',/)
@@ -562,7 +562,7 @@ c     improper torsional parameters
 c
       if (kti(1) .ne. blank16) then
          write (itxt,820)  formfeed,forcefield
-  820    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  820    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,830)
   830    format (//,15x,'Improper Torsion Parameters',
      &           ///,17x,'Classes',15x,'KTI Values',/)
@@ -602,7 +602,7 @@ c     torsional angle parameters
 c
       if (kt(1) .ne. blank16) then
          write (itxt,860)  formfeed,forcefield
-  860    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  860    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,870)
   870    format (//,15x,'Torsional Parameters',
      &           ///,17x,'Classes',15x,'KT Values',/)
@@ -772,7 +772,7 @@ c     pi-system torsion parameters
 c
       if (kpt(1) .ne. blank8) then
          write (itxt,960)  formfeed,forcefield
-  960    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+  960    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,970)
   970    format (//,15x,'Pi-Orbital Torsion Parameters',
      &           ///,18x,'Classes',15x,'KPT',/)
@@ -790,7 +790,7 @@ c     stretch-torsion parameters
 c
       if (kbt(1) .ne. blank16) then
          write (itxt,1000)  formfeed,forcefield
- 1000    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1000    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1010)
  1010    format (//,15x,'Stretch-Torsion Parameters',
      &           ///,17x,'Classes',12x,'Bond',8x,'KST1',
@@ -812,7 +812,7 @@ c     angle-torsion parameters
 c
       if (kat(1) .ne. blank16) then
          write (itxt,1040)  formfeed,forcefield
- 1040    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1040    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1050)
  1050    format (//,15x,'Angle-Torsion Parameters',
      &           ///,17x,'Classes',12x,'Angle',7x,'KAT1',
@@ -834,7 +834,7 @@ c     torsion-torsion parameters
 c
       if (ktt(1) .ne. blank20) then
          write (itxt,1080)  formfeed,forcefield
- 1080    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1080    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1090)
  1090    format (//,15x,'Torsion-Torsion Parameters',
      &           ///,19x,'Classes',18x,'KNX',9x,'KNY')
@@ -862,7 +862,7 @@ c
       end do
       if (exist) then
          write (itxt,1130)  formfeed,forcefield
- 1130    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1130    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1140)
  1140    format (//,15x,'Atomic Partial Charge Parameters',
      &           ///,24x,'Type',9x,'Partial Chg',/)
@@ -887,7 +887,7 @@ c     bond dipole moment parameters
 c
       if (kd(1) .ne. blank8) then
          write (itxt,1170)  formfeed,forcefield
- 1170    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1170    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1180)
  1180    format (//,15x,'Bond Dipole Moment Parameters',
      &           ///,25x,'Types',10x,'Bond Dipole',4x,'Position',/)
@@ -953,7 +953,7 @@ c     atomic multipole electrostatic parameters
 c
       if (kmp(1) .ne. blank16) then
          write (itxt,1300)  formfeed,forcefield
- 1300    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1300    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1310)
  1310    format (//,17x,'Atomic Multipole Parameters',
      &           ///,11x,'Type',7x,'Axis Types',8x,'Frame',
@@ -990,7 +990,7 @@ c
       end do
       if (exist) then
          write (itxt,1350)  formfeed,forcefield
- 1350    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1350    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1360)
  1360    format (//,15x,'Dipole Polarizability Parameters',
      &           ///,23x,'Type',7x,'Alpha',6x,'Damp',
@@ -1039,7 +1039,7 @@ c
       end do
       if (exist) then
          write (itxt,1420)  formfeed,forcefield
- 1420    format (a1,//,15x,'TINKER Force Field Parameters for ',a20)
+ 1420    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1430)
  1430    format (//,15x,'Conjugated Pisystem Atom Parameters',
      &           ///,20x,'Class',3x,'Electron',

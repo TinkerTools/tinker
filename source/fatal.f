@@ -24,7 +24,7 @@ c
 c     print a final warning message, then do final cleanup
 c
       write (iout,10)
-   10 format (/,' TINKER is Unable to Continue; Terminating',
+   10 format (/,' Tinker is Unable to Continue; Terminating',
      &           ' the Current Calculation',/)
       call final
 c

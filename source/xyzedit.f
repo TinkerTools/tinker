@@ -117,7 +117,7 @@ c
 c     present a list of possible coordinate modifications
 c
       write (iout,30)
-   30 format (/,' The TINKER XYZ File Editing Utility Can :',
+   30 format (/,' The Tinker XYZ File Editing Utility Can :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
      &        /,4x,'(2) Deletion of Individual Specified Atoms',
      &        /,4x,'(3) Deletion of Specified Types of Atoms',

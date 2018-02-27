@@ -76,7 +76,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Crystal Structure Utility Can :',
+   20    format (/,' The Tinker Crystal Structure Utility Can :',
      &           //,4x,'(1) Convert Fractional to Cartesian Coords',
      &           /,4x,'(2) Convert Cartesian to Fractional Coords',
      &           /,4x,'(3) Move Any Stray Molecules into Unit Cell',

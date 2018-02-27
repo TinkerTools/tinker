@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "poledit" provides for modification and manipulation of
-c     the atomic multipole electrostatic models used in TINKER
+c     the atomic multipole electrostatic models used in Tinker
 c
 c
       program poledit
@@ -39,7 +39,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Multipole Editing Utility Can :',
+   20    format (/,' The Tinker Multipole Editing Utility Can :',
      &           //,4x,'(1) Multipole Parameters from GDMA Output',
      &           /,4x,'(2) Alter Local Coordinate Frame Definitions',
      &           /,4x,'(3) Removal of Intramolecular Polarization')
@@ -1243,7 +1243,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "alterpol" finds an output set of TINKER multipole parameters
+c     "alterpol" finds an output set of Tinker multipole parameters
 c     which when used with an intergroup polarization model will
 c     give the same electrostatic potential around the molecule as
 c     the input set of multipole parameters with all atoms in one

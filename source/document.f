@@ -19,7 +19,7 @@ c     include file dependencies as needed by a Unix-style Makefile,
 c     or a formatted force field parameter set summary
 c
 c     note the logical variable "wiki" should be set true to make
-c     output suitable for inclusion in the TINKER User's Guide
+c     output suitable for inclusion in the Tinker User's Guide
 c     under MediaWiki
 c
 c
@@ -59,7 +59,7 @@ c
       character*240 info(maxline,maxunit)
       character*2048 field
 c
-c     list of the Fortran functions in the TINKER package
+c     list of the Fortran functions in the Tinker package
 c
       data fname / 'ADJACENT',  'ANGGUESS',  'ANORM',     'BETACF',
      &             'BETAI',     'BMAX',      'BNDERR',    'BNDGUESS',
@@ -82,7 +82,7 @@ c
      &             'XTALMIN1' /
 c
 c
-c     set flag to format for TINKER User's Guide under MediaWiki
+c     set flag to format for Tinker User's Guide under MediaWiki
 c
       wiki = .true.
 c
@@ -90,11 +90,11 @@ c     find out what documentation the user wants to generate
 c
       call initial
       write (iout,10)
-   10 format (/,' The TINKER Documentation Utility Can :',
+   10 format (/,' The Tinker Documentation Utility Can :',
      &        //,4x,'(1) List of Routines from a Source File',
      &        /,4x,'(2) List of Calls made by each Routine',
      &        /,4x,'(3) List of Common Blocks from Source',
-     &        /,4x,'(4) List of the TINKER Option Keywords',
+     &        /,4x,'(4) List of the Tinker Option Keywords',
      &        /,4x,'(5) List of Used Module Dependencies',
      &        /,4x,'(6) Documentation from a Parameter File')
       mode = 0

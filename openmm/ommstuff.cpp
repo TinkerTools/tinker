@@ -8,7 +8,7 @@
  *
  *    ############################################################
  *    ##                                                        ##
- *    ##  ommstuff.cpp  --  TINKER interface to the OpenMM API  ##
+ *    ##  ommstuff.cpp  --  Tinker interface to the OpenMM API  ##
  *    ##                                                        ##
  *    ############################################################
  */
@@ -32,7 +32,7 @@ using namespace std;
 
 /*
  *    ############################################################
- *           TINKER Routines Called Directly from Interface
+ *           Tinker Routines Called Directly from Interface
  *        (to convert C to C++, must enclose in extern "C" {})
  *    ############################################################
  */
@@ -75,7 +75,7 @@ typedef struct {
 
 /*
  *    ############################################################
- *            C++ Data Structures Corresponding to TINKER
+ *            C++ Data Structures Corresponding to Tinker
  *    ############################################################
  */
 
@@ -824,7 +824,7 @@ static void setNullTerminator (char* string, int maxLength, char* buffer) {
 
 /*
  *    ############################################################
- *            Copy TINKER Fortran Data into C++ Structures
+ *            Copy Tinker Fortran Data into C++ Structures
  *    ############################################################
  */
 
@@ -1959,7 +1959,7 @@ static void setupAmoebaAngleForce (OpenMM_System* system,
    int match;
    char* angleTypPtr;
 
-   // TINKER harmonic and in-plane angles are separate terms in OpenMM
+   // Tinker harmonic and in-plane angles are separate terms in OpenMM
 
    struct ConstraintMap map;
    if (removeConstrainedAngles) {
@@ -2009,7 +2009,7 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
    char* angleTypPtr;
    int match;
 
-   // TINKER harmonic and in-plane angles are separate terms in OpenMM
+   // Tinker harmonic and in-plane angles are separate terms in OpenMM
 
    struct ConstraintMap map;
    if (removeConstrainedBonds) {
@@ -2871,7 +2871,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
       for (int jj = ii; jj < nvdwpr; ++jj) {
          int tpi = avcv[ii];
          int tpj = avcv[jj];
-         // Note: TINKER assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
+         // Note: Tinker assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
          // regardless of using atom class or atom type as vdwindex, as of Feb. 2017.
          int kk = (tpi-1) * sizes__.maxclass + (tpj-1);
          double combinedSigma = vdw__.radmin[kk];
@@ -2902,7 +2902,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
             int atomj = *(couple__.i14 + 9*sizes__.maxval*ii + jj) - 1;
             if (ii < atomj) {
                int tpj = vdwindex_ptr[atomj];
-               // Note: TINKER assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
+               // Note: Tinker assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
                // regardless of using atom class or atom type as vdwindex, as of Feb. 2017.
                int kk = (tpi-1) * sizes__.maxclass + (tpj-1);
                double combinedSigma = vdw__.radmin[kk]*OpenMM_NmPerAngstrom;
@@ -4098,7 +4098,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
 /*
  *    ############################################################
- *          Copy State from OpenMM to TINKER Data Structures
+ *          Copy State from OpenMM to Tinker Data Structures
  *    ############################################################
  *
  *    @param omm                    handle with OpenMM data structures
@@ -4231,14 +4231,14 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
 
 /*
  *    ############################################################
- *       Update TINKER Data Structures; Call mdstat and mdsave
+ *       Update Tinker Data Structures; Call mdstat and mdsave
  *    ############################################################
  *
  *    @param omm          handle containing OpenMM data structures
  *    @param dt           simulation time step in ps
  *    @param istep        current step in MD loop
- *    @param callMdStat   if nonzero, call TINKER mdstat routine
- *    @param callMdSave   if nonzero, call TINKER mdsave routine
+ *    @param callMdStat   if nonzero, call Tinker mdstat routine
+ *    @param callMdSave   if nonzero, call Tinker mdsave routine
  */
 
 void openmm_update_ (void** omm, double* dt, int* istep,
@@ -4586,8 +4586,8 @@ static int usingImplicitSolvent (void) {
  *       Map Data Structures and Check for Supported Potentials
  *    ############################################################
  *
- *    (1) Map TINKER data structures with arrays to C data structs
- *    (2) Check for TINKER parameter settings consistent with OpenMM
+ *    (1) Map Tinker data structures with arrays to C data structs
+ *    (2) Check for Tinker parameter settings consistent with OpenMM
  *        values and potential types
  *    (3) If invalid match or setting found, exit
  */
@@ -4873,7 +4873,7 @@ void openmm_validate_ (int* testingActive) {
 
 /*
  *    ############################################################
- *           Compare TINKER and OpenMM Energies and Forces
+ *           Compare Tinker and OpenMM Energies and Forces
  *    ############################################################
  */
 
@@ -4908,7 +4908,7 @@ int openmm_test_ (void) {
    FILE* log = stderr;
 
    if (log) {
-      (void) fprintf (log, "\n Testing TINKER vs OpenMM Energy & Force :\n");
+      (void) fprintf (log, "\n Testing Tinker vs OpenMM Energy & Force :\n");
    }
 
    implicitSolventActive = usingImplicitSolvent ();
@@ -4950,7 +4950,7 @@ int openmm_test_ (void) {
    if (potent__.use_geom)  countActiveForces++;
 
    if (log) {
-      (void) fprintf (log, "\n Potential Terms Used in TINKER :\n" );
+      (void) fprintf (log, "\n Potential Terms Used in Tinker :\n" );
       (void) fprintf (log, "\n    Bond=    %d", abs(potent__.use_bond));
       (void) fprintf (log, "    Angle=   %d", abs(potent__.use_angle));
       (void) fprintf (log, "    StrBnd=  %d", abs(potent__.use_strbnd));
@@ -5044,7 +5044,7 @@ int openmm_test_ (void) {
 
       if (log) {
          (void) fprintf (log,
-                    "\n Potential Energy Components from TINKER :\n\n"
+                    "\n Potential Energy Components from Tinker :\n\n"
                     "    EB=  %15.7e   EA=  %15.7e   EBA= %15.7e\n"
                     "    EUB= %15.7e   EAA= %15.7e   EOPB=%15.7e\n"
                     "    EOPD=%15.7e   EID= %15.7e   EIT= %15.7e\n"
@@ -5075,7 +5075,7 @@ int openmm_test_ (void) {
 
    } else if (potent__.use_angle) {
 
-      // note TINKER angle = OpenMM (Angle + InPlaneAngle)
+      // note Tinker angle = OpenMM (Angle + InPlaneAngle)
 
       setupAmoebaAngleForce (system, removeConstrainedCovalentIxns, log);
       setupAmoebaInPlaneAngleForce (system, removeConstrainedCovalentIxns,
@@ -5210,7 +5210,7 @@ int openmm_test_ (void) {
    } else if (potent__.use_solv && implicitSolventActive > 0 &&
               !potent__.use_mpole) {
 
-      // to get TINKER WCA, zero deriv__.des, then call ewca1
+      // to get Tinker WCA, zero deriv__.des, then call ewca1
 
       zeroTinkerForce (deriv__.des);
       ewca1_ (&tinkerEnergy);
@@ -5316,7 +5316,7 @@ int openmm_test_ (void) {
       (void) fflush (log);
    }
 
-   // find differences in TINKER and OpenMM energies and forces
+   // find differences in Tinker and OpenMM energies and forces
 
    maxFDelta = 0.0;
    maxFDeltaIndex = -1;
@@ -5329,8 +5329,8 @@ int openmm_test_ (void) {
 
    if (log) {
 
-      (void) fprintf (log, "\n TINKER vs OpenMM Energy Values :\n");
-      (void) fprintf (log, "\n TINKER Potential Energy   %18.4f",
+      (void) fprintf (log, "\n Tinker vs OpenMM Energy Values :\n");
+      (void) fprintf (log, "\n Tinker Potential Energy   %18.4f",
                       tinkerEnergy);
       (void) fprintf (log, "\n OpenMM Potential Energy   %18.4f\n",
                       openMMPotentialEnergy);
@@ -5370,10 +5370,10 @@ int openmm_test_ (void) {
          avgDot += dot;
 
          if (ii == 0) {
-            (void) fprintf (log, "\n TINKER vs OpenMM Force Values :\n\n");
+            (void) fprintf (log, "\n Tinker vs OpenMM Force Values :\n\n");
          }
          if (ii < maxPrint || atoms__.n - ii - 1 < maxPrint) {
-            (void) fprintf (stderr, "%6d   TINKER %17.8e %17.8e %17.8e",
+            (void) fprintf (stderr, "%6d   Tinker %17.8e %17.8e %17.8e",
                             ii+1, tinkerF->x, tinkerF->y, tinkerF->z);
             (void) fprintf (stderr, "\n         OpenMM %17.8e %17.8e %17.8e\n",
                             force.x, force.y, force.z);
@@ -5384,7 +5384,7 @@ int openmm_test_ (void) {
          avgDot /= (double)(atoms__.n);
       }
 
-      (void) fprintf (log, "\n Summary of TINKER vs OpenMM Comparison :\n");
+      (void) fprintf (log, "\n Summary of Tinker vs OpenMM Comparison :\n");
       (void) fprintf (log, "\n EnergyDelta                    %19.8e\n",
                       maxEDelta);
       (void) fprintf (log, " MaxForceDelta at   %11d %19.8e\n",

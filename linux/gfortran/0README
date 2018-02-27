@@ -1,20 +1,20 @@
 
                      ######################################
-                     TINKER Notes for GNU gfortran on Linux
+                     Tinker Notes for GNU gfortran on Linux
                      ######################################
 
          This subdirectory contains a set of script files that can be
-         used to build the TINKER program package on a Linux system
+         used to build the Tinker program package on a Linux system
          using the GNU gfortran Fortran compiler.
 
          Building reasonably portable executables requires linking with
          static gcc libraries. This can be done via use of versions of 
          gfortran that enforce the -static-libgcc flag, or by copying 
-         the static libraries from the gcc directories into the TINKER 
+         the static libraries from the gcc directories into the Tinker 
          build directory, as noted in "link.make".
 
          Please note that by default most Linux distributions limit
          stacksize and datasize for processes, as can be checked via
-         the csh limit command or similar. Large TINKER executables
+         the csh limit command or similar. Large Tinker executables
          will need these values increased to avoid failure at startup.
 

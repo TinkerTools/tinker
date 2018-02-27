@@ -1,13 +1,13 @@
 ##
 ###################################################################
 ##                                                               ##
-##  Makefile for Building the TINKER Molecular Modeling Package  ##
+##  Makefile for Building the Tinker Molecular Modeling Package  ##
 ##                                                               ##
 ###################################################################
 ##
 ##  Invocation Options:
 ##
-##   1. make all              Build all the TINKER executables
+##   1. make all              Build all the Tinker executables
 ##   2. make install          Move the executables to BINDIR
 ##   3. make create_links     Create soft links in LINKDIR
 ##   4. make remove_links     Remove soft links from LINKDIR
@@ -18,7 +18,7 @@
 ##  and Jochen Buehler of the University of Konstanz, January 1998.
 ##  Modifications by Reece Hart & Jay Ponder, Washington University
 ##
-##  Building TINKER from source requires libraries from the FFTW
+##  Building Tinker from source requires libraries from the FFTW
 ##  Fast Fourier Transform package and (optionally) APBS Poisson-
 ##  Boltzmann solver. These libraries are assumed to already be
 ##  present, and are not built by this Makefile
@@ -29,17 +29,17 @@
 ##  Master Directory Locations; Change as Needed for Local Site  ##
 ###################################################################
 
-##  TINKERDIR       TINKER Distribution Directory
-##  TINKER_LIBDIR   Libraries needed to build TINKER
-##  BINDIR          Directory with TINKER Executables
-##  LINKDIR         Linked Copies of TINKER Executables
+##  TINKERDIR       Tinker Distribution Directory
+##  TINKER_LIBDIR   Libraries needed to build Tinker
+##  BINDIR          Directory with Tinker Executables
+##  LINKDIR         Linked Copies of Tinker Executables
 ##  FFTWDIR         FFTW Top-Level Directory
 ##  FFTW_LIB_DIR    Directory with FFTW Libraries
-##  FFTW_LIBS       FFTW Libraries needed to build TINKER
+##  FFTW_LIBS       FFTW Libraries needed to build Tinker
 ##  APBSDIR         APBS Top-Level Directory
 ##  APBS_INC_DIR    Directory with APBS Include Files
 ##  APBS_LIB_DIR    Directory with APBS Libraries
-##  APBS_LIBS       APBS Libraries needed to build TINKER
+##  APBS_LIBS       APBS Libraries needed to build Tinker
 
 TINKERDIR = $(HOME)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib

@@ -1,29 +1,29 @@
 ##
 ######################################################################
 ##                                                                  ##
-##  Makefile for Building an OpenMM-Enabled TINKER DYNAMIC Program  ##
+##  Makefile for Building an OpenMM-Enabled Tinker DYNAMIC Program  ##
 ##                                                                  ##
 ######################################################################
 ##
 ##  Invocation Options:
 ##
-##   1. make all              Build TINKER dynamic executable
+##   1. make all              Build Tinker dynamic executable
 ##   2. make install          Move the executable to BINDIR
 ##   3. make create_links     Create soft link in LINKDIR
 ##   4. make remove_links     Remove soft link from LINKDIR
 ##   6. make listing          Concatenate source to tinker.txt
 ##   5. make clean            Delete objects and executable
 ##
-##  Modified from the standard TINKER Makefile in March 2015 by
+##  Modified from the standard Tinker Makefile in March 2015 by
 ##  Jay Ponder by build an OpenMM-accelerated dynamic executable.
-##  Requires TINKER 7.1.2 or later, and assumes an AMOEBA-capable
-##  version of OpenMM is already built and present
+##  Requires that an AMOEBA-capable version of OpenMM is already
+##  built and present
 ##
 ##  Original version of this file is due to Peter Happersberger
 ##  and Jochen Buehler of the University of Konstanz, January 1998.
 ##  Modifications by Reece Hart & Jay Ponder, Washington University
 ##
-##  Building TINKER from source requires libraries from the FFTW
+##  Building Tinker from source requires libraries from the FFTW
 ##  Fast Fourier Transform package and (optionally) APBS Poisson-
 ##  Boltzmann solver. These libraries are assumed to already be
 ##  present, and are not built by this Makefile
@@ -34,9 +34,9 @@
 ##  Master Directory Locations; Change as Needed for Local Site  ##
 ###################################################################
 
-##  TINKERDIR    TINKER Distribution Directory
-##  BINDIR       Hard Copies of TINKER Executables
-##  LINKDIR      Linked Copies of TINKER Executables
+##  TINKERDIR    Tinker Distribution Directory
+##  BINDIR       Hard Copies of Tinker Executables
+##  LINKDIR      Linked Copies of Tinker Executables
 ##  FFTWDIR      FFTW Distribution Directory
 ##  OPENMMDIR    OpenMM Distribution Directory
 
@@ -68,7 +68,7 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible, Nvidia GPU
-##  Compiler: GNU gfortran 6.2, g++, nvcc
+##  Compiler: GNU gfortran 6.3, g++, nvcc
 ##  Parallel: OpenMP, OpenMM
 
 #CC = gcc
@@ -86,7 +86,7 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
-##  Compiler: GNU gfortran 6.2, clang, nvcc
+##  Compiler: GNU gfortran 7.1, clang, nvcc
 ##  Parallel: OpenMP, OpenMM
 
 CC = clang

@@ -10,7 +10,7 @@ forcefield              MM2-1991
 
 bondunit                71.94
 bond-cubic              -2.0
-bond-quartic            1.25         !! TINKER
+bond-quartic            1.25         !! Tinker
 angleunit               0.02191418
 angle-sextic            0.00000007
 strbndunit              2.51118

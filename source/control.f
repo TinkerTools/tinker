@@ -13,7 +13,7 @@ c     ################################################################
 c
 c
 c     "control" gets initial values for parameters that determine
-c     the output style and information level provided by TINKER
+c     the output style and information level provided by Tinker
 c
 c
       subroutine control

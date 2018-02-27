@@ -14,11 +14,11 @@ c
 c
 c     "movie" displays in rapid succession a series of molecular
 c     coordinate sets on a Silicon Graphics workstation; requires
-c     the TINKER package and the SGI GL graphics library
+c     the Tinker package and the SGI GL graphics library
 c
 c     note that the parameter "maxatm" in subroutines "draw" and
-c     "view" below must have the same value as in the "sizes.i"
-c     dimensioning file for the TINKER package
+c     "view" below must have the same value as in the "sizes.f"
+c     dimensioning file for the Tinker package
 c
 c     command to link an executable:
 c
@@ -30,7 +30,7 @@ c
       include 'fget.h'
 c
 c
-c     initialize the TINKER related stuff
+c     initialize the Tinker related stuff
 c
       call initial
 c
@@ -153,7 +153,7 @@ c
       end do
 c
 c     determine the number of atoms in the amino acid backbone
-c     (assumes an old TINKER format, which is no longer used)
+c     (assumes an old Tinker format, which is no longer used)
 c
       bbcount = 0
       do i = 1, n/3
