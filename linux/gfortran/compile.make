@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  compile.make  --  compile each of the TINKER routines  ##
+#  ##  compile.make  --  compile each of the Tinker routines  ##
 #  ##             (GNU gfortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################

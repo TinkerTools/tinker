@@ -15,7 +15,7 @@
 
      If MMFF executables are available, you may use the mmff.prm parameter
      file just as you would any other TINKER parameter file. The only caveat
-     is that all MMFF "bond type = 1" bonds must be listed in the TINKER
+     is that all MMFF "bond type = 1" bonds must be listed in the Tinker
      keyfile via the MMFF-PIBOND keyword. The keyword takes as arguments the
      atom numbers of atoms in type=1 bonds. Up to ten bonded atom pairs (ie,
      20 atom numbers) are listed following the MMFF-PIBOND keyword. Multiple

@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  library.make  --  create object library of TINKER modules  ##
+#  ##  library.make  --  create object library of Tinker modules  ##
 #  ##            (Windows/Cygwin/GNU gfortran Version)            ##
 #  ##                                                             ##
 #  #################################################################

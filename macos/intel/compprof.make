@@ -2,7 +2,7 @@
 #
 #  ################################################################
 #  ##                                                            ##
-#  ##  compprof.make  --  compile TINKER routines for profiling  ##
+#  ##  compprof.make  --  compile Tinker routines for profiling  ##
 #  ##              (Intel Fortran for MacOS Version)             ##
 #  ##                                                            ##
 #  ################################################################

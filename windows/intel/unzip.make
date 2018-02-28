@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  unzip.make  --  uncompress each of the TINKER executables  ##
+#  ##  unzip.make  --  uncompress each of the Tinker executables  ##
 #  ##              (Windows Version; Run under Linux)             ##
 #  ##                                                             ##
 #  #################################################################

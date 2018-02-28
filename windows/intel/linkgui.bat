@@ -1,12 +1,12 @@
 @echo off
 rem
 rem
-rem  #############################################################
-rem  ##                                                         ##
-rem  ##  linkgui.bat  --  link the TINKER programs for FFE use  ##
-rem  ##           (Intel Fortran for Windows Version)           ##
-rem  ##                                                         ##
-rem  #############################################################
+rem  ##############################################################
+rem  ##                                                          ##
+rem  ##  linkgui.bat  --  link Tinker programs for use with FFE  ##
+rem  ##            (Intel Fortran for Windows Version)           ##
+rem  ##                                                          ##
+rem  ##############################################################
 rem
 rem
 rem  Create a variable with the static libraries to link against;

@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  editbin.make  --  increase stack size for TINKER programs  ##
+#  ##  editbin.make  --  increase stack size for Tinker programs  ##
 #  ##             (Intel Fortran for Windows Version)             ##
 #  ##                                                             ##
 #  #################################################################

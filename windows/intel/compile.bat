@@ -3,7 +3,7 @@ rem
 rem
 rem  #############################################################
 rem  ##                                                         ##
-rem  ##  compile.make  --  compile each of the TINKER routines  ##
+rem  ##  compile.make  --  compile each of the Tinker routines  ##
 rem  ##           (Intel Fortran for Windows Version)           ##
 rem  ##                                                         ##
 rem  #############################################################

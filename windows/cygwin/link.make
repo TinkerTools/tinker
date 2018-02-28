@@ -2,7 +2,7 @@
 #
 #  ###############################################################
 #  ##                                                           ##
-#  ##  link.make  --  link each of the TINKER package programs  ##
+#  ##  link.make  --  link each of the Tinker package programs  ##
 #  ##           (Windows/Cygwin/GNU gfortran Version)           ##
 #  ##                                                           ##
 #  ###############################################################

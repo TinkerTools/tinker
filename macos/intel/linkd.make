@@ -2,7 +2,7 @@
 #
 #  ##############################################################
 #  ##                                                          ##
-#  ##  linkd.make  --  link the TINKER programs for debugging  ##
+#  ##  linkd.make  --  link the Tinker programs for debugging  ##
 #  ##             (Intel Fortran for MacOS Version)            ##
 #  ##                                                          ##
 #  ##############################################################

@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  link.make  --  link the TINKER programs for debugging  ##
+#  ##  link.make  --  link the Tinker programs for debugging  ##
 #  ##            (Intel Fortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################

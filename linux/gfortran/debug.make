@@ -2,7 +2,7 @@
 #
 #  ################################################################
 #  ##                                                            ##
-#  ##  debug.make  --  compile TINKER routines with debug flags  ##
+#  ##  debug.make  --  compile Tinker routines with debug flags  ##
 #  ##              (GNU gfortran for Linux Version)              ##
 #  ##                                                            ##
 #  ################################################################

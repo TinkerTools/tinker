@@ -2,7 +2,7 @@
 #
 #  ###############################################################
 #  ##                                                           ##
-#  ##  rename.make  --  move and rename the TINKER executables  ##
+#  ##  rename.make  --  move and rename the Tinker executables  ##
 #  ##                                                           ##
 #  ###############################################################
 #

@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  zip.make  --  compress each of the TINKER executables  ##
+#  ##  zip.make  --  compress each of the Tinker executables  ##
 #  ##            (Windows Version; Run under Linux)           ##
 #  ##                                                         ##
 #  #############################################################

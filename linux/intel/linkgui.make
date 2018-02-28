@@ -2,7 +2,7 @@
 #
 #  ##############################################################
 #  ##                                                          ##
-#  ##  linkgui.make  --  link the TINKER programs for FFE use  ##
+#  ##  linkgui.make  --  link the Tinker programs for FFE use  ##
 #  ##             (Intel Fortran for Linux Version)            ##
 #  ##                                                          ##
 #  ##############################################################

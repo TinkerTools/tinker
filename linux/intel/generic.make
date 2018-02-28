@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  generic.make  --  compile TINKER routines for generic CPU  ##
+#  ##  generic.make  --  compile Tinker routines for generic CPU  ##
 #  ##              (Intel Fortran for Linux Version)              ##
 #  ##                                                             ##
 #  #################################################################

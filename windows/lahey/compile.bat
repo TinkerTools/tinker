@@ -3,7 +3,7 @@ rem
 rem
 rem  ############################################################
 rem  ##                                                        ##
-rem  ##  compile.bat  --  compile each of the TINKER routines  ##
+rem  ##  compile.bat  --  compile each of the Tinker routines  ##
 rem  ##        (Lahey/Fujitsu LF95 for Windows Version)        ##
 rem  ##                                                        ##
 rem  ############################################################

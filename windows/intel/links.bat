@@ -3,7 +3,7 @@ rem
 rem
 rem  ###############################################################
 rem  ##                                                           ##
-rem  ##  links.bat  --  link each of the TINKER package programs  ##
+rem  ##  links.bat  --  link each of the Tinker package programs  ##
 rem  ##        (Intel Fortran Compiler for Windows Version)       ##
 rem  ##                                                           ##
 rem  ###############################################################

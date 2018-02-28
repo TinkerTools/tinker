@@ -3,7 +3,7 @@ rem
 rem
 rem  ##############################################################
 rem  ##                                                          ##
-rem  ##  compgui.bat  --  compile TINKER modules needed for FFE  ##
+rem  ##  compgui.bat  --  compile Tinker modules needed for FFE  ##
 rem  ##            (Intel Fortran for Windows Version)           ##
 rem  ##                                                          ##
 rem  ##############################################################

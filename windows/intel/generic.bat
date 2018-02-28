@@ -3,7 +3,7 @@ rem
 rem
 rem  #################################################################
 rem  ##                                                             ##
-rem  ##  generic.make  --  compile TINKER routines for generic CPU  ##
+rem  ##  generic.make  --  compile Tinker routines for generic CPU  ##
 rem  ##             (Intel Fortran for Windows Version)             ##
 rem  ##                                                             ##
 rem  #################################################################

@@ -3,7 +3,7 @@ rem
 rem
 rem  ###############################################################
 rem  ##                                                           ##
-rem  ##  links.bat  --  link each of the TINKER package programs  ##
+rem  ##  links.bat  --  link each of the Tinker package programs  ##
 rem  ##          (Lahey/Fujitsu LF95 for Windows Version)         ##
 rem  ##                                                           ##
 rem  ###############################################################

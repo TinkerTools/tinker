@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  linkapbs.make  --  link the TINKER programs with APBS  ##
+#  ##  linkapbs.make  --  link the Tinker programs with APBS  ##
 #  ##            (Intel Fortran for MacOS Version)            ##
 #  ##                                                         ##
 #  #############################################################

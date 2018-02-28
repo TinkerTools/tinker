@@ -2,7 +2,7 @@
 #
 #  ##############################################################
 #  ##                                                          ##
-#  ##  compserial.make  --  compile TINKER modules for serial  ##
+#  ##  compserial.make  --  compile Tinker modules for serial  ##
 #  ##             (Intel Fortran for Linux Version)            ##
 #  ##                                                          ##
 #  ##############################################################

@@ -2,7 +2,7 @@
 #
 #  ############################################################
 #  ##                                                        ##
-#  ##  compile.make  --  compile each of the TINKER modules  ##
+#  ##  compile.make  --  compile each of the Tinker modules  ##
 #  ##          (Windows/Cygwin/GNU gfortran Version)         ##
 #  ##                                                        ##
 #  ############################################################
