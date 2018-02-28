@@ -24,6 +24,7 @@ mv intxyz.x    ../bin/intxyz
 mv minimize.x  ../bin/minimize
 mv minirot.x   ../bin/minirot
 mv minrigid.x  ../bin/minrigid
+mv mol2xyz.x   ../bin/mol2xyz
 mv molxyz.x    ../bin/molxyz
 mv monte.x     ../bin/monte
 mv newton.x    ../bin/newton
@@ -49,7 +50,6 @@ mv sniffer.x   ../bin/sniffer
 mv spacefill.x ../bin/spacefill
 mv spectrum.x  ../bin/spectrum
 mv superpose.x ../bin/superpose
-mv sybylxyz.x  ../bin/sybylxyz
 mv testgrad.x  ../bin/testgrad
 mv testhess.x  ../bin/testhess
 mv testpair.x  ../bin/testpair
@@ -66,5 +66,5 @@ mv xtalfit.x   ../bin/xtalfit
 mv xtalmin.x   ../bin/xtalmin
 mv xyzedit.x   ../bin/xyzedit
 mv xyzint.x    ../bin/xyzint
+mv xyzmol2.x   ../bin/xyzmol2
 mv xyzpdb.x    ../bin/xyzpdb
-mv xyzsybyl.x  ../bin/xyzsybyl

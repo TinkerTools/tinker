@@ -420,6 +420,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 merge.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 minimize.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 minirot.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 minrigid.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 mol2xyz.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 molecule.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 molxyz.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 moments.f
@@ -513,7 +514,6 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 superpose.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 surface.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 surfatom.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 switch.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 sybylxyz.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 temper.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 testgrad.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 testhess.f
@@ -541,6 +541,6 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xtalmin.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xyzatm.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xyzedit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xyzint.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xyzmol2.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xyzpdb.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 xyzsybyl.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 zatom.f

@@ -25,6 +25,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intxyz
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minimize.x minimize.o libtinker.a libfftw3_threads.a libfftw3.a ; strip minimize.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minirot.x minirot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip minirot.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minrigid.x minrigid.o libtinker.a libfftw3_threads.a libfftw3.a ; strip minrigid.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o mol2xyz.x mol2xyz.o libtinker.a libfftw3_threads.a libfftw3.a ; strip mol2xyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o molxyz.x molxyz.o libtinker.a libfftw3_threads.a libfftw3.a ; strip molxyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o monte.x monte.o libtinker.a libfftw3_threads.a libfftw3.a ; strip monte.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o newton.x newton.o libtinker.a libfftw3_threads.a libfftw3.a ; strip newton.x
@@ -50,7 +51,6 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o sniffe
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o spacefill.x spacefill.o libtinker.a libfftw3_threads.a libfftw3.a ; strip spacefill.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o spectrum.x spectrum.o libtinker.a libfftw3_threads.a libfftw3.a ; strip spectrum.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o superpose.x superpose.o libtinker.a libfftw3_threads.a libfftw3.a ; strip superpose.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o sybylxyz.x sybylxyz.o libtinker.a libfftw3_threads.a libfftw3.a ; strip sybylxyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testgrad.x testgrad.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testgrad.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testhess.x testhess.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testhess.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testpair.x testpair.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testpair.x
@@ -67,5 +67,5 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xtalfi
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xtalmin.x xtalmin.o libtinker.a libfftw3_threads.a libfftw3.a ; strip xtalmin.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzedit.x xyzedit.o libtinker.a libfftw3_threads.a libfftw3.a ; strip xyzedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzint.x xyzint.o libtinker.a libfftw3_threads.a libfftw3.a ; strip xyzint.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzmol2.x xyzmol2.o libtinker.a libfftw3_threads.a libfftw3.a ; strip xyzmol2.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzpdb.x xyzpdb.o libtinker.a libfftw3_threads.a libfftw3.a ; strip xyzpdb.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzsybyl.x xyzsybyl.o libtinker.a libfftw3_threads.a libfftw3.a ; strip xyzsybyl.x

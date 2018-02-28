@@ -484,6 +484,7 @@ OBJS =	action.o \
 	minimize.o \
 	minirot.o \
 	minrigid.o \
+	mol2xyz.o \
 	molcul.o \
 	moldyn.o \
 	molecule.o \
@@ -629,7 +630,6 @@ OBJS =	action.o \
 	surface.o \
 	surfatom.o \
 	switch.o \
-	sybylxyz.o \
 	syntrn.o \
 	tarray.o \
 	temper.o \
@@ -677,8 +677,8 @@ OBJS =	action.o \
 	xyzatm.o \
 	xyzedit.o \
 	xyzint.o \
+	xyzmol2.o \
 	xyzpdb.o \
-	xyzsybyl.o \
 	zatom.o \
 	zclose.o \
 	zcoord.o
@@ -1538,18 +1538,19 @@ minima.o:
 minimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 minirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
 minrigid.o: files.o group.o inform.o iounit.o keys.o math.o output.o rigid.o sizes.o
+mol2xyz.o: files.o iounit.o titles.o
 molcul.o:
 moldyn.o:
 molecule.o: atomid.o atoms.o couple.o molcul.o sizes.o
 molxyz.o: files.o iounit.o titles.o
 moment.o:
 moments.o: atomid.o atoms.o bound.o charge.o dipole.o limits.o moment.o mpole.o polar.o potent.o rigid.o sizes.o solute.o units.o usage.o
-monte.o: atoms.o files.o inform.o iounit.o omega.o output.o sizes.o units.o usage.o zcoord.o
+monte.o: atoms.o bound.o files.o inform.o iounit.o omega.o output.o sizes.o units.o usage.o zcoord.o
 mplpot.o:
 mpole.o:
 mrecip.o:
 mutant.o:
-mutate.o: atomid.o atoms.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o
+mutate.o: atomid.o atoms.o bndstr.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o tors.o
 nblist.o: atoms.o bound.o boxes.o cell.o charge.o iounit.o light.o limits.o mpole.o neigh.o potent.o sizes.o vdw.o
 neigh.o:
 newton.o: atoms.o files.o inform.o iounit.o keys.o sizes.o usage.o
@@ -1671,7 +1672,7 @@ sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o s
 socket.o:
 solute.o:
 sort.o:
-spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o sizes.o usage.o
+spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o ptable.o sizes.o usage.o
 spectrum.o: files.o iounit.o math.o units.o
 square.o: inform.o iounit.o keys.o minima.o sizes.o
 stodyn.o:
@@ -1682,7 +1683,6 @@ superpose.o: align.o atomid.o atoms.o bound.o files.o inform.o iounit.o sizes.o 
 surface.o: atoms.o inform.o iounit.o math.o sizes.o usage.o
 surfatom.o: atoms.o iounit.o math.o sizes.o
 switch.o: limits.o nonpol.o shunt.o
-sybylxyz.o: files.o iounit.o titles.o
 syntrn.o:
 tarray.o:
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o sizes.o units.o usage.o
@@ -1730,8 +1730,8 @@ xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o sizes.o
 xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o linmin.o math.o minima.o molcul.o neigh.o output.o potent.o ptable.o refer.o scales.o sizes.o titles.o units.o usage.o
 xyzint.o: files.o iounit.o titles.o
+xyzmol2.o: files.o iounit.o sizes.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o sizes.o
-xyzsybyl.o: files.o iounit.o sizes.o titles.o
 zatom.o: angbnd.o atomid.o atoms.o bndstr.o fields.o iounit.o kangs.o katoms.o kbonds.o sizes.o zclose.o zcoord.o
 zclose.o: sizes.o
 zcoord.o: sizes.o

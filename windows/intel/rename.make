@@ -25,6 +25,7 @@ mv INTXYZ.ZIP    intxyz.zip
 mv MINIMIZE.ZIP  minimize.zip
 mv MINIROT.ZIP   minirot.zip
 mv MINRIGID.ZIP  minrigid.zip
+mv MOL2XYZ.ZIP   mol2xyz.zip
 mv MOLXYZ.ZIP    molxyz.zip
 mv MONTE.ZIP     monte.zip
 mv NEWTON.ZIP    newton.zip
@@ -50,7 +51,6 @@ mv SNIFFER.ZIP   sniffer.zip
 mv SPACEFILL.ZIP spacefill.zip
 mv SPECTRUM.ZIP  spectrum.zip
 mv SUPERPOSE.ZIP superpose.zip
-mv SYBYLXYZ.ZIP  sybylxyz.zip
 mv TESTGRAD.ZIP  testgrad.zip
 mv TESTHESS.ZIP  testhess.zip
 mv TESTPAIR.ZIP  testpair.zip
@@ -67,5 +67,5 @@ mv XTALFIT.ZIP   xtalfit.zip
 mv XTALMIN.ZIP   xtalmin.zip
 mv XYZEDIT.ZIP   xyzedit.zip
 mv XYZINT.ZIP    xyzint.zip
+mv XYZMOL2.ZIP   xyzmol2.zip
 mv XYZPDB.ZIP    xyzpdb.zip
-mv XYZSYBYL.ZIP  xyzsybyl.zip

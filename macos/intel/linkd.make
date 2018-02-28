@@ -25,6 +25,7 @@ ifort -g -Wl,-no_pie -o intxyz.x intxyz.o libtinker.a
 ifort -g -Wl,-no_pie -o minimize.x minimize.o libtinker.a
 ifort -g -Wl,-no_pie -o minirot.x minirot.o libtinker.a
 ifort -g -Wl,-no_pie -o minrigid.x minrigid.o libtinker.a
+ifort -g -Wl,-no_pie -o mol2xyz.x mol2xyz.o libtinker.a
 ifort -g -Wl,-no_pie -o molxyz.x molxyz.o libtinker.a
 ifort -g -Wl,-no_pie -o monte.x monte.o libtinker.a
 ifort -g -Wl,-no_pie -o newton.x newton.o libtinker.a
@@ -50,7 +51,6 @@ ifort -g -Wl,-no_pie -o sniffer.x sniffer.o libtinker.a
 ifort -g -Wl,-no_pie -o spacefill.x spacefill.o libtinker.a
 ifort -g -Wl,-no_pie -o spectrum.x spectrum.o libtinker.a
 ifort -g -Wl,-no_pie -o superpose.x superpose.o libtinker.a
-ifort -g -Wl,-no_pie -o sybylxyz.x sybylxyz.o libtinker.a
 ifort -g -Wl,-no_pie -o testgrad.x testgrad.o libtinker.a
 ifort -g -Wl,-no_pie -o testhess.x testhess.o libtinker.a
 ifort -g -Wl,-no_pie -o testpair.x testpair.o libtinker.a
@@ -67,5 +67,5 @@ ifort -g -Wl,-no_pie -o xtalfit.x xtalfit.o libtinker.a
 ifort -g -Wl,-no_pie -o xtalmin.x xtalmin.o libtinker.a
 ifort -g -Wl,-no_pie -o xyzedit.x xyzedit.o libtinker.a
 ifort -g -Wl,-no_pie -o xyzint.x xyzint.o libtinker.a
+ifort -g -Wl,-no_pie -o xyzmol2.x xyzmol2.o libtinker.a
 ifort -g -Wl,-no_pie -o xyzpdb.x xyzpdb.o libtinker.a
-ifort -g -Wl,-no_pie -o xyzsybyl.x xyzsybyl.o libtinker.a

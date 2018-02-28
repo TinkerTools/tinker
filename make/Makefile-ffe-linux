@@ -526,6 +526,7 @@ OBJS =	action.o \
 	minimize.o \
 	minirot.o \
 	minrigid.o \
+	mol2xyz.o \
 	molcul.o \
 	moldyn.o \
 	molecule.o \
@@ -670,7 +671,6 @@ OBJS =	action.o \
 	surface.o \
 	surfatom.o \
 	switch.o \
-	sybylxyz.o \
 	syntrn.o \
 	tarray.o \
 	temper.o \
@@ -718,8 +718,8 @@ OBJS =	action.o \
 	xyzatm.o \
 	xyzedit.o \
 	xyzint.o \
+	xyzmol2.o \
 	xyzpdb.o \
-	xyzsybyl.o \
 	zatom.o \
 	zclose.o \
 	zcoord.o
@@ -741,6 +741,7 @@ EXEFILES = alchemy.x \
 	    minimize.x \
 	    minirot.x \
 	    minrigid.x \
+	    mol2xyz.x \
 	    molxyz.x \
 	    monte.x \
 	    newton.x \
@@ -766,7 +767,6 @@ EXEFILES = alchemy.x \
 	    spacefill.x \
 	    spectrum.x \
 	    superpose.x \
-	    sybylxyz.x \
 	    testgrad.x \
 	    testhess.x \
 	    testpair.x \
@@ -783,8 +783,8 @@ EXEFILES = alchemy.x \
 	    xtalmin.x \
 	    xyzedit.x \
 	    xyzint.x \
-	    xyzpdb.x \
-	    xyzsybyl.x
+	    xyzmol2.x \
+	    xyzpdb.x
 
 %.o: %.c
 	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${APBS_INCDIR} ${OPTFLAGS} $<
@@ -823,6 +823,7 @@ rename_bin:
 	mv  minimize.x   $(BINDIR)/minimize
 	mv  minirot.x    $(BINDIR)/minirot
 	mv  minrigid.x   $(BINDIR)/minrigid
+	mv  mol2xyz.x    $(BINDIR)/mol2xyz
 	mv  molxyz.x     $(BINDIR)/molxyz
 	mv  monte.x      $(BINDIR)/monte
 	mv  newton.x     $(BINDIR)/newton
@@ -848,7 +849,6 @@ rename_bin:
 	mv  spacefill.x  $(BINDIR)/spacefill
 	mv  spectrum.x   $(BINDIR)/spectrum
 	mv  superpose.x  $(BINDIR)/superpose
-	mv  sybylxyz.x   $(BINDIR)/sybylxyz
 	mv  testgrad.x   $(BINDIR)/testgrad
 	mv  testhess.x   $(BINDIR)/testhess
 	mv  testpair.x   $(BINDIR)/testpair
@@ -865,8 +865,8 @@ rename_bin:
 	mv  xtalmin.x    $(BINDIR)/xtalmin
 	mv  xyzedit.x    $(BINDIR)/xyzedit
 	mv  xyzint.x     $(BINDIR)/xyzint
+	mv  xyzmol2.x    $(BINDIR)/xyzmol2
 	mv  xyzpdb.x     $(BINDIR)/xyzpdb
-	mv  xyzsybyl.x   $(BINDIR)/xyzsybyl
 
 rename_exe:
 	mv  alchemy.x    $(BINDIR)/alchemy.exe
@@ -886,6 +886,7 @@ rename_exe:
 	mv  minimize.x   $(BINDIR)/minimize.exe
 	mv  minirot.x    $(BINDIR)/minirot.exe
 	mv  minrigid.x   $(BINDIR)/minrigid.exe
+	mv  mol2xyz.x    $(BINDIR)/mol2xyz.exe
 	mv  molxyz.x     $(BINDIR)/molxyz.exe
 	mv  monte.x      $(BINDIR)/monte.exe
 	mv  newton.x     $(BINDIR)/newton.exe
@@ -911,7 +912,6 @@ rename_exe:
 	mv  spacefill.x  $(BINDIR)/spacefill.exe
 	mv  spectrum.x   $(BINDIR)/spectrum.exe
 	mv  superpose.x  $(BINDIR)/superpose.exe
-	mv  sybylxyz.x   $(BINDIR)/sybylxyz.exe
 	mv  testgrad.x   $(BINDIR)/testgrad.exe
 	mv  testhess.x   $(BINDIR)/testhess.exe
 	mv  testpair.x   $(BINDIR)/testpair.exe
@@ -929,7 +929,7 @@ rename_exe:
 	mv  xyzedit.x    $(BINDIR)/xyzedit.exe
 	mv  xyzint.x     $(BINDIR)/xyzint.exe
 	mv  xyzpdb.x     $(BINDIR)/xyzpdb.exe
-	mv  xyzsybyl.x   $(BINDIR)/xyzsybyl.exe
+	mv  xyzmol2.x    $(BINDIR)/xyzmol2.exe
 
 remove_links:
 	rm -f $(LINKDIR)/alchemy
@@ -949,6 +949,7 @@ remove_links:
 	rm -f $(LINKDIR)/minimize
 	rm -f $(LINKDIR)/minirot
 	rm -f $(LINKDIR)/minrigid
+	rm -f $(LINKDIR)/mol2xyz
 	rm -f $(LINKDIR)/molxyz
 	rm -f $(LINKDIR)/monte
 	rm -f $(LINKDIR)/newton
@@ -974,7 +975,6 @@ remove_links:
 	rm -f $(LINKDIR)/spacefill
 	rm -f $(LINKDIR)/spectrum
 	rm -f $(LINKDIR)/superpose
-	rm -f $(LINKDIR)/sybylxyz
 	rm -f $(LINKDIR)/testgrad
 	rm -f $(LINKDIR)/testhess
 	rm -f $(LINKDIR)/testpair
@@ -991,8 +991,8 @@ remove_links:
 	rm -f $(LINKDIR)/xtalmin
 	rm -f $(LINKDIR)/xyzedit
 	rm -f $(LINKDIR)/xyzint
+	rm -f $(LINKDIR)/xyzmol2
 	rm -f $(LINKDIR)/xyzpdb
-	rm -f $(LINKDIR)/xyzsybyl
 
 create_links:
 	ln -s $(BINDIR)/alchemy    $(LINKDIR)/alchemy
@@ -1012,6 +1012,7 @@ create_links:
 	ln -s $(BINDIR)/minimize   $(LINKDIR)/minimize
 	ln -s $(BINDIR)/minirot    $(LINKDIR)/minirot
 	ln -s $(BINDIR)/minrigid   $(LINKDIR)/minrigid
+	ln -s $(BINDIR)/mol2xyz    $(LINKDIR)/mol2xyz
 	ln -s $(BINDIR)/molxyz     $(LINKDIR)/molxyz
 	ln -s $(BINDIR)/monte      $(LINKDIR)/monte
 	ln -s $(BINDIR)/newton     $(LINKDIR)/newton
@@ -1037,7 +1038,6 @@ create_links:
 	ln -s $(BINDIR)/spacefill  $(LINKDIR)/spacefill
 	ln -s $(BINDIR)/spectrum   $(LINKDIR)/spectrum
 	ln -s $(BINDIR)/superpose  $(LINKDIR)/superpose
-	ln -s $(BINDIR)/sybylxyz   $(LINKDIR)/sybylxyz
 	ln -s $(BINDIR)/testgrad   $(LINKDIR)/testgrad
 	ln -s $(BINDIR)/testhess   $(LINKDIR)/testhess
 	ln -s $(BINDIR)/testpair   $(LINKDIR)/testpair
@@ -1054,8 +1054,8 @@ create_links:
 	ln -s $(BINDIR)/xtalmin    $(LINKDIR)/xtalmin
 	ln -s $(BINDIR)/xyzedit    $(LINKDIR)/xyzedit
 	ln -s $(BINDIR)/xyzint     $(LINKDIR)/xyzint
+	ln -s $(BINDIR)/xyzmol2    $(LINKDIR)/xyzmol2
 	ln -s $(BINDIR)/xyzpdb     $(LINKDIR)/xyzpdb
-	ln -s $(BINDIR)/xyzsybyl   $(LINKDIR)/xyzsybyl
 
 libtinker.a: ${OBJS} 
 	ar ${LIBFLAGS} libtinker.a \
@@ -1865,18 +1865,19 @@ minima.o:
 minimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 minirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
 minrigid.o: files.o group.o inform.o iounit.o keys.o math.o output.o rigid.o sizes.o
+mol2xyz.o: files.o iounit.o titles.o
 molcul.o:
 moldyn.o:
 molecule.o: atomid.o atoms.o couple.o molcul.o sizes.o
 molxyz.o: files.o iounit.o titles.o
 moment.o:
 moments.o: atomid.o atoms.o bound.o charge.o dipole.o limits.o moment.o mpole.o polar.o potent.o rigid.o sizes.o solute.o units.o usage.o
-monte.o: atoms.o files.o inform.o iounit.o omega.o output.o sizes.o units.o usage.o zcoord.o
+monte.o: atoms.o bound.o files.o inform.o iounit.o omega.o output.o sizes.o units.o usage.o zcoord.o
 mplpot.o:
 mpole.o:
 mrecip.o:
 mutant.o:
-mutate.o: atomid.o atoms.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o
+mutate.o: atomid.o atoms.o bndstr.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o tors.o
 nblist.o: atoms.o bound.o boxes.o cell.o charge.o iounit.o light.o limits.o mpole.o neigh.o potent.o sizes.o vdw.o
 neigh.o:
 newton.o: atoms.o files.o inform.o iounit.o keys.o sizes.o usage.o
@@ -1998,7 +1999,7 @@ sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o s
 socket.o:
 solute.o:
 sort.o:
-spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o sizes.o usage.o
+spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o ptable.o sizes.o usage.o
 spectrum.o: files.o iounit.o math.o units.o
 square.o: inform.o iounit.o keys.o minima.o sizes.o
 stodyn.o:
@@ -2009,7 +2010,6 @@ superpose.o: align.o atomid.o atoms.o bound.o files.o inform.o iounit.o sizes.o 
 surface.o: atoms.o inform.o iounit.o math.o sizes.o usage.o
 surfatom.o: atoms.o iounit.o math.o sizes.o
 switch.o: limits.o nonpol.o shunt.o
-sybylxyz.o: files.o iounit.o titles.o
 syntrn.o:
 tarray.o:
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o sizes.o units.o usage.o
@@ -2057,8 +2057,8 @@ xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o sizes.o
 xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o linmin.o math.o minima.o molcul.o neigh.o output.o potent.o ptable.o refer.o scales.o sizes.o titles.o units.o usage.o
 xyzint.o: files.o iounit.o titles.o
+xyzmol2.o: files.o iounit.o sizes.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o sizes.o
-xyzsybyl.o: files.o iounit.o sizes.o titles.o
 zatom.o: angbnd.o atomid.o atoms.o bndstr.o fields.o iounit.o kangs.o katoms.o kbonds.o sizes.o zclose.o zcoord.o
 zclose.o: sizes.o
 zcoord.o: sizes.o

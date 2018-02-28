@@ -420,6 +420,7 @@ gfortran -c -Wall merge.f
 gfortran -c -Wall minimize.f
 gfortran -c -Wall minirot.f
 gfortran -c -Wall minrigid.f
+gfortran -c -Wall mol2xyz.f
 gfortran -c -Wall molecule.f
 gfortran -c -Wall molxyz.f
 gfortran -c -Wall moments.f
@@ -513,7 +514,6 @@ gfortran -c -Wall superpose.f
 gfortran -c -Wall surface.f
 gfortran -c -Wall surfatom.f
 gfortran -c -Wall switch.f
-gfortran -c -Wall sybylxyz.f
 gfortran -c -Wall temper.f
 gfortran -c -Wall testgrad.f
 gfortran -c -Wall testhess.f
@@ -541,6 +541,6 @@ gfortran -c -Wall xtalmin.f
 gfortran -c -Wall xyzatm.f
 gfortran -c -Wall xyzedit.f
 gfortran -c -Wall xyzint.f
+gfortran -c -Wall xyzmol2.f
 gfortran -c -Wall xyzpdb.f
-gfortran -c -Wall xyzsybyl.f
 gfortran -c -Wall zatom.f

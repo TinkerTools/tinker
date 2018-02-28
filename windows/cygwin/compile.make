@@ -420,6 +420,7 @@ gfortran -c -O3 -ffast-math -fopenmp merge.f
 gfortran -c -O3 -ffast-math -fopenmp minimize.f
 gfortran -c -O3 -ffast-math -fopenmp minirot.f
 gfortran -c -O3 -ffast-math -fopenmp minrigid.f
+gfortran -c -O3 -ffast-math -fopenmp mol2xyz.f
 gfortran -c -O3 -ffast-math -fopenmp molecule.f
 gfortran -c -O3 -ffast-math -fopenmp molxyz.f
 gfortran -c -O3 -ffast-math -fopenmp moments.f
@@ -513,7 +514,6 @@ gfortran -c -O3 -ffast-math -fopenmp superpose.f
 gfortran -c -O3 -ffast-math -fopenmp surface.f
 gfortran -c -O3 -ffast-math -fopenmp surfatom.f
 gfortran -c -O3 -ffast-math -fopenmp switch.f
-gfortran -c -O3 -ffast-math -fopenmp sybylxyz.f
 gfortran -c -O3 -ffast-math -fopenmp temper.f
 gfortran -c -O3 -ffast-math -fopenmp testgrad.f
 gfortran -c -O3 -ffast-math -fopenmp testhess.f
@@ -541,6 +541,6 @@ gfortran -c -O3 -ffast-math -fopenmp xtalmin.f
 gfortran -c -O3 -ffast-math -fopenmp xyzatm.f
 gfortran -c -O3 -ffast-math -fopenmp xyzedit.f
 gfortran -c -O3 -ffast-math -fopenmp xyzint.f
+gfortran -c -O3 -ffast-math -fopenmp xyzmol2.f
 gfortran -c -O3 -ffast-math -fopenmp xyzpdb.f
-gfortran -c -O3 -ffast-math -fopenmp xyzsybyl.f
 gfortran -c -O3 -ffast-math -fopenmp zatom.f

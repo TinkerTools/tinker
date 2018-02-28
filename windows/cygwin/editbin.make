@@ -25,6 +25,7 @@ editbin /STACK:60000000 intxyz.exe
 editbin /STACK:60000000 minimize.exe
 editbin /STACK:60000000 minirot.exe
 editbin /STACK:60000000 minrigid.exe
+editbin /STACK:60000000 mol2xyz.exe
 editbin /STACK:60000000 molxyz.exe
 editbin /STACK:60000000 monte.exe
 editbin /STACK:60000000 newton.exe
@@ -50,7 +51,6 @@ editbin /STACK:60000000 sniffer.exe
 editbin /STACK:60000000 spacefill.exe
 editbin /STACK:60000000 spectrum.exe
 editbin /STACK:60000000 superpose.exe
-editbin /STACK:60000000 sybylxyz.exe
 editbin /STACK:60000000 testgrad.exe
 editbin /STACK:60000000 testhess.exe
 editbin /STACK:60000000 testpair.exe
@@ -67,5 +67,5 @@ editbin /STACK:60000000 xtalfit.exe
 editbin /STACK:60000000 xtalmin.exe
 editbin /STACK:60000000 xyzedit.exe
 editbin /STACK:60000000 xyzint.exe
+editbin /STACK:60000000 xyzmol2.exe
 editbin /STACK:60000000 xyzpdb.exe
-editbin /STACK:60000000 xyzsybyl.exe

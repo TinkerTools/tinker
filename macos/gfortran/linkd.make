@@ -25,6 +25,7 @@ gfortran -Og -g -fbacktrace -static-libgcc -o intxyz.x intxyz.o -L. libtinker.a 
 gfortran -Og -g -fbacktrace -static-libgcc -o minimize.x minimize.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o minirot.x minirot.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o minrigid.x minrigid.o -L. libtinker.a libfftw3_threads.a libfftw3.a
+gfortran -Og -g -fbacktrace -static-libgcc -o mol2xyz.x mol2xyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o molxyz.x molxyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o monte.x monte.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o newton.x newton.o -L. libtinker.a libfftw3_threads.a libfftw3.a
@@ -50,7 +51,6 @@ gfortran -Og -g -fbacktrace -static-libgcc -o sniffer.x sniffer.o -L. libtinker.
 gfortran -Og -g -fbacktrace -static-libgcc -o spacefill.x spacefill.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o spectrum.x spectrum.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o superpose.x superpose.o -L. libtinker.a libfftw3_threads.a libfftw3.a
-gfortran -Og -g -fbacktrace -static-libgcc -o sybylxyz.x sybylxyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o testgrad.x testgrad.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o testhess.x testhess.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o testpair.x testpair.o -L. libtinker.a libfftw3_threads.a libfftw3.a
@@ -67,5 +67,5 @@ gfortran -Og -g -fbacktrace -static-libgcc -o xtalfit.x xtalfit.o -L. libtinker.
 gfortran -Og -g -fbacktrace -static-libgcc -o xtalmin.x xtalmin.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o xyzedit.x xyzedit.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o xyzint.x xyzint.o -L. libtinker.a libfftw3_threads.a libfftw3.a
+gfortran -Og -g -fbacktrace -static-libgcc -o xyzmol2.x xyzmol2.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o xyzpdb.x xyzpdb.o -L. libtinker.a libfftw3_threads.a libfftw3.a
-gfortran -Og -g -fbacktrace -static-libgcc -o xyzsybyl.x xyzsybyl.o -L. libtinker.a libfftw3_threads.a libfftw3.a

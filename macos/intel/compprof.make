@@ -420,6 +420,7 @@ ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp merge
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp minimize.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp minirot.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp minrigid.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp mol2xyz.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp molecule.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp molxyz.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp moments.f
@@ -513,7 +514,6 @@ ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp super
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp surface.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp surfatom.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp switch.f
-ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp sybylxyz.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp temper.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp testgrad.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp testhess.f
@@ -541,6 +541,6 @@ ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xtalm
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xyzatm.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xyzedit.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xyzint.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xyzmol2.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xyzpdb.f
-ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp xyzsybyl.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp zatom.f

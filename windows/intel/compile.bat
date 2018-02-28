@@ -421,6 +421,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp merge.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp minimize.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp minirot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp minrigid.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp mol2xyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp molecule.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp molxyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp moments.f
@@ -514,7 +515,6 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp superpose.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp surface.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp surfatom.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp switch.f
-ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sybylxyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp temper.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testgrad.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testhess.f
@@ -542,6 +542,6 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xtalmin.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xyzatm.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xyzedit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xyzint.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xyzmol2.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xyzpdb.f
-ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp xyzsybyl.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp zatom.f
