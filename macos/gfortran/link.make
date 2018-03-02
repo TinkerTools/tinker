@@ -11,8 +11,8 @@
 #  if the -static-libgcc flag is not enforced, then copy static
 #  versions of the main gcc libraries (libgcc.a, libgfortran.a,
 #  libgomp.a and libquadmath.a) into the present build directory;
-#  with Linux, all four libraries must usually be present locally,
-#  while for MacOS, libquadmath.a is the only one usually needed
+#  with Linux, all four libraries must be present locally, while
+#  for MacOS, libquadmath.a is the only one needed
 #
 #
 gfortran -Ofast -fopenmp -static-libgcc -o alchemy.x alchemy.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip alchemy.x

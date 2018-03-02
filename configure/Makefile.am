@@ -386,6 +386,7 @@ libtinker_la_SOURCES = \
 	rattle.f \
 	readdyn.f \
 	readgau.f \
+	readgdma.f \
 	readint.f \
 	readmol.f \
 	readmol2.f \
@@ -487,6 +488,7 @@ bin_PROGRAMS = \
 	minimize \
 	minirot \
 	minrigid \
+	mol2xyz \
 	molxyz \
 	monte \
 	newton \
@@ -512,7 +514,6 @@ bin_PROGRAMS = \
 	spacefill \
 	spectrum \
 	superpose \
-	sybylxyz \
 	testgrad \
 	testhess \
 	testpair \
@@ -529,6 +530,6 @@ bin_PROGRAMS = \
 	xtalmin \
 	xyzedit \
 	xyzint \
-	xyzpdb \
-	xyzsybyl
+	xyzmol2 \
+	xyzpdb
 

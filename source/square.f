@@ -365,15 +365,15 @@ c
             if (abs(xc(j)-xlo(j)) .le. eps) then
                nactive = nactive - 1
                iactive(j) = -1
-c              goto 99
+c              goto 70
             else if (abs(xc(j)-xhi(j)) .le. eps) then
                nactive = nactive - 1
                iactive(j) = 1
-c              goto 99
+c              goto 70
             end if
          end if
       end do
-c  99 continue
+   70 continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
@@ -429,11 +429,11 @@ c     print out information about current iteration
 c
       if (iprint.ne.0 .and. mod(niter,iprint).eq.0) then
          if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
-            write (iout,70)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   70       format (i6,f14.4,2f13.4,2i10)
-         else
             write (iout,80)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   80       format (i6,f14.4,2d13.4,2i10)
+   80       format (i6,f14.4,2f13.4,2i10)
+         else
+            write (iout,90)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
+   90       format (i6,f14.4,2d13.4,2i10)
          end if
       end if
 c
@@ -455,43 +455,43 @@ c     in a true active set strategy, variables are released
 c     one at a time at a minimum of the current active set
 c
 c     if (done) then
-      if (nactive .ne. n) then
-         do j = 1, n
-            if (iactive(j).eq.-1 .and. gc(j).lt.0.0d0) then
-               nactive = nactive + 1
-               iactive(j) = 0
-               done = .false.
-c              goto 99
-            else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
-               nactive = nactive + 1
-               iactive(j) = 0
-               done = .false.
-c              goto 99
-            end if
-         end do
-c  99    continue
-      end if
+         if (nactive .ne. n) then
+            do j = 1, n
+               if (iactive(j).eq.-1 .and. gc(j).lt.0.0d0) then
+                  nactive = nactive + 1
+                  iactive(j) = 0
+                  done = .false.
+c                 goto 100
+               else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
+                  nactive = nactive + 1
+                  iactive(j) = 0
+                  done = .false.
+c                 goto 100
+               end if
+            end do
+  100       continue
+         end if
 c     end if
 c
 c     if still done, then normal termination has been achieved
 c
       if (done) then
-         write (iout,90)
-   90    format (/,' SQUARE  --  Normal Termination of Least Squares')
+         write (iout,110)
+  110    format (/,' SQUARE  --  Normal Termination of Least Squares')
 c
 c     check the limit on the number of iterations
 c
       else if (niter .ge. maxiter) then
          done = .true.
-         write (iout,100)
-  100    format (/,' SQUARE  --  Maximum Number of Allowed Iterations')
+         write (iout,120)
+  120    format (/,' SQUARE  --  Maximum Number of Allowed Iterations')
 c
 c     check for termination due to relative function convergence
 c
       else if (icode .eq. 2) then
          done = .true.
-         write (iout,110)
-  110    format (/,' SQUARE  --  Relative Function Convergence',
+         write (iout,130)
+  130    format (/,' SQUARE  --  Relative Function Convergence',
      &           //,' Both the scaled actual and predicted',
      &              ' reductions in the function',
      &           /,' are less than or equal to the relative',
@@ -501,8 +501,8 @@ c     check for termination due to false convergence
 c
       else if (icode .eq. 3) then
          done = .true.
-         write (iout,120)
-  120    format (/,' SQUARE  --  Possible False Convergence',
+         write (iout,140)
+  140    format (/,' SQUARE  --  Possible False Convergence',
      &           //,' The iterates appear to be converging to',
      &              ' a noncritical point due',
      &           /,' to bad gradient information, discontinuous',
@@ -515,8 +515,8 @@ c
          nbigstp = nbigstp + 1
          if (nbigstp .eq. 5) then
             done = .true.
-            write (iout,130)
-  130       format (/,' SQUARE  --  Five Consecutive Maximum',
+            write (iout,150)
+  150       format (/,' SQUARE  --  Five Consecutive Maximum',
      &                 ' Length Steps',
      &              //,' Either the function is unbounded below,',
      &                 ' or has a finite',
