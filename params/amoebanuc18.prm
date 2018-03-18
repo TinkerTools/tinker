@@ -88,8 +88,14 @@ atom         16    2    C     "Ribose C5'"                   6    12.011    4
 atom         17    5    H     "Ribose H5'"                   1     1.008    1
 atom         19    9    O     "Ribose O5'"                   8    15.999    2
 atom         20    6    H     "Ribose HO'5"                  1     1.008    1
-atom         23   18    O     "Ribose O3'"                   8    15.999    2
-atom         24   19    O     "Ribose O5'"                   8    15.999    2
+atom         23   18    O     "3'-Term Ribose O3'"           8    15.999    2
+atom         24   19    O     "5'-Term Ribose O5'"           8    15.999    2
+atom         36   34    O     "AMOEBA Water O"               8    15.999    2
+atom         37   35    H     "AMOEBA Water H"               1     1.008    1
+atom         41   41    Na+   "Sodium Ion Na+"              11    22.990    0
+atom         42   42    K+    "Potassium Ion K+"            19    39.098    0
+atom         43   43    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
+atom         44   44    Cl-   "Chloride Ion Cl-"            17    35.453    0
 atom         51   60    C     "Deoxyribose C4'"              6    12.011    4
 atom         52   51    C     "Deoxyribose C3'"              6    12.011    4
 atom         53   51    C     "Deoxyribose C2'"              6    12.011    4
@@ -105,14 +111,8 @@ atom         65   56    H     "Deoxyribose HO'3"             1     1.008    1
 atom         66   55    H     "Deoxyribose H5'1"             1     1.008    1
 atom         68   58    O     "Deoxyribose O5'"              8    15.999    2
 atom         69   56    H     "Deoxyribose HO'5"             1     1.008    1
-atom         73   69    O     "Deoxyribose O3'"              8    15.999    2
-atom         74   68    O     "Deoxyribose O5'"              8    15.999    2
-atom         36   34    O     "AMOEBA Water O"               8    15.999    2
-atom         37   35    H     "AMOEBA Water H"               1     1.008    1
-atom         41   41    Na+   "Sodium Ion Na+"              11    22.990    0
-atom         42   42    K+    "Potassium Ion K+"            19    39.098    0
-atom         43   43    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
-atom         44   44    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom         73   69    O     "3'-Term Deoxyribose O3'"      8    15.999    2
+atom         74   68    O     "5'-Term Deoxyribose O5'"      8    15.999    2
 atom        101  101    P     "R-Phosphodiester P"          15    30.974    4
 atom        102  102    O     "R-Phosphodiester OP"          8    15.999    1
 atom        201  219    C     "Guanine C2"                   6    12.011    3
@@ -2185,12 +2185,6 @@ biotype    1113    H3      "Uridine"                         508
 biotype    1114    O4      "Uridine"                         511
 biotype    1115    H5      "Uridine"                         509
 biotype    1116    H6      "Uridine"                         512
-biotype    1230    P       "Phosphodiester RNA"              101
-biotype    1231    OP      "Phosphodiester RNA"              102
-biotype    1232    O5*     "5'-Hydroxyl RNA"                  19
-biotype    1233    H5T     "5'-Hydroxyl RNA"                  20
-biotype    1237    O3*     "3'-Hydroxyl RNA"                  12
-biotype    1238    H3T     "3'-Hydroxyl RNA"                  13
 biotype    1117    O5*     "Deoxyadenosine"                   68
 biotype    1118    C5*     "Deoxyadenosine"                   63
 biotype    1119    H5*     "Deoxyadenosine"                   66
@@ -2304,11 +2298,17 @@ biotype    1226    O4      "Deoxythymidine"                  611
 biotype    1227    C7      "Deoxythymidine"                  601
 biotype    1228    H7      "Deoxythymidine"                  608
 biotype    1229    H6      "Deoxythymidine"                  610
+biotype    1230    P       "Phosphodiester RNA"              101
+biotype    1231    OP      "Phosphodiester RNA"              102
+biotype    1232    O5*     "5'-Hydroxyl RNA"                  24
+biotype    1233    H5T     "5'-Hydroxyl RNA"                  20
+biotype    1237    O3*     "3'-Hydroxyl RNA"                  23
+biotype    1238    H3T     "3'-Hydroxyl RNA"                  13
 biotype    1242    P       "Phosphodiester DNA"              101
 biotype    1243    OP      "Phosphodiester DNA"              102
-biotype    1244    O5*     "5'-Hydroxyl DNA"                  68
+biotype    1244    O5*     "5'-Hydroxyl DNA"                  74
 biotype    1245    H5T     "5'-Hydroxyl DNA"                  69
-biotype    1249    O3*     "3'-Hydroxyl DNA"                  64
+biotype    1249    O3*     "3'-Hydroxyl DNA"                  73
 biotype    1250    H3T     "3'-Hydroxyl DNA"                  65
 biotype    2001    O       "Water"                            36
 biotype    2002    H       "Water"                            37
