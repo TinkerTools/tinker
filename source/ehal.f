@@ -196,7 +196,7 @@ c
                      mutik = .true.
                   end if
 c
-c     get interaction energy, via soft core lambda scaling if necessary
+c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
                      rho = rik / rv
@@ -330,7 +330,7 @@ c
                         mutik = .true.
                      end if
 c
-c     get interaction energy, via soft core lambda scaling if necessary
+c     get interaction energy, via soft core lambda scaling as needed
 c
                      if (mutik) then
                         rho = rik / rv
@@ -617,7 +617,7 @@ c
                      mutik = .true.
                   end if
 c
-c     get interaction energy, via soft core lambda scaling if necessary
+c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
                      rho = rik / rv
@@ -856,7 +856,7 @@ c
                      mutik = .true.
                   end if
 c
-c     get interaction energy, via soft core lambda scaling if necessary
+c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
                      rho = rik / rv

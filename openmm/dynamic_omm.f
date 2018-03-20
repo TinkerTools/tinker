@@ -527,8 +527,9 @@ c
       call set_mplpot_data (m2scale,m3scale,m4scale,m5scale)
       call set_mpole_data (maxpole,npole,ipole,polsiz,pollist,
      &                     zaxis,xaxis,yaxis,pole,rpole,polaxe)
-      call set_mutant_data (nmut,imut,type0,class0,type1,class1,lambda,
-     &                      tlambda,vlambda,elambda,scexp,scalpha,mut)
+      call set_mutant_data (nmut,vcouple,imut,type0,class0,type1,
+     &                      class1,lambda,tlambda,vlambda,elambda,
+     &                      scexp,scalpha,mut)
       call set_nonpol_data (epso,epsh,rmino,rminh,awater,slevy,
      &                      solvprs,surften,spcut,spoff,stcut,
      &                      stoff,rcav,rdisp,cdisp)

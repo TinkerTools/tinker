@@ -460,6 +460,7 @@ struct {
 
 struct {
    int nmut;
+   int vcouple;
    int* imut;
    int* type0;
    int* class0;
@@ -1314,12 +1315,13 @@ void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
    mpole__.polaxe = polaxe;
 }
 
-void set_mutant_data_ (int* nmut, int* imut, int* type0, int* class0,
-                       int* type1, int* class1, double* lambda,
+void set_mutant_data_ (int* nmut, int* vcouple, int* imut, int* type0,
+                       int* class0, int* type1, int* class1, double* lambda,
                        double* tlambda, double* vlambda, double* elambda,
                        double* scexp, double* scalpha, int* mut) {
 
    mutant__.nmut = *nmut;
+   mutant__.vcouple = *vcouple;
    mutant__.imut = imut;
    mutant__.type0 = type0;
    mutant__.class0 = class0;

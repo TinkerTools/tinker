@@ -5,18 +5,18 @@ c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  program prtmol2  --  output of Sybyl MOL2 coordinate file  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  program prtmol2  --  output Tripos MOL2 coordinate file  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "prtmol2" writes out a set of coordinates in Sybyl MOL2
+c     "prtmol2" writes out a set of coordinates in Tripos MOL2
 c     format to an external disk file
 c
 c
-      subroutine prtmol2 (isyb)
+      subroutine prtmol2 (imol2)
       use sizes
       use atomid
       use atoms
@@ -26,51 +26,51 @@ c
       use iounit
       use titles
       implicit none
-      integer i,j,k,isyb
+      integer i,j,k,imol2
       integer thousand,hundred
       integer tens,ones
       logical opened
       character*1 digit(0:9)
       character*4 atmtyp,number
       character*7 atmnam
-      character*240 sybylfile
+      character*240 mol2file
       data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
 c
 c     open output unit if not already done
 c
-      inquire (unit=isyb,opened=opened)
+      inquire (unit=imol2,opened=opened)
       if (.not. opened) then
-         sybylfile = filename(1:leng)//'.mol2'
-         call version (sybylfile,'new')
-         open (unit=isyb,file=sybylfile,status='new')
+         mol2file = filename(1:leng)//'.mol2'
+         call version (mol2file,'new')
+         open (unit=imol2,file=mol2file,status='new')
       end if
 c
 c     write the molecule record type indicator
 c
-      write (isyb,10)
+      write (imol2,10)
    10 format ('@<TRIPOS>MOLECULE')
       if (ltitle .eq. 0) then
-         write (isyb,20)
+         write (imol2,20)
    20    format ('****')
       else
-         write (isyb,30)  title(1:ltitle)
+         write (imol2,30)  title(1:ltitle)
    30    format (a)
       end if
-      write (isyb,40)  n,nbond,1
+      write (imol2,40)  n,nbond,1
    40 format (3i8)
-      write (isyb,50)
+      write (imol2,50)
    50 format ('SMALL')
-      write (isyb,60)
+      write (imol2,60)
    60 format ('NO_CHARGES')
 c
 c     write the atom record type indicator
 c
-      write (isyb,70)
+      write (imol2,70)
    70 format (/,'@<TRIPOS>ATOM')
       do i = 1, n
 c
-c     set the Sybyl atom_name for the atom
+c     set the Tripos MOL2 atom_name for the atom
 c
          thousand = i / 1000
          hundred = (i - 1000*thousand) / 100
@@ -100,7 +100,7 @@ c
             if (atmnam(j:j) .eq. '*')  atmnam(j:j) = ' '
          end do
 c
-c     set the Sybyl atom_type for the atom
+c     set the Tripos MOL2 atom_type for the atom
 c
          atmtyp = name(i)//' '
          if (atmtyp .eq. 'C  ') then
@@ -126,25 +126,25 @@ c
          else if (atmtyp .eq. 'Lp ') then
             atmtyp = 'LP  '
          end if
-         write (isyb,80)  i,atmnam,x(i),y(i),z(i),atmtyp
+         write (imol2,80)  i,atmnam,x(i),y(i),z(i),atmtyp
    80    format (i8,3x,a7,2x,3f12.6,3x,a4)
       end do
 c
 c     write the bond record type indicator
 c
-      write (isyb,90)
+      write (imol2,90)
    90 format (/,'@<TRIPOS>BOND')
       do i = 1, nbond
-         write (isyb,100)  i,(ibnd(j,i),j=1,2),1
+         write (imol2,100)  i,(ibnd(j,i),j=1,2),1
   100    format (4i8)
       end do
 c
 c     write the substructure record type indicator
 c
-      write (isyb,110)
+      write (imol2,110)
   110 format (/,'@<TRIPOS>SUBSTRUCTURE')
-      write (isyb,120)  1,'****',1
+      write (imol2,120)  1,'****',1
   120 format (i8,12x,a4,i8)
-      if (.not. opened)  close (unit=isyb)
+      if (.not. opened)  close (unit=imol2)
       return
       end
