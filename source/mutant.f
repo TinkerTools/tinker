@@ -13,6 +13,7 @@ c     ###############################################################
 c
 c
 c     nmut       number of atoms mutated from initial to final state
+c     vcouple    van der Waals lambda type (0=decouple, 1=annihilate)
 c     imut       atomic sites differing in initial and final state
 c     type0      atom type of each atom in the initial state system
 c     class0     atom class of each atom in the initial state system
@@ -30,6 +31,7 @@ c
       module mutant
       implicit none
       integer nmut
+      integer vcouple
       integer, allocatable :: imut(:)
       integer, allocatable :: type0(:)
       integer, allocatable :: class0(:)

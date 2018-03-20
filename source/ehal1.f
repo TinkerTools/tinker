@@ -106,7 +106,7 @@ c
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -213,11 +213,18 @@ c
                   end if
                   eps = eps * vscale(k)
 c
-c     get the energy and gradient, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-c                 if ((muti .and. .not.mutk) .or.
-c    &                (mutk .and. .not.muti)) then
-                  if (muti .or. mutk) then
+                  mutik = .false.
+                  if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                   .and.vcouple.eq.0)) then
+                     mutik = .true.
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling if necessary
+c
+                  if (mutik) then
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -417,11 +424,18 @@ c
                         end if
                      end if
 c
-c     get the energy and gradient, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-c                    if ((muti .and. .not.mutk) .or.
-c    &                   (mutk .and. .not.muti)) then
-                     if (muti .or. mutk) then
+                     mutik = .false.
+                     if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                   (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                      .and.vcouple.eq.0)) then
+                        mutik = .true.
+                     end if
+c
+c     get interaction energy, via soft core lambda scaling if necessary
+c
+                     if (mutik) then
                         rho = rik / rv
                         rho6 = rho**6
                         rho7 = rho6 * rho
@@ -629,7 +643,7 @@ c
       real*8, allocatable :: zsort(:)
       logical proceed,usei,prime
       logical unique,repeat
-      logical muti,mutk
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -793,11 +807,18 @@ c
                      eps = eps * vscale(k)
                   end if
 c
-c     get the energy and gradient, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-c                 if ((muti .and. .not.mutk) .or.
-c    &                (mutk .and. .not.muti)) then
-                  if (muti .or. mutk) then
+                  mutik = .false.
+                  if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                   .and.vcouple.eq.0)) then
+                     mutik = .true.
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling if necessary
+c
+                  if (mutik) then
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -1004,7 +1025,7 @@ c
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -1121,11 +1142,18 @@ c
                   end if
                   eps = eps * vscale(k)
 c
-c     get the energy and gradient, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-c                 if ((muti .and. .not.mutk) .or.
-c    &                (mutk .and. .not.muti)) then
-                  if (muti .or. mutk) then
+                  mutik = .false.
+                  if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                   .and.vcouple.eq.0)) then
+                     mutik = .true.
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling if necessary
+c
+                  if (mutik) then
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho

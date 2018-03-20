@@ -63,8 +63,9 @@ c
       vlambda = 1.0d0
       elambda = 1.0d0
 c
-c     set defaults for soft core vdw and rotatable torsions
+c     set defaults for vdw coupling type and soft core vdw
 c
+      vcouple = 0
       scexp = 5.0d0
       scalpha = 0.7d0
 c
@@ -99,6 +100,10 @@ c
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
+         else if (keyword(1:11) .eq. 'VDW-COUPLE ') then
+            string = record(next:240)
+            read (string,*,err=30)  vcouple
+            if (vcouple .ne. 1)  vcouple = 0
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
             read (string,*,err=30)  ihyb,it0,it1
