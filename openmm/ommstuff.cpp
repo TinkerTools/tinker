@@ -23,12 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <iostream>
-#include <fstream>
 
-#define MAX_CUDA_DEVICES 17
-
-using namespace std;
+const int MAX_STRING = 240;
 
 /*
  *    ############################################################
@@ -105,7 +101,7 @@ struct {
    double qopd;
    double popd;
    double sopd;
-   char opbtyp[9];
+   char opbtyp[MAX_STRING];
    char* angtyp;
 } angpot__;
 
@@ -153,9 +149,9 @@ struct {
    int isothermal;
    int isobaric;
    int anisotrop;
-   char volscale[9];
-   char barostat[11];
-   char thermostat[11];
+   char volscale[MAX_STRING];
+   char barostat[MAX_STRING];
+   char thermostat[MAX_STRING];
 } bath__;
 
 struct {
@@ -167,7 +163,7 @@ struct {
    double cbnd;
    double qbnd;
    double bndunit;
-   char bndtyp[9];
+   char bndtyp[MAX_STRING];
 } bndpot__;
 
 struct {
@@ -209,7 +205,7 @@ struct {
    int monoclinic;
    int triclinic;
    int octahedron;
-   char spacegrp[11];
+   char spacegrp[MAX_STRING];
 } boxes__;
 
 struct {
@@ -314,7 +310,7 @@ struct {
 
 struct {
    double aewald;
-   char boundary[7];
+   char boundary[MAX_STRING];
 } ewald__;
 
 struct {
@@ -419,7 +415,7 @@ struct {
    int velsave;
    int frcsave;
    int uindsave;
-   char integrate[11];
+   char integrate[MAX_STRING];
 } mdstuf__;
 
 struct {
@@ -498,6 +494,13 @@ struct {
    int* iopb;
    double* opbk;
 } opbend__;
+
+struct {
+   void* ommHandle;
+   char cudaPrecision[MAX_STRING];
+   char ommPlatform[MAX_STRING];
+   char cudaDevice[MAX_STRING];
+} openmm__;
 
 struct {
    int npitors;
@@ -582,7 +585,7 @@ struct {
    double u3scale;
    double u4scale;
    double udiag;
-   char poltyp[6];
+   char poltyp[MAX_STRING];
 } polpot__;
 
 struct {
@@ -678,8 +681,8 @@ struct {
    double* wace;
    double* s2ace;
    double* uace;
-   char solvtyp[8];
-   char borntyp[8];
+   char solvtyp[MAX_STRING];
+   char borntyp[MAX_STRING];
 } solute__;
 
 struct {
@@ -791,13 +794,13 @@ struct {
    double v4scale;
    double v5scale;
    int use_vcorr;
-   char vdwindex[5];
-   char radtyp[5];
-   char radsiz[8];
-   char gausstyp[8];
-   char radrule[10];
-   char epsrule[10];
-   char vdwtyp[13];
+   char vdwindex[MAX_STRING];
+   char radtyp[MAX_STRING];
+   char radsiz[MAX_STRING];
+   char gausstyp[MAX_STRING];
+   char radrule[MAX_STRING];
+   char epsrule[MAX_STRING];
+   char vdwtyp[MAX_STRING];
 } vdwpot__;
 
 static void setNullTerminator (char* string, int maxLength, char* buffer) {
@@ -1366,6 +1369,15 @@ void set_opbend_data_ (int* nopbend, int* iopb, double* opbk) {
    opbend__.opbk = opbk;
 }
 
+void set_openmm_data_ (void** ommHandle, char* cudaPrecision,
+                      char* ommPlatform, char* cudaDevice) {
+
+   openmm__.ommHandle = *ommHandle;
+   setNullTerminator (cudaPrecision, 6, openmm__.cudaPrecision);
+   setNullTerminator (ommPlatform, 9, openmm__.ommPlatform);
+   setNullTerminator (cudaDevice, 16, openmm__.cudaDevice);
+}
+
 void set_pitors_data_ (int* npitors, int* ipit, double* kpit) {
 
    pitors__.npitors = *npitors;
@@ -1743,28 +1755,6 @@ void set_vdwpot_data_ (int* maxgauss, int* ngauss, double* igauss,
    setNullTerminator (radrule, 10, vdwpot__.radrule);
    setNullTerminator (epsrule, 10, vdwpot__.epsrule);
    setNullTerminator (vdwtyp, 13, vdwpot__.vdwtyp);
-}
-
-/*
- *    ############################################################
- *              Find Available CUDA-Enabled GPU Devices
- *    ############################################################
- */
-
-static char cudaDevices[MAX_CUDA_DEVICES];
-
-void set_cuda_devices_ (char* devices) {
-
-   for (int i = 0; i < MAX_CUDA_DEVICES; ++i) {
-      if (devices[i] == ' ') {
-         cudaDevices[i] = '\0';
-         break;
-      } else if ((devices[i] < '0' || devices[i] > '9') && devices[i] != ',') {
-         cudaDevices[0] = '\0';
-         break;
-      }
-      cudaDevices[i] = devices[i];
-   }
 }
 
 }
@@ -2801,6 +2791,14 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
    setNullTerminator (vdwpot__.vdwtyp, 13, buffer);
    OpenMM_AmoebaVdwForce_setFunctionalForm (amoebaVdwForce, buffer);
 
+   if (mutant__.vcouple == OpenMM_AmoebaVdwForce_Decouple) {
+      OpenMM_AmoebaVdwForce_setCoupleMethod (amoebaVdwForce,
+                                       OpenMM_AmoebaVdwForce_Decouple);
+   } else {
+      OpenMM_AmoebaVdwForce_setCoupleMethod (amoebaVdwForce,
+                                       OpenMM_AmoebaVdwForce_Annihilate);
+   }
+
    OpenMM_AmoebaVdwForce_setCutoffDistance (amoebaVdwForce,
                                     limits__.vdwcut*OpenMM_NmPerAngstrom);
 
@@ -3718,8 +3716,8 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       return platform;
    }
 
-   if (cudaDevices[0] != '\0') {
-      deviceId = cudaDevices;
+   if (openmm__.cudaDevice[0] != 0) {
+      deviceId = &openmm__.cudaDevice[0];
       device_key = true;
    } else {
       device_number = findBestCUDACard();
@@ -3730,9 +3728,6 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
          sprintf(deviceId, "%d", device_number);
       }
    }
-
-   //deviceId = "0,1";
-   //fprintf (log, "\n Value of deviceId is %s \n", deviceId);
 
    if (device_key) {
       OpenMM_Platform_setPropertyDefaultValue (platform, "CudaDeviceIndex",

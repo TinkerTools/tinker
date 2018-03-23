@@ -287,10 +287,6 @@ c
          deallocate (derivs)
       end if
 c
-c     get a list of the available CUDA-capable GPU cards
-c
-      call set_cuda_devices (cudaDevice)
-c
 c     map Tinker data structures to OpenMM wrapper structures
 c
       call openmm_data ()

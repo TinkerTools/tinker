@@ -17,6 +17,7 @@ c     from the Tinker interface into the OpenMM library
 c
 c
       subroutine kopenmm
+      use ascii
       use keys
       use openmm
       implicit none
@@ -31,6 +32,7 @@ c     initialize the OpenMM platform, CUDA device and precision
 c
       ommPlatform = 'CUDA     '
       cudaDevice = '                '
+      cudaDevice(1:1) = char(null)
       cudaPrecision = 'MIXED '
 c
 c     get the CUDA device setting from an environmental variable
@@ -42,11 +44,7 @@ c
          call getenv ('CUDA_DEVICE',record)
          if (record(1:1) .ne. ' ')  found = .true.
       end if
-      if (.not. found) then
-         cudaDevice = '0               '
-      else
-         cudaDevice = record(1:16)
-      end if
+      if (found)  cudaDevice = record(1:16)
 c
 c     check for keywords containing any altered parameters
 c

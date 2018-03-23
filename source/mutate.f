@@ -100,10 +100,8 @@ c
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
-         else if (keyword(1:11) .eq. 'VDW-COUPLE ') then
-            string = record(next:240)
-            read (string,*,err=30)  vcouple
-            if (vcouple .ne. 1)  vcouple = 0
+         else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
+            vcouple = 1
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
             read (string,*,err=30)  ihyb,it0,it1

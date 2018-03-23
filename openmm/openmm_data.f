@@ -46,6 +46,7 @@ c
       use mutant
       use nonpol
       use opbend
+      use openmm
       use pitors
       use pme
       use polar
@@ -133,6 +134,8 @@ c
      &                      solvprs,surften,spcut,spoff,stcut,
      &                      stoff,rcav,rdisp,cdisp)
       call set_opbend_data (nopbend,iopb,opbk)
+      call set_openmm_data (ommHandle,cudaPrecision,
+     &                      ommPlatform,cudaDevice)
       call set_pitors_data (npitors,ipit,kpit)
       call set_pme_data (nfft1,nfft2,nfft3,bsorder,igrid,bsmod1,
      &                   bsmod2,bsmod3,bsbuild,thetai1,thetai2,
