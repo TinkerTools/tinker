@@ -4366,8 +4366,13 @@ void openmm_update_ (void** omm, double* dt, int* istep,
       (void) fflush (stderr);
    }
 
-
    // make calls to mdstat and/or mdsave if flags are set
+   //
+   // note: call to "bounds" below enforces periodic boundaries on output
+   // coordinates as in canonical Tinker, but can break center-of-mass
+   // restraints and perhaps other things computed via OpenMM, so it is
+   // advised to allow the molecules to diffuse out of the periodic box,
+   // and then "wrap" the MD trajectory after the simulation if desired
 
    if (*callMdStat || *callMdSave) {
       double eksum, temp, pres;
@@ -4382,7 +4387,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
          mdstat_ (istep,dt,&totalEnergy,&potentialEnergy,&eksum,&temp,&pres);
       }
       if (*callMdSave) {
-         bounds_ ();
+         // bounds_ ();
          mdsave_ (istep,dt,&potentialEnergy,&eksum);
       }
    }
