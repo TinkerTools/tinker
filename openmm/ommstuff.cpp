@@ -5403,4 +5403,38 @@ int openmm_test_ (void) {
    OpenMM_Integrator_destroy (integrator);
    OpenMM_System_destroy (system);
 }
+
+void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
+   OpenMMData_s* omm = (OpenMMData_s*) (*ommHandle);
+
+   // copy periodic box from Tinker to OpenMM
+   OpenMM_Vec3 aBox;
+   OpenMM_Vec3 bBox;
+   OpenMM_Vec3 cBox;
+   aBox.x = aBox.y = aBox.z = 0.0;
+   bBox.x = bBox.y = bBox.z = 0.0;
+   cBox.x = cBox.y = cBox.z = 0.0;
+   aBox.x = *boxes__.xbox * OpenMM_NmPerAngstrom;
+   bBox.y = *boxes__.ybox * OpenMM_NmPerAngstrom;
+   cBox.z = *boxes__.zbox * OpenMM_NmPerAngstrom;
+   OpenMM_Context_setPeriodicBoxVectors (omm->context, &aBox, &bBox, &cBox);
+
+   // copy coordinates from Tinker to OpenMM
+   // never call OpenMM_Vec3Array_destroy (posInMNm);
+   static OpenMM_Vec3Array* posInNm = OpenMM_Vec3Array_create (atoms__.n);
+   for (int ii = 0; ii < atoms__.n; ++ii) {
+      OpenMM_Vec3 r;
+      r.x = atoms__.x[ii] * OpenMM_NmPerAngstrom;
+      r.y = atoms__.y[ii] * OpenMM_NmPerAngstrom;
+      r.z = atoms__.z[ii] * OpenMM_NmPerAngstrom;
+      OpenMM_Vec3Array_set (posInNm, ii, r);
+   }
+   OpenMM_Context_setPositions (omm->context, posInNm);
+
+   // get OpenMM state
+   int infoMask = 0;
+   infoMask += OpenMM_State_Energy;
+   OpenMM_State* state = OpenMM_Context_getState (omm->context, infoMask, 0);
+   *energyInKcal = OpenMM_State_getPotentialEnergy (state) * OpenMM_KcalPerKJ;
+}
 }

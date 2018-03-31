@@ -171,6 +171,7 @@ OBJS =	action.o \
 	atoms.o \
 	attach.o \
 	bar.o \
+	bar_omm.o \
 	basefile.o \
 	bath.o \
 	beeman.o \
@@ -685,7 +686,7 @@ OBJS =	action.o \
 	zclose.o \
 	zcoord.o
 
-EXEFILES = dynamic_omm.x
+EXEFILES = dynamic_omm.x bar_omm.x
 
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
@@ -712,6 +713,9 @@ listing:
 
 ommstuff.o: ommstuff.cpp
 	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuff.cpp
+
+bar_omm.x: bar_omm.o ommstuff.o libtinker.a
+	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
 
 dynamic_omm.x: dynamic_omm.o ommstuff.o libtinker.a
 	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
@@ -1206,6 +1210,7 @@ libtinker.a: ${OBJS}
 ##  Next Section has Explicit Dependencies on Include Files  ##
 ###############################################################
 
+bar_omm.o: boxes.o files.o inform.o iounit.o keys.o mdstuf.o openmm.o titles.o units.o
 dynamic_omm.o: atoms.o bath.o bndstr.o bound.o boxes.o inform.o iounit.o keys.o mdstuf.o openmm.o openmp.o potent.o sizes.o solute.o stodyn.o usage.o
 gpu_cards.o: $(GPU_USAGE_OBJS)
 kopenmm.o: ascii.o keys.o openmm.o
