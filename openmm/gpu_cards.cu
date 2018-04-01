@@ -46,7 +46,7 @@ int findBestCUDACard() {
    int device_used_mem[nDevices];
 
 
-   printf ("\n Number of CUDA Dards Detected :    %d\n", nDevices);
+   printf ("\n Number of CUDA Devices Detected :    %d\n", nDevices);
 
    // Loop through all the CUDA devices and pick the best one
 
@@ -122,7 +122,7 @@ int findBestCUDACard() {
 #endif
 #ifdef __linux__
       if (NVML_SUCCESS != nvmlInit())
-          printf("Failure to initialize NVML\n");
+          printf("Failure to Initialize NVML\n");
       else {
           nvmlUtilization_t gpuUtil;
           nvmlDevice_t nvmlDevice;
@@ -150,7 +150,7 @@ int findBestCUDACard() {
       // is already running a job
 
       if (verbose) {
-         printf("\n Device Number :  %d\n", i);
+         printf("\n Device Number :    %d\n", i);
          printf("\tDevice Name              %s\n", prop.name);
          if (coresPerMP != 0) {
             printf("\tCUDA Cores               %d\n", MPCount * coresPerMP);
