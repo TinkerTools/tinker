@@ -1074,9 +1074,9 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
 !$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
-!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
-!$OMP& cut2,vlambda,scalpha,scexp,mut,c0,c1,c2,c3,c4,c5,molcule)
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
+!$OMP& off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,cut2,
+!$OMP& vcouple,vlambda,scexp,scalpha,mut,c0,c1,c2,c3,c4,c5,molcule)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,vir,einter)
 !$OMP DO reduction(+:ev,dev,vir,einter) schedule(guided)
 c
