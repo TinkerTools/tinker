@@ -97,7 +97,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(6*ngrp))
 c
-c     transfer rigid body coordinates to optimization parameters
+c     convert rigid body coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, ngrp
@@ -112,7 +112,7 @@ c
       coordtype = 'RIGIDBODY'
       call lbfgs (nvar,xx,minimum,grdmin,minrigid1,optsave)
 c
-c     transfer optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
       nvar = 0
       do i = 1, ngrp
@@ -225,7 +225,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
       nvar = 0
       do i = 1, ngrp
@@ -245,7 +245,7 @@ c
       call gradrgd (e,derivs)
       minrigid1 = e
 c
-c     store rigid body gradient as optimization gradient
+c     convert rigid body gradient to optimization parameters
 c
       nvar = 0
       do i = 1, ngrp

@@ -1,17 +1,17 @@
 
                      #####################################
-                     MAKE Directory for the TINKER Package
+                     MAKE Directory for the Tinker Package
                      #####################################
 
         This subdirectory contains a Unix-style Makefile that can be used
-        to build the TINKER modeling package. The provided file will need
-        modification to point to the local TINKER directory, and for use
+        to build the Tinker modeling package. The provided file will need
+        modification to point to the local Tinker directory, and for use
         with machine and compiler combinations not described near the top
         of the Makefile. A list of the dependencies of source files on
-        each other is generated via the TINKER "document" program by
+        each other is generated via the Tinker "document" program by
         running the "depend.make" script from within the source directory.
 
-        Alternatively, TINKER can be built by running the compile.make,
+        Alternatively, Tinker can be built by running the compile.make,
         library.make and link.make scripts provided in machine specific
-        directories of the TINKER distribution.
+        directories of the Tinker distribution.
 

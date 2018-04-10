@@ -2,7 +2,7 @@
 #
 #  ##############################################################
 #  ##                                                          ##
-#  ##  linkgui.make  --  link the TINKER programs for FFE use  ##
+#  ##  linkgui.make  --  link the Tinker programs for FFE use  ##
 #  ##             (Intel Fortran for Linux Version)            ##
 #  ##                                                          ##
 #  ##############################################################
@@ -30,6 +30,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intxyz
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minimize.x minimize.o libtinker.a libjvm.so ; strip minimize.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minirot.x minirot.o libtinker.a libjvm.so ; strip minirot.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minrigid.x minrigid.o libtinker.a libjvm.so ; strip minrigid.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o mol2xyz.x mol2xyz.o libtinker.a libjvm.so ; strip mol2xyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o molxyz.x molxyz.o libtinker.a libjvm.so ; strip molxyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o monte.x monte.o libtinker.a libjvm.so ; strip monte.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o newton.x newton.o libtinker.a libjvm.so ; strip newton.x
@@ -55,7 +56,6 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o sniffe
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o spacefill.x spacefill.o libtinker.a libjvm.so ; strip spacefill.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o spectrum.x spectrum.o libtinker.a libjvm.so ; strip spectrum.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o superpose.x superpose.o libtinker.a libjvm.so ; strip superpose.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o sybylxyz.x sybylxyz.o libtinker.a libjvm.so ; strip sybylxyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testgrad.x testgrad.o libtinker.a libjvm.so ; strip testgrad.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testhess.x testhess.o libtinker.a libjvm.so ; strip testhess.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testpair.x testpair.o libtinker.a libjvm.so ; strip testpair.x
@@ -72,5 +72,5 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xtalfi
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xtalmin.x xtalmin.o libtinker.a libjvm.so ; strip xtalmin.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzedit.x xyzedit.o libtinker.a libjvm.so ; strip xyzedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzint.x xyzint.o libtinker.a libjvm.so ; strip xyzint.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzmol2.x xyzmol2.o libtinker.a libjvm.so ; strip xyzmol2.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzpdb.x xyzpdb.o libtinker.a libjvm.so ; strip xyzpdb.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzsybyl.x xyzsybyl.o libtinker.a libjvm.so ; strip xyzsybyl.x

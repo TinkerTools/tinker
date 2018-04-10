@@ -1,7 +1,7 @@
 
-                  ---------------------------------------------
-                  Benchmark Results for TINKER 7.0  (June 2014)            
-                  ---------------------------------------------
+                  #############################################
+                  Benchmark Results for Tinker 7.0  (June 2014)            
+                  #############################################
 
  Benchmark #1: Calmodulin Energy Evaluation (Serial)
 
@@ -251,7 +251,7 @@
  iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8     823.9 (3.88)
 
  ----------------------
- Times are reported in seconds and are measured with TINKER Version 7.0,
+ Times are reported in seconds and are measured with Tinker Version 7.0,
  dimensioned to MAXATM=1000000. Each benchmark ran twice in rapid succession
  on an unloaded machine, and times shown are the best from the two runs. The
  first five benchmarks are run in serial with a single thread, while the last

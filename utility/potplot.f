@@ -12,7 +12,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "potplot" reads a TINKER electrostatic potential grid file
+c     "potplot" reads a Tinker electrostatic potential grid file
 c     and generates an atomic coordinates file for display in FFE
 c
 c

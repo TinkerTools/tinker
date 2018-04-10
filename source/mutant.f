@@ -13,12 +13,14 @@ c     ###############################################################
 c
 c
 c     nmut       number of atoms mutated from initial to final state
+c     vcouple    van der Waals lambda type (0=decouple, 1=annihilate)
 c     imut       atomic sites differing in initial and final state
 c     type0      atom type of each atom in the initial state system
 c     class0     atom class of each atom in the initial state system
 c     type1      atom type of each atom in the final state system
 c     class1     atom class of each atom in the final state system
 c     lambda     generic weighting between initial and final states
+c     tlambda    state weighting value for torsional potential
 c     vlambda    state weighting value for van der Waals potentials
 c     elambda    state weighting value for electrostatic potentials
 c     scexp      scale factor for soft core buffered 14-7 potential
@@ -29,12 +31,14 @@ c
       module mutant
       implicit none
       integer nmut
+      integer vcouple
       integer, allocatable :: imut(:)
       integer, allocatable :: type0(:)
       integer, allocatable :: class0(:)
       integer, allocatable :: type1(:)
       integer, allocatable :: class1(:)
       real*8 lambda
+      real*8 tlambda
       real*8 vlambda
       real*8 elambda
       real*8 scexp

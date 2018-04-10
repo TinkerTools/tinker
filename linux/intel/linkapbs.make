@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  linkapbs.make  --  link the TINKER programs with APBS  ##
+#  ##  linkapbs.make  --  link the Tinker programs with APBS  ##
 #  ##            (Intel Fortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################
@@ -31,6 +31,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intxyz
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minimize.x minimize.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip minimize.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minirot.x minirot.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip minirot.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minrigid.x minrigid.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip minrigid.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o mol2xyz.x mol2xyz.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip mol2xyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o molxyz.x molxyz.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip molxyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o monte.x monte.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip monte.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o newton.x newton.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip newton.x
@@ -56,7 +57,6 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o sniffe
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o spacefill.x spacefill.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip spacefill.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o spectrum.x spectrum.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip spectrum.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o superpose.x superpose.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip superpose.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o sybylxyz.x sybylxyz.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip sybylxyz.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testgrad.x testgrad.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip testgrad.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testhess.x testhess.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip testhess.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testpair.x testpair.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip testpair.x
@@ -73,5 +73,5 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xtalfi
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xtalmin.x xtalmin.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip xtalmin.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzedit.x xyzedit.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip xyzedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzint.x xyzint.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip xyzint.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzmol2.x xyzmol2.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip xyzmol2.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzpdb.x xyzpdb.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip xyzpdb.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o xyzsybyl.x xyzsybyl.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip xyzsybyl.x

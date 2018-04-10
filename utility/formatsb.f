@@ -13,8 +13,8 @@ c     ################################################################
 c
 c
 c     "formatsb" converts stretch-bend parameters from the previous
-c     TINKER format similar to MM2/MM3 to the more general format
-c     used in TINKER 5.0 and derived from the MMFF formulation
+c     Tinker format similar to MM2/MM3 to the more general format
+c     used in Tinker 5 and later, derived from the MMFF formulation
 c
 c     the old format has a single parameter for each atom class of
 c     the central atom in a bond angle, and three possible force
@@ -26,7 +26,7 @@ c     corresponding to a bond angle, IA-IB-IC, and two separate force
 c     constants used to separately couple the IA-IB and IB-IC bond
 c     length deviations to the bond angle deviation
 c
-c     note executables must be built against a TINKER 4.x or earlier
+c     note executables must be built against a Tinker 4 or earlier
 c     source tree that implements the old stretch-bend format
 c
 c

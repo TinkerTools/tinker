@@ -108,7 +108,7 @@ c
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical muti,mutk,mutik
       logical header,huge
       character*6 mode
 c
@@ -224,10 +224,18 @@ c
                   end if
                   eps = eps * vscale(k)
 c
-c     get the interaction energy, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+                  mutik = .false.
+                  if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                   .and.vcouple.eq.0)) then
+                     mutik = .true.
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
                      scal = scalpha * (1.0d0-vlambda)**2
@@ -383,10 +391,18 @@ c
                         end if
                      end if
 c
-c     get the interaction energy, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-                     if ((muti .and. .not.mutk) .or.
-     &                   (mutk .and. .not.muti)) then
+                     mutik = .false.
+                     if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                   (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                      .and.vcouple.eq.0)) then
+                        mutik = .true.
+                     end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                     if (mutik) then
                         rho = rik / rv
                         eps = eps * vlambda**scexp
                         scal = scalpha * (1.0d0-vlambda)**2
@@ -546,7 +562,7 @@ c
       real*8, allocatable :: zsort(:)
       logical proceed,usei,prime
       logical unique,repeat
-      logical muti,mutk
+      logical muti,mutk,mutik
       logical header,huge
       character*6 mode
 c
@@ -719,10 +735,18 @@ c
                      eps = eps * vscale(k)
                   end if
 c
-c     get the interaction energy, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+                  mutik = .false.
+                  if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                   .and.vcouple.eq.0)) then
+                     mutik = .true.
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
                      scal = scalpha * (1.0d0-vlambda)**2
@@ -887,7 +911,7 @@ c
       real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical muti,mutk,mutik
       logical header,huge
       character*6 mode
 c
@@ -947,9 +971,9 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
 !$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
-!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
-!$OMP& vlambda,scalpha,scexp,mut,cut2,c0,c1,c2,c3,c4,c5,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
+!$OMP& off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,
+!$OMP& vcouple,vlambda,scexp,scalpha,mut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,einter,nev,aev)
 !$OMP DO reduction(+:ev,einter,nev,aev) schedule(guided)
@@ -1014,10 +1038,18 @@ c
                   end if
                   eps = eps * vscale(k)
 c
-c     get the interaction energy, via soft core if necessary
+c     set use of lambda scaling for vdw decoupling or annihilation
 c
-                  if ((muti .and. .not.mutk) .or.
-     &                (mutk .and. .not.muti)) then
+                  mutik = .false.
+                  if (((muti.or.mutk).and.vcouple.eq.1) .or.
+     &                (((.not.muti.and.mutk).or.(.not.mutk.and.muti))
+     &                   .and.vcouple.eq.0)) then
+                     mutik = .true.
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
                      scal = scalpha * (1.0d0-vlambda)**2

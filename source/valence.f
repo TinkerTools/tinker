@@ -74,7 +74,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Valence Parameter Utility Can :',
+   20    format (/,' The Tinker Valence Parameter Utility Can :',
      &           //,4x,'(1) Set Initial Values for Valence Parameters',
      &           /,4x,'(2) Compare QM and MM Vibrational Frequencies',
      &           /,4x,'(3) Force Fit of Parameters to QM Results',
@@ -172,7 +172,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(35*n))
 c
-c     comparison of QM and TINKER structure and frequencies
+c     comparison of QM and Tinker structure and frequencies
 c
       if (dotarget) then
          if (.not. dofit) then
@@ -280,7 +280,7 @@ c
       character*16 ptt
 c
 c
-c     check the number of atoms in QM output and TINKER xyz file
+c     check the number of atoms in QM output and Tinker xyz file
 c
       if (n .ne. ngatom) then
          write (iout,10)
@@ -1976,7 +1976,7 @@ c
          deallocate (xx)
       end if
 c
-c     compute the RMS between QM and TINKER bond lengths
+c     compute the RMS between QM and Tinker bond lengths
 c
       bave = 0.0d0
       brms = 0.0d0
@@ -2015,7 +2015,7 @@ c
          end if
       end if
 c
-c     compute the RMS between QM and TINKER bond angles
+c     compute the RMS between QM and Tinker bond angles
 c
       aave = 0.0d0
       arms = 0.0d0
@@ -2075,7 +2075,7 @@ c
          end if
       end if
 c
-c     compute the RMS between QM and TINKER torsion angles
+c     compute the RMS between QM and Tinker torsion angles
 c
       tave = 0.0d0
       trms = 0.0d0
@@ -2168,7 +2168,7 @@ c
          end if
       end if
 c
-c     compute the RMS between QM and TINKER gradient components
+c     compute the RMS between QM and Tinker gradient components
 c
       gave = 0.0d0
       grms = 0.0d0
@@ -2219,7 +2219,7 @@ c
       hesscut = 0.0d0
       call hessian (h,hinit,hstop,hindex,hdiag)
 c
-c     compute the RMS between QM and TINKER Hessian elements
+c     compute the RMS between QM and Tinker Hessian elements
 c
       have = 0.0d0
       hrms = 0.0d0
@@ -2295,7 +2295,7 @@ c
          eigen(i) = factor * sign(1.0d0,eigen(i)) * sqrt(abs(eigen(i)))
       end do
 c
-c     compute the RMS between QM and TINKER vibrational frequencies
+c     compute the RMS between QM and Tinker vibrational frequencies
 c
       fcut = 800.0d0
       if (fit_tors)  fcut = 200.0d0
@@ -2386,7 +2386,7 @@ c
       analytic = .true.
       eps = 0.00001d0
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -2414,7 +2414,7 @@ c
       end if
       minimiz1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n

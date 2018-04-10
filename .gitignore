@@ -1,8 +1,9 @@
 *.swp
 apbs
 bin
-build
-expt
+doc/announce
+doc/mechanic
+doc/word
 lib
 listing
 mscale

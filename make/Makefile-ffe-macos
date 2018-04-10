@@ -1,13 +1,13 @@
 ##
 ###################################################################
 ##                                                               ##
-##  Makefile for Building the TINKER Molecular Modeling Package  ##
+##  Makefile for Building the Tinker Molecular Modeling Package  ##
 ##                                                               ##
 ###################################################################
 ##
 ##  Invocation Options:
 ##
-##   1. make all              Build all the TINKER executables
+##   1. make all              Build all the Tinker executables
 ##   2. make install          Move the executables to BINDIR
 ##   3. make create_links     Create soft links in LINKDIR
 ##   4. make remove_links     Remove soft links from LINKDIR
@@ -18,7 +18,7 @@
 ##  and Jochen Buehler of the University of Konstanz, January 1998.
 ##  Modifications by Reece Hart & Jay Ponder, Washington University
 ##
-##  Building TINKER from source requires libraries from the FFTW
+##  Building Tinker from source requires libraries from the FFTW
 ##  Fast Fourier Transform package and (optionally) APBS Poisson-
 ##  Boltzmann solver. These libraries are assumed to already be
 ##  present, and are not built by this Makefile
@@ -30,17 +30,17 @@
 ###################################################################
 
 ##  BUILDDIR        Top-Level Directory for Building
-##  TINKERDIR       TINKER Top-Level Directory
-##  TINKER_LIBDIR   Libraries needed to build TINKER
-##  BINDIR          Directory with TINKER Executables
-##  LINKDIR         Linked Copies of TINKER Executables
+##  TINKERDIR       Tinker Top-Level Directory
+##  TINKER_LIBDIR   Libraries needed to build Tinker
+##  BINDIR          Directory with Tinker Executables
+##  LINKDIR         Linked Copies of Tinker Executables
 ##  FFTWDIR         FFTW Top-Level Directory
 ##  FFTW_LIBDIR     Directory with FFTW Libraries
-##  FFTW_LIBS       FFTW Libraries needed to build TINKER
+##  FFTW_LIBS       FFTW Libraries needed to build Tinker
 ##  APBSDIR         APBS Top-Level Directory
 ##  APBS_INCDIR     Directory with APBS Include Files
 ##  APBS_LIBDIR     Directory with APBS Libraries
-##  APBS_LIBS       APBS Libraries needed to build TINKER
+##  APBS_LIBS       APBS Libraries needed to build Tinker
 ##  FFEDIR          FFE Top-Level Directory
 ##  JAVA_INCDIR     Directories with Java Include Files
 
@@ -65,7 +65,7 @@ FFEDIR = $(BUILDDIR)/ffe
 ##  For MacOS Only
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 
-##  For Linux Only
+##  For Linux Only (Ubuntu, Java 8)
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I/usr/lib/jvm/java-8-oracle/include \
 #		-I/usr/lib/jvm/java-8-oracle/include/linux \
@@ -73,7 +73,15 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 #JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
 #JAVA_LIBS = -ljvm
 
-##  For Windows Only
+##  For Linux Only (RHEL & CentOS)
+JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+		-I/usr/java/default/include \
+		-I/usr/java/default/include/linux \
+		-I/usr/java/default/lib/amd64/server
+JAVA_LIBDIR = -L/usr/java/default/jre/lib/amd64/server
+JAVA_LIBS = -ljvm
+
+##  For Windows Only (Windows 10, JDK 1.8.0_112)
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
 #		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
@@ -88,8 +96,8 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 
 ##  Build:    TINKER
 ##  OS Type:  Generic Linux
-##  CPU Type: Intel x86 Compatible (also AMD)
-##  Compiler: GNU gfortran 6.2
+##  CPU Type: Intel x86 Compatible
+##  Compiler: GNU gfortran 6.3
 ##  Parallel: OpenMP
 
 #CC = gcc
@@ -107,7 +115,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 ##  Build:    TINKER
 ##  OS Type:  Apple MacOS
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 6.2
+##  Compiler: GNU gfortran 7.1
 ##  Parallel: OpenMP
 
 CC = gcc
@@ -126,7 +134,7 @@ RENAME = rename_bin
 ##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 5.4
+##  Compiler:  MinGW GNU gfortran 6.4
 ##  Parallel:  OpenMP
 
 #CC = gcc
@@ -392,6 +400,7 @@ OBJS =	action.o \
 	freeze.o \
 	gda.o \
 	geometry.o \
+	getarc.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -515,6 +524,7 @@ OBJS =	action.o \
 	minimize.o \
 	minirot.o \
 	minrigid.o \
+	mol2xyz.o \
 	molcul.o \
 	moldyn.o \
 	molecule.o \
@@ -607,6 +617,7 @@ OBJS =	action.o \
 	rattle.o \
 	readdyn.o \
 	readgau.o \
+	readgdma.o \
 	readint.o \
 	readmol.o \
 	readmol2.o \
@@ -658,7 +669,6 @@ OBJS =	action.o \
 	surface.o \
 	surfatom.o \
 	switch.o \
-	sybylxyz.o \
 	syntrn.o \
 	tarray.o \
 	temper.o \
@@ -706,8 +716,8 @@ OBJS =	action.o \
 	xyzatm.o \
 	xyzedit.o \
 	xyzint.o \
+	xyzmol2.o \
 	xyzpdb.o \
-	xyzsybyl.o \
 	zatom.o \
 	zclose.o \
 	zcoord.o
@@ -729,6 +739,7 @@ EXEFILES = alchemy.x \
 	    minimize.x \
 	    minirot.x \
 	    minrigid.x \
+	    mol2xyz.x \
 	    molxyz.x \
 	    monte.x \
 	    newton.x \
@@ -754,7 +765,6 @@ EXEFILES = alchemy.x \
 	    spacefill.x \
 	    spectrum.x \
 	    superpose.x \
-	    sybylxyz.x \
 	    testgrad.x \
 	    testhess.x \
 	    testpair.x \
@@ -771,8 +781,8 @@ EXEFILES = alchemy.x \
 	    xtalmin.x \
 	    xyzedit.x \
 	    xyzint.x \
-	    xyzpdb.x \
-	    xyzsybyl.x
+	    xyzmol2.x \
+	    xyzpdb.x
 
 %.o: %.c
 	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${APBS_INCDIR} ${OPTFLAGS} $<
@@ -811,6 +821,7 @@ rename_bin:
 	mv  minimize.x   $(BINDIR)/minimize
 	mv  minirot.x    $(BINDIR)/minirot
 	mv  minrigid.x   $(BINDIR)/minrigid
+	mv  mol2xyz.x    $(BINDIR)/mol2xyz
 	mv  molxyz.x     $(BINDIR)/molxyz
 	mv  monte.x      $(BINDIR)/monte
 	mv  newton.x     $(BINDIR)/newton
@@ -836,7 +847,6 @@ rename_bin:
 	mv  spacefill.x  $(BINDIR)/spacefill
 	mv  spectrum.x   $(BINDIR)/spectrum
 	mv  superpose.x  $(BINDIR)/superpose
-	mv  sybylxyz.x   $(BINDIR)/sybylxyz
 	mv  testgrad.x   $(BINDIR)/testgrad
 	mv  testhess.x   $(BINDIR)/testhess
 	mv  testpair.x   $(BINDIR)/testpair
@@ -853,8 +863,8 @@ rename_bin:
 	mv  xtalmin.x    $(BINDIR)/xtalmin
 	mv  xyzedit.x    $(BINDIR)/xyzedit
 	mv  xyzint.x     $(BINDIR)/xyzint
+	mv  xyzmol2.x    $(BINDIR)/xyzmol2
 	mv  xyzpdb.x     $(BINDIR)/xyzpdb
-	mv  xyzsybyl.x   $(BINDIR)/xyzsybyl
 
 rename_exe:
 	mv  alchemy.x    $(BINDIR)/alchemy.exe
@@ -874,6 +884,7 @@ rename_exe:
 	mv  minimize.x   $(BINDIR)/minimize.exe
 	mv  minirot.x    $(BINDIR)/minirot.exe
 	mv  minrigid.x   $(BINDIR)/minrigid.exe
+	mv  mol2xyz.x    $(BINDIR)/mol2xyz.exe
 	mv  molxyz.x     $(BINDIR)/molxyz.exe
 	mv  monte.x      $(BINDIR)/monte.exe
 	mv  newton.x     $(BINDIR)/newton.exe
@@ -899,7 +910,6 @@ rename_exe:
 	mv  spacefill.x  $(BINDIR)/spacefill.exe
 	mv  spectrum.x   $(BINDIR)/spectrum.exe
 	mv  superpose.x  $(BINDIR)/superpose.exe
-	mv  sybylxyz.x   $(BINDIR)/sybylxyz.exe
 	mv  testgrad.x   $(BINDIR)/testgrad.exe
 	mv  testhess.x   $(BINDIR)/testhess.exe
 	mv  testpair.x   $(BINDIR)/testpair.exe
@@ -917,7 +927,7 @@ rename_exe:
 	mv  xyzedit.x    $(BINDIR)/xyzedit.exe
 	mv  xyzint.x     $(BINDIR)/xyzint.exe
 	mv  xyzpdb.x     $(BINDIR)/xyzpdb.exe
-	mv  xyzsybyl.x   $(BINDIR)/xyzsybyl.exe
+	mv  xyzmol2.x    $(BINDIR)/xyzmol2.exe
 
 remove_links:
 	rm -f $(LINKDIR)/alchemy
@@ -937,6 +947,7 @@ remove_links:
 	rm -f $(LINKDIR)/minimize
 	rm -f $(LINKDIR)/minirot
 	rm -f $(LINKDIR)/minrigid
+	rm -f $(LINKDIR)/mol2xyz
 	rm -f $(LINKDIR)/molxyz
 	rm -f $(LINKDIR)/monte
 	rm -f $(LINKDIR)/newton
@@ -962,7 +973,6 @@ remove_links:
 	rm -f $(LINKDIR)/spacefill
 	rm -f $(LINKDIR)/spectrum
 	rm -f $(LINKDIR)/superpose
-	rm -f $(LINKDIR)/sybylxyz
 	rm -f $(LINKDIR)/testgrad
 	rm -f $(LINKDIR)/testhess
 	rm -f $(LINKDIR)/testpair
@@ -979,8 +989,8 @@ remove_links:
 	rm -f $(LINKDIR)/xtalmin
 	rm -f $(LINKDIR)/xyzedit
 	rm -f $(LINKDIR)/xyzint
+	rm -f $(LINKDIR)/xyzmol2
 	rm -f $(LINKDIR)/xyzpdb
-	rm -f $(LINKDIR)/xyzsybyl
 
 create_links:
 	ln -s $(BINDIR)/alchemy    $(LINKDIR)/alchemy
@@ -1000,6 +1010,7 @@ create_links:
 	ln -s $(BINDIR)/minimize   $(LINKDIR)/minimize
 	ln -s $(BINDIR)/minirot    $(LINKDIR)/minirot
 	ln -s $(BINDIR)/minrigid   $(LINKDIR)/minrigid
+	ln -s $(BINDIR)/mol2xyz    $(LINKDIR)/mol2xyz
 	ln -s $(BINDIR)/molxyz     $(LINKDIR)/molxyz
 	ln -s $(BINDIR)/monte      $(LINKDIR)/monte
 	ln -s $(BINDIR)/newton     $(LINKDIR)/newton
@@ -1025,7 +1036,6 @@ create_links:
 	ln -s $(BINDIR)/spacefill  $(LINKDIR)/spacefill
 	ln -s $(BINDIR)/spectrum   $(LINKDIR)/spectrum
 	ln -s $(BINDIR)/superpose  $(LINKDIR)/superpose
-	ln -s $(BINDIR)/sybylxyz   $(LINKDIR)/sybylxyz
 	ln -s $(BINDIR)/testgrad   $(LINKDIR)/testgrad
 	ln -s $(BINDIR)/testhess   $(LINKDIR)/testhess
 	ln -s $(BINDIR)/testpair   $(LINKDIR)/testpair
@@ -1042,8 +1052,8 @@ create_links:
 	ln -s $(BINDIR)/xtalmin    $(LINKDIR)/xtalmin
 	ln -s $(BINDIR)/xyzedit    $(LINKDIR)/xyzedit
 	ln -s $(BINDIR)/xyzint     $(LINKDIR)/xyzint
+	ln -s $(BINDIR)/xyzmol2    $(LINKDIR)/xyzmol2
 	ln -s $(BINDIR)/xyzpdb     $(LINKDIR)/xyzpdb
-	ln -s $(BINDIR)/xyzsybyl   $(LINKDIR)/xyzsybyl
 
 libtinker.a: ${OBJS} 
 	ar ${LIBFLAGS} libtinker.a \
@@ -1243,6 +1253,7 @@ libtinker.a: ${OBJS}
 	freeunit.o \
 	freeze.o \
 	geometry.o \
+	getarc.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -1434,6 +1445,7 @@ libtinker.a: ${OBJS}
 	rattle.o \
 	readdyn.o \
 	readgau.o \
+	readgdma.o \
 	readint.o \
 	readmol.o \
 	readmol2.o \
@@ -1539,7 +1551,7 @@ atmlst.o:
 atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o sizes.o
-bar.o: atoms.o boxes.o files.o inform.o iounit.o keys.o sizes.o titles.o units.o
+bar.o: boxes.o files.o inform.o iounit.o keys.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:
 beeman.o: atomid.o atoms.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o sizes.o units.o usage.o
@@ -1727,6 +1739,7 @@ freeunit.o: iounit.o
 freeze.o:
 gda.o: atoms.o files.o iounit.o minima.o potent.o sizes.o vdwpot.o warp.o
 geometry.o: atoms.o math.o sizes.o
+getarc.o: inform.o iounit.o output.o
 getint.o: atoms.o inform.o iounit.o output.o sizes.o
 getkey.o: argue.o files.o iounit.o keys.o openmp.o
 getmol.o: files.o iounit.o
@@ -1850,18 +1863,19 @@ minima.o:
 minimize.o: atoms.o files.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 minirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
 minrigid.o: files.o group.o inform.o iounit.o keys.o math.o output.o rigid.o sizes.o
+mol2xyz.o: files.o iounit.o titles.o
 molcul.o:
 moldyn.o:
 molecule.o: atomid.o atoms.o couple.o molcul.o sizes.o
 molxyz.o: files.o iounit.o titles.o
 moment.o:
 moments.o: atomid.o atoms.o bound.o charge.o dipole.o limits.o moment.o mpole.o polar.o potent.o rigid.o sizes.o solute.o units.o usage.o
-monte.o: atoms.o files.o inform.o iounit.o omega.o output.o sizes.o units.o usage.o zcoord.o
+monte.o: atoms.o bound.o files.o inform.o iounit.o omega.o output.o sizes.o units.o usage.o zcoord.o
 mplpot.o:
 mpole.o:
 mrecip.o:
 mutant.o:
-mutate.o: atomid.o atoms.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o
+mutate.o: atomid.o atoms.o bndstr.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o sizes.o tors.o
 nblist.o: atoms.o bound.o boxes.o cell.o charge.o iounit.o light.o limits.o mpole.o neigh.o potent.o sizes.o vdw.o
 neigh.o:
 newton.o: atoms.o files.o inform.o iounit.o keys.o sizes.o usage.o
@@ -1908,7 +1922,7 @@ pmestuff.o: atoms.o boxes.o charge.o chunks.o mpole.o pme.o potent.o sizes.o
 pmpb.o: iounit.o
 polar.o:
 polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o units.o
-poledit.o: atomid.o atoms.o couple.o dma.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o units.o
+poledit.o: atomid.o atoms.o couple.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o sizes.o units.o
 polgrp.o:
 polpot.o:
 polymer.o: atoms.o bndstr.o bound.o boxes.o iounit.o keys.o sizes.o
@@ -1942,6 +1956,7 @@ random.o: inform.o iounit.o keys.o math.o
 rattle.o: atomid.o atoms.o freeze.o group.o inform.o iounit.o moldyn.o sizes.o units.o usage.o virial.o
 readdyn.o: atoms.o boxes.o files.o group.o iounit.o mdstuf.o moldyn.o rgddyn.o sizes.o
 readgau.o: ascii.o iounit.o qmstuf.o sizes.o units.o
+readgdma.o: atomid.o atoms.o dma.o files.o iounit.o mpole.o sizes.o units.o
 readint.o: atomid.o atoms.o files.o inform.o iounit.o sizes.o titles.o zclose.o zcoord.o
 readmol.o: atomid.o atoms.o couple.o files.o iounit.o ptable.o sizes.o titles.o
 readmol2.o: atomid.o atoms.o couple.o files.o iounit.o ptable.o sizes.o titles.o
@@ -1982,7 +1997,7 @@ sniffer.o: atoms.o files.o inform.o iounit.o linmin.o math.o minima.o output.o s
 socket.o:
 solute.o:
 sort.o:
-spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o sizes.o usage.o
+spacefill.o: atomid.o atoms.o files.o inform.o iounit.o kvdws.o math.o ptable.o sizes.o usage.o
 spectrum.o: files.o iounit.o math.o units.o
 square.o: inform.o iounit.o keys.o minima.o sizes.o
 stodyn.o:
@@ -1993,7 +2008,6 @@ superpose.o: align.o atomid.o atoms.o bound.o files.o inform.o iounit.o sizes.o 
 surface.o: atoms.o inform.o iounit.o math.o sizes.o usage.o
 surfatom.o: atoms.o iounit.o math.o sizes.o
 switch.o: limits.o nonpol.o shunt.o
-sybylxyz.o: files.o iounit.o titles.o
 syntrn.o:
 tarray.o:
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o sizes.o units.o usage.o
@@ -2039,10 +2053,10 @@ xtalfit.o: atomid.o atoms.o bound.o boxes.o charge.o dipole.o energi.o files.o f
 xtalmin.o: atoms.o boxes.o files.o inform.o iounit.o keys.o math.o scales.o sizes.o
 xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o sizes.o
-xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o math.o molcul.o ptable.o refer.o sizes.o titles.o units.o usage.o
+xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o limits.o linmin.o math.o minima.o molcul.o neigh.o output.o potent.o ptable.o refer.o scales.o sizes.o titles.o units.o usage.o
 xyzint.o: files.o iounit.o titles.o
+xyzmol2.o: files.o iounit.o sizes.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o sizes.o
-xyzsybyl.o: files.o iounit.o sizes.o titles.o
 zatom.o: angbnd.o atomid.o atoms.o bndstr.o fields.o iounit.o kangs.o katoms.o kbonds.o sizes.o zclose.o zcoord.o
 zclose.o: sizes.o
 zcoord.o: sizes.o

@@ -49,7 +49,7 @@ http://mackerell.umaryland.edu/CHARMM_ff_params.html
 
    ######################################################
    ##                                                  ##
-   ##  TINKER Atom Class Numbers to CHARMM Atom Names  ##
+   ##  Tinker Atom Class Numbers to CHARMM Atom Names  ##
    ##                                                  ##
    ##     1  HA      11  CA      21  CY      31  NR3   ##
    ##     2  HP      12  CC      22  CPT     32  NY    ##
@@ -703,12 +703,12 @@ ureybrad      3   31   20      15.00     2.0900
    ##  C-B-A-D instead of D-A-B-C.                                 ##
    ##                                                              ##
    ##  Some of the improper angles are "double counted" in the     ##
-   ##  CHARMM protein parameter set. Since TINKER uses only one    ##
+   ##  CHARMM protein parameter set. Since Tinker uses only one    ##
    ##  improper parameter per site, we have doubled these force    ##
-   ##  constants in the TINKER version of the CHARMM parameters.   ##
+   ##  constants in the Tinker version of the CHARMM parameters.   ##
    ##  Symmetric parameters, which are the origin of the "double   ##
-   ##  counted" CHARMM values, are handled in the TINKER package   ##
-   ##  by assigning all symmetric states and using the TINKER      ##
+   ##  counted" CHARMM values, are handled in the Tinker package   ##
+   ##  by assigning all symmetric states and using the Tinker      ##
    ##  force constant divided by the symmetry number.              ##
    ##                                                              ##
    ##  Below are the original CHARMM improper parameters:          ##
@@ -1408,7 +1408,7 @@ Simple but Accurate Nonbonded Representation", Proteins, 23, 12-31 (1995)
 
    ######################################################
    ##                                                  ##
-   ##  TINKER Atom Class Numbers to CHARMM Atom Names  ##
+   ##  Tinker Atom Class Numbers to CHARMM Atom Names  ##
    ##                                                  ##
    ##    39  HT      46  CM      53  OS      60  MG    ##
    ##    40  HA1     47  CS      54  OM      61  CLA   ##
@@ -1836,7 +1836,7 @@ B. Roux, Editors. Birkhauser, Boston, pages 31-81, 1996
 
    ######################################################
    ##                                                  ##
-   ##  TINKER Atom Class Numbers to CHARMM Atom Names  ##
+   ##  Tinker Atom Class Numbers to CHARMM Atom Names  ##
    ##                                                  ##
    ##    66  HL      70  HEL1    74  CTL3    78  OSL   ##
    ##    67  HAL1    71  CL      75  CTL5    79  OBL   ##

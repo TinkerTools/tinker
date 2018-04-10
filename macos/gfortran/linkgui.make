@@ -2,7 +2,7 @@
 #
 #  ##################################################################
 #  ##                                                              ##
-#  ##  linkgui.make  --  link each of the TINKER programs for FFE  ##
+#  ##  linkgui.make  --  link each of the Tinker programs for FFE  ##
 #  ##               (GNU gfortran for MacOS Version)               ##
 #  ##                                                              ##
 #  ##################################################################
@@ -25,6 +25,7 @@ gfortran -Ofast -fopenmp -static-libgcc -o intxyz.x intxyz.o -L. libtinker.a lib
 gfortran -Ofast -fopenmp -static-libgcc -o minimize.x minimize.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o minirot.x minirot.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o minrigid.x minrigid.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
+gfortran -Ofast -fopenmp -static-libgcc -o mol2xyz.x mol2xyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o molxyz.x molxyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o monte.x monte.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o newton.x newton.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
@@ -49,7 +50,6 @@ gfortran -Ofast -fopenmp -static-libgcc -o sniffer.x sniffer.o -L. libtinker.a l
 gfortran -Ofast -fopenmp -static-libgcc -o spacefill.x spacefill.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o spectrum.x spectrum.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o superpose.x superpose.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
-gfortran -Ofast -fopenmp -static-libgcc -o sybylxyz.x sybylxyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o testgrad.x testgrad.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o testhess.x testhess.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o testpair.x testpair.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
@@ -66,5 +66,5 @@ gfortran -Ofast -fopenmp -static-libgcc -o xtalfit.x xtalfit.o -L. libtinker.a l
 gfortran -Ofast -fopenmp -static-libgcc -o xtalmin.x xtalmin.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o xyzedit.x xyzedit.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o xyzint.x xyzint.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
+gfortran -Ofast -fopenmp -static-libgcc -o xyzmol2.x xyzmol2.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o xyzpdb.x xyzpdb.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
-gfortran -Ofast -fopenmp -static-libgcc -o xyzsybyl.x xyzsybyl.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation

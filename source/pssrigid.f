@@ -173,7 +173,7 @@ c
             deform = deform0 * sigmoid (12.0d0,ratio)
          end if
 c
-c     transfer rigid body coordinates to optimization parameters
+c     convert rigid body coordinates to optimization parameters
 c
          nvar = 0
          do i = 1, ngrp
@@ -188,7 +188,7 @@ c
          iprint = 1
          call ocvm (nvar,xx,minimum,grdmin,pssrgd1,optsave)
 c
-c     transfer optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
          nvar = 0
          do i = 1, ngrp
@@ -262,7 +262,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
       nvar = 0
       do i = 1, ngrp
@@ -282,7 +282,7 @@ c
       call gradrgd (e,derivs)
       pssrgd1 = e
 c
-c     store rigid body gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, ngrp
@@ -622,7 +622,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(6*ngrp))
 c
-c     transfer rigid body coordinates to optimization parameters
+c     convert rigid body coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, ngrp
@@ -642,7 +642,7 @@ c
       verbose = oldverb
       iprint = oldprt
 c
-c     transfer optimization parameters to rigid body coordinates
+c     convert optimization parameters to rigid body coordinates
 c
       nvar = 0
       do i = 1, ngrp

@@ -123,7 +123,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Electrostatic Potential Utility Can :',
+   20    format (/,' The Tinker Electrostatic Potential Utility Can :',
      &           //,4x,'(1) Create an Input File for Gaussian CUBEGEN',
      &           /,4x,'(2) Get QM Potential from a Gaussian CUBE File',
      &           /,4x,'(3) Calculate the Model Potential for a System',
@@ -200,7 +200,7 @@ c
          end do
          close (unit=icub)
 c
-c     write the electrostatic potential to a TINKER POT file
+c     write the electrostatic potential to a Tinker POT file
 c
          potfile = filename(1:leng)
          call suffix (potfile,'pot','new')
@@ -507,7 +507,7 @@ c
      &              ' xxx.cube -5 h < xxx.grid',
      &           //,' See the Gaussian documentation for additional',
      &              ' details;',
-     &           /,' After CUBEGEN, rerun TINKER POTENTIAL using',
+     &           /,' After CUBEGEN, rerun Tinker POTENTIAL using',
      &              ' Option 2')
       end if
 c
@@ -588,6 +588,10 @@ c
          allocate (xx(12*nconf*namax))
          allocate (tmpchg(maxtyp))
          allocate (tmppol(maxtyp))
+c
+c     zero the keyfile length to avoid parameter reprocessing
+c
+         nkey = 0
 c
 c     set parameters, run optimization, get final parameters
 c
@@ -2047,6 +2051,10 @@ c
       character*240 record
 c
 c
+c     reread the contents of any previously existing keyfile
+c
+      call getkey
+c
 c     open a new keyfile to contain the optimized parameters
 c
       ikey = freeunit ()
@@ -2062,6 +2070,10 @@ c
          write (ikey,10)  record(1:size)
    10    format (a)
       end do
+c
+c     zero the keyfile length to avoid parameter reprocessing
+c
+      nkey = 0
 c
 c     output the optimized partial charge values to the keyfile
 c

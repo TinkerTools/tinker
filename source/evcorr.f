@@ -110,7 +110,12 @@ c
             kt = ivt(k)
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
-            fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+c
+c     first line below uses full vdw between ligand atoms, second line
+c     scales intraligand vdw interactions by the lambda value
+c
+c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+            fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
             if (k .eq. i)  fik = 0.5d0 * fik
             rv = radmin(kt,it)
             eps = epsilon(kt,it)
@@ -272,7 +277,12 @@ c
             kt = ivt(k)
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
-            fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+c
+c     first line below uses full vdw between ligand atoms, second line
+c     scales intraligand vdw interactions by the lambda value
+c
+c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+            fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
             if (k .eq. i)  fik = 0.5d0 * fik
             rv = radmin(kt,it)
             eps = epsilon(kt,it)

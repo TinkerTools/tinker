@@ -3,7 +3,7 @@ rem
 rem
 rem  ###############################################################
 rem  ##                                                           ##
-rem  ##  links.bat  --  link each of the TINKER package programs  ##
+rem  ##  links.bat  --  link each of the Tinker package programs  ##
 rem  ##        (Intel Fortran Compiler for Windows Version)       ##
 rem  ##                                                           ##
 rem  ###############################################################
@@ -26,6 +26,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intxyz.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minimize.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minirot.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minrigid.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static mol2xyz.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static molxyz.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static monte.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static newton.obj tinker.lib
@@ -51,7 +52,6 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static sniffer.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static spacefill.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static spectrum.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static superpose.obj tinker.lib
-ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static sybylxyz.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testgrad.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testhess.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testpair.obj tinker.lib
@@ -68,5 +68,5 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xtalfit.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xtalmin.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzedit.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzint.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzmol2.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzpdb.obj tinker.lib
-ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzsybyl.obj tinker.lib

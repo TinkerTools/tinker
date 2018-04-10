@@ -80,7 +80,7 @@ c
          end do
       end do
 c
-c     change some TINKER residue names to match PDB standards
+c     change some Tinker residue names to match PDB standards
 c
       if (rename) then
          do i = 1, npdb

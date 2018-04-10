@@ -17,10 +17,13 @@ c     radii for each element in the periodic table
 c
 c     literature references:
 c
+c     A. Bondi, van der Waals Volumes and Radii, Journal of Physical
+c     Chemistry, 68, 441-451 (1964)
+c
 c     M. Mantina. A. C. Chamberlin, R. Valero, C. J. Cramer and
 c     D. J. Truhlar, "Consistent van der Waals Radii for the Whole
 c     Main Group", Journal of Physical Chemistry A, 113, 5806-5812
-c     (2009)  [extension of 1964 Bondi vdw radii to full main group]
+c     (2009)  [extension of Bondi vdw radii to full main group]
 c
 c     S. S. Batsonov, "Van der Waals Radii of Elements", Inorganic
 c     Materials, 37, 1031-1047 (2001)  [vdw radii for metals]

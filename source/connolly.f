@@ -107,8 +107,8 @@ c
 c
 c     dimensions for arrays used by Connolly routines
 c
-      maxcls = 75 * n
-      maxtt = 40 * n
+      maxcls = 240 * n
+      maxtt = 120 * n
       maxt = 4 * n
       maxp = 4 * n
       maxv = 12 * n
@@ -192,7 +192,7 @@ c
 c
 c     find the analytical volume and surface area
 c
-c     call wiggle
+      call wiggle
       call nearby
       call torus
       call place

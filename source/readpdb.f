@@ -590,7 +590,7 @@ c     ##################################################################
 c
 c
 c     "fixpdb" corrects problems with PDB files by converting residue
-c     and atom names to the standard forms used by TINKER
+c     and atom names to the standard forms used by Tinker
 c
 c
       subroutine fixpdb (resname,atmname)

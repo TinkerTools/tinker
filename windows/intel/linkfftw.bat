@@ -3,7 +3,7 @@ rem
 rem
 rem  ###############################################################
 rem  ##                                                           ##
-rem  ##  links.bat  --  link each of the TINKER package programs  ##
+rem  ##  links.bat  --  link each of the Tinker package programs  ##
 rem  ##            (Intel Fortran for Windows Version)            ##
 rem  ##                                                           ##
 rem  ###############################################################
@@ -26,6 +26,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intxyz.obj tinker.lib lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minimize.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minirot.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minrigid.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static mol2xyz.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static molxyz.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static monte.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static newton.obj tinker.lib libfftw-3.3.lib
@@ -51,7 +52,6 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static sniffer.obj tinker.lib li
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static spacefill.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static spectrum.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static superpose.obj tinker.lib libfftw-3.3.lib
-ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static sybylxyz.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testgrad.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testhess.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testpair.obj tinker.lib libfftw-3.3.lib
@@ -68,5 +68,5 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xtalfit.obj tinker.lib li
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xtalmin.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzedit.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzint.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzmol2.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzpdb.obj tinker.lib libfftw-3.3.lib
-ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static xyzsybyl.obj tinker.lib libfftw-3.3.lib

@@ -1,17 +1,17 @@
 
                    ##########################################
-                   CONFIGURE Directory for the TINKER Package
+                   CONFIGURE Directory for the Tinker Package
                    ##########################################
 
       This directory contains autoconf configure files provided by
       Christoph Junghans as per the email below. They are untested and
-      may need modification or updating for the current TINKER version.
+      may need modification or updating for the current Tinker version.
 
       Hi,
 
       To make the build a bit easier, I have created two files to build
-      TINKER with GNU autotools, just copy Makefile.am and configure.ac
-      to the TINKER source directory and run:
+      Tinker with GNU autotools, just copy Makefile.am and configure.ac
+      to the Tinker source directory and run:
 
       $ autoreconf -i -v
       $ ./configure

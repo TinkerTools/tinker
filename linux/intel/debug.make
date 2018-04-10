@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  debug.make  --  compile the TINKER routines for debugging  ##
+#  ##  debug.make  --  compile the Tinker routines for debugging  ##
 #  ##              (Intel Fortran for Linux Version)              ##
 #  ##                                                             ##
 #  #################################################################
@@ -338,6 +338,7 @@ ifort -c -g -warn all -check all flatten.f
 ifort -c -g -warn all -check all freeunit.f
 ifort -c -g -warn all -check all gda.f
 ifort -c -g -warn all -check all geometry.f
+ifort -c -g -warn all -check all getarc.f
 ifort -c -g -warn all -check all getint.f
 ifort -c -g -warn all -check all getkey.f
 ifort -c -g -warn all -check all getmol.f
@@ -419,6 +420,7 @@ ifort -c -g -warn all -check all merge.f
 ifort -c -g -warn all -check all minimize.f
 ifort -c -g -warn all -check all minirot.f
 ifort -c -g -warn all -check all minrigid.f
+ifort -c -g -warn all -check all mol2xyz.f
 ifort -c -g -warn all -check all molecule.f
 ifort -c -g -warn all -check all molxyz.f
 ifort -c -g -warn all -check all moments.f
@@ -478,6 +480,7 @@ ifort -c -g -warn all -check all random.f
 ifort -c -g -warn all -check all rattle.f
 ifort -c -g -warn all -check all readdyn.f
 ifort -c -g -warn all -check all readgau.f
+ifort -c -g -warn all -check all readgdma.f
 ifort -c -g -warn all -check all readint.f
 ifort -c -g -warn all -check all readmol.f
 ifort -c -g -warn all -check all readmol2.f
@@ -511,7 +514,6 @@ ifort -c -g -warn all -check all superpose.f
 ifort -c -g -warn all -check all surface.f
 ifort -c -g -warn all -check all surfatom.f
 ifort -c -g -warn all -check all switch.f
-ifort -c -g -warn all -check all sybylxyz.f
 ifort -c -g -warn all -check all temper.f
 ifort -c -g -warn all -check all testgrad.f
 ifort -c -g -warn all -check all testhess.f
@@ -539,6 +541,6 @@ ifort -c -g -warn all -check all xtalmin.f
 ifort -c -g -warn all -check all xyzatm.f
 ifort -c -g -warn all -check all xyzedit.f
 ifort -c -g -warn all -check all xyzint.f
+ifort -c -g -warn all -check all xyzmol2.f
 ifort -c -g -warn all -check all xyzpdb.f
-ifort -c -g -warn all -check all xyzsybyl.f
 ifort -c -g -warn all -check all zatom.f

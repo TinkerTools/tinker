@@ -53,17 +53,18 @@ c     present a list of possible archive modifications
 c
       call initial
       write (iout,10)
-   10 format (/,' The TINKER Archive File Utility Can :',
+   10 format (/,' The Tinker Archive File Utility Can :',
      &        //,4x,'(1) Create an Archive from Individual Frames',
      &        /,4x,'(2) Extract Individual Frames from an Archive',
      &        /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
-     &        /,4x,'(4) Unfold Periodic Boundaries for a Trajectory',
-     &        /,4x,'(5) Remove Periodic Box Size from a Trajectory')
+     &        /,4x,'(4) Enforce Periodic Boundaries for a Trajectory',
+     &        /,4x,'(5) Unfold Periodic Boundaries for a Trajectory',
+     &        /,4x,'(6) Remove Periodic Box Size from a Trajectory')
 c
 c     get the desired type of archive file modification
 c
       next = 1
-      nmode = 5
+      nmode = 6
       mode = 0
       call nextarg (answer,exist)
       call getnumb (answer,mode,next)
@@ -81,8 +82,9 @@ c
       if (mode .eq. 1)  modtyp = 'CREATE'
       if (mode .eq. 2)  modtyp = 'EXTRACT'
       if (mode .eq. 3)  modtyp = 'TRIM'
-      if (mode .eq. 4)  modtyp = 'UNFOLD'
-      if (mode .eq. 5)  modtyp = 'UNBOUND'
+      if (mode .eq. 4)  modtyp = 'FOLD'
+      if (mode .eq. 5)  modtyp = 'UNFOLD'
+      if (mode .eq. 6)  modtyp = 'UNBOUND'
 c
 c     get the name to use for the coordinate archive file
 c
@@ -90,12 +92,10 @@ c
       if (.not. exist) then
          if (mode .eq. 1) then
             write (iout,60)
-   60       format (/,' Enter Base Name of the Individual',
-     &                 ' Frames :  ',$)
+   60       format (/,' Enter Base Name of the Individual Frames :  ',$)
          else
             write (iout,70)
-   70       format (/,' Enter Name of the Coordinate Archive',
-     &                 ' File :  ',$)
+   70       format (/,' Enter the Coordinate Archive File Name :  ',$)
          end if
          read (input,80)  arcfile
    80    format (a240)
@@ -115,8 +115,7 @@ c
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
             write (iout,90)
-   90       format (/,' Enter Name of the Coordinate Archive',
-     &                 ' File :  ',$)
+   90       format (/,' Enter the Coordinate Archive File Name :  ',$)
             read (input,100)  arcfile
   100       format (a240)
             call basefile (arcfile)
@@ -339,7 +338,9 @@ c
                do while (i.ge.start .and. i.le.stop)
                   call readxyz (iarc)
                   if (abort)  goto 220
-                  if (modtyp .eq. 'UNFOLD') then
+                  if (modtyp .eq. 'FOLD') then
+                     if (use_bounds)  call bounds
+                  else if (modtyp .eq. 'UNFOLD') then
                      nuse = n
                      do j = 1, n
                         use(j) = .true.
@@ -421,13 +422,13 @@ c
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine prtarc  --  output of a TINKER archive file  ##
+c     ##  subroutine prtarc  --  output of a Tinker archive file  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
 c     "prtarc" writes out a set of Cartesian coordinates for
-c     all active atoms in the TINKER XYZ archive format
+c     all active atoms in the Tinker XYZ archive format
 c
 c
       subroutine prtarc (iarc)

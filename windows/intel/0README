@@ -1,13 +1,17 @@
 
               ###################################################
-              TINKER Notes for Intel Fortran Compiler for Windows
+              Tinker Notes for Intel Fortran Compiler for Windows
               ###################################################
 
-          This subdirectory contains a set of batch files that can
-          be used to build the TINKER program package under Microsoft
-          Windows using the Intel Fortran Compiler for Windows.
+         This subdirectory contains a set of batch files that can
+         be used to build the Tinker program package under Microsoft
+         Windows using the Intel Fortran Compiler for Windows.
 
-          The "editbin.make" script can be used to increase the stack
-          size of the TINKER executables, and should be applied to
-          newly created Windows executables.
+         Building OpenMP parallel executables requires uncommenting
+         the two Intel-specific routine calls kmp_set_stacksize_s and
+         kmp_set_blocksize in the source file initial.f.
+
+         The "editbin.make" script can be used to increase the stack
+         size of the Tinker executables, and should be applied to
+         newly created Windows executables.
 

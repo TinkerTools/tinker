@@ -2,7 +2,7 @@
 #
 #  ################################################################
 #  ##                                                            ##
-#  ##  compgui.make  --  compile TINKER routines needed for FFE  ##
+#  ##  compgui.make  --  compile Tinker routines needed for FFE  ##
 #  ##              (GNU gfortran for MacOS Version)              ##
 #  ##                                                            ##
 #  ################################################################

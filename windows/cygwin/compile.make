@@ -2,7 +2,7 @@
 #
 #  ############################################################
 #  ##                                                        ##
-#  ##  compile.make  --  compile each of the TINKER modules  ##
+#  ##  compile.make  --  compile each of the Tinker modules  ##
 #  ##          (Windows/Cygwin/GNU gfortran Version)         ##
 #  ##                                                        ##
 #  ############################################################
@@ -338,6 +338,7 @@ gfortran -c -O3 -ffast-math -fopenmp flatten.f
 gfortran -c -O3 -ffast-math -fopenmp freeunit.f
 gfortran -c -O3 -ffast-math -fopenmp gda.f
 gfortran -c -O3 -ffast-math -fopenmp geometry.f
+gfortran -c -O3 -ffast-math -fopenmp getarc.f
 gfortran -c -O3 -ffast-math -fopenmp getint.f
 gfortran -c -O3 -ffast-math -fopenmp getkey.f
 gfortran -c -O3 -ffast-math -fopenmp getmol.f
@@ -419,6 +420,7 @@ gfortran -c -O3 -ffast-math -fopenmp merge.f
 gfortran -c -O3 -ffast-math -fopenmp minimize.f
 gfortran -c -O3 -ffast-math -fopenmp minirot.f
 gfortran -c -O3 -ffast-math -fopenmp minrigid.f
+gfortran -c -O3 -ffast-math -fopenmp mol2xyz.f
 gfortran -c -O3 -ffast-math -fopenmp molecule.f
 gfortran -c -O3 -ffast-math -fopenmp molxyz.f
 gfortran -c -O3 -ffast-math -fopenmp moments.f
@@ -478,6 +480,7 @@ gfortran -c -O3 -ffast-math -fopenmp random.f
 gfortran -c -O3 -ffast-math -fopenmp rattle.f
 gfortran -c -O3 -ffast-math -fopenmp readdyn.f
 gfortran -c -O3 -ffast-math -fopenmp readgau.f
+gfortran -c -O3 -ffast-math -fopenmp readgdma.f
 gfortran -c -O3 -ffast-math -fopenmp readint.f
 gfortran -c -O3 -ffast-math -fopenmp readmol.f
 gfortran -c -O3 -ffast-math -fopenmp readmol2.f
@@ -511,7 +514,6 @@ gfortran -c -O3 -ffast-math -fopenmp superpose.f
 gfortran -c -O3 -ffast-math -fopenmp surface.f
 gfortran -c -O3 -ffast-math -fopenmp surfatom.f
 gfortran -c -O3 -ffast-math -fopenmp switch.f
-gfortran -c -O3 -ffast-math -fopenmp sybylxyz.f
 gfortran -c -O3 -ffast-math -fopenmp temper.f
 gfortran -c -O3 -ffast-math -fopenmp testgrad.f
 gfortran -c -O3 -ffast-math -fopenmp testhess.f
@@ -539,6 +541,6 @@ gfortran -c -O3 -ffast-math -fopenmp xtalmin.f
 gfortran -c -O3 -ffast-math -fopenmp xyzatm.f
 gfortran -c -O3 -ffast-math -fopenmp xyzedit.f
 gfortran -c -O3 -ffast-math -fopenmp xyzint.f
+gfortran -c -O3 -ffast-math -fopenmp xyzmol2.f
 gfortran -c -O3 -ffast-math -fopenmp xyzpdb.f
-gfortran -c -O3 -ffast-math -fopenmp xyzsybyl.f
 gfortran -c -O3 -ffast-math -fopenmp zatom.f

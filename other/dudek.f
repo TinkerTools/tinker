@@ -7,13 +7,13 @@ c     ###################################################
 c
 c     #############################################################
 c     ##                                                         ##
-c     ##  program dudek  --  convert Dudek to TINKER multipoles  ##
+c     ##  program dudek  --  convert Dudek to Tinker multipoles  ##
 c     ##                                                         ##
 c     #############################################################
 c
 c
 c     "dudek" transforms multipoles in Mike Dudek's format
-c     into the multipole format used by the TINKER package
+c     into the multipole format used by the Tinker package
 c
 c
       program dudek

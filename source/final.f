@@ -111,11 +111,11 @@ c
          call sktkill
       end if
 c
-c     print a final status message before exiting TINKER
+c     print a final status message before exiting Tinker
 c
       if (debug) then
          write (iout,10)
-   10    format (/,' TINKER is Exiting following Normal Termination',/)
+   10    format (/,' Tinker is Exiting following Normal Termination',/)
       end if
 c
 c     ensure any output is written to the storage device

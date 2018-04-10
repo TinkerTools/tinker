@@ -1,38 +1,38 @@
 
-###############################################
-TINKER Implementation of the MMFF94 Force Field
-###############################################
+                ###############################################
+                Tinker Implementation of the MMFF94 Force Field
+                ###############################################
 
-Developed by Nicolas Staelens, University of Namur, 11/2005 to 04/2007
-Further adapted for TINKER by Jay W. Ponder, Washington Univ, 02/2009
+     Developed by Nicolas Staelens, University of Namur, 11/2005 to 04/2007
+     Further adapted for Tinker by Jay W. Ponder, Washington Univ, 02/2009
 
-The Info.pdf file in this directory contains some comments from Nicolas
-Staelens regarding his original implementation of MMFF in TINKER.
+     The Info.pdf file in this directory contains comments from Nicolas
+     Staelens regarding his original implementation of MMFF in Tinker.
 
-##################
-Usage Instructions
-##################
+                               ##################
+                               Usage Instructions
+                               ##################
 
-If MMFF executables are available, you may use the mmff.prm parameter
-file just as you would any other TINKER parameter file. The only caveat
-is that all MMFF "bond type = 1" bonds must be listed in the TINKER
-keyfile via the MMFF-PIBOND keyword. This keyword takes as arguments the
-atom numbers of atoms in type=1 bonds. Up to ten bonded atom pairs (ie,
-20 atom numbers) are listed following the MMFF-PIBOND keyword. Multiple
-MMFF-PIBOND keywords can be present. The MMFF bond type=1 is used for
-conjugated bonds that are "single" bonds in reasonable resonance forms,
-but could otherwise be double bonds in other structures. For example,
-the middle C-C bond in 1,3-butadiene has an MMFF bond type of 1.
+     If MMFF executables are available, you may use the mmff.prm parameter
+     file just as you would any other TINKER parameter file. The only caveat
+     is that all MMFF "bond type = 1" bonds must be listed in the Tinker
+     keyfile via the MMFF-PIBOND keyword. The keyword takes as arguments the
+     atom numbers of atoms in type=1 bonds. Up to ten bonded atom pairs (ie,
+     20 atom numbers) are listed following the MMFF-PIBOND keyword. Multiple
+     MMFF-PIBOND keywords can be present. The MMFF bond type=1 is used for
+     conjugated bonds that are "single" bonds in reasonable resonance forms,
+     but could otherwise be double bonds in other structures. For example,
+     the middle C-C bond in 1,3-butadiene has an MMFF bond type of 1.
 
-#####################
-Validation Test Cases
-#####################
+                             #####################
+                             Validation Test Cases
+                             #####################
 
-The "validation" subdirectory contains a nearly complete set of files
-for the MMFF Validation Suite deposited by Tom Halgren with the CCL.
-Some 740 structures are provided, and the only structures missing from
-the Halgren set are those with ionic heteroaromatic rings. TINKER key
-files with MMFF-PIBOND keywords are provided for the 292 molecules
-requiring explicit listing of bonds with MMFF bond type of 1. Output
-files are provided to allow verification of energy components.
+     The "validation" subdirectory contains a nearly complete set of files
+     for the MMFF Validation Suite deposited by Tom Halgren with the CCL.
+     Some 740 structures are provided, and the only structures missing from
+     the Halgren set are those with ionic heteroaromatic rings. Tinker key
+     files with MMFF-PIBOND keywords are provided for the 292 molecules
+     requiring explicit listing of bonds with MMFF bond type of 1. Output
+     files are provided to allow verification of energy components.
 

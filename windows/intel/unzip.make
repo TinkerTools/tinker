@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  unzip.make  --  uncompress each of the TINKER executables  ##
+#  ##  unzip.make  --  uncompress each of the Tinker executables  ##
 #  ##              (Windows Version; Run under Linux)             ##
 #  ##                                                             ##
 #  #################################################################
@@ -25,6 +25,7 @@ unzip intxyz.zip intxyz.exe
 unzip minimize.zip minimize.exe
 unzip minirot.zip minirot.exe
 unzip minrigid.zip minrigid.exe
+unzip mol2xyz.zip mol2xyz.exe
 unzip molxyz.zip molxyz.exe
 unzip monte.zip monte.exe
 unzip newton.zip newton.exe
@@ -50,7 +51,6 @@ unzip sniffer.zip sniffer.exe
 unzip spacefill.zip spacefill.exe
 unzip spectrum.zip spectrum.exe
 unzip superpose.zip superpose.exe
-unzip sybylxyz.zip sybylxyz.exe
 unzip testgrad.zip testgrad.exe
 unzip testhess.zip testhess.exe
 unzip testpair.zip testpair.exe
@@ -67,5 +67,5 @@ unzip xtalfit.zip xtalfit.exe
 unzip xtalmin.zip xtalmin.exe
 unzip xyzedit.zip xyzedit.exe
 unzip xyzint.zip xyzint.exe
+unzip xyzmol2.zip xyzmol2.exe
 unzip xyzpdb.zip xyzpdb.exe
-unzip xyzsybyl.zip xyzsybyl.exe

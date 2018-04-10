@@ -295,31 +295,33 @@ c
                      r2 = xr**2 + yr**2 + zr**2
                      r = sqrt(r2)
                      sk = rk * shct(k)
-                     sk2 = sk * sk
-                     if (ri+r .lt. sk) then
-                        lik = ri
-                        uik = sk - r
-                        sum = sum + pi43*(1.0d0/uik**3-1.0d0/lik**3)
-                     end if
-                     uik = r + sk
-                     if (ri+r .lt. sk) then
-                        lik = sk - r
-                     else if (r .lt. ri+sk) then
-                        lik = ri
-                     else
-                        lik = r - sk
-                     end if
-                     l2 = lik * lik
-                     l4 = l2 * l2
-                     lr = lik * r
-                     l4r = l4 * r
-                     u2 = uik * uik
-                     u4 = u2 * u2
-                     ur = uik * r
-                     u4r = u4 * r
-                     term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
+                     if (ri .lt. r+sk) then
+                        sk2 = sk * sk
+                        if (ri+r .lt. sk) then
+                           lik = ri
+                           uik = sk - r
+                           sum = sum + pi43*(1.0d0/uik**3-1.0d0/lik**3)
+                        end if
+                        uik = r + sk
+                        if (ri+r .lt. sk) then
+                           lik = sk - r
+                        else if (r .lt. ri+sk) then
+                           lik = ri
+                        else
+                           lik = r - sk
+                        end if
+                        l2 = lik * lik
+                        l4 = l2 * l2
+                        lr = lik * r
+                        l4r = l4 * r
+                        u2 = uik * uik
+                        u4 = u2 * u2
+                        ur = uik * r
+                        u4r = u4 * r
+                        term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
      &                         - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
-                     sum = sum - pi*term/12.0d0
+                        sum = sum - pi*term/12.0d0
+                     end if
                   end if
                end do
                rborn(i) = (sum/pi43)**third
@@ -732,64 +734,66 @@ c
                      yr = y(k) - yi
                      zr = z(k) - zi
                      sk = rk * shct(k)
-                     sk2 = sk * sk
-                     r2 = xr**2 + yr**2 + zr**2
-                     r = sqrt(r2)
-                     de = 0.0d0
-                     if (ri+r .lt. sk) then
-                        uik = sk - r
-                        de = -4.0d0 * pi / uik**4
-                     end if
-                     if (ri+r .lt. sk) then
-                        lik = sk - r
-                        de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+17.0d0*r2)
-     &                               / (r2*lik**4)
-                     else if (r .lt. ri+sk) then
-                        lik = ri
-                        de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2)
-     &                               / (r2*lik**4)
-                     else
-                        lik = r - sk
-                        de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2)
-     &                               / (r2*lik**4)
-                     end if
-                     uik = r + sk
-                     de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
-     &                            / (r2*uik**4)
-                     dbr = term * de/r
-                     dborn = drb(i)
-                     if (use_gk)  dborn = dborn + drbp(i)
-                     de = dbr * dborn
+                     if (ri .lt. r+sk) then
+                        sk2 = sk * sk
+                        r2 = xr**2 + yr**2 + zr**2
+                        r = sqrt(r2)
+                        de = 0.0d0
+                        if (ri+r .lt. sk) then
+                           uik = sk - r
+                           de = -4.0d0 * pi / uik**4
+                        end if
+                        if (ri+r .lt. sk) then
+                           lik = sk - r
+                           de = de + 0.25d0*pi*(sk2-4.0d0*sk*r
+     &                                  +17.0d0*r2) / (r2*lik**4)
+                        else if (r .lt. ri+sk) then
+                           lik = ri
+                           de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2)
+     &                                  / (r2*lik**4)
+                        else
+                           lik = r - sk
+                           de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2)
+     &                                  / (r2*lik**4)
+                        end if
+                        uik = r + sk
+                        de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
+     &                               / (r2*uik**4)
+                        dbr = term * de/r
+                        dborn = drb(i)
+                        if (use_gk)  dborn = dborn + drbp(i)
+                        de = dbr * dborn
 c
 c     increment the overall permanent solvation derivatives
 c
-                     dedx = de * xr
-                     dedy = de * yr
-                     dedz = de * zr
-                     des(1,i) = des(1,i) + dedx
-                     des(2,i) = des(2,i) + dedy
-                     des(3,i) = des(3,i) + dedz
-                     des(1,k) = des(1,k) - dedx
-                     des(2,k) = des(2,k) - dedy
-                     des(3,k) = des(3,k) - dedz
+                        dedx = de * xr
+                        dedy = de * yr
+                        dedz = de * zr
+                        des(1,i) = des(1,i) + dedx
+                        des(2,i) = des(2,i) + dedy
+                        des(3,i) = des(3,i) + dedz
+                        des(1,k) = des(1,k) - dedx
+                        des(2,k) = des(2,k) - dedy
+                        des(3,k) = des(3,k) - dedz
 c
 c     increment the internal virial tensor components
 c
-                     vxx = xr * dedx
-                     vyx = yr * dedx
-                     vzx = zr * dedx
-                     vyy = yr * dedy
-                     vzy = zr * dedy
-                     vzz = zr * dedz
-                     vir(1,1) = vir(1,1) + vxx
-                     vir(2,1) = vir(2,1) + vyx
-                     vir(3,1) = vir(3,1) + vzx
-                     vir(1,2) = vir(1,2) + vyx
-                     vir(2,2) = vir(2,2) + vyy
-                     vir(3,2) = vir(3,2) + vzy
-                     vir(1,3) = vir(1,3) + vzx
-                     vir(2,3) = vir(2,3) + vzy
-                     vir(3,3) = vir(3,3) + vzz
+                        vxx = xr * dedx
+                        vyx = yr * dedx
+                        vzx = zr * dedx
+                        vyy = yr * dedy
+                        vzy = zr * dedy
+                        vzz = zr * dedz
+                        vir(1,1) = vir(1,1) + vxx
+                        vir(2,1) = vir(2,1) + vyx
+                        vir(3,1) = vir(3,1) + vzx
+                        vir(1,2) = vir(1,2) + vyx
+                        vir(2,2) = vir(2,2) + vyy
+                        vir(3,2) = vir(3,2) + vzy
+                        vir(1,3) = vir(1,3) + vzx
+                        vir(2,3) = vir(2,3) + vzy
+                        vir(3,3) = vir(3,3) + vzz
+                     end if
                   end if
                end do
             end if

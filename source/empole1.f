@@ -2994,12 +2994,12 @@ c
          ziy = z(iay) - z(ii)
          vxx = vxx + xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+     &                        + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = vxz + 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                        + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
          vyy = vyy + yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = vyz + 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+     &                        + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = vzz + zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
       end do
 c

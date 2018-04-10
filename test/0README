@@ -1,10 +1,10 @@
 
                      #####################################
-                     TEST Directory for the TINKER Package
+                     TEST Directory for the Tinker Package
                      #####################################
 
          This directory contains some test casess illustrating use of
-         several of the programs in the TINKER package.
+         several of the programs in the Tinker package.
 
          For example, the argon.run file contains the commands to run
          the first test case. The resulting output is found in the file
@@ -12,7 +12,7 @@
 
          The clean.make script will remove any output files generated
          during the example runs and should be used prior to trying
-         to validate TINKER executables against the provided log files.
+         to validate Tinker executables against the provided log files.
 
          (01) ANION       estimation of the free energy of hydration
                           of Cl- anion vs. Br- anion via a 2 picosecond
@@ -28,7 +28,7 @@
                           atoms in an attempt to locate the global
                           minimum energy structure
 
-         (04) CRAMBIN     generation of a TINKER file from a PDB
+         (04) CRAMBIN     generation of a Tinker file from a PDB
                           file, followed by a single point energy
                           computation and determination of the
                           molecular volume and surface area

@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  link.make  --  link the TINKER programs for debugging  ##
+#  ##  link.make  --  link the Tinker programs for debugging  ##
 #  ##            (Intel Fortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################
@@ -25,6 +25,7 @@ ifort -g -o intxyz.x intxyz.o libtinker.a
 ifort -g -o minimize.x minimize.o libtinker.a
 ifort -g -o minirot.x minirot.o libtinker.a
 ifort -g -o minrigid.x minrigid.o libtinker.a
+ifort -g -o mol2xyz.x mol2xyz.o libtinker.a
 ifort -g -o molxyz.x molxyz.o libtinker.a
 ifort -g -o monte.x monte.o libtinker.a
 ifort -g -o newton.x newton.o libtinker.a
@@ -50,7 +51,6 @@ ifort -g -o sniffer.x sniffer.o libtinker.a
 ifort -g -o spacefill.x spacefill.o libtinker.a
 ifort -g -o spectrum.x spectrum.o libtinker.a
 ifort -g -o superpose.x superpose.o libtinker.a
-ifort -g -o sybylxyz.x sybylxyz.o libtinker.a
 ifort -g -o testgrad.x testgrad.o libtinker.a
 ifort -g -o testhess.x testhess.o libtinker.a
 ifort -g -o testpair.x testpair.o libtinker.a
@@ -67,5 +67,5 @@ ifort -g -o xtalfit.x xtalfit.o libtinker.a
 ifort -g -o xtalmin.x xtalmin.o libtinker.a
 ifort -g -o xyzedit.x xyzedit.o libtinker.a
 ifort -g -o xyzint.x xyzint.o libtinker.a
+ifort -g -o xyzmol2.x xyzmol2.o libtinker.a
 ifort -g -o xyzpdb.x xyzpdb.o libtinker.a
-ifort -g -o xyzsybyl.x xyzsybyl.o libtinker.a

@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  generic.make  --  compile TINKER routines for generic CPU  ##
+#  ##  generic.make  --  compile Tinker routines for generic CPU  ##
 #  ##               (GNU gfortran for Linux Version)              ##
 #  ##                                                             ##
 #  #################################################################
@@ -338,6 +338,7 @@ gfortran -c -Ofast -msse3 -fopenmp flatten.f
 gfortran -c -Ofast -msse3 -fopenmp freeunit.f
 gfortran -c -Ofast -msse3 -fopenmp gda.f
 gfortran -c -Ofast -msse3 -fopenmp geometry.f
+gfortran -c -Ofast -msse3 -fopenmp getarc.f
 gfortran -c -Ofast -msse3 -fopenmp getint.f
 gfortran -c -Ofast -msse3 -fopenmp getkey.f
 gfortran -c -Ofast -msse3 -fopenmp getmol.f
@@ -419,6 +420,7 @@ gfortran -c -Ofast -msse3 -fopenmp merge.f
 gfortran -c -Ofast -msse3 -fopenmp minimize.f
 gfortran -c -Ofast -msse3 -fopenmp minirot.f
 gfortran -c -Ofast -msse3 -fopenmp minrigid.f
+gfortran -c -Ofast -msse3 -fopenmp mol2xyz.f
 gfortran -c -Ofast -msse3 -fopenmp molecule.f
 gfortran -c -Ofast -msse3 -fopenmp molxyz.f
 gfortran -c -Ofast -msse3 -fopenmp moments.f
@@ -478,6 +480,7 @@ gfortran -c -Ofast -msse3 -fopenmp random.f
 gfortran -c -Ofast -msse3 -fopenmp rattle.f
 gfortran -c -Ofast -msse3 -fopenmp readdyn.f
 gfortran -c -Ofast -msse3 -fopenmp readgau.f
+gfortran -c -Ofast -msse3 -fopenmp readgdma.f
 gfortran -c -Ofast -msse3 -fopenmp readint.f
 gfortran -c -Ofast -msse3 -fopenmp readmol.f
 gfortran -c -Ofast -msse3 -fopenmp readmol2.f
@@ -511,7 +514,6 @@ gfortran -c -Ofast -msse3 -fopenmp superpose.f
 gfortran -c -Ofast -msse3 -fopenmp surface.f
 gfortran -c -Ofast -msse3 -fopenmp surfatom.f
 gfortran -c -Ofast -msse3 -fopenmp switch.f
-gfortran -c -Ofast -msse3 -fopenmp sybylxyz.f
 gfortran -c -Ofast -msse3 -fopenmp temper.f
 gfortran -c -Ofast -msse3 -fopenmp testgrad.f
 gfortran -c -Ofast -msse3 -fopenmp testhess.f
@@ -539,6 +541,6 @@ gfortran -c -Ofast -msse3 -fopenmp xtalmin.f
 gfortran -c -Ofast -msse3 -fopenmp xyzatm.f
 gfortran -c -Ofast -msse3 -fopenmp xyzedit.f
 gfortran -c -Ofast -msse3 -fopenmp xyzint.f
+gfortran -c -Ofast -msse3 -fopenmp xyzmol2.f
 gfortran -c -Ofast -msse3 -fopenmp xyzpdb.f
-gfortran -c -Ofast -msse3 -fopenmp xyzsybyl.f
 gfortran -c -Ofast -msse3 -fopenmp zatom.f

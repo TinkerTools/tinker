@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  compile.make  --  compile each of the TINKER routines  ##
+#  ##  compile.make  --  compile each of the Tinker routines  ##
 #  ##             (GNU gfortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################
@@ -338,6 +338,7 @@ gfortran -c -Ofast -mavx -fopenmp flatten.f
 gfortran -c -Ofast -mavx -fopenmp freeunit.f
 gfortran -c -Ofast -mavx -fopenmp gda.f
 gfortran -c -Ofast -mavx -fopenmp geometry.f
+gfortran -c -Ofast -mavx -fopenmp getarc.f
 gfortran -c -Ofast -mavx -fopenmp getint.f
 gfortran -c -Ofast -mavx -fopenmp getkey.f
 gfortran -c -Ofast -mavx -fopenmp getmol.f
@@ -419,6 +420,7 @@ gfortran -c -Ofast -mavx -fopenmp merge.f
 gfortran -c -Ofast -mavx -fopenmp minimize.f
 gfortran -c -Ofast -mavx -fopenmp minirot.f
 gfortran -c -Ofast -mavx -fopenmp minrigid.f
+gfortran -c -Ofast -mavx -fopenmp mol2xyz.f
 gfortran -c -Ofast -mavx -fopenmp molecule.f
 gfortran -c -Ofast -mavx -fopenmp molxyz.f
 gfortran -c -Ofast -mavx -fopenmp moments.f
@@ -478,6 +480,7 @@ gfortran -c -Ofast -mavx -fopenmp random.f
 gfortran -c -Ofast -mavx -fopenmp rattle.f
 gfortran -c -Ofast -mavx -fopenmp readdyn.f
 gfortran -c -Ofast -mavx -fopenmp readgau.f
+gfortran -c -Ofast -mavx -fopenmp readgdma.f
 gfortran -c -Ofast -mavx -fopenmp readint.f
 gfortran -c -Ofast -mavx -fopenmp readmol.f
 gfortran -c -Ofast -mavx -fopenmp readmol2.f
@@ -511,7 +514,6 @@ gfortran -c -Ofast -mavx -fopenmp superpose.f
 gfortran -c -Ofast -mavx -fopenmp surface.f
 gfortran -c -Ofast -mavx -fopenmp surfatom.f
 gfortran -c -Ofast -mavx -fopenmp switch.f
-gfortran -c -Ofast -mavx -fopenmp sybylxyz.f
 gfortran -c -Ofast -mavx -fopenmp temper.f
 gfortran -c -Ofast -mavx -fopenmp testgrad.f
 gfortran -c -Ofast -mavx -fopenmp testhess.f
@@ -539,6 +541,6 @@ gfortran -c -Ofast -mavx -fopenmp xtalmin.f
 gfortran -c -Ofast -mavx -fopenmp xyzatm.f
 gfortran -c -Ofast -mavx -fopenmp xyzedit.f
 gfortran -c -Ofast -mavx -fopenmp xyzint.f
+gfortran -c -Ofast -mavx -fopenmp xyzmol2.f
 gfortran -c -Ofast -mavx -fopenmp xyzpdb.f
-gfortran -c -Ofast -mavx -fopenmp xyzsybyl.f
 gfortran -c -Ofast -mavx -fopenmp zatom.f

@@ -36,9 +36,9 @@ c
       integer i,j,k
       integer next,nh
       integer cls,atn,lig
-      real*8 wght
+      real*8 wght,sum
       real*8 hmax,hmass
-      real*8 sum,dmass
+      real*8 dmin,dmass
       logical header,heavy
       character*3 symb
       character*20 keyword
@@ -142,15 +142,38 @@ c
                   sum = sum + mass(k)
                end if
             end do
-            hmass = max(hmax,sum/dble(nh+1))
+            hmass = min(hmax,sum/dble(nh+1))
             do j = 1, n12(i)
                k = i12(j,i)
                if (atomic(k) .eq. 1) then
                   dmass = hmass - mass(k)
-                  mass(k) = mass(k) + dmass
+                  mass(k) = hmass
                   mass(i) = mass(i) - dmass
                end if
             end do
+         end do
+         do i = 1, n
+            if (mass(i) .lt. hmax) then
+               dmass = hmax - mass(i)
+               dmin = hmax + dmass
+               if (atomic(i) .eq. 1) then
+                  do j = 1, n13(i)
+                     k = i13(j,i)
+                     if (atomic(k).ne.1 .and. mass(k).gt.dmin) then
+                        mass(k) = mass(k) - dmass
+                        mass(i) = hmax
+                     end if
+                  end do
+               else
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k).ne.1 .and. mass(k).gt.dmin) then
+                        mass(k) = mass(k) - dmass
+                        mass(i) = hmax
+                     end if
+                  end do
+               end if
+            end if
          end do
       end if
 c

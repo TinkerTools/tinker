@@ -8,7 +8,7 @@
  *
  *    ############################################################
  *    ##                                                        ##
- *    ##  ommstuff.cpp  --  TINKER interface to the OpenMM API  ##
+ *    ##  ommstuff.cpp  --  Tinker interface to the OpenMM API  ##
  *    ##                                                        ##
  *    ############################################################
  */
@@ -23,16 +23,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <iostream>
-#include <fstream>
 
-#define MAX_CUDA_DEVICES 17
-
-using namespace std;
+const int MAX_STRING = 240;
 
 /*
  *    ############################################################
- *           TINKER Routines Called Directly from Interface
+ *           Tinker Routines Called Directly from Interface
  *        (to convert C to C++, must enclose in extern "C" {})
  *    ############################################################
  */
@@ -75,7 +71,7 @@ typedef struct {
 
 /*
  *    ############################################################
- *            C++ Data Structures Corresponding to TINKER
+ *            C++ Data Structures Corresponding to Tinker
  *    ############################################################
  */
 
@@ -105,7 +101,7 @@ struct {
    double qopd;
    double popd;
    double sopd;
-   char opbtyp[9];
+   char opbtyp[MAX_STRING];
    char* angtyp;
 } angpot__;
 
@@ -153,9 +149,9 @@ struct {
    int isothermal;
    int isobaric;
    int anisotrop;
-   char volscale[9];
-   char barostat[11];
-   char thermostat[11];
+   char volscale[MAX_STRING];
+   char barostat[MAX_STRING];
+   char thermostat[MAX_STRING];
 } bath__;
 
 struct {
@@ -167,7 +163,7 @@ struct {
    double cbnd;
    double qbnd;
    double bndunit;
-   char bndtyp[9];
+   char bndtyp[MAX_STRING];
 } bndpot__;
 
 struct {
@@ -209,7 +205,7 @@ struct {
    int monoclinic;
    int triclinic;
    int octahedron;
-   char spacegrp[11];
+   char spacegrp[MAX_STRING];
 } boxes__;
 
 struct {
@@ -314,7 +310,7 @@ struct {
 
 struct {
    double aewald;
-   char boundary[7];
+   char boundary[MAX_STRING];
 } ewald__;
 
 struct {
@@ -419,7 +415,7 @@ struct {
    int velsave;
    int frcsave;
    int uindsave;
-   char integrate[11];
+   char integrate[MAX_STRING];
 } mdstuf__;
 
 struct {
@@ -460,12 +456,14 @@ struct {
 
 struct {
    int nmut;
+   int vcouple;
    int* imut;
    int* type0;
    int* class0;
    int* type1;
    int* class1;
    double lambda;
+   double tlambda;
    double vlambda;
    double elambda;
    double scexp;
@@ -496,6 +494,13 @@ struct {
    int* iopb;
    double* opbk;
 } opbend__;
+
+struct {
+   void* ommHandle;
+   char cudaPrecision[MAX_STRING];
+   char ommPlatform[MAX_STRING];
+   char cudaDevice[MAX_STRING];
+} openmm__;
 
 struct {
    int npitors;
@@ -580,7 +585,7 @@ struct {
    double u3scale;
    double u4scale;
    double udiag;
-   char poltyp[6];
+   char poltyp[MAX_STRING];
 } polpot__;
 
 struct {
@@ -676,8 +681,8 @@ struct {
    double* wace;
    double* s2ace;
    double* uace;
-   char solvtyp[8];
-   char borntyp[8];
+   char solvtyp[MAX_STRING];
+   char borntyp[MAX_STRING];
 } solute__;
 
 struct {
@@ -789,13 +794,13 @@ struct {
    double v4scale;
    double v5scale;
    int use_vcorr;
-   char vdwindex[5];
-   char radtyp[5];
-   char radsiz[8];
-   char gausstyp[8];
-   char radrule[10];
-   char epsrule[10];
-   char vdwtyp[13];
+   char vdwindex[MAX_STRING];
+   char radtyp[MAX_STRING];
+   char radsiz[MAX_STRING];
+   char gausstyp[MAX_STRING];
+   char radrule[MAX_STRING];
+   char epsrule[MAX_STRING];
+   char vdwtyp[MAX_STRING];
 } vdwpot__;
 
 static void setNullTerminator (char* string, int maxLength, char* buffer) {
@@ -823,7 +828,7 @@ static void setNullTerminator (char* string, int maxLength, char* buffer) {
 
 /*
  *    ############################################################
- *            Copy TINKER Fortran Data into C++ Structures
+ *            Copy Tinker Fortran Data into C++ Structures
  *    ############################################################
  */
 
@@ -1313,18 +1318,20 @@ void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
    mpole__.polaxe = polaxe;
 }
 
-void set_mutant_data_ (int* nmut, int* imut, int* type0, int* class0,
-                       int* type1, int* class1, double* lambda,
-                       double* vlambda, double* elambda, double* scexp,
-                       double* scalpha, int* mut) {
+void set_mutant_data_ (int* nmut, int* vcouple, int* imut, int* type0,
+                       int* class0, int* type1, int* class1, double* lambda,
+                       double* tlambda, double* vlambda, double* elambda,
+                       double* scexp, double* scalpha, int* mut) {
 
    mutant__.nmut = *nmut;
+   mutant__.vcouple = *vcouple;
    mutant__.imut = imut;
    mutant__.type0 = type0;
    mutant__.class0 = class0;
    mutant__.type1 = type1;
    mutant__.class1 = class1;
    mutant__.lambda = *lambda;
+   mutant__.tlambda = *tlambda;
    mutant__.vlambda = *vlambda;
    mutant__.elambda = *elambda;
    mutant__.scexp = *scexp;
@@ -1360,6 +1367,15 @@ void set_opbend_data_ (int* nopbend, int* iopb, double* opbk) {
    opbend__.nopbend = *nopbend;
    opbend__.iopb = iopb;
    opbend__.opbk = opbk;
+}
+
+void set_openmm_data_ (void** ommHandle, char* cudaPrecision,
+                      char* ommPlatform, char* cudaDevice) {
+
+   openmm__.ommHandle = *ommHandle;
+   setNullTerminator (cudaPrecision, 6, openmm__.cudaPrecision);
+   setNullTerminator (ommPlatform, 9, openmm__.ommPlatform);
+   setNullTerminator (cudaDevice, 16, openmm__.cudaDevice);
 }
 
 void set_pitors_data_ (int* npitors, int* ipit, double* kpit) {
@@ -1741,28 +1757,6 @@ void set_vdwpot_data_ (int* maxgauss, int* ngauss, double* igauss,
    setNullTerminator (vdwtyp, 13, vdwpot__.vdwtyp);
 }
 
-/*
- *    ############################################################
- *              Find Available CUDA-Enabled GPU Devices
- *    ############################################################
- */
-
-static char cudaDevices[MAX_CUDA_DEVICES];
-
-void set_cuda_devices_ (char* devices) {
-
-   for (int i = 0; i < MAX_CUDA_DEVICES; ++i) {
-      if (devices[i] == ' ') {
-         cudaDevices[i] = '\0';
-         break;
-      } else if ((devices[i] < '0' || devices[i] > '9') && devices[i] != ',') {
-         cudaDevices[0] = '\0';
-         break;
-      }
-      cudaDevices[i] = devices[i];
-   }
-}
-
 }
 
 /*
@@ -1957,7 +1951,7 @@ static void setupAmoebaAngleForce (OpenMM_System* system,
    int match;
    char* angleTypPtr;
 
-   // TINKER harmonic and in-plane angles are separate terms in OpenMM
+   // Tinker harmonic and in-plane angles are separate terms in OpenMM
 
    struct ConstraintMap map;
    if (removeConstrainedAngles) {
@@ -2007,7 +2001,7 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
    char* angleTypPtr;
    int match;
 
-   // TINKER harmonic and in-plane angles are separate terms in OpenMM
+   // Tinker harmonic and in-plane angles are separate terms in OpenMM
 
    struct ConstraintMap map;
    if (removeConstrainedBonds) {
@@ -2797,6 +2791,14 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
    setNullTerminator (vdwpot__.vdwtyp, 13, buffer);
    OpenMM_AmoebaVdwForce_setFunctionalForm (amoebaVdwForce, buffer);
 
+   if (mutant__.vcouple == OpenMM_AmoebaVdwForce_Decouple) {
+      OpenMM_AmoebaVdwForce_setCoupleMethod (amoebaVdwForce,
+                                       OpenMM_AmoebaVdwForce_Decouple);
+   } else {
+      OpenMM_AmoebaVdwForce_setCoupleMethod (amoebaVdwForce,
+                                       OpenMM_AmoebaVdwForce_Annihilate);
+   }
+
    OpenMM_AmoebaVdwForce_setCutoffDistance (amoebaVdwForce,
                                     limits__.vdwcut*OpenMM_NmPerAngstrom);
 
@@ -2869,7 +2871,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
       for (int jj = ii; jj < nvdwpr; ++jj) {
          int tpi = avcv[ii];
          int tpj = avcv[jj];
-         // Note: TINKER assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
+         // Note: Tinker assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
          // regardless of using atom class or atom type as vdwindex, as of Feb. 2017.
          int kk = (tpi-1) * sizes__.maxclass + (tpj-1);
          double combinedSigma = vdw__.radmin[kk];
@@ -2900,7 +2902,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
             int atomj = *(couple__.i14 + 9*sizes__.maxval*ii + jj) - 1;
             if (ii < atomj) {
                int tpj = vdwindex_ptr[atomj];
-               // Note: TINKER assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
+               // Note: Tinker assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
                // regardless of using atom class or atom type as vdwindex, as of Feb. 2017.
                int kk = (tpi-1) * sizes__.maxclass + (tpj-1);
                double combinedSigma = vdw__.radmin[kk]*OpenMM_NmPerAngstrom;
@@ -3714,8 +3716,8 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       return platform;
    }
 
-   if (cudaDevices[0] != '\0') {
-      deviceId = cudaDevices;
+   if (openmm__.cudaDevice[0] != 0) {
+      deviceId = &openmm__.cudaDevice[0];
       device_key = true;
    } else {
       device_number = findBestCUDACard();
@@ -3726,9 +3728,6 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
          sprintf(deviceId, "%d", device_number);
       }
    }
-
-   //deviceId = "0,1";
-   //fprintf (log, "\n Value of deviceId is %s \n", deviceId);
 
    if (device_key) {
       OpenMM_Platform_setPropertyDefaultValue (platform, "CudaDeviceIndex",
@@ -4096,7 +4095,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
 /*
  *    ############################################################
- *          Copy State from OpenMM to TINKER Data Structures
+ *          Copy State from OpenMM to Tinker Data Structures
  *    ############################################################
  *
  *    @param omm                    handle with OpenMM data structures
@@ -4229,14 +4228,14 @@ void openmm_copy_state_ (void** omm, double *timeInPs,
 
 /*
  *    ############################################################
- *       Update TINKER Data Structures; Call mdstat and mdsave
+ *       Update Tinker Data Structures; Call mdstat and mdsave
  *    ############################################################
  *
  *    @param omm          handle containing OpenMM data structures
  *    @param dt           simulation time step in ps
  *    @param istep        current step in MD loop
- *    @param callMdStat   if nonzero, call TINKER mdstat routine
- *    @param callMdSave   if nonzero, call TINKER mdsave routine
+ *    @param callMdStat   if nonzero, call Tinker mdstat routine
+ *    @param callMdSave   if nonzero, call Tinker mdsave routine
  */
 
 void openmm_update_ (void** omm, double* dt, int* istep,
@@ -4367,8 +4366,13 @@ void openmm_update_ (void** omm, double* dt, int* istep,
       (void) fflush (stderr);
    }
 
-
    // make calls to mdstat and/or mdsave if flags are set
+   //
+   // note: call to "bounds" below enforces periodic boundaries on output
+   // coordinates as in canonical Tinker, but can break center-of-mass
+   // restraints and perhaps other things computed via OpenMM, so it is
+   // advised to allow the molecules to diffuse out of the periodic box,
+   // and then "wrap" the MD trajectory after the simulation if desired
 
    if (*callMdStat || *callMdSave) {
       double eksum, temp, pres;
@@ -4383,7 +4387,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
          mdstat_ (istep,dt,&totalEnergy,&potentialEnergy,&eksum,&temp,&pres);
       }
       if (*callMdSave) {
-         bounds_ ();
+         // bounds_ ();
          mdsave_ (istep,dt,&potentialEnergy,&eksum);
       }
    }
@@ -4584,8 +4588,8 @@ static int usingImplicitSolvent (void) {
  *       Map Data Structures and Check for Supported Potentials
  *    ############################################################
  *
- *    (1) Map TINKER data structures with arrays to C data structs
- *    (2) Check for TINKER parameter settings consistent with OpenMM
+ *    (1) Map Tinker data structures with arrays to C data structs
+ *    (2) Check for Tinker parameter settings consistent with OpenMM
  *        values and potential types
  *    (3) If invalid match or setting found, exit
  */
@@ -4871,7 +4875,7 @@ void openmm_validate_ (int* testingActive) {
 
 /*
  *    ############################################################
- *           Compare TINKER and OpenMM Energies and Forces
+ *           Compare Tinker and OpenMM Energies and Forces
  *    ############################################################
  */
 
@@ -4906,7 +4910,7 @@ int openmm_test_ (void) {
    FILE* log = stderr;
 
    if (log) {
-      (void) fprintf (log, "\n Testing TINKER vs OpenMM Energy & Force :\n");
+      (void) fprintf (log, "\n Testing Tinker vs OpenMM Energy & Force :\n");
    }
 
    implicitSolventActive = usingImplicitSolvent ();
@@ -4948,7 +4952,7 @@ int openmm_test_ (void) {
    if (potent__.use_geom)  countActiveForces++;
 
    if (log) {
-      (void) fprintf (log, "\n Potential Terms Used in TINKER :\n" );
+      (void) fprintf (log, "\n Potential Terms Used in Tinker :\n" );
       (void) fprintf (log, "\n    Bond=    %d", abs(potent__.use_bond));
       (void) fprintf (log, "    Angle=   %d", abs(potent__.use_angle));
       (void) fprintf (log, "    StrBnd=  %d", abs(potent__.use_strbnd));
@@ -5042,7 +5046,7 @@ int openmm_test_ (void) {
 
       if (log) {
          (void) fprintf (log,
-                    "\n Potential Energy Components from TINKER :\n\n"
+                    "\n Potential Energy Components from Tinker :\n\n"
                     "    EB=  %15.7e   EA=  %15.7e   EBA= %15.7e\n"
                     "    EUB= %15.7e   EAA= %15.7e   EOPB=%15.7e\n"
                     "    EOPD=%15.7e   EID= %15.7e   EIT= %15.7e\n"
@@ -5073,7 +5077,7 @@ int openmm_test_ (void) {
 
    } else if (potent__.use_angle) {
 
-      // note TINKER angle = OpenMM (Angle + InPlaneAngle)
+      // note Tinker angle = OpenMM (Angle + InPlaneAngle)
 
       setupAmoebaAngleForce (system, removeConstrainedCovalentIxns, log);
       setupAmoebaInPlaneAngleForce (system, removeConstrainedCovalentIxns,
@@ -5208,7 +5212,7 @@ int openmm_test_ (void) {
    } else if (potent__.use_solv && implicitSolventActive > 0 &&
               !potent__.use_mpole) {
 
-      // to get TINKER WCA, zero deriv__.des, then call ewca1
+      // to get Tinker WCA, zero deriv__.des, then call ewca1
 
       zeroTinkerForce (deriv__.des);
       ewca1_ (&tinkerEnergy);
@@ -5314,7 +5318,7 @@ int openmm_test_ (void) {
       (void) fflush (log);
    }
 
-   // find differences in TINKER and OpenMM energies and forces
+   // find differences in Tinker and OpenMM energies and forces
 
    maxFDelta = 0.0;
    maxFDeltaIndex = -1;
@@ -5327,8 +5331,8 @@ int openmm_test_ (void) {
 
    if (log) {
 
-      (void) fprintf (log, "\n TINKER vs OpenMM Energy Values :\n");
-      (void) fprintf (log, "\n TINKER Potential Energy   %18.4f",
+      (void) fprintf (log, "\n Tinker vs OpenMM Energy Values :\n");
+      (void) fprintf (log, "\n Tinker Potential Energy   %18.4f",
                       tinkerEnergy);
       (void) fprintf (log, "\n OpenMM Potential Energy   %18.4f\n",
                       openMMPotentialEnergy);
@@ -5368,10 +5372,10 @@ int openmm_test_ (void) {
          avgDot += dot;
 
          if (ii == 0) {
-            (void) fprintf (log, "\n TINKER vs OpenMM Force Values :\n\n");
+            (void) fprintf (log, "\n Tinker vs OpenMM Force Values :\n\n");
          }
          if (ii < maxPrint || atoms__.n - ii - 1 < maxPrint) {
-            (void) fprintf (stderr, "%6d   TINKER %17.8e %17.8e %17.8e",
+            (void) fprintf (stderr, "%6d   Tinker %17.8e %17.8e %17.8e",
                             ii+1, tinkerF->x, tinkerF->y, tinkerF->z);
             (void) fprintf (stderr, "\n         OpenMM %17.8e %17.8e %17.8e\n",
                             force.x, force.y, force.z);
@@ -5382,7 +5386,7 @@ int openmm_test_ (void) {
          avgDot /= (double)(atoms__.n);
       }
 
-      (void) fprintf (log, "\n Summary of TINKER vs OpenMM Comparison :\n");
+      (void) fprintf (log, "\n Summary of Tinker vs OpenMM Comparison :\n");
       (void) fprintf (log, "\n EnergyDelta                    %19.8e\n",
                       maxEDelta);
       (void) fprintf (log, " MaxForceDelta at   %11d %19.8e\n",
@@ -5398,5 +5402,39 @@ int openmm_test_ (void) {
    OpenMM_Context_destroy (context);
    OpenMM_Integrator_destroy (integrator);
    OpenMM_System_destroy (system);
+}
+
+void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
+   OpenMMData_s* omm = (OpenMMData_s*) (*ommHandle);
+
+   // copy periodic box from Tinker to OpenMM
+   OpenMM_Vec3 aBox;
+   OpenMM_Vec3 bBox;
+   OpenMM_Vec3 cBox;
+   aBox.x = aBox.y = aBox.z = 0.0;
+   bBox.x = bBox.y = bBox.z = 0.0;
+   cBox.x = cBox.y = cBox.z = 0.0;
+   aBox.x = *boxes__.xbox * OpenMM_NmPerAngstrom;
+   bBox.y = *boxes__.ybox * OpenMM_NmPerAngstrom;
+   cBox.z = *boxes__.zbox * OpenMM_NmPerAngstrom;
+   OpenMM_Context_setPeriodicBoxVectors (omm->context, &aBox, &bBox, &cBox);
+
+   // copy coordinates from Tinker to OpenMM
+   // never call OpenMM_Vec3Array_destroy (posInMNm);
+   static OpenMM_Vec3Array* posInNm = OpenMM_Vec3Array_create (atoms__.n);
+   for (int ii = 0; ii < atoms__.n; ++ii) {
+      OpenMM_Vec3 r;
+      r.x = atoms__.x[ii] * OpenMM_NmPerAngstrom;
+      r.y = atoms__.y[ii] * OpenMM_NmPerAngstrom;
+      r.z = atoms__.z[ii] * OpenMM_NmPerAngstrom;
+      OpenMM_Vec3Array_set (posInNm, ii, r);
+   }
+   OpenMM_Context_setPositions (omm->context, posInNm);
+
+   // get OpenMM state
+   int infoMask = 0;
+   infoMask += OpenMM_State_Energy;
+   OpenMM_State* state = OpenMM_Context_getState (omm->context, infoMask, 0);
+   *energyInKcal = OpenMM_State_getPotentialEnergy (state) * OpenMM_KcalPerKJ;
 }
 }

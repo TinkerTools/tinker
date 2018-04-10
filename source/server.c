@@ -1,5 +1,5 @@
 /*
-   This file is an interface between TINKER Fortran code
+   This file is an interface between Tinker Fortran code
    and a Java Server used for socket based communication.
 */
 

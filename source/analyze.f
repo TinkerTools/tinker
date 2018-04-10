@@ -55,7 +55,7 @@ c
       call nextarg (string,exist)
       if (.not. exist) then
          write (iout,10)
-   10    format (/,' The TINKER Energy Analysis Utility Can :',
+   10    format (/,' The Tinker Energy Analysis Utility Can :',
      &           //,' General System and Force Field Information [G]',
      &           /,' Force Field Parameters for Interactions [P]',
      &           /,' Total Potential Energy and its Components [E]',
@@ -1649,8 +1649,7 @@ c     #################################################################
 c
 c
 c     "amberyze" prints the force field parameters in a format needed
-c     by the Amber setup protocol for using AMOEBA within Amber; this
-c     is essentially the "paramyze" format from TINKER 4.3
+c     by the Amber setup protocol for using AMOEBA within Amber
 c
 c
       subroutine amberyze (active)

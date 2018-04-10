@@ -12,8 +12,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "tsplit" takes a concatenated source listing of the TINKER code
-c     and splits it into individual source files; a TINKER-specific
+c     "tsplit" takes a concatenated source listing of the Tinker code
+c     and splits it into individual source files; a Tinker-specific
 c     version of the standard fsplit routine
 c
 c
@@ -35,11 +35,11 @@ c     get the name of the source file to split into modules
 c
       call initial
       write (iout,10)
-   10 format (/,' Enter TINKER Source Listing File Name :  ',$)
+   10 format (/,' Enter Tinker Source Listing File Name :  ',$)
       read (input,20)  filename
    20 format (a240)
 c
-c     read and store a concatenated listing of TINKER source
+c     read and store a concatenated listing of Tinker source
 c
       itxt = 1
 c     itxt = freeunit ()

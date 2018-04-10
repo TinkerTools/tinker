@@ -1,11 +1,11 @@
 
                      ######################################
-                     BENCH Directory for the TINKER Package
+                     BENCH Directory for the Tinker Package
                      ######################################
 
            This directory contains a set of benchmark exercises for
-           the TINKER program package. On Unix or Linux systems, each
+           the Tinker program package. On Unix or Linux systems, each
            exercise is invoked by executing a corresponding .run file.
            The "results" files contain CPU times on various machine
-           types for the current and previous releases of TINKER.
+           types for the current and previous releases of Tinker.
 

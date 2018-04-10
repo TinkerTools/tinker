@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  library.make  --  create object library of TINKER modules  ##
+#  ##  library.make  --  create object library of Tinker modules  ##
 #  ##            (Windows/Cygwin/GNU gfortran Version)            ##
 #  ##                                                             ##
 #  #################################################################
@@ -205,6 +205,7 @@ fracs.o \
 freeunit.o \
 freeze.o \
 geometry.o \
+getarc.o \
 getint.o \
 getkey.o \
 getmol.o \
@@ -396,6 +397,7 @@ random.o \
 rattle.o \
 readdyn.o \
 readgau.o \
+readgdma.o \
 readint.o \
 readmol.o \
 readmol2.o \

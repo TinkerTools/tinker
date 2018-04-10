@@ -3,7 +3,7 @@ rem
 rem
 rem  #################################################################
 rem  ##                                                             ##
-rem  ##  library.bat  --  create object library of TINKER routines  ##
+rem  ##  library.bat  --  create object library of Tinker routines  ##
 rem  ##         (Intel Fortran Compiler for Windows Version)        ##
 rem  ##                                                             ##
 rem  #################################################################

@@ -26,6 +26,7 @@ c
       use iounit
       use kvdws
       use math
+      use ptable
       use usage
       implicit none
       integer i,ixyz,next
@@ -150,11 +151,12 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (radius(n))
 c
-c     set each atomic radius to the Lennard-Jones sigma value
+c     set atomic radii based on force field or Bondi values
 c
       do i = 1, n
          if (use(i)) then
-            radius(i) = rad(class(i)) / twosix
+c           radius(i) = rad(class(i)) / twosix
+            radius(i) = vdwrad(atomic(i))
          else
             radius(i) = 0.0d0
          end if

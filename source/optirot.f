@@ -102,7 +102,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(nomega))
 c
-c     get optimization parameters as scaled dihedral angles
+c     convert dihedral angles to optimization parameters
 c
       do i = 1, nomega
          xx(i) = dihed(i) * scale(i)
@@ -112,7 +112,7 @@ c     make the call to the optimization routine
 c
       call ocvm (nomega,xx,minimum,grdmin,optirot1,optsave)
 c
-c     unscale the final dihedral angle values
+c     convert optimization parameters to dihedral angles
 c
       do i = 1, nomega
          dihed(i) = xx(i) / scale(i)
@@ -221,7 +221,7 @@ c
       real*8, allocatable :: derivs(:)
 c
 c
-c     translate optimization variables into dihedrals
+c     convert optimization parameters to dihedral angles
 c
       do i = 1, nomega
          dihed(i) = xx(i) / scale(i)
@@ -238,7 +238,7 @@ c
       call gradrot (e,derivs)
       optirot1 = e
 c
-c     store torsional gradient as optimization gradient
+c     convert torsional gradient to optimization parameters
 c
       do i = 1, nomega
          g(i) = derivs(i) / scale(i)

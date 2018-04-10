@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  compile.make  --  compile each of the TINKER routines  ##
+#  ##  compile.make  --  compile each of the Tinker routines  ##
 #  ##            (Intel Fortran for Linux Version)            ##
 #  ##                                                         ##
 #  #############################################################
@@ -338,6 +338,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp flatten.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp freeunit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gda.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp geometry.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getarc.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getkey.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getmol.f
@@ -419,6 +420,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp merge.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minimize.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minirot.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minrigid.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mol2xyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp molecule.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp molxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp moments.f
@@ -478,6 +480,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp random.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rattle.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readdyn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readgau.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readgdma.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readmol.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readmol2.f
@@ -511,7 +514,6 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp superpose.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp surface.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp surfatom.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp switch.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sybylxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp temper.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testgrad.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testhess.f
@@ -539,6 +541,6 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xtalmin.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzatm.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzedit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzint.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzmol2.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzpdb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzsybyl.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp zatom.f

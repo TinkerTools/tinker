@@ -12,4 +12,3 @@
 foreach x (*.f)
 	document 5 $x | grep 'o:'
 end
-

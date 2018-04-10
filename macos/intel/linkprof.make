@@ -2,7 +2,7 @@
 #
 #  #################################################################
 #  ##                                                             ##
-#  ##  linkprof.make  --  link the TINKER programs for profiling  ##
+#  ##  linkprof.make  --  link the Tinker programs for profiling  ##
 #  ##              (Intel Fortran for MacOS Version)              ##
 #  ##                                                             ##
 #  #################################################################
@@ -25,6 +25,7 @@ ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o minimize.x minimize.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o minirot.x minirot.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o minrigid.x minrigid.o libtinker.a libfftw3_threads.a libfftw3.a
+ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o mol2xyz.x mol2xyz.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o molxyz.x molxyz.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o monte.x monte.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o newton.x newton.o libtinker.a libfftw3_threads.a libfftw3.a
@@ -50,7 +51,6 @@ ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o spacefill.x spacefill.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o spectrum.x spectrum.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o superpose.x superpose.o libtinker.a libfftw3_threads.a libfftw3.a
-ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o sybylxyz.x sybylxyz.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o testgrad.x testgrad.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o testhess.x testhess.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o testpair.x testpair.o libtinker.a libfftw3_threads.a libfftw3.a
@@ -67,5 +67,5 @@ ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o xtalmin.x xtalmin.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o xyzedit.x xyzedit.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o xyzint.x xyzint.o libtinker.a libfftw3_threads.a libfftw3.a
+ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o xyzmol2.x xyzmol2.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o xyzpdb.x xyzpdb.o libtinker.a libfftw3_threads.a libfftw3.a
-ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -mmacosx-version-min=10.6 -o xyzsybyl.x xyzsybyl.o libtinker.a libfftw3_threads.a libfftw3.a

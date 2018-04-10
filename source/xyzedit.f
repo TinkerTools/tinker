@@ -117,7 +117,7 @@ c
 c     present a list of possible coordinate modifications
 c
       write (iout,30)
-   30 format (/,' The TINKER XYZ File Editing Utility Can :',
+   30 format (/,' The Tinker XYZ File Editing Utility Can :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
      &        /,4x,'(2) Deletion of Individual Specified Atoms',
      &        /,4x,'(3) Deletion of Specified Types of Atoms',
@@ -1371,7 +1371,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -1392,7 +1392,7 @@ c
       call gradient (e,derivs)
       boxmin1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n

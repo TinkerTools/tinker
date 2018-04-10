@@ -137,7 +137,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (xx(nomega))
 c
-c     translate the initial coordinates
+c     convert dihedral angles to optimization parameters
 c
       do i = 1, nomega
          xx(i) = dihed(i)
@@ -148,7 +148,7 @@ c
       call tncg (mode,method,nomega,xx,minimum,grdmin,
      &                newtrot1,newtrot2,optsave)
 c
-c     untranslate the final coordinates
+c     convert optimization parameters to dihedral angles
 c
       do i = 1, nomega
          dihed(i) = xx(i)

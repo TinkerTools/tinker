@@ -3,7 +3,7 @@ rem
 rem
 rem  #################################################################
 rem  ##                                                             ##
-rem  ##  generic.make  --  compile TINKER routines for generic CPU  ##
+rem  ##  generic.make  --  compile Tinker routines for generic CPU  ##
 rem  ##             (Intel Fortran for Windows Version)             ##
 rem  ##                                                             ##
 rem  #################################################################
@@ -339,6 +339,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp flatten.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp freeunit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp gda.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp geometry.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getarc.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getkey.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getmol.f
@@ -420,6 +421,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp merge.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp minimize.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp minirot.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp minrigid.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp mol2xyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp molecule.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp molxyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp moments.f
@@ -479,6 +481,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp random.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp rattle.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgau.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgdma.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readmol.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readmol2.f
@@ -512,7 +515,6 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp superpose.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp surface.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp surfatom.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp switch.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp sybylxyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp temper.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp testgrad.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp testhess.f
@@ -540,6 +542,6 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xtalmin.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xyzatm.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xyzedit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xyzint.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xyzmol2.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xyzpdb.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp xyzsybyl.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp zatom.f

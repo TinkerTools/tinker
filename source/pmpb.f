@@ -8,7 +8,7 @@ c
 c     ############################################################
 c     ##                                                        ##
 c     ##  routines below implement dummy versions of the APBS   ##
-c     ##  calls required for TINKER to interface with the APBS  ##
+c     ##  calls required for Tinker to interface with the APBS  ##
 c     ##  Poisson-Boltzmann solver package from Nathan Baker    ##
 c     ##                                                        ##
 c     ############################################################
@@ -60,7 +60,7 @@ c     exit with an error message if APBS calculation is attempted
 c
       write (iout,10)
    10 format (/,' APBSINITIAL  --  APBS Not Supported by This',
-     &           ' TINKER Version')
+     &           ' Tinker Version')
       call fatal
       return
       end

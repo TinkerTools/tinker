@@ -2037,7 +2037,7 @@ c
       nvar = 3 * n
       allocate (xx(nvar))
 c
-c     translate the atomic coordinates to optimization variables
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n
@@ -2071,7 +2071,7 @@ c
          call lbfgs (nvar,xx,fctval,grdmin,toterr,optsave)
       end if
 c
-c     translate optimization variables back to coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -2144,7 +2144,7 @@ c
       allocate (xmove(nvar))
       allocate (g(nvar))
 c
-c     translate the atomic coordinates to annealing variables
+c     convert atomic coordinates to annealing variables
 c
       nvar = 0
       do i = 1, n
@@ -2281,7 +2281,7 @@ c
          end if
       end do
 c
-c     translate annealing variables back to coordinates
+c     convert annealing variables to atomic coordinates
 c
    80 continue
       nvar = 0
@@ -2621,7 +2621,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -2699,7 +2699,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -2780,7 +2780,7 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n

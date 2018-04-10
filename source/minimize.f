@@ -114,7 +114,7 @@ c
       allocate (xx(nvar))
       allocate (derivs(3,n))
 c
-c     scale the coordinates of each active atom
+c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
       do i = 1, n
@@ -132,7 +132,7 @@ c     make the call to the optimization routine
 c
       call lbfgs (nvar,xx,minimum,grdmin,minimiz1,optsave)
 c
-c     unscale the final coordinates for active atoms
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -257,7 +257,7 @@ c
       analytic = .true.
       eps = 0.00001d0
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
       do i = 1, n
@@ -285,7 +285,7 @@ c
       end if
       minimiz1 = e
 c
-c     store Cartesian gradient as optimization gradient
+c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, n

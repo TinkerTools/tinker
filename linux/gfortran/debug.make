@@ -2,7 +2,7 @@
 #
 #  ################################################################
 #  ##                                                            ##
-#  ##  debug.make  --  compile TINKER routines with debug flags  ##
+#  ##  debug.make  --  compile Tinker routines with debug flags  ##
 #  ##              (GNU gfortran for Linux Version)              ##
 #  ##                                                            ##
 #  ################################################################
@@ -338,6 +338,7 @@ gfortran -c -Wall flatten.f
 gfortran -c -Wall freeunit.f
 gfortran -c -Wall gda.f
 gfortran -c -Wall geometry.f
+gfortran -c -Wall getarc.f
 gfortran -c -Wall getint.f
 gfortran -c -Wall getkey.f
 gfortran -c -Wall getmol.f
@@ -419,6 +420,7 @@ gfortran -c -Wall merge.f
 gfortran -c -Wall minimize.f
 gfortran -c -Wall minirot.f
 gfortran -c -Wall minrigid.f
+gfortran -c -Wall mol2xyz.f
 gfortran -c -Wall molecule.f
 gfortran -c -Wall molxyz.f
 gfortran -c -Wall moments.f
@@ -478,6 +480,7 @@ gfortran -c -Wall random.f
 gfortran -c -Wall rattle.f
 gfortran -c -Wall readdyn.f
 gfortran -c -Wall readgau.f
+gfortran -c -Wall readgdma.f
 gfortran -c -Wall readint.f
 gfortran -c -Wall readmol.f
 gfortran -c -Wall readmol2.f
@@ -511,7 +514,6 @@ gfortran -c -Wall superpose.f
 gfortran -c -Wall surface.f
 gfortran -c -Wall surfatom.f
 gfortran -c -Wall switch.f
-gfortran -c -Wall sybylxyz.f
 gfortran -c -Wall temper.f
 gfortran -c -Wall testgrad.f
 gfortran -c -Wall testhess.f
@@ -539,6 +541,6 @@ gfortran -c -Wall xtalmin.f
 gfortran -c -Wall xyzatm.f
 gfortran -c -Wall xyzedit.f
 gfortran -c -Wall xyzint.f
+gfortran -c -Wall xyzmol2.f
 gfortran -c -Wall xyzpdb.f
-gfortran -c -Wall xyzsybyl.f
 gfortran -c -Wall zatom.f

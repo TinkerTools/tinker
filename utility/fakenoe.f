@@ -27,7 +27,7 @@ c
       character*4 ixname,kxname
 c
 c
-c     read coordinate sets from a TINKER file and a PDB file
+c     read coordinate sets from a Tinker file and a PDB file
 c
       call initial
       call getxyz
@@ -60,7 +60,7 @@ c
       fraction = fraction / 100.0d0
       if (fraction .eq. 0.0d0)  fraction = 1.0d0
 c
-c     map the PDB atoms onto the corresponding TINKER atoms
+c     map the PDB atoms onto the corresponding Tinker atoms
 c
       do i = 1, npdb
          xi = xpdb(i)
@@ -93,7 +93,7 @@ c
                         trial = random ()
                         if (trial .le. fraction) then
 c
-c     write the NOEs in the TINKER keyfile format
+c     write the NOEs in the Tinker keyfile format
 c
                            write (iout,60)  map(i),map(k),weight,noemin,
      &                                      noemax,resnum(i),atmnam(i),

@@ -62,7 +62,7 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' The TINKER Correlation Function Utility Can :',
+   20    format (/,' The Tinker Correlation Function Utility Can :',
      &           //,4x,'(1) Find Velocity Autocorrelation Function',
      &           /,4x,'(2) Find Superposition Correlation Function')
          do while (mode.lt.1 .or. mode.gt.2)
@@ -338,7 +338,7 @@ c
                call fatal
             end if
 c
-c     read the frame in the TINKER-generated coordinate format;
+c     read the frame in the Tinker-generated coordinate format;
 c     this is fast, but assumes the fixed format shown below
 c
 c           do k = 1, n
@@ -347,7 +347,7 @@ c  30          format (8x,a3,3f12.6)
 c           end do
 c
 c     alternatively, get each frame from a free formated file;
-c     this is slow, but correctly handles any valid TINKER file
+c     this is slow, but correctly handles any valid Tinker file
 c
             do k = 1, n
                next = 1

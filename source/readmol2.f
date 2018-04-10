@@ -5,18 +5,18 @@ c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine readmol2  --  read in a Sybyl MOL2 format file  ##
-c     ##                                                             ##
-c     #################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine readmol2  --  input of a Tripos MOL2 file  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "readmol2" gets a set of Sybyl MOL2 coordinates from
-c     an external disk file
+c     "readmol2" gets a set of Tripos MOL2 coordinates from an
+c     external disk file
 c
 c
-      subroutine readmol2 (isyb)
+      subroutine readmol2 (imol2)
       use sizes
       use atomid
       use atoms
@@ -26,30 +26,31 @@ c
       use ptable
       use titles
       implicit none
-      integer i,j,k,m,ia,ib,isyb
+      integer i,j,k,m
+      integer ia,ib,imol2
       integer nbond,number
       integer next,trimtext
       logical exist,opened
       character*10 atmnam
-      character*240 sybylfile
+      character*240 mol2file
       character*240 record
       character*240 string
 c
 c
 c     open the input file if it has not already been done
 c
-      inquire (unit=isyb,opened=opened)
+      inquire (unit=imol2,opened=opened)
       if (.not. opened) then
-         sybylfile = filename(1:leng)//'.mol2'
-         call version (sybylfile,'old')
-         inquire (file=sybylfile,exist=exist)
+         mol2file = filename(1:leng)//'.mol2'
+         call version (mol2file,'old')
+         inquire (file=mol2file,exist=exist)
          if (exist) then
-            open (unit=isyb,file=sybylfile,status='old')
-            rewind (unit=isyb)
+            open (unit=imol2,file=mol2file,status='old')
+            rewind (unit=imol2)
          else
             write (iout,10)
    10       format (/,' READMOL2  --  Unable to Find the TRIPOS',
-     &                 ' Sybyl MOL2 File')
+     &                 ' MOL2 File')
             call fatal
          end if
       end if
@@ -62,16 +63,16 @@ c
 c     get title line and get the number of atoms and bonds
 c
       do while (.true.)
-         read (isyb,20,err=50,end=50)  record
+         read (imol2,20,err=50,end=50)  record
    20    format (a240)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>MOLECULE') then
-            read (isyb,30)  title
+            read (imol2,30)  title
    30       format (a240)
             ltitle = trimtext (title)
-            read (isyb,40)  record
+            read (imol2,40)  record
    40       format (a240)
             read (record,*)  n,nbond
             goto 50
@@ -96,14 +97,14 @@ c
 c     read the atom names and coordinates
 c
       do while (.true.)
-         read (isyb,80,err=100,end=100)  record
+         read (imol2,80,err=100,end=100)  record
    80    format (a240)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>ATOM') then
             do j = 1, n
-               read (isyb,90)  record
+               read (imol2,90)  record
    90          format (a240)
                read (record,*)  number
                next = 1
@@ -128,14 +129,14 @@ c
 c     read the bond list to get attached atom lists
 c
       do while (.true.)
-         read (isyb,110,err=130,end=130)  record
+         read (imol2,110,err=130,end=130)  record
   110    format (a240)
          next = 1
          call gettext (record,string,next)
          call upcase (string)
          if (string .eq. '@<TRIPOS>BOND') then
             do j = 1, nbond
-               read (isyb,120)  record
+               read (imol2,120)  record
   120          format (a240)
                read (record,*)  number,ia,ib
                n12(ia) = n12(ia) + 1
@@ -166,6 +167,6 @@ c
       do i = 1, n
          call sort (n12(i),i12(1,i))
       end do
-      if (.not. opened)  close (unit=isyb)
+      if (.not. opened)  close (unit=imol2)
       return
       end

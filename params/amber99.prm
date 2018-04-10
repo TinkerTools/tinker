@@ -62,7 +62,7 @@ at http://ambermd.org/
 
    #####################################################
    ##                                                 ##
-   ##  TINKER Atom Class Numbers to Amber Atom Types  ##
+   ##  Tinker Atom Class Numbers to Amber Atom Types  ##
    ##                                                 ##
    ##    1  CT      11  CN      21  OW      31  HO    ##
    ##    2  C       12  CK      22  OH      32  HS    ##
@@ -2063,27 +2063,27 @@ charge      321               0.2719
 charge      322              -0.5679
 charge      323              -0.2503
 charge      324               0.0853
-charge      325              -0.4157      !! TINKER
-charge      326              -0.0371      !! TINKER
-charge      327               0.5973      !! TINKER
-charge      328               0.2719      !! TINKER
-charge      329              -0.5679      !! TINKER
-charge      330               0.0850      !! TINKER
-charge      331              -0.0036      !! TINKER
-charge      332               0.0171      !! TINKER
-charge      333              -0.0645      !! TINKER
-charge      334               0.0352      !! TINKER
-charge      335               0.6000      !! TINKER
-charge      336              -0.5700      !! TINKER
-charge      337               0.5500      !! TINKER
-charge      338               0.0000      !! TINKER
-charge      339              -0.5500      !! TINKER
+charge      325              -0.4157      !! Tinker
+charge      326              -0.0371      !! Tinker
+charge      327               0.5973      !! Tinker
+charge      328               0.2719      !! Tinker
+charge      329              -0.5679      !! Tinker
+charge      330               0.0850      !! Tinker
+charge      331              -0.0036      !! Tinker
+charge      332               0.0171      !! Tinker
+charge      333              -0.0645      !! Tinker
+charge      334               0.0352      !! Tinker
+charge      335               0.6000      !! Tinker
+charge      336              -0.5700      !! Tinker
+charge      337               0.5500      !! Tinker
+charge      338               0.0000      !! Tinker
+charge      339              -0.5500      !! Tinker
 charge      340              -0.3662
 charge      341               0.1123
 charge      342               0.5972
 charge      343              -0.5679
-charge      344              -0.8400      !! TINKER
-charge      345               0.4200      !! TINKER
+charge      344              -0.8400      !! Tinker
+charge      345               0.4200      !! Tinker
 charge      346              -0.4157
 charge      347               0.2719
 charge      348              -0.1490
@@ -2234,11 +2234,11 @@ charge      492               0.7214
 charge      493               0.2165
 charge      494              -0.6013
 charge      495               0.1180
-charge      496               0.1000      !! TINKER
-charge      497               0.2447      !! TINKER
-charge      498               0.6163      !! TINKER
-charge      499               0.2000      !! TINKER
-charge      500              -0.5722      !! TINKER
+charge      496               0.1000      !! Tinker
+charge      497               0.2447      !! Tinker
+charge      498               0.6163      !! Tinker
+charge      499               0.2000      !! Tinker
+charge      500              -0.5722      !! Tinker
 charge      501              -0.3821
 charge      502              -0.2493
 charge      503               0.7231
@@ -2382,11 +2382,11 @@ charge      640               0.8488
 charge      641               0.2764
 charge      642              -0.8252
 charge      643               0.1438
-charge      644              -0.3821      !! TINKER
-charge      645              -0.0572      !! TINKER
-charge      646               0.8000      !! TINKER
-charge      647               0.2681      !! TINKER
-charge      648              -0.8200      !! TINKER
+charge      644              -0.3821      !! Tinker
+charge      645              -0.0572      !! Tinker
+charge      646               0.8000      !! Tinker
+charge      647               0.2681      !! Tinker
+charge      648              -0.8200      !! Tinker
 charge     1001              -0.4989
 charge     1002               0.0558
 charge     1003               0.0679
@@ -2620,26 +2620,26 @@ charge     1230               1.1662
 charge     1231              -0.7760
 charge     1232              -0.6223
 charge     1233               0.4295
-charge     1234              -0.6328      !! TINKER
-charge     1235               0.9000      !! TINKER
-charge     1236              -0.8200      !! TINKER
+charge     1234              -0.6328      !! Tinker
+charge     1235               0.9000      !! Tinker
+charge     1236              -0.8200      !! Tinker
 charge     1237              -0.6541
 charge     1238               0.4376
-charge     1239              -0.6565      !! TINKER
-charge     1240               0.9000      !! TINKER
-charge     1241              -0.8200      !! TINKER
+charge     1239              -0.6565      !! Tinker
+charge     1240               0.9000      !! Tinker
+charge     1241              -0.8200      !! Tinker
 charge     1242               1.1659
 charge     1243              -0.7761
 charge     1244              -0.6318
 charge     1245               0.4422
-charge     1246              -0.6296      !! TINKER
-charge     1247               0.9000      !! TINKER
-charge     1248              -0.8200      !! TINKER
+charge     1246              -0.6296      !! Tinker
+charge     1247               0.9000      !! Tinker
+charge     1248              -0.8200      !! Tinker
 charge     1249              -0.6549
 charge     1250               0.4396
-charge     1251              -0.6553      !! TINKER
-charge     1252               0.9000      !! TINKER
-charge     1253              -0.8200      !! TINKER
+charge     1251              -0.6553      !! Tinker
+charge     1252               0.9000      !! Tinker
+charge     1253              -0.8200      !! Tinker
 charge     2001              -0.8340
 charge     2002               0.4170
 charge     2003               1.0000

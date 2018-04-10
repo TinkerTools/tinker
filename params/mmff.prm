@@ -52,7 +52,7 @@ T. A. Halgren, "Merck Molecular Force Field. V. Extension of MMFF94 Using
 Experimental Data, Additional Computational Data, and Empirical Rules",
 J. Comput. Chem., 17, 616-641 (1995)
 
-The TINKER implementation and validation of MMFF94 was done during 2005
+The Tinker implementation and validation of MMFF94 was done during 2005
 to 2007 by Nicolas Staelens, Laboratoire de Physico-Chimie Informatique,
 University of Namur, Belgium
 
@@ -67,7 +67,7 @@ University of Namur, Belgium
    ###################################################################
    ##                                                               ##
    ##  Note: Do not change the MMFF atom type numbers listed below  ##
-   ##  as they are explicitly used in TINKER parameter assignment   ##
+   ##  as they are explicitly used in Tinker parameter assignment   ##
    ##                                                               ##
    ###################################################################
 

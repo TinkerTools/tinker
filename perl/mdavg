@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # MDAVG is a Perl script to compute averages and block average
-# standard deviations from a TINKER dynamics trajectory log file
+# standard deviations from a Tinker dynamics trajectory log file
 #
 # Original version written by Pengyu Ren, Ponder Lab, July 2000
 # Modified to give std dev of block averages, Jay Ponder, Oct 2011

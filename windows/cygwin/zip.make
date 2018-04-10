@@ -2,7 +2,7 @@
 #
 #  #############################################################
 #  ##                                                         ##
-#  ##  zip.make  --  compress each of the TINKER executables  ##
+#  ##  zip.make  --  compress each of the Tinker executables  ##
 #  ##            (Windows Version; Run under Linux)           ##
 #  ##                                                         ##
 #  #############################################################
@@ -25,6 +25,7 @@ zip intxyz.zip intxyz.exe
 zip minimize.zip minimize.exe
 zip minirot.zip minirot.exe
 zip minrigid.zip minrigid.exe
+zip mol2xyz.zip mol2xyz.exe
 zip molxyz.zip molxyz.exe
 zip monte.zip monte.exe
 zip newton.zip newton.exe
@@ -50,7 +51,6 @@ zip sniffer.zip sniffer.exe
 zip spacefill.zip spacefill.exe
 zip spectrum.zip spectrum.exe
 zip superpose.zip superpose.exe
-zip sybylxyz.zip sybylxyz.exe
 zip testgrad.zip testgrad.exe
 zip testhess.zip testhess.exe
 zip testpair.zip testpair.exe
@@ -67,5 +67,5 @@ zip xtalfit.zip xtalfit.exe
 zip xtalmin.zip xtalmin.exe
 zip xyzedit.zip xyzedit.exe
 zip xyzint.zip xyzint.exe
+zip xyzmol2.zip xyzmol2.exe
 zip xyzpdb.zip xyzpdb.exe
-zip xyzsybyl.zip xyzsybyl.exe

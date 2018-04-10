@@ -1,19 +1,19 @@
 
                     #######################################
-                    Files for OpenMM-Enabled TINKER DYNAMIC
+                    Files for OpenMM-Enabled Tinker DYNAMIC
                     #######################################
 
-         This directory contains the files needed to build a TINKER
+         This directory contains the files needed to build a Tinker
          DYNAMIC program using the GPU-capable OpenMM libraries. The
          files in this directory should be copied into the /source
-         directory of a clean distribution of TINKER, and the program
+         directory of a clean distribution of Tinker, and the program
          can be compiled and linked in that modified /source directory.
 
          Building an OpenMM-enabled DYNAMIC requires a special version
-         of OpenMM, call OpenMM-TINKER that is available in a separate
+         of OpenMM, call OpenMM-Tinker that is available in a separate
          GitHub branch, currently https://github.com/pren/tinker-openmm
          This version contains changes to the canonical Stanford OpenMM
-         that are needed for the TINKER interface, beyond implementation
+         that are needed for the Tinker interface, beyond implementation
          of the basic AMOEBA force field.
 
          The provided Makefile can then be used, after minor editing, to
