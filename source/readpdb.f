@@ -664,6 +664,16 @@ c
       if (resname .eq. 'TIP')  resname = 'HOH'
       if (resname .eq. 'DOD')  resname = 'HOH'
 c
+c     convert nonstandard names for cations and anions
+c
+      if (resname .eq. 'NA ')  resname = ' NA'
+      if (resname .eq. 'MG ')  resname = ' MG'
+      if (resname .eq. 'K  ')  resname = '  K'
+      if (resname .eq. 'CA ')  resname = ' CA'
+      if (resname .eq. 'CL ')  resname = ' CL'
+      if (resname .eq. 'BR ')  resname = ' BR'
+      if (resname .eq. 'I  ')  resname = '  I'
+c
 c     decide whether residue is protein or nucleic acid
 c
       restype = 'UNKNOWN'
