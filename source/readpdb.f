@@ -664,7 +664,7 @@ c
       if (resname .eq. 'TIP')  resname = 'HOH'
       if (resname .eq. 'DOD')  resname = 'HOH'
 c
-c     convert nonstandard names for cations and anions
+c     convert shifted names for cations and anions
 c
       if (resname .eq. 'LI ')  resname = ' LI'
       if (resname .eq. 'NA ')  resname = ' NA'

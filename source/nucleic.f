@@ -445,7 +445,8 @@ c
       integer c5i,o3i,o4i,o5i
       integer phtyp,ophtyp
       integer ostyp,ottyp
-      logical single,cap3,cap5
+      logical single,last
+      logical cap3,cap5
       character*3 resname
 c
 c
@@ -457,6 +458,7 @@ c     check for single residue and 3'- or 5'-phosphate caps
 c
       do m = 1, nchain
          single = .false.
+         last = .false.
          cap5 = .false.
          cap3 = .false.
          if (ichain(1,m) .eq. ichain(2,m))  single = .true.
@@ -607,6 +609,7 @@ c
 c     build atoms for residues in the middle of the chain
 c
          do i = ichain(1,m)+1, ichain(2,m)-1
+            if (i .eq. ichain(2,m)-1)  last = .true.
             k = seqtyp(i)
             resname = nuclz(k)
             if (cap5) then
@@ -652,7 +655,7 @@ c
             call zatom (-1,0.0d0,0.0d0,0.0d0,c1i,c2i,0,0)
             o3i = n
             if (deoxy(i)) then
-               if (cap3) then
+               if (cap3 .and. last) then
                   call zatom (1251,1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                else
@@ -660,7 +663,7 @@ c
      &                           c3i,c4i,c5i,0)
                end if
             else
-               if (cap3) then
+               if (cap3 .and. last) then
                   call zatom (1239,1.42d0,112.1d0,bkbone(4,i),
      &                           c3i,c4i,c5i,0)
                else
