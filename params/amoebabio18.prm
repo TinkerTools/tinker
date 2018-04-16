@@ -7946,12 +7946,6 @@ biotype    1244    O5*     "5'-Hydroxyl DNA"                 348
 biotype    1245    H5T     "5'-Hydroxyl DNA"                 342
 biotype    1249    O3*     "3'-Hydroxyl DNA"                 347
 biotype    1250    H3T     "3'-Hydroxyl DNA"                 339
-biotype    2001    O       "Water"                             0
-biotype    2002    H       "Water"                             0
-biotype    2003    NA      "Sodium Ion"                        0
-biotype    2004    K       "Potassium Ion"                     0
-biotype    2005    MG      "Magnesium Ion"                     0
-biotype    2007    CL      "Chloride Ion"                      0
 biotype    2001    O       "Water"                           349
 biotype    2002    H       "Water"                           350
 biotype    2003    NA      "Sodium Ion"                      352
