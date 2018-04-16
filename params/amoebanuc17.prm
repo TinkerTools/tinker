@@ -5,7 +5,7 @@
       ##                          ##
       ##############################
 
-forcefield              AMOEBA-NUCLEIC-2018
+forcefield              AMOEBA-NUCLEIC-2017
 
 bond-cubic              -2.55
 bond-quartic            3.793125
@@ -56,12 +56,12 @@ mutual-14-scale         1.0
       #############################
 
 
-This file contains the 2018 version of the AMOEBA nucleic acids force field
+This file contains the 2017 version of the AMOEBA nucleic acids force field
 as per the J. Chem. Theory Comput. article listed immediately below
 
 C. Zhang, C. Lu, Z. Jing, C. Wu, J.-P. Piquemal, J. W. Ponder and P. Ren,
 "AMOEBA Polarizable Atomic Multipole Force Field for Nucleic Acids",
-J. Chem. Theory Comput., 14, xxx-xxx (2018)
+J. Chem. Theory Comput., 14, 2084-2108 (2018)
 
 
       #############################
