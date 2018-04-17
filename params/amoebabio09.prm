@@ -11499,26 +11499,26 @@ biotype    1230    P       "Phosphodiester RNA"              378
 biotype    1231    OP      "Phosphodiester RNA"              379
 biotype    1232    O5*     "5'-Hydroxyl RNA"                 380
 biotype    1233    H5T     "5'-Hydroxyl RNA"                 381
-biotype    1234    O5*     "5'-Phosphate OS RNA"             382
-biotype    1235    P       "5'-Phosphate P RNA"              383
-biotype    1236    OP      "5'-Phosphate OP RNA"             384
+biotype    1234    O5*     "5'-Monophosphate OS RNA"         382
+biotype    1235    P       "5'-Monophosphate P RNA"          383
+biotype    1236    OP      "5'-Monophosphate OP RNA"         384
 biotype    1237    O3*     "3'-Hydroxyl RNA"                 385
 biotype    1238    H3T     "3'-Hydroxyl RNA"                 386
-biotype    1239    O3*     "3'-Phosphate OS RNA"             387
-biotype    1240    P       "3'-Phosphate P RNA"              388
-biotype    1241    OP      "3'-Phosphate OP RNA"             389
+biotype    1239    O3*     "3'-Monophosphate OS RNA"         387
+biotype    1240    P       "3'-Monophosphate P RNA"          388
+biotype    1241    OP      "3'-Monophosphate OP RNA"         389
 biotype    1242    P       "Phosphodiester DNA"              390
 biotype    1243    OP      "Phosphodiester DNA"              391
 biotype    1244    O5*     "5'-Hydroxyl DNA"                 392
 biotype    1245    H5T     "5'-Hydroxyl DNA"                 393
-biotype    1246    O5*     "5'-Phosphate OS DNA"             394
-biotype    1247    P       "5'-Phosphate P DNA"              395
-biotype    1248    OP      "5'-Phosphate OP DNA"             396
+biotype    1246    O5*     "5'-Monophosphate OS DNA"         394
+biotype    1247    P       "5'-Monophosphate P DNA"          395
+biotype    1248    OP      "5'-Monophosphate OP DNA"         396
 biotype    1249    O3*     "3'-Hydroxyl DNA"                 397
 biotype    1250    H3T     "3'-Hydroxyl DNA"                 398
-biotype    1251    O3*     "3'-Phosphate OS DNA"             399
-biotype    1252    P       "3'-Phosphate P DNA"              400
-biotype    1253    OP      "3'-Phosphate OP DNA"             401
+biotype    1251    O3*     "3'-Monophosphate OS DNA"         399
+biotype    1252    P       "3'-Monophosphate P DNA"          400
+biotype    1253    OP      "3'-Monophosphate OP DNA"         401
 biotype    2001    O       "Water"                           402
 biotype    2002    H       "Water"                           403
 biotype    2003    NA      "Sodium Ion"                      405

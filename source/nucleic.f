@@ -473,7 +473,8 @@ c
          if (resname.eq.' MP' .or. resname.eq.' DP'
      &          .or. resname.eq.' TP')  cap3 = .true.
 c
-c     build the first residue or a phosphate capping group
+c     build the first residue or a phosphate capping group;
+c     for now, di- and triphosphate are set to monophosphate
 c
          i = ichain(1,m)
          k = seqtyp(i)
@@ -506,9 +507,59 @@ c
             o5i = n
             call zatom (ostyp,1.63d0,106.0d0,106.0d0,poi,o3i,n-2,-1)
          else if (resname .eq. ' DP') then
-            continue
+            if (deoxy(i+1)) then
+               ostyp = 1246
+               phtyp = 1247
+               ophtyp = 1248
+            else
+               ostyp = 1234
+               phtyp = 1235
+               ophtyp = 1236
+            end if
+            if (m .eq. 1) then
+               o3i = n
+               call zatom (ophtyp,0.0d0,0.0d0,0.0d0,0,0,0,0)
+               poi = n
+               call zatom (phtyp,1.52d0,0.0d0,0.0d0,o3i,0,0,0)
+               call zatom (ophtyp,1.52d0,113.0d0,0.0d0,poi,o3i,0,0)
+            else
+               o3i = n
+               call zatom (ophtyp,30.0d0,150.0d0,180.0d0,n-1,n-2,n-3,0)
+               call zatom (-2,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
+               poi = n
+               call zatom (phtyp,1.52d0,150.0d0,180.0d0,o3i,n-2,n-3,0)
+               call zatom (ophtyp,1.52d0,113.0d0,180.0d0,poi,o3i,n-3,0)
+            end if
+            call zatom (ophtyp,1.52d0,113.0d0,113.0d0,poi,o3i,n-1,1)
+            o5i = n
+            call zatom (ostyp,1.63d0,106.0d0,106.0d0,poi,o3i,n-2,-1)
          else if (resname .eq. ' TP') then
-            continue
+            if (deoxy(i+1)) then
+               ostyp = 1246
+               phtyp = 1247
+               ophtyp = 1248
+            else
+               ostyp = 1234
+               phtyp = 1235
+               ophtyp = 1236
+            end if
+            if (m .eq. 1) then
+               o3i = n
+               call zatom (ophtyp,0.0d0,0.0d0,0.0d0,0,0,0,0)
+               poi = n
+               call zatom (phtyp,1.52d0,0.0d0,0.0d0,o3i,0,0,0)
+               call zatom (ophtyp,1.52d0,113.0d0,0.0d0,poi,o3i,0,0)
+            else
+               o3i = n
+               call zatom (ophtyp,30.0d0,150.0d0,180.0d0,n-1,n-2,n-3,0)
+               call zatom (-2,0.0d0,0.0d0,0.0d0,n-2,n-1,0,0)
+               poi = n
+               call zatom (phtyp,1.52d0,150.0d0,180.0d0,o3i,n-2,n-3,0)
+               call zatom (ophtyp,1.52d0,113.0d0,180.0d0,poi,o3i,n-3,0)
+            end if
+            call zatom (ophtyp,1.52d0,113.0d0,113.0d0,poi,o3i,n-1,1)
+            o5i = n
+            call zatom (ostyp,1.63d0,106.0d0,106.0d0,poi,o3i,n-2,-1)
          else
             if (deoxy(i)) then
                ottyp = 1244
@@ -699,7 +750,8 @@ c
             call nucbase (resname,i,c1i,o4i,c2i)
          end do
 c
-c     build the last residue or a phosphate capping group
+c     build the last residue or a phosphate capping group;
+c     for now, di- and triphosphate are set to monophosphate
 c
          i = ichain(2,m)
          k = seqtyp(i)
@@ -722,9 +774,35 @@ c
                call zatom (1241,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
             end if
          else if (resname .eq. ' DP') then
-            continue
+            poi = n
+            if (deoxy(i-1)) then
+               call zatom (1252,1.63d0,119.0d0,bkbone(5,i-1),
+     &                        o3i,c3i,c4i,0)
+               call zatom (1253,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
+               call zatom (1253,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
+               call zatom (1253,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            else
+               call zatom (1240,1.63d0,119.0d0,bkbone(5,i-1),
+     &                        o3i,c3i,c4i,0)
+               call zatom (1241,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
+               call zatom (1241,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
+               call zatom (1241,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            end if
          else if (resname .eq. ' TP') then
-            continue
+            poi = n
+            if (deoxy(i-1)) then
+               call zatom (1252,1.63d0,119.0d0,bkbone(5,i-1),
+     &                        o3i,c3i,c4i,0)
+               call zatom (1253,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
+               call zatom (1253,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
+               call zatom (1253,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            else
+               call zatom (1240,1.63d0,119.0d0,bkbone(5,i-1),
+     &                        o3i,c3i,c4i,0)
+               call zatom (1241,1.52d0,106.0d0,60.0d0,poi,o3i,c3i,0)
+               call zatom (1241,1.52d0,106.0d0,-60.0d0,poi,o3i,c3i,0)
+               call zatom (1241,1.52d0,106.0d0,180.0d0,poi,o3i,c3i,0)
+            end if
          else
             if (cap5) then
                cap5 = .false.
