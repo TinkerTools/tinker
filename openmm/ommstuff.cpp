@@ -4254,7 +4254,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
          mdstat_ (istep,dt,&totalEnergy,&potentialEnergy,&eksum,&temp,&pres);
       }
       if (*callMdSave) {
-         bounds_ ();
+         // bounds_ ();
          mdsave_ (istep,dt,&potentialEnergy,&eksum);
       }
    }
