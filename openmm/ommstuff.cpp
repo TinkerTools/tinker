@@ -34,6 +34,7 @@ const int MAX_STRING = 240;
  */
 
 extern "C" {
+
    void born_ ();
    void bounds_ ();
    void egk1_ ();
@@ -44,6 +45,7 @@ extern "C" {
    void lattice_ ();
    void mdsave_ (int*, double*, double*, double*);
    void mdstat_ (int*, double*, double*, double*, double*, double*, double*);
+
 }
 
 /*
@@ -4277,6 +4279,7 @@ void openmm_cleanup_ (void** omm) {
    OpenMM_System_destroy (openMMDataHandle->system);
    free (openMMDataHandle);
 }
+
 }
 
 static void zeroTinkerForce (double* tinkerForce) {
@@ -4372,6 +4375,7 @@ static int usingImplicitSolvent (void) {
  */
 
 extern "C" {
+
 int openmm_test_ (void) {
 
    OpenMM_Vec3Array* initialPosInNm;
@@ -4932,4 +4936,5 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
    OpenMM_State* state = OpenMM_Context_getState (omm->context, infoMask, 0);
    *energyInKcal = OpenMM_State_getPotentialEnergy (state) * OpenMM_KcalPerKJ;
 }
+
 }

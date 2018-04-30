@@ -163,7 +163,7 @@ c
 c     make half-step temperature and pressure corrections
 c
       call temper2 (dt,temp)
-c     call pressure2 (epot,temp)
+      call pressure2 (epot,temp)
 c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
