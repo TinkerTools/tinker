@@ -319,8 +319,9 @@ c
       logical save_opdist,save_improp
       logical save_imptor,save_tors
       logical save_pitors,save_strtor
-      logical save_tortor,save_geom
-      logical save_metal,save_extra
+      logical save_angtor,save_tortor
+      logical save_geom,save_metal
+      logical save_extra
 c
 c
 c     save the original state of fast-evolving potentials
@@ -337,6 +338,7 @@ c
       save_tors = use_tors
       save_pitors = use_pitors
       save_strtor = use_strtor
+      save_angtor = use_angtor
       save_tortor = use_tortor
       save_geom = use_geom
       save_metal = use_metal
@@ -356,6 +358,7 @@ c
       use_tors = .false.
       use_pitors = .false.
       use_strtor = .false.
+      use_angtor = .false.
       use_tortor = .false.
       use_geom = .false.
       use_metal = .false.
@@ -379,6 +382,7 @@ c
       use_tors = save_tors
       use_pitors = save_pitors
       use_strtor = save_strtor
+      use_angtor = save_angtor
       use_tortor = save_tortor
       use_geom = save_geom
       use_metal = save_metal
