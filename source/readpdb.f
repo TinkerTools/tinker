@@ -664,6 +664,22 @@ c
       if (resname .eq. 'TIP')  resname = 'HOH'
       if (resname .eq. 'DOD')  resname = 'HOH'
 c
+c     convert shifted names for cations and anions
+c
+      if (resname .eq. 'LI ')  resname = ' LI'
+      if (resname .eq. 'NA ')  resname = ' NA'
+      if (resname .eq. 'MG ')  resname = ' MG'
+      if (resname .eq. 'K  ')  resname = '  K'
+      if (resname .eq. 'CA ')  resname = ' CA'
+      if (resname .eq. 'RB ')  resname = ' RB'
+      if (resname .eq. 'SR ')  resname = ' SR'
+      if (resname .eq. 'CS ')  resname = ' CS'
+      if (resname .eq. 'BA ')  resname = ' BA'
+      if (resname .eq. 'F  ')  resname = '  F'
+      if (resname .eq. 'CL ')  resname = ' CL'
+      if (resname .eq. 'BR ')  resname = ' BR'
+      if (resname .eq. 'I  ')  resname = '  I'
+c
 c     decide whether residue is protein or nucleic acid
 c
       restype = 'UNKNOWN'

@@ -48,7 +48,10 @@
 
       amoebabio  Biopolymer parameters (protein and nucleic acid) for
                  the AMOEBA polarizable atomic multipole force field.
-                 The 2009 version is provided.
+                 The 2009 and 2018 versions are provided.
+
+      amoebanuc  Nucleic acid parameter for the AMOEBA polarizable atomic
+                 multipole force field. The 2017 version is provided.
 
       amoebapro  Protein parameters for the AMOEBA polarizable atomic
                  multipole force field. The original 2004 version and
@@ -145,5 +148,6 @@
       water      The current AMOEBA water parameters for a polarizable
                  multipole electrostatics model. This model is equal to
                  or better than the best available water models for many
-                 bulk and cluster properties.
+                 bulk and cluster properties. The 2003 and 2014 water
+                 models are provided.
 

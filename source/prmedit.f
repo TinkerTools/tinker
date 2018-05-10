@@ -1350,7 +1350,6 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            call prmsort (4,ia,ib,ic,id,0)
             write (iprm,320)  ia,ib,ic,id,record(next:length)
   320       format ('strtors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'ANGTORS ') then
@@ -1366,7 +1365,6 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            call prmsort (4,ia,ib,ic,id,0)
             write (iprm,330)  ia,ib,ic,id,record(next:length)
   330       format ('angtors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'TORTORS ') then

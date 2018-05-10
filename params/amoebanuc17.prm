@@ -5,7 +5,7 @@
       ##                          ##
       ##############################
 
-forcefield              AMOEBA-NUCLEIC-2018
+forcefield              AMOEBA-NUCLEIC-2017
 
 bond-cubic              -2.55
 bond-quartic            3.793125
@@ -56,12 +56,12 @@ mutual-14-scale         1.0
       #############################
 
 
-This file contains the 2018 version of the AMOEBA nucleic acids force field
+This file contains the 2017 version of the AMOEBA nucleic acids force field
 as per the J. Chem. Theory Comput. article listed immediately below
 
 C. Zhang, C. Lu, Z. Jing, C. Wu, J.-P. Piquemal, J. W. Ponder and P. Ren,
 "AMOEBA Polarizable Atomic Multipole Force Field for Nucleic Acids",
-J. Chem. Theory Comput., 14, xxx-xxx (2018)
+J. Chem. Theory Comput., 14, 2084-2108 (2018)
 
 
       #############################
@@ -239,7 +239,7 @@ vdw          48               3.4050     0.1100
 vdw          49               2.6550     0.0135      0.910
 vdw          50               3.0200     0.2600
 vdw          51               3.7100     0.3500
-vdw          52               2.9400     0.3000
+vdw          52               2.9000     0.2800
 vdw          53               4.1300     0.3400
 
 
@@ -567,115 +567,107 @@ strbnd        1    1    3      18.70      18.70
 strbnd        1    1    4      18.70      18.70
 strbnd        1    1    7      18.70      18.70
 strbnd        1    1    8      18.70      18.70
+strbnd        1    1   14      18.70      18.70
 strbnd        1    1   18      18.70      18.70
+strbnd        3    1    7      18.70      18.70
 strbnd        4    1    8      18.70      18.70
-strbnd        7    1    3      18.70      18.70
-strbnd       14    1    1      18.70      18.70
-strbnd       14    1    7      18.70      18.70
-strbnd       18    1    8      18.70      18.70
+strbnd        7    1   14      18.70      18.70
+strbnd        8    1   18      18.70      18.70
 strbnd        4    2    7      18.70      18.70
 strbnd        4    2    9      11.50      11.50
 strbnd        7    2    9      11.50      11.50
-strbnd       18    2    7      18.70      18.70
-strbnd       18    2    9      11.50      11.50
+strbnd        7    2   18      18.70      18.70
+strbnd        9    2   18      11.50      11.50
 strbnd        1    3    5      18.70      18.70
 strbnd        1    3    8      18.70      18.70
 strbnd        5    3    8      18.70      18.70
-strbnd       13    3    5      18.70      18.70
-strbnd       13    3    8      18.70      18.70
-strbnd        1    4    2      14.40      14.40
+strbnd        5    3   13      18.70      18.70
+strbnd        8    3   13      18.70      18.70
 strbnd        1    4    2      14.40      14.40
 strbnd        1    4   26      14.40      14.40
 strbnd        1    4   34      14.40      14.40
-strbnd        2    4    1      18.70      18.70
 strbnd        2    4   26      14.40      14.40
 strbnd        2    4   34      14.40      14.40
-strbnd       11    5    3       4.30       4.30
+strbnd        3    5   11       4.30       4.30
 strbnd       11    5   11       4.30       4.30
 strbnd       11    5   17       4.30       4.30
 strbnd        6    6    9      11.50      11.50
 strbnd        6    6   10      18.70      18.70
 strbnd        6    6   12      18.70      18.70
 strbnd        6    6   14      18.70      18.70
+strbnd        6    6   20      18.70      18.70
 strbnd        6    6   21      18.70      18.70
 strbnd        8    6    8      18.70      18.70
 strbnd        8    6   10      18.70      18.70
-strbnd       12    6    9      11.50      11.50
-strbnd       13    6    8      18.70      18.70
-strbnd       13    6    9      11.50      11.50
-strbnd       13    6   12      18.70      18.70
+strbnd        8    6   13      18.70      18.70
+strbnd        9    6   12      11.50      11.50
+strbnd        9    6   13      11.50      11.50
+strbnd        9    6   21      11.50      11.50
+strbnd       10    6   14      18.70      18.70
+strbnd       12    6   13      18.70      18.70
 strbnd       13    6   21      18.70      18.70
-strbnd       14    6   10      18.70      18.70
-strbnd       20    6    6      18.70      18.70
-strbnd       20    6   14      18.70      18.70
-strbnd       21    6    9      11.50      11.50
-strbnd        2    7    1      14.40      14.40
+strbnd       14    6   20      18.70      18.70
+strbnd        1    7    2      14.40      14.40
+strbnd        1    8    6      14.40      14.40
 strbnd        1    8   17      14.40      14.40
-strbnd        6    8    1      14.40      14.40
-strbnd        6    8    3      14.40      14.40
+strbnd        3    8    6      14.40      14.40
+strbnd        3    8   14      14.40      14.40
 strbnd        6    8    6      14.40      14.40
-strbnd       14    8    3      14.40      14.40
-strbnd        6   12   14       7.20       7.20
+strbnd        6   12   14      14.40      14.40
 strbnd        6   12   19       4.30       4.30
 strbnd        6   12   26      14.40      14.40
 strbnd        6   12   34      14.40      14.40
-strbnd       14   12    6      14.40      14.40
-strbnd       14   12    6      14.40      14.40
 strbnd       14   12   14       7.20       7.20
 strbnd       14   12   17       7.20       7.20
 strbnd       14   12   19       4.30       4.30
 strbnd       14   12   26      14.40      14.40
 strbnd       14   12   34      14.40      14.40
-strbnd       19   12   17       4.30       4.30
-strbnd        6   13    3      18.70      18.70
+strbnd       17   12   19       4.30       4.30
+strbnd        3   13    6      18.70      18.70
+strbnd        3   13   13      18.70      18.70
+strbnd        3   13   15      18.70      18.70
+strbnd        5   13   13      18.70      18.70
 strbnd        6   13    6      18.70      18.70
 strbnd        6   13   15      18.70      18.70
-strbnd       13   13    3      18.70      18.70
-strbnd       13   13    5      18.70      18.70
-strbnd       15   13    3      18.70      18.70
 strbnd        1   14   12      18.70      18.70
 strbnd        1   14   16      18.70      18.70
 strbnd        1   14   21      18.70      18.70
 strbnd        6   14   12      18.70      18.70
 strbnd        6   14   16      18.70      18.70
 strbnd        6   14   21      18.70      18.70
+strbnd        8   14   12      18.70      18.70
 strbnd        8   14   16      18.70      18.70
-strbnd       12   14    8      18.70      18.70
 strbnd       12   14   12      18.70      18.70
 strbnd       12   14   16      18.70      18.70
 strbnd       12   14   21      18.70      18.70
-strbnd       21   14   16      18.70      18.70
+strbnd       16   14   21      18.70      18.70
 strbnd       21   14   21      18.70      18.70
 strbnd        5   17    8      18.70      18.70
 strbnd        5   17   12      18.70      18.70
 strbnd        5   17   21      18.70      18.70
-strbnd       12   17    8      18.70      18.70
-strbnd        1   18    2      14.40      14.40
+strbnd        8   17   12      18.70      18.70
 strbnd        1   18    2      14.40      14.40
 strbnd        1   18   26      14.40      14.40
 strbnd        1   18   34      14.40      14.40
-strbnd        2   18    1      18.70      18.70
 strbnd        2   18   26      14.40      14.40
 strbnd        2   18   34      14.40      14.40
 strbnd        6   20   22      11.50      11.50
 strbnd       22   20   22      11.50      11.50
-strbnd        6   21   14      18.70      18.70
+strbnd        6   21   14       7.20       7.20
 strbnd        6   21   19       4.30       4.30
 strbnd        6   21   26      14.40      14.40
 strbnd        6   21   34      14.40      14.40
-strbnd       14   21    6      14.40      14.40
-strbnd       14   21    6      14.40      14.40
 strbnd       14   21   14      18.70      18.70
 strbnd       14   21   19       4.30       4.30
 strbnd       14   21   26      14.40      14.40
 strbnd       14   21   34      14.40      14.40
 strbnd       23   24   25      11.50      11.50
 strbnd       23   24   26      18.70      18.70
-strbnd       26   24   25      11.50      11.50
+strbnd       23   24   30      18.70      18.70
+strbnd       25   24   26      11.50      11.50
+strbnd       25   24   30      11.50      11.50
 strbnd       26   24   27      18.70      18.70
-strbnd       30   24   23      18.70      18.70
-strbnd       30   24   25      11.50      11.50
-strbnd       30   24   26      18.70      18.70
+strbnd       26   24   30      18.70      18.70
 strbnd        4   26   23      18.70      18.70
 strbnd        4   26   25      11.50      11.50
 strbnd        4   26   26      18.70      18.70
@@ -692,29 +684,29 @@ strbnd       23   26   25      11.50      11.50
 strbnd       23   26   26      18.70      18.70
 strbnd       24   26   25      11.50      11.50
 strbnd       24   26   26      18.70      18.70
+strbnd       24   26   26      18.70      18.70
+strbnd       24   26   29      18.70      18.70
+strbnd       24   26   45      18.70      18.70
+strbnd       25   26   26      11.50      11.50
 strbnd       25   26   27      11.50      11.50
-strbnd       26   26   24      18.70      18.70
-strbnd       26   26   25      11.50      11.50
+strbnd       25   26   29      11.50      11.50
+strbnd       25   26   45      11.50      11.50
 strbnd       26   26   26      18.70      18.70
 strbnd       26   26   27      18.70      18.70
-strbnd       29   26   24      18.70      18.70
-strbnd       29   26   25      11.50      11.50
-strbnd       29   26   26      18.70      18.70
-strbnd       45   26   24      18.70      18.70
-strbnd       45   26   25      11.50      11.50
-strbnd       45   26   26      18.70      18.70
-strbnd       31   30   24      11.50      11.50
+strbnd       26   26   29      18.70      18.70
+strbnd       26   26   45      18.70      18.70
+strbnd       24   30   31      11.50      11.50
+strbnd       24   30   32      18.70      18.70
+strbnd       24   30   44      18.70      18.70
 strbnd       31   30   32      11.50      11.50
 strbnd       31   30   44      11.50      11.50
-strbnd       32   30   24      18.70      18.70
-strbnd       44   30   24      18.70      18.70
 strbnd       30   32   42      14.40      14.40
+strbnd       34   33   35      18.70      18.70
 strbnd       34   33   36      11.50      11.50
-strbnd       35   33   34      18.70      18.70
+strbnd       34   33   37      18.70      18.70
 strbnd       35   33   36      11.50      11.50
-strbnd       37   33   34      18.70      18.70
-strbnd       37   33   35      18.70      18.70
-strbnd       37   33   36      11.50      11.50
+strbnd       35   33   37      18.70      18.70
+strbnd       36   33   37      11.50      11.50
 strbnd        4   34   34      18.70      18.70
 strbnd        4   34   35      18.70      18.70
 strbnd        4   34   36      11.50      11.50
@@ -729,22 +721,21 @@ strbnd       21   34   35      18.70      18.70
 strbnd       21   34   36      11.50      11.50
 strbnd       33   34   34      18.70      18.70
 strbnd       33   34   36      11.50      11.50
-strbnd       34   34   33      18.70      18.70
+strbnd       33   34   38      18.70      18.70
+strbnd       33   34   46      18.70      18.70
 strbnd       34   34   34      18.70      18.70
+strbnd       34   34   35      18.70      18.70
 strbnd       34   34   36      11.50      11.50
-strbnd       35   34   34      18.70      18.70
+strbnd       34   34   38      18.70      18.70
+strbnd       34   34   46      18.70      18.70
 strbnd       35   34   36      11.50      11.50
-strbnd       38   34   33      18.70      18.70
-strbnd       38   34   34      18.70      18.70
-strbnd       38   34   36      11.50      11.50
-strbnd       46   34   33      18.70      18.70
-strbnd       46   34   34      18.70      18.70
-strbnd       46   34   36      11.50      11.50
-strbnd       40   37   33      11.50      11.50
+strbnd       36   34   38      11.50      11.50
+strbnd       36   34   46      11.50      11.50
+strbnd       33   37   40      11.50      11.50
+strbnd       33   37   41      18.70      18.70
+strbnd       33   37   47      18.70      18.70
 strbnd       40   37   41      11.50      11.50
 strbnd       40   37   47      11.50      11.50
-strbnd       41   37   33      18.70      18.70
-strbnd       47   37   33      18.70      18.70
 strbnd       37   41   42      14.40      14.40
 
 
@@ -1269,10 +1260,10 @@ strtors       2   18   26   23    0.000   0.000   1.500   0.000   0.000  -4.000 
 strtors       2   18   34   35    0.000   0.000   1.500   0.000   0.000  -4.000   0.000   0.000   5.200
 strtors       6   21   26   23    0.000   0.000   1.500   0.000   0.000  -4.000   0.000   0.000   5.200
 strtors       6   21   34   35    0.000   0.000   1.500   0.000   0.000  -4.000   0.000   0.000   5.200
-strtors      26   29   42   32   -4.254   0.000   0.000   0.000   1.814   0.000   0.000   0.000   0.000
-strtors      30   32   42   29   -4.254   0.000   0.000   0.000   1.814   0.000   0.000   0.000   0.000
-strtors      34   38   42   41   -4.254   0.000   0.000   0.000   1.814   0.000   0.000   0.000   0.000
-strtors      37   41   42   38   -4.254   0.000   0.000   0.000   1.814   0.000   0.000   0.000   0.000
+strtors      26   29   42   32    0.000   0.000   0.000   0.000   1.814   0.000  -4.254   0.000   0.000
+strtors      30   32   42   29    0.000   0.000   0.000   0.000   1.814   0.000  -4.254   0.000   0.000
+strtors      34   38   42   41    0.000   0.000   0.000   0.000   1.814   0.000  -4.254   0.000   0.000
+strtors      37   41   42   38    0.000   0.000   0.000   0.000   1.814   0.000  -4.254   0.000   0.000
 
 
       ################################
@@ -1290,10 +1281,10 @@ angtors       2   18   26   23    0.014   0.000  -0.058   0.000   0.000  -0.011
 angtors       2   18   34   35    0.014   0.000  -0.058   0.000   0.000  -0.011
 angtors       6   21   26   23    0.014   0.000  -0.058   0.000   0.000  -0.011
 angtors       6   21   34   35    0.014   0.000  -0.058   0.000   0.000  -0.011
-angtors      26   29   42   43    0.000  -0.116   0.000   0.000   0.000  -0.011
-angtors      30   32   42   43    0.000  -0.116   0.000   0.000   0.000  -0.011
-angtors      34   38   42   43    0.000  -0.116   0.000   0.000   0.000  -0.011
-angtors      37   41   42   43    0.000  -0.116   0.000   0.000   0.000  -0.011
+angtors      26   29   42   43    0.000   0.000  -0.011   0.000  -0.116   0.000
+angtors      30   32   42   43    0.000   0.000  -0.011   0.000  -0.116   0.000
+angtors      34   38   42   43    0.000   0.000  -0.011   0.000  -0.116   0.000
+angtors      37   41   42   43    0.000   0.000  -0.011   0.000  -0.116   0.000
 
 
       ###################################
@@ -2058,7 +2049,7 @@ polarize    103          0.8370     0.3900    104
 polarize    104          0.4960     0.3900    103
 polarize    105          0.1200     0.3900
 polarize    106          0.7800     0.3900
-polarize    107          0.0800     0.1300
+polarize    107          0.0800     0.1150
 polarize    108          4.0000     0.3900
 
 
@@ -2302,14 +2293,26 @@ biotype    1230    P       "Phosphodiester RNA"               97
 biotype    1231    OP      "Phosphodiester RNA"               98
 biotype    1232    O5*     "5'-Hydroxyl RNA"                  99
 biotype    1233    H5T     "5'-Hydroxyl RNA"                  81
+biotype    1234    O5*     "5'-Monophosphate OS RNA"          -1
+biotype    1235    P       "5'-Monophosphate P RNA"           -1
+biotype    1236    OP      "5'-Monophosphate OP RNA"          -1
 biotype    1237    O3*     "3'-Hydroxyl RNA"                 100
 biotype    1238    H3T     "3'-Hydroxyl RNA"                  77
+biotype    1239    O3*     "3'-Monophosphate OS RNA"          -1
+biotype    1240    P       "3'-Monophosphate P RNA"           -1
+biotype    1241    OP      "3'-Monophosphate OP RNA"          -1
 biotype    1242    P       "Phosphodiester DNA"               97
 biotype    1243    OP      "Phosphodiester DNA"               98
 biotype    1244    O5*     "5'-Hydroxyl DNA"                 102
 biotype    1245    H5T     "5'-Hydroxyl DNA"                  96
+biotype    1246    O5*     "5'-Monophosphate OS DNA"          -1
+biotype    1247    P       "5'-Monophosphate P DNA"           -1
+biotype    1248    OP      "5'-Monophosphate OP DNA"          -1
 biotype    1249    O3*     "3'-Hydroxyl DNA"                 101
 biotype    1250    H3T     "3'-Hydroxyl DNA"                  93
+biotype    1251    O3*     "3'-Monophosphate OS DNA"          -1
+biotype    1252    P       "3'-Monophosphate P DNA"           -1
+biotype    1253    OP      "3'-Monophosphate OP DNA"          -1
 biotype    2001    O       "Water"                           103
 biotype    2002    H       "Water"                           104
 biotype    2003    NA      "Sodium Ion"                      105

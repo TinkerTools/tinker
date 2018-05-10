@@ -156,23 +156,23 @@ c
             if (mass(i) .lt. hmax) then
                dmass = hmax - mass(i)
                dmin = hmax + dmass
-               if (atomic(i) .eq. 1) then
-                  do j = 1, n13(i)
-                     k = i13(j,i)
-                     if (atomic(k).ne.1 .and. mass(k).gt.dmin) then
-                        mass(k) = mass(k) - dmass
-                        mass(i) = hmax
-                     end if
-                  end do
-               else
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k).ne.1 .and. mass(k).gt.dmin) then
-                        mass(k) = mass(k) - dmass
-                        mass(i) = hmax
-                     end if
-                  end do
-               end if
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (mass(k) .gt. dmin) then
+                     mass(k) = mass(k) - dmass
+                     mass(i) = hmax
+                     goto 50
+                  end if
+               end do
+               do j = 1, n13(i)
+                  k = i13(j,i)
+                  if (mass(k) .gt. dmin) then
+                     mass(k) = mass(k) - dmass
+                     mass(i) = hmax
+                     goto 50
+                  end if
+               end do
+   50          continue
             end if
          end do
       end if
@@ -197,12 +197,12 @@ c
             call gettext (record,symb,next)
             call getstring (record,notice,next)
             string = record(next:240)
-            read (string,*,err=70,end=70)  atn,wght,lig
+            read (string,*,err=80,end=80)  atn,wght,lig
             if (k.lt.0 .and. k.ge.-n) then
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,50)
-   50             format (/,' Additional Atom Types for',
+                  write (iout,60)
+   60             format (/,' Additional Atom Types for',
      &                       ' Specific Atoms :',
      &                    //,5x,'Atom  Class  Symbol  Description',
      &                       15x,'Atomic',4x,'Mass',3x,'Valence',/)
@@ -216,11 +216,11 @@ c
                mass(k) = wght
                valence(k) = lig
                if (.not. silent) then
-                  write (iout,60)  k,cls,symb,notice,atn,wght,lig
-   60             format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+                  write (iout,70)  k,cls,symb,notice,atn,wght,lig
+   70             format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
                end if
             end if
-   70       continue
+   80       continue
          end if
       end do
 c
@@ -235,13 +235,13 @@ c
             abort = .true.
             if (header) then
                header = .false.
-               write (iout,80)
-   80          format (/,' Undefined Atom Types or Classes :',
+               write (iout,90)
+   90          format (/,' Undefined Atom Types or Classes :',
      &                 //,' Type',10x,'Atom Number',5x,'Atom Type',
      &                    5x,'Atom Class',/)
             end if
-            write (iout,90)  i,k,cls
-   90       format (' Atom',12x,i5,10x,i5,10x,i5)
+            write (iout,100)  i,k,cls
+  100       format (' Atom',12x,i5,10x,i5,10x,i5)
          end if
       end do
 c
@@ -252,14 +252,14 @@ c
          if (n12(i) .ne. valence(i)) then
             if (header) then
                header = .false.
-               write (iout,100)
-  100          format (/,' Atoms with an Unusual Number of Attached',
+               write (iout,110)
+  110          format (/,' Atoms with an Unusual Number of Attached',
      &                    ' Atoms :',
      &                 //,' Type',11x,'Atom Name',6x,'Atom Type',7x,
      &                    'Expected',4x,'Found',/)
             end if
-            write (iout,110)  i,name(i),type(i),valence(i),n12(i)
-  110       format (' Valence',5x,i7,'-',a3,8x,i5,10x,i5,5x,i5)
+            write (iout,120)  i,name(i),type(i),valence(i),n12(i)
+  120       format (' Valence',5x,i7,'-',a3,8x,i5,10x,i5,5x,i5)
          end if
       end do
       return

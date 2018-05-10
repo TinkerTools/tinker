@@ -154,7 +154,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (keys0(nkey))
-      allocate (keys1(nkey))
 c
 c     store the keyword vqlues for state 0
 c
@@ -192,6 +191,10 @@ c
       lengb = leng
       titleb = title
       ltitleb = ltitle
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (keys1(nkey))
 c
 c     store the keyword values for state 1
 c

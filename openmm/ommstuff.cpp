@@ -34,6 +34,7 @@ const int MAX_STRING = 240;
  */
 
 extern "C" {
+
    void born_ ();
    void bounds_ ();
    void egk1_ ();
@@ -44,6 +45,7 @@ extern "C" {
    void lattice_ ();
    void mdsave_ (int*, double*, double*, double*);
    void mdstat_ (int*, double*, double*, double*, double*, double*, double*);
+
 }
 
 /*
@@ -3763,7 +3765,7 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
 
 extern "C" {
 
-extern void fatal_();
+extern void fatal_ ();
 
 void openmm_init_ (void** ommHandle, double* dt) {
 
@@ -4095,139 +4097,6 @@ void openmm_init_ (void** ommHandle, double* dt) {
 
 /*
  *    ############################################################
- *          Copy State from OpenMM to Tinker Data Structures
- *    ############################################################
- *
- *    @param omm                    handle with OpenMM data structures
- *    @param timeInPs               output simulation time in ps
- *    @param kineticEnergyInKcal    output kinetic energy in kcal
- *    @param potentialEnergyInKcal  output potential energy in kcal
- */
-
-void openmm_copy_state_ (void** omm, double *timeInPs,
-                         double* kineticEnergyInKcal,
-                         double* potentialEnergyInKcal) {
-
-   OpenMM_State* state;
-   const OpenMM_Vec3Array* positionArray;
-   const OpenMM_Vec3Array* velocityArray;
-   const OpenMM_Vec3Array* forceArray;
-   OpenMM_Vec3 aBox;
-   OpenMM_Vec3 bBox;
-   OpenMM_Vec3 cBox;
-   int infoMask;
-   int ii;
-   int offset;
-   double amass;
-   double positionConvert;
-   double velocityConvert;
-   double forceConvert;
-   OpenMMData* openMMDataHandle;
-
-   openMMDataHandle = (OpenMMData*) (*omm);
-
-   infoMask = OpenMM_State_Positions;
-   infoMask += OpenMM_State_Velocities;
-   infoMask += OpenMM_State_Forces;
-   infoMask += OpenMM_State_Energy;
-
-   // State object is created here and must be explicitly destroyed below
-
-   state = OpenMM_Context_getState (openMMDataHandle->context, infoMask, 0);
-   *timeInPs = OpenMM_State_getTime (state);
-
-   OpenMM_State_getPeriodicBoxVectors (state, &aBox, &bBox, &cBox);
-
-   *(boxes__.xbox) = aBox.x / OpenMM_NmPerAngstrom;
-   *(boxes__.ybox) = bBox.y / OpenMM_NmPerAngstrom;
-   *(boxes__.zbox) = cBox.z / OpenMM_NmPerAngstrom;
-   *(boxes__.xbox2) = 0.5 * (*(boxes__.xbox));
-   *(boxes__.ybox2) = 0.5 * (*(boxes__.ybox));
-   *(boxes__.zbox2) = 0.5 * (*(boxes__.zbox));
-
-   // positions, velocities and forces are maintained as Vec3Arrays
-   // inside the State; this provides access, but don't destroy them
-   // yourself as they will go away with the State
-
-   positionConvert = 1.0 / OpenMM_NmPerAngstrom;
-   velocityConvert = 1.0 / OpenMM_NmPerAngstrom;
-   forceConvert = 10.0;
-
-   positionArray = OpenMM_State_getPositions (state);
-   velocityArray = OpenMM_State_getVelocities (state);
-   forceArray = OpenMM_State_getForces (state);
-
-   for (ii = 0; ii < atoms__.n; ii++) {
-      atoms__.x[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).x
-                           * positionConvert;
-      atoms__.y[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).y
-                           * positionConvert;
-      atoms__.z[ii] = (*OpenMM_Vec3Array_get(positionArray, ii)).z
-                           * positionConvert;
-   }
-
-   for (ii = 0; ii < atoms__.n; ii++) {
-      offset = 3*ii;
-      moldyn__.v[offset] = (*OpenMM_Vec3Array_get(velocityArray, ii)).x
-                                * velocityConvert;
-      moldyn__.v[offset+1] = (*OpenMM_Vec3Array_get(velocityArray, ii)).y
-                                  * velocityConvert;
-      moldyn__.v[offset+2] = (*OpenMM_Vec3Array_get(velocityArray, ii)).z
-                                  * velocityConvert;
-   }
-
-   for (ii = 0; ii < atoms__.n; ii++) {
-      offset = 3*ii;
-      amass = 1.0 / atomid__.mass[ii];
-      moldyn__.a[offset] = (*OpenMM_Vec3Array_get(forceArray, ii)).x
-                                  * amass * forceConvert;
-      moldyn__.a[offset+1] = (*OpenMM_Vec3Array_get(forceArray, ii)).y
-                                  * amass * forceConvert;
-      moldyn__.a[offset+2] = (*OpenMM_Vec3Array_get(forceArray, ii)).z
-                                  * amass * forceConvert;
-   }
-
-   for (ii = 0; ii < atoms__.n; ii++) {
-      offset = 3*ii;
-      moldyn__.aalt[offset] = 0.0;
-      moldyn__.aalt[offset+1] = 0.0;
-      moldyn__.aalt[offset+2] = 0.0;
-   }
-
-   if (inform__.debug) {
-
-      (void) fprintf (stderr, "\n State: E=%15.7e [%15.7e %15.7e]\n",
-                      (*kineticEnergyInKcal + *potentialEnergyInKcal),
-                      *kineticEnergyInKcal, *potentialEnergyInKcal);
-      (void) fprintf (stderr, "        t=%15.7e ps\n\n", *timeInPs);
-
-      for (ii = 0; ii < atoms__.n; ii++) {
-         (void) fprintf (stderr, "%7d   POS   %17.8e %17.8e %17.8e\n", ii+1,
-             (*OpenMM_Vec3Array_get(positionArray,ii)).x*positionConvert,
-             (*OpenMM_Vec3Array_get(positionArray,ii)).y*positionConvert,
-             (*OpenMM_Vec3Array_get(positionArray,ii)).z*positionConvert);
-         (void) fprintf (stderr, "%7d   VEL   %17.8e %17.8e %17.8e\n", ii+1,
-             (*OpenMM_Vec3Array_get(velocityArray,ii)).x*velocityConvert,
-             (*OpenMM_Vec3Array_get(velocityArray,ii)).y*velocityConvert,
-             (*OpenMM_Vec3Array_get(velocityArray,ii)).z*velocityConvert);
-         (void) fprintf (stderr, "%7d   FRC   %17.8e %17.8e %17.8e\n", ii+1,
-             (*OpenMM_Vec3Array_get(forceArray,ii)).x*forceConvert,
-             (*OpenMM_Vec3Array_get(forceArray,ii)).y*forceConvert,
-             (*OpenMM_Vec3Array_get(forceArray,ii)).z*forceConvert);
-      }
-      (void) fflush (stderr);
-   }
-
-   *kineticEnergyInKcal = OpenMM_State_getKineticEnergy (state)
-                              * OpenMM_KcalPerKJ;
-   *potentialEnergyInKcal = OpenMM_State_getPotentialEnergy (state)
-                                * OpenMM_KcalPerKJ;
-
-   OpenMM_State_destroy (state);
-}
-
-/*
- *    ############################################################
  *       Update Tinker Data Structures; Call mdstat and mdsave
  *    ############################################################
  *
@@ -4394,91 +4263,6 @@ void openmm_update_ (void** omm, double* dt, int* istep,
    OpenMM_State_destroy (state);
 }
 
-void openmm_get_energies_ (void** omm, double* ke, double* pe) {
-
-   OpenMM_State* state;
-   const OpenMM_Vec3Array* positionArray;
-   OpenMM_Vec3 aBox;
-   OpenMM_Vec3 bBox;
-   OpenMM_Vec3 cBox;
-   int infoMask;
-   int ii;
-
-   static const double gasconst = 1.98720415e-3;
-
-   double totalEnergy, potentialEnergy, kineticEnergy;
-   OpenMMData* openMMDataHandle;
-
-   openMMDataHandle = (OpenMMData*) (*omm);
-
-   infoMask = OpenMM_State_Positions;
-   infoMask += OpenMM_State_Velocities;
-   if (inform__.debug) {
-      infoMask += OpenMM_State_Forces;
-   }
-   infoMask += OpenMM_State_Energy;
-
-   // State object is created here and must be explicitly destroyed below
-
-   state = OpenMM_Context_getState (openMMDataHandle->context, infoMask, 0);
-   OpenMM_State_getPeriodicBoxVectors (state, &aBox, &bBox, &cBox);
-
-   // load positions, velocities and energies
-
-   //positionArray = OpenMM_State_getPositions (state);
-   //velocityArray = OpenMM_State_getVelocities (state);
-
-   potentialEnergy = (OpenMM_State_getPotentialEnergy (state))
-                         * OpenMM_KcalPerKJ;
-   kineticEnergy = (OpenMM_State_getKineticEnergy (state)) * OpenMM_KcalPerKJ;
-   totalEnergy = potentialEnergy + kineticEnergy;
-
-   *ke = kineticEnergy;
-   *pe = potentialEnergy;
-
-   OpenMM_State_destroy (state);
-}
-
-void openmm_update_box_ (void** omm) {
-
-   OpenMM_Vec3 aBox;
-   OpenMM_Vec3 bBox;
-   OpenMM_Vec3 cBox;
-
-   OpenMMData* openMMDataHandle;
-   openMMDataHandle = (OpenMMData*) (*omm);
-
-   aBox.x = 0.0;
-   aBox.y = 0.0;
-   aBox.z = 0.0;
-   bBox.x = 0.0;
-   bBox.y = 0.0;
-   bBox.z = 0.0;
-   cBox.x = 0.0;
-   cBox.y = 0.0;
-   cBox.z = 0.0;
-
-   aBox.x = *(boxes__.xbox) * OpenMM_NmPerAngstrom;
-   bBox.y = *(boxes__.ybox) * OpenMM_NmPerAngstrom;
-   cBox.z = *(boxes__.zbox) * OpenMM_NmPerAngstrom;
-   OpenMM_Context_setPeriodicBoxVectors (openMMDataHandle->context,
-                                         &aBox, &bBox, &cBox);
-}
-
-void openmm_update_positions_ (void** omm) {
-
-   OpenMMData* openMMDataHandle;
-   OpenMM_Vec3Array* initialPosInNm;
-   FILE* log = stderr;
-
-   openMMDataHandle = (OpenMMData*) (*omm);
-
-   initialPosInNm = OpenMM_Vec3Array_create (0);
-   setupPositions (initialPosInNm, log);
-   OpenMM_Context_setPositions (openMMDataHandle->context, initialPosInNm);
-   OpenMM_Vec3Array_destroy (initialPosInNm);
-}
-
 void openmm_take_steps_ (void** omm, int* numSteps) {
 
    OpenMMData* openMMDataHandle = (OpenMMData*) (*omm);
@@ -4495,6 +4279,7 @@ void openmm_cleanup_ (void** omm) {
    OpenMM_System_destroy (openMMDataHandle->system);
    free (openMMDataHandle);
 }
+
 }
 
 static void zeroTinkerForce (double* tinkerForce) {
@@ -4585,301 +4370,12 @@ static int usingImplicitSolvent (void) {
 
 /*
  *    ############################################################
- *       Map Data Structures and Check for Supported Potentials
- *    ############################################################
- *
- *    (1) Map Tinker data structures with arrays to C data structs
- *    (2) Check for Tinker parameter settings consistent with OpenMM
- *        values and potential types
- *    (3) If invalid match or setting found, exit
- */
-
-extern "C" {
-void openmm_validate_ (int* testingActive) {
-
-   char buffer[128];
-   int ii;
-   int implicitSolventActive;
-   int invalidAxisType;
-   int invalid = 0;
-   int testing = *testingActive;
-   char const* ixnString = "Interaction Not Currently Supported by OpenMM.\n";
-   FILE* log = stderr;
-
-   if (testing && log) {
-      (void) fprintf (log, "Testing Mode is Active (=%d)\n", testing);
-   }
-
-   // check that requested bond potential type is supported
-
-   if (strncasecmp (bndpot__.bndtyp, "HARMONIC", 8) != 0) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Only HARMONIC bond potential supported: %s not available\n",
-                         bndpot__.bndtyp);
-      }
-   }
-
-   // check that requested angle potential type is supported
-
-   for (ii = 0; ii < angbnd__.nangle; ii++) {
-      if (strncasecmp (angpot__.angtyp + 8*ii, "HARMONIC", 8) != 0 &&
-         strncasecmp (angpot__.angtyp + 8*ii, "IN-PLANE", 8) != 0 ) {
-         invalid++;
-         if (log) {
-            setNullTerminator (angpot__.angtyp + 8*ii, 8, buffer);
-            (void) fprintf (log, "Only HARMONIC or IN-PLANE angle potential supported: %s not available\n",
-                            buffer);
-         }
-      }
-   }
-
-   // check that scaling parameters agree with hardcoded values
-
-   if (fabs( 0.0 - vdwpot__.v2scale)  > 0.0 ||
-      fabs( 0.0 - vdwpot__.v3scale)  > 0.0 ||
-      fabs( 1.0 - vdwpot__.v4scale)  > 0.0 ||
-      fabs( 1.0 - vdwpot__.v5scale)  > 0.0 ) {
-      invalid++;
-      if (log) {
-          (void) fprintf (log, "Vdw Scale Parameters [%8.1f %8.1f %8.1f %8.1f] are not [0.0, 0.0, 1.0, 1.0]\n",
-                          vdwpot__.v2scale, vdwpot__.v3scale,
-                          vdwpot__.v4scale, vdwpot__.v5scale);
-      }
-   }
-
-   if (fabs(0.0 - polpot__.p2scale) > 0.0 ||
-      fabs(0.0 - polpot__.p3scale) > 0.0 ||
-      fabs(1.0 - polpot__.p4scale) > 0.0 ||
-      fabs(0.5 - polpot__.p41scale) > 0.0 ||
-      fabs(1.0 - polpot__.p5scale) > 0.0) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "P-Scale Parameters [%8.1f %8.1f %8.1f %8.1f %8.1f] are not [0.0, 0.0, 1.0, 0.5, 1.0]\n",
-                         polpot__.p2scale, polpot__.p3scale,
-                         polpot__.p4scale, polpot__.p41scale,
-                         polpot__.p5scale);
-      }
-   }
-
-   if (fabs( 0.0 - polpot__.d1scale) > 0.0 ||
-      fabs( 1.0 - polpot__.d2scale) > 0.0 ||
-      fabs( 1.0 - polpot__.d3scale) > 0.0 ||
-      fabs( 1.0 - polpot__.d4scale) > 0.0) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "D-Scale Parameters [%8.1f %8.1f %8.1f %8.1f] are not [0.0, 1.0, 1.0, 1.0]\n",
-                         polpot__.d1scale, polpot__.d2scale,
-                         polpot__.d3scale, polpot__.d4scale);
-      }
-   }
-
-   if (fabs( 1.0 - polpot__.u1scale) > 0.0 ||
-      fabs( 1.0 - polpot__.u2scale) > 0.0 ||
-      fabs( 1.0 - polpot__.u3scale) > 0.0 ||
-      fabs( 1.0 - polpot__.u4scale) > 0.0) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "U-Scale Parameters [%8.1f %8.1f %8.1f %8.1f] are not [1.0, 1.0, 1.0, 1.0]\n",
-                         polpot__.u1scale, polpot__.u2scale,
-                         polpot__.u3scale, polpot__.u4scale);
-      }
-   }
-
-   if (fabs( 0.0 - mplpot__.m2scale) > 0.0 ||
-      fabs( 0.0 - mplpot__.m3scale) > 0.0 ||
-      fabs( 0.4 - mplpot__.m4scale) > 0.0 ||
-      fabs( 0.8 - mplpot__.m5scale) > 0.0) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "M-Scale Parameters [%8.1f %8.1f %8.1f %8.1f] are not [0.0, 0.0, 0.4, 0.8]\n",
-                          mplpot__.m2scale, mplpot__.m3scale,
-                          mplpot__.m4scale, mplpot__.m5scale);
-      }
-   }
-
-   // check that local coordinate frame axis type is supported
-
-   if (potent__.use_mpole) {
-      for (ii = 0; ii < atoms__.n; ii++) {
-         invalidAxisType = 0;
-         if (strncasecmp (mpole__.polaxe + 8*ii, "Z-then-X", 8) != 0 &&
-            strncasecmp (mpole__.polaxe + 8*ii, "Bisector", 8) != 0 &&
-            strncasecmp (mpole__.polaxe + 8*ii, "Z-Bisect", 8) != 0 &&
-            strncasecmp (mpole__.polaxe + 8*ii, "3-Fold", 6) != 0 &&
-            strncasecmp (mpole__.polaxe + 8*ii, "None", 4) != 0 &&
-            strncasecmp (mpole__.polaxe + 8*ii, "    ", 4) != 0 &&
-            strncasecmp (mpole__.polaxe + 8*ii, "Z-Only", 6) != 0) {
-            invalid++;
-            if (log) {
-               setNullTerminator (mpole__.polaxe + 8*ii, 8, buffer);
-               (void) fprintf (log, "Axis Type=%s for Atom %7d Not Supported\n",
-                               buffer, ii);
-               if (invalid > 20) {
-                  (void) fflush (log);
-                  exit (-1);
-               }
-            }
-         }
-      }
-   }
-
-   // check for any particles that are "inactive" (ie, frozen)
-
-   if (*(usage__.nuse) !=  atoms__.n) {
-      if (log) {
-         (void) fprintf (log, "Inactive Atoms Not Supported: nuse=%d, N=%d\n",
-                         *(usage__.nuse), atoms__.n);
-      }
-      invalid++;
-   }
-
-   // check for torsional values beyond the supported 3-fold term
-
-   if (potent__.use_tors) {
-      double* torsPtr;
-      for (ii = 0; ii < tors__.ntors; ii++) {
-         torsPtr = tors__.tors4 + ii*4;
-         if (*torsPtr != 0.0) {
-            if (log) {
-                (void) fprintf (log, "4-Fold Parameter for Torsion %d is NonZero %15.7e\n",
-                                ii, *torsPtr);
-            }
-            invalid++;
-         }
-         torsPtr = tors__.tors5 + ii*4;
-         if (*torsPtr != 0.0) {
-            if (log) {
-               (void) fprintf (log, "5-Fold Parameter for Torsion %d is NonZero %15.7e\n",
-                               ii, *torsPtr);
-            }
-            invalid++;
-         }
-         torsPtr = tors__.tors6 + ii*4;
-         if (*torsPtr != 0.0) {
-            if (log) {
-               (void) fprintf (log, "6-Fold Parameter for Torsion %d is NonZero %15.7e\n",
-                               ii, *torsPtr);
-            }
-            invalid++;
-         }
-      }
-   }
-
-   // check for use of potential terms not implemented in OpenMM
-
-   if (potent__.use_angang) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Angle-Angle %s", ixnString);
-      }
-   }
-   if (potent__.use_opdist) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Out-of-Plane Distance %s", ixnString);
-      }
-   }
-   if (potent__.use_improp) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Improper Dihedral %s", ixnString);
-      }
-   }
-   if (potent__.use_imptor) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Improper Torsion %s", ixnString);
-      }
-   }
-   if (potent__.use_charge) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Charge-Charge %s", ixnString);
-      }
-   }
-   if (potent__.use_chgdpl) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Atomwise Charge-Dipole %s", ixnString);
-      }
-   }
-   if (potent__.use_dipole) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Dipole-Dipole %s", ixnString);
-      }
-   }
-   if (potent__.use_rxnfld) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Reaction Field %s", ixnString);
-      }
-   }
-   if (potent__.use_metal) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Ligand Field %s", ixnString);
-      }
-   }
-   if (potent__.use_geom) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Geometric Restraint %s", ixnString);
-      }
-   }
-/*
-   if (potent__.use_extra) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Extra Potentials Not Supported\n");
-      }
-   }
-*/
-   if (potent__.use_orbit) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "SCF-Pi-MO Calculation Not Supported\n");
-      }
-   }
-   implicitSolventActive = usingImplicitSolvent ();
-   if (implicitSolventActive == -1 && !testing) {
-      if (log) {
-         (void) fprintf (log, "Either (Solvate= 'GK' && Born-Radius='GRYCUK') or the Ewald Parameter Must be Set (but not both)\n");
-      }
-      invalid++;
-   }
-   if (implicitSolventActive == -2 && !testing) {
-      if (log) {
-         (void) fprintf (log, "Unsupported Force Combination: Both solvate= 'GK' && born-radius='GRYCUK' and Ewald parameter cannot be set\n");
-      }
-      invalid++;
-   }
-   setNullTerminator (mdstuf__.integrate, 11, buffer);
-   if (strncasecmp (buffer, "VERLET", 6) != 0 &&
-      strncasecmp (buffer, "STOCHASTIC", 6) != 0 && !testing ) {
-      invalid++;
-      if (log) {
-         (void) fprintf (log, "Integrator %s is Not Supported\n", buffer);
-      }
-   }
-   if (log) {
-      (void) fflush (log);
-   }
-
-   if (invalid && !testing) {
-      exit (-1);
-   }
-}
-}
-
-/*
- *    ############################################################
  *           Compare Tinker and OpenMM Energies and Forces
  *    ############################################################
  */
 
 extern "C" {
+
 int openmm_test_ (void) {
 
    OpenMM_Vec3Array* initialPosInNm;
@@ -5408,16 +4904,19 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
    OpenMMData_s* omm = (OpenMMData_s*) (*ommHandle);
 
    // copy periodic box from Tinker to OpenMM
-   OpenMM_Vec3 aBox;
-   OpenMM_Vec3 bBox;
-   OpenMM_Vec3 cBox;
-   aBox.x = aBox.y = aBox.z = 0.0;
-   bBox.x = bBox.y = bBox.z = 0.0;
-   cBox.x = cBox.y = cBox.z = 0.0;
-   aBox.x = *boxes__.xbox * OpenMM_NmPerAngstrom;
-   bBox.y = *boxes__.ybox * OpenMM_NmPerAngstrom;
-   cBox.z = *boxes__.zbox * OpenMM_NmPerAngstrom;
-   OpenMM_Context_setPeriodicBoxVectors (omm->context, &aBox, &bBox, &cBox);
+   OpenMM_Vec3 a;
+   OpenMM_Vec3 b;
+   OpenMM_Vec3 c;
+   a.x = boxes__.lvec[0][0] * OpenMM_NmPerAngstrom;
+   a.y = boxes__.lvec[1][0] * OpenMM_NmPerAngstrom;
+   a.z = boxes__.lvec[2][0] * OpenMM_NmPerAngstrom;
+   b.x = boxes__.lvec[0][1] * OpenMM_NmPerAngstrom;
+   b.y = boxes__.lvec[1][1] * OpenMM_NmPerAngstrom;
+   b.z = boxes__.lvec[2][1] * OpenMM_NmPerAngstrom;
+   c.x = boxes__.lvec[0][2] * OpenMM_NmPerAngstrom;
+   c.y = boxes__.lvec[1][2] * OpenMM_NmPerAngstrom;
+   c.z = boxes__.lvec[2][2] * OpenMM_NmPerAngstrom;
+   OpenMM_Context_setPeriodicBoxVectors (omm->context, &a, &b, &c);
 
    // copy coordinates from Tinker to OpenMM
    // never call OpenMM_Vec3Array_destroy (posInMNm);
@@ -5437,4 +4936,5 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
    OpenMM_State* state = OpenMM_Context_getState (omm->context, infoMask, 0);
    *energyInKcal = OpenMM_State_getPotentialEnergy (state) * OpenMM_KcalPerKJ;
 }
+
 }
