@@ -1657,7 +1657,6 @@ c
       integer start,stop
       integer solute_start,solute_end
       integer ion_type
-      integer, allocatable :: map(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr,rik2
       real*8 close,close2
@@ -1730,7 +1729,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (map(n))
       allocate (remove(nmol))
       allocate (solute(nmol))
       allocate (x_ion(ncopy))
@@ -1870,42 +1868,8 @@ c
       end do
       n = ntot
 c
-c     delete solvent molecules that are too close to the solute
-c
-c      k = nref(1)
-c      ntot = k
-c      do i = nref(1)+1, n
-c         map(i) = 0
-c         if (.not. remove(molcule(i))) then
-c            k = k + 1
-c            map(i) = k
-c            ntot = k
-c         end if
-c      end do
-c      do i = nref(1)+1, n
-c         ii = map(i)
-c         if (ii .ne. 0) then
-c            x(ii) = x(i)
-c            y(ii) = y(i)
-c            z(ii) = z(i)
-c            name(ii) = name(i)
-c            type(ii) = type(i)
-c            k = 0
-c            do j = 1, n12(i)
-c               jj = map(i12(j,i))
-c               if (jj .ne. 0) then
-c                  k = k + 1
-c                  i12(k,ii) = jj
-c               end if
-c            end do
-c            n12(ii) = k
-c         end if
-c      end do
-c      n = ntot
-c
 c     perform deallocation of some local arrays
 c
-      deallocate (map)
       deallocate (remove)
       return
       end
