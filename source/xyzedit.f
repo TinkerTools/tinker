@@ -78,7 +78,7 @@ c
       call initial
       opened = .false.
       multi = .false.
-      nmode = 20
+      nmode = 21
       offset = 0
 c
 c     try to get a filename from the command line arguments
@@ -137,7 +137,8 @@ c
      &        /,3x,'(17) Delete Molecules Outside of Periodic Box',
      &        /,3x,'(18) Append a Second XYZ File to Current One',
      &        /,3x,'(19) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(20) Soak Current Molecule in Box of Solvent')
+     &        /,3x,'(20) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(21) Place Ions around a Macromolecule')
 c
 c     get the desired type of coordinate file modification
 c
@@ -1108,6 +1109,12 @@ c
          call soak
       end if
 c
+c     replace water molecules with ions
+c
+      if (mode .eq. 21) then
+         call placeions
+      end if
+c
 c     output final coordinates for single frame and print info
 c
       if (opened .and. .not.multi) then
@@ -1614,3 +1621,257 @@ c
       deallocate (remove)
       return
       end
+c
+c
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine placeions  --  place ions around solute      ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "placeions" takes a currently defined solvated system and places
+c     places ions, with removal of solvent molecules
+c
+c
+      subroutine placeions
+      use sizes
+      use atomid
+      use atoms
+      use bound
+      use boxes
+      use couple
+      use iounit
+      use molcul
+      use refer
+      use katoms
+      implicit none
+      integer i,j,k,m
+      integer ii,jj
+      integer isolv,icount
+      integer ntot,freeunit
+      integer rand_atom
+      integer ncopy
+      integer start,stop
+      integer solute_start,solute_end
+      integer ion_type
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr,rik2
+      real*8 close,close2
+      real*8 rand,random
+      real*8 weigh,xmid,ymid,zmid
+      real*8, allocatable :: x_ion(:)
+      real*8, allocatable :: y_ion(:)
+      real*8, allocatable :: z_ion(:)
+      logical exist,header,done
+      logical, allocatable :: remove(:)
+      logical, allocatable :: solute(:)
+      character*240 solvfile
+      character*240 record
+      character*240 string
+      external merge
+      external random
+c
+c
+c     count number of molecules and set lattice parameters
+c
+      call molecule
+c
+c     2. ask user for range of solute atoms numbers
+c
+ 10   continue
+      solute_start = 0
+      solute_end = 0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=20,end=20)  solute_start
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=20,end=20)  solute_end
+ 20   continue
+      if (solute_start.eq.0 .or. solute_end.eq.0) then
+         write (iout,30)
+ 30      format (/,' Enter Start and End Atom Numbers of Solute :  ',$)
+         read (input,40)  record
+ 40      format (a240)
+      end if
+      read (record,*,err=10,end=10)  solute_start,solute_end
+c      
+c      solute_start = 1
+c      solute_end = 1898
+c
+c     3. ask user for atom type of ion to place and number of copies
+c
+ 50   continue
+      ion_type = 0
+      ncopy = 0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=60,end=60)  ion_type
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=60,end=60)  ncopy
+ 60   continue
+      if (ion_type.eq.0 .or. ncopy.eq.0) then
+         write (iout,70)
+ 70      format (/,' Enter Atom Type to Place and # of Copies :  ',$)
+         read (input,80)  record
+ 80      format (a240)
+      end if
+      read (record,*,err=50,end=50)  ion_type,ncopy
+c
+c     ion_type = 106
+c     ncopy = 5
+c
+c
+c     set distance cutoff for solute-ion close contacts
+c
+      close = 5.0d0
+      close2 = close * close
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (remove(nmol))
+      allocate (solute(nmol))
+      allocate (x_ion(ncopy))
+      allocate (y_ion(ncopy))
+      allocate (z_ion(ncopy))
+c
+c     initialize the list of solvent molecules to be deleted
+c
+      do i = 1, nmol
+         remove(i) = .false.
+         solute(i) = .false.
+      end do
+c
+c     print header information when processing large systems
+c
+      icount = 0
+      header = .true.
+      if (n-nref(1) .ge. 10000) then
+         write (iout,130)
+ 130     format (/,' Scan for locations to place ions')
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,x,y,z,molcule,close2,remove,header,
+!$OMP& solute_start,solute_end,icount)
+!$OMP DO schedule(guided)
+c
+c     search for close contacts between solute and solvent
+c
+      do i = 1, n
+         if (.not. remove(molcule(i))) then
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            do k = solute_start, solute_end
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               call imagen (xr,yr,zr)
+               rik2 = xr*xr + yr*yr + zr*zr
+               if (rik2 .lt. close2) then
+                  remove(molcule(i)) = .true.
+                  goto 140
+               end if
+            end do
+ 140        continue
+         end if
+         icount = icount + 1
+         if (mod(icount,10000) .eq. 0) then
+            if (header) then
+               header = .false.
+               write (iout,150)
+ 150           format ()
+            end if
+            write (iout,160)  10000*(icount/10000)
+ 160         format (' Solvent Atoms Processed',i15)
+         end if
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     print final status when processing large systems
+c
+      icount = n
+      if (mod(icount,10000).ne.0 .and. icount.gt.10000) then
+         write (iout,170)  icount
+ 170     format (' Atoms Processed',i15)
+      end if
+c
+c     randomly replace solvent molecules with ions
+c
+      ntot = n
+      do i = 1, ncopy
+         done = .false.
+         do while (.not. done)
+c
+c     get random atom
+c
+            rand = random ()
+            rand_atom = int(rand*n)
+c
+c     check if molecule is close to solute
+c
+            if (.not. remove(molcule(rand_atom))) then
+c
+c     get center of mass and delete molecule
+c
+               start = imol(1,molcule(rand_atom))
+               stop = imol(2,molcule(rand_atom))
+               if (start .eq. stop) then
+c
+c     prevent removing ions (1 atom molecules)
+c     
+                  done = .false.
+               else
+                  done = .true.
+                  xmid = 0.0d0
+                  ymid = 0.0d0
+                  zmid = 0.0d0
+                  do m = start, stop
+                     weigh = mass(m)
+                     xmid = xmid + x(start)*weigh
+                     ymid = ymid + y(start)*weigh
+                     zmid = zmid + z(start)*weigh
+c     delete automatically shift the atoms list
+                     call delete (start)
+                     ntot = ntot - 1
+                  end do
+                  weigh = molmass(molcule(rand_atom))
+                  x_ion(i) = xmid / weigh
+                  y_ion(i) = ymid / weigh
+                  z_ion(i) = zmid / weigh
+               end if
+            end if
+         end do
+      end do
+c
+c     insert ions at saved centers of mass
+c     
+      do i = 1, ncopy
+c     this only works for single-atom ions
+         ntot = ntot + 1
+c
+c     insert ion at end of xyz file
+c
+         name(ntot) = symbol(ion_type)
+         x(ntot) = x_ion(i)
+         y(ntot) = y_ion(i)
+         z(ntot) = z_ion(i)
+         type(ntot) = ion_type
+         n12(ntot) = 0
+      end do
+      n = ntot
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (remove)
+      return
+      end
+
+
