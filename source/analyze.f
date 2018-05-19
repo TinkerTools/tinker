@@ -202,6 +202,10 @@ c
             if (nold .ne. n)  call mechanic
          end if
 c
+c     get info on the molecular system and force field
+c
+         if (dosystem)  call systyze
+c
 c     make the call to compute the potential energy
 c
          if (doenergy .or. doatom .or. dolarge)  call enrgyze
