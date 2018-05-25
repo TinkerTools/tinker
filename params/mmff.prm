@@ -212,7 +212,7 @@ atom        139   40    NC%C  "N-C-C TRIPLE BOND"            7    14.003    3
 atom        140   41    CO2M  "CARBOXYLATE ANION C"          6    12.000    3
 atom        141   41    CS2M  "C THIOCARBOXYLATE"            6    12.000    3
 atom        142   42    NSP   "N TRIPLE BONDED"              7    14.003    1
-atom        143   43    NSO2  "N SULFONAMIDES"               7    14.003    2 
+atom        143   43    NSO2  "N SULFONAMIDES"               7    14.003    3
 atom        144   43    NSO3  "N SULFONAMIDES SO3"           7    14.003    3
 atom        145   43    NPO2  "N PHOSPHONAMIDES"             7    14.003    3
 atom        146   43    NPO3  "N PHOSPHONAMIDES,PO3"         7    14.003    3
