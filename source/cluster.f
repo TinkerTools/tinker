@@ -59,7 +59,7 @@ c
          kgrp(i) = 0
          grplist(i) = 0
       end do
-      do i = 1, maxgrp
+      do i = 0, maxgrp
          igrp(1,i) = 1
          igrp(2,i) = 0
       end do
