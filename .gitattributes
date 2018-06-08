@@ -1,0 +1,8 @@
+*.f linguist-language=Fortran
+bench/* linguist-vendored
+doc/* linguist-documentation
+example/* linguist-documentation
+fftw/* linguist-vendored
+openmm/* linguist-vendored
+params/* linguist-documentation
+test/* linguist-documentation
