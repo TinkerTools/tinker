@@ -35,6 +35,7 @@ c
       use atoms
       use freeze
       use ielscf
+      use mdstuf
       use moldyn
       use polar
       use units
@@ -63,7 +64,7 @@ c
 c     set some time values for the dynamics integration
 c
       eps =  0.00000001d0
-      dalt = 0.00025d0
+      dalt = arespa
       nalt = int(dt/(dalt+eps)) + 1
       dalt = dble(nalt)
       dt_2 = 0.5d0 * dt

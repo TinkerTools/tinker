@@ -494,22 +494,26 @@ c
          else if (volscale .eq. 'MOLECULAR') then
             dkin = dble(nmol) * kt * log(volold/volbox)
          else
-            dkin = dble(nuse) * kt * log(volold/volbox)
+            dkin = dble(nmol) * kt * log(volold/volbox)
+c           dkin = dble(nuse) * kt * log(volold/volbox)
          end if
 c
-c     compute the kinetic energy change from the actual velocities;
-c     scale the kinetic energy change to match virial pressure
+c     compute the kinetic energy change from the actual velocities
 c
-c        dkin = 0.0d0
-c        do i = 1, n
-c           if (use(i)) then
-c              term = 0.5d0 * mass(i) / convert
-c              do j = 1, 3
-c                 dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
-c              end do
-c           end if
-c        end do
-c        dkin = 0.907d0 * dkin
+         dkin = 0.0d0
+         do i = 1, n
+            if (use(i)) then
+               term = 0.5d0 * mass(i) / convert
+               do j = 1, 3
+                  dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
+               end do
+            end if
+         end do
+         if (integrate .eq. 'RIGIDBODY') then
+            dkin = dkin * dble(ngrp)/dble(nuse)
+         else if (volscale .eq. 'MOLECULAR') then
+            dkin = dkin * dble(nmol)/dble(nuse)
+         end if
 c
 c     acceptance ratio from Epot change, Ekin change and PV work
 c

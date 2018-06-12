@@ -175,6 +175,7 @@ gfortran -c -Wall angles.f
 gfortran -c -Wall anneal.f
 gfortran -c -Wall archive.f
 gfortran -c -Wall attach.f
+gfortran -c -Wall baoab.f
 gfortran -c -Wall bar.f
 gfortran -c -Wall basefile.f
 gfortran -c -Wall beeman.f

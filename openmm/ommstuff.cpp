@@ -413,6 +413,7 @@ struct {
    int nfree;
    int irest;
    int bmnmix;
+   double arespa;
    int dorest;
    int velsave;
    int frcsave;
@@ -1263,14 +1264,15 @@ void set_limits_data_ (double* vdwcut, double* chgcut, double* dplcut,
    limits__.use_ulist = *use_ulist;
 }
 
-void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix, int* dorest,
-                       int* velsave, int* frcsave, int* uindsave,
+void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix, double* arespa,
+                       int* dorest, int* velsave, int* frcsave, int* uindsave,
                        char* integrate) {
 
    mdstuf__.nfree = *nfree;
    mdstuf__.irest = *irest;
-   mdstuf__.velsave = *bmnmix;
-   mdstuf__.velsave = *dorest;
+   mdstuf__.bmnmix = *bmnmix;
+   mdstuf__.arespa = *arespa;
+   mdstuf__.dorest = *dorest;
    mdstuf__.velsave = *velsave;
    mdstuf__.frcsave = *frcsave;
    mdstuf__.uindsave = *uindsave;
@@ -1284,7 +1286,8 @@ void set_moldyn_data_ (double* v, double* a, double* aalt) {
    moldyn__.aalt = aalt;
 }
 
-void set_molcul_data_ (int* nmol, int* imol, int* kmol, int* molcule, double* totmass, double* molmass) {
+void set_molcul_data_ (int* nmol, int* imol, int* kmol, int* molcule,
+                       double* totmass, double* molmass) {
 
    molcul__.nmol = *nmol;
    molcul__.imol = imol;
@@ -3741,7 +3744,20 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       (void) fprintf (log, "\n Platform CUDA :  Setting Device ID to %s \n", deviceId);
    }
 
-   OpenMM_Platform_setPropertyDefaultValue (platform, "Precision", "mixed" );
+   if (strncmp(openmm__.cudaPrecision,"DOUBLE",6) == 0) {
+      OpenMM_Platform_setPropertyDefaultValue (platform, "Precision",
+                                               "double" );
+   } else if (strncmp(openmm__.cudaPrecision,"SINGLE",6) == 0) {
+      OpenMM_Platform_setPropertyDefaultValue (platform, "Precision",
+                                               "single" );
+   } else {
+      OpenMM_Platform_setPropertyDefaultValue (platform, "Precision",
+                                               "mixed" );
+   }
+
+   if (log) {
+      (void) fprintf (log, "\n Platform CUDA :  Setting Precision to %s via CUDA-PRECISION\n", openmm__.cudaPrecision);
+   }
 
    return platform;
 }
@@ -3924,7 +3940,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
       OpenMM_CustomIntegrator* integrator = (OpenMM_CustomIntegrator*) omm->integrator;
       OpenMM_CustomIntegrator_addUpdateContextState (integrator);
 
-      int n = int (round ((*dt) / 0.00025));
+      int n = int (round ((*dt) / mdstuf__.arespa));
       char n_char[16] = {0};
       sprintf (n_char, "%d", n);
 
@@ -4051,8 +4067,15 @@ void openmm_init_ (void** ommHandle, double* dt) {
       exit (-1);
    }
 
-   omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
-                                           platform);
+   // modification of context creation to avoid bug on large systems
+
+   //omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
+   //                                        platform);
+   OpenMM_PropertyArray* properties = OpenMM_PropertyArray_create ();
+   OpenMM_PropertyArray_add (properties, "DisablePmeStream", "true");
+   omm->context = OpenMM_Context_create_3 (omm->system, omm->integrator,
+                                           platform, properties);
+   OpenMM_PropertyArray_destroy (properties);
 
    if (inform__.debug) {
       (void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
@@ -4792,7 +4815,14 @@ int openmm_test_ (void) {
       exit (-1);
    }
 
-   context = OpenMM_Context_create_2 (system, integrator, platform);
+   // modification of context creation to avoid bug on large systems
+
+   //context = OpenMM_Context_create_2 (system, integrator, platform);
+   OpenMM_PropertyArray* properties = OpenMM_PropertyArray_create ();
+   OpenMM_PropertyArray_add (properties, "DisablePmeStream", "true");
+   context = OpenMM_Context_create_3 (system, integrator, platform,
+                                      properties);
+   OpenMM_PropertyArray_destroy (properties);
 
    OpenMM_Context_setPositions (context, initialPosInNm);
 

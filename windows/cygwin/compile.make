@@ -175,6 +175,7 @@ gfortran -c -O3 -ffast-math -fopenmp angles.f
 gfortran -c -O3 -ffast-math -fopenmp anneal.f
 gfortran -c -O3 -ffast-math -fopenmp archive.f
 gfortran -c -O3 -ffast-math -fopenmp attach.f
+gfortran -c -O3 -ffast-math -fopenmp baoab.f
 gfortran -c -O3 -ffast-math -fopenmp bar.f
 gfortran -c -O3 -ffast-math -fopenmp basefile.f
 gfortran -c -O3 -ffast-math -fopenmp beeman.f

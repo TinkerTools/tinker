@@ -175,6 +175,7 @@ gfortran -c -Ofast -msse3 -fopenmp angles.f
 gfortran -c -Ofast -msse3 -fopenmp anneal.f
 gfortran -c -Ofast -msse3 -fopenmp archive.f
 gfortran -c -Ofast -msse3 -fopenmp attach.f
+gfortran -c -Ofast -msse3 -fopenmp baoab.f
 gfortran -c -Ofast -msse3 -fopenmp bar.f
 gfortran -c -Ofast -msse3 -fopenmp basefile.f
 gfortran -c -Ofast -msse3 -fopenmp beeman.f

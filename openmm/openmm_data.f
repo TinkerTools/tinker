@@ -120,7 +120,7 @@ c
      &                      chgtaper,dpltaper,mpoletaper,ewaldcut,
      &                      usolvcut,use_ewald,use_lights,use_list,
      &                      use_vlist,use_clist,use_mlist,use_ulist)
-      call set_mdstuf_data (nfree,irest,bmnmix,dorest,velsave,
+      call set_mdstuf_data (nfree,irest,bmnmix,arespa,dorest,velsave,
      &                      frcsave,uindsave,integrate)
       call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)

@@ -115,7 +115,7 @@ Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947 (2003)
    ##  29  Imidazole C=N Nitrogen               ##
    ##  30  Carboxylate Carbon                   ##
    ##  31  Carboxylate Oxygen                   ##
-   ##  32  Carboxylic Acid Carbonyl Oxygen      ##
+   ##  32  Carboxylic Acid Carbonyl Carbon      ##
    ##  33  Carboxylic Acid Carbonyl Oxygen      ##
    ##  34  Carboxylic Acid Hydroxyl Oxygen      ##
    ##  35  Carboxylic Acid Hydrogen             ##

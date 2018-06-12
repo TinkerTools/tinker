@@ -175,6 +175,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 angles.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 anneal.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 archive.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 attach.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 baoab.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 bar.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 basefile.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 beeman.f

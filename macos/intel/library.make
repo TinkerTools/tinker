@@ -25,6 +25,7 @@ atmlst.o \
 atomid.o \
 atoms.o \
 attach.o \
+baoab.o \
 basefile.o \
 bath.o \
 beeman.o \
