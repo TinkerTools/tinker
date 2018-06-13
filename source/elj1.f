@@ -99,9 +99,6 @@ c
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       character*6 mode
@@ -120,16 +117,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -493,9 +487,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       return
       end
@@ -550,9 +541,6 @@ c
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -575,9 +563,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
       allocate (xsort(8*n))
       allocate (ysort(8*n))
@@ -586,8 +571,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -835,9 +820,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       deallocate (xsort)
       deallocate (ysort)
@@ -891,9 +873,6 @@ c
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       character*6 mode
@@ -912,16 +891,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -942,8 +918,8 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,ired,kred,
-!$OMP& jvdw,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
+!$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
 !$OMP& cut2,c0,c1,c2,c3,c4,c5,molcule) firstprivate(vscale,iv14)
@@ -1123,9 +1099,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       return
       end
@@ -1209,9 +1182,6 @@ c
       real*8 width3,width4
       real*8 width5,width6
       real*8 width7
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
 c
@@ -1229,9 +1199,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
@@ -1419,9 +1386,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       return
       end

@@ -41,9 +41,6 @@ c
       real*8 rdn,cutoff
       real*8 hmax,percent
       real*8 h(*)
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8 hdiag(3,*)
       logical first
       logical, allocatable :: keep(:)
@@ -86,13 +83,6 @@ c
          call induce
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
-      allocate (keep(n))
-c
 c     calculate the reduced atomic coordinates
 c
       if (use_vdw) then
@@ -113,6 +103,10 @@ c
          if (.not. allocated(hessy))  allocate (hessy(3,n))
          if (.not. allocated(hessz))  allocate (hessz(3,n))
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (keep(n))
 c
 c     zero out the Hessian elements for the current atom
 c
@@ -151,17 +145,11 @@ c
 c     call the van der Waals Hessian component routines
 c
             if (use_vdw) then
-               if (vdwtyp .eq. 'LENNARD-JONES') then
-                  call elj2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'BUCKINGHAM') then
-                  call ebuck2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'MM3-HBOND') then
-                  call emm3hb2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'BUFFERED-14-7') then
-                  call ehal2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'GAUSSIAN') then
-                  call egauss2 (i,xred,yred,zred)
-               end if
+               if (vdwtyp .eq. 'LENNARD-JONES')  call elj2 (i)
+               if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck2 (i)
+               if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb2 (i)
+               if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal2 (i)
+               if (vdwtyp .eq. 'GAUSSIAN')  call egauss2 (i)
             end if
 c
 c     call the electrostatic Hessian component routines
@@ -250,9 +238,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (keep)
 c
 c     print message telling how much storage was finally used

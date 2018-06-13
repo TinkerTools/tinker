@@ -59,18 +59,8 @@ c
       real*8 xr,yr,zr
       real*8 radius
       real*8 rdn,r2
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       logical, allocatable :: update(:)
 c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
-      allocate (update(n))
 c
 c     apply reduction factors to find coordinates for each site
 c
@@ -99,12 +89,16 @@ c
       if (dovlst) then
          dovlst = .false.
          if (octahedron) then
-            call vbuild (xred,yred,zred)
+            call vbuild
          else
-            call vlight (xred,yred,zred)
+            call vlight
          end if
          return
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     test sites for displacement exceeding half the buffer
 c
@@ -211,9 +205,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (update)
       return
       end
@@ -230,7 +221,7 @@ c     "vbuild" performs a complete rebuild of the van der Waals
 c     pair neighbor list for all sites
 c
 c
-      subroutine vbuild (xred,yred,zred)
+      subroutine vbuild
       use sizes
       use bound
       use iounit
@@ -240,9 +231,6 @@ c
       integer i,k
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
 c
 c
 c     OpenMP directives for the major loop structure
@@ -304,7 +292,7 @@ c     "vlight" performs a complete rebuild of the van der Waals
 c     pair neighbor list for all sites using the method of lights
 c
 c
-      subroutine vlight (xred,yred,zred)
+      subroutine vlight
       use sizes
       use atoms
       use bound
@@ -320,9 +308,6 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r2,off
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)

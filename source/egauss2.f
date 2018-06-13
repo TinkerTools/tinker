@@ -16,22 +16,19 @@ c     "egauss2" calculates the Gaussian expansion van der Waals
 c     second derivatives for a single atom at a time
 c
 c
-      subroutine egauss2 (i,xred,yred,zred)
+      subroutine egauss2 (i)
       use sizes
       use warp
       implicit none
       integer i
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
 c
 c
 c     choose the method for summing over pairwise interactions
 c
       if (use_smooth) then
-         call egauss2b (i,xred,yred,zred)
+         call egauss2b (i)
       else
-         call egauss2a (i,xred,yred,zred)
+         call egauss2a (i)
       end if
       return
       end
@@ -48,7 +45,7 @@ c     "egauss2a" calculates the Gaussian expansion van der Waals
 c     second derivatives using a pairwise double loop
 c
 c
-      subroutine egauss2a (iatom,xred,yred,zred)
+      subroutine egauss2a (iatom)
       use sizes
       use atomid
       use atoms
@@ -67,8 +64,10 @@ c
       integer iatom,jcell
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
-      real*8 de,d2e,rik,rik2
-      real*8 eps,rad2,fgrp
+      real*8 de,d2e
+      real*8 rik,rik2
+      real*8 eps,rdn
+      real*8 rad2,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 redi,rediv
@@ -81,9 +80,6 @@ c
       real*8 expcut,expterm
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: vscale(:)
       real*8 term(3,3)
       logical proceed
@@ -98,8 +94,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -120,6 +116,17 @@ c
       end do
       return
    10 continue
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
 c
 c     determine the atoms involved via reduction factors
 c
@@ -611,7 +618,7 @@ c     "egauss2b" calculates the Gaussian expansion van der Waals
 c     second derivatives for use with potential energy smoothing
 c
 c
-      subroutine egauss2b (iatom,xred,yred,zred)
+      subroutine egauss2b (iatom)
       use sizes
       use atomid
       use atoms
@@ -627,8 +634,10 @@ c
       integer kk,kv,kt
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
-      real*8 de,d2e,rik,rik2
-      real*8 eps,rad2,fgrp
+      real*8 de,d2e
+      real*8 rik,rik2
+      real*8 eps,rdn
+      real*8 rad2,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 redi,rediv
@@ -646,9 +655,6 @@ c
       real*8 t1,t2
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: vscale(:)
       real*8 term(3,3)
       logical proceed
@@ -662,8 +668,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the extent of smoothing to be performed
@@ -690,6 +696,17 @@ c
       end do
       return
    10 continue
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
 c
 c     determine the atoms involved via reduction factors
 c
