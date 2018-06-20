@@ -235,7 +235,7 @@ c
 c     compute the energy contribution for this interaction
 c
          if (proceed) then
-            do jcell = 1, ncell
+            do jcell = 2, ncell
                xr = xi - x(k)
                yr = yi - y(k)
                zr = zi - z(k)
@@ -501,7 +501,7 @@ c
 c     compute the energy contribution for this interaction
 c
          if (proceed) then
-            do jcell = 1, ncell
+            do jcell = 2, ncell
                xr = xi - x(k)
                yr = yi - y(k)
                zr = zi - z(k)

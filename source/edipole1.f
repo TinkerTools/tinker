@@ -300,7 +300,7 @@ c
             if (proceed) then
                sk1 = 1.0d0 - sdpl(k)
                sk2 = sdpl(k)
-               do j = 1, ncell
+               do j = 2, ncell
                   xk = x(k2) - x(k1)
                   yk = y(k2) - y(k1)
                   zk = z(k2) - z(k1)

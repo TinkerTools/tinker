@@ -289,7 +289,7 @@ c
 c
 c     map Tinker data structures to OpenMM wrapper structures
 c
-      call openmm_data ()
+      call ommdata ()
 c
 c     setup the required potential energy terms within OpenMM
 c

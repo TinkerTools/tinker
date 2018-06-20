@@ -775,6 +775,9 @@ struct {
    int* jvdw;
    int* ired;
    double* kred;
+   double* xred;
+   double* yred;
+   double* zred;
    double* radmin;
    double* epsilon;
    double* radmin4;
@@ -1715,15 +1718,18 @@ void set_usage_data_ (int* nuse, int* iuse, int* use) {
 }
 
 void set_vdw_data_ (int* nvdw, int* ivdw, int* jvdw, int* ired,
-                    double* kred, double* radmin, double* epsilon,
-                    double* radmin4, double* epsilon4, double* radhbnd,
-                    double* epshbnd) {
+                    double* kred, double* xred, double* yred, double* zred,
+                    double* radmin, double* epsilon, double* radmin4,
+                    double* epsilon4, double* radhbnd, double* epshbnd) {
 
    vdw__.nvdw = *nvdw;
    vdw__.ivdw = ivdw;
    vdw__.jvdw = jvdw;
    vdw__.ired = ired;
    vdw__.kred = kred;
+   vdw__.xred = xred;
+   vdw__.yred = yred;
+   vdw__.zred = zred;
    vdw__.radmin = radmin;
    vdw__.epsilon = epsilon;
    vdw__.radmin4 = radmin4;

@@ -328,7 +328,7 @@ c     evaluate all sites within the cutoff distance
 c
             do k = i, npole
                kk = ipole(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = x(kk) - xi
                   yr = y(kk) - yi
                   zr = z(kk) - zi
@@ -879,7 +879,7 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = 0.5d0 * electric / dielec
-      mode = 'MPOLE'
+      mode = 'EWALD'
       call switch (mode)
 c
 c     compute the dipole polarization energy component
@@ -1096,7 +1096,7 @@ c     evaluate all sites within the cutoff distance
 c
             do k = i, npole
                kk = ipole(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = x(kk) - xi
                   yr = y(kk) - yi
                   zr = z(kk) - zi
@@ -1412,7 +1412,7 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = 0.5d0 * electric / dielec
-      mode = 'MPOLE'
+      mode = 'EWALD'
       call switch (mode)
 c
 c     OpenMP directives for the major loop structure

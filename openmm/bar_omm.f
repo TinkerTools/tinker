@@ -272,7 +272,7 @@ c
 c     find potential energies for trajectory A in state 0
 c
       if (.not. use_log) then
-         call openmm_data
+         call ommdata
          call openmm_init (ommHandle,dt)
       end if
       write (iout,90)
@@ -319,7 +319,7 @@ c
 c
 c     find potential energies for trajectory A in state 1
 c
-      call openmm_data
+      call ommdata
       call openmm_init (ommHandle,dt)
       if (verbose) then
          write (iout,140)
@@ -393,7 +393,7 @@ c
 c     find potential energies for trajectory B in state 1
 c
       if (.not. use_log) then
-         call openmm_data
+         call ommdata
          call openmm_init (ommHandle,dt)
       end if
       write (iout,190)
@@ -440,7 +440,7 @@ c
 c
 c     find potential energies for trajectory B in state 0
 c
-      call openmm_data
+      call ommdata
       call openmm_init (ommHandle,dt)
       if (verbose) then
          write (iout,240)

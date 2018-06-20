@@ -788,7 +788,7 @@ c
             if (proceed) then
                sk1 = 1.0d0 - sdpl(k)
                sk2 = sdpl(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xk = x(k1) - x(k2)
                   yk = y(k1) - y(k2)
                   zk = z(k1) - z(k2)
@@ -1052,7 +1052,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = x(i1) - xq
                   yr = y(i1) - yq
                   zr = z(i1) - zq

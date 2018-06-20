@@ -519,7 +519,7 @@ OBJS =	action.o \
 	opdist.o \
 	openend.o \
 	openmm.o \
-	openmm_data.o \
+	ommdata.o \
 	openmp.o \
 	optimize.o \
 	optirot.o \
@@ -1076,7 +1076,7 @@ libtinker.a: ${OBJS}
 	opdist.o \
 	openend.o \
 	openmm.o \
-	openmm_data.o \
+	ommdata.o \
 	openmp.o \
 	optsave.o \
 	orbital.o \
@@ -1215,7 +1215,7 @@ dynamic_omm.o: atoms.o bath.o bndstr.o bound.o boxes.o inform.o iounit.o keys.o 
 gpu_cards.o: $(GPU_USAGE_OBJS)
 kopenmm.o: ascii.o keys.o openmm.o
 openmm.o:
-openmm_data.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o imptor.o inform.o ktrtor.o kvdws.o limits.o mdstuf.o molcul.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o restrn.o sizes.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
+ommdata.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o imptor.o inform.o ktrtor.o kvdws.o limits.o mdstuf.o molcul.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o restrn.o sizes.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
 
 action.o:
 active.o: atoms.o inform.o iounit.o keys.o sizes.o usage.o
@@ -1455,7 +1455,7 @@ hessrot.o: math.o omega.o sizes.o zcoord.o
 hpmf.o:
 hybrid.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o charge.o couple.o dipole.o imptor.o inform.o iounit.o kangs.o katoms.o kbonds.o kchrge.o kdipol.o kitors.o kstbnd.o ksttor.o ktorsn.o kvdws.o math.o mutant.o sizes.o strbnd.o strtor.o tors.o vdw.o vdwpot.o
 ielscf.o:
-image.o: boxes.o cell.o sizes.o
+image.o: boxes.o cell.o
 impose.o: align.o inform.o iounit.o sizes.o
 improp.o:
 imptor.o:

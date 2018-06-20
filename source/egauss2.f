@@ -404,7 +404,7 @@ c     compute the Hessian elements for this interaction
 c
             if (proceed) then
                kt = jvdw(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)

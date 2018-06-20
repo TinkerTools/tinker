@@ -70,9 +70,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
-      integer ic,kc
+      integer ii,in,ic
+      integer kk,kn,kc
       real*8 e,fgrp
       real*8 r,r2,rb
       real*8 f,fi,fik
@@ -185,12 +184,9 @@ c
                      e = e*taper + trans
                   end if
 c
-c     scale the interaction based on its group membership
-c
-                  if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy component
 c
+                  if (use_group)  e = e * fgrp
                   ec = ec + e
                end if
             end if
@@ -260,7 +256,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xc = xic - x(kc)
                   yc = yic - y(kc)
                   zc = zic - z(kc)
@@ -297,13 +293,10 @@ c
                         e = e*taper + trans
                      end if
 c
-c     scale the interaction based on its group membership
-c
-                     if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy component
 c
                      if (i .eq. k)  e = 0.5d0 * e
+                     if (use_group)  e = e * fgrp
                      ec = ec + e
                   end if
                end do
@@ -360,8 +353,9 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k,ii,kk
-      integer in,ic,kn,kc
+      integer i,j,k
+      integer ii,in,ic
+      integer kk,kn,kc
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,fgrp
@@ -541,12 +535,9 @@ c
                      e = e*taper + trans
                   end if
 c
-c     scale the interaction based on its group membership
-c
-                  if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy component
 c
+                  if (use_group)  e = e * fgrp
                   ec = ec + e
                end if
             end if
@@ -609,9 +600,9 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
-      integer in,kn,ic,kc
+      integer i,j,k,kkk
+      integer ii,in,ic
+      integer kk,kn,kc
       real*8 e,fgrp
       real*8 r,r2,rb
       real*8 f,fi,fik
@@ -734,12 +725,9 @@ c
                      e = e*taper + trans
                   end if
 c
-c     scale the interaction based on its group membership
-c
-                  if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy component
 c
+                  if (use_group)  e = e * fgrp
                   ec = ec + e
                end if
             end if
@@ -801,8 +789,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
+      integer ii,in,kk,kn
       real*8 e,fs,fgrp
       real*8 f,fi,fik
       real*8 r,r2,rb,rew
@@ -986,7 +973,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = xi - x(k)
                   yr = yi - y(k)
                   zr = zi - z(k)
@@ -1008,8 +995,7 @@ c
                      scaleterm = scale - 1.0d0
                      e = (fik/rb) * (erfterm+scaleterm)
 c
-c     increment the overall charge-charge energy component;
-c     interaction of an atom with its own image counts half
+c     increment the overall charge-charge energy component
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ec = ec + e
@@ -1070,7 +1056,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,in,kn
+      integer ii,in,kk,kn
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,fs,fgrp
@@ -1323,9 +1309,8 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
-      integer in,kn
+      integer i,j,k,kkk
+      integer ii,in,kk,kn
       real*8 e,fs,fgrp
       real*8 f,fi,fik
       real*8 r,r2,rb,rew
@@ -1510,8 +1495,7 @@ c
       use warp
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
+      integer ii,in,kk,kn
       real*8 e,fgrp
       real*8 r,r2,rb,rb2
       real*8 f,fi,fik
@@ -1622,12 +1606,9 @@ c
                   e = fik / (rb+width)
                end if
 c
-c     scale the interaction based on its group membership
-c
-               if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy component
 c
+               if (use_group)  e = e * fgrp
                ec = ec + e
             end if
          end do

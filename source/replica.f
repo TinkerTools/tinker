@@ -95,16 +95,14 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      ncell = nx*ny*nz - 1
-      if (ncell .ne. 0) then
-         if (allocated(icell)) then
-            if (size(icell) .lt. 3*ncell) then
-               deallocate (icell)
-               allocate (icell(3,ncell))
-            end if
-         else
+      ncell = nx*ny*nz
+      if (allocated(icell)) then
+         if (size(icell) .lt. 3*ncell) then
+            deallocate (icell)
             allocate (icell(3,ncell))
          end if
+      else
+         allocate (icell(3,ncell))
       end if
 c
 c     assign indices to the required cell replicates
@@ -113,19 +111,17 @@ c
       do k = 0, nz-1
          do j = 0, ny-1
             do i = 0, nx-1
-               if (k.ne.0 .or. j.ne.0 .or. i.ne.0) then
-                  ncell = ncell + 1
-                  icell(1,ncell) = i
-                  icell(2,ncell) = j
-                  icell(3,ncell) = k
-               end if
+               ncell = ncell + 1
+               icell(1,ncell) = i
+               icell(2,ncell) = j
+               icell(3,ncell) = k
             end do
          end do
       end do
 c
 c     print a message indicating the number of replicates used
 c
-      if (debug .and. ncell.ne.0) then
+      if (debug .and. ncell.gt.1) then
          if (max(nx,ny,nz) .lt. 10) then
             write (iout,20)  nx,ny,nz
    20       format (/,' REPLICA  --  Period Boundaries via',i2,' x',

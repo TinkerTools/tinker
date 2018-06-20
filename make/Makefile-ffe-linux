@@ -1774,7 +1774,7 @@ hessrot.o: math.o omega.o sizes.o zcoord.o
 hpmf.o:
 hybrid.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o charge.o couple.o dipole.o imptor.o inform.o iounit.o kangs.o katoms.o kbonds.o kchrge.o kdipol.o kitors.o kstbnd.o ksttor.o ktorsn.o kvdws.o math.o mutant.o sizes.o strbnd.o strtor.o tors.o vdw.o vdwpot.o
 ielscf.o:
-image.o: boxes.o cell.o sizes.o
+image.o: boxes.o cell.o
 impose.o: align.o inform.o iounit.o sizes.o
 improp.o:
 imptor.o:

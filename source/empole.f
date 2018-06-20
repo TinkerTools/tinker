@@ -301,7 +301,7 @@ c
                proceed = .true.
                if (proceed)  proceed = (usei .or. usek)
                if (proceed) then
-                  do j = 1, ncell
+                  do j = 2, ncell
                      xr = x(kk) - xi
                      yr = y(kk) - yi
                      zr = z(kk) - zi
@@ -983,7 +983,7 @@ c     evaluate all sites within the cutoff distance
 c
             do k = i, npole
                kk = ipole(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = x(kk) - xi
                   yr = y(kk) - yi
                   zr = z(kk) - zi

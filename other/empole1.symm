@@ -476,7 +476,7 @@ c
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 20
-            do jcell = 2, ncell
+            do jcell = 1, ncell
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi
@@ -732,12 +732,12 @@ c
          ziy = z(iay) - z(ii)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+     &                + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+     &                + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
@@ -1776,7 +1776,7 @@ c     evaluate all sites within the cutoff distance
 c
          do k = i, npole
             kk = ipole(k)
-            do jcell = 2, ncell
+            do jcell = 1, ncell
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi
@@ -2054,15 +2054,33 @@ c
          xiy = x(iay) - x(ii)
          yiy = y(iay) - y(ii)
          ziy = z(iay) - z(ii)
+
+c        vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+c        vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+c    &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+c        vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+c    &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+c        vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+c        vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+c    &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+c        vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+c        vxy = 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+c    &                  + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxy = 0.5d0*(xiy*fix(1) + yiy*fiy(1) + ziy*fiz(1)
+     &                  + xix*fix(2) + yix*fiy(2) + zix*fiz(2))
+c        vxz = 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+c    &                  + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vxz = 0.5d0*(xiz*fix(1) + yiz*fiy(1) + ziz*fiz(1)
+     &                  + xix*fix(3) + yix*fiy(3) + zix*fiz(3)) 
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+c        vyz = 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+c    &                  + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vyz = 0.5d0*(xiz*fix(2) + yiz*fiy(2) + ziz*fiz(2)
+     &                  + xiy*fix(3) + yiy*fiy(3) + ziy*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
          vir(3,1) = vir(3,1) + vxz
@@ -2596,10 +2614,10 @@ c
 c     increment the virial due to pairwise Cartesian forces
 c
                vxx = -xr * frcx
-               vxy = -yr * frcx
-               vxz = -zr * frcx
+               vxy = -0.5d0 * (yr*frcx + xr*frcy)
+               vxz = -0.5d0 * (zr*frcx + xr*frcz)
                vyy = -yr * frcy
-               vyz = -zr * frcy
+               vyz = -0.5d0 * (zr*frcy + yr*frcz)
                vzz = -zr * frcz
                vir(1,1) = vir(1,1) + vxx
                vir(2,1) = vir(2,1) + vxy
@@ -2654,15 +2672,33 @@ c
          xiy = x(iay) - x(ii)
          yiy = y(iay) - y(ii)
          ziy = z(iay) - z(ii)
+
+c        vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+c        vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+c    &                + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+c        vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+c    &                + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+c        vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+c        vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+c    &                + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+c        vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+c        vxy = 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+c    &              + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxy = 0.5d0*(xiy*fix(1) + yiy*fiy(1) + ziy*fiz(1)
+     &              + xix*fix(2) + yix*fiy(2) + zix*fiz(2))
+c        vxz = 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+c    &              + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vxz = 0.5d0*(xiz*fix(1) + yiz*fiy(1) + ziz*fiz(1)
+     &              + xix*fix(3) + yix*fiy(3) + zix*fiz(3)) 
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+c        vyz = 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+c    &              + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vyz = 0.5d0*(xiz*fix(2) + yiz*fiy(2) + ziz*fiz(2)
+     &              + xiy*fix(3) + yiy*fiy(3) + ziy*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
          vir(3,1) = vir(3,1) + vxz
@@ -2993,13 +3029,19 @@ c
          yiy = y(iay) - y(ii)
          ziy = z(iay) - z(ii)
          vxx = vxx + xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                        + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = vxz + 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                        + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+c        vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+c    &                        + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxy = vxy + 0.5d0*(xiy*fix(1) + yiy*fiy(1) + ziy*fiz(1)
+     &                        + xix*fix(2) + yix*fiy(2) + zix*fiz(2))
+c        vxz = vxz + 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+c    &                        + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vxz = vxz + 0.5d0*(xiz*fix(1) + yiz*fiy(1) + ziz*fiz(1)
+     &                        + xix*fix(3) + yix*fiy(3) + zix*fiz(3)) 
          vyy = vyy + yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = vyz + 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                        + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+c        vyz = vyz + 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+c    &                        + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vyz = vyz + 0.5d0*(xiz*fix(2) + yiz*fiy(2) + ziz*fiz(2)
+     &                        + xiy*fix(3) + yiy*fiy(3) + ziy*fiz(3))
          vzz = vzz + zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
       end do
 c
