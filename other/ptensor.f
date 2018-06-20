@@ -146,7 +146,7 @@ c
                kx = xaxis(kk)
                kuse = (use(k) .or. use(kz) .or. use(kx))
                if (iuse .or. kuse) then
-                  do m = 1, ncell
+                  do m = 2, ncell
                      xr = x(k) - x(i)
                      yr = y(k) - y(i)
                      zr = z(k) - z(i)
@@ -282,7 +282,7 @@ c
                      kx = xaxis(kk)
                      kuse = (use(k) .or. use(kz) .or. use(kx))
                      if (iuse .or. kuse) then
-                        do m = 1, ncell
+                        do m = 2, ncell
                            xr = x(k) - x(i)
                            yr = y(k) - y(i)
                            zr = z(k) - z(i)
@@ -769,7 +769,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do m = 1, ncell
+               do m = 2, ncell
                   xr = x(k) - x(i)
                   yr = y(k) - y(i)
                   zr = z(k) - z(i)
@@ -2182,7 +2182,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do m = 1, ncell
+               do m = 2, ncell
                   xr = x(k) - xi
                   yr = y(k) - yi
                   zr = z(k) - zi
@@ -2606,7 +2606,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do m = 1, ncell
+               do m = 2, ncell
                   xr = x(k) - x(i)
                   yr = y(k) - y(i)
                   zr = z(k) - z(i)

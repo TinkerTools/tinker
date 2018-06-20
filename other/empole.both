@@ -408,7 +408,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = x(kk) - x(ii)
                   yr = y(kk) - y(ii)
                   zr = z(kk) - z(ii)
@@ -1353,7 +1353,7 @@ c
          end do
          do k = i, npole
             kk = ipole(k)
-            do j = 1, ncell
+            do j = 2, ncell
                xr = x(kk) - x(ii)
                yr = y(kk) - y(ii)
                zr = z(kk) - z(ii)
