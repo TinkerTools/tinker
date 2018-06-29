@@ -2763,20 +2763,18 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(cmp)) then
-         if (size(cmp) .lt. 10*npole) then
-            deallocate (cmp)
-            deallocate (fmp)
-            deallocate (cphi)
-            deallocate (fphi)
-         end if
-      end if
-      if (.not. allocated(cmp)) then
-         allocate (cmp(10,npole))
-         allocate (fmp(10,npole))
-         allocate (cphi(10,npole))
-         allocate (fphi(20,npole))
-      end if
+      if (allocated(cmp) .and. size(cmp).lt.10*npole)
+     &   deallocate (cmp)
+      if (allocated(fmp) .and. size(fmp).lt.10*npole)
+     &   deallocate (fmp)
+      if (allocated(cphi) .and. size(cphi).lt.10*npole)
+     &   deallocate (cphi)
+      if (allocated(fphi) .and. size(fphi).lt.20*npole)
+     &   deallocate (fphi)
+      if (.not. allocated(cmp))  allocate (cmp(10,npole))
+      if (.not. allocated(fmp))  allocate (fmp(10,npole))
+      if (.not. allocated(cphi))  allocate (cphi(10,npole))
+      if (.not. allocated(fphi))  allocate (fphi(20,npole))
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -2855,7 +2853,7 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            eterm = 0.5d0 * electric * expterm * struc2
+            eterm = 0.5d0 * f * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
             vxx = vxx + h1*h1*vterm - eterm
             vxy = vxy + h1*h2*vterm

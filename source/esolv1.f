@@ -741,7 +741,6 @@ c
       use energi
       use limits
       use potent
-      implicit none
 c
 c
 c     setup the multipoles for solvation only calculations
@@ -849,6 +848,7 @@ c
       real*8 a(0:5,0:3)
       real*8 b(0:4,0:2)
       real*8 fid(3),fkd(3)
+      real*8 fix(3),fiy(3),fiz(3)
       real*8 fidg(3,3),fkdg(3,3)
       real*8 gc(30),gux(30)
       real*8 guy(30),guz(30)
@@ -2321,8 +2321,10 @@ c
 c
 c     convert torque derivative components to Cartesian form
 c
-      call torque2 (trq,des)
-      call torque2 (trqi,des)
+      do i = 1, npole
+         call torque (i,trq(1,i),fix,fiy,fiz,des)
+         call torque (i,trqi(1,i),fix,fiy,fiz,des)
+      end do
 c
 c     perform deallocation of some local arrays
 c
@@ -2332,11 +2334,11 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine ediff1a  --  vacuum to SCRF via pair list  ##
-c     ##                                                        ##
-c     ############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ediff1a  --  vacuum to SCRF via double loop  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "ediff1a" calculates the energy and derivatives of polarizing
@@ -2408,6 +2410,7 @@ c
       real*8 rxqidk(3),rxqkdi(3)
       real*8 ddsc3(3),ddsc5(3)
       real*8 ddsc7(3)
+      real*8 fix(3),fiy(3),fiz(3)
       real*8 gli(7),glip(7)
       real*8 sc(10)
       real*8 sci(8),scip(8)
@@ -3252,7 +3255,9 @@ c
 c
 c     convert torque values into Cartesian forces
 c
-      call torque2 (trqi,des)
+      do i = 1, npole
+         call torque (i,trqi(1,i),fix,fiy,fiz,des)
+      end do
 c
 c     perform deallocation of some local arrays
 c
@@ -3264,11 +3269,11 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine ediff1b  --  vacuum to SCRF via pair list  ##
-c     ##                                                        ##
-c     ############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ediff1b  --  vacuum to SCRF via neighbor list  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "ediff1b" calculates the energy and derivatives of polarizing
@@ -3341,6 +3346,7 @@ c
       real*8 rxqidk(3),rxqkdi(3)
       real*8 ddsc3(3),ddsc5(3)
       real*8 ddsc7(3)
+      real*8 fix(3),fiy(3),fiz(3)
       real*8 gli(7),glip(7)
       real*8 sc(10)
       real*8 sci(8),scip(8)
@@ -4186,7 +4192,9 @@ c
 c
 c     convert torques into Cartesian forces
 c
-      call torque2 (trqi,des)
+      do i = 1, npole
+         call torque (i,trqi(1,i),fix,fiy,fiz,des)
+      end do
 c
 c     perform deallocation of some local arrays
 c
@@ -4249,6 +4257,7 @@ c
       implicit none
       integer i,j,ii
       real*8 sum
+      real*8 fix(3),fiy(3),fiz(3)
       real*8, allocatable :: indpole(:,:)
       real*8, allocatable :: inppole(:,:)
       real*8, allocatable :: directf(:,:)
@@ -4331,7 +4340,9 @@ c
 c     convert torques due to induced dipole reaction field acting
 c     on permanent multipoles into forces on adjacent atoms
 c
-         call torque2 (directt,polgrd)
+         do i = 1, npole
+            call torque (i,directt(1,i),fix,fiy,fiz,polgrd)
+         end do
          do i = 1, n
             polgrd(1,i) = polgrd(1,i) - directf(1,i)
             polgrd(2,i) = polgrd(2,i) - directf(2,i)
@@ -4389,7 +4400,9 @@ c
             detor(j,i) = 0.0d0
           end do
       end do
-      call torque2 (pbtp,detor)
+      do i = 1, npole
+         call torque (i,pbtp(1,i),fix,fiy,fiz,detor)
+      end do
 c
 c     add permanent reaction field forces to the torque results
 c
@@ -4433,8 +4446,7 @@ c
       real*8 ecav,edisp
       real*8 exclude
       real*8 evol,esurf
-      real*8 taperv,dtaperv
-      real*8 tapersa,dtapersa
+      real*8 taper,dtaper
       real*8 reff,reff2,reff3
       real*8 reff4,reff5,dreff
       real*8, allocatable :: aesurf(:)
@@ -4493,18 +4505,18 @@ c
       else if (reff.gt.spcut .and. reff.le.stoff) then
          mode = 'GKV'
          call switch (mode)
-         taperv = c5*reff5 + c4*reff4 + c3*reff3
-     &               + c2*reff2 + c1*reff + c0
-         dtaperv = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                 +2.0d0*c2*reff+c1) * dreff
-         ecav = evol * taperv
+         taper = c5*reff5 + c4*reff4 + c3*reff3
+     &              + c2*reff2 + c1*reff + c0
+         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
+     &                +2.0d0*c2*reff+c1) * dreff
+         ecav = evol * taper
          do i = 1, n
-            des(1,i) = des(1,i) + taperv*dvol(1,i)
-     &                    + evol*dtaperv*dsurf(1,i)
-            des(2,i) = des(2,i) + taperv*dvol(2,i)
-     &                    + evol*dtaperv*dsurf(2,i)
-            des(3,i) = des(3,i) + taperv*dvol(3,i)
-     &                    + evol*dtaperv*dsurf(3,i)
+            des(1,i) = des(1,i) + taper*dvol(1,i)
+     &                    + evol*dtaper*dsurf(1,i)
+            des(2,i) = des(2,i) + taper*dvol(2,i)
+     &                    + evol*dtaper*dsurf(2,i)
+            des(3,i) = des(3,i) + taper*dvol(3,i)
+     &                    + evol*dtaper*dsurf(3,i)
          end do
 c
 c     find cavity energy using both volume and SASA terms
@@ -4512,32 +4524,32 @@ c
       else if (reff.gt.stoff .and. reff.le.spoff) then
          mode = 'GKV'
          call switch (mode)
-         taperv = c5*reff5 + c4*reff4 + c3*reff3
-     &               + c2*reff2 + c1*reff + c0
-         dtaperv = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                 +2.0d0*c2*reff+c1) * dreff
+         taper = c5*reff5 + c4*reff4 + c3*reff3
+     &              + c2*reff2 + c1*reff + c0
+         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
+     &                +2.0d0*c2*reff+c1) * dreff
+         ecav = evol * taper
+         do i = 1, n
+            des(1,i) = des(1,i) + taper*dvol(1,i)
+     &                    + evol*dtaper*dsurf(1,i)
+            des(2,i) = des(2,i) + taper*dvol(2,i)
+     &                    + evol*dtaper*dsurf(2,i)
+            des(3,i) = des(3,i) + taper*dvol(3,i)
+     &                    + evol*dtaper*dsurf(3,i)
+         end do
          mode = 'GKSA'
          call switch (mode)
-         tapersa = c5*reff5 + c4*reff4 + c3*reff3
-     &                + c2*reff2 + c1*reff + c0
-         tapersa = 1.0d0 - tapersa
-         dtapersa = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                  +2.0d0*c2*reff+c1) * dreff
-         dtapersa = -dtapersa
-         ecav = evol * taperv
+         taper = c5*reff5 + c4*reff4 + c3*reff3
+     &              + c2*reff2 + c1*reff + c0
+         taper = 1.0d0 - taper
+         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
+     &                +2.0d0*c2*reff+c1) * dreff
+         dtaper = -dtaper
+         ecav = ecav + taper*esurf
          do i = 1, n
-            des(1,i) = des(1,i) + taperv*dvol(1,i)
-     &                    + evol*dtaperv*dsurf(1,i)
-            des(2,i) = des(2,i) + taperv*dvol(2,i)
-     &                    + evol*dtaperv*dsurf(2,i)
-            des(3,i) = des(3,i) + taperv*dvol(3,i)
-     &                    + evol*dtaperv*dsurf(3,i)
-         end do
-         ecav = ecav + tapersa*esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + (tapersa+esurf*dtapersa)*dsurf(1,i)
-            des(2,i) = des(2,i) + (tapersa+esurf*dtapersa)*dsurf(2,i)
-            des(3,i) = des(3,i) + (tapersa+esurf*dtapersa)*dsurf(3,i)
+            des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
+            des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
+            des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
          end do
 c
 c     find cavity energy from only a tapered SASA term
@@ -4545,17 +4557,17 @@ c
       else if (reff.gt.spoff .and. reff.le.stcut) then
          mode = 'GKSA'
          call switch (mode)
-         tapersa = c5*reff5 + c4*reff4 + c3*reff3
-     &                + c2*reff2 + c1*reff + c0
-         tapersa = 1.0d0 - tapersa
-         dtapersa = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                  +2.0d0*c2*reff+c1) * dreff
-         dtapersa = -dtapersa
-         ecav = tapersa * esurf
+         taper = c5*reff5 + c4*reff4 + c3*reff3
+     &              + c2*reff2 + c1*reff + c0
+         taper = 1.0d0 - taper
+         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
+     &                +2.0d0*c2*reff+c1) * dreff
+         dtaper = -dtaper
+         ecav = taper * esurf
          do i = 1, n
-            des(1,i) = des(1,i) + (tapersa+esurf*dtapersa)*dsurf(1,i)
-            des(2,i) = des(2,i) + (tapersa+esurf*dtapersa)*dsurf(2,i)
-            des(3,i) = des(3,i) + (tapersa+esurf*dtapersa)*dsurf(3,i)
+            des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
+            des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
+            des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
          end do
 c
 c     find cavity energy from only a SASA-based term

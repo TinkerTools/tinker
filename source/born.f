@@ -207,8 +207,8 @@ c
                   r = sqrt(r2)
                   rk = roff(k)
                   sk = rk * shct(k)
-                  sk2 = sk * sk
                   if (ri .lt. r+sk) then
+                     sk2 = sk * sk
                      lik = 1.0d0 / max(ri,abs(r-sk))
                      uik = 1.0d0 / (r+sk)
                      lik2 = lik * lik
@@ -244,8 +244,8 @@ c
                   r = sqrt(r2)
                   rk = roff(k)
                   sk = rk * shct(k)
-                  sk2 = sk * sk
                   if (ri .lt. r+sk) then
+                     sk2 = sk * sk
                      lik = 1.0d0 / max(ri,abs(r-sk))
                      uik = 1.0d0 / (r+sk)
                      lik2 = lik * lik
@@ -484,7 +484,7 @@ c
          roff(i) = rsolv(i) - doffset
       end do
 c
-c     set flag for use of generalized Kirkwood with polarization
+c     set flag for use of generalized Kirkwood solvation model
 c
       use_gk = .false.
       if (solvtyp(1:2) .eq. 'GK')  use_gk = .true.
@@ -581,12 +581,12 @@ c
                   xr = x(k) - xi
                   yr = y(k) - yi
                   zr = z(k) - zi
-                  rk = roff(k)
-                  sk = rk * shct(k)
-                  sk2 = sk * sk
                   r2 = xr**2 + yr**2 + zr**2
                   r = sqrt(r2)
+                  rk = roff(k)
+                  sk = rk * shct(k)
                   if (ri .lt. r+sk) then
+                     sk2 = sk * sk
                      lik = 1.0d0 / max(ri,abs(r-sk))
                      uik = 1.0d0 / (r+sk)
                      lik2 = lik * lik
@@ -654,12 +654,12 @@ c
                   xr = x(k) - xi
                   yr = y(k) - yi
                   zr = z(k) - zi
-                  rk = roff(k)
-                  sk = rk * shct(k)
-                  sk2 = sk * sk
                   r2 = xr**2 + yr**2 + zr**2
                   r = sqrt(r2)
+                  rk = roff(k)
+                  sk = rk * shct(k)
                   if (ri .lt. r+sk) then
+                     sk2 = sk * sk
                      lik = 1.0d0 / max(ri,abs(r-sk))
                      uik = 1.0d0 / (r+sk)
                      lik2 = lik * lik
@@ -733,11 +733,11 @@ c
                      xr = x(k) - xi
                      yr = y(k) - yi
                      zr = z(k) - zi
+                     r2 = xr**2 + yr**2 + zr**2
+                     r = sqrt(r2)
                      sk = rk * shct(k)
                      if (ri .lt. r+sk) then
                         sk2 = sk * sk
-                        r2 = xr**2 + yr**2 + zr**2
-                        r = sqrt(r2)
                         de = 0.0d0
                         if (ri+r .lt. sk) then
                            uik = sk - r
