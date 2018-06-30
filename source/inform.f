@@ -12,6 +12,8 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
+c     maxask    maximum number of queries for interactive input
+c
 c     digits    decimal places output for energy and coordinates
 c     iprint    steps between status printing (0=no printing)
 c     iwrite    steps between coordinate dumps (0=no dumps)
@@ -25,9 +27,12 @@ c
 c
       module inform
       implicit none
+      integer maxask
+      parameter (maxask=5)
       integer digits,iprint
       integer iwrite,isend
       logical silent,verbose
-      logical debug,holdup,abort
+      logical debug,holdup
+      logical abort
       save
       end

@@ -18,11 +18,13 @@ c
 c
       subroutine getprm
       use files
+      use inform
       use iounit
       use keys
       use params
       implicit none
-      integer i,iprm,next
+      integer i,iprm
+      integer nask,next
       integer freeunit
       integer trimtext
       logical exist,useprm
@@ -90,7 +92,9 @@ c
 c
 c     if necessary, ask for the parameter filename
 c
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter Potential Parameter File Name :  ',$)
          read (input,20)  prmfile
@@ -111,6 +115,7 @@ c
             inquire (file=prmfile,exist=exist)
          end if
       end do
+      if (.not. exist)  call fatal
 c
 c     initialize force field control and parameter values
 c

@@ -17,9 +17,10 @@ c     then reads in the coordinates file
 c
 c
       subroutine getpdb
+      use inform
       use iounit
       implicit none
-      integer ipdb
+      integer ipdb,nask
       integer freeunit
       logical exist
       character*240 pdbfile
@@ -36,7 +37,9 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter Protein Data Bank File Name :  ',$)
          read (input,20)  pdbfile
@@ -45,6 +48,7 @@ c
          call suffix (pdbfile,'pdb','old')
          inquire (file=pdbfile,exist=exist)
       end do
+      if (.not. exist)  call fatal
 c
 c     first open and then read the PDB coordinates file
 c

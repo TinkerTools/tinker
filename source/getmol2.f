@@ -18,9 +18,10 @@ c
 c
       subroutine getmol2
       use files
+      use inform
       use iounit
       implicit none
-      integer imol2
+      integer imol2,nask
       integer freeunit
       logical exist
       character*240 mol2file
@@ -37,7 +38,9 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter a Tripos MOL2 File Name :  ',$)
          read (input,20)  mol2file
@@ -46,6 +49,7 @@ c
          call suffix (mol2file,'mol2','old')
          inquire (file=mol2file,exist=exist)
       end do
+      if (.not. exist)  call fatal
 c
 c     first open and then read the Tripos MOL2 coordinates file
 c

@@ -116,8 +116,8 @@ c
       call set_group_data (ngrp,kgrp,grplist,igrp,grpmass,wgrp,
      &                     use_group,use_intra,use_inter)
       call set_imptor_data (nitors,iitors,itors,itors2,itors3)
-      call set_inform_data (digits,iprint,iwrite,isend,silent,
-     &                      verbose,debug,holdup,abort)
+      call set_inform_data (maxask,digits,iprint,iwrite,isend,
+     &                      silent,verbose,debug,holdup,abort)
       call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
      &                      ttx,tty,tbf,tbx,tby,tbxy,ktt)
       call set_kvdws_data (rad,eps,rad4,eps4,reduct)

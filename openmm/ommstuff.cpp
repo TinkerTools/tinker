@@ -348,6 +348,7 @@ struct {
 } imptor__;
 
 struct {
+   int maxask;
    int digits;
    int iprint;
    int iwrite;
@@ -1197,10 +1198,11 @@ void set_imptor_data_ (int* nitors, int* iitors, double* itors1,
    imptor__.itors3 = itors3;
 }
 
-void set_inform_data_ (int* digits, int* iprint, int* iwrite, int* isend,
-                       int* silent, int* verbose, int* debug, int* holdup,
-                       int* abort) {
+void set_inform_data_ (int* maxask, int* digits, int* iprint, int* iwrite,
+                       int* isend, int* silent, int* verbose, int* debug,
+                       int* holdup, int* abort) {
 
+   inform__.maxask = *maxask;
    inform__.digits = *digits;
    inform__.iprint = *iprint;
    inform__.iwrite = *iwrite;

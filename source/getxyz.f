@@ -21,7 +21,7 @@ c
       use iounit
       use output
       implicit none
-      integer ixyz
+      integer ixyz,nask
       integer freeunit
       logical exist
       character*240 xyzfile
@@ -38,7 +38,9 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter Cartesian Coordinate File Name :  ',$)
          read (input,20)  xyzfile
@@ -47,6 +49,7 @@ c
          call suffix (xyzfile,'xyz','old')
          inquire (file=xyzfile,exist=exist)
       end do
+      if (.not. exist)  call fatal
 c
 c     first open and then read the Cartesian coordinates file
 c
