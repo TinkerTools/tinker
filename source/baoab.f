@@ -184,15 +184,15 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine oprep  --  setup frictional and random terms  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine oprep  --  frictional & random terms for BAOAB  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "oprep" sets up the frictional and random terms needed to
-c     update positions and velocities during stochastic dynamics
+c     update positions and velocities for the BAOAB integrator
 c
 c
       subroutine oprep (istep,dt,vfric,vrand)
@@ -225,7 +225,7 @@ c
          end do
       end if 
 c
-c     get the frictional and random terms for stochastic dynamics
+c     get the frictional and random terms for a BAOAB step
 c
       egdt = exp(-(friction * dt))
       do i = 1, n

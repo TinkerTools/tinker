@@ -225,9 +225,8 @@ c
          end if
       end if
 c
-c     initialize any holonomic constraints and setup dynamics
+c     perform the setup functions needed to run dynamics
 c
-      call shakeup
       call mdinit
 c
 c     print out a header line for the dynamics computation

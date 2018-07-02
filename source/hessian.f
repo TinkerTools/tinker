@@ -19,7 +19,6 @@ c
       subroutine hessian (h,hinit,hstop,hindex,hdiag)
       use sizes
       use atoms
-      use bound
       use couple
       use hescut
       use hessn
@@ -58,10 +57,6 @@ c
             hdiag(j,i) = 0.0d0
          end do
       end do
-c
-c     maintain any periodic boundary conditions
-c
-      if (use_bounds .and. .not.use_rigid)  call bounds
 c
 c     update the pairwise interaction neighbor lists
 c

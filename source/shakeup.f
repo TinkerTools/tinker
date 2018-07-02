@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "shakeup" initializes any holonomic constraints for use with
-c     the RATTLE algorithm during molecular dynamics
+c     the SHAKE and RATTLE algorithms
 c
 c
       subroutine shakeup

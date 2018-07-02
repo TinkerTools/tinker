@@ -19,7 +19,9 @@ c
       program minimize
       use sizes
       use atoms
+      use bound
       use files
+      use freeze
       use inform
       use iounit
       use keys
@@ -154,6 +156,7 @@ c
          minimum = energy ()
          call numgrad (energy,derivs,eps)
       end if
+      if (use_rattle)  call shakef (derivs)
       gnorm = 0.0d0
       do i = 1, n
          if (use(i)) then
@@ -212,6 +215,7 @@ c
 c
 c     write the final coordinates into a file
 c
+      if (use_bounds)  call bounds
       imin = freeunit ()
       open (unit=imin,file=minfile,status='old')
       rewind (unit=imin)
@@ -239,6 +243,8 @@ c
       function minimiz1 (xx,g)
       use sizes
       use atoms
+      use bound
+      use freeze
       use scales
       use usage
       implicit none
@@ -271,6 +277,10 @@ c
          end if
       end do
 c
+c     adjust atomic coordinates to satisfy distance constraints
+c
+      if (use_rattle)  call shake (x,y,z)
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (derivs(3,n))
@@ -285,16 +295,23 @@ c
       end if
       minimiz1 = e
 c
-c     convert gradient components to optimization parameters
+c     adjust gradient to remove components along constraints
+c
+      if (use_rattle)  call shakef (derivs)
+c
+c     convert coordinates and gradient to optimization parameters
 c
       nvar = 0
       do i = 1, n
          if (use(i)) then
             nvar = nvar + 1
+            xx(nvar) = x(i) * scale(nvar)
             g(nvar) = derivs(1,i) / scale(nvar)
             nvar = nvar + 1
+            xx(nvar) = y(i) * scale(nvar)
             g(nvar) = derivs(2,i) / scale(nvar)
             nvar = nvar + 1
+            xx(nvar) = z(i) * scale(nvar)
             g(nvar) = derivs(3,i) / scale(nvar)
          end if
       end do

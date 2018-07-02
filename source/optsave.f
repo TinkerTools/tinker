@@ -20,6 +20,7 @@ c
       subroutine optsave (ncycle,f,xx)
       use sizes
       use atoms
+      use bound
       use files
       use iounit
       use math
@@ -73,6 +74,7 @@ c
                z(i) = xx(nvar) / scale(nvar)
             end if
          end do
+         if (use_bounds)  call bounds
       else if (coordtype .eq. 'INTERNAL') then
          do i = 1, nomega
             dihed(i) = xx(i) / scale(i)
