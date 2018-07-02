@@ -104,7 +104,7 @@ c
                   dot = xr*xo + yr*yo + zr*zo
                   rma = 1.0d0 / mass(ia)
                   rmb = 1.0d0 / mass(ib)
-                  term = sor * delta / (2.0d0 * (rma+rmb) * dot)
+                  term = 0.5d0 * sor * delta / ((rma+rmb) * dot)
                   xterm = xo * term
                   yterm = yo * term
                   zterm = zo * term
@@ -471,7 +471,7 @@ c
                   dot = xr*xo + yr*yo + zr*zo
                   rma = 1.0d0 / mass(ia)
                   rmb = 1.0d0 / mass(ib)
-                  term = sor * delta / (2.0d0 * (rma+rmb) * dot)
+                  term = 0.5d0 * sor * delta / ((rma+rmb) * dot)
                   xterm = xo * term
                   yterm = yo * term
                   zterm = zo * term
@@ -554,8 +554,8 @@ c
 c     literature reference:
 c
 c     Y. Duan, S. Kumar, J. M. Rosenberg and P. A. Kollman, "Gradient
-c     SHAKE: An Improved Method for Constrained Energy Minimization
-c     in Macromolecular Simulations, Journal of Computational Chemistry,
+c     SHAKE: An Improved Method for Constrained Energy Minimization in
+c     Macromolecular Simulations", Journal of Computational Chemistry,
 c     16, 1351-1356 (1995)
 c
 c
