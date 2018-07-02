@@ -274,9 +274,8 @@ c
       call upcase (answer)
       if (answer .eq. 'Y')  updateEachStep = .true.
 c
-c     initialize any holonomic constraints and setup dynamics
+c     perform the setup functions needed to run dynamics
 c
-      call shakeup
       call mdinit
 c
 c     get Tinker energy/gradient values for initial structure

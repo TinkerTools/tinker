@@ -600,7 +600,7 @@ c
 c     set the iteration counter, termination and tolerance
 c
       maxiter = 500
-      sor = 1.25d0
+      sor = 1.15d0
       eps = rateps
 c
 c     adjust the gradient to remove constraint components
@@ -627,7 +627,7 @@ c
                   done = .false.
                   update(ia) = .true.
                   update(ib) = .true.
-                  term = 0.5d0 * delta / dist2
+                  term = 0.5d0 * sor * delta / dist2
                   xterm = xr * term
                   yterm = yr * term
                   zterm = zr * term
