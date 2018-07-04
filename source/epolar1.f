@@ -122,7 +122,7 @@ c
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 rc3(3),rc5(3),rc7(3)
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
@@ -1180,19 +1180,19 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         trq(1) = diz*ufld(2,i) - diy*ufld(3,i)
+         tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))
      &               + (qizz-qiyy)*dufld(5,i)
-         trq(2) = dix*ufld(3,i) - diz*ufld(1,i)
+         tep(2) = dix*ufld(3,i) - diz*ufld(1,i)
      &               - qiyz*dufld(2,i) + qixy*dufld(5,i)
      &               + 2.0d0*qixz*(dufld(6,i)-dufld(1,i))
      &               + (qixx-qizz)*dufld(4,i)
-         trq(3) = diy*ufld(1,i) - dix*ufld(2,i)
+         tep(3) = diy*ufld(1,i) - dix*ufld(2,i)
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -1322,7 +1322,7 @@ c
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 rc3(3),rc5(3),rc7(3)
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
@@ -1892,19 +1892,19 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         trq(1) = diz*ufld(2,i) - diy*ufld(3,i)
+         tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))
      &               + (qizz-qiyy)*dufld(5,i)
-         trq(2) = dix*ufld(3,i) - diz*ufld(1,i)
+         tep(2) = dix*ufld(3,i) - diz*ufld(1,i)
      &               - qiyz*dufld(2,i) + qixy*dufld(5,i)
      &               + 2.0d0*qixz*(dufld(6,i)-dufld(1,i))
      &               + (qixx-qizz)*dufld(4,i)
-         trq(3) = diy*ufld(1,i) - dix*ufld(2,i)
+         tep(3) = diy*ufld(1,i) - dix*ufld(2,i)
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -1996,7 +1996,7 @@ c
       real*8 xufield,yufield
       real*8 zufield
       real*8 fix(3),fiy(3),fiz(3)
-      real*8 trq(3)
+      real*8 tep(3)
 c
 c
 c     zero out the polarization energy and derivatives
@@ -2059,10 +2059,10 @@ c
          uix = 0.5d0 * (uind(1,i)+uinp(1,i))
          uiy = 0.5d0 * (uind(2,i)+uinp(2,i))
          uiz = 0.5d0 * (uind(3,i)+uinp(3,i))
-         trq(1) = term * (diy*uiz-diz*uiy)
-         trq(2) = term * (diz*uix-dix*uiz)
-         trq(3) = term * (dix*uiy-diy*uix)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         tep(1) = term * (diy*uiz-diz*uiy)
+         tep(2) = term * (diz*uix-dix*uiz)
+         tep(3) = term * (dix*uiy-diy*uix)
+         call torque (i,tep,fix,fiy,fiz,dep)
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -2101,10 +2101,10 @@ c
          yufield = -term * (yu+yup)
          zufield = -term * (zu+zup)
          do i = 1, npole
-            trq(1) = rpole(3,i)*zufield - rpole(4,i)*yufield
-            trq(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
-            trq(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
-            call torque (i,trq,fix,fiy,fiz,dep)
+            tep(1) = rpole(3,i)*zufield - rpole(4,i)*yufield
+            tep(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
+            tep(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
+            call torque (i,tep,fix,fiy,fiz,dep)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -2244,7 +2244,7 @@ c
       real*8 prc3(3),prc5(3),prc7(3)
       real*8 drc3(3),drc5(3),drc7(3)
       real*8 urc3(3),urc5(3)
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 bn(0:4)
       real*8, allocatable :: pscale(:)
@@ -3498,19 +3498,19 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         trq(1) = diz*ufld(2,i) - diy*ufld(3,i)
+         tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))
      &               + (qizz-qiyy)*dufld(5,i)
-         trq(2) = dix*ufld(3,i) - diz*ufld(1,i)
+         tep(2) = dix*ufld(3,i) - diz*ufld(1,i)
      &               - qiyz*dufld(2,i) + qixy*dufld(5,i)
      &               + 2.0d0*qixz*(dufld(6,i)-dufld(1,i))
      &               + (qixx-qizz)*dufld(4,i)
-         trq(3) = diy*ufld(1,i) - dix*ufld(2,i)
+         tep(3) = diy*ufld(1,i) - dix*ufld(2,i)
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -3597,7 +3597,7 @@ c
       real*8 xufield,yufield
       real*8 zufield
       real*8 fix(3),fiy(3),fiz(3)
-      real*8 trq(3)
+      real*8 tep(3)
 c
 c
 c     zero out the polarization energy and derivatives
@@ -3660,10 +3660,10 @@ c
          uix = 0.5d0 * (uind(1,i)+uinp(1,i))
          uiy = 0.5d0 * (uind(2,i)+uinp(2,i))
          uiz = 0.5d0 * (uind(3,i)+uinp(3,i))
-         trq(1) = term * (diy*uiz-diz*uiy)
-         trq(2) = term * (diz*uix-dix*uiz)
-         trq(3) = term * (dix*uiy-diy*uix)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         tep(1) = term * (diy*uiz-diz*uiy)
+         tep(2) = term * (diz*uix-dix*uiz)
+         tep(3) = term * (dix*uiy-diy*uix)
+         call torque (i,tep,fix,fiy,fiz,dep)
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -3702,10 +3702,10 @@ c
          yufield = -term * (yu+yup)
          zufield = -term * (zu+zup)
          do i = 1, npole
-            trq(1) = rpole(3,i)*zufield - rpole(4,i)*yufield
-            trq(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
-            trq(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
-            call torque (i,trq,fix,fiy,fiz,dep)
+            tep(1) = rpole(3,i)*zufield - rpole(4,i)*yufield
+            tep(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
+            tep(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
+            call torque (i,tep,fix,fiy,fiz,dep)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -3845,7 +3845,7 @@ c
       real*8 prc3(3),prc5(3),prc7(3)
       real*8 drc3(3),drc5(3),drc7(3)
       real*8 urc3(3),urc5(3)
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 bn(0:4)
       real*8, allocatable :: pscale(:)
@@ -4502,19 +4502,19 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         trq(1) = diz*ufld(2,i) - diy*ufld(3,i)
+         tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))
      &               + (qizz-qiyy)*dufld(5,i)
-         trq(2) = dix*ufld(3,i) - diz*ufld(1,i)
+         tep(2) = dix*ufld(3,i) - diz*ufld(1,i)
      &               - qiyz*dufld(2,i) + qixy*dufld(5,i)
      &               + 2.0d0*qixz*(dufld(6,i)-dufld(1,i))
      &               + (qixx-qizz)*dufld(4,i)
-         trq(3) = diy*ufld(1,i) - dix*ufld(2,i)
+         tep(3) = diy*ufld(1,i) - dix*ufld(2,i)
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)
@@ -4630,7 +4630,7 @@ c
       real*8 hsq,expterm
       real*8 term,pterm
       real*8 vterm,struc2
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 cphid(4),cphip(4)
       real*8 a(3,3),ftc(10,10)
@@ -4974,19 +4974,19 @@ c
 c     resolve site torques then increment forces and virial
 c
       do i = 1, npole
-         trq(1) = cmp(4,i)*cphidp(3,i) - cmp(3,i)*cphidp(4,i)
+         tep(1) = cmp(4,i)*cphidp(3,i) - cmp(3,i)*cphidp(4,i)
      &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphidp(10,i)
      &               + cmp(9,i)*cphidp(8,i) + cmp(10,i)*cphidp(6,i)
      &               - cmp(8,i)*cphidp(9,i) - cmp(10,i)*cphidp(7,i)
-         trq(2) = cmp(2,i)*cphidp(4,i) - cmp(4,i)*cphidp(2,i)
+         tep(2) = cmp(2,i)*cphidp(4,i) - cmp(4,i)*cphidp(2,i)
      &               + 2.0d0*(cmp(5,i)-cmp(7,i))*cphidp(9,i)
      &               + cmp(8,i)*cphidp(10,i) + cmp(9,i)*cphidp(7,i)
      &               - cmp(9,i)*cphidp(5,i) - cmp(10,i)*cphidp(8,i)
-         trq(3) = cmp(3,i)*cphidp(2,i) - cmp(2,i)*cphidp(3,i)
+         tep(3) = cmp(3,i)*cphidp(2,i) - cmp(2,i)*cphidp(3,i)
      &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphidp(8,i)
      &               + cmp(8,i)*cphidp(5,i) + cmp(10,i)*cphidp(9,i)
      &               - cmp(8,i)*cphidp(6,i) - cmp(9,i)*cphidp(10,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
          ii = ipole(i)
          iaz = zaxis(i)
          iax = xaxis(i)

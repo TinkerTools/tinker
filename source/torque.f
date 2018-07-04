@@ -27,7 +27,7 @@ c     Second Derivatives of Anisotropic Potentials with Respect to
 c     Geometrical Parameters", Molecular Physics, 82, 411-425 (1994)
 c
 c     C. Segui, L. G. Pedersen and T. A. Darden, "Towards an Accurate
-c     Representation of Electrostatis in Classical Force Fields:
+c     Representation of Electrostatics in Classical Force Fields:
 c     Efficient Implementation of Multipolar Interactions in
 c     Biomolecular Simulations", Journal of Chemical Physics, 120,
 c     73-87 (2004)
@@ -88,12 +88,12 @@ c
 c
 c     get the local frame type and the frame-defining atoms
 c
+      axetyp = polaxe(i)
+      if (axetyp .eq. 'None')  return
       ia = zaxis(i)
       ib = ipole(i)
       ic = xaxis(i)
       id = yaxis(i)
-      axetyp = polaxe(i)
-      if (axetyp .eq. 'None')  return
 c
 c     construct the three rotation axes for the local frame
 c

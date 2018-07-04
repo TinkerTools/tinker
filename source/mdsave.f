@@ -140,6 +140,7 @@ c
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
       end if
+      if (use_bounds)  call bounds
       call prtxyz (ixyz)
       close (unit=ixyz)
       write (iout,170)  idump
