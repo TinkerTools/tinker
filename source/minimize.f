@@ -243,7 +243,6 @@ c
       function minimiz1 (xx,g)
       use sizes
       use atoms
-      use bound
       use freeze
       use scales
       use usage

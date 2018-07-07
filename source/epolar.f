@@ -24,7 +24,7 @@ c
 c
 c     choose the method for summing over polarization interactions
 c
-      pairwise = .false.
+      pairwise = .true.
       if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
@@ -1907,14 +1907,11 @@ c
          end do
       end do
 c
-c     assign PME grid and perform 3-D FFT forward transform
-c
-      call grid_uind (fuind,fuinp)
-      call fftfront
-c
 c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
+         call grid_uind (fuind,fuinp)
+         call fftfront
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
          e = f * expterm * struc2

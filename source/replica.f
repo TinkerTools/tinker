@@ -32,6 +32,7 @@ c
 c
 c     only necessary if periodic boundaries are in use
 c
+      ncell = 1
       if (.not. use_bounds)  return
 c
 c     find the maximum sphere radius inscribed in periodic box

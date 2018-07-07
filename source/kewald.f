@@ -215,8 +215,8 @@ c
       external erfc
 c
 c
-c     set the tolerance value; use of 1.0d-8 results in large
-c     Ewald coefficients that ensure continuity in the gradient
+c     set the tolerance value; use of 1.0d-8 instead of 1.0d-6
+c     gives large coefficients that ensure gradient continuity
 c
       eps = 1.0d-8
 c

@@ -1865,7 +1865,7 @@ mechanic.o: inform.o iounit.o limits.o potent.o vdwpot.o
 merck.o: sizes.o
 merge.o: atomid.o atoms.o couple.o iounit.o refer.o sizes.o
 minima.o:
-minimize.o: atoms.o bound.o files.o freeze.o inform.o iounit.o keys.o scales.o sizes.o usage.o
+minimize.o: atoms.o files.o freeze.o inform.o iounit.o keys.o scales.o sizes.o usage.o
 minirot.o: files.o inform.o iounit.o keys.o math.o omega.o scales.o sizes.o zcoord.o
 minrigid.o: files.o group.o inform.o iounit.o keys.o math.o output.o rigid.o sizes.o
 mol2xyz.o: files.o iounit.o titles.o
