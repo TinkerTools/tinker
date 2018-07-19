@@ -1331,9 +1331,9 @@ c     cutoff values and neighbor lists for vdw interactions
 c
       use_list = .false.
       use_vlist = .false.
-      vdwcut = 6.0d0
-      vdwtaper = 5.4d0
-      lbuffer = 2.0d0
+      vdwcut = 5.0d0
+      vdwtaper = 4.5d0
+      lbuffer = 1.0d0
       boxsiz = min(xbox,ybox,zbox)
       if (boxsiz .gt. 2.0d0*(vdwcut+lbuffer)) then
          use_list = .true.

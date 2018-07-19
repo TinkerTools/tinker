@@ -204,6 +204,7 @@ c     write the electrostatic potential to a Tinker POT file
 c
          potfile = filename(1:leng)
          call suffix (potfile,'pot','new')
+         ipot = freeunit ()
          open (unit=ipot,file=potfile,status ='new')
          rewind (unit=ipot)
          write (ipot,140)  npgrid(1),title(1:ltitle)
