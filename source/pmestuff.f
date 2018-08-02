@@ -1191,6 +1191,7 @@ c
             tuv012 = tuv012 + tu01*v2
             tuv111 = tuv111 + tu11*v1
          end do
+         fdip_phi1(1,isite) = 0.0d0
          fdip_phi1(2,isite) = tuv100_1
          fdip_phi1(3,isite) = tuv010_1
          fdip_phi1(4,isite) = tuv001_1
@@ -1200,6 +1201,7 @@ c
          fdip_phi1(8,isite) = tuv110_1
          fdip_phi1(9,isite) = tuv101_1
          fdip_phi1(10,isite) = tuv011_1
+         fdip_phi2(1,isite) = 0.0d0
          fdip_phi2(2,isite) = tuv100_2
          fdip_phi2(3,isite) = tuv010_2
          fdip_phi2(4,isite) = tuv001_2
