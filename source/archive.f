@@ -339,7 +339,12 @@ c
                   call readxyz (iarc)
                   if (abort)  goto 220
                   if (modtyp .eq. 'FOLD') then
-                     if (use_bounds)  call bounds
+                     call unitcell
+                     if (use_bounds) then
+                        call lattice
+                        call molecule
+                        call bounds
+                     end if
                   else if (modtyp .eq. 'UNFOLD') then
                      nuse = n
                      do j = 1, n
