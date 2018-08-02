@@ -3457,7 +3457,8 @@ static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_IntArray_destroy(particles);
       OpenMM_DoubleArray_destroy(distanceParameters);
    }
-   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+   OpenMM_CustomCompoundBondForce_setUsesPeriodicBoundaryConditions (force, OpenMM_True);
+   OpenMM_System_addForce (system, (OpenMM_Force*) force);
 }
 
 static void setupAngleRestraints (OpenMM_System* system, FILE* log) {
@@ -3588,7 +3589,8 @@ static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_IntArray_destroy (bondGroups);
       OpenMM_DoubleArray_destroy (bondParameters);
    }
-   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+   OpenMM_CustomCentroidBondForce_setUsesPeriodicBoundaryConditions (force, OpenMM_True);
+   OpenMM_System_addForce (system, (OpenMM_Force*) force);
 }
 
 /*
@@ -4287,7 +4289,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
          mdstat_ (istep,dt,&totalEnergy,&potentialEnergy,&eksum,&temp,&pres);
       }
       if (*callMdSave) {
-         // bounds_ ();
+         bounds_ ();
          mdsave_ (istep,dt,&potentialEnergy,&eksum);
       }
    }
