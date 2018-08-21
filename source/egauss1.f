@@ -88,9 +88,6 @@ c
       real*8 vyx,vzx,vzy
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       character*6 mode
@@ -109,16 +106,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -360,7 +354,7 @@ c     compute the energy contribution for this interaction
 c
             if (proceed) then
                kt = jvdw(k)
-               do m = 1, ncell
+               do m = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)
@@ -503,9 +497,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       return
       end
@@ -565,9 +556,6 @@ c
       real*8 vyx,vzx,vzy
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -590,9 +578,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
       allocate (xsort(8*n))
       allocate (ysort(8*n))
@@ -601,8 +586,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -861,9 +846,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       deallocate (xsort)
       deallocate (ysort)
@@ -921,9 +903,6 @@ c
       real*8 vyx,vzx,vzy
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       character*6 mode
@@ -942,16 +921,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -1149,9 +1125,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       return
       end
@@ -1206,9 +1179,6 @@ c
       real*8 t1,t2
       real*8 a(maxgauss)
       real*8 b(maxgauss)
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       external erf
@@ -1227,16 +1197,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
       allocate (vscale(n))
 c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the extent of smoothing to be performed
@@ -1459,9 +1426,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       deallocate (vscale)
       return
       end

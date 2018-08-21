@@ -34,12 +34,12 @@ c
       use units
       use usage
       implicit none
-      integer i,j,k,m,it
+      integer i,j,k,it
       integer ixyz,imod
       integer init,stop
       integer nmode,mode
       integer natom,atmnum
-      integer nlist,ncopy
+      integer nlist
       integer offset,origin
       integer oldtype,newtype
       integer freeunit
@@ -55,17 +55,13 @@ c
       real*8 phi,theta,psi
       real*8 cphi,ctheta,cpsi
       real*8 sphi,stheta,spsi
-      real*8 dist2,cut2,reduce
+      real*8 dist2,cut2
       real*8 random,norm,weigh
       real*8, allocatable :: rad(:)
-      real*8, allocatable :: x0(:)
-      real*8, allocatable :: y0(:)
-      real*8, allocatable :: z0(:)
       real*8 a(3,3)
       logical exist,query
       logical opened,multi
-      logical append,refine
-      character*1 answer
+      logical append
       character*240 xyzfile
       character*240 modfile
       character*240 record
@@ -972,135 +968,7 @@ c
 c     create random box full of the current coordinates file
 c
       if (mode .eq. 19) then
-         ncopy = 0
-         call nextarg (string,exist)
-         if (exist)  read (string,*,err=430,end=430)  ncopy
-  430    continue
-         if (ncopy .eq. 0)  then
-            write (iout,440)
-  440       format (/,' Enter Number of Copies to Put in Box :  ',$)
-            read (input,450)  ncopy
-  450       format (i10)
-         end if
-         xbox = 0.0d0
-         ybox = 0.0d0
-         zbox = 0.0d0
-         call nextarg (string,exist)
-         if (exist)  read (string,*,err=460,end=460)  xbox
-         call nextarg (string,exist)
-         if (exist)  read (string,*,err=460,end=460)  ybox
-         call nextarg (string,exist)
-         if (exist)  read (string,*,err=460,end=460)  zbox
-  460    continue
-         do while (xbox .eq. 0.0d0)
-            write (iout,470)
-  470       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,480)  record
-  480       format (a240)
-            read (record,*,err=490,end=490)  xbox,ybox,zbox
-  490       continue
-         end do
-         if (ybox .eq. 0.0d0)  ybox = xbox
-         if (zbox .eq. 0.0d0)  zbox = xbox
-         refine = .true.
-         answer = 'Y'
-         query = .true.
-         call nextarg (string,exist)
-         if (exist) then
-            read (string,*,err=500,end=500)  answer
-            query = .false.
-         end if
-  500    continue
-         if (query) then
-            write (iout,510)
-  510       format (/,' Refine the Periodic Box Configuration',
-     &                 ' [Y] :  ',$)
-            read (input,520)  answer
-  520       format (a1)
-         end if
-         call upcase (answer)
-         if (answer .eq. 'N')  refine = .false.
-         orthogonal = .true.
-         xcm = 0.0d0
-         ycm = 0.0d0
-         zcm = 0.0d0
-         norm = 0.0d0
-         do i = 1, n
-            weigh = mass(i)
-            xcm = xcm + x(i)*weigh
-            ycm = ycm + y(i)*weigh
-            zcm = zcm + z(i)*weigh
-            norm = norm + weigh
-         end do
-         xcm = xcm / norm
-         ycm = ycm / norm
-         zcm = zcm / norm
-         allocate (x0(n))
-         allocate (y0(n))
-         allocate (z0(n))
-         reduce = 0.001d0
-         do i = 1, n
-            x(i) = x(i) - xcm
-            y(i) = y(i) - ycm
-            z(i) = z(i) - zcm
-            if (refine) then
-               x(i) = reduce * x(i)
-               y(i) = reduce * y(i)
-               z(i) = reduce * z(i)
-            end if
-            x0(i) = x(i)
-            y0(i) = y(i)
-            z0(i) = z(i)
-         end do
-         do k = 1, ncopy
-            offset = (k-1) * n
-            xcm = xbox * (random()-0.5d0)
-            ycm = ybox * (random()-0.5d0)
-            zcm = zbox * (random()-0.5d0)
-            phi = 360.0d0 * random ()
-            theta = 360.0d0 * random ()
-            psi = 360.0d0 * random ()
-            cphi = cos(phi)
-            sphi = sin(phi)
-            ctheta = cos(theta)
-            stheta = sin(theta)
-            cpsi = cos(psi)
-            spsi = sin(psi)
-            a(1,1) = ctheta * cphi
-            a(2,1) = spsi*stheta*cphi - cpsi*sphi
-            a(3,1) = cpsi*stheta*cphi + spsi*sphi
-            a(1,2) = ctheta * sphi
-            a(2,2) = spsi*stheta*sphi + cpsi*cphi
-            a(3,2) = cpsi*stheta*sphi - spsi*cphi
-            a(1,3) = -stheta
-            a(2,3) = ctheta * spsi
-            a(3,3) = ctheta * cpsi
-            do i = 1, n
-               j = i + offset
-               name(j) = name(i)
-               type(j) = type(i)
-               mass(j) = mass(i)
-               x(j) = a(1,1)*x0(i) + a(2,1)*y0(i) + a(3,1)*z0(i) + xcm
-               y(j) = a(1,2)*x0(i) + a(2,2)*y0(i) + a(3,2)*z0(i) + ycm
-               z(j) = a(1,3)*x0(i) + a(2,3)*y0(i) + a(3,3)*z0(i) + zcm
-               n12(j) = n12(i)
-               do m = 1, n12(i)
-                  i12(m,j) = i12(m,i) + offset
-               end do
-            end do
-         end do
-         deallocate (x0)
-         deallocate (y0)
-         deallocate (z0)
-         offset = 0
-         n = ncopy * n
-         if (refine) then
-            call boxmin
-         else
-            call lattice
-            call molecule
-            call bounds
-         end if
+         call makebox
       end if
 c
 c     solvate the current system by insertion into a solvent box
@@ -1123,8 +991,8 @@ c
       end if
       if (opened) then
          close (unit=imod)
-         write (iout,530)  modfile(1:trimtext(modfile))
-  530    format (/,' New Coordinates File Written To :  ',a)
+         write (iout,430)  modfile(1:trimtext(modfile))
+  430    format (/,' New Coordinates File Written To :  ',a)
       end if
       close (unit=ixyz)
 c
@@ -1221,6 +1089,196 @@ c
       end
 c
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine makebox  --  build periodic box from monomers  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "makebox" builds a periodic box of a desired size by randomly
+c     copying a specified number of monomers into a target box size,
+c     followed by optional excluded volume refinement
+c
+c
+      subroutine makebox
+      use sizes
+      use atomid
+      use atoms
+      use boxes
+      use couple
+      use iounit
+      implicit none
+      integer i,j,k,m
+      integer ncopy
+      integer offset
+      real*8 xcm,ycm,zcm
+      real*8 phi,theta,psi
+      real*8 cphi,ctheta,cpsi
+      real*8 sphi,stheta,spsi
+      real*8 random,reduce
+      real*8 norm,weigh
+      real*8, allocatable :: x0(:)
+      real*8, allocatable :: y0(:)
+      real*8, allocatable :: z0(:)
+      real*8 a(3,3)
+      logical exist,query
+      logical refine
+      character*1 answer
+      character*240 record
+      character*240 string
+c
+c
+c     get the number of copies of the monomer to be used
+c
+      ncopy = 0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=10,end=10)  ncopy
+   10 continue
+      if (ncopy .eq. 0)  then
+         write (iout,20)
+   20    format (/,' Enter Number of Copies to Put in Box :  ',$)
+         read (input,30)  ncopy
+   30    format (i10)
+      end if
+c
+c     find the size of the periodic box to be constructed
+c
+      xbox = 0.0d0
+      ybox = 0.0d0
+      zbox = 0.0d0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=40,end=40)  xbox
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=40,end=40)  ybox
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=40,end=40)  zbox
+   40 continue
+      do while (xbox .eq. 0.0d0)
+         write (iout,50)
+   50    format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+         read (input,60)  record
+   60    format (a240)
+         read (record,*,err=70,end=70)  xbox,ybox,zbox
+   70    continue
+      end do
+      if (ybox .eq. 0.0d0)  ybox = xbox
+      if (zbox .eq. 0.0d0)  zbox = xbox
+      orthogonal = .true.
+c
+c     decide whether to use excluded volume refinement
+c
+      refine = .true.
+      answer = 'Y'
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=80,end=80)  answer
+         query = .false.
+      end if
+   80 continue
+      if (query) then
+         write (iout,90)
+   90    format (/,' Refine the Periodic Box Configuration',
+     &              ' [Y] :  ',$)
+         read (input,100)  answer
+  100    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'N')  refine = .false.
+c
+c     center the monomer and reduce its size to avoid overlap
+c
+      xcm = 0.0d0
+      ycm = 0.0d0
+      zcm = 0.0d0
+      norm = 0.0d0
+      do i = 1, n
+         weigh = mass(i)
+         xcm = xcm + x(i)*weigh
+         ycm = ycm + y(i)*weigh
+         zcm = zcm + z(i)*weigh
+         norm = norm + weigh
+      end do
+      xcm = xcm / norm
+      ycm = ycm / norm
+      zcm = zcm / norm
+      allocate (x0(n))
+      allocate (y0(n))
+      allocate (z0(n))
+      reduce = 0.001d0
+      do i = 1, n
+         x(i) = x(i) - xcm
+         y(i) = y(i) - ycm
+         z(i) = z(i) - zcm
+         if (refine) then
+            x(i) = reduce * x(i)
+            y(i) = reduce * y(i)
+            z(i) = reduce * z(i)
+         end if
+         x0(i) = x(i)
+         y0(i) = y(i)
+         z0(i) = z(i)
+      end do
+c
+c     randomly place monomer copies in the periodic box
+c
+      do k = 1, ncopy
+         offset = (k-1) * n
+         xcm = xbox * (random()-0.5d0)
+         ycm = ybox * (random()-0.5d0)
+         zcm = zbox * (random()-0.5d0)
+         phi = 360.0d0 * random ()
+         theta = 360.0d0 * random ()
+         psi = 360.0d0 * random ()
+         cphi = cos(phi)
+         sphi = sin(phi)
+         ctheta = cos(theta)
+         stheta = sin(theta)
+         cpsi = cos(psi)
+         spsi = sin(psi)
+         a(1,1) = ctheta * cphi
+         a(2,1) = spsi*stheta*cphi - cpsi*sphi
+         a(3,1) = cpsi*stheta*cphi + spsi*sphi
+         a(1,2) = ctheta * sphi
+         a(2,2) = spsi*stheta*sphi + cpsi*cphi
+         a(3,2) = cpsi*stheta*sphi - spsi*cphi
+         a(1,3) = -stheta
+         a(2,3) = ctheta * spsi
+         a(3,3) = ctheta * cpsi
+         do i = 1, n
+            j = i + offset
+            name(j) = name(i)
+            type(j) = type(i)
+            mass(j) = mass(i)
+            x(j) = a(1,1)*x0(i) + a(2,1)*y0(i) + a(3,1)*z0(i) + xcm
+            y(j) = a(1,2)*x0(i) + a(2,2)*y0(i) + a(3,2)*z0(i) + ycm
+            z(j) = a(1,3)*x0(i) + a(2,3)*y0(i) + a(3,3)*z0(i) + zcm
+            n12(j) = n12(i)
+            do m = 1, n12(i)
+               i12(m,j) = i12(m,i) + offset
+            end do
+         end do
+      end do
+      deallocate (x0)
+      deallocate (y0)
+      deallocate (z0)
+      offset = 0
+      n = ncopy * n
+c
+c     optionally perform excluded volume coordinate refinement
+c
+      if (refine) then
+         call boxmin
+      else
+         call lattice
+         call molecule
+         call bounds
+      end if
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine boxmin  --  expand molecules into periodic box  ##
@@ -1250,7 +1308,7 @@ c
       real*8 minimum
       real*8 boxmin1
       real*8 grdmin
-      real*8 boxmax
+      real*8 boxsiz
       real*8, allocatable :: xx(:)
       external boxmin1
       external optsave
@@ -1273,18 +1331,18 @@ c     cutoff values and neighbor lists for vdw interactions
 c
       use_list = .false.
       use_vlist = .false.
-      vdwcut = 6.0d0
-      vdwtaper = 5.4d0
-      lbuffer = 2.0d0
-      boxmax = min(xbox,ybox,zbox)
-      if (boxmax .gt. 2.0d0*(vdwcut+lbuffer)) then
+      vdwcut = 5.0d0
+      vdwtaper = 4.5d0
+      lbuffer = 1.0d0
+      boxsiz = min(xbox,ybox,zbox)
+      if (boxsiz .gt. 2.0d0*(vdwcut+lbuffer)) then
          use_list = .true.
          use_vlist = .true.
          dovlst = .true.
          lbuf2 = (0.5d0*lbuffer)**2
          vbuf2 = (vdwcut+lbuffer)**2
          vbufx = (vdwcut+2.0d0*lbuffer)**2
-         maxvlst = int(sqrt(vbuf2)**3)
+         maxvlst = int(sqrt(vbuf2)**3) + 100
       end if
 c
 c     perform dynamic allocation of some global arrays
@@ -1644,12 +1702,10 @@ c
       use katoms
       use molcul
       implicit none
-      integer i,j,k
+      integer i,k
       integer start,stop
-      integer ntot,ncopy
       integer icount,iontyp
-      integer freeunit
-      integer ranatm
+      integer ncopy,ranatm
       real*8 xi,yi,zi
       real*8 xr,yr,zr,rik2
       real*8 close,close2
@@ -1668,37 +1724,39 @@ c
 c
 c     get the range atoms numbers constituting the solute
 c
- 10   continue
+   10 continue
       start = 0
       stop = 0
       call nextarg (string,exist)
       if (exist)  read (string,*,err=20,end=20)  start
       call nextarg (string,exist)
       if (exist)  read (string,*,err=20,end=20)  stop
- 20   continue
+   20 continue
       if (start.eq.0 .or. stop.eq.0) then
          write (iout,30)
- 30      format (/,' Enter Start and End Atom Numbers of Solute :  ',$)
+   30    format (/,' Enter Start and End Atom Numbers of Solute :  ',$)
          read (input,40)  record
- 40      format (a240)
+   40    format (a240)
       end if
       read (record,*,err=10,end=10)  start,stop
+      start = abs(start)
+      stop = abs(stop)
 c
 c     get the atom type of ion to be added and number of copies
 c
- 50   continue
+   50 continue
       iontyp = 0
       ncopy = 0
       call nextarg (string,exist)
       if (exist)  read (string,*,err=60,end=60)  iontyp
       call nextarg (string,exist)
       if (exist)  read (string,*,err=60,end=60)  ncopy
- 60   continue
+   60 continue
       if (iontyp.eq.0 .or. ncopy.eq.0) then
          write (iout,70)
- 70      format (/,' Enter Atom Type to Add and Number of Copies :  ',$)
+   70    format (/,' Enter Atom Type to Add and Number of Copies :  ',$)
          read (input,80)  record
- 80      format (a240)
+   80    format (a240)
       end if
       read (record,*,err=50,end=50)  iontyp,ncopy
 c
@@ -1728,7 +1786,7 @@ c
       header = .true.
       if (n .ge. 10000) then
          write (iout,90)
-  90     format (/,' Scan for Available Locations to Place Ions')
+   90    format (/,' Scan for Available Locations to Place Ions')
       end if
 c
 c     OpenMP directives for the major loop structure
@@ -1755,17 +1813,17 @@ c
                   goto 100
                end if
             end do
- 100        continue
+  100       continue
          end if
          icount = icount + 1
          if (mod(icount,10000) .eq. 0) then
             if (header) then
                header = .false.
                write (iout,110)
- 110           format ()
+  110          format ()
             end if
             write (iout,120)  10000*(icount/10000)
- 120        format (' Solvent Atoms Processed',i15)
+  120       format (' Solvent Atoms Processed',i15)
          end if
       end do
 c
@@ -1779,17 +1837,16 @@ c
       icount = n
       if (mod(icount,10000).ne.0 .and. icount.gt.10000) then
          write (iout,130)  icount
- 130     format (' Atoms Processed',i15)
+  130    format (' Atoms Processed',i15)
       end if
 c
 c     randomly replace the solvent molecules with ions
 c
-      ntot = n
       do i = 1, ncopy
          done = .false.
          do while (.not. done)
             rand = random ()
-            ranatm = int(rand*n)
+            ranatm = int(rand*dble(n)) + 1
 c
 c     check solute distance, then delete polyatomic molecule
 c
@@ -1803,13 +1860,12 @@ c
                   xmid = 0.0d0
                   ymid = 0.0d0
                   zmid = 0.0d0
-                  do j = start, stop
-                     weigh = mass(j)
-                     xmid = xmid + x(j)*weigh
-                     ymid = ymid + y(j)*weigh
-                     zmid = zmid + z(j)*weigh
-                     call delete (j)
-                     ntot = ntot - 1
+                  do k = start, stop
+                     weigh = mass(k)
+                     xmid = xmid + x(k)*weigh
+                     ymid = ymid + y(k)*weigh
+                     zmid = zmid + z(k)*weigh
+                     call delete (k)
                   end do
                   weigh = molmass(molcule(ranatm))
                   xion(i) = xmid / weigh
@@ -1821,7 +1877,7 @@ c
       end do
 c
 c     insert new monoatomic ions at saved centers of mass
-c     
+c
       do i = 1, ncopy
          n = n + 1
          name(n) = symbol(iontyp)

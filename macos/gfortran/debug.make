@@ -175,6 +175,7 @@ gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized ang
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized anneal.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized archive.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized attach.f
+gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized baoab.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized bar.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized basefile.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized beeman.f

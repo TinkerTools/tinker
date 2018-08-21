@@ -113,61 +113,34 @@ c     converts to the components of the minimum image distance
 c
 c
       subroutine imager (xr,yr,zr,i)
-      use sizes
       use boxes
       use cell
       implicit none
       integer i
       real*8 xr,yr,zr
-      real*8 xsize,ysize,zsize
-      real*8 xsize2,ysize2,zsize2
       real*8 xmove,ymove,zmove
 c
 c
-c     set dimensions for either single box or replicated cell
+c     set the distance to translate along each cell axis
 c
-      if (i .ge. 0) then
-         xsize = xcell
-         ysize = ycell
-         zsize = zcell
-         xsize2 = xcell2
-         ysize2 = ycell2
-         zsize2 = zcell2
-      else
-         xsize = xbox
-         ysize = ybox
-         zsize = zbox
-         xsize2 = xbox2
-         ysize2 = ybox2
-         zsize2 = zbox2
-      end if
-c
-c     compute the distance to translate along each cell axis
-c
-      if (i .le. 0) then
-         xmove = 0.0d0
-         ymove = 0.0d0
-         zmove = 0.0d0
-      else
-         xmove = icell(1,i) * xbox
-         ymove = icell(2,i) * ybox
-         zmove = icell(3,i) * zbox
-      end if
+      xmove = icell(1,i) * xbox
+      ymove = icell(2,i) * ybox
+      zmove = icell(3,i) * zbox
 c
 c     for orthogonal lattice, find the desired image directly
 c
       if (orthogonal) then
          xr = xr + xmove
-         do while (abs(xr) .gt. xsize2)
-            xr = xr - sign(xsize,xr)
+         do while (abs(xr) .gt. xcell2)
+            xr = xr - sign(xcell,xr)
          end do
          yr = yr + ymove
-         do while (abs(yr) .gt. ysize2)
-            yr = yr - sign(ysize,yr)
+         do while (abs(yr) .gt. ycell2)
+            yr = yr - sign(ycell,yr)
          end do
          zr = zr + zmove
-         do while (abs(zr) .gt. zsize2)
-            zr = zr - sign(zsize,zr)
+         do while (abs(zr) .gt. zcell2)
+            zr = zr - sign(zcell,zr)
          end do
 c
 c     for monoclinic lattice, convert "xr" and "zr" to
@@ -178,16 +151,16 @@ c
          zr = zr / beta_sin
          xr = xr - zr*beta_cos
          xr = xr + xmove
-         do while (abs(xr) .gt. xsize2)
-            xr = xr - sign(xsize,xr)
+         do while (abs(xr) .gt. xcell2)
+            xr = xr - sign(xcell,xr)
          end do
          yr = yr + ymove
-         do while (abs(yr) .gt. ysize2)
-            yr = yr - sign(ysize,yr)
+         do while (abs(yr) .gt. ycell2)
+            yr = yr - sign(ycell,yr)
          end do
          zr = zr + zmove
-         do while (abs(zr) .gt. zsize2)
-            zr = zr - sign(zsize,zr)
+         do while (abs(zr) .gt. zcell2)
+            zr = zr - sign(zcell,zr)
          end do
          xr = xr + zr*beta_cos
          zr = zr * beta_sin
@@ -201,16 +174,16 @@ c
          yr = (yr - zr*beta_term) / gamma_sin
          xr = xr - yr*gamma_cos - zr*beta_cos
          xr = xr + xmove
-         do while (abs(xr) .gt. xsize2)
-            xr = xr - sign(xsize,xr)
+         do while (abs(xr) .gt. xcell2)
+            xr = xr - sign(xcell,xr)
          end do
          yr = yr + ymove
-         do while (abs(yr) .gt. ysize2)
-            yr = yr - sign(ysize,yr)
+         do while (abs(yr) .gt. ycell2)
+            yr = yr - sign(ycell,yr)
          end do
          zr = zr + zmove
-         do while (abs(zr) .gt. zsize2)
-            zr = zr - sign(zsize,zr)
+         do while (abs(zr) .gt. zcell2)
+            zr = zr - sign(zcell,zr)
          end do
          xr = xr + yr*gamma_cos + zr*beta_cos
          yr = yr*gamma_sin + zr*beta_term

@@ -23,7 +23,7 @@ c
       use iounit
       use output
       implicit none
-      integer izmt
+      integer izmt,nask
       integer freeunit
       logical exist
       logical clash
@@ -41,7 +41,9 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter Internal Coordinate File Name :  ',$)
          read (input,20)  intfile
@@ -50,6 +52,7 @@ c
          call suffix (intfile,'int','old')
          inquire (file=intfile,exist=exist)
       end do
+      if (.not. exist)  call fatal
 c
 c     first open and then read the internal coordinates file
 c

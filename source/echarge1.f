@@ -76,9 +76,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
-      integer ic,kc
+      integer ii,in,ic,im
+      integer kk,kn,kc,km
       real*8 e,fgrp,de,dc
       real*8 f,fi,fik
       real*8 r,r2,rb,rb2
@@ -131,6 +130,7 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
+         im = molcule(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
@@ -161,6 +161,7 @@ c
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
+            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -232,6 +233,7 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
+                  if (im .ne. km)  einter = einter + e
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -262,11 +264,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + e
                end if
             end if
          end do
@@ -335,7 +332,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xc = xic - x(kc)
                   yc = yic - y(kc)
                   zc = zic - z(kc)
@@ -404,6 +401,7 @@ c     increment the energy and gradient values
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ec = ec + e
+                     einter = einter + e
                      dec(1,i) = dec(1,i) + dedx
                      dec(2,i) = dec(2,i) + dedy
                      dec(3,i) = dec(3,i) + dedz
@@ -436,10 +434,6 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                     einter = einter + e
                   end if
                end do
             end if
@@ -499,8 +493,9 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,k,ii,kk
-      integer in,ic,kn,kc
+      integer i,j,k
+      integer ii,in,ic,im
+      integer kk,kn,kc,km
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,fgrp,de,dc
@@ -576,6 +571,7 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
+         im = molcule(i)
          xic = xsort(rgx(ii))
          yic = ysort(rgy(ii))
          zic = zsort(rgz(ii))
@@ -630,6 +626,7 @@ c
             k = iion(kmap)
             kn = jion(kmap)
             kc = kion(kmap)
+            km = molcule(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -721,6 +718,7 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
+                  if (.not.prime .or. im.ne.km)  einter = einter + e
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -751,11 +749,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (.not.prime .or. molcule(i).ne.molcule(k))
-     &               einter = einter + e
                end if
             end if
    20       continue
@@ -822,9 +815,9 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
-      integer in,kn,ic,kc
+      integer i,j,k,kkk
+      integer ii,in,ic,im
+      integer kk,kn,kc,km
       real*8 e,fgrp,de,dc
       real*8 f,fi,fik
       real*8 r,r2,rb,rb2
@@ -887,6 +880,7 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
+         im = molcule(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
@@ -918,6 +912,7 @@ c
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
+            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -989,6 +984,7 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
+                  if (im .ne. km)  einter = einter + e
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1019,11 +1015,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + e
                end if
             end if
          end do
@@ -1089,8 +1080,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
+      integer ii,in,im
+      integer kk,kn,km
       real*8 e,de,efull
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
@@ -1180,6 +1171,7 @@ c
       do ii = 1, nion-1
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          usei = use(i)
          xi = x(i)
          yi = y(i)
@@ -1206,6 +1198,7 @@ c
          do kk = ii+1, nion
             k = iion(kk)
             kn = jion(kk)
+            km = molcule(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1245,6 +1238,10 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
+                  if (im .ne. km) then
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
+                  end if
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1269,13 +1266,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intramolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
-                  end if
                end if
             end if
          end do
@@ -1339,7 +1329,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = xi - x(k)
                   yr = yi - y(k)
                   zr = zi - z(k)
@@ -1378,6 +1368,8 @@ c     increment the energy and gradient values
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ec = ec + e
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
                      dec(1,i) = dec(1,i) + dedx
                      dec(2,i) = dec(2,i) + dedy
                      dec(3,i) = dec(3,i) + dedz
@@ -1404,11 +1396,6 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intramolecular energy
-c
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
                   end if
                end do
             end if
@@ -1471,7 +1458,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,kk,in,kn
+      integer ii,in,im
+      integer kk,kn,km
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,de,efull
@@ -1585,6 +1573,7 @@ c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
@@ -1635,6 +1624,7 @@ c
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
             kn = jion(kmap)
+            km = molcule(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -1694,6 +1684,10 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
+                  if (.not.prime .or. im.ne.km) then
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
+                  end if
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1718,13 +1712,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intramolecular energy
-c
-                  if (.not.prime .or. molcule(i).ne.molcule(k)) then
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
-                  end if
                end if
             end if
    20       continue
@@ -1794,9 +1781,9 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
-      integer in,kn
+      integer i,j,k,kkk
+      integer ii,in,im
+      integer kk,kn,km
       real*8 e,de,efull
       real*8 f,fi,fik,fs
       real*8 r,r2,rew
@@ -1894,6 +1881,7 @@ c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          usei = use(i)
          xi = x(i)
          yi = y(i)
@@ -1921,6 +1909,7 @@ c
             kk = elst(kkk,ii)
             k = iion(kk)
             kn = jion(kk)
+            km = molcule(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1960,6 +1949,10 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
+                  if (im .ne. km) then
+                     efull = (fik/rb) * scale
+                     einter = einter + efull
+                  end if
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1984,13 +1977,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intramolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
-                  end if
                end if
             end if
          end do
@@ -2051,8 +2037,8 @@ c
       use warp
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
+      integer ii,in,im
+      integer kk,kn,km
       real*8 e,de,fgrp
       real*8 r,r2,rb,rb2
       real*8 f,fi,fik
@@ -2109,6 +2095,7 @@ c
       do ii = 1, nion-1
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          usei = (use(i))
          xi = x(i)
          yi = y(i)
@@ -2135,6 +2122,7 @@ c
          do kk = ii+1, nion
             k = iion(kk)
             kn = jion(kk)
+            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -2211,6 +2199,7 @@ c
 c     increment the overall energy and derivative expressions
 c
                ec = ec + e
+               if (im .ne. km)  einter = einter + e
                dec(1,i) = dec(1,i) + dedx
                dec(2,i) = dec(2,i) + dedy
                dec(3,i) = dec(3,i) + dedz
@@ -2220,9 +2209,6 @@ c
 c
 c     increment the total intermolecular energy
 c
-               if (molcule(i) .ne. molcule(k)) then
-                  einter = einter + e
-               end if
             end if
          end do
 c

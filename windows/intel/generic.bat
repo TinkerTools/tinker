@@ -176,6 +176,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp angles.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp anneal.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp archive.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp attach.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp baoab.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bar.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp basefile.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp beeman.f

@@ -342,7 +342,7 @@ c
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 rc3(3),rc5(3),rc7(3)
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
@@ -919,7 +919,7 @@ c     evaluate all sites within the cutoff distance
 c
          do k = i, npole
             kk = ipole(k)
-            do jcell = 1, ncell
+            do jcell = 2, ncell
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi
@@ -1339,19 +1339,19 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         trq(1) = diz*ufld(2,i) - diy*ufld(3,i)
+         tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))
      &               + (qizz-qiyy)*dufld(5,i)
-         trq(2) = dix*ufld(3,i) - diz*ufld(1,i)
+         tep(2) = dix*ufld(3,i) - diz*ufld(1,i)
      &               - qiyz*dufld(2,i) + qixy*dufld(5,i)
      &               + 2.0d0*qixz*(dufld(6,i)-dufld(1,i))
      &               + (qixx-qizz)*dufld(4,i)
-         trq(3) = diy*ufld(1,i) - dix*ufld(2,i)
+         tep(3) = diy*ufld(1,i) - dix*ufld(2,i)
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
       end do
 c
 c     perform deallocation of some local arrays
@@ -1440,7 +1440,7 @@ c
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 rc3(3),rc5(3),rc7(3)
-      real*8 trq(3),fix(3)
+      real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
@@ -1978,19 +1978,19 @@ c
          qiyy = rpole(9,i)
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
-         trq(1) = diz*ufld(2,i) - diy*ufld(3,i)
+         tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))
      &               + (qizz-qiyy)*dufld(5,i)
-         trq(2) = dix*ufld(3,i) - diz*ufld(1,i)
+         tep(2) = dix*ufld(3,i) - diz*ufld(1,i)
      &               - qiyz*dufld(2,i) + qixy*dufld(5,i)
      &               + 2.0d0*qixz*(dufld(6,i)-dufld(1,i))
      &               + (qixx-qizz)*dufld(4,i)
-         trq(3) = diy*ufld(1,i) - dix*ufld(2,i)
+         tep(3) = diy*ufld(1,i) - dix*ufld(2,i)
      &               + qiyz*dufld(4,i) - qixz*dufld(5,i)
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
-         call torque (i,trq,fix,fiy,fiz,dep)
+         call torque (i,tep,fix,fiy,fiz,dep)
       end do
 c
 c     OpenMP directives for the major loop structure

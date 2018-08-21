@@ -274,9 +274,8 @@ c
       call upcase (answer)
       if (answer .eq. 'Y')  updateEachStep = .true.
 c
-c     initialize any holonomic constraints and setup dynamics
+c     perform the setup functions needed to run dynamics
 c
-      call shakeup
       call mdinit
 c
 c     get Tinker energy/gradient values for initial structure
@@ -289,7 +288,7 @@ c
 c
 c     map Tinker data structures to OpenMM wrapper structures
 c
-      call openmm_data ()
+      call ommdata ()
 c
 c     setup the required potential energy terms within OpenMM
 c
@@ -309,29 +308,33 @@ c
          write (iout,380)
   380    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'BUSSI') then
+      else if (integrate .eq. 'BAOAB') then
          write (iout,390)
-  390    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Bussi-Parrinello NPT Algorithm')
-      else if (integrate .eq. 'NOSE-HOOVER') then
+  390    format (/,' Constrained Stochastic Dynamics Trajectory',
+     &              ' via BAOAB Algorithm')
+      else if (integrate .eq. 'BUSSI') then
          write (iout,400)
   400    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Bussi-Parrinello NPT Algorithm')
+      else if (integrate .eq. 'NOSE-HOOVER') then
+         write (iout,410)
+  410    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
       else if (integrate .eq. 'GHMC') then
-         write (iout,410)
-  410    format (/,' Stochastic Dynamics Trajectory via',
+         write (iout,420)
+  420    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,420)
-  420    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
          write (iout,430)
   430    format (/,' Molecular Dynamics Trajectory via',
-     &              ' r-RESPA MTS Algorithm')
-      else
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'RESPA') then
          write (iout,440)
   440    format (/,' Molecular Dynamics Trajectory via',
+     &              ' r-RESPA MTS Algorithm')
+      else
+         write (iout,450)
+  450    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
 c
@@ -377,9 +380,9 @@ c     print performance and timing information
 c
       speed = 0.0d0
       if (elapsed .ne. 0.0d0)  speed = 86.4d0 * nstep * dt / elapsed
-      write (iout,450)  speed,elapsed,nstep,updateCalls,
+      write (iout,460)  speed,elapsed,nstep,updateCalls,
      &                  1000.0d0*dt,n,nthread
-  450 format (/,' Performance:  ns/day',9x,f12.4,
+  460 format (/,' Performance:  ns/day',9x,f12.4,
      &        /,15x,'Wall Time',6x,f12.4,
      &        /,15x,'Steps',14x,i8,
      &        /,15x,'Updates',12x,i8,

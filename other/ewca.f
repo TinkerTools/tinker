@@ -269,7 +269,7 @@ c     compute the energy contribution for this interaction
 c
             if (proceed) then
                kt = class(k)
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)
@@ -1119,7 +1119,7 @@ c
             if (proceed) then
                kt = class(k)
                km = molcule(k)
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)
@@ -2239,7 +2239,7 @@ c
             if (proceed) then
                kt = class(k)
                km = molcule(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)
@@ -2769,7 +2769,7 @@ c
             if (proceed) then
                kt = class(k)
                km = molcule(k)
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)

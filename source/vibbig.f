@@ -2012,9 +2012,6 @@ c
       real*8 cutoff,rdn
       real*8 amass(*)
       real*8 vector(*)
-      real*8, allocatable :: xred(:)
-      real*8, allocatable :: yred(:)
-      real*8, allocatable :: zred(:)
       logical first
       save first
       data first  / .true. /
@@ -2043,12 +2040,6 @@ c
          call rotpole
          call induce
       end if
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (xred(n))
-      allocate (yred(n))
-      allocate (zred(n))
 c
 c     calculate the "reduced" atomic coordinates
 c
@@ -2103,22 +2094,17 @@ c
             if (use_tors)  call etors2 (i)
             if (use_pitors)  call epitors2 (i)
             if (use_strtor)  call estrtor2 (i)
+            if (use_angtor)  call eangtor2 (i)
             if (use_tortor)  call etortor2 (i)
 c
 c     call the van der Waals Hessian component routines
 c
             if (use_vdw) then
-               if (vdwtyp .eq. 'LENNARD-JONES') then
-                  call elj2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'BUCKINGHAM') then
-                  call ebuck2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'MM3-HBOND') then
-                  call emm3hb2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'BUFFERED-14-7') then
-                  call ehal2 (i,xred,yred,zred)
-               else if (vdwtyp .eq. 'GAUSSIAN') then
-                  call egauss2 (i,xred,yred,zred)
-               end if
+               if (vdwtyp .eq. 'LENNARD-JONES')  call elj2 (i)
+               if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck2 (i)
+               if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb2 (i)
+               if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal2 (i)
+               if (vdwtyp .eq. 'GAUSSIAN')  call egauss2 (i)
             end if
 c
 c     call the electrostatic Hessian component routines
@@ -2163,11 +2149,5 @@ c
             end do
          end if
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (xred)
-      deallocate (yred)
-      deallocate (zred)
       return
       end

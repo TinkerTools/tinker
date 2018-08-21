@@ -348,6 +348,7 @@ struct {
 } imptor__;
 
 struct {
+   int maxask;
    int digits;
    int iprint;
    int iwrite;
@@ -413,6 +414,7 @@ struct {
    int nfree;
    int irest;
    int bmnmix;
+   double arespa;
    int dorest;
    int velsave;
    int frcsave;
@@ -774,6 +776,9 @@ struct {
    int* jvdw;
    int* ired;
    double* kred;
+   double* xred;
+   double* yred;
+   double* zred;
    double* radmin;
    double* epsilon;
    double* radmin4;
@@ -1193,10 +1198,11 @@ void set_imptor_data_ (int* nitors, int* iitors, double* itors1,
    imptor__.itors3 = itors3;
 }
 
-void set_inform_data_ (int* digits, int* iprint, int* iwrite, int* isend,
-                       int* silent, int* verbose, int* debug, int* holdup,
-                       int* abort) {
+void set_inform_data_ (int* maxask, int* digits, int* iprint, int* iwrite,
+                       int* isend, int* silent, int* verbose, int* debug,
+                       int* holdup, int* abort) {
 
+   inform__.maxask = *maxask;
    inform__.digits = *digits;
    inform__.iprint = *iprint;
    inform__.iwrite = *iwrite;
@@ -1263,14 +1269,15 @@ void set_limits_data_ (double* vdwcut, double* chgcut, double* dplcut,
    limits__.use_ulist = *use_ulist;
 }
 
-void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix, int* dorest,
-                       int* velsave, int* frcsave, int* uindsave,
+void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix, double* arespa,
+                       int* dorest, int* velsave, int* frcsave, int* uindsave,
                        char* integrate) {
 
    mdstuf__.nfree = *nfree;
    mdstuf__.irest = *irest;
-   mdstuf__.velsave = *bmnmix;
-   mdstuf__.velsave = *dorest;
+   mdstuf__.bmnmix = *bmnmix;
+   mdstuf__.arespa = *arespa;
+   mdstuf__.dorest = *dorest;
    mdstuf__.velsave = *velsave;
    mdstuf__.frcsave = *frcsave;
    mdstuf__.uindsave = *uindsave;
@@ -1284,7 +1291,8 @@ void set_moldyn_data_ (double* v, double* a, double* aalt) {
    moldyn__.aalt = aalt;
 }
 
-void set_molcul_data_ (int* nmol, int* imol, int* kmol, int* molcule, double* totmass, double* molmass) {
+void set_molcul_data_ (int* nmol, int* imol, int* kmol, int* molcule,
+                       double* totmass, double* molmass) {
 
    molcul__.nmol = *nmol;
    molcul__.imol = imol;
@@ -1712,15 +1720,18 @@ void set_usage_data_ (int* nuse, int* iuse, int* use) {
 }
 
 void set_vdw_data_ (int* nvdw, int* ivdw, int* jvdw, int* ired,
-                    double* kred, double* radmin, double* epsilon,
-                    double* radmin4, double* epsilon4, double* radhbnd,
-                    double* epshbnd) {
+                    double* kred, double* xred, double* yred, double* zred,
+                    double* radmin, double* epsilon, double* radmin4,
+                    double* epsilon4, double* radhbnd, double* epshbnd) {
 
    vdw__.nvdw = *nvdw;
    vdw__.ivdw = ivdw;
    vdw__.jvdw = jvdw;
    vdw__.ired = ired;
    vdw__.kred = kred;
+   vdw__.xred = xred;
+   vdw__.yred = yred;
+   vdw__.zred = zred;
    vdw__.radmin = radmin;
    vdw__.epsilon = epsilon;
    vdw__.radmin4 = radmin4;
@@ -3446,7 +3457,8 @@ static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_IntArray_destroy(particles);
       OpenMM_DoubleArray_destroy(distanceParameters);
    }
-   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+   OpenMM_CustomCompoundBondForce_setUsesPeriodicBoundaryConditions (force, OpenMM_True);
+   OpenMM_System_addForce (system, (OpenMM_Force*) force);
 }
 
 static void setupAngleRestraints (OpenMM_System* system, FILE* log) {
@@ -3577,7 +3589,8 @@ static void setupCentroidRestraints (OpenMM_System* system, FILE* log) {
       OpenMM_IntArray_destroy (bondGroups);
       OpenMM_DoubleArray_destroy (bondParameters);
    }
-   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+   OpenMM_CustomCentroidBondForce_setUsesPeriodicBoundaryConditions (force, OpenMM_True);
+   OpenMM_System_addForce (system, (OpenMM_Force*) force);
 }
 
 /*
@@ -3741,7 +3754,20 @@ static OpenMM_Platform* getCUDAPlatform (FILE* log) {
       (void) fprintf (log, "\n Platform CUDA :  Setting Device ID to %s \n", deviceId);
    }
 
-   OpenMM_Platform_setPropertyDefaultValue (platform, "Precision", "mixed" );
+   if (strncmp(openmm__.cudaPrecision,"DOUBLE",6) == 0) {
+      OpenMM_Platform_setPropertyDefaultValue (platform, "Precision",
+                                               "double" );
+   } else if (strncmp(openmm__.cudaPrecision,"SINGLE",6) == 0) {
+      OpenMM_Platform_setPropertyDefaultValue (platform, "Precision",
+                                               "single" );
+   } else {
+      OpenMM_Platform_setPropertyDefaultValue (platform, "Precision",
+                                               "mixed" );
+   }
+
+   if (log) {
+      (void) fprintf (log, "\n Platform CUDA :  Setting Precision to %s via CUDA-PRECISION\n", openmm__.cudaPrecision);
+   }
 
    return platform;
 }
@@ -3924,7 +3950,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
       OpenMM_CustomIntegrator* integrator = (OpenMM_CustomIntegrator*) omm->integrator;
       OpenMM_CustomIntegrator_addUpdateContextState (integrator);
 
-      int n = int (round ((*dt) / 0.00025));
+      int n = int (round ((*dt) / mdstuf__.arespa));
       char n_char[16] = {0};
       sprintf (n_char, "%d", n);
 
@@ -4051,8 +4077,15 @@ void openmm_init_ (void** ommHandle, double* dt) {
       exit (-1);
    }
 
-   omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
-                                           platform);
+   // modification of context creation to avoid bug on large systems
+
+   //omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
+   //                                        platform);
+   OpenMM_PropertyArray* properties = OpenMM_PropertyArray_create ();
+   OpenMM_PropertyArray_add (properties, "DisablePmeStream", "true");
+   omm->context = OpenMM_Context_create_3 (omm->system, omm->integrator,
+                                           platform, properties);
+   OpenMM_PropertyArray_destroy (properties);
 
    if (inform__.debug) {
       (void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
@@ -4256,7 +4289,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
          mdstat_ (istep,dt,&totalEnergy,&potentialEnergy,&eksum,&temp,&pres);
       }
       if (*callMdSave) {
-         // bounds_ ();
+         bounds_ ();
          mdsave_ (istep,dt,&potentialEnergy,&eksum);
       }
    }
@@ -4792,7 +4825,14 @@ int openmm_test_ (void) {
       exit (-1);
    }
 
-   context = OpenMM_Context_create_2 (system, integrator, platform);
+   // modification of context creation to avoid bug on large systems
+
+   //context = OpenMM_Context_create_2 (system, integrator, platform);
+   OpenMM_PropertyArray* properties = OpenMM_PropertyArray_create ();
+   OpenMM_PropertyArray_add (properties, "DisablePmeStream", "true");
+   context = OpenMM_Context_create_3 (system, integrator, platform,
+                                      properties);
+   OpenMM_PropertyArray_destroy (properties);
 
    OpenMM_Context_setPositions (context, initialPosInNm);
 

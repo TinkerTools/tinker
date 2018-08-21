@@ -494,26 +494,22 @@ c
          else if (volscale .eq. 'MOLECULAR') then
             dkin = dble(nmol) * kt * log(volold/volbox)
          else
-            dkin = dble(nmol) * kt * log(volold/volbox)
-c           dkin = dble(nuse) * kt * log(volold/volbox)
+            dkin = dble(nuse) * kt * log(volold/volbox)
          end if
 c
-c     compute the kinetic energy change from the actual velocities
+c     compute the kinetic energy change from the actual velocities;
+c     scale the kinetic energy change to match virial pressure
 c
-         dkin = 0.0d0
-         do i = 1, n
-            if (use(i)) then
-               term = 0.5d0 * mass(i) / convert
-               do j = 1, 3
-                  dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
-               end do
-            end if
-         end do
-         if (integrate .eq. 'RIGIDBODY') then
-            dkin = dkin * dble(ngrp)/dble(nuse)
-         else if (volscale .eq. 'MOLECULAR') then
-            dkin = dkin * dble(nmol)/dble(nuse)
-         end if
+c        dkin = 0.0d0
+c        do i = 1, n
+c           if (use(i)) then
+c              term = 0.5d0 * mass(i) / convert
+c              do j = 1, 3
+c                 dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
+c              end do
+c           end if
+c        end do
+c        dkin = 0.907d0 * dkin
 c
 c     acceptance ratio from Epot change, Ekin change and PV work
 c
@@ -800,31 +796,41 @@ c
       use virial
       implicit none
       integer i
-      real*8 energy,third
-      real*8 delta,step,scale
+      real*8 energy
+      real*8 third,delta
       real*8 volold,xboxold
       real*8 yboxold,zboxold
-      real*8 epos,eneg,temp
+      real*8 sneg,vneg,eneg
+      real*8 spos,vpos,epos
       real*8 vnxx,vnyy,vnzz
+      real*8 vnxy,vnxz,vnyz
+      real*8 temp,eksum
       real*8 dedv_vir,dedv_num
       real*8 pres_vir,pres_num
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
+      real*8, allocatable :: xf(:)
+      real*8, allocatable :: yf(:)
+      real*8, allocatable :: zf(:)
 c
 c
 c     set relative volume change for finite-differences
 c
       if (.not. use_bounds)  return
       third = 1.0d0 / 3.0d0
-      delta = 0.000001d0
-      step = 0.5d0 * delta * volbox
+      delta = 0.000003d0
+      sneg = 1.0d0 - 0.5d0*delta
+      spos = 1.0d0 + 0.5d0*delta
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (xold(n))
       allocate (yold(n))
       allocate (zold(n))
+      allocate (xf(n))
+      allocate (yf(n))
+      allocate (zf(n))
 c
 c     store original box dimensions and coordinate values
 c
@@ -837,111 +843,223 @@ c
          yold(i) = y(i)
          zold(i) = z(i)
       end do
+      do i = 1, n
+         xf(i) = x(i)*recip(1,1) + y(i)*recip(2,1) + z(i)*recip(3,1)
+         yf(i) = x(i)*recip(1,2) + y(i)*recip(2,2) + z(i)*recip(3,2)
+         zf(i) = x(i)*recip(1,3) + y(i)*recip(2,3) + z(i)*recip(3,3)
+      end do
 c
 c     get the xx-component of the numerical virial tensor
 c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
+      xbox = xboxold * sneg
       call lattice
+      vneg = volbox
       do i = 1, n
-         x(i) = xold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
+      xbox = xboxold * spos
       call lattice
+      vpos = volbox
       do i = 1, n
-         x(i) = xold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       epos = energy ()
       xbox = xboxold
       call lattice
       do i = 1, n
          x(i) = xold(i)
+         y(i) = yold(i)
+         z(i) = zold(i)
       end do
-      vnxx = 3.0d0 * (epos-eneg) / delta
+      vnxx = volbox * (epos-eneg)/(vpos-vneg)
+c
+c     get the xy-component of the numerical virial tensor
+c
+      xbox = xboxold * sneg
+      ybox = yboxold * sneg
+      call lattice
+      vneg = volbox
+      do i = 1, n
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
+      end do
+      eneg = energy ()
+      xbox = xboxold * spos
+      ybox = yboxold * spos
+      call lattice
+      vpos = volbox
+      do i = 1, n
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
+      end do
+      epos = energy ()
+      xbox = xboxold
+      ybox = yboxold
+      call lattice
+      do i = 1, n
+         x(i) = xold(i)
+         y(i) = yold(i)
+         z(i) = zold(i)
+      end do
+      vnxy = volbox * (epos-eneg)/(vpos-vneg)
+c
+c     get the xz-component of the numerical virial tensor
+c
+      xbox = xboxold * sneg
+      zbox = zboxold * sneg
+      call lattice
+      vneg = volbox
+      do i = 1, n
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
+      end do
+      eneg = energy ()
+      xbox = xboxold * spos
+      zbox = zboxold * spos
+      call lattice
+      vpos = volbox
+      do i = 1, n
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
+      end do
+      epos = energy ()
+      xbox = xboxold
+      zbox = zboxold
+      call lattice
+      do i = 1, n
+         x(i) = xold(i)
+         y(i) = yold(i)
+         z(i) = zold(i)
+      end do
+      vnxz = volbox * (epos-eneg)/(vpos-vneg)
 c
 c     get the yy-component of the numerical virial tensor
 c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      ybox = yboxold * scale
+      ybox = yboxold * sneg
       call lattice
+      vneg = volbox
       do i = 1, n
-         y(i) = yold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      ybox = yboxold * scale
+      ybox = yboxold * spos
       call lattice
+      vpos = volbox
       do i = 1, n
-         y(i) = yold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       epos = energy ()
       ybox = yboxold
       call lattice
       do i = 1, n
+         x(i) = xold(i)
          y(i) = yold(i)
+         z(i) = zold(i)
       end do
-      vnyy = 3.0d0 * (epos-eneg) / delta
+      vnyy = volbox * (epos-eneg)/(vpos-vneg)
+c
+c     get the yz-component of the numerical virial tensor
+c
+      ybox = yboxold * sneg
+      zbox = zboxold * sneg
+      call lattice
+      vneg = volbox
+      do i = 1, n
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
+      end do
+      eneg = energy ()
+      ybox = yboxold * spos
+      zbox = zboxold * spos
+      call lattice
+      vpos = volbox
+      do i = 1, n
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
+      end do
+      epos = energy ()
+      ybox = yboxold
+      zbox = zboxold
+      call lattice
+      do i = 1, n
+         x(i) = xold(i)
+         y(i) = yold(i)
+         z(i) = zold(i)
+      end do
+      vnyz = volbox * (epos-eneg)/(vpos-vneg)
 c
 c     get the zz-component of the numerical virial tensor
 c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      zbox = zboxold * scale
+      zbox = zboxold * sneg
       call lattice
+      vneg = volbox
       do i = 1, n
-         z(i) = zold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      zbox = zboxold * scale
+      zbox = zboxold * spos
       call lattice
+      vpos = volbox
       do i = 1, n
-         z(i) = zold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       epos = energy ()
       zbox = zboxold
       call lattice
       do i = 1, n
+         x(i) = xold(i)
+         y(i) = yold(i)
          z(i) = zold(i)
       end do
-      vnzz = 3.0d0 * (epos-eneg) / delta
+      vnzz = volbox * (epos-eneg)/(vpos-vneg)
 c
 c     print numerical values for the virial diagonal elements
 c
-      write (iout,10)  vnxx,vnyy,vnzz
-   10 format (/,' Numerical Virial Diagonal :',9x,3f12.3)
+      write (iout,10)  vnxx,vnxy,vnxz,vnxy,vnyy,vnyz,vnxz,vnyz,vnzz
+   10 format (/,' Numerical Virial Tensor :',11x,3f12.3,
+     &           /,37x,3f12.3,/,37x,3f12.3)
 c
-c     compute the numerical change in energy with box volume
+c     compute the numerical energy change with box volume
 c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
-      ybox = yboxold * scale
-      zbox = zboxold * scale
+      xbox = xboxold * sneg
+      ybox = yboxold * sneg
+      zbox = zboxold * sneg
       call lattice
+      vneg = volbox
       do i = 1, n
-         x(i) = xold(i) * scale
-         y(i) = yold(i) * scale
-         z(i) = zold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
-      ybox = yboxold * scale
-      zbox = zboxold * scale
+      xbox = xboxold * spos
+      ybox = yboxold * spos
+      zbox = zboxold * spos
       call lattice
+      vpos = volbox
       do i = 1, n
-         x(i) = xold(i) * scale
-         y(i) = yold(i) * scale
-         z(i) = zold(i) * scale
+         x(i) = xf(i)*lvec(1,1) + yf(i)*lvec(2,1) + zf(i)*lvec(3,1)
+         y(i) = xf(i)*lvec(1,2) + yf(i)*lvec(2,2) + zf(i)*lvec(3,2)
+         z(i) = xf(i)*lvec(1,3) + yf(i)*lvec(2,3) + zf(i)*lvec(3,3)
       end do
       epos = energy ()
       xbox = xboxold
@@ -959,18 +1077,22 @@ c
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
+      deallocate (xf)
+      deallocate (yf)
+      deallocate (zf)
 c
 c     find virial-based and finite difference values of dE/dV
 c
       dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
-      dedv_num = (epos-eneg) / (delta*volbox)
+      dedv_num = (epos-eneg) / (vpos-vneg)
 c
 c     get virial-based and finite difference isotropic pressure
 c
       temp = kelvin
       if (temp .eq. 0.0d0)  temp = 298.0d0
-      pres_vir = prescon * (dble(n)*gasconst*temp/volbox-dedv_vir)
-      pres_num = prescon * (dble(n)*gasconst*temp/volbox-dedv_num)
+      eksum = dble(n) * gasconst * temp / volbox
+      pres_vir = prescon * (eksum-dedv_vir)
+      pres_num = prescon * (eksum-dedv_num)
       write (iout,20)  nint(temp),pres_vir
    20 format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
      &           ' Atmospheres')

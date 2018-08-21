@@ -146,7 +146,7 @@ c     generate the replica coordinates for the sort arrays
 c
       if (use_replica) then
          k = nsite
-         do j = 1, ncell
+         do j = 2, ncell
             xmove = icell(1,j) * xbox
             ymove = icell(2,j) * ybox
             zmove = icell(3,j) * zbox
@@ -176,7 +176,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      nlight = (ncell+1) * nsite
+      nlight = ncell * nsite
       extent = 0
       if (allocated(rgx))  extent = size(rgx)
       if (extent .lt. nlight) then

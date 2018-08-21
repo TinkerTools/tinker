@@ -982,7 +982,7 @@ c
                redkk = 1.0d0 - redk
             end if
             if (use(i) .or. use(ii) .or. use(k) .or. use(kk)) then
-               do j = 1, ncell
+               do j = 2, ncell
                   kt = itype(k)
                   xr = xi - x_red(k)
                   yr = yi - y_red(k)
@@ -1260,7 +1260,7 @@ c
             k = nlist(kk)
             kc = swsite(k)
             if (use(i) .or. use(k)) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xc = xic - x(kc)
                   yc = yic - y(kc)
                   zc = zic - z(kc)

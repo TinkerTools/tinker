@@ -764,7 +764,7 @@ c     compute the energy contribution for this interaction
 c
             sk1 = 1.0d0 - sdpl(kdipole)
             sk2 = sdpl(kdipole)
-            do jcell = 1, ncell
+            do jcell = 2, ncell
                xk = x(k2) - x(k1)
                yk = y(k2) - y(k1)
                zk = z(k2) - z(k1)

@@ -16,7 +16,7 @@ c     "ehal2" calculates the buffered 14-7 van der Waals second
 c     derivatives for a single atom at a time
 c
 c
-      subroutine ehal2 (iatom,xred,yred,zred)
+      subroutine ehal2 (iatom)
       use sizes
       use atomid
       use atoms
@@ -35,8 +35,9 @@ c
       integer iatom,jcell
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
-      real*8 e,de,d2e,fgrp
-      real*8 eps,rv,rv7
+      real*8 e,de,d2e
+      real*8 fgrp,eps
+      real*8 rdn,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 redi,rediv
@@ -52,9 +53,6 @@ c
       real*8 rik6,rik7
       real*8 d2edx,d2edy,d2edz
       real*8 term(3,3)
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: vscale(:)
       logical proceed
       character*6 mode
@@ -68,8 +66,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -89,6 +87,17 @@ c
       end do
       return
    10 continue
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
 c
 c     determine the atoms involved via reduction factors
 c
@@ -380,7 +389,7 @@ c     compute the Hessian elements for this interaction
 c
             if (proceed) then
                kt = jvdw(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)

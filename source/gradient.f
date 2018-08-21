@@ -19,7 +19,6 @@ c
       subroutine gradient (energy,derivs)
       use sizes
       use atoms
-      use bound
       use couple
       use deriv
       use energi
@@ -165,10 +164,6 @@ c
          end do
       end do
       einter = 0.0d0
-c
-c     maintain any periodic boundary conditions
-c
-      if (use_bounds .and. .not.use_rigid)  call bounds
 c
 c     update the pairwise interaction neighbor lists
 c

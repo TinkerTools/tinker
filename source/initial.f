@@ -110,9 +110,9 @@ c     number of molecules in the system
 c
       nmol = 0
 c
-c     number of unit cell replicates
+c     number of unit cell and replicates
 c
-      ncell = 0
+      ncell = 1
 c
 c     number of atoms used in superposition
 c

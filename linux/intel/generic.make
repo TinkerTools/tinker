@@ -175,6 +175,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp angles.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp anneal.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp archive.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp attach.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp baoab.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp bar.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp basefile.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp beeman.f

@@ -62,6 +62,7 @@ c     set default parameters for the dynamics trajectory
 c
       integrate = 'BEEMAN'
       bmnmix = 8
+      arespa = 0.00025d0
       nfree = 0
       irest = 1
       velsave = .false.
@@ -109,6 +110,9 @@ c
             call upcase (integrate)
          else if (keyword(1:14) .eq. 'BEEMAN-MIXING ') then
             read (string,*,err=10,end=10)  bmnmix
+         else if (keyword(1:12) .eq. 'RESPA-INNER ') then
+            read (string,*,err=10,end=10)  arespa
+            arespa = 0.001d0 * arespa
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
@@ -309,8 +313,9 @@ c
                nfree = nfree - kratx(i)
             end do
          end if
-         if (isothermal .and. thermostat.ne.'ANDERSEN'.and.
-     &       integrate.ne.'STOCHASTIC' .and. integrate.ne.'GHMC') then
+         if (isothermal .and. thermostat.ne.'ANDERSEN' .and.
+     &       integrate.ne.'STOCHASTIC' .and. integrate.ne.'BAOAB' .and.
+     &       integrate.ne.'GHMC') then
             if (use_bounds) then
                nfree = nfree - 3
             else
@@ -355,6 +360,7 @@ c
       if (irest .eq. 0)  dorest = .false.
       if (nuse. ne. n)  dorest = .false.
       if (integrate .eq. 'STOCHASTIC')  dorest = .false.
+      if (integrate .eq. 'BAOAB')  dorest = .false.
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c

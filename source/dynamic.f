@@ -225,9 +225,8 @@ c
          end if
       end if
 c
-c     initialize any holonomic constraints and setup dynamics
+c     perform the setup functions needed to run dynamics
 c
-      call shakeup
       call mdinit
 c
 c     print out a header line for the dynamics computation
@@ -240,29 +239,33 @@ c
          write (iout,350)
   350    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'BUSSI') then
+      else if (integrate .eq. 'BAOAB') then
          write (iout,360)
-  360    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Bussi-Parrinello NPT Algorithm')
-      else if (integrate .eq. 'NOSE-HOOVER') then
+  360    format (/,' Constrained Stochastic Dynamics Trajectory',
+     &              ' via BAOAB Algorithm')
+      else if (integrate .eq. 'BUSSI') then
          write (iout,370)
   370    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Bussi-Parrinello NPT Algorithm')
+      else if (integrate .eq. 'NOSE-HOOVER') then
+         write (iout,380)
+  380    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
       else if (integrate .eq. 'GHMC') then
-         write (iout,380)
-  380    format (/,' Stochastic Dynamics Trajectory via',
+         write (iout,390)
+  390    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,390)
-  390    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
          write (iout,400)
   400    format (/,' Molecular Dynamics Trajectory via',
-     &              ' r-RESPA MTS Algorithm')
-      else
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'RESPA') then
          write (iout,410)
   410    format (/,' Molecular Dynamics Trajectory via',
+     &              ' r-RESPA MTS Algorithm')
+      else
+         write (iout,420)
+  420    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
@@ -274,6 +277,8 @@ c
             call verlet (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
             call sdstep (istep,dt)
+         else if (integrate .eq. 'BAOAB') then
+            call baoab (istep,dt)
          else if (integrate .eq. 'BUSSI') then
             call bussi (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then

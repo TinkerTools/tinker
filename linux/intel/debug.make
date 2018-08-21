@@ -175,6 +175,7 @@ ifort -c -g -warn all -check all angles.f
 ifort -c -g -warn all -check all anneal.f
 ifort -c -g -warn all -check all archive.f
 ifort -c -g -warn all -check all attach.f
+ifort -c -g -warn all -check all baoab.f
 ifort -c -g -warn all -check all bar.f
 ifort -c -g -warn all -check all basefile.f
 ifort -c -g -warn all -check all beeman.f

@@ -1,17 +1,22 @@
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine openmm_data  --  copy Tinker data to OpenMM  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###################################################
+c     ##  COPYRIGHT (C)  2017  by  Jay William Ponder  ##
+c     ##              All Rights Reserved              ##
+c     ###################################################
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ommdata  --  copy data from Tinker to OpenMM  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "openmm_data" uses calls to the OpenMM interface to copy data
+c     "ommdata" uses calls to the OpenMM interface to copy data
 c     from Tinker modules to the corresponding OpenMM structures
 c
 c
-      subroutine openmm_data ()
+      subroutine ommdata ()
       use sizes
       use angbnd
       use angpot
@@ -111,8 +116,8 @@ c
       call set_group_data (ngrp,kgrp,grplist,igrp,grpmass,wgrp,
      &                     use_group,use_intra,use_inter)
       call set_imptor_data (nitors,iitors,itors,itors2,itors3)
-      call set_inform_data (digits,iprint,iwrite,isend,silent,
-     &                      verbose,debug,holdup,abort)
+      call set_inform_data (maxask,digits,iprint,iwrite,isend,
+     &                      silent,verbose,debug,holdup,abort)
       call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
      &                      ttx,tty,tbf,tbx,tby,tbxy,ktt)
       call set_kvdws_data (rad,eps,rad4,eps4,reduct)
@@ -120,7 +125,7 @@ c
      &                      chgtaper,dpltaper,mpoletaper,ewaldcut,
      &                      usolvcut,use_ewald,use_lights,use_list,
      &                      use_vlist,use_clist,use_mlist,use_ulist)
-      call set_mdstuf_data (nfree,irest,bmnmix,dorest,velsave,
+      call set_mdstuf_data (nfree,irest,bmnmix,arespa,dorest,velsave,
      &                      frcsave,uindsave,integrate)
       call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)
@@ -180,8 +185,8 @@ c
       call set_urey_data (nurey,iury,uk,ul)
       call set_urypot_data (cury,qury,ureyunit)
       call set_usage_data (nuse,iuse,use)
-      call set_vdw_data (nvdw,ivdw,jvdw,ired,kred,radmin,epsilon,
-     &                   radmin4,epsilon4,radhbnd,epshbnd)
+      call set_vdw_data (nvdw,ivdw,jvdw,ired,kred,xred,yred,zred,radmin,
+     &                   epsilon,radmin4,epsilon4,radhbnd,epshbnd)
       call set_vdwpot_data (maxgauss,ngauss,igauss,abuck,bbuck,cbuck,
      &                      ghal,dhal,v2scale,v3scale,v4scale,v5scale,
      &                      use_vcorr,vdwindex,radtyp,radsiz,gausstyp,

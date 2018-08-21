@@ -161,7 +161,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xk = x(k2) - x(k1)
                   yk = y(k2) - y(k1)
                   zk = z(k2) - z(k1)

@@ -16,15 +16,12 @@ c     "ebuck2" calculates the Buckingham exp-6 van der Waals
 c     second derivatives for a single atom at a time
 c
 c
-      subroutine ebuck2 (i,xred,yred,zred)
+      subroutine ebuck2 (i)
       use sizes
       use iounit
       use warp
       implicit none
       integer i
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
 c
 c
 c     choose double loop, method of lights or smoothing version
@@ -35,9 +32,9 @@ c
      &              ' for Buckingham vdw Potential')
          call fatal
       else if (use_smooth) then
-         call ebuck2b (i,xred,yred,zred)
+         call ebuck2b (i)
       else
-         call ebuck2a (i,xred,yred,zred)
+         call ebuck2a (i)
       end if
       return
       end
@@ -54,7 +51,7 @@ c     "ebuck2a" calculates the Buckingham exp-6 van der Waals second
 c     derivatives using a double loop over relevant atom pairs
 c
 c
-      subroutine ebuck2a (iatom,xred,yred,zred)
+      subroutine ebuck2a (iatom)
       use sizes
       use atomid
       use atoms
@@ -74,7 +71,8 @@ c
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
       real*8 e,de,d2e,fgrp
-      real*8 p,p2,p6,p12,eps,rv
+      real*8 p,p2,p6,p12
+      real*8 eps,rv,rdn
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 redi,rediv
@@ -90,9 +88,6 @@ c
       real*8 expterm,expmerge
       real*8 rvterm,rvterm2
       real*8 term(3,3)
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: vscale(:)
       logical proceed
       character*6 mode
@@ -106,8 +101,8 @@ c
 c     set arrays needed to scale connected atom interactions
 c
       do i = 1, n
-         vscale(i) = 1.0d0
          iv14(i) = 0
+         vscale(i) = 1.0d0
       end do
 c
 c     set the coefficients for the switching function
@@ -134,6 +129,17 @@ c
       end do
       return
    10 continue
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
 c
 c     determine the atoms involved via reduction factors
 c
@@ -429,7 +435,7 @@ c     compute the Hessian elements for this interaction
 c
             if (proceed) then
                kt = jvdw(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)
@@ -663,15 +669,12 @@ c     derivatives via a Gaussian approximation for use with potential
 c     energy smoothing
 c
 c
-      subroutine ebuck2b (i,xred,yred,zred)
+      subroutine ebuck2b (i)
       use sizes
       use math
       use vdwpot
       implicit none
       integer i
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
 c
 c
 c     set coefficients for a two-Gaussian fit to MM2 vdw form
@@ -684,6 +687,6 @@ c
 c
 c     compute Gaussian approximation to the Buckingham potential
 c
-      call egauss2 (i,xred,yred,zred)
+      call egauss2 (i)
       return
       end

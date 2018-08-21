@@ -175,6 +175,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp anneal.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp archive.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp attach.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp baoab.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp bar.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp basefile.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp beeman.f

@@ -110,6 +110,10 @@ c
       if (use_geom)  call kgeom
       if (use_extra)  call kextra
 c
+c     set any holonomic interatomic distance constraints
+c
+      call shakeup
+c
 c     set hybrid parameter values for free energy perturbation
 c
       call mutate

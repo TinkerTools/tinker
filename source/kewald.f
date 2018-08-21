@@ -100,7 +100,7 @@ c
          if (keyword(1:12) .eq. 'FFT-PACKAGE ') then
             call getword (record,ffttyp,next)
          else if (keyword(1:12) .eq. 'EWALD-ALPHA ') then
-            read (string,*,err=20)  aewald
+            read (string,*,err=20,end=20)  aewald
          else if (keyword(1:15) .eq. 'EWALD-BOUNDARY ') then
             boundary = 'VACUUM'
          else if (keyword(1:9) .eq. 'PME-GRID ') then
@@ -112,7 +112,7 @@ c
             if (ifft2 .eq. 0)  ifft2 = ifft1
             if (ifft3 .eq. 0)  ifft3 = ifft1
          else if (keyword(1:10) .eq. 'PME-ORDER ') then
-            read (string,*,err=20)  bsorder
+            read (string,*,err=20,end=20)  bsorder
          end if
    20    continue
       end do
@@ -215,8 +215,8 @@ c
       external erfc
 c
 c
-c     set the tolerance value; use of 1.0d-8 results in large
-c     Ewald coefficients that ensure continuity in the gradient
+c     set the tolerance value; use of 1.0d-8 instead of 1.0d-6
+c     gives large coefficients that ensure gradient continuity
 c
       eps = 1.0d-8
 c

@@ -212,7 +212,8 @@ c     #################################################################
 c
 c
 c     "wiggle" applies a random perturbation to the atomic coordinates
-c     to avoid numerical instabilities for symmetrical structures
+c     to avoid numerical instabilities for various linear, planar and
+c     symmetric structures
 c
 c
       subroutine wiggle
@@ -223,7 +224,7 @@ c
       real*8 vector(3)
 c
 c
-c     apply a small perturbation of fixed magnitude to each atom
+c     apply a small perturbation to the position of each atom
 c
       size = 0.000001d0
       do i = 1, na

@@ -21,7 +21,6 @@ c
       use sizes
       use analyz
       use atoms
-      use bound
       use energi
       use group
       use inter
@@ -157,10 +156,6 @@ c
 c     zero out the total intermolecular energy
 c
       einter = 0.0d0
-c
-c     maintain any periodic boundary conditions
-c
-      if (use_bounds .and. .not.use_group)  call bounds
 c
 c     remove any previous use of the replicates method
 c

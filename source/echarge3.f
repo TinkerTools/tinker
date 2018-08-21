@@ -79,9 +79,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
-      integer ic,kc
+      integer ii,in,ic,im
+      integer kk,kn,kc,km
       real*8 e,fgrp
       real*8 r,r2,rb
       real*8 f,fi,fik
@@ -140,6 +139,7 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
+         im = molcule(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
@@ -170,6 +170,7 @@ c
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
+            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -211,19 +212,15 @@ c
                      e = e*taper + trans
                   end if
 c
-c     scale the interaction based on its group membership
-c
-                  if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy components
 c
                   if (e .ne. 0.0d0) then
+                     if (use_group)  e = e * fgrp
                      nec = nec + 1
                      ec = ec + e
                      aec(i) = aec(i) + 0.5d0*e
                      aec(k) = aec(k) + 0.5d0*e
-                     if (molcule(i) .ne. molcule(k))
-     &                  einter = einter + e
+                     if (im .ne. km)  einter = einter + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -313,7 +310,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xc = xic - x(kc)
                   yc = yic - y(kc)
                   zc = zic - z(kc)
@@ -350,13 +347,10 @@ c
                         e = e*taper + trans
                      end if
 c
-c     scale the interaction based on its group membership
-c
-                     if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy components
 c
                      if (e .ne. 0.0d0) then
+                        if (use_group)  e = e * fgrp
                         if (i .eq. k)  e = 0.5d0 * e
                         nec = nec + 1
                         ec = ec + e
@@ -446,8 +440,9 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k,ii,kk
-      integer in,ic,kn,kc
+      integer i,j,k
+      integer ii,in,ic,im
+      integer kk,kn,kc,km
       integer kgy,kgz,kmap
       integer start,stop
       integer ikmin,ikmax
@@ -530,6 +525,7 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
+         im = molcule(i)
          usei = (use(i) .or. use(ic))
          xic = xsort(rgx(ii))
          yic = ysort(rgy(ii))
@@ -584,6 +580,7 @@ c
             k = iion(kmap)
             kn = jion(kmap)
             kc = kion(kmap)
+            km = molcule(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -644,19 +641,15 @@ c
                      e = e*taper + trans
                   end if
 c
-c     scale the interaction based on its group membership
-c
-                  if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy components
 c
                   if (e .ne. 0.0d0) then
+                     if (use_group)  e = e * fgrp
                      nec = nec + 1
                      ec = ec + e
                      aec(i) = aec(i) + 0.5d0*e
                      aec(k) = aec(k) + 0.5d0*e
-                     if (.not.prime .or. molcule(i).ne.molcule(k))
-     &                  einter = einter + e
+                     if (.not.prime .or. im.ne.km)  einter = einter + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -758,10 +751,9 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
-      integer in,kn
-      integer ic,kc
+      integer i,j,k,kkk
+      integer ii,in,ic,im
+      integer kk,kn,kc,km
       real*8 e,fgrp
       real*8 r,r2,rb
       real*8 f,fi,fik
@@ -830,6 +822,7 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
+         im = molcule(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
@@ -861,6 +854,7 @@ c
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
+            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -902,19 +896,15 @@ c
                      e = e*taper + trans
                   end if
 c
-c     scale the interaction based on its group membership
-c
-                  if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy components
 c
                   if (e .ne. 0.0d0) then
+                     if (use_group)  e = e * fgrp
                      nec = nec + 1
                      ec = ec + e
                      aec(i) = aec(i) + 0.5d0*e
                      aec(k) = aec(k) + 0.5d0*e
-                     if (molcule(i) .ne. molcule(k))
-     &                  einter = einter + e
+                     if (im .ne. km)  einter = einter + e
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1004,8 +994,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
+      integer ii,in,im
+      integer kk,kn,km
       real*8 e,efull
       real*8 f,fi,fik
       real*8 fs,fgrp
@@ -1099,6 +1089,7 @@ c
       do ii = 1, nion-1
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          usei = use(i)
          xi = x(i)
          yi = y(i)
@@ -1125,6 +1116,7 @@ c
          do kk = ii+1, nion
             k = iion(kk)
             kn = jion(kk)
+            km = molcule(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1150,17 +1142,16 @@ c
                   if (use_group)  scale = scale * fgrp
                   scaleterm = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scaleterm)
-                  ec = ec + e
 c
 c     increment the overall charge-charge energy components
 c
+                  ec = ec + e
                   efull = (fik/rb) * scale
                   if (efull .ne. 0.0d0) then
                      nec = nec + 1
                      aec(i) = aec(i) + 0.5d0*efull
                      aec(k) = aec(k) + 0.5d0*efull
-                     if (molcule(i) .ne. molcule(k))
-     &                  einter = einter + efull
+                     if (im .ne. km)  einter = einter + efull
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1245,7 +1236,7 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               do j = 1, ncell
+               do j = 2, ncell
                   xr = xi - x(k)
                   yr = yi - y(k)
                   zr = zi - z(k)
@@ -1267,10 +1258,10 @@ c
                      scaleterm = scale - 1.0d0
                      e = (fik/rb) * (erfterm+scaleterm)
                      if (i .eq. k)  e = 0.5d0 * e
-                     ec = ec + e
 c
 c     increment the overall charge-charge energy component
 c
+                     ec = ec + e
                      efull = (fik/rb) * scale
                      if (i .eq. k)  efull = 0.5d0 * efull
                      if (efull .ne. 0.0d0) then
@@ -1364,7 +1355,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,in,kn
+      integer ii,in,im
+      integer kk,kn,km
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,efull
@@ -1482,6 +1474,7 @@ c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
@@ -1532,6 +1525,7 @@ c
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
             kn = jion(kmap)
+            km = molcule(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -1577,16 +1571,16 @@ c
                   end if
                   scaleterm = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scaleterm)
-                  ec = ec + e
 c
 c     increment the overall charge-charge energy component
 c
+                  ec = ec + e
                   efull = (fik/rb) * scale
                   if (efull .ne. 0.0d0) then
                      nec = nec + 1
                      aec(i) = aec(i) + 0.5d0*efull
                      aec(k) = aec(k) + 0.5d0*efull
-                     if (.not.prime .or. molcule(i).ne.molcule(k))
+                     if (.not.prime .or. im.ne.km)
      &                  einter = einter + efull
                   end if
 c
@@ -1688,9 +1682,9 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
-      integer in,kn
+      integer i,j,k,kkk
+      integer ii,in,im
+      integer kk,kn,km
       real*8 e,efull
       real*8 f,fi,fik
       real*8 fs,fgrp
@@ -1793,6 +1787,7 @@ c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          usei = use(i)
          xi = x(i)
          yi = y(i)
@@ -1820,6 +1815,7 @@ c
             kk = elst(kkk,ii)
             k = iion(kk)
             kn = jion(kk)
+            km = molcule(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1845,17 +1841,16 @@ c
                   if (use_group)  scale = scale * fgrp
                   scaleterm = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scaleterm)
-                  ec = ec + e
 c
 c     increment the overall charge-charge energy component
 c
+                  ec = ec + e
                   efull = (fik/rb) * scale
                   if (efull .ne. 0.0d0) then
                      nec = nec + 1
                      aec(i) = aec(i) + 0.5d0*efull
                      aec(k) = aec(k) + 0.5d0*efull
-                     if (molcule(i) .ne. molcule(k))
-     &                  einter = einter + efull
+                     if (im .ne. km)  einter = einter + efull
                   end if
 c
 c     print a message if the energy of this interaction is large
@@ -1940,8 +1935,8 @@ c
       use warp
       implicit none
       integer i,j,k
-      integer ii,kk
-      integer in,kn
+      integer ii,in,im
+      integer kk,kn,km
       real*8 e,fgrp
       real*8 r,r2,rb,rb2
       real*8 f,fi,fik
@@ -2005,6 +2000,7 @@ c
       do ii = 1, nion-1
          i = iion(ii)
          in = jion(ii)
+         im = molcule(i)
          usei = (use(i))
          xi = x(i)
          yi = y(i)
@@ -2031,6 +2027,7 @@ c
          do kk = ii+1, nion
             k = iion(kk)
             kn = jion(kk)
+            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -2069,19 +2066,15 @@ c
                   e = fik / (rb+width)
                end if
 c
-c     scale the interaction based on its group membership
-c
-               if (use_group)  e = e * fgrp
-c
 c     increment the overall charge-charge energy component
 c
                if (e .ne. 0.0d0) then
+                  if (use_group)  e = e * fgrp
                   nec = nec + 1
                   ec = ec + e
                   aec(i) = aec(i) + 0.5d0*e
                   aec(k) = aec(k) + 0.5d0*e
-                  if (molcule(i) .ne. molcule(k))
-     &               einter = einter + e
+                  if (im .ne. km)  einter = einter + e
                end if
 c
 c     print a message if the energy of this interaction is large

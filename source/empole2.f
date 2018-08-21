@@ -605,7 +605,7 @@ c
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 20
-            do jcell = 1, ncell
+            do jcell = 2, ncell
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi

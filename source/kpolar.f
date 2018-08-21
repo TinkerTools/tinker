@@ -289,7 +289,7 @@ c
 c     remove zero and undefined polarizable sites from the list
 c
       npolar = 0
-      if (use_polar) then
+      if (use_polar .or. use_solv) then
          npole = 0
          do i = 1, n
             if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then

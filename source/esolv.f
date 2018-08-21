@@ -1406,7 +1406,7 @@ c
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
+         ecav = evol * taper
 c
 c     find cavity energy using both volume and SASA terms
 c

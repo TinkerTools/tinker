@@ -209,9 +209,8 @@ c
       kelvin = hot
       tautemp = loose
 c
-c     initialize any holonomic constraints and setup dynamics
+c     perform the setup functions needed to run dynamics
 c
-      call shakeup
       call mdinit
 c
 c     print out a header lines for the equilibration phase

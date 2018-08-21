@@ -24,7 +24,7 @@ c
 c
 c     choose the method for summing over polarization interactions
 c
-      pairwise = .false.
+      pairwise = .true.
       if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
@@ -328,7 +328,7 @@ c     evaluate all sites within the cutoff distance
 c
             do k = i, npole
                kk = ipole(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = x(kk) - xi
                   yr = y(kk) - yi
                   zr = z(kk) - zi
@@ -879,7 +879,7 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = 0.5d0 * electric / dielec
-      mode = 'MPOLE'
+      mode = 'EWALD'
       call switch (mode)
 c
 c     compute the dipole polarization energy component
@@ -1096,7 +1096,7 @@ c     evaluate all sites within the cutoff distance
 c
             do k = i, npole
                kk = ipole(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = x(kk) - xi
                   yr = y(kk) - yi
                   zr = z(kk) - zi
@@ -1412,7 +1412,7 @@ c
 c     set conversion factor, cutoff and switching coefficients
 c
       f = 0.5d0 * electric / dielec
-      mode = 'MPOLE'
+      mode = 'EWALD'
       call switch (mode)
 c
 c     OpenMP directives for the major loop structure
@@ -1777,20 +1777,15 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(cmp)) then
-         if (size(cmp) .lt. 10*npole) then
-            deallocate (cmp)
-            deallocate (fmp)
-            deallocate (cphi)
-            deallocate (fphi)
-         end if
-      end if
-      if (.not. allocated(cmp)) then
-         allocate (cmp(10,npole))
-         allocate (fmp(10,npole))
-         allocate (cphi(10,npole))
-         allocate (fphi(20,npole))
-      end if
+      if (allocated(cmp) .and. size(cmp).lt.10*npole)
+     &   deallocate (cmp)
+      if (allocated(fmp) .and. size(fmp).lt.10*npole)
+     &   deallocate (fmp)
+      if (allocated(fphi) .and. size(fphi).lt.20*npole)
+     &   deallocate (fphi)
+      if (.not. allocated(cmp))  allocate (cmp(10,npole))
+      if (.not. allocated(fmp))  allocate (fmp(10,npole))
+      if (.not. allocated(fphi))  allocate (fphi(20,npole))
 c
 c     get the fractional to Cartesian transformation matrix
 c
@@ -1912,14 +1907,11 @@ c
          end do
       end do
 c
-c     assign PME grid and perform 3-D FFT forward transform
-c
-      call grid_uind (fuind,fuinp)
-      call fftfront
-c
 c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
+         call grid_uind (fuind,fuinp)
+         call fftfront
          expterm = 0.5d0 * pi / xbox
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
          e = f * expterm * struc2

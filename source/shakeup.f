@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "shakeup" initializes any holonomic constraints for use with
-c     the RATTLE algorithm during molecular dynamics
+c     the SHAKE and RATTLE algorithms
 c
 c
       subroutine shakeup
@@ -53,11 +53,13 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      allocate (iratx(maxatm))
-      allocate (kratx(maxatm))
-      allocate (irat(2,maxatm))
-      allocate (krat(maxatm))
-      allocate (ratimage(maxatm))
+      if (.not. allocated(iratx)) then
+         allocate (iratx(maxatm))
+         allocate (kratx(maxatm))
+         allocate (irat(2,maxatm))
+         allocate (krat(maxatm))
+         allocate (ratimage(maxatm))
+      end if
 c
 c     process keywords containing holonomic constraint options
 c

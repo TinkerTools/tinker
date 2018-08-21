@@ -204,6 +204,7 @@ c     write the electrostatic potential to a Tinker POT file
 c
          potfile = filename(1:leng)
          call suffix (potfile,'pot','new')
+         ipot = freeunit ()
          open (unit=ipot,file=potfile,status ='new')
          rewind (unit=ipot)
          write (ipot,140)  npgrid(1),title(1:ltitle)
@@ -1090,9 +1091,9 @@ c
             uky = uind(2,k)
             ukz = uind(3,k)
          else
-            uind(1,k) = 0.0d0
-            uind(2,k) = 0.0d0
-            uind(3,k) = 0.0d0
+            ukx = 0.0d0
+            uky = 0.0d0
+            ukz = 0.0d0
          end if
 c
 c     construct some intermediate quadrupole values
@@ -1193,6 +1194,11 @@ c
             call induce
          end if
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP    PARALLEL default(private) shared(j,npgrid,pgrid,epot,er)
+!$OMP    DO reduction(+:er) schedule(guided)
+c
 c     get the RMS potential error summed over grid points
 c
          do i = 1, npgrid(j)
@@ -1203,6 +1209,11 @@ c
             epot(1,i,j) = pot
             er = er + (epot(1,i,j)-epot(2,i,j))**2
          end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP    END DO
+!$OMP    END PARALLEL
 c
 c     get deviation from integral net molecular charge
 c
@@ -1251,6 +1262,8 @@ c
                call nblist
                call induce
             end if
+!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,er)
+!$OMP       DO reduction(+:er) schedule(guided)
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
@@ -1259,6 +1272,8 @@ c
                epot(1,i,j) = pot
                er = er + (epot(1,i,j)-epot(2,i,j))**2
             end do
+!$OMP       END DO
+!$OMP       END PARALLEL
             call momfull
             ec = ec + cscale*(netchg-dble(nint(netchg)))**2
             if (use_dpl) then
@@ -1296,6 +1311,8 @@ c
                call nblist
                call induce
             end if
+!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,er)
+!$OMP       DO reduction(+:er) schedule(guided)
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
@@ -1304,6 +1321,8 @@ c
                epot(1,i,j) = pot
                er = er + (epot(1,i,j)-epot(2,i,j))**2
             end do
+!$OMP       END DO
+!$OMP       END PARALLEL
             call momfull
             ec = ec + cscale*(netchg-dble(nint(netchg)))**2
             if (use_dpl) then

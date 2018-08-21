@@ -16,24 +16,21 @@ c     "elj2" calculates the Lennard-Jones 6-12 van der Waals second
 c     derivatives for a single atom at a time
 c
 c
-      subroutine elj2 (i,xred,yred,zred)
+      subroutine elj2 (i)
       use sizes
       use warp
       implicit none
       integer i
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
 c
 c
 c     choose the method for summing over pairwise interactions
 c
       if (use_stophat) then
-         call elj2c (i,xred,yred,zred)
+         call elj2c (i)
       else if (use_smooth) then
-         call elj2b (i,xred,yred,zred)
+         call elj2b (i)
       else
-         call elj2a (i,xred,yred,zred)
+         call elj2a (i)
       end if
       return
       end
@@ -50,7 +47,7 @@ c     "elj2a" calculates the Lennard-Jones 6-12 van der Waals second
 c     derivatives using a double loop over relevant atom pairs
 c
 c
-      subroutine elj2a (iatom,xred,yred,zred)
+      subroutine elj2a (iatom)
       use sizes
       use atomid
       use atoms
@@ -69,8 +66,9 @@ c
       integer iatom,jcell
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
-      real*8 e,de,d2e,fgrp
-      real*8 p6,p12,eps,rv
+      real*8 e,de,d2e
+      real*8 fgrp,p6,p12
+      real*8 eps,rv,rdn
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 redi,rediv
@@ -85,9 +83,6 @@ c
       real*8 d2taper
       real*8 d2edx,d2edy,d2edz
       real*8 term(3,3)
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: vscale(:)
       logical proceed
       character*6 mode
@@ -122,6 +117,17 @@ c
       end do
       return
    10 continue
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
 c
 c     determine the atoms involved via reduction factors
 c
@@ -406,7 +412,7 @@ c     compute the Hessian elements for this interaction
 c
             if (proceed) then
                kt = jvdw(k)
-               do jcell = 1, ncell
+               do jcell = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
                   zr = zi - zred(k)
@@ -628,15 +634,12 @@ c     derivatives via a Gaussian approximation for use with potential
 c     energy smoothing
 c
 c
-      subroutine elj2b (i,xred,yred,zred)
+      subroutine elj2b (i)
       use sizes
       use math
       use vdwpot
       implicit none
       integer i
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
 c
 c
 c     set coefficients for a two-Gaussian fit to Lennard-Jones
@@ -649,7 +652,7 @@ c
 c
 c     compute Gaussian approximation to Lennard-Jones potential
 c
-      call egauss2 (i,xred,yred,zred)
+      call egauss2 (i)
       return
       end
 c
@@ -665,7 +668,7 @@ c     "elj2c" calculates the Lennard-Jones 6-12 van der Waals second
 c     derivatives for use with stophat potential energy smoothing
 c
 c
-      subroutine elj2c (iatom,xred,yred,zred)
+      subroutine elj2c (iatom)
       use sizes
       use atomid
       use atoms
@@ -682,8 +685,8 @@ c
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
       real*8 de,d2e
-      real*8 p6,denom
-      real*8 eps,rv,fgrp
+      real*8 fgrp,p6,denom
+      real*8 eps,rv,rdn
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 redi,rediv
@@ -702,9 +705,6 @@ c
       real*8 width7,width8
       real*8 d2edx,d2edy,d2edz
       real*8 term(3,3)
-      real*8 xred(*)
-      real*8 yred(*)
-      real*8 zred(*)
       real*8, allocatable :: vscale(:)
       logical proceed
 c
@@ -733,6 +733,17 @@ c
       end do
       return
    10 continue
+c
+c     apply any reduction factor to the atomic coordinates
+c
+      do k = 1, nvdw
+         i = ivdw(k)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
+      end do
 c
 c     determine the atoms involved via reduction factors
 c

@@ -2723,7 +2723,7 @@ c
          end do
          do k = i+1, npole
             kk = ipole(k)
-            do jcell = 1, ncell
+            do jcell = 2, ncell
             xr = x(kk) - x(ii)
             yr = y(kk) - y(ii)
             zr = z(kk) - z(ii)

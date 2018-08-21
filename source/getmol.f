@@ -18,9 +18,10 @@ c
 c
       subroutine getmol
       use files
+      use inform
       use iounit
       implicit none
-      integer imdl
+      integer imdl,nask
       integer freeunit
       logical exist
       character*240 mdlfile
@@ -37,7 +38,9 @@ c
 c
 c     ask for the user specified input structure filename
 c
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter a MDL MOL File Name :  ',$)
          read (input,20)  mdlfile
@@ -46,6 +49,7 @@ c
          call suffix (mdlfile,'mol','old')
          inquire (file=mdlfile,exist=exist)
       end do
+      if (.not. exist)  call fatal
 c
 c     first open and then read the MDL MOL coordinates file
 c
