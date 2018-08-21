@@ -1985,6 +1985,7 @@ c
       use virial
       implicit none
       integer i,j,ii
+      integer iax,iay,iaz
       real*8 e,f,term,fterm
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz,uii
@@ -1995,6 +1996,11 @@ c
       real*8 xv,yv,zv,vterm
       real*8 xufield,yufield
       real*8 zufield
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
+      real*8 xiz,yiz,ziz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
       real*8 fix(3),fiy(3),fiz(3)
       real*8 tep(3)
 c
@@ -2063,6 +2069,40 @@ c
          tep(2) = term * (diz*uix-dix*uiz)
          tep(3) = term * (dix*uiy-diy*uix)
          call torque (i,tep,fix,fiy,fiz,dep)
+         ii = ipole(i)
+         iaz = zaxis(i)
+         iax = xaxis(i)
+         iay = yaxis(i)
+         if (iaz .eq. 0)  iaz = ii
+         if (iax .eq. 0)  iax = ii
+         if (iay .eq. 0)  iay = ii
+         xiz = x(iaz) - x(ii)
+         yiz = y(iaz) - y(ii)
+         ziz = z(iaz) - z(ii)
+         xix = x(iax) - x(ii)
+         yix = y(iax) - y(ii)
+         zix = z(iax) - z(ii)
+         xiy = x(iay) - x(ii)
+         yiy = y(iay) - y(ii)
+         ziy = z(iay) - z(ii)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     compute the cell dipole boundary correction term
@@ -3586,6 +3626,7 @@ c
       use virial
       implicit none
       integer i,j,ii
+      integer iax,iay,iaz
       real*8 e,f,term,fterm
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz,uii
@@ -3596,6 +3637,11 @@ c
       real*8 xv,yv,zv,vterm
       real*8 xufield,yufield
       real*8 zufield
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
+      real*8 xiz,yiz,ziz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
       real*8 fix(3),fiy(3),fiz(3)
       real*8 tep(3)
 c
@@ -3664,6 +3710,40 @@ c
          tep(2) = term * (diz*uix-dix*uiz)
          tep(3) = term * (dix*uiy-diy*uix)
          call torque (i,tep,fix,fiy,fiz,dep)
+         ii = ipole(i)
+         iaz = zaxis(i)
+         iax = xaxis(i)
+         iay = yaxis(i)
+         if (iaz .eq. 0)  iaz = ii
+         if (iax .eq. 0)  iax = ii
+         if (iay .eq. 0)  iay = ii
+         xiz = x(iaz) - x(ii)
+         yiz = y(iaz) - y(ii)
+         ziz = z(iaz) - z(ii)
+         xix = x(iax) - x(ii)
+         yix = y(iax) - y(ii)
+         zix = z(iax) - z(ii)
+         xiy = x(iay) - x(ii)
+         yiy = y(iay) - y(ii)
+         ziy = z(iay) - z(ii)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     compute the cell dipole boundary correction term
